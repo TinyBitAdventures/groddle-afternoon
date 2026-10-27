@@ -24,9 +24,13 @@ import { crowdScaleX } from '../avatar-anims.js';
 import {
   CROWNS_ID,
   CROWNS_LADDERS,
+  CROWNS_LOCK_POINTS,
+  CROWNS_LOCK_REACH,
   CROWNS_PLAYERS,
+  CROWNS_START_POINTS,
   CROWNS_STREET,
   CROWNS_TAG_DISTANCE,
+  CROWNS_TAG_REACH_Y,
   CROWNS_TEXT,
   CROWNS_TICKET,
   CROWNS_TITLE,
@@ -48,13 +52,24 @@ import {
   playLineScreenY,
   tagCrowns,
   tickCrowns,
-} from '../game-of-crowns.js?v=crowns-1';
+} from '../game-of-crowns.js?v=crowns-2';
 import { RACE_RIVALS } from '../races.js?v=races-4';
 import { wallsScreen } from '../street-model.js';
-import { addItem } from '../inventory.js?v=catalog-unified-7';
+import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { CROWNS_SPLASH, splashFor } from '../game-splash.js?v=g311-1';
+import { saveStore } from '../save-store.js?v=mp2-2';
+import {
+  CROWNS_MP_TEXT,
+  crownHolderPos,
+  crownMsNow,
+  crownsMpBoard,
+  crownsMpOutcome,
+  normalizeCrownsMatch,
+  normalizeCrownsReward,
+  normalizeCrownsState,
+} from '../crowns-mp.js?v=g334c-1';
 
 const ICON = 'assets/sprites/races/';
 const CROWN_DIR = 'assets/sprites/races/crowns/';
@@ -64,20 +79,10 @@ const AI_SPEED = 3.7; // px per 60 Hz frame (the avatar runs 4.4)
 
 
 /** Waiting-area ledges above the play line (screen coords) for the 4 starts. */
-const START_POINTS = Object.freeze([
-  { x: 1180, y: 243 },
-  { x: 1800, y: 245 },
-  { x: 660, y: 275 },
-  { x: 2330, y: 259 },
-]);
+const START_POINTS = CROWNS_START_POINTS;
 
 /** Four lock spots on ledges below the play line (screen coords). */
-const LOCK_POINTS = Object.freeze([
-  { x: 255, y: 1230 },
-  { x: 1030, y: 1576 },
-  { x: 1640, y: 1040 },
-  { x: 2400, y: 1034 },
-]);
+const LOCK_POINTS = CROWNS_LOCK_POINTS;
 
 export { CROWNS_LADDERS };
 
@@ -164,11 +169,12 @@ export async function startCrowns(engine, opts = {}) {
   if (engine.streetTsid !== CROWNS_STREET) {
     record.returnTo = { tsid: engine.streetTsid, x: Math.round(engine.player.x), y: Math.round(engine.player.y) };
   }
-  record.pendingTicket = opts.ticket || null;
-  pending = { at: Date.now() };
+  // Multiplayer (G334): the ticket was spent when the arena opened (crown_match).
+  record.pendingTicket = opts.mp ? null : opts.ticket || null;
+  pending = { at: Date.now(), mp: opts.mp || null };
   engine.instanceHold = CROWNS_ID;
   engine.save();
-  const start = START_POINTS[0];
+  const start = opts.mp?.spawn || START_POINTS[0];
   await engine.enter(CROWNS_STREET, { spawnX: start.x, spawnY: start.y, bypassFeatureGates: true, useTransition: opts.useTransition });
   return true;
 }
@@ -244,6 +250,7 @@ function setupArena(street, engine) {
 }
 
 function readyUp(engine) {
+  if (mp) return mpReadyUp(engine);
   if (!game || game.status !== 'staging') return;
   beginCrownsCountdown(game, Date.now());
   hud.ready.hidden = true;
@@ -451,7 +458,7 @@ function tick(dtMs, now, engine) {
     for (const id of Object.keys(game.players)) {
       if (id === game.itId) continue;
       const p = posOf(id, engine);
-      if (!p || Math.abs(p.x - holder.x) > CROWNS_TAG_DISTANCE || Math.abs(p.y - holder.y) > 70) continue;
+      if (!p || Math.abs(p.x - holder.x) > CROWNS_TAG_DISTANCE || Math.abs(p.y - holder.y) > CROWNS_TAG_REACH_Y) continue;
       const from = game.itId;
       const out = tagCrowns(game, id, from, now);
       if (out) {
@@ -468,7 +475,7 @@ function tick(dtMs, now, engine) {
     if (!ready) return;
     for (const id of Object.keys(game.players)) {
       const p = posOf(id, engine);
-      if (!p || Math.abs(p.x - lock.x) > 30 || Math.abs(p.y - lock.y) > 50) continue;
+      if (!p || Math.abs(p.x - lock.x) > CROWNS_LOCK_REACH.x || Math.abs(p.y - lock.y) > CROWNS_LOCK_REACH.y) continue;
       const out = pickupCrownLock(game, id, i, now);
       if (out.ok) {
         if (id === 'you') {
@@ -586,6 +593,633 @@ function publish(engine) {
   engine.setData('crownsLadders', String(CROWNS_LADDERS.length));
   engine.setData('crownsNavNodes', nav ? String(nav.nodes.length) : '0');
   engine.setData('crownsRivals', Object.values(actors).map((a) => `${a.id}@${Math.round(a.x)},${Math.round(a.y)}:${game ? Math.floor((game.players[a.id]?.crownMs || 0) / 1000) : 0}`).join('|'));
+  // Multiplayer (G334): status:round:holder:my crown seconds, and the board.
+  if (mp || engine.mode === 'multiplayer') {
+    const st = mp?.state;
+    engine.setData('crownsMp', mp ? `${mp.status}:${mp.round}:${st?.it || 0}:${Math.floor(crownMsNow(st, mp.myId, Date.now(), mp.winMs) / 1000)}` : 'idle');
+    engine.setData('crownsMpBoard', st ? crownsMpBoard(st, mp.myId, Date.now(), mp.winMs).map((r) => `${r.name}:${r.seconds}${r.it ? '*' : ''}`).join('|') : '');
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Multiplayer (G334): real players (js/crowns-mp.js, groddle-afternoon-server/crowns.go) */
+/* ------------------------------------------------------------------ */
+
+/*
+ * The server holds the crown: who has it, the tags, the locks, the clock
+ * below the play line and the winner, from where everyone stands. This
+ * client only shows it, sends Click to Start / Play Again / Leave, and
+ * applies its own rewards from what the server says: the winner's 200 iMG
+ * and 50 currants (the currants already in the site's ledger, applied once
+ * through ledgerReceipt), it_game:won / lost / seconds_with_crown. Solo never
+ * reaches any of this (mp is only set from a crown_match).
+ */
+let mp = null; // { match, street, slot, spawn, players, playLine, locks, winMs, myId, status, round, state, ready, acked, readyAt, below, result }
+let mpClient = null;
+const mpInvites = new Map(); // challenger id -> prompt uid
+let mpWaitUid = null;
+let mpMustWaitUid = null;
+let mpChallenging = false;
+let mpAccepting = false;
+let mpStarting = false;
+let mpLast = '';
+let mpAppliedIds = []; // crown_reward ids this save applied (kept in the slice)
+const mpCounted = new Set(); // match:round counters applied this session
+const mpApplying = new Set();
+const MP_APPLIED_KEEP = 20;
+const BLOCKED_SAVES = new Set(['conflict', 'signed-out', 'error', 'offline']);
+
+function isMp(engine) {
+  return engine?.mode === 'multiplayer' && Boolean(engine.query?.('realtimeClient'));
+}
+
+function mpNote(engine, what) {
+  mpLast = what;
+  engine.setData?.('crownsMpLast', what);
+}
+
+function mpBusy() {
+  return Boolean(mp || mpStarting || mpChallenging || mpAccepting || game || pending);
+}
+
+function mpClearPrompts(engine) {
+  for (const uid of [mpWaitUid, mpMustWaitUid]) if (uid) engine.removePrompt?.(uid);
+  mpWaitUid = null;
+  mpMustWaitUid = null;
+}
+
+/** The ticket back after a challenge that never became a game (inc_games.js 2448-2450). */
+function mpRefund(engine) {
+  if (!record.pendingTicket) return;
+  addItem(engine.inv, record.pendingTicket, 1);
+  record.pendingTicket = null;
+  engine.updateHud();
+  engine.save();
+}
+
+/**
+ * race_ticket.js activate for a Game of Crowns Ticket in multiplayer:
+ * challenge the street (inc_games.js games_invite_create). races-feature
+ * routes the ticket here. True when the challenge went out.
+ */
+export function crownsMpChallenge(classTsid, engine) {
+  if (classTsid !== CROWNS_TICKET || !isMp(engine)) return false;
+  if (mpBusy()) {
+    engine.toast('You are already racing!', 2400);
+    return false;
+  }
+  const c = mpAttach(engine);
+  if (!c || c.state !== 'online' || !c.street) {
+    engine.toast(CROWNS_MP_TEXT.offline, 2600);
+    return false;
+  }
+  // race_ticket.js:121: the verb is disabled with nobody else here.
+  if (!c.players.length) {
+    engine.toast(CROWNS_MP_TEXT.alone, 2600);
+    return false;
+  }
+  if (countItem(engine.inv, classTsid) < 1) return false;
+  removeItem(engine.inv, classTsid, 1);
+  record.pendingTicket = classTsid;
+  engine.updateHud();
+  engine.save();
+  engine.pushActivity('You activated a Game of Crowns Ticket.');
+  mpChallenging = true;
+  if (!c.send('crown_challenge', {})) {
+    mpChallenging = false;
+    mpRefund(engine);
+    return false;
+  }
+  mpNote(engine, 'challenge');
+  publish(engine);
+  return true;
+}
+
+function mpAttach(engine) {
+  if (mpClient) return mpClient;
+  const c = engine.query?.('realtimeClient');
+  if (!c) return null;
+  mpClient = c;
+  c.on('msg:crown_challenged', (msg) => {
+    const from = Number(msg.from?.id) || 0;
+    if (!from || from === c.me?.id) return;
+    if (mpInvites.has(from)) engine.removePrompt?.(mpInvites.get(from));
+    // inc_games.js 2392 broadcastActionRequest('game_accept', …): accept from the prompt.
+    const uid = engine.prompt?.({
+      text: String(msg.text || ''),
+      choices: [{ label: CROWNS_MP_TEXT.accept, value: 'accept' }, { label: CROWNS_MP_TEXT.decline, value: 'no' }],
+      timeout: Math.max(1, Math.min(60, Number(msg.timeout) || 60)),
+      iconButtons: true,
+      onChoice: (v) => {
+        mpInvites.delete(from);
+        if (v !== 'accept') return;
+        if (mpBusy()) {
+          engine.toast('You are already racing!', 2400);
+          return;
+        }
+        mpAccepting = true;
+        if (!c.send('crown_accept', { from })) mpAccepting = false;
+        publish(engine);
+      },
+      onTimeout: () => mpInvites.delete(from),
+    });
+    mpInvites.set(from, uid || '');
+    mpNote(engine, `challenged:${from}`);
+  });
+  c.on('msg:crown_unchallenged', (msg) => {
+    const from = Number(msg.from) || 0;
+    const uid = mpInvites.get(from);
+    if (uid) engine.removePrompt?.(uid);
+    mpInvites.delete(from);
+    if (msg.text) engine.pushActivity(String(msg.text));
+  });
+  c.on('msg:crown_waiting', (msg) => {
+    mpChallenging = false;
+    mpAccepting = false;
+    mpStarting = true;
+    if (mpWaitUid) engine.removePrompt?.(mpWaitUid);
+    // inc_games.js 2396-2405: "Waiting for other players..." with OK, for 60 s.
+    mpWaitUid = engine.prompt?.({
+      text: String(msg.text || 'Waiting for other players...'),
+      choices: [{ label: CROWNS_MP_TEXT.ok, value: 'ok' }],
+      timeout: Math.max(1, Math.min(60, Number(msg.timeout) || 60)),
+      onChoice: () => { mpWaitUid = null; },
+      onTimeout: () => { mpWaitUid = null; },
+    }) || null;
+    mpNote(engine, `waiting:${Number(msg.have) || 0}/${Number(msg.need) || 0}`);
+    publish(engine);
+  });
+  c.on('msg:crown_failed', (msg) => {
+    mpChallenging = false;
+    mpAccepting = false;
+    mpStarting = false;
+    mpClearPrompts(engine);
+    if (msg.refund === true) {
+      mpRefund(engine);
+      engine.prompt?.({ text: String(msg.text || ''), choices: [{ label: CROWNS_MP_TEXT.dagnabit, value: 'ok' }], timeout: 10 });
+    } else if (msg.text) engine.pushActivity(String(msg.text));
+    mpNote(engine, `failed:${msg.refund === true ? 'refund' : 'no'}`);
+    publish(engine);
+  });
+  c.on('msg:crown_refused', (msg) => {
+    const text = String(msg.text || '');
+    if (mpChallenging) {
+      mpChallenging = false;
+      mpRefund(engine);
+      engine.toast(text, 3000);
+    } else if (mpAccepting) {
+      mpAccepting = false;
+      // inc_games.js 2466-2470: the late accepter's prompt.
+      if (msg.why === 'full') engine.prompt?.({ text, choices: [{ label: CROWNS_MP_TEXT.dagnabit, value: 'ok' }], timeout: 10 });
+      else engine.toast(text, 3000);
+    } else if (text) engine.toast(text, 2600);
+    mpNote(engine, `refused:${msg.why || ''}`);
+    publish(engine);
+  });
+  c.on('msg:crown_starting', (msg) => {
+    mpChallenging = false;
+    mpAccepting = false;
+    mpStarting = true;
+    mpClearPrompts(engine);
+    for (const uid of mpInvites.values()) if (uid) engine.removePrompt?.(uid);
+    mpInvites.clear();
+    // inc_games.js 2516-2557: the race_start_delay overlay, 5 s.
+    engine.toast(String(msg.text || ''), Math.max(1000, Number(msg.in) || 5000));
+    engine.pushActivity(String(msg.text || ''));
+    engine.playSound('GAME_STARTING_SOON', { volume: 0.5 });
+    mpNote(engine, 'starting');
+    publish(engine);
+  });
+  c.on('msg:crown_match', (msg) => {
+    const info = normalizeCrownsMatch(msg);
+    if (!info || mp || game || pending) {
+      if (msg?.match) c.send('crown_leave', { match: String(msg.match) });
+      mpStarting = false;
+      return;
+    }
+    mp = { ...info, myId: c.me?.id ?? null, status: 'waiting', round: 1, state: null, ready: false, acked: false, readyAt: 0, below: false, result: null, startAt: 0 };
+    mpStarting = false;
+    mpNote(engine, `match:${info.match}`);
+    // The ticket is spent once the arena opens (as solo and the races).
+    record.pendingTicket = null;
+    Promise.resolve(startCrowns(engine, { mp: info, useTransition: true })).finally(() => publish(engine));
+  });
+  c.on('msg:crown_ready_state', (msg) => {
+    if (!mp || msg.match !== mp.match) return;
+    if ((msg.ready || []).map(Number).includes(mp.myId)) mp.acked = true;
+    if (msg.text) engine.pushActivity(String(msg.text));
+    mpNote(engine, `ready:${(msg.ready || []).length}`);
+  });
+  c.on('msg:crown_soon', (msg) => {
+    if (!mp || msg.match !== mp.match) return;
+    mp.status = 'soon';
+    mp.acked = true;
+    if (mpMustWaitUid) engine.removePrompt?.(mpMustWaitUid);
+    mpMustWaitUid = null;
+    engine.hideGameSplash?.();
+    if (hud) {
+      hud.ready.hidden = true;
+      hud.countdown.hidden = false;
+      hud.countdown.classList.remove('is-go');
+      hud.countdown.textContent = String(msg.text || 'YAY! THE GAME IS STARTING SOON.');
+    }
+    engine.playSound('GAME_STARTING_SOON', { volume: 0.5 });
+    mpNote(engine, 'soon');
+    publish(engine);
+  });
+  c.on('msg:crown_round', (msg) => {
+    if (!mp || msg.match !== mp.match) return;
+    // Play Again: a new round, everyone back at the starts (games_leave_instance 'again' 2212-2233).
+    mp.round = Math.max(1, Number(msg.round) || mp.round + 1);
+    mp.state = null;
+    mp.result = null;
+    mp.below = false;
+    resultApplied = false;
+    clearTip();
+    engine.hideGameSplash?.();
+    const spawn = mp.spawn || START_POINTS[0];
+    engine.player.x = spawn.x;
+    engine.player.y = spawn.y;
+    engine.player.vx = 0;
+    engine.player.vy = 0;
+    if (hud) hud.bar.hidden = false;
+    mpNote(engine, `round:${mp.round}`);
+  });
+  c.on('msg:crown_countdown', (msg) => {
+    if (!mp || msg.match !== mp.match) return;
+    mp.status = 'countdown';
+    mp.startAt = Date.now() + Math.max(0, Number(msg.in) || 4000);
+    if (hud) {
+      hud.ready.hidden = true;
+      hud.countdown.hidden = false;
+      hud.countdown.classList.remove('is-go');
+      hud.countdown.textContent = 'READY?';
+    }
+    engine.playSound('COUNT_DOWN', { volume: 0.55 });
+    mpNote(engine, 'countdown');
+  });
+  c.on('msg:crown_go', (msg) => {
+    if (!mp || msg.match !== mp.match) return;
+    mp.state = normalizeCrownsState(msg);
+    mp.status = 'running';
+    mp.below = engine.player.y >= playLineY;
+    if (hud) {
+      hud.countdown.classList.add('is-go');
+      hud.countdown.textContent = 'GO!';
+      setTimeout(() => {
+        if (mp?.status === 'running' && hud) hud.countdown.hidden = true;
+      }, 650);
+    }
+    engine.playSound('READY', { volume: 0.65 });
+    const it = mp.state.it;
+    if (it === mp.myId) {
+      tip(engine, CROWNS_TEXT.youreItAbove);
+      engine.playSound('YOU_TAKE_CROWN', { volume: 0.55 });
+    } else if (it) tip(engine, CROWNS_MP_TEXT.has(mpName(it)));
+    mpNote(engine, `go:${it}`);
+    publish(engine);
+  });
+  c.on('msg:crown_state', (msg) => mpState(engine, msg));
+  c.on('msg:crown_tag', (msg) => {
+    if (!mpState(engine, msg)) return;
+    const from = Number(msg.from) || 0;
+    const to = Number(msg.to) || 0;
+    // games_is_it / games_is_not_it: the tip, the sound (CROWN_CHANGES_HANDS for the rest, setIt 220).
+    if (to === mp.myId) {
+      tip(engine, mp.below ? CROWNS_TEXT.youreIt(Math.ceil((mp.winMs - crownMsNow(mp.state, to, Date.now(), mp.winMs)) / 1000)) : CROWNS_TEXT.youreItAbove);
+      engine.playSound('YOU_TAKE_CROWN', { volume: 0.55 });
+    } else if (from === mp.myId) {
+      tip(engine, mp.below ? CROWNS_TEXT.notIt : CROWNS_TEXT.notItAbove);
+      engine.playSound('YOU_LOSE_CROWN', { volume: 0.45 });
+    } else {
+      tip(engine, CROWNS_MP_TEXT.stole(String(msg.toName || mpName(to)), String(msg.fromName || mpName(from))));
+      engine.playSound('CROWN_CHANGES_HANDS', { volume: 0.45 });
+    }
+    const pos = crownHolderPos(from, mp.myId, engine.player, mpClient?.players);
+    if (pos) engine.floatText(pos.x, pos.y - 150, 'Tag!', 0xffd55b);
+    mpNote(engine, `tag:${from}>${to}`);
+  });
+  c.on('msg:crown_lock', (msg) => {
+    if (!mpState(engine, msg)) return;
+    const x = Number(msg.x);
+    const y = Number(msg.y);
+    // crown_game_lock.js onPlayerCollision: the location's quoin_got "+4 time"; QUOIN_GOT for the toucher.
+    if (Number.isFinite(x) && Number.isFinite(y)) engine.floatText(x, y - 90, CROWNS_TEXT.lockGot, 0xb8f08a);
+    if (Number(msg.id) === mp.myId) engine.playSound('QUOIN_GOT', { volume: 0.55 });
+    mpNote(engine, `lock:${msg.i}:${msg.id}:${msg.locked === true}`);
+  });
+  c.on('msg:crown_end', (msg) => mpFinish(engine, msg));
+  c.on('msg:crown_left', (msg) => {
+    // Leaving a running game: the crown time you had goes on your badges (playerLeft -> games_is_not_it).
+    const key = `${msg.match}:${msg.round}`;
+    const seconds = Math.max(0, Math.floor(Number(msg.seconds) || 0));
+    if (!mpCounted.has(key)) {
+      mpCounted.add(key);
+      if (seconds > 0) engine.achievement('it_game:seconds_with_crown', seconds);
+    }
+  });
+  c.on('msg:crown_removed', (msg) => {
+    if (!mp || msg.match !== mp.match) return;
+    engine.pushActivity(String(msg.text || ''));
+    engine.toast(String(msg.text || ''), 3600);
+    mp = null;
+    leave(engine);
+  });
+  c.on('msg:crown_reward', (msg) => mpApplyReward(engine, msg));
+  return c;
+}
+
+function mpName(id) {
+  return mp?.state?.scores?.find((r) => r.id === id)?.name || mp?.players?.find((p) => p.id === id)?.name || 'Someone';
+}
+
+/** crown_state and the state in crown_tag / crown_lock. False when it is not this game's. */
+function mpState(engine, msg) {
+  if (!mp || msg?.match !== mp.match) return false;
+  const st = normalizeCrownsState(msg);
+  if (!st || st.round !== mp.round) return false;
+  mp.state = st;
+  if (mp.status !== 'running' && mp.status !== 'done') mp.status = 'running';
+  return true;
+}
+
+function mpSetupArena(street, engine) {
+  const { PIXI } = engine;
+  playLineY = Number.isFinite(mp.playLine) ? mp.playLine : playLineScreenY(street);
+  resultApplied = false;
+  clearTip();
+  actors = {};
+  lockSprites = (mp.locks.length ? mp.locks : LOCK_POINTS).map((lock) => {
+    const sprite = new PIXI.Sprite(textureFromUrl(`${CROWN_DIR}crown_game_lock.png`));
+    sprite.anchor.set(0.5, 1);
+    sprite.scale.set(1.2);
+    sprite.x = lock.x;
+    sprite.y = lock.y - 4;
+    sprite.zIndex = 30;
+    engine.entityLayer.addChild(sprite);
+    return sprite;
+  });
+  crownSprite = new PIXI.Sprite(textureFromUrl(`${CROWN_DIR}game_crown_unlocked.png`));
+  crownSprite.anchor.set(0.5, 1);
+  crownSprite.scale.set(0.8);
+  crownSprite.zIndex = 60;
+  crownSprite.visible = false;
+  engine.entityLayer.addChild(crownSprite);
+  const spawn = mp.spawn || START_POINTS[0];
+  engine.player.x = spawn.x;
+  engine.player.y = spawn.y;
+  hud.ready.hidden = false;
+  hud.bar.hidden = false;
+  engine.hideGameSplash?.();
+  mpRenderHud(engine, true);
+  mpNote(engine, 'arena');
+  publish(engine);
+}
+
+/** Click to Start: tell the server, then wait for the others (dismissOverlaysAndStart 231-342). */
+function mpReadyUp(engine) {
+  if (!mp || mp.status !== 'waiting' || mp.ready) return;
+  mp.ready = true;
+  mp.readyAt = Date.now();
+  hud.ready.hidden = true;
+  mpClient?.send('crown_ready', { match: mp.match });
+  mpMustWait(engine);
+  mpNote(engine, 'clicked');
+  publish(engine);
+}
+
+/** "You must wait for more players before this game can begin." with Leave (shared_instance_manager.js 259-266). */
+function mpMustWait(engine) {
+  hud.countdown.hidden = false;
+  hud.countdown.classList.remove('is-go');
+  hud.countdown.textContent = CROWNS_MP_TEXT.mustWait;
+  const round = mp.round;
+  setTimeout(() => {
+    if (mpMustWaitUid || !mp || mp.round !== round || (mp.status !== 'waiting' && mp.status !== 'done')) return;
+    mpMustWaitUid = engine.prompt?.({
+      text: CROWNS_MP_TEXT.mustWait,
+      choices: [{ label: CROWNS_MP_TEXT.leave, value: 'leave' }],
+      onChoice: (v) => {
+        mpMustWaitUid = null;
+        if (v === 'leave') mpLeave(engine);
+      },
+    }) || null;
+  }, 700);
+}
+
+function mpTick(dtMs, now, engine) {
+  const player = engine.player;
+  if (mp.status === 'waiting' || mp.status === 'soon' || mp.status === 'countdown') {
+    const spawn = mp.spawn || START_POINTS[0];
+    player.x = spawn.x;
+  }
+  if (mp.status === 'countdown' && hud) hud.countdown.textContent = crownsCountdownCue({ status: 'countdown', startAt: mp.startAt }, now) || 'GO!';
+  // Click to Start counts once you stand in the arena: ask again until the server says so.
+  if (mp.ready && !mp.acked && mp.status === 'waiting' && mpClient?.street === mp.street && now - mp.readyAt >= 1500) {
+    mp.readyAt = now;
+    mpClient.send('crown_ready', { match: mp.match });
+  }
+  const st = mp.state;
+  if (mp.status === 'running' && st) {
+    const below = player.y >= playLineY;
+    if (below !== mp.below && st.it === mp.myId) {
+      // games_it_game_gate 557-607: the holder through the play line, or back up.
+      tip(engine, below ? CROWNS_TEXT.stayIt : CROWNS_TEXT.exited);
+    }
+    mp.below = below;
+  }
+  const holder = st ? crownHolderPos(st.it, mp.myId, player, mpClient?.players) : null;
+  if (crownSprite && !crownSprite.destroyed) {
+    if (holder && mp.status === 'running') {
+      const locked = now < st.lockedUntil;
+      const tex = `${CROWN_DIR}game_crown_${locked ? 'locked' : 'unlocked'}.png`;
+      if (crownSprite._tex !== tex) {
+        crownSprite.texture = textureFromUrl(tex);
+        crownSprite._tex = tex;
+      }
+      crownSprite.x = holder.x;
+      crownSprite.y = holder.y - 128 - (st.it === mp.myId ? 6 : 12);
+      crownSprite.visible = true;
+    } else crownSprite.visible = false;
+  }
+  lockSprites.forEach((sprite, i) => {
+    if (sprite && !sprite.destroyed) sprite.visible = st ? st.locks[i] !== false : true;
+  });
+}
+
+function mpRenderHud(engine, force = false) {
+  if (!hud || !mp) return;
+  const now = Date.now();
+  if (!force && now - lastHud < 150) return;
+  lastHud = now;
+  const st = mp.state;
+  const rows = st ? crownsMpBoard(st, mp.myId, now, mp.winMs) : mp.players.map((p) => ({ id: p.id, name: p.name, seconds: 0, it: false, you: p.id === mp.myId }));
+  const board = hud.bar.querySelector('[data-crowns-board]');
+  board.textContent = '';
+  for (const row of rows) {
+    const span = document.createElement('span');
+    span.className = `${row.it ? 'is-it' : ''} ${row.you ? 'is-you' : ''}`.trim();
+    const b = document.createElement('b');
+    b.textContent = row.name;
+    span.append(b, ` ${row.seconds}s${row.it ? ' 👑' : ''}`);
+    board.appendChild(span);
+  }
+  const clock = hud.bar.querySelector('[data-crowns-clock]');
+  const mine = Boolean(st && st.it === mp.myId && mp.status === 'running');
+  clock.hidden = !mine;
+  if (mine) {
+    const left = Math.ceil((mp.winMs - crownMsNow(st, mp.myId, now, mp.winMs)) / 1000);
+    clock.querySelector('[data-crowns-clock-text]').textContent = `${left}s to win${mp.below ? '' : ' (below the play line)'}`;
+    clock.querySelector('img').src = `${CROWN_DIR}game_crown_${now < st.lockedUntil ? 'locked' : 'unlocked'}.png`;
+  }
+}
+
+/** crown_end: the splash for everyone, and this player's badges (games_end_it_game 613-737). */
+function mpFinish(engine, msg) {
+  if (!mp || msg.match !== mp.match) return;
+  const out = crownsMpOutcome(msg, mp.myId);
+  mp.status = 'done';
+  mp.ready = false;
+  mp.acked = false;
+  mp.result = out;
+  if (mpMustWaitUid) engine.removePrompt?.(mpMustWaitUid);
+  mpMustWaitUid = null;
+  const key = `${msg.match}:${msg.round}`;
+  if (!mpCounted.has(key) && out.played) {
+    mpCounted.add(key);
+    if (out.won) {
+      record.wins += 1;
+      engine.achievement('it_game:won', 1);
+    } else if (out.outcome === 'lost') {
+      record.losses += 1;
+      engine.achievement('it_game:lost', 1);
+    }
+    if (out.seconds > 0) engine.achievement('it_game:seconds_with_crown', out.seconds);
+  }
+  clearTip();
+  if (hud) {
+    hud.bar.hidden = true;
+    hud.countdown.hidden = true;
+    hud.ready.hidden = true;
+  }
+  if (crownSprite && !crownSprite.destroyed) crownSprite.visible = false;
+  if (out.outcome === 'called_off') {
+    // No winner (too few left, or too long): only leaving is left.
+    engine.pushActivity(CROWNS_MP_TEXT.calledOff);
+    engine.prompt?.({
+      text: CROWNS_MP_TEXT.calledOff,
+      choices: [{ label: CROWNS_SPLASH.leaveLabel, value: 'leave' }],
+      onChoice: () => mpLeave(engine),
+      onTimeout: () => mpLeave(engine),
+      timeout: 30,
+    });
+  } else {
+    if (out.won) {
+      // The activity line comes with the reward (crown_reward: what landed).
+      engine.playSound('YOU_WIN', { volume: 0.7 });
+    } else {
+      engine.pushActivity(`${out.winnerName} won the Game of Crowns.`);
+      if (out.played) engine.pushActivity(`You held the crown for ${out.seconds} seconds.`);
+      engine.playSound('YOU_LOSE', { volume: 0.7 });
+    }
+    engine.gameSplash?.({
+      key: CROWNS_SPLASH.key,
+      ...splashFor(out.won, out.winnerName),
+      textDeltaY: CROWNS_SPLASH.textDeltaY,
+      buttons: [
+        { label: CROWNS_SPLASH.againLabel, w: CROWNS_SPLASH.buttonW, value: 'again', onClick: () => mpPlayAgain(engine) },
+        { label: CROWNS_SPLASH.leaveLabel, w: CROWNS_SPLASH.buttonW, value: 'leave', onClick: () => mpLeave(engine) },
+      ],
+    });
+  }
+  engine.updateHud();
+  engine.save();
+  mpNote(engine, `end:${out.outcome}:${out.seconds}`);
+  publish(engine);
+}
+
+function mpPlayAgain(engine) {
+  if (!mp) return;
+  engine.hideGameSplash?.();
+  mp.ready = true;
+  mp.readyAt = Date.now();
+  mpClient?.send('crown_again', { match: mp.match });
+  mpMustWait(engine);
+  mpNote(engine, 'again');
+}
+
+function mpLeave(engine) {
+  if (mp) mpClient?.send('crown_leave', { match: mp.match });
+  if (mpMustWaitUid) engine.removePrompt?.(mpMustWaitUid);
+  mpMustWaitUid = null;
+  mp = null;
+  mpNote(engine, 'left');
+  leave(engine);
+}
+
+/** Off the arena some other way (a reload, a forced move): out of the game. */
+function mpDrop(engine) {
+  if (mp) mpClient?.send('crown_leave', { match: mp.match });
+  mp = null;
+  if (hud) {
+    hud.bar.hidden = true;
+    hud.ready.hidden = true;
+    hud.countdown.hidden = true;
+  }
+  if (!game && !pending && engine.instanceHold === CROWNS_ID) engine.instanceHold = null;
+}
+
+async function mpPersist(engine) {
+  engine.save?.();
+  if (typeof saveStore?.flush !== 'function') return true;
+  for (let i = 0; i < 6; i += 1) {
+    let st;
+    try {
+      st = await saveStore.flush();
+    } catch {
+      return false;
+    }
+    const now = saveStore.state || st;
+    if (now === 'saved') return true;
+    if (BLOCKED_SAVES.has(now)) return false;
+  }
+  return saveStore.state === 'saved';
+}
+
+/**
+ * crown_reward (games_end_it_game 671-674): the winner's 200 iMG with the
+ * mood bonus, and the 50 currants the site's ledger already holds, applied
+ * once (this slice's applied ids; the currants also through ledgerReceipt,
+ * which a load that caught the ledger up has already listed).
+ */
+async function mpApplyReward(engine, msg) {
+  const r = normalizeCrownsReward(msg);
+  const c = mpClient;
+  if (!r || !c || mpApplying.has(r.id)) return;
+  if (mpAppliedIds.includes(r.id)) {
+    if (await mpPersist(engine)) c.send('crown_ack', { id: r.id });
+    return;
+  }
+  mpApplying.add(r.id);
+  const pc = engine.pc;
+  const xp = r.xp > 0 ? grantMoodXp(pc, r.xp) : 0;
+  let currants = 0;
+  if (r.currants > 0) {
+    const receipt = engine.query?.('ledgerReceipt', r.id, engine);
+    if (receipt !== false) {
+      pc.currants = (pc.currants || 0) + r.currants;
+      currants = r.currants;
+    }
+  }
+  mpAppliedIds = [...mpAppliedIds, r.id].slice(-MP_APPLIED_KEEP);
+  const bits = [xp ? `+${xp} iMG` : '', r.currants ? `+${r.currants} currants` : ''].filter(Boolean).join(' · ');
+  if (bits) engine.pushActivity(`You won the Game of Crowns! ${bits}.`);
+  engine.updateHud();
+  mpNote(engine, `reward:${r.id}:${xp}:${currants}`);
+  publish(engine);
+  const ok = await mpPersist(engine);
+  mpApplying.delete(r.id);
+  if (ok) c.send('crown_ack', { id: r.id });
 }
 
 export const crownsFeature = {
@@ -596,10 +1230,14 @@ export const crownsFeature = {
   },
 
   save() {
-    return record;
+    // Multiplayer: the crown_reward ids this save applied (solo saves never carry them).
+    return mpAppliedIds.length ? { ...record, applied: mpAppliedIds } : record;
   },
 
-  restore(slice) {
+  restore(slice, engine) {
+    mpAppliedIds = engine?.mode === 'multiplayer' && Array.isArray(slice?.applied)
+      ? slice.applied.filter((id) => typeof id === 'string' && /^crowns-[0-9a-f]{16}-[0-9]{1,3}-[0-9]{1,12}$/.test(id)).slice(-MP_APPLIED_KEEP)
+      : [];
     const back = slice?.returnTo;
     record = {
       wins: Math.max(0, Math.floor(Number(slice?.wins) || 0)),
@@ -631,16 +1269,27 @@ export const crownsFeature = {
   },
 
   labelFor(tsid) {
-    return tsid === CROWNS_STREET ? { street: CROWNS_TITLE, hub: 'Games', hubId: 'it_game' } : null;
+    // A multiplayer arena (CROWNS_<match>) reads as the game, not its hub street.
+    return tsid === CROWNS_STREET || /^CROWNS_[0-9A-F]{16}$/.test(String(tsid || '')) ? { street: CROWNS_TITLE, hub: 'Games', hubId: 'it_game' } : null;
+  },
+
+  /** realtime-feature sharedStreet: in a multiplayer game the arena is shared on the match's own hub street (CROWNS_<match>). */
+  realtimeStreet(engine) {
+    return mp && engine.streetTsid === CROWNS_STREET ? mp.street : null;
   },
 
   onStreetEnter(street, engine) {
     buildChrome(engine);
+    if (engine.mode === 'multiplayer') mpAttach(engine);
     if (street.tsid === CROWNS_STREET && pending) {
+      const entry = pending;
       pending = null;
-      setupArena(street, engine);
+      if (entry.mp && mp) mpSetupArena(street, engine);
+      else setupArena(street, engine);
       return;
     }
+    // Anywhere else, a multiplayer game is over for this player.
+    if (mp && street.tsid !== CROWNS_STREET) mpDrop(engine);
     if (street.tsid !== CROWNS_STREET) {
       if (record.pendingTicket) {
         addItem(engine.inv, record.pendingTicket, 1);
@@ -666,16 +1315,24 @@ export const crownsFeature = {
   },
 
   travelGate() {
-    return game || pending ? { ok: false, msg: "You can't leave in the middle of a game!" } : null;
+    return game || pending || mp || mpStarting || mpChallenging ? { ok: false, msg: "You can't leave in the middle of a game!" } : null;
   },
 
   physics(engine) {
+    if (mp && engine.streetTsid === CROWNS_STREET) return mp.status === 'running' ? { jump: JUMP_SCALE } : { speed: 0, jump: 0 };
     if (engine.streetTsid !== CROWNS_STREET || !game) return null;
     if (game.status !== 'running') return { speed: 0, jump: 0 };
     return { jump: JUMP_SCALE };
   },
 
   onTick(dtMs, now, engine) {
+    if (engine.mode === 'multiplayer' && !mpClient) mpAttach(engine);
+    if (mp && engine.streetTsid === CROWNS_STREET) {
+      mpTick(dtMs, now, engine);
+      mpRenderHud(engine);
+      publish(engine);
+      return;
+    }
     if (!game || engine.streetTsid !== CROWNS_STREET) return;
     tick(dtMs, now, engine);
     renderHud(engine);
@@ -684,6 +1341,6 @@ export const crownsFeature = {
 
   _demoDone: false,
   _state() {
-    return { game, record };
+    return { game, record, mp, mpAppliedIds };
   },
 };

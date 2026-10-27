@@ -14,7 +14,7 @@ import { REVIVED_TRANT, createPlot, reviveDeadTree, tickPlot } from '../public/j
 import { powdersFeature } from '../public/js/features/powders-feature.js';
 import { itemVerbsFeature, inGameLocation } from '../public/js/features/item-verbs-feature.js';
 import { GAME_CHEAT_BLOCKS, gameCheatBlock } from '../public/js/item-verbs.js?v=item-verbs-4';
-import { CROWNS_STREET } from '../public/js/game-of-crowns.js?v=crowns-1';
+import { CROWNS_STREET } from '../public/js/game-of-crowns.js?v=crowns-2';
 import { HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js?v=hog-haul-2';
 import { raceSceneTsid } from '../public/js/races.js?v=races-4';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';

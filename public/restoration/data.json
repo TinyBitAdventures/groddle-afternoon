@@ -794,13 +794,14 @@
    "group": "quests",
    "name": "Races and Game of Crowns",
    "status": "solo",
-   "blurb": "Seven race courses rebuilt from footage, raced against recovered rival Glitches under the final ticket-race rules. In multiplayer, Grab ’Em Good and the seven finish-line races are against the real players on your street.",
-   "multiplayer": "Grab ’Em Good and the seven finish-line races are raced against the real players on your street.",
+   "blurb": "Seven race courses rebuilt from footage, raced against recovered rival Glitches under the final ticket-race rules. In multiplayer, Grab ’Em Good, the seven finish-line races and the Game of Crowns are against the real players on your street.",
+   "multiplayer": "Grab ’Em Good, the seven finish-line races and the Game of Crowns (four players, the crown, tags and locks decided by the server) are played against the real players on your street.",
    "spot": null,
    "evidence": [
     "public/js/races.js",
     "public/js/game-of-crowns.js",
-    "public/js/races-mp.js"
+    "public/js/races-mp.js",
+    "public/js/crowns-mp.js"
    ],
    "shot": "shots/races.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&racedemo=space_race&practice=1"
@@ -2568,7 +2569,7 @@
   ]
  },
  "git": {
-  "commits": 558,
+  "commits": 559,
   "since": "2026-10-19",
   "recent": [
    {
@@ -2693,6 +2694,6 @@
    }
   ]
  },
- "tests": 324,
+ "tests": 325,
  "generatedAt": "2026-10-27"
 }

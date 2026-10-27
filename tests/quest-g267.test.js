@@ -31,10 +31,10 @@ import {
   routeQuestEvent,
   routesCounter,
 } from '../public/js/quest-offers.js';
-import { racesFeature } from '../public/js/features/races-feature.js?v=card-19';
+import { racesFeature } from '../public/js/features/races-feature.js?v=card-20';
 import { raceSceneTsid } from '../public/js/races.js?v=races-4';
 import { HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js?v=hog-haul-2';
-import { CROWNS_STREET } from '../public/js/game-of-crowns.js?v=crowns-1';
+import { CROWNS_STREET } from '../public/js/game-of-crowns.js?v=crowns-2';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');

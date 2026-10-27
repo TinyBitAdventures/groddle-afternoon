@@ -33,6 +33,30 @@ export const CROWNS_WIN_REWARD = Object.freeze({ xp: 200, currants: 50 });
 export const CROWNS_PLAYERS = Object.freeze({ min: 4, max: 5 });
 export const CROWNS_COUNTDOWN_MS = 4_000;
 export const CROWNS_TAG_DISTANCE = 46;
+/** A tag also needs the two within 70 px up or down (crowns-feature tick). */
+export const CROWNS_TAG_REACH_Y = 70;
+/** A Crown Game Lock is touched within 30 px across and 50 px up or down. */
+export const CROWNS_LOCK_REACH = Object.freeze({ x: 30, y: 50 });
+
+/**
+ * The four starts on the waiting ledges above the play line (screen coords),
+ * one per seat of a 4 player ticket (2012-08-10 @glitchlog: "GoC tickets are
+ * now 4 player"); the source's 8 Race Start Positions carry no coordinates.
+ */
+export const CROWNS_START_POINTS = Object.freeze([
+  Object.freeze({ x: 1180, y: 243 }),
+  Object.freeze({ x: 1800, y: 245 }),
+  Object.freeze({ x: 660, y: 275 }),
+  Object.freeze({ x: 2330, y: 259 }),
+]);
+
+/** The four Crown Game Locks on ledges below the play line (screen coords). */
+export const CROWNS_LOCK_POINTS = Object.freeze([
+  Object.freeze({ x: 255, y: 1230 }),
+  Object.freeze({ x: 1030, y: 1576 }),
+  Object.freeze({ x: 1640, y: 1040 }),
+  Object.freeze({ x: 2400, y: 1034 }),
+]);
 
 /**
  * GHFFV931FRF3TMS location XML <ladders> (x centre, y bottom, h up), lost by

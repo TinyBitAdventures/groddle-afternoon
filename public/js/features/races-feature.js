@@ -85,10 +85,10 @@ import {
 } from '../race-render.js?v=races-10';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { runStreetTransition } from '../screen-fx.js?v=card-2';
-import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-1';
+import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-2';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
 import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=g311-1';
-import { startCrowns } from './crowns-feature.js?v=g313-1';
+import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=g334-4';
 import { textureFromUrl } from '../textures.js';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=desk2-1';
 import { gainMetabolic } from '../metabolics.js';
@@ -444,6 +444,8 @@ function activateTicket(classTsid, engine, opts = {}) {
     return false;
   }
   if (isMp(engine) && MP_RACE_COURSES.includes(raceId)) return mpChallenge(classTsid, raceId, engine);
+  // G334: a Game of Crowns Ticket challenges the real players on the street (crowns-feature, crowns.go).
+  if (isMp(engine) && raceId === 'it_game') return crownsMpChallenge(classTsid, engine);
   removeItem(engine.inv, classTsid, 1);
   record.pendingTicket = classTsid;
   engine.updateHud();
@@ -1770,7 +1772,7 @@ export const racesFeature = {
     if (!isRaceTicket(classTsid)) return [];
     const raceId = ticketRaceId(classTsid);
     // race_ticket.js:121, multiplayer: disabled with nobody else on the street.
-    const alone = isMp(engine) && (!raceId || MP_RACE_COURSES.includes(raceId)) && !(engine.query('realtimeClient')?.players.length > 0);
+    const alone = isMp(engine) && (!raceId || raceId === 'it_game' || MP_RACE_COURSES.includes(raceId)) && !(engine.query('realtimeClient')?.players.length > 0);
     const block = activationBlock(engine) || (alone ? 'You need at least one other player here.' : '');
     const name = raceId ? raceTitle(raceId) : 'a random race';
     return [{
