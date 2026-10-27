@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-15';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-158';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-159';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -24628,8 +24628,11 @@ async function main() {
     playSound('CLIENT_LOADED', { volume: 0.5 });
     // Apply saved look after textures are ready
     applyPlayerAppearance();
-    toast(`${currentStreet?.label || 'Hechey Track'} loaded. Press L for look · G for map.`);
-    pushActivity(`A new afternoon begins on ${currentStreet?.label || 'Hechey Track'}.`);
+    // G339: not when the tutorial is about to take the player into the clouds.
+    if (features.query('arrivalQuiet', engine) !== true) {
+      toast(`${currentStreet?.label || 'Hechey Track'} loaded. Press L for look · G for map.`);
+      pushActivity(`A new afternoon begins on ${currentStreet?.label || 'Hechey Track'}.`);
+    }
     if (buffDemoItem && bootParams.get('buffactivate') === '1') {
       usePackItem(buffDemoItem);
     }

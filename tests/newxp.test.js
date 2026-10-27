@@ -276,6 +276,15 @@ describe('newxp save', () => {
     assert.match(src, /newxpFeature/);
   });
 
+  it('keeps the street under the clouds quiet: no arrival lines, no Qurazy roll (G339)', () => {
+    const src = readFileSync(join(ROOT, 'js/features/newxp-feature.js'), 'utf8');
+    assert.match(src, /arrivalQuiet\(engine\) \{\n\s+if \(pendingStage \|\| inTutorialScene\(engine\)\) return true;\n\s+return !engine\?\.started && startCardShown && !hadSave \? true : null;/);
+    const game = readFileSync(join(ROOT, 'game.js'), 'utf8');
+    assert.match(game, /if \(features\.query\('arrivalQuiet', engine\) !== true\) \{\n\s+toast\(`\$\{currentStreet\?\.label \|\| 'Hechey Track'\} loaded\./);
+    const qurazy = readFileSync(join(ROOT, 'js/features/qurazy-feature.js'), 'utf8');
+    assert.match(qurazy, /\} else if \(engine\.query\?\.\('arrivalQuiet', engine\) === true\) \{[^}]*lastRoll = 'skip:tutorial:0';/);
+  });
+
   it('offers no skip in multiplayer, at the start or on the pill (Austin 2026-10-26)', () => {
     const src = readFileSync(join(ROOT, 'js/features/newxp-feature.js'), 'utf8');
     assert.match(src, /if \(skip\) skip\.hidden = engineRef\?\.mode === 'multiplayer';/);

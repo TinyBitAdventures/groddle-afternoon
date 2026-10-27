@@ -280,6 +280,9 @@ export const qurazyFeature = {
         lastRoll = 'skip:off:0';
       } else if (!qurazyStreetEligible(tsid) || engine.transientInstance?.()) {
         lastRoll = `skip:${markers ? 'not_here' : 'no_marker'}:0`;
+      } else if (engine.query?.('arrivalQuiet', engine) === true) {
+        // G339: the street under the tutorial's clouds; nothing is rolled, so the day's roll waits.
+        lastRoll = 'skip:tutorial:0';
       } else {
         const roll = rollQurazy(st, {
           tsid,

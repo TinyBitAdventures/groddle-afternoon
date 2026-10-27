@@ -3178,6 +3178,16 @@ export const newxpFeature = {
   },
 
   /**
+   * G339: the street under the tutorial's scenes says nothing on arrival (no
+   * "loaded" toast or new-afternoon line, no Qurazy roll) while the tutorial is
+   * about to start or running, or a new save's start card is still up.
+   */
+  arrivalQuiet(engine) {
+    if (pendingStage || inTutorialScene(engine)) return true;
+    return !engine?.started && startCardShown && !hadSave ? true : null;
+  },
+
+  /**
    * G231: true while the tutorial's own Magic Rock has your home street (the
    * house stage, runHouse; the wrap-up, homeWrapUp, until the street is left),
    * so homes-feature keeps its street rock away: one rock a street. In the

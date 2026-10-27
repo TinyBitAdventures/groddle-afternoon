@@ -2488,9 +2488,14 @@
   ]
  },
  "git": {
-  "commits": 538,
+  "commits": 540,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "fix",
+    "text": "Previewing a season with ?season= no longer rots your carved pumpkins"
+   },
    {
     "date": "2026-10-26",
     "kind": "improve",
@@ -2605,11 +2610,6 @@
     "date": "2026-10-26",
     "kind": "fix",
     "text": "The multiplayer page loads the current game, and build scripts find the source data beside the repo"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "improve",
-    "text": "Six desk decisions: a taller street view on big screens, the Rook orb above the labels, grounded Musicblocks, plainer race endings, a quiet eleven-skills badge, GSJS wording for An Autumn Day"
    }
   ]
  },
