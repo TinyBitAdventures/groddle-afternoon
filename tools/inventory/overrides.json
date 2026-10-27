@@ -120,7 +120,10 @@
   "checklist": "gardens"
  },
  "system:config/auction_delivery_time": {
-  "checklist": "auctions"
+  "checklist": "auctions",
+  "mp": "game ff6ce88d, site 35f1f47",
+  "mpReason": "LedgerAuction::DELIVERY 600 s: a sale, cancel or expiry arrives in the mailbox ten minutes later (config_prod.js:44)",
+  "register": "G333"
  },
  "system:config/mail_delivery_time": {
   "checklist": "mail"
@@ -379,7 +382,10 @@
   "reason": "client message plumbing (the remake has its own toasts and activity feed)"
  },
  "system:players/inc_auctions": {
-  "checklist": "auctions"
+  "checklist": "auctions",
+  "mp": "game ff6ce88d, site 35f1f47",
+  "mpReason": "LedgerAuction.php lists, buys, cancels and expires auctions between real players through the ledger (auctions-feature.js: Menu, Auctions; the pack's Find auctions and Sell at auction; View Auctions on a player)",
+  "register": "G333"
  },
  "system:players/inc_trading": {
   "checklist": "trading",
@@ -1476,5 +1482,10 @@
   "mp": "game 3030c2dd, server 0c75b7e, site d352b8b",
   "mpReason": "learnable in multiplayer after rank 2; radiance.go reads the rank the site signs",
   "register": "G330"
+ },
+ "quest:croppery_harvest_and_sell_at_auction": {
+  "mp": "game ff6ce88d, site 35f1f47",
+  "mpReason": "offered with Croppery II once the Auction House is live; auctions_sold_<class> counted from site-settled sales; 450 currants credited once",
+  "register": "G333"
  }
 }
