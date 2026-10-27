@@ -1,5 +1,5 @@
 {
-  "checked": "2026-10-22",
+  "checked": "2026-10-26",
   "statuses": {
     "yes": { "label": "Yes", "mark": "✓", "tone": "moss", "desc": "A public source shows it in the game." },
     "partial": { "label": "Partly", "mark": "◐", "tone": "sun", "desc": "Some of it, or adapted from the original design. The note says how." },
@@ -8,11 +8,11 @@
   },
   "sources": {
     "eg-faq": { "title": "Eleven FAQ (Wayback Machine copy of elevengiants.com)", "url": "https://web.archive.org/web/2026/http://elevengiants.com/FAQ.php", "checked": "2026-10-22" },
-    "eg-home": { "title": "Eleven homepage and latest news, 2019-08-30 (Wayback Machine copy)", "url": "https://web.archive.org/web/2026/http://www.elevengiants.com/", "checked": "2026-10-22" },
+    "eg-home": { "title": "Eleven homepage and latest news, 2019-08-30 (Wayback Machine copy)", "url": "https://web.archive.org/web/2026/http://www.elevengiants.com/", "checked": "2026-10-26" },
     "eg-team": { "title": "Eleven team page (Wayback Machine copy)", "url": "https://web.archive.org/web/2026/http://elevengiants.com/team.php", "checked": "2026-10-22" },
-    "eg-server": { "title": "ElevenGiants/eleven-server on GitHub (README, licence, commits)", "url": "https://github.com/ElevenGiants/eleven-server", "checked": "2026-10-22" },
-    "eg-gsjs": { "title": "ElevenGiants/eleven-gsjs on GitHub", "url": "https://github.com/ElevenGiants/eleven-gsjs", "checked": "2026-10-22" },
-    "eg-forum": { "title": "Eleven Forums (welcome post dated 2014-12-09; recent activity)", "url": "https://forum.elevengiants.com/", "checked": "2026-10-22" },
+    "eg-server": { "title": "ElevenGiants/eleven-server on GitHub (README, licence, commits)", "url": "https://github.com/ElevenGiants/eleven-server", "checked": "2026-10-26" },
+    "eg-gsjs": { "title": "ElevenGiants/eleven-gsjs on GitHub", "url": "https://github.com/ElevenGiants/eleven-gsjs", "checked": "2026-10-26" },
+    "eg-forum": { "title": "Eleven Forums (welcome post dated 2014-12-09; recent activity)", "url": "https://forum.elevengiants.com/", "checked": "2026-10-26" },
     "eg-forum-2023": { "title": "Eleven Forums: \"Still accepting alpha tester?\" (player reply, 2023-07-07)", "url": "https://forum.elevengiants.com/discussion/1365", "checked": "2026-10-22" },
     "eg-engadget": { "title": "Engadget: \"Eleven alpha tester: Game is 'identical to Glitch'\" (2015-01-08)", "url": "https://www.engadget.com/2015-01-08-eleven-alpha-tester-game-is-identical-to-glitch.html", "checked": "2026-10-22" },
     "eg-vid-meadow": { "title": "Video: Eleven Giants Groddle Meadow (SuperArtoo, 2019-01-20)", "url": "https://www.youtube.com/watch?v=ewxs6XjllWo", "checked": "2026-10-22" },
@@ -20,22 +20,26 @@
     "eg-vid-zilloween": { "title": "Video: Eleven Giants Zilloween (SuperArtoo, 2019-01-23)", "url": "https://www.youtube.com/watch?v=WFRNZZhL7LE", "checked": "2026-10-22" },
     "eg-vid-shops": { "title": "Video: Eleven Giants shops (SuperArtoo, 2019-05-28)", "url": "https://www.youtube.com/watch?v=OdvqophP5Ck", "checked": "2026-10-22" },
     "mop-merge": { "title": "MassivelyOP headline: \"Children of Ur and Eleven join forces\" (2019-03-21)", "url": "https://massivelyop.com/2019/03/21/children-of-ur-and-eleven-join-forces-to-create-the-ultimate-glitch-revival/", "checked": "2026-10-22" },
-    "cou-home": { "title": "Children of Ur homepage (Wayback Machine copy, January 2026)", "url": "https://web.archive.org/web/2026/http://childrenofur.com/", "checked": "2026-10-22" },
-    "cou-client": { "title": "ChildrenOfUr/coUclient on GitHub (Dart browser client, MIT, archived)", "url": "https://github.com/ChildrenOfUr/coUclient", "checked": "2026-10-22" },
-    "cou-server": { "title": "ChildrenOfUr/coUserver on GitHub (Dart server, MIT, archived)", "url": "https://github.com/ChildrenOfUr/coUserver", "checked": "2026-10-22" },
-    "cou-streets": { "title": "coUserver: CAT422 street data (1,423 files)", "url": "https://github.com/ChildrenOfUr/coUserver/tree/master/CAT422", "checked": "2026-10-22" },
-    "cou-entities": { "title": "coUserver: entities (animals, plants, rocks, shrines, vendors, mailbox)", "url": "https://github.com/ChildrenOfUr/coUserver/tree/master/lib/entities", "checked": "2026-10-22" },
-    "cou-lib": { "title": "coUserver: lib (quests, skills, achievements, auctions, upgrades, chat)", "url": "https://github.com/ChildrenOfUr/coUserver/tree/master/lib", "checked": "2026-10-22" },
+    "cou-home": { "title": "Children of Ur homepage (Wayback Machine copy, January 2026)", "url": "https://web.archive.org/web/2026/http://childrenofur.com/", "checked": "2026-10-26" },
+    "cou-client": { "title": "ChildrenOfUr/coUclient on GitHub (Dart browser client, MIT, archived)", "url": "https://github.com/ChildrenOfUr/coUclient", "checked": "2026-10-26" },
+    "cou-server": { "title": "ChildrenOfUr/coUserver on GitHub (Dart server, MIT, archived)", "url": "https://github.com/ChildrenOfUr/coUserver", "checked": "2026-10-26" },
+    "cou-streets": { "title": "coUserver: CAT422 street data (1,423 files)", "url": "https://github.com/ChildrenOfUr/coUserver/tree/master/CAT422", "checked": "2026-10-26" },
+    "cou-entities": { "title": "coUserver: entities (animals, plants, rocks, shrines, vendors, mailbox)", "url": "https://github.com/ChildrenOfUr/coUserver/tree/master/lib/entities", "checked": "2026-10-26" },
+    "cou-lib": { "title": "coUserver: lib (quests, skills, achievements, auctions, upgrades, chat)", "url": "https://github.com/ChildrenOfUr/coUserver/tree/master/lib", "checked": "2026-10-26" },
     "cou-scproxy": { "title": "ChildrenOfUr/scproxy: SoundCloud helper for the client", "url": "https://github.com/ChildrenOfUr/scproxy", "checked": "2026-10-22" },
     "cou-libregame": { "title": "Libregamewiki: Children of Ur", "url": "https://libregamewiki.org/Children_of_Ur", "checked": "2026-10-22" },
-    "cou-revival": { "title": "davidmanheim/ChildrenOfUr: local revival of the archived code (August 2026)", "url": "https://github.com/davidmanheim/ChildrenOfUr", "checked": "2026-10-22" },
+    "cou-revival": { "title": "davidmanheim/ChildrenOfUr: local revival of the archived code (August 2026)", "url": "https://github.com/davidmanheim/ChildrenOfUr", "checked": "2026-10-26" },
     "cou-vid": { "title": "Video: Children of Ur, very early alpha stream (Button Mash, 2019-03-06)", "url": "https://www.youtube.com/watch?v=UqdRwLaIdp0", "checked": "2026-10-22" },
-    "og-site": { "title": "Odd Giants website", "url": "https://oddgiants.com/", "checked": "2026-10-22" },
-    "og-help": { "title": "Odd Giants Help and FAQ", "url": "https://oddgiants.com/help", "checked": "2026-10-22" },
-    "og-downloads": { "title": "Odd Giants downloads (Windows, macOS, Linux)", "url": "https://oddgiants.com/downloads", "checked": "2026-10-22" },
-    "og-config": { "title": "Odd Giants public API: version and account count", "url": "https://api.oddgiants.com/public/configs", "checked": "2026-10-22" },
-    "og-encyclopedia": { "title": "Odd Giants encyclopedia", "url": "https://oddgiants.com/encyclopedia", "checked": "2026-10-22" },
-    "og-patreon": { "title": "Odd Giants on Patreon", "url": "https://www.patreon.com/oddgiants", "checked": "2026-10-22" },
+    "cou-play": { "title": "Children of Ur game client (play.childrenofur.com), still served", "url": "https://play.childrenofur.com/", "checked": "2026-10-26" },
+    "cou-status": { "title": "Children of Ur game server status (players online, uptime)", "url": "https://server.childrenofur.com:8181/serverStatus", "checked": "2026-10-26" },
+    "cou-blog": { "title": "Children of Ur blog, last release Alpha 1.5.1 (Wayback Machine copy, March 2026)", "url": "https://web.archive.org/web/20260317005011/http://server.childrenofur.com/blog/?page=1", "checked": "2026-10-26" },
+    "og-site": { "title": "Odd Giants website", "url": "https://oddgiants.com/", "checked": "2026-10-26" },
+    "og-help": { "title": "Odd Giants Help and FAQ", "url": "https://oddgiants.com/help", "checked": "2026-10-26" },
+    "og-downloads": { "title": "Odd Giants downloads (Windows, macOS, Linux)", "url": "https://oddgiants.com/downloads", "checked": "2026-10-26" },
+    "og-config": { "title": "Odd Giants public API: version and account count", "url": "https://api.oddgiants.com/public/configs", "checked": "2026-10-26" },
+    "og-encyclopedia": { "title": "Odd Giants encyclopedia", "url": "https://oddgiants.com/encyclopedia", "checked": "2026-10-26" },
+    "og-feed": { "title": "Odd Giants public API: the players' activity feed (skills learned, upgrades bought)", "url": "https://api.oddgiants.com/public/social/feed?available=0", "checked": "2026-10-26" },
+    "og-patreon": { "title": "Odd Giants on Patreon", "url": "https://www.patreon.com/oddgiants", "checked": "2026-10-26" },
     "og-0-3-5": { "title": "Odd Giants 0.3.5 patch notes (2021-04-11)", "url": "https://oddgiants.com/forums/announcements/21", "checked": "2026-10-22" },
     "og-0-4-0": { "title": "Odd Giants 0.4.0 patch notes (2021-05-16)", "url": "https://oddgiants.com/forums/announcements/22", "checked": "2026-10-22" },
     "og-0-4-2": { "title": "Odd Giants 0.4.2 server update (2021-05-21)", "url": "https://oddgiants.com/forums/announcements/25", "checked": "2026-10-22" },
@@ -49,11 +53,11 @@
     "og-0-15-0": { "title": "Odd Giants 0.15.0 patch notes (2022-12-04)", "url": "https://oddgiants.com/forums/announcements/522", "checked": "2026-10-22" },
     "og-0-17-0": { "title": "Odd Giants 0.17.0 patch notes (2024-07-16)", "url": "https://oddgiants.com/forums/announcements/1727", "checked": "2026-10-22" },
     "og-0-18-0": { "title": "Odd Giants 0.18.0 patch notes (2025-05-05)", "url": "https://oddgiants.com/forums/announcements/1761", "checked": "2026-10-22" },
-    "og-0-19-0": { "title": "Odd Giants 0.19.0 patch notes (2026-08-02)", "url": "https://oddgiants.com/forums/announcements/1794", "checked": "2026-10-22" },
+    "og-0-19-0": { "title": "Odd Giants 0.19.0 patch notes (2026-08-02)", "url": "https://oddgiants.com/forums/announcements/1794", "checked": "2026-10-26" },
     "og-setsideb": { "title": "Set Side B: Revival of Glitch: Odd Giants (2022-10-29)", "url": "https://setsideb.com/tag/ur/", "checked": "2026-10-22" },
     "og-vid-look": { "title": "Video: \"Learn how to change your look!\" Odd Giants #2 (yorkcommatyler)", "url": "https://www.youtube.com/watch?v=XdXqAiPk3nY", "checked": "2026-10-22" },
     "wikipedia": { "title": "Wikipedia: Glitch (video game)", "url": "https://en.wikipedia.org/wiki/Glitch_(video_game)", "checked": "2026-10-22" },
-    "ts-gsjs": { "title": "tinyspeck/glitch-GameServerJS README (CC0 1.0, logo and trademark excluded)", "url": "https://github.com/tinyspeck/glitch-GameServerJS", "checked": "2026-10-22" },
+    "ts-gsjs": { "title": "tinyspeck/glitch-GameServerJS README (CC0 1.0, logo and trademark excluded)", "url": "https://github.com/tinyspeck/glitch-GameServerJS", "checked": "2026-10-26" },
     "ga-restoration": { "title": "Groddle Field Notes: restoration report (built from this repository)", "url": "../restoration/", "checked": "2026-10-26" },
     "ga-github": { "title": "Groddle Afternoon on GitHub: the game, the realtime server and the site", "url": "https://github.com/TinyBitAdventures/groddle-afternoon", "checked": "2026-10-26" },
     "ga-site": { "title": "Groddle Afternoon", "url": "https://groddleafternoon.com", "checked": "2026-10-26" }
@@ -64,16 +68,16 @@
       "name": "Children of Ur",
       "years": "2013 to 2019",
       "approach": "Rewrite",
-      "badge": { "label": "Archived · server offline", "tone": "stone" },
+      "badge": { "label": "Archived code · game server still up", "tone": "stone" },
       "summary": "A browser MMO that rebuilt Glitch in Dart and called itself a spinoff, with new areas and updated storylines alongside the original world.",
       "link": { "label": "Source code on GitHub", "url": "https://github.com/ChildrenOfUr" },
       "facts": [
         { "label": "Client", "text": "Dart, compiled to JavaScript, in the browser. No Flash.", "sources": ["cou-client"] },
         { "label": "Server and rules", "text": "Dart server and auth server; game systems rewritten from the original ActionScript and data rather than running Tiny Speck's server code.", "sources": ["cou-server", "cou-libregame"] },
-        { "label": "Platform", "text": "Web browser.", "sources": ["cou-home"] },
+        { "label": "Platform", "text": "Web browser (its page lists Safari and Edge as unsupported). The client has phone and tablet layouts and a touch joystick.", "sources": ["cou-play", "cou-client"] },
         { "label": "Licence and code", "text": "Client and server are MIT on GitHub (client 74 stars). Last client commit 2019-02-22; repositories archived.", "sources": ["cou-client", "cou-server"] },
-        { "label": "Status", "text": "Released alphas up to 1.4.x. The site now redirects to a host that answers with an error, so the game cannot be played online. A 2019 headline reports the team joining forces with Eleven.", "sources": ["cou-libregame", "cou-home", "mop-merge"] },
-        { "label": "How to play", "text": "Not playable online today. In August 2026 one developer published a local Docker setup that runs the archived code on your own machine.", "sources": ["cou-revival"] },
+        { "label": "Status", "text": "Released alphas up to 1.5.1. The website answers with an error, but the game client at play.childrenofur.com still loads and its game server reported a player online when checked on 2026-10-26. A 2019 headline reports the team joining forces with Eleven.", "sources": ["cou-blog", "cou-home", "cou-play", "cou-status", "mop-merge"] },
+        { "label": "How to play", "text": "The browser client at play.childrenofur.com still connects to a running server; whether new players can still sign up was not tested. In August 2026 one developer published a local Docker setup that runs the archived code on your own machine.", "sources": ["cou-play", "cou-status", "cou-revival"] },
         { "label": "Team", "text": "Size not published.", "sources": ["cou-home"] }
       ]
     },
@@ -88,7 +92,7 @@
       "facts": [
         { "label": "Client", "text": "The original Flash client, with plans to reduce the reliance on Flash later.", "sources": ["eg-faq"] },
         { "label": "Server and rules", "text": "A Node.js server rebuilds the missing layer between client and server and runs Tiny Speck's original server JavaScript (GSJS).", "sources": ["eg-faq", "eg-server", "eg-gsjs"] },
-        { "label": "Platform", "text": "The original Flash client ran in a web browser. How testers run it since Flash reached end of life in 2020 is not documented publicly.", "sources": ["eg-faq"] },
+        { "label": "Platform", "text": "The original Flash client ran in a web browser. How testers run it since Flash reached end of life in 2020 is not documented publicly, and no phone version is mentioned.", "sources": ["eg-faq", "eg-home"] },
         { "label": "Licence and code", "text": "eleven-server and eleven-gsjs are MIT on GitHub (48 and 21 stars). The README says further components needed to start the game are not public. Last non-automated commit 2020-06-12.", "sources": ["eg-server", "eg-gsjs"] },
         { "label": "Status", "text": "Alpha testing began in December 2014 with 13 players, 31 by January 2015. The website answered with an error today; the forum is online. A player reported in 2023 that the game was broken and unattended (community report).", "sources": ["eg-forum", "eg-engadget", "eg-forum-2023"] },
         { "label": "How to play", "text": "Invite only: the last news post (August 2019) opened an interest list and admitted players in small batches.", "sources": ["eg-home"] },
@@ -106,9 +110,9 @@
       "facts": [
         { "label": "Client", "text": "Unity desktop application (about 2 GB download).", "sources": ["og-help", "og-downloads"] },
         { "label": "Server and rules", "text": "Own online servers. Server code is not public, so whether it uses Tiny Speck's server code is unknown.", "sources": ["og-site"] },
-        { "label": "Platform", "text": "Windows, macOS and Linux. A Steam release is planned.", "sources": ["og-downloads", "og-help"] },
+        { "label": "Platform", "text": "A desktop app for Windows, macOS and Linux; no phone or browser version. A Steam release is planned.", "sources": ["og-downloads", "og-help"] },
         { "label": "Licence and code", "text": "Closed source; no public repository found.", "sources": ["og-site"] },
-        { "label": "Status", "text": "Version 0.19.0 released 2026-08-02; regular patch notes since 2021; a player count of 3,377 reported by its API.", "sources": ["og-0-19-0", "og-config"] },
+        { "label": "Status", "text": "Version 0.19.0 released 2026-08-02; regular patch notes since 2021; 3,382 accounts reported by its API, and players active every day on its public activity feed.", "sources": ["og-0-19-0", "og-config", "og-feed"] },
         { "label": "How to play", "text": "Free account, then download. The FAQ says payment is not required to play; Patreon is optional, and future premium accounts would be cosmetic only.", "sources": ["og-help", "og-patreon"] },
         { "label": "Team", "text": "A small team of developers and artists; size not published.", "sources": ["og-site"] }
       ]
@@ -119,16 +123,16 @@
       "years": "2026",
       "approach": "Fresh take",
       "ours": true,
-      "badge": { "label": "In development · open source", "tone": "sun" },
-      "summary": "This project. A web game that rebuilds Glitch rule by rule from Tiny Speck's released code and art, played solo in your browser or multiplayer with other players, and fills the gaps from players' Snaps and recordings.",
+      "badge": { "label": "In development · not online yet", "tone": "sun" },
+      "summary": "This project. A web game that rebuilds Glitch rule by rule from Tiny Speck's released code and art, played solo in your browser or multiplayer (built and tested locally, not online yet), and fills the gaps from players' Snaps and recordings.",
       "link": { "label": "Restoration report", "url": "../restoration/" },
       "facts": [
         { "label": "Client", "text": "PixiJS 8 in the browser, with sharp 3x art on high-resolution screens. No Flash, nothing to install.", "sources": ["ga-restoration"] },
         { "label": "Server and rules", "text": "The original server code (GSJS) is mined as the design reference and its rules are rewritten in modern JavaScript. Solo needs no server and saves in your browser. Multiplayer adds accounts and server saves on the site, and a small Go server that decides what players share: quoins, rocks, races, Rook fights and trades.", "sources": ["ga-restoration", "ga-github"] },
-        { "label": "Platform", "text": "Web browser.", "sources": ["ga-restoration"] },
+        { "label": "Platform", "text": "Web browser on a desktop computer, played with the keyboard. No touch controls yet, so not on phones.", "sources": ["ga-restoration", "ga-github"] },
         { "label": "Licence and code", "text": "MIT code on GitHub in three repositories: the game, the realtime server and the site. Uses only Tiny Speck's CC0 art, sound and code, plus art and sound made fresh where nothing survives; no Glitch logo or trademark.", "sources": ["ts-gsjs", "ga-github"] },
-        { "label": "Status", "text": "In development; playable in the browser, solo or multiplayer.", "sources": ["ga-restoration"] },
-        { "label": "How to play", "text": "Open groddleafternoon.com in a desktop browser. Solo needs no account; multiplayer needs a free one, made in the game with an email and a password.", "sources": ["ga-site"] },
+        { "label": "Status", "text": "In development and not online yet. The source is public on GitHub, and multiplayer is built and tested locally, but there is no public server and no players yet.", "sources": ["ga-github", "ga-restoration"] },
+        { "label": "How to play", "text": "Not online yet: run it locally from GitHub. Solo play is static files from the game repository and needs no account; multiplayer also needs the site and the realtime server, with accounts made in the game with an email and a password.", "sources": ["ga-github"] },
         { "label": "Team", "text": "A one-person project.", "sources": ["ga-restoration"] }
       ]
     }
@@ -140,14 +144,14 @@
       "cells": {
         "cou": { "status": "yes", "note": "1,423 street files ship in the archived server.", "sources": ["cou-streets"] },
         "eleven": { "status": "yes", "note": "A 2019 player video walks Groddle Meadow.", "sources": ["eg-vid-meadow"] },
-        "odd": { "status": "yes", "note": "More than 1,300 locations, per its Help page.", "sources": ["og-help"] }
+        "odd": { "status": "yes", "note": "More than 1,300 locations per its Help page; its encyclopedia lists 1,345.", "sources": ["og-help", "og-encyclopedia"] }
       }
     },
     {
       "id": "avatar", "name": "Avatar and wardrobe",
       "ours": ["avatar"],
       "cells": {
-        "cou": { "status": "unknown", "note": "No public source on in-game avatar customisation.", "sources": [] },
+        "cou": { "status": "yes", "note": "A Choose Avatar window in the client, with custom avatar options.", "sources": ["cou-play"] },
         "eleven": { "status": "yes", "note": "The project site offers a Wardrobe and Vanity tool.", "sources": ["eg-home"] },
         "odd": { "status": "yes", "note": "Change your look in game; new clothing added in 0.18.0.", "sources": ["og-vid-look", "og-0-18-0"] }
       }
@@ -201,7 +205,7 @@
       "id": "skills", "name": "Skills",
       "ours": ["skills"],
       "cells": {
-        "cou": { "status": "partial", "note": "10 skill lines defined in the archived server data.", "sources": ["cou-lib"] },
+        "cou": { "status": "partial", "note": "10 skills with 31 levels in the archived server data.", "sources": ["cou-lib"] },
         "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
         "odd": { "status": "yes", "note": "Skill learning since the early alphas; Teleportation and Piety skills mentioned in notes.", "sources": ["og-0-3-5", "og-0-8-0", "og-0-18-0"] }
       }
@@ -228,7 +232,7 @@
       "id": "achievements", "name": "Achievements and badges",
       "ours": ["badges"],
       "cells": {
-        "cou": { "status": "yes", "note": "Achievement data in 18 categories in the server.", "sources": ["cou-lib"] },
+        "cou": { "status": "yes", "note": "639 achievements in 18 categories in the server.", "sources": ["cou-lib"] },
         "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
         "odd": { "status": "yes", "note": "Achievements since 0.4.0, many added since.", "sources": ["og-0-4-0", "og-0-18-0"] }
       }
@@ -255,7 +259,7 @@
       "id": "homes", "name": "Houses and home streets",
       "ours": ["homes"],
       "cells": {
-        "cou": { "status": "unknown", "note": "No housing code found in the archived server.", "sources": ["cou-lib"] },
+        "cou": { "status": "partial", "note": "The client picks a home street through a separate service; no house code in the archived server.", "sources": ["cou-client", "cou-lib"] },
         "eleven": { "status": "yes", "note": "A 2019 player video tours a home street.", "sources": ["eg-vid-home"] },
         "odd": { "status": "yes", "note": "Home streets in 0.10.0, houses in 0.12.0, wall customising in 0.18.0.", "sources": ["og-0-10-0", "og-0-12-0", "og-0-18-0"] }
       }
@@ -370,7 +374,8 @@
     }
   ],
   "others": [
-    { "name": "Children of Ur, local revival", "text": "A developer's August 2026 Docker setup that runs the archived Children of Ur client, server and auth server locally, with fixes and content recovery notes.", "url": "https://github.com/davidmanheim/ChildrenOfUr", "checked": "2026-10-22" },
+    { "name": "Children of Ur, local revival", "text": "A developer's August 2026 Docker setup that runs the archived Children of Ur client, server and auth server locally, with fixes and content recovery notes.", "url": "https://github.com/davidmanheim/ChildrenOfUr", "checked": "2026-10-26" },
+    { "name": "Children of Ur, run locally by a player", "text": "A player's September 2026 Reddit post about getting the archived Children of Ur code running on their own computer, past the login screen and into the game world.", "url": "https://www.reddit.com/r/glitchthegame/comments/1w5knr4/getting_the_cou_to_run/", "checked": "2026-10-26" },
     { "name": "Children of Ur minidemo", "text": "A planned single-player, simplified demo for the Children of Ur site; archived in 2015.", "url": "https://github.com/ChildrenOfUr/minidemo", "checked": "2026-10-22" },
     { "name": "unUrthed", "text": "An HTML5 mini-game of Glitch from 2013.", "url": "https://github.com/harkyman/unUrthed", "checked": "2026-10-22" }
   ],
