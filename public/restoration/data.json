@@ -2480,9 +2480,19 @@
   ]
  },
  "git": {
-  "commits": 532,
+  "commits": 534,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "fix",
+    "text": "Blurred street layers look like the original: a blur of 1 is sharp, the rest a box blur at screen sharpness"
+   },
+   {
+    "date": "2026-10-26",
+    "kind": "improve",
+    "text": "The compare page splits trading from the auction house"
+   },
    {
     "date": "2026-10-26",
     "kind": "new",
@@ -2592,19 +2602,9 @@
     "date": "2026-10-26",
     "kind": "new",
     "text": "In multiplayer, race Grab 'Em Good and the finish-line races against real players"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "new",
-    "text": "In multiplayer, a Rook attack is one fight for everyone on the street"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "A new multiplayer character starts as a new player, in the tutorial"
    }
   ]
  },
- "tests": 311,
+ "tests": 312,
  "generatedAt": "2026-10-26"
 }

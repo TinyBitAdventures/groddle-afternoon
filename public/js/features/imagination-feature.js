@@ -116,9 +116,17 @@ function ctxFor(engine = engineRef) {
     quoinMultiplier: Number(engine?.quoinState?.multiplier) || 1,
     brainCapacity: state.brainCapacity,
     inTutorial: false,
-    offerable: isOfferedInRemake,
+    offerable: engine?.mode === 'multiplayer' ? offeredInMultiplayer : isOfferedInRemake,
   };
 }
+
+/**
+ * Cards that need other players, dealt in multiplayer only: Trade Channelling
+ * opens the Trade Channel there (register G326, groups-feature; player.js:3404
+ * canJoinTradeChat). Solo deals what it always did.
+ */
+const MULTIPLAYER_OFFERS = new Set(['trade_channel']);
+const offeredInMultiplayer = (id) => isOfferedInRemake(id) || MULTIPLAYER_OFFERS.has(id);
 
 /** Keep the player's tank in step with purchased Energy Tank cards. */
 function syncEnergyTank(engine = engineRef, refill = false) {
@@ -595,7 +603,8 @@ function renderOwned(body, list) {
     mini.append(card);
     if (row.count > 1) mini.append(el('span', { class: 'img-count' }, `×${row.count}`));
     mini.append(el('b', {}, row.name));
-    const tag = row.starter ? 'Tutorial card' : status.status === 'live' ? '' : status.status === 'partial' ? 'Partly here' : 'Not here yet';
+    const live = status.status === 'live' || (engineRef?.mode === 'multiplayer' && MULTIPLAYER_OFFERS.has(row.id));
+    const tag = row.starter ? 'Tutorial card' : live ? '' : status.status === 'partial' ? 'Partly here' : 'Not here yet';
     if (tag) mini.append(el('span', { class: 'img-tag' }, tag));
     grid.append(mini);
   }

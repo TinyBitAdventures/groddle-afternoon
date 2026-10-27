@@ -280,6 +280,48 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
     },
 
     /**
+     * Groups (register G326, groddle-afternoon-site/src/Groups.php): groups()
+     * and every change answer the caller's { max, count, groups, invites,
+     * channels: { global, help, trade, silenced }, watch: { token,
+     * expiresIn } }, the token being what the realtime server lets the
+     * socket open group chat and the channels with (groups_watch).
+     * searchGroups answers { q, groups } (public ones), group(id) one group
+     * with its people. A refusal throws with .status, .code and the site's
+     * .message (and .data.fields for a create).
+     */
+    async groups() {
+      return buddyCall('Loading groups', 'groups');
+    },
+
+    async searchGroups(q = '') {
+      return buddyCall('Finding groups', `groups/search?q=${encodeURIComponent(String(q).slice(0, 32))}`);
+    },
+
+    async group(id) {
+      return buddyCall('Loading the group', `groups/${Number(id)}`);
+    },
+
+    async createGroup({ name, description = '', mode = 'public' }) {
+      return buddyCall('Making a group', 'groups', { method: 'POST', body: { name: String(name ?? ''), description: String(description ?? ''), mode: String(mode) } });
+    },
+
+    async joinGroup(id) {
+      return buddyCall('Joining the group', `groups/${Number(id)}/members`, { method: 'POST' });
+    },
+
+    async leaveGroup(id) {
+      return buddyCall('Leaving the group', `groups/${Number(id)}/members`, { method: 'DELETE' });
+    },
+
+    async inviteToGroup(id, playerId) {
+      return buddyCall('Inviting', `groups/${Number(id)}/invites`, { method: 'POST', body: { id: Number(playerId) } });
+    },
+
+    async declineGroupInvite(id) {
+      return buddyCall('Declining', `groups/${Number(id)}/invites`, { method: 'DELETE' });
+    },
+
+    /**
      * The player's profile (register G338, groddle-afternoon-site/src/Profiles.php):
      * { id, name, url, about, aboutMax, avatar: { key, at, url } | null,
      * home: { key, at, url } | null }. Each write answers the same. Pictures

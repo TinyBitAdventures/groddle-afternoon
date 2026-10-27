@@ -518,8 +518,9 @@ describe('every save read and write goes through the store', () => {
     .filter((f) => f.endsWith('.js'))
     .map((f) => join(dir, f));
   // Storage layers and device preferences that stay on localStorage directly;
-  // online-boot.js keeps one per-tab flag (Play as <name> picked) in sessionStorage, never a save.
-  const ALLOWED = new Set(['js/save-store.js', 'js/practice-mode.js', 'js/audio-pref.js', 'js/online-boot.js']);
+  // online-boot.js keeps one per-tab flag (Play as <name> picked) in sessionStorage, never a save;
+  // groups-feature.js remembers which chat tabs a multiplayer player has open on this device, never a save.
+  const ALLOWED = new Set(['js/save-store.js', 'js/practice-mode.js', 'js/audio-pref.js', 'js/online-boot.js', 'js/features/groups-feature.js']);
 
   it('game.js and js/ make no direct localStorage or sessionStorage calls', () => {
     const offenders = [];

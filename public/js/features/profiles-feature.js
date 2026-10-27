@@ -30,7 +30,7 @@
  * profileAboutSaved (saved, failed).
  */
 
-import { createMinnAccount } from '../minn-account.js?v=g338-1';
+import { createMinnAccount } from '../minn-account.js?v=g326-1';
 import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-compositor.js';
 import { drawListBounds } from '../avatar-rig.js';
 import { lookKey, resolveLook } from '../avatar-looks.js';
