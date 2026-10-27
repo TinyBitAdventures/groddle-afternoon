@@ -16,13 +16,26 @@
  * QA: ?autostart=1&fresh=1&resetgame=1&jobdemo=<job class or job id>
  *     (&jobautoplay=1, &jobphase=N)
  *
+ * Multiplayer (G346, engine.mode 'multiplayer' with a realtime client): a
+ * street's build and upgrade projects are shared. The realtime server
+ * (groddle-afternoon-server projects.go) owns them: every player's items,
+ * currants and work fill the same phases, an item or currant contribution
+ * counts once the site's ledger has taken it out of the player's ledger
+ * (project_given: then it leaves the pack here), work units go one per
+ * 1.5 s, and each contributor's reward comes from the server by the
+ * source's shares and top-contributor rules (project_reward: the currants
+ * and items already in the ledger). Everyone at the board sees it fill; a
+ * finished street opens its road for everyone (project_built). Hire a hand
+ * is solo only; restorations (projectApi) stay per player. Pure half:
+ * js/street-jobs-mp.js. Solo runs none of it.
+ *
  * Other features run their own projects through `projectApi` (the same
  * panel, contributions, work units, Hire a hand, phase settling and badges):
  * homes-feature.js registers a depleted cultivation's restoration (kind
  * 'restore', job type 5) and finishes the restore in its `onDone` hook.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon } from '../inventory.js?v=catalog-unified-7';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-3';
 import { ecologyForStreet } from '../street-ecology.js?v=official-ecology-7';
 import { worldToScreen } from '../street-model.js';
@@ -66,8 +79,26 @@ import {
   jobInProgress,
   cancelJob,
   jobDivisor,
+  upgradeOption,
 } from '../street-jobs.js?v=jobs-3';
-import { gainMetabolic } from '../metabolics.js';
+import { gainMetabolic, loseEnergy } from '../metabolics.js';
+import { saveStore } from '../save-store.js?v=mp2-2';
+import {
+  MP_TEXT,
+  applyWorld,
+  isSharedJob,
+  listsFrom,
+  localTime,
+  markContributed,
+  migrateToShared,
+  phaseShare,
+  remember,
+  rewardParts,
+  rewardPlan,
+  rowFromServer,
+  sharedSlice,
+  topLine,
+} from '../street-jobs-mp.js?v=g346-1';
 import { grantMoodXp } from '../mood-xp.js';
 import { textureFromUrl } from '../textures.js';
 
@@ -101,6 +132,14 @@ let demo = null; // { jobId, phase }
 const external = new Map();
 /** QA autoplay of an external project (projectApi.autoplay). */
 let extAuto = null; // { jobId }
+/** Multiplayer (G346): the shared board's session, the ids the save has applied, the option backed per upgrade. */
+let mpMode = false;
+let mp = null;
+let mpLists = { applied: [], rewarded: [] };
+let mpMigrated = false;
+const mpChoice = {};
+/** Is this project the server's (multiplayer, a street's build or upgrade)? */
+const shared = (jobId) => mpMode && Boolean(catalog) && isSharedJob(catalog, jobId);
 
 /* ------------------------------------------------------------------ */
 /* Loading                                                              */
@@ -439,6 +478,8 @@ function completionPages(html, vars) {
 }
 
 function finishPhase(engine, jobId) {
+  // A shared project's phases are settled by the server (project_reward).
+  if (shared(jobId)) return;
   if (!phaseIsComplete(state, catalog, jobId)) return;
   if (work?.jobId === jobId) stopWork(engine, '');
   const job = jobDef(catalog, jobId);
@@ -499,7 +540,9 @@ function finishJob(engine, jobId, out, solo) {
   const contributions = job.phases
     .map((p, i) => {
       const mine = state.jobs[jobId]?.mine?.[p.classTsid];
-      return `${i + 1}. ${p.label || catalog.classes[p.classTsid]?.title || 'Phase'}: ${mine ? 'You contributed 100% of the work!' : 'You did not contribute.'}`;
+      // Shared (multiplayer): your share of each phase's base cost, as the source's text said it.
+      const pct = shared(jobId) ? Math.round(phaseShare(state.jobs[jobId], p.classTsid, catalog.classes[p.classTsid], jobDivisor(job)) * 100) : 100;
+      return `${i + 1}. ${p.label || catalog.classes[p.classTsid]?.title || 'Phase'}: ${mine ? `You contributed ${pct}% of the work!` : 'You did not contribute.'}`;
     })
     .join(' ');
   teleportationFeature.grantScript(engine, arrivalFor(job));
@@ -607,6 +650,11 @@ function startWork(engine, jobId, rid, maxUnits = Infinity) {
     anchorX: engine.player.x,
     toolSprite: icon,
     tool: check.tool,
+    // Shared: each unit goes to the server, and counts (energy, wear) when it answers.
+    mp: shared(jobId),
+    awaiting: 0,
+    req: check.req,
+    cls: jobDef(catalog, jobId).phases[state.jobs[jobId]?.phase || 0]?.classTsid || '',
   };
   engine.pushActivity(`You start to ${check.req.verb} with your ${itemLabel(check.tool)}.`);
   // Step back to the street so the work is visible; the board reopens the panel.
@@ -642,6 +690,10 @@ function tickWork(engine, now) {
   }
   if (Math.abs(p.x - work.anchorX) > WALK_AWAY_PX) {
     stopWork(engine, 'You walked away from the project.');
+    return;
+  }
+  if (work.mp) {
+    mpTickWork(engine, now);
     return;
   }
   if (now < work.nextAt) return;
@@ -798,12 +850,18 @@ function renderPanel(engine) {
   optBox.hidden = job.kind !== 'upgrade';
   if (job.kind === 'upgrade') {
     const up = catalog.upgrades[job.street];
-    const chosen = row.option || up.options[0]?.id;
+    const chosen = (shared(jobId) && mpChoice[jobId]) || row.option || up.options[0]?.id;
     for (const o of up.options) {
       const b = el('button', { type: 'button', class: o.id === chosen ? 'is-chosen' : '', dataset: { sjOption: o.id } });
       b.append(document.createTextNode(`${o.id === chosen ? '★ ' : ''}${o.name}`), el('span', {}, o.desc));
       b.disabled = status.status === 'done';
       b.addEventListener('click', () => {
+        // Shared: the option you back rides on each contribution (the server counts the votes).
+        if (shared(jobId)) {
+          mpChoice[jobId] = o.id;
+          renderPanel(engine);
+          return;
+        }
         chooseOption(state, catalog, jobId, o.id);
         engine.save();
         renderPanel(engine);
@@ -844,6 +902,7 @@ function renderPanel(engine) {
       if (r.skill) meta.push(`needs ${skillLabel(r.skill)}`);
     }
     if (!r.done && !r.open) meta.push('opens after the earlier steps');
+    if (shared(jobId) && row.held?.[r.id]) meta.push(`${row.held[r.id]} being counted`);
     text.append(el('small', {}, meta.join(' · ')));
     const acts = el('div', { class: 'sj-acts' });
     if (open && r.open) {
@@ -851,13 +910,13 @@ function renderPanel(engine) {
         const have = countItem(engine.inv, r.classId);
         const n = Math.min(have, r.need - r.got);
         const b = el('button', { type: 'button', class: 'primary', dataset: { sjAct: 'give' } }, n ? `Add ${n}` : 'Add');
-        b.disabled = !n;
+        b.disabled = !n || Boolean(mp?.giving);
         b.addEventListener('click', () => doGive(engine, jobId, r.classId, n));
         acts.append(b);
       } else if (r.type === 'currants') {
         const n = Math.min(engine.pc.currants || 0, r.need - r.got);
         const b = el('button', { type: 'button', class: 'primary', dataset: { sjAct: 'currants' } }, n ? `Give ${n.toLocaleString()}` : 'Give');
-        b.disabled = !n;
+        b.disabled = !n || Boolean(mp?.giving);
         b.addEventListener('click', () => doCurrants(engine, jobId, n));
         acts.append(b);
       } else if (r.type === 'work') {
@@ -873,7 +932,7 @@ function renderPanel(engine) {
           b.title = check.ok ? `${r.need - r.got} units, ${(WORK_UNIT_MS / 1000).toFixed(1)}s each` : check.msg;
           b.addEventListener('click', () => startWork(engine, jobId, r.id));
           acts.append(b);
-          if (check.canHire) {
+          if (check.canHire && !shared(jobId)) {
             const quote = hireQuote(state, catalog, jobId, r.id);
             const h = el('button', { type: 'button', dataset: { sjAct: 'hire' } }, `Hire a hand · ${quote.cost.toLocaleString()}c`);
             h.title = `${check.msg} A neighbour who has it does the rest for its base cost.`;
@@ -900,6 +959,10 @@ function renderPanel(engine) {
     active: `Solo amounts: 1/${SOLO_DIVISOR} of the original multiplayer totals.${work ? ` Working: ${work.units} units so far.` : ''}`,
     open: `Solo amounts: 1/${SOLO_DIVISOR} of the original multiplayer totals. Every contribution counts toward this phase.`,
   }[status.status];
+  if (shared(jobId) && (status.status === 'active' || status.status === 'open')) {
+    const top = topLine(row, def, jobDivisor(job));
+    statusLine.textContent = `${MP_TEXT.note}${top ? ` Top contributors: ${top}.` : ' Nobody has put anything in yet.'}${work ? ` Working: ${work.units} units so far.` : ''}`;
+  }
   if (job.kind === 'restore' && (status.status === 'active' || status.status === 'open')) {
     const reward = Math.round((def.rewards?.xp || 0) * (Number(job.rewardMultiplier) || 1));
     statusLine.textContent = `${external.get(jobId)?.note || ''} Original amounts${jobDivisor(job) === 1 ? '' : ` / ${jobDivisor(job)}`}. Finishing it pays up to ${reward.toLocaleString()} iMG.${work ? ` Working: ${work.units} units so far.` : ''}`.trim();
@@ -925,6 +988,7 @@ function renderPanel(engine) {
 }
 
 function doGive(engine, jobId, classId, n) {
+  if (shared(jobId)) return mpGive(engine, jobId, { classId, n });
   const res = contributeItems(state, catalog, jobId, classId, n, engine.inv);
   if (!res.ok) return engine.toast(res.msg), false;
   engine.pushActivity(`You contributed ${res.amount} ${itemLabel(classId, res.amount)}.`);
@@ -938,6 +1002,7 @@ function doGive(engine, jobId, classId, n) {
 }
 
 function doCurrants(engine, jobId, n) {
+  if (shared(jobId)) return mpGive(engine, jobId, { currants: n });
   const res = contributeCurrants(state, catalog, jobId, n, engine.pc);
   if (!res.ok) return engine.toast(res.msg), false;
   engine.pushActivity(`You contributed ${res.amount.toLocaleString()} currants.`);
@@ -950,6 +1015,7 @@ function doCurrants(engine, jobId, n) {
 }
 
 function doHire(engine, jobId, rid) {
+  if (shared(jobId)) return false;
   const res = hireWork(state, catalog, jobId, rid, workCtx(engine));
   if (!res.ok) return engine.toast(res.msg), false;
   engine.pushActivity(`You hired a hand for ${res.units} units of work (${res.cost.toLocaleString()} currants).`);
@@ -959,6 +1025,320 @@ function doHire(engine, jobId, rid) {
   renderPanel(engine);
   drawPlate(engine);
   return true;
+}
+
+
+/* ------------------------------------------------------------------ */
+/* Multiplayer: the shared board (G346, projects.go)                    */
+/* ------------------------------------------------------------------ */
+
+const n0 = (v) => Math.max(0, Math.floor(Number(v) || 0));
+const BLOCKED_SAVES = new Set(['conflict', 'signed-out', 'error', 'offline']);
+/** A give the server has not answered is let go after this (its answer still applies when it comes). */
+const GIVE_WAIT_MS = 20000;
+const WORK_WAIT_MS = 6000;
+
+/** Writes the save now and waits for it to land (as trade-feature persist): true once saved. */
+async function persist(engine) {
+  engine.save?.();
+  if (typeof saveStore?.flush !== 'function') return true;
+  for (let i = 0; i < 6; i += 1) {
+    let st;
+    try {
+      st = await saveStore.flush();
+    } catch {
+      return false;
+    }
+    const now = saveStore.state || st;
+    if (now === 'saved') return true;
+    if (BLOCKED_SAVES.has(now)) return false;
+  }
+  return saveStore.state === 'saved';
+}
+
+function ensureMp(engine) {
+  if (mp || !mpMode || !catalog || typeof document === 'undefined') return mp;
+  const client = engine.query?.('realtimeClient');
+  if (!client) return null;
+  if (!mpMigrated) {
+    mpMigrated = true;
+    // The server's rows replace any this character kept on its own (a project it finished keeps its road).
+    if (migrateToShared(state, catalog)) engine.save?.();
+  }
+  mp = createMp(engine, client);
+  globalThis.groddleProjects = mp;
+  return mp;
+}
+
+function createMp(engine, client) {
+  let offset = 0;
+  let synced = null;
+  const s = { client, giving: null, applying: new Set(), lastError: '', get offset() { return offset; } };
+  const clock = (msg) => {
+    if (Number(msg?.now) > 0) offset = Number(msg.now) - Date.now();
+  };
+  const refresh = () => {
+    drawPlate(engine);
+    renderPanel(engine);
+    publish(engine);
+  };
+  s.sync = () => {
+    synced = client.street || '';
+    client.send('project_sync', {});
+  };
+  client.on('hello', () => s.sync());
+  client.on('roster', ({ street } = {}) => {
+    if ((street || '') !== synced) s.sync();
+  });
+  if (client.state === 'online') s.sync();
+
+  client.on('msg:project_world', (msg) => {
+    clock(msg);
+    applyWorld(state, catalog, msg, offset);
+    drawBarricades(engine);
+    refresh();
+  });
+  client.on('msg:project_built', (msg) => {
+    clock(msg);
+    const jobId = String(msg.job || '');
+    applyWorld(state, catalog, { built: { [jobId]: { at: msg.at, option: msg.option } }, rest: msg.rest }, offset);
+    const job = jobDef(catalog, jobId);
+    if (work?.jobId === jobId) stopWork(engine, '');
+    // locations/inc_jobs.js jobs_modify_connections: the road opens for everyone.
+    if (job?.kind === 'street' && job.connecting.includes(engine.streetTsid)) engine.toast(`The road to ${job.label} is open!`, 3200);
+    drawBarricades(engine);
+    refresh();
+  });
+  client.on('msg:project_street', (msg) => {
+    clock(msg);
+    for (const [jobId, row] of Object.entries(msg.jobs || {})) if (isSharedJob(catalog, jobId)) state.jobs[jobId] = rowFromServer(row, offset);
+    refresh();
+  });
+  client.on('msg:project_state', (msg) => {
+    clock(msg);
+    const jobId = String(msg.job || '');
+    if (!isSharedJob(catalog, jobId)) return;
+    state.jobs[jobId] = rowFromServer(msg.row, offset);
+    if (work?.mp && work.jobId === jobId && !work.awaiting) {
+      const req = phaseRequirements(state, catalog, jobId).find((r) => r.id === work.rid);
+      if (!req || !req.open) stopWork(engine, '');
+    }
+    refresh();
+  });
+  client.on('msg:project_given', (msg) => applyGiven(msg));
+  client.on('msg:project_worked', (msg) => mpWorked(engine, msg));
+  client.on('msg:project_reward', (msg) => applyReward(msg));
+  client.on('error', ({ code, message } = {}) => {
+    if (code !== 'project' || !message) return;
+    s.giving = null;
+    s.lastError = message;
+    if (work?.mp) stopWork(engine, message);
+    else {
+      engine.toast(message, 3200);
+      engine.pushActivity(message);
+    }
+    renderPanel(engine);
+    publish(engine);
+  });
+
+  /** project_given: the ledger took it, so it leaves the pack now (once: the id is remembered and saved). */
+  async function applyGiven(msg) {
+    const id = String(msg.id || '');
+    if (!id) return;
+    if (s.giving?.job === msg.job) s.giving = null;
+    if (s.applying.has(id)) return;
+    if (mpLists.applied.includes(id)) {
+      if (await persist(engine)) client.send('project_ack', { id });
+      return;
+    }
+    s.applying.add(id);
+    const jobId = String(msg.job || '');
+    const items = Object.entries(msg.items && typeof msg.items === 'object' ? msg.items : {});
+    for (const [c, n] of items) {
+      const k = Math.min(countItem(engine.inv, c), n0(n));
+      if (k > 0) removeItem(engine.inv, c, k);
+    }
+    const cur = Math.min(n0(msg.currants), n0(engine.pc.currants));
+    if (cur > 0) engine.pc.currants = n0(engine.pc.currants) - cur;
+    remember(mpLists.applied, id);
+    const rec = markContributed(state, jobId, String(msg.cls || ''));
+    if (rec.newPhase) for (const badge of contributionBadgesReached(rec.distinctPhases)) engine.grantAchievement(badge);
+    const [c, n] = items[0] || [];
+    engine.pushActivity(c ? `You contributed ${n0(n)} ${itemLabel(c, n0(n))}.` : `You contributed ${n0(msg.currants).toLocaleString()} currants.`);
+    if (c) engine.playSound('ITEM_GIVE', { volume: 0.55 });
+    lastResult = `${jobId}:given:${c || 'currants'}`;
+    engine.updateHud();
+    refresh();
+    const ok = await persist(engine);
+    s.applying.delete(id);
+    if (ok) client.send('project_ack', { id });
+  }
+
+  /** project_reward: the server's share for this phase (players/inc_jobs.js); its currants and items are in the ledger already. */
+  async function applyReward(msg) {
+    const id = String(msg.id || '');
+    if (!id || s.applying.has(id)) return;
+    const plan = rewardPlan(msg, mpLists);
+    if (plan.skip) {
+      if (await persist(engine)) client.send('project_ack', { id });
+      return;
+    }
+    s.applying.add(id);
+    const jobId = String(msg.job || '');
+    const job = jobDef(catalog, jobId);
+    const index = n0(msg.phase);
+    const pc = job ? phaseClass(catalog, jobId, index) : null;
+    if (job && pc?.def) {
+      const parts = rewardParts(msg, { ledger: plan.ledger });
+      const paid = payout(engine, parts.rewards);
+      const paidPerformance = payout(engine, parts.performance);
+      grantItems(engine, parts.performance.items);
+      // quest.js 1715-1719: the top five get a job_phase_winner count.
+      if (msg.top5) {
+        engine.achievement(PHASE_WINNER_COUNTER, 1);
+        state.phaseWins += 1;
+      }
+      const out = {
+        index,
+        phase: pc.phase,
+        def: pc.def,
+        participation: n0(msg.participation),
+        finalPhase: msg.final === true,
+        phaseCount: job.phases.length,
+        participant: n0(msg.phases) >= 4,
+        option: job.kind === 'upgrade' ? upgradeOption(catalog, job.street, msg.option) : null,
+        next: job.phases[index + 1],
+        readyAt: localTime(msg.readyAt, offset),
+      };
+      mpPhaseAward(engine, jobId, out, paid, paidPerformance, `${MP_TEXT.note} ${msg.winner ? MP_TEXT.winner : MP_TEXT.notWinner}`);
+    }
+    remember(mpLists.rewarded, id);
+    remember(mpLists.applied, id);
+    const ok = await persist(engine);
+    s.applying.delete(id);
+    if (ok) client.send('project_ack', { id });
+  }
+
+  // QA (window.groddleProjects): the board's own actions, and the row as this page sees it.
+  s.open = (jobId) => openPanel(engine, jobId);
+  s.give = (jobId, classId, n) => doGive(engine, jobId, classId, n);
+  s.currants = (jobId, n) => doCurrants(engine, jobId, n);
+  s.work = (jobId, rid, max = Infinity) => startWork(engine, jobId, rid, max);
+  s.row = (jobId) => JSON.parse(JSON.stringify(state.jobs[jobId] || null));
+  s.lists = () => ({ applied: [...mpLists.applied], rewarded: [...mpLists.rewarded] });
+  s.working = () => (work ? { jobId: work.jobId, rid: work.rid, units: work.units } : null);
+  s.roadOpen = (tsid) => !roadClosure(state, catalog, tsid, [tsid], opts());
+  s.tick = (now) => {
+    if (s.giving && now - s.giving.at > GIVE_WAIT_MS) {
+      s.giving = null;
+      renderPanel(engine);
+    }
+  };
+  return s;
+}
+
+/** An item or currant contribution: asked of the server, which asks the site's ledger; the pack changes on project_given. */
+function mpGive(engine, jobId, what) {
+  const s = ensureMp(engine);
+  if (!s) return engine.toast(MP_TEXT.offline), false;
+  if (s.giving) return engine.toast(MP_TEXT.counting), false;
+  const money = what.currants != null;
+  const reqs = phaseRequirements(state, catalog, jobId);
+  const req = money ? reqs.find((r) => r.type === 'currants' && r.open) : reqs.find((r) => r.type === 'item' && r.classId === what.classId && r.open);
+  if (!req) return engine.toast(money ? 'No currants are needed right now.' : 'Nothing here needs that right now.'), false;
+  const have = money ? n0(engine.pc.currants) : countItem(engine.inv, what.classId);
+  const n = Math.min(n0(money ? what.currants : what.n), have, req.need - req.got - n0(state.jobs[jobId]?.held?.[req.id]));
+  if (n <= 0) return engine.toast(money ? 'You do not have any currants to give.' : `You have no ${String(what.classId).replace(/_/g, ' ')} to give.`), false;
+  const payload = { job: jobId, req: req.id, option: mpChoice[jobId] || '' };
+  if (money) payload.currants = n;
+  else payload.n = n;
+  if (!s.client.send('project_give', payload)) return engine.toast(MP_TEXT.offline), false;
+  s.giving = { job: jobId, req: req.id, at: Date.now() };
+  renderPanel(engine);
+  publish(engine);
+  return true;
+}
+
+/** A shared work session: one unit sent every 1.5 s; it counts (energy, wear) when the server says so. */
+function mpTickWork(engine, now) {
+  if (!mp) {
+    stopWork(engine, MP_TEXT.offlineWork);
+    return;
+  }
+  if (work.awaiting) {
+    if (now - work.awaiting > WORK_WAIT_MS) stopWork(engine, MP_TEXT.lostWork);
+    return;
+  }
+  if (now < work.nextAt) return;
+  const check = workCheck(state, catalog, work.jobId, work.rid, workCtx(engine));
+  if (!check.ok) {
+    stopWork(engine, check.msg);
+    return;
+  }
+  if (!mp.client.send('project_work', { job: work.jobId, req: work.rid, option: mpChoice[work.jobId] || '' })) {
+    stopWork(engine, MP_TEXT.offlineWork);
+    return;
+  }
+  work.awaiting = now;
+  work.nextAt = now + WORK_UNIT_MS;
+}
+
+function mpWorked(engine, msg) {
+  if (!work?.mp || msg.job !== work.jobId || msg.req !== work.rid) return;
+  work.awaiting = 0;
+  const req = work.req;
+  // items/include/jobs.js acceptJobWork: the unit's energy and tool wear (G289 loseEnergy).
+  loseEnergy(engine.pc, req.energy);
+  const wear = useToolCondition(engine.toolState, work.tool, req.wear);
+  work.units += 1;
+  work.energy += req.energy;
+  const p = engine.player;
+  engine.floatText(p.x, p.y - 118, `+1 ${req.verbPast}`, 0xf2c14e);
+  if (wear?.msg) engine.pushActivity(wear.msg);
+  const rec = markContributed(state, work.jobId, work.cls);
+  if (rec.newPhase) for (const badge of contributionBadgesReached(rec.distinctPhases)) engine.grantAchievement(badge);
+  engine.updateHud();
+  drawPlate(engine);
+  if (n0(msg.left) <= 0 || work.units >= work.maxUnits) {
+    stopWork(engine, '');
+    return;
+  }
+  if (panel && !panel.hidden) renderPanel(engine);
+}
+
+/** The phase award for a shared project, in the solo board's words (finishPhase) with the shared note. */
+function mpPhaseAward(engine, jobId, out, paid, paidPerformance, note) {
+  if (work?.jobId === jobId) stopWork(engine, '');
+  const job = jobDef(catalog, jobId);
+  const bits = [...rewardBits(paid), ...rewardBits(paidPerformance)];
+  let title = `${job.title}: phase ${out.index + 1} of ${out.phaseCount}`;
+  let steps;
+  if (out.finalPhase) {
+    ({ title, steps } = finishJob(engine, jobId, out, note));
+  } else {
+    steps = [
+      {
+        text: `Yay! The ${phaseOrdinal(out.index)} phase, ${phaseTitle(job, out.phase, out.def)}, of the project ${job.title} has been completed! You did ${out.participation}% of the work.`,
+        response: 'View Rewards',
+      },
+      { text: note, response: 'Continue' },
+    ];
+    const upcoming = out.next;
+    const mins = out.readyAt ? Math.round((out.readyAt - Date.now()) / 60000) : 0;
+    steps.push({
+      text: mins
+        ? `${upcoming?.delayText || `The ${phaseOrdinal(out.index + 1)} phase, ${upcoming?.label || 'the next phase'}, opens in ${mins} minutes.`}`
+        : `The ${phaseOrdinal(out.index + 1)} phase, ${upcoming?.label || 'the next phase'}, is ready now.`,
+      response: 'OK',
+    });
+  }
+  engine.award({ kind: 'quest', title, body: '', subtitle: bits.join(' · '), iconUrl: BOARD_ART, steps, primaryLabel: 'OK' });
+  lastResult = `${jobId}:phase${out.index + 1}${out.finalPhase ? ':done' : ''}`;
+  engine.pushActivity({ base: `Project phase complete: ${job.title}`, effects: { xp: paid.xp + paidPerformance.xp } });
+  engine.playSound('COMPLETE_QUEST_REQUIREMENT', { volume: 0.6 });
+  engine.updateHud();
+  renderPanel(engine);
+  drawPlate(engine);
 }
 
 /* ------------------------------------------------------------------ */
@@ -1008,7 +1388,7 @@ function seedPhase(engine, jobId, { realWork }) {
 
 function autoplayStep(engine, now) {
   const jobId = extAuto?.jobId || (demo && engine.param('jobautoplay') ? demo.jobId : null);
-  if (!jobId || autoplay.stage === 'done') return;
+  if (!jobId || autoplay.stage === 'done' || shared(jobId)) return;
   if (now < autoplay.timer) return;
   if (engine.questDialogueOpen()) {
     engine.acceptOpenOffer();
@@ -1110,6 +1490,14 @@ function publish(engine) {
   engine.setData('streetJobUpgrade', appliedUpgrade(state, catalog, engine.streetTsid)?.name || '');
   engine.setData('streetJobPlayable', String(catalog.counts?.playableJobs || 0));
   if (engine.param('jobautoplay') || extAuto) engine.setData('streetJobAutoplay', autoplay.stage);
+  if (mpMode) {
+    engine.setData('streetJobShared', mp ? 'on' : 'waiting');
+    engine.setData('streetJobGiving', mp?.giving ? mp.giving.req : '');
+    const row = head ? state.jobs[head.jobId] : null;
+    const pcx = head ? phaseClass(catalog, head.jobId, row?.phase || 0) : null;
+    engine.setData('streetJobTop', row && pcx?.def ? topLine(row, pcx.def, jobDivisor(jobDef(catalog, head.jobId))) : '');
+    engine.setData('streetJobMine', row ? JSON.stringify(row.mine || {}) : '');
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -1121,15 +1509,26 @@ export const streetJobsFeature = {
 
   init(engine) {
     engineRef = engine;
+    mpMode = engine?.mode === 'multiplayer';
     load();
   },
 
   save() {
+    // Multiplayer: the shared rows are the server's; the save keeps the player's own bits and the applied ids.
+    if (mpMode) return catalog ? sharedSlice(state, catalog, mpLists) : { ...state, ...mpLists };
     return state;
   },
 
-  restore(slice) {
+  restore(slice, engine) {
     state = normalizeStreetJobState(slice || {});
+    if (engine) mpMode = engine.mode === 'multiplayer';
+    mpLists = mpMode ? listsFrom(slice) : { applied: [], rewarded: [] };
+    mpMigrated = false;
+    if (mp && catalog) {
+      mpMigrated = true;
+      migrateToShared(state, catalog);
+      mp.sync();
+    }
   },
 
   ecologyOverride(street) {
@@ -1157,7 +1556,8 @@ export const streetJobsFeature = {
     load().then(() => {
       if (mine !== generation || !catalog) return;
       if (initializeStreetJobs(state, engine.visitedStreets ? engine.visitedStreets() : [])) engine.save();
-      if (engine.param('jobdemo') && !demo) demo = resolveDemo(engine);
+      if (mpMode) ensureMp(engine);
+      if (engine.param('jobdemo') && !demo && !mpMode) demo = resolveDemo(engine);
       const tsid = engine.streetTsid;
       if (demo) {
         const p = engine.player;
@@ -1187,6 +1587,7 @@ export const streetJobsFeature = {
 
   onTick(dtMs, now, engine) {
     if (!catalog) return;
+    if (mpMode) ensureMp(engine)?.tick(now);
     const px = engine.player?.x;
     for (const b of barricades) {
       if (b.barricadeTag && !b.destroyed) b.barricadeTag.visible = Number.isFinite(px) && Math.abs(px - b.x) < 160;
