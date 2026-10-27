@@ -801,7 +801,9 @@ async function goVisit(engine, opts = {}) {
   const scene = {
     tsid: neighbourSceneTsid(neighbour.id),
     label: homeStreetLabel(neighbour),
-    hubName: 'Neighbourhood',
+    // G318: home streets are copied into mote 15 "Homes" (inc_houses.js 1127), whose hub is
+    // 117 "Homes" (inc_data_maps_prod.js 959-966, 1355).
+    hubName: 'Homes',
     width: NEIGHBOUR_SCENE.width,
     height: NEIGHBOUR_SCENE.height,
     background: buildNeighbourBackground(engine.PIXI, neighbour),
@@ -824,7 +826,7 @@ async function goVisit(engine, opts = {}) {
       fromLabel: engine.street?.label || '',
       fromHub: engine.street?.hubName || '',
       toLabel: homeStreetLabel(neighbour),
-      toHub: 'Neighbourhood',
+      toHub: 'Homes',
       topColor: top,
       bottomColor: bottom,
       // G270: a home street is a POL (location.js getLoadingInfo 3391-3410:

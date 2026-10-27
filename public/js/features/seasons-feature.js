@@ -107,12 +107,6 @@ const TALK_FRAMES = 74;
 // (tools/vector-sprites/seasons.json, routed by js/sprite-hires.js).
 const GIVE_RANGE = 260;
 const HELPER_NAMES = { npc_piggy: 'Piggy', npc_chicken: 'Chicken', npc_butterfly: 'Butterfly' };
-const RECIPIENT_LINES = Object.freeze({
-  npc_piggy: ['The Piggy crunches the candy, wrapper and all.', 'The Piggy snuffles the candy down in one go.'],
-  npc_chicken: ['The Chicken pecks the candy into a hundred pieces, then eats every one.'],
-  npc_butterfly: ['The Butterfly sips politely at the candy. Then less politely.'],
-  street_spirit: ['The Street Spirit pops the candy in its mouth. "Ooh, zingy."'],
-});
 
 let state = createSeasonState();
 let season = { ids: [], primary: null, via: 'none' };
@@ -264,7 +258,6 @@ function nearestLover(engine, range = GIVE_RANGE) {
   return best;
 }
 
-const loverKind = (t) => (/^street_spirit/.test(t.classId) ? 'street_spirit' : t.classId);
 const loverName = (t) => (/^street_spirit/.test(t.classId) ? 'Street Spirit' : HELPER_NAMES[t.classId] || t.label || 'friend');
 const loverKey = (engine, t) => `${engine.streetTsid}:${t.classId}:${Math.round(t.sprite?.baseX ?? t.sprite?.x ?? 0)}`;
 
@@ -802,11 +795,11 @@ function tickBoosts(engine, now) {
   const due = pendingBoosts.filter((b) => b.at <= now);
   pendingBoosts = pendingBoosts.filter((b) => b.at > now);
   for (const b of due) {
-    const pool = RECIPIENT_LINES[loverKind(b.recipient)] || RECIPIENT_LINES.npc_piggy;
     if (b.recipient?.sprite && !b.recipient.sprite.destroyed) engine.say?.(b.recipient, '*munch munch*', 1800);
-    // zilloweenBoostCheck: eaten inside 30 seconds of the gift.
+    // zilloweenBoostCheck: eaten inside 30 seconds of the gift. The giver hears only
+    // the source line (players/inc_items.js 838); nothing narrates the eater.
     const effects = { mood: grant(engine, 'mood', TREATER_BOOST.mood) };
-    say(engine, `${pool[Math.floor(Math.random() * pool.length)]} ${SOURCE_LINES.candyEaten}`, true, effects);
+    say(engine, SOURCE_LINES.candyEaten, true, effects);
   }
 }
 

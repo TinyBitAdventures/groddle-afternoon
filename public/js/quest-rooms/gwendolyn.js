@@ -1504,9 +1504,10 @@ let themeStage = 'desert';
 export const room = {
   id: ROOM_ID,
   title: "Gwendolyn's Task",
-  kicker: 'A vision quest',
+  // G318: all four templates sit in hub 79 "Tower Quest" (inc_data_maps_prod.js 441; streets 18019-18022).
+  kicker: 'Tower Quest',
   icon: `${ART}gwendolyn_icon.png`,
-  hubName: 'A vision quest',
+  hubName: 'Tower Quest',
   durationMs: 0, // exit_delay is the "Are you stuck?" prompt, not a clock
   doneLabel: 'Go back',
   leaveText: 'Leave the vision quest? Gwendolyn’s Task will start over from Area 42.',

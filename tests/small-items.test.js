@@ -28,14 +28,14 @@ import {
   planBallHit,
   reconcileFortunes,
 } from '../public/js/small-items.js?v=g155-1';
-import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=g375-1';
-import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=g375-1';
+import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=g377-1';
+import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=g377-1';
 import { FEATURES } from '../public/js/features/index.js';
 import { countItem } from '../public/js/inventory.js?v=catalog-unified-7';
 import { pickWoodTool, quoteWoodTreeHarvest, harvestWoodTree, woodToolLabel } from '../public/js/woodcutting.js?v=g369-1';
 import { TOOL_CONDITION_CATALOG, createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=woodcutting-test-3';
 import { HOG_HAUL_GAME_ID, HOG_HAUL_TICKET, RACE_STORE_ITEMS } from '../public/js/races.js?v=races-4';
-import { racesFeature } from '../public/js/features/races-feature.js?v=card-23';
+import { racesFeature } from '../public/js/features/races-feature.js?v=g377-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');

@@ -88,7 +88,7 @@ import { runStreetTransition } from '../screen-fx.js?v=card-2';
 import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-2';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
 import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=g311-1';
-import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=g334-6';
+import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=g377-1';
 import { startHogHaulMp } from './hog-haul-mp-feature.js?v=g334-hog-1';
 import { textureFromUrl } from '../textures.js';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=desk2-1';
@@ -574,7 +574,9 @@ async function startRace(raceId, engine, opts = {}) {
   const scene = {
     tsid: raceSceneTsid(raceId),
     label: race.title,
-    hubName: 'Race',
+    // G318: no hub line. Race templates sit in hub 67 "Multiplayer Quests" (inc_data_maps_prod.js
+    // 301, streets 17957-18004), and getLoadingInfo sends instances no hub_name (location.js 3311).
+    hubName: '',
     width: course.width,
     height: course.height,
     background,
@@ -594,7 +596,7 @@ async function startRace(raceId, engine, opts = {}) {
       fromLabel: engine.street?.label || '',
       fromHub: engine.street?.hubName || '',
       toLabel: race.title,
-      toHub: 'Race',
+      toHub: '',
       topColor: raceLoadingColors(course)[0],
       bottomColor: raceLoadingColors(course)[1],
       onMid: setup,
@@ -1889,7 +1891,7 @@ export const racesFeature = {
   /** A racer's place in a party roster (party-feature streetLabel): the race, not RACE_<match>. */
   labelFor(tsid) {
     if (!/^RACE_[0-9A-F]{16}$/.test(String(tsid || ''))) return null;
-    return { street: mp?.street === tsid ? RACES[mp.course]?.title || 'A race' : 'A race', hub: 'Race', hubId: 'scene' };
+    return { street: mp?.street === tsid ? RACES[mp.course]?.title || 'A race' : 'A race', hub: '', hubId: 'scene' };
   },
 
   /** QA / tests. */

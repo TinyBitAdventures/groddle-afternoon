@@ -49,8 +49,9 @@ const B_IDLE = `${LEGALIZE}npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_n
 const B_TALK = `${LEGALIZE}npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_talk_png_1354833010.png`;
 
 /**
- * Behind the veil. Reconstruction: the source conversation is lost; the lines
- * keep the npc_bureaucrat "sss" voice and the quest's class name.
+ * Behind the veil. Remake copy (G318: no source text for this moment): the
+ * source conversation is lost; the lines keep the npc_bureaucrat "sss" voice
+ * (npc_bureaucrat.js 887, 897) and the quest's class name.
  */
 export const VEIL_TALK = Object.freeze([
   { text: 'Oh! Er. Thisss is a ssstandard observation booth. Nothing to sssee here.', response: 'Are you watching me?' },
@@ -347,10 +348,11 @@ export const room = {
 
   objective(ctx) {
     const p = ctx.player;
-    let text = 'Ride it out. Something is watching you.';
+    // The quest's desc (quests/stale_but_necessary.js 2), then requirement r523's desc (37).
+    let text = "You drank water from a questionable source and you don't look well. You need to ride it out.";
     if (ctx.data.peeked) text = 'Waking up…';
     else if (ctx.data.peeking) text = 'Peeking behind the veil.';
-    else if (p && canPeek(p.x, p.y)) text = 'Peek behind the veil.';
+    else if (p && canPeek(p.x, p.y)) text = 'Peek Behind the Veil';
     return { text, stats: [['screens on you', ctx.data.watching ?? 0]] };
   },
 

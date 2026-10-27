@@ -11,7 +11,7 @@ import {
   nextDialogue,
   formatSpokenLine,
 } from '../public/js/dialogue.js';
-import { runVerb } from '../public/content.js?v=g374-1';
+import { runVerb } from '../public/content.js?v=g377-1';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -79,6 +79,34 @@ test.describe('official world dialogue pools', () => {
     assert.match(first.msgs[0], /^Chicken: “/);
     assert.equal(target.state.dialogueTurn, 2);
   });
+});
+
+test.describe('pools are GSJS conversations, verbatim (G318)', () => {
+  // Each pool is one conversation_run_* function's start/reply lines, in order.
+  const SOURCES = {
+    npc_piggy: ['npc_piggy', 'surfeit_of_cherries_2'],
+    npc_chicken: ['npc_chicken', 'chickens_cautionary_tales_1'],
+    npc_butterfly: ['npc_butterfly', 'what_the_butterfly_saw_2'],
+    trant_fruit: ['trant_fruit', 'surfeit_of_cherries_1'],
+    trant_egg: ['trant_egg', 'shape_of_the_world_2'],
+    trant_bean: ['trant_bean', 'the_rise_and_fall_of_the_bean_1'],
+    trant_bubble: ['trant_bubble', 'one_tree_claims_to_know_the_unknowable_2'],
+    trant_gas: ['trant_gas', 'shape_of_the_world_1'],
+    trant_spice: ['trant_spice', 'one_tree_claims_to_know_the_unknowable_3'],
+    street_spirit: ['street_spirit_groddle', 'street_spirit_stories_1'],
+  };
+  const gsjs = path.resolve(root, '../glitch-GameServerJS/items');
+  for (const [key, [file, conv]] of Object.entries(SOURCES)) {
+    test(`${key} speaks ${file}.js ${conv}`, () => {
+      const src = fs.readFileSync(path.join(gsjs, `${file}.js`), 'utf8');
+      const start = src.indexOf(`function conversation_run_${conv}(`);
+      assert.ok(start >= 0, conv);
+      const body = src.slice(start, src.indexOf('\n}', start));
+      const lines = [...body.matchAll(/this\.conversation_(?:start|reply)\(pc, (?:msg, )?"((?:[^"\\]|\\.)*)", choices/g)]
+        .map((m) => JSON.parse(`"${m[1]}"`).trim());
+      assert.deepEqual([...dialoguePool(key)], lines);
+    });
+  }
 });
 
 test.describe('target-following speech-bubble client integration', () => {

@@ -139,7 +139,7 @@ function loadRoom(roomId) {
     const path = roomModulePath(roomId).replace(/^\.\//, '../quest-rooms/');
     loading.set(
       roomId,
-      import(`${path}?v=rooms-g315`)
+      import(`${path}?v=rooms-g377`)
         .then((mod) => {
           const def = mod.room || mod.default || null;
           loaded.set(roomId, def);
@@ -866,7 +866,8 @@ async function buildStage(engine, stage) {
   engine.enterScene({
     tsid: questSceneTsid(room.id, stage),
     label: scene.label || room.title,
-    hubName: scene.hubName ?? room.hubName ?? 'A quiet place beyond Ur',
+    // G318: a room with no hub of its own says plain 'Quest', as the hub-61 rooms do (G315).
+    hubName: scene.hubName ?? room.hubName ?? 'Quest',
     width: scene.width,
     height: scene.height,
     background: scene.background,
@@ -917,7 +918,7 @@ async function startInstance(engine, questId, opts = {}) {
     engine.closeMap?.();
     room.start?.(ctx);
     const label = room.loadingLabel?.(run.stage, ctx) || room.stageLabel?.(run.stage, ctx) || room.title;
-    await withTransition(engine, label, room.hubName || 'A quiet place beyond Ur', room.theme, () => buildStage(engine, run.stage));
+    await withTransition(engine, label, room.hubName || 'Quest', room.theme, () => buildStage(engine, run.stage));
     engine.setData('qiStatus', run.status);
     publish(engine, true);
     if (opts.autoplay) runAutoplay(engine, opts.autoplay);
@@ -933,7 +934,7 @@ async function gotoStage(engine, stage, opts = {}) {
   const label = room.loadingLabel?.(stage, ctx) || room.stageLabel?.(stage, ctx) || room.title;
   const work = () => buildStage(engine, stage);
   if (opts.transition === false) await work();
-  else await withTransition(engine, label, room.hubName || 'A quiet place beyond Ur', room.theme, work);
+  else await withTransition(engine, label, room.hubName || 'Quest', room.theme, work);
   publish(engine, true);
   return true;
 }

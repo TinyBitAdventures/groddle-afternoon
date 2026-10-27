@@ -1342,13 +1342,15 @@ export const crownsFeature = {
   prepareStreet(street) {
     if (street.tsid !== CROWNS_STREET) return;
     street.label = CROWNS_TITLE;
-    street.hubName = 'Games';
+    // G318: no hub line. LHV2H026E492IAF sits in hub 67 "Multiplayer Quests" (inc_data_maps_prod.js
+    // 18003), and getLoadingInfo sends instances no hub_name (location.js 3311).
+    street.hubName = '';
     street.walls = CROWNS_LADDERS.map((l) => ({ id: l.id, x: l.x, y: l.y - l.h, w: 50, h: l.h }));
   },
 
   labelFor(tsid) {
     // A multiplayer arena (CROWNS_<match>) reads as the game, not its hub street.
-    return tsid === CROWNS_STREET || /^CROWNS_[0-9A-F]{16}$/.test(String(tsid || '')) ? { street: CROWNS_TITLE, hub: 'Games', hubId: 'it_game' } : null;
+    return tsid === CROWNS_STREET || /^CROWNS_[0-9A-F]{16}$/.test(String(tsid || '')) ? { street: CROWNS_TITLE, hub: '', hubId: 'it_game' } : null;
   },
 
   /** realtime-feature sharedStreet: in a multiplayer game the arena is shared on the match's own hub street (CROWNS_<match>). */

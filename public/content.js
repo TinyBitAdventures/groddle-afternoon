@@ -55,7 +55,7 @@ import {
   collectMusicblock,
   isMusicblock,
 } from './js/musicblocks.js?v=g370-1';
-import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=dialogue-2';
+import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=dialogue-3';
 import {
   ensureWoodTreeState,
   quoteWoodTreeHarvest,

@@ -28,7 +28,7 @@ import { meditationFeature } from '../public/js/features/meditation-feature.js?v
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=teleport-13';
 import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=g334-1';
 import { rubeFeature } from '../public/js/features/rube-feature.js?v=rube-12';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=card-18';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=card-19';
 import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js';
 import {
   activateBuffItem,
@@ -509,7 +509,7 @@ describe('wiring', () => {
     for (const m of src.matchAll(/from '\.\/([a-z-]+-feature\.js\?v=[^']+)'/g)) {
       assert.ok(index.includes(`'./${m[1]}'`), m[1]);
     }
-    assert.match(index, /buff-triggers-feature\.js\?v=radiate-12'; FEATURES\.push\(buffTriggersFeature\)/);
+    assert.match(index, /buff-triggers-feature\.js\?v=radiate-13'; FEATURES\.push\(buffTriggersFeature\)/);
   });
 
   it('game.js applies Stuffed at the daily limit and announces each making batch', () => {
