@@ -421,6 +421,15 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       return buddyCall('Checking your radiance', 'radiance');
     },
 
+    /**
+     * Gifts between players (register G332, groddle-afternoon-site/src/LedgerGift.php):
+     * { gifts: [{ op, side: gave|got, with: { id, name }, items, box, note, ref?, at }] },
+     * the gives the site settled that this save has not applied yet.
+     */
+    async gifts() {
+      return buddyCall('Checking your gifts', 'gifts');
+    },
+
     async deleteBackup(slot) {
       const r = await call(`backups/${Number(slot)}`, { method: 'DELETE' });
       if (!r.ok) throw failed('Deleting the backup', r);

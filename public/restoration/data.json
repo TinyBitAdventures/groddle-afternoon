@@ -680,14 +680,16 @@
   {
    "id": "trading",
    "group": "economy",
-   "name": "Trading between players",
+   "name": "Trading and giving between players",
    "status": "source",
-   "blurb": "In multiplayer, trade items and currants face to face with another player on your street, up to six stacks a side as in the original: the server holds both offers until you both accept, and the site settles the swap so only what you really hold can change hands.",
-   "multiplayer": "Trade items and currants face to face with another player on your street.",
+   "blurb": "In multiplayer, trade items and currants face to face with another player on your street, up to six stacks a side as in the original: the server holds both offers until you both accept, and the site settles the swap so only what you really hold can change hands. Or give a stack, a written note or a wrapped Gift Box to a player beside you; the site moves it from your ledger to theirs, and they unwrap the box.",
+   "multiplayer": "Trade face to face, or give a stack, a written note or a wrapped Gift Box to a player on your street.",
    "spot": null,
    "evidence": [
     "public/js/trade.js",
-    "public/js/features/trade-feature.js"
+    "public/js/features/trade-feature.js",
+    "public/js/gifts.js",
+    "public/js/features/gifts-feature.js"
    ],
    "shot": null,
    "play": null
@@ -2563,7 +2565,7 @@
   ]
  },
  "git": {
-  "commits": 552,
+  "commits": 553,
   "since": "2026-10-19",
   "recent": [
    {
@@ -2688,6 +2690,6 @@
    }
   ]
  },
- "tests": 321,
+ "tests": 322,
  "generatedAt": "2026-10-27"
 }
