@@ -145,7 +145,8 @@ describe('ledger edits to a stored save', { skip }, () => {
     const entries = save({ inv: { apple: 2 }, currants: 50, hold: { trade: 'x', items: { apple: 1 }, currants: 20 }, storage: {}, dropped: { GA5: [{ id: 'w1', classTsid: 'apple', count: 5 }] } });
     const out = php('remove', entries, counts({ apple: 6 }, 60));
     const state = JSON.parse(out.playerState);
-    assert.deepEqual(state.inventory, {});
+    // The pack keeps a class it ran out of at 0, as the game does (a missing key gets a starter grant at boot).
+    assert.deepEqual(state.inventory, { apple: 0 });
     assert.equal(state.player.currants, 0);
     assert.deepEqual(state.systems.features.trade.hold.items, {});
     assert.equal(state.systems.features.trade.hold.currants, 10);

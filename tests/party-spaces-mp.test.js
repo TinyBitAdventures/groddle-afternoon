@@ -389,7 +389,8 @@ describe('the site\'s spend route (LedgerSpend.php)', { skip: skipSite }, () => 
       echo json_encode(['view' => $view, 'inv' => $s['inventory'], 'applied' => LedgerMath::applied($twice)]);`;
     const out = JSON.parse(execFileSync('php', ['-r', code]).toString());
     assert.deepEqual(out.view, { items: { party_pack_toxic_moon: 1 }, currants: 500 });
-    assert.equal(out.inv.party_pack_toxic_moon, undefined);
+    // The pack keeps a class it ran out of at 0, as the game does (G335 slice 2, LedgerMath::applyTrade).
+    assert.equal(out.inv.party_pack_toxic_moon || 0, 0);
     assert.deepEqual(out.applied, ['party-00000000000000a9']);
   });
 });

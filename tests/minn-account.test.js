@@ -310,7 +310,7 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
   const src = (f) => readFileSync(join(ext, 'src', f), 'utf8');
 
   it('declares its tables under its own names, with the keys the routes rely on', () => {
-    assert.deepEqual(Object.keys(manifest.tables).sort(), ['groddle_buddies', 'groddle_group_invites', 'groddle_group_members', 'groddle_groups', 'groddle_home_visitors', 'groddle_house_keys', 'groddle_ignores', 'groddle_ledger', 'groddle_ledger_items', 'groddle_ledger_log', 'groddle_mp_saves', 'groddle_players', 'groddle_profiles', 'groddle_solo_backups', 'groddle_trades']);
+    assert.deepEqual(Object.keys(manifest.tables).sort(), ['groddle_buddies', 'groddle_group_invites', 'groddle_group_members', 'groddle_groups', 'groddle_home_visitors', 'groddle_house_keys', 'groddle_ignores', 'groddle_ledger', 'groddle_ledger_credited', 'groddle_ledger_items', 'groddle_ledger_log', 'groddle_mp_saves', 'groddle_players', 'groddle_profiles', 'groddle_solo_backups', 'groddle_trades']);
     assert.ok(manifest.tables.groddle_players.includes('UNIQUE KEY name_key (name_key)'), 'no two characters share a name, whatever its letter case');
     assert.ok(manifest.tables.groddle_mp_saves.includes('PRIMARY KEY  (user_id)'), 'one multiplayer save per user');
     assert.ok(manifest.tables.groddle_solo_backups.includes('PRIMARY KEY  (user_id,slot)'), 'one backup per slot');
