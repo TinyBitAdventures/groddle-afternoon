@@ -188,8 +188,26 @@ let bannerRun = 0;
 /** A banner is playing or loading (G309: overlay-art may cancel it before onStreetClear runs). */
 let bannerLive = false;
 
+/**
+ * G320: in multiplayer the start card is up while the first street loads, and the banner played
+ * over it: it waits for the card to close (engine.started). Solo plays it at once, as before.
+ */
+function afterStartCard(engine, run) {
+  if (engine.mode !== 'multiplayer' || engine.started !== false) return Promise.resolve(true);
+  engine.setData?.('qurazyOverlay', 'held');
+  return new Promise((resolve) => {
+    const poll = () => {
+      if (run !== bannerRun) resolve(false);
+      else if (engine.started === false) setTimeout(poll, 200);
+      else resolve(true);
+    };
+    poll();
+  });
+}
+
 async function showSpawnOverlay(engine) {
   const run = ++bannerRun;
+  if (!(await afterStartCard(engine, run)) || run !== bannerRun) return;
   const root = typeof document === 'undefined' ? null : document.getElementById('game-root');
   const c = root?.querySelector('canvas:not(.overlay-art):not(.lonely-fireworks):not(.lonely-portrait)')?.getBoundingClientRect();
   if (!c?.width) {

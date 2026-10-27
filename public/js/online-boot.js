@@ -82,6 +82,39 @@ export const GATE_COPY = {
   },
 };
 
+/**
+ * Who is playing, as account.session() answers, without the console's 400 on a signed-out visit
+ * (G322). session() asks admin-ajax rest-nonce first, and a signed-out page gets "0" with 400.
+ * admin-ajax's heartbeat answers 200 to anyone: with no heartbeat nonce a signed-in cookie gets
+ * wp_ajax_heartbeat's {"success":false} (its empty _nonce check), a signed-out visit
+ * wp_ajax_nopriv_heartbeat's {"server_time":…}. So only a signed-in page goes on to session();
+ * a signed-out one asks groddle/v1/me alone (open to anyone, no nonce needed).
+ */
+export async function quietSession(account, { fetch: fetchFn = globalThis.fetch?.bind(globalThis), baseUri = globalThis.document?.baseURI } = {}) {
+  const offline = { minn: false, offline: true, signedIn: false, player: null };
+  const none = { minn: false, signedIn: false, player: null };
+  let beat = null;
+  try {
+    const res = await fetchFn(new URL('wp-admin/admin-ajax.php?action=heartbeat', baseUri).href, { method: 'POST', credentials: 'same-origin', cache: 'no-store' });
+    beat = res.ok ? await res.json().catch(() => null) : null;
+  } catch {
+    return offline;
+  }
+  if (!beat || typeof beat !== 'object') return none;
+  if (beat.success === false) return account.session();
+  let me;
+  try {
+    const res = await fetchFn(`${account.urls.api}me`, { credentials: 'same-origin', cache: 'no-store' });
+    me = { ok: res.ok, data: await res.json().catch(() => null) };
+  } catch {
+    return offline;
+  }
+  if (!me.ok || typeof me.data?.signedIn !== 'boolean') return none;
+  // A session that began between the two asks still has no nonce here: session() fetches it.
+  if (me.data.signedIn) return account.session();
+  return { minn: true, signedIn: false, player: null, backups: null, account: null };
+}
+
 /** Which gate a session answer leads to; 'ready' boots the game. */
 export function gateFor(session) {
   if (session?.offline) return 'offline';
@@ -188,7 +221,7 @@ async function boot() {
   };
   const onSignedOut = () => { boot(); };
   showGate(gate, 'checking', { account, onSignedIn });
-  const session = await account.session();
+  const session = await quietSession(account);
   const state = gateFor(session);
   // A sign-up link opened in a browser signed in already (as anyone): the link still finishes its character.
   if (state === 'ready' && verifyLinkFrom(location.hash)) {

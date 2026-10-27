@@ -248,8 +248,10 @@ describe('the game wires them', () => {
 
   it('toasts and activity lines hide under the card and their clocks stop (GrowlQueue)', () => {
     assert.match(css, /html\[data-street-cards\] \.toast,\nhtml\[data-street-cards\] \.activity-feed \{ visibility: hidden; \}/);
-    assert.match(game, /if \(streetCardUp\(\)\) state\.toastHeldAt \|\|= t;/);
-    assert.match(game, /state\.toastHeldAt = streetCardUp\(\) \? state\.toastTimer - ms : 0;/);
+    // G320: through toastHeld(), which is the street card (and in multiplayer the start card too).
+    assert.match(game, /function toastHeld\(\) \{\n\s+return streetCardUp\(\) \|\|/);
+    assert.match(game, /if \(toastHeld\(\)\) state\.toastHeldAt \|\|= t;/);
+    assert.match(game, /state\.toastHeldAt = toastHeld\(\) \? state\.toastTimer - ms : 0;/);
     assert.match(game, /cardPausedTimeout\(\(\) => \{\n\s*el\.classList\.add\('is-leaving'\);/);
   });
 

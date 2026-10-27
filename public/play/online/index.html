@@ -74,6 +74,18 @@
     .save-pill[data-state="conflict"], .save-pill[data-state="signed-out"] { background: #fff1d6; }
     .save-pill[data-state="conflict"] .save-pill-state::before, .save-pill[data-state="signed-out"] .save-pill-state::before { background: #c8553d; }
     .save-pill a { color: #8a3d12; }
+    /* G320: the start card over the street, the chat dock and the pack, inside the game frame (it scrolls when the
+       frame is shorter); the street's toasts, activity lines and Qurazy banner wait for it to close (game.js holds the
+       toast's clock, qurazy-feature the banner). */
+    #overlay:not(.hidden) { z-index: 80; padding: 8px; box-sizing: border-box; }
+    #overlay:not(.hidden) > .card { max-height: 100%; overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box; }
+    #game-root:has(> #overlay:not(.hidden)) :is(.toast, .activity-feed, .qurazy-overlay) { visibility: hidden; }
+    body:has(#overlay:not(.hidden)) .save-pill { z-index: 81; }
+    @media (max-width: 560px) {
+      #overlay:not(.hidden) > .card { width: 100%; padding: 0.85rem 0.95rem 0.75rem; font-size: 0.9rem; line-height: 1.35; }
+      #overlay:not(.hidden) > .card h2 { font-size: 1.1rem; margin-bottom: 0.35rem; }
+      #overlay:not(.hidden) > .card p { margin: 0.35rem 0; }
+    }
   </style>
 </head>
 <body class="is-booting online-gated">
@@ -905,6 +917,6 @@
 
   </div>
   <!-- game.js loads once the multiplayer save is in memory (js/online-boot.js). -->
-  <script type="module" id="online-boot" src="js/online-boot.js?v=play-11" data-game="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=quest-pages-3&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g373-1"></script>
+  <script type="module" id="online-boot" src="js/online-boot.js?v=g372-1" data-game="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=quest-pages-3&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g372-1"></script>
 </body>
 </html>

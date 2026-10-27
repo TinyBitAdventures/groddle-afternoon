@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g369-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-203';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-204';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -1939,14 +1939,22 @@ function updateDametimeChrome(now = dametimeDisplayNow()) {
   return light;
 }
 
+/**
+ * G320: a toast waits behind a street loading card, and in multiplayer behind the start card too
+ * (the page's style hides it there: the street's "Arrived:" toast sat over the card). Solo unchanged.
+ */
+function toastHeld() {
+  return streetCardUp() || (GAME_MODE === 'multiplayer' && !state.started);
+}
+
 function toast(msg, ms = 3000) {
   const el = document.getElementById('toast');
   el.hidden = false;
   el.textContent = wholeStatAmounts(msg);
   // Wall-clock deadline: frame-counted timers linger on slow or throttled frames.
   state.toastTimer = performance.now() + ms;
-  // Shown during a loading card: its time starts once the card has gone (G198).
-  state.toastHeldAt = streetCardUp() ? state.toastTimer - ms : 0;
+  // Shown during a loading card (or the multiplayer start card, G320): its time starts once the card has gone (G198).
+  state.toastHeldAt = toastHeld() ? state.toastTimer - ms : 0;
   state.toastOverModal = Boolean(openGlitchModal());
 }
 
@@ -10871,7 +10879,7 @@ function physics(dt) {
   // stops while a street loading card is up (style.css hides it) and runs on after (G198).
   if (state.toastTimer > 0) {
     const t = performance.now();
-    if (streetCardUp()) state.toastHeldAt ||= t;
+    if (toastHeld()) state.toastHeldAt ||= t;
     else if (state.toastHeldAt) {
       state.toastTimer += t - state.toastHeldAt;
       state.toastHeldAt = 0;

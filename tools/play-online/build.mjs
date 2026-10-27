@@ -23,7 +23,7 @@ const SOURCE = join(root, 'public/play/index.html');
 const TARGET = join(root, 'public/play/online/index.html');
 
 /** The cache key of js/online-boot.js (bump it when that file or js/minn-account.js changes). */
-export const ONLINE_BOOT_SRC = 'js/online-boot.js?v=play-11';
+export const ONLINE_BOOT_SRC = 'js/online-boot.js?v=g372-1';
 
 const MODE_ENTRY = `  <!--
     Multiplayer entry (js/game-mode.js). This must stay the FIRST script on the page, ahead of
@@ -87,6 +87,18 @@ const ONLINE_STYLE = `  <style>
     .save-pill[data-state="conflict"], .save-pill[data-state="signed-out"] { background: #fff1d6; }
     .save-pill[data-state="conflict"] .save-pill-state::before, .save-pill[data-state="signed-out"] .save-pill-state::before { background: #c8553d; }
     .save-pill a { color: #8a3d12; }
+    /* G320: the start card over the street, the chat dock and the pack, inside the game frame (it scrolls when the
+       frame is shorter); the street's toasts, activity lines and Qurazy banner wait for it to close (game.js holds the
+       toast's clock, qurazy-feature the banner). */
+    #overlay:not(.hidden) { z-index: 80; padding: 8px; box-sizing: border-box; }
+    #overlay:not(.hidden) > .card { max-height: 100%; overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box; }
+    #game-root:has(> #overlay:not(.hidden)) :is(.toast, .activity-feed, .qurazy-overlay) { visibility: hidden; }
+    body:has(#overlay:not(.hidden)) .save-pill { z-index: 81; }
+    @media (max-width: 560px) {
+      #overlay:not(.hidden) > .card { width: 100%; padding: 0.85rem 0.95rem 0.75rem; font-size: 0.9rem; line-height: 1.35; }
+      #overlay:not(.hidden) > .card h2 { font-size: 1.1rem; margin-bottom: 0.35rem; }
+      #overlay:not(.hidden) > .card p { margin: 0.35rem 0; }
+    }
   </style>`;
 
 const GATE = `  <!-- Multiplayer phase 2: js/online-boot.js signs the player in and loads the save before game.js. -->

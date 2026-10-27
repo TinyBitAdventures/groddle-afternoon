@@ -16,7 +16,7 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 
 import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=nbhome-10';
-import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=play-12';
+import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=g372-1';
 import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=g337-2';
 import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=nbhome-10';
 import { FEATURES } from '../public/js/features/index.js';
