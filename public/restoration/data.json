@@ -2644,9 +2644,14 @@
   ]
  },
  "git": {
-  "commits": 617,
+  "commits": 618,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "improve",
+    "text": "Butterflies count once per quest, Rainbow Run coins are mood quoins, and home and stone questions stop looking like quests"
+   },
    {
     "date": "2026-10-27",
     "kind": "new",
@@ -2761,11 +2766,6 @@
     "date": "2026-10-27",
     "kind": "improve",
     "text": "A street on the Map offers Set as Destination and Teleport Here, as the original did"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "A release process: live.json names what groddleafternoon.com runs, kinsta.sh deploys exactly that"
    }
   ]
  },
