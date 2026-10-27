@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g370-1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g369-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-201';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-202';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -715,7 +715,7 @@ import {
   resetWoodTreeDay,
   woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=woodcutting-test-4';
+} from './js/woodcutting.js?v=g369-1';
 import {
   GIANTS,
   createShrineState,
@@ -1738,6 +1738,45 @@ let localCompanions = [];
 let npcGlitches = null;
 /** Original-style live follow session; intentionally reset by a page reload. */
 const companionFollowState = createCompanionFollowState();
+
+/**
+ * G182: a move the game makes for you (players/player.js:1932 moveAvatar, sent as
+ * move_avatar; the client's NCMsgHandler.as:2220 do_MOVE_AVATAR walks the avatar there
+ * with startMovingAvatarOnGSPath, then faces `face`). Wine of the Dead's pour walks you
+ * beside the item this way (wine_of_the_dead.js:233). Any movement key takes over; a walk
+ * blocked by a wall gives up after AVATAR_WALK_MAX_MS. { x, face, until, tsid } or null.
+ */
+let avatarWalk = null;
+const AVATAR_WALK_MAX_MS = 4000;
+const AVATAR_WALK_ARRIVE_PX = 6;
+
+function startAvatarWalk(x, face = '') {
+  if (!player || !Number.isFinite(Number(x))) return false;
+  avatarWalk = {
+    x: Math.max(0, Math.min(WORLD_W, Number(x))),
+    face: face === 'left' || face === 'right' ? face : '',
+    until: Date.now() + AVATAR_WALK_MAX_MS,
+    tsid: currentStreetTsid,
+  };
+  return true;
+}
+
+/** handleInput: -1 / 1 while the walk steers left / right, 0 once it is over (it faces then). */
+function avatarWalkSteer(userMoving) {
+  const w = avatarWalk;
+  if (!w || !player) return 0;
+  const dx = w.x - player.x;
+  const done = Math.abs(dx) <= AVATAR_WALK_ARRIVE_PX || Date.now() > w.until;
+  if (userMoving || w.tsid !== currentStreetTsid || done) {
+    avatarWalk = null;
+    if (!userMoving && w.tsid === currentStreetTsid) {
+      if (done) player.vx = 0;
+      if (w.face) player.facing = w.face;
+    }
+    return 0;
+  }
+  return dx < 0 ? -1 : 1;
+}
 let playerSpeechTarget = null;
 /** Emotional Bear target chooser and source-animation overlay. */
 let emotionalBearPendingAction = null;
@@ -8721,6 +8760,11 @@ const engine = {
   vog: (opts) => openLocationVog(opts),
   vogOpen: () => isVogOpen(),
   stopFollowing: () => stopCompanionFollowForInstance(),
+  /** G182: walk the avatar to world x, then face 'left' | 'right' (player.js moveAvatar). */
+  moveAvatar: (x, face) => startAvatarWalk(x, face),
+  get avatarWalking() {
+    return Boolean(avatarWalk);
+  },
   transientInstance: () => anyTransientInstance() || engine.inScene() || Boolean(engine.instanceHold),
   homeContext() {
     return {
@@ -10418,10 +10462,15 @@ function handleInput() {
     return;
   }
   const now = movementNow();
-  const left = keys.has('ArrowLeft') || keys.has('a') || keys.has('A');
-  const right = keys.has('ArrowRight') || keys.has('d') || keys.has('D');
+  let left = keys.has('ArrowLeft') || keys.has('a') || keys.has('A');
+  let right = keys.has('ArrowRight') || keys.has('d') || keys.has('D');
   const up = keys.has('ArrowUp') || keys.has('w') || keys.has('W');
   const down = keys.has('ArrowDown') || keys.has('s') || keys.has('S');
+  if (avatarWalk && !climb.active) {
+    const steer = avatarWalkSteer(left || right || up || down);
+    if (steer < 0) left = true;
+    else if (steer > 0) right = true;
+  }
   const jumpRequested = hasQueuedJump(jumpState, now);
   const climbHit = findClimbWallNear(streetWalls, player.x, player.y, 40);
   const movementBuff = combinedPhysics();

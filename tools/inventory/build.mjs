@@ -420,7 +420,7 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
   const fix = () => D.conversionFixpoint(reach, conversions);
   fix();
   const present = new Map();
-  for (const sec of ['streets', 'soil', 'wildlife', 'furniture', 'vendors']) {
+  for (const sec of ['streets', 'soil', 'wildlife', 'furniture', 'vendors', 'swoonerflies']) {
     for (const [tsid, r] of Object.entries(ecology[sec] || {})) {
       const counts = r.counts || r;
       for (const k of Object.keys(counts)) if (!present.has(k)) present.set(k, `street-ecology.json ${sec} (${tsid})`);

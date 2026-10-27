@@ -42,7 +42,7 @@ import { ensureItem } from '../inventory.js?v=catalog-unified-7';
 import { platformYAt } from '../street-model.js';
 import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=official-ecology-7';
 import { trantStatusLabel } from '../trants.js?v=trant-harvest-2';
-import { woodTreeStatusLabel } from '../woodcutting.js?v=woodcutting-test-4';
+import { woodTreeStatusLabel } from '../woodcutting.js?v=g369-1';
 import {
   GROWN_TREE_LABELS,
   SEASONED_BEANS,

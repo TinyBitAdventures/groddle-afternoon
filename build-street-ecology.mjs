@@ -12,6 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { interiorReason } from './public/js/street-ecology.js';
 import { VENDOR_NPC_LABELS } from './public/js/vendor-npcs.js';
+import { SWOONERFLY_LABEL, SWOONERFLY_CLASS } from './public/js/swoonerflies.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const streetIndexPath = join(root, 'public/assets/streets/index.json');
@@ -170,6 +171,26 @@ function vendorsFromLabels(labels) {
 }
 
 /**
+ * World Swoonerflies (js/swoonerflies.js, features/swoonerflies-feature.js):
+ * items/npc_swoonerfly.js objrefs labelled "Swoonerfly", from the `items`
+ * objrefs. Written to a separate top-level `swoonerflies` map, like `vendors`.
+ * An instanced location (dynamic is_instance true) is skipped: Area 42
+ * (LHF8DDDBTPF3P4U, instance_id tower_quest_desert) holds four that a
+ * player's squid dropped mid-quest (npc_squid.js:311-317 createSwoonerfly,
+ * five calls at 337-405), and Gwendolyn's room already drops those
+ * (js/quest-rooms/gwendolyn.js swoonerfly()). Three in the archived snapshot:
+ * Parsin's Trail SW, Tower St West and Pandhal Pegs, one each.
+ */
+function swoonerfliesFromLabels(labels) {
+  const n = labels.filter((label) => label === SWOONERFLY_LABEL).length;
+  return n ? { [SWOONERFLY_CLASS]: n } : {};
+}
+
+function isInstanceLocation(xml) {
+  return /<bool id="is_instance">true<\/bool>/.test(xml);
+}
+
+/**
  * Curated source-empty streets. Their archived XML holds only scenery-style
  * objects, and the remake deliberately keeps them uncluttered (for example the
  * private Stoot memorial), so the row is emitted with `empty: true` even when
@@ -241,6 +262,7 @@ const soil = {};
 const wildlife = {};
 const furniture = {};
 const vendors = {};
+const swoonerflies = {};
 for (const [tsid, meta] of Object.entries(index.streets || {})) {
   const candidates = locationAliases(tsid).map((alias) => join(locationRoot, `${alias}.xml`));
   const sourcePath = await firstReadable(candidates);
@@ -250,7 +272,8 @@ for (const [tsid, meta] of Object.entries(index.streets || {})) {
     streets[tsid] = { label: meta.label || tsid, sourceTsid, counts: {}, empty: true };
     continue;
   }
-  const labels = itemLabels(await readFile(sourcePath, 'utf8'));
+  const xml = await readFile(sourcePath, 'utf8');
+  const labels = itemLabels(xml);
   const soilCounts = soilFromLabels(labels);
   if (Object.keys(soilCounts).length) soil[tsid] = soilCounts;
   const wildlifeCounts = wildlifeFromLabels(labels);
@@ -259,6 +282,8 @@ for (const [tsid, meta] of Object.entries(index.streets || {})) {
   if (Object.keys(furnitureCounts).length) furniture[tsid] = furnitureCounts;
   const vendorCounts = vendorsFromLabels(labels);
   if (Object.keys(vendorCounts).length) vendors[tsid] = vendorCounts;
+  const swoonCounts = isInstanceLocation(xml) ? {} : swoonerfliesFromLabels(labels);
+  if (Object.keys(swoonCounts).length) swoonerflies[tsid] = swoonCounts;
   const ecology = ecologyFromLabels(labels);
   const geometry = JSON.parse(await readFile(join(root, 'public', meta.file), 'utf8'));
   const interiorWhy = interiorReason({ ...geometry, tsid, hubId: meta.hubId ?? geometry.hubId }, lists);
@@ -299,6 +324,8 @@ const catalog = {
   furniture,
   vendorStreetCount: Object.keys(vendors).length,
   vendors,
+  swoonerflyStreetCount: Object.keys(swoonerflies).length,
+  swoonerflies,
 };
 
 await writeFile(outputPath, `${JSON.stringify(catalog, null, 2)}\n`);

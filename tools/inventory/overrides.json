@@ -729,8 +729,8 @@
   "register": "G121"
  },
  "npc:npc_swoonerfly": {
-  "status": "partial",
-  "reason": "Gwendolyn's room drops one at your side as npc_squid.js does (js/quest-rooms/gwendolyn.js swoonerfly()); the 7 archived world Swoonerflies (Area 42 x4, Parsin's Trail SW, Tower St West, Pandhal Pegs) are not placed yet",
+  "status": "source",
+  "reason": "Gwendolyn's room drops one at your side as npc_squid.js:311-317 createSwoonerfly does (js/quest-rooms/gwendolyn.js swoonerfly()); the three archived world Swoonerflies (Parsin's Trail SW GA51450HIC42Q4I, Tower St West GIF5UU8FO3029OK, Pandhal Pegs GUVNIF7Q9KR2382: street-ecology.json swoonerflies, build-street-ecology.mjs) loop their onCreate 'fly-rooked' state on those streets (js/features/swoonerflies-feature.js), with no verbs and not selectable (npc_swoonerfly.js:35, :104); only the squid calls fall(), so they never fall. Area 42's four (LHF8DDDBTPF3P4U, is_instance tower_quest_desert) are a player's mid-quest squid drops, which the room makes",
   "register": "G121"
  },
  "npc:npc_combat_cubimal": {

@@ -14891,5 +14891,17 @@
     "GM413RQ6LRG9N": {
       "npc_jabba2": 1
     }
+  },
+  "swoonerflyStreetCount": 3,
+  "swoonerflies": {
+    "GA51450HIC42Q4I": {
+      "npc_swoonerfly": 1
+    },
+    "GIF5UU8FO3029OK": {
+      "npc_swoonerfly": 1
+    },
+    "GUVNIF7Q9KR2382": {
+      "npc_swoonerfly": 1
+    }
   }
 }

@@ -70,10 +70,18 @@
  * 200 px (wears it out 3 s later; a Patch's tree goes with its Patch) or a
  * proto whose project has started (the project is canceled, the unbuilt
  * Tower's too). The Cultivate sidebar's Pour button and the proto's verb ask
- * the same "Please Confirm!". QA: &homedemo=cultivate&wotddemo=3.
+ * the same "Please Confirm!". After Yes the avatar walks to 100 px short of the
+ * item, facing it, while the bottle's tool_animation pours on it for 3 s
+ * (wine_of_the_dead.js modal_callback). Dragging the bottle from the pack onto
+ * a cultivated item or a running proto asks the same (patch.js / trant / proto
+ * remove: drop tip "Pour Wine of the Dead on <item>"). QA:
+ * &homedemo=cultivate&wotddemo=3 (&wotdtarget=patch stands you by the yard's
+ * Patch; &wotdtree=trant_bean first grows a Bean Tree on it).
  * Canvas data: homeDecorPlaced, homeDecorStorage, homeDecorWall/Walls/Floor/Ceiling, homeStamping,
  * homeDecorSegments, homeMode, homeCultivations, homeYard, homeAutoplay,
  * homeProtos, homeRestore, homeLifespan, homePour (confirm|pouring|depleted|canceled:<id>),
+ * homePourFx (tool_animation|-tool_animation:<x>,<y> while it plays, then done), homePourDrag
+ * (none|dragging|over:<id>),
  * homeBackCultivations, homeBackYard (back-yard expansions bought), homeBackYardWidth,
  * homeHouseX (the house's left end in interior world x), homeYardStyle, homeYardShown.
  *     &cultwear=N  every cultivation wears out after N uses (x its lifespan multiplier)
@@ -155,7 +163,8 @@ import {
   towerItem,
 } from '../home-cultivation.js?v=home-cultivation-5';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
-import { playPoofIn } from '../overlay-art.js?v=g311-1';
+import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=g311-1';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { fadeInNewNear } from '../poof-fade.js?v=g311-1';
 import { projectApi } from './street-jobs-feature.js?v=blur-9';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-3';
@@ -163,9 +172,10 @@ import { towerApi } from './home-tower-feature.js?v=g366-1';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-15';
-import { patchesFeature } from './patches-feature.js?v=patches-15';
-import { plotLabel } from '../patches.js';
+import { patchesFeature } from './patches-feature.js?v=patches-16';
+import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=g165-1';
+import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=g369-1';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
 import {
   STREET_STYLE_BY_KEY,
@@ -2156,9 +2166,8 @@ function depleteItem(engine, id, { wotd = false } = {}, st = activeCult()) {
   if (!result?.ok) return result;
   if (selected?.kind === 'cultivation' && selected.id === Number(id)) selected = null;
   queueCultivationPoof(result.item || st.items.find((r) => r.id === Number(id)), st, { proto: true });
-  engine.pushActivity(wotd
-    ? `You poured Wine of the Dead on your ${result.label}. It wore out at once.`
-    : `Your ${result.label} wore out. Restore it with a project, or cultivate something new.`);
+  // A Wine of the Dead pour sends no line: makeDepleted -> replaceWithDepleted (include/cultivation.js 52-82).
+  if (!wotd) engine.pushActivity(`Your ${result.label} wore out. Restore it with a project, or cultivate something new.`);
   engine.toast(`Your ${result.label} has worn out. Click it to start a project to restore it.`, 3600);
   engine.save();
   registerRestores(engine);
@@ -2253,6 +2262,7 @@ function applyPour(engine, row) {
       engine.refreshHomeScene?.();
     }, WOTD_DEPLETE_MS);
   }
+  pourFx(engine, row);
   removeItem(engine.inv, WOTD, 1);
   engine.achievement('wotd:poured_on_something', 1);
   if (row.tower || item.depleted) {
@@ -2267,6 +2277,207 @@ function applyPour(engine, row) {
 let pourLast = '';
 let wotdDemoDone = false;
 let wotdPlaced = false;
+let wotdTreeDone = false;
+let pourSheets = null;
+let pourOverlay = null; // { clip, startedAt, lifeMs, end }
+let pourDrag = null; // { over }
+let pourDragWired = false;
+let pourTip = null;
+
+/** The live target drawn for a pour row: the one standing nearest its x. */
+function pourRowTarget(engine, row) {
+  let best = null;
+  let bestD = 48;
+  for (const t of engine.interactables || []) {
+    const s = t?.sprite;
+    if (!s || s.destroyed || s === engine.player || !Number.isFinite(s.x)) continue;
+    const d = Math.abs(s.x - row.x);
+    if (d < bestD) {
+      best = t;
+      bestD = d;
+    }
+  }
+  return best;
+}
+
+function pourRowSprite(engine, row) {
+  return pourRowTarget(engine, row)?.sprite || null;
+}
+
+/**
+ * The top of the target's art (LocationItemstackView getYAboveDisplay): a tree's
+ * measured artHeight (js/speech-placement.js giveArtHeight) above its feet, else
+ * the top of its sprite.
+ */
+function pourRowTop(target, row) {
+  const spr = target?.sprite;
+  if (!spr) return Number(row.y) - 60;
+  const art = Number(target.artHeight) || 0;
+  return art > 0 ? spr.y - art : displayTopOf(spr);
+}
+
+/**
+ * wine_of_the_dead.js modal_callback 218-262: walk to 100 px short of the
+ * target, facing it, and play the bottle's tool_animation on it for 3 s
+ * (itemstack_overlay at its top + 20, 10 px toward you, flipped when it is on
+ * your left). The overlay goes at the next street change like every other.
+ */
+function pourFx(engine, row) {
+  const p = engine.player;
+  if (!p || !row) return;
+  const target = pourRowTarget(engine, row);
+  const spr = target?.sprite || null;
+  const tx = spr ? spr.x : row.x;
+  const ap = pourApproach(tx, p.x);
+  engine.moveAvatar?.(ap.endpoint, ap.face);
+  const top = pourRowTop(target, row);
+  const at = itemstackOverlayPoint(tx, top, { dx: ap.deltaX, dy: WOTD_TOOL.deltaY });
+  const { PIXI } = engine;
+  pourSheets ||= createSheetLoader(PIXI);
+  pourOverlay?.end();
+  const sheet = WOTD_TOOL.sheet;
+  const tsid = engine.streetTsid;
+  pourSheets.load(sheet).then(() => {
+    const frames = pourSheets.frames(sheet);
+    if (!frames.length || engine.streetTsid !== tsid || !engine.entityLayer) return;
+    const clip = new PIXI.AnimatedSprite(frames);
+    clip.anchor.set(0.5, 1);
+    clip.x = at.x;
+    clip.y = at.y;
+    clip.scale.x = ap.flipped ? -1 : 1;
+    clip.loop = false;
+    clip.animationSpeed = pixiSpeed(sheet.fps);
+    clip.zIndex = 60;
+    clip.eventMode = 'none';
+    clip.alpha = 0;
+    engine.entityLayer.addChild(clip);
+    clip.play();
+    let release = null;
+    const end = () => {
+      release?.();
+      release = null;
+      if (!clip.destroyed) clip.destroy();
+      if (pourOverlay?.clip === clip) pourOverlay = null;
+      engine.setData('homePourFx', 'done');
+    };
+    release = trackOverlay(end);
+    pourOverlay = { clip, startedAt: Date.now(), lifeMs: overlayLifeMs(WOTD_TOOL.durationMs), end };
+    engine.setData('homePourFx', `${ap.state}:${Math.round(at.x)},${Math.round(at.y)}`);
+  });
+}
+
+function tickPourOverlay(now = Date.now()) {
+  const o = pourOverlay;
+  if (!o) return;
+  if (o.clip.destroyed) {
+    o.end();
+    return;
+  }
+  const ms = now - o.startedAt;
+  if (ms >= o.lifeMs) o.end();
+  else o.clip.alpha = overlayAlpha(ms, WOTD_TOOL.durationMs);
+}
+
+function gameCanvas() {
+  return typeof document === 'undefined' ? null : document.querySelector('canvas[aria-label="Groddle game world"]');
+}
+
+/** The pour row under a client point (its drawn sprite's bounds), or null. */
+function pourRowAt(engine, clientX, clientY) {
+  const canvas = gameCanvas();
+  if (!canvas) return null;
+  const rect = canvas.getBoundingClientRect();
+  if (!rect.width || !rect.height) return null;
+  const res = Number(canvas.dataset.renderResolution) || 1;
+  const sx = ((clientX - rect.left) * (canvas.width / res)) / rect.width;
+  const sy = ((clientY - rect.top) * (canvas.height / res)) / rect.height;
+  let best = null;
+  let bestD = Infinity;
+  for (const row of pourTargets(engine)) {
+    const spr = pourRowSprite(engine, row);
+    const b = spr?.getBounds?.();
+    if (!b || !b.width) continue;
+    if (sx < b.x - 8 || sx > b.x + b.width + 8 || sy < b.y - 8 || sy > b.y + b.height + 8) continue;
+    const d = Math.abs(sx - (b.x + b.width / 2));
+    if (d < bestD) {
+      best = row;
+      bestD = d;
+    }
+  }
+  return best;
+}
+
+function showPourTip(text, x, y) {
+  if (typeof document === 'undefined') return;
+  if (!pourTip) {
+    pourTip = document.createElement('div');
+    pourTip.className = 'wotd-drag-tip';
+    pourTip.dataset.wotdDragTip = '';
+    Object.assign(pourTip.style, {
+      position: 'fixed', zIndex: '76', pointerEvents: 'none', transform: 'translate(14px, 10px)', padding: '0.2rem 0.55rem',
+      borderRadius: '6px', background: '#fffdf6', color: '#302b34', font: '600 13px/1.3 system-ui, sans-serif', boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+    });
+    document.body.appendChild(pourTip);
+  }
+  pourTip.hidden = !text;
+  pourTip.style.display = text ? '' : 'none';
+  if (!text) return;
+  pourTip.textContent = text;
+  pourTip.style.left = `${x}px`;
+  pourTip.style.top = `${y}px`;
+}
+
+function endPourDrag(engine) {
+  pourDrag = null;
+  showPourTip('');
+  engine.setData('homePourDrag', 'none');
+}
+
+/** Drop the bottle on a row: the remove verb hands it to verbs.pour with that target (patch.js:66-73). */
+function dropPour(engine, row) {
+  if (!row || countItem(engine.inv, WOTD) < 1) return false;
+  return confirmPour(engine, row);
+}
+
+function wirePourDrag(engine) {
+  const canvas = gameCanvas();
+  if (pourDragWired || !canvas) return Boolean(canvas);
+  pourDragWired = true;
+  canvas.addEventListener('dragover', (event) => {
+    if (!pourDrag) return;
+    const row = pourRowAt(engine, event.clientX, event.clientY);
+    pourDrag.over = row;
+    engine.setData('homePourDrag', row ? `over:${row.id}` : 'dragging');
+    if (!row) return showPourTip('');
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+    showPourTip(pourDropTip(ITEM_CATALOG[WOTD]?.label || 'Wine of the Dead', row.name), event.clientX, event.clientY);
+  });
+  canvas.addEventListener('dragleave', () => { if (pourDrag) showPourTip(''); });
+  canvas.addEventListener('drop', (event) => {
+    if (!pourDrag) return;
+    const row = pourRowAt(engine, event.clientX, event.clientY) || pourDrag.over;
+    endPourDrag(engine);
+    if (!row) return;
+    event.preventDefault();
+    dropPour(engine, row);
+  });
+  document.addEventListener('dragend', () => { if (pourDrag) endPourDrag(engine); });
+  return true;
+}
+
+/** game.js pack slot dragstart: the bottle may go onto a cultivated item or running proto here. */
+function startPourDrag(classTsid, event, engine) {
+  if (classTsid !== WOTD || countItem(engine.inv, WOTD) < 1 || !pourTargets(engine).length || !wirePourDrag(engine)) return false;
+  pourDrag = { over: null };
+  engine.setData('homePourDrag', 'dragging');
+  if (event?.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('application/x-groddle-item', WOTD);
+    event.dataTransfer.setData('text/plain', WOTD);
+  }
+  return true;
+}
 
 /**
  * G267: the home's yes / no questions are confirms, not quest offers: two
@@ -4006,15 +4217,35 @@ function demoSetup(engine) {
   }
   // QA: &wotddemo=N puts N Wine of the Dead in the pack (the pour pack verb) and,
   // on the home street, stands you 120 px left of the first rock, garden or patch
-  // (else the Tower).
+  // (else the Tower). &wotdtarget=patch picks the yard's Patch, and
+  // &wotdtree=<trant class> (trant_bean, wood_tree ...) grows a tree on it first.
   const wotd = Math.floor(Number(engine.param('wotddemo')) || 0);
+  const wotdTree = engine.param('wotdtree');
+  if (wotd > 0 && wotdTree && GROWN_TREE_LABELS[wotdTree] && scene?.room === 'street' && !wotdTreeDone) {
+    const patch = cult.items.find((row) => !row.depleted && cultivationDef(row.protoClass)?.kind === 'patch');
+    const key = patch && soilKeyMap(cult.items).get(patch.id)?.[0];
+    if (key) {
+      wotdTreeDone = true;
+      const slot = engine.streetSlot('patches', yardTsid(cult));
+      const now = Date.now();
+      const plot = createPlot(patch.endClass, { now, seed: key });
+      plot.stage = 'seedling';
+      plot.seedling = { trantClass: wotdTree, beanClass: 'bean_bean', plantedAt: now, minAt: now, maxAt: now, upgradeGrowLevel: 0, petted: 3, petters: 0, growLevel: 4, thirdPetAt: now };
+      growTree(plot, now);
+      slot.plots = { ...(slot.plots || {}), [key]: plot };
+      engine.save();
+      setTimeout(() => engine.refreshHomeScene?.(), 0);
+    }
+  }
   if (wotd > 0 && !wotdDemoDone) {
     wotdDemoDone = true;
     if (countItem(engine.inv, WOTD) < wotd) engine.inv[WOTD] = wotd;
     engine.updateHud();
   }
   if (wotd > 0 && scene?.room === 'street' && !wotdPlaced) {
-    const item = cult.items.find((row) => !row.depleted && cultivationDef(row.protoClass)?.kind !== 'tower') || towerItem(cult);
+    const wantPatch = engine.param('wotdtarget') === 'patch' || Boolean(wotdTree);
+    const item = (wantPatch && cult.items.find((row) => !row.depleted && cultivationDef(row.protoClass)?.kind === 'patch'))
+      || cult.items.find((row) => !row.depleted && cultivationDef(row.protoClass)?.kind !== 'tower') || towerItem(cult);
     if (item && engine.player) {
       wotdPlaced = true;
       setTimeout(() => {
@@ -4980,6 +5211,11 @@ export const homesFeature = {
     }
   },
 
+  /** game.js pack dragstart: Wine of the Dead onto a cultivated item (patch.js / trant / proto remove drop target). */
+  packDragStart(classTsid, event, engine) {
+    return startPourDrag(classTsid, event, engine) ? true : null;
+  },
+
   /** Pack furniture: place it straight from the pack while inside the house. */
   packVerbs(classTsid, engine) {
     // G264: homestreet_ticket.js 29-42, the ticket's "use" is always disabled in the pack.
@@ -5019,6 +5255,7 @@ export const homesFeature = {
   },
 
   onTick(dtMs, now, engine) {
+    tickPourOverlay();
     if (!scene) return;
     rockImgBubble(engine);
     if (scene.room === 'street') {

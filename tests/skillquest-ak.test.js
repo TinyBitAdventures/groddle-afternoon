@@ -158,7 +158,7 @@ describe('G290 wiring', () => {
   it('cultivations poof in where the source does (quest.js 1880, cultivation.js 75)', { skip: !haveGsjs }, () => {
     assert.match(gsjs('quests/quest.js'), /offerer\.container\.createItemStackWithPoof\(/);
     assert.match(gsjs('items/include/cultivation.js'), /this\.replaceWithPoofIfOnGround\(this\.proto_class\)/);
-    has(homes, /import \{ playPoofIn \} from '\.\.\/overlay-art\.js/);
+    has(homes, /import \{[^}]*\bplayPoofIn\b[^}]*\} from '\.\.\/overlay-art\.js/);
     has(homes, /function finishRestore\([\s\S]*?queueCultivationPoof\(result\.item, st\);/);
     has(homes, /function depleteItem\([\s\S]*?queueCultivationPoof\(.*\{ proto: true \}\);/);
     has(homes, /spawnProtos\(engine, st\);\n\s+if \(pendingPoofs\.length\) playPendingPoofs\(engine, st, poofBefore\);/);

@@ -42,7 +42,14 @@ export const WOOD_TREE_HARVEST = Object.freeze({
   plankYieldByMaturity: Object.freeze([25, 30, 40, 50, 60, 80]),
 });
 
+/**
+ * wood_tree.js:1303-1331 responses, picked by doHarvest (745-754) from the
+ * maturity before the harvest: harvest_state_1to0 for the wee tree it fells,
+ * 3to2_2to1 for 2-3, 5to4_4to3 for 4-5, 6to5 for 6.
+ */
 const HARVEST_LINES = Object.freeze({
+  // harvest_state_1to0 (wood_tree.js:1304-1310).
+  felled: Object.freeze(['Wood: felled.', 'My trunk! My mighty tru…', "I've totally lost wood.", "Aaaand I'm spent.", 'Kiss this wood goodbye.']),
   small: Object.freeze(['Donk.', 'Thonk.', "You've got wood.", 'Planks.']),
   medium: Object.freeze([
     'Never mind the quality, feel the width.',
@@ -86,8 +93,13 @@ export function plankYieldForMaturity(maturity, state = null) {
   return map[index];
 }
 
+/**
+ * The source names one size: maturity 1 is the "wee tree" a harvest kills
+ * (wood_tree.js:451 harvest_clear tooltip, :458 maturity == 1). The other
+ * words follow doHarvest's talkback tiers (745-754): 2-3, 4-5, and 6.
+ */
 export function woodMaturityLabel(maturity) {
-  return ['Stump', 'Wee', 'Young', 'Sturdy', 'Large', 'Mighty'][whole(maturity, 1, 1, 6) - 1];
+  return ['Wee', 'Young', 'Young', 'Large', 'Large', 'Mighty'][whole(maturity, 1, 1, 6) - 1];
 }
 
 export function woodTreeStatusLabel(state = {}) {
@@ -153,7 +165,9 @@ function harvestLine(maturity, turn) {
     ? HARVEST_LINES.mighty
     : maturity >= 4
       ? HARVEST_LINES.medium
-      : HARVEST_LINES.small;
+      : maturity >= 2
+        ? HARVEST_LINES.small
+        : HARVEST_LINES.felled;
   return pool[whole(turn, 0) % pool.length];
 }
 
