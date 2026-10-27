@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Deploys the Groddle site to groddleafternoon.com (Kinsta), as first done on 2026-10-27:
-# the development Minn Engine and Minn Admin, the Groddle theme (groddle-afternoon-site) and the
-# built game. The database and wp-config.php are left alone (the first deploy imported the
-# database and added MINN_WP_API and GRODDLE_REALTIME_URL to wp-config.php).
+# Deploys a release of the Groddle site to groddleafternoon.com (Kinsta): the game, the Groddle theme
+# (groddle-afternoon-site), Minn Engine and Minn Admin, each at the version tools/deploy/live.json names.
+# Everything is exported from git (tags for the game and site, pinned commits for Minn), never copied
+# from a working tree, so nothing uncommitted can ship. The database and wp-config.php are left alone
+# (the first deploy, 2026-10-27, imported the database and added MINN_WP_API and GRODDLE_REALTIME_URL).
 #
 # Kinsta's layout, and why:
 # - PHP may only open files under public/ and web/ (open_basedir), so the built game lives in
@@ -12,61 +13,80 @@
 # - nginx serves a folder's index.html itself and answers 403 for a folder with none, so every
 #   built folder that shadows a published Minn page or Note gets an index.php that hands the
 #   request to Minn (index.php wins over index.html there).
-# - The route to Kinsta is slow per connection, so the game goes up as a tarball in parallel
-#   parts, resumable, checked by sha256.
+# - The game goes up with rsync into a hard-linked copy of the live one (only changed files cross the
+#   slow link), then the copies swap, so players never load a half-written game.
 #
-# Usage: tools/deploy/kinsta.sh [--game <built public/ dir>]   (default: ~/Cove/Sites/groddle.localhost/game,
-# which the dev-glitch-game sync fills from a clean main checkout)
+# Usage: tools/deploy/kinsta.sh [<release json>]   (default: tools/deploy/live.json)
 set -euo pipefail
+here=$(cd "$(dirname "$0")/../.." && pwd)
+RELEASE=${1:-$here/tools/deploy/live.json}
 # The Kinsta SSH address stays out of the repo: GRODDLE_KINSTA_SSH (user@host) and GRODDLE_KINSTA_PORT,
 # from the environment or ~/.config/groddle/deploy.env.
 [ -f "$HOME/.config/groddle/deploy.env" ] && . "$HOME/.config/groddle/deploy.env"
 HOST=${GRODDLE_KINSTA_SSH:?set GRODDLE_KINSTA_SSH=user@host, or put it in ~/.config/groddle/deploy.env}
 PORT=${GRODDLE_KINSTA_PORT:?set GRODDLE_KINSTA_PORT, or put it in ~/.config/groddle/deploy.env}
 SSH=(ssh -p "$PORT" -o BatchMode=yes -o ServerAliveInterval=15 -o ServerAliveCountMax=4)
-GAME=${GAME:-$HOME/Cove/Sites/groddle.localhost/game}
-[ "${1:-}" = "--game" ] && GAME=$2
-ENGINE=$HOME/Cove/Sites/minn-engine.localhost/public/minn
-ADMIN=$HOME/Cove/Sites/minnadmin.localhost/public/wp-content/plugins/minn-admin
-THEME=$HOME/Documents/glitch-audit/groddle-afternoon-site
-[ -f "$GAME/play/index.html" ] || { echo "no built game at $GAME" >&2; exit 1; }
-work=$(mktemp -d)
-trap 'rm -rf "$work"' EXIT
+SITE_REPO=${GRODDLE_SITE_DIR:-$(dirname "$here")/groddle-afternoon-site}
+ENGINE_REPO=${MINN_ENGINE_REPO:-$HOME/Cove/Sites/minn-engine.localhost}
+ADMIN_REPO=${MINN_ADMIN_REPO:-$HOME/Cove/Sites/minnadmin.localhost/public/wp-content/plugins/minn-admin}
+AUDIT=$(dirname "$(cd "$here" && pwd -P)")
 
-echo "1/5 engine, Minn Admin, theme"
-rsync -az --delete --exclude admin --exclude .install.json -e "${SSH[*]}" "$ENGINE/" "$HOST:public/minn/"
-rsync -az --delete --exclude .git --exclude tests --exclude node_modules -e "${SSH[*]}" "$ADMIN/" "$HOST:public/wp-content/plugins/minn-admin/"
-rsync -az --delete --exclude .git -e "${SSH[*]}" "$THEME/" "$HOST:public/wp-content/themes/groddle/"
+field() { node -e 'const r = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")); const v = r[process.argv[2]]; if (!v) process.exit(1); console.log(v);' "$RELEASE" "$1" || { echo "$RELEASE names no $1" >&2; exit 1; }; }
+resolve() { git -C "$1" rev-parse --verify --quiet "$2^{commit}" || { echo "$2 is not in $1: tag or fetch it first" >&2; exit 1; }; }
+GAME_REF=$(field game); SITE_REF=$(field site); ENGINE_REF=$(field engine); ADMIN_REF=$(field minnAdmin)
+game_c=$(resolve "$here" "$GAME_REF"); site_c=$(resolve "$SITE_REPO" "$SITE_REF")
+engine_c=$(resolve "$ENGINE_REPO" "$ENGINE_REF"); admin_c=$(resolve "$ADMIN_REPO" "$ADMIN_REF")
+echo "deploying game $GAME_REF, site $SITE_REF, Minn Engine ${engine_c:0:8}, Minn Admin ${admin_c:0:8}"
+
+work=$(mktemp -d)
+trap 'git -C "$here" worktree remove --force "$work/game" >/dev/null 2>&1 || true; rm -rf "$work"' EXIT
+
+echo "1/6 export and build"
+mkdir -p "$work/engine" "$work/admin" "$work/site"
+git -C "$ENGINE_REPO" archive "$engine_c" public/minn | tar -x -C "$work/engine"
+git -C "$ADMIN_REPO" archive "$admin_c" | tar -x -C "$work/admin"
+rm -rf "$work/admin/tests"
+git -C "$SITE_REPO" archive "$site_c" | tar -x -C "$work/site"
+git -C "$here" worktree add --detach --quiet "$work/game" "$game_c"
+# The restoration and catalog builds read the original sources and the research inventory beside the game.
+for d in glitch-GameServerJS streets glitch-client glitch-items glitch-overlays research; do [ -e "$AUDIT/$d" ] && ln -s "$AUDIT/$d" "$work/$d"; done
+ln -s "$here/node_modules" "$work/game/node_modules"
+(cd "$work/game" && node tools/build-restoration.mjs >/dev/null)
+# The header menu is content on the live site (Minn Admin, Design, Navigation): write the live one in.
+"${SSH[@]}" "$HOST" 'cd ~/public && wp post list --post_type=wp_navigation --post_status=publish --fields=ID,post_date --format=json' > "$work/menus.json"
+menu=$(node -e 'const m = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8") || "[]"); m.sort((a, b) => (a.post_date === b.post_date ? b.ID - a.ID : (a.post_date < b.post_date ? 1 : -1))); console.log(m[0]?.ID || "");' "$work/menus.json")
+if [ -n "$menu" ]; then
+	"${SSH[@]}" "$HOST" "cd ~/public && wp post get $menu --field=post_content" > "$work/menu.html"
+	node "$work/game/tools/site-nav/apply.mjs" --game="$work/game/public" --menu="$work/menu.html"
+fi
+GAME="$work/game/public"
+
+echo "2/6 Minn Engine, Minn Admin, theme"
+rsync -rlc --delete --exclude admin --exclude .install.json -e "${SSH[*]}" "$work/engine/public/minn/" "$HOST:public/minn/"
+rsync -rlc --delete --exclude tests --exclude node_modules -e "${SSH[*]}" "$work/admin/" "$HOST:public/wp-content/plugins/minn-admin/"
+rsync -rlc --delete -e "${SSH[*]}" "$work/site/" "$HOST:public/wp-content/themes/groddle/"
 "${SSH[@]}" "$HOST" 'ln -sfn ../wp-content/plugins/minn-admin ~/public/minn/admin'
 
-echo "2/5 the game, in parallel parts"
-(cd "$GAME" && COPYFILE_DISABLE=1 tar -cf - .) | split -b 120m - "$work/game.tar.part."
-"${SSH[@]}" "$HOST" 'rm -rf ~/private/game-parts && mkdir -p ~/private/game-parts'
-for p in "$work"/game.tar.part.*; do
-	( for try in 1 2 3 4 5 6 7 8; do
-		rsync -q --partial --append --timeout=60 -e "${SSH[*]}" "$p" "$HOST:private/game-parts/" && break
-		sleep 5
-	done ) &
-done
-wait
-(cd "$work" && shasum -a 256 game.tar.part.* | awk '{print $1, $2}') > "$work/local.sums"
-"${SSH[@]}" "$HOST" 'cd ~/private/game-parts && sha256sum game.tar.part.* | awk "{print \$1, \$2}"' > "$work/remote.sums"
-diff -q "$work/local.sums" "$work/remote.sums" >/dev/null || { echo "a part did not arrive whole: run again" >&2; exit 1; }
+echo "3/6 the game (changed files only)"
+"${SSH[@]}" "$HOST" 'rm -rf ~/web/game.next && cp -al ~/web/game ~/web/game.next'
+rsync -rlc --delete --exclude index.php --timeout=120 -e "${SSH[*]}" "$GAME/" "$HOST:web/game.next/"
+"${SSH[@]}" "$HOST" 'rm -rf ~/web/game.old && mv ~/web/game ~/web/game.old && mv ~/web/game.next ~/web/game && rm -rf ~/web/game.old'
 
-echo "3/5 unpack, links, shims"
-links=$(cd "$GAME" && ls -A)
+echo "4/6 links, shims"
+links=$(cd "$GAME" && ls -A | tr "\n" " ")
 "${SSH[@]}" "$HOST" "bash -s" <<REMOTE
 set -e
-rm -rf ~/web/game.new && mkdir -p ~/web/game.new
-cat ~/private/game-parts/game.tar.part.* | tar -xf - -C ~/web/game.new 2>/dev/null
-rm -rf ~/web/game.old && { [ -d ~/web/game ] && mv ~/web/game ~/web/game.old || true; } && mv ~/web/game.new ~/web/game
-rm -rf ~/private/game-parts ~/web/game.old
 cd ~/public
 for n in $links; do
 	[ "\$n" = index.html ] && continue
 	if [ -e "\$n" ] && [ ! -L "\$n" ]; then echo "kept \$n (not a link)"; continue; fi
 	ln -sfn "../web/game/\$n" "\$n"
 done
+# Links whose entry left the game go.
+for l in *; do
+	if [ -L "\$l" ] && [ ! -e "\$l" ]; then case "\$(readlink "\$l")" in ../web/game/*) rm "\$l";; esac; fi
+done
+find ~/web/game -mindepth 2 -name index.php -delete
 shim='<?php
 // Kinsta serves a folder index itself: hand this folder'"'"'s address to Minn (tools/deploy/kinsta.sh writes this).
 require \$_SERVER["DOCUMENT_ROOT"] . "/index.php";'
@@ -78,12 +98,13 @@ while read -r type slug; do
 done < /tmp/groddle-paths.txt
 rm -f /tmp/groddle-paths.txt
 echo "shims: \$n"
+echo "\$(date -u +%FT%TZ) game $GAME_REF site $SITE_REF engine ${engine_c:0:8} minn-admin ${admin_c:0:8}" >> ~/private/deploys.log
 REMOTE
 
-echo "4/5 cache"
+echo "5/6 cache"
 "${SSH[@]}" "$HOST" 'cd ~/public && wp cache flush' | tail -1
 
-echo "5/5 check"
-for p in / /play/ /play/online/ /restoration/ /changelog/ /musicblocks/ /wp-json/groddle/v1/me; do
+echo "6/6 check"
+for p in / /play/ /play/online/ /restoration/ /changelog/ /musicblocks/ /items/ /wp-json/groddle/v1/me; do
 	printf '%s %s\n' "$(curl -s -o /dev/null -w '%{http_code}' "https://groddleafternoon.com$p?deploy=$RANDOM")" "$p"
 done
