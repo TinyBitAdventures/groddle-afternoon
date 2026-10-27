@@ -54,7 +54,7 @@ import { quoinDailyLimitFor } from '../quoins.js';
 import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-4';
 import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js';
 import { isPoisoned } from '../tree-poison.js';
-import { furnitureSize } from '../home-decor.js?v=home-decor-6';
+import { furnitureSize } from '../home-decor.js?v=home-decor-7';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js';
 import { POTION_ART } from '../potion-art.js?v=g149-1';
 import { playPoofIn, playSheetOverlay } from '../overlay-art.js?v=g311-1';
@@ -98,7 +98,7 @@ import {
 } from '../potions.js?v=g149-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { patchesFeature } from './patches-feature.js?v=patches-15';
-import { homesFeature } from './homes-feature.js?v=homes-52';
+import { homesFeature } from './homes-feature.js?v=homes-53';
 import { streetTreeIndex } from './tree-death-feature.js?v=tree-death-18';
 import { questRoomConverse } from './quest-instances-feature.js?v=qi-17';
 

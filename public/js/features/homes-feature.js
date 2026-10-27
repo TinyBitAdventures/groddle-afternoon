@@ -120,9 +120,9 @@ import {
   textureConfig,
   unexpandInterior,
   UNEXPAND_TEXT,
-} from '../home-decor.js?v=home-decor-6';
-import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=furnup-1';
-import { chooseUpgrade, closeUpgradePicker, openUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=furnup-1';
+} from '../home-decor.js?v=home-decor-7';
+import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=furnup-2';
+import { chooseUpgrade, closeUpgradePicker, openUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=furnup-2';
 import { RECIPE_CATALOG } from '../making.js?v=g300-2';
 import {
   createBackYardState,
@@ -225,7 +225,7 @@ import {
   quoteHouseExpansion,
   quoteHouseUnexpand,
   unexpandHouseFloors,
-} from '../home-floors.js?v=g358-1';
+} from '../home-floors.js?v=g363-1';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -504,6 +504,8 @@ let demoDone = false;
 /** G358: the style the picker previews on a placed piece ({ id, upgradeId }), or null. */
 let upgradePreview = null;
 let furnupLast = '';
+/** FURNSELL QA: currants spent on styles this session. */
+let furnupSpent = 0;
 let autoplay = null;
 let ui = null;
 /** The chosen street style (inc_homes.js cfg.style on the exterior); null: the purchase look's. */
@@ -596,6 +598,7 @@ function publish(engine) {
   engine.setData('furnupStored', Object.entries(decor.styles || {}).map(([c, rows]) => rows.map((r) => `${c}:${r.upgradeId || 0}`).join(',')).filter(Boolean).join(','));
   engine.setData('furnupPicker', upgradePickerOpen() ? `${upgradePickerState().pieceId}:${upgradePickerState().chosen ?? ''}` : '');
   engine.setData('furnupLast', furnupLast);
+  engine.setData('furnupSpent', String(furnupSpent));
   engine.setData('homePlacing', placing ? placing.classTsid || placing.protoClass || '' : '');
   engine.setData('homeStreetStyle', currentStreetStyle(engine));
   engine.setData('homeStylePick', ui?.styles && !ui.styles.hidden ? stylePick || '' : '');
@@ -2863,6 +2866,8 @@ function openUpgradeFor(engine, id) {
     piece: item,
     baseLabel: def.label,
     baseArt: def.art.path,
+    // FURNSELL: paid styles are bought with currants; the picker reads the purse.
+    currants: () => Number(engine.pc?.currants) || 0,
     onPreview: (upgradeId) => {
       upgradePreview = upgradeId == null ? null : { id: item.id, upgradeId: upgradeId === '0' ? '' : upgradeId };
       renderFurniture(engine);
@@ -2877,16 +2882,30 @@ function openUpgradeFor(engine, id) {
   return ok;
 }
 
-/** furniture_upgrade_purchase_do for a free or owned style: applyUpgrade, the "upgraded" counter, redraw. */
+/**
+ * furniture_upgrade_purchase_do: applyUpgrade, the "upgraded" counter, redraw.
+ * A paid style (lane FURNSELL) takes its price from the purse first; in
+ * multiplayer the save write carries the lower purse, a loss the ledger always
+ * accepts (site LedgerMath::reconcile), so no signed spend is needed for a
+ * cosmetic the player keeps.
+ */
 function saveFurnitureUpgrade(engine, id, upgradeId) {
   const item = placedItem(decor, id);
   if (!item) return null;
-  const result = applyUpgrade(item, upgradeId, { baseLabel: furnitureDef(item.classTsid).label });
+  const purse = Number(engine.pc?.currants) || 0;
+  const result = applyUpgrade(item, upgradeId, { baseLabel: furnitureDef(item.classTsid).label, currants: purse });
   upgradePreview = null;
   if (!result.ok) {
     engine.toast(result.msg);
     renderFurniture(engine);
     return result;
+  }
+  if (result.cost > 0) {
+    engine.pc.currants = Math.max(0, purse - result.cost);
+    engine.playSound?.('PURCHASE_ITEM', { volume: 0.55 });
+    engine.pushActivity?.(`You paid ${currantsText(result.cost)} for the ${result.name}.`);
+    engine.updateHud?.();
+    furnupSpent += result.cost;
   }
   // applyUpgrade: achievements_increment("upgraded", class_id, 1).
   engine.achievement?.(result.counter, 1);
@@ -2939,7 +2958,10 @@ function bonusFurnitureUpgrade(engine, recipeKey) {
  * it down again), =locked (choose a paid style: the save stays off),
  * =card (own the three cards and run a Construction Tool Chair through the
  * bonus roll; add &furnuproll=0), =craft (card I, Furnituremaking I, a
- * Construction Tool and a Chair's inputs, for a real craft in the Make panel).
+ * Construction Tool and a Chair's inputs, for a real craft in the Make panel),
+ * =buy (FURNSELL: choose the Chair's cheapest paid style and buy it; add
+ * &furnupcurrants=N to set the purse first), =short (the same with 10
+ * currants: the button stays off with "You need more currants").
  */
 function runFurnUpAutoplay(engine, how) {
   const chair = () => decor.placed.find((row) => row.classTsid === 'furniture_chair');
@@ -2977,16 +2999,31 @@ function runFurnUpAutoplay(engine, how) {
     }
     const item = chair();
     if (!item) return say('furnup:no-chair');
+    const purseParam = engine.param?.('furnupcurrants');
+    if (how === 'short') engine.pc.currants = 10;
+    else if (how === 'buy' && purseParam != null && purseParam !== '' && Number.isFinite(Number(purseParam))) engine.pc.currants = Math.max(0, Math.floor(Number(purseParam)));
+    engine.updateHud?.();
     selected = { kind: 'furniture', id: item.id };
     renderFurniture(engine);
     renderBar(engine);
     openUpgradeFor(engine, item.id);
-    const option = upgradePickerOpen() && (how === 'locked'
-      ? document.querySelector('.furn-upgrade .fu-tile.locked')
-      : [...document.querySelectorAll('.furn-upgrade .fu-tile')].find((b) => !b.classList.contains('locked') && !b.classList.contains('on')));
+    const paidPick = how === 'locked' || how === 'buy' || how === 'short';
+    const option = upgradePickerOpen() && (paidPick
+      ? document.querySelector('.furn-upgrade .fu-tile.paid')
+      : [...document.querySelectorAll('.furn-upgrade .fu-tile')].find((b) => !b.classList.contains('paid') && !b.classList.contains('on')));
     if (option) chooseUpgrade(option.getAttribute('data-upgrade'));
     publish(engine);
     say(`furnup:${how}:chosen`);
+    if (how === 'buy' || how === 'short') {
+      setTimeout(() => {
+        const before = Number(engine.pc.currants) || 0;
+        const saved = saveUpgrade();
+        const after = chair();
+        publish(engine);
+        say(`furnup:${how}:${saved ? 'saved' : 'refused'}:${after?.upgradeId || ''}:${before}:${Number(engine.pc.currants) || 0}`);
+      }, 1200);
+      return;
+    }
     if (how !== 'apply') return;
     setTimeout(() => {
       saveUpgrade();

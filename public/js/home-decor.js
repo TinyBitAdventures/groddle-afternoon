@@ -50,7 +50,7 @@ import {
   HOME_LIMITS,
   HOME_TEXTURE_CONFIGS,
 } from './homes-catalog.js?v=homes-catalog-2';
-import { cleanHistory, cleanUpgradeId, upgradeArt, upgradeRow } from './furniture-upgrades.js?v=furnup-1';
+import { cleanHistory, cleanUpgradeId, upgradeArt, upgradeRow } from './furniture-upgrades.js?v=furnup-2';
 
 export const SEGMENT_W = 150;
 /** Room geometry version stored with the house (2 = source 150 px segments). */

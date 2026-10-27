@@ -28,10 +28,11 @@
  *   inc_data_imagination.js 2037-2120: Bonus Furniture Upgrade I / II / III.
  *
  * Remake decisions:
- * - Credits were real money. Upgrades with credits_cost 0 are free to choose;
- *   paid ones are shown locked (their price and art, no way to buy) until
- *   Austin decides how players get them. The Bonus Furniture Upgrade cards
- *   are the one way in, as in the source.
+ * - Credits were real money. Upgrades with credits_cost 0 are free to choose.
+ *   Paid ones (Austin 2026-10-27, lane FURNSELL) are bought with currants at
+ *   CURRANTS_PER_CREDIT, the rate players themselves sold credit styles at
+ *   (see the constant). The Bonus Furniture Upgrade cards still hand out a
+ *   paid style for nothing, as in the source.
  * - The remake has no subscription (home-styles.js drops the same gate), so
  *   subscriber_only does not lock a free upgrade.
  * - The base piece is upgrade '' (the source's 0) and its art is the class's
@@ -55,10 +56,44 @@ export const UPGRADE_TEXT = Object.freeze({
   invalid: 'Invalid upgrade',
   already: 'Already upgraded',
   forSale: "Cannot be upgraded while it's for sale",
-  needCredits: 'You need more credits',
-  locked: 'Styles that cost credits are not for sale here.',
+  // FurnUpgradeDialog.as updateCredits 579-613 and furniture_upgrade_purchase
+  // (inc_furniture.js 781), with currants for credits (lane FURNSELL).
+  youHave: 'You have',
+  needCurrants: 'You need more currants',
+  notEnough: "You don't have enough currants.",
   cancel: 'Cancel',
 });
+
+/**
+ * Currants a paid style costs per credit of its credits_cost (lane FURNSELL,
+ * reimagined: the source sold credits for money and never priced a style in
+ * currants). The rate is the one players sold credit-upgraded furniture at in
+ * the game's Marketplace forum in 2012 (research/wayback/raw/forum/
+ * marketplace-threads.tsv, thread titles): 2k a credit at first (lines 1751,
+ * 1792, 1929; 3498 offers 50k for a 25 credit table), 1.5k by the autumn
+ * (1842, 1925, 1955, 2031, 2109, 2115), then 1k (1817, 2080, 2577, 2662,
+ * 2846, 3004, 3038, 3069, 3155, 3307) with one 700 (3014), and the last
+ * "Master list of affordable furniture sellers - incl. Credit (1k per)"
+ * (3446, on the forum front page of 2012-11-12). So a 15 credit Chair is
+ * 15,000 currants against the plain Chair's 450.
+ */
+export const CURRANTS_PER_CREDIT = 1000;
+
+/** What a style costs in currants (0 for a free one). */
+export function styleCurrants(credits) {
+  return Math.max(0, Math.floor(Number(credits) || 0)) * CURRANTS_PER_CREDIT;
+}
+
+/** "25,000 currants" (FurnUpgradeButton's "N credits", in currants). */
+export function currantsText(n) {
+  const v = Math.max(0, Math.floor(Number(n) || 0));
+  return `${v.toLocaleString('en-US')} ${v === 1 ? 'currant' : 'currants'}`;
+}
+
+/** The dialog's purse line, "You have 1,200 currants" (credits_holder). */
+export function purseText(currants) {
+  return `${UPGRADE_TEXT.youHave} ${currantsText(currants)}`;
+}
 
 /** construction_tool.js 334: if (!is_chance(0.05)) return. */
 export const BONUS_UPGRADE_CHANCE = 0.05;
@@ -86,11 +121,35 @@ export function cleanUpgradeId(classTsid, id) {
   return FURNITURE_UPGRADES[classTsid]?.upgrades?.[key]?.art ? key : '';
 }
 
-/** upgrade_history rows ({ from, to, when }), at most 40, ids as strings. */
+/** How many upgrade_history rows a piece keeps. */
+export const HISTORY_LIMIT = 40;
+
+/**
+ * upgrade_history rows ({ from, to, when }), ids as strings. Past
+ * HISTORY_LIMIT the oldest row of a style seen again later goes first, so a
+ * style bought with currants stays owned however often the piece changes
+ * (lane FURNSELL; no class has more than 48 styles).
+ */
 export function cleanHistory(rows) {
   if (!Array.isArray(rows)) return [];
+  let list = rows.filter((row) => row && typeof row === 'object');
+  if (list.length > HISTORY_LIMIT) {
+    const key = (row) => String(row.to ?? '').replace(/[^0-9]/g, '').slice(0, 6) || '0';
+    const lastAt = new Map(list.map((row, i) => [key(row), i]));
+    const extra = list.length - HISTORY_LIMIT;
+    let dropped = 0;
+    list = list.filter((row, i) => {
+      if (dropped < extra && lastAt.get(key(row)) !== i) {
+        dropped += 1;
+        return false;
+      }
+      return true;
+    });
+    // Still long: only distinct styles are left; keep each one's latest row.
+    if (list.length > 64) list = list.slice(-64);
+  }
   const out = [];
-  for (const row of rows.slice(-40)) {
+  for (const row of list) {
     if (!row || typeof row !== 'object') continue;
     const to = String(row.to ?? '').replace(/[^0-9]/g, '').slice(0, 6) || '0';
     const from = String(row.from ?? '').replace(/[^0-9]/g, '').slice(0, 6) || '0';
@@ -133,7 +192,8 @@ export function upgradeVerb(piece) {
  * The picker's list for a piece: getUpgrades (+ the base piece when the class
  * can revert), hidden rows dropped, sorted owned first, then credits, then id,
  * and the current upgrade on top (marked owned). Each option:
- * { id ('0' = base), label, credits, owned, current, locked, art, isNew, text }.
+ * { id ('0' = base), label, credits, currants (its price, 0 when free or
+ * owned), owned, current, paid (bought with currants), art, isNew, text }.
  */
 export function listUpgrades(piece, baseLabel = '') {
   const def = FURNITURE_UPGRADES[piece?.classTsid];
@@ -157,41 +217,57 @@ export function listUpgrades(piece, baseLabel = '') {
   if (at > 0) rows.unshift(...rows.splice(at, 1));
   if (at >= 0) rows[0].owned = true;
   for (const row of rows) {
-    row.locked = row.credits > 0 && !row.owned;
+    row.paid = row.credits > 0 && !row.owned;
+    row.currants = row.paid ? styleCurrants(row.credits) : 0;
     row.text = row.owned && row.credits ? UPGRADE_TEXT.owned
-      : row.credits ? `${row.credits.toLocaleString()} ${row.credits === 1 ? 'credit' : 'credits'}`
+      : row.paid ? currantsText(row.currants)
         : UPGRADE_TEXT.freeForEveryone;
   }
   return rows;
 }
 
-/** FurnUpgradeDialog's save button for a chosen option. */
-export function saveButtonText(piece, option) {
+/** Whether the list has styles to buy (the dialog shows the purse then: credits_holder, 367-368). */
+export function listHasPaid(options) {
+  return (options || []).some((row) => row.paid);
+}
+
+/**
+ * FurnUpgradeDialog's save button for a chosen option (setButtonToChosen
+ * 552-565 and updateCredits 579-613): "Change style for N currants" for a
+ * style to buy, turned off with "You need more currants" when the purse
+ * (`currants`) is short. `short` marks the purse line low (furn_upgrade_credits_low).
+ */
+export function saveButtonText(piece, option, { currants = 0 } = {}) {
   const current = cleanUpgradeId(piece?.classTsid, piece?.upgradeId) || '0';
   if (!option || option.id === current) return { text: UPGRADE_TEXT.pick, disabled: true };
   if (option.owned) return { text: UPGRADE_TEXT.change, disabled: false };
-  if (option.credits) {
-    return { text: `${UPGRADE_TEXT.change} for ${option.credits} ${option.credits === 1 ? 'credit' : 'credits'}`, disabled: true, tip: UPGRADE_TEXT.locked };
+  if (option.paid) {
+    const cost = option.currants || styleCurrants(option.credits);
+    const text = `${UPGRADE_TEXT.change} for ${currantsText(cost)}`;
+    if ((Number(currants) || 0) >= cost) return { text, disabled: false, cost };
+    return { text, disabled: true, cost, short: true, tip: UPGRADE_TEXT.needCurrants };
   }
   return { text: UPGRADE_TEXT.changeFree, disabled: false };
 }
 
 /**
- * furniture_upgrade_purchase + applyUpgrade for a free or owned upgrade.
- * Paid upgrades the piece never had are refused (credits are not sold here).
- * @returns {{ ok: boolean, msg?: string, reason?: string, id?: string, name?: string }}
+ * furniture_upgrade_purchase + applyUpgrade. A free or owned style applies at
+ * once; a paid one the piece never had costs `cost` currants (the caller
+ * takes them from the purse) and is refused with "You don't have enough
+ * currants." when `currants` is short (inc_furniture.js 778-782, credits
+ * there). Either way upgrade_history records it, so the piece owns it after.
+ * @returns {{ ok: boolean, msg?: string, reason?: string, id?: string, name?: string, cost?: number }}
  */
-export function applyUpgrade(piece, id, { now = Date.now(), baseLabel = '' } = {}) {
+export function applyUpgrade(piece, id, { now = Date.now(), baseLabel = '', currants = 0 } = {}) {
   const option = listUpgrades(piece, baseLabel).find((row) => row.id === String(id));
   if (!option) return { ok: false, reason: 'invalid', msg: UPGRADE_TEXT.invalid };
   const current = cleanUpgradeId(piece.classTsid, piece.upgradeId) || '0';
   if (option.id === current) return { ok: false, reason: 'already', msg: UPGRADE_TEXT.already };
-  if (option.locked) return { ok: false, reason: 'credits', msg: UPGRADE_TEXT.locked };
-  piece.upgradeHistory = cleanHistory(piece.upgradeHistory);
-  piece.upgradeHistory.push({ from: current, to: option.id, when: Math.floor(now / 1000) });
-  if (piece.upgradeHistory.length > 40) piece.upgradeHistory.splice(0, piece.upgradeHistory.length - 40);
+  const cost = option.paid ? option.currants : 0;
+  if (cost > 0 && !((Number(currants) || 0) >= cost)) return { ok: false, reason: 'currants', msg: UPGRADE_TEXT.notEnough, cost };
+  piece.upgradeHistory = cleanHistory([...cleanHistory(piece.upgradeHistory), { from: current, to: option.id, when: Math.floor(now / 1000) }]);
   piece.upgradeId = option.id === '0' ? '' : option.id;
-  return { ok: true, id: option.id, name: option.label, counter: `upgraded:${piece.classTsid}` };
+  return { ok: true, id: option.id, name: option.label, cost, counter: `upgraded:${piece.classTsid}` };
 }
 
 /**
@@ -205,8 +281,7 @@ export function applyUpgrade(piece, id, { now = Date.now(), baseLabel = '' } = {
 export function applyBonusUpgrade(piece, id, { now = Date.now() } = {}) {
   const key = cleanUpgradeId(piece?.classTsid, id);
   if (!key) return false;
-  piece.upgradeHistory = cleanHistory(piece.upgradeHistory);
-  piece.upgradeHistory.push({ from: cleanUpgradeId(piece.classTsid, piece.upgradeId) || '0', to: key, when: Math.floor(now / 1000) });
+  piece.upgradeHistory = cleanHistory([...cleanHistory(piece.upgradeHistory), { from: cleanUpgradeId(piece.classTsid, piece.upgradeId) || '0', to: key, when: Math.floor(now / 1000) }]);
   piece.upgradeId = key;
   return true;
 }

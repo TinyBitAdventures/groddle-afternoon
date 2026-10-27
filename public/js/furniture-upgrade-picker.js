@@ -5,13 +5,17 @@
  * first), and the save button whose words follow the chosen style (see
  * furniture-upgrades.js saveButtonText). Choosing a style previews it on the
  * piece in the room (FurnUpgradeController.setChosenUpgrade); Cancel puts the
- * old look back (cancel), Escape is Cancel.
+ * old look back (cancel), Escape is Cancel. A style that cost credits is
+ * bought with currants (lane FURNSELL): the footer shows the purse, "You have
+ * N currants" (the dialog's credits_holder, red when short), and the button
+ * reads "Change style for N currants", off with "You need more currants"
+ * when the purse is short.
  *
  * DOM only; the rules are js/furniture-upgrades.js and the homes feature
  * applies the choice.
  */
 
-import { listUpgrades, saveButtonText, UPGRADE_TEXT } from './furniture-upgrades.js?v=furnup-1';
+import { listHasPaid, listUpgrades, purseText, saveButtonText, UPGRADE_TEXT } from './furniture-upgrades.js?v=furnup-2';
 
 const CSS = `
 .furn-upgrade{position:absolute;left:50%;top:56px;transform:translateX(-50%);z-index:46;width:min(572px,calc(100% - 20px));max-height:calc(100% - 150px);display:flex;flex-direction:column;background:#fffdf7;border-radius:14px;box-shadow:0 12px 32px rgba(40,30,20,.28);border:1px solid rgba(90,70,40,.18);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;color:#2b2a33;overflow:hidden}
@@ -28,17 +32,18 @@ const CSS = `
 .furn-upgrade .fu-tile{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;border:2px solid transparent;background:#f6efe2;border-radius:10px;padding:5px 4px;cursor:pointer;font:inherit;font-size:11px;line-height:1.15;color:#3b3328;text-align:center}
 .furn-upgrade .fu-tile:hover{border-color:#e0a84a}
 .furn-upgrade .fu-tile.on{border-color:#d08a2a;background:#fff3d8}
-.furn-upgrade .fu-tile.locked img{opacity:.55;filter:saturate(.5)}
 .furn-upgrade .fu-tile img{width:64px;height:64px;object-fit:contain}
 .furn-upgrade .fu-tile .fu-label{font-weight:700}
 .furn-upgrade .fu-tile .fu-price{color:#6d6252}
-.furn-upgrade .fu-tile.locked .fu-price{color:#7a4fb5;font-weight:700}
+.furn-upgrade .fu-tile.paid .fu-price{color:#7a5a12;font-weight:700}
 .furn-upgrade .fu-tile .fu-new{position:absolute;left:4px;top:3px;font-size:9px;font-weight:700;background:#e07a3d;color:#fff;border-radius:6px;padding:0 4px}
 .furn-upgrade footer{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 12px 10px;border-top:1px solid rgba(90,70,40,.12)}
 .furn-upgrade footer button{border:1px solid rgba(90,70,40,.2);background:#fff;border-radius:8px;padding:6px 11px;font-size:12.5px;font-weight:700;color:#4a3a28;cursor:pointer}
 .furn-upgrade footer button.primary{background:#4a90c8;border-color:#4a90c8;color:#fff}
 .furn-upgrade footer button:disabled{opacity:.45;cursor:not-allowed}
 .furn-upgrade .fu-note{flex-basis:100%;margin:0;font-size:12px;color:#a0522d}
+.furn-upgrade .fu-purse{margin-left:auto;font-size:12px;font-weight:700;color:#5c4a2e}
+.furn-upgrade .fu-purse.low{color:#b8322a}
 @media (max-width:640px){.furn-upgrade{top:auto;bottom:106px;max-height:60%}.furn-upgrade .fu-prev{display:none}.furn-upgrade .fu-grid{grid-template-columns:repeat(auto-fill,minmax(84px,1fr))}}
 `;
 
@@ -86,7 +91,8 @@ export function upgradePickerState() {
 
 /**
  * Open the picker for a placed piece.
- * opts: { piece, baseLabel, baseArt (path), onPreview(upgradeId|null), onSave(optionId), onClose() }
+ * opts: { piece, baseLabel, baseArt (path), currants() (the purse, read at
+ * each render), onPreview(upgradeId|null), onSave(optionId), onClose() }
  */
 export function openUpgradePicker(opts) {
   if (!ensureRoot()) return false;
@@ -118,10 +124,14 @@ export function chooseUpgrade(id) {
   return true;
 }
 
+function purse() {
+  return Math.max(0, Number(current?.currants?.()) || 0);
+}
+
 /** The save button (tryToSave). */
 export function saveUpgrade() {
   if (!current) return false;
-  const button = saveButtonText(current.piece, current.chosen);
+  const button = saveButtonText(current.piece, current.chosen, { currants: purse() });
   if (button.disabled) return false;
   const { chosen, onSave } = current;
   closeUpgradePicker(false);
@@ -136,7 +146,7 @@ function artPath(option) {
 function render() {
   if (!current || !root) return;
   const chosen = current.chosen;
-  const button = saveButtonText(current.piece, chosen);
+  const button = saveButtonText(current.piece, chosen, { currants: purse() });
   const header = el('header', {}, [
     el('h3', { text: UPGRADE_TEXT.title }),
     el('button', { type: 'button', class: 'fu-close', 'aria-label': 'Close', text: '×', onclick: () => closeUpgradePicker(true) }),
@@ -147,7 +157,7 @@ function render() {
   ]);
   const grid = el('div', { class: 'fu-grid' }, current.options.map((option) => el('button', {
     type: 'button',
-    class: `fu-tile${chosen?.id === option.id ? ' on' : ''}${option.locked ? ' locked' : ''}`,
+    class: `fu-tile${chosen?.id === option.id ? ' on' : ''}${option.paid ? ' paid' : ''}`,
     title: option.label,
     'data-upgrade': option.id,
     onclick: () => chooseUpgrade(option.id),
@@ -160,6 +170,7 @@ function render() {
   const footer = el('footer', {}, [
     el('button', { type: 'button', class: 'primary', 'data-upgrade-save': '1', disabled: button.disabled, text: button.text, onclick: () => saveUpgrade() }),
     el('button', { type: 'button', text: UPGRADE_TEXT.cancel, onclick: () => closeUpgradePicker(true) }),
+    listHasPaid(current.options) ? el('span', { class: `fu-purse${button.short ? ' low' : ''}`, 'data-upgrade-purse': '1', text: purseText(purse()) }) : null,
     button.tip ? el('p', { class: 'fu-note', text: button.tip }) : null,
   ]);
   root.replaceChildren(header, el('div', { class: 'fu-main' }, [preview, grid]), footer);

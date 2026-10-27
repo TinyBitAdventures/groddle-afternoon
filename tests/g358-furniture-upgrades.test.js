@@ -1,5 +1,6 @@
 // G358: furniture upgrades (styles), the free ones in the picker, the paid ones
-// locked, and the three Bonus Furniture Upgrade cards.
+// for currants (lane FURNSELL: tests/g358-furniture-sell.test.js), and the
+// three Bonus Furniture Upgrade cards.
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { execFileSync } from 'node:child_process';
@@ -36,7 +37,7 @@ import {
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js';
 import { IMAGINATION_UPGRADES, upgradeStatus, DEALT_SECRET_CARDS } from '../public/js/imagination.js';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js';
-import { visitorHomeState } from '../public/js/features/homes-feature.js?v=homes-52';
+import { visitorHomeState } from '../public/js/features/homes-feature.js?v=homes-53';
 
 const spike = join(import.meta.dirname, '..');
 const pub = join(spike, 'public');
@@ -107,22 +108,22 @@ describe('the style picker (getUpgrades, HandOfDecorator, FurnUpgradeDialog)', (
       const b = rest[i];
       assert.ok(a.credits < b.credits || (a.credits === b.credits && Number(a.id) < Number(b.id)), `${a.id} before ${b.id}`);
     }
-    assert.deepEqual(list.filter((row) => !row.locked).map((row) => row.id), ['0', '1', '14', '15', '45']);
+    assert.deepEqual(list.filter((row) => !row.paid).map((row) => row.id), ['0', '1', '14', '15', '45']);
     assert.equal(list.find((row) => row.id === '1').text, UPGRADE_TEXT.freeForEveryone);
-    assert.equal(list.find((row) => row.id === '112').text, '25 credits');
-    assert.equal(list.find((row) => row.id === '112').locked, true);
+    assert.equal(list.find((row) => row.id === '112').text, '25,000 currants');
+    assert.equal(list.find((row) => row.id === '112').paid, true);
   });
 
-  it('words the save button like FurnUpgradeDialog and keeps paid styles locked', () => {
+  it('words the save button like FurnUpgradeDialog; a paid style needs the currants', () => {
     const piece = { id: 1, classTsid: CHAIR };
     const list = listUpgrades(piece, 'Chair');
     assert.deepEqual(saveButtonText(piece, list[0]), { text: 'Choose a style from the right', disabled: true });
     assert.deepEqual(saveButtonText(piece, list.find((r) => r.id === '1')), { text: 'Change style for FREE!', disabled: false });
     const paid = saveButtonText(piece, list.find((r) => r.id === '112'));
-    assert.equal(paid.text, 'Change style for 25 credits');
+    assert.equal(paid.text, 'Change style for 25,000 currants');
     assert.equal(paid.disabled, true);
-    assert.equal(paid.tip, UPGRADE_TEXT.locked);
-    assert.deepEqual(applyUpgrade(piece, '112').reason, 'credits');
+    assert.equal(paid.tip, UPGRADE_TEXT.needCurrants);
+    assert.deepEqual(applyUpgrade(piece, '112').reason, 'currants');
     assert.equal(piece.upgradeId, undefined);
   });
 
@@ -130,7 +131,7 @@ describe('the style picker (getUpgrades, HandOfDecorator, FurnUpgradeDialog)', (
     const piece = { id: 1, classTsid: CHAIR };
     assert.equal(upgradeVerb(piece).label, 'Upgrade');
     const r = applyUpgrade(piece, '1', { now: 1_000_000, baseLabel: 'Chair' });
-    assert.deepEqual(r, { ok: true, id: '1', name: 'Brass Metal Chair', counter: 'upgraded:furniture_chair' });
+    assert.deepEqual(r, { ok: true, id: '1', name: 'Brass Metal Chair', cost: 0, counter: 'upgraded:furniture_chair' });
     assert.equal(piece.upgradeId, '1');
     assert.deepEqual(piece.upgradeHistory, [{ from: '0', to: '1', when: 1000 }]);
     assert.equal(pieceLabel(piece, 'Chair'), 'Brass Metal Chair');
@@ -147,7 +148,7 @@ describe('the style picker (getUpgrades, HandOfDecorator, FurnUpgradeDialog)', (
     assert.equal(applyBonusUpgrade(piece, '112', { now: 5000 }), true);
     assert.equal(applyUpgrade(piece, '1').ok, true);
     const crab = listUpgrades(piece, 'Chair').find((row) => row.id === '112');
-    assert.deepEqual([crab.owned, crab.locked, crab.text], [true, false, 'You own this']);
+    assert.deepEqual([crab.owned, crab.paid, crab.currants, crab.text], [true, false, 0, 'You own this']);
     assert.deepEqual(saveButtonText(piece, crab), { text: 'Change style', disabled: false });
     assert.equal(applyUpgrade(piece, '112').ok, true);
   });
@@ -259,8 +260,8 @@ describe('Bonus Furniture Upgrade I-III (construction_tool.js 330-380)', () => {
 describe('wiring and copy', () => {
   it('draws, picks and rolls from the homes feature', () => {
     const src = readFileSync(join(pub, 'js/features/homes-feature.js'), 'utf8');
-    assert.match(src, /from '\.\.\/furniture-upgrades\.js\?v=furnup-1'/);
-    assert.match(src, /from '\.\.\/furniture-upgrade-picker\.js\?v=furnup-1'/);
+    assert.match(src, /from '\.\.\/furniture-upgrades\.js\?v=furnup-2'/);
+    assert.match(src, /from '\.\.\/furniture-upgrade-picker\.js\?v=furnup-2'/);
     assert.match(src, /pieceArt\(item\.classTsid, upgradeId\)/);
     assert.match(src, /counter\.startsWith\('making_recipe:'\)\) bonusFurnitureUpgrade/);
     assert.match(src, /towerDecor\.map\(\(\{ storage, styles, \.\.\.rest \}\)/);

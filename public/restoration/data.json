@@ -923,7 +923,7 @@
    "group": "home",
    "name": "Your house and yard",
    "status": "source",
-   "blurb": "Get your house and home street free, as in 2012: the Magic Rock hands you a Home Street Ticket and the Home Street Selection Machine takes it for a Meadow, Firebog or Uralia street. Paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the street and the private back yard left of the house (walk out through the house’s open end; worn-out rocks, gardens and patches become protos you restore with a project), expand both (the yard from 5 to 20 segments, which with a full-width street earns Landgrabber), restyle the street as any of 36 of the original 37 street styles and the back yard as any of 34 of its 37 (Change Style, level x 10 iMG; each rebuilt from Tiny Speck’s own scenery, a yard drawn like the street of its template family), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges). Add a second and third floor with a Door (the Furniture Store, or recipe 260): set it on your top floor and put 100 Planks into Build a New Floor. Give any piece a new style in Decorate: the 113 free furniture upgrades of the original in Tiny Speck’s own art, with the paid ones shown locked; Bonus Furniture Upgrade I to III turn 5% of the furniture you make into a style that cost credits.",
+   "blurb": "Get your house and home street free, as in 2012: the Magic Rock hands you a Home Street Ticket and the Home Street Selection Machine takes it for a Meadow, Firebog or Uralia street. Paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the street and the private back yard left of the house (walk out through the house’s open end; worn-out rocks, gardens and patches become protos you restore with a project), expand both (the yard from 5 to 20 segments, which with a full-width street earns Landgrabber), restyle the street as any of 36 of the original 37 street styles and the back yard as any of 34 of its 37 (Change Style, level x 10 iMG; each rebuilt from Tiny Speck’s own scenery, a yard drawn like the street of its template family), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges). Add a second and third floor with a Door (the Furniture Store, or recipe 260): set it on your top floor and put 100 Planks into Build a New Floor. Give any piece a new style in Decorate: the original’s 565 furniture upgrades in Tiny Speck’s own art, 113 of them free and the 452 that cost credits sold for currants instead, at 1,000 currants a credit (reimagined: the going rate players sold credit furniture at in the 2012 Marketplace forum), so a 15 credit Chair style is 15,000 currants; Bonus Furniture Upgrade I to III turn 5% of the furniture you make into a style that cost credits.",
    "multiplayer": null,
    "spot": "mailbox",
    "evidence": [
@@ -2607,9 +2607,14 @@
   ]
  },
  "git": {
-  "commits": 608,
+  "commits": 609,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "Furniture styles: the 113 free upgrades in Decorate, the paid ones shown locked, and Bonus Furniture Upgrade I to III"
+   },
    {
     "date": "2026-10-27",
     "kind": "improve",
@@ -2724,14 +2729,9 @@
     "date": "2026-10-27",
     "kind": "fix",
     "text": "The online page loads the bags build"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "Bags give the pack more slots, as in the original"
    }
   ]
  },
- "tests": 361,
+ "tests": 362,
  "generatedAt": "2026-10-27"
 }
