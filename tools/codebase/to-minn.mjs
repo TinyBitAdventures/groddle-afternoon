@@ -19,6 +19,13 @@ const SITE = String(args.site || 'https://groddle.localhost').replace(/\/$/, '')
 const GH = 'https://github.com/TinyBitAdventures';
 const data = (repo) => `<!-- wp:groddle/codebase ${attrJson({ repo })} /-->`;
 const band = (id, alt, title, inner) => group('section', `band${alt ? ' band-alt' : ''}`, id, [group('div', 'wrap', null, [h(2, title, { id: `${id}-h` }), ...inner])]);
+/** A repo's section as a fabric patch sewn onto the page (the .cb-patch styles in the site's style.css). */
+const patch = (id, alt, title, inner) => group('section', `band${alt ? ' band-alt' : ''}`, id, [group('div', 'wrap', null, [group('div', `cb-patch cb-patch-${id}`, null, [h(2, title, { id: `${id}-h` }), ...inner])])]);
+/** A checkpoint on the seam that runs down the page: one link of Glitch's textile chain, drawn with its Tiny Speck icon by the .cb-knot styles. */
+const knot = (item, name, words) => group('div', `cb-knot cb-knot-${item}`, null, [p('', `<strong>${name}</strong> ${words}`)]);
+/** A Tiny Speck badge from the game's own badge art (public/assets/badges). */
+const badge = (file, alt) => block('image', { width: '72px', height: '72px', className: 'cb-badge' },
+  `<figure class="wp-block-image is-resized cb-badge"><img src="/assets/badges/${file}.png" alt="${alt}" width="72" height="72" style="width:72px;height:72px"/></figure>`);
 const list = (cls, items, ordered = false) => block('list', { ...(ordered ? { ordered: true } : {}), ...(cls ? { className: cls } : {}) },
   `<${ordered ? 'ol' : 'ul'} class="wp-block-list${cls ? ` ${cls}` : ''}">${items.map((i) => block('list-item', null, `<li>${i}</li>`)).join('\n')}</${ordered ? 'ol' : 'ul'}>`);
 const links = (repo) => p('cb-links', `On GitHub: <a href="${GH}/${repo}">the code</a> · <a href="${GH}/${repo}/issues">issues</a> · <a href="${GH}/${repo}/pulls">pull requests</a>`);
@@ -35,21 +42,25 @@ export function codebaseContent() {
       data('overview'),
       p('jump', jump),
     ])]),
-    band('game', false, 'The game', [
+    knot('fiber', 'Fiber', 'The scraps we started from: Tiny Speck’s code and art files, pages the Wayback Machine kept, and what players recorded.'),
+    patch('game', false, 'The game', [
       p('section-lead', '<a href="' + GH + '/groddle-afternoon">groddle-afternoon</a> is the whole game: streets and physics, skills, quests, crafting, gardens, homes, and the multiplayer client. It is plain JavaScript in ES modules, drawn with PixiJS, with no framework and no build step for the game itself: the files in <code>public/</code> are what your browser loads. Most rules are ported from Tiny Speck’s GameServerJS, and the scripts in <code>tools/</code> turn Tiny Speck’s item, street and art files into the data and sprites the game reads. The tests run on Node’s own test runner, and many of them check the game against Tiny Speck’s files directly.'),
       links('groddle-afternoon'),
       data('game'),
     ]),
-    band('server', true, 'The realtime server', [
+    knot('spindle', 'Spindle', 'The build tools, which spin those scraps into the data and sprites the game reads.'),
+    patch('server', true, 'The realtime server', [
       p('section-lead', '<a href="' + GH + '/groddle-afternoon-server">groddle-afternoon-server</a> is the multiplayer side: one Go program that keeps who is where, chat, parties and groups, and the parts of the world players share, such as quoins, rocks, races, Rook attacks and trades. Players connect over a WebSocket (coder/websocket), and each shared system is a module of its own that registers with one hub. It saves its state to files when it stops; on the live server it runs under systemd behind Caddy. Its world data is written by the game’s build tools, so both sides read the same numbers.'),
       links('groddle-afternoon-server'),
       data('server'),
     ]),
-    band('site', false, 'The site', [
+    knot('thread', 'Thread', 'The modules: one strand for each system, from gardens to trades.'),
+    patch('site', false, 'The site', [
       p('section-lead', '<a href="' + GH + '/groddle-afternoon-site">groddle-afternoon-site</a> is groddleafternoon.com: a theme and extension for Minn, in PHP. The theme draws the pages and Notes in the site’s look. The extension serves the built game beside them, adds the page blocks (each a <code>block.json</code> drawn in PHP, like the figures on this page) and answers the game’s <code>groddle/v1</code> routes: sign-up and sign-in, saves, buddies, groups, profiles, homes, and the shared ledger of currants and items. It uses only Minn’s own classes, no WordPress functions. Its tests live in the game repo and run when the two are checked out side by side.'),
       links('groddle-afternoon-site'),
       data('site'),
     ]),
+    knot('loomer', 'Loomer', 'The tests, which weave the strands together and hold them to the original.'),
     band('platform', true, 'What it runs on', [
       p('section-lead', '<a href="https://github.com/austinginder/minn-engine">Minn Engine</a> is a from-scratch PHP engine, MIT licensed, that speaks WordPress’s contracts (its database tables, REST API, sign-in and roles), so the site can be hosted and run like a WordPress site without being one. <a href="https://github.com/austinginder/minn-admin">Minn Admin</a> is the admin it comes with, where the words on this page are edited. Both are separate projects with repositories of their own.'),
       data('platform'),
@@ -57,8 +68,15 @@ export function codebaseContent() {
     band('art', false, 'Where the art, sound and data come from', [
       p('section-lead', 'When Glitch closed, Tiny Speck released its art, sound and code into the public domain (CC0) at <a href="https://github.com/tinyspeck">github.com/tinyspeck</a>: the items, locations, avatars and overlays, the Flash client, and the GameServerJS code that ran the game. Groddle Afternoon is built from those files, and where nothing survived, rebuilt from what players recorded. The Glitch name and logo were not part of that release, so they are not used here.'),
     ]),
+    knot('general_fabric', 'Fabric', 'The finished cloth: the game you play at <a href="https://groddleafternoon.com">groddleafternoon.com</a>.'),
     band('contribute', true, 'Contributing', [
-      p('section-lead', 'Issues and pull requests are welcome on all three repos. A bug you hit while playing, a rule that does not match the original, an item that is missing: open an issue, or send the fix.'),
+      group('div', 'cb-invite', null, [
+        p('section-lead', 'Issues and pull requests are welcome on all three repos. A bug you hit while playing, a rule that does not match the original, an item that is missing: open an issue, or send the fix.'),
+        group('div', 'cb-nod', null, [
+          group('div', 'cb-nod-badges', null, [badge('string_practicioner', 'String Practitioner badge'), badge('threader_of_renown', 'Threader of Renown badge')]),
+          p('cb-nod-note', 'A nod to everyone who sends a pull request: <strong>String Practitioner</strong> and <strong>Threader of Renown</strong>, two of Tiny Speck’s badges. In Glitch you earned them by spinning fiber straight into string and by threading five bead necklaces. Nothing grants them for a pull request: they are only our thanks.'),
+        ]),
+      ]),
       list('', [
         `The game: <a href="${GH}/groddle-afternoon/issues">issues</a> · <a href="${GH}/groddle-afternoon/pulls">pull requests</a>`,
         `The realtime server: <a href="${GH}/groddle-afternoon-server/issues">issues</a> · <a href="${GH}/groddle-afternoon-server/pulls">pull requests</a>`,
