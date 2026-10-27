@@ -31,15 +31,15 @@ before(async () => {
 });
 
 describe('the full skill tree', () => {
-  it('covers all 105 skills, every family has an honest remake note', () => {
+  it('covers all 105 skills and Better Learning I to V, every family has an honest remake note', () => {
     const catalog = getSkillCatalog();
-    assert.equal(Object.keys(catalog).length, 105);
+    assert.equal(Object.keys(catalog).length, 110);
     for (const family of skillFamilies()) {
       assert.ok(SKILL_REMAKE_NOTES[family.name], `missing note for ${family.name}`);
       assert.ok(SKILL_CATEGORIES[family.categoryId], `unknown category for ${family.name}`);
     }
     const table = skillAuditTable();
-    assert.equal(table.length, 105);
+    assert.equal(table.length, 110);
     const counts = table.reduce((acc, row) => ({ ...acc, [row.status]: (acc[row.status] || 0) + 1 }), {});
     assert.ok(counts.live >= 70, JSON.stringify(counts));
   });
@@ -73,8 +73,9 @@ describe('the full skill tree', () => {
     const cooking = filterSkillTree(state, { category: 8 }, { level: 99 });
     assert.deepEqual(cooking.groups.map((g) => g.name), ['Cooking']);
     const counts = skillTreeCounts(state, { level: 99 });
-    assert.equal(counts.all, 105);
-    assert.equal(counts.learned + counts.available + counts.learning + counts.locked, 105);
+    // 105 from inc_data_skills.js plus Better Learning I to V (G62).
+    assert.equal(counts.all, 110);
+    assert.equal(counts.learned + counts.available + counts.learning + counts.locked, 110);
   });
 
   it('spends a Giant emblem for its skill unlock badge', () => {

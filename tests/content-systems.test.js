@@ -70,7 +70,8 @@ describe('mined catalogs from GSJS', () => {
     assert.ok(meta?.counts);
     assert.equal(Object.keys(getQuestCatalog()).length, meta.counts.quests.output);
     assert.equal(Object.keys(getAchievementCatalog()).length, meta.counts.achievements.output);
-    assert.equal(Object.keys(getSkillCatalog()).length, meta.counts.skills.output);
+    // Better Learning I to V are added to the mined skills (better-learning.js, G62).
+    assert.equal(Object.values(getSkillCatalog()).filter((s) => !s.remake).length, meta.counts.skills.output);
     assert.equal(Object.keys(getBuffCatalog()).length, meta.counts.buffs.output);
   });
 

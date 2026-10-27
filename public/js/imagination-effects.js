@@ -245,13 +245,17 @@ export function brainCapacityRescale(count, oldCapacity, newCapacity) {
 
 /**
  * Seconds factor for one skill (skills_points_to_seconds): the learning
- * modifier, then the category reduction (100 - percent) / 100 when one is set.
- * @param {{ count: number, brainCapacity: number, categoryId?: number, reductions?: Record<number, number> }} ctx
+ * modifier, then the category reduction (100 - percent) / 100 when one is set,
+ * then Better Learning's cut (`discount`, 0 to 0.2, better-learning.js, G62).
+ * Each multiplies the seconds, as inc_skills.js:1093-1118 does with the first two.
+ * @param {{ count: number, brainCapacity: number, categoryId?: number, reductions?: Record<number, number>, discount?: number }} ctx
  */
-export function skillTimeFactor({ count = 0, brainCapacity = 20, categoryId = null, reductions = {} } = {}) {
+export function skillTimeFactor({ count = 0, brainCapacity = 20, categoryId = null, reductions = {}, discount = 0 } = {}) {
   let factor = learningTimeModifier(count, brainCapacity);
   const pct = categoryId == null ? 0 : Number(reductions?.[categoryId]) || 0;
   if (pct) factor *= (100 - pct) / 100;
+  const cut = Number(discount) || 0;
+  if (cut > 0 && cut < 1) factor *= 1 - cut;
   return factor;
 }
 

@@ -40,6 +40,7 @@ export const PLAY_ROUTES = Object.freeze({
   vendors: `${BASE}&vendor=toys`,
   // G152: a full pack with an empty Generic Bag: click the bag, drag a stack in.
   bags: `${BASE}&bagdemo=1`,
+  'better-learning': `${BASE}&skilltree=betterlearning_1`,
   levels: `${BASE}&leveldemo=1`,
   feats: `${BASE}&companiondemo=feat`,
   seasons: `${BASE}&season=zilloween&seasondemo=1`,

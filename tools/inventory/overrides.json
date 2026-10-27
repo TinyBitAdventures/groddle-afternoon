@@ -1767,5 +1767,30 @@
   "status": "reimagined",
   "reason": "no archived street holds one (inc_upgrades.js 344 rebuilt it with npc_mailbox on player-owned lot and quarter streets); placed on the home street outside the World Gate. Send mail, interact/cancel and the doParcel run (600 ms, 1 s, frog pickup, package_sent 1 s) are the source's; GSJS never calls sendParcel, here an item letter sent from it does (js/features/mail-courier-feature.js)",
   "register": "G121"
+ },
+ "skill:betterlearning_1": {
+  "status": "reimagined",
+  "reason": "Better Learning I is back (public/js/better-learning.js, G62): the 2011 rank (Ziggyny 2011-10-05: 10 min, 2% off every later skill), learnable first, offering Spreading the Love (inc_data_skills.js:3938, inc_quests.js:974-980). Reimagined: the 2011 skill limit it raised is not back (Austin 2026-10-27), Brain Capacity cards do that part; its words are new",
+  "register": "G62"
+ },
+ "skill:betterlearning_2": {
+  "status": "reimagined",
+  "reason": "Better Learning II is back (public/js/better-learning.js, G62): after I, 176.4 min with I's cut, 5% off every later skill (Ziggyny 2011-10-05). Reimagined: no 2011 skill limit (Austin 2026-10-27); its words are new",
+  "register": "G62"
+ },
+ "skill:betterlearning_3": {
+  "status": "reimagined",
+  "reason": "Better Learning III is back (public/js/better-learning.js, G62): after II and an Emblem of Lem spent, 11.4 h with II's cut, 8% off every later skill (Ziggyny 2011-10-05), offering Under the Wire (inc_data_skills.js:3939); the work job_street_ph3_08 asks for (quests/job_street_ph3_08.js:157). Reimagined: no 2011 skill limit (Austin 2026-10-27); its words are new",
+  "register": "G62"
+ },
+ "skill:betterlearning_4": {
+  "status": "reimagined",
+  "reason": "Better Learning IV is back (public/js/better-learning.js, G62): after III, 33.12 h with III's cut, 12% off every later skill (Ziggyny 2011-10-05). Reimagined: no 2011 skill limit (Austin 2026-10-27); its words are new",
+  "register": "G62"
+ },
+ "skill:betterlearning_5": {
+  "status": "reimagined",
+  "reason": "Better Learning V is back (public/js/better-learning.js, G62): after IV, 4.4 days with IV's cut, 20% off every later skill (Ziggyny 2011-10-05), offering This Favor Goes Up to 11 (inc_data_skills.js:3940); the work job_street_ph1_03, ph4_06 and ph4_06b ask for (quests/job_street_ph1_03.js:140, job_street_ph4_06.js:157, job_street_ph4_06b.js:157). Reimagined: no 2011 skill limit (Austin 2026-10-27); its words are new",
+  "register": "G62"
  }
 }

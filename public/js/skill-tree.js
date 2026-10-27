@@ -16,7 +16,7 @@
  */
 
 import { getSkillCatalog } from './content-catalogs.js';
-import { canLearnSkill, getStudyStatus, studySecondsForSkill } from './skills.js';
+import { SKILL_POINTS_PER_SECOND, canLearnSkill, getStudyStatus, studySecondsForSkill } from './skills.js';
 
 export const SKILL_CATEGORIES = Object.freeze({
   6: 'Alchemy',
@@ -295,6 +295,10 @@ export const SKILL_REMAKE_NOTES = Object.freeze({
     status: 'live',
     note: 'Camera Mode (press C) looks 400 px around you; with Eyeballery it looks across the whole street.',
   },
+  'Better Learning': {
+    status: 'live',
+    note: 'A 2011 skill the late game retired, back by request: each rank cuts the time of every skill you learn after it (2, 5, 8, 12 and 20%). In 2011 it also raised a 20-skill limit; that limit is not here, so Brain Capacity cards do that part.',
+  },
   'Bureaucratic Arts': {
     status: 'live',
     note: 'The Bureaucrat outside the Bureaucratic Halls on Gregarious Grange, Baeli Bray and Chego Chase sells Your Papers (Complete them for the You Have Papers badge) to those who know Bureaucratic Arts.',
@@ -447,6 +451,20 @@ export function unlocksAfter(classTsid) {
 }
 
 /**
+ * Study seconds as the player would see them (skills_get_all total_time,
+ * inc_skills.js:273: skills_points_to_seconds with every modifier), when the
+ * context carries the study time factor; the catalog time otherwise.
+ */
+function studySeconds(def, ctx = {}) {
+  const base = studySecondsForSkill(def);
+  if (typeof ctx?.timeFactor !== 'function' && typeof ctx?.timeFactor !== 'number') return base;
+  const raw = typeof ctx.timeFactor === 'function' ? ctx.timeFactor(def) : ctx.timeFactor;
+  const factor = Number(raw);
+  if (!(factor > 0) || factor >= 1000) return base;
+  return Math.max(1, Math.round(((def.pointCost || 0) / SKILL_POINTS_PER_SECOND) * factor));
+}
+
+/**
  * One skill's full panel state.
  * status: learned | studying | paused | available | locked
  */
@@ -469,7 +487,7 @@ export function skillTreeEntry(state, classTsid, ctx = {}, now = Date.now()) {
     status,
     study,
     check,
-    seconds: studySecondsForSkill(def),
+    seconds: studySeconds(def, ctx),
     prerequisites: prerequisiteRows(state, classTsid, ctx),
     chain: prerequisiteChain(classTsid),
     unlocks: unlocksAfter(classTsid),

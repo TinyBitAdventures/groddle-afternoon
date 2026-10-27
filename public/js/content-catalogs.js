@@ -2,7 +2,12 @@
  * Load mined GSJS content catalogs (quests, achievements, skills, buffs).
  * Browser: fetch assets/content/*.json
  * Node tests: loadFromDir(fs path)
+ *
+ * The skill catalog also gets Better Learning I to V (better-learning.js,
+ * register G62): 2011 skills the late inc_data_skills.js no longer has.
  */
+
+import { withBetterLearning } from './better-learning.js';
 
 const CACHE = {
   quests: null,
@@ -27,7 +32,7 @@ export async function loadContentCatalogs(fetchImpl = globalThis.fetch) {
   };
   CACHE.quests = await load('quests');
   CACHE.achievements = await load('achievements');
-  CACHE.skills = await load('skills');
+  CACHE.skills = withBetterLearning(await load('skills'));
   CACHE.buffs = await load('buffs');
   try {
     CACHE.meta = await load('meta');
@@ -47,7 +52,7 @@ export async function loadContentCatalogsFromDir(dir) {
   const { join } = await import('node:path');
   CACHE.quests = JSON.parse(await readFile(join(dir, 'quests.json'), 'utf8'));
   CACHE.achievements = JSON.parse(await readFile(join(dir, 'achievements.json'), 'utf8'));
-  CACHE.skills = JSON.parse(await readFile(join(dir, 'skills.json'), 'utf8'));
+  CACHE.skills = withBetterLearning(JSON.parse(await readFile(join(dir, 'skills.json'), 'utf8')));
   CACHE.buffs = JSON.parse(await readFile(join(dir, 'buffs.json'), 'utf8'));
   try {
     CACHE.meta = JSON.parse(await readFile(join(dir, 'meta.json'), 'utf8'));

@@ -50,6 +50,7 @@ import {
   reshuffleHand,
 } from '../imagination.js';
 import { brainCapacityRescale, skillTimeFactor } from '../imagination-effects.js';
+import { betterLearningDiscount } from '../better-learning.js';
 import { rescaleStudiesForLearningModifier } from '../skills.js';
 import { isOfferedInRemake, remakeStatus } from '../imagination-remake.js';
 import { hellFeature } from './hell-feature.js?v=hell-16';
@@ -853,7 +854,7 @@ export const imaginationFeature = {
     return remakeMovementMultipliers(owned(engine));
   },
 
-  /** skills_points_to_seconds factor for one skill (brain capacity + category cards). */
+  /** skills_points_to_seconds factor for one skill (brain capacity + category cards + Better Learning). */
   skillTimeFactor(def, engine) {
     const learned = engine?.learnedSkills || [];
     // skills_learn computes the duration before queuing a new skill, but a
@@ -864,6 +865,8 @@ export const imaginationFeature = {
       brainCapacity: state.brainCapacity,
       categoryId: def?.categoryId ?? null,
       reductions: learnTimeReductions(owned(engine)),
+      // G62: Better Learning I to V cut every study by 2 to 20%.
+      discount: betterLearningDiscount(learned),
     });
   },
 
