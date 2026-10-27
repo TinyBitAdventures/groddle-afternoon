@@ -2563,9 +2563,14 @@
   ]
  },
  "git": {
-  "commits": 551,
+  "commits": 552,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "In multiplayer, radiate calm to the players near you, and see who is meditating"
+   },
    {
     "date": "2026-10-27",
     "kind": "new",
@@ -2680,11 +2685,6 @@
     "date": "2026-10-26",
     "kind": "new",
     "text": "In multiplayer, add players as buddies, see who is online and where, and block players"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "new",
-    "text": "In multiplayer, Wood Trees are shared: harvests by anyone wear one down"
    }
   ]
  },

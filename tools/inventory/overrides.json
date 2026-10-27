@@ -1372,5 +1372,50 @@
   "mp": "game 4aaf6361, server 016b4d8",
   "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
   "register": "G329"
+ },
+ "skill:transcendental_radiation_1": {
+  "mp": "game b66b2948, server 0c75b7e, site d352b8b",
+  "mpReason": "radiance.go radiates to every player in range from the rank the site signs (Radiance.php); meditation-feature pays and applies each pulse",
+  "register": "G330"
+ },
+ "imagination:transcendental_radius_1": {
+  "mp": "game b66b2948, server 0c75b7e, site d352b8b",
+  "mpReason": "radiance.go widens the range by 1.5 from the cards the site signs",
+  "register": "G330"
+ },
+ "imagination:transcendental_radius_2": {
+  "mp": "game b66b2948, server 0c75b7e, site d352b8b",
+  "mpReason": "radiance.go doubles the range from the cards the site signs",
+  "register": "G330"
+ },
+ "imagination:transcendental_radius_3": {
+  "mp": "game b66b2948, server 0c75b7e, site d352b8b",
+  "mpReason": "radiance.go reaches the whole street from the cards the site signs",
+  "register": "G330"
+ },
+ "imagination:transcendental_benefits_1": {
+  "mp": "game b66b2948, server 0c75b7e, site d352b8b",
+  "mpReason": "radiance.go lengthens the radiation 20% from the cards the site signs",
+  "register": "G330"
+ },
+ "imagination:transcendental_benefits_2": {
+  "mp": "game b66b2948, server 0c75b7e, site d352b8b",
+  "mpReason": "radiance.go lengthens the radiation 50% from the cards the site signs",
+  "register": "G330"
+ },
+ "imagination:transcendental_imagination": {
+  "mp": "game b66b2948, server 0c75b7e, site d352b8b",
+  "mpReason": "meditation-feature rolls the 5% Transcendental Highway iMG at the end of a radiation between real players",
+  "register": "G330"
+ },
+ "imagination:meditative_arts_less_distraction_2": {
+  "mp": "game b66b2948, server 0c75b7e, site d352b8b",
+  "mpReason": "your own local, party and group chat no longer breaks a meditation (player.js:1846-1883)",
+  "register": "G330"
+ },
+ "imagination:meditative_arts_less_distraction": {
+  "mp": "game b66b2948, server 0c75b7e, site d352b8b",
+  "mpReason": "dealt in multiplayer as Mantra Meditation's prerequisite; its own effect lets an instant message by, and the remake has no instant messages between players",
+  "register": "G330"
  }
 }
