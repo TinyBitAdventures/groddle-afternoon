@@ -17,7 +17,7 @@ import { join } from 'node:path';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js';
 import { createQuestState } from '../public/js/quests.js';
 import { pendingQuestOffers } from '../public/js/quest-offers.js';
-import { MP_RACE_QUESTS, MULTIPLAYER_QUESTS, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=g329-6';
+import { MP_RACE_QUESTS, MULTIPLAYER_QUESTS, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=g358-1';
 import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=offers-12';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js';
 import { HELL_LOCATION } from '../public/js/hell.js';
@@ -78,7 +78,7 @@ describe('The Great Hog Haul quest in multiplayer (quests/hogtie_piggy.js)', () 
   });
 
   it('logs for the challenger, completes on the server\'s win and leaving, fails on a loss', async () => {
-    const { questsMpFeature: feature } = await import('../public/js/features/quests-mp-feature.js?v=races3-test-1');
+    const { questsMpFeature: feature } = await import('../public/js/features/quests-mp-feature.js?v=races3-test-2');
     const client = fakeClient(1);
     const calls = { activity: [], awards: [] };
     const engine = {

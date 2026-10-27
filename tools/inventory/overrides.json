@@ -518,7 +518,10 @@
  },
  "system:players/inc_requests": {
   "status": "lost",
-  "reason": "requests between players (trade, invites)"
+  "reason": "requests between players (trade, invites)",
+  "mp": "server 2421d95",
+  "mpReason": "requests.go: Make a trade offer tells the street \"<name> is looking for someone to trade with.\" for 5 minutes, arrivals hear it, leaving cancels it; Start negotiation! starts a trade (trade.go trade.startWith). Race and game challenges are each game's own (races.go, crowns.go, hoghaul.go)",
+  "register": "G329"
  },
  "system:players/inc_special_locations": {
   "status": "partial",
@@ -828,7 +831,9 @@
  "achievement:fox_flurrier": {
   "status": "lost",
   "reason": "inc_npcs.js:130-154 spawn_fox: a fourth fox spawns only with 9+ active players on the preserve (max_foxes = players / 3)",
-  "register": "G134"
+  "register": "G134",
+  "mp": "server 2421d95",
+  "mpReason": "foxes.go spawn_fox between players: one fox per three on a preserve; a spawn among three foxes sends fox_flurry to everyone there, which counts fox:three_or_more (features/foxes-feature.js multiplayer branch)"
  },
  "achievement:good_neighbour": {
   "status": "lost",
@@ -925,8 +930,8 @@
   "mpReason": "hi.go spreads a scatter to everyone else on the street and powders-feature.js onCaught applies Sneezing to each of them (catalog_buffs.js 2411)"
  },
  "buff:tickle_me_emo": {
-  "status": "lost",
-  "reason": "quests/zero_mood.js:76: Tickle Me Emo times hugging 33 different players",
+  "status": "unbuilt_original",
+  "reason": "applied only by zero_mood's onStarted (quests/zero_mood.js:73-77), and zero_mood is offered only to a god at zero mood (players/inc_metabolics.js:215-217 is_god): staff only. The hugs between players are built (verbs.go, emotional_bear.js:95-125)",
   "register": "G124"
  },
  "buff:turn_off_quests": {
@@ -1608,5 +1613,25 @@
   "status": "source",
   "reason": "never held: not_selectable, no verbs (items/golgi_apparatus.js); it is the dust trap's remnant overlay (dust_trap.js:63-68 organelleOverlay, inc_data_overlays.js:68) and Baqalic Caesura's requirement icon (quests/baqala_nostalgia.js:28). js/resource-nodes.js DUST_TRAP_ORGANELLES rolls it (7%, +40 s), js/features/resource-nodes-feature.js organelleOverlay draws it over the trap, and the find counts organelles_found",
   "register": "G352"
+ },
+ "quest:butler_zombies": {
+  "status": "unbuilt_original",
+  "reason": "nothing offers it: no quests_offer, giver list or config map names it (only quests/butler_zombies.js does). The butler's counting was written (items/include/butler_data.js:1350-1368, 2052-2065; reset at the new day, players/player.js:1018-1021) but no giver ever handed it out",
+  "register": "G329"
+ },
+ "quest:grub_giver": {
+  "status": "unbuilt_original",
+  "reason": "nothing offers or names it, and it was never finished: the offer stops mid-sentence (quests/grub_giver.js:3) and the requirements are only the Awesome Pot makes (r430 repeats r429), with no give requirement",
+  "register": "G329"
+ },
+ "quest:tower_defense": {
+  "status": "unbuilt_original",
+  "reason": "nothing offers it and it cannot complete (requirements = {}, quests/tower_defense.js:24); its only trace is a test street named Tower Defense in inc_data_maps_dev.js:5084, not in the prod maps",
+  "register": "G329"
+ },
+ "quest:multiplayer_races": {
+  "status": "unbuilt_original",
+  "reason": "development only: its course is in config_dev.js:168-176 (a street only in inc_data_maps_dev.js), not config_prod.js:823; no race ticket (items/race_ticket_*.js), not in clean_race_quests (players/inc_quests.js:1394); placeholder offer text",
+  "register": "G329"
  }
 }

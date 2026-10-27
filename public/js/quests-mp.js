@@ -188,9 +188,9 @@ export const MULTIPLAYER_QUESTS = Object.freeze({
 /** The quests G329 judged and left out, with what each needs (or why it stays out). */
 export const MULTIPLAYER_QUESTS_LEFT_OUT = Object.freeze({
   zero_mood: 'Staff only: the familiar offers Tickle Me Emo at zero mood only to a god (players/inc_metabolics.js:215-217 is_god). Hugs between players are counted all the same (player verbs).',
-  grub_giver: 'Nothing in GSJS offers or names it, and its requirements are only cooking.',
-  butler_zombies: 'Nothing in GSJS offers it, and butlers_zombied is only ever reset there (player.js:1018-1021; telling a Butler "zombie" keeps another tally, butler_data.js 1349-1365).',
-  tower_defense: 'Nothing survives of it: no requirements, and nothing offers it.',
+  grub_giver: 'Nothing in GSJS offers or names it; unfinished: the offer stops mid-sentence (grub_giver.js:3) and its requirements are only cooking, with no give.',
+  butler_zombies: 'Nothing in GSJS offers it (no quests_offer, giver or map names it). The counting was written: saying "zombie" to a butler sets butlers_zombied to the different butlers told today (butler_data.js 1350-1368, 2052-2065), reset each game day (player.js:1018-1021), but no giver ever handed the quest out.',
+  tower_defense: 'Nothing offers it and it has no requirements (tower_defense.js:24); its only trace is a "Tower Defense" test street in inc_data_maps_dev.js:5084.',
   multiplayer_races: 'Development only: its course is in config_dev.js:169, not config_prod.js.',
 });
 

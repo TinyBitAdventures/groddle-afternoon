@@ -29,9 +29,9 @@ import {
   normalizeQuestsMpSlice,
   offerableMultiplayerQuest,
   tradeHoochCount,
-} from '../public/js/quests-mp.js?v=g329-6';
+} from '../public/js/quests-mp.js?v=g358-1';
 import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=offers-12';
-import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=g329-6';
+import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=races3-test-2';
 import { economyCredits } from '../tools/build-economy.mjs';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 

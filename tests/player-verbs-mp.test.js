@@ -31,7 +31,7 @@ import { playerVerbsMpFeature } from '../public/js/features/player-verbs-mp-feat
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js';
 import { createQuestState } from '../public/js/quests.js';
 import { pendingQuestOffers, acceptOffer } from '../public/js/quest-offers.js';
-import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, MP_FACTS, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=g329-6';
+import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, MP_FACTS, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=g358-1';
 import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js';
 import { economyCredits } from '../tools/build-economy.mjs';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';

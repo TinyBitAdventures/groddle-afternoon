@@ -28,8 +28,16 @@
  *   move both sides; until it answers the window shows "settling" (Edit and
  *   the x are off). A refusal arrives as a cancel plus the source's words.
  *
+ * - Trade requests (G329, players/inc_requests.js; server requests.go):
+ *   Menu, Make a trade offer tells the street "<name> is looking for someone
+ *   to trade with." for 5 minutes (End trade takes it back); everyone there,
+ *   and anyone arriving, gets it with Start negotiation!, which starts a
+ *   trade with the requester (inc_requests.js:110-121).
+ *
  * QA: canvas data tradeState (none|open|locked|settling|sealed), tradeWith,
- * tradeHold, tradeMine, tradeTheirs, tradeLast; window.groddleTrade.
+ * tradeHold, tradeMine, tradeTheirs, tradeLast, tradeRequest (mine|''),
+ * tradeRequestsHeard (requester ids); window.groddleTrade (request,
+ * endRequest, acceptRequest).
  */
 
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=catalog-unified-7';
@@ -66,6 +74,19 @@ const SEND_DEBOUNCE_MS = 220;
 const LOG_LINES = 40;
 const TABLE_URL = 'assets/content/trade-items.json';
 const BLOCKED_SAVES = new Set(['conflict', 'signed-out', 'error', 'offline']);
+
+/**
+ * G329 trade requests (players/inc_requests.js, the realtime server's requests.go):
+ * "<name> is looking for someone to trade with." to the street for 5 minutes;
+ * whoever accepts starts a trade with the requester.
+ */
+export const TRADE_REQUEST_TEXT = Object.freeze({
+  menu: 'Make a trade offer', // ChatDropdown.as:100
+  menuTip: 'Tell everyone on this street you are looking for someone to trade with',
+  accept: 'Start negotiation!', // RightSideManager.as getActionLink
+  end: 'End trade', // ActionRequestUI.as:78
+  notNow: 'Not now',
+});
 
 /** The saved slice: { hold: { trade, with, items, currants } | null, applied: [tradeId] }. */
 let saved = normalizeSlice(null);
@@ -579,6 +600,112 @@ function createSession(engine, client) {
     render();
   }
 
+  // —— Trade requests (G329) ——
+  /** Your open request's prompt uid (or '' when the prompt went), null when you have none. */
+  let myRequest = null;
+  /** Requests heard on this street: requester id -> prompt uid. */
+  const heard = new Map();
+  function requestData() {
+    engine.setData?.('tradeRequest', myRequest !== null ? 'mine' : '');
+    engine.setData?.('tradeRequestsHeard', [...heard.keys()].join(','));
+  }
+  function request() {
+    if (!client.send('trade_request', {})) {
+      engine.toast?.(TRADE_TEXT.offline, 2600);
+      return false;
+    }
+    return true;
+  }
+  function endRequest() {
+    return client.send('trade_request_cancel', {});
+  }
+  function acceptRequest(from) {
+    const id = n0(from);
+    if (!id) return false;
+    if (open && !open.sealed) {
+      engine.toast?.(TRADE_TEXT.busySelf, 2800);
+      return false;
+    }
+    if (!holdEmpty(saved.hold)) {
+      engine.toast?.(TRADE_TEXT.unsettled, 4200);
+      client.send('trade_check', { trade: saved.hold.trade });
+      return false;
+    }
+    loadTable();
+    return client.send('trade_request_accept', { from: id });
+  }
+  const menu = document.getElementById?.('more-list');
+  if (menu && !document.getElementById?.('trade-request-btn')) {
+    const btn = el('button', { id: 'trade-request-btn', type: 'button', class: 'chrome-btn', title: TRADE_REQUEST_TEXT.menuTip, 'data-trade-request': '' }, TRADE_REQUEST_TEXT.menu);
+    btn.addEventListener('click', () => request());
+    const before = document.getElementById?.('signout-btn');
+    if (before && before.parentElement === menu) menu.insertBefore(btn, before);
+    else menu.append(btn);
+  }
+
+  client.on('msg:trade_requested', (msg) => {
+    const from = n0(msg.from?.id);
+    const text = String(msg.text || '');
+    if (!from || !text) return;
+    const timeout = Math.max(1, Math.min(300, n0(msg.timeout) || 300));
+    if (msg.mine === true) {
+      if (myRequest) engine.removePrompt?.(myRequest);
+      // ActionRequestUI.as:76-83: your own line has End trade and the time left.
+      myRequest = engine.prompt?.({
+        text,
+        choices: [{ label: TRADE_REQUEST_TEXT.end, value: 'end' }],
+        timeout,
+        onChoice: (v) => {
+          myRequest = '';
+          if (v === 'end') endRequest();
+          requestData();
+        },
+        onTimeout: () => { myRequest = ''; },
+      }) || '';
+    } else {
+      if (heard.has(from)) engine.removePrompt?.(heard.get(from));
+      engine.pushActivity?.(text);
+      const uid = engine.prompt?.({
+        text,
+        choices: [{ label: TRADE_REQUEST_TEXT.accept, value: 'accept' }, { label: TRADE_REQUEST_TEXT.notNow, value: 'no' }],
+        timeout,
+        onChoice: (v) => {
+          heard.delete(from);
+          requestData();
+          if (v === 'accept') acceptRequest(from);
+        },
+        onTimeout: () => { heard.delete(from); requestData(); },
+      });
+      heard.set(from, uid || '');
+    }
+    requestData();
+  });
+
+  client.on('msg:trade_unrequested', (msg) => {
+    const from = n0(msg.from);
+    if (from && from === n0(client.me?.id)) {
+      if (myRequest) engine.removePrompt?.(myRequest);
+      myRequest = null;
+    } else if (heard.has(from)) {
+      const uid = heard.get(from);
+      if (uid) engine.removePrompt?.(uid);
+      heard.delete(from);
+    }
+    if (msg.text) engine.pushActivity?.(String(msg.text));
+    requestData();
+  });
+
+  let requestStreet = '';
+  client.on('roster', (r) => {
+    const street = String(r?.street || '');
+    if (street === requestStreet) return;
+    requestStreet = street;
+    // A new street: the requests heard on the last one are gone (location.js:895-950).
+    for (const uid of heard.values()) if (uid) engine.removePrompt?.(uid);
+    heard.clear();
+    requestData();
+  });
+
   // —— Starting ——
   function start(who) {
     if (open && !open.sealed) {
@@ -757,6 +884,11 @@ function createSession(engine, client) {
     get applied() { return saved.applied; },
     get table() { return table; },
     start,
+    request,
+    endRequest,
+    acceptRequest,
+    get requesting() { return myRequest !== null; },
+    get requestsHeard() { return [...heard.keys()]; },
     addFromPack,
     editDraft,
     accept,

@@ -30,7 +30,17 @@
  * Combine with &streetdemo=GA53N05IG9S2BLR (Gyerean Park) for a real preserve.
  * Canvas data: foxPreserve, foxRanger, foxMarkers, foxCount, foxState, foxX,
  * foxBaits, foxLicense, foxLastBrush, foxFibers, foxBrush, foxHubs, foxDemo,
- * foxRangerTalk.
+ * foxRangerTalk; multiplayer foxMp (server foxes:baits) and foxFlurry.
+ *
+ * Multiplayer (G329, js/foxes-mp.js): the realtime server's foxes.go owns each
+ * preserve's foxes and baits, so the players there see the same foxes. An
+ * ignite sends fox_ignite (the server drops the three baits for everyone and
+ * spawns the fox, one per three players on the street); a brush still pays the
+ * brusher here and sends fox_brush (the server sends the fox away after three
+ * brushers or 21 brushes); the first game to see a fox reach a bait eats it for
+ * everyone; a spawn among three foxes counts fox / three_or_more (Fox
+ * Flurrier); eight players past the Ranger close the preserve. Solo is
+ * unchanged.
  */
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
@@ -70,6 +80,7 @@ import {
   splitConversation,
   stepFox,
 } from '../foxes.js';
+import { FOX_FLURRY_COUNTER, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=g329-1';
 
 export const FOX_FEATURE_ID = 'foxes';
 const PLAYER_NAME = 'Glitch';
@@ -187,6 +198,8 @@ let publishAt = 0;
 let spawnCount = 0;
 let baitSeq = 0;
 let shopOpened = false;
+// G329 multiplayer: the server's foxes and baits on this preserve (foxes.go), or null in solo.
+let mp = null;
 
 function rng() {
   return Math.random();
@@ -424,13 +437,16 @@ function clearEffects() {
 // Foxes and bait
 // ---------------------------------------------------------------------------
 
-function spawnFoxAt(engine, x, y, dir = 'left') {
+function spawnFoxAt(engine, x, y, dir = 'left', sid = '') {
   spawnCount += 1;
-  const fox = createFox({ id: `fox:${spawnCount}`, x, y, dir });
+  const fox = createFox({ id: sid ? `fox:${sid}` : `fox:${spawnCount}`, x, y, dir });
   fox.state = 'idle'; // startMoving on the first tick
+  // Multiplayer: the server's fox number picks the coat, so every game draws the same fox.
+  const seq = sid ? parseInt(sid.slice(2), 36) || 1 : spawnCount;
   const entity = {
+    serverId: sid,
     fox,
-    skin: spawnCount % 4 === 0 ? 'silver' : 'orange',
+    skin: seq % 4 === 0 ? 'silver' : 'orange',
     sprite: null,
     target: null,
     clip: '',
@@ -510,6 +526,11 @@ function tickFoxes(engine, dtMs, now) {
     for (const ev of events) {
       if (ev.type === 'eat') {
         const bait = baits.find((b) => b.id === ev.baitId);
+        if (bait && mp && entity.serverId && bait.serverId) {
+          // The first game to see a fox reach a bait eats it for everyone (foxes.go fox_eat).
+          mp.client.send('fox_eat', { fox: entity.serverId, bait: bait.serverId });
+          mp.baits.delete(bait.serverId);
+        }
         if (bait) removeBait(bait);
         world.baits = baits.map((b) => ({ id: b.id, x: b.x }));
         engine.playSound('FOX_EAT', { volume: 0.45 });
@@ -517,13 +538,160 @@ function tickFoxes(engine, dtMs, now) {
         engine.pushActivity(ev.reason);
       } else if (ev.type === 'despawn') {
         removeFox(engine, entity);
-        if (baits.length && !pendingSpawnAt && entity.fox.brushCount > 0) {
+        if (mp && entity.serverId) {
+          // Off this screen; the server says when it has gone (fox_gone) and when another comes.
+          mp.departed.add(entity.serverId);
+        } else if (baits.length && !pendingSpawnAt && entity.fox.brushCount > 0) {
           pendingSpawnAt = now + FOX_TIMING.respawnAfterLeaveMs;
         }
       }
     }
     if (foxes.includes(entity)) placeFox(engine, entity);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Multiplayer (G329): the server's foxes and baits (foxes.go)
+// ---------------------------------------------------------------------------
+
+/**
+ * In multiplayer the realtime server owns how many foxes a preserve has and
+ * where its baits lie (inc_npcs.js spawn_fox: one fox per three players; a
+ * fourth among ten counts Fox Flurrier). This game draws them and runs each
+ * fox along the street with the solo rules; mp.foxes / mp.baits are the
+ * server's word and mpReconcile makes the street match it.
+ */
+function mpSession(engine) {
+  const client = engine.query?.('realtimeClient');
+  if (!client) return null;
+  mp = { client, foxes: new Map(), baits: new Map(), departed: new Set(), refundAt: 0, nextSync: 0 };
+  const dirty = () => { mp.nextSync = 0; };
+  client.on('msg:fox_state', (msg) => {
+    mp.foxes = new Map(normalizeFoxes(msg.foxes).map((f) => [f.id, { leaving: f.leaving }]));
+    mp.baits = new Map(normalizeBaits(msg.baits).map((b) => [b.id, { x: b.x, dropAt: 0 }]));
+    mp.departed.clear();
+    dirty();
+  });
+  client.on('msg:fox_baits', (msg) => {
+    // dropFoxBaits 2 s after the ignite, each landing 1 s later (location.js:4347-4362).
+    const at = Date.now() + FOX_TIMING.baitDropDelayMs;
+    for (const b of normalizeBaits(msg.baits)) mp.baits.set(b.id, { x: b.x, dropAt: at });
+    if (Number(msg.by) === Number(client.me?.id)) mp.refundAt = 0;
+    dirty();
+  });
+  client.on('msg:fox_bait_gone', (msg) => {
+    mp.baits.delete(serverId(msg.bait));
+    dirty();
+  });
+  client.on('msg:fox_spawn', (msg) => {
+    const id = serverId(msg.fox);
+    if (!id) return;
+    mp.foxes.set(id, { leaving: false, fresh: true });
+    dirty();
+  });
+  client.on('msg:fox_leave', (msg) => {
+    const f = mp.foxes.get(serverId(msg.fox));
+    if (!f) return;
+    f.leaving = true;
+    if (msg.text && preserve) engine.pushActivity(String(msg.text));
+    dirty();
+  });
+  client.on('msg:fox_gone', (msg) => {
+    const id = serverId(msg.fox);
+    mp.foxes.delete(id);
+    mp.departed.delete(id);
+    dirty();
+  });
+  client.on('msg:fox_flurry', () => {
+    // inc_npcs.js:153-155: achievements_increment('fox', 'three_or_more') for everyone on the street.
+    engine.achievement?.(FOX_FLURRY_COUNTER, 1);
+    engine.setData?.('foxFlurry', String(Date.now()));
+  });
+  client.on('error', ({ code, message }) => {
+    if (code !== 'fox') return;
+    if (mp.refundAt && Date.now() < mp.refundAt) {
+      // The server refused the ignite: the bait is still yours.
+      addItem(engine.inv, FOX_BAIT_ID, 1);
+      engine.refreshPack();
+      engine.save();
+    }
+    mp.refundAt = 0;
+    if (message) engine.toast(String(message), 2600);
+  });
+  return mp;
+}
+
+function mpForget() {
+  mp.foxes.clear();
+  mp.baits.clear();
+  mp.departed.clear();
+  mp.nextSync = 0;
+}
+
+/** Make this street's foxes and baits match the server's (and drop baits whose time has come). */
+function mpReconcile(engine, now) {
+  if (!mp || !preserve) return;
+  let next = Infinity;
+  const localBait = new Map(baits.filter((b) => b.serverId).map((b) => [b.serverId, b]));
+  for (const bait of [...baits]) if (bait.serverId && !mp.baits.has(bait.serverId)) removeBait(bait);
+  for (const [id, b] of mp.baits) {
+    if (localBait.has(id)) continue;
+    if (b.dropAt > now) {
+      next = Math.min(next, b.dropAt);
+      continue;
+    }
+    const fresh = b.dropAt > 0 && now - b.dropAt < FOX_TIMING.baitLandMs;
+    const x = Math.max(60, Math.min(engine.worldW - 60, b.x));
+    const y = nearestSurfaceY(engine.platforms, x, preserve.spawnerY) ?? preserve.spawnerY;
+    baitSeq += 1;
+    const bait = {
+      id: `bait:${baitSeq}`,
+      serverId: id,
+      x,
+      y,
+      startY: fresh ? y - FOX_TIMING.baitDropHeight : y,
+      variant: 1 + (parseInt(id.slice(2), 36) % 3 || 0),
+      bornAt: fresh ? b.dropAt : now,
+      landAt: fresh ? b.dropAt + FOX_TIMING.baitLandMs : now,
+      expireAt: now + FOX_TIMING.baitExpireMs * 2, // the server says when it goes
+      sprite: null,
+      landed: false,
+    };
+    baits.push(bait);
+    buildBaitView(engine, bait);
+    if (!fresh) landBait(engine, bait);
+  }
+  const localFox = new Map(foxes.filter((e) => e.serverId).map((e) => [e.serverId, e]));
+  for (const entity of [...foxes]) if (entity.serverId && !mp.foxes.has(entity.serverId)) removeFox(engine, entity);
+  for (const [id, f] of mp.foxes) {
+    const entity = localFox.get(id);
+    if (entity) {
+      if (f.leaving && !entity.fox.leaving) {
+        entity.fox.leaving = true;
+        entity.fox.state = 'idle'; // startMoving: run for the exit
+        entity.fox.timerMs = 0;
+      }
+      continue;
+    }
+    if (mp.departed.has(id) || (f.leaving && !f.fresh)) continue;
+    const y = nearestSurfaceY(engine.platforms, preserve.spawnerX, preserve.spawnerY) ?? preserve.spawnerY;
+    const made = spawnFoxAt(engine, preserve.spawnerX, y, 'left', id);
+    if (f.leaving) made.fox.leaving = true;
+    if (f.fresh) {
+      f.fresh = false;
+      engine.pushActivity(FOX_TEXT.appears);
+      engine.toast(FOX_TEXT.appears, 1800);
+      engine.floatText(preserve.spawnerX, y - 120, 'A fox appears!', 0xffd27a);
+    }
+  }
+  mp.nextSync = Number.isFinite(next) ? next : now + 1000;
+  publish(engine, true);
+}
+
+/** npc_fox_ranger.js overCapacity: eight other players already past the Ranger. */
+function mpOverCapacity() {
+  if (!mp || !preserve || !Number.isFinite(preserve.rangerX)) return false;
+  return preserveOverCapacity(mp.client.players, preserve.rangerX, preserve.inside);
 }
 
 // ---------------------------------------------------------------------------
@@ -583,7 +751,11 @@ function performBrush(engine, entity, { ignoreReach = false } = {}) {
     engine.grantAchievement(FOX_TOURIST_ACHIEVEMENT);
   }
   if (result.broke) engine.toast(result.brokeMsg, 2600);
-  if (result.leave) {
+  if (mp && entity.serverId) {
+    // Multiplayer: the server counts every player's brushes and says when the fox leaves (foxes.go).
+    entity.fox.leaving = mp.foxes.get(entity.serverId)?.leaving === true;
+    mp.client.send('fox_brush', { fox: entity.serverId });
+  } else if (result.leave) {
     engine.pushActivity(result.leaveMsg);
     if (baits.length && !pendingSpawnAt) pendingSpawnAt = nowMs + FOX_TIMING.respawnAfterLeaveMs;
   }
@@ -744,6 +916,12 @@ function openRangerShop(engine) {
 
 function greet(engine, { fromVerb = false } = {}) {
   if (!ranger) return;
+  if (licensed(engine) && slice.intro && mpOverCapacity()) {
+    // npc_fox_ranger.js:405-410: eight players are already inside.
+    ranger.greeted = true;
+    rangerDialog(engine, { key: 'overCapacity', text: FOX_RANGER_TEXT.overCapacity, accept: 'OK', onAccept: () => rangerSay(engine, FOX_RANGER_TEXT.overCapacityThanks, 4000) });
+    return;
+  }
   const g = rangerGreeting({
     conversated: ranger.conversated,
     visited: slice.visited,
@@ -802,7 +980,7 @@ function tickRanger(engine, now) {
     greet(engine);
   }
   if (ranger.inBox && !inBox && rel > half) {
-    const reason = rangerGateReason({ licensed: licensed(engine), hasBrush: countItem(engine.inv, FOX_BRUSH_ID) > 0 });
+    const reason = rangerGateReason({ licensed: licensed(engine), hasBrush: countItem(engine.inv, FOX_BRUSH_ID) > 0, overCapacity: mpOverCapacity() });
     if (reason) {
       p.x = preserve.rangerX - inside * FOX_TIMING.rangerPushBack;
       p.vx = 0;
@@ -838,8 +1016,18 @@ function ignite(engine) {
   if (!removeItem(engine.inv, FOX_BAIT_ID, 1)) return false;
   const now = Date.now();
   const p = engine.player;
-  if (!pendingSpawnAt) pendingSpawnAt = now + FOX_TIMING.spawnDelayMs;
-  pendingDrops.push({ at: now + FOX_TIMING.baitDropDelayMs, x: p.x, y: p.y });
+  if (mp) {
+    // Multiplayer: the server drops the baits for everyone and decides the fox (foxes.go fox_ignite).
+    if (!mp.client.send('fox_ignite', { baits: igniteBaitXs(p.x, engine.worldW, rng) })) {
+      addItem(engine.inv, FOX_BAIT_ID, 1);
+      engine.toast('You are offline.', 2400);
+      return false;
+    }
+    mp.refundAt = now + 4000;
+  } else {
+    if (!pendingSpawnAt) pendingSpawnAt = now + FOX_TIMING.spawnDelayMs;
+    pendingDrops.push({ at: now + FOX_TIMING.baitDropDelayMs, x: p.x, y: p.y });
+  }
   igniteFx(engine);
   engine.playSound('FOX_BAIT', { volume: 0.5 });
   engine.pushActivity({ base: 'You ignited a Fox Bait', effects: { items: { 'Fox Bait': -1 } } });
@@ -977,6 +1165,7 @@ function publish(engine, force = false) {
   engine.setData('foxHubs', String(slice.hubsBrushed.length));
   engine.setData('foxDemo', demoMode);
   engine.setData('foxRangerTalk', lastTalk);
+  if (mp) engine.setData('foxMp', `${mp.foxes.size}:${mp.baits.size}`);
 }
 
 // ---------------------------------------------------------------------------
@@ -1023,6 +1212,7 @@ export const foxesFeature = {
         buildRanger(engine);
       }
       setupDemo(engine);
+      if (mp) mpReconcile(engine, Date.now());
       publish(engine, true);
       scheduleAutoplay(engine);
     });
@@ -1040,6 +1230,7 @@ export const foxesFeature = {
     pendingSpawnAt = 0;
     pendingDrops = [];
     pendingHandoff = null;
+    if (mp) mpForget();
     if (shopOpened) {
       shopOpened = false;
       engine?.openShop?.(null);
@@ -1047,6 +1238,8 @@ export const foxesFeature = {
   },
 
   onTick(dtMs, now, engine) {
+    if (!mp && engine.mode === 'multiplayer' && engine.started) mpSession(engine);
+    if (mp && preserve && now >= mp.nextSync) mpReconcile(engine, now);
     if (shopOpened && !engine.shopOpen()) {
       shopOpened = false;
       engine.openShop(null);

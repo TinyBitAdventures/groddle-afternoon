@@ -392,10 +392,11 @@
    "name": "Foxes and Heli Kitties",
    "status": "source",
    "blurb": "Fox brushing in the preserves and the kitties overhead.",
-   "multiplayer": null,
+   "multiplayer": "A preserve’s foxes and baits are everyone’s there: one fox comes for every three players on the street, so ten players can see four at once and all earn Fox Flurrier. A fox three players have brushed runs off for everyone, and eight players past the Ranger fill the preserve.",
    "spot": null,
    "evidence": [
-    "public/js/foxes.js"
+    "public/js/foxes.js",
+    "public/js/foxes-mp.js"
    ],
    "shot": "shots/foxes.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&foxdemo=1&practice=1"
@@ -699,7 +700,7 @@
    "name": "Trading and giving between players",
    "status": "source",
    "blurb": "In multiplayer, trade items and currants face to face with another player on your street, up to six stacks a side as in the original: the server holds both offers until you both accept, and the site settles the swap so only what you really hold can change hands. Or give a stack, a written note or a wrapped Gift Box to a player beside you; the site moves it from your ledger to theirs, and they unwrap the box.",
-   "multiplayer": "Trade face to face, or give a stack, a written note or a wrapped Gift Box to a player on your street, or drag a pack item onto them to give it. Drop a stack on a public street and everyone there sees it; once you have walked away from it, whoever picks it up first has it.",
+   "multiplayer": "Trade face to face, or give a stack, a written note or a wrapped Gift Box to a player on your street, or drag a pack item onto them to give it. Drop a stack on a public street and everyone there sees it; once you have walked away from it, whoever picks it up first has it. Make a trade offer from the Menu and everyone on the street, and anyone who arrives, hears you are looking for someone to trade with for five minutes; Start negotiation! opens the trade.",
    "spot": null,
    "evidence": [
     "public/js/trade.js",
@@ -1190,7 +1191,7 @@
  },
  "back": 68,
  "possible": 69,
- "multiplayer": 18,
+ "multiplayer": 19,
  "quests": {
   "total": 445,
   "story": 245,
@@ -2587,9 +2588,14 @@
   ]
  },
  "git": {
-  "commits": 589,
+  "commits": 590,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "improve",
+    "text": "Speech bubbles keep off players' heads, fit their line and name only players"
+   },
    {
     "date": "2026-10-27",
     "kind": "fix",
@@ -2704,14 +2710,9 @@
     "date": "2026-10-27",
     "kind": "new",
     "text": "In multiplayer, follow another player and teleport with your followers"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "In multiplayer, a Game of Crowns Ticket challenges the real players on your street"
    }
   ]
  },
- "tests": 349,
+ "tests": 351,
  "generatedAt": "2026-10-27"
 }

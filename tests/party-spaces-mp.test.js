@@ -308,7 +308,7 @@ describe('party spaces in solo', () => {
     const idx = read('public/js/features/index.js');
     assert.ok(idx.includes("import { partySpacesFeature } from './party-spaces-feature.js?v=party-10';"));
     assert.ok(idx.includes("shared-quoins-feature.js?v=mp4-2"));
-    assert.ok(idx.includes("trade-feature.js?v=pspace-1"));
+    assert.ok(idx.includes("trade-feature.js?v=pspace-2"));
   });
 });
 
