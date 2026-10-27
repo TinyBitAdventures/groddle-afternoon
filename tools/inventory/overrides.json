@@ -898,7 +898,9 @@
  "buff:glitch_train": {
   "status": "lost",
   "reason": "player.js:3146-3147: applied only with at least 19 other glitches in the street",
-  "register": "G124"
+  "register": "G334",
+  "mp": "game 2d05959b, server 234b659",
+  "mpReason": "follow-mp-feature.js applies it while follow.go says a chain of 20 is on (player.js:3126-3148)"
  },
  "buff:party_time": {
   "status": "source",
@@ -1487,5 +1489,30 @@
   "mp": "game ff6ce88d, site 35f1f47",
   "mpReason": "offered with Croppery II once the Auction House is live; auctions_sold_<class> counted from site-settled sales; 450 currants credited once",
   "register": "G333"
+ },
+ "achievement:licenced_teleporter_pfft_class": {
+  "mp": "game 2d05959b, server 234b659",
+  "mpReason": "follow.go counts the leader's followers at a teleport (follow_teleported); follow-mp-feature.js emits teleportation_self_withfollowers counters (inc_teleportation.js 404-414, 533-542); only real followers count, so it needs other players",
+  "register": "G334"
+ },
+ "achievement:licensed_teleporter_gee_class": {
+  "mp": "game 2d05959b, server 234b659",
+  "mpReason": "follow.go counts the leader's followers at a teleport (follow_teleported); follow-mp-feature.js emits teleportation_self_withfollowers counters (inc_teleportation.js 404-414, 533-542); only real followers count, so it needs other players",
+  "register": "G334"
+ },
+ "achievement:licenced_teleporter_whoa_class": {
+  "mp": "game 2d05959b, server 234b659",
+  "mpReason": "follow.go counts the leader's followers at a teleport (follow_teleported); follow-mp-feature.js emits teleportation_self_withfollowers counters (inc_teleportation.js 404-414, 533-542); only real followers count, so it needs other players",
+  "register": "G334"
+ },
+ "achievement:licensed_super_gragarious_glitch_beamer": {
+  "mp": "game 2d05959b, server 234b659",
+  "mpReason": "follow.go counts the leader's followers at a teleport (follow_teleported); follow-mp-feature.js emits teleportation_self_withfollowers counters (inc_teleportation.js 404-414, 533-542); only real followers count, so it needs other players",
+  "register": "G334"
+ },
+ "quest:teleportation_teleport_with_followers": {
+  "mp": "game 2d05959b, server 234b659, site 6c49a26",
+  "mpReason": "offered with Teleportation III once following works; follow.go counts 3 or more still following at teleport_complete (inc_teleportation.js 1054); 350 currants credited once",
+  "register": "G329"
  }
 }
