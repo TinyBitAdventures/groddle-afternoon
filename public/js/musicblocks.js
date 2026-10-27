@@ -226,8 +226,11 @@ export function musicblockCollectionNote(inv, classTsid) {
  * Street spawns: locations/newbie_island.js and the greeting locations
  * (location.js:663) place one random block from the five series. SB-1 only
  * comes out of the soil (patches.js musicblocks_brown). GNG was Tiny Speck's
- * thank-you from the Special Item That Only Beta Testers Get, which the remake
- * does not have, so it turns up on a street once all 25 series tunes are owned.
+ * thank-you from the Special Item That Only Beta Testers Get (giveAward,
+ * special_item_that_only_beta_testers_get.js 372-378): seeing all six of its
+ * powers sends it (js/features/funpickle-feature.js, G209). Before the
+ * Funpickle was in the remake, GNG also turned up on a street once all 25
+ * series tunes are owned; that street find stays (desk FUNPICKLE).
  */
 export const MUSICBLOCK_STREET_POOL = Object.freeze(
   Object.values(MUSICBLOCK_CATALOG).filter((def) => def.collection).map((def) => def.classTsid)

@@ -69,7 +69,7 @@
  * street per Feat (MP_ACTS).
  */
 
-import { FEAT_BY_ID, QUICK_MS, REWARD_ITEM, SOLO_FEATS, WIRED_FEATS, vogTextFor } from './solo-feats.js?v=g335-1';
+import { FEAT_BY_ID, QUICK_MS, REWARD_ITEM, SOLO_FEATS, WIRED_FEATS, vogTextFor } from './solo-feats.js?v=g370-1';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=dametime-4';
 
 /** players/inc_feats.js 25-27: a Feat is open for 24 real hours. */
@@ -117,6 +117,8 @@ export const MP_PACE = Object.freeze({
   animal_love: pace(1, 2_000, 10, 'ours: an animal every 2 s; a crab gives up to 5'),
   // location.js 4529-4553: 1, 2 and 3 points, one line per chain.
   makeup_feat_redux: pace(3, 15_000, 3, 'ours: a line of up to 3 points every 15 s'),
+  // bag_butler.js 3802-3805: +2 a package; ours: one every 6 s, the Butler's own pace (homes_help.go butlerEvery).
+  visiting_stones: pace(2, 6_000, 2, 'ours: a package every 6 s (homes_help.go butlerEvery); bag_butler.js 3802-3805 +2'),
 });
 
 /** Feats whose reports name what was done: a fixed amount and a dedupe key. */
@@ -128,6 +130,10 @@ export const MP_ACTS = Object.freeze({
   qurazy_quoin_collecting: Object.freeze({
     quoin: Object.freeze({ n: 1, dedupe: 'street', source: 'one qurazy quoin per street' }),
   }),
+  // The street is the neighbour's HOME_<id>, so each Butler counts once a Feat.
+  visiting_stones: Object.freeze({
+    package: Object.freeze({ n: 2, dedupe: 'street', source: 'bag_butler.js 3802-3805: +2, the first package left with this Butler' }),
+  }),
 });
 
 function pace(n, everyMs, burst, source) {
@@ -137,13 +143,19 @@ function pace(n, everyMs, burst, source) {
 /** The goals of one Feat in multiplayer. */
 export function mpGoals(featId) {
   const f = FEAT_BY_ID[featId];
-  if (!f?.wired) return null;
+  if (!f?.wired && !f?.mp) return null;
   const goal = f.goal * MP_GOAL_SCALE;
   return { goal, bonus: goal * MP_BONUS, super: goal * MP_SUPER };
 }
 
-/** The Feats that take turns, in game_day order (inc_data_feats_prod.js file order). */
-export const MP_ORDER = Object.freeze(WIRED_FEATS.map((f) => f.id));
+/**
+ * The Feats that take turns: the wired ones in game_day order (inc_data_feats_prod.js
+ * file order), then the multiplayer-only ones (solo-feats.js `mp`, G172). Those go
+ * last so every earlier Feat keeps its place: feats.go builds its first and reward
+ * message ids from a Feat's index here.
+ */
+export const MP_ONLY_FEATS = Object.freeze(SOLO_FEATS.filter((f) => !f.wired && f.mp));
+export const MP_ORDER = Object.freeze([...WIRED_FEATS, ...MP_ONLY_FEATS].map((f) => f.id));
 
 /** Which Feat is open at a time (the server's schedule, for tests and the panel's next line). */
 export function runAt(now, shift = 0, order = MP_ORDER) {

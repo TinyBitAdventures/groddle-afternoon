@@ -36,9 +36,9 @@ import {
   runFromServer,
   youLine,
 } from '../public/js/feats-mp.js';
-import { FEAT_BY_ID, WIRED_FEATS, vogTextFor } from '../public/js/solo-feats.js?v=g335-1';
+import { FEAT_BY_ID, WIRED_FEATS, vogTextFor } from '../public/js/solo-feats.js?v=g370-1';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from '../public/js/game-day.js?v=dametime-4';
-import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=g345-2';
+import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=g370-1';
 
 const root = join(import.meta.dirname, '..');
 const feature = readFileSync(join(root, 'public/js/features/solo-feats-feature.js'), 'utf8');
@@ -53,7 +53,8 @@ describe('the server table (tools/build-realtime-feats.mjs)', () => {
 
   it('carries every wired Feat in game_day order with three goals from the personal goal', () => {
     const t = featTable();
-    assert.deepEqual(t.order, WIRED_FEATS.map((f) => f.id));
+    // G172: then the multiplayer-only Feat, last so the others keep their index.
+    assert.deepEqual(t.order, [...WIRED_FEATS.map((f) => f.id), 'visiting_stones']);
     for (const id of t.order) {
       const f = FEAT_BY_ID[id];
       const row = t.feats[id];
@@ -77,7 +78,7 @@ describe('the server table (tools/build-realtime-feats.mjs)', () => {
   it('cites a pace for every wired Feat and acts only where the source fixes the amount', () => {
     assert.deepEqual(Object.keys(MP_PACE).sort(), [...MP_ORDER].sort());
     for (const [id, p] of Object.entries(MP_PACE)) assert.ok(p.source && !/—/.test(p.source), id);
-    assert.deepEqual(Object.keys(MP_ACTS).sort(), ['qurazy_quoin_collecting', 'streaking']);
+    assert.deepEqual(Object.keys(MP_ACTS).sort(), ['qurazy_quoin_collecting', 'streaking', 'visiting_stones']);
   });
 
   it('reads the source it cites', { skip: !hasGsjs && 'glitch-GameServerJS not checked out' }, () => {

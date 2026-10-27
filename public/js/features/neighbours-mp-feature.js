@@ -94,6 +94,7 @@ import {
   doorVerbs,
   givenLine,
   holdsKeyFrom,
+  homeStreetFor,
   homeStreetName,
   hostedCounters,
   houseName,
@@ -1032,11 +1033,11 @@ function createSession(engine, client) {
       engine.refreshPack?.();
       const gift = noteGift(slice.gifted, visit.owner);
       slice.gifted = gift.gifted;
-      if (gift.counted && receipt !== false) {
-        count(NEIGHBOUR_COUNTERS.gifts, 1);
-        // bag_butler.js:3802-3805: the first package left with this Butler.
-        engine.featsIncrement?.('visiting_stones', 2);
-      }
+      if (gift.counted && receipt !== false) count(NEIGHBOUR_COUNTERS.gifts, 1);
+      // G172: bag_butler.js:3802-3805, +2 to The Good Neighbor for the first package left with this
+      // Butler. The shared Feat (feats-mp.js MP_ACTS visiting_stones) counts each neighbour's
+      // HOME_<id> once a run, so every run of the Feat can count it again.
+      if (receipt !== false) engine.featsIncrement?.('visiting_stones', 2, { act: 'package', street: homeStreetFor(visit.owner) });
       butlerSay(BT.packageConfirm(visit.name));
     } else {
       butlerSay(BT.messageSuccess(visit.name));

@@ -47,6 +47,7 @@ import {
   usePotion,
 } from '../public/js/potions.js';
 import { potionsFeature, usePotionNow, munchRug, shakeFavor } from '../public/js/features/potions-feature.js';
+import { BUFF_ICONS } from '../public/js/buff-triggers.js?v=g370-1';
 import { createPlot, growTree, tickPlot, trantsformPlotTree, normalizePlot } from '../public/js/patches.js';
 import { POTION_ART } from '../public/js/potion-art.js';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
@@ -176,7 +177,8 @@ describe('quaff potions', () => {
     use(engine, 'potion_amorous_philtre');
     assert.deepEqual(calls.buffs, ['feeling_called_love']);
     assert.equal(engine.pc.mood, 60);
-    assert.equal(engine.buffRow('feeling_called_love').sourceItem, 'potion_amorous_philtre');
+    // G277: the tray stand-in comes with applyBuff (buff-triggers BUFF_ICONS), tests/g370-left.
+    assert.equal(BUFF_ICONS.feeling_called_love, 'potion_amorous_philtre');
     assert.equal(potionsFeature.packVerbs('potion_amorous_philtre', engine)[0].reason, "This doesn't fit my plans, no.");
   });
 
@@ -189,7 +191,7 @@ describe('quaff potions', () => {
     use(engine, 'potion_elixir_of_avarice');
     assert.equal(engine.quoinState.dailyLimit, 150);
     assert.equal(calls.said[0], 'You quaffed an Elixir of Avarice. Your quoin limit for today has increased by 50!');
-    assert.equal(engine.buffRow('crazy_coin_collector').sourceItem, 'potion_elixir_of_avarice');
+    assert.equal(BUFF_ICONS.crazy_coin_collector, 'potion_elixir_of_avarice');
     potionsFeature.onNewDay(Date.now(), engine);
     assert.equal(engine.hasBuff('crazy_coin_collector'), false);
   });

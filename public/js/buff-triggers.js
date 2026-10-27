@@ -287,7 +287,9 @@ export function isNekkid(worn) {
  * The buff tray shows the buff's item_class iconic. These item classes are
  * NPCs or quest markers whose iconic does not survive in the CC0 dump, so the
  * tray uses Tiny Speck art from the same thing: the quest's own requirement
- * item, the bog's Peat, Alph's emblem, the Cactus's Cubimal.
+ * item, the bog's Peat, Alph's emblem, the Cactus's Cubimal, the potion that
+ * gives the buff, the Bureaucrat's Cubimal. js/buffs.js applyBuff reads this
+ * table, so the stand-in is there from the first frame.
  */
 export const BUFF_ICONS = Object.freeze({
   get_a_rasher: 'meat', // npc_piggy; animalkinship_nibble_meat asks for meat
@@ -297,4 +299,8 @@ export const BUFF_ICONS = Object.freeze({
   teleportation_teleport_in_time_period: 'teleportation_script', // quest_req_icon_teleport
   its_so_hot: 'npc_cubimal_cactus', // npc_cactus
   its_so_hot2: 'npc_cubimal_cactus', // npc_cactus
+  // G277: once potions-feature's own table, which swapped them in a tick after the buff was applied.
+  crazy_coin_collector: 'potion_elixir_of_avarice', // quoin; the Elixir of Avarice gives it
+  feeling_called_love: 'potion_amorous_philtre', // no item_class; the Amorous Philtre gives it
+  please_wait: 'npc_cubimal_bureaucrat', // npc_bureaucrat; the Bureaucrat's own Cubimal
 });

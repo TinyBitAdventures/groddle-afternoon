@@ -8,8 +8,9 @@
  *   the same shape that drains 3% a minute; a crash that ends with no rush
  *   croaks you. A rush kept going more than 660 s after the first sniff
  *   earns Dragon Chaser. Sniffing while pooped wastes the powder.
- * - Sneezing Powder: Scatter. -2 mood and, two seconds later, the ah-choo
- *   and a Bean at your feet. (The sneezing itself is for other players.)
+ * - Sneezing Powder: Scatter. -2 mood and, two seconds later, the ah-choo,
+ *   its sneeze overlay over you and a Bean at your feet. (The sneezing fits
+ *   are for other players.)
  * - Sparkle Powder: Sprinkle. -20 energy, +10 mood.
  * - Powder of Mild / Startling Fecundity: Disperse. The street's piggies,
  *   butterflies and chickens (15 at most) drop meat, milk and grain 6 / 7 s
@@ -225,10 +226,12 @@ const RUNNERS = {
     say(engine, POWDER_TEXT.sneezing);
     const x = nearestPlayerX(engine);
     const y = Number(engine.player?.y) || 0;
-    // sneezing_powder.js: SNEEZING_AHCHOO and a Bean at your feet two seconds later.
+    // sneezing_powder.js: SNEEZING_AHCHOO and a Bean at your feet two seconds later, and (282-293)
+    // the overlay_sneezing_powder pc_overlay over you: delay_ms 2000, 2 s, 300 x 300, delta_y -110.
     later(2000, () => {
       engine.playSound?.('SNEEZING_AHCHOO', { volume: 0.7 });
       engine.dropWorldStack?.('bean_plain', 1, x, y - 1);
+      sneezeOverlay(engine, () => (engine.player ? { x: engine.player.x, y: engine.player.y } : null));
     });
     finishUse(engine, classTsid);
     engine.updateHud?.();

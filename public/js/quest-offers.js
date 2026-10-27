@@ -691,6 +691,8 @@ export function acceptOffer(questState, classTsid, ctx = {}) {
  *     'animal' takes the label from the event's detail ({ animal }, the
  *     street animal's key), counting as usual when an event has none
  *   minAmount: flag only when one event carries at least this amount
+ *   whileQuests: the event counts only while one of these quests is active
+ *     (the source's getQuestStatus(...) == 'todo' guard before quests_inc_counter)
  */
 /**
  * The Seam Streets (locations/location.js:540, G-prefixed): only a first visit
@@ -707,8 +709,10 @@ export const COUNTER_ROUTES = Object.freeze([
   { system: 'animals', counter: 'meats_collected_from_pigs', event: 'npc_piggy:nibble' },
   // G277: each Butterfly counts once per quest run (npc_butterfly.js 1139-1142 and 1286-1291 keep
   // pc.butterflies_massaged / pc.butterflies_milked by tsid; the quests' onComplete_custom clear them).
-  { system: 'animals', counter: 'butterflies_massaged', event: 'npc_butterfly:massage', distinct: 'animal' },
-  { system: 'animals', counter: 'butterflies_milked', event: 'npc_butterfly:milk', distinct: 'animal' },
+  // Both counters move only while their own quests are todo (npc_butterfly.js 1139, 1286), so the
+  // Aranna Scramble's butterflies_milked (rannacramble.js r475) advances only alongside a milk quest.
+  { system: 'animals', counter: 'butterflies_massaged', event: 'npc_butterfly:massage', distinct: 'animal', whileQuests: ['animalkinship_massage_butterflies'] },
+  { system: 'animals', counter: 'butterflies_milked', event: 'npc_butterfly:milk', distinct: 'animal', whileQuests: ['animalkinship_milk_butterflies', 'master_milker'] },
   { system: 'animal-kinship', counter: 'piggy_nibble_max_reward', event: 'animal_max_reward:npc_piggy' },
   { system: 'animal-kinship', counter: 'butterfly_milk_max_reward', event: 'animal_max_reward:npc_butterfly' },
   { system: 'animal-kinship', counter: 'chicken_squeeze_max_reward', event: 'animal_max_reward:npc_chicken' },
@@ -1184,6 +1188,7 @@ export function routeQuestEvent(questState, event, amount = 1, ctx = {}) {
           const hit = counters.find((c) => c.counter === req.name);
           if (!hit) continue;
           if (hit.route?.minAmount && delta < hit.route.minAmount) continue;
+          if (hit.route?.whileQuests && !hit.route.whileQuests.some((q) => questState.active?.[q] && !offers.failed[q])) continue;
           const label = hit.route?.distinct === 'animal' ? String(ctx.detail?.animal || '') : hit.label;
           if (hit.route?.distinct && label) {
             const seen = ((offers.distinct[id] ||= {})[req.name] ||= []);

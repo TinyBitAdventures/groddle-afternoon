@@ -28,7 +28,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
-import { FEAT_BY_ID, SOLO_FEATS } from '../public/js/solo-feats.js?v=g335-1';
+import { FEAT_BY_ID, SOLO_FEATS } from '../public/js/solo-feats.js?v=g370-1';
 import { GAME_DAY_MS } from '../public/js/game-day.js?v=dametime-4';
 import {
   CIGAR_PLACES,
@@ -77,7 +77,8 @@ export function featTable() {
     order: [...MP_ORDER],
     feats,
     epics: epicSizes(),
-    unwired: SOLO_FEATS.filter((f) => !f.wired).map((f) => f.id),
+    // The Feats that never take a turn (solo-feats.js `mp` ones do, G172).
+    unwired: SOLO_FEATS.filter((f) => !MP_ORDER.includes(f.id)).map((f) => f.id),
     reward: {
       xp: MP_REWARD.xp,
       currants: MP_REWARD.currants,

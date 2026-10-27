@@ -41,7 +41,7 @@ import {
 } from '../public/js/home-street-mp.js?v=homes3-1';
 import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../public/js/note-pole-art.js?v=homes3-1';
 import { isSharedJob } from '../public/js/street-jobs-mp.js?v=g360-1';
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=g366-1';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=g370-1';
 import { projectTable } from '../tools/build-realtime-projects.mjs';
 import { HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 
@@ -261,7 +261,7 @@ describe('solo is untouched', () => {
   });
   it('sits before street-objects in features/index.js', () => {
     const src = read('public/js/features/index.js');
-    const at = src.indexOf("from './home-street-mp-feature.js?v=g366-1'");
+    const at = src.search(/from '\.\/home-street-mp-feature\.js\?v=g\d+-\d+'/);
     assert.ok(at > 0 && at < src.indexOf("from './street-objects-feature.js"));
   });
 });

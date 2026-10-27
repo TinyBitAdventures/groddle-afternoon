@@ -103,7 +103,8 @@ export function completionText(title) {
 /**
  * Every production Feat (inc_data_feats_prod.js, in file order, which is
  * game_day order). `goal` / `unit` / `what` are remake copy; `wired: false`
- * rows carry the reason they stay out.
+ * rows carry the reason they stay out of solo. `mp: true` rows have no solo
+ * route but take their turn as the shared Feat in multiplayer (js/feats-mp.js).
  */
 export const SOLO_FEATS = Object.freeze([
   feat('meditation_of_groddlocritus', {
@@ -214,7 +215,14 @@ export const SOLO_FEATS = Object.freeze([
     url: 'good-neighbor',
     epic_id: 4,
     wired: false,
-    reason: "The one surviving increment is a visitor leaving a package with someone else's Butler (items/bag_butler.js 3802-3805, +2 once per Butler). The remake's neighbours have no Butler to leave one with.",
+    reason: "The one surviving increment is a visitor leaving a package with someone else's Butler (items/bag_butler.js 3802-3805, +2 once per Butler). A solo game's neighbours have no Butler to leave one with, so it runs only in multiplayer (mp).",
+    // G172: multiplayer only, where a neighbour's Butler takes your package (server homes_help.go).
+    // Two Butlers' first packages (+2 each) make the personal goal; the shared Feat's minimum is 3x.
+    mp: true,
+    goal: 4,
+    unit: 'points',
+    what: "Leave a package with a neighbour's Butler. Each Butler counts once per Feat.",
+    source: 'items/bag_butler.js 3802-3805 onLeavePackage: feats_increment(visiting_stones, 2) when this Butler holds nothing from you; neighbours-mp-feature butler_left settled',
   }),
   feat('pet_only', {
     line: 82,

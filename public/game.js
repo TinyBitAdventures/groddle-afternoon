@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g366-1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g370-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-200';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-201';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -383,7 +383,7 @@ import {
   formatBuffRemaining,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from './js/buffs.js?v=g366-1';
+} from './js/buffs.js?v=g370-1';
 import { grantMoodXp, moodXpMultiplierFor, setMoodXpEnv } from './js/mood-xp.js';
 import {
   loadContentCatalogs,
@@ -692,7 +692,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=g303-1';
+} from './js/musicblocks.js?v=g370-1';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -4096,7 +4096,9 @@ function playPackMusicblock(classTsid) {
 function checkQuest() {
   // Quest completion handled by applyQuestProgress; full-screen award when starters done
   if (state.questDone) return;
-  const main = ['animalkinship_pet_piggies', 'animalkinship_milk_butterflies'];
+  // G277: the demo kit's one starter quest (Animal Kinship I's, inc_data_skills.js 3912); the milk
+  // quest is Animal Kinship IV's offer (3915), so the award no longer waits for it.
+  const main = ['animalkinship_pet_piggies'];
   if (main.every((id) => questState.completed.includes(id))) {
     state.questDone = true;
     floatText(player.x, player.y - 90, 'QUESTS ✓', 0xffe066);
@@ -23678,7 +23680,7 @@ async function main() {
     restoreAnimalStateCache();
     rehydrateSavedBuffs();
     dropBootStarterQuests(questState);
-    const mainQuests = ['animalkinship_pet_piggies', 'animalkinship_milk_butterflies'];
+    const mainQuests = ['animalkinship_pet_piggies'];
     state.questDone = mainQuests.every((id) => questState.completed.includes(id));
     handleSkillCompletions(tickSkillStudy(skillState, Date.now()).completed, { offline: true });
     backfillStreetVisits();

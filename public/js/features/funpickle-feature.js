@@ -29,6 +29,7 @@
  * moonwalk|comedian|sneezingFit|scream|brokenTeleporter|packExploder forces
  * the power; &funpickleseen=<n> marks the first n powers seen (5 then shows
  * the award); &funpickleautoplay=1 picks it up if it lies here and admires it.
+ * &funpickledest=<tsid> makes the Broken Teleporter land on that street.
  * Canvas data: funpickleOwned, funpicklePlaced, funpicklePhase, funpickleLast,
  * funpicklePowers, funpickleAward, funpickleSneezes, funpickleOverlay.
  */
@@ -171,11 +172,13 @@ function changeMood(engine, delta) {
 }
 
 /** The mood the source gave every other player on the street, over your companions. */
-function cheerCompanions(engine, mood) {
+function cheerCompanions(engine, mood, emotion = null) {
   for (const actor of engine.localCompanions || []) {
     const s = actor?.sprite;
     if (!s || s.destroyed) continue;
     engine.floatText?.(s.x, s.y - 90, `+${mood} mood`, 0xf6c35b);
+    // catalog_buffs.js 470-472: the others playEmotionAnimation('happy') (a vector companion's emote).
+    if (emotion) actor.body?.npc?.emote?.(emotion);
   }
 }
 
@@ -404,7 +407,9 @@ function brokenTeleporter(engine) {
   const lines = brokenTeleporterLines(playerName(engine));
   const finish = () => {
     clearWash();
-    const tsid = pickRandomTeleport(STREET_INDEX.streets, Math.random, (t) =>
+    // QA &funpickledest=<tsid> picks the street the random teleport lands on.
+    const dest = String(engine.param?.('funpickledest') || '');
+    const tsid = STREET_INDEX.streets?.[dest] ? dest : pickRandomTeleport(STREET_INDEX.streets, Math.random, (t) =>
       t !== engine.streetTsid && engine.streetExists?.(t) && engine.travelGate?.(t)?.ok !== false);
     last = `brokenTeleporter:${tsid || 'none'}`;
     publish(engine);
@@ -462,7 +467,7 @@ export function endComedian(engine) {
   engine.removeBuff('comedian');
   engine.playSound?.(COMEDIAN_SOUND, { volume: 0.7 });
   say(engine, COMEDIAN_LINE);
-  cheerCompanions(engine, COMEDIAN_OTHERS_MOOD);
+  cheerCompanions(engine, COMEDIAN_OTHERS_MOOD, 'happy');
   last = 'comedian:laugh';
   publish(engine);
   return true;

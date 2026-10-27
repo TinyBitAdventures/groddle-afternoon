@@ -343,7 +343,6 @@ function applyLove(engine) {
   // buffs_apply restarts a running buff; on_apply adds 10% of max mood.
   if (engine.hasBuff(LOVE)) engine.removeBuff(LOVE);
   engine.applyBuff(LOVE);
-  syncTrayIcons(engine);
   const pc = engine.pc;
   // catalog_buffs.js 719: on_apply is metabolics_add_mood, nothing while dead (inc_metabolics.js 79-86).
   const before = Number(pc.mood) || 0;
@@ -374,7 +373,6 @@ const EFFECTS = {
 
   potion_elixir_of_avarice(engine) {
     engine.applyBuff(CRAZY);
-    syncTrayIcons(engine);
     const state = engine.quoinState;
     if (state) state.dailyLimit = crazyQuoinLimit(baseQuoinLimit(engine));
     engine.refreshPack?.();
@@ -699,21 +697,6 @@ export function munchRug(engine) {
 /* ------------------------------------------------------------------ */
 
 /**
- * Buff tray icons for buffs whose item_class iconic does not survive (as
- * buff-triggers BUFF_ICONS does): Crazy Quoin Collector (item_class quoin)
- * shows the Elixir of Avarice, Feeling Called Love (none) the Amorous
- * Philtre, Please Wait (npc_bureaucrat) the Bureaucrat's own Cubimal.
- */
-const TRAY_ICONS = Object.freeze({ crazy_coin_collector: 'potion_elixir_of_avarice', feeling_called_love: 'potion_amorous_philtre', please_wait: 'npc_cubimal_bureaucrat' });
-
-function syncTrayIcons(engine) {
-  for (const [buff, icon] of Object.entries(TRAY_ICONS)) {
-    const row = engine.buffRow?.(buff);
-    if (row && row.sourceItem !== icon) row.sourceItem = icon;
-  }
-}
-
-/**
  * Feeling Called Love's indicator (catalog_buffs.js 721
  * announce_add_indicator('feeling_called_love', 'amorous_philtre_heart');
  * players/inc_announcements.js 585-642): a pc_overlay of Tiny Speck's
@@ -853,7 +836,6 @@ export const potionsFeature = {
     tickPhysicsItems(engine, t);
     applyScale(engine, t);
     syncHeart(engine);
-    syncTrayIcons(engine);
     if (t - lastRugSync >= RUG_SYNC_MS) {
       lastRugSync = t;
       syncRugs(engine);

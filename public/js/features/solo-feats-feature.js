@@ -114,7 +114,7 @@ import {
   resetPending,
   streakCheck,
   takePending,
-} from '../solo-feats.js?v=g335-1';
+} from '../solo-feats.js?v=g370-1';
 import { saveStore } from '../save-store.js?v=mp2-2';
 import { gainMetabolic } from '../metabolics.js';
 import { grantMoodXp } from '../mood-xp.js';
@@ -133,7 +133,7 @@ import {
   runFromServer,
   vogFor,
   youLine,
-} from '../feats-mp.js?v=g345-2';
+} from '../feats-mp.js?v=g370-1';
 
 const POLL_MS = 500;
 /** How often an open panel redraws its "Opens again in" lines. */

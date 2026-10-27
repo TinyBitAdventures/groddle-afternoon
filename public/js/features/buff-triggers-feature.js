@@ -48,7 +48,7 @@ import {
   questTimerBuffs,
   smallEnlightenmentSeconds,
   smeltItDealtItFreeSmelts,
-} from '../buff-triggers.js?v=g124-2';
+} from '../buff-triggers.js?v=g370-1';
 import {
   addSkillPackageOverride,
   getSkillPackageOverride,
