@@ -67,8 +67,9 @@ export const GARLIC_AGAIN = 'People have been warned about your garlicky breath.
 
 /**
  * Timed quests and their timer buffs (quests/<id>.js onStarted; the same
- * pairs as quests.json `timer`). play_musicblocks (Blocks That Rock) and
- * zero_mood (Tickle Me Emo) are left out: both need other players.
+ * pairs as quests.json `timer`). play_musicblocks (Blocks That Rock) is
+ * offered only in multiplayer (player verbs, js/quests-mp.js); zero_mood (Tickle Me
+ * Emo) is left out: the source offered it to staff alone.
  * @type {ReadonlyArray<{ quest: string, buff: string }>}
  */
 export const QUEST_TIMER_BUFFS = Object.freeze([
@@ -80,6 +81,7 @@ export const QUEST_TIMER_BUFFS = Object.freeze([
   { quest: 'gardening_harvest_all_trees_in_time_period', buff: 'gardening_harvest_all_trees_in_time_period' },
   { quest: 'mining_deplete_rocks_in_time_period', buff: 'mining_deplete_rocks_in_time_period' },
   { quest: 'mining_mine_in_time_period', buff: 'mining_mine_in_time_period' },
+  { quest: 'play_musicblocks', buff: 'play_musicblocks' },
   { quest: 'potionmaking_make_different_potions_in_a_time_period', buff: 'make_different_potions' },
   { quest: 'refining_refine_ore_in_time_period', buff: 'the_daily_grind' },
   { quest: 'soilappreciation_collect_loam', buff: 'soil_appreciation_loam_in_time_period' },

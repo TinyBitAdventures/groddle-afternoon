@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-15';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-178';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-179';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -8121,6 +8121,16 @@ const engine = {
   award: (payload) => enqueueAward(payload),
   /** pc.feats_increment (players/inc_feats.js:37): a solo Feat contribution, counted by features/solo-feats-feature.js (G143). */
   featsIncrement: (featId, amount = 1, opts = {}) => features.query('featsIncrement', featId, amount, opts, engine) || 0,
+  /** Player verbs: when the player last heard each musicblock (heardAt), for a block another player plays for them. */
+  musicblockHeard: () => musicblockState.heardAt,
+  /** Player verbs: play a musicblock's recording as the pack's Play does (a block another player played for you). */
+  playMusicblockAudio(classTsid) {
+    const def = getMusicblock(classTsid);
+    if (def) playMusicblockAudio(def);
+    return def ? def.label : '';
+  },
+  /** Player verbs: the Emotional Bear's upgrades (kiss, moon), for the player menu's emotes. */
+  emotionalBearUpgrades: () => [...(emotionalBearState.upgrades || [])],
   /** `{ ignoreHome: true }` lets a feature (Camera Mode) run at home while panels and verbs still block it. */
   busy({ ignoreHome = false } = {}) {
     return Boolean(

@@ -22,7 +22,7 @@ import {
   questTimerBuffs,
   smallEnlightenmentSeconds,
   smeltItDealtItFreeSmelts,
-} from '../public/js/buff-triggers.js?v=g124-1';
+} from '../public/js/buff-triggers.js?v=g124-2';
 import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js';
 import { meditationFeature } from '../public/js/features/meditation-feature.js?v=radiate-5';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=teleport-12';
@@ -482,10 +482,12 @@ describe('systems with their own timer show the source buff', () => {
     assert.deepEqual(questTimerBuffs({ zero_mood: { endsAt: t + 1 } }, t), {}, 'multiplayer timers are not in the table');
   });
 
-  it('the quest timer table matches quests.json for every solo quest', () => {
+  it('the quest timer table matches quests.json for every solo or multiplayer quest', async () => {
     const quests = JSON.parse(readFileSync(join(root, 'assets/content/quests.json'), 'utf8'));
     const all = quests.quests || quests;
-    const solo = Object.entries(all).filter(([, q]) => q.timer?.buff && q.solo).map(([id, q]) => `${id}>${q.timer.buff}`).sort();
+    // Player verbs: Blocks That Rock is offered in multiplayer (js/quests-mp.js), so its timer buff runs there.
+    const { MULTIPLAYER_QUESTS } = await import('../public/js/quests-mp.js');
+    const solo = Object.entries(all).filter(([id, q]) => q.timer?.buff && (q.solo || MULTIPLAYER_QUESTS[id])).map(([id, q]) => `${id}>${q.timer.buff}`).sort();
     assert.deepEqual(QUEST_TIMER_BUFFS.map((r) => `${r.quest}>${r.buff}`).sort(), solo);
   });
 
@@ -507,7 +509,7 @@ describe('wiring', () => {
     for (const m of src.matchAll(/from '\.\/([a-z-]+-feature\.js\?v=[^']+)'/g)) {
       assert.ok(index.includes(`'./${m[1]}'`), m[1]);
     }
-    assert.match(index, /buff-triggers-feature\.js\?v=radiate-5'; FEATURES\.push\(buffTriggersFeature\)/);
+    assert.match(index, /buff-triggers-feature\.js\?v=radiate-6'; FEATURES\.push\(buffTriggersFeature\)/);
   });
 
   it('game.js applies Stuffed at the daily limit and announces each making batch', () => {

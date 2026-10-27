@@ -39,7 +39,7 @@ import {
 } from '../public/js/auctions.js?v=g333-1';
 import { auctionsFeature } from '../public/js/features/auctions-feature.js?v=g333-3';
 import { normalizeMailboxState } from '../public/js/mailbox.js?v=homes-mail-3';
-import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=g329-5';
+import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=g329-6';
 import { auctionJson } from '../tools/build-auctions.mjs';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
 

@@ -52,7 +52,7 @@ import {
   isRaceStreet,
   normalizeQuestsMpSlice,
   tradeHoochCount,
-} from '../quests-mp.js?v=g329-5';
+} from '../quests-mp.js?v=g329-6';
 
 export const QUESTS_MP_FEATURE_ID = 'quests-mp';
 const FACT_CHECK_MS = 1_000;
@@ -210,6 +210,8 @@ function createSession(engine, client) {
         fact(MP_FACTS.visitNeighbour);
         if (visiting.key === true) fact(MP_FACTS.tendNeighbour);
       }
+      // Player verbs: Super Soaker's offer (ours): a Watering Can and another player here (player-verbs-mp-feature).
+      if (engine.query?.('playerVerbsSoakReady', engine) === true) fact(MP_FACTS.soakReady);
     },
     onEvent(counter, amount, detail) {
       const name = String(counter || '');
@@ -238,7 +240,7 @@ function createSession(engine, client) {
       }
     },
     context() {
-      return { facts: { ...slice.facts }, ready: { give: engine.query?.('playerGiveReady', engine) === true, auctions: engine.query?.('auctionsReady', engine) === true, follow: engine.query?.('followReady', engine) === true } };
+      return { facts: { ...slice.facts }, ready: { give: engine.query?.('playerGiveReady', engine) === true, auctions: engine.query?.('auctionsReady', engine) === true, follow: engine.query?.('followReady', engine) === true, verbs: engine.query?.('playerVerbsReady', engine) === true } };
     },
   };
 }

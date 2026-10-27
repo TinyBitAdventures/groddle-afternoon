@@ -77,6 +77,16 @@
  *    with their butler"): once you have stood on another player's home
  *    street, where their Butler takes a package.
  *
+ * Offered by a trigger of ours once the player verbs work (nothing in
+ * GSJS offers them; features/player-verbs-mp-feature.js counts them from the
+ * server's verb_done):
+ *  - play_musicblocks (Blocks That Rock): by its prerequisite (over level
+ *    10), as quests.json infers; each block's <class>_played flag from a Play
+ *    for, each player once in the quest (musicblock_*.js 239-242).
+ *  - watering_time (Super Soaker): once you hold a Watering Can with another
+ *    player on the street (fact soak_ready); players_soaked once per player
+ *    soaked (watering_can.js 320-326).
+ *
  * Logged by a race challenge (offer: 'challenge'): amazing_race, canyon_run,
  * crystal_climb, grab_em_good, lava_leap, space_race, star_sprint,
  * time_warp. These are the quest races (is_multiplayer, familiar_turnin,
@@ -136,6 +146,8 @@ export const MP_FACTS = Object.freeze({
   tendNeighbour: 'tend_neighbour',
   /** Stood on another player's home street. */
   visitNeighbour: 'visit_neighbour',
+  /** Player verbs: held a Watering Can with another player on the street (Super Soaker's offer, ours). */
+  soakReady: 'soak_ready',
 });
 
 const ours = (fact) => Object.freeze([Object.freeze({ type: 'mp', fact })]);
@@ -163,13 +175,19 @@ export const MULTIPLAYER_QUESTS = Object.freeze({
   good_neighbor: Object.freeze({ offer: 'ours', offerTriggers: ours(MP_FACTS.tendNeighbour) }),
   water_neighbor_garden: Object.freeze({ offer: 'ours', offerTriggers: ours(MP_FACTS.tendNeighbour) }),
   neighbor_gifts: Object.freeze({ offer: 'ours', offerTriggers: ours(MP_FACTS.visitNeighbour) }),
+  // Player verbs (features/player-verbs-mp-feature.js, the server's verbs.go): nothing in GSJS
+  // offers these two. Blocks That Rock by its own prerequisite (over_level 10, quests.json's inferred
+  // trigger) once Play for works between players; each block's flag is set by a Play for the server
+  // confirmed, each player once (musicblock_*.js 239-242 canPlayFor). Super Soaker once you hold a
+  // Watering Can with another player here; players_soaked once per player (watering_can.js 320-326).
+  play_musicblocks: Object.freeze({ offer: 'ours', needs: Object.freeze(['verbs']), offerTriggers: Object.freeze([Object.freeze({ type: 'prerequisites' })]), source: 'quests/play_musicblocks.js prerequisites; musicblock_*.js 239-242' }),
+  watering_time: Object.freeze({ offer: 'ours', needs: Object.freeze(['verbs']), offerTriggers: ours(MP_FACTS.soakReady), source: 'watering_can.js:320-326' }),
   ...Object.fromEntries(MP_RACE_QUESTS.map((id) => [id, Object.freeze({ offer: 'challenge', source: 'quest.js:74-76, 106-140' })])),
 });
 
 /** The quests G329 judged and left out, with what each needs (or why it stays out). */
 export const MULTIPLAYER_QUESTS_LEFT_OUT = Object.freeze({
-  play_musicblocks: 'Nothing in GSJS offers it, and it needs Play for on another player (musicblock_*.js 239-242).',
-  watering_time: 'Nothing in GSJS offers it (watering_can.js 320-325 only counts it), and it needs watering another player.',
+  zero_mood: 'Staff only: the familiar offers Tickle Me Emo at zero mood only to a god (players/inc_metabolics.js:215-217 is_god). Hugs between players are counted all the same (player verbs).',
   grub_giver: 'Nothing in GSJS offers or names it, and its requirements are only cooking.',
   butler_zombies: 'Nothing in GSJS offers it, and butlers_zombied is only ever reset there (player.js:1018-1021; telling a Butler "zombie" keeps another tally, butler_data.js 1349-1365).',
   tower_defense: 'Nothing survives of it: no requirements, and nothing offers it.',

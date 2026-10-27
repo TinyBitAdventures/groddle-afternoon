@@ -28,7 +28,7 @@ import {
   takeObjs,
 } from '../public/js/street-objects.js?v=g334-2';
 import { HELP_DIG_COUNTER, HELP_DIG_LABEL, digHelpFrom, helpDigMessage, othersDigging } from '../public/js/help-dig.js?v=g329-dig-1';
-import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, creditedMultiplayerQuests, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=g329-5';
+import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, creditedMultiplayerQuests, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=g329-6';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js';
 import { isPoisoned, TREE_ANTIDOTE, TREE_POISON, BOTANY_SKILL } from '../public/js/tree-poison.js';
 import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=tree-death-18';

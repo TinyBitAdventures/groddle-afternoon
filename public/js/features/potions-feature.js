@@ -226,8 +226,9 @@ function checkFor(classTsid, engine) {
     case 'potion_keycutter_tonic':
       return keycutterCheck({ keys: keyChoices(engine.inv) });
     case 'potion_charades':
-      // Solo: nobody else is ever on the street.
-      return charadesCheck({ players: 1 });
+      // Solo: nobody else is ever on the street. Multiplayer (player verbs): the players here, from
+      // player-verbs-mp-feature (which answers nothing in solo).
+      return engine.query?.('charadesCheck', engine) || charadesCheck({ players: 1 });
     case 'potion_ancestral_spirits':
       return ancestralCheck({ nostalgia: engine.hasBuff('ancestral_nostalgia') });
     case 'potion_animal_youth': {
@@ -431,6 +432,9 @@ const EFFECTS = {
   potion_avatar_large: (engine) => spawnPhysicsItem(engine, 'avatar_embiggenifier'),
   potion_avatar_small: (engine) => spawnPhysicsItem(engine, 'avatar_smallifier'),
   potion_rainbow_juice: (engine) => spawnPhysicsItem(engine, 'anti_gravitys_rainbow'),
+  // Player verbs, multiplayer: onQuaff asks for the secret word (potion_charades.js 541-552); the potion
+  // goes once the realtime server takes it (player-verbs-mp-feature). Solo never gets here.
+  potion_charades: (engine) => engine.query?.('charadesQuaff', engine) || { ok: false },
 
   potion_trantsformation_fluid(engine, { target }) {
     if (!target?.state || !(engine.interactables || []).includes(target)) return { ok: false };
