@@ -234,6 +234,59 @@ function pngSize(path) {
   return b.length > 24 && b.toString('ascii', 12, 16) === 'IHDR' ? { w: b.readUInt32BE(16), h: b.readUInt32BE(20) } : null;
 }
 
+/**
+ * Lost artifacts the original drew as a Large Petrified Rock (register G174).
+ * Their item SWFs (GSJS asset_swf_v items/2012-12/artifact_*.swf) were never
+ * archived, and Tiny Speck's own icon for each, captured by the Wayback on
+ * 2013-11-19 at c2.glitch.bz/items/2012-12-06/<n>_<ts>_iconic.png (the <ts> is
+ * the SWF's version stamp), is one and the same 40 x 40 picture: the Large
+ * Petrified Rock (md5 f9cbda35..., all 38). Those captures are reference only
+ * (research/catalog-icons-2026-10-27/raw/wayback-matches.txt); what ships is a
+ * byte copy of the CC0 petrified_rock_large.png and @3x.png under each id.
+ * id -> the capture's <n>_<ts>.
+ */
+export const ROCK_STAND_INS = Object.freeze({
+  artifact_bag_of_tent_pegs: '5142_1354846617',
+  artifact_ball_of_string: '5143_1354846702',
+  artifact_bee_key: '5139_1354845888',
+  artifact_bronze_ladle: '5137_1354845379',
+  artifact_butterfly_windchimes: '5129_1354844799',
+  artifact_button_bird: '5114_1354839779',
+  artifact_button_cloud: '5113_1354839700',
+  artifact_button_frog: '5112_1354839627',
+  artifact_button_wasp: '5115_1354839861',
+  artifact_carved_ear: '5117_1354840065',
+  artifact_caterpillar_trousers: '5118_1354840218',
+  artifact_daybag: '5105_1354838545',
+  artifact_disembodied_dentures: '5125_1354841791',
+  artifact_ear_trumpet: '5111_1354839546',
+  artifact_ebony_teaspoon: '5132_1354845018',
+  artifact_fan: '5107_1354838936',
+  artifact_goggles: '5108_1354839031',
+  artifact_gold_butter_knife: '5138_1354845520',
+  artifact_handbag_clasp: '5106_1354838842',
+  artifact_heart_shaped_lump: '5131_1354844940',
+  artifact_ivory_coffeestick: '5144_1354846784',
+  artifact_metal_tap: '5136_1354845318',
+  artifact_nose_of_plaster: '5119_1354840348',
+  artifact_nose_of_wool: '5120_1354841070',
+  artifact_paper_bag: '5126_1354841888',
+  artifact_plastic_spoon: '5140_1354846076',
+  artifact_roll_of_blueprints: '5127_1354844600',
+  artifact_scarf: '5110_1354839485',
+  artifact_see_through_bottle: '5141_1354846165',
+  artifact_seed_pouch: '5116_1354839980',
+  artifact_silver_spoon: '5130_1354844865',
+  artifact_small_water_glass: '5133_1354845138',
+  artifact_sock_garters: '5124_1354841461',
+  artifact_sock_hook: '5135_1354845255',
+  artifact_three_cornered_hat: '5122_1354841279',
+  artifact_toenail_clippers: '5134_1354845197',
+  artifact_top_hat: '5109_1354839112',
+  artifact_twenty_nine_cornered_hat: '5123_1354841359',
+});
+export const ROCK_STAND_IN_ICON = 'petrified_rock_large';
+
 /** The pack icon (assets/sprites/icons/<id>.png, CC0 OGA or tools/icon-hires 3x renders), or null: a placeholder is drawn. */
 function iconOf(id, files) {
   if (!files.has(`${id}.png`)) return null;
@@ -258,6 +311,8 @@ async function readRemake(names) {
   const garden = await import(js('garden.js'));
   const husbandry = await import(js('animal-husbandry.js'));
   const buffsMod = await import(js('buffs.js'));
+  const artifacts = await import(js('artifacts.js'));
+  const { DROP_TABLES } = await import(js('drop-tables-data.js'));
   const { GIANT_ICON_DATA } = await import(js('giant-icons-data.js'));
   const recipes = content('recipes.json');
   const makingItems = content('making-items.json').items;
@@ -312,6 +367,17 @@ async function readRemake(names) {
     push(otherMade, g.iconClass, c);
     push(otherUses, g.emblemClass, c);
   }
+  // Artifacts (js/artifacts.js, from players/inc_artifacts.js): the pieces put themselves together, and so do a necklace's beads.
+  for (const a of Object.values(artifacts.ARTIFACT_MAP)) {
+    const c = { inputs: a.pieces, tool: null, outputs: [a.artifact], source: 'assembly' };
+    push(otherMade, a.artifact, c);
+    for (const piece of a.pieces) push(otherUses, piece, c);
+  }
+  for (const [bead, n] of Object.entries(artifacts.ARTIFACT_NECKLACES)) {
+    const c = { inputs: [bead], tool: null, outputs: [n.produces], source: 'assembly', count: n.required };
+    push(otherMade, n.produces, c);
+    push(otherUses, bead, c);
+  }
 
   // Harvests: each as { text, tool? } in our words, naming the remake's own labels.
   const harvests = new Map();
@@ -353,6 +419,28 @@ async function readRemake(names) {
       for (const tool of verb.tools || []) push(toolUses, tool, { text: `${verb.label} ${node.labelPlural || node.label}` });
     }
   }
+  // Petrified Rocks (js/artifacts.js CRACK_STEPS, rolled through js/drop-tables-data.js): what cracking each one can turn up.
+  const dropIds = (key, seen = new Set()) => {
+    const out = new Set();
+    if (seen.has(key) || !DROP_TABLES[key]) return out;
+    seen.add(key);
+    for (const [, picks] of DROP_TABLES[key].rows || []) {
+      for (const pick of picks) {
+        if (pick.item) out.add(pick.item);
+        if (pick.table) for (const id of dropIds(pick.table, seen)) out.add(id);
+      }
+    }
+    return out;
+  };
+  const cracked = new Map();
+  for (const [rock, steps] of Object.entries(artifacts.CRACK_STEPS)) {
+    for (const step of steps) {
+      const got = step.table ? dropIds(step.table) : new Set((step.items || []).map(([id]) => id));
+      for (const id of got) push(cracked, id, rock);
+    }
+  }
+  const rockName = (id) => `${article(names.get(id)?.name || id)} ${names.get(id)?.name || id}`;
+  for (const [id, rocks] of cracked) push(harvests, id, { text: `Cracked out of ${orList([...new Set(rocks)].map(rockName))}` });
   const soilIds = new Set([...tableIds(patches.SOIL_DROP_TABLES), ...Object.keys(patches.SOIL_ITEM_DEFS)]);
   for (const id of soilIds) push(harvests, id, { text: 'Sometimes found while digging soil patches, with Soil Appreciation.' });
   for (const id of Object.keys(mining.PICK_TOOLS)) push(toolUses, id, { text: 'Mine rocks for chunks' });
@@ -372,6 +460,7 @@ async function readRemake(names) {
   const isTool = new Set([...Object.keys(making.TOOL_CATALOG), ...Object.keys(tools.TOOL_CONDITION_CATALOG)]);
   const itemBuffs = new Map();
   for (const b of Object.values(buffs)) if (b.itemClass) push(itemBuffs, b.itemClass, b);
+  const questTimers = readQuestTimers();
   const skillName = (id) => {
     const s = skills[id];
     if (!s) return id;
@@ -379,9 +468,29 @@ async function readRemake(names) {
     return `${s.name}${roman && Object.values(skills).some((o) => o.name === s.name && o.classTsid !== s.classTsid) ? ` ${roman}` : ''}`;
   };
   return {
-    vendors, soldBy, madeBy, usedIn, toolFor, otherMade, otherUses, harvests, toolUses, starter, isTool, itemBuffs,
+    vendors, soldBy, madeBy, usedIn, toolFor, otherMade, otherUses, harvests, toolUses, starter, isTool, itemBuffs, questTimers,
     uses: makingItems, buffItems: buffsMod.BUFF_ITEM_CATALOG, skillName, names,
   };
+}
+
+/**
+ * Buffs that are a quest's countdown, not an effect: catalog_buffs.js entries
+ * whose on_remove fails a quest (e.g. get_a_rasher, items/catalog_buffs.js
+ * 887-909, applied by quests/animalkinship_nibble_meat.js:69). Their
+ * item_class only picks the picture the buff shows. buff id -> { quest, line }.
+ */
+export function readQuestTimers(gsjs = GSJS) {
+  const text = readFileSync(join(gsjs, 'items', 'catalog_buffs.js'), 'utf8');
+  const out = new Map();
+  for (const m of text.matchAll(/^\t"([a-z0-9_]+)"\s*:\s*\{/gm)) {
+    const body = literalFrom(text, m.index) || '';
+    const remove = /on_remove\s*:\s*function[^{]*\{/.exec(body);
+    const onRemove = remove ? literalFrom(body, remove.index + remove[0].length - 1) || '' : '';
+    if (!/\.failQuest\(/.test(onRemove)) continue;
+    const quest = /quest_id\s*=\s*['"]([a-z0-9_]+)['"]/.exec(onRemove)?.[1];
+    if (quest) out.set(m[1], { quest, line: lineOf(text, m.index) });
+  }
+  return out;
 }
 
 /** Remake files that hand items out (inventory evidence `addItem at js/...`), named for players. */
@@ -416,11 +525,41 @@ const EXTRA_VENDORS = {
   race_ticket_dispenser: 'Race Ticket Dispenser',
 };
 
+/**
+ * Skill packages whose drop tables the remake rolls (js/features/drops-feature.js),
+ * as the thing you do, in our words. Inventory evidence names them as
+ * `drop table <table> (skill package <package>, rolled at <file:line>)`.
+ */
+const PACKAGE_ACTS = {
+  scraping: 'scrape a Barnacle',
+  peat_harvest: 'harvest a Peat Bog',
+  paper_tree_pet: 'pet a Paper Tree',
+  paper_tree_water: 'water a Paper Tree',
+  herbalism_clear: 'clear an herb garden plot',
+  croppery_clear: 'clear a crop garden plot',
+  jellisac_scooping: 'scoop a Jellisac',
+  refining: 'refine ore in a Grinder',
+};
+
+/**
+ * A `how:` an override wrote into the inventory evidence (tools/inventory/overrides.json
+ * reason "how: <sentence> (<remake file:line>)"): the sentence, without the file references.
+ */
+export function howOf(evidence) {
+  const m = /(?:^|\| )how: ([^|]+)/.exec(evidence || '');
+  if (!m) return null;
+  const text = m[1].trim().replace(/\s*\((?=[^()]*\.js)[\s\S]*$/, '').trim();
+  return text ? (/[.!?]$/.test(text) ? text : `${text}.`) : null;
+}
+
 /** What the inventory says gave a source item to the player, when no other route above names it. */
 function evidenceWay(evidence, quests, takeable) {
   const ob = /obtainable: ([^|]*)/.exec(evidence || '')?.[1]?.trim() || '';
   let m;
   if ((m = /^vendor:([a-z0-9_]+)/.exec(ob))) return { kind: 'sold', vendor: m[1], label: EXTRA_VENDORS[m[1]] || m[1].replace(/_/g, ' ') };
+  if ((m = /^drop table [a-z0-9_]+ \(skill package ([a-z0-9_]+)/.exec(ob)) && PACKAGE_ACTS[m[1]]) {
+    return { kind: 'harvest', harvest: { text: `Sometimes drops when you ${PACKAGE_ACTS[m[1]]}.` } };
+  }
   if ((m = /^reward of quest ([a-z0-9_]+)/.exec(ob))) return `A reward for the quest ${quests[m[1]]?.title ? `“${quests[m[1]].title}”` : m[1]}.`;
   if ((m = /^given on accepting quest ([a-z0-9_]+)/.exec(ob))) return `Handed to you when you take the quest ${quests[m[1]]?.title ? `“${quests[m[1]].title}”` : m[1]}.`;
   if (/^street-project/.test(ob)) return 'Dropped as a reward when you finish a street project.';
@@ -510,7 +649,7 @@ export async function buildCatalog({ inventory = readInventory(), evidence = rea
   files[`${OUT}/index.html`] = indexPage(data);
   entries.forEach((e, i) => {
     files[`${OUT}/${e.it.id}/index.html`] = itemPage(e, {
-      prev: entries[i - 1], next: entries[i + 1], remake, inCatalog, names, musicCards, total: entries.length, index: i,
+      prev: entries[i - 1], next: entries[i + 1], remake, inCatalog, names, musicCards, quests, total: entries.length, index: i,
     });
   });
   return { files, data, excludedIds: excluded };
@@ -540,6 +679,8 @@ function waysFor(id, remake, evidence, quests, takeable) {
   for (const c of remake.otherMade.get(id) || []) ways.push({ kind: 'made', conv: c });
   for (const h of remake.harvests.get(id) || []) ways.push({ kind: 'harvest', harvest: h });
   if (remake.starter.has(id)) ways.push({ kind: 'other', text: 'Every new player starts with one.' });
+  const how = howOf(evidence);
+  if (how) ways.push({ kind: 'other', text: how });
   if (!ways.length) {
     const way = evidenceWay(evidence, quests, takeable);
     ways.push(typeof way === 'string' ? { kind: 'other', text: way } : way);
@@ -661,7 +802,13 @@ function itemPage(e, ctx) {
     switch (c.source.split(':')[0]) {
       case 'garden': return `Grown in a garden plot from ${link(c.inputs[0])}.`;
       case 'transform': return `Made from ${ins} with its ${esc(c.source.split(':')[1].replace(/_/g, ' '))} verb.`;
-      case 'assembly': return `Assembled from ${ins}.`;
+      case 'assembly': {
+        // An artifact's pieces all carry the artifact's name (items/artifact_*_piece*.js): number them instead.
+        const same = c.inputs.length > 1 && c.inputs.every((i) => nameOf(i) === nameOf(c.inputs[0]));
+        return same
+          ? `Assembled from ${c.inputs.length === 2 ? 'both' : `all ${c.inputs.length}`} ${esc(pluralOf(c.inputs[0]))}: ${andList(c.inputs.map((i, n) => link(i, `piece ${n + 1}`)))}.`
+          : `Assembled from ${ins}.`;
+      }
       case 'still': return `Distilled in ${tool('still')} from ${ins}.`;
       case 'paper': return `Written on ${link('paper')}.`;
       case 'piggy_plop': return 'A Piggy plops it after eating three or more crops.';
@@ -741,7 +888,15 @@ function itemPage(e, ctx) {
   // Buffs (GSJS catalog_buffs.js names and descriptions, via buffs.json).
   // buffs.json keeps catalog_buffs.js's escaped quotes (\\"Take a picture\\"); unescape them.
   const unq = (t) => String(t).replace(/\\(["'/])/g, '$1');
-  const buffs = (remake.itemBuffs.get(it.id) || []).map((b) => `<li><strong>${esc(unq(b.name))}</strong>${b.desc ? `: ${gsjsHtml(unq(b.desc), linkItem).join(' ')}` : ''}</li>`);
+  const buffLine = (b, after = '') => `<li><strong>${esc(unq(b.name))}</strong>${b.desc ? `: ${gsjsHtml(unq(b.desc), linkItem).join(' ')}` : ''}${after}</li>`;
+  const itemBuffs = remake.itemBuffs.get(it.id) || [];
+  const buffs = itemBuffs.filter((b) => !remake.questTimers.has(b.classTsid)).map((b) => buffLine(b));
+  // A quest's countdown shows this item's picture; it is not something the item does (readQuestTimers).
+  const timers = itemBuffs.filter((b) => remake.questTimers.has(b.classTsid)).map((b) => {
+    const quest = ctx.quests[remake.questTimers.get(b.classTsid).quest];
+    const title = quest?.title ? `“${esc(String(quest.title).trim())}”` : 'it belongs to';
+    return buffLine(b, `${/[.!?]$/.test(plainText(unq(b.desc))) ? '' : '.'} The countdown for the quest ${title}, shown with this item’s picture: if it runs out first, the quest fails.`);
+  });
 
   const status = STATUS[e.status];
   const isMusic = it.id.startsWith('musicblock_') || it.tags.includes('musicblock');
@@ -787,7 +942,7 @@ ${usesHtml.length ? `          <h3>What it is for</h3>
         <div>
           <h2 id="orig-h">In Tiny Speck’s game</h2>
           ${desc.length ? `<div class="cat-desc">${desc.map((d) => `<p>${d}</p>`).join('')}</div>` : '<p class="cat-muted">The game code gives it no description.</p>'}
-${extras.length ? `          <ul class="cat-list cat-extras">\n${extras.map((x) => `            <li>${x}</li>`).join('\n')}\n          </ul>\n` : ''}${buffs.length ? `          <h3>Buffs</h3>\n          <ul class="cat-list">\n            ${buffs.join('\n            ')}\n          </ul>\n` : ''}          <p class="cat-source">From <code>${esc(it.file)}</code> in Tiny Speck’s game code.</p>
+${extras.length ? `          <ul class="cat-list cat-extras">\n${extras.map((x) => `            <li>${x}</li>`).join('\n')}\n          </ul>\n` : ''}${buffs.length ? `          <h3>Buffs</h3>\n          <ul class="cat-list">\n            ${buffs.join('\n            ')}\n          </ul>\n` : ''}${timers.length ? `          <h3>Quest timers</h3>\n          <ul class="cat-list">\n            ${timers.join('\n            ')}\n          </ul>\n` : ''}          <p class="cat-source">From <code>${esc(it.file)}</code> in Tiny Speck’s game code.</p>
         </div>
         <dl class="cat-facts">
           <dt>Category</dt><dd>${esc(e.category)}</dd>

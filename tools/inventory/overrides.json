@@ -967,7 +967,7 @@
  },
  "item:furniture_chassis": {
   "status": "source",
-  "reason": "the house itself: locations/inc_homes.js:2459-2466 places furniture_chassis (Groddle Cottage) at the home street's door when the home is made; the remake's home street draws the house (js/homes.js HOME_STYLES, features/homes-feature.js)",
+  "reason": "how: It is the house on your home street, so it comes with your home; the Home Street Ticket picks its look (js/features/homes-feature.js:1392-1398 HOUSES, js/homes.js HOME_STYLES) | the house itself: locations/inc_homes.js:2459-2466 places furniture_chassis (Groddle Cottage) at the home street's door when the home is made; the remake's home street draws the house (js/homes.js HOME_STYLES, features/homes-feature.js)",
   "register": "G125"
  },
  "item:stoot_barfield_pullstring_doll": {
@@ -1356,7 +1356,7 @@
  },
  "item:musicblock_goodnight_groddle": {
   "status": "source",
-  "reason": "MUSICBLOCK_ENDGAME_DROP: the remake places it on a street once all 25 series tunes are owned (musicblocks.js:235); in Glitch it was the beta testers' gift (special_item_that_only_beta_testers_get.js:377), and the remake's Señor Funpickle sends it too once all six powers are seen (G209). The scanner cannot follow the constant (G176)",
+  "reason": "how: Turns up on a street once you own all 25 series Musicblocks (js/musicblocks.js:235-250 MUSICBLOCK_ENDGAME_DROP) | MUSICBLOCK_ENDGAME_DROP: the remake places it on a street once all 25 series tunes are owned (musicblocks.js:235); in Glitch it was the beta testers' gift (special_item_that_only_beta_testers_get.js:377), and the remake's Señor Funpickle sends it too once all six powers are seen (G209). The scanner cannot follow the constant (G176)",
   "register": "G176"
  },
  "item:special_item_that_only_beta_testers_get": {
@@ -1935,5 +1935,26 @@
   "reason": "no geometry survives anywhere: Arbito 03 (category live-region-other: other name in a live region: needs a judgement); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
   "register": "G351",
   "lost": "nosource"
+ },
+ "item:cup_of_water": {
+  "reason": "how: Get water from the Water Cooler in a Bureaucratic Hall (js/features/bureaucratic-halls-feature.js:166 calls getWater, js/water-cooler.js:80 adds the cup)"
+ },
+ "item:drink_ticket": {
+  "reason": "how: Handed to you when you take the quest Beelzebooze, and a mourner at your grave can leave one once you have started it (js/features/hell-tickets-feature.js:375-377 hell_quest onAccepted and 145-147 recognizeDeath's grant_item, grantTicket at 139-142)"
+ },
+ "item:game_box": {
+  "reason": "how: Made when all three SWFs are in your pack at once (js/features/swf-feature.js:190-197, the create stage after drop1-drop3)"
+ },
+ "item:swf_1": {
+  "reason": "how: Sometimes drops when you scrape a Barnacle (barnacle_scraping rolls swfs_1 in js/drop-tables-data.js; js/features/drops-feature.js:141 maps mortar_barnacle:scrape to the scraping package, rollResourceNodeDrop at 153; the addItem the scan found at js/features/swf-feature.js:388 is the swfdemo QA route)"
+ },
+ "item:swf_2": {
+  "reason": "how: Sometimes drops when you scrape a Barnacle (barnacle_scraping rolls swfs_2 in js/drop-tables-data.js; js/features/drops-feature.js:141 maps mortar_barnacle:scrape to the scraping package, rollResourceNodeDrop at 153; the addItem the scan found at js/features/swf-feature.js:388 is the swfdemo QA route)"
+ },
+ "item:swf_3": {
+  "reason": "how: Sometimes drops when you scrape a Barnacle (barnacle_scraping rolls swfs_3 in js/drop-tables-data.js; js/features/drops-feature.js:141 maps mortar_barnacle:scrape to the scraping package, rollResourceNodeDrop at 153; the addItem the scan found at js/features/swf-feature.js:397 is the swfdemo QA route)"
+ },
+ "item:petrified_rock_small": {
+  "reason": "how: The reward for finishing a Feat, which opens again a game week later for another (js/features/solo-feats-feature.js:225-227, REWARD_ITEM in js/solo-feats.js:69)"
  }
 }
