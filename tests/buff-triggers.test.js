@@ -24,7 +24,7 @@ import {
   smeltItDealtItFreeSmelts,
 } from '../public/js/buff-triggers.js?v=g124-1';
 import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=radiate-3';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=radiate-4';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=teleport-12';
 import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=g334-1';
 import { rubeFeature } from '../public/js/features/rube-feature.js?v=rube-12';
@@ -507,7 +507,7 @@ describe('wiring', () => {
     for (const m of src.matchAll(/from '\.\/([a-z-]+-feature\.js\?v=[^']+)'/g)) {
       assert.ok(index.includes(`'./${m[1]}'`), m[1]);
     }
-    assert.match(index, /buff-triggers-feature\.js\?v=radiate-3'; FEATURES\.push\(buffTriggersFeature\)/);
+    assert.match(index, /buff-triggers-feature\.js\?v=radiate-4'; FEATURES\.push\(buffTriggersFeature\)/);
   });
 
   it('game.js applies Stuffed at the daily limit and announces each making batch', () => {

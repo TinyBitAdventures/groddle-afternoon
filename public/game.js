@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-15';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-175';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-176';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -3199,6 +3199,8 @@ function renderPackRow(box, slots, opts = {}) {
     if (canDragToVendor) {
       slot.addEventListener('dragstart', (event) => {
         if (!isVendorOpen()) {
+          // G332: drag a pack item onto another player to give it (features/gifts-feature.js).
+          if (features.query('packDragStart', s.classTsid, event, engine)) return;
           event.preventDefault();
           return;
         }
@@ -8431,6 +8433,8 @@ const engine = {
     saveDroppedItems();
     refreshDroppedWorldItems();
   },
+  /** Redraw dropped stacks without saving (G332: the shared stacks changed). */
+  redrawDroppedStacks: () => refreshDroppedWorldItems(),
   /** TSIDs of every street this save has entered (the persistent world keys). */
   visitedStreets: () => Object.keys(persistentWorldState.streets || {}),
   /** A garden bed through the street garden path ({ x, y, gardenType, cols, rows, label, garden, detached }). */
@@ -9195,7 +9199,7 @@ function spawnDroppedItemStack(stack) {
   register({
     classId: 'dropped_item',
     label: named?.label || item.label || stack.classTsid,
-    subtitle: `${named ? `${named.kind} · ` : ''}Dropped stack · ${stack.count} in this pile`,
+    subtitle: `${named ? `${named.kind} · ` : ''}${stack.subtitle || `Dropped stack · ${stack.count} in this pile`}`,
     sprite: spr,
     state: {
       id: stack.id,
@@ -9224,11 +9228,13 @@ function refreshDroppedWorldItems() {
   }
   droppedItemSprites = [];
   const streetStacks = listDroppedStacks(droppedItemState, droppedStacksTsid());
+  // G332: a public street's shared stacks in multiplayer (features/drops-mp-feature.js), drawn beside the player's own.
+  const sharedStacks = features.query('sharedDroppedStacks', droppedStacksTsid(), engine) || [];
   app.canvas.dataset.droppedStacks = String(streetStacks.length);
   app.canvas.dataset.droppedStootDolls = String(
     streetStacks.filter((stack) => stack.classTsid === STOOT_DOLL_ID).length
   );
-  for (const stack of streetStacks) {
+  for (const stack of [...streetStacks, ...sharedStacks]) {
     spawnDroppedItemStack(stack);
   }
 }
@@ -9268,6 +9274,11 @@ function dropPackItem(classTsid, requested = 1) {
   // overlaps more of the world, so use a larger readable lift while keeping the
   // pile within pickup range and visually tethered to the avatar's platform.
   const y = player.y - 74;
+  // G332: in multiplayer a public street's drop is everyone's, through the server (features/drops-mp-feature.js).
+  if (features.query('sharedDrop', { classTsid, count, x, y }, engine)) {
+    closePackPopover();
+    return;
+  }
   const result = dropInventoryStack(
     droppedItemState,
     inv,
@@ -9295,6 +9306,8 @@ function dropPackItem(classTsid, requested = 1) {
 }
 
 function pickupDroppedWorldItem(target) {
+  const shared = features.query('sharedPickup', target, engine);
+  if (shared != null) return shared;
   const id = target?.state?.id || target?.worldItemId;
   const x = target?.sprite?.x ?? player?.x ?? 0;
   const y = target?.sprite?.y ?? player?.y ?? 0;

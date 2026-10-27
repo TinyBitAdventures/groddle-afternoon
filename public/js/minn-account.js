@@ -431,6 +431,15 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
     },
 
     /**
+     * Stacks dropped for everyone (register G332, groddle-afternoon-site/src/LedgerDrop.php):
+     * { drops: [{ op, side: dropped|took, id, item: { c, n, r? }, why? }] }, the drops and
+     * pickups the site settled that this save has not applied yet.
+     */
+    async drops() {
+      return buddyCall('Checking your drops', 'drops');
+    },
+
+    /**
      * The Auction House (register G333, groddle-afternoon-site/src/LedgerAuction.php).
      * auctions({ q, cat, c, seller, sort, page }) { auctions, total, page, per, cats, rules };
      * myAuctions() { active, ended, deliveries, receipts, listable, rules, now };

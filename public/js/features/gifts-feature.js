@@ -25,15 +25,19 @@
  *   QUESTS lane's kindly_randomness and hand-out quests read it), and
  *   items_received:<class> for the receiver (takeable.js 278-281).
  *
- * QA: canvas data giftState (none|open|wrap|sending), giftLast, giftBoxes;
- * window.groddleGifts.
+ * - Drag a pack stack onto another player's Glitch (the source's "Or, drag
+ *   item to player"): the tip says Give, and the drop opens the Give window
+ *   for that player with that stack picked (game.js asks packDragStart).
+ *
+ * QA: canvas data giftState (none|open|wrap|sending), giftLast, giftBoxes,
+ * giftDrag (none|dragging|over:<id>); window.groddleGifts.
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { TOOL_CONDITION_CATALOG, getToolCondition, setToolRemaining } from '../tools.js?v=woodcutting-test-3';
-import { createMinnAccount } from '../minn-account.js?v=nbhome-5';
+import { createMinnAccount } from '../minn-account.js?v=nbhome-6';
 // The same key as features/index.js: one module instance holds the carried notes.
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=furniture-49';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=furniture-50';
 import {
   BOX_SLOTS,
   GIFT_BOX,
@@ -98,6 +102,10 @@ const STYLE = `
 .gift-foot button { font: 700 12.5px/1.2 system-ui; border: 0; border-radius: 999px; padding: 0.42rem 0.95rem; cursor: pointer; color: #fff; background: #74508e; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }
 .gift-foot button.is-quiet { color: #3a3340; background: #efe7da; }
 .gift-foot button:disabled { opacity: 0.5; cursor: default; }
+.gift-drag-tip { position: fixed; z-index: 76; pointer-events: none; transform: translate(14px, 10px); padding: 0.2rem 0.55rem; border-radius: 6px; background: #fffdf6; color: #302b34;
+  box-shadow: 0 2px 6px rgba(28, 25, 31, 0.3); font: 700 12px/1.3 system-ui, sans-serif; white-space: nowrap; }
+.gift-drag-tip[hidden] { display: none; }
+.gift-drag-tip.is-no { color: #cc0000; }
 `;
 
 function el(tag, attrs = {}, text = '') {
@@ -591,10 +599,112 @@ function createSession(engine, client) {
     return true;
   }
 
+  // —— Drag a pack item onto another player (the source's "Or, drag item to player") ——
+  // glitch-client DragVO.as findDragTargetForStack 148-155: a giveable stack dragged over a
+  // player's Glitch targets them; LocationInputHandler.as 531-537 and 692-697 show "Give" (or, for a
+  // soulbound one, "You can't give this item away!" in red), and a drop there (633-638, 848-853) opens
+  // the give "as if they had already chosen give and an itemstack".
+  let drag = null;
+  let dragWired = false;
+  const tip = el('div', { class: 'gift-drag-tip', hidden: true, 'data-gift-drag-tip': '' });
+  document.body.append(tip);
+
+  function canvasEl() {
+    return document.querySelector('canvas[aria-label="Groddle game world"]');
+  }
+
+  /** The other player whose Glitch is under a client point, or null. */
+  function playerAt(clientX, clientY) {
+    const canvas = canvasEl();
+    const remotes = globalThis.groddleRealtime?.remotes;
+    if (!canvas || !remotes?.entries) return null;
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+    const res = Number(canvas.dataset.renderResolution) || 1;
+    const sx = ((clientX - rect.left) * (canvas.width / res)) / rect.width;
+    const sy = ((clientY - rect.top) * (canvas.height / res)) / rect.height;
+    const people = others();
+    for (const [id, r] of remotes.entries()) {
+      const p = people.find((o) => o.id === Number(id));
+      if (!p || !r?.root || r.root.destroyed) continue;
+      const b = r.root.getBounds();
+      if (sx >= b.x - 8 && sx <= b.x + b.width + 8 && sy >= b.y - 8 && sy <= b.y + b.height + 8) return p;
+    }
+    return null;
+  }
+
+  function dragTip(text, no, x, y) {
+    if (!text) {
+      tip.hidden = true;
+      return;
+    }
+    tip.hidden = false;
+    tip.textContent = text;
+    tip.classList.toggle('is-no', Boolean(no));
+    tip.style.left = `${x}px`;
+    tip.style.top = `${y}px`;
+  }
+
+  function endDrag() {
+    drag = null;
+    dragTip('');
+    engine.setData?.('giftDrag', 'none');
+  }
+
+  function wireDrag() {
+    const canvas = canvasEl();
+    if (dragWired || !canvas) return Boolean(canvas);
+    dragWired = true;
+    canvas.addEventListener('dragover', (event) => {
+      if (!drag) return;
+      const p = playerAt(event.clientX, event.clientY);
+      drag.over = p;
+      engine.setData?.('giftDrag', p ? `over:${p.id}` : 'dragging');
+      if (!p) return dragTip('');
+      event.preventDefault();
+      if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+      dragTip(drag.soulbound ? "You can't give this item away!" : GIFT_TEXT.verb, drag.soulbound, event.clientX, event.clientY);
+    });
+    canvas.addEventListener('dragleave', () => { if (drag) dragTip(''); });
+    canvas.addEventListener('drop', (event) => {
+      if (!drag) return;
+      const p = playerAt(event.clientX, event.clientY) || drag.over;
+      const c = drag.c;
+      const soulbound = drag.soulbound;
+      endDrag();
+      if (!p) return;
+      event.preventDefault();
+      if (soulbound) return;
+      open({ to: p, classTsid: c });
+    });
+    document.addEventListener('dragend', () => { if (drag) endDrag(); });
+    return true;
+  }
+
+  /** game.js's pack slot dragstart (the vendor closed): true when the drag may go on. */
+  function startDrag(classTsid, event) {
+    const c = String(classTsid || '');
+    if (client.state !== 'online' || !others().length || c === GIFT_WRAPPED || !wireDrag()) return false;
+    const reason = table ? giveReason(c, table, ITEM_CATALOG[c]?.tags) : '';
+    // Only a giveable stack targets a player (DragVO.as:148 item.giveable); a soulbound one shows the red tip.
+    if (reason && reason !== GIFT_TEXT.soulbound) return false;
+    drag = { c, soulbound: reason === GIFT_TEXT.soulbound, over: null };
+    engine.setData?.('giftDrag', 'dragging');
+    if (event?.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('application/x-groddle-item', c);
+      event.dataTransfer.setData('text/plain', c);
+    }
+    return true;
+  }
+
   publish();
 
   return {
     client,
+    startDrag,
+    playerAt,
+    get drag() { return drag; },
     get give() { return give; },
     get wrap() { return wrap; },
     get boxes() { return slice.boxes; },
@@ -674,6 +784,12 @@ export const giftsFeature = {
   runVerbOverride(target, verbId) {
     if (verbId !== GIFT_VERB || !session || !target?.playerId) return null;
     return session.open({ to: { id: Number(target.playerId), name: String(target.label || target.name || 'A Glitch') } });
+  },
+
+  /** game.js pack slot dragstart: dragging a stack toward another player on the street (DragVO.as). */
+  packDragStart(classTsid, event, engine) {
+    if (!multiplayer || !session || engine?.mode !== 'multiplayer') return null;
+    return session.startDrag(classTsid, event) ? true : null;
   },
 
   /** The pack popover: Give to…, and the Gift Box's own verbs. */

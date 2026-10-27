@@ -26,8 +26,8 @@ import {
   freshReverse,
   normalizeList,
 } from '../public/js/buddies.js?v=g325-1';
-import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-5';
-import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=g328-7';
+import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-6';
+import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=g328-8';
 import { FEATURES } from '../public/js/features/index.js';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
