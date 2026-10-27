@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-15';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-187';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-188';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -827,7 +827,7 @@ import { hidesChatBubble } from './js/hi-signs.js?v=hi-signs-4';
 import { GAME_MODE, isSolo } from './js/game-mode.js?v=mp2-1';
 import { saveStore } from './js/save-store.js?v=mp2-2';
 import { isNewMultiplayerPlayer, newPlayerInventory, newPlayerStats } from './js/new-player.js?v=mp5-1';
-import { clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSpeechTip, speechOffsetFor, speechTailPoints } from './js/speech-placement.js?v=g269-1';
+import { clearSpeechOfBox, giveArtHeight, hudColumnBox, liftOverAvatars, placeSpeechTail, placeSpeechTip, speechOffsetFor, speechTailPoints } from './js/speech-placement.js?v=g357-1';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -4806,6 +4806,24 @@ function hudColumnViewBox() {
   return hudBoxCache;
 }
 
+/**
+ * Heads a bubble keeps off (G357): the player, other players in multiplayer
+ * and the street's companion Glitches, each as a world box from its feet up;
+ * the speaker's own is left out.
+ */
+function speechAvoidBoxes(speaker) {
+  const targets = [playerSpeechTarget, ...(features.query('speechAvoidTargets', engine) || []), ...localCompanions];
+  const out = [];
+  for (const t of targets) {
+    const spr = t?.sprite;
+    if (!spr || spr.destroyed || spr === speaker?.sprite || spr.visible === false) continue;
+    const art = Number(t.artHeight) > 0 ? Number(t.artHeight) : clamp(Math.abs(spr.height || 110), 60, 170);
+    const half = clamp(Math.abs(spr.width || 50) / 2, 14, 26); // a Glitch's body, not its name plate or pack
+    out.push({ left: spr.x - half, right: spr.x + half, top: spr.y - art, bottom: spr.y });
+  }
+  return out;
+}
+
 function positionSpeechBubble(bubble) {
   const meta = bubble?._speechFx;
   const spr = meta?.target?.sprite;
@@ -4851,18 +4869,27 @@ function positionSpeechBubble(bubble) {
     place = { tip: clear.tip + cameraY, flip: clear.flip };
   }
   meta.overHud = clear?.how === 'over';
+  // G357: lifted clear of a player's head, at most 120 px and never out of view; eased so it doesn't jump.
+  const lift = place.flip ? { lift: 0 } : liftOverAvatars({
+    left: bubble.x - meta.width / 2, width: meta.width, height: meta.height, tip: place.tip,
+    avatars: speechAvoidBoxes(meta.target), maxLift: place.tip - lowestTip,
+  });
+  const shown = Number(meta.lift) || 0;
+  const nextLift = Math.abs(lift.lift - shown) < 0.5 ? lift.lift : shown + (lift.lift - shown) * 0.3;
   // Clamped at the edge, the tail still points at the speaker (G233, ChatBubble.as 179-193).
   const tail = placeSpeechTail({ bubbleX: bubble.x, width: meta.width, speakerX: spr.x + offset.x });
-  if (meta.tailAt !== `${tail.tip},${tail.base}`) {
-    meta.tailAt = `${tail.tip},${tail.base}`;
-    drawSpeechTail(meta.tailDown, meta.height, tail, false);
+  const liftPx = Math.round(nextLift * 2) / 2;
+  if (meta.tailAt !== `${tail.tip},${tail.base},${liftPx}`) {
+    meta.tailAt = `${tail.tip},${tail.base},${liftPx}`;
+    drawSpeechTail(meta.tailDown, meta.height, tail, false, 11 + liftPx);
     drawSpeechTail(meta.tailUp, meta.height, tail, true);
   }
   const flip = place.flip;
   bubble.y = place.tip;
-  if (meta.flipped !== flip) {
+  if (meta.flipped !== flip || meta.lift !== liftPx) {
     meta.flipped = flip;
-    bubble.pivot.y = flip ? -11 : meta.height + 11;
+    meta.lift = liftPx;
+    bubble.pivot.y = flip ? -11 : meta.height + 11 + liftPx;
     if (meta.tailDown) meta.tailDown.visible = !flip;
     if (meta.tailUp) meta.tailUp.visible = flip;
   }
@@ -4879,14 +4906,15 @@ function positionSpeechBubble(bubble) {
     app.canvas.dataset.speechWidth = Number(meta.width).toFixed(2);
     app.canvas.dataset.speechTail = meta.tailAt;
     app.canvas.dataset.speechClear = clear?.how || '';
+    app.canvas.dataset.speechLift = `${Math.round(lift.lift)}${lift.covered ? ':covered' : ''}`;
   }
   return true;
 }
 
 /** One bubble tail, filled over the bubble's border, its two slanted sides outlined (js/speech-placement.js). */
-function drawSpeechTail(g, height, tail, up) {
+function drawSpeechTail(g, height, tail, up, length = 11) {
   if (!g || g.destroyed) return;
-  const p = speechTailPoints({ height, tip: tail.tip, base: tail.base, up });
+  const p = speechTailPoints({ height, tip: tail.tip, base: tail.base, up, length });
   g.clear();
   g.poly(p.fill).fill({ color: 0xfffdf5, alpha: 0.97 });
   g.moveTo(p.edge[0], p.edge[1]).lineTo(p.edge[2], p.edge[3]).lineTo(p.edge[4], p.edge[5]).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
@@ -4908,7 +4936,9 @@ function showSpeechBubble(target, speech) {
     wordWrap: true,
     wordWrapWidth: 246,
   } });
-  const speaker = new PIXI.Text({ text: String(speech.speaker || target.label || ''), style: {
+  // G357: only a player's bubble names its speaker; the tail already shows who an NPC is.
+  const named = target.classId === 'pc_player' || target.classId === 'pc_remote';
+  const speaker = new PIXI.Text({ text: named ? String(speech.speaker || target.label || '') : '', style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 12,
     fill: 0x7f6c55,
@@ -4917,8 +4947,10 @@ function showSpeechBubble(target, speech) {
   } });
   // Stat slugs under the line (garden talkbacks: iMG, mood, energy pills, as sendBubble showed them).
   const slugRow = speechSlugRow(speech.slugs);
-  const width = clamp(Math.max(body.width, speaker.width, slugRow?.width || 0) + 24, 156, 280);
-  const height = Math.ceil(12 + speaker.height + 4 + body.height + (slugRow ? 6 + slugRow.height : 0) + 12);
+  // G357: as wide as the line, as the client's was (ChatBubble.as MIN_WIDTH 50, MAX_WIDTH 276).
+  const width = clamp(Math.max(body.width, named ? speaker.width : 0, slugRow?.width || 0) + 24, 60, 280);
+  const head = named ? speaker.height + 4 : 0;
+  const height = Math.ceil(12 + head + body.height + (slugRow ? 6 + slugRow.height : 0) + 12);
   const bg = new PIXI.Graphics();
   bg.roundRect(0, 0, width, height, 12).fill({ color: 0xfffdf5, alpha: 0.97 }).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
   // Tails (drawn by positionSpeechBubble, which aims them at the speaker).
@@ -4928,8 +4960,9 @@ function showSpeechBubble(target, speech) {
   tailUp.visible = false;
   speaker.x = 12;
   speaker.y = 10;
+  speaker.visible = named;
   body.x = 12;
-  body.y = 10 + speaker.height + 4;
+  body.y = 10 + head;
 
   const bubble = new PIXI.Container();
   bubble.addChild(bg, tailDown, tailUp, speaker, body);
@@ -24995,6 +25028,28 @@ async function main() {
     if (state.started) return;
     document.getElementById('overlay').classList.add('hidden');
     state.started = true;
+    // QA (G357, before the audio wait, which never settles under autostart): &speechdemo=<line> stands the player beside the nearest short speaker
+    // (animals first, &speechclass=<classId> to pick) and has it say the line every 4 s.
+    const speechDemo = bootParams.get('speechdemo');
+    if (speechDemo) {
+      let tries = 0;
+      const find = () => {
+        const want = bootParams.get('speechclass');
+        const pool = interactables.filter((t) => t?.sprite && !t.sprite.destroyed && t !== playerSpeechTarget && (!want || t.classId === want || t.kind === want));
+        pool.sort((a, b) => Math.abs(a.sprite.x - player.x) - Math.abs(b.sprite.x - player.x));
+        const speaker = pool[0];
+        if (!speaker) {
+          if ((tries += 1) < 40) setTimeout(find, 500);
+          return;
+        }
+        player.x = speaker.sprite.x + 46;
+        const say = () => showSpeechBubble(speaker, { text: speechDemo, durationMs: 3800 });
+        say();
+        setInterval(say, 4000);
+        if (app?.canvas) app.canvas.dataset.speechDemo = String(speaker.classId || speaker.kind || speaker.label || '');
+      };
+      setTimeout(find, 1500);
+    }
     if (!state.muted && audio.ctx?.state === 'suspended') {
       try { await audio.ctx.resume(); } catch (_) { /* */ }
     }

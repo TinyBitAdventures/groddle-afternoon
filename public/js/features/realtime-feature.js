@@ -414,6 +414,10 @@ function createSession(engine) {
     chatName() {
       return client.me?.name || boot.player?.name || null;
     },
+    /** The other Glitches drawn on this street, for bubbles to keep off their heads. */
+    speechTargets() {
+      return [...remotes.values()].map((r) => r.target).filter((t) => t.sprite && !t.sprite.destroyed && t.sprite.visible !== false);
+    },
   };
   return session;
 }
@@ -455,6 +459,11 @@ export const realtimeFeature = {
    */
   realtimeClient() {
     return session?.client || null;
+  },
+
+  /** Speech bubbles keep off these players' heads (game.js positionSpeechBubble). */
+  speechAvoidTargets() {
+    return session ? session.speechTargets() : null;
   },
 
   /** /who: the other players on this street. */

@@ -22,13 +22,14 @@ import {
   clearSpeechOfBox,
   firstOpaqueRow,
   giveArtHeight,
+  liftOverAvatars,
   opaqueTopOf,
   placeSpeechTail,
   placeSpeechTip,
   speechBubbleRect,
   speechOffsetFor,
   speechTailPoints,
-} from '../public/js/speech-placement.js?v=g269-1';
+} from '../public/js/speech-placement.js?v=g357-1';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '../glitch-GameServerJS');
@@ -209,7 +210,7 @@ describe('art heights', () => {
 describe('wiring', () => {
   it('game.js places every bubble through the module and gives registered targets art heights', () => {
     const game = read('public/game.js');
-    assert.match(game, /import \{ clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSpeechTip, speechOffsetFor, speechTailPoints \} from '\.\/js\/speech-placement\.js\?v=[\w-]+';/);
+    assert.match(game, /import \{ clearSpeechOfBox, giveArtHeight, hudColumnBox, liftOverAvatars, placeSpeechTail, placeSpeechTip, speechOffsetFor, speechTailPoints \} from '\.\/js\/speech-placement\.js\?v=[\w-]+';/);
     assert.match(game, /function register\(target\) \{\n[^\n]*\n  giveArtHeight\(target\);\n  interactables\.push\(target\);/);
     const fn = game.slice(game.indexOf('function positionSpeechBubble'), game.indexOf('function showSpeechBubble'));
     assert.match(fn, /const offset = speechOffsetFor\(meta\.target\);\n  bubble\.x = clampWorldOverlayX\(spr\.x \+ offset\.x, meta\.width, 12\);/);
@@ -217,7 +218,7 @@ describe('wiring', () => {
     assert.match(fn, /dataset\.speechArt = /);
     // G233: the tail is aimed at the speaker the bubble was meant to centre on.
     assert.match(fn, /placeSpeechTail\(\{ bubbleX: bubble\.x, width: meta\.width, speakerX: spr\.x \+ offset\.x \}\)/);
-    assert.match(fn, /drawSpeechTail\(meta\.tailDown, meta\.height, tail, false\);\n\s*drawSpeechTail\(meta\.tailUp, meta\.height, tail, true\);/);
+    assert.match(fn, /drawSpeechTail\(meta\.tailDown, meta\.height, tail, false, 11 \+ liftPx\);\n\s*drawSpeechTail\(meta\.tailUp, meta\.height, tail, true\);/);
   });
 
   it('a dressed Street Spirit takes the spirits\' 0 / 60 under the same module key', () => {
@@ -294,5 +295,53 @@ describe('bubbles keep clear of the activity feed column (G269)', () => {
     assert.match(game, /el\.toggleAttribute\('data-under-speech', over\)/);
     const css = readFileSync(join(ROOT, 'public/style.css'), 'utf8');
     assert.match(css, /\.activity-feed\[data-under-speech\], \.buff-strip\[data-under-speech\] \{ opacity: 0\.18; \}/);
+  });
+});
+
+describe('bubbles keep off players\' heads (G357, Austin 2026-10-27)', () => {
+  // A 200 x 50 bubble whose tail points at y 400 (a short speaker's head); its body is 339-389.
+  const bubble = { left: 100, width: 200, height: 50, tip: 400 };
+  const player = { left: 160, right: 220, top: 300, bottom: 450 };
+
+  it('lifts a bubble clear of the player standing beside a short speaker', () => {
+    const out = liftOverAvatars({ ...bubble, avatars: [player] });
+    assert.equal(out.covered, false);
+    // body bottom = 400 - 11 - lift must sit 6 px over the head at 300
+    assert.equal(out.lift, 400 - 11 - (300 - 6));
+  });
+
+  it('leaves alone a bubble that covers nobody, or a player off to the side', () => {
+    assert.deepEqual(liftOverAvatars({ ...bubble, avatars: [] }), { lift: 0, covered: false });
+    assert.equal(liftOverAvatars({ ...bubble, avatars: [{ left: 400, right: 460, top: 300, bottom: 450 }] }).lift, 0);
+    // a head already under the tail's point: the body is above it
+    assert.equal(liftOverAvatars({ ...bubble, avatars: [{ left: 160, right: 220, top: 395, bottom: 450 }] }).lift, 0);
+  });
+
+  it('rises at most 120 px (ChatBubble.as) and never out of view', () => {
+    const tall = { left: 160, right: 220, top: 150, bottom: 450 };
+    assert.deepEqual(liftOverAvatars({ ...bubble, avatars: [tall] }), { lift: 120, covered: true });
+    assert.deepEqual(liftOverAvatars({ ...bubble, avatars: [player], maxLift: 40 }), { lift: 40, covered: true });
+  });
+
+  it('keeps rising past a second head the first lift ran into', () => {
+    const higher = { left: 250, right: 300, top: 280, bottom: 330 };
+    const out = liftOverAvatars({ ...bubble, avatars: [player, higher] });
+    assert.equal(out.lift, 400 - 11 - (280 - 6));
+  });
+
+  it('a stretched tail reaches the speaker', () => {
+    const p = speechTailPoints({ height: 50, tip: 100, base: 100, length: 11 + 40 });
+    assert.equal(p.fill[3], 50 + 51);
+  });
+
+  it('game.js lifts tip-down bubbles, names only players and sizes a bubble to its line', () => {
+    const game = read('public/game.js');
+    const fn = game.slice(game.indexOf('function positionSpeechBubble'), game.indexOf('function showSpeechBubble'));
+    assert.match(fn, /const lift = place\.flip \? \{ lift: 0 \} : liftOverAvatars\(\{/);
+    assert.match(fn, /avatars: speechAvoidBoxes\(meta\.target\), maxLift: place\.tip - lowestTip,/);
+    const show = game.slice(game.indexOf('function showSpeechBubble'), game.indexOf('function speechSlugRow'));
+    assert.match(show, /const named = target\.classId === 'pc_player' \|\| target\.classId === 'pc_remote';/);
+    assert.match(show, /\+ 24, 60, 280\);/);
+    assert.match(read('public/js/features/realtime-feature.js'), /speechAvoidTargets\(\) \{/);
   });
 });

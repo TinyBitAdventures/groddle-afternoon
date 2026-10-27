@@ -226,11 +226,11 @@ export function placeSpeechTail({ bubbleX, width, speakerX }) {
  * the two slanted sides to outline. `up` is the tail of a bubble hung under
  * its speaker (G185), drawn from the bubble's top.
  */
-export function speechTailPoints({ height, tip, base, up = false }) {
+export function speechTailPoints({ height, tip, base, up = false, length = SPEECH_TAIL_HEIGHT }) {
   const h = SPEECH_TAIL_HALF;
   const y0 = up ? 0 : height;
   const yIn = up ? 2 : height - 2;
-  const yTip = up ? -SPEECH_TAIL_HEIGHT : height + SPEECH_TAIL_HEIGHT;
+  const yTip = up ? -length : height + length;
   return {
     fill: [base - h, yIn, tip, yTip, base + h, yIn],
     edge: [base - h, y0, tip, yTip, base + h, y0],
@@ -322,4 +322,44 @@ export function hudColumnBox(elements, canvas, viewW, viewH) {
       : b;
   }
   return box;
+}
+
+/*
+ * A bubble never sits over another Glitch's head (Austin 2026-10-27: a short
+ * speaker's bubble covered the player beside it). The client hung each bubble
+ * over its speaker and moved it at most 120 px (ChatBubble.as keepInBounds);
+ * here a bubble that would cover a player is lifted clear of their head by up
+ * to that much, its tail stretched down to the speaker.
+ */
+
+/** Gap kept between a lifted bubble and the head under it. */
+export const SPEECH_AVATAR_MARGIN = 6;
+
+/**
+ * How far to lift a tip-down bubble (world or view units, y down) so its body
+ * clears every avatar box it overlaps: `left`/`width`/`height` the body,
+ * `tip` the tail's point, `avatars` boxes { left, right, top, bottom } (the
+ * speaker's own left out), `maxLift` the most it may rise (the 120 px limit,
+ * or less near the top of the view). Returns { lift, covered } (covered: an
+ * avatar is still under it at maxLift).
+ */
+export function liftOverAvatars({ left, width, height, tip, avatars, maxLift = SPEECH_PUSH_LIMIT, margin = SPEECH_AVATAR_MARGIN }) {
+  const cap = Math.max(0, Math.min(SPEECH_PUSH_LIMIT, Number(maxLift) || 0));
+  const right = left + width;
+  let lift = 0;
+  for (let pass = 0; pass < 4; pass += 1) {
+    const bottom = tip - SPEECH_TAIL_HEIGHT - lift;
+    const top = bottom - height;
+    let need = lift;
+    for (const a of avatars || []) {
+      if (!a || !(a.right > a.left) || !(a.bottom > a.top)) continue;
+      if (right <= a.left - margin || left >= a.right + margin) continue;
+      if (bottom <= a.top - margin || top >= a.bottom) continue;
+      need = Math.max(need, tip - SPEECH_TAIL_HEIGHT - (a.top - margin));
+    }
+    if (need === lift) return { lift: Math.min(lift, cap), covered: false };
+    if (need > cap) return { lift: cap, covered: true };
+    lift = need;
+  }
+  return { lift: Math.min(lift, cap), covered: false };
 }
