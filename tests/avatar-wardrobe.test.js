@@ -27,7 +27,11 @@ const REIMAGINED = [
   'shirt/chaulkywhite_shirtvest', 'shirt/cola_bottle_shirt', 'shirt/frilly_tank_blouse_belly', 'shirt/mushroom_shirt_light', 'shirt/nintendo_shirt_lighter',
   'pants/kiss_pants', 'pants/mongolia_fighting_pants', 'pants/rainbow_leggings',
   'dress/teaport', 'skirt/bell_skirt', 'shoes/slouch_boots', 'shoes/sweet_heart_shoes',
+  // Row G359: two more SWF-only greyscale masters, under the same rule.
+  'shirt/glitchfashionShirt_loose', 'skirt/brazil_carnival_tail_skirt',
 ];
+/** SWF-only articles in their own colours (G18, G359). */
+const OWN_COLOURS = ['coat/RideRainbow', 'hair/BrowStache', 'coat/caterpillar_coat_01', 'coat/caterpillar_coat_02'];
 
 describe('saved colourway indices', () => {
   // Saved looks store variant[type] as an index into the article's colourways
@@ -79,9 +83,9 @@ describe('saved colourway indices', () => {
     }
     assert.deepEqual(
       Object.entries(catalog.types).flatMap(([t, l]) => l.filter((i) => !i.gsjsId && t !== 'nose').map((i) => `${t}/${i.name}`)).sort(),
-      ['coat/RideRainbow', 'hair/BrowStache', ...REIMAGINED].sort(),
+      [...OWN_COLOURS, ...REIMAGINED].sort(),
     );
-    assert.equal(extras, 2 + REIMAGINED.length);
+    assert.equal(extras, OWN_COLOURS.length + REIMAGINED.length);
   });
 
   it('random looks (and the seeded NPC looks) draw only from the GSJS wardrobe', () => {
@@ -164,7 +168,7 @@ describe('morph shapes (shape tweens)', () => {
 describe('reimagined greyscale masters (row G52)', () => {
   const entries = Object.entries(manifest.articles).flatMap(([type, list]) => list.filter((e) => typeof e === 'object' && e.reimagined).map((e) => ({ type, ...e })));
 
-  it('lists the 17 masters, each marked and named for its colour source', () => {
+  it('lists the 19 masters, each marked and named for its colour source', () => {
     assert.deepEqual(entries.map((e) => `${e.type}/${e.name}`).sort(), [...REIMAGINED].sort());
     for (const e of entries) {
       const it = item(e.type, e.name);

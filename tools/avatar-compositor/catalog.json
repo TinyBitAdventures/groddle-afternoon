@@ -432,6 +432,18 @@
         "name": "nintendo_shirt_lighter",
         "reimagined": true,
         "borrowedColours": "shirt/nintendo_shirt"
+      },
+      {
+        "name": "glitchfashionShirt_loose",
+        "reimagined": true,
+        "asset": "skirt/glitchfashionShirt.swf",
+        "borrowedColours": "shirt/glitchfashionShirt",
+        "partsFrom": {
+          "backSleeveUpperLeft": "backCoatSleeveUpperLeft",
+          "backSleeveLowerLeft": "backCoatSleeveLowerLeft",
+          "backSleeveUpperRight": "backCoatSleeveUpperRight",
+          "backSleeveLowerRight": "backCoatSleeveLowerRight"
+        }
       }
     ],
     "coat": [
@@ -557,6 +569,14 @@
             "color_1": "D9A520 -10 -10 20 100 100"
           }
         ]
+      },
+      {
+        "name": "caterpillar_coat_01",
+        "ownColours": true
+      },
+      {
+        "name": "caterpillar_coat_02",
+        "ownColours": true
       }
     ],
     "pants": [
@@ -673,6 +693,11 @@
         "name": "bell_skirt",
         "reimagined": true,
         "borrowedColours": "shirt/bell_top"
+      },
+      {
+        "name": "brazil_carnival_tail_skirt",
+        "reimagined": true,
+        "borrowedColours": "pants/brazil_carnival_tail"
       }
     ],
     "dress": [

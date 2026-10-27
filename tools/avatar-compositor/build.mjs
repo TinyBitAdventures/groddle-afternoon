@@ -299,8 +299,17 @@ function buildArticle(type, name, gsjsEntry) {
   if (type === 'hat') partNames.push('sideHatHairMask', 'backHatHairMask');
   const parts = {};
   const ids = new Set();
+  // Manifest `partsFrom` { part: swfClass }: a SWF that exports a part under a
+  // sibling slot's class (skirt/glitchfashionShirt.swf names its back sleeves
+  // backCoatSleeve*; the coat and shirt sleeve containers share one
+  // registration in Avatar2011.fla's guide layers).
+  const from = gsjsEntry?.partsFrom || {};
+  for (const [part, cls] of Object.entries(from)) {
+    if (!partNames.includes(part)) throw new Error(`${type}/${name}: partsFrom ${part} is not a ${type} part`);
+    if (!swf.classes.has(cls)) throw new Error(`${type}/${name}: partsFrom ${part} <- ${cls}, which ${basename(file)} does not export`);
+  }
   for (const part of partNames) {
-    const id = swf.classes.get(part);
+    const id = swf.classes.get(from[part] || part);
     if (id === undefined || !swf.sprites.has(id)) continue;
     const flat = flattenPart(swf, id, RIG_FRAMES);
     if (!flat.variants.some((v) => v.length)) continue;
@@ -386,7 +395,7 @@ function buildData({ only = null } = {}) {
       const reim = typeof e === 'object' && e.reimagined;
       if ((own || reim) && g) throw new Error(`${type}/${name}: ${own ? 'ownColours' : 'reimagined'}, but GSJS lists it`);
       if (own && reim) throw new Error(`${type}/${name}: ownColours and reimagined`);
-      const src = g || ((own || reim) && e.asset ? { asset: e.asset } : undefined);
+      const src = g || ((own || reim) && (e.asset || e.partsFrom) ? { asset: e.asset, partsFrom: e.partsFrom } : undefined);
       const key = `${type}/${name}`;
       let data;
       if (only && !only.has(key)) {

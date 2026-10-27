@@ -61,7 +61,7 @@ const measures = [
   ['Sound keys with a real recording', data.sounds.playable, data.sounds.keys, `the rest are synth stand-ins${data.sounds.deadKeys ? `; ${data.sounds.deadKeys} dead in the final client not counted` : ''}`],
   ['Item icons sharp (3x)', data.icons.sharp, data.icons.items, ''],
   ['Badges with official art', data.badges.officialArt, data.badges.total, ''],
-  ['Wardrobe articles wearable', wardrobe, WARDROBE_SWFS, `${wardrobe - reimaginedWardrobe} + ${reimaginedWardrobe} reimagined (greyscale masters, borrowed colours); bracelets have no container`],
+  ['Wardrobe articles wearable', wardrobe, WARDROBE_SWFS, `${wardrobe - reimaginedWardrobe} + ${reimaginedWardrobe} reimagined (greyscale masters, borrowed colours); the rest are testers, copies of shipped articles and the never-wired bracelets (G359, G360)`],
 ];
 
 /**

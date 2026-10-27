@@ -1712,5 +1712,50 @@
   "status": "unbuilt_original",
   "reason": "Strange Note: only Manor Mystery hands it out (quests/manor_mystery.js:53-55 doProvided), and the original never offered that quest (quest:manor_mystery); no archived street holds one",
   "register": "G125"
+ },
+ "wardrobe:coat/chaulkywhite_coatshirtvest": {
+  "status": "source",
+  "reason": "ships as coat/chaulkywhite_coatshirtvest_coat: GSJS inc_data_clothing.js:56073 lists this SWF as the coat-slot asset of class chaulkywhite_coatshirtvest (worn in two slots), so the catalog names it apart from shirt/chaulkywhite_coatshirtvest",
+  "register": "G359"
+ },
+ "wardrobe:skirt/RideBurgerCar": {
+  "status": "source",
+  "reason": "byte-identical (md5 c2e8f4ce) to coat/RideBurgerCar.swf, which the catalog ships; GSJS (inc_data_clothing.js 1556, inc_data_swfs_avatar_prod.js:270) only knows the coat; it holds coat parts only, so the skirt slot would draw nothing",
+  "register": "G359"
+ },
+ "wardrobe:skirt/RidePig": {
+  "status": "source",
+  "reason": "byte-identical (md5 e8e82b53) to coat/RidePig.swf, which the catalog ships; GSJS (inc_data_clothing.js 1555, inc_data_swfs_avatar_prod.js:273) only knows the coat; it holds coat parts only",
+  "register": "G359"
+ },
+ "wardrobe:skirt/Women_Plain_Dress": {
+  "status": "source",
+  "reason": "misfiled copy of dress/Women_Plain_Dress (shipped): the same dress parts, frame for frame, 3 of 76 shapes 0.05 px apart; it exports no skirt or backSkirt part, so the skirt slot (AvatarSwf.as addSkirt) would draw nothing; GSJS clothing uses the dress asset",
+  "register": "G359"
+ },
+ "wardrobe:dress/female_steampunk_skirt": {
+  "status": "excluded",
+  "reason": "work copy of skirt/female_steampunk_skirt (shipped, the GSJS asset, inc_data_clothing.js:47761): it exports skirt parts, not dress ones, and its skirt symbol still holds the preview legs and a black backdrop (68 shapes against the clean 27)",
+  "register": "G359"
+ },
+ "wardrobe:shirt/female_steampunk_skirt": {
+  "status": "excluded",
+  "reason": "work copy of skirt/female_steampunk_skirt (shipped, the GSJS asset): skirt parts only, and its skirt symbol still holds the preview legs and a black backdrop",
+  "register": "G359"
+ },
+ "wardrobe:skirt/glitchfashionShirt": {
+  "status": "reimagined",
+  "reason": "a looser, earlier cut of shirt/glitchfashionShirt filed under skirt/ (not in inc_data_swfs_avatar_prod.js, no GSJS article): ships as shirt/glitchfashionShirt_loose, a greyscale master with the shirt's colourways (G52 rule), its backCoatSleeve* classes worn as the back sleeves (manifest partsFrom)",
+  "register": "G359"
+ },
+ "wardrobe:bracelet/bracelet_B010": {
+  "status": "unbuilt_original",
+  "reason": "the client can wear a bracelet (AvatarSwf.as:1820-1824 addBracelet) but GSJS has no bracelet slot or article and no avatar package lists one; Avatar.swf and Avatar2011.fla never place sideBraceletCloseContainer_mc",
+  "register": "G360"
+ },
+ "wardrobe:bracelet/bracelet_B010_grey": {
+  "status": "unbuilt_original",
+  "reason": "greyscale (color_1) twin of bracelet_B010; same as it: no GSJS bracelet slot, side container never placed",
+  "register": "G360"
  }
 }

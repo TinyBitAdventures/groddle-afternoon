@@ -164,6 +164,8 @@ const ROWS = [
   ['shirt/chaulkywhite_shirtvest', 'Chaulkywhite shirt and vest', S],
   ['shirt/female_steampunk_blouse', 'Steampunk blouse', S],
   ['shirt/glitchfashionShirt', 'Glitchfashion shirt', S],
+  // skirt/glitchfashionShirt.swf: an earlier, looser cut of the shirt filed under skirt/ (G359).
+  ['shirt/glitchfashionShirt_loose', 'Glitchfashion shirt, loose', O],
   ['shirt/gypsy_shirt', 'Boho shirt', O],
   ['shirt/japnese_school_girl_sexy_top', 'Japanese school top', S],
   ['shirt/kendo_tor', 'Kendo top', S],
@@ -208,6 +210,8 @@ const ROWS = [
   ['coat/train_03_coat', 'Train coat 3', S],
   ['coat/train_04_coat', 'Train coat 4', S],
   ['coat/train_05_coat', 'Train coat 5', S],
+  ['coat/caterpillar_coat_01', 'Caterpillar coat 1', S],
+  ['coat/caterpillar_coat_02', 'Caterpillar coat 2', S],
 
   // Trousers
   ['pants/Godzilla_Pants', 'Godzilla pants', S],
@@ -234,6 +238,8 @@ const ROWS = [
   ['skirt/Hawaii_long', 'Long Hawaiian skirt', S],
   ['skirt/japnese_school_girl_sexy_skirt', 'Japanese school skirt', S],
   ['skirt/Leather_Skirt', 'Leather skirt', S],
+  // The skirt slot draws only its belt; the tail is a pants part (AvatarSwf.as addSkirt), G359.
+  ['skirt/brazil_carnival_tail_skirt', 'Brazil carnival belt', O],
 
   // Dresses
   ['dress/Nevermore_Dress', 'Nevermore dress', S],
