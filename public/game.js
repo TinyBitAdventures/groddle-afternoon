@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-15';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-195';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-196';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -21293,6 +21293,8 @@ function renderBuffsPanel() {
  * with no item_class (BuffUI.as setIcon 156-171: Pooped, Super Pooped), else an apple.
  */
 function buffIconUrl(row) {
+  // A system that draws its own tray icon (Ancestral Nostalgia: none, as BuffUI.as shows it).
+  if (row?.iconUrl) return row.iconUrl;
   const item = row?.sourceItem || row?.def?.itemClass;
   if (item) return `assets/sprites/icons/${item}.png`;
   return row?.def?.isDebuff ? 'assets/ui/buff-debuff.svg' : 'assets/sprites/icons/apple.png';

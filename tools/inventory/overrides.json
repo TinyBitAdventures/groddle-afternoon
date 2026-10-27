@@ -527,8 +527,7 @@
   "register": "G329"
  },
  "system:players/inc_special_locations": {
-  "status": "partial",
-  "reason": "Baqala/Savanna Ancestral Lands timer: the remake has no 10-minute limit by design (G39)"
+  "checklist": "ancestral-lands"
  },
  "system:items/include/animal_naming": {
   "checklist": "piggies"

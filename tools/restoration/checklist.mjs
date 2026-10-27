@@ -98,6 +98,9 @@ export const CHECKLIST = Object.freeze([
   { id: 'vicars-peak', group: 'world', name: 'Vicar’s Peak', status: 'rebuilt',
     blurb: 'The Groddle Heights cliff behind Thornfad Layers’ locked door (Door Key 1): seven tiers of pebbly ledges, wooden ladders twined with vines, and a stone-arched door at the top that leads on to Mossystep. Home to 11 Piggies, 7 Chickens and a Metal Rock, as its loading card said. Its layout was never archived, so it is a reconstruction from a 2011 party recording and two players’ 2012 Snaps, built with Tiny Speck’s own Heights art.',
     evidence: ['public/js/vicars-peak.js', 'public/js/features/vicars-peak-feature.js', 'public/assets/streets/GCR1516SFHM122V.json', 'tools/build-vicars-peak.mjs'] },
+  { id: 'ancestral-lands', group: 'world', name: 'The Ancestral Lands', status: 'source',
+    blurb: 'Baqala, Choru, Zhambu and Xalanga weigh on you: Overwhelming Ancestral Nostalgia gives you 10 minutes a visit (11 and 12 with the two Prepared For Ancestral Nostalgia cards), Dust Trap remnants and Ancestral Spirits buy time back, and time away wins half of it back. Run out and you are Overwhelmed: sent to a street beyond the savanna and kept out for half an hour. The longer you stay, the bolder the Juju Bandits get.',
+    evidence: ['public/js/ancestral-nostalgia.js', 'public/js/ancestral-nostalgia-data.js', 'public/js/features/juju-bandits-feature.js', 'public/js/juju-bandits.js', 'tests/g39-ancestral-nostalgia.test.js'] },
 
   // —— Creatures & trees ——
   { id: 'piggies', group: 'creatures', name: 'Piggies', status: 'source', spot: 'piggy',

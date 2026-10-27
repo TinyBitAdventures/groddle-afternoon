@@ -33,9 +33,11 @@
  *   only on your home street) becomes a different random tree at health 4,
  *   maturity max(4, maturity - 3). A street tree's spot goes to the patches
  *   feature, as for a tree that died (tree-death-feature `replaced`).
- * - Charades Potion and Ancestral Spirits show their solo refusals: Charades
- *   needs other players; Ancestral Spirits needs Overwhelming Ancestral
- *   Nostalgia, the Ancestral Lands timer the remake leaves out (G39).
+ * - Charades Potion shows its solo refusal (it needs other players).
+ * - Ancestral Spirits: only under Overwhelming Ancestral Nostalgia in the
+ *   Ancestral Lands, once a visit; give_baqala_time(300) puts five minutes
+ *   back on the visit (G39: the juju-bandits feature owns the clock and
+ *   answers engine.query ancestralSpiritsState / ancestralSpiritsQuaff).
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&potiondemo=1 packs one
  *   of every potion here, a Yellow-Purple Triangle Key and a Rug (open the
@@ -98,7 +100,7 @@ import {
 } from '../potions.js?v=g149-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { patchesFeature } from './patches-feature.js?v=patches-15';
-import { homesFeature } from './homes-feature.js?v=homes-53';
+import { homesFeature } from './homes-feature.js?v=homes-54';
 import { streetTreeIndex } from './tree-death-feature.js?v=tree-death-18';
 import { questRoomConverse } from './quest-instances-feature.js?v=qi-17';
 
@@ -230,7 +232,7 @@ function checkFor(classTsid, engine) {
       // player-verbs-mp-feature (which answers nothing in solo).
       return engine.query?.('charadesCheck', engine) || charadesCheck({ players: 1 });
     case 'potion_ancestral_spirits':
-      return ancestralCheck({ nostalgia: engine.hasBuff('ancestral_nostalgia') });
+      return ancestralCheck(engine.query?.('ancestralSpiritsState', engine) || { nostalgia: engine.hasBuff('ancestral_nostalgia') });
     case 'potion_animal_youth': {
       const target = closestAnimal(engine);
       return { ...animalYouthCheck(target), target };
@@ -435,6 +437,11 @@ const EFFECTS = {
   // Player verbs, multiplayer: onQuaff asks for the secret word (potion_charades.js 541-552); the potion
   // goes once the realtime server takes it (player-verbs-mp-feature). Solo never gets here.
   potion_charades: (engine) => engine.query?.('charadesQuaff', engine) || { ok: false },
+  // potion_ancestral_spirits.js onQuaff (517-521): give_baqala_time(300), potion_used, "Your nostalgia subsides somewhat."
+  potion_ancestral_spirits(engine) {
+    const given = engine.query?.('ancestralSpiritsQuaff', engine);
+    return given == null ? { ok: false } : { ok: true, msg: POTION_TEXT.ancestralDone, tag: `nostalgia+${Math.round(given)}` };
+  },
 
   potion_trantsformation_fluid(engine, { target }) {
     if (!target?.state || !(engine.interactables || []).includes(target)) return { ok: false };

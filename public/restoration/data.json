@@ -312,6 +312,24 @@
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&streetdemo=GCR1516SFHM122V&streetx=1000&streety=215&practice=1"
   },
   {
+   "id": "ancestral-lands",
+   "group": "world",
+   "name": "The Ancestral Lands",
+   "status": "source",
+   "blurb": "Baqala, Choru, Zhambu and Xalanga weigh on you: Overwhelming Ancestral Nostalgia gives you 10 minutes a visit (11 and 12 with the two Prepared For Ancestral Nostalgia cards), Dust Trap remnants and Ancestral Spirits buy time back, and time away wins half of it back. Run out and you are Overwhelmed: sent to a street beyond the savanna and kept out for half an hour. The longer you stay, the bolder the Juju Bandits get.",
+   "multiplayer": null,
+   "spot": null,
+   "evidence": [
+    "public/js/ancestral-nostalgia.js",
+    "public/js/ancestral-nostalgia-data.js",
+    "public/js/features/juju-bandits-feature.js",
+    "public/js/juju-bandits.js",
+    "tests/g39-ancestral-nostalgia.test.js"
+   ],
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=GA5P9MNTJK42IJS&nostalgiademo=60&practice=1"
+  },
+  {
    "id": "piggies",
    "group": "creatures",
    "name": "Piggies",
@@ -1202,14 +1220,14 @@
   }
  ],
  "tally": {
-  "source": 52,
+  "source": 53,
   "rebuilt": 10,
   "solo": 6,
   "reimagined": 2,
   "progress": 1
  },
- "back": 70,
- "possible": 71,
+ "back": 71,
+ "possible": 72,
  "multiplayer": 20,
  "quests": {
   "total": 445,
@@ -2161,8 +2179,7 @@
  "imagination": {
   "total": 275,
   "counts": {
-   "live": 241,
-   "later": 2,
+   "live": 243,
    "starter": 9,
    "none": 6,
    "multiplayer": 10,
@@ -2607,9 +2624,14 @@
   ]
  },
  "git": {
-  "commits": 609,
+  "commits": 610,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "Paid furniture styles sell for currants, 1,000 a credit"
+   },
    {
     "date": "2026-10-27",
     "kind": "new",
@@ -2724,14 +2746,9 @@
     "date": "2026-10-27",
     "kind": "new",
     "text": "New players finish their character from the emailed link, and the bag quest says how many bags it still wants"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "fix",
-    "text": "The online page loads the bags build"
    }
   ]
  },
- "tests": 362,
+ "tests": 363,
  "generatedAt": "2026-10-27"
 }

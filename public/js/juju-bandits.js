@@ -36,13 +36,15 @@
  *      it was a logout. Walking between Savanna streets changes nothing.
  *      baqala_times lives on the player, so it survives a relog.
  *
- * G39 (Austin): the remake tracks that clock and uses the source theft curve,
- * but has no Ancestral Nostalgia buff and no 10-minute kick
- * (check_baqala_boot / do_baqala_boot, too_much_nostalgia), so the only resets
- * are the source's own: entering with no banked time, and a reset game. The
- * clock counts real play time (the game's ticker; a hidden or paused tab does
- * not count). The ancestral_lands_time cards only lengthen the buff, not this
- * clock, so they stay 'later' (imagination-remake.js).
+ * G39 (Austin 10-27, reversing 10-22's "track time, no kick"): the Ancestral
+ * Nostalgia buff, the kick (check_baqala_boot / do_baqala_boot) and
+ * too_much_nostalgia run on this clock (js/ancestral-nostalgia.js, driven by
+ * features/juju-bandits-feature.js); the kick and the end of
+ * too_much_nostalgia reset it (reset_baqala_times). The clock counts real
+ * play time (the game's ticker; a hidden or paused tab does not count). The
+ * ancestral_lands_time cards lengthen the buff, not this clock, so with them
+ * you stay past the 9 minutes where every Dust Trap payout brings a thief;
+ * Dust Trap remnants and Ancestral Spirits take time off it.
  */
 
 export const JUJU_SOURCE = 'tinyspeck/glitch-GameServerJS CC0 items/npc_juju_bandit.js, players/inc_special_locations.js, items/dust_trap.js';

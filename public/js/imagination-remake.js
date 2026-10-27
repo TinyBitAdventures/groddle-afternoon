@@ -139,7 +139,9 @@ const RULES = [
   [/^icon_tithe_[1-4]$/, 'live', 'Tithing an Icon costs 3 / 5 / 10 / 20% fewer currants.'],
   [/^icon_bestow_chance_[1-3]$/, 'live', 'Placed Icons bestow Giant Love 5.5 / 6 / 6.5% of the time (from 5%).'],
   [/^transcendental_/, 'multiplayer', 'Transcendental Radiation needs other players.'],
-  [/^ancestral_lands_time_[12]$/, 'later', 'These add a minute to Ancestral Nostalgia, the 10-minute stay before the kick, and the remake has no 10-minute limit by design (G39); the Juju Bandit clock counts time spent, so they would change nothing.'],
+  // inc_special_locations.js 46-51 / 133-138, catalog_buffs.js 31-36, inc_imagination.js 175-176 (G39, js/ancestral-nostalgia.js).
+  [/^ancestral_lands_time_1$/, 'live', 'Overwhelming Ancestral Nostalgia lasts 11 minutes instead of 10, so you can stay a minute longer in the Ancestral Lands before you are sent away.'],
+  [/^ancestral_lands_time_2$/, 'live', 'Overwhelming Ancestral Nostalgia lasts 12 minutes.'],
   [/^rube_better_items$/, 'live', 'The Rube treats you as 10 levels higher when choosing what to offer: no more cheap items.'],
   [/^rube_chance_to_meet$/, 'live', 'The Rube visits on 1% of street entries (from 0.5%).'],
   [/^unlearning_ability$/, 'live', 'Unlearn a skill from the Skills panel in the time it took to learn.'],

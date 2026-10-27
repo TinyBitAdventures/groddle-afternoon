@@ -224,10 +224,10 @@ describe('the Ancestral Lands clock (baqala_times, G39: no kick)', () => {
     assert.match(img, /ancestral_lands_time\/\.exec\(class_tsid\) && this\.buffs_has\("ancestral_nostalgia"\)\) \{\s*this\.buffs_extend_time\("ancestral_nostalgia", 60\);/);
   });
 
-  it('leaves the Prepared For Ancestral Nostalgia cards for later (no 10-minute limit)', () => {
+  it('deals the Prepared For Ancestral Nostalgia cards now the visit is limited (G39, Austin 10-27)', () => {
     for (const id of ['ancestral_lands_time_1', 'ancestral_lands_time_2']) {
-      assert.equal(remakeStatus(id).status, 'later');
-      assert.match(remakeStatus(id).note, /no 10-minute limit by design \(G39\)/);
+      assert.equal(remakeStatus(id).status, 'live');
+      assert.match(remakeStatus(id).note, /Overwhelming Ancestral Nostalgia lasts 1[12] minutes/);
     }
   });
 });
@@ -274,7 +274,7 @@ describe('the Juju feature on the clock', () => {
     feature.restore({ ancestral: { spent: 9 * 60 } });
     enter(engine, savanna);
     assert.equal(feature._state().stealChance, 1);
-    // Past the roll: the empty pack is what stops it now (no 10-minute kick either).
+    // Past the roll: the empty pack is what stops it now (a minute of Ancestral Nostalgia left).
     assert.equal(trap(engine), 'no-juju:nothing_to_take');
   });
 

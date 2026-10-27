@@ -41,6 +41,8 @@ export const PLAY_ROUTES = Object.freeze({
   // G152: a full pack with an empty Generic Bag: click the bag, drag a stack in.
   bags: `${BASE}&bagdemo=1`,
   'better-learning': `${BASE}&skilltree=betterlearning_1`,
+  // Dust Path 1A in Baqala with a minute of Ancestral Nostalgia left: wait for the kick, or trigger a Dust Trap first.
+  'ancestral-lands': `${BASE}&streetdemo=GA5P9MNTJK42IJS&nostalgiademo=60`,
   levels: `${BASE}&leveldemo=1`,
   feats: `${BASE}&companiondemo=feat`,
   seasons: `${BASE}&season=zilloween&seasondemo=1`,

@@ -94,8 +94,9 @@ describe('statuses (imagination-remake.js)', () => {
     assert.equal(remakeStatus('meditative_arts_less_distraction').status, 'multiplayer');
     assert.equal(remakeStatus('meditative_arts_less_distraction_2').status, 'multiplayer');
     const later = Object.keys(IMAGINATION_UPGRADES).filter((id) => remakeStatus(id).status === 'later').sort();
-    // G358 dealt the three Bonus Furniture Upgrade cards (tests/g358-furniture-upgrades.test.js).
-    assert.deepEqual(later, ['ancestral_lands_time_1', 'ancestral_lands_time_2']);
+    // G358 dealt the three Bonus Furniture Upgrade cards (tests/g358-furniture-upgrades.test.js);
+    // G39 the two Prepared For Ancestral Nostalgia cards (tests/g39-ancestral-nostalgia.test.js).
+    assert.deepEqual(later, []);
   });
 });
 

@@ -19,7 +19,21 @@
  * play time in the Savanna hubs, loses half the time you spend away when you
  * come back, clamps 600+ s to 585 s on entry, and survives a reload (the
  * source kept it on the player; a reload in the Savanna is a relog, so no
- * decay). G39: no Ancestral Nostalgia buff, no 10-minute kick, no HUD cue.
+ * decay).
+ *
+ * G39 / G151 (Austin 2026-10-27, reversing 10-22): the visit is limited again
+ * (js/ancestral-nostalgia.js). Entering the Savanna applies Overwhelming
+ * Ancestral Nostalgia with the source's activity line; the buff's time left
+ * is its full length (10 min, 11 with Prepared For Ancestral Nostalgia I, 12
+ * with II) minus the clock, so the cards, the Dust Trap remnants
+ * (give_baqala_time 10 to 60 s) and Ancestral Spirits (300 s, once a visit)
+ * move both. When it runs out in the Savanna: Overwhelmed by Ancestral
+ * Nostalgia (30 min, counts while away), the clock starts over, and you are
+ * sent to one of the 26 do_baqala_boot streets at a signpost or door that
+ * leads there; the first time, the "Overwhelmed!" prompt explains. Coming back
+ * while overwhelmed shows the other "Overwhelmed!" prompt and sends you away
+ * again. The kick waits while you are in a quest room or scene, a dialogue
+ * or a verb (the source sent you mid-anything).
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=<Savanna street>
  *   &jujudemo=offer|steal   a Juju appears 1 s after load (offer needs the quest new)
@@ -27,9 +41,15 @@
  *   &jujutime=<seconds>     preset the Ancestral Lands clock on the first street
  *   &jujuitem=<class>       the item a stealing Juju wants (default: the first it finds)
  *   &jujuautoplay=accept|decline  answer the offer
+ *   &nostalgiademo=<seconds>  Ancestral Nostalgia has this long left on the first
+ *                           Savanna street (1 = 20 s); =overwhelmed starts you
+ *                           overwhelmed (the entry prompt, then the kick)
+ *   &nostalgiadest=<tsid>   where the kick sends you (one of the 26)
  * Canvas data: jujuState, jujuMode, jujuItem, jujuLast, jujuEscaped, jujuX,
  *   jujuAncestralSeconds, jujuAncestralInside, jujuStealChance (the curve now;
- *   0 outside the Savanna).
+ *   0 outside the Savanna), nostalgiaState (''|inside|overwhelmed|booting),
+ *   nostalgiaLeft (seconds), nostalgiaLimit, nostalgiaKicks, nostalgiaLast,
+ *   nostalgiaPotion (1 once Ancestral Spirits is used this visit).
  */
 
 import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unified-7';
@@ -59,7 +79,19 @@ import {
   redeclareDelay,
   stealChanceForSeconds,
   withinReach,
-} from '../juju-bandits.js?v=g39-3';
+} from '../juju-bandits.js?v=g364-1';
+import {
+  NOSTALGIA_BUFF,
+  NOSTALGIA_TEXT,
+  OVERWHELMED_BUFF,
+  NOSTALGIA,
+  buffLeftSeconds,
+  giveBaqalaTime,
+  nostalgiaLimitSeconds,
+  pickBootTarget,
+  resetBaqalaTimes,
+} from '../ancestral-nostalgia.js?v=g39-nostalgia-1';
+import { NOSTALGIA_BOOT_STREETS } from '../ancestral-nostalgia-data.js?v=g39-nostalgia-1';
 
 export const JUJU_FEATURE_ID = 'juju-bandits';
 const Z = 30;
@@ -81,6 +113,29 @@ let relog = false;
 let presetDone = false;
 let lastTickAt = 0;
 let publishedSecond = -1;
+/**
+ * Ancestral Nostalgia (js/ancestral-nostalgia.js), saved beside the clock:
+ * kicks, the once-only exit prompt (too_much_nostalgia_prompt: the source
+ * never clears it, since overwhelmed_prompt_callback tests the flag the wrong
+ * way round, inc_special_locations.js 242-246), overwhelmed (so
+ * too_much_nostalgia's on_remove runs even when it ran out while away) and
+ * potion_used (Ancestral Spirits once a visit).
+ */
+let nostalgia = freshNostalgia();
+/** A kick waiting for a free moment: { reason: 'expired'|'overwhelmed', nextAt }. */
+let pendingBoot = null;
+/** on_overwhelmed_prompt: the entry prompt is up. */
+let enterPromptUp = false;
+let nostalgiaLast = '';
+let nostalgiaPresetDone = false;
+let publishedLeft = null;
+/** start_baqala_buff's sendActivity, due at this time (0: none). */
+let warnAt = 0;
+const WARN_DELAY_MS = 1500;
+
+function freshNostalgia() {
+  return { kicks: 0, exitPromptShown: false, overwhelmed: false, potionUsed: false };
+}
 
 const pcLabel = () => JUJU_PLAYER_LABEL;
 
@@ -117,29 +172,232 @@ function publishClock(engine) {
   engine.setData('jujuAncestralSeconds', sec);
   engine.setData('jujuAncestralInside', clock.inside ? 1 : 0);
   engine.setData('jujuStealChance', stealChanceNow());
+  publishNostalgia(engine);
 }
 
-/** region_on_enter / region_login for the Savanna (locations/inc_regions.js, savanna.js). */
-function trackRegion(street, engine, now) {
-  const savanna = isSavannaHub(street?.hubId);
-  if (relog) {
-    relog = false;
-    // Logged out in the Savanna (leave_savanna(true)): logging back in there
-    // starts again without decay; landing anywhere else counts as walking out now.
-    if (savanna) ancestralEnter(clock, now);
-    else {
-      clock.loggedOut = false;
-      clock.exitAt = now;
-    }
-  } else if (savanna && !clock.inside) ancestralEnter(clock, now);
-  else if (!savanna && clock.inside) ancestralLeave(clock, now, false);
+/* ------------------------------------------------------------------ */
+/* Ancestral Nostalgia (js/ancestral-nostalgia.js)                      */
+/* ------------------------------------------------------------------ */
+
+/** The buff tray shows no icon for it: no item_class and not a debuff (BuffUI.as setIcon 156-173). */
+const NOSTALGIA_ICON = 'assets/ui/buff-none.svg';
+const HELD_BY = 'ancestral-lands';
+const RETRY_MS = 3000;
+
+const ownedCards = (engine) => (Array.isArray(engine?.pc?.imaginationUpgrades) ? engine.pc.imaginationUpgrades : []);
+const buffOn = (engine, id) => (typeof engine?.hasBuff === 'function' ? Boolean(engine.hasBuff(id)) : false);
+const inSavanna = (engine) => isSavannaHub(engine?.street?.hubId);
+const nostalgiaLeft = (engine) => buffLeftSeconds(ancestralSeconds(clock), ownedCards(engine));
+
+function nostalgiaState(engine) {
+  if (pendingBoot) return 'booting';
+  if (buffOn(engine, OVERWHELMED_BUFF)) return 'overwhelmed';
+  return clock.inside && inSavanna(engine) ? 'inside' : '';
+}
+
+function publishNostalgia(engine) {
+  const left = clock.inside ? Math.max(0, Math.ceil(nostalgiaLeft(engine))) : '';
+  publishedLeft = left;
+  engine.setData('nostalgiaState', nostalgiaState(engine));
+  engine.setData('nostalgiaLeft', left);
+  engine.setData('nostalgiaLimit', nostalgiaLimitSeconds(ownedCards(engine)));
+  engine.setData('nostalgiaKicks', nostalgia.kicks);
+  engine.setData('nostalgiaLast', nostalgiaLast);
+  engine.setData('nostalgiaPotion', nostalgia.potionUsed ? 1 : 0);
+}
+
+/**
+ * Keep the tray's Overwhelming Ancestral Nostalgia on the clock: its time
+ * left is the full length minus the clock (never under a second, so the
+ * tray's own expiry never beats the kick), and it cannot be ended by hand.
+ */
+function syncNostalgiaBuff(engine, now, { quiet = true } = {}) {
+  if (typeof engine?.applyBuff !== 'function') return;
+  const left = nostalgiaLeft(engine);
+  if (left <= 0) return;
+  if (!buffOn(engine, NOSTALGIA_BUFF)) engine.applyBuff('ancestral_nostalgia', { quiet });
+  const row = engine.buffRow?.(NOSTALGIA_BUFF);
+  if (!row) return;
+  row.expiresAt = now + Math.max(1000, Math.round(left * 1000));
+  row.heldBy = HELD_BY;
+  row.iconUrl = NOSTALGIA_ICON;
+}
+
+function holdOverwhelmed(engine) {
+  const row = engine?.buffRow?.(OVERWHELMED_BUFF);
+  if (row) row.heldBy = HELD_BY;
+}
+
+/** too_much_nostalgia on_remove: reset_baqala_times (also when it ran out while you were away). */
+function syncOverwhelmed(engine) {
+  if (!nostalgia.overwhelmed || typeof engine?.hasBuff !== 'function') return;
+  if (engine.hasBuff(OVERWHELMED_BUFF)) {
+    holdOverwhelmed(engine);
+    return;
+  }
+  nostalgia.overwhelmed = false;
+  if (!clock.inside) resetBaqalaTimes(clock);
+  nostalgiaLast = 'recovered';
+}
+
+/** check_baqala_boot / the entry prompt's OK: send you away at the next free moment. */
+function requestBoot(reason) {
+  if (!pendingBoot) pendingBoot = { reason, nextAt: 0 };
+}
+
+/** Never mid-room, mid-dialogue or mid-verb (the source teleported you whatever you were doing). */
+function canBootNow(engine) {
+  if (!engine?.street || !inSavanna(engine)) return false;
+  if (engine.inScene?.() || engine.transientInstance?.()) return false;
+  if (engine.questDialogueOpen?.() || engine.acting?.()) return false;
+  return true;
+}
+
+function bootTarget(engine) {
+  const forced = engine.param?.('nostalgiadest');
+  const rows = forced ? NOSTALGIA_BOOT_STREETS.filter((r) => r.tsid === forced || r.source === forced) : [];
+  const exists = (tsid) => (typeof engine?.streetExists === 'function' ? engine.streetExists(tsid) : true);
+  return pickBootTarget(rows.length ? rows : NOSTALGIA_BOOT_STREETS, { exists });
+}
+
+function showNostalgiaPrompt(engine, text, onChoice = null) {
+  if (typeof engine?.prompt !== 'function') {
+    onChoice?.('ok');
+    return;
+  }
+  engine.prompt({
+    modal: true,
+    title: NOSTALGIA_TEXT.title,
+    text,
+    choices: [{ value: 'ok', label: NOSTALGIA_TEXT.ok }],
+    onChoice,
+  });
+}
+
+/**
+ * do_baqala_boot: too_much_nostalgia (check_baqala_boot applies it when the
+ * buff ran out), reset_baqala_times, then a teleport to one of the 26
+ * streets at a signpost or door that leads there. The first time, the exit
+ * prompt (savanna_on_exit) once you land.
+ */
+function boot(engine, now) {
+  const { reason } = pendingBoot;
+  const target = bootTarget(engine);
+  if (!target) {
+    pendingBoot = null;
+    nostalgiaLast = 'boot:no_target';
+    return;
+  }
+  if (reason !== 'retry') {
+    resetBaqalaTimes(clock);
+    publishedSecond = -1;
+    if (buffOn(engine, NOSTALGIA_BUFF)) engine.removeBuff?.(NOSTALGIA_BUFF);
+    if (!buffOn(engine, OVERWHELMED_BUFF)) engine.applyBuff?.('too_much_nostalgia');
+    holdOverwhelmed(engine);
+    nostalgia.overwhelmed = true;
+    nostalgia.potionUsed = false;
+    nostalgia.kicks += 1;
+  }
+  pendingBoot = { reason: 'retry', nextAt: Infinity };
+  nostalgiaLast = `boot:${reason}:${target.tsid}`;
+  engine.save?.();
+  publishNostalgia(engine);
+  Promise.resolve(engine.travel?.(target.tsid, { arrive: target.arrive, label: target.label, via: 'nostalgia' }))
+    .then((res) => {
+      if (res && res.ok === false) {
+        // Still in the Savanna (a travel gate, a failed load): try again shortly.
+        pendingBoot = { reason: 'retry', nextAt: Date.now() + RETRY_MS };
+        nostalgiaLast = `boot:failed:${res.reason || ''}`;
+        publishNostalgia(engine);
+        return;
+      }
+      pendingBoot = null;
+      nostalgiaLast = `kicked:${target.tsid}`;
+      if (!nostalgia.exitPromptShown) {
+        nostalgia.exitPromptShown = true;
+        showNostalgiaPrompt(engine, NOSTALGIA_TEXT.kicked);
+      }
+      engine.save?.();
+      publishNostalgia(engine);
+    }, () => {
+      pendingBoot = { reason: 'retry', nextAt: Date.now() + RETRY_MS };
+    });
+}
+
+/** QA presets on the first street: &jujutime, &nostalgiademo. */
+function applyPresets(engine, savanna) {
   const preset = engine.param('jujutime');
   if (!presetDone && preset !== null && Number.isFinite(Number(preset))) {
     clock.spent = Math.max(0, Number(preset));
     clock.exitAt = null;
   }
   presetDone = true;
+  const demo = engine.param('nostalgiademo');
+  if (nostalgiaPresetDone || demo === null || !savanna || !clock.inside) return;
+  nostalgiaPresetDone = true;
+  const leftWanted = demo === '1' || demo === '' ? 20 : Number(demo);
+  if (Number.isFinite(leftWanted) && leftWanted > 0) {
+    clock.spent = Math.max(0, nostalgiaLimitSeconds(ownedCards(engine)) - leftWanted);
+    clock.exitAt = null;
+  }
+}
+
+/** region_on_enter / region_login for the Savanna (locations/inc_regions.js, savanna.js). */
+function trackRegion(street, engine, now) {
+  const savanna = isSavannaHub(street?.hubId);
+  const wasInside = clock.inside;
+  const login = relog;
+  // QA: start overwhelmed (as after a kick, with its prompt already seen).
+  if (!nostalgiaPresetDone && engine.param('nostalgiademo') === 'overwhelmed') {
+    nostalgiaPresetDone = true;
+    if (!buffOn(engine, OVERWHELMED_BUFF)) engine.applyBuff?.('too_much_nostalgia', { quiet: true });
+    resetBaqalaTimes(clock);
+    relog = false;
+    nostalgia.overwhelmed = true;
+    nostalgia.exitPromptShown = true;
+  }
+  syncOverwhelmed(engine);
+  const overwhelmed = buffOn(engine, OVERWHELMED_BUFF);
+  if (relog) {
+    relog = false;
+    // Logged out in the Savanna (leave_savanna(true)): logging back in there
+    // starts again without decay; landing anywhere else counts as walking out now.
+    if (savanna && !overwhelmed) ancestralEnter(clock, now);
+    else if (!savanna) {
+      clock.loggedOut = false;
+      clock.exitAt = now;
+    }
+  } else if (savanna && !clock.inside && !overwhelmed) ancestralEnter(clock, now);
+  else if (!savanna && clock.inside) ancestralLeave(clock, now, false);
+  applyPresets(engine, savanna);
   lastTickAt = now;
+
+  if (savanna && overwhelmed) {
+    // savanna_on_enter 6-18: "Oh, this is too much!" and OK sends you away (no clock, no buff).
+    nostalgiaLast = 'overwhelmed';
+    if (!enterPromptUp && !pendingBoot) {
+      enterPromptUp = true;
+      showNostalgiaPrompt(engine, NOSTALGIA_TEXT.tooMuch, () => {
+        enterPromptUp = false;
+        requestBoot('overwhelmed');
+      });
+    }
+  } else if (savanna && (!wasInside || login)) {
+    // start_baqala_buff: the buff (shortened by the clock) and its line.
+    if (nostalgiaLeft(engine) > 0) syncNostalgiaBuff(engine, now, { quiet: login });
+    // The line lands after the travel's own "Arrived:" line, so it stays in view.
+    warnAt = now + WARN_DELAY_MS;
+    nostalgiaLast = login ? 'login' : 'entered';
+  } else if (!savanna) {
+    if (wasInside) {
+      // leave_savanna: the buff goes and potion_used is forgotten.
+      nostalgia.potionUsed = false;
+      nostalgiaLast = 'left';
+    }
+    // Out of the Savanna, a kick still waiting is moot (not the one under way).
+    if (pendingBoot && pendingBoot.nextAt !== Infinity) pendingBoot = null;
+    if (buffOn(engine, NOSTALGIA_BUFF)) engine.removeBuff?.(NOSTALGIA_BUFF);
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -435,6 +693,26 @@ function walk(engine, dtMs) {
   if (bandit.state !== 'walk') setState(engine, 'walk');
 }
 
+/** Every frame: the buff on the clock, the kick when it runs out, too_much_nostalgia's end. */
+function tickNostalgia(engine, now) {
+  if (warnAt && now >= warnAt) {
+    warnAt = 0;
+    if (clock.inside && inSavanna(engine)) engine.pushActivity?.(NOSTALGIA_TEXT.enter);
+  }
+  if (clock.inside) {
+    if (nostalgiaLeft(engine) > 0) syncNostalgiaBuff(engine, now);
+    else if (inSavanna(engine)) requestBoot('expired');
+    else {
+      // Out of time in a quest room or scene: the tray holds at a second until you are back.
+      const row = engine.buffRow?.(NOSTALGIA_BUFF);
+      if (row) row.expiresAt = now + 1000;
+    }
+  }
+  syncOverwhelmed(engine);
+  if (pendingBoot && now >= pendingBoot.nextAt && canBootNow(engine)) boot(engine, now);
+  if (clock.inside && Math.max(0, Math.ceil(nostalgiaLeft(engine))) !== publishedLeft) publishNostalgia(engine);
+}
+
 /* ------------------------------------------------------------------ */
 /* Feature                                                              */
 /* ------------------------------------------------------------------ */
@@ -470,13 +748,27 @@ export const jujuBanditsFeature = {
   id: JUJU_FEATURE_ID,
 
   save() {
-    return { escaped, ancestral: { ...clock } };
+    return { escaped, ancestral: { ...clock }, nostalgia: { ...nostalgia } };
   },
 
   restore(slice) {
     escaped = Math.max(0, Math.floor(Number(slice?.escaped) || 0));
     clock = ancestralClock(slice?.ancestral);
     presetDone = false;
+    const n = slice?.nostalgia || {};
+    nostalgia = {
+      kicks: Math.max(0, Math.floor(Number(n.kicks) || 0)),
+      exitPromptShown: Boolean(n.exitPromptShown),
+      overwhelmed: Boolean(n.overwhelmed),
+      // leave_savanna(logout) forgets potion_used, so a reload does too.
+      potionUsed: false,
+    };
+    pendingBoot = null;
+    enterPromptUp = false;
+    warnAt = 0;
+    nostalgiaLast = '';
+    nostalgiaPresetDone = false;
+    publishedLeft = null;
     // A reload is a logout and login (region_logout -> leave_savanna(true)).
     relog = clock.inside;
     if (relog) ancestralLeave(clock, Date.now(), true);
@@ -508,6 +800,35 @@ export const jujuBanditsFeature = {
     pendingCurseAt = 0;
   },
 
+  /**
+   * give_baqala_time (engine.query): a Dust Trap remnant's 10 / 20 / 40 / 60 s
+   * (dust_trap.js 51-74). Only under the buff; returns the seconds given.
+   */
+  giveBaqalaTime(seconds, engine) {
+    const given = giveBaqalaTime(clock, seconds, { active: clock.inside && nostalgiaLeft(engine) > 0 });
+    if (given) {
+      publishedSecond = -1;
+      syncNostalgiaBuff(engine, Date.now());
+      publishClock(engine);
+    }
+    return given;
+  },
+
+  /** potion_ancestral_spirits.js canQuaff: under the buff, once a visit (engine.query). */
+  ancestralSpiritsState(engine) {
+    return { nostalgia: clock.inside && inSavanna(engine) && buffOn(engine, NOSTALGIA_BUFF), usedThisVisit: nostalgia.potionUsed };
+  },
+
+  /** potion_ancestral_spirits.js onQuaff: give_baqala_time(300) and potion_used (engine.query). */
+  ancestralSpiritsQuaff(engine) {
+    const state = this.ancestralSpiritsState(engine);
+    if (!state.nostalgia || state.usedThisVisit) return null;
+    const given = this.giveBaqalaTime(NOSTALGIA.potionSeconds, engine);
+    nostalgia.potionUsed = true;
+    publishNostalgia(engine);
+    return given;
+  },
+
   /** dust_trap.js doDrop: every payout may bring a Juju (pc.juju_bandit_curse after 1 s). */
   onEvent(counter, _amount, engine) {
     if (counter !== 'dust_trap:trigger' || bandit || pendingCurseAt) return;
@@ -521,6 +842,7 @@ export const jujuBanditsFeature = {
       if (Math.floor(ancestralSeconds(clock)) !== publishedSecond) publishClock(engine);
     }
     lastTickAt = now;
+    tickNostalgia(engine, now);
     if (pendingCurseAt && now >= pendingCurseAt) {
       pendingCurseAt = 0;
       const mode = demoMode;
@@ -578,7 +900,17 @@ export const jujuBanditsFeature = {
 
   /** QA / tests. */
   _state() {
-    return { bandit, escaped, last, clock: { ...clock }, stealChance: stealChanceNow() };
+    return {
+      bandit,
+      escaped,
+      last,
+      clock: { ...clock },
+      stealChance: stealChanceNow(),
+      nostalgia: { ...nostalgia },
+      pendingBoot: pendingBoot ? { ...pendingBoot } : null,
+      nostalgiaLast,
+      enterPromptUp,
+    };
   },
 };
 

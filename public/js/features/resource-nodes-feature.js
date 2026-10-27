@@ -1395,6 +1395,8 @@ function triggerTrap(engine, entity) {
   if (result.ok && result.baqalaSeconds) {
     engine.floatText(entity.x, entity.y - 120, `+${result.baqalaSeconds}s`, 0xbfe6ff);
     organelleOverlay(engine, entity, result.organelle);
+    // dust_trap.js 54-72 give_baqala_time: the Ancestral Lands clock and its buff (juju-bandits feature, G39).
+    engine.query?.('giveBaqalaTime', result.baqalaSeconds, engine);
   }
   applyResult(engine, entity, result);
 }
