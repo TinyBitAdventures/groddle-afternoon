@@ -471,6 +471,18 @@ export function pickNewxpExit(rng = Math.random, exists = () => true) {
  */
 export const ISLAND_STEPS = Object.freeze(['arrive', 'quest_given', 'bags_done', 'go_home', 'home_done', 'leaving', 'exited']);
 
+/**
+ * The original client's quest progress popup line (QuestQueue.as
+ * handleNextThingInQueue 152-158, for GSJS quest.js announceStateChange
+ * 798-829 quest_req_state): the quest's title, then the requirement's desc
+ * with " (got/need)" when it needs more than one.
+ */
+export function questQueueLine(title, desc, got, need) {
+  const n = Math.max(0, Math.floor(Number(need) || 0));
+  const g = Math.max(0, Math.min(n || Infinity, Math.floor(Number(got) || 0)));
+  return { title: String(title || 'Quest Update'), line: n > 1 ? `${desc} (${g}/${n})` : String(desc) };
+}
+
 /** newbie_island.js hitBox street4_check: null (pass), 'noBags' (back 250) or 'notSoFast' (back 150). */
 export function street4Check(island, bagsDone) {
   if (island === 'leaving' || island === 'exited') return null;

@@ -15,10 +15,10 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=nbhome-7';
-import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=play-9';
-import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=g337-1';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=nbhome-7';
+import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=nbhome-8';
+import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=play-10';
+import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=g337-2';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=nbhome-8';
 import { FEATURES } from '../public/js/features/index.js';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=mp2-1';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=mp2-2';
@@ -310,7 +310,7 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
   const src = (f) => readFileSync(join(ext, 'src', f), 'utf8');
 
   it('declares its tables under its own names, with the keys the routes rely on', () => {
-    assert.deepEqual(Object.keys(manifest.tables).sort(), ['groddle_auctions', 'groddle_buddies', 'groddle_butler_parcels', 'groddle_drops', 'groddle_gifts', 'groddle_group_halls', 'groddle_group_invites', 'groddle_group_members', 'groddle_groups', 'groddle_home_tending', 'groddle_home_visitors', 'groddle_house_keys', 'groddle_ignores', 'groddle_ledger', 'groddle_ledger_credited', 'groddle_ledger_items', 'groddle_ledger_log', 'groddle_ledger_outcomes', 'groddle_mp_saves', 'groddle_players', 'groddle_profiles', 'groddle_solo_backups', 'groddle_trades']);
+    assert.deepEqual(Object.keys(manifest.tables).sort(), ['groddle_auctions', 'groddle_buddies', 'groddle_butler_parcels', 'groddle_drops', 'groddle_gifts', 'groddle_group_halls', 'groddle_group_invites', 'groddle_group_members', 'groddle_groups', 'groddle_home_tending', 'groddle_home_visitors', 'groddle_house_keys', 'groddle_ignores', 'groddle_ledger', 'groddle_ledger_credited', 'groddle_ledger_items', 'groddle_ledger_log', 'groddle_ledger_outcomes', 'groddle_mp_saves', 'groddle_players', 'groddle_profiles', 'groddle_signups', 'groddle_solo_backups', 'groddle_trades']);
     assert.ok(manifest.tables.groddle_players.includes('UNIQUE KEY name_key (name_key)'), 'no two characters share a name, whatever its letter case');
     assert.ok(manifest.tables.groddle_mp_saves.includes('PRIMARY KEY  (user_id)'), 'one multiplayer save per user');
     assert.ok(manifest.tables.groddle_solo_backups.includes('PRIMARY KEY  (user_id,slot)'), 'one backup per slot');
@@ -344,6 +344,8 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
       'Post /groddle/v1/password-reset Public',
       'Post /groddle/v1/password-reset/confirm Public',
       'Post /groddle/v1/players Public',
+      'Post /groddle/v1/players/resend Public',
+      'Post /groddle/v1/players/verify Public',
       'Post /groddle/v1/realtime SignedIn',
       'Post /groddle/v1/session Public',
       'Put /groddle/v1/account/email SignedIn',

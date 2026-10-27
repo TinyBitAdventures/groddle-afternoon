@@ -155,12 +155,41 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
     },
 
     /**
-     * A new player (email, password, the character's name): signed straight
-     * in. { ok: true, player } or { ok: false, code, message, fields } with
-     * the refusals keyed by form field (email, password, name).
+     * A new player (email, password, the character's name). The site holds
+     * the sign-up until the emailed link is opened: { ok: true, pending:
+     * true, email, name, nameHeld } (nameHeld: another sign-up waiting on its
+     * link asked for the name too). A local QA address is made at once and
+     * signed straight in: { ok: true, player }. A refusal is { ok: false,
+     * code, message, fields } keyed by form field (email, password, name).
      */
     async signUp({ email, password, name, website = '' }) {
-      return signedIn(await post('players', { email, password, name, website }));
+      const r = await post('players', { email, password, name, website });
+      if (r.status === 202 && r.data?.pending === true) {
+        return { ok: true, pending: true, email: String(r.data.email || email), name: String(r.data.name || name), nameHeld: r.data.nameHeld === true };
+      }
+      return signedIn(r);
+    },
+
+    /**
+     * Opens a held sign-up's link (its token from /play/online/#verify=):
+     * the account is made and signed in, { ok: true, player }. A name
+     * someone got first is refused with code name_taken and fields.name;
+     * send the token again with another name. Other refusals: signup_used,
+     * signup_expired, signup_unknown, email_exists.
+     */
+    async verifySignUp({ token, name = '' }) {
+      return signedIn(await post('players/verify', name ? { token, name } : { token }));
+    },
+
+    /**
+     * Mails a held sign-up a new link, by its token ({ ok, email }) or by
+     * email ({ ok }: the same whether or not one is waiting). Refusals:
+     * signup_wait (a minute between emails), signup_spent, signup_used,
+     * signup_unknown.
+     */
+    async resendSignUp({ token = '', email = '' } = {}) {
+      const r = await post('players/resend', token ? { token } : { email });
+      return r.ok ? { ok: true, ...(r.data?.email ? { email: String(r.data.email) } : {}) } : refusal(r);
     },
 
     /** Signs in by email; remember keeps the session for two weeks. Same answers as signUp. */

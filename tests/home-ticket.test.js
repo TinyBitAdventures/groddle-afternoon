@@ -19,7 +19,7 @@ import {
   rockTicketBeats,
   ticketCount,
   useHomeTicket,
-} from '../public/js/home-ticket.js?v=g310-1';
+} from '../public/js/home-ticket.js?v=g310-2';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
 import { createHomeState } from '../public/js/homes.js?v=homes-mail-4';
 

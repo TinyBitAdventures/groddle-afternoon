@@ -84,7 +84,7 @@ describe('the Play page chooses: sign in, or Play solo (Austin 2026-10-26)', () 
     assert.match(boot, /if \(state === 'signed-out'\) \{\n\s+const solo = el\('section', \{ class: 'online-solo'/);
     assert.match(boot, /if \(!continuedHere\(\)\) \{\n\s+showGate\(gate, 'choose'/);
     assert.match(boot, /name \? `Play as \$\{name\}` : 'Play'/);
-    assert.match(boot, /const onSignedIn = \(\) => \{ markContinued\(\); boot\(\); \};/);
+    assert.match(boot, /const onSignedIn = \(\) => \{\n\s*markContinued\(\);\n\s*if \(verifyLinkFrom\(location\.hash\)\) history\.replaceState\(history\.state, '', location\.pathname\);\n\s*boot\(\);\n\s*\};/);
   });
 
   it('uses plain copy with no em-dashes', () => {

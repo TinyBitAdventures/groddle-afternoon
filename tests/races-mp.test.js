@@ -28,7 +28,7 @@ import {
 import { raceData } from '../tools/build-realtime-races.mjs';
 import { RACE_COURSE_IDS, raceCourse } from '../public/js/race-courses.js';
 import { quoinGrabWinner } from '../public/js/races.js';
-import { sharedStreet } from '../public/js/features/realtime-feature.js?v=nbhome-7';
+import { sharedStreet } from '../public/js/features/realtime-feature.js?v=nbhome-8';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

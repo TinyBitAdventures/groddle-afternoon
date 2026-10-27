@@ -101,12 +101,13 @@ import {
   shouldResume,
   startNewxp,
   street4Check,
+  questQueueLine,
   talkPages,
   training1Layout,
   training2Layout,
   tutorialPhysics,
   vogPages,
-} from '../newxp.js?v=newxp-3';
+} from '../newxp.js?v=newxp-4';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js';
 import { soundForQuoin } from '../sound-moments.js';
@@ -119,7 +120,7 @@ import * as kit from '../quest-rooms/kit.js?v=qi-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g311-1';
-import { HOME_MACHINE } from '../home-ticket.js?v=g310-1';
+import { HOME_MACHINE } from '../home-ticket.js?v=g310-2';
 import { createAnimalState } from '../animals.js?v=g296-1';
 import {
   AK_ANIMALS,
@@ -2193,6 +2194,28 @@ function bagShopProfile() {
 const bagsBought = (engine) => Number(engine.questState?.active?.buy_two_bags?.progress?.generic_bag_purchased) || 0;
 const questDone = (engine, id) => (engine.questState?.completed || []).includes(id);
 
+/**
+ * How many bags the quest still wants, the way the original client said it
+ * after each purchase (QuestQueue.as 142-181: the quest's title and
+ * "Purchase a Generic Bag (1/2)" for four seconds, COMPLETE_QUEST_REQUIREMENT,
+ * and "Quest Progress: ..." in the local log). Shown after each bag bought,
+ * and again after the Progress Way gate's "You haven't bought your bags"
+ * (a departure: the source said only that line there, and players with one
+ * bag read it as a bug). Null when the quest isn't running.
+ */
+function bagProgress(engine, { sound = true } = {}) {
+  const def = getQuestCatalog().buy_two_bags;
+  const req = def?.requirements?.find((r) => r.name === 'generic_bag_purchased');
+  const done = questDone(engine, 'buy_two_bags');
+  if (!def || !req || (!done && !engine.questState?.active?.buy_two_bags)) return null;
+  const q = questQueueLine(def.title, req.desc, done ? req.num : bagsBought(engine), req.num);
+  engine.toast(`${q.title}: ${q.line}`, 4000);
+  if (sound) engine.playSound('COMPLETE_QUEST_REQUIREMENT', { volume: 0.6 });
+  engine.pushActivity(`Quest Progress: ${q.title}. ${q.line}`);
+  engine.setData('newxpBagProgress', q.line);
+  return q;
+}
+
 async function autoBags(engine, t) {
   try {
     await engine.enter(GENTLE_ISLAND.progress_way, { spawnX: 2300, quiet: true, bypassFeatureGates: true });
@@ -2404,7 +2427,7 @@ function islandTick(engine, now) {
   if (speak) run.data.gateAt = now;
   if (block === 'noBags') {
     place(p.x - 250, p.y);
-    if (speak) vog(token, LINES.noBagsYet).catch(() => {});
+    if (speak) vog(token, LINES.noBagsYet).then(() => bagProgress(engine, { sound: false })).catch(() => {});
   } else if (block === 'notSoFast') {
     place(p.x - 150, p.y);
     if (speak) vog(token, LINES.notSoFast).then(() => { if (save.island === 'go_home') openHomePanel(engine); }).catch(() => {});
@@ -3148,6 +3171,11 @@ export const newxpFeature = {
     if (cls === 'npc_butterfly' && /massage/.test(String(verb)) && islandLive(engine) && !hasFlag('butterfly_msg_off_called')) {
       setFlag('butterfly_msg_off_called');
       fireStreetEvent(engine, 'butterfly_msg_off');
+    }
+    // A bag bought at the cheap vendor: the quest's progress, as the original client showed it (after the
+    // vendor's own toast has had a moment).
+    if (/^vendor_bought:bag_(generic|bigger)$/.test(String(counter)) && save.stage === 'island') {
+      setTimeout(() => bagProgress(engine), 1500);
     }
     // skillquest_ak eventScriptEventFired: verb_<x>_success from the practice animals.
     if (run.data?.ak && verb) akVerb(engine, cls, verb);

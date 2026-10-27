@@ -46,15 +46,38 @@ function call(jar, method, path, { nonce, body, form } = {}) {
   return { status, json, text, headers };
 }
 
-/** A throwaway player made the way the game makes one: email, password and a character name (groddle/v1/players). */
+const MAILPIT = (process.env.MINN_MAILPIT || 'https://mail.cove.localhost/api/v1').replace(/\/$/, '');
+
+/** The sign-up link's token mailed to an address (Cove's Mailpit), waiting a few seconds for it. */
+function mailedToken(email) {
+  for (let i = 0; i < 30; i++) {
+    const found = JSON.parse(execFileSync('curl', ['-sk', `${MAILPIT}/search?query=${encodeURIComponent(`to:${email}`)}&limit=1`], { encoding: 'utf8' }));
+    const id = found.messages?.[0]?.ID;
+    if (id) {
+      const html = JSON.parse(execFileSync('curl', ['-sk', `${MAILPIT}/message/${id}`], { encoding: 'utf8' })).HTML || '';
+      const m = /#verify=([0-9a-f]{48})/.exec(html);
+      if (m) return m[1];
+    }
+    execFileSync('sleep', ['0.3']);
+  }
+  throw new Error(`no sign-up email reached ${email}`);
+}
+
+/**
+ * A throwaway player made the way the game makes one: email, password and a
+ * character name (groddle/v1/players), held until the mailed link is opened
+ * (groddle/v1/players/verify), which signs it in.
+ */
 function player(name) {
   const jar = join(dir, `${name}.jar`);
   const pass = `zz-${name}-${process.pid}-pass`;
   const email = `zz-${name}-${process.pid}@example.com`;
   const shown = `Zz ${name} ${process.pid % 100000}`;
   writeFileSync(jar, '');
-  const made = call(jar, 'POST', '/wp-json/groddle/v1/players', { body: { email, password: pass, name: shown } });
-  assert.equal(made.status, 201, `${email} signs up: ${made.text}`);
+  const held = call(jar, 'POST', '/wp-json/groddle/v1/players', { body: { email, password: pass, name: shown } });
+  assert.equal(held.status, 202, `${email} signs up and is asked to check the email: ${held.text}`);
+  const made = call(jar, 'POST', '/wp-json/groddle/v1/players/verify', { body: { token: mailedToken(email) } });
+  assert.equal(made.status, 201, `${email} opens the link: ${made.text}`);
   return {
     id: made.json.player.id,
     email,
@@ -84,7 +107,7 @@ describe('groddle/v1 on the live site', { skip: !LIVE && 'set GRODDLE_LIVE=1 to 
   });
   after(() => {
     for (const p of [a, b].filter(Boolean)) {
-      wp('db', 'query', `DELETE FROM wp_groddle_mp_saves WHERE user_id = ${p.id}; DELETE FROM wp_groddle_solo_backups WHERE user_id = ${p.id}; DELETE FROM wp_groddle_players WHERE user_id = ${p.id}`);
+      wp('db', 'query', `DELETE FROM wp_groddle_mp_saves WHERE user_id = ${p.id}; DELETE FROM wp_groddle_solo_backups WHERE user_id = ${p.id}; DELETE FROM wp_groddle_players WHERE user_id = ${p.id}; DELETE FROM wp_groddle_signups WHERE user_id = ${p.id}`);
       wp('user', 'delete', String(p.id), '--yes');
     }
     rmSync(dir, { recursive: true, force: true });

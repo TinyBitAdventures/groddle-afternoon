@@ -11,13 +11,20 @@
  * name other players see. The account's username is made up by the site and
  * never shown. A hidden "website" field catches form-filling scripts.
  *
+ * No account exists until its email is proven (Austin 2026-10-27): New
+ * player's answer is "Check your email" (with Send it again, a minute
+ * apart), and the mailed link, /play/online/#verify=<token>, opens the gate
+ * on the finishing step (verifyLinkFrom(hash)), which makes the character
+ * and signs the player in. A used link offers Sign in, an expired one Send a
+ * new link, and a name someone else got first asks for another name.
+ *
  * A password reset mails a link back to /play/online/#reset=<key>&login=<login>;
  * resetLinkFrom(hash) reads it and the gate opens on Choose a new password,
  * which saves it and signs the player in.
  *
- * mountAccountForms(host, { account, start, reset, onSignedIn }) replaces
- * host's children; onSignedIn({ player, how: 'signin' | 'signup' | 'reset' })
- * runs once the session and its nonce are in place.
+ * mountAccountForms(host, { account, start, reset, verify, onSignedIn })
+ * replaces host's children; onSignedIn({ player, how: 'signin' | 'signup' |
+ * 'reset' | 'verify' }) runs once the session and its nonce are in place.
  */
 
 /** The form copy (plain remake copy, no em-dashes). */
@@ -46,7 +53,62 @@ export const FORM_COPY = Object.freeze({
     busy: 'Saving…',
     again: 'Ask for a new link',
   },
+  check: {
+    title: 'Check your email',
+    body: 'We sent a link to {email}. Open it to finish making {name}. It works once, for a day.',
+    bodyNew: 'We sent a new link to {email}. Open it to finish making your character. It works once, for a day.',
+    held: 'Someone else is waiting to finish a character called {name} too. Whoever opens their link first keeps the name.',
+    resend: 'Send it again',
+    busy: 'Sending…',
+    wait: 'Send it again ({s})',
+    sent: 'Sent again. Check your inbox, and the spam folder.',
+    other: 'Use a different email',
+  },
+  verify: {
+    title: 'Finishing your character',
+    busy: 'Finishing your character…',
+    nameTitle: 'Choose another name',
+    submit: 'Finish',
+    newLink: 'Send a new link',
+    retry: 'Try again',
+  },
 });
+
+/** A sign-up link's token from a location hash (#verify=<48 hex>), or null. */
+export function verifyLinkFrom(hash) {
+  const m = /^#verify=([0-9a-f]{48})$/.exec(String(hash || ''));
+  return m ? { token: m[1] } : null;
+}
+
+/** Fills {email} and {name} in a line of FORM_COPY. */
+export function fillCopy(line, values = {}) {
+  return String(line).replace(/\{(\w+)\}/g, (all, key) => (key in values ? String(values[key]) : all));
+}
+
+/** What a New player answer shows: 'signed-in' (a QA address made at once), 'check-email', or 'refused'. */
+export function signUpOutcome(r) {
+  if (!r?.ok) return 'refused';
+  return r.pending ? 'check-email' : 'signed-in';
+}
+
+/**
+ * What a sign-up link's answer shows: 'signed-in'; 'name' (choose another
+ * name: someone got it first, or it doesn't fit); 'expired' (Send a new
+ * link); 'signin' (the link was used, or the email has a character: sign in
+ * instead); 'unknown' (an old or broken link); 'retry' (the site didn't
+ * answer).
+ */
+export function verifyOutcome(r) {
+  if (r?.ok) return 'signed-in';
+  switch (r?.code) {
+    case 'name_taken': return 'name';
+    case 'signup_expired': return 'expired';
+    case 'signup_used':
+    case 'email_exists': return 'signin';
+    case 'signup_unknown': return 'unknown';
+    default: return r?.fields?.name ? 'name' : 'retry';
+  }
+}
 
 /** The reset link's key and login from a location hash (#reset=<key>&login=<login>), or null. */
 export function resetLinkFrom(hash) {
@@ -88,6 +150,10 @@ const STYLE = `
 .acct-message { margin: 0; font-weight: 600; color: #4c6b2e; }
 .acct-message:empty { display: none; }
 .acct-message[data-tone="bad"] { color: #a33b22; }
+.acct-field[hidden], .acct-submit[hidden], .acct-message[hidden] { display: none; }
+.acct-panel { display: grid; gap: 0.55rem; }
+.acct-panel[hidden] { display: none; }
+.acct-panel p { margin: 0; }
 .acct-forms[data-account-settings] .acct-form + .acct-form { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e3e8d6; }
 `;
 
@@ -123,10 +189,10 @@ function field(id, label, attrs, help = '') {
 /**
  * Draws the forms into host.
  * @param {HTMLElement} host
- * @param {{ account: object, start?: 'signin' | 'signup', reset?: { key: string, login: string } | null, onSignedIn?: (r: { player: object, how: string }) => void }} opts
+ * @param {{ account: object, start?: 'signin' | 'signup', reset?: { key: string, login: string } | null, verify?: { token: string } | null, onSignedIn?: (r: { player: object, how: string }) => void }} opts
  *   account: createMinnAccount() from js/minn-account.js
  */
-export function mountAccountForms(host, { account, start = 'signin', reset = null, onSignedIn = () => {} } = {}) {
+export function mountAccountForms(host, { account, start = 'signin', reset = null, verify = null, onSignedIn = () => {} } = {}) {
   if (!document.getElementById(STYLE_ID)) {
     const style = el('style', { id: STYLE_ID });
     style.textContent = STYLE;
@@ -178,6 +244,22 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
   const againLink = el('button', { type: 'button', class: 'acct-link', 'data-account-again': '' }, FORM_COPY.reset.again);
   renew.append(el('strong', {}, FORM_COPY.reset.title), el('p', { class: 'acct-message' }, FORM_COPY.reset.body), rsPass.wrap, rsSubmit, againLink);
 
+  // Check your email (after New player): no character until the link is opened.
+  const check = el('div', { class: 'acct-panel', 'data-form': 'check', hidden: true });
+  const checkBody = el('p', { 'data-account-check': '' });
+  const checkHeld = el('p', { class: 'acct-message', 'data-account-held': '', hidden: true });
+  const resendButton = el('button', { type: 'button', class: 'acct-submit', 'data-account-resend': '' }, FORM_COPY.check.resend);
+  const otherLink = el('button', { type: 'button', class: 'acct-link', 'data-account-other': '' }, FORM_COPY.check.other);
+  check.append(el('strong', {}, FORM_COPY.check.title), checkBody, checkHeld, resendButton, otherLink);
+
+  // Finishing a character from the emailed link: automatic, unless a name or a new link is needed.
+  const finish = el('form', { class: 'acct-form', id: `acct-verify-${n}`, 'data-form': 'verify', novalidate: true, hidden: true });
+  const finishTitle = el('strong', {}, FORM_COPY.verify.title);
+  const vfName = field(`acct-vf-name-${n}`, 'Character name', { name: 'name', type: 'text', autocomplete: 'nickname', maxlength: '19', autocapitalize: 'words', spellcheck: 'false', required: true }, FORM_COPY.signup.nameHelp);
+  const vfSubmit = el('button', { type: 'submit', class: 'acct-submit', 'data-account-submit': 'verify' }, FORM_COPY.verify.submit);
+  const newLinkButton = el('button', { type: 'button', class: 'acct-submit', 'data-account-newlink': '' }, FORM_COPY.verify.newLink);
+  finish.append(finishTitle, vfName.wrap, vfSubmit, newLinkButton);
+
   const panels = { signin, signup };
   const tabButtons = {};
   for (const key of ['signin', 'signup']) {
@@ -203,17 +285,84 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
 
   function show(which, { focus = false } = {}) {
     say('');
-    tabs.hidden = which === 'forgot' || which === 'reset';
     for (const [key, b] of Object.entries(tabButtons)) {
       b.setAttribute('aria-selected', String(key === which));
       b.tabIndex = key === which ? 0 : -1;
     }
+    tabs.hidden = which === 'forgot' || which === 'reset' || which === 'check' || which === 'verify';
     signin.hidden = which !== 'signin';
     signup.hidden = which !== 'signup';
     forgot.hidden = which !== 'forgot';
     renew.hidden = which !== 'reset';
+    check.hidden = which !== 'check';
+    finish.hidden = which !== 'verify';
+    if (which !== 'check') stopCooldown();
     root.dataset.showing = which;
-    if (focus) ({ signin: siEmail, signup: suEmail, forgot: fgEmail, reset: rsPass })[which].input.focus();
+    if (focus) ({ signin: siEmail, signup: suEmail, forgot: fgEmail, reset: rsPass, check: { input: resendButton }, verify: { input: vfName.input } })[which].input.focus();
+  }
+
+  // Send it again: once a minute (the site sends nothing sooner), counted down on the button.
+  let cooldown = 0;
+  let pending = { email: '', name: '' };
+  function stopCooldown() {
+    if (cooldown) clearInterval(cooldown);
+    cooldown = 0;
+    resendButton.disabled = false;
+    resendButton.textContent = FORM_COPY.check.resend;
+  }
+  function startCooldown(seconds = 60) {
+    stopCooldown();
+    let left = seconds;
+    resendButton.disabled = true;
+    resendButton.textContent = fillCopy(FORM_COPY.check.wait, { s: left });
+    cooldown = setInterval(() => {
+      left -= 1;
+      if (left <= 0 || !root.isConnected) return stopCooldown();
+      resendButton.textContent = fillCopy(FORM_COPY.check.wait, { s: left });
+    }, 1000);
+  }
+  function showCheck({ email, name, nameHeld = false }) {
+    pending = { email, name };
+    show('check');
+    root.dataset.pending = 'true';
+    checkBody.textContent = fillCopy(name ? FORM_COPY.check.body : FORM_COPY.check.bodyNew, { email, name });
+    checkHeld.textContent = nameHeld ? fillCopy(FORM_COPY.check.held, { name }) : '';
+    checkHeld.hidden = !nameHeld;
+    startCooldown();
+  }
+
+  /** The finishing step in one of its states (verifyOutcome): busy, a name to choose, or a new link to ask for. */
+  function showFinish(state, r = null) {
+    show('verify');
+    finish.dataset.state = state;
+    finishTitle.textContent = state === 'name' ? FORM_COPY.verify.nameTitle : FORM_COPY.verify.title;
+    vfName.wrap.hidden = state !== 'name';
+    vfSubmit.hidden = state !== 'name';
+    newLinkButton.hidden = state !== 'expired' && state !== 'retry';
+    newLinkButton.textContent = state === 'retry' ? FORM_COPY.verify.retry : FORM_COPY.verify.newLink;
+    if (state === 'busy') say(FORM_COPY.verify.busy);
+    if (r && state !== 'name') say(r.message, 'bad');
+    if (r && state === 'name') {
+      vfName.input.value = '';
+      showRefusal(r, { name: vfName });
+    }
+  }
+
+  async function finishSignUp(name = '') {
+    if (!verify?.token) return;
+    const r = await account.verifySignUp({ token: verify.token, name });
+    const outcome = verifyOutcome(r);
+    if (outcome === 'signed-in') {
+      root.dataset.signedIn = 'true';
+      onSignedIn({ player: r.player, how: 'verify' });
+      return;
+    }
+    if (outcome === 'signin' || outcome === 'unknown') {
+      show('signin');
+      say(r.message, outcome === 'unknown' ? 'bad' : 'good');
+      return;
+    }
+    showFinish(outcome, r);
   }
 
   /** The site's refusals on their fields; the first bad field takes the focus. */
@@ -275,7 +424,12 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
       if (!/^[A-Za-z0-9](?:[A-Za-z0-9 _-]{1,17})[A-Za-z0-9]$/.test(values.name)) missing.name = 'Names are 3 to 19 letters, numbers, spaces, - or _, starting and ending with a letter or number.';
       if (Object.keys(missing).length) return showRefusal({ fields: missing }, fields);
       const r = await account.signUp(values);
-      if (!r.ok) return showRefusal(r, fields);
+      const outcome = signUpOutcome(r);
+      if (outcome === 'refused') return showRefusal(r, fields);
+      if (outcome === 'check-email') {
+        suPass.input.value = '';
+        return showCheck(r);
+      }
       root.dataset.signedIn = 'true';
       onSignedIn({ player: r.player, how: 'signup' });
     });
@@ -307,15 +461,53 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
   });
   againLink.addEventListener('click', () => show('forgot', { focus: true }));
 
+  resendButton.addEventListener('click', async () => {
+    if (resendButton.disabled) return;
+    resendButton.disabled = true;
+    resendButton.textContent = FORM_COPY.check.busy;
+    const r = await account.resendSignUp({ email: pending.email });
+    say(r.ok ? FORM_COPY.check.sent : r.message, r.ok ? 'good' : 'bad');
+    startCooldown();
+  });
+  otherLink.addEventListener('click', () => {
+    delete root.dataset.pending;
+    show('signup', { focus: true });
+  });
+
+  finish.addEventListener('submit', (e) => {
+    e.preventDefault();
+    submit(finish, vfSubmit, FORM_COPY.verify.busy, async () => {
+      const name = vfName.input.value.trim().replace(/\s+/g, ' ');
+      if (!/^[A-Za-z0-9](?:[A-Za-z0-9 _-]{1,17})[A-Za-z0-9]$/.test(name)) return showRefusal({ fields: { name: 'Names are 3 to 19 letters, numbers, spaces, - or _, starting and ending with a letter or number.' } }, { name: vfName });
+      await finishSignUp(name);
+    });
+  });
+  newLinkButton.addEventListener('click', async () => {
+    if (finish.dataset.state === 'retry') {
+      showFinish('busy');
+      return finishSignUp();
+    }
+    newLinkButton.disabled = true;
+    const r = await account.resendSignUp({ token: verify?.token || '' });
+    newLinkButton.disabled = false;
+    if (r.ok) return showCheck({ email: r.email || '', name: '' });
+    say(r.message, 'bad');
+  });
+
   forgotLink.addEventListener('click', () => {
     fgEmail.input.value = siEmail.input.value;
     show('forgot', { focus: true });
   });
   backLink.addEventListener('click', () => show('signin', { focus: true }));
 
-  root.append(tabs, message, signin, signup, forgot, renew);
+  root.append(tabs, message, signin, signup, forgot, renew, check, finish);
   host.replaceChildren(root);
-  show(reset ? 'reset' : start === 'signup' ? 'signup' : 'signin');
+  if (verify?.token) {
+    showFinish('busy');
+    finishSignUp();
+  } else {
+    show(reset ? 'reset' : start === 'signup' ? 'signup' : 'signin');
+  }
   return { root, show };
 }
 

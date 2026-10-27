@@ -17,8 +17,8 @@
  * play/index.html by tools/play-online/build.mjs.
  */
 
-import { createMinnAccount } from './minn-account.js?v=nbhome-7';
-import { mountAccountForms, resetLinkFrom } from './account-forms.js?v=g337-1';
+import { createMinnAccount } from './minn-account.js?v=nbhome-8';
+import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from './account-forms.js?v=g337-2';
 
 const PILL_TEXT = {
   saved: 'Saved',
@@ -141,8 +141,9 @@ function showGate(gate, state, { account, onSignedIn, onSignedOut = onSignedIn, 
   if (state === 'signed-out') {
     const host = el('div', { class: 'online-account' });
     card.append(host);
-    // A link from the site can open the gate on New player (/play/online/#new); a reset email opens it on a new password.
-    mountAccountForms(host, { account, start: location.hash === '#new' ? 'signup' : 'signin', reset: resetLinkFrom(location.hash), onSignedIn });
+    // A link from the site can open the gate on New player (/play/online/#new); a reset email opens it on a new
+    // password; a sign-up email (#verify=<token>) finishes the character.
+    mountAccountForms(host, { account, start: location.hash === '#new' ? 'signup' : 'signin', reset: resetLinkFrom(location.hash), verify: verifyLinkFrom(location.hash), onSignedIn });
   }
   if (state === 'offline' || state === 'load-failed') {
     const retry = el('button', { type: 'button', class: 'online-play', 'data-online-retry': '' }, 'Try again');
@@ -179,11 +180,21 @@ async function boot() {
   const script = document.getElementById('online-boot');
   const account = createMinnAccount({ baseUri: document.baseURI });
   // Signed in from the gate's forms: the same steps again, now with a session, straight into the game.
-  const onSignedIn = () => { markContinued(); boot(); };
+  // A sign-up link is spent once used: it leaves the address bar before the gate looks at it again.
+  const onSignedIn = () => {
+    markContinued();
+    if (verifyLinkFrom(location.hash)) history.replaceState(history.state, '', location.pathname);
+    boot();
+  };
   const onSignedOut = () => { boot(); };
   showGate(gate, 'checking', { account, onSignedIn });
   const session = await account.session();
   const state = gateFor(session);
+  // A sign-up link opened in a browser signed in already (as anyone): the link still finishes its character.
+  if (state === 'ready' && verifyLinkFrom(location.hash)) {
+    showGate(gate, 'signed-out', { account, onSignedIn });
+    return;
+  }
   if (state !== 'ready') {
     showGate(gate, state, { account, onSignedIn });
     return;
@@ -212,7 +223,7 @@ async function enter(gate, script, account, session, onSignedIn) {
   document.body.classList.remove('online-gated');
   mountSavePill(session.player);
   // The reset key is spent once signed in: it leaves the address bar too.
-  if (location.hash === '#new' || location.hash.startsWith('#reset=')) history.replaceState(history.state, '', location.pathname);
+  if (location.hash === '#new' || location.hash.startsWith('#reset=') || location.hash.startsWith('#verify=')) history.replaceState(history.state, '', location.pathname);
   const game = document.createElement('script');
   game.type = 'module';
   game.src = script.dataset.game;
@@ -221,8 +232,8 @@ async function enter(gate, script, account, session, onSignedIn) {
 
 if (typeof document !== 'undefined' && document.getElementById('online-boot')) {
   boot();
-  // A reset link opened in a tab already on the gate changes only the hash: show its form.
+  // A reset or sign-up link opened in a tab already on the gate changes only the hash: show its form.
   window.addEventListener('hashchange', () => {
-    if (document.getElementById('online-gate')?.dataset.online === 'signed-out' && resetLinkFrom(location.hash)) boot();
+    if (document.getElementById('online-gate')?.dataset.online === 'signed-out' && (resetLinkFrom(location.hash) || verifyLinkFrom(location.hash))) boot();
   });
 }

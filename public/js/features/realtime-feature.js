@@ -25,7 +25,7 @@
  * realtimeStreet, realtimeLastSaid; window.groddleRealtime in multiplayer.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=nbhome-7';
+import { createMinnAccount } from '../minn-account.js?v=nbhome-8';
 import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=mp3-2';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js';
 
