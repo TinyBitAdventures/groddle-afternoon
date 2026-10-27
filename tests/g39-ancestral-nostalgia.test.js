@@ -223,8 +223,10 @@ describe('the visit, in the feature', () => {
   it('entering applies the buff with the source line; its time left follows the clock', () => {
     feature.restore(undefined);
     const engine = makeEngine();
-    clockNow = Date.now();
     enter(engine, street('86'));
+    // Entering stamps the real clock (trackRegion), so the fake clock starts after it: set first, a
+    // millisecond's gap made the first 1 s tick short and the rounded-up time left read 501.
+    clockNow = Date.now();
     play(engine, 2);
     assert.equal(engine.activity.at(-1), NOSTALGIA_TEXT.enter, 'start_baqala_buff sendActivity, after the arrival line');
     const row = engine.buffRow('ancestral_nostalgia');
