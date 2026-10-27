@@ -19,7 +19,7 @@ import {
   unknownLine,
 } from '../public/js/slash-commands.js?v=g249-1';
 import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=blur-8';
-import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=card-46';
+import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=card-47';
 import { towerApi } from '../public/js/features/home-tower-feature.js?v=home-tower-15';
 import { BUTLER_STRINGS } from '../public/js/butler.js?v=butler-9';
 import { butlerFeature } from '../public/js/features/butler-feature.js?v=butler-feature-47';

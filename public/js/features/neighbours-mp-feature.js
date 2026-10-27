@@ -1138,8 +1138,10 @@ function createSession(engine, client) {
     street() {
       const home = engine.homeContext?.() || {};
       if (visit && readVisitScene(engine.streetTsid)?.owner !== visit.owner) return '';
-      const tower = homesFeature._state?.().scene?.tower != null;
-      return sharedHomeStreet({ visit, me: me(), inHome: home.inHome === true, room: home.room, towerFloor: tower });
+      const scene = homesFeature._state?.().scene;
+      // A Tower floor or an upper house floor (G153, home-floors.js) is a room of its own: not the street visitors share.
+      const ownRoom = scene?.tower != null || Number(scene?.houseFloor) > 0;
+      return sharedHomeStreet({ visit, me: me(), inHome: home.inHome === true, room: home.room, towerFloor: ownRoom });
     },
     /** The scene went away (an ordinary street, a reload): the visit is over. */
     left() {
