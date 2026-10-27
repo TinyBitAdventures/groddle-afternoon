@@ -690,6 +690,15 @@ export function acceptOffer(questState, classTsid, ctx = {}) {
  *   distinct: count each label once per quest run (GSJS stored a hash)
  *   minAmount: flag only when one event carries at least this amount
  */
+/**
+ * The Seam Streets (locations/location.js:540, G-prefixed): only a first visit
+ * to one of them counts visit_seam_street for explore_the_seams (G158).
+ */
+export const SEAM_STREETS = Object.freeze([
+  'GDOC74759ST2IG1', 'GDOB5HTH1ID2MTL', 'GCR14T7ECHM18G8', 'GDOHDJ84BST2UI2', 'GTJ1KL16N2O13T2',
+  'GHVDIELDQQ7228K', 'GTJ1KOM8N2O1EFS', 'GM11E7ODKHO1QJE', 'GCR1516SFHM122V', 'GDOSHD9J6NT2HUJ',
+]);
+
 export const COUNTER_ROUTES = Object.freeze([
   // animals (animal-kinship.js; emitted via worldVerbAchievementCounters)
   { system: 'animals', counter: 'piggies_petted', event: 'npc_piggy:pet' },
@@ -783,7 +792,7 @@ export const COUNTER_ROUTES = Object.freeze([
   { system: 'skills', counter: 'learn_skill', event: 'skill_learned:{a}' },
   // travel / teleportation (travel.js, map)
   { system: 'travel', counter: 'map_dest_reached', event: 'map_destination_reached' },
-  { system: 'travel', counter: 'visit_seam_street', event: 'street_first_visit:{a}', note: 'seam streets only' },
+  { system: 'travel', counter: 'visit_seam_street', event: 'street_first_visit:{a}', a: SEAM_STREETS, note: 'seam streets only (locations/location.js:540)' },
   { system: 'travel', counter: 'find_ix_hole', event: 'street_entered:great_hole_to_ix' },
   { system: 'travel', counter: 'find_groddle_ladder', event: 'street_entered:groddle_ladder' },
   { system: 'travel', counter: 'arrive_at_neva_neva', event: 'street_entered:neva_neva' },
@@ -965,6 +974,8 @@ export function eventCounters(event) {
     if (route.counter.startsWith('<')) continue;
     const vars = matchTemplate(route.event, name);
     if (!vars) continue;
+    // A route limited to some {a} values (the Seam Streets) ignores the rest.
+    if (route.a && !route.a.includes(vars.a)) continue;
     out.push({ counter: fill(route.counter, vars), route, label: vars.a ?? name });
   }
   // Direct counter/flag names (e.g. 'found_ghost') and the legacy aliases

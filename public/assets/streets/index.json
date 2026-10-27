@@ -13133,6 +13133,33 @@
       "platforms": 2,
       "decos": 3,
       "reconstructed": true
+    },
+    "GA9RLGSQ05F3Q69": {
+      "label": "Snowed In",
+      "file": "assets/streets/GA9RLGSQ05F3Q69.json",
+      "hubId": "143",
+      "hubName": "Vortex of Random",
+      "platforms": 2,
+      "decos": 100,
+      "reconstructed": true
+    },
+    "GA9EKMN138D3QK2": {
+      "label": "Ethereal Endeavour",
+      "file": "assets/streets/GA9EKMN138D3QK2.json",
+      "hubId": "129",
+      "hubName": "Gentle Island",
+      "platforms": 5,
+      "decos": 62,
+      "reconstructed": true
+    },
+    "GCR14T7ECHM18G8": {
+      "label": "Martleby Hare",
+      "file": "assets/streets/GCR14T7ECHM18G8.json",
+      "hubId": "64",
+      "hubName": "Groddle Heights",
+      "platforms": 6,
+      "decos": 150,
+      "reconstructed": true
     }
   }
 }

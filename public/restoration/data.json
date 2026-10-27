@@ -312,6 +312,25 @@
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&streetdemo=GCR1516SFHM122V&streetx=1000&streety=215&practice=1"
   },
   {
+   "id": "picture-rooms",
+   "group": "world",
+   "name": "Rooms rebuilt from pictures",
+   "status": "reimagined",
+   "blurb": "Three places no archive kept, rebuilt from players’ pictures with Tiny Speck’s own art. Snowed In, behind Abbasid River’s door: an apartment hall buried in drifts, eight doors, four windows onto snowy firs, a lift, a teleporter beam and a campfire with washing on the line. Ethereal Endeavour, behind Doonboggle Trail’s locked door (Door Key 1): a cellular room of neurons and floating quoins, out through the EXIT in the membrane. Martleby Hare, behind Rookthills Lay’s locked door (Door Key 2): a Seams cliff of mossy ledges down to a stone-arched door that opens on Footlands Heath’s balcony.",
+   "multiplayer": null,
+   "spot": null,
+   "evidence": [
+    "public/js/rebuilt-rooms.js",
+    "public/js/features/rebuilt-rooms-feature.js",
+    "tools/build-rebuilt-rooms.mjs",
+    "public/assets/streets/GA9RLGSQ05F3Q69.json",
+    "public/assets/streets/GA9EKMN138D3QK2.json",
+    "public/assets/streets/GCR14T7ECHM18G8.json"
+   ],
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=GA9RLGSQ05F3Q69&streetx=1644&streety=527&practice=1"
+  },
+  {
    "id": "ancestral-lands",
    "group": "world",
    "name": "The Ancestral Lands",
@@ -1222,12 +1241,12 @@
  "tally": {
   "source": 53,
   "rebuilt": 10,
+  "reimagined": 3,
   "solo": 6,
-  "reimagined": 2,
   "progress": 1
  },
- "back": 71,
- "possible": 72,
+ "back": 72,
+ "possible": 73,
  "multiplayer": 20,
  "quests": {
   "total": 445,
@@ -2624,9 +2643,19 @@
   ]
  },
  "git": {
-  "commits": 610,
+  "commits": 612,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "improve",
+    "text": "The Code page's words sew in the textile chain: checkpoints, patches and two badges for contributors"
+   },
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "Ancestral Nostalgia: 10 minutes in the Ancestral Lands, then you are Overwhelmed and sent away"
+   },
    {
     "date": "2026-10-27",
     "kind": "new",
@@ -2736,19 +2765,9 @@
     "date": "2026-10-27",
     "kind": "fix",
     "text": "In multiplayer an owner on an upper house floor no longer shares the ground floor's street"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "The last six missing items: a Water Cooler's cup, Shim Shiri's Light Beams, the golgi apparatus, house floors and the larger Petrified Rocks"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "New players finish their character from the emailed link, and the bag quest says how many bags it still wants"
    }
   ]
  },
- "tests": 363,
+ "tests": 364,
  "generatedAt": "2026-10-27"
 }

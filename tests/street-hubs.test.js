@@ -68,7 +68,7 @@ test('every street on the map lists has its own location hub, which the map data
 
 test('rebuilt rooms (no location XML) keep a hub the map data lists them under', () => {
   const rebuilt = rows.filter((r) => !r.own);
-  assert.equal(rebuilt.length, 32);
+  assert.equal(rebuilt.length, 35); // + Snowed In, Ethereal Endeavour, Martleby Hare (G157-G159)
   for (const r of rebuilt) assert.deepEqual(r.maps, [r.meta.hubId], `${r.tsid} ${r.meta.label}`);
 });
 

@@ -1265,8 +1265,8 @@
   "register": "G141"
  },
  "location:LA9RLGSQ05F3Q69": {
-  "status": "missing",
-  "reason": "Snowed In: door on Abbasid River; encyclopedia street page and 2 Snaps, no geometry or code",
+  "status": "reimagined",
+  "reason": "Snowed In: rebuilt from a picture (G157). No geometry or code survives (inc_data_maps_prod.js:17874 only); slivered's 2012-12-18 full render (Flickr 8283569651, reference only) places the hall's eight doors, four windows, lift, teleporter beam, drifts and camp, built from CC0 apartment-hall and Alakol snow decos (public/js/rebuilt-rooms.js, tools/build-rebuilt-rooms.mjs). In through Abbasid River's door_1353965313720 (connect 89,-115), out through the lift",
   "register": "G157"
  },
  "location:LA9S2N3F15F3JD3": {
@@ -1275,13 +1275,13 @@
   "register": "G157"
  },
  "location:LCR14T7ECHM18G8": {
-  "status": "missing",
-  "reason": "Martleby Hare: a Seams street (explore_the_seams counts it, 3 of 10 needed); geometry lost; Footlands Heath was cloned from it",
+  "status": "reimagined",
+  "reason": "Martleby Hare: rebuilt from a picture (G158). Geometry lost; Cleops' 2013-01 snap (Flickr 8411933944, reference only) gives the cliff, mossy ledges, slate overhang and stone-arched door, built from Footlands Heath's CC0 Heights decos (public/js/rebuilt-rooms.js). In through Rookthills Lay's door_1 (Door Key 2, connect -613,-1833), out to Footlands Heath's balcony (Footlands' sources list it); a first visit counts visit_seam_street (location.js:540, quest-offers.js SEAM_STREETS)",
   "register": "G158"
  },
  "location:LA9EKMN138D3QK2": {
-  "status": "missing",
-  "reason": "Ethereal Endeavour: door on Gentle Island's Doonboggle Trail; no geometry, code, Snaps or page",
+  "status": "reimagined",
+  "reason": "Ethereal Endeavour: rebuilt from a picture (G159). No geometry or code survives (inc_data_maps_prod.js:17711 only); Cleops' Old Ethereal Endeavour snap (Flickr 8406081612, reference only) matches the newxp brain art, so the room is the brain end of And so it begins... (GA614AEMKBD2UCC, newxp.swf, CC0) mirrored, membrane and EXIT at the left (public/js/rebuilt-rooms.js). In through Doonboggle Trail's door_1343415170600 (Door Key 1, connect -264,-159), out through the oval",
   "register": "G159"
  },
  "buff:max_luck": {

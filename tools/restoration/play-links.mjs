@@ -56,6 +56,8 @@ export const PLAY_ROUTES = Object.freeze({
   'small-items': `${BASE}&smallitemdemo=ball`,
   // Beside a Fruit Tree with its first story offered (convodemo meets its level and shrine terms, dev offer rules).
   conversations: `${BASE}&convodemo=brief_thoughts_of_the_fruit_tree_1`,
+  // Snowed In by the lift (G157); its neighbours behind locked doors open with doordemo + doorkey.
+  'picture-rooms': `${BASE}&streetdemo=GA9RLGSQ05F3Q69&streetx=1644&streety=527`,
 });
 
 /** Nothing to open: lost and multiplayer-only systems, and the quest-rooms row (the rooms section links each room). */
