@@ -2644,9 +2644,14 @@
   ]
  },
  "git": {
-  "commits": 626,
+  "commits": 627,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "improve",
+    "text": "The multiplayer start card fits a phone and holds the street's toasts and Qurazy banner until it closes; a signed-out visit asks for no REST nonce"
+   },
    {
     "date": "2026-10-27",
     "kind": "improve",
@@ -2761,11 +2766,6 @@
     "date": "2026-10-27",
     "kind": "improve",
     "text": "The top bar groups you, progress and wallet, with mood and energy stacked beside your name"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "Neighbours on your signpost, Note Poles, furniture for sale and restoring a friend's cultivations"
    }
   ]
  },
