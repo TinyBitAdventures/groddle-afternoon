@@ -20137,6 +20137,30 @@ function focusedDialogButton() {
   return dialog && !dialog.hidden ? button : null;
 }
 
+/** True while escapeOpenFeatureDialog's own Escape is on its way (it must not be relayed again). */
+let relayingEscape = false;
+
+/**
+ * Esc for a feature's dialog that holds no focus (Buddies, House Keys, Groups and the rest are
+ * opened from the Menu, so focus stays on the menu button and their own Escape listener, on the
+ * dialog's shade, never hears the key). The topmost shown aria-modal dialog is handed an Escape;
+ * true when that closed it. A dialog with no listener of its own stays open and Escape goes on
+ * to the game's own panels below.
+ */
+function escapeOpenFeatureDialog() {
+  const shown = [...document.querySelectorAll('[role="dialog"][aria-modal="true"]')].filter((d) => d.getClientRects().length > 0);
+  // Each feature appends its shade to the body when it is made: the last one shown is on top.
+  const top = shown.at(-1);
+  if (!top) return false;
+  relayingEscape = true;
+  try {
+    top.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+  } finally {
+    relayingEscape = false;
+  }
+  return !top.isConnected || top.getClientRects().length === 0;
+}
+
 function isQuestDialogueOpen() {
   const modal = document.getElementById('quest-dialogue');
   return Boolean(modal && !modal.hidden);
@@ -24192,12 +24216,15 @@ async function main() {
       }
       return;
     }
+    // escapeOpenFeatureDialog's own Escape, bubbling back up from a dialog that did not take it.
+    if (relayingEscape) return;
     // A focused button in an open dialog (the subway's red button refusal and other
     // feature dialogs) takes Enter and Space itself: never the nearest thing's menu or a jump.
     if ((e.key === 'Enter' || e.key === ' ') && focusedDialogButton()) return;
     keys.add(e.key);
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
     if (e.key === 'Escape') {
+      if (escapeOpenFeatureDialog()) return;
       if (isMailboxOpen()) {
         closeMailboxPanel();
         return;
