@@ -65,8 +65,8 @@ export function restorationContent() {
     // Its own tone (band-seasons) between the designers' band and the alternate one after it.
     group('section', 'band band-seasons', 'seasons', [group('div', 'wrap', null, [
       h(2, 'Seasons and holidays', { id: 'seasons-h' }),
-      p('section-lead', 'Glitch kept four holidays, and the remake brings each one round on its real dates. Zilloween also comes round on Ur’s own Dametime calendar, for about two real days in every fifty-one, so it turns up between the real ones too. A card marked On now is running today.'),
-      p('practice-note', 'Each <strong>Try it in solo</strong> link opens that season in a fresh practice copy, with what it needs in your pack. Like every Play link here, it never touches your saved game.'),
+      p('section-lead', 'Glitch kept three holidays on the calendar, and the remake brings each one round on its real dates. Zilloween also comes round on Ur’s own Dametime calendar, for about two real days in every fifty-one, so it turns up between the real ones too. The Egg Hunt has no dates: its chocolate eggs drop from Egg Plants all year. A card marked On now is running today.'),
+      p('practice-note', 'Each <strong>Try it in solo</strong> link opens a fresh practice copy with that season on and what it needs in your pack, or for the Egg Hunt, beside an Egg Plant. Like every Play link here, it never touches your saved game.'),
       data('seasons'),
     ])]),
     band('recent', true, 'Recently restored', [

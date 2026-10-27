@@ -13,11 +13,19 @@
  *    the Pi recipe and Pi's Estimate verb ask it.
  *  - Both isZilloween and isGlitchmas were forced to `return true` for the
  *    end of the world, so the final server ran every holiday at once.
+ *  - The Egg Hunt has no date check at all: petting an Egg Plant runs the
+ *    lgt_egg_plant_pet package (items/include/trants.js performPetting, "For
+ *    the easter egg hunt"), whose egg_plant_pet drop gives one of five
+ *    chocolate eggs, all year. collection_egg_hunter (collection_type 2) then
+ *    takes one of each egg for the Egg Hunter Trophy (players/
+ *    inc_achievements.js 392-420). So it is not a dated event here either:
+ *    EGG_HUNT below describes it, and it is never in activeSeasons.
  *
  * The remake drives each event from the player's real-world date instead
  * (windows below), keeps the source's Dametime Zilloween (Remember 25-37,
  * about two real days in every 51) and the exact Pi Day test, and accepts a
- * `?season=<id>` QA override (`none` forces every event off) and
+ * `?season=<id>` QA override (`none` forces every event off; an id that is
+ * not a dated event, such as egg_hunt, overrides nothing) and
  * `?seasondate=YYYY-MM-DD` to preview a calendar date.
  */
 
@@ -28,7 +36,7 @@ const DAY_MS = 86_400_000;
 /* ------------------------------------------------------------- catalog */
 
 /**
- * Every event. `source` is how much survives in GameServerJS:
+ * Every dated event. `source` is how much survives in GameServerJS:
  * 'source' = items, verbs and badges are all recovered;
  * 'reconstructed' = items survive but the event mechanics were lost;
  * 'designed' = no source event, written for the remake in Glitch's voice.
@@ -52,15 +60,6 @@ export const SEASONS = Object.freeze({
     window: 'December 12 to January 3',
     blurb: 'Snow over Ur and candy canes by the signposts. The Toy Vendor stocks Glitchmas Crackers and Cards, Egg Nog is back, and somebody wants you to say "yay".',
   }),
-  egg_hunt: Object.freeze({
-    id: 'egg_hunt',
-    label: 'Egg Hunt',
-    giant: 'all',
-    icon: 'egghunt_egg_5',
-    source: 'reconstructed',
-    window: 'the week before Easter Sunday, through Easter Monday',
-    blurb: 'Five chocolate eggs are hidden across Ur, one in the grass of many streets. Find all five for the Egg Hunter Trophy.',
-  }),
   pi_day: Object.freeze({
     id: 'pi_day',
     label: 'Pi Day',
@@ -74,26 +73,25 @@ export const SEASONS = Object.freeze({
 
 export const SEASON_IDS = Object.freeze(Object.keys(SEASONS));
 
-/* -------------------------------------------------------- calendar math */
+/**
+ * The Egg Hunt, as the final source ran it: all year, from Egg Plants (see
+ * the header). Not a dated event, so not in SEASONS.
+ */
+export const EGG_HUNT = Object.freeze({
+  id: 'egg_hunt',
+  label: 'Egg Hunt',
+  icon: 'egghunt_egg_5',
+  source: 'source',
+  window: 'all year',
+  blurb: 'Pet an Egg Plant and now and then a chocolate egg drops. Collect all five kinds and the Egg Hunter Trophy takes them in exchange.',
+  /** items/include/trants.js performPetting: the Egg Plant's petting package. */
+  pet: Object.freeze({ trant: 'trant_egg', package: 'lgt_egg_plant_pet', table: 'egg_plant_pet' }),
+  /** achievements/collection_egg_hunter.js and its reward. */
+  badge: 'collection_egg_hunter',
+  trophy: 'trophy_egghunt',
+});
 
-/** Easter Sunday (anonymous Gregorian algorithm) as [month 1-12, day]. */
-export function easterSunday(year) {
-  const a = year % 19;
-  const b = Math.floor(year / 100);
-  const c = year % 100;
-  const d = Math.floor(b / 4);
-  const e = b % 4;
-  const f = Math.floor((b + 8) / 25);
-  const g = Math.floor((b - f + 1) / 3);
-  const h = (19 * a + b - d - g + 15) % 30;
-  const i = Math.floor(c / 4);
-  const k = c % 4;
-  const l = (32 + 2 * e + 2 * i - h - k) % 7;
-  const m = Math.floor((a + 11 * h + 22 * l) / 451);
-  const month = Math.floor((h + l - 7 * m + 114) / 31);
-  const day = ((h + l - 7 * m + 114) % 31) + 1;
-  return [month, day];
-}
+/* -------------------------------------------------------- calendar math */
 
 /** Local calendar parts of a timestamp (the player's own date). */
 function local(now) {
@@ -125,15 +123,6 @@ export function isPiDay(now = Date.now()) {
   return day === 14 || (day === 15 && hour < 12) || (day === 13 && hour >= 12);
 }
 
-/** Egg Hunt: Easter Sunday minus seven days through Easter Monday (designed). */
-export function isEggHunt(now = Date.now()) {
-  const t = local(now);
-  const [em, ed] = easterSunday(t.y);
-  const easter = dayIndex(t.y, em, ed);
-  const today = dayIndex(t.y, t.m, t.d);
-  return today >= easter - 7 && today <= easter + 1;
-}
-
 /** Source isZilloween() calendar test on Dametime parts ({ month, monthDay }). */
 export function isDametimeZilloween(parts) {
   return Boolean(parts && parts.month === 'Remember' && Number(parts.monthDay) >= 25);
@@ -146,7 +135,6 @@ export function calendarSeasons(now = Date.now()) {
   if (isPiDay(now)) out.push('pi_day');
   if (inWindow(t, REAL_WINDOWS.zilloween.from, REAL_WINDOWS.zilloween.to)) out.push('zilloween');
   if (inWindow(t, REAL_WINDOWS.glitchmas.from, REAL_WINDOWS.glitchmas.to)) out.push('glitchmas');
-  if (isEggHunt(now)) out.push('egg_hunt');
   return out;
 }
 
@@ -200,9 +188,9 @@ export function createSeasonState(seed = {}) {
     cards: arr(s.cards).filter((c) => c && Number.isInteger(c.poem)),
     holidayQuest: obj(s.holidayQuest), // { [yearKey]: 'offered' | 'done' }
     yetiMail: arr(s.yetiMail).filter((k) => typeof k === 'string'),
-    eggsFound: obj(s.eggsFound), // { [yearKey]: [tsid] }
+    eggsFound: obj(s.eggsFound), // retired grass-egg hunt ({ [yearKey]: [tsid] }): kept so older saves round-trip
     piYears: arr(s.piYears).filter((y) => typeof y === 'string'),
-    trophyGiven: s.trophyGiven === true,
+    trophyGiven: s.trophyGiven === true, // the Egg Hunter Trophy exchange has run (planEggTrophy)
     lastActive: arr(s.lastActive).filter((id) => SEASONS[id]),
     stats: obj(s.stats),
   };
@@ -516,37 +504,16 @@ export function yetiMailDue(state, now = Date.now()) {
 
 export const EGG_CLASSES = Object.freeze([1, 2, 3, 4, 5].map((n) => `egghunt_egg_${n}`));
 
-function hash(text) {
-  let h = 2166136261;
-  for (const ch of String(text)) {
-    h ^= ch.charCodeAt(0);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
-
 /**
- * The egg hidden on a street this hunt, or null. About half of all streets
- * hide one; which of the five follows the source egg_plant_pet table (20%
- * steps, so each egg is equally likely).
+ * The Egg Hunter Trophy, the source way (inc_achievements.js 392-420): once
+ * collection_egg_hunter is unlocked, however the fifth egg arrived, one of
+ * each egg is destroyed (items_destroy(label, 1), so a missing one is simply
+ * skipped) and the trophy is given, once. Returns { take, trophy } or null.
+ * countOf(classTsid) is the pack count.
  */
-export function eggForStreet(tsid, yearKey) {
-  if (!tsid) return null;
-  const h = hash(`${yearKey}:${tsid}`);
-  if (h % 100 >= 50) return null;
-  const roll = (Math.floor(h / 100) % 100) + 1;
-  const index = Math.min(4, Math.floor((roll - 1) / 20));
-  return EGG_CLASSES[index];
-}
-
-export function eggFound(state, yearKey, tsid) {
-  return (state.eggsFound[yearKey] || []).includes(tsid);
-}
-
-export function recordEggFound(state, yearKey, tsid) {
-  state.eggsFound[yearKey] ||= [];
-  if (!state.eggsFound[yearKey].includes(tsid)) state.eggsFound[yearKey].push(tsid);
-  return state.eggsFound[yearKey].length;
+export function planEggTrophy(state, unlocked, countOf) {
+  if (state?.trophyGiven || !(unlocked || []).includes(EGG_HUNT.badge)) return null;
+  return { take: EGG_CLASSES.filter((cls) => (Number(countOf(cls)) || 0) > 0), trophy: EGG_HUNT.trophy };
 }
 
 /* ---------------------------------------------------------------- Pi Day */
@@ -579,10 +546,7 @@ export function daysLeft(id, now = Date.now()) {
   let end = null;
   if (id === 'zilloween') end = dayIndex(t.y, 11, 1);
   else if (id === 'glitchmas') end = t.m === 1 ? dayIndex(t.y, 1, 3) : dayIndex(t.y + 1, 1, 3);
-  else if (id === 'egg_hunt') {
-    const [m, d] = easterSunday(t.y);
-    end = dayIndex(t.y, m, d) + 1;
-  } else if (id === 'pi_day') end = today;
+  else if (id === 'pi_day') end = today;
   if (end == null) return null;
   const left = end - today;
   return left >= 0 && left < 60 ? left : null;
@@ -592,8 +556,9 @@ export function daysLeft(id, now = Date.now()) {
 
 /**
  * Seasonal item paths for tools/job-obtainable.mjs: conversions (carving a
- * pumpkin needs the Knife & Board; the Pick is starter kit) and direct
- * sources that only run while their event is on.
+ * pumpkin needs the Knife & Board; the Pick is starter kit; the five eggs
+ * become the Egg Hunter Trophy) and direct sources that only run while their
+ * event is on, plus the Egg Plant's all-year chocolate eggs.
  */
 export function seasonalConversions() {
   return [
@@ -603,6 +568,8 @@ export function seasonalConversions() {
     ...LIT_CLASSES.map((cls) => ({ inputs: [cls], tool: null, outputs: ['pumpkin_pie'], source: 'season:zilloween_smash' })),
     { inputs: ['glitchmas_present'], tool: null, outputs: ['collectors_edition_2010_glitchmas_yeti'], source: 'season:glitchmas_unwrap' },
     { inputs: ['glitchmas_cracker'], tool: null, outputs: ['glitchmas_cracker_joke', 'glitchmas_cracker_factoid'], source: 'season:glitchmas_cracker' },
+    // All five eggs complete collection_egg_hunter, which trades them for the trophy.
+    { inputs: [...EGG_CLASSES], tool: null, outputs: [EGG_HUNT.trophy], source: `collection:${EGG_HUNT.badge}` },
   ];
 }
 
@@ -611,8 +578,8 @@ export function seasonalSources() {
     ...CANDY_CLASSES.map((id) => [id, 'season:zilloween_lantern_treat']),
     ...Object.values(SEASONAL_STOCK).flatMap((stores) => Object.values(stores).flat().map((o) => [o.classTsid, 'season:vendor'])),
     ['glitchmas_present', 'season:glitchmas_quest'],
-    ...EGG_CLASSES.map((id) => [id, 'season:egg_hunt']),
-    ['trophy_egghunt', 'season:egg_hunt'],
+    // Not seasonal: petting an Egg Plant rolls egg_plant_pet all year.
+    ...EGG_CLASSES.map((id) => [id, `drop:${EGG_HUNT.pet.table}`]),
   ];
 }
 

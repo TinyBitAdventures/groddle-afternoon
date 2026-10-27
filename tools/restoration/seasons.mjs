@@ -1,13 +1,15 @@
 /**
  * The restoration report's Seasons section (groddle/restoration-seasons,
- * drawn by groddle-afternoon-site/src/Restoration.php): one card per holiday
- * in js/seasons.js, written into public/restoration/data.json by
- * tools/build-restoration.mjs as `seasons`.
+ * drawn by groddle-afternoon-site/src/Restoration.php): one card per dated
+ * holiday in js/seasons.js, then the all-year Egg Hunt (EGG_HUNT), written
+ * into public/restoration/data.json by tools/build-restoration.mjs as
+ * `seasons`.
  *
  * Everything comes from the game: names, windows and blurbs from SEASONS;
  * item names from Tiny Speck's item files (SEASON_DATA, making-items.json);
  * the numbers from the rules in seasons.js; the badges from achievements.json;
- * the Pi recipe from recipes.json. The page decides which season is on now
+ * the Pi recipe from recipes.json; the Egg Plant's odds from its skill package
+ * (skill-packages-data.js). The page decides which season is on now
  * from `when` (real-world windows the PHP evaluates on each request) and
  * `dametime` (Zilloween on Ur's own calendar), so nothing has to be rebuilt
  * for the "On now" mark to move.
@@ -22,6 +24,7 @@ import {
   CARVE,
   CARVED_CLASSES,
   EGG_CLASSES,
+  EGG_HUNT,
   LIGHT,
   LIT_CLASSES,
   NOG,
@@ -34,6 +37,8 @@ import { SEASON_DATA } from '../../public/js/seasons-data.js';
 import { GAME_DAY_MS, GAME_EPOCH_MS, GAME_YEAR_MS, MONTH_LENGTHS, MONTH_NAMES } from '../../public/js/game-day.js';
 import { SEASONAL_SEEDS } from '../../public/js/garden.js';
 import { SEASONAL_RECIPES } from '../../public/js/making.js';
+import { SKILL_PACKAGES } from '../../public/js/skill-packages-data.js';
+import { TRANT_META } from '../../public/js/trants.js';
 import { playHref } from './play-links.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -43,7 +48,6 @@ const json = (p) => JSON.parse(readFileSync(join(pub, p), 'utf8'));
 /** How much of each event survives (SEASONS[id].source), as the card's tag. */
 export const SEASON_STATUS = Object.freeze({
   source: { label: 'Restored from source', tone: 'moss', note: 'Its items, verbs, words and badges come from Tiny Speck’s server code.' },
-  reconstructed: { label: 'Reconstructed', tone: 'plum', note: 'The eggs and the trophy survive in Tiny Speck’s files, but how the hunt ran does not, so the remake rebuilt it around them.' },
 });
 
 /** Each card's colour, a report tone token. */
@@ -59,16 +63,26 @@ const BADGE_MATCH = {
 
 /**
  * The real-world window each event runs in, as data the page can test: fixed
- * dates (seasons.js REAL_WINDOWS, inclusive, may wrap the year), the Egg Hunt
- * (isEggHunt: Easter Sunday minus seven days through Easter Monday) and Pi
- * Day (isPiDay: March 14 in UTC, plus twelve hours either side).
+ * dates (seasons.js REAL_WINDOWS, inclusive, may wrap the year) and Pi Day
+ * (isPiDay: March 14 in UTC, plus twelve hours either side). The Egg Hunt is
+ * always on, so it is never marked On now.
  */
 const WHEN = {
   zilloween: { kind: 'dates', from: [...REAL_WINDOWS.zilloween.from], to: [...REAL_WINDOWS.zilloween.to] },
   glitchmas: { kind: 'dates', from: [...REAL_WINDOWS.glitchmas.from], to: [...REAL_WINDOWS.glitchmas.to] },
-  egg_hunt: { kind: 'easter', before: 7, after: 1 },
   pi_day: { kind: 'utc-day', month: 3, day: 14, slackHours: 12 },
+  egg_hunt: { kind: 'always' },
 };
+
+/**
+ * Each card's play link: a practice copy with the season switched on and its
+ * pack stocked, or for the Egg Hunt one standing beside the Egg Plant on
+ * Murrukku Meander (&caredemo=egg, its petting reset for the day).
+ */
+const PLAY = {
+  egg_hunt: `?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=GA51B2OQAK623EF&caredemo=egg&carereset=1`,
+};
+const play = (id) => playHref(PLAY[id] || `?autostart=1&fresh=1&resetgame=1&questoffer=off&season=${id}&seasondemo=1`);
 
 const items = json('assets/content/making-items.json').items;
 const label = (id) => SEASON_DATA.items[id]?.label || items[id]?.label || id;
@@ -128,8 +142,13 @@ function facts(id) {
     ];
   }
   if (id === 'egg_hunt') {
+    const skills = Object.entries(SKILL_PACKAGES[EGG_HUNT.pet.package].skills);
+    const chance = (skill) => skills.find(([k]) => k === skill)?.[1].drop_chance;
+    const ranks = skills.filter(([k]) => k !== 'no_skill').map(([, s]) => `${s.drop_chance}%`);
+    const works = skills.find(([k]) => k === 'no_skill')[1].success_rate;
     return [
-      { label: 'Find', text: 'One of five chocolate eggs hides in the grass of about half the streets in Ur, a different spread every hunt. Eat them, or keep all five.', items: EGG_CLASSES.map(item) },
+      { label: 'Pet', text: `Pet an ${TRANT_META[EGG_HUNT.pet.trant].label} once a game day for a ${chance('no_skill')}% chance of a chocolate egg, rising to ${list(ranks)} with Light Green Thumb I, II and III. Without the skill only ${works}% of pettings take. Each of the five eggs is as likely, and they drop all year.`, items: EGG_CLASSES.map(item) },
+      { label: 'Trophy', text: `Collect all five and the ${label(EGG_HUNT.trophy)} takes one of each in exchange.`, items: [item(EGG_HUNT.trophy)] },
     ];
   }
   if (id === 'pi_day') {
@@ -161,8 +180,8 @@ function badges(id, achievements) {
 /** The `seasons` block of public/restoration/data.json. */
 export function seasonsData() {
   const achievements = json('assets/content/achievements.json');
-  const seasons = SEASON_IDS.map((id) => {
-    const s = SEASONS[id];
+  const seasons = [...SEASON_IDS.map((id) => SEASONS[id]), EGG_HUNT].map((s) => {
+    const { id } = s;
     const status = SEASON_STATUS[s.source];
     if (!status) throw new Error(`seasons: no status for ${id} (${s.source})`);
     return {
@@ -177,7 +196,7 @@ export function seasonsData() {
       dametime: id === 'zilloween',
       facts: facts(id),
       ...badges(id, achievements),
-      play: playHref(`?autostart=1&fresh=1&resetgame=1&questoffer=off&season=${id}&seasondemo=1`),
+      play: play(id),
     };
   });
   return { status: SEASON_STATUS, dametime: dametimeWindow(), seasons };

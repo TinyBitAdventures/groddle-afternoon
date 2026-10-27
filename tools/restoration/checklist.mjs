@@ -215,8 +215,8 @@ export const CHECKLIST = Object.freeze([
     blurb: 'Carry Contraband across Ur without a Deimaginator catching you, then break the wrongfully imprisoned Smuggler out of his cell.',
     evidence: ['public/js/smuggling.js', 'public/js/features/smuggling-feature.js', 'public/js/quest-rooms/penalty.js'] },
   { id: 'seasons', group: 'quests', name: 'Holidays', status: 'source',
-    blurb: 'Zilloween, Glitchmas, the Egg Hunt and Pi Day.',
-    evidence: ['public/js/seasons.js'] },
+    blurb: 'Zilloween, Glitchmas and Pi Day on their dates, and the Egg Hunt all year from Egg Plants.',
+    evidence: ['public/js/seasons.js', 'public/js/features/seasons-feature.js', 'public/js/features/drops-feature.js'] },
 
   // —— Home & neighbours ——
   { id: 'homes', group: 'home', name: 'Your house and yard', status: 'source', spot: 'mailbox',

@@ -826,10 +826,12 @@
    "group": "quests",
    "name": "Holidays",
    "status": "source",
-   "blurb": "Zilloween, Glitchmas, the Egg Hunt and Pi Day.",
+   "blurb": "Zilloween, Glitchmas and Pi Day on their dates, and the Egg Hunt all year from Egg Plants.",
    "spot": null,
    "evidence": [
-    "public/js/seasons.js"
+    "public/js/seasons.js",
+    "public/js/features/seasons-feature.js",
+    "public/js/features/drops-feature.js"
    ],
    "shot": null,
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&season=zilloween&seasondemo=1&practice=1"
@@ -2059,11 +2061,6 @@
     "label": "Restored from source",
     "tone": "moss",
     "note": "Its items, verbs, words and badges come from Tiny Speck’s server code."
-   },
-   "reconstructed": {
-    "label": "Reconstructed",
-    "tone": "plum",
-    "note": "The eggs and the trophy survive in Tiny Speck’s files, but how the hunt ran does not, so the remake rebuilt it around them."
    }
   },
   "dametime": {
@@ -2368,74 +2365,6 @@
     "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&season=glitchmas&seasondemo=1&practice=1"
    },
    {
-    "id": "egg_hunt",
-    "label": "Egg Hunt",
-    "tone": "plum",
-    "icon": {
-     "id": "egghunt_egg_5",
-     "name": "Golden Egg",
-     "icon": "/assets/sprites/icons/egghunt_egg_5.png",
-     "icon3x": "/assets/sprites/icons/egghunt_egg_5@3x.png"
-    },
-    "status": "reconstructed",
-    "window": "the week before Easter Sunday, through Easter Monday",
-    "blurb": "Five chocolate eggs are hidden across Ur, one in the grass of many streets. Find all five for the Egg Hunter Trophy.",
-    "when": {
-     "kind": "easter",
-     "before": 7,
-     "after": 1
-    },
-    "dametime": false,
-    "facts": [
-     {
-      "label": "Find",
-      "text": "One of five chocolate eggs hides in the grass of about half the streets in Ur, a different spread every hunt. Eat them, or keep all five.",
-      "items": [
-       {
-        "id": "egghunt_egg_1",
-        "name": "Certified Organic Chocolate Egg",
-        "icon": "/assets/sprites/icons/egghunt_egg_1.png",
-        "icon3x": "/assets/sprites/icons/egghunt_egg_1@3x.png"
-       },
-       {
-        "id": "egghunt_egg_2",
-        "name": "Bugsbury Creme Egg",
-        "icon": "/assets/sprites/icons/egghunt_egg_2.png",
-        "icon3x": "/assets/sprites/icons/egghunt_egg_2@3x.png"
-       },
-       {
-        "id": "egghunt_egg_3",
-        "name": "Pysanka",
-        "icon": "/assets/sprites/icons/egghunt_egg_3.png",
-        "icon3x": "/assets/sprites/icons/egghunt_egg_3@3x.png"
-       },
-       {
-        "id": "egghunt_egg_4",
-        "name": "Secular Holiday Egg",
-        "icon": "/assets/sprites/icons/egghunt_egg_4.png",
-        "icon3x": "/assets/sprites/icons/egghunt_egg_4@3x.png"
-       },
-       {
-        "id": "egghunt_egg_5",
-        "name": "Golden Egg",
-        "icon": "/assets/sprites/icons/egghunt_egg_5.png",
-        "icon3x": "/assets/sprites/icons/egghunt_egg_5@3x.png"
-       }
-      ]
-     }
-    ],
-    "badges": [
-     {
-      "id": "collection_egg_hunter",
-      "name": "Egg Hunter Trophy",
-      "desc": "Collected all 5 Chocolate Eggs",
-      "icon": "/assets/badges/collection_egg_hunter.png"
-     }
-    ],
-    "secret": 0,
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&season=egg_hunt&seasondemo=1&practice=1"
-   },
-   {
     "id": "pi_day",
     "label": "Pi Day",
     "tone": "moss",
@@ -2477,11 +2406,89 @@
     "badges": [],
     "secret": 0,
     "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&season=pi_day&seasondemo=1&practice=1"
+   },
+   {
+    "id": "egg_hunt",
+    "label": "Egg Hunt",
+    "tone": "plum",
+    "icon": {
+     "id": "egghunt_egg_5",
+     "name": "Golden Egg",
+     "icon": "/assets/sprites/icons/egghunt_egg_5.png",
+     "icon3x": "/assets/sprites/icons/egghunt_egg_5@3x.png"
+    },
+    "status": "source",
+    "window": "all year",
+    "blurb": "Pet an Egg Plant and now and then a chocolate egg drops. Collect all five kinds and the Egg Hunter Trophy takes them in exchange.",
+    "when": {
+     "kind": "always"
+    },
+    "dametime": false,
+    "facts": [
+     {
+      "label": "Pet",
+      "text": "Pet an Egg Plant once a game day for a 10% chance of a chocolate egg, rising to 15%, 20% and 30% with Light Green Thumb I, II and III. Without the skill only 60% of pettings take. Each of the five eggs is as likely, and they drop all year.",
+      "items": [
+       {
+        "id": "egghunt_egg_1",
+        "name": "Certified Organic Chocolate Egg",
+        "icon": "/assets/sprites/icons/egghunt_egg_1.png",
+        "icon3x": "/assets/sprites/icons/egghunt_egg_1@3x.png"
+       },
+       {
+        "id": "egghunt_egg_2",
+        "name": "Bugsbury Creme Egg",
+        "icon": "/assets/sprites/icons/egghunt_egg_2.png",
+        "icon3x": "/assets/sprites/icons/egghunt_egg_2@3x.png"
+       },
+       {
+        "id": "egghunt_egg_3",
+        "name": "Pysanka",
+        "icon": "/assets/sprites/icons/egghunt_egg_3.png",
+        "icon3x": "/assets/sprites/icons/egghunt_egg_3@3x.png"
+       },
+       {
+        "id": "egghunt_egg_4",
+        "name": "Secular Holiday Egg",
+        "icon": "/assets/sprites/icons/egghunt_egg_4.png",
+        "icon3x": "/assets/sprites/icons/egghunt_egg_4@3x.png"
+       },
+       {
+        "id": "egghunt_egg_5",
+        "name": "Golden Egg",
+        "icon": "/assets/sprites/icons/egghunt_egg_5.png",
+        "icon3x": "/assets/sprites/icons/egghunt_egg_5@3x.png"
+       }
+      ]
+     },
+     {
+      "label": "Trophy",
+      "text": "Collect all five and the Egg Hunter Trophy takes one of each in exchange.",
+      "items": [
+       {
+        "id": "trophy_egghunt",
+        "name": "Egg Hunter Trophy",
+        "icon": "/assets/sprites/icons/trophy_egghunt.png",
+        "icon3x": "/assets/sprites/icons/trophy_egghunt@3x.png"
+       }
+      ]
+     }
+    ],
+    "badges": [
+     {
+      "id": "collection_egg_hunter",
+      "name": "Egg Hunter Trophy",
+      "desc": "Collected all 5 Chocolate Eggs",
+      "icon": "/assets/badges/collection_egg_hunter.png"
+     }
+    ],
+    "secret": 0,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=GA51B2OQAK623EF&caredemo=egg&carereset=1&practice=1"
    }
   ]
  },
  "git": {
-  "commits": 535,
+  "commits": 536,
   "since": "2026-10-19",
   "recent": [
    {

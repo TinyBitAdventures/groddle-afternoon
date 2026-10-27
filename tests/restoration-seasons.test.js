@@ -13,7 +13,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { SEASONS, SEASON_IDS, calendarSeasons, isDametimeZilloween } from '../public/js/seasons.js';
+import { EGG_HUNT, SEASONS, SEASON_IDS, calendarSeasons, isDametimeZilloween } from '../public/js/seasons.js';
 import { dametimeParts } from '../public/js/game-day.js';
 import { seasonsData } from '../tools/restoration/seasons.mjs';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
@@ -56,10 +56,10 @@ describe('restoration Seasons section (tools/restoration/seasons.mjs, Seasons.ph
     assert.deepEqual(built.seasons, data, 'run node tools/build-restoration.mjs');
   });
 
-  it('has a card for every season in js/seasons.js, with its own name, window and blurb', () => {
-    assert.deepEqual(data.seasons.map((s) => s.id), SEASON_IDS);
+  it('has a card for every dated season in js/seasons.js, then the all-year Egg Hunt, each with its own name, window and blurb', () => {
+    assert.deepEqual(data.seasons.map((s) => s.id), [...SEASON_IDS, 'egg_hunt']);
     for (const s of data.seasons) {
-      const src = SEASONS[s.id];
+      const src = SEASONS[s.id] || EGG_HUNT;
       assert.equal(s.label, src.label);
       assert.equal(s.window, src.window);
       assert.equal(s.blurb, src.blurb);
@@ -85,19 +85,31 @@ describe('restoration Seasons section (tools/restoration/seasons.mjs, Seasons.ph
     const by = Object.fromEntries(data.seasons.map((s) => [s.id, s]));
     for (const id of ['pumpkin_carver', 'lanternerer', 'mini_tricksy_treater', 'the_candyglitch', 'candy_muncher']) assert.ok(by.zilloween.badges.some((b) => b.id === id), id);
     assert.deepEqual(by.egg_hunt.badges.map((b) => b.id), ['collection_egg_hunter']);
+    // The Egg Hunt is the source mechanic: Egg Plants, all year, never On now.
+    assert.equal(by.egg_hunt.status, 'source');
+    assert.deepEqual(by.egg_hunt.when, { kind: 'always' });
+    assert.match(by.egg_hunt.facts[0].text, /Egg Plant once a game day for a 10% chance .* 15%, 20% and 30% with Light Green Thumb I, II and III\. Without the skill only 60% of pettings take/);
+    assert.doesNotMatch(JSON.stringify(by.egg_hunt), /grass|Easter/);
     assert.equal(by.glitchmas.badges.some((b) => b.id === 'pop_star'), false, 'Pop Idol is a secret badge');
     assert.equal(by.glitchmas.secret, 1);
     for (const b of data.seasons.flatMap((s) => s.badges)) assert.equal(b.name, achievements[b.id].name);
   });
 
-  it('opens each Try it link as a practice copy with that season on, never the saved game', () => {
+  it('opens each Try it link as a practice copy (the season on, or beside an Egg Plant), never the saved game', () => {
+    const ecology = JSON.parse(readFileSync(join(pub, 'assets/content/street-ecology.json'), 'utf8')).streets;
     for (const s of data.seasons) {
       const url = new URL(s.play, 'https://groddle.localhost/restoration/');
       assert.equal(url.pathname, '/play/');
       assert.equal(url.searchParams.get('practice'), '1', s.id);
-      assert.equal(url.searchParams.get('season'), s.id);
-      assert.equal(url.searchParams.get('seasondemo'), '1');
       assert.equal(url.searchParams.has('seasonautoplay'), false);
+      if (s.id === 'egg_hunt') {
+        assert.equal(url.searchParams.has('season'), false);
+        assert.equal(url.searchParams.get('caredemo'), 'egg');
+        assert.ok(ecology[url.searchParams.get('streetdemo')]?.counts?.trant_egg > 0, 'the street grows an Egg Plant');
+      } else {
+        assert.equal(url.searchParams.get('season'), s.id);
+        assert.equal(url.searchParams.get('seasondemo'), '1');
+      }
     }
   });
 
@@ -124,7 +136,7 @@ describe('restoration Seasons section (tools/restoration/seasons.mjs, Seasons.ph
     }
   });
 
-  it('marks On now in PHP exactly when the game turns a season on (Seasons.php, every day 2026 to 2029, and the Pi Day edges)', { skip: skipWithoutSite }, (t) => {
+  it('marks On now in PHP exactly when the game turns a season on, and the all-year Egg Hunt never (Seasons.php, every day 2026 to 2029, and the Pi Day edges)', { skip: skipWithoutSite }, (t) => {
     if (!php()) return t.skip('no php on PATH');
     const piEdges = [2026, 2027].flatMap((y) => [-1, 0, 1].flatMap((h) => [Date.UTC(y, 2, 13, 12 + h), Date.UTC(y, 2, 15, 12 + h) - (h === 0 ? 1 : 0)]));
     const moments = [...NOONS, ...piEdges];
@@ -132,9 +144,6 @@ describe('restoration Seasons section (tools/restoration/seasons.mjs, Seasons.ph
     moments.forEach((ms, i) => {
       assert.deepEqual([...got[i]].sort(), [...calendarSeasons(ms)].sort(), new Date(ms).toISOString());
     });
-    // Easter as seasons.js computes it, for a century.
-    const easter = runPhp('$out = []; foreach ($in as $y) $out[] = Groddle\\Minn\\Seasons::easter($y); echo json_encode($out);', Array.from({ length: 100 }, (_, i) => 2000 + i));
-    return import('../public/js/seasons.js').then(({ easterSunday }) => easter.forEach((md, i) => assert.deepEqual(md, easterSunday(2000 + i), String(2000 + i))));
   });
 
   it('knows when Ur\'s own calendar is in Zilloween, as isDametimeZilloween does (Seasons.php dametime)', { skip: skipWithoutSite }, (t) => {

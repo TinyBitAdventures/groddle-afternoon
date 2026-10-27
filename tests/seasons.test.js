@@ -14,6 +14,7 @@ import {
   CANDY_DAILY_MAX,
   CARVED_CLASSES,
   EGG_CLASSES,
+  EGG_HUNT,
   LIT_CLASSES,
   PI_DIGITS,
   SEASONS,
@@ -24,8 +25,6 @@ import {
   carveOutcome,
   createSeasonState,
   crackerNote,
-  easterSunday,
-  eggForStreet,
   estimatePi,
   isDametimeZilloween,
   isPiDay,
@@ -34,6 +33,7 @@ import {
   parseSeasonDate,
   pieEatGate,
   placeCheck,
+  planEggTrophy,
   pumpkinTreat,
   recordCandyEaten,
   recordCandyGiven,
@@ -41,6 +41,7 @@ import {
   saysYay,
   seasonYearKey,
   seasonalConversions,
+  seasonalSources,
   smashOutcome,
   syncCards,
   teachPhrase,
@@ -57,17 +58,17 @@ const seq = (...vals) => {
 };
 
 describe('seasonal calendar', () => {
-  it('opens Zilloween, Glitchmas and the Egg Hunt on their real-world dates', () => {
+  it('opens Zilloween and Glitchmas on their real-world dates, and the Egg Hunt never (it runs all year)', () => {
     assert.deepEqual(calendarSeasons(at(2026, 10, 20)), ['zilloween']);
     assert.deepEqual(calendarSeasons(at(2026, 10, 31)), ['zilloween']);
     assert.deepEqual(calendarSeasons(at(2026, 11, 2)), []);
     assert.deepEqual(calendarSeasons(at(2026, 12, 24)), ['glitchmas']);
     assert.deepEqual(calendarSeasons(at(2027, 1, 3)), ['glitchmas']);
     assert.deepEqual(calendarSeasons(at(2027, 1, 4)), []);
-    assert.deepEqual(easterSunday(2027), [3, 28]);
-    assert.deepEqual(easterSunday(2026), [4, 5]);
-    assert.deepEqual(calendarSeasons(at(2027, 3, 22)), ['egg_hunt']);
-    assert.deepEqual(calendarSeasons(at(2027, 3, 30)), []);
+    // Easter week 2027 is no event: the source's eggs come from Egg Plants all year.
+    assert.deepEqual(calendarSeasons(at(2027, 3, 22)), []);
+    assert.deepEqual(calendarSeasons(at(2027, 3, 29)), []);
+    assert.equal(SEASONS.egg_hunt, undefined);
   });
 
   it('keeps the source Pi Day test (March 14 anywhere on Earth)', () => {
@@ -86,6 +87,9 @@ describe('seasonal calendar', () => {
     assert.deepEqual(activeSeasons(quiet, { dametime: { month: 'Remember', monthDay: 37 } }), { ids: ['zilloween'], primary: 'zilloween', via: 'dametime' });
     assert.deepEqual(activeSeasons(at(2026, 10, 20), { override: 'none' }).ids, []);
     assert.deepEqual(activeSeasons(quiet, { override: 'glitchmas' }), { ids: ['glitchmas'], primary: 'glitchmas', via: 'override' });
+    // ?season=egg_hunt names no dated event, so it overrides nothing.
+    assert.deepEqual(activeSeasons(quiet, { override: 'egg_hunt' }), activeSeasons(quiet));
+    assert.deepEqual(activeSeasons(at(2026, 10, 20), { override: 'egg_hunt' }).ids, ['zilloween']);
     assert.equal(parseSeasonDate('2026-12-24'), at(2026, 12, 24));
     assert.equal(seasonYearKey('glitchmas', at(2027, 1, 2)), 'glitchmas:2026');
   });
@@ -110,13 +114,12 @@ describe('seasonal calendar', () => {
       assert.deepEqual([s.fw, s.fh, s.cols, s.frames, s.label], [...size[n], 19, 74, 'talk'], path);
       assert.match(HIRES_SPRITES.get(path) || '', /@3x\.webp$/, path);
     }
-    for (const path of ['assets/sprites/seasons/egghunt_egg_4_world.png', 'assets/sprites/seasons/glitchmas_cracker_world.png']) {
+    for (const path of ['assets/sprites/seasons/glitchmas_cracker_world.png']) {
       assert.ok(src.includes(`'${path}'`), path);
       assert.match(HIRES_SPRITES.get(path) || '', /@3x\.webp$/, path);
     }
-    // Eggs 1, 2, 3 and 5 look like their icon in the world, so they draw it (3x via icon-hires).
-    assert.match(src, /assets\/sprites\/icons\/egghunt_egg_\$\{n\}\.png/);
-    for (const n of [1, 2, 3, 5]) assert.ok(HIRES_ICONS.has(`egghunt_egg_${n}`), n);
+    // No eggs in the grass: the source's eggs drop from Egg Plants.
+    assert.doesNotMatch(src, /egghunt_egg_4_world|spawnEgg|eggForStreet|seasonegg/);
     // Placed carved pumpkins draw their pack icon.
     for (const cls of CARVED_CLASSES) assert.ok(HIRES_ICONS.has(cls), cls);
   });
@@ -239,20 +242,81 @@ describe('Glitchmas', () => {
 });
 
 describe('Egg Hunt and Pi Day', () => {
-  it('hides one of five eggs on about half the streets, stable for a hunt', () => {
-    let hidden = 0;
-    const kinds = new Set();
-    for (let i = 0; i < 400; i += 1) {
-      const egg = eggForStreet(`GA${i}`, 'egg_hunt:2027');
-      if (egg) {
-        hidden += 1;
-        kinds.add(egg);
-      }
-    }
-    assert.ok(hidden > 150 && hidden < 250, String(hidden));
-    assert.equal(kinds.size, 5);
-    assert.equal(eggForStreet('GA7', 'egg_hunt:2027'), eggForStreet('GA7', 'egg_hunt:2027'));
+  it('is the source mechanic: Egg Plants pet with lgt_egg_plant_pet, five equally likely eggs, all year', async () => {
+    const { SKILL_PACKAGES } = await import('../public/js/skill-packages-data.js');
+    const { DROP_TABLES } = await import('../public/js/drop-tables-data.js');
+    const { packageForEvent } = await import('../public/js/features/drops-feature.js');
+    assert.equal(packageForEvent(`${EGG_HUNT.pet.trant}:pet`, {}), EGG_HUNT.pet.package);
+    const pkg = SKILL_PACKAGES[EGG_HUNT.pet.package];
+    assert.deepEqual(Object.values(pkg.skills).map((s) => [s.drop_class_id, s.drop_chance]), [[EGG_HUNT.pet.table, 10], [EGG_HUNT.pet.table, 15], [EGG_HUNT.pet.table, 20], [EGG_HUNT.pet.table, 30]]);
+    const table = DROP_TABLES[EGG_HUNT.pet.table];
+    assert.deepEqual(JSON.stringify(table).match(/egghunt_egg_[1-5]/g), EGG_CLASSES);
     assert.deepEqual(EGG_CLASSES, ['egghunt_egg_1', 'egghunt_egg_2', 'egghunt_egg_3', 'egghunt_egg_4', 'egghunt_egg_5']);
+    // Supply: eggs from the Egg Plant drop, the trophy from the collection.
+    const sources = Object.fromEntries(seasonalSources());
+    for (const cls of EGG_CLASSES) assert.equal(sources[cls], 'drop:egg_plant_pet', cls);
+    assert.equal(sources.trophy_egghunt, undefined);
+    const trade = seasonalConversions().find((r) => r.outputs.includes('trophy_egghunt'));
+    assert.deepEqual([trade.inputs, trade.source], [EGG_CLASSES, 'collection:collection_egg_hunter']);
+  });
+
+  it('trades one of each egg for the Egg Hunter Trophy once the collection unlocks, once (inc_achievements.js 392-420)', () => {
+    const state = createSeasonState();
+    const pack = { egghunt_egg_1: 2, egghunt_egg_2: 1, egghunt_egg_3: 1, egghunt_egg_4: 1, egghunt_egg_5: 1 };
+    const count = (cls) => pack[cls] || 0;
+    assert.equal(planEggTrophy(state, [], count), null);
+    assert.deepEqual(planEggTrophy(state, ['collection_egg_hunter'], count), { take: EGG_CLASSES, trophy: 'trophy_egghunt' });
+    // items_destroy skips an egg that is gone (eaten after the badge, an older save).
+    pack.egghunt_egg_3 = 0;
+    assert.deepEqual(planEggTrophy(state, ['collection_egg_hunter'], count).take, ['egghunt_egg_1', 'egghunt_egg_2', 'egghunt_egg_4', 'egghunt_egg_5']);
+    // A save that already has its trophy keeps it and its eggs.
+    const given = createSeasonState({ trophyGiven: true, eggsFound: { 'egg_hunt:2027': ['GA1'] } });
+    assert.equal(planEggTrophy(given, ['collection_egg_hunter'], count), null);
+    assert.deepEqual(given.eggsFound, { 'egg_hunt:2027': ['GA1'] }, 'the retired grass-egg record still loads');
+    const cat = JSON.parse(readFileSync(join(root, 'assets/content/achievements.json'), 'utf8'));
+    assert.deepEqual(cat.collection_egg_hunter.conditions.map((c) => [c.group, c.name, c.num]), EGG_CLASSES.map((cls) => ['in_inventory', cls, 1]));
+    assert.equal(Object.values(cat.collection_egg_hunter.rewards.items)[0].class_id, EGG_HUNT.trophy);
+  });
+
+  it('counts each egg into the collection however it arrives, then gives the trophy for them (seasons-feature)', async () => {
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js');
+    const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=catalog-unified-7');
+    const unlocked = [];
+    const counted = {};
+    const inv = createInventory();
+    const engine = {
+      inv,
+      started: true,
+      param: () => null,
+      get unlockedAchievements() { return unlocked; },
+      achievement(counter) {
+        counted[counter] = (counted[counter] || 0) + 1;
+        const have = Object.keys(counted).filter((k) => /^in_inventory:egghunt_egg_/.test(k)).length;
+        if (have === 5 && !unlocked.includes('collection_egg_hunter')) unlocked.push('collection_egg_hunter');
+      },
+    };
+    seasonsFeature._reset();
+    seasonsFeature.restore({}, null);
+    let now = 1_000_000;
+    const tick = () => { now += 1500; seasonsFeature.onTick(16, now, engine); };
+    for (const cls of EGG_CLASSES.slice(0, 4)) addItem(inv, cls, 1);
+    tick();
+    assert.equal(Object.keys(counted).length, 4);
+    assert.equal(countItem(inv, 'trophy_egghunt'), 0);
+    tick();
+    assert.equal(Object.keys(counted).length, 4, 'an egg already counted is not counted again');
+    // The fifth, from anywhere (an Egg Plant drop, a trade, mail).
+    addItem(inv, 'egghunt_egg_5', 1);
+    addItem(inv, 'egghunt_egg_2', 1);
+    tick();
+    assert.equal(countItem(inv, 'trophy_egghunt'), 1);
+    assert.deepEqual(EGG_CLASSES.map((cls) => countItem(inv, cls)), [0, 1, 0, 0, 0]);
+    assert.equal(seasonsFeature.save().trophyGiven, true);
+    for (const cls of EGG_CLASSES) addItem(inv, cls, 1);
+    tick();
+    tick();
+    assert.equal(countItem(inv, 'trophy_egghunt'), 1, 'once');
+    seasonsFeature._reset();
   });
 
   it('estimates the first six digits for sure, then fades out (pi.js estimateDigit)', () => {

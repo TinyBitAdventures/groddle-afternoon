@@ -15,16 +15,20 @@
  * (sign, read, mail); Egg Nog; "A Holiday Thing" (say "yay" for a Present
  * with a Collectors' Edition Yeti inside); the Yeti's cracker letter from
  * December 24.
- * Egg Hunt (reconstructed): a chocolate egg hidden on about half the streets;
- * all five for the Egg Hunter Trophy.
+ * Egg Hunt (source, all year, not a dated event): Egg Plants drop the eggs
+ * (drops-feature, lgt_egg_plant_pet); this module counts each egg into
+ * collection_egg_hunter as it lands in the pack, however it got there, and
+ * then trades one of each for the Egg Hunter Trophy, once (planEggTrophy).
  * Pi Day (source): Pi's Estimate verb.
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&season=zilloween
- *     (glitchmas | egg_hunt | pi_day | none), &seasondate=2026-12-24 previews a
+ *     (glitchmas | pi_day | none), &seasondate=2026-12-24 previews a
  *     date, &seasonautoplay=1 runs the event's loop (=hold stops before the
- *     end), &seasondemo=1 stocks the pack for it. Canvas: seasonActive,
+ *     end), &seasondemo=1 stocks the pack for it, &eggdemo=1,2,3,4 puts those
+ *     chocolate eggs in the pack. Canvas: seasonActive,
  *     seasonVia, seasonDecor, seasonLast, seasonAutoplay, seasonCandy,
- *     seasonGiftees, seasonFaces, seasonCrackers, seasonEggs, seasonPlaced.
+ *     seasonGiftees, seasonFaces, seasonCrackers, seasonEggs (egg kinds in the
+ *     pack), seasonTrophy, seasonPlaced.
  */
 
 import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-7';
@@ -67,8 +71,6 @@ import {
   crackerNote,
   dailyRow,
   daysLeft,
-  eggForStreet,
-  eggFound,
   estimatePi,
   faceOf,
   isCandyLover,
@@ -79,11 +81,11 @@ import {
   parseSeasonDate,
   pieEatGate,
   placeCheck,
+  planEggTrophy,
   pumpkinTreat,
   recordCandyEaten,
   recordCandyGiven,
   recordCarvedFace,
-  recordEggFound,
   saysYay,
   seasonYearKey,
   smashOutcome,
@@ -97,16 +99,12 @@ import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 
 export const SEASONS_FEATURE_ID = 'seasons';
 const LANTERN_GROUP = 'seasons:lantern';
-const EGG_GROUP = 'seasons:egg';
 const HOME_TSIDS = new Set(['RH_HOME_EXT', 'RH_HOME_INT']);
 const TALK_SIZE = { 1: [49, 47], 2: [49, 47], 3: [50, 47], 4: [48, 47], 5: [50, 55] };
 const TALK_COLS = 19;
 const TALK_FRAMES = 74;
-// The talk sheets, egg 4 and the cracker have 3x renders from their SWFs
-// (tools/vector-sprites/seasons.json, routed by js/sprite-hires.js). Eggs 1,
-// 2, 3 and 5 look in the world exactly like their pack icon (same OGA pixels),
-// so they draw the icon and get its 3x file from js/icon-hires.js.
-const eggWorldUrl = (n) => (n === 4 ? 'assets/sprites/seasons/egghunt_egg_4_world.png' : `assets/sprites/icons/egghunt_egg_${n}.png`);
+// The talk sheets and the cracker have 3x renders from their SWFs
+// (tools/vector-sprites/seasons.json, routed by js/sprite-hires.js).
 const GIVE_RANGE = 260;
 const HELPER_NAMES = { npc_piggy: 'Piggy', npc_chicken: 'Chicken', npc_butterfly: 'Butterfly' };
 const RECIPIENT_LINES = Object.freeze({
@@ -134,6 +132,9 @@ let autoplayStep = 0;
 let autoplayLog = [];
 let demoDone = false;
 let engineRef = null;
+let eggsOwned = null; // egg kinds in the pack at the last look (null before the first)
+let eggDemoDone = false;
+let eggCheckAt = 0;
 const textures = new Map();
 
 const dayKey = () => getGameDayKey(Date.now());
@@ -153,7 +154,8 @@ function publish(engine) {
   engine.setData('seasonGiftees', String(state.giftees.length));
   engine.setData('seasonFaces', state.carvedFaces.join(',') || 'none');
   engine.setData('seasonCrackers', String(state.crackersOpened));
-  engine.setData('seasonEggs', Object.values(state.eggsFound).reduce((n, list) => n + list.length, 0));
+  engine.setData('seasonEggs', String(EGG_CLASSES.filter((cls) => countItem(engine.inv, cls) > 0).length));
+  engine.setData('seasonTrophy', state.trophyGiven ? 'given' : 'none');
   engine.setData('seasonPlaced', state.placed.map((r) => `${r.cls}@${r.tsid}`).join(',') || 'none');
 }
 
@@ -330,7 +332,6 @@ function renderChip(engine) {
       style.textContent = `
 .season-chip { display: inline-flex; align-items: center; gap: 0.3rem; margin-left: 0.45rem; padding: 0.05rem 0.5rem 0.05rem 0.2rem; border: 1px solid #e0c88f; border-radius: 999px; background: #fff6e0; color: #7a4a12; font: inherit; font-size: 0.78rem; font-weight: 700; cursor: pointer; vertical-align: middle; }
 .season-chip[data-season="glitchmas"] { background: #eef8ff; border-color: #a9cde8; color: #1f5a82; }
-.season-chip[data-season="egg_hunt"] { background: #f7f0ff; border-color: #cdb7ec; color: #5b3a8a; }
 .season-chip[data-season="pi_day"] { background: #eefaf0; border-color: #a7d6b0; color: #2f6a3a; }
 .season-chip img { width: 18px; height: 18px; object-fit: contain; }
 .season-chip:hover { filter: brightness(1.04); }
@@ -370,7 +371,6 @@ function seasonTodo(id) {
       'Somebody would like to hear you say "yay" in local chat.',
     ];
   }
-  if (id === 'egg_hunt') return ['Chocolate eggs are hidden on about half the streets.', 'Find all five kinds for the Egg Hunter Trophy.', 'Each egg gives a Chocolate High (and a Sugar Crash after).'];
   if (id === 'pi_day') return ['Cook Pi with a Frying Pan.', 'Estimate Pi from your pack: the year\'s first estimate pays favor with Tii.'];
   return [];
 }
@@ -538,41 +538,6 @@ function tickSnow(dtMs) {
   }
 }
 
-function spawnEgg(engine, cls, pt) {
-  const { PIXI } = engine;
-  const n = EGG_CLASSES.indexOf(cls) + 1;
-  const y = groundAt(engine, pt.x, pt.y);
-  const spr = new PIXI.Sprite(textureFromUrl(eggWorldUrl(n)));
-  spr.anchor.set(0.5, 1);
-  spr.x = pt.x;
-  spr.y = y + 2;
-  spr.zIndex = 9;
-  spr._worldHitW = 46;
-  spr._worldHitH = 40;
-  engine.entityLayer.addChild(spr);
-  const sparkle = new PIXI.Graphics();
-  for (const [dx, dy] of [[0, -9], [7, 0], [0, 9], [-7, 0]]) {
-    sparkle.moveTo(0, 0);
-    sparkle.lineTo(dx * 0.25 + dy * 0.12, dy * 0.25 + dx * 0.12);
-    sparkle.lineTo(dx, dy);
-    sparkle.lineTo(dx * 0.25 - dy * 0.12, dy * 0.25 - dx * 0.12);
-  }
-  sparkle.fill({ color: 0xfff6b0, alpha: 0.9 });
-  sparkle.x = spr.x + 10;
-  sparkle.y = spr.y - 22;
-  sparkle.zIndex = 10;
-  engine.entityLayer.addChild(sparkle);
-  const target = engine.register({
-    classId: cls,
-    featureId: SEASONS_FEATURE_ID,
-    label: ITEM_CATALOG[cls]?.label || 'Chocolate Egg',
-    subtitle: 'Something sweet in the grass',
-    sprite: spr,
-    seasonDecor: 'egg',
-  });
-  decor.push({ kind: 'egg', sprite: spr, target, extra: sparkle, t: 0, cls });
-}
-
 function spawnPlaced(engine, row) {
   const { PIXI } = engine;
   const lit = isLitPumpkin(row.cls);
@@ -606,7 +571,7 @@ function spawnAll(engine) {
   if (!engine.street) return publish(engine);
   const inHome = HOME_TSIDS.has(engine.streetTsid);
   // Interiors (the Jethimadh Tower Base corridors and rooms) and source-empty
-  // streets (the Stoot memorial, puzzle courses) get no lanterns, eggs or canes.
+  // streets (the Stoot memorial, puzzle courses) get no lanterns or canes.
   const bare = Boolean(engine.population?.interior || engine.population?.sourceEmpty);
   const blocked = (engine.transientInstance?.() || bare) && !inHome;
   if (!blocked && !inHome) {
@@ -621,16 +586,6 @@ function spawnAll(engine) {
       spawnCandyCanes(engine);
       if (outdoors(engine)) startSnow(engine);
     }
-    if (isOn('egg_hunt')) {
-      const yearKey = seasonYearKey('egg_hunt', nowForCalendar(engine));
-      // &seasonegg=1..5 hides that egg here for QA.
-      const forced = Number(engine.param?.('seasonegg')) || 0;
-      const cls = forced >= 1 && forced <= 5 ? EGG_CLASSES[forced - 1] : eggForStreet(engine.streetTsid, yearKey);
-      if (cls && !eggFound(state, yearKey, engine.streetTsid)) {
-        const pt = (engine.placement(EGG_GROUP) || [])[0] || fallbackPoints(engine, 1)[0];
-        if (pt) spawnEgg(engine, cls, pt);
-      }
-    }
   }
   if (inHome && isOn('glitchmas') && engine.streetTsid === 'RH_HOME_EXT') startSnow(engine);
   for (const row of state.placed) if (row.tsid === engine.streetTsid) spawnPlaced(engine, row);
@@ -638,7 +593,7 @@ function spawnAll(engine) {
   publish(engine);
 }
 
-/** QA: &seasonpreview=lantern|ghost|candycane|egg|placed stands the avatar beside that decoration once. */
+/** QA: &seasonpreview=lantern|ghost|candycane|placed stands the avatar beside that decoration once. */
 let previewDone = false;
 function previewAt(engine) {
   const kind = engine.param?.('seasonpreview');
@@ -1090,11 +1045,6 @@ function tickDecor(engine, dtMs, now) {
       d.sprite.y = d.baseY + Math.sin(d.t * 0.9) * 10;
       d.sprite.alpha = 0.1 + (Math.sin(d.t * 0.35) + 1) * 0.05;
     }
-    if (d.kind === 'egg' && d.extra && !d.extra.destroyed) {
-      const s = 0.6 + Math.max(0, Math.sin(d.t * 2.4)) * 0.7;
-      d.extra.scale.set(s);
-      d.extra.alpha = 0.3 + Math.max(0, Math.sin(d.t * 2.4)) * 0.7;
-    }
     if ((d.kind === 'lantern' || d.kind === 'placed') && d.sprite?.stop && d.talkUntil && now > d.talkUntil) {
       d.talkUntil = 0;
       d.sprite.gotoAndStop(0);
@@ -1112,6 +1062,43 @@ function tickDecor(engine, dtMs, now) {
       lanternSpeak(engine, d, d.row.phrases[Math.floor(Math.random() * d.row.phrases.length)], now);
     }
   }
+}
+
+/* ---------------------------------------------------------------- Egg Hunt */
+
+/**
+ * collection_egg_hunter counts in_inventory per egg. Eggs reach the pack from
+ * an Egg Plant (drops-feature), a trade, mail or anything else, so the pack is
+ * watched: each kind is counted the first time it shows up (and every kind
+ * owned at the first look, which is harmless: each condition needs 1). Then,
+ * once the badge is unlocked, the trophy exchange runs (planEggTrophy).
+ */
+function tickEggs(engine, now = Date.now()) {
+  if (!engine?.inv || !engine.started || now < eggCheckAt) return;
+  eggCheckAt = now + 1000;
+  const qa = engine.param?.('eggdemo');
+  if (qa && !eggDemoDone) {
+    eggDemoDone = true;
+    for (const n of String(qa).split(',').map(Number)) {
+      const cls = EGG_CLASSES[n - 1];
+      if (cls && countItem(engine.inv, cls) < 1) addItem(engine.inv, cls, 1);
+    }
+    engine.refreshPack?.();
+  }
+  const owned = EGG_CLASSES.filter((cls) => countItem(engine.inv, cls) > 0);
+  const fresh = eggsOwned ? owned.filter((cls) => !eggsOwned.has(cls)) : owned;
+  eggsOwned = new Set(owned);
+  for (const cls of fresh) engine.achievement?.(`in_inventory:${cls}`, 1);
+  const plan = planEggTrophy(state, engine.unlockedAchievements, (cls) => countItem(engine.inv, cls));
+  if (plan) {
+    state.trophyGiven = true;
+    for (const cls of plan.take) removeItem(engine.inv, cls, 1);
+    addItem(engine.inv, plan.trophy, 1);
+    eggsOwned = new Set(EGG_CLASSES.filter((cls) => countItem(engine.inv, cls) > 0));
+    const trophy = ITEM_CATALOG[plan.trophy]?.label || 'Egg Hunter Trophy';
+    say(engine, plan.take.length === EGG_CLASSES.length ? `You got the ${trophy}, in exchange for your five chocolate eggs.` : `You got the ${trophy}.`);
+    engine.save?.();
+  } else if (fresh.length) publish(engine);
 }
 
 /* ----------------------------------------------------------------------- QA */
@@ -1143,13 +1130,6 @@ function demoSetup(engine) {
     need('egg_plain', 2);
   }
   if (isOn('pi_day')) need('pi', 1);
-  if (isOn('egg_hunt') && engine.param?.('seasonautoplay') === 'trophy') {
-    // Four of the five eggs already found, so the street's egg completes the set.
-    for (const cls of EGG_CLASSES.slice(0, 4)) {
-      need(cls, 1);
-      engine.achievement?.(`in_inventory:${cls}`, 1);
-    }
-  }
   engine.refreshPack?.();
   if (engine.param?.('seasonautoplay')) autoplayAt = Date.now() + 1800;
   publish(engine);
@@ -1158,7 +1138,6 @@ function demoSetup(engine) {
 const AUTOPLAY = {
   zilloween: [['carve'], ['wait', 1600], ['carve'], ['wait', 1600], ['light'], ['eat'], ['eat'], ['give'], ['wait', 1800], ['treat'], ['hold'], ['home'], ['wait', 2600], ['place'], ['teach'], ['wait', 7000], ['done']],
   glitchmas: [['nog'], ['quest'], ['yay'], ['wait', 800], ['unwrap'], ['yeti'], ['card'], ['crack'], ['wait', 1500], ['read'], ['done']],
-  egg_hunt: [['egg'], ['done']],
   pi_day: [['pi'], ['wait', 9000], ['done']],
 };
 
@@ -1258,14 +1237,6 @@ function autoplay(engine, now) {
       if (cls) run(cls, 'read');
       break;
     }
-    case 'egg': {
-      const egg = decor.find((d) => d.kind === 'egg');
-      if (egg) {
-        if (engine.player) engine.player.x = egg.sprite.x - 30;
-        seasonsFeature.runVerb(egg.target, 'pickup', engine);
-      }
-      break;
-    }
     case 'pi':
       run('pi', 'estimate');
       break;
@@ -1316,7 +1287,6 @@ export const seasonsFeature = {
     refreshSeason(engineRef, true);
     const groups = [];
     if (isOn('zilloween')) groups.push({ key: LANTERN_GROUP, count: lanternCount({ worldW: (street.bounds?.r || 0) - (street.bounds?.l || 0) || 2000 }), clearance: 110 });
-    if (isOn('egg_hunt')) groups.push({ key: EGG_GROUP, count: 1, clearance: 70 });
     return groups;
   },
 
@@ -1375,6 +1345,7 @@ export const seasonsFeature = {
 
   onTick(dtMs, now, engine) {
     if (refreshSeason(engine) && engine.street) spawnAll(engine);
+    tickEggs(engine, now);
     if (engine.street && spawnedFor !== engine.streetTsid) spawnAll(engine);
     if (autoplayAt && now >= autoplayAt) autoplay(engine, now);
     tickCarve(engine, now);
@@ -1559,7 +1530,6 @@ export const seasonsFeature = {
         { id: 'talk', label: 'Talk to', enabled: true, tooltip: 'It has opinions', durationMs: 0 },
       ];
     }
-    if (d.kind === 'egg') return [{ id: 'pickup', label: 'Pick up', enabled: true, tooltip: 'Put it in your pack', durationMs: 0 }];
     if (d.kind === 'placed') {
       const rows = [{ id: 'pickup', label: 'Pick up', enabled: true, tooltip: 'Put it in your pack', durationMs: 0 }];
       if (isLitPumpkin(d.row.cls)) rows.unshift({ id: 'teach', label: 'Teach', enabled: true, tooltip: 'Teach me a new phrase', durationMs: 0 });
@@ -1589,23 +1559,6 @@ export const seasonsFeature = {
         lanternSpeak(engine, d, 'TRICK! MWA-HA-HA!', now);
         const effects = grantAll(engine, { mood: res.mood || 0, energy: res.energy || 0 });
         say(engine, res.line, true, effects);
-      }
-      engine.save?.();
-      return true;
-    }
-    if (d.kind === 'egg' && verbId === 'pickup') {
-      const yearKey = seasonYearKey('egg_hunt', nowForCalendar(engine));
-      recordEggFound(state, yearKey, engine.streetTsid);
-      addItem(engine.inv, d.cls, 1);
-      engine.achievement?.(`in_inventory:${d.cls}`, 1);
-      engine.playSound?.('DISCOVER_USEFUL_NEW_ITEM', { volume: 0.6 });
-      clearDecor(engine, (x) => x === d);
-      const kinds = EGG_CLASSES.filter((c) => countItem(engine.inv, c) > 0).length;
-      say(engine, `You found a ${ITEM_CATALOG[d.cls]?.label || 'chocolate egg'}! (${kinds} of 5 kinds in your pack)`);
-      if ((engine.unlockedAchievements || []).includes('collection_egg_hunter') && !state.trophyGiven) {
-        state.trophyGiven = true;
-        addItem(engine.inv, 'trophy_egghunt', 1);
-        say(engine, 'You got the Egg Hunter Trophy!');
       }
       engine.save?.();
       return true;
@@ -1653,6 +1606,9 @@ export const seasonsFeature = {
     cracker = null;
     pendingBoosts = [];
     demoDone = false;
+    eggsOwned = null;
+    eggDemoDone = false;
+    eggCheckAt = 0;
     autoplayAt = 0;
     autoplayStep = 0;
     autoplayLog = [];
