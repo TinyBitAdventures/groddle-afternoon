@@ -100,7 +100,8 @@ describe('the study bar', () => {
       assert.match(src, /progress_bar\.filters = StaticFilters\.copyFilterArrayFromObject\(\{blurX:8, blurY:8, strength:20, alpha:\.2\}, StaticFilters\.white4px40AlphaGlowA\);/);
     }
     const css = read('style.css');
-    const at = css.indexOf('.quest-log-body .skill-study-card.unlearning .q-bar.skill-study-bar {');
+    // G241: the frame moved onto every study bar, unlearning included.
+    const at = css.indexOf('.quest-log-body .q-bar.skill-study-bar {');
     assert.ok(at > 0);
     const rule = css.slice(at, css.indexOf('}', at));
     assert.match(rule, /background: #cfd0d0;/);
@@ -108,6 +109,29 @@ describe('the study bar', () => {
     // G235 (Austin): the card is neutral, the learning card's look; no red border, pink or red label.
     assert.doesNotMatch(css, /\.skill-study-card\.unlearning \{/);
     assert.doesNotMatch(css, /\.skill-study-card\.unlearning \.skill-study-title span/);
+  });
+
+  it('learning, fast and paused bars share the one Skills bar frame (G241)', () => {
+    if (existsSync(imagination)) {
+      const src = readFileSync(join(imagination, 'ImaginationSkillsUI.as'), 'utf8');
+      // One ProgressBar for every state (ImaginationSkillsUI.as 68), framed once in
+      // buildBase (120-125); updateSkillTraining (401-460) only calls setBarColors.
+      assert.equal(src.match(/new ProgressBar\(/g).length, 1);
+      assert.equal(src.match(/setFrameColors\(/g).length, 1);
+      assert.match(src, /progress_bar\.setFrameColors\(0xcfd0d0, 0xb6b7b7\);\s*progress_bar\.corner_size = 10;/);
+      const pb = readFileSync(join(imagination, '../../gameoverlay/ProgressBar.as'), 'utf8');
+      // ProgressBar's own default frame, which the Skills bar replaced (ProgressBar.as 22-24).
+      assert.match(pb, /FRAME_TOP_COLOR:Number = 0x656b6b;/);
+      assert.match(pb, /FRAME_COLOR:Number = 0x9ca3a3;/);
+    }
+    const css = read('style.css');
+    const at = css.indexOf('.quest-log-body .q-bar.skill-study-bar {');
+    const rule = css.slice(at, css.indexOf('}', at));
+    assert.match(rule, /background: #cfd0d0;/);
+    assert.match(rule, /border-radius: 5px;/);
+    // No state rule paints its own frame, and the default grey is gone from the bars.
+    assert.doesNotMatch(css, /\.skill-study-card\.unlearning \.q-bar\.skill-study-bar \{/);
+    assert.doesNotMatch(css.replace(/\/\*[\s\S]*?\*\//g, ''), /#9ca3a3|#656b6b/);
   });
 
   it('style.css draws them in those colours, with the arrows scrolling one step every 0.4 s', () => {

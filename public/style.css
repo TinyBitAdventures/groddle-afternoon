@@ -3620,14 +3620,6 @@ html[data-street-cards] .activity-feed { visibility: hidden; }
     linear-gradient(180deg, #4d9899, #4e989a) left / 2px 100% no-repeat,
     linear-gradient(180deg, #75c1c2, #42a5a8);
 }
-.quest-log-body .skill-study-card.unlearning .q-bar.skill-study-bar {
-  /* G236: the client's skills bar frame and glow (ImaginationSkillsUI.as
-     122-125): setFrameColors(0xcfd0d0, 0xb6b7b7), a light grey frame under a
-     2 px top edge (ProgressBar.as drawFrame 91-100, setFrameColors 270-277), and a white
-     GlowFilter (blur 8, strength 20, alpha 0.2; StaticFilters.as 264-272). */
-  background: #cfd0d0;
-  box-shadow: inset 0 2px 0 #b6b7b7, 0 0 1px 3px rgba(255, 255, 255, 0.2);
-}
 .skill-unlearn-btn { margin-top: 0.35rem; color: #8a3a31; border-color: #e0b3ad; background: #fff7f5; }
 .skill-unlearn-btn.is-confirm { color: #fff; background: #b8564a; border-color: #9a3d33; }
 .skill-tree-toolbar {
@@ -3845,15 +3837,24 @@ html[data-street-cards] .activity-feed { visibility: hidden; }
 }
 .skill-study-time { font-variant-numeric: tabular-nums; }
 /* G222: study bars in the client's look (js/skills-panel.js studyBar):
-   ProgressBar.as 20-33 + drawBar 113-150 (grey frame with a dark top edge, a
+   ProgressBar.as 20-33 + drawBar 113-150 (the Skills frame below, a
    vertical gradient fill and a 2 px tip), ImaginationSkillsUI.as 200-211 (learn
    and fast colours; unlearning's teal is with .skill-study-card.unlearning, G230), buildArrows 241-263 and animateArrows 508-517 (gold 17x25
    arrows every 24 px over the filled part, one step every 0.4 s). */
 .quest-log-body .q-bar.skill-study-bar {
+  /* G236/G241: every study bar (learning, fast, paused, unlearning) sits in the
+     client's one Skills bar frame (ImaginationSkillsUI.as buildBase 120-125: the
+     single progress_bar every state reuses, recoloured only by setBarColors in
+     updateSkillTraining 401-460): setFrameColors(0xcfd0d0, 0xb6b7b7), a light
+     grey frame under a 2 px top edge (ProgressBar.as drawFrame 91-100,
+     setFrameColors 270-277), corner_size 10 (drawRoundRect's ellipse width, so a
+     5 px radius; ProgressBar.as 285-290) and a white GlowFilter (blur 8, strength
+     20, alpha 0.2; StaticFilters.as 264-272), not ProgressBar's default grey
+     0x9ca3a3 / 0x656b6b (ProgressBar.as 22-24). */
   height: 10px;
-  border-radius: 6px;
-  background: #9ca3a3;
-  box-shadow: inset 0 2px 0 #656b6b;
+  border-radius: 5px;
+  background: #cfd0d0;
+  box-shadow: inset 0 2px 0 #b6b7b7, 0 0 1px 3px rgba(255, 255, 255, 0.2);
 }
 .quest-log-body .skill-study-bar > i { position: relative; overflow: hidden; }
 .quest-log-body .skill-study-bar.is-learn > i,
@@ -7768,3 +7769,75 @@ html[data-street-cards] .familiar-dialog,
   .award-familiar-bubble { left: auto; right: 0; }
   .award-familiar-bubble::after { left: auto; right: 22px; }
 }
+
+/* G254: the client's hotkey sheet (js/hotkeys-sheet.js; Hotkeys.as and its art
+   TSEngineAssets hotkeys.png, 765x545): a 40% black shade over the game
+   (Hotkeys.as refresh 95-97), the card 70% black (sampled 0,0,0,179), white
+   labels with the keys in the art's green #9ccc1c, a green "?" on a tab above
+   the title and the footer in a darker pill; up to 100 px from the top
+   (refresh 99), fading in over 0.1 s (ANI_TIME, 26). */
+.hotkeys-shade {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: min(100px, 8vh) 16px 20px;
+  background: rgba(0, 0, 0, 0.4);
+  overflow-y: auto;
+  pointer-events: none;
+  animation: hotkeys-in 0.1s linear;
+}
+.hotkeys-shade[hidden] { display: none; }
+@keyframes hotkeys-in { from { opacity: 0; } to { opacity: 1; } }
+.hotkeys-card {
+  position: relative;
+  box-sizing: border-box;
+  width: min(765px, 100%);
+  margin-top: 2.6rem;
+  padding: 2.1rem 1.6rem 1rem;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font: 700 0.86rem/1.35 "Trebuchet MS", sans-serif;
+}
+.hotkeys-badge {
+  position: absolute;
+  top: -2.6rem;
+  left: 50%;
+  width: 4.9rem;
+  height: 2.7rem;
+  transform: translateX(-50%);
+  border-radius: 2.45rem 2.45rem 0 0;
+  background: rgba(0, 0, 0, 0.7);
+  color: #9ccc1c;
+  font: 900 2.2rem/3rem "Trebuchet MS", sans-serif;
+  text-align: center;
+}
+.hotkeys-card h2 {
+  margin: 0 0 1rem;
+  text-align: center;
+  font: 900 clamp(1.4rem, 4vw, 2.2rem)/1.1 "Trebuchet MS", sans-serif;
+  text-shadow: 0 2px 2px rgba(0, 0, 0, 0.6);
+}
+.hotkeys-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.4rem 1.6rem;
+}
+.hotkeys-section h3 { margin: 0.4rem 0 0.35rem; font: 900 1.15rem/1.2 "Trebuchet MS", sans-serif; }
+.hotkeys-section ul { margin: 0; padding: 0; list-style: none; }
+.hotkeys-section li { margin: 0 0 0.3rem; }
+.hotkeys-section b { color: #9ccc1c; }
+.hotkeys-section small { display: block; color: #cbcbcb; font-weight: 400; font-size: 0.76rem; }
+.hotkeys-foot {
+  width: fit-content;
+  margin: 0.8rem auto 0;
+  padding: 0.25rem 1rem;
+  border-radius: 999px;
+  background: rgba(35, 35, 35, 0.73);
+  font-weight: 400;
+  font-size: 0.82rem;
+}
+@media (prefers-reduced-motion: reduce) { .hotkeys-shade { animation: none; } }

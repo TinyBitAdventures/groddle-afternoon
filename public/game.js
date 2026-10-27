@@ -818,6 +818,7 @@ import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g367-1';
 import { forgetTexture, frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
 import { cancelAllOverlays, playPoofIn } from './js/overlay-art.js?v=g311-1';
 import * as textureUrls from './js/textures.js';
@@ -1211,6 +1212,70 @@ function openLookBuilderOn(slot) {
   }
   if (isAvatarOpen()) renderAvatarBuilder();
   else openAvatarPanel();
+}
+
+/** G254: the client's hold-? sheet (js/client-hotkeys.js); the keyring row only in multiplayer. */
+const hotkeysSheet = createHotkeysSheet(document, { keyring: () => Boolean(document.getElementById('keys-btn')) });
+
+/** A visible element (not under a hidden ancestor or display: none). */
+function shownElement(node) {
+  return Boolean(node && !node.closest('[hidden]') && node.getClientRects().length);
+}
+
+/**
+ * G254: the client's keys the remake has a panel for (js/client-hotkeys.js
+ * CLIENT_KEY_TABLE: TSMainView.as 641-660 and hotkeys.png). M is with G below and
+ * ? is the sheet; this takes Z, Shift+L, Shift+K and Shift+D. The main keydown
+ * handler has already let typing in a field through. Returns true when the key
+ * was taken (the caller stops there).
+ *
+ * Left out, with nothing behind them here: comma Preferences (commaKeyHandler
+ * 806-814, PrefsDialog), I Info-getting Mode (iKeyHandler 870-891), Shift+F and
+ * backquote Inventory Search (shiftFKeyHandler 846-855, 655), Shift+M the chat
+ * map's minimap tab (shiftMKeyHandler 925-940). F stays the remake's apple.
+ */
+function clientShortcutKey(e) {
+  const action = clientKeyAction(e);
+  // Z: the player menu (zKeyHandler 1031-1042: TSFrontController.togglePlayerMenu),
+  // not where the location hides the mood (no_mood; newxp-feature's nx-hide-mood).
+  if (action === 'player-menu') {
+    const btn = document.getElementById('player-menu-btn');
+    if (!e.repeat && shownElement(btn) && !document.body.classList.contains('nx-hide-mood')) btn.click();
+    return true;
+  }
+  // Shift+L: your looks (shiftLKeyHandler 980-994: opens ImaginationYourLooksUI unless it is up).
+  if (action === 'looks') {
+    if (!e.repeat && !isAvatarOpen()) openAvatarPanel();
+    return true;
+  }
+  // Shift+K: the keyring (shiftKKeyHandler 962-978: ACLDialog start, or end when open).
+  // The keyring is multiplayer's (neighbours-mp-feature); solo has no keys to hold.
+  if (action === 'keyring') {
+    if (e.repeat) return true;
+    const shade = document.getElementById('keys-shade');
+    if (shade && !shade.hidden) shade.querySelector('.keys-close')?.click();
+    else document.getElementById('keys-btn')?.click();
+    return true;
+  }
+  // Shift+D: decorate mode (shiftDKeyHandler 831-844): CLICK_SUCCESS and out when it is on,
+  // else startDecoratorMode, which only goes ahead where you can decorate
+  // (TSFrontController.as setDecoratorMode 3957-3968: can_decorate, inside your house
+  // or tower). Anywhere else Shift+D is still a step right.
+  if (action === 'decorate') {
+    const mode = features.query('homeEditMode', engine);
+    const close = mode === 'decorate' ? document.querySelector('#homes-bar .hb-close') : null;
+    const open = mode ? null : document.getElementById('homes-decorate-btn');
+    if (!close && !shownElement(open)) return false;
+    keys.delete('d');
+    keys.delete('D');
+    if (e.repeat) return true;
+    if (close) {
+      playSound('CLICK_SUCCESS', { volume: 0.32 });
+      close.click();
+    } else open.click();
+    return true;
+  }
+  return false;
 }
 
 function installPlayerMenu() {
@@ -24639,6 +24704,12 @@ async function main() {
       closeShrinePanel();
     }
     if (!state.started) return;
+    // G254: hold ? for the hotkey sheet (TSMainView.as 656-657, shiftSlashKeyHandler
+    // 942-960: shown on the key down, hidden when ? or Shift comes up; Hotkeys.as).
+    if (clientKeyAction(e) === 'hotkeys') {
+      if (!e.repeat) hotkeysSheet.show();
+      return;
+    }
     if (isQuestDialogueOpen()) return;
     if (isEmotionalBearPickerOpen()) return;
     if (currentAction) {
@@ -24691,7 +24762,8 @@ async function main() {
       return;
     }
     if (isMapOpen()) {
-      if (e.key === 'g' || e.key === 'G') closeMap();
+      // G254: M closes it too (TSMainView.as mKeyHandler 733-741, toggleHubMapDialog).
+      if (e.key === 'g' || e.key === 'G' || isPlainKey(e, 'm')) closeMap();
       return;
     }
     if (
@@ -24712,10 +24784,12 @@ async function main() {
       if (e.key === 'q' || e.key === 'Q') closeQuestPanel();
       if (e.key === 'b' || e.key === 'B') closeAchievePanel();
       if (e.key === 'h' || e.key === 'H') closeFeatPanel();
-      if (e.key === 'k' || e.key === 'K') closeSkillsPanel();
+      // G254: Shift+K is the keyring and Shift+L only opens the looks (TSMainView.as
+      // shiftKKeyHandler 962-978, shiftLKeyHandler 980-994), so neither closes a panel.
+      if (isPlainKey(e, 'k')) closeSkillsPanel();
       if (e.key === 'y' || e.key === 'Y') closeBuffsPanel();
       if (e.key === 'c' || e.key === 'C') closeMakePanel();
-      if (e.key === 'l' || e.key === 'L') closeAvatarPanel();
+      if (isPlainKey(e, 'l')) closeAvatarPanel();
       return;
     }
     // Verb menu open: let Enter activate the focused choice (native button);
@@ -24758,9 +24832,15 @@ async function main() {
       if (!e.repeat) features.query('teleportPointsKey', engine);
       return;
     }
+    if (clientShortcutKey(e)) return;
     if (e.key === 'f' || e.key === 'F') eatApple();
     if (e.key === 't' || e.key === 'T') doTeleport();
-    if (e.key === 'g' || e.key === 'G') openMap();
+    if (e.key === 'g' || e.key === 'G' || isPlainKey(e, 'm')) {
+      // G254: M is the client's map key (TSMainView.as 641, mKeyHandler 733-741); G stays.
+      // No map while Gentle Island hides it (newxp-feature's nx-hide-map; the client's
+      // mKeyHandler returns while MiniMapView is hidden).
+      if (!document.body.classList.contains('nx-hide-map')) openMap();
+    }
     if (e.key === 'q' || e.key === 'Q') openQuestPanel();
     if (e.key === 'b' || e.key === 'B') openAchievePanel();
     if (e.key === 'h' || e.key === 'H') openFeatPanel();
@@ -24780,6 +24860,8 @@ async function main() {
       keys.delete(e.key.toLowerCase());
       keys.delete(e.key.toUpperCase());
     }
+    // G254: the hotkey sheet goes when ? or Shift comes up (shiftSlashKeyHandler 952-959).
+    if (hotkeysSheet.isOpen() && isHotkeySheetRelease(e)) hotkeysSheet.hide();
   });
   window.addEventListener('resize', updateLocalChatDockPosition);
 

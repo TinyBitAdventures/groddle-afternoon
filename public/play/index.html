@@ -6,7 +6,7 @@
   <base href="../" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Groddle Afternoon</title>
-    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;tools=g183-1&amp;make=g191-1&amp;rock=g211-1&amp;route=g192-1&amp;prompt=g198-1&amp;machines=g193-1&amp;skills=g236-1&amp;chooser=g206-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=ticket-1&amp;card=g249-1&amp;offers=g229-1&amp;buffs=g256-1&amp;speech=g269-1&amp;banner=g297-1&amp;pop=g332-1&amp;bags=g152-1&amp;maptp=g356-1&amp;hud2=g361-1" />
+    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;tools=g183-1&amp;make=g191-1&amp;rock=g211-1&amp;route=g192-1&amp;prompt=g198-1&amp;machines=g193-1&amp;skills=g367-1&amp;chooser=g206-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=ticket-1&amp;card=g249-1&amp;offers=g229-1&amp;buffs=g256-1&amp;speech=g269-1&amp;banner=g297-1&amp;pop=g332-1&amp;bags=g152-1&amp;maptp=g356-1&amp;hud2=g361-1" />
   <!-- ?practice=1: a solo copy that never touches the saved game (must run before the game modules). -->
   <script src="js/practice-mode.js?v=practice-2"></script>
   <script src="vendor/pixi/pixi-8.22.0.min.js"></script>
@@ -29,7 +29,7 @@
          Mood and energy sit with the name as PlayerInfoUI.as kept them with the face. -->
     <header class="top-bar">
       <div class="hud-cluster hud-you" data-hud-cluster="you">
-        <button id="player-menu-btn" type="button" class="brand" aria-haspopup="true" aria-expanded="false" aria-controls="player-menu" title="Your stats, skills and look">
+        <button id="player-menu-btn" type="button" class="brand" aria-haspopup="true" aria-expanded="false" aria-controls="player-menu" title="Your stats, skills and look (Z)">
           <span class="brand-mark">Ur</span>
           <span class="brand-sub">Groddle Afternoon</span>
         </button>
@@ -71,7 +71,7 @@
       <div class="top-actions">
         <button id="quest-btn" type="button" class="chrome-btn" title="Quests (Q)">Quests</button>
         <button id="make-btn" type="button" class="chrome-btn" title="Making">Make</button>
-        <button id="map-btn" type="button" class="chrome-btn" title="Map (G)">Map</button>
+        <button id="map-btn" type="button" class="chrome-btn" title="Map (M or G)">Map</button>
         <button id="study-chip" type="button" class="chrome-btn is-studying" hidden>Study</button>
         <div class="more-menu">
           <button id="more-btn" type="button" class="chrome-btn more-btn" aria-haspopup="true" aria-expanded="false" aria-controls="more-list" title="Badges, skills, buffs, home and more">Menu <span class="more-chevron" aria-hidden="true"></span></button>
@@ -102,7 +102,8 @@
             tap <kbd>W</kbd>/<kbd>Space</kbd> to jump ·
             <kbd>↑</kbd> climb ladders ·
             <kbd>Enter</kbd> verbs ·
-            <kbd>G</kbd> map ·
+            <kbd>M</kbd> or <kbd>G</kbd> map ·
+            <kbd>Z</kbd> player menu ·
             <kbd>Q</kbd> quests ·
             <kbd>B</kbd> badges ·
             <kbd>H</kbd> feat ·
@@ -111,7 +112,8 @@
             <kbd>Y</kbd> buffs ·
             <kbd>C</kbd> camera ·
             <kbd>Shift</kbd>+<kbd>T</kbd> teleport points ·
-            <kbd>V</kbd> vendor
+            <kbd>V</kbd> vendor ·
+            hold <kbd>?</kbd> for every key
           </p>
           <p class="quest-preview">
             Gather grain/meat · Make flour &amp; sammiches · land and jump 3× quickly for a Triple Jump.
@@ -734,7 +736,7 @@
           <p class="map-sub">Original street geometry · yellow = travel · red star = you</p>
           <div id="map-canvas" class="map-canvas"></div>
           <ul id="map-list" class="map-list-hidden" hidden></ul>
-          <p class="map-hint"><kbd>G</kbd> map · Esc closes</p>
+          <p class="map-hint"><kbd>M</kbd> or <kbd>G</kbd> map · Esc closes</p>
         </div>
       </div>
 
@@ -831,6 +833,6 @@
     </div>
 
   </div>
-  <script type="module" src="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=quest-pages-3&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g365-1"></script>
+  <script type="module" src="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=quest-pages-3&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g367-1"></script>
 </body>
 </html>
