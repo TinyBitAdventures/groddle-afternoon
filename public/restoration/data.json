@@ -785,12 +785,13 @@
    "id": "feats",
    "group": "quests",
    "name": "Feats",
-   "status": "solo",
-   "blurb": "The Last Feat’s incantation chain, with local companions taking the other parts, and ten of the old Feats as goals of your own, each worth a Small Petrified Rock and open again a game week after you finish it.",
+   "status": "source",
+   "blurb": "The Last Feat’s incantation chain and ten of the old Feats. In multiplayer one Feat a day is shared by everyone playing: a live bar with its minimum, bonus and supermegabonus goals, contributors ranked, petrified rocks by place and the top-contributor badges. Solo keeps them as goals of your own, each worth a Small Petrified Rock and open again a game week later, with local companions taking the chain’s other parts.",
    "spot": null,
    "evidence": [
     "public/js/feats.js",
-    "public/js/solo-feats.js"
+    "public/js/solo-feats.js",
+    "public/js/feats-mp.js"
    ],
    "shot": null,
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&companiondemo=feat&practice=1"
@@ -1086,9 +1087,9 @@
   }
  ],
  "tally": {
-  "source": 48,
+  "source": 49,
   "rebuilt": 10,
-  "solo": 7,
+  "solo": 6,
   "missing": 1,
   "reimagined": 1,
   "progress": 1,
@@ -2492,9 +2493,14 @@
   ]
  },
  "git": {
-  "commits": 544,
+  "commits": 545,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "In multiplayer, visit other players' homes as they keep them, knock to be let in, and give friends house keys"
+   },
    {
     "date": "2026-10-26",
     "kind": "new",
@@ -2609,14 +2615,9 @@
     "date": "2026-10-26",
     "kind": "new",
     "text": "Make a multiplayer character and sign in right in the game, with an email and a password"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "new",
-    "text": "A light, dark or system theme switch in the site header, on every page"
    }
   ]
  },
- "tests": 315,
+ "tests": 316,
  "generatedAt": "2026-10-26"
 }
