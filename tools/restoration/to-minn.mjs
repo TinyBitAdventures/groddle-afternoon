@@ -28,7 +28,7 @@ const band = (id, alt, title, inner) => group('section', `band${alt ? ' band-alt
 export function restorationContent() {
   const jump = [
     ['#street', 'Walk a street'], ['#systems', 'Every system'], ['#numbers', 'By the numbers'], ['#rooms', 'Quest rooms'],
-    ['#designers', 'Designers’ levels'], ['#recent', 'Recently restored'], ['#honest', 'What can’t come back'], ['/compare/', 'Other remakes compared'],
+    ['#designers', 'Designers’ levels'], ['#seasons', 'Seasons'], ['#recent', 'Recently restored'], ['#honest', 'What can’t come back'], ['/compare/', 'Other remakes compared'],
   ].map(([href, label]) => `<a href="${href}">${label}</a>`).join(' ');
   return [
     group('header', 'masthead', null, [group('div', 'wrap', null, [
@@ -62,6 +62,13 @@ export function restorationContent() {
       p('section-lead', 'No recording of these is known, so they come from the upgrade cards, item text and players’ forum posts.'),
       data('levels'),
     ]),
+    // Its own tone (band-seasons) between the designers' band and the alternate one after it.
+    group('section', 'band band-seasons', 'seasons', [group('div', 'wrap', null, [
+      h(2, 'Seasons and holidays', { id: 'seasons-h' }),
+      p('section-lead', 'Glitch kept four holidays, and the remake brings each one round on its real dates. Zilloween also comes round on Ur’s own Dametime calendar, for about two real days in every fifty-one, so it turns up between the real ones too. A card marked On now is running today.'),
+      p('practice-note', 'Each <strong>Try it in solo</strong> link opens that season in a fresh practice copy, with what it needs in your pack. Like every Play link here, it never touches your saved game.'),
+      data('seasons'),
+    ])]),
     band('recent', true, 'Recently restored', [
       p('section-lead', 'The latest additions and fixes, straight from the project’s history.'),
       data('recent'),

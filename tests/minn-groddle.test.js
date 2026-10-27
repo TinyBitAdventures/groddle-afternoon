@@ -93,7 +93,7 @@ describe('Groddle on Minn (groddle-afternoon-site, a block theme that is also an
     for (const d of sections) assert.equal(content.split(`<!-- wp:groddle/${d}`).length - 1, 1, `${d} is on the page once`);
     // Every jump link lands on a band, each band's heading carries the id its section is labelled by.
     const bands = [...content.matchAll(/<section class="wp-block-group band[^"]*" id="([a-z]+)">/g)].map((m) => m[1]);
-    assert.deepEqual(bands, ['street', 'systems', 'numbers', 'rooms', 'designers', 'recent', 'honest']);
+    assert.deepEqual(bands, ['street', 'systems', 'numbers', 'rooms', 'designers', 'seasons', 'recent', 'honest']);
     for (const [, id] of content.matchAll(/<a href="#([a-z]+)">/g)) assert.ok(bands.includes(id), id);
     for (const id of bands) assert.match(content, new RegExp(`<h2 class="wp-block-heading" id="${id}-h">`));
     // The page is published at /restoration/ and wins over the built file there; its template is declared.

@@ -2040,10 +2040,442 @@
   "playableJobs": 689,
   "offeringStreets": 593
  },
+ "seasons": {
+  "status": {
+   "source": {
+    "label": "Restored from source",
+    "tone": "moss",
+    "note": "Its items, verbs, words and badges come from Tiny Speck’s server code."
+   },
+   "reconstructed": {
+    "label": "Reconstructed",
+    "tone": "plum",
+    "note": "The eggs and the trophy survive in Tiny Speck’s files, but how the hunt ran does not, so the remake rebuilt it around them."
+   }
+  },
+  "dametime": {
+   "month": "Remember",
+   "fromDay": 25,
+   "toDay": 37,
+   "epochMs": 1238562000000,
+   "yearMs": 4435200000,
+   "fromMs": 3326400000,
+   "toMs": 3513600000
+  },
+  "seasons": [
+   {
+    "id": "zilloween",
+    "label": "Zilloween",
+    "tone": "accent",
+    "icon": {
+     "id": "pumpkin_lit_1",
+     "name": "Jack-O-Lantern",
+     "icon": "/assets/sprites/icons/pumpkin_lit_1.png",
+     "icon3x": "/assets/sprites/icons/pumpkin_lit_1@3x.png"
+    },
+    "status": "source",
+    "window": "October 17 to November 1, and Remember 25-37 on the Dametime calendar",
+    "blurb": "Jack-O-Lanterns glow on every street. Carve pumpkins with a Pick and a Knife & Board, light them with a full Firefly Jar, eat candy for a Sugar Rush, and give candy away.",
+    "when": {
+     "kind": "dates",
+     "from": [
+      10,
+      17
+     ],
+     "to": [
+      11,
+      1
+     ]
+    },
+    "dametime": true,
+    "facts": [
+     {
+      "label": "Carve",
+      "text": "Carve a Pumpkin with a Pick and a Knife & Board for 15 energy. Each one comes out with one of five faces, plus 5 Roasted Pepitas and a Clump of Jellisac.",
+      "items": [
+       {
+        "id": "pumpkin_carved_1",
+        "name": "Jack the Pumpkin",
+        "icon": "/assets/sprites/icons/pumpkin_carved_1.png",
+        "icon3x": "/assets/sprites/icons/pumpkin_carved_1@3x.png"
+       },
+       {
+        "id": "pumpkin_carved_2",
+        "name": "Steve the Pumpkin",
+        "icon": "/assets/sprites/icons/pumpkin_carved_2.png",
+        "icon3x": "/assets/sprites/icons/pumpkin_carved_2@3x.png"
+       },
+       {
+        "id": "pumpkin_carved_3",
+        "name": "Hello Pumpkin!",
+        "icon": "/assets/sprites/icons/pumpkin_carved_3.png",
+        "icon3x": "/assets/sprites/icons/pumpkin_carved_3@3x.png"
+       },
+       {
+        "id": "pumpkin_carved_4",
+        "name": "Zille the Pumpkin",
+        "icon": "/assets/sprites/icons/pumpkin_carved_4.png",
+        "icon3x": "/assets/sprites/icons/pumpkin_carved_4@3x.png"
+       },
+       {
+        "id": "pumpkin_carved_5",
+        "name": "Lem the Pumpkin",
+        "icon": "/assets/sprites/icons/pumpkin_carved_5.png",
+        "icon3x": "/assets/sprites/icons/pumpkin_carved_5@3x.png"
+       }
+      ]
+     },
+     {
+      "label": "Light",
+      "text": "Light a carved pumpkin with a full Firefly Jar (7 fireflies), place it at home and teach it phrases to say. Carved pumpkins rot when Zilloween ends.",
+      "items": [
+       {
+        "id": "pumpkin_lit_1",
+        "name": "Jack-O-Lantern",
+        "icon": "/assets/sprites/icons/pumpkin_lit_1.png",
+        "icon3x": "/assets/sprites/icons/pumpkin_lit_1@3x.png"
+       },
+       {
+        "id": "pumpkin_lit_2",
+        "name": "Steve-O-Lantern",
+        "icon": "/assets/sprites/icons/pumpkin_lit_2.png",
+        "icon3x": "/assets/sprites/icons/pumpkin_lit_2@3x.png"
+       },
+       {
+        "id": "pumpkin_lit_3",
+        "name": "Shiny Hello Pumpkin!",
+        "icon": "/assets/sprites/icons/pumpkin_lit_3.png",
+        "icon3x": "/assets/sprites/icons/pumpkin_lit_3@3x.png"
+       },
+       {
+        "id": "pumpkin_lit_4",
+        "name": "Zille-O-Lantern",
+        "icon": "/assets/sprites/icons/pumpkin_lit_4.png",
+        "icon3x": "/assets/sprites/icons/pumpkin_lit_4@3x.png"
+       },
+       {
+        "id": "pumpkin_lit_5",
+        "name": "Lem-O-Lantern",
+        "icon": "/assets/sprites/icons/pumpkin_lit_5.png",
+        "icon3x": "/assets/sprites/icons/pumpkin_lit_5@3x.png"
+       }
+      ]
+     },
+     {
+      "label": "Candy",
+      "text": "The Jack-O-Lanterns on the streets answer Trick or treat once a game day. Candy gives a Sugar Rush, 11 a game day at most (the last one brings toothache), or give it to Piggies, Chickens, Butterflies and Street Spirits.",
+      "items": [
+       {
+        "id": "birch_candy",
+        "name": "Birch Candy",
+        "icon": "/assets/sprites/icons/birch_candy.png",
+        "icon3x": "/assets/sprites/icons/birch_candy@3x.png"
+       },
+       {
+        "id": "corn_syrup_squares",
+        "name": "Hi-Sucrose Corn Syrup Square",
+        "icon": "/assets/sprites/icons/corn_syrup_squares.png",
+        "icon3x": "/assets/sprites/icons/corn_syrup_squares@3x.png"
+       },
+       {
+        "id": "carobish_treats",
+        "name": "Raw Bio-Organic Carob-ish Treat",
+        "icon": "/assets/sprites/icons/carobish_treats.png",
+        "icon3x": "/assets/sprites/icons/carobish_treats@3x.png"
+       }
+      ]
+     },
+     {
+      "label": "Grow",
+      "text": "Pumpkin Seeds only grow during Zilloween.",
+      "items": [
+       {
+        "id": "seed_pumpkin",
+        "name": "Pumpkin Seed",
+        "icon": "/assets/sprites/icons/seed_pumpkin.png",
+        "icon3x": "/assets/sprites/icons/seed_pumpkin@3x.png"
+       }
+      ]
+     }
+    ],
+    "badges": [
+     {
+      "id": "lanternerer",
+      "name": "Lanternerer",
+      "desc": "Lit and Displayed a Pumpkin Lantern",
+      "icon": "/assets/badges/lanternerer.png"
+     },
+     {
+      "id": "mini_tricksy_treater",
+      "name": "Mini Tricksy-Treater",
+      "desc": "Gave Candy to 5 Lucky Candy-Munchers during Zilloween",
+      "icon": "/assets/badges/mini_tricksy_treater.png"
+     },
+     {
+      "id": "pumpkin_carver",
+      "name": "Pumpkin Carver",
+      "desc": "Carved the full collection of Pumpkins",
+      "icon": "/assets/badges/pumpkin_carver.png"
+     },
+     {
+      "id": "candy_muncher",
+      "name": "Candy Muncher",
+      "desc": "Munched 17 Candy during Zilloween",
+      "icon": "/assets/badges/candy_muncher.png"
+     },
+     {
+      "id": "minor_tricksy_treater",
+      "name": "Minor Tricksy-Treater",
+      "desc": "Gave Candy to 37 Lucky Candy-Eaters during Zilloween",
+      "icon": "/assets/badges/minor_tricksy_treater.png"
+     },
+     {
+      "id": "candy_snaffler",
+      "name": "Candy Snaffler",
+      "desc": "Snaffled 43 Candy during Zilloween",
+      "icon": "/assets/badges/candy_snaffler.png"
+     },
+     {
+      "id": "candy_nommer",
+      "name": "Candy Nommer",
+      "desc": "Nommed 79 Candy during Zilloween",
+      "icon": "/assets/badges/candy_nommer.png"
+     },
+     {
+      "id": "major_tricksy_treater",
+      "name": "Major Tricksy-Treater",
+      "desc": "Gave Candy to 103 Lucky Candy-Biters during Zilloween",
+      "icon": "/assets/badges/major_tricksy_treater.png"
+     },
+     {
+      "id": "candy_caner",
+      "name": "Candy Caner",
+      "desc": "Caned 137 Candy during Zilloween",
+      "icon": "/assets/badges/candy_caner.png"
+     },
+     {
+      "id": "super_tricksy_treater",
+      "name": "Super Tricksy-Treater",
+      "desc": "Gave Candy to 257 Lucky Candy-Lovers during Zilloween",
+      "icon": "/assets/badges/super_tricksy_treater.png"
+     },
+     {
+      "id": "candy_stripper",
+      "name": "Candy Stripper",
+      "desc": "Devoured 353 Candy during Zilloween",
+      "icon": "/assets/badges/candy_stripper.png"
+     },
+     {
+      "id": "the_candyglitch",
+      "name": "The Candyglitch",
+      "desc": "Gave Candy to 499 Lucky Candy-Lickers during Zilloween",
+      "icon": "/assets/badges/the_candyglitch.png"
+     }
+    ],
+    "secret": 0,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&season=zilloween&seasondemo=1&practice=1"
+   },
+   {
+    "id": "glitchmas",
+    "label": "Glitchmas",
+    "tone": "sky",
+    "icon": {
+     "id": "glitchmas_cracker",
+     "name": "Glitchmas Cracker",
+     "icon": "/assets/sprites/icons/glitchmas_cracker.png",
+     "icon3x": "/assets/sprites/icons/glitchmas_cracker@3x.png"
+    },
+    "status": "source",
+    "window": "December 12 to January 3",
+    "blurb": "Snow over Ur and candy canes by the signposts. The Toy Vendor stocks Glitchmas Crackers and Cards, Egg Nog is back, and somebody wants you to say \"yay\".",
+    "when": {
+     "kind": "dates",
+     "from": [
+      12,
+      12
+     ],
+     "to": [
+      1,
+      3
+     ]
+    },
+    "dametime": false,
+    "facts": [
+     {
+      "label": "Shop",
+      "text": "The Toy Vendor sells Glitchmas Crackers (550 currants) and Glitchmas Cards (220 currants). Pull a cracker with a nearby critter’s help for a joke or a fun fact; sign a card and mail it.",
+      "items": [
+       {
+        "id": "glitchmas_cracker",
+        "name": "Glitchmas Cracker",
+        "icon": "/assets/sprites/icons/glitchmas_cracker.png",
+        "icon3x": "/assets/sprites/icons/glitchmas_cracker@3x.png"
+       },
+       {
+        "id": "glitchmas_card",
+        "name": "Glitchmas Card",
+        "icon": "/assets/sprites/icons/glitchmas_card.png",
+        "icon3x": "/assets/sprites/icons/glitchmas_card@3x.png"
+       }
+      ]
+     },
+     {
+      "label": "Quest",
+      "text": "A Holiday Thing: All you have to do is type \"yay\" into local chat and you will get a gift. The present holds a Collectors' Edition 2010 Glitchmas Yeti.",
+      "items": [
+       {
+        "id": "glitchmas_present",
+        "name": "Glitchmas Present",
+        "icon": "/assets/sprites/icons/glitchmas_present.png",
+        "icon3x": "/assets/sprites/icons/glitchmas_present@3x.png"
+       },
+       {
+        "id": "collectors_edition_2010_glitchmas_yeti",
+        "name": "Collectors' Edition 2010 Glitchmas Yeti",
+        "icon": "/assets/sprites/icons/collectors_edition_2010_glitchmas_yeti.png",
+        "icon3x": "/assets/sprites/icons/collectors_edition_2010_glitchmas_yeti@3x.png"
+       }
+      ]
+     },
+     {
+      "label": "Nog",
+      "text": "Nog an Egg once a game day for 11 iMG. From December 24 the Glitchmas Yeti mails you a cracker.",
+      "items": [
+       {
+        "id": "egg_plain",
+        "name": "Egg",
+        "icon": "/assets/sprites/icons/egg_plain.png",
+        "icon3x": "/assets/sprites/icons/egg_plain@3x.png"
+       }
+      ]
+     }
+    ],
+    "badges": [],
+    "secret": 1,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&season=glitchmas&seasondemo=1&practice=1"
+   },
+   {
+    "id": "egg_hunt",
+    "label": "Egg Hunt",
+    "tone": "plum",
+    "icon": {
+     "id": "egghunt_egg_5",
+     "name": "Golden Egg",
+     "icon": "/assets/sprites/icons/egghunt_egg_5.png",
+     "icon3x": "/assets/sprites/icons/egghunt_egg_5@3x.png"
+    },
+    "status": "reconstructed",
+    "window": "the week before Easter Sunday, through Easter Monday",
+    "blurb": "Five chocolate eggs are hidden across Ur, one in the grass of many streets. Find all five for the Egg Hunter Trophy.",
+    "when": {
+     "kind": "easter",
+     "before": 7,
+     "after": 1
+    },
+    "dametime": false,
+    "facts": [
+     {
+      "label": "Find",
+      "text": "One of five chocolate eggs hides in the grass of about half the streets in Ur, a different spread every hunt. Eat them, or keep all five.",
+      "items": [
+       {
+        "id": "egghunt_egg_1",
+        "name": "Certified Organic Chocolate Egg",
+        "icon": "/assets/sprites/icons/egghunt_egg_1.png",
+        "icon3x": "/assets/sprites/icons/egghunt_egg_1@3x.png"
+       },
+       {
+        "id": "egghunt_egg_2",
+        "name": "Bugsbury Creme Egg",
+        "icon": "/assets/sprites/icons/egghunt_egg_2.png",
+        "icon3x": "/assets/sprites/icons/egghunt_egg_2@3x.png"
+       },
+       {
+        "id": "egghunt_egg_3",
+        "name": "Pysanka",
+        "icon": "/assets/sprites/icons/egghunt_egg_3.png",
+        "icon3x": "/assets/sprites/icons/egghunt_egg_3@3x.png"
+       },
+       {
+        "id": "egghunt_egg_4",
+        "name": "Secular Holiday Egg",
+        "icon": "/assets/sprites/icons/egghunt_egg_4.png",
+        "icon3x": "/assets/sprites/icons/egghunt_egg_4@3x.png"
+       },
+       {
+        "id": "egghunt_egg_5",
+        "name": "Golden Egg",
+        "icon": "/assets/sprites/icons/egghunt_egg_5.png",
+        "icon3x": "/assets/sprites/icons/egghunt_egg_5@3x.png"
+       }
+      ]
+     }
+    ],
+    "badges": [
+     {
+      "id": "collection_egg_hunter",
+      "name": "Egg Hunter Trophy",
+      "desc": "Collected all 5 Chocolate Eggs",
+      "icon": "/assets/badges/collection_egg_hunter.png"
+     }
+    ],
+    "secret": 0,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&season=egg_hunt&seasondemo=1&practice=1"
+   },
+   {
+    "id": "pi_day",
+    "label": "Pi Day",
+    "tone": "moss",
+    "icon": {
+     "id": "pi",
+     "name": "Pi",
+     "icon": "/assets/sprites/icons/pi.png",
+     "icon3x": "/assets/sprites/icons/pi@3x.png"
+    },
+    "status": "source",
+    "window": "March 14, wherever it is still March 14",
+    "blurb": "Anyone with a Frying Pan can cook Pi today, and a Pi in your pack can Estimate Pi for favor with Tii.",
+    "when": {
+     "kind": "utc-day",
+     "month": 3,
+     "day": 14,
+     "slackHours": 12
+    },
+    "dametime": false,
+    "facts": [
+     {
+      "label": "Cook",
+      "text": "Cook Pi in a Frying Pan from 14 Flour, 7 Butterfly Butter, 3 Old(er) Spice and 22 Tiite. The recipe only works on Pi Day.",
+      "items": [
+       {
+        "id": "pi",
+        "name": "Pi",
+        "icon": "/assets/sprites/icons/pi.png",
+        "icon3x": "/assets/sprites/icons/pi@3x.png"
+       }
+      ]
+     },
+     {
+      "label": "Estimate",
+      "text": "With a Pi in your pack, Estimate Pi once a game day. Each digit you get is favor with Tii the first time each year, and mood after that.",
+      "items": []
+     }
+    ],
+    "badges": [],
+    "secret": 0,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&season=pi_day&seasondemo=1&practice=1"
+   }
+  ]
+ },
  "git": {
-  "commits": 530,
+  "commits": 531,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "Multiplayer packs follow the site's ledger, so forged items can't be traded"
+   },
    {
     "date": "2026-10-26",
     "kind": "improve",
@@ -2158,14 +2590,9 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "Rocks no longer carry a name tag over them"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Pack card buttons no longer blink or wash out on hover"
    }
   ]
  },
- "tests": 309,
+ "tests": 310,
  "generatedAt": "2026-10-26"
 }

@@ -6,7 +6,8 @@
  * computed from the repo so the page stays honest: quests that can be played
  * solo, quest rooms built, badges with original art, the skills audit,
  * streets imported, recovered sounds, recipes, Imagination cards, street
- * projects, and the latest additions from the git log.
+ * projects, the seasons (tools/restoration/seasons.mjs), and the latest
+ * additions from the git log.
  *
  *   node tools/build-restoration.mjs          write data.json
  *   node tools/build-restoration.mjs --check  exit 1 if data.json is stale
@@ -28,6 +29,7 @@ import { DESIGNERS, DESIGNER_LEVELS, TEXT_LEVELS } from './restoration/designer-
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 import { ROOM_NOTES } from './restoration/rooms.mjs';
 import { parseQuestConversation } from '../public/js/quests.js';
+import { seasonsData } from './restoration/seasons.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -302,6 +304,7 @@ export async function buildRestorationData() {
     icons: iconStats(),
     imagination: imaginationStats(),
     jobs: jobStats(),
+    seasons: seasonsData(),
     git: gitStats(),
     tests: testFileCount(),
   };
