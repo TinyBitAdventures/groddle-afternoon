@@ -11,7 +11,10 @@
  *   reimagined        designed fresh (nothing survives)
  *   partial           present but incomplete
  *   missing           the original had it working; the remake does not
- *   lost              needs other players, or nothing survives
+ *   multiplayer       reachable only between real players in multiplayer (/play/online/), proven by
+ *                     the commit an override names (`mp`); solo cannot reach it. Not in REACHABLE,
+ *                     which stays the solo game's measure
+ *   lost              needs other players, or nothing survives (lost_why: players | nosource)
  *   excluded          dev/test/retired/data, with a reason
  *   unknown           a detector cannot decide; needs a human (override)
  *   unbuilt_original  defined in the original but never wired there either
@@ -24,7 +27,25 @@
 import { matchPattern, prefixLabels, patternString } from './scan.mjs';
 
 export const REACHABLE = new Set(['source', 'rebuilt', 'solo', 'reimagined']);
-export const STATUSES = ['source', 'rebuilt', 'solo', 'reimagined', 'partial', 'missing', 'lost', 'excluded', 'unknown', 'unbuilt_original'];
+export const STATUSES = ['source', 'rebuilt', 'solo', 'reimagined', 'multiplayer', 'partial', 'missing', 'lost', 'excluded', 'unknown', 'unbuilt_original'];
+
+/**
+ * Why a `lost` row is lost (column lost_why): `players` needs other players (Track M's backlog: an
+ * override's `mp` moves it to multiplayer once two real players have proven it), `nosource` nothing
+ * about it survives (it stays lost). Overrides say `"lost": "nosource"`; players is the default.
+ */
+export const LOST_WHY = Object.freeze({ players: 'needs other players', nosource: 'nothing survives' });
+
+/**
+ * An override's multiplayer judgement on a row: `mp` (the commits that proved it between two real
+ * players, e.g. "game aa6e9f37, server d8d044b") and `mpReason` (what reaches it there) make the row
+ * `multiplayer`, whatever the detector said (a row the solo game reaches needs no mp).
+ */
+export function applyMultiplayer(e, o) {
+  if (!o?.mp) return e;
+  const why = `multiplayer (${o.mp})${o.mpReason ? `: ${o.mpReason}` : ''}`;
+  return { ...e, status: 'multiplayer', basis: 'override', mp: o.mp, lost_why: '', evidence: `${why} | ${e.evidence || ''}`.replace(/ \| $/, '') };
+}
 
 const row = (kind, id, fields) => ({ kind, id: String(id), name: '', source_ref: '', status: 'unknown', basis: 'auto', detector: '', evidence: '', ...fields });
 
@@ -122,21 +143,39 @@ const ADMIN_RE = /\b(admin|staff|beta|tester|test badge|debug|impossible|intern|
  * achievements: [{ id, name, desc, category, isSecret, conditions }]
  * remake / original: { counters: [emission], grants: [emission] }
  * deps: { remake(group, name) -> veto|null, original(group, name) -> veto|null }
- * counterOverrides: { group: { status, reason } } (multiplayer groups and the like)
+ * counterOverrides: { group | group:label: { status, reason, lost?, mp?, mpReason? } } (multiplayer groups and the like)
+ *
+ * A counter group judged by an override is met on the remake side only by an emission that names the
+ * group literally (`players_traded:${id}`): an open-wildcard group (`${classTsid}:crunch`) can spell any
+ * group and says nothing about this one. A judged group with `mp` was proven between real players: a
+ * badge that needs it is `multiplayer` (reached, or blocked only by judged groups that all carry mp).
  */
 export function judgeAchievements({ achievements, remake, original, deps = {}, counterOverrides = {} }) {
   const rows = [];
   const grantIn = (side, id) => side.grants.find((g) => matchPattern(g.pattern, id)) || side.grants.find((g) => { const l = loosen(g.pattern); return l && matchPattern(l, id); });
-  const judge = (side, a, depFn) => {
+  const judgedKey = (c) => {
+    const key = c.group ? `${c.group}:${c.name}` : c.name;
+    if (counterOverrides[key]) return key;
+    return c.group && counterOverrides[c.group] ? c.group : null;
+  };
+  const literalCache = new Map();
+  const literalGroup = (emissions, group) => {
+    const k = `${group}:`;
+    if (!literalCache.has(emissions)) literalCache.set(emissions, new Map());
+    const byGroup = literalCache.get(emissions);
+    if (!byGroup.has(k)) byGroup.set(k, emissions.filter((e) => typeof e.pattern[0] === 'string' && e.pattern[0].startsWith(k)));
+    return byGroup.get(k);
+  };
+  const judge = (side, a, depFn, strict = false) => {
     const g = grantIn(side, a.id);
     if (g) return { ok: true, granted: g, results: [] };
     if (!a.conditions.length) return { ok: false, results: [], why: 'no conditions and never granted directly' };
-    const results = a.conditions.map((c) => ({ c, r: conditionReach(c, side.counters, depFn) }));
+    const results = a.conditions.map((c) => ({ c, r: conditionReach(c, strict && c.group && judgedKey(c) ? literalGroup(side.counters, c.group) : side.counters, depFn) }));
     const blocked = results.filter((x) => !x.r.ok);
     return { ok: !blocked.length, results, blocked, why: blocked.map((x) => x.r.why).join('; ') };
   };
   for (const a of achievements) {
-    const rm = judge(remake, a, deps.remake);
+    const rm = judge(remake, a, deps.remake, true);
     const og = original ? judge(original, a, deps.original) : null;
     const base = { name: a.name, source_ref: `achievements/${a.id}.js`, detector: 'achievement-counters' };
     const ev = [];
@@ -145,14 +184,24 @@ export function judgeAchievements({ achievements, remake, original, deps = {}, c
     const flags = [a.isSecret ? 'secret' : '', EVENT_CATEGORIES.has(a.category) ? 'event-only' : ''].filter(Boolean);
     if (rm.ok) {
       const weak = rm.results.some((x) => x.r.weak);
+      // Reached through a judged group proven in multiplayer: only real players get there.
+      const mpKey = rm.results.map((x) => judgedKey(x.c)).find((k) => k && counterOverrides[k].mp);
+      if (mpKey) {
+        const o = counterOverrides[mpKey];
+        rows.push(row('achievement', a.id, { ...base, status: 'multiplayer', basis: 'override', mp: o.mp, detector: `achievement-counters${weak ? ':loose' : ''}`, evidence: [`multiplayer (${o.mp}): counter group ${mpKey}${o.mpReason ? `: ${o.mpReason}` : ''}`, ...flags, ...ev].join(' | ') }));
+        continue;
+      }
       rows.push(row('achievement', a.id, { ...base, status: 'source', detector: `achievement-counters${weak ? ':loose' : ''}`, evidence: [...flags, ...ev].join(' | ') }));
       continue;
     }
     // Why not: a counter group judged by an override (multiplayer), the original's own wiring, flags.
     const blockGroups = (rm.blocked || []).map((x) => x.c.group).filter(Boolean);
-    const blockKeys = (rm.blocked || []).map((x) => (x.c.group ? `${x.c.group}:${x.c.name}` : x.c.name));
-    const ov = (rm.blocked || []).length ? (rm.blocked.every((x) => counterOverrides[`${x.c.group}:${x.c.name}`] || counterOverrides[x.c.group])
-      ? counterOverrides[blockKeys[0]] || counterOverrides[blockGroups[0]] : null) : null;
+    const judged = (rm.blocked || []).map((x) => judgedKey(x.c));
+    const ovKey = judged.length && judged.every(Boolean) ? judged[0] : null;
+    const ov = ovKey ? counterOverrides[ovKey] : null;
+    // Blocked only by judged groups that all carry mp: reached between real players (the counter
+    // arrives from the realtime server, which the scanner cannot follow).
+    const ovMp = ov && judged.every((k) => counterOverrides[k].mp) ? [...new Set(judged.map((k) => counterOverrides[k].mp))].join('; ') : '';
     const ogWhy = og && !og.ok ? og.why : '';
     const blocker = rm.blocked?.[0]?.c;
     const blockKey = blocker ? (blocker.group || blocker.name) : '(no conditions)';
@@ -160,8 +209,11 @@ export function judgeAchievements({ achievements, remake, original, deps = {}, c
       rows.push(row('achievement', a.id, { ...base, status: 'excluded', blocker: blockKey, evidence: ['granted by hand to staff, interns or beta testers (no conditions, no grant in code)', ...flags, ...ev].join(' | ') }));
     } else if (og && !og.ok) {
       rows.push(row('achievement', a.id, { ...base, status: 'unbuilt_original', blocker: blockKey, evidence: [`original: ${ogWhy}`, ...flags, ...ev].join(' | ') }));
+    } else if (ov && ovMp) {
+      const why = [...new Set(judged.map((k) => counterOverrides[k].mpReason).filter(Boolean))].join('; ');
+      rows.push(row('achievement', a.id, { ...base, status: 'multiplayer', basis: 'override', mp: ovMp, blocker: blockKey, evidence: [`multiplayer (${ovMp}): counter group ${judged.join(',')}${why ? `: ${why}` : ''}`, `counter group ${blockGroups.join(',')}: ${ov.reason}`, ...flags, ...ev].join(' | ') }));
     } else if (ov) {
-      rows.push(row('achievement', a.id, { ...base, status: ov.status, blocker: blockKey, evidence: [`counter group ${blockGroups.join(',')}: ${ov.reason}`, ...flags, ...ev].join(' | ') }));
+      rows.push(row('achievement', a.id, { ...base, status: ov.status, lost_why: ov.status === 'lost' ? ov.lost || 'players' : '', blocker: blockKey, evidence: [`counter group ${blockGroups.join(',')}: ${ov.reason}`, ...flags, ...ev].join(' | ') }));
     } else if (ADMIN_RE.test(`${a.name} ${a.desc}`)) {
       rows.push(row('achievement', a.id, { ...base, status: 'excluded', blocker: blockKey, evidence: ['admin/staff/test badge', ...flags, ...ev].join(' | ') }));
     } else if (EVENT_CATEGORIES.has(a.category)) {
@@ -196,9 +248,12 @@ export function judgeSystems({ sources, systemMap, checklist }) {
       // Several items: the weakest status wins.
       const order = ['missing', 'partial', 'lost', 'reimagined', 'solo', 'rebuilt', 'source'];
       const st = items.map((i) => CHECKLIST_STATUS[i.status] || 'unknown').sort((a, b) => order.indexOf(a) - order.indexOf(b))[0];
-      return row('system', s.id, { ...base, status: m.status || st, evidence: `checklist ${items.map((i) => `${i.id} (${i.status})`).join(', ')}${m.reason ? `; ${m.reason}` : ''}` });
+      const status = m.status || st;
+      // A checklist item that "can't come back" (Snapshots) is lost because nothing survives.
+      const r = row('system', s.id, { ...base, status, lost_why: status === 'lost' ? m.lost || (m.status ? 'players' : 'nosource') : '', evidence: `checklist ${items.map((i) => `${i.id} (${i.status})`).join(', ')}${m.reason ? `; ${m.reason}` : ''}` });
+      return applyMultiplayer(r, m);
     }
-    return row('system', s.id, { ...base, status: m.status, basis: 'override', evidence: m.reason || '' });
+    return applyMultiplayer(row('system', s.id, { ...base, status: m.status, basis: 'override', lost_why: m.status === 'lost' ? m.lost || 'players' : '', evidence: m.reason || '' }), m);
   });
 }
 
@@ -619,7 +674,9 @@ export function judgeJobs({ jobIds, jobs, excluded }) {
     if (jobs[id]) return row('street_project', id, { ...base, name: jobs[id].title || jobs[id].label, status: 'solo', evidence: `street-jobs.json ${jobs[id].kind} on ${jobs[id].street}` });
     if (excluded[id]) {
       const st = JOB_REASON.find(([re]) => re.test(excluded[id].reason))?.[1] || 'unknown';
-      return row('street_project', id, { ...base, name: excluded[id].label, status: st, evidence: excluded[id].reason });
+      // Group halls need a player group; an empty cultivation proto slot has nothing left to restore.
+      const why = st === 'lost' ? (/cultivation proto/.test(excluded[id].reason) ? 'nosource' : 'players') : '';
+      return row('street_project', id, { ...base, name: excluded[id].label, status: st, lost_why: why, evidence: excluded[id].reason });
     }
     return row('street_project', id, { ...base, name: id, status: 'unknown', evidence: 'in the location XML but dropped by build-street-jobs.mjs before classification (no type 1 row, no phases or unknown class)' });
   });

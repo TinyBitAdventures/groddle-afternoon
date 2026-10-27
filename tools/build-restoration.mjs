@@ -265,6 +265,8 @@ function checklist() {
     name: item.name,
     status: item.status,
     blurb: item.blurb,
+    // What works between real players in multiplayer (Track M), or null.
+    multiplayer: item.multiplayer || null,
     spot: item.spot || null,
     evidence: item.evidence.filter((p) => existsSync(join(root, p))),
     shot: shotFile(item.id),
@@ -286,6 +288,8 @@ export async function buildRestorationData() {
   // A checklist item counts as "back" when it is playable in any form.
   const back = items.filter((it) => ['source', 'rebuilt', 'reimagined', 'solo'].includes(it.status)).length;
   const possible = items.filter((it) => it.status !== 'lost').length;
+  // Systems that work between real players in multiplayer (the checklist's multiplayer field).
+  const multiplayer = items.filter((it) => it.multiplayer).length;
   return {
     status: STATUS,
     groups: GROUPS,
@@ -293,6 +297,7 @@ export async function buildRestorationData() {
     tally,
     back,
     possible,
+    multiplayer,
     quests: questStats(),
     rooms: roomStats(),
     designers: designerLevels(),

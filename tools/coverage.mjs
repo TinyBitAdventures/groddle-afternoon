@@ -9,7 +9,11 @@
  *   node tools/coverage.mjs --json   machine-readable (for round logs)
  *
  * When the inventory DB exists (node tools/inventory/build.mjs), it also prints one
- * reachable / total line per inventory kind.
+ * reachable / total line per inventory kind, and Track M's multiplayer line (G324): of the
+ * rows that need other players, how many are reachable between real players (status
+ * multiplayer), how many are still lost, and how many are lost because nothing survives.
+ * The checklist's multiplayer field (tools/restoration/checklist.mjs) counts the systems
+ * that work between real players.
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
@@ -32,6 +36,7 @@ const reimaginedWardrobe = Object.values(catalog.types || {}).reduce((n, list) =
 const t = data.tally || {};
 const playableSystems = (t.source || 0) + (t.rebuilt || 0) + (t.solo || 0) + (t.reimagined || 0);
 const allSystems = Object.values(t).reduce((a, b) => a + b, 0);
+const mpSystems = (data.items || []).filter((it) => it.multiplayer).length;
 
 function registerCounts() {
   if (!existsSync(REGISTER)) return null;
@@ -46,6 +51,7 @@ function registerCounts() {
 
 const measures = [
   ['Systems playable', playableSystems, allSystems, 'checklist statuses (lost ones need other players)'],
+  ['Systems working between real players', mpSystems, allSystems, 'checklist multiplayer field (Track M)'],
   ['Story and skill quests playable', data.quests.playable, data.quests.story, 'quest-offers buckets'],
   ['Private quest rooms', data.rooms.built, data.rooms.total, ''],
   ['Streets on the maps imported', data.streets.onMapsImported, data.streets.onMaps, `${data.streets.imported} imported in all`],
@@ -70,6 +76,11 @@ async function inventoryLines() {
     const db = new DatabaseSync(path, { readOnly: true });
     const rows = db.prepare('SELECT kind, status, COUNT(*) AS n FROM entities GROUP BY kind, status').all();
     const built = db.prepare('SELECT at, "commit" FROM builds ORDER BY at DESC LIMIT 1').get();
+    // Track M (G324): multiplayer rows, and lost rows by why (a DB from before G324 has no lost_why).
+    const hasWhy = db.prepare('PRAGMA table_info(entities)').all().some((c) => c.name === 'lost_why');
+    const mp = { multiplayer: 0, players: 0, nosource: 0 };
+    for (const r of db.prepare(`SELECT ${hasWhy ? "CASE WHEN status = 'multiplayer' THEN 'multiplayer' ELSE COALESCE(NULLIF(lost_why, ''), 'players') END" : "CASE WHEN status = 'multiplayer' THEN 'multiplayer' ELSE 'players' END"} AS k, COUNT(*) AS n FROM entities WHERE status IN ('multiplayer', 'lost') GROUP BY 1`).all()) mp[r.k] = r.n;
+    mp.needPlayers = mp.multiplayer + mp.players;
     db.close();
     const by = {};
     for (const r of rows) {
@@ -79,8 +90,9 @@ async function inventoryLines() {
       if (r.status === 'missing') k.missing += r.n;
       if (r.status === 'unknown') k.unknown += r.n;
       if (r.status === 'unbuilt_original') k.unbuilt += r.n;
+      if (r.status === 'multiplayer') k.multiplayer = (k.multiplayer || 0) + r.n;
     }
-    return { builtAt: built?.at || '', commit: built?.commit || '', kinds: Object.values(by) };
+    return { builtAt: built?.at || '', commit: built?.commit || '', kinds: Object.values(by), multiplayer: mp };
   } catch {
     return null;
   }
@@ -99,8 +111,10 @@ if (process.argv.includes('--json')) {
   if (inventory) {
     console.log(`\nInventory (tools/inventory/build.mjs, built ${inventory.builtAt.slice(0, 16)} at ${inventory.commit || '?'}): reachable / total`);
     for (const k of inventory.kinds.sort((a, b) => a.kind.localeCompare(b.kind))) {
-      console.log(`  ${k.kind.padEnd(34)} ${String(k.reachable).padStart(5)} / ${String(k.total).padEnd(5)} ${pct(k.reachable, k.total).padStart(6)}  ${k.missing} missing, ${k.unknown} unknown, ${k.unbuilt} unbuilt in the original`);
+      console.log(`  ${k.kind.padEnd(34)} ${String(k.reachable).padStart(5)} / ${String(k.total).padEnd(5)} ${pct(k.reachable, k.total).padStart(6)}  ${k.multiplayer ? `${k.multiplayer} more in multiplayer, ` : ''}${k.missing} missing, ${k.unknown} unknown, ${k.unbuilt} unbuilt in the original`);
     }
+    const m = inventory.multiplayer;
+    console.log(`  ${'Multiplayer (Track M)'.padEnd(34)} ${String(m.multiplayer).padStart(5)} / ${String(m.needPlayers).padEnd(5)} ${pct(m.multiplayer, m.needPlayers).padStart(6)}  rows that need other players, reachable between real players; ${m.players} still lost; ${m.nosource} lost because nothing survives`);
   }
   if (reg) console.log(`\nGap register: ${reg.total} gaps (${Object.entries(reg.by).map(([k, v]) => `${v} ${k}`).join(', ')})`);
   else console.log(`\nGap register not found at ${REGISTER}`);

@@ -20,6 +20,9 @@
  *   missing     Not yet
  *   lost        Can't come back: nothing about it survives, or it was retired
  *
+ * multiplayer: what of it works between real players in multiplayer (/play/online/), one
+ *   sentence for the report (optional; Track M, register G324). Set it when a two-player live
+ *   check has proven the system; the inventory's `mp` overrides name the commits.
  * spot: where the item sits in the page's street diorama (optional).
  * shot: a screenshot under spike/shots/ to illustrate it (optional).
  */
@@ -108,6 +111,7 @@ export const CHECKLIST = Object.freeze([
     evidence: ['public/js/animal-kinship.js', 'public/js/tools.js'] },
   { id: 'trants', group: 'creatures', name: 'Trants and Wood Trees', status: 'source', spot: 'tree',
     blurb: 'Six living trees to pet, water and harvest (with super harvests), Wood Trees for planks, and Tree Poison: a poisoned tree dies into a dead tree you clear and replant.',
+    multiplayer: 'Trees are shared by everyone on the street: a harvest by anyone wears a Wood Tree down, and a tree the Rook rooks loses its fruit for everyone until it is revived.',
     evidence: ['public/js/trants.js', 'public/js/trant-care.js', 'public/js/woodcutting.js', 'public/js/tree-poison.js'] },
   { id: 'batterflies', group: 'creatures', name: 'Batterflies and guano', status: 'source',
     blurb: 'Cave Batterflies that turn food into guano, and the bar that boosts them.',
@@ -131,12 +135,14 @@ export const CHECKLIST = Object.freeze([
     evidence: ['public/js/garden.js', 'public/js/master-garden.js'] },
   { id: 'mining', group: 'making', name: 'Mining and metal', status: 'source', spot: 'rock',
     blurb: 'Mine four rock types, smelt, grind and make metal with the original tools. Other Glitches sometimes work a rock near you: Help mine it for I Me Mine, and when they join your rock each one adds to what you get.',
+    multiplayer: 'Rocks are shared by everyone on the street, and real players can help each other mine for more chunks.',
     evidence: ['public/js/mining.js', 'public/js/help-mine.js', 'public/js/features/help-mine-feature.js'] },
   { id: 'cooking', group: 'making', name: 'Cooking and making', status: 'source',
     blurb: 'The recipe catalog across every making tool, with skill rules and tool wear.',
     evidence: ['public/js/making.js', 'public/assets/content/recipes.json'] },
   { id: 'powders', group: 'making', name: 'Powders', status: 'source',
     blurb: 'Every Beaker powder does its own thing again: No-No Powder’s rush and crash, Sneezing and Sparkle Powder, the Fecundity powders that make the animals drop their edibles, Fertilidust for the trees (it brings dead ones back to life), and hallowed powder that doubles or triples your next shrine donation. In multiplayer, Sneezing and Sparkle Powder reach every other player on the street.',
+    multiplayer: 'Sneezing Powder and Sparkle Powder spread to the other players on your street.',
     evidence: ['public/js/powders.js', 'public/js/features/powders-feature.js'] },
   { id: 'potions', group: 'making', name: 'Potions', status: 'source',
     blurb: 'Every Cauldron potion can be quaffed or poured again: the Amorous Philtre’s Feeling Called Love, the Elixir of Avarice’s fifty extra quoins, favor from a Draught of Giant Amicability (shake it for another Giant), the Keycutter Tonic, Potions of Animal Youth, clouds that embiggen or shrink you, Rainbow Juice that sends you up, and Trantsformation Fluid that turns one tree into another. You can munch a Rug, too.',
@@ -146,6 +152,7 @@ export const CHECKLIST = Object.freeze([
     evidence: ['public/js/machines.js'] },
   { id: 'resources', group: 'making', name: 'Peat, dirt, jellisacs and more', status: 'source',
     blurb: 'Harvestable street resources and their rare drops.',
+    multiplayer: 'Peat, dirt, jellisacs and the other resources are shared by everyone on the street: what one player takes is gone for the rest.',
     evidence: ['public/js/features/resource-nodes-feature.js', 'public/js/drop-tables.js'] },
   { id: 'tools', group: 'making', name: 'Tools that wear and mend', status: 'source',
     blurb: 'Every tool’s exact condition, breakage and Tinkertool repairs.',
@@ -154,6 +161,7 @@ export const CHECKLIST = Object.freeze([
   // —— Giants & economy ——
   { id: 'quoins', group: 'economy', name: 'Quoins', status: 'source', spot: 'quoin',
     blurb: 'All eight quoin types, daily limits, multipliers and Qurazy quoins. Each street quoin spot is given one of the original quoin classes, which sets what it gives (a tiny 1, a small 2 to 6, a steady 25, a long-wait 2 to 100) and how long it takes to come back. Grab an iMG, mood, energy or currants quoin near other Glitches and they get a shard, and their grabs near you share with you. In multiplayer a street’s quoins are shared: the first to touch one gets it.',
+    multiplayer: 'A street’s quoins are shared by everyone on it: the first player to touch one gets it.',
     evidence: ['public/js/quoins.js', 'public/js/quoin-shards.js', 'public/js/features/quoin-shards-feature.js'] },
   { id: 'shrines', group: 'economy', name: 'Giants and shrines', status: 'source', spot: 'shrine',
     blurb: 'Donate at the eleven Giants’ shrines for favor; a waiting emblem is handed over as you walk past, and the third shrine you pass says hello. Spend favor, or a spare emblem, to learn the skill you are studying faster.',
@@ -175,6 +183,7 @@ export const CHECKLIST = Object.freeze([
     evidence: ['public/js/achievements.js', 'public/js/exploration.js'] },
   { id: 'trading', group: 'economy', name: 'Trading between players', status: 'source',
     blurb: 'In multiplayer, trade items and currants face to face with another player on your street, up to six stacks a side as in the original: the server holds both offers until you both accept, and the site settles the swap so only what you really hold can change hands.',
+    multiplayer: 'Trade items and currants face to face with another player on your street.',
     evidence: ['public/js/trade.js', 'public/js/features/trade-feature.js'] },
   { id: 'auctions', group: 'economy', name: 'Auction house', status: 'missing',
     blurb: 'Not here yet, by choice: the auction house waits until trading between players has had a playtest. The original rules survive (inc_auctions.js), so it can come back.',
@@ -198,18 +207,22 @@ export const CHECKLIST = Object.freeze([
     evidence: ['public/js/paradise-flight.js', 'public/js/paradise-courses.js', 'public/js/paradise-course-runtime.js'] },
   { id: 'races', group: 'quests', name: 'Races and Game of Crowns', status: 'solo',
     blurb: 'Seven race courses rebuilt from footage, raced against recovered rival Glitches under the final ticket-race rules. In multiplayer, Grab ’Em Good and the seven finish-line races are against the real players on your street.',
+    multiplayer: 'Grab ’Em Good and the seven finish-line races are raced against the real players on your street.',
     evidence: ['public/js/races.js', 'public/js/game-of-crowns.js', 'public/js/races-mp.js'] },
   { id: 'hog-haul', group: 'quests', name: 'The Great Hog Haul', status: 'solo',
     blurb: 'The piggy-wrangling race, on its real cave street, against a rival.',
     evidence: ['public/js/hog-haul.js'] },
   { id: 'street-jobs', group: 'quests', name: 'Street projects', status: 'source',
     blurb: 'Build new streets and upgrades together. In multiplayer everyone on the street fills the same phases, the site takes what you give from your pack, rewards follow the original shares and top contributors, and a finished street opens its road for everyone. Solo has a hired hand.',
+    multiplayer: 'Everyone on a street fills the same project, and a finished street opens its road for everyone.',
     evidence: ['public/js/street-jobs.js', 'public/js/street-jobs-mp.js', 'public/js/features/street-jobs-feature.js'] },
   { id: 'feats', group: 'quests', name: 'Feats', status: 'source',
     blurb: 'The Last Feat’s incantation chain and ten of the old Feats. In multiplayer one Feat a day is shared by everyone playing: a live bar with its minimum, bonus and supermegabonus goals, contributors ranked, petrified rocks by place and the top-contributor badges. Solo keeps them as goals of your own, each worth a Small Petrified Rock and open again a game week later, with local companions taking the chain’s other parts.',
+    multiplayer: 'One Feat a day is shared by everyone playing, with its goals, the contributors ranked and the top-contributor badges.',
     evidence: ['public/js/feats.js', 'public/js/solo-feats.js', 'public/js/feats-mp.js'] },
   { id: 'parties', group: 'quests', name: 'Party spaces', status: 'source',
     blurb: 'All eight party packs and their party streets. In multiplayer a pack opens one space for your whole party: everyone gets a way in, shares the clock, the Party ATM and the quoins, and the creator can kick someone out.',
+    multiplayer: 'A Party Pack opens one party space for your whole party, with a shared clock, Party ATM and quoins.',
     evidence: ['public/js/party-spaces.js', 'public/js/party-spaces-mp.js', 'public/js/features/party-spaces-feature.js'] },
   { id: 'smuggling', group: 'quests', name: 'The Smuggler', status: 'source',
     blurb: 'Carry Contraband across Ur without a Deimaginator catching you, then break the wrongfully imprisoned Smuggler out of his cell.',
@@ -227,6 +240,7 @@ export const CHECKLIST = Object.freeze([
     evidence: ['public/js/mailbox.js'] },
   { id: 'neighbours', group: 'home', name: 'Neighbours', status: 'reimagined',
     blurb: 'Visiting Stones lead to six authored neighbours, standing in for other players’ homes.',
+    multiplayer: 'Visit other players’ homes as they keep them, knock to be let in, and give friends house keys.',
     evidence: ['public/js/neighbours.js'] },
   { id: 'tower', group: 'home', name: 'Your Tower', status: 'solo',
     blurb: 'Cultivate a Tower on your home street, build it as a project, pick one of six styles and every floor, roof and decoration the original offered, and raise it to nine floors marked L to 8 on the elevator, each decorated on its own; every new floor goes up at a Workbench on a planked frame open to the stars. The Jethimadh Tower Base hides eleven secret spots.',
@@ -236,11 +250,13 @@ export const CHECKLIST = Object.freeze([
     evidence: ['public/js/craftybot.js', 'public/js/features/craftybot-feature.js', 'public/assets/content/craftybot-specs.json'] },
   { id: 'chat', group: 'home', name: 'Other players and chat', status: 'source',
     blurb: 'Make a character with an email and a password, right in the game, and in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global Chat, Live Help and the Trade Channel are open to everyone the original let in, and players make, find and join groups with their own chat. Say hi with 5 and your daily hi sign flies to another player; a player with no sign catches it, matching signs share a bonus, and the clock shows the day’s Hi sign leaderboard.',
+    multiplayer: 'See other players and chat on the street, form parties, keep buddies, join groups and channels, and trade hi signs.',
     evidence: ['public/js/realtime-client.js', 'public/js/features/realtime-feature.js', 'public/js/features/party-feature.js', 'public/js/account-forms.js', 'public/js/features/buddies-feature.js', 'public/js/features/groups-feature.js'] },
 
   // —— Late game ——
   { id: 'rooks', group: 'late', name: 'Rook attacks', status: 'solo',
     blurb: 'The herald, the attack, stuns with the Focusing Orb, primed shrines and the revival. In multiplayer, everyone on the street fights the same Rook together.',
+    multiplayer: 'Everyone on the street fights the same Rook together.',
     evidence: ['public/js/rook-attack.js', 'public/js/rook-mp.js'] },
   { id: 'skills', group: 'late', name: 'Skills', status: 'source',
     blurb: 'All 105 skills to learn, with the real effects where their systems exist.',

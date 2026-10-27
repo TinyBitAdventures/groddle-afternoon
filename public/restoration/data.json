@@ -94,6 +94,7 @@
    "name": "Original streets",
    "status": "source",
    "blurb": "Over 1,400 archived streets with their real geometry, layered art, parallax, colour grading and signposts.",
+   "multiplayer": null,
    "spot": "signpost",
    "evidence": [
     "public/js/street-loader.js",
@@ -109,6 +110,7 @@
    "name": "Doors, ladders and walls",
    "status": "source",
    "blurb": "Doors between streets, climbable ladders and solid walls restored from the location files, keys included.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/location-navigation.js",
@@ -123,6 +125,7 @@
    "name": "Glitch physics",
    "status": "source",
    "blurb": "The client’s walk, jump, Triple Jump, ladder and air rules, plus each street’s own physics (underwater, low gravity, tiny).",
+   "multiplayer": null,
    "spot": "player",
    "evidence": [
     "public/js/movement.js",
@@ -137,6 +140,7 @@
    "name": "Street scripts and puzzles",
    "status": "rebuilt",
    "blurb": "Archived street event scripts run again; puzzle streets got their lost switches and triggers rebuilt.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/features/location-events-feature.js",
@@ -151,6 +155,7 @@
    "name": "Dametime and the day cycle",
    "status": "source",
    "blurb": "The official calendar: ten-second minutes, four-hour days, eight-day weeks, and a new day that refreshes Ur.",
+   "multiplayer": null,
    "spot": "clock",
    "evidence": [
     "public/js/game-day.js"
@@ -164,6 +169,7 @@
    "name": "Hub maps and travel",
    "status": "source",
    "blurb": "Every region’s map with its streets, and travel by signpost or map.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/map-graph.js",
@@ -178,6 +184,7 @@
    "name": "The Ur subway",
    "status": "rebuilt",
    "blurb": "Twelve stations under Ur on one loop, the Red Line one way and the Blue Line the other. Go down the station stairs on Gregarious Grange, Groddle Forest Junction or any of the other ten, push A Red Button for a 50-currant ticket (Your Papers must be in order), ride, and get off at any stop or stay on for the next. Ride counts earn Subwayfarer, Ground Hogger, Commuter Mug and Chute Jockey. The fares, lines, announcements, gate and badges come from the source; the stations and the train were never archived, so they are rebuilt from players’ footage with Tiny Speck’s own subway art. With nobody else to wait for, the train leaves ten seconds after you board.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/subway.js",
@@ -197,6 +204,7 @@
    "name": "Music and sounds",
    "status": "source",
    "blurb": "The published soundtrack per region, every recovered Musicblock and meditation track, Esquibeth's melody from her own overlay files, real recordings for most sound keys (Wayback files plus Tiny Speck's archived sound effects set), and gentle synth stand-ins for the sounds still lost.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/ambient-music.js",
@@ -212,6 +220,7 @@
    "name": "Your Glitch",
    "status": "source",
    "blurb": "Tiny Speck’s own vector avatar, rebuilt part by part: walk, climb, jump, happy, angry, surprised, with real hair, eyes, mouths, hats and clothes in their original colourways, sharp on Retina. Start fresh with Tiny Speck’s new-player picker, four choices for each part, or dress up as a giant, the Rook or a chicken from the original wardrobe. Seventeen pieces Tiny Speck left in greyscale are reimagined with colours borrowed from their siblings, and tagged as such. A player’s 2012 sheets, found on the Wayback Machine, were the first reference for the poses; they stay in the research notes and never ship.",
+   "multiplayer": null,
    "spot": "player",
    "evidence": [
     "public/js/avatar-rig.js",
@@ -229,6 +238,7 @@
    "name": "Camera Mode",
    "status": "source",
    "blurb": "Press C to look around the street; with Eyeballery, the whole street.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/features/camera-mode-feature.js"
@@ -242,6 +252,7 @@
    "name": "The new-player tutorial",
    "status": "rebuilt",
    "blurb": "An optional start: fall through the clouds, learn to walk and jump with the Welcoming Flamingo and the Dustbunny, get your home street and first skill, buy two bags on Gentle Island, go home for the Magic Rock's send-off, and head out into Ur.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/newxp.js",
@@ -256,6 +267,7 @@
    "name": "Eleven Secret Locations",
    "status": "source",
    "blurb": "Twenty DNAja-vu beacons across Ur, a Giant’s message at each, and Lem’s at the eleventh.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/secret-spots.js",
@@ -270,6 +282,7 @@
    "name": "The hidden floors",
    "status": "rebuilt",
    "blurb": "Three rooms no signpost leads to, each behind its street’s own hidden teleporter: the lost floor off Goorsh Gam’s treetops, the forgotten floor up in Odena Odes’ ceiling, and the missing floor at the top of Ilmenskie’s cave mouth, a running Triple Jump off the mushroom caps. The lost and missing floors are rebuilt from players’ footage and Snaps with Tiny Speck’s own apartment-hall art: ripped posters, dripping pipes, a climbable vine.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/hidden-floors.js",
@@ -286,6 +299,7 @@
    "name": "Vicar’s Peak",
    "status": "rebuilt",
    "blurb": "The Groddle Heights cliff behind Thornfad Layers’ locked door (Door Key 1): seven tiers of pebbly ledges, wooden ladders twined with vines, and a stone-arched door at the top that leads on to Mossystep. Home to 11 Piggies, 7 Chickens and a Metal Rock, as its loading card said. Its layout was never archived, so it is a reconstruction from a 2011 party recording and two players’ 2012 Snaps, built with Tiny Speck’s own Heights art.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/vicars-peak.js",
@@ -302,6 +316,7 @@
    "name": "Piggies",
    "status": "source",
    "blurb": "Pet, nibble for meat, feed, name, capture and incubate, with the exact Animal Kinship tables; piggies keep a mood and hunger, sulk in gloomy places and wander over to eat dropped food.",
+   "multiplayer": null,
    "spot": "piggy",
    "evidence": [
     "public/js/animal-kinship.js",
@@ -316,6 +331,7 @@
    "name": "Chickens",
    "status": "source",
    "blurb": "Squeeze for grain, incubate eggs, raise chicks.",
+   "multiplayer": null,
    "spot": "chicken",
    "evidence": [
     "public/js/animal-kinship.js"
@@ -329,6 +345,7 @@
    "name": "Butterflies",
    "status": "source",
    "blurb": "Massage with lotion, then milk; the onboarding quests start here.",
+   "multiplayer": null,
    "spot": "butterfly",
    "evidence": [
     "public/js/animal-kinship.js",
@@ -343,6 +360,7 @@
    "name": "Trants and Wood Trees",
    "status": "source",
    "blurb": "Six living trees to pet, water and harvest (with super harvests), Wood Trees for planks, and Tree Poison: a poisoned tree dies into a dead tree you clear and replant.",
+   "multiplayer": "Trees are shared by everyone on the street: a harvest by anyone wears a Wood Tree down, and a tree the Rook rooks loses its fruit for everyone until it is revived.",
    "spot": "tree",
    "evidence": [
     "public/js/trants.js",
@@ -359,6 +377,7 @@
    "name": "Batterflies and guano",
    "status": "source",
    "blurb": "Cave Batterflies that turn food into guano, and the bar that boosts them.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/animal-husbandry.js"
@@ -372,6 +391,7 @@
    "name": "Foxes and Heli Kitties",
    "status": "source",
    "blurb": "Fox brushing in the preserves and the kitties overhead.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/foxes.js"
@@ -385,6 +405,7 @@
    "name": "Crabs",
    "status": "solo",
    "blurb": "Crabs on eight streets will listen to your Musicblocks, and one that hears its oldest tune is a happy crab. Flatter one and hug it for Crabato Juice. Play a crab the tune it just heard and it still shouts and sulks, but solo you keep the block: the original destroyed it, which only made sense with other players in between. In multiplayer the crab keeps it, as in the original.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/crabs.js",
@@ -399,6 +420,7 @@
    "name": "Animals, trees and shrines tell their stories",
    "status": "source",
    "blurb": "Walk up to a chicken, piggy, butterfly, tree, rock, peat bog, barnacle, patch, shrine or Icon and it may call you over with something to tell. All 92 of their conversations come word for word from the source, offered by its rules: one every half hour, every 15 seconds while you are in the middle of a chain, and none until you have given to every shrine. Forty-three of them lead up to the shrines, whose stories wake the Street Spirits’ own. A talk cut off by a reload picks up where it stopped.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/conversations.js",
@@ -415,6 +437,7 @@
    "name": "Who lives where",
    "status": "source",
    "blurb": "Each street’s real population of animals, trees, rocks and shrines from the archive.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/street-ecology.js",
@@ -429,6 +452,7 @@
    "name": "Gardens and herbs",
    "status": "source",
    "blurb": "Hoe, plant, water and harvest crops and herbs, with the Master Gardener potions.",
+   "multiplayer": null,
    "spot": "garden",
    "evidence": [
     "public/js/garden.js",
@@ -443,6 +467,7 @@
    "name": "Mining and metal",
    "status": "source",
    "blurb": "Mine four rock types, smelt, grind and make metal with the original tools. Other Glitches sometimes work a rock near you: Help mine it for I Me Mine, and when they join your rock each one adds to what you get.",
+   "multiplayer": "Rocks are shared by everyone on the street, and real players can help each other mine for more chunks.",
    "spot": "rock",
    "evidence": [
     "public/js/mining.js",
@@ -458,6 +483,7 @@
    "name": "Cooking and making",
    "status": "source",
    "blurb": "The recipe catalog across every making tool, with skill rules and tool wear.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/making.js",
@@ -472,6 +498,7 @@
    "name": "Powders",
    "status": "source",
    "blurb": "Every Beaker powder does its own thing again: No-No Powder’s rush and crash, Sneezing and Sparkle Powder, the Fecundity powders that make the animals drop their edibles, Fertilidust for the trees (it brings dead ones back to life), and hallowed powder that doubles or triples your next shrine donation. In multiplayer, Sneezing and Sparkle Powder reach every other player on the street.",
+   "multiplayer": "Sneezing Powder and Sparkle Powder spread to the other players on your street.",
    "spot": null,
    "evidence": [
     "public/js/powders.js",
@@ -486,6 +513,7 @@
    "name": "Potions",
    "status": "source",
    "blurb": "Every Cauldron potion can be quaffed or poured again: the Amorous Philtre’s Feeling Called Love, the Elixir of Avarice’s fifty extra quoins, favor from a Draught of Giant Amicability (shake it for another Giant), the Keycutter Tonic, Potions of Animal Youth, clouds that embiggen or shrink you, Rainbow Juice that sends you up, and Trantsformation Fluid that turns one tree into another. You can munch a Rug, too.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/potions.js",
@@ -500,6 +528,7 @@
    "name": "Machines and the Still",
    "status": "source",
    "blurb": "Assemble Blockmakers, Fuelmakers and Woodworkers; fuel them; distil hooch.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/machines.js"
@@ -513,6 +542,7 @@
    "name": "Peat, dirt, jellisacs and more",
    "status": "source",
    "blurb": "Harvestable street resources and their rare drops.",
+   "multiplayer": "Peat, dirt, jellisacs and the other resources are shared by everyone on the street: what one player takes is gone for the rest.",
    "spot": null,
    "evidence": [
     "public/js/features/resource-nodes-feature.js",
@@ -527,6 +557,7 @@
    "name": "Tools that wear and mend",
    "status": "source",
    "blurb": "Every tool’s exact condition, breakage and Tinkertool repairs.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/tools.js"
@@ -540,6 +571,7 @@
    "name": "Quoins",
    "status": "source",
    "blurb": "All eight quoin types, daily limits, multipliers and Qurazy quoins. Each street quoin spot is given one of the original quoin classes, which sets what it gives (a tiny 1, a small 2 to 6, a steady 25, a long-wait 2 to 100) and how long it takes to come back. Grab an iMG, mood, energy or currants quoin near other Glitches and they get a shard, and their grabs near you share with you. In multiplayer a street’s quoins are shared: the first to touch one gets it.",
+   "multiplayer": "A street’s quoins are shared by everyone on it: the first player to touch one gets it.",
    "spot": "quoin",
    "evidence": [
     "public/js/quoins.js",
@@ -555,6 +587,7 @@
    "name": "Giants and shrines",
    "status": "source",
    "blurb": "Donate at the eleven Giants’ shrines for favor; a waiting emblem is handed over as you walk past, and the third shrine you pass says hello. Spend favor, or a spare emblem, to learn the skill you are studying faster.",
+   "multiplayer": null,
    "spot": "shrine",
    "evidence": [
     "public/js/shrines.js"
@@ -568,6 +601,7 @@
    "name": "Bureaucratic Halls",
    "status": "rebuilt",
    "blurb": "The hall doors on Gregarious Grange, Chego Chase and Baeli Bray open again: the Bureaucratic Hall, the Andra and the Muufo halls, where the bureaucrats behind the counter sell the Card-Carrying Qualification, Your Papers and General Building Permits. The halls themselves were never archived, so all three use the one hall rebuilt for Legalize It.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/features/bureaucratic-halls-feature.js",
@@ -582,6 +616,7 @@
    "name": "Street spirits and vendors",
    "status": "source",
    "blurb": "The original stores, stock and prices, buying and selling. The scarecrow Gardening Tools Vendor, the Meal Vendor, the Tool Vendor, Uncle Friendly, Helga and the Sno Cone Vending Machine stand on the eleven streets the archive puts them on, each with its own store, and the scarecrow sends you on his Meet the Merchants errands. Sno Cones give iMG, not energy: each colour needs its level, the fourth of the day may freeze your brain, and a dropped cone melts. A Street Spirit you have not visited for a game day may get lonely: it calls you from the corner of the screen in its porthole, asks to be your destination, cries on its street until you walk up to it, and thanks you with 1000 iMG, or throws you a party.",
+   "multiplayer": null,
    "spot": "vendor",
    "evidence": [
     "public/js/vendor.js",
@@ -602,6 +637,7 @@
    "name": "Imagination upgrades",
    "status": "source",
    "blurb": "The upgrade card shop with its hand of three cards, re-deals and effects.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/imagination.js"
@@ -615,6 +651,7 @@
    "name": "Levels, energy and mood",
    "status": "source",
    "blurb": "The official XP table, level rewards, metabolics, idle mood loss and food variety.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/progression.js",
@@ -631,6 +668,7 @@
    "name": "Badges",
    "status": "source",
    "blurb": "The full badge catalog with official art and the original counters.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/achievements.js",
@@ -645,6 +683,7 @@
    "name": "Trading between players",
    "status": "source",
    "blurb": "In multiplayer, trade items and currants face to face with another player on your street, up to six stacks a side as in the original: the server holds both offers until you both accept, and the site settles the swap so only what you really hold can change hands.",
+   "multiplayer": "Trade items and currants face to face with another player on your street.",
    "spot": null,
    "evidence": [
     "public/js/trade.js",
@@ -659,6 +698,7 @@
    "name": "Auction house",
    "status": "missing",
    "blurb": "Not here yet, by choice: the auction house waits until trading between players has had a playtest. The original rules survive (inc_auctions.js), so it can come back.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [],
    "shot": null,
@@ -670,6 +710,7 @@
    "name": "Story and skill quests",
    "status": "source",
    "blurb": "Hundreds of original quests with their dialogue, offered by the Magic Rock or, where the original had one, their own giver: your Butler, the Ghost of Gwendolyn, the Greeterbot.",
+   "multiplayer": null,
    "spot": "rock-magic",
    "evidence": [
     "public/js/quests.js",
@@ -684,6 +725,7 @@
    "name": "Quest rooms",
    "status": "rebuilt",
    "blurb": "Private quest instances: almost none survive, so each is rebuilt from the quest code and gameplay footage.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/features/quest-instances-feature.js",
@@ -698,6 +740,7 @@
    "name": "Hand-built story quests",
    "status": "rebuilt",
    "blurb": "Phantom Glitch, Rooks’ Woods, Museum of the Rook, Winter Walk, A Summer’s Day, Ilmenskie Jones, Legalize It and more.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/ghost-quest.js",
@@ -714,6 +757,7 @@
    "name": "The Purple Journey",
    "status": "rebuilt",
    "blurb": "Imbibe an Essence of Purple and wait: the minute of HURRY UP PLEASE ITS TIME, then Le Voyage Violet, where Scions of Purple say strange things and quoins appear. Purpled Out follows, and three journeys earn Elementary Penguin. The room was never archived, so it is rebuilt from the players’ Snaps.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/purple-journey.js",
@@ -729,6 +773,7 @@
    "name": "Ticket to Paradise",
    "status": "rebuilt",
    "blurb": "Thirteen private courses: Cloud Rings, Radial Heights, Starlit Night, Slip ’N Slide, Aerial Boost, Mountain Scaling, Abysmal Thrill, Arbor Hollow, Bippity Bop, Cloud Flight, Updraft, Sky Plunge and Drafty Uplift. Tiny Speck built Updraft and Drafty Uplift, but they may never have reached players: only eleven Paradise courses are known to have gone live.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/paradise-flight.js",
@@ -744,6 +789,7 @@
    "name": "Races and Game of Crowns",
    "status": "solo",
    "blurb": "Seven race courses rebuilt from footage, raced against recovered rival Glitches under the final ticket-race rules. In multiplayer, Grab ’Em Good and the seven finish-line races are against the real players on your street.",
+   "multiplayer": "Grab ’Em Good and the seven finish-line races are raced against the real players on your street.",
    "spot": null,
    "evidence": [
     "public/js/races.js",
@@ -759,6 +805,7 @@
    "name": "The Great Hog Haul",
    "status": "solo",
    "blurb": "The piggy-wrangling race, on its real cave street, against a rival.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/hog-haul.js"
@@ -772,6 +819,7 @@
    "name": "Street projects",
    "status": "source",
    "blurb": "Build new streets and upgrades together. In multiplayer everyone on the street fills the same phases, the site takes what you give from your pack, rewards follow the original shares and top contributors, and a finished street opens its road for everyone. Solo has a hired hand.",
+   "multiplayer": "Everyone on a street fills the same project, and a finished street opens its road for everyone.",
    "spot": null,
    "evidence": [
     "public/js/street-jobs.js",
@@ -787,6 +835,7 @@
    "name": "Feats",
    "status": "source",
    "blurb": "The Last Feat’s incantation chain and ten of the old Feats. In multiplayer one Feat a day is shared by everyone playing: a live bar with its minimum, bonus and supermegabonus goals, contributors ranked, petrified rocks by place and the top-contributor badges. Solo keeps them as goals of your own, each worth a Small Petrified Rock and open again a game week later, with local companions taking the chain’s other parts.",
+   "multiplayer": "One Feat a day is shared by everyone playing, with its goals, the contributors ranked and the top-contributor badges.",
    "spot": null,
    "evidence": [
     "public/js/feats.js",
@@ -802,6 +851,7 @@
    "name": "Party spaces",
    "status": "source",
    "blurb": "All eight party packs and their party streets. In multiplayer a pack opens one space for your whole party: everyone gets a way in, shares the clock, the Party ATM and the quoins, and the creator can kick someone out.",
+   "multiplayer": "A Party Pack opens one party space for your whole party, with a shared clock, Party ATM and quoins.",
    "spot": null,
    "evidence": [
     "public/js/party-spaces.js",
@@ -817,6 +867,7 @@
    "name": "The Smuggler",
    "status": "source",
    "blurb": "Carry Contraband across Ur without a Deimaginator catching you, then break the wrongfully imprisoned Smuggler out of his cell.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/smuggling.js",
@@ -832,6 +883,7 @@
    "name": "Holidays",
    "status": "source",
    "blurb": "Zilloween, Glitchmas and Pi Day on their dates, and the Egg Hunt all year from Egg Plants.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/seasons.js",
@@ -847,6 +899,7 @@
    "name": "Your house and yard",
    "status": "source",
    "blurb": "Get your house and home street free, as in 2012: the Magic Rock hands you a Home Street Ticket and the Home Street Selection Machine takes it for a Meadow, Firebog or Uralia street. Paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the street and the private back yard left of the house (walk out through the house’s open end; worn-out rocks, gardens and patches become protos you restore with a project), expand both (the yard from 5 to 20 segments, which with a full-width street earns Landgrabber), restyle the street as any of 36 of the original 37 street styles and the back yard as any of 34 of its 37 (Change Style, level x 10 iMG; each rebuilt from Tiny Speck’s own scenery, a yard drawn like the street of its template family), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges).",
+   "multiplayer": null,
    "spot": "mailbox",
    "evidence": [
     "public/js/homes.js",
@@ -866,6 +919,7 @@
    "name": "Mail",
    "status": "source",
    "blurb": "Mailboxes, postage, parcels and replies.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/mailbox.js"
@@ -879,6 +933,7 @@
    "name": "Neighbours",
    "status": "reimagined",
    "blurb": "Visiting Stones lead to six authored neighbours, standing in for other players’ homes.",
+   "multiplayer": "Visit other players’ homes as they keep them, knock to be let in, and give friends house keys.",
    "spot": null,
    "evidence": [
     "public/js/neighbours.js"
@@ -892,6 +947,7 @@
    "name": "Your Tower",
    "status": "solo",
    "blurb": "Cultivate a Tower on your home street, build it as a project, pick one of six styles and every floor, roof and decoration the original offered, and raise it to nine floors marked L to 8 on the elevator, each decorated on its own; every new floor goes up at a Workbench on a planked frame open to the stars. The Jethimadh Tower Base hides eleven secret spots.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/home-tower.js",
@@ -906,6 +962,7 @@
    "name": "Craftybot",
    "status": "source",
    "blurb": "A crafting robot delivered in a box by your Magic Rock: queue jobs and it fetches the ingredients and tools, crafts every step, burns fuel and crystals, and hands you the results.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/craftybot.js",
@@ -921,6 +978,7 @@
    "name": "Other players and chat",
    "status": "source",
    "blurb": "Make a character with an email and a password, right in the game, and in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global Chat, Live Help and the Trade Channel are open to everyone the original let in, and players make, find and join groups with their own chat. Say hi with 5 and your daily hi sign flies to another player; a player with no sign catches it, matching signs share a bonus, and the clock shows the day’s Hi sign leaderboard.",
+   "multiplayer": "See other players and chat on the street, form parties, keep buddies, join groups and channels, and trade hi signs.",
    "spot": null,
    "evidence": [
     "public/js/realtime-client.js",
@@ -939,6 +997,7 @@
    "name": "Rook attacks",
    "status": "solo",
    "blurb": "The herald, the attack, stuns with the Focusing Orb, primed shrines and the revival. In multiplayer, everyone on the street fights the same Rook together.",
+   "multiplayer": "Everyone on the street fights the same Rook together.",
    "spot": null,
    "evidence": [
     "public/js/rook-attack.js",
@@ -953,6 +1012,7 @@
    "name": "Skills",
    "status": "source",
    "blurb": "All 105 skills to learn, with the real effects where their systems exist.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/skill-tree.js",
@@ -967,6 +1027,7 @@
    "name": "Meditation and teleportation",
    "status": "source",
    "blurb": "Focusing Orb meditation, levitation, teleport points and scripts.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/meditation.js",
@@ -981,6 +1042,7 @@
    "name": "Giant Icons",
    "status": "source",
    "blurb": "Make an Icon from eleven emblems and tend it for the Giants’ love.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/giant-icons.js"
@@ -994,6 +1056,7 @@
    "name": "The Rube",
    "status": "source",
    "blurb": "The mysterious trader who appears and offers a swap.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/rube.js"
@@ -1007,6 +1070,7 @@
    "name": "Hell (Naraka)",
    "status": "source",
    "blurb": "Croak and work your way out by squishing grapes, or step into the Hell Bar behind Panka Surazu, where Hell’s Bartender swaps a Diabolical Drink Ticket for Wine of the Dead.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/hell.js",
@@ -1021,6 +1085,7 @@
    "name": "Musicblocks, Cubimals and the Stoot doll",
    "status": "source",
    "blurb": "All 27 recovered Musicblock tunes (five series of five, SB-1 and Goodnight Groddle) with their collector trophies, both Cubimal series and the memorial pull-string doll.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/musicblocks.js",
@@ -1036,6 +1101,7 @@
    "name": "Fortune Cookies, Plates of Beans and other small things",
    "status": "source",
    "blurb": "Put a written note in a Fortune Cookie and break it for a Fortune to read, type /beans in Local chat for a Plate of Beans to overthink (again and again, each time with one more \"really\"), turn a Great Hog Haul Ticket into the Hog Haul, chop Wood Trees with the Class Axe, and hit the Balls on Plexus and Nandu Pitha. Their verbs, words, numbers and art come from the source. Only the three numbers behind the Ball’s hit survive, not what the game did with them, so the way it flies and bounces is reimagined.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/small-items.js",
@@ -1051,6 +1117,7 @@
    "name": "Artifacts and petrified rocks",
    "status": "progress",
    "blurb": "Crack a petrified rock with a pick, hoe, hatchet, shovel or grinder for artifact pieces, necklace beads, a gem and currants; a whole set rebuilds one of the ten artifacts or five necklaces. The rocks were Feat rewards: each of your own Feats gives a Small one, and again every game week, so a set or two comes with time.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/artifacts.js",
@@ -1065,6 +1132,7 @@
    "name": "Door Drink portals",
    "status": "solo",
    "blurb": "Pour a Door Drink and a Hyperspacetime Portal Door stands at your feet. The original chained everyone’s doors across Ur; here the chain is yours, so each new door leads back to the one you poured before it.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/door-drink.js",
@@ -1080,6 +1148,7 @@
    "name": "Snapshots",
    "status": "lost",
    "blurb": "Snapshottery was retired before Glitch closed.",
+   "multiplayer": null,
    "spot": null,
    "evidence": [],
    "shot": null,
@@ -1097,6 +1166,7 @@
  },
  "back": 66,
  "possible": 68,
+ "multiplayer": 13,
  "quests": {
   "total": 445,
   "story": 245,
@@ -2493,9 +2563,14 @@
   ]
  },
  "git": {
-  "commits": 546,
+  "commits": 547,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "In multiplayer, say hi to other players: your sign flies to them, a player with none catches it, and matching signs share a bonus"
+   },
    {
     "date": "2026-10-26",
     "kind": "new",
@@ -2610,14 +2685,9 @@
     "date": "2026-10-26",
     "kind": "new",
     "text": "In multiplayer, a tree the Rook rooks loses its fruit for everyone until it is revived"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "new",
-    "text": "Reset a forgotten multiplayer password without leaving the game"
    }
   ]
  },
- "tests": 317,
+ "tests": 318,
  "generatedAt": "2026-10-26"
 }

@@ -33,6 +33,10 @@ const playLink = (href, label = 'Play', cls = '') => (href
 
 const STATUS_ORDER = ['source', 'rebuilt', 'reimagined', 'solo', 'progress', 'missing', 'lost'];
 
+/** What works between real players in multiplayer (the checklist's multiplayer field), as one line. */
+const MP_LABEL = 'In multiplayer';
+const mpLine = (it, cls, tag = 'p') => (it.multiplayer ? el(tag, { class: cls }, el('b', {}, `${MP_LABEL}: `), it.multiplayer) : null);
+
 /* —— Scoreboard ———————————————————————————— */
 function renderScore(data) {
   for (const node of document.querySelectorAll('[data-bind]')) node.textContent = fmt(data[node.dataset.bind]);
@@ -48,6 +52,8 @@ function renderScore(data) {
     bar.append(el('span', { style: `width:${(n / total) * 100}%; background:${tone(status, data)}`, title: `${data.status[status].label}: ${n}` }));
     legend.append(el('li', {}, el('span', { class: 'dot', style: `background:${tone(status, data)}` }), el('b', {}, String(n)), data.status[status].label));
   }
+  const mp = $('#score-mp');
+  if (mp && data.multiplayer) mp.replaceChildren(el('b', {}, String(data.multiplayer)), ` of them work between real players in multiplayer.`);
 }
 
 /* —— Detail card ———————————————————————————— */
@@ -61,6 +67,8 @@ function detailFor(item, data) {
   pill.textContent = data.status[item.status].label;
   pill.style.setProperty('--tone', tone(item.status, data));
   $('.detail-blurb', node).textContent = item.blurb;
+  const mp = mpLine(item, 'detail-mp');
+  if (mp) $('.detail-blurb', node).after(mp);
   const play = $('.detail-play', node);
   if (item.play) {
     play.href = item.play;
@@ -125,7 +133,7 @@ function setupBoard(data) {
   const chips = [];
   const addChip = (id, label, count) => {
     const chip = el('button', { class: 'chip', type: 'button', 'aria-pressed': String(id === active), onclick: () => { active = id; apply(); } },
-      id !== 'all' ? el('span', { class: 'dot', style: `background:${tone(id, data)}` }) : null,
+      data.status[id] ? el('span', { class: 'dot', style: `background:${tone(id, data)}` }) : null,
       label, el('span', { class: 'count' }, String(count)));
     chip.dataset.status = id;
     chips.push(chip);
@@ -133,6 +141,8 @@ function setupBoard(data) {
   };
   addChip('all', 'Everything', data.items.length);
   for (const s of STATUS_ORDER) if (data.tally[s]) addChip(s, data.status[s].label, data.tally[s]);
+  // Not a status: the systems that also work between real players.
+  if (data.multiplayer) addChip('multiplayer', MP_LABEL, data.multiplayer);
 
   for (const group of data.groups) {
     const items = data.items.filter((it) => it.group === group.id);
@@ -142,21 +152,23 @@ function setupBoard(data) {
         return n ? el('span', { style: `width:${(n / items.length) * 100}%; background:${tone(s, data)}` }) : null;
       }));
     const back = items.filter((it) => ['source', 'rebuilt', 'reimagined', 'solo'].includes(it.status)).length;
+    const mpCount = items.filter((it) => it.multiplayer).length;
     groupsEl.append(el('section', { class: 'group', 'aria-label': group.name },
       el('h3', {}, group.name),
-      el('p', { class: 'group-blurb' }, `${group.blurb} ${back} of ${items.length} back.`),
+      el('p', { class: 'group-blurb' }, `${group.blurb} ${back} of ${items.length} back${mpCount ? `, ${mpCount} in multiplayer` : ''}.`),
       meter,
       el('ul', { class: 'items' }, items.map((it) => {
         const st = data.status[it.status];
-        const li = el('li', { class: 'item', style: `--tone:${tone(it.status, data)}`, 'data-status': it.status });
+        const li = el('li', { class: 'item', style: `--tone:${tone(it.status, data)}`, 'data-status': it.status, 'data-mp': it.multiplayer ? '1' : null });
         const btn = el('button', { type: 'button', 'aria-expanded': 'false', onclick: () => {
           const open = li.classList.toggle('is-open');
           btn.setAttribute('aria-expanded', String(open));
         } },
         el('span', { class: 'check', 'aria-hidden': 'true' }, st.mark || ''),
-        el('span', { class: 'item-name' }, it.name),
+        el('span', { class: 'item-name' }, it.name, it.multiplayer ? el('span', { class: 'item-mp', title: it.multiplayer }, MP_LABEL) : null),
         el('span', { class: 'item-tag' }, st.short),
         el('span', { class: 'item-blurb' }, it.blurb),
+        mpLine(it, 'item-blurb item-mp-line', 'span'),
         it.shot ? el('img', { class: 'item-shot', src: it.shot, alt: `${it.name} in Groddle Afternoon`, loading: 'lazy' }) : null);
         li.append(btn);
         const play = playLink(it.play, 'Play', 'item-play');
@@ -170,7 +182,8 @@ function setupBoard(data) {
 
   function apply() {
     for (const chip of chips) chip.setAttribute('aria-pressed', String(chip.dataset.status === active));
-    for (const li of groupsEl.querySelectorAll('.item')) li.hidden = active !== 'all' && li.dataset.status !== active;
+    const shows = (li) => active === 'all' || (active === 'multiplayer' ? li.dataset.mp === '1' : li.dataset.status === active);
+    for (const li of groupsEl.querySelectorAll('.item')) li.hidden = !shows(li);
     for (const g of groupsEl.querySelectorAll('.group')) g.hidden = ![...g.querySelectorAll('.item')].some((li) => !li.hidden);
   }
 }

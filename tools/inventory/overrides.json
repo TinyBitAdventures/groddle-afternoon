@@ -1,5 +1,5 @@
 {
- "_doc": "Manual judgements for tools/inventory/build.mjs, keyed kind:id. Detectors come first; keep this small. system:<src>/<name> maps a GSJS system to a checklist.mjs item (checklist) or gives it a status with a reason. counter:<group> or counter:<group>:<label> judges every badge that counter blocks (multiplayer counters). Other kinds take {status, reason, register}.",
+ "_doc": "Manual judgements for tools/inventory/build.mjs, keyed kind:id. Detectors come first; keep this small. system:<src>/<name> maps a GSJS system to a checklist.mjs item (checklist) or gives it a status with a reason. counter:<group> or counter:<group>:<label> judges every badge that counter blocks (multiplayer counters); a judged group is met only by an emission that names it literally. Other kinds take {status, reason, register}. Multiplayer (G324): any of them may add mp (the commits that proved it between two real players: \"game <hash>, server <hash>, site <hash>\") and mpReason (the code that reaches it there): the row becomes multiplayer, reachable between real players only. \"lost\": \"nosource\" marks a lost row nothing survives of (the default is players: needs other players).",
  "system:config/familiar_tsid": {
   "status": "excluded",
   "reason": "server plumbing, not a game system"
@@ -73,25 +73,45 @@
   "checklist": "newxp"
  },
  "system:config/max_groups": {
-  "checklist": "chat"
+  "checklist": "chat",
+  "mp": "game 2d2b7f09, server cb1d385, site 79d4ecb",
+  "mpReason": "Groups.php MAX_GROUPS (20) limits the groups a player is in",
+  "register": "G326"
  },
  "system:config/max_party_size": {
-  "checklist": "chat"
+  "checklist": "chat",
+  "mp": "game 07c5c704, server 2efd0e8",
+  "mpReason": "party.go partyMaxSize (71)"
  },
  "system:config/buddy_limit": {
-  "checklist": "chat"
+  "checklist": "chat",
+  "mp": "game bfef1df4, server 161fc4d, site bde2359",
+  "mpReason": "Buddies.php BUDDY_LIMIT (1000)",
+  "register": "G325"
  },
  "system:config/live_help_groups": {
-  "checklist": "chat"
+  "checklist": "chat",
+  "mp": "game 2d2b7f09, server cb1d385, site 79d4ecb",
+  "mpReason": "channels.go: Live Help for players level 11 and up",
+  "register": "G326"
  },
  "system:config/newbie_live_help_groups": {
-  "checklist": "chat"
+  "checklist": "chat",
+  "mp": "game 2d2b7f09, server cb1d385, site 79d4ecb",
+  "mpReason": "channels.go: the newbie Live Help room under level 11",
+  "register": "G326"
  },
  "system:config/global_chat_groups": {
-  "checklist": "chat"
+  "checklist": "chat",
+  "mp": "game 2d2b7f09, server cb1d385, site 79d4ecb",
+  "mpReason": "channels.go: Global Chat for everyone signed in",
+  "register": "G326"
  },
  "system:config/trade_chat_groups": {
-  "checklist": "chat"
+  "checklist": "chat",
+  "mp": "game 2d2b7f09, server cb1d385, site 79d4ecb",
+  "mpReason": "channels.go: the Trade Channel, with the trade_channel card",
+  "register": "G326"
  },
  "system:config/garden_water_threshold": {
   "checklist": "gardens"
@@ -110,11 +130,17 @@
  },
  "system:config/acl_keys_per_house_limit": {
   "status": "lost",
-  "reason": "house keys handed to other players"
+  "reason": "house keys handed to other players",
+  "mp": "game 1e3afa1a, server 3bf289c, site 458a1c2",
+  "mpReason": "Neighbours.php HOUSE_LIMIT (100 keys given out per house)",
+  "register": "G328"
  },
  "system:config/acl_keys_per_player_limit": {
   "status": "lost",
-  "reason": "house keys handed to other players"
+  "reason": "house keys handed to other players",
+  "mp": "game 1e3afa1a, server 3bf289c, site 458a1c2",
+  "mpReason": "Neighbours.php PLAYER_LIMIT (100 keys held per player)",
+  "register": "G328"
  },
  "system:config/skill_points_per_second": {
   "checklist": "skills"
@@ -195,11 +221,17 @@
  },
  "system:config/hi_variants_tracker": {
   "status": "lost",
-  "reason": "the viral Hi emote spread between players"
+  "reason": "the viral Hi emote spread between players",
+  "mp": "game aa6e9f37, server d8d044b",
+  "mpReason": "hi.go is the tracker: daily signs, the tally, infection, yesterday's winner and the evasion records",
+  "register": "G327"
  },
  "system:config/feature_hi_viral": {
   "status": "lost",
-  "reason": "the viral Hi emote spread between players"
+  "reason": "the viral Hi emote spread between players",
+  "mp": "game aa6e9f37, server d8d044b",
+  "mpReason": "hi.go: a hi flies to another player, one with no sign catches it, matching signs share a bonus",
+  "register": "G327"
  },
  "system:config/feature_hi_records": {
   "checklist": "homes"
@@ -209,7 +241,10 @@
  },
  "system:locations/inc_acl_keys": {
   "status": "lost",
-  "reason": "house keys for other players"
+  "reason": "house keys for other players",
+  "mp": "game 1e3afa1a, server 3bf289c, site 458a1c2",
+  "mpReason": "Neighbours.php keys (give, take back, a block takes them both ways) and homes.go house passes",
+  "register": "G328"
  },
  "system:locations/inc_admin": {
   "status": "excluded",
@@ -303,11 +338,17 @@
  },
  "system:players/inc_acl_keys": {
   "status": "lost",
-  "reason": "house keys for other players"
+  "reason": "house keys for other players",
+  "mp": "game 1e3afa1a, server 3bf289c, site 458a1c2",
+  "mpReason": "Neighbours.php keys (give, take back, a block takes them both ways) and homes.go house passes",
+  "register": "G328"
  },
  "system:players/inc_houses_keys": {
   "status": "lost",
-  "reason": "house keys for other players"
+  "reason": "house keys for other players",
+  "mp": "game 1e3afa1a, server 3bf289c, site 458a1c2",
+  "mpReason": "homes.go lets key-holders into the house and walks out a revoked one; Menu > House Keys (neighbours-mp-feature.js)",
+  "register": "G328"
  },
  "system:players/inc_admin": {
   "status": "excluded",
@@ -341,22 +382,35 @@
   "checklist": "auctions"
  },
  "system:players/inc_trading": {
-  "checklist": "auctions"
+  "checklist": "trading",
+  "mp": "game 1fa394e5, server 89a0cde",
+  "mpReason": "trade.go holds both offers until both accept and the site's ledger settles the swap (trade-feature.js)"
  },
  "system:players/inc_avatar": {
   "checklist": "avatar"
  },
  "system:players/inc_buddies": {
-  "checklist": "chat"
+  "checklist": "chat",
+  "mp": "game bfef1df4, server 161fc4d, site bde2359",
+  "mpReason": "Buddies.php add, remove and block, buddies.go who is online and where",
+  "register": "G325"
  },
  "system:players/inc_groups": {
-  "checklist": "chat"
+  "checklist": "chat",
+  "mp": "game 2d2b7f09, server cb1d385, site 79d4ecb",
+  "mpReason": "Groups.php groups (make, find, join, leave, invite) and channels.go group chat",
+  "register": "G326"
  },
  "system:players/inc_organizations": {
-  "checklist": "chat"
+  "checklist": "chat",
+  "status": "lost",
+  "reason": "organizations (inc_organizations.js) were left out of the groups work",
+  "register": "G326"
  },
  "system:players/inc_party": {
-  "checklist": "chat"
+  "checklist": "chat",
+  "mp": "game 07c5c704, server 2efd0e8",
+  "mpReason": "party.go invites, party chat and a roster that follows members across streets"
  },
  "system:players/inc_buffs": {
   "status": "source",
@@ -567,7 +621,9 @@
  },
  "counter:players_traded": {
   "status": "lost",
-  "reason": "trading needs other players"
+  "reason": "trading needs other players",
+  "mp": "game 1fa394e5, server 89a0cde",
+  "mpReason": "trade-feature.js:739 counts players_traded:<player> for a trade where something moved (trading_transfer 1122-1129)"
  },
  "counter:items_given": {
   "status": "lost",
@@ -575,7 +631,10 @@
  },
  "counter:hi_variants": {
   "status": "lost",
-  "reason": "the viral Hi emote spread between players"
+  "reason": "the viral Hi emote spread between players",
+  "mp": "game aa6e9f37, server d8d044b",
+  "mpReason": "hi.go sends hi_variants:<sign> for every hi you say to another player; hi-signs-feature.js applies it",
+  "register": "G327"
  },
  "counter:players_splanked": {
   "status": "lost",
@@ -607,7 +666,10 @@
  },
  "counter:player:buddies_count": {
   "status": "lost",
-  "reason": "buddies are other players"
+  "reason": "buddies are other players",
+  "mp": "game bfef1df4, server 161fc4d, site bde2359",
+  "mpReason": "buddies-feature.js sets player:buddies_count to the size of your real buddy list (inc_buddies.js:196, 276)",
+  "register": "G325"
  },
  "counter:hosted_party": {
   "status": "lost",
@@ -621,12 +683,16 @@
  "achievement:social_butterfly": {
   "status": "lost",
   "reason": "inc_emotes.js:204-208: say hi to 53 different players in one game day",
-  "register": "G117"
+  "register": "G117 G327",
+  "mp": "game aa6e9f37, server d8d044b",
+  "mpReason": "hi.go grants it at a hi said to 53 different players in one game day; hi-signs-feature.js applies the grant"
  },
  "achievement:hi_and_mighty": {
   "status": "lost",
   "reason": "inc_emotes.js:355-362: a matching-sign Hi jackpot with 17 different players in one game day (the Butler jackpot is its own counter)",
-  "register": "G117"
+  "register": "G117 G327",
+  "mp": "game aa6e9f37, server d8d044b",
+  "mpReason": "hi.go grants it at a matching-sign jackpot with 17 different players in one game day (hi.go 721-738); hi-signs-feature.js applies the grant"
  },
  "achievement:philanthropic_member_of_the_social_construct": {
   "status": "lost",
@@ -735,12 +801,16 @@
  "achievement:sneezeorama": {
   "status": "lost",
   "reason": "sneezing_powder.js:316-329: counts only when 5 or more other players on the street catch the sneezes",
-  "register": "G134"
+  "register": "G134 G327",
+  "mp": "game aa6e9f37, server d8d044b",
+  "mpReason": "hi.go counts powders:sneezeorama when 5 or more other players on the street catch the sneezes; powders-feature.js applies the counter"
  },
  "achievement:sparkle_buddy": {
   "status": "lost",
   "reason": "sparkle_powder.js:310-341: counts only when 7 or more other players on the street are sprinkled",
-  "register": "G134"
+  "register": "G134 G327",
+  "mp": "game aa6e9f37, server d8d044b",
+  "mpReason": "hi.go counts powders:sparkle_buddy when 7 or more other players on the street are sprinkled; powders-feature.js applies the counter"
  },
  "achievement:fox_flurrier": {
   "status": "lost",
@@ -780,7 +850,8 @@
  "system:locations/inc_quarters": {
   "status": "lost",
   "reason": "apartment quarters, the 2010-2011 POL model: a quarter group (groups/quarter.js, made only by admin.js from config.quarter_templates) holds floors built from templates in hub 55 'June 2010 POLs' (inc_data_pols_prod.js 861), none archived. Five archived streets keep an elevator signpost into a quarter (geo.signposts[].quarter: Abandoned Gregarious Grange, Hakusan Heaps, Egret Taun and Sabudana Drama Towers, Abandoned Hauki Seeks Manor; groups RIF12A8IEUK1V1B, RA9K2TTVD5D2S26, RA9M20EOK3H2AAO, RA5ENLT7GMB2R2H, RHVMQ7S8TA32UQK), but neither the groups nor the floors survive. Home streets (inc_homes, checklist homes, G6/G7) replaced it; quarters_get_pols otherwise only feeds the loading card's 'N Houses (N for sale)' line",
-  "register": "G123"
+  "register": "G123",
+  "lost": "nosource"
  },
  "system:players/inc_mountaineering": {
   "status": "unbuilt_original",
@@ -830,7 +901,9 @@
  "buff:sneezing": {
   "status": "lost",
   "reason": "sneezing_powder.js:316-322: scatter applies it to every other player in the street (pcx != pc)",
-  "register": "G124"
+  "register": "G124 G327",
+  "mp": "game aa6e9f37, server d8d044b",
+  "mpReason": "hi.go spreads a scatter to everyone else on the street and powders-feature.js onCaught applies Sneezing to each of them (catalog_buffs.js 2411)"
  },
  "buff:tickle_me_emo": {
   "status": "lost",
@@ -955,7 +1028,8 @@
  "item:bag_moving_box": {
   "status": "lost",
   "reason": "locations/inc_pols.js:1213-1258 packs a player's things when they move out of an apartment POL; the quarters were never archived (system inc_quarters lost, G144)",
-  "register": "G125"
+  "register": "G125",
+  "lost": "nosource"
  },
  "item:bag_gift_box": {
   "status": "lost",
@@ -1226,5 +1300,71 @@
   "status": "solo",
   "reason": "I Me Mine: the local companions stand in for the other miners; they work rocks you can Help mine, and helping counts help_mine (features/help-mine-feature.js, items/include/mining.js 501-505) (G207)",
   "register": "G207"
+ },
+ "counter:feats:top_26": {
+  "status": "lost",
+  "reason": "inc_feats.js 139-144: a place in the top 26 contributors of a Feat everyone shares (G120: stays for multiplayer)",
+  "register": "G120 G345",
+  "mp": "game 2c54a95e, server 6377b5d, site 9727447",
+  "mpReason": "feats.go counts feats:top_26 for places 1-26 when the shared Feat ends; solo-feats-feature.js applies the reward counters"
+ },
+ "counter:hi_jackpot": {
+  "status": "lost",
+  "reason": "inc_emotes.js:353-361: a matching-sign hi jackpot with another player (the Butler's is hi_jackpot_butler)",
+  "register": "G327",
+  "mp": "game aa6e9f37, server d8d044b",
+  "mpReason": "hi.go sends hi_jackpot:<player> to both players of a matching-sign bonus; hi-signs-feature.js applies it"
+ },
+ "counter:daily_evasion_record": {
+  "status": "lost",
+  "reason": "hi_variants_tracker.js calculate_pcs_daily_evasion_record_achieves: the street's daily hi-evasion records, held against other players",
+  "register": "G327",
+  "mp": "game aa6e9f37, server d8d044b",
+  "mpReason": "hi.go keeps each street's record holders; hi-signs-feature.js onHiState counts daily_evasion_record:held for the records you held"
+ },
+ "imagination:trade_channel": {
+  "mp": "game 2d2b7f09, server cb1d385, site 79d4ecb",
+  "mpReason": "imagination-feature.js deals Trade Channelling in multiplayer (MULTIPLAYER_OFFERS); with it Groups.php lets you into the Trade Channel (channels.go)",
+  "register": "G326"
+ },
+ "quest:amazing_race": {
+  "mp": "game 4aaf6361, server 016b4d8",
+  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
+  "register": "G329"
+ },
+ "quest:canyon_run": {
+  "mp": "game 4aaf6361, server 016b4d8",
+  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
+  "register": "G329"
+ },
+ "quest:crystal_climb": {
+  "mp": "game 4aaf6361, server 016b4d8",
+  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
+  "register": "G329"
+ },
+ "quest:grab_em_good": {
+  "mp": "game 4aaf6361, server 016b4d8",
+  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
+  "register": "G329"
+ },
+ "quest:lava_leap": {
+  "mp": "game 4aaf6361, server 016b4d8",
+  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
+  "register": "G329"
+ },
+ "quest:space_race": {
+  "mp": "game 4aaf6361, server 016b4d8",
+  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
+  "register": "G329"
+ },
+ "quest:star_sprint": {
+  "mp": "game 4aaf6361, server 016b4d8",
+  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
+  "register": "G329"
+ },
+ "quest:time_warp": {
+  "mp": "game 4aaf6361, server 016b4d8",
+  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
+  "register": "G329"
  }
 }

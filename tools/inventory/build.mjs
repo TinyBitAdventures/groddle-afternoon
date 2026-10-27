@@ -6,18 +6,24 @@
  *   node tools/inventory/build.mjs                build the DB (prints a one-line summary)
  *   node tools/inventory/build.mjs --report       counts by kind + the top unreachable entries
  *   node tools/inventory/build.mjs --kind <k>     every row of one kind (with --status <s> to filter)
+ *   node tools/inventory/build.mjs --status <s>   every row with that status, by kind (e.g. lost, multiplayer)
  *   node tools/inventory/build.mjs --diff         status changes recorded by the last build
  *   node tools/inventory/build.mjs --json         machine-readable (with --report / --kind / --diff)
  *   node tools/inventory/build.mjs --no-build     report from the existing DB without rebuilding
  *   INVENTORY_DB=<path> overrides the DB location (tests use a temp file).
  *
  * DB: ~/Documents/glitch-audit/research/coverage/inventory.sqlite (generated, outside git).
- * Manual judgements: tools/inventory/overrides.json (in git), keyed kind:id.
+ * Manual judgements: tools/inventory/overrides.json (in git), keyed kind:id. Any of them, a counter:<group>
+ * or a system:<src>/<name> may carry `mp` ("game <hash>, server <hash>") and `mpReason`: the row is then
+ * `multiplayer` (reachable between real players only). `"lost": "nosource"` marks a lost row nothing
+ * survives of (players is the default).
  *
  * Schema
- *   entities(kind, id, name, source_ref, status, basis, detector, evidence, register, updated_at, PRIMARY KEY(kind, id))
- *     status: source | rebuilt | solo | reimagined | partial | missing | lost | excluded | unknown | unbuilt_original
+ *   entities(kind, id, name, source_ref, status, basis, detector, evidence, register, updated_at, mp, lost_why, PRIMARY KEY(kind, id))
+ *     status: source | rebuilt | solo | reimagined | multiplayer | partial | missing | lost | excluded | unknown | unbuilt_original
  *     basis: auto (a detector decided) | override (overrides.json)
+ *     mp: for multiplayer rows, the commits that proved it between two real players (an override's `mp`)
+ *     lost_why: for lost rows, players (needs other players: Track M's backlog) | nosource (nothing survives)
  *   history(kind, id, at, from_status, to_status, commit)   one row per status change between builds, HEAD's short hash
  *   builds(at, commit, counts)                              one row per build, counts JSON by kind and status
  *   commits(hash, date, type, subject, register_rows)       git log typed by Emoji-Log prefix (NEW/IMPROVE/FIX/DOC/TEST/RELEASE)
@@ -653,14 +659,18 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
 
   let entities = [...achRows, ...sysRows, ...locRows, ...itemRows, ...questRows, ...skillRows, ...imgRows, ...buffRows, ...jobRows, ...soundRows, ...wardrobeRows, ...badgeRows];
 
-  // Overrides: kind:id -> { status, reason, register }.
+  // Overrides: kind:id -> { status, reason, register, lost, mp, mpReason }.
   const applied = new Set();
   entities = entities.map((e) => {
     const o = overrides[`${e.kind}:${e.id}`];
     if (!o || e.kind === 'system') return e;
     applied.add(`${e.kind}:${e.id}`);
-    return { ...e, status: o.status || e.status, basis: o.status ? 'override' : e.basis, evidence: o.reason ? `${o.reason} | auto: ${e.status} ${e.evidence}` : e.evidence, register: o.register || e.register || '' };
+    const status = o.status || e.status;
+    const next = { ...e, status, basis: o.status ? 'override' : e.basis, lost_why: status === 'lost' ? o.lost || e.lost_why || '' : '', evidence: o.reason ? `${o.reason} | auto: ${e.status} ${e.evidence}` : e.evidence, register: o.register || e.register || '' };
+    return D.applyMultiplayer(next, o);
   });
+  // Every lost row says why: needs other players unless something said nothing survives.
+  entities = entities.map((e) => ({ ...e, mp: e.status === 'multiplayer' ? e.mp || '' : '', lost_why: e.status === 'lost' ? e.lost_why || 'players' : '' }));
 
   // Remake-only things.
   const remakeOnly = [];
@@ -722,7 +732,7 @@ export function openDb(path) {
   mkdirSync(dirname(path), { recursive: true });
   const db = new DatabaseSync(path);
   db.exec(`
-    CREATE TABLE IF NOT EXISTS entities (kind TEXT, id TEXT, name TEXT, source_ref TEXT, status TEXT, basis TEXT, detector TEXT, evidence TEXT, register TEXT, updated_at TEXT, PRIMARY KEY (kind, id));
+    CREATE TABLE IF NOT EXISTS entities (kind TEXT, id TEXT, name TEXT, source_ref TEXT, status TEXT, basis TEXT, detector TEXT, evidence TEXT, register TEXT, updated_at TEXT, mp TEXT, lost_why TEXT, PRIMARY KEY (kind, id));
     CREATE TABLE IF NOT EXISTS history (kind TEXT, id TEXT, at TEXT, from_status TEXT, to_status TEXT, "commit" TEXT);
     CREATE TABLE IF NOT EXISTS builds (at TEXT, "commit" TEXT, counts TEXT);
     CREATE TABLE IF NOT EXISTS commits (hash TEXT PRIMARY KEY, date TEXT, type TEXT, subject TEXT, register_rows TEXT);
@@ -732,6 +742,9 @@ export function openDb(path) {
     CREATE INDEX IF NOT EXISTS entities_status ON entities (kind, status);
     CREATE INDEX IF NOT EXISTS history_at ON history (at);
   `);
+  // DBs built before G324 have no multiplayer columns.
+  const cols = new Set(db.prepare('PRAGMA table_info(entities)').all().map((c) => c.name));
+  for (const c of ['mp', 'lost_why']) if (!cols.has(c)) db.exec(`ALTER TABLE entities ADD COLUMN ${c} TEXT`);
   return db;
 }
 
@@ -744,11 +757,11 @@ export function writeDb(db, data, { commit = '', at = new Date().toISOString() }
   db.exec('BEGIN');
   try {
     db.exec('DELETE FROM entities; DELETE FROM remake_only; DELETE FROM links; DELETE FROM blockers; DELETE FROM commits;');
-    const ins = db.prepare('INSERT OR REPLACE INTO entities (kind, id, name, source_ref, status, basis, detector, evidence, register, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    const ins = db.prepare('INSERT OR REPLACE INTO entities (kind, id, name, source_ref, status, basis, detector, evidence, register, updated_at, mp, lost_why) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
     for (const e of data.entities) {
       const key = `${e.kind}:${e.id}`;
       seen.add(key);
-      ins.run(e.kind, e.id, e.name || '', e.source_ref || '', e.status, e.basis || 'auto', e.detector || '', String(e.evidence || '').slice(0, 4000), e.register || '', at);
+      ins.run(e.kind, e.id, e.name || '', e.source_ref || '', e.status, e.basis || 'auto', e.detector || '', String(e.evidence || '').slice(0, 4000), e.register || '', at, e.status === 'multiplayer' ? e.mp || '' : '', e.status === 'lost' ? e.lost_why || 'players' : '');
       const was = prev.get(key);
       if (!firstBuild && was !== e.status) changes.push({ kind: e.kind, id: e.id, from: was ?? null, to: e.status });
     }
@@ -812,6 +825,30 @@ export function summary(db) {
   return by;
 }
 
+/**
+ * Track M's measure (G324): the rows that need other players or that nothing survives of, by kind.
+ *   multiplayer  reachable between real players (an override's mp names the proving commits)
+ *   players      still lost: needs other players (the backlog)
+ *   nosource     lost because nothing survives (stays lost)
+ * `needPlayers` = multiplayer + players: everything that needs other players.
+ */
+export function multiplayerSummary(db) {
+  const rows = db.prepare("SELECT kind, CASE WHEN status = 'multiplayer' THEN 'multiplayer' ELSE COALESCE(NULLIF(lost_why, ''), 'players') END AS k, COUNT(*) AS n FROM entities WHERE status IN ('multiplayer', 'lost') GROUP BY 1, 2").all();
+  const out = { multiplayer: 0, players: 0, nosource: 0, needPlayers: 0, kinds: {} };
+  for (const r of rows) {
+    const k = (out.kinds[r.kind] ||= { multiplayer: 0, players: 0, nosource: 0 });
+    k[r.k] += r.n;
+    out[r.k] += r.n;
+  }
+  out.needPlayers = out.multiplayer + out.players;
+  return out;
+}
+
+/** One line for the report and the scorecard. */
+export function multiplayerLine(m) {
+  return `${m.multiplayer} of ${m.needPlayers} rows that need other players are reachable between real players in multiplayer; ${m.players} still lost needing players; ${m.nosource} lost because nothing survives`;
+}
+
 /** The most valuable unreachable things: whole systems, then counter groups that block many badges, then the rest. */
 export function topMissing(db, limit = 30) {
   const out = [];
@@ -829,8 +866,8 @@ export function topMissing(db, limit = 30) {
 }
 
 function printTable(by) {
-  const cols = ['total', 'reachable', 'partial', 'missing', 'unknown', 'lost', 'excluded', 'unbuilt_original'];
-  console.log(`${'kind'.padEnd(16)}${cols.map((c) => c.replace('unbuilt_original', 'unbuilt').padStart(10)).join('')}`);
+  const cols = ['total', 'reachable', 'multiplayer', 'partial', 'missing', 'unknown', 'lost', 'excluded', 'unbuilt_original'];
+  console.log(`${'kind'.padEnd(16)}${cols.map((c) => c.replace('unbuilt_original', 'unbuilt').replace('multiplayer', 'multi').padStart(10)).join('')}`);
   for (const k of [...KIND_ORDER, ...Object.keys(by).filter((x) => !KIND_ORDER.includes(x))]) {
     if (!by[k]) continue;
     console.log(`${k.padEnd(16)}${cols.map((c) => String(by[k][c] || 0).padStart(10)).join('')}`);
@@ -874,9 +911,19 @@ async function main() {
     const top = topMissing(db, 30);
     const blockers = db.prepare('SELECT * FROM blockers ORDER BY count DESC').all();
     const unbuilt = db.prepare("SELECT kind, id, name, evidence FROM entities WHERE status = 'unbuilt_original' ORDER BY kind, id").all();
-    if (asJson) { console.log(JSON.stringify({ counts: by, top, blockers, unbuilt }, null, 1)); return; }
+    const mp = multiplayerSummary(db);
+    if (asJson) { console.log(JSON.stringify({ counts: by, multiplayer: mp, top, blockers, unbuilt }, null, 1)); return; }
     console.log(`Inventory (${dbPath})\n`);
     printTable(by);
+    console.log('(reachable is the solo game; multi = reachable only between real players in multiplayer)');
+    console.log(`\nMultiplayer (Track M): ${multiplayerLine(mp)}`);
+    const KIND_W = 16;
+    console.log(`${''.padEnd(2)}${'kind'.padEnd(KIND_W)}${['multiplayer', 'lost:players', 'lost:nosource'].map((c) => c.padStart(14)).join('')}`);
+    for (const k of [...KIND_ORDER, ...Object.keys(mp.kinds).filter((x) => !KIND_ORDER.includes(x))]) {
+      const r = mp.kinds[k];
+      if (r) console.log(`${''.padEnd(2)}${k.padEnd(KIND_W)}${[r.multiplayer, r.players, r.nosource].map((n) => String(n).padStart(14)).join('')}`);
+    }
+    console.log('  --status multiplayer lists the reachable rows with their commits; --status lost the rest');
     console.log('\nTop unreachable (missing/unknown), most valuable first:');
     top.forEach((t, i) => console.log(`${String(i + 1).padStart(2)}. [${t.kind}] ${t.id}${t.name && t.name !== t.id ? ` (${cut(t.name, 50)})` : ''}: ${cut(t.why, 150)}`));
     console.log('\nCounter groups blocking badges:');
@@ -885,11 +932,19 @@ async function main() {
     if (built) console.log(`\n${built.changes.length} status changes this build; --diff lists them`);
     return;
   }
-  if (val('--kind')) {
+  if (val('--kind') || val('--status')) {
+    const kind = val('--kind');
     const st = val('--status');
-    const rows = db.prepare(`SELECT * FROM entities WHERE kind = ?${st ? ' AND status = ?' : ''} ORDER BY status, id`).all(...[val('--kind'), st].filter(Boolean));
+    const where = [kind ? 'kind = ?' : '', st ? 'status = ?' : ''].filter(Boolean).join(' AND ');
+    const rows = db.prepare(`SELECT * FROM entities WHERE ${where} ORDER BY ${kind ? '' : 'kind, '}status, id`).all(...[kind, st].filter(Boolean));
     if (asJson) { console.log(JSON.stringify(rows, null, 1)); return; }
-    for (const r of rows) console.log(`${r.status.padEnd(17)} ${r.id.padEnd(36)} ${cut(r.name, 34).padEnd(35)} ${cut(r.evidence, 140)}`);
+    // A multiplayer row shows its proving commits, a lost row why it is lost.
+    const tag = (r) => (r.status === 'multiplayer' ? `[${r.mp}] ` : r.status === 'lost' && r.lost_why ? `[${r.lost_why}] ` : '');
+    let at = null;
+    for (const r of rows) {
+      if (!kind && r.kind !== at) { at = r.kind; console.log(`\n${at}`); }
+      console.log(`${r.status.padEnd(17)} ${r.id.padEnd(36)} ${cut(r.name, 34).padEnd(35)} ${cut(`${tag(r)}${r.evidence}`, 140)}`);
+    }
     console.log(`${rows.length} rows`);
     return;
   }

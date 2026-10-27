@@ -40,6 +40,20 @@ describe('restoration checklist', () => {
     }
   });
 
+  it('says in one sentence what works between real players, only on systems that are back (G324)', async () => {
+    const mp = CHECKLIST.filter((i) => i.multiplayer != null);
+    assert.ok(mp.length >= 10, `${mp.length} multiplayer items`);
+    for (const item of mp) {
+      assert.equal(typeof item.multiplayer, 'string', item.id);
+      assert.ok(item.multiplayer.length > 20 && /\.$/.test(item.multiplayer), `${item.id}: one sentence`);
+      assert.ok(!/—/.test(item.multiplayer), `${item.id}: no em-dashes`);
+      assert.ok(PLAYABLE.has(item.status), `${item.id} is ${item.status}`);
+    }
+    const data = await buildRestorationData();
+    assert.equal(data.multiplayer, mp.length);
+    assert.deepEqual(data.items.filter((i) => i.multiplayer).map((i) => i.id), mp.map((i) => i.id));
+  });
+
   it('every diorama spot on the page opens a checklist item', () => {
     const html = readFileSync(join(root, 'public/restoration/index.html'), 'utf8');
     const spots = new Set([...html.matchAll(/data-spot="([^"]+)"/g)].map((m) => m[1]));
