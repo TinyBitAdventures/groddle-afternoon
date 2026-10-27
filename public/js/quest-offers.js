@@ -61,12 +61,16 @@
  * ctx (all optional): { level, xp, skills, achievements, inv, buffs, hub,
  *   region, street, events, streetsVisited, emblemsMax, recipes, now,
  *   includeCustom, addItem, removeItem, countItem, learnRecipe,
- *   customPrereq(id, prereq) }
+ *   customPrereq(id, prereq),
+ *   multiplayer, mpFacts, mpReady }  multiplayer only (G329, js/quests-mp.js):
+ *   the quests that need other players are offered too; mpFacts answers their
+ *   'mp' triggers, mpReady[need] whether what a quest needs is live.
  */
 
 import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js';
 import { getQuestCatalog } from './content-catalogs.js';
 import { levelInfoForXp } from './progression.js';
+import { offerableMultiplayerQuest } from './quests-mp.js?v=g329-1';
 import {
   assignQuest,
   completeQuest,
@@ -210,7 +214,8 @@ export function npcMatches(triggerNpc, npcClass) {
 
 const npcInRemake = (npc) => REMAKE_QUEST_NPCS.some((have) => npcMatches(npc, have));
 
-const FAMILIAR_TRIGGERS = new Set(['level', 'xp', 'skill', 'quest', 'achievement', 'region', 'street', 'event', 'prerequisites', 'inferred']);
+// 'mp': a multiplayer fact (js/quests-mp.js MP_FACTS), only in a multiplayer ctx (G329).
+const FAMILIAR_TRIGGERS = new Set(['level', 'xp', 'skill', 'quest', 'achievement', 'region', 'street', 'event', 'prerequisites', 'inferred', 'mp']);
 const isNpcTrigger = (t) => t.type === 'npc' || (t.type === 'inferred' && t.npc);
 const isFamiliarTrigger = (t) => FAMILIAR_TRIGGERS.has(t.type) && !isNpcTrigger(t);
 
@@ -387,6 +392,9 @@ export function triggerMet(trigger, def, questState, pc = null, ctx = {}) {
       return npcMatches(t.npc, ctx.npc);
     case 'prerequisites':
       return (def?.prerequisites || []).length > 0;
+    case 'mp':
+      // G329: a fact features/quests-mp-feature.js keeps; never in solo (no ctx.multiplayer).
+      return ctx.multiplayer === true && Boolean(ctx.mpFacts?.[t.fact]);
     case 'event':
       if (t.adminOnly) return false;
       if (t.event === 'streets_visited') return (Number(ctx.streetsVisited) || 0) >= Number(t.count || 0);
@@ -422,10 +430,13 @@ function offerableStatus(questState, def) {
 }
 
 function eligibleTrigger(def, questState, pc, ctx, { npc = false } = {}) {
-  if (!def?.solo) return null;
+  // G329: in multiplayer the quests that need other players (js/quests-mp.js) are offered
+  // too, by their own trigger or the one quests-mp.js gives them. Solo: def.solo alone.
+  const mp = def?.solo ? null : offerableMultiplayerQuest(def?.classTsid, ctx);
+  if (!def?.solo && !mp) return null;
   if (def.custom && !ctx.includeCustom) return null;
   if (!offerableStatus(questState, def)) return null;
-  const triggers = (def.offerTriggers || []).filter((t) => (npc ? isNpcTrigger(t) : isFamiliarTrigger(t)));
+  const triggers = (mp?.offerTriggers || def.offerTriggers || []).filter((t) => (npc ? isNpcTrigger(t) : isFamiliarTrigger(t)));
   const met = triggers.filter((t) => triggerMet(t, def, questState, pc, ctx));
   if (!met.length) return null;
   if (!prerequisitesMet(def, questState, pc, ctx).ok) return null;

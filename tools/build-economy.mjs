@@ -39,7 +39,8 @@
  *  - credits: rewards the source pays for a marker the save carries, credited
  *    once per character: quests the remake can complete (assets/content/
  *    quests.json rewards: currants, tradeable items; not street jobs or the
- *    quests js/quest-offers.js leaves out), badges (achievements.json rewards.currants;
+ *    quests js/quest-offers.js leaves out, but the multiplayer quests
+ *    js/quests-mp.js makes completable online, G329), badges (achievements.json rewards.currants;
  *    the remake pays no badge items), level-ups (players/inc_stats.js via
  *    js/progression.js: the final level's currants) and imagination cards
  *    that hand out an item (inc_imagination.js reward type 8, js/imagination
@@ -67,6 +68,7 @@ import { ARTIFACT_MAP, ARTIFACT_NECKLACES } from '../public/js/artifacts.js';
 import { XP_FOR_LEVEL, currantRewardForLevel } from '../public/js/progression.js';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js';
 import { SPINDLE_TOOLS } from '../public/js/making.js';
+import { creditedMultiplayerQuests } from '../public/js/quests-mp.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const OUT = sitePath('data', 'economy.json');
@@ -176,13 +178,17 @@ export function economyCredits(tradeable) {
     return m;
   };
   const quests = {};
+  const onlineQuests = new Set(creditedMultiplayerQuests());
   const questDefs = content('quests.json');
   for (const id of Object.keys(questDefs).sort()) {
     const def = questDefs[id];
     // js/quest-offers.js questOfferIndex: street jobs (paid by the Job Board, and in multiplayer
     // through the ledger's project route) and quests the remake leaves out are never completed
     // through the quest log, so a save that lists one has nothing to be paid for.
-    if (def.solo === false || (def.solo === undefined && (def.isJob || def.isMultiplayer))) continue;
+    // G329: the quests multiplayer makes completable (js/quests-mp.js) are credited too; a
+    // solo save never lists them, as solo never offers them.
+    const online = onlineQuests.has(id);
+    if (!online && (def.solo === false || (def.solo === undefined && (def.isJob || def.isMultiplayer)))) continue;
     const r = def.rewards || {};
     const c = Math.max(0, Math.floor(Number(r.currants) || 0));
     const i = rewardItems(r.items);

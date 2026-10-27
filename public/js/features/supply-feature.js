@@ -303,6 +303,9 @@ function runMachineVerb(classTsid, verbId, engine) {
     if (!res) return false;
     // still.js:454-455 giveHooch: only Hooch collected in your own home (POL) counts.
     if (res.ok && verb === 'collect' && engine.homeContext?.().inHome) engine.achievement?.('still:collected_in_pol', res.got);
+    // still.js:453 giveHooch: quests_inc_counter('make_hooch', hooch) on every collect, for the
+    // multiplayer quest that uses it (G329, js/quests-mp.js); solo has no quest that counts it.
+    if (res.ok && verb === 'collect' && res.got > 0 && engine.mode === 'multiplayer') engine.achievement?.('make_hooch', res.got);
     say(engine, res.msg, res.ok);
     engine.save?.();
     return true;

@@ -192,7 +192,8 @@ export const CHECKLIST = Object.freeze([
   // —— Quests & adventures ——
   { id: 'quests', group: 'quests', name: 'Story and skill quests', status: 'source', spot: 'rock-magic',
     blurb: 'Hundreds of original quests with their dialogue, offered by the Magic Rock or, where the original had one, their own giver: your Butler, the Ghost of Gwendolyn, the Greeterbot.',
-    evidence: ['public/js/quests.js', 'public/js/quest-offers.js'] },
+    multiplayer: 'The quests that need other players are offered between real players: bootlegging Hooch, handing out Teleportation Scripts, kind gifts, tending, watering and gifting a friend’s home, meditating and radiating together, and each race challenge goes in the challenger’s quest log.',
+    evidence: ['public/js/quests.js', 'public/js/quest-offers.js', 'public/js/quests-mp.js'] },
   { id: 'quest-rooms', group: 'quests', name: 'Quest rooms', status: 'rebuilt',
     blurb: 'Private quest instances: almost none survive, so each is rebuilt from the quest code and gameplay footage.',
     evidence: ['public/js/features/quest-instances-feature.js', 'public/js/quest-rooms/catalog.js'] },

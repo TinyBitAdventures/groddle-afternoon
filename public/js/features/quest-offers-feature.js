@@ -71,6 +71,10 @@
  * disabled with "Starting new quests is not allowed right now!" (setTryButton
  * 230, 253-258) and an offer's accept_and_start choice is too
  * (ConversationManager.as 582-585); features answer noStartingQuests(engine).
+ * G329: in multiplayer, questContext asks questsMpContext
+ * (features/quests-mp-feature.js), and the quests that need other players
+ * (js/quests-mp.js) are offered too; solo never asks and offers as before.
+ *
  * QA: &questofferdemo=timed[:<quest>] starts a timed quest (default
  * mining_mine_in_time_period) with one second left, so it fails and shows
  * Try again in the log.
@@ -131,7 +135,11 @@ const PACK_GAIN_SKIP = /^(musicblock_|npc_cubimal_)/;
 
 function questContext(engine, now = Date.now()) {
   const street = engine.street || {};
+  // G329: in multiplayer, features/quests-mp-feature.js lets the quests that need other
+  // players be offered (js/quests-mp.js); solo asks nothing and the ctx is as it was.
+  const mp = engine.mode === 'multiplayer' ? engine.query?.('questsMpContext', engine) : null;
   return {
+    ...(mp ? { multiplayer: true, mpFacts: mp.facts || {}, mpReady: mp.ready || {} } : {}),
     level: engine.pc.level,
     xp: engine.pc.xp,
     skills: engine.learnedSkills,

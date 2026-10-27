@@ -1285,6 +1285,12 @@ export const neighboursMpFeature = {
     return session.street() || null;
   },
 
+  /** G329 (features/quests-mp-feature.js): the other player's home you stand on, and whether you hold their key. */
+  neighboursVisiting(engine) {
+    if (!session?.visit || engine?.mode !== 'multiplayer') return null;
+    return { owner: session.visit.owner, key: session.mayTend() };
+  },
+
   /** buddies-feature's Visit button. */
   canVisitHomes(engine) {
     return session && engine?.mode === 'multiplayer' ? true : null;
