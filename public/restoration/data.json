@@ -827,7 +827,7 @@
    "name": "Street projects",
    "status": "source",
    "blurb": "Build new streets and upgrades together. In multiplayer everyone on the street fills the same phases, the site takes what you give from your pack, rewards follow the original shares and top contributors, and a finished street opens its road for everyone. Solo has a hired hand.",
-   "multiplayer": "Everyone on a street fills the same project, and a finished street opens its road for everyone.",
+   "multiplayer": "Everyone on a street fills the same project, a finished street opens its road for everyone, and a group can claim one of the ten group halls and build it as its own.",
    "spot": null,
    "evidence": [
     "public/js/street-jobs.js",
@@ -2571,9 +2571,14 @@
   ]
  },
  "git": {
-  "commits": 573,
+  "commits": 574,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "In multiplayer, the pack's emotes work on real players, and Charades, Super Soaker and Blocks That Rock need other players again"
+   },
    {
     "date": "2026-10-27",
     "kind": "fix",
@@ -2688,14 +2693,9 @@
     "date": "2026-10-26",
     "kind": "fix",
     "text": "Falling into the cloud tutorial no longer announces Hechey Track or a Qurazy Quoin"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "fix",
-    "text": "Previewing a season with ?season= no longer rots your carved pumpkins"
    }
   ]
  },
- "tests": 336,
+ "tests": 337,
  "generatedAt": "2026-10-27"
 }

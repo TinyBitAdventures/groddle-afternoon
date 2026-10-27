@@ -57,8 +57,10 @@ describe('the server table (tools/build-realtime-projects.mjs)', () => {
   it('carries every street build and upgrade with the board amounts, and no restorations', () => {
     const t = projectTable(catalog);
     const kinds = Object.values(catalog.jobs).filter((j) => j.kind === 'street' || j.kind === 'upgrade').length;
-    assert.equal(Object.keys(t.jobs).length, kinds);
-    assert.ok(Object.values(t.jobs).every((j) => j.kind === 'street' || j.kind === 'upgrade'));
+    // Group halls (G331, tests/g331-halls-mp.test.js) come from catalog.halls.
+    const halls = Object.keys(catalog.halls?.jobs || {}).length;
+    assert.equal(Object.keys(t.jobs).length, kinds + halls);
+    assert.ok(Object.values(t.jobs).every((j) => j.kind === 'street' || j.kind === 'upgrade' || j.kind === 'hall'));
     const job = t.jobs[JOB];
     assert.deepEqual(job.offer, ['GLI57DI72HI153U']);
     assert.equal(job.street, catalog.jobs[JOB].street);

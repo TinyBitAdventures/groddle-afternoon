@@ -30,10 +30,89 @@ export const MP_TEXT = Object.freeze({
 const whole = (v) => Math.max(0, Math.floor(Number(v) || 0));
 const clean = (value) => String(value || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64);
 
-/** Is this one of the projects the server shares (a street's build or upgrade)? Homes' restorations stay per player. */
+/** Is this one of the projects the server shares (a street's build or upgrade, a group hall)? Homes' restorations stay per player. */
 export function isSharedJob(catalog, jobId) {
   const kind = catalog?.jobs?.[jobId]?.kind;
-  return kind === 'street' || kind === 'upgrade';
+  return kind === 'street' || kind === 'upgrade' || kind === 'hall';
+}
+
+/*
+ * Group halls (G331, the server's group_halls.go): the catalog's `halls`
+ * (build-street-jobs.mjs) join the board in multiplayer only. A hall takes
+ * nothing until someone claims it for one of their groups (quest.js
+ * claimJob 1297-1338), the claimed phase has a clock (onJobTimeout
+ * 1356-1380), and the finished hall is the group's (doJobEffects 1831-1863).
+ */
+
+/** Words for the hall's board: the client's where it has them (file:line), else ours. */
+export const HALL_TEXT = Object.freeze({
+  kicker: 'Group Hall',
+  claim: 'Claim this project!', // JobIntroUI.as:37
+  need: 'You\'ll need the following thing:', // JobIntroUI.as:252
+  // JobDialog.as:802-803 (duration 180 minutes: "3 hours").
+  confirm: (minutes) => `Would you like to claim this project? I'll go ahead and give you ${hoursText(minutes)} to finish it up. Can you hack it?`,
+  yes: 'Yes, I can!', // JobDialog.as:805
+  no: 'Never mind', // JobDialog.as:806
+  claimedBy: (group) => `Claimed by ${group}`, // JobIntroUI.as:326
+  noGroup: 'Claiming takes a group: make or join one in Menu, Groups.', // ours (JobIntroUI.as:410-413 needs one)
+  pickGroup: 'For which group?', // ours
+  claiming: 'Someone is claiming this project right now.', // ours (the server's word)
+  locked: 'Opens once a group claims this project.', // ours
+  shucks: 'Aw, shucks', // quest.js:1367
+  paid: (n) => `You paid ${n.toLocaleString()} currants to claim the project.`, // ours
+  owned: (group) => `Finished. ${group} owns this group hall.`, // ours (quest.js:1849-1861)
+  noStreet: 'Only its members may enter, once there is a street to enter: the hall\'s own street is not in the public archive, and the original never made one.', // ours (quest.js:1844)
+  built: (group) => `${group} owns a new group hall!`, // ours
+});
+
+/** "3 hours", "90 minutes" (StringUtil.formatTime of duration*60). */
+export function hoursText(minutes) {
+  const m = whole(minutes);
+  if (m && m % 60 === 0) return `${m / 60} hour${m === 60 ? '' : 's'}`;
+  return `${m} minute${m === 1 ? '' : 's'}`;
+}
+
+/** The catalog's group halls onto its board (multiplayer only; idempotent). */
+export function mergeHalls(catalog) {
+  const halls = catalog?.halls;
+  if (!halls?.jobs || catalog._hallsMerged) return false;
+  for (const [id, def] of Object.entries(halls.classes || {})) if (!catalog.classes[id]) catalog.classes[id] = def;
+  for (const [id, job] of Object.entries(halls.jobs)) {
+    if (job.blockers?.length) continue;
+    catalog.jobs[id] = job;
+    for (const tsid of job.connecting || []) {
+      const list = (catalog.byStreet[tsid] ||= []);
+      if (!list.includes(id)) list.push(id);
+    }
+  }
+  catalog._hallsMerged = true;
+  return true;
+}
+
+/** A hall row's claim as the server sent it (group_halls.go hallJSON), checked. */
+export function hallFromServer(h, offset = 0) {
+  if (!h || typeof h !== 'object') return null;
+  const who = (o) => ({ id: whole(o?.id), name: String(o?.name || '').slice(0, 40) });
+  return {
+    claim: whole(h.claim),
+    minutes: whole(h.minutes),
+    claimed: h.claimed === true,
+    claiming: h.claiming === true,
+    owned: h.owned === true,
+    until: localTime(h.until, offset),
+    by: h.by ? who(h.by) : null,
+    group: h.group ? who(h.group) : null,
+  };
+}
+
+/** "2 hours 5 minutes left to finish this phase" (JobDialog.as showTimerAndTitle). */
+export function hallClock(hall, now = Date.now()) {
+  if (!hall?.claimed || !hall.until) return '';
+  const left = Math.max(0, Math.ceil((hall.until - now) / 60000));
+  const h = Math.floor(left / 60);
+  const m = left % 60;
+  const parts = [h ? `${h} hour${h === 1 ? '' : 's'}` : '', m || !h ? `${m} minute${m === 1 ? '' : 's'}` : ''].filter(Boolean);
+  return `${parts.join(' ')} left to finish this phase.`;
 }
 
 /** A server time (ms) on this page's clock: offset is server now minus local now. */
@@ -59,6 +138,7 @@ export function rowFromServer(row, offset = 0) {
     votes: counts(row?.votes),
     top: (Array.isArray(row?.top) ? row.top : []).slice(0, 5).map((c) => ({ id: whole(c?.id), name: String(c?.name || 'A Glitch').slice(0, 40), cost: whole(c?.cost) })),
     count: whole(row?.count),
+    ...(row?.hall ? { hall: hallFromServer(row.hall, offset) } : {}),
   };
 }
 

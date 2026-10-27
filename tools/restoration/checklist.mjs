@@ -218,7 +218,7 @@ export const CHECKLIST = Object.freeze([
     evidence: ['public/js/hog-haul.js', 'public/js/hog-haul-mp.js'] },
   { id: 'street-jobs', group: 'quests', name: 'Street projects', status: 'source',
     blurb: 'Build new streets and upgrades together. In multiplayer everyone on the street fills the same phases, the site takes what you give from your pack, rewards follow the original shares and top contributors, and a finished street opens its road for everyone. Solo has a hired hand.',
-    multiplayer: 'Everyone on a street fills the same project, and a finished street opens its road for everyone.',
+    multiplayer: 'Everyone on a street fills the same project, a finished street opens its road for everyone, and a group can claim one of the ten group halls and build it as its own.',
     evidence: ['public/js/street-jobs.js', 'public/js/street-jobs-mp.js', 'public/js/features/street-jobs-feature.js'] },
   { id: 'feats', group: 'quests', name: 'Feats', status: 'source',
     blurb: 'The Last Feat’s incantation chain and ten of the old Feats. In multiplayer one Feat a day is shared by everyone playing: a live bar with its minimum, bonus and supermegabonus goals, contributors ranked, petrified rocks by place and the top-contributor badges. Solo keeps them as goals of your own, each worth a Small Petrified Rock and open again a game week later, with local companions taking the chain’s other parts.',

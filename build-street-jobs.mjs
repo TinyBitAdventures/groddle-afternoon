@@ -20,6 +20,9 @@
  *    the Restore project a depleted cultivation offers (setJobData: one phase
  *    per class, delay_seconds 60) and item_class what it turns back into;
  *    written to `restorations` with their job classes in `classes`
+ *  - the group hall jobs (quest.js type 3, claimable; one street_info.type 2
+ *    row each, target_street the hall): `halls` {jobs, classes, byStreet},
+ *    multiplayer only (G331, js/street-jobs-mp.js mergeHalls)
  *
  * Writes public/assets/content/street-jobs.json. tools/job-obtainable.mjs
  * decides which item requirements a solo player can meet in the remake.
@@ -88,6 +91,8 @@ async function loadClasses() {
       completion: ctx.completion || '',
       ...(num(ctx.duration) ? { duration: num(ctx.duration) } : {}),
       ...(num(ctx.claimable) ? { claimable: 1 } : {}),
+      // quest.js claimJob 1297-1338: what claiming takes (group halls only).
+      ...(ctx.claim_reqs ? { claimReqs: Object.entries(ctx.claim_reqs).map(([rid, r]) => ({ id: rid, type: r.type, ...(r.class_id ? { classId: r.class_id } : {}), num: num(r.num), desc: r.desc || '' })) } : {}),
       requirements,
       rewards: {
         ...(rewards.xp ? { xp: num(rewards.xp) } : {}),
@@ -361,6 +366,47 @@ for (const [jobId, rows] of byJobId) {
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* Group halls (G331, multiplayer only)                                 */
+/* ------------------------------------------------------------------ */
+
+// A group hall job (quest.js type 3) has no type 1 row: each is one street_info.type 2 row on the
+// street it is offered from, with the hall it builds as target_street (not in the public dump).
+// quest.js 1080-1086: a later phase of another type inherits the claim, so the first phase decides.
+const halls = { jobs: {}, classes: {} };
+for (const [jobId, rows] of byJobId) {
+  if (rows.some((r) => r.job.street_info?.type === 1)) continue;
+  const row = rows.find((r) => r.job.street_info?.type === 2);
+  if (!row) continue;
+  const phases = Object.entries(row.job.class_ids || {})
+    .map(([classTsid, p]) => ({ classTsid, order: num(p.in_order) || 1, delaySeconds: num(p.delay_seconds), ...(p.delay_text ? { delayText: p.delay_text } : {}), label: p.label || '' }))
+    .sort((a, b) => a.order - b.order);
+  const first = classes[phases[0]?.classTsid];
+  if (!first || first.type !== 3 || !first.claimable || phases.some((p) => !classes[p.classTsid])) continue;
+  const offerAt = gTsid(row.loc.tsid);
+  const meta = indexed(offerAt);
+  if (!meta || row.job.street_info.is_hidden === 1) continue;
+  const blockers = [...new Set(phases.flatMap((p) => classes[p.classTsid].blockers || []))];
+  halls.jobs[jobId] = {
+    kind: 'hall',
+    street: gTsid(row.job.street_info.target_street || ''),
+    label: 'A group hall',
+    hub: meta.hubName || '',
+    hubId: meta.hubId || '',
+    connecting: [offerAt],
+    // quest.js getTitle 176 and getDesc 188 (type 3).
+    title: 'Build a Group-owned Location',
+    desc: 'You will be building a location that belongs to one of your groups. Once completed, only group members will be able to access it -- like your own private country club! Careful, though... once claimed, your group will have a limited amount of time to complete the project or lose everything it has contributed.',
+    phases,
+    claim: first.claimReqs || [],
+    duration: first.duration || 0,
+    ...(blockers.length ? { blockers } : {}),
+  };
+  for (const p of phases) halls.classes[p.classTsid] = classes[p.classTsid];
+}
+halls.byStreet = {};
+for (const [jobId, job] of Object.entries(halls.jobs)) (halls.byStreet[job.connecting[0]] ||= []).push(jobId);
+
 // Keep the per-street offer order stable: ascending job id like the source hash.
 for (const list of Object.values(byStreet)) list.sort((a, b) => num(a) - num(b));
 
@@ -456,6 +502,8 @@ const catalog = {
   drops,
   items,
   excluded: excludedJobs,
+  // Multiplayer only (js/street-jobs-mp.js mergeHalls): solo never reads this.
+  halls,
 };
 
 await writeFile(outputPath, `${JSON.stringify(catalog)}\n`);

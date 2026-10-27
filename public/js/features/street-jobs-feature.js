@@ -29,6 +29,14 @@
  * is solo only; restorations (projectApi) stay per player. Pure half:
  * js/street-jobs-mp.js. Solo runs none of it.
  *
+ * Group halls (G331, multiplayer only): the catalog's ten halls join the
+ * board on the streets they came from (mergeHalls). One takes nothing until
+ * someone claims it for one of their groups (project_claim: the site checks
+ * the group and takes the claim's currants), the claimed phase has three
+ * hours (project_expired: it all resets), and the finished hall is the
+ * group's (project_built with its group). The hall's own street is not in the
+ * archive, so it ends there (the server's group_halls.go header).
+ *
  * Other features run their own projects through `projectApi` (the same
  * panel, contributions, work units, Hire a hand, phase settling and badges):
  * homes-feature.js registers a depleted cultivation's restoration (kind
@@ -84,9 +92,12 @@ import {
 import { gainMetabolic, loseEnergy } from '../metabolics.js';
 import { saveStore } from '../save-store.js?v=mp2-2';
 import {
+  HALL_TEXT,
   MP_TEXT,
   applyWorld,
+  hallClock,
   isSharedJob,
+  mergeHalls,
   listsFrom,
   localTime,
   markContributed,
@@ -98,8 +109,10 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../street-jobs-mp.js?v=g346-1';
+} from '../street-jobs-mp.js?v=g346-2';
 import { grantMoodXp } from '../mood-xp.js';
+import { createMinnAccount } from '../minn-account.js?v=nbhome-7';
+import { normalizeGroups } from '../groups.js?v=g326-1';
 import { textureFromUrl } from '../textures.js';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
@@ -154,12 +167,14 @@ function load() {
   if (catalog) return Promise.resolve(catalog);
   if (!loading) {
     loading = Promise.all([
-      fetch('assets/content/street-jobs.json?v=jobs-4').then((r) => r.json()),
+      fetch('assets/content/street-jobs.json?v=jobs-5').then((r) => r.json()),
       fetch('assets/streets/index.json').then((r) => r.json()),
     ])
       .then(([cat, idx]) => {
         catalog = cat;
         streetIndex = idx;
+        // Group halls are multiplayer only (G331): solo's board never sees them.
+        if (mpMode) mergeHalls(catalog);
         for (const [id, meta] of Object.entries(cat.items || {})) {
           ensureItem(id, { label: meta.label, desc: meta.desc, baseCost: meta.baseCost, stackMax: meta.stackMax });
         }
@@ -250,7 +265,7 @@ function spawnBoard(engine, point) {
   const target = engine.register({
     classId: BOARD_CLASS,
     featureId: STREET_JOBS_FEATURE_ID,
-    label: job?.kind === 'upgrade' ? 'Street Upgrade Project' : 'Street Project',
+    label: job?.kind === 'upgrade' ? 'Street Upgrade Project' : job?.kind === 'hall' ? 'Group Hall Project' : 'Street Project',
     subtitle: job ? job.title : 'Projects for this street',
     sprite: spr,
   });
@@ -545,6 +560,7 @@ function finishJob(engine, jobId, out, solo) {
       return `${i + 1}. ${p.label || catalog.classes[p.classTsid]?.title || 'Phase'}: ${mine ? `You contributed ${pct}% of the work!` : 'You did not contribute.'}`;
     })
     .join(' ');
+  if (job.kind === 'hall') return finishHall(engine, jobId, job, contributions, solo);
   teleportationFeature.grantScript(engine, arrivalFor(job));
   if (job.kind === 'street') {
     const { header, pages } = completionPages(def.completion, { location: job.label, participation: out.participation });
@@ -571,6 +587,24 @@ function finishJob(engine, jobId, out, solo) {
   // locations/inc_upgrades.js upgrades_move_players: reload the street once the award closes.
   pendingReload = { tsid: engine.streetTsid, x: engine.player?.x, y: engine.player?.y };
   return { title: job.title, steps };
+}
+
+/**
+ * A group hall (G331): players/inc_jobs.js:484's "Hooray!", your share of each
+ * phase, and whose hall it is (quest.js doJobEffects 1831-1863). The source's
+ * completion promises a teleport to the new location; its street is not in
+ * the archive, so there is no script and no road.
+ */
+function finishHall(engine, jobId, job, contributions, note) {
+  const group = state.jobs[jobId]?.hall?.group?.name || 'The group';
+  return {
+    title: job.title,
+    steps: [
+      { text: `Hooray! The project ${job.title} has been completed! Your contributions: ${contributions}`, response: 'View Rewards' },
+      { text: `The hall is built for ${group}. ${HALL_TEXT.noStreet}`, response: 'Continue' },
+      { text: note, response: 'OK' },
+    ],
+  };
 }
 
 /**
@@ -743,9 +777,9 @@ const PANEL_CSS = `
 .sj-req.is-done{opacity:.6}
 .sj-req.is-locked{opacity:.55;background:rgba(240,236,228,.8)}
 .sj-req .sj-acts{display:flex;gap:.3rem;flex-wrap:wrap;justify-content:flex-end}
-.sj-req button,.sj-options button{font:inherit;font-size:.74rem;font-weight:700;border-radius:7px;border:1px solid #c9b48a;background:#fff;color:#6a4f17;padding:.3rem .55rem;cursor:pointer;white-space:nowrap}
-.sj-req button.primary{background:#e8b23d;border-color:#c99525;color:#3a2a08}
-.sj-req button[disabled]{opacity:.45;cursor:not-allowed}
+.sj-req button,.sj-options button,.sj-hall button{font:inherit;font-size:.74rem;font-weight:700;border-radius:7px;border:1px solid #c9b48a;background:#fff;color:#6a4f17;padding:.3rem .55rem;cursor:pointer;white-space:nowrap}
+.sj-req button.primary,.sj-hall button.primary{background:#e8b23d;border-color:#c99525;color:#3a2a08}
+.sj-req button[disabled],.sj-hall button[disabled]{opacity:.45;cursor:not-allowed}
 .sj-options{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin:.1rem 0 .55rem}
 .sj-options button{text-align:left;white-space:normal;padding:.45rem .55rem;line-height:1.3}
 .sj-options button.is-chosen{background:#fff6dc;border-color:#e0b443;box-shadow:0 0 0 2px rgba(224,180,67,.35)}
@@ -758,6 +792,10 @@ const PANEL_CSS = `
 .sj-map-card img{width:24px;height:38px;object-fit:contain}
 .sj-map-card strong{display:block;font-size:.82rem;color:#3a2f1a}
 .sj-map-card span{display:block}
+.sj-hall{margin:.1rem 0 .5rem;padding:.45rem .6rem;border-radius:8px;background:rgba(255,255,255,.86);border:1px solid #e1d9c9;font-size:.8rem;color:#4a4336}
+.sj-hall p{margin:.15rem 0}
+.sj-hall .sj-hall-row{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin-top:.35rem}
+.sj-hall select{font:inherit;font-size:.8rem;padding:.2rem .3rem;border-radius:6px;border:1px solid #cfc6b5;max-width:100%}
 .sj-others button{font:inherit;font-size:.72rem;background:none;border:0;color:#3a6a9a;cursor:pointer;padding:0;text-decoration:underline}
 @media (max-width:480px){.sj-options{grid-template-columns:1fr}.sj-req{grid-template-columns:28px 1fr}.sj-req .sj-acts{grid-column:1/-1}}
 `;
@@ -779,6 +817,7 @@ function ensurePanel() {
     <button type="button" class="verb-menu-x" data-sj-close aria-label="Close">×</button></div>
     <p class="sj-desc" data-sj-desc></p>
     <div class="sj-options" data-sj-options hidden></div>
+    <div class="sj-hall" data-sj-hall hidden></div>
     <div class="sj-phase"><span data-sj-phase></span><div class="sj-bar"><i data-sj-bar></i></div></div>
     <ul class="sj-reqs" data-sj-reqs></ul>
     <p class="sj-status" data-sj-status></p>
@@ -802,6 +841,11 @@ let engineRef = null;
 
 function openPanel(engine, jobId) {
   ensurePanel();
+  if (jobDef(catalog, jobId)?.kind === 'hall' && mpMode && !hallGroups.loading) {
+    hallGroups.list = null;
+    loadHallGroups(engine);
+  }
+  if (panelJobId !== jobId) hallConfirm = '';
   panelJobId = jobId;
   panel.hidden = false;
   renderPanel(engine);
@@ -836,7 +880,7 @@ function renderPanel(engine) {
   const pcx = phaseClass(catalog, jobId, Math.min(status.phase, job.phases.length - 1));
   const def = pcx.def;
   const q = (s) => panel.querySelector(s);
-  const kind = { upgrade: 'Street Upgrade', restore: 'Restoration Project' }[job.kind] || 'Street Project';
+  const kind = { upgrade: 'Street Upgrade', restore: 'Restoration Project', hall: HALL_TEXT.kicker }[job.kind] || 'Street Project';
   q('[data-sj-kicker]').textContent = `${kind} · ${external.get(jobId)?.kicker || job.hub || streetLabel(engine.streetTsid)}`;
   q('[data-sj-title]').textContent = job.title;
   const desc = job.kind === 'street'
@@ -870,6 +914,13 @@ function renderPanel(engine) {
     }
   }
 
+  // A group hall: who has it, or the claim (G331).
+  const hallBox = q('[data-sj-hall]');
+  const hall = job.kind === 'hall' ? row.hall || null : null;
+  const unclaimed = job.kind === 'hall' && !hall?.claimed && status.status !== 'done';
+  hallBox.hidden = job.kind !== 'hall';
+  if (job.kind === 'hall') renderHall(engine, hallBox, jobId, job, hall, status);
+
   const reqs = status.status === 'done' || status.status === 'built'
     ? phaseRequirements(state, catalog, jobId, job.phases.length - 1)
     : phaseRequirements(state, catalog, jobId);
@@ -880,7 +931,7 @@ function renderPanel(engine) {
 
   const list = q('[data-sj-reqs]');
   list.replaceChildren();
-  const open = status.status === 'active' || status.status === 'open';
+  const open = (status.status === 'active' || status.status === 'open') && !unclaimed;
   const ctx = workCtx(engine);
   for (const r of reqs) {
     const li = el('li', { class: `sj-req${r.done ? ' is-done' : ''}${!r.done && !r.open ? ' is-locked' : ''}`, dataset: { sjReq: r.id } });
@@ -901,7 +952,8 @@ function renderPanel(engine) {
       meta.push(`${r.energy} energy · ${r.wear} wear a unit`);
       if (r.skill) meta.push(`needs ${skillLabel(r.skill)}`);
     }
-    if (!r.done && !r.open) meta.push('opens after the earlier steps');
+    if (unclaimed) meta.push(HALL_TEXT.locked);
+    else if (!r.done && !r.open) meta.push('opens after the earlier steps');
     if (shared(jobId) && row.held?.[r.id]) meta.push(`${row.held[r.id]} being counted`);
     text.append(el('small', {}, meta.join(' · ')));
     const acts = el('div', { class: 'sj-acts' });
@@ -963,6 +1015,8 @@ function renderPanel(engine) {
     const top = topLine(row, def, jobDivisor(job));
     statusLine.textContent = `${MP_TEXT.note}${top ? ` Top contributors: ${top}.` : ' Nobody has put anything in yet.'}${work ? ` Working: ${work.units} units so far.` : ''}`;
   }
+  if (job.kind === 'hall' && status.status === 'done') statusLine.textContent = `${HALL_TEXT.owned(hall?.group?.name || 'A group')} ${HALL_TEXT.noStreet}`;
+  else if (unclaimed) statusLine.textContent = MP_TEXT.note;
   if (job.kind === 'restore' && (status.status === 'active' || status.status === 'open')) {
     const reward = Math.round((def.rewards?.xp || 0) * (Number(job.rewardMultiplier) || 1));
     statusLine.textContent = `${external.get(jobId)?.note || ''} Original amounts${jobDivisor(job) === 1 ? '' : ` / ${jobDivisor(job)}`}. Finishing it pays up to ${reward.toLocaleString()} iMG.${work ? ` Working: ${work.units} units so far.` : ''}`.trim();
@@ -985,6 +1039,95 @@ function renderPanel(engine) {
     others.append(ul);
   }
   publish(engine);
+}
+
+/** The claim (JobIntroUI.as: the cost, a group, "Claim this project!", the confirm) or who has it and the clock. */
+function renderHall(engine, box, jobId, job, hall, status) {
+  box.replaceChildren();
+  const claim = hall?.claim || 0;
+  const minutes = hall?.minutes || job.duration || 0;
+  if (status.status === 'done') {
+    box.append(el('p', {}, HALL_TEXT.owned(hall?.group?.name || 'A group')));
+    return;
+  }
+  if (hall?.claimed) {
+    box.append(el('p', {}, `${HALL_TEXT.claimedBy(hall.group?.name || 'a group')} (${hall.by?.name || 'a Glitch'}).`));
+    const clock = hallClock(hall);
+    if (clock) box.append(el('p', { dataset: { sjHallClock: '' } }, clock));
+    return;
+  }
+  if (hall?.claiming) {
+    box.append(el('p', {}, HALL_TEXT.claiming));
+    return;
+  }
+  box.append(el('p', {}, `${HALL_TEXT.need} ${claim.toLocaleString()} currants.`));
+  const groups = hallGroups.list;
+  if (!groups) {
+    loadHallGroups(engine);
+    box.append(el('p', {}, 'Loading your groups...'));
+    return;
+  }
+  if (!groups.length) {
+    box.append(el('p', {}, HALL_TEXT.noGroup));
+    return;
+  }
+  const rowEl = el('div', { class: 'sj-hall-row' });
+  if (hallConfirm === jobId) {
+    rowEl.append(el('span', {}, HALL_TEXT.confirm(minutes)));
+    const yes = el('button', { type: 'button', class: 'primary', dataset: { sjAct: 'claim-yes' } }, HALL_TEXT.yes);
+    yes.addEventListener('click', () => {
+      hallConfirm = '';
+      mpClaim(engine, jobId, hallGroups.chosen);
+    });
+    const no = el('button', { type: 'button', dataset: { sjAct: 'claim-no' } }, HALL_TEXT.no);
+    no.addEventListener('click', () => {
+      hallConfirm = '';
+      renderPanel(engine);
+    });
+    rowEl.append(yes, no);
+  } else {
+    const pick = el('select', { 'aria-label': HALL_TEXT.pickGroup, dataset: { sjHallGroup: '' } });
+    for (const g of groups) {
+      const o = el('option', { value: String(g.id) }, g.name);
+      if (g.id === hallGroups.chosen) o.selected = true;
+      pick.append(o);
+    }
+    if (!groups.some((g) => g.id === hallGroups.chosen)) hallGroups.chosen = groups[0].id;
+    pick.addEventListener('change', () => {
+      hallGroups.chosen = Number(pick.value) || 0;
+    });
+    const b = el('button', { type: 'button', class: 'primary', dataset: { sjAct: 'claim' } }, HALL_TEXT.claim);
+    b.disabled = (engine.pc.currants || 0) < claim || Boolean(mp?.claiming);
+    b.addEventListener('click', () => {
+      hallConfirm = jobId;
+      renderPanel(engine);
+    });
+    rowEl.append(el('span', {}, HALL_TEXT.pickGroup), pick, b);
+  }
+  box.append(rowEl);
+}
+
+/** The groups a claim may name: the caller's own (groddle/v1/groups, Groups::answer). */
+const hallGroups = { list: null, chosen: 0, loading: null };
+let hallConfirm = '';
+function loadHallGroups(engine) {
+  if (hallGroups.loading) return hallGroups.loading;
+  const boot = globalThis.GRODDLE_MP_BOOT || {};
+  const account = createMinnAccount({ baseUri: document.baseURI, nonce: boot.nonce || '' });
+  hallGroups.loading = account.groups()
+    .then((answer) => {
+      hallGroups.list = normalizeGroups(answer).groups;
+    })
+    .catch(() => {
+      hallGroups.list = null;
+    })
+    .finally(() => {
+      setTimeout(() => {
+        hallGroups.loading = null;
+      }, hallGroups.list ? 60000 : 5000);
+      renderPanel(engine);
+    });
+  return hallGroups.loading;
 }
 
 function doGive(engine, jobId, classId, n) {
@@ -1060,6 +1203,7 @@ function ensureMp(engine) {
   if (mp || !mpMode || !catalog || typeof document === 'undefined') return mp;
   const client = engine.query?.('realtimeClient');
   if (!client) return null;
+  mergeHalls(catalog);
   if (!mpMigrated) {
     mpMigrated = true;
     // The server's rows replace any this character kept on its own (a project it finished keeps its road).
@@ -1106,6 +1250,11 @@ function createMp(engine, client) {
     if (work?.jobId === jobId) stopWork(engine, '');
     // locations/inc_jobs.js jobs_modify_connections: the road opens for everyone.
     if (job?.kind === 'street' && job.connecting.includes(engine.streetTsid)) engine.toast(`The road to ${job.label} is open!`, 3200);
+    if (job?.kind === 'hall' && msg.hall?.group?.name) {
+      const row = state.jobs[jobId];
+      if (row) row.hall = { ...(row.hall || {}), claimed: true, owned: true, group: { id: n0(msg.hall.group.id), name: String(msg.hall.group.name).slice(0, 40) } };
+      if (job.connecting.includes(engine.streetTsid)) engine.toast(HALL_TEXT.built(String(msg.hall.group.name).slice(0, 40)), 3200);
+    }
     drawBarricades(engine);
     refresh();
   });
@@ -1128,9 +1277,11 @@ function createMp(engine, client) {
   client.on('msg:project_given', (msg) => applyGiven(msg));
   client.on('msg:project_worked', (msg) => mpWorked(engine, msg));
   client.on('msg:project_reward', (msg) => applyReward(msg));
+  client.on('msg:project_expired', (msg) => applyExpired(msg));
   client.on('error', ({ code, message } = {}) => {
     if (code !== 'project' || !message) return;
     s.giving = null;
+    s.claiming = null;
     s.lastError = message;
     if (work?.mp) stopWork(engine, message);
     else {
@@ -1161,10 +1312,16 @@ function createMp(engine, client) {
     const cur = Math.min(n0(msg.currants), n0(engine.pc.currants));
     if (cur > 0) engine.pc.currants = n0(engine.pc.currants) - cur;
     remember(mpLists.applied, id);
-    const rec = markContributed(state, jobId, String(msg.cls || ''));
-    if (rec.newPhase) for (const badge of contributionBadgesReached(rec.distinctPhases)) engine.grantAchievement(badge);
     const [c, n] = items[0] || [];
-    engine.pushActivity(c ? `You contributed ${n0(n)} ${itemLabel(c, n0(n))}.` : `You contributed ${n0(msg.currants).toLocaleString()} currants.`);
+    if (msg.claim === true) {
+      // A group hall's claim (G331): the currants are spent, not contributed.
+      s.claiming = null;
+      engine.pushActivity(HALL_TEXT.paid(n0(msg.currants)));
+    } else {
+      const rec = markContributed(state, jobId, String(msg.cls || ''));
+      if (rec.newPhase) for (const badge of contributionBadgesReached(rec.distinctPhases)) engine.grantAchievement(badge);
+      engine.pushActivity(c ? `You contributed ${n0(n)} ${itemLabel(c, n0(n))}.` : `You contributed ${n0(msg.currants).toLocaleString()} currants.`);
+    }
     if (c) engine.playSound('ITEM_GIVE', { volume: 0.55 });
     lastResult = `${jobId}:given:${c || 'currants'}`;
     engine.updateHud();
@@ -1219,18 +1376,44 @@ function createMp(engine, client) {
     if (ok) client.send('project_ack', { id });
   }
 
+  /** project_expired: your hall claim ran out of time (quest.js onJobTimeout 1356-1380); everything put in is lost. */
+  async function applyExpired(msg) {
+    const id = String(msg.id || '');
+    if (!id || s.applying.has(id)) return;
+    s.applying.add(id);
+    const text = plainText(String(msg.text || ''));
+    const jobId = String(msg.job || '');
+    if (work?.jobId === jobId) stopWork(engine, '');
+    engine.pushActivity(text);
+    engine.award({ kind: 'quest', title: jobDef(catalog, jobId)?.title || 'Group Hall', body: '', subtitle: '', iconUrl: BOARD_ART, steps: [{ text, response: HALL_TEXT.shucks }], primaryLabel: HALL_TEXT.shucks });
+    lastResult = `${jobId}:expired`;
+    refresh();
+    s.applying.delete(id);
+    client.send('project_ack', { id });
+  }
+
   // QA (window.groddleProjects): the board's own actions, and the row as this page sees it.
   s.open = (jobId) => openPanel(engine, jobId);
   s.give = (jobId, classId, n) => doGive(engine, jobId, classId, n);
   s.currants = (jobId, n) => doCurrants(engine, jobId, n);
   s.work = (jobId, rid, max = Infinity) => startWork(engine, jobId, rid, max);
   s.row = (jobId) => JSON.parse(JSON.stringify(state.jobs[jobId] || null));
+  s.claim = (jobId, group) => mpClaim(engine, jobId, group);
   s.lists = () => ({ applied: [...mpLists.applied], rewarded: [...mpLists.rewarded] });
   s.working = () => (work ? { jobId: work.jobId, rid: work.rid, units: work.units } : null);
   s.roadOpen = (tsid) => !roadClosure(state, catalog, tsid, [tsid], opts());
   s.tick = (now) => {
     if (s.giving && now - s.giving.at > GIVE_WAIT_MS) {
       s.giving = null;
+      renderPanel(engine);
+    }
+    if (s.claiming && now - s.claiming.at > GIVE_WAIT_MS) {
+      s.claiming = null;
+      renderPanel(engine);
+    }
+    // A hall's clock on the open panel, once a minute.
+    if (panel && !panel.hidden && jobDef(catalog, panelJobId)?.kind === 'hall' && now - (s.clockAt || 0) > 30000) {
+      s.clockAt = now;
       renderPanel(engine);
     }
   };
@@ -1254,6 +1437,19 @@ function mpGive(engine, jobId, what) {
   else payload.n = n;
   if (!s.client.send('project_give', payload)) return engine.toast(MP_TEXT.offline), false;
   s.giving = { job: jobId, req: req.id, at: Date.now() };
+  renderPanel(engine);
+  publish(engine);
+  return true;
+}
+
+/** Claim a group hall for one of your groups (G331): the server asks the site, which takes the currants. */
+function mpClaim(engine, jobId, group) {
+  const s = ensureMp(engine);
+  if (!s) return engine.toast(MP_TEXT.offline), false;
+  if (s.claiming) return engine.toast(MP_TEXT.counting), false;
+  if (!n0(group)) return engine.toast(HALL_TEXT.noGroup), false;
+  if (!s.client.send('project_claim', { job: jobId, group: n0(group) })) return engine.toast(MP_TEXT.offline), false;
+  s.claiming = { job: jobId, at: Date.now() };
   renderPanel(engine);
   publish(engine);
   return true;
@@ -1497,6 +1693,8 @@ function publish(engine) {
     const pcx = head ? phaseClass(catalog, head.jobId, row?.phase || 0) : null;
     engine.setData('streetJobTop', row && pcx?.def ? topLine(row, pcx.def, jobDivisor(jobDef(catalog, head.jobId))) : '');
     engine.setData('streetJobMine', row ? JSON.stringify(row.mine || {}) : '');
+    const hall = head && jobDef(catalog, head.jobId)?.kind === 'hall' ? row?.hall : null;
+    engine.setData('streetJobHall', hall ? `${hall.owned ? 'owned' : hall.claimed ? 'claimed' : hall.claiming ? 'claiming' : 'open'}:${hall.group?.name || ''}` : '');
   }
 }
 
