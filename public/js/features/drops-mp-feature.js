@@ -22,11 +22,20 @@
  * each applies once through the trade slice's applied list (ledgerReceipt),
  * and on every connect the site's list brings any answer that was missed.
  *
- * Piggies (animal-mood-feature) eat only the stacks in engine.droppedItems,
- * the player's own: a shared stack is the server's, so no one page's Piggy
- * eats it.
+ * Piggies: a street Piggy eats a shared stack of food as the source's did
+ * (items/npc_piggy.js onContainerItemAdded 1393-1411, onFoodPathing
+ * 1482-1500): the server decides which Piggy and when and takes one off the
+ * stack (drops.go ground_eaten); here the stack shrinks and the Piggy walks
+ * over and chews (animal-mood-feature sharedAnimalEvent). Each page's own
+ * Piggies (animal-mood-feature) still eat only the stacks in
+ * engine.droppedItems, the player's own.
  *
- * QA: canvas data sharedStacks, dropState (none|dropping|picking), dropLast;
+ * The pack's drop prompt (game.js asks sharedDropPrompt) reads the drop
+ * verb's tooltip, "Drop it on the ground.", when the stack is dropped for
+ * everyone: shared stacks never merge.
+ *
+ * QA: canvas data sharedStacks, dropState (none|dropping|picking), dropLast,
+ * dropEaten (the last bite: id:left:pig);
  * window.groddleDrops.
  */
 
@@ -34,7 +43,7 @@ import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=
 import { TOOL_CONDITION_CATALOG, getToolCondition, setToolRemaining } from '../tools.js?v=woodcutting-test-3';
 import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
 import { saveStore } from '../save-store.js?v=mp2-2';
-import { DROP_OP, DROP_TEXT, dropEffect, groundFrom, isPublicStreet, normalizeGroundStack, normalizeMine, shareReason } from '../drops-mp.js?v=g332-drops-1';
+import { DROP_OP, DROP_TEXT, dropEffect, eatenStack, groundFrom, isPublicStreet, normalizeGroundStack, normalizeMine, pigAnimalKey, shareReason } from '../drops-mp.js?v=g375-1';
 
 export const DROPS_MP_FEATURE_ID = 'drops-mp';
 const TABLE_URL = 'assets/content/trade-items.json';
@@ -77,6 +86,7 @@ function createSession(engine, client) {
   /** The stack a pickup asked for: { id, at }. */
   let picking = null;
   let lastLine = '';
+  let lastEaten = '';
   let syncing = false;
   let syncedAt = 0;
   let refN = 0;
@@ -95,6 +105,7 @@ function createSession(engine, client) {
     engine.setData?.('sharedStacks', String(stacks.size));
     engine.setData?.('dropState', dropping ? 'dropping' : picking ? 'picking' : 'none');
     engine.setData?.('dropLast', lastLine);
+    engine.setData?.('dropEaten', lastEaten);
   }
 
   function redraw() {
@@ -175,6 +186,22 @@ function createSession(engine, client) {
 
   client.on('msg:ground_gone', (msg) => {
     if (stacks.delete(String(msg.id || ''))) redraw();
+  });
+
+  // A street Piggy ate one (drops.go eat): the stack shrinks, the Piggy walks over and chews.
+  client.on('msg:ground_eaten', (msg) => {
+    const id = String(msg.id || '');
+    const s = stacks.get(id);
+    if (!s || !street || String(msg.street || '') !== street) return;
+    const left = eatenStack(s, msg.n);
+    if (left) stacks.set(id, left);
+    else stacks.delete(id);
+    redraw();
+    const key = pigAnimalKey(street, msg.pig);
+    const pig = key ? (engine.interactables || []).find((t) => t?.classId === 'npc_piggy' && t.animalKey === key && !t.featureId && !t.husbandryAnimal) : null;
+    lastEaten = `${id}:${left ? left.count : 0}:${msg.pig || ''}`;
+    if (pig) engine.query?.('sharedAnimalEvent', pig, { ev: 'ate', at: { x: Number(msg.x) || s.x, y: Number(msg.y) || s.y }, classTsid: s.classTsid }, engine);
+    publish();
   });
 
   client.on('msg:ground_dropped', (msg) => {
@@ -297,6 +324,17 @@ function createSession(engine, client) {
     return true;
   }
 
+  /** Whether a pack stack of this class would be dropped for everyone here now. */
+  function wouldShare(classTsid) {
+    const s = here();
+    if (!s) return false;
+    if (!table) {
+      loadTable();
+      return false;
+    }
+    return !shareReason(String(classTsid || ''), table, { street: s, dropKey: String(engine.dropTsid || s) });
+  }
+
   function list(tsid) {
     const s = here();
     if (!s || tsid !== s || street !== s) return [];
@@ -315,6 +353,7 @@ function createSession(engine, client) {
     drop,
     pickup,
     list,
+    wouldShare,
     sync,
     tick(now) {
       // A street change empties the list until the server's ground_state for the new one.
@@ -362,6 +401,12 @@ export const dropsMpFeature = {
   sharedPickup(target, engine) {
     if (!multiplayer || !session || engine?.mode !== 'multiplayer') return null;
     return session.pickup(target);
+  },
+
+  /** game.js pack drop prompt: the drop verb's own words when the stack goes to everyone (shared stacks never merge). */
+  sharedDropPrompt(classTsid, engine) {
+    if (!multiplayer || engine?.mode !== 'multiplayer') return null;
+    return ensure(engine)?.wouldShare(classTsid) ? DROP_TEXT.prompt : null;
   },
 
   /** game.js refreshDroppedWorldItems: the shared stacks to draw with the player's own. */

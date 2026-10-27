@@ -40,6 +40,9 @@ export const DROP_TEXT = Object.freeze({
   gone: 'That stack has already been picked up.', // the game's own
   locked: 'You are not allowed to pick this up.', // takeable.js:39
   offline: "You're offline.",
+  // The drop verb's tooltip on every item (e.g. items/apple.js:84): the pack's drop prompt when the
+  // stack is dropped for everyone (stacks dropped for others never merge: drops.go).
+  prompt: 'Drop it on the ground.',
 });
 
 /** A public street others share (realtime-feature sharedStreet; drops.go dropShared: no "_" in the id). */
@@ -88,6 +91,19 @@ export function normalizeGroundStack(raw, street = '') {
   };
   if (raw.r != null && Number.isFinite(Number(raw.r))) out.r = Math.max(0, Math.floor(Number(raw.r)));
   return out;
+}
+
+/** A stack after a street Piggy ate one (drops.go ground_eaten): n left, or null when none is. */
+export function eatenStack(stack, n) {
+  const left = Math.floor(finite(n));
+  if (!stack || left < 1) return null;
+  return { ...stack, count: left, subtitle: `${DROP_TEXT.by(stack.by?.name || 'Someone')} · ${left} in this pile` };
+}
+
+/** The animalKey of the street Piggy a server id names ("pig:2"; js/street-objects.js streetPigIndex), or ''. */
+export function pigAnimalKey(street, pig) {
+  const m = /^pig:(\d{1,2})$/.exec(String(pig || ''));
+  return m && street ? `${street}:npc_piggy:${Number(m[1])}` : '';
 }
 
 /** A street's stacks from ground_state, oldest first. */

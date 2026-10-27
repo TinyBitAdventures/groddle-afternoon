@@ -1081,9 +1081,13 @@ function refreshRockSubtitle(engine, now = Date.now()) {
 
 /**
  * G232: houses_get_img_rewards for this player now (js/magic-rock-home.js
- * imgRewards: with no visitors, the daily stipend from level 2).
+ * imgRewards: with no visitors, the daily stipend from level 2). G201: in
+ * multiplayer the site's pool decides it (home-pool-mp-feature homeImgPool:
+ * the best earlier day of what visitors did here, capped, plus the stipend).
  */
 function rockImgToCollect(engine, now = Date.now()) {
+  const shared = engine.query?.('homeImgPool', engine);
+  if (Number.isFinite(shared)) return shared;
   return imgRewards({ level: engine.pc?.level || 1, cashedToday: rockImgDay === getGameDayKey(now) });
 }
 
@@ -1182,7 +1186,18 @@ function talkToRock(target, engine) {
     return towerApi.talkToRock(engine) || true;
   }
   const img = rockImgToCollect(engine);
-  if (img > 0) return handOverImg(engine, img);
+  if (img > 0) {
+    // G201: in multiplayer the site hands it over (and marks the game day cashed) first.
+    const asked = engine.query?.('homeImgCollect', engine, { cashedToday: rockImgDay === getGameDayKey(Date.now()) });
+    if (asked && typeof asked.then === 'function') {
+      asked.then((got) => {
+        if (got > 0) handOverImg(engine, got);
+        else publish(engine);
+      });
+      return true;
+    }
+    return handOverImg(engine, img);
+  }
   if (room === 'street' && towerApi.rockTalk?.(engine)) {
     engine.setData?.('homeRockLast', 'talk_tower');
     return towerApi.talkToRock(engine) || true;

@@ -2644,9 +2644,14 @@
   ]
  },
  "git": {
-  "commits": 628,
+  "commits": 629,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "improve",
+    "text": "Trees regrow fruit when tended instead of at dawn, and the Fuelmaker draws sharp at 3x"
+   },
    {
     "date": "2026-10-27",
     "kind": "improve",
@@ -2761,14 +2766,9 @@
     "date": "2026-10-27",
     "kind": "fix",
     "text": "The icon test allows the Greeter Badge, left out of the catalog by decision"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "improve",
-    "text": "The top bar groups you, progress and wallet, with mood and energy stacked beside your name"
    }
   ]
  },
- "tests": 373,
+ "tests": 374,
  "generatedAt": "2026-10-27"
 }

@@ -48,7 +48,8 @@
  * and twice-daily clock and runs its ticks; this page runs none for it and
  * replays none on arrival. Its tick events come back as sharedAnimalEvent:
  * the "Other animals make me happy!" bubble, the croak, and a walk to the
- * tree whose fruit it ate (the server took the fruit). A Piggy that eats
+ * tree whose fruit it ate (the server took the fruit), and a walk to a
+ * stack dropped for everyone it ate one of (drops-mp-feature, G332). A Piggy that eats
  * food only this player sees (their own dropped stack, or a tree they just
  * worked) tells the server (sharedPiggyAte), which sates it for everyone.
  * Released and raised Piggies (the husbandry feature's) stay each player's
@@ -451,8 +452,8 @@ function arriveShared(engine, r) {
   const target = r.target;
   let ate = null;
   if (r.food?.shared) {
-    // The server's tick already took the fruit and sated it: only the chew and the "Yum!" are left.
-    ate = { kind: 'trant', classTsid: r.food.target?.classId || 'trant' };
+    // The server already took the fruit (or one of a stack dropped for everyone) and sated it: only the chew and the "Yum!" are left.
+    ate = r.food.kind === 'stack' ? { kind: 'stack', classTsid: r.food.classTsid || 'food' } : { kind: 'trant', classTsid: r.food.target?.classId || 'trant' };
   } else if (Number(target.state.hunger) > 0) {
     const spr = target.sprite;
     const near = (x, y) => Math.hypot(x - spr.x, (Number.isFinite(y) ? y : spr.y) - spr.y) <= EAT_RADIUS;
@@ -1279,9 +1280,10 @@ export const animalMoodFeature = {
 
   /**
    * Multiplayer (street-objects-feature, objects_pigs.go obj_ev): a street Piggy's tick.
-   * ev: happy (the bubble), croak, ate (on: the tree whose fruit the server gave it: walk there).
+   * ev: happy (the bubble), croak, ate (on: the tree whose fruit the server gave it: walk there;
+   * at: where the stack dropped for everyone lay that it ate one of, drops-mp-feature ground_eaten).
    */
-  sharedAnimalEvent(target, { ev, on } = {}, engine) {
+  sharedAnimalEvent(target, { ev, on, at, classTsid } = {}, engine) {
     if (target?.classId !== 'npc_piggy' || !target.sprite || target.sprite.destroyed) return null;
     const r = recordFor(target);
     if (ev === 'happy') say(engine, target, PIGGY_LINES.happy, 3000);
@@ -1289,6 +1291,11 @@ export const animalMoodFeature = {
     else if (ev === 'ate' && on?.sprite && r.mode !== 'sad') {
       if (!startSeek(engine, r, { kind: 'trant', target: on, x: on.sprite.x, y: on.sprite.y, shared: true })) {
         playClip(engine, r, PIGGY_MOOD_SHEETS.chew);
+      }
+    } else if (ev === 'ate' && at && Number.isFinite(at.x) && r.mode !== 'sad') {
+      if (!startSeek(engine, r, { kind: 'stack', x: at.x, y: at.y, classTsid: String(classTsid || ''), shared: true })) {
+        playClip(engine, r, PIGGY_MOOD_SHEETS.chew);
+        say(engine, target, PIGGY_LINES.yum, PIGGY_LINES.yumMs);
       }
     }
     lastEvent = `shared:${ev}`;

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g374-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-205';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-206';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -3056,7 +3056,7 @@ function renderPackPopover(classTsid, anchor = null) {
     : `Show ${relatedRecipes.length === 1 ? 'recipe' : 'recipes'}`;
   const dropPrompt = packDropMode
     ? `<div class="pack-drop-quantity" aria-label="Choose quantity to drop">
-        <p>Drop this stack at your feet. Nearby matching stacks will merge.</p>
+        <p>${escapeHtml(features.query('sharedDropPrompt', classTsid, engine) || 'Drop this stack at your feet. Nearby matching stacks will merge.')}</p>
         <div class="pack-drop-stepper">
           <button type="button" data-pack-drop-dec aria-label="Drop one fewer">−</button>
           <output aria-live="polite">${packDropQty} of ${slot.count}</output>

@@ -52,7 +52,7 @@ describe('trade table (tools/build-realtime-trade.mjs)', () => {
   it('keeps the source rules', () => {
     assert.equal(table.slots, 6);
     assert.equal(TRADE_SLOTS, 6); // TradeDialog.as:50
-    assert.deepEqual(table.items.apple, { max: 100, name: 'Apple', plural: 'Apples' }); // items/apple.js stackmax
+    assert.deepEqual(table.items.apple, { max: 100, name: 'Apple', plural: 'Apples', food: true }); // items/apple.js stackmax; food: include/food.js (a Piggy eats it off the ground)
     assert.equal(table.items.pick.max, 1);
     assert.equal(table.untradeable.play_cube, 'soulbound'); // items/play_cube.js:121-140
     assert.equal(table.untradeable.greeter_twig, 'soulbound');
