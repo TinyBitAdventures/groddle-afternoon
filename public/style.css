@@ -5500,7 +5500,8 @@ header.top-bar + .sub { display: none; }
   opacity: 0;
   pointer-events: none;
   background: rgba(80, 110, 78, 0.92); /* ~#a7c39c @ high alpha */
-  cursor: pointer;
+  /* Only the OK button (or Enter / Escape) closes it (BaseScreenView.as 171-173). */
+  cursor: default;
 }
 .award-screen.is-visible {
   opacity: 1;
@@ -5620,6 +5621,58 @@ header.top-bar + .sub { display: none; }
 }
 .award-next[hidden] {
   display: none !important;
+}
+/* BaseScreenView screens (js/screen-fx.js AWARD_BUTTON_IN): the OK button
+   animates in after the screen is already listening (ready at the end of the
+   .4 s fade-in). AchievementView.as 511-517 and NewDayView.as 566-569: 40 px
+   up with easeOutBounce; LevelUpView.as 257-258: a linear fade. The glow is
+   StaticFilters.white4px40AlphaGlowA on every ok_bt. */
+.award-screen[data-okin="true"] .award-next {
+  display: block;
+  min-width: 9.5rem;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  background: linear-gradient(180deg, #6aaa3a, #4a8a28);
+  box-shadow: 0 0 4px 2px rgba(255, 255, 255, 0.4), 0 4px 14px rgba(0, 0, 0, 0.2);
+  font: inherit;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #fffdf7;
+}
+.award-screen[data-okin="true"] .award-next:hover,
+.award-screen[data-okin="true"] .award-next:focus-visible {
+  background: linear-gradient(180deg, #76b744, #52942e);
+}
+.award-screen[data-okin="true"] .award-next,
+.new-day-btn[data-award-ok] {
+  animation: awardOkBounce var(--award-ok-time, 0.4s) var(--award-ok-delay, 1.5s) both;
+}
+.award-screen[data-okin="true"] .award-next[data-award-ok="fade"],
+.new-day-btn[data-award-ok="fade"] {
+  animation-name: awardOkFade;
+  animation-timing-function: linear;
+}
+@keyframes awardOkFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+/* easeOutBounce: lands at 36%, hops a quarter, a sixteenth, a sixty-fourth. */
+@keyframes awardOkBounce {
+  0% { opacity: 0; transform: translateY(var(--award-ok-rise, 40px)); animation-timing-function: ease-in; }
+  36.36% { opacity: 1; transform: translateY(0); animation-timing-function: ease-out; }
+  54.54% { opacity: 0.75; transform: translateY(calc(var(--award-ok-rise, 40px) * 0.25)); animation-timing-function: ease-in; }
+  72.72% { opacity: 1; transform: translateY(0); animation-timing-function: ease-out; }
+  81.81% { opacity: 0.94; transform: translateY(calc(var(--award-ok-rise, 40px) * 0.0625)); animation-timing-function: ease-in; }
+  90.9% { opacity: 1; transform: translateY(0); animation-timing-function: ease-out; }
+  95.45% { opacity: 0.98; transform: translateY(calc(var(--award-ok-rise, 40px) * 0.0156)); animation-timing-function: ease-in; }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .award-screen[data-okin="true"] .award-next,
+  .new-day-btn[data-award-ok] {
+    animation-name: awardOkFade;
+  }
 }
 .award-close {
   display: none;
@@ -5852,6 +5905,7 @@ header.top-bar + .sub { display: none; }
   box-shadow: 0 0 0 3px rgba(255,255,255,0.35), 0 4px 14px rgba(0,0,0,0.2);
 }
 .new-day-btn:hover { filter: brightness(1.06); }
+.new-day-btn:focus-visible { outline: 2px solid #fffdf7; outline-offset: 2px; }
 
 /* —— The Great Hog Haul —— */
 .hog-haul-hud {

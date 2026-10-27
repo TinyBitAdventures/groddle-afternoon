@@ -4,10 +4,10 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g377-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-208';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-209';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
-import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
+import { createPromptStack } from './js/prompt-stack.js?v=g378-1';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=g311-1';
 import {
   actionDurationFor,
@@ -635,20 +635,17 @@ import {
   trantStatusLabel,
 } from './js/trants.js?v=trant-harvest-2';
 import {
-  crossfadeElement,
-  AWARD_FADE_IN,
-  AWARD_FADE_OUT,
-  NEW_DAY_HOLD_MS,
   runStreetTransition,
   showAwardScreen,
+  showNewDayScreen,
   afterStreetCard,
   streetCardUp,
   STREET_CARD_UP,
   cardPausedTimeout,
   POL_OWNER_SIZE,
-} from './js/screen-fx.js?v=card-2';
+} from './js/screen-fx.js?v=g378-1';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=g225-1';
-import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=card-2';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=g378-1';
 import {
   planTravel,
   listMapDestinations,
@@ -2131,7 +2128,9 @@ function announceAchievementUpdates(updates = []) {
       status: update.def.statusText || update.def.status_text || '',
       subtitle: rewardBits.join(' · '),
       iconUrl: badgeIconFor(update.classTsid || update.def.classTsid),
-      // inc_achievements.js:428: collection trophies say TROPHY_RECEIVED, every other badge ACHIEVEMENT_UNLOCKED.
+      // inc_achievements.js:426-428: a collection trophy is a collection_complete screen
+      // (CollectionCompleteView, its button 'Alllllright!') saying TROPHY_RECEIVED, every other badge ACHIEVEMENT_UNLOCKED.
+      screen: update.def.category === 'trophies' ? 'collection' : undefined,
       sound: update.def.category === 'trophies' ? 'TROPHY_RECEIVED' : undefined,
     });
   }
@@ -4044,7 +4043,6 @@ function openPackedCubimalBox(classTsid) {
     body: `Series ${result.package.series} collection: ${result.collection.owned}/${result.collection.total}`,
     subtitle: 'You opened the box!',
     iconUrl: `assets/sprites/icons/${result.prize.classTsid}.png`,
-    holdMs: 1_800,
   });
   updateHud();
   return result;
@@ -4105,7 +4103,6 @@ function setPackedCubimalFree(classTsid, opts = {}) {
     body: result.response,
     subtitle: `+${result.reward.toLocaleString()} Imagination`,
     iconUrl: `assets/sprites/icons/${classTsid}.png`,
-    holdMs: 1_800,
   });
   updateHud();
   return result;
@@ -10228,7 +10225,8 @@ function resolveSavedLocation(saved) {
 
 /**
  * New Day celebration (NewDayView.as): morning crossfade, energy refill, fanfare.
- * Non-skippable — holds for NEW_DAY_HOLD_MS then fades out.
+ * It stays until the player presses Onwards and upwards!, Enter or Escape
+ * (js/screen-fx.js showNewDayScreen; BaseScreenView.as 171-173, 224-226).
  * @param {{ force?: boolean }} [opts]
  */
 async function maybeNewDay(opts = {}) {
@@ -10265,7 +10263,6 @@ async function maybeNewDay(opts = {}) {
   if (el) {
     const dateEl = el.querySelector('[data-nd-date]');
     const statsEl = el.querySelector('[data-nd-stats]');
-    const okBtn = el.querySelector('[data-nd-ok]');
     if (dateEl) dateEl.textContent = formatGameDayLabel();
     if (statsEl) {
       statsEl.textContent =
@@ -10273,30 +10270,8 @@ async function maybeNewDay(opts = {}) {
           ? `Energy ${Math.round(refill.energyBefore)} → ${energyCap()} · Mood restored`
           : 'You were already full. Still, a new day!';
     }
-    // Decorative button only — cannot skip
-    if (okBtn) {
-      okBtn.disabled = true;
-      okBtn.setAttribute('aria-disabled', 'true');
-      okBtn.textContent = 'A new day dawns…';
-    }
-    const swallow = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-    };
-    el.addEventListener('click', swallow);
-    el.addEventListener('keydown', swallow);
-
     playSfx('newDay', { volume: 0.75 });
-    await crossfadeElement(el, { show: true, durationSec: AWARD_FADE_IN });
-    await new Promise((resolve) => setTimeout(resolve, NEW_DAY_HOLD_MS));
-    el.removeEventListener('click', swallow);
-    el.removeEventListener('keydown', swallow);
-    await crossfadeElement(el, { show: false, durationSec: AWARD_FADE_OUT });
-    if (okBtn) {
-      okBtn.disabled = false;
-      okBtn.removeAttribute('aria-disabled');
-      okBtn.textContent = 'Onwards and upwards!';
-    }
+    await showNewDayScreen(el);
   } else {
     toast('A new day: energy refilled!', 4000);
     playSfx('newDay', { volume: 0.75 });

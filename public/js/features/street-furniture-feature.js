@@ -40,7 +40,7 @@ import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-3';
 import { getGameDayKey } from '../game-day.js?v=dametime-4';
-import { runStreetTransition } from '../screen-fx.js?v=card-2';
+import { runStreetTransition } from '../screen-fx.js?v=g378-1';
 import { STREET_VISITS_SLOT, loadingCardDetails, recordStreetEntry, streetLoadingVisit } from '../exploration.js';
 import {
   BOARD_ART,
@@ -117,7 +117,7 @@ import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } 
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=note-g175';
 import { textureFromUrl } from '../textures.js';
 import { butlerApi } from './butler-feature.js?v=g375-1';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=g375-1';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=g378-1';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';
 const PLAYER_ID = 'player';

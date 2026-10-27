@@ -72,7 +72,7 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
-import { runStreetTransition } from '../screen-fx.js?v=card-2';
+import { runStreetTransition } from '../screen-fx.js?v=g378-1';
 import { STREET_INDEX } from '../street-loader.js';
 import { ITEM_CATALOG, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=home-cultivation-5';

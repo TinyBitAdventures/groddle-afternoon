@@ -10,27 +10,28 @@ import {
   LOAD_HOLD_MS,
   AWARD_FADE_IN,
   AWARD_FADE_OUT,
-  AWARD_HOLD_MS,
-  NEW_DAY_HOLD_MS,
+  AWARD_QA_HOLD_MS,
+  NEW_DAY_QA_HOLD_MS,
   wait,
   nextFrame,
   normalizeAwardPages,
   awardRewardTokens,
   runStreetTransition,
   showAwardScreen,
-} from '../public/js/screen-fx.js?v=card-2';
+} from '../public/js/screen-fx.js?v=g378-1';
 
 describe('screen-fx timings (LoadingLocationView / BaseScreenView)', () => {
-  it('uses deliberate non-skippable fade windows (seconds)', () => {
+  it('uses the street card windows and the BaseScreenView fades (seconds)', () => {
     // Teleport slightly slower than original LoadingLocationView (~0.2 / 0.5)
     assert.ok(LOAD_FADE_IN >= 0.35 && LOAD_FADE_IN <= 0.7);
     assert.ok(LOAD_FADE_OUT >= 0.6 && LOAD_FADE_OUT <= 1.2);
     assert.ok(LOAD_HOLD_MS >= 300 && LOAD_HOLD_MS <= 800);
-    // BaseScreenView-ish award fades
-    assert.ok(AWARD_FADE_IN >= 0.3 && AWARD_FADE_IN <= 0.6);
-    assert.ok(AWARD_FADE_OUT >= 0.25 && AWARD_FADE_OUT <= 0.55);
-    assert.ok(AWARD_HOLD_MS >= 3000);
-    assert.ok(NEW_DAY_HOLD_MS >= 3500);
+    // BaseScreenView.as 33-34: fade_in_secs .4, fade_out_secs .3.
+    assert.equal(AWARD_FADE_IN, 0.4);
+    assert.equal(AWARD_FADE_OUT, 0.3);
+    // Award screens wait for the player; these holds only serve QA auto-close (awardAutoCloseMs).
+    assert.equal(AWARD_QA_HOLD_MS, 3800);
+    assert.equal(NEW_DAY_QA_HOLD_MS, 4500);
   });
 
   it('wait resolves after the requested delay', async () => {
@@ -96,7 +97,7 @@ describe('screen-fx timings (LoadingLocationView / BaseScreenView)', () => {
     );
   });
 
-  it('rejects malformed pages so ordinary awards retain their timed behavior', () => {
+  it('rejects malformed pages so ordinary awards keep their single OK button', () => {
     assert.deepEqual(normalizeAwardPages({ steps: null }), []);
     assert.deepEqual(normalizeAwardPages({ steps: [{ text: '  ', response: '' }] }), []);
   });
@@ -164,7 +165,7 @@ describe('badge + loading asset maps (local pack)', () => {
 
 describe('award card text', () => {
   it('drops GSJS item links and tags but keeps the words', async () => {
-    const { awardText, normalizeAwardPages } = await import('../public/js/screen-fx.js?v=card-2');
+    const { awardText, normalizeAwardPages } = await import('../public/js/screen-fx.js?v=g378-1');
     assert.equal(
       awardText('Give 6 <a href="event:item|npc_piggy">Piggies</a> the pleasuring of a lifetime. By petting them, of course.'),
       'Give 6 Piggies the pleasuring of a lifetime. By petting them, of course.',
@@ -175,7 +176,7 @@ describe('award card text', () => {
   });
 });
 
-import { LOAD_STATUS, loadStatusLabel, loadingSplit, cssColor } from '../public/js/screen-fx.js?v=card-2';
+import { LOAD_STATUS, loadStatusLabel, loadingSplit, cssColor } from '../public/js/screen-fx.js?v=g378-1';
 
 describe('loading card status and hub split (LoadingLocationView.as)', () => {
   it('uses the client status labels with the TimerBar percent', () => {
@@ -223,7 +224,7 @@ import {
   polGradient,
   polNeighbours,
   polVisitLine,
-} from '../public/js/screen-fx.js?v=card-2';
+} from '../public/js/screen-fx.js?v=g378-1';
 
 describe('home loading card (G249, LoadingLocationPOLView.as)', () => {
   it('names the place as setText does (215-235)', () => {
@@ -303,7 +304,7 @@ describe('home loading card (G249, LoadingLocationPOLView.as)', () => {
 
 describe('home loading card on a narrow screen', () => {
   it('scales the holder and the fill to fit with 16 px gutters', async () => {
-    const { polCardScale } = await import('../public/js/screen-fx.js?v=card-2');
+    const { polCardScale } = await import('../public/js/screen-fx.js?v=g378-1');
     const house = polCardLayout('interior');
     assert.equal(polCardScale(house, 1280), 1);
     assert.equal(polCardScale(house, 390), (390 - 32) / 616);

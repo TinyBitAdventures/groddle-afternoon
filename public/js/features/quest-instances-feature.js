@@ -86,8 +86,8 @@ import {
 import { parseQuestConversation } from '../quests.js';
 import { getQuestCatalog } from '../content-catalogs.js';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { runStreetTransition } from '../screen-fx.js?v=card-2';
-import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=card-2';
+import { runStreetTransition } from '../screen-fx.js?v=g378-1';
+import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=g378-1';
 import { applyFamiliarLook, familiarLook } from '../familiar.js?v=g225-1';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js';
 import { sourceFromUrl } from '../textures.js';

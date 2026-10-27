@@ -19,12 +19,87 @@ export const LOAD_FADE_IN = 0.45;
 export const LOAD_FADE_OUT = 0.85;
 /** Pause after street is ready, before fade-out (ms). */
 export const LOAD_HOLD_MS = 480;
-/** BaseScreenView award timings. */
-export const AWARD_FADE_IN = 0.45;
-export const AWARD_FADE_OUT = 0.4;
-/** Minimum on-screen time for award/new-day — not dismissible early. */
-export const AWARD_HOLD_MS = 3800;
-export const NEW_DAY_HOLD_MS = 4500;
+/** BaseScreenView.as 33-34 fade_in_secs / fade_out_secs (tweens 109 and 153). */
+export const AWARD_FADE_IN = 0.4;
+export const AWARD_FADE_OUT = 0.3;
+/**
+ * Award and new-day screens stay up until the player closes them: BaseScreenView
+ * has no timer, only onOkClick (171-173) from the OK button, Enter or Escape
+ * (224-226). These holds are for QA only (awardAutoCloseMs), so headless
+ * autoplay runs still finish.
+ */
+export const AWARD_QA_HOLD_MS = 3800;
+export const NEW_DAY_QA_HOLD_MS = 4500;
+
+/**
+ * Each screen's OK button. AchievementView.as 117-124, LevelUpView.as 83-89,
+ * CollectionCompleteView.as 98-104, NewDayView.as 112-118 (the Facebook and
+ * Twitter share buttons of AchievementView 129-160 are left out). Screens the
+ * client never had (quest cards, Feats, Cubimal boxes, emblems) use their
+ * payload's primaryLabel, else 'OK'.
+ */
+export const AWARD_BUTTON_LABELS = Object.freeze({
+  achievement: 'OK, Good!',
+  level: 'Sweet sweetness...',
+  collection: 'Alllllright!',
+  newDay: 'Onwards and upwards!',
+});
+
+/**
+ * When each OK button animates in (seconds after the screen starts): delay and
+ * time of its tween, 40 px up with easeOutBounce (offset 40), except the
+ * level-up button, which only fades (LevelUpView.as 257-258).
+ * AchievementView.as 511-517, CollectionCompleteView.as 273-276, NewDayView.as 566-569.
+ * Input is ready well before: once the .4 s fade-in ends (BaseScreenView.as 119-121).
+ */
+export const AWARD_BUTTON_IN = Object.freeze({
+  achievement: Object.freeze({ delay: 1.5, time: 0.4, rise: 40 }),
+  level: Object.freeze({ delay: 1.2, time: 0.5, rise: 0 }),
+  collection: Object.freeze({ delay: 1.3, time: 0.4, rise: 40 }),
+  newDay: Object.freeze({ delay: 1.3, time: 0.4, rise: 40 }),
+  other: Object.freeze({ delay: 1.5, time: 0.4, rise: 40 }),
+});
+
+/** Which screen an award payload is: achievement, level, collection (trophies) or other. */
+export function awardScreenKind(payload = {}) {
+  if (payload.screen && AWARD_BUTTON_IN[payload.screen]) return payload.screen;
+  if (payload.kind === 'achievement') return 'achievement';
+  if (payload.kind === 'level') return 'level';
+  return 'other';
+}
+
+/** The OK button's label for an award payload (AWARD_BUTTON_LABELS, else primaryLabel, else OK). */
+export function awardButtonLabel(payload = {}) {
+  const screen = awardScreenKind(payload);
+  return AWARD_BUTTON_LABELS[screen] || String(payload.primaryLabel || '').trim() || 'OK';
+}
+
+/**
+ * QA only: how long an award or new-day screen waits before closing itself,
+ * or null (the game's default: it waits for the player).
+ * `&awardautoclose=1` uses the QA hold, `=<ms>` that many ms, `=0` never;
+ * without it, any `*autoplay` route (jobautoplay, questautoplay, ...) closes
+ * screens after the QA hold, as they did before, so autoplay runs finish.
+ */
+export function awardAutoCloseMs(search = globalThis.location?.search || '', { newDay = false } = {}) {
+  let params;
+  try {
+    params = new URLSearchParams(search);
+  } catch {
+    return null;
+  }
+  const hold = newDay ? NEW_DAY_QA_HOLD_MS : AWARD_QA_HOLD_MS;
+  if (params.has('awardautoclose')) {
+    const raw = String(params.get('awardautoclose') || '').trim();
+    if (raw === '0' || raw === 'off' || raw === 'false') return null;
+    const ms = Number(raw);
+    return Number.isFinite(ms) && ms > 1 ? ms : hold;
+  }
+  for (const [key, value] of params) {
+    if (/autoplay$/i.test(key) && value !== '' && value !== '0') return hold;
+  }
+  return null;
+}
 
 /**
  * Street loading cards in flight (G192). The client holds prompts, quest
@@ -268,10 +343,10 @@ export function awardRewardTokens(subtitle = '') {
  * @param {HTMLElement} el
  * @param {{ show: boolean, durationSec: number }} opts
  */
-export async function crossfadeElement(el, { show, durationSec }) {
+export async function crossfadeElement(el, { show, durationSec, easing = 'cubic-bezier(0.55, 0.06, 0.68, 0.19)' }) {
   if (!el) return;
   el.hidden = false;
-  el.style.transition = `opacity ${durationSec}s cubic-bezier(0.55, 0.06, 0.68, 0.19)`; // easeInCubic-ish
+  el.style.transition = `opacity ${durationSec}s ${easing}`; // easeInCubic-ish by default (LoadingLocationView)
   await nextFrame();
   if (show) {
     el.classList.add('is-visible');
@@ -903,130 +978,204 @@ export function startFamiliarDrop(fam, { status = '', body = '', name = '' } = {
   };
 }
 
+/** Keys whose browser default (scrolling the page) a screen with the keyboard stops. */
+const SCREEN_NAV_KEYS = new Set([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Home', 'End']);
+
+/** A text field outside the screen (the online chat box) keeps its own keys. */
+function typingElsewhere(event, el) {
+  const t = event?.target;
+  return Boolean(t?.closest?.('input, textarea, select, [contenteditable="true"]') && !el?.contains?.(t));
+}
+
 /**
- * Full-screen award / quest complete celebration.
- * @param {HTMLElement} el  #award-screen
- * @param {{
- *   kind?: 'achievement'|'quest'|'level'|'generic',
- *   title: string,
- *   subtitle?: string,
- *   body?: string,
- *   iconUrl?: string|null,
- *   holdMs?: number,
- *   steps?: Array<{text?: string, response?: string}>,
- *   primaryLabel?: string,
- *   onPage?: (page: {index: number, total: number, final: boolean}) => void,
- *   onDismiss?: () => void,
- * }} payload
+ * The input of one award or new-day screen (BaseScreenView.as).
+ * - It takes the keyboard while it is up, fading included: TSFrontController
+ *   requestFocus blurs the location (TSMainView.as blur 538-555 stops the
+ *   avatar's key control and LocationInputHandler), so no key reaches the
+ *   avatar, the hotkeys or the features (a capture listener on window, ahead
+ *   of theirs). Key-ups pass, so a key held before the screen does not stick.
+ * - Enter and Escape call onOkClick (startListeningForControlEvts 224-226),
+ *   the OK button too (each view's ok_bt CLICK); clicks anywhere else on the
+ *   screen do nothing.
+ * - onOkClick closes only once ready_for_input (171-173), which onAnimateComplete
+ *   sets when the fade-in ends (99-121); earlier presses and clicks are ignored.
+ * - KeyBeacon fires KEY_DOWN_ once per press (KeyBeacon.as 296-302) and a
+ *   Shift/Ctrl/Alt press is a different key there (289-295): a held or
+ *   modified Enter does not close it.
+ * Returns { done, ready, close, release }: `done` resolves with how it closed.
  */
-export async function showAwardScreen(el, payload) {
-  if (!el) return;
-  const kind = payload.kind || 'generic';
-  const kicker = el.querySelector('[data-award-kicker]');
-  const title = el.querySelector('[data-award-title]');
-  const body = el.querySelector('[data-award-body]');
-  const badge = el.querySelector('[data-award-badge]');
-  const glyph = el.querySelector('[data-award-glyph]');
-  const img = el.querySelector('[data-award-img]');
-  const sub = el.querySelector('[data-award-sub]');
-  const next = el.querySelector('[data-award-next]');
-  const close = el.querySelector('[data-award-close]');
-  const pages = normalizeAwardPages(payload);
-  const paged = pages.length > 0 && next;
-
-  const kickers = {
-    achievement: 'New Achievement!',
-    quest: 'Quest Complete!',
-    level: 'Level Up!',
-    generic: 'Well done!',
+export function screenInput(el, { button = null, win = globalThis.window } = {}) {
+  let isReady = false;
+  let closed = false;
+  let resolveDone = () => {};
+  const done = new Promise((resolve) => {
+    resolveDone = resolve;
+  });
+  const close = (how = 'button') => {
+    if (!isReady || closed) return false;
+    closed = true;
+    el.dataset.awardInput = 'closing';
+    el.dataset.awardClosedBy = how;
+    resolveDone(how);
+    return true;
   };
-  if (kicker) kicker.textContent = kickers[kind] || kickers.generic;
-  const bodyText = awardText(payload.body);
-  if (title) title.textContent = awardText(payload.title);
-  if (body) {
-    body.textContent = bodyText;
-    body.hidden = !bodyText;
-  }
-  if (sub) {
-    // Crossfades are non-skippable — no "click to dismiss" cue
-    sub.textContent = awardText(payload.subtitle);
-    sub.classList.remove('has-reward-tokens');
-    sub.hidden = !payload.subtitle || Boolean(paged);
-  }
-  if (next) next.hidden = true;
-  if (close) close.hidden = true;
-  if (badge) {
-    badge.dataset.kind = kind;
-  }
-  // Real badge PNG when available (Wayback / assets/badges)
-  if (img && glyph) {
-    if (payload.iconUrl) {
-      img.hidden = false;
-      img.alt = payload.title || 'Badge';
-      img.src = payload.iconUrl;
-      glyph.hidden = true;
-      img.onerror = () => {
-        img.hidden = true;
-        glyph.hidden = false;
-        glyph.textContent =
-          kind === 'quest' ? '✓' : kind === 'level' ? '★' : kind === 'achievement' ? '◉' : '✦';
-      };
-    } else {
-      img.hidden = true;
-      img.removeAttribute('src');
-      glyph.hidden = false;
-      glyph.textContent =
-        kind === 'quest' ? '✓' : kind === 'level' ? '★' : kind === 'achievement' ? '◉' : '✦';
+  const onKey = (event) => {
+    if (typingElsewhere(event, el)) return;
+    event.stopImmediatePropagation();
+    const plain = !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey;
+    if (event.type === 'keydown' && plain && (event.key === 'Enter' || event.key === 'Escape')) {
+      event.preventDefault();
+      if (!event.repeat) close(event.key === 'Enter' ? 'enter' : 'escape');
+      return;
     }
-  } else if (badge && !img) {
-    badge.textContent =
-      kind === 'quest' ? '✓' : kind === 'level' ? '★' : kind === 'achievement' ? '◉' : '✦';
-  }
+    if (SCREEN_NAV_KEYS.has(event.key) || event.key === 'Enter') event.preventDefault();
+  };
+  const onClick = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (button && (event.target === button || button.contains?.(event.target))) close('button');
+  };
+  win?.addEventListener?.('keydown', onKey, true);
+  win?.addEventListener?.('keypress', onKey, true);
+  el.addEventListener('click', onClick);
+  el.dataset.awardInput = 'waiting';
+  delete el.dataset.awardClosedBy;
+  return {
+    done,
+    ready() {
+      if (closed) return;
+      isReady = true;
+      el.dataset.awardInput = 'ready';
+    },
+    close,
+    release() {
+      win?.removeEventListener?.('keydown', onKey, true);
+      win?.removeEventListener?.('keypress', onKey, true);
+      el.removeEventListener('click', onClick);
+      el.dataset.awardInput = 'closed';
+    },
+  };
+}
 
-  el.dataset.kind = kind;
-  // G219: a badge (an achievement with a class) brings the familiar along.
-  const fam = el.querySelector('[data-award-familiar]');
-  const withFamiliar = Boolean(fam) && kind === 'achievement' && Boolean(payload.classTsid) && !paged;
-  let stopFamiliar = () => {};
-  if (fam) fam.hidden = !withFamiliar;
-  el.dataset.familiar = withFamiliar ? 'true' : 'false';
-  if (withFamiliar) {
-    stopFamiliar = startFamiliarDrop(fam, {
-      status: payload.status || '',
-      body: bodyText,
-      name: awardText(payload.title),
-    });
-  }
-  if (paged) {
-    el.dataset.paged = 'true';
-    el.dataset.pages = String(pages.length);
-  } else {
-    delete el.dataset.paged;
-    delete el.dataset.page;
-    delete el.dataset.pages;
-  }
+/** Sets the OK button's label and its entrance (AWARD_BUTTON_IN) for one screen. */
+function prepareOkButton(button, label, screen) {
+  if (!button) return;
+  const anim = AWARD_BUTTON_IN[screen] || AWARD_BUTTON_IN.other;
+  button.textContent = label;
+  button.disabled = false;
+  button.removeAttribute('aria-disabled');
+  button.hidden = false;
+  button.style.setProperty('--award-ok-delay', `${anim.delay}s`);
+  button.style.setProperty('--award-ok-time', `${anim.time}s`);
+  button.style.setProperty('--award-ok-rise', `${anim.rise}px`);
+  button.dataset.awardOk = anim.rise ? 'bounce' : 'fade';
+}
+
+/** BaseScreenView.as 109 and 153: the screen fades with a linear tween. */
+const SCREEN_EASING = 'linear';
+
+/**
+ * Resolves once `el` is drawn fully opaque (at most `maxMs` more): ready_for_input
+ * comes with the end of the fade-in tween (onAnimateComplete), so a slow frame
+ * that holds the CSS fade back holds input back too.
+ */
+function opaqueSettled(el, maxMs = 1000) {
+  const cs = globalThis.getComputedStyle;
+  const raf = globalThis.requestAnimationFrame;
+  if (typeof cs !== 'function' || typeof raf !== 'function') return Promise.resolve();
+  return new Promise((resolve) => {
+    let done = false;
+    // A hidden tab runs no frames: the cap still frees the input.
+    const cap = setTimeout(() => finish(), maxMs);
+    const finish = () => {
+      if (done) return;
+      done = true;
+      clearTimeout(cap);
+      resolve();
+    };
+    const check = () => {
+      if (done) return;
+      let op = 1;
+      try {
+        op = Number(cs(el).opacity);
+      } catch {
+        op = 1;
+      }
+      if (!(op < 0.99)) finish();
+      else raf(check);
+    };
+    check();
+  });
+}
+
+/**
+ * Shows a BaseScreenView-style screen and waits for the player: fade in
+ * (AWARD_FADE_IN), ready, then the OK button, Enter or Escape, then fade out
+ * (AWARD_FADE_OUT, done 151-154). `autoCloseMs` (QA) closes it after that long.
+ * Resolves with how it closed: 'button', 'enter', 'escape' or 'auto'.
+ */
+export async function holdScreenUntilDismissed(el, { button = null, autoCloseMs = null, onReady = null } = {}) {
+  if (!el) return '';
+  const input = screenInput(el, { button });
   el.style.pointerEvents = 'auto';
-  // Swallow clicks/keys so they don't hit the world underneath.
+  let timer = 0;
+  try {
+    await crossfadeElement(el, { show: true, durationSec: AWARD_FADE_IN, easing: SCREEN_EASING });
+    await opaqueSettled(el);
+    input.ready();
+    button?.focus?.({ preventScroll: true });
+    onReady?.();
+    if (Number.isFinite(autoCloseMs) && autoCloseMs >= 0) {
+      timer = setTimeout(() => input.close('auto'), Math.max(0, autoCloseMs - AWARD_FADE_IN * 1000));
+    }
+    const how = await input.done;
+    clearTimeout(timer);
+    if (button && globalThis.document?.activeElement === button) button.blur?.();
+    await crossfadeElement(el, { show: false, durationSec: AWARD_FADE_OUT, easing: SCREEN_EASING });
+    return how;
+  } finally {
+    clearTimeout(timer);
+    input.release();
+  }
+}
+
+/**
+ * New Day (NewDayView.as): the same screen rules, its button 'Onwards and
+ * upwards!' (112-118). Enter mid-count closes it too: NewDayView keeps
+ * onOkClick and onDoneTweenComplete stops the energy count (216-222).
+ */
+export async function showNewDayScreen(el, { button = el?.querySelector?.('[data-nd-ok]') || null, autoCloseMs = awardAutoCloseMs(undefined, { newDay: true }) } = {}) {
+  if (!el) return '';
+  prepareOkButton(button, AWARD_BUTTON_LABELS.newDay, 'newDay');
+  return holdScreenUntilDismissed(el, { button, autoCloseMs });
+}
+
+/**
+ * The player-paced quest completion (the quest book card with its page
+ * buttons): it waits for the last page's button or the close control. While
+ * it is up it has the keyboard like the other screens (screenInput); Tab and
+ * Enter or Space on its own buttons still work.
+ */
+async function showAwardPages(el, { payload, pages, next, close, body, sub }) {
+  const win = globalThis.window;
   const swallow = (e) => {
     e.preventDefault();
     e.stopPropagation();
   };
+  const pagedKey = (event) => {
+    if (typingElsewhere(event, el)) return;
+    event.stopImmediatePropagation();
+    const onButton = event.target === next || event.target === close;
+    if (onButton && (event.key === 'Enter' || event.key === ' ' || event.code === 'Space')) return;
+    if (event.key === 'Tab') return;
+    event.preventDefault();
+  };
+  el.style.pointerEvents = 'auto';
   el.addEventListener('click', swallow);
-
-  await crossfadeElement(el, { show: true, durationSec: AWARD_FADE_IN });
-
-  if (paged) {
-    const swallowPagedKey = (event) => {
-      if (
-        (event.target === next || event.target === close) &&
-        (event.key === 'Enter' || event.key === ' ' || event.code === 'Space')
-      ) {
-        event.stopPropagation();
-        return;
-      }
-      swallow(event);
-    };
-    el.addEventListener('keydown', swallowPagedKey);
+  win?.addEventListener?.('keydown', pagedKey, true);
+  win?.addEventListener?.('keypress', pagedKey, true);
+  try {
+    await crossfadeElement(el, { show: true, durationSec: AWARD_FADE_IN, easing: SCREEN_EASING });
     let pageIndex = 0;
     const renderPage = () => {
       const page = pages[pageIndex];
@@ -1079,17 +1228,130 @@ export async function showAwardScreen(el, payload) {
       next.addEventListener('click', advance);
       close?.addEventListener('click', finish);
     });
-    el.removeEventListener('keydown', swallowPagedKey);
-  } else {
-    el.addEventListener('keydown', swallow);
-    const hold = payload.holdMs ?? AWARD_HOLD_MS;
-    await wait(hold);
-    el.removeEventListener('keydown', swallow);
+    el.removeEventListener('click', swallow);
+    await crossfadeElement(el, { show: false, durationSec: AWARD_FADE_OUT, easing: SCREEN_EASING });
+  } finally {
+    el.removeEventListener('click', swallow);
+    win?.removeEventListener?.('keydown', pagedKey, true);
+    win?.removeEventListener?.('keypress', pagedKey, true);
+  }
+}
+
+/**
+ * Full-screen award / quest complete celebration. It stays until the player
+ * closes it (holdScreenUntilDismissed: its OK button, Enter or Escape once the
+ * fade-in is done); paged quest completions wait for their page buttons.
+ * @param {HTMLElement} el  #award-screen
+ * @param {{
+ *   kind?: 'achievement'|'quest'|'level'|'generic'|'feat'|'badge',
+ *   screen?: 'achievement'|'level'|'collection',
+ *   title: string,
+ *   subtitle?: string,
+ *   body?: string,
+ *   iconUrl?: string|null,
+ *   steps?: Array<{text?: string, response?: string}>,
+ *   primaryLabel?: string,
+ *   onPage?: (page: {index: number, total: number, final: boolean}) => void,
+ *   onDismiss?: () => void,
+ * }} payload
+ */
+export async function showAwardScreen(el, payload) {
+  if (!el) return;
+  const kind = payload.kind || 'generic';
+  const kicker = el.querySelector('[data-award-kicker]');
+  const title = el.querySelector('[data-award-title]');
+  const body = el.querySelector('[data-award-body]');
+  const badge = el.querySelector('[data-award-badge]');
+  const glyph = el.querySelector('[data-award-glyph]');
+  const img = el.querySelector('[data-award-img]');
+  const sub = el.querySelector('[data-award-sub]');
+  const next = el.querySelector('[data-award-next]');
+  const close = el.querySelector('[data-award-close]');
+  const pages = normalizeAwardPages(payload);
+  const paged = pages.length > 0 && next;
+  const screen = awardScreenKind(payload);
+
+  const kickers = {
+    achievement: 'New Achievement!',
+    quest: 'Quest Complete!',
+    level: 'Level Up!',
+    generic: 'Well done!',
+  };
+  if (kicker) kicker.textContent = kickers[kind] || kickers.generic;
+  const bodyText = awardText(payload.body);
+  if (title) title.textContent = awardText(payload.title);
+  if (body) {
+    body.textContent = bodyText;
+    body.hidden = !bodyText;
+  }
+  if (sub) {
+    sub.textContent = awardText(payload.subtitle);
+    sub.classList.remove('has-reward-tokens');
+    sub.hidden = !payload.subtitle || Boolean(paged);
+  }
+  if (next) next.hidden = true;
+  if (close) close.hidden = true;
+  if (badge) {
+    badge.dataset.kind = kind;
+  }
+  // Real badge PNG when available (Wayback / assets/badges)
+  if (img && glyph) {
+    if (payload.iconUrl) {
+      img.hidden = false;
+      img.alt = payload.title || 'Badge';
+      img.src = payload.iconUrl;
+      glyph.hidden = true;
+      img.onerror = () => {
+        img.hidden = true;
+        glyph.hidden = false;
+        glyph.textContent =
+          kind === 'quest' ? '✓' : kind === 'level' ? '★' : kind === 'achievement' ? '◉' : '✦';
+      };
+    } else {
+      img.hidden = true;
+      img.removeAttribute('src');
+      glyph.hidden = false;
+      glyph.textContent =
+        kind === 'quest' ? '✓' : kind === 'level' ? '★' : kind === 'achievement' ? '◉' : '✦';
+    }
+  } else if (badge && !img) {
+    badge.textContent =
+      kind === 'quest' ? '✓' : kind === 'level' ? '★' : kind === 'achievement' ? '◉' : '✦';
   }
 
-  el.removeEventListener('click', swallow);
+  el.dataset.kind = kind;
+  // G219: a badge (an achievement with a class) brings the familiar along.
+  const fam = el.querySelector('[data-award-familiar]');
+  // CollectionCompleteView (a trophy) has no familiar.
+  const withFamiliar = Boolean(fam) && kind === 'achievement' && Boolean(payload.classTsid) && !paged && screen !== 'collection';
+  let stopFamiliar = () => {};
+  if (fam) fam.hidden = !withFamiliar;
+  el.dataset.familiar = withFamiliar ? 'true' : 'false';
+  if (withFamiliar) {
+    stopFamiliar = startFamiliarDrop(fam, {
+      status: payload.status || '',
+      body: bodyText,
+      name: awardText(payload.title),
+    });
+  }
+  if (paged) {
+    el.dataset.paged = 'true';
+    el.dataset.pages = String(pages.length);
+  } else {
+    delete el.dataset.paged;
+    delete el.dataset.page;
+    delete el.dataset.pages;
+  }
+  el.dataset.screen = paged ? 'pages' : screen;
+  if (paged) {
+    await showAwardPages(el, { payload, pages, next, close, body, sub });
+  } else {
+    el.dataset.okin = 'true';
+    prepareOkButton(next, awardButtonLabel(payload), screen);
+    await holdScreenUntilDismissed(el, { button: next, autoCloseMs: awardAutoCloseMs() });
+    delete el.dataset.okin;
+  }
 
-  await crossfadeElement(el, { show: false, durationSec: AWARD_FADE_OUT });
   stopFamiliar();
   if (fam) fam.hidden = true;
   if (next) next.hidden = true;
