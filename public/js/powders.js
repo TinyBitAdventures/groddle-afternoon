@@ -20,7 +20,7 @@
  * - krazy_salts.js verbs.push.
  */
 
-import { fruitCapacityAt } from './trants.js?v=trant-harvest-2';
+import { trantFruitCycle } from './trant-care.js?v=g374-1';
 
 /** One powder: its single verb, charges, sound and the verb's own tooltip. */
 const powder = (verb, label, tooltip, sound, extra = {}) => Object.freeze({ verb, label, tooltip, sound, maxCharges: 5, ...extra });
@@ -200,7 +200,8 @@ export function isFertileTree(classId) {
 
 /**
  * onFertilidust: a trant grows one maturity step below 10 and goes to full
- * health (health 9, then plusHealth); a Wood Tree grows one step below 6.
+ * health (health 9, then plusHealth, which regrows its fruit); a Wood Tree
+ * grows one step below 6.
  * Mutates the tree's state; returns true when anything changed.
  */
 export function fertilizeTree(classId, state) {
@@ -213,7 +214,8 @@ export function fertilizeTree(classId, state) {
     const m = Math.floor(Number(state.maturity) || 0);
     if (m < 10) state.maturity = m + 1;
     state.health = 10;
-    state.fruitCapacity = fruitCapacityAt(classId, state.maturity, state.health);
+    // include/trants.js 1236-1244: health 9, then plusHealth, whose onFruitCycle regrows the fruit.
+    trantFruitCycle(state, classId);
   } else {
     return false;
   }

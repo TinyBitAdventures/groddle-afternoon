@@ -37,6 +37,7 @@
  */
 
 import { MACHINE_ART_LOOPERS, MACHINE_ART_SHEETS } from './machine-art-sheets.js';
+import { SPLIT_SPRITES } from './sprite-hires.js';
 
 export { MACHINE_ART_SHEETS };
 
@@ -167,34 +168,79 @@ export function machineSheetDef(classTsid) {
 /* ------------------------------------------------------------------ DOM */
 
 /**
+ * The 3x parts of a machine's sheet (tools/vector-sprites/machines.json, rendered
+ * from each SWF's animatee clip; js/sprite-hires.js SPLIT_SPRITES) when the Make
+ * panel would stretch the 1x art: more than one device pixel per art pixel
+ * (devicePixelRatio x the panel scale), as the Make panel's tool sheets switch
+ * to their 3x renders above 1x (tools/build-make-tool-sheets.py density_for).
+ * Each part is [url, first frame, frame count, columns]. Null keeps the 1x sheet.
+ */
+export function machineHiresParts(classTsid, dpr = globalThis.devicePixelRatio || 1) {
+  const s = MACHINE_ART_SHEETS[classTsid];
+  const split = s ? SPLIT_SPRITES.get(s.url) : null;
+  if (!split?.parts?.length || !(Number(dpr) * s.scale > 1)) return null;
+  return split.parts;
+}
+
+/** CSS background (image, size, position) that shows frame k from the 1x sheet or its 3x part. */
+export function machineFrameBackground(classTsid, k, parts = null) {
+  const s = MACHINE_ART_SHEETS[classTsid];
+  if (!s || k < 0) return null;
+  const part = parts?.find(([, from, count]) => k >= from && k < from + count);
+  if (part) {
+    const [url, from, count, cols] = part;
+    const j = k - from;
+    return {
+      image: `url('${url}')`,
+      size: `${cols * s.fw}px ${Math.ceil(count / cols) * s.fh}px`,
+      position: `${-(j % cols) * s.fw}px ${-Math.floor(j / cols) * s.fh}px`,
+    };
+  }
+  const r = machineFrameRect(classTsid, k);
+  return {
+    image: `url('${s.url}')`,
+    size: `${s.cols * s.fw}px ${Math.ceil(s.frames / s.cols) * s.fh}px`,
+    position: `${-r.x}px ${-r.y}px`,
+  };
+}
+
+/**
  * A span that shows one frame of a machine's sheet (the Make panel). The
  * caller moves it with setMachineArtFrame. Null for anything else.
  */
-export function machineArtHtml(classTsid, { className = 'mp-tool mp-tool-machine', label = '' } = {}) {
+export function machineArtHtml(classTsid, { className = 'mp-tool mp-tool-machine', label = '', dpr } = {}) {
   const s = MACHINE_ART_SHEETS[classTsid];
   if (!s) return null;
-  const rows = Math.ceil(s.frames / s.cols);
+  const parts = machineHiresParts(classTsid, dpr);
+  const bg = machineFrameBackground(classTsid, 0, parts);
   const style = [
     `width:${s.fw}px`,
     `height:${s.fh}px`,
-    `background-image:url('${s.url}')`,
-    `background-size:${s.cols * s.fw}px ${rows * s.fh}px`,
-    'background-position:0 0',
+    `background-image:${bg.image}`,
+    `background-size:${bg.size}`,
+    parts ? `background-position:${bg.position}` : 'background-position:0 0',
     'background-repeat:no-repeat',
     `--mp-scale:${s.scale}`,
   ].join(';');
   const aria = label ? ` role="img" aria-label="${label.replace(/[<>&"]/g, '')}"` : ' aria-hidden="true"';
-  return `<span class="${className}" data-machine-art="${classTsid}" data-machine-state="assembled"${aria} style="${style}"></span>`;
+  const hires = parts ? ` data-machine-hires="3" data-machine-part="${bg.image.replace(/"/g, '')}"` : '';
+  return `<span class="${className}" data-machine-art="${classTsid}" data-machine-state="assembled"${hires}${aria} style="${style}"></span>`;
 }
 
 /** Show `state`, `ms` after it began, on a span from machineArtHtml. */
 export function setMachineArtFrame(el, state, ms) {
   const cls = el?.dataset?.machineArt;
   const k = machineFrame(cls, state, ms);
-  const r = machineFrameRect(cls, k);
-  if (!r) return;
-  const pos = `${-r.x}px ${-r.y}px`;
-  if (el.style.backgroundPosition !== pos) el.style.backgroundPosition = pos;
+  const parts = el?.dataset?.machineHires ? machineHiresParts(cls, Infinity) : null;
+  const bg = machineFrameBackground(cls, k, parts);
+  if (!bg) return;
+  // A split sheet's frames sit in more than one file (browsers rewrite url('') quotes, so compare our own copy).
+  if (parts && el.dataset.machinePart !== bg.image) {
+    el.dataset.machinePart = bg.image;
+    el.style.backgroundImage = bg.image;
+    el.style.backgroundSize = bg.size;
+  }
+  if (el.style.backgroundPosition !== bg.position) el.style.backgroundPosition = bg.position;
   if (el.dataset.machineState !== state) el.dataset.machineState = state;
 }
 

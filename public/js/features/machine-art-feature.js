@@ -21,7 +21,7 @@
 import { addItem, countItem } from '../inventory.js?v=catalog-unified-7';
 import { ensureToolCondition } from '../tools.js?v=woodcutting-test-3';
 import { MACHINE_SKILLS } from '../machine-rooms.js?v=g175-1';
-import { freezeMachineState, isMachineArt } from '../machine-art.js?v=g193-1';
+import { freezeMachineState, isMachineArt } from '../machine-art.js?v=g374-1';
 
 export const MACHINE_ART_FEATURE_ID = 'machine-art';
 

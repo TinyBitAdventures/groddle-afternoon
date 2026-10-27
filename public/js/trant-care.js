@@ -10,7 +10,7 @@
  */
 
 import { TOOL_CONDITION_CATALOG, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-3';
-import { fruitCapacityAt } from './trants.js?v=trant-harvest-2';
+import { fruitCapacityAt, fruitProductionAt } from './trants.js?v=trant-harvest-2';
 import { scaledToolWear, toolWearMultiplier } from './imagination-effects.js';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
@@ -110,11 +110,29 @@ export function quoteTrantCare(state, classId, kind, ctx = {}) {
 }
 
 /**
+ * include/trants.js onFruitCycle (1043-1054), called from plusHealth (697-704):
+ * refresh the capacity for the tree's maturity and health, then push the
+ * fruitProdMap cell's fruit back on, never past the capacity (pushFruit 466-473).
+ * This is the only way a living trant regrows fruit after initTrant fills it
+ * (518); nothing in GSJS refills trees at the new game day.
+ * Returns the fruit added.
+ */
+export function trantFruitCycle(state, classId = state?.classTsid) {
+  if (!state) return 0;
+  const cap = fruitCapacityAt(classId, state.maturity, state.health);
+  state.fruitCapacity = cap;
+  const before = Math.min(cap, Math.max(0, Number(state.fruitCount) || 0));
+  const push = fruitProductionAt(classId, state.maturity, state.health);
+  state.fruitCount = Math.min(cap, before + Math.max(0, push));
+  return state.fruitCount - before;
+}
+
+/**
  * Commit one tending attempt. The success roll comes first, as in
  * finishSkillPackage: a failure spends no energy and no Watering Can wear; a
  * failed living-trant pet loses its mood bonus (include/trants.js onPetComplete).
  * Health rises once a period, when the tree has been both petted and watered
- * (include/trants.js performTending).
+ * (include/trants.js performTending), and that health tick regrows the fruit.
  */
 export function performTrantCare(state, classId, kind, ctx = {}) {
   const quote = quoteTrantCare(state, classId, kind, ctx);
@@ -151,12 +169,16 @@ export function performTrantCare(state, classId, kind, ctx = {}) {
     ? useToolCondition(ctx.tools, toolId, wear)
     : null;
   state[flag] = true;
+  let fruitAdded = 0;
   if (classId !== 'wood_tree') {
     if (state.petted && state.watered) {
+      // performTending (670-684): plusHealth, which runs onFruitCycle.
       state.health = Math.max(1, Math.min(10, (Number(state.health) || 5) + 1));
+      fruitAdded = trantFruitCycle(state, classId);
+    } else {
+      state.fruitCapacity = fruitCapacityAt(classId, state.maturity, state.health);
+      state.fruitCount = Math.min(state.fruitCapacity, Math.max(0, Number(state.fruitCount) || 0));
     }
-    state.fruitCapacity = fruitCapacityAt(classId, state.maturity, state.health);
-    state.fruitCount = Math.min(state.fruitCapacity, Math.max(0, Number(state.fruitCount) || 0));
   }
   const moodBefore = Number(pc.mood) || 0;
   // G259: mood_bonus is metabolics_add_mood (inc_skill_packages.js 524), refused while dead.
@@ -170,6 +192,7 @@ export function performTrantCare(state, classId, kind, ctx = {}) {
     success: true,
     profile,
     toolUse,
+    fruitAdded,
     effects: { energy: -profile.energyCost, mood, xp },
     msg: `Thanks for ${kind === 'water' ? 'watering' : 'petting'}!`,
   };

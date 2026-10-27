@@ -29,19 +29,21 @@ import {
   isMachineArt,
   machineArtHtml,
   machineFrame,
+  machineFrameBackground,
   machineFrameRect,
+  machineHiresParts,
   machineSheetDef,
   packHandOverState,
   packMakeState,
   roomMachineState,
   setMachineArtFrame,
-} from '../public/js/machine-art.js?v=g193-1';
+} from '../public/js/machine-art.js?v=g374-1';
 import { MACHINE_IDS } from '../public/js/machines.js';
 import { MACHINE_EXTRA_WAIT_MS, machineTank, tankFuel } from '../public/js/machine-rooms.js';
 import { craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=g300-2';
 import { platformsScreen } from '../public/js/street-model.js';
-import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=g300-1';
-import { machineArtFeature } from '../public/js/features/machine-art-feature.js?v=g300-1';
+import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=g374-1';
+import { machineArtFeature } from '../public/js/features/machine-art-feature.js?v=g374-1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -236,7 +238,7 @@ describe('G193 machine art: which state shows when', () => {
 describe('G193 machine art: wiring', () => {
   it('room machines draw the states and lost the wobble and drawn light', () => {
     const src = read('js/features/machine-rooms-feature.js');
-    assert.match(src, /from '\.\.\/machine-art\.js\?v=g193-1'/);
+    assert.match(src, /from '\.\.\/machine-art\.js\?v=g374-1'/);
     assert.match(src, /roomMachineState\(\{ job, waiting, collectedAt: collectedAt\[m\.def\.id\] \}, t\)/);
     assert.match(src, /m\.sprite\.texture = m\.frames\[k\]/);
     assert.doesNotMatch(src, /sprite\.rotation|light\.circle|blinkReadyLight: the ready state/);
@@ -245,7 +247,7 @@ describe('G193 machine art: wiring', () => {
   it('the Make panel plays a pack machine\'s states and its hand-over', () => {
     const game = read('game.js');
     const css = read('style.css');
-    assert.match(game, /import \{[^}]*machineArtHtml[^}]*\} from '\.\/js\/machine-art\.js\?v=g193-1'/);
+    assert.match(game, /import \{[^}]*machineArtHtml[^}]*\} from '\.\/js\/machine-art\.js\?v=g374-1'/);
     assert.match(game, /\|\| machineArtHtml\(recipe\.tool, \{ label: /);
     assert.match(game, /const \{ state, since \} = packMakeState\(ms\);\n\s+setMachineArtFrame\(machineArt, state, ms - since\);/);
     assert.match(game, /playMachineHandOver\(resEl\.querySelector\('\[data-machine-art\]'\)\)/);
@@ -254,7 +256,7 @@ describe('G193 machine art: wiring', () => {
     assert.match(game, /showMakeResult\(record\.lowFuel \? \{ \.\.\.result, lowFuel: true \} : result, record\.key\)/);
     assert.match(game, /result\.lowFuel \? `<span class="mr-machine-say" role="status">\$\{LOW_FUEL_LINE\}<\/span>`/);
     assert.match(css, /\.make-progress \.mp-tool-machine,\n\.make-result \.mr-machine \{[\s\S]*?animation: none;[\s\S]*?transform: translateX\(-50%\) scale\(var\(--mp-scale\)\);/);
-    assert.match(read('js/features/index.js'), /import \{ machineArtFeature \} from '\.\/machine-art-feature\.js\?v=g300-1'; FEATURES\.push\(machineArtFeature\);/);
+    assert.match(read('js/features/index.js'), /import \{ machineArtFeature \} from '\.\/machine-art-feature\.js\?v=g374-1'; FEATURES\.push\(machineArtFeature\);/);
   });
 });
 
@@ -375,5 +377,105 @@ describe('G193 low fuel in a machine room', () => {
       machineArtFeature._reset();
     }
     assert.equal(roomMachineState({}, 0).state, 'assembled');
+  });
+});
+
+/**
+ * Root-timeline PlaceObject2 of each named character in a CWS/FWS SWF: { id, name, sx, sy } (matrix scale,
+ * 1 when the matrix has none). Data only.
+ */
+function rootPlacements(file) {
+  const raw = readFileSync(file);
+  const body = raw.toString('ascii', 0, 3) === 'CWS' ? inflateSync(raw.subarray(8)) : raw.subarray(8);
+  let i = Math.ceil((5 + 4 * (body[0] >> 3)) / 8) + 4;
+  const out = [];
+  while (i < body.length) {
+    const head = body.readUInt16LE(i); i += 2;
+    let len = head & 0x3f;
+    if (len === 0x3f) { len = body.readUInt32LE(i); i += 4; }
+    const code = head >> 6;
+    const t = body.subarray(i, i + len);
+    i += len;
+    if (code === 0) break;
+    if (code !== 26) continue;
+    const flags = t[0];
+    if (!(flags & 0x02) || !(flags & 0x20)) continue;
+    let p = 3;
+    const id = t.readUInt16LE(p); p += 2;
+    let sx = 1, sy = 1;
+    if (flags & 0x04) {
+      let bit = p * 8;
+      const read = (n) => { let v = 0; for (let k = 0; k < n; k++, bit++) v = (v << 1) | ((t[bit >> 3] >> (7 - (bit & 7))) & 1); return v; };
+      const signed = (n) => { const v = read(n); return n && v >> (n - 1) ? v - 2 ** n : v; };
+      if (read(1)) { const n = read(5); sx = signed(n) / 65536; sy = signed(n) / 65536; }
+      if (read(1)) { const n = read(5); signed(n); signed(n); }
+      const n = read(5); signed(n); signed(n);
+      p = Math.ceil(bit / 8);
+    }
+    if (flags & 0x08) continue; // a colour transform would come next (none on these placements)
+    if (flags & 0x10) p += 2;
+    const name = t.toString('latin1', p, t.indexOf(0, p));
+    out.push({ id, name, sx: +sx.toFixed(3), sy: +sy.toFixed(3) });
+  }
+  return out;
+}
+
+describe('G201 / G292 machine art: 3x parts from each animatee clip', () => {
+  const manifest = JSON.parse(readFileSync(join(spike, 'tools/vector-sprites/machines.json'), 'utf8'));
+  const results = JSON.parse(readFileSync(join(spike, 'tools/vector-sprites/results.json'), 'utf8'));
+
+  it('the Fuelmaker\'s root places its animatee at 0.9, so it renders at zoom 2.7; the other three are unscaled', { skip: !audit && 'glitch-items missing' }, () => {
+    const want = { blockmaker: [69, 'blockmaker', 1], fuelmaker: [57, 'fuelmaker', 0.9], metalmaker: [108, 'metalmaker', 1], woodworker: [45, 'woodworker_mc', 1] };
+    for (const [id, [sprite, name, scale]] of Object.entries(want)) {
+      const placed = rootPlacements(join(audit, 'glitch-items/tools', id, `${id}.swf`)).find((r) => r.id === sprite);
+      assert.ok(placed, `${id}: root places sprite ${sprite}`);
+      assert.equal(placed.name, name, id);
+      assert.equal(placed.sx, scale, `${id} scale x`);
+      assert.equal(placed.sy, scale, `${id} scale y`);
+      const job = manifest.jobs.find((j) => j.name === `machine-${id}`);
+      assert.equal(job.sprite, sprite, id);
+      assert.equal(job.zoom ?? 3, +(3 * scale).toFixed(3), `${id} zoom`);
+    }
+  });
+
+  it('all four sheets passed against the OGA recordings and ship their parts at 3x the cells', () => {
+    for (const [id, s] of Object.entries(MACHINE_ART_SHEETS)) {
+      const r = results[s.url];
+      assert.equal(r?.status, 'ok', `${id}: ${r?.reason || ''}`);
+      assert.ok(r.score >= 0.98 && r.minFrame >= 0.97, `${id} score ${r.score} min ${r.minFrame}`);
+      assert.equal(r.cells, s.frames, id);
+      let next = 0;
+      for (const part of r.parts) {
+        assert.equal(part.from, next, `${id} parts run in frame order`);
+        next += part.count;
+        assert.deepEqual(webpSize(join(pub, part.hires)), [part.cols * s.fw * 3, Math.ceil(part.count / part.cols) * s.fh * 3], part.hires);
+      }
+      assert.equal(next, s.frames, `${id} parts cover every frame`);
+    }
+    assert.equal(results[MACHINE_ART_SHEETS.fuelmaker.url].zoom, 2.7);
+  });
+
+  it('the Make panel uses the parts when it would stretch the 1x art, and moves across them', () => {
+    assert.equal(machineHiresParts('fuelmaker', 1), null, 'DPR 1: 0.64 device pixels per art pixel');
+    assert.equal(machineHiresParts('metalmaker', 2), null, 'DPR 2: 0.86');
+    assert.ok(machineHiresParts('blockmaker', 2), 'DPR 2: 1.02');
+    for (const id of Object.keys(MACHINE_ART_SHEETS)) assert.ok(machineHiresParts(id, 3), `${id} at DPR 3`);
+    assert.equal(machineHiresParts('frying_pan', 3), null);
+    assert.doesNotMatch(machineArtHtml('fuelmaker', { dpr: 1 }), /data-machine-hires/);
+    const html = machineArtHtml('blockmaker', { dpr: 3 });
+    assert.match(html, /data-machine-hires="3"/);
+    assert.match(html, /background-image:url\('assets\/sprites\/machines\/blockmaker-states\.p1@3x\.webp'\);background-size:1287px 1098px;background-position:0px 0px/);
+    const el = { dataset: { machineArt: 'blockmaker', machineHires: '3', machinePart: "url('assets/sprites/machines/blockmaker-states.p1@3x.webp')" }, style: {} };
+    const ready = MACHINE_ART_SHEETS.blockmaker.states.ready[0]; // frame 79: the second part (53-105)
+    setMachineArtFrame(el, 'ready', 0);
+    const j = ready - 53;
+    assert.equal(el.style.backgroundImage, "url('assets/sprites/machines/blockmaker-states.p2@3x.webp')");
+    assert.equal(el.style.backgroundSize, '1287px 1098px');
+    assert.equal(el.style.backgroundPosition, `${-(j % 9) * 143}px ${-Math.floor(j / 9) * 183}px`);
+    assert.deepEqual(machineFrameBackground('blockmaker', ready), {
+      image: "url('assets/sprites/machines/blockmaker-states.webp')",
+      size: '2002px 1464px',
+      position: `${-(ready % 14) * 143}px ${-Math.floor(ready / 14) * 183}px`,
+    });
   });
 });

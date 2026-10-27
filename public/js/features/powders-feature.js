@@ -83,7 +83,7 @@ import {
   sniffNoNo,
   sprinkleHallowed,
   usePowderCharge,
-} from '../powders.js?v=powders-1';
+} from '../powders.js?v=g374-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { DEAD_TRANT_CLASSES } from '../patches.js';
 import { hellFeature } from './hell-feature.js?v=hell-16';

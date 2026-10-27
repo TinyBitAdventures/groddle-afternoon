@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g369-1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g374-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-204';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-205';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -498,7 +498,7 @@ import {
   recipeToolInUse,
 } from './js/making.js?v=g300-2';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=g191-1';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=g193-1';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=g374-1';
 import {
   createGarden,
   tickGarden,
@@ -738,7 +738,7 @@ import {
   emblemRelationNote,
   formatSpeedUpTime,
 } from './js/shrines.js?v=spinning-wheel-test-4';
-import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=powders-1';
+import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=g374-1';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,
@@ -9434,7 +9434,12 @@ function refreshWoodTreeVisual(target) {
   }
 }
 
-/** Apply new-game-day to persisted trees on every visited street. */
+/**
+ * Apply new-game-day to persisted trees on every visited street: the day's
+ * harvest and tending limits only. GSJS never refills fruit at the day turn:
+ * include/trants.js pushes fruit only from initTrant (518) and plusHealth's
+ * onFruitCycle (697-704, 1043-1054), which tending runs (js/trant-care.js).
+ */
 function resetAllTrantsForNewDay() {
   let n = 0;
   const seen = new Set();
@@ -9444,8 +9449,6 @@ function resetAllTrantsForNewDay() {
       seen.add(tree.state);
       if (TRANT_META[tree.classId]) {
         resetTrantDay(tree.state);
-        // Partial refill (not full) — trees regrow overnight, not instantly full.
-        refillFruit(tree.state, 0.55 + Math.random() * 0.25);
         n += 1;
       } else if (tree.classId === 'wood_tree') {
         resetWoodTreeDay(tree.state);
@@ -10237,7 +10240,7 @@ async function maybeNewDay(opts = {}) {
   // doNewDay drops the mining gem-drop overrides.
   pc.miningDropScale = {};
   setLastNewDayTs(Date.now());
-  // Living things: reset daily care/harvest limits and regrow tree produce.
+  // Living things: reset daily care/harvest limits (fruit regrows when tended).
   const trantN = resetAllTrantsForNewDay();
   const animalN = resetAllAnimalsForNewDay();
   resetShrineDay(shrineState);
@@ -10254,7 +10257,7 @@ async function maybeNewDay(opts = {}) {
   updateHud();
   pushActivity(
     `A new day: energy refilled (+${Math.round(refill.energyGained)}) · mood restored` +
-      (trantN ? ` · ${trantN} tree${trantN === 1 ? '' : 's'} regrew` : '') +
+      (trantN ? ` · ${trantN} tree${trantN === 1 ? '' : 's'} ready for care` : '') +
       (animalN ? ` · ${animalN} animal${animalN === 1 ? '' : 's'} ready for care` : '') +
       (quoinReset.hitLimit ? ` · quoin-limit streak ${quoinReset.limitStreak}` : '')
   );

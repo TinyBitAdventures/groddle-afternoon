@@ -33,7 +33,7 @@
  *    trants.js die() / wood_tree.js onDie for a tree grown in a plot.
  */
 
-import { createTrantState, fruitCapacityAt, refillFruit, resetTrantDay } from './trants.js?v=trant-harvest-2';
+import { createTrantState, fruitCapacityAt, resetTrantDay } from './trants.js?v=trant-harvest-2';
 import { ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=g369-1';
 import { canUseTool, useToolCondition } from './tools.js?v=woodcutting-test-3';
 import { musicblockItemMeta } from './musicblocks.js';
@@ -538,7 +538,9 @@ export function growTree(plot, now = Date.now()) {
   const maturity = seedling.growLevel || GROWN_TRANT_START.maturity;
   const state = classId === 'wood_tree'
     ? ensureWoodTreeState({ maturity: Math.min(6, maturity) })
-    : createTrantState(classId, { maturity, health: seedling.health || GROWN_TRANT_START.health });
+    // patch_seedling.js growUp replaceWith: initTrant fills at maturity 1 (no fruit), then
+    // sets maturity without updateFruitCap, so a new tree has no fruit until it is tended.
+    : createTrantState(classId, { maturity, health: seedling.health || GROWN_TRANT_START.health, fruitCount: 0 });
   plot.stage = 'tree';
   plot.since = now;
   plot.dueAt = 0;
@@ -605,7 +607,8 @@ export function reviveDeadTree(plot, now = Date.now()) {
   plot.deadClass = null;
   plot.tree = {
     classId,
-    state: createTrantState(classId, { ...REVIVED_TRANT }),
+    // replaceWith runs initTrant (no fruit at maturity 1); plusHealth there pushes nothing.
+    state: createTrantState(classId, { ...REVIVED_TRANT, fruitCount: 0 }),
     grownAt: now,
     lastCycleAt: now,
     woodPetted: 0,
@@ -784,8 +787,10 @@ export function tickPlot(plot, now = Date.now(), ctx = {}) {
 }
 
 /**
- * New game day: grown trees refresh like the street's own trees. Trees on
- * streets not loaded at midnight catch up with `resetPlotDayIfStale`.
+ * New game day: grown trees refresh like the street's own trees (harvest and
+ * tending limits only: fruit regrows when the tree is tended, js/trant-care.js
+ * trantFruitCycle). Trees on streets not loaded at midnight catch up with
+ * `resetPlotDayIfStale`.
  */
 export function resetPlotDay(plot, rng = Math.random, now = Date.now()) {
   if (plot?.stage !== 'tree' || !plot.tree) return false;
@@ -794,7 +799,6 @@ export function resetPlotDay(plot, rng = Math.random, now = Date.now()) {
   if (tree.classId === 'wood_tree') resetWoodTreeDay(tree.state);
   else {
     resetTrantDay(tree.state);
-    refillFruit(tree.state, 0.55 + rng() * 0.25);
   }
   tree.seenPetted = false;
   tree.seenWatered = false;

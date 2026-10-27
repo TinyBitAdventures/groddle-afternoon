@@ -26,14 +26,14 @@ import {
   stateFor,
   streetPigIndex,
   takeObjs,
-} from '../public/js/street-objects.js?v=g334-2';
+} from '../public/js/street-objects.js?v=g374-1';
 import { HELP_DIG_COUNTER, HELP_DIG_LABEL, digHelpFrom, helpDigMessage, othersDigging } from '../public/js/help-dig.js?v=g329-dig-1';
 import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, creditedMultiplayerQuests, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=g358-1';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js';
 import { isPoisoned, TREE_ANTIDOTE, TREE_POISON, BOTANY_SKILL } from '../public/js/tree-poison.js';
 import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=tree-death-19';
 import { patchesFeature } from '../public/js/features/patches-feature.js?v=patches-16';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=g369-1';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=g374-1';
 import { helpMineFeature } from '../public/js/features/help-mine-feature.js?v=g334-3';
 import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=g366-1';
 

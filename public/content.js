@@ -15,7 +15,7 @@ import {
 import {
   quoteTrantCare,
   performTrantCare,
-} from './js/trant-care.js?v=trant-care-test-4';
+} from './js/trant-care.js?v=g374-1';
 import {
   listPlantableSeeds,
   waterAllPlots,
