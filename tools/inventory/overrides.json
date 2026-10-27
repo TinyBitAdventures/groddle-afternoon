@@ -1792,5 +1792,25 @@
   "status": "reimagined",
   "reason": "Better Learning V is back (public/js/better-learning.js, G62): after IV, 4.4 days with IV's cut, 20% off every later skill (Ziggyny 2011-10-05), offering This Favor Goes Up to 11 (inc_data_skills.js:3940); the work job_street_ph1_03, ph4_06 and ph4_06b ask for (quests/job_street_ph1_03.js:140, job_street_ph4_06.js:157, job_street_ph4_06b.js:157). Reimagined: no 2011 skill limit (Austin 2026-10-27); its words are new",
   "register": "G62"
+ },
+ "street_project:645": {
+  "status": "unbuilt_original",
+  "reason": "never offered at shutdown: both rows (Dunlin Roble LA95G0P137927B4.xml:53-82, Samak Shun LA9GT0J87H92MPR.xml:14-42) carry four phases but no street_info, and jobs_get_all and jobs_get_available skip a job without street_info (locations/inc_jobs.js:411-412, 441-442). The phase 1 instance on Dunlin Roble (LA95G0P137927B4.xml:61) shows it was started once (jobs_start needs street_info, inc_jobs.js:277) and then withdrawn; Samak Shun stands unlocked (LA9GT0J87H92MPR.xml:45), so its road is open here too",
+  "register": "G15"
+ },
+ "street_project:job_standard1_for_new_streets": {
+  "status": "excluded",
+  "reason": "not a job: an empty <object> keyed by the class tsid in the jobs block of Middle Arbor, Sylvan Grove and Grand Mile (LCR101UN0NJ1QPQ.xml:73, LCR10NQRPKJ16H6.xml:73, LLI1BQA9PUH16A0.xml:73), the stub jobs_init leaves when a jobs_* lookup is handed a class id (locations/inc_jobs.js:1-4); with no class_ids or street_info jobs_get_all never sees it (inc_jobs.js:411-412). The class's 21 real jobs are counted under their own ids, all playable",
+  "register": "G15"
+ },
+ "street_project:job_standard1_for_street_upgrades": {
+  "status": "excluded",
+  "reason": "not a job: an empty <object> keyed by the class tsid in Clamber Crag's jobs block (LCR1OU9H34K19OE.xml:38), the stub jobs_init leaves when a jobs_* lookup is handed a class id (locations/inc_jobs.js:1-4); with no class_ids or street_info jobs_get_all never sees it (inc_jobs.js:411-412). The class's 9 real upgrade jobs (3, 4, 6, 8, 10, 12, 40, 55, 73) are counted under their own ids, all already upgraded in the source",
+  "register": "G15"
+ },
+ "street_project:166": {
+  "status": "excluded",
+  "reason": "Build Seldom Squish was finished in the original: Seldom Squish stands unlocked (LLI57G8I2HI1CSO.xml:54; inc_jobs.js:556-569 keeps it locked while the job is not done) and Peatland Moors holds all four phase instances (LLICF642CTI16R1.xml:36, 44, 52, 60) with its signpost open (GLICF642CTI16R1.xml:2691, no hidden). Its last phase needs 250 Grain Seeds (quests/job_standard1b_for_new_groddle_meadow_streets.js:20-27), an alpha-era item (glitchen wiki Grain Seed, 2011-02-10: Gardening Vendor 10c, Piggy plop of 3 grain; forum ideas/5164: \"it used to be\") deleted before shutdown: no items/seed_grain.js in GSJS or eleven-gsjs, listed under catalog_tags.js deleted (738, 867). The final source cannot finish it again, so the street stays built here as it was at shutdown",
+  "register": "G15"
  }
 }
