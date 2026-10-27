@@ -123,9 +123,25 @@ function ctxFor(engine = engineRef) {
 /**
  * Cards that need other players, dealt in multiplayer only: Trade Channelling
  * opens the Trade Channel there (register G326, groups-feature; player.js:3404
- * canJoinTradeChat). Solo deals what it always did.
+ * canJoinTradeChat); the Transcendental cards change a radiation between real
+ * players (G330, radiance.go: Radius I-III the range, Prolonger and
+ * Prolongest the time; Transcendental Highway the radiator's bonus,
+ * meditation-feature); Mantra Meditation keeps your own chat from breaking a
+ * meditation, and Tune Out The Chatter, which lets an incoming instant message
+ * by (players/player.js:1854-1859), is dealt as its prerequisite
+ * (inc_data_imagination.js:5192). Solo deals what it always did.
  */
-const MULTIPLAYER_OFFERS = new Set(['trade_channel']);
+const MULTIPLAYER_OFFERS = new Set([
+  'trade_channel',
+  'transcendental_radius_1',
+  'transcendental_radius_2',
+  'transcendental_radius_3',
+  'transcendental_benefits_1',
+  'transcendental_benefits_2',
+  'transcendental_imagination',
+  'meditative_arts_less_distraction',
+  'meditative_arts_less_distraction_2',
+]);
 const offeredInMultiplayer = (id) => isOfferedInRemake(id) || MULTIPLAYER_OFFERS.has(id);
 
 /** Keep the player's tank in step with purchased Energy Tank cards. */

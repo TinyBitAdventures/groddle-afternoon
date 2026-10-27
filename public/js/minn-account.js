@@ -412,6 +412,15 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       return buddyCall('Checking your gardens', 'homes/tending');
     },
 
+    /**
+     * Transcendental Radiation (register G330, groddle-afternoon-site/src/Radiance.php):
+     * { rank, cards, watch: { token, expiresIn } }, the skill and cards the save holds,
+     * signed for the realtime server (radiance_watch).
+     */
+    async radiance() {
+      return buddyCall('Checking your radiance', 'radiance');
+    },
+
     async deleteBackup(slot) {
       const r = await call(`backups/${Number(slot)}`, { method: 'DELETE' });
       if (!r.ok) throw failed('Deleting the backup', r);

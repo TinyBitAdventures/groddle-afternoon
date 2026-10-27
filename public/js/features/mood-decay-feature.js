@@ -14,8 +14,8 @@
  *   Paradise          PARADISE_* courses and the Beam Me Down scene
  *   newxp locations   tutorial scenes, Gentle Island, and the home while the
  *                     tutorial runs (homes_set_newxp)
- *   transcendental meditation is not in the remake (Transcendental Radiation
- *   needs other players), so that skip never fires.
+ *   transcendental meditation  while radiating (player.js:2361), which happens
+ *                     between real players in multiplayer only (G330)
  * engine.metabolicGate('mood', 'loss') also stops it while dead in Naraka.
  *
  * QA: ?autostart=1&fresh=1&mooddemo=90&moodtick=1500 starts mood at 90% and
@@ -35,6 +35,7 @@ import { loseMood, moodMax } from '../metabolics.js';
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=newxp-3';
 import { homesFeature } from './homes-feature.js?v=homes-43';
 import { newxpFeature } from './newxp-feature.js?v=play-2';
+import { meditationFeature } from './meditation-feature.js?v=radiate-1';
 
 export const MOOD_DECAY_FEATURE_ID = 'mood-decay';
 const BEAM_ME_DOWN_TSID = 'PUZZLESCENE_BEAM_ME_DOWN';
@@ -58,7 +59,7 @@ export function moodDecayContext(engine) {
   return {
     decoMode: homeMode === 'decorate' || homeMode === 'cultivate',
     paradise: tsid.startsWith('PARADISE_') || tsid === BEAM_ME_DOWN_TSID,
-    transcendental: false,
+    transcendental: meditationFeature._session?.()?.kind === 'transcendental',
     newxpLocation: isNewxpSceneTsid(tsid) || GENTLE_ISLAND_TSIDS.includes(tsid) || (inHome && introActive()),
   };
 }

@@ -27,6 +27,18 @@
  * Canvas data: meditationActive, meditationKind,
  * meditationElapsed, meditationDuration, meditationLast, meditationCooldown,
  * meditationZen, meditationTotalSeconds, meditationLevitating.
+ *
+ * Multiplayer (G330; engine.mode 'multiplayer' with the realtime client, solo
+ * untouched): Radiate works. The realtime server (radiance.go) decides who is
+ * in range, the pulses, the time, the rank and cards (signed by the site from
+ * the save, groddle/v1/radiance) and the cooldown; this file pays the
+ * radiator's pulses, applies a receiver's gains once per pulse and works out
+ * the radiator's end (js/radiance-mp.js). Every meditation is told to the
+ * street (meditate_start / meditate_stop) so others see the orb bubble over a
+ * meditating player and the server counts who meditates together; your own
+ * chat line breaks a meditation unless you hold Mantra Meditation
+ * (players/player.js:1846-1883). Canvas data: radianceLast, radianceGot,
+ * radianceStatus, meditationTogether, meditatorsHere.
  */
 
 import { addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-7';
@@ -54,11 +66,30 @@ import {
   startLevitation,
   startMeditation,
 } from '../meditation.js';
-import { energyMax, metabolicGain, moodMax, loseEnergy } from '../metabolics.js';
+import { energyMax, metabolicGain, moodMax, loseEnergy, loseMood } from '../metabolics.js';
 import { levitationCards } from '../imagination-effects.js';
 import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js';
 import { sourceFromUrl } from '../textures.js';
 import { moodScaledXp } from '../mood-xp.js';
+import { createMinnAccount } from '../minn-account.js?v=nbhome-3';
+import { getSkillPackageOverride } from '../skill-packages.js';
+import {
+  RADIANCE_TEXT,
+  RADIATE_COOLDOWN_SECONDS,
+  burstLines,
+  chatInterrupts,
+  cleanName,
+  playersInRange,
+  pulseCost,
+  pulseGain,
+  pulseKey,
+  radId,
+  radiateEnergyNeeded,
+  radiationDistance,
+  radiationRank,
+  radiatorEnd,
+  radiatorLine,
+} from '../radiance-mp.js?v=radiance-1';
 
 export const MEDITATION_FEATURE_ID = 'meditation';
 /** metabolics_get_max_energy: the energy tank (100 plus Energy Tank cards). */
@@ -116,7 +147,7 @@ function verbCtx(engine) {
     tank: tankOf(engine),
     meditating: Boolean(session),
     unfairPlace: engine.transientInstance(),
-    nearbyPlayers: 0,
+    nearbyPlayers: mpNearby(engine),
   };
 }
 
@@ -351,16 +382,22 @@ function begin(engine, verbId) {
     else stop();
   });
   fx = buildMeditationFx(engine);
+  mpMeditating(engine, session.kind);
   publish(engine, true);
   return true;
 }
 
 function end(engine, reason = 'timer', at = Date.now()) {
   if (!session) return;
+  if (session.kind === 'transcendental') {
+    endRadiateLocal(engine, reason);
+    return;
+  }
   const done = session;
   session = null;
   done.stopMusic?.();
   destroyMeditationFx(engine);
+  mpMeditating(engine, '', done);
   const pc = engine.pc;
   const out = finishMeditation(state, done, {
     now: at,
@@ -483,6 +520,456 @@ function demoSetup(engine) {
   publish(engine, true);
 }
 
+/* ------------------------------------------------------------------ */
+/* Multiplayer: Transcendental Radiation and meditating together (G330) */
+/* ------------------------------------------------------------------ */
+
+/** A radiation the server never ended (a lost socket) ends here this long after its time. */
+const RADIATE_LOST_MS = 6000;
+/** A radiance token older than this is fetched again before Radiate. */
+const WATCH_FRESH_MS = 60_000;
+const START_WAIT_MS = 6000;
+const BUBBLE_DY = -186; // pc_overlay bubble delta_y -110 over the head (focusing_orb.js:2096); here above the name plate (realtime-feature PLATE_Y -150)
+const BUBBLE_SIZE = 40;
+const STOP_WHY = { interrupted: 'moved', stopped: 'stopped', street: 'street', chat: 'chat', tired: 'tired', timer: 'stopped', verb: 'verb' };
+
+function freshMp() {
+  return {
+    client: null,
+    account: null,
+    watch: null, // { rank, cards, at }
+    fetching: null,
+    status: null, // radiance_status { rank, dist, cooldown }
+    pending: 0, // when Radiate was asked for
+    rad: '', // our radiation running
+    awaitDone: '', // our radiation ended here, its radiate_done not in yet
+    rank: 0,
+    lines: [],
+    bursts: new Set(),
+    spentEnergy: 0,
+    moodless: false,
+    got: new Map(), // rad -> { name, energy, mood, seen: Set<n> } for radiations reaching us
+    meditators: new Map(), // id -> kind, others on this street
+    bubbles: new Map(), // id -> Pixi sprite
+    together: 0,
+    peak: 0,
+    last: '',
+  };
+}
+
+let mp = freshMp();
+
+function mpOn(engine) {
+  if (engine?.mode !== 'multiplayer') return false;
+  if (!mp.client) {
+    const c = engine.query?.('realtimeClient');
+    if (c) attachMp(engine, c);
+  }
+  return Boolean(mp.client);
+}
+
+function mpMe() {
+  return Number(mp.client?.me?.id) || 0;
+}
+
+function mpNote(engine, key, value) {
+  engine.setData?.(key, value);
+}
+
+function attachMp(engine, c) {
+  mp.client = c;
+  const boot = globalThis.GRODDLE_MP_BOOT || {};
+  mp.account = createMinnAccount({ baseUri: globalThis.document?.baseURI || 'http://localhost/', nonce: boot.nonce || '' });
+  c.on('hello', () => {
+    mp.watch = null;
+    refreshWatch(engine).catch(() => {});
+  });
+  if (c.state === 'online') refreshWatch(engine).catch(() => {});
+  c.on('msg:radiance_status', (m) => {
+    mp.status = { rank: Number(m.rank) || 0, dist: Number(m.dist) || 0, cooldown: Number(m.cooldown) || 0 };
+    mpNote(engine, 'radianceStatus', `${mp.status.rank}:${mp.status.dist}:${mp.status.cooldown}`);
+  });
+  c.on('msg:radiate_started', (m) => onRadiateStarted(engine, m));
+  c.on('msg:radiate_burst', (m) => onRadiateBurst(engine, m));
+  c.on('msg:radiate_done', (m) => onRadiateDone(engine, m));
+  c.on('msg:radiate_felt', (m) => onRadiateFelt(engine, m));
+  c.on('msg:radiate_pulse', (m) => onRadiatePulse(engine, m));
+  c.on('msg:radiate_ended', (m) => onRadiateEnded(engine, m));
+  c.on('msg:meditating', (m) => {
+    const id = Number(m.id);
+    if (!id || id === mpMe()) return;
+    if (typeof m.kind === 'string' && m.kind) mp.meditators.set(id, m.kind);
+    else mp.meditators.delete(id);
+    mpNote(engine, 'meditatorsHere', [...mp.meditators.keys()].join(','));
+  });
+  c.on('msg:meditators', (m) => {
+    for (const row of Array.isArray(m.list) ? m.list : []) {
+      const id = Number(row?.id);
+      if (id && id !== mpMe() && typeof row.kind === 'string' && row.kind) mp.meditators.set(id, row.kind);
+    }
+    mpNote(engine, 'meditatorsHere', [...mp.meditators.keys()].join(','));
+  });
+  c.on('msg:meditate_together', (m) => {
+    mp.together = Math.max(0, Math.floor(Number(m.n) || 0));
+    if (session) mp.peak = Math.max(mp.peak, mp.together);
+    mpNote(engine, 'meditationTogether', String(mp.together));
+  });
+  c.on('roster', ({ players }) => {
+    const here = new Set((players || []).map((p) => Number(p.id)));
+    for (const id of [...mp.meditators.keys()]) if (!here.has(id)) mp.meditators.delete(id);
+  });
+  // Your own chat line (local, party, group): players/player.js:1857-1863.
+  c.on('said', (m) => { if (m?.mine) chatSaid(engine); });
+  c.on('msg:party_said', (m) => { if (Number(m.id) === mpMe()) chatSaid(engine); });
+  c.on('msg:channel_said', (m) => { if (Number(m.id) === mpMe()) chatSaid(engine); });
+  c.on('error', (e) => {
+    if (e?.code !== 'radiance') return;
+    if (mp.pending) {
+      mp.pending = 0;
+      engine.toast?.(e.message || MEDITATION_TEXT.failed);
+    }
+    mp.last = `error:${e.message}`;
+    mpNote(engine, 'radianceLast', mp.last);
+  });
+}
+
+/** The skill and cards the site read from the save, signed for the server. */
+async function refreshWatch(engine, force = false) {
+  if (!mp.client || !mp.account) return null;
+  if (!force && mp.watch && Date.now() - mp.watch.at < WATCH_FRESH_MS) return mp.watch;
+  if (mp.fetching) return mp.fetching;
+  mp.fetching = mp.account.radiance().then((r) => {
+    mp.watch = { rank: Number(r?.rank) || 0, cards: Array.isArray(r?.cards) ? r.cards : [], at: Date.now() };
+    if (r?.watch?.token) mp.client.send('radiance_watch', { token: r.watch.token });
+    return mp.watch;
+  }).finally(() => { mp.fetching = null; });
+  return mp.fetching;
+}
+
+/** The menu's count of players near enough (the server decides when you press it). */
+function mpNearby(engine) {
+  if (!mpOn(engine)) return 0;
+  const rank = mp.status?.rank || radiationRank(learned(engine));
+  const dist = mp.status?.rank ? mp.status.dist : radiationDistance(rank, upgrades(engine));
+  return playersInRange(mp.client.players || [], engine.player?.x || 0, dist);
+}
+
+/** verbs.radiate 490-496: the energy check, in multiplayer where Radiate can be pressed. */
+function mpVerb(engine, verb) {
+  if (verb.id !== 'radiate' || !verb.enabled || !mpOn(engine)) return verb;
+  const rank = radiationRank(learned(engine));
+  if ((engine.pc?.energy || 0) <= radiateEnergyNeeded(tankOf(engine), rank)) {
+    return { ...verb, enabled: false, reason: RADIANCE_TEXT.tired };
+  }
+  return verb;
+}
+
+async function radiateMp(engine) {
+  if (session || (mp.pending && Date.now() - mp.pending < START_WAIT_MS)) return false;
+  if (countItem(engine.inv, ORB_CLASS) < 1) {
+    engine.toast('You need a Focusing Orb.');
+    return false;
+  }
+  const verb = mpVerb(engine, listOrbVerbs(state, verbCtx(engine)).find((v) => v.id === 'radiate') || { id: 'radiate', enabled: false, reason: MEDITATION_TEXT.failed });
+  if (!verb.enabled) {
+    engine.toast(verb.reason || MEDITATION_TEXT.failed);
+    return false;
+  }
+  if (mp.client.state !== 'online') {
+    engine.toast(RADIANCE_TEXT.offline);
+    return false;
+  }
+  mp.pending = Date.now();
+  try {
+    await refreshWatch(engine, true);
+  } catch (err) {
+    mp.pending = 0;
+    engine.toast(err?.message || MEDITATION_TEXT.failed);
+    return false;
+  }
+  mp.client.send('radiate_start', { moodless: (engine.pc?.mood || 0) <= 0 });
+  mp.last = 'asked';
+  mpNote(engine, 'radianceLast', mp.last);
+  return true;
+}
+
+function bonusAmountFor(rank) {
+  const pkg = { 1: 6, 2: 10, 3: 15 }[rank] || 6;
+  const override = getSkillPackageOverride('transcendental_radiation');
+  return Number.isFinite(override?.bonus_amount) ? override.bonus_amount : pkg;
+}
+
+function onRadiateStarted(engine, m) {
+  const rad = radId(m.rad);
+  if (!rad) return;
+  mp.pending = 0;
+  if (session) {
+    // Something else began meanwhile: give it back.
+    mp.client.send('radiate_stop', { why: 'verb' });
+    return;
+  }
+  mp.rad = rad;
+  mp.awaitDone = '';
+  mp.rank = Math.max(1, Math.min(3, Number(m.rank) || 1));
+  mp.bursts = new Set();
+  mp.spentEnergy = 0;
+  mp.moodless = (engine.pc?.mood || 0) <= 0;
+  mp.peak = 0;
+  const durationMs = Math.max(3000, Number(m.duration) || 3000);
+  mp.lines = burstLines(pulseCost(tankOf(engine), mp.rank), durationMs, rng(engine));
+  session = {
+    kind: 'transcendental',
+    focus: 'radiate',
+    startedAt: Date.now(),
+    durationMs,
+    durationMaxMs: Number(m.durationMax) || durationMs,
+    ticks: 0,
+    x: engine.player.x,
+    stopMusic: null,
+    rad,
+  };
+  engine.pushActivity(RADIANCE_TEXT.begin);
+  // TRANSCENDENTAL_MEDITATION_01 / _02 (inc_data_sounds.js:135-136) are not recovered:
+  // the Wayback meditation tracks the solo verbs do not use stand in.
+  const music = rng(engine)() < 0.5 ? 'assets/audio/ambient/meditation4_1344997846.mp3' : 'assets/audio/ambient/Meditation_1291879502.mp3';
+  engine.playCue(music, { volume: 0.55 }).then((stop) => {
+    if (session && session.rad === rad && !session.stopMusic) session.stopMusic = stop;
+    else stop();
+  });
+  if (engine.PIXI && engine.fxLayer) fx = buildMeditationFx(engine);
+  mp.last = `started:${rad}:${durationMs}:${Number(m.recipients) || 0}`;
+  mpNote(engine, 'radianceLast', mp.last);
+  publish(engine, true);
+}
+
+/** onTRUpdatePlayers 1807-1818: the radiator pays a pulse. */
+function onRadiateBurst(engine, m) {
+  const rad = radId(m.rad);
+  const n = Math.floor(Number(m.n) || 0);
+  if (!rad || rad !== mp.rad || n < 1 || mp.bursts.has(n)) return;
+  mp.bursts.add(n);
+  const pc = engine.pc;
+  const tank = tankOf(engine);
+  const cost = pulseCost(tank, mp.rank);
+  loseMood(pc, cost);
+  mp.spentEnergy -= loseEnergy(pc, cost);
+  const line = mp.lines.shift();
+  if (line) engine.pushActivity(line);
+  if (!mp.moodless && (pc.mood || 0) <= 0) {
+    mp.moodless = true;
+    mp.client.send('radiate_mood', { moodless: true });
+  }
+  engine.updateHud();
+  mp.last = `burst:${rad}:${n}:${Number(m.recipients) || 0}`;
+  mpNote(engine, 'radianceLast', mp.last);
+  // onTick 1767-1772: the next pulse would leave no energy, so it ends there.
+  if ((pc.energy || 0) - cost <= 0) endRadiateLocal(engine, 'tired');
+}
+
+/** Our radiation stops here (moving, a verb, chat, tired, a street change). */
+function endRadiateLocal(engine, reason) {
+  if (!session || session.kind !== 'transcendental') return;
+  const done = session;
+  session = null;
+  done.stopMusic?.();
+  destroyMeditationFx(engine);
+  mp.awaitDone = done.rad;
+  mp.rad = '';
+  state = { ...state, cooldownUntil: Math.max(state.cooldownUntil, Date.now() + RADIATE_COOLDOWN_SECONDS * 1000) };
+  if (mp.client && reason !== 'server') mp.client.send('radiate_stop', { why: STOP_WHY[reason] || 'stopped' });
+  engine.save();
+  publish(engine, true);
+}
+
+/** endTranscendentalRadiationNew 1152-1311: the radiator's bonus, line and counters. */
+function onRadiateDone(engine, m) {
+  const rad = radId(m.rad);
+  if (!rad || (rad !== mp.rad && rad !== mp.awaitDone)) return;
+  if (session?.rad === rad) endRadiateLocal(engine, 'server');
+  mp.awaitDone = '';
+  const pc = engine.pc;
+  const tank = tankOf(engine);
+  const out = radiatorEnd(m, {
+    rank: mp.rank,
+    tank,
+    mood: pc.mood,
+    upgrades: upgrades(engine),
+    spentEnergy: mp.spentEnergy,
+    bonusAmount: bonusAmountFor(mp.rank),
+    rng: rng(engine),
+  });
+  let energyGot = 0;
+  if (out.energyBonus > 0 && metabolicGain('energy').ok) {
+    energyGot = Math.min(out.energyBonus, Math.max(0, tank - (pc.energy || 0)));
+    pc.energy = (pc.energy || 0) + energyGot;
+  }
+  // stats_add_xp(n, false): the mood bonus; the card's iMG first (1225), then the full bonus (1243).
+  const imgBonus = out.imgBonus ? moodScaledXp(pc, out.imgBonus) : 0;
+  const img = out.img ? moodScaledXp(pc, out.img) : 0;
+  if (img + imgBonus) {
+    pc.imagination = (pc.imagination || 0) + img + imgBonus;
+    pc.xp = (pc.xp || 0) + img + imgBonus;
+  }
+  if (m.why === 'alone') engine.pushActivity(RADIANCE_TEXT.alone);
+  engine.pushActivity(radiatorLine({ energy: mp.spentEnergy + energyGot, img, imgBonus, reached: Number(m.recipients) > 0 }, rng(engine)));
+  const seconds = Math.max(0, Math.floor(Number(m.seconds) || 0));
+  const prevSeconds = state.totalSeconds;
+  state = {
+    ...state,
+    totalSeconds: state.totalSeconds + seconds,
+    sessions: state.sessions + 1,
+    fullSessions: state.fullSessions + (m.full ? 1 : 0),
+    cooldownUntil: Math.max(state.cooldownUntil, Date.now() + RADIATE_COOLDOWN_SECONDS * 1000),
+  };
+  // quests_inc_counter('meditation_time') and the focusing_orb:meditation_time badge (1294-1296).
+  if (seconds > 0) engine.achievement('meditation_seconds', seconds);
+  const minutes = Math.floor(state.totalSeconds / 60) - Math.floor(prevSeconds / 60);
+  if (minutes > 0) engine.achievement('focusing_orb:meditation_time', minutes);
+  for (const flag of Array.isArray(m.flags) ? m.flags : []) {
+    if (flag !== 'transcendence_5players') continue;
+    engine.questFlag?.(flag);
+    engine.achievement(flag, 1);
+  }
+  if (mp.peak > 0) engine.achievement('meditated_together', mp.peak);
+  mp.peak = 0;
+  const player = engine.player;
+  const parts = [];
+  if (energyGot) parts.push(`+${energyGot} energy`);
+  if (img + imgBonus) parts.push(`+${img + imgBonus} iMG`);
+  if (player && parts.length) engine.floatText(player.x, player.y - avatarHeight(engine) - 20, parts.join('  '), m.full ? 0xd6f5ff : 0xf0e6d0);
+  if (m.maxRelax && player) showMaxRelax(engine);
+  mp.last = `done:${rad}:${m.why}:${seconds}s:${m.full ? 'full' : 'part'}:p${Number(m.pulses) || 0}:r${Number(m.recipients) || 0}:e${energyGot}:i${img}${imgBonus ? `:hw${imgBonus}` : ''}`;
+  mpNote(engine, 'radianceLast', mp.last);
+  engine.setData('meditationLast', `radiate:${m.why}:${seconds}s:e${energyGot}:m0:i${img}:${m.full ? 'full' : 'part'}`);
+  engine.updateHud();
+  engine.save();
+  publish(engine, true);
+}
+
+function gotFor(rad, m) {
+  let rec = mp.got.get(rad);
+  if (!rec) {
+    rec = { name: cleanName(m?.from?.name), energy: 0, mood: 0, seen: new Set() };
+    mp.got.set(rad, rec);
+  }
+  return rec;
+}
+
+function onRadiateFelt(engine, m) {
+  const rad = radId(m.rad);
+  if (!rad || mp.got.has(rad)) return;
+  const rec = gotFor(rad, m);
+  engine.pushActivity(RADIANCE_TEXT.felt(rec.name));
+}
+
+/** onTRUpdatePlayers 1843-1880 for this receiver: its own tank, the radiator's rank, once per pulse. */
+function onRadiatePulse(engine, m) {
+  const key = pulseKey(m.rad, m.n);
+  if (!key) return;
+  const rad = radId(m.rad);
+  const rec = gotFor(rad, m);
+  const n = Math.floor(Number(m.n));
+  if (rec.seen.has(n)) return;
+  rec.seen.add(n);
+  const pc = engine.pc;
+  const tank = tankOf(engine);
+  const gain = pulseGain(tank, Math.max(1, Math.min(3, Number(m.rank) || 1)));
+  let mood = 0;
+  let energy = 0;
+  if (m.mood && gain > 0 && metabolicGain('mood').ok) {
+    mood = Math.min(gain, Math.max(0, moodMax(pc) - (pc.mood || 0)));
+    pc.mood = (pc.mood || 0) + mood;
+  }
+  if (gain > 0 && !hasZen(state, dayKey(), tank) && metabolicGain('energy').ok) {
+    energy = Math.min(gain, Math.max(0, tank - (pc.energy || 0)));
+    pc.energy = (pc.energy || 0) + energy;
+  }
+  rec.energy += energy;
+  rec.mood += mood;
+  const player = engine.player;
+  const parts = [];
+  if (mood) parts.push(`+${mood} mood`);
+  if (energy) parts.push(`+${energy} energy`);
+  if (player && parts.length) engine.floatText(player.x, player.y - avatarHeight(engine) - 20, parts.join('  '), 0xe9e2ff);
+  mpNote(engine, 'radianceGot', `${key}:e${rec.energy}:m${rec.mood}`);
+  engine.updateHud();
+}
+
+function onRadiateEnded(engine, m) {
+  const rad = radId(m.rad);
+  if (!rad) return;
+  const rec = mp.got.get(rad);
+  if (!rec) return;
+  mp.got.delete(rad);
+  const name = cleanName(m?.from?.name) || rec.name;
+  engine.pushActivity(m.complete ? RADIANCE_TEXT.transcended(name, rec.energy, rec.mood) : RADIANCE_TEXT.somewhat(name, rec.energy, rec.mood));
+  mpNote(engine, 'radianceGot', `ended:${rad}:${m.complete ? 'full' : 'part'}:e${rec.energy}:m${rec.mood}`);
+  engine.save();
+}
+
+/** Tell the street a standing or focused meditation began or ended. */
+function mpMeditating(engine, kind, done = null) {
+  if (!mpOn(engine) || kind === 'transcendental') return;
+  if (kind) {
+    mp.peak = 0;
+    mp.client.send('meditate_start', { kind });
+    return;
+  }
+  if (done?.kind === 'transcendental') return;
+  mp.client.send('meditate_stop');
+  if (mp.peak > 0) engine.achievement('meditated_together', mp.peak);
+  mp.peak = 0;
+}
+
+/** players/player.js:1857-1863: your own chat line breaks a meditation, unless Mantra Meditation. */
+function chatSaid(engine) {
+  if (!session || !chatInterrupts(upgrades(engine))) return;
+  end(engine, 'chat');
+}
+
+/** The orb bubble over other players who meditate (pc_overlay bubble, focusing_orb.js:2091-2104). */
+function mpTick(engine, now) {
+  if (!mpOn(engine)) return;
+  if (mp.pending && now - mp.pending > START_WAIT_MS) mp.pending = 0;
+  const remotes = globalThis.groddleRealtime?.remotes;
+  for (const [id, sprite] of [...mp.bubbles]) {
+    const root = remotes?.get?.(id)?.root;
+    if (!mp.meditators.has(id) || !root || root.destroyed) {
+      sprite.parent?.removeChild(sprite);
+      sprite.destroy();
+      mp.bubbles.delete(id);
+    }
+  }
+  if (!mp.meditators.size || !engine.fxLayer || !engine.PIXI) return;
+  for (const id of mp.meditators.keys()) {
+    const root = remotes?.get?.(id)?.root;
+    if (!root || root.destroyed) continue;
+    let sprite = mp.bubbles.get(id);
+    if (!sprite) {
+      const { PIXI } = engine;
+      sprite = new PIXI.AnimatedSprite(orbTextures(engine));
+      sprite.anchor.set(0.5);
+      sprite.width = BUBBLE_SIZE;
+      sprite.height = BUBBLE_SIZE;
+      sprite.animationSpeed = 0.42;
+      sprite.zIndex = 40;
+      sprite.play();
+      engine.fxLayer.addChild(sprite);
+      mp.bubbles.set(id, sprite);
+    }
+    sprite.position.set(root.x, root.y + BUBBLE_DY + Math.sin(now / 900 + id) * 3);
+  }
+}
+
+function clearBubbles() {
+  for (const sprite of mp.bubbles.values()) {
+    sprite.parent?.removeChild(sprite);
+    sprite.destroy();
+  }
+  mp.bubbles.clear();
+  mp.meditators.clear();
+}
+
 export const meditationFeature = {
   id: MEDITATION_FEATURE_ID,
 
@@ -522,6 +1009,7 @@ export const meditationFeature = {
   onStreetClear(engine) {
     if (session) end(engine || engineRef, 'street');
     destroyLevitationFx();
+    clearBubbles();
   },
 
   onNewDay() {
@@ -549,14 +1037,21 @@ export const meditationFeature = {
       } else {
         const elapsed = now - session.startedAt;
         const tick = Math.floor(elapsed / 1000);
-        while (session.ticks < tick) {
-          session.ticks += 1;
-          const line = meditationChatter(session.ticks, rng(engine));
-          if (line) engine.pushActivity(line);
+        if (session.kind === 'transcendental') {
+          // The server's ticks pulse and end it (radiate_done); the orb says nothing (onTick 1745).
+          session.ticks = tick;
+          if (elapsed >= session.durationMs + RADIATE_LOST_MS) endRadiateLocal(engine, 'timer');
+          else drawMeditationFx(engine, now);
+        } else {
+          while (session.ticks < tick) {
+            session.ticks += 1;
+            const line = meditationChatter(session.ticks, rng(engine));
+            if (line) engine.pushActivity(line);
+          }
+          // The source timer fires exactly at the rolled duration.
+          if (elapsed >= session.durationMs) end(engine, 'timer', session.startedAt + session.durationMs);
+          else drawMeditationFx(engine, now);
         }
-        // The source timer fires exactly at the rolled duration.
-        if (elapsed >= session.durationMs) end(engine, 'timer', session.startedAt + session.durationMs);
-        else drawMeditationFx(engine, now);
       }
     }
     if (state.levitateUntil) {
@@ -572,6 +1067,7 @@ export const meditationFeature = {
         drawLevitationFx(engine, now);
       }
     }
+    mpTick(engine, now);
     publish(engine);
   },
 
@@ -580,7 +1076,7 @@ export const meditationFeature = {
     if (session) {
       return [{ id: 'stop', label: 'Stop meditating', enabled: true, tooltip: 'Moving also stops it', primary: true }];
     }
-    return listOrbVerbs(state, verbCtx(engine)).map((verb) => ({
+    return listOrbVerbs(state, verbCtx(engine)).map((verb) => mpVerb(engine, {
       id: verb.id,
       label: verb.label,
       enabled: verb.enabled,
@@ -594,7 +1090,10 @@ export const meditationFeature = {
     if (classTsid !== ORB_CLASS) return false;
     if (verbId === 'stop') end(engine, 'stopped');
     else if (verbId === 'levitate') levitate(engine);
-    else if (verbId === 'radiate') engine.toast(MEDITATION_TEXT.radiateAlone);
+    else if (verbId === 'radiate') {
+      if (mpOn(engine)) radiateMp(engine);
+      else engine.toast(MEDITATION_TEXT.radiateAlone);
+    }
     else begin(engine, verbId);
     return true;
   },
@@ -605,5 +1104,14 @@ export const meditationFeature = {
   },
   _session() {
     return session;
+  },
+  /** QA / tests: the multiplayer half, and a fresh one. */
+  _mp() {
+    return mp;
+  },
+  _mpReset() {
+    clearBubbles();
+    mp = freshMp();
+    session = null;
   },
 };

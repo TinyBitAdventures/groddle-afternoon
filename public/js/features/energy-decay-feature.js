@@ -16,8 +16,8 @@
  * Skips, as in source:
  *   house deco mode   Decorate or Cultivate open (as the mood decay feature)
  *   Paradise          PARADISE_* courses and the Beam Me Down scene
- *   transcendental meditation never runs in the remake (Transcendental
- *                     Radiation needs other players), so it never fires
+ *   transcendental meditation  while radiating (player.js:799), which
+ *                     happens between real players in multiplayer only (G330)
  *   before the intro  loss only above 50% and never in the three tutorial
  *                     scenes (newxp_intro / training1 / training2)
  * engine.metabolicGate('energy', 'loss') also stops it while dead in Naraka
@@ -34,7 +34,7 @@ import { createEnergyLossClock, ENERGY_LOSS_TICK_MS, energyLossSkip, periodicEne
 import { energyMax } from '../metabolics.js';
 import { isNewxpSceneTsid } from '../newxp.js?v=newxp-3';
 import { homesFeature } from './homes-feature.js?v=homes-43';
-import { meditationFeature } from './meditation-feature.js?v=g335-1';
+import { meditationFeature } from './meditation-feature.js?v=radiate-1';
 import { newxpFeature } from './newxp-feature.js?v=play-2';
 
 export const ENERGY_DECAY_FEATURE_ID = 'energy-decay';

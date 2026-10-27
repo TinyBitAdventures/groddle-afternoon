@@ -71,7 +71,7 @@
  * multiplayer.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=nbhome-2';
+import { createMinnAccount } from '../minn-account.js?v=nbhome-3';
 import { runStreetTransition } from '../screen-fx.js?v=card-2';
 import { STREET_INDEX } from '../street-loader.js';
 import { ITEM_CATALOG, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=catalog-unified-7';

@@ -31,8 +31,8 @@ import {
   tabOrder,
   writeMemory,
 } from '../public/js/groups.js?v=g326-1';
-import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-2';
-import { groupsFeature } from '../public/js/features/groups-feature.js?v=nbhome-2';
+import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-3';
+import { groupsFeature } from '../public/js/features/groups-feature.js?v=nbhome-3';
 import { FEATURES } from '../public/js/features/index.js';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
@@ -308,7 +308,7 @@ describe('groups feature (js/features/groups-feature.js)', () => {
     assert.ok(ids.indexOf('groups') > ids.indexOf('profiles'));
     assert.ok(ids.indexOf('groups') < ids.indexOf('realtime'));
     assert.equal(ids.indexOf('street-objects') + 1, ids.indexOf('realtime'), 'street objects stays just before realtime');
-    assert.match(read('public/js/features/index.js'), /groups-feature\.js\?v=nbhome-2'/);
+    assert.match(read('public/js/features/index.js'), /groups-feature\.js\?v=nbhome-3'/);
   });
 
   it('loads the list, sends the signed list, and opens the chats remembered', async () => {
@@ -433,7 +433,7 @@ describe('Trade Channelling in multiplayer (imagination-feature)', () => {
   it('is dealt in multiplayer only', () => {
     const src = read('public/js/features/imagination-feature.js');
     assert.match(src, /offerable: engine\?\.mode === 'multiplayer' \? offeredInMultiplayer : isOfferedInRemake/);
-    assert.match(src, /MULTIPLAYER_OFFERS = new Set\(\['trade_channel'\]\)/);
+    assert.match(src, /MULTIPLAYER_OFFERS = new Set\(\[\s*'trade_channel',/);
     const data = read('public/js/imagination-data.js');
     assert.match(data, /"trade_channel": \{\n  "name": "Trade Channelling"/);
   });

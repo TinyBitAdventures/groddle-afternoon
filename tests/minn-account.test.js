@@ -15,10 +15,10 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=nbhome-2';
-import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=play-4';
+import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=nbhome-3';
+import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=play-5';
 import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=g337-1';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=nbhome-2';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=nbhome-3';
 import { FEATURES } from '../public/js/features/index.js';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=mp2-1';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=mp2-2';

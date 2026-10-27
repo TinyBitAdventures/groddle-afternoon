@@ -263,6 +263,7 @@ export const CHECKLIST = Object.freeze([
     evidence: ['public/js/skill-tree.js', 'public/js/skills.js'] },
   { id: 'meditation', group: 'late', name: 'Meditation and teleportation', status: 'source',
     blurb: 'Focusing Orb meditation, levitation, teleport points and scripts.',
+    multiplayer: 'Transcendental Radiation works between real players: radiate calm to everyone near you, the Transcendental cards widen and lengthen it, and meditating players show their orb to the street.',
     evidence: ['public/js/meditation.js', 'public/js/teleportation.js'] },
   { id: 'icons', group: 'late', name: 'Giant Icons', status: 'source',
     blurb: 'Make an Icon from eleven emblems and tend it for the Giants’ love.',

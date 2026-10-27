@@ -1027,7 +1027,7 @@
    "name": "Meditation and teleportation",
    "status": "source",
    "blurb": "Focusing Orb meditation, levitation, teleport points and scripts.",
-   "multiplayer": null,
+   "multiplayer": "Transcendental Radiation works between real players: radiate calm to everyone near you, the Transcendental cards widen and lengthen it, and meditating players show their orb to the street.",
    "spot": null,
    "evidence": [
     "public/js/meditation.js",
@@ -1166,7 +1166,7 @@
  },
  "back": 66,
  "possible": 68,
- "multiplayer": 13,
+ "multiplayer": 14,
  "quests": {
   "total": 445,
   "story": 245,
@@ -2563,9 +2563,19 @@
   ]
  },
  "git": {
-  "commits": 548,
+  "commits": 551,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "In multiplayer, leave a gift or a note with a friend's Butler, and water their garden with their key"
+   },
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "build-economy writes the ledger's transforms, credits and capped gates"
+   },
    {
     "date": "2026-10-26",
     "kind": "new",
@@ -2675,19 +2685,9 @@
     "date": "2026-10-26",
     "kind": "new",
     "text": "In multiplayer, Wood Trees are shared: harvests by anyone wear one down"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "new",
-    "text": "In multiplayer, help another player mine and both get more chunks"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "fix",
-    "text": "The trade window stays above the Qurazy banner"
    }
   ]
  },
- "tests": 320,
+ "tests": 321,
  "generatedAt": "2026-10-27"
 }
