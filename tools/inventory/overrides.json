@@ -893,7 +893,9 @@
  "buff:charades": {
   "status": "lost",
   "reason": "potion_charades.js:526 / catalog_buffs.js charades: other players in the street guess the word and win; nobody can guess in a solo street",
-  "register": "G124"
+  "register": "G355",
+  "mp": "game bf2b98c4, server 64f8412, site fdb3286",
+  "mpReason": "the potion's word stays on the server, street chat is checked for it (main.js 1766-1793), the guesser's 250 currants are a signed credit"
  },
  "buff:glitch_train": {
   "status": "lost",
@@ -910,7 +912,9 @@
  "buff:play_musicblocks": {
   "status": "lost",
   "reason": "quests/play_musicblocks.js:225: Blocks That Rock times playing musicblocks for 25 other players",
-  "register": "G124"
+  "register": "G355",
+  "mp": "game bf2b98c4, server 64f8412, site fdb3286",
+  "mpReason": "Blocks That Rock times Play for on 25 other players (quests/play_musicblocks.js:225), each Play for confirmed by verbs.go"
  },
  "buff:sneezing": {
   "status": "lost",
@@ -1519,5 +1523,75 @@
   "mp": "game 818bd2b5, server b6c1038, site 71c11f2",
   "mpReason": "offered with Soil Appreciation II; objects.go keeps Dirt Pile dig crews (dirt_pile.js addDigger 153-166) and a dig its answer says had helpers counts helped_dig (481-483); 200 currants credited once",
   "register": "G329"
+ },
+ "achievement:hanky_splanky": {
+  "mp": "game bf2b98c4, server 64f8412, site fdb3286",
+  "mpReason": "verbs.go confirms each Splank on a real player on the street within 800 px (plank.js 30-89); players_splanked:<target> counted from the server's verb_done",
+  "register": "G355"
+ },
+ "achievement:epic_blowout": {
+  "mp": "game bf2b98c4, server 64f8412, site fdb3286",
+  "mpReason": "verbs.go counts a house party at a home with 12 players, 11 under Buzzed, Smashed, Purple Junk or No-No Powder (locations/home.js 197-218)",
+  "register": "G355"
+ },
+ "quest:play_musicblocks": {
+  "mp": "game bf2b98c4, server 64f8412, site fdb3286",
+  "mpReason": "offered in multiplayer by its own prerequisite once Play for works; each block's flag counts once per player (musicblock_*.js 239-242)",
+  "register": "G355"
+ },
+ "quest:watering_time": {
+  "mp": "game bf2b98c4, server 64f8412, site fdb3286",
+  "mpReason": "Super Soaker counts soaks on other players (watering_can.js 320-326) from the server's confirmation; offered when you hold a Watering Can with another player on the street; 500 currants credited once",
+  "register": "G355"
+ },
+ "street_project:689": {
+  "mp": "game 68350d28, server db45fc1, site 3bc88de",
+  "mpReason": "a group claims the hall through the site (membership, one hall a group, the claim currants), anyone contributes, the group owns it at the end (quest.js 1297-1338, 1831-1863)",
+  "register": "G331"
+ },
+ "street_project:690": {
+  "mp": "game 68350d28, server db45fc1, site 3bc88de",
+  "mpReason": "a group claims the hall through the site (membership, one hall a group, the claim currants), anyone contributes, the group owns it at the end (quest.js 1297-1338, 1831-1863)",
+  "register": "G331"
+ },
+ "street_project:691": {
+  "mp": "game 68350d28, server db45fc1, site 3bc88de",
+  "mpReason": "a group claims the hall through the site (membership, one hall a group, the claim currants), anyone contributes, the group owns it at the end (quest.js 1297-1338, 1831-1863)",
+  "register": "G331"
+ },
+ "street_project:692": {
+  "mp": "game 68350d28, server db45fc1, site 3bc88de",
+  "mpReason": "a group claims the hall through the site (membership, one hall a group, the claim currants), anyone contributes, the group owns it at the end (quest.js 1297-1338, 1831-1863)",
+  "register": "G331"
+ },
+ "street_project:693": {
+  "mp": "game 68350d28, server db45fc1, site 3bc88de",
+  "mpReason": "a group claims the hall through the site (membership, one hall a group, the claim currants), anyone contributes, the group owns it at the end (quest.js 1297-1338, 1831-1863)",
+  "register": "G331"
+ },
+ "street_project:694": {
+  "mp": "game 68350d28, server db45fc1, site 3bc88de",
+  "mpReason": "a group claims the hall through the site (membership, one hall a group, the claim currants), anyone contributes, the group owns it at the end (quest.js 1297-1338, 1831-1863)",
+  "register": "G331"
+ },
+ "street_project:695": {
+  "mp": "game 68350d28, server db45fc1, site 3bc88de",
+  "mpReason": "a group claims the hall through the site (membership, one hall a group, the claim currants), anyone contributes, the group owns it at the end (quest.js 1297-1338, 1831-1863)",
+  "register": "G331"
+ },
+ "street_project:696": {
+  "mp": "game 68350d28, server db45fc1, site 3bc88de",
+  "mpReason": "a group claims the hall through the site (membership, one hall a group, the claim currants), anyone contributes, the group owns it at the end (quest.js 1297-1338, 1831-1863)",
+  "register": "G331"
+ },
+ "street_project:697": {
+  "mp": "game 68350d28, server db45fc1, site 3bc88de",
+  "mpReason": "a group claims the hall through the site (membership, one hall a group, the claim currants), anyone contributes, the group owns it at the end (quest.js 1297-1338, 1831-1863)",
+  "register": "G331"
+ },
+ "street_project:698": {
+  "mp": "game 68350d28, server db45fc1, site 3bc88de",
+  "mpReason": "a group claims the hall through the site (membership, one hall a group, the claim currants), anyone contributes, the group owns it at the end (quest.js 1297-1338, 1831-1863)",
+  "register": "G331"
  }
 }

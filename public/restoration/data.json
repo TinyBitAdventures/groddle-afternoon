@@ -2571,9 +2571,14 @@
   ]
  },
  "git": {
-  "commits": 574,
+  "commits": 575,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "In multiplayer the Job Board offers the ten group halls to claim for your group"
+   },
    {
     "date": "2026-10-27",
     "kind": "new",
@@ -2688,11 +2693,6 @@
     "date": "2026-10-26",
     "kind": "new",
     "text": "In multiplayer, a Party Pack opens a party space for your real party"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "fix",
-    "text": "Falling into the cloud tutorial no longer announces Hechey Track or a Qurazy Quoin"
    }
   ]
  },
