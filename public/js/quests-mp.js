@@ -43,6 +43,12 @@
  *    I's quest (inc_data_skills.js:3750, 3942). transcendence_5players is
  *    focusing_orb.js 1298-1300 (6+ players on the street when it ends),
  *    decided by the server (G330 radiance.go) and set by meditation-feature.
+ *  - teleportation_teleport_with_followers (Three's a Cloud): Teleportation
+ *    III's quest (inc_data_skills.js:3417, 3965). teleportation_self_withfollowers_3
+ *    is inc_teleportation.js teleport_complete 1048-1057: 3 or more still
+ *    following 3 s after the teleport. The server counts the followers
+ *    (follow.go follow_teleported) and features/follow-mp-feature.js sets
+ *    the flag; offered once following another player works (needs: follow).
  *  - meditative_arts_with_friends (is_multiplayer): offered by its own
  *    conditions (the quest file's prerequisites has_skill meditativearts_1
  *    and its two prereq_quests; quests.json 'prerequisites' trigger), as the
@@ -125,6 +131,8 @@ export const MULTIPLAYER_QUESTS = Object.freeze({
   // counted when the site settled the sale (inc_auctions.js:526; features/auctions-feature.js).
   croppery_harvest_and_sell_at_auction: Object.freeze({ offer: 'source', needs: Object.freeze(['auctions']), source: 'inc_data_skills.js:938, 3920' }),
   transcendentalradiation_radiate_to_five_people: Object.freeze({ offer: 'source', source: 'inc_data_skills.js:3750, 3942' }),
+  // G334 follow: Teleportation III's quest; the flag is the server's count at teleport_complete (follow.go).
+  teleportation_teleport_with_followers: Object.freeze({ offer: 'source', needs: Object.freeze(['follow']), source: 'inc_data_skills.js:3417, 3965' }),
   meditative_arts_with_friends: Object.freeze({ offer: 'source', source: 'quests/meditative_arts_with_friends.js prerequisites, prereq_quests' }),
   good_neighbor: Object.freeze({ offer: 'ours', offerTriggers: ours(MP_FACTS.tendNeighbour) }),
   water_neighbor_garden: Object.freeze({ offer: 'ours', offerTriggers: ours(MP_FACTS.tendNeighbour) }),
@@ -134,7 +142,6 @@ export const MULTIPLAYER_QUESTS = Object.freeze({
 
 /** The quests G329 judged and left out, with what each needs (or why it stays out). */
 export const MULTIPLAYER_QUESTS_LEFT_OUT = Object.freeze({
-  teleportation_teleport_with_followers: 'Needs following another player (inc_teleportation.js teleport_complete 1048-1057 sets it with 3 or more followers): multiplayer has no follow yet.',
   soilappreciation_help_digging: 'Needs digging a Dirt Pile together (dirt_pile.js addDigger 153-166, helped_dig 481-483): objects.go keeps help crews for rocks only.',
   play_musicblocks: 'Nothing in GSJS offers it, and it needs Play for on another player (musicblock_*.js 239-242).',
   watering_time: 'Nothing in GSJS offers it (watering_can.js 320-325 only counts it), and it needs watering another player.',

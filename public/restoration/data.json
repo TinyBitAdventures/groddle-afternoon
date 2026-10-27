@@ -984,8 +984,8 @@
    "group": "home",
    "name": "Other players and chat",
    "status": "source",
-   "blurb": "Make a character with an email and a password, right in the game, and in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global Chat, Live Help and the Trade Channel are open to everyone the original let in, and players make, find and join groups with their own chat. Say hi with 5 and your daily hi sign flies to another player; a player with no sign catches it, matching signs share a bonus, and the clock shows the day’s Hi sign leaderboard.",
-   "multiplayer": "See other players and chat on the street, form parties, keep buddies, join groups and channels, and trade hi signs.",
+   "blurb": "Make a character with an email and a password, right in the game, and in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global Chat, Live Help and the Trade Channel are open to everyone the original let in, and players make, find and join groups with their own chat. Say hi with 5 and your daily hi sign flies to another player; a player with no sign catches it, matching signs share a bonus, and the clock shows the day’s Hi sign leaderboard. Follow another player and your Glitch walks after them wherever they go, teleports included.",
+   "multiplayer": "See other players and chat on the street, form parties, keep buddies, join groups and channels, trade hi signs, and follow another player from street to street.",
    "spot": null,
    "evidence": [
     "public/js/realtime-client.js",
@@ -993,7 +993,8 @@
     "public/js/features/party-feature.js",
     "public/js/account-forms.js",
     "public/js/features/buddies-feature.js",
-    "public/js/features/groups-feature.js"
+    "public/js/features/groups-feature.js",
+    "public/js/follow-mp.js"
    ],
    "shot": null,
    "play": null
@@ -2569,7 +2570,7 @@
   ]
  },
  "git": {
-  "commits": 560,
+  "commits": 561,
   "since": "2026-10-19",
   "recent": [
    {
@@ -2694,6 +2695,6 @@
    }
   ]
  },
- "tests": 326,
+ "tests": 327,
  "generatedAt": "2026-10-27"
 }

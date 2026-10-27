@@ -19,7 +19,8 @@
  *   from meditation-feature's meditated_together (the server's peak of
  *   others meditating at once) of 10 or more. make_hooch is supply-feature's,
  *   transcendence_5players meditation-feature's, the neighbour counters
- *   neighbours-mp-feature's.
+ *   neighbours-mp-feature's, teleportation_self_withfollowers_3 (Three's a
+ *   Cloud) follow-mp-feature's (the server's follow_teleported).
  * - Race quests: the server's race_waiting to the challenger logs the
  *   course's quest, started; race_failed (refund: the challenger's own
  *   challenge) fails it; race_end with you the winner sets
@@ -50,7 +51,7 @@ import {
   isRaceStreet,
   normalizeQuestsMpSlice,
   tradeHoochCount,
-} from '../quests-mp.js?v=g329-2';
+} from '../quests-mp.js?v=g329-3';
 
 export const QUESTS_MP_FEATURE_ID = 'quests-mp';
 const FACT_CHECK_MS = 1_000;
@@ -236,7 +237,7 @@ function createSession(engine, client) {
       }
     },
     context() {
-      return { facts: { ...slice.facts }, ready: { give: engine.query?.('playerGiveReady', engine) === true, auctions: engine.query?.('auctionsReady', engine) === true } };
+      return { facts: { ...slice.facts }, ready: { give: engine.query?.('playerGiveReady', engine) === true, auctions: engine.query?.('auctionsReady', engine) === true, follow: engine.query?.('followReady', engine) === true } };
     },
   };
 }
