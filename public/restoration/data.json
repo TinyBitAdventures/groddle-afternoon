@@ -471,7 +471,7 @@
    "group": "making",
    "name": "Powders",
    "status": "source",
-   "blurb": "Every Beaker powder does its own thing again: No-No Powder’s rush and crash, Sneezing and Sparkle Powder, the Fecundity powders that make the animals drop their edibles, Fertilidust for the trees (it brings dead ones back to life), and hallowed powder that doubles or triples your next shrine donation.",
+   "blurb": "Every Beaker powder does its own thing again: No-No Powder’s rush and crash, Sneezing and Sparkle Powder, the Fecundity powders that make the animals drop their edibles, Fertilidust for the trees (it brings dead ones back to life), and hallowed powder that doubles or triples your next shrine donation. In multiplayer, Sneezing and Sparkle Powder reach every other player on the street.",
    "spot": null,
    "evidence": [
     "public/js/powders.js",
@@ -920,7 +920,7 @@
    "group": "home",
    "name": "Other players and chat",
    "status": "source",
-   "blurb": "Make a character with an email and a password, right in the game, and in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global Chat, Live Help and the Trade Channel are open to everyone the original let in, and players make, find and join groups with their own chat.",
+   "blurb": "Make a character with an email and a password, right in the game, and in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global Chat, Live Help and the Trade Channel are open to everyone the original let in, and players make, find and join groups with their own chat. Say hi with 5 and your daily hi sign flies to another player; a player with no sign catches it, matching signs share a bonus, and the clock shows the day’s Hi sign leaderboard.",
    "spot": null,
    "evidence": [
     "public/js/realtime-client.js",
@@ -2493,9 +2493,14 @@
   ]
  },
  "git": {
-  "commits": 545,
+  "commits": 546,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "In multiplayer, one Feat a day is shared by everyone playing, with its goals, ranks and petrified rock rewards"
+   },
    {
     "date": "2026-10-26",
     "kind": "new",
@@ -2610,14 +2615,9 @@
     "date": "2026-10-26",
     "kind": "new",
     "text": "Reset a forgotten multiplayer password without leaving the game"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "new",
-    "text": "Make a multiplayer character and sign in right in the game, with an email and a password"
    }
   ]
  },
- "tests": 316,
+ "tests": 317,
  "generatedAt": "2026-10-26"
 }

@@ -136,7 +136,7 @@ export const CHECKLIST = Object.freeze([
     blurb: 'The recipe catalog across every making tool, with skill rules and tool wear.',
     evidence: ['public/js/making.js', 'public/assets/content/recipes.json'] },
   { id: 'powders', group: 'making', name: 'Powders', status: 'source',
-    blurb: 'Every Beaker powder does its own thing again: No-No Powder’s rush and crash, Sneezing and Sparkle Powder, the Fecundity powders that make the animals drop their edibles, Fertilidust for the trees (it brings dead ones back to life), and hallowed powder that doubles or triples your next shrine donation.',
+    blurb: 'Every Beaker powder does its own thing again: No-No Powder’s rush and crash, Sneezing and Sparkle Powder, the Fecundity powders that make the animals drop their edibles, Fertilidust for the trees (it brings dead ones back to life), and hallowed powder that doubles or triples your next shrine donation. In multiplayer, Sneezing and Sparkle Powder reach every other player on the street.',
     evidence: ['public/js/powders.js', 'public/js/features/powders-feature.js'] },
   { id: 'potions', group: 'making', name: 'Potions', status: 'source',
     blurb: 'Every Cauldron potion can be quaffed or poured again: the Amorous Philtre’s Feeling Called Love, the Elixir of Avarice’s fifty extra quoins, favor from a Draught of Giant Amicability (shake it for another Giant), the Keycutter Tonic, Potions of Animal Youth, clouds that embiggen or shrink you, Rainbow Juice that sends you up, and Trantsformation Fluid that turns one tree into another. You can munch a Rug, too.',
@@ -235,7 +235,7 @@ export const CHECKLIST = Object.freeze([
     blurb: 'A crafting robot delivered in a box by your Magic Rock: queue jobs and it fetches the ingredients and tools, crafts every step, burns fuel and crystals, and hands you the results.',
     evidence: ['public/js/craftybot.js', 'public/js/features/craftybot-feature.js', 'public/assets/content/craftybot-specs.json'] },
   { id: 'chat', group: 'home', name: 'Other players and chat', status: 'source',
-    blurb: 'Make a character with an email and a password, right in the game, and in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global Chat, Live Help and the Trade Channel are open to everyone the original let in, and players make, find and join groups with their own chat.',
+    blurb: 'Make a character with an email and a password, right in the game, and in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global Chat, Live Help and the Trade Channel are open to everyone the original let in, and players make, find and join groups with their own chat. Say hi with 5 and your daily hi sign flies to another player; a player with no sign catches it, matching signs share a bonus, and the clock shows the day’s Hi sign leaderboard.',
     evidence: ['public/js/realtime-client.js', 'public/js/features/realtime-feature.js', 'public/js/features/party-feature.js', 'public/js/account-forms.js', 'public/js/features/buddies-feature.js', 'public/js/features/groups-feature.js'] },
 
   // —— Late game ——

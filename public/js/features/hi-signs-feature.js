@@ -48,6 +48,21 @@
  * Canvas data: hiVariant, hiButlerVariant, hiCount, hiLast, hiMissiles,
  *   hiMissileSecs, hiBonus, hiMood, hiResponse, hiOverlay, hiRecord,
  *   hiRecordsHeld, hiBest, hiAutoplay.
+ *
+ * Multiplayer (G327; engine.mode 'multiplayer' with the realtime client,
+ * groddle-afternoon-server hi.go; pure helpers js/hi-signs-mp.js): the
+ * server rolls your daily sign (and your Butler's), picks whom a hi flies
+ * at (the nearest player within 400 px you have not said hi to since your
+ * sign was set, in front of you first), passes your sign to a player with
+ * none, decides the bonus and keeps the day's tally and each street's
+ * evasion records. "5" sends hi_say and draws what hi_said answers; every
+ * hi on the street is drawn from hi_emoted (the sign over that player and
+ * its missile to the one it flies at); a missile chasing you reports its
+ * seconds when it lands (hi_hit) and hi_evaded grants the badges; the
+ * bonus (hi_bonus) draws the 2x sign and bolts between you and them. Your
+ * Butler at home works as in solo, with the server's signs. Click the clock
+ * for the Hi sign leaderboard (HiLeaderboard.as in the clock's dialog).
+ * Canvas data: hiMpLast, hiBoard (sign:count,...), hiBoardOpen, hiYesterday.
  */
 
 import { butlerApi } from './butler-feature.js?v=butler-feature-42';
@@ -55,6 +70,7 @@ import { metabolicGain, moodMax } from '../metabolics.js';
 import { frameTexture, sourceFromUrl } from '../textures.js';
 import {
   HI,
+  HI_BUTLER_ID,
   HI_TEXT,
   HI_ART,
   butlerHiResponse,
@@ -77,6 +93,7 @@ import {
   normalizeEvasionRecords,
   normalizePlayerHi,
   playerButlerBonusCounters,
+  playerHiActivity,
   playerHiVariant,
   playerSaysHi,
   rememberDailyRecord,
@@ -84,6 +101,21 @@ import {
   setPlayerHiVariant,
   stepMissile,
 } from '../hi-signs.js?v=hi-signs-4';
+import {
+  BOARD_POLL_MS,
+  BOARD_TEXT,
+  BUTLER_INFECT,
+  BUTLER_TARGET,
+  boardRows,
+  counterRows,
+  grantIds,
+  normalizeBoard,
+  normalizeHiState,
+  normalizeWinner,
+  recordLine,
+  yesterdayLine,
+  yourSignLine,
+} from '../hi-signs-mp.js?v=g327-1';
 
 export const HI_FEATURE_ID = 'hi-signs';
 /** The player's label in the Butler's lines (as BUTLER_INTRO: the remake's players have no name). */
@@ -329,10 +361,14 @@ function moodText(engine, x, y, n, bang = false) {
   engine.floatText?.(x, y, `+${n} mood${bang ? '!' : ''}`, 0xfff0a8);
 }
 
-/** doEmoteHiBonus: the 2x sign between you and the Butler, two bolts, HI_FLOWERS_2X, "+N mood!". */
-function showBonus(engine, variant, granted) {
+/**
+ * doEmoteHiBonus: the 2x sign between you and the Butler (or, in multiplayer,
+ * the other player: `spotOf` gives where they stand), two bolts,
+ * HI_FLOWERS_2X, "+N mood!".
+ */
+function showBonus(engine, variant, granted, spotOf = () => butlerApi.hiSpot(engine)) {
   const pl = engine.player;
-  const spot = butlerApi.hiSpot(engine);
+  const spot = spotOf();
   if (!pl || !spot) return;
   const mid = { x: pl.x - (pl.x - spot.x) / 2, y: pl.y - (pl.y - spot.y) / 2 + HI.BONUS_OVERLAY_DY };
   const over = showOverlay(engine, variant, 'bonus', () => mid, HI.BONUS_OVERLAY_MS);
@@ -340,7 +376,7 @@ function showBonus(engine, variant, granted) {
   const to = () => (over && !over.sprite.destroyed ? { x: mid.x, y: mid.y + HI.BOLT_TO_DY } : null);
   showBolt(engine, color, () => (engine.player ? { x: engine.player.x, y: engine.player.y + HI.BOLT_FROM_DY } : null), to);
   showBolt(engine, color, () => {
-    const s = butlerApi.hiSpot(engine);
+    const s = spotOf();
     return s ? { x: s.x, y: s.y + HI.BOLT_FROM_DY } : null;
   }, to);
   engine.playSound?.('HI_FLOWERS_2X');
@@ -376,10 +412,25 @@ function sayHi(engine, { force = false } = {}) {
   const t = performance.now();
   if (!force && t - lastHiAt < HI.THROTTLE_MS) return 'throttled';
   lastHiAt = t;
+  if (ensureMp(engine)) return sayHiMp(engine);
+  return runHi(engine);
+}
+
+/**
+ * doEmote with your Butler as the only possible target. In multiplayer the
+ * sign is already the server's (hi_said), so nothing rolls here; `random`
+ * is whether the server rolled it for this hi.
+ */
+function runHi(engine, { random = null } = {}) {
   const now = nowMs();
   const b = butlerApi.hiState();
   const near = butlerNear(engine);
-  const out = playerSaysHi(p, b, { now, rand: rng, butlerNear: near, butlerLabel: butlerApi.label() || 'Butler' });
+  const label = butlerApi.label() || 'Butler';
+  const out = playerSaysHi(p, b, { now, rand: rng, butlerNear: near, butlerLabel: label });
+  if (random != null) {
+    out.gotRandomly = Boolean(random);
+    out.activity = playerHiActivity(out, label);
+  }
   counters(engine, out.counters);
   if (out.activity) engine.pushActivity?.(out.activity);
   showOverlay(engine, out.variant, 'hi', playerOverlayAt(engine));
@@ -450,7 +501,11 @@ function butlerSayHi(engine) {
   const spot = butlerApi.hiSpot(engine);
   if (!b || !spot || !engine.player) return null;
   const now = nowMs();
+  // Multiplayer: when the Butler needs a sign today it takes the server's roll (hi_state butler).
+  if (ensureMp(engine) && mp.butler && (!b.variant || b.gtDay !== hiDay(now))) setButlerHiVariant(b, mp.butler, now);
   const out = butlerSaysHi(b, p, { now, rand: rng, busy: butlerWaiting });
+  // ... and a sign it passes you is the server's to set (it answers with hi_state).
+  if (out.said && out.infectedPlayer && mpc) mpc.send('hi_caught', { from: 'butler' });
   if (!out.said) {
     save(engine);
     lastMsg = `butler:${out.reason}`;
@@ -533,6 +588,373 @@ function missileHitYou(engine, m, granted) {
   lastMsg = `hit:you:${secs}`;
   save(engine);
   publish(engine, true);
+}
+
+// ---------------------------------------------------------------------------
+// Multiplayer (G327): hi signs between real players, from groddle-afternoon-server hi.go
+// ---------------------------------------------------------------------------
+
+/** The realtime client once realtime-feature has one, in multiplayer only. */
+let mpc = null;
+let mp = freshMp();
+let board = null;
+
+function freshMp() {
+  return { butler: '', board: normalizeBoard({}), yesterday: normalizeWinner({}), pendingButler: false, moodFrom: new Map(), last: '', polledAt: 0 };
+}
+
+function ensureMp(engine) {
+  if (mpc) return mpc;
+  if (engine?.mode !== 'multiplayer') return null;
+  const c = engine.query?.('realtimeClient');
+  if (c) attachMp(engine, c);
+  return mpc;
+}
+
+function myId() {
+  return Number(mpc?.me?.id) || 0;
+}
+
+/** Where another player's Glitch is drawn (realtime-feature's remotes), or null once they left. */
+function remoteAt(id) {
+  const r = globalThis.groddleRealtime?.remotes?.get?.(Number(id))?.root;
+  return r && !r.destroyed ? { x: r.x, y: r.y } : null;
+}
+
+function hidden(engine, id) {
+  return Boolean(engine.query?.('realtimeHidden', Number(id)));
+}
+
+/** The server's sign for today becomes yours (setPlayerHiVariant: a new sign starts the Butler targets over). */
+function mirrorVariant(variant, now = nowMs()) {
+  const v = isHiVariant(variant) ? variant : '';
+  if (playerHiVariant(p, now) === v) return;
+  p.variant = '';
+  p.variantDay = -1;
+  if (v) setPlayerHiVariant(p, v, now);
+}
+
+function grants(engine, list) {
+  for (const id of grantIds(list)) engine.grantAchievement?.(id);
+}
+
+function mpNote(engine, s) {
+  mp.last = s;
+  engine.setData?.('hiMpLast', s);
+}
+
+function attachMp(engine, c) {
+  mpc = c;
+  const sync = () => c.send('hi_sync');
+  c.on('hello', sync);
+  if (c.state === 'online') sync();
+  c.on('msg:hi_state', (m) => onHiState(engine, m));
+  c.on('msg:hi_said', (m) => onHiSaid(engine, m));
+  c.on('msg:hi_emoted', (m) => onHiEmoted(engine, m));
+  c.on('msg:hi_got', (m) => onHiGot(engine, m));
+  c.on('msg:hi_bonus', (m) => onHiBonus(engine, m));
+  c.on('msg:hi_evaded', (m) => onHiEvaded(engine, m));
+  c.on('msg:hi_record', (m) => {
+    const line = recordLine(m.name, m.msg);
+    engine.pushActivity?.(line);
+    if (Number(m.id) === myId()) lastRecord = `record:${m.msg}`;
+    mpNote(engine, `record:${m.name}`);
+  });
+  c.on('msg:hi_board', (m) => {
+    mp.board = normalizeBoard(m.board);
+    renderBoard(engine);
+  });
+  c.on('msg:hi_winner', (m) => {
+    mp.yesterday = normalizeWinner(m.yesterday);
+    renderBoard(engine);
+  });
+  bindClock(engine);
+}
+
+function onHiState(engine, m) {
+  const st = normalizeHiState(m);
+  mirrorVariant(st.variant);
+  mp.butler = st.butler;
+  mp.board = st.board;
+  mp.yesterday = st.yesterday;
+  if (st.held > 0) {
+    // calculate_pcs_daily_evasion_record_achieves: the records you held on shared streets.
+    engine.achievement?.('daily_evasion_record:held', st.held);
+    mpc?.send('hi_ack', { held: st.held });
+  }
+  mpNote(engine, `state:${st.variant || 'none'}`);
+  save(engine);
+  renderBoard(engine);
+  publish(engine, true);
+}
+
+/** sayHi in multiplayer: the server rolls and aims; hi_said comes back. */
+function sayHiMp(engine) {
+  if (mpc.state !== 'online') {
+    engine.toast?.('You can say hi once you are back online.', 2400);
+    lastMsg = 'hi:offline';
+    publish(engine, true);
+    return lastMsg;
+  }
+  const b = butlerApi.hiState();
+  const near = Boolean(b) && butlerNear(engine);
+  let butler = '';
+  if (near) {
+    // playerSaysHi: the Butler is your target once per sign, and catches it when it has none.
+    const target = !playerHiVariant(p, nowMs()) || !p.butlers[HI_BUTLER_ID];
+    butler = target && !b.variant ? BUTLER_INFECT : BUTLER_TARGET;
+  }
+  mp.pendingButler = near;
+  mpc.send('hi_say', butler ? { butler } : {});
+  lastMsg = `hi:asked${near ? ':butler' : ''}`;
+  publish(engine, true);
+  return lastMsg;
+}
+
+/** Missile.as from a sign over `fromAt()` to the chest of whoever `targetAt()` follows. */
+function playerMissile(engine, variant, fromAt, targetAt, onHit) {
+  later(HI.SHARD_DELAY_MS, () => launchMissile(engine, {
+    variant,
+    from: () => {
+      const q = fromAt();
+      return q ? { x: q.x, y: q.y + HI.OVERLAY_DY + HI.MISSILE_START_DY } : null;
+    },
+    target: () => {
+      const q = targetAt();
+      return q ? { x: q.x, y: q.y + HI.MISSILE_TARGET_DY } : null;
+    },
+    onHit,
+  }), 'mp');
+}
+
+function meAt(engine) {
+  return () => (engine.player && engine.started ? { x: engine.player.x, y: engine.player.y } : null);
+}
+
+function onHiSaid(engine, m) {
+  const variant = isHiVariant(m.variant) ? m.variant : '';
+  if (!variant) return;
+  mirrorVariant(variant);
+  if (mp.pendingButler) {
+    // Your Butler at home: the solo flow, with the server's sign.
+    mp.pendingButler = false;
+    runHi(engine, { random: Boolean(m.random) });
+    mpNote(engine, `said:${variant}:butler`);
+    return;
+  }
+  // counters_increment("emotes", "hi").
+  p.count = (p.count || 0) + 1;
+  counters(engine, counterRows(m.counters));
+  grants(engine, m.grant);
+  if (m.activity) engine.pushActivity?.(String(m.activity));
+  showOverlay(engine, variant, 'hi', playerOverlayAt(engine));
+  const target = Number(m.target?.id) || 0;
+  if (target) {
+    engine.playSound?.('HI_FLOWERS');
+    playerMissile(engine, variant, meAt(engine), () => remoteAt(target), () => {
+      lastMsg = `hit:pc:${target}:${variant}`;
+      publish(engine, true);
+    });
+  }
+  lastMsg = `hi:${variant}${m.random ? ':random' : ''}${target ? `:pc:${target}` : ''}${m.infected ? ':infected' : ''}${m.bonus ? ':bonus' : ''}`;
+  mpNote(engine, `said:${variant}:${target}`);
+  save(engine);
+  publish(engine, true);
+}
+
+/** Someone else on the street said hi: their sign over them, and its missile to whoever it flies at. */
+function onHiEmoted(engine, m) {
+  const from = Number(m.id) || 0;
+  const variant = isHiVariant(m.variant) ? m.variant : '';
+  if (!from || !variant || hidden(engine, from)) return;
+  const fromAt = () => remoteAt(from);
+  showOverlay(engine, variant, 'hi', () => {
+    const q = fromAt();
+    return q ? { x: q.x, y: q.y + HI.OVERLAY_DY } : null;
+  });
+  const target = Number(m.target) || 0;
+  if (!target) return;
+  if (target === myId()) {
+    // Your client hears HI_FLOWERS for a shard aimed at you; the missile chases you.
+    engine.playSound?.('HI_FLOWERS');
+    playerMissile(engine, variant, fromAt, meAt(engine), (missile) => hitByPlayer(engine, from, missile));
+  } else {
+    playerMissile(engine, variant, fromAt, () => remoteAt(target), null);
+  }
+  mpNote(engine, `emoted:${from}:${variant}:${target}`);
+}
+
+/** You were said hi to: their sign if you had none, their line, and the mood (granted now, shown when it lands). */
+function onHiGot(engine, m) {
+  const from = Number(m.from?.id) || 0;
+  mirrorVariant(m.variant);
+  counters(engine, counterRows(m.counters));
+  if (m.activity) engine.pushActivity?.(String(m.activity));
+  const granted = Number(m.mood) > 0 ? addMood(engine, Number(m.mood)) : 0;
+  if (from) mp.moodFrom.set(from, granted);
+  mpNote(engine, `got:${from}:${m.variant}${m.infected ? ':infected' : ''}${m.bonus ? ':bonus' : ''}`);
+  save(engine);
+  publish(engine, true);
+}
+
+/** MissileController.doMissilehit on you, then doHiEmoteMissileHit: the server checks and counts it. */
+function hitByPlayer(engine, from, missile) {
+  const pl = engine.player;
+  const granted = mp.moodFrom.get(from) || 0;
+  mp.moodFrom.delete(from);
+  if (pl) moodText(engine, pl.x, avatarTop(engine) + 30, granted);
+  engine.playSound?.('HI_FLOWERS_HIT');
+  // A Fine How-Do-You-Do: a hi sign received (G143).
+  engine.featsIncrement?.('hi_signs_1', 1);
+  const secs = missileSeconds(missile);
+  p.bestEvasion = Math.max(p.bestEvasion || 0, secs);
+  lastEvasion = String(secs);
+  mpc?.send('hi_hit', { from, secs });
+  lastMsg = `hit:you:${secs}`;
+  save(engine);
+  publish(engine, true);
+}
+
+function onHiEvaded(engine, m) {
+  grants(engine, m.grant);
+  if (m.activity) engine.pushActivity?.(String(m.activity));
+  if (m.record) lastRecord = `${m.record}:${Number(m.secs) || 0}`;
+  mpNote(engine, `evaded:${Number(m.secs) || 0}:${m.record || ''}`);
+  publish(engine, true);
+}
+
+/** doHiEmoteBonusWithOtherPlayer: your mood, the 2x sign and bolts between you and them. */
+function onHiBonus(engine, m) {
+  const variant = isHiVariant(m.variant) ? m.variant : '';
+  if (!variant) return;
+  const other = Number(m.other?.id) || 0;
+  const granted = addMood(engine, Number(m.mood) || 0);
+  counters(engine, counterRows(m.counters));
+  grants(engine, m.grant);
+  showBonus(engine, variant, granted, () => remoteAt(other));
+  lastMsg = `bonus:pc:${variant}:${granted}`;
+  mpNote(engine, `bonus:${other}:${granted}`);
+  save(engine);
+  publish(engine, true);
+}
+
+// —— The Hi sign leaderboard (HiLeaderboard.as, in the clock's dialog) ——
+
+const BOARD_STYLE = `
+.hi-board { position: fixed; z-index: 70; top: 3.2rem; left: 50%; transform: translateX(-50%); width: min(27rem, calc(100vw - 2rem)); max-height: calc(100vh - 5rem); overflow: auto;
+  border-radius: 12px; padding: 0.8rem 0.95rem 0.9rem; background: #fbf8ef; color: #2b2a22; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); font: 13px/1.4 system-ui, sans-serif; }
+.hi-board[hidden] { display: none; }
+.hi-board h2 { margin: 0 0 0.35rem; font-size: 1rem; }
+.hi-board .hi-close { float: right; border: 0; background: transparent; font-size: 1.15rem; line-height: 1; cursor: pointer; color: #2b2a22; }
+.hi-board .hi-you { display: flex; align-items: center; gap: 0.5rem; margin: 0.2rem 0 0.4rem; font-weight: 600; }
+.hi-board .hi-sign { display: inline-block; flex: none; background-repeat: no-repeat; }
+.hi-board .hi-more { border: 0; padding: 0; background: none; color: #027b94; font: inherit; font-weight: 700; cursor: pointer; }
+.hi-board .hi-desc { margin: 0.4rem 0; color: #4a463c; }
+.hi-board ol { list-style: none; margin: 0.5rem 0; padding: 0.55rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(7.6rem, 1fr)); gap: 0.25rem 0.6rem; border-radius: 10px; background: #f0ece0; }
+.hi-board li { display: flex; align-items: center; gap: 0.35rem; }
+.hi-board li b { margin-left: auto; }
+.hi-board .hi-yesterday { margin: 0.3rem 0 0; font-weight: 600; }
+/* The nameplate lets clicks through to the street; its clock takes them in multiplayer. */
+.dametime-clock[data-hi-board] { cursor: pointer; pointer-events: auto; }
+`;
+
+/** The sign's "1" icon (ItemIconView hi_overlay state 1): its still cell cropped round the icon's centre. */
+function signImg(variant, size = 30) {
+  const sheet = hiArtSheet(variant, 'still');
+  const box = 46;
+  const k = size / box;
+  const icon = document.createElement('span');
+  icon.className = 'hi-sign';
+  icon.setAttribute('aria-hidden', 'true');
+  icon.style.width = `${size}px`;
+  icon.style.height = `${size}px`;
+  icon.style.backgroundImage = `url("${sheet.url}")`;
+  icon.style.backgroundSize = `${sheet.w * k}px ${sheet.h * k}px`;
+  icon.style.backgroundPosition = `${-(sheet.ax - box / 2) * k}px ${-(sheet.ay - box / 2) * k}px`;
+  return icon;
+}
+
+function bindClock(engine) {
+  if (typeof document === 'undefined' || board) return;
+  const clock = document.getElementById('dametime-clock');
+  if (!clock) return;
+  const style = document.createElement('style');
+  style.id = 'hi-board-css';
+  style.textContent = BOARD_STYLE;
+  document.head.append(style);
+  const box = document.createElement('section');
+  box.className = 'hi-board';
+  box.hidden = true;
+  box.setAttribute('aria-label', BOARD_TEXT.title);
+  box.dataset.hiBoard = '';
+  document.body.append(box);
+  board = { box, open: false, more: false };
+  clock.dataset.hiBoard = '';
+  clock.setAttribute('tabindex', '0');
+  clock.setAttribute('title', `${clock.getAttribute('title') || ''} (click for the ${BOARD_TEXT.title})`.trim());
+  const toggle = () => setBoardOpen(engine, !board.open);
+  clock.addEventListener('click', toggle);
+  clock.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggle();
+    }
+  });
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && board?.open) setBoardOpen(engine, false);
+  });
+}
+
+function setBoardOpen(engine, open) {
+  if (!board) return;
+  board.open = open;
+  board.box.hidden = !open;
+  if (open) {
+    mp.polledAt = performance.now();
+    mpc?.send('hi_board');
+  }
+  renderBoard(engine);
+}
+
+function renderBoard(engine) {
+  const b = mp.board;
+  engine?.setData?.('hiBoard', Object.entries(b).filter(([, n]) => n > 0).map(([v, n]) => `${v}:${n}`).join(','));
+  engine?.setData?.('hiYesterday', yesterdayLine(mp.yesterday));
+  engine?.setData?.('hiBoardOpen', board?.open ? '1' : '0');
+  if (!board?.open) return;
+  const { box } = board;
+  const el = (tag, cls, text) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text) n.textContent = text;
+    return n;
+  };
+  const close = el('button', 'hi-close', '×');
+  close.type = 'button';
+  close.setAttribute('aria-label', 'Close');
+  close.addEventListener('click', () => setBoardOpen(engine, false));
+  const variant = playerHiVariant(p, nowMs());
+  const you = el('p', 'hi-you');
+  if (variant) you.append(signImg(variant));
+  you.append(document.createTextNode(yourSignLine(variant)));
+  const more = el('button', 'hi-more', board.more ? BOARD_TEXT.less : BOARD_TEXT.more);
+  more.type = 'button';
+  more.addEventListener('click', () => {
+    board.more = !board.more;
+    renderBoard(engine);
+  });
+  const parts = [close, el('h2', '', BOARD_TEXT.title), you, el('p', '', BOARD_TEXT.instruct), more];
+  if (board.more) parts.push(el('p', 'hi-desc', BOARD_TEXT.desc));
+  const list = el('ol');
+  list.setAttribute('aria-label', 'Signs today');
+  for (const row of boardRows(b)) {
+    const li = el('li');
+    li.dataset.variant = row.variant;
+    li.append(signImg(row.variant, 22), document.createTextNode(row.name), el('b', '', String(row.count)));
+    list.append(li);
+  }
+  parts.push(list, el('p', 'hi-yesterday', yesterdayLine(mp.yesterday)));
+  box.replaceChildren(...parts);
 }
 
 // ---------------------------------------------------------------------------
@@ -781,6 +1203,7 @@ export const hiSignsFeature = {
     // onPlayerExit: the Butler's hi timers stop and it forgets its target; missiles end with the location.
     cancel('butler');
     cancel('hint');
+    cancel('mp');
     butlerWaiting = false;
     for (const f of effects) f.destroy();
     effects = [];
@@ -797,6 +1220,10 @@ export const hiSignsFeature = {
 
   onTick(dtMs, _t, engine) {
     if (!engine.started) return;
+    if (ensureMp(engine) && board?.open && performance.now() - mp.polledAt > BOARD_POLL_MS) {
+      mp.polledAt = performance.now();
+      mpc.send('hi_board');
+    }
     if (!demoDone) demoSetup(engine);
     runTimers();
     if (effects.length) {
@@ -821,8 +1248,18 @@ export const hiSignsFeature = {
   _butlerSayHi(engine) {
     return butlerSayHi(engine);
   },
+  /** Multiplayer QA / tests: the client this feature listens on, and its state. */
+  _mp() {
+    return { client: mpc, mp, board };
+  },
+  _attachMp(engine, client) {
+    attachMp(engine, client);
+  },
   _reset() {
     p = normalizePlayerHi({});
+    mpc = null;
+    mp = freshMp();
+    board = null;
     effects = [];
     timers = [];
     lastHiAt = -Infinity;

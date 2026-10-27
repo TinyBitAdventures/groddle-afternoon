@@ -38,8 +38,22 @@
  * the Feat ran (inc_feats.js:321 returns on its first line); solo Feats turn
  * them back on.
  *
- * Not built: the sneezing and sparkle effects on other players (Sneeze-O-Rama
- * needs 5 of them, Sparkle Buddy 7: lost). Nothing to build for
+ * Multiplayer (G327; engine.mode 'multiplayer' with the realtime client):
+ * Scatter and Sprinkle first ask the realtime server (groddle-afternoon-server
+ * hi.go powder_spread), which counts the street: over 15 players a Sneezing
+ * Powder is "Really? Really?! Why be SUCH a jerk??" and a splanking (three
+ * drops of 10 mood), over 10 a Sparkle Powder is "There ain't enough sparkle
+ * in the jar for this many people."; neither uses a charge. Otherwise the jar
+ * runs as in solo and every other player on the street catches it: the
+ * Sneezing buff (sneezes the server times, 0-8 s in and at 13 s, seen by
+ * everyone, and at 21 s the last one and a Bean at their feet) or +20 mood,
+ * each with the source's line; Sneeze-O-Rama at 5 others, Sparkle Buddy at 7
+ * (the server's powders counters). The 150% window sparkle overlay is not
+ * built (overlay_sparkle_powder.fla is not in the overlay sheets yet).
+ * Canvas: powderMp.
+ *
+ * Solo: the sneezing and sparkle effects on other players are multiplayer's
+ * (Sneeze-O-Rama and Sparkle Buddy stay out of reach). Nothing to build for
  * include/trants.js:1244 onFertilidust: it calls this.reduceRookedness(60) on
  * a rooked trant, but no GSJS file defines reduceRookedness.
  *
@@ -73,6 +87,16 @@ import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { DEAD_TRANT_CLASSES } from '../patches.js';
 import { hellFeature } from './hell-feature.js?v=hell-16';
 import { grantMoodXp } from '../mood-xp.js';
+import { playSheetOverlay } from '../overlay-art.js?v=g311-1';
+import {
+  POWDER_MP,
+  POWDER_MP_TEXT,
+  SPREAD_POWDERS,
+  counterRows,
+  powderCaughtLine,
+  powderRefusedLine,
+  powderRefusedSound,
+} from '../hi-signs-mp.js?v=g327-1';
 
 export const POWDERS_FEATURE_ID = 'powders';
 
@@ -316,9 +340,147 @@ export function runPowder(engine, classTsid) {
     engine.toast?.(button.reason, 2400);
     return null;
   }
+  // Multiplayer: Scatter and Sprinkle reach the street; the server says who first (powder_spread).
+  if (SPREAD_POWDERS.has(classTsid) && ensureMp(engine)?.state === 'online') {
+    if (asking) return null;
+    asking = classTsid;
+    mpc.send('powder_spread', { cls: classTsid });
+    last = `${classTsid}:asked`;
+    mpNote(engine, last);
+    publish(engine);
+    return last;
+  }
   last = `${classTsid}:${runnerFor(classTsid)(engine, classTsid)}`;
   publish(engine);
   return last;
+}
+
+// ---------------------------------------------------------------------------
+// Multiplayer (G327): powders that spread to the other players on the street
+// ---------------------------------------------------------------------------
+
+let mpc = null;
+let asking = '';
+
+function ensureMp(engine) {
+  if (mpc) return mpc;
+  if (engine?.mode !== 'multiplayer') return null;
+  const c = engine.query?.('realtimeClient');
+  if (c) attachMp(engine, c);
+  return mpc;
+}
+
+function mpNote(engine, s) {
+  engine.setData?.('powderMp', s);
+}
+
+function remoteAt(id) {
+  const r = globalThis.groddleRealtime?.remotes?.get?.(Number(id))?.root;
+  return r && !r.destroyed ? { x: r.x, y: r.y } : null;
+}
+
+/** The sneeze over a player (pc_overlay overlay_sneezing_powder, 300 x 300, 110 px up). */
+function sneezeOverlay(engine, at) {
+  let spot = at();
+  if (!engine.PIXI || !engine.entityLayer || !spot) return;
+  playSheetOverlay(engine.PIXI, 'overlay_sneezing_powder', {
+    layer: engine.entityLayer,
+    // A pc_overlay stands (center bottom) 110 px above the feet, following them; where they were if they left.
+    at: () => {
+      spot = at() || spot;
+      return { x: spot.x, y: spot.y + POWDER_MP.SNEEZE_DY };
+    },
+    wh: POWDER_MP.SNEEZE_WH,
+    durationMs: POWDER_MP.SNEEZE_MS,
+    loop: false,
+    zIndex: 70,
+  });
+}
+
+function attachMp(engine, c) {
+  mpc = c;
+  c.on('msg:powder_spread', (m) => onSpread(engine, m));
+  c.on('msg:powder_caught', (m) => onCaught(engine, m));
+  c.on('msg:powder_sneeze', (m) => onSneeze(engine, m));
+  c.on('state', ({ state }) => {
+    if (state !== 'online') asking = '';
+  });
+}
+
+/** The server's answer to Scatter / Sprinkle: run the jar (as solo) and count the badge, or refuse. */
+function onSpread(engine, m) {
+  const cls = String(m.cls || '');
+  if (!SPREAD_POWDERS.has(cls) || asking !== cls) return;
+  asking = '';
+  if (!m.ok) {
+    const line = powderRefusedLine(cls, m.why);
+    say(engine, line, false);
+    const sound = powderRefusedSound(cls, m.why);
+    if (sound) engine.playSound?.(sound, { volume: 0.6 });
+    if (cls === 'sneezing_powder' && m.why === 'crowd') {
+      // naughtySplanking (players/player.js 2936-2970): three drops of 10 mood, 3.5 s apart.
+      for (let i = 1; i <= POWDER_MP.SPLANK_DROPS; i += 1) {
+        later(i * POWDER_MP.SPLANK_MS, () => {
+          loseMood(engine.pc, POWDER_MP.SPLANK_MOOD);
+          engine.updateHud?.();
+        });
+      }
+    }
+    last = `${cls}:refused:${m.why || ''}`;
+    mpNote(engine, last);
+    publish(engine);
+    return;
+  }
+  if (countItem(engine.inv, cls) < 1) return;
+  last = `${cls}:${runnerFor(cls)(engine, cls)}:${Number(m.players) || 0}`;
+  for (const [counter, amount] of counterRows(m.counters)) engine.achievement(counter, amount);
+  mpNote(engine, last);
+  publish(engine);
+}
+
+/** Someone else's powder reached you. */
+function onCaught(engine, m) {
+  const cls = String(m.cls || '');
+  const name = String(m.from?.name || '');
+  if (cls === 'sneezing_powder') {
+    // catalog_buffs.js 2411: Sneezing, 21 s; its sneezes come from the server (powder_sneeze).
+    engine.applyBuff?.('sneezing');
+    say(engine, powderCaughtLine(cls, name));
+  } else if (cls === 'sparkle_powder') {
+    // sparkle_powder.js 324: metabolics_add_mood(20) for each of the others.
+    const pc = engine.pc;
+    let granted = 0;
+    if (pc && metabolicGain('mood').ok) {
+      const before = Number(pc.mood) || 0;
+      pc.mood = Math.min(moodMax(pc), before + POWDER_MP.SPARKLE_MOOD);
+      granted = Math.round(pc.mood - before);
+    }
+    say(engine, powderCaughtLine(cls, name, granted));
+    engine.updateHud?.();
+    engine.save?.();
+  } else return;
+  mpNote(engine, `caught:${cls}:${name}`);
+}
+
+/** A sneeze on the street: yours (the sound, the line, at the last one the bean) or another player's overlay. */
+function onSneeze(engine, m) {
+  const id = Number(m.id) || 0;
+  const mine = id && id === Number(mpc?.me?.id);
+  if (mine) {
+    const pl = engine.player;
+    engine.playSound?.('SNEEZING_AHCHOO', { volume: 0.7 });
+    sneezeOverlay(engine, () => (engine.player ? { x: engine.player.x, y: engine.player.y } : null));
+    if (m.last) {
+      say(engine, POWDER_MP_TEXT.lastSneeze);
+      // Sneezing on_remove: location.createItem('bean_plain', 1, pc.x, pc.y).
+      if (pl) engine.dropWorldStack?.('bean_plain', 1, pl.x, pl.y - 1);
+    } else engine.pushActivity?.(POWDER_MP_TEXT.sneeze);
+    mpNote(engine, `sneeze:me${m.last ? ':last' : ''}`);
+    return;
+  }
+  if (!id || engine.query?.('realtimeHidden', id)) return;
+  sneezeOverlay(engine, () => remoteAt(id));
+  mpNote(engine, `sneeze:${id}${m.last ? ':last' : ''}`);
 }
 
 function setupDemo(engine) {
@@ -343,6 +505,7 @@ export const powdersFeature = {
   },
 
   onTick(dtMs, now, engine) {
+    if (engine?.mode === 'multiplayer' && !mpc) ensureMp(engine);
     if (!pending.length) return;
     const due = pending.filter((p) => p.at <= now);
     if (!due.length) return;
@@ -406,7 +569,12 @@ export const powdersFeature = {
   _state() {
     return { charges, noNo, pending: pending.length, last };
   },
+  _attachMp(engine, client) {
+    attachMp(engine, client);
+  },
   _reset() {
+    mpc = null;
+    asking = '';
     charges = {};
     noNo = { day: '', sniffs: 0, startAt: 0 };
     pending = [];
