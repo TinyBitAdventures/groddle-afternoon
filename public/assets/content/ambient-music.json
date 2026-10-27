@@ -52,7 +52,6 @@
       "label": "Uralia",
       "gsjsKeys": ["AMBIENT_URALIA1", "AMBIENT_URALIA2", "AMBIENT_URALIA3", "AMBIENT_URALIA4"],
       "tracks": [
-        "assets/audio/ambient/Spinning-Wheel_1292034939.mp3",
         "assets/audio/ambient/Rainbow-Run_1291879159.mp3",
         "assets/audio/ambient/eesti_life_catalogue_1344997859.mp3",
         "assets/audio/ambient/moon_music_1344997839.mp3"
@@ -104,7 +103,6 @@
       "label": "Kajuu / Andra",
       "gsjsKeys": ["ANDRA_KAJUU_1", "ANDRA_KAJUU_2"],
       "tracks": [
-        "assets/audio/ambient/Spinning-Wheel_1292034939.mp3",
         "assets/audio/ambient/Rainbow-Run_1291879159.mp3",
         "assets/audio/ambient/The_Rube_Song_1290596637.mp3"
       ]

@@ -136,4 +136,13 @@ describe('street playlists', () => {
       for (const track of theme.tracks || []) assert.doesNotMatch(track, /GOODNIGHT_GRODDLE|MUSICBLOCK/i, `${id}: ${track}`);
     }
   });
+
+  it('no street music set loops the Spinning Wheel jingle (a 9 s one-shot from the downloads page)', () => {
+    const cfg = JSON.parse(readFileSync(cfgPath, 'utf8'));
+    for (const [id, theme] of Object.entries(cfg.themes)) {
+      for (const track of theme.tracks || []) assert.doesNotMatch(track, /Spinning-Wheel/i, `${id}: ${track}`);
+    }
+    // It stays on the Street music page as one of Tiny Speck's published tracks.
+    assert.ok(cfg.downloads.some((d) => /Spinning-Wheel/.test(d.file)));
+  });
 });
