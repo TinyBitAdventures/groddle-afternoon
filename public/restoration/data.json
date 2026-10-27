@@ -640,16 +640,27 @@
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&badgeqa=1&practice=1"
   },
   {
-   "id": "auctions",
+   "id": "trading",
    "group": "economy",
-   "name": "Auctions and trading",
-   "status": "progress",
-   "blurb": "In multiplayer, trade items and currants face to face with another player on your street: the server holds both offers until you both accept. The auction house is not here yet.",
+   "name": "Trading between players",
+   "status": "source",
+   "blurb": "In multiplayer, trade items and currants face to face with another player on your street, up to six stacks a side as in the original: the server holds both offers until you both accept, and the site settles the swap so only what you really hold can change hands.",
    "spot": null,
    "evidence": [
     "public/js/trade.js",
     "public/js/features/trade-feature.js"
    ],
+   "shot": null,
+   "play": null
+  },
+  {
+   "id": "auctions",
+   "group": "economy",
+   "name": "Auction house",
+   "status": "missing",
+   "blurb": "Not here yet, by choice: the auction house waits until trading between players has had a playtest. The original rules survive (inc_auctions.js), so it can come back.",
+   "spot": null,
+   "evidence": [],
    "shot": null,
    "play": null
   },
@@ -1068,15 +1079,16 @@
   }
  ],
  "tally": {
-  "source": 44,
+  "source": 45,
   "rebuilt": 10,
   "solo": 9,
-  "progress": 3,
+  "missing": 1,
   "reimagined": 1,
+  "progress": 2,
   "lost": 1
  },
- "back": 64,
- "possible": 67,
+ "back": 65,
+ "possible": 68,
  "quests": {
   "total": 445,
   "story": 245,
@@ -2468,9 +2480,14 @@
   ]
  },
  "git": {
-  "commits": 531,
+  "commits": 532,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "The restoration report lists every season, which one is on today, and a link to try each in solo"
+   },
    {
     "date": "2026-10-26",
     "kind": "new",
@@ -2585,11 +2602,6 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "A new multiplayer character starts as a new player, in the tutorial"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Rocks no longer carry a name tag over them"
    }
   ]
  },

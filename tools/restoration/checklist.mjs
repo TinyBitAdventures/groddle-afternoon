@@ -173,9 +173,12 @@ export const CHECKLIST = Object.freeze([
   { id: 'badges', group: 'economy', name: 'Badges', status: 'source',
     blurb: 'The full badge catalog with official art and the original counters.',
     evidence: ['public/js/achievements.js', 'public/js/exploration.js'] },
-  { id: 'auctions', group: 'economy', name: 'Auctions and trading', status: 'progress',
-    blurb: 'In multiplayer, trade items and currants face to face with another player on your street: the server holds both offers until you both accept. The auction house is not here yet.',
+  { id: 'trading', group: 'economy', name: 'Trading between players', status: 'source',
+    blurb: 'In multiplayer, trade items and currants face to face with another player on your street, up to six stacks a side as in the original: the server holds both offers until you both accept, and the site settles the swap so only what you really hold can change hands.',
     evidence: ['public/js/trade.js', 'public/js/features/trade-feature.js'] },
+  { id: 'auctions', group: 'economy', name: 'Auction house', status: 'missing',
+    blurb: 'Not here yet, by choice: the auction house waits until trading between players has had a playtest. The original rules survive (inc_auctions.js), so it can come back.',
+    evidence: [] },
 
   // —— Quests & adventures ——
   { id: 'quests', group: 'quests', name: 'Story and skill quests', status: 'source', spot: 'rock-magic',

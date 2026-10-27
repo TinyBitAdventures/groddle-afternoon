@@ -279,7 +279,16 @@
       }
     },
     {
-      "id": "trading", "name": "Auctions and trading",
+      "id": "trading", "name": "Trading between players",
+      "ours": ["trading"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "unknown", "note": "Not mentioned in its patch notes.", "sources": [] }
+      }
+    },
+    {
+      "id": "auctions", "name": "Auction house",
       "ours": ["auctions"],
       "cells": {
         "cou": { "status": "yes", "note": "An auctions service in the server.", "sources": ["cou-lib"] },

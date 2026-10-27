@@ -54,7 +54,7 @@ export const PLAY_ROUTES = Object.freeze({
 });
 
 /** Nothing to open: lost and multiplayer-only systems, and the quest-rooms row (the rooms section links each room). */
-export const NO_PLAY = new Set(['auctions', 'chat', 'snaps', 'quest-rooms']);
+export const NO_PLAY = new Set(['auctions', 'chat', 'trading', 'snaps', 'quest-rooms']);
 
 /** A capture route with the camera-only parameters removed. */
 export function playRoute(route) {
