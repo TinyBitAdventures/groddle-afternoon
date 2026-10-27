@@ -26,6 +26,20 @@
  * way. A multiplayer save never gets bags it didn't buy (the ledger would see
  * new value): what doesn't fit is held by the magic rock.
  *
+ * Starter bags (Austin 2026-10-27): a multiplayer character made before bags
+ * asks the site once (POST groddle/v1/ledger/starter-bags, site
+ * src/LedgerStarter.php), which decides from its own records: the solo
+ * migration's kit for what the ledger says the pack holds, topped up to at
+ * least 2 Bigger Bags as a welcome gift (Austin 2026-10-27: a floor for
+ * everyone; pack-slots.js starterKit mirrors it), or nothing for a character
+ * newer than bags (they buy theirs in the tutorial). A grant is a settled ledger trade with the fixed id
+ * starter-bags-<user>: the page applies it once through the trade slice's
+ * applied list (ledgerReceipt), or the site's load already did
+ * (Ledger::catchUp); either way the held stacks are then laid into the new
+ * bags as the solo migration lays them (arrangeIntoBags) and one notice says
+ * what was given and why. The slice remembers the answer (starter), so a
+ * character asks only until the site has decided.
+ *
  * Departures (see js/pack-slots.js): every overflow is held by the magic rock
  * (the source put things made from a source on the ground); rock-held stacks
  * are out of the pack but recipes and quests still count them; elements may
@@ -48,11 +62,14 @@ import {
   bagAccepts,
   isBagClass,
   layoutPack,
+  arrangeIntoBags,
+  isBagClass as isBag,
   moveStack,
   normalizePrefs,
   packIntoBags,
   roomFor,
-} from '../pack-slots.js?v=g152-1';
+} from '../pack-slots.js?v=g152-2';
+import { createMinnAccount } from '../minn-account.js?v=nbhome-9';
 
 export const BAGS_FEATURE_ID = 'bags';
 export const BAG_DEMO_KIT = Object.freeze([
@@ -65,10 +82,15 @@ export const BAG_DEMO_FILL = Object.freeze([
 ]);
 export const BAG_DEMO_DROP = Object.freeze({ classTsid: 'plum', count: 5, dx: 70 });
 
-const fresh = () => ({ v: 1, prefs: normalizePrefs(null), rock: {}, open: '', migrated: false });
+const fresh = () => ({ v: 1, prefs: normalizePrefs(null), rock: {}, open: '', migrated: false, starter: '' });
 let slice = fresh();
 let lastLayout = null;
 let demoDone = false;
+/** The site's answers that settle the starter question: granted, none, or refused (new, nosave). */
+const STARTER_DONE = new Set(['granted', 'none', 'new', 'nosave']);
+const STARTER_TRADE = /^starter-bags-[1-9][0-9]{0,18}$/;
+/** One ask per page load (a failed one is asked again on the next load). */
+let starterAsked = false;
 
 function opts() {
   const labels = {};
@@ -165,6 +187,100 @@ function runDemo(engine) {
   engine.updateHud?.();
 }
 
+/** A multiplayer character the site has not answered for yet: starter bags may be on their way. */
+const starterOpen = (engine) => engine?.mode === 'multiplayer' && !STARTER_DONE.has(slice.starter);
+
+/** The starter bags in the order they are laid out: toolboxes first, then the rest. */
+export function starterMint(got) {
+  const out = [];
+  for (const row of Array.isArray(got?.items) ? got.items : []) {
+    const c = String(row?.c || '');
+    const n = Math.max(0, Math.min(16, Math.floor(Number(row?.n) || 0)));
+    if (!isBag(c)) continue;
+    for (let i = 0; i < n; i += 1) out.push(c);
+  }
+  return out.sort((a, b) => (BAG_DEFS[b].holds === 'tool') - (BAG_DEFS[a].holds === 'tool'));
+}
+
+/** items/bag_toolbox_red.js and items/bag_bigger.js name_single / name_plural (the catalog may not have them yet). */
+const STARTER_NAMES = Object.freeze({ bag_toolbox_red: ['Red Toolbox', 'Red Toolboxes'], bag_bigger: ['Bigger Bag', 'Bigger Bags'] });
+
+/**
+ * The notice for starter bags: what was given and why, in plain words.
+ * overflowed: the pack held more than fit before the bags (then they say
+ * everything is packed into them); a pack that already fit gets the gift alone.
+ */
+export function starterText(mint, rockStacks = 0, overflowed = true) {
+  const counts = mint.reduce((acc, c) => ((acc[c] = (acc[c] || 0) + 1), acc), {});
+  const name = (c, n) => (STARTER_NAMES[c] ? (n === 1 ? `a ${STARTER_NAMES[c][0]}` : `${n} ${STARTER_NAMES[c][1]}`) : nameOf(c, n));
+  const given = listText(Object.entries(counts).map(([c, n]) => name(c, n)));
+  const tail = rockStacks > 0 ? ' Your magic rock holds what still does not fit.' : overflowed ? ' Everything you carry is packed into them.' : '';
+  return `Your pack has ${PACK_CAPACITY} slots now. As a character from before bags, you get starter bags: ${given}.${tail}`;
+}
+
+/**
+ * The site granted starter bags (answer.status granted): apply the receipt
+ * once, lay the held stacks into the new bags, say so once. Returns true when
+ * the question is settled.
+ */
+export function applyStarter(engine, answer) {
+  const trade = String(answer?.trade || '');
+  const mint = starterMint(answer?.got);
+  if (!STARTER_TRADE.test(trade) || !mint.length) return false;
+  const receipt = engine.query?.('ledgerReceipt', trade, engine);
+  if (receipt !== true && receipt !== false) return false;
+  const inv = engine.inv;
+  // Did the pack overflow before these bags? (A load may already have added them: take them out to look.)
+  const without = { ...inv };
+  if (receipt === false) for (const c of mint) without[c] = Math.max(0, (Number(without[c]) || 0) - 1);
+  const overflowed = layoutPack(without, slice.prefs, opts()).rockStacks > 0;
+  if (receipt === true) for (const c of mint) addItem(inv, c, 1);
+  // The solo migration's arrangement for the new bags; what was there before is placed as usual.
+  slice.prefs = normalizePrefs(arrangeIntoBags(inv, mint, opts()));
+  slice.open = '';
+  const layout = layoutPack(inv, slice.prefs, opts());
+  slice.prefs = layout.prefs;
+  slice.rock = { ...layout.rock };
+  lastLayout = layout;
+  slice.starter = 'granted';
+  engine.setData?.('packStarter', `granted:${mint.join(',')}:${receipt ? 'applied' : 'loaded'}`);
+  say(engine, starterText(mint, layout.rockStacks, overflowed));
+  publish(engine, layout);
+  engine.updateHud?.();
+  engine.refreshPack?.();
+  engine.save?.();
+  return true;
+}
+
+/** Multiplayer, once the game is running: ask the site whether this character has starter bags coming. */
+function askStarter(engine) {
+  if (starterAsked || !engine?.started || !starterOpen(engine)) return;
+  if (typeof document === 'undefined' || typeof globalThis.fetch !== 'function') return;
+  starterAsked = true;
+  const boot = globalThis.GRODDLE_MP_BOOT || {};
+  const account = createMinnAccount({ baseUri: document.baseURI, nonce: boot.nonce || '' });
+  engine.setData?.('packStarter', 'asking');
+  Promise.resolve()
+    .then(() => account.starterBags())
+    .then((answer) => {
+      const status = String(answer?.status || '');
+      if (status === 'granted') {
+        if (!applyStarter(engine, answer)) engine.setData?.('packStarter', 'unapplied');
+        return;
+      }
+      const done = status === 'refused' ? String(answer?.why || '') : status;
+      if (STARTER_DONE.has(done) && done !== 'granted') {
+        slice.starter = done;
+        engine.setData?.('packStarter', done);
+        engine.save?.();
+      }
+    })
+    .catch((err) => {
+      engine.setData?.('packStarter', 'error');
+      console.warn('[bags]', err?.message || err);
+    });
+}
+
 /** The layout, taking in whatever changed in the pack since the last look. */
 function reconcile(engine) {
   const inv = engine?.inv || {};
@@ -173,6 +289,8 @@ function reconcile(engine) {
   if (engine?.started) {
     const before = lastLayout;
     const changes = rockChanges(slice.rock, layout.rock, before?.slotted || layout.slotted, layout.slotted);
+    // Starter bags a load already applied wait for the site's answer, which lays them out (no rock line for them).
+    if (starterOpen(engine)) changes.holding = changes.holding.filter((r) => !isBag(r.cls));
     if (changes.holding.length) {
       const total = changes.holding.reduce((a, r) => a + r.n, 0);
       say(engine, PACK_COPY.rockHolding(listText(changes.holding.map((r) => nameOf(r.cls, r.n))), total > 1));
@@ -230,6 +348,7 @@ export const bagsFeature = {
 
   onTick(_dt, _now, engine) {
     runDemo(engine);
+    askStarter(engine);
   },
 
   packLayout(engine) {
@@ -307,16 +426,18 @@ export const bagsFeature = {
   },
 
   save() {
-    return { v: 1, prefs: slice.prefs, rock: slice.rock, open: slice.open, migrated: slice.migrated };
+    return { v: 1, prefs: slice.prefs, rock: slice.rock, open: slice.open, migrated: slice.migrated, ...(slice.starter ? { starter: slice.starter } : {}) };
   },
 
   restore(saved) {
     slice = fresh();
     lastLayout = null;
+    starterAsked = false;
     if (!saved || typeof saved !== 'object') return;
     slice.prefs = normalizePrefs(saved.prefs);
     slice.rock = cleanRock(saved.rock);
     slice.open = typeof saved.open === 'string' ? saved.open.replace(/[^a-zA-Z0-9_]/g, '').slice(0, 40) : '';
     slice.migrated = saved.migrated === true;
+    slice.starter = STARTER_DONE.has(saved.starter) ? saved.starter : '';
   },
 };

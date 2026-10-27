@@ -417,6 +417,18 @@ export function moveStack(inv, prefs, from, to, opts = {}) {
   return { ok: true, prefs: after.prefs };
 }
 
+/** Each stack's class, split as the pack would (full stacks first): tools and the rest, in auto-place order. */
+function stacksByKind(inv, opts) {
+  const toolStacks = [];
+  const otherStacks = [];
+  for (const cls of classOrder(inv, opts)) {
+    if (isBagClass(cls) || takesNoSlot(cls)) continue;
+    const stacks = splitStacks(inv[cls], stackMaxOf(cls, opts.catalog));
+    for (let i = 0; i < stacks.length; i += 1) (isToolClass(cls, opts) ? toolStacks : otherStacks).push(cls);
+  }
+  return { toolStacks, otherStacks };
+}
+
 /**
  * First load of a save made before bags (solo only): pack what overflows into
  * bags, a Red Toolbox for tools and Bigger Bags for the rest, so everything
@@ -426,29 +438,68 @@ export function packIntoBags(inv, opts = {}) {
   const capacity = Math.max(1, Math.floor(opts.capacity ?? PACK_CAPACITY));
   const first = layoutPack(inv, null, opts);
   if (!first.rockStacks) return { mint: [], prefs: first.prefs };
-  const toolStacks = [];
-  const otherStacks = [];
-  for (const cls of classOrder(inv, opts)) {
-    if (isBagClass(cls) || takesNoSlot(cls)) continue;
-    const stacks = splitStacks(inv[cls], stackMaxOf(cls, opts.catalog));
-    for (let i = 0; i < stacks.length; i += 1) (isToolClass(cls, opts) ? toolStacks : otherStacks).push(cls);
-  }
+  const { toolStacks, otherStacks } = stacksByKind(inv, opts);
   const mint = [];
+  const room = BAG_DEFS.bag_bigger.capacity;
+  let tools = toolStacks.length;
+  if (tools >= 4) {
+    mint.push('bag_toolbox_red');
+    tools = Math.max(0, tools - BAG_DEFS.bag_toolbox_red.capacity);
+  }
+  let rest = tools + otherStacks.length;
+  while (rest > 0 && mint.length < capacity - 1) {
+    mint.push('bag_bigger');
+    rest -= room;
+  }
+  return { mint, prefs: arrangeIntoBags(inv, mint, opts) };
+}
+
+/** Austin 2026-10-27: every multiplayer character made before bags gets at least this many Bigger Bags. */
+export const STARTER_FLOOR = 2;
+
+/**
+ * A multiplayer character's starter bags (decided by the site,
+ * groddle-afternoon-site src/LedgerStarter.php starterKit, which this
+ * mirrors for the tests): the solo migration's kit, then Bigger Bags until
+ * there are at least STARTER_FLOOR of them, at most capacity - 1 bags in all.
+ * Returns { mint, solo } (solo: how many of mint the solo rule gives).
+ */
+export function starterKit(inv, opts = {}) {
+  const capacity = Math.max(1, Math.floor(opts.capacity ?? PACK_CAPACITY));
+  const mint = [...packIntoBags(inv, opts).mint];
+  const solo = mint.length;
+  let bigger = mint.filter((c) => c === 'bag_bigger').length;
+  for (; bigger < STARTER_FLOOR && mint.length < capacity - 1; bigger += 1) mint.push('bag_bigger');
+  return { mint, solo };
+}
+
+/**
+ * The arrangement packIntoBags makes, for bags that just arrived (the solo
+ * migration's, or a multiplayer character's starter bags from the site's
+ * ledger): the new bags first in the pack, a toolbox filled with tool stacks,
+ * then each other bag with the stacks left, in auto-place order. Bags the
+ * pack held before and anything left over are placed by layoutPack as usual
+ * (free pack slots, then the magic rock). Returns prefs (normalizePrefs shape).
+ */
+export function arrangeIntoBags(inv, mint, opts = {}) {
+  const { toolStacks, otherStacks } = stacksByKind(inv, opts);
+  const list = (Array.isArray(mint) ? mint : []).filter((cls) => isBagClass(cls));
   const prefs = { bags: [], place: { pack: [] } };
-  let n = 0;
-  const addBag = (cls, stacks) => {
-    n += 1;
-    const key = `b${n}`;
-    mint.push(cls);
+  const keyOf = list.map((cls, i) => ({ cls, key: `b${i + 1}` }));
+  for (const { cls, key } of keyOf) {
     prefs.bags.push({ key, cls });
     prefs.place.pack.push(`@${key}`);
-    prefs.place[key] = stacks;
-  };
-  const room = BAG_DEFS.bag_bigger.capacity;
-  if (toolStacks.length >= 4) {
-    addBag('bag_toolbox_red', toolStacks.splice(0, BAG_DEFS.bag_toolbox_red.capacity));
+    prefs.place[key] = [];
+  }
+  // Toolboxes first take the tool stacks (as packIntoBags always did), then the bags that take anything.
+  for (const { cls, key } of keyOf) {
+    if (BAG_DEFS[cls].holds !== 'tool') continue;
+    prefs.place[key] = toolStacks.splice(0, BAG_DEFS[cls].capacity);
   }
   const rest = [...toolStacks, ...otherStacks];
-  while (rest.length && n < capacity - 1) addBag('bag_bigger', rest.splice(0, room));
-  return { mint, prefs };
+  for (const { cls, key } of keyOf) {
+    if (BAG_DEFS[cls].holds !== 'any') continue;
+    prefs.place[key] = rest.splice(0, BAG_DEFS[cls].capacity);
+  }
+  return prefs;
 }

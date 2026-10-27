@@ -111,7 +111,7 @@ import {
   topLine,
 } from '../street-jobs-mp.js?v=g346-2';
 import { grantMoodXp } from '../mood-xp.js';
-import { createMinnAccount } from '../minn-account.js?v=nbhome-8';
+import { createMinnAccount } from '../minn-account.js?v=nbhome-9';
 import { normalizeGroups } from '../groups.js?v=g326-1';
 import { textureFromUrl } from '../textures.js';
 

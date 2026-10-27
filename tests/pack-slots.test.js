@@ -20,9 +20,9 @@ import {
   roomFor,
   splitStacks,
   stackMaxOf,
-} from '../public/js/pack-slots.js?v=g152-1';
+} from '../public/js/pack-slots.js?v=g152-2';
 import { STACKMAX } from '../public/js/pack-slots-data.js?v=g152-1';
-import { bagsFeature, rockChanges } from '../public/js/features/bags-feature.js?v=g152-1';
+import { bagsFeature, rockChanges } from '../public/js/features/bags-feature.js?v=g152-2';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');
@@ -260,7 +260,7 @@ describe('wiring', () => {
   });
 
   it('the feature is registered and vendors stock the bags', () => {
-    assert.match(read('public/js/features/index.js'), /bags-feature\.js\?v=g152-1'; FEATURES\.push\(bagsFeature\)/);
+    assert.match(read('public/js/features/index.js'), /bags-feature\.js\?v=g152-2'; FEATURES\.push\(bagsFeature\)/);
     const text = read('public/js/store-catalog.js');
     for (const cls of ['bag_generic', 'bag_bigger', 'bag_toolbox_red', 'bag_spicerack']) assert.ok(text.includes(`"classTsid": "${cls}"`), cls);
     for (const cls of Object.keys(BAG_DEFS)) assert.ok(existsSync(join(ROOT, 'public/assets/sprites/icons', `${cls}.png`)), `${cls} icon`);

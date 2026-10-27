@@ -513,6 +513,16 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       return buddyCall('Collecting the delivery', `auctions/${encodeURIComponent(String(id))}/collect`, { method: 'POST' });
     },
 
+    /**
+     * Starter bags for a character made before bags (G152, groddle-afternoon-site
+     * src/LedgerStarter.php): { status: granted, trade, got, text, again? } |
+     * { status: none } | { status: refused, why: new | nosave, text }. Once per
+     * character: asking again answers as the site decided.
+     */
+    async starterBags() {
+      return buddyCall('Checking for starter bags', 'ledger/starter-bags', { method: 'POST' });
+    },
+
     async deleteBackup(slot) {
       const r = await call(`backups/${Number(slot)}`, { method: 'DELETE' });
       if (!r.ok) throw failed('Deleting the backup', r);

@@ -32,8 +32,8 @@ import {
   sampleTrack,
   socketUrl,
 } from '../public/js/realtime-client.js?v=mp3-2';
-import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-8';
-import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=nbhome-8';
+import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-9';
+import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=nbhome-9';
 import { FEATURES } from '../public/js/features/index.js';
 
 const root = join(import.meta.dirname, '..');
@@ -544,7 +544,7 @@ describe('minn-account: realtime tickets', () => {
 describe('realtime feature', () => {
   it('is registered (before the account backup, which stays last), under its own key', () => {
     assert.equal(FEATURES.at(-2), realtimeFeature);
-    assert.match(read('public/js/features/index.js'), /realtime-feature\.js\?v=nbhome-8/);
+    assert.match(read('public/js/features/index.js'), /realtime-feature\.js\?v=nbhome-9/);
   });
 
   it('does nothing in solo: no socket, no UI, no hook answers', () => {

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-15';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-184';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-185';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -408,7 +408,7 @@ import {
   removeItem,
   isToolItem,
 } from './js/inventory.js?v=catalog-unified-7';
-import { PACK_COPY } from './js/pack-slots.js?v=g152-1';
+import { PACK_COPY } from './js/pack-slots.js?v=g152-2';
 import {
   packPagerState,
   packPageTarget,

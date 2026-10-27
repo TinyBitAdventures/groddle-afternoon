@@ -38,7 +38,7 @@
 
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { TOOL_CONDITION_CATALOG, getToolCondition, setToolRemaining } from '../tools.js?v=woodcutting-test-3';
-import { createMinnAccount } from '../minn-account.js?v=nbhome-8';
+import { createMinnAccount } from '../minn-account.js?v=nbhome-9';
 import { saveStore } from '../save-store.js?v=mp2-2';
 import {
   AUCTION_TEXT as T,
