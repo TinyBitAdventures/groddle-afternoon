@@ -440,6 +440,14 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
     },
 
     /**
+     * A bug report from the game's header (groddle-afternoon-site src/BugReports.php):
+     * { status: sent, id }. A refusal (an empty message, too many just now) throws with the site's words.
+     */
+    async reportBug(message, context = {}) {
+      return buddyCall('Sending your bug report', 'feedback', { method: 'POST', body: { message, context } });
+    },
+
+    /**
      * The Auction House (register G333, groddle-afternoon-site/src/LedgerAuction.php).
      * auctions({ q, cat, c, seller, sort, page }) { auctions, total, page, per, cats, rules };
      * myAuctions() { active, ended, deliveries, receipts, listable, rules, now };

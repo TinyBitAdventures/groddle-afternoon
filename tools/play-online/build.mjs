@@ -23,7 +23,7 @@ const SOURCE = join(root, 'public/play/index.html');
 const TARGET = join(root, 'public/play/online/index.html');
 
 /** The cache key of js/online-boot.js (bump it when that file or js/minn-account.js changes). */
-export const ONLINE_BOOT_SRC = 'js/online-boot.js?v=play-8';
+export const ONLINE_BOOT_SRC = 'js/online-boot.js?v=play-9';
 
 const MODE_ENTRY = `  <!--
     Multiplayer entry (js/game-mode.js). This must stay the FIRST script on the page, ahead of

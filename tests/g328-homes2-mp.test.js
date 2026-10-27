@@ -34,8 +34,8 @@ import {
 import { createButlerState, nextHandover, normalizeButlerState, packagesAndMessagesForOwner } from '../public/js/butler.js?v=butler-9';
 import { createGarden, tickGarden } from '../public/js/garden.js?v=g300-1';
 import { butlerApi } from '../public/js/features/butler-feature.js?v=butler-feature-44';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=radiate-6';
-import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-6';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=radiate-7';
+import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-7';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

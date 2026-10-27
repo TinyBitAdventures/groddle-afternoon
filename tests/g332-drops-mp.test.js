@@ -23,8 +23,8 @@ import {
   normalizeMine,
   shareReason,
 } from '../public/js/drops-mp.js?v=g332-drops-1';
-import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=g332-drops-1';
-import { giftsFeature } from '../public/js/features/gifts-feature.js?v=g332-5';
+import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=g332-drops-2';
+import { giftsFeature } from '../public/js/features/gifts-feature.js?v=g332-6';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
