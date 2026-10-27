@@ -1009,29 +1009,79 @@ footer a { color: inherit; }
   letter-spacing: 0.04em;
 }
 .brand-sub { font-size: 0.72rem; opacity: 0.7; }
+/* Top bar clusters (Austin 2026-10-27): you (name, then mood and energy stacked
+   in one card, as PlayerInfoUI.as kept them with the face), progress (level,
+   iMG) and wallet (currants, quoins). Every card is two lines tall, like the
+   level card; small gaps inside a cluster, larger ones between clusters. */
+.top-bar {
+  --hud-card-h: 2.85rem;
+  --hud-gap-in: 0.3rem;
+  --hud-gap-out: 0.95rem;
+  column-gap: var(--hud-gap-out);
+}
+.hud-cluster {
+  display: flex;
+  align-items: center;
+  gap: var(--hud-gap-in);
+  flex: 0 0 auto;
+}
+.hud-you .brand { margin-right: 0; }
+.hud-cluster > .meta-vitals,
+.hud-cluster > .level-meter,
+.hud-cluster > .meta-stat {
+  box-sizing: border-box;
+  height: var(--hud-card-h);
+}
 .metabolics-cluster {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.4rem var(--hud-gap-out);
   flex: 1;
   flex-wrap: wrap;
 }
-.meta-pill {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  background: #fff;
-  border-radius: 999px;
+.meta-vitals {
+  display: grid;
+  align-content: center;
+  row-gap: 0.26rem;
+  min-width: 11.6rem;
   padding: 0.2rem 0.5rem;
-  border: 1px solid #cfdde6;
+  border: 1px solid #c8d7df;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #fff, #f6fbfd);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.8) inset;
+}
+/* The new-player tour hides mood and energy one at a time (newxp-feature.js); with both gone, so is their card. */
+body.nx-hide-mood.nx-hide-energy .meta-vitals { visibility: hidden; }
+.meta-pill {
+  display: grid;
+  grid-template-columns: 0.95rem 2.7rem minmax(40px, 1fr) auto;
+  align-items: center;
+  gap: 0.28rem;
+  color: #486272;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.meta-ico {
   font-size: 0.78rem;
-  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+}
+.meta-pill.mood .meta-ico { color: #c98a1a; }
+.meta-pill.energy .meta-ico { color: #3aa0d0; }
+.meta-num {
+  min-width: 2.9rem;
+  color: #6f7e86;
+  font-size: 0.61rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
 }
 .meta-ring {
-  width: 52px;
-  height: 8px;
-  background: #e6eef3;
+  height: 6px;
+  background: #dfe9ee;
   border-radius: 999px;
+  box-shadow: 0 1px 1px rgba(40,70,85,0.18) inset;
   overflow: hidden;
 }
 .meta-fill {
@@ -1046,6 +1096,7 @@ footer a { color: inherit; }
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
+  align-content: center;
   gap: 0.12rem 0.4rem;
   min-width: 138px;
   padding: 0.22rem 0.48rem 0.24rem;
@@ -1088,6 +1139,8 @@ footer a { color: inherit; }
   transition: width 0.28s ease-out;
 }
 .meta-stat {
+  display: inline-flex;
+  align-items: center;
   font-size: 0.82rem;
   font-weight: 600;
   background: #fff;
@@ -1096,16 +1149,35 @@ footer a { color: inherit; }
   padding: 0.25rem 0.5rem;
 }
 .meta-stat.currants { color: #b8860b; }
+/* iMG as two lines: the label over the number, like the level card. */
+.meta-stat.hud-img {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.1rem;
+  color: #486272;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.meta-stat.hud-img strong { color: #8a5aa6; font-size: 0.88rem; }
+/* Quoins as two lines: today's count over the multiplier. */
 .quoin-stat {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.22rem;
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  align-content: center;
+  align-items: center;
+  column-gap: 0.22rem;
+  row-gap: 0.08rem;
+  line-height: 1;
   color: #7654a6;
   white-space: nowrap;
   transition: background 0.2s ease, color 0.2s ease;
 }
-.quoin-stat > span { color: #a778d0; }
+.quoin-stat > span { grid-row: 1 / 3; color: #a778d0; }
+.quoin-stat strong { grid-column: 2; }
 .quoin-stat small {
+  grid-column: 2;
   color: #7c8990;
   font-size: 0.67rem;
   font-weight: 800;
@@ -1201,6 +1273,16 @@ footer a { color: inherit; }
 @media (max-width: 980px) {
   .level-meter { min-width: 112px; }
   .level-xp { display: none; }
+}
+
+/* Phone: the you cluster on one row, progress and wallet on the next, the buttons under them. */
+@media (max-width: 560px) {
+  .top-bar { --hud-card-h: 2.6rem; --hud-gap-out: 0.5rem; row-gap: 0.4rem; }
+  .hud-you,
+  .metabolics-cluster,
+  .top-actions { flex: 1 1 100%; }
+  .hud-you .meta-vitals { flex: 1; min-width: 0; }
+  .metabolics-cluster { justify-content: space-between; }
 }
 
 @media (min-width: 981px) and (max-width: 1380px) {
@@ -4595,19 +4677,24 @@ body.buff-purple-pulse::after {
  */
 @media (min-width: 1500px) {
   .top-bar {
-    gap: 0.62rem;
+    --hud-card-h: 3.3rem;
+    --hud-gap-in: 0.36rem;
+    --hud-gap-out: 1.15rem;
+    gap: 0.62rem var(--hud-gap-out);
     padding: 0.5rem 0.74rem;
   }
   .brand { min-width: 7.2rem; }
   .brand-mark { font-size: 1.34rem; }
   .brand-sub { font-size: 0.82rem; }
-  .metabolics-cluster { gap: 0.5rem; }
+  .meta-vitals { min-width: 13.4rem; padding: 0.24rem 0.58rem; row-gap: 0.32rem; }
   .meta-pill {
-    gap: 0.4rem;
-    padding: 0.28rem 0.62rem;
-    font-size: 0.9rem;
+    grid-template-columns: 1.05rem 3.1rem minmax(48px, 1fr) auto;
+    gap: 0.34rem;
+    font-size: 0.8rem;
   }
-  .meta-ring { width: 62px; height: 9px; }
+  .meta-ico { font-size: 0.88rem; }
+  .meta-num { font-size: 0.7rem; }
+  .meta-ring { height: 7px; }
   .level-meter {
     min-width: 158px;
     padding: 0.3rem 0.58rem;
@@ -4619,6 +4706,8 @@ body.buff-purple-pulse::after {
     padding: 0.32rem 0.58rem;
     font-size: 0.94rem;
   }
+  .meta-stat.hud-img { font-size: 0.82rem; }
+  .meta-stat.hud-img strong { font-size: 1rem; }
   .quoin-stat small { font-size: 0.74rem; }
   .top-actions { gap: 0.3rem; }
   .chrome-btn {

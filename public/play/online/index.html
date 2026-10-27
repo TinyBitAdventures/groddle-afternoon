@@ -32,7 +32,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex" />
   <title>Groddle Afternoon · Multiplayer</title>
-    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;tools=g183-1&amp;make=g191-1&amp;rock=g211-1&amp;route=g192-1&amp;prompt=g198-1&amp;machines=g193-1&amp;skills=g236-1&amp;chooser=g206-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=ticket-1&amp;card=g249-1&amp;offers=g229-1&amp;buffs=g256-1&amp;speech=g269-1&amp;banner=g297-1&amp;pop=g332-1&amp;bags=g152-1&amp;maptp=g356-1" />
+    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;tools=g183-1&amp;make=g191-1&amp;rock=g211-1&amp;route=g192-1&amp;prompt=g198-1&amp;machines=g193-1&amp;skills=g236-1&amp;chooser=g206-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=ticket-1&amp;card=g249-1&amp;offers=g229-1&amp;buffs=g256-1&amp;speech=g269-1&amp;banner=g297-1&amp;pop=g332-1&amp;bags=g152-1&amp;maptp=g356-1&amp;hud2=g361-1" />
   <script src="vendor/pixi/pixi-8.22.0.min.js"></script>
   <link rel="icon" href="favicon.svg?v=quoin" type="image/svg+xml" />
   <link rel="icon" href="favicon.ico?v=quoin" sizes="32x32" />
@@ -96,36 +96,47 @@
         </div>
       </div>
     </div>
-    <!-- Top bar: metabolics + tools (Glitch-inspired) -->
+    <!-- Top bar: you (name, mood and energy), progress (level, iMG), wallet (currants, quoins), then tools.
+         Mood and energy sit with the name as PlayerInfoUI.as kept them with the face. -->
     <header class="top-bar">
-      <button id="player-menu-btn" type="button" class="brand" aria-haspopup="true" aria-expanded="false" aria-controls="player-menu" title="Your stats, skills and look">
-        <span class="brand-mark">Ur</span>
-        <span class="brand-sub">Groddle Afternoon</span>
-      </button>
+      <div class="hud-cluster hud-you" data-hud-cluster="you">
+        <button id="player-menu-btn" type="button" class="brand" aria-haspopup="true" aria-expanded="false" aria-controls="player-menu" title="Your stats, skills and look">
+          <span class="brand-mark">Ur</span>
+          <span class="brand-sub">Groddle Afternoon</span>
+        </button>
+        <div class="meta-vitals">
+          <div class="meta-pill mood" title="Mood">
+            <span class="meta-ico">☺</span>
+            <span class="meta-label">Mood</span>
+            <div class="meta-ring"><div id="bar-mood" class="meta-fill"></div></div>
+            <span id="stat-mood" class="meta-num"></span>
+          </div>
+          <div class="meta-pill energy" title="Energy">
+            <span class="meta-ico">⚡</span>
+            <span class="meta-label">Energy</span>
+            <div class="meta-ring"><div id="bar-energy" class="meta-fill"></div></div>
+            <span id="stat-energy" class="meta-num"></span>
+          </div>
+        </div>
+      </div>
       <div id="player-menu" class="player-menu" role="dialog" aria-label="Player menu" hidden></div>
       <div class="metabolics-cluster">
-        <div class="meta-pill mood">
-          <span class="meta-ico">☺</span>
-          <span class="meta-label">Mood</span>
-          <div class="meta-ring"><div id="bar-mood" class="meta-fill"></div></div>
+        <div class="hud-cluster hud-progress" data-hud-cluster="progress">
+          <div id="level-meter" class="level-meter" role="meter" title="Level progress: click for your stats" aria-label="Level progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <span class="level-label">Level <strong id="stat-level">5</strong></span>
+            <div class="level-track" aria-hidden="true"><i id="bar-level"></i></div>
+            <span id="stat-xp" class="level-xp">0 / 0 XP</span>
+          </div>
+          <div class="meta-stat hud-img">iMG <strong id="stat-img">0</strong></div>
         </div>
-        <div class="meta-pill energy">
-          <span class="meta-ico">⚡</span>
-          <span class="meta-label">Energy</span>
-          <div class="meta-ring"><div id="bar-energy" class="meta-fill"></div></div>
-        </div>
-        <div id="level-meter" class="level-meter" role="meter" title="Level progress: click for your stats" aria-label="Level progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-          <span class="level-label">Level <strong id="stat-level">5</strong></span>
-          <div class="level-track" aria-hidden="true"><i id="bar-level"></i></div>
-          <span id="stat-xp" class="level-xp">0 / 0 XP</span>
-        </div>
-        <div class="meta-stat">iMG <strong id="stat-img">0</strong></div>
-        <div class="meta-stat currants">
-          <span class="currant-coin">◎</span>
-          <strong id="stat-currants">0</strong>
-        </div>
-        <div id="quoin-stat" class="meta-stat quoin-stat" role="status" aria-label="0 of 100 quoins collected today. Multiplier 1.">
-          <span aria-hidden="true">◉</span> <strong>0/100</strong><small>×1</small>
+        <div class="hud-cluster hud-wallet" data-hud-cluster="wallet">
+          <div class="meta-stat currants">
+            <span class="currant-coin">◎</span>
+            <strong id="stat-currants">0</strong>
+          </div>
+          <div id="quoin-stat" class="meta-stat quoin-stat" role="status" aria-label="0 of 100 quoins collected today. Multiplier 1.">
+            <span aria-hidden="true">◉</span> <strong>0/100</strong><small>×1</small>
+          </div>
         </div>
       </div>
       <div class="top-actions">
@@ -892,6 +903,6 @@
 
   </div>
   <!-- game.js loads once the multiplayer save is in memory (js/online-boot.js). -->
-  <script type="module" id="online-boot" src="js/online-boot.js?v=play-11" data-game="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=quest-pages-3&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g360-1"></script>
+  <script type="module" id="online-boot" src="js/online-boot.js?v=play-11" data-game="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=quest-pages-3&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g361-1"></script>
 </body>
 </html>

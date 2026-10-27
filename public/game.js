@@ -3712,6 +3712,15 @@ function updateHud() {
   }
   setBar('bar-energy', (pc.energy / energyCap()) * 100);
   setBar('bar-mood', (pc.mood / moodMax(pc)) * 100);
+  // The numbers beside the mood and energy bars (and on hover) in the top bar's "you" card.
+  for (const [id, label, now, max] of [['stat-mood', 'Mood', pc.mood, moodMax(pc)], ['stat-energy', 'Energy', pc.energy, energyCap()]]) {
+    const num = document.getElementById(id);
+    if (!num) continue;
+    const text = `${Math.round(Number(now) || 0)}/${Math.round(Number(max) || 0)}`;
+    if (num.textContent === text) continue;
+    num.textContent = text;
+    num.parentElement.title = `${label} ${text}`;
+  }
 
   // Dual-row pack: items (top) + tools (bottom), currants already set above
   syncEmotionalBearCatalog();
