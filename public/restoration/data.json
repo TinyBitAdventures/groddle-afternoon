@@ -912,15 +912,16 @@
    "id": "chat",
    "group": "home",
    "name": "Other players and chat",
-   "status": "progress",
-   "blurb": "Make a character with an email and a password, right in the game, and in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global chat and groups are not here yet.",
+   "status": "source",
+   "blurb": "Make a character with an email and a password, right in the game, and in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global Chat, Live Help and the Trade Channel are open to everyone the original let in, and players make, find and join groups with their own chat.",
    "spot": null,
    "evidence": [
     "public/js/realtime-client.js",
     "public/js/features/realtime-feature.js",
     "public/js/features/party-feature.js",
     "public/js/account-forms.js",
-    "public/js/features/buddies-feature.js"
+    "public/js/features/buddies-feature.js",
+    "public/js/features/groups-feature.js"
    ],
    "shot": null,
    "play": null
@@ -1079,15 +1080,15 @@
   }
  ],
  "tally": {
-  "source": 45,
+  "source": 46,
   "rebuilt": 10,
   "solo": 9,
   "missing": 1,
   "reimagined": 1,
-  "progress": 2,
+  "progress": 1,
   "lost": 1
  },
- "back": 65,
+ "back": 66,
  "possible": 68,
  "quests": {
   "total": 445,
@@ -2480,9 +2481,14 @@
   ]
  },
  "git": {
-  "commits": 534,
+  "commits": 535,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "In multiplayer, chat tabs for Global Chat, Live Help, the Trade Channel and your groups, and a Groups panel"
+   },
    {
     "date": "2026-10-26",
     "kind": "fix",
@@ -2597,11 +2603,6 @@
     "date": "2026-10-26",
     "kind": "new",
     "text": "In multiplayer, trade items and currants with another player"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "new",
-    "text": "In multiplayer, race Grab 'Em Good and the finish-line races against real players"
    }
   ]
  },
