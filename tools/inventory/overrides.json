@@ -43,16 +43,19 @@
   "checklist": "trants"
  },
  "system:config/greeting_enabled": {
-  "status": "lost",
-  "reason": "greeters were volunteer players meeting newcomers"
+  "status": "excluded",
+  "reason": "greeters were volunteer players meeting newcomers (config greeter_group, greeting_*); Austin 2026-10-26 and 10-27: kept out by decision, revisit after an outside playtest",
+  "register": "G333"
  },
  "system:config/greeting_locations": {
-  "status": "lost",
-  "reason": "greeters were volunteer players meeting newcomers"
+  "status": "excluded",
+  "reason": "greeters were volunteer players meeting newcomers (config greeter_group, greeting_*); Austin 2026-10-26 and 10-27: kept out by decision, revisit after an outside playtest",
+  "register": "G333"
  },
  "system:config/greeter_group": {
-  "status": "lost",
-  "reason": "greeters were volunteer players meeting newcomers"
+  "status": "excluded",
+  "reason": "greeters were volunteer players meeting newcomers (config greeter_group, greeting_*); Austin 2026-10-26 and 10-27: kept out by decision, revisit after an outside playtest",
+  "register": "G333"
  },
  "system:config/hell": {
   "checklist": "hell"
@@ -1051,9 +1054,9 @@
   "mpReason": "a hidden bag the player never sees: the trade hold (trade.go keeps both offers, the site's ledger settles) and the wrapped gift box (groddle_gifts) are its escrow between real players"
  },
  "item:bag_greeter_badge": {
-  "status": "lost",
-  "reason": "players/player.js:2777: worn by members of config.greeter_group, the volunteer greeters who met new players",
-  "register": "G125"
+  "status": "excluded",
+  "reason": "players/player.js:2777: worn by members of config.greeter_group, the volunteer greeters who met new players; Austin 2026-10-26 and 10-27: greeters kept out by decision, revisit after an outside playtest",
+  "register": "G333"
  },
  "item:bag_moving_box": {
   "status": "lost",

@@ -2590,9 +2590,14 @@
   ]
  },
  "git": {
-  "commits": 596,
+  "commits": 597,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "improve",
+    "text": "The top bar groups you, progress and wallet, with mood and energy stacked beside your name"
+   },
    {
     "date": "2026-10-27",
     "kind": "new",
@@ -2707,11 +2712,6 @@
     "date": "2026-10-27",
     "kind": "new",
     "text": "In multiplayer, drops on a public street are shared, and dragging an item onto a player opens Give"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "The Great Hog Haul quest between real players, and the dead and the reloaded leave races and crowns"
    }
   ]
  },
