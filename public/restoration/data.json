@@ -2488,9 +2488,14 @@
   ]
  },
  "git": {
-  "commits": 536,
+  "commits": 538,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "improve",
+    "text": "The Egg Hunt runs all year as Glitch's own did: Egg Plants drop the chocolate eggs, and the Egg Hunter Trophy takes all five"
+   },
    {
     "date": "2026-10-26",
     "kind": "new",
@@ -2605,11 +2610,6 @@
     "date": "2026-10-26",
     "kind": "improve",
     "text": "Six desk decisions: a taller street view on big screens, the Rook orb above the labels, grounded Musicblocks, plainer race endings, a quiet eleven-skills badge, GSJS wording for An Autumn Day"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "new",
-    "text": "In multiplayer, trade items and currants with another player"
    }
   ]
  },
