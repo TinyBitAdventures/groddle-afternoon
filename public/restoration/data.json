@@ -2607,9 +2607,14 @@
   ]
  },
  "git": {
-  "commits": 605,
+  "commits": 606,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "fix",
+    "text": "The last four unclassified street projects are judged (G15)"
+   },
    {
     "date": "2026-10-27",
     "kind": "new",
@@ -2724,11 +2729,6 @@
     "date": "2026-10-27",
     "kind": "fix",
     "text": "Uralia and Andra Kajuu streets no longer loop the 9-second Spinning Wheel jingle as their music"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "In multiplayer the Job Board offers the ten group halls to claim for your group"
    }
   ]
  },

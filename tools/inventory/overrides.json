@@ -1812,5 +1812,89 @@
   "status": "excluded",
   "reason": "Build Seldom Squish was finished in the original: Seldom Squish stands unlocked (LLI57G8I2HI1CSO.xml:54; inc_jobs.js:556-569 keeps it locked while the job is not done) and Peatland Moors holds all four phase instances (LLICF642CTI16R1.xml:36, 44, 52, 60) with its signpost open (GLICF642CTI16R1.xml:2691, no hidden). Its last phase needs 250 Grain Seeds (quests/job_standard1b_for_new_groddle_meadow_streets.js:20-27), an alpha-era item (glitchen wiki Grain Seed, 2011-02-10: Gardening Vendor 10c, Piggy plop of 3 grain; forum ideas/5164: \"it used to be\") deleted before shutdown: no items/seed_grain.js in GSJS or eleven-gsjs, listed under catalog_tags.js deleted (738, 867). The final source cannot finish it again, so the street stays built here as it was at shutdown",
   "register": "G15"
+ },
+ "location:LHVM01TACH92TQF": {
+  "status": "lost",
+  "reason": "no geometry survives anywhere: Plexus Colour Game (category instance-template-no-geometry: quest/instance room with no geometry anywhere; GSJS: config shared_instances.color_game); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
+  "register": "G351",
+  "lost": "nosource"
+ },
+ "location:LIF1M7G6GEU1F4D": {
+  "status": "lost",
+  "reason": "no geometry survives anywhere: The Penalty Box (category instance-template-no-geometry: quest/instance room with no geometry anywhere); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
+  "register": "G351",
+  "lost": "nosource"
+ },
+ "location:LIFLFPPBUUT11SP": {
+  "status": "lost",
+  "reason": "no geometry survives anywhere: Interrogation (category instance-template-no-geometry: quest/instance room with no geometry anywhere); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
+  "register": "G351",
+  "lost": "nosource"
+ },
+ "location:LA5F9AT6U133F5T": {
+  "status": "lost",
+  "reason": "no geometry survives anywhere: Celestial Strum (category live-region-other: other name in a live region: needs a judgement); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
+  "register": "G351",
+  "lost": "nosource"
+ },
+ "location:LCR17I2DB0O1CB0": {
+  "status": "lost",
+  "reason": "no geometry survives anywhere: Luster Pose (category live-region-other: other name in a live region: needs a judgement); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
+  "register": "G351",
+  "lost": "nosource"
+ },
+ "location:LCR17J1HB0O1PP8": {
+  "status": "lost",
+  "reason": "no geometry survives anywhere: Coulcairn  (category live-region-other: other name in a live region: needs a judgement); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
+  "register": "G351",
+  "lost": "nosource"
+ },
+ "location:LCR17KJHB0O1U2H": {
+  "status": "lost",
+  "reason": "no geometry survives anywhere: Fendeer  (category live-region-other: other name in a live region: needs a judgement); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
+  "register": "G351",
+  "lost": "nosource"
+ },
+ "location:LCRDGMREPJ02ORK": {
+  "status": "lost",
+  "reason": "no geometry survives anywhere: Louise Pasture Villa (category live-region-other: other name in a live region: needs a judgement); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
+  "register": "G351",
+  "lost": "nosource"
+ },
+ "location:LHV13KC42L82G08": {
+  "status": "lost",
+  "reason": "no geometry survives anywhere: Plexus Colours (category live-region-other: other name in a live region: needs a judgement); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
+  "register": "G351",
+  "lost": "nosource"
+ },
+ "location:LIF8QNR1PJ02RGM": {
+  "status": "lost",
+  "reason": "no geometry survives anywhere: BT_01 (category live-region-other: other name in a live region: needs a judgement); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
+  "register": "G351",
+  "lost": "nosource"
+ },
+ "location:LTJ116NHCER1EEO": {
+  "status": "lost",
+  "reason": "no geometry survives anywhere: Spooky Street (category live-region-other: other name in a live region: needs a judgement); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
+  "register": "G351",
+  "lost": "nosource"
+ },
+ "location:LTJ1F4BGR9V1OS1": {
+  "status": "lost",
+  "reason": "no geometry survives anywhere: deep H 02 (category live-region-other: other name in a live region: needs a judgement); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
+  "register": "G351",
+  "lost": "nosource"
+ },
+ "location:LTJ1KM57N2O1P7M": {
+  "status": "lost",
+  "reason": "no geometry survives anywhere: Arbito 02 (category live-region-other: other name in a live region: needs a judgement); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
+  "register": "G351",
+  "lost": "nosource"
+ },
+ "location:LTJ1KN28N2O1E20": {
+  "status": "lost",
+  "reason": "no geometry survives anywhere: Arbito 03 (category live-region-other: other name in a live region: needs a judgement); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
+  "register": "G351",
+  "lost": "nosource"
  }
 }
