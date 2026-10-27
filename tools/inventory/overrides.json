@@ -1514,5 +1514,10 @@
   "mp": "game 2d05959b, server 234b659, site 6c49a26",
   "mpReason": "offered with Teleportation III once following works; follow.go counts 3 or more still following at teleport_complete (inc_teleportation.js 1054); 350 currants credited once",
   "register": "G329"
+ },
+ "quest:soilappreciation_help_digging": {
+  "mp": "game 818bd2b5, server b6c1038, site 71c11f2",
+  "mpReason": "offered with Soil Appreciation II; objects.go keeps Dirt Pile dig crews (dirt_pile.js addDigger 153-166) and a dig its answer says had helpers counts helped_dig (481-483); 200 currants credited once",
+  "register": "G329"
  }
 }
