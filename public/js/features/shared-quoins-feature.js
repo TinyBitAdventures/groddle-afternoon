@@ -29,7 +29,8 @@
  * The daily quoin limit (quoin.js 159) is the player's own: at the limit
  * the touch is left to game.js, which says so and leaves the quoin alone.
  * Personal quoins (Qurazy, quest rewards, private instances, homes) never
- * come here. If realtime is off for good (off, signed out, replaced) the
+ * come here. A Party Space's quoins are its party's (G334): the space's hub
+ * street (PARTY_<id>, the sharedQuoinStreet query) is the street they share. If realtime is off for good (off, signed out, replaced) the
  * street's quoins are this player's own again, as in solo.
  *
  * QA: canvas data sharedQuoins (pending | shared | local | off),
@@ -65,6 +66,9 @@ function multiplayer(engine) {
 /** realtime-feature sharedStreet: the street others share, or '' in a private place. */
 function sharedStreet(engine) {
   if (!engine?.player || !engine.streetTsid) return '';
+  // G334: a Party Space's members share its quoins on the space's hub street (party-spaces-feature).
+  const own = engine.query?.('sharedQuoinStreet', engine);
+  if (own) return String(own);
   if (engine.transientInstance?.()) return '';
   if (engine.homeContext?.().inHome) return '';
   return String(engine.streetTsid);
@@ -275,7 +279,7 @@ export const sharedQuoinsFeature = {
   onStreetEnter(street, engine) {
     if (!multiplayer(engine)) return;
     ensureClient(engine);
-    entered = String(engine.streetTsid || '');
+    entered = sharedStreet(engine) || String(engine.streetTsid || '');
     applied = '';
     if (client && sharedStreet(engine) && !LOCAL_STATES.has(client.state)) {
       // Hidden until the server says where they are and which are gone.

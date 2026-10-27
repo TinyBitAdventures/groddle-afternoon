@@ -854,6 +854,19 @@ export const tradeFeature = {
     return true;
   },
 
+  /**
+   * G334: a ledger spend the realtime server made for this player (a Party
+   * Pack, the Party ATM's currants: party_spaces.go), remembered with the
+   * trades the save has applied so the site counts it once (LedgerSpend.php).
+   * True the first time (the caller applies it), false when already applied.
+   */
+  ledgerReceipt(id) {
+    if (!multiplayer || typeof id !== 'string' || !id || id.length > 40) return null;
+    if (saved.applied.includes(id)) return false;
+    saved.applied = [...saved.applied, id].slice(-APPLIED_KEEP);
+    return true;
+  },
+
   save() {
     if (!multiplayer) return undefined;
     if (!saved.hold && !saved.applied.length) return undefined;

@@ -27,7 +27,27 @@
  * pack; &partyexpire=<seconds> shortens the clock after entry.
  * Canvas data: partyStatus, partyTemplate, partyRemaining, partyInside,
  * partyReturn, partyStacks, partyAtm, partyGuests, partyPhysics, partyBoost,
- * partyAmbience, partyMusic, partyLast, partyDemo, partyTeleporter.
+ * partyAmbience, partyMusic, partyLast, partyDemo, partyTeleporter,
+ * partyMp (multiplayer: the space's hub street, creator id and members' ids).
+ *
+ * Multiplayer (G334; engine.mode and engine.query('realtimeClient')): the
+ * realtime server owns the space (groddle-afternoon-server party_spaces.go,
+ * pure side js/party-spaces-mp.js). Activate asks the server, which spends
+ * the pack from the site's ledger and opens one space for your party (a
+ * party is needed, as in the source); the pack leaves the pack when the
+ * server says so. You get the free teleporter; the other members get the
+ * source's offer of one for the teleport energy (the Map's Party card
+ * offers it again). Everyone in the space shares its hub street
+ * (realtimeStreet: PARTY_<id>), so they see each other and its quoins are
+ * the party's (sharedQuoinStreet, quoins.go); nobody outside the party can
+ * join it. The clock, the warning and the end are the server's; the ATM's
+ * currants are spent from the payer's ledger. The creator's player menu has
+ * Kick out <name> for someone in the space (main.js party_space_kick); the
+ * kicked player is sent home and out of the party. No stand-in dancers: the
+ * party is the real players. QA: the multiplayer page strips query params,
+ * so &partyexpire is solo only; on a GRODDLE_PARTY_DEV server a member's
+ * socket can send party_space_dev {expire_in} to bring the shared end near.
+ * Solo is untouched.
  */
 
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=catalog-unified-7';
@@ -63,6 +83,7 @@ import {
 } from '../party-spaces.js';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { loseEnergy } from '../metabolics.js';
+import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../party-spaces-mp.js?v=g334-1';
 
 export const PARTY_FEATURE_ID = 'party-spaces';
 const HOLD = 'party';
@@ -107,6 +128,9 @@ let teleporter = null; // { target, sprite, phase, gone }
 let hud = null;
 let modal = null;
 let demo = null; // { stage, at, mode }
+// Multiplayer (G334): { client, inParty, pending, unsub }
+let mp = null;
+let kickGuard = false;
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                            */
@@ -116,6 +140,19 @@ const party = () => record.party;
 const space = () => (party() ? PARTY_SPACES[party().template] : null);
 const onPartyStreet = (engine) => Boolean(partySpaceForStreet(engine.streetTsid));
 const label = (classTsid) => ITEM_CATALOG[classTsid]?.label || String(classTsid).replace(/_/g, ' ');
+
+const isMp = (engine) => engine?.mode === 'multiplayer';
+
+/** Multiplayer: in a party now (this feature's view of the roster, else party-feature's). */
+function mpInParty() {
+  return Boolean(mp?.inParty || globalThis.groddleParty?.party);
+}
+
+/** Multiplayer: standing on the template street of this player's live server space. */
+function mpOnSpace(engine) {
+  const p = party();
+  return Boolean(isMp(engine) && p?.mp && partyAlive(p) && space()?.streetTsid === engine.streetTsid);
+}
 
 function insideLiveParty(engine) {
   const p = party();
@@ -355,6 +392,7 @@ function activatePack(engine, classTsid, { skipInstructions = false } = {}) {
     return true;
   }
   record.instructionsRead = true;
+  if (isMp(engine)) return activateMp(engine, classTsid);
   if (countItem(engine.inv, classTsid) < 1) return false;
   const res = startParty(party(), classTsid, { now: Date.now() });
   if (!res.ok) {
@@ -575,9 +613,12 @@ function tickClock(engine, now) {
   const p = party();
   if (!p) return;
   if (!partyAlive(p, now)) {
-    expire(engine);
+    if (p.mp) spaceGone(engine, 'expired');
+    else expire(engine);
     return;
   }
+  // Multiplayer: the warning is the server's (party_space warned).
+  if (p.mp) return;
   if (partyWarningDue(p, now)) {
     p.warned = true;
     engine.toast(PARTY_TEXT.warning, 4200);
@@ -621,7 +662,8 @@ function setupSpace(street, engine) {
     spawnBooster(engine, far);
   }
   for (const group of partyStackGroups(p.template)) spawnStack(engine, group, take());
-  PARTY_GUESTS.forEach((g, i) => spawnGuest(engine, g, guestPoints[i], i));
+  // Multiplayer: the party is the real players, so no stand-in dancers.
+  if (!p.mp) PARTY_GUESTS.forEach((g, i) => spawnGuest(engine, g, guestPoints[i], i));
   buildOverlay(engine, s);
   engine.playSound('LONELINESS_FIREWORKS', { volume: 0.45 });
   engine.pushActivity(`Welcome to ${s.label}! ${s.desc}`);
@@ -942,6 +984,7 @@ function openAtm(engine) {
 
 function chooseExtend(engine, minutes) {
   const p = party();
+  if (p?.mp) return extendMp(engine, minutes);
   const res = extendParty(p, minutes, engine.pc, { now: Date.now() });
   closeModal(engine);
   if (res.ok) {
@@ -959,6 +1002,202 @@ function chooseExtend(engine, minutes) {
   note(engine, res.reply || 'atm');
   if (res.expired) expire(engine);
   return res;
+}
+
+/* ------------------------------------------------------------------ */
+/* Multiplayer (G334): the realtime server's space                     */
+/* ------------------------------------------------------------------ */
+
+/** Listens to the realtime client once it exists (realtime-feature makes it). */
+function ensureMp(engine) {
+  if (mp || !isMp(engine)) return mp;
+  const client = engine.query?.('realtimeClient');
+  if (!client?.on) return null;
+  mp = { client, inParty: false, pending: '', unsub: [] };
+  const on = (kind, fn) => mp.unsub.push(client.on(kind, fn));
+  on('msg:party', (msg) => {
+    mp.inParty = Boolean(msg.party && Array.isArray(msg.party.members) && msg.party.members.length);
+    if (!mp.inParty && party()?.mp) spaceGone(engine, 'left');
+  });
+  on('msg:party_space', (msg) => applySpace(engine, msg.space, msg.why));
+  on('msg:party_space_opened', (msg) => spaceOpened(engine, msg));
+  on('msg:party_space_prompt', (msg) => spacePrompt(engine, msg));
+  on('msg:party_space_refused', (msg) => spaceRefused(engine, msg));
+  on('msg:party_space_extended', (msg) => spaceExtended(engine, msg));
+  on('msg:party_space_kicked', (msg) => spaceGone(engine, 'kicked', String(msg.text || '')));
+  on('error', ({ code }) => {
+    // The server would not let us onto the space's street (kicked, over, a restart forgot it).
+    if (code === 'private_street' && MP_SPACE_STREET_RE.test(client.wanted || '') && party()?.mp) spaceGone(engine, 'private', MP_PARTY_TEXT.privateSpace);
+  });
+  return mp;
+}
+
+/** party_space: the space as the server has it now (or none). */
+function applySpace(engine, view, why = '') {
+  const s = normalizeSpace(view);
+  if (!s) {
+    spaceGone(engine, why);
+    return;
+  }
+  const prev = party();
+  const fresh = prev?.mp?.id !== s.id;
+  if (!fresh && !prev.warned && s.warned) {
+    engine.toast(PARTY_TEXT.warning, 4200);
+    note(engine, PARTY_TEXT.warning);
+  }
+  record.party = partyFromSpace(s, prev);
+  if (fresh) {
+    // A new space: rocks, quoins and trees start over (a fresh instance).
+    resetSpaceWorld(engine, s.template);
+    engine.save();
+  }
+  publish(engine, true);
+}
+
+/** The space is over for this player: expired, closed, left, kicked or refused. */
+function spaceGone(engine, why, text = '') {
+  const p = party();
+  if (!p?.mp) return;
+  const words = text || (why === 'expired' ? PARTY_TEXT.expired : '');
+  const here = onPartyStreet(engine);
+  const back = p.returnTo || DEFAULT_STREET;
+  record.party = null;
+  if (mp) mp.pending = '';
+  if (teleporter) despawnTeleporter(engine, { vanish: true });
+  if (words) {
+    engine.toast(words, 4200);
+    engine.pushActivity(words);
+  }
+  note(engine, words || `gone:${why || 'closed'}`);
+  engine.save();
+  if (here) {
+    engine.instanceHold = null;
+    closeModal(engine);
+    engine.enter(back.tsid, { spawnX: back.x, spawnY: back.y, bypassFeatureGates: true });
+  }
+  publish(engine, true);
+}
+
+/** Activate in multiplayer: the server spends the pack from the ledger and opens the space. */
+function activateMp(engine, classTsid) {
+  const m = ensureMp(engine);
+  if (!m || countItem(engine.inv, classTsid) < 1) {
+    if (!m) engine.toast(MP_PARTY_TEXT.offline);
+    return false;
+  }
+  const block = mpActivationBlock({ inParty: mpInParty(), instructionsRead: true, pending: Boolean(m.pending) });
+  if (block) {
+    engine.toast(block);
+    note(engine, block);
+    return false;
+  }
+  if (!m.client.send('party_space_start', { pack: classTsid })) {
+    engine.toast(MP_PARTY_TEXT.offline);
+    return false;
+  }
+  m.pending = classTsid;
+  note(engine, `activating:${classTsid}`);
+  engine.save();
+  return true;
+}
+
+/** party_space_opened: the creator's pack is spent and the teleporter is theirs. */
+function spaceOpened(engine, msg) {
+  const s = normalizeSpace(msg.space);
+  if (!s) return;
+  if (mp) mp.pending = '';
+  applySpace(engine, msg.space);
+  const pack = String(msg.pack || '');
+  // Once per spend (the trade slice remembers it, so the site counts it once: LedgerSpend.php).
+  const receipt = engine.query?.('ledgerReceipt', String(msg.spend || ''), engine);
+  if (receipt !== false && countItem(engine.inv, pack) > 0) removeItem(engine.inv, pack, 1);
+  if (receipt !== false) {
+    record.partiesThrown += 1;
+    if (!record.themes.includes(s.template)) record.themes.push(s.template);
+    engine.achievement(`party_space_started:${s.template}`, 1);
+  }
+  const announce = `${s.creatorName || 'You'} made us a new Party Space!`;
+  engine.toast(announce, 3600);
+  note(engine, announce);
+  openTeleporter(engine);
+  engine.refreshPack();
+  engine.save();
+  publish(engine, true);
+}
+
+/** party_space_prompt (inc_party.js party_space_prompt): a teleporter for the teleport energy, or later. */
+function spacePrompt(engine, msg) {
+  const s = normalizeSpace(msg.space);
+  if (!s || mpOnSpace(engine)) return;
+  applySpace(engine, msg.space);
+  const cost = rejoinCost(engine);
+  const names = (Array.isArray(msg.pcs) ? msg.pcs : []).map(String).slice(0, 12);
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  showModal(engine, {
+    kind: 'invite',
+    art: itemIcon(s.pack || `party_pack_${DEMO_SLUGS[s.template]}`),
+    kicker: MP_PARTY_TEXT.inviteKicker(s.label),
+    body: `<p class="party-modal-small" style="font-size:.84rem">${esc(PARTY_SPACES[s.template].desc)}</p><p class="party-modal-small">${esc(MP_PARTY_TEXT.partying(names))}</p>`,
+    copy: MP_PARTY_TEXT.inviteCost(cost),
+    buttons: [
+      { id: 'go', label: MP_PARTY_TEXT.inviteGo(cost), run: () => { closeModal(engine); rejoin(engine); } },
+      { id: 'later', label: MP_PARTY_TEXT.inviteLater, cancel: true, run: () => { closeModal(engine); note(engine, PARTY_TEXT.joinLater); engine.pushActivity(PARTY_TEXT.joinLater); } },
+    ],
+  });
+  note(engine, `invited:${s.street}`);
+}
+
+function spaceRefused(engine, msg) {
+  if (mp) mp.pending = '';
+  const text = String(msg.text || '');
+  if (!text) return;
+  engine.playSound('CLICK_FAILURE', { volume: 0.5 });
+  if (atm && (msg.why === 'currants' || msg.why === 'late') && mpOnSpace(engine)) engine.say(atm.target, text, 3200);
+  else engine.toast(text, 3200);
+  note(engine, text);
+  engine.refreshPack();
+}
+
+/** party_space_extended: the ATM took this player's currants (once per spend). */
+function spaceExtended(engine, msg) {
+  const receipt = engine.query?.('ledgerReceipt', String(msg.spend || ''), engine);
+  const cost = Math.max(0, Math.floor(Number(msg.cost) || 0));
+  if (receipt !== false) {
+    engine.pc.currants = Math.max(0, (Number(engine.pc.currants) || 0) - cost);
+    record.extensions += 1;
+    const p = party();
+    if (p) engine.achievement(`party_space_extended:${p.template}`, Number(msg.minutes) || 0);
+  }
+  engine.playSound('PURCHASE_ITEM', { volume: 0.55 });
+  const text = String(msg.text || PARTY_TEXT.atmOk);
+  if (atm) engine.say(atm.target, text, 3200);
+  note(engine, text);
+  engine.updateHud();
+  engine.save();
+}
+
+/** The ATM in multiplayer: the server spends the payer's currants from the ledger. */
+function extendMp(engine, minutes) {
+  const p = party();
+  closeModal(engine);
+  const option = partyExtendOptions(p).find((o) => o.minutes === Number(minutes));
+  if (!p || !partyAlive(p)) {
+    if (atm) engine.say(atm.target, PARTY_TEXT.atmTooLate, 3200);
+    return { ok: false, reply: PARTY_TEXT.atmTooLate };
+  }
+  if (!option) return { ok: false, reply: '' };
+  if ((Number(engine.pc.currants) || 0) < option.cost) {
+    engine.playSound('CLICK_FAILURE', { volume: 0.5 });
+    if (atm) engine.say(atm.target, PARTY_TEXT.atmBroke, 3200);
+    note(engine, PARTY_TEXT.atmBroke);
+    return { ok: false, reply: PARTY_TEXT.atmBroke };
+  }
+  if (!mp?.client.send('party_space_extend', { minutes: option.minutes })) {
+    engine.toast(MP_PARTY_TEXT.offline);
+    return { ok: false, reply: '' };
+  }
+  note(engine, `extending:${option.minutes}`);
+  return { ok: true, pending: true, minutes: option.minutes, cost: option.cost };
 }
 
 /* ------------------------------------------------------------------ */
@@ -988,6 +1227,10 @@ function publish(engine, force = false) {
   engine.setData('partyThrown', String(record.partiesThrown));
   engine.setData('partyLast', last);
   engine.setData('partyDemo', demo ? demo.stage : '');
+  if (isMp(engine)) {
+    const ref = p?.mp;
+    engine.setData('partyMp', ref ? `${ref.street}:creator=${ref.creatorId}:here=${mpOnSpace(engine) ? (mp?.client.players || []).map((o) => o.id).join('+') : ''}` : '');
+  }
 }
 
 function packFor(template, taster) {
@@ -1167,6 +1410,7 @@ export const partySpacesFeature = {
 
   onStreetEnter(street, engine) {
     buildChrome(engine);
+    if (isMp(engine)) ensureMp(engine);
     const s = partySpaceForStreet(street.tsid);
     const p = party();
     if (s) {
@@ -1184,7 +1428,7 @@ export const partySpacesFeature = {
       if (p?.inside) p.inside = false;
       if (engine.instanceHold === HOLD) engine.instanceHold = null;
       if (p?.teleporter) spawnTeleporter(engine);
-      if (!demo && engine.param('partydemo') && engine.started) startDemo(engine);
+      if (!demo && engine.param('partydemo') && engine.started && !isMp(engine)) startDemo(engine);
     }
     publish(engine, true);
   },
@@ -1222,7 +1466,8 @@ export const partySpacesFeature = {
   },
 
   onTick(dtMs, now, engine) {
-    if (demo === null && engine.started && engine.param('partydemo') && !onPartyStreet(engine)) startDemo(engine);
+    if (isMp(engine) && engine.started) ensureMp(engine);
+    if (demo === null && engine.started && engine.param('partydemo') && !onPartyStreet(engine) && !isMp(engine)) startDemo(engine);
     simMs += dtMs;
     tickClock(engine, now);
     tickTeleporter(engine, now);
@@ -1284,7 +1529,8 @@ export const partySpacesFeature = {
 
   packVerbs(classTsid, engine) {
     if (!isPartyPack(classTsid)) return [];
-    const block = activationBlock(engine, classTsid);
+    const block = activationBlock(engine, classTsid)
+      || (isMp(engine) ? mpActivationBlock({ inParty: mpInParty(), instructionsRead: record.instructionsRead, pending: Boolean(mp?.pending) }) : '');
     return [{ id: 'activate', label: 'Activate', primary: true, enabled: !block, reason: block, tooltip: PARTY_TEXT.activateTooltip }];
   },
 
@@ -1309,8 +1555,59 @@ export const partySpacesFeature = {
     return onPartyStreet(engine) ? true : null;
   },
 
+  /** realtime-feature sharedStreet: in multiplayer a space's members share its hub street (PARTY_<id>). */
+  realtimeStreet(engine) {
+    return mpOnSpace(engine) ? party().mp.street : null;
+  },
+
+  /** shared-quoins-feature: a space's quoins are its party's, on the same hub street. */
+  sharedQuoinStreet(engine) {
+    return mpOnSpace(engine) ? party().mp.street : null;
+  },
+
+  /** party-feature streetLabel: a member in a space is in it, not on PARTY_<id>. */
+  labelFor(tsid) {
+    if (!MP_SPACE_STREET_RE.test(String(tsid || ''))) return null;
+    const p = party();
+    const label = p?.mp?.street === tsid ? space()?.label : '';
+    return { street: label || 'A Party Space', hub: 'Party Locations', hubId: '108' };
+  },
+
+  /** Another player's Glitch: the creator's Kick out <name> in the space (main.js:3730-3739). */
+  verbOverride(target, engine) {
+    if (kickGuard || !mp || !isMp(engine) || target?.classId !== 'pc_remote' || !target.playerId) return null;
+    const p = party();
+    const verb = kickVerb({ me: mp.client.me?.id, space: p?.mp || null, onSpaceStreet: mpOnSpace(engine), target: { id: target.playerId, name: target.label } });
+    if (!verb) return null;
+    kickGuard = true;
+    let base;
+    try {
+      base = engine.targetVerbs?.(target) || [];
+    } finally {
+      kickGuard = false;
+    }
+    return [...base.filter((v) => v.id !== verb.id), verb];
+  },
+
+  runVerbOverride(target, verbId, engine) {
+    if (verbId !== 'party_space_kick' || !mp || !target?.playerId) return null;
+    const id = target.playerId;
+    const name = target.label || 'them';
+    engine.prompt?.({
+      modal: true,
+      text: MP_PARTY_TEXT.kickConfirm(name),
+      choices: [{ label: MP_PARTY_TEXT.kickYes, value: true }, { label: MP_PARTY_TEXT.kickNo, value: false }],
+      onChoice: (v) => {
+        if (v !== true) return;
+        if (!mp.client.send('party_space_kick', { id })) engine.toast(MP_PARTY_TEXT.offline);
+        note(engine, `kick:${id}`);
+      },
+    });
+    return true;
+  },
+
   /** QA / tests. */
   _state() {
-    return { record, demo, stacks: stacks.length, guests: guests.length, atm: Boolean(atm), booster: Boolean(booster) };
+    return { record, demo, stacks: stacks.length, guests: guests.length, atm: Boolean(atm), booster: Boolean(booster), mp: mp ? { inParty: mp.inParty, pending: mp.pending } : null };
   },
 };

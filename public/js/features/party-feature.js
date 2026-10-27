@@ -18,7 +18,7 @@
  * - Chat: /p <text> (or /party <text>) talks to the party; /invite <name>
  *   invites someone online by name; /leaveparty leaves. Party lines show in
  *   the panel and in the chat stream marked "Party".
- * - Deferred: Party Spaces in multiplayer and party-only quoins.
+ * - Party Spaces between the members (and their quoins) are party-spaces-feature.js (G334).
  *
  * QA: canvas data partyState (none|in), partyMembers (name@where,...),
  * partyLeader, partyInvites (prompts waiting), partyLastSaid;

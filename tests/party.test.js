@@ -23,7 +23,7 @@ import {
   partiersLine,
   partyCommand,
 } from '../public/js/party.js?v=mp4-1';
-import { partyFeature } from '../public/js/features/party-feature.js?v=mp4-1';
+import { partyFeature } from '../public/js/features/party-feature.js?v=mp4-2';
 import { FEATURES } from '../public/js/features/index.js';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 

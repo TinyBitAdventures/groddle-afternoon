@@ -608,8 +608,17 @@ export function normalizePartyRecord(seed = {}, now = Date.now()) {
       teleporter: normalizeTeleporter(p.teleporter, now),
       instance: Number(p.instance) || Number(p.startedAt) || now,
     };
+    // Multiplayer (G334): the realtime server's space this party is (js/party-spaces-mp.js).
+    const mp = normalizeMpSpaceRef(p.mp);
+    if (mp) out.party.mp = mp;
   }
   return out;
+}
+
+function normalizeMpSpaceRef(mp) {
+  if (!mp || typeof mp !== 'object' || !/^PARTY_[0-9A-F]{16}$/.test(String(mp.street || ''))) return null;
+  const n = Number(mp.creatorId);
+  return { id: String(mp.id || ''), street: String(mp.street), creatorId: Number.isFinite(n) ? Math.floor(n) : 0, creatorName: String(mp.creatorName || '') };
 }
 
 function normalizeTeleporter(tp, now) {

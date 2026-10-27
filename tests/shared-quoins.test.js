@@ -24,7 +24,7 @@ import {
   shardFor,
   statusOf,
 } from '../public/js/shared-quoins.js?v=mp4-1';
-import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?v=mp4-1';
+import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?v=mp4-2';
 import {
   QUOIN_SHARD_FLOOR,
   QUOIN_SHARD_NEAR,
@@ -352,7 +352,7 @@ describe('the server and the wiring', () => {
 
   it('registers before realtime, and game.js hands the touch, the reward and respawns over', () => {
     const idx = read('public/js/features/index.js');
-    const mine = idx.indexOf("import { sharedQuoinsFeature } from './shared-quoins-feature.js?v=mp4-1'");
+    const mine = idx.indexOf("import { sharedQuoinsFeature } from './shared-quoins-feature.js?v=mp4-2'");
     assert.ok(mine > 0 && mine < idx.indexOf('realtimeFeature'));
     const game = read('public/game.js');
     assert.match(game, /if \(features\.query\('quoinTouched', q, engine\)\) continue;\n\s+grabWorldQuoin\(q\);/);

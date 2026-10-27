@@ -797,11 +797,13 @@
    "id": "parties",
    "group": "quests",
    "name": "Party spaces",
-   "status": "solo",
-   "blurb": "All eight party packs and their party streets.",
+   "status": "source",
+   "blurb": "All eight party packs and their party streets. In multiplayer a pack opens one space for your whole party: everyone gets a way in, shares the clock, the Party ATM and the quoins, and the creator can kick someone out.",
    "spot": null,
    "evidence": [
-    "public/js/party-spaces.js"
+    "public/js/party-spaces.js",
+    "public/js/party-spaces-mp.js",
+    "public/js/features/party-spaces-feature.js"
    ],
    "shot": "shots/parties.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&partydemo=moon&practice=1"
@@ -1082,9 +1084,9 @@
   }
  ],
  "tally": {
-  "source": 46,
+  "source": 47,
   "rebuilt": 10,
-  "solo": 9,
+  "solo": 8,
   "missing": 1,
   "reimagined": 1,
   "progress": 1,
@@ -2488,9 +2490,14 @@
   ]
  },
  "git": {
-  "commits": 540,
+  "commits": 541,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "fix",
+    "text": "Falling into the cloud tutorial no longer announces Hechey Track or a Qurazy Quoin"
+   },
    {
     "date": "2026-10-26",
     "kind": "fix",
@@ -2605,14 +2612,9 @@
     "date": "2026-10-26",
     "kind": "fix",
     "text": "Only CC0 or our own art and sound ship: every file from Glitch's CDN or downloads page is traced, replaced or dropped"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "fix",
-    "text": "The multiplayer page loads the current game, and build scripts find the source data beside the repo"
    }
   ]
  },
- "tests": 312,
+ "tests": 313,
  "generatedAt": "2026-10-26"
 }

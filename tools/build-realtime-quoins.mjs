@@ -10,7 +10,10 @@
  * What differs from a solo layout, on purpose: no saved-arrival reservation
  * (that one is per player; in multiplayer everyone stands the quoins where
  * the server says) and no feature ecology overrides (those streets are
- * private instances, rebuilt rooms or empty stations, never shared).
+ * private instances, rebuilt rooms or empty stations, never shared), but
+ * one: a party street's own (party-spaces.js partyEcologyEntry, the
+ * archived template's quoins), since a Party Space's party shares them
+ * (G334, quoins.go spotsOf).
  *
  * Run from the game repo root:
  *   node tools/build-realtime-quoins.mjs           writes data/quoins.json in the server repo (go:embed in its quoins.go)
@@ -31,6 +34,7 @@ import {
   setStreetEcologyCatalog,
 } from '../public/js/street-ecology.js';
 import { QUOIN_CLASSES, QUOIN_TYPES, planStreetQuoins, streetQuoinClass } from '../public/js/quoins.js';
+import { partyEcologyEntry, partySpaceForStreet } from '../public/js/party-spaces.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');
@@ -59,12 +63,18 @@ export function placementRequests(population) {
   ];
 }
 
+/** The ecology game.js lays a street out with here: a party street's is its template's (party-spaces-feature ecologyOverride). */
+export function streetEcology(tsid) {
+  const party = partySpaceForStreet(tsid);
+  return party ? partyEcologyEntry(party.id) : ecologyForStreet(tsid);
+}
+
 /**
  * One street's natural quoins: [x, y, type, class] where x, y are the
  * quoin's centre before its bob (game.js spawnWorldQuoin: x = spot.x,
  * baseY = spot.y - 58 - (index % 3) * 34) in the street's screen pixels.
  */
-export function streetQuoinLayout(data, { starter = false, ecology = ecologyForStreet(data.tsid) } = {}) {
+export function streetQuoinLayout(data, { starter = false, ecology = streetEcology(data.tsid) } = {}) {
   const population = populationForStreet(data.tsid, ecology, { starter });
   if (!population.quoins) return [];
   const reserved = (data.signposts || []).map((signpost, index) => {
