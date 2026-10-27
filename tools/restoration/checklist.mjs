@@ -226,7 +226,7 @@ export const CHECKLIST = Object.freeze([
     evidence: ['public/js/feats.js', 'public/js/solo-feats.js', 'public/js/feats-mp.js'] },
   { id: 'parties', group: 'quests', name: 'Party spaces', status: 'source',
     blurb: 'All eight party packs and their party streets. In multiplayer a pack opens one space for your whole party: everyone gets a way in, shares the clock, the Party ATM and the quoins, and the creator can kick someone out.',
-    multiplayer: 'A Party Pack opens one party space for your whole party, with a shared clock, Party ATM and quoins.',
+    multiplayer: 'A Party Pack opens one party space for your whole party, with a shared clock, Party ATM and quoins, kept through a server restart; a space that can’t go on gives back what it cost.',
     evidence: ['public/js/party-spaces.js', 'public/js/party-spaces-mp.js', 'public/js/features/party-spaces-feature.js'] },
   { id: 'smuggling', group: 'quests', name: 'The Smuggler', status: 'source',
     blurb: 'Carry Contraband across Ur without a Deimaginator catching you, then break the wrongfully imprisoned Smuggler out of his cell.',

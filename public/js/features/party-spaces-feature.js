@@ -1025,6 +1025,7 @@ function ensureMp(engine) {
   on('msg:party_space_refused', (msg) => spaceRefused(engine, msg));
   on('msg:party_space_extended', (msg) => spaceExtended(engine, msg));
   on('msg:party_space_kicked', (msg) => spaceGone(engine, 'kicked', String(msg.text || '')));
+  on('msg:party_space_refunded', (msg) => spaceRefunded(engine, msg));
   on('error', ({ code }) => {
     // The server would not let us onto the space's street (kicked, over, a restart forgot it).
     if (code === 'private_street' && MP_SPACE_STREET_RE.test(client.wanted || '') && party()?.mp) spaceGone(engine, 'private', MP_PARTY_TEXT.privateSpace);
@@ -1174,6 +1175,42 @@ function spaceExtended(engine, msg) {
   note(engine, text);
   engine.updateHud();
   engine.save();
+}
+
+/**
+ * party_space_refunded (party_spaces.go, party_persist.go): a spend that bought
+ * nothing (no answer came, the party ended meanwhile, the space could not come
+ * back after a server restart) was given back by the site (LedgerSpend.php
+ * refund, a trade id of its own). Both ids go in the applied list, so a spend
+ * this page never applied and its refund net to nothing; the pack or the
+ * currants come back only when the spend had been applied here. Sent on every
+ * connect for a day: the second time it is already applied and does nothing.
+ */
+function spaceRefunded(engine, msg) {
+  const spend = String(msg.spend || '');
+  const refund = String(msg.refund || '');
+  if (!spend || refund !== `${spend}-r`) return;
+  const hadSpend = engine.query?.('ledgerReceipt', spend, engine) === false;
+  const fresh = engine.query?.('ledgerReceipt', refund, engine) === true;
+  if (fresh && hadSpend) {
+    const goods = msg.goods && typeof msg.goods === 'object' ? msg.goods : {};
+    for (const it of Array.isArray(goods.items) ? goods.items.slice(0, 8) : []) {
+      const c = String(it?.c || '');
+      const n = Math.max(0, Math.min(1000, Math.floor(Number(it?.n) || 0)));
+      if (/^party_pack_[a-z_]{1,48}$/.test(c) && n) addItem(engine.inv, c, n);
+    }
+    const currants = Math.max(0, Math.floor(Number(goods.currants) || 0));
+    if (currants) engine.pc.currants = (Number(engine.pc.currants) || 0) + currants;
+    const text = String(msg.text || '');
+    if (text) {
+      engine.toast(text, 4200);
+      engine.pushActivity(text);
+    }
+    note(engine, `refunded:${spend}`);
+    engine.refreshPack();
+    engine.updateHud();
+  }
+  if (fresh) engine.save();
 }
 
 /** The ATM in multiplayer: the server spends the payer's currants from the ledger. */

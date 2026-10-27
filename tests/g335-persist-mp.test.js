@@ -30,6 +30,7 @@ const STATE_FILES = {
   'rook-file': 'realtime-rook.json',
   'quoins-file': 'realtime-quoins.json',
   'crowns-file': 'realtime-crowns.json', // G334 lane RACES3: crowns.go's owed rewards
+  'party-file': 'realtime-party.json', // G335 lane PARTYSAVE: parties, Party Spaces and the spends owed back
 };
 
 describe('the server keeps its lasting state in files', { skip: skipWithoutServer }, () => {
