@@ -13160,6 +13160,15 @@
       "platforms": 6,
       "decos": 150,
       "reconstructed": true
+    },
+    "GA9S2N3F15F3JD3": {
+      "label": "Growing Stuff",
+      "file": "assets/streets/GA9S2N3F15F3JD3.json",
+      "hubId": "143",
+      "hubName": "Vortex of Random",
+      "platforms": 2,
+      "decos": 141,
+      "reconstructed": true
     }
   }
 }

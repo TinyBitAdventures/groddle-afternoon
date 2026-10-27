@@ -1270,8 +1270,8 @@
   "register": "G157"
  },
  "location:LA9S2N3F15F3JD3": {
-  "status": "missing",
-  "reason": "Growing Stuff: door on Abbasid Jail; 1 Snap, no geometry or code",
+  "status": "reimagined",
+  "reason": "Growing Stuff: rebuilt from a picture (G157). No geometry or code survives (inc_data_maps_prod.js:17879 only); Hedge's 2012-12-09 Snap (reference only) matches Snowed In's hall bay for bay (Abbasid Jail's door was made four minutes before Abbasid River's), so the room is that hall: boarded doors, a window boarded but for a slit, hanging lamps, a vent pipe, a table and stool, and raised beds of ferns and mushrooms, built from CC0 apartment-hall, abandoned-apartment and planter decos (public/js/rebuilt-rooms.js, tools/build-rebuilt-rooms.mjs). In through Abbasid Jail's door_1353965060768 (connect 111,-121), out through the lift",
   "register": "G157"
  },
  "location:LCR14T7ECHM18G8": {

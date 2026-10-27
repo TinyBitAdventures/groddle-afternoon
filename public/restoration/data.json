@@ -316,7 +316,7 @@
    "group": "world",
    "name": "Rooms rebuilt from pictures",
    "status": "reimagined",
-   "blurb": "Three places no archive kept, rebuilt from players’ pictures with Tiny Speck’s own art. Snowed In, behind Abbasid River’s door: an apartment hall buried in drifts, eight doors, four windows onto snowy firs, a lift, a teleporter beam and a campfire with washing on the line. Ethereal Endeavour, behind Doonboggle Trail’s locked door (Door Key 1): a cellular room of neurons and floating quoins, out through the EXIT in the membrane. Martleby Hare, behind Rookthills Lay’s locked door (Door Key 2): a Seams cliff of mossy ledges down to a stone-arched door that opens on Footlands Heath’s balcony.",
+   "blurb": "Four places no archive kept, rebuilt from players’ pictures with Tiny Speck’s own art. Snowed In, behind Abbasid River’s door: an apartment hall buried in drifts, eight doors, four windows onto snowy firs, a lift, a teleporter beam and a campfire with washing on the line. Growing Stuff, behind Abbasid Jail’s door: the same hall in lavender, its doors and windows boarded up, with raised beds of ferns and mushrooms along the front. Ethereal Endeavour, behind Doonboggle Trail’s locked door (Door Key 1): a cellular room of neurons and floating quoins, out through the EXIT in the membrane. Martleby Hare, behind Rookthills Lay’s locked door (Door Key 2): a Seams cliff of mossy ledges down to a stone-arched door that opens on Footlands Heath’s balcony.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
@@ -325,7 +325,8 @@
     "tools/build-rebuilt-rooms.mjs",
     "public/assets/streets/GA9RLGSQ05F3Q69.json",
     "public/assets/streets/GA9EKMN138D3QK2.json",
-    "public/assets/streets/GCR14T7ECHM18G8.json"
+    "public/assets/streets/GCR14T7ECHM18G8.json",
+    "public/assets/streets/GA9S2N3F15F3JD3.json"
    ],
    "shot": null,
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=GA9RLGSQ05F3Q69&streetx=1644&streety=527&practice=1"
@@ -2648,11 +2649,6 @@
   "recent": [
    {
     "date": "2026-10-27",
-    "kind": "fix",
-    "text": "Qualified Artifactologist had two inventory entries; the older 'missing' one won"
-   },
-   {
-    "date": "2026-10-27",
     "kind": "new",
     "text": "Snowed In, Ethereal Endeavour and Martleby Hare, rebuilt from players' pictures"
    },
@@ -2765,6 +2761,11 @@
     "date": "2026-10-27",
     "kind": "improve",
     "text": "The game connects to the realtime server the site names"
+   },
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "Multiplayer characters from before bags get their starter bags"
    }
   ]
  },

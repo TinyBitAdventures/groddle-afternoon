@@ -1,6 +1,7 @@
 /**
- * Three places rebuilt from players' pictures (register rows G157, G158,
- * G159): Snowed In, Ethereal Endeavour and Martleby Hare. Pure data and
+ * Four places rebuilt from players' pictures (register rows G157, G158,
+ * G159): Snowed In, Ethereal Endeavour, Martleby Hare and Growing Stuff (its
+ * notes are with its builder below). Pure data and
  * street builders (no Pixi, no DOM); tools/build-rebuilt-rooms.mjs writes the
  * street JSON, the index rows and the doors that lead in, and
  * features/rebuilt-rooms-feature.js gives each its population.
@@ -677,16 +678,235 @@ export function martlebyStreet({ footlandsArrive = null } = {}) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Growing Stuff                                                       */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Growing Stuff (LA9S2N3F15F3JD3, hub 143 Vortex of Random)
+ * - GSJS: only the map list (inc_data_maps_prod.js:17879). The way in is
+ *   Abbasid Jail's door_1353965060768 (GA9R4OR505F3PSL.xml:1736-1763): an
+ *   unlocked door_asset_gray, no key, no level, connect 111,-121, whose swf
+ *   list names bldg_int_apt (the apartment interior art). Abbasid Jail's
+ *   geometry `sources` (:2614) list Growing Stuff, so the room linked back.
+ * - The same hall as Snowed In: the two doors were made four minutes apart
+ *   (door ids 1353965060768 and 1353965313720, 2012-11-26), both gray doors
+ *   on Vortex of Random streets into new hub 143 rooms, both landing just
+ *   right of x 0 near y -120. Hedge's Snap matches it bay for bay: its
+ *   pilasters at Snap x 35, 182, 330, 440 and 590 are Snowed In's bay edges
+ *   311, 536, 762, 925 and 1151 (world x = 311 + (Snap x - 35) * 1.53, world
+ *   y = (Snap y - 427) * 1.5), the same door, door, narrow window, door, door
+ *   run. So the room keeps Snowed In's 3110 x 642 bounds, bays and central
+ *   lift, and the Snap's view (world x 257..1237) is placed exactly.
+ * - Picture: Hedge's Snap, 2012-12-09, "Growing stuff!" (the only picture,
+ *   640 x 427, research/wayback/raw/snaps/growing-stuff, reference only): a
+ *   lavender apartment hall, arched wooden doors (the first and last boarded
+ *   with planks), a narrow window boarded but for a slit, two hanging lamps
+ *   at the pilasters, a vent pipe out of the ceiling at the left, a round
+ *   table and a stool, and along the front three raised stone beds: ferns
+ *   and teal leaves, a fenced bed of blue-purple mushrooms, and a bed of
+ *   mauve mushrooms round a big red cap.
+ * - Art: the apartment hall pieces Snowed In uses, door_asset_abandoned_apt_1
+ *   and abandoned_apt_windowboard_* (the abandoned-apartment set), wallpipe_1,
+ *   hanging_lightbulb, deco_table_wooden_ghtest, deco_stool_wooden_ghtest,
+ *   abbasid_planter_box_1x3 (Abbasid's grey stone bed), plant_fern_*,
+ *   zutto_plant_2/3, purple_mushroom_*, mushroom_amanita_1,
+ *   bling_wildmushrooms_2, post_wood_1 and ground_rail_1 for the fence.
+ * - Remake choices: the half the Snap does not show mirrors the half it does
+ *   (doors, boards, lamps, a second pipe, three more beds); the way out is
+ *   the lift, as in Snowed In. The lamps' dark shades are left out (no CC0
+ *   shade: bare hanging bulbs), and the beds are scenery, not garden plots.
+ */
+
+export const GROWING_STUFF_TSID = 'GA9S2N3F15F3JD3';
+export const GROWING_STUFF_SOURCE_TSID = 'LA9S2N3F15F3JD3';
+export const GROWING_STUFF_LABEL = 'Growing Stuff';
+export const GROWING_STUFF_HUB = SNOWED_IN_HUB;
+export const ABBASID_JAIL_TSID = 'GA9R4OR505F3PSL';
+export const ABBASID_JAIL_SOURCE_TSID = 'LA9R4OR505F3PSL';
+export const ABBASID_JAIL_DOOR = 'door_1353965060768';
+/** Abbasid Jail's door connect x/y: world, in Growing Stuff. */
+export const GROWING_STUFF_ARRIVE = Object.freeze({ x: 111, y: -121 });
+/** Snowed In's hall (see above). */
+export const GROWING_STUFF_BOUNDS = SNOWED_IN_BOUNDS;
+export const GROWING_STUFF_FLOOR_Y = -121;
+export const GROWING_STUFF_EXIT_DOOR = 'door_growing_stuff_lift';
+/** The Snap's view in world x (Snap x 0..640). */
+export const GROWING_STUFF_SNAP_VIEW = Object.freeze({ l: 257, r: 1237 });
+export const GROWING_STUFF_SOURCE_LINE =
+  'reconstruction: Growing Stuff (LA9S2N3F15F3JD3, not in tinyspeck/glitch-locations); Snowed In\'s hall, after Hedge\'s 2012-12-09 Snap "Growing stuff!" (reference only), CC0 apartment hall, abandoned apartment and planter decos';
+
+/** Boarded doors (bay index: planks) and the Snap's two (bays 7 and 11), mirrored to bays 4 and 0. */
+const GS_BOARDED_DOORS = Object.freeze({ 0: 2, 4: 1, 7: 1, 11: 2 });
+/** Lamps hang at the pilasters (Snap x 182 and 440: world 536 and 925), mirrored. */
+export const GROWING_STUFF_LAMPS = Object.freeze([-933, -529, 536, 925]);
+/** Raised beds along the front (Snap: 257..578, 571..977, 962..1367 world), mirrored. */
+export const GROWING_STUFF_BEDS = Object.freeze([
+  ['mushrooms', -1165], ['fenced', -775], ['ferns', -370], ['ferns', 370], ['fenced', 775], ['mushrooms', 1165],
+].map(([kind, x]) => Object.freeze({ kind, x })));
+const GS_BED = Object.freeze({ w: 410, h: 78, base: -40, soil: -84 });
+
+function growingWallDecos() {
+  const out = [];
+  let z = 10;
+  const h = SI_WALL_BASE - SI_WALL_TOP;
+  out.push(deco('apartment_hall_wall_side', -1462, -40, 200, 610, z++));
+  out.push(deco('apartment_hall_wall_side', 1468, -40, 200, 610, z++, { flip: true }));
+  for (const [i, bay] of SNOWED_IN_BAYS.entries()) {
+    const w = bay.b - bay.a + 14;
+    if (bay.kind === 'window') out.push(deco('apartment_hall_wall_piece_window', bay.x, SI_WALL_BASE, w, h, z++, { id: `window_${i + 1}` }));
+    else out.push(deco('apartment_hall_wall_piece_2', bay.x, SI_WALL_BASE, w, h, z++, i % 2 ? { flip: true } : {}));
+  }
+  out.push(deco('apartment_hall_wall_piece_2', -4, SI_WALL_BASE, 330, h, 9));
+  return out;
+}
+
+const GS_PLANKS = ['abandoned_apt_windowboard_1', 'abandoned_apt_windowboard_2', 'abandoned_apt_windowboard_3', 'abandoned_apt_windowboard_4', 'abandoned_apt_windowboard_5'];
+
+function growingDoorDecos() {
+  const out = [];
+  let z = 50;
+  for (const [i, bay] of SNOWED_IN_BAYS.entries()) {
+    if (bay.kind === 'door') {
+      out.push(deco('door_asset_abandoned_apt_1', bay.x, SI_WALL_BASE + 2, 128, 190, z++, { id: `hall_door_${i + 1}`, ...(i % 2 ? { flip: true } : {}) }));
+      const planks = GS_BOARDED_DOORS[i] || 0;
+      // One wide plank across the middle (Snap, left door); two crossed high and low (Snap, right door).
+      const rows = planks === 1 ? [[-288, -4]] : planks === 2 ? [[-306, 7], [-246, -6]] : [];
+      rows.forEach(([y, r], k) => out.push(deco(GS_PLANKS[(i + k) % GS_PLANKS.length], bay.x + (k ? 6 : -10), y, 200, 46, z++, { id: `door_plank_${i + 1}_${k + 1}`, r, ...((i + k) % 2 ? { flip: true } : {}) })));
+    } else {
+      // The narrow window boarded but for a slit (Snap): three planks over it, one under.
+      for (const [k, y] of [-404, -378, -352, -300].entries()) {
+        out.push(deco(GS_PLANKS[(i + k) % GS_PLANKS.length], bay.x + (rnd(i * 7 + k) - 0.5) * 6, y, 92, 28, z++, { id: `window_plank_${i + 1}_${k + 1}`, ...(k % 2 ? { flip: true } : {}) }));
+      }
+    }
+  }
+  return out;
+}
+
+function growingFixtureDecos() {
+  const out = [];
+  let z = 90;
+  // The vent pipe out of the ceiling (Snap, top left), and its mirror.
+  out.push(deco('wallpipe_1', 292, -442, 76, 152, 38, { id: 'vent_pipe_1' }));
+  out.push(deco('wallpipe_1', -300, -442, 76, 152, 38, { id: 'vent_pipe_2', flip: true }));
+  for (const [i, x] of GROWING_STUFF_LAMPS.entries()) out.push(deco('hanging_lightbulb', x, -418, 22, 168, z++, { id: `lamp_${i + 1}` }));
+  // The round table and the stool (Snap x 462 and 345).
+  out.push(deco('deco_stool_wooden_ghtest', 785, -160, 62, 43, z++, { id: 'stool' }));
+  out.push(deco('deco_table_wooden_ghtest', 964, -162, 186, 71, z++, { id: 'table' }));
+  return out;
+}
+
+/** One bed's plants, world x from the bed's centre. */
+function bedPlantDecos(bed, bi) {
+  const out = [];
+  const y = GS_BED.soil;
+  const half = GS_BED.w / 2 - 30;
+  if (bed.kind === 'ferns') {
+    const kinds = [['zutto_plant_2', 202, 186, 0.36], ['plant_fern_1', 62, 142, 0.5], ['zutto_plant_3', 118, 110, 0.5], ['zutto_plant_2', 202, 186, 0.3], ['plant_fern_2', 72, 144, 0.48], ['zutto_plant_2', 202, 186, 0.34], ['plant_fern_4', 58, 154, 0.46], ['zutto_plant_3', 118, 110, 0.44], ['zutto_plant_2', 202, 186, 0.3], ['plant_fern_1', 62, 142, 0.44]];
+    kinds.forEach(([sprite, w, h, s], k) => {
+      const x = bed.x - half + (k + 0.5) * ((2 * half) / kinds.length) + (rnd(bi * 31 + k) - 0.5) * 12;
+      out.push(deco(sprite, x, y + 4, w * s, h * s, 0, (bi + k) % 2 ? { flip: true } : {}));
+    });
+  } else if (bed.kind === 'fenced') {
+    const kinds = [['purple_mushroom_1', 90, 118, 0.5], ['purple_mushroom_3', 168, 140, 0.48], ['purple_mushroom_2', 42, 96, 0.5], ['purple_mushroom_1', 90, 118, 0.44], ['purple_mushroom_3', 168, 140, 0.54], ['purple_mushroom_2', 42, 96, 0.46], ['purple_mushroom_1', 90, 118, 0.48]];
+    kinds.forEach(([sprite, w, h, s], k) => {
+      const x = bed.x - half + (k + 0.5) * ((2 * half) / kinds.length) + (rnd(bi * 37 + k) - 0.5) * 14;
+      out.push(deco(sprite, x, y + 2, w * s, h * s, 0, k % 2 ? { flip: true } : {}));
+    });
+  } else {
+    const smalls = [-140, -88, -40, 64, 116, 160];
+    smalls.forEach((dx, k) => out.push(deco('bling_wildmushrooms_2', bed.x + dx, y + 4 - (k % 2) * 6, 104, 35, 0, k % 2 ? { flip: true } : {})));
+    // The big red caps, a little right of centre (Snap).
+    out.push(deco('mushroom_amanita_1', bed.x - 4, y + 4, 62, 84, 0, { id: `red_cap_${bi + 1}` }));
+    out.push(deco('mushroom_amanita_1', bed.x + 30, y + 8, 50, 68, 0, { flip: true }));
+  }
+  return out;
+}
+
+/** In front of the walk line: the raised beds (Snap, along the front). */
+function growingFrontDecos() {
+  const { l, t } = GROWING_STUFF_BOUNDS;
+  const out = [];
+  let z = 200;
+  const s = (d) => ({ ...d, x: d.x - l, y: d.y - t, z: z++ });
+  const fence = (bed, bi, y, side) => {
+    // A low fence: a post at each corner and a thin rail along their tops (Snap, the middle bed).
+    const half = GS_BED.w / 2 - (side === 'back' ? 34 : 18);
+    for (const dx of [-1, 1]) out.push(s(deco('post_wood_1', bed.x + dx * half, y, 12, side === 'back' ? 52 : 44, 0)));
+    out.push(s(deco('ground_rail_1', bed.x, y - (side === 'back' ? 46 : 38), 2 * half + 8, 6, 0, { id: `fence_${side}_${bi + 1}` })));
+  };
+  for (const [bi, bed] of GROWING_STUFF_BEDS.entries()) {
+    out.push(s(deco('abbasid_planter_box_1x3', bed.x, GS_BED.base, GS_BED.w, GS_BED.h, 0, { id: `bed_${bi + 1}`, ...(bi % 2 ? { flip: true } : {}) })));
+    if (bed.kind === 'fenced') fence(bed, bi, GS_BED.soil - 16, 'back');
+    for (const d of bedPlantDecos(bed, bi)) out.push(s(d));
+    if (bed.kind === 'fenced') fence(bed, bi, GS_BED.soil + 12, 'front');
+  }
+  return out;
+}
+
+export function growingStuffStreet({ jailArrive = null, jailXY = null } = {}) {
+  const B = GROWING_STUFF_BOUNDS;
+  const W = B.r - B.l;
+  const H = B.b - B.t;
+  const platforms = [
+    { id: 'plat_growing_stuff_floor', x1: B.l, y1: GROWING_STUFF_FLOOR_Y, x2: B.r, y2: GROWING_STUFF_FLOOR_Y, pc_perm: -1 },
+    { id: 'plat_growing_stuff_ceiling', x1: B.l, y1: SNOWED_IN_CEILING_Y, x2: B.r, y2: SNOWED_IN_CEILING_Y, pc_perm: 1 },
+  ];
+  const layers = [
+    {
+      id: 'middleground', name: 'middleground', z: 0, w: W, h: H,
+      decos: [...snowedInShellDecos(), ...growingWallDecos(), ...growingDoorDecos(), ...snowedInLiftDecos(), ...growingFixtureDecos()],
+      // The Snap's lavender hall: the apartment pieces tinted and dimmed.
+      filters: { tintColor: 0xb49ad2, tintAmount: 30, saturation: -20, brightness: -6 },
+    },
+    { id: 'T_growing_stuff_front', name: 'middleplus', z: 1, w: W, h: H, decos: growingFrontDecos(), filters: { brightness: -10, saturation: -8 } },
+  ];
+  const lift = SNOWED_IN_LIFT.door;
+  const doors = [
+    doorRow(B, { id: GROWING_STUFF_EXIT_DOOR, x: lift.x, y: SNOWED_IN_LIFT.base, w: lift.w, h: lift.h, sprite: 'door_asset_elevator_door' }, {
+      tsid: ABBASID_JAIL_SOURCE_TSID,
+      label: 'Abbasid Jail',
+      street: ABBASID_JAIL_TSID,
+      ...(jailXY ? { x: jailXY.x, y: jailXY.y } : {}),
+      hub_id: GROWING_STUFF_HUB.hubId,
+      ...(jailArrive ? { arrive: { ...jailArrive } } : {}),
+    }),
+  ];
+  return streetShell({
+    source: GROWING_STUFF_SOURCE_LINE,
+    tsid: GROWING_STUFF_TSID,
+    label: GROWING_STUFF_LABEL,
+    hub: GROWING_STUFF_HUB,
+    swf: 'groddle1.swf,subway1.swf,bldg_int_apt.swf,zutto1.swf,abbasid1.swf',
+    bounds: B,
+    platforms,
+    layers,
+    doors,
+    // The blue through the window's slit (Snap).
+    gradient: { top: 'A9C8EA', bottom: 'DCE8F6' },
+    why: {
+      street: 'inc_data_maps_prod.js:17879 (hub 143 Vortex of Random); no location XML, no GSJS code.',
+      bounds: 'Snowed In\'s hall: Abbasid Jail\'s door (door_1353965060768) was made four minutes before Abbasid River\'s (door_1353965313720), both land just right of the lift, and the Snap\'s pilasters fall on Snowed In\'s bay edges (world x = 311 + (Snap x - 35) * 1.53).',
+      arrival: 'Abbasid Jail (GA9R4OR505F3PSL.xml:1736) door_1353965060768 connect 111,-121: just right of the lift, on the floor line; swf names bldg_int_apt.',
+      layout: 'The Snap (world 257..1237): boarded door, door, narrow window boarded but for a slit, door, boarded door; lamps at the pilasters; a vent pipe; a stool and a round table; three raised beds (ferns, fenced blue-purple mushrooms, mauve mushrooms round a red cap). The other half mirrors it.',
+      wayOut: 'The lift, as in Snowed In, back to Abbasid Jail in front of its door (Abbasid Jail\'s sources list Growing Stuff).',
+      notBuilt: 'The lamps\' dark shades (bare bulbs: no CC0 shade), and the beds are scenery, not garden plots. The hall doors lead nowhere.',
+    },
+  });
+}
+
+/* ------------------------------------------------------------------ */
 /* Index rows and ecology                                              */
 /* ------------------------------------------------------------------ */
 
 export const snowedInIndexEntry = (street) => indexRow(street);
 export const etherealIndexEntry = (street) => indexRow(street);
 export const martlebyIndexEntry = (street) => indexRow(street);
+export const growingStuffIndexEntry = (street) => indexRow(street);
 
 export const isSnowedInTsid = (tsid) => sameTsid(tsid, SNOWED_IN_TSID);
 export const isEtherealTsid = (tsid) => sameTsid(tsid, ETHEREAL_TSID);
 export const isMartlebyTsid = (tsid) => sameTsid(tsid, MARTLEBY_TSID);
+export const isGrowingStuffTsid = (tsid) => sameTsid(tsid, GROWING_STUFF_TSID);
 
 /**
  * The ecology rows (build-street-ecology.mjs cannot write them: no location
@@ -697,13 +917,18 @@ export function rebuiltRoomEcology(tsid) {
   if (isSnowedInTsid(tsid)) return { label: SNOWED_IN_LABEL, sourceTsid: SNOWED_IN_SOURCE_TSID, counts: {}, interior: true, interiorWhy: 'a hall indoors (slivered\'s render)', quoins: 0, reconstructed: true };
   if (isEtherealTsid(tsid)) return { label: ETHEREAL_LABEL, sourceTsid: ETHEREAL_SOURCE_TSID, counts: {}, interior: true, interiorWhy: 'a cellular room (Cleops\' snap)', quoins: ETHEREAL_QUOINS, companions: false, reconstructed: true };
   if (isMartlebyTsid(tsid)) return { label: MARTLEBY_LABEL, sourceTsid: MARTLEBY_SOURCE_TSID, counts: {}, reconstructed: true };
+  if (isGrowingStuffTsid(tsid)) return { label: GROWING_STUFF_LABEL, sourceTsid: GROWING_STUFF_SOURCE_TSID, counts: {}, interior: true, interiorWhy: 'a hall indoors (Hedge\'s Snap)', quoins: 0, reconstructed: true };
   return null;
 }
 
-/** The three rooms, for the builder and the tests. */
+/** True for any of the rebuilt rooms. */
+export const isRebuiltRoomTsid = (tsid) => isSnowedInTsid(tsid) || isEtherealTsid(tsid) || isMartlebyTsid(tsid) || isGrowingStuffTsid(tsid);
+
+/** The rooms, for the builder and the tests. */
 export const REBUILT_ROOMS = Object.freeze([
   Object.freeze({ tsid: SNOWED_IN_TSID, sourceTsid: SNOWED_IN_SOURCE_TSID, label: SNOWED_IN_LABEL, register: 'G157', from: ABBASID_RIVER_TSID, door: ABBASID_RIVER_DOOR, key: 0, arrive: SNOWED_IN_ARRIVE }),
   Object.freeze({ tsid: ETHEREAL_TSID, sourceTsid: ETHEREAL_SOURCE_TSID, label: ETHEREAL_LABEL, register: 'G159', from: DOONBOGGLE_TSID, door: DOONBOGGLE_DOOR, key: DOONBOGGLE_KEY, arrive: ETHEREAL_ARRIVE }),
   Object.freeze({ tsid: MARTLEBY_TSID, sourceTsid: MARTLEBY_SOURCE_TSID, label: MARTLEBY_LABEL, register: 'G158', from: ROOKTHILLS_TSID, door: ROOKTHILLS_DOOR, key: ROOKTHILLS_KEY, arrive: MARTLEBY_ARRIVE }),
+  Object.freeze({ tsid: GROWING_STUFF_TSID, sourceTsid: GROWING_STUFF_SOURCE_TSID, label: GROWING_STUFF_LABEL, register: 'G157', from: ABBASID_JAIL_TSID, door: ABBASID_JAIL_DOOR, key: 0, arrive: GROWING_STUFF_ARRIVE }),
 ]);
 

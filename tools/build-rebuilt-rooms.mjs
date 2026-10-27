@@ -1,8 +1,9 @@
 /**
- * Write the three rooms rebuilt from players' pictures (public/js/rebuilt-rooms.js;
- * register rows G157 Snowed In, G158 Martleby Hare, G159 Ethereal Endeavour) as
- * street JSON, list them in assets/streets/index.json, and point the doors that
- * lead in at them: Abbasid River's door_1353965313720, Doonboggle Trail's locked
+ * Write the rooms rebuilt from players' pictures (public/js/rebuilt-rooms.js;
+ * register rows G157 Snowed In and Growing Stuff, G158 Martleby Hare, G159
+ * Ethereal Endeavour) as street JSON, list them in assets/streets/index.json, and
+ * point the doors that lead in at them: Abbasid River's door_1353965313720,
+ * Abbasid Jail's door_1353965060768, Doonboggle Trail's locked
  * door_1343415170600 (Door Key 1) and Rookthills Lay's locked door_1 (Door Key 2).
  * Each door's own connect x/y is kept and snapped to the rebuilt floor. Safe to
  * re-run; run it again after a street re-import or a build-street-navigation.mjs
@@ -17,6 +18,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { arrivalInTarget } from '../public/js/location-navigation.js';
 import {
+  ABBASID_JAIL_DOOR,
+  ABBASID_JAIL_TSID,
   ABBASID_RIVER_DOOR,
   ABBASID_RIVER_TSID,
   DOONBOGGLE_DOOR,
@@ -26,6 +29,8 @@ import {
   ETHEREAL_TSID,
   FOOTLANDS_BALCONY,
   FOOTLANDS_TSID,
+  GROWING_STUFF_ARRIVE,
+  GROWING_STUFF_TSID,
   MARTLEBY_ARRIVE,
   MARTLEBY_TSID,
   ROOKTHILLS_DOOR,
@@ -34,6 +39,8 @@ import {
   SNOWED_IN_TSID,
   etherealIndexEntry,
   etherealStreet,
+  growingStuffIndexEntry,
+  growingStuffStreet,
   martlebyIndexEntry,
   martlebyStreet,
   snowedInIndexEntry,
@@ -125,6 +132,18 @@ function indexRow(tsid, row) {
   put(`${MARTLEBY_TSID}.json`, `${JSON.stringify(room)}\n`);
   put(`${ROOKTHILLS_TSID}.json`, `${JSON.stringify(rook)}\n`);
   indexRow(MARTLEBY_TSID, martlebyIndexEntry(room));
+}
+
+// Growing Stuff, behind Abbasid Jail's door: Snowed In's hall, out by the lift.
+{
+  const jail = read(`${ABBASID_JAIL_TSID}.json`);
+  const { door, xy, arrive } = inFrontOf(jail, ABBASID_JAIL_DOOR);
+  if (door.is_locked || door.key_id) throw new Error("Abbasid Jail's door is no longer an open door");
+  const room = growingStuffStreet({ jailArrive: arrive, jailXY: xy });
+  wireDoor(jail, door, room, GROWING_STUFF_ARRIVE);
+  put(`${GROWING_STUFF_TSID}.json`, `${JSON.stringify(room)}\n`);
+  put(`${ABBASID_JAIL_TSID}.json`, `${JSON.stringify(jail)}\n`);
+  indexRow(GROWING_STUFF_TSID, growingStuffIndexEntry(room));
 }
 
 if (indexChanged) put('index.json', `${JSON.stringify(index, null, 2)}\n`);
