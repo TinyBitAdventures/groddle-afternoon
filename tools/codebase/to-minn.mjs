@@ -28,6 +28,11 @@ const badge = (file, alt) => block('image', { width: '72px', height: '72px', cla
   `<figure class="wp-block-image is-resized cb-badge"><img src="/assets/badges/${file}.png" alt="${alt}" width="72" height="72" style="width:72px;height:72px"/></figure>`);
 const list = (cls, items, ordered = false) => block('list', { ...(ordered ? { ordered: true } : {}), ...(cls ? { className: cls } : {}) },
   `<${ordered ? 'ol' : 'ul'} class="wp-block-list${cls ? ` ${cls}` : ''}">${items.map((i) => block('list-item', null, `<li>${i}</li>`)).join('\n')}</${ordered ? 'ol' : 'ul'}>`);
+/** A repo's contributing badge: a small sewn-on patch in its section's tone, with a Tiny Speck icon and its two GitHub doors (the .cb-rbadge styles). */
+const repoBadge = (id, name, repo) => group('div', `cb-rbadge cb-rbadge-${id}`, null, [
+  p('cb-rbadge-name', `<strong>${name}</strong> <span>${repo}</span>`),
+  p('cb-rbadge-links', `<a href="${GH}/${repo}/issues">Issues</a> <a href="${GH}/${repo}/pulls">Pull requests</a>`),
+]);
 const links = (repo) => p('cb-links', `On GitHub: <a href="${GH}/${repo}">the code</a> · <a href="${GH}/${repo}/issues">issues</a> · <a href="${GH}/${repo}/pulls">pull requests</a>`);
 
 /** The page's blocks: our words around the measured figures. */
@@ -77,10 +82,10 @@ export function codebaseContent() {
           p('cb-nod-note', 'A nod to everyone who sends a pull request: <strong>String Practitioner</strong> and <strong>Threader of Renown</strong>, two of Tiny Speck’s badges. In Glitch you earned them by spinning fiber straight into string and by threading five bead necklaces. Nothing grants them for a pull request: they are only our thanks.'),
         ]),
       ]),
-      list('', [
-        `The game: <a href="${GH}/groddle-afternoon/issues">issues</a> · <a href="${GH}/groddle-afternoon/pulls">pull requests</a>`,
-        `The realtime server: <a href="${GH}/groddle-afternoon-server/issues">issues</a> · <a href="${GH}/groddle-afternoon-server/pulls">pull requests</a>`,
-        `The site: <a href="${GH}/groddle-afternoon-site/issues">issues</a> · <a href="${GH}/groddle-afternoon-site/pulls">pull requests</a>`,
+      group('div', 'cb-rbadges', null, [
+        repoBadge('game', 'The game', 'groddle-afternoon'),
+        repoBadge('server', 'The realtime server', 'groddle-afternoon-server'),
+        repoBadge('site', 'The site', 'groddle-afternoon-site'),
       ]),
       h(3, 'Run it locally'),
       list('code-steps', [
