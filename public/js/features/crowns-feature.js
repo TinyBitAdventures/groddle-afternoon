@@ -1291,7 +1291,11 @@ export const crownsFeature = {
     // Anywhere else, a multiplayer game is over for this player.
     if (mp && street.tsid !== CROWNS_STREET) mpDrop(engine);
     if (street.tsid !== CROWNS_STREET) {
-      if (record.pendingTicket) {
+      // In multiplayer a ticket spent on a challenge still in flight comes back only
+      // when the server says it failed (crown_failed; inc_games.js 2448-2450): a croak
+      // to Hell One during the start is a street change, not a failed challenge (G349).
+      const inFlight = isMp(engine) && (mpChallenging || mpAccepting || mpStarting);
+      if (record.pendingTicket && !inFlight) {
         addItem(engine.inv, record.pendingTicket, 1);
         record.pendingTicket = null;
         engine.toast('Your game never started, so your ticket was returned.', 3600);

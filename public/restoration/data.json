@@ -2571,9 +2571,14 @@
   ]
  },
  "git": {
-  "commits": 563,
+  "commits": 564,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "fix",
+    "text": "In multiplayer a spent race ticket comes back only when the server says the challenge failed, and real players race The Great Hog Haul"
+   },
    {
     "date": "2026-10-27",
     "kind": "new",
@@ -2688,11 +2693,6 @@
     "date": "2026-10-26",
     "kind": "improve",
     "text": "Play opens the Play page: sign in or make a character, or play solo"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "improve",
-    "text": "First Eleven Skills comes at the eleventh skill you learn, in solo too"
    }
   ]
  },
