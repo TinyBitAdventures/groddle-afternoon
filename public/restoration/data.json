@@ -795,7 +795,7 @@
    "name": "Races and Game of Crowns",
    "status": "solo",
    "blurb": "Seven race courses rebuilt from footage, raced against recovered rival Glitches under the final ticket-race rules. In multiplayer, Grab ’Em Good, the seven finish-line races and the Game of Crowns are against the real players on your street.",
-   "multiplayer": "Grab ’Em Good, the seven finish-line races and the Game of Crowns (four players, the crown, tags and locks decided by the server) are played against the real players on your street.",
+   "multiplayer": "Grab ’Em Good, the seven finish-line races, The Great Hog Haul and the Game of Crowns (four players, the crown, tags and locks decided by the server) are played against the real players on your street; a reload mid-race ends it for both, as a logout did.",
    "spot": null,
    "evidence": [
     "public/js/races.js",
@@ -812,10 +812,11 @@
    "name": "The Great Hog Haul",
    "status": "solo",
    "blurb": "The piggy-wrangling race, on its real cave street, against a rival.",
-   "multiplayer": null,
+   "multiplayer": "In multiplayer the ticket challenges the real players on your street, and the server decides every sack, Piggy and pen delivery.",
    "spot": null,
    "evidence": [
-    "public/js/hog-haul.js"
+    "public/js/hog-haul.js",
+    "public/js/hog-haul-mp.js"
    ],
    "shot": "shots/hog-haul.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=hoghaul&racedemo=1&practice=1"
@@ -1173,7 +1174,7 @@
  },
  "back": 67,
  "possible": 68,
- "multiplayer": 16,
+ "multiplayer": 17,
  "quests": {
   "total": 445,
   "story": 245,
@@ -2570,7 +2571,7 @@
   ]
  },
  "git": {
-  "commits": 562,
+  "commits": 563,
   "since": "2026-10-19",
   "recent": [
    {
@@ -2695,6 +2696,6 @@
    }
   ]
  },
- "tests": 327,
+ "tests": 328,
  "generatedAt": "2026-10-27"
 }

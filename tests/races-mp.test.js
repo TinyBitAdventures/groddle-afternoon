@@ -141,7 +141,7 @@ describe('the server (races.go)', { skip: skipWithoutServer }, () => {
     assert.match(go, /raceAutoLeave\s+= 2 \* time\.Minute/);
     assert.match(go, /raceSoon\s+= 5 \* time\.Second/);
     assert.match(go, /raceCountdown\s+= 4000 \* time\.Millisecond/);
-    assert.match(go, /"quoin_grab": \{min: 2, max: 2/);
+    assert.match(go, /"quoin_grab":\s+\{min: 2, max: 2/);
     assert.match(go, /"race":\s+\{min: 2, max: 2/);
   });
 
@@ -184,7 +184,7 @@ describe('the shared street of a race scene', () => {
   });
 
   it('races-feature answers only in a multiplayer match', async () => {
-    const { racesFeature } = await import('../public/js/features/races-feature.js?v=card-20');
+    const { racesFeature } = await import('../public/js/features/races-feature.js?v=card-21');
     assert.equal(racesFeature.realtimeStreet({ inScene: () => true }), null, 'no match: nothing shared');
     assert.deepEqual(racesFeature.labelFor('RACE_00000000000000A1'), { street: 'A race', hub: 'Race', hubId: 'scene' });
     assert.equal(racesFeature.labelFor('RACE_GRAB_EM_GOOD'), null, 'solo race scenes keep their own labels');

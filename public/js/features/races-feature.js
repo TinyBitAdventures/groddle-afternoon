@@ -89,6 +89,7 @@ import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
 import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=g311-1';
 import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=g334-4';
+import { startHogHaulMp } from './hog-haul-mp-feature.js?v=g334-hog-1';
 import { textureFromUrl } from '../textures.js';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=desk2-1';
 import { gainMetabolic } from '../metabolics.js';
@@ -158,6 +159,7 @@ let mpAccepting = false; // race_accept sent, no answer yet
 let mpReadyAt = 0;
 let mpFinishAt = 0;
 let mpLast = '';
+let mpAsked = false; // race_pending sent, no race_ticket yet
 
 /* ------------------------------------------------------------------ */
 /* Items                                                              */
@@ -439,6 +441,8 @@ function activateTicket(classTsid, engine, opts = {}) {
     engine.toast('That race is not in this remake yet.');
     return false;
   }
+  // G334: in multiplayer the Hog Haul Ticket challenges the street too (hog-haul-mp-feature, races.go + hoghaul.go).
+  if (isMp(engine) && raceId === HOG_HAUL_GAME_ID) return mpChallenge(classTsid, raceId, engine);
   if (raceId === HOG_HAUL_GAME_ID && typeof engine.startHogHaulRace !== 'function') {
     engine.toast('That race is not in this remake yet.');
     return false;
@@ -1138,6 +1142,23 @@ function mpRefund(engine) {
   engine.save();
 }
 
+/**
+ * G349: a spent ticket this page holds for a challenge it never saw end (a
+ * reload, a dropped socket, a croak or teleport while it waited). The source
+ * spends the ticket at activation (race_ticket.js:150) and gives it back only
+ * when the challenge fails (inc_games.js games_invite_timeout 2448-2450), so
+ * in multiplayer the server says which (race_pending -> race_ticket, or
+ * race_failed for a challenge still open); entering a street never refunds.
+ */
+function mpAskPending(engine) {
+  const c = mpClient;
+  if (!c || c.state !== 'online' || mpAsked || run || mpChallenging || starting || !record.pendingTicket) return;
+  const course = ticketRaceId(record.pendingTicket);
+  if (!course) return;
+  mpAsked = c.send('race_pending', { course }) !== false;
+  mpNote(engine, `pending:${course}`);
+}
+
 /** race_ticket.js activate in multiplayer: challenge the street (inc_games.js games_invite_create). */
 function mpChallenge(classTsid, raceId, engine) {
   const c = mpClient || engine.query('realtimeClient');
@@ -1233,7 +1254,7 @@ function mpAttach(engine) {
     mpClearPrompts(engine);
     if (msg.refund === true) {
       mpRefund(engine);
-      engine.prompt?.({ text: String(msg.text || ''), choices: [{ label: MP_RACE_TEXT.dagnabit, value: 'ok' }], timeout: 10 });
+      if (msg.text) engine.prompt?.({ text: String(msg.text), choices: [{ label: MP_RACE_TEXT.dagnabit, value: 'ok' }], timeout: 10 });
     } else if (msg.text) engine.pushActivity(String(msg.text));
     mpNote(engine, `failed:${msg.refund === true ? 'refund' : 'no'}`);
     publish(engine);
@@ -1272,6 +1293,17 @@ function mpAttach(engine) {
     publish(engine);
   });
   c.on('msg:race_match', (msg) => {
+    if (msg?.course === HOG_HAUL_GAME_ID && !run) {
+      // The Great Hog Haul runs on its own street (hog-haul-mp-feature); the ticket is spent once it opens.
+      if (hud) hud.banner.hidden = true;
+      record.pendingTicket = null;
+      starting = false;
+      mpNote(engine, `hog:${String(msg.match || '')}`);
+      engine.save();
+      startHogHaulMp(engine, msg);
+      publish(engine);
+      return;
+    }
     const info = normalizeMatch(msg);
     if (!info || run) {
       if (msg?.match) c.send('race_leave', { match: String(msg.match) });
@@ -1336,7 +1368,43 @@ function mpAttach(engine) {
     }
     mpNote(engine, `refused:${msg.i}:${msg.why}`);
   });
-  c.on('msg:race_end', (msg) => mpEnd(engine, msg));
+  c.on('msg:race_end', (msg) => {
+    // G334: a page that reloaded mid-race hears the game it left is over (races.go pending / onJoin).
+    if (!mp && msg?.left && Number(msg.left.id) === mpMyId() && msg.course !== HOG_HAUL_GAME_ID) {
+      const title = String(msg.title || 'the race');
+      engine.pushActivity(`You left ${title}, so the game is over.`);
+      mpNote(engine, `end:${msg.why || ''}`);
+      return;
+    }
+    mpEnd(engine, msg);
+  });
+  // G349: what became of a spent ticket's challenge, when this page asks (mpAskPending).
+  c.on('msg:race_ticket', (msg) => {
+    mpAsked = false;
+    if (!record.pendingTicket || run) return;
+    if (msg.refund === true) {
+      mpRefund(engine);
+      engine.toast(String(msg.text || 'Your race never started, so your ticket was returned.'), 3600);
+    } else {
+      record.pendingTicket = null;
+      engine.save();
+    }
+    mpNote(engine, `ticket:${msg.refund === true ? 'refund' : 'spent'}`);
+    publish(engine);
+  });
+  // Every (re)connect: the server called off any challenge this page had open (races.go onDisconnect).
+  c.on('hello', () => {
+    mpAsked = false;
+    if (!run && (mpChallenging || mpAccepting || starting)) {
+      mpChallenging = false;
+      mpAccepting = false;
+      starting = false;
+      mpClearPrompts(engine);
+      if (hud) hud.banner.hidden = true;
+    }
+    mpAskPending(engine);
+  });
+  if (c.state === 'online') mpAskPending(engine);
   c.on('msg:race_removed', (msg) => {
     if (!mp || msg.match !== mp.match) return;
     engine.pushActivity(String(msg.text || ''));
@@ -1688,7 +1756,9 @@ export const racesFeature = {
     buildChrome(engine);
     if (engine.mode === 'multiplayer') mpAttach(engine);
     if (!run) {
-      if (record.pendingTicket) {
+      // G349: solo's reload rule. In multiplayer the server says (mpAskPending), never a street change.
+      if (engine.mode === 'multiplayer') mpAskPending(engine);
+      else if (record.pendingTicket) {
         addItem(engine.inv, record.pendingTicket, 1);
         engine.toast('Your race never started, so your ticket was returned.', 3600);
         record.pendingTicket = null;
@@ -1772,7 +1842,7 @@ export const racesFeature = {
     if (!isRaceTicket(classTsid)) return [];
     const raceId = ticketRaceId(classTsid);
     // race_ticket.js:121, multiplayer: disabled with nobody else on the street.
-    const alone = isMp(engine) && (!raceId || raceId === 'it_game' || MP_RACE_COURSES.includes(raceId)) && !(engine.query('realtimeClient')?.players.length > 0);
+    const alone = isMp(engine) && (!raceId || raceId === 'it_game' || raceId === HOG_HAUL_GAME_ID || MP_RACE_COURSES.includes(raceId)) && !(engine.query('realtimeClient')?.players.length > 0);
     const block = activationBlock(engine) || (alone ? 'You need at least one other player here.' : '');
     const name = raceId ? raceTitle(raceId) : 'a random race';
     return [{
