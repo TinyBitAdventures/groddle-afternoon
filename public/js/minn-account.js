@@ -344,6 +344,50 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       return buddyCall('Saving your home picture', 'profile/home', { method: 'PUT', body: { key, home } });
     },
 
+    /**
+     * Homes and house keys (register G328, groddle-afternoon-site/src/Neighbours.php).
+     * home(id) and visitRandom() answer { owner: { id, name }, home: { owned,
+     * style }, homes: <the owner's homes slice>, key, pass: { token,
+     * expiresIn } } (the pass the realtime server lets you onto their home
+     * with); visitors() / optInVisitors() / optOutVisitors() answer { allow,
+     * can: { ok, error, reason } } (and the source's text on a change);
+     * houseKeys() and each key change answer { given, received: [{ id, name,
+     * at }], houseLimit, playerLimit, hasHouse }, a change also `told` (the
+     * proof the realtime server tells the holder with). A refusal throws
+     * with .status, .code and the site's .message.
+     */
+    async home(id) {
+      return buddyCall('Finding their home', `homes/${Number(id)}`);
+    },
+
+    async visitRandom() {
+      return buddyCall('Finding a home', 'homes/random', { method: 'POST' });
+    },
+
+    async visitors() {
+      return buddyCall('Loading your visitors', 'homes/visitors');
+    },
+
+    async optInVisitors() {
+      return buddyCall('Opting in', 'homes/visitors', { method: 'POST' });
+    },
+
+    async optOutVisitors() {
+      return buddyCall('Opting out', 'homes/visitors', { method: 'DELETE' });
+    },
+
+    async houseKeys() {
+      return buddyCall('Loading your keys', 'keys');
+    },
+
+    async giveKey(id) {
+      return buddyCall('Giving a key', 'keys', { method: 'POST', body: { id: Number(id) } });
+    },
+
+    async revokeKey(id) {
+      return buddyCall('Revoking the key', `keys/${Number(id)}`, { method: 'DELETE' });
+    },
+
     async deleteBackup(slot) {
       const r = await call(`backups/${Number(slot)}`, { method: 'DELETE' });
       if (!r.ok) throw failed('Deleting the backup', r);

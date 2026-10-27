@@ -18,7 +18,7 @@ import {
   AVATAR_STILL, AVATAR_TILE, FAILURE_BACKOFF_MS, HOME_MAX_BYTES, HOME_REFRESH_MS, PROFILE_ABOUT_MAX, PROFILE_COPY, RETRY_MS,
   aboutCounter, aboutLength, avatarKeyOf, base64Bytes, cleanAbout, homeKeyOf, pngBase64, profileSlug, shortHash, shouldUpload, stillTransform,
 } from '../public/js/profiles.js?v=play-1';
-import { createMinnAccount } from '../public/js/minn-account.js?v=g326-1';
+import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-1';
 import { FEATURES } from '../public/js/features/index.js';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
@@ -132,7 +132,7 @@ describe('the profiles feature', () => {
     const ids = FEATURES.map((f) => f.id);
     assert.ok(ids.includes('profiles'));
     assert.ok(ids.indexOf('profiles') < ids.indexOf('account-backup'));
-    assert.match(read('public/js/features/index.js'), /profiles-feature\.js\?v=play-2/);
+    assert.match(read('public/js/features/index.js'), /profiles-feature\.js\?v=play-3/);
   });
 
   it('does nothing in solo: no state, no account section, no upload', () => {

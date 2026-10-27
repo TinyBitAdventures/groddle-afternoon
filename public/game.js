@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-15';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-161';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-162';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -8381,6 +8381,8 @@ const engine = {
       owned: homeState.owned === true,
       style: homeState.style || 'meadow',
       returnLabel: homeState.returnLocation?.label || '',
+      // G328: where the home's way back leads (a visit to someone's home from yours returns there).
+      returnLocation: homeState.returnLocation ? { ...homeState.returnLocation } : null,
       unread: unreadMailCount(mailboxState, Date.now()),
     };
   },

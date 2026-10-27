@@ -32,7 +32,7 @@
  * buddiesIgnoring (ids), buddiesLast (the last notice); window.groddleBuddies.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=g326-1';
+import { createMinnAccount } from '../minn-account.js?v=nbhome-1';
 import { STREET_INDEX } from '../street-loader.js';
 import {
   BUDDY_COUNTER,
@@ -186,7 +186,9 @@ function createSession(engine, client) {
       const mine = el('ul', { 'data-buddies-list': '' });
       // Online first (by name), then offline.
       const sorted = [...list.buddies].sort((a, b) => Number(online.has(b.id)) - Number(online.has(a.id)) || a.name.localeCompare(b.name));
-      for (const b of sorted) mine.append(row(b, { buttons: [{ kind: 'remove', label: 'Remove', run: () => confirmRemove(b) }] }));
+      // G328: Visit their home street (PlayerInfoDialog.as 155-160), when a feature can take you there.
+      const visit = (b) => (engine.query?.('canVisitHomes', engine) ? [{ kind: 'visit', label: 'Visit', run: () => { close(); engine.query?.('visitHome', b.id, b.name, engine); } }] : []);
+      for (const b of sorted) mine.append(row(b, { buttons: [...visit(b), { kind: 'remove', label: 'Remove', run: () => confirmRemove(b) }] }));
       panel.append(sorted.length ? mine : el('p', { class: 'buddies-none' }, BUDDY_TEXT.empty));
       const back = addedYouOnly(list);
       if (back.length) {

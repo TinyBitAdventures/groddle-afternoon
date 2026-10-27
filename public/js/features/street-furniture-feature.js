@@ -116,7 +116,8 @@ import {
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=neighbours-4';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=note-g175';
 import { textureFromUrl } from '../textures.js';
-import { butlerApi } from './butler-feature.js?v=butler-feature-41';
+import { butlerApi } from './butler-feature.js?v=butler-feature-42';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=g328-1';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';
 const PLAYER_ID = 'player';
@@ -664,7 +665,12 @@ function visitBlock(engine) {
 
 function stoneVerbList(engine, entity) {
   const home = homeInfo(engine);
-  const verbs = stoneVerbs({ level: engine.pc.level, homeOwned: home.owned === true, hasButler: hasButler(engine), allowVisits: nb.allowVisits, blocked: visitBlock(engine) });
+  const mp = neighboursMpApi.active(engine);
+  const allowVisits = mp ? neighboursMpApi.allowVisits() ?? nb.allowVisits : nb.allowVisits;
+  const verbs = stoneVerbs({ level: engine.pc.level, homeOwned: home.owned === true, hasButler: hasButler(engine), allowVisits, blocked: visitBlock(engine) });
+  // G328: in multiplayer the stone sends you to a random real player's home (visiting_stone.js
+  // verbs.visit tooltip), and opting in also wants 3 cultivated items (inc_visiting.js:17-25).
+  if (mp) return multiplayerStoneVerbs(engine, verbs, home);
   if (!entity.home) return verbs;
   const back = nb.returnTo ? 'Back to where you came from' : 'Back into Ur';
   return [
@@ -672,6 +678,19 @@ function stoneVerbList(engine, entity) {
     { ...verbs.find((v) => v.id === 'visit'), label: 'Visit another neighbour' },
     verbs.find((v) => v.id === 'flip'),
   ];
+}
+
+/** G328: visiting_can_opt_in's order: level, a home, 3 cultivations, a Butler (visiting_stone.js 136-138). */
+function multiplayerStoneVerbs(engine, verbs, home) {
+  return verbs.map((v) => {
+    if (v.id === 'visit') return { ...v, tooltip: "Visit a random player's home" };
+    if (v.id !== 'get_visitors') return v;
+    const gate = canOptIn({ level: engine.pc.level, homeOwned: home.owned === true });
+    if (!gate.ok) return { ...v, enabled: false, reason: gate.reason };
+    if (neighboursMpApi.cultivations() < 3) return { ...v, enabled: false, reason: 'You need to cultivate 3 items.' };
+    if (!butlerApi.owned()) return { ...v, enabled: false, reason: STONE_TEXT.noButler };
+    return v;
+  });
 }
 
 function flipStone(engine, entity) {
@@ -692,7 +711,8 @@ function askVisit(engine, entity, opts = {}) {
     beats: [{ text: STONE_TEXT.visit, response: STONE_TEXT.visitYes }],
     acceptLabel: STONE_TEXT.visitYes,
     declineLabel: STONE_TEXT.visitNo,
-    onAccept: () => goVisit(engine, opts),
+    // G328: a random opted-in real player's home in multiplayer (visiting_visit_random).
+    onAccept: () => (neighboursMpApi.active(engine) ? neighboursMpApi.visitRandom(engine) : goVisit(engine, opts)),
     onDecline: () => engine.say(entity.target, STONE_TEXT.visitLater, 3500),
   });
   lastAction = 'stone:ask';
@@ -711,7 +731,9 @@ function askOptIn(engine, entity) {
     ],
     acceptLabel: STONE_TEXT.optInYes,
     declineLabel: STONE_TEXT.optInNo,
-    onAccept: () => {
+    onAccept: async () => {
+      // G328: in multiplayer the site keeps the opt-in (pc.home_allow_visits) and checks it again.
+      if (neighboursMpApi.active(engine) && !(await neighboursMpApi.optIn(engine))) return;
       nb.allowVisits = true;
       nb.lastVisitorDay = dayKey();
       engine.say(entity.target, STONE_TEXT.optInDone(butlerApi.label() || STONE_BUTLER_STANDIN), 6000);
@@ -732,7 +754,8 @@ function askOptOut(engine) {
     acceptLabel: 'OK',
     // G255: visiting_stone.js 84-87 gives the opt-out one choice, OK.
     declinable: false,
-    onAccept: () => {
+    onAccept: async () => {
+      if (neighboursMpApi.active(engine) && !(await neighboursMpApi.optOut(engine))) return;
       nb.allowVisits = false;
       engine.pushActivity(STONE_TEXT.optedOut);
       lastAction = 'stone:opt_out';
@@ -1109,6 +1132,8 @@ function runNeighbourVerb(engine, target, verbId) {
 }
 
 function deliverVisitor(engine) {
+  // G328: in multiplayer the visitors are real players; solo's authored neighbours don't drop by.
+  if (engine.mode === 'multiplayer') return;
   const home = homeInfo(engine);
   const letter = visitorLetter(nb, { dayKey: dayKey(), homeOwned: home.owned === true, now: Date.now() });
   if (!letter) return;

@@ -2492,9 +2492,14 @@
   ]
  },
  "git": {
-  "commits": 542,
+  "commits": 544,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "In multiplayer, everyone on a street builds its project together, and a finished street opens its road for everyone"
+   },
    {
     "date": "2026-10-26",
     "kind": "new",
@@ -2609,14 +2614,9 @@
     "date": "2026-10-26",
     "kind": "new",
     "text": "A light, dark or system theme switch in the site header, on every page"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "improve",
-    "text": "The realtime server and the Minn site move to their own repos, and the game gets a readme and MIT licence"
    }
   ]
  },
- "tests": 314,
+ "tests": 315,
  "generatedAt": "2026-10-26"
 }

@@ -168,6 +168,7 @@ import {
   yardStyleFor,
 } from '../home-styles.js?v=g253-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
+import { ROCK_CATALOG } from '../mining.js?v=g330-1';
 import {
   HOUSE_SIGN,
   IMG_BUBBLE_MS,
@@ -3869,6 +3870,227 @@ function runRestoreAutoplay(engine) {
     autoplay = setTimeout(tick, 600);
   };
   autoplay = setTimeout(tick, 900);
+}
+
+// ---------------------------------------------------------------------------
+// Another player's home, for a visitor (G328, multiplayer)
+// ---------------------------------------------------------------------------
+
+/** G328: the homes slice a visitor is shown, normalized as restore() does (no Tower floors, no rock). */
+export function visitorHomeState(view = {}) {
+  const slice = view?.homes && typeof view.homes === 'object' ? view.homes : {};
+  const style = ['meadow', 'firebog', 'uralia'].includes(view?.home?.style) ? view.home.style : 'meadow';
+  return {
+    style,
+    decor: normalizeHomeDecorState(slice.decor || {}),
+    cult: normalizeCultivationState(slice.cult || {}),
+    backCult: createBackYardState(slice.backYard || {}),
+    streetStyle: STREET_STYLE_BY_KEY[slice.streetStyle]?.built ? slice.streetStyle : null,
+    yardStyle: YARD_STYLE_BY_KEY[slice.yardStyle]?.built ? slice.yardStyle : null,
+  };
+}
+
+/**
+ * Runs fn with this module's home state swapped for the owner's (`v`), and
+ * puts the player's own back before it returns, whatever fn does: the
+ * builders above read the module's state, and a visit must never touch the
+ * visitor's own home.
+ */
+function withOwnersHome(v, fn) {
+  const keep = { decor, houseDecor, cult, backCult, streetStyle, yardStyle, stylePreview, yardPreview, scene, mode };
+  try {
+    decor = v.decor;
+    houseDecor = v.decor;
+    cult = v.cult;
+    backCult = v.backCult;
+    streetStyle = v.streetStyle;
+    yardStyle = v.yardStyle;
+    stylePreview = null;
+    yardPreview = null;
+    scene = null;
+    mode = null;
+    return fn();
+  } finally {
+    ({ decor, houseDecor, cult, backCult, streetStyle, yardStyle, stylePreview, yardPreview, scene, mode } = keep);
+  }
+}
+
+/** A still of a rock's first frame (mining's sheet), as spawnMineRock draws it, without its slot. */
+function rockStill(PIXI, endClass) {
+  const def = ROCK_CATALOG[rockClassFor(endClass)] || ROCK_CATALOG.rock_metal_1;
+  const source = sourceFromUrl(`${def.worldSheet}?v=exact-rock-cells-1`);
+  const spr = new PIXI.Sprite(PIXI.Texture.EMPTY);
+  spr.anchor.set(0.5, 1);
+  spr.scale.set(0.85);
+  onLoaded(source, () => {
+    if (!spr.destroyed) spr.texture = frameTexture(source, new PIXI.Rectangle(0, 0, def.frameWidth, def.frameHeight));
+  });
+  return spr;
+}
+
+/**
+ * The owner's cultivations as they stand, for a visitor: rocks, pods, mounds
+ * and hives, worn-out protos, and gardens with their crops (the garden path,
+ * detached, a copy of the owner's plots). Display only: the visitor's
+ * features own none of it (features/neighbours-mp-feature.js answers their
+ * menus). Patches, resource nodes and the Tower are not drawn yet.
+ */
+function drawVisitorYard(engine, st, groundY, houseX) {
+  const { PIXI } = engine;
+  const layer = engine.entityLayer;
+  const targets = [];
+  for (const item of st.items) {
+    const def = cultivationDef(item.protoClass);
+    if (!def || def.kind === 'tower') continue;
+    const x = houseX + item.rx;
+    if (item.depleted) {
+      const art = PROTO_DEPLETED_ART[item.protoClass];
+      if (!art) continue;
+      const [file, ox, oy, w, h] = art;
+      const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/cultivation/proto/${file}`));
+      spr.anchor.set(ox / w, oy / h);
+      spr.width = w;
+      spr.height = h;
+      spr.x = x;
+      spr.y = groundY + 6;
+      spr.zIndex = 14;
+      layer.addChild(spr);
+      continue;
+    }
+    if (def.kind === 'rock') {
+      const spr = rockStill(PIXI, item.endClass);
+      spr.x = x;
+      spr.y = groundY;
+      spr.zIndex = 22;
+      layer.addChild(spr);
+      continue;
+    }
+    if (def.kind === 'garden' && engine.spawnGarden) {
+      const garden = st.gardens[item.id] ? JSON.parse(JSON.stringify(st.gardens[item.id])) : null;
+      const target = engine.spawnGarden({
+        x,
+        y: groundY + 2,
+        gardenType: def.gardenType,
+        cols: def.cols,
+        rows: def.rows,
+        label: def.label.replace(/^S\. |^M\. |^L\. /, ''),
+        garden,
+        detached: true,
+      });
+      if (target) targets.push(target);
+      continue;
+    }
+    if (def.art && POD_ART[def.art]) {
+      const art = POD_ART[def.art];
+      const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/cultivation/${def.art}.png`));
+      spr.anchor.set(0.5, 1);
+      spr.x = x;
+      spr.y = groundY + 6;
+      spr.zIndex = 14;
+      spr.width = art.w;
+      spr.height = art.h;
+      layer.addChild(spr);
+    }
+  }
+  return targets;
+}
+
+/**
+ * G328: a real player's home street or house as they keep it, for a visitor
+ * in multiplayer (features/neighbours-mp-feature.js). `view` is the site's
+ * answer (groddle-afternoon-site src/Neighbours.php: the owner's homes slice
+ * and home style, read from the owner's save, never the visitor's), `room`
+ * 'street' or 'interior'. Returns the scene for engine.enterScene (the same
+ * walk line, width and house as the owner's own scene, so both stand in the
+ * same places) and `populate(engine)`, which draws what stands there and
+ * returns { door, gate } spots for the caller's own targets. The visitor's
+ * own home state is put back before this returns.
+ */
+export function visitorHomeScene(engine, view = {}, room = 'street') {
+  const v = visitorHomeState(view);
+  const shim = Object.create(engine, {
+    homeContext: { value: () => ({ inHome: false, room, owned: true, style: v.style, returnLabel: '', unread: 0 }) },
+  });
+  if (room === 'interior') {
+    return withOwnersHome(v, () => {
+      const background = interiorBackground(shim, { yard: true });
+      const x0 = background.houseX;
+      const roomW = interiorWidth(v.decor);
+      const width = x0 + roomW;
+      const doorX = x0 + interiorDoorX();
+      const furniture = renderOrder(v.decor).map((item) => ({ ...item }));
+      const yard = v.backCult;
+      return {
+        width,
+        height: background.worldH,
+        groundY: GROUND_Y,
+        background,
+        platforms: background.platformsScreen,
+        spawnX: doorX - 80,
+        doorX,
+        populate(eng) {
+          const { PIXI } = eng;
+          const layer = new PIXI.Container();
+          layer.sortableChildren = true;
+          layer.zIndex = FURNITURE_Z;
+          layer.x = x0;
+          furniture.forEach((item, i) => {
+            const box = furnitureView(PIXI, item);
+            box.zIndex = i;
+            layer.addChild(box);
+          });
+          eng.entityLayer.addChild(layer);
+          const spec = background.room?.door || { piece: 'door_asset_entry_basic', x: interiorDoorX(), y: GROUND_Y + 18, w: 75, h: 236 };
+          const door = new PIXI.Sprite(textureFromUrl(pieceUrl(spec.piece, wantsHiresPieces(eng))));
+          door.anchor.set(0.5, 1);
+          door.width = spec.w;
+          door.height = spec.h;
+          door.x = x0 + spec.x;
+          door.y = spec.y;
+          door.zIndex = 8;
+          eng.entityLayer.addChild(door);
+          const gardens = drawVisitorYard(eng, yard, BACK_YARD_GROUND_Y, homeStreetLayout(yard).houseX);
+          return { door, gardens };
+        },
+      };
+    });
+  }
+  return withOwnersHome(v, () => {
+    const background = streetBackground(shim, shownStreetStyle(shim), v.style);
+    const layout = homeStreetLayout(v.cult);
+    const st = v.cult;
+    return {
+      width: layout.width,
+      height: STREET_WORLD_H,
+      groundY: STREET_GROUND_Y,
+      background,
+      platforms: background.platformsScreen,
+      spawnX: layout.lotLeft + 130,
+      doorX: background.houseDoorX,
+      populate(eng) {
+        const { PIXI } = eng;
+        const mailbox = new PIXI.Sprite(textureFromUrl('assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png'));
+        mailbox.anchor.set(0.5, 1);
+        mailbox.x = Math.round(background.houseSignX ?? layout.houseX - 260);
+        mailbox.y = STREET_GROUND_Y + 4;
+        mailbox.zIndex = 30;
+        eng.entityLayer.addChild(mailbox);
+        const door = new PIXI.Graphics();
+        door.rect(-46, -150, 92, 150).fill({ color: 0xffffff, alpha: 0.001 });
+        door.x = background.houseDoorX;
+        door.y = STREET_GROUND_Y;
+        door.zIndex = 9;
+        eng.entityLayer.addChild(door);
+        const gate = makeGateSprite(eng);
+        gate.x = layout.lotLeft + 40;
+        gate.y = STREET_GROUND_Y + 2;
+        gate.zIndex = 20;
+        eng.entityLayer.addChild(gate);
+        const gardens = drawVisitorYard(eng, st, STREET_GROUND_Y, layout.houseX);
+        return { door, gate, mailbox, gardens };
+      },
+    };
+  });
 }
 
 // ---------------------------------------------------------------------------
