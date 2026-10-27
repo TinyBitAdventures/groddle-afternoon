@@ -423,6 +423,9 @@ function evidenceWay(evidence, quests, takeable) {
   if ((m = /^given on accepting quest ([a-z0-9_]+)/.exec(ob))) return `Handed to you when you take the quest ${quests[m[1]]?.title ? `“${quests[m[1]].title}”` : m[1]}.`;
   if (/^street-project/.test(ob)) return 'Dropped as a reward when you finish a street project.';
   if (/^imagination/.test(ob)) return 'Comes with an Imagination upgrade card.';
+  if (/^drop:egg_plant_pet/.test(ob)) return 'Petting an Egg Plant can drop one, any time of year.';
+  if (/^drop:/.test(ob)) return 'A drop you can get as you play.';
+  if (/^collection:/.test(ob)) return 'A reward for finishing a collection.';
   if (/^season/.test(ob)) return 'Only while its holiday is on in the remake.';
   if (/^starter/.test(ob)) return 'Every new player starts with one.';
   if (/^reward of badge/.test(ob)) return 'A reward for finishing a collection.';
