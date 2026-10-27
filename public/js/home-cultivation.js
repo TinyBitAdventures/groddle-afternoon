@@ -50,7 +50,7 @@
  *   drifts the way repeated float + 0.05 can.
  */
 
-import { CULTIVATION_CLASSES, HOME_LIMITS } from './homes-catalog.js?v=homes-catalog-1';
+import { CULTIVATION_CLASSES, HOME_LIMITS } from './homes-catalog.js?v=homes-catalog-2';
 import {
   TOWER_CHASSIS,
   TOWER_IMG_COST,

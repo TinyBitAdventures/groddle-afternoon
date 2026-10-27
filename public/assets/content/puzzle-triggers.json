@@ -3672,7 +3672,9 @@
      "onEnter": [
       "beam_blue"
      ],
-     "why": "Light Beam (blue): one of the six archived Light Beam objrefs (no x/y). Its beam_blue script centres the avatar on x=1903 (moveAvatar target -1097 world) before tp_blue lifts it into Bilicious Blues, so the beam stands there on the floor (y 880)."
+     "why": "Light Beam (blue): one of the six archived Light Beam objrefs (no x/y). Its beam_blue script centres the avatar on x=1903 (moveAvatar target -1097 world) before tp_blue lifts it into Bilicious Blues, so the beam stands there on the floor (y 880).",
+     "verb": "beam_up",
+     "dest": "Bilicious Blues"
     },
     {
      "id": "beam_yellow",
@@ -3684,7 +3686,9 @@
      "onEnter": [
       "beam_yellow"
      ],
-     "why": "Light Beam (yellow): one of the six archived Light Beam objrefs (no x/y). Its beam_yellow script centres the avatar on x=958 (moveAvatar target -2042 world) before tp_yellow lifts it into Yellow Yawning, so the beam stands there on the floor (y 874)."
+     "why": "Light Beam (yellow): one of the six archived Light Beam objrefs (no x/y). Its beam_yellow script centres the avatar on x=958 (moveAvatar target -2042 world) before tp_yellow lifts it into Yellow Yawning, so the beam stands there on the floor (y 874).",
+     "verb": "beam_up",
+     "dest": "Yellow Yawning"
     },
     {
      "id": "beam_grey",
@@ -3696,7 +3700,9 @@
      "onEnter": [
       "beam_grey"
      ],
-     "why": "Light Beam (grey): one of the six archived Light Beam objrefs (no x/y). Its beam_grey script centres the avatar on x=2761 (moveAvatar target -239 world) before tp_grey lifts it into Greyving Grays, so the beam stands there on the floor (y 891)."
+     "why": "Light Beam (grey): one of the six archived Light Beam objrefs (no x/y). Its beam_grey script centres the avatar on x=2761 (moveAvatar target -239 world) before tp_grey lifts it into Greyving Grays, so the beam stands there on the floor (y 891).",
+     "verb": "beam_up",
+     "dest": "Greyving Grays"
     },
     {
      "id": "beam_green",
@@ -3708,7 +3714,9 @@
      "onEnter": [
       "beam_green"
      ],
-     "why": "Light Beam (green): one of the six archived Light Beam objrefs (no x/y). Its beam_green script centres the avatar on x=3447 (moveAvatar target 447 world) before tp_green lifts it into Glutton Greens, so the beam stands there on the floor (y 877)."
+     "why": "Light Beam (green): one of the six archived Light Beam objrefs (no x/y). Its beam_green script centres the avatar on x=3447 (moveAvatar target 447 world) before tp_green lifts it into Glutton Greens, so the beam stands there on the floor (y 877).",
+     "verb": "beam_up",
+     "dest": "Glutton Greens"
     },
     {
      "id": "beam_orange",
@@ -3720,7 +3728,9 @@
      "onEnter": [
       "beam_orange"
      ],
-     "why": "Light Beam (orange): one of the six archived Light Beam objrefs (no x/y). Its beam_orange script centres the avatar on x=4359 (moveAvatar target 1359 world) before tp_orange lifts it into Organish Chute, so the beam stands there on the floor (y 880)."
+     "why": "Light Beam (orange): one of the six archived Light Beam objrefs (no x/y). Its beam_orange script centres the avatar on x=4359 (moveAvatar target 1359 world) before tp_orange lifts it into Organish Chute, so the beam stands there on the floor (y 880).",
+     "verb": "beam_up",
+     "dest": "Organish Chute"
     },
     {
      "id": "beam_brown",
@@ -3732,7 +3742,9 @@
      "onEnter": [
       "beam_brown"
      ],
-     "why": "Light Beam (brown): one of the six archived Light Beam objrefs (no x/y). Its beam_brown script centres the avatar on x=5273 (moveAvatar target 2273 world) before tp_brown lifts it into Duodenal Browns, so the beam stands there on the floor (y 889)."
+     "why": "Light Beam (brown): one of the six archived Light Beam objrefs (no x/y). Its beam_brown script centres the avatar on x=5273 (moveAvatar target 2273 world) before tp_brown lifts it into Duodenal Browns, so the beam stands there on the floor (y 889).",
+     "verb": "beam_up",
+     "dest": "Duodenal Browns"
     }
    ],
    "art": [
@@ -3804,7 +3816,8 @@
     }
    ],
    "quoins": [],
-   "artWhy": "items/light_beam.js art (OGA glitch-assets light_beam__x1_1, 161x382, white) tinted per beam colour and stretched from the floor to the ceiling like the client's 176x415 asset box."
+   "artWhy": "items/light_beam.js art (OGA glitch-assets light_beam__x1_1, 161x382, white) tinted per beam colour and stretched from the floor to the ceiling like the client's 176x415 asset box.",
+   "verbWhy": "items/light_beam.js: a Light Beam is clicked, not walked into: verb beam_up 'Beam Up' (key e, proximity_override 160, get_tooltip 'Travel to '+dest) broadcasts the instanceProps event to the street (events_broadcast with target_pc). The six beams' dest props were not archived; each says the tube its tp_<colour> teleport reaches."
   },
   "GA9UCEFP7LD3523": {
    "name": "Organish Chute",

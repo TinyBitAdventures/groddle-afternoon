@@ -2573,6 +2573,19 @@
       "isTool": false,
       "source": "items/furniture_desk.js"
     },
+    "furniture_door": {
+      "label": "Door",
+      "namePlural": "Doors",
+      "desc": "That which brings you down can also lift you up. This is true of many things, but never more so than in the case of this magical-handled uppy-downy between-floor-device. Or 'Door'.",
+      "baseCost": 2500,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_door.js"
+    },
     "furniture_fireplace": {
       "label": "Fireplace",
       "namePlural": "Fireplaces",

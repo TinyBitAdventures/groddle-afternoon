@@ -51,18 +51,39 @@ function pngSize(file) {
   return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
 }
 
+/**
+ * Classes whose frames sit under another OGA folder. The Door's base frame
+ * is the client's door config `door_up_job` (furniture_door.js
+ * getDefaultUpgradeConfig: a door placed to build a floor); DOOR_ART has all four.
+ */
+const ART_DIR = { furniture_door: 'furniture_door_door_door_up_job' };
+/** furniture_door.js getDefaultUpgradeConfig: door_<up|down>[_job]. */
+const DOOR_ART = ['up', 'up_job', 'down', 'down_job'];
+/** Icons made elsewhere (G174's icon pass drew the Door from its SWF): keep them. */
+const KEEP_ICON = new Set(['furniture_door']);
+
 function ogaFrame(classTsid, pattern = /__x1_1_png_|_x1_1_png_/) {
-  const dir = join(OGA, classTsid);
+  const dir = join(OGA, ART_DIR[classTsid] || classTsid);
   if (!existsSync(dir)) return null;
   const file = readdirSync(dir).find((name) => pattern.test(name));
   return file ? join(dir, file) : null;
+}
+
+function ogaFrameIn(dirName) {
+  const dir = join(OGA, dirName);
+  const file = existsSync(dir) ? readdirSync(dir).find((name) => /_x1_1_png_/.test(name)) : null;
+  if (!file) throw new Error(`${dirName}: no x1 frame`);
+  return join(dir, file);
 }
 
 // ---------------------------------------------------------------------------
 // Furniture
 // ---------------------------------------------------------------------------
 
-/** Classes with recovered art. The four furniture_door_* job frames are floor-link doors, not decor. */
+/**
+ * Classes with recovered art. The Door (furniture_door) adds a floor: its
+ * rules are js/home-floors.js, its four frames DOOR_ART.
+ */
 const FURNITURE_CLASSES = [
   'furniture_chair', 'furniture_armchair', 'furniture_bench', 'furniture_stool', 'furniture_sofa',
   'furniture_loveseat', 'furniture_bed', 'furniture_table', 'furniture_coffeetable', 'furniture_sidetable',
@@ -75,6 +96,7 @@ const FURNITURE_CLASSES = [
   'furniture_largewalldeco', 'furniture_ceilingdeco', 'furniture_roomdeco', 'furniture_tabledeco',
   'furniture_smalltabledeco', 'furniture_largetabledeco', 'furniture_smallbackfloordeco',
   'furniture_largebackfloordeco', 'furniture_smallfrontfloordeco', 'furniture_largefrontfloordeco',
+  'furniture_door',
 ];
 
 /**
@@ -178,6 +200,9 @@ function buildFurniture() {
       canFlip: String(row.classProps.can_flip ?? '1') !== '0',
       art: { path: `assets/sprites/furniture/${classTsid}.png`, w, h },
       ...(LAYOUT[classTsid] || {}),
+      ...(classTsid === 'furniture_door'
+        ? { doorArt: Object.fromEntries(DOOR_ART.map((v) => [v, `assets/sprites/furniture/furniture_door_${v}.png`])) }
+        : {}),
       upgrades: upgrades[classTsid] || 0,
       recipe: recipeByOutput[classTsid] || null,
       storeCost: offer ? offer.cost : null,
@@ -322,6 +347,10 @@ function copyArt(furniture) {
   for (const classTsid of Object.keys(furniture)) {
     const src = ogaFrame(classTsid);
     copyFileSync(src, join(furnDir, `${classTsid}.png`));
+    if (classTsid === 'furniture_door') {
+      for (const v of DOOR_ART) copyFileSync(ogaFrameIn(`furniture_door_door_door_${v}`), join(furnDir, `furniture_door_${v}.png`));
+    }
+    if (KEEP_ICON.has(classTsid) && existsSync(join(iconDir, `${classTsid}.png`))) continue;
     try {
       execFileSync('magick', [src, '-resize', '48x48>', '-strip', join(iconDir, `${classTsid}.png`)]);
       thumbs += 1;

@@ -224,7 +224,14 @@ describe('furniture making and buying', () => {
     assert.equal(recipes.furniture_rug.tool, 'loomer');
     assert.equal(recipes.furniture_fireplace.id, '321');
     const stillSkipped = skipped.skipped.filter((r) => r.tool === 'construction_tool').map((r) => r.id);
-    assert.deepEqual(stillSkipped, ['260', '303']);
+    assert.deepEqual(stillSkipped, ['303']);
+    // G153: the Door (recipe 260) builds now that a house can have more floors.
+    assert.equal(recipes.furniture_door.id, '260');
+    assert.deepEqual(recipes.furniture_door.inputs, [
+      { classTsid: 'wood_post', qty: 8 },
+      { classTsid: 'board', qty: 16 },
+      { classTsid: 'snail', qty: 20 },
+    ]);
   });
 
   it('stocks the Construction Tool and Bulb where catalog_stores.js sells them', () => {

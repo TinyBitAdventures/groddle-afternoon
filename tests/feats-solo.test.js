@@ -43,7 +43,7 @@ import {
   reopensAt,
 } from '../public/js/solo-feats.js?v=g335-1';
 import { DAY_NAMES, GAME_DAY_MS } from '../public/js/game-day.js?v=dametime-4';
-import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=g345-1';
+import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=g345-2';
 import { FEATURES } from '../public/js/features/index.js';
 import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=player-save-21';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js';

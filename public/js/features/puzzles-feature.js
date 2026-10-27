@@ -17,6 +17,12 @@
  * recovery to the last ledge passed, the exit door as the finish line (first
  * finish pays the colour-level reward), and a Map card to reach the levels.
  *
+ * A trigger with `verb` is an item the player clicks rather than walks into:
+ * Shim Shiri's six Light Beams (items/light_beam.js beam_up "Beam Up", key e,
+ * proximity_override 160, tooltip "Travel to " + dest) broadcast their event
+ * from the verb (events_broadcast, target_pc), so they register as targets
+ * on their beam art and never fire on contact.
+ *
  * QA: ?autostart=1&questoffer=off&puzzledemo=<tsid> travels to a puzzle
  * street and stands at its start; &puzzleautoplay=1 walks the triggers in
  * order by placing the avatar on each (1.2 s apart), collects every quoin,
@@ -45,6 +51,10 @@ import { energyMax, metabolicGain, moodMax } from '../metabolics.js';
 import { isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 
 export const PUZZLES_FEATURE_ID = 'puzzles';
+export const LIGHT_BEAM_CLASS = 'light_beam';
+export const BEAM_UP_VERB = 'beam_up';
+/** items/light_beam.js: label, verb name, get_tooltip. */
+export const LIGHT_BEAM = Object.freeze({ label: 'Light Beam', verb: 'Beam Up', tooltip: (dest) => `Travel to ${dest || 'a new location'}` });
 const DATA_MS = 250;
 const BODY_H = 34; // avatar height at the colour levels' 0.41 scale
 
@@ -58,7 +68,7 @@ let demo = { stage: 'idle', at: 0, queue: [], target: '' };
 function load() {
   if (data) return Promise.resolve(data);
   if (!loading) {
-    loading = fetch(`${PUZZLE_DATA_URL}?v=puzzles-2`)
+    loading = fetch(`${PUZZLE_DATA_URL}?v=puzzles-3`)
       .then((r) => r.json())
       .then((raw) => {
         data = normalizePuzzleData(raw);
@@ -256,6 +266,35 @@ function startRun(engine, street, def) {
   spawnQuoins(engine, def);
   spawnArt(engine, def);
   spawnBubbles(engine, def);
+  spawnVerbTargets(engine, def);
+}
+
+/** Clicked triggers (light beams): a target on the art standing at the trigger's x. */
+function spawnVerbTargets(engine, def) {
+  for (const t of def.triggers) {
+    if (t.verb !== BEAM_UP_VERB) continue;
+    const view = run.artViews.find((v) => v.a.x === t.x);
+    if (!view?.spr || typeof engine.register !== 'function') continue;
+    engine.register({
+      classId: LIGHT_BEAM_CLASS,
+      featureId: PUZZLES_FEATURE_ID,
+      label: LIGHT_BEAM.label,
+      subtitle: LIGHT_BEAM.tooltip(t.dest),
+      sprite: view.spr,
+      state: { trigger: t.id },
+    });
+  }
+}
+
+/** beam_up handler: broadcast the beam's event(s) to the street, aimed at the player. */
+function beamUp(engine, triggerId) {
+  const t = run?.def.triggers.find((tr) => tr.id === triggerId && tr.verb === BEAM_UP_VERB);
+  if (!t) return false;
+  fireAll(engine, t.onEnter, t.id);
+  if (!run) return true;
+  // moveAvatar stand-in: ease the avatar onto the beam while it lifts.
+  if (t.pullMs) run.pull = { x: t.x, until: locationEventsApi.clock() + t.pullMs };
+  return true;
 }
 
 function place(engine, x, y) {
@@ -405,7 +444,7 @@ function stepRun(engine) {
     }
   }
   const now = locationEventsApi.clock();
-  for (const edge of stepTriggers(run.def.triggers, run.inside, run.spent, p.x, p.y, height)) {
+  for (const edge of stepTriggers(run.def.triggers.filter((t) => !t.verb), run.inside, run.spent, p.x, p.y, height)) {
     fireAll(engine, edge.events, edge.trigger.id);
     if (!run) return;
     if (edge.edge === 'enter') run.repeatAt.set(edge.trigger.id, now + (edge.trigger.repeatMs || 0));
@@ -651,6 +690,8 @@ function demoStep(engine, now) {
       const y = t.standY ?? (t.body ? t.y - t.h / 2 : t.y - 2);
       place(engine, t.standX ?? t.x, y);
       engine.player.onGround = !t.body;
+      // A clicked trigger (a light beam) runs its verb once the avatar stands there.
+      if (t.verb === BEAM_UP_VERB) beamUp(engine, t.id);
     }
     engine.setData('puzzleDemo', `trigger:${step.id}`);
   } else if (step.kind === 'quoin') {
@@ -741,6 +782,19 @@ export const puzzlesFeature = {
     const p = def.physics || {};
     const src = def.sourcePhysics ? SOURCE_PHYSICS : { speed: 1, gravity: 1 };
     return { speed: src.speed * (p.speed ?? 1), jump: p.jump ?? 1, gravity: src.gravity * (p.gravity ?? 1) };
+  },
+
+  verbsFor(target) {
+    if (target?.classId !== LIGHT_BEAM_CLASS) return null;
+    const t = run?.def.triggers.find((tr) => tr.id === target.state?.trigger);
+    if (!t) return [];
+    return [{ id: BEAM_UP_VERB, label: LIGHT_BEAM.verb, sort: 50, enabled: true, reason: '', energy: 0, durationMs: 0, tooltip: LIGHT_BEAM.tooltip(t.dest) }];
+  },
+
+  runVerb(target, verbId, engine) {
+    if (target?.classId !== LIGHT_BEAM_CLASS || verbId !== BEAM_UP_VERB) return false;
+    beamUp(engine, target.state?.trigger);
+    return true;
   },
 
   verbOverride(target, engine) {

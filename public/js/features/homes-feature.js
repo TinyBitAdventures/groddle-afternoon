@@ -42,6 +42,17 @@
  *     removes; =max buys every expansion left for Landgrabber)
  *     &homeyardstyle=<GSJS interior key> sets the yard style once, free.
  *
+ * Floors (register G153, js/home-floors.js): a Door (furniture_door.js) set
+ * down on the top floor opens Build a New Floor (job_proto_door, 100 Planks,
+ * through projectApi); finishing it adds a floor (homes_add_floor_at) with a
+ * Door down at the same x, up to three floors. Each floor is its own room
+ * (as the Tower's are) and the Doors are the way between; Expand and
+ * Un-expand work on every floor at once. QA:
+ *     ?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=interior&homefloordemo=door
+ *     (a Door in storage, 100 Planks, Decorate open; =build places it and
+ *     fills the project, =up also goes upstairs). Canvas: homeFloor,
+ *     homeFloors, homeDoorPending, homeDoorLast.
+ *
  * Worn-out cultivations become their proto in place (items/include/cultivation.js
  * replaceWithDepleted): the CC0 `depleted` frame of the proto SWF
  * (js/home-proto-art.js) with Restore, which runs the proto's job_cult_*
@@ -76,7 +87,7 @@ import {
   CULTIVATION_CLASSES,
   FURNITURE_CATALOG,
   FURNITURE_STORE,
-} from '../homes-catalog.js?v=homes-catalog-1';
+} from '../homes-catalog.js?v=homes-catalog-2';
 import {
   INTERIOR,
   arrangeStarterRoom,
@@ -107,7 +118,7 @@ import {
   textureConfig,
   unexpandInterior,
   UNEXPAND_TEXT,
-} from '../home-decor.js?v=home-decor-4';
+} from '../home-decor.js?v=home-decor-5';
 import {
   createBackYardState,
   isBackYard,
@@ -137,16 +148,16 @@ import {
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=home-cultivation-4';
+} from '../home-cultivation.js?v=home-cultivation-5';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
 import { playPoofIn } from '../overlay-art.js?v=g311-1';
 import { fadeInNewNear } from '../poof-fade.js?v=g311-1';
-import { projectApi } from './street-jobs-feature.js?v=blur-4';
+import { projectApi } from './street-jobs-feature.js?v=blur-5';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-3';
 import { towerApi } from './home-tower-feature.js?v=home-tower-15';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-13';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-14';
 import { patchesFeature } from './patches-feature.js?v=patches-15';
 import { plotLabel } from '../patches.js';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=g165-1';
@@ -188,6 +199,28 @@ import {
 import { getGameDayKey } from '../game-day.js?v=dametime-4';
 import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=g310-2';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-6';
+import {
+  DOOR_CLASS,
+  DOOR_JOB_PHASES,
+  DOOR_TEXT,
+  addFloor,
+  clearPendingDoor,
+  createFloorsState,
+  doorArtKey,
+  doorDestination,
+  doorJobId,
+  doorLiftCheck,
+  doorPlaceCheck,
+  doorRole,
+  expandHouseFloors,
+  floorCount,
+  floorDecor,
+  itemsText,
+  noteDoorPlaced,
+  quoteHouseExpansion,
+  quoteHouseUnexpand,
+  unexpandHouseFloors,
+} from '../home-floors.js?v=g153-1';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -206,6 +239,7 @@ const HOME_INTERIOR_TSID = 'RH_HOME_INT';
  * before, and pick up and drop again on any floor.
  */
 const TOWER_DROP_PREFIX = 'RH_HOME_TOWER_';
+const HOUSE_FLOOR_DROP_PREFIX = 'RH_HOME_FLOOR_';
 const VIEW_W = 960;
 const VIEW_H = 540;
 const DECO = 'assets/decos/groddle/';
@@ -436,6 +470,11 @@ export function ensureFurnitureItems() {
 let houseDecor = createHomeDecorState();
 /** One decor slice per Tower floor; furniture storage is shared with the house (one furniture bag). */
 let towerDecor = [];
+/** The house's floors above the ground floor and their Doors (js/home-floors.js). */
+let floors = createFloorsState();
+/** Where to stand after a Door between floors: room x, used once. */
+let floorArrivalX = null;
+let doorLast = '';
 /** The home-street walk line the save was made on (old saves: 620); see liftOldStreetRows. */
 let savedStreetGround = STREET_GROUND_Y;
 /** The decor being shown and edited: the house, or the Tower floor you stand on. */
@@ -484,7 +523,13 @@ let savedStreetHouseX = null;
 
 /** The house itself (not a Tower floor): its back yard is left of it. */
 function inHouse() {
-  return scene?.room === 'interior' && scene.tower == null;
+  return scene?.room === 'interior' && scene.tower == null && !scene.houseFloor;
+}
+
+/** The house floor shown now: 0 the ground floor, null on a Tower floor or outside. */
+function houseFloorHere() {
+  if (scene?.room !== 'interior' || scene.tower != null) return null;
+  return scene.houseFloor || 0;
 }
 
 /** The yard Cultivate works on here: the back yard in the house, else the home street. */
@@ -548,6 +593,10 @@ function publish(engine) {
   engine.setData('homeRockSubtitle', liveRock()?.subtitle || '');
   engine.setData('homeSign', ui?.sign && !ui.sign.hidden ? '1' : '');
   engine.setData('homeStreetHouseX', savedStreetHouseX ?? '');
+  engine.setData('homeFloor', houseFloorHere() ?? '');
+  engine.setData('homeFloors', floorCount(floors));
+  engine.setData('homeDoorPending', floors.pending ? `${floors.pending.floor}:${floors.pending.id}` : '');
+  engine.setData('homeDoorLast', doorLast);
 }
 
 // ---------------------------------------------------------------------------
@@ -580,6 +629,16 @@ function constructionDecor() {
 
 function inTower() {
   return scene?.tower != null;
+}
+
+/** An upper house floor's decor: the house's furniture storage and width (homes_extend keeps floors alike). */
+function houseFloorDecor(index) {
+  const slice = floorDecor(floors, houseDecor, index);
+  if (!slice || slice === houseDecor) return slice;
+  slice.storage = houseDecor.storage;
+  slice.wallSegments = houseDecor.wallSegments;
+  slice.layout = 'house';
+  return slice;
 }
 
 /** Bridge the Tower feature uses onto the cultivation state (it never imports this file). */
@@ -1679,7 +1738,10 @@ function renderFurniture(engine) {
   const { PIXI } = engine;
   const layer = scene.furnitureLayer;
   layer.removeChildren().forEach((child) => child.destroy({ children: true }));
+  const here = houseFloorHere();
   renderOrder(decor).forEach((item, i) => {
+    // A Door between floors (or building one) is drawn by its own target (spawnDoorTargets).
+    if (here != null && item.classTsid === DOOR_CLASS && doorRole(floors, here, item.id)) return;
     const view = furnitureView(PIXI, item);
     view.zIndex = i;
     layer.addChild(view);
@@ -2792,15 +2854,18 @@ function renderDecorateBody(engine, body) {
     return;
   }
   if (tab === 'house') {
-    const quote = quoteInteriorExpansion(decor, engine.inv);
-    body.append(el('p', { class: 'hb-note', text: `Your house is ${decor.wallSegments} wall segments wide (the most is 20). Each extra segment takes one Wall Segment, made with a Construction Tool.` }));
+    const quote = quoteHouseExpansion(floors, houseDecor, engine.inv);
+    const many = floorCount(floors) > 1;
+    body.append(el('p', { class: 'hb-note', text: many
+      ? `Your house is ${decor.wallSegments} wall segments wide (the most is 20) and ${floorCount(floors)} floors high. The next segment goes on every floor and takes ${itemsText(quote.items)}.`
+      : `Your house is ${decor.wallSegments} wall segments wide (the most is 20). Each extra segment takes one Wall Segment, made with a Construction Tool.` }));
     body.append(el('div', { class: 'hb-row' }, [
       el('button', {
         type: 'button',
         class: 'primary',
         'data-home-expand': 'house',
         disabled: !quote.ok,
-        text: `Expand house (${engine.inv.wall_segment || 0} Wall Segment${(engine.inv.wall_segment || 0) === 1 ? '' : 's'})`,
+        text: many ? 'Expand house' : `Expand house (${engine.inv.wall_segment || 0} Wall Segment${(engine.inv.wall_segment || 0) === 1 ? '' : 's'})`,
         onclick: () => expandHouse(engine),
       }),
       el('button', {
@@ -3051,6 +3116,13 @@ function beginPlacing(engine, classTsid, from = null) {
 function beginMove(engine, id) {
   const item = placedItem(decor, id);
   if (!item) return;
+  if (item.classTsid === DOOR_CLASS) {
+    const lift = doorLiftCheck(floors, houseFloorHere() ?? -1, id, { inProgress: doorJobStarted() });
+    if (!lift.ok) {
+      engine.toast(lift.msg);
+      return;
+    }
+  }
   placing = { kind: 'furniture', classTsid: item.classTsid, moveId: id };
   makeGhost(engine);
   renderBar(engine);
@@ -3114,7 +3186,18 @@ function runFurnitureAction(engine, action, arg) {
   else if (action === 'forward') result = restackFurniture(decor, id, false);
   else if (action === 'back') result = restackFurniture(decor, id, true);
   else if (action === 'pickup') {
-    result = pickUpFurniture(decor, id);
+    const door = placedItem(decor, id)?.classTsid === DOOR_CLASS
+      ? doorLiftCheck(floors, houseFloorHere() ?? -1, id, { inProgress: doorJobStarted() })
+      : null;
+    result = door && !door.ok ? { ok: false, reason: 'door', msg: door.msg } : pickUpFurniture(decor, id);
+    if (result.ok && door?.role === 'pending') {
+      // A Door picked up before its project started takes the project with it.
+      const jobId = doorJobId(floors);
+      clearPendingDoor(floors);
+      if (jobId) projectApi.unregister(jobId, { dropRow: true });
+      doorLast = 'lifted';
+      setTimeout(() => engine.refreshHomeScene?.(), 0);
+    }
     if (result.ok) {
       selected = null;
       engine.pushActivity(`You picked up the ${result.lifted.map((c) => furnitureDef(c).label).join(', ')}. It went into your furniture storage.`);
@@ -3134,7 +3217,7 @@ function runFurnitureAction(engine, action, arg) {
 }
 
 function expandHouse(engine) {
-  const result = expandInterior(decor, engine.inv);
+  const result = inTower() ? expandInterior(decor, engine.inv) : expandHouseFloors(floors, houseDecor, engine.inv);
   if (!result.ok) {
     engine.toast(result.msg || 'You cannot expand right now.');
     return result;
@@ -3163,7 +3246,7 @@ function refundList(items) {
 
 /** DecorateToolbarUI Un-expand -> HouseExpandDialog -> its confirm dialog -> houses_unexpand. */
 function confirmUnexpand(engine) {
-  const quote = quoteInteriorUnexpand(decor);
+  const quote = inTower() ? quoteInteriorUnexpand(decor) : quoteHouseUnexpand(floors, houseDecor);
   if (!quote.ok) {
     engine.toast(quote.msg, 2400);
     return quote;
@@ -3183,14 +3266,14 @@ function confirmUnexpand(engine) {
 }
 
 function unexpandHouse(engine) {
-  const result = unexpandInterior(decor, engine.inv);
+  const result = inTower() ? unexpandInterior(decor, engine.inv) : unexpandHouseFloors(floors, houseDecor, engine.inv);
   if (!result.ok) {
     engine.toast(result.msg || UNEXPAND_TEXT.min);
     return result;
   }
   // homes_unexpand moves players standing in the last 300 px over too.
   const p = engine.player;
-  if (p && scene?.room === 'interior' && !scene.tower && p.x - roomX0() >= result.edge) p.x -= 150;
+  if (p && scene?.room === 'interior' && scene.tower == null && p.x - roomX0() >= result.edge) p.x -= 150;
   engine.pushActivity(`You un-expanded your house. Refunded: ${refundList(result.items)}.`);
   engine.refreshPack();
   engine.save();
@@ -3233,11 +3316,24 @@ function placeAtPointer(engine, at) {
   if (!placing) return null;
   if (placing.kind === 'furniture') {
     let result;
-    if (placing.moveId) {
+    const isDoor = placing.classTsid === DOOR_CLASS;
+    const doorCheck = isDoor && !placing.moveId ? doorPlaceCheck(floors, { floor: houseFloorHere() ?? 0, tower: inTower() }) : { ok: true };
+    if (!doorCheck.ok) {
+      result = { ok: false, reason: doorCheck.reason, msg: doorCheck.msg };
+    } else if (placing.moveId) {
       result = moveFurniture(decor, placing.moveId, at);
       selected = { kind: 'furniture', id: placing.moveId };
+      if (result.ok && isDoor) setTimeout(() => engine.refreshHomeScene?.(), 0);
     } else {
       result = placeFurniture(decor, engine.inv, placing.classTsid, at, { from: placing.from || undefined });
+      if (result.ok && isDoor) {
+        // onContainerChanged: a Door set down in the house opens Build a New Floor.
+        noteDoorPlaced(floors, houseFloorHere() ?? 0, result.item.id);
+        doorLast = `placed:${floors.pending?.floor}`;
+        registerDoorJob(engine);
+        engine.pushActivity("Click your Door to add a floor.");
+        setTimeout(() => engine.refreshHomeScene?.(), 0);
+      }
       if (result.ok) {
         selected = { kind: 'furniture', id: result.item.id };
         engine.pushActivity(`You placed a ${furnitureDef(placing.classTsid).label}.`);
@@ -3627,7 +3723,37 @@ function demoFurniture(engine) {
   }
 }
 
+/**
+ * QA (G153): &homefloordemo=door puts a Door in furniture storage and 100
+ * Planks in the pack and opens Decorate on the ground floor; =built also
+ * builds the second floor at once (a Door at room x 600 and its floor).
+ */
+let floorDemoDone = false;
+function floorDemo(engine) {
+  const want = String(engine.param('homefloordemo') || '');
+  if (!want || floorDemoDone || houseFloorHere() !== 0) return;
+  floorDemoDone = true;
+  if (want === 'built' && floorCount(floors) === 1 && !floors.pending) {
+    houseDecor.placed.push({ id: houseDecor.nextId++, classTsid: DOOR_CLASS, slot: 'floor', x: 600, y: INTERIOR.floorY, facingRight: true, z: 1, on: null });
+    noteDoorPlaced(floors, 0, houseDecor.nextId - 1);
+    addFloor(floors, houseDecor);
+    doorLast = 'demo:built';
+    engine.save();
+    setTimeout(() => engine.refreshHomeScene?.(), 0);
+    return;
+  }
+  if (floorCount(floors) === 1 && !floors.pending && !decor.placed.some((row) => row.classTsid === DOOR_CLASS)) {
+    houseDecor.storage[DOOR_CLASS] = Math.max(1, houseDecor.storage[DOOR_CLASS] || 0);
+  }
+  engine.inv.plank = Math.max(100, engine.inv.plank || 0);
+  engine.refreshPack?.();
+  engine.updateHud?.();
+  doorLast = 'demo:door';
+  setMode(engine, 'decorate');
+}
+
 function demoSetup(engine) {
+  floorDemo(engine);
   demoFurniture(engine);
   // QA: &homestyledemo=open opens Change Style on the home street once.
   if (!styleDialogDemoDone && scene?.room === 'street' && engine.param('homestyledemo') === 'open') {
@@ -4172,6 +4298,177 @@ function towerFloorScene(engine, floor) {
 }
 
 /**
+ * An upper house floor (G153): its own room like a Tower floor, closed at
+ * both ends (homes_get_floor_config: only the ground floor opens onto the
+ * yard), no front door, its Doors the way down (and up).
+ */
+function houseFloorScene(engine, index) {
+  decor = houseFloorDecor(index);
+  const background = interiorBackground(engine, {});
+  const width = interiorWidth(decor);
+  const arriveX = floorArrivalX;
+  floorArrivalX = null;
+  return {
+    width,
+    groundY: GROUND_Y,
+    background,
+    spawnFor(opts = {}) {
+      if (opts.arrive === 'exact' && Number.isFinite(opts.spawnX)) return Math.max(80, Math.min(width - 80, opts.spawnX));
+      if (Number.isFinite(arriveX)) return arriveX;
+      if (homeX(engine) != null) return homeX(engine);
+      const down = floors.links.find((l) => l.floor + 1 === index);
+      return down ? down.x : Math.round(width / 2);
+    },
+    spawnTargets() {
+      scene = { room: 'interior', houseFloor: index, background, furnitureLayer: null, ghost: null, markers: null };
+      lastWallX = null;
+      spawnDoorTargets(engine);
+      return {};
+    },
+    enter() {
+      const { PIXI } = engine;
+      const layer = new PIXI.Container();
+      layer.sortableChildren = true;
+      layer.zIndex = FURNITURE_Z;
+      engine.entityLayer.addChild(layer);
+      scene.furnitureLayer = layer;
+      renderFurniture(engine);
+      afterEnter(engine);
+    },
+  };
+}
+
+/** The Door art for a placed Door on this floor (getDefaultUpgradeConfig). */
+function doorArtUrl(item, floor = houseFloorHere() ?? 0) {
+  const def = furnitureDef(DOOR_CLASS);
+  return def?.doorArt?.[doorArtKey(doorRole(floors, floor, item.id))] || def?.art?.path;
+}
+
+/** The Doors on this floor that do something (build a floor, lead up or down) are targets; their art is theirs. */
+function spawnDoorTargets(engine) {
+  const floor = houseFloorHere();
+  if (floor == null) return;
+  const { PIXI } = engine;
+  for (const item of decor.placed) {
+    if (item.classTsid !== DOOR_CLASS) continue;
+    const role = doorRole(floors, floor, item.id);
+    if (!role) continue;
+    const spr = new PIXI.Sprite(textureFromUrl(doorArtUrl(item, floor)));
+    spr.anchor.set(0.5, 1);
+    const art = furnitureDef(DOOR_CLASS).art;
+    spr.width = art.w;
+    spr.height = art.h;
+    spr.x = roomX0() + item.x;
+    spr.y = item.y;
+    spr.zIndex = FURNITURE_Z - 1;
+    engine.entityLayer.addChild(spr);
+    const dest = doorDestination(floors, floor, item.id);
+    engine.register({
+      classId: DOOR_CLASS,
+      featureId: HOMES_FEATURE_ID,
+      label: 'Door',
+      subtitle: role === 'pending' ? DOOR_TEXT.createTooltip : `${dest.dir === 'up' ? 'Up' : 'Down'} to the ${floorName(dest.floor)}`,
+      sprite: spr,
+      state: { doorId: item.id, floor },
+    });
+  }
+}
+
+function floorName(index) {
+  return ['ground floor', 'second floor', 'third floor'][index] || `floor ${index + 1}`;
+}
+
+/** canPickup's hasInProgressJob: anything put into the pending Door's project yet. */
+function doorJobStarted() {
+  const jobId = doorJobId(floors);
+  return Boolean(jobId && projectApi.registered(jobId) && projectApi.inProgress(jobId));
+}
+
+/** The pending Door's Build a New Floor project, registered with projectApi once its catalog is in. */
+function registerDoorJob(engine) {
+  const jobId = doorJobId(floors);
+  if (!jobId) return Promise.resolve(false);
+  return projectApi.ready().then(() => {
+    if (doorJobId(floors) !== jobId) return false;
+    if (projectApi.registered(jobId)) return true;
+    const cls = projectApi.catalog()?.classes?.[DOOR_JOB_PHASES[0].classTsid];
+    return projectApi.register(jobId, {
+      kind: 'restore',
+      title: cls?.title || 'Build a New Floor',
+      label: 'Your house',
+      desc: cls?.desc || '',
+      phases: DOOR_JOB_PHASES.map((p) => ({ ...p })),
+      // A home project is sized for its owner: the source amounts.
+      divisor: 1,
+      rewardMultiplier: 1,
+    }, {
+      kicker: 'Your house',
+      kindLabel: 'Home Project',
+      // players/inc_jobs.js:471 says every type 5 job in a house (not is_public) is "in your yard".
+      place: 'in your yard',
+      iconUrl: 'assets/sprites/icons/furniture_door.png',
+      note: `When it is done your house has ${floorCount(floors) + 1} floors.`,
+      target: () => (engine.interactables || []).find((t) => t.classId === DOOR_CLASS && t.state?.doorId === floors.pending?.id) || null,
+      onDone: (eng) => finishFloor(eng, jobId),
+    });
+  });
+}
+
+/** onJobComplete -> homes_add_floor_at: the floor goes on, the Door now leads up. */
+function finishFloor(engine, jobId) {
+  const res = addFloor(floors, houseDecor);
+  if (!res.ok) return '';
+  doorLast = `built:${res.floor}`;
+  engine.save();
+  setTimeout(() => {
+    projectApi.unregister(jobId, { dropRow: true });
+    if (houseFloorHere() != null) engine.refreshHomeScene?.();
+    publish(engine);
+  }, 0);
+  return `Your ${floorName(res.floor)} is ready: go up through the Door.`;
+}
+
+/** Through a Door: the other floor's room, standing at its Door. */
+async function goToHouseFloor(engine, floor, x) {
+  if (!houseFloorDecor(floor)) return false;
+  floors.at = floor;
+  floorArrivalX = Math.round(Number(x) || 0);
+  doorLast = `went:${floor}`;
+  engine.save();
+  engine.playSound?.('DOOR_OPEN', { volume: 0.5 });
+  await engine.enter(HOME_INTERIOR_TSID, {});
+  return true;
+}
+
+function doorVerbs(target) {
+  const floor = target.state?.floor ?? 0;
+  const role = doorRole(floors, floor, target.state?.doorId);
+  if (role === 'pending') {
+    return [{ id: 'door_create', label: DOOR_TEXT.createLabel, sort: 55, enabled: true, reason: '', energy: 0, durationMs: 0, tooltip: DOOR_TEXT.createTooltip }];
+  }
+  const dest = doorDestination(floors, floor, target.state?.doorId);
+  if (!dest) return [];
+  return [{ id: 'door_go', label: dest.dir === 'up' ? 'Go up' : 'Go down', sort: 10, enabled: true, reason: '', energy: 0, durationMs: 0, tooltip: `To the ${floorName(dest.floor)}` }];
+}
+
+function runDoorVerb(target, verbId, engine) {
+  const floor = target.state?.floor ?? 0;
+  if (verbId === 'door_create') {
+    registerDoorJob(engine).then((ok) => {
+      const jobId = doorJobId(floors);
+      if (!ok || !jobId || !projectApi.open(engine, jobId)) engine.toast('The project is not ready yet. Try again in a moment.');
+    });
+    return true;
+  }
+  if (verbId === 'door_go') {
+    const dest = doorDestination(floors, floor, target.state?.doorId);
+    if (dest) goToHouseFloor(engine, dest.floor, dest.x);
+    return true;
+  }
+  return false;
+}
+
+/**
  * location.js:72-74 onPlayerEnter: butler_hint_counters visited_my_house counts
  * each time you enter your own house (any way in: the door, /house, from the
  * Tower). A rebuild of the room you are already in is not a visit.
@@ -4199,8 +4496,16 @@ function homeScene(room, engine) {
   countHouseVisit(engine, floor != null ? 'tower' : room === 'interior' ? 'house' : 'street');
   if (floor != null) return towerFloorScene(engine, floor);
   decor = houseDecor;
-  if (room !== 'interior') towerApi.clearFloor();
+  if (room !== 'interior') {
+    towerApi.clearFloor();
+    floors.at = 0;
+    floorArrivalX = null;
+  }
   if (room === 'interior') {
+    if (floors.at > 0 && houseFloorDecor(floors.at)) return houseFloorScene(engine, floors.at);
+    floors.at = 0;
+    const arriveX = floorArrivalX;
+    floorArrivalX = null;
     if (!decor.starterKit) {
       grantStarterKit(decor);
       arrangeStarterRoom(decor);
@@ -4223,6 +4528,8 @@ function homeScene(room, engine) {
         if (opts.arrive === 'exact' && Number.isFinite(opts.spawnX)) {
           return Math.max(60, Math.min(width - 80, opts.spawnX + (opts.shift || 0)));
         }
+        // Down a Door from the floor above: at that Door.
+        if (Number.isFinite(arriveX)) return x0 + arriveX;
         // &homex= is room x (negative: in the back yard).
         if (opts.arrive !== 'door' && homeX(engine) != null) return x0 + homeX(engine);
         if (opts.arrive !== 'door' && engine.param('homeyarddemo')) return Math.max(60, x0 - 330);
@@ -4232,7 +4539,9 @@ function homeScene(room, engine) {
       spawnTargets() {
         scene = { room, background, furnitureLayer: null, ghost: null, markers: null };
         lastWallX = null;
-        return spawnInteriorTargets(engine);
+        const out = spawnInteriorTargets(engine);
+        spawnDoorTargets(engine);
+        return out;
       },
       enter() {
         const { PIXI } = engine;
@@ -4342,6 +4651,8 @@ export const homesFeature = {
       decor: houseDecor,
       cult,
       towerDecor: towerDecor.map(({ storage, ...rest }) => rest),
+      // G153: the floors above the ground floor, their Doors, and the floor you are on.
+      floors: { ...floors, upper: floors.upper.map(({ storage, ...rest }) => rest) },
       streetGround: savedStreetGround,
       houseVisits,
       streetStyle,
@@ -4379,6 +4690,9 @@ export const homesFeature = {
     // Saves from before G226: nothing to move until the street grows again.
     const sx = Number(slice?.streetHouseX);
     savedStreetHouseX = slice?.streetHouseX != null && Number.isFinite(sx) ? sx : null;
+    floors = createFloorsState(slice?.floors || {}, houseDecor);
+    floorArrivalX = null;
+    doorLast = '';
     towerDecor = (Array.isArray(slice?.towerDecor) ? slice.towerDecor : [])
       .slice(0, TOWER_CONFIG.MAX_FLOORS)
       .map((row) => normalizeHomeDecorState({ ...row, wallSegments: TOWER_GEO.wallSegments, layout: 'tower', starterKit: true }));
@@ -4475,6 +4789,7 @@ export const homesFeature = {
   /** Protos on the home street (items/proto_*.js restore / remove verbs). */
   verbsFor(target, engine) {
     if (target?.classId === 'magic_rock') return magicRockVerbs(target, engine);
+    if (target?.classId === DOOR_CLASS) return doorVerbs(target);
     const id = target?.state?.cultivationId;
     const item = id != null ? activeCult().items.find((row) => row.id === id) : null;
     if (!item?.depleted) return [];
@@ -4482,6 +4797,7 @@ export const homesFeature = {
   },
 
   runVerb(target, verbId, engine) {
+    if (target?.classId === DOOR_CLASS) return runDoorVerb(target, verbId, engine);
     if (target?.classId === 'magic_rock' && (ROCK_VERB_IDS.includes(verbId) || verbId === 'talk_to')) {
       return runRockVerb(target, verbId, engine);
     }
@@ -4498,7 +4814,7 @@ export const homesFeature = {
 
   /** QA / tests. */
   _state() {
-    return { decor, houseDecor, towerDecor, cult, backCult, yardStyle, savedHouseX, savedStreetHouseX, rockFlags, rockTarget, mode, placing, selected, scene, houseVisits };
+    return { decor, houseDecor, towerDecor, floors, cult, backCult, yardStyle, savedHouseX, savedStreetHouseX, rockFlags, rockTarget, mode, placing, selected, scene, houseVisits };
   },
 
   /**
@@ -4513,7 +4829,9 @@ export const homesFeature = {
   dropTsid(tsid) {
     if (tsid !== HOME_INTERIOR_TSID) return null;
     const floor = towerApi.currentFloor();
-    return floor != null ? towerDropTsid(floor) : null;
+    if (floor != null) return towerDropTsid(floor);
+    // G153: each upper house floor keeps its own stacks.
+    return floors.at > 0 ? `${HOUSE_FLOOR_DROP_PREFIX}${floors.at}` : null;
   },
 
   /**

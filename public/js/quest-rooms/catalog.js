@@ -146,10 +146,11 @@ export const OFFER_OVERRIDES = Object.freeze({
     prerequisites: [{ condition: 'custom_code', value: 'hours_after:4:last_pilgrimage_of_esquibeth', not: 0 }],
     why: 'canOffer: a game day (4 hours) after part 1 and after the last repeat or fail; offered by the Conch Reminisce verb',
   },
-  // Drinking a Cup of Water after getting your papers; the remake has no tainted cup.
+  // Drinking a Cup of Water from a Bureaucratic Hall's Water Cooler (cup_of_water.js drink:
+  // quests_offer('stale_but_necessary', true)): features/bureaucratic-halls-feature.js offers it then.
   stale_but_necessary: {
-    offerTriggers: [{ type: 'quest', quest: 'card_carrying_qualification' }],
-    why: 'item_use cup_of_water trigger; offered after Legalize It',
+    offerTriggers: [{ type: 'event', event: 'item_use', item: 'cup_of_water' }],
+    why: 'item_use cup_of_water trigger: drinking a Cup of Water from a Bureaucratic Hall Water Cooler',
   },
   // The Rube visiting your home; the remake's Rube trades on streets.
   rube_spy: {

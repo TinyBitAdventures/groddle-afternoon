@@ -886,6 +886,7 @@ export const EMITTED_EVENTS = Object.freeze([
   { event: 'animals_grown:{a}', a: ['chick', 'piglet', 'caterpillar'] },
   { event: 'meat_collector:full' },
   { event: 'butterfly_milker:full' },
+  { event: 'dust_trap:organelle', note: 'resource-nodes.js dust_trap: a remnant found (quests_inc_counter organelles_found)' },
 ]);
 
 const templateCache = new Map();

@@ -8515,6 +8515,44 @@
     "learnt": 1,
     "source": "catalog_recipes.js recipes[\"259\"]"
   },
+  "furniture_door": {
+    "id": "260",
+    "name": "Door",
+    "tool": "construction_tool",
+    "energyCost": 250,
+    "xpReward": 100,
+    "waitMs": 5000,
+    "inputs": [
+      {
+        "classTsid": "wood_post",
+        "qty": 8
+      },
+      {
+        "classTsid": "board",
+        "qty": 16
+      },
+      {
+        "classTsid": "snail",
+        "qty": 20
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_door",
+        "qty": 1
+      }
+    ],
+    "skill": "engineering_1",
+    "skills": [
+      "engineering_1",
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 5,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"260\"]"
+  },
   "wall_segment": {
     "id": "261",
     "name": "Wall Segment",

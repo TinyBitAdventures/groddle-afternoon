@@ -2,8 +2,8 @@
   "_meta": {
     "generator": "build-recipes.mjs",
     "sourceRecipes": 339,
-    "imported": 319,
-    "skipped": 20,
+    "imported": 320,
+    "skipped": 19,
     "verbRecipes": 7
   },
   "skipped": [
@@ -96,16 +96,6 @@
       ],
       "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
       "source": "catalog_recipes.js recipes[\"254\"]"
-    },
-    {
-      "id": "260",
-      "name": "Door",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_door"
-      ],
-      "reason": "Doors connect extra floors; the remake house has one floor.",
-      "source": "catalog_recipes.js recipes[\"260\"]"
     },
     {
       "id": "263",

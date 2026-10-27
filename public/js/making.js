@@ -587,9 +587,9 @@ export async function loadRecipeCatalog(fetchImpl = globalThis.fetch) {
   }
   try {
     const [res, itemsRes] = await Promise.all([
-      fetchImpl('assets/content/recipes.json?v=fruit-machine-2&catalog=recipes-full-2'),
+      fetchImpl('assets/content/recipes.json?v=fruit-machine-2&catalog=recipes-full-3'),
       Promise.resolve()
-        .then(() => fetchImpl('assets/content/making-items.json?v=recipes-full-3'))
+        .then(() => fetchImpl('assets/content/making-items.json?v=door-1'))
         .catch(() => null),
     ]);
     if (itemsRes?.ok) {

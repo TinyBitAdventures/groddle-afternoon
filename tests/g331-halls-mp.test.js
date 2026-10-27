@@ -59,7 +59,7 @@ describe('the catalog (build-street-jobs.mjs halls)', () => {
     assert.ok(!Object.keys(catalog.classes).some((id) => id.startsWith('job_group_')), 'no hall class on the solo board');
     // The feature merges them only in multiplayer.
     assert.match(feature, /if \(mpMode\) mergeHalls\(catalog\);/);
-    assert.match(feature, /street-jobs\.json\?v=jobs-5/);
+    assert.match(feature, /street-jobs\.json\?v=jobs-6/);
   });
 });
 

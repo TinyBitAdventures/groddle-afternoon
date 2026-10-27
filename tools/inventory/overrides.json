@@ -1124,9 +1124,10 @@
   "register": "G125"
  },
  "item:petrified_rock_large": {
-  "status": "missing",
-  "reason": "a top-contributor Feat reward from the web side (2012-10-12 'Epic of Feats'; main.js:7692 doBreakIt); ranking against other contributors stays multiplayer (G120). Solo Feats give Small rocks only (G143)",
-  "register": "G125"
+  "reason": "a Feat reward: the Large rock is 'drawn to the 13 who contributed the most awe' (items/petrified_rock_large.js:8); solo Feats are personal goals and give Small rocks only (G143, G171), so only a shared Feat ranks contributors (G120)",
+  "register": "G125",
+  "mp": "game 2c54a95e, server 6377b5d",
+  "mpReason": "the shared Feat (server feats.go end) gives places 1 to 13 a Large Petrified Rock (js/feats-mp.js LARGE_PLACES); js/features/solo-feats-feature.js applyReward puts it in the pack"
  },
  "item:doll_ayn_rand": {
   "status": "excluded",
@@ -1593,5 +1594,16 @@
   "mp": "game 68350d28, server db45fc1, site 3bc88de",
   "mpReason": "a group claims the hall through the site (membership, one hall a group, the claim currants), anyone contributes, the group owns it at the end (quest.js 1297-1338, 1831-1863)",
   "register": "G331"
+ },
+ "item:petrified_rock_medium": {
+  "reason": "a Feat reward for the top contributors below the 13 Large ones (the blog's 'various tiers', 2012-10-12 'The Epic of Feats'), and the Large rock's 2% crack (items/petrified_rock_large.js:239-245, js/artifacts.js CRACK_STEPS); solo has neither (G143, G171)",
+  "register": "G125",
+  "mp": "game 2c54a95e, server 6377b5d",
+  "mpReason": "the shared Feat (server feats.go end) gives places 14 to 26 a Medium Petrified Rock; cracking a Large one can add a Medium (js/artifacts.js rollCrack)"
+ },
+ "item:golgi_apparatus": {
+  "status": "source",
+  "reason": "never held: not_selectable, no verbs (items/golgi_apparatus.js); it is the dust trap's remnant overlay (dust_trap.js:63-68 organelleOverlay, inc_data_overlays.js:68) and Baqalic Caesura's requirement icon (quests/baqala_nostalgia.js:28). js/resource-nodes.js DUST_TRAP_ORGANELLES rolls it (7%, +40 s), js/features/resource-nodes-feature.js organelleOverlay draws it over the trap, and the find counts organelles_found",
+  "register": "G352"
  }
 }

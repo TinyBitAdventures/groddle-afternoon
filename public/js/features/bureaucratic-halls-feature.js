@@ -22,6 +22,14 @@
  * through the supply feature's clerk verbs (js/bureaucracy.js). The greeting,
  * waiting area and random questions are not rebuilt outside Legalize It.
  *
+ * Every hall has its Water Cooler (js/water-cooler.js: items/water_cooler.js
+ * get_water, 2 energy for a Cup of Water). Drinking the cup (cup_of_water.js
+ * drink: 5 mood) puts Being Watched (quests/stale_but_necessary.js) to the
+ * player at once, as quests_offer(id, true) did; accepting it starts the
+ * quest's room through the quest-instances feature. Where the cooler stands
+ * is ours (the halls' geometry is lost): right of the counter, clear of the
+ * glass doors, the chairs and the counter.
+ *
  * QA: ?autostart=1&questoffer=off&doordemo=GA5I10NJDL52TKD (Chego Chase),
  *   doordemo=GA91JUQT2G82GUL (Baeli Bray) or doordemo=GLI32G3NUTD100I&doorindex=1
  *   (Gregarious Grange) stands you at the hall door; add &hallautoplay=1 to
@@ -30,12 +38,19 @@
  */
 
 import { LEGALIZE_CLERKS } from '../legalize-it.js?v=legalize-2';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
+import { loseEnergy, loseMood } from '../metabolics.js';
+import { acceptOffer, ensureQuestOfferState, markOffered, questStatus } from '../quest-offers.js';
+import { getQuestCatalog } from '../content-catalogs.js';
+import { parseQuestConversation } from '../quests.js';
+import { CUP_CLASS, CUP_OF_WATER, WATER_COOLER, WATER_COOLER_CLASS, drinkCup, getWater, getWaterState } from '../water-cooler.js?v=g352-1';
 
 export const HALLS_FEATURE_ID = 'bureaucratic-halls';
 export const HALL_ENTER_VERB = 'hall_enter';
 export const HALL_LEAVE_VERB = 'hall_leave';
 /** features/supply-feature.js owns npc_bureaucrat verbs (buy the documents). */
 const CLERK_FEATURE_ID = 'supply';
+const CUP_QUEST_ID = 'stale_but_necessary';
 
 /** Street door id -> the hall behind it (location XML door connects). */
 export const HALL_DOORS = Object.freeze({
@@ -57,6 +72,11 @@ export function hallForDoor(target) {
 
 const ROOM = Object.freeze({ width: 1600, height: 760, ground: 620, spawnX: 150 });
 const EXIT_X = 70;
+/** Ours: right of the counter (x 620-1480), inside the room's 1600 px. */
+export const COOLER_X = 1536;
+const COOLER_ART = 'assets/sprites/icons/water_cooler@3x.png';
+export const GET_WATER_VERB = WATER_COOLER.verb.id;
+export const DRINK_VERB = 'cup_drink';
 const EXIT_ART = 'assets/decos/groddle/door_asset_bureaucratic_hall_int.png';
 const COUNTER_ART = 'assets/decos/groddle/bureaucratic_hall_counter_1.png';
 
@@ -106,6 +126,106 @@ function spawnHall(engine, kit) {
   counter.zIndex = 44;
   counter.eventMode = 'none';
   engine.entityLayer.addChild(counter);
+  const cooler = kit.sprite(COOLER_ART);
+  cooler.anchor.set(0.5, 1);
+  cooler.position.set(COOLER_X, ROOM.ground + 2);
+  // getAssetInfo: a 96 x 172 box.
+  cooler.width = WATER_COOLER.w;
+  cooler.height = WATER_COOLER.h;
+  cooler.zIndex = 46;
+  engine.entityLayer.addChild(cooler);
+  engine.register({
+    classId: WATER_COOLER_CLASS,
+    featureId: HALLS_FEATURE_ID,
+    label: WATER_COOLER.label,
+    subtitle: hall.def.label,
+    sprite: cooler,
+  });
+}
+
+/** The cup in the shared catalog (cup_of_water.js label, description, base_cost, stackmax, tags). */
+function ensureCup() {
+  ensureItem(CUP_CLASS, {
+    label: CUP_OF_WATER.label,
+    namePlural: CUP_OF_WATER.namePlural,
+    desc: CUP_OF_WATER.desc,
+    baseCost: CUP_OF_WATER.baseCost,
+    stackMax: CUP_OF_WATER.stackMax,
+    tags: [...CUP_OF_WATER.tags],
+  });
+}
+
+/** How many cups fit (the pack's room, when it has a limit to ask), else null. */
+function cupRoom(engine) {
+  const room = engine.query?.('packRoom', CUP_CLASS, 1, engine);
+  return Number.isFinite(room) ? room : null;
+}
+
+function runGetWater(engine) {
+  ensureCup();
+  const res = getWater(engine.inv, { room: cupRoom(engine), addItem, loseEnergy: (n) => loseEnergy(engine.pc, n) });
+  if (!res.ok) {
+    engine.toast?.(res.msg);
+    return true;
+  }
+  engine.pushActivity?.(res.msg);
+  engine.playSound?.('ITEM_GIVE', { volume: 0.5 });
+  engine.refreshPack?.();
+  engine.updateHud?.();
+  engine.save?.();
+  last = 'water';
+  publish(engine);
+  return true;
+}
+
+/**
+ * quests_offer('stale_but_necessary', true): offered at once, prereqs skipped
+ * (force_now), as the source's emergency card (is_emergency: no way to put it
+ * off). Accepting it starts the room (quest-instances, needsStart).
+ */
+function offerNap(engine, id) {
+  const qs = engine.questState;
+  const def = getQuestCatalog()[id];
+  if (!qs || !def || typeof engine.offerQuestDialogue !== 'function') return false;
+  ensureQuestOfferState(qs);
+  markOffered(qs, id, Date.now());
+  engine.setData?.('questOffer', id);
+  engine.playSound?.('QUEST_OFFER', { volume: 0.55 });
+  engine.offerQuestDialogue({
+    title: def.title,
+    kicker: 'Magic Rock',
+    beats: parseQuestConversation(def.offer || def.desc),
+    acceptLabel: def.acceptLabel || 'Take nap',
+    declinable: false,
+    urgent: true,
+    onAccept: () => {
+      const result = acceptOffer(qs, id, { inv: engine.inv, pc: engine.pc, addItem, removeItem, countItem, now: Date.now() });
+      engine.setData?.('questOfferResult', result.ok ? 'accepted' : result.reason || 'failed');
+      if (result.ok) engine.pushActivity?.(`New quest: ${def.title}`);
+      engine.refreshPack?.();
+      engine.save?.();
+      // questInstanceLocation takes you from where you drank. The nap starts from a street (the
+      // hall is a scene, and the quest-instances feature waits for one), so step out of the hall
+      // first; you wake outside its door.
+      if (result.ok && hall) leaveHall(engine);
+    },
+  });
+  return true;
+}
+
+function runDrink(engine) {
+  const status = engine.questState ? questStatus(engine.questState, CUP_QUEST_ID) : 'done';
+  const res = drinkCup(engine.inv, { removeItem, countItem, loseMood: (n) => loseMood(engine.pc, n), questStatus: status });
+  if (!res.ok) return true;
+  engine.pushActivity?.(res.msg);
+  engine.playSound?.('ITEM_DRINK', { volume: 0.6 });
+  engine.refreshPack?.();
+  engine.updateHud?.();
+  engine.save?.();
+  last = res.offer ? 'drink:offer' : 'drink';
+  if (res.offer) offerNap(engine, res.offer);
+  publish(engine);
+  return true;
 }
 
 /** Walk through a hall door: the hall scene, remembering the street door to come back to. */
@@ -205,15 +325,36 @@ export const bureaucraticHallsFeature = {
     return true;
   },
 
-  verbsFor(target) {
+  verbsFor(target, engine) {
+    if (target?.classId === WATER_COOLER_CLASS) {
+      const st = getWaterState({ room: engine ? cupRoom(engine) : null });
+      return [{ id: GET_WATER_VERB, label: WATER_COOLER.verb.label, sort: 50, enabled: st.enabled, reason: st.reason, energy: WATER_COOLER.energy, durationMs: 0, tooltip: WATER_COOLER.verb.tooltip }];
+    }
     if (target?.classId !== 'bureaucratic_hall_exit') return null;
     return [{ id: HALL_LEAVE_VERB, label: 'Leave', sort: 10, enabled: true, reason: '', energy: 0, durationMs: 0, tooltip: target.subtitle || 'Leave the hall' }];
   },
 
   runVerb(target, verbId, engine) {
+    if (target?.classId === WATER_COOLER_CLASS && verbId === GET_WATER_VERB) return runGetWater(engine);
     if (target?.classId !== 'bureaucratic_hall_exit' || verbId !== HALL_LEAVE_VERB) return false;
     leaveHall(engine);
     return true;
+  },
+
+  /** cup_of_water.js drink (the cup's default verb, keys_in_pack n). */
+  packVerbs(classTsid, engine) {
+    if (classTsid !== CUP_CLASS || !(countItem(engine?.inv || {}, CUP_CLASS) > 0)) return null;
+    return [{ id: DRINK_VERB, label: CUP_OF_WATER.verb.label, enabled: true, reason: '', tooltip: CUP_OF_WATER.verb.tooltip, primary: true }];
+  },
+
+  runPackVerb(classTsid, verbId, engine) {
+    if (classTsid !== CUP_CLASS || verbId !== DRINK_VERB) return false;
+    return runDrink(engine);
+  },
+
+  init() {
+    // A cup kept in a save shows its own name and description in the pack.
+    ensureCup();
   },
 
   /** Tests. */

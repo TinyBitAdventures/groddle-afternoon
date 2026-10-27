@@ -1059,6 +1059,37 @@ export const FURNITURE_CATALOG = Object.freeze({
     "recipe": null,
     "storeCost": null,
     "source": "items/furniture_largefrontfloordeco.js"
+  },
+  "furniture_door": {
+    "classTsid": "furniture_door",
+    "label": "Door",
+    "desc": "That which brings you down can also lift you up. This is true of many things, but never more so than in the case of this magical-handled uppy-downy between-floor-device. Or 'Door'.",
+    "baseCost": 2500,
+    "placementSet": [
+      "bookshelf"
+    ],
+    "slot": "floor",
+    "tabletop": false,
+    "canFlip": false,
+    "art": {
+      "path": "assets/sprites/furniture/furniture_door.png",
+      "w": 117,
+      "h": 169
+    },
+    "doorArt": {
+      "up": "assets/sprites/furniture/furniture_door_up.png",
+      "up_job": "assets/sprites/furniture/furniture_door_up_job.png",
+      "down": "assets/sprites/furniture/furniture_door_down.png",
+      "down_job": "assets/sprites/furniture/furniture_door_down_job.png"
+    },
+    "upgrades": 32,
+    "recipe": {
+      "id": "260",
+      "tool": "construction_tool",
+      "name": "Door"
+    },
+    "storeCost": 2500,
+    "source": "items/furniture_door.js"
   }
 });
 

@@ -443,6 +443,16 @@ for (const proto of CULTIVATION_PROTOS) {
     ...(blockers.length ? { blockers } : {}),
   };
 }
+/**
+ * Home projects other features run (projectApi): the Door's Build a New Floor
+ * (items/furniture_door.js classProps job_class_id job_proto_door,
+ * onContainerChanged in_order 1 delay_seconds 60; js/home-floors.js).
+ */
+const HOME_JOB_CLASSES = ['job_proto_door'];
+for (const id of HOME_JOB_CLASSES) {
+  if (!classes[id]) throw new Error(`${id}: home project class missing`);
+  restoreClasses.add(id);
+}
 const dropIds = [...new Set(Object.values(classes).flatMap((c) => c.performance.dropTables || []))];
 const drops = await loadDropTables(dropIds);
 

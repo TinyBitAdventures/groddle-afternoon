@@ -59,6 +59,7 @@ import { rollResourceNodeDrop } from './drops-feature.js?v=drops-4';
 import { rollSlothBonusSnails } from '../imagination-effects.js';
 import {
   DUST_TRAP_DROP_ITEM_DEFS,
+  ORGANELLE_OVERLAY,
   RESOURCE_ITEM_DEFS,
   RESOURCE_NODE_CATALOG,
   SALMON_RELEASE,
@@ -1383,14 +1384,58 @@ async function spawnStreet(engine, items, myGeneration) {
 }
 
 function triggerTrap(engine, entity) {
+  // QA: &dusttraproll=0.25 sets the trap's first roll (0.23-0.30 shows the golgi apparatus).
+  const raw = engine.param?.('dusttraproll');
+  let roll = raw != null && raw !== '' && Number.isFinite(Number(raw)) ? Math.min(0.999999, Math.max(0, Number(raw))) : null;
   const result = harvestResourceNode(entity.node, engine.inv, engine.pc, {
     verbId: 'trigger',
     now: Date.now(),
+    ...(roll != null ? { rng: () => { const r = roll ?? Math.random(); roll = null; return r; } } : {}),
   });
   if (result.ok && result.baqalaSeconds) {
     engine.floatText(entity.x, entity.y - 120, `+${result.baqalaSeconds}s`, 0xbfe6ff);
+    organelleOverlay(engine, entity, result.organelle);
   }
   applyResult(engine, entity, result);
+}
+
+/**
+ * dust_trap.js organelleOverlay: the remnant shows over the trap (place_at_bottom,
+ * delta_y -153) for its 3 s, then flies off to the buffs (animate_to_buffs).
+ */
+function organelleOverlay(engine, entity, organelle) {
+  const art = ORGANELLE_OVERLAY.art[organelle];
+  if (!art || !engine.PIXI || !engine.fxLayer) return;
+  const spr = new engine.PIXI.Sprite(textureFromUrl(art.url));
+  spr.anchor.set(0.5, 1);
+  const from = { x: entity.x, y: entity.y + ORGANELLE_OVERLAY.deltaY };
+  spr.position.set(from.x, from.y);
+  spr.width = art.w;
+  spr.height = art.h;
+  const base = { x: spr.scale.x, y: spr.scale.y };
+  engine.setData?.('dustTrapOverlay', organelle);
+  const hold = ORGANELLE_OVERLAY.durationMs - 600;
+  addEffect(engine, spr, (t) => {
+    // The texture may land after the first frame: keep the source box.
+    if (spr.texture?.width > 1 && Math.abs(spr.width - art.w) > 1) {
+      spr.width = art.w;
+      spr.height = art.h;
+      base.x = spr.scale.x;
+      base.y = spr.scale.y;
+    }
+    const pop = Math.min(1, t / 200);
+    if (t <= hold) {
+      spr.scale.set(base.x * pop, base.y * pop);
+      return true;
+    }
+    const k = Math.min(1, (t - hold) / 600);
+    const cam = engine.camera || { x: from.x, y: from.y - 300 };
+    spr.x = from.x + (cam.x + 70 - from.x) * k;
+    spr.y = from.y + (cam.y + 70 - from.y) * k;
+    spr.scale.set(base.x * (1 - 0.6 * k), base.y * (1 - 0.6 * k));
+    spr.alpha = 1 - k * 0.8;
+    return k < 1;
+  });
 }
 
 /**

@@ -53,9 +53,10 @@
  * REWARDS. A Feat that met its minimum goal pays every contributor the
  * doBreakIt reward times the pool's scale (what was done over the minimum
  * goal, at most the supermegabonus over the minimum, so 1 to 3), and a Small
- * Petrified Rock. Places 1 to 5 also get a Large rock and places 6 to 26 a
- * Medium one (the blog's tiers; the cut at 26 is feats:top_26's, the one at
- * 5 ours). Currants go into the ledger; iMG, mood, energy, favor, the rocks
+ * Petrified Rock. Places 1 to 13 also get a Large rock and places 14 to 26 a
+ * Medium one (the blog's tiers; the cut at 13 is the Large rock's own
+ * description, petrified_rock_large.js:8 "drawn to the 13 who contributed the
+ * most awe", the one at 26 feats:top_26's). Currants go into the ledger; iMG, mood, energy, favor, the rocks
  * (not tradeable, so not the ledger's) and the badges are the client's to
  * apply from feat_reward, which the server sends until it is acked.
  *
@@ -84,8 +85,11 @@ export const MP_SUPER = 3;
 /** inc_feats.js 139-144: place <= 26 counts feats:top_26, 27 to 30 get The Cigar. */
 export const TOP_PLACES = 26;
 export const CIGAR_PLACES = 30;
-/** Ours: the top tier of the blog's "various tiers" gets a Large rock. */
-export const LARGE_PLACES = 5;
+/**
+ * items/petrified_rock_large.js:8: the Large rock is "drawn to the 13 who
+ * contributed the most awe to the act", so places 1 to 13 get one.
+ */
+export const LARGE_PLACES = 13;
 
 /** main.js 7712-7733 doBreakIt: the one recorded Feat reward (place 1304). */
 export const MP_REWARD = Object.freeze({ xp: 272, currants: 170, mood: 0, energy: 102, favor: Object.freeze([Object.freeze({ giant: 'all', points: 34 })]) });

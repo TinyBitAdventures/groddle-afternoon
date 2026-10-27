@@ -44,9 +44,9 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=woodcutting-test-3';
-import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=g300-1';
+import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=g300-2';
 import { listDroppedStacks } from '../world-items.js?v=world-items-4';
-import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=homes-46';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=homes-47';
 import {
   CRAFTYBOT,
   CRAFTYBOT_BOX,
@@ -91,7 +91,7 @@ const HOME_STREET_TSID = 'RH_HOME_EXT';
 const HOME_INTERIOR_TSID = 'RH_HOME_INT';
 const BOT = CRAFTYBOT.CLASS;
 const BOX = CRAFTYBOT_BOX.CLASS;
-const SPECS_URL = 'assets/content/craftybot-specs.json?v=craftybot-2';
+const SPECS_URL = 'assets/content/craftybot-specs.json?v=craftybot-3';
 const ART = 'assets/sprites/craftybot/';
 /**
  * OGA npc_crafty_bot__x1_* sheets (137x140 cells, one registration point;
@@ -460,7 +460,9 @@ function currentRoom(engine) {
   const ctx = engine.homeContext?.();
   if (!ctx?.inHome) return null;
   if (engine.streetTsid === HOME_STREET_TSID) return 'street';
-  if (engine.streetTsid === HOME_INTERIOR_TSID && homesFeature._state?.()?.scene?.tower == null) return 'interior';
+  // The house's ground floor only (G153: an upper floor, like a Tower floor, is its own room).
+  const scene = homesFeature._state?.()?.scene;
+  if (engine.streetTsid === HOME_INTERIOR_TSID && scene?.tower == null && !scene?.houseFloor) return 'interior';
   return null;
 }
 

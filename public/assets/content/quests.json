@@ -33524,13 +33524,14 @@
   "hasCanOffer": false,
   "offerTriggers": [
    {
-    "type": "quest",
-    "quest": "card_carrying_qualification",
+    "type": "event",
+    "event": "item_use",
+    "item": "cup_of_water",
     "override": true
    }
   ],
   "instanceRoom": "being_watched",
-  "offerNote": "item_use cup_of_water trigger; offered after Legalize It",
+  "offerNote": "item_use cup_of_water trigger: drinking a Cup of Water from a Bureaucratic Hall Water Cooler",
   "solo": true
  },
  "star_sprint": {

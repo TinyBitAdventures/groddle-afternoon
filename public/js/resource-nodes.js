@@ -217,6 +217,20 @@ export const RESOURCE_DROP_TABLES = Object.freeze({
 });
 
 /** dust_trap.js doDrop: organelle rolls (Baqala timer seconds) before the drop table. */
+/**
+ * dust_trap.js organelleOverlay (214-235): the remnant's overlay
+ * (inc_data_overlays.js 67-70) over the trap for 3 s, bottom at 153 px above
+ * it, "+Ns", then off to the buffs. Only the golgi apparatus has CC0 raster
+ * art (its item, items/golgi_apparatus.js, OGA golgi_apparatus__x1_1); the
+ * other three overlays survive only as vector .fla sources (glitch-overlays)
+ * and keep the "+Ns" alone.
+ */
+export const ORGANELLE_OVERLAY = Object.freeze({
+  durationMs: 3000,
+  deltaY: -153,
+  art: Object.freeze({ golgi_apparatus: Object.freeze({ url: 'assets/sprites/icons/golgi_apparatus@3x.png', w: 86, h: 80 }) }),
+});
+
 export const DUST_TRAP_ORGANELLES = Object.freeze([
   { upTo: 0.13, id: 'vacuoles', label: 'a vacuole', seconds: 10 },
   { upTo: 0.23, id: 'endoplasmic_reticulum', label: 'an endoplasmic reticulum', seconds: 20 },
@@ -1467,6 +1481,9 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
       if (organelle) {
         extra.baqalaSeconds = organelle.seconds;
         extra.organelle = organelle.id;
+        // quests_inc_counter('organelles_found', 1) (dust_trap.js 54-74): Baqalic Caesura's
+        // "Find three Glitchian Remnants" (quest-offers.js routes dust_trap:organelle there).
+        achievementCounters.push({ counter: 'dust_trap:organelle', amount: 1 });
       } else {
         outputs.push(...rollDropTable('dust_trap', rng));
       }

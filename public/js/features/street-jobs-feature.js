@@ -167,7 +167,7 @@ function load() {
   if (catalog) return Promise.resolve(catalog);
   if (!loading) {
     loading = Promise.all([
-      fetch('assets/content/street-jobs.json?v=jobs-5').then((r) => r.json()),
+      fetch('assets/content/street-jobs.json?v=jobs-6').then((r) => r.json()),
       fetch('assets/streets/index.json').then((r) => r.json()),
     ])
       .then(([cat, idx]) => {
@@ -880,7 +880,7 @@ function renderPanel(engine) {
   const pcx = phaseClass(catalog, jobId, Math.min(status.phase, job.phases.length - 1));
   const def = pcx.def;
   const q = (s) => panel.querySelector(s);
-  const kind = { upgrade: 'Street Upgrade', restore: 'Restoration Project', hall: HALL_TEXT.kicker }[job.kind] || 'Street Project';
+  const kind = external.get(jobId)?.kindLabel || { upgrade: 'Street Upgrade', restore: 'Restoration Project', hall: HALL_TEXT.kicker }[job.kind] || 'Street Project';
   q('[data-sj-kicker]').textContent = `${kind} · ${external.get(jobId)?.kicker || job.hub || streetLabel(engine.streetTsid)}`;
   q('[data-sj-title]').textContent = job.title;
   const desc = job.kind === 'street'
@@ -1019,7 +1019,7 @@ function renderPanel(engine) {
   else if (unclaimed) statusLine.textContent = MP_TEXT.note;
   if (job.kind === 'restore' && (status.status === 'active' || status.status === 'open')) {
     const reward = Math.round((def.rewards?.xp || 0) * (Number(job.rewardMultiplier) || 1));
-    statusLine.textContent = `${external.get(jobId)?.note || ''} Original amounts${jobDivisor(job) === 1 ? '' : ` / ${jobDivisor(job)}`}. Finishing it pays up to ${reward.toLocaleString()} iMG.${work ? ` Working: ${work.units} units so far.` : ''}`.trim();
+    statusLine.textContent = `${external.get(jobId)?.note || ''} Original amounts${jobDivisor(job) === 1 ? '' : ` / ${jobDivisor(job)}`}.${reward ? ` Finishing it pays up to ${reward.toLocaleString()} iMG.` : ''}${work ? ` Working: ${work.units} units so far.` : ''}`.trim();
   }
 
   const others = q('[data-sj-others]');
@@ -1881,7 +1881,7 @@ export const projectApi = {
   /**
    * job: { kind: 'restore', title, label, desc, phases: [{ classTsid, order, delaySeconds, label }],
    *        divisor, rewardMultiplier }
-   * hooks: { onDone(engine, { jobId, out, job }) -> extra text, kicker, place, note, target() -> target }
+   * hooks: { onDone(engine, { jobId, out, job }) -> extra text, kicker, kindLabel, place, note, target() -> target }
    */
   register(jobId, job, hooks = {}) {
     if (!catalog) return false;
