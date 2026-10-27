@@ -39,6 +39,11 @@
  *   animal-mood-feature's sharedAnimalEvent.
  * - Help dig (G329): help-mine-feature tells the server when a dig at a Dirt
  *   Pile starts or stops (sharedDigSwing) and reads who digs (sharedDiggers).
+ * - Fruit (G361): a shared tree regrows fruit only when its health rises (pet
+ *   and water, the server's fruitCycle) or from Fertilidust, never at the day
+ *   turn. powders-feature tells the server when Fertilidust lands
+ *   (sharedFertilize: obj_dust, every tree of the street, or the Lite's one
+ *   tree), and the server grows the shared trees for everyone.
  *
  * QA: canvas data streetObjects (street:snap|none|waiting), streetObjectsLast
  * (id:verb:ok|code), streetObjectsShared (shared objects on this street),
@@ -153,6 +158,12 @@ function bind(engine) {
   });
   c.on('msg:obj_ok', (msg) => answered(engine, msg, true));
   c.on('msg:obj_no', (msg) => answered(engine, msg, false));
+  // G361: the trees a Fertilidust grew (their new state comes as objs, to everyone).
+  c.on('msg:obj_dusted', (msg) => {
+    pending.delete(msg?.req);
+    lastAnswer = `dust:ok:${Array.isArray(msg?.ids) ? msg.ids.length : 0}`;
+    publish(engine);
+  });
   // A street Piggy's tick (objects_pigs.go): the bubble, the croak, the walk to a tree it ate from.
   c.on('msg:obj_ev', (msg) => {
     if (!msg || msg.street !== copy.street || copy.street !== engine.streetTsid) return;
@@ -492,6 +503,25 @@ export const streetObjectsFeature = {
     reqSeq += 1;
     if (!c.send('obj_act', actMessage({ req: reqSeq, id: pigId(streetPigIndex(target, engine.streetTsid)), verb: 'eat', on }))) return null;
     pending.set(reqSeq, { id: pigId(streetPigIndex(target, engine.streetTsid)), target, verbId: 'eat', at: Date.now(), silent: true });
+    return true;
+  },
+
+  /**
+   * G361 Fertilidust (powders-feature fertilize): the dust landed on targets. The server grows the
+   * shared street trees (objects.go handleDust: every tree of the street, or with lite the one
+   * named) and everyone hears their new state; the local rules still run at once. True when the
+   * server was told, null when the trees are local (solo, a private place, a tree in your Patch).
+   */
+  sharedFertilize(targets, lite, engine) {
+    if (!engine || engine.mode !== 'multiplayer' || !shared(engine)) return null;
+    const trees = (targets || []).filter(isStreetTree);
+    if (!trees.length || (lite && trees.length !== 1)) return null;
+    const c = bind(engine);
+    reqSeq += 1;
+    const msg = { req: reqSeq };
+    if (lite) msg.id = treeId(trees[0].treeIndex);
+    if (!c?.send('obj_dust', msg)) return null;
+    pending.set(reqSeq, { id: msg.id || 'dust', target: null, verbId: 'dust', at: Date.now(), silent: true });
     return true;
   },
 

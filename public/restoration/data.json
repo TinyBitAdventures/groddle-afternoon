@@ -2645,9 +2645,14 @@
   ]
  },
  "git": {
-  "commits": 632,
+  "commits": 633,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "improve",
+    "text": "Animals, trees and the street spirit speak their whole GSJS conversations, and instance hub lines follow the source"
+   },
    {
     "date": "2026-10-27",
     "kind": "new",
@@ -2762,11 +2767,6 @@
     "date": "2026-10-27",
     "kind": "new",
     "text": "Two caterpillar coats, a carnival belt and a looser glitchfashion shirt join the wardrobe"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "improve",
-    "text": "The Magic Rock stops offering Manor Mystery, a quest the original never finished"
    }
   ]
  },

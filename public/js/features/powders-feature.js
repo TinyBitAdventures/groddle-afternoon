@@ -53,6 +53,11 @@
  * built (overlay_sparkle_powder.fla is not in the overlay sheets yet).
  * Canvas: powderMp.
  *
+ * Fertilidust in multiplayer (G361): as the dust lands, the street's shared
+ * trees are the server's (street-objects-feature sharedFertilize, the server's
+ * objects.go handleDust): it grows them for everyone on the street, and the
+ * local rules run at once on this page's copy.
+ *
  * Solo: the sneezing and sparkle effects on other players are multiplayer's
  * (Sneeze-O-Rama and Sparkle Buddy stay out of reach). Nothing to build for
  * include/trants.js:1244 onFertilidust: it calls this.reduceRookedness(60) on
@@ -185,7 +190,9 @@ function finishUse(engine, classTsid) {
   engine.save?.();
 }
 
-function fertilize(engine, targets) {
+function fertilize(engine, targets, lite = false) {
+  // G361 multiplayer: the server grows the street's shared trees for everyone; its word lands after.
+  engine.query?.('sharedFertilize', targets, lite, engine);
   const grown = [];
   for (const target of targets) {
     const before = target.state?.maturity;
@@ -297,7 +304,7 @@ const RUNNERS = {
     const out = fertilidustLiteTarget(trees, nearestPlayerX(engine));
     say(engine, out.message, out.ok);
     if (!out.ok) return 'no-tree';
-    later(3000, () => fertilize(engine, [out.tree.target]));
+    later(3000, () => fertilize(engine, [out.tree.target], true));
     later(2000, () => engine.playSound?.(out.sound, { volume: 0.6 }));
     finishUse(engine, classTsid);
     return `tree:${out.tree.classId}`;

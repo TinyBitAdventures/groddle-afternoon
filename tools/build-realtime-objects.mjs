@@ -19,7 +19,8 @@
  *     dirt_pile.js 176 + 467, peat_1.js 224-229, paper_tree.js);
  *   - js/trants.js ARBOROLOGY_HARVEST bonus amounts (catalog_skill_packages.js
  *     gardening_harvest) and assets/content/trants.json fruitCapMap
- *     (include/trants.js 1026-1041 updateFruitCap);
+ *     (include/trants.js 1026-1041 updateFruitCap) and fruitProdMap (rules.prod:
+ *     onFruitCycle 1043-1054, the fruit a tended tree's health rise brings back);
  *   - js/trant-care.js TRANT_CARE_PACKAGES living_pet / living_water success
  *     rates (catalog_skill_packages.js light_green_thumb_pet / _water);
  *   - js/resource-nodes.js RESOURCE_SKILL_PACKAGES dig_dirt_pile drop_chance and
@@ -192,6 +193,9 @@ export function ruleTables(trantTables) {
   for (const [id, row] of Object.entries(TRANT_CARE_PACKAGES.living_water)) care.water[id] = row.successRate;
   const trants = {};
   for (const id of Object.keys(TRANT_META)) trants[id] = trantTables[id].fruitCapMap;
+  // G361: fruitProdMap, what one health rise pushes back on (include/trants.js onFruitCycle 1043-1054).
+  const prod = {};
+  for (const id of Object.keys(TRANT_META)) prod[id] = trantTables[id].fruitProdMap;
   const mega = { chunks: MEGA_ROCK_CHUNKS, chance: { ...MEGA_ROCK_CHANCE } };
   const dig = {};
   for (const [id, row] of Object.entries(RESOURCE_SKILL_PACKAGES.dig_dirt_pile.skills)) {
@@ -203,7 +207,7 @@ export function ruleTables(trantTables) {
       pig[verb][rank === 0 ? 'no_skill' : `animalkinship_${rank}`] = row.successRate;
     });
   }
-  return { rocks, mega, nodes, harvest, care, trants, dig, pig };
+  return { rocks, mega, nodes, harvest, care, trants, prod, dig, pig };
 }
 
 async function main() {

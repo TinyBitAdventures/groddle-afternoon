@@ -39,7 +39,7 @@ import {
   treeReady,
   treeSkill,
 } from '../public/js/street-objects.js?v=g374-1';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=g374-1';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=g376-1';
 import { FEATURES } from '../public/js/features/index.js';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=g330-1';
 import { createResourceNode } from '../public/js/resource-nodes.js';
@@ -250,7 +250,7 @@ describe('street objects: the feature', () => {
   it('is registered just before the realtime feature', () => {
     const ids = FEATURES.map((f) => f.id);
     assert.equal(ids.indexOf('street-objects') + 1, ids.indexOf('realtime'));
-    assert.match(read('public/js/features/index.js'), /street-objects-feature\.js\?v=g374-1/);
+    assert.match(read('public/js/features/index.js'), /street-objects-feature\.js\?v=g376-1/);
   });
 
   it('asks for the street on joining, and waits for it', () => {
@@ -311,6 +311,32 @@ describe('street objects: the feature', () => {
     streetObjectsFeature.onTick(16, 0, r.engine);
     assert.deepEqual([r.tree.fruitCount, r.tree.watered, r.tree.health], [20, true, 8]);
     assert.match(r.treeT.subtitle, /20 Cherries/);
+  });
+
+  it('G361: Fertilidust tells the server, and the server\'s grown trees land', () => {
+    const r = rig();
+    assert.equal(streetObjectsFeature.sharedFertilize([r.treeT], false, r.engine), null, 'not before the snapshot');
+    r.client.emit('msg:objs', { t: 'objs', street: 'GSTREET', snap: true, objs: [] });
+    streetObjectsFeature.onTick(16, 0, r.engine);
+    assert.equal(streetObjectsFeature.sharedFertilize([r.rockT], false, r.engine), null, 'no street tree, nothing to tell');
+    const patchTree = { ...r.treeT, grownFromBean: true };
+    assert.equal(streetObjectsFeature.sharedFertilize([patchTree], true, r.engine), null, 'a tree in your own Patch stays local');
+    assert.equal(streetObjectsFeature.sharedFertilize([r.treeT, patchTree], false, r.engine), true);
+    assert.deepEqual(r.sent.at(-1), { t: 'obj_dust', req: 1 });
+    assert.equal(streetObjectsFeature.sharedFertilize([r.treeT], true, r.engine), true);
+    assert.deepEqual(r.sent.at(-1), { t: 'obj_dust', req: 2, id: 'tree:0' }, 'the Lite names its tree');
+    r.client.emit('msg:obj_dusted', { t: 'obj_dusted', req: 2, ids: ['tree:0'] });
+    assert.equal(r.engine.data.streetObjectsLast, 'dust:ok:1');
+    r.client.emit('msg:objs', { t: 'objs', street: 'GSTREET', objs: [{ id: 'tree:0', fruit: 90, cap: 90, health: 10, maturity: 10, petted: false, watered: false }] });
+    streetObjectsFeature.onTick(16, 0, r.engine);
+    assert.deepEqual([r.tree.fruitCount, r.tree.health], [90, 10]);
+    assert.equal(streetObjectsFeature.sharedFertilize([r.treeT], false, rig({ mode: 'solo' }).engine), null, 'solo is local');
+  });
+
+  it('G361: powders-feature asks sharedFertilize as the dust lands', () => {
+    const src = read('public/js/features/powders-feature.js');
+    assert.match(src, /function fertilize\(engine, targets, lite = false\) \{\n[^\n]*\n  engine\.query\?\.\('sharedFertilize', targets, lite, engine\);/);
+    assert.match(src, /fertilize\(engine, \[out\.tree\.target\], true\)/);
   });
 
   it('times out a request the server never answers', () => {
