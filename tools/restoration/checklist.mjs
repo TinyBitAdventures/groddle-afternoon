@@ -294,7 +294,8 @@ export const CHECKLIST = Object.freeze([
   { id: 'door-drink', group: 'late', name: 'Door Drink portals', status: 'solo',
     blurb: 'Pour a Door Drink and a Hyperspacetime Portal Door stands at your feet. The original chained everyone’s doors across Ur; here the chain is yours, so each new door leads back to the one you poured before it.',
     evidence: ['public/js/door-drink.js', 'public/js/features/door-drink-feature.js', 'public/assets/sprites/door-drink/portal_sheet.webp'] },
-  { id: 'snaps', group: 'late', name: 'Snapshots', status: 'lost',
-    blurb: 'Snapshottery was retired before Glitch closed.',
-    evidence: [] },
+  { id: 'snaps', group: 'late', name: 'Snapshots', status: 'source',
+    blurb: 'With the Snapshottery card, press Enter in Camera Mode to take a Snap and caption it; your Snaps live on the site.',
+    multiplayer: 'A Camera from the Toy Vendor shows a random Snap by another player and takes you to where it was taken.',
+    evidence: ['public/js/features/snaps-feature.js', 'public/js/snaps.js'] },
 ]);

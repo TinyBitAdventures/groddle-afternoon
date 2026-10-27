@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-15';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-189';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-190';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -19418,8 +19418,11 @@ async function enterStreet(tsid, opts = {}) {
       store: STREET_INDEX.streets?.[currentStreetTsid]?.store,
     }
   );
-  // Seasonal stock (Glitchmas Crackers and Cards) comes and goes with the calendar.
-  activeVendor = features.query('vendorProfile', activeVendor, engine) || activeVendor;
+  // Seasonal stock (Glitchmas Crackers and Cards) comes and goes with the calendar;
+  // the multiplayer Camera (G332, snaps-feature). Each feature's answer feeds the next.
+  for (const feature of features.features) {
+    if (typeof feature.vendorProfile === 'function') activeVendor = feature.vendorProfile(activeVendor, engine) || activeVendor;
+  }
   const reserved = (data.signposts || []).map((signpost, index) => {
     const point = worldToScreen(data, signpost.x, signpost.y);
     return { ...point, key: `signpost:${index}`, clearance: 100 };

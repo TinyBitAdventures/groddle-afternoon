@@ -12,6 +12,13 @@
  * keeps the view inside the street (engine.setCameraLook). Quest rooms are
  * skipped: Vision Quest runs its own Camera Mode.
  *
+ * Multiplayer (G332, features/snaps-feature.js): Snapshottery itself was live
+ * at shutdown (glitchlog 2012-09-19: "you just need the upgrade"; it was the
+ * snapshot quests that went), so with the card Enter takes a Snap there:
+ * this feature asks `cameraSnap` (engine, { end }) on Enter and
+ * `cameraSnapHint` (engine, range) for the line under "Camera Mode". Solo
+ * answers neither and stays the looking part only.
+ *
  * QA: ?autostart=1&camerademo=1 opens it (&cameraskill=1 grants Eyeballery,
  * &cameralook=x,y pans). Canvas data: cameraMode, cameraLookX, cameraLookY,
  * cameraRange.
@@ -58,7 +65,7 @@ export function homeEditing(engine) {
   return Boolean(engine?.query?.('homeEditMode', engine));
 }
 
-function showOverlay(on, range) {
+function showOverlay(on, range, snapHint = null) {
   if (typeof document === 'undefined') return;
   if (!overlay) {
     overlay = document.createElement('div');
@@ -72,7 +79,9 @@ function showOverlay(on, range) {
   }
   overlay.hidden = !on;
   const hint = overlay.querySelector('[data-camera-hint]');
-  if (hint) {
+  if (hint && typeof snapHint === 'string' && snapHint) {
+    hint.textContent = snapHint;
+  } else if (hint) {
     hint.textContent = Number.isFinite(range)
       ? 'Arrows to look · C to return · Eyeballery lets you look across the whole street'
       : 'Arrows to look · C to return';
@@ -87,7 +96,8 @@ function setActive(engine, on) {
     look = { x: 0, y: 0 };
     engine.setCameraLook(0, 0);
   }
-  showOverlay(on, cameraRange(engine.learnedSkills));
+  const range = cameraRange(engine.learnedSkills);
+  showOverlay(on, range, on ? engine.query?.('cameraSnapHint', engine, range) : null);
   engine.playSound(on ? 'CAMERA_MODE_ON' : 'CAMERA_MODE_OFF', { volume: 0.4 });
   publish(engine);
 }
@@ -122,6 +132,12 @@ function attach(engine) {
       return;
     }
     if (!active) return;
+    // G332: Enter snaps in multiplayer with Snapshottery (CameraManView.as 189, CameraMan.as snap).
+    if (k === 'enter' && !e.metaKey && !e.ctrlKey && !e.altKey && engine.query?.('cameraSnap', engine, { end: () => setActive(engine, false) }) === true) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return;
+    }
     if (k === 'escape') {
       e.preventDefault();
       e.stopImmediatePropagation();

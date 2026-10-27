@@ -144,7 +144,8 @@ const RULES = [
 
   // Interface conveniences.
   [/^trade_channel$/, 'multiplayer', 'The trade chat channel needs other players.'],
-  [/^(snapshotting|snapshottery_)/, 'interface', 'Snapshots and photo filters are a client feature not in the remake.'],
+  [/^snapshotting$/, 'multiplayer', 'Snaps in Camera Mode (Enter), kept on the site for other players\' Cameras (G332).'],
+  [/^snapshottery_/, 'interface', 'Photo filters are a client feature not in the remake.'],
   [/^(map_search|inventory_search)$/, 'none', 'Secret card with no server effect.'],
   [/^pack_(stack_up_bags|internal_sortitude|magic_sort)$/, 'interface', 'Bag sorting verbs; the remake pack has no bags.'],
 ];

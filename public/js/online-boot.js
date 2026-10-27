@@ -17,7 +17,7 @@
  * play/index.html by tools/play-online/build.mjs.
  */
 
-import { createMinnAccount } from './minn-account.js?v=nbhome-9';
+import { createMinnAccount } from './minn-account.js?v=nbhome-10';
 import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from './account-forms.js?v=g337-2';
 
 const PILL_TEXT = {

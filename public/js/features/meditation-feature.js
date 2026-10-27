@@ -71,7 +71,7 @@ import { levitationCards } from '../imagination-effects.js';
 import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js';
 import { sourceFromUrl } from '../textures.js';
 import { moodScaledXp } from '../mood-xp.js';
-import { createMinnAccount } from '../minn-account.js?v=nbhome-9';
+import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
 import { getSkillPackageOverride } from '../skill-packages.js';
 import {
   RADIANCE_TEXT,

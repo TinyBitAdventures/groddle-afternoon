@@ -1163,14 +1163,16 @@
   "register": "G125"
  },
  "item:furniture_snap_frame": {
-  "status": "lost",
-  "reason": "frames one of your Snaps (player photographs on the web site) on your wall (catalog_furniture.js:7430, userdeco set 'wall'); Snaps are lost",
-  "register": "G125"
+  "status": "unbuilt_original",
+  "reason": "an unfinished idea: getExtraConfig (furniture_snap_frame.js:382-408) draws one hard-coded test photo for every frame (if (true) img_url = photos/2012-06-24/...), and nothing hands one out: no store, no styles in catalog_furniture.js:7429-7432 (add_furniture_23 is empty, so the furniture shop lists none), no recipe (catalog_craftytasking.js:67935-67951 names only itself), no quest, drop or Rube; eleven-gsjs the same",
+  "register": "G332"
  },
  "item:camera": {
   "status": "lost",
   "reason": "Toy Vendor sells it (catalog_stores.js:1455, 1100c), but take_picture (camera.js:93-119) only opens the client's snap_travel_screen, which loads a random player Snap from the web API (SnapTravelView.as:167 snapsRandomForCamera) and offers travel to it; there are no player Snaps",
-  "register": "G125"
+  "register": "G332",
+  "mp": "site ff4cd91",
+  "mpReason": "the Toy Vendor sells it online (1100); take a picture with opens the snap travel screen with another player's Snap (Snaps.php snaps/random, saved by Enter in Camera Mode with Snapshottery), Go there! teleports to its spot (camera_recharging 90 s, Forget it 15 s); snaps-feature.js"
  },
  "item:mental_feeling": {
   "status": "unbuilt_original",

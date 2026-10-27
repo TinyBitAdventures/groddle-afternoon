@@ -69,7 +69,7 @@ import {
   packIntoBags,
   roomFor,
 } from '../pack-slots.js?v=g152-2';
-import { createMinnAccount } from '../minn-account.js?v=nbhome-9';
+import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
 
 export const BAGS_FEATURE_ID = 'bags';
 export const BAG_DEMO_KIT = Object.freeze([

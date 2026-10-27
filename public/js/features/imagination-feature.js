@@ -141,6 +141,9 @@ const MULTIPLAYER_OFFERS = new Set([
   'transcendental_imagination',
   'meditative_arts_less_distraction',
   'meditative_arts_less_distraction_2',
+  // G332: Snapshottery lets Enter take a Snap in Camera Mode (player.js 2148-2173, snaps-feature);
+  // the filter packs stay out (the remake has no photo filters).
+  'snapshotting',
 ]);
 const offeredInMultiplayer = (id) => isOfferedInRemake(id) || MULTIPLAYER_OFFERS.has(id);
 

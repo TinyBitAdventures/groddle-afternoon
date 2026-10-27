@@ -17,7 +17,7 @@
  * line shown); window.groddleBugReport.open() in multiplayer.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=nbhome-9';
+import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 

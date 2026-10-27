@@ -528,5 +528,28 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       if (!r.ok) throw failed('Deleting the backup', r);
       return r.data;
     },
+
+    /**
+     * Snaps (G332, groddle-afternoon-site src/Snaps.php): snaps() your album
+     * { snaps, max, captionMax }; saveSnap({ image, caption, street, x, y })
+     * { snap, ...album }; deleteSnap(id); randomSnap(exclude) the Camera's
+     * { snap: { id, url, street, x, y, caption, owner: { id, name } } | null }.
+     */
+    async snaps() {
+      return buddyCall('Loading your snaps', 'snaps');
+    },
+
+    async saveSnap(snap) {
+      return buddyCall('Saving the snap', 'snaps', { method: 'POST', body: snap });
+    },
+
+    async deleteSnap(id) {
+      return buddyCall('Deleting the snap', `snaps/${Number(id)}`, { method: 'DELETE' });
+    },
+
+    async randomSnap(exclude = '') {
+      const q = exclude ? `?exclude=${encodeURIComponent(String(exclude))}` : '';
+      return buddyCall('Finding a snap', `snaps/random${q}`);
+    },
   };
 }
