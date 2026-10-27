@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-15';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-186';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-187';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -19863,13 +19863,13 @@ async function openMap(hubId) {
     const artNote = view.bgLocal ? 'painted bg' : 'geometry only';
     const loadedN = view.streets.filter((s) => s.loaded).length;
     sub.textContent =
-      `${view.streets.length} streets · ${loadedN} playable here · ${artNote} · yellow = travel · red star = you`;
+      `${view.streets.length} streets · ${loadedN} playable here · ${artNote} · click a street to set a destination or teleport · red star = you`;
   }
 
   canvas.innerHTML = renderHubMapSvg(view);
 
   canvas.querySelectorAll('.map-street.travelable').forEach((g) => {
-    g.addEventListener('click', () => {
+    g.addEventListener('click', (e) => {
       const tsid = g.getAttribute('data-tsid');
       const label = g.getAttribute('data-label') || tsid;
       const plan = mapClickTravel(currentStreetTsid, tsid, STREET_INDEX.streets);
@@ -19879,8 +19879,13 @@ async function openMap(hubId) {
         else toast('Cannot travel there.');
         return;
       }
-      closeMap();
-      travelTo(plan.toTsid, { label: plan.label || label });
+      // QA routes that hop by Map keep the old free travel (&maptravel=free).
+      if (new URLSearchParams(location.search).get('maptravel') === 'free') {
+        closeMap();
+        travelTo(plan.toTsid, { label: plan.label || label });
+        return;
+      }
+      openMapStreetMenu(canvas, e, { tsid: plan.toTsid, label: plan.label || label, hubId: targetHub, hubName: view.hubName });
     });
   });
 
@@ -19954,6 +19959,74 @@ function arrangeMapCards(panel) {
     mapExtrasOpen = details.open;
   });
   card.insertBefore(details, card.querySelector(':scope > [data-map-route]') || canvas);
+}
+
+/**
+ * A street's menu on the Map (glitch-client InteractionMenuController.as 130-275):
+ * Set as Destination (a guided path, the map-routes feature) and Teleport Here, which
+ * the teleportation feature allows only with Teleportation IV, to a visited street,
+ * with the energy and off cooldown (teleportation_map_teleport). The original never
+ * moved you just for clicking a street.
+ */
+function openMapStreetMenu(canvas, event, street) {
+  canvas.querySelector('.map-street-menu')?.remove();
+  const menu = document.createElement('div');
+  menu.className = 'map-street-menu';
+  menu.setAttribute('role', 'menu');
+  menu.dataset.tsid = street.tsid;
+  const title = document.createElement('strong');
+  title.textContent = street.label;
+  menu.appendChild(title);
+  const close = () => {
+    menu.remove();
+    document.removeEventListener('pointerdown', outside, true);
+    document.removeEventListener('keydown', onKey, true);
+  };
+  const outside = (e) => { if (!menu.contains(e.target)) close(); };
+  const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
+  const entry = (text, note, enabled, run) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('role', 'menuitem');
+    b.textContent = text;
+    b.disabled = !enabled;
+    if (note) {
+      const n = document.createElement('span');
+      n.textContent = note;
+      b.appendChild(n);
+      b.title = note;
+    }
+    b.addEventListener('click', () => { close(); run(); });
+    menu.appendChild(b);
+    return b;
+  };
+  entry('Set as Destination', 'Get a guided path to this location', true, () => {
+    const res = features.query('mapRoute', 'set', { to: street.tsid, source: 'player' }, engine);
+    if (res && res.ok === false) toast(res.error || 'No path to there.', 2600);
+    else {
+      pushActivity(`Destination set: ${street.label}.`);
+      openMap(street.hubId);
+    }
+  });
+  const tp = features.query('mapTeleport', 'check', street, engine) || { ok: false, error: 'You cannot teleport from here.' };
+  entry(
+    tp.ok && tp.energyCost ? `Teleport Here · ${tp.energyCost} energy` : 'Teleport Here',
+    tp.ok ? tp.tooltip : tp.error,
+    tp.ok,
+    () => features.query('mapTeleport', 'go', street, engine)
+  );
+  canvas.appendChild(menu);
+  const box = canvas.getBoundingClientRect();
+  const x = Math.min(Math.max(8, event.clientX - box.left), box.width - menu.offsetWidth - 8);
+  const y = Math.min(Math.max(8, event.clientY - box.top + 10), box.height - menu.offsetHeight - 8);
+  menu.style.left = `${Math.max(8, x)}px`;
+  menu.style.top = `${Math.max(8, y)}px`;
+  if (app?.canvas) app.canvas.dataset.mapStreetMenu = `${street.tsid}:${tp.ok ? 'teleport' : 'route'}`;
+  setTimeout(() => {
+    document.addEventListener('pointerdown', outside, true);
+    document.addEventListener('keydown', onKey, true);
+  }, 0);
+  menu.querySelector('button:not([disabled])')?.focus();
 }
 
 function closeMap() {

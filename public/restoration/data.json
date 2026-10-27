@@ -168,12 +168,13 @@
    "group": "world",
    "name": "Hub maps and travel",
    "status": "source",
-   "blurb": "Every region’s map with its streets, and travel by signpost or map.",
+   "blurb": "Every region’s map with its streets. Travel by signpost; from the map, set a destination for a guided path, or with Teleportation IV teleport to a street you have visited.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/map-graph.js",
-    "public/js/travel.js"
+    "public/js/travel.js",
+    "public/js/teleportation.js"
    ],
    "shot": null,
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&practice=1"
@@ -2586,9 +2587,14 @@
   ]
  },
  "git": {
-  "commits": 583,
+  "commits": 584,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "improve",
+    "text": "The game connects to the realtime server the site names"
+   },
    {
     "date": "2026-10-27",
     "kind": "new",
@@ -2703,14 +2709,9 @@
     "date": "2026-10-27",
     "kind": "new",
     "text": "In multiplayer, radiate calm to the players near you, and see who is meditating"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "In multiplayer, leave a gift or a note with a friend's Butler, and water their garden with their key"
    }
   ]
  },
- "tests": 348,
+ "tests": 349,
  "generatedAt": "2026-10-27"
 }

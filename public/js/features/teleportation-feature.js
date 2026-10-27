@@ -42,8 +42,10 @@ import {
   SCRIPT_ITEM,
   TELEPORT_HIT_ANIMATION_MS,
   canCreateScript,
+  canMapTeleport,
   createScript,
   listTargets,
+  mapTeleport,
   maxTargets,
   normalizeTeleportState,
   reconcileScripts,
@@ -55,7 +57,7 @@ import {
   teleportRank,
   teleportToPoint,
   useScript,
-} from '../teleportation.js';
+} from '../teleportation.js?v=g356-1';
 import { loseEnergy } from '../metabolics.js';
 
 export const TELEPORT_FEATURE_ID = 'teleportation';
@@ -214,6 +216,26 @@ function teleportPoint(engine, id) {
   const out = teleportToPoint(state, id, jumpCtx(engine));
   if (!out.ok) return engine.toast(out.error), false;
   launch(engine, out, `point${id}`);
+  return true;
+}
+
+/** The Map's street menu: a street you clicked, with what the map knows of it. */
+function mapTarget(opts = {}) {
+  return { tsid: String(opts.tsid || ''), label: opts.label || '', hubId: String(opts.hubId || ''), hubName: opts.hubName || '' };
+}
+
+function mapCtx(engine, target) {
+  return { ...jumpCtx(engine), visited: (engine.visitedStreets?.() || []).includes(target.tsid) };
+}
+
+/** "Teleport Here" from the Map (teleportation_map_teleport). */
+function teleportFromMap(engine, opts) {
+  const target = mapTarget(opts);
+  const pre = preflight(engine, target);
+  if (!pre.ok) return engine.toast(pre.msg), false;
+  const out = mapTeleport(state, target, mapCtx(engine, target));
+  if (!out.ok) return engine.toast(out.error), false;
+  launch(engine, out, 'map');
   return true;
 }
 
@@ -520,6 +542,21 @@ export const teleportationFeature = {
       if (engine.param('teleportfx') !== 'hold' && now - pending.startedAt >= TELEPORT_HIT_ANIMATION_MS) land(engine);
     }
     demoStep(engine, now);
+  },
+
+  /**
+   * The Map's street menu asks here (engine.query('mapTeleport', action, opts, engine)):
+   * 'check' -> { ok, error, energyCost, tooltip } for the Teleport Here entry, 'go' teleports.
+   */
+  mapTeleport(action, opts, engine) {
+    const target = mapTarget(opts);
+    if (action === 'check') {
+      const pre = preflight(engine, target);
+      if (!pre.ok) return { ok: false, error: pre.msg };
+      return canMapTeleport(state, target, mapCtx(engine, target));
+    }
+    if (action === 'go') return teleportFromMap(engine, opts);
+    return null;
   },
 
   mapCards(engine) {

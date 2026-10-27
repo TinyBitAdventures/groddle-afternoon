@@ -722,6 +722,8 @@ const SCENARIOS = {
       return { hubs: sel ? [...sel.options].map((o) => o.textContent) : [], streets: document.querySelectorAll('#map-canvas [data-tsid], #map-canvas .map-street').length };
     });
     t.note(`map hubs=${mapInfo.hubs.length} street nodes=${mapInfo.streets}`);
+    // A street click opens Set as Destination / Teleport Here (G356); the playtest hops with the QA flag.
+    await t.page.evaluate(() => { const u = new URL(location.href); u.searchParams.set('maptravel', 'free'); history.replaceState(null, '', u); });
     for (const hubName of [/Ix/, /Shimla Mirch|Alakol/, /Groddle Meadow/]) {
       const from = (await t.snap()).street;
       if (!(await t.page.evaluate(() => !document.getElementById('map-panel').hidden))) {

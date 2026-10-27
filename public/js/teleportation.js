@@ -169,7 +169,7 @@ export function normalizeTeleportState(seed = {}) {
     cooldownUntil: Number(s.cooldownUntil) > 0 ? Number(s.cooldownUntil) : 0,
     dayKey: typeof s.dayKey === 'string' ? s.dayKey : '',
     mapTeleportsToday: count(s.mapTeleportsToday),
-    totals: { plain: count(totals.plain), script: count(totals.script), set: count(totals.set) },
+    totals: { plain: count(totals.plain), script: count(totals.script), set: count(totals.set), map: count(totals.map) },
     scripts,
     looseScripts: looseScripts.slice(-20),
     nextScriptId: Math.max(1, count(s.nextScriptId)),
@@ -278,6 +278,67 @@ export function teleportToPoint(state, id, ctx = {}) {
     target,
     energyCost,
     events: teleportEvents(target, ctx.fromHubId, 'plain'),
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Map teleports                                                       */
+/* ------------------------------------------------------------------ */
+
+/** The rescue-pig quest's street, which the client let you pick before you'd been there. */
+export const MAP_TELEPORT_UNVISITED_OK = 'LHFIV4V8J6J2I7U';
+
+export const MAP_TELEPORT_TEXT = Object.freeze({
+  here: 'This is your current location!',
+  cooldown: 'Teleportation cooldown active. No teleporting!',
+  unvisited: 'You need to visit this location first!',
+  // The client's no-skill path was teleportation tokens, which the remake has none of.
+  noSkill: 'You need Teleportation IV to teleport from the map.',
+  outToday: 'You are out of map teleports for today.',
+  energy: (cost) => `You do not have enough energy to teleport (${cost} required).`,
+  ready: 'Teleport here instantly with energy.',
+});
+
+/**
+ * The Map's "Teleport Here" (glitch-client InteractionMenuController.as 200-275, the
+ * server's teleportation_map_teleport, inc_teleportation.js 419-516): not to the street
+ * you are on, not while cooling down, only to a street you have visited, and only with
+ * Teleportation IV (teleportation_get_max_map_teleports 957-967), its daily count and
+ * the skill's energy cost.
+ * @param {{ learned?: string[], now?: number, energy?: number, tank?: number,
+ *   currentTsid?: string, visited?: boolean, teleporting?: boolean }} ctx
+ * @returns {{ ok: boolean, error?: string, energyCost?: number|null, tooltip?: string }}
+ */
+export function canMapTeleport(state, target, ctx = {}) {
+  const s = normalizeTeleportState(state);
+  const now = ctx.now ?? Date.now();
+  if (!target?.tsid) return { ok: false, error: TELEPORT_TEXT.noDestination };
+  if (target.tsid === ctx.currentTsid) return { ok: false, error: MAP_TELEPORT_TEXT.here };
+  if (ctx.teleporting) return { ok: false, error: TELEPORT_TEXT.already };
+  if (s.cooldownUntil > now) return { ok: false, error: MAP_TELEPORT_TEXT.cooldown };
+  if (!ctx.visited && target.tsid !== MAP_TELEPORT_UNVISITED_OK) return { ok: false, error: MAP_TELEPORT_TEXT.unvisited };
+  if (teleportRank(ctx.learned) < 4) return { ok: false, error: MAP_TELEPORT_TEXT.noSkill };
+  if (s.mapTeleportsToday >= maxMapTeleports(ctx.learned)) return { ok: false, error: MAP_TELEPORT_TEXT.outToday };
+  const energyCost = teleportEnergyCost(ctx.learned, ctx.tank || DEFAULT_TANK);
+  if ((ctx.energy ?? 0) <= energyCost) return { ok: false, error: MAP_TELEPORT_TEXT.energy(energyCost), energyCost };
+  return { ok: true, energyCost, tooltip: MAP_TELEPORT_TEXT.ready };
+}
+
+/** teleportation_map_teleport: count it, pay the energy, start the cooldown. */
+export function mapTeleport(state, target, ctx = {}) {
+  const gate = canMapTeleport(state, target, ctx);
+  if (!gate.ok) return gate;
+  const s = normalizeTeleportState(state);
+  const now = ctx.now ?? Date.now();
+  s.mapTeleportsToday += 1;
+  s.cooldownUntil = now + teleportCooldownSeconds(ctx.learned) * 1000;
+  s.totals.map += 1;
+  return {
+    ok: true,
+    state: s,
+    target: cleanLocation(target),
+    energyCost: gate.energyCost,
+    events: teleportEvents(target, ctx.fromHubId, 'map'),
   };
 }
 

@@ -4962,6 +4962,53 @@ body.buff-purple-pulse::after {
   overflow: hidden;
   box-shadow: inset 0 0 40px rgba(60,50,30,0.25);
 }
+.map-street-menu {
+  position: absolute;
+  z-index: 5;
+  min-width: 190px;
+  max-width: min(260px, calc(100% - 16px));
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid #8a7a58;
+  background: #fffdf5;
+  box-shadow: 0 6px 18px rgba(40, 30, 15, 0.3);
+  color: #453b34;
+  font-size: 13px;
+}
+.map-street-menu strong {
+  display: block;
+  padding: 2px 6px 6px;
+  font-size: 13px;
+}
+.map-street-menu button {
+  display: block;
+  width: 100%;
+  margin: 2px 0 0;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+.map-street-menu button:hover:not([disabled]),
+.map-street-menu button:focus-visible {
+  background: #f1e9d2;
+  outline: none;
+}
+.map-street-menu button[disabled] {
+  cursor: not-allowed;
+  color: #9a8e80;
+}
+.map-street-menu button span {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: #7f6c55;
+}
 .map-canvas svg,
 .map-canvas .hub-map-svg {
   width: 100%;
