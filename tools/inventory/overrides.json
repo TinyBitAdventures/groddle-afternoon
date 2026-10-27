@@ -410,8 +410,9 @@
  "system:players/inc_organizations": {
   "checklist": "chat",
   "status": "lost",
-  "reason": "organizations (inc_organizations.js) were left out of the groups work",
-  "register": "G326"
+  "reason": "organizations (inc_organizations.js, groups/organization.js) cannot be rebuilt from what survives: one is made only by buying a group-owned location (inc_pols.js:285-313, inc_houses.js:514-617) and no archived location is ownable by an organization (no owner_type 2); its bank never worked (organization.js:65-110 writes an undefined amount, nothing calls it) and the member cap check is inverted (group.js:157, 1479), so nobody could join one (lane HALLS judgement 2026-10-27)",
+  "register": "G326",
+  "lost": "nosource"
  },
  "system:players/inc_party": {
   "checklist": "chat",
@@ -1036,7 +1037,9 @@
  "item:bag_escrow": {
   "status": "lost",
   "reason": "trade escrow: players/inc_trading.js:23 and the gift boxes (bag_gift_box.js:270, bag_gift_box_wrapped.js:436) hold items while two players trade",
-  "register": "G125"
+  "register": "G125",
+  "mp": "game 1fa394e5, server 89a0cde, game 3b2faba2, server dfe78b2, site 82e0574",
+  "mpReason": "a hidden bag the player never sees: the trade hold (trade.go keeps both offers, the site's ledger settles) and the wrapped gift box (groddle_gifts) are its escrow between real players"
  },
  "item:bag_greeter_badge": {
   "status": "lost",
