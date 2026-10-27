@@ -73,6 +73,10 @@ function normalizeMessage(seed = {}, index = 0) {
     currants,
     attachmentsClaimed: seed?.attachmentsClaimed === true || (!attachment && currants === 0),
     outgoing: seed?.outgoing === true,
+    // Express (G121): a letter carrying an item is added with to_mailbox false (main.js 6677,
+    // 6716; inc_mail.js 1583), so the AFLC Frog brings it (js/mail-courier.js) until it is handed
+    // over or sent on to the mailbox (inMailbox; is_expedited once there). Older letters have none.
+    ...(seed?.express === true ? { express: true, inMailbox: seed?.inMailbox === true, expedited: seed?.expedited === true } : {}),
     // Multiplayer only (G333): an attachment the site's ledger holds until it is received
     // (features/auctions-feature.js mailReceive). Solo letters never carry one.
     ...(/^auc-[0-9a-f]{16}-d$/.test(String(seed?.ledger || '')) ? { ledger: String(seed.ledger) } : {}),
@@ -129,10 +133,14 @@ function findMessage(state, id) {
 export function deliverMail(state, message = {}) {
   const normalized = normalizeMailboxState(state);
   Object.assign(state, normalized);
+  // G121: an item makes a letter express unless the caller says otherwise (express: false);
+  // a letter the site's ledger settles (G333 auctions) is never the frog's.
+  const express = message.express !== false && !message.ledger && Boolean(normalizeAttachment(message.attachment || message.item));
   const row = normalizeMessage({
     ...message,
     id: message.id || nextMessageId(state),
     outgoing: false,
+    ...(express ? { express: true, inMailbox: message.inMailbox === true } : { express: false }),
   }, state.messages.length);
   state.messages.push(row);
   state.totalReceived += 1;
@@ -156,6 +164,8 @@ export function seedMailbox(state, now = Date.now()) {
     sentAt: now - 60_000,
     deliveryAt: now - 60_000,
     attachment: { classTsid: 'apple', count: 1 },
+    // The welcome letters wait in the new mailbox (no frog).
+    express: false,
   });
   return state;
 }
@@ -276,6 +286,8 @@ export function receiveMailAttachments(state, inventory, player, id, now = Date.
   }
   player.currants = finiteInt(player?.currants) + finiteInt(message.currants);
   message.attachmentsClaimed = true;
+  // Collected at the mailbox: the frog has nothing left to bring.
+  if (message.express) message.inMailbox = true;
   return {
     ok: true,
     item: message.attachment,

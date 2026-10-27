@@ -87,6 +87,7 @@ import { craftybotFeature } from './craftybot-feature.js?v=blur-11'; FEATURES.pu
 import { moodDecayFeature } from './mood-decay-feature.js?v=play-19'; FEATURES.push(moodDecayFeature);
 import { animalMoodFeature } from './animal-mood-feature.js?v=g335-3'; FEATURES.push(animalMoodFeature);
 import { butlerFeature } from './butler-feature.js?v=butler-feature-51'; FEATURES.push(butlerFeature);
+import { mailCourierFeature } from './mail-courier-feature.js?v=mailnpc-1'; FEATURES.push(mailCourierFeature);
 import { pouchFeature } from './elemental-pouch-feature.js?v=g335-2'; FEATURES.push(pouchFeature);
 import { bagsFeature } from './bags-feature.js?v=g359-1'; FEATURES.push(bagsFeature);
 import { hiSignsFeature } from './hi-signs-feature.js?v=hi-signs-48'; FEATURES.push(hiSignsFeature);

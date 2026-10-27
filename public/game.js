@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-15';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-191';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-192';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -429,7 +429,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=player-save-21';
+} from './js/player-save.js?v=player-save-22';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -455,7 +455,7 @@ import {
   seedMailbox,
   sendMail,
   unreadMailCount,
-} from './js/mailbox.js?v=homes-mail-3';
+} from './js/mailbox.js?v=homes-mail-4';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,

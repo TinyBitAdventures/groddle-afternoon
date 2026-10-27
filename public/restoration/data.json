@@ -943,11 +943,13 @@
    "group": "home",
    "name": "Mail",
    "status": "source",
-   "blurb": "Mailboxes, postage, parcels and replies.",
+   "blurb": "Mailboxes, postage, parcels and replies. A letter with an item comes by AFLC Frog, and the Mail Dispatcher outside your World Gate sends parcels.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
-    "public/js/mailbox.js"
+    "public/js/mailbox.js",
+    "public/js/mail-courier.js",
+    "public/js/features/mail-courier-feature.js"
    ],
    "shot": null,
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=mail&practice=1"
@@ -2590,9 +2592,14 @@
   ]
  },
  "git": {
-  "commits": 602,
+  "commits": 603,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "Two caterpillar coats, a carnival belt and a looser glitchfashion shirt join the wardrobe"
+   },
    {
     "date": "2026-10-27",
     "kind": "improve",
@@ -2707,14 +2714,9 @@
     "date": "2026-10-27",
     "kind": "fix",
     "text": "Esc closes Buddies, House Keys, Groups, Auctions and the bug report when opened from the Menu"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "In multiplayer a Party Pack or ATM currants given back after a restart reach your pack once"
    }
   ]
  },
- "tests": 357,
+ "tests": 358,
  "generatedAt": "2026-10-27"
 }

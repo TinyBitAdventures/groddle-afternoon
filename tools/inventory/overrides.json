@@ -1757,5 +1757,15 @@
   "status": "unbuilt_original",
   "reason": "greyscale (color_1) twin of bracelet_B010; same as it: no GSJS bracelet slot, side container never placed",
   "register": "G360"
+ },
+ "npc:npc_yoga_frog": {
+  "status": "source",
+  "reason": "the AFLC Frog brings express mail (a letter with an item, to_mailbox false: main.js 6677/6716, inc_mail.js 1583): the Special delivery prompt, fall, followPC, its lines, ramblings and epiphanies, hand-over, yoga and leave (npc_yoga_frog.js), and it collects the Mail Dispatcher's parcels (startPickup/doPickup); js/mail-courier.js + js/features/mail-courier-feature.js spawnCourier/spawnPickup; the red auction frog is not used (auction deliveries are ledger letters, G333)",
+  "register": "G121"
+ },
+ "npc:npc_mail_dispatcher": {
+  "status": "reimagined",
+  "reason": "no archived street holds one (inc_upgrades.js 344 rebuilt it with npc_mailbox on player-owned lot and quarter streets); placed on the home street outside the World Gate. Send mail, interact/cancel and the doParcel run (600 ms, 1 s, frog pickup, package_sent 1 s) are the source's; GSJS never calls sendParcel, here an item letter sent from it does (js/features/mail-courier-feature.js)",
+  "register": "G121"
  }
 }
