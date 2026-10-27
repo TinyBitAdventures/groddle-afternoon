@@ -106,9 +106,9 @@ describe('G62 learn times and discounts', () => {
     assert.equal(betterLearningDiscount(['betterlearning_2', 'betterlearning_3']), 0, 'a gap holds no rank');
   });
 
-  it('learning each rank after the one before takes the 2011 time (Ziggyny 2011-10-05)', () => {
-    // 10 min, 176.4 min, 11.4 h, 33.12 h, 4.4 days
-    const quoted = [600, 176.4 * 60, 11.4 * 3600, 33.12 * 3600, 4.4 * 86400].map(Math.round);
+  it('learning each rank after the one before takes a tenth of the 2011 time, the late game\'s 10x study rate (Austin 2026-10-27)', () => {
+    // 2011 (Ziggyny 2011-10-05): 10 min, 176.4 min, 11.4 h, 33.12 h, 4.4 days; now a tenth of each
+    const quoted = [600, 176.4 * 60, 11.4 * 3600, 33.12 * 3600, 4.4 * 86400].map((s) => Math.round(s / 10));
     const state = createSkillState();
     // Ten other skills known: well under the brain capacity of 20.
     for (const id of ['mining_1', 'refining_1', 'tinkering_1', 'ezcooking_1', 'gardening_1', 'animalkinship_1', 'soil_appreciation_1', 'light_green_thumb_1', 'meditativearts_1', 'teleportation_1']) grantSkill(state, id, true);
@@ -118,7 +118,7 @@ describe('G62 learn times and discounts', () => {
       const run = startSkillStudy(state, id, ctxFor(state, { unlockedAchievements: badges }), now);
       assert.equal(run.ok, true, `${id} ${run.reason}`);
       assert.equal(run.durationSeconds, quoted[i], id);
-      assert.equal(run.durationSeconds, Math.round(BETTER_LEARNING_BASE_SECONDS[i + 1] * (1 - (BETTER_LEARNING_DISCOUNTS[i] || 0))));
+      assert.equal(run.durationSeconds, Math.round((BETTER_LEARNING_BASE_SECONDS[i + 1] / 10) * (1 - (BETTER_LEARNING_DISCOUNTS[i] || 0))));
       now += run.durationSeconds * 1000;
       assert.deepEqual(tickSkillStudy(state, now).completed.map((row) => row.classTsid), [id]);
     });

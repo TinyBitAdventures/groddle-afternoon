@@ -36,8 +36,13 @@
  * before it (176.4 min = 3 h x 0.98, 11.4 h = 12 h x 0.95, 33.12 h = 36 h x
  * 0.92, 4.4 d = 5 d x 0.88). So the discount was on the skill's cost in
  * study time (point_cost turned into seconds, skills_points_to_seconds), and
- * the base costs below are those round numbers at 10 points a second
- * (config_prod.js:53). A player with the rank before sees the quoted time.
+ * the base costs below are those round numbers in 2011 study seconds.
+ * 2011 studied about 1 point a second; the late game studies 10
+ * (config_prod.js:53 skill_points_per_second), ten times faster. Austin
+ * (2026-10-27) kept the 2011 proportions: each rank costs its 2011 seconds in
+ * points, so at the late rate it takes a tenth of the quoted time (Better
+ * Learning V: 4.4 days then, about 10.6 hours now), in step with the rest of
+ * the skill tree.
  *
  * Reimagined (nothing survives, or Austin's call):
  *  - No skill limit. The 2011 cap and its 3% per skill over it are not back:
@@ -79,7 +84,8 @@ export const BETTER_LEARNING_2011_CAPS = Object.freeze({ 0: 20, 1: 21, 2: 24, 3:
 /** Base study seconds per rank (the quoted times before the rank-before's discount). */
 export const BETTER_LEARNING_BASE_SECONDS = Object.freeze({ 1: 600, 2: 10800, 3: 43200, 4: 129600, 5: 432000 });
 
-const POINTS_PER_SECOND = 10; // config_prod.js:53 skill_points_per_second
+/** 2011 study points per second; the late game's 10 (config_prod.js:53) makes every time a tenth. */
+export const BETTER_LEARNING_2011_POINTS_PER_SECOND = 1;
 
 const DESCRIPTIONS = Object.freeze({
   1: 'Learning how to learn. Better Learning I takes 2% off the time every skill you learn after it takes.',
@@ -113,7 +119,7 @@ function skillDef(level) {
     level,
     description: DESCRIPTIONS[level],
     learned: LEARNED[level],
-    pointCost: BETTER_LEARNING_BASE_SECONDS[level] * POINTS_PER_SECOND,
+    pointCost: BETTER_LEARNING_BASE_SECONDS[level] * BETTER_LEARNING_2011_POINTS_PER_SECOND,
     categoryId: 19,
     requiresLevel: 0,
     questId: QUESTS[level] || null,

@@ -270,7 +270,7 @@ export const CHECKLIST = Object.freeze([
     blurb: 'All 105 skills to learn, with the real effects where their systems exist.',
     evidence: ['public/js/skill-tree.js', 'public/js/skills.js'] },
   { id: 'better-learning', group: 'late', name: 'Better Learning', status: 'reimagined',
-    blurb: 'Better Learning I to V, skills from 2011 that the late game retired, are back with their 2011 learn times (10 minutes up to 4.4 days): each rank cuts the time of every skill you learn after it by 2, 5, 8, 12 and then 20%, the third needs an Emblem of Lem, and learning them opens their favor quests and the street project work that asks for them. In 2011 they also raised a 20-skill limit. That limit is not here, the late game’s Brain Capacity cards stay, so that half of them is reimagined.',
+    blurb: 'Better Learning I to V, skills from 2011 that the late game retired, are back with their 2011 learn times in proportion (1 minute up to about 10.6 hours at the late game’s study speed): each rank cuts the time of every skill you learn after it by 2, 5, 8, 12 and then 20%, the third needs an Emblem of Lem, and learning them opens their favor quests and the street project work that asks for them. In 2011 they also raised a 20-skill limit. That limit is not here, the late game’s Brain Capacity cards stay, so that half of them is reimagined.',
     evidence: ['public/js/better-learning.js', 'tests/g62-better-learning.test.js'] },
   { id: 'meditation', group: 'late', name: 'Meditation and teleportation', status: 'source',
     blurb: 'Focusing Orb meditation, levitation, teleport points and scripts.',
