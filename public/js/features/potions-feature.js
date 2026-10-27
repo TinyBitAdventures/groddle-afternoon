@@ -54,7 +54,7 @@ import { quoinDailyLimitFor } from '../quoins.js';
 import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-4';
 import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js';
 import { isPoisoned } from '../tree-poison.js';
-import { furnitureSize } from '../home-decor.js?v=home-decor-5';
+import { furnitureSize } from '../home-decor.js?v=home-decor-6';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js';
 import { POTION_ART } from '../potion-art.js?v=g149-1';
 import { playPoofIn, playSheetOverlay } from '../overlay-art.js?v=g311-1';
@@ -98,7 +98,7 @@ import {
 } from '../potions.js?v=g149-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { patchesFeature } from './patches-feature.js?v=patches-15';
-import { homesFeature } from './homes-feature.js?v=homes-51';
+import { homesFeature } from './homes-feature.js?v=homes-52';
 import { streetTreeIndex } from './tree-death-feature.js?v=tree-death-18';
 import { questRoomConverse } from './quest-instances-feature.js?v=qi-17';
 
@@ -655,8 +655,8 @@ function syncRugs(engine) {
   const { PIXI } = engine;
   if (!PIXI?.Sprite) return;
   for (const row of rugs) {
-    const { w, h } = furnitureSize(row.classTsid);
-    // The Rug is drawn by the house (homes-feature); this is its click box.
+    const { w, h } = furnitureSize(row.classTsid, row.upgradeId);
+    // The Rug is drawn by the house (homes-feature); this is its click box (an upgraded rug's own size, G358).
     const spr = new PIXI.Sprite(PIXI.Texture.EMPTY);
     spr.anchor.set(0.5, 1);
     spr.x = row.x;

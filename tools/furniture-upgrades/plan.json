@@ -1,0 +1,1697 @@
+{
+ "bag_furniture_cabinet/304": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_cabinet/bag_furniture_cabinet_onyx_black_cabinet.swf"
+ },
+ "bag_furniture_cabinet/305": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_cabinet/bag_furniture_cabinet_wine_cabinet.swf"
+ },
+ "bag_furniture_cabinet/306": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_cabinet/bag_furniture_cabinet_violet_voyage_cabinet.swf"
+ },
+ "bag_furniture_cabinet/307": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_cabinet/bag_furniture_cabinet_spaceship_locker.swf"
+ },
+ "bag_furniture_cabinet/327": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_cabinet/bag_furniture_cabinet_firebog_cabinet.swf"
+ },
+ "bag_furniture_cabinet/352": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_cabinet/bag_furniture_cabinet_simply_white_cabinet.swf"
+ },
+ "bag_furniture_cabinet/396": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_cabinet/bag_furniture_cabinet_powdered_blue_cabinet.swf"
+ },
+ "bag_furniture_cabinet/514": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_cabinet/bag_furniture_cabinet_cherry_crabato_can_cabinet.swf"
+ },
+ "bag_furniture_cabinet/626": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_cabinet/bag_furniture_cabinet_uralia_cabinet.swf"
+ },
+ "bag_furniture_cabinet/657": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_cabinet/bag_furniture_cabinet_hell_cabinet.swf"
+ },
+ "bag_furniture_cabinet/669": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_cabinet/bag_furniture_cabinet_rook__cabinet.swf"
+ },
+ "bag_furniture_cabinet/689": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_cabinet/bag_furniture_cabinet_tetromino_cabinet.swf"
+ },
+ "bag_furniture_cabinet/702": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_cabinet/bag_furniture_cabinet_dark_tetromino_cabinet.swf"
+ },
+ "bag_furniture_sdb/214": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_granite_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/215": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_green_apple_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/216": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_white_swedish-y_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/217": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_mahogany_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/218": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_retro_sci-fi_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/231": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_black_and_white_stripes.swf"
+ },
+ "bag_furniture_sdb/232": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_gold_plated_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/233": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_80s_kids_show_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/234": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_retrofitted_crt_monitor_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/261": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_simply_red_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/263": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_simply_pink_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/264": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_simply_green_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/265": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_simply_blue_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/266": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_simply_black_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/267": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_simply_white_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/268": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_mahogany_with_maple_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/441": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_firebog_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/442": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_platinum_plated_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/508": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_liquid_chartreuse_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/509": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_liquid_orange_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/510": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_liquid_purple_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/544": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_crab_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/545": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_snocone_vendor_storage_display__box.swf"
+ },
+ "bag_furniture_sdb/546": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_glass_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/547": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_rock_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/548": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_sci-fi_monitor_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/549": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_firebog_storage_display_jar.swf"
+ },
+ "bag_furniture_sdb/550": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_img_quoin_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/551": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_ur_cubimal_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/552": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_transparent_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/554": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_golden_emblem_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/555": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_cubimal_chocolate_display_box.swf"
+ },
+ "bag_furniture_sdb/556": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_cubimal_green_display_box.swf"
+ },
+ "bag_furniture_sdb/557": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_cubimal_orange_display_box.swf"
+ },
+ "bag_furniture_sdb/558": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_cubimal_pink_display_box.swf"
+ },
+ "bag_furniture_sdb/562": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_black_glass_display_box.swf"
+ },
+ "bag_furniture_sdb/563": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_blue_glass_display_box.swf"
+ },
+ "bag_furniture_sdb/564": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_blue_light_glass_display_box.swf"
+ },
+ "bag_furniture_sdb/565": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_hell_rock_display_box.swf"
+ },
+ "bag_furniture_sdb/566": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb__ix_house_display_box.swf"
+ },
+ "bag_furniture_sdb/567": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_ix_rock_display_box.swf"
+ },
+ "bag_furniture_sdb/568": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_uralia_root_display_box.swf"
+ },
+ "bag_furniture_sdb/569": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_purple_cubimal_display_box_.swf"
+ },
+ "bag_furniture_sdb/570": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_cubimal_blue_display_box.swf"
+ },
+ "bag_furniture_sdb/571": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_cubimal_light_green_display_box.swf"
+ },
+ "bag_furniture_sdb/572": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_bronze_emblem_storage_display_box.swf"
+ },
+ "bag_furniture_sdb/573": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_sdb/bag_furniture_sdb_eye_of_emblem_storage_display_box.swf"
+ },
+ "bag_furniture_smallcabinet/303": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_smallcabinet/bag_furniture_smallcabinet_danish_modern_small_cabinet.swf"
+ },
+ "bag_furniture_smallcabinet/308": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_smallcabinet/bag_furniture_smallcabinet_spaceship_small_storage.swf"
+ },
+ "bag_furniture_smallcabinet/325": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_smallcabinet/bag_furniture_smallcabinet_dark_wood_small_cabinet.swf"
+ },
+ "bag_furniture_smallcabinet/326": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_smallcabinet/bag_furniture_smallcabinet_onxy_black_small_cabinet.swf"
+ },
+ "bag_furniture_smallcabinet/348": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_smallcabinet/bag_furniture_smallcabinet_pig_treasure_chest.swf"
+ },
+ "bag_furniture_smallcabinet/349": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_smallcabinet/bag_furniture_smallcabinet_vintage_trunk.swf"
+ },
+ "bag_furniture_smallcabinet/350": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_smallcabinet/bag_furniture_smallcabinet_simply_white_small_cabinet.swf"
+ },
+ "bag_furniture_smallcabinet/397": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_smallcabinet/bag_furniture_smallcabinet_powdered_blue_small_cabinet.swf"
+ },
+ "bag_furniture_smallcabinet/439": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_smallcabinet/bag_furniture_smallcabinet_small_root_caninet_.swf"
+ },
+ "bag_furniture_smallcabinet/627": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_smallcabinet/bag_furniture_smallcabinet_uralia_small_cabinet.swf"
+ },
+ "bag_furniture_wallcabinet/298": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_wallcabinet/bag_furniture_wallcabinet_wall_safe.swf"
+ },
+ "bag_furniture_wallcabinet/300": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_wallcabinet/bag_furniture_wallcabinet_dark_wood_wall_cabinet.swf"
+ },
+ "bag_furniture_wallcabinet/309": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_wallcabinet/bag_furniture_wallcabinet_spaceship_wall_locker.swf"
+ },
+ "bag_furniture_wallcabinet/324": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_wallcabinet/bag_furniture_wallcabinet_onxy_black_wall_cabinet.swf"
+ },
+ "bag_furniture_wallcabinet/347": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_wallcabinet/bag_furniture_wallcabinet_firebog_wall_cabinet.swf"
+ },
+ "bag_furniture_wallcabinet/351": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_wallcabinet/bag_furniture_wallcabinet_simply_white_wall_cabinet.swf"
+ },
+ "bag_furniture_wallcabinet/398": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_wallcabinet/bag_furniture_wallcabinet_powdered_blue_wall_cabinet.swf"
+ },
+ "bag_furniture_wallcabinet/628": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/bag_furniture_wallcabinet/bag_furniture_wallcabinet_uralia_wall_cabinet.swf"
+ },
+ "furniture_armchair/2": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_orange_hand_armchair.swf"
+ },
+ "furniture_armchair/6": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_modern_box_armchair.swf"
+ },
+ "furniture_armchair/9": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_armchair_pimpred.swf"
+ },
+ "furniture_armchair/10": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_armchair_pinkseashell.swf"
+ },
+ "furniture_armchair/42": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_orange_round_armchair.swf"
+ },
+ "furniture_armchair/46": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_black_leather_lazy_armchair.swf"
+ },
+ "furniture_armchair/47": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_wooden_armchair_with_dot_cushions.swf"
+ },
+ "furniture_armchair/223": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_black_hand_armchair.swf"
+ },
+ "furniture_armchair/224": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_white_hand_armchair.swf"
+ },
+ "furniture_armchair/225": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_orange_modern_box_chair.swf"
+ },
+ "furniture_armchair/226": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_blue_modern_box_chair.swf"
+ },
+ "furniture_armchair/227": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_royal_pink_armchair.swf"
+ },
+ "furniture_armchair/228": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_dark_green_hand_armchair.swf"
+ },
+ "furniture_armchair/240": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_purple_journey_beanbag.swf"
+ },
+ "furniture_armchair/241": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_blue_beanbag.swf"
+ },
+ "furniture_armchair/482": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_slimy_in_blue_armchair.swf"
+ },
+ "furniture_armchair/486": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_powdered_blue_armchair.swf"
+ },
+ "furniture_armchair/506": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_baby_back_bbq_ribs_armchair.swf"
+ },
+ "furniture_armchair/516": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_coconut_armchair.swf"
+ },
+ "furniture_armchair/517": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_banana_armchair.swf"
+ },
+ "furniture_armchair/586": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_pink_highback_armchair.swf"
+ },
+ "furniture_armchair/587": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_wine_highback_chair_.swf"
+ },
+ "furniture_armchair/588": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_armchair/furniture_armchair_white_highback_armchair.swf"
+ },
+ "furniture_bed/3": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_.swf"
+ },
+ "furniture_bed/18": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_bed_woodwithstripedsheets.swf"
+ },
+ "furniture_bed/19": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_bed_canopywithtransparentcurtains.swf"
+ },
+ "furniture_bed/87": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_log_cabin_bed.swf"
+ },
+ "furniture_bed/105": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_yeti_bed.swf"
+ },
+ "furniture_bed/106": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_rook_nest_bed.swf"
+ },
+ "furniture_bed/160": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_clamshell_bed.swf"
+ },
+ "furniture_bed/195": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_baroque_pink_bed.swf"
+ },
+ "furniture_bed/272": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_sloth_bed.swf"
+ },
+ "furniture_bed/281": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_fish_bed.swf"
+ },
+ "furniture_bed/461": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_blue_colorful_striped_bed.swf"
+ },
+ "furniture_bed/462": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_green_colorful_striped_bed.swf"
+ },
+ "furniture_bed/463": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_gentlemen_red_quilted_bed.swf"
+ },
+ "furniture_bed/464": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_pearly_white_quilted_bed.swf"
+ },
+ "furniture_bed/465": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_red_and_blue_platform_bed.swf"
+ },
+ "furniture_bed/466": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_sandwich_bed.swf"
+ },
+ "furniture_bed/467": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_slimy_in_red_bed.swf"
+ },
+ "furniture_bed/507": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_steak_bed.swf"
+ },
+ "furniture_bed/512": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_bed_of_buttermilk_pancakes.swf"
+ },
+ "furniture_bed/523": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_pineapple_bed.swf"
+ },
+ "furniture_bed/654": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_hell_bed.swf"
+ },
+ "furniture_bed/671": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_rook_bed.swf"
+ },
+ "furniture_bed/691": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_glitch_game_console_bed.swf"
+ },
+ "furniture_bed/706": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bed/furniture_bed_green_glitch_game_console_bed.swf"
+ },
+ "furniture_bench/29": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bench/furniture_bench_bench_darkredwood_with_creamcushions.swf"
+ },
+ "furniture_bench/30": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bench/furniture_bench_bench_whitemodernbox.swf"
+ },
+ "furniture_bench/124": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bench/furniture_bench_sausage_snake_bench.swf"
+ },
+ "furniture_bench/161": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bench/furniture_bench_whale_bench.swf"
+ },
+ "furniture_bench/277": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bench/furniture_bench_violet_voyage_bench.swf"
+ },
+ "furniture_bench/334": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bench/furniture_bench_firebog_green_bench.swf"
+ },
+ "furniture_bench/361": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bench/furniture_bench_gentlemen_red_quilted_bench.swf"
+ },
+ "furniture_bench/364": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bench/furniture_bench_pearly_white_quilted_bench.swf"
+ },
+ "furniture_bench/515": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bench/furniture_bench_hot_dog_bench.swf"
+ },
+ "furniture_bench/524": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bench/furniture_bench_pea_bench.swf"
+ },
+ "furniture_bench/580": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bench/furniture_bench_theater_chair_red.swf"
+ },
+ "furniture_bench/581": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bench/furniture_bench_theater_chair_classic.swf"
+ },
+ "furniture_bench/629": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bench/furniture_bench_uralia_bench.swf"
+ },
+ "furniture_ceilingdeco/154": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_fish_mobile.swf"
+ },
+ "furniture_ceilingdeco/189": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_wind_chimes.swf"
+ },
+ "furniture_ceilingdeco/190": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_disco_ball.swf"
+ },
+ "furniture_ceilingdeco/379": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_firebog_hanging_charms.swf"
+ },
+ "furniture_ceilingdeco/452": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_gwendolyn_teru_teru_bozu_doll.swf"
+ },
+ "furniture_ceilingdeco/453": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_hanging_jars_of_flowers.swf"
+ },
+ "furniture_ceilingdeco/454": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_origami_cranes.swf"
+ },
+ "furniture_ceilingdeco/455": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_hanging_crystal_pendants.swf"
+ },
+ "furniture_ceilingdeco/456": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_hanging_rook.swf"
+ },
+ "furniture_ceilingdeco/457": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_rook_skeleton.swf"
+ },
+ "furniture_ceilingdeco/458": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_streamer_of_colorful_triangular_flags.swf"
+ },
+ "furniture_ceilingdeco/468": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_bird_cage.swf"
+ },
+ "furniture_ceilingdeco/469": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_hanging_candy.swf"
+ },
+ "furniture_ceilingdeco/470": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_rock_pig_hanging_decor.swf"
+ },
+ "furniture_ceilingdeco/471": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_flying_pig.swf"
+ },
+ "furniture_ceilingdeco/472": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_hanging_yeti.swf"
+ },
+ "furniture_ceilingdeco/473": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_giant_flag_01.swf"
+ },
+ "furniture_ceilingdeco/474": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_giant_flag_02.swf"
+ },
+ "furniture_ceilingdeco/475": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_giant_flag_03.swf"
+ },
+ "furniture_ceilingdeco/476": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_giant_flag_04.swf"
+ },
+ "furniture_ceilingdeco/532": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_pepper_hanging_decor.swf"
+ },
+ "furniture_ceilingdeco/602": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_chef_pig_eatery_sign.swf"
+ },
+ "furniture_ceilingdeco/603": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_tool_shop_sign.swf"
+ },
+ "furniture_ceilingdeco/604": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_cafe_sign.swf"
+ },
+ "furniture_ceilingdeco/613": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_market_sign.swf"
+ },
+ "furniture_ceilingdeco/648": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_hanging_uralia_vines.swf"
+ },
+ "furniture_ceilingdeco/653": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilingdeco/furniture_ceilingdeco_hell_hanging_decor.swf"
+ },
+ "furniture_ceilinglamp/84": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_fluorescent_ceiling_lamp.swf"
+ },
+ "furniture_ceilinglamp/85": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_large_glowing_stars_ceiling_lamp.swf"
+ },
+ "furniture_ceilinglamp/86": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_octopus_chandelier.swf"
+ },
+ "furniture_ceilinglamp/92": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_baroque_ceiling_lamp.swf"
+ },
+ "furniture_ceilinglamp/153": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_industrial_space_ship_ceiling_light.swf"
+ },
+ "furniture_ceilinglamp/172": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_jellyfish_ceiling_lamp.swf"
+ },
+ "furniture_ceilinglamp/276": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_smiling_cat_chandelier.swf"
+ },
+ "furniture_ceilinglamp/357": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_firebog_lantern_ceiling_lamp.swf"
+ },
+ "furniture_ceilinglamp/424": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_firefly_jar_ceiling_lamp.swf"
+ },
+ "furniture_ceilinglamp/491": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_powdered_blue_ceiling_lamp.swf"
+ },
+ "furniture_ceilinglamp/530": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_pumpkin_lamp.swf"
+ },
+ "furniture_ceilinglamp/536": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_meat_drumstick_ceiling_light.swf"
+ },
+ "furniture_ceilinglamp/543": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_ceiling_spotlight.swf"
+ },
+ "furniture_ceilinglamp/576": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_small_ceiling_spotlight.swf"
+ },
+ "furniture_ceilinglamp/578": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_bronze_ceiling_lamp.swf"
+ },
+ "furniture_ceilinglamp/593": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_ceiling_potlight.swf"
+ },
+ "furniture_ceilinglamp/594": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_long_ceiling_lamp.swf"
+ },
+ "furniture_ceilinglamp/595": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_discrete_ceiling_lamp.swf"
+ },
+ "furniture_ceilinglamp/596": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_ceiling_stage_light.swf"
+ },
+ "furniture_ceilinglamp/637": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_uralia_tree_ceiling_lamp.swf"
+ },
+ "furniture_ceilinglamp/661": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_hell_ceiling_lamp.swf"
+ },
+ "furniture_ceilinglamp/696": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_ceilinglamp/furniture_ceilinglamp_illuminated_uralia_ghosts.swf"
+ },
+ "furniture_chair/1": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_brass_metal_chair.swf"
+ },
+ "furniture_chair/5": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_cactus_chiair.swf"
+ },
+ "furniture_chair/11": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_chair_brass_with_whitecushion.swf"
+ },
+ "furniture_chair/12": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_chair_coppermetal.swf"
+ },
+ "furniture_chair/13": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_chair_modpatterncushion.swf"
+ },
+ "furniture_chair/14": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_chair_steelmetal.swf"
+ },
+ "furniture_chair/15": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_chair_wood_with_whitecushion.swf"
+ },
+ "furniture_chair/27": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_hart_bistro_chair.swf"
+ },
+ "furniture_chair/39": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_cane_chair.swf"
+ },
+ "furniture_chair/41": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_blue_leather_dining_chair.swf"
+ },
+ "furniture_chair/44": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_chair_blackleatheroffice.swf"
+ },
+ "furniture_chair/45": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_chair_blueplasticoffice.swf"
+ },
+ "furniture_chair/103": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_classic_green_chair.swf"
+ },
+ "furniture_chair/104": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_metal_coffee_chair.swf"
+ },
+ "furniture_chair/110": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_rook_nest_chair.swf"
+ },
+ "furniture_chair/112": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_crab_chair.swf"
+ },
+ "furniture_chair/480": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_slimy_in_purple_chair.swf"
+ },
+ "furniture_chair/662": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_chair/furniture_chair_hell_chair.swf"
+ },
+ "furniture_coffeetable/54": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_coffeetable/furniture_coffeetable_log_cabin_coffee_table.swf"
+ },
+ "furniture_coffeetable/61": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_coffeetable/furniture_coffeetable_glass_coffee_table.swf"
+ },
+ "furniture_coffeetable/107": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_coffeetable/furniture_coffeetable_rook_nest_coffee_table_.swf"
+ },
+ "furniture_coffeetable/194": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_coffeetable/furniture_coffeetable_fish_tank_coffee_table.swf"
+ },
+ "furniture_coffeetable/244": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_coffeetable/furniture_coffeetable_danish_modern_coffee_table.swf"
+ },
+ "furniture_coffeetable/280": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_coffeetable/furniture_coffeetable_violet_voyage_coffee_table.swf"
+ },
+ "furniture_coffeetable/362": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_coffeetable/furniture_coffeetable_black_penthouse_coffee_table.swf"
+ },
+ "furniture_coffeetable/437": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_coffeetable/furniture_coffeetable_root_coffee_table.swf"
+ },
+ "furniture_coffeetable/438": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_coffeetable/furniture_coffeetable_rock_coffee_table_.swf"
+ },
+ "furniture_coffeetable/484": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_coffeetable/furniture_coffeetable_slimy_in_brown_coffee_table.swf"
+ },
+ "furniture_coffeetable/521": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_coffeetable/furniture_coffeetable_rhubarb_coffee_table.swf"
+ },
+ "furniture_coffeetable/674": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_coffeetable/furniture_coffeetable_rook_coffee_table.swf"
+ },
+ "furniture_coffeetable/698": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_coffeetable/furniture_coffeetable_snobunny_coffee_table.swf"
+ },
+ "furniture_counter/78": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_black_and_white_counter.swf"
+ },
+ "furniture_counter/80": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_granite_top_counter.swf"
+ },
+ "furniture_counter/82": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_wood_top_counter.swf"
+ },
+ "furniture_counter/253": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_billard_green_quilted_counter.swf"
+ },
+ "furniture_counter/254": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_gentlemen_red_quilted_counter.swf"
+ },
+ "furniture_counter/255": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_penthouse_purple_quilred_counter.swf"
+ },
+ "furniture_counter/256": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_granite_counter.swf"
+ },
+ "furniture_counter/257": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_congo_counter.swf"
+ },
+ "furniture_counter/258": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_lab_counter.swf"
+ },
+ "furniture_counter/284": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_circular_counter.swf"
+ },
+ "furniture_counter/285": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_icy_blue_counter.swf"
+ },
+ "furniture_counter/408": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_firebog_counter.swf"
+ },
+ "furniture_counter/477": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_slimy_in_blue_counter.swf"
+ },
+ "furniture_counter/488": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_powdered_blue_counter.swf"
+ },
+ "furniture_counter/518": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_canned_ham_counter.swf"
+ },
+ "furniture_counter/539": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_glass_wooden_counter.swf"
+ },
+ "furniture_counter/540": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_white_polished_counter.swf"
+ },
+ "furniture_counter/541": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_glass_chrome_counter.swf"
+ },
+ "furniture_counter/579": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_sno_cone_counter.swf"
+ },
+ "furniture_counter/589": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_white_swedish_counter.swf"
+ },
+ "furniture_counter/590": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_birch_veneer_swedish_counter.swf"
+ },
+ "furniture_counter/591": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_show_stage_counter.swf"
+ },
+ "furniture_counter/641": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_uralia_counter.swf"
+ },
+ "furniture_counter/650": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_hell_counter.swf"
+ },
+ "furniture_counter/676": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_8bit_counter.swf"
+ },
+ "furniture_counter/704": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_counter/furniture_counter_pink_8bit_counter.swf"
+ },
+ "furniture_desk/68": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_desk/furniture_desk_student_glass_desk.swf"
+ },
+ "furniture_desk/69": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_desk/furniture_desk_rolltop_desk.swf"
+ },
+ "furniture_desk/151": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_desk/furniture_desk_spaceship_desk.swf"
+ },
+ "furniture_desk/238": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_desk/furniture_desk_rube_desk.swf"
+ },
+ "furniture_desk/478": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_desk/furniture_desk_slimy_in_green_desk.swf"
+ },
+ "furniture_desk/660": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_desk/furniture_desk_hell_desk.swf"
+ },
+ "furniture_desk/681": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_desk/furniture_desk_8bit_mushroom_desk.swf"
+ },
+ "furniture_desk/700": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_desk/furniture_desk_pink_8bit_mushroom_desk.swf"
+ },
+ "furniture_fireplace/269": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_fireplace/furniture_fireplace_fireplace.swf"
+ },
+ "furniture_fireplace/395": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_fireplace/furniture_fireplace_firebog_fireplace.swf"
+ },
+ "furniture_fireplace/413": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_fireplace/furniture_fireplace_rocky_fireplace.swf"
+ },
+ "furniture_fireplace/713": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_fireplace/furniture_fireplace_wood_stove.swf"
+ },
+ "furniture_fireplace/714": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_fireplace/furniture_fireplace_steel_fireplace.swf"
+ },
+ "furniture_fireplace/715": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_fireplace/furniture_fireplace_uralia_fireplace.swf"
+ },
+ "furniture_fireplace/716": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_fireplace/furniture_fireplace_rustic_oven.swf"
+ },
+ "furniture_fireplace/717": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_fireplace/furniture_fireplace_modern_fireplace.swf"
+ },
+ "furniture_fireplace/719": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_fireplace/furniture_fireplace_hell_fireplace.swf"
+ },
+ "furniture_fireplace/720": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_fireplace/furniture_fireplace_camp_fire_pit.swf"
+ },
+ "furniture_fireplace/721": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_fireplace/furniture_fireplace_foresty_fireplace.swf"
+ },
+ "furniture_floorlamp/83": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_red_fringe_floor_lamp.swf"
+ },
+ "furniture_floorlamp/91": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_japanese_floor_lamp.swf"
+ },
+ "furniture_floorlamp/114": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_rook_nest_floor_lamp.swf"
+ },
+ "furniture_floorlamp/116": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_dinosaur_lamp.swf"
+ },
+ "furniture_floorlamp/155": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_angler_fish_floor_lamp.swf"
+ },
+ "furniture_floorlamp/278": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_violet_voyage_floor_lamp.swf"
+ },
+ "furniture_floorlamp/355": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_firefly_jar_floor_lamp.swf"
+ },
+ "furniture_floorlamp/422": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_tomato_floor_lamp.swf"
+ },
+ "furniture_floorlamp/430": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_mushroom__lamp.swf"
+ },
+ "furniture_floorlamp/483": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_slimy_rainbow_floor_lamp.swf"
+ },
+ "furniture_floorlamp/487": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_powdered_blue_floor_lamp.swf"
+ },
+ "furniture_floorlamp/527": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_corn_lamp.swf"
+ },
+ "furniture_floorlamp/535": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_meat_drumstick_floor_lamp.swf"
+ },
+ "furniture_floorlamp/597": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_standing_stage_spotlight.swf"
+ },
+ "furniture_floorlamp/598": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_stage_floor_spotlight.swf"
+ },
+ "furniture_floorlamp/638": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_crimson_uralia_tree_floor_lamp.swf"
+ },
+ "furniture_floorlamp/639": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_azure_uralia_tree_lamp.swf"
+ },
+ "furniture_floorlamp/659": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_floorlamp/furniture_floorlamp_hell_floor_lamp.swf"
+ },
+ "furniture_loveseat/26": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_loveseat/furniture_loveseat_loveseat_blackleather.swf"
+ },
+ "furniture_loveseat/28": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_loveseat/furniture_loveseat_loveseat_wickerwithstripedcushions.swf"
+ },
+ "furniture_loveseat/149": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_loveseat/furniture_loveseat_spaceship_love_seat.swf"
+ },
+ "furniture_loveseat/279": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_loveseat/furniture_loveseat_scion_of_purple_loveseat.swf"
+ },
+ "furniture_loveseat/360": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_loveseat/furniture_loveseat_gentlemen_red_quilted_loveseat.swf"
+ },
+ "furniture_loveseat/365": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_loveseat/furniture_loveseat_pearl_white_quilted_loveseat.swf"
+ },
+ "furniture_loveseat/582": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_loveseat/furniture_loveseat_round_brown_loveseat.swf"
+ },
+ "furniture_loveseat/583": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_loveseat/furniture_loveseat_round_black_loveseat.swf"
+ },
+ "furniture_loveseat/584": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_loveseat/furniture_loveseat_club_loveseat_green.swf"
+ },
+ "furniture_loveseat/585": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_loveseat/furniture_loveseat_club_loveseat_gream.swf"
+ },
+ "furniture_loveseat/643": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_loveseat/furniture_loveseat_uralia_tree_grove_loveseat.swf"
+ },
+ "furniture_loveseat/697": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_loveseat/furniture_loveseat_snocone_vendor_loveseat.swf"
+ },
+ "furniture_roomdeco/137": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_smallbackfloordeco/furniture_smallbackfloordeco_alakol_willow_plant.swf"
+ },
+ "furniture_roomdeco/156": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_largebackfloordeco/furniture_largebackfloordeco_venus_de_muufo.swf"
+ },
+ "furniture_roomdeco/171": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_smallbackfloordeco/furniture_smallbackfloordeco_plant_with_seashell.swf"
+ },
+ "furniture_roomdeco/173": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_largefrontfloordeco/furniture_largefrontfloordeco_alph_stander.swf"
+ },
+ "furniture_roomdeco/174": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_largefrontfloordeco/furniture_largefrontfloordeco_cosma_stander.swf"
+ },
+ "furniture_roomdeco/175": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_largefrontfloordeco/furniture_largefrontfloordeco_flower_screen_.swf"
+ },
+ "furniture_roomdeco/176": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_largefrontfloordeco/furniture_largefrontfloordeco_forest_screen.swf"
+ },
+ "furniture_roomdeco/193": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_fish_tank.swf"
+ },
+ "furniture_roomdeco/205": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_fire_bog_screen.swf"
+ },
+ "furniture_roomdeco/206": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_pig_shiva.swf"
+ },
+ "furniture_roomdeco/311": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_pillar.swf"
+ },
+ "furniture_roomdeco/312": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_pyramid.swf"
+ },
+ "furniture_roomdeco/328": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_dried_lizards.swf"
+ },
+ "furniture_roomdeco/330": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_firebog_jars.swf"
+ },
+ "furniture_roomdeco/331": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_firebog_plant.swf"
+ },
+ "furniture_roomdeco/332": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_firebog_vase_of_wood.swf"
+ },
+ "furniture_roomdeco/333": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_firebog_stand_of_wood.swf"
+ },
+ "furniture_roomdeco/402": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_floor_hurdle.swf"
+ },
+ "furniture_roomdeco/435": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_flower_pillor.swf"
+ },
+ "furniture_roomdeco/436": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_mushroom__privacy_screen.swf"
+ },
+ "furniture_roomdeco/459": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_skeleton_of_a_hoggosaurus.swf"
+ },
+ "furniture_roomdeco/494": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_vase_of_buttercup__roses.swf"
+ },
+ "furniture_roomdeco/553": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_wooden_podium.swf"
+ },
+ "furniture_roomdeco/574": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_glass_wooden_podium.swf"
+ },
+ "furniture_roomdeco/575": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_white_podium.swf"
+ },
+ "furniture_roomdeco/619": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_pillar_back.swf"
+ },
+ "furniture_roomdeco/623": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_firebog_cattails.swf"
+ },
+ "furniture_roomdeco/634": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_uralia_tree.swf"
+ },
+ "furniture_roomdeco/640": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_grounded_uralia_creatures.swf"
+ },
+ "furniture_roomdeco/644": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_violet_uralia_ghost.swf"
+ },
+ "furniture_roomdeco/645": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_carrot_uralia_ghost.swf"
+ },
+ "furniture_roomdeco/646": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_cherry_uralia_ghost.swf"
+ },
+ "furniture_roomdeco/647": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_aqua_uralia_ghost.swf"
+ },
+ "furniture_roomdeco/663": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_hell_dead_tree.swf"
+ },
+ "furniture_roomdeco/682": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_turtle_shell_sprout.swf"
+ },
+ "furniture_roomdeco/683": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_warp_pipe_plant_pot.swf"
+ },
+ "furniture_roomdeco/684": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_red_mushroom.swf"
+ },
+ "furniture_roomdeco/685": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_green_mushroom.swf"
+ },
+ "furniture_roomdeco/686": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_barrel.swf"
+ },
+ "furniture_roomdeco/705": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_roomdeco/furniture_roomdeco_green_turtle_shell_sprout.swf"
+ },
+ "furniture_rug/117": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_sunny_side_rug.swf"
+ },
+ "furniture_rug/127": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_dark_brown_concentric_rug.swf"
+ },
+ "furniture_rug/128": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_green_palm_rug.swf"
+ },
+ "furniture_rug/129": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_yeti_fur_rug.swf"
+ },
+ "furniture_rug/130": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_brown_berber_rug.swf"
+ },
+ "furniture_rug/131": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_leopard_skin_rug.swf"
+ },
+ "furniture_rug/132": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_retro_squares_rug.swf"
+ },
+ "furniture_rug/133": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_spotted_deep_purple_rug.swf"
+ },
+ "furniture_rug/134": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_blue_fireworks_rug.swf"
+ },
+ "furniture_rug/135": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_faux_zebra_skin_rug.swf"
+ },
+ "furniture_rug/159": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_starfish_rug.swf"
+ },
+ "furniture_rug/245": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_blue_striped_rug.swf"
+ },
+ "furniture_rug/246": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_red_striped_rug.swf"
+ },
+ "furniture_rug/310": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_floor_crack.swf"
+ },
+ "furniture_rug/353": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_man_silhouette_hole.swf"
+ },
+ "furniture_rug/412": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_rug_of_spikes.swf"
+ },
+ "furniture_rug/416": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_corn_rug.swf"
+ },
+ "furniture_rug/418": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_apple_rug.swf"
+ },
+ "furniture_rug/451": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_pearly_white_and_black_rug.swf"
+ },
+ "furniture_rug/513": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_pepperoni_pizza_rug.swf"
+ },
+ "furniture_rug/678": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_8bit_qurazy_quoin_rug.swf"
+ },
+ "furniture_rug/679": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_yeti_rug.swf"
+ },
+ "furniture_rug/707": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_rug/furniture_rug_currant_quoin_rug.swf"
+ },
+ "furniture_shelf/93": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_basic_black_wall_shelf.swf"
+ },
+ "furniture_shelf/94": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_basic_wood_wall_shelf.swf"
+ },
+ "furniture_shelf/95": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_glass_wall_shelf.swf"
+ },
+ "furniture_shelf/96": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_vintage_black_wall_shelf.swf"
+ },
+ "furniture_shelf/97": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_wooden_wall_shelf.swf"
+ },
+ "furniture_shelf/98": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_small_basic_black_wall_shelf.swf"
+ },
+ "furniture_shelf/99": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_small_basic_wood_wall_shelf.swf"
+ },
+ "furniture_shelf/100": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_small_glass_wall_shelf.swf"
+ },
+ "furniture_shelf/101": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_small_vintage_black_wall_shelf.swf"
+ },
+ "furniture_shelf/102": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_small_wooden_shelf.swf"
+ },
+ "furniture_shelf/123": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_log_cabin_shelf.swf"
+ },
+ "furniture_shelf/148": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_industrial_shelf.swf"
+ },
+ "furniture_shelf/344": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_firebog_shelf.swf"
+ },
+ "furniture_shelf/411": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_slim_firebog_shelf.swf"
+ },
+ "furniture_shelf/426": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_big_oyster_shelf.swf"
+ },
+ "furniture_shelf/427": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_two_layers_oyster_shelf.swf"
+ },
+ "furniture_shelf/489": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_powdered_blue_wall_shelf.swf"
+ },
+ "furniture_shelf/490": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_blue_grey_wall_shelf.swf"
+ },
+ "furniture_shelf/511": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_crispy_bacon_wall_shelf.swf"
+ },
+ "furniture_shelf/533": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_cheese_shelf.swf"
+ },
+ "furniture_shelf/592": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_birch_veneer_swedish-y_shelf.swf"
+ },
+ "furniture_shelf/614": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_white_wall_shelf.swf"
+ },
+ "furniture_shelf/642": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_uralia_wall_shelf.swf"
+ },
+ "furniture_shelf/651": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_hell_self_big.swf"
+ },
+ "furniture_shelf/652": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_hell_self_small.swf"
+ },
+ "furniture_shelf/677": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_8bit_brick_shelf.swf"
+ },
+ "furniture_shelf/703": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_shelf/furniture_shelf_green_8bit_brick_shelf.swf"
+ },
+ "furniture_sidetable/67": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_wood_side_table.swf"
+ },
+ "furniture_sidetable/89": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_log_cabin_side_table.swf"
+ },
+ "furniture_sidetable/90": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_baroque_side_table_black.swf"
+ },
+ "furniture_sidetable/109": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_pig_glass_table.swf"
+ },
+ "furniture_sidetable/113": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_japanese_tea_table.swf"
+ },
+ "furniture_sidetable/115": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_rook_nest_side_table.swf"
+ },
+ "furniture_sidetable/157": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_squid_side_table.swf"
+ },
+ "furniture_sidetable/162": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_shell_side_table.swf"
+ },
+ "furniture_sidetable/199": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_baroque_side_table_pink.swf"
+ },
+ "furniture_sidetable/242": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_danish_modern_side_table.swf"
+ },
+ "furniture_sidetable/409": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_firebog_side_table.swf"
+ },
+ "furniture_sidetable/415": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_carrot_side_table.swf"
+ },
+ "furniture_sidetable/495": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_black_onxy_short_pedestal.swf"
+ },
+ "furniture_sidetable/496": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_ashen_black_branches_pedestal.swf"
+ },
+ "furniture_sidetable/497": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_forest_vines_pedestal.swf"
+ },
+ "furniture_sidetable/498": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_glass_pedestal.swf"
+ },
+ "furniture_sidetable/500": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_granite_top_pedestal.swf"
+ },
+ "furniture_sidetable/501": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_piggy_side_table.swf"
+ },
+ "furniture_sidetable/503": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_swirly_multicolor_pedestal.swf"
+ },
+ "furniture_sidetable/504": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_white_museum_pedestal.swf"
+ },
+ "furniture_sidetable/505": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_mahogany_museum_pedestal.swf"
+ },
+ "furniture_sidetable/519": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_onion_side_table.swf"
+ },
+ "furniture_sidetable/520": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_tomato_side_table.swf"
+ },
+ "furniture_sidetable/537": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_marble_pedestal.swf"
+ },
+ "furniture_sidetable/538": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_dark_swirly_multicolor_pedestal.swf"
+ },
+ "furniture_sidetable/630": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_uralia_pedestal.swf"
+ },
+ "furniture_sidetable/673": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_rook_sidetable.swf"
+ },
+ "furniture_sidetable/693": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_img_quoin_block.swf"
+ },
+ "furniture_sidetable/694": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_currant_quoin_block.swf"
+ },
+ "furniture_sidetable/695": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sidetable/furniture_sidetable_energy_quoin_block.swf"
+ },
+ "furniture_sofa/16": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_sofa_blue_withyellowcushions.swf"
+ },
+ "furniture_sofa/17": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_sofa_brasswithyellowcushion.swf"
+ },
+ "furniture_sofa/158": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_octopus_sofa.swf"
+ },
+ "furniture_sofa/196": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_baroque_sofa_black.swf"
+ },
+ "furniture_sofa/197": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_baroque_pink_sofa.swf"
+ },
+ "furniture_sofa/243": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_danish_modern_sofa.swf"
+ },
+ "furniture_sofa/345": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_firebog_sofa.swf"
+ },
+ "furniture_sofa/359": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_gentlemen_red_quilted_sofa.swf"
+ },
+ "furniture_sofa/366": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_pearly_white_quilted_sofa.swf"
+ },
+ "furniture_sofa/404": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_blue_black_octopus_sofa.swf"
+ },
+ "furniture_sofa/405": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_red_black_octopus_sofa.swf"
+ },
+ "furniture_sofa/406": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_octopus_sofa_base.swf"
+ },
+ "furniture_sofa/485": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_slimy_in_orange_sofa.swf"
+ },
+ "furniture_sofa/526": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_durian_sofa.swf"
+ },
+ "furniture_sofa/577": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_long_sofa_test_.swf"
+ },
+ "furniture_sofa/656": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_hell_sofa.swf"
+ },
+ "furniture_sofa/692": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_game_controller_couch.swf"
+ },
+ "furniture_sofa/701": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_sofa/furniture_sofa_green_game_controller_couch.swf"
+ },
+ "furniture_stool/24": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_stool/furniture_stool_stool_darkwoodwithblackcushion.swf"
+ },
+ "furniture_stool/25": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_stool/furniture_stool_stool_steelwithredcushion.swf"
+ },
+ "furniture_stool/49": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_stool/furniture_stool_japanese_stool.swf"
+ },
+ "furniture_stool/53": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_stool/furniture_stool_black_baroque_stool.swf"
+ },
+ "furniture_stool/111": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_stool/furniture_stool_rook_nest_stool.swf"
+ },
+ "furniture_stool/169": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_stool/furniture_stool_coral_stool.swf"
+ },
+ "furniture_stool/198": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_stool/furniture_stool_pink_baroque_stool.swf"
+ },
+ "furniture_stool/354": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_stool/furniture_stool_firebog_stool.swf"
+ },
+ "furniture_stool/419": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_stool/furniture_stool_lime_stool.swf"
+ },
+ "furniture_stool/420": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_stool/furniture_stool_orange_stool.swf"
+ },
+ "furniture_stool/440": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_stool/furniture_stool_mushroom_stool.swf"
+ },
+ "furniture_stool/525": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_stool/furniture_stool_chocolate_sprinkles_donut_stool.swf"
+ },
+ "furniture_stool/655": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_stool/furniture_stool_hell_stool.swf"
+ },
+ "furniture_stool/675": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_stool/furniture_stool_rook_nest_stool.swf"
+ },
+ "furniture_table/59": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_table/furniture_table_dining_table_with_striped_runner.swf"
+ },
+ "furniture_table/60": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_table/furniture_table_blue_basic_dining_table.swf"
+ },
+ "furniture_table/62": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_table/furniture_table_mosaic_cafe_table.swf"
+ },
+ "furniture_table/63": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_table/furniture_table_white_tablecloth_table.swf"
+ },
+ "furniture_table/168": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_table/furniture_table_coral_table.swf"
+ },
+ "furniture_table/187": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_table/furniture_table_spaceship_table.swf"
+ },
+ "furniture_table/335": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_table/furniture_table_firebog_green_table.swf"
+ },
+ "furniture_table/363": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_table/furniture_table_black_penthouse_table.swf"
+ },
+ "furniture_table/417": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_table/furniture_table_watermelon_table.swf"
+ },
+ "furniture_table/481": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_table/furniture_table_slimy_in_green_table.swf"
+ },
+ "furniture_table/534": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_table/furniture_table_hearty_hambuger_table.swf"
+ },
+ "furniture_table/615": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_table/furniture_table_white_swedish-y_table.swf"
+ },
+ "furniture_table/616": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_table/furniture_table_birch_veneer_swedish-y_table.swf"
+ },
+ "furniture_table/631": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_table/furniture_table_uralia_table.swf"
+ },
+ "furniture_table/680": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_table/furniture_table_pink_questioning_table.swf"
+ },
+ "furniture_table/699": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_table/furniture_table_green_questioning_table.swf"
+ },
+ "furniture_tabledeco/118": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_smalltabledeco/furniture_smalltabledeco_black_vase.swf"
+ },
+ "furniture_tabledeco/119": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_smalltabledeco/furniture_smalltabledeco_glass_vase.swf"
+ },
+ "furniture_tabledeco/120": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_smalltabledeco/furniture_smalltabledeco_flower_paper_bag.swf"
+ },
+ "furniture_tabledeco/121": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_smalltabledeco/furniture_smalltabledeco_flower_vase.swf"
+ },
+ "furniture_tabledeco/138": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_smalltabledeco/furniture_smalltabledeco_creepy_candlestick.swf"
+ },
+ "furniture_tabledeco/139": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_smalltabledeco/furniture_smalltabledeco_vintage_egg_][_computer.swf"
+ },
+ "furniture_tabledeco/179": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_lotus_bowl.swf"
+ },
+ "furniture_tabledeco/202": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_scarecrow_vase.swf"
+ },
+ "furniture_tabledeco/203": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_couple_bears.swf"
+ },
+ "furniture_tabledeco/204": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_panda_bowl.swf"
+ },
+ "furniture_tabledeco/236": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_pink_bear.swf"
+ },
+ "furniture_tabledeco/283": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_glass_candles_centerpiece.swf"
+ },
+ "furniture_tabledeco/295": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_.swf"
+ },
+ "furniture_tabledeco/297": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_bamboo_tabletop_fountain.swf"
+ },
+ "furniture_tabledeco/342": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_jar_of_jellisac.swf"
+ },
+ "furniture_tabledeco/343": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_firebog_charm_in_an_egg.swf"
+ },
+ "furniture_tabledeco/346": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_jar_of_firebog_plant.swf"
+ },
+ "furniture_tabledeco/356": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_firebog_fishbowl.swf"
+ },
+ "furniture_tabledeco/358": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_firebog_fire.swf"
+ },
+ "furniture_tabledeco/373": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_test_blocko_blue.swf"
+ },
+ "furniture_tabledeco/374": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_test_blocko_red.swf"
+ },
+ "furniture_tabledeco/375": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_test_blocko_yellow.swf"
+ },
+ "furniture_tabledeco/376": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco__test_blocko_wide_red.swf"
+ },
+ "furniture_tabledeco/377": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_test_blocko_wide_blue.swf"
+ },
+ "furniture_tabledeco/378": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_test_blocko_green.swf"
+ },
+ "furniture_tabledeco/423": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_firefly_jar.swf"
+ },
+ "furniture_tabledeco/599": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_vintage_cash_register.swf"
+ },
+ "furniture_tabledeco/617": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_blue_grey_simple_cash_register.swf"
+ },
+ "furniture_tabledeco/618": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_black_simple_cash_register.swf"
+ },
+ "furniture_tabledeco/622": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_small_firebog_jars.swf"
+ },
+ "furniture_tabledeco/632": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_uralia_owl.swf"
+ },
+ "furniture_tabledeco/708": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tabledeco/furniture_tabledeco_fire.swf"
+ },
+ "furniture_tablelamp/126": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tablelamp/furniture_tablelamp_log_cabin_table_lamp.swf"
+ },
+ "furniture_tablelamp/188": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tablelamp/furniture_tablelamp_lava_lamp.swf"
+ },
+ "furniture_tablelamp/239": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tablelamp/furniture_tablelamp_danish_modern_lamp.swf"
+ },
+ "furniture_tablelamp/273": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tablelamp/furniture_tablelamp_geisha_doll_lamp.swf"
+ },
+ "furniture_tablelamp/282": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tablelamp/furniture_tablelamp_mushroom_lamp.swf"
+ },
+ "furniture_tablelamp/421": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tablelamp/furniture_tablelamp_orange_table_lamp.swf"
+ },
+ "furniture_tablelamp/425": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tablelamp/furniture_tablelamp_firefly_jar_table_lamp.swf"
+ },
+ "furniture_tablelamp/432": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tablelamp/furniture_tablelamp_table_lamp_flower.swf"
+ },
+ "furniture_tablelamp/479": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tablelamp/furniture_tablelamp_slimy_in_yellow_table_lamp.swf"
+ },
+ "furniture_tablelamp/492": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tablelamp/furniture_tablelamp_powdered_blue_table_lamp.swf"
+ },
+ "furniture_tablelamp/528": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tablelamp/furniture_tablelamp_pepper_lamp.swf"
+ },
+ "furniture_tablelamp/633": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tablelamp/furniture_tablelamp_uralia_tree_lamp.swf"
+ },
+ "furniture_tablelamp/666": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tablelamp/furniture_tablelamp_decorative_glowing_claw.swf"
+ },
+ "furniture_tablelamp/690": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_tablelamp/furniture_tablelamp_joystick_table_lamp.swf"
+ },
+ "furniture_walldeco/122": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_largewalldeco/furniture_largewalldeco_japanese_ink_painting.swf"
+ },
+ "furniture_walldeco/136": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_smallwalldeco/furniture_smallwalldeco_mounted_salmon.swf"
+ },
+ "furniture_walldeco/141": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_smallwalldeco/furniture_smallwalldeco_minimalist_bamboo_triptych.swf"
+ },
+ "furniture_walldeco/163": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_largewalldeco/furniture_largewalldeco_glitch_american_gothic_painting.swf"
+ },
+ "furniture_walldeco/164": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_largewalldeco/furniture_largewalldeco_rube_cubimal_pop_art.swf"
+ },
+ "furniture_walldeco/165": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_largewalldeco/furniture_largewalldeco_uralia_post_impressionism_painting.swf"
+ },
+ "furniture_walldeco/180": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_black_and__white_groddle_photo.swf"
+ },
+ "furniture_walldeco/181": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_butterfly_half_tone_art.swf"
+ },
+ "furniture_walldeco/182": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_the_helga_screamer.swf"
+ },
+ "furniture_walldeco/183": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_pigs_playing_poker.swf"
+ },
+ "furniture_walldeco/184": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_rubist_painting.swf"
+ },
+ "furniture_walldeco/185": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_shimla_mirch_landscape_painting.swf"
+ },
+ "furniture_walldeco/191": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_spaceship_screen_1.swf"
+ },
+ "furniture_walldeco/192": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_spaceship_screen_2.swf"
+ },
+ "furniture_walldeco/207": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_rube_pendant.swf"
+ },
+ "furniture_walldeco/208": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_rook_totem.swf"
+ },
+ "furniture_walldeco/210": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_egg_tree_painting.swf"
+ },
+ "furniture_walldeco/211": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_flower_painting.swf"
+ },
+ "furniture_walldeco/296": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_lion_head_fountain.swf"
+ },
+ "furniture_walldeco/338": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_firebog_green_charm.swf"
+ },
+ "furniture_walldeco/339": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_firebog_yellow_charm.swf"
+ },
+ "furniture_walldeco/340": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_firebog_paper_talisman.swf"
+ },
+ "furniture_walldeco/341": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_firebog_lizard.swf"
+ },
+ "furniture_walldeco/399": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_red_slimy.swf"
+ },
+ "furniture_walldeco/400": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_blue_slimy.swf"
+ },
+ "furniture_walldeco/401": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_green_slimy.swf"
+ },
+ "furniture_walldeco/410": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_firebog_hanging_dried_lizards.swf"
+ },
+ "furniture_walldeco/433": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_walldeco_moss_flower.swf"
+ },
+ "furniture_walldeco/434": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_moss_walldeco.swf"
+ },
+ "furniture_walldeco/460": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_mounted_fish_skeleton.swf"
+ },
+ "furniture_walldeco/605": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_party_sign.swf"
+ },
+ "furniture_walldeco/606": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_horizontal_lit_arrow.swf"
+ },
+ "furniture_walldeco/607": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_vertical_lit_arrow.swf"
+ },
+ "furniture_walldeco/608": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_worn_wooden_open_sign.swf"
+ },
+ "furniture_walldeco/609": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_neon_martini_sign.swf"
+ },
+ "furniture_walldeco/610": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_neon_save_on_meat_sign.swf"
+ },
+ "furniture_walldeco/611": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_neon_open_sign.swf"
+ },
+ "furniture_walldeco/612": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_music_notes.swf"
+ },
+ "furniture_walldeco/636": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_red_eye_critter_burrow.swf"
+ },
+ "furniture_walldeco/649": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_climbing_uralia_vines.swf"
+ },
+ "furniture_walldeco/687": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_i_heart_8bit_life_wall_deco.swf"
+ },
+ "furniture_walldeco/688": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walldeco/furniture_walldeco_8bit_cloud.swf"
+ },
+ "furniture_walllamp/125": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walllamp/furniture_walllamp_rook_nest_wall_lamp.swf"
+ },
+ "furniture_walllamp/142": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walllamp/furniture_walllamp_sun_wall_lamp.swf"
+ },
+ "furniture_walllamp/144": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walllamp/furniture_walllamp_gothic_wall_lamp.swf"
+ },
+ "furniture_walllamp/145": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walllamp/furniture_walllamp_forest_wall_lamp.swf"
+ },
+ "furniture_walllamp/146": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walllamp/furniture_walllamp_sleek_wall_lamp.swf"
+ },
+ "furniture_walllamp/147": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walllamp/furniture_walllamp_aluminum_wall_lamp.swf"
+ },
+ "furniture_walllamp/167": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walllamp/furniture_walllamp_regal_wall_lamp.swf"
+ },
+ "furniture_walllamp/170": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walllamp/furniture_walllamp_blowfish_wall_lamp.swf"
+ },
+ "furniture_walllamp/431": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walllamp/furniture_walllamp_wall_lamp_mushroom.swf"
+ },
+ "furniture_walllamp/529": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walllamp/furniture_walllamp_gooseberry_lamp.swf"
+ },
+ "furniture_walllamp/542": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walllamp/furniture_walllamp_wall_spotlight_.swf"
+ },
+ "furniture_walllamp/600": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walllamp/furniture_walllamp_horizontal_vanity_light.swf"
+ },
+ "furniture_walllamp/601": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walllamp/furniture_walllamp_vertical_vanity_light.swf"
+ },
+ "furniture_walllamp/635": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walllamp/furniture_walllamp_purple_mushroom_wall_lamp.swf"
+ },
+ "furniture_walllamp/672": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_walllamp/furniture_walllamp_rook_wall_lamp.swf"
+ },
+ "furniture_bookcase/32": {
+  "swf": "~/Documents/glitch-audit/glitch-items/furniture/furniture_bookcase/furniture_bookcase_bookcase_warpedwood.swf"
+ }
+}

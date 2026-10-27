@@ -107,6 +107,8 @@ import {
   moveFurniture,
   normalizeHomeDecorState,
   pickUpFurniture,
+  pieceArt,
+  pieceScale,
   placeFurniture,
   placedItem,
   quoteInteriorExpansion,
@@ -118,7 +120,10 @@ import {
   textureConfig,
   unexpandInterior,
   UNEXPAND_TEXT,
-} from '../home-decor.js?v=home-decor-5';
+} from '../home-decor.js?v=home-decor-6';
+import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=furnup-1';
+import { chooseUpgrade, closeUpgradePicker, openUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=furnup-1';
+import { RECIPE_CATALOG } from '../making.js?v=g300-2';
 import {
   createBackYardState,
   isBackYard,
@@ -220,7 +225,7 @@ import {
   quoteHouseExpansion,
   quoteHouseUnexpand,
   unexpandHouseFloors,
-} from '../home-floors.js?v=g153-1';
+} from '../home-floors.js?v=g358-1';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -496,6 +501,9 @@ let lastHomeRoom = null; // 'house' | 'tower' | 'street' while at home, null awa
 let pointer = { x: 0, y: 0, inside: false };
 let lastNodeCheck = 0;
 let demoDone = false;
+/** G358: the style the picker previews on a placed piece ({ id, upgradeId }), or null. */
+let upgradePreview = null;
+let furnupLast = '';
 let autoplay = null;
 let ui = null;
 /** The chosen street style (inc_homes.js cfg.style on the exterior); null: the purchase look's. */
@@ -583,6 +591,11 @@ function publish(engine) {
   engine.setData('homeYardStyle', currentYardStyle(engine));
   engine.setData('homeYardShown', yardPreview || '');
   engine.setData('homeSelected', selected ? `${selected.kind}:${selected.id}` : '');
+  // G358: placed pieces' upgrades (class:id), the open picker and the last upgrade.
+  engine.setData('furnupPlaced', decor.placed.filter((p) => p.upgradeId).map((p) => `${p.classTsid}:${p.upgradeId}`).join(','));
+  engine.setData('furnupStored', Object.entries(decor.styles || {}).map(([c, rows]) => rows.map((r) => `${c}:${r.upgradeId || 0}`).join(',')).filter(Boolean).join(','));
+  engine.setData('furnupPicker', upgradePickerOpen() ? `${upgradePickerState().pieceId}:${upgradePickerState().chosen ?? ''}` : '');
+  engine.setData('furnupLast', furnupLast);
   engine.setData('homePlacing', placing ? placing.classTsid || placing.protoClass || '' : '');
   engine.setData('homeStreetStyle', currentStreetStyle(engine));
   engine.setData('homeStylePick', ui?.styles && !ui.styles.hidden ? stylePick || '' : '');
@@ -617,6 +630,7 @@ function towerFloorDecor(index) {
   }
   const slice = towerDecor[index];
   slice.storage = houseDecor.storage;
+  slice.styles = houseDecor.styles ||= {};
   slice.wallSegments = TOWER_GEO.wallSegments;
   slice.layout = 'tower';
   return slice;
@@ -636,6 +650,7 @@ function houseFloorDecor(index) {
   const slice = floorDecor(floors, houseDecor, index);
   if (!slice || slice === houseDecor) return slice;
   slice.storage = houseDecor.storage;
+  slice.styles = houseDecor.styles ||= {};
   slice.wallSegments = houseDecor.wallSegments;
   slice.layout = 'house';
   return slice;
@@ -764,7 +779,7 @@ function drawRoomShell(engine, container, opts = {}) {
   const { floorY } = INTERIOR;
   for (const item of decor.placed) {
     if (!/lamp/.test(item.classTsid)) continue;
-    const { w, h } = furnitureSize(item.classTsid);
+    const { w, h } = furnitureSize(item.classTsid, item.upgradeId);
     if (item.slot === 'ceiling') {
       pool(item.x, item.y + h + 30, w * 1.5, 90, 0.32);
       pool(item.x, floorY + 12, w * 1.6, 16, 0.4);
@@ -1678,10 +1693,12 @@ function spawnStreetTargets(engine) {
 // ---------------------------------------------------------------------------
 
 function furnitureView(PIXI, item) {
-  const def = furnitureDef(item.classTsid);
-  const s = furnitureScale(item.classTsid);
+  // G358: an upgraded piece (or the style the picker previews on it) draws its upgrade's frame.
+  const upgradeId = upgradePreview?.id === item.id ? upgradePreview.upgradeId : item.upgradeId;
+  const art = pieceArt(item.classTsid, upgradeId);
+  const s = pieceScale(item.classTsid, upgradeId);
   const box = new PIXI.Container();
-  const spr = new PIXI.Sprite(textureFromUrl(def.art.path));
+  const spr = new PIXI.Sprite(textureFromUrl(art.path));
   spr.anchor.set(0.5, item.slot === 'ceiling' ? 0 : 1);
   spr.scale.set((item.facingRight ? 1 : -1) * s, s);
   box.addChild(spr);
@@ -1692,13 +1709,13 @@ function furnitureView(PIXI, item) {
   }
   if (item.slot === 'wall' || item.slot === 'floor') {
     const shadow = new PIXI.Graphics();
-    const { w } = furnitureSize(item.classTsid);
+    const { w } = furnitureSize(item.classTsid, upgradeId);
     if (item.slot === 'floor' && !item.on) {
       shadow.ellipse(0, -2, w * 0.46, 7).fill({ color: 0x000000, alpha: 0.16 });
     }
     box.addChildAt(shadow, 0);
     if (item.slot === 'wall') {
-      const silhouette = new PIXI.Sprite(textureFromUrl(def.art.path));
+      const silhouette = new PIXI.Sprite(textureFromUrl(art.path));
       silhouette.anchor.set(0.5, 1);
       silhouette.scale.copyFrom(spr.scale);
       silhouette.tint = 0x000000;
@@ -1756,7 +1773,7 @@ function renderFurniture(engine) {
 }
 
 function furnitureBounds(item) {
-  const { w, h } = furnitureSize(item.classTsid);
+  const { w, h } = furnitureSize(item.classTsid, upgradePreview?.id === item.id ? upgradePreview.upgradeId : item.upgradeId);
   const top = item.slot === 'ceiling' ? item.y : item.y - h;
   return { x: item.x - w / 2, y: top, w, h };
 }
@@ -2790,6 +2807,7 @@ function renderSelectionCard(engine, body) {
   const def = furnitureDef(item.classTsid);
   const actions = [
     el('button', { type: 'button', 'data-home-action': 'move', text: 'Move', onclick: () => beginMove(engine, item.id) }),
+    ...upgradeButtons(engine, item),
     el('button', { type: 'button', 'data-home-action': 'flip', text: 'Flip', disabled: !def.canFlip, onclick: () => runFurnitureAction(engine, 'flip') }),
     el('button', { type: 'button', 'data-home-action': 'forward', text: 'Forward', onclick: () => runFurnitureAction(engine, 'forward') }),
     el('button', { type: 'button', 'data-home-action': 'back', text: 'Back', onclick: () => runFurnitureAction(engine, 'back') }),
@@ -2811,10 +2829,182 @@ function renderSelectionCard(engine, body) {
     }
   }
   body.append(el('div', { class: 'hb-sel' }, [
-    el('strong', { text: def.label }),
+    el('strong', { text: pieceLabel(item, def.label) }),
     el('p', { text: def.desc || '' }),
     el('div', { class: 'hb-actions' }, actions),
   ]));
+}
+
+// ---------------------------------------------------------------------------
+// Furniture upgrades (G358, js/furniture-upgrades.js)
+// ---------------------------------------------------------------------------
+
+/** verbs.upgrade / verbs.change_style on a placed piece: opens the style picker. */
+function upgradeButtons(engine, item) {
+  const verb = upgradeVerb(item);
+  if (!verb) return [];
+  const sale = houseFloorHere() === 0 ? engine.query?.('furnitureSaleLock', decor, item.id, engine) : null;
+  const locked = typeof sale === 'string' && sale;
+  return [el('button', {
+    type: 'button',
+    'data-home-action': verb.id,
+    text: verb.label,
+    title: locked ? UPGRADE_TEXT.forSale : verb.tooltip,
+    disabled: Boolean(locked),
+    onclick: () => openUpgradeFor(engine, item.id),
+  })];
+}
+
+function openUpgradeFor(engine, id) {
+  const item = placedItem(decor, id);
+  if (!item || !hasUpgrades(item.classTsid)) return false;
+  const def = furnitureDef(item.classTsid);
+  const ok = openUpgradePicker({
+    piece: item,
+    baseLabel: def.label,
+    baseArt: def.art.path,
+    onPreview: (upgradeId) => {
+      upgradePreview = upgradeId == null ? null : { id: item.id, upgradeId: upgradeId === '0' ? '' : upgradeId };
+      renderFurniture(engine);
+    },
+    onSave: (upgradeId) => saveFurnitureUpgrade(engine, item.id, upgradeId),
+    onClose: () => {
+      upgradePreview = null;
+      renderFurniture(engine);
+    },
+  });
+  publish(engine);
+  return ok;
+}
+
+/** furniture_upgrade_purchase_do for a free or owned style: applyUpgrade, the "upgraded" counter, redraw. */
+function saveFurnitureUpgrade(engine, id, upgradeId) {
+  const item = placedItem(decor, id);
+  if (!item) return null;
+  const result = applyUpgrade(item, upgradeId, { baseLabel: furnitureDef(item.classTsid).label });
+  upgradePreview = null;
+  if (!result.ok) {
+    engine.toast(result.msg);
+    renderFurniture(engine);
+    return result;
+  }
+  // applyUpgrade: achievements_increment("upgraded", class_id, 1).
+  engine.achievement?.(result.counter, 1);
+  furnupLast = `${item.classTsid}:${item.upgradeId || 0}`;
+  // Tabletop decor follows the new top (the source nudges what stood on the old plats).
+  moveFurniture(decor, item.id, { x: item.x, y: item.y });
+  engine.playSound?.('ITEM_DROP', { volume: 0.4 });
+  renderFurniture(engine);
+  renderBar(engine);
+  engine.save();
+  return result;
+}
+
+/**
+ * construction_tool.js onMakingComplete 334-381 (Bonus Furniture Upgrade I-III):
+ * after a Construction Tool unit, 5% of the time the piece just made becomes a
+ * random style worth 25 credits or less. The source found it in the furniture
+ * bag (bag.js 104-105 sends every furniture stack there); the remake's made
+ * furniture lands in the pack, so the upgraded piece moves into furniture
+ * storage, which needs a house. QA: &furnuproll=0 makes every roll hit.
+ */
+function bonusFurnitureUpgrade(engine, recipeKey) {
+  const recipe = RECIPE_CATALOG[recipeKey];
+  if (recipe?.tool !== 'construction_tool') return null;
+  const classTsid = recipe.outputs?.[0]?.classTsid;
+  if (!classTsid || !hasUpgrades(classTsid) || !furnitureDef(classTsid)) return null;
+  const forced = engine.param?.('furnuproll');
+  const rand = forced != null && forced !== '' && Number.isFinite(Number(forced)) ? () => Number(forced) : Math.random;
+  const roll = rollBonusUpgrade({ recipe, owned: engine.pc?.imaginationUpgrades || [], rand, classTsid });
+  if (!roll || !engine.homeOwned?.() || !(Number(engine.inv?.[classTsid]) > 0)) return null;
+  engine.inv[classTsid] -= 1;
+  houseDecor.storage[classTsid] = (houseDecor.storage[classTsid] || 0) + 1;
+  houseDecor.styles ||= {};
+  const piece = { classTsid };
+  applyBonusUpgrade(piece, roll.id);
+  (houseDecor.styles[classTsid] ||= []).push({ upgradeId: piece.upgradeId, upgradeHistory: piece.upgradeHistory });
+  engine.achievement?.(`upgraded:${classTsid}`, 1);
+  engine.pushActivity(bonusUpgradeLine(roll.name));
+  furnupLast = `bonus:${classTsid}:${roll.id}`;
+  engine.refreshPack?.();
+  if (scene && mode === 'decorate') renderBar(engine);
+  publish(engine);
+  engine.save();
+  return roll;
+}
+
+/**
+ * QA (with homedemo=decorate): &furnupautoplay=pick (open the Chair's picker and
+ * choose its first free style), =apply (also save it, pick the Chair up and set
+ * it down again), =locked (choose a paid style: the save stays off),
+ * =card (own the three cards and run a Construction Tool Chair through the
+ * bonus roll; add &furnuproll=0), =craft (card I, Furnituremaking I, a
+ * Construction Tool and a Chair's inputs, for a real craft in the Make panel).
+ */
+function runFurnUpAutoplay(engine, how) {
+  const chair = () => decor.placed.find((row) => row.classTsid === 'furniture_chair');
+  const say = (label) => engine.setData('homeAutoplay', label);
+  setTimeout(() => {
+    if (how === 'craft') {
+      // A real craft through the Make panel (the QA drives it): the cards, Furnituremaking I, a
+      // Construction Tool and one Chair's inputs (catalog_recipes.js 252).
+      const ups = (engine.pc.imaginationUpgrades ||= []);
+      if (!ups.includes('furnituremaking_bonus_upgrade_1')) ups.push('furnituremaking_bonus_upgrade_1');
+      engine.grantSkill?.('furnituremaking_1');
+      for (const [cls, n] of [['construction_tool', 1], ['wood_post', 1], ['board', 4], ['snail', 4]]) engine.inv[cls] = Math.max(n, Number(engine.inv[cls]) || 0);
+      engine.pc.energy = Math.max(engine.pc.energy || 0, 95);
+      engine.refreshPack?.();
+      engine.updateHud?.();
+      say('craft:ready');
+      return;
+    }
+    if (how === 'card') {
+      const ups = (engine.pc.imaginationUpgrades ||= []);
+      for (const id of ['furnituremaking_bonus_upgrade_1', 'furnituremaking_bonus_upgrade_2', 'furnituremaking_bonus_upgrade_3']) if (!ups.includes(id)) ups.push(id);
+      engine.inv.furniture_chair = (Number(engine.inv.furniture_chair) || 0) + 1;
+      const roll = bonusFurnitureUpgrade(engine, 'furniture_chair');
+      say(roll ? `card:${roll.id}` : 'card:none');
+      const row = listPlaceable(decor, engine.inv).find((r) => r.upgradeId);
+      if (row) {
+        beginPlacing(engine, row.classTsid, null, row.style);
+        const r = placeAtPointer(engine, { x: 640, y: GROUND_Y });
+        if (r?.item) selected = { kind: 'furniture', id: r.item.id };
+        renderFurniture(engine);
+        renderBar(engine);
+        say(`card:placed:${r?.item?.upgradeId || ''}`);
+      }
+      return;
+    }
+    const item = chair();
+    if (!item) return say('furnup:no-chair');
+    selected = { kind: 'furniture', id: item.id };
+    renderFurniture(engine);
+    renderBar(engine);
+    openUpgradeFor(engine, item.id);
+    const option = upgradePickerOpen() && (how === 'locked'
+      ? document.querySelector('.furn-upgrade .fu-tile.locked')
+      : [...document.querySelectorAll('.furn-upgrade .fu-tile')].find((b) => !b.classList.contains('locked') && !b.classList.contains('on')));
+    if (option) chooseUpgrade(option.getAttribute('data-upgrade'));
+    publish(engine);
+    say(`furnup:${how}:chosen`);
+    if (how !== 'apply') return;
+    setTimeout(() => {
+      saveUpgrade();
+      const upgraded = chair();
+      say(`furnup:apply:saved:${upgraded?.upgradeId || ''}`);
+      setTimeout(() => {
+        selected = { kind: 'furniture', id: upgraded.id };
+        runFurnitureAction(engine, 'pickup');
+        const row = listPlaceable(decor, engine.inv).find((r) => r.classTsid === 'furniture_chair' && r.upgradeId);
+        if (row) {
+          beginPlacing(engine, 'furniture_chair', null, row.style);
+          const r = placeAtPointer(engine, { x: 300, y: GROUND_Y });
+          say(`furnup:apply:replaced:${r?.item?.upgradeId || ''}`);
+        }
+        publish(engine);
+      }, 900);
+    }, 1200);
+  }, 1200);
 }
 
 function displayableItems(engine) {
@@ -2837,12 +3027,14 @@ function renderDecorateBody(engine, body) {
       body.append(el('p', { class: 'hb-note', text: placing ? 'Click in the room to place it. Esc cancels.' : 'Choose a piece, then click in the room to place it. Click placed furniture to move, flip or pick it up.' }));
       body.append(el('div', { class: 'hb-grid' }, list.map((row) => el('button', {
         type: 'button',
-        class: `hb-tile${placing?.classTsid === row.classTsid ? ' on' : ''}`,
+        class: `hb-tile${placing?.classTsid === row.classTsid && (placing?.style ?? null) === (row.style ?? null) ? ' on' : ''}`,
         'data-furniture': row.classTsid,
+        'data-furniture-style': row.style ?? false,
         title: `${row.label} · ${row.slot}${row.stored ? ` · ${row.stored} in storage` : ''}${row.packed ? ` · ${row.packed} in pack` : ''}`,
-        onclick: () => beginPlacing(engine, row.classTsid),
+        onclick: () => beginPlacing(engine, row.classTsid, null, row.style),
       }, [
-        el('img', { src: `assets/sprites/icons/${row.classTsid}.png`, alt: '' }),
+        // G358: an upgraded piece in storage shows its own art.
+        el('img', { src: row.upgradeId ? pieceArt(row.classTsid, row.upgradeId).path : `assets/sprites/icons/${row.classTsid}.png`, alt: '' }),
         el('span', { text: row.label }),
         el('span', { class: 'hb-count', text: String(row.total) }),
       ]))));
@@ -3053,6 +3245,7 @@ function cultivationIcon(protoClass) {
 function setMode(engine, next) {
   if (next && !scene) return;
   const endsCultivation = mode === 'cultivate' && next !== 'cultivate';
+  closeUpgradePicker(true);
   mode = next;
   placing = null;
   selected = null;
@@ -3108,8 +3301,13 @@ function toggleCultivateKey(engine) {
   return 'on';
 }
 
-function beginPlacing(engine, classTsid, from = null) {
+function beginPlacing(engine, classTsid, from = null, style = null) {
   placing = { kind: 'furniture', classTsid, from };
+  // G358: an upgraded piece from storage (its index in decor.styles[class]).
+  if (Number.isInteger(style)) {
+    placing.style = style;
+    placing.upgradeId = decor.styles?.[classTsid]?.[style]?.upgradeId || '';
+  }
   selected = null;
   makeGhost(engine);
   renderFurniture(engine);
@@ -3126,7 +3324,7 @@ function beginMove(engine, id) {
       return;
     }
   }
-  placing = { kind: 'furniture', classTsid: item.classTsid, moveId: id };
+  placing = { kind: 'furniture', classTsid: item.classTsid, moveId: id, upgradeId: item.upgradeId || '' };
   makeGhost(engine);
   renderBar(engine);
 }
@@ -3206,7 +3404,7 @@ function runFurnitureAction(engine, action, arg) {
     }
     if (result.ok) {
       selected = null;
-      engine.pushActivity(`You picked up the ${result.lifted.map((c) => furnitureDef(c).label).join(', ')}. It went into your furniture storage.`);
+      engine.pushActivity(`You picked up the ${result.pieces.map((p) => pieceLabel(p, furnitureDef(p.classTsid).label)).join(', ')}. It went into your furniture storage.`);
     }
   } else if (action === 'deposit') {
     result = displayDeposit(decor, engine.inv, id, arg, engine.inv[arg] || 1);
@@ -3331,7 +3529,7 @@ function placeAtPointer(engine, at) {
       selected = { kind: 'furniture', id: placing.moveId };
       if (result.ok && isDoor) setTimeout(() => engine.refreshHomeScene?.(), 0);
     } else {
-      result = placeFurniture(decor, engine.inv, placing.classTsid, at, { from: placing.from || undefined });
+      result = placeFurniture(decor, engine.inv, placing.classTsid, at, { from: placing.from || undefined, style: placing.style });
       if (result.ok && isDoor) {
         // onContainerChanged: a Door set down in the house opens Build a New Floor.
         noteDoorPlaced(floors, houseFloorHere() ?? 0, result.item.id);
@@ -3342,7 +3540,7 @@ function placeAtPointer(engine, at) {
       }
       if (result.ok) {
         selected = { kind: 'furniture', id: result.item.id };
-        engine.pushActivity(`You placed a ${furnitureDef(placing.classTsid).label}.`);
+        engine.pushActivity(`You placed a ${pieceLabel(result.item, furnitureDef(placing.classTsid).label)}.`);
         if (result.from === 'pack') engine.refreshPack();
       }
     }
@@ -3398,9 +3596,9 @@ function makeGhost(engine) {
   g.zIndex = 95;
   if (placing.kind === 'furniture') {
     const def = furnitureDef(placing.classTsid);
-    const spr = new PIXI.Sprite(textureFromUrl(def.art.path));
+    const spr = new PIXI.Sprite(textureFromUrl(pieceArt(def.classTsid, placing.upgradeId).path));
     spr.anchor.set(0.5, def.slot === 'ceiling' ? 0 : 1);
-    spr.scale.set(furnitureScale(def.classTsid));
+    spr.scale.set(pieceScale(def.classTsid, placing.upgradeId));
     spr.alpha = 0.72;
     g.addChild(spr);
   } else {
@@ -3431,7 +3629,7 @@ function updateGhost(engine) {
   const at = pointer.inside ? pointer : { x: engine.player?.x ?? 400, y: GROUND_Y - 120 };
   if (placing.kind === 'furniture') {
     // Furniture lives in room x; the room starts at the back yard's edge.
-    const snap = snapPlacement(decor, placing.classTsid, toRoom(at), placing.moveId || null);
+    const snap = snapPlacement(decor, placing.classTsid, toRoom(at), placing.moveId || null, placing.upgradeId || '');
     g.x = snap.x + roomX0();
     g.y = snap.y;
     return;
@@ -3832,6 +4030,7 @@ function demoSetup(engine) {
     renderFurniture(engine);
     setMode(engine, 'decorate');
     if (engine.param('homeautoplay') === '1') runDecorateAutoplay(engine);
+    else if (engine.param('furnupautoplay')) runFurnUpAutoplay(engine, String(engine.param('furnupautoplay')));
   } else if (demo === 'cultivate' && scene.room === 'street') {
     // Level 12 opens every cultivation class (inc_cultivation.js gates top out at 10).
     if ((engine.pc.level || 1) < 12) {
@@ -4659,9 +4858,9 @@ export const homesFeature = {
     return {
       decor: houseDecor,
       cult,
-      towerDecor: towerDecor.map(({ storage, ...rest }) => rest),
+      towerDecor: towerDecor.map(({ storage, styles, ...rest }) => rest),
       // G153: the floors above the ground floor, their Doors, and the floor you are on.
-      floors: { ...floors, upper: floors.upper.map(({ storage, ...rest }) => rest) },
+      floors: { ...floors, upper: floors.upper.map(({ storage, styles, ...rest }) => rest) },
       streetGround: savedStreetGround,
       houseVisits,
       streetStyle,
@@ -4713,6 +4912,7 @@ export const homesFeature = {
   },
 
   onStreetClear(engine) {
+    closeUpgradePicker(true);
     releaseCameraLook(engine);
     destroyGhost();
     scene = null;
@@ -4793,6 +4993,7 @@ export const homesFeature = {
 
   onEvent(counter, amount, engine) {
     wearFromEvent(engine, counter);
+    if (counter.startsWith('making_recipe:')) bonusFurnitureUpgrade(engine, counter.slice('making_recipe:'.length));
   },
 
   /** Protos on the home street (items/proto_*.js restore / remove verbs). */

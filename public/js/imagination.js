@@ -153,8 +153,19 @@ export function checkCondition(condition, ctx = {}) {
 }
 
 /**
+ * Secret cards the remake deals anyway (G358): Bonus Furniture Upgrade I-III.
+ * inc_data_imagination.js 2037-2120 marks them is_secret, so
+ * imagination_get_all (inc_imagination.js 552) never dealt them, though
+ * construction_tool.js 334-381 reads them; they are the one way to a style
+ * that cost credits, so the shop deals them with their source cost and
+ * conditions (Austin decides the other paid styles).
+ */
+export const DEALT_SECRET_CARDS = new Set(['furnituremaking_bonus_upgrade_1', 'furnituremaking_bonus_upgrade_2', 'furnituremaking_bonus_upgrade_3']);
+
+/**
  * imagination_get_all for one card: { got, reqs, can_learn }.
- * Secret cards are never learnable (the source skips them entirely).
+ * Secret cards are never learnable (the source skips them entirely), except
+ * DEALT_SECRET_CARDS.
  */
 export function upgradeStatus(id, ctx = {}) {
   const u = IMAGINATION_UPGRADES[id];
@@ -163,7 +174,7 @@ export function upgradeStatus(id, ctx = {}) {
   const got = owned.has(id);
   const reqs = u.conditions.map((c) => checkCondition(c, ctx));
   const isTutorial = u.conditions.some((c) => c.type === 1);
-  let canLearn = !u.is_secret && !(got && u.max_uses);
+  let canLearn = (!u.is_secret || DEALT_SECRET_CARDS.has(id)) && !(got && u.max_uses);
   if (canLearn && isTutorial && ctx.inTutorial !== true) canLearn = false;
   if (canLearn) canLearn = reqs.every((r) => r.ok);
   return { id, got, reqs, can_learn: canLearn, is_secret: Boolean(u.is_secret), is_tutorial: isTutorial };

@@ -35,8 +35,12 @@
  *   source. The remake has no credits, so every visible swatch is free to apply.
  * - Saves from before the 150 px geometry (no `geo`) have their furniture
  *   spread onto the narrower room in proportion.
- * - Furniture upgrades (catalog_furniture.js) were credit purchases with SWF art
- *   that is not recoverable; the remake places the recovered base frames.
+ * - Furniture upgrades (G358, js/furniture-upgrades.js): a piece keeps its
+ *   `upgradeId` and `upgradeHistory` (the source's upgrade_id and
+ *   upgrade_history instance props) when placed, moved, picked up and placed
+ *   again. Stored upgraded pieces are listed in `styles[class]`, a part of
+ *   `storage[class]` (the count stays per class, so the ledger sees the class).
+ *   Sizes and tabletop surfaces follow the upgrade's art.
  * - Glitch furniture never rotated; it faces left or right (`facing_right`).
  */
 
@@ -46,6 +50,7 @@ import {
   HOME_LIMITS,
   HOME_TEXTURE_CONFIGS,
 } from './homes-catalog.js?v=homes-catalog-2';
+import { cleanHistory, cleanUpgradeId, upgradeArt, upgradeRow } from './furniture-upgrades.js?v=furnup-1';
 
 export const SEGMENT_W = 150;
 /** Room geometry version stored with the house (2 = source 150 px segments). */
@@ -105,17 +110,42 @@ export function furnitureScale(classTsid) {
   return Math.min(1, Number(furnitureDef(classTsid)?.scale) || 1);
 }
 
-export function furnitureSize(classTsid) {
+/** Drawn size; an upgraded piece (G358) is its upgrade's frame at 1:1. */
+export function furnitureSize(classTsid, upgradeId = '') {
   const def = furnitureDef(classTsid);
   if (!def) return { w: 0, h: 0 };
+  const art = upgradeArt(classTsid, upgradeId);
+  if (art) return { w: art.w, h: art.h };
   const s = furnitureScale(classTsid);
   return { w: Math.round(def.art.w * s), h: Math.round(def.art.h * s) };
 }
 
-/** Height above the foot where tabletop decor rests, or 0 for no surface. */
-export function surfaceHeight(classTsid) {
+/** Display scale of a piece: upgrade frames are drawn 1:1. */
+export function pieceScale(classTsid, upgradeId = '') {
+  return upgradeArt(classTsid, upgradeId) ? 1 : furnitureScale(classTsid);
+}
+
+/** The art a piece draws: { path, w, h } of its upgrade, else the class frame. */
+export function pieceArt(classTsid, upgradeId = '') {
+  return upgradeArt(classTsid, upgradeId) || furnitureDef(classTsid)?.art || null;
+}
+
+/**
+ * Height above the foot where tabletop decor rests, or 0 for no surface. An
+ * upgrade uses its highest catalog plat over the middle when that sits on the
+ * art, else the class's surface in proportion to the art's height.
+ */
+export function surfaceHeight(classTsid, upgradeId = '') {
   const def = furnitureDef(classTsid);
-  return def?.surface ? Math.round(def.surface * furnitureScale(classTsid)) : 0;
+  if (!def?.surface) return 0;
+  const art = upgradeArt(classTsid, upgradeId);
+  if (art) {
+    const plat = upgradeRow(classTsid, upgradeId)?.platY;
+    // Tops drawn in three-quarter view put the source plat mid-surface (about half the height).
+    if (plat && plat <= art.h + 4 && plat >= art.h * 0.2) return plat;
+    return Math.round(def.surface * (art.h / def.art.h));
+  }
+  return Math.round(def.surface * furnitureScale(classTsid));
 }
 
 function finite(value, fallback = 0) {
@@ -162,9 +192,55 @@ function normalizePlaced(row) {
     z: Math.round(finite(row?.z, 0)),
     on: Number.isFinite(Number(row?.on)) && Number(row.on) > 0 ? Math.floor(Number(row.on)) : null,
   };
+  copyStyle(row, out);
   if (classTsid === 'bag_furniture_sdb' && row?.display?.classTsid) {
     const count = Math.max(0, Math.min(1_000_000, Math.floor(finite(row.display.count, 0))));
     if (count > 0) out.display = { classTsid: cleanKey(row.display.classTsid), count };
+  }
+  return out;
+}
+
+/** G358: copy a piece's upgrade (upgrade_id, upgrade_history) onto `to`, cleaned. */
+function copyStyle(from, to) {
+  const id = cleanUpgradeId(to.classTsid, from?.upgradeId);
+  const history = cleanHistory(from?.upgradeHistory);
+  if (id) to.upgradeId = id;
+  else delete to.upgradeId;
+  if (history.length) to.upgradeHistory = history;
+  else delete to.upgradeHistory;
+  return to;
+}
+
+/** A stored piece that carries an upgrade or its history. */
+function isStyled(row) {
+  return Boolean(row?.upgradeId || row?.upgradeHistory?.length);
+}
+
+/**
+ * Upgraded pieces in storage for one class (G358), never more than the class's
+ * stored count: whatever took pieces out of `storage` without this module
+ * takes them from the end of the list.
+ */
+export function storedStyles(state, classTsid) {
+  if (!state.styles || typeof state.styles !== 'object') state.styles = {};
+  const list = Array.isArray(state.styles[classTsid]) ? state.styles[classTsid] : [];
+  const n = Math.max(0, Math.floor(finite(state.storage?.[classTsid], 0)));
+  if (list.length > n) list.length = n;
+  if (list.length) state.styles[classTsid] = list;
+  else delete state.styles[classTsid];
+  return list;
+}
+
+function normalizeStyles(seed, storage) {
+  const out = {};
+  for (const [cls, rows] of Object.entries(seed && typeof seed === 'object' ? seed : {})) {
+    const key = cleanKey(cls);
+    if (!isFurniture(key) || !Array.isArray(rows)) continue;
+    const list = rows.slice(0, storage[key] || 0)
+      .map((row) => copyStyle(row, { classTsid: key }))
+      .filter(isStyled)
+      .map(({ classTsid, ...rest }) => rest);
+    if (list.length) out[key] = list;
   }
   return out;
 }
@@ -200,6 +276,8 @@ export function normalizeHomeDecorState(seed = {}) {
     nextId: Math.max(maxId + 1, Math.floor(finite(seed?.nextId, 1))),
     wallSegments,
   };
+  const styles = normalizeStyles(seed?.styles, storage);
+  if (Object.keys(styles).length) out.styles = styles;
   for (const kind of TEXTURE_KINDS) {
     const key = cleanKey(seed?.[kind]);
     out[kind] = textureOk(kind, key) ? key : defaultTexture(kind);
@@ -239,10 +317,10 @@ function fitPlacements(state, legacy) {
   const moved = new Map();
   for (const row of hosts) {
     const before = { x: row.x, y: row.y };
-    row.x = horizontalClamp(state, row.classTsid, mapX(row.x));
+    row.x = horizontalClamp(state, row.classTsid, mapX(row.x), row.upgradeId);
     if (row.slot === 'ceiling') row.y = INTERIOR.ceilingY;
     else if (row.slot === 'wall') {
-      const h = furnitureSize(row.classTsid).h;
+      const h = furnitureSize(row.classTsid, row.upgradeId).h;
       const top = INTERIOR.wallTop + INTERIOR.wallMarginTop + h;
       const bottom = INTERIOR.floorY - INTERIOR.wallMarginBottom;
       row.y = Math.round(Math.max(top, Math.min(bottom, row.y)));
@@ -294,16 +372,26 @@ export function grantStarterKit(state) {
   return granted;
 }
 
-/** Furniture the player can place: private storage plus furniture in the pack. */
+/**
+ * Furniture the player can place: private storage plus furniture in the pack.
+ * Upgraded pieces in storage (G358) get a row each, with `style` (their index
+ * in `styles[class]`), `upgradeId` and the upgrade's name.
+ */
 export function listPlaceable(state, inv = {}) {
   const out = [];
   for (const def of Object.values(FURNITURE_CATALOG)) {
-    const stored = state.storage[def.classTsid] || 0;
+    const styles = storedStyles(state, def.classTsid);
+    const stored = Math.max(0, (state.storage[def.classTsid] || 0) - styles.length);
     const packed = Math.max(0, Math.floor(finite(inv?.[def.classTsid], 0)));
+    styles.forEach((row, style) => {
+      const upgradeId = cleanUpgradeId(def.classTsid, row.upgradeId);
+      const label = upgradeRow(def.classTsid, upgradeId)?.name || def.label;
+      out.push({ classTsid: def.classTsid, label, slot: def.slot, stored: 1, packed: 0, total: 1, style, upgradeId });
+    });
     if (stored + packed < 1) continue;
     out.push({ classTsid: def.classTsid, label: def.label, slot: def.slot, stored, packed, total: stored + packed });
   }
-  return out.sort((a, b) => a.slot.localeCompare(b.slot) || a.label.localeCompare(b.label));
+  return out.sort((a, b) => a.slot.localeCompare(b.slot) || a.label.localeCompare(b.label) || (a.style ?? -1) - (b.style ?? -1));
 }
 
 function itemById(state, id) {
@@ -342,10 +430,10 @@ export function placementSpan(state, classTsid) {
   };
 }
 
-function horizontalClamp(state, classTsid, x) {
+function horizontalClamp(state, classTsid, x, upgradeId = '') {
   const { left, right } = placementSpan(state, classTsid);
   // HandOfDecorator: half_width_it_takes = Math.ceil(width / 2).
-  const half = Math.ceil(furnitureSize(classTsid).w / 2);
+  const half = Math.ceil(furnitureSize(classTsid, upgradeId).w / 2);
   return Math.round(Math.max(left + half, Math.min(right - half, finite(x, left + half))));
 }
 
@@ -354,9 +442,9 @@ export function surfaceUnder(state, x, excludeId = null) {
   let best = null;
   for (const row of state.placed) {
     if (row.id === excludeId || row.slot === 'wall' || row.slot === 'ceiling' || row.slot === 'rug') continue;
-    const h = surfaceHeight(row.classTsid);
+    const h = surfaceHeight(row.classTsid, row.upgradeId);
     if (!h) continue;
-    const half = furnitureSize(row.classTsid).w / 2 - 6;
+    const half = furnitureSize(row.classTsid, row.upgradeId).w / 2 - 6;
     if (Math.abs(x - row.x) > half) continue;
     if (!best || row.z > best.z) best = row;
   }
@@ -368,11 +456,11 @@ export function surfaceUnder(state, x, excludeId = null) {
  * (bottom-center) for floor, rug, tabletop and wall pieces, and the hanging
  * point (top-center) for ceiling pieces.
  */
-export function snapPlacement(state, classTsid, at = {}, excludeId = null) {
+export function snapPlacement(state, classTsid, at = {}, excludeId = null, upgradeId = '') {
   const def = furnitureDef(classTsid);
   if (!def) return null;
-  const x = horizontalClamp(state, classTsid, at.x);
-  const { h } = furnitureSize(classTsid);
+  const x = horizontalClamp(state, classTsid, at.x, upgradeId);
+  const { h } = furnitureSize(classTsid, upgradeId);
   if (def.slot === 'wall') {
     const top = INTERIOR.wallTop + INTERIOR.wallMarginTop + h;
     const bottom = INTERIOR.floorY - INTERIOR.wallMarginBottom;
@@ -384,7 +472,7 @@ export function snapPlacement(state, classTsid, at = {}, excludeId = null) {
   if (def.tabletop) {
     const host = surfaceUnder(state, x, excludeId);
     if (host && host.id !== excludeId) {
-      return { x, y: host.y - surfaceHeight(host.classTsid), slot: 'floor', on: host.id };
+      return { x, y: host.y - surfaceHeight(host.classTsid, host.upgradeId), slot: 'floor', on: host.id };
     }
   }
   return { x, y: INTERIOR.floorY, slot: 'floor', on: null };
@@ -404,12 +492,20 @@ export function placeFurniture(state, inv, classTsid, at = {}, opts = {}) {
   if (state.placed.length >= MAX_PLACED) return { ok: false, reason: 'full', msg: 'Your house is full of furniture already.' };
   const stored = state.storage[classTsid] || 0;
   const packed = Math.max(0, Math.floor(finite(inv?.[classTsid], 0)));
-  const from = opts.from === 'pack' ? (packed ? 'pack' : null) : stored ? 'storage' : packed ? 'pack' : null;
+  // G358: `opts.style` picks an upgraded piece from storage; otherwise a plain one goes first.
+  const styles = storedStyles(state, classTsid);
+  const styleAt = Number.isInteger(opts.style) && opts.style >= 0 && opts.style < styles.length ? opts.style : null;
+  const plain = stored - styles.length;
+  const from = styleAt != null ? 'storage'
+    : opts.from === 'pack' ? (packed ? 'pack' : null) : plain > 0 || (stored && !packed) ? 'storage' : packed ? 'pack' : null;
   if (!from) return { ok: false, reason: 'none', msg: `You don't have a ${def.label} to place.` };
-  const snapped = snapPlacement(state, classTsid, at);
+  const style = from === 'storage' ? (styleAt != null ? styles[styleAt] : plain > 0 ? null : styles[0]) : null;
+  const snapped = snapPlacement(state, classTsid, at, null, cleanUpgradeId(classTsid, style?.upgradeId));
   if (from === 'storage') {
+    if (style) styles.splice(styles.indexOf(style), 1);
     state.storage[classTsid] = stored - 1;
     if (state.storage[classTsid] <= 0) delete state.storage[classTsid];
+    storedStyles(state, classTsid);
   } else {
     inv[classTsid] = packed - 1;
   }
@@ -423,6 +519,7 @@ export function placeFurniture(state, inv, classTsid, at = {}, opts = {}) {
     z: topZ(state) + 1,
     on: snapped.on,
   };
+  if (style) copyStyle(style, item);
   state.placed.push(item);
   return { ok: true, item, from };
 }
@@ -445,7 +542,7 @@ export function riders(state, id) {
 export function moveFurniture(state, id, at = {}) {
   const item = itemById(state, id);
   if (!item) return { ok: false, reason: 'missing' };
-  const snapped = snapPlacement(state, item.classTsid, at, item.id);
+  const snapped = snapPlacement(state, item.classTsid, at, item.id, item.upgradeId);
   const dx = snapped.x - item.x;
   const dy = snapped.y - item.y;
   item.x = snapped.x;
@@ -491,8 +588,17 @@ export function pickUpFurniture(state, id) {
   }
   const ids = new Set(lifted.map((row) => row.id));
   state.placed = state.placed.filter((row) => !ids.has(row.id));
-  for (const row of lifted) state.storage[row.classTsid] = (state.storage[row.classTsid] || 0) + 1;
-  return { ok: true, lifted: lifted.map((row) => row.classTsid) };
+  for (const row of lifted) {
+    // G358: an upgraded piece keeps its upgrade in storage (furniture_pickup moves the stack, props and all).
+    const styles = storedStyles(state, row.classTsid);
+    state.storage[row.classTsid] = (state.storage[row.classTsid] || 0) + 1;
+    if (isStyled(row)) {
+      const { classTsid, ...style } = copyStyle(row, { classTsid: row.classTsid });
+      styles.push(style);
+      state.styles[row.classTsid] = styles;
+    }
+  }
+  return { ok: true, lifted: lifted.map((row) => row.classTsid), pieces: lifted.map((row) => ({ classTsid: row.classTsid, upgradeId: row.upgradeId || '' })) };
 }
 
 /**

@@ -75,7 +75,10 @@ const RULES = [
   [/^engineering_assemble_machine$/, 'live', 'Assemble a machine from its stand and parts without spending energy (60 otherwise).'],
   [/^engineering_disassemble_machine$/, 'live', 'Fully disassemble a machine for 15 energy instead of 15 per part.'],
   [/^engineering_reduce_time$/, 'live', 'Installing or uninstalling each machine part takes 1 second instead of 2.'],
-  [/^furnituremaking_bonus_upgrade_[123]$/, 'later', 'Furniture upgrades (credit SWFs) are lost.'],
+  // construction_tool.js 334-381 (G358, js/furniture-upgrades.js). Secret in the source; dealt here (imagination.js DEALT_SECRET_CARDS).
+  [/^furnituremaking_bonus_upgrade_1$/, 'live', '5% of the Furnituremaking I pieces you make with a Construction Tool come out as a random style worth 25 credits or less (the piece goes into your furniture storage).'],
+  [/^furnituremaking_bonus_upgrade_2$/, 'live', 'The 5% bonus style now also comes out of Furnituremaking II pieces.'],
+  [/^furnituremaking_bonus_upgrade_3$/, 'live', 'The 5% bonus style now also comes out of Engineering pieces (Storage Display Box, cabinets, shelves).'],
   [/^fiber_arts_bonus_1$/, 'live', '4% of spins on a Spindle make String instead of Thread.'],
   [/^fiber_arts_bonus_2$/, 'live', '4% of General Fabric batches on a Loomer give 2 more Fabric.'],
   [/^distilling_(corn|grain|potato)$/, 'live', 'That crop puts 20% more into the Still hopper.'],

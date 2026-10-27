@@ -42,7 +42,8 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=g300-2';
-import { furnitureDef, furnitureScale, furnitureSize } from '../home-decor.js?v=home-decor-5';
+import { furnitureDef, furnitureScale, furnitureSize } from '../home-decor.js?v=home-decor-6';
+import { pieceLabel } from '../furniture-upgrades.js?v=furnup-1';
 import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=home-cultivation-5';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
 import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note-pole-art.js?v=homes3-1';
@@ -50,10 +51,10 @@ import { textureFromUrl } from '../textures.js';
 import { signArmWidth } from '../street-render.js?v=parallax-9';
 import { openNotePicker, openNoteView } from '../note-view.js?v=note-g175';
 import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=g328-4';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=homes-51';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=homes-52';
 import { projectApi } from './street-jobs-feature.js?v=blur-9';
 import { saveStore } from '../save-store.js?v=mp2-2';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=furniture-59';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=furniture-60';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,
@@ -423,7 +424,8 @@ function createSession(engine, client) {
       const def = furnitureDef(row.classTsid);
       const listing = listed.get(row.uid) || null;
       if (!def || (!owner && !listing) || (owner && !canSellClass(row.classTsid))) continue;
-      const { w, h } = furnitureSize(row.classTsid);
+      // G358: an upgraded piece's own size and name.
+      const { w, h } = furnitureSize(row.classTsid, row.upgradeId);
       const ceiling = def.slot === 'ceiling';
       const box = new PIXI.Container();
       box.x = Math.round(row.x);
@@ -440,7 +442,7 @@ function createSession(engine, client) {
         tag.y = ceiling ? box.y + h + 14 : box.y - h - 12;
         engine.entityLayer.addChild(tag);
       }
-      const label = def.label || ITEM_CATALOG[row.classTsid]?.label || row.classTsid;
+      const label = pieceLabel(row, def.label) || ITEM_CATALOG[row.classTsid]?.label || row.classTsid;
       const subtitle = listing ? T.buyTip(listing.price) : 'Yours';
       const target = addTarget({ classId: CLASS_SALE, label, subtitle, sprite: box, state: { uid: row.uid, owner } });
       drawn.sales.set(row.uid, { target, tag, uid: row.uid, classTsid: row.classTsid, label, listing, x: row.x });
@@ -505,7 +507,7 @@ function createSession(engine, client) {
     const decor = st?.houseDecor;
     if (!decor) return;
     const geo = ownGeometry();
-    drawSales(decor.placed.map((p) => ({ uid: p.id, classTsid: p.classTsid, x: geo.house.roomX + p.x, y: p.y })), own.listed, { owner: true });
+    drawSales(decor.placed.map((p) => ({ uid: p.id, classTsid: p.classTsid, upgradeId: p.upgradeId, x: geo.house.roomX + p.x, y: p.y })), own.listed, { owner: true });
   }
 
   // —— My own home: the site's word ——
@@ -622,7 +624,7 @@ function createSession(engine, client) {
     }
     drawPoles();
     if (visit.room === 'interior') {
-      drawSales(visit.pieces.map(({ item, box }) => ({ uid: Number(item.id), classTsid: item.classTsid, x: visit.roomX + Number(item.x), y: Number(item.y), box })), visit.listed, { owner: false });
+      drawSales(visit.pieces.map(({ item, box }) => ({ uid: Number(item.id), classTsid: item.classTsid, upgradeId: item.upgradeId, x: visit.roomX + Number(item.x), y: Number(item.y), box })), visit.listed, { owner: false });
     }
     drawVisitProtos();
     publish();

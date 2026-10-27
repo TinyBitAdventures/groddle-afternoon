@@ -1813,6 +1813,21 @@
   "reason": "Build Seldom Squish was finished in the original: Seldom Squish stands unlocked (LLI57G8I2HI1CSO.xml:54; inc_jobs.js:556-569 keeps it locked while the job is not done) and Peatland Moors holds all four phase instances (LLICF642CTI16R1.xml:36, 44, 52, 60) with its signpost open (GLICF642CTI16R1.xml:2691, no hidden). Its last phase needs 250 Grain Seeds (quests/job_standard1b_for_new_groddle_meadow_streets.js:20-27), an alpha-era item (glitchen wiki Grain Seed, 2011-02-10: Gardening Vendor 10c, Piggy plop of 3 grain; forum ideas/5164: \"it used to be\") deleted before shutdown: no items/seed_grain.js in GSJS or eleven-gsjs, listed under catalog_tags.js deleted (738, 867). The final source cannot finish it again, so the street stays built here as it was at shutdown",
   "register": "G15"
  },
+ "imagination:furnituremaking_bonus_upgrade_1": {
+  "status": "reimagined",
+  "reason": "dealt in the Upgrades shop at its source cost (5000 iMG) and condition (Furnituremaking I), though inc_data_imagination.js 2037-2058 marks it is_secret and imagination_get_all (inc_imagination.js 552) never dealt it; it is the one way to a style that cost credits (G358, js/furniture-upgrades.js). The roll is construction_tool.js 334-381: 5%, Furnituremaking I recipes, a random style of the made class worth 1 to 25 credits. Reimagined: the made piece moves from the pack into furniture storage (the source's furniture bag, bag.js 104-105) and needs a house; the card's style is recorded in upgrade_history so it stays owned",
+  "register": "G358"
+ },
+ "imagination:furnituremaking_bonus_upgrade_2": {
+  "status": "reimagined",
+  "reason": "dealt at its source cost (7500 iMG) and conditions (Furnituremaking II, Bonus Furniture Upgrade I) though is_secret in the source (inc_data_imagination.js 2061-2088; inc_imagination.js 552 never dealt it); adds Furnituremaking II recipes to the 5% roll (construction_tool.js 351-353). Reimagined as card I (G358)",
+  "register": "G358"
+ },
+ "imagination:furnituremaking_bonus_upgrade_3": {
+  "status": "reimagined",
+  "reason": "dealt at its source cost (10000 iMG) and conditions (Furnituremaking II, Engineering I, Bonus Furniture Upgrade II) though is_secret in the source (inc_data_imagination.js 2091-2120; inc_imagination.js 552 never dealt it); adds Engineering I recipes to the 5% roll (construction_tool.js 354-356). Reimagined as card I (G358)",
+  "register": "G358"
+ },
  "location:LHVM01TACH92TQF": {
   "status": "lost",
   "reason": "no geometry survives anywhere: Plexus Colour Game (category instance-template-no-geometry: quest/instance room with no geometry anywhere; GSJS: config shared_instances.color_game); listed in the round 2 hunt brief (research/coverage/hunt-outline-2026-10-27-round2.md) and comes back if a source turns up",
