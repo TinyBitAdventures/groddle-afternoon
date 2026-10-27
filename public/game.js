@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-15';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-180';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-181';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -406,7 +406,9 @@ import {
   ensureItem,
   addItem,
   removeItem,
+  isToolItem,
 } from './js/inventory.js?v=catalog-unified-7';
+import { PACK_COPY } from './js/pack-slots.js?v=g152-1';
 import {
   packPagerState,
   packPageTarget,
@@ -701,7 +703,7 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=vendor-profiles-6';
+} from './js/vendor.js?v=vendor-profiles-7';
 import {
   createAnimalState,
   resetAnimalDay,
@@ -3106,16 +3108,23 @@ function renderPackPopover(classTsid, anchor = null) {
  */
 function renderPackRow(box, slots, opts = {}) {
   if (!box) return;
-  setupPackPager(box);
+  if (box.classList.contains('pack-items') || box.classList.contains('pack-tools')) setupPackPager(box);
   box.innerHTML = '';
+  if (opts.container) box.dataset.packContainer = opts.container;
   const emptyCount = opts.emptyCount ?? 4;
-  if (!slots.length) {
+  // G152: with the slot layout the free slots always show (drop targets); otherwise only an empty row shows boxes.
+  const appendEmpties = () => {
     for (let i = 0; i < emptyCount; i++) {
       const empty = document.createElement('div');
       empty.className = 'pack-slot pack-empty';
       empty.setAttribute('role', 'listitem');
+      if (opts.container) empty.dataset.packContainer = opts.container;
       box.appendChild(empty);
     }
+  };
+  if (!slots.length && !opts.fillEmpty) {
+    appendEmpties();
+    if (opts.rock) box.appendChild(packRockChip(opts.rock));
     refreshPackPager(box);
     return;
   }
@@ -3144,7 +3153,22 @@ function renderPackRow(box, slots, opts = {}) {
       : `${shownLabel} × ${s.count} · click for actions`;
     slot.dataset.tsid = s.classTsid;
     const canDragToVendor = !(s.isTool || opts.toolRow);
-    slot.draggable = canDragToVendor;
+    // G152: a slot from the pack layout knows where it sits, so it can be dragged between the pack and a bag.
+    const inLayout = s.container != null;
+    if (inLayout) {
+      slot.dataset.packContainer = s.container;
+      slot.dataset.packIndex = String(s.index);
+    }
+    if (s.bag) {
+      slot.classList.add('pack-bag');
+      slot.dataset.packBag = s.bag.key;
+      slot.classList.toggle('is-open', Boolean(s.bag.open));
+      slot.setAttribute('aria-haspopup', 'true');
+      slot.setAttribute('aria-expanded', s.bag.open ? 'true' : 'false');
+      slot.setAttribute('aria-label', `${s.bag.label || shownLabel}, ${s.bag.used} of ${s.bag.capacity} slots used, ${s.bag.open ? 'open' : 'closed'}`);
+      slot.title = `${s.bag.label || shownLabel} · ${s.bag.used}/${s.bag.capacity} · click to ${s.bag.open ? 'close' : 'open'}`;
+    }
+    slot.draggable = canDragToVendor || inLayout;
     if (s.icon) {
       const img = document.createElement('img');
       const brokenToolIcons = {
@@ -3166,7 +3190,15 @@ function renderPackRow(box, slots, opts = {}) {
     } else {
       slot.textContent = s.label.slice(0, 2);
     }
-    if (!(s.isTool || opts.toolRow) || s.count > 1) {
+    if (s.bag) {
+      // PackSlot.as:147-176, 197-213: the opener strip under a bag shows used/total; it opens the bag's Options.
+      const opener = document.createElement('span');
+      opener.className = 'pack-bag-opener';
+      opener.dataset.packOpener = '1';
+      opener.title = PACK_COPY.options;
+      opener.innerHTML = `<b>${s.bag.used}/${s.bag.capacity}</b><i aria-hidden="true"></i>`;
+      slot.appendChild(opener);
+    } else if (!(s.isTool || opts.toolRow) || s.count > 1) {
       const c = document.createElement('span');
       c.className = 'count';
       c.textContent = s.count;
@@ -3182,6 +3214,14 @@ function renderPackRow(box, slots, opts = {}) {
     }
     slot.addEventListener('click', (event) => {
       if (currentAction) cancelCurrentAction({ quiet: true });
+      // G152: clicking a bag opens or closes it (one at a time); its opener strip opens its Options.
+      if (s.bag && !event.target?.closest?.('[data-pack-opener]')) {
+        closePackPopover();
+        features.query('packToggleBag', s.bag.key, engine);
+        playSound('CLICK_SUCCESS', { volume: 0.4 });
+        updateHud();
+        return;
+      }
       if (event.shiftKey && !(s.isTool || opts.toolRow) && getPackUseInfo(s.classTsid).usable) {
         closePackPopover();
         usePackItem(s.classTsid);
@@ -3196,11 +3236,23 @@ function renderPackRow(box, slots, opts = {}) {
         renderPackPopover(s.classTsid, slot);
       }
     });
-    if (canDragToVendor) {
+    if (canDragToVendor || inLayout) {
       slot.addEventListener('dragstart', (event) => {
-        if (!isVendorOpen()) {
+        packDrag = inLayout ? { container: s.container, index: s.index, cls: s.classTsid, bag: s.bag?.key || '' } : null;
+        if (!isVendorOpen() || !canDragToVendor) {
           // G332: drag a pack item onto another player to give it (features/gifts-feature.js).
-          if (features.query('packDragStart', s.classTsid, event, engine)) return;
+          if (canDragToVendor && !s.bag && features.query('packDragStart', s.classTsid, event, engine)) return;
+          if (inLayout) {
+            // G152: between the pack and a bag (PackContainerView.as startDraggingAPISView).
+            closePackPopover();
+            if (event.dataTransfer) {
+              event.dataTransfer.effectAllowed = 'move';
+              event.dataTransfer.setData('application/x-groddle-slot', `${s.container}:${s.index}`);
+              event.dataTransfer.setData('text/plain', s.classTsid);
+            }
+            slot.classList.add('is-dragging');
+            return;
+          }
           event.preventDefault();
           return;
         }
@@ -3224,13 +3276,167 @@ function renderPackRow(box, slots, opts = {}) {
       });
       slot.addEventListener('dragend', () => {
         vendorDragTsid = null;
+        packDrag = null;
         slot.classList.remove('is-dragging');
         document.getElementById('vendor-sell-drop')?.classList.remove('is-dragover');
+        document.querySelectorAll('.pack-bar .is-drop-target').forEach((el) => el.classList.remove('is-drop-target'));
       });
     }
     box.appendChild(slot);
   }
+  if (opts.fillEmpty) appendEmpties();
+  if (opts.rock) box.appendChild(packRockChip(opts.rock));
   refreshPackPager(box);
+}
+
+/** G152: the stack being dragged inside the pack ({ container, index, cls, bag }). */
+let packDrag = null;
+
+/** G152 (inc_rewards.js:66-93): what the magic rock holds for you while the pack is full. */
+function packRockChip(rock) {
+  const entries = Object.entries(rock || {}).filter(([, n]) => n > 0);
+  const chip = document.createElement('button');
+  chip.type = 'button';
+  chip.className = 'pack-slot pack-rock';
+  chip.dataset.packRock = entries.map(([c, n]) => `${c}:${n}`).join(',');
+  const names = entries.map(([c, n]) => `${n} ${n === 1 ? ITEM_CATALOG[c]?.label || c : ITEM_CATALOG[c]?.namePlural || `${ITEM_CATALOG[c]?.label || c}s`}`);
+  const line = PACK_COPY.rockHolding(names.length > 4 ? `${names.slice(0, 3).join(', ')} and ${names.length - 3} more things` : names.join(', ').replace(/, ([^,]*)$/, ' and $1'), entries.length > 1 || entries.some(([, n]) => n > 1));
+  chip.title = line;
+  chip.setAttribute('aria-label', line);
+  chip.innerHTML = `<img src="assets/sprites/icons/magic_rock.png" alt="" /><span class="count">${entries.length}</span>`;
+  chip.addEventListener('click', () => {
+    toast(line, 5000);
+    playSound('CLICK_SUCCESS', { volume: 0.4 });
+  });
+  return chip;
+}
+
+/** G152: the stacks of the pack layout as pack row entries. */
+function packLayoutEntry(slot, container, index, layout, openKey) {
+  const meta = ITEM_CATALOG[slot.cls] || {};
+  const entry = {
+    classTsid: slot.cls,
+    label: meta.label || slot.cls.replace(/_/g, ' '),
+    count: slot.count,
+    icon: meta.icon || itemIconUrl(slot.cls),
+    desc: meta.desc || '',
+    isTool: isToolItem(slot.cls),
+    baseCost: meta.baseCost,
+    stackMax: meta.stackMax,
+    sellable: meta.sellable !== false,
+    donatable: meta.donatable !== false,
+    container,
+    index,
+  };
+  if (slot.kind === 'bag') {
+    const box = layout.bags[slot.key];
+    entry.isTool = false;
+    entry.bag = { key: slot.key, used: box?.slots.length || 0, capacity: box?.capacity || 0, open: openKey === slot.key, label: box?.label || entry.label, holds: box?.holds || 'any' };
+  }
+  return entry;
+}
+
+/** G152: the open bag's own row of slots above the pack (PackDisplayManager.as:1101-1185). */
+function renderOpenBagRow(layout, openKey) {
+  const rows = document.querySelector('#pack-bar .pack-rows');
+  if (!rows) return;
+  let row = document.getElementById('pack-bag');
+  if (!row) {
+    row = document.createElement('div');
+    row.id = 'pack-bag';
+    row.className = 'pack-bag-row';
+    row.setAttribute('role', 'group');
+    row.hidden = true;
+    rows.insertBefore(row, rows.firstChild);
+  }
+  const box = openKey ? layout?.bags?.[openKey] : null;
+  if (!box) {
+    row.hidden = true;
+    row.innerHTML = '';
+    delete row.dataset.packBag;
+    return;
+  }
+  row.hidden = false;
+  row.dataset.packBag = box.key;
+  row.dataset.packContainer = box.key;
+  row.setAttribute('aria-label', `${box.label}, ${box.slots.length} of ${box.capacity} slots used`);
+  row.innerHTML = '';
+  const head = document.createElement('div');
+  head.className = 'pack-bag-head';
+  head.innerHTML = `<img src="${itemIconUrl(box.cls)}" alt="" /><strong>${escapeHtml(box.label)}</strong><span>${box.slots.length}/${box.capacity}</span>`;
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.className = 'pack-bag-close';
+  close.setAttribute('aria-label', `Close ${box.label}`);
+  close.textContent = '×';
+  close.addEventListener('click', () => {
+    features.query('packToggleBag', box.key, engine);
+    updateHud();
+  });
+  head.appendChild(close);
+  row.appendChild(head);
+  const slots = document.createElement('div');
+  slots.className = 'pack-slots pack-bag-slots';
+  slots.setAttribute('role', 'list');
+  slots.dataset.packContainer = box.key;
+  row.appendChild(slots);
+  renderPackRow(slots, box.slots.map((slot, i) => packLayoutEntry(slot, box.key, i, layout, openKey)), {
+    emptyCount: Math.max(0, box.capacity - box.slots.length),
+    fillEmpty: true,
+    container: box.key,
+  });
+  // Centred over the bag's slot, kept inside the pack (placeContainer, PackDisplayManager.as:1170-1185).
+  const bagEl = document.querySelector(`.pack-slot[data-pack-bag="${box.key}"]`);
+  const rowsRect = rows.getBoundingClientRect();
+  if (bagEl && rowsRect.width) {
+    const r = bagEl.getBoundingClientRect();
+    const width = row.offsetWidth || 0;
+    const centre = r.left - rowsRect.left + r.width / 2;
+    const left = Math.max(0, Math.min(centre - width / 2, rowsRect.width - width));
+    row.style.marginLeft = `${Math.round(left)}px`;
+  }
+}
+
+/** G152: drops inside the pack bar move a stack between the pack and a bag. */
+function setupPackDrops() {
+  const bar = document.getElementById('pack-bar');
+  if (!bar || bar.dataset.packDropsReady === '1') return;
+  bar.dataset.packDropsReady = '1';
+  const targetOf = (event) => event.target?.closest?.('.pack-slot[data-pack-container], .pack-slot.pack-empty, [data-pack-container]');
+  const destFor = (el) => {
+    if (!el || !packDrag) return null;
+    if (el.dataset.packBag && !packDrag.bag && el.dataset.packBag !== packDrag.container) return { bag: el.dataset.packBag };
+    const container = el.dataset.packContainer || el.closest('[data-pack-container]')?.dataset.packContainer;
+    if (!container) return null;
+    return el.dataset.packIndex != null ? { container, index: Number(el.dataset.packIndex) } : { container };
+  };
+  bar.addEventListener('dragover', (event) => {
+    if (!packDrag) return;
+    const el = targetOf(event);
+    const dest = destFor(el);
+    document.querySelectorAll('.pack-bar .is-drop-target').forEach((n) => { if (n !== el) n.classList.remove('is-drop-target'); });
+    if (!dest) return;
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+    el.classList.add('is-drop-target');
+    const label = dest.bag ? document.querySelector(`.pack-slot[data-pack-bag="${dest.bag}"]`)?.getAttribute('aria-label')?.split(',')[0] : '';
+    el.title = dest.bag ? PACK_COPY.moveTo(label || 'the bag') : PACK_COPY.moveHere;
+    if (app?.canvas) app.canvas.dataset.packDragTip = el.title;
+  });
+  bar.addEventListener('drop', (event) => {
+    if (!packDrag) return;
+    const el = targetOf(event);
+    const dest = destFor(el);
+    document.querySelectorAll('.pack-bar .is-drop-target').forEach((n) => n.classList.remove('is-drop-target'));
+    if (!dest) return;
+    event.preventDefault();
+    const from = { container: packDrag.container, index: packDrag.index };
+    packDrag = null;
+    const result = features.query('packMove', from, dest, engine);
+    if (result && !result.ok && result.reason && result.reason !== 'missing') toast(result.reason, 3000);
+    playSound(result?.ok ? 'CLICK_SUCCESS' : 'CLICK_FAILURE', { volume: 0.45 });
+    updateHud();
+  });
 }
 
 /** G255: the quest log markup last drawn (updateHud redraws only when it changes). */
@@ -3509,10 +3715,26 @@ function updateHud() {
 
   // Dual-row pack: items (top) + tools (bottom), currants already set above
   syncEmotionalBearCatalog();
-  const rows = listPackRows(inv);
   const itemsBox = document.getElementById('pack-items');
   const toolsBox = document.getElementById('pack-tools');
-  if (itemsBox || toolsBox) {
+  // G152: 16 pack slots shared by both rows (tools and toolboxes below, the rest and the free slots above),
+  // each bag's slots in its own row when open, and what the magic rock holds (features/bags-feature.js).
+  const packLayout = (itemsBox || toolsBox) ? features.query('packLayout', engine) : null;
+  if (packLayout) {
+    setupPackDrops();
+    const openKey = features.query('packOpenBag') || '';
+    const itemRow = [];
+    const toolRow = [];
+    packLayout.pack.slots.forEach((slot, i) => {
+      const entry = packLayoutEntry(slot, 'pack', i, packLayout, openKey);
+      const toolSlot = slot.kind === 'bag' ? entry.bag.holds === 'tool' : entry.isTool;
+      (toolSlot ? toolRow : itemRow).push(entry);
+    });
+    renderPackRow(itemsBox, itemRow, { emptyCount: packLayout.free, fillEmpty: true, container: 'pack', rock: packLayout.rockStacks ? packLayout.rock : null });
+    renderPackRow(toolsBox, toolRow, { emptyCount: 0, toolRow: true, container: 'pack' });
+    renderOpenBagRow(packLayout, openKey);
+  } else if (itemsBox || toolsBox) {
+    const rows = listPackRows(inv);
     renderPackRow(itemsBox, rows.items, { emptyCount: 6 });
     renderPackRow(toolsBox, rows.tools, { emptyCount: 4, toolRow: true });
   } else {
@@ -9316,12 +9538,23 @@ function dropPackItem(classTsid, requested = 1) {
 }
 
 function pickupDroppedWorldItem(target) {
+  // G152 (takeable.js:76-79, 84-93): a full pack refuses the stack; a part that fits is taken, the rest stays down.
+  const wantClass = target?.state?.classTsid;
+  const wantCount = Math.max(1, Math.floor(Number(target?.state?.count) || 1));
+  const room = wantClass ? features.query('packRoom', wantClass, wantCount, engine) : null;
+  if (room === 0) {
+    playSound('PACK_FULL', { volume: 0.6 });
+    toast(PACK_COPY.pickupFull);
+    pushActivity(PACK_COPY.pickupFull);
+    if (app?.canvas) app.canvas.dataset.packLast = PACK_COPY.pickupFull;
+    return false;
+  }
   const shared = features.query('sharedPickup', target, engine);
   if (shared != null) return shared;
   const id = target?.state?.id || target?.worldItemId;
   const x = target?.sprite?.x ?? player?.x ?? 0;
   const y = target?.sprite?.y ?? player?.y ?? 0;
-  const result = pickupDroppedStack(droppedItemState, inv, droppedStacksTsid(), id);
+  const result = pickupDroppedStack(droppedItemState, inv, droppedStacksTsid(), id, room != null && room < wantCount ? room : Infinity);
   if (!result.ok) {
     toast('That stack has already been picked up.');
     refreshDroppedWorldItems();
@@ -22267,9 +22500,14 @@ function renderVendorList() {
       applyQ(Number(e.target.value) || 1);
     });
     detail.querySelector('[data-v-go]')?.addEventListener('click', () => {
-      const r = isBuy
-        ? vendorBuy(pc, inv, activeVendor.offers, vendorSelected, vendorQty)
-        : vendorSell(pc, inv, activeVendor.offers, vendorSelected, vendorQty, vendorSellOpts());
+      // G152 (inc_stores.js:168-196): buy only what fits; none fitting is refused, the rest isn't charged.
+      const fit = isBuy ? features.query('packRoom', vendorSelected, vendorQty, engine) : null;
+      const r = isBuy && fit === 0
+        ? { ok: false, reason: 'pack_full', msgs: [PACK_COPY.buyNone] }
+        : isBuy
+          ? vendorBuy(pc, inv, activeVendor.offers, vendorSelected, fit != null && fit < vendorQty ? fit : vendorQty)
+          : vendorSell(pc, inv, activeVendor.offers, vendorSelected, vendorQty, vendorSellOpts());
+      if (isBuy && r.ok && fit != null && fit < vendorQty) r.msgs[0] += PACK_COPY.buyPartial(vendorQty - fit);
       toast(r.msgs[0]);
       pushActivity(r.msgs[0]);
       playSound(r.ok ? (isBuy ? 'PURCHASE_ITEM' : 'VENDOR_SELL') : 'CLICK_FAILURE', { volume: 0.55 });

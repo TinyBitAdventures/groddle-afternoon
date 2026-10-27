@@ -15,7 +15,7 @@ import {
   vendorBuy,
   vendorSell,
   vendorSellValue,
-} from '../public/js/vendor.js?v=vendor-profiles-6';
+} from '../public/js/vendor.js?v=vendor-profiles-7';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');
@@ -33,7 +33,7 @@ describe('official street vendor profiles', () => {
     assert.equal(VENDOR_PROFILES.groceries.offers.length, 12);
     assert.equal(VENDOR_PROFILES.gardening.offers.length, 19); // Pumpkin Seed joined with its recovered icon
     assert.equal(VENDOR_PROFILES.produce.offers.length, 15);
-    assert.equal(VENDOR_PROFILES.toys.offers.length, 23); // 14 Party Packs joined with their icons
+    assert.equal(VENDOR_PROFILES.toys.offers.length, 24); // 14 Party Packs joined with their icons; the Cubimal Case (G152)
     for (const vendor of Object.values(VENDOR_PROFILES)) {
       assert.match(vendor.id, /^street_spirit_/, vendor.label);
       for (const offer of vendor.offers) {

@@ -17,6 +17,7 @@ import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
+import { BAG_DEFS } from './public/js/pack-slots.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const gsjs = process.env.GSJS_ROOT || decodeURIComponent(new URL('../glitch-GameServerJS', import.meta.url).pathname);
@@ -72,12 +73,13 @@ for (const [rawId, meta] of Object.entries(KEEP)) {
     // Machine parts and pasture machines have no remake system yet and no
     // recovered icon, so stock only what the pack can actually show.
     // Icons that arrived with drop tables still have no system behind them:
-    // bags (no bag slots) and the snapshot Camera (no photos). The Elemental
-    // Pouch is the exception: js/elemental-pouch.js gives it its Shake and
-    // Rename verbs while elements stay in the pack (G83).
+    // the snapshot Camera (no photos). Bags are stocked when the pack has a
+    // slot for them (G152, js/pack-slots.js BAG_DEFS: the Generic and Bigger
+    // Bags, the Toolboxes, Spice Rack, Alchemistry Kit, Cubimal Case and the
+    // Elemental Pouch, G83); other bag_ classes (furniture cabinets) stay out.
     // js/seasons.js SEASONAL_STOCK adds these only during Glitchmas.
     if (SEASONAL.has(entry.class_tsid)) continue;
-    if ((/^bag_/.test(entry.class_tsid) && entry.class_tsid !== 'bag_elemental_pouch') || entry.class_tsid === 'camera') {
+    if ((/^bag_/.test(entry.class_tsid) && !Object.prototype.hasOwnProperty.call(BAG_DEFS, entry.class_tsid)) || entry.class_tsid === 'camera') {
       skipped.push(`${store.name}: ${entry.class_tsid}`);
       continue;
     }

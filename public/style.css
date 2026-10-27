@@ -1755,6 +1755,90 @@ button.play-context-head:focus-visible {
   border-style: dashed;
   cursor: default;
 }
+/* G152 bags: a bag in a pack slot with its opener strip (PackSlot.as:106-176), the open bag's row above the
+   pack (PackContainerView.as:213-219 background 0xc6d2d3, border 0xb2bfc0) and the magic rock's chip. */
+.pack-slots .pack-slot.pack-bag {
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 2px;
+  overflow: hidden;
+}
+.pack-slots .pack-slot.pack-bag img { max-width: 26px; max-height: 26px; }
+.pack-bag-opener {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  background: #f0f5f7;
+  border-top: 1px solid #d1d6d7;
+  font-size: 0.56rem;
+  line-height: 1;
+  color: #4d5659;
+}
+.pack-bag-opener i {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #6d777c;
+}
+.pack-slots .pack-slot.pack-bag.is-open {
+  transform: translateY(-6px);
+  background: #78898a;
+  border-color: #6b7a7b;
+}
+.pack-slots .pack-slot.pack-bag.is-open .pack-bag-opener { background: #78898a; color: #fff; border-top-color: #6b7a7b; }
+.pack-slots .pack-slot.pack-bag.is-open .pack-bag-opener i { background: #fff; }
+.pack-bag-row {
+  align-self: flex-start;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 4px 6px 5px;
+  background: #c6d2d3;
+  border: 1px solid #b2bfc0;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  animation: pack-bag-in 0.3s ease-in;
+}
+.pack-bag-row[hidden] { display: none; }
+@keyframes pack-bag-in { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .pack-bag-row { animation: none; } }
+.pack-bag-head {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.68rem;
+  color: #3f4a4c;
+  margin-bottom: 3px;
+}
+.pack-bag-head img { width: 16px; height: 16px; }
+.pack-bag-head span { opacity: 0.75; }
+.pack-bag-close {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  font: 800 0.95rem/1 "Trebuchet MS", sans-serif;
+  color: #4d5659;
+  cursor: pointer;
+  padding: 0 2px;
+}
+.pack-slots.pack-bag-slots {
+  flex-wrap: wrap;
+  overflow: visible;
+  min-height: 0;
+}
+.pack-slots.pack-bag-slots .pack-slot { width: 40px; height: 40px; flex-basis: 40px; }
+.pack-slots .pack-slot.is-drop-target {
+  border-color: #5c9cc7;
+  box-shadow: 0 0 0 2px rgba(92, 156, 199, 0.45);
+  opacity: 1;
+}
+.pack-slots .pack-slot.pack-rock {
+  background: #efe6d2;
+  border-color: #b9a77f;
+}
+.pack-slots .pack-slot.pack-rock img { max-width: 28px; max-height: 28px; }
 .pack-hint {
   font-size: 0.62rem;
   opacity: 0.5;

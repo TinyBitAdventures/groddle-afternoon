@@ -611,6 +611,21 @@
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&doordemo=GA5I10NJDL52TKD&practice=1"
   },
   {
+   "id": "bags",
+   "group": "economy",
+   "name": "Bags and the 16-slot pack",
+   "status": "source",
+   "blurb": "The pack holds 16 stacks; Generic and Bigger Bags, Toolboxes, the Spice Rack, Alchemistry Kit, Cubimal Case and Elemental Pouch add their own slots and open above the pack. A full pack refuses pickups and vendor buys with the original words, and the magic rock holds anything else until there is room.",
+   "multiplayer": null,
+   "spot": null,
+   "evidence": [
+    "public/js/pack-slots.js",
+    "public/js/features/bags-feature.js"
+   ],
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&bagdemo=1&practice=1"
+  },
+  {
    "id": "vendors",
    "group": "economy",
    "name": "Street spirits and vendors",
@@ -1165,15 +1180,15 @@
   }
  ],
  "tally": {
-  "source": 50,
+  "source": 51,
   "rebuilt": 10,
   "solo": 6,
   "reimagined": 1,
   "progress": 1,
   "lost": 1
  },
- "back": 67,
- "possible": 68,
+ "back": 68,
+ "possible": 69,
  "multiplayer": 18,
  "quests": {
   "total": 445,
@@ -2119,7 +2134,7 @@
   "skipped": 20
  },
  "icons": {
-  "items": 1030,
+  "items": 1031,
   "sharp": 1018
  },
  "imagination": {
@@ -2571,9 +2586,14 @@
   ]
  },
  "git": {
-  "commits": 576,
+  "commits": 577,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "fix",
+    "text": "Uralia and Andra Kajuu streets no longer loop the 9-second Spinning Wheel jingle as their music"
+   },
    {
     "date": "2026-10-27",
     "kind": "new",
@@ -2688,14 +2708,9 @@
     "date": "2026-10-26",
     "kind": "new",
     "text": "In multiplayer, everyone on a street builds its project together, and a finished street opens its road for everyone"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "new",
-    "text": "In multiplayer, a Party Pack opens a party space for your real party"
    }
   ]
  },
- "tests": 337,
+ "tests": 338,
  "generatedAt": "2026-10-27"
 }

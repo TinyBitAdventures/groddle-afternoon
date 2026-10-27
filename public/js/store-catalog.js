@@ -140,9 +140,29 @@ export const STORE_CATALOG = Object.freeze([
         "cost": 560
       },
       {
+        "classTsid": "bag_generic_blue",
+        "label": "Generic Blue Bag",
+        "cost": 1120
+      },
+      {
+        "classTsid": "bag_generic_gray",
+        "label": "Generic Gray Bag",
+        "cost": 1064
+      },
+      {
+        "classTsid": "bag_generic_pink",
+        "label": "Generic Pink Bag",
+        "cost": 1092
+      },
+      {
         "classTsid": "hatchet",
         "label": "Hatchet",
         "cost": 112
+      },
+      {
+        "classTsid": "bag_generic_green",
+        "label": "Generic Green Bag",
+        "cost": 1036
       },
       {
         "classTsid": "emotional_bear",
@@ -158,6 +178,51 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "moon",
         "label": "Moon",
         "cost": 111
+      },
+      {
+        "classTsid": "bag_generic",
+        "label": "Generic Bag",
+        "cost": 1008
+      },
+      {
+        "classTsid": "bag_bigger",
+        "label": "Bigger Bag",
+        "cost": 2239
+      },
+      {
+        "classTsid": "bag_bigger_blue",
+        "label": "Bigger Blue Bag",
+        "cost": 2239
+      },
+      {
+        "classTsid": "bag_bigger_gray",
+        "label": "Bigger Gray Bag",
+        "cost": 2239
+      },
+      {
+        "classTsid": "bag_bigger_green",
+        "label": "Bigger Green Bag",
+        "cost": 2239
+      },
+      {
+        "classTsid": "bag_bigger_pink",
+        "label": "Bigger Pink Bag",
+        "cost": 2239
+      },
+      {
+        "classTsid": "bag_toolbox_chrome",
+        "label": "Chrome Toolbox",
+        "cost": 2800
+      },
+      {
+        "classTsid": "bag_toolbox_red",
+        "label": "Red Toolbox",
+        "cost": 2800
+      },
+      {
+        "classTsid": "bag_toolbox_green",
+        "label": "Green Toolbox",
+        "cost": 2800
       },
       {
         "classTsid": "smelter",
@@ -471,6 +536,11 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "spice_mill",
         "label": "Spice Mill",
         "cost": 165
+      },
+      {
+        "classTsid": "bag_spicerack",
+        "label": "Spice Rack",
+        "cost": 550
       }
     ]
   },
@@ -573,6 +643,11 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "bag_elemental_pouch",
         "label": "Elemental Pouch",
         "cost": 54
+      },
+      {
+        "classTsid": "bag_alchemistry_kit",
+        "label": "Alchemistry Kit",
+        "cost": 107
       },
       {
         "classTsid": "alchemical_tongs",
@@ -777,6 +852,11 @@ export const STORE_CATALOG = Object.freeze([
         "cost": 158
       },
       {
+        "classTsid": "bag_alchemistry_kit",
+        "label": "Alchemistry Kit",
+        "cost": 105
+      },
+      {
         "classTsid": "bag_elemental_pouch",
         "label": "Elemental Pouch",
         "cost": 53
@@ -815,6 +895,31 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "focusing_orb",
         "label": "Focusing Orb",
         "cost": 1260
+      },
+      {
+        "classTsid": "bag_generic",
+        "label": "Generic Bag",
+        "cost": 945
+      },
+      {
+        "classTsid": "bag_generic_blue",
+        "label": "Generic Blue Bag",
+        "cost": 1050
+      },
+      {
+        "classTsid": "bag_generic_gray",
+        "label": "Generic Gray Bag",
+        "cost": 998
+      },
+      {
+        "classTsid": "bag_generic_green",
+        "label": "Generic Green Bag",
+        "cost": 971
+      },
+      {
+        "classTsid": "bag_generic_pink",
+        "label": "Generic Pink Bag",
+        "cost": 1024
       },
       {
         "classTsid": "alchemical_tongs",
@@ -860,6 +965,46 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "blockmaker_plates",
         "label": "Blockmaker Plates",
         "cost": 1313
+      },
+      {
+        "classTsid": "bag_bigger",
+        "label": "Bigger Bag",
+        "cost": 2099
+      },
+      {
+        "classTsid": "bag_bigger_blue",
+        "label": "Bigger Blue Bag",
+        "cost": 2099
+      },
+      {
+        "classTsid": "bag_bigger_gray",
+        "label": "Bigger Gray Bag",
+        "cost": 2099
+      },
+      {
+        "classTsid": "bag_bigger_green",
+        "label": "Bigger Green Bag",
+        "cost": 2099
+      },
+      {
+        "classTsid": "bag_bigger_pink",
+        "label": "Bigger Pink Bag",
+        "cost": 2099
+      },
+      {
+        "classTsid": "bag_toolbox_chrome",
+        "label": "Chrome Toolbox",
+        "cost": 2625
+      },
+      {
+        "classTsid": "bag_toolbox_red",
+        "label": "Red Toolbox",
+        "cost": 2625
+      },
+      {
+        "classTsid": "bag_toolbox_green",
+        "label": "Green Toolbox",
+        "cost": 2625
       },
       {
         "classTsid": "fuelmaker_case",
@@ -1501,6 +1646,11 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "cubimal_package",
         "label": "Cubimal Series 1 Box",
         "cost": 5500
+      },
+      {
+        "classTsid": "bag_cubimal_case",
+        "label": "Cubimal Case",
+        "cost": 550
       },
       {
         "classTsid": "emotional_bear",

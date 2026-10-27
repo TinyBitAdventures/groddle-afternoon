@@ -27,7 +27,7 @@ import { createToolConditionState, getToolCondition, repairToolCondition, setToo
 import { quoteWoodTreeHarvest } from '../public/js/woodcutting.js?v=woodcutting-test-4';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js';
 import { createGarden, getPlot, plantPlot, plotKey } from '../public/js/garden.js';
-import { vendorBuy, vendorSell, vendorBuyUnitPrice } from '../public/js/vendor.js?v=vendor-profiles-6';
+import { vendorBuy, vendorSell, vendorBuyUnitPrice } from '../public/js/vendor.js?v=vendor-profiles-7';
 import { normalizePlayerSnapshot } from '../public/js/player-save.js';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js';
 import { createSkillState, getStudyStatus, pauseSkillStudy, startSkillStudy } from '../public/js/skills.js';

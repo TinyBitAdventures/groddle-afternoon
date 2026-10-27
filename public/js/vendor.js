@@ -15,7 +15,7 @@ import {
 import { gardenVendorOffers } from './garden.js?v=g300-1';
 import { miningVendorOffers } from './mining.js';
 
-import { STORE_CATALOG, ITEM_BASE_COSTS, NO_VENDOR_ITEMS } from './store-catalog.js?v=stores-2';
+import { STORE_CATALOG, ITEM_BASE_COSTS, NO_VENDOR_ITEMS } from './store-catalog.js?v=stores-3';
 
 /** @typedef {{ classTsid: string, label: string, buyPrice: number, sellPrice: number, stock?: number }} VendorOffer */
 

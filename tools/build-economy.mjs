@@ -90,6 +90,8 @@ const CATALOGS = new Set([
   'public/js/icon-hires.js',
   'public/js/deco-hires-list.js',
   'public/js/sprite-hires.js',
+  // G152: stackmax and bag-kind sets for every takeable class (tools/build-pack-slots.mjs).
+  'public/js/pack-slots-data.js',
   'public/assets/content/trade-items.json',
 ]);
 

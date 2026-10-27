@@ -118,8 +118,10 @@ class Session {
   /** Pack contents {classTsid: count} plus HUD currencies. */
   async pack() {
     return this.page.evaluate(() => {
-      const out = {};
-      for (const el of document.querySelectorAll('.pack-slot[data-tsid]')) {
+      // G152: stacks in a closed bag or held by the magic rock are not drawn, so count what is held.
+      const held = window.groddlePack?.counts?.();
+      const out = held ? { ...held } : {};
+      if (!held) for (const el of document.querySelectorAll('.pack-slot[data-tsid]')) {
         const m = /× (\d+)/.exec(el.getAttribute('aria-label') || '');
         out[el.dataset.tsid] = (out[el.dataset.tsid] || 0) + (m ? Number(m[1]) : 1);
       }
@@ -497,6 +499,8 @@ async function useTarget(t, re, verbRe, { wait = 9000, exclude = [], same = null
 
 async function packCount(t, id) {
   return t.page.evaluate((cls) => {
+    const held = window.groddlePack?.counts?.();
+    if (held) return held[cls] || 0;
     const el = document.querySelector(`.pack-slot[data-tsid="${cls}"]`);
     if (!el) return 0;
     const n = el.querySelector('.pack-count, .count, .qty');
