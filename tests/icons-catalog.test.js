@@ -32,7 +32,9 @@ describe('G174 catalog icons', () => {
   it('adds the icons the catalog was missing', () => {
     assert.ok(added.length >= 236, `${added.length} plan entries`);
     const catalog = new Set(JSON.parse(readFileSync(join(root, 'public/items/data.json'), 'utf8')).items.map((i) => i.id));
-    for (const [id] of added) assert.ok(catalog.has(id), `${id} is not a catalog item`);
+    // Items left out by decision drop from the catalog but keep their recovered icon (G333: greeters, Austin 2026-10-27).
+    const leftOut = new Set(['bag_greeter_badge']);
+    for (const [id] of added) if (!leftOut.has(id)) assert.ok(catalog.has(id), `${id} is not a catalog item`);
   });
 
   it('each one is a 1x PNG plus an @3x PNG exactly three times its size, and listed', () => {
