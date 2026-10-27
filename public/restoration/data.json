@@ -2644,9 +2644,14 @@
   ]
  },
  "git": {
-  "commits": 629,
+  "commits": 630,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "Visitors on your home street fill your Magic Rock's daily iMG, and street Piggies eat food dropped for everyone"
+   },
    {
     "date": "2026-10-27",
     "kind": "improve",
@@ -2761,11 +2766,6 @@
     "date": "2026-10-27",
     "kind": "improve",
     "text": "The Magic Rock stops offering Manor Mystery, a quest the original never finished"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "fix",
-    "text": "The icon test allows the Greeter Badge, left out of the catalog by decision"
    }
   ]
  },
