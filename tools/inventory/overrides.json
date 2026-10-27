@@ -1416,6 +1416,27 @@
   "mpReason": "radiance.go radiates to every player in range from the rank the site signs (Radiance.php); meditation-feature pays and applies each pulse",
   "register": "G330"
  },
+ "achievement:the_cigar": {
+  "mp": "game 2c54a95e, server 6377b5d, site 9727447",
+  "mpReason": "the shared Feat (feats.go) grants The Cigar to places 27 to 30 when it ends (feats_test.go 346); the original granted it from the same Feat ranking (no conditions in its achievement file)",
+  "register": "G345"
+ },
+ "skill:bureaucraticarts_3": {
+  "status": "excluded",
+  "reason": "needs the Impossible Achievement badge, which nothing in the original could grant (a joke by design; audit later, register G117)"
+ },
+ "quest:missing": {
+  "status": "excluded",
+  "reason": "quests/missing.js is a placeholder file, not a quest"
+ },
+ "quest:quest": {
+  "status": "excluded",
+  "reason": "quests/quest.js is the shared quest base code, not a quest"
+ },
+ "quest:quest_scripting": {
+  "status": "excluded",
+  "reason": "quests/quest_scripting.js holds helper functions for quest locations, not a quest"
+ },
  "skill:martial_imagination_1": {
   "mp": "game 221c66ab, server aa257cb",
   "mpReason": "a Rook attack is one fight for everyone on the street, and only a player who learned Martial Imagination can start the Focusing Orb stun (rook-attack-feature.js MP_ROOK.stunSkill; the source's rook_attack stun rule)",

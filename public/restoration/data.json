@@ -2590,9 +2590,14 @@
   ]
  },
  "git": {
-  "commits": 600,
+  "commits": 601,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "improve",
+    "text": "The Magic Rock stops offering Manor Mystery, a quest the original never finished"
+   },
    {
     "date": "2026-10-27",
     "kind": "fix",
@@ -2707,11 +2712,6 @@
     "date": "2026-10-27",
     "kind": "new",
     "text": "In multiplayer a Party Pack or ATM currants given back after a restart reach your pack once"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "In multiplayer, the bug icon in the game header sends a report to the site"
    }
   ]
  },
