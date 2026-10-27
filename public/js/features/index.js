@@ -143,5 +143,5 @@ import { dropsMpFeature } from './drops-mp-feature.js?v=g332-drops-4'; FEATURES.
 import { bugReportFeature } from './bug-report-feature.js?v=g353-3'; FEATURES.push(bugReportFeature);
 import { playerVerbsMpFeature } from './player-verbs-mp-feature.js?v=verbs-1'; FEATURES.push(playerVerbsMpFeature);
 import { streetObjectsFeature } from './street-objects-feature.js?v=g334-4'; FEATURES.push(streetObjectsFeature);
-import { realtimeFeature } from './realtime-feature.js?v=nbhome-9'; FEATURES.push(realtimeFeature);
+import { realtimeFeature } from './realtime-feature.js?v=nbhome-10'; FEATURES.push(realtimeFeature);
 import { accountBackupFeature } from './account-backup-feature.js?v=nbhome-9'; FEATURES.push(accountBackupFeature);

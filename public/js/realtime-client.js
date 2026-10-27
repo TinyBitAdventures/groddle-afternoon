@@ -62,9 +62,14 @@ export function decodeAnim(word) {
   return KNOWN_STATES.has(s) ? s : 'stand';
 }
 
-/** The socket URL for the ticket's path, on the page's own host (wss on https). */
+/**
+ * The socket URL for a ticket: its url when the site names the realtime
+ * server's own address (GRODDLE_REALTIME_URL, a ws:// or wss:// URL on
+ * another host), else its path on the page's own host (wss on https).
+ */
 export function socketUrl(path, baseUri) {
   const url = new URL(path || '/ws', baseUri);
+  if (url.protocol === 'wss:' || url.protocol === 'ws:') return url.href;
   url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
   return url.href;
 }
@@ -91,7 +96,7 @@ const round1 = (n) => Math.round((Number(n) || 0) * 10) / 10;
 
 /**
  * @param {object} opts
- * @param {() => Promise<{ ticket: string, path?: string }>} opts.ticket
+ * @param {() => Promise<{ ticket: string, path?: string, url?: string }>} opts.ticket
  *   a fresh ticket (minn-account.js realtimeTicket); throws with .status
  *   401 (signed out), 503 (no realtime here), anything else to retry.
  * @param {string} opts.baseUri the page's base URI, for the socket host
@@ -211,7 +216,7 @@ export function createRealtimeClient({
     if (gen !== generation) return;
     let socket;
     try {
-      socket = new WS(socketUrl(t?.path, baseUri));
+      socket = new WS(socketUrl(t?.url || t?.path, baseUri));
     } catch {
       return retryLater();
     }

@@ -26,7 +26,7 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=nbhome-9';
-import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=mp3-2';
+import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=mp3-4';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js';
 
 export const REALTIME_FEATURE_ID = 'realtime';

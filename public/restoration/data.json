@@ -2586,9 +2586,14 @@
   ]
  },
  "git": {
-  "commits": 582,
+  "commits": 583,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "Multiplayer characters from before bags get their starter bags"
+   },
    {
     "date": "2026-10-27",
     "kind": "fix",
@@ -2703,14 +2708,9 @@
     "date": "2026-10-27",
     "kind": "new",
     "text": "In multiplayer, leave a gift or a note with a friend's Butler, and water their garden with their key"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "build-economy writes the ledger's transforms, credits and capped gates"
    }
   ]
  },
- "tests": 347,
+ "tests": 348,
  "generatedAt": "2026-10-27"
 }

@@ -31,9 +31,9 @@ import {
   pushSample,
   sampleTrack,
   socketUrl,
-} from '../public/js/realtime-client.js?v=mp3-2';
+} from '../public/js/realtime-client.js?v=mp3-4';
 import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-9';
-import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=nbhome-9';
+import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=nbhome-10';
 import { FEATURES } from '../public/js/features/index.js';
 
 const root = join(import.meta.dirname, '..');
@@ -155,6 +155,9 @@ describe('realtime-client: wire helpers', () => {
     assert.equal(socketUrl('/ws', BASE), 'wss://groddle.localhost/ws');
     assert.equal(socketUrl('/ws', 'http://127.0.0.1:8771/play/online/'), 'ws://127.0.0.1:8771/ws');
     assert.equal(socketUrl(undefined, BASE), 'wss://groddle.localhost/ws');
+    // GRODDLE_REALTIME_URL: the site names a server on another host; kept as given, never downgraded.
+    assert.equal(socketUrl('wss://play.example.com/ws', BASE), 'wss://play.example.com/ws');
+    assert.equal(socketUrl('ws://127.0.0.1:8793/ws', BASE), 'ws://127.0.0.1:8793/ws');
   });
 
   it('a look over 4 KB of JSON is not sent', () => {
@@ -544,7 +547,7 @@ describe('minn-account: realtime tickets', () => {
 describe('realtime feature', () => {
   it('is registered (before the account backup, which stays last), under its own key', () => {
     assert.equal(FEATURES.at(-2), realtimeFeature);
-    assert.match(read('public/js/features/index.js'), /realtime-feature\.js\?v=nbhome-9/);
+    assert.match(read('public/js/features/index.js'), /realtime-feature\.js\?v=nbhome-10/);
   });
 
   it('does nothing in solo: no socket, no UI, no hook answers', () => {
