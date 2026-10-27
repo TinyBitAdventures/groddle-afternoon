@@ -78,7 +78,7 @@ import {
   ITEM_CATALOG,
 } from './inventory.js?v=catalog-unified-7';
 import { canUseTool, useToolCondition } from './tools.js?v=woodcutting-test-3';
-import { getGameDayKey } from './game-day.js?v=dametime-3';
+import { getGameDayKey } from './game-day.js?v=dametime-4';
 import { grantMoodXp } from './mood-xp.js';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js';
 

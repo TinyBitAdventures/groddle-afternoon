@@ -533,7 +533,7 @@ describe('every save read and write goes through the store', () => {
 
   it('game.js uses the store for the player state, location, drops and companions', () => {
     const game = read('game.js');
-    assert.match(game, /import \{ saveStore \} from '\.\/js\/save-store\.js\?v=mp2-1';/);
+    assert.match(game, /import \{ saveStore \} from '\.\/js\/save-store\.js\?v=[\w-]+';/);
     for (const name of ['playerState', 'location', 'droppedItems', 'companions']) {
       assert.match(game, new RegExp(`_STORAGE_KEY = '${name}';`), name);
     }
@@ -542,12 +542,15 @@ describe('every save read and write goes through the store', () => {
     assert.match(game, /saveStore\.remove\(PLAYER_STATE_STORAGE_KEY\);\n\s*saveStore\.remove\(DROPPED_ITEMS_STORAGE_KEY\);\n\s*saveStore\.remove\(LOCATION_STORAGE_KEY\);/);
   });
 
-  it('every importer of save-store and game-mode uses one cache key', () => {
-    const keys = new Set();
+  it('every importer of save-store and of game-mode uses one cache key for it', () => {
+    const keys = { 'save-store': new Set(), 'game-mode': new Set() };
     for (const rel of ['game.js', ...files('js')]) {
-      for (const m of read(rel).matchAll(/from '[^']*\/(save-store|game-mode)\.js(\?v=[^']*)?'/g)) keys.add(m[2] || '');
+      for (const m of read(rel).matchAll(/from '[^']*\/(save-store|game-mode)\.js(\?v=[^']*)?'/g)) keys[m[1]].add(m[2] || '');
     }
-    assert.deepEqual([...keys], ['?v=mp2-1']);
+    for (const [mod, set] of Object.entries(keys)) {
+      assert.equal(set.size, 1, `${mod}: ${[...set].join(' ')}`);
+      assert.match([...set][0], /^\?v=[\w-]+$/, mod);
+    }
   });
 });
 

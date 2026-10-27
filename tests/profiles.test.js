@@ -175,7 +175,7 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
 
   it('registers the REST routes signed-in and the pages public', () => {
     const ext = site('src/Extension.php');
-    assert.match(ext, /new Profiles\(\$minn\)\);/);
+    assert.match(ext, /new Profiles\(\$minn\)[,)]/);
     assert.match(ext, /\$minn->routes\(new PlayerPages\(\$minn, \$root\)\);/);
     const routes = (f) => [...site(`src/${f}`).matchAll(/#\[Route\(Method::(\w+), '([^']+)', policy: new Policy\(Access::(\w+)\)\)\]/g)].map((m) => `${m[1]} ${m[2]} ${m[3]}`).sort();
     assert.deepEqual(routes('Profiles.php'), [

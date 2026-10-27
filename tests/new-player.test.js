@@ -14,7 +14,7 @@ import {
   newPlayerInventory,
   newPlayerStats,
 } from '../public/js/new-player.js?v=mp5-1';
-import { createBrowserSaveStore, createMultiplayerSaveStore, createSaveStore } from '../public/js/save-store.js?v=mp2-1';
+import { createBrowserSaveStore, createMultiplayerSaveStore, createSaveStore } from '../public/js/save-store.js?v=mp2-2';
 import { createInventory } from '../public/js/inventory.js?v=catalog-unified-7';
 import { normalizePlayerSnapshot } from '../public/js/player-save.js';
 import { createQuoinState } from '../public/js/quoins.js';

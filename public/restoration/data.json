@@ -2041,9 +2041,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 528,
+  "commits": 530,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "improve",
+    "text": "Play opens the Play page: sign in or make a character, or play solo"
+   },
    {
     "date": "2026-10-26",
     "kind": "improve",
@@ -2158,14 +2163,9 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "Pack card buttons no longer blink or wash out on hover"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "A Multiplayer item in the Menu, and folder links work without their slash"
    }
   ]
  },
- "tests": 308,
+ "tests": 309,
  "generatedAt": "2026-10-26"
 }

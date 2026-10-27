@@ -140,6 +140,9 @@ function entriesOf(value) {
  * failed write retries with backoff; 409 means another copy was saved
  * since this one loaded, and writing stops (state conflict) rather than
  * overwrite it. The REST nonce the server hands back on each answer is kept.
+ * An answer whose ledger corrected the save (groddle-afternoon-site
+ * src/Ledger.php, G335: what the site could not account for was taken out
+ * of the stored save) goes to onLedger({ corrected: { items, currants }, text }).
  */
 export function createSaveSync({
   url,
@@ -153,6 +156,7 @@ export function createSaveSync({
   debounceMs = 2500,
   maxWaitMs = 15000,
   onState = () => {},
+  onLedger = () => {},
 } = {}) {
   let state = 'saved';
   let dirty = false;
@@ -212,6 +216,9 @@ export function createSaveSync({
     try { data = await res.json(); } catch { /* not JSON */ }
     if (res.ok && Number.isInteger(data?.version)) {
       current.version = data.version;
+      if (data.ledger?.corrected && typeof data.ledger.corrected === 'object') {
+        try { onLedger(data.ledger); } catch { /* a listener's trouble is not the save's */ }
+      }
       failures = 0;
       nonceRetried = false;
       lastError = null;
@@ -310,6 +317,18 @@ function announceSaveState(scope, state, detail) {
   } catch { /* no page */ }
 }
 
+/** The event a ledger correction arrives as (js/features/ledger-feature.js applies it to the page). */
+export const LEDGER_CORRECTED_EVENT = 'groddle:ledger-corrected';
+
+/** Announces a ledger correction on the page. */
+function announceLedger(scope, ledger) {
+  try {
+    if (typeof scope?.dispatchEvent === 'function' && typeof scope.CustomEvent === 'function') {
+      scope.dispatchEvent(new scope.CustomEvent(LEDGER_CORRECTED_EVENT, { detail: ledger }));
+    }
+  } catch { /* no page */ }
+}
+
 /**
  * The multiplayer store: the whole save in memory from boot data
  * (window.GRODDLE_MP_BOOT, set by js/online-boot.js from groddle/v1/save),
@@ -333,6 +352,7 @@ export function createMultiplayerSaveStore(opts = {}) {
     debounceMs: opts.debounceMs,
     maxWaitMs: opts.maxWaitMs,
     onState: (state, detail) => announceSaveState(scope, state, detail),
+    onLedger: (ledger) => announceLedger(scope, ledger),
   });
   if (typeof scope?.addEventListener === 'function') {
     scope.addEventListener('pagehide', () => { sync.flush({ keepalive: true }); });

@@ -24,14 +24,17 @@
  *   with whatever the trade did not take. On trade_done the hold minus what
  *   you gave comes back, what you got goes in, the save is written and only
  *   then the server hears trade_ack.
+ * - Settling (G335): once both accept, the server asks the site's ledger to
+ *   move both sides; until it answers the window shows "settling" (Edit and
+ *   the x are off). A refusal arrives as a cancel plus the source's words.
  *
- * QA: canvas data tradeState (none|open|locked|sealed), tradeWith,
+ * QA: canvas data tradeState (none|open|locked|settling|sealed), tradeWith,
  * tradeHold, tradeMine, tradeTheirs, tradeLast; window.groddleTrade.
  */
 
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { TOOL_CONDITION_CATALOG, getToolCondition, setToolRemaining } from '../tools.js?v=woodcutting-test-3';
-import { saveStore } from '../save-store.js?v=mp2-1';
+import { saveStore } from '../save-store.js?v=mp2-2';
 import {
   APPLIED_KEEP,
   TRADE_SLOTS,
@@ -55,7 +58,7 @@ import {
   slotMax,
   tradeCommand,
   untradeableReason,
-} from '../trade.js?v=mp4-1';
+} from '../trade.js?v=g335-1';
 
 export const TRADE_FEATURE_ID = 'trade';
 export const TRADE_VERB = 'trade_start';
@@ -249,7 +252,7 @@ function createSession(engine, client) {
   }
 
   function publish() {
-    const state = !open ? 'none' : open.sealed ? 'sealed' : open.mine.accepted ? 'locked' : 'open';
+    const state = !open ? 'none' : open.sealed ? 'sealed' : open.settling ? 'settling' : open.mine.accepted ? 'locked' : 'open';
     engine.setData?.('tradeState', state);
     engine.setData?.('tradeWith', open?.with.name || '');
     engine.setData?.('tradeHold', saved.hold ? JSON.stringify({ items: saved.hold.items, currants: saved.hold.currants }) : '');
@@ -346,7 +349,7 @@ function createSession(engine, client) {
       return;
     }
     win.hidden = false;
-    win.dataset.state = open.sealed ? 'sealed' : open.mine.accepted ? 'locked' : 'open';
+    win.dataset.state = open.sealed ? 'sealed' : open.settling ? 'settling' : open.mine.accepted ? 'locked' : 'open';
     const name = open.with.name;
     if (open.sealed) {
       title.textContent = TRADE_TEXT.sealedTitle;
@@ -363,12 +366,12 @@ function createSession(engine, client) {
     renderPack();
     renderLog();
     const online = client.state === 'online';
-    closeBtn.hidden = Boolean(open.sealed);
+    closeBtn.hidden = Boolean(open.sealed) || Boolean(open.settling);
     doneBtn.hidden = !open.sealed;
     offerBtn.hidden = Boolean(open.sealed) || open.mine.accepted;
-    editBtn.hidden = Boolean(open.sealed) || !open.mine.accepted;
+    editBtn.hidden = Boolean(open.sealed) || !open.mine.accepted || Boolean(open.settling);
     waitText.hidden = Boolean(open.sealed) || !open.mine.accepted;
-    waitText.textContent = TRADE_TEXT.waiting(name);
+    waitText.textContent = open.settling ? TRADE_TEXT.settling : TRADE_TEXT.waiting(name);
     offerBtn.textContent = open.theirs.accepted ? TRADE_TEXT.confirm : TRADE_TEXT.offer;
     offerBtn.disabled = !online || open.closing;
     editBtn.disabled = !online || open.closing;
@@ -646,6 +649,7 @@ function createSession(engine, client) {
     if (mine.accepted !== open.mine.accepted) line(`You ${mine.accepted ? TRADE_TEXT.confirmed : TRADE_TEXT.youEdit}`);
     open.mine = mine;
     open.theirs = theirs;
+    open.settling = msg.settling === true;
     open.sentV = Math.max(open.sentV, mine.v);
     for (const v of [...open.pending.keys()]) if (v <= mine.v || v === n0(msg.rejected)) open.pending.delete(v);
     if (msg.rejected) {

@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-14';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-15';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-153';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-154';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -427,7 +427,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=player-save-19';
+} from './js/player-save.js?v=player-save-20';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -586,7 +586,7 @@ import {
   getGameDayKey,
   timestampForGameHour,
   msUntilNewDay,
-} from './js/game-day.js?v=dametime-3';
+} from './js/game-day.js?v=dametime-4';
 import {
   FOOD_VARIETY_UPGRADE,
   createFoodState,
@@ -596,7 +596,7 @@ import {
   canEatFood,
   recordFoodEat,
   resetFoodDay,
-} from './js/food.js?v=food-memory-7';
+} from './js/food.js?v=food-memory-8';
 import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
@@ -820,10 +820,10 @@ import { forgetTexture, frameTexture, isLoaded, onFailed, onLoaded, textureFromU
 import { cancelAllOverlays, playPoofIn } from './js/overlay-art.js?v=g311-1';
 import * as textureUrls from './js/textures.js';
 import { installPixiFixes } from './js/pixi-fixes.js';
-import { hidesChatBubble } from './js/hi-signs.js?v=hi-signs-3';
+import { hidesChatBubble } from './js/hi-signs.js?v=hi-signs-4';
 // Multiplayer phase 1: the mode flag and the save interface every save read/write goes through.
 import { GAME_MODE, isSolo } from './js/game-mode.js?v=mp2-1';
-import { saveStore } from './js/save-store.js?v=mp2-1';
+import { saveStore } from './js/save-store.js?v=mp2-2';
 import { isNewMultiplayerPlayer, newPlayerInventory, newPlayerStats } from './js/new-player.js?v=mp5-1';
 import { clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSpeechTip, speechOffsetFor, speechTailPoints } from './js/speech-placement.js?v=g269-1';
 

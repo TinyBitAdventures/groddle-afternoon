@@ -50,7 +50,7 @@
  *   hiRecordsHeld, hiBest, hiAutoplay.
  */
 
-import { butlerApi } from './butler-feature.js?v=butler-feature-38';
+import { butlerApi } from './butler-feature.js?v=butler-feature-39';
 import { metabolicGain, moodMax } from '../metabolics.js';
 import { frameTexture, sourceFromUrl } from '../textures.js';
 import {
@@ -83,7 +83,7 @@ import {
   setButlerHiVariant,
   setPlayerHiVariant,
   stepMissile,
-} from '../hi-signs.js?v=hi-signs-3';
+} from '../hi-signs.js?v=hi-signs-4';
 
 export const HI_FEATURE_ID = 'hi-signs';
 /** The player's label in the Butler's lines (as BUTLER_INTRO: the remake's players have no name). */

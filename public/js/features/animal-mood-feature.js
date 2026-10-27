@@ -102,8 +102,8 @@ import {
   sadnessMax,
   sadnessStart,
   streetWidth,
-} from '../animal-crowding.js?v=g321-1';
-import { GAME_DAY_MS, setLastNewDayTs } from '../game-day.js?v=dametime-3';
+} from '../animal-crowding.js?v=g335-1';
+import { GAME_DAY_MS, setLastNewDayTs } from '../game-day.js?v=dametime-4';
 import {
   CROAK_INTERVAL_MS,
   EAT_PAUSE_MS,

@@ -39,6 +39,7 @@ export const TRADE_TEXT = Object.freeze({
   edit: 'Edit', // TradeDialog.as:1415
   done: 'Ok, done!', // TradeDialog.as:1434
   waiting: (name) => `Waiting for ${name}`, // TradeDialog.as:247
+  settling: 'Finishing the trade...', // ours (G335: the site's ledger is moving both sides)
   begun: (name) => `You and ${name} have begun a trade.`, // RightSideManager line, TradeDialog.as:1345 (its chat half is not here)
   confirmed: 'confirmed the offer', // TradeDialog.as:367
   theyEdit: 'is editing their offer', // TradeDialog.as:427

@@ -24,9 +24,9 @@
  *     (`<command>:<outcome>`), slashLine (the last line shown).
  */
 
-import { BUTLER_STRINGS } from '../butler.js?v=butler-7';
-import { butlerApi } from './butler-feature.js?v=butler-feature-38';
-import { hellFeature } from './hell-feature.js?v=hell-15';
+import { BUTLER_STRINGS } from '../butler.js?v=butler-8';
+import { butlerApi } from './butler-feature.js?v=butler-feature-39';
+import { hellFeature } from './hell-feature.js?v=hell-16';
 import { towerApi } from './home-tower-feature.js?v=home-tower-15';
 import { slashPlan, unknownLine } from '../slash-commands.js?v=g249-1';
 
