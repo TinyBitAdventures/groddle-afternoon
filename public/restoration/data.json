@@ -933,7 +933,7 @@
    "name": "Neighbours",
    "status": "reimagined",
    "blurb": "Visiting Stones lead to six authored neighbours, standing in for other players’ homes.",
-   "multiplayer": "Visit other players’ homes as they keep them, knock to be let in, and give friends house keys.",
+   "multiplayer": "Visit other players’ homes as they keep them, knock to be let in, give friends house keys, leave a package or a message with their Butler, and water and tend their gardens with their key.",
    "spot": null,
    "evidence": [
     "public/js/neighbours.js"
@@ -2688,6 +2688,6 @@
    }
   ]
  },
- "tests": 319,
+ "tests": 320,
  "generatedAt": "2026-10-27"
 }

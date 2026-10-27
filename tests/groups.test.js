@@ -31,8 +31,8 @@ import {
   tabOrder,
   writeMemory,
 } from '../public/js/groups.js?v=g326-1';
-import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-1';
-import { groupsFeature } from '../public/js/features/groups-feature.js?v=nbhome-1';
+import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-2';
+import { groupsFeature } from '../public/js/features/groups-feature.js?v=nbhome-2';
 import { FEATURES } from '../public/js/features/index.js';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
@@ -308,7 +308,7 @@ describe('groups feature (js/features/groups-feature.js)', () => {
     assert.ok(ids.indexOf('groups') > ids.indexOf('profiles'));
     assert.ok(ids.indexOf('groups') < ids.indexOf('realtime'));
     assert.equal(ids.indexOf('street-objects') + 1, ids.indexOf('realtime'), 'street objects stays just before realtime');
-    assert.match(read('public/js/features/index.js'), /groups-feature\.js\?v=nbhome-1'/);
+    assert.match(read('public/js/features/index.js'), /groups-feature\.js\?v=nbhome-2'/);
   });
 
   it('loads the list, sends the signed list, and opens the chats remembered', async () => {

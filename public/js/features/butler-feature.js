@@ -131,7 +131,7 @@ import {
   takeVisitorDelivery,
   teachButler,
   visitorsReport,
-} from '../butler.js?v=butler-8';
+} from '../butler.js?v=butler-9';
 
 export const BUTLER_FEATURE_ID = 'butler';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -1317,24 +1317,35 @@ function handOver(engine) {
   }
   engine.pushActivity?.(`${butlerName(st)}: ${out.text}`);
   lastMsg = out.text;
-  const give = out.give;
+  let give = out.give;
+  // G328 slice 2: a real visitor's parcel (multiplayer) is taken through the site first, so a
+  // package comes into the pack once (features/neighbours-mp-feature.js sets the hook). Solo never has one.
+  const parcel = engine.mode === 'multiplayer' && parcelHook?.owns?.(out.id) ? out.id : '';
+  const taken = parcel ? parcelHook.take(engine, parcel) : null;
+  const hand = (float) => {
+    if (!give) return;
+    const g = give;
+    give = null;
+    ensureItem(g.classTsid, NEIGHBOUR_ITEMS[g.classTsid] || {});
+    addItem(engine.inv, g.classTsid, g.count);
+    engine.refreshPack?.();
+    if (float) engine.floatText?.(engine.player?.x ?? rt.x, (engine.player?.y ?? engine.groundY) - 90, `+${itemName(g.classTsid, g.count)}`, 0xf2c879);
+    engine.save?.();
+  };
+  const giveStack = (float) => {
+    if (!taken) return hand(float);
+    taken.then((ok) => { if (ok) hand(float); else give = null; }, () => { give = null; });
+    return undefined;
+  };
   line(engine, out.kind === 'package' ? 'package' : 'message', out.text, 'Thanks!', () => {
     // acceptPackage: giveStack, then the next one.
-    if (give) {
-      ensureItem(give.classTsid, NEIGHBOUR_ITEMS[give.classTsid] || {});
-      addItem(engine.inv, give.classTsid, give.count);
-      engine.refreshPack?.();
-      engine.floatText?.(engine.player?.x ?? rt.x, (engine.player?.y ?? engine.groundY) - 90, `+${itemName(give.classTsid, give.count)}`, 0xf2c879);
-    }
+    giveStack(true);
     engine.save?.();
     handOver(engine);
   }, {
     onClose: () => {
       // Closing the bubble still hands the stack over (onConversationEnding: giveStack).
-      if (give) {
-        addItem(engine.inv, give.classTsid, give.count);
-        engine.refreshPack?.();
-      }
+      giveStack(false);
       engine.save?.();
     },
   });
@@ -1668,8 +1679,28 @@ function neighbourIdFor(name) {
 }
 
 /** For street-furniture-feature (one-way import, no cycle). */
+/** G328 slice 2 (multiplayer): { owns(id), take(engine, id) -> Promise<boolean> } for real visitors' parcels. */
+let parcelHook = null;
+
 export const butlerApi = {
   owned: () => st.owned === true,
+  /**
+   * G328 slice 2, multiplayer only: the Butler's state, for features/neighbours-mp-feature.js to add
+   * the parcels real visitors left (with the site's ids) and to read what it holds.
+   */
+  mpState: (engine) => (engine?.mode === 'multiplayer' ? st : null),
+  /** neighbours-mp-feature: the site takes a parcel before the Butler hands it over. */
+  setParcelHook(hook) {
+    parcelHook = hook && typeof hook.owns === 'function' && typeof hook.take === 'function' ? hook : null;
+  },
+  /** After parcels arrive: the Butler (if it stands here) says what it holds, and the counts redraw. */
+  parcelsArrived(engine) {
+    if (engine?.mode !== 'multiplayer' || !st.owned) return '';
+    const text = packagesAndMessagesForOwner(st, { now: now() });
+    if (text && view?.butler && currentRoom(engine) === 'street') say(engine, text, 4000, { activity: true });
+    publish(engine, true);
+    return text;
+  },
   /** butler.getLabel(pc) for the owner: the name, or "Butler". */
   label: () => (st.owned ? butlerName(st) : ''),
   receiveVisitor: (engine, letter) => receiveVisitor(engine, letter),

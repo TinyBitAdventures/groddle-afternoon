@@ -388,6 +388,30 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       return buddyCall('Revoking the key', `keys/${Number(id)}`, { method: 'DELETE' });
     },
 
+    /**
+     * G328 slice 2 (groddle-afternoon-site src/ButlerParcels.php,
+     * src/HomeTending.php): butlerParcels() answers { parcels: [{ id, from:
+     * { id, name }, item: { c, n } | null, text, at }] } the owner's Butler
+     * holds; takeParcel(id) { status: taken | done, id, credit, item };
+     * tend(owner, acts) { acts: [{ ok, id | text, plot }], tell }; tending()
+     * { acts } a key-holder did that the owner's save has not applied.
+     */
+    async butlerParcels() {
+      return buddyCall('Asking your Butler', 'butler');
+    },
+
+    async takeParcel(id) {
+      return buddyCall('Taking the package', `butler/${encodeURIComponent(String(id))}/take`, { method: 'POST' });
+    },
+
+    async tend(owner, acts) {
+      return buddyCall('Tending', `homes/${Number(owner)}/tend`, { method: 'POST', body: { acts } });
+    },
+
+    async tending() {
+      return buddyCall('Checking your gardens', 'homes/tending');
+    },
+
     async deleteBackup(slot) {
       const r = await call(`backups/${Number(slot)}`, { method: 'DELETE' });
       if (!r.ok) throw failed('Deleting the backup', r);

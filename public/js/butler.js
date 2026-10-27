@@ -742,7 +742,7 @@ export function nextHandover(state, { now = Date.now(), itemName = (cls, n) => `
   if (loose) {
     state.messages = state.messages.filter((m) => m !== loose);
     const text = butlerText('messagesGive', { pc: loose.fromName, message_text: loose.text, message_time: ago(loose.time, now) }).trim();
-    return { kind: 'message', text, from: loose.fromName };
+    return { kind: 'message', text, from: loose.fromName, id: loose.id };
   }
   // giveNextPackage: one stack from the first giver, with its message.
   const pkg = state.packages[0];
@@ -756,7 +756,7 @@ export function nextHandover(state, { now = Date.now(), itemName = (cls, n) => `
   } else {
     text += butlerText('packageNoMessage', { param: ago(pkg.time, now) });
   }
-  return { kind: 'package', text, from: pkg.fromName, give: { classTsid: pkg.classTsid, count: pkg.count } };
+  return { kind: 'package', text, from: pkg.fromName, give: { classTsid: pkg.classTsid, count: pkg.count }, id: pkg.id };
 }
 
 /** retrieve_messages / retrieve_packages verb states (one of the two shows). */

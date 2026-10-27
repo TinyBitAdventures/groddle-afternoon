@@ -32,7 +32,7 @@
  * buddiesIgnoring (ids), buddiesLast (the last notice); window.groddleBuddies.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=nbhome-1';
+import { createMinnAccount } from '../minn-account.js?v=nbhome-2';
 import { STREET_INDEX } from '../street-loader.js';
 import {
   BUDDY_COUNTER,

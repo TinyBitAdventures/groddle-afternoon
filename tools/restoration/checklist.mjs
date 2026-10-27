@@ -240,7 +240,7 @@ export const CHECKLIST = Object.freeze([
     evidence: ['public/js/mailbox.js'] },
   { id: 'neighbours', group: 'home', name: 'Neighbours', status: 'reimagined',
     blurb: 'Visiting Stones lead to six authored neighbours, standing in for other players’ homes.',
-    multiplayer: 'Visit other players’ homes as they keep them, knock to be let in, and give friends house keys.',
+    multiplayer: 'Visit other players’ homes as they keep them, knock to be let in, give friends house keys, leave a package or a message with their Butler, and water and tend their gardens with their key.',
     evidence: ['public/js/neighbours.js'] },
   { id: 'tower', group: 'home', name: 'Your Tower', status: 'solo',
     blurb: 'Cultivate a Tower on your home street, build it as a project, pick one of six styles and every floor, roof and decoration the original offered, and raise it to nine floors marked L to 8 on the elevator, each decorated on its own; every new floor goes up at a Workbench on a planked frame open to the stars. The Jethimadh Tower Base hides eleven secret spots.',
