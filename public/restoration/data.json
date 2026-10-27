@@ -2566,9 +2566,14 @@
   ]
  },
  "git": {
-  "commits": 554,
+  "commits": 555,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "In multiplayer, the familiar offers the quests that need other players, and the ledger pays them"
+   },
    {
     "date": "2026-10-27",
     "kind": "new",
@@ -2683,11 +2688,6 @@
     "date": "2026-10-26",
     "kind": "improve",
     "text": "In multiplayer the tutorial has no skip, and a crab keeps a repeated Musicblock"
-   },
-   {
-    "date": "2026-10-26",
-    "kind": "new",
-    "text": "In multiplayer, change your email and password from Menu > Account"
    }
   ]
  },

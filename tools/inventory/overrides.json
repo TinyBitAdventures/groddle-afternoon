@@ -1040,12 +1040,16 @@
  "item:bag_gift_box": {
   "status": "lost",
   "reason": "Toy Vendor sells it (catalog_stores.js:1431) to wrap a present for another player (bag_gift_box.js:283 wraps, bag_gift_box_wrapped.js is opened by the receiver)",
-  "register": "G125"
+  "register": "G332",
+  "mp": "game 3b2faba2, server dfe78b2, site 82e0574",
+  "mpReason": "wrap up to three stacks and give the box whole to a player on your street (gifts-feature.js, gifts.go, LedgerGift.php ledger/gift); Recycle into four Paper"
  },
  "item:bag_gift_box_wrapped": {
   "status": "lost",
   "reason": "a present wrapped for another player (bag_gift_box.js:283); bag_butler.js:1013 lets a Butler accept one from a visitor",
-  "register": "G125"
+  "register": "G332",
+  "mp": "game 3b2faba2, server dfe78b2, site 82e0574",
+  "mpReason": "the wrapped box is given whole and the receiver unwraps it (bag_gift_box_wrapped.js 419-484), the site counting the box and what is inside"
  },
  "item:pile_of_currants": {
   "status": "lost",
@@ -1334,43 +1338,43 @@
   "register": "G326"
  },
  "quest:amazing_race": {
-  "mp": "game 4aaf6361, server 016b4d8",
-  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
+  "mp": "game 4aaf6361, server 016b4d8, game 3030c2dd",
+  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js); the challenge logs the course's quest for the challenger, and winning and leaving completes it (quests-mp-feature, inc_race.js:386, location.js:533-538)",
   "register": "G329"
  },
  "quest:canyon_run": {
-  "mp": "game 4aaf6361, server 016b4d8",
-  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
+  "mp": "game 4aaf6361, server 016b4d8, game 3030c2dd",
+  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js); the challenge logs the course's quest for the challenger, and winning and leaving completes it (quests-mp-feature, inc_race.js:386, location.js:533-538)",
   "register": "G329"
  },
  "quest:crystal_climb": {
-  "mp": "game 4aaf6361, server 016b4d8",
-  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
+  "mp": "game 4aaf6361, server 016b4d8, game 3030c2dd",
+  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js); the challenge logs the course's quest for the challenger, and winning and leaving completes it (quests-mp-feature, inc_race.js:386, location.js:533-538)",
   "register": "G329"
  },
  "quest:grab_em_good": {
-  "mp": "game 4aaf6361, server 016b4d8",
-  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
+  "mp": "game 4aaf6361, server 016b4d8, game 3030c2dd",
+  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js); the challenge logs the course's quest for the challenger, and winning and leaving completes it (quests-mp-feature, inc_race.js:386, location.js:533-538)",
   "register": "G329"
  },
  "quest:lava_leap": {
-  "mp": "game 4aaf6361, server 016b4d8",
-  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
+  "mp": "game 4aaf6361, server 016b4d8, game 3030c2dd",
+  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js); the challenge logs the course's quest for the challenger, and winning and leaving completes it (quests-mp-feature, inc_race.js:386, location.js:533-538)",
   "register": "G329"
  },
  "quest:space_race": {
-  "mp": "game 4aaf6361, server 016b4d8",
-  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
+  "mp": "game 4aaf6361, server 016b4d8, game 3030c2dd",
+  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js); the challenge logs the course's quest for the challenger, and winning and leaving completes it (quests-mp-feature, inc_race.js:386, location.js:533-538)",
   "register": "G329"
  },
  "quest:star_sprint": {
-  "mp": "game 4aaf6361, server 016b4d8",
-  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
+  "mp": "game 4aaf6361, server 016b4d8, game 3030c2dd",
+  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js); the challenge logs the course's quest for the challenger, and winning and leaving completes it (quests-mp-feature, inc_race.js:386, location.js:533-538)",
   "register": "G329"
  },
  "quest:time_warp": {
-  "mp": "game 4aaf6361, server 016b4d8",
-  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js MP_RACE_COURSES); a win sets multiplayer_quest_win and leaving race_leave, the quest's two flags (races-feature.js)",
+  "mp": "game 4aaf6361, server 016b4d8, game 3030c2dd",
+  "mpReason": "raced against real players on your street by ticket (races.go, races-mp.js); the challenge logs the course's quest for the challenger, and winning and leaving completes it (quests-mp-feature, inc_race.js:386, location.js:533-538)",
   "register": "G329"
  },
  "skill:transcendental_radiation_1": {
@@ -1416,6 +1420,61 @@
  "imagination:meditative_arts_less_distraction": {
   "mp": "game b66b2948, server 0c75b7e, site d352b8b",
   "mpReason": "dealt in multiplayer as Mantra Meditation's prerequisite; its own effect lets an instant message by, and the remake has no instant messages between players",
+  "register": "G330"
+ },
+ "quest:distilling_make_and_distribute_hooch": {
+  "mp": "game 3030c2dd, site 2a1f9e6",
+  "mpReason": "offered by Distilling I in multiplayer; Hooch sold, traded or given bootlegs it, counted from settled trades, sales and gives (quests-mp-feature)",
+  "register": "G329"
+ },
+ "quest:herbalism_plant_seeds_in_someones_garden": {
+  "mp": "game 3030c2dd, server 3830dea, site 2a1f9e6",
+  "mpReason": "offered by Herbalism III; herb seeds planted in a friend's garden with their key, as the site took the tending",
+  "register": "G329"
+ },
+ "quest:good_neighbor": {
+  "mp": "game 3030c2dd, server 3830dea, site 2a1f9e6",
+  "mpReason": "offered on a friend's home street while holding their key (ours: GSJS never offered it); tending and watering the site took count",
+  "register": "G329"
+ },
+ "quest:water_neighbor_garden": {
+  "mp": "game 3030c2dd, server 3830dea, site 2a1f9e6",
+  "mpReason": "offered on a friend's home street while holding their key (ours: GSJS never offered it); each watering the site took counts",
+  "register": "G329"
+ },
+ "quest:neighbor_gifts": {
+  "mp": "game 3030c2dd, server 3830dea, site 2a1f9e6",
+  "mpReason": "offered on another player's home street (ours: GSJS never offered it); packages left with their Butler count",
+  "register": "G329"
+ },
+ "quest:transcendentalradiation_radiate_to_five_people": {
+  "mp": "game 3030c2dd, server 0c75b7e, site 2a1f9e6",
+  "mpReason": "offered in multiplayer; set by radiance.go's transcendence_5players flag with six or more players on the street",
+  "register": "G329"
+ },
+ "quest:meditative_arts_with_friends": {
+  "mp": "game 3030c2dd, server 0c75b7e, site d352b8b",
+  "mpReason": "offered in multiplayer; counted from the server's count of players meditating together (radiance.go meditated_together); meditate_10players is never set in GSJS, so the 10-player reading is ours",
+  "register": "G329"
+ },
+ "quest:teleportation_make_and_hand_out_tp_scripts": {
+  "mp": "game 3030c2dd, server dfe78b2, site 2a1f9e6",
+  "mpReason": "offered by Teleportation V once Give works; each player given a Teleportation Script counts once (teleportation_script.js:285-289)",
+  "register": "G329"
+ },
+ "quest:kindly_randomness": {
+  "mp": "game 3030c2dd, server dfe78b2, site 82e0574",
+  "mpReason": "offered at level 10 once Give works; each receiver of level 3-5, by the site's saved level, counts once per run (takeable.js:283-289)",
+  "register": "G329"
+ },
+ "skill:transcendental_radiation_2": {
+  "mp": "game 3030c2dd, server 0c75b7e, site d352b8b",
+  "mpReason": "learnable in multiplayer once Sharing the Oneness is done; radiance.go reads the rank the site signs",
+  "register": "G330"
+ },
+ "skill:transcendental_radiation_3": {
+  "mp": "game 3030c2dd, server 0c75b7e, site d352b8b",
+  "mpReason": "learnable in multiplayer after rank 2; radiance.go reads the rank the site signs",
   "register": "G330"
  }
 }

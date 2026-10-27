@@ -175,6 +175,7 @@ export function readInventory(path = INVENTORY_DB) {
 export const STATUSES = [
   { key: 'source', label: 'In the remake', short: 'In the remake' },
   { key: 'missing', label: 'Not yet', short: 'Not yet' },
+  { key: 'multiplayer', label: 'In multiplayer', short: 'In multiplayer' },
   { key: 'lost', label: 'Lost', short: 'Lost' },
   { key: 'unbuilt_original', label: 'Never finished', short: 'Never finished' },
 ];
@@ -184,6 +185,7 @@ const STATUS = Object.fromEntries(STATUSES.map((s) => [s.key, s]));
 const STATUS_TEXT = {
   source: 'This item is in the remake.',
   missing: 'Not in the remake yet. Tiny Speck’s game had it, and it is on the list to bring back.',
+  multiplayer: 'In the remake between real players: it only does anything with someone else to give it to, so it works in multiplayer and not in solo play.',
   lost: 'Lost for now. It needed other players or Tiny Speck’s own servers in a way neither solo play nor multiplayer brings back yet.',
   unbuilt_original: 'Never finished in the original. Tiny Speck’s code defines it, but the game never handed it out, so there is nothing to restore.',
 };

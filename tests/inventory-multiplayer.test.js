@@ -142,12 +142,12 @@ describe('inventory: multiplayer overrides (overrides.json)', () => {
   const overrides = JSON.parse(readFileSync(join(root, 'tools/inventory/overrides.json'), 'utf8'));
   const mpRows = Object.entries(overrides).filter(([, v]) => v && typeof v === 'object' && v.mp);
 
-  it('name the proving commits by repo, with what reaches the row, and never an item (the item catalog has no multiplayer status)', () => {
+  it('name the proving commits by repo, with what reaches the row, and never an NPC (the catalog shows items only)', () => {
     assert.ok(mpRows.length >= 20, `${mpRows.length} mp overrides`);
     for (const [k, v] of mpRows) {
       assert.match(v.mp, /^(game|server|site|engine) [0-9a-f]{7,40}(, (game|server|site|engine) [0-9a-f]{7,40})*$/, k);
       assert.ok(v.mpReason && !/—/.test(v.mpReason), `${k} needs an mpReason (no em-dashes)`);
-      assert.ok(!k.startsWith('item:') && !k.startsWith('npc:'), `${k}: tools/catalog/build.mjs would need the multiplayer status first`);
+      assert.ok(!k.startsWith('npc:'), `${k}: nothing shows an NPC's multiplayer status yet`);
     }
     for (const [k, v] of Object.entries(overrides)) if (v?.lost) assert.ok(['players', 'nosource'].includes(v.lost), k);
   });

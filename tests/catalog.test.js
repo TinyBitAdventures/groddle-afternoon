@@ -40,6 +40,12 @@ describe('item catalog', () => {
     assert.ok(!data.items.some((i) => /^npc_/.test(i.id) && !inventory.has(i.id)));
   });
 
+  it('has a status for every item the inventory marks, multiplayer included', () => {
+    const keys = new Set(data.statuses.map((s) => s.key));
+    assert.ok(keys.has('multiplayer'));
+    for (const item of data.items) assert.ok(keys.has(item.status), `${item.id}: ${item.status}`);
+  });
+
   it('shows the inventory status of each item, on the list and on its page', { skip: skipWithoutInventory }, () => {
     const labels = Object.fromEntries(data.statuses.map((s) => [s.key, s.label]));
     for (const item of data.items) {

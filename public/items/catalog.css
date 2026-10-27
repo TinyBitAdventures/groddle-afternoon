@@ -6,9 +6,10 @@
 .catalog { --ph: color-mix(in srgb, var(--border) 55%, transparent); }
 .st-source { --tone: var(--moss); }
 .st-missing { --tone: var(--sun); }
+.st-multiplayer { --tone: var(--sky); }
 .st-lost { --tone: var(--plum); }
 .st-unbuilt_original { --tone: var(--stone); }
-.dot.st-source, .dot.st-missing, .dot.st-lost, .dot.st-unbuilt_original { background: var(--tone); }
+.dot.st-source, .dot.st-missing, .dot.st-multiplayer, .dot.st-lost, .dot.st-unbuilt_original { background: var(--tone); }
 
 /* —— The catalog —— */
 .cat-head { padding-bottom: 20px; }
