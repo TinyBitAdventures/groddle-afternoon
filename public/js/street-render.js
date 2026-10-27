@@ -418,70 +418,404 @@ function colourFilter(PIXI, filters) {
   return cm;
 }
 
-/** Resolution of the one-time texture a blurred layer is baked into. */
-const BLURRED_LAYER_RESOLUTION = 0.5;
+/**
+ * The client's layer blur: Layer.as keeps `blur` as an int and gives every deco on the layer
+ * BlurFilter(blur, blur, LOW), one box pass each way `blur` stage pixels wide, so 2.186 is 2, and
+ * a blur of 1 (or 1.61) draws nothing ("a blur of 1 or less means that the original image is
+ * copied as is", the AS3 reference; Ruffle skips those passes). Returns the box width in layer
+ * pixels, or 0 for no blur.
+ */
+export function flashBlurSize(blur) {
+  const n = Math.trunc(Number(blur) || 0);
+  return n > 1 ? Math.min(n, 255) : 0;
+}
 
 /**
- * Blurred layers are static, so bake colour + blur into one half-resolution
- * texture once every deco texture has loaded, instead of re-blurring a
- * street-wide layer every frame. The texture covers the layer's full local
- * bounds: Pixi's cacheAsBitmap clips filters to the screen, which baked only
- * the part visible at load time and let its cut edges slide with parallax.
- * Flash's BlurFilter(blur, blur, LOW) is one box pass; a light two-pass Pixi
- * blur at half strength matches it.
+ * Weights of one box pass `size` texels wide, centre first: whole texels out to the radius
+ * (size - 1) / 2, the last one a fraction, summing to `size` (Ruffle's blur.wgsl). The bake's
+ * shader computes the same weights; this copy is for the tests.
  */
-function bakeBlurredLayer(PIXI, renderer, lc, blur, colour) {
+export function boxBlurWeights(size) {
+  if (!(size > 1)) return [1];
+  const r = (size - 1) / 2;
+  const out = [1];
+  for (let k = 1; r - k + 1 > 0; k += 1) out.push(Math.min(1, r - k + 1));
+  return out;
+}
+
+/**
+ * Texels per layer pixel for a blurred layer's tiles. Flash drew the layers at one pixel per
+ * layer pixel and then blurred them, so a box `size` pixels wide leaves nothing finer than about
+ * size / 4 pixels: the bake follows the screen's density (renderer.resolution, up to 2) for
+ * light blurs and drops to half density for heavy ones, in steps of 2 so tile edges land on
+ * whole texels.
+ */
+export function blurBakeResolution(size, rendererResolution = 1) {
+  const want = Math.min(Number(rendererResolution) || 1, 4 / size);
+  return want >= 2 ? 2 : want >= 1 ? 1 : 0.5;
+}
+
+/** Layer pixels per side of one blurred-layer tile. */
+export const BLUR_TILE = 512;
+/**
+ * Baked blur tiles a street keeps even when they are far off screen: a rebake draws the decos'
+ * art again, and re-uploading a 5000 x 1920 blur_landscape_piece cost a 100 ms frame on Dasas
+ * Terrace. Past it, tiles culled for RECOLOUR_EVICT_MS are freed, least recently seen first.
+ */
+export const BLUR_TILE_KEEP_BYTES = 96 * 1024 * 1024;
+/** Most memory one street may hold in baked blur tiles: past it, culled tiles go at once. */
+export const BLUR_TILE_BUDGET_BYTES = 160 * 1024 * 1024;
+
+/** Layer pixels of clear margin a tile bake needs around its tile for a box `size` wide. */
+export function blurTilePad(size) {
+  // The box reaches (size - 1) / 2 pixels; one more keeps the RT edge out of reach, and an even
+  // count keeps a half-density crop on whole texels.
+  return 2 * Math.ceil((Math.ceil(size / 2) + 1) / 2);
+}
+
+/**
+ * Split a blurred layer into tiles: each BLUR_TILE cell that some deco (grown by `pad`) reaches,
+ * cropped to those decos' boxes and snapped to even pixels. `items` keeps the decos in layer
+ * order, so a tile draws them in the same z order as the layer.
+ * @param {{ x0: number, y0: number, x1: number, y1: number }[]} boxes one per layer child
+ */
+export function planBlurTiles(boxes, pad, tile = BLUR_TILE) {
+  const cells = new Map();
+  boxes.forEach((b, index) => {
+    if (!b) return;
+    const x0 = b.x0 - pad;
+    const y0 = b.y0 - pad;
+    const x1 = b.x1 + pad;
+    const y1 = b.y1 + pad;
+    for (let tx = Math.floor(x0 / tile); tx <= Math.floor(x1 / tile); tx += 1) {
+      for (let ty = Math.floor(y0 / tile); ty <= Math.floor(y1 / tile); ty += 1) {
+        const key = `${tx},${ty}`;
+        let cell = cells.get(key);
+        if (!cell) cells.set(key, (cell = { tx, ty, items: [], x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity }));
+        cell.items.push(index);
+        cell.x0 = Math.min(cell.x0, x0);
+        cell.y0 = Math.min(cell.y0, y0);
+        cell.x1 = Math.max(cell.x1, x1);
+        cell.y1 = Math.max(cell.y1, y1);
+      }
+    }
+  });
+  const even = (v, up) => 2 * (up ? Math.ceil(v / 2) : Math.floor(v / 2));
+  const out = [];
+  for (const cell of cells.values()) {
+    const x = even(Math.max(cell.tx * tile, cell.x0), false);
+    const y = even(Math.max(cell.ty * tile, cell.y0), false);
+    const w = even(Math.min((cell.tx + 1) * tile, cell.x1), true) - x;
+    const h = even(Math.min((cell.ty + 1) * tile, cell.y1), true) - y;
+    if (w > 0 && h > 0) out.push({ x, y, w, h, items: cell.items });
+  }
+  return out;
+}
+
+const BOX_BLUR_GL = `in vec2 vTextureCoord;
+out vec4 finalColor;
+uniform sampler2D uTexture;
+// highp like the default filter vertex shader, which declares uInputSize too (they must match).
+uniform highp vec4 uInputSize;
+uniform highp vec4 uInputPixel;
+uniform highp vec4 uInputClamp;
+uniform vec2 uDirection;
+uniform float uSize;
+void main(void) {
+  // uSize is the box width in layer pixels; the filter texture holds uInputPixel.x / uInputSize.x
+  // texels per layer pixel.
+  float r = (uSize * uInputPixel.x / uInputSize.x - 1.0) * 0.5;
+  vec2 stepUv = uDirection * uInputPixel.zw;
+  vec4 sum = texture(uTexture, vTextureCoord);
+  float total = 1.0;
+  for (int i = 1; i <= 8; i++) {
+    float k = float(i);
+    float w = clamp(r - k + 1.0, 0.0, 1.0);
+    if (w <= 0.0) break;
+    sum += texture(uTexture, clamp(vTextureCoord + stepUv * k, uInputClamp.xy, uInputClamp.zw)) * w;
+    sum += texture(uTexture, clamp(vTextureCoord - stepUv * k, uInputClamp.xy, uInputClamp.zw)) * w;
+    total += 2.0 * w;
+  }
+  finalColor = sum / total;
+}`;
+
+const BOX_BLUR_WGSL = `struct GlobalFilterUniforms {
+  uInputSize:vec4<f32>,
+  uInputPixel:vec4<f32>,
+  uInputClamp:vec4<f32>,
+  uOutputFrame:vec4<f32>,
+  uGlobalFrame:vec4<f32>,
+  uOutputTexture:vec4<f32>,
+};
+struct BoxUniforms {
+  uDirection:vec2<f32>,
+  uSize:f32,
+};
+@group(0) @binding(0) var<uniform> gfu: GlobalFilterUniforms;
+@group(0) @binding(1) var uTexture: texture_2d<f32>;
+@group(0) @binding(2) var uSampler: sampler;
+@group(1) @binding(0) var<uniform> boxUniforms: BoxUniforms;
+struct VSOutput {
+  @builtin(position) position: vec4<f32>,
+  @location(0) uv: vec2<f32>,
+};
+fn filterVertexPosition(aPosition: vec2<f32>) -> vec4<f32> {
+  var position = aPosition * gfu.uOutputFrame.zw + gfu.uOutputFrame.xy;
+  position.x = position.x * (2.0 / gfu.uOutputTexture.x) - 1.0;
+  position.y = position.y * (2.0 * gfu.uOutputTexture.z / gfu.uOutputTexture.y) - gfu.uOutputTexture.z;
+  return vec4(position, 0.0, 1.0);
+}
+@vertex
+fn mainVertex(@location(0) aPosition: vec2<f32>) -> VSOutput {
+  return VSOutput(filterVertexPosition(aPosition), aPosition * (gfu.uOutputFrame.zw * gfu.uInputSize.zw));
+}
+@fragment
+fn mainFragment(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
+  let r = (boxUniforms.uSize * gfu.uInputPixel.x / gfu.uInputSize.x - 1.0) * 0.5;
+  let stepUv = boxUniforms.uDirection * gfu.uInputPixel.zw;
+  var sum = textureSampleLevel(uTexture, uSampler, uv, 0.0);
+  var total = 1.0;
+  for (var i = 1; i <= 8; i++) {
+    let k = f32(i);
+    let w = clamp(r - k + 1.0, 0.0, 1.0);
+    if (w <= 0.0) { break; }
+    sum += textureSampleLevel(uTexture, uSampler, clamp(uv + stepUv * k, gfu.uInputClamp.xy, gfu.uInputClamp.zw), 0.0) * w;
+    sum += textureSampleLevel(uTexture, uSampler, clamp(uv - stepUv * k, gfu.uInputClamp.xy, gfu.uInputClamp.zw), 0.0) * w;
+    total += 2.0 * w;
+  }
+  return sum / total;
+}`;
+
+let boxPrograms = null;
+/**
+ * One pass of Flash's LOW-quality BlurFilter: a box `size` layer pixels wide along one axis. The
+ * shader reaches 8 texels a side, a box 17 texels wide: blurBakeResolution keeps the streets'
+ * blurs (2 to 10) at 5 texels or fewer.
+ */
+export function flashBoxBlurFilter(PIXI, size, horizontal) {
+  if (!boxPrograms || boxPrograms.PIXI !== PIXI) {
+    boxPrograms = {
+      PIXI,
+      gl: PIXI.GlProgram.from({ vertex: PIXI.defaultFilterVert, fragment: BOX_BLUR_GL, name: 'flash-box-blur' }),
+      gpu: PIXI.GpuProgram.from({ vertex: { source: BOX_BLUR_WGSL, entryPoint: 'mainVertex' }, fragment: { source: BOX_BLUR_WGSL, entryPoint: 'mainFragment' } }),
+    };
+  }
+  return new PIXI.Filter({
+    glProgram: boxPrograms.gl,
+    gpuProgram: boxPrograms.gpu,
+    resources: {
+      boxUniforms: new PIXI.UniformGroup({
+        uDirection: { value: horizontal ? [1, 0] : [0, 1], type: 'vec2<f32>' },
+        uSize: { value: size, type: 'f32' },
+      }),
+    },
+    // Even, like the tiles' pad: an odd padding at half density put the filter's texture half a
+    // texel off the tile's and resampled it.
+    padding: blurTilePad(size),
+    resolution: 'inherit',
+  });
+}
+
+/** A layer child's box in layer coordinates (sprites by their texture, anything else by its bounds). */
+function childBox(PIXI, child) {
+  if (child instanceof PIXI.Sprite) return decoBox(child);
+  const b = child.getLocalBounds();
+  if (!(b.width > 0 && b.height > 0)) return null;
+  return { x0: child.x + b.x, y0: child.y + b.y, x1: child.x + b.x + b.width, y1: child.y + b.y + b.height };
+}
+
+/**
+ * Blurred layers are static, so bake colour + blur once instead of filtering a street-wide layer
+ * every frame. Each deco stays at its own art's sharpness: the layer is cut into BLUR_TILE tiles
+ * (only where decos are), and a tile is baked at blurBakeResolution, padded so the box reaches
+ * across tile edges, when the camera first comes near it (cullDecos), and freed again once it has
+ * been far off screen for RECOLOUR_EVICT_MS and the street holds more than BLUR_TILE_KEEP_BYTES. Bakes cover the decos' own boxes, so tall art is not
+ * clipped (Pixi's cacheAsBitmap clipped filters to the screen and let the cut edges slide with
+ * parallax). A layer that is ready before anything culls it (a strip render) bakes every tile.
+ * The old single bake of the whole layer at half resolution, scaled up on screen, smeared a
+ * blur of 1 (none in the client) into unreadable signs (Surveyor's Stroll's clipboard).
+ */
+function bakeBlurredLayer(lc, size, colour, state) {
+  const { PIXI, renderer } = state;
   const bases = new Set();
   for (const child of lc.children) {
     const base = child.texture?.source;
     if (base && !isLoaded(base)) bases.add(base);
   }
-  const bake = () => {
+  const ready = () => {
     if (lc.destroyed || !lc.children.length) return;
-    const pad = Math.ceil(blur * 2);
-    const bounds = lc.getLocalBounds();
-    const region = new PIXI.Rectangle(
-      Math.floor(bounds.x - pad),
-      Math.floor(bounds.y - pad),
-      Math.ceil(bounds.width + pad * 2),
-      Math.ceil(bounds.height + pad * 2)
-    );
-    const holder = new PIXI.Container();
-    holder.filters = [...(colour ? [colour] : []), new PIXI.BlurFilter({ strength: blur * 0.5, quality: 2 })];
-    const moved = lc.removeChildren();
-    for (const child of moved) {
+    const t0 = performance.now();
+    const res = blurBakeResolution(size, renderer.resolution);
+    const pad = blurTilePad(size);
+    const decos = lc.removeChildren();
+    const boxes = decos.map((child) => childBox(PIXI, child));
+    // The decos stay in the layer, hidden, so features that find one by id (location events,
+    // newxp sign labels) still see its parent chain; a tile redraws when one of its decos is
+    // shown, hidden, faded or tinted (refreshBlurTiles).
+    const parked = new PIXI.Container();
+    parked.visible = false;
+    parked.label = 'blur-decos';
+    for (const child of decos) {
       child.culled = false;
-      child.x -= region.x;
-      child.y -= region.y;
-      holder.addChild(child);
+      parked.addChild(child);
     }
-    holder.sortableChildren = true;
-    const texture = renderer.generateTexture({
-      target: holder,
-      frame: new PIXI.Rectangle(0, 0, region.width, region.height),
-      resolution: BLURRED_LAYER_RESOLUTION,
-    });
-    trimTexturePool(PIXI);
-    holder.destroy({ children: true });
-    const baked = new PIXI.Sprite(texture);
-    baked.x = region.x;
-    baked.y = region.y;
+    const layer = {
+      lc,
+      size,
+      res,
+      pad,
+      parked,
+      filters: [...(colour ? [colour] : []), flashBoxBlurFilter(PIXI, size, true), flashBoxBlurFilter(PIXI, size, false)],
+      tiles: [],
+    };
+    for (const plan of planBlurTiles(boxes, pad)) {
+      const spr = new PIXI.Sprite(PIXI.Texture.EMPTY);
+      spr.x = plan.x;
+      spr.y = plan.y;
+      spr.visible = false;
+      const tile = { ...plan, items: plan.items.map((i) => decos[i]), layer, sprite: spr, texture: null, bytes: 0, seen: 0 };
+      spr.blurTile = tile;
+      layer.tiles.push(tile);
+      lc.addChild(spr);
+    }
+    lc.addChild(parked);
     lc.filters = null;
-    lc.addChild(baked);
-    lc.bakedLayer = baked;
+    lc.blurLayer = layer;
+    // Upload the decos' art now, while the street loads, as the old whole-layer bake did: a
+    // first upload in a tile bake mid-walk cost a 100 ms frame on Dasas Terrace.
+    const sources = new Set(decos.map((child) => child.texture?.source).filter((source) => source && isLoaded(source)));
+    for (const source of sources) {
+      try {
+        renderer.texture?.initSource?.(source);
+      } catch { /* a lost context uploads on first draw instead */ }
+    }
+    state.layers.push(layer);
+    state.tiles += layer.tiles.length;
+    state.planMs += performance.now() - t0;
+    state.dirty = true;
+    // Nothing has culled this street yet (a one-off render): bake it all now.
+    setTimeout(() => {
+      if (state.culled || lc.destroyed) return;
+      state.eager += 1;
+      for (const tile of layer.tiles) bakeBlurTile(tile, state);
+    }, 250);
   };
   if (!bases.size) {
-    bake();
+    ready();
     return;
   }
   let pending = bases.size;
   const done = () => {
     pending -= 1;
-    if (pending === 0) bake();
+    if (pending === 0) ready();
   };
   for (const base of bases) {
     onLoaded(base, done);
     onFailed(base, done);
+  }
+}
+
+/** Bake one blur tile: its decos through the layer's colour and box blur, cropped to the tile. */
+function bakeBlurTile(tile, state) {
+  if (tile.texture || tile.sprite.destroyed) return;
+  const { PIXI, renderer } = state;
+  const t0 = performance.now();
+  const { pad, res, filters, parked } = tile.layer;
+  const inner = new PIXI.Container();
+  inner.sortableChildren = true;
+  inner.x = pad - tile.x;
+  inner.y = pad - tile.y;
+  for (const child of tile.items) inner.addChild(child);
+  const holder = new PIXI.Container();
+  holder.addChild(inner);
+  holder.filters = filters;
+  const baked = renderer.generateTexture({
+    target: holder,
+    frame: new PIXI.Rectangle(0, 0, tile.w + pad * 2, tile.h + pad * 2),
+    resolution: res,
+  });
+  for (const child of tile.items) parked.addChild(child);
+  tile.look = tileLook(tile);
+  holder.filters = null;
+  holder.destroy({ children: true });
+  trimTexturePool(PIXI);
+  // The padding stays in the texture: the crop's linear sampling reads the neighbour's blur.
+  tile.texture = new PIXI.Texture({ source: baked.source, frame: new PIXI.Rectangle(pad, pad, tile.w, tile.h) });
+  tile.bytes = baked.source.pixelWidth * baked.source.pixelHeight * 4;
+  tile.sprite.texture = tile.texture;
+  tile.sprite.visible = true;
+  tile.seen = performance.now();
+  state.bytes += tile.bytes;
+  state.peakBytes = Math.max(state.peakBytes, state.bytes);
+  state.bakes += 1;
+  state.bakeMs += performance.now() - t0;
+  if (state.bytes > BLUR_TILE_BUDGET_BYTES) evictBlurTiles(state, tile.seen, true);
+}
+
+/** What a tile's bake depends on beyond its decos' places: their visibility, alpha and tint. */
+function tileLook(tile) {
+  let look = 0;
+  for (const child of tile.items) {
+    look = (look * 31 + (child.visible ? 1 + Math.round(child.alpha * 255) : 0)) % 2147483647;
+    look = (look * 31 + (child.tint ?? 0xffffff)) % 2147483647;
+  }
+  return look;
+}
+
+/** Bake again any tile near the camera whose decos changed since its bake (a location event). */
+function refreshBlurTiles(state) {
+  for (const layer of state.layers) {
+    for (const tile of layer.tiles) {
+      if (!tile.texture || tile.sprite.culled || tileLook(tile) === tile.look) continue;
+      freeBlurTile(tile, state);
+      state.redraws += 1;
+      bakeBlurTile(tile, state);
+    }
+  }
+}
+
+function freeBlurTile(tile, state) {
+  if (!tile.sprite.destroyed) {
+    tile.sprite.texture = state.PIXI.Texture.EMPTY;
+    tile.sprite.visible = false;
+  }
+  tile.texture.destroy(true);
+  tile.texture = null;
+  state.bytes -= tile.bytes;
+  tile.bytes = 0;
+}
+
+/**
+ * Which baked blur tiles to free, least recently seen first, while the street holds more than
+ * `keep` bytes: tiles culled for RECOLOUR_EVICT_MS, or with `squeeze` (over `budget`) any culled
+ * tile, down to the budget. A tile near the camera is never freed.
+ * @param {{ texture: any, culled: boolean, seen: number, bytes: number }[]} tiles
+ */
+export function pickBlurTilesToFree(tiles, { now, bytes = 0, keep = BLUR_TILE_KEEP_BYTES, budget = BLUR_TILE_BUDGET_BYTES, squeeze = false }) {
+  const floor = squeeze ? budget : keep;
+  if (bytes <= floor) return [];
+  const idle = tiles
+    .filter((tile) => tile.texture && tile.culled && (squeeze || now - tile.seen >= RECOLOUR_EVICT_MS))
+    .sort((a, b) => a.seen - b.seen);
+  const out = [];
+  let left = bytes;
+  for (const tile of idle) {
+    if (left <= floor) break;
+    out.push(tile);
+    left -= tile.bytes;
+  }
+  return out;
+}
+
+/** Free the blur tiles pickBlurTilesToFree picks; `squeeze` when the street is over budget. */
+function evictBlurTiles(state, now, squeeze = false) {
+  const tiles = [];
+  for (const layer of state.layers) {
+    for (const tile of layer.tiles) tiles.push({ tile, texture: tile.texture, culled: tile.sprite.culled, seen: tile.seen, bytes: tile.bytes });
+  }
+  for (const pick of pickBlurTilesToFree(tiles, { now, bytes: state.bytes, squeeze })) {
+    freeBlurTile(pick.tile, state);
+    state.evictions += 1;
   }
 }
 
@@ -813,8 +1147,11 @@ export function decoBox(spr) {
   return { x0: spr.x + Math.min(xa, xb), y0: spr.y + Math.min(ya, yb), x1: spr.x + Math.max(xa, xb), y1: spr.y + Math.max(ya, yb) };
 }
 
-/** Cull one layer's sprites against the camera; returns how many are culled. */
-function cullLayer(lc, camX, camY, vpW, vpH, rebake) {
+/**
+ * Cull one layer's sprites against the camera; returns how many are culled. A recoloured deco
+ * or a blur tile coming into range is baked first (`rebake`).
+ */
+function cullLayer(lc, camX, camY, vpW, vpH, rebake, now) {
   if (lc.destroyed || !lc.visible) return 0;
   const x0 = camX - lc.x - CULL_MARGIN;
   const y0 = camY - lc.y - CULL_MARGIN;
@@ -822,7 +1159,18 @@ function cullLayer(lc, camX, camY, vpW, vpH, rebake) {
   const y1 = y0 + vpH + CULL_MARGIN * 2;
   let culled = 0;
   for (const child of lc.children) {
-    if (!child.texture || child.bakedLayerSprite) continue;
+    const tile = child.blurTile;
+    if (tile) {
+      const out = tile.x + tile.w < x0 || tile.x > x1 || tile.y + tile.h < y0 || tile.y > y1;
+      if (!out) {
+        if (!tile.texture) rebake(child);
+        tile.seen = now;
+      }
+      child.culled = out;
+      if (out) culled += 1;
+      continue;
+    }
+    if (!child.texture) continue;
     const b = decoBox(child);
     if (!b) continue;
     const out = b.x1 < x0 || b.x0 > x1 || b.y1 < y0 || b.y0 > y1;
@@ -851,10 +1199,22 @@ export function buildStreetView(street, PIXI, opts = {}) {
   root.sortableChildren = true;
   const recolourCache = { textures: new Map(), entries: new Map(), bytes: 0, evictions: 0, rebakes: 0, lastEvict: 0 };
   root.recolourCache = recolourCache;
+  /** Blurred layers' tiles (bakeBlurredLayer): counts for QA in root.blurStats. */
+  const blurState = {
+    PIXI, renderer: opts.renderer, layers: [], tiles: 0, bytes: 0, peakBytes: 0,
+    bakes: 0, bakeMs: 0, planMs: 0, evictions: 0, redraws: 0, eager: 0, culled: false, dirty: false,
+  };
+  root.blurStats = blurState;
   // Decos are destroyed with the view but not their textures; free the copies.
   root.once('destroyed', () => {
     for (const texture of recolourCache.textures.values()) texture.destroy(true);
     recolourCache.textures.clear();
+    for (const layer of blurState.layers) {
+      for (const tile of layer.tiles) tile.texture?.destroy(true);
+      if (!layer.parked.destroyed) layer.parked.destroy({ children: true });
+    }
+    blurState.layers.length = 0;
+    blurState.bytes = 0;
   });
 
   const W = streetWidth(street);
@@ -968,8 +1328,9 @@ export function buildStreetView(street, PIXI, opts = {}) {
       lc.addChild(spr);
       drawn += 1;
     }
-    const blur = Number(layer.filters?.blur) || 0;
-    if (blur > 0 && opts.renderer) bakeBlurredLayer(PIXI, opts.renderer, lc, blur, colour);
+    // A blur under 2 is no blur in the client (flashBlurSize): those layers only recolour.
+    const blur = flashBlurSize(layer.filters?.blur);
+    if (blur > 0 && opts.renderer) bakeBlurredLayer(lc, blur, colour, blurState);
     else if (colour && opts.renderer) bakeLayerColour(PIXI, opts.renderer, lc, colour, recolourCache);
     root.addChild(lc);
     layerContainers.push(lc);
@@ -999,12 +1360,20 @@ export function buildStreetView(street, PIXI, opts = {}) {
     if (now - recolourCache.lastEvict > 2000) {
       recolourCache.lastEvict = now;
       evictRecolours(recolourCache, now);
+      evictBlurTiles(blurState, now);
+    }
+    blurState.culled = true;
+    if (blurState.layers.length) refreshBlurTiles(blurState);
+    // A blurred layer was just tiled: place its first tiles now.
+    if (blurState.dirty) {
+      blurState.dirty = false;
+      force = true;
     }
     if (!force && lastCull && Math.abs(lastCull.x - camX) < CULL_MARGIN / 4 && Math.abs(lastCull.y - camY) < CULL_MARGIN / 4 && lastCull.w === vpW && lastCull.h === vpH) return;
     lastCull = { x: camX, y: camY, w: vpW, h: vpH };
     let culled = 0;
-    const rebake = (spr) => ensureRecoloured(PIXI, opts.renderer, recolourCache, spr);
-    for (const lc of layerContainers) culled += cullLayer(lc, camX, camY, vpW, vpH, rebake);
+    const rebake = (spr) => (spr.blurTile ? bakeBlurTile(spr.blurTile, blurState) : ensureRecoloured(PIXI, opts.renderer, recolourCache, spr));
+    for (const lc of layerContainers) culled += cullLayer(lc, camX, camY, vpW, vpH, rebake, now);
     root.culledDecos = culled;
   };
   /** Call once per frame with the camera's top-left in screen space. */
