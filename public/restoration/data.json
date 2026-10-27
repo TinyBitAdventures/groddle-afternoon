@@ -698,11 +698,14 @@
    "id": "auctions",
    "group": "economy",
    "name": "Auction house",
-   "status": "missing",
-   "blurb": "Not here yet, by choice: the auction house waits until trading between players has had a playtest. The original rules survive (inc_auctions.js), so it can come back.",
-   "multiplayer": null,
+   "status": "source",
+   "blurb": "In multiplayer, sell a stack to other players for the price you name, and browse, search and buy what they list, at the original’s prices: a non-refundable 1.5% listing fee (at least 3 currants), 8% commission on a sale, 72 hours to sell. Bought, cancelled and expired stacks come by mail from the Auction Fulfillment and Logistics Corporation ten minutes later. The auction pages were never released, so the Auctions window is drawn new.",
+   "multiplayer": "List, browse, search and buy between real players; the site holds every listing and moves the stacks and currants through the ledger.",
    "spot": null,
-   "evidence": [],
+   "evidence": [
+    "public/js/auctions.js",
+    "public/js/features/auctions-feature.js"
+   ],
    "shot": null,
    "play": null
   },
@@ -1159,17 +1162,16 @@
   }
  ],
  "tally": {
-  "source": 49,
+  "source": 50,
   "rebuilt": 10,
   "solo": 6,
-  "missing": 1,
   "reimagined": 1,
   "progress": 1,
   "lost": 1
  },
- "back": 66,
+ "back": 67,
  "possible": 68,
- "multiplayer": 15,
+ "multiplayer": 16,
  "quests": {
   "total": 445,
   "story": 245,
@@ -2566,7 +2568,7 @@
   ]
  },
  "git": {
-  "commits": 555,
+  "commits": 556,
   "since": "2026-10-19",
   "recent": [
    {
@@ -2691,6 +2693,6 @@
    }
   ]
  },
- "tests": 323,
+ "tests": 324,
  "generatedAt": "2026-10-27"
 }

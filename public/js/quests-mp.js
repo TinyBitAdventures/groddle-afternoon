@@ -15,8 +15,9 @@
  *    (features/supply-feature.js counts a collect in multiplayer);
  *    bootleg_hooch is hooch.js onSell 144-147 (vendor_sold:hooch), onTrade
  *    149-152 (a settled trade, the server's trade_done) and onGive 135-137
- *    (a Give to a player, once G332 has one). onMail 139-142 and
- *    onAuctionSold 131-133 have no multiplayer path yet.
+ *    (a Give to a player, once G332 has one) and onAuctionSold 131-133 (a
+ *    sale the site settled, G333 features/auctions-feature.js). onMail
+ *    139-142 has no multiplayer path yet.
  *  - teleportation_make_and_hand_out_tp_scripts: Teleportation V's quest
  *    (inc_data_skills.js:3491, 3967). make_teleportation_script is the
  *    script written (js/teleportation.js making_recipe:teleportation_script);
@@ -27,6 +28,12 @@
  *    1025). give_player_level1 is takeable.js takeable_give 283-289: once per
  *    player of level 3 to 5 given anything. Needs a Give whose receiver's
  *    level the site or server vouches for (needs: give).
+ *  - croppery_harvest_and_sell_at_auction (Tater 'n' Mater): Croppery II's
+ *    quest (inc_data_skills.js:938, 3920). auctions_sold_potato and
+ *    auctions_sold_tomato are inc_auctions.js:526, the seller's count of a
+ *    sale; G333's Auction House counts it once per sale the site settled
+ *    (features/auctions-feature.js), so it waits for the auctions (needs:
+ *    auctions). The harvest counters are the garden's, as in solo.
  *  - herbalism_plant_seeds_in_someones_garden: Herbalism III's quest
  *    (inc_data_skills.js:1937, 3977). herb_seeds_planted_for_others is
  *    include/garden.js 394-396, counted by features/neighbours-mp-feature.js
@@ -114,6 +121,9 @@ export const MULTIPLAYER_QUESTS = Object.freeze({
   teleportation_make_and_hand_out_tp_scripts: Object.freeze({ offer: 'source', needs: Object.freeze(['give']), source: 'inc_data_skills.js:3491, 3967' }),
   kindly_randomness: Object.freeze({ offer: 'source', needs: Object.freeze(['give']), source: 'inc_quests.js:1025' }),
   herbalism_plant_seeds_in_someones_garden: Object.freeze({ offer: 'source', source: 'inc_data_skills.js:1937, 3977' }),
+  // G333: Croppery II's quest (inc_data_skills.js:938, 3920); auctions_sold_<class> is the seller's,
+  // counted when the site settled the sale (inc_auctions.js:526; features/auctions-feature.js).
+  croppery_harvest_and_sell_at_auction: Object.freeze({ offer: 'source', needs: Object.freeze(['auctions']), source: 'inc_data_skills.js:938, 3920' }),
   transcendentalradiation_radiate_to_five_people: Object.freeze({ offer: 'source', source: 'inc_data_skills.js:3750, 3942' }),
   meditative_arts_with_friends: Object.freeze({ offer: 'source', source: 'quests/meditative_arts_with_friends.js prerequisites, prereq_quests' }),
   good_neighbor: Object.freeze({ offer: 'ours', offerTriggers: ours(MP_FACTS.tendNeighbour) }),
@@ -132,7 +142,6 @@ export const MULTIPLAYER_QUESTS_LEFT_OUT = Object.freeze({
   butler_zombies: 'Nothing in GSJS offers it, and butlers_zombied is only ever reset there (player.js:1018-1021; telling a Butler "zombie" keeps another tally, butler_data.js 1349-1365).',
   tower_defense: 'Nothing survives of it: no requirements, and nothing offers it.',
   multiplayer_races: 'Development only: its course is in config_dev.js:169, not config_prod.js.',
-  croppery_harvest_and_sell_at_auction: 'Needs the auction house (auctions_sold_*).',
 });
 
 /** The multiplayer row for a quest, or null. */

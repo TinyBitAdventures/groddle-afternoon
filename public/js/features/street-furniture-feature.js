@@ -117,7 +117,7 @@ import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } 
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=note-g175';
 import { textureFromUrl } from '../textures.js';
 import { butlerApi } from './butler-feature.js?v=butler-feature-43';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=radiate-3';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=radiate-4';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';
 const PLAYER_ID = 'player';

@@ -185,9 +185,10 @@ export const CHECKLIST = Object.freeze([
     blurb: 'In multiplayer, trade items and currants face to face with another player on your street, up to six stacks a side as in the original: the server holds both offers until you both accept, and the site settles the swap so only what you really hold can change hands. Or give a stack, a written note or a wrapped Gift Box to a player beside you; the site moves it from your ledger to theirs, and they unwrap the box.',
     multiplayer: 'Trade face to face, or give a stack, a written note or a wrapped Gift Box to a player on your street.',
     evidence: ['public/js/trade.js', 'public/js/features/trade-feature.js', 'public/js/gifts.js', 'public/js/features/gifts-feature.js'] },
-  { id: 'auctions', group: 'economy', name: 'Auction house', status: 'missing',
-    blurb: 'Not here yet, by choice: the auction house waits until trading between players has had a playtest. The original rules survive (inc_auctions.js), so it can come back.',
-    evidence: [] },
+  { id: 'auctions', group: 'economy', name: 'Auction house', status: 'source',
+    blurb: 'In multiplayer, sell a stack to other players for the price you name, and browse, search and buy what they list, at the original’s prices: a non-refundable 1.5% listing fee (at least 3 currants), 8% commission on a sale, 72 hours to sell. Bought, cancelled and expired stacks come by mail from the Auction Fulfillment and Logistics Corporation ten minutes later. The auction pages were never released, so the Auctions window is drawn new.',
+    multiplayer: 'List, browse, search and buy between real players; the site holds every listing and moves the stacks and currants through the ledger.',
+    evidence: ['public/js/auctions.js', 'public/js/features/auctions-feature.js'] },
 
   // —— Quests & adventures ——
   { id: 'quests', group: 'quests', name: 'Story and skill quests', status: 'source', spot: 'rock-magic',

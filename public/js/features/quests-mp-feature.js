@@ -50,7 +50,7 @@ import {
   isRaceStreet,
   normalizeQuestsMpSlice,
   tradeHoochCount,
-} from '../quests-mp.js?v=g329-1';
+} from '../quests-mp.js?v=g329-2';
 
 export const QUESTS_MP_FEATURE_ID = 'quests-mp';
 const FACT_CHECK_MS = 1_000;
@@ -236,7 +236,7 @@ function createSession(engine, client) {
       }
     },
     context() {
-      return { facts: { ...slice.facts }, ready: { give: engine.query?.('playerGiveReady', engine) === true } };
+      return { facts: { ...slice.facts }, ready: { give: engine.query?.('playerGiveReady', engine) === true, auctions: engine.query?.('auctionsReady', engine) === true } };
     },
   };
 }

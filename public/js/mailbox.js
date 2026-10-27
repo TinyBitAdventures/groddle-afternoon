@@ -73,6 +73,9 @@ function normalizeMessage(seed = {}, index = 0) {
     currants,
     attachmentsClaimed: seed?.attachmentsClaimed === true || (!attachment && currants === 0),
     outgoing: seed?.outgoing === true,
+    // Multiplayer only (G333): an attachment the site's ledger holds until it is received
+    // (features/auctions-feature.js mailReceive). Solo letters never carry one.
+    ...(/^auc-[0-9a-f]{16}-d$/.test(String(seed?.ledger || '')) ? { ledger: String(seed.ledger) } : {}),
   };
 }
 

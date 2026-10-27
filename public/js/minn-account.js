@@ -430,6 +430,43 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       return buddyCall('Checking your gifts', 'gifts');
     },
 
+    /**
+     * The Auction House (register G333, groddle-afternoon-site/src/LedgerAuction.php).
+     * auctions({ q, cat, c, seller, sort, page }) { auctions, total, page, per, cats, rules };
+     * myAuctions() { active, ended, deliveries, receipts, listable, rules, now };
+     * listAuction({ id, c, n, cost, r? }) { status: listed, auction, receipt };
+     * buyAuction(id) { status: bought, auction, receipt, delivery };
+     * cancelAuction(id) { status: cancelled, auction, delivery };
+     * collectAuction(id) { status: collected | done, receipt, delivery }.
+     * A refusal throws with the site's { status: refused, why, text } as err.data.
+     */
+    async auctions(params = {}) {
+      const q = new URLSearchParams();
+      for (const [k, v] of Object.entries(params)) if (v !== undefined && v !== null && v !== '') q.set(k, String(v));
+      const query = q.toString();
+      return buddyCall('Browsing the auctions', `auctions${query ? `?${query}` : ''}`);
+    },
+
+    async myAuctions() {
+      return buddyCall('Checking your auctions', 'auctions/mine');
+    },
+
+    async listAuction(listing) {
+      return buddyCall('Posting the auction', 'auctions', { method: 'POST', body: listing });
+    },
+
+    async buyAuction(id) {
+      return buddyCall('Buying', `auctions/${encodeURIComponent(String(id))}/buy`, { method: 'POST' });
+    },
+
+    async cancelAuction(id) {
+      return buddyCall('Cancelling the auction', `auctions/${encodeURIComponent(String(id))}/cancel`, { method: 'POST' });
+    },
+
+    async collectAuction(id) {
+      return buddyCall('Collecting the delivery', `auctions/${encodeURIComponent(String(id))}/collect`, { method: 'POST' });
+    },
+
     async deleteBackup(slot) {
       const r = await call(`backups/${Number(slot)}`, { method: 'DELETE' });
       if (!r.ok) throw failed('Deleting the backup', r);

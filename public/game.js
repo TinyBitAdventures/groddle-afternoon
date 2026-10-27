@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-15';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-168';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-169';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -427,7 +427,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=player-save-20';
+} from './js/player-save.js?v=player-save-21';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -453,7 +453,7 @@ import {
   seedMailbox,
   sendMail,
   unreadMailCount,
-} from './js/mailbox.js?v=homes-mail-2';
+} from './js/mailbox.js?v=homes-mail-3';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,
@@ -8304,6 +8304,8 @@ const engine = {
   openMailbox: () => openMailboxPanel({ anywhere: true }),
   mailboxOpen: () => isMailboxOpen(),
   mailUnread: () => unreadMailCount(mailboxState, Date.now()),
+  /** G333: the mailbox's letters (live rows), for a feature that delivers and settles its own (auctions). */
+  mailMessages: () => mailboxState.messages,
   /** Whether the player owns a home street (Visiting Stone opt-in, visitor letters). */
   homeOwned: () => homeState.owned === true,
   /** newxp: the Magic Rock imagines the home street for free (inc_houses.js houses_go_to_new_house). */
@@ -18473,12 +18475,19 @@ function renderMailboxReader(message) {
         ${canReceive ? '<button type="button" class="btn-glitch-primary" data-mail-receive>Receive</button>' : ''}
       </div>` : ''}
     <div class="mail-message-actions">
-      ${!message.outgoing ? `<button type="button" class="btn-glitch-primary" data-mail-reply>Reply</button>
+      ${!message.outgoing && !message.ledger ? `<button type="button" class="btn-glitch-primary" data-mail-reply>Reply</button>
         <button type="button" data-mail-archive>${message.archived ? 'Move to inbox' : 'Archive'}</button>
         <button type="button" data-mail-delete>Delete</button>` : ''}
+      ${message.ledger && message.attachmentsClaimed ? '<button type="button" data-mail-delete>Delete</button>' : ''}
     </div>
   `;
   reader.querySelector('[data-mail-receive]')?.addEventListener('click', () => {
+    // G333: an attachment the site's ledger holds (an auction delivery) is received through the site.
+    const settled = message.ledger ? features.query('mailReceive', message, engine) : null;
+    if (settled) {
+      Promise.resolve(settled).finally(() => { updateHud(); updateHomeChrome(); savePlayerState(); renderMailboxPanel(); });
+      return;
+    }
     const result = receiveMailAttachments(mailboxState, inv, pc, message.id, Date.now());
     if (!result.ok) {
       toast('There is nothing left to receive.');
