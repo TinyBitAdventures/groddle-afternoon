@@ -116,8 +116,8 @@ import {
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=neighbours-4';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=note-g175';
 import { textureFromUrl } from '../textures.js';
-import { butlerApi } from './butler-feature.js?v=butler-feature-54';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=radiate-18';
+import { butlerApi } from './butler-feature.js?v=g366-1';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=g366-1';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';
 const PLAYER_ID = 'player';
@@ -702,18 +702,34 @@ function flipStone(engine, entity) {
   engine.save();
 }
 
+/**
+ * G277: the stone talks (visiting_stone.js 87, 110, 148 conversation_start): an NPC
+ * conversation on the plain card, not a quest offer (no New Quest heading or quest
+ * sound). One choice has no second button; `no` adds it.
+ */
+function stoneTalk(engine, { beats, yes, no = '', onYes, onNo }) {
+  engine.scriptedDialogue({
+    title: 'Visiting Stone',
+    kicker: 'Visiting Stone',
+    beats,
+    cancelable: Boolean(no),
+    primaryLabel: yes,
+    cancelLabel: no,
+    onComplete: onYes,
+    onCancel: no ? onNo : undefined,
+  });
+}
+
 function askVisit(engine, entity, opts = {}) {
   const block = visitBlock(engine);
   if (block) return engine.toast(block, 2400);
-  engine.offerQuestDialogue({
-    title: 'Visiting Stone',
-    kicker: 'Visiting Stone',
+  stoneTalk(engine, {
     beats: [{ text: STONE_TEXT.visit, response: STONE_TEXT.visitYes }],
-    acceptLabel: STONE_TEXT.visitYes,
-    declineLabel: STONE_TEXT.visitNo,
+    yes: STONE_TEXT.visitYes,
+    no: STONE_TEXT.visitNo,
     // G328: a random opted-in real player's home in multiplayer (visiting_visit_random).
-    onAccept: () => (neighboursMpApi.active(engine) ? neighboursMpApi.visitRandom(engine) : goVisit(engine, opts)),
-    onDecline: () => engine.say(entity.target, STONE_TEXT.visitLater, 3500),
+    onYes: () => (neighboursMpApi.active(engine) ? neighboursMpApi.visitRandom(engine) : goVisit(engine, opts)),
+    onNo: () => engine.say(entity.target, STONE_TEXT.visitLater, 3500),
   });
   lastAction = 'stone:ask';
 }
@@ -722,16 +738,14 @@ function askOptIn(engine, entity) {
   const home = homeInfo(engine);
   const gate = canOptIn({ level: engine.pc.level, homeOwned: home.owned === true, hasButler: hasButler(engine) });
   if (!gate.ok) return engine.toast(gate.reason, 2400);
-  engine.offerQuestDialogue({
-    title: 'Visiting Stone',
-    kicker: 'Visiting Stone',
+  stoneTalk(engine, {
     beats: [
       { text: STONE_TEXT.optIn, response: STONE_TEXT.optInSplit },
       { text: STONE_TEXT.optInAsk, response: STONE_TEXT.optInYes },
     ],
-    acceptLabel: STONE_TEXT.optInYes,
-    declineLabel: STONE_TEXT.optInNo,
-    onAccept: async () => {
+    yes: STONE_TEXT.optInYes,
+    no: STONE_TEXT.optInNo,
+    onYes: async () => {
       // G328: in multiplayer the site keeps the opt-in (pc.home_allow_visits) and checks it again.
       if (neighboursMpApi.active(engine) && !(await neighboursMpApi.optIn(engine))) return;
       nb.allowVisits = true;
@@ -742,19 +756,16 @@ function askOptIn(engine, entity) {
       engine.save();
       publish(engine, true);
     },
-    onDecline: () => engine.say(entity.target, STONE_TEXT.optInLater, 4000),
+    onNo: () => engine.say(entity.target, STONE_TEXT.optInLater, 4000),
   });
 }
 
 function askOptOut(engine) {
-  engine.offerQuestDialogue({
-    title: 'Visiting Stone',
-    kicker: 'Visiting Stone',
+  stoneTalk(engine, {
     beats: [{ text: STONE_TEXT.optOut, response: 'OK' }],
-    acceptLabel: 'OK',
+    yes: 'OK',
     // G255: visiting_stone.js 84-87 gives the opt-out one choice, OK.
-    declinable: false,
-    onAccept: async () => {
+    onYes: async () => {
       if (neighboursMpApi.active(engine) && !(await neighboursMpApi.optOut(engine))) return;
       nb.allowVisits = false;
       engine.pushActivity(STONE_TEXT.optedOut);

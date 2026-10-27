@@ -66,7 +66,7 @@ import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 import {
   applyAchievementProgress,
   createAchievementState,
-} from '../public/js/achievements.js?v=badge-events-1';
+} from '../public/js/achievements.js?v=g366-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

@@ -687,7 +687,9 @@ export function acceptOffer(questState, classTsid, ctx = {}) {
  * should advance it, and the system that has to emit that event. Events use
  * the same `group:label` shape as js/achievements.js. `{a}`/`{b}` are
  * placeholders shared by the event and counter templates.
- *   distinct: count each label once per quest run (GSJS stored a hash)
+ *   distinct: count each label once per quest run (GSJS stored a hash);
+ *     'animal' takes the label from the event's detail ({ animal }, the
+ *     street animal's key), counting as usual when an event has none
  *   minAmount: flag only when one event carries at least this amount
  */
 /**
@@ -703,8 +705,10 @@ export const COUNTER_ROUTES = Object.freeze([
   // animals (animal-kinship.js; emitted via worldVerbAchievementCounters)
   { system: 'animals', counter: 'piggies_petted', event: 'npc_piggy:pet' },
   { system: 'animals', counter: 'meats_collected_from_pigs', event: 'npc_piggy:nibble' },
-  { system: 'animals', counter: 'butterflies_massaged', event: 'npc_butterfly:massage' },
-  { system: 'animals', counter: 'butterflies_milked', event: 'npc_butterfly:milk' },
+  // G277: each Butterfly counts once per quest run (npc_butterfly.js 1139-1142 and 1286-1291 keep
+  // pc.butterflies_massaged / pc.butterflies_milked by tsid; the quests' onComplete_custom clear them).
+  { system: 'animals', counter: 'butterflies_massaged', event: 'npc_butterfly:massage', distinct: 'animal' },
+  { system: 'animals', counter: 'butterflies_milked', event: 'npc_butterfly:milk', distinct: 'animal' },
   { system: 'animal-kinship', counter: 'piggy_nibble_max_reward', event: 'animal_max_reward:npc_piggy' },
   { system: 'animal-kinship', counter: 'butterfly_milk_max_reward', event: 'animal_max_reward:npc_butterfly' },
   { system: 'animal-kinship', counter: 'chicken_squeeze_max_reward', event: 'animal_max_reward:npc_chicken' },
@@ -1157,6 +1161,7 @@ function makeMatches(req, event) {
  * @param {object} questState
  * @param {string} event  e.g. 'npc_piggy:pet', 'trants_harvested:trant_bean', 'making_recipe:cheese', 'quoins_collected'
  * @param {number} [amount=1]
+ * ctx.detail is the event's detail ({ animal } on animal verbs) for `distinct: 'animal'` routes.
  */
 export function routeQuestEvent(questState, event, amount = 1, ctx = {}) {
   const offers = ensureQuestOfferState(questState);
@@ -1179,10 +1184,11 @@ export function routeQuestEvent(questState, event, amount = 1, ctx = {}) {
           const hit = counters.find((c) => c.counter === req.name);
           if (!hit) continue;
           if (hit.route?.minAmount && delta < hit.route.minAmount) continue;
-          if (hit.route?.distinct) {
+          const label = hit.route?.distinct === 'animal' ? String(ctx.detail?.animal || '') : hit.label;
+          if (hit.route?.distinct && label) {
             const seen = ((offers.distinct[id] ||= {})[req.name] ||= []);
-            if (seen.includes(hit.label)) continue;
-            seen.push(hit.label);
+            if (seen.includes(label)) continue;
+            seen.push(label);
             next = req.type === 'flag' ? 1 : Math.min(req.num, current + 1);
           } else {
             next = req.type === 'flag' ? 1 : Math.min(req.num, current + delta);

@@ -23,7 +23,7 @@ import {
   applyAchievementProgress,
   createAchievementState,
   seedAchievementNearCompletion,
-} from '../public/js/achievements.js?v=badge-events-1';
+} from '../public/js/achievements.js?v=g366-1';
 import { getGameDayKey } from '../public/js/game-day.js?v=dametime-4';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 

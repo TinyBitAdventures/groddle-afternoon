@@ -39,7 +39,7 @@ import {
   treeReady,
   treeSkill,
 } from '../public/js/street-objects.js?v=g334-2';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=g334-4';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=g366-1';
 import { FEATURES } from '../public/js/features/index.js';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=g330-1';
 import { createResourceNode } from '../public/js/resource-nodes.js';
@@ -250,7 +250,7 @@ describe('street objects: the feature', () => {
   it('is registered just before the realtime feature', () => {
     const ids = FEATURES.map((f) => f.id);
     assert.equal(ids.indexOf('street-objects') + 1, ids.indexOf('realtime'));
-    assert.match(read('public/js/features/index.js'), /street-objects-feature\.js\?v=g334-4/);
+    assert.match(read('public/js/features/index.js'), /street-objects-feature\.js\?v=g366-1/);
   });
 
   it('asks for the street on joining, and waits for it', () => {

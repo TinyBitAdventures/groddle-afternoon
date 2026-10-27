@@ -49,7 +49,8 @@ function defaultsFor(classId) {
     return { petted: false, nibbled: false, fed: false, hunger: 1, petCount: 0, nibbleCount: 0, feedCount: 0 };
   }
   if (classId === 'npc_chicken') {
-    return { squeezedToday: 0, squeezed: 0, buttered: false, fed: false, hunger: 1, feedCount: 0 };
+    // G282: no `buttered` flag: butter up has no daily limit (npc_chicken.js 163-236); js/animal-flattery.js counts butteredUp.
+    return { squeezedToday: 0, squeezed: 0, fed: false, hunger: 1, feedCount: 0 };
   }
   if (classId === 'npc_butterfly') {
     return {
@@ -159,7 +160,7 @@ export function resetAnimalDay(classId, state) {
     s.fed = false;
     delete s.lastFed;
   } else if (classId === 'npc_chicken') {
-    s.buttered = false;
+    delete s.buttered; // G282: an old save's unused flag
     s.fed = false;
     s.hunger = Math.min(3, (s.hunger || 0) + 1);
     delete s.lastFed;

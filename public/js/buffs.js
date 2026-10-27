@@ -10,6 +10,7 @@
 import { getBuffCatalog } from './content-catalogs.js';
 import { energyMax, gainMetabolic, loseEnergy, loseMood, moodMax, shiftMetabolic } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
+import { BUFF_ICONS } from './buff-triggers.js?v=g124-2';
 
 const SECOND = 1000;
 
@@ -286,7 +287,9 @@ export function applyBuff(state, classTsid, pc = null, now = Date.now(), opts = 
     expiresAt: durationMs != null ? appliedAt + durationMs : null,
     nextTickAt: tickMs != null ? appliedAt + tickMs : null,
     activated: delayMs === 0,
-    sourceItem: opts.sourceItem || def.itemClass || null,
+    // G277: a buff whose item_class iconic is lost (npc_butterfly, npc_piggy, ...) gets its
+    // stand-in icon at once (buff-triggers BUFF_ICONS), not a tick later after a 404 in the tray.
+    sourceItem: opts.sourceItem || BUFF_ICONS[classTsid] || def.itemClass || null,
     args: opts.args && typeof opts.args === 'object' ? { ...opts.args } : {},
     def,
   };

@@ -35,7 +35,7 @@ import {
   setCubimalFree,
 } from '../public/js/cubimals.js';
 import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=catalog-unified-7';
-import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=cubimals-1';
+import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=g366-1';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 import { FEATURES } from '../public/js/features/index.js';
 import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js';

@@ -786,14 +786,17 @@ function rangerDialog(engine, { text, beats, accept, decline, onAccept, onDeclin
     if (ranger) ranger.talking = false;
     if (typeof fn === 'function') fn();
   };
-  engine.offerQuestDialogue({
+  // G277: npc_fox_ranger.js conversation_start (195-415): an NPC conversation on the plain
+  // card, not a quest offer; a one-choice line has one button (no second copy of it).
+  engine.scriptedDialogue({
     title: 'Fox Ranger',
     kicker: 'Fox Brushing Preserve',
     beats: list,
-    acceptLabel: accept,
-    declineLabel: decline || accept,
-    onAccept: done(onAccept),
-    onDecline: done(onDecline || onAccept),
+    cancelable: Boolean(decline),
+    primaryLabel: accept,
+    cancelLabel: decline || '',
+    onComplete: done(onAccept),
+    onCancel: decline ? done(onDecline || onAccept) : undefined,
   });
   publish(engine, true);
 }

@@ -22,7 +22,7 @@ import {
   isTrophyClass,
   itemVerbsFeature,
 } from '../public/js/features/item-verbs-feature.js';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=homes-54';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=g366-1';
 import {
   applyAchievementProgress,
   createAchievementState,
@@ -31,8 +31,8 @@ import {
   resetAchievementCounter,
   seedAchievementNearCompletion,
   worldVerbAchievementCounters,
-} from '../public/js/achievements.js?v=badge-events-1';
-import { applyBuff, buffPhysics, createBuffState, getBuffItemInfo, tickBuffs } from '../public/js/buffs.js?v=item-buffs-7';
+} from '../public/js/achievements.js?v=g366-1';
+import { applyBuff, buffPhysics, createBuffState, getBuffItemInfo, tickBuffs } from '../public/js/buffs.js?v=g366-1';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 
 const publicRoot = join(dirname(fileURLToPath(import.meta.url)), '../public');

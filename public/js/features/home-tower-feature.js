@@ -1095,13 +1095,15 @@ function requestRemove(engine, item, doRemove) {
     engine.toast(WOTD_TEXT.pourFirst, 3200);
     return false;
   }
-  engine.offerQuestDialogue({
+  // G277: a prompt, not a quest card (proto_furniture_tower_chassis.js 66-76 prompts_add,
+  // is_modal, choices ok / cancel): no New Quest heading, no quest sound; Escape is the Nevermind.
+  engine.prompt({
+    modal: true,
     title: 'Please Confirm!',
-    kicker: 'Tower',
-    beats: [{ text: 'Are you really sure you want to remove this Tower?', response: 'Yes' }],
-    acceptLabel: 'Yes',
-    declineLabel: 'Nevermind',
-    onAccept: () => {
+    text: 'Are you really sure you want to remove this Tower?',
+    choices: [{ value: 'ok', label: 'Yes' }, { value: 'cancel', label: 'Nevermind' }],
+    onChoice: (value) => {
+      if (value !== 'ok') return;
       tower.project = {};
       if (work) stopWork(engine, '');
       doRemove();

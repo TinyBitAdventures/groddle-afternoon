@@ -109,6 +109,8 @@ const STREET_ENTER_DELAY_MS = 4_000;
 const SYNC_MS = 1_000;
 /** G213: how soon a check spent by an award or new-day screen looks again. */
 const SCREEN_RETRY_MS = 1_000;
+/** G277: an emergency left waiting is looked at every second (QuestsDialog.as 41 emergency_timer = new Timer(1000), onEmergencyTick 335-360). */
+export const EMERGENCY_RETRY_MS = 1_000;
 
 let nextOfferCheckAt = 0;
 let nextSyncAt = 0;
@@ -560,8 +562,9 @@ export const questOffersFeature = {
     );
   },
 
-  onEvent(counter, amount, engine) {
-    const result = routeQuestEvent(engine.questState, counter, amount, questContext(engine));
+  onEvent(counter, amount, engine, detail) {
+    // G277: the detail ({ animal }) lets a butterfly count once per run (quest-offers.js distinct 'animal').
+    const result = routeQuestEvent(engine.questState, counter, amount, { ...questContext(engine), detail });
     if (result.advanced.length) engine.updateHud();
     finish(result.completable, engine);
   },
@@ -629,6 +632,10 @@ export const questOffersFeature = {
       } else if (presentOffer(engine, now)) {
         if (cardGoneAt) engine.setData('questOfferAfterCardMs', String(now - cardGoneAt));
         cardGoneAt = 0;
+      }
+      // G277: an emergency still unanswered (pushed off, closed by force, held) tries again in 1 s, not 30 s.
+      if (!offerOpen && waitingOffers(engine.questState).some((row) => row.emergency)) {
+        nextOfferCheckAt = Math.min(nextOfferCheckAt, now + EMERGENCY_RETRY_MS);
       }
     }
   },

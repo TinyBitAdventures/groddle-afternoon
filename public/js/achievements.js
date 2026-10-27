@@ -108,6 +108,14 @@ export function worldVerbAchievementCounters(classTsid, verbId, result = null) {
       if (classId === 'npc_butterfly' && verb === 'massage') rows.push({ counter: 'butterflies:massaged', amount: 1 });
       return rows;
     }
+    // G282: npc_butterfly.js:679, a song sung counts butterflies:sung_to; items/item.js:738
+    // notifyVerb counts npc_butterfly:sing_to (the class:verb every verb counts).
+    if (classId === 'npc_butterfly' && verb === 'sing_to') {
+      return [
+        { counter: 'npc_butterfly:sing_to', amount: 1 },
+        { counter: 'butterflies:sung_to', amount: 1 },
+      ];
+    }
     return [];
   }
   // wood_tree.js:794 (and wood_tree_enchanted.js:825): every finished harvest.

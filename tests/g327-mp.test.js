@@ -34,7 +34,7 @@ import { HI_VARIANTS, HI_VARIANT_COLORS, HI_VARIANT_NAMES, hiDay } from '../publ
 import { hiSignsFeature } from '../public/js/features/hi-signs-feature.js';
 import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js';
 import { addItem, countItem } from '../public/js/inventory.js?v=catalog-unified-7';
-import { applyAchievementProgress, createAchievementState, getAchievementProgress, seedAchievementNearCompletion } from '../public/js/achievements.js?v=badge-events-1';
+import { applyAchievementProgress, createAchievementState, getAchievementProgress, seedAchievementNearCompletion } from '../public/js/achievements.js?v=g366-1';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 import { HAS_SERVER, serverPath } from '../tools/repos.mjs';
 

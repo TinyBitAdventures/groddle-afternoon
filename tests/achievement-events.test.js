@@ -21,7 +21,7 @@ import {
   consumeAchievementCounters,
   resetAchievementCounter,
   purchaseAchievementUpdates,
-} from '../public/js/achievements.js?v=badge-events-1';
+} from '../public/js/achievements.js?v=g366-1';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js';
 import { createPlot, growTree, tickPlot } from '../public/js/patches.js';
 import { slothsChewing } from '../public/js/features/resource-nodes-feature.js';
@@ -395,6 +395,6 @@ describe('G117 badges GSJS grants outright', () => {
     assert.match(game, /consumeAchievementCounters\(classTsid, \{ kind: ordinaryInfo\.kind/);
     assert.match(game, /'coin_count:days_maxed', 1, pc[\s\S]{0,80}resetAchievementCounter\(achieveState, 'coin_count:days_maxed'\)/);
     assert.equal((game.match(/countPlayerJump\(\);/g) || []).length, 2);
-    assert.match(game, /achievements\.js\?v=badge-counters-2/);
+    assert.match(game, /achievements\.js\?v=g366-1/);
   });
 });

@@ -159,7 +159,7 @@ import { playPoofIn } from '../overlay-art.js?v=g311-1';
 import { fadeInNewNear } from '../poof-fade.js?v=g311-1';
 import { projectApi } from './street-jobs-feature.js?v=blur-9';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-3';
-import { towerApi } from './home-tower-feature.js?v=home-tower-15';
+import { towerApi } from './home-tower-feature.js?v=g366-1';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-15';
@@ -3755,6 +3755,9 @@ function bindPointer(engine) {
   window.addEventListener('keydown', (e) => {
     if (!mode || e.key !== 'Escape') return;
     if (e.target?.matches?.('input, textarea, select')) return;
+    // G277: an open confirm takes Escape first, as its no (ConfirmationDialog.as closeFromUserInput
+    // 102-111 submits escape_value; HouseExpandDialog.as 202-209 sets it false). The bar stays open.
+    if (engine.questDialogueOpen?.()) return;
     e.stopImmediatePropagation();
     if (stamping) {
       stopStamping(engine);

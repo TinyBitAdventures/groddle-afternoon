@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-15';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g366-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-199';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-200';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -329,7 +329,7 @@ import {
   consumeAchievementCounters,
   resetAchievementCounter,
   purchaseAchievementUpdates,
-} from './js/achievements.js?v=badge-counters-2';
+} from './js/achievements.js?v=g366-1';
 import {
   applyStreetVisit,
   STREET_VISITS_SLOT,
@@ -383,7 +383,7 @@ import {
   formatBuffRemaining,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from './js/buffs.js?v=item-buffs-7';
+} from './js/buffs.js?v=g366-1';
 import { grantMoodXp, moodXpMultiplierFor, setMoodXpEnv } from './js/mood-xp.js';
 import {
   loadContentCatalogs,
@@ -413,8 +413,8 @@ import {
   packPagerState,
   packPageTarget,
 } from './js/pack-pager.js?v=original-pager-1';
-import { listAnimalFeedOptions } from './js/animals.js?v=g296-1';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g296-1';
+import { listAnimalFeedOptions } from './js/animals.js?v=g366-1';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g366-1';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -708,7 +708,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=g296-1';
+} from './js/animals.js?v=g366-1';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -6178,13 +6178,17 @@ function executeVerb(target, verbId) {
         }
       }
     }
+    // The animal's identity rides along (npc_piggy.js:734 times_fed_for_feat, solo Feats;
+    // G277: npc_butterfly.js:1286-1291 counts butterflies_milked once per butterfly).
+    const verbDetail = target.animalKey ? { animal: target.animalKey } : undefined;
     const achievementEvents = worldVerbAchievementCounters(target.classId, verbId, result);
     for (const achievementEvent of achievementEvents) {
       const achievementUpdates = applyAchievementProgress(
         achieveState,
         achievementEvent.counter,
         achievementEvent.amount,
-        pc
+        pc,
+        verbDetail
       );
       announceAchievementUpdates(achievementUpdates);
     }
@@ -6196,8 +6200,6 @@ function executeVerb(target, verbId) {
     // Every world verb is also a `<class>:<verb>` quest event, unless a badge
     // counter of the same name already carried it.
     const verbEvent = `${target.classId}:${verbId}`;
-    // The animal's identity rides along (npc_piggy.js:734 times_fed_for_feat, solo Feats).
-    const verbDetail = target.animalKey ? { animal: target.animalKey } : undefined;
     if (!achievementEvents.some((event) => event.counter === verbEvent)) emitGameEvent(verbEvent, 1, verbDetail);
     if (ROCK_CATALOG[target.classId] && verbId === 'mine' && target.state?.rock?.depleted) {
       emitGameEvent(`rocks_depleted:${target.classId}`);
@@ -9205,6 +9207,7 @@ function spawnButterflies(xs, flyingSpots) {
       sprite: spr,
       airborne: false,
       state: animalState,
+      animalKey: `${currentStreetTsid}:npc_butterfly:${i}`,
     });
   });
   // Flying butterflies — also interactable (Enter when near, or click). Same scale as rest.
@@ -9233,7 +9236,8 @@ function spawnButterflies(xs, flyingSpots) {
     b._ambient = true;
     entityLayer.addChild(b);
     list.push(b);
-    const animalState = animalStateFor('npc_butterfly', (xs !== undefined ? xs.length : 4) + i);
+    const flyIndex = (xs !== undefined ? xs.length : 4) + i;
+    const animalState = animalStateFor('npc_butterfly', flyIndex);
     register({
       classId: 'npc_butterfly',
       label: 'Butterfly',
@@ -9241,6 +9245,7 @@ function spawnButterflies(xs, flyingSpots) {
       sprite: b,
       airborne: true,
       state: animalState,
+      animalKey: `${currentStreetTsid}:npc_butterfly:${flyIndex}`,
     });
   }
   return list;

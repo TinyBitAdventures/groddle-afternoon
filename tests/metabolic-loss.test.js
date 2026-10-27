@@ -18,7 +18,7 @@ import {
   setMetabolicLossGate,
   shiftMetabolic,
 } from '../public/js/metabolics.js';
-import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=item-buffs-7';
+import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=g366-1';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js';
 import { BUTTER_UP, butterUpChicken } from '../public/js/animal-flattery.js';

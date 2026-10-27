@@ -23,6 +23,17 @@ export const RUN_MS = 30_000;
 export const COINS_NEEDED = 30;
 /** Where the run starts: on the meadow by the slide's flower. */
 export const SPAWN_X = 110;
+/**
+ * G261: the run's coins are class 'rainbow run' (spawner_moving_quoin.js 189
+ * setInstanceProp("class_name", "rainbow run")): items/quoin.js 448-452 makes
+ * that a mood quoin worth 1, back 15 s after a grab (respawn_time 15; quoin.js
+ * 289 only skips the respawn in races, games, Cloudhopolis and Top of the
+ * Tree). The rainbow_run instance ignores the daily quoin limit and does not
+ * count toward it (quoin.js 198, 234).
+ */
+export const COIN_CLASS = 'rainbow run';
+export const COIN_TYPE = 'mood';
+export const COIN_BACK_MS = 15_000;
 
 export const room = {
   id: 'rainbow_run',
@@ -53,7 +64,7 @@ export const room = {
     ctx.data.got = 0;
     ctx.data.phase = ctx.data.phase || 'ready';
     for (const c of rainbowCoins()) {
-      const spr = ctx.add(ctx.quoinSprite('currants', c.x, c.y, 0.85), 30);
+      const spr = ctx.add(ctx.quoinSprite(COIN_TYPE, c.x, c.y, 0.85), 30);
       ctx.data.coins.push({ ...c, spr, taken: false });
     }
     if (ctx.data.phase === 'ready') ready(ctx);
@@ -73,13 +84,21 @@ export const room = {
     }
     if (ctx.data.phase !== 'running') return;
     const p = ctx.player;
+    const now = Date.now();
     for (const c of ctx.data.coins) {
+      // onRespawn: a grabbed coin is back COIN_BACK_MS later.
+      if (c.taken && c.backAt && now >= c.backAt) {
+        c.taken = false;
+        c.backAt = 0;
+        if (c.spr && !c.spr.destroyed) c.spr.visible = true;
+      }
       if (c.taken) continue;
       if (Math.abs(p.x - c.x) < 34 && p.y - 70 < c.y + 18 && p.y + 6 > c.y - 18) {
         c.taken = true;
+        c.backAt = now + COIN_BACK_MS;
         c.spr.visible = false;
         ctx.data.got += 1;
-        ctx.collectQuoin('currants', c.x, c.y);
+        ctx.collectQuoin(COIN_TYPE, c.x, c.y, { className: COIN_CLASS, ignoreLimit: true });
         ctx.progress('quoins_collected', 1);
       }
     }

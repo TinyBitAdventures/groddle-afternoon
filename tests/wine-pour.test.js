@@ -19,8 +19,8 @@ import {
   pourConditions,
   pourConfirmText,
 } from '../public/js/wine-pour.js?v=g165-1';
-import { homeTowerFeature, towerApi } from '../public/js/features/home-tower-feature.js?v=home-tower-15';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=homes-54';
+import { homeTowerFeature, towerApi } from '../public/js/features/home-tower-feature.js?v=g366-1';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=g366-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');
@@ -39,6 +39,8 @@ function stubEngine() {
     save: () => {},
     toast: (t) => toasts.push(t),
     offerQuestDialogue: (d) => dialogs.push(d),
+    // G277: the Tower's remove confirm is a modal prompt (proto_furniture_tower_chassis.js 66-76).
+    prompt: (d) => dialogs.push(d),
     homeContext: () => ({ inHome: false, owned: true }),
   };
 }
@@ -123,8 +125,12 @@ describe('the Tower project', () => {
     assert.equal(towerApi.cancelProject(engine), false, 'nothing left to cancel');
     // Untouched: the ordinary "Please Confirm!".
     assert.equal(towerApi.requestRemove(engine, { endClass: 'proto_furniture_tower_chassis' }, () => { removed = true; }), true);
-    assert.equal(engine.dialogs[0].beats[0].text, 'Are you really sure you want to remove this Tower?');
-    engine.dialogs[0].onAccept();
+    const ask = engine.dialogs[0];
+    assert.deepEqual([ask.modal, ask.title, ask.text], [true, 'Please Confirm!', 'Are you really sure you want to remove this Tower?']);
+    assert.deepEqual(ask.choices, [{ value: 'ok', label: 'Yes' }, { value: 'cancel', label: 'Nevermind' }]);
+    ask.onChoice('cancel');
+    assert.equal(removed, false, 'Nevermind keeps it');
+    ask.onChoice('ok');
     assert.equal(removed, true);
   });
 

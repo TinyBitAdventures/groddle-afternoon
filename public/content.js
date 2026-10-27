@@ -44,7 +44,7 @@ import {
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=g296-1';
+} from './js/animals.js?v=g366-1';
 import {
   quoteAnimalKinship,
   performAnimalKinship,
@@ -73,7 +73,7 @@ import {
   queuePlops,
   startIncubation,
 } from './js/animal-husbandry.js';
-import { metabolicGain, moodMax } from './js/metabolics.js';
+import { loseEnergy, metabolicGain, moodMax } from './js/metabolics.js';
 import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js';
 import { levelInfoForXp } from './js/progression.js?v=progression-1';
@@ -1312,8 +1312,9 @@ export function runVerb(target, verbId, ctx) {
       return { ok: false, msgs: [result.reason || 'Cannot harvest.'], effects };
     }
     // Spend energy / gain mood & xp from Arborology package
-    pc.energy -= result.energyCost;
-    effects.energy -= result.energyCost;
+    // G282: inc_skill_packages.js 486-488 metabolics_lose_energy: nothing lost while dead
+    // (inc_metabolics.js 108-122, js/metabolics.js loseEnergy).
+    effects.energy -= loseEnergy(pc, result.energyCost);
     // inc_skill_packages.js 524: the mood bonus is metabolics_add_mood,
     // nothing while dead (inc_metabolics.js 79-86).
     if (result.moodBonus > 0 && metabolicGain('mood').ok) {

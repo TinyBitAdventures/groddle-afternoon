@@ -50,7 +50,7 @@ import { potionsFeature, usePotionNow, munchRug, shakeFavor } from '../public/js
 import { createPlot, growTree, tickPlot, trantsformPlotTree, normalizePlot } from '../public/js/patches.js';
 import { POTION_ART } from '../public/js/potion-art.js';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
-import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=badge-counters-2';
+import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=g366-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

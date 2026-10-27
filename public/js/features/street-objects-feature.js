@@ -78,7 +78,7 @@ import {
 import { ROCK_CATALOG } from '../mining.js?v=g330-1';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=trant-harvest-2';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=woodcutting-test-4';
-import { animalStatusLabel } from '../animals.js?v=g296-1';
+import { animalStatusLabel } from '../animals.js?v=g366-1';
 import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=g296-1';
 import { PIGGY_FEED, itemBaseCost } from '../animal-husbandry.js';
 

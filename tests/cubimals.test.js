@@ -30,7 +30,7 @@ import {
   applyAchievementProgress,
   createAchievementState,
   getAchievementProgress,
-} from '../public/js/achievements.js?v=cubimals-1';
+} from '../public/js/achievements.js?v=g366-1';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 
 const here = dirname(fileURLToPath(import.meta.url));

@@ -2644,9 +2644,14 @@
   ]
  },
  "git": {
-  "commits": 616,
+  "commits": 617,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "Winter Walk, Winter Haven and Being Watched, rebuilt from players' pictures"
+   },
    {
     "date": "2026-10-27",
     "kind": "improve",
@@ -2761,14 +2766,9 @@
     "date": "2026-10-27",
     "kind": "new",
     "text": "A release process: live.json names what groddleafternoon.com runs, kinsta.sh deploys exactly that"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "tools/deploy/kinsta.sh deploys the site to groddleafternoon.com"
    }
   ]
  },
- "tests": 366,
+ "tests": 367,
  "generatedAt": "2026-10-27"
 }

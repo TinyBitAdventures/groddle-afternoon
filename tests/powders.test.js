@@ -31,9 +31,9 @@ import {
   createAchievementState,
   getAchievementProgress,
   seedAchievementNearCompletion,
-} from '../public/js/achievements.js?v=badge-events-1';
+} from '../public/js/achievements.js?v=g366-1';
 import { createShrineState, donateToShrine, quoteShrineDonation } from '../public/js/shrines.js?v=spinning-wheel-test-4';
-import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=item-buffs-7';
+import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=g366-1';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 
 const publicRoot = join(dirname(fileURLToPath(import.meta.url)), '../public');

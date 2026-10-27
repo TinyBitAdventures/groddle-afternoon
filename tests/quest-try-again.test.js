@@ -30,7 +30,7 @@ import {
   retryTimedQuest,
   showWaitingOffer,
   startBlockedReason,
-} from '../public/js/features/quest-offers-feature.js?v=offers-12';
+} from '../public/js/features/quest-offers-feature.js?v=g366-1';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');
@@ -253,7 +253,13 @@ describe('G255 offers', () => {
     one('js/features/hell-tickets-feature.js', 'engine.offerQuestDialogue({');
     one('js/features/seasons-feature.js', 'engine.offerQuestDialogue?.({\n    title: q.title');
     one('js/features/newxp-feature.js', "const def = getQuestCatalog().leave_gentle_island;");
-    one('js/features/street-furniture-feature.js', 'beats: [{ text: STONE_TEXT.optOut');
+    // G277: the stone's opt-out is a one-choice conversation (visiting_stone.js 84-87), not a quest card.
+    const stone = read('js/features/street-furniture-feature.js');
+    const at = stone.indexOf('beats: [{ text: STONE_TEXT.optOut');
+    assert.ok(at >= 0);
+    const call = stone.slice(stone.lastIndexOf('stoneTalk(engine, {', at), stone.indexOf('});', at));
+    assert.match(call, /yes: 'OK'/);
+    assert.doesNotMatch(call, /\bno:|onNo/);
   });
 
   it('party spaces answer noStartingQuests (location.js 2673-2676)', () => {
