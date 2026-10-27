@@ -38,7 +38,9 @@ game_c=$(resolve "$here" "$GAME_REF"); site_c=$(resolve "$SITE_REPO" "$SITE_REF"
 engine_c=$(resolve "$ENGINE_REPO" "$ENGINE_REF"); admin_c=$(resolve "$ADMIN_REPO" "$ADMIN_REF")
 echo "deploying game $GAME_REF, site $SITE_REF, Minn Engine ${engine_c:0:8}, Minn Admin ${admin_c:0:8}"
 
-work=$(mktemp -d)
+# The real path: macOS hands out /var/... for /private/var/..., and the build tools only run as main
+# when the path they were started by matches their own (they did nothing at all from /var).
+work=$(cd "$(mktemp -d)" && pwd -P)
 trap 'git -C "$here" worktree remove --force "$work/game" >/dev/null 2>&1 || true; rm -rf "$work"' EXIT
 
 echo "1/6 export and build"
@@ -52,12 +54,15 @@ git -C "$here" worktree add --detach --quiet "$work/game" "$game_c"
 for d in glitch-GameServerJS streets glitch-client glitch-items glitch-overlays research; do [ -e "$AUDIT/$d" ] && ln -s "$AUDIT/$d" "$work/$d"; done
 ln -s "$here/node_modules" "$work/game/node_modules"
 (cd "$work/game" && node tools/build-restoration.mjs >/dev/null)
+[ "$(git -C "$work/game" status --porcelain -- public/restoration/history.json)" ] || echo "note: the restoration history was already current"
 # The header menu is content on the live site (Minn Admin, Design, Navigation): write the live one in.
 "${SSH[@]}" "$HOST" 'cd ~/public && wp post list --post_type=wp_navigation --post_status=publish --fields=ID,post_date --format=json' > "$work/menus.json"
 menu=$(node -e 'const m = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8") || "[]"); m.sort((a, b) => (a.post_date === b.post_date ? b.ID - a.ID : (a.post_date < b.post_date ? 1 : -1))); console.log(m[0]?.ID || "");' "$work/menus.json")
 if [ -n "$menu" ]; then
 	"${SSH[@]}" "$HOST" "cd ~/public && wp post get $menu --field=post_content" > "$work/menu.html"
-	node "$work/game/tools/site-nav/apply.mjs" --game="$work/game/public" --menu="$work/menu.html"
+	nav=$(node "$work/game/tools/site-nav/apply.mjs" --game="$work/game/public" --menu="$work/menu.html")
+	echo "$nav"
+	case "$nav" in "site nav:"*) ;; *) echo "the menu was not written into the built pages" >&2; exit 1;; esac
 fi
 GAME="$work/game/public"
 
