@@ -22,6 +22,16 @@
  * carries the bonus from everyone who helped, and the line names them.
  * Companions stay solo stand-ins.
  *
+ * Help dig (G329, js/help-dig.js; dirt_pile.js addDigger, onDigComplete), in
+ * multiplayer only: a Dirt Pile keeps a dig crew on the realtime server as a
+ * rock keeps its miners (street-objects-feature sharedDigSwing /
+ * sharedDiggers). The dig verb reads "Help dig" while someone else digs; a
+ * dig that had helpers gets the server's bonus items (and Loam when the
+ * crew's chance came up, applied by resource-nodes-feature), the source's
+ * "You got N additional ... thanks to the help you got from ..." line, and
+ * counts helped_dig for It Takes Two. Solo has no dig crews (the source's
+ * helpers were other players; the companions only mine).
+ *
  * Companions are opt-in (?companions=1, game.js localCompanionsEnabled).
  * Hooks from game.js: engine.query('verbStarted', target, verb, engine) as a
  * timed verb begins, engine.query('rockMined', target, result, engine) after
@@ -42,6 +52,7 @@ import { MEGA_ROCK_CHUNKS, megaRockChance } from '../imagination-effects.js';
 import { crowdScaleX } from '../avatar-anims.js';
 import { frameTexture, loadTexture } from '../textures.js';
 import { acceptOffer } from '../quest-offers.js';
+import { HELP_DIG_COUNTER, HELP_DIG_LABEL, digHelpFrom, helpDigMessage, othersDigging } from '../help-dig.js?v=g329-dig-1';
 import {
   COMPANION_MINE_RULES,
   HELP_MINE_COUNTER,
@@ -74,6 +85,8 @@ const interest = new Map();
 /** companion name -> session at a rock. */
 const sessions = new Map();
 let playerAt = null; // { target, helping }
+let playerDig = null; // multiplayer: { target, helping } while your dig at a Dirt Pile runs
+let digHelps = 0;
 let pickFrames = null;
 let pickLoading = false;
 let helps = 0;
@@ -372,6 +385,36 @@ function sharedMined(target, result, engine) {
   }
 }
 
+/** Multiplayer: the server's dig crew at a Dirt Pile ({ diggers, others }), or null. */
+function sharedDigCrew(engine, target) {
+  if (target?.classId !== 'dirt_pile' || engine.mode !== 'multiplayer' || !engine.query?.('realtimeClient')) return null;
+  const diggers = engine.query('sharedDiggers', target, engine);
+  if (!Array.isArray(diggers)) return null;
+  const me = Number(engine.query('realtimeClient')?.me?.id) || 0;
+  return { diggers, others: othersDigging(diggers, me) };
+}
+
+/** Your dig landed (resource-nodes-feature resourceNodeUsed): the crew's bonus, from the server. */
+function sharedDug(target, result, engine) {
+  const help = digHelpFrom(engine.query('sharedVerbGrant', target, 'dig', engine)?.help);
+  playerDig = null;
+  if (!help) {
+    engine.setData('helpDigLast', 'alone');
+    return;
+  }
+  if (help.items > 0) {
+    addItem(engine.inv, help.classTsid, help.items);
+    engine.pushActivity(helpDigMessage(help.items, help.classTsid, help.by));
+    engine.floatText?.(target.sprite?.x ?? 0, (target.sprite?.y ?? 0) - 120, `+${help.items}`, 0xfff4d6);
+    engine.refreshPack?.();
+  }
+  // dirt_pile.js 481-483: a dig that had help counts for It Takes Two.
+  digHelps += 1;
+  engine.achievement(HELP_DIG_COUNTER, 1);
+  engine.setData('helpDigLast', `bonus:${help.items}:${help.classTsid}:${help.by.join(',')}`);
+  engine.setData('helpDigHelps', String(digHelps));
+}
+
 /** Your swing begins: are you helping, and does anyone join you? */
 function playerStarts(target, engine, now = Date.now()) {
   const crew = crewOf(target);
@@ -555,6 +598,7 @@ export const helpMineFeature = {
     for (const s of sessions.values()) hidePick(s);
     sessions.clear();
     playerAt = null;
+    playerDig = null;
     const mode = demoMode(engine);
     demo = mode && !demo?.used ? { mode, staged: false, used: true } : demo?.used ? { used: true, done: true } : null;
     publishCrews(engine);
@@ -575,6 +619,18 @@ export const helpMineFeature = {
     lookForRocks(now, engine);
   },
 
+  /**
+   * dirt_pile.js getVerbLabel 273-281 in multiplayer: "Help dig" while someone else digs the pile
+   * (resource-nodes-feature verbsFor asks; a Dirt Pile's menu is that feature's own).
+   */
+  sharedVerbLabel(target, verbId, engine) {
+    if (verbId !== 'dig') return null;
+    const dig = sharedDigCrew(engine, target);
+    if (!dig?.others.length) return null;
+    engine.setData('helpDigLabel', HELP_DIG_LABEL);
+    return HELP_DIG_LABEL;
+  },
+
   /** mining.js getVerbLabel: "help mine" while a companion works the rock. */
   decorateVerbs(target, verbs, engine) {
     if (!isRock(target)) return null;
@@ -591,6 +647,15 @@ export const helpMineFeature = {
   },
 
   verbStarted(target, verb, engine) {
+    if (verb?.id === 'dig') {
+      const dig = sharedDigCrew(engine, target);
+      if (dig) {
+        playerDig = { target, helping: dig.others.length > 0 };
+        engine.query('sharedDigSwing', target, 'start', engine);
+        engine.setData('helpDigCrew', `shared:${dig.diggers.length + 1}`);
+      }
+      return undefined;
+    }
     if (!isRock(target) || verb?.id !== 'mine') return undefined;
     const shared = sharedCrew(engine, target);
     if (shared) sharedStarts(target, shared, engine);
@@ -599,10 +664,20 @@ export const helpMineFeature = {
   },
 
   verbCancelled(target, verbId, engine) {
+    if (playerDig?.target === target && String(verbId).split(':')[0] === 'dig') {
+      engine.query('sharedDigSwing', target, 'stop', engine);
+      playerDig = null;
+    }
     if (playerAt?.shared && playerAt.target === target && String(verbId).split(':')[0] === 'mine') {
       engine.query('sharedMineSwing', target, 'stop');
       playerAt = null;
     }
+    return undefined;
+  },
+
+  /** resource-nodes-feature performVerb, multiplayer: a node verb landed. */
+  resourceNodeUsed(target, result, engine) {
+    if (target?.classId === 'dirt_pile' && result?.verbId === 'dig' && engine.mode === 'multiplayer') sharedDug(target, result, engine);
     return undefined;
   },
 

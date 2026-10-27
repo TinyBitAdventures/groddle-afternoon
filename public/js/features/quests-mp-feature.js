@@ -51,7 +51,7 @@ import {
   isRaceStreet,
   normalizeQuestsMpSlice,
   tradeHoochCount,
-} from '../quests-mp.js?v=g329-3';
+} from '../quests-mp.js?v=g329-4';
 
 export const QUESTS_MP_FEATURE_ID = 'quests-mp';
 const FACT_CHECK_MS = 1_000;

@@ -43,6 +43,17 @@
  *   Chickens and Butterflies somewhere depressing leave or vanish on load
  *   (npc_chicken.js / npc_butterfly.js onLoad).
  *
+ * Multiplayer (G334): a street Piggy is everyone's. The realtime server
+ * (objects_pigs.go, through street-objects-feature) holds its mood, hunger
+ * and twice-daily clock and runs its ticks; this page runs none for it and
+ * replays none on arrival. Its tick events come back as sharedAnimalEvent:
+ * the "Other animals make me happy!" bubble, the croak, and a walk to the
+ * tree whose fruit it ate (the server took the fruit). A Piggy that eats
+ * food only this player sees (their own dropped stack, or a tree they just
+ * worked) tells the server (sharedPiggyAte), which sates it for everyone.
+ * Released and raised Piggies (the husbandry feature's) stay each player's
+ * own, on the local rules.
+ *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&animaldemo=piggy
  *   &animalrank=6&animalreset=1&animalmood=0 (E → nibble refuses);
  *   &animalhunger=9&animalfood=potato drops 3 Potatoes 220 px away and the
@@ -223,6 +234,17 @@ function recordFor(target) {
 
 function isExtra(target) {
   return Boolean(target?.husbandryAnimal);
+}
+
+/** Multiplayer: the realtime server holds this street Piggy (street-objects-feature). */
+function serverPig(engine, target) {
+  return engine?.mode === 'multiplayer' && engine.query?.('sharedPiggy', target, engine) === true;
+}
+
+/** Multiplayer with a realtime client: a street Piggy whose ticks wait for the server's snapshot. */
+function awaitsServer(engine, target) {
+  return engine?.mode === 'multiplayer' && !isExtra(target) && Boolean(engine.query?.('realtimeClient'))
+    && /:npc_piggy:\d+$/.test(String(target?.animalKey || ''));
 }
 
 function frames(def) {
@@ -424,8 +446,51 @@ function stepSeek(engine, r, dtMs) {
   }
 }
 
+/** Multiplayer arrival for a street Piggy: the fruit and the hunger are the server's. */
+function arriveShared(engine, r) {
+  const target = r.target;
+  let ate = null;
+  if (r.food?.shared) {
+    // The server's tick already took the fruit and sated it: only the chew and the "Yum!" are left.
+    ate = { kind: 'trant', classTsid: r.food.target?.classId || 'trant' };
+  } else if (Number(target.state.hunger) > 0) {
+    const spr = target.sprite;
+    const near = (x, y) => Math.hypot(x - spr.x, (Number.isFinite(y) ? y : spr.y) - spr.y) <= EAT_RADIUS;
+    const stack = foodStacks(engine).find((row) => near(row.x, row.y));
+    if (stack) {
+      const cls = stack.classTsid;
+      consumeStack(engine, stack);
+      engine.query?.('sharedPiggyAte', target, null, engine);
+      ate = { kind: 'stack', classTsid: cls };
+    } else {
+      const trant = fruitingTrants(engine).find((t) => near(t.sprite.x, t.sprite.y));
+      if (trant) {
+        // The tree is shared: the server takes the fruit for everyone.
+        engine.query?.('sharedPiggyAte', target, trant, engine);
+        ate = { kind: 'trant', classTsid: trant.classId };
+      }
+    }
+    if (ate) satePiggy(target.state);
+  }
+  if (ate) {
+    playClip(engine, r, PIGGY_MOOD_SHEETS.chew);
+    say(engine, target, PIGGY_LINES.yum, PIGGY_LINES.yumMs);
+    target.subtitle = animalStatusLabel('npc_piggy', target.state);
+    lastEvent = `ate:${ate.classTsid}:shared`;
+  } else {
+    lastEvent = 'seek:missed';
+  }
+  r.mode = 'eat';
+  r.food = null;
+  r.holdUntil = now() + EAT_PAUSE_MS;
+}
+
 function arrive(engine, r) {
   const target = r.target;
+  if (serverPig(engine, target)) {
+    arriveShared(engine, r);
+    return;
+  }
   const ate = Number(target.state.hunger) > 0 ? eatNearby(engine, target) : null;
   if (ate) {
     satePiggy(target.state);
@@ -916,8 +981,11 @@ function resetCrowd() {
 
 // —— Ticks ——————————————————————————————————————————————————————————————
 
-function piggyRows(engine) {
-  return livePiggies(engine).map((target) => ({ target, state: target.state }));
+function piggyRows(engine, { replay = false } = {}) {
+  // Multiplayer: the server ticks its street Piggies (and on arrival its snapshot is their state).
+  return livePiggies(engine)
+    .filter((target) => !serverPig(engine, target) && !(replay && awaitsServer(engine, target)))
+    .map((target) => ({ target, state: target.state }));
 }
 
 function ctxFor(engine, depressing) {
@@ -971,7 +1039,7 @@ function adoptNew(engine) {
   }
   // Ticks that fell due while you were away land at once (the back yard runs its own).
   if (engine.streetTsid !== YARD_TSID) {
-    const rows = piggyRows(engine);
+    const rows = piggyRows(engine, { replay: true });
     handleTickEvents(engine, advancePiggies(rows, now(), {
       ctxFor: ctxFor(engine, depressing),
       rng: deathRoll(engine),
@@ -1207,6 +1275,26 @@ export const animalMoodFeature = {
       const r = recordFor(target);
       if (canSeek(engine, r)) startSeek(engine, r, { kind: 'trant', target: trant, x: trant.sprite.x, y: trant.sprite.y });
     }
+  },
+
+  /**
+   * Multiplayer (street-objects-feature, objects_pigs.go obj_ev): a street Piggy's tick.
+   * ev: happy (the bubble), croak, ate (on: the tree whose fruit the server gave it: walk there).
+   */
+  sharedAnimalEvent(target, { ev, on } = {}, engine) {
+    if (target?.classId !== 'npc_piggy' || !target.sprite || target.sprite.destroyed) return null;
+    const r = recordFor(target);
+    if (ev === 'happy') say(engine, target, PIGGY_LINES.happy, 3000);
+    else if (ev === 'croak') r.nextCroakAt = Math.min(r.nextCroakAt || Infinity, now() + 1500);
+    else if (ev === 'ate' && on?.sprite && r.mode !== 'sad') {
+      if (!startSeek(engine, r, { kind: 'trant', target: on, x: on.sprite.x, y: on.sprite.y, shared: true })) {
+        playClip(engine, r, PIGGY_MOOD_SHEETS.chew);
+      }
+    }
+    lastEvent = `shared:${ev}`;
+    target.subtitle = animalStatusLabel('npc_piggy', target.state);
+    publish(engine, true);
+    return true;
   },
 
   /** Sad piggies refuse; a piggy not in the mood refuses nibble at once. */

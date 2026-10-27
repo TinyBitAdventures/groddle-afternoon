@@ -27,6 +27,17 @@
  * (`patchesFeature.killTree`). Nothing respawns a dead street tree: only a
  * planted bean brings a tree back, as in the source.
  *
+ * Multiplayer (G334): a street tree is everyone's. A pour that lands on one
+ * asks the realtime server first (street-objects-feature sharedObjectVerb;
+ * the server's objects.go pour), and the poison's clock, anyone's antidote
+ * and the death are the server's: this page never kills a shared street
+ * tree on its own clock, it waits for the server's word (sharedTreeDied),
+ * which also reaches players who come later. Then the tree dies here as in
+ * solo (its plot becomes this player's own Patch, as every street Patch is
+ * in multiplayer); a dead Wood Tree's 25 Planks fall only for the player
+ * who poured the poison. Your bottle, guilt, mood and Botany stay yours.
+ * Trees grown in your Patches, your home and private places stay local.
+ *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&treepoisondemo=1
  *   teaches Botany and packs Tree Poison, Antidote, Hatchet, Hoe and beans,
  *   then stands you by the nearest living street trant
@@ -307,6 +318,20 @@ function applyGuiltChange(engine, change) {
   if (change.apply) engine.applyBuff?.(change.apply.id, { durationSec: change.apply.durationSec, args: change.apply.args });
 }
 
+/** Multiplayer with the realtime client: does the server hold this street tree's life? */
+function sharedTree(engine, target) {
+  if (engine?.mode !== 'multiplayer' || !engine.query?.('realtimeClient') || target?.grownFromBean) return false;
+  return Number.isInteger(target?.treeIndex) && isTreeTarget(target);
+}
+
+/** The pour is the server's call first (null: it is local here; true: asked). */
+function askServer(engine, kind, target) {
+  if (!sharedTree(engine, target)) return null;
+  const verbId = `${VERB_PREFIX}${kind}`;
+  if (engine.query('sharedVerbGrant', target, verbId, engine)) return null;
+  return engine.query('sharedObjectVerb', target, verbId, engine) === true ? true : null;
+}
+
 /** onPourComplete for either potion on a tree target. */
 function completePour(engine, kind, target) {
   if (!isTreeTarget(target) || !(engine.interactables || []).includes(target)) {
@@ -317,6 +342,8 @@ function completePour(engine, kind, target) {
   if (kind === 'poison') {
     const q = quotePoisonVerb(target.state, ctx);
     if (!q.enabled) return say(engine, q.reason || POISON_COPY.noPoisonTarget, false), false;
+    // Multiplayer: the street hears of it first; its go-ahead runs this pour again (the grant).
+    if (askServer(engine, kind, target)) return true;
     const res = performPoisonPour(target.state, { ...ctx, now: Date.now(), durationMs: poisonMs(engine), bottles });
     if (!res.ok) return say(engine, res.msg, false), false;
     applyGuiltChange(engine, res.guilt);
@@ -326,6 +353,7 @@ function completePour(engine, kind, target) {
   } else {
     const q = quoteAntidoteVerb(target.state, ctx);
     if (!q.enabled) return say(engine, q.reason || POISON_COPY.noAntidoteTarget, false), false;
+    if (askServer(engine, kind, target)) return true;
     // G268: the pour asks the metabolic gate itself, after it lands, and the
     // gate says "You would have gained some mood, but you're dead!".
     const res = performAntidotePour(target.state, { ...ctx, bottles });
@@ -341,9 +369,9 @@ function completePour(engine, kind, target) {
   return true;
 }
 
-/** die(): replace the tree with what it leaves behind. */
-function killTree(engine, target) {
-  const outcome = treeDeathOutcome(target.classId, { poisoned: isPoisoned(target.state) });
+/** die(): replace the tree with what it leaves behind (opts.planks: multiplayer says whose they are). */
+function killTree(engine, target, opts = {}) {
+  const outcome = treeDeathOutcome(target.classId, { poisoned: typeof opts.planks === 'boolean' ? opts.planks : isPoisoned(target.state) });
   dropOverlay(target);
   if (!outcome) return null;
   const x = target.sprite.x;
@@ -549,9 +577,10 @@ export const treeDeathFeature = {
   onStreetEnter(street, engine) {
     hideReplacedTrees(engine);
     // Poison timers keep running while the street is away (apiSetTimer('die')).
+    // A shared street tree's death is the server's word (sharedTreeDied).
     const now = Date.now();
     for (const target of [...(engine.interactables || [])]) {
-      if (isTreeTarget(target) && poisonDue(target.state, now)) killTree(engine, target);
+      if (isTreeTarget(target) && poisonDue(target.state, now) && !sharedTree(engine, target)) killTree(engine, target);
     }
     const variant = demoVariant(engine);
     if (variant && !demo) {
@@ -587,7 +616,7 @@ export const treeDeathFeature = {
     let changed = false;
     for (const target of [...(engine.interactables || [])]) {
       if (!isTreeTarget(target) || !isPoisoned(target.state)) continue;
-      if (poisonDue(target.state, now)) {
+      if (poisonDue(target.state, now) && !sharedTree(engine, target)) {
         killTree(engine, target);
         changed = true;
         continue;
@@ -646,6 +675,19 @@ export const treeDeathFeature = {
     const uses = `${bottleUsesLeft(bottles, classTsid, engine.inv)} of 5 left`;
     const tip = kind === 'poison' ? POISON_COPY.pourPoisonTip : POISON_COPY.pourAntidoteTip;
     return [{ id: 'pour', label: 'Pour', enabled: check.ok, reason: check.msg || '', tooltip: `${tip} · ${uses}`, primary: check.ok }];
+  },
+
+  /**
+   * Multiplayer (street-objects-feature): the server says this street tree died, for everyone.
+   * by: who poured the poison (their 25 Planks, for a Wood Tree); 0 is the Rook.
+   */
+  sharedTreeDied(target, info, engine) {
+    if (engine?.mode !== 'multiplayer' || !isTreeTarget(target) || target.grownFromBean) return null;
+    if (!(engine.interactables || []).includes(target)) return true;
+    const me = Number(engine.query?.('realtimeClient')?.me?.id) || 0;
+    const by = Number(info?.by) || 0;
+    killTree(engine, target, { planks: by > 0 && by === me });
+    return true;
   },
 
   runPackVerb(classTsid, verbId, engine) {

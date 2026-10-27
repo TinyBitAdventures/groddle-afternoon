@@ -146,7 +146,7 @@ import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tow
 import { towerApi } from './home-tower-feature.js?v=home-tower-15';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-12';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-13';
 import { patchesFeature } from './patches-feature.js?v=patches-15';
 import { plotLabel } from '../patches.js';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=g165-1';

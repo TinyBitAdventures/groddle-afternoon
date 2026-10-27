@@ -27,6 +27,19 @@
  *   or is cancelled (sharedMineSwing), reads who is swinging (sharedMiners)
  *   and the help bonus with the swing's grant (sharedVerbGrant().help).
  *
+ * - Tree death (G334): Tree Poison and its antidote on a street tree ask the
+ *   server (tree-death-feature calls sharedObjectVerb as its pour lands); the
+ *   poison's clock and the death are the server's, and a tree it says died
+ *   dies here too (tree-death-feature's sharedTreeDied), for a player who
+ *   arrives later as well.
+ * - Street Piggies (G334): pet, nibble and feed ask the server, whose mood,
+ *   hunger and twice-daily clock win (animal-mood-feature leaves their ticks
+ *   to it); a Piggy eating food only this player sees tells the server
+ *   (sharedPiggyAte); the server's tick events (obj_ev) reach
+ *   animal-mood-feature's sharedAnimalEvent.
+ * - Help dig (G329): help-mine-feature tells the server when a dig at a Dirt
+ *   Pile starts or stops (sharedDigSwing) and reads who digs (sharedDiggers).
+ *
  * QA: canvas data streetObjects (street:snap|none|waiting), streetObjectsLast
  * (id:verb:ok|code), streetObjectsShared (shared objects on this street),
  * streetObjectsView (each as this client has it: rock:1=43, tree:0=98pw).
@@ -44,6 +57,12 @@ import {
   createStreetCopy,
   nodeId,
   nodePerks,
+  digSkill,
+  applyPigState,
+  pigId,
+  pigSkill,
+  POUR_VERBS,
+  streetPigIndex,
   reconcile,
   rockId,
   rockPerks,
@@ -55,10 +74,13 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=g334-1';
+} from '../street-objects.js?v=g334-2';
 import { ROCK_CATALOG } from '../mining.js?v=g330-1';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=trant-harvest-2';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=woodcutting-test-4';
+import { animalStatusLabel } from '../animals.js?v=g296-1';
+import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=g296-1';
+import { PIGGY_FEED, itemBaseCost } from '../animal-husbandry.js';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -131,6 +153,14 @@ function bind(engine) {
   });
   c.on('msg:obj_ok', (msg) => answered(engine, msg, true));
   c.on('msg:obj_no', (msg) => answered(engine, msg, false));
+  // A street Piggy's tick (objects_pigs.go): the bubble, the croak, the walk to a tree it ate from.
+  c.on('msg:obj_ev', (msg) => {
+    if (!msg || msg.street !== copy.street || copy.street !== engine.streetTsid) return;
+    const obj = localObjects(engine).find((row) => row.id === msg.id);
+    if (!obj) return;
+    const on = msg.on ? localObjects(engine).find((row) => row.id === msg.on) : null;
+    engine.query?.('sharedAnimalEvent', obj.target, { ev: String(msg.ev || ''), on: on?.target || null }, engine);
+  });
   return c;
 }
 
@@ -144,6 +174,9 @@ function localObjects(engine) {
       out.push({ id: treeId(t.treeIndex), kind: 'tree', target: t, classId: t.classId, state: t.state, index: t.treeIndex });
     } else if (Number.isInteger(t.treeIndex) && t.classId === 'wood_tree' && !t.grownFromBean && t.state) {
       out.push({ id: treeId(t.treeIndex), kind: 'wood', target: t, classId: t.classId, state: t.state, index: t.treeIndex });
+    } else if (t.classId === 'npc_piggy' && t.state) {
+      const i = streetPigIndex(t, engine.streetTsid);
+      if (i >= 0) out.push({ id: pigId(i), kind: 'pig', target: t, classId: t.classId, state: t.state, index: i });
     }
   }
   for (const n of engine.query?.('streetResourceNodes', engine) || []) {
@@ -168,7 +201,13 @@ function redraw(engine, obj, before = null) {
     if (obj.target) obj.target.subtitle = trantStatusLabel(obj.state, TRANT_META[obj.classId]);
   } else if (obj.kind === 'wood') {
     if (obj.target) engine.refreshTreeVisual?.(obj.target);
+  } else if (obj.kind === 'pig') {
+    if (obj.target) obj.target.subtitle = animalStatusLabel('npc_piggy', obj.state);
   } else obj.refresh?.();
+  // G334: the server says this street tree died (for everyone): it dies here too.
+  if ((obj.kind === 'tree' || obj.kind === 'wood') && obj.state?.sharedDead && obj.target) {
+    engine.query?.('sharedTreeDied', obj.target, { by: obj.state.sharedDeadBy || 0 }, engine);
+  }
 }
 
 function shared(engine) {
@@ -200,8 +239,21 @@ function reconcileAll(engine, force = false) {
 function viewOf(obj) {
   if (obj.kind === 'rock') return `${obj.id}=${obj.rock.chunksRemaining}${obj.rock.mega ? 'm' : ''}`;
   if (obj.kind === 'node') return `${obj.id}=${obj.node.units}${obj.node.petted ? 'p' : ''}${obj.node.watered ? 'w' : ''}`;
-  if (obj.kind === 'wood') return `${obj.id}=m${obj.state.maturity}c${obj.state.harvestCount || 0}`;
-  return `${obj.id}=${obj.state.fruitCount}${obj.state.petted ? 'p' : ''}${obj.state.watered ? 'w' : ''}`;
+  if (obj.kind === 'wood') return `${obj.id}=m${obj.state.maturity}c${obj.state.harvestCount || 0}${deathView(obj.state)}`;
+  if (obj.kind === 'pig') return `${obj.id}=m${obj.state.mood}h${obj.state.hunger}${obj.state.hasBeenPetted ? 'p' : ''}`;
+  return `${obj.id}=${obj.state.fruitCount}${obj.state.petted ? 'p' : ''}${obj.state.watered ? 'w' : ''}${deathView(obj.state)}`;
+}
+
+/** QA: a tree's poison (x) or death (d) in streetObjectsView. */
+function deathView(state) {
+  if (state?.sharedDead) return 'd';
+  return Number(state?.poisonEndsAt) > 0 ? 'x' : '';
+}
+
+/** A street tree the server shares (tree or Wood Tree, not one grown in a Patch). */
+function isStreetTree(target) {
+  return Boolean(target?.state && Number.isInteger(target.treeIndex) && !target.grownFromBean
+    && (TRANT_META[target.classId] || target.classId === 'wood_tree'));
 }
 
 /** The shared object a verb on target would change, or null (then it is local). */
@@ -209,6 +261,35 @@ function sharedVerbOn(engine, target, verbId) {
   if (!target) return null;
   const learned = engine.learnedSkills || [];
   const upgrades = engine.pc?.imaginationUpgrades || [];
+  // G334 tree death: the pour landed; its own checks (bottle, Botany, guilt, mood) ran in tree-death-feature.
+  if (POUR_VERBS[verbId] && isStreetTree(target)) {
+    return { id: treeId(target.treeIndex), wire: POUR_VERBS[verbId], ready: () => true };
+  }
+  // G334 street Piggies: the player's own side (energy, daily limits, petted first) refuses locally.
+  const pig = streetPigIndex(target, engine.streetTsid);
+  if (pig >= 0) {
+    const [base, cls] = String(verbId || '').split(':');
+    if (base === 'pet' || base === 'nibble') {
+      if (verbId !== base) return null;
+      const rank = highestAnimalKinshipRank(learned);
+      return {
+        id: pigId(pig),
+        ready: () => quoteAnimalKinship(target.state, 'npc_piggy', base, { pc: engine.pc, inv: engine.inv, learned, upgrades }).ok === true,
+        skill: pigSkill(learned),
+        perks: base === 'nibble' && rank >= 6 ? ['ak6'] : [],
+      };
+    }
+    if (base === 'feed' && cls) {
+      return {
+        id: pigId(pig),
+        wire: 'feed',
+        ready: () => (Number(engine.inv?.[cls]) || 0) > 0,
+        // npc_piggy.js feed 672-676 (js/animal-husbandry.js feedPiggyStack): base cost 5 or more sates.
+        perks: itemBaseCost(cls) >= PIGGY_FEED.minBaseCost ? ['sate'] : [],
+      };
+    }
+    return null;
+  }
   if (Number.isInteger(target.rockIndex) && ROCK_CATALOG[target.classId] && target.state?.rock) {
     if (verbId !== 'mine') return null;
     return {
@@ -235,7 +316,13 @@ function sharedVerbOn(engine, target, verbId) {
   if (target.resourceKey) {
     const n = (engine.query?.('streetResourceNodes', engine) || []).find((row) => row.target === target);
     if (!n || !sharedNodeVerb(n.classTsid, verbId)) return null;
-    return { id: nodeId(n.key), ready: () => n.ready(verbId), perks: nodePerks(n.classTsid, verbId, { upgrades }) };
+    return {
+      id: nodeId(n.key),
+      ready: () => n.ready(verbId),
+      perks: nodePerks(n.classTsid, verbId, { upgrades }),
+      // A Dirt Pile's dig: the server rolls its Loam drop from the skill (objects.go digHelp).
+      skill: n.classTsid === 'dirt_pile' && verbId === 'dig' ? digSkill(learned, upgrades) : '',
+    };
   }
   return null;
 }
@@ -244,8 +331,9 @@ function applyKnown(obj, s) {
   const now = Date.now();
   if (obj.kind === 'rock') applyRockState(obj.rock, s, now);
   else if (obj.kind === 'node') applyNodeState(obj.node, s, now);
-  else if (obj.kind === 'wood') applyWoodState(obj.state, s);
-  else applyTreeState(obj.state, s);
+  else if (obj.kind === 'wood') applyWoodState(obj.state, s, now);
+  else if (obj.kind === 'pig') applyPigState(obj.state, s, now);
+  else applyTreeState(obj.state, s, now);
 }
 
 function answered(engine, msg, ok) {
@@ -258,6 +346,11 @@ function answered(engine, msg, ok) {
   lastAnswer = `${msg.id}:${msg.verb}:${ok ? 'ok' : msg.code || 'no'}`;
   publish(engine);
   if (!p || copy.street !== engine.streetTsid) return;
+  // A word to the server with nothing to run here (a Piggy ate food only this player saw).
+  if (p.silent) {
+    reconcileAll(engine);
+    return;
+  }
   if (!ok) {
     const line = String(msg.message || 'Not now.');
     engine.toast?.(line, 2600);
@@ -284,6 +377,41 @@ function answered(engine, msg, ok) {
   redraw(engine, obj);
 }
 
+/**
+ * Ask the server before a shared verb lands: true when asked (or refused for
+ * now: connecting, busy), null when the verb is local.
+ */
+function ask(engine, target, verbId) {
+  if (engine.mode !== 'multiplayer') return null;
+  if (grant && grant.target === target && grant.verbId === verbId) return null;
+  const c = bind(engine);
+  if (!c || LOCAL_STATES.has(c.state)) return null;
+  // A private place (home, quest room, instance): nobody shares it.
+  if (!c.wanted && c.state === 'online') return null;
+  const verb = sharedVerbOn(engine, target, verbId);
+  if (!verb) return null;
+  if (copy.none && copy.street === engine.streetTsid) return null;
+  if (!shared(engine)) {
+    engine.toast?.(COPY.connecting, 2400);
+    return true;
+  }
+  // The player's own side (pick, skill, energy, daily limits) refuses locally, as in solo.
+  if (!verb.ready()) return null;
+  for (const p of pending.values()) {
+    if (p.id === verb.id && !p.silent) {
+      engine.toast?.(COPY.busy, 1600);
+      return true;
+    }
+  }
+  reqSeq += 1;
+  if (!c.send('obj_act', actMessage({ req: reqSeq, id: verb.id, verb: verb.wire || verbId, perks: verb.perks, skill: verb.skill }))) {
+    engine.toast?.(COPY.connecting, 2400);
+    return true;
+  }
+  pending.set(reqSeq, { id: verb.id, target, verbId, at: Date.now() });
+  return true;
+}
+
 export const streetObjectsFeature = {
   id: STREET_OBJECTS_FEATURE_ID,
 
@@ -306,7 +434,7 @@ export const streetObjectsFeature = {
     for (const [req, p] of pending) {
       if (wall - p.at < REQUEST_TIMEOUT_MS) continue;
       pending.delete(req);
-      engine.toast?.(COPY.timeout, 2400);
+      if (!p.silent) engine.toast?.(COPY.timeout, 2400);
     }
     if (reapplyAt && wall >= reapplyAt) {
       reapplyAt = 0;
@@ -331,34 +459,57 @@ export const streetObjectsFeature = {
 
   /** game.js executeVerb: a shared verb asks the server before it lands. */
   runVerbOverride(target, verbId, engine) {
-    if (engine.mode !== 'multiplayer') return null;
-    if (grant && grant.target === target && grant.verbId === verbId) return null;
+    return ask(engine, target, verbId);
+  },
+
+  /**
+   * A feature whose own runVerbOverride comes first (tree-death-feature's pour) asks here:
+   * true when the server was asked (or the street is still connecting), null when the verb
+   * is local. The go-ahead runs executeVerb(target, verbId) again with the grant.
+   */
+  sharedObjectVerb(target, verbId, engine) {
+    return ask(engine, target, verbId);
+  },
+
+  /** Whether the server shares this street tree now (tree-death-feature leaves its death to it). */
+  sharedTree(target, engine) {
+    if (!engine || engine.mode !== 'multiplayer' || !isStreetTree(target)) return null;
+    return shared(engine) ? true : null;
+  },
+
+  /** Whether the server holds this street Piggy (animal-mood-feature leaves its ticks to it). */
+  sharedPiggy(target, engine) {
+    if (!engine || engine.mode !== 'multiplayer' || !shared(engine)) return null;
+    const i = streetPigIndex(target, engine.streetTsid);
+    return i >= 0 && copy.objs.has(pigId(i)) ? true : null;
+  },
+
+  /** A street Piggy ate food only this player sees (their own dropped stack), or a tree's fruit (onTarget). */
+  sharedPiggyAte(target, onTarget, engine) {
+    if (!streetObjectsFeature.sharedPiggy(target, engine)) return null;
     const c = bind(engine);
-    if (!c || LOCAL_STATES.has(c.state)) return null;
-    // A private place (home, quest room, instance): nobody shares it.
-    if (!c.wanted && c.state === 'online') return null;
-    const verb = sharedVerbOn(engine, target, verbId);
-    if (!verb) return null;
-    if (copy.none && copy.street === engine.streetTsid) return null;
-    if (!shared(engine)) {
-      engine.toast?.(COPY.connecting, 2400);
-      return true;
-    }
-    // The player's own side (pick, skill, energy, daily limits) refuses locally, as in solo.
-    if (!verb.ready()) return null;
-    for (const p of pending.values()) {
-      if (p.id === verb.id) {
-        engine.toast?.(COPY.busy, 1600);
-        return true;
-      }
-    }
+    const on = isStreetTree(onTarget) && TRANT_META[onTarget.classId] ? treeId(onTarget.treeIndex) : '';
     reqSeq += 1;
-    if (!c.send('obj_act', actMessage({ req: reqSeq, id: verb.id, verb: verbId, perks: verb.perks, skill: verb.skill }))) {
-      engine.toast?.(COPY.connecting, 2400);
-      return true;
-    }
-    pending.set(reqSeq, { id: verb.id, target, verbId, at: Date.now() });
+    if (!c.send('obj_act', actMessage({ req: reqSeq, id: pigId(streetPigIndex(target, engine.streetTsid)), verb: 'eat', on }))) return null;
+    pending.set(reqSeq, { id: pigId(streetPigIndex(target, engine.streetTsid)), target, verbId: 'eat', at: Date.now(), silent: true });
     return true;
+  },
+
+  /** Help dig (features/help-mine-feature.js): who the server says digs a shared Dirt Pile, or null. */
+  sharedDiggers(target, engine) {
+    if (!client || !copy.snap || !target?.resourceKey) return null;
+    const n = (engine?.query?.('streetResourceNodes', engine) || []).find((row) => row.target === target);
+    if (!n || n.classTsid !== 'dirt_pile') return null;
+    const s = stateFor(copy, nodeId(n.key));
+    return Array.isArray(s?.diggers) ? s.diggers.map(Number) : [];
+  },
+
+  /** Help dig: tell the server a dig at a shared Dirt Pile starts or stops (objects.go obj_dig). */
+  sharedDigSwing(target, what, engine) {
+    if (!client || !target?.resourceKey || (what !== 'start' && what !== 'stop')) return null;
+    const n = (engine?.query?.('streetResourceNodes', engine) || []).find((row) => row.target === target);
+    if (!n || n.classTsid !== 'dirt_pile') return null;
+    return client.send('obj_dig', { id: nodeId(n.key), do: what }) !== false;
   },
 
   /** game.js runVerb: the server's rolls for the verb it just allowed. */

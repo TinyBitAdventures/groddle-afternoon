@@ -21,15 +21,23 @@
  *         obj_no  { req, id, verb, code, message, obj? }
  *         objs    { street, snap?, none?, objs: [state] }
  * A state is { id, chunks, mega, in } (rock), { id, units, in, petted?,
- * watered?, reset? } (node) or { id, fruit, cap, health, maturity, petted,
- * watered } (tree); `in` and `reset` are ms from when it was sent.
+ * watered?, reset?, diggers? } (node), { id, fruit, cap, health, maturity, petted,
+ * watered, poison?, dead?, by? } (tree) or { id, mood, hunger, petted, daily,
+ * croak, in } (pig: a street Piggy, objects_pigs.go); `in`, `reset` and
+ * `poison` are ms from when it was sent.
+ *
+ * G334: a street tree's Tree Poison and death are the server's (poison: ms
+ * to its death, by: who poured it; dead: it died for everyone), and so are
+ * a street Piggy's mood, hunger and twice-daily clock. G329: a Dirt Pile
+ * keeps a dig crew (diggers) as a rock keeps miners.
  */
 
 import { ROCK_CATALOG, findWorkingPick, miningProfile } from './mining.js?v=g330-1';
 import { MINING_EXPERT_UPGRADES } from './imagination-effects.js';
 import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage } from './trants.js?v=trant-harvest-2';
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=trant-care-test-4';
-import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG } from './resource-nodes.js';
+import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js';
+import { highestAnimalKinshipRank } from './animal-kinship.js?v=g296-1';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
 export const SHARED_NODE_CLASSES = Object.freeze(['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree']);
@@ -38,7 +46,11 @@ export const SHARED_NODE_CLASSES = Object.freeze(['mortar_barnacle', 'ice_knob',
 export const SHARED_VERBS = Object.freeze({
   rock: Object.freeze(['mine']),
   tree: Object.freeze(['harvest', 'pet', 'water']),
+  pig: Object.freeze(['pet', 'nibble', 'feed']),
 });
+
+/** tree-death-feature's pour verbs, and the word the server knows each by (objects.go pour). */
+export const POUR_VERBS = Object.freeze({ 'treepoison:poison': 'poison', 'treepoison:antidote': 'antidote' });
 
 /** No answer from the server in this long: give up on the request. */
 export const REQUEST_TIMEOUT_MS = 6000;
@@ -69,10 +81,24 @@ export function treeId(index) {
 export function nodeId(key) {
   return `node:${key}`;
 }
+export function pigId(index) {
+  return `pig:${index}`;
+}
 
-/** The kind an id names ('rock' | 'tree' | 'node'), or ''. */
+/**
+ * A street Piggy's spawn index (game.js spawnPiggies animalKey
+ * `<street>:npc_piggy:<i>`) on this street, or -1 (a released or raised
+ * Piggy, the husbandry feature's, is each player's own).
+ */
+export function streetPigIndex(target, streetTsid) {
+  if (target?.classId !== 'npc_piggy' || target.featureId || target.husbandryAnimal) return -1;
+  const m = /^(.+):npc_piggy:(\d{1,2})$/.exec(String(target.animalKey || ''));
+  return m && m[1] === String(streetTsid || '') ? Number(m[2]) : -1;
+}
+
+/** The kind an id names ('rock' | 'tree' | 'node' | 'pig'), or ''. */
 export function idKind(id) {
-  const m = /^(rock|tree|node):/.exec(String(id || ''));
+  const m = /^(rock|tree|node|pig):/.exec(String(id || ''));
   return m ? m[1] : '';
 }
 
@@ -113,6 +139,17 @@ export function nodePerks(classTsid, verbId, { upgrades = [] } = {}) {
 export function treeSkill(verbId, learned = []) {
   if (verbId === 'harvest') return resolveArborologyPackage(learned).skillId || 'no_skill';
   return highestLightGreenThumbRank(learned);
+}
+
+/** The Animal Kinship rank word for a Piggy's pet and nibble rolls (js/animal-kinship.js packages). */
+export function pigSkill(learned = []) {
+  const rank = highestAnimalKinshipRank(learned);
+  return rank > 0 ? `animalkinship_${rank}` : 'no_skill';
+}
+
+/** The dig_dirt_pile skill the server reads a dig's drop chance and yield from. */
+export function digSkill(learned = [], upgrades = []) {
+  return resolveResourceSkillPackage('dig_dirt_pile', learned, upgrades)?.skill || 'no_skill';
 }
 
 /**
@@ -212,9 +249,41 @@ export function applyNodeState(node, s, now = Date.now()) {
   return node;
 }
 
+/**
+ * A tree's poison and death as the server has them (objects.go pour, killTree):
+ * poisonEndsAt is js/tree-poison.js isPoisoned's field; sharedDead / sharedDeadBy
+ * tell tree-death-feature the tree died for everyone (and whose Planks they are).
+ */
+export function applyTreeDeath(state, s, now = Date.now()) {
+  if (!state || !s) return state;
+  const poison = Number(s.poison);
+  if (s.dead === true) {
+    state.sharedDead = true;
+    state.sharedDeadBy = Math.max(0, Math.floor(Number(s.by) || 0));
+  } else if (Number.isFinite(poison) && poison > 0) {
+    if (!(Number(state.poisonedAt) > 0)) state.poisonedAt = now;
+    state.poisonEndsAt = now + poison;
+    state.poisonBy = Math.max(0, Math.floor(Number(s.by) || 0));
+  } else {
+    clearTreeDeath(state);
+  }
+  return state;
+}
+
+/** No poison, not dead (a cure, or a tree nobody has touched). */
+function clearTreeDeath(state) {
+  delete state.poisonedAt;
+  delete state.poisonEndsAt;
+  delete state.poisonBubble;
+  delete state.poisonBy;
+  delete state.sharedDead;
+  delete state.sharedDeadBy;
+}
+
 /** A tree's shared fields as nobody has touched it (game.js spawnTrees + trants.js createTrantState). */
 export function freshenTree(state, classId, index) {
   if (!state || !TRANT_META[classId]) return state;
+  clearTreeDeath(state);
   const { maturity, health } = freshTreePlan(index);
   state.maturity = maturity;
   state.health = health;
@@ -230,23 +299,25 @@ export function freshenTree(state, classId, index) {
  * the shared maturity and harvest_count. harvestedToday stays the player's own
  * (the source's per-player intervals[today]).
  */
-export function applyWoodState(state, s) {
+export function applyWoodState(state, s, now = Date.now()) {
   if (!state || !s) return state;
   const whole = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.floor(Number(v) || 0)));
   state.maturity = whole(s.maturity, 0, 6);
   state.harvestCount = whole(s.count, 0, 1);
+  applyTreeDeath(state, s, now);
   return state;
 }
 
 /** A Wood Tree nobody has touched on the server: maturity 6 (js/woodcutting.js ensureWoodTreeState). */
 export function freshenWood(state) {
   if (!state) return state;
+  clearTreeDeath(state);
   state.maturity = 6;
   state.harvestCount = 0;
   return state;
 }
 
-export function applyTreeState(state, s) {
+export function applyTreeState(state, s, now = Date.now()) {
   if (!state || !s) return state;
   const whole = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.floor(Number(v) || 0)));
   state.maturity = whole(s.maturity, 0, 10);
@@ -255,6 +326,26 @@ export function applyTreeState(state, s) {
   state.fruitCount = whole(s.fruit, 0, state.fruitCapacity);
   state.petted = s.petted === true;
   state.watered = s.watered === true;
+  applyTreeDeath(state, s, now);
+  return state;
+}
+
+/**
+ * A street Piggy as the server has it (objects_pigs.go): js/animal-mood.js's
+ * mood, hunger, isDaily, hasBeenPetted, croaking and the next tick (hungerAt).
+ * The player's own Animal Kinship counters on the state stay as they are.
+ */
+export function applyPigState(state, s, now = Date.now()) {
+  if (!state || !s) return state;
+  const whole = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.floor(Number(v) || 0)));
+  state.mood = whole(s.mood, 0, 2);
+  state.hunger = whole(s.hunger, 0, 10);
+  state.isDaily = s.daily === true ? 1 : 0;
+  state.hasBeenPetted = s.petted === true ? 1 : 0;
+  state.croaking = s.croak === true && state.hunger === 10;
+  const due = deadline(s.in, now);
+  if (due) state.hungerAt = due;
+  state.moodVersion = 1;
   return state;
 }
 
@@ -312,6 +403,7 @@ export function stateFor(copy, id, now = Date.now()) {
   const gone = Math.max(0, now - row.at);
   if (Number(s.in) > 0) s.in = Math.max(1, s.in - gone);
   if (Number(s.reset) > 0) s.reset = Math.max(1, s.reset - gone);
+  if (Number(s.poison) > 0) s.poison = Math.max(1, s.poison - gone);
   return s;
 }
 
@@ -326,20 +418,25 @@ export function reconcile(obj, copy, now = Date.now()) {
     if (s) applyNodeState(obj.node, s, now);
     else freshenNode(obj.node);
   } else if (obj.kind === 'tree') {
-    if (s) applyTreeState(obj.state, s);
+    if (s) applyTreeState(obj.state, s, now);
     else freshenTree(obj.state, obj.classId, obj.index);
   } else if (obj.kind === 'wood') {
-    if (s) applyWoodState(obj.state, s);
+    if (s) applyWoodState(obj.state, s, now);
     else freshenWood(obj.state);
+  } else if (obj.kind === 'pig') {
+    // The server lists every Piggy of a street it has; one it does not list keeps the local rules.
+    if (!s) return false;
+    applyPigState(obj.state, s, now);
   } else return false;
   return true;
 }
 
 /** An obj_act message, validated the way the server will. */
-export function actMessage({ req, id, verb, perks = [], skill = '' }) {
+export function actMessage({ req, id, verb, perks = [], skill = '', on = '' }) {
   const msg = { req: Math.max(1, Math.floor(Number(req) || 1)), id: String(id || ''), verb: String(verb || '') };
   const words = (perks || []).filter((p) => /^[a-z0-9_]{1,24}$/.test(p)).slice(0, 8);
   if (words.length) msg.perks = words;
   if (skill && /^[a-z0-9_]{1,32}$/.test(skill)) msg.skill = skill;
+  if (on && /^tree:\d{1,2}$/.test(on)) msg.on = on;
   return msg;
 }

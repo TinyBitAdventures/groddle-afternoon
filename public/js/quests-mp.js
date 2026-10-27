@@ -49,6 +49,12 @@
  *    following 3 s after the teleport. The server counts the followers
  *    (follow.go follow_teleported) and features/follow-mp-feature.js sets
  *    the flag; offered once following another player works (needs: follow).
+ *  - soilappreciation_help_digging (It Takes Two): Soil Appreciation II's
+ *    quest (inc_data_skills.js:3158, 3891). helped_dig is dirt_pile.js
+ *    onDigComplete 481-483: a dig that had helpers (others who started
+ *    digging the same Dirt Pile while it ran, addDigger 153-166). The
+ *    realtime server keeps the dig crews (objects.go obj_dig, digHelp) and
+ *    features/help-mine-feature.js counts a dig its answer says was helped.
  *  - meditative_arts_with_friends (is_multiplayer): offered by its own
  *    conditions (the quest file's prerequisites has_skill meditativearts_1
  *    and its two prereq_quests; quests.json 'prerequisites' trigger), as the
@@ -134,6 +140,8 @@ export const MULTIPLAYER_QUESTS = Object.freeze({
   // G334 follow: Teleportation III's quest; the flag is the server's count at teleport_complete (follow.go).
   teleportation_teleport_with_followers: Object.freeze({ offer: 'source', needs: Object.freeze(['follow']), source: 'inc_data_skills.js:3417, 3965' }),
   meditative_arts_with_friends: Object.freeze({ offer: 'source', source: 'quests/meditative_arts_with_friends.js prerequisites, prereq_quests' }),
+  // G329 help digging: the server's Dirt Pile dig crews (objects.go digHelp); helped_dig from its answer.
+  soilappreciation_help_digging: Object.freeze({ offer: 'source', source: 'inc_data_skills.js:3158, 3891' }),
   good_neighbor: Object.freeze({ offer: 'ours', offerTriggers: ours(MP_FACTS.tendNeighbour) }),
   water_neighbor_garden: Object.freeze({ offer: 'ours', offerTriggers: ours(MP_FACTS.tendNeighbour) }),
   neighbor_gifts: Object.freeze({ offer: 'ours', offerTriggers: ours(MP_FACTS.visitNeighbour) }),
@@ -142,7 +150,6 @@ export const MULTIPLAYER_QUESTS = Object.freeze({
 
 /** The quests G329 judged and left out, with what each needs (or why it stays out). */
 export const MULTIPLAYER_QUESTS_LEFT_OUT = Object.freeze({
-  soilappreciation_help_digging: 'Needs digging a Dirt Pile together (dirt_pile.js addDigger 153-166, helped_dig 481-483): objects.go keeps help crews for rocks only.',
   play_musicblocks: 'Nothing in GSJS offers it, and it needs Play for on another player (musicblock_*.js 239-242).',
   watering_time: 'Nothing in GSJS offers it (watering_can.js 320-325 only counts it), and it needs watering another player.',
   grub_giver: 'Nothing in GSJS offers or names it, and its requirements are only cooking.',

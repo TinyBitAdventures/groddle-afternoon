@@ -1410,6 +1410,8 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
         ? rollDropTable(pkg.drop_class_id, rng)
         : [];
       if (drop.length) outputs.push(...drop);
+      // Multiplayer help dig (dirt_pile.js onDigComplete 380-389): the crew's Loam chance came up.
+      else if (ctx.loamBonus === true) outputs.push({ classTsid: 'loam', qty: pkg.bonus_amount || 2 });
       else outputs.push({ classTsid: 'earth', qty: pkg.bonus_amount || 2 });
       achievementCounters.push({ counter: 'dug:dirt', amount: 1 });
       break;

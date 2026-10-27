@@ -21,7 +21,13 @@
  *     gardening_harvest) and assets/content/trants.json fruitCapMap
  *     (include/trants.js 1026-1041 updateFruitCap);
  *   - js/trant-care.js TRANT_CARE_PACKAGES living_pet / living_water success
- *     rates (catalog_skill_packages.js light_green_thumb_pet / _water).
+ *     rates (catalog_skill_packages.js light_green_thumb_pet / _water);
+ *   - js/resource-nodes.js RESOURCE_SKILL_PACKAGES dig_dirt_pile drop_chance and
+ *     bonus_amount by skill (Dirt Pile help crews, dirt_pile.js onDigComplete);
+ *   - js/animal-kinship.js ANIMAL_KINSHIP_PACKAGES npc_piggy pet / nibble success
+ *     rates by Animal Kinship rank (catalog_skill_packages.js ak_piggy_pet / _nibble).
+ * Street Piggies (pigs: game.js spawnPiggies, index i) are laid out too, and a
+ * street where a Piggy is sad (js/animal-mood.js locationIsDepressing) says so.
  *
  * What differs from a solo layout, on purpose (as tools/build-realtime-quoins.mjs):
  * no saved-arrival reservation (that one is per player; in multiplayer game.js
@@ -49,9 +55,11 @@ import {
 } from '../public/js/street-ecology.js';
 import { ROCK_CATALOG } from '../public/js/mining.js';
 import { MEGA_ROCK_CHANCE, MEGA_ROCK_CHUNKS } from '../public/js/imagination-effects.js';
-import { RESOURCE_NODE_CATALOG } from '../public/js/resource-nodes.js';
+import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js';
 import { ARBOROLOGY_HARVEST, TRANT_META } from '../public/js/trants.js';
 import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js';
+import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js';
+import { locationIsDepressing } from '../public/js/animal-mood.js';
 import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js';
 import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js';
 
@@ -99,6 +107,8 @@ function groundY(platforms) {
  *   trees [i, class, x, y, maturity, health] game.js spawnTrees (the trants, and the Wood Tree at
  *                                          maturity 6, health 0: ensureWoodTreeState's fresh tree)
  *   nodes [key, class, x, y]               resource-nodes-feature resourceSpawnPlan (`<class>:<n>`)
+ *   pigs  [i, x, y]                        game.js spawnPiggies (index i in placement('piggies'); y + 2)
+ *   sad   true                             locationIsDepressing for the street (its Piggies are sad)
  */
 export function streetObjectLayout(data, { starter = false, ecology = ecologyForStreet(data.tsid) } = {}) {
   const population = populationForStreet(data.tsid, ecology, { starter });
@@ -139,7 +149,17 @@ export function streetObjectLayout(data, { starter = false, ecology = ecologyFor
     .filter((row) => SHARED_NODE_CLASSES.includes(row.classTsid))
     .map((row) => [row.key, row.classTsid, r1(row.x), r1(row.y + 2)]);
 
-  return { rocks, trees, nodes };
+  const pigs = placement('piggies').map((p, i) => [i, r1(p.x), r1((p.y ?? ground) + 2)]);
+  const meta = STREET_INDEX.streets?.[data.tsid] || {};
+  // features/animal-mood-feature.js describeAnimalPlace on an ordinary street (no race, game or instance).
+  const sad = pigs.length > 0 && locationIsDepressing({
+    tsid: data.tsid,
+    hubId: data.hubId ?? meta.hubId ?? '',
+    hubName: data.hubName || meta.hubName || meta.hub || '',
+    label: data.label || meta.label || '',
+  });
+
+  return { rocks, trees, nodes, pigs, sad };
 }
 
 /** The rule numbers the server applies, from the game's own tables. */
@@ -173,7 +193,17 @@ export function ruleTables(trantTables) {
   const trants = {};
   for (const id of Object.keys(TRANT_META)) trants[id] = trantTables[id].fruitCapMap;
   const mega = { chunks: MEGA_ROCK_CHUNKS, chance: { ...MEGA_ROCK_CHANCE } };
-  return { rocks, mega, nodes, harvest, care, trants };
+  const dig = {};
+  for (const [id, row] of Object.entries(RESOURCE_SKILL_PACKAGES.dig_dirt_pile.skills)) {
+    dig[id] = { drop: Number(row.drop_chance) || 0, bonus: Number(row.bonus_amount) || 0 };
+  }
+  const pig = { pet: {}, nibble: {} };
+  for (const verb of ['pet', 'nibble']) {
+    ANIMAL_KINSHIP_PACKAGES[`npc_piggy:${verb}`].forEach((row, rank) => {
+      pig[verb][rank === 0 ? 'no_skill' : `animalkinship_${rank}`] = row.successRate;
+    });
+  }
+  return { rocks, mega, nodes, harvest, care, trants, dig, pig };
 }
 
 async function main() {
@@ -183,7 +213,7 @@ async function main() {
   setStreetEcologyCatalog(JSON.parse(await readFile(join(root, 'public/assets/content/street-ecology.json'), 'utf8')));
   const trantTables = JSON.parse(await readFile(join(root, 'public/assets/content/trants.json'), 'utf8'));
   const streets = {};
-  const totals = { rocks: 0, trees: 0, nodes: 0 };
+  const totals = { rocks: 0, trees: 0, nodes: 0, pigs: 0 };
   for (const tsid of Object.keys(index.streets).sort()) {
     let data;
     try {
@@ -193,23 +223,24 @@ async function main() {
       continue;
     }
     const layout = streetObjectLayout(data, { starter: data.tsid === STREET_INDEX.default });
-    if (!layout.rocks.length && !layout.trees.length && !layout.nodes.length) continue;
+    if (!layout.rocks.length && !layout.trees.length && !layout.nodes.length && !layout.pigs.length) continue;
     const row = {};
-    for (const key of ['rocks', 'trees', 'nodes']) {
+    for (const key of ['rocks', 'trees', 'nodes', 'pigs']) {
       if (layout[key].length) row[key] = layout[key];
       totals[key] += layout[key].length;
     }
+    if (layout.sad) row.sad = true;
     streets[data.tsid] = row;
   }
   const out = {
     about: 'Shared street objects for objects.go in groddle-afternoon-server. Generated by tools/build-realtime-objects.mjs from public/assets/streets, street-ecology.json, trants.json and the game modules; do not edit by hand.',
-    format: 'streets[tsid] = { rocks: [[i, class, x, y]], trees: [[i, class, x, y, maturity, health]], nodes: [[key, class, x, y]] }',
+    format: 'streets[tsid] = { rocks: [[i, class, x, y]], trees: [[i, class, x, y, maturity, health]], nodes: [[key, class, x, y]], pigs: [[i, x, y]], sad?: true }',
     rules: ruleTables(trantTables),
     streets,
   };
   await mkdir(dirname(outPath), { recursive: true });
   await writeFile(outPath, `${JSON.stringify(out)}\n`);
-  console.log(`${Object.keys(streets).length} streets, ${totals.rocks} rocks, ${totals.trees} trees, ${totals.nodes} nodes -> ${outPath}`);
+  console.log(`${Object.keys(streets).length} streets, ${totals.rocks} rocks, ${totals.trees} trees, ${totals.nodes} nodes, ${totals.pigs} pigs -> ${outPath}`);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();

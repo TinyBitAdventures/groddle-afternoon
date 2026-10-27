@@ -1032,7 +1032,22 @@ function nearbyFireflies(engine, entity) {
 }
 
 function verbContext(engine, entity, verbId) {
+  // Multiplayer (street-objects-feature): the realtime server's go-ahead for a Dirt Pile dig carries
+  // its roll (the skill's Loam drop, the first draw) and whether the crew's help made the yield Loam
+  // (dirt_pile.js onDigComplete 380-389). Solo never has a grant.
+  const grant = verbId && entity?.target ? engine.query?.('sharedVerbGrant', entity.target, menuVerbId(verbId), engine) : null;
+  let roll = Number.isFinite(grant?.roll) ? Math.min(0.999999, Math.max(0, grant.roll)) : null;
+  const shared = grant ? {
+    rng: () => {
+      if (roll == null) return Math.random();
+      const r = roll;
+      roll = null;
+      return r;
+    },
+    loamBonus: grant.help?.loam === true,
+  } : {};
   return {
+    ...shared,
     verbId,
     skills: engine.learnedSkills,
     // Imagination upgrades (scraping/scooping speed, ice and peat yield, dirt and peat daily limits).
@@ -1216,6 +1231,8 @@ export function slothsChewing(list, now = Date.now()) {
 function performVerb(engine, entity, verbId) {
   const result = harvestResourceNode(entity.node, engine.inv, engine.pc, verbContext(engine, entity, verbId));
   applyResult(engine, entity, result);
+  // Help dig in multiplayer (features/help-mine-feature.js): the crew's bonus, after the dig's own yield.
+  if (result.ok && engine.mode === 'multiplayer') engine.query?.('resourceNodeUsed', entity.target, result, engine);
   return result;
 }
 
@@ -1508,7 +1525,8 @@ export const resourceNodesFeature = {
     const ctx = verbContext(engine, entity);
     return resourceNodeVerbs(entity.node, engine.inv, engine.pc, ctx).map((verb) => ({
       id: menuVerbId(verb.id),
-      label: verb.label,
+      // Multiplayer help dig (features/help-mine-feature.js): "Help dig" while someone else digs.
+      label: (engine.mode === 'multiplayer' && engine.query?.('sharedVerbLabel', target, verb.id, engine)) || verb.label,
       enabled: verb.enabled,
       tooltip: verbTooltip(verb),
       reason: verb.enabled ? '' : verb.message,
