@@ -51,6 +51,9 @@ export function soundForVerb(classId, verbId, result = {}) {
   const cls = String(classId || '');
   const verb = String(verbId || '').split(':')[0];
   if (result && result.ok === false) return 'CLICK_FAILURE';
+  // include/trants.js 325-346 and paper_tree.js 497: each tree's harvest plays its own sound, a super
+  // harvest included (its rainbow brings RAINBOW_SUPERHARVEST a second later, game.js showSuperHarvestFx).
+  if (verb === 'harvest' && (cls.startsWith('trant_') || cls === 'paper_tree')) return TRANT_TREE_KEYS[cls] || 'HARVEST';
   const superHarvest = result?.harvest?.superHarvest || result?.animalKinship?.superHarvest;
   if (superHarvest) return 'RAINBOW_SUPERHARVEST';
   if (cls === 'npc_piggy') {

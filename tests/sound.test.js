@@ -187,13 +187,22 @@ describe('sound moments', () => {
     assert.equal(soundForVerb('npc_piggy', 'feed:apple'), 'FEED_PIGGY');
     assert.equal(soundForVerb('npc_chicken', 'squeeze'), 'CHICKEN_SQUEEZED');
     assert.equal(soundForVerb('npc_butterfly', 'milk'), 'BUTTERFLY_SING');
-    assert.equal(soundForVerb('trant_bean', 'harvest'), 'HARVEST');
+    // include/trants.js 325-346: each tree's own harvest sound, super harvest included.
+    assert.equal(soundForVerb('trant_bean', 'harvest'), 'BEEN_TREE');
+    assert.equal(soundForVerb('trant_fruit', 'harvest'), 'FRUIT_TREE');
+    assert.equal(soundForVerb('trant_egg', 'harvest'), 'EGG_TREE');
+    assert.equal(soundForVerb('trant_bubble', 'harvest'), 'BUBBLE_TREE');
+    assert.equal(soundForVerb('trant_gas', 'harvest'), 'GAS_TREE');
+    assert.equal(soundForVerb('trant_spice', 'harvest'), 'SPICE_TREE');
+    assert.equal(soundForVerb('paper_tree', 'harvest'), 'PAPER_TREE');
+    assert.equal(soundForVerb('wood_tree', 'harvest'), 'HARVEST');
+    assert.equal(soundForVerb('trant_fruit', 'harvest', { harvest: { superHarvest: true } }), 'FRUIT_TREE');
+    assert.equal(soundForVerb('npc_piggy', 'nibble', { animalKinship: { superHarvest: true } }), 'RAINBOW_SUPERHARVEST');
     assert.equal(soundForVerb('trant_bean', 'water'), 'WATERING_CAN');
     assert.equal(soundForVerb('wood_tree', 'pet'), 'PET_TRANT');
     assert.equal(soundForVerb('beryl_rock', 'mine'), 'PETRIFIED_ROCK');
     assert.equal(soundForVerb('apple', 'pickup'), 'ITEM_PICKUP');
     assert.equal(soundForVerb('npc_piggy', 'pet', { ok: false }), 'CLICK_FAILURE');
-    assert.equal(soundForVerb('trant_fruit', 'harvest', { harvest: { superHarvest: true } }), 'RAINBOW_SUPERHARVEST');
   });
 
   test('timed verbs loop the tool sound', () => {

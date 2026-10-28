@@ -110,7 +110,7 @@ import {
 } from '../newxp.js?v=newxp-4';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js';
-import { soundForQuoin } from '../sound-moments.js';
+import { soundForQuoin } from '../sound-moments.js?v=g393-1';
 import { IMAGINATION_UPGRADES } from '../imagination.js';
 import { assignQuest, completeQuest } from '../quests.js';
 import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js';

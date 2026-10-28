@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g388-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-219';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-220';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g378-1';
@@ -797,7 +797,7 @@ import {
   planStreetPlacements,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=official-ecology-7';
-import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js';
+import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=g393-1';
 import {
   actionLoopFor,
   legacySoundKey,
@@ -810,7 +810,7 @@ import {
   soundForGameEvent,
   soundForQuoin,
   soundForVerb,
-} from './js/sound-moments.js';
+} from './js/sound-moments.js?v=g393-1';
 import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from './js/metabolics.js';
 import { installHiresIcons } from './js/icon-hires.js?v=g373-1';
 import { installHiresDecos } from './js/deco-hires.js';
@@ -5318,7 +5318,10 @@ function showSuperHarvestFx(target, itemClassTsid, amount) {
   if (!target?.sprite || target.sprite.destroyed) return null;
   const count = Math.max(1, Math.floor(Number(amount) || 1));
   const itemId = String(itemClassTsid || '').trim();
-  const h = playerRainbow('rainbow_superharvest', { sound: false });
+  // A tree already played its own harvest sound, so the rainbow brings RAINBOW_SUPERHARVEST (player.js
+  // 3038-3065); an animal's super harvest sound is RAINBOW_SUPERHARVEST itself (sound-moments.js).
+  const tree = /^trant_|^paper_tree$/.test(String(target.classId || ''));
+  const h = playerRainbow('rainbow_superharvest', { sound: tree });
   if (app?.canvas) {
     app.canvas.dataset.superHarvestFx = 'playing';
     app.canvas.dataset.superHarvestItem = itemId;
@@ -25503,7 +25506,7 @@ async function main() {
     },
   };
   if (new URLSearchParams(location.search).has('soundtest')) {
-    import('./js/sound-test.js').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
+    import('./js/sound-test.js?v=g393-1').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
       state.muted = false;
       if (audio.ctx?.state === 'suspended') {
         try { await audio.ctx.resume(); } catch (_) { /* opt-in */ }

@@ -63,7 +63,7 @@ import {
   completePapersCheck,
 } from '../bureaucracy.js';
 import { frameTexture, sourceFromUrl } from '../textures.js';
-import { setMetalMakingMusic } from '../sound-moments.js';
+import { setMetalMakingMusic } from '../sound-moments.js?v=g393-1';
 
 export const SUPPLY_FEATURE_ID = 'supply';
 export const CLERK_CLASS = 'npc_bureaucrat';

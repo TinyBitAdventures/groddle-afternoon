@@ -2645,9 +2645,14 @@
   ]
  },
  "git": {
-  "commits": 658,
+  "commits": 659,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-28",
+    "kind": "new",
+    "text": "Two dozen item verbs from the original: dice, Alphabet Sauce, the Draught of Wisdom, sniffable cheese and more"
+   },
    {
     "date": "2026-10-28",
     "kind": "improve",
@@ -2762,11 +2767,6 @@
     "date": "2026-10-27",
     "kind": "new",
     "text": "Visitors on your home street fill your Magic Rock's daily iMG, and street Piggies eat food dropped for everyone"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "improve",
-    "text": "Trees regrow fruit when tended instead of at dawn, and the Fuelmaker draws sharp at 3x"
    }
   ]
  },

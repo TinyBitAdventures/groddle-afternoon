@@ -13,7 +13,7 @@
 
 import { SOUND_ALIASES, SOUND_CATEGORIES, SOUND_FILES } from './sound-keys.js?v=g388-1';
 import { playSynthRecipe, recipeForKey } from './synth-sfx.js?v=g388-1';
-import { legacySoundKey } from './sound-moments.js';
+import { legacySoundKey } from './sound-moments.js?v=g393-1';
 
 export const DEFAULT_SFX_VOLUME = 0.7;
 const LATE_FILE_MS = 350;
