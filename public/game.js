@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g412-1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-242';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-243';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g405-1';
@@ -416,8 +416,8 @@ import {
   packPagerState,
   packPageTarget,
 } from './js/pack-pager.js?v=original-pager-1';
-import { listAnimalFeedOptions } from './js/animals.js?v=g403-1';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g403-1';
+import { listAnimalFeedOptions } from './js/animals.js?v=g414-1';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g414-1';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -710,14 +710,14 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=g403-1';
+} from './js/animals.js?v=g414-1';
 import {
   ensureWoodTreeState,
   pickWoodTool,
   resetWoodTreeDay,
   woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=g403-1';
+} from './js/woodcutting.js?v=g414-1';
 import {
   GIANTS,
   createShrineState,
@@ -740,7 +740,7 @@ import {
   emblemRelationNote,
   formatSpeedUpTime,
 } from './js/shrines.js?v=spinning-wheel-test-9';
-import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=g403-1';
+import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=g414-1';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,
@@ -832,6 +832,7 @@ import { GAME_MODE, isSolo } from './js/game-mode.js?v=mp2-1';
 import { saveStore } from './js/save-store.js?v=mp2-2';
 import { isNewMultiplayerPlayer, newPlayerInventory, newPlayerStats } from './js/new-player.js?v=mp5-1';
 import { clearSpeechOfBox, giveArtHeight, hudColumnBox, liftOverAvatars, placeSpeechTail, placeSpeechTip, speechOffsetFor, speechTailPoints } from './js/speech-placement.js?v=g357-1';
+import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?v=g414-1';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=g412-1';
 
 /** @type {object|null} assets/maps/index.json */
@@ -7170,6 +7171,8 @@ function updateSpinningWheel() {
         speaker: 'Spinning Wheel',
         text: `${result.response} ${result.label}!`,
         durationMs: 5_800,
+        // npc_spinning_wheel.js 248-289: the prize line carries the currants won (items get no slug).
+        slugs: r.kind === 'currants' && r.amount ? { currants: r.amount } : null,
       });
       pushActivity(`The Spinning Wheel awards ${result.label}. ${result.response}`);
       // inc_skill_packages.js:41 / :66 runDropTable quest counter drop_table_<table>_<item|currants>
@@ -22655,9 +22658,17 @@ function performShrineDonation() {
   closeShrinePanel();
   playShrineDonation(target);
   refreshShrineTarget(target);
-  toast(line, 4200);
   pushActivity(line);
-  floatText(target.sprite.x, target.sprite.y - 150, `+${result.favor} ${giant.name} favor`, 0xffe066);
+  // include/shrines.js 632-651: the shrine answers with the donation's iMG, mood and favor slugs
+  // (the source skips it under an emblem or the Giant screen; neither follows a donation here).
+  const answer = verbResponse(target.classId, shrineDonationResponseKey(result.baseCost, result.bonus), {
+    speaker: giant.name,
+    slugs: { xp: result.xp, mood: result.mood, favor: result.favor ? [{ giant: giantId, points: result.favor }] : null },
+  });
+  if (answer) showSpeechBubble(target, answer);
+  else floatText(target.sprite.x, target.sprite.y - 150, `+${result.favor} ${giant.name} favor`, 0xffe066);
+  // The slugs show the numbers; a Gameshow Ticket still gets its toast.
+  if (!answer || result.gameshowTicket) toast(line, 4200);
   burst(target.sprite.x, target.sprite.y - 85, 0xffe066, 20);
   playSound(soundForDonation(result.favor), { volume: 0.65 });
   announceAchievementUpdates(
@@ -22883,6 +22894,13 @@ function grantShrineEmblem(target) {
   playShrineDonation(target);
   refreshShrineTarget(target);
   playSound('DONATION_RECIEVE_EMBLEM', { volume: 0.7 });
+  // include/shrines.js 122-126: the shrine's own words, with the emblem's iMG slug.
+  showSpeechBubble(target, {
+    speaker: result.giant.name,
+    text: `Congratulations! Your devotion has earned you an emblem of ${result.giant.name}!`,
+    durationMs: 5000,
+    slugs: result.xp ? { xp: result.xp } : null,
+  });
   pushActivity(`The Shrine grants you an Emblem of ${result.giant.name}.${result.xp ? ` +${result.xp} iMG.` : ''}`);
   applyAchievementProgress(achieveState, `emblems_acquired:${giantId}`, 1, pc);
   enqueueAward({

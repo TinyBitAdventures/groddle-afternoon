@@ -35,6 +35,7 @@ import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../
 import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js?v=g403-1';
 import { energyMax, loseMood, metabolicGain, moodMax, shiftMetabolic } from '../metabolics.js';
 import { grantMoodXp } from '../mood-xp.js';
+import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
 import { getGameDayKey } from '../game-day.js';
 import { cleanQuestMarkup } from '../quests.js?v=item-buffs-7';
 import { walkSurfaceY } from '../walk-surface.js';
@@ -416,7 +417,10 @@ function onSettle(engine, row) {
   }
   if (live(row)) {
     setClip(row.crab, row.heard.settleState);
-    engine.say(row.crab.target, row.heard.reply, CRAB_REPLY_MS);
+    // npc_crab.js 535-548: sendBubble(reply, 4000, pc, rewards), the mood, energy, iMG and currants that landed.
+    engine.say(row.crab.target, row.heard.reply, CRAB_REPLY_MS, {
+      slugs: slugsFromEffects({ mood: effects.mood, energy: effects.energy, xp: effects.xp, currants: r.currants }),
+    });
     resume(row.crab, CRAB_RESUME_MS);
   }
   engine.pushActivity({ base: `The Crab: "${row.heard.reply}"`, effects });

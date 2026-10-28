@@ -29,10 +29,11 @@
  * enchantedSeedlings, enchantedLast, enchantedYield.
  */
 
+import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
 import { platformsScreen, platformYAt } from '../street-model.js';
 import { frameTexture, textureFromUrl } from '../textures.js';
-import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=g403-1';
-import { noteWoodTreeCare } from '../patches.js?v=g403-1';
+import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=g414-1';
+import { noteWoodTreeCare } from '../patches.js?v=g414-1';
 import {
   ENCHANTED_FORESTS,
   ENCHANTED_WOOD_TREE,
@@ -44,7 +45,7 @@ import {
   normalizeEnchantedTree,
   petEnchantedSeedling,
   seedlingStatusLabel,
-} from '../enchanted-forests.js?v=g289-1';
+} from '../enchanted-forests.js?v=g414-1';
 
 export const ENCHANTED_FEATURE_ID = 'enchanted-forest';
 const SEEDLING_URL = 'assets/sprites/soil/patch-seedling@3x.webp';
@@ -330,9 +331,9 @@ export const enchantedForestFeature = {
     const result = petEnchantedSeedling(entity.tree, engine.pc, petTurn);
     petTurn += 1;
     engine.updateHud();
-    engine.say?.(target, result.bubble, 3500);
+    // patch_seedling.js 245: pet_no_more with the 2 energy it cost.
+    engine.say?.(target, result.bubble, 3500, { slugs: slugsFromEffects({ energy: -(result.energyCost || 0) }) });
     engine.pushActivity(result.msg);
-    engine.floatText?.(entity.x, entity.y - 80, `-${result.energyCost} energy`, 0xffd27a);
     last = `seedling-pet:${entity.index}`;
     engine.save();
     publish(engine);

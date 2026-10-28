@@ -6,7 +6,7 @@
  * 1060-1065 -> sendBubble(choice, 3500, pc, slugs)).
  */
 
-import { VERB_RESPONSE_POOLS } from './verb-responses-data.js?v=g412-1';
+import { VERB_RESPONSE_POOLS } from './verb-responses-data.js?v=g414-1';
 
 /** item.js sendResponse: the bubble stays 3,500 ms. */
 export const VERB_RESPONSE_MS = 3500;
@@ -93,9 +93,64 @@ export function rockResponseKey(rockType, toGet, { cleared = false, gem = null }
   return n < 7 ? 'mine_sparkly' : 'mine_max_sparkly';
 }
 
-/** The pool a class answers from (the rocks share one table). */
+/**
+ * The answer to a verb that failed its success roll (no slugs: runSkillPackage
+ * returns before costs). npc_piggy.js 1774 pet_na_fail, 1676 nibble_na_fail;
+ * include/trants.js 103 pet_na_failed, 204 water_na_failed; wood_tree.js
+ * 1040-1042. npc_chicken.js has squeeze_na_failed in its table but never
+ * sends it, and the butterfly's misses say nothing.
+ */
+export function failureResponseKey(classId, verb) {
+  if (classId === 'npc_piggy') return verb === 'pet' ? 'pet_na_fail' : verb === 'nibble' ? 'nibble_na_fail' : null;
+  if (/^trant_/.test(String(classId)) || classId === 'wood_tree') {
+    return verb === 'pet' ? 'pet_na_failed' : verb === 'water' ? 'water_na_failed' : null;
+  }
+  return null;
+}
+
+/**
+ * include/shrines.js 632-651: a 20x or 5x lucky bonus has its own line,
+ * otherwise the tier follows the donation's whole base cost (397:
+ * getBaseCost() * count): up to 10, 100, 500, or more.
+ */
+export function shrineDonationResponseKey(baseCost, bonus = null) {
+  if (bonus === 'super') return 'super_donation_20x_xp';
+  if (bonus === 'huge') return 'super_donation_5x_xp';
+  const cost = Number(baseCost) || 0;
+  if (cost <= 10) return 'donated_item_tier1';
+  if (cost <= 100) return 'donated_item_tier2';
+  if (cost <= 500) return 'donated_item_tier3';
+  return 'donated_item_tier4';
+}
+
+/**
+ * A resource node's answer after its verb (js/resource-nodes.js result):
+ * mortar_barnacle.js 290 scrape; ice_knob.js 136-176 + 308 the yield's key
+ * ("we don't have talkbacks for 5": scrape); peat_1.js 288-293 the drop
+ * line when the package's drop came up; dirt_pile.js 360-445 the gone line
+ * when the pile is dug out, else dig_loam / dig_dirt (_helped with a crew).
+ */
+export function resourceNodeResponseKey(classTsid, { qty = 0, gotDrop = false, gone = false, loam = false, helped = false } = {}) {
+  if (classTsid === 'mortar_barnacle') return 'scrape';
+  if (classTsid === 'ice_knob') {
+    // 1 (and 5, with Ice Scraping Yield) is plain scrape; 2-4 have their own lines.
+    const n = Number(qty) || 0;
+    return n >= 2 && n <= 4 ? `scrape_${n}_ice` : 'scrape';
+  }
+  if (/^peat_[123]$/.test(String(classTsid))) return gotDrop ? 'harvest_peat_drop' : 'harvest_peat_ns_bs';
+  if (classTsid === 'dirt_pile') {
+    if (gone) return 'dirt_pile_gone';
+    return `${loam ? 'dig_loam' : 'dig_dirt'}${helped ? '_helped' : ''}`;
+  }
+  return null;
+}
+
+/** The pool a class answers from (the rocks share one table, so do the peat bogs). */
 export function responsePool(classId, key) {
-  const table = /^rock_|^mineable_rock$/.test(String(classId)) ? VERB_RESPONSE_POOLS.rock : VERB_RESPONSE_POOLS[classId];
+  const id = String(classId);
+  const table = /^rock_|^mineable_rock$/.test(id)
+    ? VERB_RESPONSE_POOLS.rock
+    : /^peat_[123]$/.test(id) ? VERB_RESPONSE_POOLS.peat_1 : VERB_RESPONSE_POOLS[classId];
   return (key && table?.[key]) || null;
 }
 

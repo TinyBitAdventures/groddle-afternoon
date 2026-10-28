@@ -56,6 +56,8 @@ import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=catalog-unif
 import { platformYAt } from '../street-model.js';
 import { hiresSpriteUrl } from '../sprite-hires.js?v=g405-1';
 import { rollResourceNodeDrop } from './drops-feature.js?v=drops-8';
+import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
+import { resourceNodeResponseKey, verbResponse } from '../verb-responses.js?v=g414-1';
 import { rollSlothBonusSnails } from '../imagination-effects.js?v=g403-1';
 import {
   DUST_TRAP_DROP_ITEM_DEFS,
@@ -82,7 +84,7 @@ import {
   starterResourceTools,
   swimmingSalmonCount,
   tickResourceNode,
-} from '../resource-nodes.js?v=g403-1';
+} from '../resource-nodes.js?v=g414-1';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js';
 import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=g403-1';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=ffw-2';
@@ -1169,6 +1171,33 @@ function sfxFor(result) {
   return { scrape: 'SCRAPER', scoop: 'SCOOPED_JELLISAC', dig: 'SHOVEL', harvest: 'HOE' }[result.verbId] || 'ITEM_PICKUP';
 }
 
+/**
+ * sendResponse(key, pc, slugs) after a scrape, peat harvest or dig: the
+ * energy, mood and iMG the package moved (inc_skill_packages.js 485-575),
+ * plus a drop's currants and favor (557-571). mortar_barnacle.js 290,
+ * ice_knob.js 308, peat_1.js 288-293, dirt_pile.js 360-445
+ * (js/verb-responses.js resourceNodeResponseKey).
+ */
+export function talkbackFor(result, drop = null) {
+  if (!result?.ok) return null;
+  const hit = Boolean(drop?.hit && drop.result);
+  const key = resourceNodeResponseKey(result.classTsid, {
+    qty: result.outputs?.[0]?.qty || 0,
+    gotDrop: hit,
+    gone: result.dugOut === true,
+    loam: result.loam === true,
+    helped: result.helped === true,
+  });
+  if (!key) return null;
+  return verbResponse(result.classTsid, key, {
+    slugs: slugsFromEffects({
+      ...result.effects,
+      currants: hit ? Number(drop.result.currants) || 0 : 0,
+      favor: hit && Array.isArray(drop.result.favor) && drop.result.favor.length ? drop.result.favor : 0,
+    }),
+  });
+}
+
 function applyResult(engine, entity, result) {
   notePublishResult(result);
   if (!result.ok) {
@@ -1186,10 +1215,13 @@ function applyResult(engine, entity, result) {
     engine.floatText(anchorX, anchorY - lift, `+${itemLabel(classTsid, qty)}`, 0xfff4d6);
     lift += 18;
   }
-  if (result.costs?.xp) engine.floatText(anchorX, anchorY - lift, `+${result.costs.xp} iMG`, 0xd7b8ff);
   for (const counter of result.achievementCounters || []) engine.achievement(counter.counter, counter.amount);
   // Skill-package rare drops (scraping, jellisac, peat, paper tree): features/drops-feature.js.
-  rollResourceNodeDrop(engine, result);
+  const drop = rollResourceNodeDrop(engine, result);
+  // The node's talkback with the package's slugs (barnacle, ice, peat, dirt; see talkbackFor).
+  const answer = talkbackFor(result, drop);
+  if (answer && entity.target) engine.say(entity.target, answer.text, answer.durationMs, { slugs: answer.slugs });
+  else if (result.costs?.xp) engine.floatText(anchorX, anchorY - lift, `+${result.costs.xp} iMG`, 0xd7b8ff);
   engine.playSound(sfxFor(result), { volume: 0.6, jitter: 0.05 });
 
   if (entity.classTsid === 'npc_firefly') {

@@ -496,7 +496,7 @@ export function brushFox(ctx) {
   const wearPoints = scaledToolWear(toolState, FOX_BRUSH_ID, pkg.toolWear, wearMultiplier);
   const wear = wearPoints > 0 ? useToolCondition(toolState, FOX_BRUSH_ID, wearPoints) : { wear: 0 };
   // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
-  loseEnergy(pc, pkg.energyCost);
+  const energyLost = loseEnergy(pc, pkg.energyCost);
   // inc_skill_packages.js 532 (fox_brushing): xp_bonus takes the mood bonus.
   const xp = grantMoodXp(pc, pkg.xpBonus);
   const [lo, hi] = foxFiberRange(ctx.learned, upgrades);
@@ -526,7 +526,7 @@ export function brushFox(ctx) {
     ok: true,
     reason: 'brushed',
     fibers,
-    energy: -pkg.energyCost,
+    energy: energyLost ? -energyLost : 0,
     xp,
     wear: wear.wear ?? wearPoints,
     broke: wear.broke === true,

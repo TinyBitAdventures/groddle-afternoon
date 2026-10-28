@@ -1303,7 +1303,8 @@ function bumpDaily(node, verbId, dayKey) {
 
 function applyMetabolics(pc, costs) {
   // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
-  if (costs.energy) loseEnergy(pc, costs.energy);
+  // costs.energy keeps what was lost (the slugs and the activity line show it).
+  if (costs.energy) costs.energy = loseEnergy(pc, costs.energy);
   if (costs.mood > 0) {
     // G278: a package's mood_bonus is metabolics_add_mood
     // (inc_skill_packages.js 524), refused while dead (inc_metabolics.js
@@ -1429,6 +1430,9 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
       // Multiplayer help dig (dirt_pile.js onDigComplete 380-389): the crew's Loam chance came up.
       else if (ctx.loamBonus === true) outputs.push({ classTsid: 'loam', qty: pkg.bonus_amount || 2 });
       else outputs.push({ classTsid: 'earth', qty: pkg.bonus_amount || 2 });
+      // The talkback (dirt_pile.js 377-445): dig_loam for Loam, _helped when a crew's bonus brought it.
+      extra.loam = drop.length > 0 || ctx.loamBonus === true;
+      extra.helped = ctx.loamBonus === true;
       achievementCounters.push({ counter: 'dug:dirt', amount: 1 });
       // G463 / G464 (dirt_pile.js 391-393, 414, 432): dig_loam counts every drop-table lump and a Loam
       // bonus, dig_dirt the Lumps of Earth (quest routes soil_dug:loam / soil_dug:earth).
@@ -1572,7 +1576,8 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
       node.units = Math.max(def.stock.min, node.units - 1);
       node.regrowAt = now + def.regrow.minMs;
       msgs.push(`You dug ${outputs.map((o) => plural(o.qty, o.classTsid)).join(' and ')}.`);
-      if (node.units <= def.stock.min) msgs.push('The dirt pile is all dug out.');
+      extra.dugOut = node.units <= def.stock.min;
+      if (extra.dugOut) msgs.push('The dirt pile is all dug out.');
       break;
     }
     case 'peat_1': {

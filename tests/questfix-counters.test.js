@@ -29,8 +29,8 @@ import {
   COLD_COMFORT,
   COLD_COMFORT_LEAVE_TEXT,
 } from '../public/js/quest-offers.js?v=g403-1';
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=g403-1';
-import { createPlot, performPlotVerb } from '../public/js/patches.js?v=g403-1';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=g414-1';
+import { createPlot, performPlotVerb } from '../public/js/patches.js?v=g414-1';
 import { createToolConditionState } from '../public/js/tools.js?v=woodcutting-test-8';
 import { performEmotionalBearAction, createEmotionalBearState } from '../public/js/emotional-bear.js?v=g390-1';
 import {

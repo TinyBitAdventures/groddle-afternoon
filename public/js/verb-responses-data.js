@@ -179,6 +179,125 @@ export const VERB_RESPONSE_POOLS = Object.freeze({
     water_na: Object.freeze(["Yep. Nothing like wet kindling.","Oh thanks. Now I've got rising damp.","You've totally moistened my roots.","Even a dribble from the right hose provides succor to a thirsty trunk.","Watch it, you've gushed all over my barky bits."]),
     water_na_failed: Object.freeze(["Take that away, I like to keep my tinder dry.","I prefer a dry rub - you can carry your can away."]),
   }),
+  // items/npc_shrine_alph.js 866
+  npc_shrine_alph: Object.freeze({
+    donated_item_tier1: Object.freeze(["Alph acknowledges your minor donation.","Alph has received and weighed your donation. It is small.","Your donation has been appraised on behalf of Alph. Little, isn't it?","Fzzzzt. Your very small donation is accepted.","Small donation, eh? Alph has noted this."]),
+    donated_item_tier2: Object.freeze(["Alph acknowledges your middling donation.","Alph has received and weighed your donation. It is middling.","Your donation has been appraised on behalf of Alph. It is ok.","Bzzzt. Your middling donation is accepted.","A middling donation. Alph remembers."]),
+    donated_item_tier3: Object.freeze(["Alph acknowledges your really quite good donation.","Alph has received and weighed your donation. It is quite good.","Your donation has been appraised on behalf of Alph. Pretty good.","Fjzjzzjzzt! Your reasonable donation has been gratefully accepted.","A very reasonable donation, Alph would say."]),
+    donated_item_tier4: Object.freeze(["Alph acknowledges your impressive donation, and likes you for it.","Alph has received and weighed your donation. It is most pleasing.","Chkkkkkzzt. Generous donation gratefully accepted.","Your donation has been appraised on behalf of Alph. It is GREAT.","An impressive and mighty donation. Alph will remember this."]),
+    super_donation_20x_xp: Object.freeze(["Mighty, mighty Alph, gives you mighty, mighty thanks.","You have been deemed worthy of extra Alphibian reward.","Never say that Alph is not a generous Giant. BOOM!"]),
+    super_donation_5x_xp: Object.freeze(["Mighty Alph sometimes rewards extra. Like today.","Alph thanks you a random extra amount for this.","One day, you will know the mighty rewards of Alph. Today. Why not?"]),
+  }),
+  // items/npc_shrine_cosma.js 883
+  npc_shrine_cosma: Object.freeze({
+    donated_item_tier1: Object.freeze(["As the pebble sinks, so this donation reaches Cosma's heart.","Like the sun rising behind a raincloud is this donation to Cosma.","Like a flower with a cough, so sad is this little donation to Cosma.","Like a sock that is wet, is this sad little donation to Cosma.","This donation is to Cosma what no rainbow at all is to a wet day."]),
+    donated_item_tier2: Object.freeze(["As the fart rises, so this donation reaches Cosma's heart.","Like the sun rising on a boggy swamp is this donation to Cosma.","The wind carries to you Cosma's middling gratitude.","To Cosma this donation is but an imaginary rainbow on a wet day.","Like a hat that is ugly, is this mediocre donation to Cosma."]),
+    donated_item_tier3: Object.freeze(["As the feather floats, so this donation reaches Cosma.","Like the sun rising on a forest glade is this donation to Cosma.","The wind carries to you Cosma's considerable gratitude.","This donation is to Cosma what a beautiful rainbow is to a wet day.","Like a cloud that is fluffy is this moderate donation to Cosma."]),
+    donated_item_tier4: Object.freeze(["As the grumpy butterfly soars, so this donation reaches Cosma.","Like the sun rising on a glorious mountain is this donation to Cosma.","The wind carries to you Cosma's enormous gratitude.","A HUGE double rainbow on a dark day is this donation unto Cosma.","Like eleventy-thousand tickling feathers is this donation to Cosma."]),
+    super_donation_20x_xp: Object.freeze(["The glorious wind of Cosma's gratitude has blown upon you. Hard.","The happy breath of Cosma super-blesses you.","The warm wind of Cosma's gratitude has blown up your underthings."]),
+    super_donation_5x_xp: Object.freeze(["Cosma bestows upon you a breath of bonusness","Cosma's breath blesses you.","The soft wind of Cosma's gratitude blows upon you."]),
+  }),
+  // items/npc_shrine_friendly.js 866
+  npc_shrine_friendly: Object.freeze({
+    donated_item_tier1: Object.freeze(["C'mon, really?!?","Not so hot.","This verges on negligible.","Friendly thought you were a better Friend than this.","This is weak. Like bad, bad hooch."]),
+    donated_item_tier2: Object.freeze(["Passable.","Hm. Other glitches are nicer, you know.","See where you're coming from, friend. But bigger is better.","Friends don't let Friends give mediocre donations.","This? It is the warm cheap beer of donations."]),
+    donated_item_tier3: Object.freeze(["Getting there.","Other glitches could learn a thing from you.","Friendly feels friendly.","For this, Friendly will raise a glass in your honour.","This is an act of glorious altruism."]),
+    donated_item_tier4: Object.freeze(["YES, Friend. This is more like it.","Now we're talking. Now this is a party.","Friendly will remember you fondly and often for this.","Hot stuff, little Friend.","Friendly will drink to you. Heavily."]),
+    super_donation_20x_xp: Object.freeze(["Drinks are on Friendly. Metaphorical drinks.","Yes! Party like it is Year 19, little Friend.  Or Year 9999! Whatever!","A toast! A toast to you, firm friend of Friendly."]),
+    super_donation_5x_xp: Object.freeze(["A little extra in your glass of life.","An extra pour for you.","A little chaser for your generosity."]),
+  }),
+  // items/npc_shrine_grendaline.js 910
+  npc_shrine_grendaline: Object.freeze({
+    donated_item_tier1: Object.freeze(["Meh.","This is a donation? No, this is a washout.","This could be so much better.","With this, you have barely dipped your toe in Grendalinian gratitude.","Grendaline is disappointed. Grateful, but disappointed."]),
+    donated_item_tier2: Object.freeze(["Wishy-washy, as donations go.","Grendalinian gratitude laps against your knees for this.","Mediocre, but Grendaline still smiles upon you.","Grendaline is mildly pleased. This could be so much worse.","Grendaline stands by you. Even though you only gave this."]),
+    donated_item_tier3: Object.freeze(["Grendaline's heart begins to swell with pride.","This couldn't be much better. Good donation.","Grendalinian gratitudiness washes over you for this.","Grendaline is pleased. You are favored.","This is the kind of thing that Grendaline likes."]),
+    donated_item_tier4: Object.freeze(["So generous!","This is so much better than other donations. Grazie.","You shall be pummelled with waterfalls of favor.","You are verily swimming in Grendalinian gratitudiness for this.","Donations like this are why Grendaline loves you the most."]),
+    super_donation_20x_xp: Object.freeze(["WOOOOSH! What was that? Yes. The gratitude of Grendaline.","And thusly are you rewarded for your generosity.","Grendaline loves you, little generous one."]),
+    super_donation_5x_xp: Object.freeze(["A deluge of gratitude for you.","The tide of Grendaline's gratitude is extra high today.","Wade in the gratitude, generous little one."]),
+  }),
+  // items/npc_shrine_humbaba.js 930
+  npc_shrine_humbaba: Object.freeze({
+    donated_item_tier1: Object.freeze(["Pah.","Humbaba remembers when her people were more generous.","Thank you?","The point of donation is to please your giant. Yes?","Humbaba has forgotten your name already."]),
+    donated_item_tier2: Object.freeze(["Humbaba is ok with this.","Thank you.","This is ok.","Know this: you can do better. Humbaba believes in you.","Humbaba recognises you."]),
+    donated_item_tier3: Object.freeze(["Humbaba likes this.","Thank you!","This is pretty good.","Know this: you have done well. Humbaba approves.","Humbaba remembers you for this."]),
+    donated_item_tier4: Object.freeze(["Humbaba loves this.","YES! Thank you. Thank you!!!","This is wonderful.","Know this: you have pleased Humbaba. Very, very much.","Humbaba will always remember this kindness."]),
+    super_donation_20x_xp: Object.freeze(["Your soul is filled with the bubbling laughter of Humbaba.","Humbaba is very pleased with you today.","You should always remember Humbaba kindly."]),
+    super_donation_5x_xp: Object.freeze(["Sometimes Humbaba smiles on her supplicants.","A little extra nibble for you, little Humbabarian.","You deserve a little extra, little one."]),
+  }),
+  // items/npc_shrine_lem.js 852
+  npc_shrine_lem: Object.freeze({
+    donated_item_tier1: Object.freeze(["This?! This is all you're giving me? Shazbot!","Smeg.","Seriously? This? Tanj.","Feckik.","Call this a gorram donation?"]),
+    donated_item_tier2: Object.freeze(["Hab SoSlI' Quch! Just kidding. This is an ok donation.","Well frell me dead, kid: this isn't all bad.","\"Donation: an act of generosity.\" Generosity? Ringing any bells?","Not terrible, but barely worth a diddly-doo, kid.","Not bad. Not the kick in the mivonks I was expecting from you."]),
+    donated_item_tier3: Object.freeze(["Not frakking bad.","Pretty smegging good, kid.","Well diddle my doo, little'un! This is worth somethin'.","Frunge, little one! This is a pretty good little gift!","Feetal's Gizz, petal, Lem is pleased with this."]),
+    donated_item_tier4: Object.freeze(["Yippy Ki-yay, Muddyfunster! Lem loves this. He Lemves this!","Holy Zarquon's Singing Fish, child! THIS is what I call a donation!","One of these?! D'Arvit, little one! This is VERY GOOD.","Belgium! This is BRILLIANT. Good donation, smallfry.","Well, – –, kid! This is one – of a – ing donation!"]),
+    super_donation_20x_xp: Object.freeze(["By the power of LEM!","Well floop, young'un. I'd hug you, but instead, take this.","Once in a Gorram century, kid, I just like giving you a little extra.","#@!$%&*!!! Yes! Lem rewards you!"]),
+    super_donation_5x_xp: Object.freeze(["Farathoom! For once, you deserve extra reward, kid!","Grabbaga putz, little wanderer! Let Lem reward you a little!","Holy Poozer, glitchling, you deserve a little boost."]),
+  }),
+  // items/npc_shrine_mab.js 866
+  npc_shrine_mab: Object.freeze({
+    donated_item_tier1: Object.freeze(["What? Oh.","Yes. But try harder.","You, we like. But this? Pah.","Donation? This? Really?","Feh."]),
+    donated_item_tier2: Object.freeze(["Ok. Not bad.","Yes. Could do better.","Right. Well, thanks. Work harder.","Donation. It needs practice, apparently.","This? Hm? You're mainly here to hang out, right?"]),
+    donated_item_tier3: Object.freeze(["Hm! Ok. Ok. Not bad. Not bad at all.","Other people do better, you know. But this is good.","Yes. Please come again.","This is pretty good. You're ok.","It is not often we say this. But: Mab thanks you."]),
+    donated_item_tier4: Object.freeze(["Mab is happy. Mabby.","Yes. Well done. 5/5, would favor again.","Yes! This is precisely the level of donation Mab likes.","Excellent! Good! Yes! Ok!","Be still and know that that donation was awesome."]),
+    super_donation_20x_xp: Object.freeze(["You've been MABBED!","Rewarded! You have been rewarded, tiny Mabbite!","Remember Mab, and Mab will reward you muchly."]),
+    super_donation_5x_xp: Object.freeze(["Will a little extra reward encourage you?","A little extra something-something. From Mab, to you.","A mite of Mabbish gratitude."]),
+  }),
+  // items/npc_shrine_pot.js 873
+  npc_shrine_pot: Object.freeze({
+    donated_item_tier1: Object.freeze(["Peh. Peh. I do not like this. It is small.","This is not good. Do you have anything better?","Why did you give me this?","Pyew. Almost inedible.","Nyuk."]),
+    donated_item_tier2: Object.freeze(["Not tasty enough.","This is ok. But not great. I prefer something greater.","Hm. Chewy. Not sure.","I've had better.","Not bad. I've had worse."]),
+    donated_item_tier3: Object.freeze(["Pretty tasty, as donations go.","I like this. What is this? I like it. More like this, please.","This is pretty ok. Nice aftertaste. Woody.","nom nom nom.","A passable shrine-stomach offering. Tasty."]),
+    donated_item_tier4: Object.freeze(["NOM. YES.","Pot's Shrine-stomach is making happy noises. Like this: Mmmmm.","You have satiated Pot's shrine-stomach.","This. This is what Pot likes. Nom.","An excellent repast. Really, top notch, little Glitchling."]),
+    super_donation_20x_xp: Object.freeze(["Yes. This is indeed what you deserve.","You have heard of Pot Luck, yes? Well, TA-DAH!","Pot wants you to be lucky. Potluck for you!"]),
+    super_donation_5x_xp: Object.freeze(["You have fed Pot's shrine-stomach. Now Pot will feed your soul.","Pot gives back.","Yes. Now a little something extra from Pot."]),
+  }),
+  // items/npc_shrine_spriggan.js 880
+  npc_shrine_spriggan: Object.freeze({
+    donated_item_tier1: Object.freeze(["Meh.","Pah.","Sigh…","Feh.","Hm."]),
+    donated_item_tier2: Object.freeze(["It is ok.","This is mediocre.","Ok. But more. More. Yes? More.","Spriggan likes this ok.","Takk."]),
+    donated_item_tier3: Object.freeze(["Thank you, yes.","Danke. Ja.","Merci. Oui.","Gracias. Sí.","Hvala Vam. Da."]),
+    donated_item_tier4: Object.freeze(["Spriggan salutes you. He Spriglutes you!","Tres bon. Merci beaucoup.","Dear supplicant: YES. Regards, Spriggan.","YES. YES!","Bold. Strong. Good. GOOD."]),
+    super_donation_20x_xp: Object.freeze(["By the power of SPRIGGAN!","The law of Spriggan says: you deserve reward.","Extra Spriggot love for you, little one.","Spoinks, petal! Here's one doozy of a re-diddly-ward, y'hear? Ahem."]),
+    super_donation_5x_xp: Object.freeze(["Spriggan says: you deserve a reward.","More reward for you. From Spriggan.","Sometimes, you deserve a little encouragement."]),
+  }),
+  // items/npc_shrine_ti.js 866
+  npc_shrine_ti: Object.freeze({
+    donated_item_tier1: Object.freeze(["Donk. Donation received. Status: poor.","Donk. Donation received. Tii says: this is not worth much.","Donk. Donation received. Object value: low.","Donk. Minor donation detected. Minor thanks given by Tii.","Donk. Minor donation to Tii received. Tii reciprocates, minorly."]),
+    donated_item_tier2: Object.freeze(["Ping. Donation received. Donation status: mediocre.","Ping. Donation received. Tii says: this object is worth a little.","Ping. Donation received. Object value: mediocre to middling.","Ping. Mediocre donation received. Mediocre thanks given by Tii.","Ping. Mediocre donation received. Tii reciprocates, mediocrely."]),
+    donated_item_tier3: Object.freeze(["Beep-boop! Donation received. Donation status: moderate.","Beep-boop! Donation received. Tii says: This is worth something.","Beep-boop! Donation received. Object value: moderate.","Beep-boop! Moderate donation received. Moderate thanks given by Tii.","Beep-boop! Moderate donation received. Tii reciprocates, moderately."]),
+    donated_item_tier4: Object.freeze(["Ding-Dong! Donation received. Status: Major.","Ding-Dong! Donation received. Tii says: This is worth a lot. Thanks.","Ding-dong! Major donation received. Object value: high.","Ding-DONG! Major donation received. Major thanks given by Tii.","Ding-DONG! Major donation received. Tii reciprocates, majorly."]),
+    super_donation_20x_xp: Object.freeze(["PING! PING! Tii's major random reward algorithm has been tripped!","PING! PING! ALERT! Tii is randomly super-pleased!","PING! PING! ALERT! Major Random Reward triggered!"]),
+    super_donation_5x_xp: Object.freeze(["Biddly-boop-boop-BING! Donation extra-reward notification!","Biddly-boop-boop-BING! Tii is randomly pleased.","Biddly-boop-boop-BING! Random reward triggered."]),
+  }),
+  // items/npc_shrine_zille.js 923
+  npc_shrine_zille: Object.freeze({
+    donated_item_tier1: Object.freeze(["Donation is this? What know you of donations?","Rubbish, this donation is.","Small, see? This donation? Small.","Zille wants donations like boulders. You offer gravel.","Tiny is this donation. Stingy you are."]),
+    donated_item_tier2: Object.freeze(["Many are the things that Zille wants. This is not so much one of them.","Zille wants donations like boulders. You offer pebbles.","Donations yes. This? This, not much of a donation is.","Mediocre, this donation is.","Size matters not. Except in donations. Then it does. More, please."]),
+    donated_item_tier3: Object.freeze(["Donation is a natural part of life. Especially good ones. Like this.","Donations like boulders, Zille wants. Offer this, you do. Not bad.","Good relations with Zille you have. Well, with gifts like this, you have.","Donate you did; like it, Zille does.","Be like the megarock. Constant, proud, generous. Like this."]),
+    donated_item_tier4: Object.freeze(["Adventure? Excitement? Zille craves not these things. But THIS? Yes.","Like this you should donate always. Always, youngling.","Zille wants donations like boulders. This. THIS is a boulder-sized gift.","Zille will protect you for this mighty kindness.","Mighty, this donation is."]),
+    super_donation_20x_xp: Object.freeze(["Feel the force! Of Zille, that is! Feel it!","Reward you, Zille does. Avalanches of rewardlings.","Be as the rock! Mighty! And large! And hard! And rejuvenatey!"]),
+    super_donation_5x_xp: Object.freeze(["Youngling, gather round, a gift for you I have.","Mind what I have given you today, little miner.","Boosts of extra havings for you. Enjoy them you will."]),
+  }),
+  // items/mortar_barnacle.js 435
+  mortar_barnacle: Object.freeze({
+    scrape: Object.freeze(["Arrrrrrrrrrr…","You be boostin' barnacles, be you? Arrr, that you be.","That be that then, lads. I be off.","Farewell, me blister of Barnacle mates! Farewell!","Offward, ho!","Oh. I be scuppered now.","That be me unstuck, then","Arr, I clung me best, but all for naught","Batten down your hatches, lads, there be a scraper at large!","Arrrr, I be naught but 'lubber booty now."]),
+    scrape_drop: Object.freeze(["Ye scurvy bilge-rat, you've plundered me now.","Arrr, you've found me gold.","Treasure!","Arrr! You've found me lucky charm!","The spoils are all yours, me hearty."]),
+  }),
+  // items/ice_knob.js 406
+  ice_knob: Object.freeze({
+    scrape: Object.freeze(["That's just cold, man.","Ice THIS, Glitch!","I'm cool with this, little bud.","Ice to meet you. Yeah. Ice.","It's a thrill to chill you, chum.","You been ICED, Glitch!","Chill.","BAM! Ice! Whut-WHUT?!?"]),
+    scrape_2_ice: Object.freeze(["Bling BLING, friend! Consider yo'self ICED.","Ice ICE, baby! BAM!","We chill? Yeah. We're chill.","So cold. But so, so hawt.","Izzle to yo scrapazizzle, glizzle.","Ice THIS! (It's ice, you don't have to ice it much)"]),
+    scrape_3_ice: Object.freeze(["Here, catch! Yeah. You caught'a cold.","Didn't your mama tell you not to catch a chill?","I to the C to the E, tinyglitchsta.","You really are a cowboy. Take it from the Ice, man.","Bling bling BLING. You is rich in the chilly stuff, chum."]),
+    scrape_4_ice: Object.freeze(["Nice, kid. You can be my wingman any time.","Supercool.","Bada BLING, friend.","We the chilliest chilled, amarite? I rite. Ice out."]),
+  }),
+  // items/dirt_pile.js 541
+  dirt_pile: Object.freeze({
+    dig_dirt: Object.freeze(["Ooooof. I maded you dirts.","YAY! Heresis are the erfs and stuff you did dig.","Diggins for you. Good diggin.","Ooooooh, looky what you did pull from my middles.","Nice duggy-uppin’ with your shovel-widget. I like you.","Hello! Is you wantin more dirty bits? I made you some.","I did make you erfs and stuff and did put it in your bag. OK!","HERE IS ERFS AND STUFFS. I like you."]),
+    dig_dirt_helped: Object.freeze(["Ooof! Mores the peopling makes dirty dirts nicer.","Nicey dirts for you? And for friendleglitches, I fink.","Nice for you! You likes it.","Good diggin? Erfy digs? Or Loammy digs?","Ooooh, big dirty piles are erfier than little patches, int they?","Erfs for you, erfs for erryone!","Theres enuff dirtypiles for you AND friendies. True.","Good diggin', yous! I like yous! Allofyous!"]),
+    dig_loam: Object.freeze(["Looks! Looks at the stuff you did dugged up! Loammy!","You maded loams!","Lookit! Loamminess!","OooooOOOOoooo. Loam, innit? I like you."]),
+    dig_loam_helped: Object.freeze(["You all togetherish did dig out extra loams. LOAMS!","Grouppy-shovellins make for loaminess. Like they say.","Many shovellinesses make more loams.","Yes. Many friends make moresome loamminess. Good."]),
+    dirt_pile_gone: Object.freeze(["Paf! No more dirtypile!","Allgone!","Dirtygone.","Poff! Out of erfs now.","I like you. I go now."]),
+  }),
   // items/rock_beryl_1.js 678 (and the other 11 rock classes)
   rock: Object.freeze({
     gem_drop_amber: Object.freeze(["Here - small, garish, and has a dead bug in, yet still oddly pleasing.","What do you mean ONLY amber?! It's still a gem, chum"]),
@@ -196,5 +315,10 @@ export const VERB_RESPONSE_POOLS = Object.freeze({
     mine_metal_rock: Object.freeze(["Slave to the GRIND, kid! ROCK ON!","I’d feel worse if I wasn’t under such heavy sedation.","Sweet! Air pickaxe solo! C'MON!","Yeah. Appetite for destruction, man. I feel ya.","LET THERE BE ROCK!","Those who seek true metal, we salute you!","YEAH, man! You SHOOK me!","All hail the mighty metal power of the axe!","Metal, man! METAL!","Wield that axe like a metal-lover, man!"]),
     mine_sparkly: Object.freeze(["Here! What's mined is yours!","Pick me! Pick me!","I sparkle! You sparkle! Sparkles!","Oooh, you're cute. You into carbon-dating?","Oh yeah! Who's your magma?!?","Yay! You picked me!","Hey, cutestuff! You make me sliver.","You crack me up, Glitchy!","Yay! Everything should sparkle! Except maybe vampires.","Together, we'll make the world sparkly, Glitchy"]),
     rock_disappeared: Object.freeze(["Oof, where'd I go?","brb","kbye","A la peanut butter sammiches","Alakazam!","*poof*","I'm all mined out!","Gone to the rock quarry in the sky","Yes. You hit rock bottom","All rocked out for now"]),
+  }),
+  // items/peat_1.js 618 (and peat_2, peat_3)
+  peat_1: Object.freeze({
+    harvest_peat_drop: Object.freeze(["Eh? What's this? Meh, take it, kid.","Don't want this newfangled thingamajiggy. You have it.","This wadjimacallit some kinda joke? Take it and get outta here!"]),
+    harvest_peat_ns_bs: Object.freeze(["Peat here. Nice doin' business with ya, kid.","You know your shovellin' kid, I'll give ya that.","What's that you say, kid? Dig?","There ya go, kid. Now git offa my lawn.","Peat THAT, kid!","In my day, a person used to ask before stickin' their spade in…"]),
   }),
 });

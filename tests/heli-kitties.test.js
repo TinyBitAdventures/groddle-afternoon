@@ -22,9 +22,9 @@ import {
   sanitizeKittyName,
   scareChance,
   stepKitty,
-} from '../public/js/heli-kitties.js';
-import { KITTY_SHEETS, heliKittiesFeature, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js';
-import { foxesFeature } from '../public/js/features/foxes-feature.js?v=g405-1';
+} from '../public/js/heli-kitties.js?v=g414-1';
+import { KITTY_SHEETS, heliKittiesFeature, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=g414-1';
+import { foxesFeature } from '../public/js/features/foxes-feature.js?v=g414-1';
 import { createFeatureHost } from '../public/js/feature-host.js';
 import { setWildlifeCatalog } from '../public/js/wildlife.js';
 import { readFileSync } from 'node:fs';

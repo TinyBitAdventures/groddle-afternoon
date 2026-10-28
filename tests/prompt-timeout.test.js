@@ -259,7 +259,8 @@ describe('the game wires them', () => {
     assert.match(game, /state\.toastOverModal = Boolean\(openGlitchModal\(\)\);/);
     assert.match(game, /const staleUnderPanel = state\.toastTimer > 0 && !state\.toastOverModal && openGlitchModal\(\);/);
     assert.match(game, /if \(staleUnderPanel \|\| \(!state\.toastHeldAt && state\.toastTimer > 0 && performance\.now\(\) >= state\.toastTimer\)\)/);
-    assert.match(game, /closeShrinePanel\(\);\n\s*playShrineDonation\(target\);\n\s*refreshShrineTarget\(target\);\n\s*toast\(line, 4200\);/, 'the donation toast is raised after the panel closes');
+    // The shrine's answer carries the numbers now; the toast (no answer, or a Gameshow Ticket) still comes after the close.
+    assert.match(game, /closeShrinePanel\(\);\n\s*playShrineDonation\(target\);\n\s*refreshShrineTarget\(target\);[\s\S]{0,1200}?if \(!answer \|\| result\.gameshowTicket\) toast\(line, 4200\);/, 'the donation toast is raised after the panel closes');
   });
 });
 

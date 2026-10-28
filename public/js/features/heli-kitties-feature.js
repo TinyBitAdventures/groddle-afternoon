@@ -26,6 +26,7 @@
  * kittyHiddenVerbs, kittyDemo.
  */
 
+import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g405-1';
 import { landingY, nearestSurfaceY, walkSurfaceY } from '../walk-surface.js';
 import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js';
@@ -45,7 +46,7 @@ import {
   petKitty,
   rollScare,
   stepKitty,
-} from '../heli-kitties.js';
+} from '../heli-kitties.js?v=g414-1';
 
 export const KITTY_FEATURE_ID = 'heli-kitties';
 export const KITTY_GROUP = 'kitty';
@@ -179,7 +180,8 @@ function pet(engine, entity) {
     return;
   }
   setClip(entity, '3sleepStart');
-  engine.say(entity.target, result.bubble, KITTY_PET.bubbleMs);
+  // npc_kitty_chicken.js 240-279: sendBubble("purrrrrr", 2000, pc, slugs), xp, mood and energy.
+  engine.say(entity.target, result.bubble, KITTY_PET.bubbleMs, { slugs: slugsFromEffects({ energy: result.energy, mood: result.mood, xp: result.xp }) });
   engine.playSound('FLYING_KITTY_PURR', { volume: 0.6 });
   // npc_kitty_chicken.js 283-287: animal_love +1 for the first 3 pets of each kitty (G143).
   engine.featsIncrement?.('animal_love', 1, { cap: { key: `kitty:${engine.streetTsid}:${entity.kitty.key}`, max: 3 } });

@@ -20,7 +20,7 @@
  * - krazy_salts.js verbs.push.
  */
 
-import { trantFruitCycle } from './trant-care.js?v=g403-1';
+import { trantFruitCycle } from './trant-care.js?v=g414-1';
 
 /** One powder: its single verb, charges, sound and the verb's own tooltip. */
 const powder = (verb, label, tooltip, sound, extra = {}) => Object.freeze({ verb, label, tooltip, sound, maxCharges: 5, ...extra });

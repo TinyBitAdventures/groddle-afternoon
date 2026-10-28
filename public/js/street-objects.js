@@ -35,8 +35,8 @@
 import { ROCK_CATALOG, findWorkingPick, miningProfile } from './mining.js?v=g403-1';
 import { MINING_EXPERT_UPGRADES } from './imagination-effects.js?v=g403-1';
 import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage } from './trants.js?v=trant-harvest-2';
-import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=g403-1';
-import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=g403-1';
+import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=g414-1';
+import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=g414-1';
 import { highestAnimalKinshipRank } from './animal-kinship.js?v=g403-1';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */

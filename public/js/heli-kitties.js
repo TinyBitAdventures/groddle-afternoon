@@ -167,7 +167,7 @@ export function petKitty(kitty, pc) {
   if (!kitty || kitty.flying) return { ok: false, reason: 'flying', msg: 'This kitty is up in the air.' };
   const energy = Math.min(KITTY_PET.energy, Math.max(0, pc.energy || 0));
   // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
-  loseEnergy(pc, energy);
+  const energyLost = loseEnergy(pc, energy);
   // npc_kitty_chicken.js 247: metabolics_add_mood(10), nothing while dead (inc_metabolics.js 79-86).
   const before = pc.mood || 0;
   if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), before + KITTY_PET.mood);
@@ -178,7 +178,7 @@ export function petKitty(kitty, pc) {
   startSleep(kitty);
   return {
     ok: true,
-    energy: -energy,
+    energy: energyLost ? -energyLost : 0,
     mood,
     xp,
     bubble: KITTY_PET.bubble,

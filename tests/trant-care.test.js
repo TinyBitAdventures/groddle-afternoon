@@ -10,7 +10,7 @@ import {
   resolveTrantCarePackage,
   quoteTrantCare,
   performTrantCare,
-} from '../public/js/trant-care.js?v=g403-1';
+} from '../public/js/trant-care.js?v=g414-1';
 import {
   createTrantState,
   livingTrantPlanForStreet,
@@ -23,7 +23,7 @@ import {
   getToolCondition,
   setToolRemaining,
 } from '../public/js/tools.js?v=woodcutting-test-8';
-import { getVerbsFor, runVerb } from '../public/content.js?v=g412-1';
+import { getVerbsFor, runVerb } from '../public/content.js?v=g414-1';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(root, 'public');

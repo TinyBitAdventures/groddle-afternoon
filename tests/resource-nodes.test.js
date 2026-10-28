@@ -30,7 +30,7 @@ import {
   resourceSpritePaths,
   resourceItemIds,
   sheetFrameRect,
-} from '../public/js/resource-nodes.js?v=g403-1';
+} from '../public/js/resource-nodes.js?v=g414-1';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
 import {
   TOOL_CONDITION_CATALOG,

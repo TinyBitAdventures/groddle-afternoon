@@ -29,18 +29,18 @@ import {
   normalizeEnchantedTree,
   petEnchantedSeedling,
   seedlingRemainingMs,
-} from '../public/js/enchanted-forests.js';
+} from '../public/js/enchanted-forests.js?v=g414-1';
 import {
   WOOD_TREE_HARVEST,
   harvestWoodTree,
   plankYieldForMaturity,
   quoteWoodTreeHarvest,
   woodTreeStatusLabel,
-} from '../public/js/woodcutting.js?v=g403-1';
-import { noteWoodTreeCare } from '../public/js/patches.js?v=g403-1';
-import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=g403-1';
-import { enchantedForestFeature, floorScreenY, hollowTrees, treeSpots } from '../public/js/features/enchanted-forest-feature.js?v=g403-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-242';
+} from '../public/js/woodcutting.js?v=g414-1';
+import { noteWoodTreeCare } from '../public/js/patches.js?v=g414-1';
+import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=g414-1';
+import { enchantedForestFeature, floorScreenY, hollowTrees, treeSpots } from '../public/js/features/enchanted-forest-feature.js?v=g414-1';
+import { FEATURES } from '../public/js/features/index.js?v=registry-243';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

@@ -43,6 +43,7 @@
  * unchanged.
  */
 
+import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
 import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { getToolCondition } from '../tools.js?v=woodcutting-test-8';
 import { worldToScreen } from '../street-model.js';
@@ -80,8 +81,8 @@ import {
   rangerGreeting,
   splitConversation,
   stepFox,
-} from '../foxes.js?v=g403-1';
-import { FOX_FLURRY_COUNTER, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=g403-1';
+} from '../foxes.js?v=g414-1';
+import { FOX_FLURRY_COUNTER, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=g414-1';
 
 export const FOX_FEATURE_ID = 'foxes';
 const PLAYER_NAME = 'Glitch';
@@ -731,7 +732,8 @@ function performBrush(engine, entity, { ignoreReach = false } = {}) {
     effects: { energy: result.energy, xp: result.xp, items: { Fiber: result.fibers } },
   });
   engine.floatText(entity.fox.x, entity.fox.y - 96, `+${result.fibers} Fiber`, 0xfff1c2);
-  if (entity.target) engine.say(entity.target, result.response, 2500);
+  // npc_fox.js 421-438: sendResponse('brushed', pc, slugs), the package's energy and iMG.
+  if (entity.target) engine.say(entity.target, result.response, 2500, { slugs: slugsFromEffects({ energy: result.energy, xp: result.xp }) });
   for (const { counter, amount } of result.counters) engine.achievement(counter, amount);
   if (result.fleet && !engine.unlockedAchievements.includes(FLEET_FOXER_ACHIEVEMENT)) {
     engine.grantAchievement(FLEET_FOXER_ACHIEVEMENT);

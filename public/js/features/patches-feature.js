@@ -42,7 +42,7 @@ import { ensureItem } from '../inventory.js?v=catalog-unified-7';
 import { platformYAt } from '../street-model.js';
 import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=official-ecology-7';
 import { trantStatusLabel } from '../trants.js?v=trant-harvest-2';
-import { woodTreeStatusLabel } from '../woodcutting.js?v=g403-1';
+import { woodTreeStatusLabel } from '../woodcutting.js?v=g414-1';
 import {
   GROWN_TREE_LABELS,
   SEASONED_BEANS,
@@ -62,9 +62,10 @@ import {
   soilSpawnClasses,
   soilSpritePaths,
   tickPlot,
-} from '../patches.js?v=g403-1';
+} from '../patches.js?v=g414-1';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=woodcutting-test-8';
+import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
 
 export const PATCHES_FEATURE_ID = 'patches';
 export const SOIL_GROUP_PREFIX = 'soil:';
@@ -556,7 +557,7 @@ async function startToolFx(engine, entity, verb) {
  * bubble follows the plot's current sprite but names the speaker explicitly,
  * so a Seedling's last words stay the Seedling's when it becomes a tree.
  */
-function talk(engine, entity, text, speaker) {
+function talk(engine, entity, text, speaker, slugs = null) {
   if (!entity.sprite || entity.sprite.destroyed || typeof engine.say !== 'function') return;
   if (!entity.voice) {
     entity.voice = {
@@ -567,7 +568,19 @@ function talk(engine, entity, text, speaker) {
     };
   }
   entity.voice.label = speaker;
-  engine.say(entity.voice, text, 4500);
+  engine.say(entity.voice, text, 4500, slugs ? { slugs } : null);
+}
+
+/**
+ * The slugs a finished plot verb answers with: patch.js 594-599 (dig), 720-723
+ * (tend), patch_seedling.js 213-245 (pet), trant_*_dead.js 190-205 (clear),
+ * the package's energy, mood and iMG plus a drop's currants. Planting
+ * (patch.js 757) and a failed tend (446, 727) answer with none.
+ */
+export function plotVerbSlugs(result) {
+  if (!result?.ok || !['tend', 'dig', 'pet', 'clear'].includes(result.verbId)) return null;
+  const c = result.costs || {};
+  return slugsFromEffects({ energy: -(Number(c.energy) || 0), mood: c.mood, xp: c.xp, currants: c.currants });
 }
 
 function itemLabel(classTsid, qty) {
@@ -603,10 +616,14 @@ function performVerb(engine, entity, verbId) {
     engine.floatText(x, y - 60 - lift, `+${itemLabel(out.classTsid, out.qty)}`, 0xfff4d6);
     lift += 18;
   }
-  if (result.costs?.currants) engine.floatText(x, y - 60 - lift, `+${result.costs.currants} currants`, 0xffe066);
-  if (result.costs?.energy) engine.floatText(engine.player.x, engine.player.y - 70, `-${result.costs.energy} energy`, 0xff8888);
-  if (result.costs?.mood) engine.floatText(engine.player.x + 20, engine.player.y - 90, `+${result.costs.mood} mood`, 0xffe066);
-  if (result.costs?.xp) engine.floatText(engine.player.x - 20, engine.player.y - 90, `+${result.costs.xp} iMG`, 0xb388ff);
+  // The answer's slugs show these; the floats stand in only when nothing will answer.
+  const slugs = result.response ? plotVerbSlugs(result) : null;
+  if (!slugs) {
+    if (result.costs?.currants) engine.floatText(x, y - 60 - lift, `+${result.costs.currants} currants`, 0xffe066);
+    if (result.costs?.energy) engine.floatText(engine.player.x, engine.player.y - 70, `-${result.costs.energy} energy`, 0xff8888);
+    if (result.costs?.mood) engine.floatText(engine.player.x + 20, engine.player.y - 90, `+${result.costs.mood} mood`, 0xffe066);
+    if (result.costs?.xp) engine.floatText(engine.player.x - 20, engine.player.y - 90, `+${result.costs.xp} iMG`, 0xb388ff);
+  }
   for (const row of result.counters || []) engine.achievement(row.counter, row.amount);
   if (result.verbId === 'tend' || result.verbId === 'dig') soilPuff(engine, x, y);
   engine.playSound?.({ pet: 'PET_TRANT', water: 'WATERING_CAN', dig: 'SHOVEL', tend: 'HOE', plant: 'GARDEN_PLANT' }[result.verbId] || 'ITEM_PICKUP', { volume: 0.6, jitter: 0.05 });
@@ -616,7 +633,7 @@ function performVerb(engine, entity, verbId) {
   // GSJS: the seedling answers a planting or petting; the patch answers the rest.
   const speaker = result.verbId === 'pet' || result.verbId === 'plant' ? 'Seedling' : plotLabel(entity.plot);
   const after = () => {
-    if (result.response) talk(engine, entity, result.response, speaker);
+    if (result.response) talk(engine, entity, result.response, speaker, slugs);
   };
   if (rebuild) {
     buildView(engine, entity, myGeneration, { grow: entity.plot.stage === 'tree' }).then(() => {

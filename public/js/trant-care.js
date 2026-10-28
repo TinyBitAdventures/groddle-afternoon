@@ -159,7 +159,7 @@ export function performTrantCare(state, classId, kind, ctx = {}) {
     };
   }
   // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
-  loseEnergy(pc, profile.energyCost);
+  const energyLost = loseEnergy(pc, profile.energyCost);
   // Heavy Flow (lightgreenthumb_tool_wear): the Watering Can wears at half rate.
   const upgrades = ctx.upgrades || ctx.imaginationUpgrades || pc?.imaginationUpgrades || [];
   const wear = kind === 'water'
@@ -193,7 +193,8 @@ export function performTrantCare(state, classId, kind, ctx = {}) {
     profile,
     toolUse,
     fruitAdded,
-    effects: { energy: -profile.energyCost, mood, xp },
+    // slugs.energy is what metabolics_lose_energy took, 0 while dead (inc_skill_packages.js 487-488).
+    effects: { energy: energyLost ? -energyLost : 0, mood, xp },
     msg: `Thanks for ${kind === 'water' ? 'watering' : 'petting'}!`,
   };
 }

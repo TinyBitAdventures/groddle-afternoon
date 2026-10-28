@@ -46,6 +46,7 @@
  *   rookNextAttack, rookArmor, rookBalmPoints, rookDemo, rookArt, rookStats.
  */
 
+import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-7';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g405-1';
 import { nearestSurfaceY } from '../walk-surface.js';
@@ -1660,10 +1661,20 @@ function revive(engine, target, { balm = false } = {}) {
   const mood = soloCost(ROOK_SOURCE.reviveMood);
   const r = applyReviveDose(s, key, { balm });
   if (!r.ok) return false;
+  const energyBefore = Number(engine.pc.energy) || 0;
+  const moodBefore = Number(engine.pc.mood) || 0;
   const xp = grant(engine, { xp: r.xp, energy: -energy, mood: -mood });
   const label = rookLabel(target);
   const line = rookResponse(target.classId, r.response, Math.random, PLAYER_LABEL);
-  if (line) engine.say(target, line, 4000);
+  // include/rook.js 183-206: the revived_* line carries the iMG, the energy and mood the dose
+  // actually cost, and on the last dose the favor with every Giant.
+  const slugs = slugsFromEffects({
+    xp,
+    energy: (Number(engine.pc.energy) || 0) - energyBefore,
+    mood: (Number(engine.pc.mood) || 0) - moodBefore,
+    favor: r.done && r.favor ? [{ giant: 'all', points: r.favor }] : 0,
+  });
+  if (line) engine.say(target, line, 4000, { slugs });
   save.stats.revives += 1;
   if (r.done) {
     const favor = engine.pc.giantFavor;

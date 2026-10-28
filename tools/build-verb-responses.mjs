@@ -8,10 +8,13 @@
  *   node tools/build-verb-responses.mjs [path/to/glitch-GameServerJS] [--check]
  *
  * Only the verb keys the remake plays are kept (pet, nibble, squeeze,
- * massage, milk, water, mining). Harvest talk for the living trees is in
- * js/trants.js, the wood tree's in js/woodcutting.js. The twelve rock
- * classes share one table (include/mining.js keys); the build throws if
- * any rock's table differs.
+ * massage, milk, water, mining, shrine donations, barnacle and ice
+ * scraping, peat harvests, dirt digging). Harvest talk for the living trees
+ * is in js/trants.js, the wood tree's in js/woodcutting.js, the patches' in
+ * js/patches.js. The twelve rock classes share one table (include/mining.js
+ * keys) and the three peat bogs another; the build throws if one differs.
+ * Each Giant's four shrines (Groddle, Firebog, Ix, Uralia) share their
+ * Giant's table; npc_shrine_<giant>.js is the one read.
  */
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
@@ -25,6 +28,11 @@ const OUT = join(ROOT, 'public/js/verb-responses-data.js');
 
 const TREES = ['trant_fruit', 'trant_egg', 'trant_bean', 'trant_bubble', 'trant_spice', 'trant_gas', 'wood_tree'];
 const ROCKS = ['beryl', 'dullite', 'sparkly', 'metal'].flatMap((r) => [1, 2, 3].map((n) => `rock_${r}_${n}`));
+const PEATS = ['peat_1', 'peat_2', 'peat_3'];
+/** js/shrines.js GIANTS ids; the shrine classes are npc_shrine_<id>. */
+const SHRINE_GIANTS = ['alph', 'cosma', 'friendly', 'grendaline', 'humbaba', 'lem', 'mab', 'pot', 'spriggan', 'ti', 'zille'];
+const SHRINES = SHRINE_GIANTS.map((g) => `npc_shrine_${g}`);
+const RESOURCE_NODES = ['mortar_barnacle', 'ice_knob', 'dirt_pile'];
 
 /** Which response keys each class keeps (a RegExp over the key). */
 const KEEP = {
@@ -33,6 +41,11 @@ const KEEP = {
   npc_butterfly: /^(massage|milk)_/,
   ...Object.fromEntries(TREES.map((c) => [c, /^(pet|water)_/])),
   rock: /^(mine_|gem_drop_|rock_disappeared$|metal_rock_disappeared$)/,
+  ...Object.fromEntries(SHRINES.map((c) => [c, /^(donated_item_tier\d|super_donation_)/])),
+  mortar_barnacle: /^scrape/,
+  ice_knob: /^scrape/,
+  dirt_pile: /^(dig_|dirt_pile_gone$)/,
+  peat_1: /^harvest_peat_/,
 };
 
 function fail(msg) {
@@ -83,7 +96,7 @@ export function buildVerbResponses(gsjs = GSJS) {
     if (!Object.keys(out).length) fail(`${cls}: no kept keys`);
     return out;
   };
-  for (const cls of ['npc_piggy', 'npc_chicken', 'npc_butterfly', ...TREES]) {
+  for (const cls of ['npc_piggy', 'npc_chicken', 'npc_butterfly', ...TREES, ...SHRINES, ...RESOURCE_NODES]) {
     const { all, source } = readResponses(gsjs, cls);
     pools[cls] = keep(cls, all, KEEP[cls]);
     sources[cls] = source;
@@ -100,6 +113,18 @@ export function buildVerbResponses(gsjs = GSJS) {
     }
   }
   pools.rock = rock;
+  let peat = null;
+  for (const cls of PEATS) {
+    const { all, source } = readResponses(gsjs, cls);
+    const kept = keep(cls, all, KEEP.peat_1);
+    if (!peat) {
+      peat = kept;
+      sources.peat_1 = `${source} (and peat_2, peat_3)`;
+    } else if (JSON.stringify(kept) !== JSON.stringify(peat)) {
+      fail(`${cls}: peat responses differ from ${PEATS[0]}`);
+    }
+  }
+  pools.peat_1 = peat;
   return { pools, sources };
 }
 

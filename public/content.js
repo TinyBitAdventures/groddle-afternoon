@@ -15,7 +15,7 @@ import {
 import {
   quoteTrantCare,
   performTrantCare,
-} from './js/trant-care.js?v=g403-1';
+} from './js/trant-care.js?v=g414-1';
 import {
   listPlantableSeeds,
   waterAllPlots,
@@ -44,7 +44,7 @@ import {
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=g403-1';
+} from './js/animals.js?v=g414-1';
 import {
   quoteAnimalKinship,
   performAnimalKinship,
@@ -61,7 +61,7 @@ import {
   quoteWoodTreeHarvest,
   harvestWoodTree,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=g403-1';
+} from './js/woodcutting.js?v=g414-1';
 import { findWorkingRookTool } from './js/rook-woods.js?v=rook-woods-9';
 import {
   HERDKEEPING,
@@ -72,7 +72,7 @@ import {
   namingVerbs,
   queuePlops,
   startIncubation,
-} from './js/animal-husbandry.js?v=g403-1';
+} from './js/animal-husbandry.js?v=g414-1';
 import { loseEnergy, metabolicGain, moodMax } from './js/metabolics.js';
 import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js';
@@ -80,7 +80,7 @@ import { levelInfoForXp } from './js/progression.js?v=progression-1';
 import { getGameDayKey } from './js/game-day.js?v=dametime-4';
 import { ITEM_CATALOG } from './js/inventory.js?v=catalog-unified-7';
 import { slugsFromEffects } from './js/speech-slugs.js?v=g412-1';
-import { animalResponseKey, trantCareResponseKey, rockResponseKey, verbResponse } from './js/verb-responses.js?v=g412-1';
+import { animalResponseKey, failureResponseKey, trantCareResponseKey, rockResponseKey, verbResponse } from './js/verb-responses.js?v=g414-1';
 
 /** Naming / capture context for an animal target (the back yard counts as yours). */
 function husbandryCtx(ctx) {
@@ -1076,9 +1076,15 @@ export function runVerb(target, verbId, ctx) {
     }
     return care;
   };
+  // A verb that missed its success roll: the source's failure line, no slugs, marked failed.
+  const failedSpeech = (verb, speaker = target.label || '') => {
+    const said = verbResponse(classId, failureResponseKey(classId, verb), { rng: ctx.talkRng || Math.random, speaker });
+    return said ? { ...said, failed: true } : null;
+  };
   // The animal's answer to a finished verb, with that verb's slugs (sendResponse(key, pc, slugs)).
   const kinshipSpeech = (care, verb, bonus) => {
-    if (!care.ok) return null;
+    // A missed success roll answers without slugs (npc_piggy.js 1774, 1676).
+    if (!care.ok) return care.reason === 'success_rate' ? failedSpeech(verb) : null;
     const key = animalResponseKey(classId, verb, {
       learned: ctx.skills?.learned || ctx.learned || [],
       achievements: ctx.achievements || [],
@@ -1281,10 +1287,15 @@ export function runVerb(target, verbId, ctx) {
           slugs: slugsFromEffects(effects),
           speaker: TRANT_META[classId]?.label || 'Wood Tree',
         })
-      : null;
+      : care.attempted && care.reason === 'failed'
+        ? failedSpeech('pet', TRANT_META[classId]?.label || 'Wood Tree')
+        : null;
     effects._activityBase = care.ok
       ? `You pet a ${TRANT_META[classId]?.label || 'Wood Tree'}.`
-      : `You try to pet a ${TRANT_META[classId]?.label || 'Wood Tree'}.`;
+      : speech
+        // include/trants.js 94-103: the failure's activity line, the tree's line in the bubble.
+        ? care.msg
+        : `You try to pet a ${TRANT_META[classId]?.label || 'Wood Tree'}.`;
     if (!speech) msgs.push(care.msg || 'Could not pet this tree.');
     finalizeMsgs(msgs, effects);
     return {
@@ -1319,10 +1330,15 @@ export function runVerb(target, verbId, ctx) {
           slugs: slugsFromEffects(effects),
           speaker: TRANT_META[classId]?.label || 'Wood Tree',
         })
-      : null;
+      : care.attempted && care.reason === 'failed'
+        ? failedSpeech('water', TRANT_META[classId]?.label || 'Wood Tree')
+        : null;
     effects._activityBase = care.ok
       ? `You water a ${TRANT_META[classId]?.label || 'Wood Tree'}.`
-      : `You try to water a ${TRANT_META[classId]?.label || 'Wood Tree'}.`;
+      : speech
+        // include/trants.js 94-103: the failure's activity line, the tree's line in the bubble.
+        ? care.msg
+        : `You try to water a ${TRANT_META[classId]?.label || 'Wood Tree'}.`;
     if (!speech) msgs.push(care.msg || 'Could not water this tree.');
     finalizeMsgs(msgs, effects);
     return {
