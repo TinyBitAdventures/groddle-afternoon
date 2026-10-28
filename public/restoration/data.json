@@ -2645,9 +2645,14 @@
   ]
  },
  "git": {
-  "commits": 653,
+  "commits": 654,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-28",
+    "kind": "fix",
+    "text": "Every Tiny Speck sound we hold plays its original recording again"
+   },
    {
     "date": "2026-10-27",
     "kind": "fix",
@@ -2762,11 +2767,6 @@
     "date": "2026-10-27",
     "kind": "fix",
     "text": "Restoration rows keep Play inside the card when a name carries the In multiplayer chip"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "improve",
-    "text": "The Code page's contributing links are repo badges"
    }
   ]
  },
