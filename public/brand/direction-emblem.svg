@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <title>Direction explored: a stitched emblem with a tree and the sun</title>
+  <!-- The Groddle Afternoon mark: our own drawing (tools/brand/build.mjs writes this file). -->
+  <defs>
+    <clipPath id="ga-e-disc"><circle cx="32" cy="32" r="24"/></clipPath>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="#30462c"/>
+  <circle cx="32" cy="32" r="27" fill="none" stroke="#e3b04a" stroke-width="1.6" stroke-dasharray="3.2 2.4" stroke-linecap="round"/>
+  <g clip-path="url(#ga-e-disc)">
+    <rect x="8" y="8" width="48" height="48" fill="#fbfaf2"/>
+    <circle cx="40" cy="33" r="9" fill="#e58b3f"/>
+    <path d="M8 41c8-5 16-6 24-3s16 3 24-1v19H8Z" fill="#79bd64"/>
+    <path d="M23 24c-5 0-8 4-8 8.5c0 3.6 2.6 6.5 6 7.2V44h4v-4.3c3.4-0.7 6-3.6 6-7.2C31 28 28 24 23 24Z" fill="#4f8a3f"/>
+    <path d="M8 48c9-3.5 20-4.5 30-2c7 1.7 12 1.8 18 0.5V56H8Z" fill="#4f8a3f"/>
+  </g>
+</svg>

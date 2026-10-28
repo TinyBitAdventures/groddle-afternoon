@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <title>Groddle Afternoon</title>
+  <!-- The Groddle Afternoon mark: our own drawing (tools/brand/build.mjs writes this file). -->
+  <rect width="64" height="64" fill="#dcefc9"/>
+  <g transform="translate(4.14 5.07) scale(0.8571)">
+    <defs>
+      <clipPath id="ga-a-arch"><path d="M8 28a24 24 0 0 1 48 0v26.5a5.5 5.5 0 0 1-5.5 5.5h-37A5.5 5.5 0 0 1 8 54.5Z"/></clipPath>
+      <linearGradient id="ga-a-sky" x1="0" y1="4" x2="0" y2="44" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#e3b04a"/>
+        <stop offset="1" stop-color="#e58b3f"/>
+      </linearGradient>
+    </defs>
+    <g clip-path="url(#ga-a-arch)">
+      <rect x="8" y="4" width="48" height="56" fill="url(#ga-a-sky)"/>
+      <circle cx="39" cy="29.5" r="10" fill="#fbfaf2"/>
+      <path d="M8 40.5c6-4.5 12-5.5 18-3.5c6 2 10 4.5 16 4.5c5 0 9-2 14-4.5V60H8Z" fill="#79bd64"/>
+      <circle cx="18.5" cy="30.6" r="5" fill="#4f8a3f"/>
+      <path d="M17.6 32h1.8v5.9a0.6 0.6 0 0 1-0.6 0.6h-0.6a0.6 0.6 0 0 1-0.6-0.6Z" fill="#4f8a3f"/>
+      <path d="M8 51c8-4 17-6.5 27-6.5c8 0 14 2.5 21 5.5V60H8Z" fill="#4f8a3f"/>
+      <path d="M19.5 60C27 55 30.5 50 35.3 44.6h1.4C35.2 49.5 33.2 55 36 60Z" fill="#dcefc9"/>
+    </g>
+  </g>
+</svg>

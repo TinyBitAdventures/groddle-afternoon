@@ -2645,9 +2645,14 @@
   ]
  },
  "git": {
-  "commits": 643,
+  "commits": 644,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "Header dropdown under Project on every page, opened by hover, click or keyboard"
+   },
    {
     "date": "2026-10-27",
     "kind": "improve",
@@ -2762,14 +2767,9 @@
     "date": "2026-10-27",
     "kind": "new",
     "text": "Snowed In, Ethereal Endeavour and Martleby Hare, rebuilt from players' pictures"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "improve",
-    "text": "The Code page's words sew in the textile chain: checkpoints, patches and two badges for contributors"
    }
   ]
  },
- "tests": 380,
+ "tests": 381,
  "generatedAt": "2026-10-27"
 }
