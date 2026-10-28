@@ -2640,9 +2640,14 @@
   ]
  },
  "git": {
-  "commits": 686,
+  "commits": 687,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-28",
+    "kind": "fix",
+    "text": "Street art in front layers draws over your Glitch again"
+   },
    {
     "date": "2026-10-28",
     "kind": "fix",
@@ -2757,14 +2762,9 @@
     "date": "2026-10-27",
     "kind": "improve",
     "text": "Smaller speech bubbles, a Rook call bubble that fits its words, and award screens over prompts"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "fix",
-    "text": "The item catalog's dropdowns draw their arrow inset from the pill's round end"
    }
   ]
  },
- "tests": 396,
+ "tests": 397,
  "generatedAt": "2026-10-28"
 }

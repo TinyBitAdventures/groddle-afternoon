@@ -79,6 +79,8 @@ import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState
 import { levelInfoForXp } from './js/progression.js?v=progression-1';
 import { getGameDayKey } from './js/game-day.js?v=dametime-4';
 import { ITEM_CATALOG } from './js/inventory.js?v=catalog-unified-7';
+import { slugsFromEffects } from './js/speech-slugs.js?v=g412-1';
+import { animalResponseKey, trantCareResponseKey, rockResponseKey, verbResponse } from './js/verb-responses.js?v=g412-1';
 
 /** Naming / capture context for an animal target (the back yard counts as yours). */
 function husbandryCtx(ctx) {
@@ -1074,17 +1076,33 @@ export function runVerb(target, verbId, ctx) {
     }
     return care;
   };
+  // The animal's answer to a finished verb, with that verb's slugs (sendResponse(key, pc, slugs)).
+  const kinshipSpeech = (care, verb, bonus) => {
+    if (!care.ok) return null;
+    const key = animalResponseKey(classId, verb, {
+      learned: ctx.skills?.learned || ctx.learned || [],
+      achievements: ctx.achievements || [],
+      bonus,
+    });
+    return verbResponse(classId, key, {
+      rng: ctx.talkRng || Math.random,
+      slugs: slugsFromEffects(effects),
+      speaker: target.label || '',
+    });
+  };
 
   // --- piggy ---
   if (classId === 'npc_piggy' && verbId === 'pet') {
     const care = performKinship('pet');
+    const speech = kinshipSpeech(care, 'pet', false);
     effects._activityBase = care.ok ? 'You pet a Piggy.' : 'You try to pet a Piggy.';
-    msgs.push(care.ok ? '♥ oink' : care.msg);
+    if (!speech) msgs.push(care.ok ? '♥ oink' : care.msg);
     finalizeMsgs(msgs, effects);
     return {
       ok: care.ok,
       msgs,
       effects,
+      speech,
       anim: 'pet',
       animalChanged: care.ok,
       animalKinshipAttempted: care.attempted,
@@ -1097,15 +1115,19 @@ export function runVerb(target, verbId, ctx) {
     for (const [itemId, amount] of Object.entries(drop?.items || {})) {
       effects.items[itemId] = (effects.items[itemId] || 0) + amount;
     }
+    const speech = kinshipSpeech(care, 'nibble', care.superHarvest);
     effects._activityBase = care.ok ? 'You nibble a Piggy.' : 'You try to nibble a Piggy.';
-    msgs.push(care.ok
-      ? `${care.superHarvest ? 'Super Harvest! ' : ''}The Piggy looks philosophical about it.`
-      : care.msg);
+    if (!speech) {
+      msgs.push(care.ok
+        ? `${care.superHarvest ? 'Super Harvest! ' : ''}The Piggy looks philosophical about it.`
+        : care.msg);
+    }
     finalizeMsgs(msgs, effects);
     return {
       ok: care.ok,
       msgs,
       effects,
+      speech,
       anim: 'nibble',
       animalChanged: care.ok,
       animalKinshipAttempted: care.attempted,
@@ -1124,13 +1146,15 @@ export function runVerb(target, verbId, ctx) {
     for (const [itemId, amount] of Object.entries(drop?.items || {})) {
       effects.items[itemId] = (effects.items[itemId] || 0) + amount;
     }
+    const speech = kinshipSpeech(care, 'squeeze', care.superHarvest);
     effects._activityBase = care.ok ? 'You squeeze a Chicken.' : 'You try to squeeze a Chicken.';
-    msgs.push(care.ok ? `${care.superHarvest ? 'Super Harvest! ' : ''}Buk!` : care.msg);
+    if (!speech) msgs.push(care.ok ? `${care.superHarvest ? 'Super Harvest! ' : ''}Buk!` : care.msg);
     finalizeMsgs(msgs, effects);
     return {
       ok: care.ok,
       msgs,
       effects,
+      speech,
       anim: 'squeeze',
       animalChanged: care.ok,
       animalKinshipAttempted: care.attempted,
@@ -1154,7 +1178,8 @@ export function runVerb(target, verbId, ctx) {
       msgs,
       effects,
       animalChanged: true,
-      speech: { speaker: target.label || 'Chicken', text: butter.bubble, durationMs: butter.bubbleMs },
+      // npc_chicken.js 225-230: slugs xp, mood, energy.
+      speech: { speaker: target.label || 'Chicken', text: butter.bubble, durationMs: butter.bubbleMs, slugs: slugsFromEffects(effects) },
     };
   }
   if (classId === 'npc_chicken' && verbId === 'talk_to') {
@@ -1164,15 +1189,19 @@ export function runVerb(target, verbId, ctx) {
   // --- butterfly ---
   if (classId === 'npc_butterfly' && verbId === 'massage') {
     const care = performKinship('massage');
+    const speech = kinshipSpeech(care, 'massage', care.bonusTriggered);
     effects._activityBase = care.ok ? 'You massage a Butterfly.' : 'You try to massage a Butterfly.';
-    msgs.push(care.ok
-      ? `${care.bonusTriggered ? 'Expert touch! ' : ''}The Butterfly shimmers appreciatively.`
-      : care.msg);
+    if (!speech) {
+      msgs.push(care.ok
+        ? `${care.bonusTriggered ? 'Expert touch! ' : ''}The Butterfly shimmers appreciatively.`
+        : care.msg);
+    }
     finalizeMsgs(msgs, effects);
     return {
       ok: care.ok,
       msgs,
       effects,
+      speech,
       anim: 'massage',
       animalChanged: care.ok,
       animalKinshipAttempted: care.attempted,
@@ -1181,15 +1210,19 @@ export function runVerb(target, verbId, ctx) {
   }
   if (classId === 'npc_butterfly' && verbId === 'milk') {
     const care = performKinship('milk');
+    const speech = kinshipSpeech(care, 'milk', care.superHarvest);
     effects._activityBase = care.ok ? 'You milk a Butterfly.' : 'You try to milk a Butterfly.';
-    msgs.push(care.ok
-      ? `${care.superHarvest ? 'Super Harvest! ' : ''}The Butterfly offers its most precious essence.`
-      : care.msg);
+    if (!speech) {
+      msgs.push(care.ok
+        ? `${care.superHarvest ? 'Super Harvest! ' : ''}The Butterfly offers its most precious essence.`
+        : care.msg);
+    }
     finalizeMsgs(msgs, effects);
     return {
       ok: care.ok,
       msgs,
       effects,
+      speech,
       anim: 'milk',
       animalChanged: care.ok,
       animalKinshipAttempted: care.attempted,
@@ -1218,7 +1251,8 @@ export function runVerb(target, verbId, ctx) {
       effects,
       animalChanged: true,
       wisdom: sung.wisdom,
-      speech: { speaker: target.label || 'Butterfly', text: sung.bubble, durationMs: sung.bubbleMs },
+      // npc_butterfly.js 661-677: slugs xp, energy.
+      speech: { speaker: target.label || 'Butterfly', text: sung.bubble, durationMs: sung.bubbleMs, slugs: slugsFromEffects(effects) },
     };
   }
   if (classId === 'npc_butterfly' && verbId === 'talk_to') {
@@ -1240,15 +1274,24 @@ export function runVerb(target, verbId, ctx) {
       effects.img += care.effects.xp || 0;
       effects.xp += care.effects.xp || 0;
     }
+    // include/trants.js / wood_tree.js: the tree answers with the package's slugs.
+    const speech = care.ok
+      ? verbResponse(classId, trantCareResponseKey('pet', { learned: ctx.skills?.learned || ctx.learned || [] }), {
+          rng: ctx.talkRng || Math.random,
+          slugs: slugsFromEffects(effects),
+          speaker: TRANT_META[classId]?.label || 'Wood Tree',
+        })
+      : null;
     effects._activityBase = care.ok
       ? `You pet a ${TRANT_META[classId]?.label || 'Wood Tree'}.`
       : `You try to pet a ${TRANT_META[classId]?.label || 'Wood Tree'}.`;
-    msgs.push(care.msg || 'Could not pet this tree.');
+    if (!speech) msgs.push(care.msg || 'Could not pet this tree.');
     finalizeMsgs(msgs, effects);
     return {
       ok: care.ok,
       msgs,
       effects,
+      speech,
       anim: 'pet',
       trantCareChanged: care.ok,
       trantCareAttempted: care.attempted === true,
@@ -1269,15 +1312,24 @@ export function runVerb(target, verbId, ctx) {
       effects.img += care.effects.xp || 0;
       effects.xp += care.effects.xp || 0;
     }
+    // include/trants.js / wood_tree.js: the tree answers with the package's slugs.
+    const speech = care.ok
+      ? verbResponse(classId, trantCareResponseKey('water', { learned: ctx.skills?.learned || ctx.learned || [] }), {
+          rng: ctx.talkRng || Math.random,
+          slugs: slugsFromEffects(effects),
+          speaker: TRANT_META[classId]?.label || 'Wood Tree',
+        })
+      : null;
     effects._activityBase = care.ok
       ? `You water a ${TRANT_META[classId]?.label || 'Wood Tree'}.`
       : `You try to water a ${TRANT_META[classId]?.label || 'Wood Tree'}.`;
-    msgs.push(care.msg || 'Could not water this tree.');
+    if (!speech) msgs.push(care.msg || 'Could not water this tree.');
     finalizeMsgs(msgs, effects);
     return {
       ok: care.ok,
       msgs,
       effects,
+      speech,
       anim: 'water',
       trantCareChanged: care.ok,
       trantCareAttempted: care.attempted === true,
@@ -1318,8 +1370,10 @@ export function runVerb(target, verbId, ctx) {
     // inc_skill_packages.js 524: the mood bonus is metabolics_add_mood,
     // nothing while dead (inc_metabolics.js 79-86).
     if (result.moodBonus > 0 && metabolicGain('mood').ok) {
-      pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + result.moodBonus);
-      effects.mood += result.moodBonus;
+      const moodBefore = Number(pc.mood) || 0;
+      pc.mood = Math.min(moodMax(pc), moodBefore + result.moodBonus);
+      // apiInc's change: what landed under the tank (the slug shows it).
+      effects.mood += Math.max(0, pc.mood - moodBefore);
     }
     if (result.xpBonus) {
       // inc_skill_packages.js 532 (gardening_harvest): xp_bonus takes the mood bonus.
@@ -1350,11 +1404,13 @@ export function runVerb(target, verbId, ctx) {
       effects,
       anim: 'harvest',
       harvest: result,
+      // include/trants.js 380-416: harvest talkbacks carry the package's slugs.
       speech: result.reaction
         ? {
             speaker: TRANT_META[classId]?.label || 'Tree',
             text: result.reaction,
             durationMs: 4200,
+            slugs: slugsFromEffects(effects),
           }
         : null,
     };
@@ -1375,7 +1431,8 @@ export function runVerb(target, verbId, ctx) {
       anim: 'harvest',
       woodTreeChanged: true,
       woodHarvest: result,
-      speech: { speaker: 'Wood Tree', text: result.line, durationMs: 4600 },
+      // wood_tree.js 761: sendResponse(resp_type, pc, ret.slugs).
+      speech: { speaker: 'Wood Tree', text: result.line, durationMs: 4600, slugs: slugsFromEffects(effects) },
     };
   }
   if (TREE_IDS.has(classId) && verbId === 'talk_to') {
@@ -1463,10 +1520,17 @@ export function runVerb(target, verbId, ctx) {
     msgs.push(...(r.msgs || []));
     finalizeMsgs(msgs, effects);
     s.rock = rock;
+    // include/mining.js 420-495: the rock answers the swing with its slugs.
+    const speech = verbResponse(classId, rockResponseKey(rock.rockType || ROCK_CATALOG[classId]?.rockType, r.got, { cleared: r.cleared, gem: r.gem }), {
+      rng: ctx.talkRng || Math.random,
+      slugs: slugsFromEffects(effects),
+      speaker: ROCK_CATALOG[classId]?.label || 'Rock',
+    });
     return {
       ok: true,
       msgs,
       effects,
+      speech,
       anim: 'mine',
       miningChanged: true,
       rock,

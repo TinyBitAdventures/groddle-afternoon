@@ -2,7 +2,7 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g403-1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g412-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-237';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
@@ -832,6 +832,7 @@ import { GAME_MODE, isSolo } from './js/game-mode.js?v=mp2-1';
 import { saveStore } from './js/save-store.js?v=mp2-2';
 import { isNewMultiplayerPlayer, newPlayerInventory, newPlayerStats } from './js/new-player.js?v=mp5-1';
 import { clearSpeechOfBox, giveArtHeight, hudColumnBox, liftOverAvatars, placeSpeechTail, placeSpeechTip, speechOffsetFor, speechTailPoints } from './js/speech-placement.js?v=g357-1';
+import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=g412-1';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -5195,8 +5196,8 @@ function showSpeechBubble(target, speech) {
     fontWeight: '700',
     letterSpacing: 0.4,
   } });
-  // Stat slugs under the line (garden talkbacks: iMG, mood, energy pills, as sendBubble showed them).
-  const slugRow = speechSlugRow(speech.slugs);
+  // Reward slugs under the line (LisChatBubbleManager.as 57-90, js/speech-slugs.js).
+  const slugRow = speechSlugRow(speech.slugs, 256);
   // G357: as wide as the line, as the client's was (ChatBubble.as MIN_WIDTH 50, MAX_WIDTH 276).
   // Padding: ChatBubble.as base_padd 7, growing a little with the text (297, 352).
   const width = clamp(Math.max(body.width, named ? speaker.width : 0, slugRow?.width || 0) + 20, 60, 280);
@@ -5239,45 +5240,153 @@ function showSpeechBubble(target, speech) {
   speechBubbles.push(bubble);
   fxLayer.addChild(bubble);
   positionSpeechBubble(bubble);
+  if (slugRow) animateSpeechSlugs(slugRow);
   if (app?.canvas) {
     app.canvas.dataset.speechSpeaker = String(speech.speaker || target.label || '');
     app.canvas.dataset.lastSpeech = text;
-    app.canvas.dataset.lastSpeechSlugs = speech.slugs ? Object.entries(speech.slugs).map(([k, v]) => `${k}=${v}`).join(',') : '';
+    app.canvas.dataset.lastSpeechSlugs = formatRawSlugs(speech.slugs);
+    // The slugs as drawn, in the client's order: "imagination:+7,energy:-3,mood:+4".
+    app.canvas.dataset.lastSpeechSlugRow = slugRow ? formatSlugList(slugRow._slugList) : '';
+    // The last bubble that had slugs (a later slugless line, a Jack-O-Lantern's, keeps it).
+    if (slugRow) app.canvas.dataset.lastSlugBubble = `${target.classId || ''}|${app.canvas.dataset.lastSpeechSlugRow}`;
     app.canvas.dataset.speechBubbles = String(speechBubbles.length);
   }
   return bubble;
 }
 
-/** { xp, energyGain, mood, energy } -> "+7 iMG" "+60 energy" "+4 mood" "-3 energy" pills (energy is spent, so negative; energyGain is gained). */
-function speechSlugRow(slugs) {
-  if (!slugs) return null;
-  const pills = [
-    ['xp', '+', 'iMG', 0xe9e1f7, 0x6a4c9c],
-    // G364: energy gained (the new day's refill, Slug.as 161 '+' for an amount above 0), before mood as stats_today lists it.
-    // Gains and losses take the client's own fills (Slug.as 50-51 energy/mood_pos_bg_color 0xc1d76e,
-    // 58 energy_neg_bg_color 0xefc6c1; separate slug_energy_pos/neg art, Assets.as 677-680).
-    ['energyGain', '+', 'energy', 0xc1d76e, 0x3f5c14],
-    ['mood', '+', 'mood', 0xc1d76e, 0x3f5c14],
-    ['energy', '-', 'energy', 0xefc6c1, 0xa2382c],
-  ].filter(([k]) => Number(slugs[k]) > 0);
-  if (!pills.length) return null;
-  const row = new PIXI.Container();
-  let x = 0;
-  for (const [k, sign, unit, bgColor, fg] of pills) {
-    const t = new PIXI.Text({ text: `${sign}${Math.round(slugs[k])} ${unit}`, style: {
-      fontFamily: 'Trebuchet MS, sans-serif', fontSize: 12, fontWeight: '700', fill: fg,
-    } });
-    const pill = new PIXI.Graphics();
-    pill.roundRect(0, 0, t.width + 14, t.height + 4, (t.height + 4) / 2).fill({ color: bgColor });
-    t.x = 7;
-    t.y = 2;
+/**
+ * The bubble's reward slugs (Slug.as, LisChatBubbleManager.as 57-90): per
+ * slug a white-bordered pill in the type's fill, the signed amount, then the
+ * icon (vector redraws of the client's slug_*.png, js/speech-slugs.js).
+ * Takes { xp|imagination, energy (spent), energyGain, mood, moodLoss,
+ * currants, favor }; returns null when nothing moved.
+ */
+function speechSlugRow(slugs, maxWidth = 256) {
+  const list = speechSlugList(slugs);
+  if (!list.length) return null;
+  const L = SLUG_LAYOUT;
+  const pills = list.map((slug) => {
+    const neg = slug.amount < 0;
+    const style = SLUG_STYLES[slug.type];
+    // Slug.as 205: a 1 px white drop shadow straight down (white1px90Degrees_DropShadowA).
+    const textStyle = {
+      fontFamily: 'Trebuchet MS, sans-serif', fontSize: L.fontSize, fontWeight: '700',
+      fill: neg ? style.textNeg : style.text,
+      dropShadow: { color: 0xffffff, alpha: 0.9, blur: 0, distance: 1, angle: Math.PI / 2 },
+    };
+    const sign = new PIXI.Text({ text: slugSign(slug.amount), style: textStyle });
+    const num = new PIXI.Text({ text: slugNumber(slug.amount), style: textStyle });
+    const box = slugBox(slug.type, sign.width, num.width);
+    const bg = new PIXI.Graphics();
+    slugPillPath(bg, box.width, box.height, L.cornerRadius, box.rightRadius)
+      .fill({ color: neg ? style.neg : style.pos })
+      .stroke({ width: L.borderWidth, color: L.borderColor });
+    sign.x = box.signX;
+    num.x = box.numberX;
+    sign.y = num.y = Math.round((box.height - num.height) / 2);
+    const icon = drawSlugIcon(new PIXI.Graphics(), slug.type, neg);
+    icon.x = box.iconX;
+    icon.y = box.iconY;
     const c = new PIXI.Container();
-    c.addChild(pill, t);
-    c.x = x;
-    row.addChild(c);
-    x += t.width + 14 + 6;
-  }
+    c.addChild(bg, sign, num, icon);
+    c._slug = { ...slug, sign, num, box };
+    return c;
+  });
+  const placed = layoutSlugRow(pills.map((p) => p._slug.box.width), maxWidth);
+  const row = new PIXI.Container();
+  pills.forEach((pill, i) => {
+    pill.x = placed.at[i].x;
+    pill.y = placed.at[i].y;
+    row.addChild(pill);
+  });
+  row._slugList = list;
   return row;
+}
+
+/** The HUD point a slug's amount flies to, in client pixels (SlugAnimator.as 110-132). */
+function slugFlightTarget(type) {
+  const id = SLUG_TARGETS[type];
+  let el = id ? document.getElementById(id) : null;
+  if (el && (type === 'mood' || type === 'energy')) el = el.closest('.meta-ring') || el;
+  if (el && el.offsetParent !== null) {
+    const r = el.getBoundingClientRect();
+    if (r.width || r.height) return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }
+  // "when in doubt, animate it to the avatar" (128-130).
+  if (!player || !fxLayer || fxLayer.destroyed || !app?.canvas) return null;
+  const c = app.canvas.getBoundingClientRect();
+  const p = fxLayer.toGlobal(new PIXI.Point(player.x, player.y - 40));
+  return { x: c.left + p.x * (c.width / VIEW_W), y: c.top + p.y * (c.height / VIEW_H) };
+}
+
+/**
+ * SlugAnimator.as 57-156: one slug at a time (the first after 0.4 s), its
+ * amount growing to 3x over 0.4 s, then flying to its stat and shrinking to
+ * 0.4x over 0.3 s, the slug's own text at half alpha meanwhile. The flying
+ * amount is a page element so it stays sharp at any pixel ratio.
+ */
+function animateSpeechSlugs(row) {
+  const pills = row.children.filter((c) => c._slug);
+  if (!pills.length || typeof document === 'undefined') return;
+  const reduced = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) return;
+  const A = SLUG_ANIMATION;
+  const flyNext = (i, delay) => {
+    const pill = pills[i];
+    if (!pill || pill.destroyed || !app?.canvas) return;
+    const slug = pill._slug;
+    setTimeout(() => {
+      if (pill.destroyed || !app?.canvas) return;
+      const to = slugFlightTarget(slug.type);
+      if (!to) {
+        flyNext(i + 1, 0);
+        return;
+      }
+      const c = app.canvas.getBoundingClientRect();
+      const mid = pill.toGlobal(new PIXI.Point((slug.box.signX + slug.box.iconX) / 2, slug.box.height / 2));
+      const from = { x: c.left + mid.x * (c.width / VIEW_W), y: c.top + mid.y * (c.height / VIEW_H) };
+      const style = SLUG_STYLES[slug.type];
+      const hex = (n) => `#${n.toString(16).padStart(6, '0')}`;
+      const el = document.createElement('div');
+      el.className = 'slug-flight';
+      el.textContent = `${slugSign(slug.amount)}${slugNumber(slug.amount)}`;
+      el.setAttribute('aria-hidden', 'true');
+      Object.assign(el.style, {
+        position: 'fixed', left: '0', top: '0', zIndex: '9000', pointerEvents: 'none',
+        // Set at the 3x peak size and scaled down from it, so the grown amount stays sharp.
+        font: `700 ${SLUG_LAYOUT.fontSize * A.growScale}px "Trebuchet MS", sans-serif`,
+        color: hex(slug.amount < 0 ? style.textNeg : style.text),
+        textShadow: '0 0 3px #fff, 0 0 6px #fff, 0 0 9px rgba(255, 255, 255, 0.8)',
+        whiteSpace: 'nowrap',
+      });
+      document.body.appendChild(el);
+      const at = (p, k) => `translate(${p.x}px, ${p.y}px) translate(-50%, -50%) scale(${k / A.growScale})`;
+      slug.sign.alpha = slug.num.alpha = A.dimAlpha;
+      const total = A.flyAtMs + A.flyMs;
+      const anim = el.animate([
+        { transform: at(from, 1), offset: 0, easing: A.ease },
+        { transform: at(from, A.growScale), offset: A.growMs / total },
+        { transform: at(from, A.growScale), offset: A.flyAtMs / total, easing: A.ease },
+        { transform: at(to, A.endScale), offset: 1 },
+      ], { duration: total, fill: 'forwards' });
+      // QA: &slugfx=hold freezes the first amount at its 3x peak, before it flies.
+      if (i === 0 && new URLSearchParams(location.search).get('slugfx') === 'hold') {
+        anim.pause();
+        anim.currentTime = A.flyAtMs - 20;
+        if (app?.canvas) app.canvas.dataset.slugFlightHold = slug.type;
+        return;
+      }
+      if (app?.canvas) app.canvas.dataset.slugFlights = String((Number(app.canvas.dataset.slugFlights) || 0) + 1);
+      const done = () => {
+        el.remove();
+        if (!pill.destroyed) slug.sign.alpha = slug.num.alpha = 1;
+        flyNext(i + 1, 0);
+      };
+      anim.onfinish = done;
+      anim.oncancel = done;
+    }, delay);
+  };
+  flyNext(0, A.firstDelayMs);
 }
 
 function updateSpeechBubbles(dt) {
@@ -6136,8 +6245,9 @@ function executeVerb(target, verbId) {
     if (reactionText && m === reactionText) return; // rendered in a wrapped speech bubble
     floatText(target.sprite.x, target.sprite.y - 50 - i * 16, m, 0xfff4d6);
   });
-  // Floating metabolic deltas
-  if (result.ok && result.effects) {
+  // Floating metabolic deltas, unless the answer's slugs already show them
+  // (the client's slugs fly to the stats instead, SlugAnimator.as).
+  if (result.ok && result.effects && !(spoke && result.speech?.slugs)) {
     const e = result.effects;
     if (e.energy) {
       floatText(

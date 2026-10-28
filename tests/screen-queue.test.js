@@ -16,6 +16,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { SLUG_STYLES, speechSlugList } from '../public/js/speech-slugs.js?v=g412-1';
 import {
   NEW_DAY_MESSAGES,
   SCREEN_CLOSED_RETRY_MS,
@@ -241,7 +242,12 @@ describe('the new day bubble (NewDayView.as showChatBubble)', () => {
     assert.match(slug, /energy_pos_bg_color:uint = 0xc1d76e;/);
     assert.match(slug, /mood_pos_bg_color:uint = 0xc1d76e;/);
     assert.match(slug, /energy_neg_bg_color:uint = 0xefc6c1;/);
-    assert.match(game, /\['energyGain', '\+', 'energy', 0xc1d76e, 0x3f5c14\],\n\s*\['mood', '\+', 'mood', 0xc1d76e, 0x3f5c14\],\n\s*\['energy', '-', 'energy', 0xefc6c1, 0xa2382c\],/);
+    // js/speech-slugs.js draws them: the gain fill for +energy, energy before mood.
+    assert.equal(SLUG_STYLES.energy.pos, 0xc1d76e);
+    assert.equal(SLUG_STYLES.mood.pos, 0xc1d76e);
+    assert.equal(SLUG_STYLES.energy.neg, 0xefc6c1);
+    assert.deepEqual(speechSlugList(b.slugs), [{ type: 'energy', amount: 62 }, { type: 'mood', amount: 30 }]);
+    assert.match(game, /const slugRow = speechSlugRow\(speech\.slugs/);
   });
 });
 

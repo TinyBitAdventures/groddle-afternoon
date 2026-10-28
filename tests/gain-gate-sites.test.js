@@ -22,7 +22,7 @@ import { runTransform } from '../public/js/item-transforms.js';
 import { applyTreePoison, performAntidotePour } from '../public/js/tree-poison.js';
 import { createPlot, performPlotVerb } from '../public/js/patches.js?v=g403-1';
 import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js';
-import { runVerb } from '../public/content.js?v=g403-1';
+import { runVerb } from '../public/content.js?v=g412-1';
 import { applySetFree } from '../public/js/animal-set-free.js';
 import { RESOURCE_SKILL_PACKAGES, createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=g403-1';
 import { room as topOfTree } from '../public/js/quest-rooms/top-of-tree.js';
