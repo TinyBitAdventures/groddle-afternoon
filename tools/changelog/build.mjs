@@ -89,7 +89,7 @@ ${siteNav(p, 'changelog')}
 ${body}
   <footer class="foot">
     <div class="wrap">
-      <p>Tiny Speck's Glitch art and code are CC0. The sounds are Tiny Speck's original recordings, shipped as the originals. Groddle Afternoon is a fan remake and uses no Glitch logo.</p>
+      <p>A fan remake of Tiny Speck’s Glitch · <a href="${p}credits/">Credits</a></p>
       <p><a href="${p}">Home</a> · <a href="${p}play/">Play Groddle Afternoon</a> · <a href="${p}restoration/">Restoration report</a> · <a href="${p}restoration/history/">Every change</a></p>
     </div>
   </footer>

@@ -39,14 +39,11 @@ export function projectContent() {
     group('header', 'masthead', null, [group('div', 'wrap', null, [
       p('kicker', 'Groddle Field Notes · Project'),
       h(1, 'The project'),
-      p('lead', 'Groddle Afternoon brings back Glitch, Tiny Speck’s game, from the art, sound and code they gave to the public domain. These pages follow how that is going.'),
+      p('lead', 'Groddle Afternoon brings back Glitch, Tiny Speck’s game, from the art, sounds and code they left behind. These pages follow how that is going.'),
     ])]),
     group('section', 'band pj-band', 'pages', [group('div', 'wrap', null, [
       group('div', 'pj-cards', null, CARDS.map(card)),
     ])]),
-    group('div', 'wrap report-foot', null, [
-      p('', 'The icons are Tiny Speck’s own, from their public-domain (CC0) release of Glitch.'),
-    ]),
   ].join('\n\n');
 }
 
