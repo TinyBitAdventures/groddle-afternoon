@@ -22,10 +22,137 @@
  * resetLinkFrom(hash) reads it and the gate opens on Choose a new password,
  * which saves it and signs the player in.
  *
+ * Cloudflare Turnstile (Austin 2026-10-28): when the site has a Turnstile
+ * site key (groddle/v1/account/options), the forms that send an email to an
+ * address someone typed (New player, Send it again, Forgot your password)
+ * each carry a managed widget, shown only when Cloudflare needs the player to
+ * do something, and send its token with the form (createAccountRequests).
+ * Without a key no script loads and the forms work as they always have.
+ *
  * mountAccountForms(host, { account, start, reset, verify, onSignedIn })
  * replaces host's children; onSignedIn({ player, how: 'signin' | 'signup' |
  * 'reset' | 'verify' }) runs once the session and its nonce are in place.
  */
+
+/** Cloudflare's widget script, loaded only when the site has a Turnstile site key. */
+export const TURNSTILE_SCRIPT = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+
+/**
+ * The account calls the forms make beyond js/minn-account.js: the card's
+ * options, and the three emailing forms with a Turnstile token. Public
+ * routes only, sent without a nonce (a stale one would be refused). The
+ * answers have minn-account's shapes.
+ * @param {{ api: string, fetch?: typeof fetch }} opts api: account.urls.api
+ */
+export function createAccountRequests({ api, fetch: fetchFn = globalThis.fetch?.bind(globalThis) } = {}) {
+  async function call(path, body) {
+    try {
+      const res = await fetchFn(api + path, {
+        method: body === undefined ? 'GET' : 'POST',
+        credentials: 'same-origin',
+        cache: 'no-store',
+        headers: body === undefined ? {} : { 'Content-Type': 'application/json' },
+        body: body === undefined ? undefined : JSON.stringify(body),
+      });
+      let data = null;
+      try { data = await res.json(); } catch { /* not JSON */ }
+      return { status: res.status, ok: res.ok, data };
+    } catch {
+      return { status: 0, ok: false, data: { code: 'offline', message: 'The Groddle site is not answering. Try again in a moment.' } };
+    }
+  }
+  const refusal = (r) => ({
+    ok: false,
+    code: r.data?.code || `http_${r.status}`,
+    message: r.data?.message || 'That didn\'t work. Try again in a moment.',
+    fields: r.data?.fields && typeof r.data.fields === 'object' ? r.data.fields : {},
+  });
+  const signedIn = (r) => (r.ok && r.data?.signedIn === true ? { ok: true, player: r.data.player } : refusal(r));
+  return {
+    /** { turnstile: site key | null }; {} when the site can't be asked (a static server). */
+    async options() {
+      const r = await call('account/options');
+      return r.ok && r.data && typeof r.data === 'object' ? r.data : {};
+    },
+    async signUp({ email, password, name, website = '', turnstile = '' }) {
+      const r = await call('players', { email, password, name, website, turnstile });
+      if (r.status === 202 && r.data?.pending === true) {
+        return { ok: true, pending: true, email: String(r.data.email || email), name: String(r.data.name || name), nameHeld: r.data.nameHeld === true };
+      }
+      return signedIn(r);
+    },
+    async resendSignUp({ email, turnstile = '' }) {
+      const r = await call('players/resend', { email, turnstile });
+      return r.ok ? { ok: true } : refusal(r);
+    },
+    async requestPasswordReset(email, turnstile = '') {
+      const r = await call('password-reset', { email, turnstile });
+      return r.ok ? { ok: true } : refusal(r);
+    },
+  };
+}
+
+const scripts = new Map();
+/** Loads a script once; resolves when it has run (null when it could not load). */
+function loadScript(src) {
+  if (!scripts.has(src)) {
+    scripts.set(src, new Promise((resolve) => {
+      const tag = document.createElement('script');
+      tag.src = src;
+      tag.async = true;
+      tag.onload = () => resolve(true);
+      tag.onerror = () => { scripts.delete(src); resolve(null); };
+      document.head.append(tag);
+    }));
+  }
+  return scripts.get(src);
+}
+
+/**
+ * Turnstile widgets in the card's slots (one per emailing form), drawn once
+ * the script has loaded. token(which) waits a little for the widget's token
+ * (Cloudflare may ask the player to tick a box); reset(which) after each
+ * send, since a token works once.
+ */
+function turnstileWidgets(siteKey, slots) {
+  const tokens = {};
+  const waiters = {};
+  const ids = {};
+  const settle = (which) => { for (const done of waiters[which] || []) done(tokens[which] || ''); waiters[which] = []; };
+  const ready = loadScript(TURNSTILE_SCRIPT).then((loaded) => {
+    const ts = loaded && globalThis.turnstile;
+    if (!ts) return null;
+    for (const [which, slot] of Object.entries(slots)) {
+      ids[which] = ts.render(slot, {
+        sitekey: siteKey,
+        action: which,
+        appearance: 'interaction-only',
+        callback: (t) => { tokens[which] = t; settle(which); },
+        'expired-callback': () => { tokens[which] = ''; },
+        'error-callback': () => { tokens[which] = ''; settle(which); },
+      });
+    }
+    return ts;
+  });
+  return {
+    async token(which, wait = 20000) {
+      const ts = await ready;
+      if (!ts) return '';
+      if (tokens[which]) return tokens[which];
+      return new Promise((resolve) => {
+        (waiters[which] ||= []).push(resolve);
+        setTimeout(() => resolve(tokens[which] || ''), wait);
+      });
+    },
+    async reset(which) {
+      const ts = await ready;
+      tokens[which] = '';
+      if (ts && ids[which] !== undefined) {
+        try { ts.reset(ids[which]); } catch { /* the widget went with the card */ }
+      }
+    },
+  };
+}
 
 /** The form copy (plain remake copy, no em-dashes). */
 export const FORM_COPY = Object.freeze({
@@ -154,6 +281,8 @@ const STYLE = `
 .acct-panel { display: grid; gap: 0.55rem; }
 .acct-panel[hidden] { display: none; }
 .acct-panel p { margin: 0; }
+.acct-turnstile { display: flex; justify-content: center; }
+.acct-turnstile:empty { display: none; }
 .acct-forms[data-account-settings] .acct-form + .acct-form { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e3e8d6; }
 `;
 
@@ -228,14 +357,20 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
   const trapInput = el('input', { type: 'text', name: 'website', tabindex: '-1', autocomplete: 'off' });
   trap.append(el('label', {}, 'Website'), trapInput);
   const suSubmit = el('button', { type: 'submit', class: 'acct-submit', 'data-account-submit': 'signup' }, FORM_COPY.signup.submit);
-  signup.append(suEmail.wrap, suPass.wrap, suName.wrap, trap, suSubmit);
+  // Turnstile's widget for each emailing form, empty (and hidden) unless the site has a site key.
+  const slots = {
+    signup: el('div', { class: 'acct-turnstile', 'data-account-turnstile': 'signup' }),
+    resend: el('div', { class: 'acct-turnstile', 'data-account-turnstile': 'resend' }),
+    forgot: el('div', { class: 'acct-turnstile', 'data-account-turnstile': 'forgot' }),
+  };
+  signup.append(suEmail.wrap, suPass.wrap, suName.wrap, trap, slots.signup, suSubmit);
 
   // Forgot your password
   const forgot = el('form', { class: 'acct-form', id: `acct-forgot-${n}`, 'data-form': 'forgot', novalidate: true, hidden: true });
   const fgEmail = field(`acct-fg-email-${n}`, 'Email', { name: 'email', type: 'email', autocomplete: 'email', inputmode: 'email', autocapitalize: 'none', spellcheck: 'false', required: true });
   const fgSubmit = el('button', { type: 'submit', class: 'acct-submit', 'data-account-submit': 'forgot' }, FORM_COPY.forgot.submit);
   const backLink = el('button', { type: 'button', class: 'acct-link', 'data-account-back': '' }, FORM_COPY.forgot.back);
-  forgot.append(el('strong', {}, FORM_COPY.forgot.title), el('p', { class: 'acct-message' }, FORM_COPY.forgot.body), fgEmail.wrap, fgSubmit, backLink);
+  forgot.append(el('strong', {}, FORM_COPY.forgot.title), el('p', { class: 'acct-message' }, FORM_COPY.forgot.body), fgEmail.wrap, slots.forgot, fgSubmit, backLink);
 
   // Choose a new password (from a reset link)
   const renew = el('form', { class: 'acct-form', id: `acct-reset-${n}`, 'data-form': 'reset', novalidate: true, hidden: true });
@@ -250,7 +385,7 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
   const checkHeld = el('p', { class: 'acct-message', 'data-account-held': '', hidden: true });
   const resendButton = el('button', { type: 'button', class: 'acct-submit', 'data-account-resend': '' }, FORM_COPY.check.resend);
   const otherLink = el('button', { type: 'button', class: 'acct-link', 'data-account-other': '' }, FORM_COPY.check.other);
-  check.append(el('strong', {}, FORM_COPY.check.title), checkBody, checkHeld, resendButton, otherLink);
+  check.append(el('strong', {}, FORM_COPY.check.title), checkBody, checkHeld, slots.resend, resendButton, otherLink);
 
   // Finishing a character from the emailed link: automatic, unless a name or a new link is needed.
   const finish = el('form', { class: 'acct-form', id: `acct-verify-${n}`, 'data-form': 'verify', novalidate: true, hidden: true });
@@ -259,6 +394,28 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
   const vfSubmit = el('button', { type: 'submit', class: 'acct-submit', 'data-account-submit': 'verify' }, FORM_COPY.verify.submit);
   const newLinkButton = el('button', { type: 'button', class: 'acct-submit', 'data-account-newlink': '' }, FORM_COPY.verify.newLink);
   finish.append(finishTitle, vfName.wrap, vfSubmit, newLinkButton);
+
+  // What the site turns on for the card (a Turnstile site key), asked once; the emailing forms wait for it.
+  const requests = createAccountRequests({ api: account.urls?.api || '' });
+  let turnstile = null;
+  const ready = (account.urls?.api ? requests.options() : Promise.resolve({})).then((options) => {
+    if (typeof options.turnstile === 'string' && options.turnstile) {
+      turnstile = turnstileWidgets(options.turnstile, slots);
+      root.dataset.turnstile = 'on';
+    }
+    return options;
+  });
+  /** A Turnstile token for an emailing form ('' when Turnstile is off), and the widget reset after the send. */
+  async function withTurnstile(which, plain, guarded) {
+    await ready;
+    if (!turnstile) return plain();
+    const token = await turnstile.token(which);
+    try {
+      return await guarded(token);
+    } finally {
+      turnstile.reset(which);
+    }
+  }
 
   const panels = { signin, signup };
   const tabButtons = {};
@@ -423,7 +580,12 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
       if (values.password.length < 8) missing.password = 'Passwords need at least 8 characters.';
       if (!/^[A-Za-z0-9](?:[A-Za-z0-9 _-]{1,17})[A-Za-z0-9]$/.test(values.name)) missing.name = 'Names are 3 to 19 letters, numbers, spaces, - or _, starting and ending with a letter or number.';
       if (Object.keys(missing).length) return showRefusal({ fields: missing }, fields);
-      const r = await account.signUp(values);
+      const r = await withTurnstile('signup', () => account.signUp(values), async (token) => {
+        const answer = await requests.signUp({ ...values, turnstile: token });
+        // A QA address signed straight in: the account's nonce follows the new session.
+        if (answer.ok && !answer.pending) await account.session?.();
+        return answer;
+      });
       const outcome = signUpOutcome(r);
       if (outcome === 'refused') return showRefusal(r, fields);
       if (outcome === 'check-email') {
@@ -440,7 +602,7 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
     submit(forgot, fgSubmit, FORM_COPY.forgot.busy, async () => {
       const email = fgEmail.input.value.trim();
       if (!email.includes('@')) return showRefusal({ fields: { email: 'Enter your email.' } }, { email: fgEmail });
-      const r = await account.requestPasswordReset(email);
+      const r = await withTurnstile('forgot', () => account.requestPasswordReset(email), (token) => requests.requestPasswordReset(email, token));
       if (!r.ok) return showRefusal(r, { email: fgEmail });
       show('signin');
       siEmail.input.value = email;
@@ -465,7 +627,7 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
     if (resendButton.disabled) return;
     resendButton.disabled = true;
     resendButton.textContent = FORM_COPY.check.busy;
-    const r = await account.resendSignUp({ email: pending.email });
+    const r = await withTurnstile('resend', () => account.resendSignUp({ email: pending.email }), (token) => requests.resendSignUp({ email: pending.email, turnstile: token }));
     say(r.ok ? FORM_COPY.check.sent : r.message, r.ok ? 'good' : 'bad');
     startCooldown();
   });

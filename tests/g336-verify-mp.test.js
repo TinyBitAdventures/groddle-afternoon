@@ -21,7 +21,7 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 
 import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-10';
-import { FORM_COPY, fillCopy, signUpOutcome, verifyLinkFrom, verifyOutcome, resetLinkFrom } from '../public/js/account-forms.js?v=g337-2';
+import { FORM_COPY, fillCopy, signUpOutcome, verifyLinkFrom, verifyOutcome, resetLinkFrom } from '../public/js/account-forms.js?v=g398-1';
 import { HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -197,7 +197,7 @@ describe('the site: no account until the email is proven (groddle-afternoon-site
   it('resend: by token says why it waits; by email answers the same whether or not anything waits', () => {
     const acct = src('PlayerAccount.php');
     const resend = acct.slice(acct.indexOf('public function resend('), acct.indexOf('private function makeNow('));
-    assert.match(resend, /if \(\$row !== null && \(\$row\['used_at'\] \?\? null\) === null && Signups::sendRefusal\(\$row, \$now\) === null\) \{\n\s*\$this->mailLink/);
+    assert.match(resend, /if \(\$row !== null && \(\$row\['used_at'\] \?\? null\) === null && Signups::sendRefusal\(\$row, \$now\) === null\) \{\n\s*\$mailed = \$this->mailLink/);
     assert.match(resend, /\n\s*return Response::json\(\['sent' => true\]\);\n\s*\}\n/, 'one answer for every address');
     assert.match(acct, /'signup_spent' => /);
     assert.doesNotMatch(Object.values(acct.match(/private const WORDS = \[[\s\S]*?\];/)).join(''), /—/, 'no em-dashes in the words');

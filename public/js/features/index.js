@@ -153,4 +153,4 @@ import { questVerbsFeature } from './quest-verbs-feature.js?v=g390-1'; FEATURES.
 import { itemVerbsMoreFeature } from './item-verbs-more-feature.js?v=g391-1'; FEATURES.push(itemVerbsMoreFeature);
 import { streetObjectsFeature } from './street-objects-feature.js?v=g383-1'; FEATURES.push(streetObjectsFeature);
 import { realtimeFeature } from './realtime-feature.js?v=nbhome-12'; FEATURES.push(realtimeFeature);
-import { accountBackupFeature } from './account-backup-feature.js?v=g396-1'; FEATURES.push(accountBackupFeature);
+import { accountBackupFeature } from './account-backup-feature.js?v=g398-1'; FEATURES.push(accountBackupFeature);

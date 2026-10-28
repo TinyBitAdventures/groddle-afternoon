@@ -18,7 +18,7 @@
  */
 
 import { createMinnAccount } from './minn-account.js?v=nbhome-10';
-import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from './account-forms.js?v=g337-2';
+import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from './account-forms.js?v=g398-1';
 
 const PILL_TEXT = {
   saved: 'Saved',
