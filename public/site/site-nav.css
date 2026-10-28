@@ -164,7 +164,11 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
   background: color-mix(in srgb, var(--accent) 18%, transparent);
 }
 .site-nav-links .site-nav-panel a:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
-.site-nav-links .site-nav-panel a[aria-current="page"] { box-shadow: inset 3px 0 0 var(--accent); }
+/* The page being read: the header's own accent underline, under the word. */
+.site-nav-links .site-nav-panel a[aria-current="page"] {
+  text-decoration: underline; text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px; text-underline-offset: 6px;
+}
 @media (max-width: 640px) {
   .site-nav-panel {
     top: calc(100% + 1px); left: 0; right: 0; min-width: 0;
