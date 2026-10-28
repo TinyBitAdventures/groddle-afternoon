@@ -658,6 +658,7 @@ import {
 import { facingScaleX, facingFromVelocity } from './js/avatar.js';
 import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js';
 import { landingY } from './js/walk-surface.js';
+import { holdCloseToFloor, stickToSlope } from './js/slope-walk.js?v=g411-1';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=npc-glitch-1';
 import { bakeIdleSheet, bakeLook, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareLook } from './js/avatar-compositor.js';
@@ -8000,7 +8001,11 @@ function glitchAnimState(requested) {
   // AvatarView: the idle timer runs while standing (or hit) and resets otherwise.
   const standing = !airborne && requested !== 'walk';
   const randomIdle = idles ? idleClock.step(now, standing || Boolean(hit)) : null;
-  const st = avatarAnimState({
+  const last = player.glitchState || 'stand';
+  const vyPerSecond = player.vy * 60;
+  const distFromFloor = floorY == null ? null : floorY - player.y;
+  // AvatarAnimationState close_limit: a short drop keeps the walk (js/slope-walk.js).
+  const st = holdCloseToFloor(avatarAnimState({
     airborne,
     moving: requested === 'walk',
     hit,
@@ -8008,14 +8013,14 @@ function glitchAnimState(requested) {
     // walk1x/walk2x compare against the client's px/s (vx_max 335 = the remake's 4.4 px/frame).
     vx: player.vx * (335 / 4.4),
     vxMax: (player.vxMax ?? 4.4) * (335 / 4.4),
-    vy: player.vy * 60,
-    distFromFloor: floorY == null ? null : floorY - player.y,
+    vy: vyPerSecond,
+    distFromFloor,
     idles,
     choices: choicesDialogOpen(),
     afk: afkState.afk,
     waking: now < afkState.wakeUntil,
     randomIdle,
-  }, player.glitchState || 'stand');
+  }, last), last, { airborne, vy: vyPerSecond, distFromFloor });
   // getStandInForStand: a hit or an emotion resets the idle timer.
   if (st === 'hit1' || st === 'hit2' || EMOTIONS.includes(st)) idleClock.reset();
   if (idles) loadIdleSheetsFor(pack, st, standing, now);
@@ -10729,6 +10734,8 @@ function physics(dt) {
     player.pivot.y = Math.sin(player.walkPhase) * 1.5;
   } else {
     const movementBuff = combinedPhysics();
+    // On the floor before this frame's move (a jump in handleInput already left it).
+    const wasGrounded = player.onGround === true;
     player.vy += 0.42 * movementBuff.gravity * dt;
     streetPhysicsFreeFall(movementBuff, dt);
     const prevX = player.x;
@@ -10756,6 +10763,12 @@ function physics(dt) {
     {
       const ground = resolveGround(player.x, player.y);
       if (player.y >= ground && player.vy >= 0) {
+        player.y = ground;
+        player.vy = 0;
+        player.onGround = true;
+      } else if (stickToSlope({ wasGrounded, vy: player.vy, dx: player.x - prevX, feetY: player.y, groundY: ground })) {
+        // Walking down a slope (js/slope-walk.js): the floor fell away faster than
+        // gravity moved the feet; stay on it instead of hopping down in falls.
         player.y = ground;
         player.vy = 0;
         player.onGround = true;
