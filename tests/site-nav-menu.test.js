@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { FALLBACK, applyToHtml, currentIndex, parseMenu, renderLinks } from '../tools/site-nav/apply.mjs';
+import { FALLBACK, SECTIONS, applyToHtml, currentIndex, parseMenu, renderLinks } from '../tools/site-nav/apply.mjs';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -35,6 +37,52 @@ describe('the header menu in the built pages (tools/site-nav/apply.mjs)', () => 
     assert.equal(currentIndex(links, '/play/'), -1);
     assert.equal(currentIndex(links, '/'), -1);
     assert.match(renderLinks(links, '/tj/'), /<a href="\/tj\/" aria-current="page">Tom &amp; Jerry<\/a>/);
+  });
+
+  it('marks Project on the pages it gathers; a link straight to a page still wins (G338)', () => {
+    const header = [
+      { label: 'Items', href: '/items/', className: '' },
+      { label: 'Players', href: '/players/', className: '' },
+      { label: 'Project', href: '/project/', className: '' },
+      { label: 'Play', href: '/play/online/', className: 'site-nav-play' },
+    ];
+    for (const path of ['/project/', '/restoration/', '/restoration/history/', '/compare/', '/changelog/', '/changelog/some-note/', '/code/']) {
+      assert.equal(currentIndex(header, path), 2, path);
+    }
+    assert.equal(currentIndex(header, '/players/bo-peep/skills/'), 1);
+    assert.equal(currentIndex(header, '/items/'), 0);
+    assert.equal(currentIndex(header, '/codex/'), -1, 'a section is a whole path segment');
+    assert.equal(currentIndex(header, '/musicblocks/'), -1);
+    assert.equal(currentIndex(header, '/play/online/'), -1);
+    const both = [...header, { label: 'Notes', href: '/changelog/', className: '' }];
+    assert.equal(currentIndex(both, '/changelog/'), 4, 'the direct link beats the section that gathers it');
+    assert.equal(currentIndex(both, '/code/'), 2);
+    assert.match(renderLinks(header, '/compare/'), /<a href="\/project\/" aria-current="page">Project<\/a>/);
+  });
+
+  it('gathers the same pages as the theme (SiteNav::SECTIONS)', { skip: skipWithoutSite }, () => {
+    const php = readFileSync(sitePath('src/SiteNav.php'), 'utf8');
+    const body = php.match(/public const SECTIONS = \[\n([\s\S]*?)\n\s*\];/)[1];
+    const rows = Object.fromEntries([...body.matchAll(/'([^']+)' => \[([^\]]*)\]/g)].map(([, href, list]) => [href, [...list.matchAll(/'([^']+)'/g)].map((m) => m[1])]));
+    assert.deepEqual(rows, SECTIONS);
+  });
+
+  const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
+  it('the theme marks the same link (php: SiteNav::current and nav)', { skip: (skipWithoutSite || (!existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)')) }, () => {
+    let out;
+    try {
+      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/profiles/profile-pages.php'), engine, sitePath(''), join(root, 'public')], { encoding: 'utf8' }));
+    } catch (err) {
+      if (err.code === 'ENOENT') return; // no php here
+      throw err;
+    }
+    const header = [['Items', '/items/', ''], ['Players', '/players/', ''], ['Project', '/project/', ''], ['Play', '/play/online/', 'site-nav-play']]
+      .map(([label, href, className]) => ({ label, href, className }));
+    for (const [path, index] of Object.entries(out.current)) {
+      assert.equal(index ?? -1, currentIndex(header, path), path);
+    }
+    assert.equal(out['direct link wins'], 4);
+    assert.match(out['nav on /code/'], /<a href="\/project\/" aria-current="page">Project<\/a>/);
   });
 
   it('rewrites only the links of a built page', () => {

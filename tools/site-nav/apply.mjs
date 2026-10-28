@@ -24,6 +24,15 @@ export const FALLBACK = [
   { label: 'Play', href: '/play/', className: 'site-nav-play' },
 ];
 
+/**
+ * Pages a link stands for besides its own path, so its section is marked on
+ * them too: Project gathers the restoration story (Austin 2026-10-28, register
+ * G338). A link straight to the page still wins. The same list as SiteNav::SECTIONS.
+ */
+export const SECTIONS = {
+  '/project/': ['/restoration/', '/compare/', '/changelog/', '/code/'],
+};
+
 const decode = (s) => s.replace(/<[^>]*>/g, '').replace(/&(amp|lt|gt|quot|#039|#39|apos);/g, (m, e) => ({ amp: '&', lt: '<', gt: '>', quot: '"', '#039': "'", '#39': "'", apos: "'" })[e]);
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -47,15 +56,22 @@ export function parseMenu(markup) {
   return links.length ? links : FALLBACK;
 }
 
-/** The link whose section holds the page: the longest site path that starts it, never home or Play. */
+/**
+ * The link whose section holds the page: the longest site path that starts it
+ * (the link's own, or one it stands for in SECTIONS, which loses a tie to a
+ * link's own), never home or Play.
+ */
 export function currentIndex(links, pagePath) {
   let best = -1;
-  let length = 0;
+  let score = 0;
   const path = pagePath.replace(/\/?$/, '/');
   links.forEach(({ href, className }, i) => {
     if (href === '/' || !href.startsWith('/') || className.split(/\s+/).includes('site-nav-play')) return;
-    const section = href.replace(/\/?$/, '/');
-    if (path.startsWith(section) && section.length > length) { best = i; length = section.length; }
+    const own = href.replace(/\/?$/, '/');
+    for (const section of [own, ...(SECTIONS[own] || [])]) {
+      const points = section.length * 2 + (section === own ? 1 : 0);
+      if (path.startsWith(section) && points > score) { best = i; score = points; }
+    }
   });
   return best;
 }

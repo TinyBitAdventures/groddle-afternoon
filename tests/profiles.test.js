@@ -21,6 +21,10 @@ import {
 import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-10';
 import { FEATURES } from '../public/js/features/index.js';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js';
+import { skillTitle } from '../public/js/skill-tree.js';
+import { skillArtFor } from '../public/js/familiar.js?v=g225-1';
+import { CARD_ART_LAYERS } from '../public/js/imagination-data.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -190,6 +194,8 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
       'Get /players/{id:\\d+}/{kind:avatar|tile|home}.png Public',
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*} Public',
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/ Public',
+      'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/{tab:skills|achievements|buddies} Public',
+      'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/{tab:skills|achievements|buddies}/ Public',
     ]);
   });
 
@@ -269,3 +275,53 @@ describe('only characters from level 5 are public (Austin 2026-10-26)', () => {
   });
 });
 
+
+describe('a profile\'s pages: skills, badges and buddies (G338, Glitch\'s /profiles/<tsid>/skills/, achievements/, friends/)', { skip: skipWithoutSite }, () => {
+  const pages = () => readFileSync(join(SITE_DIR, 'src/PlayerPages.php'), 'utf8');
+
+  it('every page of a profile goes through one door with the level rule', () => {
+    const src = pages();
+    assert.match(src, /private const TABS = \['' => 'Profile', 'skills' => 'Skills', 'achievements' => 'Badges', 'buddies' => 'Buddies'\];/);
+    assert.match(src, /public function profile\(Request \$request, string \$slug\): Response\n\s+\{\n\s+return \$this->tab\(\$request, \$slug, ''\);/);
+    assert.match(src, /public function subpage\(Request \$request, string \$slug, string \$tab\): Response\n\s+\{\n\s+return \$this->tab\(\$request, \$slug, \$tab\);/);
+    assert.equal([...src.matchAll(/Profiles::LISTED_LEVEL && !\$own\)/g)].length, 1, 'one level check, shared by all four pages');
+  });
+
+  it('lists only buddies who are public, and never one who ignores the player or whom they ignore', () => {
+    const src = pages();
+    const fn = src.slice(src.indexOf('private function buddies('), src.indexOf('private function skillCatalog('));
+    assert.match(fn, /JOIN ' \. \$db->table\(MultiplayerSave::TABLE\) \. ' s ON s\.user_id = b\.buddy_id AND ' \. Profiles::levelSql\('s'\) \. ' >= ' \. Profiles::LISTED_LEVEL/);
+    assert.match(fn, /JOIN " \. \$db->table\(Characters::TABLE\) \. ' c ON c\.user_id = b\.buddy_id/);
+    assert.match(fn, /NOT EXISTS \(SELECT 1 FROM \{\$ignores\} i WHERE \(i\.user_id = b\.buddy_id AND i\.ignored_id = b\.user_id\) OR \(i\.user_id = b\.user_id AND i\.ignored_id = b\.buddy_id\)\)/);
+    assert.match(fn, /WHERE b\.user_id = \?/);
+    assert.doesNotMatch(fn, /user_email|user_login|display_name/);
+  });
+
+  it('shows the CC0 art the game already ships: badge pictures and skill card art', () => {
+    const src = pages();
+    assert.match(src, /<img src="\/assets\/badges\/' \. Html::attr\(\$badge\) \. '\.png"/);
+    assert.match(src, /"\/assets\/imagination\/cards\/\{\$art\}\.svg"/);
+    assert.match(src, /Html::esc\(\$title\)/);
+    assert.match(readFileSync(join(SITE_DIR, 'style.css'), 'utf8'), /\.profile-skills \{/);
+  });
+
+  const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
+  it('names and pictures each skill as the game does (php against js/skill-tree.js skillTitle, js/familiar.js skillArtFor)', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, async () => {
+    let out;
+    try {
+      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/profiles/profile-pages.php'), engine, SITE_DIR, join(root, 'public')], { encoding: 'utf8' }));
+    } catch (err) {
+      if (err.code === 'ENOENT') return; // no php here
+      throw err;
+    }
+    await loadContentCatalogsFromDir(join(root, 'public/assets/content'));
+    const catalog = getSkillCatalog();
+    assert.ok(Object.keys(catalog).length > 100);
+    for (const [id, def] of Object.entries(catalog)) {
+      assert.deepEqual(out.skills[id], [skillTitle(def), `/${skillArtFor(id, CARD_ART_LAYERS)}`], id);
+    }
+    assert.equal(out.skills.not_a_skill_1, undefined, 'a skill the game does not know is left out');
+    assert.deepEqual(out.ids, ['refining_1', 'mining_1', 'alchemy_1'], 'newest first, once each, only well formed ids');
+    assert.deepEqual(out['ids not a list'], []);
+  });
+});
