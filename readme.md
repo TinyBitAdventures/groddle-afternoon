@@ -1,8 +1,8 @@
 # Groddle Afternoon
 
 A fresh take on the world of Glitch, Tiny Speck's browser game (2011 to 2012), rebuilt for the
-modern web. It is not online yet: run it locally (see [Run it locally](#run-it-locally) below).
-Multiplayer is built and tested locally, but there is no public server and no players yet.
+modern web. Play it at [groddleafternoon.com](https://groddleafternoon.com), solo or online with
+other players, or run it yourself (see [Run it locally](#run-it-locally) below).
 
 Walk the original streets, pet piggies, milk butterflies, harvest trees, mine rocks, cook, grow
 gardens, learn skills, earn badges, build street projects, fight off a Rook attack and play the

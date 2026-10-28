@@ -59,8 +59,8 @@
     "wikipedia": { "title": "Wikipedia: Glitch (video game)", "url": "https://en.wikipedia.org/wiki/Glitch_(video_game)", "checked": "2026-10-22" },
     "ts-gsjs": { "title": "tinyspeck/glitch-GameServerJS README (CC0 1.0, logo and trademark excluded)", "url": "https://github.com/tinyspeck/glitch-GameServerJS", "checked": "2026-10-26" },
     "ga-restoration": { "title": "Groddle Field Notes: restoration report (built from this repository)", "url": "../restoration/", "checked": "2026-10-26" },
-    "ga-github": { "title": "Groddle Afternoon on GitHub: the game, the realtime server and the site", "url": "https://github.com/TinyBitAdventures/groddle-afternoon", "checked": "2026-10-26" },
-    "ga-site": { "title": "Groddle Afternoon", "url": "https://groddleafternoon.com", "checked": "2026-10-26" }
+    "ga-github": { "title": "Groddle Afternoon on GitHub: the game, the realtime server and the site", "url": "https://github.com/TinyBitAdventures/groddle-afternoon", "checked": "2026-10-28" },
+    "ga-site": { "title": "Groddle Afternoon", "url": "https://groddleafternoon.com", "checked": "2026-10-28" }
   },
   "projects": [
     {
@@ -123,16 +123,16 @@
       "years": "2026",
       "approach": "Fresh take",
       "ours": true,
-      "badge": { "label": "In development · not online yet", "tone": "sun" },
-      "summary": "This project. A web game that rebuilds Glitch rule by rule from Tiny Speck's released code and art, played solo in your browser or multiplayer (built and tested locally, not online yet), and fills the gaps from players' Snaps and recordings.",
+      "badge": { "label": "Online · solo and multiplayer", "tone": "moss" },
+      "summary": "This project. A web game that rebuilds Glitch rule by rule from Tiny Speck's released code and art, played solo in your browser or online with other players, and fills the gaps from players' Snaps and recordings.",
       "link": { "label": "Restoration report", "url": "../restoration/" },
       "facts": [
         { "label": "Client", "text": "PixiJS 8 in the browser, with sharp 3x art on high-resolution screens. No Flash, nothing to install.", "sources": ["ga-restoration"] },
         { "label": "Server and rules", "text": "The original server code (GSJS) is mined as the design reference and its rules are rewritten in modern JavaScript. Solo needs no server and saves in your browser. Multiplayer adds accounts and server saves on the site, and a small Go server that decides what players share: quoins, rocks, races, Rook fights and trades.", "sources": ["ga-restoration", "ga-github"] },
         { "label": "Platform", "text": "Web browser on a desktop computer, played with the keyboard. No touch controls yet, so not on phones.", "sources": ["ga-restoration", "ga-github"] },
         { "label": "Licence and code", "text": "MIT code on GitHub in three repositories: the game, the realtime server and the site. Uses only Tiny Speck's CC0 art, sound and code, plus art and sound made fresh where nothing survives; no Glitch logo or trademark.", "sources": ["ts-gsjs", "ga-github"] },
-        { "label": "Status", "text": "In development and not online yet. The source is public on GitHub, and multiplayer is built and tested locally, but there is no public server and no players yet.", "sources": ["ga-github", "ga-restoration"] },
-        { "label": "How to play", "text": "Not online yet: run it locally from GitHub. Solo play is static files from the game repository and needs no account; multiplayer also needs the site and the realtime server, with accounts made in the game with an email and a password.", "sources": ["ga-github"] },
+        { "label": "Status", "text": "Online at groddleafternoon.com since October 2026, solo and multiplayer, and still in active development: version 0.3.0 came out on 28 October 2026. The source is public on GitHub.", "sources": ["ga-site", "ga-github", "ga-restoration"] },
+        { "label": "How to play", "text": "Open groddleafternoon.com in a desktop browser. Solo needs no account and saves in your browser; playing online takes an account made in the game with an email and a password, saved on the site. It also runs locally from GitHub.", "sources": ["ga-site", "ga-github"] },
         { "label": "Team", "text": "A one-person project.", "sources": ["ga-restoration"] }
       ]
     }
