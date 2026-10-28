@@ -1427,7 +1427,7 @@ export const partySpacesFeature = {
   prepareStreet(street) {
     const s = partySpaceForStreet(street?.tsid);
     if (!s) return;
-    street.hubName = 'Party Locations';
+    street.hubName = ''; // G363: an instance, no hub line (location.js 3311); hub 108 stays for colours
     street.hubId = street.hubId || '108';
     // Spaces with no music_file fell back to the hub's unmapped ambient.
     if (!street.musicFile) street.musicFile = LIVELY_MUSIC;
@@ -1604,10 +1604,14 @@ export const partySpacesFeature = {
 
   /** party-feature streetLabel: a member in a space is in it, not on PARTY_<id>. */
   labelFor(tsid) {
+    // G363: a party space is an instance (groups/party.js 560, 661 instances_create('party_space')),
+    // and getLoadingInfo sends an instance no hub_name (location.js 3311): no 'Party Locations' line.
+    const solo = partySpaceForStreet(tsid);
+    if (solo) return { street: solo.label, hub: '', hubId: '108' };
     if (!MP_SPACE_STREET_RE.test(String(tsid || ''))) return null;
     const p = party();
     const label = p?.mp?.street === tsid ? space()?.label : '';
-    return { street: label || 'A Party Space', hub: 'Party Locations', hubId: '108' };
+    return { street: label || 'A Party Space', hub: '', hubId: '108' };
   },
 
   /** Another player's Glitch: the creator's Kick out <name> in the space (main.js:3730-3739). */

@@ -262,8 +262,9 @@ export function enterVoyage(engine) {
   engine.enterScene({
     tsid: VOYAGE_SCENE,
     label: VOYAGE_LABEL,
-    // G315: hub 61 'Simple Level Quests' (inc_data_maps_prod.js 245) is a dev label; plain remake wording.
-    hubName: 'Quest',
+    // G363: no hub line. The voyage is the purple_journey instance (players/inc_special_locations.js
+    // 392-393), and getLoadingInfo sends an instance no hub_name (location.js 3311).
+    hubName: '',
     width: VOYAGE_W,
     height: VOYAGE_H,
     background: scene.background,
@@ -579,7 +580,7 @@ export const purpleJourneyFeature = {
 
   /** The scene keeps no ordinary signposts; a reload resumes where you came from (enterScene's returnTo). */
   labelFor(tsid) {
-    return tsid === VOYAGE_SCENE ? { street: VOYAGE_LABEL, hub: 'Quest', hubId: 'scene' } : null;
+    return tsid === VOYAGE_SCENE ? { street: VOYAGE_LABEL, hub: '', hubId: 'scene' } : null;
   },
 
   /** purple_flower.js canMunch while Purpled Out. */

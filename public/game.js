@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g377-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-212';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-213';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g378-1';
@@ -2223,7 +2223,7 @@ async function enterStreetWithTransition(tsid, opts = {}) {
   const el = document.getElementById('screen-transition');
   const currentWinterLabel = winterLocationLabel(currentStreetTsid);
   const fromLabel = currentWinterLabel?.street || currentStreet?.label || '';
-  const fromHub = currentWinterLabel?.hub || currentStreet?.hubName || '';
+  const fromHub = currentWinterLabel?.hub ?? currentStreet?.hubName ?? '';
   const meta =
     STREET_INDEX.streets?.[tsid] ||
     STREET_INDEX.streets?.[String(tsid).replace(/^G/, 'L')] ||
@@ -2233,7 +2233,8 @@ async function enterStreetWithTransition(tsid, opts = {}) {
   const featureLabel = features.query('labelFor', tsid, engine);
   const toLabel = featureLabel?.street || winterLabel?.street || LAST_FEAT_STREET_LABELS[tsid] ||
     (tsid === AXIS_DENYDE_STREET_ID ? 'Axis Denyde' : meta.label || tsid);
-  const toHub = featureLabel?.hub || winterLabel?.hub ||
+  // G363: a feature's or Winter Walk's '' (an instance: location.js 3311) means no hub line, not the index hub.
+  const toHub = featureLabel?.hub ?? winterLabel?.hub ??
     (tsid === AXIS_DENYDE_STREET_ID ? 'Pollokoo' : meta.hubName || '');
   const hubId = featureLabel?.hubId || meta.hubId || currentStreet?.hubId;
   const colors = await resolveHubColors(hubId);
@@ -3672,7 +3673,7 @@ function updateHud() {
     // G186 (desk HUBLESS): an instance copy has no region (location.js 3311 sends
     // hub_name '' for instances), so the 21 copies whose files name a hidden hub
     // show the street alone, as the nameplate on arrival does; no Groddle Forest.
-    const hubLabel = winterLabel?.hub ||
+    const hubLabel = winterLabel?.hub ??
       (currentStreet.tsid === AXIS_DENYDE_STREET_ID
         ? 'Pollokoo'
         : currentStreet.hubName || '');
@@ -6551,9 +6552,8 @@ function enterHeldBy() {
 }
 
 function tryOpenNearestMenu({ nearestFirst = false } = {}) {
-  // G228: the crab's call-out never took focus (dont_take_focus), so Enter never
-  // answered it; here it does nothing while the call-out is up instead of
-  // opening the chooser over it.
+  // G228: a feature may hold Enter. G230 (Austin 2026-10-28): the crab's call-out no
+  // longer does; Enter opens its menu as the client's (LocationInputHandler.as 193-237).
   const held = enterHeldBy();
   if (app?.canvas) app.canvas.dataset.enterHeld = held || '';
   if (held) return;
@@ -12176,7 +12176,7 @@ async function startFourLetterQuest(opts = {}) {
     currentStreet = {
       tsid: FOUR_LETTER_ROOM_ID,
       label: "Mr. Block's Playroom",
-      hubName: 'Quest', // G315: hub 61, a dev label (inc_data_maps_prod.js 245)
+      hubName: '', // G363: the kids_room instance (letter_block_1.js 107): no hub line (location.js 3311)
       bounds: { l: 0, r: KIDS_ROOM_W, t: 0, b: 760 },
       platforms: bgLayer.platformsScreen,
       signposts: [],
@@ -12206,7 +12206,7 @@ async function startFourLetterQuest(opts = {}) {
     world.y = -Math.round(camY);
     const nameEl = document.getElementById('street-name');
     if (nameEl) {
-      nameEl.textContent = "Mr. Block's Playroom · Quest";
+      nameEl.textContent = "Mr. Block's Playroom";
       nameEl.dataset.tsid = FOUR_LETTER_ROOM_ID;
     }
     savePlayerLocation(fourLetterSourceLocation);
@@ -12637,7 +12637,7 @@ function installLegalizeScene(layer, { tsid, label, hubName, spawnX }) {
   world.y = -Math.round(camY);
   const nameEl = document.getElementById('street-name');
   if (nameEl) {
-    nameEl.textContent = `${label} · ${hubName}`;
+    nameEl.textContent = hubName ? `${label} · ${hubName}` : label;
     nameEl.dataset.tsid = tsid;
   }
   savePlayerLocation(legalizeSourceLocation);
@@ -12719,7 +12719,7 @@ function spawnLegalizeBackAlley() {
   installLegalizeScene(drawLegalizeBackAlley(), {
     tsid: LEGALIZE_BACK_ALLEY_TSID,
     label: 'The Back Alley',
-    hubName: 'Instance',
+    hubName: '', // G363: the back_alley instance (card_carrying_qualification.js 88): no hub line (location.js 3311)
     spawnX: 1120,
   });
   legalizeTargets = [];
@@ -12763,7 +12763,7 @@ function spawnLegalizeBackAlleyStation() {
     {
       tsid: LEGALIZE_BACK_ALLEY_STATION_TSID,
       label: 'The Back Alley Subway Station',
-      hubName: 'Instance',
+      hubName: '', // G363: inside the back_alley instance: no hub line (location.js 3311)
       spawnX: 220,
     }
   );
@@ -13544,7 +13544,7 @@ function setupGreedyStreetInstance() {
   }
   const name = document.getElementById('street-name');
   if (name) {
-    name.textContent = 'The Greedy Street Spirit · Storyland';
+    name.textContent = 'The Greedy Street Spirit'; // G363: an instance, no hub line (location.js 3311)
     name.dataset.tsid = GREEDY_STREET_PRODUCTION_TSID;
   }
   camTarget = cameraTargetForPlayer(player?.x || 365);
@@ -13857,11 +13857,12 @@ function updateGreedyStreetSpirit() {
 
 function winterLocationLabel(tsid) {
   if (tsid === WINTER_WALK_STREET_ID) {
-    // G315: both templates sit in hub 61, a dev label (inc_data_maps_prod.js 245, 17934-17938): plain remake wording.
-    return { street: 'Winter Walk', hub: 'Quest' };
+    // G363: both are level_quest_winter_walk / _haven instances (winter_walk.js 24-33, 100), and
+    // getLoadingInfo sends an instance no hub_name (location.js 3311): no hub line.
+    return { street: 'Winter Walk', hub: '' };
   }
   if (tsid === WINTER_HAVEN_STREET_ID) {
-    return { street: 'Winter Haven', hub: 'Quest' };
+    return { street: 'Winter Haven', hub: '' };
   }
   return null;
 }
@@ -14142,7 +14143,7 @@ function setupWinterWalkStage(stage) {
   }
   const name = document.getElementById('street-name');
   if (name && label) {
-    name.textContent = `${label.street} · ${label.hub}`;
+    name.textContent = label.hub ? `${label.street} · ${label.hub}` : label.street;
     name.dataset.tsid = currentStreetTsid;
   }
   renderWinterWalkHud();
@@ -14416,11 +14417,11 @@ function summersDayIsInstanced() {
 
 function summersDayLocationLabel(tsid = currentStreetTsid) {
   if (tsid === SUMMERS_DAY_MAIN_ID) {
-    // G315: both templates sit in hub 61 'Simple Level Quests' (inc_data_maps_prod.js 245), a dev label: plain remake wording.
-    return { street: 'A Summer’s Day', hub: 'Quest' };
+    // G363: the blue_and_white instance (blue_and_white_part1.js 98): no hub line (location.js 3311).
+    return { street: 'A Summer’s Day', hub: '' };
   }
   if (tsid === SUMMERS_DAY_BONUS_ID) {
-    return { street: 'Annex of A Summer’s Day', hub: 'Quest' };
+    return { street: 'Annex of A Summer’s Day', hub: '' };
   }
   return null;
 }
@@ -14864,7 +14865,7 @@ function setupSummersDayStage(stage) {
   world.y = -camY;
   const name = document.getElementById('street-name');
   if (name) {
-    name.textContent = `${label.street} · ${label.hub}`;
+    name.textContent = label.hub ? `${label.street} · ${label.hub}` : label.street;
     name.dataset.tsid = currentStreetTsid;
   }
   savePlayerLocation(summersDaySourceLocation);
@@ -14885,7 +14886,7 @@ async function transitionIntoSummersDay(stage, useTransition = true) {
     fromLabel: currentStreet?.label || '',
     fromHub: currentStreet?.hubName || '',
     toLabel: label,
-    toHub: 'Quest',
+    toHub: '',
     topColor: 0xf9fdff,
     bottomColor: 0xb8dce8,
     onMid: async () => setup(),
@@ -15523,7 +15524,7 @@ function setupRookWoodsInstance() {
   currentStreet = {
     tsid: ROOK_WOODS_STREET_ID,
     label: "Rooks' Woods",
-    hubName: 'Quest', // G315: hub 61, a dev label (inc_data_maps_prod.js 245)
+    hubName: '', // G363: the humbaba instance (rook_egg_smash.js 79): no hub line (location.js 3311)
     hubId: 'rook',
     bounds: { l: 0, r: bgLayer.worldW, t: 0, b: bgLayer.worldH },
     platforms: bgLayer.platformsScreen,
@@ -15551,7 +15552,7 @@ function setupRookWoodsInstance() {
   world.position.set(-Math.round(camTarget), -Math.round(camY));
   const name = document.getElementById('street-name');
   if (name) {
-    name.textContent = "Rooks' Woods · Quest";
+    name.textContent = "Rooks' Woods";
     name.dataset.tsid = ROOK_WOODS_STREET_ID;
   }
   setAmbientForStreet({ hubName: 'Rook Woods' }, { force: true });
@@ -15603,7 +15604,7 @@ async function startRookWoodsQuest(opts = {}) {
         fromLabel: currentStreet?.label || '',
         fromHub: currentStreet?.hubName || '',
         toLabel: "Rooks' Woods",
-        toHub: 'Quest',
+        toHub: '',
         topColor: '#2e332c',
         bottomColor: '#101411',
         onMid: setup,
@@ -16262,7 +16263,7 @@ function setupRookMuseumInstance() {
     tsid: ROOK_MUSEUM_STREET_ID,
     productionTsid: ROOK_MUSEUM_PRODUCTION_TSID,
     label: 'Museum of the Rook',
-    hubName: 'Jethimadh Tower',
+    hubName: '', // G363: the rook_museum instance (rook_hall.js 288): no hub line (location.js 3311)
     hubId: 'rook-museum',
     bounds: { l: 0, r: bgLayer.worldW, t: 0, b: bgLayer.worldH },
     platforms: bgLayer.platformsScreen,
@@ -16290,7 +16291,7 @@ function setupRookMuseumInstance() {
   world.y = -camY;
   const name = document.getElementById('street-name');
   if (name) {
-    name.textContent = 'Museum of the Rook · Jethimadh Tower';
+    name.textContent = 'Museum of the Rook';
     name.dataset.tsid = ROOK_MUSEUM_PRODUCTION_TSID;
   }
   renderRookMuseumHud();
@@ -16761,7 +16762,7 @@ function setupDeEmbiggenifyInstance() {
     tsid: EESTI_STREET_ID,
     productionTsid: EESTI_PRODUCTION_TSID,
     label: 'Eesti Life Catalogue Page 17',
-    hubName: 'Eesti Life Catalog', // G315: hub 49 (inc_data_maps_prod.js 119)
+    hubName: '', // G363: the eesti instance (de_embiggenify.js 43): no hub line (location.js 3311); hub 49 keeps its music
     hubId: '49',
     bounds: { l: 0, r: bgLayer.worldW, t: 0, b: bgLayer.worldH },
     platforms: bgLayer.platformsScreen,
@@ -16791,7 +16792,7 @@ function setupDeEmbiggenifyInstance() {
   world.y = -Math.round(camY);
   const name = document.getElementById('street-name');
   if (name) {
-    name.textContent = 'Eesti Life Catalogue Page 17 · Eesti Life Catalog';
+    name.textContent = 'Eesti Life Catalogue Page 17';
     name.dataset.tsid = EESTI_PRODUCTION_TSID;
   }
   if (state.started && audio.ctx) {
@@ -17735,7 +17736,7 @@ function setupParadiseCourse(course, sourcePoints) {
   currentStreet = {
     tsid: currentStreetTsid,
     label: course.name,
-    hubName: 'Ticket to Paradise',
+    hubName: '', // G363: a paradise_ticket instance (paradise_ticket.js 285): no hub line (location.js 3311)
     musicFile: course.musicFile || null,
     bounds: { l: 0, r: course.width, t: 0, b: course.height },
     platforms: [],
@@ -17827,7 +17828,7 @@ function setupParadiseCourse(course, sourcePoints) {
   world.y = -camY;
   const name = document.getElementById('street-name');
   if (name) {
-    name.textContent = `${course.name} · Ticket to Paradise`;
+    name.textContent = course.name;
     name.dataset.tsid = currentStreetTsid;
   }
   savePlayerLocation(paradiseSourceLocation);
@@ -17853,7 +17854,7 @@ async function transitionIntoParadise(course, points, useTransition = true) {
     fromLabel: currentStreet?.label || '',
     fromHub: currentStreet?.hubName || '',
     toLabel: course.name,
-    toHub: 'Ticket to Paradise',
+    toHub: '',
     topColor: colors[0],
     bottomColor: colors[1],
     onMid: async () => setup(),
@@ -19825,7 +19826,7 @@ async function enterStreet(tsid, opts = {}) {
       : null;
     const streetLabel = winterLabel?.street || stootLabel?.street ||
       (data.tsid === AXIS_DENYDE_STREET_ID ? 'Axis Denyde' : data.label);
-    const hubLabel = winterLabel?.hub || stootLabel?.hub ||
+    const hubLabel = winterLabel?.hub ?? stootLabel?.hub ??
       (data.tsid === AXIS_DENYDE_STREET_ID ? 'Pollokoo' : data.hubName);
     nameEl.textContent = hubLabel ? `${streetLabel} · ${hubLabel}` : streetLabel;
     nameEl.dataset.tsid = data.tsid;

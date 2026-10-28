@@ -89,7 +89,7 @@ import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
 import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=g311-1';
 import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=g377-1';
-import { startHogHaulMp } from './hog-haul-mp-feature.js?v=g334-hog-1';
+import { startHogHaulMp } from './hog-haul-mp-feature.js?v=g334-hog-2';
 import { textureFromUrl } from '../textures.js';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=desk2-1';
 import { gainMetabolic } from '../metabolics.js';

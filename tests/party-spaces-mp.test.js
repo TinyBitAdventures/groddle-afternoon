@@ -17,7 +17,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 
 import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../public/js/party-spaces-mp.js?v=g334-1';
 import { PARTY_PACKS, PARTY_SPACES, PARTY_TEXT, normalizePartyRecord } from '../public/js/party-spaces.js';
-import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=party-10';
+import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=party-11';
 import { sharedStreet } from '../public/js/features/realtime-feature.js?v=nbhome-12';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
@@ -228,7 +228,10 @@ describe('party spaces feature in multiplayer (features/party-spaces-feature.js)
     assert.equal(partySpacesFeature.realtimeStreet(engine), STREET);
     assert.equal(partySpacesFeature.sharedQuoinStreet(engine), STREET);
     assert.equal(sharedStreet({ ...engine, player: { x: 0, y: 0 }, query: (h, e) => (h === 'realtimeStreet' ? partySpacesFeature.realtimeStreet(e) : null) }), STREET);
-    assert.deepEqual(partySpacesFeature.labelFor(STREET), { street: 'Toxic Moon', hub: 'Party Locations', hubId: '108' });
+    // G363: a party space is an instance (groups/party.js 560 instances_create), and getLoadingInfo
+    // sends an instance no hub_name (locations/location.js 3311): no hub line, solo street or shared.
+    assert.deepEqual(partySpacesFeature.labelFor(STREET), { street: 'Toxic Moon', hub: '', hubId: '108' });
+    assert.deepEqual(partySpacesFeature.labelFor(PARTY_SPACES.moon.streetTsid), { street: 'Toxic Moon', hub: '', hubId: '108' });
   });
 
   it('shows the server\'s warning, and the ATM spends the payer\'s currants once', () => {
@@ -306,7 +309,7 @@ describe('party spaces in solo', () => {
 
   it('is wired after the realtime client exists, with fresh keys', () => {
     const idx = read('public/js/features/index.js');
-    assert.ok(idx.includes("import { partySpacesFeature } from './party-spaces-feature.js?v=party-10';"));
+    assert.ok(idx.includes("import { partySpacesFeature } from './party-spaces-feature.js?v=party-11';"));
     assert.ok(idx.includes("shared-quoins-feature.js?v=mp4-2"));
     assert.ok(idx.includes("trade-feature.js?v=pspace-2"));
   });

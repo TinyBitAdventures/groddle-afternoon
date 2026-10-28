@@ -595,7 +595,8 @@ export const hogHaulMpFeature = {
 
   labelFor(tsid) {
     const game = mp || pending;
-    return game && tsid === game.street ? { street: HOG_MP_TEXT.title, hub: 'Race', hubId: 'scene' } : null;
+    // G363: a game is an instance: no hub line (location.js 3311), as races show none.
+    return game && tsid === game.street ? { street: HOG_MP_TEXT.title, hub: '', hubId: 'scene' } : null;
   },
 
   /** QA / tests. */

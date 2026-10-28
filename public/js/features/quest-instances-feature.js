@@ -34,6 +34,7 @@
  *     firstStage, stageLabel(stage), loadingLabel(stage) (the loading card's line, else stageLabel),
  *     build(ctx, stage) -> { width, height, background, platforms, walls,
  *                            barriers, spawn: {x,y}, label, hubName }
+ *       (hubName is kept for reference only: G363, a room shows no hub line)
  *     street(ctx, stage) -> { tsid, x, y }      (an imported street instead)
  *     enter(ctx, stage), tick(ctx, dtMs, now), clear(ctx),
  *     verbs(ctx, target) -> verbs, runVerb(ctx, target, verbId) -> true,
@@ -139,7 +140,7 @@ function loadRoom(roomId) {
     const path = roomModulePath(roomId).replace(/^\.\//, '../quest-rooms/');
     loading.set(
       roomId,
-      import(`${path}?v=rooms-g381`)
+      import(`${path}?v=rooms-g382`)
         .then((mod) => {
           const def = mod.room || mod.default || null;
           loaded.set(roomId, def);
@@ -828,7 +829,12 @@ const LOADING_COLORS = {
   lab: ['#33414f', '#151c23'],
 };
 
-async function withTransition(engine, label, hubName, theme, work) {
+/**
+ * G363 (Austin 2026-10-28): no hub line inside a quest room. getLoadingInfo sends
+ * an instance hub_name '' (GSJS locations/location.js 3311), and the client's
+ * location bar drew the street name alone then (CurrentLocationUI.as), as races do.
+ */
+async function withTransition(engine, label, theme, work) {
   const fx = typeof document !== 'undefined' ? document.getElementById('screen-transition') : null;
   if (!fx || engine.param('questfx') === '0') {
     await work();
@@ -839,7 +845,7 @@ async function withTransition(engine, label, hubName, theme, work) {
     fromLabel: engine.street?.label || '',
     fromHub: engine.street?.hubName || '',
     toLabel: label,
-    toHub: hubName || '',
+    toHub: '',
     topColor: top,
     bottomColor: bottom,
     onMid: work,
@@ -866,8 +872,8 @@ async function buildStage(engine, stage) {
   engine.enterScene({
     tsid: questSceneTsid(room.id, stage),
     label: scene.label || room.title,
-    // G318: a room with no hub of its own says plain 'Quest', as the hub-61 rooms do (G315).
-    hubName: scene.hubName ?? room.hubName ?? 'Quest',
+    // G363: an instance has no hub line (location.js 3311), whatever the room names.
+    hubName: '',
     width: scene.width,
     height: scene.height,
     background: scene.background,
@@ -918,7 +924,7 @@ async function startInstance(engine, questId, opts = {}) {
     engine.closeMap?.();
     room.start?.(ctx);
     const label = room.loadingLabel?.(run.stage, ctx) || room.stageLabel?.(run.stage, ctx) || room.title;
-    await withTransition(engine, label, room.hubName || 'Quest', room.theme, () => buildStage(engine, run.stage));
+    await withTransition(engine, label, room.theme, () => buildStage(engine, run.stage));
     engine.setData('qiStatus', run.status);
     publish(engine, true);
     if (opts.autoplay) runAutoplay(engine, opts.autoplay);
@@ -934,7 +940,7 @@ async function gotoStage(engine, stage, opts = {}) {
   const label = room.loadingLabel?.(stage, ctx) || room.stageLabel?.(stage, ctx) || room.title;
   const work = () => buildStage(engine, stage);
   if (opts.transition === false) await work();
-  else await withTransition(engine, label, room.hubName || 'Quest', room.theme, work);
+  else await withTransition(engine, label, room.theme, work);
   publish(engine, true);
   return true;
 }
@@ -1004,7 +1010,7 @@ async function leaveInstance(engine, opts = {}) {
     if (back?.tsid) await engine.enter(back.tsid, { spawnX: back.x, spawnY: back.y, quiet: true, bypassFeatureGates: true, useTransition: false });
   };
   if (opts.transition === false) await go();
-  else await withTransition(engine, '', '', leftRoom?.theme, go);
+  else await withTransition(engine, '', leftRoom?.theme, go);
   publish(engine, true);
   if (activeQuest(engine, questId) && requirementsMet(engine, questId) && !hook.noTurnIn) {
     await turnIn(engine, questId);
@@ -1317,7 +1323,8 @@ export const questInstancesFeature = {
     if (!run || !wait || !street || street.tsid !== wait.tsid) return;
     const label = room?.stageLabel?.(wait.stage, ctx) || room?.title;
     if (label) street.label = label;
-    street.hubName = room?.hubName || street.hubName || '';
+    // G363: a street-based room is an instance copy too: no hub line (location.js 3311).
+    street.hubName = '';
   },
 
   physics(engine) {

@@ -49,8 +49,9 @@
  * ladder_interior_4steps. Left out (no CC0 art in the shipped set): the big
  * hollow two-trunk tree and the pale green curling plants of the walk (bare
  * trees and dry grass stand there), and the snow on the haven's branches.
- * The two caption lines the pictures show are not used (longer copy needs a
- * source; see the register).
+ * The walk's caption line (WINTER_WALK_CAPTION) is placed in the walk as the
+ * pictures show it (G352, Austin 2026-10-28: one-off approval); Being Watched
+ * places its own (js/quest-rooms/being-watched.js CAPTION).
  */
 
 export const WINTER_STREETS_SOURCE = 'research/flickr-2026-10-27 (reference only)';
@@ -158,6 +159,23 @@ export const WINTER_WALK_PILLARS = Object.freeze([
 ]);
 /** The camp at the left end (Flickr 8417912672: you start beside the fire, the teepee just past it). */
 export const WINTER_WALK_CAMP = Object.freeze({ fire: -2760, tent: -2540 });
+/**
+ * G352: the walk's caption, read off URvonb's snap (Flickr 8264519059, snap 111722-054d9a5777,
+ * 2012-10-14) and reelasitgets' (Flickr 8273330942, 2012-12-14), reference only. No GSJS text:
+ * it was deco sign text placed in the lost template (the client's Deco sign_txt,
+ * DecoRenderer.as 287-311), so it stays put as you walk: both pictures show it at the same spot,
+ * dark grey, centred in four lines, just right of the hollow two-trunk tree past the camp,
+ * about 140 px above the floor. Here that is right of the two-trunk heights_tree_bare_4 (-1720, its right trunk near -1658)
+ * and short of the next tree (-1430), clear of the trunks. World x, y of its centre; drawn by
+ * features/rebuilt-rooms-feature.js.
+ * Austin 2026-10-28: one-off approval.
+ */
+export const WINTER_WALK_CAPTION = Object.freeze({
+  lines: Object.freeze(['Have you ever heard the', 'ding-a-ling-ling sound', 'icicles make when you', 'tappity-tap them?']),
+  x: -1545,
+  y: WINTER_WALK_START.y - 150,
+  fill: 0x3a3836,
+});
 export const WINTER_WALK_SOURCE_LINE =
   'reconstruction: Winter Walk (LIFH2AKJ5I735SV, not in tinyspeck/glitch-locations); layout from Cleops\' 2013-01-26 snaps (Flickr 8417912672, 8417912992), URvonb\'s snap (Flickr 8264519059) and reelasitgets\' (Flickr 8273330942), reference only; CC0 Alakol, Heights and Juju camp decos';
 
@@ -366,7 +384,8 @@ export function winterWalkStreet() {
       bounds: 'onStarted drops you at -2875,-81 (winter_walk.js:105), so the walk is the standard -3000..3000 with its floor at -81.',
       layout: 'Left to right: the camp (campfire, teepee) where you start, a wood of bare dead trees and snowy scrub, an open snowfield, then the cliffs\' end with a basalt overhang, a big bare tree and three snow pillars; firs, white hills and snowy basalt mountains behind.',
       route: 'js/winter-walk.js runs the timed route: motes spread over the platforms, the passage to Winter Haven at the right end, and the way home at the same end on the return.',
-      notBuilt: 'The hollow two-trunk tree and the curling green plants have no CC0 art in the shipped set; the caption lines are not used.',
+      notBuilt: 'The hollow two-trunk tree and the curling green plants have no CC0 art in the shipped set.',
+      caption: 'The pictures\' caption line is drawn at the same spot by features/rebuilt-rooms-feature.js (WINTER_WALK_CAPTION; Austin 2026-10-28: one-off approval).',
     },
   });
 }

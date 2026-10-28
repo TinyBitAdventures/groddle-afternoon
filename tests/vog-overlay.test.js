@@ -205,18 +205,20 @@ describe('Enter during the crab\'s call-out', () => {
     assert.match(crab, /this\.conversation_start\(pc, txt, choices, null, null, null, \{required_distance: 100, dont_take_focus: true\}\);/);
   });
 
-  it('the crab holds Enter while its call-out is up, and Enter does nothing then', () => {
-    const crabs = read('js/features/crabs-feature.js');
-    assert.match(crabs, /holdsEnter\(\) \{\s*return talk \? 'crab' : null;\s*\}/);
-    const open = game.slice(game.indexOf('function tryOpenNearestMenu('));
-    assert.match(open, /^function tryOpenNearestMenu\(\{ nearestFirst = false \} = \{\}\) \{[\s\S]{0,400}?const held = enterHeldBy\(\);[\s\S]{0,120}?if \(held\) return;/);
-    assert.match(game, /function enterHeldBy\(\) \{\s*return features\.query\('holdsEnter', engine\) \|\| null;\s*\}/);
-    assert.match(game, /if \(!enterHeldBy\(\)\) want = \{\s*key: 'Enter',/);
+  it('Enter still reached the client\'s location handler, which opened the menu (G230, Austin 2026-10-28)', { skip: !existsSync(client) && 'no client checkout' }, () => {
+    const lih = readFileSync(join(client, 'view/renderer/LocationInputHandler.as'), 'utf8');
+    // enterKeyHandler 193-207 returns only for a focused input or cult mode, then begins the interaction.
+    assert.match(lih, /private function enterKeyHandler\(e:KeyboardEvent = null\):void \{[\s\S]*?if \(model\.stateModel\.focus_is_in_input\) return;[\s\S]*?_beginInteractionAfterEnterKey\(\);/);
+    assert.match(lih, /TSFrontController\.instance\.startInteractionWith\(interaction_spritesV\[0\]\);/);
   });
 
-  it('the crab feature answers holdsEnter from its talk state', async () => {
-    const { crabsFeature } = await import('../public/js/features/crabs-feature.js?v=g196-1');
-    assert.equal(crabsFeature.holdsEnter(), null);
+  it('the crab holds no Enter, so Enter opens its menu while the call-out is up', async () => {
+    const crabs = read('js/features/crabs-feature.js');
+    assert.doesNotMatch(crabs, /holdsEnter\(/);
+    const { crabsFeature } = await import('../public/js/features/crabs-feature.js?v=g382-1');
+    assert.equal(crabsFeature.holdsEnter, undefined);
+    // The generic hook stays for any later feature; nothing answers it now.
+    assert.match(game, /function enterHeldBy\(\) \{\s*return features\.query\('holdsEnter', engine\) \|\| null;\s*\}/);
   });
 });
 

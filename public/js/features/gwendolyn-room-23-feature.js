@@ -574,6 +574,19 @@ export const gwendolynRoom23Feature = {
     save = { v: 1, repeatPaid: slice?.repeatPaid === true, greetings: Number(slice?.greetings) || 0 };
   },
 
+  /**
+   * G363: Room 23 is a tower_quest instance (npc_widget.js 423, 431 and 499 check
+   * container.isInstance('tower_quest')), and getLoadingInfo sends an instance no
+   * hub_name (location.js 3311): the loading card and location bar show no hub line.
+   */
+  labelFor(tsid) {
+    return isRoom23(tsid) ? { street: 'Room 23', hub: '', hubId: '79' } : null;
+  },
+
+  prepareStreet(street) {
+    if (isRoom23(street?.tsid)) street.hubName = '';
+  },
+
   /** Indoors like the tower rooms: nothing archived, so no animals, apples, Musicblocks or quoins. */
   ecologyOverride(street) {
     if (!isRoom23(street?.tsid)) return null;

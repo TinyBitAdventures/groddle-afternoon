@@ -195,6 +195,7 @@ export function lightLayout() {
   ];
   // G318: the designer's sign texts, read off footage Et0RkY43A5Q and matched in five players'
   // Snaps (reference only). No GSJS or client text: neither template is in the locations dump.
+  // Longer than the sign-words rule allows: Austin 2026-10-28: one-off approval (footage Et0RkY43A5Q).
   const signs = [
     { text: 'What would the world be without light?', x: 240, y: 680 },
     { text: 'Light up your path to find the way.', x: 680, y: 665 },

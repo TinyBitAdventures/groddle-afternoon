@@ -29,8 +29,8 @@
  * Bureaucratic Hall's, where the cup of water comes from), so the room is
  * rebuilt dark: ceiling TVs along the room that turn to face you, a pool of
  * light that follows you, and the veil the source names ("Peek Behind the
- * Veil") on a dais at the far end. The picture's caption line is not used
- * (no source text). Peeking behind the veil finds the Bureaucrats'
+ * Veil") on a dais at the far end. The picture's caption line is placed
+ * text in the room (CAPTION below). Peeking behind the veil finds the Bureaucrats'
  * observation booth; their short exchange (marked below, no source text
  * survives) sets `convo_end`, and you wake up, which sets `leave` and turns
  * the quest in with the source completion text.
@@ -79,6 +79,14 @@ export const MONITORS = Object.freeze([
   { x: 1520, y: FLOOR - 172, s: 0.44 },
 ]);
 export const TV = Object.freeze({ sprite: 'bureaucratic_hall_tv_1', w: 266, h: 282 });
+/**
+ * G352: the room's caption, read off Arthur DentUre's snap (Flickr 8270858639, 2012-12-13;
+ * research/flickr-2026-10-27/raw/being-watched, reference only). No GSJS text: placed in the
+ * lost template as deco sign text (the client's Deco sign_txt, DecoRenderer.as 287-311), white
+ * and bold on the black, left of a ceiling set and level with it, there the whole nap.
+ * Austin 2026-10-28: one-off approval.
+ */
+export const CAPTION = Object.freeze({ text: 'Ever feel like you\'re being watched?', x: 640, y: FLOOR - 205 });
 /** A set watches you while it faces you and you are this near. */
 export const WATCH_RANGE = 760;
 
@@ -130,6 +138,8 @@ function drawDark(ctx) {
   g.roundRect(DAIS.x1, DAIS.y, DAIS.x2 - DAIS.x1, FLOOR - DAIS.y + 8, 10).fill(0x16161a);
   g.roundRect(DAIS.x1, DAIS.y - 4, DAIS.x2 - DAIS.x1, 8, 4).fill({ color: 0x3a3a42, alpha: 0.8 });
   world.addChild(g);
+  // G352: the snap's caption (CAPTION; Austin 2026-10-28: one-off approval).
+  world.addChild(kit.label(PIXI, CAPTION.text, CAPTION.x, CAPTION.y, { size: 17, fill: 0xffffff, weight: '800' }));
   // Ceiling TVs, each hung from the dark on a rod above its own stalk.
   const sets = MONITORS.map((m, i) => {
     const c = new PIXI.Container();
