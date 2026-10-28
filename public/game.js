@@ -15,6 +15,7 @@ import {
   advanceTimedAction,
   cancelTimedAction,
 } from './js/action-timing.js?v=timed-actions-1';
+import { createWordProgressView, wordAnchor, heldActionDelta, MAX_PUSH_DOWN } from './js/word-progress.js?v=g387-1';
 import {
   createQuestState,
   assignQuest,
@@ -5647,45 +5648,31 @@ function openFeedPicker(target, verb = null) {
   return true;
 }
 
-function positionActionProgress() {
-  const el = document.getElementById('action-progress');
-  if (!el || el.hidden || !player || !app?.canvas) return;
-  const canvas = app.canvas;
-  const canvasW = canvas.clientWidth || canvas.width || VIEW_W;
-  const canvasH = canvas.clientHeight || canvas.height || VIEW_H;
-  const screenX = (player.x - camTarget) * (canvasW / VIEW_W);
-  const screenY = (player.y - (camY || 0) - 98) * (canvasH / VIEW_H);
-  const halfWidth = Math.max(1, el.offsetWidth || 238) / 2;
-  const safeRight = horizontalLocationViewWidth() * (canvasW / VIEW_W);
-  const clampedX = cameraOverlayCenterX(
-    screenX,
-    halfWidth * 2,
-    canvasW,
-    cameraRightInset * (canvasW / VIEW_W),
-    10
-  );
-  el.style.left = `${clampedX}px`;
-  el.style.top = `${clamp(screenY, 66, Math.max(66, canvasH - 120))}px`;
-  canvas.dataset.actionScreenX = clampedX.toFixed(2);
-  canvas.dataset.actionSafeRight = safeRight.toFixed(2);
-  canvas.dataset.actionWidth = (halfWidth * 2).toFixed(2);
-}
+let wordProgressView;
 
+/** The running verb's word over its item (js/word-progress.js: WordProgressBar.as, runSkillPackage placement). */
 function renderCurrentAction() {
   const el = document.getElementById('action-progress');
   if (!el) return;
-  if (!currentAction || currentAction.status !== 'running') {
-    el.hidden = true;
-    el.setAttribute('aria-hidden', 'true');
+  wordProgressView ||= createWordProgressView(el, { onCancel: () => cancelCurrentAction() });
+  const spr = currentAction?.target?.sprite;
+  if (!currentAction || currentAction.status !== 'running' || !spr || spr.destroyed || !player || !app?.canvas) {
+    wordProgressView?.hide();
     return;
   }
-  el.hidden = false;
-  el.setAttribute('aria-hidden', 'false');
-  const label = el.querySelector('[data-action-label]');
-  const fill = el.querySelector('[data-action-fill]');
-  if (label) label.textContent = currentAction.label;
-  if (fill) fill.style.width = `${Math.round(currentAction.progress * 100)}%`;
-  positionActionProgress();
+  const canvas = app.canvas;
+  const scale = (canvas.clientWidth || canvas.width || VIEW_W) / VIEW_W;
+  const art = Number(currentAction.target.artHeight) > 0 ? Number(currentAction.target.artHeight) : clamp(Math.abs(spr.height || 60), 36, 170);
+  const at = wordAnchor({ classId: currentAction.classId, verbId: currentAction.verbId, itemX: spr.x, itemY: spr.y, itemTop: spr.y - art, playerX: player.x });
+  // keepInBounds: below the top bar, pushed down at most 120 px.
+  const top = (at.y - (camY || 0)) * scale;
+  const y = top < 66 ? Math.min(66, top + MAX_PUSH_DOWN * scale) : top;
+  const clampX = (x, width) => cameraOverlayCenterX(x, width, canvas.clientWidth || VIEW_W, cameraRightInset * scale, 10);
+  const shown = wordProgressView.show(currentAction, { x: (at.x - camTarget) * scale, y, clampX }, scale);
+  canvas.dataset.actionScreenX = shown.x.toFixed(2);
+  canvas.dataset.actionSafeRight = (horizontalLocationViewWidth() * scale).toFixed(2);
+  canvas.dataset.actionWidth = shown.width.toFixed(2);
+  canvas.dataset.wordProgress = `${shown.word}:${shown.fill.toFixed(2)}:${shown.dismissible ? 'cancel' : 'nocancel'}:${at.placeAtBottom ? 'bottom' : 'top'}`;
 }
 
 function clearActionToolFx(status = 'cancelled') {
@@ -5947,7 +5934,7 @@ function updateCurrentAction(deltaMs) {
     cancelCurrentAction({ quiet: true });
     return;
   }
-  currentAction = advanceTimedAction(currentAction, deltaMs);
+  currentAction = advanceTimedAction(currentAction, heldActionDelta(currentAction, deltaMs));
   if (currentAction.target === rookEggTarget) updateRookEggSmashVisual(currentAction);
   renderCurrentAction();
   if (currentAction.status !== 'complete') return;

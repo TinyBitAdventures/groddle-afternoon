@@ -1403,62 +1403,50 @@ body.nx-hide-mood.nx-hide-energy .meta-vitals { visibility: hidden; }
 @keyframes actIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 .activity-feed .act.is-leaving { opacity: 0; transition: opacity 0.4s ease; }
 
-/* Committed world verb, positioned above the avatar by game.js. */
-.action-progress {
+/* The running verb's word (the original's WordProgressBar, js/word-progress.js):
+   three atlas layers (empty letters, the fill clipped by its width, the highlight)
+   and the cancel button. game.js places it over the item in world px, scaled. */
+.word-progress {
   position: absolute;
-  left: 50%;
-  top: 60%;
+  left: 0;
+  top: 0;
   z-index: 24;
-  width: min(238px, 46%);
-  transform: translate(-50%, -100%);
+  transform-origin: 0 0;
   pointer-events: none;
-  line-height: 1.2;
+  will-change: transform, opacity;
 }
-.action-progress[hidden] { display: none !important; }
-.action-progress-card {
-  overflow: hidden;
-  border: 1px solid rgba(82, 73, 56, 0.58);
-  border-radius: 9px;
-  background: rgba(255, 253, 247, 0.96);
-  box-shadow: 0 4px 14px rgba(28, 24, 18, 0.24);
-  animation: actionIn 140ms ease-out;
+.word-progress[hidden] { display: none !important; }
+.word-progress-word {
+  position: absolute;
+  left: 0;
+  top: 0;
 }
-.action-progress-copy {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.45rem;
-  padding: 0.36rem 0.48rem 0.3rem;
-  color: #3d4f31;
+.word-progress-word > i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-image: var(--word-progress-sheet);
+  background-size: var(--word-progress-atlas);
+  background-repeat: no-repeat;
 }
-.action-progress-copy strong {
-  overflow: hidden;
-  font-size: 0.72rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.word-progress-word > i[hidden] { display: none; }
+.word-progress-word > .word-progress-fill { overflow: hidden; }
+.word-progress-cancel {
+  position: absolute;
+  width: 20px;
+  height: 21px;
+  padding: 0;
+  border: 0;
+  background: url("assets/sprites/word-progress/cancel.png") no-repeat 0 0 / 20px 21px;
+  cursor: pointer;
+  pointer-events: auto;
 }
-.action-progress-copy span {
-  flex-shrink: 0;
-  color: #777064;
-  font-size: 0.56rem;
+.word-progress-cancel:hover,
+.word-progress-cancel:focus-visible {
+  background-image: url("assets/sprites/word-progress/cancel_hover.png");
 }
-.action-progress-track {
-  height: 7px;
-  overflow: hidden;
-  background: #d9e2d2;
-}
-.action-progress-track > i {
-  display: block;
-  width: 0;
-  height: 100%;
-  border-radius: 0 999px 999px 0;
-  background: linear-gradient(90deg, #75b348, #b6d968 72%, #f0dd69);
-  box-shadow: 0 0 8px rgba(173, 207, 91, 0.65);
-}
-@keyframes actionIn {
-  from { opacity: 0; transform: translateY(5px) scale(0.97); }
-  to { opacity: 1; transform: none; }
-}
+.word-progress-cancel:focus-visible { outline: 2px solid #fff; outline-offset: 1px; border-radius: 50%; }
+.word-progress-cancel[hidden] { display: none; }
 
 /* Persistent quest + activity context. Hidden to keep the street clear: the
    Quests panel and the activity popups carry the same information. The camera

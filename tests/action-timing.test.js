@@ -66,6 +66,7 @@ describe('world action timing', () => {
     assert.match(game, /e\.key === 'e'/);
     assert.match(html, /id="action-progress"/);
     assert.match(html, /data-action-fill/);
-    assert.match(css, /\.action-progress-track/);
+    // The word progress bar replaced the cream panel (tests/word-progress.test.js).
+    assert.match(css, /\.word-progress-fill/);
   });
 });

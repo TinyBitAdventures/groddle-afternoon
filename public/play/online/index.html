@@ -32,7 +32,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex" />
   <title>Groddle Afternoon · Multiplayer</title>
-    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;tools=g183-1&amp;make=g191-1&amp;rock=g211-1&amp;route=g192-1&amp;prompt=g198-1&amp;machines=g193-1&amp;skills=g367-1&amp;chooser=g206-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=ticket-1&amp;card=g249-1&amp;offers=g229-1&amp;buffs=g256-1&amp;speech=g269-1&amp;banner=g297-1&amp;pop=g332-1&amp;bags=g152-1&amp;maptp=g356-1&amp;hud2=g361-1&amp;award=g385-1" />
+    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;tools=g183-1&amp;make=g191-1&amp;rock=g211-1&amp;route=g192-1&amp;prompt=g198-1&amp;machines=g193-1&amp;skills=g367-1&amp;chooser=g206-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=ticket-1&amp;card=g249-1&amp;offers=g229-1&amp;buffs=g256-1&amp;speech=g269-1&amp;banner=g297-1&amp;pop=g332-1&amp;bags=g152-1&amp;maptp=g356-1&amp;hud2=g361-1&amp;award=g385-1&amp;wordprog=g387-1" />
   <script src="vendor/pixi/pixi-8.22.0.min.js"></script>
   <link rel="icon" href="favicon.svg?v=arch" type="image/svg+xml" />
   <link rel="icon" href="favicon.ico?v=arch" sizes="32x32" />
@@ -458,15 +458,13 @@
       <!-- Activity / toast feed -->
       <div id="activity-feed" class="activity-feed" aria-live="polite"></div>
 
-      <!-- Avatar-anchored committed world action -->
-      <div id="action-progress" class="action-progress" role="status" aria-live="polite" hidden>
-        <div class="action-progress-card">
-          <div class="action-progress-copy">
-            <strong data-action-label>Doing a thing…</strong>
-            <span>Move or Esc to cancel</span>
-          </div>
-          <div class="action-progress-track" aria-hidden="true"><i data-action-fill></i></div>
+      <!-- The running verb's word, filling over the item (the original's WordProgressBar; js/word-progress.js) -->
+      <div id="action-progress" class="word-progress" role="status" aria-live="polite" hidden>
+        <span class="visually-hidden" data-action-label>Doing a thing…</span>
+        <div class="word-progress-word" data-word-progress aria-hidden="true">
+          <i class="word-progress-base"></i><i class="word-progress-fill" data-action-fill></i><i class="word-progress-top"></i>
         </div>
+        <button type="button" class="word-progress-cancel" data-word-cancel aria-label="Cancel" title="Cancel" hidden></button>
       </div>
 
       <!-- Persistent play context, inspired by Glitch's quest/activity sidebar -->
@@ -917,6 +915,6 @@
 
   </div>
   <!-- game.js loads once the multiplayer save is in memory (js/online-boot.js). -->
-  <script type="module" id="online-boot" src="js/online-boot.js?v=g372-1" data-game="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=g378-1&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g388-1"></script>
+  <script type="module" id="online-boot" src="js/online-boot.js?v=g372-1" data-game="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=g378-1&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g387-1"></script>
 </body>
 </html>
