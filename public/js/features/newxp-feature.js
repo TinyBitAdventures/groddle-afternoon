@@ -646,6 +646,7 @@ async function skillChooser(t) {
 
 async function fadeOut() {
   ensureUi();
+  if (!ui) return;
   positionBubbles();
   ui.fade.style.opacity = '1';
   await new Promise((r) => setTimeout(r, 380));
@@ -2408,22 +2409,129 @@ async function autoLeave(engine, t) {
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* Exits with a way out (G401)                                          */
+/* ------------------------------------------------------------------ */
+
+/** The Map's signpost graph (map-routes-feature, same URL so the browser keeps one copy). */
+const EXIT_GRAPH_URL = 'assets/content/signpost-graph.json?v=g198-1';
+let exitGraph = null;
+
+/**
+ * G401 (Austin 2026-10-28, stranded on Rappam Rolls after the tutorial): an exit only counts when its
+ * roads lead back to the starting street. The remake opens most of Ur through street projects (a road
+ * into a street still being built stays closed: js/street-jobs.js roadClosure), while newxp_exits is from
+ * a world whose roads were all built, so on a fresh world 100 of the 115 drops were pockets with every
+ * signpost closed ("still under construction"), and a new player has no Teleportation for the Map.
+ * `graph` is assets/content/signpost-graph.json (signposts; doors, which no road closure holds, except
+ * keyed ones), `closed` the streets whose roads are closed now (street-jobs-feature closedRoads),
+ * `start` the street the open world grows from (Hechey Track: its roads are never closed).
+ */
+export function exitLeadsHome(tsid, { graph, closed = [], start = DEFAULT_START } = {}) {
+  const g = (t) => { const s = String(t || ''); return s.startsWith('L') ? `G${s.slice(1)}` : s; };
+  const from = g(tsid);
+  const home = g(start);
+  if (!from || !graph?.streets) return false;
+  if (from === home) return true;
+  const shut = new Set((closed || []).map(g));
+  const keyed = new Set(Object.keys(graph.doorKeys || {}));
+  const seen = new Set([from]);
+  const queue = [from];
+  for (let i = 0; i < queue.length; i += 1) {
+    const at = queue[i];
+    const next = [
+      ...(graph.streets[at] || []).filter((to) => !shut.has(to)),
+      ...(graph.doors?.[at] || []).filter((to) => !keyed.has(`${at}>${to}`)),
+    ];
+    for (const to of next) {
+      if (to === home) return true;
+      if (seen.has(to)) continue;
+      seen.add(to);
+      queue.push(to);
+    }
+  }
+  return false;
+}
+
+/** player.js teleportHome's pick, kept to exits with a way out; the starting street when none has one. */
+export function pickOpenExit(rng, exists, open) {
+  if (!open) return pickNewxpExit(rng, exists);
+  return pickNewxpExit(rng, (tsid) => exists(tsid) && open(tsid)) || { sourceTsid: '', tsid: DEFAULT_START, x: 0, y: 0 };
+}
+
+/** A predicate for streets a new player can walk out of; null while the roads or the graph are unknown. */
+async function exitRoads(engine) {
+  if (!exitGraph && typeof fetch === 'function') {
+    exitGraph = fetch(EXIT_GRAPH_URL).then((r) => r.json()).catch(() => null);
+  }
+  const graph = await exitGraph;
+  if (!graph?.streets) exitGraph = null; // a failed load is tried again next time
+  const closed = engine.query?.('closedRoads', engine);
+  if (!graph?.streets || !Array.isArray(closed)) return null;
+  return (tsid) => exitLeadsHome(tsid, { graph, closed });
+}
+
+/** player.js teleportHome: the source x, dropped in from above (x 0 is mid-street). */
+function dropAtExit(engine, exit) {
+  const b = engine.street?.bounds;
+  if (b && engine.streetTsid === exit.tsid) place(Math.max(60, Math.min(b.r - b.l - 60, exit.x - b.l)), 40);
+}
+
+/** The tutorial's chrome is down once the island is left: nothing of it holds the avatar on the exit street. */
+function unrootForExit() {
+  rooted = false;
+  if (!ui) return;
+  for (const n of [ui.bubble, ui.card, ui.vog, ui.instr]) n.hidden = true;
+  ui.resolve = null;
+}
+
 /** player.js teleportHome: choose_one(config.newxp_exits). */
 async function leaveIsland(engine) {
   if (!islandExitOpen(save.island)) return;
-  const exit = pickNewxpExit(Math.random, (tsid) => engine.streetExists(tsid));
+  const open = await exitRoads(engine);
+  if (!islandExitOpen(save.island)) return;
+  const exit = pickOpenExit(Math.random, (tsid) => engine.streetExists(tsid), open);
   if (!exit) return;
   save.island = 'exited';
   save.exit = { tsid: exit.tsid, x: exit.x };
   engine.save();
   engine.setData('newxpExit', exit.tsid);
+  unrootForExit();
   await fadeOut();
   await engine.enter(exit.tsid, { quiet: true, bypassFeatureGates: true });
-  // player.js teleportHome: the source x, dropped in from above.
-  const b = engine.street?.bounds;
-  if (b && engine.streetTsid === exit.tsid) place(Math.max(60, Math.min(b.r - b.l - 60, exit.x - b.l)), 40);
+  dropAtExit(engine, exit);
   fadeIn();
   islandEnter(engine);
+}
+
+let strandChecked = '';
+let strandRetryAt = 0;
+/**
+ * G401: a player already left on a street with every road still being built (dropped there before the
+ * pick above, or on a world whose roads have closed since) is set down on an exit with a way out, once,
+ * when the street is entered or the game reloads there.
+ */
+async function rescueStranded(engine) {
+  const tsid = engine.streetTsid;
+  if (!save.exit || tsid !== save.exit.tsid || !(save.status === 'done' || save.island === 'exited')) return false;
+  const open = await exitRoads(engine);
+  if (!open) return 'unknown';
+  if (open(tsid) || engine.streetTsid !== tsid) return false;
+  const exit = pickOpenExit(Math.random, (t) => engine.streetExists(t), open);
+  if (!exit || exit.tsid === tsid) return false;
+  const from = engine.street?.label || 'this street';
+  save.exit = { tsid: exit.tsid, x: exit.x };
+  engine.save();
+  engine.setData('newxpExit', exit.tsid);
+  engine.setData('newxpRescued', `${tsid}>${exit.tsid}`);
+  unrootForExit();
+  await fadeOut();
+  await engine.enter(exit.tsid, { quiet: true, bypassFeatureGates: true });
+  dropAtExit(engine, exit);
+  fadeIn();
+  strandChecked = engine.streetTsid;
+  engine.toast?.(`The roads out of ${from} are still under construction, so you were set down on ${engine.street?.label || 'a street nearby'}.`, 6000);
+  return true;
 }
 
 async function finishTutorial(engine, t) {
@@ -2646,9 +2754,10 @@ async function revealMappery(engine, t) {
   await engine.openMap(String(engine.street?.hubId || '129'));
   if (typeof document !== 'undefined') document.getElementById('map-panel')?.classList.add('nx-map-progress');
   if (auto) {
+    // A street click opens its Set as Destination / Teleport Here menu (G356) and never travels, so
+    // autoplay just closes the Map, as a player who has read it would; the tour walks on by itself.
     await sleep(t, 400);
-    const g = typeof document !== 'undefined' ? document.querySelector(`#map-canvas .map-street[data-tsid="${GENTLE_ISLAND.progress_way}"]`) : null;
-    if (g) g.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    engine.closeMap?.();
   }
   return null;
 }
@@ -3229,6 +3338,16 @@ export const newxpFeature = {
         else beginStage(engine, save.stage);
       }
     }
+    // G401: once a street is settled (no card, panel or transition up), a player stranded on the exit street is moved on.
+    if (save.exit && engine.streetTsid !== strandChecked && now >= strandRetryAt && !islandBusy && !engine.busy?.()) {
+      strandChecked = engine.streetTsid;
+      rescueStranded(engine)
+        .then((res) => {
+          // The street projects or the graph still loading: look again in a moment.
+          if (res === 'unknown') { strandChecked = ''; strandRetryAt = Date.now() + 2000; }
+        })
+        .catch((err) => console.warn('newxp stranded', err));
+    }
     if (!active()) {
       publish(engine, now);
       return;
@@ -3289,7 +3408,8 @@ export const newxpFeature = {
   },
 
   physics(engine) {
-    if (rooted && active() && (inTutorialScene(engine) || ui?.bubble?.hidden === false || ui?.card?.hidden === false)) {
+    // Rooted only while the tutorial runs and the island is not yet left (G401: never on the exit street).
+    if (rooted && active() && save.island !== 'exited' && (inTutorialScene(engine) || ui?.bubble?.hidden === false || ui?.card?.hidden === false)) {
       return { speed: 0.0001, jump: 0, gravity: 1, tripleJump: 0 };
     }
     if (!inTutorialScene(engine)) return null;
@@ -3447,4 +3567,10 @@ export const __newxpTest = {
   get save() { return save; },
   set save(v) { save = normalizeNewxpSave(v); },
   bagShopProfile,
+  // G401: the exit pick and the stranded rescue, with a stub engine and fetch.
+  leaveIsland,
+  rescueStranded,
+  get rooted() { return rooted; },
+  set rooted(v) { rooted = Boolean(v); },
+  resetExits() { exitGraph = null; strandChecked = ''; strandRetryAt = 0; },
 };
