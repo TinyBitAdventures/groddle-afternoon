@@ -89,7 +89,7 @@ ${siteNav(p, 'changelog')}
 ${body}
   <footer class="foot">
     <div class="wrap">
-      <p>A fan remake of Tiny Speck’s Glitch · <a href="${p}credits/">Credits</a></p>
+      <p>A <a href="https://tinybitadventures.com">fan remake</a> of Tiny Speck’s Glitch · <a href="${p}credits/">Credits</a></p>
       <p><a href="${p}">Home</a> · <a href="${p}play/">Play Groddle Afternoon</a> · <a href="${p}restoration/">Restoration report</a> · <a href="${p}restoration/history/">Every change</a></p>
     </div>
   </footer>

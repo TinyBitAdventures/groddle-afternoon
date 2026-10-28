@@ -2645,9 +2645,14 @@
   ]
  },
  "git": {
-  "commits": 662,
+  "commits": 663,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-28",
+    "kind": "improve",
+    "text": "Solo play stays quiet and readable: no console 400, a clear verb word, honest map and quest counts, solid upgrade cards, a tidy pack"
+   },
    {
     "date": "2026-10-28",
     "kind": "fix",
@@ -2762,11 +2767,6 @@
     "date": "2026-10-27",
     "kind": "improve",
     "text": "Award and new-day screens wait for you, with their own OK buttons"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "improve",
-    "text": "Shared street trees regrow when tended or dusted, never at dawn, and Fertilidust grows them for everyone"
    }
   ]
  },

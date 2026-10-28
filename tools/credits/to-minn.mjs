@@ -18,7 +18,7 @@ const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/
 const SITE = String(args.site || 'https://groddle.localhost').replace(/\/$/, '');
 
 /** The one line every footer carries, linking this page. */
-export const CREDIT_LINE = 'A fan remake of Tiny Speck’s Glitch';
+export const CREDIT_LINE = 'A <a href="https://tinybitadventures.com">fan remake</a> of Tiny Speck’s Glitch';
 
 /** The page's sections: heading, then its paragraphs. */
 export const SECTIONS = [
