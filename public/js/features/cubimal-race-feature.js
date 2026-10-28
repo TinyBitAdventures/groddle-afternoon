@@ -80,8 +80,11 @@ import {
 
 export const CUBIMAL_RACE_FEATURE_ID = 'cubimal-race';
 const DEMO_DEFAULT = 'npc_cubimal_chick';
-/** itemDef in_foreground: true, so the figure draws in front of the avatar (zIndex 50). */
-const RACER_Z = 55;
+/**
+ * itemDef in_foreground: true puts the figure over other items (FG_ITEM), still under the avatars
+ * (zIndex 50; MiddleGroundRenderer.setupEndShapes 111-171).
+ */
+const RACER_Z = 40;
 
 let loader = null;
 /** Figure names by class (one per class; the remake's pack has no item instances). */

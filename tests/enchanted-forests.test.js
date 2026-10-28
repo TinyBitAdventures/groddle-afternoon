@@ -40,7 +40,7 @@ import {
 import { noteWoodTreeCare } from '../public/js/patches.js?v=g403-1';
 import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=g403-1';
 import { enchantedForestFeature, floorScreenY, hollowTrees, treeSpots } from '../public/js/features/enchanted-forest-feature.js?v=g403-1';
-import { FEATURES } from '../public/js/features/index.js';
+import { FEATURES } from '../public/js/features/index.js?v=registry-242';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

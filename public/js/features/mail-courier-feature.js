@@ -91,8 +91,11 @@ const DISPATCHER_LOOPERS = new Set(['idle', 'waiting_for_frog']);
 /** Just outside the World Gate (the lot's left edge), clear of its sign; else left of the Mailbox. */
 const DISPATCHER_GATE_DX = -150;
 const DISPATCHER_DX = -125;
-/** in_foreground (the frog) and in_background (the station), around the avatar's 50. */
-const FROG_Z = 60;
+/**
+ * in_foreground (the frog) and in_background (the station): both under the avatar's 50, since the
+ * client's item holders sit below the avatar holders (MiddleGroundRenderer.setupEndShapes 111-171).
+ */
+const FROG_Z = 40;
 const DISPATCHER_Z = 28;
 
 let state = normalizeCourierState();

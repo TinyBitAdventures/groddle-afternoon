@@ -20,7 +20,7 @@ import {
   rulesVerbId,
   surfaceNear,
   verbTooltip,
-} from '../public/js/features/resource-nodes-feature.js';
+} from '../public/js/features/resource-nodes-feature.js?v=g413-1';
 import {
   RESOURCE_NODE_CATALOG,
   RESOURCE_NODE_CLASS_IDS,

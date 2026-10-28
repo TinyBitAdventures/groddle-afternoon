@@ -108,6 +108,17 @@ export function lookOf(engine) {
   return { v: 1, vector: vector && typeof vector === 'object' ? vector : {} };
 }
 
+/**
+ * Draw order of another player's Glitch. The client adds each PC under its OTHER_AV marker
+ * (MiddleGroundRenderer.addOtherAvatar, LayerRenderer.addUnder), so the one who arrived last is
+ * drawn over the earlier ones, never by height; all of them sit over the items and under your
+ * own avatar (YOUR_AVATAR, zIndex 50). `order` counts arrivals on this client.
+ */
+export function remoteAvatarZ(order) {
+  const n = Math.max(0, Math.floor(Number(order) || 0)) % 9000;
+  return 49 + n / 10000;
+}
+
 const STYLE = `
 .mp-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; margin: 0 0 0.3rem; pointer-events: auto; font: 600 11.5px/1.3 system-ui, sans-serif; }
 .mp-state { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.55rem; border-radius: 999px; color: #24401b; background: rgba(244, 251, 236, 0.94); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22); }
@@ -146,6 +157,8 @@ function createSession(engine) {
   const account = createMinnAccount({ baseUri: document.baseURI, nonce: boot.nonce || '' });
   const client = createRealtimeClient({ ticket: () => account.realtimeTicket(), baseUri: document.baseURI });
   const remotes = new Map();
+  /** Arrivals so far, for remoteAvatarZ. */
+  let arrivals = 0;
   const log = [];
   let lookJson = '';
   let lookCheckAt = 0;
@@ -241,7 +254,7 @@ function createSession(engine) {
     plate.roundRect(-Math.ceil(name.width / 2) - 7, name.y - name.height - 4, Math.ceil(name.width) + 14, Math.ceil(name.height) + 7, 7)
       .fill({ color: 0xfffdf5, alpha: 0.86 }).stroke({ width: 1, color: 0x5fa83a, alpha: 0.7 });
     root.addChild(body, plate, name);
-    root.zIndex = 49;
+    root.zIndex = remoteAvatarZ(arrivals++);
     root.eventMode = 'none';
     root.x = p.x;
     root.y = p.y;

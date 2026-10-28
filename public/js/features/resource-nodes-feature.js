@@ -129,7 +129,8 @@ export const FIREFLY_OFFER_LINES = Object.freeze([
   { lines: ['What ho! ...'], clickToAdvance: true },
   { lines: ['... Fireflies!'], durationMs: 2500 },
 ]);
-const Z = Object.freeze({ tree: 14, paper: 16, ground: 21, trap: 19, salmon: 24, firefly: 60 });
+/** Every node is an item, so all of them draw under the avatars (50); npc_firefly is in_foreground (FG_ITEM). */
+const Z = Object.freeze({ tree: 14, paper: 16, ground: 21, trap: 19, salmon: 24, firefly: 40 });
 
 // ---------------------------------------------------------------------------
 // Pure helpers (tested in tests/resource-nodes-feature.test.js)

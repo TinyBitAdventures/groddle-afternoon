@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g412-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-241';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-242';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g405-1';
@@ -5160,12 +5160,18 @@ function positionSpeechBubble(bubble) {
   return true;
 }
 
+/**
+ * Bubbles are opaque, like the client's talk_bubble_body art (ChatBubble.as 280-300): a hint chip,
+ * or an earlier bubble under one no longer shows through it.
+ */
+const SPEECH_FILL_ALPHA = 1;
+
 /** One bubble tail, filled over the bubble's border, its two slanted sides outlined (js/speech-placement.js). */
 function drawSpeechTail(g, height, tail, up, length = 11) {
   if (!g || g.destroyed) return;
   const p = speechTailPoints({ height, tip: tail.tip, base: tail.base, up, length });
   g.clear();
-  g.poly(p.fill).fill({ color: 0xfffdf5, alpha: 0.97 });
+  g.poly(p.fill).fill({ color: 0xfffdf5, alpha: SPEECH_FILL_ALPHA });
   g.moveTo(p.edge[0], p.edge[1]).lineTo(p.edge[2], p.edge[3]).lineTo(p.edge[4], p.edge[5]).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
 }
 
@@ -5204,7 +5210,7 @@ function showSpeechBubble(target, speech) {
   const head = named ? speaker.height + 4 : 0;
   const height = Math.ceil(9 + head + body.height + (slugRow ? 6 + slugRow.height : 0) + 9);
   const bg = new PIXI.Graphics();
-  bg.roundRect(0, 0, width, height, 12).fill({ color: 0xfffdf5, alpha: 0.97 }).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
+  bg.roundRect(0, 0, width, height, 12).fill({ color: 0xfffdf5, alpha: SPEECH_FILL_ALPHA }).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
   // Tails (drawn by positionSpeechBubble, which aims them at the speaker).
   // The up tail is for a bubble hung under its speaker.
   const tailDown = new PIXI.Graphics();
@@ -13554,7 +13560,8 @@ function greedyButtonSprite(actIndex, x, y) {
   root.addChild(label);
   root.x = x;
   root.y = y;
-  root.zIndex = 51;
+  // A wall_button item: under the avatars, as every item is (MiddleGroundRenderer.setupEndShapes 111-171).
+  root.zIndex = 44;
   root._buttonArt = button;
   entityLayer.addChild(root);
   return root;
@@ -13577,7 +13584,8 @@ function createGreedyExitSprite(x, y) {
   root.addChild(label);
   root.x = x;
   root.y = y;
-  root.zIndex = 52;
+  // A sign standing in the room: under the avatars, like the signposts (MiddleGroundRenderer GEO).
+  root.zIndex = 44;
   entityLayer.addChild(root);
   return root;
 }
@@ -15576,7 +15584,8 @@ function spawnRookEgg() {
   sprite.anchor.set(0.5, 1);
   sprite.scale.set(0.84);
   sprite.position.set(2140, 784);
-  sprite.zIndex = 54;
+  // rook_egg is in_background (BG_ITEM): under the avatars. The Crushers stay over them.
+  sprite.zIndex = 40;
   sprite.eventMode = 'static';
   sprite.cursor = 'pointer';
   sprite._rookHitW = 145;
@@ -16068,7 +16077,8 @@ function makeRookMuseumSpeaker(exhibit) {
   sprite.anchor.set(0.5, 1);
   sprite.scale.set(0.68);
   sprite.position.set(exhibit.x + 168, 502);
-  sprite.zIndex = 55;
+  // rook_hall_speaker is in_foreground (FG_ITEM), still under the avatars (MiddleGroundRenderer 111-171).
+  sprite.zIndex = 44;
   sprite.eventMode = 'static';
   sprite.cursor = 'pointer';
   entityLayer.addChild(sprite);
@@ -16119,7 +16129,8 @@ function spawnRookMuseumExhibits() {
 
 function spawnRookMuseumGreeter() {
   const sprite = new PIXI.Container();
-  sprite.zIndex = 58;
+  // An NPC is an item: under the avatars (MiddleGroundRenderer 111-171).
+  sprite.zIndex = 46;
   const shadow = new PIXI.Graphics();
   shadow.ellipse(0, 0, 38, 9).fill({ color: 0x1d100b, alpha: 0.35 });
   sprite.addChild(shadow);
@@ -16635,7 +16646,8 @@ function spawnMrHairball() {
   sprite.anchor.set(0.5, 1);
   sprite.scale.set(0.82);
   sprite.position.set(1140, 800);
-  sprite.zIndex = 62;
+  // npc_dustbunny is in_foreground (FG_ITEM), still under the avatars (MiddleGroundRenderer 111-171).
+  sprite.zIndex = 45;
   sprite.animationSpeed = 0.16;
   sprite.loop = true;
   sprite.play();

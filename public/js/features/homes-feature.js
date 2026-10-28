@@ -171,7 +171,7 @@ import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tow
 import { towerApi } from './home-tower-feature.js?v=g415-1';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js?v=g415-1';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-21';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=g413-1';
 import { patchesFeature } from './patches-feature.js?v=patches-21';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=g403-1';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=g165-1';
