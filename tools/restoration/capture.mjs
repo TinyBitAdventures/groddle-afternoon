@@ -51,7 +51,9 @@ for (const key of keys) {
   page.on('pageerror', (e) => errors.push(e.message));
   try {
     // viewh=408 keeps the street view the shots were framed for (the view now grows with the window).
-    const route = `${spec.route}${spec.route.includes('?') ? '&' : '?'}viewh=408`;
+    // Camera-only: no Qurazy banner, and award screens close themselves (shots.mjs routes are
+    // also the page's Play links, so these stay out of them).
+    const route = `${spec.route}${spec.route.includes('?') ? '&' : '?'}viewh=408&qurazy=off&awardautoclose=1`;
     await page.goto(`${BASE}${route}`, { waitUntil: 'load', timeout: 120000 });
     await page.addStyleTag({ content: hd ? HIDE_HD : HIDE });
     await page.waitForTimeout(spec.wait || 9000);
