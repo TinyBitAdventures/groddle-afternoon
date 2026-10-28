@@ -998,6 +998,25 @@ export function parallaxLayerOffset(layer, camX, camY, vpW, vpH, streetW, street
   };
 }
 
+/**
+ * Whether a street layer draws in front of the avatars. The client sorts a location's layers
+ * by z (LocationViewBuilder.buildLocationView 82-89, SortTools.layerZSort) and adds one
+ * LayerRenderer per layer to the LocationRenderer in that order (LocationViewBuilder 104-107).
+ * Avatars, NPCs and items live inside the MiddleGroundRenderer, above every middleground deco
+ * (LayerRenderer.setupEndShapes 63-76 and addDeco 200-211 put decos under the DECO marker;
+ * MiddleGroundRenderer.setupEndShapes 111-171 adds the item and avatar holders after it), so
+ * each layer whose z is above the middleground's covers them, and the rest sit behind.
+ */
+export function layerDrawsInFront(layer, index, middleLayerZ) {
+  if (!layer || layer.id === 'middleground' || middleLayerZ === null || middleLayerZ === undefined) return false;
+  return (layer.z ?? index) > middleLayerZ;
+}
+
+/** Layers the editors hid never draw: the regular client splices them (Location.as 541-542). */
+export function layerIsDrawn(layer) {
+  return !!layer && (layer.id === 'middleground' || layer.hidden !== true);
+}
+
 function makePlaceholder(PIXI, deco, pos) {
   const g = new PIXI.Graphics();
   const w = deco.w || 48;
@@ -1266,9 +1285,20 @@ export function buildStreetView(street, PIXI, opts = {}) {
   const decoViews = new Map();
   const missingSprites = new Set();
   let drawn = 0;
+  // Layers above the middleground cover the avatars and entities (layerDrawsInFront). They
+  // live in their own container with the root's coordinates; the game puts it above its
+  // entity layer (game.js syncStreetFront) and it goes when the street view is destroyed.
+  const front = new PIXI.Container();
+  front.sortableChildren = true;
+  front.label = 'street-front';
+  root.frontView = front;
+  root.once('destroyed', () => {
+    if (!front.destroyed) front.destroy({ children: true });
+  });
 
   for (let li = 0; li < (street.layers || []).length; li++) {
     const layer = street.layers[li];
+    if (!layerIsDrawn(layer)) continue;
     const lc = new PIXI.Container();
     lc.sortableChildren = true;
     lc.zIndex = (layer.z ?? li) * 10;
@@ -1332,7 +1362,8 @@ export function buildStreetView(street, PIXI, opts = {}) {
     const blur = flashBlurSize(layer.filters?.blur);
     if (blur > 0 && opts.renderer) bakeBlurredLayer(lc, blur, colour, blurState);
     else if (colour && opts.renderer) bakeLayerColour(PIXI, opts.renderer, lc, colour, recolourCache);
-    root.addChild(lc);
+    lc.inFront = layerDrawsInFront(layer, li, middleLayerZ);
+    (lc.inFront ? front : root).addChild(lc);
     layerContainers.push(lc);
   }
   const skirtDepth = H - sourceH + Math.max(0, Number(opts.skirtBelow) || 0);
@@ -1342,6 +1373,8 @@ export function buildStreetView(street, PIXI, opts = {}) {
     buildGroundSkirt(PIXI, opts.renderer, root, ground, W, sourceH, skirtDepth, fallback);
   }
   root.decoDrawn = drawn;
+  /** Labels of the layers drawn over the avatars, for QA (canvas data-street-front-layers). */
+  root.frontLayers = layerContainers.filter((lc) => lc.inFront).map((lc) => lc.label);
   root.decoViews = decoViews;
   root.parallaxLayers = layerContainers.filter((lc) => lc.parallaxLayer);
   // The client filters the whole middleground plane, so avatars and items on

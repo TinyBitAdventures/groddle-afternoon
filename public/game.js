@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g403-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-236';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-237';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g405-1';
@@ -577,7 +577,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=parallax-9';
+} from './js/street-render.js?v=g410-1';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -1132,8 +1132,31 @@ const SHEETS = {
 
 const keys = new Set();
 let app, world, bgLayer, entityLayer, fxLayer, player, prompt, camTarget, camY, portalSprites;
+/** Holds the street's layers above the middleground (street-render frontView), over entityLayer. */
+let streetFrontLayer = null;
 let hoveredSignBoard = null;
 let cameraRightInset = 0;
+
+/**
+ * Show the current street's front layers over the avatars and entities, as the client's
+ * layer order does (street-render layerDrawsInFront). Every scene swap replaces bgLayer, so
+ * this follows it: called on street entry and every frame. Scenes without a frontView
+ * (feature backgrounds, quest rooms drawn by hand) clear it; it copies bgLayer's transform.
+ */
+function syncStreetFront() {
+  if (!streetFrontLayer) return;
+  const live = bgLayer && !bgLayer.destroyed ? bgLayer.frontView : null;
+  const front = live && !live.destroyed ? live : null;
+  if (streetFrontLayer.children[0] !== front || streetFrontLayer.children.length > (front ? 1 : 0)) {
+    streetFrontLayer.removeChildren();
+    if (front) streetFrontLayer.addChild(front);
+  }
+  if (!front) return;
+  streetFrontLayer.position.copyFrom(bgLayer.position);
+  streetFrontLayer.scale.copyFrom(bgLayer.scale);
+  streetFrontLayer.visible = bgLayer.visible;
+  streetFrontLayer.alpha = bgLayer.alpha;
+}
 
 /** The top bar's Menu: the less-used panels, closed by a pick, Esc or a click away. */
 function installMoreMenu() {
@@ -19629,6 +19652,8 @@ async function enterStreet(tsid, opts = {}) {
   const ys = streetPlatforms.map((p) => (p.y1 + p.y2) / 2).sort((a, b) => a - b);
   GROUND_Y = ys[Math.floor(ys.length * 0.75)] || streetPlatforms[0]?.y1 || 800;
   world.addChildAt(bgLayer, 0);
+  syncStreetFront();
+  if (app?.canvas) app.canvas.dataset.streetFrontLayers = (bgLayer.frontLayers || []).join(',');
 
   // Tiny Speck's late-game location objects retain each street's real item
   // population. Allocate all of it in one pass so independent systems never
@@ -23759,7 +23784,10 @@ async function main() {
   fxLayer = new PIXI.Container();
   // bgLayer filled by enterStreet
   bgLayer = new PIXI.Container();
-  world.addChild(bgLayer, entityLayer, fxLayer);
+  // Street layers above the middleground draw over the avatars; speech and FX stay on top.
+  streetFrontLayer = new PIXI.Container();
+  streetFrontLayer.label = 'street-front-host';
+  world.addChild(bgLayer, entityLayer, streetFrontLayer, fxLayer);
   app.stage.addChild(world);
 
   player = makePlayer();
@@ -25589,6 +25617,7 @@ async function main() {
   let skillTickAccum = 0;
   let dametimeTickAccum = 0;
   app.ticker.add((ticker) => {
+    syncStreetFront();
     if (!state.started) return;
     const dt = Math.min(ticker.deltaTime, 2.5);
     updateCurrentAction((1000 / 60) * dt);
@@ -25614,6 +25643,7 @@ async function main() {
     releaseHeldScriptedDialog();
     // A new street or room may hold the view to its own height (TSMainView smallest layer).
     if (bgLayer !== viewSceneLayer) syncLocationViewHeight();
+    syncStreetFront();
     bgLayer?.updateParallax?.(-world.x, -world.y, VIEW_W, LOCATION_VIEW_H, VIEW_H);
     bgLayer?.cullDecos?.(-world.x, -world.y, VIEW_W, VIEW_H);
 

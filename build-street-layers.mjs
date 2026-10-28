@@ -4,7 +4,7 @@
  * (brightness, contrast, saturation, tintColor, tintAmount, blur), and the
  * location's sky `gradient` (top, bottom), its `music_file` override, plus each
  * deco's `h_flip` and
- * `hidden` flags. Source: tinyspeck/glitch-locations
+ * `hidden` flags, and each layer's `is_hidden` (as `hidden`). Source: tinyspeck/glitch-locations
  * (CC0). Edits assets/streets/*.json in place; safe to re-run.
  *
  * Run from spike root:
@@ -121,6 +121,7 @@ function decoFlags(layerBody) {
 let updated = 0;
 let flipped = 0;
 let hiddenDecos = 0;
+let hiddenLayers = 0;
 let filtered = 0;
 let gradients = 0;
 for (const file of files) {
@@ -161,6 +162,15 @@ for (const file of files) {
       const scalars = directScalars(body);
       if (Number.isFinite(scalars.w) && scalars.w > 0) layer.w = scalars.w;
       if (Number.isFinite(scalars.h) && scalars.h > 0) layer.h = scalars.h;
+      // A layer the editors hid: the regular client splices it from Location.layers
+      // (Location.as 541, all but the middleground), so it never draws.
+      const ownText = childObjects(body).reduce((text, child) => text.replace(child.body, ''), body);
+      if (layer.id !== 'middleground' && /<bool id="is_hidden">true<\/bool>/.test(ownText)) {
+        layer.hidden = true;
+        hiddenLayers += 1;
+      } else {
+        delete layer.hidden;
+      }
       const filterChild = childObjects(body).find((c) => c.id === 'filtersNEW');
       const filters = filterChild ? parseFilters(filterChild.body) : null;
       if (filters) {
@@ -195,5 +205,5 @@ for (const file of files) {
 }
 console.log(
   `Updated ${updated} streets: ${gradients} gradients, ${filtered} filtered layers, ` +
-    `${flipped} flipped decos, ${hiddenDecos} hidden decos.`
+    `${flipped} flipped decos, ${hiddenDecos} hidden decos, ${hiddenLayers} hidden layers.`
 );
