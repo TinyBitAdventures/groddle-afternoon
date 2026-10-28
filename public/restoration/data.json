@@ -2645,9 +2645,14 @@
   ]
  },
  "git": {
-  "commits": 635,
+  "commits": 636,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "improve",
+    "text": "Badges, the new day and the Giants wait for open conversations, menus and Decorate, and the new day ends with your line over your head"
+   },
    {
     "date": "2026-10-27",
     "kind": "improve",
@@ -2762,11 +2767,6 @@
     "date": "2026-10-27",
     "kind": "fix",
     "text": "The last four unclassified street projects are judged (G15)"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "Better Learning I to V return with their 2011 learn times and discounts, without the 2011 skill limit"
    }
   ]
  },
