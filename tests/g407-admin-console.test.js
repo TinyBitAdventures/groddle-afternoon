@@ -319,6 +319,16 @@ describe('the site routes (groddle-afternoon-site AdminConsole, AdminConsolePage
     assert.match(readFileSync(sitePath('src/AdminTeleport.php'), 'utf8'), /AdminConsole::recordAction\(\$db, \$admin->id, \$player\['id'\], 'teleport'/);
   });
 
+  it('lists, finds and acts on an account with no character name (an administrator under their display name)', () => {
+    const src = readFileSync(sitePath('src/AdminConsole.php'), 'utf8');
+    const rows = src.slice(src.indexOf('private function rows('), src.indexOf('private function nameOr('));
+    assert.match(rows, /namesOf\(\$ids\)/);
+    assert.match(rows, /\$db->table\('users'\) \. ' u LEFT JOIN '/);
+    assert.doesNotMatch(rows, /FROM " \. \$db->table\(Characters::TABLE\)/);
+    assert.match(src, /namesOf\(\[\$id\]\)\[\$id\] \?\? null/);
+    assert.match(src, /WHERE c\.user_id IS NULL AND LOWER\(u\.display_name\) LIKE \?/);
+  });
+
   it('the theme serves the console\'s script and styles, keyed', () => {
     assert.ok(existsSync(sitePath('console/console.js')));
     assert.ok(existsSync(sitePath('console/console.css')));
