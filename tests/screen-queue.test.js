@@ -236,7 +236,12 @@ describe('the new day bubble (NewDayView.as showChatBubble)', () => {
     const gsjs = join(root, '..', 'glitch-GameServerJS', 'players', 'player.js');
     if (existsSync(gsjs)) assert.match(readFileSync(gsjs, 'utf8'), /"stats_today"\s*: \{\s*energy: energy,\s*mood: mood\s*\}/);
     const game = read('game.js');
-    assert.match(game, /\['energyGain', '\+', 'energy', 0xf8dcd8, 0xa2382c\],\n\s*\['mood', '\+', 'mood'/);
+    // Slug.as 50-51, 58: gains are energy/mood_pos_bg_color 0xc1d76e, an energy loss energy_neg_bg_color 0xefc6c1.
+    const slug = client('view/ui/Slug.as');
+    assert.match(slug, /energy_pos_bg_color:uint = 0xc1d76e;/);
+    assert.match(slug, /mood_pos_bg_color:uint = 0xc1d76e;/);
+    assert.match(slug, /energy_neg_bg_color:uint = 0xefc6c1;/);
+    assert.match(game, /\['energyGain', '\+', 'energy', 0xc1d76e, 0x3f5c14\],\n\s*\['mood', '\+', 'mood', 0xc1d76e, 0x3f5c14\],\n\s*\['energy', '-', 'energy', 0xefc6c1, 0xa2382c\],/);
   });
 });
 

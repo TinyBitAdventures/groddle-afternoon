@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g377-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-210';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-211';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g378-1';
@@ -2128,6 +2128,15 @@ function elementShown(id) {
 }
 
 /**
+ * G364: screen_view_open: an award, new-day or Giant screen is showing (not
+ * one still waiting in the queue). Familiar talk waits for it
+ * (TSFrontController.as startFamiliarConversationWithPayload 2134-2139).
+ */
+function isScreenViewOpen() {
+  return ['award-screen', 'new-day-screen', 'giant-screen-panel'].some(elementShown);
+}
+
+/**
  * G364: the remake's equivalents of tryShowScreenViewFromQ's gates
  * (TSFrontController.as 3362-3400; js/screen-queue.js SCREEN_GATES has the order).
  */
@@ -2149,7 +2158,7 @@ function screenGateState() {
     // 3388: ChoicesDialog: conversations and quest offers.
     choicesDialog: isQuestDialogueOpen(),
     // 3390: screen_view_open: a screen shown outside the queue.
-    screenOpen: ['award-screen', 'new-day-screen', 'giant-screen-panel'].some(elementShown),
+    screenOpen: isScreenViewOpen(),
     // 3392: ImgMenuView (imagination-feature's upgrade cards).
     imgMenu: elementShown('imagination-panel'),
     // 3394: fam_dialog_open (familiar-dialog-feature).
@@ -5191,9 +5200,11 @@ function speechSlugRow(slugs) {
   const pills = [
     ['xp', '+', 'iMG', 0xe9e1f7, 0x6a4c9c],
     // G364: energy gained (the new day's refill, Slug.as 161 '+' for an amount above 0), before mood as stats_today lists it.
-    ['energyGain', '+', 'energy', 0xf8dcd8, 0xa2382c],
-    ['mood', '+', 'mood', 0xe2f1d6, 0x4c7a2c],
-    ['energy', '-', 'energy', 0xf8dcd8, 0xa2382c],
+    // Gains and losses take the client's own fills (Slug.as 50-51 energy/mood_pos_bg_color 0xc1d76e,
+    // 58 energy_neg_bg_color 0xefc6c1; separate slug_energy_pos/neg art, Assets.as 677-680).
+    ['energyGain', '+', 'energy', 0xc1d76e, 0x3f5c14],
+    ['mood', '+', 'mood', 0xc1d76e, 0x3f5c14],
+    ['energy', '-', 'energy', 0xefc6c1, 0xa2382c],
   ].filter(([k]) => Number(slugs[k]) > 0);
   if (!pills.length) return null;
   const row = new PIXI.Container();
@@ -8568,6 +8579,8 @@ const engine = {
   award: (payload) => enqueueAward(payload),
   /** G364: a full screen of a feature's own (the Giant's), queued with the award screens; resolves when it closes. */
   queueScreen: (show, opts) => queueScreen(show, opts),
+  /** G364: an award, new-day or Giant screen is showing (screen_view_open); the familiar's panel waits for it. */
+  screenViewOpen: () => isScreenViewOpen(),
   /** pc.feats_increment (players/inc_feats.js:37): a solo Feat contribution, counted by features/solo-feats-feature.js (G143). */
   featsIncrement: (featId, amount = 1, opts = {}) => features.query('featsIncrement', featId, amount, opts, engine) || 0,
   /** Player verbs: when the player last heard each musicblock (heardAt), for a block another player plays for them. */
@@ -20654,14 +20667,28 @@ function holdScriptedDialog(opts) {
   // addPrompt 330-354) and shows an emergency whatever prompts are up (QuestsDialog.as
   // onEmergencyTick 335-340); with one card, the croak prompt used to push Hell's offer off.
   const underEmergency = !opts?.offer && isQuestDialogueOpen() && questDialogueState?.urgent === true;
-  if (!opts || !(menuTarget || enterChooser?.isOpen() || underEmergency)) return false;
+  if (!opts || !(menuTarget || enterChooser?.isOpen() || underEmergency || familiarWaitsForScreen(opts))) return false;
   heldScriptedDialogs.push(opts);
   if (app?.canvas) app.canvas.dataset.dialogHeld = String(heldScriptedDialogs.length);
   return true;
 }
 
+/**
+ * G364: the Magic Rock's own talk (a quest offer, or any line in its
+ * familiar or conversation look) waits while a screen is showing:
+ * TSFrontController.as startFamiliarConversationWithPayload 2134-2139 bails on
+ * screen_view_open and queues the payload (2185-2186; quest offers are dropped there, the remake holds them) for familiar_retry_timer
+ * (StateModel.as 116). A voice-of-rock overlay is an announcement, not the dialog.
+ */
+function familiarWaitsForScreen(opts) {
+  if (!opts || opts.vog) return false;
+  const look = familiarLook({ look: opts.look, kicker: opts.kicker, offer: opts.offer });
+  return (look === 'familiar' || look === 'conversation') && isScreenViewOpen();
+}
+
 function releaseHeldScriptedDialog() {
   if (!heldScriptedDialogs.length || menuTarget || enterChooser?.isOpen() || isQuestDialogueOpen() || isVogOpen()) return;
+  if (familiarWaitsForScreen(heldScriptedDialogs[0])) return;
   const next = heldScriptedDialogs.shift();
   // G228: a held VOG goes back to its own overlay.
   if (next?.vog) openLocationVog(next);

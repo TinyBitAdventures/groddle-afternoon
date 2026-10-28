@@ -786,7 +786,7 @@ async function cactusRant(ctx, epoch) {
   squidAt(ctx, p.x - 150, p.y);
   bamfIn(ctx);
   d.desertState = 0;
-  ctx.activity('Something has appeared beside you.');
+  // G318: no activity line here: doCrazyShit (npc_cactus.js 222-227) creates the squid without a word.
 }
 
 async function pollNear(ctx, epoch, range = 150) {
@@ -1460,7 +1460,8 @@ async function gwendolynTalk(ctx, epoch) {
       if (!live(ctx, epoch)) return;
       d.gwenDone = true;
       ctx.solve();
-      ctx.activity('Gwendolyn fades back into the dark. The way out is behind you.');
+      // G318: no activity line: the turn-in's completion text is the last word, and she does
+      // not fade (npc_gwendolyn.js onPlayerCollision 216-236 only offers; resumeIdling after 3 s).
     }
   } finally {
     d.talking = false;
@@ -1622,6 +1623,8 @@ export const room = {
     const stage = ctx.stage;
     const heat = d.heat ? [[HEAT[d.heat].name, `-${HEAT[d.heat].mood} mood`]] : [];
     if (stage === 'desert') {
+      // G318: remake objective lines, ours: the chain's quests have no requirements to word
+      // them (tower_quest.js 23, tower_quest_part2.js 22, tower_quest_part3.js 22).
       let text = 'It is scorching out here. Look around Area 42.';
       if (d.desertState >= 0 && d.desertState < 2) text = 'Something has appeared beside you.';
       else if (d.desertState >= 2 && d.desertState < 17) text = 'Follow Zzybzfrx.';

@@ -326,3 +326,34 @@ describe('The Inner Mind matches its Snaps (G71)', () => {
     assert.ok(bytes < 400_000, `${bytes} bytes`);
   });
 });
+
+describe('G318: no lines of our own where the source says nothing', () => {
+  const HAVE_GSJS = existsSync(join(gsjs, 'items', 'npc_gwendolyn.js'));
+
+  it('the talk_to verbs hide (state null) instead of a made-up disabled reason', { skip: !HAVE_GSJS && 'GSJS not present' }, () => {
+    const gwen = readFileSync(join(gsjs, 'items', 'npc_gwendolyn.js'), 'utf8').split('\n');
+    assert.match(gwen[181], /"tooltip"\s*: "Speak\. With words",/);
+    assert.match(gwen[185], /return \{state:null\};/);
+    const widget = readFileSync(join(gsjs, 'items', 'npc_widget.js'), 'utf8').split('\n');
+    assert.match(widget[210], /if \(!config\.is_dev\) return \{state:null\};/);
+    assert.match(readFileSync(join(gsjs, 'items', 'npc_quest_giver_widget.js'), 'utf8').split('\n')[187], /"tooltip"\s*: "Listen to what they have to say",/);
+    const feat = readFileSync(pub('js/features/gwendolyn-room-23-feature.js'), 'utf8');
+    assert.doesNotMatch(feat, /It has said its piece|She has nothing to offer you now/);
+    assert.match(feat, /if \(greeter\.state !== 'waiting'\) return \[\];/);
+    assert.match(feat, /if \(!can\) return \[\];/);
+  });
+
+  it('the squid appears and Gwendolyn turns in without an activity line', { skip: !HAVE_GSJS && 'GSJS not present' }, () => {
+    const cactus = readFileSync(join(gsjs, 'items', 'npc_cactus.js'), 'utf8').split('\n');
+    const crazy = cactus.slice(221, 227).join('\n');
+    assert.match(crazy, /function doCrazyShit\(\)/);
+    assert.match(crazy, /createItemStack\('npc_squid', 1, pc\.x - 150, pc\.y - 60\)/);
+    assert.doesNotMatch(crazy, /sendActivity|sendBubble|announce/);
+    const gwen = readFileSync(join(gsjs, 'items', 'npc_gwendolyn.js'), 'utf8').split('\n');
+    const collide = gwen.slice(215, 236).join('\n');
+    assert.match(collide, /function onPlayerCollision\(pc\)/);
+    assert.doesNotMatch(collide, /sendActivity|apiDelete|fade/i);
+    const room = readFileSync(pub('js/quest-rooms/gwendolyn.js'), 'utf8');
+    assert.doesNotMatch(room, /Something has appeared beside you\.'\);|fades back into the dark/);
+  });
+});

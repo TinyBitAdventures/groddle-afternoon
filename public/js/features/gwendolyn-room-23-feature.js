@@ -616,13 +616,23 @@ export const gwendolynRoom23Feature = {
     if (exitAt) engine.setData('room23ExitIn', Math.max(0, Math.round((exitAt - Date.now()) / 1000)));
   },
 
+  /**
+   * Both talk_to verbs are hidden in the source (npc_widget.js 211: talk_to returns
+   * state null off the dev server; npc_gwendolyn.js 184-187 always): the bot and
+   * the ghost talk on collision. The remake keeps Talk to as a shortcut while it
+   * would do what the collision does (tooltips: npc_quest_giver_widget.js 188,
+   * npc_gwendolyn.js 182) and hides it, as state null does, when it would not:
+   * no disabled reason of our own (G318).
+   */
   verbsFor(target, engine) {
     if (greeter && target === greeter.target) {
-      return [{ id: 'talk_to', label: 'Talk to', sort: 50, tooltip: 'Listen to what they have to say', enabled: greeter.state === 'waiting', reason: greeter.state === 'waiting' ? '' : 'It has said its piece', durationMs: 0 }];
+      if (greeter.state !== 'waiting') return [];
+      return [{ id: 'talk_to', label: 'Talk to', sort: 50, tooltip: 'Listen to what they have to say', enabled: true, durationMs: 0 }];
     }
     if (gwen && target === gwen.target) {
       const can = !gwen.offering && gwendolynOffers(engine?.questState, { repeatPaid: repeatPaid(engine?.questState) });
-      return [{ id: 'talk_to', label: 'Talk to', sort: 50, tooltip: 'Speak. With words', enabled: can, reason: can ? '' : 'She has nothing to offer you now', durationMs: 0 }];
+      if (!can) return [];
+      return [{ id: 'talk_to', label: 'Talk to', sort: 50, tooltip: 'Speak. With words', enabled: true, durationMs: 0 }];
     }
     return null;
   },

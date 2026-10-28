@@ -193,6 +193,8 @@ export function lightLayout() {
     { id: 'pc', colors: ['red', 'yellow', 'blue'], x: 5090, surface: 700, bulbY: 650 },
     { id: 'pd', colors: ['red', 'yellow', 'blue'], x: 5090, surface: 590, bulbY: 520 },
   ];
+  // G318: the designer's sign texts, read off footage Et0RkY43A5Q and matched in five players'
+  // Snaps (reference only). No GSJS or client text: neither template is in the locations dump.
   const signs = [
     { text: 'What would the world be without light?', x: 240, y: 680 },
     { text: 'Light up your path to find the way.', x: 680, y: 665 },
@@ -201,7 +203,7 @@ export function lightLayout() {
     { text: 'Other times, you need to fall', x: 2560, y: 560, dots: true },
     { text: 'to find something you couldn’t see before', x: 2740, y: 880 },
     { text: 'In some cases, you’ll need to mix colors to reveal the correct path.', x: 3520, y: 570 },
-    { text: 'Astounding! You truly are a Champ!', x: 7020, y: 560, big: true },
+    { text: 'Astounding! You truly are a Champ!', x: 7020, y: 560, big: true }, // the end sign, footage Et0RkY43A5Q
   ];
   const q = (x, y, type = 'xp') => ({ x, y, type });
   const quoins = [

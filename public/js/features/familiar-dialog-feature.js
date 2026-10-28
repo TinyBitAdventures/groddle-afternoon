@@ -14,6 +14,15 @@
  * YouDisplayManager.as 400-428: hidden while the AchievementView is up and
  * while moving between streets.
  *
+ * G364: while an award, new-day or Giant screen shows, the panel waits and
+ * grows as it closes. The client's skill panel is not on the 2134
+ * screen_view_open gate (that is startFamiliarConversationWithPayload, the
+ * familiar's talk: game.js familiarWaitsForScreen); it opens at once but stays
+ * hidden while the AchievementView is on stage (changeTeleportDialogVisibility
+ * 420, called as the view animates in and when its done tween completes,
+ * AchievementView.as 307, 449), and the other screens draw over it. The
+ * queue's own fam_dialog_open gate (3394) only counts a panel that has grown.
+ *
  * game.js emits `skill_learned:<class>` for every finished skill (online or
  * caught up offline); this feature queues it. While the panel is up the
  * Magic Rock holds its quest offers (the familiar is busy talking).
@@ -24,7 +33,8 @@
  *     (&familiarbadge=<id>, default betterthanlousy_douser) so the rock drops
  *     in beside it (G219). The voice-of-rock overlay (G220):
  *     &questdemo=high_jump (the High Jumper's tree-top line).
- *     Canvas: familiarPanel (open class or ''), familiarQueue, familiarLast.
+ *     Canvas: familiarPanel (open class or ''), familiarQueue, familiarLast,
+ *     familiarHeld ('screen' while a screen holds the panel).
  */
 
 import { CARD_ART_LAYERS } from '../imagination-data.js';
@@ -32,6 +42,27 @@ import { skillArtFor, skillLearnedModel } from '../familiar.js?v=g225-1';
 
 /** FamiliarDialog grow / shrink: 0.3 s (start 340-343, end 253-268). */
 export const FAMILIAR_GROW_MS = 300;
+
+/** How often a panel held by a screen looks again (ours: the client shows it as the screen's tween ends). */
+export const FAMILIAR_SCREEN_POLL_MS = 100;
+
+/** Resolves once no award, new-day or Giant screen is showing (engine.screenViewOpen). */
+export function afterScreens(engine, { pollMs = FAMILIAR_SCREEN_POLL_MS, setTimer = (fn, ms) => setTimeout(fn, ms) } = {}) {
+  return new Promise((resolve) => {
+    const check = () => {
+      let up = false;
+      try {
+        up = engine?.screenViewOpen?.() === true;
+      } catch {
+        up = false;
+      }
+      engine?.setData?.('familiarHeld', up ? 'screen' : '');
+      if (up) setTimer(check, pollMs);
+      else resolve();
+    };
+    check();
+  });
+}
 
 const queue = [];
 let open = null; // { classTsid }
@@ -122,7 +153,10 @@ async function showNext(engine) {
   open = { classTsid };
   render(engine, info);
   setData(engine);
-  // Like the client's interval while the familiar is hidden: wait for the loading card.
+  // Like the client's interval while the familiar is hidden: wait for the loading card,
+  // then (G364) for any screen showing, then the card again if a street change came meanwhile.
+  await engine.afterStreetCard?.();
+  await afterScreens(engine);
   await engine.afterStreetCard?.();
   if (open?.classTsid !== classTsid) return;
   engine.playSound?.('SKILL_ACHIEVED', { volume: 0.7 });

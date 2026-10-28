@@ -4,7 +4,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -32,10 +32,11 @@ import {
 import { CARD_ART_LAYERS } from '../public/js/imagination-data.js';
 import {
   _resetFamiliarDialog,
+  afterScreens,
   familiarDialogFeature,
   familiarDialogOpen,
   queueSkillLearned,
-} from '../public/js/features/familiar-dialog-feature.js?v=g225-1';
+} from '../public/js/features/familiar-dialog-feature.js?v=g381-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');
@@ -223,7 +224,93 @@ describe('skill learned panel (G218)', () => {
     assert.match(game, /openSkillTree\(classTsid = ''\) \{/);
     const index = read('js/features/index.js');
     // Registered (G185 appends the loneliness feature after it; neither answers the other's first-answer hooks).
-    assert.match(index, /^import \{ familiarDialogFeature \} from '\.\/familiar-dialog-feature\.js\?v=g225-1'; FEATURES\.push\(familiarDialogFeature\);$/m);
+    assert.match(index, /^import \{ familiarDialogFeature \} from '\.\/familiar-dialog-feature\.js\?v=g381-1'; FEATURES\.push\(familiarDialogFeature\);$/m);
+  });
+});
+
+describe('G364 familiar talk waits for an open screen', () => {
+  const CLIENT = join(root, '..', 'glitch-client', 'com', 'tinyspeck', 'engine');
+  const HAVE_CLIENT = existsSync(CLIENT);
+  const clientLines = (p) => readFileSync(join(CLIENT, p), 'utf8').split('\n');
+
+  it('the client gates familiar talk on screen_view_open and hides the panel under the AchievementView', { skip: !HAVE_CLIENT && 'glitch-client not present' }, () => {
+    const fc = clientLines('control/TSFrontController.as');
+    assert.match(fc[2080], /public function startFamiliarConversationWithPayload/);
+    assert.match(fc[2133], /if \(sm\.screen_view_open\) \{/);
+    assert.match(fc[2184], /if \(payload\.conv_type != ConversationManager\.TYPE_QUEST_OFFER\) \{ \/\/ we do not q quest_offers/);
+    assert.match(fc[2185], /sm\.fam_dialog_conv_payload_q\.push\(payload\);/);
+    // The skill panel is not on that gate: it waits only for the You display (2040).
+    const skill = fc.slice(2036, 2058).join('\n');
+    assert.match(skill, /startFamiliarSkillMessageWithPayload/);
+    assert.doesNotMatch(skill, /screen_view_open/);
+    const you = clientLines('view/gameoverlay/YouDisplayManager.as');
+    assert.match(you[419], /&& !AchievementView\.instance\.parent/);
+    const ach = clientLines('view/gameoverlay/AchievementView.as');
+    assert.match(ach[306], /changeTeleportDialogVisibility\(\);/);
+    assert.match(ach[448], /changeTeleportDialogVisibility\(\);/);
+  });
+
+  it('holds the skill panel while a screen shows and grows it after', async () => {
+    _resetFamiliarDialog();
+    const data = {};
+    let screenUp = true;
+    const timers = [];
+    const engine = {
+      param: () => null,
+      setData: (k, v) => { data[k] = v; },
+      skillLearnedInfo: (id) => ({ classTsid: id, name: id, learned: '', next: [] }),
+      afterStreetCard: async () => {},
+      screenViewOpen: () => screenUp,
+      playSound: () => { data.sound = 'played'; },
+    };
+    let resolved = false;
+    afterScreens(engine, { setTimer: (fn) => timers.push(fn) }).then(() => { resolved = true; });
+    await Promise.resolve();
+    assert.equal(resolved, false);
+    assert.equal(data.familiarHeld, 'screen');
+    screenUp = false;
+    timers.shift()();
+    await Promise.resolve();
+    assert.equal(resolved, true);
+    assert.equal(data.familiarHeld, '');
+
+    // Through the feature: the panel is claimed (offers held) but not grown or sounded while the screen shows.
+    screenUp = true;
+    familiarDialogFeature.init(engine);
+    familiarDialogFeature.onEvent('skill_learned:animalkinship_1', 1, engine);
+    await new Promise((r) => setTimeout(r, 20));
+    assert.equal(familiarDialogOpen(), true);
+    assert.equal(familiarDialogFeature.holdQuestOffers(), true);
+    assert.equal(data.familiarHeld, 'screen');
+    assert.equal(data.familiarLast, undefined);
+    assert.equal(data.sound, undefined);
+    screenUp = false;
+    await new Promise((r) => setTimeout(r, 250));
+    assert.equal(data.familiarHeld, '');
+    assert.equal(data.familiarLast, 'animalkinship_1');
+    assert.equal(data.sound, 'played');
+    _resetFamiliarDialog();
+  });
+
+  it('game.js holds the Magic Rock\'s own lines while a screen shows', () => {
+    const game = read('game.js');
+    const fn = (name) => {
+      const start = game.indexOf(`function ${name}(`);
+      assert.ok(start >= 0, name);
+      return game.slice(start, game.indexOf('\n}\n', start));
+    };
+    assert.match(fn('isScreenViewOpen'), /\['award-screen', 'new-day-screen', 'giant-screen-panel'\]\.some\(elementShown\)/);
+    assert.match(fn('screenGateState'), /screenOpen: isScreenViewOpen\(\),/);
+    const waits = fn('familiarWaitsForScreen');
+    assert.match(waits, /if \(!opts \|\| opts\.vog\) return false;/);
+    assert.match(waits, /\(look === 'familiar' \|\| look === 'conversation'\) && isScreenViewOpen\(\)/);
+    assert.match(fn('holdScriptedDialog'), /underEmergency \|\| familiarWaitsForScreen\(opts\)/);
+    assert.match(fn('releaseHeldScriptedDialog'), /if \(familiarWaitsForScreen\(heldScriptedDialogs\[0\]\)\) return;/);
+    assert.match(game, /screenViewOpen: \(\) => isScreenViewOpen\(\),/);
+    // The looks it holds: quest offers and Magic Rock lines, never a plain card or the VOG.
+    assert.equal(familiarLook({ kicker: 'Magic Rock' }), 'conversation');
+    assert.equal(familiarLook({ offer: true }), 'familiar');
+    assert.equal(familiarLook({ kicker: 'Mr. Block' }), 'plain');
   });
 });
 
