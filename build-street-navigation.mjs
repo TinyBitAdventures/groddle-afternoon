@@ -18,6 +18,10 @@
  *
  * Run from spike root:
  *   node build-street-navigation.mjs
+ *   node build-street-navigation.mjs --only=GM4109NI2R640,GTJ1KOM8N2O1EFS   (just those streets)
+ * A full run also rewrites streets later builders touched (e.g. the subway
+ * station doors js/features/subway-feature.js retargets at load); use --only
+ * after an importer change that only affects some streets.
  */
 
 import { readFile, writeFile, readdir, access } from 'node:fs/promises';
@@ -43,6 +47,9 @@ async function readable(path) {
     return false;
   }
 }
+
+const onlyArg = process.argv.find((a) => a.startsWith('--only='));
+const only = onlyArg ? new Set(onlyArg.slice('--only='.length).split(',').filter(Boolean)) : null;
 
 const index = JSON.parse(await readFile(join(streetsDir, 'index.json'), 'utf8'));
 const files = (await readdir(streetsDir)).filter((f) => /^[GL][A-Z0-9]+\.json$/.test(f));
@@ -83,6 +90,7 @@ const missingTargets = new Map();
 const sprites = new Set();
 
 for (const [tsid, { file, street }] of streets) {
+  if (only && !only.has(tsid)) continue;
   let xmlPath = null;
   for (const alias of [tsid, ...streetAliases(tsid)]) {
     const candidate = join(xmlRoot, `${alias.startsWith('L') ? `G${alias.slice(1)}` : alias}.xml`);

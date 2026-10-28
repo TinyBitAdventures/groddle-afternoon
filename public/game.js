@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g412-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-237';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-241';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g405-1';
@@ -577,7 +577,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=g410-1';
+} from './js/street-render.js?v=g415-1';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -815,7 +815,7 @@ import {
 } from './js/sound-moments.js?v=g393-1';
 import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from './js/metabolics.js';
 import { installHiresIcons } from './js/icon-hires.js?v=g373-1';
-import { installHiresDecos } from './js/deco-hires.js';
+import { installHiresDecos } from './js/deco-hires.js?v=g415-1';
 import { loadMutedPreference, saveMutedPreference } from './js/audio-pref.js';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=g405-1';

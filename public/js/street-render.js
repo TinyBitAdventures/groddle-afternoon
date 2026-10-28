@@ -12,7 +12,8 @@ import {
 } from './street-model.js';
 import { availableStreetTsids } from './street-loader.js';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js';
-import { decoUrl } from './deco-hires.js';
+import { decoUrl } from './deco-hires.js?v=g415-1';
+import { LADDER_TILE_Z, ladderTilePieces } from './ladder-tiling.js?v=g415-1';
 
 const DECO_BASE = 'assets/decos/groddle/';
 /**
@@ -20,8 +21,15 @@ const DECO_BASE = 'assets/decos/groddle/';
  * grass_texture3 and house_back_medium_05 PNGs (Children of Ur exports, no SWF
  * by those names) are pixel for pixel grass_texture_3 and house_back_medium05,
  * whose CC0 glitch-locations SWFs the deco pipeline renders (G317).
+ * Lapulapu Caverns' ladder tiling names corey3's basicWood tiles without the
+ * `groddle_` prefix its bundle (corey3.swf) gives them (tools/build-ladder-tiles.py).
  */
-export const DECO_TWINS = Object.freeze({ grass_texture3: 'grass_texture_3', house_back_medium_05: 'house_back_medium05' });
+export const DECO_TWINS = Object.freeze({
+  grass_texture3: 'grass_texture_3',
+  house_back_medium_05: 'house_back_medium05',
+  ladder_tile_center_00_basicWood: 'groddle_ladder_tile_center_00_basicWood',
+  ladder_tile_cap_1_basicWood: 'groddle_ladder_tile_cap_1_basicWood',
+});
 const PLACEHOLDER = 0x5a7a4a;
 /** Original engine art from TSEngineAssets (SignpostView.as). */
 const SIGNPOST = {
@@ -1140,6 +1148,39 @@ function buildGroundSkirt(PIXI, renderer, root, lc, W, sourceH, depthPx, fallbac
   }
 }
 
+/**
+ * Draw every ladder's `tiling` into the middleground container (js/ladder-tiling.js): tile decos
+ * at their own w x h, above the middleground decos, under the avatars, recoloured with the layer.
+ * Returns how many tiles were added.
+ */
+function addLadderTiles(PIXI, lc, street, available, decoBase) {
+  const art = (name) => (available.has(name) ? name : available.has(DECO_TWINS[name]) ? DECO_TWINS[name] : null);
+  let added = 0;
+  for (const ladder of street.ladders || []) {
+    const pieces = ladderTilePieces(ladder, (name) => !!art(name));
+    if (!pieces.length) continue;
+    const foot = worldToScreen(street, ladder.x, ladder.y);
+    for (const piece of pieces) {
+      const tex = textureFromUrl(`${decoBase}${art(piece.sprite)}.png`);
+      const spr = new PIXI.Sprite(tex);
+      const size = () => {
+        if (spr.destroyed) return;
+        spr.width = piece.w;
+        spr.height = piece.h;
+      };
+      size();
+      if (!isLoaded(tex)) onLoaded(tex.source, size);
+      spr.x = foot.x + piece.x;
+      spr.y = foot.y + piece.y;
+      spr.zIndex = LADDER_TILE_Z;
+      spr.glitchLadderId = ladder.id || '';
+      lc.addChild(spr);
+      added += 1;
+    }
+  }
+  return added;
+}
+
 /** Screen pixels past the view edge that still count as visible (pre-uploads). */
 export const CULL_MARGIN = 256;
 
@@ -1218,6 +1259,8 @@ export function buildStreetView(street, PIXI, opts = {}) {
   root.sortableChildren = true;
   const recolourCache = { textures: new Map(), entries: new Map(), bytes: 0, evictions: 0, rebakes: 0, lastEvict: 0 };
   root.recolourCache = recolourCache;
+  /** Ladder tiles drawn from the street's ladders' `tiling` (addLadderTiles). */
+  root.ladderTiles = 0;
   /** Blurred layers' tiles (bakeBlurredLayer): counts for QA in root.blurStats. */
   const blurState = {
     PIXI, renderer: opts.renderer, layers: [], tiles: 0, bytes: 0, peakBytes: 0,
@@ -1358,6 +1401,8 @@ export function buildStreetView(street, PIXI, opts = {}) {
       lc.addChild(spr);
       drawn += 1;
     }
+    // Ladder tiling art (its own count, not a placed deco).
+    if (layer.id === 'middleground') root.ladderTiles = addLadderTiles(PIXI, lc, street, available, decoBase);
     // A blur under 2 is no blur in the client (flashBlurSize): those layers only recolour.
     const blur = flashBlurSize(layer.filters?.blur);
     if (blur > 0 && opts.renderer) bakeBlurredLayer(lc, blur, colour, blurState);

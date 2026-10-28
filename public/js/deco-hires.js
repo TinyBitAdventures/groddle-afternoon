@@ -13,7 +13,7 @@
  * pixels per world pixel (device pixel ratio x the view's zoom, js/render-density.js). Up to 2.25
  * the 2x file is plenty (DPR 1 and most DPR 1.5 windows); above it (Retina) the 3x file is used.
  */
-import { HIRES_DECOS, HIRES_DECOS_BIG } from './deco-hires-list.js';
+import { HIRES_DECOS, HIRES_DECOS_BIG } from './deco-hires-list.js?v=g415-1';
 
 const DECO_PNG = /^(.*?(?:^|\/)assets\/decos\/groddle\/)([^/?#]+)\.png([?#].*)?$/;
 

@@ -7,7 +7,9 @@
  *   y-h..y), key_id, requires_level, is_locked, house_number, for_sale,
  *   owner, plus `connect` (objref target, arrival x/y in the target street,
  *   hidden) or `destinations` (a random pick, inc main.js doStartDoorMove).
- * - middleground `ladders`: x centre, y bottom, h up (insertLadder).
+ * - middleground `ladders`: x centre, y bottom, h up (insertLadder), and the
+ *   `tiling` of the 9 that have one (both caps, every center, the pattern;
+ *   js/ladder-tiling.js draws it).
  * - middleground `walls`: vertical colliders, top y, h down, with pc_perm
  *   (Wall.as: null solid both ways, 0 open, 1 open from the left, -1 open
  *   from the right). Glitch walls are not climbable.
@@ -70,6 +72,37 @@ function readDoor(node) {
   };
 }
 
+/** One tiling piece (Tiling.as cap_0 / cap_1 / centers[i]): sprite class and box. */
+function readTilePiece(node) {
+  if (!node) return null;
+  const sprite = String(childValue(node, 'sprite_class', '') || '');
+  if (!sprite) return null;
+  return { sprite, w: num(childValue(node, 'w', 0)), h: num(childValue(node, 'h', 0)) };
+}
+
+/**
+ * A ladder's `tiling` (Ladder.fromAnonymous → Tiling.fromAnonymous): both caps, every center
+ * (in key order: center_pattern indexes them) and the pattern. LadderView/SurfaceView.tile()
+ * draws it; null when there is none.
+ */
+function readTiling(node) {
+  if (!node) return null;
+  const centers = objects(findChild(node, 'object', 'centers'))
+    .map((c) => ({ key: Number(c.id), piece: readTilePiece(c) }))
+    .filter((c) => c.piece)
+    .sort((a, b) => a.key - b.key)
+    .map((c) => c.piece);
+  const out = {};
+  const cap0 = readTilePiece(findChild(node, 'object', 'cap_0'));
+  const cap1 = readTilePiece(findChild(node, 'object', 'cap_1'));
+  if (cap0) out.cap_0 = cap0;
+  if (cap1) out.cap_1 = cap1;
+  if (centers.length) out.centers = centers;
+  const pattern = String(childValue(node, 'center_pattern', '') ?? '');
+  if (pattern) out.pattern = pattern.split(',').map((v) => num(v.trim(), 0));
+  return Object.keys(out).length ? out : null;
+}
+
 /**
  * Extract every navigation object from one location XML document.
  * @param {string} xmlText
@@ -97,8 +130,6 @@ export function extractLocationNavigation(xmlText) {
   for (const layer of objects(layers)) {
     for (const door of objects(findChild(layer, 'object', 'doors'))) out.doors.push(readDoor(door));
     for (const ladder of objects(findChild(layer, 'object', 'ladders'))) {
-      const tiling = findChild(ladder, 'object', 'tiling');
-      const center = tiling && objects(findChild(tiling, 'object', 'centers'))[0];
       const row = {
         id: ladder.id || '',
         x: num(childValue(ladder, 'x', 0)),
@@ -106,8 +137,8 @@ export function extractLocationNavigation(xmlText) {
         w: num(childValue(ladder, 'w', 0)),
         h: num(childValue(ladder, 'h', 0)),
       };
-      const tile = center ? childValue(center, 'sprite_class', '') : '';
-      if (tile) row.tiling = String(tile);
+      const tiling = readTiling(findChild(ladder, 'object', 'tiling'));
+      if (tiling) row.tiling = tiling;
       if (row.h > 0) out.ladders.push(row);
     }
     for (const wall of objects(findChild(layer, 'object', 'walls'))) {

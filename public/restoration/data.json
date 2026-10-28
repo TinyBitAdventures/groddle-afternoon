@@ -2640,9 +2640,14 @@
   ]
  },
  "git": {
-  "commits": 687,
+  "commits": 688,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-28",
+    "kind": "new",
+    "text": "Trees, animals and rocks answer with the original reward badges"
+   },
    {
     "date": "2026-10-28",
     "kind": "fix",
@@ -2757,14 +2762,9 @@
     "date": "2026-10-27",
     "kind": "fix",
     "text": "A line shown in a speech bubble is not also toasted"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "improve",
-    "text": "Smaller speech bubbles, a Rook call bubble that fits its words, and award screens over prompts"
    }
   ]
  },
- "tests": 397,
+ "tests": 398,
  "generatedAt": "2026-10-28"
 }

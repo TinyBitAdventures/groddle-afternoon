@@ -32,7 +32,7 @@
  */
 
 import { countItem } from '../inventory.js?v=catalog-unified-7';
-import { doorsFeature } from './doors-feature.js?v=g410-1';
+import { doorsFeature } from './doors-feature.js?v=g415-1';
 import { textureFromUrl } from '../textures.js';
 import {
   CAR_FLOOR,
