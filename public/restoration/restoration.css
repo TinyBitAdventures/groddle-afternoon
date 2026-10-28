@@ -348,12 +348,12 @@ h3 { font-size: 22px; margin: 0 0 10px; }
   display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 10px; align-items: center;
   padding: 9px 2px;
 }
-.item button:hover .item-name { text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px; }
+.item button:hover .item-label { text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px; }
 .check {
   width: 20px; height: 20px; border-radius: 6px; display: grid; place-items: center;
   font-size: 13px; font-weight: 900; color: #fff; background: var(--tone);
 }
-.item-name { font-weight: 700; min-width: 0; overflow-wrap: anywhere; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; }
+.item-name { font-weight: 700; min-width: 0; overflow-wrap: anywhere; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; line-height: var(--row-line); }
 .item-tag { font-size: 12px; font-weight: 700; color: var(--tone); white-space: nowrap; }
 .item-mp { font-size: 11px; font-weight: 700; letter-spacing: 0.02em; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 1px 7px; white-space: nowrap; }
 .item-mp-line b { color: var(--fg); }
@@ -487,7 +487,14 @@ a.play-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2p
 /* minmax(0, 1fr): a long name with its 'In multiplayer' chip wraps inside the row instead of pushing Play out of the card. */
 .item { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 8px; }
 .item.is-open { align-items: start; }
-.item.is-open .item-play { margin-top: 8px; }
+/* An open row lines up on the name's first line: the box, the status word and Play sit level
+   with it, however far the chip and the blurb wrap below. */
+.item { --row-line: 24.8px; }
+.item .item-play { height: 26px; padding-block: 0; box-sizing: border-box; }
+.item.is-open button { align-items: start; }
+.item.is-open .check { margin-top: calc((var(--row-line) - 20px) / 2); }
+.item.is-open .item-tag { line-height: var(--row-line); }
+.item.is-open .item-play { margin-top: calc(9px + (var(--row-line) - 26px) / 2); }
 .detail-play { margin-left: 8px; vertical-align: middle; }
 .rm-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: flex-end; }
 .room-cell { display: flex; flex-direction: column; gap: 8px; }

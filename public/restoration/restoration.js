@@ -165,7 +165,7 @@ function setupBoard(data) {
           btn.setAttribute('aria-expanded', String(open));
         } },
         el('span', { class: 'check', 'aria-hidden': 'true' }, st.mark || ''),
-        el('span', { class: 'item-name' }, it.name, it.multiplayer ? el('span', { class: 'item-mp', title: it.multiplayer }, MP_LABEL) : null),
+        el('span', { class: 'item-name' }, el('span', { class: 'item-label' }, it.name), it.multiplayer ? el('span', { class: 'item-mp', title: it.multiplayer }, MP_LABEL) : null),
         el('span', { class: 'item-tag' }, st.short),
         el('span', { class: 'item-blurb' }, it.blurb),
         mpLine(it, 'item-blurb item-mp-line', 'span'),
