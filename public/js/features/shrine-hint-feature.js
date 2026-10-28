@@ -13,8 +13,13 @@
  * chat box within 200 px of that Giant's shrine (the closest shrine there),
  * the Giant's screen opens: "<Giant> says..." / "I love you too, friend",
  * on the Giant's colour, with GONG_GIANTS as the fade-in ends. Click
- * anywhere (or Enter / Esc / Space) once the line is up to close it. The
- * chat line itself still shows, as in the source. No favor, no daily cap.
+ * anywhere, Enter or Escape once the line is up closes it (GiantView.as 128
+ * listens for a click anywhere, BaseScreenView.as 224-226 for Escape and
+ * Enter; Space is not one of them, G364). While it is up it has the keyboard,
+ * as the award screens do (screen-fx.js screenInput). It waits in the game's
+ * screen queue like the client's GIANT_SCREEN (NCMsgHandler.as 1025-1031:
+ * engine.queueScreen, G364). The chat line itself still shows, as in the
+ * source. No favor, no daily cap.
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&shrinedemo=1
  *   &giantloveautoplay=1 types "I love you <this shrine's Giant>" into the
  *   chat box and sends it 2.5 s in (&giantlovesay=<line> sends that line
@@ -26,6 +31,7 @@ import { questStatus } from '../quest-offers.js';
 import { GIANT_SCREEN_FADE_MS, giantLoveResponse } from '../giant-love.js?v=g94-1';
 import { GIANTS, inEmblemHitbox } from '../shrines.js?v=spinning-wheel-test-4';
 import { vogPages } from '../newxp.js';
+import { screenInput } from '../screen-fx.js?v=g378-1';
 
 export const SHRINE_HINT_FEATURE_ID = 'shrine-hint';
 export const SHRINES_TO_PASS = 3;
@@ -34,7 +40,7 @@ let state = { passed: {}, announced: false };
 let inside = false;
 let ui = null;
 let eng = null;
-let love = { ui: null, open: false, ready: false, autoAt: 0, autoDone: false, timers: [] };
+let love = { ui: null, open: false, ready: false, queued: false, autoAt: 0, autoDone: false, timers: [] };
 
 export function shrineHintText(giantName) {
   return `Lo, a shrine to ${giantName}//Try donating something.`;
@@ -111,8 +117,18 @@ export function sayLoveLine(engine, text) {
   const res = giantLoveResponse(text, { shrines: liveShrines(engine), x: Number(p?.x), y: Number(p?.y) });
   if (res.reason === 'not-love') return res;
   engine.setData?.('giantLove', res.ok ? `screen:${res.giant}` : `${res.reason}:${res.giant}`);
-  if (res.ok && !love.open) showGiantScreen(engine, res.screen, res.giant);
+  if (res.ok && !love.open && !love.queued) queueGiantScreen(engine, res.screen, res.giant);
   return res;
+}
+
+/** G364: the Giant's screen waits its turn behind award screens and the queue's gates. */
+function queueGiantScreen(engine, screen, giantId) {
+  love.queued = true;
+  const run = () => showGiantScreen(engine, screen, giantId);
+  const shown = typeof engine?.queueScreen === 'function' ? engine.queueScreen(run) : run();
+  Promise.resolve(shown).finally(() => {
+    love.queued = false;
+  });
 }
 
 function ensureLoveUi() {
@@ -146,13 +162,6 @@ function ensureLoveUi() {
   el.setAttribute('role', 'dialog');
   el.setAttribute('aria-live', 'polite');
   el.innerHTML = '<div class="gs-stage"><img class="gs-art" alt=""><div class="gs-text"><p class="gs-name"></p><p class="gs-tip"></p></div></div><div class="gs-ok">Click anywhere...</div>';
-  el.addEventListener('click', () => closeGiantScreen());
-  window.addEventListener('keydown', (e) => {
-    if (!love.open || !['Enter', 'Escape', ' '].includes(e.key)) return;
-    e.preventDefault();
-    e.stopPropagation();
-    closeGiantScreen();
-  }, true);
   document.body.appendChild(el);
   love.ui = el;
   return el;
@@ -163,9 +172,12 @@ function hexToRgba(hex, alpha) {
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
 }
 
-/** GiantView.show with start_with_tip: the Giant's colour, its art, "<Giant> says...", the line, then Click anywhere. */
+/**
+ * GiantView.show with start_with_tip: the Giant's colour, its art, "<Giant> says...", the line, then Click anywhere.
+ * Resolves with how it closed once it has faded out.
+ */
 function showGiantScreen(engine, screen, giantId) {
-  if (typeof document === 'undefined') return;
+  if (typeof document === 'undefined') return Promise.resolve('');
   const el = ensureLoveUi();
   const r = engine.app?.canvas?.getBoundingClientRect?.() || document.querySelector('canvas')?.getBoundingClientRect();
   if (r) Object.assign(el.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
@@ -188,25 +200,33 @@ function showGiantScreen(engine, screen, giantId) {
     engine.playSound?.(screen.sound, { volume: 0.7 });
     engine.setData('giantLoveSound', screen.sound);
   }, GIANT_SCREEN_FADE_MS));
-  // GiantView: input waits for the text to finish (onAnimateTextComplete).
+  // A click anywhere on it (GiantView.as 128), Enter or Escape (BaseScreenView.as 224-226).
+  const input = screenInput(el, { button: el });
+  // GiantView: input waits for the text to finish (onAnimateTextComplete 454-459).
   love.timers.push(setTimeout(() => {
     love.ready = true;
+    input.ready();
     el.classList.add('ready');
     engine.setData('giantLoveScreen', 'ready');
   }, 3800));
+  return input.done.then((how) => closeGiantScreen(how)).finally(() => input.release());
 }
 
-function closeGiantScreen() {
+function closeGiantScreen(how = '') {
   const el = love.ui;
-  if (!el || !love.open || !love.ready) return;
+  if (!el || !love.open) return Promise.resolve(how);
   love.open = false;
   love.ready = false;
   el.classList.add('out');
   el.classList.remove('on');
   eng?.setData?.('giantLoveScreen', 'closed');
-  love.timers.push(setTimeout(() => {
-    if (!love.open) el.hidden = true;
-  }, 400));
+  eng?.setData?.('giantLoveClosedBy', how);
+  return new Promise((resolve) => {
+    love.timers.push(setTimeout(() => {
+      if (!love.open) el.hidden = true;
+      resolve(how);
+    }, 400));
+  });
 }
 
 /** The Local chat box (read in the capture phase, before the form clears it). */
@@ -282,6 +302,6 @@ export const shrineHintFeature = {
 
   /** Tests: the Giant screen state. */
   _love() {
-    return { open: love.open, ready: love.ready };
+    return { open: love.open, ready: love.ready, queued: love.queued };
   },
 };

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g377-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-209';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-210';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g378-1';
@@ -644,6 +644,7 @@ import {
   cardPausedTimeout,
   POL_OWNER_SIZE,
 } from './js/screen-fx.js?v=g378-1';
+import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=g379-1';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=g225-1';
 import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=g378-1';
 import {
@@ -2078,26 +2079,93 @@ function achievementBadgeFallback(def = {}) {
  */
 /** Award screens queued or showing (G213). */
 let awardsPending = 0;
+/** When the last queued screen closed (G364: the next one tries 500 ms later, screenViewClosed 3341). */
+let screenClosedAt = -Infinity;
 
 function enqueueAward(payload) {
   if (payload.kind === 'achievement' && payload.classTsid && !payload.iconUrl) {
     payload.iconUrl = badgeIconFor(payload.classTsid);
   }
+  return queueScreen(async () => {
+    const el = document.getElementById('award-screen');
+    playSound(payload.sound || soundForAward(payload.kind), { volume: 0.7 });
+    await showAwardScreen(el, payload);
+  });
+}
+
+/**
+ * G364: one queue for the award, new-day and Giant screens, as the client's
+ * screen_view_q (TSFrontController.as addToScreenViewQ 3344-3356). `show`
+ * draws one and resolves when it has closed. `requiresFocus` is the queue
+ * entry's requires_client_focus (false for the new day: NCMsgHandler.as 2764-2768).
+ */
+function queueScreen(show, { requiresFocus = true } = {}) {
   // G213: queued screens count as up, so a quest offer check does not slip in before one shows.
   awardsPending += 1;
   awardQueue = awardQueue
-    // TSFrontController.tryShowScreenViewFromQ 3399-3400: award screens wait for the loading card (G192).
+    // TSFrontController.tryShowScreenViewFromQ 3396: screens wait for the loading card (G192).
     .then(() => afterStreetCard())
-    .then(async () => {
-      const el = document.getElementById('award-screen');
-      playSound(payload.sound || soundForAward(payload.kind), { volume: 0.7 });
-      await showAwardScreen(el, payload);
-    })
+    // G364: and for the rest of its gates (js/screen-queue.js), checked again every second.
+    .then(() => waitForScreenGates(screenGateState, { requiresFocus, closedAt: screenClosedAt, onHold: noteScreenHold }))
+    .then(show)
     .catch((e) => console.warn('award screen', e))
     .finally(() => {
       awardsPending = Math.max(0, awardsPending - 1);
+      screenClosedAt = performance.now();
+      noteScreenHold('');
     });
   return awardQueue;
+}
+
+function noteScreenHold(why) {
+  if (app?.canvas) app.canvas.dataset.screenQueueHold = why || '';
+}
+
+/** A visible element by id (not [hidden]). */
+function elementShown(id) {
+  const el = document.getElementById(id);
+  return Boolean(el && !el.hidden);
+}
+
+/**
+ * G364: the remake's equivalents of tryShowScreenViewFromQ's gates
+ * (TSFrontController.as 3362-3400; js/screen-queue.js SCREEN_GATES has the order).
+ */
+function screenGateState() {
+  const editMode = features.query('homeEditMode', engine);
+  return {
+    // 3370, 3372: cult_mode, decorator_mode (homes-feature's Cultivate and Decorate bars).
+    cultivating: editMode === 'cultivate',
+    decorating: editMode === 'decorate',
+    // 3374: StageBeacon.flash_has_focus.
+    unfocused: typeof document.hasFocus === 'function' && !document.hasFocus(),
+    // 3376, 3398: CameraMan in focus, in_camera_control_mode (camera-mode-feature).
+    cameraMode: app?.canvas?.dataset?.cameraMode === '1',
+    // 3384: InteractionMenu: the verb menu, the door chooser, the item pickers a verb opens.
+    interactionMenu: Boolean(menuTarget && elementShown('verb-menu')) || Boolean(enterChooser?.isOpen()) ||
+      isFeedPickerOpen() || isEmotionalBearPickerOpen(),
+    // 3386: GetInfoDialog: an item's card (the pack popover).
+    getInfo: isPackPopoverOpen(),
+    // 3388: ChoicesDialog: conversations and quest offers.
+    choicesDialog: isQuestDialogueOpen(),
+    // 3390: screen_view_open: a screen shown outside the queue.
+    screenOpen: ['award-screen', 'new-day-screen', 'giant-screen-panel'].some(elementShown),
+    // 3392: ImgMenuView (imagination-feature's upgrade cards).
+    imgMenu: elementShown('imagination-panel'),
+    // 3394: fam_dialog_open (familiar-dialog-feature).
+    familiarDialog: elementShown('familiar-dialog'),
+    // 3396: moveModel.moving: a street change (the loading card, a scene's own fade).
+    moving: streetCardUp() || Boolean(document.getElementById('screen-transition')?.classList.contains('is-visible')) ||
+      sceneTransitionBusy(),
+  };
+}
+
+/** A scene's own way in or out (its fade and street swap) is under way. */
+function sceneTransitionBusy() {
+  return Boolean(
+    legalizeTransitionBusy || winterWalkTransitionBusy || summersDayTransitionBusy || rookWoodsTransitionBusy ||
+      rookMuseumTransitionBusy || deEmbiggenifyTransitionBusy || paradiseTransitionBusy || greedyStreetTransitionBusy
+  );
 }
 
 /** Show every newly unlocked badge from a counter update. */
@@ -5117,11 +5185,13 @@ function showSpeechBubble(target, speech) {
   return bubble;
 }
 
-/** { xp, mood, energy } -> "+7 iMG" "+4 mood" "-3 energy" pills (energy is spent, so negative). */
+/** { xp, energyGain, mood, energy } -> "+7 iMG" "+60 energy" "+4 mood" "-3 energy" pills (energy is spent, so negative; energyGain is gained). */
 function speechSlugRow(slugs) {
   if (!slugs) return null;
   const pills = [
     ['xp', '+', 'iMG', 0xe9e1f7, 0x6a4c9c],
+    // G364: energy gained (the new day's refill, Slug.as 161 '+' for an amount above 0), before mood as stats_today lists it.
+    ['energyGain', '+', 'energy', 0xf8dcd8, 0xa2382c],
     ['mood', '+', 'mood', 0xe2f1d6, 0x4c7a2c],
     ['energy', '-', 'energy', 0xf8dcd8, 0xa2382c],
   ].filter(([k]) => Number(slugs[k]) > 0);
@@ -8496,6 +8566,8 @@ const engine = {
   /** First non-null answer from any feature's `hook` (feature-host query). */
   query: (hook, ...args) => features.query(hook, ...args),
   award: (payload) => enqueueAward(payload),
+  /** G364: a full screen of a feature's own (the Giant's), queued with the award screens; resolves when it closes. */
+  queueScreen: (show, opts) => queueScreen(show, opts),
   /** pc.feats_increment (players/inc_feats.js:37): a solo Feat contribution, counted by features/solo-feats-feature.js (G143). */
   featsIncrement: (featId, amount = 1, opts = {}) => features.query('featsIncrement', featId, amount, opts, engine) || 0,
   /** Player verbs: when the player last heard each musicblock (heardAt), for a block another player plays for them. */
@@ -10047,6 +10119,27 @@ function isScreenFxBlocking() {
 
 /** @type {boolean} */
 let newDayBusy = false;
+/** NewDayView.as 162, 244, 264: MESSAGES shuffled once, then one a day in turn. */
+let newDayMessages = null;
+let newDayMessageIndex = 0;
+
+/**
+ * G364: once the new-day screen has gone, the day's line and its stats in a
+ * bubble over you (NewDayView.as onDoneTweenComplete 216-225, showChatBubble
+ * 236-265; js/screen-queue.js newDayBubble).
+ */
+function showNewDayBubble(refill = {}) {
+  if (!playerSpeechTarget) return null;
+  newDayMessages ||= shuffleNewDayMessages();
+  const message = newDayMessages[newDayMessageIndex] || newDayMessages[0];
+  newDayMessageIndex = newDayMessageIndex < newDayMessages.length - 1 ? newDayMessageIndex + 1 : 0;
+  const bubble = newDayBubble(message, { energy: refill.energyGained, mood: refill.moodGained });
+  if (app?.canvas) app.canvas.dataset.newDayBubble = bubble.text;
+  return showSpeechBubble(playerSpeechTarget, {
+    speaker: features.query('playerChatName', engine) || playerSpeechTarget.label || 'Ur',
+    ...bubble,
+  });
+}
 
 // Save entry names (js/save-store.js); in solo they are the same localStorage keys as always.
 /** Last street + xy (auto save/load): 'groddle_player_location'. */
@@ -10270,8 +10363,12 @@ async function maybeNewDay(opts = {}) {
           ? `Energy ${Math.round(refill.energyBefore)} → ${energyCap()} · Mood restored`
           : 'You were already full. Still, a new day!';
     }
-    playSfx('newDay', { volume: 0.75 });
-    await showNewDayScreen(el);
+    // G364: through the screen queue, without its focus gate (NCMsgHandler.as do_NEW_DAY 2764-2768).
+    await queueScreen(async () => {
+      playSfx('newDay', { volume: 0.75 });
+      await showNewDayScreen(el);
+    }, { requiresFocus: false });
+    showNewDayBubble(refill);
   } else {
     toast('A new day: energy refilled!', 4000);
     playSfx('newDay', { volume: 0.75 });
@@ -25262,6 +25359,12 @@ async function main() {
           }, 1_350);
         }
       }, 250);
+    }
+    // G364 QA: &awardqdemo=<ms> earns a real badge that long after the start (&awardqbadge=<id>,
+    // default betterthanlousy_douser), so a route can open an offer or a mode first and watch it wait.
+    const awardQDemoMs = Number(params.get('awardqdemo'));
+    if (params.has('awardqdemo') && Number.isFinite(awardQDemoMs)) {
+      setTimeout(() => engine.grantAchievement(params.get('awardqbadge') || 'betterthanlousy_douser'), Math.max(0, awardQDemoMs));
     }
     if (params.has('newday')) {
       await maybeNewDay({ force: true });
