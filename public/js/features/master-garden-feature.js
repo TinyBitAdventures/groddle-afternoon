@@ -201,6 +201,10 @@ function finishPour(engine) {
   for (const [cropId, qty] of Object.entries(res.items || {})) {
     engine.achievement?.(`${garden.gardenType === 'herb' ? 'herb_harvest' : 'garden_harvest'}:${cropId}`, qty);
   }
+  // G448: include/garden.js 486-505: an herb garden's Super Harvest counts super_harvest_herb.
+  if (res.superHarvest && garden.gardenType === 'herb') {
+    for (const cropId of res.superCrops || []) engine.achievement?.(`herb_super_harvest:${cropId}`, 1);
+  }
   if (res.drop) {
     engine.setData?.('mgDrop', `${res.drop.table}@${Math.round(res.drop.chance * 100)}%:${res.drop.hit ? 'hit' : 'miss'}`);
     if (res.drop.hit) payDrop(engine, rollDropTable(res.drop.table), { source: 'master_gardener' });

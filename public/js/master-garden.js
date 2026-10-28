@@ -296,7 +296,9 @@ export function potionTendGarden(garden, action, inv, pc, ctx = {}) {
     drop = { chance, table: mgDropTable(type, action), hit: chance > 0 && rng() < chance };
   }
   const superHarvest = Object.values(results).some((r) => r.bonus > 0);
-  return { ok: true, action, count, energy, mood, xp, items, superHarvest, msg: growl(base, { energy, mood, xp }), drop, tired };
+  // G448: the crops whose pick took a Super Harvest bonus.
+  const superCrops = Object.keys(results).filter((cropId) => results[cropId].bonus > 0);
+  return { ok: true, action, count, energy, mood, xp, items, superHarvest, superCrops, msg: growl(base, { energy, mood, xp }), drop, tired };
 }
 
 const GARDEN_POTIONS_BY_ACTION = Object.fromEntries(Object.values(GARDEN_POTIONS).map((p) => [p.action, p]));

@@ -95,9 +95,17 @@ import {
   routeQuestEvent,
   syncItemRequirements,
   tickQuestTimers,
+  toolBreakEvents,
   turnInQuest,
   waitingOffers,
+  wintryPlaceLeave,
+  homeTreesGrown,
+  COLD_COMFORT,
+  COLD_COMFORT_LEAVE_TEXT,
+  HOME_TREE_GROWN_TEXT,
+  SEED_TO_SCYTHE,
 } from '../quest-offers.js';
+import { parseQuestConversation } from '../quests.js';
 import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unified-7';
 import { getQuestCatalog } from '../content-catalogs.js';
 
@@ -132,6 +140,38 @@ let ui = null;
 let noticeTimer = 0;
 /** Pack counts at the last sync, for `in_inventory:<item>` gain events. */
 let lastPack = null;
+/** G440: which tools were broken at the last sync, for `tool_broke:<tool>` (quest-offers.js toolBreakEvents). */
+let lastBroken = null;
+/** G470: the street we were on, so leaving Wintry Place resets Cold Comfort. */
+let lastStreetTsid = '';
+/** G446: your yard trees' maturities at the last look (null off your yard). */
+let lastYardMaturity = null;
+/** The patches feature's per-street slot id (features/patches-feature.js PATCHES_FEATURE_ID). */
+const PATCHES_SLOT = 'patches';
+
+/** Standing in your own home's yard (patch.js pols_is_owner, include/trants.js pols_get_owner). */
+export function onOwnYard(engine) {
+  const home = engine.homeContext?.();
+  return Boolean(home?.inHome && home.owned && home.room !== 'interior');
+}
+
+/** G446: look at your yard's trees; one that just reached full growth counts for Seed to Scythe. */
+function checkYardTrees(engine) {
+  if (!onOwnYard(engine)) {
+    lastYardMaturity = null;
+    return;
+  }
+  const { grown, maturity } = homeTreesGrown(lastYardMaturity, engine.streetSlot(PATCHES_SLOT)?.plots);
+  lastYardMaturity = maturity;
+  const qs = engine.questState;
+  if (!grown.length || !qs?.active?.[SEED_TO_SCYTHE] || qs.offers?.failed?.[SEED_TO_SCYTHE]) return;
+  for (const label of grown) {
+    const seen = qs.offers?.distinct?.[SEED_TO_SCYTHE]?.pol_trants_fully_grown || [];
+    if (seen.includes(label)) continue;
+    questOffersFeature.onEvent(`home_trant_grown:${label}`, 1, engine);
+    engine.prompt?.({ text: HOME_TREE_GROWN_TEXT, timeout: 10, choices: [{ value: 'ok', label: 'ok' }] });
+  }
+}
 // Musicblocks and Cubimals already emit in_inventory through their badges.
 const PACK_GAIN_SKIP = /^(musicblock_|npc_cubimal_)/;
 
@@ -560,6 +600,23 @@ export const questOffersFeature = {
       nextOfferCheckAt || Infinity,
       Date.now() + (engine.param('questoffer') === 'now' ? 1_500 : STREET_ENTER_DELAY_MS)
     );
+    const tsid = String(engine.streetTsid || street?.tsid || '');
+    // G470: location.js onPlayerExit 791-807: leaving Wintry Place mid-quest starts the minute over.
+    if (lastStreetTsid && lastStreetTsid !== tsid && wintryPlaceLeave(engine.questState, lastStreetTsid)) {
+      engine.updateHud();
+      engine.scriptedDialogue?.({
+        title: getQuestCatalog()[COLD_COMFORT]?.title || 'Cold Comfort',
+        kicker: 'Magic Rock',
+        look: 'conversation',
+        beats: parseQuestConversation(COLD_COMFORT_LEAVE_TEXT),
+      });
+    }
+    lastStreetTsid = tsid;
+    // G446: the yard's saved maturities, before the patches feature catches up on time away.
+    lastYardMaturity = null;
+    checkYardTrees(engine);
+    // G456 / G461: arrivals by street id (location.js onPlayerEnter 524-544: the Great Hole, the seams).
+    if (tsid && !engine.inScene?.()) this.onEvent(`street_entered_tsid:${tsid}`, 1, engine);
   },
 
   onEvent(counter, amount, engine, detail) {
@@ -567,6 +624,8 @@ export const questOffersFeature = {
     const result = routeQuestEvent(engine.questState, counter, amount, { ...questContext(engine), detail });
     if (result.advanced.length) engine.updateHud();
     finish(result.completable, engine);
+    // G458: patch.js 781-782: a bean planted in a yard you own also counts pol_beans_planted.
+    if (/^patch(?:_dark)?:plant$/.test(String(counter)) && onOwnYard(engine)) this.onEvent('patch:plant_home', 1, engine);
   },
 
   onTick(dtMs, now, engine) {
@@ -602,6 +661,10 @@ export const questOffersFeature = {
         }
       }
       lastPack = pack;
+      const breaks = toolBreakEvents(lastBroken, engine.toolState);
+      lastBroken = breaks.broken;
+      for (const event of breaks.events) this.onEvent(event, 1, engine);
+      checkYardTrees(engine);
       const sync = syncItemRequirements(qs, engine.inv, questContext(engine, now));
       if (sync.advanced?.length) engine.updateHud();
       finish(sync.completable, engine);

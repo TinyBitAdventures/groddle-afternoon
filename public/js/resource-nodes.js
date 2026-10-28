@@ -1413,6 +1413,8 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
         const bonus = qty * (pkg.bonus_multiplier - 1);
         outputs.push({ classTsid: 'jellisac_clump', qty: bonus, superHarvest: true });
         extra.superHarvest = { classTsid: 'jellisac_clump', qty: bonus };
+        // G453: jellisac.js 198 super_harvest_jellisac (A Slatheration of Jellisacs).
+        achievementCounters.push({ counter: 'jellisac:super_harvest', amount: 1 });
       }
       // item.js:738 notifyVerb (Goo Getter, Gloopmeister and the rest).
       achievementCounters.push({ counter: 'jellisac:scoop', amount: 1 });
@@ -1428,6 +1430,10 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
       else if (ctx.loamBonus === true) outputs.push({ classTsid: 'loam', qty: pkg.bonus_amount || 2 });
       else outputs.push({ classTsid: 'earth', qty: pkg.bonus_amount || 2 });
       achievementCounters.push({ counter: 'dug:dirt', amount: 1 });
+      // G463 / G464 (dirt_pile.js 391-393, 414, 432): dig_loam counts every drop-table lump and a Loam
+      // bonus, dig_dirt the Lumps of Earth (quest routes soil_dug:loam / soil_dug:earth).
+      const lumps = outputs.reduce((sum, out) => sum + (Number(out.qty) || 0), 0);
+      if (lumps > 0) achievementCounters.push({ counter: drop.length || ctx.loamBonus === true ? 'soil_dug:loam' : 'soil_dug:earth', amount: lumps });
       break;
     }
     case 'peat_1': {
@@ -1443,6 +1449,8 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
         outputs.push({ classTsid: 'paper', qty: Math.min(want, node.units) });
         // item.js:738 notifyVerb (Paper Plucker, Pad Pincher and the rest).
         achievementCounters.push({ counter: 'paper_tree:harvest', amount: 1 });
+        // G439: paper_tree.js 475 trant_harvest_paper_tree (One, Two, Tree, Four, Six, Eight).
+        achievementCounters.push({ counter: 'trants_harvested:paper_tree', amount: 1 });
       } else if (verb.id === 'water') {
         achievementCounters.push({ counter: 'trants_watered:paper_tree', amount: 1 });
       }

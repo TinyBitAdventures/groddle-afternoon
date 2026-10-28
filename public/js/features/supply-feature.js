@@ -141,6 +141,8 @@ function settleWork(engine, now = Date.now()) {
   if (!res.ok) return;
   // metalmaker.js:1386 and siblings: machines_assembled:<machine>.
   if (done.kind === 'assemble') engine.achievement?.(`machines_assembled:${done.machine}`, 1);
+  // G443: machine_stand.js 797-808 onDisassembled: Machine Shop Pit Stop's second half.
+  else engine.achievement?.(`machines_disassembled:${done.machine}`, 1);
   engine.updateHud?.();
   say(engine, res.msg, true);
   engine.save?.();
@@ -322,6 +324,8 @@ function runTransformVerb(classTsid, verbId, engine) {
   if (!ITEM_TRANSFORMS[classTsid] && !HERB_SEEDS[classTsid]) return false;
   const [verb, count] = String(verbId).split(':');
   const res = runTransform(classTsid, verb, count === 'all' ? 'all' : 1, engine.inv, engine.pc, learned(engine));
+  // G444: gandlevery.js 359-372: the seeds that landed count seeds_extracted (Shucks To Be You).
+  if (res.ok && HERB_SEEDS[classTsid] && res.got > 0 && res.out) engine.achievement?.(`herb_seeds_extracted:${res.out}`, res.got);
   // butterfly_butter.js:211: compressing Butterfly Butter into Cheese grants Cheesemongerer.
   if (res.ok && classTsid === 'butterfly_butter' && verb === 'compress') engine.grantAchievement?.('cheesemongerer');
   engine.updateHud?.();

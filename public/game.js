@@ -3,8 +3,8 @@
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g388-1';
-import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-216';
+import { createFeatureHost } from './js/feature-host.js?v=g390-1';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-217';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g378-1';
@@ -28,7 +28,7 @@ import {
   cleanQuestMarkup,
 } from './js/quests.js';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropBootStarterQuests, routesCounter } from './js/quest-offers.js';
+import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -229,6 +229,7 @@ import {
 import {
   EMOTIONAL_BEAR_ACTIONS,
   EMOTIONAL_BEAR_COMPANIONS,
+  GARLIC_BREATH_BUFF,
   createEmotionalBearState,
   emotionalBearActionQuote,
   emotionalBearHasUpgrade,
@@ -238,7 +239,7 @@ import {
   listEmotionalBearActions,
   performEmotionalBearAction,
   upgradeEmotionalBear,
-} from './js/emotional-bear.js?v=emotional-bear-2';
+} from './js/emotional-bear.js?v=g390-1';
 import {
   LAST_FEAT_STREET_IDS,
   LAST_FEAT_STREET_LABELS,
@@ -430,7 +431,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=g380-1';
+} from './js/player-save.js?v=g390-1';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -2591,6 +2592,8 @@ function runEmotionalBearAction(actionId, target = '') {
     {
       dayKey: getGameDayKey(Date.now()),
       inRace: hogHaulIsInstanced(),
+      // G459: a kiss with garlic breath (emotional_bear.js 234-262).
+      garlic: actionId === 'kiss' && hasBuff(buffState, GARLIC_BREATH_BUFF, Date.now()),
     }
   );
   if (!result.ok) {
@@ -2628,7 +2631,7 @@ function runEmotionalBearAction(actionId, target = '') {
     Math.min(4_800, result.durationMs)
   );
   if (target) {
-    const response = `${EMOTIONAL_BEAR_ACTIONS[actionId].label}! Mood +${result.targetEffects.mood}`;
+    const response = `${EMOTIONAL_BEAR_ACTIONS[actionId].label}! Mood ${result.targetEffects.mood < 0 ? '' : '+'}${result.targetEffects.mood}`;
     showLocalChatBubble(target, response);
     showLocalCompanionSpeech(target, response, {
       durationMs: Math.min(7_200, result.durationMs),
@@ -2644,6 +2647,11 @@ function runEmotionalBearAction(actionId, target = '') {
     if (counter) {
       announceAchievementUpdates(applyAchievementProgress(achieveState, counter, 1, pc));
     }
+  }
+  if (result.garlic && target) {
+    // emotional_bear.js 254-260: players_garlic_kissed by the one kissed; Spread the Garlic Love counts each once.
+    announceAchievementUpdates(applyAchievementProgress(achieveState, `players_garlic_kissed:${target}`, 1, pc));
+    emitGameEvent(`companion_garlic_kissed:${String(target).replace(/[^a-zA-Z0-9_]+/g, '_')}`);
   }
   if (player) {
     floatText(
@@ -2981,6 +2989,8 @@ function beginToolRepair(classTsid) {
     pushActivity(result.msg);
     playSound('CRAFT_DONE', { volume: 0.5 });
     emitGameEvent(`tool_repaired:${classTsid}`);
+    // tinkertool.js 370-371: a repair of 15 or more one-second ticks sets tinkertool_15s_repair.
+    if (quote.durationSeconds >= 15) emitGameEvent(`tool_repaired_long:${classTsid}`);
     updateHud();
   }, quote.durationMs);
   activeToolRepair = { classTsid, timer, finishesAt };
@@ -6323,6 +6333,8 @@ function executeVerb(target, verbId) {
     // counter of the same name already carried it.
     const verbEvent = `${target.classId}:${verbId}`;
     if (!achievementEvents.some((event) => event.counter === verbEvent)) emitGameEvent(verbEvent, 1, verbDetail);
+    // Tree quest counters the badge events leave out (wood trees, super and last harvests, healing).
+    for (const row of worldVerbQuestEvents(target, verbId, result)) emitGameEvent(row.event, row.amount, verbDetail);
     if (ROCK_CATALOG[target.classId] && verbId === 'mine' && target.state?.rock?.depleted) {
       emitGameEvent(`rocks_depleted:${target.classId}`);
     }
@@ -21836,6 +21848,8 @@ function noteMadeUnit(record, madeInv, stringBefore) {
   for (const output of record.recipe.outputs || []) {
     emitGameEvent(`making_tool_output:${record.recipe.tool}:${output.classTsid}`, output.qty || 1);
   }
+  // Grinder ore_crushed / ore_refined, a 20-ingot smelt (quest-offers.js makingUnitQuestEvents).
+  for (const row of makingUnitQuestEvents(record)) emitGameEvent(row.event, row.amount);
   const achievementCounter = makingToolAchievementCounter(record.recipe.tool);
   const achievementUpdates = achievementCounter
     ? applyAchievementProgress(achieveState, achievementCounter, 1, pc)
@@ -22501,7 +22515,9 @@ function performShrineDonation() {
   announceAchievementUpdates(
     applyAchievementProgress(achieveState, `shrines_donated:${giantId}`, 1, pc)
   );
-  if (result.favor) applyQuestProgress(questState, 'favor_points', result.favor, pc);
+  // Offered quests count favor through favor_earned / favor_daily / favor_offered (quest-offers.js routes).
+  if (result.favor) applyQuestProgress(questState, 'favor_points', result.favor, pc, { skipManaged: routesCounter('favor_points') });
+  for (const row of shrineDonationQuestEvents(giantId, result)) emitGameEvent(row.event, row.amount);
   // Sparkla's Shine on the Giants (inc_data_feats_prod.js 42-49): chunks of Sparkly donated (G143).
   if (result.classTsid === 'sparkly') engine.featsIncrement('donate_sparkly', result.qty);
   updateHud();
@@ -23643,7 +23659,11 @@ function runGardenPlotAction(key, action) {
   if (action === 'harvest' && r.cropId) {
     const kind = activeGarden.gardenType === 'herb' ? 'herb_harvest' : 'garden_harvest';
     emitGameEvent(`${kind}:${r.cropId}`, r.count || 1);
+    // include/garden.js 486-505: super_harvest_herb on an herb garden's bonus roll.
+    if (r.superHarvest && activeGarden.gardenType === 'herb') emitGameEvent(`herb_super_harvest:${r.cropId}`);
   }
+  // include/garden.js 386-392: herb_seeds_planted (and Shucks To Be You's count).
+  if (action === 'plant' && r.seedId && activeGarden.gardenType === 'herb') emitGameEvent(`herb_seed_planted:${r.seedId}`);
   if (r.effects) {
     pushActivity({
       base: r.msgs?.[0] || 'You tended a plot',

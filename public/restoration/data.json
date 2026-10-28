@@ -2645,9 +2645,14 @@
   ]
  },
  "git": {
-  "commits": 655,
+  "commits": 656,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-28",
+    "kind": "improve",
+    "text": "The running verb's word fills over the item, as the original's word progress bar did"
+   },
    {
     "date": "2026-10-28",
     "kind": "fix",
@@ -2762,14 +2767,9 @@
     "date": "2026-10-27",
     "kind": "improve",
     "text": "Lost artifacts show their 3x icons, and the meadow house's border plants stand at their real shapes"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "fix",
-    "text": "Restoration rows keep Play inside the card when a name carries the In multiplayer chip"
    }
   ]
  },
- "tests": 382,
+ "tests": 383,
  "generatedAt": "2026-10-28"
 }

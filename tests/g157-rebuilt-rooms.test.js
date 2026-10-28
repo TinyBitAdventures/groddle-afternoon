@@ -339,8 +339,9 @@ describe('rebuilt rooms: population and the Seams', () => {
     assert.equal(isRebuiltRoomTsid(ABBASID_JAIL_TSID), false);
   });
 
-  it('a first visit counts visit_seam_street only on a Seam Street (Martleby Hare among them)', () => {
-    const counted = (tsid) => eventCounters(`street_first_visit:${tsid}`).some((c) => c.counter === 'visit_seam_street');
+  it('an arrival counts visit_seam_street only on a Seam Street (Martleby Hare among them)', () => {
+    // G461: every entry by street id (quest-offers-feature onStreetEnter), each seam once per run.
+    const counted = (tsid) => eventCounters(`street_entered_tsid:${tsid}`).some((c) => c.counter === 'visit_seam_street');
     assert.equal(counted(MARTLEBY_TSID), true);
     assert.equal(counted('GCR1516SFHM122V'), true);
     assert.equal(counted(SNOWED_IN_TSID), false);

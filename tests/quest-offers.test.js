@@ -507,7 +507,8 @@ describe('routing table', () => {
   it('reports which systems still need to emit events', () => {
     const report = questRoutingReport();
     assert.ok(report.unemitted.making.some((row) => row.event === 'making_recipe:flour'));
-    assert.ok(report.unemitted.garden.length > 0);
+    // QUESTFIX (G444, G448): herb shucks, plantings and super harvests are sent now; every garden route is emitted.
+    assert.ok(!report.unemitted.garden, 'garden and herb events are emitted today');
     assert.ok(!report.unemitted.animals, 'animal verbs are emitted today');
     const shrine = Object.values(report.bySystem.shrines).find((row) => row.requirement === 'counter:shrine_donated_ti');
     assert.equal(shrine.emitted, true);

@@ -63,6 +63,13 @@ export const EMOTIONAL_BEAR_ACTIONS = Object.freeze({
   }),
 });
 
+/**
+ * G459: a kiss with garlic breath (emotional_bear.js 228-262): it needs and
+ * costs 5 energy, gives you 5 mood, and the one kissed loses 3 mood.
+ */
+export const GARLIC_BREATH_BUFF = 'buff_garlic_breath';
+export const GARLIC_KISS = Object.freeze({ energy: 5, selfMood: 5, targetMood: -3 });
+
 const VALID_UPGRADES = new Set(['kiss', 'moon']);
 const VALID_ACTIONS = new Set(Object.keys(EMOTIONAL_BEAR_ACTIONS));
 const COMPANION_SET = new Set(EMOTIONAL_BEAR_COMPANIONS);
@@ -177,8 +184,9 @@ export function emotionalBearActionQuote(
   player,
   actionId,
   target = '',
-  { dayKey = '', inRace = false } = {}
+  options = {}
 ) {
+  const { dayKey = '', inRace = false } = options || {};
   const normalized = normalizeEmotionalBearState(state);
   if (actionId === 'anthropomorphize') {
     if (normalized.anthropomorphizedDay === cleanDayKey(dayKey)) {
@@ -212,14 +220,15 @@ export function emotionalBearActionQuote(
     return { ok: false, reason: 'target', message: 'Choose a street companion.' };
   }
   // GSJS checks <= the cost, so an action always leaves at least one energy.
-  if ((Number(player?.energy) || 0) <= action.energy) {
+  const garlic = actionId === 'kiss' && options?.garlic === true;
+  if ((Number(player?.energy) || 0) <= (garlic ? GARLIC_KISS.energy : action.energy)) {
     return {
       ok: false,
       reason: 'energy',
       message: `You tried to ${action.label.toLowerCase()} ${target}, but you just don't have the energy.`,
     };
   }
-  return { ok: true, ...action };
+  return garlic ? { ok: true, ...action, ...GARLIC_KISS, garlic: true } : { ok: true, ...action };
 }
 
 export function performEmotionalBearAction(
@@ -249,7 +258,8 @@ export function performEmotionalBearAction(
     };
   }
 
-  const action = EMOTIONAL_BEAR_ACTIONS[actionId];
+  // quote carries the garlic kiss's costs when options.garlic (G459).
+  const action = { ...EMOTIONAL_BEAR_ACTIONS[actionId], energy: quote.energy, selfMood: quote.selfMood, targetMood: quote.targetMood };
   // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
   loseEnergy(player, action.energy);
   const selfMoodBefore = clampMood(player.mood);
@@ -281,7 +291,11 @@ export function performEmotionalBearAction(
     targetEffects: { mood: targetMood },
     targetMood: next.companionMood[target],
     uniqueTarget: next.interactions[actionId][target] === 1,
-    message: `You ${past} ${target}. Energy -${action.energy}${selfMood > 0 ? `, Mood +${selfMood}` : ''}`,
+    garlic: quote.garlic === true,
+    // emotional_bear.js 247: "Hopefully they don't notice your garlic breath. -5 energy, +5 mood".
+    message: quote.garlic
+      ? `You ${past} ${target}. Hopefully they don't notice your garlic breath. -${action.energy} energy, +${selfMood} mood`
+      : `You ${past} ${target}. Energy -${action.energy}${selfMood > 0 ? `, Mood +${selfMood}` : ''}`,
   };
 }
 

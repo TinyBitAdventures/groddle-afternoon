@@ -15,7 +15,7 @@ import {
   normalizeEmotionalBearState,
   performEmotionalBearAction,
   upgradeEmotionalBear,
-} from '../public/js/emotional-bear.js?v=emotional-bear-2';
+} from '../public/js/emotional-bear.js?v=g390-1';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
 

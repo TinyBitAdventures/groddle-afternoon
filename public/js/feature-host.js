@@ -103,11 +103,22 @@ export function createFeatureHost(features = []) {
     event(counter, amount, engine, detail) {
       each('onEvent', counter, amount, engine, detail);
     },
-    /** Verb list for a feature-owned target, or null when no feature owns it. */
+    /**
+     * Verb list for a feature-owned target, or null when no feature owns it.
+     * Other features may add rows to it with extraVerbs(target, engine) (a
+     * quest's verb on any NPC, as the source's npc base verbs were: G447).
+     */
     verbsFor(target, engine) {
       const feature = owner(target);
       if (!feature || typeof feature.verbsFor !== 'function') return null;
-      return feature.verbsFor(target, engine) || [];
+      const own = feature.verbsFor(target, engine) || [];
+      let out = own;
+      for (const other of list) {
+        if (other === feature || typeof other.extraVerbs !== 'function') continue;
+        const rows = other.extraVerbs(target, engine);
+        if (Array.isArray(rows) && rows.length) out = [...out, ...rows];
+      }
+      return out;
     },
     /**
      * A target's own (content.js) verb list passed through every feature's

@@ -7,10 +7,10 @@ import { normalizeFoodState } from './food.js?v=food-memory-8';
 import { createGhostQuestState } from './ghost-quest.js?v=phantom-4';
 import { normalizeParadiseState } from './paradise-flight.js?v=paradise-flight-2';
 import { normalizeFeatSnapshot } from './feats.js?v=incantations-2';
-import { normalizeEmotionalBearState } from './emotional-bear.js?v=emotional-bear-2';
+import { normalizeEmotionalBearState } from './emotional-bear.js?v=g390-1';
 import { normalizeHomeState } from './homes.js?v=g380-1';
 import { normalizeMailboxState } from './mailbox.js?v=homes-mail-4';
-import { normalizeFeatureSlices } from './feature-host.js?v=features-3';
+import { normalizeFeatureSlices } from './feature-host.js?v=g390-1';
 import { normalizeQuestOfferState } from './quest-offers.js';
 
 export const PLAYER_SAVE_VERSION = 7;
