@@ -2645,9 +2645,14 @@
   ]
  },
  "git": {
-  "commits": 641,
+  "commits": 642,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "improve",
+    "text": "Fertilidust, Tree Poison and Antidote on shared trees use the charge the ledger confirms"
+   },
    {
     "date": "2026-10-27",
     "kind": "improve",
@@ -2762,11 +2767,6 @@
     "date": "2026-10-27",
     "kind": "improve",
     "text": "The Code page's words sew in the textile chain: checkpoints, patches and two badges for contributors"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "Ancestral Nostalgia: 10 minutes in the Ancestral Lands, then you are Overwhelmed and sent away"
    }
   ]
  },
