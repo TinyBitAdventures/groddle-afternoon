@@ -56,7 +56,9 @@ ln -s "$here/node_modules" "$work/game/node_modules"
 (cd "$work/game" && node tools/build-restoration.mjs >/dev/null)
 [ "$(git -C "$work/game" status --porcelain -- public/restoration/history.json)" ] || echo "note: the restoration history was already current"
 # The Code page measures the repos at the tags this release names (the tagged copy describes the one before).
-node "$work/game/tools/codebase/build-data.mjs" --release="$RELEASE" --out="$work/game/public/codebase/data.json"
+# It reads the other two repos through git at their tags, so it is pointed at the real clones (the export has no .git).
+GRODDLE_SERVER_DIR=${GRODDLE_SERVER_DIR:-$AUDIT/groddle-afternoon-server} GRODDLE_SITE_DIR="$SITE_REPO" \
+  node "$work/game/tools/codebase/build-data.mjs" --release="$RELEASE" --out="$work/game/public/codebase/data.json"
 # The header menu is content on the live site (Minn Admin, Design, Navigation): write the live one in.
 "${SSH[@]}" "$HOST" 'cd ~/public && wp post list --post_type=wp_navigation --post_status=publish --fields=ID,post_date --format=json' > "$work/menus.json"
 menu=$(node -e 'const m = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8") || "[]"); m.sort((a, b) => (a.post_date === b.post_date ? b.ID - a.ID : (a.post_date < b.post_date ? 1 : -1))); console.log(m[0]?.ID || "");' "$work/menus.json")
