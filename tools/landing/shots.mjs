@@ -32,12 +32,12 @@ const CARD = { frame: 'world', viewport: [1280, 860], scale: 2, size: [1200, 511
 
 export const SHOTS = Object.freeze({
   // Hechey Track: the Glitch under the fruit tree, the Sparkly Rock and two quoins to the left,
-  // a chicken, the Groceries Vendor and a piggy to the right. The first Bigger Bag is open,
-  // so the pack shows its items above the bags and the Red Toolbox.
+  // a chicken, the Groceries Vendor and a piggy to the right. bagdemo=hero carries a few
+  // gathered things loose and the tools on their row, with no bags or toolbox; daylight, and no
+  // Enter hint (a chicken often wanders into reach and makes it read "choose from 2").
   hero: {
-    route: `${Q}&streetdemo=${HECHEY}&streetx=2575`,
+    route: `${Q}&bagdemo=hero&prompt=off&timedemo=day&streetdemo=${HECHEY}&streetx=2575`,
     frame: 'root', viewport: [1304, 866], viewh: 408, scale: 1.3, size: [1600, 977], bytes: 122000, wait: 10000,
-    steps: [{ click: '#pack-items > .pack-bag' }, { wait: 1200 }],
   },
   // The herb garden on Hechey Track, the fruit tree and a piggy to the right.
   grow: { ...CARD, route: `${Q}&streetdemo=${HECHEY}&streetx=3490`, bytes: 39000, wait: 10000 },

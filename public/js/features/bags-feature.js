@@ -48,7 +48,9 @@
  * QA: `?autostart=1&fresh=1&resetgame=1&questoffer=off&bagdemo=1` empties the
  * pack to a Generic Bag and 15 stacks (16/16, the bag empty) and drops 5 Plums
  * beside you; `bagdemo=full` fills the bag's 10 slots too, so the Plums can't
- * be picked up.
+ * be picked up. `bagdemo=hero` is the home page's pack (tools/landing/shots.mjs): no
+ * bags or toolbox, a few things gathered loose (HERO_PACK) and the tools on their row
+ * (HERO_TOOLS), with nothing dropped.
  * Canvas data packSlots (used/16), packBags, packBagOpen, packRock,
  * packLast, bagDemo; window.groddlePack.{layout,counts,room,move,toggle}, and in solo
  * grant(class, n) to gain something the way a reward does.
@@ -76,6 +78,13 @@ export const BAG_DEMO_KIT = Object.freeze([
   'apple', 'cherry', 'grain', 'meat', 'orange', 'lemon', 'spinach', 'plain_bubble',
   'general_vapour', 'all_spice', 'seed_spinach', 'seed_onion', 'seed_carrot', 'fuel_cell', 'pinch_of_salt',
 ]);
+/** bagdemo=hero: what a player out on Hechey Track might be carrying (class, count). */
+export const HERO_PACK = Object.freeze([
+  ['cherry', 12], ['apple', 3], ['plain_bubble', 8], ['grain', 6], ['meat', 2], ['all_spice', 4],
+  ['egg_plain', 3], ['bean_plain', 5], ['general_vapour', 4], ['pinch_of_salt', 5],
+]);
+/** bagdemo=hero's tool row. */
+export const HERO_TOOLS = Object.freeze(['pick', 'hoe', 'watering_can', 'hatchet', 'shovel', 'knife_and_board']);
 /** bagdemo=full also fills the bag, so nothing fits anywhere (isBagFull, bag.js:443-462). */
 export const BAG_DEMO_FILL = Object.freeze([
   'flour', 'bun', 'sammich', 'egg_plain', 'bean_plain', 'milk_butterfly', 'seed_tomato', 'seed_corn', 'seed_potato', 'herb_seed_purple_flower',
@@ -174,16 +183,22 @@ function runDemo(engine) {
   demoDone = true;
   const inv = engine.inv;
   for (const k of Object.keys(inv)) inv[k] = 0;
-  addItem(inv, 'bag_generic', 1);
-  for (const cls of BAG_DEMO_KIT) addItem(inv, cls, cls === 'apple' ? 3 : 2);
-  if (engine.param('bagdemo') === 'full') for (const cls of BAG_DEMO_FILL) addItem(inv, cls, 1);
+  const hero = engine.param('bagdemo') === 'hero';
+  if (hero) {
+    for (const [cls, n] of HERO_PACK) addItem(inv, cls, n);
+    for (const cls of HERO_TOOLS) addItem(inv, cls, 1);
+  } else {
+    addItem(inv, 'bag_generic', 1);
+    for (const cls of BAG_DEMO_KIT) addItem(inv, cls, cls === 'apple' ? 3 : 2);
+    if (engine.param('bagdemo') === 'full') for (const cls of BAG_DEMO_FILL) addItem(inv, cls, 1);
+  }
   slice.prefs = normalizePrefs(null);
   slice.rock = {};
   slice.open = '';
   slice.migrated = true;
   const p = engine.player;
-  if (p && engine.dropWorldStack) engine.dropWorldStack(BAG_DEMO_DROP.classTsid, BAG_DEMO_DROP.count, p.x + BAG_DEMO_DROP.dx, p.y);
-  engine.setData?.('bagDemo', 'ready');
+  if (!hero && p && engine.dropWorldStack) engine.dropWorldStack(BAG_DEMO_DROP.classTsid, BAG_DEMO_DROP.count, p.x + BAG_DEMO_DROP.dx, p.y);
+  engine.setData?.('bagDemo', hero ? 'hero' : 'ready');
   engine.updateHud?.();
 }
 

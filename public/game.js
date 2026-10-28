@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g388-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-221';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-222';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g378-1';
@@ -4724,12 +4724,14 @@ function makePromptChip() {
 }
 
 const settlePromptChange = createPromptSettler(180);
+// QA `&prompt=off`: no Enter hint over the street (the home page's screenshots, tools/landing/shots.mjs).
+const PROMPT_OFF = new URLSearchParams(location.search).get('prompt') === 'off';
 
 /** Show this frame's hint once it has settled (js/prompt-settle.js). */
 function settlePrompt(want, now) {
   const shownId = prompt.visible ? promptId({ key: prompt.promptKey, label: prompt.promptLabel }) : '';
   if (!settlePromptChange(want, shownId, now)) return;
-  if (!want) {
+  if (!want || PROMPT_OFF) {
     prompt.visible = false;
     return;
   }
