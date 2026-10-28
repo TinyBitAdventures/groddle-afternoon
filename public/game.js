@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g377-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-214';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-215';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g378-1';
@@ -5126,11 +5126,13 @@ function showSpeechBubble(target, speech) {
     if (bubble._speechFx?.target === target) removeSpeechBubble(bubble);
   }
 
+  // Austin 10-28: 15 px read too large; 13 px matches the original's bubbles in players' snaps
+  // (the client's stylesheet that set it was never recovered, G292).
   const body = new PIXI.Text({ text: text, style: {
     fontFamily: 'Trebuchet MS, sans-serif',
-    fontSize: 15,
+    fontSize: 13,
     fill: 0x453b34,
-    lineHeight: 19,
+    lineHeight: 17,
     wordWrap: true,
     wordWrapWidth: 246,
   } });
@@ -5146,9 +5148,10 @@ function showSpeechBubble(target, speech) {
   // Stat slugs under the line (garden talkbacks: iMG, mood, energy pills, as sendBubble showed them).
   const slugRow = speechSlugRow(speech.slugs);
   // G357: as wide as the line, as the client's was (ChatBubble.as MIN_WIDTH 50, MAX_WIDTH 276).
-  const width = clamp(Math.max(body.width, named ? speaker.width : 0, slugRow?.width || 0) + 24, 60, 280);
+  // Padding: ChatBubble.as base_padd 7, growing a little with the text (297, 352).
+  const width = clamp(Math.max(body.width, named ? speaker.width : 0, slugRow?.width || 0) + 20, 60, 280);
   const head = named ? speaker.height + 4 : 0;
-  const height = Math.ceil(12 + head + body.height + (slugRow ? 6 + slugRow.height : 0) + 12);
+  const height = Math.ceil(9 + head + body.height + (slugRow ? 6 + slugRow.height : 0) + 9);
   const bg = new PIXI.Graphics();
   bg.roundRect(0, 0, width, height, 12).fill({ color: 0xfffdf5, alpha: 0.97 }).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
   // Tails (drawn by positionSpeechBubble, which aims them at the speaker).
@@ -5156,16 +5159,16 @@ function showSpeechBubble(target, speech) {
   const tailDown = new PIXI.Graphics();
   const tailUp = new PIXI.Graphics();
   tailUp.visible = false;
-  speaker.x = 12;
-  speaker.y = 10;
+  speaker.x = 10;
+  speaker.y = 8;
   speaker.visible = named;
-  body.x = 12;
-  body.y = 10 + head;
+  body.x = 10;
+  body.y = 8 + head;
 
   const bubble = new PIXI.Container();
   bubble.addChild(bg, tailDown, tailUp, speaker, body);
   if (slugRow) {
-    slugRow.x = 12;
+    slugRow.x = 10;
     slugRow.y = body.y + body.height + 6;
     bubble.addChild(slugRow);
   }

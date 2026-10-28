@@ -341,7 +341,7 @@ describe('bubbles keep off players\' heads (G357, Austin 2026-10-27)', () => {
     assert.match(fn, /avatars: speechAvoidBoxes\(meta\.target\), maxLift: place\.tip - lowestTip,/);
     const show = game.slice(game.indexOf('function showSpeechBubble'), game.indexOf('function speechSlugRow'));
     assert.match(show, /const named = target\.classId === 'pc_player' \|\| target\.classId === 'pc_remote';/);
-    assert.match(show, /\+ 24, 60, 280\);/);
+    assert.match(show, /\+ 20, 60, 280\);/);
     assert.match(read('public/js/features/realtime-feature.js'), /speechAvoidTargets\(\) \{/);
   });
 });

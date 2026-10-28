@@ -5494,7 +5494,9 @@ header.top-bar + .sub { display: none; }
 .award-screen {
   position: absolute;
   inset: 0;
-  z-index: 85;
+  /* Above prompts (prompt-stack 95): the client added screen views over the main container that
+     held PromptView (TSMainView.as 282, addView 394), so a prompt waits under an open screen. */
+  z-index: 96;
   display: grid;
   place-items: center;
   opacity: 0;
@@ -5802,7 +5804,7 @@ header.top-bar + .sub { display: none; }
 .new-day-screen {
   position: absolute;
   inset: 0;
-  z-index: 88;
+  z-index: 96;
   display: grid;
   place-items: center;
   opacity: 0;

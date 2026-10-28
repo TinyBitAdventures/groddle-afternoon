@@ -134,7 +134,7 @@ function queueGiantScreen(engine, screen, giantId) {
 function ensureLoveUi() {
   if (love.ui) return love.ui;
   const style = document.createElement('style');
-  style.textContent = `.giant-screen{position:fixed;z-index:62;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  style.textContent = `.giant-screen{position:fixed;z-index:96;display:flex;flex-direction:column;align-items:center;justify-content:center;
   box-sizing:border-box;padding:20px;cursor:default;opacity:0;transition:opacity .8s linear;color:#fff;overflow:hidden}
 .giant-screen.on{opacity:1}
 .giant-screen.out{opacity:0;transition-duration:.4s}

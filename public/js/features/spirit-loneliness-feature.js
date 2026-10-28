@@ -256,11 +256,11 @@ const CSS = `
 .lonely-invite canvas{position:absolute;left:0;top:0}
 #game-root .lonely-invite canvas.lonely-portrait,#game-root canvas.lonely-fireworks.lonely-fireworks{width:var(--lw)!important;height:var(--lh)!important;display:block}
 .lonely-bubble{position:absolute;box-sizing:border-box;background:#fff;border-radius:13px;
+  padding:calc(var(--k,1)*9px) calc(var(--k,1)*11px);transform:translateY(-100%);
   filter:drop-shadow(1.4px 1.4px 1px rgba(0,0,0,.65))}
-.lonely-bubble::after{content:'';position:absolute;right:8%;bottom:-11.5%;width:10.6%;height:12.8%;background:#fff;
+.lonely-bubble::after{content:'';position:absolute;right:8%;bottom:calc(var(--k,1)*-10.4px);width:10.6%;height:calc(var(--k,1)*11.5px);background:#fff;
   clip-path:polygon(0 0,100% 0,100% 100%)}
-.lonely-bubble p{margin:0;position:absolute;left:4%;top:9%;width:92%;height:81%;display:flex;align-items:center;
-  font-family:Arial,'Helvetica Neue',sans-serif;color:#000;line-height:1.15;overflow:hidden}
+.lonely-bubble p{margin:0;font-family:Arial,'Helvetica Neue',sans-serif;color:#000;line-height:1.15;text-wrap:pretty}
 .lonely-street{left:0;top:0;text-align:center;color:#fff;font-weight:900;font-family:Nunito,'Trebuchet MS',sans-serif;
   text-shadow:0 2px 0 #24303a,0 0 3px #24303a,0 0 10px rgba(0,0,0,.45);transition:opacity 300ms linear}
 .lonely-street p{margin:0;line-height:1.2}
@@ -406,10 +406,13 @@ function drawInvite(now) {
     const h = def.fh * s;
     ctx.drawImage(img, sx, sy, def.fw, def.fh, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
   }
-  // The bubble (loneliness_quest_bubble_overlay: 255 x 111 stage fitted to 250).
+  // The bubble (loneliness_quest_bubble_overlay: 255 x 111 stage fitted to 250). Its width and the
+  // bottom edge, where the tail points at the porthole, are the source's; its height fits the plea
+  // (Austin 10-28: the fixed 246 x 90 box read as too large around two lines), growing upward.
   const bw = INVITE_ART.bubble.size * k;
   const bh = (INVITE_ART.bubble.size * 90 / 255) * k;
-  Object.assign(bubble.style, { width: `${bw * 246 / 250}px`, height: `${bh}px`, left: `${vp.width - bw - INVITE_ART.bubble.x * k}px`, top: `${INVITE_ART.bubble.y * k}px` });
+  Object.assign(bubble.style, { width: `${bw * 246 / 250}px`, left: `${vp.width - bw - INVITE_ART.bubble.x * k}px`, top: `${INVITE_ART.bubble.y * k + bh}px` });
+  bubble.style.setProperty('--k', String(k));
   const p = bubble.querySelector('p');
   p.style.fontSize = `${Math.max(9, 12 * k)}px`;
   if (p.textContent !== inv.text) p.textContent = inv.text;

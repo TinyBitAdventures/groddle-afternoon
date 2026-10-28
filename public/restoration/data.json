@@ -2645,9 +2645,24 @@
   ]
  },
  "git": {
-  "commits": 647,
+  "commits": 651,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "fix",
+    "text": "The item catalog's dropdowns draw their arrow inset from the pill's round end"
+   },
+   {
+    "date": "2026-10-27",
+    "kind": "fix",
+    "text": "An open restoration row lines up on the name, and hovering a name no longer underlines its chip"
+   },
+   {
+    "date": "2026-10-27",
+    "kind": "improve",
+    "text": "The site's icon is now the arch mark, and the brand page offers PNG lockups"
+   },
    {
     "date": "2026-10-27",
     "kind": "fix",
@@ -2752,21 +2767,6 @@
     "date": "2026-10-27",
     "kind": "improve",
     "text": "Quoin icons, lost artifacts show the Petrified Rock as the original did, and every catalog item says where it comes from"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "improve",
-    "text": "Butterfly milk counts wait for a milk quest, The Good Neighbor joins the shared Feats, and the Comedian makes everyone laugh"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "improve",
-    "text": "Butterflies count once per quest, Rainbow Run coins are mood quoins, and home and stone questions stop looking like quests"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "Winter Walk, Winter Haven and Being Watched, rebuilt from players' pictures"
    }
   ]
  },
