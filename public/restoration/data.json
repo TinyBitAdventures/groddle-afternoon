@@ -2640,9 +2640,14 @@
   ]
  },
  "git": {
-  "commits": 690,
+  "commits": 691,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-28",
+    "kind": "new",
+    "text": "Shrines, scraping, peat, digging, patches and more answer with their reward badges"
+   },
    {
     "date": "2026-10-28",
     "kind": "fix",
@@ -2757,11 +2762,6 @@
     "date": "2026-10-28",
     "kind": "fix",
     "text": "Thirty quests count the way the original did, with Slather and Give a cubimal to"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "improve",
-    "text": "The running verb's word fills over the item, as the original's word progress bar did"
    }
   ]
  },

@@ -61,7 +61,7 @@ import {
   scionWords,
 } from '../purple-journey.js?v=g150-2';
 import { VOYAGE_FLOOR, VOYAGE_H, VOYAGE_OFFSET, VOYAGE_W, buildVoyageScene } from '../purple-journey-scene.js?v=g150-1';
-import { homesFeature } from './homes-feature.js?v=g414-1';
+import { homesFeature } from './homes-feature.js?v=g418-1';
 
 export const PURPLE_FEATURE_ID = 'purple-journey';
 /** The scene's own TSID (the template is LNVV4OTMAUG2PQV). */
@@ -442,7 +442,7 @@ function manifestQuoin(engine) {
   // createItemStackWithPoof (location.js 2054-2071): it appears in a
   // proto_puff centred on it (G272).
   const h = Math.abs(spr.height) || 40;
-  playPoofIn(PIXI, { layer: engine.entityLayer, x: pos.x, bottom: pos.y + h / 2, itemH: h, zIndex: 41 });
+  playPoofIn(PIXI, { layer: engine.fxLayer || engine.entityLayer, x: pos.x, bottom: pos.y + h / 2, itemH: h });
   quoins.push({ sprite: spr, x: pos.x, y: pos.y, ...q });
 }
 

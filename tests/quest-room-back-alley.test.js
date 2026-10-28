@@ -42,7 +42,7 @@ import {
   room,
   stationForDoor,
   stationPlatforms,
-} from '../public/js/quest-rooms/back-alley.js';
+} from '../public/js/quest-rooms/back-alley.js?v=g418-1';
 import { BACK_ALLEY_FILES } from '../public/js/quest-rooms/back-alley-art.js';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js';
 

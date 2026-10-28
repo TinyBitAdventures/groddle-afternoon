@@ -69,7 +69,7 @@ import { quoinDailyLimitFor } from '../quoins.js';
 import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
 import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=g414-1';
 import { isPoisoned } from '../tree-poison.js';
-import { furnitureSize } from '../home-decor.js?v=home-decor-7';
+import { furnitureSize } from '../home-decor.js?v=g418-1';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js';
 import { POTION_ART } from '../potion-art.js?v=g149-1';
 import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=progression-1';
@@ -129,7 +129,7 @@ import {
 } from '../potions.js?v=g391-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { patchesFeature } from './patches-feature.js?v=g414-1';
-import { homesFeature } from './homes-feature.js?v=g414-1';
+import { homesFeature } from './homes-feature.js?v=g418-1';
 import { streetTreeIndex } from './tree-death-feature.js?v=g414-1';
 import { questRoomConverse } from './quest-instances-feature.js?v=g405-1';
 
@@ -319,12 +319,14 @@ function buttonFor(classTsid, engine) {
 
 function bottleFx(engine, classTsid, target) {
   const { PIXI } = engine;
-  if (!PIXI?.Sprite || !engine.entityLayer) return null;
+  // The bottle's tool_animation is an itemstack_overlay: over the street's front layers too.
+  const layer = engine.fxLayer || engine.entityLayer;
+  if (!PIXI?.Sprite || !layer) return null;
   const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${classTsid}.png`));
   spr.anchor.set(0.5, 1);
   spr.zIndex = 900;
   spr.scale.set(0.9);
-  engine.entityLayer.addChild(spr);
+  layer.addChild(spr);
   const follow = () => {
     if (spr.destroyed) return;
     const host = target?.sprite && !target.sprite.destroyed ? target.sprite : engine.player;

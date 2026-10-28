@@ -156,7 +156,7 @@ describe('G285: the last overlay stand-ins', () => {
   it("Feeling Called Love's heart is amorous_philtre_heart, a pc_overlay at delta_y -120", { skip: !haveGsjs }, async () => {
     assert.match(gsjs('items/catalog_buffs.js'), /pc\.announce_add_indicator\('feeling_called_love', 'amorous_philtre_heart'\);/);
     assert.match(gsjs('players/inc_announcements.js'), /delta_y: indicator\.delta_y \? indicator\.delta_y : -120,/);
-    const { LOVE_HEART } = await import('../public/js/features/potions-feature.js?v=g414-1');
+    const { LOVE_HEART } = await import('../public/js/features/potions-feature.js?v=g418-1');
     assert.deepEqual({ ...LOVE_HEART }, { key: 'amorous_philtre_heart', dy: -120 });
     assert.equal(manifest.amorous_philtre_heart.kind, 'sheet');
   });
@@ -178,7 +178,8 @@ describe('G285: the last overlay stand-ins', () => {
   it('letter blocks poof in (letter_block_2.js, letter_block_3.js createItemStackWithPoof)', { skip: !haveGsjs }, () => {
     assert.equal((gsjs('quests/letter_block_2.js').match(/createItemStackWithPoof\('letter_block'/g) || []).length, 4);
     assert.equal((gsjs('quests/letter_block_3.js').match(/createItemStackWithPoof\('letter_block'/g) || []).length, 3);
-    assert.match(read('game.js'), /playPoofIn\(PIXI, \{ layer: entityLayer, x: spr\.x, bottom: spr\.y, itemH: Math\.round\(197 \* 0\.74\), zIndex: 46 \}\);/);
+    // LAYERS3: an itemstack_overlay, in the overlay holder (tests/draw-order.test.js).
+    assert.match(read('game.js'), /playPoofIn\(PIXI, \{ layer: fxLayer \|\| entityLayer, x: spr\.x, bottom: spr\.y, itemH: Math\.round\(197 \* 0\.74\) \}\);/);
     assert.match(read('js/quest-rooms/kids-room.js'), /for \(const b of ctx\.data\.blocks\) playPoofIn\(PIXI, \{ layer: puffs, x: b\.sprite\.x, bottom: b\.sprite\.y, itemH: BLOCK_H \}\);/);
   });
 

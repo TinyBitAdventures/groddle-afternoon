@@ -765,6 +765,22 @@ export function renderOrder(state) {
 }
 
 /**
+ * The slots whose pieces draw over the avatars. glitch-client LocationRenderer.as 1465-1468 hands a
+ * stack on a `front` or `ceiling` placement plat to addForegroundFurnitureItem, the FG_FURN holder
+ * that MiddleGroundRenderer.setupEndShapes (111-171) adds after OTHER_AV, YOUR_AVATAR and
+ * FOREMOST_ITEMS; every other set (wall, rug, bookshelf, chair) goes in under the item holders.
+ * The three ceiling classes (furniture_ceilinglamp, furniture_lamp, furniture_ceilingdeco:
+ * placement_set "ceiling") are the remake's: floor pieces always snap onto the floor plat
+ * (snapPlacement), so nothing stands on the front plat yet.
+ */
+export const FRONT_FURNITURE_SLOTS = Object.freeze(['ceiling', 'front']);
+
+/** True when a placed piece draws over the avatars (FG_FURN). */
+export function furnitureDrawsInFront(item) {
+  return FRONT_FURNITURE_SLOTS.includes(item?.slot);
+}
+
+/**
  * First visit: lay the furniture_populate starter kit out as a cosy room, so a
  * new house is lived in from the start. Everything stays movable. The blank
  * Room / Tabletop / Wall Decoration frames (their art came from credit

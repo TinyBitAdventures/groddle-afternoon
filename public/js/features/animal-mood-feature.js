@@ -544,7 +544,7 @@ let crowdRespawnAt = 0;
  * keeps the full puff up for screenshots.
  */
 export function smokePuff(engine, x, top, { hold = false } = {}) {
-  const layer = engine?.entityLayer;
+  const layer = engine?.fxLayer || engine?.entityLayer;
   if (!engine?.PIXI || !layer) return null;
   const at = itemstackOverlayPoint(x, top, { dy: PIGGY_DEATH_PUFF.deltaY });
   return playSheetOverlay(engine.PIXI, PIGGY_DEATH_PUFF.overlay, {

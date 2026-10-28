@@ -515,7 +515,7 @@ async function refuel(ctx) {
  */
 function puff(ctx, bot) {
   const at = itemstackOverlayPoint(bot.x, displayTopOf(bot), { dy: PUFF_DY });
-  ctx.data.puff = playSheetOverlay(ctx.PIXI, 'smoke_puff', { layer: ctx.engine.entityLayer, at: () => at, durationMs: 1500, loop: false, zIndex: 40 });
+  ctx.data.puff = playSheetOverlay(ctx.PIXI, 'smoke_puff', { layer: ctx.engine.fxLayer || ctx.engine.entityLayer, at: () => at, durationMs: 1500, loop: false });
 }
 
 /* ------------------------------------------------------------------ */

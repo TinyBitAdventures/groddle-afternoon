@@ -812,7 +812,7 @@ function deleteWithPoof(engine, spr, dx = 0, dy = 0, { holdMs = null, x = spr?.x
   if (!spr || spr.destroyed) return null;
   const at = itemstackOverlayPoint(x, top ?? displayTopOf(spr), { dx, dy });
   engine.playSound('PROTO_PUFF', { volume: 0.5 });
-  return playSheetOverlay(engine.PIXI, 'proto_puff', { layer: engine.entityLayer, at: () => at, durationMs: 2000, loop: false, zIndex: 70, holdMs });
+  return playSheetOverlay(engine.PIXI, 'proto_puff', { layer: engine.fxLayer || engine.entityLayer, at: () => at, durationMs: 2000, loop: false, zIndex: 70, holdMs });
 }
 
 /** items/item.js 509 deleteWithPoof: apiSetTimer('apiDelete', 200), the stack goes 200 ms after the puff. */
@@ -884,7 +884,7 @@ function poofInQuoin(engine, q, key = 'smoke_puff') {
   q.poofAt = Date.now();
   q.spr.alpha = 0;
   engine.playSound('PROTO_PUFF', { volume: 0.5 });
-  playPoofIn(engine.PIXI, { layer: engine.entityLayer, x: q.x, bottom: q.y + h / 2, itemH: h, key });
+  playPoofIn(engine.PIXI, { layer: engine.fxLayer || engine.entityLayer, x: q.x, bottom: q.y + h / 2, itemH: h, key });
 }
 
 /** An iMG quoin with a location_event_id; `onTake` runs once when touched. */
@@ -1998,7 +1998,7 @@ function akSpawn(engine, classId) {
   const row = { classId, sprite: spr, target, baseX: at.x, baseY: spr.y, vx: classId === 'npc_piggy' ? 0.45 : -0.5, phase: 0, poofAt: Date.now(), gone: false };
   ak.animals[classId] = row;
   engine.playSound('PROTO_PUFF', { volume: 0.5 });
-  playPoofIn(PIXI, { layer: engine.entityLayer, x: spr.x, bottom: def.airborne ? spr.y + h / 2 : spr.y, itemH: h });
+  playPoofIn(PIXI, { layer: engine.fxLayer || engine.entityLayer, x: spr.x, bottom: def.airborne ? spr.y + h / 2 : spr.y, itemH: h });
   setTimeout(() => {
     if (run?.data?.ak !== ak || row.gone || spr.destroyed) return;
     engine.say(target, def.bubble, AK_BUBBLE.durationMs);

@@ -183,7 +183,7 @@ function playRainbow(engine) {
   const p = engine.player;
   const hold = engine.param('secretrainbowhold') === '1';
   return playSheetOverlay(engine.PIXI, 'rainbow_secretspot', {
-    layer: engine.entityLayer,
+    layer: engine.fxLayer || engine.entityLayer,
     at: () => ({ x: p.x, y: p.y }),
     wh: 400,
     durationMs: SECRET_TIMING.rainbow,

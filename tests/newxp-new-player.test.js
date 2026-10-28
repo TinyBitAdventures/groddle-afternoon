@@ -21,7 +21,7 @@ import { createInventory } from '../public/js/inventory.js?v=catalog-unified-7';
 import { PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=paradise-flight-14';
 import { createPlayerSave, parsePlayerSave, restorePlayerSave, serializePlayerSave, normalizePlayerSnapshot } from '../public/js/player-save.js?v=g403-1';
 import { cloudsLayout, SCENE_TSIDS, GENTLE_ISLAND } from '../public/js/newxp.js?v=newxp-4';
-import { newxpFeature, __newxpTest, cloudEdge, cloudStepOff, CLOUD_EDGE_CLEAR, CLOUD_END_PUFFS } from '../public/js/features/newxp-feature.js?v=g414-1';
+import { newxpFeature, __newxpTest, cloudEdge, cloudStepOff, CLOUD_EDGE_CLEAR, CLOUD_END_PUFFS } from '../public/js/features/newxp-feature.js?v=g418-1';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

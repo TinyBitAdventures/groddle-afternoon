@@ -4,10 +4,11 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-243';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-246';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g405-1';
+import { createWindowStack } from './js/window-stack.js?v=g418-1';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=g311-1';
 import {
   actionDurationFor,
@@ -5174,6 +5175,20 @@ function drawSpeechTail(g, height, tail, up, length = 11) {
   g.clear();
   g.poly(p.fill).fill({ color: 0xfffdf5, alpha: SPEECH_FILL_ALPHA });
   g.moveTo(p.edge[0], p.edge[1]).lineTo(p.edge[2], p.edge[3]).lineTo(p.edge[4], p.edge[5]).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
+}
+
+/**
+ * True while `target` has a speech bubble up. LisChatBubbleManager.bubble 104-138 hides the
+ * stack's action indicators and its tip trigger for as long as its bubble shows (aivs_hidden_for_bubble,
+ * AIVManager.showHideAIVs 231; back in _doAfterChatBubbleHide 158-169), so the Enter chip over it
+ * waits too. Someone else's bubble (yours, a neighbour's) leaves it be.
+ */
+function speakingNow(target) {
+  if (!target) return false;
+  return speechBubbles.some((b) => {
+    const t = b._speechFx?.target;
+    return t === target || (t?.sprite && t.sprite === target.sprite);
+  });
 }
 
 function showSpeechBubble(target, speech) {
@@ -12172,7 +12187,7 @@ function spawnFourLetterBlocks() {
     spr.zIndex = 45;
     entityLayer.addChild(spr);
     // letter_block_2.js 74-98 createItemStackWithPoof: proto_puff poof_in (G285).
-    playPoofIn(PIXI, { layer: entityLayer, x: spr.x, bottom: spr.y, itemH: Math.round(197 * 0.74), zIndex: 46 });
+    playPoofIn(PIXI, { layer: fxLayer || entityLayer, x: spr.x, bottom: spr.y, itemH: Math.round(197 * 0.74) });
     return register({
       classId: 'letter_block',
       label: `Letter Block ${index + 1}`,
@@ -14060,10 +14075,11 @@ function clearWinterAtmosphere() {
 
 function spawnWinterSnow() {
   clearWinterAtmosphere();
-  if (!entityLayer) return null;
+  if (!fxLayer) return null;
+  // Weather over the whole view: in the overlay holder, over the street's front layers (the Winter
+  // Walk's front ground and drifts) as well as the avatars; under the speech bubbles and hint chip.
   const snow = new PIXI.Container();
   snow.label = 'winter-snow';
-  snow.zIndex = 110;
   snow.eventMode = 'none';
 
   const veil = new PIXI.Graphics();
@@ -14087,7 +14103,7 @@ function spawnWinterSnow() {
     flake._phase = i * 0.91;
     snow.addChild(flake);
   }
-  entityLayer.addChild(snow);
+  fxLayer.addChildAt(snow, 0);
   winterSnow = snow;
   return snow;
 }
@@ -20883,6 +20899,43 @@ function focusedDialogButton() {
   return dialog && !dialog.hidden ? button : null;
 }
 
+/** The newest-on-top window stack (js/window-stack.js), installed in main. */
+let windowStack = null;
+
+/**
+ * The game's plain panels by id, with what closes each (the Escape chain's last step closes them
+ * all at once). When one of them is the topmost window, opened over a dialog or an offer,
+ * Escape closes it first, as the newest window is the one on top.
+ */
+const PANEL_CLOSERS = Object.freeze({
+  'map-panel': () => closeMap(),
+  'vendor-panel': () => closeVendor(),
+  'quest-panel': () => closeQuestPanel(),
+  'achieve-panel': () => closeAchievePanel(),
+  'feat-panel': () => closeFeatPanel(),
+  'skills-panel': () => closeSkillsPanel(),
+  'buffs-panel': () => closeBuffsPanel(),
+  'make-panel': () => closeMakePanel(),
+  'garden-panel': () => closeGardenPanel(),
+  'avatar-panel': () => closeAvatarPanel(),
+  'shrine-panel': () => closeShrinePanel(),
+});
+
+/**
+ * Escape for the topmost window when it is one of the plain panels over another window (a Map
+ * opened over the Magic Rock's offer); true when it closed it. A panel on its own keeps the
+ * chain's order (pack card, verb menus and the action first).
+ */
+function escapeTopPanel() {
+  const open = windowStack?.restack() || [];
+  if (open.length < 2) return false;
+  const top = windowStack.top();
+  const close = top ? PANEL_CLOSERS[top.id] : null;
+  if (!close) return false;
+  close();
+  return true;
+}
+
 /** True while escapeOpenFeatureDialog's own Escape is on its way (it must not be relayed again). */
 let relayingEscape = false;
 
@@ -20895,8 +20948,8 @@ let relayingEscape = false;
  */
 function escapeOpenFeatureDialog() {
   const shown = [...document.querySelectorAll('[role="dialog"][aria-modal="true"]')].filter((d) => d.getClientRects().length > 0);
-  // Each feature appends its shade to the body when it is made: the last one shown is on top.
-  const top = shown.at(-1);
+  // The newest is on top (js/window-stack.js); without the stack, the last one in the page.
+  const top = windowStack ? windowStack.topmost(shown) : shown.at(-1);
   if (!top) return false;
   relayingEscape = true;
   try {
@@ -23858,6 +23911,13 @@ function rendererPreference() {
 
 async function main() {
   const root = document.getElementById('game-root');
+  // The newest window on top (TSMainView.addView): panels, dialogs and offers restack as they open.
+  windowStack = createWindowStack({
+    onChange: (open, zs) => {
+      if (app?.canvas) app.canvas.dataset.windowStack = open.map((el, i) => `${el.id || el.className.split(' ')[0]}:${zs[i]}`).join(',');
+    },
+  });
+  windowStack.install();
   syncCameraSafeArea();
   syncLocationViewHeight();
   window.addEventListener('resize', () => {
@@ -25009,6 +25069,7 @@ async function main() {
     keys.add(e.key);
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
     if (e.key === 'Escape') {
+      if (escapeTopPanel()) return;
       if (escapeOpenFeatureDialog()) return;
       if (isMailboxOpen()) {
         closeMailboxPanel();
@@ -25870,8 +25931,9 @@ async function main() {
           const plan = enterPlanForPrompt();
           if (plan.mode === 'chooser') label = enterPromptLabel(plan, label);
         }
-        // G228: no Enter hint while a call-out holds Enter.
-        if (!enterHeldBy()) want = {
+        // G228: no Enter hint while a call-out holds Enter; none while the thing itself is talking
+        // (speakingNow: the client hides a stack's indicators under its bubble).
+        if (!enterHeldBy() && !speakingNow(near)) want = {
           key: 'Enter',
           label,
           x: near.sprite.x,

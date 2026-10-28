@@ -14,8 +14,9 @@ const game = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../publ
 
 describe('Esc and feature dialogs (G354)', () => {
   it('relays Escape to the topmost shown aria-modal dialog before the game panels', () => {
-    const at = game.indexOf("    if (e.key === 'Escape') {\n      if (escapeOpenFeatureDialog()) return;\n      if (isMailboxOpen()) {");
-    assert.ok(at > 0, 'the relay comes first in the main Escape branch');
+    // LAYERS3: a plain panel opened over another window (js/window-stack.js) closes first.
+    const at = game.indexOf("    if (e.key === 'Escape') {\n      if (escapeTopPanel()) return;\n      if (escapeOpenFeatureDialog()) return;\n      if (isMailboxOpen()) {");
+    assert.ok(at > 0, 'the relay comes first in the main Escape branch, after the topmost panel');
     assert.match(game, /function escapeOpenFeatureDialog\(\) \{[\s\S]*?querySelectorAll\('\[role="dialog"\]\[aria-modal="true"\]'\)[\s\S]*?dispatchEvent\(new KeyboardEvent\('keydown', \{ key: 'Escape', bubbles: true, cancelable: true \}\)\)/);
   });
 

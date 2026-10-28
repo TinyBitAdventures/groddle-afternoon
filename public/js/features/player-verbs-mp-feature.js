@@ -170,7 +170,7 @@ function createSession(engine, client) {
     const p = engine.player;
     if (!p || !engine.PIXI) return;
     // show_rainbow (players/player.js 3014-3029): 400 x 400 at the avatar, 4 s.
-    playSheetOverlay(engine.PIXI, 'rainbow_youdidit', { layer: engine.entityLayer, at: () => ({ x: p.x, y: p.y }), wh: 400, durationMs: 4000, loop: false });
+    playSheetOverlay(engine.PIXI, 'rainbow_youdidit', { layer: engine.fxLayer || engine.entityLayer, at: () => ({ x: p.x, y: p.y }), wh: 400, durationMs: 4000, loop: false });
   }
 
   // —— Pickers ——
@@ -397,7 +397,7 @@ function createSession(engine, client) {
       say(CHARADES_TEXT.timeout);
       // G373 catalog_buffs.js 412-419: nobody guessed, show_rainbow('charades_gameover') at the drinker.
       const p = engine.player;
-      if (p) showRainbow(engine.PIXI, 'charades_gameover', { layer: engine.entityLayer, at: () => ({ x: p.x, y: p.y }) });
+      if (p) showRainbow(engine.PIXI, 'charades_gameover', { layer: engine.fxLayer || engine.entityLayer, at: () => ({ x: p.x, y: p.y }) });
     } else if (why === 'left') {
       say(CHARADES_TEXT.left);
     }

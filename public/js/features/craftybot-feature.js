@@ -46,7 +46,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } fr
 import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=woodcutting-test-8';
 import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=g403-1';
 import { listDroppedStacks } from '../world-items.js?v=world-items-4';
-import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=g414-1';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=g418-1';
 import {
   CRAFTYBOT,
   CRAFTYBOT_BOX,
@@ -713,7 +713,7 @@ let pendingOpenX = 0;
  */
 function puff(engine, x, top) {
   const at = itemstackOverlayPoint(x, top, { dy: 125 });
-  playSheetOverlay(engine.PIXI, 'proto_puff', { layer: engine.entityLayer, at: () => at, durationMs: 2000, loop: false, zIndex: 70 });
+  playSheetOverlay(engine.PIXI, 'proto_puff', { layer: engine.fxLayer || engine.entityLayer, at: () => at, durationMs: 2000, loop: false, zIndex: 70 });
 }
 
 function finishOpen(engine) {

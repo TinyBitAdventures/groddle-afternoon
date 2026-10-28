@@ -175,7 +175,7 @@ function destroySprite(sprite) {
  * centred on it. (x, y) is the figure's feet.
  */
 function poof(engine, x, y) {
-  const h = playPoofIn(engine.PIXI, { layer: engine.entityLayer, x, bottom: y, itemH: 40, zIndex: RACER_Z + 1 });
+  const h = playPoofIn(engine.PIXI, { layer: engine.fxLayer || engine.entityLayer, x, bottom: y, itemH: 40 });
   poofs.push({ h, at: now() });
 }
 

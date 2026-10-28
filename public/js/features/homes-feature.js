@@ -106,6 +106,7 @@ import {
   flipFurniture,
   furnishDemoRoom,
   furnitureDef,
+  furnitureDrawsInFront,
   furnitureScale,
   furnitureSize,
   grantStarterKit,
@@ -128,7 +129,7 @@ import {
   textureConfig,
   unexpandInterior,
   UNEXPAND_TEXT,
-} from '../home-decor.js?v=home-decor-7';
+} from '../home-decor.js?v=g418-1';
 import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=furnup-2';
 import { chooseUpgrade, closeUpgradePicker, openUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=furnup-2';
 import { RECIPE_CATALOG } from '../making.js?v=g403-1';
@@ -235,7 +236,7 @@ import {
   quoteHouseExpansion,
   quoteHouseUnexpand,
   unexpandHouseFloors,
-} from '../home-floors.js?v=g363-1';
+} from '../home-floors.js?v=g418-1';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -290,6 +291,12 @@ const YARD_LIFT = BACK_YARD_GROUND_Y - OLD_STREET_GROUND_Y;
 /** Above this much of the avatar the house's left end is a wall (the post over the way in). */
 const AVATAR_HEAD = 90;
 const FURNITURE_Z = 12;
+/**
+ * FG_FURN (MiddleGroundRenderer.setupEndShapes 111-171; LocationRenderer.as 1465-1468): ceiling
+ * and front pieces draw over your avatar (50), other players (49.x) and anything worn or carried
+ * (the crown 60, the Crushers 58), under the Decorate ghost (95).
+ */
+const FURNITURE_FRONT_Z = 90;
 
 // ---------------------------------------------------------------------------
 // Pure helpers (tested in tests/homes-feature.test.js)
@@ -1778,24 +1785,50 @@ function furnitureView(PIXI, item) {
   return box;
 }
 
+/**
+ * The room's two furniture holders in the entity layer: `back` under the avatars (wall, rug and
+ * floor pieces) and `front` over them (ceiling pieces, FG_FURN), both in room x from `x`.
+ */
+function addFurnitureLayers(engine, x = 0) {
+  const { PIXI } = engine;
+  const make = (zIndex, label) => {
+    const layer = new PIXI.Container();
+    layer.sortableChildren = true;
+    layer.zIndex = zIndex;
+    layer.label = label;
+    layer.x = x;
+    engine.entityLayer.addChild(layer);
+    return layer;
+  };
+  return { back: make(FURNITURE_Z, 'home-furniture'), front: make(FURNITURE_FRONT_Z, 'home-furniture-front') };
+}
+
+/** Which of a room's two holders a piece goes in. */
+function furnitureHolder(layers, item) {
+  return furnitureDrawsInFront(item) && layers.front ? layers.front : layers.back;
+}
+
 function renderFurniture(engine) {
   if (!scene?.furnitureLayer) return;
   const { PIXI } = engine;
-  const layer = scene.furnitureLayer;
-  layer.removeChildren().forEach((child) => child.destroy({ children: true }));
+  const layers = { back: scene.furnitureLayer, front: scene.furnitureFrontLayer };
+  for (const layer of [layers.back, layers.front]) {
+    layer?.removeChildren().forEach((child) => child.destroy({ children: true }));
+  }
   const here = houseFloorHere();
   renderOrder(decor).forEach((item, i) => {
     // A Door between floors (or building one) is drawn by its own target (spawnDoorTargets).
     if (here != null && item.classTsid === DOOR_CLASS && doorRole(floors, here, item.id)) return;
     const view = furnitureView(PIXI, item);
     view.zIndex = i;
-    layer.addChild(view);
+    furnitureHolder(layers, item).addChild(view);
   });
   if (selected?.kind === 'furniture') {
     const item = placedItem(decor, selected.id);
-    if (item) layer.addChild(selectionOutline(PIXI, furnitureBounds(item)));
+    if (item) furnitureHolder(layers, item).addChild(selectionOutline(PIXI, furnitureBounds(item)));
     else selected = null;
   }
+  engine.setData('homeFurnitureFront', layers.front ? layers.front.children.length : 0);
   scene.background?.redraw?.();
   publish(engine);
 }
@@ -1858,7 +1891,7 @@ function playPendingPoofs(engine, st, before = null) {
     const item = st.items.find((r) => r.id === row.id);
     if (!item) continue;
     engine.playSound?.('PROTO_PUFF', { volume: 0.5 });
-    playPoofIn(engine.PIXI, { layer: engine.entityLayer, x: cultivationWorldX(item, st), bottom: yardGroundY(st) + 6, itemH: row.itemH });
+    playPoofIn(engine.PIXI, { layer: engine.fxLayer || engine.entityLayer, x: cultivationWorldX(item, st), bottom: yardGroundY(st) + 6, itemH: row.itemH });
     // poofItIn's fade (LocationItemstackView.as 739, 768): whatever the redraw drew for this item (G298).
     const faded = before ? fadeInNewNear(engine.entityLayer, before, { x: cultivationWorldX(item, st), halfW: footprint(item.protoClass) }) : [];
     if (engine.setData) engine.setData('homePoofFade', String(faded.length));
@@ -2354,7 +2387,9 @@ function pourFx(engine, row) {
   const tsid = engine.streetTsid;
   pourSheets.load(sheet).then(() => {
     const frames = pourSheets.frames(sheet);
-    if (!frames.length || engine.streetTsid !== tsid || !engine.entityLayer) return;
+    // An itemstack_overlay goes in the overlay holder, over the street's front layers (AnnouncementController.as 503-540).
+    const layer = engine.fxLayer || engine.entityLayer;
+    if (!frames.length || engine.streetTsid !== tsid || !layer) return;
     const clip = new PIXI.AnimatedSprite(frames);
     clip.anchor.set(0.5, 1);
     clip.x = at.x;
@@ -2365,7 +2400,7 @@ function pourFx(engine, row) {
     clip.zIndex = 60;
     clip.eventMode = 'none';
     clip.alpha = 0;
-    engine.entityLayer.addChild(clip);
+    layer.addChild(clip);
     clip.play();
     let release = null;
     const end = () => {
@@ -3917,7 +3952,9 @@ function worldPoint(engine, event) {
 }
 
 function furnitureAt(point) {
-  const order = renderOrder(decor).reverse();
+  // Front-most first: the ceiling pieces over the avatars, then the rest from the top down.
+  const top = renderOrder(decor).reverse();
+  const order = [...top.filter(furnitureDrawsInFront), ...top.filter((item) => !furnitureDrawsInFront(item))];
   for (const item of order) {
     const b = furnitureBounds(item);
     if (point.x >= b.x && point.x <= b.x + b.w && point.y >= b.y && point.y <= b.y + b.h) return item;
@@ -4647,19 +4684,16 @@ export function visitorHomeScene(engine, view = {}, room = 'street') {
         doorX,
         populate(eng) {
           const { PIXI } = eng;
-          const layer = new PIXI.Container();
-          layer.sortableChildren = true;
-          layer.zIndex = FURNITURE_Z;
-          layer.x = x0;
+          // The owner's ceiling pieces hang over every visitor, as in your own house (FG_FURN).
+          const layers = addFurnitureLayers(eng, x0);
           // HOMES3: each piece's box, so a sale can take it away (home-street-mp-feature).
           const pieces = [];
           furniture.forEach((item, i) => {
             const box = furnitureView(PIXI, item);
             box.zIndex = i;
-            layer.addChild(box);
+            furnitureHolder(layers, item).addChild(box);
             pieces.push({ item, box });
           });
-          eng.entityLayer.addChild(layer);
           const spec = background.room?.door || { piece: 'door_asset_entry_basic', x: interiorDoorX(), y: GROUND_Y + 18, w: 75, h: 236 };
           const door = new PIXI.Sprite(textureFromUrl(pieceUrl(spec.piece, wantsHiresPieces(eng))));
           door.anchor.set(0.5, 1);
@@ -4772,17 +4806,14 @@ function towerFloorScene(engine, floor) {
       return TOWER_GEO.elevatorX + 70;
     },
     spawnTargets() {
-      scene = { room: 'interior', tower: floor, construction, background, furnitureLayer: null, ghost: null, markers: null };
+      scene = { room: 'interior', tower: floor, construction, background, furnitureLayer: null, furnitureFrontLayer: null, ghost: null, markers: null };
       towerApi.spawnFloor(engine, { width, groundY: GROUND_Y, doorX: TOWER_GEO.exitX });
       return {};
     },
     enter() {
-      const { PIXI } = engine;
-      const layer = new PIXI.Container();
-      layer.sortableChildren = true;
-      layer.zIndex = FURNITURE_Z;
-      engine.entityLayer.addChild(layer);
-      scene.furnitureLayer = layer;
+      const layers = addFurnitureLayers(engine);
+      scene.furnitureLayer = layers.back;
+      scene.furnitureFrontLayer = layers.front;
       // tower_build_expansion: the bare tower base (home_tower.swf) until the floor is built.
       if (construction && mode === 'decorate') mode = null;
       renderFurniture(engine);
@@ -4814,18 +4845,15 @@ function houseFloorScene(engine, index) {
       return down ? down.x : Math.round(width / 2);
     },
     spawnTargets() {
-      scene = { room: 'interior', houseFloor: index, background, furnitureLayer: null, ghost: null, markers: null };
+      scene = { room: 'interior', houseFloor: index, background, furnitureLayer: null, furnitureFrontLayer: null, ghost: null, markers: null };
       lastWallX = null;
       spawnDoorTargets(engine);
       return {};
     },
     enter() {
-      const { PIXI } = engine;
-      const layer = new PIXI.Container();
-      layer.sortableChildren = true;
-      layer.zIndex = FURNITURE_Z;
-      engine.entityLayer.addChild(layer);
-      scene.furnitureLayer = layer;
+      const layers = addFurnitureLayers(engine);
+      scene.furnitureLayer = layers.back;
+      scene.furnitureFrontLayer = layers.front;
       renderFurniture(engine);
       afterEnter(engine);
     },
@@ -5031,21 +5059,17 @@ function homeScene(room, engine) {
         return x0 + interiorDoorX() - 80;
       },
       spawnTargets() {
-        scene = { room, background, furnitureLayer: null, ghost: null, markers: null };
+        scene = { room, background, furnitureLayer: null, furnitureFrontLayer: null, ghost: null, markers: null };
         lastWallX = null;
         const out = spawnInteriorTargets(engine);
         spawnDoorTargets(engine);
         return out;
       },
       enter() {
-        const { PIXI } = engine;
-        const layer = new PIXI.Container();
-        layer.sortableChildren = true;
-        layer.zIndex = FURNITURE_Z;
         // Furniture is placed in room x.
-        layer.x = x0;
-        engine.entityLayer.addChild(layer);
-        scene.furnitureLayer = layer;
+        const layers = addFurnitureLayers(engine, x0);
+        scene.furnitureLayer = layers.back;
+        scene.furnitureFrontLayer = layers.front;
         renderFurniture(engine);
         spawnCultivations(engine, backCult);
         afterEnter(engine);

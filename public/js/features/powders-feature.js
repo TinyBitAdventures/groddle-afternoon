@@ -448,9 +448,10 @@ function remoteAt(id) {
 /** The sneeze over a player (pc_overlay overlay_sneezing_powder, 300 x 300, 110 px up). */
 function sneezeOverlay(engine, at) {
   let spot = at();
-  if (!engine.PIXI || !engine.entityLayer || !spot) return;
+  const layer = engine.fxLayer || engine.entityLayer;
+  if (!engine.PIXI || !layer || !spot) return;
   playSheetOverlay(engine.PIXI, 'overlay_sneezing_powder', {
-    layer: engine.entityLayer,
+    layer,
     // A pc_overlay stands (center bottom) 110 px above the feet, following them; where they were if they left.
     at: () => {
       spot = at() || spot;

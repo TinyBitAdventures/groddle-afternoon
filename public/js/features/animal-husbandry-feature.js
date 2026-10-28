@@ -105,7 +105,7 @@ import {
 import { loseEnergy, shiftMetabolic } from '../metabolics.js';
 import { textureFromUrl } from '../textures.js';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g414-1';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g418-1';
 import { grantMoodXp } from '../mood-xp.js';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
@@ -1017,7 +1017,7 @@ function setFreeNow(engine, target) {
   engine.say(target, res.line, 4000, { slugs: { mood: res.slugs.mood, energy: res.slugs.energy } });
   let last = itemstackOverlayPoint(spr.x, displayTopOf(spr), { dy: SET_FREE.puff.deltaY });
   playSheetOverlay(engine.PIXI, SET_FREE.puff.overlay, {
-    layer: engine.entityLayer,
+    layer: engine.fxLayer || engine.entityLayer,
     at: () => {
       if (!spr.destroyed) last = itemstackOverlayPoint(spr.x, displayTopOf(spr), { dy: SET_FREE.puff.deltaY });
       return last;

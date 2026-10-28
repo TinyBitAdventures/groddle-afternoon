@@ -68,7 +68,7 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackItemSlots, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { homeStreetLayout, towerItem } from '../home-cultivation.js?v=home-cultivation-5';
-import { homesFeature } from './homes-feature.js?v=g414-1';
+import { homesFeature } from './homes-feature.js?v=g418-1';
 import { towerApi } from './home-tower-feature.js?v=g415-1';
 import { levelInfoForXp } from '../progression.js?v=progression-1';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
@@ -750,7 +750,7 @@ function openBox(engine) {
  */
 function puff(engine, x, top) {
   const at = itemstackOverlayPoint(x, top, { dy: 125 });
-  playSheetOverlay(engine.PIXI, 'proto_puff', { layer: engine.entityLayer, at: () => at, durationMs: 2000, loop: false, zIndex: 70 });
+  playSheetOverlay(engine.PIXI, 'proto_puff', { layer: engine.fxLayer || engine.entityLayer, at: () => at, durationMs: 2000, loop: false, zIndex: 70 });
 }
 
 function finishOpen(engine) {

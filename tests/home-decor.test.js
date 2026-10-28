@@ -31,7 +31,7 @@ import {
   restackFurniture,
   setHomeTexture,
   snapPlacement,
-} from '../public/js/home-decor.js';
+} from '../public/js/home-decor.js?v=g418-1';
 
 const root = join(import.meta.dirname, '..', 'public');
 
