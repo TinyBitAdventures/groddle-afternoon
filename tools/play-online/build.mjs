@@ -23,7 +23,7 @@ const SOURCE = join(root, 'public/play/index.html');
 const TARGET = join(root, 'public/play/online/index.html');
 
 /** The cache key of js/online-boot.js (bump it when that file or js/minn-account.js changes). */
-export const ONLINE_BOOT_SRC = 'js/online-boot.js?v=g399-1';
+export const ONLINE_BOOT_SRC = 'js/online-boot.js?v=g408-1';
 
 const MODE_ENTRY = `  <!--
     Multiplayer entry (js/game-mode.js). This must stay the FIRST script on the page, ahead of
@@ -87,6 +87,9 @@ const ONLINE_STYLE = `  <style>
     .save-pill[data-state="conflict"], .save-pill[data-state="signed-out"] { background: #fff1d6; }
     .save-pill[data-state="conflict"] .save-pill-state::before, .save-pill[data-state="signed-out"] .save-pill-state::before { background: #c8553d; }
     .save-pill a { color: #8a3d12; }
+    /* In the pack, under its hint (js/online-boot.js mountSavePill): part of the game, not over it. */
+    .pack-side { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 0.35rem; flex-shrink: 0; }
+    .save-pill.in-pack { position: static; z-index: auto; box-shadow: none; padding: 0.18rem 0.55rem; font-size: 11px; white-space: nowrap; }
     /* G320: the start card over the street, the chat dock and the pack, inside the game frame (it scrolls when the
        frame is shorter); the street's toasts, activity lines and Qurazy banner wait for it to close (game.js holds the
        toast's clock, qurazy-feature the banner). */

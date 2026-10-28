@@ -193,18 +193,50 @@ function showGate(gate, state, { account, onSignedIn, onSignedOut = onSignedIn, 
   if (state !== 'checking') card.append(el('a', { class: 'online-home', href: './' }, 'Back to Groddle Afternoon'));
 }
 
+/** A save taking longer than this shows "Saving…"; a routine autosave stays "Saved" (Austin 2026-10-28). */
+export const SAVING_SHOWN_AFTER_MS = 1500;
+
+/**
+ * The quiet states: the wait before an autosave and a quick save read as Saved. Problems
+ * (offline, not saved, a conflict, signed out) show at once.
+ */
+export function pillStateFor(state, { slow = false } = {}) {
+  if (state === 'pending') return 'saved';
+  if (state === 'saving') return slow ? 'saving' : 'saved';
+  return state || 'saved';
+}
+
 function mountSavePill(player) {
   const pill = el('div', { id: 'save-pill', class: 'save-pill', role: 'status', 'aria-live': 'polite', 'data-state': 'saved' });
   pill.append(el('span', { class: 'save-pill-who' }, player?.name ? `Playing as ${player.name}` : 'Multiplayer'), el('span', { class: 'save-pill-state' }, PILL_TEXT.saved));
-  document.body.append(pill);
-  window.addEventListener('groddle:save-state', (e) => {
-    const s = e.detail?.state || 'saved';
+  // In the pack's own corner under its hint, so it never covers the slots and the award and
+  // new-day screens cover it with the rest of the game; the window's corner when there is no pack.
+  const hint = document.querySelector('.pack-hint');
+  if (hint?.parentNode) {
+    const side = el('div', { class: 'pack-side' });
+    hint.parentNode.insertBefore(side, hint);
+    side.append(hint, pill);
+    pill.classList.add('in-pack');
+  } else {
+    document.body.append(pill);
+  }
+  let shown = 'saved';
+  let slowTimer = 0;
+  const show = (s) => {
+    if (s === shown) return;
+    shown = s;
     pill.dataset.state = s;
     // A conflict or an ended session needs the player: the words become the way out.
     // Reloading /play/online/ shows the gate's sign-in when the session is gone.
     const href = s === 'conflict' || s === 'signed-out' ? location.pathname : '';
     const text = PILL_TEXT[s] || s;
     pill.lastChild.replaceWith(href ? el('a', { class: 'save-pill-state', href }, text) : el('span', { class: 'save-pill-state' }, text));
+  };
+  window.addEventListener('groddle:save-state', (e) => {
+    const s = e.detail?.state || 'saved';
+    clearTimeout(slowTimer);
+    if (s === 'saving') slowTimer = setTimeout(() => show(pillStateFor('saving', { slow: true })), SAVING_SHOWN_AFTER_MS);
+    show(pillStateFor(s));
   });
 }
 
