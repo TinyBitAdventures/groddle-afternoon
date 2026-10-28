@@ -189,11 +189,12 @@ let bannerRun = 0;
 let bannerLive = false;
 
 /**
- * G320: in multiplayer the start card is up while the first street loads, and the banner played
- * over it: it waits for the card to close (engine.started). Solo plays it at once, as before.
+ * G320: the start card (#overlay .card) is up while the first street loads, and the banner played
+ * over it: it waits for the card to close (engine.started), in multiplayer and, since Austin's
+ * solo play of 2026-10-28 (the banner sat on the welcome card after a reload), in solo too.
  */
 function afterStartCard(engine, run) {
-  if (engine.mode !== 'multiplayer' || engine.started !== false) return Promise.resolve(true);
+  if (engine.started !== false) return Promise.resolve(true);
   engine.setData?.('qurazyOverlay', 'held');
   return new Promise((resolve) => {
     const poll = () => {

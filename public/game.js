@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g388-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-220';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-221';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g378-1';
@@ -790,6 +790,7 @@ import {
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
 } from './js/map-graph.js';
+import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=g396-1';
 import {
   loadStreetEcologyCatalog,
   ecologyForStreet,
@@ -3706,11 +3707,6 @@ function updateHud() {
     const log = listQuestLog(questState);
     // G229: quests put off with "Not right now" wait in the log to be started (quest-offers-feature).
     const putOff = features.collect('questLogCards', engine);
-    const meta = document.getElementById('quest-meta');
-    if (meta) {
-      const n = Object.keys(getQuestCatalog()).length;
-      meta.textContent = `${log.filter((r) => r.status === 'active').length} active · ${questState.completed.length} done · ${n} in catalog`;
-    }
     if (!log.length && !putOff.length) {
       const empty = document.createElement('div');
       empty.className = 'q-req';
@@ -3852,6 +3848,16 @@ function updateHud() {
     const firstDone = qBox.querySelector('.q-card.done');
     for (const el of putOff) qBox.insertBefore(el, firstDone);
     appendStoryQuestOffers(qBox);
+    // The header counts the cards drawn: offers (put off, or a story quest's offer card) on their own.
+    const meta = document.getElementById('quest-meta');
+    if (meta) {
+      meta.textContent = questLogSummary({
+        active: log.filter((r) => r.status === 'active').length,
+        offered: qBox.querySelectorAll('.q-put-off, .story-offer').length,
+        done: questState.completed.length,
+        catalog: Object.keys(getQuestCatalog()).length,
+      });
+    }
     const drawn = qBox.innerHTML;
     if (drawn !== questLogDrawn) {
       qShown.replaceChildren(...qBox.childNodes);
@@ -20080,10 +20086,9 @@ async function openMap(hubId) {
   const view = buildHubMapView(hubData, currentStreetTsid, STREET_INDEX.streets);
   if (title) title.textContent = view.hubName;
   if (sub) {
-    const artNote = view.bgLocal ? 'painted bg' : 'geometry only';
-    const loadedN = view.streets.filter((s) => s.loaded).length;
-    sub.textContent =
-      `${view.streets.length} streets · ${loadedN} playable here · ${artNote} · click a street to set a destination or teleport · red star = you`;
+    // The painted-or-geometry note is for QA only (js/panel-copy.js), not the player's subtitle.
+    sub.textContent = hubMapSubtitle(view);
+    sub.dataset.mapArt = hubMapArtNote(view);
   }
 
   canvas.innerHTML = renderHubMapSvg(view);

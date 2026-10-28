@@ -9,7 +9,8 @@
  * G320: on the multiplayer start card the street's "Arrived:" toast and the Qurazy banner played over
  * the card, and at 390 px the chat dock and pack covered its bottom. The online page's style lifts the
  * card over them and lets it scroll inside the game frame; game.js holds the toast's clock and
- * qurazy-feature holds the banner until the card closes (engine.started). Solo is unchanged.
+ * qurazy-feature holds the banner until the card closes (engine.started). Solo is unchanged
+ * (since 2026-10-28 solo waits for its start card too: tests/solo-polish.test.js).
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -129,9 +130,9 @@ describe('G320: the multiplayer start card', () => {
     assert.match(src, /document\.getElementById\('overlay'\)\.classList\.add\('hidden'\);\n\s+state\.started = true;/);
   });
 
-  it('qurazy-feature waits for the start card in multiplayer before it plays the banner', () => {
+  it('qurazy-feature waits for the start card before it plays the banner (multiplayer, and solo since 2026-10-28)', () => {
     const src = read('public/js/features/qurazy-feature.js');
-    assert.match(src, /function afterStartCard\(engine, run\) \{\n\s+if \(engine\.mode !== 'multiplayer' \|\| engine\.started !== false\) return Promise\.resolve\(true\);/);
+    assert.match(src, /function afterStartCard\(engine, run\) \{\n\s+if \(engine\.started !== false\) return Promise\.resolve\(true\);/);
     assert.match(src, /const run = \+\+bannerRun;\n\s+if \(!\(await afterStartCard\(engine, run\)\) \|\| run !== bannerRun\) return;/);
     assert.match(read('public/js/features/index.js'), /qurazy-feature\.js\?v=g\d+-\d+'/);
   });

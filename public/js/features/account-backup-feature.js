@@ -22,6 +22,10 @@
  *
  * Off in practice copies (?practice=1 swaps the storage) and on a plain
  * static server (no account routes answer).
+ *
+ * Solo asks who is playing the quiet way (online-boot.js quietSession, G322):
+ * a signed-out page never asks admin-ajax for a REST nonce, whose "0" with
+ * 400 showed in the console (Austin 2026-10-28). Only a signed-in page does.
  * QA: /play/ on groddle.localhost, Menu, Account; /play/online/, Menu, Sign out.
  */
 
@@ -30,6 +34,7 @@ import { mountAccountForms, mountAccountSettings } from '../account-forms.js?v=g
 import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=mp2-2';
 import { formatGameDayLabel } from '../game-day.js?v=dametime-4';
 import { multiplayerEntryUrl } from '../game-mode.js?v=mp2-1';
+import { quietSession } from '../online-boot.js?v=g372-1';
 
 /** Which slot a new backup goes to: the first empty one, else the oldest (which then needs a yes). */
 export function slotForNewBackup(backups, slots) {
@@ -317,7 +322,7 @@ function createPanel(engine, account, signedInSession) {
 
 async function install(engine) {
   const account = createMinnAccount({ baseUri: document.baseURI });
-  const session = await account.session();
+  const session = await quietSession(account);
   engine.setData?.('accountSession', session.minn ? (session.signedIn ? 'signed-in' : 'signed-out') : 'none');
   if (!session.minn) return;
   const list = document.getElementById('more-list');

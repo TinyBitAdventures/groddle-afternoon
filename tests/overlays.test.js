@@ -308,6 +308,6 @@ describe('wiring', () => {
 
   it('style.css hides the words under the countdown picture; the link carries the overlays key', () => {
     assert.match(read('style.css'), /\.hog-haul-countdown\.has-art,\s*\.hog-haul-countdown\.has-throbber \{ color: transparent; text-shadow: none; \}/);
-    assert.match(read('play/index.html'), /style\.css\?[^"]*&amp;overlays=g392-1"/);
+    assert.match(read('play/index.html'), /style\.css\?[^"]*&amp;overlays=g392-1(?:&amp;[^"]*)?"/);
   });
 });
