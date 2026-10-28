@@ -46,6 +46,7 @@
 import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { getToolCondition } from '../tools.js?v=woodcutting-test-3';
 import { worldToScreen } from '../street-model.js';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=g392-1';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js';
 import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js';
@@ -380,34 +381,23 @@ function brushFx(engine, x, y, kind = 'hit') {
   addEffect(engine, spr, (fx) => fx.t > 700);
 }
 
+/**
+ * G373 fox_bait.js 127-138: Tiny Speck's fox_bait_ignite, a 150 x 150 pc_overlay for 4 s, locking,
+ * delta_x 60 toward the way the avatar faces (pc.s < 0: -60), delta_y -80.
+ */
 function igniteFx(engine) {
-  const { PIXI } = engine;
   const player = engine.player;
   if (!player) return;
-  const root = new PIXI.Container();
+  const use = OVERLAY_USES.fox_bait_ignite;
   const side = player.scale?.x < 0 ? -1 : 1;
-  root.x = player.x + side * 60;
-  root.y = player.y - 80;
-  const puffs = [];
-  for (let i = 0; i < 9; i += 1) {
-    const g = new PIXI.Graphics();
-    const warm = i % 3 === 0;
-    g.circle(0, 0, warm ? 7 : 11 + (i % 4) * 2).fill({ color: warm ? 0xffb347 : 0x9fa36a, alpha: warm ? 0.85 : 0.55 });
-    g.x = (i - 4) * 6;
-    g.vx = (i - 4) * 0.25;
-    g.vy = -0.6 - (i % 3) * 0.35;
-    root.addChild(g);
-    puffs.push(g);
-  }
-  addEffect(engine, root, (fx) => {
-    for (const g of puffs) {
-      g.x += g.vx;
-      g.y += g.vy;
-      g.scale.set(1 + fx.t / 1400);
-    }
-    root.alpha = Math.max(0, 1 - fx.t / 4000);
-    return fx.t > 4000;
+  playOverlay(engine.PIXI, 'fox_bait_ignite', {
+    layer: engine.fxLayer || engine.entityLayer,
+    at: () => ({ x: player.x + side * use.dx, y: player.y + use.dy }),
+    wh: use.wh,
+    durationMs: use.durationMs,
+    loop: false,
   });
+  engine.setData?.('foxBaitIgnite', 'fox_bait_ignite');
 }
 
 function tickEffects(dtMs) {

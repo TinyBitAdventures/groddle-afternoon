@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g388-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-217';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-218';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g378-1';
@@ -16,6 +16,8 @@ import {
   cancelTimedAction,
 } from './js/action-timing.js?v=timed-actions-1';
 import { createWordProgressView, wordAnchor, heldActionDelta, MAX_PUSH_DOWN } from './js/word-progress.js?v=g387-1';
+// G374/G375/G378: Tiny Speck's quoin-limit and super-harvest rainbows and the musicblock notes.
+import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=g392-1';
 import {
   createQuestState,
   assignQuest,
@@ -38,7 +40,6 @@ import {
   PHANTOM_APPEAR_FRAME_COUNT,
   PHANTOM_APPEAR_ANIMATION_SPEED,
   PHANTOM_ECHO_APPEAR_ANIMATION_SPEED,
-  PHANTOM_MEMORY_ANIMATION_SPEED,
   PHANTOM_GIVE_HEART_ANIMATION_SPEED,
   PHANTOM_GIVE_HEART_DURATION_MS,
   PHANTOM_GIVE_HEART_FRAME_COUNT,
@@ -5291,64 +5292,36 @@ function burst(x, y, color = 0xffe066, n = 10) {
   }
 }
 
-/** Source-video-style rainbow celebration shared by animal and tree super harvests. */
+/**
+ * show_rainbow (players/player.js 3014-3029) at the avatar: Tiny Speck's 400 x 400 arc for 4 s
+ * (js/overlays.js), with the sound the source pairs with it (3038-3065).
+ */
+function playerRainbow(key, { delayMs = null, sound = true } = {}) {
+  if (!entityLayer || !player) return null;
+  const p = player;
+  const h = showRainbow(PIXI, key, { layer: fxLayer || entityLayer, at: () => ({ x: p.x, y: p.y }), delayMs });
+  if (sound && rainbowSound(key)) setTimeout(() => playSound(rainbowSound(key), { volume: 0.5 }), delayMs ?? OVERLAY_USES[key]?.delayMs ?? 0);
+  if (app?.canvas) app.canvas.dataset.rainbow = key;
+  return h;
+}
+
+/**
+ * Super harvests (G375): show_rainbow('rainbow_superharvest', 1000) at the player (include/trants.js
+ * 293, include/garden.js 501, npc_piggy.js 1604), the "SUPER HARVEST!" arc Tiny Speck drew; the
+ * bonus count is the activity line. The harvest's own sound (sound-moments.js) is the arc's sound.
+ */
 function showSuperHarvestFx(target, itemClassTsid, amount) {
-  if (!fxLayer || !target?.sprite || target.sprite.destroyed) return null;
+  if (!target?.sprite || target.sprite.destroyed) return null;
   const count = Math.max(1, Math.floor(Number(amount) || 1));
   const itemId = String(itemClassTsid || '').trim();
-  const fx = new PIXI.Container();
-  const rainbow = new PIXI.Graphics();
-  const colors = [0xf15b5a, 0xf8a33a, 0xf5d74e, 0x78c96b, 0x5ba8e5, 0x9566d7];
-  colors.forEach((color, index) => {
-    rainbow.moveTo(-112, 29 + index * 3);
-    rainbow.bezierCurveTo(-58, -30 + index * 2, 58, -30 + index * 2, 112, 29 + index * 3);
-    rainbow.stroke({ width: 4, color: color, alpha: 0.92 });
-  });
-  const heading = new PIXI.Text({ text: 'SUPER HARVEST!', style: {
-    fontFamily: 'Trebuchet MS, sans-serif',
-    fontSize: 27,
-    fill: 0xfff8d6,
-    fontWeight: '900',
-    letterSpacing: 1.5,
-    stroke: { color: 0x54402d, width: 5 },
-    dropShadow: { alpha: 0.28, blur: 3, color: 0x000000, distance: 2 },
-  } });
-  heading.anchor.set(0.5);
-  heading.y = 19;
-  const itemIcon = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[itemId]?.icon || `assets/sprites/icons/${itemId}.png`));
-  itemIcon.anchor.set(0.5);
-  const largest = Math.max(itemIcon.texture.width || 1, itemIcon.texture.height || 1);
-  const itemScale = Math.min(1.05, 38 / largest);
-  itemIcon.scale.set(itemScale);
-  itemIcon.x = -18;
-  itemIcon.y = 62;
-  const countText = new PIXI.Text({ text: `+${count}`, style: {
-    fontFamily: 'Trebuchet MS, sans-serif',
-    fontSize: 21,
-    fill: 0xffffff,
-    fontWeight: '900',
-    stroke: { color: 0x4a3829, width: 4 },
-  } });
-  countText.anchor.set(0, 0.5);
-  countText.x = 8;
-  countText.y = 62;
-  fx.addChild(rainbow, heading, itemIcon, countText);
-  fx.x = target.sprite.x;
-  fx.y = target.sprite.y - Math.min(178, Math.max(118, Math.abs(target.sprite.height) * 0.72));
-  fx.zIndex = 100001;
-  fx.eventMode = 'none';
-  fx._superHarvestFx = true;
-  fx._life = 0;
-  fx._max = 126;
-  fx._baseY = fx.y;
-  fxLayer.addChild(fx);
-  burst(target.sprite.x, target.sprite.y - 70, 0xffd95a, 18);
+  const h = playerRainbow('rainbow_superharvest', { sound: false });
   if (app?.canvas) {
     app.canvas.dataset.superHarvestFx = 'playing';
     app.canvas.dataset.superHarvestItem = itemId;
     app.canvas.dataset.superHarvestAmount = String(count);
   }
-  return fx;
+  h?.done.then(() => { if (app?.canvas) app.canvas.dataset.superHarvestFx = 'complete'; });
+  return h;
 }
 
 function showMusicblockFx(def) {
@@ -5368,32 +5341,19 @@ function showMusicblockFx(def) {
   icon.y = player.y - 112;
   fxLayer.addChild(icon);
 
-  const glyphs = ['♪', '♫', '♬', '♩'];
-  const colors = def.collection === 'DR'
-    ? [0xf397a6, 0xffc66d, 0xd982ae]
-    : [0x8ee3a1, 0x7dc9ff, 0xc6a2ff];
-  const count = Math.max(10, Math.ceil(def.durationMs / 700));
-  for (let i = 0; i < count; i++) {
-    const note = new PIXI.Text({ text: glyphs[i % glyphs.length], style: {
-      fontFamily: 'Trebuchet MS, sans-serif',
-      fontSize: 18 + (i % 3) * 3,
-      fill: colors[i % colors.length],
-      fontWeight: '700',
-      dropShadow: { blur: 2, color: 0x3b274c, distance: 1 },
-    } });
-    note.anchor.set(0.5);
-    note._musicFx = 'note';
-    note._life = 0;
-    note._delay = i * 34;
-    note._max = 88;
-    note._vx = (i % 2 ? 1 : -1) * (0.25 + (i % 4) * 0.08);
-    note._vy = -0.58 - (i % 3) * 0.08;
-    note.x = player.x + 20 + (i % 2 ? 20 : -20);
-    note.y = player.y - 112;
-    note.alpha = 0;
-    fxLayer.addChild(note);
-  }
+  // G378 musicblock_*.js 139-151: Tiny Speck's musicblock_notes, 180 x 180 at delta 140, -100, for the tune.
+  musicblockNotes?.stop();
+  const use = OVERLAY_USES.musicblock_notes;
+  const p = player;
+  musicblockNotes = playOverlay(PIXI, 'musicblock_notes', {
+    layer: fxLayer,
+    at: () => ({ x: p.x + use.dx, y: p.y + use.dy }),
+    wh: use.wh,
+    durationMs: Math.max(1000, Number(def.durationMs) || 0),
+  });
+  if (app?.canvas) app.canvas.dataset.musicblockNotes = 'musicblock_notes';
 }
+let musicblockNotes = null;
 
 // —— Verb menu (HTML) ——
 /** A target's verb menu (engine.targetVerbs: pack verbs that proxy to a nearby target read it too). */
@@ -7046,6 +7006,9 @@ function updateSpinningWheel() {
   if (phase.endsWith('_end') && !wheel.rewardApplied) {
     const result = applySpinningWheelReward(wheel, inv, pc);
     if (result.ok) {
+      // G376 npc_spinning_wheel.js 263, 270: a musicblock or 500+ currants shows rainbow_spindoctor.
+      const r = result.reward || {};
+      if (r.kind === 'currants' ? Number(r.amount) >= 500 : /^musicblock_/.test(String(r.classTsid || ''))) playerRainbow('rainbow_spindoctor');
       showSpeechBubble(target, {
         speaker: 'Spinning Wheel',
         text: `${result.response} ${result.label}!`,
@@ -10015,6 +9978,8 @@ function grabWorldQuoin(q, shared = null) {
     if (shrine) refreshShrineTarget(shrine);
   }
   if (result.hitLimit) {
+    // G374 stats_add_quoins_today (inc_stats.js 686-699): the 150 cap has its own rainbow; Paradise none.
+    if (!paradiseRun) playerRainbow(result.dailyLimit === 150 ? 'rainbow_150coinstoday' : 'rainbow_100coinstoday');
     enqueueAward({
       kind: 'achievement',
       title: 'Quoin Limit Reached!',
@@ -10882,20 +10847,7 @@ function physics(dt) {
   for (let i = fxLayer.children.length - 1; i >= 0; i--) {
     const t = fxLayer.children[i];
     if (t === prompt || t._speechFx) continue;
-    if (t._superHarvestFx) {
-      t._life += dt;
-      const enter = clamp(t._life / 12, 0, 1);
-      const leave = clamp((t._max - t._life) / 26, 0, 1);
-      const pulse = 0.86 + enter * 0.14 + Math.sin(t._life * 0.1) * 0.025;
-      t.scale.set(pulse);
-      t.y = t._baseY - Math.min(18, t._life * 0.14);
-      t.alpha = Math.min(enter, leave);
-      if (t._life > t._max) {
-        fxLayer.removeChild(t);
-        if (!t.destroyed) t.destroy({ children: true });
-        if (app?.canvas) app.canvas.dataset.superHarvestFx = 'complete';
-      }
-    } else if (t._musicFx) {
+    if (t._musicFx) {
       t._life += dt;
       const localLife = t._life - (t._delay || 0);
       if (localLife < 0) {
@@ -11289,21 +11241,13 @@ function rememberFadedHeartInWorld() {
   closePackPopover();
   const points = samplePlatformPoints(7);
   const point = points[5] || { x: player.x + 180, y: player.y };
-  const memory = makeAnimated('phantomAppear', { animationSpeed: PHANTOM_MEMORY_ANIMATION_SPEED, scale: 0.56 });
-  memory.x = point.x;
-  memory.y = point.y + 2;
-  memory.alpha = 0.42;
-  memory.loop = true;
-  memory.eventMode = 'none';
-  memory.zIndex = 90;
-  fxLayer.addChild(memory);
+  // G389 faded_heart.js 85-93: Tiny Speck's 2011 phantom_glitch location_overlay at the spawn
+  // point, under the decos, for 15 s (js/overlays.js), not the 2012 item's appear sheet.
+  playOverlay(PIXI, 'phantom_glitch', { layer: entityLayer, at: () => ({ x: point.x, y: point.y + 2 }), durationMs: 15_000, zIndex: -10 });
+  if (app?.canvas) app.canvas.dataset.ghostMemoryArt = 'phantom_glitch';
   pushActivity(
     `The Faded Heart remembered this place. ${result.remembered}/13 new haunts found.`
   );
-  setTimeout(() => {
-    if (memory.parent) memory.parent.removeChild(memory);
-    if (!memory.destroyed) memory.destroy();
-  }, 15_000);
   const updates = applyQuestProgress(questState, 'faded_heart_remembered', 1, pc);
   if (!updates.some((update) => update.completed)) {
     showGhostVignette('You remembered the half-forgotten Glitch.');
@@ -11686,6 +11630,8 @@ function beginHogHaulCountdown() {
     countdown.hidden = false;
     countdown.classList.remove('is-go');
     countdown.textContent = 'READY?';
+    // G394: Tiny Speck's 321_countdown picture over the words (inc_race.js 200-211).
+    playCountdownArt(countdown);
   }
   keys.clear();
   player.vx = 0;
@@ -22502,6 +22448,8 @@ function performShrineDonation() {
     : result.bonus === 'huge'
       ? ' A super huge bonus!'
       : '';
+  // G376 shrines.js 460-461: the 1% (or Max Luck) bonus shows rainbow_superdonation.
+  if (result.bonus) playerRainbow('rainbow_superdonation');
   const ticket = result.gameshowTicket ? ' A Gameshow Ticket appears in your pack!' : '';
   const line = `You donated ${result.qty}× ${result.label} to ${giant.name}. +${result.xp} iMG, +${result.mood} mood, +${result.favor} favor.${bonus}${ticket}`;
   closeShrinePanel();

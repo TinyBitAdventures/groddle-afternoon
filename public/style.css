@@ -5999,6 +5999,12 @@ header.top-bar + .sub { display: none; }
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 4px rgba(0, 0, 0, 0.22);
   animation: hogHaulCardIn 320ms cubic-bezier(.2, .85, .25, 1.2);
 }
+/* G395: the games' opening logos (glitch-overlays race_logo and the rest, games_*_splash scale 1). */
+.hog-haul-ready-card > img.game-logo {
+  width: min(300px, 72%);
+  height: auto;
+  max-height: 190px;
+}
 @keyframes hogHaulCardIn {
   from { transform: translateY(18px) scale(0.94); opacity: 0; }
   to { transform: translateY(0) scale(1); opacity: 1; }
@@ -6932,6 +6938,9 @@ header.top-bar + .sub { display: none; }
 }
 .hog-haul-countdown[hidden] { display: none; }
 .hog-haul-countdown.is-go { color: #ffe260; }
+/* G394/G396: Tiny Speck's 321_countdown and game_of_crowns_throbber (js/overlays.js) show instead of the words. */
+.hog-haul-countdown.has-art,
+.hog-haul-countdown.has-throbber { color: transparent; text-shadow: none; }
 .hog-haul-result-card {
   background:
     radial-gradient(circle at 50% 15%, rgba(255, 235, 117, 0.3), transparent 50%),

@@ -42,6 +42,7 @@ import { ensureQuestOfferState } from '../quest-offers.js';
 import { getMusicblock, isMusicblock } from '../musicblocks.js';
 import { GAME_DAY_MS } from '../game-day.js';
 import { playSheetOverlay } from '../overlay-art.js?v=g311-1';
+import { showRainbow } from '../overlays.js?v=g392-1';
 import {
   CHARADES_BUFF,
   CHARADES_POTION,
@@ -394,6 +395,9 @@ function createSession(engine, client) {
     } else if (why === 'timeout') {
       engine.playSound?.('FAILED_AT_CHARADES', { volume: 0.7 });
       say(CHARADES_TEXT.timeout);
+      // G373 catalog_buffs.js 412-419: nobody guessed, show_rainbow('charades_gameover') at the drinker.
+      const p = engine.player;
+      if (p) showRainbow(engine.PIXI, 'charades_gameover', { layer: engine.entityLayer, at: () => ({ x: p.x, y: p.y }) });
     } else if (why === 'left') {
       say(CHARADES_TEXT.left);
     }

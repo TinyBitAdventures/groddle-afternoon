@@ -88,6 +88,7 @@ import { shrinePrimeBonus } from '../imagination-effects.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js';
 import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g311-1';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=g392-1';
 import {
   MP_ROOK,
   MP_ROOK_TEXT,
@@ -867,6 +868,25 @@ function spawnFeathers(engine, x, y, n = 9) {
   }
 }
 
+/**
+ * G377: Tiny Speck's rook_feathers_falling, a location_overlay for 3 s after 1 s, at the
+ * attacker's x and 220 px above (a stun, inc_rook.js 746-755) or 200 px above the shrine (a
+ * strike, shrines.js 1078-1087); its clip plays once (stop()).
+ */
+function featherFall(engine, from, dy = OVERLAY_USES.rook_feathers_falling.dy) {
+  if (!from) return null;
+  const use = OVERLAY_USES.rook_feathers_falling;
+  const x = from.x;
+  const y = from.y + dy;
+  return playOverlay(engine.PIXI, 'rook_feathers_falling', {
+    layer: frontLayer(engine) || engine.entityLayer,
+    at: () => ({ x, y }),
+    durationMs: use.durationMs,
+    delayMs: use.delayMs,
+    loop: false,
+  });
+}
+
 function updateFeathers(dtMs) {
   feathers = feathers.filter((f) => {
     if (f.destroyed) return false;
@@ -1212,9 +1232,18 @@ function startStun(engine, source = 'verb') {
     state: orbLookFor(0).state,
     zIndex: 39,
   });
+  // G390 inc_rook.js 346, 432-451 sendGlowMsg: avatar_power_up at the starter's feet for the orb window.
+  const powerUp = playOverlay(PIXI, 'avatar_power_up', {
+    layer: frontLayer(engine),
+    at: () => ({ x: p.x, y: p.y }),
+    durationMs: ROOK_SOURCE.orbWindowMs / timeScale + 1000,
+    state: OVERLAY_USES.avatar_power_up.state,
+    zIndex: 38,
+  });
   orb = {
     root,
     art,
+    powerUp,
     count,
     startedAt: now(),
     joiners: 0,
@@ -1319,6 +1348,7 @@ function updateOrb(engine, dtMs) {
 function cancelOrb(engine, why = '') {
   if (!orb) return;
   orb.art?.stop();
+  orb.powerUp?.stop();
   for (const m of orb.motes) if (!m.destroyed) m.destroy();
   if (!orb.root.destroyed) orb.root.destroy({ children: true });
   orb = null;
@@ -1347,7 +1377,7 @@ function releaseOrb(engine) {
     return;
   }
   orbLaser(engine, joiners);
-  spawnFeathers(engine, rookScreenPos().x, rookScreenPos().y);
+  featherFall(engine, engine.player);
   setHeadClip('stun', { once: true, lockMs: 1100 });
   if (ui?.badge) {
     ui.badge.stamp.text = `STUN! ${r.damage}`;
@@ -1399,6 +1429,7 @@ function endPrime(engine, announce = true) {
   if (!primed) return;
   const total = primed.damage;
   if (primed.ring && !primed.ring.destroyed) primed.ring.destroy();
+  for (const h of primed.art || []) h.stop();
   primed = null;
   closeOfferPanel();
   if (!announce) return;
@@ -1464,7 +1495,7 @@ function strike(engine, target, classTsid, count) {
   primed.strikeAt = now() + ROOK_SOURCE.strikeCooldownMs / timeScale;
   const spr = target.sprite;
   shrineLaser(engine, spr, strikeBeamFor(r.damage, emblem));
-  spawnFeathers(engine, rookScreenPos().x, rookScreenPos().y);
+  featherFall(engine, spr, -200);
   setHeadClip('stunnedHit', { once: true, lockMs: 1100 });
   const xp = grant(engine, { xp: r.damage });
   engine.pushActivity({ base: ROOK_TEXT.strikeHit(r.damage, xp), effects: { xp } });
@@ -1555,6 +1586,26 @@ function updatePrimeFx(engine) {
   }
   const spr = primed.target.sprite;
   if (!spr || spr.destroyed) return;
+  // G382 shrines.js 795-817, 907-924: shrine_power_up at the shrine (x - 40, y + 10, 1 s late)
+  // and click_to_donate on its top while it is primed (the source shows that one to the others;
+  // solo, the primer strikes).
+  if (!primed.art) {
+    const pu = OVERLAY_USES.shrine_power_up;
+    primed.art = [
+      playOverlay(engine.PIXI, 'shrine_power_up', {
+        layer: engine.fxLayer,
+        at: () => ({ x: spr.x + pu.dx, y: spr.y + pu.dy }),
+        durationMs: Math.max(1000, primed.until - now()),
+        delayMs: pu.delayMs,
+        state: pu.state,
+      }),
+      playOverlay(engine.PIXI, 'click_to_donate', {
+        layer: engine.fxLayer,
+        at: () => ({ x: spr.x, y: displayTopOf(spr) }),
+        durationMs: 0,
+      }),
+    ];
+  }
   if (!primed.ring || primed.ring.destroyed) {
     primed.ring = new engine.PIXI.Graphics();
     primed.ring.eventMode = 'none';
@@ -1563,14 +1614,10 @@ function updatePrimeFx(engine) {
   const t = now();
   const g = primed.ring;
   g.clear();
-  const k = 1 + Math.sin(t / 180) * 0.08;
-  g.ellipse(spr.x, spr.y - 6, 90 * k, 18 * k).fill({ color: 0xfff2a0, alpha: 0.18 });
-  g.ellipse(spr.x, spr.y - 6, 70 * k, 13 * k).stroke({ width: 3, color: 0xffe066, alpha: 0.8 });
-  // The bobbing "click to donate" arrow over the bowl.
-  const ay = spr.y - 175 + Math.sin(t / 220) * 8;
-  g.poly([spr.x - 16, ay - 18, spr.x + 16, ay - 18, spr.x + 16, ay, spr.x + 26, ay, spr.x, ay + 22, spr.x - 26, ay, spr.x - 16, ay]).fill({ color: 0xffd23c, alpha: 0.95 }).stroke({ width: 2, color: 0x9a6b00, alpha: 1 });
+  // The time left, over the click_to_donate arrow.
+  const ay = displayTopOf(spr) - 150;
   const left = Math.max(0, primed.until - t);
-  g.arc(spr.x, ay - 44, 12, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * left) / ROOK_SOURCE.primeMs).stroke({ width: 4, color: 0xffe066, alpha: 0.95 });
+  g.arc(spr.x, ay, 12, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * left) / ROOK_SOURCE.primeMs).stroke({ width: 4, color: 0xffe066, alpha: 0.95 });
 }
 
 // ---------------------------------------------------------------------------
@@ -1761,6 +1808,7 @@ function mpLeaveStreet(engine) {
   mp.street = '';
   mp.synced = '';
   mp.snapped = '';
+  for (const h of primed?.art || []) h.stop();
   primed = null;
 }
 
@@ -1789,12 +1837,16 @@ function mpSyncPrimed(engine) {
   if (!p || !shrine) {
     if (primed?.mp) {
       if (primed.ring && !primed.ring.destroyed) primed.ring.destroy();
+      for (const h of primed.art || []) h.stop();
       primed = null;
       closeOfferPanel();
     }
     return;
   }
-  if (!primed?.mp || primed.target !== shrine) primed = { mp: true, target: shrine, until: p.until, damage: 0, strikeAt: 0, ring: primed?.ring };
+  if (!primed?.mp || primed.target !== shrine) {
+    if (primed?.target !== shrine) for (const h of primed?.art || []) h.stop();
+    primed = { mp: true, target: shrine, until: p.until, damage: 0, strikeAt: 0, ring: primed?.ring, art: primed?.target === shrine ? primed.art : null };
+  }
   primed.until = p.until;
   primed.by = p.by;
 }
@@ -1926,7 +1978,7 @@ function mpStunFx(engine, a, ev) {
   const at = mpPosOf(engine, ev.by) || engine.player;
   const damage = Number(ev.damage) || 0;
   orbLaser(engine, Number(ev.joiners) || 0, at);
-  spawnFeathers(engine, rookScreenPos().x, rookScreenPos().y);
+  featherFall(engine, at);
   setHeadClip('stun', { once: true, lockMs: 1100 });
   if (ui?.badge) {
     ui.badge.stamp.text = `STUN! ${damage}`;

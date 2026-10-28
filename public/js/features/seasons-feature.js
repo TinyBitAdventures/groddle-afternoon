@@ -96,6 +96,7 @@ import {
   yetiQuote,
 } from '../seasons.js';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
+import { playOverlay } from '../overlays.js?v=g392-1';
 
 export const SEASONS_FEATURE_ID = 'seasons';
 const LANTERN_GROUP = 'seasons:lantern';
@@ -118,7 +119,7 @@ let fx = [];
 let snow = null;
 let chip = null;
 let carving = null; // { until, step, face?, toolSprite }
-let cracker = null; // { waitingSince, sprite }
+let cracker = null; // { waitingSince, art, helper, popAt }
 let pendingBoosts = []; // { at, candy, recipient }
 let questOfferAt = 0;
 let autoplayAt = 0;
@@ -823,23 +824,31 @@ function syncNotes(engine) {
   }
 }
 
+const CRACKER_PULL_MS = 3167; // glitchmas_cracker.js 349 apiSetTimerX('crackerPull', 3167)
+
 function pullCracker(engine) {
   if (cracker) return say(engine, SOURCE_LINES.crackerAlready, false), true;
   if (countItem(engine.inv, 'glitchmas_cracker') < 1) return true;
   const helper = nearestLover(engine, CRACKER.helpRange);
   cracker = { waitingSince: Date.now(), sprite: null };
-  const spr = new engine.PIXI.Sprite(textureFromUrl('assets/sprites/seasons/glitchmas_cracker_world.png'));
-  spr.anchor.set(0.5);
-  spr.zIndex = 40;
-  engine.fxLayer?.addChild(spr);
-  cracker.sprite = spr;
+  // G381 glitchmas_cracker.js 178-215: Tiny Speck's glitchmas_cracker pc_overlay, state waiting,
+  // 140 px over the puller until someone grabs it (js/overlays.js).
+  const p = engine.player;
+  cracker.art = playOverlay(engine.PIXI, 'glitchmas_cracker', {
+    layer: engine.fxLayer || engine.entityLayer,
+    at: () => ({ x: p?.x || 0, y: (p?.y || 0) - 140 }),
+    durationMs: 0,
+    state: 'waiting',
+    zIndex: 40,
+  });
+  engine.setData?.('crackerArt', 'waiting');
   if (helper) return popCracker(engine, helper), true;
   say(engine, SOURCE_LINES.crackerWait);
   return true;
 }
 
 function stopWaiting(engine) {
-  if (cracker?.sprite && !cracker.sprite.destroyed) cracker.sprite.destroy();
+  cracker?.art?.stop();
   cracker = null;
   say(engine, SOURCE_LINES.crackerAway);
   return true;
@@ -848,25 +857,17 @@ function stopWaiting(engine) {
 function popCracker(engine, helper) {
   if (!cracker) return;
   cracker.helper = helper;
-  cracker.popAt = Date.now() + (engine.param?.('seasonautoplay') ? 500 : 1100);
+  // onOverlayClicked 330-350: the grab state, GLITCHMAS_CRACKER, and the pop 3167 ms later (the grab
+  // clip's 96 frames at 30 fps).
+  cracker.art?.setState('grab');
+  engine.setData?.('crackerArt', 'grab');
+  engine.playSound?.('GLITCHMAS_CRACKER', { volume: 0.7 });
+  cracker.popAt = Date.now() + (engine.param?.('seasonautoplay') ? 500 : CRACKER_PULL_MS);
   engine.say?.(helper, 'One, two, three... PULL!', 1400);
 }
 
 function tickCracker(engine, now) {
   if (!cracker) return;
-  const p = engine.player;
-  const spr = cracker.sprite;
-  if (spr && !spr.destroyed && p) {
-    const h = cracker.helper?.sprite;
-    if (h && !h.destroyed) {
-      spr.x = (p.x + h.x) / 2;
-      spr.y = Math.min(p.y, h.y) - 70 + Math.sin(now / 60) * 3;
-      spr.rotation = Math.sin(now / 45) * 0.15;
-    } else {
-      spr.x = p.x;
-      spr.y = (p.y || 0) - 140;
-    }
-  }
   if (!cracker.helper) {
     const helper = nearestLover(engine, 150);
     if (helper) popCracker(engine, helper);
@@ -874,10 +875,9 @@ function tickCracker(engine, now) {
   }
   if (now < cracker.popAt) return;
   const helper = cracker.helper;
-  if (spr && !spr.destroyed) spr.destroy();
+  cracker.art?.stop();
   cracker = null;
   if (!removeItem(engine.inv, 'glitchmas_cracker', 1)) return;
-  engine.playSound?.('GLITCHMAS_CRACKER', { volume: 0.7 });
   burst(engine, 0xff5a5a, 22);
   burst(engine, 0x7ad37a, 12);
   // crackerPull: the helper gets the joke or fun fact (a critter cannot read, so it hands it to you); the owner gets the toy.
@@ -1331,8 +1331,8 @@ export const seasonsFeature = {
     clearSnow();
     for (const f of fx) if (!f.g.destroyed) f.g.destroy();
     fx = [];
-    if (cracker?.sprite && !cracker.sprite.destroyed) cracker.sprite.destroy();
-    if (cracker) cracker.sprite = null;
+    cracker?.art?.stop();
+    if (cracker) cracker.art = null;
     if (carving?.toolSprite && !carving.toolSprite.destroyed) carving.toolSprite.destroy();
     if (carving) carving.toolSprite = null;
     spawnedFor = null;

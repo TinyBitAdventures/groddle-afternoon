@@ -31,6 +31,7 @@
  */
 
 import { crowdScaleX } from '../avatar-anims.js';
+import { playCountdownArt } from '../overlays.js?v=g392-1';
 import {
   RACES,
   RACE_ACHIEVEMENTS,
@@ -88,8 +89,8 @@ import { runStreetTransition } from '../screen-fx.js?v=g378-1';
 import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-2';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
 import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=g311-1';
-import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=g377-1';
-import { startHogHaulMp } from './hog-haul-mp-feature.js?v=g334-hog-2';
+import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=g392-1';
+import { startHogHaulMp } from './hog-haul-mp-feature.js?v=g392-1';
 import { textureFromUrl } from '../textures.js';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=desk2-1';
 import { gainMetabolic } from '../metabolics.js';
@@ -108,6 +109,7 @@ import {
 } from '../races-mp.js?v=mp4-1';
 
 const RACE_ICON_DIR = 'assets/sprites/races/';
+const GAME_LOGO_DIR = 'assets/sprites/overlays/';
 const RIVAL_SCALE = 1.35 * 0.4;
 
 let record = normalizeRaceRecord({});
@@ -771,8 +773,12 @@ function placeRival(x, y, mode, facing) {
 
 function showReady(engine) {
   const race = RACES[run.raceId];
-  const icon = `${RACE_ICON_DIR}${race.ticket}.png`;
-  hud.ready.querySelector('[data-race-ready-icon]').src = icon;
+  // G395 games_race_splash / games_quoin_grab_splash (inc_games.js 1279-1290, 1430-1440): the
+  // splash graphic is Tiny Speck's race_logo, or grabemgood_logo for Grab 'Em Good.
+  const icon = `${GAME_LOGO_DIR}${run.kind === 'quoins' ? 'grabemgood_logo' : 'race_logo'}@1.5x.webp`;
+  const img = hud.ready.querySelector('[data-race-ready-icon]');
+  img.src = icon;
+  img.classList.add('game-logo');
   hud.ready.querySelector('[data-race-ready-kicker]').textContent = race.title;
   // games_quoin_grab_splash has its own line; the races share games_race_splash.
   hud.ready.querySelector('[data-race-ready-desc]').textContent = race.splash || RACE_SPLASH_TEXT;
@@ -803,6 +809,8 @@ function readyUp(engine) {
     hud.countdown.classList.remove('race-soon');
     hud.countdown.textContent = 'READY?';
     engine.playSound('COUNT_DOWN', { volume: 0.55 });
+    // G394: Tiny Speck's 321_countdown (shared_instance_manager.js 672-683), the words kept for screen readers.
+    playCountdownArt(hud.countdown);
     engine.setData('raceStarting', 'countdown');
     publish(engine);
   }, RACE_STARTING_SOON_MS);
@@ -1368,6 +1376,7 @@ function mpAttach(engine) {
     hud.countdown.classList.remove('race-soon');
     hud.countdown.textContent = 'READY?';
     engine.playSound('COUNT_DOWN', { volume: 0.55 });
+    playCountdownArt(hud.countdown);
     engine.setData('raceStarting', 'countdown');
     mpNote(engine, 'countdown');
     publish(engine);

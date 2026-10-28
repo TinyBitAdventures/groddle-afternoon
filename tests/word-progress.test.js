@@ -241,7 +241,7 @@ describe('in the game', () => {
     for (const html of pages) {
       assert.match(html, /<div id="action-progress" class="word-progress" role="status" aria-live="polite" hidden>/);
       assert.match(html, /<button type="button" class="word-progress-cancel" data-word-cancel aria-label="Cancel" title="Cancel" hidden><\/button>/);
-      assert.match(html, /style\.css\?v=[^"]*&amp;wordprog=g387-1"/);
+      assert.match(html, /style\.css\?v=[^"]*&amp;wordprog=g387-1(?:&amp;[^"]*)?"/);
     }
   });
 

@@ -21,6 +21,7 @@
  */
 
 import { crowdScaleX } from '../avatar-anims.js';
+import { OVERLAY_USES, playCountdownArt, playWindowOverlay } from '../overlays.js?v=g392-1';
 import {
   CROWNS_ID,
   CROWNS_LADDERS,
@@ -143,7 +144,7 @@ function buildChrome(engine) {
   const ready = el('div', { id: 'crowns-ready', class: 'hog-haul-screen', hidden: true, role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'crowns-ready-title' }, `
     <div class="hog-haul-screen-shade"></div>
     <div class="hog-haul-ready-card">
-      <img src="${CROWN_DIR}game_crown_unlocked.png" alt="" />
+      <img class="game-logo" src="assets/sprites/overlays/game_of_crowns_logo@1.5x.webp" alt="" />
       <p>${CROWNS_TITLE}</p>
       <h2 id="crowns-ready-title">Hold the crown for 60 seconds to win</h2>
       <ul class="crowns-rules">${CROWNS_TEXT.rules.map((r) => `<li>${r}</li>`).join('')}</ul><br />
@@ -257,6 +258,8 @@ function readyUp(engine) {
   hud.countdown.hidden = false;
   hud.countdown.textContent = 'READY?';
   engine.playSound('COUNT_DOWN', { volume: 0.55 });
+  // G394: Tiny Speck's 321_countdown (shared_instance_manager.js 672-683), the words kept for screen readers.
+  playCountdownArt(hud.countdown);
 }
 
 function posOf(id, engine) {
@@ -566,8 +569,64 @@ function playAgain(engine) {
   engine.enter(CROWNS_STREET, { spawnX: START_POINTS[0].x, spawnY: START_POINTS[0].y, bypassFeatureGates: true, useTransition: false });
 }
 
+/**
+ * G396 games_it_game_start_scores (inc_games.js 872-893): who holds the crown, as Tiny Speck's
+ * vp_overlay indicators: crown_game_indicator_you 140 wide at x 70 px, y 88% when you do,
+ * crown_game_indicator_someone_else 100 wide at x 94%, y 91% when someone else does (duration 0,
+ * swapped at each change, dismissed at the end).
+ */
+const CROWN_INDICATORS = Object.freeze({
+  you: { key: 'crown_game_indicator_you', ...OVERLAY_USES.crown_game_indicator_you },
+  other: { key: 'crown_game_indicator_someone_else', ...OVERLAY_USES.crown_game_indicator_someone_else },
+});
+let crownIndicator = null; // { kind, handle }
+
+function syncCrownIndicator(kind) {
+  if ((crownIndicator?.kind || null) === (kind || null) && !crownIndicator?.handle?.cancelled) return;
+  crownIndicator?.handle?.stop();
+  crownIndicator = null;
+  const ind = CROWN_INDICATORS[kind];
+  if (!ind) return;
+  const handle = playWindowOverlay(ind.key, {
+    wh: ind.wh,
+    durationMs: 0,
+    place: ind.xPx != null
+      ? (meta, r) => windowPlacementAt(meta, r, ind)
+      : null,
+    x: ind.x,
+    y: ind.y,
+  });
+  crownIndicator = { kind, handle };
+}
+
+/** x in source px from the view's left (scaled with the view), y a fraction. */
+function windowPlacementAt(meta, r, ind) {
+  const [sw, sh] = meta.stage;
+  const [bx, by, bw, bh] = meta.box;
+  const scale = (ind.wh / Math.max(sw, sh)) * (r.scale || 1);
+  const left = ind.xPx * (r.scale || 1) - (sw * scale) / 2;
+  const top = r.height * ind.y - (sh * scale) / 2;
+  return { left: left + bx * scale, top: top + by * scale, width: bw * scale, height: bh * scale };
+}
+
+/** G396 dismissOverlaysAndStart (shared_instance_manager.js 247-257): game_of_crowns_throbber, 200 wide, centred, while it waits. */
+let crownsThrobber = null;
+
+function syncCrownsThrobber(waiting) {
+  if (waiting && (!crownsThrobber || crownsThrobber.cancelled)) {
+    const t = OVERLAY_USES.game_of_crowns_throbber;
+    crownsThrobber = playWindowOverlay('game_of_crowns_throbber', { wh: t.wh, x: t.x, y: t.y, durationMs: 0 });
+    hud?.countdown.classList.add('has-throbber');
+  } else if (!waiting && crownsThrobber) {
+    crownsThrobber.stop();
+    crownsThrobber = null;
+    hud?.countdown.classList.remove('has-throbber');
+  }
+}
+
 function renderHud(engine, force = false) {
   if (!hud || !game) return;
+  syncCrownIndicator(game.status === 'running' && game.itId ? (game.itId === 'you' ? 'you' : 'other') : null);
   const now = Date.now();
   if (!force && now - lastHud < 150) return;
   lastHud = now;
@@ -899,6 +958,7 @@ function mpAttach(engine) {
       hud.countdown.hidden = false;
       hud.countdown.classList.remove('is-go');
       hud.countdown.textContent = 'READY?';
+      playCountdownArt(hud.countdown);
     }
     engine.playSound('COUNT_DOWN', { volume: 0.55 });
     mpNote(engine, 'countdown');
@@ -1125,6 +1185,8 @@ function mpTick(dtMs, now, engine) {
 
 function mpRenderHud(engine, force = false) {
   if (!hud || !mp) return;
+  syncCrownIndicator(mp.status === 'running' && mp.state?.it ? (mp.state.it === mp.myId ? 'you' : 'other') : null);
+  syncCrownsThrobber(mp.status === 'waiting' && !hud.countdown.hidden && hud.countdown.textContent === CROWNS_MP_TEXT.mustWait);
   const now = Date.now();
   if (!force && now - lastHud < 150) return;
   lastHud = now;

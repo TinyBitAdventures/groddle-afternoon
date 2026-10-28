@@ -34,10 +34,10 @@ import {
 } from '../hog-haul-mp.js?v=g334-hog-1';
 import { HOG_HAUL_SPLASH, splashFor } from '../game-splash.js?v=g311-1';
 import { grantMoodXp } from '../mood-xp.js';
+import { playCountdownArt } from '../overlays.js?v=g392-1';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
 
 const HOLD = 'hog-haul-mp';
-const ICON = 'assets/sprites/races/race_ticket_hogtie_piggy__x1_iconic_png_1354836452.png';
 const BAIT_ICON = 'assets/sprites/races/pig_bait__x1_iconic_png_1354830334.png';
 const PIG_ICON = 'assets/sprites/races/hogtied_piggy__x1_1_png_1354830331.png';
 const PIGGY_SCALE = 1.35 * 0.72; // game.js ENTITY_SCALE.piggy
@@ -82,7 +82,7 @@ function buildChrome() {
   const ready = el('div', { id: 'hog-mp-ready', class: 'hog-haul-screen', hidden: true, role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'hog-mp-ready-title' }, `
     <div class="hog-haul-screen-shade"></div>
     <div class="hog-haul-ready-card">
-      <img src="${ICON}" alt="" />
+      <img class="game-logo" src="assets/sprites/overlays/thegreathoghaul_logo@1.5x.webp" alt="" />
       <p>${HOG_MP_TEXT.title}</p>
       <h2 id="hog-mp-ready-title" data-hog-mp-ready-text>${HOG_MP_TEXT.splash}</h2>
       <div class="hog-haul-loop" aria-label="Race steps">${steps}</div>
@@ -424,6 +424,8 @@ function attach(engine) {
     hud.countdown.hidden = false;
     hud.countdown.textContent = 'READY?';
     engine.playSound?.('COUNT_DOWN', { volume: 0.55 });
+    // G394: Tiny Speck's 321_countdown (shared_instance_manager.js 672-683).
+    playCountdownArt(hud.countdown);
     note(engine, 'countdown');
     publish(engine);
   });

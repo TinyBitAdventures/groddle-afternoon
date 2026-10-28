@@ -70,6 +70,7 @@ import { energyMax, metabolicGain, moodMax, loseEnergy, loseMood } from '../meta
 import { levitationCards } from '../imagination-effects.js';
 import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js';
 import { sourceFromUrl } from '../textures.js';
+import { rainbowSound, showRainbow } from '../overlays.js?v=g392-1';
 import { moodScaledXp } from '../mood-xp.js';
 import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
 import { getSkillPackageOverride } from '../skill-packages.js';
@@ -295,36 +296,16 @@ function destroyMeditationFx(engine) {
   fx = null;
 }
 
+/**
+ * G375: a full meditation's show_rainbow('rainbow_maxrelax') (focusing_orb.js 781, 938, 1142, 1302):
+ * Tiny Speck's 400 x 400 arc at the avatar for 4 s, with RAINBOW_MAXRELAX (player.js 3044).
+ */
 function showMaxRelax(engine) {
-  const { PIXI } = engine;
   const player = engine.player;
-  const h = avatarHeight(engine);
-  const g = new PIXI.Graphics();
-  const colors = [0xff6b6b, 0xffa94d, 0xffe066, 0x69db7c, 0x4dabf7, 0xb197fc];
-  colors.forEach((color, i) => {
-    const r = 70 - i * 6;
-    g.moveTo(-r, 0);
-    g.arc(0, 0, r, Math.PI, Math.PI * 2);
-    g.stroke({ width: 5, color: color, alpha: 0.9 });
-  });
-  g.position.set(player.x, player.y - h + 6);
-  g.zIndex = 41;
-  engine.fxLayer.addChild(g);
-  engine.floatText(player.x, player.y - h - 82, 'MAX RELAX!', 0xffd85a);
-  const born = Date.now();
-  const step = () => {
-    const life = (Date.now() - born) / 2200;
-    if (g.destroyed) return;
-    if (life >= 1) {
-      g.parent?.removeChild(g);
-      g.destroy();
-      return;
-    }
-    g.alpha = life < 0.2 ? life / 0.2 : 1 - (life - 0.2) / 0.8;
-    g.scale.set(0.9 + life * 0.15);
-    requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
+  if (!player) return;
+  showRainbow(engine.PIXI, 'rainbow_maxrelax', { layer: engine.fxLayer || engine.entityLayer, at: () => ({ x: player.x, y: player.y }) });
+  engine.playSound?.(rainbowSound('rainbow_maxrelax'), { volume: 0.5 });
+  engine.setData?.('rainbow', 'rainbow_maxrelax');
 }
 
 function drawLevitationFx(engine, now) {

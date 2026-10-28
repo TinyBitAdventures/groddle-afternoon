@@ -98,7 +98,8 @@ import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { DEAD_TRANT_CLASSES } from '../patches.js';
 import { hellFeature } from './hell-feature.js?v=hell-16';
 import { grantMoodXp } from '../mood-xp.js';
-import { playSheetOverlay } from '../overlay-art.js?v=g311-1';
+import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=g311-1';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=g392-1';
 import {
   POWDER_MP,
   POWDER_MP_TEXT,
@@ -182,6 +183,28 @@ function notify(engine, classTsid, verb) {
 }
 
 /** powder_base doVerb after a successful onUse: use_sound, one charge, notifyVerb. */
+/**
+ * G380: the powder burst on each tree (fertilidust.js 283-294: target_effect_powder_extreme, 300 px,
+ * delta 25 / 200 from the stack's top, 5.4 s after 2 s; fertilidust_lite.js 279-290:
+ * target_effect_powder_mild, delta 75 / 200, 4.3 s).
+ */
+function powderBurst(engine, key, targets) {
+  const use = OVERLAY_USES[key];
+  for (const t of targets) {
+    const spr = t?.sprite;
+    if (!spr || spr.destroyed) continue;
+    playOverlay(engine.PIXI, key, {
+      layer: engine.fxLayer || engine.entityLayer,
+      at: () => ({ x: spr.x + use.dx, y: displayTopOf(spr) + use.dy }),
+      wh: use.wh,
+      durationMs: use.durationMs,
+      delayMs: use.delayMs,
+      loop: false,
+    });
+  }
+  engine.setData?.('powderBurst', `${key}:${targets.length}`);
+}
+
 function finishUse(engine, classTsid) {
   const def = POWDERS[classTsid];
   if (def.sound) engine.playSound?.(def.sound, { volume: 0.6 });
@@ -318,6 +341,7 @@ const RUNNERS = {
       engine.updateHud?.();
     }
     if (trees.length) later(3000, () => fertilize(engine, trees));
+    powderBurst(engine, 'target_effect_powder_extreme', trees);
     if (out.sound) later(2000, () => engine.playSound?.(out.sound, { volume: 0.6 }));
     for (const row of out.achievementCounters) engine.achievement(row.counter, row.amount);
     // fertilidust.js:352: the Feat counts only when living trees took the dust.
@@ -336,6 +360,7 @@ const RUNNERS = {
     say(engine, out.message, out.ok);
     if (!out.ok) return 'no-tree';
     later(3000, () => fertilize(engine, [out.tree.target]));
+    powderBurst(engine, 'target_effect_powder_mild', [out.tree.target]);
     later(2000, () => engine.playSound?.(out.sound, { volume: 0.6 }));
     finishUse(engine, classTsid);
     return `tree:${out.tree.classId}`;

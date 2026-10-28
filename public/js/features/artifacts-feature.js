@@ -38,7 +38,7 @@
 import { addItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { DROP_ITEMS, rollDropTable } from '../drop-tables.js';
 import { canUseTool, useToolCondition, TOOL_CONDITION_CATALOG } from '../tools.js?v=woodcutting-test-3';
-import { textureFromUrl } from '../textures.js';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=g392-1';
 import {
   ALL_ARTIFACT_CLASSES,
   ARRIVE_DELAY_MS,
@@ -234,40 +234,31 @@ function tickAssembly(engine, now) {
 
 /* ------------------------------------------------------------------ crack */
 
+/**
+ * G379 petrified_rock_small.js 174-199 (and medium, large): Tiny Speck's petrified_rock_open_overlay,
+ * a pc_overlay at 1:1, delta_y -115, locking, for the 2 s crack.
+ */
 function crackFx(engine, rock) {
-  const { PIXI } = engine;
   const p = engine.player;
-  if (!PIXI || !p || !engine.fxLayer) return null;
-  const root = new PIXI.Container();
-  root.zIndex = 9000;
-  root.eventMode = 'none';
-  const icon = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[rock]?.icon || `assets/sprites/icons/${rock}.png`));
-  icon.anchor.set(0.5, 0.5);
-  root.addChild(icon);
-  engine.fxLayer.addChild(root);
-  return { root, icon, age: 0 };
+  if (!engine.PIXI || !p || !engine.fxLayer) return null;
+  const use = OVERLAY_USES.petrified_rock_open_overlay;
+  const handle = playOverlay(engine.PIXI, 'petrified_rock_open_overlay', {
+    layer: engine.fxLayer,
+    at: () => ({ x: p.x + use.dx, y: p.y + use.dy }),
+    durationMs: Math.max(use.durationMs, CRACK_MS),
+    loop: false,
+    zIndex: 9000,
+  });
+  engine.setData?.('artifactCrackArt', `petrified_rock_open_overlay:${rock}`);
+  return { handle };
 }
 
-function tickCrackFx(fx, engine, dtMs) {
-  if (!fx || fx.root.destroyed) return;
-  fx.age += dtMs;
-  const p = engine.player;
-  const k = Math.min(1, fx.age / CRACK_MS);
-  if (p) {
-    fx.root.x = p.x;
-    fx.root.y = (p.y || 0) - 115;
-  }
-  // A shake that grows, then the rock swells and fades as it splits.
-  const shake = Math.sin(fx.age / 28) * 5 * Math.min(1, k * 1.6);
-  fx.icon.x = shake;
-  fx.icon.rotation = shake * 0.02;
-  const pop = k > 0.82 ? (k - 0.82) / 0.18 : 0;
-  fx.icon.scale.set(1.5 + pop * 0.6);
-  fx.root.alpha = 1 - pop;
+function tickCrackFx() {
+  // The overlay runs itself (js/overlays.js).
 }
 
 function stopCrackFx() {
-  if (crack?.fx?.root && !crack.fx.root.destroyed) crack.fx.root.destroy({ children: true });
+  crack?.fx?.handle?.stop();
 }
 
 function startCrack(engine, rock, tool) {

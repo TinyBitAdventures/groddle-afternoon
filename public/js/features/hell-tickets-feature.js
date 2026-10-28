@@ -39,6 +39,7 @@
  */
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
+import { OVERLAY_USES, playWindowOverlay } from '../overlays.js?v=g392-1';
 import { acceptOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js';
 import { getQuestCatalog } from '../content-catalogs.js';
 import { parseQuestConversation } from '../quests.js';
@@ -369,6 +370,11 @@ export const hellTicketsFeature = {
     if (holeHintDue(qs, state, { inHellOne: isInHellOne(engine.streetTsid) })) {
       state = { ...state, holeHinted: true };
       engine.toast(HELL_HOLE_ACCEPTED_TEXT, 4500);
+      // G391 hell_hole.js 104-113: Tiny Speck's right_arrow under the hint, 75 px, x 50%, top_y 15%,
+      // no duration (it goes at the next street change).
+      const arrow = OVERLAY_USES.right_arrow;
+      playWindowOverlay('right_arrow', { wh: arrow.wh, x: arrow.x, topY: arrow.topY, durationMs: 0 });
+      engine.setData?.('hellHoleArrow', 'right_arrow');
       engine.pushActivity(HELL_HOLE_ACCEPTED_TEXT);
       engine.save();
     }

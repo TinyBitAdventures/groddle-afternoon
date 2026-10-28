@@ -114,10 +114,9 @@ describe('seasonal calendar', () => {
       assert.deepEqual([s.fw, s.fh, s.cols, s.frames, s.label], [...size[n], 19, 74, 'talk'], path);
       assert.match(HIRES_SPRITES.get(path) || '', /@3x\.webp$/, path);
     }
-    for (const path of ['assets/sprites/seasons/glitchmas_cracker_world.png']) {
-      assert.ok(src.includes(`'${path}'`), path);
-      assert.match(HIRES_SPRITES.get(path) || '', /@3x\.webp$/, path);
-    }
+    // G381: the pulled cracker is Tiny Speck's glitchmas_cracker overlay (js/overlays.js), not the item's world sprite.
+    assert.match(src, /playOverlay\(engine\.PIXI, 'glitchmas_cracker'/);
+    assert.doesNotMatch(src, /glitchmas_cracker_world\.png/);
     // No eggs in the grass: the source's eggs drop from Egg Plants.
     assert.doesNotMatch(src, /egghunt_egg_4_world|spawnEgg|eggForStreet|seasonegg/);
     // Placed carved pumpkins draw their pack icon.

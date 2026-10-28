@@ -485,7 +485,7 @@ describe('item detector: artifact and necklace assembly (G187)', () => {
     cube: { artifact: 'artifact_cube', pieces: ['cube_piece1', 'cube_piece2'] },
   };
   const NECK = { bead_x: { required: 17, produces: 'necklace_x' }, bead_y: { required: 19, produces: 'necklace_y' } };
-  const GAME = "import { artifactsFeature } from './js/features/artifacts-feature.js?v=g300-1';\n";
+  const GAME = "import { artifactsFeature } from './js/features/artifacts-feature.js?v=g392-1';\n";
   const FEATURE = "import { addItem } from '../inventory.js';\nimport { assemblyFor, consumeForAssembly } from '../artifacts.js';\n"
     + "function assemble(engine, plan) {\n  if (!consumeForAssembly(engine.inv, plan)) return false;\n  addItem(engine.inv, plan.artifact, 1);\n}\nexport const artifactsFeature = { assemble };\n";
   const sitesOf = (files) => assemblySites(buildIndex(files.map(([path, text]) => ({ path: `/fixture/public/${path}`, text })), { root: '/fixture/public' }));

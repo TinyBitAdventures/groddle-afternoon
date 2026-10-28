@@ -27,7 +27,7 @@ import {
   targetSide,
   underTheInfluence,
 } from '../public/js/player-verbs-mp.js?v=verbs-1';
-import { playerVerbsMpFeature } from '../public/js/features/player-verbs-mp-feature.js?v=verbs-1';
+import { playerVerbsMpFeature } from '../public/js/features/player-verbs-mp-feature.js?v=g392-1';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js';
 import { createQuestState } from '../public/js/quests.js';
 import { pendingQuestOffers, acceptOffer } from '../public/js/quest-offers.js';
@@ -121,7 +121,7 @@ describe('player verbs: solo is untouched', () => {
 
   it('is registered before street-objects', () => {
     const index = readFileSync(join(PUBLIC, 'js/features/index.js'), 'utf8');
-    const a = index.indexOf("from './player-verbs-mp-feature.js?v=verbs-1'");
+    const a = index.indexOf("from './player-verbs-mp-feature.js?v=g392-1'");
     const b = index.indexOf("from './street-objects-feature.js");
     assert.ok(a > 0 && a < b, 'player-verbs-mp before street-objects');
   });

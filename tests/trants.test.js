@@ -310,7 +310,8 @@ describe('trant harvest (GSJS-extracted)', () => {
     assert.match(content, /durationMs:\s*arbor\.durationMs/);
     assert.match(game, /playTrantHarvestAnimation\(target, durationMs\)/);
     assert.match(game, /function showSuperHarvestFx/);
-    assert.match(game, /SUPER HARVEST!/);
+    // G375: Tiny Speck's rainbow_superharvest arc (js/overlays.js), not a drawn one.
+    assert.match(game, /playerRainbow\('rainbow_superharvest'/);
     assert.match(game, /data(?:set)?\.superHarvestFx|dataset\.superHarvestFx/);
     assert.match(game, /bootParams\.has\('harvestdemo'\)/);
     assert.match(game, /harvestrank/);

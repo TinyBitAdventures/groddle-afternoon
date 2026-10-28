@@ -43,6 +43,7 @@
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { TOOL_CONDITION_CATALOG, getToolCondition, setToolRemaining } from '../tools.js?v=woodcutting-test-3';
 import { saveStore } from '../save-store.js?v=mp2-2';
+import { playOverlay } from '../overlays.js?v=g392-1';
 import {
   APPLIED_KEEP,
   TRADE_SLOTS,
@@ -593,9 +594,29 @@ function createSession(engine, client) {
     render();
   }
 
+  // G383 inc_trading.js 188-205, 247: the other trader wears Tiny Speck's trading picture, 70 px,
+  // 110 px over the head, until the trade ends (apiSendAnnouncementX: everyone but the wearer sees it).
+  let tradingBubble = null;
+  function showTradingBubble(withId) {
+    tradingBubble?.stop();
+    let last = null;
+    tradingBubble = engine.PIXI ? playOverlay(engine.PIXI, 'trading', {
+      layer: engine.fxLayer || engine.entityLayer,
+      wh: 70,
+      durationMs: 0,
+      at: () => {
+        const p = (client.players || []).find((x) => Number(x.id) === Number(withId));
+        if (p) last = { x: Number(p.x) || 0, y: (Number(p.y) || 0) - 110 };
+        return last || { x: -1e5, y: -1e5 };
+      },
+    }) : null;
+  }
+
   function close() {
     if (sendTimer) clearTimeout(sendTimer);
     sendTimer = null;
+    tradingBubble?.stop();
+    tradingBubble = null;
     open = null;
     render();
   }
@@ -760,6 +781,7 @@ function createSession(engine, client) {
       };
       line(TRADE_TEXT.begun(withP.name));
       engine.playSound?.('UI_PANEL_OPEN');
+      showTradingBubble(withP.id);
     }
     loadTable();
     render();
