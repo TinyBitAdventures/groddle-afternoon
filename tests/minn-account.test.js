@@ -412,7 +412,7 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
     assert.equal(mail.bad[1], 'From: Groddle Afternoon <noreply@groddle.example>', 'an option that is not an address falls back');
     assert.match(mail.html, /Hi <strong>Zz &lt;b&gt;Bold&lt;\/b&gt; &amp; Co<\/strong>,/, 'the character name is escaped');
     assert.match(mail.html, /href="https:\/\/groddle\.example\/play\/online\/#reset=AbC123&amp;login=player-0123abcdef"/);
-    assert.match(mail.html, /src="https:\/\/groddle\.example\/apple-touch-icon\.png"/, 'the quoin from the site, absolute');
+    assert.match(mail.html, /src="https:\/\/groddle\.example\/apple-touch-icon\.png"/, 'the mark from the site, absolute');
     assert.match(mail.html, /background:#dcefc9/, 'the site\'s moss background');
     assert.match(mail.html, /background:#e58b3f/, 'the orange Play button');
     const outsideLink = mail.html.replaceAll(/#reset=[^"<]+/g, '');

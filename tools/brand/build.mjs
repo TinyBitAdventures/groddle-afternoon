@@ -8,16 +8,25 @@
  * the mark, its one-colour version, the lockups and the icons cannot drift.
  * No Tiny Speck art and no Glitch name or logo are part of it.
  *
- *   node tools/brand/build.mjs            write the SVGs, then render the PNGs and the ICO
- *   node tools/brand/build.mjs --svg      write the SVGs only
- *   node tools/brand/build.mjs --check    fail if an SVG on disk differs from what this would write
+ *   node tools/brand/build.mjs            write the SVGs, render the PNGs and the ICO, copy the site icons
+ *   node tools/brand/build.mjs --svg      write the SVGs (and the SVG favicon) only
+ *   node tools/brand/build.mjs --check    fail if an SVG differs from what this would write, a site icon
+ *                                         differs from its copy in swap/, or a PNG is missing or the wrong size
  *
  * Rendering needs rsvg-convert and ImageMagick (brew install librsvg imagemagick).
- * The files in public/brand/swap/ are the favicon, ICO and touch icons that
- * would replace the site's current ones once Austin approves the mark.
+ * The lockup PNGs are rendered by Google Chrome on a Mac (CHROME names another
+ * Chrome binary): the name in the lockups is live text in Iowan Old Style, an
+ * Apple system font whose outlines we do not embed, and rsvg-convert picks its
+ * Black weight for 600 and ignores textLength, so only a Mac browser draws the
+ * lettering as the site does. Elsewhere those PNGs are left as they are.
+ * --check compares the SVGs and the site icons byte for byte, but only the
+ * presence and pixel size of each PNG: renders differ from machine to machine.
+ * public/brand/swap/ holds the site's icons (the arch replaced the quoin on
+ * 2026-10-28); they are copied to public/favicon.svg, favicon.ico,
+ * apple-touch-icon.png and favicon-192.png, which the pages link with ?v=arch.
  */
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, readFileSync, writeFileSync, existsSync, rmSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync, existsSync, rmSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -212,6 +221,47 @@ export const RENDERS = [
   ['app-icon.svg', 'swap/favicon-192.png', 192],
 ];
 
+/** The four lockups as PNGs, at twice and eight times their size: [source svg, out path, scale]. */
+export const LOCKUP_RENDERS = ['lockup-horizontal', 'lockup-horizontal-dark', 'lockup-stacked', 'lockup-stacked-dark']
+  .flatMap((name) => [2, 8].map((scale) => [`${name}.svg`, `png/${name}-${scale}x.png`, scale]));
+
+/** An SVG's width and height, from its root element. */
+export function svgSize(svg) {
+  const m = /^<svg [^>]*width="(\d+)" height="(\d+)"/.exec(svg);
+  if (!m) throw new Error('no width and height on the svg');
+  return [Number(m[1]), Number(m[2])];
+}
+
+/** The site's icons: public/<name> is a copy of public/brand/swap/<name>. */
+export const SITE_ICONS = ['favicon.svg', 'favicon.ico', 'apple-touch-icon.png', 'favicon-192.png'];
+
+const CHROME = process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+
+/** Renders the lockup PNGs with Chrome on a Mac (see the note at the top); false when it cannot. */
+function renderLockups() {
+  if (process.platform !== 'darwin' || !existsSync(CHROME)) {
+    console.warn(`lockup PNGs left as they are: they are rendered by Google Chrome on a Mac (${process.platform !== 'darwin' ? 'not a Mac' : `no ${CHROME}`})`);
+    return false;
+  }
+  const tmp = join(tmpdir(), `groddle-brand-chrome-${process.pid}`);
+  mkdirSync(tmp, { recursive: true });
+  try {
+    for (const [src, out, scale] of LOCKUP_RENDERS) {
+      const [w, h] = svgSize(readFileSync(join(OUT, src), 'utf8'));
+      const shot = join(tmp, 'shot.png');
+      execFileSync(CHROME, ['--headless', '--disable-gpu', '--hide-scrollbars', '--no-first-run', '--no-default-browser-check', `--user-data-dir=${join(tmp, 'profile')}`,
+        '--default-background-color=00000000', `--force-device-scale-factor=${scale}`, `--window-size=${w},${h}`, `--screenshot=${shot}`, `file://${join(OUT, src)}`], { stdio: 'ignore', timeout: 60000 });
+      execFileSync('magick', [shot, '-crop', `${w * scale}x${h * scale}+0+0`, '+repage', '-strip', join(OUT, out)]);
+    }
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+  return true;
+}
+
+/** The PNG's width and height, from its header. */
+const pngSize = (buf) => [buf.readUInt32BE(16), buf.readUInt32BE(20)];
+
 function render() {
   for (const [src, out, size] of RENDERS) {
     mkdirSync(dirname(join(OUT, out)), { recursive: true });
@@ -237,21 +287,32 @@ function render() {
 function main() {
   const args = new Set(process.argv.slice(2));
   const files = svgFiles();
+  const PUB = join(root, 'public');
   if (args.has('--check')) {
     const stale = Object.entries(files).filter(([path, svg]) => !existsSync(join(OUT, path)) || readFileSync(join(OUT, path), 'utf8') !== svg).map(([p]) => p);
+    for (const name of SITE_ICONS) if (!existsSync(join(PUB, name)) || !readFileSync(join(PUB, name)).equals(readFileSync(join(OUT, 'swap', name)))) stale.push(`public/${name}`);
+    const pngs = [...RENDERS.map(([, out, size]) => [out, [size, size]]), ...LOCKUP_RENDERS.map(([src, out, scale]) => [out, svgSize(files[src]).map((n) => n * scale)])];
+    for (const [out, want] of pngs) if (!existsSync(join(OUT, out)) || pngSize(readFileSync(join(OUT, out))).join('x') !== want.join('x')) stale.push(out);
     if (stale.length) {
       console.error(`stale: ${stale.join(', ')} (run node tools/brand/build.mjs)`);
       process.exit(1);
     }
-    console.log(`${Object.keys(files).length} brand SVGs up to date`);
+    console.log(`${Object.keys(files).length} brand SVGs and ${SITE_ICONS.length} site icons up to date; ${pngs.length} PNGs present at their sizes (renders: pixels not compared)`);
     return;
   }
   for (const [path, svg] of Object.entries(files)) {
     mkdirSync(dirname(join(OUT, path)), { recursive: true });
     writeFileSync(join(OUT, path), svg);
   }
-  if (!args.has('--svg')) render();
-  console.log(`wrote ${Object.keys(files).length} SVGs${args.has('--svg') ? '' : ` and ${RENDERS.length + 1} renders`} to public/brand/`);
+  let lockups = false;
+  if (!args.has('--svg')) {
+    render();
+    lockups = renderLockups();
+  }
+  const icons = args.has('--svg') ? ['favicon.svg'] : SITE_ICONS;
+  for (const name of icons) copyFileSync(join(OUT, 'swap', name), join(PUB, name));
+  const renders = args.has('--svg') ? '' : ` and ${RENDERS.length + 1 + (lockups ? LOCKUP_RENDERS.length : 0)} renders`;
+  console.log(`wrote ${Object.keys(files).length} SVGs${renders} to public/brand/, and copied ${icons.join(', ')} to public/`);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) main();

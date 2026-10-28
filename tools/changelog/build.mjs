@@ -57,7 +57,7 @@ export function historySince() {
 /** The site header, identical on every page apart from the path prefix (tests/site-nav.test.js). */
 export const siteNav = (p, current) => `  <nav class="site-nav" aria-label="Site">
     <div class="wrap site-nav-row">
-      <a class="wordmark" href="${p}"><img src="${p}favicon.svg?v=quoin" alt="" width="28" height="28" /><span>Groddle Afternoon</span></a>
+      <a class="wordmark" href="${p}"><img src="${p}favicon.svg?v=arch" alt="" width="28" height="28" /><span>Groddle Afternoon</span></a>
       <div class="site-nav-links">
         <a href="${p}restoration/">Restoration</a>
         <a href="${p}compare/">Compare</a>
@@ -80,9 +80,9 @@ ${noindex ? '  <meta name="robots" content="noindex" />\n' : ''}  <title>${esc(t
   <link rel="stylesheet" href="${p}changelog/changelog.css" />
   <link rel="stylesheet" href="${p}site/site-nav.css" />
   <script src="${p}site/theme.js"></script>
-  <link rel="icon" href="${p}favicon.svg?v=quoin" type="image/svg+xml" />
-  <link rel="icon" href="${p}favicon.ico?v=quoin" sizes="32x32" />
-  <link rel="apple-touch-icon" href="${p}apple-touch-icon.png?v=quoin" />
+  <link rel="icon" href="${p}favicon.svg?v=arch" type="image/svg+xml" />
+  <link rel="icon" href="${p}favicon.ico?v=arch" sizes="32x32" />
+  <link rel="apple-touch-icon" href="${p}apple-touch-icon.png?v=arch" />
 </head>
 <body class="notes">
 ${siteNav(p, 'changelog')}

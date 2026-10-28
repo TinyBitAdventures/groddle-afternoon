@@ -709,9 +709,9 @@ const shell = ({ p, title, description, body, script }) => `<!doctype html>
   <link rel="stylesheet" href="${p}site/site-nav.css" />
   <script src="${p}site/theme.js"></script>
   <link rel="stylesheet" href="${p}items/catalog.css" />
-  <link rel="icon" href="${p}favicon.svg?v=quoin" type="image/svg+xml" />
-  <link rel="icon" href="${p}favicon.ico?v=quoin" sizes="32x32" />
-  <link rel="apple-touch-icon" href="${p}apple-touch-icon.png?v=quoin" />
+  <link rel="icon" href="${p}favicon.svg?v=arch" type="image/svg+xml" />
+  <link rel="icon" href="${p}favicon.ico?v=arch" sizes="32x32" />
+  <link rel="apple-touch-icon" href="${p}apple-touch-icon.png?v=arch" />
 ${script ? `  <script type="module" src="${script}"></script>\n` : ''}</head>
 <body class="notes catalog">
 ${siteNav(p, 'items')}

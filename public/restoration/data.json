@@ -2645,9 +2645,24 @@
   ]
  },
  "git": {
-  "commits": 644,
+  "commits": 647,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "fix",
+    "text": "A room's status sits beside Play this room as a label, level with it, and Play links read in dark mode"
+   },
+   {
+    "date": "2026-10-27",
+    "kind": "improve",
+    "text": "The Project menu marks the page being read with the header's underline, not a left bar"
+   },
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "A Groddle Afternoon mark and an unlinked brand page"
+   },
    {
     "date": "2026-10-27",
     "kind": "new",
@@ -2752,21 +2767,6 @@
     "date": "2026-10-27",
     "kind": "new",
     "text": "Winter Walk, Winter Haven and Being Watched, rebuilt from players' pictures"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "improve",
-    "text": "The original's M, Z, Shift+L, Shift+K and Shift+D keys, a hold-? hotkey sheet, and every skill bar in the Skills frame"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "Growing Stuff, Snowed In's hall in lavender with raised beds of ferns and mushrooms, rebuilt from Hedge's Snap"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "Snowed In, Ethereal Endeavour and Martleby Hare, rebuilt from players' pictures"
    }
   ]
  },

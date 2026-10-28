@@ -1,33 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <!-- iMG quoin, redrawn as vectors from Tiny Speck's quoin_img_thumb (CC0): scalloped purple badge, white rim, "i", propeller. -->
+  <title>Groddle Afternoon</title>
+  <!-- The Groddle Afternoon mark: our own drawing (tools/brand/build.mjs writes this file). -->
   <defs>
-    <linearGradient id="body" gradientUnits="userSpaceOnUse" x1="0" y1="-23" x2="0" y2="23">
-      <stop offset="0" stop-color="#8b699c"/>
-      <stop offset="0.45" stop-color="#7c5491"/>
-      <stop offset="1" stop-color="#8a60a1"/>
+    <clipPath id="ga-sm-arch"><path d="M5 31a27 27 0 0 1 54 0v25a6 6 0 0 1-6 6H11a6 6 0 0 1-6-6Z"/></clipPath>
+    <linearGradient id="ga-sm-sky" x1="0" y1="4" x2="0" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e3b04a"/>
+      <stop offset="1" stop-color="#e58b3f"/>
     </linearGradient>
-    <g id="badge">
-      <circle cx="0" cy="0" r="18.6"/>
-      <circle cx="0.00" cy="-16.20" r="6.4"/>
-      <circle cx="11.46" cy="-11.46" r="6.4"/>
-      <circle cx="16.20" cy="-0.00" r="6.4"/>
-      <circle cx="11.46" cy="11.46" r="6.4"/>
-      <circle cx="0.00" cy="16.20" r="6.4"/>
-      <circle cx="-11.46" cy="11.46" r="6.4"/>
-      <circle cx="-16.20" cy="0.00" r="6.4"/>
-      <circle cx="-11.46" cy="-11.46" r="6.4"/>
-    </g>
   </defs>
-  <!-- propeller -->
-  <rect x="30.7" y="6" width="2.6" height="9" rx="1.1" fill="#e3ad31"/>
-  <ellipse cx="32" cy="6.2" rx="11" ry="2.2" fill="#a0a0a0" fill-opacity="0.7"/>
-  <circle cx="32" cy="6.2" r="2" fill="#e7d37d"/>
-  <!-- white rim, then the purple body -->
-  <g transform="translate(32 39.5)">
-    <g transform="scale(1.1)" fill="#ffffff"><use href="#badge"/></g>
-    <g fill="url(#body)"><use href="#badge"/></g>
+  <g clip-path="url(#ga-sm-arch)">
+    <rect x="5" y="4" width="54" height="58" fill="url(#ga-sm-sky)"/>
+    <circle cx="38" cy="29" r="12" fill="#fbfaf2"/>
+    <path d="M5 42c7-5 14-6 21-4c7 2 11 5 18 5c6 0 10-2 15-5V62H5Z" fill="#79bd64"/>
+    <circle cx="17" cy="33" r="6" fill="#4f8a3f"/>
+    <path d="M5 54c9-5 19-7.5 29-7.5c10 0 17 3 25 6.5V62H5Z" fill="#4f8a3f"/>
   </g>
-  <!-- the i -->
-  <circle cx="32" cy="28" r="3.5" fill="#f5e5f5"/>
-  <rect x="29.3" y="33.4" width="5.4" height="16" rx="2.7" fill="#f5e5f5"/>
 </svg>

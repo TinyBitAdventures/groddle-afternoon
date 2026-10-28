@@ -6,7 +6,8 @@
  * (tools/brand/build.mjs writes them), served beside the page like every
  * other built folder. The page is not linked from the header or any menu
  * (Austin 2026-10-28: a /brand/ page, unlinked, with a mark of our own in
- * place of the quoin icon, for him to approve before the header changes).
+ * place of the quoin icon; he approved the mark the same day, and the site's
+ * icons and the header's wordmark are now the arch).
  * The palette is read from public/restoration/restoration.css, the site's
  * tokens, so no colour on the page is typed by hand.
  *
@@ -18,6 +19,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { block, Minn } from '../changelog/to-minn.mjs';
+import { LOCKUP_RENDERS, svgFiles, svgSize } from './build.mjs';
 import { p, h, group } from '../restoration/to-minn.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')).map(([k, v]) => [k, v ?? true]));
@@ -68,6 +70,13 @@ const band = (id, alt, title, inner) => group('section', `band brand-band${alt ?
 /** A tile that shows a file on a fixed light or dark ground, with a caption. */
 const tile = (ground, inner, caption) => group('div', `brand-tile brand-on-${ground}`, null, [...inner, p('brand-tile-cap', caption)]);
 const tiles = (cls, inner) => group('div', `brand-tiles${cls ? ` ${cls}` : ''}`, null, inner);
+
+/** The PNG renders of a lockup, as links with their pixel sizes: "2x (966 × 112) and 8x (3864 × 448)". */
+function lockupPngs(name) {
+  const files = svgFiles();
+  return LOCKUP_RENDERS.filter(([src]) => src === `${name}.svg`)
+    .map(([src, out, scale]) => `<a href="${asset(out)}">${scale}x</a> (${svgSize(files[src]).map((n) => n * scale).join(' × ')})`).join(' and ');
+}
 
 /** One colour: its swatch in light and in dark, its name and token, what it is for, and both values. */
 function swatch([token, name, role], tokens) {
@@ -125,7 +134,14 @@ export function brandContent(tokens = siteTokens()) {
           '<strong>Clear space.</strong> Keep one sun’s width empty on every side of the mark or a lockup. Nothing else sits inside the dashed line.',
           '<strong>Smallest size.</strong> The mark alone down to 16 px, using the small drawing below 32 px. The horizontal lockup down to 20 px tall, the stacked one down to 64 px tall. Smaller than that, use the mark alone.',
           '<strong>Use the files.</strong> Take the lockup you need from the files below rather than setting the name beside the mark by hand.',
+          '<strong>SVG or PNG.</strong> The SVG lockups set the name as text in Iowan Old Style, which Apple devices have and others may not. Where it matters that the lettering is exact, such as print, slides or a link preview, use the PNGs, rendered on a Mac.',
         ]),
+      ]),
+      list('brand-files', [
+        `Horizontal, for light grounds: ${lockupPngs('lockup-horizontal')}`,
+        `Horizontal, for dark grounds: ${lockupPngs('lockup-horizontal-dark')}`,
+        `Stacked, for light grounds: ${lockupPngs('lockup-stacked')}`,
+        `Stacked, for dark grounds: ${lockupPngs('lockup-stacked-dark')}`,
       ]),
     ]),
     band('type', false, 'Type', [
@@ -134,7 +150,7 @@ export function brandContent(tokens = siteTokens()) {
         group('div', 'brand-face brand-face-display', null, [
           p('brand-specimen', 'Groddle Afternoon'),
           p('brand-face-name', '<strong>Iowan Old Style</strong>, semibold (600)'),
-          p('brand-face-note', 'The wordmark and every heading. Where it is missing it falls back to Charter, then Georgia. The lockup files hold the name at its measured width, so a fallback face keeps the lockup’s shape.'),
+          p('brand-face-note', 'The wordmark and every heading. Where it is missing it falls back to Charter, then Georgia. The SVG lockups hold the name at its measured width, so a fallback face keeps the lockup’s shape; the PNG lockups are rendered on a Mac, in the face itself.'),
         ]),
         group('div', 'brand-face brand-face-body', null, [
           p('brand-specimen', 'Plant a bean, pet a piggy, and wait for the sun to come round again.'),
@@ -154,7 +170,7 @@ export function brandContent(tokens = siteTokens()) {
       group('div', 'brand-swatches', null, PALETTE.map((c) => swatch(c, tokens))),
     ]),
     band('icons', false, 'Icons', [
-      p('section-lead', 'At 16 and 32 pixels the mark is redrawn: a wider arch and a bigger sun, without the path, and the tree a round bush. At 180 and 512 pixels the full mark sits on Meadow, since app icons need a solid ground.'),
+      p('section-lead', 'At 16 and 32 pixels the mark is redrawn: a wider arch and a bigger sun, without the path, and the tree a round bush. At 180 and 512 pixels the full mark sits on Meadow, since app icons need a solid ground. These are the site’s icons: the browser tab, the header beside the name, and the home-screen icon.'),
       group('div', 'brand-icons', null, [
         group('div', 'brand-icon', null, [img('png/icon-16.png', 'The favicon at 16 pixels', 16, 16, 'brand-px'), img('png/icon-16.png', 'The 16 pixel favicon enlarged eight times', 128, 128, 'brand-px brand-zoom'), p('brand-tile-cap', '16 px, the browser tab, and enlarged')]),
         group('div', 'brand-icon', null, [img('png/icon-32.png', 'The favicon at 32 pixels', 32, 32, 'brand-px'), img('png/icon-32.png', 'The 32 pixel favicon enlarged four times', 128, 128, 'brand-px brand-zoom'), p('brand-tile-cap', '32 px, high-density tabs, and enlarged')]),
@@ -208,9 +224,11 @@ export function brandContent(tokens = siteTokens()) {
         `<a href="${asset('mark-ink.svg')}">mark-ink.svg</a> and <a href="${asset('mark-paper.svg')}">mark-paper.svg</a>: one colour, for light and dark grounds`,
         `<a href="${asset('lockup-horizontal.svg')}">lockup-horizontal.svg</a> and <a href="${asset('lockup-horizontal-dark.svg')}">lockup-horizontal-dark.svg</a>: the name beside the mark, for light and dark grounds`,
         `<a href="${asset('lockup-stacked.svg')}">lockup-stacked.svg</a> and <a href="${asset('lockup-stacked-dark.svg')}">lockup-stacked-dark.svg</a>: the name under the mark, for light and dark grounds`,
+        `<a href="${asset('png/lockup-horizontal-2x.png')}">lockup-horizontal-2x.png</a>, <a href="${asset('png/lockup-horizontal-8x.png')}">lockup-horizontal-8x.png</a>, <a href="${asset('png/lockup-horizontal-dark-2x.png')}">lockup-horizontal-dark-2x.png</a> and <a href="${asset('png/lockup-horizontal-dark-8x.png')}">lockup-horizontal-dark-8x.png</a>: the horizontal lockups as PNGs on a clear ground, at twice and eight times size, rendered on a Mac`,
+        `<a href="${asset('png/lockup-stacked-2x.png')}">lockup-stacked-2x.png</a>, <a href="${asset('png/lockup-stacked-8x.png')}">lockup-stacked-8x.png</a>, <a href="${asset('png/lockup-stacked-dark-2x.png')}">lockup-stacked-dark-2x.png</a> and <a href="${asset('png/lockup-stacked-dark-8x.png')}">lockup-stacked-dark-8x.png</a>: the stacked lockups, the same way`,
         `<a href="${asset('png/mark-512.png')}">mark-512.png</a>: the mark at 512 px on a clear ground`,
         `<a href="${asset('png/icon-512.png')}">icon-512.png</a> and <a href="${asset('png/icon-180.png')}">icon-180.png</a>: app icons on Meadow`,
-        `<a href="${asset('swap/favicon.svg')}">favicon.svg</a>, <a href="${asset('swap/favicon.ico')}">favicon.ico</a>, <a href="${asset('swap/apple-touch-icon.png')}">apple-touch-icon.png</a> and <a href="${asset('swap/favicon-192.png')}">favicon-192.png</a>: the site icons, ready for the swap`,
+        `<a href="${asset('swap/favicon.svg')}">favicon.svg</a>, <a href="${asset('swap/favicon.ico')}">favicon.ico</a>, <a href="${asset('swap/apple-touch-icon.png')}">apple-touch-icon.png</a> and <a href="${asset('swap/favicon-192.png')}">favicon-192.png</a>: the site’s icons, the same files the site serves from its root`,
       ]),
     ]),
     group('div', 'wrap report-foot', null, [

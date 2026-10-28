@@ -2,9 +2,9 @@
  * The Brand page (Austin 2026-10-28): an unlinked /brand/ page with a mark of
  * our own in place of the quoin icon. tools/brand/build.mjs draws the mark and
  * writes every brand file into public/brand/; tools/brand/to-minn.mjs makes
- * the Minn page once. The header, favicon and wordmark do not change until
- * Austin approves the mark: the files that would replace them wait in
- * public/brand/swap/.
+ * the Minn page once. Austin approved the mark the same day: the site's icons
+ * (public/favicon.svg, favicon.ico, apple-touch-icon.png, favicon-192.png) are
+ * copies of public/brand/swap/, linked with ?v=arch.
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -12,7 +12,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 import { ASSETS, PALETTE, brandContent, siteTokens } from '../tools/brand/to-minn.mjs';
-import { MARK_COLOURS, RENDERS, svgFiles } from '../tools/brand/build.mjs';
+import { LOCKUP_RENDERS, MARK_COLOURS, RENDERS, SITE_ICONS, svgFiles, svgSize } from '../tools/brand/build.mjs';
 import { SECTIONS } from '../tools/site-nav/apply.mjs';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
 
@@ -113,9 +113,21 @@ describe('the brand files (tools/brand/build.mjs)', () => {
     for (const s of [16, 32]) assert.ok(sizes.includes(s), `favicon.ico has ${s}`);
   });
 
-  it('keep the swap favicon the small drawing, and leave the live favicon alone', () => {
+  it('render the four lockups as PNGs at twice and eight times their size, on a clear ground', () => {
+    const files = svgFiles();
+    assert.equal(LOCKUP_RENDERS.length, 8);
+    for (const [src, out, scale] of LOCKUP_RENDERS) {
+      const png = readFileSync(join(BRAND, out));
+      assert.equal(png.toString('latin1', 1, 4), 'PNG', out);
+      assert.deepEqual([png.readUInt32BE(16), png.readUInt32BE(20)], svgSize(files[src]).map((n) => n * scale), out);
+      assert.equal(png[25], 6, `${out} is RGBA, so the lockup sits on any ground`);
+    }
+  });
+
+  it('make the site\'s icons the arch: the small drawing for the SVG favicon, the live files copies of swap/', () => {
     assert.equal(readFileSync(join(BRAND, 'swap/favicon.svg'), 'utf8'), readFileSync(join(BRAND, 'mark-small.svg'), 'utf8'));
-    assert.match(readFileSync(join(root, 'public/favicon.svg'), 'utf8'), /iMG quoin/, 'the quoin favicon stays until Austin approves the mark');
+    for (const name of SITE_ICONS) assert.ok(readFileSync(join(root, 'public', name)).equals(readFileSync(join(BRAND, 'swap', name))), `public/${name} is public/brand/swap/${name} (node tools/brand/build.mjs)`);
+    assert.doesNotMatch(readFileSync(join(root, 'public/favicon.svg'), 'utf8'), /quoin/i, 'the quoin favicon is gone');
   });
 });
 

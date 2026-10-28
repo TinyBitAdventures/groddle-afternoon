@@ -104,7 +104,7 @@ const ONLINE_STYLE = `  <style>
 const GATE = `  <!-- Multiplayer phase 2: js/online-boot.js signs the player in and loads the save before game.js. -->
   <main id="online-gate" class="online-gate" data-online="checking">
     <div class="card" role="status" aria-live="polite">
-      <img src="favicon.svg?v=quoin" alt="" width="44" height="44" />
+      <img src="favicon.svg?v=arch" alt="" width="44" height="44" />
       <h2>Finding your account</h2>
       <p>Checking whether you are signed in…</p>
       <noscript><p>Multiplayer needs JavaScript. <a href="play/">Play solo</a></p></noscript>
