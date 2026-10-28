@@ -14,6 +14,9 @@
   --radius: 10px;
   --radius-lg: 16px;
 
+  /* Play links: their own fill and text, so the label keeps 4.5:1 in both themes (white on the dark-mode
+     moss was 2.3:1). */
+  --play-bg: #477d38; --play-fg: #ffffff; --play-hover: #3d7031;
   /* status tones */
   --moss: #4f8a3f;
   --sky: #3f86b0;
@@ -40,6 +43,7 @@
     --border: #3a4939;
     --accent: #eea05c;
     --moss: #79bd64;
+    --play-bg: #79bd64; --play-fg: #13200e; --play-hover: #8fcf78;
     --sky: #68aed6;
     --plum: #b38ccb;
     --sun: #e3b04a;
@@ -61,6 +65,7 @@
   --border: #3a4939;
   --accent: #eea05c;
   --moss: #79bd64;
+  --play-bg: #79bd64; --play-fg: #13200e; --play-hover: #8fcf78;
   --sky: #68aed6;
   --plum: #b38ccb;
   --sun: #e3b04a;
@@ -409,7 +414,15 @@ button.room:focus-visible { outline: 3px solid var(--accent); outline-offset: 3p
 .rm-kicker { margin: 0 0 2px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
 .rm-title { margin: 0; font-size: clamp(26px, 3.4vw, 34px); }
 .rm-tagline { margin: 4px 0 0; color: var(--muted); font-size: 17px; }
-.rm-pill { flex: none; margin-top: 6px; }
+/* Beside "Play this room" the status is a quiet label (tinted, with its tone's dot), not a second
+   button, and both sit at one height on one line. */
+.rm-pill {
+  flex: none; min-height: 30px; padding: 0 12px 0 10px; box-sizing: border-box;
+  background: color-mix(in srgb, var(--tone, var(--stone)) 14%, transparent); color: var(--fg);
+  border: 1px solid color-mix(in srgb, var(--tone, var(--stone)) 45%, transparent);
+}
+.rm-pill::before { background: var(--tone, var(--stone)); }
+.rm-actions .rm-playlink { min-height: 30px; padding: 0 14px; box-sizing: border-box; }
 .rm-offer {
   margin: 18px 0; padding: 12px 18px; border-left: 4px solid var(--accent);
   background: rgba(229, 139, 63, 0.08); border-radius: 0 10px 10px 0;
@@ -465,10 +478,10 @@ button.room:focus-visible { outline: 3px solid var(--accent); outline-offset: 3p
 /* —— Play links (practice mode) —— */
 .play-link {
   display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 999px;
-  background: var(--moss); color: #fff; font-size: 12px; font-weight: 700; text-decoration: none; white-space: nowrap;
+  background: var(--play-bg); color: var(--play-fg); font-size: 12px; font-weight: 700; text-decoration: none; white-space: nowrap;
 }
 .play-link::before { content: ''; border-left: 7px solid currentColor; border-top: 4.5px solid transparent; border-bottom: 4.5px solid transparent; }
-a.play-link:hover, a.play-link:focus-visible { background: #3d7031; }
+a.play-link:hover, a.play-link:focus-visible { background: var(--play-hover); }
 a.play-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .play-link[hidden] { display: none; }
 /* minmax(0, 1fr): a long name with its 'In multiplayer' chip wraps inside the row instead of pushing Play out of the card. */
