@@ -28,7 +28,7 @@ import {
   playMusicblock,
   starterMusicblocks,
 } from '../public/js/musicblocks.js';
-import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js';
+import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=g388-1';
 import { DROP_TABLES } from '../public/js/drop-tables-data.js';
 import { SOIL_DROP_TABLES } from '../public/js/patches.js';
 import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js';

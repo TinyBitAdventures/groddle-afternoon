@@ -72,11 +72,7 @@ export const SCRAMBLE = Object.freeze(['feeling', 'of', 'This', 'comfort.']);
 export const LINGER_MS = 12_000;
 
 const ART = 'assets/sprites/quest-rooms/an_autumn_day/';
-/**
- * The room's music. The source played AUTUMN_DAY (c2 Autumn_Day_2.5.mp3), a CDN
- * file in no CC0 release (G317), so the room has none.
- */
-export const MUSIC = null;
+const MUSIC = 'assets/audio/sfx/AUTUMN_DAY.mp3';
 
 /* ------------------------------------------------------------------ */
 /* Geometry                                                             */
@@ -1034,7 +1030,7 @@ export const room = {
   enter(ctx, stage) {
     const d = ctx.data;
     silhouette(ctx, true);
-    if (MUSIC && !d.stopMusic && !d.musicStarting) {
+    if (!d.stopMusic && !d.musicStarting) {
       d.musicStarting = true;
       Promise.resolve(ctx.engine.playCue?.(MUSIC, { volume: 0.5 })).then((stop) => {
         d.musicStarting = false;

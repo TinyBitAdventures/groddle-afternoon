@@ -117,10 +117,9 @@ describe('An Autumn Day (an_autumn_day): source', () => {
     }
   });
 
-  it('ships its art, and no music since the c2 AUTUMN_DAY is in no CC0 release (G317)', () => {
+  it('ships its art and the recovered AUTUMN_DAY music', () => {
     for (const f of ['crow.png', 'bird_red.png', 'bird_icon.png']) assert.ok(existsSync(pub(`assets/sprites/quest-rooms/an_autumn_day/${f}`)), f);
-    assert.ok(!existsSync(pub('assets/audio/sfx/AUTUMN_DAY.mp3')));
-    assert.match(readFileSync(pub('js/quest-rooms/an-autumn-day.js'), 'utf8'), /export const MUSIC = null;/);
+    assert.ok(existsSync(pub('assets/audio/sfx/AUTUMN_DAY.mp3')));
     for (const d of ['heights_tree_bare_1', 'heights_tree_bare_3', 'tree_bare_tall_1', 'background_ghost_transparent']) {
       assert.ok(existsSync(pub(`assets/decos/groddle/${d}.webp`)), d);
     }

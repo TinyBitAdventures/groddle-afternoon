@@ -57,6 +57,7 @@ export const PLACES = {
   party_holiday: 'the Winter Wingding party',
   party_lively: null,
   enchanted: 'the Enchanted Wood',
+  piano: null,
   snappy: null,
   sky_plunge: 'Sky Plunge',
 };

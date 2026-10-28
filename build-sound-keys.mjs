@@ -46,64 +46,63 @@ const PUBLIC = join(root, 'public');
  * matches exactly, from GSJS where the filename names the key (HARVEST,
  * PETRIFIED_ROCK, STEWARTDOLL1-14), and otherwise from the filename itself.
  *
- * Tiny Speck's CC0 dedication covers only the files it released (the GitHub
- * repos, the art zips, the archive.org items), not the CDN. A c2 file ships
- * only where the same recording is in a CC0 file (research/coverage/
- * g312-provenance.md, G317): the rows marked `notCc0` stay catalogued with
- * their url but no file, so they play their synth stand-in, a CC0 stand-in
- * (ALIASES, the street music themes) or nothing (songs and voices).
- * FIREFLY_WHISTLE_1 ships the archive.org ringtone (tools/sound/
- * archiveorg-sfx-map.json); the BW_* bells are cut from a CC0 ringtone (DERIVED).
+ * They are Tiny Speck's own recordings and ship as the originals, byte for
+ * byte (tools/sound/install-c2-sfx.mjs). G317 (2026-10-26) had held back the 28
+ * with no CC0-tagged copy; Austin reversed that on 2026-10-28 ("use all of the
+ * original sound"; research/coverage/g312-provenance.md "Original sounds,
+ * 2026-10-28").
  */
 const C2 = 'http://c2.glitch.bz/sounds/';
 const RECOVERED = {
   HERE_YOU_GO_LIGHTER: { url: `${C2}2010-05/here_you_go_lighter.mp3`, keyFrom: 'filename' },
-  FIREFLY_WHISTLE_1: { url: `${C2}2011-01/1296255471-Firefly_Whistle_1.3.mp3`, keyFrom: 'music_map', notCc0: true },
+  FIREFLY_WHISTLE_1: { url: `${C2}2011-01/1296255471-Firefly_Whistle_1.3.mp3`, keyFrom: 'music_map' },
   FIREFLY_WHISTLE_2: { url: `${C2}2011-01/1296255489-Firefly_Whistle_2.2.mp3`, keyFrom: 'music_map' },
   FIREFLY_WHISTLE_3: { url: `${C2}2011-01/1296255520-Firefly_Whistle_3.3.mp3`, keyFrom: 'music_map' },
   MOONWALK: { url: `${C2}2011-09/1316194089-Moonwalk_1.1.mp3`, keyFrom: 'music_map' },
-  TOXIC_MOON: { url: `${C2}2011-11/1322689572-Also_Sprach_Zarathustra_Loop_3.2_fades.mp3`, keyFrom: 'music_map', notCc0: true },
-  HARVEST: { url: `${C2}2012-03/1333032669-Harvest_2.1.mp3`, keyFrom: 'gsjs-filename', notCc0: true },
+  TOXIC_MOON: { url: `${C2}2011-11/1322689572-Also_Sprach_Zarathustra_Loop_3.2_fades.mp3`, keyFrom: 'music_map' },
+  HARVEST: { url: `${C2}2012-03/1333032669-Harvest_2.1.mp3`, keyFrom: 'gsjs-filename' },
   WATER_SPLASH: { url: `${C2}2012-06/1339778251-Water_Splash_1.1.mp3`, keyFrom: 'filename' },
-  CLOUD_DROP_2: { url: `${C2}2012-06/1340390601-Rainbow_Run_A_Capella_8s_2.3.mp3`, keyFrom: 'music_map', notCc0: true },
-  CLOUD_DROP_2_INTRO: { url: `${C2}2012-06/1340390619-Rainbow_Run_A_Cappella_Intro_1.1.mp3`, keyFrom: 'music_map', notCc0: true },
-  PIANO_THEME1: { url: `${C2}2012-07/1341549958-Dreamy_Theme_Loop_1.1.mp3`, keyFrom: 'music_map', notCc0: true },
-  BW_A1: { url: `${C2}2012-08/1346434794-BW_A1.mp3`, keyFrom: 'filename', notCc0: true },
-  BW_C2: { url: `${C2}2012-08/1346434795-BW_C2.mp3`, keyFrom: 'filename', notCc0: true },
-  BW_D2: { url: `${C2}2012-08/1346434795-BW_D2.mp3`, keyFrom: 'filename', notCc0: true },
-  BW_E2: { url: `${C2}2012-08/1346434795-BW_E2.mp3`, keyFrom: 'filename', notCc0: true },
-  BW_G2: { url: `${C2}2012-08/1346434796-BW_G2.mp3`, keyFrom: 'filename', notCc0: true },
-  AMBIENT_WATERFALL: { url: `${C2}2012-09/1346892406-Waterfall_Background_1.1.mp3`, keyFrom: 'music_map', notCc0: true },
-  AMBIENT_WATERFALL_LEVEL3: { url: `${C2}2012-09/1347325991-Waterfall_Background_No_Gurgle_1.1.mp3`, keyFrom: 'music_map', notCc0: true },
+  CLOUD_DROP_2: { url: `${C2}2012-06/1340390601-Rainbow_Run_A_Capella_8s_2.3.mp3`, keyFrom: 'music_map' },
+  CLOUD_DROP_2_INTRO: { url: `${C2}2012-06/1340390619-Rainbow_Run_A_Cappella_Intro_1.1.mp3`, keyFrom: 'music_map' },
+  PIANO_THEME1: { url: `${C2}2012-07/1341549958-Dreamy_Theme_Loop_1.1.mp3`, keyFrom: 'music_map' },
+  BW_A1: { url: `${C2}2012-08/1346434794-BW_A1.mp3`, keyFrom: 'filename' },
+  BW_C2: { url: `${C2}2012-08/1346434795-BW_C2.mp3`, keyFrom: 'filename' },
+  BW_D2: { url: `${C2}2012-08/1346434795-BW_D2.mp3`, keyFrom: 'filename' },
+  BW_E2: { url: `${C2}2012-08/1346434795-BW_E2.mp3`, keyFrom: 'filename' },
+  BW_G2: { url: `${C2}2012-08/1346434796-BW_G2.mp3`, keyFrom: 'filename' },
+  AMBIENT_WATERFALL: { url: `${C2}2012-09/1346892406-Waterfall_Background_1.1.mp3`, keyFrom: 'music_map' },
+  AMBIENT_WATERFALL_LEVEL3: { url: `${C2}2012-09/1347325991-Waterfall_Background_No_Gurgle_1.1.mp3`, keyFrom: 'music_map' },
   ROCKS_DISAPPEAR: { url: `${C2}2012-09/1347481186-Rocks_Disappear_2.2.mp3`, keyFrom: 'filename' },
   WATERFALL_SUCCESS: { url: `${C2}2012-09/1347572925-Waterfall_3.3_more_throaght.mp3`, keyFrom: 'music_map' },
   CONCH: { url: `${C2}2012-09/1347572925-Waterfall_For_Conch_1.1.mp3`, keyFrom: 'music_map' },
   WATERFALL_SYMBOL_GLOW: { url: `${C2}2012-09/1347576005-Waterfall_Symbol_Glow_1.1.mp3`, keyFrom: 'filename' },
   PETRIFIED_ROCK: { url: `${C2}2012-10/1350083646-Petrified_Rock_1.1.mp3`, keyFrom: 'gsjs-filename' },
-  AUTUMN_DAY: { url: `${C2}2012-10/1350096123-Autumn_Day_2.5.mp3`, keyFrom: 'music_map', notCc0: true },
+  AUTUMN_DAY: { url: `${C2}2012-10/1350096123-Autumn_Day_2.5.mp3`, keyFrom: 'music_map' },
 };
 const DOLL_STAMPS = [578, 578, 578, 579, 579, 579, 579, 580, 580, 580, 698, 698, 698, 699];
 DOLL_STAMPS.forEach((stamp, i) => {
-  RECOVERED[`STEWARTDOLL${i + 1}`] = { url: `${C2}2012-11/1353539${stamp}-Stewart_Doll_${i + 1}.mp3`, keyFrom: 'gsjs-filename', notCc0: true };
+  RECOVERED[`STEWARTDOLL${i + 1}`] = { url: `${C2}2012-11/1353539${stamp}-Stewart_Doll_${i + 1}.mp3`, keyFrom: 'gsjs-filename' };
 });
 for (const [key, row] of Object.entries(RECOVERED)) {
-  if (row.notCc0) continue;
   row.file = `assets/audio/sfx/${key}.mp3`;
   row.origin = 'wayback-c2';
 }
 
 /**
- * Sounds the remake cuts from a CC0 recording (tools/sound/build-esquibeth-bells.mjs):
- * the five puzzle bells from the archive.org ringtone "Esquebeth Puzzle.mp3".
+ * Glitch CDN files that survive only in a mirror. Slack (Tiny Speck's next
+ * product) shipped some Glitch SFX as notification sounds; archive.org
+ * `slack_sfx` (2015, a third-party upload) holds 11 of them, and its
+ * here_you_go_lighter.mp3 is byte-identical to the Wayback c2 capture, so these
+ * are the CDN bytes. Installed byte for byte (research/audio-hunt/raw/slack_sfx).
  */
-const DERIVED = {};
-for (const key of ['BW_D2', 'BW_E2', 'BW_G2', 'BW_C2', 'BW_A1']) {
-  DERIVED[key] = {
-    file: `assets/audio/sfx/bells/${key}.mp3`,
-    source: 'https://archive.org/download/esquebeth-quest/Esquebeth%20Puzzle.mp3',
-    derivedFrom: 'esquebeth-quest/Esquebeth Puzzle.mp3 (CC0): the D2 strike at 3.746 s, pitched (tools/sound/build-esquibeth-bells.mjs)',
-  };
-}
+const MIRRORED = {
+  SAVE_AND_CHECKOUT: {
+    mirrorFile: 'save_and_checkout.mp3',
+    source: 'https://archive.org/download/slack_sfx/save_and_checkout.mp3',
+    why: 'npc_crafty_bot.js:218. The only surviving copy is Slack\'s (md5 1f16c1a6...); its sibling here_you_go_lighter.mp3 is the c2 file byte for byte.',
+  },
+};
+for (const [key, row] of Object.entries(MIRRORED)) row.file = `assets/audio/sfx/${key}.mp3`;
 
 /**
  * Recordings Tiny Speck embedded in the CC0 overlay sources
@@ -141,7 +140,7 @@ const DOWNLOADS = {
   STREET_LOADED: { file: 'assets/audio/game_loaded_2.mp3', name: 'game_loaded_2.mp3', fit: 'Game Loaded (second take)' },
   CAULDRON: { file: 'assets/audio/cauldron.mp3', name: 'cauldron.mp3', fit: 'Cauldron (tool class sound)' },
   TINCTURING_KIT: { file: 'assets/audio/tincture.mp3', name: 'tincture.mp3', fit: 'Tincture (tool class sound)' },
-  // IMAGINATION_PURCHASE's old best fit, imagination_upgrade.mp3, has no CC0 copy (G317): it plays its synth recipe.
+  IMAGINATION_PURCHASE: { file: 'assets/audio/imagination_upgrade.mp3', name: 'imagination_upgrade.mp3', fit: 'Imagination Upgrade' },
   FLITTERBUG_COLLISION: { file: 'assets/audio/flitterbug_collision.mp3', name: 'flitterbug_collision.mp3', fit: 'Flitterbug Collision' },
   PIGGY_PLOP: { file: 'assets/audio/piggy_plop.mp3', name: 'piggy_plop.mp3', fit: 'Piggy Plop' },
   SPINNING_WHEEL: { file: 'assets/audio/ambient/Spinning-Wheel_1292034939.mp3', name: 'Spinning-Wheel_1292034939.mp3', fit: 'Spinning Wheel' },
@@ -173,9 +172,6 @@ Object.assign(DOWNLOADS, {
 /** Keys that borrow another key's recovered file (best fit, documented). */
 const ALIASES = {
   ITEM_GIVE: 'HERE_YOU_GO_LIGHTER',
-  // Sky Plunge's every-quoin music: the a cappella intro is in no CC0 file; the
-  // CC0 choir sting (archive.org "success-choir") stands in.
-  CLOUD_DROP_2_INTRO: 'DONATION_RECIEVE_EMBLEM',
 };
 
 /**
@@ -200,7 +196,6 @@ for (const entry of ARCHIVE_MAP.files) {
     ALIASES[alias] = entry.key;
   }
 }
-const ARCHIVE_KEYS = new Set(Object.keys(ARCHIVEORG));
 
 /** Hand-written in-game moments for the keys the remake plays. */
 const MOMENTS = {
@@ -471,7 +466,6 @@ note('trumpet', { category: 'ui', where: 'client:TSEngineAssets/src/Assets.as:10
 
 // —— Remake-only keys (moments the remake has that never had their own key) ——
 const REMAKE = {
-  IMAGINATION_PURCHASE: 'Buy an imagination upgrade card (the downloads-page "Imagination Upgrade" jingle has no CC0 copy, G317)',
   UI_PANEL_OPEN: 'Any side panel or dialog opens',
   UI_PANEL_CLOSE: 'Any side panel or dialog closes',
   UI_TOGGLE: 'Mute and other small toggles',
@@ -524,21 +518,16 @@ for (const [key, row] of Object.entries(RECOVERED)) {
   const entry = keys.get(key);
   entry.url = row.url;
   entry.keyFrom = row.keyFrom;
-  if (row.notCc0) {
-    entry.notCc0 = 'the c2 copy (url) is in no CC0 release and is not shipped (G317)';
-    if (existsSync(join(PUBLIC, `assets/audio/sfx/${key}.mp3`)) && !ARCHIVE_KEYS.has(key)) {
-      throw new Error(`assets/audio/sfx/${key}.mp3 is a c2 file in no CC0 release (G317)`);
-    }
-    continue;
-  }
   entry.file = row.file;
   entry.origin = 'wayback-c2';
-  if (!existsSync(join(PUBLIC, row.file))) throw new Error(`missing recovered file ${row.file}`);
+  if (!existsSync(join(PUBLIC, row.file))) throw new Error(`missing recovered file ${row.file} (run tools/sound/install-c2-sfx.mjs)`);
 }
-for (const [key, row] of Object.entries(DERIVED)) {
-  if (!keys.has(key)) throw new Error(`derived key ${key} is not catalogued`);
-  Object.assign(keys.get(key), { file: row.file, origin: 'archiveorg-derived', source: row.source, derivedFrom: row.derivedFrom });
-  if (!existsSync(join(PUBLIC, row.file))) throw new Error(`missing derived file ${row.file} (run tools/sound/build-esquibeth-bells.mjs)`);
+for (const [key, row] of Object.entries(MIRRORED)) {
+  if (!keys.has(key)) throw new Error(`mirrored key ${key} is not catalogued`);
+  const entry = keys.get(key);
+  if (entry.file) throw new Error(`mirrored ${key} would replace ${entry.file}`);
+  Object.assign(entry, { file: row.file, origin: 'slack-mirror', mirrorSource: row.source, mirrorFile: row.mirrorFile, why: row.why });
+  if (!existsSync(join(PUBLIC, row.file))) throw new Error(`missing mirrored file ${row.file}`);
 }
 for (const [key, row] of Object.entries(OVERLAY)) {
   if (keys.has(key)) throw new Error(`overlay key ${key} is already catalogued`);
@@ -602,8 +591,7 @@ for (const key of [...keys.keys()].sort((a, b) => a.localeCompare(b))) {
     ...(row.source ? { source: row.source, archiveItem: row.archiveItem, archiveFile: row.archiveFile } : {}),
     ...(row.why ? { why: row.why } : {}),
     ...(row.doubt ? { doubt: row.doubt } : {}),
-    ...(row.derivedFrom ? { derivedFrom: row.derivedFrom } : {}),
-    ...(row.notCc0 ? { notCc0: row.notCc0 } : {}),
+    ...(row.mirrorSource ? { mirrorSource: row.mirrorSource, mirrorFile: row.mirrorFile } : {}),
     ...(row.fit && !row.source ? { fit: row.fit } : {}),
     ...(ALIASES[key] ? { alias: ALIASES[key] } : {}),
     ...(dead ? { dead: 'commented out in the final client', commentedOut: row.commentedOut } : {}),
@@ -623,10 +611,7 @@ const counts = {
   music: Object.values(catalog).filter((r) => r.category === 'music').length,
   remake: Object.values(catalog).filter((r) => r.category === 'remake').length,
   recoveredWayback: Object.keys(RECOVERED).length,
-  /** c2 files that ship: the same recording is in a CC0 file (G317). */
-  waybackShipped: Object.values(catalog).filter((r) => r.origin === 'wayback-c2').length,
-  notCc0: Object.values(catalog).filter((r) => r.notCc0).length,
-  derived: Object.keys(DERIVED).length,
+  mirrored: Object.keys(MIRRORED).length,
   downloadsBestFit: Object.values(catalog).filter((r) => r.origin === 'downloads-best-fit').length,
   archiveorgSfx: Object.keys(ARCHIVEORG).length,
   overlayFla: Object.keys(OVERLAY).length,

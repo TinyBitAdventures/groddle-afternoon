@@ -513,27 +513,20 @@ test('Sky Plunge has one Qurazy quoin among the last two, paid by the level tabl
   assert.equal(resolveParadiseReward(course.rewards[0]), course.rewards[0]);
 });
 
-test('Sky Plunge keeps the CLOUD_DROP_2 keys and plays CC0 stand-ins for the c2 cuts (G317)', () => {
+test('Sky Plunge plays the Rainbow Run A Cappella cuts: CLOUD_DROP_2 loop, intro on every quoin', () => {
   const course = EXTRA_PARADISE_COURSES.sky_plunge;
   assert.equal(course.musicFile, 'CLOUD_DROP_2');
   assert.equal(course.completionSound, 'CLOUD_DROP_2_INTRO');
   const music = JSON.parse(fs.readFileSync(path.join(publicDir, 'assets', 'content', 'ambient-music.json'), 'utf8'));
   const theme = music.themes[music.streetMusic.CLOUD_DROP_2];
   assert.ok(theme, 'CLOUD_DROP_2 maps to a theme');
-  // Tiny Speck's CC0 Rainbow Run (archive.org glitch-mmo-tiny-speck-music).
-  assert.deepEqual(theme.tracks, ['assets/audio/ambient/Rainbow-Run_1291879159.mp3']);
-  assert.ok(fs.existsSync(path.join(publicDir, theme.tracks[0])));
+  assert.deepEqual(theme.tracks, ['assets/audio/sfx/CLOUD_DROP_2.mp3']);
   assert.ok(theme.gsjsKeys.includes('TICKET_TO_PARADISE1'));
   const keys = JSON.parse(fs.readFileSync(path.join(publicDir, 'assets', 'content', 'sound-keys.json'), 'utf8'));
   for (const key of ['CLOUD_DROP_2', 'CLOUD_DROP_2_INTRO']) {
     assert.match(keys.keys?.[key]?.url || keys[key]?.url || '', /Rainbow_Run_A_Capp?ella/, key);
-    assert.ok(keys.keys[key].notCc0, `${key}: the c2 cut is not shipped`);
-    assert.equal(keys.keys[key].file, undefined, key);
-    assert.ok(!fs.existsSync(path.join(publicDir, 'assets', 'audio', 'sfx', `${key}.mp3`)), key);
+    assert.ok(fs.existsSync(path.join(publicDir, 'assets', 'audio', 'sfx', `${key}.mp3`)), key);
   }
-  // The every-quoin music borrows the CC0 choir sting.
-  assert.equal(keys.keys.CLOUD_DROP_2_INTRO.alias, 'DONATION_RECIEVE_EMBLEM');
-  assert.equal(keys.keys.DONATION_RECIEVE_EMBLEM.origin, 'archiveorg-sfx');
   const game = fs.readFileSync(path.join(publicDir, 'game.js'), 'utf8');
   assert.match(game, /musicFile: course\.musicFile/);
   assert.match(game, /if \(course\.musicFile\) setAmbientForStreet\(currentStreet\)/);

@@ -34,7 +34,7 @@ export function restorationContent() {
     group('header', 'masthead', null, [group('div', 'wrap', null, [
       p('kicker', 'Groddle Field Notes · Restoration report'),
       h(1, 'How much of Glitch is back?'),
-      p('lead', 'Glitch closed in December 2012. Tiny Speck released its art, music and server code into the public domain, and almost everything else was lost: the maps of private quest rooms, most of the sound library, the multiplayer world itself. Groddle Afternoon is a fresh web build that puts the pieces back together, rule by rule from the original code, room by room from players’ recordings where nothing else survives, and with a new multiplayer server so players can share Ur again.'),
+      p('lead', 'Glitch closed in December 2012. Tiny Speck released its art and server code into the public domain, and almost everything else was lost: the maps of private quest rooms, most of the sound library, the multiplayer world itself. Groddle Afternoon is a fresh web build that puts the pieces back together, rule by rule from the original code, room by room from players’ recordings where nothing else survives, and with a new multiplayer server so players can share Ur again.'),
       data('score'),
       p('jump', jump),
     ])]),

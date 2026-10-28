@@ -5,8 +5,8 @@
   -10
  ],
  "peakCeiling": -1,
- "bytesIn": 32898631,
- "bytesOut": 16807422,
+ "bytesIn": 32761824,
+ "bytesOut": 16854862,
  "files": {
   "ACTIVATE_1": {
    "source": "glitch-mmo-sfx-tiny-speck/activate.mp3",
@@ -1977,6 +1977,138 @@
    "bytesIn": 170084,
    "bytesOut": 63146
   },
+  "TELEPORT_AWAY": {
+   "source": "glitch-mmo-tiny-speck-unused-sfx/beam up.mp3",
+   "sourceMd5": "51f3e7ee0875e7ccad88e4c0634b40a4",
+   "seconds": 3.25,
+   "loudness": -18.5,
+   "peak": -7.7,
+   "gainDb": 0,
+   "mode": "copy",
+   "bytesIn": 72160,
+   "bytesOut": 61570
+  },
+  "BUTLER_DOLL_FALL": {
+   "source": "glitch-mmo-tiny-speck-unused-sfx/butler-fall.mp3",
+   "sourceMd5": "0dd0e038fb44a971178a934d94b51b5e",
+   "seconds": 4.94,
+   "loudness": -21,
+   "peak": -4.5,
+   "gainDb": 0,
+   "mode": "copy",
+   "bytesIn": 96988,
+   "bytesOut": 86289
+  },
+  "BUTLER_DOLL_IDLE_2": {
+   "source": "glitch-mmo-tiny-speck-unused-sfx/butler-idle.mp3",
+   "sourceMd5": "37308f5ca254555a7066ebbf173aa35c",
+   "seconds": 2.79,
+   "loudness": -17.8,
+   "peak": -0.2,
+   "gainDb": 0,
+   "mode": "copy",
+   "bytesIn": 69001,
+   "bytesOut": 58439
+  },
+  "BEEN_TREE": {
+   "source": "glitch-mmo-tiny-speck-unused-sfx/harvest been tree.mp3",
+   "sourceMd5": "a75d638f48b26a4d77b8f3d11f91ef4b",
+   "seconds": 0.44,
+   "loudness": -21.4,
+   "peak": -10.6,
+   "gainDb": 0,
+   "mode": "copy",
+   "bytesIn": 22760,
+   "bytesOut": 12264
+  },
+  "BUBBLE_TREE": {
+   "source": "glitch-mmo-tiny-speck-unused-sfx/harvest bubble tree.mp3",
+   "sourceMd5": "d2a1d70bc82dfcb09d7c164a6aeeb6e7",
+   "seconds": 0.26,
+   "loudness": -24.1,
+   "peak": -10.9,
+   "gainDb": 0,
+   "mode": "copy",
+   "bytesIn": 17281,
+   "bytesOut": 6679
+  },
+  "EGG_TREE": {
+   "source": "glitch-mmo-tiny-speck-unused-sfx/harvest egg tree.mp3",
+   "sourceMd5": "195b721bf404f9c55f11109b6e9ccf8c",
+   "seconds": 0.43,
+   "loudness": -17.5,
+   "peak": -7.8,
+   "gainDb": 0,
+   "mode": "copy",
+   "bytesIn": 22133,
+   "bytesOut": 11638
+  },
+  "FRUIT_TREE": {
+   "source": "glitch-mmo-tiny-speck-unused-sfx/harvest fruit tree.mp3",
+   "sourceMd5": "1aff5f795d816129886f1f9fa68be047",
+   "seconds": 0.44,
+   "loudness": -10.4,
+   "peak": -1.1,
+   "gainDb": 0,
+   "mode": "copy",
+   "bytesIn": 23599,
+   "bytesOut": 13413
+  },
+  "GAS_TREE": {
+   "source": "glitch-mmo-tiny-speck-unused-sfx/harvest gass tree.mp3",
+   "sourceMd5": "83e24cf28e1954c13f40450de0185453",
+   "seconds": 0.63,
+   "loudness": -12.9,
+   "peak": -0.3,
+   "gainDb": 0,
+   "mode": "copy",
+   "bytesIn": 24690,
+   "bytesOut": 14296
+  },
+  "PAPER_TREE": {
+   "source": "glitch-mmo-tiny-speck-unused-sfx/harvest paper tree.mp3",
+   "sourceMd5": "3b63e8a4aacd86e7b5a1eaab44f515f7",
+   "seconds": 0.27,
+   "loudness": -15.3,
+   "peak": 0.3,
+   "gainDb": 0,
+   "mode": "copy",
+   "bytesIn": 22506,
+   "bytesOut": 12633
+  },
+  "JUMP": {
+   "source": "glitch-mmo-tiny-speck-unused-sfx/jump 1.mp3",
+   "sourceMd5": "02837e334f5eb451d18179a04e94892a",
+   "seconds": 0.44,
+   "loudness": -14.5,
+   "peak": -0.3,
+   "gainDb": 0,
+   "mode": "copy",
+   "bytesIn": 22361,
+   "bytesOut": 12082
+  },
+  "BUTTERFLY_LOTION": {
+   "source": "glitch-mmo-tiny-speck-unused-sfx/massage butterfly 1.mp3",
+   "sourceMd5": "8a0485eb80db9b7320a53380a0ec67a9",
+   "seconds": 1,
+   "loudness": -15.3,
+   "peak": -0.3,
+   "gainDb": 0,
+   "mode": "copy",
+   "bytesIn": 34193,
+   "bytesOut": 23901
+  },
+  "MAKING_WAITING_COOKING": {
+   "source": "glitch-mmo-tiny-speck-unused-sfx/process.mp3",
+   "sourceMd5": "ce3889e813717731d8ecec0fd66adb02",
+   "seconds": 1.53,
+   "loudness": -12.2,
+   "peak": -0.3,
+   "gainDb": 0,
+   "mode": "copy",
+   "bytesIn": 50541,
+   "bytesOut": 40261
+  },
   "MUSICBLOCK_B_BROWN_01": {
    "source": "esquebeth-quest/BB-1.mp3",
    "sourceMd5": "f1aaf3531d427a62d7c51c48cf7f0d0d",
@@ -2251,17 +2383,6 @@
    "mode": "vbr4",
    "bytesIn": 638908,
    "bytesOut": 332254
-  },
-  "FIREFLY_WHISTLE_1": {
-   "source": "esquebeth-quest/Firefly Whistle 1.mp3",
-   "sourceMd5": "a7d34d7cd95a25309ed466a3f1e2ca69",
-   "seconds": 17.62,
-   "loudness": -11.5,
-   "peak": -0.5,
-   "gainDb": 0,
-   "mode": "vbr4",
-   "bytesIn": 615020,
-   "bytesOut": 306025
   }
  }
 }

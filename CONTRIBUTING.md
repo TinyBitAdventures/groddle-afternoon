@@ -45,4 +45,4 @@ A test that needs a checkout you do not have skips and says what to clone.
 
 ## Licences
 
-The code is MIT (see `LICENSE`). Tiny Speck's art, sound and game data are CC0. The Glitch name and logo are Tiny Speck's and not part of that release, so they never ship. Only CC0 art and audio may be added; footage, Snaps and other players' recordings can guide a rebuild but never ship.
+The code is MIT (see `LICENSE`). Tiny Speck's art and game data are CC0. The sounds are Tiny Speck's original recordings (archive.org and Glitch's own servers through the Wayback Machine), shipped as the originals. The Glitch name and logo are Tiny Speck's and not part of that release, so they never ship. Only CC0 art and Tiny Speck's own recordings may be added; footage, Snaps and other players' recordings can guide a rebuild but never ship.

@@ -98,7 +98,8 @@ describe('street music_file keys', () => {
       for (const url of cfg.themes[theme].tracks) assert.ok(existsSync(join(__dirname, '../public', url)), url);
     }
     assert.equal(resolveAmbientTheme({ musicFile: 'TOXIC_MOON' }), 'street:TOXIC_MOON');
-    assert.match(tracksForTheme('street:TOXIC_MOON')[0], /moon_music/);
+    // The c2 original (Also_Sprach_Zarathustra_Loop_3.2_fades), not the Moon Music stand-in.
+    assert.equal(tracksForTheme('street:TOXIC_MOON')[0], 'assets/audio/sfx/TOXIC_MOON.mp3');
   });
 
   it('unknown music_file keys keep the default library', () => {

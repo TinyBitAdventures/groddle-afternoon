@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g377-1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g388-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-215';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-216';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g378-1';
@@ -690,7 +690,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=g370-1';
+} from './js/musicblocks.js?v=g388-1';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -4283,7 +4283,7 @@ async function loadAudio() {
 /** Small recovered files worth warming at boot (the rest load on first use). */
 const PRELOAD_SOUND_KEYS = [
   'QUEST_COMPLETE', 'LEVEL_UP', 'TRIPLE_JUMP', 'DISCOVER_USEFUL_NEW_ITEM', 'QUORAZY_QUOIN',
-  'QUEST_ADDED', 'CLIENT_LOADED', 'STREET_LOADED', 'PETRIFIED_ROCK', 'PIGGY_PLOP',
+  'QUEST_ADDED', 'CLIENT_LOADED', 'STREET_LOADED', 'HARVEST', 'PETRIFIED_ROCK', 'PIGGY_PLOP',
   'HERE_YOU_GO_LIGHTER', 'NEWDAY', 'WATER_SPLASH',
   // Small archive.org takes heard every minute (all under 60 KB).
   'ITEM_PICKUP', 'ITEM_DROP', 'QUOIN_GOT', 'CLICK_SUCCESS', 'CLICK_FAILURE', 'PET_PIGGY', 'PICK', 'HATCHET',
@@ -6912,8 +6912,7 @@ function spawnStootMemorial() {
   if (app?.canvas) {
     app.canvas.dataset.stootMemorial = 'clean-cc0';
     app.canvas.dataset.stootDollActive = '1';
-    // The c2 voice lines are in no CC0 release (G317): the doll is silent.
-    app.canvas.dataset.stootDollAudio = 'none';
+    app.canvas.dataset.stootDollAudio = 'recovered-c2';
   }
   return memorial;
 }
@@ -6948,10 +6947,9 @@ function handleStootDollTarget(target, verbId, { context = 'world', animate = tr
     app.canvas.dataset.stootDollQuote = result.quote;
     app.canvas.dataset.stootDollSoundKey = result.soundKey || '';
   }
-  // The production voice files (c2.glitch.bz Stewart_Doll_1-14, Wayback) are
-  // in no CC0 release (G317), so the 14 voiced keys play nothing (voice keys
-  // never get a synth stand-in) and the quote shows on its own; quotes 0-28
-  // never had audio. Never substitute compressed video audio for the lines.
+  // Tiny Speck's production voice files (c2.glitch.bz Stewart_Doll_1-14,
+  // recovered from the Wayback CDX index) play as the originals; quotes 0-28
+  // never had audio. Never substitute compressed video audio for the missing lines.
   if (result.soundKey) playSound(result.soundKey, { volume: 0.85 });
 }
 

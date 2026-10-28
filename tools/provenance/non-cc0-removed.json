@@ -1,50 +1,10 @@
 {
- "about": "Files taken out of the game because they are in no CC0 release (G316/G317, research/coverage/g312-provenance.md \"Resolved 2026-10-26\"): c2.glitch.bz CDN and downloads-page files with no CC0 copy, the unlicensed archive.org unused-SFX takes, renders of a Wayback SWF, untraced art, and the licensed new_day_fanfare.mp3. tests/g316-provenance.test.js keeps their bytes (git blob ids) and paths out of public/ and assets-src/.",
+ "about": "Files taken out of the game in G316/G317 (research/coverage/g312-provenance.md \"Resolved 2026-10-26\"): renders of a Wayback SWF, untraced art, CDN loading strips, and the licensed stock new_day_fanfare.mp3. tests/g316-provenance.test.js keeps their bytes (git blob ids) and paths out of public/ and assets-src/. `restored`: Tiny Speck's own recordings that G317 had also taken out and that ship again as the originals since 2026-10-28 (Austin: use all of the original sound; g312-provenance.md \"Original sounds, 2026-10-28\"); each blob is allowed only at its own path.",
  "paths": [
   "assets-src/decos/groddle/patch_grass_2.png",
   "assets-src/decos/groddle/patch_grass_4.png",
   "assets-src/decos/groddle/patch_grass_6.png",
-  "public/assets/audio/imagination_upgrade.mp3",
   "public/assets/audio/new_day_fanfare.mp3",
-  "public/assets/audio/sfx/AMBIENT_WATERFALL.mp3",
-  "public/assets/audio/sfx/AMBIENT_WATERFALL_LEVEL3.mp3",
-  "public/assets/audio/sfx/AUTUMN_DAY.mp3",
-  "public/assets/audio/sfx/BEEN_TREE.mp3",
-  "public/assets/audio/sfx/BUBBLE_TREE.mp3",
-  "public/assets/audio/sfx/BUTLER_DOLL_FALL.mp3",
-  "public/assets/audio/sfx/BUTLER_DOLL_IDLE_2.mp3",
-  "public/assets/audio/sfx/BUTTERFLY_LOTION.mp3",
-  "public/assets/audio/sfx/BW_A1.mp3",
-  "public/assets/audio/sfx/BW_C2.mp3",
-  "public/assets/audio/sfx/BW_D2.mp3",
-  "public/assets/audio/sfx/BW_E2.mp3",
-  "public/assets/audio/sfx/BW_G2.mp3",
-  "public/assets/audio/sfx/CLOUD_DROP_2.mp3",
-  "public/assets/audio/sfx/CLOUD_DROP_2_INTRO.mp3",
-  "public/assets/audio/sfx/EGG_TREE.mp3",
-  "public/assets/audio/sfx/FRUIT_TREE.mp3",
-  "public/assets/audio/sfx/GAS_TREE.mp3",
-  "public/assets/audio/sfx/HARVEST.mp3",
-  "public/assets/audio/sfx/JUMP.mp3",
-  "public/assets/audio/sfx/MAKING_WAITING_COOKING.mp3",
-  "public/assets/audio/sfx/PAPER_TREE.mp3",
-  "public/assets/audio/sfx/PIANO_THEME1.mp3",
-  "public/assets/audio/sfx/STEWARTDOLL1.mp3",
-  "public/assets/audio/sfx/STEWARTDOLL10.mp3",
-  "public/assets/audio/sfx/STEWARTDOLL11.mp3",
-  "public/assets/audio/sfx/STEWARTDOLL12.mp3",
-  "public/assets/audio/sfx/STEWARTDOLL13.mp3",
-  "public/assets/audio/sfx/STEWARTDOLL14.mp3",
-  "public/assets/audio/sfx/STEWARTDOLL2.mp3",
-  "public/assets/audio/sfx/STEWARTDOLL3.mp3",
-  "public/assets/audio/sfx/STEWARTDOLL4.mp3",
-  "public/assets/audio/sfx/STEWARTDOLL5.mp3",
-  "public/assets/audio/sfx/STEWARTDOLL6.mp3",
-  "public/assets/audio/sfx/STEWARTDOLL7.mp3",
-  "public/assets/audio/sfx/STEWARTDOLL8.mp3",
-  "public/assets/audio/sfx/STEWARTDOLL9.mp3",
-  "public/assets/audio/sfx/TELEPORT_AWAY.mp3",
-  "public/assets/audio/sfx/TOXIC_MOON.mp3",
   "public/assets/decos/groddle/patch_grass_2.png",
   "public/assets/decos/groddle/patch_grass_2.webp",
   "public/assets/decos/groddle/patch_grass_4.png",
@@ -149,8 +109,6 @@
   "03b8af171fdd68e683eaaacad6c59d48d37f8a37": "untraced image (redrawn by tools/garden-art)",
   "0468b24328fd0b830b4e14cc43715d4611386244": "loading strip (c2 CDN via Wayback)",
   "04eb8ca427855a51fd0aacb47611d8a906f9616a": "loading strip (c2 CDN via Wayback)",
-  "0851fdcfb8514dc74bc5ad77ef5092916253d9dc": "c2 CDN sound, no CC0 copy",
-  "08de7757de3f36e73d110710511d2b35b382a06f": "c2 CDN sound, no CC0 copy",
   "0b000d70913b34e62609aea01bdc19298e4e5218": "loading strip (c2 CDN via Wayback)",
   "0c01c38a983511c24a6bf8f7959126763665c020": "loading strip (c2 CDN via Wayback)",
   "0c9c27bc05c9a16ef899548a57600bf3cd86b586": "loading strip (c2 CDN via Wayback)",
@@ -159,69 +117,45 @@
   "179a01c32122da0e0ea7dd21ff79a4cbcf0749d2": "loading strip (c2 CDN via Wayback)",
   "19101b93f0de09feddedb20e68b45fc3573f368e": "loading strip (c2 CDN via Wayback)",
   "1933b1d33bf19e18b870021a1f5d343460484659": "loading strip (c2 CDN via Wayback)",
-  "199677b163fb1ce885e94c24970100e12dd6eea7": "c2 CDN sound, no CC0 copy",
-  "1e04933d4556c1fc6a0ad4ed67d6d97b8b63171f": "archive.org unused-sfx item (no licence)",
   "20ab42a957919ab175385e84876596267980764a": "loading strip (c2 CDN via Wayback)",
-  "20c7caf788b376bdb7f4687a860da1708de1c380": "archive.org unused-sfx item (no licence)",
   "20d2a172437286f8336f216ecaa7a72fdbfee9cb": "loading strip (c2 CDN via Wayback)",
-  "20f91d17405fcd0217950840b0a6ca6db8971e83": "archive.org unused-sfx item (no licence)",
   "25648ef579ef3d4ae71e681d9ce9abfb44dbff74": "loading strip (c2 CDN via Wayback)",
-  "28cbce6def65cf101b5bbbafa38061fa11cb6733": "archive.org unused-sfx item (no licence)",
   "29351b3aedd696596ca934d50801aa525067cc17": "loading strip (c2 CDN via Wayback)",
   "2b698ae2cd32aaf4053041f2efee842f5bc84f89": "loading strip (c2 CDN via Wayback)",
   "2f2dedd670127ccd9bceaf9348f836c149caa22a": "loading strip (c2 CDN via Wayback)",
-  "30a622b71a991166c733d6d467425fa2f7d65342": "c2 CDN sound, no CC0 copy",
   "32881472c05dcc989d2c4b29d685c7fa787e435b": "loading strip (c2 CDN via Wayback)",
   "335b014a073dd2b3f217a8ab63d3c85cf13490cf": "loading strip (c2 CDN via Wayback)",
-  "33b5d89959473ebc88c75be6e30f032e42891e30": "c2 CDN sound, no CC0 copy",
   "33c855d0c7e7585c37c7f177b8b74ed9bd088d26": "loading strip (c2 CDN via Wayback)",
   "36f62ed857962b2bcd8acc8103603c5a1385e17d": "loading strip (c2 CDN via Wayback)",
   "3caa77ba5e006fea587fb60b3e0d8b0d9f524387": "deco with no SWF in any CC0 set (CoU _png-2x)",
   "3f810718b6812e12ad4b5cc9ba77972cdf7e70ce": "loading strip (c2 CDN via Wayback)",
   "409f27a227a3c3335b8facec018c4bcdde25f3c7": "loading strip (c2 CDN via Wayback)",
-  "40bb88720122655cd041543c2e6e5f94bc486cd3": "c2 CDN sound, no CC0 copy",
   "41e6ce3fa38d11d670da50de56ad3bc8a3864555": "loading strip (c2 CDN via Wayback)",
-  "41ff286e11dbb3b46e13f753e1dbf3cbb5b6e7d3": "archive.org unused-sfx item (no licence)",
   "43842bc58688a11b435e075d13a90b13023a7cfa": "loading strip (c2 CDN via Wayback)",
   "4a8460974d32828cd4165d7e741c28be4ceaf9e7": "loading strip (c2 CDN via Wayback)",
   "4efe9ac2e8eeb6895fc73d17e68a8d1c3d01bac6": "loading strip (c2 CDN via Wayback)",
-  "54e26f4056fb59a9716c828710e3e50649d937f2": "archive.org unused-sfx item (no licence)",
   "556e635c88489ed150675961ad2f95308ed1bd71": "loading strip (c2 CDN via Wayback)",
-  "55da764a8240b1a68dc4d16de56c9684097ef769": "c2 CDN sound, no CC0 copy",
   "56167b97b914cc57c133978834fe2b7e675c53c5": "loading strip (c2 CDN via Wayback)",
   "5911e6299ab0a01692277ee35586b16c500f9e15": "render of a Wayback npc_butterfly.swf",
   "5a25536c2386164eb1b426e9851c16eac4a8cf5d": "loading strip (c2 CDN via Wayback)",
   "5aa19732fa03544d9fa26392dfb4060185ef4e8c": "render of a Wayback npc_butterfly.swf",
   "5b19082c022016415f9e26f8ed71ebf52d877b68": "loading strip (c2 CDN via Wayback)",
-  "5b3ee804595a10f0a4efea33dadbb5db2aed6f7e": "c2 CDN sound, no CC0 copy",
-  "5f669938b2d4b0ee9b3a468618fea3516a3fb6e7": "c2 CDN sound, no CC0 copy",
   "62138561fa62a8899415ce9272827ac9b698847a": "loading strip (c2 CDN via Wayback)",
-  "6300617299975796fcc71f7ad41312d4f3d625a4": "c2 CDN sound, no CC0 copy",
   "683af8872aed078c5437eb46484d6f1c98d79064": "loading strip (c2 CDN via Wayback)",
   "6c4036be5e52f0ab7cc11adfe9dceef5fd1fd792": "loading strip (c2 CDN via Wayback)",
   "6dba7f462847a3df176daeb87751c1b357bb0dbc": "loading strip (c2 CDN via Wayback)",
   "74272194863d8ae9b6b545bab5f7abef0d3d112c": "untraced image",
-  "74fb2881fd43366274f5b27705b996f4c1d7c570": "c2 CDN sound, no CC0 copy",
-  "7693832a0eea48cf9c71391bdd612a0046beb2ef": "c2 CDN sound, no CC0 copy",
   "77e0facfe5006165c89d17f015cb0deadddd4b15": "loading strip (c2 CDN via Wayback)",
-  "786b7e3f9b33d89c92848048d741633c90555fed": "c2 CDN sound, no CC0 copy",
-  "79c95b766820002f087df6203a6939fb67b3433c": "archive.org unused-sfx item (no licence)",
-  "7b99c383c76d8fb57afb71af9cb3036fe44a343a": "c2 CDN sound, no CC0 copy",
   "7f1c1d6c6f10557609f0a7688cd2d65112381d4f": "loading strip (c2 CDN via Wayback)",
   "833676e6b64fcb28e2f72a238645006ae25e6c25": "loading strip (c2 CDN via Wayback)",
-  "83dc09338d8fde476498b812ea170bbece04a3ab": "c2 CDN sound, no CC0 copy",
   "8413093d69611028632d556f615d477f4e79c292": "loading strip (c2 CDN via Wayback)",
   "87623dfe03a03d6e37b7de73338a15301234bf3c": "loading strip (c2 CDN via Wayback)",
   "89dad5d48d2a21449fe4d2e98dab020d16d2e940": "loading strip (c2 CDN via Wayback)",
-  "8c615ca5a4de86ae1b299d3022d5a3b30bf4b270": "c2 CDN sound, no CC0 copy",
   "8c6b897160d80ce168f8cbc27b339ee1f6ff83d8": "loading strip (c2 CDN via Wayback)",
   "8d179e9a70e344459233f746d8153eef861ef3dc": "loading strip (c2 CDN via Wayback)",
   "8d63d2e9ad68f7a9d00a5eb7ebfc32420cb9210d": "loading strip (c2 CDN via Wayback)",
   "90c3739fd96c97ccf352c8d076d3d3a2d719ed4a": "loading strip (c2 CDN via Wayback)",
-  "931d119ad71400bb409b0af6f65b40e86da0ad95": "c2 CDN sound, no CC0 copy",
   "935a3be042fd5aaf70e69497374cff23e35612ed": "untraced image (redrawn by tools/garden-art)",
-  "93b2a1d891a9975a98740e9ddd65a79d83ee1f1f": "archive.org unused-sfx item (no licence)",
-  "942573f8f56d8ba9a3d4dea5073ded9f03a3bb19": "c2 CDN sound, no CC0 copy",
   "9656c6ee02448696048d72fd23042f4f8fa144d7": "loading strip (c2 CDN via Wayback)",
   "97c3e83703b941a1cea17703ab1617a03a254141": "loading strip (c2 CDN via Wayback)",
   "98d15b4097c3742f9a3ab0e2fe585049d268db6a": "loading strip (c2 CDN via Wayback)",
@@ -229,21 +163,16 @@
   "9bac4919bbf0caa8c654c8bdc225f0b2bd2a277c": "loading strip (c2 CDN via Wayback)",
   "9bfdaef70c1007bcc5b12140e9ea755c20020e61": "licensed stock audio (removed earlier in 64216a47)",
   "9d5a1c3b8d887591c808f0e73b04be40fc7d16bc": "loading strip (c2 CDN via Wayback)",
-  "9e46b88b2311d3d0c416c497f6ed0f7bd07d9b56": "archive.org unused-sfx item (no licence)",
   "a0b108fbaf9d2d138d5a245da62e95bc40a8c208": "loading strip (c2 CDN via Wayback)",
   "a16b278b0d79bca01ffda71799601b0c0b7bdb56": "loading strip (c2 CDN via Wayback)",
-  "a3bcab5101ad4bce57b0ad2d59aff9b21e4a48b2": "c2 CDN sound, no CC0 copy",
-  "a40dd01a0c750ee656a30809bbb3b2eee780294a": "c2 CDN sound, no CC0 copy",
   "a4ed5e0e1228db30f1d3572ed27ba21674cc4c86": "untraced image (redrawn by tools/garden-art)",
   "a73a5bf252edd6805914a6ab2665412274c2a505": "loading strip (c2 CDN via Wayback)",
   "a83d08f992bdb7464afd488d229610a066eee621": "loading strip (c2 CDN via Wayback)",
   "a8a932f543c2eb9381515e4dba999e304ab61bbd": "loading strip (c2 CDN via Wayback)",
   "ac56a5e363348bcc203dd8c9069855cd5072260f": "loading strip (c2 CDN via Wayback)",
-  "ae4cd1bb7b82e864be91b23a42c3f2d8d493b217": "c2 CDN sound, no CC0 copy",
   "aef03fbdcae89d37491b59c719cd72648ef2c590": "loading strip (c2 CDN via Wayback)",
   "b195ff0c6c582788f867f85622ae8cc490abb459": "loading strip (c2 CDN via Wayback)",
   "b3fc19217b3f4b8924cae743d46f31af0df60288": "loading strip (c2 CDN via Wayback)",
-  "b468439b8693215646b990ab03d1e8492752e9f2": "c2 CDN sound, no CC0 copy",
   "b58a8217019fc730bd225bc41dab515e6d0d43ca": "loading strip (c2 CDN via Wayback)",
   "b6bb2da822d08f526f56a69749c6d69bf5de9408": "loading strip (c2 CDN via Wayback)",
   "b6cbbbd6ecfaab4d155796733232e73b06060f00": "loading strip (c2 CDN via Wayback)",
@@ -251,28 +180,20 @@
   "bcbb59972e8f926f4c92e98bfe8e7e9c9ed4ba2e": "loading strip (c2 CDN via Wayback)",
   "be359b5b06509b088d7b761dfb234d292583874e": "loading strip (c2 CDN via Wayback)",
   "c044a43d3fb5396dc7d5660ab85a0db1ce2d2b60": "untraced image (redrawn by tools/garden-art)",
-  "c14935cea888b8fa225c0341df4b7f7f6f1208eb": "c2 CDN sound (replaced by the CC0 ringtone)",
-  "c3eecfc470938f3815c4863db68ddb3fb1eba393": "c2 CDN sound, no CC0 copy",
   "c556add2ccd91b831a62d8899f7f3389845aa174": "loading strip (c2 CDN via Wayback)",
-  "c55eb12d107674c401a972b2ee033051f8622f83": "c2 CDN sound, no CC0 copy",
   "c613b24a494d96006ac158a7951a16d6cf34468e": "loading strip (c2 CDN via Wayback)",
   "c749697e47f0fd53df742574264505b03b50e514": "loading strip (c2 CDN via Wayback)",
   "c84446f049b58fe19cff595bf1a1d1d55d08ae62": "loading strip (c2 CDN via Wayback)",
   "c8efae4c713ad3dadf8641962c1f68f36bf7d93c": "loading strip (c2 CDN via Wayback)",
   "cb7ee2e50bebba7fc5f74bedeea76b73fc6d0886": "loading strip (c2 CDN via Wayback)",
   "ccdb7c7494b9965a654acef406f16a7a957942e4": "untraced image",
-  "d0e76251d299ee4f3a8556ed5ba2be427d59eb36": "c2 CDN sound, no CC0 copy",
   "d1f9f0fe000ff5c74a9204cda5e1de0440b1c7e9": "loading strip (c2 CDN via Wayback)",
   "d34802b8724df864b2a6635f874078902ed97cb0": "loading strip (c2 CDN via Wayback)",
   "d6bcaaa7fab342f3bff7c66c9edb621217e8d4f8": "untraced image",
   "d82b229440a026beb1c745dde4bed5b155088e53": "loading strip (c2 CDN via Wayback)",
   "dbe00fd53d2b3e3ccee81603b1c3f683e2a68f45": "loading strip (c2 CDN via Wayback)",
-  "dcece3b25561a028c904c12043e25c80430a4b0b": "archive.org unused-sfx item (no licence)",
   "dd0a6acc5f3c8b379fddfdef95f833ac75fef610": "loading strip (c2 CDN via Wayback)",
-  "dd1baf1b0719b92720d39e9e01b4594528878830": "downloads-page sound, no CC0 copy",
-  "dd2aa551e2a56ac6cb0064df16ed2768e7baf5d8": "archive.org unused-sfx item (no licence)",
   "e4996ae9cb3083cb037b3e2421ec06a672295102": "loading strip (c2 CDN via Wayback)",
-  "e4b63e98155893ed43c16675574af87acbeb46f2": "c2 CDN sound, no CC0 copy",
   "eb72c11821b0db0a93634b248602cd6b3129bd68": "render of a Wayback npc_butterfly.swf",
   "ebbffeee72d6bf2118f9cb0920ee8c12d250c89b": "loading strip (c2 CDN via Wayback)",
   "ee1dca3754e77d30b7bc2586626c81752b373b12": "deco with no SWF in any CC0 set (CoU _png-2x)",
@@ -280,8 +201,172 @@
   "f23dacfe38c901e0698dae1a172047663b797f61": "loading strip (c2 CDN via Wayback)",
   "fa3d9991bc3f90954a289378e7a1c5db13ba7998": "loading strip (c2 CDN via Wayback)",
   "fa75a9e997e61a6fc6ef0e15d5fd7aca48a10cc3": "loading strip (c2 CDN via Wayback)",
-  "fc9b1a08d3412e1b5a74f87232f57adce4e0f90c": "c2 CDN sound, no CC0 copy",
-  "ff2a381e58e236711ca434e489c2847284dc5ad3": "archive.org unused-sfx item (no licence)",
   "ffc04f9f5007047f3cfa64b1447d4aca1bee792a": "render of a Wayback npc_butterfly.swf"
+ },
+ "restored": {
+  "dd1baf1b0719b92720d39e9e01b4594528878830": {
+   "path": "public/assets/audio/imagination_upgrade.mp3",
+   "source": "glitchthegame.com downloads page via Wayback (wayback/audio/imagination_upgrade.mp3)"
+  },
+  "931d119ad71400bb409b0af6f65b40e86da0ad95": {
+   "path": "public/assets/audio/sfx/AMBIENT_WATERFALL.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "ae4cd1bb7b82e864be91b23a42c3f2d8d493b217": {
+   "path": "public/assets/audio/sfx/AMBIENT_WATERFALL_LEVEL3.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "8c615ca5a4de86ae1b299d3022d5a3b30bf4b270": {
+   "path": "public/assets/audio/sfx/AUTUMN_DAY.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "ff2a381e58e236711ca434e489c2847284dc5ad3": {
+   "path": "public/assets/audio/sfx/BEEN_TREE.mp3",
+   "source": "archive.org glitch-mmo-tiny-speck-unused-sfx (tools/sound/install-archiveorg-sfx.mjs)"
+  },
+  "1e04933d4556c1fc6a0ad4ed67d6d97b8b63171f": {
+   "path": "public/assets/audio/sfx/BUBBLE_TREE.mp3",
+   "source": "archive.org glitch-mmo-tiny-speck-unused-sfx (tools/sound/install-archiveorg-sfx.mjs)"
+  },
+  "dd2aa551e2a56ac6cb0064df16ed2768e7baf5d8": {
+   "path": "public/assets/audio/sfx/BUTLER_DOLL_FALL.mp3",
+   "source": "archive.org glitch-mmo-tiny-speck-unused-sfx (tools/sound/install-archiveorg-sfx.mjs)"
+  },
+  "dcece3b25561a028c904c12043e25c80430a4b0b": {
+   "path": "public/assets/audio/sfx/BUTLER_DOLL_IDLE_2.mp3",
+   "source": "archive.org glitch-mmo-tiny-speck-unused-sfx (tools/sound/install-archiveorg-sfx.mjs)"
+  },
+  "28cbce6def65cf101b5bbbafa38061fa11cb6733": {
+   "path": "public/assets/audio/sfx/BUTTERFLY_LOTION.mp3",
+   "source": "archive.org glitch-mmo-tiny-speck-unused-sfx (tools/sound/install-archiveorg-sfx.mjs)"
+  },
+  "c55eb12d107674c401a972b2ee033051f8622f83": {
+   "path": "public/assets/audio/sfx/BW_A1.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "fc9b1a08d3412e1b5a74f87232f57adce4e0f90c": {
+   "path": "public/assets/audio/sfx/BW_C2.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "c3eecfc470938f3815c4863db68ddb3fb1eba393": {
+   "path": "public/assets/audio/sfx/BW_D2.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "b468439b8693215646b990ab03d1e8492752e9f2": {
+   "path": "public/assets/audio/sfx/BW_E2.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "74fb2881fd43366274f5b27705b996f4c1d7c570": {
+   "path": "public/assets/audio/sfx/BW_G2.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "a40dd01a0c750ee656a30809bbb3b2eee780294a": {
+   "path": "public/assets/audio/sfx/CLOUD_DROP_2.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "08de7757de3f36e73d110710511d2b35b382a06f": {
+   "path": "public/assets/audio/sfx/CLOUD_DROP_2_INTRO.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "20c7caf788b376bdb7f4687a860da1708de1c380": {
+   "path": "public/assets/audio/sfx/EGG_TREE.mp3",
+   "source": "archive.org glitch-mmo-tiny-speck-unused-sfx (tools/sound/install-archiveorg-sfx.mjs)"
+  },
+  "c14935cea888b8fa225c0341df4b7f7f6f1208eb": {
+   "path": "public/assets/audio/sfx/FIREFLY_WHISTLE_1.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "93b2a1d891a9975a98740e9ddd65a79d83ee1f1f": {
+   "path": "public/assets/audio/sfx/FRUIT_TREE.mp3",
+   "source": "archive.org glitch-mmo-tiny-speck-unused-sfx (tools/sound/install-archiveorg-sfx.mjs)"
+  },
+  "20f91d17405fcd0217950840b0a6ca6db8971e83": {
+   "path": "public/assets/audio/sfx/GAS_TREE.mp3",
+   "source": "archive.org glitch-mmo-tiny-speck-unused-sfx (tools/sound/install-archiveorg-sfx.mjs)"
+  },
+  "786b7e3f9b33d89c92848048d741633c90555fed": {
+   "path": "public/assets/audio/sfx/HARVEST.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "9e46b88b2311d3d0c416c497f6ed0f7bd07d9b56": {
+   "path": "public/assets/audio/sfx/JUMP.mp3",
+   "source": "archive.org glitch-mmo-tiny-speck-unused-sfx (tools/sound/install-archiveorg-sfx.mjs)"
+  },
+  "79c95b766820002f087df6203a6939fb67b3433c": {
+   "path": "public/assets/audio/sfx/MAKING_WAITING_COOKING.mp3",
+   "source": "archive.org glitch-mmo-tiny-speck-unused-sfx (tools/sound/install-archiveorg-sfx.mjs)"
+  },
+  "54e26f4056fb59a9716c828710e3e50649d937f2": {
+   "path": "public/assets/audio/sfx/PAPER_TREE.mp3",
+   "source": "archive.org glitch-mmo-tiny-speck-unused-sfx (tools/sound/install-archiveorg-sfx.mjs)"
+  },
+  "33b5d89959473ebc88c75be6e30f032e42891e30": {
+   "path": "public/assets/audio/sfx/PIANO_THEME1.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "5f669938b2d4b0ee9b3a468618fea3516a3fb6e7": {
+   "path": "public/assets/audio/sfx/STEWARTDOLL1.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "7693832a0eea48cf9c71391bdd612a0046beb2ef": {
+   "path": "public/assets/audio/sfx/STEWARTDOLL10.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "a3bcab5101ad4bce57b0ad2d59aff9b21e4a48b2": {
+   "path": "public/assets/audio/sfx/STEWARTDOLL11.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "83dc09338d8fde476498b812ea170bbece04a3ab": {
+   "path": "public/assets/audio/sfx/STEWARTDOLL12.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "7b99c383c76d8fb57afb71af9cb3036fe44a343a": {
+   "path": "public/assets/audio/sfx/STEWARTDOLL13.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "0851fdcfb8514dc74bc5ad77ef5092916253d9dc": {
+   "path": "public/assets/audio/sfx/STEWARTDOLL14.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "40bb88720122655cd041543c2e6e5f94bc486cd3": {
+   "path": "public/assets/audio/sfx/STEWARTDOLL2.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "6300617299975796fcc71f7ad41312d4f3d625a4": {
+   "path": "public/assets/audio/sfx/STEWARTDOLL3.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "199677b163fb1ce885e94c24970100e12dd6eea7": {
+   "path": "public/assets/audio/sfx/STEWARTDOLL4.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "5b3ee804595a10f0a4efea33dadbb5db2aed6f7e": {
+   "path": "public/assets/audio/sfx/STEWARTDOLL5.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "d0e76251d299ee4f3a8556ed5ba2be427d59eb36": {
+   "path": "public/assets/audio/sfx/STEWARTDOLL6.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "942573f8f56d8ba9a3d4dea5073ded9f03a3bb19": {
+   "path": "public/assets/audio/sfx/STEWARTDOLL7.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "55da764a8240b1a68dc4d16de56c9684097ef769": {
+   "path": "public/assets/audio/sfx/STEWARTDOLL8.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "30a622b71a991166c733d6d467425fa2f7d65342": {
+   "path": "public/assets/audio/sfx/STEWARTDOLL9.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  },
+  "41ff286e11dbb3b46e13f753e1dbf3cbb5b6e7d3": {
+   "path": "public/assets/audio/sfx/TELEPORT_AWAY.mp3",
+   "source": "archive.org glitch-mmo-tiny-speck-unused-sfx (tools/sound/install-archiveorg-sfx.mjs)"
+  },
+  "e4b63e98155893ed43c16675574af87acbeb46f2": {
+   "path": "public/assets/audio/sfx/TOXIC_MOON.mp3",
+   "source": "c2.glitch.bz via the Wayback CDX (tools/sound/install-c2-sfx.mjs)"
+  }
  }
 }

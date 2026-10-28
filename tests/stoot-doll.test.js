@@ -113,12 +113,11 @@ test.describe('pull-string interaction', () => {
     assert.match(game, /data\.hubName = 'Jethimadh Tower: Mid'/);
     assert.doesNotMatch(game, /Alphermia Prime/);
     assert.match(game, /currentStreetPopulation\.companions !== false/);
-    assert.match(game, /stootDollAudio = 'none'/);
+    assert.match(game, /stootDollAudio = 'recovered-c2'/);
     assert.match(game, /if \(result\.soundKey\) playSound\(result\.soundKey/);
     assert.match(game, /Never substitute compressed video audio/);
-    // G317: the c2 voice files are in no CC0 release; the keys stay, silent.
     for (let n = 1; n <= 14; n += 1) {
-      assert.equal(fs.existsSync(path.join(root, `public/assets/audio/sfx/STEWARTDOLL${n}.mp3`)), false, `STEWARTDOLL${n}`);
+      assert.equal(fs.existsSync(path.join(root, `public/assets/audio/sfx/STEWARTDOLL${n}.mp3`)), true, `STEWARTDOLL${n}`);
     }
     assert.match(game, /stootdollautoplay/);
     assert.match(game, /stootdollpackautoplay/);

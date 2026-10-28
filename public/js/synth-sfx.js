@@ -714,7 +714,7 @@ const KEY_RECIPES = {
   AWESOME_POT: 'bubble',
   CAULDRON: 'bubble',
   MAKING_WAITING_COOKING: 'bubble',
-  // G317: these lost their files (no CC0 copy); stand-ins by moment.
+  // Cold-file fallbacks by moment (each key plays Tiny Speck's recording once loaded).
   IMAGINATION_PURCHASE: 'sparkle',
   BUTLER_DOLL_FALL: 'drop',
   BUTLER_DOLL_IDLE_2: 'squishSoft',

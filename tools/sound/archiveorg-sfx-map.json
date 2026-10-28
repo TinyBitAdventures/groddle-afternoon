@@ -11,7 +11,7 @@
     "unused": {
       "id": "glitch-mmo-tiny-speck-unused-sfx",
       "url": "https://archive.org/details/glitch-mmo-tiny-speck-unused-sfx",
-      "license": "No licenseurl field on this item (the uploader's sibling items carry CC0). Not treated as a CC0 release: nothing from it ships (G317, 2026-10-26).",
+      "license": "No licenseurl field on this item. Same uploader, same evening (2025-07-20) as its three CC0-tagged siblings (sfx, music, ringtones). Tiny Speck's own recordings, shipped as the originals since 2026-10-28 (Austin: use all of the original sound; research/coverage/g312-provenance.md \"Original sounds, 2026-10-28\"). Used only where a key has no released take.",
       "album": "Glitch SFX [Un-used and Rejects], Daniel Simmons",
       "uploader": "interestingephemera (archive.org)"
     },
@@ -204,6 +204,19 @@
     { "item": "sfx", "file": "watering can.mp3", "key": "WATERING_CAN", "aliases": ["IRRIGATOR_9000"], "why": "The Irrigator 9000 is the upgraded watering can with no file of its own." },
     { "item": "sfx", "file": "yoga frog-pose.mp3", "key": "WARRIOR_POSE_FROG", "aliases": ["TREE_POSE_FROG", "DANCER_POSE_FROG"], "why": "npc_yoga_frog.js:311-317 doYoga picks one of three poses; one pose take survives." },
 
+    { "item": "unused", "file": "beam up.mp3", "key": "TELEPORT_AWAY", "aliases": ["TELEPORT_AWAY_HUB"], "why": "player.js:675-677 teleportToLocation. Unused/rejected take; no released file.", "doubt": "rejected take" },
+    { "item": "unused", "file": "butler-fall.mp3", "key": "BUTLER_DOLL_FALL", "why": "bag_butler.js:5214. Listed as unused, but the key exists in GSJS." },
+    { "item": "unused", "file": "butler-idle.mp3", "key": "BUTLER_DOLL_IDLE_2", "why": "bag_butler.js:5211. Listed as unused, but the key exists in GSJS." },
+    { "item": "unused", "file": "harvest been tree.mp3", "key": "BEEN_TREE", "why": "trants.js:327 onHarvestingComplete. Unused take; no released file." },
+    { "item": "unused", "file": "harvest bubble tree.mp3", "key": "BUBBLE_TREE", "why": "trants.js:330. Unused take; no released file." },
+    { "item": "unused", "file": "harvest egg tree.mp3", "key": "EGG_TREE", "why": "trants.js:333. Unused take; no released file." },
+    { "item": "unused", "file": "harvest fruit tree.mp3", "key": "FRUIT_TREE", "why": "trants.js:336. Unused take; no released file." },
+    { "item": "unused", "file": "harvest gass tree.mp3", "key": "GAS_TREE", "why": "trants.js:339. Unused take; no released file." },
+    { "item": "unused", "file": "harvest paper tree.mp3", "key": "PAPER_TREE", "why": "paper_tree.js:497 givePaper. Unused take; no released file." },
+    { "item": "unused", "file": "jump 1.mp3", "key": "JUMP", "why": "The remake's ordinary jump (TRIPLE_JUMP has its own file). Unused take.", "doubt": "rejected take, remake-only key" },
+    { "item": "unused", "file": "massage butterfly 1.mp3", "key": "BUTTERFLY_LOTION", "why": "Massaging a butterfly uses Butterfly Lotion; the remake loops BUTTERFLY_LOTION for the massage verb (sound-moments.js). Unused take; takes 2-4 are variants.", "doubt": "rejected take" },
+    { "item": "unused", "file": "process.mp3", "key": "MAKING_WAITING_COOKING", "why": "inc_making.js:677 tryToMake: waiting while it cooks. Unused take.", "doubt": "rejected take, moment by name" },
+
     { "item": "ringtones", "file": "BB-1.mp3", "key": "MUSICBLOCK_B_BROWN_01", "why": "Ringtone of Musicblock BB-1 (Brandon Brown)." },
     { "item": "ringtones", "file": "BB-2.mp3", "key": "MUSICBLOCK_B_BROWN_02", "why": "Ringtone of Musicblock BB-2." },
     { "item": "ringtones", "file": "BB-3.mp3", "key": "MUSICBLOCK_B_BROWN_03", "why": "Ringtone of Musicblock BB-3." },
@@ -228,8 +241,7 @@
     { "item": "ringtones", "file": "Meditation (Round Two in Seven).mp3", "key": "MEDITATIVE_ARTS_01", "why": "music_map MEDITATIVE_ARTS_01 = Round_Two_in_Seven_2.mp3; focusing_orb.js:2007 plays it for Meditative Arts." },
     { "item": "ringtones", "file": "Construction Tool.mp3", "key": "CONSTRUCTION_TOOL", "why": "The Construction Tool's own class sound while it works (ringtone cut)." },
     { "item": "ringtones", "file": "Esquebeth Puzzle.mp3", "key": "WATERFALL_MELODY", "why": "Esquibeth's pilgrimage is the 2012 waterfall puzzle (the sfx item's 'esquibeth symbol glow' and 'esquibeth-rock disappears' match the c2 WATERFALL_SYMBOL_GLOW and ROCKS_DISAPPEAR files, r 0.99), and the ringtone 'Esquebeth Quest' is WATERFALL_SUCCESS (r 0.96). The puzzle tune is the bell melody the player repeats: music_map WATERFALL_MELODY = Bells_Waterfall_1.3. Its notes, read off the bells (BW_E2 BW_G2 BW_D2 BW_E2 BW_C2 BW_A1 BW_D2), are the whole song, phrases A B C.", "doubt": "c2 file lost; an earlier take (2012-08-29) than the playback overlays' Puzzle_Melody_Section_*_2.1 (2012-08-31), which are what both recordings play, so the remake does not wire it" },
-    { "item": "ringtones", "file": "The Rook.mp3", "key": "ROOK_ATTACK", "why": "music_map ROOK_ATTACK = Master_Rook_attack.mp3, played on each wing beat (inc_rook.js:255). The ringtone is a different piece from 'rook flight' (ROOK_FLOCK, r 0.38).", "doubt": "name and length only" },
-    { "item": "ringtones", "file": "Firefly Whistle 1.mp3", "key": "FIREFLY_WHISTLE_1", "why": "The CC0 ringtone of the c2 Firefly_Whistle_1.3 take (17.7 / 17.0 s; sample r 0.46 against the c2 file, 0.05 for Firefly Whistle 2). The c2 copy is in no CC0 release, so the ringtone replaces it (G317)." }
+    { "item": "ringtones", "file": "The Rook.mp3", "key": "ROOK_ATTACK", "why": "music_map ROOK_ATTACK = Master_Rook_attack.mp3, played on each wing beat (inc_rook.js:255). The ringtone is a different piece from 'rook flight' (ROOK_FLOCK, r 0.38).", "doubt": "name and length only" }
   ],
   "duplicates": [
     { "item": "sfx", "file": "client loaded.mp3", "sameAs": "CLIENT_LOADED", "evidence": "envelope r 0.95 with downloads game_loaded.mp3 (already shipped)" },
@@ -260,6 +272,7 @@
     { "item": "ringtones", "file": "Conch.mp3", "sameAs": "CONCH", "evidence": "47.4 / 45.1 s, c2 Waterfall_For_Conch" },
     { "item": "ringtones", "file": "Conch 30 sec.mp3", "sameAs": "CONCH", "evidence": "30 s cut" },
     { "item": "ringtones", "file": "Elevator Music.mp3", "sameAs": "ELEVATOR_MUSIC", "evidence": "downloads elevator_music (21.0 / 21.9 s)" },
+    { "item": "ringtones", "file": "Firefly Whistle 1.mp3", "sameAs": "FIREFLY_WHISTLE_1", "evidence": "c2 file, 17.0 / 17.7 s" },
     { "item": "ringtones", "file": "Firefly Whistle 2.mp3", "sameAs": "FIREFLY_WHISTLE_2", "evidence": "c2 file" },
     { "item": "ringtones", "file": "Firefly Whistle 3.mp3", "sameAs": "FIREFLY_WHISTLE_3", "evidence": "c2 file" },
     { "item": "ringtones", "file": "Glitch Theme - Marching Band.mp3", "sameAsFile": "assets/audio/ambient/marching_band_1344997302.mp3", "evidence": "downloads marching_band (30.2 / 30.3 s)" },
@@ -303,18 +316,6 @@
     { "item": "unused", "file": "wardrobe-opening.mp3", "why": "No wardrobe key." },
     { "item": "unused", "file": "wardrobe-take off item.mp3", "why": "No wardrobe key." },
     { "item": "unused", "file": "wardrobe-test.mp3", "why": "No wardrobe key." },
-    { "item": "ringtones", "file": "Globometer.mp3", "why": "No globometer in GSJS or the client." },
-    { "item": "unused", "file": "beam up.mp3", "why": "Was TELEPORT_AWAY. The item has no licenseurl, so it is not a CC0 release: not shipped since G317 (TELEPORT_AWAY plays its synth stand-in)." },
-    { "item": "unused", "file": "butler-fall.mp3", "why": "Was BUTLER_DOLL_FALL. The item has no licenseurl, so it is not a CC0 release: not shipped since G317 (BUTLER_DOLL_FALL plays its synth stand-in)." },
-    { "item": "unused", "file": "butler-idle.mp3", "why": "Was BUTLER_DOLL_IDLE_2. The item has no licenseurl, so it is not a CC0 release: not shipped since G317 (BUTLER_DOLL_IDLE_2 plays its synth stand-in)." },
-    { "item": "unused", "file": "harvest been tree.mp3", "why": "Was BEEN_TREE. The item has no licenseurl, so it is not a CC0 release: not shipped since G317 (BEEN_TREE plays its synth stand-in)." },
-    { "item": "unused", "file": "harvest bubble tree.mp3", "why": "Was BUBBLE_TREE. The item has no licenseurl, so it is not a CC0 release: not shipped since G317 (BUBBLE_TREE plays its synth stand-in)." },
-    { "item": "unused", "file": "harvest egg tree.mp3", "why": "Was EGG_TREE. The item has no licenseurl, so it is not a CC0 release: not shipped since G317 (EGG_TREE plays its synth stand-in)." },
-    { "item": "unused", "file": "harvest fruit tree.mp3", "why": "Was FRUIT_TREE. The item has no licenseurl, so it is not a CC0 release: not shipped since G317 (FRUIT_TREE plays its synth stand-in)." },
-    { "item": "unused", "file": "harvest gass tree.mp3", "why": "Was GAS_TREE. The item has no licenseurl, so it is not a CC0 release: not shipped since G317 (GAS_TREE plays its synth stand-in)." },
-    { "item": "unused", "file": "harvest paper tree.mp3", "why": "Was PAPER_TREE. The item has no licenseurl, so it is not a CC0 release: not shipped since G317 (PAPER_TREE plays its synth stand-in)." },
-    { "item": "unused", "file": "jump 1.mp3", "why": "Was JUMP. The item has no licenseurl, so it is not a CC0 release: not shipped since G317 (JUMP plays its synth stand-in)." },
-    { "item": "unused", "file": "massage butterfly 1.mp3", "why": "Was BUTTERFLY_LOTION. The item has no licenseurl, so it is not a CC0 release: not shipped since G317 (BUTTERFLY_LOTION plays its synth stand-in)." },
-    { "item": "unused", "file": "process.mp3", "why": "Was MAKING_WAITING_COOKING. The item has no licenseurl, so it is not a CC0 release: not shipped since G317 (MAKING_WAITING_COOKING plays its synth stand-in)." }
+    { "item": "ringtones", "file": "Globometer.mp3", "why": "No globometer in GSJS or the client." }
   ]
 }

@@ -3,21 +3,19 @@
  "soundsXml": "http://c2.glitch.bz/sounds/2012-12/sounds_1354665929.xml (not archived)",
  "counts": {
   "keys": 641,
-  "original": 605,
+  "original": 606,
   "music": 208,
-  "remake": 33,
+  "remake": 32,
   "recoveredWayback": 38,
-  "waybackShipped": 10,
-  "notCc0": 28,
-  "derived": 5,
-  "downloadsBestFit": 26,
-  "archiveorgSfx": 205,
+  "mirrored": 1,
+  "downloadsBestFit": 27,
+  "archiveorgSfx": 216,
   "overlayFla": 3,
-  "withFile": 249,
+  "withFile": 285,
   "aliases": 83,
-  "playable": 332,
-  "dead": 4,
-  "live": 637
+  "playable": 368,
+  "dead": 3,
+  "live": 638
  },
  "keys": {
   "11_SECRET_LOCATIONS_BEACON_LOOP": {
@@ -931,8 +929,9 @@
     "gsjs:inc_data_sounds.js (music_map)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-09/1346892406-Waterfall_Background_1.1.mp3",
-   "keyFrom": "music_map",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/AMBIENT_WATERFALL.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
   },
   "AMBIENT_WATERFALL_LEVEL3": {
    "category": "music",
@@ -945,8 +944,9 @@
     "gsjs:inc_data_sounds.js (music_map)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-09/1347325991-Waterfall_Background_No_Gurgle_1.1.mp3",
-   "keyFrom": "music_map",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/AMBIENT_WATERFALL_LEVEL3.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
   },
   "ANDRA_KAJUU_1": {
    "category": "music",
@@ -1172,8 +1172,9 @@
     "gsjs:inc_data_sounds.js (music_map)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-10/1350096123-Autumn_Day_2.5.mp3",
-   "keyFrom": "music_map",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/AUTUMN_DAY.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
   },
   "AWESOME_POT": {
    "category": "tool",
@@ -1262,7 +1263,13 @@
    ],
    "sources": [
     "gsjs:items/include/trants.js:327 (onHarvestingComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BEEN_TREE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/harvest%20been%20tree.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "harvest been tree.mp3",
+   "why": "trants.js:327 onHarvestingComplete. Unused take; no released file."
   },
   "BEGIN_LEARNING_SKILL": {
    "category": "ui",
@@ -1486,7 +1493,13 @@
    ],
    "sources": [
     "gsjs:items/include/trants.js:330 (onHarvestingComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BUBBLE_TREE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/harvest%20bubble%20tree.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "harvest bubble tree.mp3",
+   "why": "trants.js:330. Unused take; no released file."
   },
   "BUBBLE_TUNER": {
    "category": "tool",
@@ -1542,7 +1555,13 @@
    ],
    "sources": [
     "gsjs:items/bag_butler.js:5214 (playSound)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BUTLER_DOLL_FALL.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/butler-fall.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "butler-fall.mp3",
+   "why": "bag_butler.js:5214. Listed as unused, but the key exists in GSJS."
   },
   "BUTLER_DOLL_IDLE_2": {
    "category": "event",
@@ -1553,7 +1572,13 @@
    ],
    "sources": [
     "gsjs:items/bag_butler.js:5211 (playSound)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BUTLER_DOLL_IDLE_2.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/butler-idle.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "butler-idle.mp3",
+   "why": "bag_butler.js:5211. Listed as unused, but the key exists in GSJS."
   },
   "BUTTERFLY_LOTION": {
    "category": "tool",
@@ -1564,7 +1589,14 @@
    ],
    "sources": [
     "gsjs:items/butterfly_lotion.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BUTTERFLY_LOTION.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/massage%20butterfly%201.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "massage butterfly 1.mp3",
+   "why": "Massaging a butterfly uses Butterfly Lotion; the remake loops BUTTERFLY_LOTION for the massage verb (sound-moments.js). Unused take; takes 2-4 are variants.",
+   "doubt": "rejected take"
   },
   "BUTTERFLY_NET": {
    "category": "tool",
@@ -1627,12 +1659,9 @@
     "wayback:http://c2.glitch.bz/sounds/2012-08/1346434794-BW_A1.mp3 (filename)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-08/1346434794-BW_A1.mp3",
-   "file": "assets/audio/sfx/bells/BW_A1.mp3",
-   "origin": "archiveorg-derived",
-   "keyFrom": "filename",
-   "source": "https://archive.org/download/esquebeth-quest/Esquebeth%20Puzzle.mp3",
-   "derivedFrom": "esquebeth-quest/Esquebeth Puzzle.mp3 (CC0): the D2 strike at 3.746 s, pitched (tools/sound/build-esquibeth-bells.mjs)",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/BW_A1.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "filename"
   },
   "BW_C2": {
    "category": "recovered",
@@ -1645,12 +1674,9 @@
     "wayback:http://c2.glitch.bz/sounds/2012-08/1346434795-BW_C2.mp3 (filename)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-08/1346434795-BW_C2.mp3",
-   "file": "assets/audio/sfx/bells/BW_C2.mp3",
-   "origin": "archiveorg-derived",
-   "keyFrom": "filename",
-   "source": "https://archive.org/download/esquebeth-quest/Esquebeth%20Puzzle.mp3",
-   "derivedFrom": "esquebeth-quest/Esquebeth Puzzle.mp3 (CC0): the D2 strike at 3.746 s, pitched (tools/sound/build-esquibeth-bells.mjs)",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/BW_C2.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "filename"
   },
   "BW_D2": {
    "category": "recovered",
@@ -1663,12 +1689,9 @@
     "wayback:http://c2.glitch.bz/sounds/2012-08/1346434795-BW_D2.mp3 (filename)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-08/1346434795-BW_D2.mp3",
-   "file": "assets/audio/sfx/bells/BW_D2.mp3",
-   "origin": "archiveorg-derived",
-   "keyFrom": "filename",
-   "source": "https://archive.org/download/esquebeth-quest/Esquebeth%20Puzzle.mp3",
-   "derivedFrom": "esquebeth-quest/Esquebeth Puzzle.mp3 (CC0): the D2 strike at 3.746 s, pitched (tools/sound/build-esquibeth-bells.mjs)",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/BW_D2.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "filename"
   },
   "BW_E2": {
    "category": "recovered",
@@ -1681,12 +1704,9 @@
     "wayback:http://c2.glitch.bz/sounds/2012-08/1346434795-BW_E2.mp3 (filename)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-08/1346434795-BW_E2.mp3",
-   "file": "assets/audio/sfx/bells/BW_E2.mp3",
-   "origin": "archiveorg-derived",
-   "keyFrom": "filename",
-   "source": "https://archive.org/download/esquebeth-quest/Esquebeth%20Puzzle.mp3",
-   "derivedFrom": "esquebeth-quest/Esquebeth Puzzle.mp3 (CC0): the D2 strike at 3.746 s, pitched (tools/sound/build-esquibeth-bells.mjs)",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/BW_E2.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "filename"
   },
   "BW_G2": {
    "category": "recovered",
@@ -1699,12 +1719,9 @@
     "wayback:http://c2.glitch.bz/sounds/2012-08/1346434796-BW_G2.mp3 (filename)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-08/1346434796-BW_G2.mp3",
-   "file": "assets/audio/sfx/bells/BW_G2.mp3",
-   "origin": "archiveorg-derived",
-   "keyFrom": "filename",
-   "source": "https://archive.org/download/esquebeth-quest/Esquebeth%20Puzzle.mp3",
-   "derivedFrom": "esquebeth-quest/Esquebeth Puzzle.mp3 (CC0): the D2 strike at 3.746 s, pitched (tools/sound/build-esquibeth-bells.mjs)",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/BW_G2.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "filename"
   },
   "CAMERA_SHUTTER": {
    "category": "ui",
@@ -2109,8 +2126,9 @@
     "gsjs:inc_data_sounds.js (music_map)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-06/1340390601-Rainbow_Run_A_Capella_8s_2.3.mp3",
-   "keyFrom": "music_map",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/CLOUD_DROP_2.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
   },
   "CLOUD_DROP_2_INTRO": {
    "category": "music",
@@ -2123,9 +2141,9 @@
     "gsjs:inc_data_sounds.js (music_map)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-06/1340390619-Rainbow_Run_A_Cappella_Intro_1.1.mp3",
-   "keyFrom": "music_map",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)",
-   "alias": "DONATION_RECIEVE_EMBLEM"
+   "file": "assets/audio/sfx/CLOUD_DROP_2_INTRO.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
   },
   "CLOUD1": {
    "category": "ui",
@@ -2971,7 +2989,13 @@
    ],
    "sources": [
     "gsjs:items/include/trants.js:333 (onHarvestingComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/EGG_TREE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/harvest%20egg%20tree.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "harvest egg tree.mp3",
+   "why": "trants.js:333. Unused take; no released file."
   },
   "ELEVATOR_MUSIC": {
    "category": "music",
@@ -3249,13 +3273,8 @@
    ],
    "url": "http://c2.glitch.bz/sounds/2011-01/1296255471-Firefly_Whistle_1.3.mp3",
    "file": "assets/audio/sfx/FIREFLY_WHISTLE_1.mp3",
-   "origin": "archiveorg-sfx",
-   "keyFrom": "music_map",
-   "source": "https://archive.org/download/esquebeth-quest/Firefly%20Whistle%201.mp3",
-   "archiveItem": "esquebeth-quest",
-   "archiveFile": "Firefly Whistle 1.mp3",
-   "why": "The CC0 ringtone of the c2 Firefly_Whistle_1.3 take (17.7 / 17.0 s; sample r 0.46 against the c2 file, 0.05 for Firefly Whistle 2). The c2 copy is in no CC0 release, so the ringtone replaces it (G317).",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
   },
   "FIREFLY_WHISTLE_2": {
    "category": "music",
@@ -3610,7 +3629,13 @@
    ],
    "sources": [
     "gsjs:items/include/trants.js:336 (onHarvestingComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FRUIT_TREE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/harvest%20fruit%20tree.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "harvest fruit tree.mp3",
+   "why": "trants.js:336. Unused take; no released file."
   },
   "FRYING_PAN": {
    "category": "tool",
@@ -3756,7 +3781,13 @@
    ],
    "sources": [
     "gsjs:items/include/trants.js:339 (onHarvestingComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/GAS_TREE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/harvest%20gass%20tree.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "harvest gass tree.mp3",
+   "why": "trants.js:339. Unused take; no released file."
   },
   "GASSIFIER": {
    "category": "tool",
@@ -3979,8 +4010,9 @@
     "gsjs:items/wood_tree_enchanted.js:801 (endHarvest)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-03/1333032669-Harvest_2.1.mp3",
-   "keyFrom": "gsjs-filename",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/HARVEST.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
   },
   "HAS_MAIL": {
    "category": "event",
@@ -4297,15 +4329,18 @@
    "archiveFile": "imagination-open.mp3"
   },
   "IMAGINATION_PURCHASE": {
-   "category": "remake",
-   "moment": "Buy an imagination upgrade card (the downloads-page \"Imagination Upgrade\" jingle has no CC0 copy, G317)",
+   "category": "downloads",
+   "moment": "downloads.html (Imagination Upgrade)",
    "uses": 1,
    "via": [
-    "remake"
+    "downloads"
    ],
    "sources": [
-    "remake (Buy an imagination upgrade card (the downloads-page \"Imagination Upgrade\" jingle has no CC0 copy, G317))"
-   ]
+    "downloads.html (Imagination Upgrade)"
+   ],
+   "file": "assets/audio/imagination_upgrade.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Imagination Upgrade"
   },
   "INCOMING_CHAT": {
    "category": "ui",
@@ -4554,7 +4589,14 @@
    ],
    "sources": [
     "remake (Ordinary jump)"
-   ]
+   ],
+   "file": "assets/audio/sfx/JUMP.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/jump%201.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "jump 1.mp3",
+   "why": "The remake's ordinary jump (TRIPLE_JUMP has its own file). Unused take.",
+   "doubt": "rejected take, remake-only key"
   },
   "KISS_RECV": {
    "category": "event",
@@ -4993,14 +5035,17 @@
   },
   "MAKING_WAITING_COOKING": {
    "category": "making",
-   "moment": "players/inc_making.js:677 (tryToMake)",
+   "moment": "",
    "uses": 0,
    "via": [],
    "sources": [],
-   "dead": "commented out in the final client",
-   "commentedOut": [
-    "gsjs:players/inc_making.js:677 (tryToMake)"
-   ]
+   "file": "assets/audio/sfx/MAKING_WAITING_COOKING.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/process.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "process.mp3",
+   "why": "inc_making.js:677 tryToMake: waiting while it cooks. Unused take.",
+   "doubt": "rejected take, moment by name"
   },
   "MB_B1": {
    "category": "event",
@@ -5989,7 +6034,13 @@
    ],
    "sources": [
     "gsjs:items/paper_tree.js:497 (givePaper)"
-   ]
+   ],
+   "file": "assets/audio/sfx/PAPER_TREE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/harvest%20paper%20tree.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "harvest paper tree.mp3",
+   "why": "paper_tree.js:497 givePaper. Unused take; no released file."
   },
   "PARALAXING_STREETS": {
    "category": "music",
@@ -6094,8 +6145,9 @@
     "gsjs:inc_data_sounds.js (music_map)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-07/1341549958-Dreamy_Theme_Loop_1.1.mp3",
-   "keyFrom": "music_map",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/PIANO_THEME1.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
   },
   "PICK": {
    "category": "tool",
@@ -7378,7 +7430,12 @@
    ],
    "sources": [
     "gsjs:items/npc_crafty_bot.js:218 (initInstanceProps)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SAVE_AND_CHECKOUT.mp3",
+   "origin": "slack-mirror",
+   "why": "npc_crafty_bot.js:218. The only surviving copy is Slack's (md5 1f16c1a6...); its sibling here_you_go_lighter.mp3 is the c2 file byte for byte.",
+   "mirrorSource": "https://archive.org/download/slack_sfx/save_and_checkout.mp3",
+   "mirrorFile": "save_and_checkout.mp3"
   },
   "SCOOPED_JELLISAC": {
    "category": "animal",
@@ -7891,8 +7948,9 @@
     "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-11/1353539578-Stewart_Doll_1.mp3",
-   "keyFrom": "gsjs-filename",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/STEWARTDOLL1.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
   },
   "STEWARTDOLL10": {
    "category": "voice",
@@ -7905,8 +7963,9 @@
     "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-11/1353539580-Stewart_Doll_10.mp3",
-   "keyFrom": "gsjs-filename",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/STEWARTDOLL10.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
   },
   "STEWARTDOLL11": {
    "category": "voice",
@@ -7919,8 +7978,9 @@
     "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-11/1353539698-Stewart_Doll_11.mp3",
-   "keyFrom": "gsjs-filename",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/STEWARTDOLL11.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
   },
   "STEWARTDOLL12": {
    "category": "voice",
@@ -7933,8 +7993,9 @@
     "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-11/1353539698-Stewart_Doll_12.mp3",
-   "keyFrom": "gsjs-filename",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/STEWARTDOLL12.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
   },
   "STEWARTDOLL13": {
    "category": "voice",
@@ -7947,8 +8008,9 @@
     "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-11/1353539698-Stewart_Doll_13.mp3",
-   "keyFrom": "gsjs-filename",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/STEWARTDOLL13.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
   },
   "STEWARTDOLL14": {
    "category": "voice",
@@ -7961,8 +8023,9 @@
     "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-11/1353539699-Stewart_Doll_14.mp3",
-   "keyFrom": "gsjs-filename",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/STEWARTDOLL14.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
   },
   "STEWARTDOLL2": {
    "category": "voice",
@@ -7975,8 +8038,9 @@
     "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-11/1353539578-Stewart_Doll_2.mp3",
-   "keyFrom": "gsjs-filename",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/STEWARTDOLL2.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
   },
   "STEWARTDOLL3": {
    "category": "voice",
@@ -7989,8 +8053,9 @@
     "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-11/1353539578-Stewart_Doll_3.mp3",
-   "keyFrom": "gsjs-filename",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/STEWARTDOLL3.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
   },
   "STEWARTDOLL4": {
    "category": "voice",
@@ -8003,8 +8068,9 @@
     "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-11/1353539579-Stewart_Doll_4.mp3",
-   "keyFrom": "gsjs-filename",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/STEWARTDOLL4.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
   },
   "STEWARTDOLL5": {
    "category": "voice",
@@ -8017,8 +8083,9 @@
     "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-11/1353539579-Stewart_Doll_5.mp3",
-   "keyFrom": "gsjs-filename",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/STEWARTDOLL5.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
   },
   "STEWARTDOLL6": {
    "category": "voice",
@@ -8031,8 +8098,9 @@
     "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-11/1353539579-Stewart_Doll_6.mp3",
-   "keyFrom": "gsjs-filename",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/STEWARTDOLL6.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
   },
   "STEWARTDOLL7": {
    "category": "voice",
@@ -8045,8 +8113,9 @@
     "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-11/1353539579-Stewart_Doll_7.mp3",
-   "keyFrom": "gsjs-filename",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/STEWARTDOLL7.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
   },
   "STEWARTDOLL8": {
    "category": "voice",
@@ -8059,8 +8128,9 @@
     "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-11/1353539580-Stewart_Doll_8.mp3",
-   "keyFrom": "gsjs-filename",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/STEWARTDOLL8.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
   },
   "STEWARTDOLL9": {
    "category": "voice",
@@ -8073,8 +8143,9 @@
     "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-11/1353539580-Stewart_Doll_9.mp3",
-   "keyFrom": "gsjs-filename",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/STEWARTDOLL9.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
   },
   "STILL_COLLECT": {
    "category": "making",
@@ -8251,7 +8322,14 @@
    ],
    "sources": [
     "gsjs:players/player.js:677 (teleportToLocation)"
-   ]
+   ],
+   "file": "assets/audio/sfx/TELEPORT_AWAY.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/beam%20up.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "beam up.mp3",
+   "why": "player.js:675-677 teleportToLocation. Unused/rejected take; no released file.",
+   "doubt": "rejected take"
   },
   "TELEPORT_AWAY_HUB": {
    "category": "travel",
@@ -8262,7 +8340,8 @@
    ],
    "sources": [
     "gsjs:players/player.js:675 (teleportToLocation)"
-   ]
+   ],
+   "alias": "TELEPORT_AWAY"
   },
   "TELEPORTER_VISIBLE_APPEAR": {
    "category": "event",
@@ -8475,8 +8554,9 @@
     "gsjs:inc_data_sounds.js (music_map)"
    ],
    "url": "http://c2.glitch.bz/sounds/2011-11/1322689572-Also_Sprach_Zarathustra_Loop_3.2_fades.mp3",
-   "keyFrom": "music_map",
-   "notCc0": "the c2 copy (url) is in no CC0 release and is not shipped (G317)"
+   "file": "assets/audio/sfx/TOXIC_MOON.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
   },
   "TRADE_COMPLETED": {
    "category": "ui",

@@ -71,7 +71,7 @@ export function codebaseContent() {
       data('platform'),
     ]),
     band('art', false, 'Where the art, sound and data come from', [
-      p('section-lead', 'When Glitch closed, Tiny Speck released its art, sound and code into the public domain (CC0) at <a href="https://github.com/tinyspeck">github.com/tinyspeck</a>: the items, locations, avatars and overlays, the Flash client, and the GameServerJS code that ran the game. Groddle Afternoon is built from those files, and where nothing survived, rebuilt from what players recorded. The Glitch name and logo were not part of that release, so they are not used here.'),
+      p('section-lead', 'When Glitch closed, Tiny Speck released its art and code into the public domain (CC0) at <a href="https://github.com/tinyspeck">github.com/tinyspeck</a>: the items, locations, avatars and overlays, the Flash client, and the GameServerJS code that ran the game. Groddle Afternoon is built from those files, and where nothing survived, rebuilt from what players recorded. The sounds are Tiny Speck’s original recordings, shipped as the originals: from the Glitch audio sets on archive.org (most tagged CC0, one untagged) and from Glitch’s own servers through the Wayback Machine. The Glitch name and logo were not part of that release, so they are not used here.'),
     ]),
     knot('general_fabric', 'Fabric', 'The finished cloth: the game you play at <a href="https://groddleafternoon.com">groddleafternoon.com</a>.'),
     band('contribute', true, 'Contributing', [
@@ -96,7 +96,7 @@ export function codebaseContent() {
         'Run the site: it needs a Minn site. <a href="https://cove.run">Cove</a> runs one locally; the site’s readme has the steps.',
       ], true),
       h(3, 'Licences'),
-      p('', 'The code in all three repos is MIT. Tiny Speck’s art, sound and game data are CC0. The Glitch name and logo are not ours to use, and never ship.'),
+      p('', 'The code in all three repos is MIT. Tiny Speck’s art and game data are CC0. The sounds are Tiny Speck’s original recordings, shipped as the originals. The Glitch name and logo are not ours to use, and never ship.'),
       h(3, 'House rules'),
       list('code-rules', [
         'Commit subjects use Emoji-Log: <code>📦 NEW:</code>, <code>👌 IMPROVE:</code>, <code>🐛 FIX:</code>, <code>📖 DOC:</code> or <code>🤖 TEST:</code>, then the change in plain words, such as <code>📦 NEW: Peat bogs and dirt piles to dig</code>.',

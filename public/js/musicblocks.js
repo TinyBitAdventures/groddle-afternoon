@@ -10,7 +10,7 @@ import { addItem, countItem, ensureItem } from './inventory.js?v=catalog-unified
 import { GAME_DAY_MS } from './game-day.js';
 import { metabolicGain, moodMax, loseEnergy } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
-import { SOUND_ALIASES, SOUND_FILES } from './sound-keys.js';
+import { SOUND_ALIASES, SOUND_FILES } from './sound-keys.js?v=g388-1';
 
 export const MUSICBLOCK_MONTH_MS = Math.round(30.5 * 24 * 60 * 60 * 1000);
 export const MUSICBLOCK_REPLAY_MS = 4 * 60 * 60 * 1000;

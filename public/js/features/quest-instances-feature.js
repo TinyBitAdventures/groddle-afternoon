@@ -140,7 +140,7 @@ function loadRoom(roomId) {
     const path = roomModulePath(roomId).replace(/^\.\//, '../quest-rooms/');
     loading.set(
       roomId,
-      import(`${path}?v=rooms-g382`)
+      import(`${path}?v=rooms-g388`)
         .then((mod) => {
           const def = mod.room || mod.default || null;
           loaded.set(roomId, def);

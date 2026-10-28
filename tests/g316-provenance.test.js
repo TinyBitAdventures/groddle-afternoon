@@ -1,8 +1,14 @@
 /**
- * G316/G317: nothing from the c2.glitch.bz CDN, the downloads page or the
- * unlicensed archive.org item ships unless the same picture or recording is in
- * a CC0 file, and nothing still points at a file that was taken out.
+ * G316/G317: no file that is neither Tiny Speck's nor our own comes back (Wayback
+ * SWF renders, untraced art, the CDN loading strips, the licensed stock
+ * new_day_fanfare.mp3), and nothing still points at a file that was taken out.
  * tools/provenance/non-cc0-removed.json lists the removed paths and their bytes.
+ *
+ * 2026-10-28 (Austin: use all of the original sound): Tiny Speck's own
+ * recordings that G317 had also taken out ship again as the originals. They are
+ * listed by path and git blob under `restored`, and each may appear only at its
+ * own path with its own bytes (research/coverage/g312-provenance.md "Original
+ * sounds, 2026-10-28").
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -30,7 +36,10 @@ const gitBlob = (buf) => createHash('sha1').update(`blob ${buf.length}\0`).updat
 describe('non-CC0 files stay out (G316/G317)', () => {
   it('no shipped or source file carries the bytes of a removed one', () => {
     const blobs = new Set(Object.keys(REMOVED.blobs));
-    assert.ok(blobs.size >= 130);
+    assert.ok(blobs.size >= 95);
+    // The stock trumpet (Sounddogs, rights withheld) stays out.
+    assert.match(Object.values(REMOVED.blobs).join('\n'), /licensed stock audio/);
+    assert.ok(REMOVED.paths.includes('public/assets/audio/new_day_fanfare.mp3'));
     const hits = [];
     for (const dir of [join(pub, 'assets'), join(root, 'assets-src')]) {
       for (const f of walk(dir)) {
@@ -39,6 +48,29 @@ describe('non-CC0 files stay out (G316/G317)', () => {
       }
     }
     assert.deepEqual(hits, []);
+  });
+
+  it('the restored Tiny Speck originals sit only at their own paths, byte for byte (2026-10-28)', () => {
+    const restored = Object.entries(REMOVED.restored);
+    assert.equal(restored.length, 41);
+    const byBlob = new Map(restored);
+    for (const [blob, row] of restored) {
+      assert.ok(!REMOVED.blobs[blob], `${row.path} is both removed and restored`);
+      assert.ok(!REMOVED.paths.includes(row.path), row.path);
+      assert.match(row.path, /^public\/assets\/audio\//);
+      assert.match(row.source, /^(c2\.glitch\.bz via the Wayback CDX|archive\.org glitch-mmo-tiny-speck-unused-sfx|glitchthegame\.com downloads page)/);
+      assert.ok(existsSync(join(root, row.path)), row.path);
+      assert.equal(gitBlob(readFileSync(join(root, row.path))), blob, `${row.path}: not the original bytes`);
+    }
+    const misplaced = [];
+    for (const dir of [join(pub, 'assets'), join(root, 'assets-src')]) {
+      for (const f of walk(dir)) {
+        if (!/\.(mp3|ogg|wav)$/i.test(f)) continue;
+        const row = byBlob.get(gitBlob(readFileSync(f)));
+        if (row && relative(root, f) !== row.path) misplaced.push(relative(root, f));
+      }
+    }
+    assert.deepEqual(misplaced, []);
   });
 
   it('no removed path is back, and no code or data names one', () => {

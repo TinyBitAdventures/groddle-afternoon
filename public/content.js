@@ -54,7 +54,7 @@ import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,
   isMusicblock,
-} from './js/musicblocks.js?v=g370-1';
+} from './js/musicblocks.js?v=g388-1';
 import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=dialogue-3';
 import {
   ensureWoodTreeState,

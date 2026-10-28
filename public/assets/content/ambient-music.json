@@ -198,8 +198,8 @@
     "party_moon": {
       "label": "Party: Toxic Moon",
       "gsjsKeys": ["TOXIC_MOON"],
-      "note": "Source Also_Sprach_Zarathustra_Loop_3.2_fades.mp3 is unrecovered; Moon Music (public downloads) stands in.",
-      "tracks": ["assets/audio/ambient/moon_music_1344997839.mp3"]
+      "note": "music_map TOXIC_MOON = Also_Sprach_Zarathustra_Loop_3.2_fades.mp3, recovered from the Wayback CDX (c2.glitch.bz) and played as the original (2026-10-28). Moon Music, the public downloads stand-in before that, is a different recording.",
+      "tracks": ["assets/audio/sfx/TOXIC_MOON.mp3"]
     },
     "party_highlands": {
       "label": "Party: Val Holla",
@@ -234,6 +234,11 @@
       "gsjsKeys": ["ENCHANTED_WOOD", "ENCHANTED_WOOD_III"],
       "tracks": ["assets/audio/ambient/enchanted_woods_1344997332.mp3"]
     },
+    "piano": {
+      "label": "Piano Theme",
+      "gsjsKeys": ["PIANO_THEME1"],
+      "tracks": ["assets/audio/sfx/PIANO_THEME1.mp3"]
+    },
     "snappy": {
       "label": "Groddle Snappy Loop",
       "gsjsKeys": ["SNAPPY_LOOP"],
@@ -242,8 +247,8 @@
     "sky_plunge": {
       "label": "Sky Plunge (Rainbow Run A Cappella)",
       "gsjsKeys": ["CLOUD_DROP_2", "CLOUD_DROP_2_INTRO", "TICKET_TO_PARADISE1"],
-      "note": "Players name the Rainbow Run A Cappella theme as the Sky Plunge music. GSJS inc_data_sounds.js:203-206 cuts CLOUD_DROP_2 (8 s loop) and CLOUD_DROP_2_INTRO from it, named for the WIP street cloud_drop_2 (LDOQBF6DEO138FJ); no source binds a key to the template LHFO01RM7I238UN, and TICKET_TO_PARADISE1 (the full take) is unrecovered. The c2 cuts (CLOUD_DROP_2, CLOUD_DROP_2_INTRO) are in no CC0 release (G317): the course plays Tiny Speck's CC0 Rainbow Run theme (archive.org glitch-mmo-tiny-speck-music), and the every-quoin music is the CC0 choir sting (CLOUD_DROP_2_INTRO borrows DONATION_RECIEVE_EMBLEM).",
-      "tracks": ["assets/audio/ambient/Rainbow-Run_1291879159.mp3"]
+      "note": "Players name the Rainbow Run A Cappella theme as the Sky Plunge music. GSJS inc_data_sounds.js:203-206 cuts CLOUD_DROP_2 (8 s loop) and CLOUD_DROP_2_INTRO from it, named for the WIP street cloud_drop_2 (LDOQBF6DEO138FJ); no source binds a key to the template LHFO01RM7I238UN, and TICKET_TO_PARADISE1 (the full take) is unrecovered. The course plays the recovered loop; the intro is its every-quoin music.",
+      "tracks": ["assets/audio/sfx/CLOUD_DROP_2.mp3"]
     }
   },
   "streetMusic": {
@@ -256,6 +261,7 @@
     "DE_EMBIGGENIFY": "eesti",
     "ENCHANTED_WOOD": "enchanted",
     "ENCHANTED_WOOD_III": "enchanted",
+    "PIANO_THEME1": "piano",
     "AMBIENT_SAVANNA1": "savanna",
     "SNAPPY_LOOP": "snappy",
     "HOME_STREET_URALIA": "uralia",
