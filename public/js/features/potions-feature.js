@@ -129,9 +129,9 @@ import {
 } from '../potions.js?v=g391-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { patchesFeature } from './patches-feature.js?v=patches-21';
-import { homesFeature } from './homes-feature.js?v=g403-1';
+import { homesFeature } from './homes-feature.js?v=g405-1';
 import { streetTreeIndex } from './tree-death-feature.js?v=g403-1';
-import { questRoomConverse } from './quest-instances-feature.js?v=g403-1';
+import { questRoomConverse } from './quest-instances-feature.js?v=g405-1';
 
 export const POTIONS_FEATURE_ID = 'potions';
 const LOVE = 'feeling_called_love';

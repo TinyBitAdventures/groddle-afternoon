@@ -19,8 +19,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=g399-1';
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=g403-1';
-import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=g403-1';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=g405-1';
+import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=g405-1';
 import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js?v=g375-1';
 import { qurazyFeature, resetQurazyFeatureForTests } from '../public/js/features/qurazy-feature.js?v=g396-1';
 import { QURAZY_SPAWN_LINE } from '../public/js/qurazy.js';
@@ -266,6 +266,6 @@ describe('style.css: word outline and solid dimmed upgrade cards', () => {
   });
 
   it('the solo page links style.css with the polish key', () => {
-    assert.match(read('public/play/index.html'), /style\.css\?v=[^"]*&amp;polish=g396-1"/);
+    assert.match(read('public/play/index.html'), /style\.css\?v=[^"]*&amp;polish=g396-1[&"]/);
   });
 });

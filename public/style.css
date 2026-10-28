@@ -1012,30 +1012,37 @@ footer a { color: inherit; }
 /* Top bar clusters (Austin 2026-10-27): you (name, then mood and energy stacked
    in one card, as PlayerInfoUI.as kept them with the face), progress (level,
    iMG) and wallet (currants, quoins). Every card is two lines tall, like the
-   level card; small gaps inside a cluster, larger ones between clusters. */
+   level card. One gap (Austin 2026-10-28): the name, every card and every row
+   sit --hud-gap apart, inside and between clusters, and every card has the
+   same height, side padding, border and corner. */
 .top-bar {
   --hud-card-h: 2.85rem;
-  --hud-gap-in: 0.3rem;
-  --hud-gap-out: 0.95rem;
-  column-gap: var(--hud-gap-out);
+  --hud-gap: 0.5rem;
+  --hud-pad-x: 0.5rem;
+  gap: var(--hud-gap);
 }
 .hud-cluster {
   display: flex;
   align-items: center;
-  gap: var(--hud-gap-in);
+  gap: var(--hud-gap);
   flex: 0 0 auto;
 }
-.hud-you .brand { margin-right: 0; }
+/* The name's hover pad overhangs it (.brand margin), so the gap counts from its text. */
+.hud-you .brand { margin-right: -0.35rem; min-width: 0; }
 .hud-cluster > .meta-vitals,
 .hud-cluster > .level-meter,
 .hud-cluster > .meta-stat {
   box-sizing: border-box;
   height: var(--hud-card-h);
+  padding: 0 var(--hud-pad-x);
+  border: 1px solid #c8d7df;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #fff, #f6fbfd);
 }
 .metabolics-cluster {
   display: flex;
   align-items: center;
-  gap: 0.4rem var(--hud-gap-out);
+  gap: var(--hud-gap);
   flex: 1;
   flex-wrap: wrap;
 }
@@ -1277,12 +1284,14 @@ body.nx-hide-mood.nx-hide-energy .meta-vitals { visibility: hidden; }
 
 /* Phone: the you cluster on one row, progress and wallet on the next, the buttons under them. */
 @media (max-width: 560px) {
-  .top-bar { --hud-card-h: 2.6rem; --hud-gap-out: 0.5rem; row-gap: 0.4rem; }
+  .top-bar { --hud-card-h: 2.6rem; --hud-gap: 0.4rem; }
   .hud-you,
   .metabolics-cluster,
   .top-actions { flex: 1 1 100%; }
-  .hud-you .meta-vitals { flex: 1; min-width: 0; }
-  .metabolics-cluster { justify-content: space-between; }
+  /* Each row fills the bar with the same gaps: the mood and energy card and the level card stretch. */
+  .hud-you .meta-vitals,
+  .hud-progress,
+  .hud-progress .level-meter { flex: 1; min-width: 0; }
 }
 
 @media (min-width: 981px) and (max-width: 1380px) {
@@ -4688,15 +4697,14 @@ body.buff-purple-pulse::after {
 @media (min-width: 1500px) {
   .top-bar {
     --hud-card-h: 3.3rem;
-    --hud-gap-in: 0.36rem;
-    --hud-gap-out: 1.15rem;
-    gap: 0.62rem var(--hud-gap-out);
+    --hud-gap: 0.6rem;
+    --hud-pad-x: 0.58rem;
     padding: 0.5rem 0.74rem;
   }
   .brand { min-width: 7.2rem; }
   .brand-mark { font-size: 1.34rem; }
   .brand-sub { font-size: 0.82rem; }
-  .meta-vitals { min-width: 13.4rem; padding: 0.24rem 0.58rem; row-gap: 0.32rem; }
+  .meta-vitals { min-width: 13.4rem; row-gap: 0.32rem; }
   .meta-pill {
     grid-template-columns: 1.05rem 3.1rem minmax(48px, 1fr) auto;
     gap: 0.34rem;
@@ -4705,17 +4713,11 @@ body.buff-purple-pulse::after {
   .meta-ico { font-size: 0.88rem; }
   .meta-num { font-size: 0.7rem; }
   .meta-ring { height: 7px; }
-  .level-meter {
-    min-width: 158px;
-    padding: 0.3rem 0.58rem;
-  }
+  .level-meter { min-width: 158px; }
   .level-label { font-size: 0.82rem; }
   .level-label strong { font-size: 1rem; }
   .level-xp { font-size: 0.7rem; }
-  .meta-stat {
-    padding: 0.32rem 0.58rem;
-    font-size: 0.94rem;
-  }
+  .meta-stat { font-size: 0.94rem; }
   .meta-stat.hud-img { font-size: 0.82rem; }
   .meta-stat.hud-img strong { font-size: 1rem; }
   .quoin-stat small { font-size: 0.74rem; }

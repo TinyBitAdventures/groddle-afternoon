@@ -38,7 +38,7 @@ import {
   pickBartenderLine,
   talkStateFor,
 } from '../public/js/hell-bar.js';
-import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=g403-1';
+import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=g405-1';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-16';
 import { FEATURES } from '../public/js/features/index.js';
 

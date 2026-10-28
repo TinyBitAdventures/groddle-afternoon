@@ -7,7 +7,7 @@
  * DOM-driven (not Pixi) so it covers HUD + canvas inside #game-root.
  */
 
-import { ACHIEVEMENT_DROP, ACHIEVEMENT_ROCK_WH, achievementBubbleText, easeOutBounce, mountPetRock } from './familiar.js?v=g225-1';
+import { ACHIEVEMENT_DROP, ACHIEVEMENT_ROCK_WH, achievementBubbleText, easeOutBounce, mountPetRock } from './familiar.js?v=g405-1';
 import { formatLoadingTime, ordinal } from './exploration.js';
 
 /**

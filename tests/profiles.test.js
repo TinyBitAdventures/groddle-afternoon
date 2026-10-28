@@ -23,7 +23,7 @@ import { FEATURES } from '../public/js/features/index.js';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=g403-1';
 import { skillTitle } from '../public/js/skill-tree.js?v=g403-1';
-import { skillArtFor } from '../public/js/familiar.js?v=g225-1';
+import { skillArtFor } from '../public/js/familiar.js?v=g405-1';
 import { CARD_ART_LAYERS } from '../public/js/imagination-data.js';
 
 const root = join(import.meta.dirname, '..');

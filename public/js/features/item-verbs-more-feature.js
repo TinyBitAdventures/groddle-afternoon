@@ -47,7 +47,7 @@ import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=newxp-4';
 import { SKILLQUEST_AK_TSID } from '../skillquest-ak.js?v=g298-1';
 import { setToolRemaining, TOOL_CONDITION_CATALOG } from '../tools.js?v=woodcutting-test-8';
 import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husbandry.js?v=g403-1';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g403-1';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g405-1';
 import { sourceFromUrl, frameTexture } from '../textures.js';
 import { landingY, walkSurfaceY } from '../walk-surface.js';
 import { overlayOrStandIn } from '../overlay-stand-in.js?v=g391-1';

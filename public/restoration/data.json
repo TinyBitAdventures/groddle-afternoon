@@ -2640,9 +2640,14 @@
   ]
  },
  "git": {
-  "commits": 675,
+  "commits": 676,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-28",
+    "kind": "fix",
+    "text": "The tutorial no longer leaves a new player on a street whose every road is still being built"
+   },
    {
     "date": "2026-10-28",
     "kind": "fix",
@@ -2757,11 +2762,6 @@
     "date": "2026-10-27",
     "kind": "new",
     "text": "A Groddle Afternoon mark and an unlinked brand page"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "Header dropdown under Project on every page, opened by hover, click or keyboard"
    }
   ]
  },

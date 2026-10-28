@@ -28,7 +28,7 @@ import {
   skillLearnedModel,
   truncateLabel,
   vogLayout,
-} from '../public/js/familiar.js?v=g225-1';
+} from '../public/js/familiar.js?v=g405-1';
 import { CARD_ART_LAYERS } from '../public/js/imagination-data.js';
 import {
   _resetFamiliarDialog,
@@ -36,7 +36,7 @@ import {
   familiarDialogFeature,
   familiarDialogOpen,
   queueSkillLearned,
-} from '../public/js/features/familiar-dialog-feature.js?v=g381-1';
+} from '../public/js/features/familiar-dialog-feature.js?v=g405-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');
@@ -55,6 +55,22 @@ describe('pet_rock art (CC0 OGA sheet)', () => {
     assert.equal(sheet.sheetW / sheet.cellW, sheet.cols);
     assert.ok(sheet.frames <= sheet.cols * (sheet.sheetH / sheet.cellH));
     assert.equal(sheet.frames, 193, 'the Pet_Rock idle label runs 193 frames (pet_rock_rays.fla Pet_Rock.xml)');
+  });
+
+  it('draws the rock from its 3x render of pet_rock.swf, three times the cropped 1x sheet (G402)', () => {
+    const sheet = PET_ROCK_SHEETS.idle;
+    assert.equal(sheet.hires, sheet.src.replace(/\.png$/, '@3x.webp'));
+    const b = readFileSync(join(PUBLIC, sheet.hires));
+    assert.equal(b.toString('ascii', 12, 16), 'VP8L', 'lossless WebP');
+    const bits = b.readUInt32LE(21);
+    assert.deepEqual({ w: (bits & 0x3fff) + 1, h: ((bits >> 14) & 0x3fff) + 1 }, { w: sheet.sheetW * 3, h: sheet.sheetH * 3 });
+    // The crop keeps every frame's opaque box, and the square box it is fitted into, inside its cell.
+    const side = Math.max(sheet.bbox.w, sheet.bbox.h);
+    const cx = sheet.bbox.x + sheet.bbox.w / 2;
+    const cy = sheet.bbox.y + sheet.bbox.h / 2;
+    assert.ok(cx - side / 2 >= 0 && cx + side / 2 <= sheet.cellW, 'no neighbour cell across');
+    assert.ok(cy - side / 2 >= 0 && cy + side / 2 <= sheet.cellH, 'no neighbour cell down');
+    assert.match(read('js/familiar.js'), /backgroundImage = `url\("\$\{sheet\.hires \|\| sheet\.src\}"\)`/);
   });
 
   it('fits the rock into its box like ItemIconView and steps through the grid', () => {
@@ -224,7 +240,7 @@ describe('skill learned panel (G218)', () => {
     assert.match(game, /openSkillTree\(classTsid = ''\) \{/);
     const index = read('js/features/index.js');
     // Registered (G185 appends the loneliness feature after it; neither answers the other's first-answer hooks).
-    assert.match(index, /^import \{ familiarDialogFeature \} from '\.\/familiar-dialog-feature\.js\?v=g381-1'; FEATURES\.push\(familiarDialogFeature\);$/m);
+    assert.match(index, /^import \{ familiarDialogFeature \} from '\.\/familiar-dialog-feature\.js\?v=g405-1'; FEATURES\.push\(familiarDialogFeature\);$/m);
   });
 });
 

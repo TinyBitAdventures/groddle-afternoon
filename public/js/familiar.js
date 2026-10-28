@@ -29,19 +29,25 @@ export const FAMILIAR_FPS = 30;
 
 /**
  * pet_rock sheets (pet_rock__x1_<state>_png_*.png). `bbox` is the union of
- * every frame's opaque pixels inside its 81 x 102 cell, so a fitted rock
- * never moves between frames.
+ * every frame's opaque pixels inside its cell, so a fitted rock never moves
+ * between frames. The idle cells are the OGA 81 x 102 cells cropped to
+ * 58 x 57 at (12, 15) (no pixel lost; wide enough that the square box the
+ * rock is fitted into never shows a neighbour cell), and `hires` is the
+ * same sheet at 3x from pet_rock.swf (tools/vector-sprites/familiar.json):
+ * the rock is always drawn larger than its art (68 to 100+ px for 51 px), so
+ * the 1x sheet read soft. background-size stays in 1x units (G402).
  */
 export const PET_ROCK_SHEETS = Object.freeze({
   idle: Object.freeze({
-    src: 'assets/sprites/pet-rock/pet_rock_idle.png',
+    src: 'assets/sprites/pet-rock/pet_rock_idle_fit.png',
+    hires: 'assets/sprites/pet-rock/pet_rock_idle_fit@3x.webp',
     cols: 12,
     frames: 193,
-    cellW: 81,
-    cellH: 102,
-    sheetW: 972,
-    sheetH: 1734,
-    bbox: Object.freeze({ x: 23, y: 18, w: 36, h: 51 }),
+    cellW: 58,
+    cellH: 57,
+    sheetW: 696,
+    sheetH: 969,
+    bbox: Object.freeze({ x: 11, y: 3, w: 36, h: 51 }),
   }),
 });
 
@@ -312,7 +318,7 @@ export function mountPetRock(el, { size = QUEST_ROCK_WH, state = 'idle' } = {}) 
   el.classList.add('pet-rock');
   el.style.width = `${size}px`;
   el.style.height = `${size}px`;
-  el.style.backgroundImage = `url("${sheet.src}")`;
+  el.style.backgroundImage = `url("${sheet.hires || sheet.src}")`;
   el.style.backgroundRepeat = 'no-repeat';
   paintRock(rock);
   if (!rockTimer && typeof setInterval === 'function') rockTimer = setInterval(tickRocks, 1000 / FAMILIAR_FPS);

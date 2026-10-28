@@ -1,0 +1,9 @@
+{
+ "about": "The Magic Rock familiar (js/familiar.js PET_ROCK_SHEETS): the pet_rock idle sheet the quest card, the voice of rock and the badge award draw as a CSS background, fitted into 68 to 100+ px boxes, so the 1x art was always upscaled. glitch-items misc/pet_rock/pet_rock.swf (CC0) sprite 46 holds the idle label (frames 1-193) the client recorded into the OGA pet_rock__x1_idle sheet. pet_rock_idle_fit.png is that OGA sheet (shipped as is in pet_rock_idle.png, which a page still running the old module asks for) with each 81x102 cell cropped to 58x57 at (12, 15) (every frame's opaque pixels lie in x 23-58, y 18-68, and the square box the rock is fitted into spans 51 px across that centre, so no neighbour cell shows; alpha and colour sums unchanged), so the 3x file is 2088x2907 instead of 2916x5202. js/familiar.js draws the @3x file; its background-size stays in 1x units. Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/familiar.json",
+ "webp": true,
+ "jobs": [
+  {"name": "pet_rock", "swf": "misc/pet_rock/pet_rock.swf", "sprite": 46, "sheets": [
+   {"path": "assets/sprites/pet-rock/pet_rock_idle_fit.png", "label": "idle", "fw": 58, "fh": 57, "cols": 12, "frames": 193}
+  ]}
+ ]
+}

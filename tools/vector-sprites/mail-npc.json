@@ -1,0 +1,50 @@
+{
+ "about": "The Mail Dispatcher (G.I.G.P.D.S.) on the home street (js/features/mail-courier-feature.js, js/mail-npc-art.js DISPATCHER_ART): tools/mail-npc-art/build.mjs renders glitch-items misc/npc/npc_mail_dispatcher/npc_mail_dispatcher.swf (CC0) sprite 28 (dispatcherLeft) at the item's 1.135 scale into one 1x sheet, 116 cells of 118x211 from the idle label on; that sheet drew soft once the 960 px view was zoomed to the window. Here the same sprite renders at zoom 3.405 (3 x 1.135), so the 3x parts are exactly 3x the 1x cells, and swap in when the station is first drawn. The 3x as one file would be 4248x6330 (107 MB decoded), so it ships as parts. Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/mail-npc.json The Mailbox beside it (homes-feature.js spawnStreetTargets, game.js; the OGA npc_mailbox mailboxRight idle and has_mail_idle stills, 97x146) is glitch-items misc/npc/npc_mailbox/npc_mailbox.swf sprite 81 (mailboxRight; sprite 28 is mailboxLeft), frames 1 and 2.",
+ "firstDraw": true,
+ "webp": true,
+ "budget": {
+  "maxSide": 8192,
+  "maxMB": 64
+ },
+ "jobs": [
+  {
+   "name": "mail_dispatcher",
+   "swf": "misc/npc/npc_mail_dispatcher/npc_mail_dispatcher.swf",
+   "sprite": 28,
+   "zoom": 3.405,
+   "sheets": [
+    {
+     "path": "assets/sprites/mail-npc/dispatcher_left.png",
+     "label": "idle",
+     "fw": 118,
+     "fh": 211,
+     "cols": 12,
+     "frames": 116
+    }
+   ]
+  },
+  {
+   "name": "mailbox_right",
+   "swf": "misc/npc/npc_mailbox/npc_mailbox.swf",
+   "sprite": 81,
+   "sheets": [
+    {
+     "path": "assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png",
+     "label": "idle",
+     "fw": 97,
+     "fh": 146,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.png",
+     "label": "has_mail_idle",
+     "fw": 97,
+     "fh": 146,
+     "cols": 1,
+     "frames": 1
+    }
+   ]
+  }
+ ]
+}

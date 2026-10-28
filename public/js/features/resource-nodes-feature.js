@@ -54,7 +54,7 @@
 
 import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=catalog-unified-7';
 import { platformYAt } from '../street-model.js';
-import { hiresSpriteUrl } from '../sprite-hires.js?v=g403-1';
+import { hiresSpriteUrl } from '../sprite-hires.js?v=g405-1';
 import { rollResourceNodeDrop } from './drops-feature.js?v=drops-8';
 import { rollSlothBonusSnails } from '../imagination-effects.js?v=g403-1';
 import {

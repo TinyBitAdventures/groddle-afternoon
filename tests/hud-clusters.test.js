@@ -1,6 +1,7 @@
 // The top bar in three clusters (Austin 2026-10-27): you (the name, then mood
 // and energy stacked in one card, as PlayerInfoUI.as kept them with the face),
-// progress (level, iMG) and wallet (currants, quoins), every card two lines tall.
+// progress (level, iMG) and wallet (currants, quoins), every card two lines tall,
+// all one gap apart (Austin 2026-10-28).
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
@@ -45,11 +46,19 @@ describe('top bar clusters', () => {
     assert.match(css, /body\.nx-hide-mood\.nx-hide-energy \.meta-vitals \{ visibility: hidden; \}/);
   });
 
-  it('gives every card one height and the clusters wider gaps than their cards', () => {
-    assert.match(css, /\.hud-cluster > \.meta-vitals,\n\.hud-cluster > \.level-meter,\n\.hud-cluster > \.meta-stat \{[^}]*height: var\(--hud-card-h\)/);
-    const vars = /\.top-bar \{\n  --hud-card-h: [\d.]+rem;\n  --hud-gap-in: ([\d.]+)rem;\n  --hud-gap-out: ([\d.]+)rem;/.exec(css);
-    assert.ok(vars && Number(vars[2]) > Number(vars[1]) * 2, 'between-cluster gap well over the in-cluster gap');
-    assert.match(css, /@media \(max-width: 560px\) \{[^}]*--hud-card-h[^}]*\}\n  \.hud-you,\n  \.metabolics-cluster,\n  \.top-actions \{ flex: 1 1 100%; \}/);
+  it('gives every card one height, one side padding and one gap, inside and between clusters (2026-10-28)', () => {
+    const card = /\.hud-cluster > \.meta-vitals,\n\.hud-cluster > \.level-meter,\n\.hud-cluster > \.meta-stat \{([^}]*)\}/.exec(css);
+    assert.ok(card, 'one rule for every card');
+    assert.match(card[1], /height: var\(--hud-card-h\)/);
+    assert.match(card[1], /padding: 0 var\(--hud-pad-x\)/);
+    assert.match(css, /\.top-bar \{\n  --hud-card-h: [\d.]+rem;\n  --hud-gap: [\d.]+rem;\n  --hud-pad-x: [\d.]+rem;\n  gap: var\(--hud-gap\);/);
+    assert.match(css, /\.hud-cluster \{[^}]*gap: var\(--hud-gap\);/);
+    assert.match(css, /\.metabolics-cluster \{[^}]*gap: var\(--hud-gap\);/);
+    assert.doesNotMatch(css, /--hud-gap-(in|out)/, 'no second gap');
+    // The name's hover pad overhangs into the gap, so the gap counts from its text.
+    assert.match(css, /\.hud-you \.brand \{ margin-right: -0\.35rem; min-width: 0; \}/);
+    assert.match(css, /@media \(max-width: 560px\) \{\n  \.top-bar \{ --hud-card-h: [\d.]+rem; --hud-gap: [\d.]+rem; \}\n  \.hud-you,\n  \.metabolics-cluster,\n  \.top-actions \{ flex: 1 1 100%; \}/);
+    assert.doesNotMatch(css, /\.metabolics-cluster \{ justify-content: space-between; \}/);
   });
 
   it('writes the mood and energy numbers beside the bars and on hover', () => {

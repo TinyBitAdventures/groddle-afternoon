@@ -47,7 +47,7 @@
  */
 
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-7';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g403-1';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g405-1';
 import { nearestSurfaceY } from '../walk-surface.js';
 import { donationValueFor } from '../shrines.js?v=spinning-wheel-test-9';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=trant-harvest-2';

@@ -258,8 +258,8 @@ describe('the Giant screen (GiantView.as)', () => {
     const src = read('js/features/shrine-hint-feature.js');
     assert.doesNotMatch(src, /\['Enter', 'Escape', ' '\]/);
     assert.match(src, /const input = screenInput\(el, \{ button: el \}\);/);
-    assert.match(src, /import \{ screenInput \} from '\.\.\/screen-fx\.js\?v=g378-1';/);
+    assert.match(src, /import \{ screenInput \} from '\.\.\/screen-fx\.js\?v=g405-1';/);
     assert.match(src, /engine\.queueScreen\(run\)/);
-    assert.match(read('js/features/index.js'), /shrine-hint-feature\.js\?v=g403-1'/);
+    assert.match(read('js/features/index.js'), /shrine-hint-feature\.js\?v=g405-1'/);
   });
 });

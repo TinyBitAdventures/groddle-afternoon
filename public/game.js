@@ -4,10 +4,10 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g403-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-232';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-233';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
-import { createPromptStack } from './js/prompt-stack.js?v=g378-1';
+import { createPromptStack } from './js/prompt-stack.js?v=g405-1';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=g311-1';
 import {
   actionDurationFor,
@@ -501,7 +501,7 @@ import {
   recipeToolInUse,
 } from './js/making.js?v=g403-1';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=g191-1';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=g403-1';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=g405-1';
 import {
   createGarden,
   tickGarden,
@@ -646,10 +646,10 @@ import {
   STREET_CARD_UP,
   cardPausedTimeout,
   POL_OWNER_SIZE,
-} from './js/screen-fx.js?v=g378-1';
+} from './js/screen-fx.js?v=g405-1';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=g379-1';
-import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=g225-1';
-import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=g378-1';
+import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=g405-1';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=g405-1';
 import {
   planTravel,
   listMapDestinations,
@@ -817,7 +817,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=g373-1';
 import { installHiresDecos } from './js/deco-hires.js';
 import { loadMutedPreference, saveMutedPreference } from './js/audio-pref.js';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js';
-import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=g403-1';
+import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=g405-1';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g367-1';

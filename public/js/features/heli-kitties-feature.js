@@ -26,7 +26,7 @@
  * kittyHiddenVerbs, kittyDemo.
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g403-1';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g405-1';
 import { landingY, nearestSurfaceY, walkSurfaceY } from '../walk-surface.js';
 import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js';
 import {

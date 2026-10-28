@@ -20,7 +20,7 @@ import {
   loveYouLine,
 } from '../public/js/giant-love.js';
 import { GIANTS } from '../public/js/shrines.js';
-import { sayLoveLine } from '../public/js/features/shrine-hint-feature.js?v=g403-1';
+import { sayLoveLine } from '../public/js/features/shrine-hint-feature.js?v=g405-1';
 
 const ROOT = join(import.meta.dirname, '..');
 const AUDIT = join(ROOT, '..');
