@@ -24,8 +24,8 @@
  * costs the dig_patch energy and tool wear and turns up earth.
  */
 
-import { createPlot, performPlotVerb, plotArtPath, plotVerbs, soilResponse } from '../patches.js';
-import { getQuestCatalog } from '../content-catalogs.js';
+import { createPlot, performPlotVerb, plotArtPath, plotVerbs, soilResponse } from '../patches.js?v=g403-1';
+import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
 import { onLoaded, textureFromUrl } from '../textures.js';
 import { ensureItem } from '../inventory.js?v=catalog-unified-7';
 

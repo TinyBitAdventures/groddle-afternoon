@@ -22,8 +22,8 @@
  */
 
 import { addItem, countItem, removeItem } from './inventory.js?v=catalog-unified-7';
-import { ensureToolCondition, getToolCondition } from './tools.js?v=woodcutting-test-3';
-import { distillingBonus, hasMasterAssembler, hasMasterExploder, machinePartInstallMs } from './imagination-effects.js';
+import { ensureToolCondition, getToolCondition } from './tools.js?v=woodcutting-test-8';
+import { distillingBonus, hasMasterAssembler, hasMasterExploder, machinePartInstallMs } from './imagination-effects.js?v=g403-1';
 import { loseEnergy } from './metabolics.js';
 
 export const MACHINE_STAND = 'machine_stand';

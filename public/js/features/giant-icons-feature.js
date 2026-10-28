@@ -37,7 +37,7 @@
 import { addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-7';
 import { getGameDayKey } from '../game-day.js?v=dametime-4';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
-import { emblemCostFor } from '../shrines.js';
+import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
 import { landingY } from '../walk-surface.js';
 import {
   EMBLEM_VERBS,

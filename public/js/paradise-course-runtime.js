@@ -16,7 +16,7 @@
  * vectors. Nothing here reads or copies recording pixels.
  */
 
-import { stepParadiseBody, usesParadiseBody } from './paradise-courses.js';
+import { stepParadiseBody, usesParadiseBody } from './paradise-courses.js?v=g403-1';
 import { SKY_PLUNGE_FILES } from './sky-plunge-art.js';
 import { isLoaded, onLoaded, textureFromUrl } from './textures.js';
 

@@ -10,14 +10,14 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { REVIVED_TRANT, createPlot, reviveDeadTree, tickPlot } from '../public/js/patches.js';
-import { powdersFeature } from '../public/js/features/powders-feature.js';
-import { itemVerbsFeature, inGameLocation } from '../public/js/features/item-verbs-feature.js';
+import { REVIVED_TRANT, createPlot, reviveDeadTree, tickPlot } from '../public/js/patches.js?v=g403-1';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=g403-1';
+import { itemVerbsFeature, inGameLocation } from '../public/js/features/item-verbs-feature.js?v=g403-1';
 import { GAME_CHEAT_BLOCKS, gameCheatBlock } from '../public/js/item-verbs.js?v=item-verbs-4';
 import { CROWNS_STREET } from '../public/js/game-of-crowns.js?v=crowns-2';
 import { HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js?v=hog-haul-2';
 import { raceSceneTsid } from '../public/js/races.js?v=races-4';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(root, '../glitch-GameServerJS');

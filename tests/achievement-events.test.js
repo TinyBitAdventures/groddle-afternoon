@@ -21,14 +21,14 @@ import {
   consumeAchievementCounters,
   resetAchievementCounter,
   purchaseAchievementUpdates,
-} from '../public/js/achievements.js?v=g366-1';
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js';
-import { createPlot, growTree, tickPlot } from '../public/js/patches.js';
+} from '../public/js/achievements.js?v=g403-1';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=g403-1';
+import { createPlot, growTree, tickPlot } from '../public/js/patches.js?v=g403-1';
 import { slothsChewing } from '../public/js/features/resource-nodes-feature.js';
-import { supplyFeature } from '../public/js/features/supply-feature.js';
-import { createToolConditionState } from '../public/js/tools.js?v=woodcutting-test-3';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
-import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=g395-1';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=g403-1';
+import { createToolConditionState } from '../public/js/tools.js?v=woodcutting-test-8';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
+import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=g403-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
@@ -395,6 +395,6 @@ describe('G117 badges GSJS grants outright', () => {
     assert.match(game, /consumeAchievementCounters\(classTsid, \{ kind: ordinaryInfo\.kind/);
     assert.match(game, /'coin_count:days_maxed', 1, pc[\s\S]{0,80}resetAchievementCounter\(achieveState, 'coin_count:days_maxed'\)/);
     assert.equal((game.match(/countPlayerJump\(\);/g) || []).length, 2);
-    assert.match(game, /achievements\.js\?v=g366-1/);
+    assert.match(game, /achievements\.js\?v=g403-1/);
   });
 });

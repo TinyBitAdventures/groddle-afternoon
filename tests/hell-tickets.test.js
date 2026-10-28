@@ -8,9 +8,9 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js';
+import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=g403-1';
 import { createQuestState } from '../public/js/quests.js';
-import { classifyQuests, eventCounters, isEventEmitted, questRoutingReport, requirementRoute } from '../public/js/quest-offers.js';
+import { classifyQuests, eventCounters, isEventEmitted, questRoutingReport, requirementRoute } from '../public/js/quest-offers.js?v=g403-1';
 import { HELL_LOCATION, HELL_QUESTS, createHellState, croak } from '../public/js/hell.js';
 import { PANKA_TSID, HELL_BAR_TSID } from '../public/js/hell-bar.js';
 import {
@@ -27,10 +27,10 @@ import {
   recognitionBranch,
   ticketDue,
 } from '../public/js/hell-tickets.js';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g392-1';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g403-1';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-16';
-import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=g300-1';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=g390-1';
+import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=g403-1';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=g403-1';
 import { questFlagsFeature } from '../public/js/features/quest-flags-feature.js?v=flags-1';
 import { FEATURES } from '../public/js/features/index.js';
 

@@ -111,17 +111,17 @@ import {
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js';
 import { soundForQuoin } from '../sound-moments.js?v=g393-1';
-import { IMAGINATION_UPGRADES } from '../imagination.js';
-import { assignQuest, completeQuest } from '../quests.js';
-import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js';
-import { getQuestCatalog } from '../content-catalogs.js';
-import { locationEventsApi } from './location-events-feature.js?v=location-events-4';
+import { IMAGINATION_UPGRADES } from '../imagination.js?v=g403-1';
+import { assignQuest, completeQuest } from '../quests.js?v=item-buffs-7';
+import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=g403-1';
+import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
+import { locationEventsApi } from './location-events-feature.js?v=location-events-9';
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g311-1';
 import { HOME_MACHINE } from '../home-ticket.js?v=g380-1';
-import { createAnimalState } from '../animals.js?v=g366-1';
+import { createAnimalState } from '../animals.js?v=g403-1';
 import {
   AK_ANIMALS,
   AK_BUBBLE,

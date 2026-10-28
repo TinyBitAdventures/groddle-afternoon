@@ -12,7 +12,7 @@ import { join } from 'node:path';
 import {
   loadContentCatalogsFromDir,
   resetContentCatalogs,
-} from '../public/js/content-catalogs.js';
+} from '../public/js/content-catalogs.js?v=g403-1';
 import {
   createSkillState,
   getStudyStatus,
@@ -37,12 +37,12 @@ import {
   spendEmblemOnStudy,
   spendFavorOnStudy,
 } from '../public/js/shrines.js';
-import { emblemUnlockSkillFor } from '../public/js/skill-tree.js';
-import { studyGiantsLine } from '../public/js/skills-panel.js';
-import { EMITTED_EVENTS, routeQuestEvent, acceptOffer, requirementRoute } from '../public/js/quest-offers.js';
+import { emblemUnlockSkillFor } from '../public/js/skill-tree.js?v=g403-1';
+import { studyGiantsLine } from '../public/js/skills-panel.js?v=g403-1';
+import { EMITTED_EVENTS, routeQuestEvent, acceptOffer, requirementRoute } from '../public/js/quest-offers.js?v=g403-1';
 import { createQuestState } from '../public/js/quests.js';
-import { getQuestCatalog } from '../public/js/content-catalogs.js';
-import { normalizeShrineState } from '../public/js/shrines.js?v=spinning-wheel-test-4';
+import { getQuestCatalog } from '../public/js/content-catalogs.js?v=g403-1';
+import { normalizeShrineState } from '../public/js/shrines.js?v=spinning-wheel-test-9';
 
 const root = join(import.meta.dirname, '..', 'public');
 

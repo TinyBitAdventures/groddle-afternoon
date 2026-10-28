@@ -19,7 +19,7 @@ import {
   resolveParadiseCourseAlias,
   stepParadiseBody,
   usesParadiseBody,
-} from '../public/js/paradise-courses.js';
+} from '../public/js/paradise-courses.js?v=g403-1';
 import {
   PARADISE_COURSES,
   PARADISE_DAILY_LIMIT,
@@ -33,7 +33,7 @@ import {
   resolveParadiseReward,
 } from '../public/js/paradise-flight.js';
 import { QURAZY_REWARDS } from '../public/js/quoins.js';
-import { remakeStatus } from '../public/js/imagination-remake.js';
+import { remakeStatus } from '../public/js/imagination-remake.js?v=g403-1';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');

@@ -25,7 +25,7 @@ import {
   streetCanHostRube,
   tradeablePack,
 } from '../public/js/rube.js';
-import { remakeStatus } from '../public/js/imagination-remake.js';
+import { remakeStatus } from '../public/js/imagination-remake.js?v=g403-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const CATALOG = JSON.parse(readFileSync(join(root, 'assets/content/rube-catalog.json'), 'utf8')).items;

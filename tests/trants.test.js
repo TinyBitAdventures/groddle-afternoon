@@ -23,7 +23,7 @@ import {
   TRANT_META,
   trantHarvestResponse,
 } from '../public/js/trants.js';
-import { getVerbsFor, runVerb } from '../public/content.js';
+import { getVerbsFor, runVerb } from '../public/content.js?v=g403-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../public');
 

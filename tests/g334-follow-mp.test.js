@@ -31,11 +31,11 @@ import {
 } from '../public/js/follow-mp.js?v=follow-1';
 import { followMpFeature } from '../public/js/features/follow-mp-feature.js?v=follow-1';
 import { COMPANION_FOLLOW_TRAIL_DISTANCE } from '../public/js/local-companions.js?v=street-players-4';
-import { loadContentCatalogsFromDir, getQuestCatalog, getAchievementCatalog } from '../public/js/content-catalogs.js';
+import { loadContentCatalogsFromDir, getQuestCatalog, getAchievementCatalog } from '../public/js/content-catalogs.js?v=g403-1';
 import { createQuestState } from '../public/js/quests.js';
-import { pendingQuestOffers } from '../public/js/quest-offers.js';
+import { pendingQuestOffers } from '../public/js/quest-offers.js?v=g403-1';
 import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=g358-1';
-import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=races3-test-2';
+import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=races3-test-7';
 import { economyCredits } from '../tools/build-economy.mjs';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 

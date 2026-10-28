@@ -84,16 +84,16 @@ import {
   secondsToString,
   takeJobIngredients,
   tankFuel,
-} from '../machine-rooms.js?v=g175-1';
-import { refuelMachine, MAX_FUEL } from '../machines.js';
+} from '../machine-rooms.js?v=g403-1';
+import { refuelMachine, MAX_FUEL } from '../machines.js?v=g403-1';
 import { DROP_ITEMS, applyDropResult, isEmptyDrop, rollDropTable } from '../drop-tables.js';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { energyMax, moodMax } from '../metabolics.js';
-import { getSkillCatalog } from '../content-catalogs.js';
+import { getSkillCatalog } from '../content-catalogs.js?v=g403-1';
 import { worldToScreen } from '../street-model.js';
 import { nearestSurfaceY } from '../walk-surface.js';
 import { textureFromUrl } from '../textures.js';
-import { createSheetLoader } from '../sprite-sheets.js';
+import { createSheetLoader } from '../sprite-sheets.js?v=g403-1';
 import {
   LOW_FUEL_BUBBLE_MS,
   LOW_FUEL_LINE,
@@ -103,7 +103,7 @@ import {
   machineFrame,
   machineSheetDef,
   roomMachineState,
-} from '../machine-art.js?v=g374-1';
+} from '../machine-art.js?v=g403-1';
 
 export const MACHINE_ROOMS_FEATURE_ID = 'machine-rooms';
 const MUSIC_CARD = 'metalmaking_music';

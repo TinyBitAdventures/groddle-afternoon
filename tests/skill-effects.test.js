@@ -9,7 +9,7 @@ import { before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
 
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
 import {
   SKILL_PACKAGES,
   skillPackageDetails,
@@ -20,7 +20,7 @@ import {
   mineRock,
   createMineRock,
   crushOre,
-} from '../public/js/mining.js';
+} from '../public/js/mining.js?v=g403-1';
 import {
   createGarden,
   gardenActionProfile,
@@ -30,7 +30,7 @@ import {
   clearPlot,
   SEED_CATALOG,
   GARDEN_HARVEST_FAILED_LINES,
-} from '../public/js/garden.js';
+} from '../public/js/garden.js?v=g403-1';
 import {
   loadRecipeCatalogFromFile,
   ensureMakingItems,
@@ -44,9 +44,9 @@ import {
   craftRecipeBatch,
   craftUnitDurations,
   MACHINE_EXTRA_WAIT_MS,
-} from '../public/js/making.js';
+} from '../public/js/making.js?v=g403-1';
 import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-7';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=woodcutting-test-3';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=woodcutting-test-8';
 
 const root = join(import.meta.dirname, '..', 'public');
 

@@ -23,10 +23,10 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=g403-1';
 import { createQuestState } from '../public/js/quests.js';
-import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js';
-import { applyBuff, createBuffState } from '../public/js/buffs.js?v=g370-1';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=g403-1';
+import { applyBuff, createBuffState } from '../public/js/buffs.js?v=g403-1';
 import { BUFF_ICONS } from '../public/js/buff-triggers.js?v=g370-1';
 import { FEAT_BY_ID, UNWIRED_FEATS, WIRED_FEATS, featsInEpic } from '../public/js/solo-feats.js?v=g370-1';
 import { MP_ACTS, MP_ORDER, MP_PACE, mpGoals, reportFor } from '../public/js/feats-mp.js';

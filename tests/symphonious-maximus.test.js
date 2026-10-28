@@ -11,7 +11,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry } from '../public/js/street-model.js';
 import { arrivalInTarget } from '../public/js/location-navigation.js';
-import { inEventBox, runLocationEvent, createEventRuntime } from '../public/js/location-events.js';
+import { inEventBox, runLocationEvent, createEventRuntime } from '../public/js/location-events.js?v=g403-1';
 import {
   CEBARKUL_DOOR,
   CEBARKUL_TSID,

@@ -33,8 +33,8 @@ import {
   stackAvailable,
   startParty,
   teleporterPhase,
-} from '../public/js/party-spaces.js';
-import { OWNED_STREETS } from '../public/js/location-events.js';
+} from '../public/js/party-spaces.js?v=g403-1';
+import { OWNED_STREETS } from '../public/js/location-events.js?v=g403-1';
 import { populationForStreet } from '../public/js/street-ecology.js';
 
 const here = dirname(fileURLToPath(import.meta.url));

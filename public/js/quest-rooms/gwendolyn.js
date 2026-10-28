@@ -63,8 +63,8 @@
  * they end with the room.
  */
 
-import { ensureQuestOfferState } from '../quest-offers.js';
-import { MEDITATION_MUSIC, ORB_TOOL_SHEET } from '../meditation.js';
+import { ensureQuestOfferState } from '../quest-offers.js?v=g403-1';
+import { MEDITATION_MUSIC, ORB_TOOL_SHEET } from '../meditation.js?v=g403-1';
 import { gainMetabolic, loseMood } from '../metabolics.js';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g311-1';

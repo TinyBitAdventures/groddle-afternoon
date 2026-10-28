@@ -40,9 +40,9 @@
 import { LEGALIZE_CLERKS } from '../legalize-it.js?v=legalize-2';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { loseEnergy, loseMood } from '../metabolics.js';
-import { acceptOffer, ensureQuestOfferState, markOffered, questStatus } from '../quest-offers.js';
-import { getQuestCatalog } from '../content-catalogs.js';
-import { parseQuestConversation } from '../quests.js';
+import { acceptOffer, ensureQuestOfferState, markOffered, questStatus } from '../quest-offers.js?v=g403-1';
+import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
+import { parseQuestConversation } from '../quests.js?v=item-buffs-7';
 import { CUP_CLASS, CUP_OF_WATER, WATER_COOLER, WATER_COOLER_CLASS, drinkCup, getWater, getWaterState } from '../water-cooler.js?v=g352-1';
 
 export const HALLS_FEATURE_ID = 'bureaucratic-halls';

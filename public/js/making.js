@@ -17,7 +17,7 @@ import {
   ensureItem,
   registerItemUse,
 } from './inventory.js?v=catalog-unified-7';
-import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-3';
+import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-8';
 import { getSkillPackageOverride, highestSkillLevel, skillPackageDetails } from './skill-packages.js';
 import {
   adjustedTaskLimit,
@@ -29,7 +29,7 @@ import {
   spellboundSpindle,
   toolWearMultiplier,
   wondrousWeave,
-} from './imagination-effects.js';
+} from './imagination-effects.js?v=g403-1';
 import { grantMoodXp } from './mood-xp.js';
 import { loseEnergy, loseMood } from './metabolics.js';
 

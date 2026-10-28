@@ -16,8 +16,8 @@
  */
 
 import { addItem, countItem, ensureItem } from './inventory.js?v=catalog-unified-7';
-import { canUseTool, useToolCondition } from './tools.js?v=woodcutting-test-3';
-import { foxBrushingCard, scaledToolWear } from './imagination-effects.js';
+import { canUseTool, useToolCondition } from './tools.js?v=woodcutting-test-8';
+import { foxBrushingCard, scaledToolWear } from './imagination-effects.js?v=g403-1';
 import { grantMoodXp } from './mood-xp.js';
 import { loseEnergy } from './metabolics.js';
 

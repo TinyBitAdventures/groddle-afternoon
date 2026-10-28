@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g388-1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g403-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-226';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-231';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g378-1';
@@ -28,9 +28,9 @@ import {
   listQuestTracker,
   parseQuestConversation,
   cleanQuestMarkup,
-} from './js/quests.js';
+} from './js/quests.js?v=item-buffs-7';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js';
+import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=g403-1';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -187,7 +187,7 @@ import {
   rookEggStateForProgress,
   rookWoodsObjective,
   rookWoodsRemainingMs,
-} from './js/rook-woods.js?v=rook-woods-4';
+} from './js/rook-woods.js?v=rook-woods-9';
 import {
   ROOK_HALL_QUEST_ID,
   ROOK_HALL_START_QUEST_ID,
@@ -309,13 +309,13 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=paradise-flight-9';
-import { resolveParadiseCourseAlias } from './js/paradise-courses.js';
+} from './js/paradise-flight.js?v=paradise-flight-14';
+import { resolveParadiseCourseAlias } from './js/paradise-courses.js?v=g403-1';
 import {
   buildParadiseCourseArt,
   paradiseCoursePreloadUrls,
   paradiseCourseRuntime,
-} from './js/paradise-course-runtime.js';
+} from './js/paradise-course-runtime.js?v=g403-1';
 import {
   createAchievementState,
   applyAchievementProgress as applyAchievementProgressRaw,
@@ -332,7 +332,7 @@ import {
   consumeAchievementCounters,
   resetAchievementCounter,
   purchaseAchievementUpdates,
-} from './js/achievements.js?v=g366-1';
+} from './js/achievements.js?v=g403-1';
 import {
   applyStreetVisit,
   STREET_VISITS_SLOT,
@@ -366,9 +366,9 @@ import {
   grantSkillWithPrereqs,
   canLearnSkill,
   listLearnedSkills,
-} from './js/skills.js';
-import { skillTitle, spendEmblemForSkill } from './js/skill-tree.js';
-import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js';
+} from './js/skills.js?v=study-6';
+import { skillTitle, spendEmblemForSkill } from './js/skill-tree.js?v=g403-1';
+import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=g403-1';
 import {
   createBuffState,
   applyBuff,
@@ -386,7 +386,7 @@ import {
   formatBuffRemaining,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from './js/buffs.js?v=g370-1';
+} from './js/buffs.js?v=g403-1';
 import { grantMoodXp, moodXpMultiplierFor, setMoodXpEnv } from './js/mood-xp.js';
 import {
   loadContentCatalogs,
@@ -395,7 +395,7 @@ import {
   getAchievementCatalog,
   getSkillCatalog,
   getBuffCatalog,
-} from './js/content-catalogs.js';
+} from './js/content-catalogs.js?v=g403-1';
 import {
   createInventory,
   useItem,
@@ -416,8 +416,8 @@ import {
   packPagerState,
   packPageTarget,
 } from './js/pack-pager.js?v=original-pager-1';
-import { listAnimalFeedOptions } from './js/animals.js?v=g366-1';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g366-1';
+import { listAnimalFeedOptions } from './js/animals.js?v=g403-1';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g403-1';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -432,7 +432,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=g395-1';
+} from './js/player-save.js?v=g403-1';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -470,7 +470,7 @@ import {
   setToolRemaining,
   WATERING_CAN_TOOLS,
   firstWorkingTool,
-} from './js/tools.js?v=woodcutting-test-3';
+} from './js/tools.js?v=woodcutting-test-8';
 import {
   listRecipes,
   listRecipesForTool,
@@ -499,9 +499,9 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=g300-2';
+} from './js/making.js?v=g403-1';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=g191-1';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=g374-1';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=g403-1';
 import {
   createGarden,
   tickGarden,
@@ -526,7 +526,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=g300-1';
+} from './js/garden.js?v=g403-1';
 import {
   ROCK_CATALOG,
   createMineRock,
@@ -538,7 +538,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=g330-1';
+} from './js/mining.js?v=g403-1';
 import {
   createActivityLog,
   appendActivity,
@@ -693,7 +693,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=g388-1';
+} from './js/musicblocks.js?v=g403-1';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -704,19 +704,19 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=vendor-profiles-7';
+} from './js/vendor.js?v=vendor-profiles-12';
 import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=g366-1';
+} from './js/animals.js?v=g403-1';
 import {
   ensureWoodTreeState,
   pickWoodTool,
   resetWoodTreeDay,
   woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=g369-1';
+} from './js/woodcutting.js?v=g403-1';
 import {
   GIANTS,
   createShrineState,
@@ -738,8 +738,8 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=spinning-wheel-test-4';
-import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=g374-1';
+} from './js/shrines.js?v=spinning-wheel-test-9';
+import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=g403-1';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,
@@ -749,7 +749,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=spinning-wheel-4';
+} from './js/spinning-wheel.js?v=spinning-wheel-9';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -817,7 +817,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=g373-1';
 import { installHiresDecos } from './js/deco-hires.js';
 import { loadMutedPreference, saveMutedPreference } from './js/audio-pref.js';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js';
-import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js';
+import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=g403-1';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g367-1';
@@ -25553,7 +25553,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=g403-1').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // Loading card QA (js/loading-card-qa.js): ?loadcarddemo=<tsid>[,<tsid>].
   if (new URLSearchParams(location.search).has('loadcarddemo')) {

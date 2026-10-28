@@ -13,7 +13,7 @@ import { assertStreetGeometry, platformYAt } from '../public/js/street-model.js'
 import { arrivalInTarget } from '../public/js/location-navigation.js';
 import { populationForStreet } from '../public/js/street-ecology.js';
 import { checkDoorEntry, doorAt, doorDestination } from '../public/js/doors.js';
-import { eventCounters, SEAM_STREETS } from '../public/js/quest-offers.js';
+import { eventCounters, SEAM_STREETS } from '../public/js/quest-offers.js?v=g403-1';
 import {
   ABBASID_JAIL_DOOR,
   ABBASID_JAIL_TSID,

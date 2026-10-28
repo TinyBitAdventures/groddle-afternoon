@@ -62,11 +62,11 @@ import {
 } from '../public/js/hell.js';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
 import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from '../public/js/game-day.js?v=dametime-4';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
 import {
   applyAchievementProgress,
   createAchievementState,
-} from '../public/js/achievements.js?v=g366-1';
+} from '../public/js/achievements.js?v=g403-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

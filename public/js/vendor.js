@@ -3,7 +3,7 @@
  * Prices adapted from Glitch economy feel (GSJS street_spirit patterns).
  */
 
-import { adjustedVendorPayout, adjustedVendorPrice } from './imagination-effects.js';
+import { adjustedVendorPayout, adjustedVendorPrice } from './imagination-effects.js?v=g403-1';
 import {
   addItem,
   removeItem,
@@ -12,8 +12,8 @@ import {
   ITEM_CATALOG,
   ensureItem,
 } from './inventory.js?v=catalog-unified-7';
-import { gardenVendorOffers } from './garden.js?v=g300-1';
-import { miningVendorOffers } from './mining.js';
+import { gardenVendorOffers } from './garden.js?v=g403-1';
+import { miningVendorOffers } from './mining.js?v=g403-1';
 
 import { STORE_CATALOG, ITEM_BASE_COSTS, NO_VENDOR_ITEMS } from './store-catalog.js?v=stores-3';
 

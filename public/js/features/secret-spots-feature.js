@@ -29,7 +29,7 @@
  * secretCount, secretOverlay, secretGrowl, secretDemo, secretBox.
  */
 
-import { emblemCostFor } from '../shrines.js';
+import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
 import {
   ELEVEN_BADGE,
   SECRET_MARKER_SIZE,

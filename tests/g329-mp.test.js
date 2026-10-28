@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { before, describe, it } from 'node:test';
 import { join } from 'node:path';
 
-import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js';
+import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=g403-1';
 import { createQuestState } from '../public/js/quests.js';
 import {
   acceptOffer,
@@ -17,7 +17,7 @@ import {
   ensureQuestOfferState,
   pendingQuestOffers,
   routeQuestEvent,
-} from '../public/js/quest-offers.js';
+} from '../public/js/quest-offers.js?v=g403-1';
 import {
   MP_FACTS,
   MP_RACE_QUESTS,
@@ -30,8 +30,8 @@ import {
   offerableMultiplayerQuest,
   tradeHoochCount,
 } from '../public/js/quests-mp.js?v=g358-1';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=g390-1';
-import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=races3-test-2';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=g403-1';
+import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=races3-test-7';
 import { economyCredits } from '../tools/build-economy.mjs';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 

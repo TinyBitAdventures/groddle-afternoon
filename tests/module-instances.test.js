@@ -1,5 +1,5 @@
 // G300: a browser (and node) loads one module instance per specifier, so
-// `./tools.js` and `./tools.js?v=woodcutting-test-3` were two copies of
+// `./tools.js` and `./tools.js?v=woodcutting-test-8` were two copies of
 // js/tools.js. Every importer, in the game and in the tests, now uses the
 // keyed form. The ratchet lists the other modules still imported under more
 // than one specifier in public/ (a follow-up row); new splits fail here.
@@ -43,7 +43,9 @@ describe('module instances', () => {
     const forms = specifierForms([...jsFiles(pub), ...jsFiles(here)]);
     const tools = forms.get('js/tools.js');
     assert.ok(tools, 'js/tools.js has importers');
-    assert.deepEqual([...tools.keys()], ['?v=woodcutting-test-3']);
+    // One specifier (its key moves with each cache-key cascade).
+    assert.equal(tools.size, 1, [...tools.keys()].join(', '));
+    assert.match([...tools.keys()][0], /^\?v=woodcutting-test-\d+$/);
   });
 
   it('no new module is split across specifiers in public/ (ratchet)', () => {

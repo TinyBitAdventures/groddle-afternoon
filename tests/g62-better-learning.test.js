@@ -8,19 +8,19 @@ import assert from 'node:assert/strict';
 import { before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { getSkillCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js';
+import { getSkillCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=g403-1';
 import {
   BETTER_LEARNING_BASE_SECONDS,
   BETTER_LEARNING_DISCOUNTS,
   BETTER_LEARNING_SKILL_IDS,
   betterLearningDiscount,
   betterLearningRank,
-} from '../public/js/better-learning.js';
+} from '../public/js/better-learning.js?v=g403-1';
 import { canLearnSkill, createSkillState, grantSkill, startSkillStudy, tickSkillStudy } from '../public/js/skills.js';
-import { skillTimeFactor } from '../public/js/imagination-effects.js';
-import { learnTimeReductions } from '../public/js/imagination.js';
-import { emblemUnlockSkillFor, skillRemakeNote, skillTitle, skillTreeEntry, spendEmblemForSkill } from '../public/js/skill-tree.js';
-import { acceptOffer, pendingQuestOffers } from '../public/js/quest-offers.js';
+import { skillTimeFactor } from '../public/js/imagination-effects.js?v=g403-1';
+import { learnTimeReductions } from '../public/js/imagination.js?v=g403-1';
+import { emblemUnlockSkillFor, skillRemakeNote, skillTitle, skillTreeEntry, spendEmblemForSkill } from '../public/js/skill-tree.js?v=g403-1';
+import { acceptOffer, pendingQuestOffers } from '../public/js/quest-offers.js?v=g403-1';
 import { createQuestState } from '../public/js/quests.js';
 import { normalizeStreetJobState, phaseRequirements, workCheck } from '../public/js/street-jobs.js';
 import { skillArtFor } from '../public/js/familiar.js';

@@ -28,8 +28,8 @@
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { getGameDayKey } from '../game-day.js?v=dametime-4';
-import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js';
-import { VENDOR_PROFILES } from '../vendor.js?v=vendor-profiles-7';
+import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js?v=g403-1';
+import { VENDOR_PROFILES } from '../vendor.js?v=vendor-profiles-12';
 import {
   ELEMENT_STACKMAX,
   POUCH_CLASS,

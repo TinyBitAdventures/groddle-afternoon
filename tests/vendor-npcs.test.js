@@ -29,7 +29,7 @@ import {
   vendorSheet,
 } from '../public/js/vendor-npcs.js';
 import { VENDOR_PROFILES } from '../public/js/vendor.js';
-import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js';
+import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=g403-1';
 import { createQuestState } from '../public/js/quests.js';
 import {
   REMAKE_QUEST_NPCS,
@@ -40,7 +40,7 @@ import {
   pendingQuestOffers,
   syncItemRequirements,
   turnInQuest,
-} from '../public/js/quest-offers.js';
+} from '../public/js/quest-offers.js?v=g403-1';
 import { XP_FOR_LEVEL } from '../public/js/progression.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

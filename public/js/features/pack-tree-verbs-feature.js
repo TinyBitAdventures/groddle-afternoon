@@ -22,7 +22,7 @@
  */
 
 import { countItem } from '../inventory.js?v=catalog-unified-7';
-import { getToolCondition } from '../tools.js?v=woodcutting-test-3';
+import { getToolCondition } from '../tools.js?v=woodcutting-test-8';
 import {
   PACK_TREE_REACH,
   deadTreeSide,

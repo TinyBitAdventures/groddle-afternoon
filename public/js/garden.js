@@ -11,9 +11,9 @@
  */
 
 import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=catalog-unified-7';
-import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-3';
+import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-8';
 import { skillPackageDetails } from './skill-packages.js';
-import { gardenGrowModifier } from './imagination-effects.js';
+import { gardenGrowModifier } from './imagination-effects.js?v=g403-1';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 

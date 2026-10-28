@@ -16,7 +16,7 @@ import {
   canUseTool,
   setToolRemaining,
   useToolCondition,
-} from './tools.js?v=woodcutting-test-3';
+} from './tools.js?v=woodcutting-test-8';
 import { SKILL_PACKAGES, getSkillPackageOverride, skillPackageDetails } from './skill-packages.js';
 import { loseEnergy, metabolicGain, moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';

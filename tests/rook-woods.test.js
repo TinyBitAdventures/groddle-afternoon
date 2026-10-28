@@ -33,7 +33,7 @@ import {
 import {
   createToolConditionState,
   setToolRemaining,
-} from '../public/js/tools.js?v=woodcutting-test-3';
+} from '../public/js/tools.js?v=woodcutting-test-8';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -182,5 +182,5 @@ test('Rooks’ Woods uses a deterministic clean-asset forest with readable depth
   const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
   assert.match(game, /rookForestArt/);
   assert.match(game, /ROOK_FOREST_DEPTH_LAYERS/);
-  assert.match(game, /rook-woods\.js\?v=rook-woods-4/);
+  assert.match(game, /rook-woods\.js\?v=rook-woods-9/);
 });

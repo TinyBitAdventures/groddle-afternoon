@@ -15,7 +15,7 @@ import {
 import {
   quoteTrantCare,
   performTrantCare,
-} from './js/trant-care.js?v=g374-1';
+} from './js/trant-care.js?v=g403-1';
 import {
   listPlantableSeeds,
   waterAllPlots,
@@ -28,7 +28,7 @@ import {
   hasWateringCan,
   hasHoe,
   plotStatusLabel,
-} from './js/garden.js?v=g300-1';
+} from './js/garden.js?v=g403-1';
 import {
   ROCK_CATALOG,
   MINING_COSTS,
@@ -38,31 +38,31 @@ import {
   findWorkingPick,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=g330-1';
+} from './js/mining.js?v=g403-1';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=g366-1';
+} from './js/animals.js?v=g403-1';
 import {
   quoteAnimalKinship,
   performAnimalKinship,
   highestAnimalKinshipRank,
-} from './js/animal-kinship.js?v=g296-1';
+} from './js/animal-kinship.js?v=g403-1';
 import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,
   isMusicblock,
-} from './js/musicblocks.js?v=g388-1';
+} from './js/musicblocks.js?v=g403-1';
 import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=dialogue-3';
 import {
   ensureWoodTreeState,
   quoteWoodTreeHarvest,
   harvestWoodTree,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=g369-1';
-import { findWorkingRookTool } from './js/rook-woods.js?v=rook-woods-4';
+} from './js/woodcutting.js?v=g403-1';
+import { findWorkingRookTool } from './js/rook-woods.js?v=rook-woods-9';
 import {
   HERDKEEPING,
   INCUBATION,
@@ -72,7 +72,7 @@ import {
   namingVerbs,
   queuePlops,
   startIncubation,
-} from './js/animal-husbandry.js';
+} from './js/animal-husbandry.js?v=g403-1';
 import { loseEnergy, metabolicGain, moodMax } from './js/metabolics.js';
 import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js';

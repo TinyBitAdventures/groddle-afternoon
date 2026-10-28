@@ -93,9 +93,9 @@ import {
   sniffNoNo,
   sprinkleHallowed,
   usePowderCharge,
-} from '../powders.js?v=g374-1';
+} from '../powders.js?v=g403-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
-import { DEAD_TRANT_CLASSES } from '../patches.js';
+import { DEAD_TRANT_CLASSES } from '../patches.js?v=g403-1';
 import { hellFeature } from './hell-feature.js?v=hell-16';
 import { grantMoodXp } from '../mood-xp.js';
 import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=g311-1';

@@ -76,16 +76,16 @@ import {
 } from '../quest-instance.js?v=qi-1';
 import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=qi-3';
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
-import { locationEventsApi } from './location-events-feature.js?v=location-events-4';
+import { locationEventsApi } from './location-events-feature.js?v=location-events-9';
 import {
   acceptOffer,
   ensureQuestOfferState,
   npcQuestOffers,
   questAwardPayload,
   turnInQuest,
-} from '../quest-offers.js';
-import { parseQuestConversation } from '../quests.js';
-import { getQuestCatalog } from '../content-catalogs.js';
+} from '../quest-offers.js?v=g403-1';
+import { parseQuestConversation } from '../quests.js?v=item-buffs-7';
+import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { runStreetTransition } from '../screen-fx.js?v=g378-1';
 import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=g378-1';

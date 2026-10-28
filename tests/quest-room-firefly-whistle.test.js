@@ -40,7 +40,7 @@ import { DRESSING, ENTRY, FLOOR, FLOOR_Y, LAB, W, entryPath, labPlatforms, seams
 import { FIREFLY_LAB_FILES } from '../public/js/quest-rooms/firefly-lab-art.js';
 import * as kit from '../public/js/quest-rooms/kit.js';
 import { BUILT_ROOMS, OFFER_OVERRIDES, QUEST_ROOMS, questGiver } from '../public/js/quest-rooms/catalog.js';
-import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js';
+import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=g403-1';
 import { FIREFLY_OFFER_LINES, FIREFLY_WHISTLE_QUEST, fireflyTouches } from '../public/js/features/resource-nodes-feature.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -186,7 +186,7 @@ describe('Fireflex 3000 Lab layout', () => {
 
 describe('Firefly Whistle offer and room wiring', () => {
   before(async () => {
-    const { loadContentCatalogsFromDir } = await import('../public/js/content-catalogs.js');
+    const { loadContentCatalogsFromDir } = await import('../public/js/content-catalogs.js?v=g403-1');
     loadContentCatalogsFromDir(join(root, 'public/assets/content'));
   });
 

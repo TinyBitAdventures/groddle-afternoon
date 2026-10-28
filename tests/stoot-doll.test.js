@@ -30,12 +30,12 @@ import {
   createShrineState,
   listShrineDonationOptions,
   quoteShrineDonation,
-} from '../public/js/shrines.js?v=spinning-wheel-test-4';
+} from '../public/js/shrines.js?v=spinning-wheel-test-9';
 import {
   createVendorSellQuote,
   listSellOffers,
   vendorSell,
-} from '../public/js/vendor.js?v=vendor-profiles-7';
+} from '../public/js/vendor.js?v=vendor-profiles-12';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

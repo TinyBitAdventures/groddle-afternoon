@@ -39,18 +39,18 @@ import {
   renderX,
   roomMachineVerbs,
   tankFuel,
-} from '../public/js/machine-rooms.js';
+} from '../public/js/machine-rooms.js?v=g403-1';
 import { FOREST_MACHINE_ROOM_HELD, FOREST_MACHINE_ROOM_TSID } from '../public/js/forest-machine-room.js';
-import { FRESH_FUEL, MAX_FUEL, refuelMachine } from '../public/js/machines.js';
+import { FRESH_FUEL, MAX_FUEL, refuelMachine } from '../public/js/machines.js?v=g403-1';
 import { DROP_TABLES, applyDropResult, rollDropTable } from '../public/js/drop-tables.js';
 import { countItem, removeItem } from '../public/js/inventory.js?v=catalog-unified-7';
-import { canUseTool } from '../public/js/tools.js?v=woodcutting-test-3';
-import { MACHINE_EXTRA_WAIT_MS as MAKING_EXTRA_WAIT_MS, MAKING_TOOL_SKILLS, RECIPE_CATALOG, canCraft, craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=g300-2';
+import { canUseTool } from '../public/js/tools.js?v=woodcutting-test-8';
+import { MACHINE_EXTRA_WAIT_MS as MAKING_EXTRA_WAIT_MS, MAKING_TOOL_SKILLS, RECIPE_CATALOG, canCraft, craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=g403-1';
 import { fixedFurniturePoints, furniturePlacementGroups } from '../public/js/street-furniture.js?v=furniture-g175';
 import { worldToScreen } from '../public/js/street-model.js';
 import { nearestSurfaceY } from '../public/js/walk-surface.js';
 import { platformsScreen } from '../public/js/street-model.js';
-import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=g374-1';
+import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=g403-1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(spike, '../glitch-GameServerJS');

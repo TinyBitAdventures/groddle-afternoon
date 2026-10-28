@@ -27,18 +27,18 @@
  * vendorNpcLast.
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g403-1';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js';
-import { VENDOR_PROFILES } from '../vendor.js?v=vendor-profiles-7';
+import { VENDOR_PROFILES } from '../vendor.js?v=vendor-profiles-12';
 import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { parseQuestConversation } from '../quests.js';
+import { parseQuestConversation } from '../quests.js?v=item-buffs-7';
 import {
   acceptOffer,
   declineOffer,
   npcQuestOffers,
   questAwardPayload,
   turnInQuest,
-} from '../quest-offers.js';
+} from '../quest-offers.js?v=g403-1';
 import {
   GOT_QUEST_TEXT,
   VENDOR_NPCS,

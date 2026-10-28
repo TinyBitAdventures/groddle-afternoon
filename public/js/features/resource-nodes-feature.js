@@ -54,9 +54,9 @@
 
 import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=catalog-unified-7';
 import { platformYAt } from '../street-model.js';
-import { hiresSpriteUrl } from '../sprite-hires.js';
-import { rollResourceNodeDrop } from './drops-feature.js?v=drops-4';
-import { rollSlothBonusSnails } from '../imagination-effects.js';
+import { hiresSpriteUrl } from '../sprite-hires.js?v=g403-1';
+import { rollResourceNodeDrop } from './drops-feature.js?v=drops-8';
+import { rollSlothBonusSnails } from '../imagination-effects.js?v=g403-1';
 import {
   DUST_TRAP_DROP_ITEM_DEFS,
   ORGANELLE_OVERLAY,
@@ -82,9 +82,9 @@ import {
   starterResourceTools,
   swimmingSalmonCount,
   tickResourceNode,
-} from '../resource-nodes.js';
+} from '../resource-nodes.js?v=g403-1';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js';
-import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js';
+import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=g403-1';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=ffw-2';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';

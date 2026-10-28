@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry } from '../public/js/street-model.js';
-import { OWNED_STREETS, streetOwner } from '../public/js/location-events.js';
+import { OWNED_STREETS, streetOwner } from '../public/js/location-events.js?v=g403-1';
 import { JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js';
 import { WINTER_HAVEN_STREET_ID, WINTER_WALK_STREET_ID } from '../public/js/winter-walk.js';
 import {

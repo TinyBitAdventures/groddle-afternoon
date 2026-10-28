@@ -49,9 +49,9 @@
  */
 
 import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=catalog-unified-7';
-import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-3';
-import { acceptOffer, npcQuestOffers } from '../quest-offers.js';
-import { getQuestCatalog } from '../content-catalogs.js';
+import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-8';
+import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=g403-1';
+import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
 import {
   BUILD_A_TOWER,

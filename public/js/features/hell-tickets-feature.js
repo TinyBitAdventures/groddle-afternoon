@@ -40,9 +40,9 @@
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { OVERLAY_USES, playWindowOverlay } from '../overlays.js?v=g392-1';
-import { acceptOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js';
-import { getQuestCatalog } from '../content-catalogs.js';
-import { parseQuestConversation } from '../quests.js';
+import { acceptOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js?v=g403-1';
+import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
+import { parseQuestConversation } from '../quests.js?v=item-buffs-7';
 import { HELL_LOCATION, HELL_QUESTS, isInHell, isInHellOne } from '../hell.js';
 import { BARTENDER, PANKA_DOOR, PANKA_TSID, isHellBarTsid } from '../hell-bar.js';
 import {

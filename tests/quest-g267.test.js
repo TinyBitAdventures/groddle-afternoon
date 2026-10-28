@@ -21,7 +21,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js';
+import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=g403-1';
 import { applyQuestProgress, createQuestState } from '../public/js/quests.js';
 import {
   BOOT_STARTER_LEFTOVERS,
@@ -30,7 +30,7 @@ import {
   ensureQuestOfferState,
   routeQuestEvent,
   routesCounter,
-} from '../public/js/quest-offers.js';
+} from '../public/js/quest-offers.js?v=g403-1';
 import { racesFeature } from '../public/js/features/races-feature.js?v=g392-1';
 import { raceSceneTsid } from '../public/js/races.js?v=races-4';
 import { HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js?v=hog-haul-2';

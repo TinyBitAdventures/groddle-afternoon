@@ -21,10 +21,10 @@ import {
 import { NOSTALGIA_BOOT_STREETS } from '../public/js/ancestral-nostalgia-data.js';
 import { BOOT_SOURCE_TSIDS, buildRows, render } from '../tools/build-ancestral-nostalgia.mjs';
 import { ancestralClock, stealChanceForSeconds } from '../public/js/juju-bandits.js';
-import { applyBuff, createBuffState, hasBuff, removeBuff } from '../public/js/buffs.js';
-import { getBuffCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
-import { IMAGINATION_UPGRADES, buildDeck, upgradeStatus } from '../public/js/imagination.js';
-import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js';
+import { applyBuff, createBuffState, hasBuff, removeBuff } from '../public/js/buffs.js?v=g403-1';
+import { getBuffCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
+import { IMAGINATION_UPGRADES, buildDeck, upgradeStatus } from '../public/js/imagination.js?v=g403-1';
+import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=g403-1';
 import { POTION_TEXT, ancestralCheck } from '../public/js/potions.js';
 import { FEATURES } from '../public/js/features/index.js';
 

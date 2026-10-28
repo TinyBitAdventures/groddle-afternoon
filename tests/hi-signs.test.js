@@ -47,8 +47,8 @@ import {
   stepMissile,
 } from '../public/js/hi-signs.js';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from '../public/js/game-day.js';
-import { hiSignsFeature } from '../public/js/features/hi-signs-feature.js';
-import { getAchievementCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
+import { hiSignsFeature } from '../public/js/features/hi-signs-feature.js?v=g403-1';
+import { getAchievementCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -384,10 +384,10 @@ describe('hi-signs feature', () => {
 
   it('is registered with one import line and binds the 5 key', () => {
     const index = readFileSync(join(PUBLIC, 'js/features/index.js'), 'utf8');
-    assert.match(index, /import \{ hiSignsFeature \} from '\.\/hi-signs-feature\.js\?v=g380-1'; FEATURES\.push\(hiSignsFeature\);/);
+    assert.match(index, /import \{ hiSignsFeature \} from '\.\/hi-signs-feature\.js\?v=g403-1'; FEATURES\.push\(hiSignsFeature\);/);
     const src = readFileSync(join(PUBLIC, 'js/features/hi-signs-feature.js'), 'utf8');
     assert.match(src, /e\.code === 'Digit5' \|\| e\.code === 'Numpad5'/);
-    assert.match(src, /butler-feature\.js\?v=g380-1/);
+    assert.match(src, /butler-feature\.js\?v=g403-1/);
   });
 });
 

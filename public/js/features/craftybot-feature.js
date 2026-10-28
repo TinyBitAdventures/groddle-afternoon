@@ -43,10 +43,10 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=woodcutting-test-3';
-import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=g300-2';
+import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=woodcutting-test-8';
+import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=g403-1';
 import { listDroppedStacks } from '../world-items.js?v=world-items-4';
-import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=g380-1';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=g403-1';
 import {
   CRAFTYBOT,
   CRAFTYBOT_BOX,

@@ -25,7 +25,7 @@ import {
   loadRecipeCatalogFromFile,
   recipeToolFor,
   recipeToolInUse,
-} from '../public/js/making.js';
+} from '../public/js/making.js?v=g403-1';
 import { ITEM_CATALOG, countItem, createInventory, isToolItem } from '../public/js/inventory.js?v=catalog-unified-7';
 import {
   GRINDER_TOOLS,
@@ -36,13 +36,13 @@ import {
   firstWorkingTool,
   getToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js?v=woodcutting-test-3';
-import { crushOre } from '../public/js/mining.js';
+} from '../public/js/tools.js?v=woodcutting-test-8';
+import { crushOre } from '../public/js/mining.js?v=g403-1';
 import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js';
-import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js';
-import { performTrantCare, quoteTrantCare } from '../public/js/trant-care.js';
+import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js?v=g403-1';
+import { performTrantCare, quoteTrantCare } from '../public/js/trant-care.js?v=g403-1';
 import { createTrantState, setTrantTables } from '../public/js/trants.js?v=trant-harvest-2';
-import { createPlot, performPlotVerb, plotVerbs } from '../public/js/patches.js';
+import { createPlot, performPlotVerb, plotVerbs } from '../public/js/patches.js?v=g403-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

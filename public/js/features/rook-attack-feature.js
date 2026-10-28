@@ -47,9 +47,9 @@
  */
 
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-7';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g403-1';
 import { nearestSurfaceY } from '../walk-surface.js';
-import { donationValueFor } from '../shrines.js?v=spinning-wheel-test-4';
+import { donationValueFor } from '../shrines.js?v=spinning-wheel-test-9';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=trant-harvest-2';
 import {
   FOREHORSEMAN_LINES,
@@ -84,7 +84,7 @@ import {
   strikeDamageFor,
   useBalmPoint,
 } from '../rook-attack.js';
-import { shrinePrimeBonus } from '../imagination-effects.js';
+import { shrinePrimeBonus } from '../imagination-effects.js?v=g403-1';
 import { grantMoodXp } from '../mood-xp.js';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js';
 import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g311-1';

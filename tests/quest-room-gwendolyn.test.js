@@ -12,9 +12,9 @@ import { fileURLToPath } from 'node:url';
 
 import * as kit from '../public/js/quest-rooms/kit.js';
 import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js';
-import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js';
-import { acceptOffer, ensureQuestOfferState, questStatus, turnInQuest } from '../public/js/quest-offers.js';
-import { gwendolynOffers } from '../public/js/gwendolyn-room-23.js';
+import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=g403-1';
+import { acceptOffer, ensureQuestOfferState, questStatus, turnInQuest } from '../public/js/quest-offers.js?v=g403-1';
+import { gwendolynOffers } from '../public/js/gwendolyn-room-23.js?v=g403-1';
 import {
   CACTUS,
   CACTUS_LINES,

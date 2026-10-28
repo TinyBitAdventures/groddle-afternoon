@@ -29,7 +29,7 @@
  * accepted | declined | quiet), room23Last, room23RepeatPaid, room23ExitIn.
  */
 
-import { acceptOffer, declineOffer, npcQuestOffers } from '../quest-offers.js';
+import { acceptOffer, declineOffer, npcQuestOffers } from '../quest-offers.js?v=g403-1';
 import { XP_FOR_LEVEL } from '../progression.js';
 import { textureFromUrl } from '../textures.js';
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
@@ -63,7 +63,7 @@ import {
   isRoom23,
   leadPath,
   toScreen,
-} from '../gwendolyn-room-23.js';
+} from '../gwendolyn-room-23.js?v=g403-1';
 
 export const GWENDOLYN_ROOM_23_FEATURE_ID = 'gwendolyn-room-23';
 const CHECK_MS = 120;

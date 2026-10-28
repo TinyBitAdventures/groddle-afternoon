@@ -9,9 +9,9 @@
  * - items/wood_tree.js: Wood Tree tending gates
  */
 
-import { TOOL_CONDITION_CATALOG, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-3';
+import { TOOL_CONDITION_CATALOG, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-8';
 import { fruitCapacityAt, fruitProductionAt } from './trants.js?v=trant-harvest-2';
-import { scaledToolWear, toolWearMultiplier } from './imagination-effects.js';
+import { scaledToolWear, toolWearMultiplier } from './imagination-effects.js?v=g403-1';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 

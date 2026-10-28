@@ -44,10 +44,10 @@
  */
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { getToolCondition } from '../tools.js?v=woodcutting-test-3';
+import { getToolCondition } from '../tools.js?v=woodcutting-test-8';
 import { worldToScreen } from '../street-model.js';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=g392-1';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g403-1';
 import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js';
 import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js';
 import {
@@ -80,8 +80,8 @@ import {
   rangerGreeting,
   splitConversation,
   stepFox,
-} from '../foxes.js';
-import { FOX_FLURRY_COUNTER, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=g329-1';
+} from '../foxes.js?v=g403-1';
+import { FOX_FLURRY_COUNTER, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=g403-1';
 
 export const FOX_FEATURE_ID = 'foxes';
 const PLAYER_NAME = 'Glitch';

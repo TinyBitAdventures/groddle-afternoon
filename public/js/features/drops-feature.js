@@ -35,7 +35,7 @@
  */
 
 import { addItem, ensureItem, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-7';
-import { emblemCostFor } from '../shrines.js';
+import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
 import {
   DROP_ITEMS,
   DROP_TABLES,

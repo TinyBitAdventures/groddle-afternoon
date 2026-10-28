@@ -13,7 +13,7 @@ import {
   resetContentCatalogs,
   getQuestCatalog,
   getContentMeta,
-} from '../public/js/content-catalogs.js';
+} from '../public/js/content-catalogs.js?v=g403-1';
 import {
   createQuestState,
   assignQuest,
@@ -53,7 +53,7 @@ import {
   tickQuestTimers,
   restartTimedQuest,
   questTimerStatus,
-} from '../public/js/quest-offers.js';
+} from '../public/js/quest-offers.js?v=g403-1';
 import { XP_FOR_LEVEL } from '../public/js/progression.js';
 
 const CONTENT = join(dirname(fileURLToPath(import.meta.url)), '../public/assets/content');

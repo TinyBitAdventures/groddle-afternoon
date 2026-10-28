@@ -23,8 +23,8 @@ import {
   soilSpawnClasses,
   tickPlot,
   archivedSeedlingTrant,
-} from '../public/js/patches.js';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=woodcutting-test-3';
+} from '../public/js/patches.js?v=g403-1';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=woodcutting-test-8';
 
 const seq = (...values) => {
   let i = 0;
@@ -360,8 +360,8 @@ describe('persistence and presentation', () => {
 
 describe('soil badge counters reach their group_sum badges', async () => {
   const { readFile } = await import('node:fs/promises');
-  const { setContentCatalogs } = await import('../public/js/content-catalogs.js');
-  const { applyAchievementProgress, createAchievementState } = await import('../public/js/achievements.js');
+  const { setContentCatalogs } = await import('../public/js/content-catalogs.js?v=g403-1');
+  const { applyAchievementProgress, createAchievementState } = await import('../public/js/achievements.js?v=g403-1');
   const achievements = JSON.parse(await readFile(new URL('../public/assets/content/achievements.json', import.meta.url), 'utf8'));
 
   it('VERB:tend:patch counts toward Mulcher and VERB:plant:patch toward Whiz-Bang Plantifier', () => {

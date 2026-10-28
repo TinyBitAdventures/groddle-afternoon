@@ -7,7 +7,7 @@
  * - items/*flower.js and herb_base (munch, optional delayed application)
  */
 
-import { getBuffCatalog } from './content-catalogs.js';
+import { getBuffCatalog } from './content-catalogs.js?v=g403-1';
 import { energyMax, gainMetabolic, loseEnergy, loseMood, moodMax, shiftMetabolic } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 import { BUFF_ICONS } from './buff-triggers.js?v=g370-1';

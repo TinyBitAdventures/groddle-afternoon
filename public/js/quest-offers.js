@@ -68,7 +68,7 @@
  */
 
 import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js';
-import { getQuestCatalog } from './content-catalogs.js';
+import { getQuestCatalog } from './content-catalogs.js?v=g403-1';
 import { levelInfoForXp } from './progression.js';
 import { offerableMultiplayerQuest } from './quests-mp.js?v=g358-1';
 import {
@@ -78,7 +78,7 @@ import {
   parseQuestConversation,
   cleanQuestMarkup,
   eventToCounter,
-} from './quests.js';
+} from './quests.js?v=item-buffs-7';
 
 /** Original: only one offer every 5 minutes (quests_offer delay = 60 * 5). */
 export const OFFER_INTERVAL_MS = 5 * 60 * 1000;

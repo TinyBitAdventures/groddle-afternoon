@@ -105,7 +105,7 @@ describe('Groddle on Minn (groddle-afternoon-site, a block theme that is also an
   it('makes the Musicblocks page from the game: every recovered tune in data.json, one block per set (tools/musicblocks)', async () => {
     execFileSync('node', [join(root, 'tools/musicblocks/build-data.mjs'), '--check'], { stdio: 'ignore' });
     const data = JSON.parse(readFileSync(join(root, 'public/musicblocks/data.json'), 'utf8'));
-    const { MUSICBLOCK_CATALOG } = await import('../public/js/musicblocks.js');
+    const { MUSICBLOCK_CATALOG } = await import('../public/js/musicblocks.js?v=g403-1');
     const listed = data.sets.flatMap((s) => s.blocks.map((b) => b.id));
     assert.deepEqual(listed.sort(), Object.keys(MUSICBLOCK_CATALOG).sort());
     for (const b of data.sets.flatMap((s) => s.blocks)) {

@@ -22,12 +22,12 @@ import {
 import {
   GAMESHOW_TICKET_ID,
   gameshowTicketChance,
-} from './spinning-wheel.js?v=spinning-wheel-4';
+} from './spinning-wheel.js?v=spinning-wheel-9';
 import { metabolicGain, moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
-import { getSkillCatalog } from './content-catalogs.js';
-import { accelerateActiveStudy, getActiveStudy, maxStudyAcceleration } from './skills.js';
-import { emblemUnlockSkillFor } from './skill-tree.js';
+import { getSkillCatalog } from './content-catalogs.js?v=g403-1';
+import { accelerateActiveStudy, getActiveStudy, maxStudyAcceleration } from './skills.js?v=study-6';
+import { emblemUnlockSkillFor } from './skill-tree.js?v=g403-1';
 
 export const EMBLEM_FAVOR_COST = 1000;
 export const EMBLEM_FAVOR_INCREMENT = 100;

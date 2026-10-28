@@ -8,14 +8,14 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-7';
-import { SEED_CATALOG } from '../public/js/garden.js';
+import { SEED_CATALOG } from '../public/js/garden.js?v=g403-1';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
   vendorBuy,
   vendorSell,
   vendorSellValue,
-} from '../public/js/vendor.js?v=vendor-profiles-7';
+} from '../public/js/vendor.js?v=vendor-profiles-12';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');

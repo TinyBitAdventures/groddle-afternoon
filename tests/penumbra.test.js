@@ -23,7 +23,7 @@ import {
   windowOrbs,
 } from '../public/js/penumbra.js';
 import { autoplaySteps, normalizePuzzleData, quoinsInReach, stepTriggers } from '../public/js/puzzle-triggers.js';
-import { createEventRuntime, dueEventTimers, runLocationEvent } from '../public/js/location-events.js';
+import { createEventRuntime, dueEventTimers, runLocationEvent } from '../public/js/location-events.js?v=g403-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => JSON.parse(readFileSync(join(root, rel), 'utf8'));

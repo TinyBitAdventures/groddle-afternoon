@@ -6,7 +6,7 @@ import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadLocation, getLocation, playerInBounds, DEFAULT_STREET } from '../public/js/locations.js';
+import { loadLocation, getLocation, playerInBounds, DEFAULT_STREET } from '../public/js/locations.js?v=g403-1';
 import {
   createWorld,
   teleportTo,
@@ -30,8 +30,8 @@ import {
   countItem,
   ITEM_CATALOG,
 } from '../public/js/inventory.js?v=catalog-unified-7';
-import { getVerbsFor, runVerb } from '../public/content.js';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
+import { getVerbsFor, runVerb } from '../public/content.js?v=g403-1';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 before(async () => {

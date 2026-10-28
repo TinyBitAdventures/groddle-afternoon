@@ -18,17 +18,17 @@ import {
   setMetabolicLossGate,
   shiftMetabolic,
 } from '../public/js/metabolics.js';
-import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=g370-1';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
+import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=g403-1';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
 import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js';
 import { BUTTER_UP, butterUpChicken } from '../public/js/animal-flattery.js';
 import { SET_FREE, applySetFree } from '../public/js/animal-set-free.js';
 import { applyVerbReward, getVerbReward } from '../public/js/verb-rewards.js';
 import { createInventory, countItem } from '../public/js/inventory.js';
-import { startAssembly, startDisassembly } from '../public/js/machines.js';
-import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=woodcutting-test-3';
-import { smeltMetalRocks } from '../public/js/mining.js';
-import { craftRecipe } from '../public/js/making.js';
+import { startAssembly, startDisassembly } from '../public/js/machines.js?v=g403-1';
+import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=woodcutting-test-8';
+import { smeltMetalRocks } from '../public/js/mining.js?v=g403-1';
+import { craftRecipe } from '../public/js/making.js?v=g403-1';
 import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js';
 
 const here = dirname(fileURLToPath(import.meta.url));

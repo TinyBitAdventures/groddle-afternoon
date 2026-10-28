@@ -38,8 +38,8 @@
 import { countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js';
 import { grantMoodXp } from '../mood-xp.js';
-import { ensureQuestOfferState } from '../quest-offers.js';
-import { getMusicblock, isMusicblock } from '../musicblocks.js';
+import { ensureQuestOfferState } from '../quest-offers.js?v=g403-1';
+import { getMusicblock, isMusicblock } from '../musicblocks.js?v=g403-1';
 import { GAME_DAY_MS } from '../game-day.js';
 import { playSheetOverlay } from '../overlay-art.js?v=g311-1';
 import { showRainbow } from '../overlays.js?v=g392-1';

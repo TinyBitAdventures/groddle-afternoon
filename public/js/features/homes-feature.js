@@ -131,7 +131,7 @@ import {
 } from '../home-decor.js?v=home-decor-7';
 import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=furnup-2';
 import { chooseUpgrade, closeUpgradePicker, openUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=furnup-2';
-import { RECIPE_CATALOG } from '../making.js?v=g300-2';
+import { RECIPE_CATALOG } from '../making.js?v=g403-1';
 import {
   createBackYardState,
   isBackYard,
@@ -164,16 +164,16 @@ import {
 } from '../home-cultivation.js?v=home-cultivation-5';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=g311-1';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g403-1';
 import { fadeInNewNear } from '../poof-fade.js?v=g311-1';
-import { projectApi } from './street-jobs-feature.js?v=blur-9';
+import { projectApi } from './street-jobs-feature.js?v=blur-14';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-3';
-import { towerApi } from './home-tower-feature.js?v=g366-1';
+import { towerApi } from './home-tower-feature.js?v=g403-1';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-15';
-import { patchesFeature } from './patches-feature.js?v=patches-16';
-import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-20';
+import { patchesFeature } from './patches-feature.js?v=patches-21';
+import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=g403-1';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=g165-1';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=g369-1';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
@@ -194,7 +194,7 @@ import {
   yardStyleFor,
 } from '../home-styles.js?v=g373-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
-import { ROCK_CATALOG } from '../mining.js?v=g330-1';
+import { ROCK_CATALOG } from '../mining.js?v=g403-1';
 import {
   HOUSE_SIGN,
   IMG_BUBBLE_MS,

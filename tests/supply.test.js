@@ -9,7 +9,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-7';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=woodcutting-test-3';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=woodcutting-test-8';
 import {
   MACHINE_ASSEMBLIES,
   MACHINE_PART_ITEMS,
@@ -22,14 +22,14 @@ import {
   distillInStill,
   advanceStill,
   collectHooch,
-} from '../public/js/machines.js';
+} from '../public/js/machines.js?v=g403-1';
 import { runTransform, listTransformVerbs, transformEdges } from '../public/js/item-transforms.js';
-import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js';
+import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=g403-1';
 import { VENDOR_PROFILES } from '../public/js/vendor.js';
-import { SEED_CATALOG } from '../public/js/garden.js';
+import { SEED_CATALOG } from '../public/js/garden.js?v=g403-1';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 import { supplyReport } from '../tools/supply-report.mjs';
-import { supplyFeature } from '../public/js/features/supply-feature.js';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=g403-1';
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const ENGINEER = ['engineering_1'];

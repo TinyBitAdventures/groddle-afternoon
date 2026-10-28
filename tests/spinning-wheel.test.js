@@ -27,7 +27,7 @@ import {
 import {
   createShrineState,
   donateToShrine,
-} from '../public/js/shrines.js?v=spinning-wheel-test-4';
+} from '../public/js/shrines.js?v=spinning-wheel-test-9';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

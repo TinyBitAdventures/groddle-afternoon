@@ -54,7 +54,7 @@
  * engine.query('spiritLonelyHere').
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g403-1';
 import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js';
 import { STREET_SPIRIT_SPEECH_OFFSET } from '../speech-placement.js?v=g357-1';
 import {
@@ -93,8 +93,8 @@ import {
   resumeTarget,
   setCurrentState,
 } from '../conversations.js?v=g202-1';
-import { questStatus } from '../quest-offers.js';
-import { questDoneAt } from '../quests.js';
+import { questStatus } from '../quest-offers.js?v=g403-1';
+import { questDoneAt } from '../quests.js?v=item-buffs-7';
 
 export const STREET_SPIRITS_FEATURE_ID = 'street-spirits';
 const TALK_MS = 5000; // the remake's talk bubble; the source talks until the conversation ends

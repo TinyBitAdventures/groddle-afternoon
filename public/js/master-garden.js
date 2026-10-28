@@ -31,8 +31,8 @@
  * growModifier }. Growth uses SEED_CATALOG grow1Ms / grow2Ms.
  */
 
-import { SEED_CATALOG, stageElapsedMs, wetPlot } from './garden.js';
-import { gardenGrowModifier } from './imagination-effects.js';
+import { SEED_CATALOG, stageElapsedMs, wetPlot } from './garden.js?v=g403-1';
+import { gardenGrowModifier } from './imagination-effects.js?v=g403-1';
 import { skillPackageDetails } from './skill-packages.js';
 import { metabolicGain, moodMax, loseEnergy } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';

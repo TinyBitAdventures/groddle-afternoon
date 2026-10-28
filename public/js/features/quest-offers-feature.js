@@ -104,10 +104,10 @@ import {
   COLD_COMFORT_LEAVE_TEXT,
   HOME_TREE_GROWN_TEXT,
   SEED_TO_SCYTHE,
-} from '../quest-offers.js';
-import { parseQuestConversation } from '../quests.js';
+} from '../quest-offers.js?v=g403-1';
+import { parseQuestConversation } from '../quests.js?v=item-buffs-7';
 import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unified-7';
-import { getQuestCatalog } from '../content-catalogs.js';
+import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
 
 const OFFER_CHECK_MS = 30_000;
 /** QuestElementUI.as setTryButton 247-258 and ConversationManager.as 584. */

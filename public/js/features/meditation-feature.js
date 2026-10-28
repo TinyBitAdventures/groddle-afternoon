@@ -65,10 +65,10 @@ import {
   rollMeditationDay,
   startLevitation,
   startMeditation,
-} from '../meditation.js';
+} from '../meditation.js?v=g403-1';
 import { energyMax, metabolicGain, moodMax, loseEnergy, loseMood } from '../metabolics.js';
-import { levitationCards } from '../imagination-effects.js';
-import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js';
+import { levitationCards } from '../imagination-effects.js?v=g403-1';
+import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js?v=g403-1';
 import { sourceFromUrl } from '../textures.js';
 import { rainbowSound, showRainbow } from '../overlays.js?v=g392-1';
 import { moodScaledXp } from '../mood-xp.js';
@@ -90,7 +90,7 @@ import {
   radiationRank,
   radiatorEnd,
   radiatorLine,
-} from '../radiance-mp.js?v=radiance-1';
+} from '../radiance-mp.js?v=radiance-5';
 
 export const MEDITATION_FEATURE_ID = 'meditation';
 /** metabolics_get_max_energy: the energy tank (100 plus Energy Tank cards). */

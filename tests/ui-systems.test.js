@@ -19,7 +19,7 @@ import {
   isToolItem,
   getItemUseInfo,
 } from '../public/js/inventory.js?v=catalog-unified-7';
-import { starterToolsInventory, ensureMakingItems } from '../public/js/making.js';
+import { starterToolsInventory, ensureMakingItems } from '../public/js/making.js?v=g403-1';
 import {
   createQuestState,
   assignQuest,
@@ -28,7 +28,7 @@ import {
   listQuestTracker,
   QUEST_CATALOG,
 } from '../public/js/quests.js';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
 
 const __dirnameUi = dirname(fileURLToPath(import.meta.url));
 before(async () => {

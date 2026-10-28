@@ -33,7 +33,7 @@ import {
   builtInstanceQuests,
   roomModulePath,
 } from '../public/js/quest-rooms/catalog.js';
-import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js';
+import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=g403-1';
 import * as kit from '../public/js/quest-rooms/kit.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -276,7 +276,7 @@ describe('Le Misérable (le_miserable)', () => {
 
   async function setup() {
     const mod = await import('../public/js/quest-rooms/le-miserable.js');
-    const ev = await import('../public/js/location-events.js');
+    const ev = await import('../public/js/location-events.js?v=g403-1');
     const { readFileSync } = await import('node:fs');
     const street = JSON.parse(readFileSync(streetFile, 'utf8'));
     const rt = ev.createEventRuntime();
@@ -388,8 +388,8 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
   };
 
   it('a run lost to a reload marks a startable quest failed, not a retry prompt', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g388-1');
-    const { ensureQuestOfferState } = await import('../public/js/quest-offers.js');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g403-1');
+    const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=g403-1');
     assert.equal(getQuestCatalog().mental_block?.needsStart, true);
     assert.notEqual(getQuestCatalog().help_juju_bandits?.needsStart, true, 'no onStarted in GSJS');
     questInstancesFeature.restore({ questId: 'mental_block', roomId: 'mental_block', memory: {}, retry: { help_juju_bandits: Date.now() - 60_000 } });
@@ -452,8 +452,8 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('a reload removes a source-removed quest and its offers, and keeps the prompt for the three', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g388-1');
-    const { questStatus } = await import('../public/js/quest-offers.js');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g403-1');
+    const { questStatus } = await import('../public/js/quest-offers.js?v=g403-1');
     const t = Date.now() - 60_000;
     questInstancesFeature.restore({ memory: {}, retry: { tower_quest: t, le_miserable_part_2: t, smuggle_the_smuggler_part2: t } });
     const active = { tower_quest: { progress: {} }, le_miserable_part_2: { progress: {} }, smuggle_the_smuggler_part2: { progress: {} } };
@@ -480,7 +480,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('has no map card', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g388-1');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g403-1');
     assert.equal(questInstancesFeature.mapCards, undefined);
     const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
     assert.doesNotMatch(src, /Unfinished quest places/);

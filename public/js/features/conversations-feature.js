@@ -71,8 +71,8 @@
 import { addItem, ensureItem } from '../inventory.js?v=catalog-unified-7';
 import { isPoisoned } from '../tree-poison.js';
 import { GREEDY_ACTS, GREEDY_STREET_SPIRIT_QUEST_ID, canOfferGreedyFirst } from '../greedy-street-spirit.js?v=greedy-story-2';
-import { questStatus } from '../quest-offers.js';
-import { questDoneAt } from '../quests.js';
+import { questStatus } from '../quest-offers.js?v=g403-1';
+import { questDoneAt } from '../quests.js?v=item-buffs-7';
 import { grantMoodXp } from '../mood-xp.js';
 import { CONVERSATIONS, TELLERS } from '../conversations-data.js?v=g202-1';
 import {

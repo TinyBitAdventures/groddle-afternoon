@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
 
-import { FOX_TIMING, canSpawnFox } from '../public/js/foxes.js';
+import { FOX_TIMING, canSpawnFox } from '../public/js/foxes.js?v=g403-1';
 import {
   FOX_FLURRY_COUNTER,
   FOX_LEAVE_MS,
@@ -26,7 +26,7 @@ import {
   serverCanSpawn,
   serverId,
   spawnIsFlurry,
-} from '../public/js/foxes-mp.js?v=g329-1';
+} from '../public/js/foxes-mp.js?v=g403-1';
 import { foxesData, preserveStreets } from '../tools/build-realtime-foxes.mjs';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
@@ -117,7 +117,7 @@ describe('G329 foxes: the game', () => {
   it('runs the multiplayer branch only with a realtime client in multiplayer', () => {
     assert.match(src, /engine\.mode === 'multiplayer' && engine\.started\) mpSession\(engine\)/);
     assert.match(src, /engine\.query\?\.\('realtimeClient'\)/);
-    assert.match(src, /from '\.\.\/foxes-mp\.js\?v=g329-1'/);
+    assert.match(src, /from '\.\.\/foxes-mp\.js\?v=g403-1'/);
   });
 
   it('sends ignites, brushes and eats, and counts the flurry the server sends', () => {

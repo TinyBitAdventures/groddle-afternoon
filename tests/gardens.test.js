@@ -40,7 +40,7 @@ import {
   GARDEN_TALKBACK_MS,
   gardenTalkbackKey,
   gardenTalkback,
-} from '../public/js/garden.js';
+} from '../public/js/garden.js?v=g403-1';
 import {
   createInventory,
   countItem,

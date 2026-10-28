@@ -48,11 +48,11 @@ import {
   purchaseCard,
   remakeMovementMultipliers,
   reshuffleHand,
-} from '../imagination.js';
-import { brainCapacityRescale, skillTimeFactor } from '../imagination-effects.js';
-import { betterLearningDiscount } from '../better-learning.js';
-import { rescaleStudiesForLearningModifier } from '../skills.js';
-import { isOfferedInRemake, remakeStatus } from '../imagination-remake.js';
+} from '../imagination.js?v=g403-1';
+import { brainCapacityRescale, skillTimeFactor } from '../imagination-effects.js?v=g403-1';
+import { betterLearningDiscount } from '../better-learning.js?v=g403-1';
+import { rescaleStudiesForLearningModifier } from '../skills.js?v=study-6';
+import { isOfferedInRemake, remakeStatus } from '../imagination-remake.js?v=g403-1';
 import { hellFeature } from './hell-feature.js?v=hell-16';
 
 const ART = 'assets/imagination/cards/';

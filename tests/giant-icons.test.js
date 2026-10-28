@@ -27,7 +27,7 @@ import {
   titheIcon,
   useEmblem,
 } from '../public/js/giant-icons.js';
-import { remakeStatus } from '../public/js/imagination-remake.js';
+import { remakeStatus } from '../public/js/imagination-remake.js?v=g403-1';
 // The key every importer uses (giant-icons-feature.js too): one module, one record.
 import { CONVERSATION_RULES, conversationRecord, hasCompleted, resetConversationRecord, restoreConversationRecord } from '../public/js/conversations.js?v=g202-1';
 import { CONVERSATIONS, TELLERS } from '../public/js/conversations-data.js?v=g202-1';
@@ -260,7 +260,7 @@ describe('icon conversations (G202: the shared record)', () => {
   });
 
   it('a version 1 save hands its talked list to the record once, in either restore order', async () => {
-    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js');
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=g403-1');
     const old = { version: 1, talked: ['icon_humbaba_1', 'icon_alph_1'] };
     const saved = { completed: { npc_chicken: { chickens_cautionary_tales_1: 700 } } };
     const t0 = Date.now();
@@ -299,7 +299,7 @@ describe('imagination cards', () => {
 
 describe('giant icons feature', () => {
   it('offers the source pack verbs and iconizes through the engine', async () => {
-    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js');
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=g403-1');
     giantIconsFeature._reset();
     const events = [];
     const granted = [];

@@ -8,9 +8,9 @@ import assert from 'node:assert/strict';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { applyRewards, roundTo5 } from '../public/js/quests.js';
-import { scaleRewards } from '../public/js/imagination-effects.js';
-import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js';
-import { createAchievementState, unlockAchievement } from '../public/js/achievements.js';
+import { scaleRewards } from '../public/js/imagination-effects.js?v=g403-1';
+import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=g403-1';
+import { createAchievementState, unlockAchievement } from '../public/js/achievements.js?v=g403-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 

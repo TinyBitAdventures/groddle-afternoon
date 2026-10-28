@@ -29,7 +29,7 @@
  * engine.mode === 'multiplayer' and the realtime client first.
  */
 
-import { TRANSCENDENTAL_RADIATION_PACKAGE, tankMultiplier } from './meditation.js';
+import { TRANSCENDENTAL_RADIATION_PACKAGE, tankMultiplier } from './meditation.js?v=g403-1';
 
 export const RADIATE_COOLDOWN_SECONDS = 120; // focusing_orb.js:1305
 export const RADIATE_IMAGINATION_CHANCE = 0.05; // 1213 is_chance(.05)

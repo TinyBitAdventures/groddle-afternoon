@@ -14,11 +14,11 @@ import { before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js';
+import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=g403-1';
 import { createQuestState } from '../public/js/quests.js';
-import { pendingQuestOffers } from '../public/js/quest-offers.js';
+import { pendingQuestOffers } from '../public/js/quest-offers.js?v=g403-1';
 import { MP_RACE_QUESTS, MULTIPLAYER_QUESTS, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=g358-1';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=g390-1';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=g403-1';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js';
 import { HELL_LOCATION } from '../public/js/hell.js';
 import { HOG_MP_COURSE } from '../public/js/hog-haul-mp.js?v=g334-hog-1';
@@ -78,7 +78,7 @@ describe('The Great Hog Haul quest in multiplayer (quests/hogtie_piggy.js)', () 
   });
 
   it('logs for the challenger, completes on the server\'s win and leaving, fails on a loss', async () => {
-    const { questsMpFeature: feature } = await import('../public/js/features/quests-mp-feature.js?v=races3-test-2');
+    const { questsMpFeature: feature } = await import('../public/js/features/quests-mp-feature.js?v=races3-test-7');
     const client = fakeClient(1);
     const calls = { activity: [], awards: [] };
     const engine = {

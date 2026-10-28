@@ -33,7 +33,7 @@
  * puzzleRespawns, puzzleComplete, puzzleReward, puzzleDemo.
  */
 
-import { locationEventsApi } from './location-events-feature.js?v=location-events-4';
+import { locationEventsApi } from './location-events-feature.js?v=location-events-9';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js';
 import {
   PUZZLE_DATA_URL,

@@ -31,8 +31,8 @@
 
 import { platformsScreen, platformYAt } from '../street-model.js';
 import { frameTexture, textureFromUrl } from '../textures.js';
-import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=g369-1';
-import { noteWoodTreeCare } from '../patches.js';
+import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=g403-1';
+import { noteWoodTreeCare } from '../patches.js?v=g403-1';
 import {
   ENCHANTED_FORESTS,
   ENCHANTED_WOOD_TREE,

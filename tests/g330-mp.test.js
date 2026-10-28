@@ -33,10 +33,10 @@ import {
   trCostSkillMultiplier,
   trCostTankMultiplier,
   trSkillMultiplier,
-} from '../public/js/radiance-mp.js?v=radiance-1';
-import { meditationFeature } from '../public/js/features/meditation-feature.js';
+} from '../public/js/radiance-mp.js?v=radiance-5';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=g403-1';
 import { createInventory } from '../public/js/inventory.js?v=catalog-unified-7';
-import { createToolConditionState } from '../public/js/tools.js?v=woodcutting-test-3';
+import { createToolConditionState } from '../public/js/tools.js?v=woodcutting-test-8';
 import { HAS_SERVER, HAS_SITE, serverPath, sitePath } from '../tools/repos.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

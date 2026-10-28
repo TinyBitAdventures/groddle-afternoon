@@ -13,8 +13,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import * as kit from '../public/js/quest-rooms/kit.js';
-import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js';
-import { acceptOffer, ensureQuestOfferState, npcQuestOffers, pendingQuestOffers, turnInQuest } from '../public/js/quest-offers.js';
+import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=g403-1';
+import { acceptOffer, ensureQuestOfferState, npcQuestOffers, pendingQuestOffers, turnInQuest } from '../public/js/quest-offers.js?v=g403-1';
 import { XP_FOR_LEVEL } from '../public/js/progression.js';
 import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js';
 import { GREETERBOT } from '../public/js/tower-mid-rooms.js';
@@ -49,8 +49,8 @@ import {
   gwendolynOffers,
   leadPath,
   room23Street,
-} from '../public/js/gwendolyn-room-23.js';
-import { gwendolynRoom23Feature } from '../public/js/features/gwendolyn-room-23-feature.js';
+} from '../public/js/gwendolyn-room-23.js?v=g403-1';
+import { gwendolynRoom23Feature } from '../public/js/features/gwendolyn-room-23-feature.js?v=g403-1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = (p) => join(spike, 'public', p);

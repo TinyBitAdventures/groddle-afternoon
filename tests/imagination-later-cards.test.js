@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js';
-import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js';
+import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=g403-1';
 import {
   BONUS_TOOL_CANDIDATES,
   adjustedTaskLimit,
@@ -21,9 +21,9 @@ import {
   rollBonusTool,
   rollSlothBonusSnails,
   taskLimitMultiplier,
-} from '../public/js/imagination-effects.js';
+} from '../public/js/imagination-effects.js?v=g403-1';
 import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-7';
-import { createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=woodcutting-test-3';
+import { createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=woodcutting-test-8';
 import {
   DEFAULT_TASK_LIMIT,
   RECIPE_CATALOG,
@@ -32,7 +32,7 @@ import {
   loadRecipeCatalogFromFile,
   makingSkillAdjustments,
   recipeTaskLimit,
-} from '../public/js/making.js';
+} from '../public/js/making.js?v=g403-1';
 import {
   assemblyCheck,
   assemblyEnergy,
@@ -43,7 +43,7 @@ import {
   finishMachineWork,
   startAssembly,
   startDisassembly,
-} from '../public/js/machines.js';
+} from '../public/js/machines.js?v=g403-1';
 import {
   finishMeditation,
   levitationMinEnergy,
@@ -51,14 +51,14 @@ import {
   sessionPackage,
   startLevitation,
   startMeditation,
-} from '../public/js/meditation.js';
+} from '../public/js/meditation.js?v=g403-1';
 import { skillPackageDetails } from '../public/js/skill-packages.js';
 import { strikeDamageFor } from '../public/js/rook-attack.js';
-import { createMineRock, mineRock, tickMineRock } from '../public/js/mining.js';
+import { createMineRock, mineRock, tickMineRock } from '../public/js/mining.js?v=g403-1';
 import { runTransform, shuckDetails } from '../public/js/item-transforms.js';
-import { brushFox, createFox, foxFiberRange } from '../public/js/foxes.js';
+import { brushFox, createFox, foxFiberRange } from '../public/js/foxes.js?v=g403-1';
 import { soundForMakingTool } from '../public/js/sound-moments.js';
-import { supplyFeature } from '../public/js/features/supply-feature.js';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=g403-1';
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const seq = (...values) => {
