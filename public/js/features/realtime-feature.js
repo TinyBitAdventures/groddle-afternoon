@@ -21,13 +21,25 @@
  *   here reloads, for the newest save, and takes the character back), and
  *   the chat log toggle.
  *
+ * - An administrator's teleport (v0.2.2, js/admin-teleport.js): the server's
+ *   {"t":"teleport","street","x"?,"y"?,"by":"admin"} (sent only on the site's
+ *   signed call, groddle-afternoon-server teleport.go) has already taken you
+ *   off your street; the game enters the new one the ordinary way, quietly
+ *   (at the spot when one came, else where an arrival lands), says
+ *   "An administrator moved you to <street>." and saves. Nothing joins a
+ *   street until the move is done.
+ *
  * QA: canvas data realtimeState, realtimeHere, realtimePlayers,
- * realtimeStreet, realtimeLastSaid; window.groddleRealtime in multiplayer.
+ * realtimeStreet, realtimeLastSaid, realtimeTeleport (the street an
+ * administrator sent you to, once there); window.groddleRealtime in multiplayer.
  */
 
 import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
 import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=mp3-4';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js';
+import { movedLine } from '../admin-teleport.js?v=g406-1';
+import { saveStore } from '../save-store.js?v=mp2-2';
+import { STREET_INDEX } from '../street-loader.js';
 
 export const REALTIME_FEATURE_ID = 'realtime';
 /** Lines kept in the chat log. */
@@ -127,6 +139,8 @@ function createSession(engine) {
   const log = [];
   let lookJson = '';
   let lookCheckAt = 0;
+  /** An administrator's teleport under way: no join until the game is on the new street. */
+  let teleporting = false;
 
   // —— Dock UI ——
   const style = el('style', { id: 'realtime-css' });
@@ -363,6 +377,31 @@ function createSession(engine) {
     } else console.warn('[realtime]', code, message);
   });
 
+  // An administrator moved you (the site's signed call; the server already took you off your street).
+  client.on('msg:teleport', (msg) => {
+    const street = String(msg?.street || '');
+    if (!street || teleporting || !engine.streetExists?.(street)) {
+      console.warn('[realtime] teleport to a street this game does not know', street);
+      return;
+    }
+    teleporting = true;
+    client.leave();
+    const spot = Number.isFinite(msg.x) && Number.isFinite(msg.y) ? { spawnX: msg.x, spawnY: msg.y } : {};
+    Promise.resolve()
+      .then(() => engine.enter?.(street, { ...spot, quiet: true }))
+      .catch((err) => console.warn('[realtime] teleport', err))
+      .finally(() => {
+        teleporting = false;
+        const line = movedLine(STREET_INDEX.streets, street);
+        addLog({ note: true, text: line });
+        engine.pushActivity?.(line);
+        engine.toast?.(line, 5200);
+        engine.setData?.('realtimeTeleport', String(engine.streetTsid || street));
+        engine.save?.();
+        Promise.resolve(saveStore.flush?.()).catch(() => {});
+      });
+  });
+
   // "/" focuses the chat, unless something else has the keyboard.
   window.addEventListener('keydown', (e) => {
     if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -378,11 +417,16 @@ function createSession(engine) {
     remotes,
     log,
     emote,
+    get teleporting() { return teleporting; },
     start() {
       publish();
       client.start();
     },
     tick(t) {
+      if (teleporting) {
+        drawRemotes(t);
+        return;
+      }
       const player = engine.player;
       const street = sharedStreet(engine);
       if (street !== client.wanted) {

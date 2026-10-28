@@ -19,9 +19,13 @@
  *   sendIM), in the activity log; silent without a Butler, as in the source.
  * - has_used_house_command / has_used_tower_command are kept (saved) for the
  *   Butler hints that teach /house and /tower (butler_hints.js:382-399).
+ * - /tp: the administrators' teleport (js/admin-teleport.js, v0.2.2), multiplayer
+ *   only; the site's admin/teleport route decides who may, and anyone else sees
+ *   the ordinary Unknown command line. Solo says /tp is not available.
  *
  * QA: type the commands into Local chat. Canvas data: slashLast
- *     (`<command>:<outcome>`), slashLine (the last line shown).
+ *     (`<command>:<outcome>`, `/tp:<kind>:<outcome>` once a /tp is answered),
+ *     slashLine (the last line shown).
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=butler-9';
@@ -29,6 +33,10 @@ import { butlerApi } from './butler-feature.js?v=g405-1';
 import { hellFeature } from './hell-feature.js?v=hell-16';
 import { towerApi } from './home-tower-feature.js?v=g403-1';
 import { slashPlan, unknownLine } from '../slash-commands.js?v=g249-1';
+import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=g406-1';
+import { minnUrls } from '../minn-account.js?v=nbhome-10';
+import { saveStore } from '../save-store.js?v=mp2-2';
+import { STREET_INDEX } from '../street-loader.js';
 
 export const SLASH_COMMANDS_FEATURE_ID = 'slash-commands';
 
@@ -100,8 +108,49 @@ function butlerIm(engine, rand = Math.random) {
   }, 500 + Math.floor(rand() * 500));
 }
 
+/** What /tp needs from the page (tests replace it). */
+let tpDeps = () => {
+  const baseUri = globalThis.document?.baseURI || globalThis.location?.href || '';
+  return {
+    fetch: globalThis.fetch?.bind(globalThis),
+    baseUri,
+    nonce: globalThis.GRODDLE_MP_BOOT?.nonce || '',
+    nonceUrl: baseUri ? minnUrls(baseUri).nonce : '',
+    streets: STREET_INDEX.streets,
+    flush: () => saveStore.flush?.(),
+  };
+};
+
+/** /tp <...>: multiplayer administrators only (js/admin-teleport.js). */
+function teleportCommand(engine, text, args) {
+  if (engine.mode !== 'multiplayer') {
+    activity(engine, TP_TEXT.solo);
+    last = '/tp:solo';
+    publish(engine);
+    return;
+  }
+  last = '/tp:asking';
+  publish(engine);
+  const deps = tpDeps();
+  return runTeleportCommand(args, {
+    ...deps,
+    engine,
+    say: (line) => { if (line) activity(engine, line); },
+    unknown: () => activity(engine, unknownLine(text)),
+  }).then((outcome) => {
+    last = `/tp:${outcome}`;
+    publish(engine);
+    return outcome;
+  });
+}
+
 /** Answer one slash line; null when this feature does not know it. */
 export function runSlashCommand(engine, text) {
+  const tp = parseTp(text);
+  if (tp !== null) {
+    teleportCommand(engine, text, tp);
+    return true;
+  }
   const plan = slashPlan(text, slashContext(engine));
   if (!plan) return null;
   if (plan.command === '/house') used.house = true;
@@ -150,6 +199,11 @@ export const slashCommandsFeature = {
   /** butler_hints.js:382, :392: has the player used /house or /tower yet. */
   usedCommand(name) {
     return name === 'house' ? used.house : name === 'tower' ? used.tower : false;
+  },
+
+  /** Tests: what /tp reaches instead of the page (fetch, baseUri, nonce, nonceUrl, streets, flush). */
+  _setTeleportDeps(fn) {
+    tpDeps = fn;
   },
 
   /** Tests. */

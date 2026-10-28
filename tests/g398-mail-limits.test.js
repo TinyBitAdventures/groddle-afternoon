@@ -91,7 +91,8 @@ describe('the site: email limits and Turnstile (groddle-afternoon-site)', { skip
     assert.ok(!t.some((l) => /^email /.test(l)), 'never the address itself');
     for (const key of ['KEY kind_email (kind,email_hash,sent_at)', 'KEY kind_address (kind,address,sent_at)', 'KEY sent_at (sent_at)']) assert.ok(t.includes(key), key);
     assert.ok(manifest.needs.http.includes('https://challenges.cloudflare.com/turnstile/v0/siteverify'), 'outgoing HTTP to siteverify, by its full path');
-    assert.ok(manifest.needs.http.every((url) => /^https:\/\/[^/]+\/.+/.test(url)), 'every grant a path, never a whole host');
+    // Plain http only to the realtime server on this host (the admin teleport's call, AdminTeleport).
+    assert.ok(manifest.needs.http.every((url) => /^(https:\/\/[^/]+|http:\/\/127\.0\.0\.1:\d+)\/.+/.test(url)), 'every grant a path, never a whole host');
   });
 
   it('a reset is checked, limited, recorded for player and stranger alike, and answered the same', () => {
