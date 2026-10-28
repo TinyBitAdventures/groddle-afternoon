@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g388-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-218';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-219';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g378-1';
@@ -2740,6 +2740,9 @@ function upgradePackedEmotionalBear(upgrade) {
 
 /** Merge ordinary food metabolics with real item-triggered buff actions. */
 function getPackUseInfo(classTsid) {
+  // G423: an item's own default verb replaces the food Eat (licorice.js verbs.eat; features/item-verbs-more-feature.js).
+  const featureUse = features.query('packUseInfo', classTsid, engine);
+  if (featureUse) return featureUse;
   const cubimalPackage = cubimalPackageInfo(classTsid);
   if (cubimalPackage) {
     const progress = cubimalCollectionProgress(inv, cubimalPackage.series);
@@ -3960,6 +3963,7 @@ function updateHud() {
 
 function usePackItem(classTsid) {
   if (!state.started) return;
+  if (features.query('runPackUse', classTsid, engine) === true) return;
   if (cubimalPackageInfo(classTsid)) {
     openPackedCubimalBox(classTsid);
     return;

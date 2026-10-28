@@ -34,6 +34,17 @@
  *   maturity max(4, maturity - 3). A street tree's spot goes to the patches
  *   feature, as for a tree that died (tree-death-feature `replaced`).
  * - Charades Potion shows its solo refusal (it needs other players).
+ * - Draught of Wisdom (potion_xp, G430): from level 20, once a game day,
+ *   500 iMG with no mood bonus ("+500 xp").
+ * - Rocky Regeneration Solution (G431): with the Shiny Nugget Award, the
+ *   closest mineable rock within 200 px that has fewer than 50 chunks goes
+ *   back to 50 ("The rock now looks as good as new!").
+ * - Alphabet Sauce (G428): asks what to spell (3 to 140 letters and
+ *   spaces), pours a puddle at your feet for five minutes; walking into it
+ *   puts a random letter (or a heart) over your head until you leave the
+ *   street. The street hearing the phrase is multiplayer (not here). The
+ *   puddle and letters are stand-ins until the art is rendered (letter_*_overlay
+ *   through js/overlay-stand-in.js; the puddle is a plain shape: alphabet_sauce.swf).
  * - Ancestral Spirits: only under Overwhelming Ancestral Nostalgia in the
  *   Ancestral Lands, once a visit; give_baqala_time(300) puts five minutes
  *   back on the visit (G39: the juju-bandits feature owns the clock and
@@ -46,7 +57,9 @@
  *   room with a Rug) and &potionautoplay=rug, which munches once the Decorate
  *   bar is closed.
  *   Canvas: potionLast, potionUses, potionItems, potionScale, potionGravity,
- *   potionRugs, potionFavorGiant.
+ *   potionRugs, potionFavorGiant, potionSauce (word), potionLetter.
+ *   &potionsauce=<phrase> answers the Alphabet Sauce box (autoplay), and
+ *   &potionlevel=<n> sets your level for the Draught of Wisdom.
  */
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
@@ -59,6 +72,8 @@ import { isPoisoned } from '../tree-poison.js';
 import { furnitureSize } from '../home-decor.js?v=home-decor-7';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js';
 import { POTION_ART } from '../potion-art.js?v=g149-1';
+import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=progression-1';
+import { overlayOrStandIn } from '../overlay-stand-in.js?v=g391-1';
 import { playPoofIn, playSheetOverlay } from '../overlay-art.js?v=g311-1';
 import {
   ANIMAL_BABIES,
@@ -68,7 +83,21 @@ import {
   POTION_ACTION_MS,
   POTION_TEXT,
   POUR_RANGE,
+  ROCKY,
   RUG_MUNCH,
+  WISDOM,
+  ALPHABET_SAUCE,
+  inSauce,
+  nearSauce,
+  regenerateRock,
+  rockyCheck,
+  rollSauceLetter,
+  sauceInputOk,
+  sauceLabel,
+  sauceLetterOverlay,
+  sauceWord,
+  wisdomCheck,
+  wisdomMessage,
   amorousCheck,
   ancestralCheck,
   animalYouthCheck,
@@ -97,7 +126,7 @@ import {
   trantsformMessage,
   trantsformOutcome,
   usePotion,
-} from '../potions.js?v=g149-1';
+} from '../potions.js?v=g391-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { patchesFeature } from './patches-feature.js?v=patches-16';
 import { homesFeature } from './homes-feature.js?v=g380-1';
@@ -127,6 +156,11 @@ let rugTargets = [];
 let heart = null; // playSheetOverlay handle
 let heartRetryAt = 0;
 let adopting = []; // street trees handed to patches, waiting for their plot's first draw
+let sauces = []; // alphabet_sauce puddles: { id, tsid, x, y, word, expiresAt }
+let letter = null; // pc.letter: 'A'..'Z', 'heart' or '1' (has_letter)
+let letterView = null; // overlayOrStandIn handle over the avatar
+let sauceTouching = new Set();
+const sauceViews = new Map(); // puddle id -> Pixi view
 const views = new Map(); // item id -> sprite
 
 const now = () => Date.now();
@@ -141,6 +175,8 @@ function publish(engine) {
   engine.setData('potionGravity', String(phys.gravity));
   engine.setData('potionRugs', String(rugTargets.length));
   engine.setData('potionFavorGiant', favorGiant);
+  engine.setData('potionSauce', sauces.filter((i) => i.tsid === engine.streetTsid).map((i) => i.word).join(','));
+  engine.setData('potionLetter', letter || '');
 }
 
 function say(engine, text, ok = true) {
@@ -188,6 +224,18 @@ function closestTree(engine) {
   const list = live(engine, (t) => !t.featureId && t.state && isTrantsformable(t, { home, poisoned: isPoisoned(t.state) }))
     .map((t) => ({ x: t.sprite.x, target: t }));
   return closestWithin(list, Number(p?.x) || 0, POUR_RANGE)?.target || null;
+}
+
+/** getValidTargets: findCloseStack(is_mineable && isUseable, 200), the closest rock that is not depleted. */
+function closestRock(engine) {
+  const p = engine.player;
+  const list = live(engine, (t) => Boolean(t.state?.rock) && !t.state.rock.depleted && t.state.rock.chunksRemaining > 0)
+    .map((t) => ({ x: t.sprite.x, y: t.sprite.y, target: t }));
+  return closestWithin(list, Number(p?.x) || 0, ROCKY.range, Number(p?.y) || 0)?.target || null;
+}
+
+function playerLevel(engine) {
+  return levelInfoForXp(engine.pc?.xp).level;
 }
 
 function signpostsHere(engine) {
@@ -248,6 +296,14 @@ function checkFor(classTsid, engine) {
       const target = closestTree(engine);
       return { ...trantsformCheck(target), target };
     }
+    case 'potion_xp':
+      return wisdomCheck({ level: playerLevel(engine), quaffedToday: Boolean(today().quaffed.potion_xp) });
+    case 'potion_rocky_regeneration_solution': {
+      const target = closestRock(engine);
+      return { ...rockyCheck({ hasAward: (engine.unlockedAchievements || []).includes(ROCKY.award), rock: target?.state?.rock }), target };
+    }
+    case 'potion_alphabet_sauce':
+      return { ok: true };
     default:
       return { ok: false };
   }
@@ -366,6 +422,43 @@ function syncQuoinLimit(engine) {
 }
 
 const EFFECTS = {
+  // potion_xp.js onQuaff 518-522: the daily counter, then stats_add_xp(500, true) (no mood bonus).
+  potion_xp(engine) {
+    const check = checkFor('potion_xp', engine);
+    if (!check.ok) return { ok: false, msg: check.error };
+    today().quaffed.potion_xp = 1;
+    const pc = engine.pc;
+    pc.xp = (Number(pc.xp) || 0) + WISDOM.xp;
+    pc.imagination = (Number(pc.imagination) || 0) + WISDOM.xp;
+    engine.updateHud?.();
+    return { ok: true, msg: wisdomMessage(WISDOM.xp), tag: `xp+${WISDOM.xp}` };
+  },
+
+  // onPour 532-538: msg.target's chunks_remaining = 50 (no target: "No mineable rock could be found.").
+  potion_rocky_regeneration_solution(engine, { target }) {
+    const rock = target?.state?.rock;
+    if (!rock || !(engine.interactables || []).includes(target)) return { ok: false, msg: 'No mineable rock could be found.' };
+    regenerateRock(rock);
+    engine.refreshRock?.(target);
+    return { ok: true, msg: POTION_TEXT.rockRegenerated, tag: `${target.classId}:${rock.chunksRemaining}` };
+  },
+
+  // onPour 551-559: createItemStackWithPoof('alphabet_sauce') at your feet with the word.
+  potion_alphabet_sauce(engine, { extra }) {
+    const word = String(extra?.word || '');
+    const p = engine.player;
+    if (!word || !p) return { ok: false };
+    seq += 1;
+    const item = { id: `as${seq}`, tsid: engine.streetTsid, x: Math.round(p.x), y: Math.round(p.y), word, expiresAt: now() + ALPHABET_SAUCE.lifeSec * 1000 };
+    sauces.push(item);
+    drawSauce(engine, item);
+    poof(engine, item.x, item.y, 20);
+    // onContainerChanged: everyone within 450 px with no letter gets one (you, standing in it).
+    if (!letter && nearSauce(item, p.x, p.y)) setLetter(engine, rollSauceLetter());
+    sauceTouching.add(item.id);
+    return { ok: true, tag: `sauce:${word}` };
+  },
+
   potion_amorous_philtre(engine) {
     applyLove(engine);
     return { ok: true, tag: LOVE };
@@ -741,6 +834,152 @@ function syncHeart(engine) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Alphabet Sauce: the puddle and the letter over your head             */
+/* ------------------------------------------------------------------ */
+
+/** A plain puddle in the sauce's place until alphabet_sauce.swf is rendered (stand-in art). */
+function drawSauce(engine, item) {
+  const { PIXI } = engine;
+  if (!PIXI?.Graphics || !engine.entityLayer || sauceViews.has(item.id)) return;
+  const g = new PIXI.Graphics();
+  g.ellipse(0, 0, 46, 9).fill({ color: 0xc8432b, alpha: 0.78 });
+  g.ellipse(-8, -2, 20, 3).fill({ color: 0xf2b38e, alpha: 0.7 });
+  g.x = item.x;
+  g.y = item.y - 2;
+  g.zIndex = 34;
+  g.eventMode = 'none';
+  g.label = 'alphabet-sauce';
+  engine.entityLayer.addChild(g);
+  sauceViews.set(item.id, g);
+}
+
+function dropSauceView(id) {
+  const g = sauceViews.get(id);
+  if (g && !g.destroyed) {
+    g.parent?.removeChild(g);
+    g.destroy();
+  }
+  sauceViews.delete(id);
+}
+
+function clearSauceViews() {
+  for (const id of [...sauceViews.keys()]) dropSauceView(id);
+}
+
+function stopLetter() {
+  letterView?.stop?.();
+  letterView = null;
+}
+
+/** announce_add_indicator('letter'+ran, 'letter_'+ran+'_overlay', false, '1', { width: 42, height: 60 }). */
+function showLetter(engine) {
+  stopLetter();
+  if (!letter || letter === '1' || !engine.player) return; // no letter_1_overlay exists: nothing shows
+  letterView = overlayOrStandIn(engine, sauceLetterOverlay(letter), {
+    at: () => {
+      const pl = engine.player;
+      return pl ? { x: pl.x, y: pl.y - 130 } : { x: 0, y: 0 };
+    },
+    wh: ALPHABET_SAUCE.letterH,
+    durationMs: Infinity,
+    label: letter === 'heart' ? '\u2665' : letter,
+  });
+}
+
+function setLetter(engine, next) {
+  letter = next;
+  showLetter(engine);
+  last = `sauce:letter:${letter}`;
+}
+
+function tickSauces(engine, t) {
+  const before = sauces.length;
+  // destroy after 5 minutes; the letters stay (alphabet_sauce.js destroy's TODO).
+  sauces = sauces.filter((i) => i.expiresAt > t);
+  if (sauces.length !== before) for (const id of [...sauceViews.keys()]) if (!sauces.some((i) => i.id === id)) dropSauceView(id);
+  const p = engine.player;
+  if (p) {
+    for (const item of sauces) {
+      if (item.tsid !== engine.streetTsid) continue;
+      const inside = inSauce(item, p.x, p.y);
+      if (inside && !sauceTouching.has(item.id)) {
+        sauceTouching.add(item.id);
+        // onPlayerCollision: a fresh roll replaces the letter you had.
+        setLetter(engine, rollSauceLetter());
+      } else if (!inside) sauceTouching.delete(item.id);
+    }
+  }
+  letterView?.tick?.();
+}
+
+/** askPlayer 'alphabet_sauce': input_label, 3 to 140 characters, a-z and space. */
+function askSauce(engine, onWord) {
+  if (typeof document === 'undefined') return null;
+  document.getElementById('alphabet-sauce-modal')?.remove();
+  const host = document.getElementById('verb-menu')?.parentElement || document.body;
+  const wrap = document.createElement('div');
+  wrap.className = 'verb-menu animal-name-modal';
+  wrap.id = 'alphabet-sauce-modal';
+  wrap.setAttribute('role', 'dialog');
+  wrap.setAttribute('aria-modal', 'true');
+  wrap.innerHTML = `
+    <div class="verb-menu-card">
+      <div class="verb-menu-head">
+        <div class="verb-menu-title"></div>
+        <button type="button" class="verb-menu-x" aria-label="Cancel">×</button>
+      </div>
+      <form style="padding:0.2rem 0.85rem 0.85rem;display:grid;gap:0.55rem">
+        <label style="font-size:0.82rem;opacity:0.75" for="alphabet-sauce-input"></label>
+        <input id="alphabet-sauce-input" type="text" maxlength="${ALPHABET_SAUCE.maxChars}" autocomplete="off" spellcheck="false"
+          style="font:inherit;padding:0.45rem 0.6rem;border:1px solid #d9ccb3;border-radius:8px;background:#fff" />
+        <div style="display:flex;gap:0.5rem;justify-content:flex-end">
+          <button type="button" data-cancel class="verb-choice" style="width:auto;border:1px solid #e4d9c4;border-radius:8px;padding:0.35rem 0.8rem">Cancel</button>
+          <button type="submit" class="verb-choice" style="width:auto;border:1px solid #9cc47a;border-radius:8px;padding:0.35rem 0.8rem;background:#e8f0dc;font-weight:700">OK</button>
+        </div>
+      </form>
+    </div>`;
+  wrap.querySelector('.verb-menu-title').textContent = POTIONS.potion_alphabet_sauce.name;
+  wrap.querySelector('label').textContent = POTION_TEXT.sauceAsk;
+  const input = wrap.querySelector('input');
+  const ok = wrap.querySelector('[type=submit]');
+  const close = () => wrap.remove();
+  // input_restrict 'a-z ': the box only takes letters and spaces; input_min_chars 3.
+  const sync = () => {
+    const clean = input.value.replace(ALPHABET_SAUCE.restrict, '');
+    if (clean !== input.value) input.value = clean;
+    ok.disabled = !sauceInputOk(input.value);
+  };
+  input.addEventListener('input', sync);
+  wrap.querySelector('.verb-menu-x').addEventListener('click', close);
+  wrap.querySelector('[data-cancel]').addEventListener('click', close);
+  wrap.querySelector('form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!sauceInputOk(input.value)) return;
+    const value = input.value;
+    close();
+    onWord(value);
+  });
+  input.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      close();
+    }
+  });
+  sync();
+  host.appendChild(wrap);
+  globalThis.requestAnimationFrame?.(() => input.focus());
+  return wrap;
+}
+
+/** onInputBoxResponse: the letters only, then the pour. */
+export function pourSauce(engine, value) {
+  const word = sauceWord(value);
+  if (!word) return null;
+  return usePotionNow(engine, 'potion_alphabet_sauce', { word });
+}
+
+/* ------------------------------------------------------------------ */
 /* QA                                                                   */
 /* ------------------------------------------------------------------ */
 
@@ -756,6 +995,8 @@ function setupDemo(engine) {
   engine.removeBuff?.(CRAZY);
   daily = { day: '', quaffed: {}, shakes: 0 };
   engine.setData?.('potionDemo', '1');
+  const lvl = Math.floor(Number(engine.param?.('potionlevel')) || 0);
+  if (lvl > 1 && engine.pc) engine.pc.xp = Math.max(Number(engine.pc.xp) || 0, XP_FOR_LEVEL[Math.min(XP_FOR_LEVEL.length, lvl) - 2] || 0);
   engine.refreshPack?.();
   if (engine.param?.('potionautoplay')) autoplayAt = now() + 1800;
 }
@@ -782,6 +1023,21 @@ async function runAutoplay(engine) {
     usePotionNow(engine, mode, { key: keyChoices(engine.inv)[0] });
     return;
   }
+  if (mode === 'potion_alphabet_sauce') {
+    pourSauce(engine, engine.param?.('potionsauce') || 'hello world');
+    return;
+  }
+  if (mode === 'potion_rocky_regeneration_solution') {
+    // Stand by the closest rock, mined down to 10 chunks (QA).
+    const rocks = live(engine, (t) => Boolean(t.state?.rock)).sort((a, b) => Math.abs(a.sprite.x - engine.player.x) - Math.abs(b.sprite.x - engine.player.x));
+    if (rocks[0] && engine.player) {
+      rocks[0].state.rock.chunksRemaining = Math.min(rocks[0].state.rock.chunksRemaining, 10);
+      engine.refreshRock?.(rocks[0]);
+      engine.player.x = rocks[0].sprite.x - 60;
+      engine.player.vx = 0;
+      engine.snapCamera?.();
+    }
+  }
   if (mode === 'potion_animal_youth' || mode === 'potion_trantsformation_fluid') {
     // Stand beside the closest target first.
     const want = mode === 'potion_animal_youth' ? (t) => Boolean(ANIMAL_BABIES[t.classId]) : (t) => !t.featureId && t.state && isTrantsformable(t, { home: onHomeStreet(engine) }) && (t.state.maturity >= 4) && (t.state.health >= 4);
@@ -805,6 +1061,9 @@ export const potionsFeature = {
   onStreetEnter(street, engine) {
     setupDemo(engine);
     for (const item of items) if (item.tsid === engine.streetTsid) drawItem(engine, item);
+    for (const item of sauces) if (item.tsid === engine.streetTsid) drawSauce(engine, item);
+    // announce_show_indicators on arrival: a letter you still have shows again.
+    showLetter(engine);
     syncRugs.key = '';
     syncRugs(engine);
     syncQuoinLimit(engine);
@@ -818,6 +1077,11 @@ export const potionsFeature = {
       pending = null;
     }
     clearViews();
+    // alphabet_sauce.js onPlayerExit: a sauce still on the street you leave takes your letter away.
+    if (letter && sauces.some((i) => i.tsid === engine.streetTsid)) letter = null;
+    stopLetter();
+    clearSauceViews();
+    sauceTouching = new Set();
     endEffects(engine);
     // A tree handed over as you left: the plot is saved; it grows on your next visit.
     for (const row of adopting) trantsformPlotTree(row.entity.plot, row.out, now());
@@ -834,6 +1098,7 @@ export const potionsFeature = {
     }
     tickAdopting(t);
     tickPhysicsItems(engine, t);
+    tickSauces(engine, t);
     applyScale(engine, t);
     syncHeart(engine);
     if (t - lastRugSync >= RUG_SYNC_MS) {
@@ -893,6 +1158,11 @@ export const potionsFeature = {
       });
       return true;
     }
+    if (classTsid === 'potion_alphabet_sauce') {
+      if (pending) return true;
+      askSauce(engine, (value) => pourSauce(engine, value));
+      return true;
+    }
     usePotionNow(engine, classTsid);
     return true;
   },
@@ -908,7 +1178,7 @@ export const potionsFeature = {
   },
 
   save() {
-    return { version: 1, uses: { ...uses }, favorGiant, daily: { ...daily, quaffed: { ...daily.quaffed } }, items: items.map((i) => ({ ...i })), seq };
+    return { version: 1, uses: { ...uses }, favorGiant, daily: { ...daily, quaffed: { ...daily.quaffed } }, items: items.map((i) => ({ ...i })), seq, sauces: sauces.map((i) => ({ ...i })), letter };
   },
 
   restore(slice) {
@@ -925,6 +1195,11 @@ export const potionsFeature = {
       .filter((i) => PHYSICS_ITEMS[i?.classTsid] && Number(i.expiresAt) > t && typeof i.tsid === 'string')
       .map((i) => ({ id: String(i.id), classTsid: i.classTsid, tsid: i.tsid, x: Number(i.x) || 0, y: Number(i.y) || 0, expiresAt: Number(i.expiresAt) }));
     seq = Math.max(0, Math.floor(Number(slice?.seq) || 0));
+    sauces = (Array.isArray(slice?.sauces) ? slice.sauces : [])
+      .filter((i) => i && Number(i.expiresAt) > t && typeof i.tsid === 'string' && typeof i.word === 'string')
+      .map((i) => ({ id: String(i.id), tsid: i.tsid, x: Number(i.x) || 0, y: Number(i.y) || 0, word: i.word, expiresAt: Number(i.expiresAt) }));
+    letter = typeof slice?.letter === 'string' && /^([A-Z]|heart|1)$/.test(slice.letter) ? slice.letter : null;
+    sauceTouching = new Set();
     pending = null;
     effects = {};
     touching = new Set();
@@ -932,7 +1207,7 @@ export const potionsFeature = {
 
   /** Tests. */
   _state() {
-    return { uses: { ...uses }, favorGiant, daily, items: items.map((i) => ({ ...i })), effects: { ...effects }, pending: pending ? pending.classTsid : null, last, rugs: rugTargets.length };
+    return { uses: { ...uses }, favorGiant, daily, items: items.map((i) => ({ ...i })), effects: { ...effects }, pending: pending ? pending.classTsid : null, last, rugs: rugTargets.length, sauces: sauces.map((i) => ({ ...i })), letter };
   },
   _complete(engine) {
     if (pending) complete(engine);
@@ -948,6 +1223,11 @@ export const potionsFeature = {
     baseScale = null;
     pending = null;
     adopting = [];
+    sauces = [];
+    letter = null;
+    stopLetter();
+    sauceTouching = new Set();
+    sauceViews.clear();
     last = '';
     demoDone = false;
     autoplayAt = 0;

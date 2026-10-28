@@ -59,6 +59,10 @@ export const POTIONS = Object.freeze({
   potion_avatar_small: potion('De-Embiggenifying Potion', 'a', 'pour', 'Create a smallifying cloud', 5, { spawns: 'avatar_smallifier' }),
   potion_rainbow_juice: potion('Rainbow Juice', 'a', 'pour', 'Taste the rainbow', 1, { spawns: 'anti_gravitys_rainbow' }),
   potion_trantsformation_fluid: potion('Trantsformation Fluid', 'a', 'pour', 'Turn a tree into a random different tree', 3),
+  // G430, G431, G428 (register rows; potion_xp.js, potion_rocky_regeneration_solution.js, potion_alphabet_sauce.js).
+  potion_xp: potion('Draught of Wisdom', 'a', 'quaff', 'Boom! XP!', 5),
+  potion_rocky_regeneration_solution: potion('Rocky Regeneration Solution', 'a', 'pour', 'Regenerate a rock', 3),
+  potion_alphabet_sauce: potion('Alphabet Sauce', 'an', 'pour', 'Sauce up a phrase', 1, { noConditions: true }),
 });
 
 export const POTION_TEXT = Object.freeze({
@@ -82,6 +86,16 @@ export const POTION_TEXT = Object.freeze({
   treeSmall: 'This tree is too small to be trantsformed',
   treeWeak: 'This tree is too weak to be trantsformed',
   othersTree: "You can't trantsform somebody else's tree.",
+  // potion_xp.js 512-516
+  wisdomLevel: 'You must be at least level 20',
+  wisdomDaily: 'You can only do this once per day',
+  // potion_rocky_regeneration_solution.js 512-538
+  rockyAward: 'You must have the Shiny Nugget Award to pour this.',
+  noRocks: 'There are no mineable rocks around here.',
+  rockFine: "This rock doesn't need regeneration",
+  rockRegenerated: 'The rock now looks as good as new!',
+  // potion_alphabet_sauce.js 73-80, 543
+  sauceAsk: 'What do you want to spell?',
 });
 
 export function isPotion(classTsid) {
@@ -124,7 +138,8 @@ export function potionButton(classTsid, { uses, dead = false, check = { ok: true
   if (!def) return null;
   const left = potionUsesLeft(classTsid, uses);
   let reason = '';
-  if (dead) reason = POTION_TEXT.dead;
+  // potion_alphabet_sauce.js 52-88 overrides pour with no conditions: not even the dead check.
+  if (dead && !def.noConditions) reason = POTION_TEXT.dead;
   else if (!check?.ok) reason = check?.error || POTION_TEXT.notHookedUp;
   const label = def.capacity > 1 ? `${def.label} (${left}/${def.capacity})` : def.label;
   return { id: def.verb, label, tooltip: check?.tooltip || def.tooltip || POTION_TEXT.notHookedUp, enabled: !reason, reason, primary: !reason };
@@ -414,6 +429,127 @@ export function trantsformOutcome(classId, maturity, { home = false, rng = Math.
 export function trantsformMessage(oldLabel, newLabel) {
   const an = /^[aeiou]/i.test(String(newLabel || ''));
   return `The ${oldLabel} is now ${an ? 'an' : 'a'} ${newLabel}.`;
+}
+
+/* ------------------------------------------------------------------ */
+/* Draught of Wisdom (G430)                                             */
+/* ------------------------------------------------------------------ */
+
+/** potion_xp.js 512-522: level 20, once a game day (stats daily counter), 500 iMG with no mood bonus. */
+export const WISDOM = Object.freeze({ minLevel: 20, xp: 500 });
+
+export function wisdomCheck({ level = 1, quaffedToday = false } = {}) {
+  if ((Number(level) || 0) < WISDOM.minLevel) return { ok: false, error: POTION_TEXT.wisdomLevel };
+  if (quaffedToday) return { ok: false, error: POTION_TEXT.wisdomDaily };
+  return { ok: true };
+}
+
+/** onQuaff's msg: '+' + stats_add_xp(500, true) + ' xp'. */
+export function wisdomMessage(xp) {
+  return `+${Math.max(0, Math.floor(Number(xp) || 0))} xp`;
+}
+
+/* ------------------------------------------------------------------ */
+/* Rocky Regeneration Solution (G431)                                   */
+/* ------------------------------------------------------------------ */
+
+/**
+ * potion_rocky_regeneration_solution.js 512-538: the Shiny Nugget Award
+ * (achievements/shiny_nugget_award.js, 2003 nodes mined), then the closest
+ * mineable rock within 200 px (findCloseStack; isUseable: not depleted),
+ * refused while it still has 50 chunks or more; the pour sets it to 50.
+ */
+export const ROCKY = Object.freeze({ award: 'shiny_nugget_award', range: 200, chunks: 50 });
+
+export function rockyCheck({ hasAward = false, rock = null } = {}) {
+  if (!hasAward) return { ok: false, error: POTION_TEXT.rockyAward };
+  if (!rock) return { ok: false, error: POTION_TEXT.noRocks };
+  if ((Number(rock.chunksRemaining) || 0) >= ROCKY.chunks) return { ok: false, error: POTION_TEXT.rockFine };
+  return { ok: true };
+}
+
+/** onPour: chunks_remaining = 50. */
+export function regenerateRock(rock) {
+  if (!rock) return false;
+  rock.chunksRemaining = ROCKY.chunks;
+  return true;
+}
+
+/* ------------------------------------------------------------------ */
+/* Alphabet Sauce (G428)                                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * potion_alphabet_sauce.js: verbs.pour asks "What do you want to spell?"
+ * (3 to 140 characters, a-z and space), onInputBoxResponse keeps the letters
+ * only (spaces go too) in lower case, the usual 2.5 s pour, then onPour puts
+ * an alphabet_sauce at your feet. Its canPour (signposts, puzzle rooms) is
+ * never called: the pour verb it overrides has no conditions.
+ * alphabet_sauce.js: a 450 x 450 hit box, gone after 5 minutes (destroy
+ * leaves the letters: its TODO); on arrival everyone within 450 px without a
+ * letter gets one, and walking into it rolls a new one; the letter stays
+ * over your head until you leave the street (onPlayerExit).
+ */
+export const ALPHABET_SAUCE = Object.freeze({
+  minChars: 3,
+  maxChars: 140,
+  restrict: /[^a-z ]/gi,
+  lifeSec: 5 * 60,
+  hitW: 450,
+  hitH: 450,
+  radius: 450,
+  letterW: 42,
+  letterH: 60,
+});
+
+/** onPlayerCollision: weight[randInt(0, weight.length)]; 1-26 A-Z, 27 a heart. */
+export const LETTER_WEIGHTS = Object.freeze([1,1,1,1,1,1,1,1,1,1,2,3,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,6,7,8,8,8,8,8,8,9,9,9,9,9,9,9,9,10,11,12,12,12,13,14,14,14,14,14,14,14,14,14,15,15,15,15,15,15,15,15,15,16,17,18,18,18,18,18,19,19,19,19,19,19,20,20,20,20,20,20,20,20,20,20,20,21,21,22,23,24,25,26,27,27]);
+
+/**
+ * randInt is inclusive (common.js 691), so one roll in LETTER_WEIGHTS.length + 1
+ * reads past the end: no case matches and the letter stays '1', whose
+ * letter_1_overlay does not exist (nothing shows).
+ */
+export function rollSauceLetter(rng = Math.random) {
+  const r = Math.max(0, Math.min(0.999999999, Number(rng()) || 0));
+  const n = LETTER_WEIGHTS[Math.floor(r * (LETTER_WEIGHTS.length + 1))];
+  if (!n) return '1';
+  if (n === 27) return 'heart';
+  return String.fromCharCode(64 + n);
+}
+
+/** The overlay an indicator shows: letter_<A-Z|heart>_overlay. */
+export const sauceLetterOverlay = (letter) => `letter_${letter}_overlay`;
+
+/** What the input box takes (client restrict 'a-z ', 3-140 characters). */
+export function sauceInputOk(value) {
+  const v = String(value ?? '');
+  return v.length >= ALPHABET_SAUCE.minChars && v.length <= ALPHABET_SAUCE.maxChars && !/[^a-z ]/i.test(v);
+}
+
+/** onInputBoxResponse: utils.trim(value.substr(0, 140).replace(/[^a-z]/gi, '')).toLowerCase(). */
+export function sauceWord(value) {
+  return String(value ?? '').slice(0, ALPHABET_SAUCE.maxChars).replace(/[^a-z]/gi, '').trim().toLowerCase();
+}
+
+/** getLabel: "Alphabet Sauce spelling <word>". */
+export const sauceLabel = (word) => `Alphabet Sauce spelling ${word}`;
+
+/** onPour's sendLocationActivity to everyone else here. */
+export const sauceStreetLine = (name, word) => `${name} poured an Alphabet Sauce to try and spell: ${word}`;
+
+/** The 450 x 450 hit box, centred on the puddle and rising from its feet. */
+export function inSauce(item, px, py, bodyH = 90) {
+  if (!item) return false;
+  const left = item.x - ALPHABET_SAUCE.hitW / 2;
+  const right = item.x + ALPHABET_SAUCE.hitW / 2;
+  const top = item.y - ALPHABET_SAUCE.hitH;
+  return px >= left && px <= right && py >= top && py - bodyH <= item.y;
+}
+
+/** onContainerChanged: within 450 px of where it lands. */
+export function nearSauce(item, px, py) {
+  return Boolean(item) && Math.hypot(px - item.x, py - item.y) <= ALPHABET_SAUCE.radius;
 }
 
 /* ------------------------------------------------------------------ */
