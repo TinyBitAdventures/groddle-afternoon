@@ -225,6 +225,10 @@ describe('the art', () => {
     const dir = join(CLIENT, 'TSEngineAssets/src/assets/graphics');
     assert.deepEqual(readFileSync(join(pub, 'assets/sprites/word-progress/cancel.png')), readFileSync(join(dir, 'word_dismisser_cancel.png')));
     assert.deepEqual(readFileSync(join(pub, 'assets/sprites/word-progress/cancel_hover.png')), readFileSync(join(dir, 'word_dismisser_cancel_hover.png')));
+    // The street draws the SVG redraw of those PNGs, so the button stays sharp when the view scales.
+    const css = readFileSync(join(pub, 'style.css'), 'utf8');
+    assert.match(css, /\.word-progress-cancel \{[^}]*cancel\.svg/);
+    assert.match(css, /cancel_hover\.svg/);
   });
 });
 
@@ -241,7 +245,7 @@ describe('in the game', () => {
     for (const html of pages) {
       assert.match(html, /<div id="action-progress" class="word-progress" role="status" aria-live="polite" hidden>/);
       assert.match(html, /<button type="button" class="word-progress-cancel" data-word-cancel aria-label="Cancel" title="Cancel" hidden><\/button>/);
-      assert.match(html, /style\.css\?v=[^"]*&amp;wordprog=g387-1(?:&amp;[^"]*)?"/);
+      assert.match(html, /style\.css\?v=[^"]*&amp;wordprog=g\d+-\d+(?:&amp;[^"]*)?"/);
     }
   });
 
@@ -249,7 +253,7 @@ describe('in the game', () => {
     assert.match(game, /createWordProgressView\(el, \{ onCancel: \(\) => cancelCurrentAction\(\) \}\)/);
     assert.match(game, /if \(currentAction\) \{\n\s+cancelCurrentAction\(\);\n\s+return;\n\s+\}/); // Escape
     assert.match(game, /if \(currentAction\) \{\n\s+if \(\['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'w', 'W', 'a', 'A', 's', 'S', 'd', 'D'\]\.includes\(e\.key\)\) \{\n\s+cancelCurrentAction\(\);/);
-    assert.match(css, /\.word-progress-cancel:hover,[\s\S]*?cancel_hover\.png/);
+    assert.match(css, /\.word-progress-cancel:hover,[\s\S]*?cancel_hover\.svg/);
   });
 
   it('places the word from the target and scales it with the street view', () => {

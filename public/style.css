@@ -1437,13 +1437,14 @@ body.nx-hide-mood.nx-hide-energy .meta-vitals { visibility: hidden; }
   height: 21px;
   padding: 0;
   border: 0;
-  background: url("assets/sprites/word-progress/cancel.png") no-repeat 0 0 / 20px 21px;
+  /* cancel.svg redraws the client's 20 x 21 word_dismisser_cancel.png so it stays sharp when the view scales. */
+  background: url("assets/sprites/word-progress/cancel.svg") no-repeat 0 0 / 20px 21px;
   cursor: pointer;
   pointer-events: auto;
 }
 .word-progress-cancel:hover,
 .word-progress-cancel:focus-visible {
-  background-image: url("assets/sprites/word-progress/cancel_hover.png");
+  background-image: url("assets/sprites/word-progress/cancel_hover.svg");
 }
 .word-progress-cancel:focus-visible { outline: 2px solid #fff; outline-offset: 1px; border-radius: 50%; }
 .word-progress-cancel[hidden] { display: none; }
@@ -1854,7 +1855,10 @@ button.play-context-head:focus-visible {
   background: #6d777c;
 }
 .pack-slots .pack-slot.pack-bag.is-open {
-  transform: translateY(-6px);
+  /* PackSlot.as drawFullBox 127-130: the open bag's slot stays in the row and squares its top corners;
+     no lift (the row scrolls sideways, so a lift was clipped). */
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
   background: #78898a;
   border-color: #6b7a7b;
 }

@@ -2645,9 +2645,14 @@
   ]
  },
  "git": {
-  "commits": 659,
+  "commits": 660,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-28",
+    "kind": "fix",
+    "text": "Each tree plays its own harvest sound again"
+   },
    {
     "date": "2026-10-28",
     "kind": "new",
@@ -2762,11 +2767,6 @@
     "date": "2026-10-27",
     "kind": "improve",
     "text": "Animals, trees and the street spirit speak their whole GSJS conversations, and instance hub lines follow the source"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "Visitors on your home street fill your Magic Rock's daily iMG, and street Piggies eat food dropped for everyone"
    }
   ]
  },
