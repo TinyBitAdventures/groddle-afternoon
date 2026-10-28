@@ -108,6 +108,14 @@ echo "shims: \$n"
 echo "\$(date -u +%FT%TZ) game $GAME_REF site $SITE_REF engine ${engine_c:0:8} minn-admin ${admin_c:0:8}" >> ~/private/deploys.log
 REMOTE
 
+# G335 slice 4 (Austin 2026-10-28): users 1 and 54 (the developer's and the reviewer's characters) start the
+# multiplayer ledger at a new player's zero, not from their saves (site src/Ledger.php, option
+# groddle_ledger_start_empty). Idempotent: a ledger already put back to zero ("zeroed") is never zeroed again.
+START_EMPTY=${GRODDLE_LEDGER_START_EMPTY:-1,54}
+case "$START_EMPTY" in *[!0-9,]*) echo "GRODDLE_LEDGER_START_EMPTY must be ids and commas" >&2; exit 1;; esac
+"${SSH[@]}" "$HOST" "cd ~/public && wp db query \"INSERT INTO wp_options (option_name, option_value, autoload) VALUES ('groddle_ledger_start_empty', '$START_EMPTY', 'off') ON DUPLICATE KEY UPDATE option_value = VALUES(option_value)\""
+echo "ledger: users $START_EMPTY start at a new player's zero"
+
 echo "5/6 cache"
 "${SSH[@]}" "$HOST" 'cd ~/public && wp cache flush' | tail -1
 

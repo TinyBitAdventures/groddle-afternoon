@@ -39,7 +39,7 @@ import {
   treeReady,
   treeSkill,
 } from '../public/js/street-objects.js?v=g374-1';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=g376-1';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=g383-1';
 import { FEATURES } from '../public/js/features/index.js';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=g330-1';
 import { createResourceNode } from '../public/js/resource-nodes.js';
@@ -250,7 +250,7 @@ describe('street objects: the feature', () => {
   it('is registered just before the realtime feature', () => {
     const ids = FEATURES.map((f) => f.id);
     assert.equal(ids.indexOf('street-objects') + 1, ids.indexOf('realtime'));
-    assert.match(read('public/js/features/index.js'), /street-objects-feature\.js\?v=g376-1/);
+    assert.match(read('public/js/features/index.js'), /street-objects-feature\.js\?v=g383-1/);
   });
 
   it('asks for the street on joining, and waits for it', () => {
@@ -313,19 +313,41 @@ describe('street objects: the feature', () => {
     assert.match(r.treeT.subtitle, /20 Cherries/);
   });
 
-  it('G361: Fertilidust tells the server, and the server\'s grown trees land', () => {
+  it('G361 / G335: a Fertilidust jar asks the server first; its go-ahead runs the verb, then the grown trees land', () => {
     const r = rig();
+    const granted = [];
+    const query = r.engine.query;
+    r.engine.query = (hook, ...args) => (hook === 'powderUseGranted' ? (granted.push(args.slice(0, 2)), true) : query(hook, ...args));
     assert.equal(streetObjectsFeature.sharedFertilize([r.treeT], false, r.engine), null, 'not before the snapshot');
     r.client.emit('msg:objs', { t: 'objs', street: 'GSTREET', snap: true, objs: [] });
     streetObjectsFeature.onTick(16, 0, r.engine);
     assert.equal(streetObjectsFeature.sharedFertilize([r.rockT], false, r.engine), null, 'no street tree, nothing to tell');
     const patchTree = { ...r.treeT, grownFromBean: true };
     assert.equal(streetObjectsFeature.sharedFertilize([patchTree], true, r.engine), null, 'a tree in your own Patch stays local');
-    assert.equal(streetObjectsFeature.sharedFertilize([r.treeT, patchTree], false, r.engine), true);
+    assert.equal(streetObjectsFeature.sharedFertilize([r.treeT, patchTree], false, r.engine, 'fertilidust'), true);
     assert.deepEqual(r.sent.at(-1), { t: 'obj_dust', req: 1 });
+    // One jar at a time: a second while the first is asked waits.
+    assert.equal(streetObjectsFeature.sharedFertilize([r.treeT], true, r.engine), true);
+    assert.equal(r.sent.length, 2, 'not sent');
+    assert.match(r.engine.toasts.at(-1), /still asking/);
+    // The ledger used a charge: the verb runs here with its word.
+    const use = { op: 'use-00000000000000a1', c: 'fertilidust', left: 4, spent: false };
+    r.client.emit('msg:obj_dust_used', { t: 'obj_dust_used', req: 1, c: 'fertilidust', use });
+    assert.deepEqual(granted, [['fertilidust', use]]);
+    assert.equal(r.engine.data.streetObjectsLast, 'dust:used:4');
+    r.client.emit('msg:obj_dust_used', { t: 'obj_dust_used', req: 1, c: 'fertilidust', use });
+    assert.equal(granted.length, 1, 'once');
+    // The Lite names its tree; a refusal shows the ledger's words and runs nothing.
     assert.equal(streetObjectsFeature.sharedFertilize([r.treeT], true, r.engine), true);
     assert.deepEqual(r.sent.at(-1), { t: 'obj_dust', req: 2, id: 'tree:0' }, 'the Lite names its tree');
-    r.client.emit('msg:obj_dusted', { t: 'obj_dusted', req: 2, ids: ['tree:0'] });
+    r.client.emit('msg:obj_no', { t: 'obj_no', req: 2, id: 'tree:0', verb: 'dust', code: 'no_item', message: "You don't have enough of that item." });
+    assert.equal(r.engine.toasts.at(-1), "You don't have enough of that item.");
+    assert.equal(granted.length, 1);
+    // Without a ledger on the server the go-ahead carries no use (the jar is this page's own word).
+    streetObjectsFeature.sharedFertilize([r.treeT], false, r.engine, 'fertilidust');
+    r.client.emit('msg:obj_dust_used', { t: 'obj_dust_used', req: 3, c: 'fertilidust' });
+    assert.deepEqual(granted.at(-1), ['fertilidust', null]);
+    r.client.emit('msg:obj_dusted', { t: 'obj_dusted', req: 3, ids: ['tree:0'] });
     assert.equal(r.engine.data.streetObjectsLast, 'dust:ok:1');
     r.client.emit('msg:objs', { t: 'objs', street: 'GSTREET', objs: [{ id: 'tree:0', fruit: 90, cap: 90, health: 10, maturity: 10, petted: false, watered: false }] });
     streetObjectsFeature.onTick(16, 0, r.engine);
@@ -333,10 +355,24 @@ describe('street objects: the feature', () => {
     assert.equal(streetObjectsFeature.sharedFertilize([r.treeT], false, rig({ mode: 'solo' }).engine), null, 'solo is local');
   });
 
-  it('G361: powders-feature asks sharedFertilize as the dust lands', () => {
+  it('G335: a pour\'s grant carries the ledger\'s use of the bottle', () => {
+    const r = rig();
+    r.client.emit('msg:objs', { t: 'objs', street: 'GSTREET', snap: true, objs: [] });
+    streetObjectsFeature.onTick(16, 0, r.engine);
+    assert.equal(streetObjectsFeature.sharedObjectVerb(r.treeT, 'treepoison:poison', r.engine), true);
+    assert.deepEqual(r.sent.at(-1), { t: 'obj_act', req: 1, id: 'tree:0', verb: 'poison' });
+    const use = { op: 'use-00000000000000b2', c: 'potion_tree_poison', left: 0, spent: true };
+    r.client.emit('msg:obj_ok', { t: 'obj_ok', req: 1, id: 'tree:0', verb: 'poison', obj: { id: 'tree:0', fruit: 98, cap: 98, health: 7, maturity: 10, poison: 180000, by: 1 }, poison: 180000, use });
+    const exec = r.calls.find((c) => c[0] === 'execute' && c[1] === 'treepoison:poison');
+    assert.deepEqual(exec[3].use, use);
+  });
+
+  it('G361 / G335: powders-feature asks sharedFertilize as the jar is used, and the dust lands on its own', () => {
     const src = read('public/js/features/powders-feature.js');
-    assert.match(src, /function fertilize\(engine, targets, lite = false\) \{\n[^\n]*\n  engine\.query\?\.\('sharedFertilize', targets, lite, engine\);/);
-    assert.match(src, /fertilize\(engine, \[out\.tree\.target\], true\)/);
+    assert.match(src, /return engine\.query\?\.\('sharedFertilize', targets, lite, engine, classTsid\) === true;/);
+    assert.match(src, /if \(out\.ok && askDust\(engine, classTsid, trees, false\)\) return 'asked';/);
+    assert.match(src, /if \(out\.ok && askDust\(engine, classTsid, \[out\.tree\.target\], true\)\) return 'asked';/);
+    assert.doesNotMatch(src.slice(src.indexOf('function fertilize(')), /^[^\n]*sharedFertilize/m, 'fertilize no longer tells the server');
   });
 
   it('times out a request the server never answers', () => {

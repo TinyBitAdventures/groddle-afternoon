@@ -53,10 +53,15 @@
  * built (overlay_sparkle_powder.fla is not in the overlay sheets yet).
  * Canvas: powderMp.
  *
- * Fertilidust in multiplayer (G361): as the dust lands, the street's shared
- * trees are the server's (street-objects-feature sharedFertilize, the server's
- * objects.go handleDust): it grows them for everyone on the street, and the
- * local rules run at once on this page's copy.
+ * Fertilidust in multiplayer (G361, G335 slice 4): the street's shared trees
+ * are the server's. Using a jar on them asks the server first
+ * (street-objects-feature sharedFertilize, the server's objects.go
+ * handleDust), which uses one of the jar's charges through the site's ledger
+ * (LedgerUse.php) and refuses with the ledger's words when it holds none.
+ * Its go-ahead (powderUseGranted) runs the verb here, with the charges the
+ * ledger left (an emptied jar applied once through ledgerReceipt), and the
+ * server grows the trees for everyone as the dust lands; the local rules run
+ * on this page's copy at the same moment.
  *
  * Solo: the sneezing and sparkle effects on other players are multiplayer's
  * (Sneeze-O-Rama and Sparkle Buddy stay out of reach). Nothing to build for
@@ -111,6 +116,8 @@ let noNo = { day: '', sniffs: 0, startAt: 0 };
 let pending = [];
 let last = '';
 let demoDone = false;
+/** G335: the server's go-ahead for a jar on shared trees, while its verb runs: { classTsid, use }. */
+let granted = null;
 
 function publish(engine) {
   engine.setData?.('powderLast', last);
@@ -178,6 +185,20 @@ function notify(engine, classTsid, verb) {
 function finishUse(engine, classTsid) {
   const def = POWDERS[classTsid];
   if (def.sound) engine.playSound?.(def.sound, { volume: 0.6 });
+  const use = granted?.classTsid === classTsid ? granted.use : null;
+  if (use && def.maxCharges) {
+    // The ledger used this charge (LedgerUse.php): the jar holds what it says is left, and an
+    // emptied jar leaves the pack once (the trade slice's applied list holds its op).
+    const left = Math.max(0, Math.floor(Number(use.left) || 0));
+    if (use.spent && engine.query?.('ledgerReceipt', String(use.op || ''), engine) === false) {
+      delete charges[classTsid];
+      notify(engine, classTsid, def.verb);
+      engine.refreshPack?.();
+      engine.save?.();
+      return;
+    }
+    charges[classTsid] = use.spent ? 1 : Math.min(def.maxCharges - 1, left) + 1;
+  }
   const used = usePowderCharge(classTsid, charges[classTsid]);
   if (used.emptied) {
     removeItem(engine.inv, classTsid, 1);
@@ -190,9 +211,17 @@ function finishUse(engine, classTsid) {
   engine.save?.();
 }
 
-function fertilize(engine, targets, lite = false) {
-  // G361 multiplayer: the server grows the street's shared trees for everyone; its word lands after.
-  engine.query?.('sharedFertilize', targets, lite, engine);
+/**
+ * G335 multiplayer: a jar used on the street's shared trees asks the server first (its go-ahead runs
+ * the verb again through powderUseGranted). True when asked; false for trees that are only yours.
+ */
+function askDust(engine, classTsid, targets, lite) {
+  if (granted?.classTsid === classTsid) return false;
+  return engine.query?.('sharedFertilize', targets, lite, engine, classTsid) === true;
+}
+
+function fertilize(engine, targets) {
+  // G361 multiplayer: the server grows the street's shared trees for everyone as the dust lands (it was asked when the jar was used).
   const grown = [];
   for (const target of targets) {
     const before = target.state?.maturity;
@@ -277,6 +306,7 @@ const RUNNERS = {
     const deadTargets = deadTreeTargets(engine);
     const paper = streetTargets(engine, (t) => t.classId === 'paper_tree').length;
     const out = fertilidustOutcome({ trants: trees.length, dead: deadTargets.length, paper });
+    if (out.ok && askDust(engine, classTsid, trees, false)) return 'asked';
     for (const msg of out.msgs) say(engine, msg, out.ok);
     if (!out.ok) return 'no-trees';
     const dead = reviveDeadTrees(engine, deadTargets);
@@ -302,9 +332,10 @@ const RUNNERS = {
       ...streetTargets(engine, (t) => t.classId === 'paper_tree'),
     ].map((t) => ({ classId: t.classId, x: t.sprite.x, target: t }));
     const out = fertilidustLiteTarget(trees, nearestPlayerX(engine));
+    if (out.ok && askDust(engine, classTsid, [out.tree.target], true)) return 'asked';
     say(engine, out.message, out.ok);
     if (!out.ok) return 'no-tree';
-    later(3000, () => fertilize(engine, [out.tree.target], true));
+    later(3000, () => fertilize(engine, [out.tree.target]));
     later(2000, () => engine.playSound?.(out.sound, { volume: 0.6 }));
     finishUse(engine, classTsid);
     return `tree:${out.tree.classId}`;
@@ -560,6 +591,23 @@ export const powdersFeature = {
     return true;
   },
 
+  /**
+   * G335: the server's go-ahead for a jar used on shared trees (street-objects-feature, on
+   * obj_dust_used): the verb runs now with the charges the ledger left (use: { op, c, left, spent },
+   * or null when the server has no ledger and the jar is this page's own word).
+   */
+  powderUseGranted(classTsid, use, engine) {
+    if (!POWDERS[classTsid] || !engine || countItem(engine.inv, classTsid) < 1) return null;
+    granted = { classTsid, use: use && typeof use === 'object' ? use : null };
+    try {
+      last = `${classTsid}:${runnerFor(classTsid)(engine, classTsid)}:granted`;
+    } finally {
+      granted = null;
+    }
+    publish(engine);
+    return true;
+  },
+
   save() {
     return { version: 1, charges: { ...charges }, noNo: { ...noNo } };
   },
@@ -585,6 +633,7 @@ export const powdersFeature = {
   _reset() {
     mpc = null;
     asking = '';
+    granted = null;
     charges = {};
     noNo = { day: '', sniffs: 0, startAt: 0 };
     pending = [];

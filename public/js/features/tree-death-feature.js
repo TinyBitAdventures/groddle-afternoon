@@ -35,7 +35,10 @@
  * which also reaches players who come later. Then the tree dies here as in
  * solo (its plot becomes this player's own Patch, as every street Patch is
  * in multiplayer); a dead Wood Tree's 25 Planks fall only for the player
- * who poured the poison. Your bottle, guilt, mood and Botany stay yours.
+ * who poured the poison. The bottle is the site's ledger's to confirm (G335
+ * slice 4): the server uses its charge there before the pour lands, refuses
+ * without one ("You don't have any antidote!"), and the pour here uses the
+ * charge the ledger did (bottleFromLedger). Guilt, mood and Botany stay yours.
  * Trees grown in your Patches, your home and private places stay local.
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&treepoisondemo=1
@@ -328,8 +331,23 @@ function sharedTree(engine, target) {
 function askServer(engine, kind, target) {
   if (!sharedTree(engine, target)) return null;
   const verbId = `${VERB_PREFIX}${kind}`;
-  if (engine.query('sharedVerbGrant', target, verbId, engine)) return null;
+  const grant = engine.query('sharedVerbGrant', target, verbId, engine);
+  if (grant) {
+    if (grant.use) bottleFromLedger(engine, kind === 'poison' ? TREE_POISON : TREE_ANTIDOTE, grant.use);
+    return null;
+  }
   return engine.query('sharedObjectVerb', target, verbId, engine) === true ? true : null;
+}
+
+/**
+ * G335 slice 4: the server used this pour's charge through the site's ledger (LedgerUse.php):
+ * the bottle holds what the ledger says is left, so the pour's own use lands on it, and a bottle
+ * the ledger emptied leaves the pack once (the trade slice's applied list holds its op).
+ */
+function bottleFromLedger(engine, potionClass, use) {
+  const left = Math.max(0, Math.floor(Number(use.left) || 0));
+  if (use.spent) engine.query?.('ledgerReceipt', String(use.op || ''), engine);
+  bottles.uses[potionClass] = use.spent ? 1 : Math.min(4, left) + 1;
 }
 
 /** onPourComplete for either potion on a tree target. */

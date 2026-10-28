@@ -41,9 +41,17 @@
  *   Pile starts or stops (sharedDigSwing) and reads who digs (sharedDiggers).
  * - Fruit (G361): a shared tree regrows fruit only when its health rises (pet
  *   and water, the server's fruitCycle) or from Fertilidust, never at the day
- *   turn. powders-feature tells the server when Fertilidust lands
- *   (sharedFertilize: obj_dust, every tree of the street, or the Lite's one
- *   tree), and the server grows the shared trees for everyone.
+ *   turn. powders-feature asks the server when a Fertilidust jar is used on
+ *   shared trees (sharedFertilize: obj_dust, every tree of the street, or
+ *   the Lite's one tree), and the server grows the shared trees for everyone
+ *   as the dust lands.
+ * - Jars and bottles (G335 slice 4): Fertilidust, Tree Poison and its
+ *   Antidote on shared trees are confirmed and used through the site's
+ *   ledger by the server first. A dust's go-ahead is obj_dust_used, which
+ *   hands powders-feature the ledger's word (powderUseGranted); a pour's is
+ *   obj_ok with "use", which tree-death-feature reads through
+ *   sharedVerbGrant().use. Without the item the server refuses with the
+ *   ledger's words ("You don't have any antidote!") and nothing changes.
  *
  * QA: canvas data streetObjects (street:snap|none|waiting), streetObjectsLast
  * (id:verb:ok|code), streetObjectsShared (shared objects on this street),
@@ -158,6 +166,15 @@ function bind(engine) {
   });
   c.on('msg:obj_ok', (msg) => answered(engine, msg, true));
   c.on('msg:obj_no', (msg) => answered(engine, msg, false));
+  // G335: the ledger used the jar's charge: the verb runs here now; the dust lands on the server 3 s on.
+  c.on('msg:obj_dust_used', (msg) => {
+    const p = pending.get(msg?.req);
+    if (!p || p.verbId !== 'dust') return;
+    pending.delete(msg.req);
+    lastAnswer = `dust:used:${msg.use ? `${Number(msg.use.left) || 0}${msg.use.spent ? ':spent' : ''}` : 'local'}`;
+    publish(engine);
+    engine.query?.('powderUseGranted', p.classTsid, msg.use || null, engine);
+  });
   // G361: the trees a Fertilidust grew (their new state comes as objs, to everyone).
   c.on('msg:obj_dusted', (msg) => {
     pending.delete(msg?.req);
@@ -374,7 +391,7 @@ function answered(engine, msg, ok) {
   if (!obj) return;
   // The local rules run on the state the server decided from, with its rolls.
   if (msg.before) applyKnown(obj, msg.before);
-  grant = { target: p.target, verbId: p.verbId, roll: Number(msg.roll), chunks: Number.isInteger(msg.chunks) ? msg.chunks : undefined, help: msg.help && typeof msg.help === 'object' ? msg.help : null };
+  grant = { target: p.target, verbId: p.verbId, roll: Number(msg.roll), chunks: Number.isInteger(msg.chunks) ? msg.chunks : undefined, help: msg.help && typeof msg.help === 'object' ? msg.help : null, use: msg.use && typeof msg.use === 'object' ? msg.use : null };
   try {
     engine.executeVerb?.(p.target, p.verbId, { animated: true });
   } finally {
@@ -507,21 +524,29 @@ export const streetObjectsFeature = {
   },
 
   /**
-   * G361 Fertilidust (powders-feature fertilize): the dust landed on targets. The server grows the
-   * shared street trees (objects.go handleDust: every tree of the street, or with lite the one
-   * named) and everyone hears their new state; the local rules still run at once. True when the
-   * server was told, null when the trees are local (solo, a private place, a tree in your Patch).
+   * G361 / G335 Fertilidust (powders-feature, as a jar is used on targets): the server uses the
+   * jar's charge through the site's ledger, answers obj_dust_used (powderUseGranted runs the verb
+   * here) or refuses (the line is shown), and grows the shared street trees as the dust lands
+   * (objects.go handleDust: every tree of the street, or with lite the one named); everyone hears
+   * their new state. True when the server was asked, null when the trees are local (solo, a
+   * private place, a tree in your Patch).
    */
-  sharedFertilize(targets, lite, engine) {
+  sharedFertilize(targets, lite, engine, classTsid = lite ? 'fertilidust_lite' : 'fertilidust') {
     if (!engine || engine.mode !== 'multiplayer' || !shared(engine)) return null;
     const trees = (targets || []).filter(isStreetTree);
     if (!trees.length || (lite && trees.length !== 1)) return null;
     const c = bind(engine);
+    for (const p of pending.values()) {
+      if (p.verbId === 'dust') {
+        engine.toast?.(COPY.busy, 1600);
+        return true;
+      }
+    }
     reqSeq += 1;
     const msg = { req: reqSeq };
     if (lite) msg.id = treeId(trees[0].treeIndex);
     if (!c?.send('obj_dust', msg)) return null;
-    pending.set(reqSeq, { id: msg.id || 'dust', target: null, verbId: 'dust', at: Date.now(), silent: true });
+    pending.set(reqSeq, { id: msg.id || 'dust', target: null, verbId: 'dust', classTsid, at: Date.now() });
     return true;
   },
 
@@ -542,10 +567,12 @@ export const streetObjectsFeature = {
     return client.send('obj_dig', { id: nodeId(n.key), do: what }) !== false;
   },
 
-  /** game.js runVerb: the server's rolls for the verb it just allowed. */
+  /** game.js runVerb: the server's rolls for the verb it just allowed (and, for a pour, the ledger's use of the bottle). */
   sharedVerbGrant(target, verbId) {
     if (!grant || grant.target !== target || grant.verbId !== verbId) return null;
-    return { roll: Number.isFinite(grant.roll) ? grant.roll : undefined, chunks: grant.chunks, help: grant.help };
+    const out = { roll: Number.isFinite(grant.roll) ? grant.roll : undefined, chunks: grant.chunks, help: grant.help };
+    if (grant.use) out.use = grant.use;
+    return out;
   },
 
   /** Help mine (features/help-mine-feature.js): who the server says is swinging at a shared rock, or null. */
