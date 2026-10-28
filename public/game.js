@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g388-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-222';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-223';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g378-1';
@@ -432,7 +432,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=g390-1';
+} from './js/player-save.js?v=g395-1';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -1529,6 +1529,8 @@ const toolState = createToolConditionState();
  * below (level 5, 5,000 iMG, a full pack and tool row, starter skills).
  */
 const NEW_PLAYER = isNewMultiplayerPlayer(GAME_MODE, saveStore);
+/** A player save was loaded at boot: engine.startAsNewPlayer never resets one. */
+let bootHadPlayerSave = false;
 const pc = NEW_PLAYER ? newPlayerStats() : { energy: 80, mood: 70, imagination: 5000, currants: 200, xp: 5000, level: 5, rewardMultiplier: 1 };
 ensureMusicblockItems();
 const musicblockState = createMusicblockState();
@@ -8343,6 +8345,29 @@ const engine = {
   mode: GAME_MODE,
   /** A multiplayer character with no saved state, started as the source's new player (js/new-player.js); never in solo. */
   newPlayer: NEW_PLAYER,
+  /**
+   * A brand-new solo save that chose "Start with the tutorial" on the start card
+   * (features/newxp-feature.js) starts as a new multiplayer character does
+   * (js/new-player.js): the source stats, an empty pack, no skills, quests,
+   * badges or tutorial cards. Refused once the game runs, for a multiplayer
+   * page (already new or not new) and whenever a player save was loaded.
+   */
+  startAsNewPlayer() {
+    if (NEW_PLAYER || !isSolo() || state.started || bootHadPlayerSave) return false;
+    const fresh = createPlayerSave({
+      inventory: newPlayerInventory(createInventory(), PARADISE_TICKET_IDS),
+      player: { ...newPlayerStats(), startedFresh: true },
+    });
+    const { features: _slices, ...systems } = persistentSystems();
+    restorePlayerSave(fresh, inv, pc, systems);
+    starterSkills = new Set();
+    state.questDone = false;
+    // The imagination shop as a new player has it: the tutorial cards handled, none owned.
+    features.get('imagination')?.restore({ starterGranted: true }, engine);
+    bootHadPlayerSave = true;
+    updateHud();
+    return true;
+  },
   get started() {
     return state.started === true;
   },
@@ -19806,7 +19831,8 @@ async function enterStreet(tsid, opts = {}) {
       pushActivity(`Music: ${themeLabel(ambientThemeId)}`);
     }
   }
-  if (!opts.quiet) toast(`Arrived: ${data.label}`, 2800);
+  // Not under the start card or into the tutorial (newxp-feature arrivalQuiet, G339).
+  if (!opts.quiet && features.query('arrivalQuiet', engine) !== true) toast(`Arrived: ${data.label}`, 2800);
   // Auto-save map location after every successful street enter
   if (player) savePlayerLocation({ tsid: data.tsid, x: player.x, y: player.y });
   return data;
@@ -23803,6 +23829,7 @@ async function main() {
   }
   droppedItemState = loadDroppedItems();
   const savedPlayerState = loadPlayerState();
+  bootHadPlayerSave = Boolean(savedPlayerState);
   if (savedPlayerState) {
     const savedFeatureSlices = {};
     restorePlayerSave(savedPlayerState, inv, pc, {
@@ -23818,6 +23845,8 @@ async function main() {
     state.questDone = mainQuests.every((id) => questState.completed.includes(id));
     handleSkillCompletions(tickSkillStudy(skillState, Date.now()).completed, { offline: true });
     backfillStreetVisits();
+    // A solo game started as a new player (engine.startAsNewPlayer) never had the demo kit's skills.
+    if (pc.startedFresh) starterSkills = new Set();
   } else if (bootParams.has('resetgame') || !NEW_PLAYER) {
     // G306 (Austin 2026-10-26): a new solo game's demo kit already knows 11+ starter
     // skills, which don't count: the badge, its card and its +250 iMG / +500 currants
@@ -23876,7 +23905,7 @@ async function main() {
   }
   // This slice ships with a Tinkertool, so existing saves also receive the entry repair skill.
   // A solo migration: every multiplayer save postdates it, and a new multiplayer player has no Tinkertool.
-  if (isSolo()) grantSkill(skillState, 'tinkering_1', true);
+  if (isSolo() && !pc.startedFresh) grantSkill(skillState, 'tinkering_1', true);
   // Food variety and Triple Jump are imagination upgrade cards bought in the
   // Upgrades shop (features/imagination-feature.js). Saves from before the
   // shop keep the copies the old demo grant gave them.
@@ -24206,7 +24235,8 @@ async function main() {
       inv[GAMESHOW_TICKET_ID] = Math.max(1, inv[GAMESHOW_TICKET_ID] || 0);
       if (app?.canvas) app.canvas.dataset.stootDemo = '1';
     }
-    if (savedLoc) {
+    // Not when a reload goes straight back into the tutorial (newxp-feature arrivalQuiet).
+    if (savedLoc && features.query('arrivalQuiet', engine) !== true) {
       pushActivity(`Welcome back to ${currentStreet?.label || startTsid}`);
     }
   } catch (err) {

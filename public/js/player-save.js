@@ -114,6 +114,9 @@ export function normalizePlayerSnapshot(seed = {}, fallback = PLAYER_DEFAULTS) {
     ),
     miningDropScale: Object.fromEntries(Object.entries(cleanScalarRecord(source.miningDropScale))
       .filter(([, v]) => typeof v === 'number').map(([k, v]) => [k, clamp(v, 0, 1)])),
+    // A solo game begun as a new player ("Start with the tutorial", game.js startAsNewPlayer):
+    // its reloads never hand it the demo kit's migrations (Tinkering I, the starter skills).
+    ...(source.startedFresh === true ? { startedFresh: true } : {}),
   };
 }
 

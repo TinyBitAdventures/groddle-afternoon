@@ -41,7 +41,7 @@ describe('home page and /play/', () => {
     const firstRelative = play.search(/(?:href|src)="(?!https?:)/);
     assert.ok(base < firstRelative, 'base comes before the first relative URL');
     for (const ref of refs(play)) {
-      if (ref === '../') continue;
+      if (ref === '../' || servedByMinn(ref)) continue;
       assert.ok(existsSync(resolve(pub, ref)), ref);
     }
   });

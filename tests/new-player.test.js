@@ -179,7 +179,8 @@ describe('solo is unchanged', () => {
     }
     assert.match(starters, /for \(const sk of STARTER_MINING_SKILLS\)/);
     assert.match(starters, /assignQuest\(questState, 'animalkinship_pet_piggies'/);
-    assert.match(game, /if \(isSolo\(\)\) grantSkill\(skillState, 'tinkering_1', true\);/);
+    // A solo game begun as a new player (the start card's tutorial, tests/newxp-new-player.test.js) skips it.
+    assert.match(game, /if \(isSolo\(\) && !pc\.startedFresh\) grantSkill\(skillState, 'tinkering_1', true\);/);
     assert.match(game, /newPlayer: NEW_PLAYER,/);
   });
 

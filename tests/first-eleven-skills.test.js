@@ -54,7 +54,7 @@ describe('the remake', () => {
   });
 
   it("a new multiplayer player's fresh boot runs the same check a save does", () => {
-    assert.match(game, /handleSkillCompletions\(tickSkillStudy\(skillState, Date\.now\(\)\)\.completed, \{ offline: true \}\);\s*backfillStreetVisits\(\);\s*\} else if \(bootParams\.has\('resetgame'\) \|\| !NEW_PLAYER\) \{/);
+    assert.match(game, /handleSkillCompletions\(tickSkillStudy\(skillState, Date\.now\(\)\)\.completed, \{ offline: true \}\);\s*backfillStreetVisits\(\);\s*(?:\/\/[^\n]*\n\s*if \(pc\.startedFresh\) starterSkills = new Set\(\);\s*)?\} else if \(bootParams\.has\('resetgame'\) \|\| !NEW_PLAYER\) \{/);
     assert.match(game, /\} else \{\s*(?:\/\/[^\n]*\n\s*)+handleSkillCompletions\(\[\]\);\s*\}/);
     assert.match(game, /if \(skillsLearnedCount\(\) >= 11\) engine\.grantAchievement\('first_eleven_skills'\);/);
   });

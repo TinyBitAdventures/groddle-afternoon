@@ -168,6 +168,8 @@ let ui = null;
 let startCardShown = false;
 let pendingStage = null;
 let resumeChecked = false;
+/** A reload found the tutorial in progress: the game starts straight back into it (no welcome card). */
+let resumeQueued = false;
 let lastTsid = '';
 let lastData = 0;
 let auto = false;
@@ -1068,16 +1070,61 @@ function buildClouds(engine) {
     world.addChild(text);
     return text;
   });
-  for (let x = -260, i = 0; x < 3420; x += 200, i++) {
+  // The floor ends where the cloud platform does (newxp.js cloudsLayout): the deco row stops
+  // there too, so no cloud art stands over the drop, and the body ends in soft puffs.
+  const edge = cloudEdge(L);
+  for (let x = -260, i = 0; x < edge - 150; x += 200, i++) {
     world.addChild(kit.deco(PIXI, i % 2 ? 'cloud_fluffy_1' : 'cloud_fluffy_2', x, L.cloudY + 110 + (i % 2) * 14, { scale: 0.95 }));
   }
-  const fill = new PIXI.Graphics();
-  fill.rect(-300, L.cloudY + 90, 3640, 600).fill(0xf7fbff);
-  world.addChildAt(fill, 0);
+  world.addChildAt(cloudFloor(PIXI, edge, L.cloudY + 90), 0);
   // Scene names: the source files' header comments (newxp_intro.js 1, newxp_training1.js 3, newxp_training2.js 3).
   enterNewxpScene(engine, 'clouds', L, root, 'Cloud Level');
   run.views = { beats, root };
   return L;
+}
+
+/** The cloud platform's right end: walking past it falls to Training Level One. */
+export function cloudEdge(L) {
+  return L.platforms.find((p) => p.id === 'cloud')?.x2 ?? L.dropX;
+}
+
+/**
+ * Past the cloud's edge the game's ground slack (street-model.js platformYAt's
+ * 4 px margin, game.js resolveGround's 8 px seam bridge) held an avatar that
+ * stepped off slowly standing on air against the cloud's side until pushed
+ * again. Feet standing past the edge are moved just clear of that slack, so
+ * the avatar falls at once. Returns the x to move to, or null.
+ */
+export const CLOUD_EDGE_CLEAR = 9;
+export function cloudStepOff(edge, p) {
+  if (!Number.isFinite(edge) || !p?.onGround || !(p.x > edge) || p.x >= edge + CLOUD_EDGE_CLEAR) return null;
+  return edge + CLOUD_EDGE_CLEAR;
+}
+
+/**
+ * Puffs (x from the edge, y from the floor's top, radius) that round the cloud
+ * floor's end and tuck it in underneath, so it ends as a cloud, not a white
+ * block's hard side: simple Pixi shapes in the floor's own colour, blurred to
+ * the soft edge of the scene's cloud_fluffy decos, with two of those decos
+ * over them (G395 lane).
+ */
+export const CLOUD_END_PUFFS = Object.freeze([
+  [-90, 20, 90], [-60, 120, 80], [-100, 220, 90], [-170, 330, 105], [-260, 460, 125], [-380, 600, 150],
+]);
+
+function cloudFloor(PIXI, edge, top) {
+  const root = new PIXI.Container();
+  const colour = 0xf7fbff;
+  const body = new PIXI.Graphics();
+  body.rect(-300, top, edge - 160 + 300, 700).fill(colour);
+  for (const [dx, dy, r] of CLOUD_END_PUFFS) body.circle(edge + dx, top + dy, r).fill(colour);
+  // Blurred whole, so the floor's top meets the deco row softly too (no ruled line).
+  body.filters = [new PIXI.BlurFilter({ strength: 18, quality: 3 })];
+  root.addChild(body);
+  // The scene's own cloud art down the end, as the deco row does along the top.
+  root.addChild(kit.deco(PIXI, 'cloud_fluffy_2', edge - 170, top + 250, { scale: 0.8, flip: true, alpha: 0.95 }));
+  root.addChild(kit.deco(PIXI, 'cloud_fluffy_1', edge - 260, top + 430, { scale: 0.85, alpha: 0.9 }));
+  return root;
 }
 
 async function runClouds(t) {
@@ -1093,7 +1140,12 @@ async function runClouds(t) {
   await until(t, () => P().x - startX > 50, { help: () => place(startX + 80, P().y) });
   clearInstruction();
   setStep('walk');
-  await until(t, () => P().x > L.dropX && P().y > L.dropY, { help: () => place(L.dropX + 60, L.dropY + 60) });
+  // Past the edge and falling: on to training1. Testing the edge itself (not dropX, 10 px on)
+  // means an avatar that steps off slowly never lands on the catch floor below and stands
+  // against the cloud's side.
+  const edge = cloudEdge(L);
+  run.data.cloudEdge = edge;
+  await until(t, () => P().x > edge && P().y > L.dropY, { help: () => place(L.dropX + 60, L.dropY + 60) });
   return 'training1';
 }
 
@@ -3016,6 +3068,11 @@ function showStartCard(engine) {
       <button type="button" class="alt" data-nx-skipstart>Skip to Ur</button>
     </div>`;
     box.querySelector('[data-nx-start]').addEventListener('click', () => {
+      // Austin 2026-10-28: a brand-new solo game that takes the tutorial starts as a new
+      // multiplayer character does, from zero (game.js startAsNewPlayer, js/new-player.js;
+      // players/player.js onCreate 1188-1243). Skip to Ur keeps the demo kit.
+      const fresh = engine.startAsNewPlayer?.() === true;
+      engine.setData('newxpFreshStart', fresh ? '1' : '0');
       pendingStage = 'clouds';
       startBtn.click();
     });
@@ -3028,6 +3085,33 @@ function showStartCard(engine) {
   // Solo or multiplayer is chosen before the game, on the Play page (/play/online/: sign in, or
   // Play solo; Austin 2026-10-26), so a new solo game goes straight to the tutorial choice.
   tutorialChoice();
+}
+
+/**
+ * A reload with the tutorial in progress: no welcome card ("Welcome to a scrap
+ * of Ur" over Hechey Track); the game starts by itself once the page has booted
+ * and onTick's resume puts the player back in the stage it was on. The scenes
+ * and the house and practice stages start again from their top; the island
+ * resumes where the player stood. Sound waits for the first key or click
+ * (game.js resumeAudioOnGesture), as under ?autostart.
+ */
+function resumeOnReload(engine) {
+  if (resumeQueued || typeof document === 'undefined') return;
+  const overlay = document.getElementById('overlay');
+  const startBtn = document.getElementById('start-btn');
+  if (!overlay || !startBtn) return;
+  resumeQueued = true;
+  overlay.classList.add('hidden');
+  engine.setData('newxpResume', save.stage);
+  const go = () => {
+    if (engine.started) return;
+    if (document.body.classList.contains('is-booting')) {
+      setTimeout(go, 60);
+      return;
+    }
+    startBtn.click();
+  };
+  setTimeout(go, 0);
 }
 
 /* ------------------------------------------------------------------ */
@@ -3072,6 +3156,8 @@ export const newxpFeature = {
 
   onStreetEnter(street, engine) {
     if (!engine.started && !hadSave && !engine.param('autostart') && !engine.param('newxp')) showStartCard(engine);
+    if (!engine.started && hadSave && !engine.param('autostart') && !engine.param('newxp')
+      && shouldResume(save, { fresh: engine.param('fresh') != null, resetgame: engine.param('resetgame') != null })) resumeOnReload(engine);
     if (active() && save.stage === 'island' && run && !isNewxpSceneTsid(street?.tsid)) islandEnter(engine);
     // players/inc_newxp.js newxpReturnToGentleIsland: back on the island after finishing it.
     if (save.status === 'done' && GENTLE_ISLAND_TSIDS.includes(street?.tsid) && !hasFlag('returned') && engine.started) {
@@ -3147,6 +3233,14 @@ export const newxpFeature = {
       const next = document.querySelector('#award-screen [data-award-next]');
       if (next && !next.closest('[hidden]')) next.click();
     }
+    if (run?.stage === 'clouds' && run.data.cloudEdge) {
+      const p = P();
+      const x = cloudStepOff(run.data.cloudEdge, p);
+      if (x != null) {
+        p.x = x;
+        p.onGround = false;
+      }
+    }
     stepNpcs(dtMs);
     akStep(dtMs);
     // The practice street's hint signs follow their decos' fades and parallax every frame (G298).
@@ -3201,8 +3295,18 @@ export const newxpFeature = {
     return null;
   },
 
-  holdQuestOffers() {
-    return active() ? true : null;
+  /**
+   * No quest offers while the tutorial runs: from the start card's choice
+   * (pendingStage, before the first stage has begun) to leaving Gentle Island,
+   * and never in its scenes. inc_quests.js quests_offer 622-624 held every
+   * offer while !has_done_intro, on an is_newxp location or on newbie_island
+   * before buy_two_bags, and quests_give_level_do 1035-1036 gave none during
+   * newxp. The tutorial's own quests (buy_two_bags, leave_gentle_island) are
+   * accepted by this feature directly, not offered.
+   */
+  holdQuestOffers(engine) {
+    if (pendingStage || active()) return true;
+    return isNewxpSceneTsid(engine?.streetTsid) ? true : null;
   },
 
   /**
@@ -3212,6 +3316,8 @@ export const newxpFeature = {
    */
   arrivalQuiet(engine) {
     if (pendingStage || inTutorialScene(engine)) return true;
+    // A stage before the island (resumed after a reload, or between scenes): no arrival lines.
+    if (active() && save.stage !== 'island') return true;
     return !engine?.started && startCardShown && !hadSave ? true : null;
   },
 

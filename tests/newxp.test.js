@@ -278,7 +278,7 @@ describe('newxp save', () => {
 
   it('keeps the street under the clouds quiet: no arrival lines, no Qurazy roll (G339)', () => {
     const src = readFileSync(join(ROOT, 'js/features/newxp-feature.js'), 'utf8');
-    assert.match(src, /arrivalQuiet\(engine\) \{\n\s+if \(pendingStage \|\| inTutorialScene\(engine\)\) return true;\n\s+return !engine\?\.started && startCardShown && !hadSave \? true : null;/);
+    assert.match(src, /arrivalQuiet\(engine\) \{\n\s+if \(pendingStage \|\| inTutorialScene\(engine\)\) return true;\n(?:\s+\/\/[^\n]*\n)*\s+if \(active\(\) && save\.stage !== 'island'\) return true;\n\s+return !engine\?\.started && startCardShown && !hadSave \? true : null;/);
     const game = readFileSync(join(ROOT, 'game.js'), 'utf8');
     assert.match(game, /if \(features\.query\('arrivalQuiet', engine\) !== true\) \{\n\s+toast\(`\$\{currentStreet\?\.label \|\| 'Hechey Track'\} loaded\./);
     const qurazy = readFileSync(join(ROOT, 'js/features/qurazy-feature.js'), 'utf8');
