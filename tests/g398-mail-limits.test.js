@@ -17,7 +17,7 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { FORM_COPY, TURNSTILE_SCRIPT, createAccountRequests } from '../public/js/account-forms.js?v=g398-1';
+import { FORM_COPY, TURNSTILE_SCRIPT, createAccountRequests } from '../public/js/account-forms.js?v=g399-1';
 import { HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -90,7 +90,8 @@ describe('the site: email limits and Turnstile (groddle-afternoon-site)', { skip
     for (const col of ['id', 'kind', 'email_hash', 'address', 'mailed', 'sent_at']) assert.ok(t.some((l) => l.startsWith(`${col} `)), col);
     assert.ok(!t.some((l) => /^email /.test(l)), 'never the address itself');
     for (const key of ['KEY kind_email (kind,email_hash,sent_at)', 'KEY kind_address (kind,address,sent_at)', 'KEY sent_at (sent_at)']) assert.ok(t.includes(key), key);
-    assert.deepEqual(manifest.needs, { http: ['https://challenges.cloudflare.com/turnstile/v0/siteverify'] }, 'outgoing HTTP only to siteverify');
+    assert.ok(manifest.needs.http.includes('https://challenges.cloudflare.com/turnstile/v0/siteverify'), 'outgoing HTTP to siteverify, by its full path');
+    assert.ok(manifest.needs.http.every((url) => /^https:\/\/[^/]+\/.+/.test(url)), 'every grant a path, never a whole host');
   });
 
   it('a reset is checked, limited, recorded for player and stranger alike, and answered the same', () => {

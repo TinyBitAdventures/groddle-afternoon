@@ -2645,9 +2645,14 @@
   ]
  },
  "git": {
-  "commits": 667,
+  "commits": 668,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-28",
+    "kind": "improve",
+    "text": "The account card carries Cloudflare Turnstile on the forms that send email"
+   },
    {
     "date": "2026-10-28",
     "kind": "fix",
@@ -2762,14 +2767,9 @@
     "date": "2026-10-27",
     "kind": "new",
     "text": "The Project page in Minn, and built pages mark Project for the restoration story"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "Visitors pet, dig and water what grows and walks on your home street, and fill your Magic Rock"
    }
   ]
  },
- "tests": 388,
+ "tests": 389,
  "generatedAt": "2026-10-28"
 }

@@ -18,7 +18,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=g398-1';
+import { accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=g399-1';
 import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=g380-1';
 import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=g380-1';
 import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js?v=g375-1';
@@ -141,8 +141,8 @@ describe('solo asks no rest-nonce (the console 400)', () => {
       assert.match(read(rel), /engine\?\.mode !== 'multiplayer'|engine\?\.mode === 'multiplayer'/, rel);
     }
     assert.match(read('public/js/features/account-backup-feature.js'), /const session = await quietSession\(account\);/);
-    assert.match(read('public/js/features/account-backup-feature.js'), /import \{ quietSession \} from '\.\.\/online-boot\.js\?v=g398-1';/);
-    assert.match(read('public/js/features/index.js'), /account-backup-feature\.js\?v=g398-1'/);
+    assert.match(read('public/js/features/account-backup-feature.js'), /import \{ quietSession \} from '\.\.\/online-boot\.js\?v=g399-1';/);
+    assert.match(read('public/js/features/index.js'), /account-backup-feature\.js\?v=g399-1'/);
   });
 });
 

@@ -29,17 +29,29 @@
  * do something, and send its token with the form (createAccountRequests).
  * Without a key no script loads and the forms work as they always have.
  *
+ * Continue with Google (Austin 2026-10-28): when the site has a Google
+ * client id, both tabs carry Google's own Sign in with Google button (Google
+ * Identity Services, the credential callback: no redirect, no client
+ * secret). The credential goes straight to groddle/v1/account/google and is
+ * dropped; a new player then chooses a character name on the same card
+ * ("Choose your character name"), holding only the site's short-lived
+ * pending token, and is signed in.
+ *
  * mountAccountForms(host, { account, start, reset, verify, onSignedIn })
  * replaces host's children; onSignedIn({ player, how: 'signin' | 'signup' |
  * 'reset' | 'verify' }) runs once the session and its nonce are in place.
  */
+
+/** Google Identity Services, loaded only when the site has a Google client id. */
+export const GOOGLE_SCRIPT = 'https://accounts.google.com/gsi/client';
 
 /** Cloudflare's widget script, loaded only when the site has a Turnstile site key. */
 export const TURNSTILE_SCRIPT = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 
 /**
  * The account calls the forms make beyond js/minn-account.js: the card's
- * options, and the three emailing forms with a Turnstile token. Public
+ * options, the three emailing forms with a Turnstile token, and Continue
+ * with Google (the credential, then the name step). Public
  * routes only, sent without a nonce (a stale one would be refused). The
  * answers have minn-account's shapes.
  * @param {{ api: string, fetch?: typeof fetch }} opts api: account.urls.api
@@ -89,7 +101,30 @@ export function createAccountRequests({ api, fetch: fetchFn = globalThis.fetch?.
       const r = await call('password-reset', { email, turnstile });
       return r.ok ? { ok: true } : refusal(r);
     },
+    /** A Google credential: { ok, player } signed in, { ok, pending, email, name } a name to choose, or a refusal. */
+    async google({ credential, remember = true }) {
+      const r = await call('account/google', { credential, remember: !!remember });
+      if (r.status === 202 && typeof r.data?.pending === 'string') {
+        return { ok: true, pending: r.data.pending, email: String(r.data.email || ''), name: String(r.data.name || '') };
+      }
+      return signedIn(r);
+    },
+    /** The name step: { ok, player } or a refusal (name_taken and name_invalid on fields.name, google_expired). */
+    async googleFinish({ pending, name, remember = true }) {
+      return signedIn(await call('account/google/finish', { pending, name, remember: !!remember }));
+    },
   };
+}
+
+/** What a Google answer shows: 'signed-in', 'name' (a new player chooses a name), or 'refused'. */
+export function googleOutcome(r) {
+  if (!r?.ok) return 'refused';
+  return r.pending ? 'name' : 'signed-in';
+}
+
+/** Google's button options (its own button, as Google's branding rules ask): Continue with Google, outlined, large. */
+export function googleButtonOptions(width = 320) {
+  return { type: 'standard', theme: 'outline', size: 'large', text: 'continue_with', shape: 'pill', logo_alignment: 'left', width: Math.max(200, Math.min(400, Math.round(width))) };
 }
 
 const scripts = new Map();
@@ -191,6 +226,15 @@ export const FORM_COPY = Object.freeze({
     sent: 'Sent again. Check your inbox, and the spam folder.',
     other: 'Use a different email',
   },
+  google: {
+    or: 'or',
+    failed: 'Google sign-in didn\'t work. Try again, or use your email.',
+    nameTitle: 'Choose your character name',
+    nameBody: 'You\'re signing in with Google as {email}. What should other players call you?',
+    submit: 'Make my character',
+    busy: 'Making your character…',
+    back: 'Use my email instead',
+  },
   verify: {
     title: 'Finishing your character',
     busy: 'Finishing your character…',
@@ -281,6 +325,10 @@ const STYLE = `
 .acct-panel { display: grid; gap: 0.55rem; }
 .acct-panel[hidden] { display: none; }
 .acct-panel p { margin: 0; }
+.acct-google { display: grid; gap: 0.55rem; justify-items: center; min-height: 44px; }
+.acct-google[hidden] { display: none; }
+.acct-or { display: flex; align-items: center; gap: 0.6rem; width: 100%; color: #5b6b4e; font-size: 0.85rem; }
+.acct-or::before, .acct-or::after { content: ''; flex: 1; border-top: 1px solid #dfe7d3; }
 .acct-turnstile { display: flex; justify-content: center; }
 .acct-turnstile:empty { display: none; }
 .acct-forms[data-account-settings] .acct-form + .acct-form { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e3e8d6; }
@@ -345,7 +393,15 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
   rememberRow.append(remember, document.createTextNode(FORM_COPY.signin.remember));
   const siSubmit = el('button', { type: 'submit', class: 'acct-submit', 'data-account-submit': 'signin' }, FORM_COPY.signin.submit);
   const forgotLink = el('button', { type: 'button', class: 'acct-link', 'data-account-forgot': '' }, FORM_COPY.signin.forgot);
-  signin.append(siEmail.wrap, siPass.wrap, rememberRow, siSubmit, forgotLink);
+  // Continue with Google, on both tabs: Google draws its own button into each, once the site says it has a client id.
+  const googleRow = (which) => {
+    const wrap = el('div', { class: 'acct-google', 'data-account-google': which, hidden: true });
+    const button = el('div', { 'data-account-google-button': which });
+    wrap.append(button, el('div', { class: 'acct-or', 'aria-hidden': 'true' }, FORM_COPY.google.or));
+    return { wrap, button };
+  };
+  const googleRows = { signin: googleRow('signin'), signup: googleRow('signup') };
+  signin.append(googleRows.signin.wrap, siEmail.wrap, siPass.wrap, rememberRow, siSubmit, forgotLink);
 
   // New player
   const signup = el('form', { class: 'acct-form', id: `acct-signup-${n}`, 'data-form': 'signup', novalidate: true });
@@ -363,7 +419,7 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
     resend: el('div', { class: 'acct-turnstile', 'data-account-turnstile': 'resend' }),
     forgot: el('div', { class: 'acct-turnstile', 'data-account-turnstile': 'forgot' }),
   };
-  signup.append(suEmail.wrap, suPass.wrap, suName.wrap, trap, slots.signup, suSubmit);
+  signup.append(googleRows.signup.wrap, suEmail.wrap, suPass.wrap, suName.wrap, trap, slots.signup, suSubmit);
 
   // Forgot your password
   const forgot = el('form', { class: 'acct-form', id: `acct-forgot-${n}`, 'data-form': 'forgot', novalidate: true, hidden: true });
@@ -395,6 +451,15 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
   const newLinkButton = el('button', { type: 'button', class: 'acct-submit', 'data-account-newlink': '' }, FORM_COPY.verify.newLink);
   finish.append(finishTitle, vfName.wrap, vfSubmit, newLinkButton);
 
+  // Choose your character name (a new player from Google): the site's pending token, held here only.
+  const googleName = el('form', { class: 'acct-form', id: `acct-google-${n}`, 'data-form': 'google', novalidate: true, hidden: true });
+  const gnBody = el('p', { class: 'acct-message', 'data-account-google-email': '' });
+  const gnName = field(`acct-gn-name-${n}`, 'Character name', { name: 'name', type: 'text', autocomplete: 'nickname', maxlength: '19', autocapitalize: 'words', spellcheck: 'false', required: true }, FORM_COPY.signup.nameHelp);
+  const gnSubmit = el('button', { type: 'submit', class: 'acct-submit', 'data-account-submit': 'google' }, FORM_COPY.google.submit);
+  const gnBack = el('button', { type: 'button', class: 'acct-link', 'data-account-google-back': '' }, FORM_COPY.google.back);
+  googleName.append(el('strong', {}, FORM_COPY.google.nameTitle), gnBody, gnName.wrap, gnSubmit, gnBack);
+  let googlePending = null;
+
   // What the site turns on for the card (a Turnstile site key), asked once; the emailing forms wait for it.
   const requests = createAccountRequests({ api: account.urls?.api || '' });
   let turnstile = null;
@@ -403,8 +468,52 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
       turnstile = turnstileWidgets(options.turnstile, slots);
       root.dataset.turnstile = 'on';
     }
+    if (typeof options.google === 'string' && options.google) startGoogle(options.google);
     return options;
   });
+
+  /** Google's button on both tabs; its credential goes to the site at once. */
+  async function startGoogle(clientId) {
+    if (!(await loadScript(GOOGLE_SCRIPT))) return;
+    const gis = globalThis.google?.accounts?.id;
+    if (!gis || !root.isConnected) return;
+    gis.initialize({ client_id: clientId, callback: (r) => onGoogleCredential(r?.credential), ux_mode: 'popup', auto_select: false, cancel_on_tap_outside: true, context: 'signin' });
+    const width = Math.min(400, (root.clientWidth || host.clientWidth || 320));
+    for (const row of Object.values(googleRows)) {
+      row.wrap.hidden = false;
+      gis.renderButton(row.button, googleButtonOptions(width));
+    }
+    root.dataset.google = 'on';
+  }
+
+  /** A credential from Google's button: signed in, or the name step, or the words for what went wrong. */
+  async function onGoogleCredential(credential) {
+    const from = root.dataset.showing === 'signup' ? 'signup' : 'signin';
+    // New player has no box to untick; Sign in keeps its "Keep me signed in".
+    const keep = from === 'signin' ? remember.checked : true;
+    say('');
+    if (typeof credential !== 'string' || !credential) return say(FORM_COPY.google.failed, 'bad');
+    const r = await requests.google({ credential, remember: keep });
+    const outcome = googleOutcome(r);
+    if (outcome === 'refused') return say(r.code === 'offline' || r.code?.startsWith?.('http_') ? FORM_COPY.google.failed : r.message, 'bad');
+    if (outcome === 'name') {
+      googlePending = { pending: r.pending, remember: keep };
+      show('google');
+      gnBody.textContent = fillCopy(FORM_COPY.google.nameBody, { email: r.email });
+      gnName.input.value = r.name || '';
+      gnName.input.focus();
+      return;
+    }
+    await googleSignedIn(r);
+  }
+
+  async function googleSignedIn(r) {
+    googlePending = null;
+    // The new session's nonce, for the account's signed-in calls.
+    await account.session?.();
+    root.dataset.signedIn = 'true';
+    onSignedIn({ player: r.player, how: 'google' });
+  }
   /** A Turnstile token for an emailing form ('' when Turnstile is off), and the widget reset after the send. */
   async function withTurnstile(which, plain, guarded) {
     await ready;
@@ -446,16 +555,18 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
       b.setAttribute('aria-selected', String(key === which));
       b.tabIndex = key === which ? 0 : -1;
     }
-    tabs.hidden = which === 'forgot' || which === 'reset' || which === 'check' || which === 'verify';
+    tabs.hidden = which === 'forgot' || which === 'reset' || which === 'check' || which === 'verify' || which === 'google';
     signin.hidden = which !== 'signin';
     signup.hidden = which !== 'signup';
     forgot.hidden = which !== 'forgot';
     renew.hidden = which !== 'reset';
     check.hidden = which !== 'check';
     finish.hidden = which !== 'verify';
+    googleName.hidden = which !== 'google';
+    if (which !== 'google') googlePending = null;
     if (which !== 'check') stopCooldown();
     root.dataset.showing = which;
-    if (focus) ({ signin: siEmail, signup: suEmail, forgot: fgEmail, reset: rsPass, check: { input: resendButton }, verify: { input: vfName.input } })[which].input.focus();
+    if (focus) ({ signin: siEmail, signup: suEmail, forgot: fgEmail, reset: rsPass, check: { input: resendButton }, verify: { input: vfName.input }, google: gnName })[which].input.focus();
   }
 
   // Send it again: once a minute (the site sends nothing sooner), counted down on the button.
@@ -656,13 +767,29 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
     say(r.message, 'bad');
   });
 
+  googleName.addEventListener('submit', (e) => {
+    e.preventDefault();
+    submit(googleName, gnSubmit, FORM_COPY.google.busy, async () => {
+      const name = gnName.input.value.trim().replace(/\s+/g, ' ');
+      if (!/^[A-Za-z0-9](?:[A-Za-z0-9 _-]{1,17})[A-Za-z0-9]$/.test(name)) return showRefusal({ fields: { name: 'Names are 3 to 19 letters, numbers, spaces, - or _, starting and ending with a letter or number.' } }, { name: gnName });
+      if (!googlePending) return show('signin');
+      const r = await requests.googleFinish({ ...googlePending, name });
+      if (r.ok) return googleSignedIn(r);
+      if (r.fields?.name) return showRefusal(r, { name: gnName });
+      // Expired or already used: back to the tabs, with the words.
+      show('signin');
+      say(r.code === 'offline' || r.code?.startsWith?.('http_') ? FORM_COPY.google.failed : r.message, 'bad');
+    });
+  });
+  gnBack.addEventListener('click', () => show('signin', { focus: true }));
+
   forgotLink.addEventListener('click', () => {
     fgEmail.input.value = siEmail.input.value;
     show('forgot', { focus: true });
   });
   backLink.addEventListener('click', () => show('signin', { focus: true }));
 
-  root.append(tabs, message, signin, signup, forgot, renew, check, finish);
+  root.append(tabs, message, signin, signup, forgot, renew, check, finish, googleName);
   host.replaceChildren(root);
   if (verify?.token) {
     showFinish('busy');
