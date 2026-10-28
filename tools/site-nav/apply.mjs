@@ -5,8 +5,11 @@
  * Navigation; the Groddle theme draws it on Minn's pages (groddle-afternoon-site/src/
  * SiteNav.php), and this puts the same links in every built page that carries
  * the header (<div class="site-nav-links">), with the section being read
- * marked, so one edit changes every page. sync-to-cove.sh runs it on the
- * copy in the site's game/ folder; the spike's own pages keep their links.
+ * marked, so one edit changes every page. A Navigation submenu becomes the
+ * link with a toggle and a panel of the links inside it (site/theme.js opens
+ * it), one line per top-level item: applyToHtml ends the links at the first
+ * line that is only </div>. sync-to-cove.sh runs it on the copy in the
+ * site's game/ folder; the spike's own pages keep their links.
  *
  *   node tools/site-nav/apply.mjs --game=<site>/game --site=<site>/public   read the menu with WP-CLI
  *   node tools/site-nav/apply.mjs --game=<dir> --menu=<file>               read block markup from a file
@@ -34,53 +37,107 @@ export const SECTIONS = {
 };
 
 const decode = (s) => s.replace(/<[^>]*>/g, '').replace(/&(amp|lt|gt|quot|#039|#39|apos);/g, (m, e) => ({ amp: '&', lt: '<', gt: '>', quot: '"', '#039': "'", '#39': "'", apos: "'" })[e]);
-const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+// As the theme's Html::esc (htmlspecialchars with ENT_QUOTES), so both draw the same bytes.
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
-/** The menu's top-level navigation links from wp_navigation block markup. */
+/**
+ * The menu's top-level navigation links from wp_navigation block markup; a
+ * submenu also carries `children`, the links inside it (one level: deeper
+ * submenus' links join the list), as SiteNav::parse reads them.
+ */
 export function parseMenu(markup) {
   const links = [];
-  let depth = 0;
+  const open = []; // the blocks we are inside, outermost first
+  let parent = null;
+  const read = (json) => {
+    let attrs = {};
+    try { attrs = json ? JSON.parse(json) : {}; } catch { attrs = {}; }
+    const label = decode(String(attrs.label ?? '')).trim();
+    const href = String(attrs.url ?? '').trim();
+    return label && href ? { label, href, className: String(attrs.className ?? '').trim() } : null;
+  };
   for (const m of String(markup).matchAll(/<!--\s+(\/)?wp:([a-z0-9/-]+)(?:\s+(\{[\s\S]*?\}))?\s+(\/)?-->/g)) {
     const [, closing, rawName, json, selfClosing] = m;
     const name = rawName.includes('/') ? rawName : `core/${rawName}`;
-    if (closing) { depth = Math.max(0, depth - 1); continue; }
-    if (depth === 0 && (name === 'core/navigation-link' || name === 'core/navigation-submenu')) {
-      let attrs = {};
-      try { attrs = json ? JSON.parse(json) : {}; } catch { attrs = {}; }
-      const label = decode(String(attrs.label ?? '')).trim();
-      const href = String(attrs.url ?? '').trim();
-      if (label && href) links.push({ label, href, className: String(attrs.className ?? '').trim() });
+    if (closing) {
+      open.pop();
+      if (!open.length) parent = null;
+      continue;
     }
-    if (!selfClosing) depth++;
+    if (name === 'core/navigation-link' || name === 'core/navigation-submenu') {
+      if (!open.length) {
+        const link = read(json);
+        if (link) links.push(link);
+        parent = link && name === 'core/navigation-submenu' && !selfClosing ? link : null;
+      } else if (parent && open.every((n) => n === 'core/navigation-submenu')) {
+        // Inside submenus only (SiteNav::inner never looks inside another block).
+        const child = read(json);
+        if (child) (parent.children ||= []).push(child);
+      }
+    }
+    if (!selfClosing) open.push(name);
   }
   return links.length ? links : FALLBACK;
 }
 
+const sitePath = (href) => href !== '/' && href.startsWith('/') && !href.startsWith('//');
+const section = (href) => href.replace(/\/?$/, '/');
+
 /**
  * The link whose section holds the page: the longest site path that starts it
- * (the link's own, or one it stands for in SECTIONS, which loses a tie to a
- * link's own), never home or Play.
+ * (the link's own, one it stands for in SECTIONS, or one of a submenu's links;
+ * the others lose a tie to a link's own), never home or Play.
  */
 export function currentIndex(links, pagePath) {
   let best = -1;
   let score = 0;
-  const path = pagePath.replace(/\/?$/, '/');
-  links.forEach(({ href, className }, i) => {
-    if (href === '/' || !href.startsWith('/') || className.split(/\s+/).includes('site-nav-play')) return;
-    const own = href.replace(/\/?$/, '/');
-    for (const section of [own, ...(SECTIONS[own] || [])]) {
-      const points = section.length * 2 + (section === own ? 1 : 0);
-      if (path.startsWith(section) && points > score) { best = i; score = points; }
+  const path = section(pagePath);
+  links.forEach(({ href, className, children = [] }, i) => {
+    if (!sitePath(href) || className.split(/\s+/).includes('site-nav-play')) return;
+    const own = section(href);
+    const sections = [own, ...(SECTIONS[own] || []), ...children.filter((c) => sitePath(c.href)).map((c) => section(c.href))];
+    for (const s of sections) {
+      const points = s.length * 2 + (s === own ? 1 : 0);
+      if (path.startsWith(s) && points > score) { best = i; score = points; }
     }
   });
   return best;
 }
 
+/** The submenu link whose path holds the page (the longest), or -1 (SiteNav::currentChild). */
+export function currentChild(children, pagePath) {
+  let best = -1;
+  let length = 0;
+  const path = section(pagePath);
+  children.forEach(({ href }, j) => {
+    const own = section(href);
+    if (sitePath(href) && path.startsWith(own) && own.length > length) { best = j; length = own.length; }
+  });
+  return best;
+}
+
+const anchor = ({ label, href, className }, current) =>
+  `<a${className ? ` class="${esc(className)}"` : ''} href="${esc(href)}"${current ? ' aria-current="page"' : ''}>${esc(label)}</a>`;
+
+/**
+ * One top-level item on one line: a link, or a submenu's link, toggle and
+ * panel. The same markup as SiteNav::item in the site repo.
+ */
+export function renderItem(link, index, current, pagePath) {
+  const a = anchor(link, current);
+  const children = link.children || [];
+  if (!children.length) return a;
+  const id = `site-nav-sub-${index}`;
+  const child = current ? currentChild(children, pagePath) : -1;
+  return `<div class="site-nav-sub">${a}`
+    + `<button class="site-nav-toggle" type="button" aria-expanded="false" aria-controls="${id}" aria-label="${esc(`More in ${link.label}`)}"></button>`
+    + `<div class="site-nav-panel" id="${id}" hidden>${children.map((c, j) => anchor(c, j === child)).join('')}</div></div>`;
+}
+
 /** The links' markup, in the built pages' indentation. */
 export function renderLinks(links, pagePath, indent = '        ') {
   const current = currentIndex(links, pagePath);
-  return links.map(({ label, href, className }, i) =>
-    `${indent}<a${className ? ` class="${esc(className)}"` : ''} href="${esc(href)}"${i === current ? ' aria-current="page"' : ''}>${esc(label)}</a>`).join('\n');
+  return links.map((link, i) => `${indent}${renderItem(link, i, i === current, pagePath)}`).join('\n');
 }
 
 /** A built page with its header links replaced; unchanged when it has no header. */

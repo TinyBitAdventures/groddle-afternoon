@@ -90,6 +90,37 @@ describe('site colour theme', () => {
     assert.ok(!readFileSync(join(pub, 'compare', 'compare.js'), 'utf8').includes('groddle-compare-theme'), 'compare.js keeps no theme of its own');
   });
 
+  it('opens the header submenus: hover with a mouse, the toggle, Escape back to the toggle, outside click and Tab out close', () => {
+    const js = readFileSync(join(pub, 'site', 'theme.js'), 'utf8');
+    const subs = js.slice(js.indexOf("// The header's submenus."));
+    assert.ok(subs.length > 1000, 'the submenu block follows the theme block');
+    assert.match(subs, /document\.querySelectorAll\('\.site-nav-sub'\)/);
+    assert.match(subs, /document\.getElementById\(toggle\.getAttribute\('aria-controls'\)\)/);
+    assert.match(subs, /addEventListener\('pointerenter', \(e\) => \{\n\s*if \(e\.pointerType !== 'mouse'/, 'hover opens for a mouse only');
+    assert.match(subs, /toggle\.addEventListener\('click'/);
+    assert.match(subs, /sub\.panel\.hidden = false;\n\s*sub\.toggle\.setAttribute\('aria-expanded', 'true'\);/);
+    assert.match(subs, /sub\.panel\.hidden = true;\n\s*sub\.toggle\.setAttribute\('aria-expanded', 'false'\);\n\s*if \(focusToggle\) sub\.toggle\.focus\(\);/);
+    assert.match(subs, /e\.key === 'Escape' && !panel\.hidden[\s\S]*?close\(sub, true\)/, 'Escape returns focus to the toggle');
+    assert.match(subs, /addEventListener\('focusout'/, 'Tab out closes');
+    assert.match(subs, /document\.addEventListener\('pointerdown', \(e\) => \{\n\s*for \(const sub of subs\) if \(!sub\.panel\.hidden && !sub\.el\.contains\(e\.target\)\) close/, 'a click outside closes');
+    assert.match(subs, /setProperty\('--site-nav-panel-left'/, 'wide, the panel sits under its link');
+  });
+
+  it('hangs the submenu panel from the header row, so the links\' sideways scroll never clips it', () => {
+    const css = readFileSync(join(pub, 'site', 'site-nav.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    assert.match(css, /\.site-nav-row \{ position: relative; \}/);
+    for (const [, selector, body] of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      if (/\.site-nav-(links|sub)\b(?![-\w])/.test(selector.split(',').map((x) => x.trim().split(/\s+/).at(-1)).join(' '))) {
+        assert.doesNotMatch(body, /position:/, `${selector.trim()} must stay unpositioned`);
+      }
+    }
+    assert.match(css, /\.site-nav-panel \{\n\s*position: absolute; z-index: 30;[^}]*left: var\(--site-nav-panel-left, 0\)/);
+    assert.match(css, /\.site-nav-panel\[hidden\] \{ display: none; \}/);
+    assert.match(css, /:root\[data-theme-mode\] \.site-nav-toggle \{/, 'the toggle shows only once theme.js runs');
+    assert.match(css, /@media \(max-width: 640px\) \{\n\s*\.site-nav-panel \{\n\s*top: calc\(100% \+ 1px\); left: 0; right: 0;/, 'narrow, it spans the row');
+    assert.match(css, /prefers-reduced-motion[^\n]*\.site-nav-toggle::before/);
+  });
+
   it('every stylesheet the header pages lean on has a forced dark theme', () => {
     for (const css of ['restoration/restoration.css', 'changelog/changelog.css', 'landing/landing.css', 'compare/compare.css']) {
       const text = readFileSync(join(pub, css), 'utf8');

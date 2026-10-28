@@ -124,4 +124,57 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
   .site-nav-theme::before { width: 14px; height: 14px; }
 }
 
-@media (prefers-reduced-motion: reduce) { .site-nav-play, .site-nav-theme { transition: none; } }
+/* A submenu (a Navigation submenu block in the Minn menu): its link, a caret toggle and a panel
+   of its links, one line of markup. site/theme.js opens the panel (hover with a mouse, the toggle
+   anywhere); without it the toggle stays hidden and the link is a plain link. The panel hangs from
+   .site-nav-row, never the item, because at narrow widths .site-nav-links scrolls sideways and would
+   clip it: wide, theme.js sets --site-nav-panel-left to sit it under the link; narrow, it spans the row. */
+.site-nav-row { position: relative; }
+.site-nav-sub { display: inline-flex; align-items: center; gap: 1px; flex-shrink: 0; }
+.site-nav-toggle { display: none; }
+:root[data-theme-mode] .site-nav-toggle {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 24px; height: 24px; padding: 0; margin: 0 -4px 0 0; border: 0; border-radius: 6px; cursor: pointer;
+  background: transparent; color: var(--muted);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+}
+.site-nav-toggle::before {
+  content: ''; width: 6px; height: 6px; margin-top: -3px;
+  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+  transform: rotate(45deg); transition: transform .15s ease, margin-top .15s ease;
+}
+.site-nav-toggle:hover, .site-nav-toggle[aria-expanded="true"] { color: var(--fg); }
+.site-nav-toggle[aria-expanded="true"]::before { transform: rotate(225deg); margin-top: 3px; }
+.site-nav-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+.site-nav-panel {
+  position: absolute; z-index: 30; top: calc(100% + 6px); left: var(--site-nav-panel-left, 0);
+  min-width: 180px; padding: 6px; display: flex; flex-direction: column; gap: 2px;
+  background: var(--surface); color: var(--fg);
+  border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.45);
+}
+.site-nav-panel[hidden] { display: none; }
+/* Keeps the hover across the gap between the link and the panel. */
+.site-nav-panel::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: 28px; }
+.site-nav-links .site-nav-panel a {
+  display: block; padding: 8px 12px; border: 0; border-radius: 8px;
+  color: var(--fg); font-size: 15px; font-weight: 700; white-space: nowrap; text-decoration: none;
+}
+.site-nav-links .site-nav-panel a:hover, .site-nav-links .site-nav-panel a:focus-visible {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.site-nav-links .site-nav-panel a:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.site-nav-links .site-nav-panel a[aria-current="page"] { box-shadow: inset 3px 0 0 var(--accent); }
+@media (max-width: 640px) {
+  .site-nav-panel {
+    top: calc(100% + 1px); left: 0; right: 0; min-width: 0;
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-width: 0 0 1px; border-radius: 0 0 12px 12px; padding: 8px 12px 10px;
+  }
+  .site-nav-panel::before { height: 20px; }
+}
+@media (max-width: 440px) {
+  :root[data-theme-mode] .site-nav-toggle { width: 22px; margin-right: -3px; }
+}
+
+@media (prefers-reduced-motion: reduce) { .site-nav-play, .site-nav-theme, .site-nav-toggle::before { transition: none; } }
