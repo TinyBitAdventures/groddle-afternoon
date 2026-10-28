@@ -152,5 +152,5 @@ import { yardVerbsMpFeature } from './yard-verbs-mp-feature.js?v=g405-1'; FEATUR
 import { questVerbsFeature } from './quest-verbs-feature.js?v=g390-1'; FEATURES.push(questVerbsFeature);
 import { itemVerbsMoreFeature } from './item-verbs-more-feature.js?v=g405-1'; FEATURES.push(itemVerbsMoreFeature);
 import { streetObjectsFeature } from './street-objects-feature.js?v=g403-1'; FEATURES.push(streetObjectsFeature);
-import { realtimeFeature } from './realtime-feature.js?v=g406-1'; FEATURES.push(realtimeFeature);
-import { accountBackupFeature } from './account-backup-feature.js?v=g408-1'; FEATURES.push(accountBackupFeature);
+import { realtimeFeature } from './realtime-feature.js?v=g409-1'; FEATURES.push(realtimeFeature);
+import { accountBackupFeature } from './account-backup-feature.js?v=g409-1'; FEATURES.push(accountBackupFeature);

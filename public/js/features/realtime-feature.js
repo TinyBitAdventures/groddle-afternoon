@@ -29,15 +29,23 @@
  *   "An administrator moved you to <street>." and saves. Nothing joins a
  *   street until the move is done.
  *
+ * - The administrators' console (js/admin-console-mp.js, groddle-afternoon-server
+ *   admin.go): admin_message opens "Message from an administrator"; booted
+ *   says "An administrator signed you out: <reason>." and the client stops
+ *   reconnecting (4010 'booted'; a ban 4011 'suspended'); admin_give applies a
+ *   ledger give once (ledgerReceipt) to the pack and purse; admin_refill fills
+ *   mood and energy. Like the teleport, only the site's signed calls send them.
+ *
  * QA: canvas data realtimeState, realtimeHere, realtimePlayers,
  * realtimeStreet, realtimeLastSaid, realtimeTeleport (the street an
  * administrator sent you to, once there); window.groddleRealtime in multiplayer.
  */
 
 import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
-import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=mp3-4';
+import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=g409-1';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js';
 import { movedLine } from '../admin-teleport.js?v=g406-1';
+import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=g407-1';
 import { saveStore } from '../save-store.js?v=mp2-2';
 import { STREET_INDEX } from '../street-loader.js';
 
@@ -57,6 +65,8 @@ export function statusText(state, { here = 0, attempt = 0 } = {}) {
     case 'replaced': return 'Playing somewhere else';
     case 'signed-out': return 'Signed out';
     case 'off': return 'Others are off on this site';
+    case 'booted': return ADMIN_TEXT.stateBooted;
+    case 'suspended': return ADMIN_TEXT.stateSuspended;
     case 'stopped': return 'Offline';
     default: return 'Connecting';
   }
@@ -103,7 +113,7 @@ const STYLE = `
 .mp-state { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.55rem; border-radius: 999px; color: #24401b; background: rgba(244, 251, 236, 0.94); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22); }
 .mp-state::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #e8a33c; }
 .mp-state[data-state="online"]::before { background: #5fa83a; }
-.mp-state[data-state="offline"]::before, .mp-state[data-state="replaced"]::before, .mp-state[data-state="signed-out"]::before, .mp-state[data-state="stopped"]::before { background: #c8553d; }
+.mp-state[data-state="offline"]::before, .mp-state[data-state="replaced"]::before, .mp-state[data-state="signed-out"]::before, .mp-state[data-state="stopped"]::before, .mp-state[data-state="booted"]::before, .mp-state[data-state="suspended"]::before { background: #c8553d; }
 .mp-state[data-state="off"]::before { background: #9a948a; }
 .mp-bar button { font: inherit; border: 0; border-radius: 999px; padding: 0.2rem 0.6rem; cursor: pointer; color: #3a3340; background: rgba(255, 253, 247, 0.92); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2); }
 .mp-bar button[aria-pressed="true"] { background: #efe4f6; }
@@ -333,6 +343,8 @@ function createSession(engine) {
     return true;
   }
 
+  /** A sign-out or suspension already shown (the booted message comes before the close). */
+  let bootedSaid = false;
   client.on('state', ({ state }) => {
     publish();
     if (state === 'replaced') {
@@ -341,6 +353,12 @@ function createSession(engine) {
       engine.toast?.(line, 5200);
     }
     if (state === 'signed-out') addLog({ note: true, text: 'You are signed out, so others cannot see you. Log in again to rejoin.' });
+    // A ticket refused for a suspended account (no booted message came first): say so once.
+    if (state === 'suspended' && !bootedSaid) {
+      bootedSaid = true;
+      addLog({ note: true, text: ADMIN_TEXT.suspended });
+      showBooted(engine, { banned: true, reason: '' });
+    }
   });
   client.on('roster', syncRoster);
   client.on('joined', (p) => addLog({ note: true, text: `${p.name} is here.` }));
@@ -400,6 +418,25 @@ function createSession(engine) {
         engine.save?.();
         Promise.resolve(saveStore.flush?.()).catch(() => {});
       });
+  });
+
+  // The administrators' console (admin.go): a message, a sign-out, a give, a refill.
+  client.on('msg:admin_message', (msg) => {
+    if (showAdminMessage(engine, msg)) addLog({ note: true, text: `${ADMIN_TEXT.messageTitle}: ${msg.text}` });
+  });
+  client.on('msg:booted', (msg) => {
+    bootedSaid = true;
+    addLog({ note: true, text: showBooted(engine, msg) });
+    engine.save?.();
+    Promise.resolve(saveStore.flush?.()).catch(() => {});
+  });
+  client.on('msg:admin_give', (msg) => {
+    if (!applyAdminGive(engine, msg)) return;
+    addLog({ note: true, text: String(msg.text || ADMIN_TEXT.gave) });
+    Promise.resolve(saveStore.flush?.()).catch(() => {});
+  });
+  client.on('msg:admin_refill', () => {
+    if (applyAdminRefill(engine)) addLog({ note: true, text: ADMIN_TEXT.refilled });
   });
 
   // "/" focuses the chat, unless something else has the keyboard.

@@ -76,6 +76,11 @@ export const GATE_COPY = {
     title: 'The Groddle site is not answering',
     body: ['Multiplayer saves live on the site, so it has to be reachable to play. Try again in a moment.'],
   },
+  // The administrators' console banned this account (groddle-afternoon-site src/AdminConsole.php).
+  suspended: {
+    title: 'Account suspended',
+    body: ['This account is suspended.', 'It cannot play with others. Solo play in this browser still works.'],
+  },
   'load-failed': {
     title: 'Your character did not load',
     body: ['The site answered, but your multiplayer save could not be read. Try again in a moment.'],
@@ -113,6 +118,22 @@ export async function quietSession(account, { fetch: fetchFn = globalThis.fetch?
   // A session that began between the two asks still has no nonce here: session() fetches it.
   if (me.data.signedIn) return account.session();
   return { minn: true, signedIn: false, player: null, backups: null, account: null };
+}
+
+/**
+ * Whether the signed-in account is suspended (groddle/v1/me "suspended", the
+ * administrators' console's ban). account.session() does not carry it, so the
+ * gate asks once more before it offers Play as <name>; a failed ask is false
+ * (the save route refuses a suspended account anyway, and enter() says so).
+ */
+export async function suspendedNow(account, { fetch: fetchFn = globalThis.fetch?.bind(globalThis) } = {}) {
+  try {
+    const res = await fetchFn(`${account.urls.api}me`, { credentials: 'same-origin', cache: 'no-store', headers: account.nonce ? { 'X-WP-Nonce': account.nonce } : {} });
+    const data = res.ok ? await res.json().catch(() => null) : null;
+    return data?.signedIn === true && data.suspended === true;
+  } catch {
+    return false;
+  }
 }
 
 /** Which gate a session answer leads to; 'ready' boots the game. */
@@ -177,6 +198,19 @@ function showGate(gate, state, { account, onSignedIn, onSignedOut = onSignedIn, 
     // A link from the site can open the gate on New player (/play/online/#new); a reset email opens it on a new
     // password; a sign-up email (#verify=<token>) finishes the character.
     mountAccountForms(host, { account, start: location.hash === '#new' ? 'signup' : 'signin', reset: resetLinkFrom(location.hash), verify: verifyLinkFrom(location.hash), onSignedIn });
+  }
+  if (state === 'suspended') {
+    const out = el('button', { type: 'button', class: 'online-home online-signout', 'data-online-signout': '' }, 'Sign out');
+    out.addEventListener('click', async () => {
+      out.disabled = true;
+      markContinued(false);
+      try {
+        await account.signOut();
+      } finally {
+        onSignedOut();
+      }
+    });
+    card.append(out);
   }
   if (state === 'offline' || state === 'load-failed') {
     const retry = el('button', { type: 'button', class: 'online-play', 'data-online-retry': '' }, 'Try again');
@@ -264,6 +298,11 @@ async function boot() {
     showGate(gate, state, { account, onSignedIn });
     return;
   }
+  if (await suspendedNow(account)) {
+    markContinued(false);
+    showGate(gate, 'suspended', { account, onSignedIn, onSignedOut, session });
+    return;
+  }
   // Signed in already: Play as <name> or Play solo, once a tab.
   if (!continuedHere()) {
     showGate(gate, 'choose', { account, onSignedIn, onSignedOut, session, onPlay: () => { markContinued(); enter(gate, script, account, session, onSignedIn); } });
@@ -280,7 +319,7 @@ async function enter(gate, script, account, session, onSignedIn) {
     window.GRODDLE_MP_BOOT = bootDataFrom({ account, session, save });
   } catch (err) {
     console.warn('[online] save did not load', err);
-    showGate(gate, err?.status === 401 ? 'signed-out' : 'load-failed', { account, onSignedIn });
+    showGate(gate, err?.status === 401 ? 'signed-out' : err?.code === 'groddle_suspended' ? 'suspended' : 'load-failed', { account, onSignedIn, onSignedOut: () => { boot(); } });
     return;
   }
   gate.hidden = true;

@@ -292,7 +292,8 @@ describe('the realtime server (groddle-afternoon-server teleport.go)', { skip: s
     const file = serverPath('teleport.go');
     assert.ok(existsSync(file), 'teleport.go');
     const go = readFileSync(file, 'utf8');
-    assert.match(go, /serviceRouteTeleport = "\/realtime\/v1\/teleport"/);
+    assert.match(go, /serviceRouteTeleport = (?:"\/realtime\/v1\/teleport"|serviceRoutePrefix \+ "teleport")/);
+    assert.match(go, /serviceRoutePrefix   = "\/realtime\/v1\/"/);
     assert.doesNotMatch(go, /Handle\("teleport"/);
     assert.match(readFileSync(serverPath('main.go'), 'utf8'), /r\.Method == http\.MethodPost \{\s*s\.service\(w, r\)/);
   });
