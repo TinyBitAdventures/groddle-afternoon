@@ -42,14 +42,18 @@ const engineStub = (extra = {}) => ({
 });
 
 describe('1. the tutorial path starts from zero; Skip to Ur keeps the kit', () => {
-  it('the start card calls startAsNewPlayer only from the tutorial button', () => {
+  it('the start card starts from zero on the tutorial button and on Customize look first, never on Skip to Ur', () => {
     const card = feature.slice(feature.indexOf('function showStartCard(engine)'), feature.indexOf('// Solo or multiplayer is chosen before the game'));
     const solo = card.slice(card.indexOf('<strong>New to Ur?</strong>'));
     const start = solo.slice(solo.indexOf("querySelector('[data-nx-start]')"), solo.indexOf("querySelector('[data-nx-skipstart]')"));
-    const skip = solo.slice(solo.indexOf("querySelector('[data-nx-skipstart]')"));
+    const skip = solo.slice(solo.indexOf("querySelector('[data-nx-skipstart]')"), solo.indexOf("getElementById('start-customize-btn')"));
+    const customize = solo.slice(solo.indexOf("getElementById('start-customize-btn')"));
     assert.match(start, /engine\.startAsNewPlayer\?\.\(\) === true;[\s\S]*pendingStage = 'clouds';\n\s+startBtn\.click\(\);/);
     assert.doesNotMatch(skip, /startAsNewPlayer/);
     assert.match(skip, /save\.status = 'skipped';/);
+    // Customize look first (Austin 2026-10-28): the tutorial from zero, the builder opened by game.js on the same click.
+    assert.match(customize, /if \(save\.status === 'skipped' \|\| pendingStage\) return;[\s\S]*engine\.startAsNewPlayer\?\.\(\) === true;[\s\S]*pendingStage = 'clouds';/);
+    assert.match(customize, /\{ capture: true, once: true \}/);
   });
 
   it('game.js starts a brand-new solo save as the multiplayer new player, and nothing else', () => {

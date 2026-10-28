@@ -2645,9 +2645,14 @@
   ]
  },
  "git": {
-  "commits": 668,
+  "commits": 669,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-28",
+    "kind": "new",
+    "text": "Continue with Google on the sign-in card"
+   },
    {
     "date": "2026-10-28",
     "kind": "improve",
@@ -2762,11 +2767,6 @@
     "date": "2026-10-27",
     "kind": "improve",
     "text": "Quest rooms and other instances show no hub line, two snap captions return, and Enter opens the crab's menu"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "The Project page in Minn, and built pages mark Project for the restoration story"
    }
   ]
  },

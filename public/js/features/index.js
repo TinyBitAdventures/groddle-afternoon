@@ -35,7 +35,7 @@ import { questInstancesFeature } from './quest-instances-feature.js?v=g388-1';
 import { partySpacesFeature } from './party-spaces-feature.js?v=party-11';
 import { seasonsFeature } from './seasons-feature.js?v=g392-1';
 import { cameraModeFeature } from './camera-mode-feature.js?v=g359-1';
-import { newxpFeature } from './newxp-feature.js?v=g395-1';
+import { newxpFeature } from './newxp-feature.js?v=g400-1';
 
 export { questFlagsFeature };
 
@@ -84,12 +84,12 @@ import { treeDeathFeature } from './tree-death-feature.js?v=g383-1'; FEATURES.pu
 import { enchantedForestFeature } from './enchanted-forest-feature.js?v=g369-1'; FEATURES.push(enchantedForestFeature);
 import { jujuBanditsFeature } from './juju-bandits-feature.js?v=g364-1'; FEATURES.push(jujuBanditsFeature);
 import { craftybotFeature } from './craftybot-feature.js?v=g380-1'; FEATURES.push(craftybotFeature);
-import { moodDecayFeature } from './mood-decay-feature.js?v=g395-1'; FEATURES.push(moodDecayFeature);
+import { moodDecayFeature } from './mood-decay-feature.js?v=g400-1'; FEATURES.push(moodDecayFeature);
 import { animalMoodFeature } from './animal-mood-feature.js?v=g392-1'; FEATURES.push(animalMoodFeature);
 import { butlerFeature } from './butler-feature.js?v=g380-1'; FEATURES.push(butlerFeature);
 import { mailCourierFeature } from './mail-courier-feature.js?v=g388-1'; FEATURES.push(mailCourierFeature);
 import { pouchFeature } from './elemental-pouch-feature.js?v=g335-2'; FEATURES.push(pouchFeature);
-import { bagsFeature } from './bags-feature.js?v=g397-1'; FEATURES.push(bagsFeature);
+import { bagsFeature } from './bags-feature.js?v=g400-1'; FEATURES.push(bagsFeature);
 import { hiSignsFeature } from './hi-signs-feature.js?v=g380-1'; FEATURES.push(hiSignsFeature);
 import { gwendolynRoom23Feature } from './gwendolyn-room-23-feature.js?v=g382-1'; FEATURES.push(gwendolynRoom23Feature);
 import { cubimalRaceFeature } from './cubimal-race-feature.js?v=g311-1'; FEATURES.push(cubimalRaceFeature);
@@ -127,7 +127,7 @@ import { familiarDialogFeature } from './familiar-dialog-feature.js?v=g381-1'; F
 import { spiritLonelinessFeature } from './spirit-loneliness-feature.js?v=lonely-13'; FEATURES.push(spiritLonelinessFeature);
 import { funpickleFeature } from './funpickle-feature.js?v=desk2-9'; FEATURES.push(funpickleFeature);
 import { qurazyFeature } from './qurazy-feature.js?v=g396-1'; FEATURES.push(qurazyFeature);
-import { energyDecayFeature } from './energy-decay-feature.js?v=g395-1'; FEATURES.push(energyDecayFeature);
+import { energyDecayFeature } from './energy-decay-feature.js?v=g400-1'; FEATURES.push(energyDecayFeature);
 import { partyFeature } from './party-feature.js?v=mp4-2'; FEATURES.push(partyFeature);
 import { sharedQuoinsFeature } from './shared-quoins-feature.js?v=mp4-2'; FEATURES.push(sharedQuoinsFeature);
 import { tradeFeature } from './trade-feature.js?v=g392-1'; FEATURES.push(tradeFeature);

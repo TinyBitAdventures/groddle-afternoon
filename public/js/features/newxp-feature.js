@@ -3080,6 +3080,15 @@ function showStartCard(engine) {
       save.status = 'skipped';
       startBtn.click();
     });
+    // "Customize look first" on a brand-new save is the tutorial's own path with the look
+    // builder opened first (Austin 2026-10-28): from zero, into the clouds. game.js opens the
+    // builder on the same click; this capture listener runs before it.
+    document.getElementById('start-customize-btn')?.addEventListener('click', () => {
+      if (save.status === 'skipped' || pendingStage) return;
+      const fresh = engine.startAsNewPlayer?.() === true;
+      engine.setData('newxpFreshStart', fresh ? '1' : '0');
+      pendingStage = 'clouds';
+    }, { capture: true, once: true });
     engine.setData('newxpStartCard', 'shown');
   };
   // Solo or multiplayer is chosen before the game, on the Play page (/play/online/: sign in, or

@@ -408,10 +408,13 @@ export const bagsFeature = {
     const out = [];
     const inPack = places.some((p) => p.container === 'pack');
     if (inPack) {
-      for (const box of Object.values(layout.bags)) {
-        if (!bagAccepts(BAG_DEFS[box.cls], cls, opts())) continue;
+      // Each bag's button names its fill, so two Bigger Bags read apart, and bags with room come first.
+      const boxes = Object.values(layout.bags).filter((box) => bagAccepts(BAG_DEFS[box.cls], cls, opts()));
+      boxes.sort((a, b) => Number(a.slots.length >= a.capacity) - Number(b.slots.length >= b.capacity));
+      for (const box of boxes) {
         const full = box.slots.length >= box.capacity;
-        out.push({ id: `bags_put:${box.key}`, label: `Put in ${box.label}`, enabled: !full, reason: full ? PACK_COPY.noRoom(box.label) : '', tooltip: PACK_COPY.moveTo(box.label) });
+        const fill = `${box.slots.length}/${box.capacity}`;
+        out.push({ id: `bags_put:${box.key}`, label: `Put in ${box.label} (${fill})`, enabled: !full, reason: full ? PACK_COPY.noRoom(box.label) : '', tooltip: PACK_COPY.moveTo(box.label) });
         if (out.length >= 3) break;
       }
     }
