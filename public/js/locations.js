@@ -127,7 +127,7 @@ export const LOCATIONS = {
     tsid: 'RH_HOME_INT',
     label: 'Your House',
     hubId: 'home',
-    hubName: 'Home',
+    hubName: 'Homes',
     worldW: 1200,
     groundY: 420,
     spawnX: 200,

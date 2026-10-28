@@ -61,8 +61,10 @@
  *   owner's hosted_party (crowded_house, house_party: locations/home.js:55-66,
  *   told by the server).
  *
- * Not yet: patches, resource nodes and the Tower on a visited street; the
- * Magic Rock's daily iMG for what visitors do on a home street (G119).
+ * A visited street's Patches, trees and animals and their visitor verbs are
+ * features/yard-verbs-mp-feature.js; the Magic Rock's daily iMG from visitors
+ * is features/home-pool-mp-feature.js. Not yet: resource nodes and the Tower
+ * on a visited street.
  *
  * QA: canvas data neighboursVisit (owner:room), neighboursKeys (given/received
  * counts), neighboursLast, neighboursButler (the visitor Butler: name@x),
@@ -79,8 +81,8 @@ import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=home-
 import { tickGarden } from '../garden.js?v=g300-1';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=butler-rig-1';
 import { normalizeButlerParts } from '../butler.js?v=butler-9';
-import { butlerApi } from './butler-feature.js?v=g375-1';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=g375-1';
+import { butlerApi } from './butler-feature.js?v=g380-1';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=g380-1';
 import {
   BUTLER_MESSAGE_MAX,
   KEY_VERB,
@@ -304,7 +306,7 @@ function createSession(engine, client) {
     const scene = {
       tsid: visitSceneTsid(visit.owner, room),
       label,
-      hubName: 'Home',
+      hubName: 'Homes',
       width: built.width,
       height: built.height,
       background: built.background,
@@ -337,7 +339,7 @@ function createSession(engine, client) {
         fromLabel: from.label,
         fromHub: from.hub,
         toLabel: label,
-        toHub: 'Home',
+        toHub: 'Homes',
         pol: { type: room === 'interior' ? 'interior' : 'exterior', ownerName: visit.name },
         onMid: setup,
       });

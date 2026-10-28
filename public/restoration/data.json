@@ -2645,9 +2645,14 @@
   ]
  },
  "git": {
-  "commits": 637,
+  "commits": 638,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "improve",
+    "text": "The familiar waits for badges and the new day, and Gwendolyn's rooms say only what the source says"
+   },
    {
     "date": "2026-10-27",
     "kind": "improve",
@@ -2762,14 +2767,9 @@
     "date": "2026-10-27",
     "kind": "improve",
     "text": "Better Learning keeps 2011's proportions: each rank takes a tenth of its 2011 time"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "fix",
-    "text": "The last four unclassified street projects are judged (G15)"
    }
   ]
  },
- "tests": 376,
+ "tests": 377,
  "generatedAt": "2026-10-27"
 }

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g377-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-211';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-212';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g378-1';
@@ -429,7 +429,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=player-save-22';
+} from './js/player-save.js?v=g380-1';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -440,8 +440,8 @@ import {
   enterHomeInterior,
   leaveHomeInterior,
   imagineHome,
-} from './js/homes.js?v=homes-mail-4';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=g310-2';
+} from './js/homes.js?v=g380-1';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=g380-1';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -19257,7 +19257,7 @@ async function renderHomeScene(room = homeState.room || 'street', opts = {}) {
     tsid: targetTsid,
     label: room === 'interior' ? 'Your House' : 'Your Home Street',
     hubId: 'home',
-    hubName: 'Home',
+    hubName: 'Homes',
     bounds: { l: 0, r: WORLD_W, t: 0, b: AUTHORED_VIEW_H },
     platforms: streetPlatforms,
     signposts: [],
@@ -19407,9 +19407,9 @@ async function switchHomeRoom(room) {
   if (!result.ok) return false;
   await showLocationTransition({
     fromLabel: currentStreet?.label || 'Home',
-    fromHub: 'Home',
+    fromHub: 'Homes',
     toLabel: result.label,
-    toHub: 'Home',
+    toHub: 'Homes',
     pol: { type: room === 'interior' ? 'interior' : 'exterior' },
     load: () => renderHomeScene(room, { arrive: 'door', spawnX: room === 'interior' ? 1030 : 910 }),
   });

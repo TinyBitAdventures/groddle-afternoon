@@ -121,7 +121,7 @@ export function beginHomeVisit(state, location = {}) {
     ok: true,
     tsid: HOME_STREET_TSID,
     label: 'Your Home Street',
-    hubName: 'Home',
+    hubName: 'Homes',
     style: home.style,
     returnLocation: state.returnLocation,
   };
@@ -133,7 +133,7 @@ export function enterHomeInterior(state) {
   if (!home.inHome) return { ok: false, reason: 'not_home' };
   if (home.room === 'interior') return { ok: false, reason: 'already_inside' };
   Object.assign(state, home, { room: 'interior' });
-  return { ok: true, tsid: HOME_INTERIOR_TSID, label: 'Your House', hubName: 'Home' };
+  return { ok: true, tsid: HOME_INTERIOR_TSID, label: 'Your House', hubName: 'Homes' };
 }
 
 export function leaveHomeInterior(state) {
@@ -141,7 +141,7 @@ export function leaveHomeInterior(state) {
   if (!home.owned || !home.inHome) return { ok: false, reason: 'not_home' };
   if (home.room !== 'interior') return { ok: false, reason: 'already_outside' };
   Object.assign(state, home, { room: 'street' });
-  return { ok: true, tsid: HOME_STREET_TSID, label: 'Your Home Street', hubName: 'Home' };
+  return { ok: true, tsid: HOME_STREET_TSID, label: 'Your Home Street', hubName: 'Homes' };
 }
 
 export function endHomeVisit(state) {

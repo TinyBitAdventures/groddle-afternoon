@@ -35,8 +35,8 @@ import {
   visitSceneTsid,
 } from '../public/js/neighbours-mp.js?v=g328-4';
 import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-10';
-import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=g375-1';
-import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=g378-1';
+import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=g380-1';
+import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=g380-1';
 import { FEATURES } from '../public/js/features/index.js';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
