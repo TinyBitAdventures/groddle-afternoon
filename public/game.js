@@ -6111,7 +6111,8 @@ function executeVerb(target, verbId) {
     app.canvas.dataset.feedPickerResult = result.ok ? 'success' : 'failed';
   }
   let reactionText = null;
-  if ((result.ok || result.speech?.failed) && result.speech?.text) {
+  const spoke = Boolean((result.ok || result.speech?.failed) && result.speech?.text);
+  if (spoke) {
     showSpeechBubble(target, result.speech);
   } else if (result.ok && SPEECH_REACTION_VERBS.has(baseVerb)) {
     reactionText = result.msgs?.[1] || result.msgs?.[0] || null;
@@ -6123,10 +6124,13 @@ function executeVerb(target, verbId) {
       });
     }
   }
-  // Single feed entry: prefer colorized activityLine; toast first msg once
+  // Single feed entry: prefer colorized activityLine; toast first msg once. A line already in a
+  // speech bubble is not toasted too (Austin 10-28: the bubble, the toast and the feed said it
+  // three times); the feed keeps it as history, as the client's conversation bubble stood alone.
   const feedLine = result.effects?.activityLine || result.msgs?.[0];
   if (feedLine) {
-    toast(result.msgs?.[0] || feedLine, 3200);
+    const toastLine = result.msgs?.[0] || feedLine;
+    if (!spoke && toastLine !== reactionText) toast(toastLine, 3200);
     pushActivity(feedLine);
   }
   (result.msgs || []).forEach((m, i) => {
