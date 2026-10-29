@@ -393,6 +393,10 @@ describe('neighbours across the repos', () => {
     assert.match(readFileSync(sitePath('src/Extension.php'), 'utf8'), /new Neighbours\(\$minn\)/);
     for (const text of ['Could not find their house.', "You can't give out keys because you don't have a house!", 'They already have too many keys on their keyring!', "You've already given out the maximum number of keys for your house.", 'You need to cultivate 3 items.']) assert.ok(php.includes(text), text);
     assert.match(php, /HOUSE_LIMIT = 100/);
+    // The Visiting Stone with nobody opted in says so (the remake's line); a target that fails keeps the source's.
+    assert.match(php, /if \(\$ids === \[\]\) \{\s*throw new RestError\('groddle_home_random_empty', self::TEXT_RANDOM_EMPTY, 404\);/);
+    assert.ok(php.includes("Nobody's taking visitors right now. Try again later."));
+    assert.ok(php.includes("TEXT_RANDOM_NONE = 'Hmm, something went wrong :('"));
     assert.match(php, /PLAYER_LIMIT = 100/);
   });
 
