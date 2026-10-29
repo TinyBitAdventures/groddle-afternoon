@@ -837,7 +837,8 @@ import { denseSprite } from './js/sprite-dense.js?v=g430-1';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g367-1';
-import { forgetTexture, frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
+import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
+import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=g432-1';
 import { cancelAllOverlays, playPoofIn } from './js/overlay-art.js?v=g311-1';
 import * as textureUrls from './js/textures.js';
 import { installPixiFixes } from './js/pixi-fixes.js';
@@ -26215,19 +26216,51 @@ async function main() {
     closePackPopover();
   }, { capture: true });
   if (new URLSearchParams(location.search).has('autostart')) beginGame();
-  document.body.classList.remove('is-booting');
   const bootLoader = document.getElementById('boot-loader');
-  if (bootLoader) bootLoader.hidden = true;
+  /** The loading card goes and the game shows; `fade` when the start card comes in behind it. */
+  const endBoot = ({ fade = false } = {}) => {
+    document.body.classList.remove('is-booting');
+    if (!bootLoader || bootLoader.hidden) return;
+    if (!fade) {
+      bootLoader.hidden = true;
+      return;
+    }
+    bootLoader.classList.add('is-leaving');
+    setTimeout(() => {
+      bootLoader.hidden = true;
+      bootLoader.classList.remove('is-leaving');
+    }, 320);
+  };
+  // BACKDROP (js/start-backdrop.js): the start card waits under the loading card until its street
+  // has drawn. Autostart, a tutorial reload (newxp resumeOnReload) and a started game skip it.
+  const startOverlay = document.getElementById('overlay');
+  const startCardWaits = !state.started && Boolean(startOverlay) && !startOverlay.classList.contains('hidden');
+  if (startCardWaits) startOverlay.classList.add('is-waiting');
+  else endBoot();
 
   let newDayCheckAccum = 0;
   let locSaveAccum = 0;
   let buffTickAccum = 0;
   let skillTickAccum = 0;
   let dametimeTickAccum = 0;
+  // BACKDROP: the street as its camera sees it (view height, front layers, parallax, culled decos
+  // and the blurred layers' tiles), every frame and under the start card too: before 2026-10-29
+  // this ran only after Start, so the card sat over far layers at their unscrolled offsets and
+  // decos never culled in (Austin: "looks almost broken" behind the card on Verdant Green).
+  const drawStreetFrame = () => {
+    // A new street or room may hold the view to its own height (TSMainView smallest layer).
+    if (bgLayer !== viewSceneLayer) syncLocationViewHeight();
+    syncStreetFront();
+    bgLayer?.updateParallax?.(-world.x, -world.y, VIEW_W, LOCATION_VIEW_H, VIEW_H);
+    bgLayer?.cullDecos?.(-world.x, -world.y, VIEW_W, VIEW_H);
+  };
   app.ticker.add((ticker) => {
     syncStreetFront();
     tickAtmosphere();
-    if (!state.started) return;
+    if (!state.started) {
+      drawStreetFrame();
+      return;
+    }
     const dt = Math.min(ticker.deltaTime, 2.5);
     updateCurrentAction((1000 / 60) * dt);
     updateMakeCraft((1000 / 60) * dt);
@@ -26251,11 +26284,7 @@ async function main() {
     updateSpinningWheel();
     features.tick((1000 / 60) * dt, Date.now(), engine);
     releaseHeldScriptedDialog();
-    // A new street or room may hold the view to its own height (TSMainView smallest layer).
-    if (bgLayer !== viewSceneLayer) syncLocationViewHeight();
-    syncStreetFront();
-    bgLayer?.updateParallax?.(-world.x, -world.y, VIEW_W, LOCATION_VIEW_H, VIEW_H);
-    bgLayer?.cullDecos?.(-world.x, -world.y, VIEW_W, VIEW_H);
+    drawStreetFrame();
 
     buffTickAccum += dt;
     if (buffTickAccum >= 24) {
@@ -26366,11 +26395,44 @@ async function main() {
       prompt.visible = false;
     }
   });
+
+  if (startCardWaits) {
+    const t0 = performance.now();
+    const noteBackdrop = (mode) => {
+      if (!app?.canvas) return;
+      app.canvas.dataset.startBackdrop = mode;
+      app.canvas.dataset.startBackdropMs = String(Math.round(performance.now() - t0));
+    };
+    noteBackdrop('waiting');
+    // QA: &backdropcap=<ms> (0 shows the calm backdrop, then the street once drawn).
+    const cap = Number(bootParams.get('backdropcap'));
+    revealStartCard({
+      drawn: whenSceneDrawn({
+        // What the card sits over: the street and its front layers, the shrine, items and avatars.
+        roots: () => [bgLayer, entityLayer, streetFrontLayer],
+        isSettled: (source) => source.destroyed || isLoaded(source) || isFailed(source),
+        whenSettled: (source) => Promise.race([whenLoaded(source).catch(() => {}), new Promise((resolve) => setTimeout(resolve, 15000))]),
+        nextFrame: () => new Promise((resolve) => requestAnimationFrame(() => resolve())),
+      }),
+      show: (mode) => {
+        startOverlay.classList.toggle('is-calm', mode === 'calm');
+        endBoot({ fade: true });
+        requestAnimationFrame(() => startOverlay.classList.remove('is-waiting'));
+        noteBackdrop(mode);
+      },
+      clear: () => {
+        startOverlay.classList.remove('is-calm');
+        noteBackdrop('calm-then-street');
+      },
+      ...(bootParams.has('backdropcap') && Number.isFinite(cap) ? { capMs: Math.max(0, cap) } : {}),
+    });
+  }
 }
 
 main().catch((err) => {
   console.error(err);
   document.body.classList.remove('is-booting');
+  document.getElementById('overlay')?.classList.remove('is-waiting', 'is-calm');
   const bootLoader = document.getElementById('boot-loader');
   const bootTitle = document.getElementById('boot-loader-title');
   const bootCopy = document.getElementById('boot-loader-copy');
