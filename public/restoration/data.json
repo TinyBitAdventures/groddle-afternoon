@@ -2640,9 +2640,19 @@
   ]
  },
  "git": {
-  "commits": 692,
+  "commits": 695,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-28",
+    "kind": "improve",
+    "text": "Street Spirits, their lonely porthole and the tools in your hands draw sharp"
+   },
+   {
+    "date": "2026-10-28",
+    "kind": "improve",
+    "text": "Scenery that streets draw larger than its art is sharp again"
+   },
    {
     "date": "2026-10-28",
     "kind": "fix",
@@ -2752,19 +2762,9 @@
     "date": "2026-10-28",
     "kind": "fix",
     "text": "Each tree plays its own harvest sound again"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "new",
-    "text": "Two dozen item verbs from the original: dice, Alphabet Sauce, the Draught of Wisdom, sniffable cheese and more"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "improve",
-    "text": "Tiny Speck's own rainbows, race countdown, game logos and street overlays play where the original showed them"
    }
   ]
  },
- "tests": 401,
+ "tests": 403,
  "generatedAt": "2026-10-28"
 }

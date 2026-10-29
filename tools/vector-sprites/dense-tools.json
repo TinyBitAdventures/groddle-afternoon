@@ -1,0 +1,25 @@
+{
+ "about": "The Focusing Orb's tool_animation (focusing_orb.swf, CC0) at 4x: features/meditation-feature.js draws its 40 px cells at ORB_HELD_SIZE 52 px, 1.3 world px per texel, so 3 device px per world px needs 3.9. Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/dense-tools.json",
+ "density": 4,
+ "results": "results-dense.json",
+ "module": "js/sprite-dense.js",
+ "jobs": [
+  {
+   "name": "tool-focusing-orb",
+   "swf": "tools/tool_base/focusing_orb/focusing_orb.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/meditation/focusing_orb-tool.png",
+     "fw": 40,
+     "fh": 40,
+     "cols": 16,
+     "frames": 31,
+     "swfStart": 2,
+     "swfCount": 31
+    }
+   ]
+  }
+ ]
+}

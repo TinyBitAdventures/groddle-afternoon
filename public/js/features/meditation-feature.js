@@ -70,6 +70,7 @@ import { energyMax, metabolicGain, moodMax, loseEnergy, loseMood } from '../meta
 import { levitationCards } from '../imagination-effects.js?v=g403-1';
 import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js?v=g403-1';
 import { sourceFromUrl } from '../textures.js';
+import { denseSprite } from '../sprite-dense.js?v=g417-1';
 import { rainbowSound, showRainbow } from '../overlays.js?v=g392-1';
 import { moodScaledXp } from '../mood-xp.js';
 import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
@@ -174,7 +175,11 @@ function publish(engine, force = false) {
 function orbTextures(engine) {
   if (orbFrames) return orbFrames;
   const { PIXI } = engine;
-  const base = sourceFromUrl(ORB_TOOL_SHEET.url);
+  // Held at ORB_HELD_SIZE (52) over 40 px cells: its 4x render (js/sprite-dense.js, one file in the
+  // same grid; js/textures.js reads resolution 4 from the name) when that is 1.5+ device px per texel.
+  const pxPerTexel = (ORB_HELD_SIZE / ORB_TOOL_SHEET.frameW) * (engine.app?.renderer?.resolution || globalThis.devicePixelRatio || 1);
+  const dense = denseSprite(ORB_TOOL_SHEET.url, pxPerTexel);
+  const base = sourceFromUrl(dense?.parts.length === 1 ? dense.parts[0][0] : ORB_TOOL_SHEET.url);
   orbFrames = [];
   for (let i = 0; i < ORB_TOOL_SHEET.frames; i += 1) {
     const col = i % ORB_TOOL_SHEET.cols;

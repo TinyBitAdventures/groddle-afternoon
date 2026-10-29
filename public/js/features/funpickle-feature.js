@@ -37,7 +37,7 @@
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { ITEM_BASE_COSTS } from '../store-catalog.js';
 import { shiftMetabolic } from '../metabolics.js';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g405-1';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g417-1';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { landingY, nearestSurfaceY } from '../walk-surface.js';
 import { STREET_INDEX } from '../street-loader.js';

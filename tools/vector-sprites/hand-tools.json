@@ -1,0 +1,142 @@
+{
+ "about": "In-hand tool animations the game draws beside the avatar (the watering can and Irrigator 9000 while watering, hatchet and Class Axe on wood trees, hoe, High Class Hoe and shovel on patches, Wine of the Dead's pour): each SWF's own tool_animation scene (root timeline, swfStart = the scene's first frame, DefineSceneAndFrameLabelData) at 3x, rendered from a copy with a padded stage (padStage) so art outside the authored stage is kept, as tools/build-make-tool-sheets.py does. The picks are pick-tool@3x.webp / fancy-pick-tool@3x.webp (5224164b). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/hand-tools.json Left out: the Rook Balm (rook-balm-tool.png): its 67 OGA cells are not the 75 frames of potion_rook_balm.swf's tool_animation in order (best placement scores 0.30).",
+ "firstDraw": true,
+ "jobs": [
+  {
+   "name": "tool-watering-can",
+   "swf": "tools/tool_base/watering_can/watering_can.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/tools/watering-can-tool.png",
+     "fw": 91,
+     "fh": 78,
+     "cols": 10,
+     "frames": 30,
+     "swfStart": 2,
+     "swfCount": 30
+    }
+   ]
+  },
+  {
+   "name": "tool-hatchet",
+   "swf": "tools/tool_base/hatchet/hatchet.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/tools/hatchet-tool.png",
+     "fw": 110,
+     "fh": 64,
+     "cols": 8,
+     "frames": 38,
+     "swfStart": 1,
+     "swfCount": 38
+    }
+   ]
+  },
+  {
+   "name": "tool-class-axe",
+   "swf": "tools/hatchet/class_axe/class_axe.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/tools/class-axe-tool.png",
+     "fw": 111,
+     "fh": 65,
+     "cols": 8,
+     "frames": 38,
+     "swfStart": 1,
+     "swfCount": 38
+    }
+   ]
+  },
+  {
+   "name": "tool-irrigator",
+   "swf": "tools/watering_can/irrigator_9000/irrigator_9000.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/making/irrigator_9000-tool.png",
+     "fw": 95,
+     "fh": 76,
+     "cols": 10,
+     "frames": 30,
+     "swfStart": 2,
+     "swfCount": 30
+    }
+   ]
+  },
+  {
+   "name": "tool-hoe",
+   "swf": "tools/tool_base/hoe/hoe.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/soil/hoe-tool.png",
+     "fw": 86,
+     "fh": 58,
+     "cols": 10,
+     "frames": 30,
+     "swfStart": 2,
+     "swfCount": 30
+    }
+   ]
+  },
+  {
+   "name": "tool-high-class-hoe",
+   "swf": "tools/hoe/high_class_hoe/high_class_hoe.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/soil/high-class-hoe-tool.png",
+     "fw": 89,
+     "fh": 55,
+     "cols": 10,
+     "frames": 30,
+     "swfStart": 2,
+     "swfCount": 30
+    }
+   ]
+  },
+  {
+   "name": "tool-shovel",
+   "swf": "tools/tool_base/shovel/shovel.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/soil/shovel-tool.png",
+     "fw": 65,
+     "fh": 82,
+     "cols": 14,
+     "frames": 53,
+     "swfStart": 4,
+     "swfCount": 53
+    }
+   ]
+  },
+  {
+   "name": "tool-wine-of-the-dead",
+   "swf": "misc/wine_of_the_dead/wine_of_the_dead.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/hell/wine_of_the_dead-tool.webp",
+     "fw": 66,
+     "fh": 89,
+     "cols": 15,
+     "frames": 90,
+     "swfStart": 1,
+     "swfCount": 90
+    }
+   ]
+  }
+ ]
+}

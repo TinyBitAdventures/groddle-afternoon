@@ -58,6 +58,7 @@ import { getStreetEcologyCatalog } from '../street-ecology.js?v=official-ecology
 import { graphKey, routeGraph, tsidAliases } from '../map-routes.js?v=lonely-1';
 import { STREET_SPIRIT_VARIANTS, portraitFit, portraitSheet, spiritForStreet } from '../street-spirits.js';
 import { grantMoodXp } from '../mood-xp.js';
+import { denseFrame, denseSprite } from '../sprite-dense.js?v=g417-1';
 import { loadVectorFrames, overlayAlpha, overlayFrameAt, overlayLifeMs, overlayPlacement, trackOverlay } from '../overlay-art.js?v=g311-1';
 import {
   INVITE_ART,
@@ -317,24 +318,82 @@ function inviteMs(now = Date.now()) {
   return now - rt.invite.startAt;
 }
 
-function openInvite(engine, e, now) {
-  const sheets = {};
-  for (const s of ['in', 'loop', 'out']) sheets[s] = portraitSheet(e.variant, e.look, s);
+/** Device px across the porthole canvas (the loneliness_size in CSS px x the density, at most 3). */
+function portholeBackingPx(variant) {
+  const vp = viewport();
+  const box = inviteBox(STREET_SPIRIT_VARIANTS[variant]?.loneliness);
+  return Math.round(box.size * (vp?.scale || 1) * Math.min(3, globalThis.devicePixelRatio || 1));
+}
+
+/**
+ * The porthole's art: the 1x strips, plus their 5x renders (js/sprite-dense.js) when the canvas
+ * draws 1.5+ device px per 1x pixel. A dense sheet is split into parts; each loads on the first
+ * frame that needs it, and the 1x strip stands in until then.
+ */
+function portraitArt(variant, look, sheets) {
+  const fit = portraitFit(variant, look) || 1;
+  const pxPerTexel = portholeBackingPx(variant) / fit;
   const imgs = {};
+  const dense = {};
+  const parts = new Map();
   if (typeof Image !== 'undefined') {
     for (const [s, def] of Object.entries(sheets)) {
       if (!def) continue;
       const img = new Image();
       img.src = def.path;
       imgs[s] = img;
+      dense[s] = denseSprite(def.path, pxPerTexel);
+      // Each clip's first part now (the in clip plays at once, the loop 1 s later).
+      const first = dense[s] && denseFrame(dense[s], 0);
+      if (first) {
+        const p = new Image();
+        p.decoding = 'async';
+        p.src = first.url;
+        parts.set(first.url, p);
+      }
     }
   }
+  return { imgs, dense, parts, pxPerTexel };
+}
+
+/** The loaded image and source rect for frame f of a state: the dense part when it is in, else the 1x strip. */
+function portraitFrame(inv, clip, f) {
+  const def = inv.sheets[clip];
+  const d = inv.art.dense[clip] && denseFrame(inv.art.dense[clip], f);
+  if (d && typeof Image !== 'undefined') {
+    let img = inv.art.parts.get(d.url);
+    if (!img) {
+      img = new Image();
+      img.decoding = 'async';
+      img.src = d.url;
+      inv.art.parts.set(d.url, img);
+      // The next part too, so the loop never waits on a load.
+      const part = inv.art.dense[clip].parts.find(([u]) => u === d.url);
+      const next = part && denseFrame(inv.art.dense[clip], part[1] + part[2]);
+      if (next && !inv.art.parts.has(next.url)) {
+        const n = new Image();
+        n.decoding = 'async';
+        n.src = next.url;
+        inv.art.parts.set(next.url, n);
+      }
+    }
+    if (img.complete && img.naturalWidth) return { img, sx: d.x, sy: d.y, sw: d.w, sh: d.h, density: inv.art.dense[clip].density };
+  }
+  const img = inv.art.imgs[clip];
+  if (!def || !img?.complete || !img.naturalWidth) return null;
+  return { img, sx: (f % def.cols) * def.fw, sy: Math.floor(f / def.cols) * def.fh, sw: def.fw, sh: def.fh, density: 1 };
+}
+
+function openInvite(engine, e, now) {
+  const sheets = {};
+  for (const s of ['in', 'loop', 'out']) sheets[s] = portraitSheet(e.variant, e.look, s);
+  const art = portraitArt(e.variant, e.look, sheets);
   rt.invite = {
     startAt: now,
     variant: e.variant,
     look: e.look,
     sheets,
-    imgs,
+    art,
     text: inviteText(e.option, playerName(engine), e.label),
     hold: engine.param('lonelyhold') === 'invite',
   };
@@ -383,28 +442,31 @@ function drawInvite(now) {
   node.hidden = false;
   // The porthole: art_w = art_h = size; centre at vp_w - size/2 - x, size/2 + y.
   const size = box.size * k;
-  const pxRatio = Math.min(2, globalThis.devicePixelRatio || 1);
+  // Up to 3 device px per CSS px: the 5x art fills a DPR 3 screen (Austin 10-28: it was blurry).
+  const pxRatio = Math.min(3, globalThis.devicePixelRatio || 1);
   canvas.width = Math.round(size * pxRatio);
   canvas.height = Math.round(size * pxRatio);
   Object.assign(canvas.style, { left: `${vp.width - size - box.x * k}px`, top: `${box.y * k}px` });
   canvas.style.setProperty('--lw', `${size}px`);
   canvas.style.setProperty('--lh', `${size}px`);
   const def = inv.sheets[clip];
-  const img = inv.imgs[clip];
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (def && img?.complete && img.naturalWidth) {
+  if (def) {
     const start = clip === 'in' ? 0 : clip === 'loop' ? LONELY_RULES.loopAtMs : LONELY_RULES.outAtMs;
     let f = Math.floor(((ms - start) * def.fps) / 1000);
     f = clip === 'loop' ? f % def.frames : Math.min(def.frames - 1, Math.max(0, f));
-    const sx = (f % def.cols) * def.fw;
-    const sy = Math.floor(f / def.cols) * def.fh;
-    // ItemIconView fits the art to wh: one scale for all three clips, centred.
-    const fit = portraitFit(inv.variant, inv.look) || def.fw;
-    const s = (canvas.width / fit);
-    const w = def.fw * s;
-    const h = def.fh * s;
-    ctx.drawImage(img, sx, sy, def.fw, def.fh, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+    const src = portraitFrame(inv, clip, f);
+    if (src) {
+      // ItemIconView fits the art to wh: one scale for all three clips, centred.
+      const fit = portraitFit(inv.variant, inv.look) || def.fw;
+      const s = (canvas.width / fit);
+      const w = def.fw * s;
+      const h = def.fh * s;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(src.img, src.sx, src.sy, src.sw, src.sh, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+      canvas.dataset.density = String(src.density);
+    }
   }
   // The bubble (loneliness_quest_bubble_overlay: 255 x 111 stage fitted to 250). Its width and the
   // bottom edge, where the tail points at the porthole, are the source's; its height fits the plea
