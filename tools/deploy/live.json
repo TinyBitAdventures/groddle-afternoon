@@ -1,8 +1,8 @@
 {
   "note": "What groddleafternoon.com runs. Edit before a deploy (tools/deploy/kinsta.sh reads it), commit after. The server's version is on the VPS's /healthz.",
   "deployed": "2026-10-29",
-  "game": "v0.4.1",
-  "site": "v0.4.1",
+  "game": "v0.4.2",
+  "site": "v0.4.2",
   "server": "v0.4.0",
   "engine": "707b59e3858394e3d3975a3fb7e26ea958291e47",
   "minnAdmin": "43c7a9911b1aec9b97ba00c90daae0c427adeac9"
