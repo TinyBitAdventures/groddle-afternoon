@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } from '../public/js/sprite-hires.js?v=g446-4';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } from '../public/js/sprite-hires.js?v=g448-4';
 import { fruitState } from '../tools/vector-sprites/trant-states.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -45,14 +45,34 @@ describe('3x harvestables', () => {
     }
   });
 
-  it('built sheets meet the 0.9 bar and swap on first draw (only drawn trees pay for 3x)', () => {
+  it('built sheets meet the 0.9 bar (or their job\'s own, explained, never under 0.88) and swap on first draw (only drawn trees pay for 3x)', () => {
     assert.equal(manifest.minScore, 0.9);
-    for (const { sheet } of sheets) {
+    for (const { job, sheet } of sheets) {
       const r = results[sheet.path];
+      if (job.minScore != null) {
+        assert.ok(job.minScore >= 0.88, job.name);
+        assert.match(job.minScoreWhy || '', /\S.{40}/, `${job.name} says why`);
+      }
       if (r?.status !== 'ok') continue;
-      assert.ok(r.score >= 0.9, `${sheet.path} ${r.score}`);
+      assert.ok(r.score >= (job.minScore ?? 0.9), `${sheet.path} ${r.score}`);
+      assert.ok(r.minFrame >= 0.8 && r.drift.length === 0, `${sheet.path} ${r.minFrame}`);
       assert.ok(FIRST_DRAW_SPRITES.has(sheet.path), sheet.path);
     }
+  });
+
+  it('G448: the ice knobs, the Dust Trap and all 32 Firefly Jar sheets are sharp', () => {
+    const paths = [
+      ...[1, 2, 3, 4].map((k) => `assets/sprites/resources/ice-knob-knob${k}.png`),
+      ...['idle', 'smack-down', 'down', 'up'].map((s) => `assets/sprites/resources/dust-trap-${s}.png`),
+      ...Array.from({ length: 8 }, (_, n) => ['closed', 'opening', 'open', 'closing'].map((s) => `assets/sprites/resources/firefly-jar-${n}-${s}.png`)).flat(),
+    ];
+    assert.equal(paths.length, 40);
+    for (const path of paths) {
+      assert.equal(results[path]?.status, 'ok', path);
+      assert.ok(HIRES_SPRITES.has(path) && FIRST_DRAW_SPRITES.has(path), path);
+    }
+    // Only the ice knobs take the lower bar.
+    assert.deepEqual(manifest.jobs.filter((j) => j.minScore != null).map((j) => j.name), ['ice-knob-knob1', 'ice-knob-knob2', 'ice-knob-knob3', 'ice-knob-knob4']);
   });
 
   it('trant stills are one cell each, pinned to the health-10 frame of their maturity clip', () => {

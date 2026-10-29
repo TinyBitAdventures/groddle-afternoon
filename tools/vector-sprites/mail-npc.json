@@ -1,5 +1,5 @@
 {
- "about": "The Mail Dispatcher (G.I.G.P.D.S.) on the home street (js/features/mail-courier-feature.js, js/mail-npc-art.js DISPATCHER_ART): tools/mail-npc-art/build.mjs renders glitch-items misc/npc/npc_mail_dispatcher/npc_mail_dispatcher.swf (CC0) sprite 28 (dispatcherLeft) at the item's 1.135 scale into one 1x sheet, 116 cells of 118x211 from the idle label on; that sheet drew soft once the 960 px view was zoomed to the window. Here the same sprite renders at zoom 3.405 (3 x 1.135), so the 3x parts are exactly 3x the 1x cells, and swap in when the station is first drawn. The 3x as one file would be 4248x6330 (107 MB decoded), so it ships as parts. Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/mail-npc.json The Mailbox beside it (homes-feature.js spawnStreetTargets, game.js; the OGA npc_mailbox mailboxRight idle and has_mail_idle stills, 97x146) is glitch-items misc/npc/npc_mailbox/npc_mailbox.swf sprite 81 (mailboxRight; sprite 28 is mailboxLeft), frames 1 and 2.",
+ "about": "The Mail Dispatcher (G.I.G.P.D.S.) on the home street (js/features/mail-courier-feature.js, js/mail-npc-art.js DISPATCHER_ART): tools/mail-npc-art/build.mjs renders glitch-items misc/npc/npc_mail_dispatcher/npc_mail_dispatcher.swf (CC0) sprite 28 (dispatcherLeft) at the item's 1.135 scale into one 1x sheet, 116 cells of 118x211 from the idle label on; that sheet drew soft once the 960 px view was zoomed to the window. Here the same sprite renders at zoom 3.405 (3 x 1.135), so the 3x parts are exactly 3x the 1x cells, and swap in when the station is first drawn. The 3x as one file would be 4248x6330 (107 MB decoded), so it ships as parts. Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/mail-npc.json The Mailbox beside it (homes-feature.js spawnStreetTargets, game.js; the OGA npc_mailbox mailboxRight idle and has_mail_idle stills, 97x146) is glitch-items misc/npc/npc_mailbox/npc_mailbox.swf sprite 81 (mailboxRight; sprite 28 is mailboxLeft), frames 1 and 2. G448: the AFLC Frog (npc_yoga_frog.swf, CC0) in its 28 sheets. With the parcel (frog_blue_box_*, the OGA sheets): the root timeline (sprite 0), which places namasteFrogContainer (frogBlue, sprite 108) and boxContainer (box, sprite 112); all three share one 266-frame layout, so each sheet pins its root frames (swfStart/swfCount, from frogBlue's labels) and the nested clips play in step. Without it (frog_blue_none_*, built from frogBlue): sprite 108 and its labels. Both swap to 3x only when first drawn: the courier preloads every label (mail-courier-feature.js frogFrames) and only the clips it plays pay for 3x.",
  "firstDraw": true,
  "webp": true,
  "budget": {
@@ -43,6 +43,288 @@
      "fh": 146,
      "cols": 1,
      "frames": 1
+    }
+   ]
+  },
+  {
+   "name": "frog-blue-box",
+   "character": "aflc-frog",
+   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_box_idle.png",
+     "swfStart": 2,
+     "swfCount": 48,
+     "fw": 108,
+     "fh": 94,
+     "cols": 8,
+     "frames": 48,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_box_moveStart.png",
+     "swfStart": 50,
+     "swfCount": 5,
+     "fw": 108,
+     "fh": 94,
+     "cols": 5,
+     "frames": 5,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_box_move.png",
+     "swfStart": 55,
+     "swfCount": 24,
+     "fw": 108,
+     "fh": 94,
+     "cols": 8,
+     "frames": 24,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_box_moveEnd.png",
+     "swfStart": 79,
+     "swfCount": 5,
+     "fw": 108,
+     "fh": 94,
+     "cols": 5,
+     "frames": 5,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_box_talk.png",
+     "swfStart": 84,
+     "swfCount": 62,
+     "fw": 108,
+     "fh": 94,
+     "cols": 9,
+     "frames": 62,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_box_treePoseIn.png",
+     "swfStart": 146,
+     "swfCount": 22,
+     "fw": 108,
+     "fh": 94,
+     "cols": 8,
+     "frames": 22,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_box_treePose.png",
+     "swfStart": 168,
+     "swfCount": 6,
+     "fw": 108,
+     "fh": 94,
+     "cols": 6,
+     "frames": 6,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_box_treePoseOut.png",
+     "swfStart": 174,
+     "swfCount": 19,
+     "fw": 108,
+     "fh": 94,
+     "cols": 7,
+     "frames": 19,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_box_dancerPoseIn.png",
+     "swfStart": 193,
+     "swfCount": 20,
+     "fw": 108,
+     "fh": 94,
+     "cols": 7,
+     "frames": 20,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_box_dancerPose.png",
+     "swfStart": 213,
+     "swfCount": 6,
+     "fw": 108,
+     "fh": 94,
+     "cols": 6,
+     "frames": 6,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_box_dancerPoseOut.png",
+     "swfStart": 219,
+     "swfCount": 8,
+     "fw": 108,
+     "fh": 94,
+     "cols": 8,
+     "frames": 8,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_box_warriorPoseIn.png",
+     "swfStart": 227,
+     "swfCount": 23,
+     "fw": 108,
+     "fh": 94,
+     "cols": 8,
+     "frames": 23,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_box_warriorPose.png",
+     "swfStart": 250,
+     "swfCount": 6,
+     "fw": 108,
+     "fh": 94,
+     "cols": 6,
+     "frames": 6,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_box_warriorPoseOut.png",
+     "swfStart": 256,
+     "swfCount": 11,
+     "fw": 108,
+     "fh": 94,
+     "cols": 6,
+     "frames": 11,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "frog-blue-none",
+   "character": "aflc-frog",
+   "swf": "inhabitants/yoga_frog/npc_yoga_frog.swf",
+   "sprite": 108,
+   "sheets": [
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_none_idle.png",
+     "label": "idle",
+     "fw": 108,
+     "fh": 94,
+     "cols": 8,
+     "frames": 48,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_none_moveStart.png",
+     "label": "moveStart",
+     "fw": 108,
+     "fh": 94,
+     "cols": 5,
+     "frames": 5,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_none_move.png",
+     "label": "move",
+     "fw": 108,
+     "fh": 94,
+     "cols": 8,
+     "frames": 24,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_none_moveEnd.png",
+     "label": "moveEnd",
+     "fw": 108,
+     "fh": 94,
+     "cols": 5,
+     "frames": 5,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_none_talk.png",
+     "label": "talk",
+     "fw": 108,
+     "fh": 94,
+     "cols": 9,
+     "frames": 62,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_none_treePoseIn.png",
+     "label": "treePoseIn",
+     "fw": 108,
+     "fh": 94,
+     "cols": 8,
+     "frames": 22,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_none_treePose.png",
+     "label": "treePose",
+     "fw": 108,
+     "fh": 94,
+     "cols": 6,
+     "frames": 6,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_none_treePoseOut.png",
+     "label": "treePoseOut",
+     "fw": 108,
+     "fh": 94,
+     "cols": 7,
+     "frames": 19,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_none_dancerPoseIn.png",
+     "label": "dancerPoseIn",
+     "fw": 108,
+     "fh": 94,
+     "cols": 7,
+     "frames": 20,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_none_dancerPose.png",
+     "label": "dancerPose",
+     "fw": 108,
+     "fh": 94,
+     "cols": 6,
+     "frames": 6,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_none_dancerPoseOut.png",
+     "label": "dancerPoseOut",
+     "fw": 108,
+     "fh": 94,
+     "cols": 8,
+     "frames": 8,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_none_warriorPoseIn.png",
+     "label": "warriorPoseIn",
+     "fw": 108,
+     "fh": 94,
+     "cols": 8,
+     "frames": 23,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_none_warriorPose.png",
+     "label": "warriorPose",
+     "fw": 108,
+     "fh": 94,
+     "cols": 6,
+     "frames": 6,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/mail-npc/frog_blue_none_warriorPoseOut.png",
+     "label": "warriorPoseOut",
+     "fw": 108,
+     "fh": 94,
+     "cols": 6,
+     "frames": 11,
+     "mirror": false
     }
    ]
   }

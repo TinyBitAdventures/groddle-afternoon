@@ -49,6 +49,9 @@
  *    with multiply/overlay/hard-light blend modes (svg-raster.mjs).
  *  - sheet "frameList": [n, ...] gives each cell's SWF frame (the barnacle
  *    and ice sheets skip the "bigger" state).
+ *  - job "minScore" (with a "minScoreWhy") replaces the manifest's bar for
+ *    that job, never under SHEET_MIN: art whose 1x frames are hairline-thin
+ *    (the ice knobs' snowflakes) scores low on antialiasing alone.
  *  - job "sprite": 0 renders the root timeline (FFDec frame export).
  *  - sheet "swfStart" (+ "swfCount") pins the SWF frame when the sheet has
  *    no FrameLabel (a still picked by state, e.g. trant health 10).
@@ -446,9 +449,12 @@ function buildSheet(job, sheet, labels, frameDir) {
     ...(frames.some((f) => f.empty) ? { emptyFrames: frames.filter((f) => f.empty).length } : {}),
     faintMin: +faintMin.toFixed(4),
     drift: drift.map((f) => ({ k: f.k, ...f.ownBest })),
+    ...(job.minScore != null ? { minScore: Math.max(SHEET_MIN, job.minScore) } : {}),
   };
   const reasons = [];
-  if (mean < sheetMin) reasons.push(`mean score ${mean.toFixed(3)} < ${sheetMin}`);
+  // A job's own "minScore" (with its "minScoreWhy") may stand in for the manifest's, never under SHEET_MIN.
+  const bar = job.minScore != null ? Math.max(SHEET_MIN, job.minScore) : sheetMin;
+  if (mean < bar) reasons.push(`mean score ${mean.toFixed(3)} < ${bar}`);
   if (min < FRAME_MIN) reasons.push(`frame ${solid.find((f) => f.score === min).k} score ${min.toFixed(3)} < ${FRAME_MIN}`);
   if (faintMin < FAINT_MIN) reasons.push(`faint frame score ${faintMin.toFixed(3)} < ${FAINT_MIN}`);
   if (drift.length) reasons.push(`${drift.length} frame(s) prefer another offset`);

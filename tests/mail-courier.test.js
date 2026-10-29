@@ -214,6 +214,25 @@ describe('mail npc art (tools/mail-npc-art/build.mjs)', () => {
     // The built frog lines up with Tiny Speck's own renders.
     for (const fit of Object.values(FROG_ART.redFit)) assert.ok(fit >= 0.8);
   });
+
+  it('G448: the frog\'s 28 sheets have 3x renders from npc_yoga_frog.swf that swap in on first draw', async () => {
+    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=g448-4');
+    const results = JSON.parse(readFileSync(join(root, 'tools/vector-sprites/results.json'), 'utf8'));
+    let n = 0;
+    for (const label of Object.keys(FROG_ART.sheets)) {
+      for (const kind of ['box', 'none']) {
+        const path = `${MAIL_NPC_ART_DIR}${FROG_ART.files[kind]}${label}.png`.replace(/^.*?(assets\/)/, '$1');
+        const r = results[path];
+        assert.equal(r?.status, 'ok', path);
+        assert.ok(r.score >= 0.9 && r.minFrame >= 0.8 && r.drift.length === 0, `${path} ${r.score}`);
+        assert.ok(HIRES_SPRITES.has(path) && FIRST_DRAW_SPRITES.has(path), path);
+        assert.match(hiresSpriteUrl(path), /@3x\.webp$/, path);
+        assert.ok(existsSync(join(pub, r.hires)), r.hires);
+        n += 1;
+      }
+    }
+    assert.equal(n, 28);
+  });
 });
 
 describe('mail courier feature', () => {

@@ -2665,9 +2665,14 @@
   ]
  },
  "git": {
-  "commits": 748,
+  "commits": 749,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "improve",
+    "text": "Furniture styles and the potion clouds draw sharp on Retina"
+   },
    {
     "date": "2026-10-29",
     "kind": "improve",
@@ -2782,11 +2787,6 @@
     "date": "2026-10-29",
     "kind": "new",
     "text": "Fathom analytics on the static game pages, added at deploy"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "The street behind the start card is fully drawn, and the card fades in over it"
    }
   ]
  },

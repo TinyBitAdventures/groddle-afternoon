@@ -1349,7 +1349,9 @@
       5
      ]
     }
-   ]
+   ],
+   "minScore": 0.88,
+   "minScoreWhy": "G448: the snowflake frames (scrape_state 2 and 3) are hairline crystals whose 1x antialiasing differs from a 3:1 box downscale pixel by pixel (0.82-0.88); the placement is exact (no frame prefers another offset, each cell matches its frame 0.82-0.88 against at most 0.56 for any other), alpha mass and luminance agree within 7% and 0.02, and after a 3x3 blur of both every cell scores 0.91-0.97"
   },
   {
    "name": "ice-knob-knob2",
@@ -1371,7 +1373,9 @@
       5
      ]
     }
-   ]
+   ],
+   "minScore": 0.88,
+   "minScoreWhy": "G448: the snowflake frames (scrape_state 2 and 3) are hairline crystals whose 1x antialiasing differs from a 3:1 box downscale pixel by pixel (0.82-0.88); the placement is exact (no frame prefers another offset, each cell matches its frame 0.82-0.88 against at most 0.56 for any other), alpha mass and luminance agree within 7% and 0.02, and after a 3x3 blur of both every cell scores 0.91-0.97"
   },
   {
    "name": "ice-knob-knob3",
@@ -1393,7 +1397,9 @@
       5
      ]
     }
-   ]
+   ],
+   "minScore": 0.88,
+   "minScoreWhy": "G448: the snowflake frames (scrape_state 2 and 3) are hairline crystals whose 1x antialiasing differs from a 3:1 box downscale pixel by pixel (0.82-0.88); the placement is exact (no frame prefers another offset, each cell matches its frame 0.82-0.88 against at most 0.56 for any other), alpha mass and luminance agree within 7% and 0.02, and after a 3x3 blur of both every cell scores 0.91-0.97"
   },
   {
    "name": "ice-knob-knob4",
@@ -1414,6 +1420,472 @@
       3,
       5
      ]
+    }
+   ],
+   "minScore": 0.88,
+   "minScoreWhy": "G448: the snowflake frames (scrape_state 2 and 3) are hairline crystals whose 1x antialiasing differs from a 3:1 box downscale pixel by pixel (0.82-0.88); the placement is exact (no frame prefers another offset, each cell matches its frame 0.82-0.88 against at most 0.56 for any other), alpha mass and luminance agree within 7% and 0.02, and after a 3x3 blur of both every cell scores 0.91-0.97"
+  },
+  {
+   "name": "dust-trap",
+   "swf": "misc/dust_trap/dust_trap.swf",
+   "sprite": 93,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/dust-trap-idle.png",
+     "label": "idle",
+     "fw": 110,
+     "fh": 255,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/dust-trap-smack-down.png",
+     "label": "smackDown",
+     "fw": 110,
+     "fh": 255,
+     "cols": 9,
+     "frames": 45,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/dust-trap-down.png",
+     "label": "down",
+     "fw": 110,
+     "fh": 255,
+     "cols": 1,
+     "frames": 1,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/dust-trap-up.png",
+     "label": "up",
+     "fw": 110,
+     "fh": 255,
+     "cols": 8,
+     "frames": 16,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "firefly-jar-0",
+   "character": "firefly-jar",
+   "swf": "misc/firefly_jar/firefly_jar.swf",
+   "sprite": 19,
+   "zoom": 2.17,
+   "parts": {
+    "flies_7": "flies_0"
+   },
+   "record": {
+    "clips": [
+     "flies_0"
+    ]
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/firefly-jar-0-closed.png",
+     "label": "closed",
+     "fw": 54,
+     "fh": 87,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-0-opening.png",
+     "label": "opening",
+     "fw": 54,
+     "fh": 87,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-0-open.png",
+     "label": "open",
+     "fw": 54,
+     "fh": 87,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-0-closing.png",
+     "label": "closing",
+     "fw": 54,
+     "fh": 87,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "firefly-jar-1",
+   "character": "firefly-jar",
+   "swf": "misc/firefly_jar/firefly_jar.swf",
+   "sprite": 19,
+   "zoom": 2.17,
+   "parts": {
+    "flies_7": "flies_1"
+   },
+   "record": {
+    "clips": [
+     "flies_1"
+    ]
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/firefly-jar-1-closed.png",
+     "label": "closed",
+     "fw": 54,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-1-opening.png",
+     "label": "opening",
+     "fw": 54,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-1-open.png",
+     "label": "open",
+     "fw": 54,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-1-closing.png",
+     "label": "closing",
+     "fw": 54,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "firefly-jar-2",
+   "character": "firefly-jar",
+   "swf": "misc/firefly_jar/firefly_jar.swf",
+   "sprite": 19,
+   "zoom": 2.17,
+   "parts": {
+    "flies_7": "flies_2"
+   },
+   "record": {
+    "clips": [
+     "flies_2"
+    ]
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/firefly-jar-2-closed.png",
+     "label": "closed",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-2-opening.png",
+     "label": "opening",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-2-open.png",
+     "label": "open",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-2-closing.png",
+     "label": "closing",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "firefly-jar-3",
+   "character": "firefly-jar",
+   "swf": "misc/firefly_jar/firefly_jar.swf",
+   "sprite": 19,
+   "zoom": 2.17,
+   "parts": {
+    "flies_7": "flies_3"
+   },
+   "record": {
+    "clips": [
+     "flies_3"
+    ]
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/firefly-jar-3-closed.png",
+     "label": "closed",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-3-opening.png",
+     "label": "opening",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-3-open.png",
+     "label": "open",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-3-closing.png",
+     "label": "closing",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "firefly-jar-4",
+   "character": "firefly-jar",
+   "swf": "misc/firefly_jar/firefly_jar.swf",
+   "sprite": 19,
+   "zoom": 2.17,
+   "parts": {
+    "flies_7": "flies_4"
+   },
+   "record": {
+    "clips": [
+     "flies_4"
+    ]
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/firefly-jar-4-closed.png",
+     "label": "closed",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-4-opening.png",
+     "label": "opening",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-4-open.png",
+     "label": "open",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-4-closing.png",
+     "label": "closing",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "firefly-jar-5",
+   "character": "firefly-jar",
+   "swf": "misc/firefly_jar/firefly_jar.swf",
+   "sprite": 19,
+   "zoom": 2.17,
+   "parts": {
+    "flies_7": "flies_5"
+   },
+   "record": {
+    "clips": [
+     "flies_5"
+    ]
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/firefly-jar-5-closed.png",
+     "label": "closed",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-5-opening.png",
+     "label": "opening",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-5-open.png",
+     "label": "open",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-5-closing.png",
+     "label": "closing",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "firefly-jar-6",
+   "character": "firefly-jar",
+   "swf": "misc/firefly_jar/firefly_jar.swf",
+   "sprite": 19,
+   "zoom": 2.17,
+   "parts": {
+    "flies_7": "flies_6"
+   },
+   "record": {
+    "clips": [
+     "flies_6"
+    ]
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/firefly-jar-6-closed.png",
+     "label": "closed",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-6-opening.png",
+     "label": "opening",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-6-open.png",
+     "label": "open",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-6-closing.png",
+     "label": "closing",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "firefly-jar-7",
+   "character": "firefly-jar",
+   "swf": "misc/firefly_jar/firefly_jar.swf",
+   "sprite": 19,
+   "zoom": 2.17,
+   "record": {
+    "clips": [
+     "flies_7"
+    ]
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/firefly-jar-7-closed.png",
+     "label": "closed",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-7-opening.png",
+     "label": "opening",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-7-open.png",
+     "label": "open",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
+    },
+    {
+     "path": "assets/sprites/resources/firefly-jar-7-closing.png",
+     "label": "closing",
+     "fw": 55,
+     "fh": 88,
+     "cols": 15,
+     "frames": 15,
+     "mirror": false
     }
    ]
   },
