@@ -37,13 +37,13 @@ import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=g403
 import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=g403-1';
 import { setSeasonalRecipeCheck } from '../making.js?v=g403-1';
 import { getToolCondition } from '../tools.js?v=woodcutting-test-8';
-import { landingY, nearestSurfaceY } from '../walk-surface.js';
+import { landingY, nearestSurfaceY } from '../walk-surface.js?v=g442-6';
 import { isBatterflyHabitat } from '../animal-husbandry.js?v=g414-1';
 import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
 import { rollDropTable } from '../drop-tables.js';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=note-g175';
 import { payDrop } from './drops-feature.js?v=drops-8';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=g430-1';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=g442-6';
 import { SEASON_DATA } from '../seasons-data.js';
 import {
   CANDY_CLASSES,

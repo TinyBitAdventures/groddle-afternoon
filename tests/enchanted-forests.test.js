@@ -9,7 +9,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry, platformsScreen } from '../public/js/street-model.js';
+import { assertStreetGeometry, platformsScreen } from '../public/js/street-model.js?v=g442-6';
 import {
   ENCHANTED_FORESTS,
   ENCHANTED_MUSIC,
@@ -38,9 +38,9 @@ import {
   woodTreeStatusLabel,
 } from '../public/js/woodcutting.js?v=g414-1';
 import { noteWoodTreeCare } from '../public/js/patches.js?v=g414-1';
-import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=g414-1';
-import { enchantedForestFeature, floorScreenY, hollowTrees, treeSpots } from '../public/js/features/enchanted-forest-feature.js?v=g414-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-268';
+import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=g442-6';
+import { enchantedForestFeature, floorScreenY, hollowTrees, treeSpots } from '../public/js/features/enchanted-forest-feature.js?v=g442-6';
+import { FEATURES } from '../public/js/features/index.js?v=registry-270';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

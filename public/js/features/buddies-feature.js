@@ -33,7 +33,7 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
-import { STREET_INDEX } from '../street-loader.js';
+import { STREET_INDEX } from '../street-loader.js?v=g442-6';
 import {
   BUDDY_COUNTER,
   BUDDY_TEXT,

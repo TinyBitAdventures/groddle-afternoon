@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-268';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-270';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g434-1';
@@ -556,7 +556,7 @@ import {
   availableStreetTsids,
   ensureStreetIndex,
   resolveIndexTsid,
-} from './js/street-loader.js';
+} from './js/street-loader.js?v=g442-6';
 import {
   ladderTopDeck,
   resolveGround as resolveStreetGround,
@@ -571,7 +571,7 @@ import {
   buriedSignpostUnder,
   headCeiling,
   isStandable,
-} from './js/street-model.js';
+} from './js/street-model.js?v=g442-6';
 import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=g422-1';
 import {
   buildStreetView,
@@ -581,7 +581,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=g435-1';
+} from './js/street-render.js?v=g442-6';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -668,10 +668,10 @@ import {
   planTravel,
   listMapDestinations,
   planSignpostTravel,
-} from './js/travel.js';
+} from './js/travel.js?v=g442-6';
 import { facingScaleX, facingFromVelocity } from './js/avatar.js';
 import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js';
-import { landingY } from './js/walk-surface.js';
+import { landingY } from './js/walk-surface.js?v=g442-6';
 import { holdCloseToFloor, stickToSlope } from './js/slope-walk.js?v=g411-1';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=g421-1';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js';
@@ -805,7 +805,7 @@ import {
   listHubsFromIndex,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
-} from './js/map-graph.js';
+} from './js/map-graph.js?v=g442-6';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=g396-1';
 import {
   loadStreetEcologyCatalog,
@@ -1510,7 +1510,7 @@ let verbAnimationAlreadyStarted = false;
 /** @type {any|null} official tool sprite attached to the current timed verb. */
 let actionToolFx = null;
 
-/** @type {import('./js/street-model.js').StreetData|null} */
+/** @type {import('./js/street-model.js?v=g442-6').StreetData|null} */
 let currentStreet = null;
 /** Camera Mode offset from the avatar, in world pixels (engine.setCameraLook). */
 const cameraLook = { x: 0, y: 0 };

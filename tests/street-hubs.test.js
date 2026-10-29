@@ -15,7 +15,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 
-import { convertLocationXml } from '../public/js/location-xml.js';
+import { convertLocationXml } from '../public/js/location-xml.js?v=g442-6';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const LOCATIONS = join(ROOT, '../streets/mnt/stos/location_data');

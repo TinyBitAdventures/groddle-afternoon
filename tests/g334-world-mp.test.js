@@ -31,11 +31,11 @@ import { HELP_DIG_COUNTER, HELP_DIG_LABEL, digHelpFrom, helpDigMessage, othersDi
 import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, creditedMultiplayerQuests, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=g358-1';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=g414-1';
 import { isPoisoned, TREE_ANTIDOTE, TREE_POISON, BOTANY_SKILL } from '../public/js/tree-poison.js';
-import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=g414-1';
-import { patchesFeature } from '../public/js/features/patches-feature.js?v=g414-1';
+import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=g442-6';
+import { patchesFeature } from '../public/js/features/patches-feature.js?v=g442-6';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=g414-1';
 import { helpMineFeature } from '../public/js/features/help-mine-feature.js?v=g403-1';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=g430-1';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=g442-6';
 
 // ---------------------------------------------------------------------------
 // Pure helpers

@@ -49,7 +49,7 @@ import { setToolRemaining, TOOL_CONDITION_CATALOG } from '../tools.js?v=woodcutt
 import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husbandry.js?v=g414-1';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g430-1';
 import { sourceFromUrl, frameTexture } from '../textures.js';
-import { landingY, walkSurfaceY } from '../walk-surface.js';
+import { landingY, walkSurfaceY } from '../walk-surface.js?v=g442-6';
 import { overlayOrStandIn } from '../overlay-stand-in.js?v=g391-1';
 import {
   BUNDLE_OF_JOY,

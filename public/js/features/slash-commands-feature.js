@@ -29,14 +29,14 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=butler-9';
-import { butlerApi } from './butler-feature.js?v=g435-1';
+import { butlerApi } from './butler-feature.js?v=g442-6';
 import { hellFeature } from './hell-feature.js?v=hell-16';
 import { towerApi } from './home-tower-feature.js?v=g435-1';
 import { slashPlan, unknownLine } from '../slash-commands.js?v=g249-1';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=g406-1';
 import { minnUrls } from '../minn-account.js?v=nbhome-10';
 import { saveStore } from '../save-store.js?v=mp2-2';
-import { STREET_INDEX } from '../street-loader.js';
+import { STREET_INDEX } from '../street-loader.js?v=g442-6';
 
 export const SLASH_COMMANDS_FEATURE_ID = 'slash-commands';
 

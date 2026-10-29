@@ -55,7 +55,7 @@ import {
   tickCrowns,
 } from '../game-of-crowns.js?v=crowns-2';
 import { RACE_RIVALS } from '../races.js?v=races-4';
-import { wallsScreen } from '../street-model.js';
+import { wallsScreen } from '../street-model.js?v=g442-6';
 import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';

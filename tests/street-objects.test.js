@@ -40,12 +40,12 @@ import {
   treeSkill,
 } from '../public/js/street-objects.js?v=g414-1';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=g414-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-268';
+import { FEATURES } from '../public/js/features/index.js?v=registry-270';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=g403-1';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=g414-1';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=trant-harvest-2';
 import { placementRequests, ruleTables, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=g442-6';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 

@@ -35,7 +35,7 @@
  */
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g430-1';
-import { nearestSurfaceY } from '../walk-surface.js';
+import { nearestSurfaceY } from '../walk-surface.js?v=g442-6';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-8';
@@ -69,6 +69,7 @@ import {
   closeMailboxView,
   createMailboxView,
   editNote,
+  clearOfDoors,
   fixedFurniturePoints,
   furniturePlacementGroups,
   furnitureFor,
@@ -93,7 +94,7 @@ import {
   streetNoteSeeds,
   takePinnedNote,
   writePaperNote,
-} from '../street-furniture.js?v=furniture-g175';
+} from '../street-furniture.js?v=g442-6';
 import {
   CHORES,
   NEIGHBOURS,
@@ -116,8 +117,8 @@ import {
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=neighbours-4';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=note-g175';
 import { textureFromUrl } from '../textures.js';
-import { butlerApi } from './butler-feature.js?v=g435-1';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=g435-1';
+import { butlerApi } from './butler-feature.js?v=g442-6';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=g442-6';
 import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';
@@ -1183,9 +1184,15 @@ function spawnStreet(engine, row) {
   currentRow = row;
   const groups = FURNITURE_GROUPS;
   const at = (classTsid) => fixedFurniturePoints(row, classTsid) || engine.placement(groups[classTsid].key) || [];
-  (at('npc_mailbox')).forEach((p) => buildMailbox(engine, p.x, p.y));
-  (at('visiting_stone')).forEach((p, i) => buildStone(engine, p.x, p.y, i));
-  (at('bag_notice_board')).forEach((p, i) => buildBoard(engine, p.x, p.y, i));
+  // Planned spots step off the street's doors (fixed spots were put where they are on purpose).
+  const doors = engine.street?.doors || [];
+  const worldW = Number(engine.worldW) || Infinity;
+  const clear = (classTsid, half) => fixedFurniturePoints(row, classTsid)
+    ? at(classTsid)
+    : at(classTsid).map((p) => clearOfDoors(p, half, doors, engine.platforms, worldW));
+  (clear('npc_mailbox', 50)).forEach((p) => buildMailbox(engine, p.x, p.y));
+  (clear('visiting_stone', STONE_ART.w / 2)).forEach((p, i) => buildStone(engine, p.x, p.y, i));
+  (clear('bag_notice_board', BOARD_ART.w / 2)).forEach((p, i) => buildBoard(engine, p.x, p.y, i));
   const noteCount = Number(row?.note) || 0;
   if (noteCount) {
     const rows = streetNotes(engine, noteCount);

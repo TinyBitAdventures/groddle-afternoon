@@ -2661,9 +2661,14 @@
   ]
  },
  "git": {
-  "commits": 732,
+  "commits": 733,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "Tunnels and tubes have roofs: a source line with null pc_perm stops a rising head"
+   },
    {
     "date": "2026-10-29",
     "kind": "new",
@@ -2778,14 +2783,9 @@
     "date": "2026-10-28",
     "kind": "improve",
     "text": "Distant scenery behind the street is sharp too"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "fix",
-    "text": "Streets, data and art changed in a release load fresh without a hard refresh"
    }
   ]
  },
- "tests": 422,
+ "tests": 424,
  "generatedAt": "2026-10-29"
 }

@@ -3,7 +3,7 @@
  * imported street platforms, all in screen space.
  */
 
-import { platformYAt } from './street-model.js';
+import { platformYAt } from './street-model.js?v=g442-6';
 
 /**
  * The surface at x closest to the creature's current feet y, accepting only a

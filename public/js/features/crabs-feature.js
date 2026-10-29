@@ -38,7 +38,7 @@ import { grantMoodXp } from '../mood-xp.js';
 import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
 import { getGameDayKey } from '../game-day.js';
 import { cleanQuestMarkup } from '../quests.js?v=item-buffs-7';
-import { walkSurfaceY } from '../walk-surface.js';
+import { walkSurfaceY } from '../walk-surface.js?v=g442-6';
 import {
   CRAB_CLASS,
   CRAB_COPY,

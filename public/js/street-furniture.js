@@ -1,3 +1,5 @@
+import { platformYAt } from './street-model.js?v=g442-6';
+
 /**
  * Street furniture rules: street Mailboxes, placed Notes, Notice Boards and
  * Visiting Stones (pure; js/features/street-furniture-feature.js renders them).
@@ -183,6 +185,48 @@ export function fixedFurniturePoints(row, classTsid) {
   const pts = row?.at?.[classTsid];
   if (!Array.isArray(pts)) return null;
   return pts.filter((p) => Number.isFinite(p?.x) && Number.isFinite(p?.y)).slice(0, whole(row[classTsid]));
+}
+
+/** Gap kept between a piece of furniture and a door's frame, in px. */
+export const DOOR_CLEARANCE = 24;
+
+/**
+ * A planned spot moved off any door on its floor. The archive keeps how many
+ * Mailboxes, Visiting Stones and Notice Boards a street had, not where (the
+ * planner picks), and the planner only keeps clear of signposts, so Gregarious
+ * Towers' board hung over the Grange door (Austin 2026-10-29). `doors` are the
+ * street's own (screen space, bottom-centre, build-street-navigation.mjs); the
+ * spot slides to the nearer side that clears the frame by DOOR_CLEARANCE and
+ * has floor within 60 px of its own (a step down off a doorstep counts), else it stays.
+ * @param {{x:number,y:number}} point
+ * @param {number} halfWidth  half the furniture's art width
+ */
+export function clearOfDoors(point, halfWidth, doors = [], platforms = [], worldW = Infinity) {
+  if (!Number.isFinite(point?.x) || !Number.isFinite(point?.y)) return point;
+  const floorAt = (x) => {
+    let best = null;
+    for (const p of platforms || []) {
+      if (p?.pcPerm === 1) continue;
+      const y = platformYAt(p, x, 0);
+      if (y != null && Math.abs(y - point.y) <= 60 && (best == null || Math.abs(y - point.y) < Math.abs(best - point.y))) best = y;
+    }
+    return best;
+  };
+  let at = { ...point };
+  for (let pass = 0; pass < 3; pass += 1) {
+    const door = (doors || []).find((d) => !d?.hidden && Number.isFinite(d?.x) && Number.isFinite(d?.y)
+      && Math.abs(d.y - at.y) <= 60 && Math.abs(d.x - at.x) < (Number(d.w) || 0) / 2 + halfWidth + DOOR_CLEARANCE);
+    if (!door) return at;
+    const reach = (Number(door.w) || 0) / 2 + halfWidth + DOOR_CLEARANCE;
+    const sides = [door.x - reach, door.x + reach]
+      .filter((x) => x - halfWidth >= 0 && x + halfWidth <= worldW)
+      .map((x) => ({ x: Math.round(x), y: floorAt(x) }))
+      .filter((c) => c.y != null)
+      .sort((a, b) => Math.abs(a.x - at.x) - Math.abs(b.x - at.x));
+    if (!sides.length) return at;
+    at = { ...at, x: sides[0].x, y: sides[0].y };
+  }
+  return at;
 }
 
 /** Planner groups for one street row (notes beyond the planner cap pile up nearby). */

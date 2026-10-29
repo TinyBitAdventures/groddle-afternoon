@@ -6,7 +6,7 @@
  * (same layout as tinyspeck/glitch-locations dumps).
  */
 
-/** @typedef {import('./street-model.js').StreetData} StreetData */
+/** @typedef {import('./street-model.js?v=g442-6').StreetData} StreetData */
 
 /**
  * Decode a few XML entities used in labels.
