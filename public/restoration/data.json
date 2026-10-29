@@ -2663,9 +2663,14 @@
   ]
  },
  "git": {
-  "commits": 737,
+  "commits": 738,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "new",
+    "text": "The Bureaucratic Halls greet you, make you wait, and serve you"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2780,11 +2785,6 @@
     "date": "2026-10-29",
     "kind": "new",
     "text": "Eat or drink several at once from the pack card"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "The inventory stops counting a QA demo's items as obtainable"
    }
   ]
  },

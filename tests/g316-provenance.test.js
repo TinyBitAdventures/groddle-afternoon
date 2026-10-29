@@ -1,7 +1,11 @@
 /**
- * G316/G317: no file that is neither Tiny Speck's nor our own comes back (Wayback
- * SWF renders, untraced art, the CDN loading strips, the licensed stock
- * new_day_fanfare.mp3), and nothing still points at a file that was taken out.
+ * G316/G317: no file that is neither Tiny Speck's nor our own comes back (untraced
+ * art, the CDN loading strips, the licensed stock new_day_fanfare.mp3), and
+ * nothing still points at a file that was taken out.
+ *
+ * 2026-10-29: the six butterfly 3x renders ship again. Their SWF was thought to be
+ * a Wayback-only copy, but tinyspeck/glitch-items has the same file
+ * (misc/npc/npc_butterfly/npc_butterfly.swf, commit 9a64021, sha1 63bafbd0...).
  * tools/provenance/non-cc0-removed.json lists the removed paths and their bytes.
  *
  * 2026-10-28 (Austin: use all of the original sound): Tiny Speck's own
@@ -36,7 +40,7 @@ const gitBlob = (buf) => createHash('sha1').update(`blob ${buf.length}\0`).updat
 describe('non-CC0 files stay out (G316/G317)', () => {
   it('no shipped or source file carries the bytes of a removed one', () => {
     const blobs = new Set(Object.keys(REMOVED.blobs));
-    assert.ok(blobs.size >= 95);
+    assert.ok(blobs.size >= 92);
     // The stock trumpet (Sounddogs, rights withheld) stays out.
     assert.match(Object.values(REMOVED.blobs).join('\n'), /licensed stock audio/);
     assert.ok(REMOVED.paths.includes('public/assets/audio/new_day_fanfare.mp3'));
@@ -113,16 +117,20 @@ describe('loading-card strips are our own renders (G316)', () => {
 });
 
 describe('sprites, decos and garden art (G316)', () => {
-  it('every 3x sprite file exists and the butterfly sheets stay 1x', async () => {
-    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=g430-1');
+  it('every 3x sprite file exists; the butterfly sheets render the CC0 glitch-items SWF', async () => {
+    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=g446-1');
     for (const [lo, hi] of HIRES_SPRITES) {
       assert.ok(existsSync(join(pub, lo.split('?')[0])), lo);
       assert.ok(existsSync(join(pub, hi)), hi);
     }
     for (const lo of ['assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.png', 'assets/sprites/rooks/butterfly-fly-rooked.png',
       'assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall.png']) {
-      assert.equal(HIRES_SPRITES.has(lo), false, lo);
+      assert.ok(HIRES_SPRITES.has(lo), lo);
       assert.ok(existsSync(join(pub, lo)), `${lo}: the CC0 1x sheet stays`);
+    }
+    for (const name of ['animals.json', 'characters.json']) {
+      const m = JSON.parse(readFileSync(join(root, 'tools/vector-sprites', name), 'utf8'));
+      for (const job of m.jobs) assert.ok(!/wayback/i.test(job.swf), `${job.name}: ${job.swf}`);
     }
   });
 

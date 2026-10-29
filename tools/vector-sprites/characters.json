@@ -1,5 +1,5 @@
 {
- "about": "Character, NPC and shrine sheets the game draws, paired with their vector SWF (glitch-items, CC0; the rooked butterfly and swoonerfly have no 3x: their SWF is a Wayback copy in no CC0 release, G316). Same shape as animals.json; character groups are all-or-nothing, budget caps each 3x sheet, and every sheet swaps to 3x on first draw (js/sprite-hires.js installHiresFirstDraw). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/characters.json [--only <character>]",
+ "about": "Character, NPC and shrine sheets the game draws, paired with their vector SWF (glitch-items, CC0). Same shape as animals.json; character groups are all-or-nothing, budget caps each 3x sheet, and every sheet swaps to 3x on first draw (js/sprite-hires.js installHiresFirstDraw). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/characters.json [--only <character>]",
  "firstDraw": true,
  "budget": {"maxSide": 8192, "maxMB": 64},
  "jobs": [
@@ -96,6 +96,12 @@
   ] },
   {"name": "sad-kitty", "swf": "inhabitants/heli_kitty/npc_kitty_chicken.swf", "sprite": 114, "sheets": [
    {"path": "assets/sprites/rooks/kitty-sad.png", "label": "3sad", "fw": 136, "fh": 115, "cols": 6, "frames": 17}
+  ] },
+  {"name": "rooked-butterfly", "swf": "misc/npc/npc_butterfly/npc_butterfly.swf", "sprite": 9, "zoom": 0.335, "sheets": [
+   {"path": "assets/sprites/rooks/butterfly-fly-rooked.png", "label": "fly", "fw": 70, "fh": 65, "cols": 14, "frames": 14},
+   {"path": "assets/sprites/rooks/butterfly-rest-rooked.png", "label": "rest", "fw": 70, "fh": 65, "cols": 1, "frames": 1},
+   {"path": "assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall.png", "label": "fly", "fw": 70, "fh": 65, "cols": 14, "frames": 14},
+   {"path": "assets/sprites/quest-rooms/gwendolyn/swoonerfly_rest.png", "label": "rest", "fw": 70, "fh": 65, "cols": 1, "frames": 1}
   ] },
   {"name": "gwendolyn", "swf": "inhabitants/gwendolyn/npc_gwendolyn.swf", "sprite": 298, "sheets": [
    {"path": "assets/sprites/quest-rooms/gwendolyn/gwendolyn_idle.webp", "label": "idle", "fw": 116, "fh": 191, "cols": 8, "frames": 76},

@@ -1,5 +1,5 @@
 {
- "about": "Files taken out of the game in G316/G317 (research/coverage/g312-provenance.md \"Resolved 2026-10-26\"): renders of a Wayback SWF, untraced art, CDN loading strips, and the licensed stock new_day_fanfare.mp3. tests/g316-provenance.test.js keeps their bytes (git blob ids) and paths out of public/ and assets-src/. `restored`: Tiny Speck's own recordings that G317 had also taken out and that ship again as the originals since 2026-10-28 (Austin: use all of the original sound; g312-provenance.md \"Original sounds, 2026-10-28\"); each blob is allowed only at its own path.",
+ "about": "Files taken out of the game in G316/G317 (research/coverage/g312-provenance.md \"Resolved 2026-10-26\"): untraced art, CDN loading strips, and the licensed stock new_day_fanfare.mp3. tests/g316-provenance.test.js keeps their bytes (git blob ids) and paths out of public/ and assets-src/. `restored`: Tiny Speck's own recordings that G317 had also taken out and that ship again as the originals since 2026-10-28 (Austin: use all of the original sound; g312-provenance.md \"Original sounds, 2026-10-28\"); each blob is allowed only at its own path.",
  "paths": [
   "assets-src/decos/groddle/patch_grass_2.png",
   "assets-src/decos/groddle/patch_grass_4.png",
@@ -97,12 +97,6 @@
   "public/assets/loading/LM4109NI2R640.jpg",
   "public/assets/sprites/garden/bed_frame_4x2.png",
   "public/assets/sprites/home-tower/elevator.png",
-  "public/assets/sprites/npc_butterfly__x1_fly-side_png_1354829525@3x.webp",
-  "public/assets/sprites/npc_butterfly__x1_rest-angle1_png_1354829530@3x.webp",
-  "public/assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall@3x.webp",
-  "public/assets/sprites/quest-rooms/gwendolyn/swoonerfly_rest@3x.webp",
-  "public/assets/sprites/rooks/butterfly-fly-rooked@3x.webp",
-  "public/assets/sprites/rooks/butterfly-rest-rooked@3x.webp",
   "public/assets/sprites/tree_fruit_single.png"
  ],
  "blobs": {
@@ -136,9 +130,7 @@
   "4efe9ac2e8eeb6895fc73d17e68a8d1c3d01bac6": "loading strip (c2 CDN via Wayback)",
   "556e635c88489ed150675961ad2f95308ed1bd71": "loading strip (c2 CDN via Wayback)",
   "56167b97b914cc57c133978834fe2b7e675c53c5": "loading strip (c2 CDN via Wayback)",
-  "5911e6299ab0a01692277ee35586b16c500f9e15": "render of a Wayback npc_butterfly.swf",
   "5a25536c2386164eb1b426e9851c16eac4a8cf5d": "loading strip (c2 CDN via Wayback)",
-  "5aa19732fa03544d9fa26392dfb4060185ef4e8c": "render of a Wayback npc_butterfly.swf",
   "5b19082c022016415f9e26f8ed71ebf52d877b68": "loading strip (c2 CDN via Wayback)",
   "62138561fa62a8899415ce9272827ac9b698847a": "loading strip (c2 CDN via Wayback)",
   "683af8872aed078c5437eb46484d6f1c98d79064": "loading strip (c2 CDN via Wayback)",
@@ -194,14 +186,12 @@
   "dbe00fd53d2b3e3ccee81603b1c3f683e2a68f45": "loading strip (c2 CDN via Wayback)",
   "dd0a6acc5f3c8b379fddfdef95f833ac75fef610": "loading strip (c2 CDN via Wayback)",
   "e4996ae9cb3083cb037b3e2421ec06a672295102": "loading strip (c2 CDN via Wayback)",
-  "eb72c11821b0db0a93634b248602cd6b3129bd68": "render of a Wayback npc_butterfly.swf",
   "ebbffeee72d6bf2118f9cb0920ee8c12d250c89b": "loading strip (c2 CDN via Wayback)",
   "ee1dca3754e77d30b7bc2586626c81752b373b12": "deco with no SWF in any CC0 set (CoU _png-2x)",
   "eed93cca6d96cf6f6ca3763334f1905533ed8c73": "loading strip (c2 CDN via Wayback)",
   "f23dacfe38c901e0698dae1a172047663b797f61": "loading strip (c2 CDN via Wayback)",
   "fa3d9991bc3f90954a289378e7a1c5db13ba7998": "loading strip (c2 CDN via Wayback)",
-  "fa75a9e997e61a6fc6ef0e15d5fd7aca48a10cc3": "loading strip (c2 CDN via Wayback)",
-  "ffc04f9f5007047f3cfa64b1447d4aca1bee792a": "render of a Wayback npc_butterfly.swf"
+  "fa75a9e997e61a6fc6ef0e15d5fd7aca48a10cc3": "loading strip (c2 CDN via Wayback)"
  },
  "restored": {
   "dd1baf1b0719b92720d39e9e01b4594528878830": {
