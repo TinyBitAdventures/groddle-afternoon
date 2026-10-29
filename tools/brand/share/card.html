@@ -1,0 +1,21 @@
+<!doctype html>
+<!--
+  The social share card (public/brand/share.jpg, 1200x630): link previews for every page (og:image).
+  The street is Kristel Kaos at x 300 by day, the HUD hidden, from the game itself (Tiny Speck's CC0 art).
+  Rebuild: open this file in Chrome at 1200x630, device scale 1, screenshot it, then
+  magick shot.png -strip -quality 88 -sampling-factor 4:2:0 public/brand/share.jpg
+-->
+<html><head><meta charset="utf-8"><style>
+*{margin:0;box-sizing:border-box}
+html,body{width:1200px;height:630px;overflow:hidden;background:#14261c}
+.card{position:relative;width:1200px;height:630px;background:url(kristel-kaos.jpg) 30% 62%/auto 118% no-repeat}
+.shade{position:absolute;inset:0;background:linear-gradient(270deg,rgba(12,26,20,.94) 0%,rgba(12,26,20,.86) 36%,rgba(12,26,20,.35) 52%,rgba(12,26,20,0) 64%)}
+.copy{position:absolute;right:56px;top:0;bottom:0;width:480px;display:flex;flex-direction:column;justify-content:center;gap:26px;color:#fdf6e6}
+.copy img{width:440px;height:auto}
+.copy p{font:500 31px/1.35 'Trebuchet MS',system-ui,sans-serif;color:#f3ead4;max-width:470px}
+.copy .url{font:600 22px/1 'Trebuchet MS',system-ui,sans-serif;letter-spacing:.02em;color:#f0b25a}
+</style></head><body><div class="card"><div class="shade"></div><div class="copy">
+<img src="../../../public/brand/lockup-horizontal-dark.svg" alt="">
+<p>A fan remake of Tiny Speck's Glitch. Play it free in your browser, solo or online.</p>
+<p class="url">groddleafternoon.com</p>
+</div></div></body></html>

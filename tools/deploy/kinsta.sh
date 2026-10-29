@@ -74,6 +74,8 @@ fi
 GAME="$work/game/public"
 # Fathom analytics on the static game pages; the theme carries it for the pages Minn renders (tools/deploy/fathom.mjs).
 node "$work/game/tools/deploy/fathom.mjs" "$GAME" || { echo "fathom was not added to the built pages" >&2; exit 1; }
+# Link previews (Open Graph and Twitter cards) on the static game pages; the theme adds them to Minn's pages (tools/deploy/social.mjs).
+node "$work/game/tools/deploy/social.mjs" "$GAME" || { echo "social tags were not added to the built pages" >&2; exit 1; }
 
 echo "2/6 Minn Engine, Minn Admin, theme"
 rsync -rlc --delete --exclude admin --exclude .install.json -e "${SSH[*]}" "$work/engine/public/minn/" "$HOST:public/minn/"

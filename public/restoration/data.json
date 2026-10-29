@@ -2661,9 +2661,14 @@
   ]
  },
  "git": {
-  "commits": 729,
+  "commits": 730,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "A speech bubble's tail fades with the bubble"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2778,14 +2783,9 @@
     "date": "2026-10-28",
     "kind": "fix",
     "text": "A Glitch resting on a ladder holds still instead of bobbing and cycling"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "improve",
-    "text": "Street Spirits, their lonely porthole and the tools in your hands draw sharp"
    }
   ]
  },
- "tests": 421,
+ "tests": 422,
  "generatedAt": "2026-10-29"
 }
