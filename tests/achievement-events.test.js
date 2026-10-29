@@ -28,7 +28,7 @@ import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v
 import { supplyFeature } from '../public/js/features/supply-feature.js?v=g403-1';
 import { createToolConditionState } from '../public/js/tools.js?v=woodcutting-test-8';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
-import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=g403-1';
+import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=g424-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

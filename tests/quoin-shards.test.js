@@ -250,7 +250,7 @@ describe('wiring', () => {
   it('routes the player grab, companions and the Grab Em Good rival through the feature', () => {
     const game = read('game.js');
     assert.match(game, /features\.query\('quoinShards', \{\s+grabber: 'player',[\s\S]{0,120}baseAmount: result\.baseAmount,/);
-    assert.match(game, /playSound\(quoinShare\?\.sound \|\| soundForQuoin\(result\.typeId\)/);
+    assert.match(game, /playSound\(quoinShare\?\.sound \|\| soundForQuoin\(result\.resolvedTypeId\)/);
     assert.match(game, /get localCompanions\(\) \{/);
     assert.match(game, /takeQuoin\(q\) \{/);
     assert.match(game, /params\.has\('quoinshard'\)\) return true;/);

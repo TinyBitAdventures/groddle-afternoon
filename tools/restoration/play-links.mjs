@@ -21,6 +21,8 @@ const CAMERA_ONLY = /^(?:.*autoplay|.*preview|.*hold|.*fx|cameralook|esqstage|ra
 /** Systems without a screenshot route, by checklist id. */
 export const PLAY_ROUTES = Object.freeze({
   dametime: `${BASE}&timedemo=dusk`,
+  // A mystery quoin one step away: grab it to see what it turns into.
+  'mystery-quoins': `${BASE}&quoindemo=mystery`,
   map: `${BASE}`,
   music: `${BASE}&soundtest=1`,
   avatar: `${BASE}`,

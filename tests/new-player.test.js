@@ -16,10 +16,10 @@ import {
 } from '../public/js/new-player.js?v=mp5-1';
 import { createBrowserSaveStore, createMultiplayerSaveStore, createSaveStore } from '../public/js/save-store.js?v=mp2-2';
 import { createInventory } from '../public/js/inventory.js?v=catalog-unified-7';
-import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=g403-1';
+import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=g424-1';
 import { createQuoinState } from '../public/js/quoins.js';
 import { createShrineState } from '../public/js/shrines.js?v=spinning-wheel-test-9';
-import { PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=paradise-flight-14';
+import { PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=g424-1';
 import { imaginationFeature, STARTER_UPGRADES } from '../public/js/features/imagination-feature.js';
 import { RESOURCE_FEATURE_ID, resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=g417-1';
 

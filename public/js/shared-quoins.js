@@ -12,6 +12,7 @@
  *
  * - quoins        the street's quoins (place, type, class) and which are gone
  * - quoin_got     this player got one: amount before their own multiplier
+ *                 (and, for a mystery quoin, the kind the server rolled: resolved)
  * - quoin_taken   someone else got one (with everyone's shards)
  * - quoin_refused not yours (gone, too far, ...)
  * - quoin_back    one respawned
@@ -29,6 +30,9 @@ export const RECLAIM_MS = 1200;
 
 /** items/quoin.js 84 and 162-174: the types that shard and the stat each shows. */
 export const SHARD_STATS = Object.freeze({ xp: 'iMG', mood: 'mood', energy: 'energy', currants: 'currants' });
+
+/** The kinds a mystery quoin can turn into (js/quoins.js MYSTERY_QUOIN_KINDS; the server rolls). */
+const MYSTERY_KINDS = new Set(['xp', 'mood', 'energy', 'currants']);
 
 const finite = (v, fallback = 0) => (Number.isFinite(Number(v)) ? Number(v) : fallback);
 const word = (v) => (typeof v === 'string' && /^[A-Za-z0-9_ -]{1,40}$/.test(v) ? v : '');
@@ -54,6 +58,8 @@ export function normalizeGrab(msg) {
     id: Number.isFinite(Number(msg.id)) ? Number(msg.id) : null,
     name: String(msg.name || '').slice(0, 64),
     type: word(msg.type),
+    // A mystery quoin's rolled kind ('' for any other quoin).
+    resolved: msg.type === 'mystery' && MYSTERY_KINDS.has(msg.resolved) ? msg.resolved : '',
     amount: Math.max(0, Math.floor(finite(msg.amount, 0))),
     x: finite(msg.x),
     y: finite(msg.y),

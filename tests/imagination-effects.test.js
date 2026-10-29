@@ -28,7 +28,7 @@ import { quoteWoodTreeHarvest } from '../public/js/woodcutting.js?v=g414-1';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=g403-1';
 import { createGarden, getPlot, plantPlot, plotKey } from '../public/js/garden.js?v=g403-1';
 import { vendorBuy, vendorSell, vendorBuyUnitPrice } from '../public/js/vendor.js?v=vendor-profiles-12';
-import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=g403-1';
+import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=g424-1';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=g403-1';
 import { createSkillState, getStudyStatus, pauseSkillStudy, startSkillStudy } from '../public/js/skills.js';
 

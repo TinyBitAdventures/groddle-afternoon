@@ -65,7 +65,7 @@
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { getGameDayKey } from '../game-day.js';
 import { metabolicGain, moodMax } from '../metabolics.js';
-import { quoinDailyLimitFor } from '../quoins.js';
+import { quoinDailyLimitFor } from '../quoins.js?v=g424-1';
 import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
 import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=g414-1';
 import { isPoisoned } from '../tree-poison.js';
@@ -131,7 +131,7 @@ import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { patchesFeature } from './patches-feature.js?v=g414-1';
 import { homesFeature } from './homes-feature.js?v=g419-1';
 import { streetTreeIndex } from './tree-death-feature.js?v=g414-1';
-import { questRoomConverse } from './quest-instances-feature.js?v=g405-1';
+import { questRoomConverse } from './quest-instances-feature.js?v=g424-1';
 
 export const POTIONS_FEATURE_ID = 'potions';
 const LOVE = 'feeling_called_love';

@@ -34,7 +34,7 @@
  */
 
 import { locationEventsApi } from './location-events-feature.js?v=location-events-9';
-import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js';
+import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g424-1';
 import {
   PUZZLE_DATA_URL,
   SOURCE_PHYSICS,

@@ -16,7 +16,8 @@
  *   ones gone. Until then they are hidden and cannot be grabbed.
  * - Touching one (game.js quoinTouched) hides it and asks the server; the
  *   reward lands only when the server says this player got it
- *   (engine.grantQuoin, the solo reward path with the server's amount),
+ *   (engine.grantQuoin, the solo reward path with the server's amount and,
+ *   for a mystery quoin, the kind the server rolled),
  *   and the quoin comes back if the server says no.
  * - Someone else's grab hides it with the source's grow-and-shrink (or the
  *   shard bolts), and a shard lands on this player's own stats with the
@@ -35,12 +36,12 @@
  *
  * QA: canvas data sharedQuoins (pending | shared | local | off),
  * sharedQuoinsStreet, sharedQuoinsLive (spawned/total), sharedQuoinLast
- * (got:i:amount | taken:i:by | refused:i:why | back:i | shard:i:amount>actual).
+ * (got:i:amount[:resolved] | taken:i:by | refused:i:why | back:i | shard:i:amount>actual).
  */
 
-import { QUOIN_TYPES, creditQuoinStat } from '../quoins.js?v=desk2-1';
+import { QUOIN_TYPES, creditQuoinStat } from '../quoins.js?v=g424-1';
 import { quoinShardGrabberSound, quoinShardSoundKey } from '../quoin-shards.js?v=g216-1';
-import { LOCAL_STATES, SHARD_STATS, createSharedQuoinBook, fxShards, normalizeGrab, shardFor, statusOf } from '../shared-quoins.js?v=mp4-1';
+import { LOCAL_STATES, SHARD_STATS, createSharedQuoinBook, fxShards, normalizeGrab, shardFor, statusOf } from '../shared-quoins.js?v=g424-1';
 
 export const SHARED_QUOINS_FEATURE_ID = 'shared-quoins';
 /** Status goes out on a change, and at least this often while on a street. */
@@ -176,10 +177,10 @@ function onGot(engine, msg) {
     if (!q) return;
   }
   const sound = quoinShardGrabberSound(grab.shards.length);
-  const ok = engine.grantQuoin?.(q, { amount: grab.amount, share: { sound } });
+  const ok = engine.grantQuoin?.(q, { amount: grab.amount, resolved: grab.resolved, share: { sound } });
   if (!ok) engine.takeQuoin(q);
   else showGrabFx(engine, grab, { grabberIsViewer: true });
-  publish(engine, `got:${grab.i}:${grab.amount}`);
+  publish(engine, `got:${grab.i}:${grab.amount}${grab.resolved ? `:${grab.resolved}` : ''}`);
 }
 
 function onTaken(engine, msg) {

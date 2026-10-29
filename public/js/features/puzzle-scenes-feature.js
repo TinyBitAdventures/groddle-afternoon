@@ -22,7 +22,7 @@
  */
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js';
+import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g424-1';
 import {
   BEAM_ME_DOWN,
   CONSTELLATION,

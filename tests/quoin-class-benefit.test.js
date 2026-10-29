@@ -155,9 +155,10 @@ describe('collectQuoin with a class', () => {
     assert.equal(collectQuoin(createQuoinState(), 'xp', pc, { className: 'nope' }).quoinClass, null);
   });
 
-  it('mystery gives nothing and qurazy keeps its level reward, whatever the class', () => {
+  it('mystery pays its rolled kind\'s class of the same tier, and qurazy keeps its level reward, whatever the class', () => {
     const pc = pcFor();
-    assert.equal(collectQuoin(createQuoinState(), 'mystery', pc, { className: 'slow medium-large xp' }).baseAmount, 0);
+    const m = collectQuoin(createQuoinState(), 'mystery', pc, { className: 'slow medium-large xp', rng: () => 0.3 });
+    assert.deepEqual([m.resolvedTypeId, m.quoinClass, m.baseAmount], ['mood', 'slow medium-large mood', 25]);
     const q = collectQuoin(createQuoinState(), 'qurazy', pc, { className: 'slow medium-large xp' });
     assert.equal(q.baseAmount, 10);
     assert.equal(q.quoinClass, null);

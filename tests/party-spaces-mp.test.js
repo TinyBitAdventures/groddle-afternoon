@@ -310,7 +310,7 @@ describe('party spaces in solo', () => {
   it('is wired after the realtime client exists, with fresh keys', () => {
     const idx = read('public/js/features/index.js');
     assert.ok(idx.includes("import { partySpacesFeature } from './party-spaces-feature.js?v=party-15';"));
-    assert.ok(idx.includes("shared-quoins-feature.js?v=mp4-2"));
+    assert.ok(idx.includes("shared-quoins-feature.js?v=g424-1"));
     assert.ok(idx.includes("trade-feature.js?v=g403-1"));
   });
 });

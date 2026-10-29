@@ -721,7 +721,7 @@
  },
  "item:quoin": {
   "status": "source",
-  "reason": "js/quoins.js spawns the eight quoin types on every street (game.js spawnQuoins); the scan sees no class literal for the base quoin"
+  "reason": "js/quoins.js spawns the eight quoin types on every street (game.js spawnQuoins); the scan sees no class literal for the base quoin. The mystery type's reward is reimagined (items/quoin.js 156-260 adds no stat for it): it rolls iMG, mood, energy or currants (js/quoins.js MYSTERY_QUOIN_KINDS, restoration item mystery-quoins)"
  },
  "npc:npc_esquibeth_playback": {
   "status": "rebuilt",

@@ -26,7 +26,7 @@ import {
   MINING_COSTS,
 } from '../public/js/mining.js?v=g403-1';
 import { craftRecipe } from '../public/js/making.js?v=g403-1';
-import { createPlayerSave, normalizePlayerSave } from '../public/js/player-save.js?v=g403-1';
+import { createPlayerSave, normalizePlayerSave } from '../public/js/player-save.js?v=g424-1';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');

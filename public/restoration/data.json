@@ -622,6 +622,22 @@
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&quoindemo=qurazy&practice=1"
   },
   {
+   "id": "mystery-quoins",
+   "group": "economy",
+   "name": "Mystery quoins",
+   "status": "reimagined",
+   "blurb": "Tiny Speck drew mystery quoins and their server knew the type, but never gave one a reward: grabbing it counted toward the day and added nothing. Here a mystery quoin keeps its question-mark art until you grab it, then turns into an iMG, mood, energy or currants quoin, each as likely, pays what that quoin pays on the spot (a small 2 to 6, now and then 25, times your multiplier) and says what it became, as in \"Mystery quoin: +4 mood\". It still counts toward the daily limit.",
+   "multiplayer": "The realtime server rolls what a shared mystery quoin becomes, and the player who grabs it sees what it paid.",
+   "spot": null,
+   "evidence": [
+    "public/js/quoins.js",
+    "public/game.js",
+    "tests/mystery-quoins.test.js"
+   ],
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&quoindemo=mystery&practice=1"
+  },
+  {
    "id": "shrines",
    "group": "economy",
    "name": "Giants and shrines",
@@ -1243,13 +1259,13 @@
  "tally": {
   "source": 53,
   "rebuilt": 10,
-  "reimagined": 3,
+  "reimagined": 4,
   "solo": 6,
   "progress": 1
  },
- "back": 72,
- "possible": 73,
- "multiplayer": 21,
+ "back": 73,
+ "possible": 74,
+ "multiplayer": 22,
  "quests": {
   "total": 445,
   "story": 245,
@@ -2645,9 +2661,14 @@
   ]
  },
  "git": {
-  "commits": 702,
+  "commits": 703,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "Quest text shows its bold and links, and Phantom cold spots beat and say how to notice"
+   },
    {
     "date": "2026-10-29",
     "kind": "new",
@@ -2762,14 +2783,9 @@
     "date": "2026-10-28",
     "kind": "fix",
     "text": "Customize look first starts the tutorial from zero, and each bag button names its fill"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "new",
-    "text": "Continue with Google on the sign-in card"
    }
   ]
  },
- "tests": 410,
+ "tests": 411,
  "generatedAt": "2026-10-29"
 }

@@ -23,8 +23,8 @@ import {
   normalizeSync,
   shardFor,
   statusOf,
-} from '../public/js/shared-quoins.js?v=mp4-1';
-import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?v=mp4-2';
+} from '../public/js/shared-quoins.js?v=g424-1';
+import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?v=g424-1';
 import {
   QUOIN_SHARD_FLOOR,
   QUOIN_SHARD_NEAR,
@@ -32,7 +32,7 @@ import {
   QUOIN_SHARD_TOP,
   QUOIN_SHARD_FALL,
 } from '../public/js/quoin-shards.js?v=g216-1';
-import { placementRequests, streetQuoinLayout, classTable } from '../tools/build-realtime-quoins.mjs';
+import { placementRequests, streetQuoinLayout, classTable, mysteryTable } from '../tools/build-realtime-quoins.mjs';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js';
 import { QUOIN_CLASSES } from '../public/js/quoins.js';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
@@ -65,6 +65,10 @@ describe('the book', () => {
     assert.deepEqual(g.shards, [{ id: 8, x: 1, y: 2, amount: 2, pct: 0.5 }]);
     assert.equal(g.amount, 4);
     assert.equal(normalizeGrab({ street: 'GQTEST', i: 1.5 }), null);
+    // A mystery quoin's rolled kind: one of the four basic kinds, and only on a mystery grab.
+    assert.equal(normalizeGrab({ street: 'GQTEST', i: 2, type: 'mystery', resolved: 'mood' }).resolved, 'mood');
+    assert.equal(normalizeGrab({ street: 'GQTEST', i: 2, type: 'mystery', resolved: 'favor' }).resolved, '');
+    assert.equal(normalizeGrab({ street: 'GQTEST', i: 1, type: 'xp', resolved: 'mood' }).resolved, '');
   });
 
   it('books claims: one at a time, gone stays gone, refused waits before asking again', () => {
@@ -187,6 +191,7 @@ function fakeEngine(mode, client) {
     },
     grantQuoin(q, shared) {
       engine.log.push(`grant:${q.naturalQuoinIndex}:${shared.amount}:${shared.share?.sound || 'QUOIN_GOT'}`);
+      if (shared.resolved) engine.log.push(`resolved:${q.naturalQuoinIndex}:${shared.resolved}`);
       return engine.takeQuoin(q);
     },
   };
@@ -301,6 +306,27 @@ describe('the feature', () => {
   });
 });
 
+describe('a mystery quoin in multiplayer', () => {
+  it('lands as the kind the server rolled', async () => {
+    // A fresh copy of the feature: the one above still holds its replaced client.
+    const { sharedQuoinsFeature } = await import('../public/js/features/shared-quoins-feature.js?v=mystery-test-1');
+    const client = fakeClient();
+    const engine = fakeEngine('multiplayer', client);
+    sharedQuoinsFeature.onStreetEnter({}, engine);
+    client.street = 'GQTEST';
+    client.emit('roster', { street: 'GQTEST', players: [] });
+    client.emit('msg:quoins', { ...SYNC, gone: [] });
+    sharedQuoinsFeature.onTick(16, 0, engine);
+    const q2 = quoinAt(engine, 2);
+    assert.equal(q2.typeId, 'mystery', 'mystery art until it is grabbed');
+    assert.equal(sharedQuoinsFeature.quoinTouched(q2, engine), true);
+    client.emit('msg:quoin_got', { street: 'GQTEST', i: 2, type: 'mystery', resolved: 'mood', amount: 3, x: 700, y: 760, crowd: 0, shards: [] });
+    assert.ok(engine.log.includes('grant:2:3:QUOIN_GOT'), engine.log.join('|'));
+    assert.ok(engine.log.includes('resolved:2:mood'), engine.log.join('|'));
+    assert.equal(engine.data.sharedQuoinLast, 'got:2:3:mood');
+  });
+});
+
 describe('the server data', () => {
   const index = JSON.parse(read('public/assets/streets/index.json'));
   const shipped = HAS_SERVER ? JSON.parse(readFileSync(serverPath('data/quoins.json'), 'utf8')) : null;
@@ -326,6 +352,7 @@ describe('the server data', () => {
     }
     assert.equal(shipped.streets.GLI2V0UN7RD1T2J.length, 8);
     assert.deepEqual(shipped.classes, classTable());
+    assert.deepEqual(shipped.mystery, mysteryTable());
     assert.equal(Object.keys(shipped.classes).length, Object.keys(QUOIN_CLASSES).length);
     for (const rows of Object.values(shipped.streets)) for (const [, , type, cls] of rows) {
       assert.ok(shipped.classes[cls], cls);
@@ -352,7 +379,7 @@ describe('the server and the wiring', () => {
 
   it('registers before realtime, and game.js hands the touch, the reward and respawns over', () => {
     const idx = read('public/js/features/index.js');
-    const mine = idx.indexOf("import { sharedQuoinsFeature } from './shared-quoins-feature.js?v=mp4-2'");
+    const mine = idx.indexOf("import { sharedQuoinsFeature } from './shared-quoins-feature.js?v=g424-1'");
     assert.ok(mine > 0 && mine < idx.indexOf('realtimeFeature'));
     const game = read('public/game.js');
     assert.match(game, /if \(features\.query\('quoinTouched', q, engine\)\) continue;\n\s+grabWorldQuoin\(q\);/);

@@ -60,13 +60,15 @@ describe('official quoin economy', () => {
     assert.equal(collectQuoin(state, 'mood', pc).actual, 10);
   });
 
-  it('counts a mystery quoin toward the day but pays nothing (items/quoin.js has no mystery branch)', () => {
+  it('counts a mystery quoin toward the day and pays the kind it rolled (reimagined: items/quoin.js has no mystery branch)', () => {
     const state = createQuoinState();
     const pc = { imagination: 0, xp: 0, energy: 0, mood: 0, currants: 0 };
     const result = collectQuoin(state, 'mystery', pc, { rng: () => 0.8 });
-    assert.equal(result.resolvedTypeId, 'mystery');
-    assert.deepEqual([pc.currants, pc.xp, pc.energy, pc.mood], [0, 0, 0, 0]);
-    assert.equal(state.byType.mystery, 1);
+    assert.equal(result.typeId, 'mystery');
+    assert.equal(result.resolvedTypeId, 'currants');
+    assert.equal(result.amount, QUOIN_TYPES.currants.baseAmount, 'no class: the rolled kind\'s base amount');
+    assert.deepEqual([pc.currants, pc.xp, pc.energy, pc.mood], [7, 0, 0, 0]);
+    assert.deepEqual(state.byType, { currants: 1 }, 'counted as the kind it paid');
     assert.equal(state.collectedToday, 1);
   });
 

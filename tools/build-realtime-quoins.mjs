@@ -33,7 +33,15 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
 } from '../public/js/street-ecology.js';
-import { QUOIN_CLASSES, QUOIN_TYPES, planStreetQuoins, streetQuoinClass } from '../public/js/quoins.js';
+import {
+  MYSTERY_QUOIN_KINDS,
+  QUOIN_CLASSES,
+  QUOIN_TYPES,
+  STREET_QUOIN_CLASSES,
+  mysteryClassFor,
+  planStreetQuoins,
+  streetQuoinClass,
+} from '../public/js/quoins.js';
 import { partyEcologyEntry, partySpaceForStreet } from '../public/js/party-spaces.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -97,9 +105,9 @@ export function streetQuoinLayout(data, { starter = false, ecology = streetEcolo
 /**
  * The class table the server rolls and times from: respawn seconds and the
  * benefit (fixed) or floor..ceil (random), quoin.js 318-662. A spot whose
- * class is of another type (mystery spots use the iMG pair) gives its own
- * type's base amount instead (js/quoins.js collectQuoin): the server reads
- * `types` for that.
+ * class is of another type gives its own type's base amount instead
+ * (js/quoins.js collectQuoin): the server reads `types` for that. Mystery
+ * spots (the iMG pair) pay by `mysteryTable` instead.
  */
 export function classTable() {
   const out = {};
@@ -113,6 +121,21 @@ export function classTable() {
     out[name] = entry;
   }
   return out;
+}
+
+/**
+ * What a mystery quoin turns into (reimagined, js/quoins.js
+ * MYSTERY_QUOIN_KINDS): the kinds the server picks from, each as likely, and
+ * for every street-pair class the class each kind pays by (mysteryClassFor).
+ */
+export function mysteryTable() {
+  const classes = {};
+  for (const kind of MYSTERY_QUOIN_KINDS) {
+    for (const name of STREET_QUOIN_CLASSES[kind]) {
+      classes[name] = Object.fromEntries(MYSTERY_QUOIN_KINDS.map((k) => [k, mysteryClassFor(name, k)]));
+    }
+  }
+  return { kinds: [...MYSTERY_QUOIN_KINDS], classes };
 }
 
 async function main() {
@@ -141,6 +164,7 @@ async function main() {
     format: 'streets[tsid][i] = [x, y, type, class]',
     types,
     classes: classTable(),
+    mystery: mysteryTable(),
     streets,
   };
   const text = `${JSON.stringify(out)}\n`;

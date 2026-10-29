@@ -90,7 +90,7 @@ import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=ca
 import { runStreetTransition } from '../screen-fx.js?v=g405-1';
 import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=g405-1';
 import { applyFamiliarLook, familiarLook } from '../familiar.js?v=g405-1';
-import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js';
+import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g424-1';
 import { sourceFromUrl } from '../textures.js';
 
 let quoinFrames = null;

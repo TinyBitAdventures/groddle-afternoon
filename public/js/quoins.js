@@ -124,6 +124,44 @@ export function resetQuoinDay(state, upgrades = []) {
 }
 
 /**
+ * Mystery quoins, reimagined (Austin 2026-10-29). The source never defined
+ * their reward: items/quoin.js onPlayerCollision (156-260) works out an
+ * amount and announces it, but adds a stat only for xp, mood, energy,
+ * currants, favor, time and qurazy, and the client has no mystery handling.
+ * Here a mystery quoin rolls one of the four basic kinds, each as likely,
+ * pays that kind's normal amount and says what it turned into. Favor and
+ * time never come up. It keeps the mystery art until it is grabbed, still
+ * counts toward the daily limit, and shards as a mystery quoin: not at all
+ * (distributeQuoinShards, quoin.js 84, goes by the quoin's own type).
+ */
+export const MYSTERY_QUOIN_KINDS = Object.freeze(['xp', 'mood', 'energy', 'currants']);
+
+/** One of MYSTERY_QUOIN_KINDS, uniformly, from rng() in [0, 1). */
+export function rollMysteryKind(rng = Math.random) {
+  const r = clamp(finite(typeof rng === 'function' ? rng() : Math.random(), 0), 0, 0.999999999);
+  return MYSTERY_QUOIN_KINDS[Math.floor(r * MYSTERY_QUOIN_KINDS.length)];
+}
+
+/**
+ * The class a mystery spot pays by once it rolled `kind`: the class itself
+ * when it is of that kind; else the same tier of that kind's street pair
+ * (STREET_QUOIN_CLASSES: a mystery spot carries the iMG pair, so 'small
+ * random xp' pays as 'small random mood', 'slow medium-large xp' as 'slow
+ * medium-large mood'); '' when the class is in no pair (the kind's
+ * baseAmount then applies, as for any quoin with no class).
+ */
+export function mysteryClassFor(className, kind) {
+  const row = className ? QUOIN_CLASSES[className] : null;
+  if (!row || !MYSTERY_QUOIN_KINDS.includes(kind)) return '';
+  if (row.type === kind) return className;
+  for (const id of MYSTERY_QUOIN_KINDS) {
+    const tier = STREET_QUOIN_CLASSES[id].indexOf(className);
+    if (tier >= 0) return STREET_QUOIN_CLASSES[kind][tier];
+  }
+  return '';
+}
+
+/**
  * Credit an iMG, mood, energy or currants amount to the player and return
  * what landed: the shared reward path for a grabbed quoin and a quoin shard
  * (items/quoin.js 162-174 and 184-187 call the same stats_add_xp,
@@ -165,6 +203,9 @@ export function creditQuoinStat(pc, typeId, rawAmount, { gated = false } = {}) {
  * benefit, rolled per grab with `opts.rng`, and a class's own Giant; an
  * explicit `opts.amount` still wins, and with neither the type's baseAmount
  * applies. The multiplier scales whichever it is (quoin.js 171-174).
+ * A mystery quoin resolves first (rollMysteryKind with `opts.rng`, or a
+ * multiplayer `opts.resolvedType`): the result's typeId stays 'mystery' and
+ * resolvedTypeId is the kind it paid.
  */
 export function collectQuoin(state, typeId, pc, opts = {}) {
   const normalized = normalizeQuoinState(state);
@@ -174,11 +215,16 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
     return { ok: false, reason: 'daily_limit', dailyCount: state.collectedToday, dailyLimit: state.dailyLimit };
   }
 
-  // items/quoin.js has no mystery branch: a mystery quoin only counts toward the daily limit.
-  const resolvedType = originalType;
+  // Reimagined (Austin 2026-10-29): items/quoin.js has no mystery branch, so a
+  // mystery quoin turns into one of the four basic kinds (the realtime
+  // server's roll when it sent one) and pays what that kind pays here.
+  const resolvedType = originalType === 'mystery'
+    ? (MYSTERY_QUOIN_KINDS.includes(opts.resolvedType) ? opts.resolvedType : rollMysteryKind(opts.rng))
+    : originalType;
   const def = QUOIN_TYPES[resolvedType];
   const multiplier = originalType === 'qurazy' ? 1 : state.multiplier;
-  const classAmount = originalType === 'qurazy' ? null : quoinClassAmount(opts.className, originalType, opts.rng);
+  const className = originalType === 'mystery' ? mysteryClassFor(opts.className, resolvedType) : opts.className;
+  const classAmount = originalType === 'qurazy' ? null : quoinClassAmount(className, resolvedType, opts.rng);
   const baseAmount = originalType === 'qurazy'
     ? qrazyRewardForLevel(pc?.level)
     : Math.max(0, Math.floor(finite(opts.amount, classAmount ?? def.baseAmount)));
@@ -227,12 +273,13 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
   }
 
   state.totalCollected += 1;
-  state.byType[originalType] = (state.byType[originalType] || 0) + 1;
+  // A mystery quoin is counted as the kind it paid (the source keeps no per-type count).
+  state.byType[resolvedType] = (state.byType[resolvedType] || 0) + 1;
   if (originalType === 'qurazy') {
     state.qurazyFound += 1;
   } else {
     state.collectedToday += 1;
-    state.dailyByType[originalType] = (state.dailyByType[originalType] || 0) + 1;
+    state.dailyByType[resolvedType] = (state.dailyByType[resolvedType] || 0) + 1;
   }
 
   return {
@@ -250,7 +297,7 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
     dailyLimit: state.dailyLimit,
     hitLimit: originalType !== 'qurazy' && state.collectedToday >= state.dailyLimit,
     giantId,
-    quoinClass: classAmount !== null ? opts.className : null,
+    quoinClass: classAmount !== null ? className : null,
     acceleration: resolvedType === 'time' ? acceleration : null,
   };
 }
@@ -326,7 +373,8 @@ export const QUOIN_CLASSES = Object.freeze({
  * (purple_emperor.js 58-75): 95% a small random class, 5% slow medium-large;
  * Austin chose it for street spots (G257, desk QUOINTIER). Favor and time use
  * their small and slow medium classes the same way; mystery quoins have no
- * class in the source, so they use the iMG pair.
+ * class in the source, so they use the iMG pair (for its respawn timer, and
+ * its tier for the kind they roll: mysteryClassFor).
  */
 export const STREET_QUOIN_CLASSES = Object.freeze({
   xp: Object.freeze(['small random xp', 'slow medium-large xp']),
@@ -363,7 +411,8 @@ function randInt(lo, hi, rng = Math.random) {
  * G227: what one grab of a `className` quoin gives before the multiplier
  * (items/quoin.js 161-166): its benefit, or randInt(benefit_floor,
  * benefit_ceil) when the class is random. null for an unknown class or one
- * of another type (mystery and qurazy quoins keep their own rules).
+ * of another type (a mystery quoin asks with mysteryClassFor's class and
+ * the kind it rolled; qurazy quoins keep their own rules).
  */
 export function quoinClassAmount(className, typeId, rng = Math.random) {
   const row = className ? QUOIN_CLASSES[className] : null;

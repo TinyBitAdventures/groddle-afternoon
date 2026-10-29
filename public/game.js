@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-253';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-252';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g405-1';
@@ -312,7 +312,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=paradise-flight-14';
+} from './js/paradise-flight.js?v=g424-1';
 import { resolveParadiseCourseAlias } from './js/paradise-courses.js?v=g403-1';
 import {
   buildParadiseCourseArt,
@@ -435,7 +435,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=g403-1';
+} from './js/player-save.js?v=g424-1';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -795,7 +795,7 @@ import {
   releaseQuoinRespawns,
   quoinClassType,
   resetStreetQuoinsForNewDay,
-} from './js/quoins.js?v=desk2-1';
+} from './js/quoins.js?v=g424-1';
 import {
   buildHubMapView,
   mapClickTravel,
@@ -8844,10 +8844,10 @@ const engine = {
     quoins.push(q);
     return q;
   },
-  /** Multiplayer: the realtime server says this player got quoin q ({ amount, share: { sound } }); the solo reward path. */
+  /** Multiplayer: the realtime server says this player got quoin q ({ amount, resolved, share: { sound } }); the solo reward path. */
   grantQuoin(q, shared) {
     if (!q || !quoins.includes(q)) return false;
-    return grabWorldQuoin(q, { amount: Number(shared?.amount) || 0, share: shared?.share || null });
+    return grabWorldQuoin(q, { amount: Number(shared?.amount) || 0, resolved: shared?.resolved || '', share: shared?.share || null });
   },
   /** G260: visits to a street before this entry counts (the loading card's rule, G89). */
   streetVisitsBefore(tsid = currentStreetTsid) {
@@ -10321,16 +10321,17 @@ function tickQuoinRespawns(now = Date.now()) {
 /**
  * The player gets world quoin q: the reward, its sound and text, quest
  * progress. False when the daily limit refuses it (q stays). `shared` is the
- * realtime server's answer for a multiplayer street quoin ({ amount, share:
- * { sound } }, features/shared-quoins-feature.js via engine.grantQuoin).
+ * realtime server's answer for a multiplayer street quoin ({ amount, resolved,
+ * share: { sound } }, features/shared-quoins-feature.js via engine.grantQuoin).
  */
 function grabWorldQuoin(q, shared = null) {
   const giantId = giantForStreet(currentStreet).id;
   const result = collectQuoin(quoinState, q.typeId, pc, {
     // G227: a street spot gives what its class gives (quoin.js 161-166, 321-650).
     className: q.quoinClass,
-    // Multiplayer: the amount the realtime server rolled (quoin.js 161-166).
-    ...(shared ? { amount: shared.amount } : {}),
+    // Multiplayer: the amount the realtime server rolled (quoin.js 161-166),
+    // and the kind a mystery quoin turned into there.
+    ...(shared ? { amount: shared.amount, resolvedType: shared.resolved } : {}),
     giantId,
     favor: shrineState.favor,
     favorCap: (id) => emblemCostFor(shrineState, id),
@@ -10371,6 +10372,8 @@ function grabWorldQuoin(q, shared = null) {
   const copy = quoinResultCopy(result);
   // QA (G148): base amount > what landed after the mood bonus.
   app.canvas.dataset.quoinLast = `${result.typeId}:${result.amount}>${result.actual}`;
+  // A mystery quoin's rolled kind (js/quoins.js rollMysteryKind).
+  app.canvas.dataset.quoinResolved = result.resolvedTypeId;
   app.canvas.dataset.moodXpMultiplier = String(moodXpMultiplierFor(pc));
   // G212: Glitches within 300 px get shards; you hear QUOIN_SHARD_<n> (items/quoin.js 169, 266-271).
   // Multiplayer: the server shared it out (features/shared-quoins-feature.js).
@@ -10381,7 +10384,7 @@ function grabWorldQuoin(q, shared = null) {
     quoin: { x: q.x, y: q.y },
     at: { x: player.x, y: player.y },
   }, engine);
-  playSound(quoinShare?.sound || soundForQuoin(result.typeId), {
+  playSound(quoinShare?.sound || soundForQuoin(result.resolvedTypeId), {
     volume: result.typeId === 'qurazy' ? 0.82 : 0.6,
     rate: result.typeId === 'qurazy' ? 1.2 : 1,
     jitter: result.typeId === 'qurazy' ? 0 : 0.03,
