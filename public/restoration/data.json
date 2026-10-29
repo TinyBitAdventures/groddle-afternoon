@@ -2661,9 +2661,14 @@
   ]
  },
  "git": {
-  "commits": 724,
+  "commits": 726,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "new",
+    "text": "Street decos play where the original played them: glints, steam, waves, grass, stars and 49 more"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2778,11 +2783,6 @@
     "date": "2026-10-28",
     "kind": "improve",
     "text": "Scenery that streets draw larger than its art is sharp again"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "fix",
-    "text": "Ceiling lamps hang over your Glitch, the newest window opens on top, and snow and puffs fall over the scenery"
    }
   ]
  },

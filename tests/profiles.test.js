@@ -191,7 +191,7 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
     assert.deepEqual(routes('PlayerPages.php'), [
       'Get /players Public',
       'Get /players/ Public',
-      'Get /players/{id:\\d+}/{kind:avatar|tile|home}.png Public',
+      'Get /players/{id:\\d+}/{kind:avatar|tile|home} Public',
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*} Public',
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/ Public',
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/{tab:skills|achievements|buddies} Public',
@@ -259,7 +259,8 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
     assert.equal(out['about 500'], 'ok:500');
     for (const k of ['about 501', 'about not text', 'about bad utf8']) assert.equal(out[k], 'groddle_profile_about:400', k);
     assert.equal(out.slug, 'zz-prof-a-12,bo-peep,bo-peep,x,review-glitch');
-    assert.equal(out['image url'], '/players/57/tile.png?v=1793037600');
+    // No .png: Kinsta's nginx answers a missing .png file itself, so PHP never saw those (2026-10-29).
+    assert.equal(out['image url'], '/players/57/tile?v=1793037600');
   });
 });
 
