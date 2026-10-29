@@ -167,11 +167,11 @@ import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=g446-2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g446-4';
 import { fadeInNewNear } from '../poof-fade.js?v=g446-2';
-import { projectApi } from './street-jobs-feature.js?v=g443-1';
+import { projectApi } from './street-jobs-feature.js?v=g449-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-3';
-import { towerApi } from './home-tower-feature.js?v=g443-1';
+import { towerApi } from './home-tower-feature.js?v=g449-1';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
-import { wantsHiresDecos } from '../deco-hires.js?v=g443-1';
+import { wantsHiresDecos } from '../deco-hires.js?v=g449-1';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=g446-4';
 import { patchesFeature } from './patches-feature.js?v=g442-6';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=g414-1';
@@ -213,7 +213,7 @@ import {
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=g253-1';
 import { getGameDayKey } from '../game-day.js?v=dametime-4';
-import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=g380-1';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=g449-1';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-6';
 import {
   DOOR_CLASS,

@@ -19,12 +19,12 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=g436-3';
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=g446-4';
-import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=g446-4';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=g449-1';
+import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=g449-1';
 import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js?v=g375-1';
-import { qurazyFeature, resetQurazyFeatureForTests } from '../public/js/features/qurazy-feature.js?v=g446-2';
+import { qurazyFeature, resetQurazyFeatureForTests } from '../public/js/features/qurazy-feature.js?v=g449-1';
 import { QURAZY_SPAWN_LINE } from '../public/js/qurazy.js';
-import { QURAZY_PLACEMENT_GROUP } from '../public/js/features/qurazy-feature.js?v=g446-2';
+import { QURAZY_PLACEMENT_GROUP } from '../public/js/features/qurazy-feature.js?v=g449-1';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from '../public/js/panel-copy.js?v=g396-1';
 
 const root = join(import.meta.dirname, '..');

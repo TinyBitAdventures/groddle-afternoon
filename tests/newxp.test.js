@@ -36,6 +36,10 @@ import {
   TRAINING2_DRINKS,
   TRAINING2_FOOD,
   UPGRADE_HANDS,
+  CLOUD_LETTERS,
+  CLOUD_WORDS,
+  cloudLetterDeco,
+  cloudWordDeco,
   cloudsLayout,
   inBox,
   inHitBox,
@@ -55,7 +59,7 @@ import {
   training2Layout,
   tutorialPhysics,
   vogPages,
-} from '../public/js/newxp.js';
+} from '../public/js/newxp.js?v=g449-1';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(ROOT, 'assets/streets', `${tsid}.json`), 'utf8'));
@@ -160,14 +164,35 @@ describe('newxp source data', () => {
 describe('newxp layouts', () => {
   const by = (L, id) => L.platforms.find((p) => p.id === id);
 
-  it('clouds: land on the cloud, the drop is past its edge', () => {
+  it('clouds: wait on the perch, drop cloud to cloud, the last drop is past the last edge', () => {
     const L = cloudsLayout();
     const cloud = by(L, 'cloud');
-    assert.ok(L.spawn.x > cloud.x1 && L.spawn.x < cloud.x2);
+    const perch = by(L, 'perch');
+    // You wait on the perch over the ceiling until the chain is pulled, over the first cloud.
+    assert.ok(L.spawn.x > perch.x1 && L.spawn.x < perch.x2 && L.spawn.y < perch.y1);
+    assert.ok(perch.y1 < L.ceilingY && L.chain.x === L.spawn.x);
+    const first = L.terraces[0];
+    assert.ok(L.spawn.x > first.x1 && L.spawn.x < first.x2 && first.y > L.ceilingY);
+    // Each lower cloud starts under the end of the one above, so a step off always lands.
+    for (let i = 1; i < L.terraces.length; i++) {
+      const [a, b] = [L.terraces[i - 1], L.terraces[i]];
+      assert.ok(b.y > a.y && b.x1 < a.x2 && b.x2 > a.x2, b.id);
+      const wall = L.barriers.find((w) => w.id === `back_${b.id}`);
+      assert.ok(wall && wall.x < a.x2 && wall.y + wall.h === b.y && wall.y > a.y, `${b.id} keeps you from walking off backwards`);
+    }
+    assert.equal(L.terraces.at(-1), L.terraces.find((t) => t.id === 'cloud'));
     assert.ok(L.dropX > cloud.x2);
-    // G310: the cloud words were lost with the template; two lines of remake copy.
-    assert.equal(L.beats.length, 2);
-    for (const b of L.beats) assert.ok(b.x > cloud.x1 && b.x < cloud.x2, b.text);
+    // G310: the words are Tiny Speck's lettering art (newxp_cloud.swf), one phrase per lower cloud.
+    assert.equal(LINES.cloudBeats, undefined, 'no remake copy');
+    assert.deepEqual(L.terraces.filter((t) => t.phrase).map((t) => t.phrase), Object.keys(CLOUD_WORDS));
+    for (const t of L.terraces.filter((q) => q.phrase)) assert.ok(t.box > t.x1 && t.box < t.at && t.at < t.x2, t.id);
+    const decos = new Set(JSON.parse(readFileSync(join(ROOT, 'assets/decos/manifest.json'), 'utf8')));
+    for (const [w] of Object.values(CLOUD_WORDS).flat()) assert.ok(decos.has(cloudWordDeco(w)), w);
+    for (const [c] of CLOUD_LETTERS) for (const dark of [false, true]) assert.ok(decos.has(cloudLetterDeco(c, dark)), `${c} ${dark}`);
+    for (const p of [...training1Layout().platforms, ...training2Layout().platforms]) if (p.art) assert.ok(decos.has(p.art), p.art);
+    // The words read in the recording's order: the first phrase starts THE ELEVEN GIANTS WHO.
+    assert.deepEqual(CLOUD_WORDS.eleven.slice(0, 4).map(([w]) => w), ['the', 'eleven', 'giants', 'who']);
+    assert.deepEqual(CLOUD_WORDS.go.map(([w]) => w), ['lets', 'go_exclamation']);
   });
 
   it('training1: mushrooms need Walk Speed I; the islands need High Jumper I; the top needs the tree and ladder', () => {
@@ -198,6 +223,13 @@ describe('newxp layouts', () => {
     for (const p of L.platforms) assert.ok(got.has(p.id), p.id);
     const ledge = by(L, 'egg_ledge');
     assert.ok(L.eggPlant.x >= ledge.x1 && L.eggPlant.x <= ledge.x2 && L.eggPlant.y === ledge.y1);
+    // The three style stations (board at -160, picture at +160, each 208 wide) stand apart, inside the room.
+    const stations = L.machine.choices.map((c) => c.x);
+    for (let i = 1; i < stations.length; i++) assert.ok(stations[i] - stations[i - 1] >= 2 * (160 + 104), 'stations do not overlap');
+    // The stations stand past the tube building's wall, and the Magic Rock's ledge past them (K2q5GXruLvE 7:36-8:20).
+    const wall = L.barriers.find((b) => b.id === 'tube_building');
+    assert.ok(stations[0] - 264 > wall.x && stations.at(-1) + 264 < by(L, 'rock_step').x1 && by(L, 'rock_ledge').x2 < L.width);
+    assert.ok(L.boxes.magicrock_reveal.x > stations.at(-1) && L.boxes.magicrock_reveal.x < L.rock.x);
     // The food and drinks sit on their tables, under 160 px above the floor.
     for (const spot of Object.values(L.items)) assert.ok(L.floorY - spot.y < 160);
     // Walls in source order: drinks, egg plant, the tube building.

@@ -43,7 +43,7 @@ import { getGameDayKey } from '../game-day.js';
 import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=progression-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { ELEMENT_STACKMAX, hasPouch, POUCH_CLASS } from '../elemental-pouch.js';
-import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=newxp-4';
+import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=g449-1';
 import { SKILLQUEST_AK_TSID } from '../skillquest-ak.js?v=g298-1';
 import { setToolRemaining, TOOL_CONDITION_CATALOG } from '../tools.js?v=woodcutting-test-8';
 import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husbandry.js?v=g414-1';

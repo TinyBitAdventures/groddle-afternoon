@@ -20,8 +20,8 @@ import { newPlayerInventory, newPlayerStats } from '../public/js/new-player.js?v
 import { createInventory } from '../public/js/inventory.js?v=catalog-unified-7';
 import { PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=g424-1';
 import { createPlayerSave, parsePlayerSave, restorePlayerSave, serializePlayerSave, normalizePlayerSnapshot } from '../public/js/player-save.js?v=g424-1';
-import { cloudsLayout, SCENE_TSIDS, GENTLE_ISLAND } from '../public/js/newxp.js?v=newxp-4';
-import { newxpFeature, __newxpTest, cloudEdge, cloudStepOff, CLOUD_EDGE_CLEAR, CLOUD_END_PUFFS } from '../public/js/features/newxp-feature.js?v=g446-2';
+import { cloudsLayout, SCENE_TSIDS, GENTLE_ISLAND } from '../public/js/newxp.js?v=g449-1';
+import { newxpFeature, __newxpTest, cloudEdge, cloudStepOff, cloudStepOffAny, CLOUD_BODY_DEPTH, CLOUD_EDGE_CLEAR, CLOUD_END_PUFFS } from '../public/js/features/newxp-feature.js?v=g449-1';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -229,7 +229,12 @@ describe('4. the Cloud Level ends in a soft cloud, and the edge drops cleanly', 
     assert.equal(cloudStepOff(edge, { x: edge, onGround: true }), null, 'still on the cloud');
     assert.equal(cloudStepOff(edge, { x: edge + 4, onGround: false }), null, 'already falling');
     assert.equal(cloudStepOff(edge, { x: edge + 20, onGround: true }), null, 'on the catch floor below, past the slack');
-    assert.match(feature, /if \(run\?\.stage === 'clouds' && run\.data\.cloudEdge\) \{\n\s+const p = P\(\);\n\s+const x = cloudStepOff\(run\.data\.cloudEdge, p\);/);
+    // Every cloud drops onto the next, so every edge is cleared the same way.
+    for (const t of L.terraces) {
+      assert.equal(cloudStepOffAny(L.terraces, { x: t.x2 + 4, y: t.y, onGround: true }), t.x2 + CLOUD_EDGE_CLEAR, t.id);
+      assert.equal(cloudStepOffAny(L.terraces, { x: t.x2 + 4, y: t.y + 200, onGround: true }), null, `${t.id}: not on its line`);
+    }
+    assert.match(feature, /if \(run\?\.stage === 'clouds' && run\.data\.terraces\) \{\n\s+const p = P\(\);\n\s+const x = cloudStepOffAny\(run\.data\.terraces, p\);/);
   });
 
   it('the floor is the scene\'s colour, blurred, ending in puffs at the edge (no hard white block side)', () => {
@@ -240,12 +245,16 @@ describe('4. the Cloud Level ends in a soft cloud, and the edge drops cleanly', 
     // Lower puffs tuck in under the edge, as a cloud's underside does.
     const xs = CLOUD_END_PUFFS.map(([dx]) => dx);
     assert.ok(xs.at(-1) < xs[0]);
-    const fn = feature.slice(feature.indexOf('function cloudFloor('), feature.indexOf('async function runClouds('));
-    assert.match(fn, /body\.rect\(-300, top, edge - 160 \+ 300, 700\)\.fill\(colour\);/);
+    const fn = feature.slice(feature.indexOf('function cloudFloor('), feature.indexOf('function pullChain('));
+    assert.match(fn, /body\.rect\(x1 - 300, top, edge - 160 - x1 \+ 300, CLOUD_BODY_DEPTH - 60\)\.fill\(colour\);/);
     assert.match(fn, /new PIXI\.BlurFilter\(/);
-    assert.match(fn, /kit\.deco\(PIXI, 'cloud_fluffy_2'/, 'the scene\'s own cloud art');
+    assert.match(fn, /stageDeco\(PIXI, 'clouds_bg_middleplus_01b_newxp'/, 'Tiny Speck\'s own newxp cloud art');
     // The deco row stops at the edge.
-    assert.match(feature, /for \(let x = -260, i = 0; x < edge - 150; x \+= 200, i\+\+\) \{/);
+    assert.match(fn, /for \(let x = x1 - 120, i = 0; x < edge - 150; x \+= 300, i\+\+\) \{/);
+    // A cloud's body ends above the next cloud's walking line, so it never hides the one below.
+    for (let i = 1; i < L.terraces.length; i++) assert.ok(L.terraces[i - 1].y + CLOUD_BODY_DEPTH < L.terraces[i].y);
+    const drop = Math.min(...L.terraces.slice(1).map((t, i) => t.y - L.terraces[i].y));
+    for (const [, dy, r] of CLOUD_END_PUFFS) assert.ok(60 + dy + r < drop, 'the end puffs stop above the next cloud');
   });
 });
 

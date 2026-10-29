@@ -1493,6 +1493,166 @@
    ],
    "png_sha": "06eaa4a7ef800b36"
   },
+  "floatingplatform_blue_medium_01a_newxpblack": {
+   "swf": "bundle:newxp_cloud.swf#floatingplatform_blue_medium_01a_newxpblack",
+   "swf_sha": "ffe30487e4816e65",
+   "stage": [
+    396.7,
+    105.4
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "a blue floating platform",
+   "png": [
+    794,
+    211
+   ],
+   "png_sha": "0870192cc53ab87a"
+  },
+  "floatingplatform_blue_small_01a_newxpblack": {
+   "swf": "bundle:newxp_cloud.swf#floatingplatform_blue_small_01a_newxpblack",
+   "swf_sha": "be33dcc5ef526cb1",
+   "stage": [
+    187.65,
+    64.8
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "a blue floating platform",
+   "png": [
+    376,
+    130
+   ],
+   "png_sha": "b3f9558c1e9932bf"
+  },
+  "floatingplatform_green_medium_01a_newxpblack": {
+   "swf": "bundle:newxp_cloud.swf#floatingplatform_green_medium_01a_newxpblack",
+   "swf_sha": "958a69cc0a43241f",
+   "stage": [
+    396.7,
+    105.35
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "a green floating platform (the top of Training Level One, the Egg Plant ledge)",
+   "png": [
+    794,
+    211
+   ],
+   "png_sha": "d92653b77969688c"
+  },
+  "floatingplatform_green_small_01a_newxpblack": {
+   "swf": "bundle:newxp_cloud.swf#floatingplatform_green_small_01a_newxpblack",
+   "swf_sha": "82e8be6639f38421",
+   "stage": [
+    190.0,
+    70.85
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "a green floating platform",
+   "png": [
+    380,
+    142
+   ],
+   "png_sha": "2f1c99d7b7b0e7a9"
+  },
+  "floatingplatform_red_medium_01a_newxpblack": {
+   "swf": "bundle:newxp_cloud.swf#floatingplatform_red_medium_01a_newxpblack",
+   "swf_sha": "321c1fc770271ec1",
+   "stage": [
+    396.7,
+    105.4
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "a red floating platform (the Magic Rock ledge)",
+   "png": [
+    794,
+    211
+   ],
+   "png_sha": "71efc9d5826578b0"
+  },
+  "floatingplatform_red_small_01a_newxpblack": {
+   "swf": "bundle:newxp_cloud.swf#floatingplatform_red_small_01a_newxpblack",
+   "swf_sha": "c6ece1dae656d8f4",
+   "stage": [
+    187.6,
+    64.75
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "a red floating platform",
+   "png": [
+    376,
+    130
+   ],
+   "png_sha": "492c086d7fc19480"
+  },
+  "floatingplatform_yellow_medium_01a_newxpblack": {
+   "swf": "bundle:newxp_cloud.swf#floatingplatform_yellow_medium_01a_newxpblack",
+   "swf_sha": "530181ce4d49783d",
+   "stage": [
+    397.0,
+    105.4
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "a yellow floating platform",
+   "png": [
+    794,
+    211
+   ],
+   "png_sha": "23d45bfa618074a7"
+  },
+  "floatingplatform_yellow_small_01a_newxpblack": {
+   "swf": "bundle:newxp_cloud.swf#floatingplatform_yellow_small_01a_newxpblack",
+   "swf_sha": "f05e4cad491648b8",
+   "stage": [
+    187.65,
+    64.5
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "a yellow floating platform",
+   "png": [
+    376,
+    129
+   ],
+   "png_sha": "425dd83da12bc8b4"
+  },
   "floor_shadow_left_open": {
    "swf": "bundle:home_groddle.swf#floor_shadow_left_open",
    "swf_sha": "653a562c098cc4de",
@@ -2044,6 +2204,86 @@
    ],
    "png_sha": "f1dbc463eef3f4c2"
   },
+  "groundstars_bg1_01a_newxpblack": {
+   "swf": "bundle:newxp_cloud.swf#groundstars_bg1_01a_newxpblack",
+   "swf_sha": "d9f43cfffaeaa4ed",
+   "stage": [
+    971.75,
+    29.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the star field, far row",
+   "png": [
+    1944,
+    60
+   ],
+   "png_sha": "48a714e924624edf"
+  },
+  "groundstars_bg2_01a_newxpblack": {
+   "swf": "bundle:newxp_cloud.swf#groundstars_bg2_01a_newxpblack",
+   "swf_sha": "cc8fc500ed4b2b54",
+   "stage": [
+    875.65,
+    13.55
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the star field, far row",
+   "png": [
+    1752,
+    28
+   ],
+   "png_sha": "d0e300c055bd59bf"
+  },
+  "groundstars_middleback_01a_newxpblack": {
+   "swf": "bundle:newxp_cloud.swf#groundstars_middleback_01a_newxpblack",
+   "swf_sha": "985559106de8ac16",
+   "stage": [
+    957.4,
+    76.5
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the star field, behind the walking line",
+   "png": [
+    1915,
+    153
+   ],
+   "png_sha": "60fe6e9818891323"
+  },
+  "groundstars_middleplus_01a_newxpblack": {
+   "swf": "bundle:newxp_cloud.swf#groundstars_middleplus_01a_newxpblack",
+   "swf_sha": "566ad0f2fa376329",
+   "stage": [
+    752.45,
+    62.4
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the star field, in front of the walking line",
+   "png": [
+    1505,
+    125
+   ],
+   "png_sha": "bd0c979768c20162"
+  },
   "hill_distant1": {
    "swf": "bundle:corey3.swf#hill_distant1",
    "swf_sha": "ece02a82f0a3cfb7",
@@ -2215,6 +2455,26 @@
    ],
    "png_sha": "a5c1dd7500263431"
   },
+  "homestreetstyle_sign_large_newxpblack": {
+   "swf": "bundle:newxp_cloud.swf#homestreetstyle_sign_large_newxpblack",
+   "swf_sha": "c79d6013be54413c",
+   "stage": [
+    1086.0,
+    477.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the hanging HOME STREET STYLE sign",
+   "png": [
+    2172,
+    954
+   ],
+   "png_sha": "91a1624f4843254a"
+  },
   "house_asset_orange": {
    "swf": "bundle:meomi2.swf#house_asset_orange",
    "swf_sha": "7c0ef330029e25e0",
@@ -2290,6 +2550,26 @@
     65
    ],
    "png_sha": "7aa65cd1b46278d6"
+  },
+  "ladder_starry_1a_newxpblack": {
+   "swf": "bundle:newxp_cloud.swf#ladder_starry_1a_newxpblack",
+   "swf_sha": "272db80502f28dbc",
+   "stage": [
+    85.9,
+    232.7
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the starry ladder up to the top of Training Level One",
+   "png": [
+    172,
+    466
+   ],
+   "png_sha": "e5d0eaf6d2a9f670"
   },
   "ladder_tile_cap_1_metal": {
    "swf": "bundle:meomi2.swf#ladder_tile_cap_1_metal",
@@ -2423,6 +2703,1326 @@
     280
    ],
    "png_sha": "49ce16f27e17a575"
+  },
+  "newxp_clicktopull_arrow": {
+   "swf": "bundle:newxp_cloud.swf#newxp_clicktopull_arrow",
+   "swf_sha": "4ca00d78de31cf6e",
+   "stage": [
+    75.0,
+    108.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the click to pull arrow under the Cloud Level chain",
+   "png": [
+    150,
+    218
+   ],
+   "png_sha": "09846d49b37656e2"
+  },
+  "newxp_glitchlogo_stone_c_01a": {
+   "swf": "bundle:newxp_cloud.swf#newxp_glitchlogo_stone_c_01a",
+   "swf_sha": "71cd513a96131af0",
+   "stage": [
+    182.9,
+    223.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the stone letter c of the Cloud Level Glitch logo",
+   "png": [
+    366,
+    446
+   ],
+   "png_sha": "7614f66eb6532be9"
+  },
+  "newxp_glitchlogo_stone_c_dark_01a": {
+   "swf": "bundle:newxp_cloud.swf#newxp_glitchlogo_stone_c_dark_01a",
+   "swf_sha": "d0efdb25bc75202b",
+   "stage": [
+    182.9,
+    223.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the same stone letter, unlit (it lightens as you land)",
+   "png": [
+    366,
+    446
+   ],
+   "png_sha": "7cb49a04c1a54b7d"
+  },
+  "newxp_glitchlogo_stone_g_01a": {
+   "swf": "bundle:newxp_cloud.swf#newxp_glitchlogo_stone_g_01a",
+   "swf_sha": "434b417ac34cf3d7",
+   "stage": [
+    338.25,
+    447.3
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the stone letter g of the Cloud Level Glitch logo",
+   "png": [
+    677,
+    895
+   ],
+   "png_sha": "2ed12d5ef9eef9fd"
+  },
+  "newxp_glitchlogo_stone_g_dark01a": {
+   "swf": "bundle:newxp_cloud.swf#newxp_glitchlogo_stone_g_dark01a",
+   "swf_sha": "56ab5e079e6450bd",
+   "stage": [
+    338.25,
+    447.3
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the same stone letter, unlit (it lightens as you land)",
+   "png": [
+    677,
+    895
+   ],
+   "png_sha": "9f71d4dffdd50935"
+  },
+  "newxp_glitchlogo_stone_h_01a": {
+   "swf": "bundle:newxp_cloud.swf#newxp_glitchlogo_stone_h_01a",
+   "swf_sha": "fdeced9592b7cfad",
+   "stage": [
+    232.9,
+    419.15
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the stone letter h of the Cloud Level Glitch logo",
+   "png": [
+    466,
+    839
+   ],
+   "png_sha": "da876dd0112b52ef"
+  },
+  "newxp_glitchlogo_stone_h_dark_01a": {
+   "swf": "bundle:newxp_cloud.swf#newxp_glitchlogo_stone_h_dark_01a",
+   "swf_sha": "15957d70ad40e033",
+   "stage": [
+    232.9,
+    419.15
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the same stone letter, unlit (it lightens as you land)",
+   "png": [
+    466,
+    839
+   ],
+   "png_sha": "04dfec3baf0913fb"
+  },
+  "newxp_glitchlogo_stone_i_01a": {
+   "swf": "bundle:newxp_cloud.swf#newxp_glitchlogo_stone_i_01a",
+   "swf_sha": "c05304264e28678d",
+   "stage": [
+    84.85,
+    305.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the stone letter i of the Cloud Level Glitch logo",
+   "png": [
+    170,
+    612
+   ],
+   "png_sha": "c415f825dceb1e28"
+  },
+  "newxp_glitchlogo_stone_i_dark_01a": {
+   "swf": "bundle:newxp_cloud.swf#newxp_glitchlogo_stone_i_dark_01a",
+   "swf_sha": "2b988d0f109e4f1a",
+   "stage": [
+    84.85,
+    305.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the same stone letter, unlit (it lightens as you land)",
+   "png": [
+    170,
+    612
+   ],
+   "png_sha": "6633e3d571fb73fa"
+  },
+  "newxp_glitchlogo_stone_l_01a": {
+   "swf": "bundle:newxp_cloud.swf#newxp_glitchlogo_stone_l_01a",
+   "swf_sha": "f10714274537c8cf",
+   "stage": [
+    141.75,
+    463.15
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the stone letter l of the Cloud Level Glitch logo",
+   "png": [
+    284,
+    927
+   ],
+   "png_sha": "2090c5913e9c73dc"
+  },
+  "newxp_glitchlogo_stone_l_dark_01a": {
+   "swf": "bundle:newxp_cloud.swf#newxp_glitchlogo_stone_l_dark_01a",
+   "swf_sha": "fcd5e686e622ed27",
+   "stage": [
+    141.75,
+    463.15
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the same stone letter, unlit (it lightens as you land)",
+   "png": [
+    284,
+    927
+   ],
+   "png_sha": "10d3dec29869ae26"
+  },
+  "newxp_glitchlogo_stone_t_01a": {
+   "swf": "bundle:newxp_cloud.swf#newxp_glitchlogo_stone_t_01a",
+   "swf_sha": "e5468430d05ba657",
+   "stage": [
+    159.85,
+    401.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the stone letter t of the Cloud Level Glitch logo",
+   "png": [
+    320,
+    804
+   ],
+   "png_sha": "9863452fcb58c3e8"
+  },
+  "newxp_glitchlogo_stone_t_dark_01a": {
+   "swf": "bundle:newxp_cloud.swf#newxp_glitchlogo_stone_t_dark_01a",
+   "swf_sha": "32c3967a2707aae1",
+   "stage": [
+    159.85,
+    401.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the same stone letter, unlit (it lightens as you land)",
+   "png": [
+    320,
+    804
+   ],
+   "png_sha": "54b0f0a4f8863f08"
+  },
+  "newxp_homestreetchoosingfacilitysign": {
+   "swf": "bundle:newxp_cloud.swf#newxp_homestreetchoosingfacilitysign",
+   "swf_sha": "d1c4262e9e2d39f0",
+   "stage": [
+    195.0,
+    87.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Home Street Choosing Facility plaque",
+   "png": [
+    390,
+    174
+   ],
+   "png_sha": "33f4fda26eaf8157"
+  },
+  "newxp_t1_striations_01a": {
+   "swf": "bundle:newxp_cloud.swf#newxp_t1_striations_01a",
+   "swf_sha": "02a7d96b3c1c6086",
+   "stage": [
+    470.35,
+    777.8
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "Training Level One: the striped shaft you fall down",
+   "png": [
+    941,
+    1556
+   ],
+   "png_sha": "a013289f8255b364"
+  },
+  "newxp_t1_striations_bg_01a": {
+   "swf": "bundle:newxp_cloud.swf#newxp_t1_striations_bg_01a",
+   "swf_sha": "33eb54e22da615a1",
+   "stage": [
+    1221.4,
+    393.1
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "Training Level One: the sky and green ground above the shaft",
+   "png": [
+    2443,
+    787
+   ],
+   "png_sha": "3dc0a14f708161f2"
+  },
+  "newxp_t1_striations_middleplus_01a": {
+   "swf": "bundle:newxp_cloud.swf#newxp_t1_striations_middleplus_01a",
+   "swf_sha": "f43b86553ec30096",
+   "stage": [
+    624.6,
+    117.75
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "Training Level One: the green lip of the hole",
+   "png": [
+    1250,
+    236
+   ],
+   "png_sha": "de5f5fca72038399"
+  },
+  "newxp_t1_striations_sun_01a": {
+   "swf": "bundle:lighting1.swf#newxp_t1_striations_sun_01a",
+   "swf_sha": "546202285c46ce6e",
+   "stage": [
+    202.35,
+    202.35
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "Training Level One: the sun over the hole",
+   "png": [
+    405,
+    405
+   ],
+   "png_sha": "f5952a08c472318a"
+  },
+  "newxpblack_choosestreetstyle_blueprint_firebog": {
+   "swf": "bundle:newxp_cloud.swf#newxpblack_choosestreetstyle_blueprint_firebog",
+   "swf_sha": "9dc1aa2c24b57e1b",
+   "stage": [
+    208.05,
+    185.25
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the CHOOSE FIREBOG STYLE board",
+   "png": [
+    417,
+    371
+   ],
+   "png_sha": "8990f6d2a2954dfd"
+  },
+  "newxpblack_choosestreetstyle_blueprint_meadow": {
+   "swf": "bundle:newxp_cloud.swf#newxpblack_choosestreetstyle_blueprint_meadow",
+   "swf_sha": "5059454099466d4f",
+   "stage": [
+    208.05,
+    185.25
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the CHOOSE MEADOW STYLE board",
+   "png": [
+    417,
+    371
+   ],
+   "png_sha": "da034f85264a8bc0"
+  },
+  "newxpblack_choosestreetstyle_blueprint_uralia": {
+   "swf": "bundle:newxp_cloud.swf#newxpblack_choosestreetstyle_blueprint_uralia",
+   "swf_sha": "b0955d530de23635",
+   "stage": [
+    208.05,
+    185.25
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the CHOOSE URALIA STYLE board",
+   "png": [
+    417,
+    371
+   ],
+   "png_sha": "b5889a9bee460186"
+  },
+  "newxpblack_choosestreetstyle_firebog": {
+   "swf": "bundle:newxp_cloud.swf#newxpblack_choosestreetstyle_firebog",
+   "swf_sha": "5195aedcf657ce1f",
+   "stage": [
+    208.05,
+    185.25
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Firebog style picture",
+   "png": [
+    417,
+    371
+   ],
+   "png_sha": "b69b9e44221bc34c"
+  },
+  "newxpblack_choosestreetstyle_meadow": {
+   "swf": "bundle:newxp_cloud.swf#newxpblack_choosestreetstyle_meadow",
+   "swf_sha": "1098636a43793692",
+   "stage": [
+    208.05,
+    185.25
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Meadow style picture",
+   "png": [
+    417,
+    371
+   ],
+   "png_sha": "6b15719c140b3d7e"
+  },
+  "newxpblack_choosestreetstyle_pole": {
+   "swf": "bundle:newxp_cloud.swf#newxpblack_choosestreetstyle_pole",
+   "swf_sha": "d3e43e3db166a92d",
+   "stage": [
+    52.45,
+    179.85
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the pole a style picture stands on",
+   "png": [
+    105,
+    360
+   ],
+   "png_sha": "b7a04f20eb9164de"
+  },
+  "newxpblack_choosestreetstyle_uralia": {
+   "swf": "bundle:newxp_cloud.swf#newxpblack_choosestreetstyle_uralia",
+   "swf_sha": "1217cef1504ca355",
+   "stage": [
+    208.05,
+    185.25
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Uralia style picture",
+   "png": [
+    417,
+    371
+   ],
+   "png_sha": "76d0b64e2829199f"
+  },
+  "newxpblack_target_01a": {
+   "swf": "bundle:newxp_cloud.swf#newxpblack_target_01a",
+   "swf_sha": "ab5ba80f37c2ea23",
+   "stage": [
+    112.55,
+    46.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the target ring under a style tube",
+   "png": [
+    226,
+    94
+   ],
+   "png_sha": "41676da1faa6c467"
+  },
+  "newxpblack_target_01b": {
+   "swf": "bundle:newxp_cloud.swf#newxpblack_target_01b",
+   "swf_sha": "562bc6b4fb1579ae",
+   "stage": [
+    112.55,
+    46.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the target ring under a style tube",
+   "png": [
+    226,
+    94
+   ],
+   "png_sha": "046f399071e77c82"
+  },
+  "newxpblack_target_01c": {
+   "swf": "bundle:newxp_cloud.swf#newxpblack_target_01c",
+   "swf_sha": "fd9e4517c4f2e4a3",
+   "stage": [
+    112.55,
+    46.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the target ring under a style tube",
+   "png": [
+    226,
+    94
+   ],
+   "png_sha": "9c65f3d15cd8bd6d"
+  },
+  "newxpblack_tube_metal_01a_back": {
+   "swf": "bundle:newxp_cloud.swf#newxpblack_tube_metal_01a_back",
+   "swf_sha": "3acaf3872a327850",
+   "stage": [
+    189.95,
+    707.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the back of the holey tube",
+   "png": [
+    380,
+    1414
+   ],
+   "png_sha": "6980186de6f0351e"
+  },
+  "newxpblack_tube_metal_01a_front": {
+   "swf": "bundle:newxp_cloud.swf#newxpblack_tube_metal_01a_front",
+   "swf_sha": "1801c22ea9148d55",
+   "stage": [
+    209.8,
+    698.2
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the holey tube over a home street style station",
+   "png": [
+    420,
+    1397
+   ],
+   "png_sha": "3925503f06318b2f"
+  },
+  "newxpblack_wallcover_middle_01a": {
+   "swf": "bundle:newxp_cloud.swf#newxpblack_wallcover_middle_01a",
+   "swf_sha": "f05b367774144d46",
+   "stage": [
+    205.25,
+    999.95
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the dark wall of Training Level Two",
+   "png": [
+    411,
+    2000
+   ],
+   "png_sha": "e884cf599a6bcd81"
+  },
+  "newxptext_and": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_and",
+   "swf_sha": "9d35815db778b93d",
+   "stage": [
+    96.0,
+    46.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word and (white lettering)",
+   "png": [
+    192,
+    92
+   ],
+   "png_sha": "6538be93ade736b5"
+  },
+  "newxptext_are": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_are",
+   "swf_sha": "3cb77f20e3d002a1",
+   "stage": [
+    83.0,
+    46.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word are (white lettering)",
+   "png": [
+    166,
+    92
+   ],
+   "png_sha": "2435eeddcd301595"
+  },
+  "newxptext_can": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_can",
+   "swf_sha": "582af7b1a5e25d30",
+   "stage": [
+    98.0,
+    48.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word can (white lettering)",
+   "png": [
+    196,
+    96
+   ],
+   "png_sha": "83a944c9b66d880c"
+  },
+  "newxptext_eleven": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_eleven",
+   "swf_sha": "b7f98701d23f01e0",
+   "stage": [
+    153.0,
+    49.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word eleven (white lettering)",
+   "png": [
+    306,
+    98
+   ],
+   "png_sha": "ff78267cf0f75227"
+  },
+  "newxptext_ellipses": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_ellipses",
+   "swf_sha": "e67e08a81ff69e70",
+   "stage": [
+    51.0,
+    24.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word ellipses (white lettering)",
+   "png": [
+    102,
+    48
+   ],
+   "png_sha": "42392f395fab7b8c"
+  },
+  "newxptext_enough": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_enough",
+   "swf_sha": "5e41ae2917faed14",
+   "stage": [
+    184.0,
+    48.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word enough (white lettering)",
+   "png": [
+    368,
+    96
+   ],
+   "png_sha": "93afd5fe0decb6c0"
+  },
+  "newxptext_everything": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_everything",
+   "swf_sha": "6b975acd27627706",
+   "stage": [
+    265.0,
+    50.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word everything (white lettering)",
+   "png": [
+    530,
+    100
+   ],
+   "png_sha": "01c05bde939b5903"
+  },
+  "newxptext_existence_ellipses": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_existence_ellipses",
+   "swf_sha": "eafefe6b8161d442",
+   "stage": [
+    259.0,
+    50.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word existence ellipses (white lettering)",
+   "png": [
+    518,
+    100
+   ],
+   "png_sha": "e55e871b1c87387d"
+  },
+  "newxptext_giants": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_giants",
+   "swf_sha": "ead80144d66b41c7",
+   "stage": [
+    178.0,
+    53.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word giants (white lettering)",
+   "png": [
+    356,
+    106
+   ],
+   "png_sha": "b59ffb5f71c1b601"
+  },
+  "newxptext_go_exclamation": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_go_exclamation",
+   "swf_sha": "aefb378ab12cda2d",
+   "stage": [
+    101.0,
+    54.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word go exclamation (white lettering)",
+   "png": [
+    202,
+    108
+   ],
+   "png_sha": "8ec830419b26a2b4"
+  },
+  "newxptext_grow": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_grow",
+   "swf_sha": "46a9f9be930bf765",
+   "stage": [
+    146.0,
+    49.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word grow (white lettering)",
+   "png": [
+    292,
+    98
+   ],
+   "png_sha": "4e65d3d27526db2e"
+  },
+  "newxptext_have": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_have",
+   "swf_sha": "62d87d6fdbaab8e1",
+   "stage": [
+    115.0,
+    48.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word have (white lettering)",
+   "png": [
+    230,
+    96
+   ],
+   "png_sha": "1ea82fac8a6f43cc"
+  },
+  "newxptext_help": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_help",
+   "swf_sha": "418a058fffd162b1",
+   "stage": [
+    106.0,
+    47.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word help (white lettering)",
+   "png": [
+    212,
+    94
+   ],
+   "png_sha": "2fc2cf8430a3c30c"
+  },
+  "newxptext_imagination_comma": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_imagination_comma",
+   "swf_sha": "be87f2128a3cac39",
+   "stage": [
+    310.0,
+    57.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word imagination comma (white lettering)",
+   "png": [
+    620,
+    114
+   ],
+   "png_sha": "fcc42331de169048"
+  },
+  "newxptext_imagine": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_imagine",
+   "swf_sha": "db647f04f0921e05",
+   "stage": [
+    192.0,
+    51.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word imagine (white lettering)",
+   "png": [
+    384,
+    102
+   ],
+   "png_sha": "1b94fb9fd90546b3"
+  },
+  "newxptext_imagined": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_imagined",
+   "swf_sha": "916e97e608265c39",
+   "stage": [
+    221.0,
+    51.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word imagined (white lettering)",
+   "png": [
+    442,
+    102
+   ],
+   "png_sha": "a713846692678653"
+  },
+  "newxptext_into": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_into",
+   "swf_sha": "8b89a0d156725fae",
+   "stage": [
+    96.0,
+    44.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word into (white lettering)",
+   "png": [
+    192,
+    88
+   ],
+   "png_sha": "b318b9978d09f97c"
+  },
+  "newxptext_lets": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_lets",
+   "swf_sha": "293e5a85d87c832a",
+   "stage": [
+    100.0,
+    46.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word lets (white lettering)",
+   "png": [
+    200,
+    92
+   ],
+   "png_sha": "0cb0130c5e9815ba"
+  },
+  "newxptext_like": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_like",
+   "swf_sha": "16b131eec29a64bf",
+   "stage": [
+    89.0,
+    47.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word like (white lettering)",
+   "png": [
+    178,
+    94
+   ],
+   "png_sha": "62dd5e9ee61b7490"
+  },
+  "newxptext_lucky": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_lucky",
+   "swf_sha": "074f5cbee293075e",
+   "stage": [
+    151.0,
+    51.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word lucky (white lettering)",
+   "png": [
+    302,
+    102
+   ],
+   "png_sha": "30405ee0bc9b91aa"
+  },
+  "newxptext_own": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_own",
+   "swf_sha": "db1c11451b1241df",
+   "stage": [
+    119.0,
+    50.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word own (white lettering)",
+   "png": [
+    238,
+    100
+   ],
+   "png_sha": "bcc4e668ebb51d19"
+  },
+  "newxptext_sang": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_sang",
+   "swf_sha": "eeb349b95bdaef05",
+   "stage": [
+    133.0,
+    50.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word sang (white lettering)",
+   "png": [
+    266,
+    100
+   ],
+   "png_sha": "3f80c22e728057d2"
+  },
+  "newxptext_shape": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_shape",
+   "swf_sha": "25dd937053e1fbea",
+   "stage": [
+    150.0,
+    51.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word shape (white lettering)",
+   "png": [
+    300,
+    102
+   ],
+   "png_sha": "bbf1ba0b9c18700b"
+  },
+  "newxptext_someone": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_someone",
+   "swf_sha": "bed63150d886a843",
+   "stage": [
+    212.0,
+    49.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word someone (white lettering)",
+   "png": [
+    424,
+    98
+   ],
+   "png_sha": "966a4522ebae0711"
+  },
+  "newxptext_sometimes": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_sometimes",
+   "swf_sha": "e06aa89ce0e9ffdf",
+   "stage": [
+    247.0,
+    49.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word sometimes (white lettering)",
+   "png": [
+    494,
+    98
+   ],
+   "png_sha": "cc455988ca2226c5"
+  },
+  "newxptext_the": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_the",
+   "swf_sha": "deb721d9d18a2068",
+   "stage": [
+    94.0,
+    51.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word the (white lettering)",
+   "png": [
+    188,
+    102
+   ],
+   "png_sha": "5ad5df6384b36079"
+  },
+  "newxptext_these": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_these",
+   "swf_sha": "11d0ae85dda2797c",
+   "stage": [
+    132.0,
+    49.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word these (white lettering)",
+   "png": [
+    264,
+    98
+   ],
+   "png_sha": "e2731dcd47e7698d"
+  },
+  "newxptext_this": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_this",
+   "swf_sha": "bce50cda6f113d3a",
+   "stage": [
+    95.0,
+    46.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word this (white lettering)",
+   "png": [
+    190,
+    92
+   ],
+   "png_sha": "5a55e8545181e3bd"
+  },
+  "newxptext_thought": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_thought",
+   "swf_sha": "ed998e77d65cf66a",
+   "stage": [
+    227.0,
+    51.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word thought (white lettering)",
+   "png": [
+    454,
+    102
+   ],
+   "png_sha": "12e281f67a886df5"
+  },
+  "newxptext_to": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_to",
+   "swf_sha": "dd642088beb72d8b",
+   "stage": [
+    60.0,
+    43.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word to (white lettering)",
+   "png": [
+    120,
+    86
+   ],
+   "png_sha": "8f9b702c6febd942"
+  },
+  "newxptext_who": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_who",
+   "swf_sha": "78353f71bfd54dd1",
+   "stage": [
+    117.0,
+    48.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word who (white lettering)",
+   "png": [
+    234,
+    96
+   ],
+   "png_sha": "a6232945652769de"
+  },
+  "newxptext_world_period": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_world_period",
+   "swf_sha": "f33f89744065b903",
+   "stage": [
+    182.0,
+    51.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word world period (white lettering)",
+   "png": [
+    364,
+    102
+   ],
+   "png_sha": "6c4139968c67f622"
+  },
+  "newxptext_you": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_you",
+   "swf_sha": "883f40eb44730a3f",
+   "stage": [
+    112.0,
+    53.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word you (white lettering)",
+   "png": [
+    224,
+    106
+   ],
+   "png_sha": "f33f8ba2f6a75a2c"
+  },
+  "newxptext_you_period": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_you_period",
+   "swf_sha": "af2a16f04e9f5a51",
+   "stage": [
+    119.0,
+    51.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word you period (white lettering)",
+   "png": [
+    238,
+    102
+   ],
+   "png_sha": "71edd66458ed8367"
+  },
+  "newxptext_your": {
+   "swf": "bundle:newxp_cloud.swf#newxptext_your",
+   "swf_sha": "818ab66e33a72919",
+   "stage": [
+    131.0,
+    51.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Cloud Level word your (white lettering)",
+   "png": [
+    262,
+    102
+   ],
+   "png_sha": "05227ce954aa3288"
   },
   "patch_hilite1": {
    "swf": "bundle:corey3.swf#patch_hilite1",
@@ -2879,6 +4479,26 @@
     74
    ],
    "png_sha": "5e2cd35fc1eda38a"
+  },
+  "sign_t2streetstyle_newxp": {
+   "swf": "bundle:newxp_cloud.swf#sign_t2streetstyle_newxp",
+   "swf_sha": "e512a4f465d082a4",
+   "stage": [
+    236.0,
+    171.1
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Go talk to your Magic Rock sign",
+   "png": [
+    472,
+    343
+   ],
+   "png_sha": "c2c6ec888604502c"
   },
   "sign_waiting_area": {
    "swf": "bundle:bldg_int_bhall.swf#sign_waiting_area",

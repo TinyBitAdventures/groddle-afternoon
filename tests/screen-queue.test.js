@@ -266,6 +266,6 @@ describe('the Giant screen (GiantView.as)', () => {
     assert.match(src, /const input = screenInput\(el, \{ button: el \}\);/);
     assert.match(src, /import \{ screenInput \} from '\.\.\/screen-fx\.js\?v=g434-1';/);
     assert.match(src, /engine\.queueScreen\(run\)/);
-    assert.match(read('js/features/index.js'), /shrine-hint-feature\.js\?v=g434-1'/);
+    assert.match(read('js/features/index.js'), /shrine-hint-feature\.js\?v=g449-1'/);
   });
 });

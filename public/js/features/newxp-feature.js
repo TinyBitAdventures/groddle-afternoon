@@ -89,6 +89,13 @@ import {
   TRAINING2_ENTER_METABOLICS,
   TRAINING2_FOOD,
   UPGRADE_HANDS,
+  CLOUD_LETTERS,
+  CLOUD_LETTER_FADE_MS,
+  CLOUD_WORDS,
+  CLOUD_WORD_FADE_MS,
+  CLOUD_WORD_STAGGER_MS,
+  cloudLetterDeco,
+  cloudWordDeco,
   cloudsLayout,
   firstSkill,
   inBox,
@@ -107,7 +114,7 @@ import {
   training2Layout,
   tutorialPhysics,
   vogPages,
-} from '../newxp.js?v=newxp-4';
+} from '../newxp.js?v=g449-1';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=g424-1';
 import { soundForQuoin } from '../sound-moments.js?v=g393-1';
@@ -117,10 +124,10 @@ import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '
 import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
 import { locationEventsApi } from './location-events-feature.js?v=location-events-9';
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
-import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
+import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g446-2';
-import { HOME_MACHINE } from '../home-ticket.js?v=g380-1';
+import { HOME_MACHINE } from '../home-ticket.js?v=g449-1';
 import { createAnimalState } from '../animals.js?v=g414-1';
 import {
   AK_ANIMALS,
@@ -976,51 +983,58 @@ function newRun(stage, layout = null) {
   return { stage, layout, npcs: [], quoins: [], pickups: [], fixtures: [], data: {}, step: '', views: {} };
 }
 
-function drawPlatforms(PIXI, root, platforms) {
-  const g = new PIXI.Graphics();
-  for (const p of platforms) {
-    if (p.style === 'invisible' || p.style === 'stars' || p.style === 'cloud' || p.tree) continue;
-    if (p.style === 'mushroom') {
-      g.ellipse((p.x1 + p.x2) / 2, p.y1 + 6, (p.x2 - p.x1) / 2 + 6, 14).fill(0xe8d6a8);
-      g.ellipse((p.x1 + p.x2) / 2, p.y1 + 12, (p.x2 - p.x1) / 2, 8).fill(0xd8bf86);
-      g.rect((p.x1 + p.x2) / 2 - 10, p.y1 + 14, 20, 60).fill(0xf3ead2);
-      continue;
-    }
-    const w = p.x2 - p.x1;
-    const cx = (p.x1 + p.x2) / 2;
-    const top = { grass: 0x8cbf3f, pool: 0x4a8fe0, red: 0xc0564e }[p.style] || 0x8cbf3f;
-    g.moveTo(p.x1, p.y1 + 4);
-    g.quadraticCurveTo(cx, p.y1 + 70, p.x2, p.y1 + 4);
-    g.closePath();
-    g.fill(0x5b4636);
-    g.ellipse(cx, p.y1 + 4, w / 2, 11).fill(top);
-    g.ellipse(cx - w * 0.12, p.y1 + 1, w * 0.3, 4).fill({ color: 0xffffff, alpha: 0.12 });
-  }
-  root.addChild(g);
-  return g;
+/** Stage sizes of the newxpblack floating platforms (newxp_cloud.swf, CC0). */
+const PLATFORM_ART_SIZE = Object.freeze({ small: [188, 65], green_small: [190, 71], medium: [397, 105] });
+/** Where a floating platform's walking line sits under its art's top (the middle of its top face). */
+export const PLATFORM_ART_TOP = 0.14;
+
+/**
+ * A layout platform drawn as its Tiny Speck floating platform (`art`): 12% wider than the walking
+ * line, as tall as that scale allows up to 1.5x, the walking line across the middle of its top face.
+ */
+export function platformArtFit(p) {
+  const size = p.art?.includes('_medium_') ? PLATFORM_ART_SIZE.medium : p.art?.includes('green_small') ? PLATFORM_ART_SIZE.green_small : PLATFORM_ART_SIZE.small;
+  const sx = ((p.x2 - p.x1) * 1.12) / size[0];
+  const sy = Math.min(sx, 1.5);
+  return { x: (p.x1 + p.x2) / 2, y: p.y1 - size[1] * PLATFORM_ART_TOP * sy, sx, sy };
 }
 
-/** Black void with a field of gold stars on the floor (the training levels). */
+function drawPlatforms(PIXI, root, platforms) {
+  const layer = new PIXI.Container();
+  for (const p of platforms) {
+    if (!p.art || p.tree) continue;
+    const f = platformArtFit(p);
+    layer.addChild(stageDeco(PIXI, p.art, f.x, f.y, { ay: 0, sx: f.sx, sy: f.sy }));
+  }
+  root.addChild(layer);
+  return layer;
+}
+
+/**
+ * The training rooms' black space and its star field: Tiny Speck's groundstars rows
+ * (newxp_cloud.swf groundstars_*_newxpblack), far rows above the walking line, nearer and
+ * bigger ones under it, as the recording's floor reads (K2q5GXruLvE 1:28-5:20).
+ */
+const STAR_ROWS = Object.freeze([
+  ['groundstars_bg2_01a_newxpblack', -34], ['groundstars_bg1_01a_newxpblack', -22], ['groundstars_middleback_01a_newxpblack', -8],
+  ['groundstars_row_6a_newxpblack', 4], ['groundstars_middle_01a_newxpblack', 16], ['groundstars_row_4a_newxpblack', 34],
+  ['groundstars_row_3a_newxpblack', 52], ['groundstars_row_2a_newxpblack', 72], ['groundstars_middleplus_01a_newxpblack', 96],
+  ['groundstars_row_1a_newxpblack', 124],
+]);
 function starVoid(PIXI, root, width, height, floorY) {
   const bg = new PIXI.Graphics();
   bg.rect(-700, -500, width + 1400, height + 1000).fill(0x000000);
   root.addChild(bg);
-  const glow = new PIXI.Graphics();
-  for (let i = 0; i < 6; i++) {
-    glow.ellipse(width / 2, floorY + 30, width / 2 + 300 - i * 40, 60 - i * 6).fill({ color: 0x2c2a10, alpha: 0.08 });
-  }
-  root.addChild(glow);
-  for (let x = -200, i = 0; x < width + 200; x += 46, i += 1) {
-    for (let row = 0; row < 3; row += 1) {
-      const h = kit.hash01(`nxstar:${i}:${row}`);
-      const s = kit.deco(PIXI, 'star_asset_01', x + h * 40, floorY + 6 + row * 22 + h * 10, { ay: 0.5, tint: 0xf0d27a, alpha: 0.75 + h * 0.25 });
-      const size = 14 + h * 16 + row * 4;
-      const fit = () => { s.width = size; s.height = size; };
-      if (isLoaded(s.texture)) fit();
-      else onLoaded(s.texture.source, fit);
-      root.addChild(s);
+  STAR_ROWS.forEach(([name, dy], row) => {
+    for (let x = -400 + (row % 3) * 230, i = 0; x < width + 400; x += 860, i++) {
+      root.addChild(stageDeco(PIXI, name, x, floorY + dy, { sx: i % 2 ? -1 : 1, sy: 1 }));
     }
-  }
+  });
+}
+
+/** A dark wall (newxpblack_wallcover_middle_01a) standing for a barrier until it opens. */
+function wallArt(PIXI, b) {
+  return stageDeco(PIXI, 'newxpblack_wallcover_middle_01a', b.x, b.y + b.h, { ay: 1, sx: 1, sy: b.h / 1000 });
 }
 
 function enterNewxpScene(engine, stage, layout, background, label) {
@@ -1053,44 +1067,94 @@ function addPlatforms(engine, list) {
 /* Stage: clouds (newxp_intro)                                          */
 /* ------------------------------------------------------------------ */
 
+/** A deco at its stage size (decos ship at 2x, js/deco-hires.js): centre-anchored unless told. */
+function stageDeco(PIXI, name, x, y, { ax = 0.5, ay = 0.5, scale = 1, sx = null, sy = null, rot = 0, alpha = 1, flipY = false } = {}) {
+  const spr = kit.deco(PIXI, name, x, y, { ax, ay, scale: 0.5 * scale });
+  if (sx != null) spr.scale.x = 0.5 * sx;
+  if (sy != null) spr.scale.y = 0.5 * sy;
+  if (flipY) spr.scale.y *= -1;
+  if (rot) spr.rotation = (rot * Math.PI) / 180;
+  spr.alpha = alpha;
+  return spr;
+}
+
+/** newxp_chain's 58 x 505 x1 sheets (OGA extracted_newxp newxp_chain, CC0): hang loops, pull plays once. */
+const CHAIN_ART = Object.freeze({
+  hang: { url: `${ART}chain_hang.png`, cols: 15, rows: 4, count: 60 },
+  pull: { url: `${ART}chain_pull.png`, cols: 16, rows: 3, count: 45 },
+});
+
 function buildClouds(engine) {
   const { PIXI } = engine;
   const L = cloudsLayout();
   const root = kit.sceneRoot(PIXI, L.width, L.height);
   const sky = root.layer(0, 0);
   sky.addChild(kit.gradient(PIXI, [[0, '#7ec4f2'], [0.6, '#cfeaf7'], [1, '#fdf3cf']], 960, 640));
+  // sun_01a_newxp, the low sun of the recording's sky (K2q5GXruLvE 0:20-1:20), fixed to the view.
+  sky.addChild(stageDeco(PIXI, 'sun_01a_newxp', 780, 470, { alpha: 0.85 }));
   const far = root.layer(0.35, 1);
-  for (let x = -200, i = 0; x < L.width; x += 330, i++) {
-    far.addChild(kit.deco(PIXI, i % 2 ? 'cloud_fluffy_1' : 'cloud_fluffy_2', x, 260 + (i % 3) * 40, { scale: 0.6, alpha: 0.65 }));
+  for (let x = -200, i = 0; x < L.width; x += 420, i++) {
+    far.addChild(stageDeco(PIXI, i % 2 ? 'clouds_bg_1_01a_newxp' : 'clouds_bg_2_01a_newxp', x, 700 + (i % 3) * 420, { alpha: 0.7 }));
   }
   const world = root.layer(1, 2);
-  const beats = L.beats.map((b) => {
-    const text = kit.label(PIXI, b.text, b.x, b.y, { size: b.text.length < 12 ? 64 : 34, fill: 0xffffff, wrap: 560, stroke: { color: 0x6fa7c9, width: 2 } });
-    // G315: the words were street art (decos) in the newxp_intro template, so they
-    // stood on the clouds from the start; newxp_intro.js (1-104) has no reveal step.
-    world.addChild(text);
-    return text;
-  });
-  // The floor ends where the cloud platform does (newxp.js cloudsLayout): the deco row stops
-  // there too, so no cloud art stands over the drop, and the body ends in soft puffs.
-  const edge = cloudEdge(L);
-  for (let x = -260, i = 0; x < edge - 150; x += 200, i++) {
-    world.addChild(kit.deco(PIXI, i % 2 ? 'cloud_fluffy_1' : 'cloud_fluffy_2', x, L.cloudY + 110 + (i % 2) * 14, { scale: 0.95 }));
+  // The chain hangs under the ceiling (items/newxp_chain.js): click it, or press Enter, to pull.
+  const chain = kit.animated(PIXI, CHAIN_ART.hang.url, CHAIN_ART.hang.cols, CHAIN_ART.hang.rows, { count: CHAIN_ART.hang.count, ax: 0.5, ay: 0, speed: 0.4 });
+  chain.x = L.chain.x;
+  chain.y = L.chain.top;
+  chain.eventMode = 'static';
+  chain.cursor = 'pointer';
+  chain.hitArea = new PIXI.Rectangle(-29, 230, 58, 250);
+  chain.on('pointertap', () => pullChain(engine));
+  world.addChild(chain);
+  // newxp_clicktopull_arrow: blinks under the handle while you wait (K2q5GXruLvE 0:22-0:24).
+  const arrow = stageDeco(PIXI, 'newxp_clicktopull_arrow', L.chain.x, L.chain.top + 540, { alpha: 0 });
+  world.addChild(arrow);
+  // The stone GLITCH, unlit, with its lit copy over it (CLOUD_LETTERS).
+  const letters = new PIXI.Container();
+  const lit = [];
+  for (const [c, dx, base, ms] of CLOUD_LETTERS) {
+    letters.addChild(stageDeco(PIXI, cloudLetterDeco(c, true), L.letters.x + dx, L.letters.y + base, { ay: 1 }));
+    const on = stageDeco(PIXI, cloudLetterDeco(c), L.letters.x + dx, L.letters.y + base, { ay: 1, alpha: 0 });
+    letters.addChild(on);
+    lit.push({ spr: on, ms });
   }
-  world.addChildAt(cloudFloor(PIXI, edge, L.cloudY + 90), 0);
+  world.addChild(letters);
+  // The phrases: every word hidden until its cloud is reached (geo_deco_toggle_visibility fades).
+  const phrases = [];
+  for (const t of L.terraces.filter((q) => q.phrase)) {
+    const words = CLOUD_WORDS[t.phrase].map(([w, dx, dy, deg, scale = 1]) => {
+      const spr = stageDeco(PIXI, cloudWordDeco(w), t.at + dx, t.y + dy, { rot: deg, scale, alpha: 0 });
+      world.addChild(spr);
+      return spr;
+    });
+    phrases.push({ id: t.phrase, terrace: t, words, shownAt: 0 });
+  }
+  // The clouds you walk on, upper first so each lower one draws over the one above's underside.
+  for (const t of L.terraces) world.addChild(cloudFloor(PIXI, t));
+  // The ceiling: the newxp cloud banks upside down over a soft white band, drawn over the avatar
+  // (bgLayer.frontView, game.js syncStreetFront) so you wait hidden above it.
+  const front = new PIXI.Container();
+  const band = new PIXI.Graphics();
+  band.rect(-300, -500, 2400, 500 + L.ceilingY - 60).fill(0xf7fbff);
+  band.filters = [new PIXI.BlurFilter({ strength: 18, quality: 3 })];
+  front.addChild(band);
+  for (let x = -200, i = 0; x < 2100; x += 380, i++) {
+    front.addChild(stageDeco(PIXI, i % 2 ? 'clouds_bg_middleplus_01b_newxp' : 'clouds_bg_middleplus_01a_newxp', x, L.ceilingY - 70 + (i % 2) * 18, { flipY: true }));
+  }
+  root.frontView = front;
   // Scene names: the source files' header comments (newxp_intro.js 1, newxp_training1.js 3, newxp_training2.js 3).
   enterNewxpScene(engine, 'clouds', L, root, 'Cloud Level');
-  run.views = { beats, root };
+  run.views = { root, chain, arrow, lit, phrases };
   return L;
 }
 
-/** The cloud platform's right end: walking past it falls to Training Level One. */
+/** The last cloud's right end: walking past it falls to Training Level One. */
 export function cloudEdge(L) {
   return L.platforms.find((p) => p.id === 'cloud')?.x2 ?? L.dropX;
 }
 
 /**
- * Past the cloud's edge the game's ground slack (street-model.js platformYAt's
+ * Past a cloud's edge the game's ground slack (street-model.js platformYAt's
  * 4 px margin, game.js resolveGround's 8 px seam bridge) held an avatar that
  * stepped off slowly standing on air against the cloud's side until pushed
  * again. Feet standing past the edge are moved just clear of that slack, so
@@ -1102,30 +1166,102 @@ export function cloudStepOff(edge, p) {
   return edge + CLOUD_EDGE_CLEAR;
 }
 
+/** The same at every cloud's edge (each drops onto the next): the terrace whose walking line the feet are on. */
+export function cloudStepOffAny(terraces, p) {
+  for (const t of terraces || []) {
+    if (Math.abs((p?.y ?? NaN) - t.y) > 12) continue;
+    const x = cloudStepOff(t.x2, p);
+    if (x != null) return x;
+  }
+  return null;
+}
+
 /**
- * Puffs (x from the edge, y from the floor's top, radius) that round the cloud
- * floor's end and tuck it in underneath, so it ends as a cloud, not a white
+ * Puffs (x from the edge, y from the floor's top, radius) that round each
+ * cloud's end and tuck it in underneath, so it ends as a cloud, not a white
  * block's hard side: simple Pixi shapes in the floor's own colour, blurred to
- * the soft edge of the scene's cloud_fluffy decos, with two of those decos
- * over them (G395 lane).
+ * the soft edge of the newxp cloud decos over them (G395 lane).
  */
 export const CLOUD_END_PUFFS = Object.freeze([
-  [-90, 20, 90], [-60, 120, 80], [-100, 220, 90], [-170, 330, 105], [-260, 460, 125], [-380, 600, 150],
+  [-90, 20, 90], [-60, 120, 80], [-100, 220, 90], [-170, 320, 100],
 ]);
+/** How far a cloud's body reaches under its walking line: less than the drop to the next one. */
+export const CLOUD_BODY_DEPTH = 420;
 
-function cloudFloor(PIXI, edge, top) {
+function cloudFloor(PIXI, terrace) {
+  const { x1, x2: edge } = terrace;
+  const top = terrace.y + 60;
   const root = new PIXI.Container();
   const colour = 0xf7fbff;
   const body = new PIXI.Graphics();
-  body.rect(-300, top, edge - 160 + 300, 700).fill(colour);
+  body.rect(x1 - 300, top, edge - 160 - x1 + 300, CLOUD_BODY_DEPTH - 60).fill(colour);
   for (const [dx, dy, r] of CLOUD_END_PUFFS) body.circle(edge + dx, top + dy, r).fill(colour);
   // Blurred whole, so the floor's top meets the deco row softly too (no ruled line).
   body.filters = [new PIXI.BlurFilter({ strength: 18, quality: 3 })];
   root.addChild(body);
-  // The scene's own cloud art down the end, as the deco row does along the top.
-  root.addChild(kit.deco(PIXI, 'cloud_fluffy_2', edge - 170, top + 250, { scale: 0.8, flip: true, alpha: 0.95 }));
-  root.addChild(kit.deco(PIXI, 'cloud_fluffy_1', edge - 260, top + 430, { scale: 0.85, alpha: 0.9 }));
+  // Tiny Speck's own cloud banks along the top (clouds_bg_middleplus, clouds_bg_middle); the row stops at the edge.
+  for (let x = x1 - 120, i = 0; x < edge - 150; x += 300, i++) {
+    const name = ['clouds_bg_middleplus_01a_newxp', 'clouds_bg_middle_01a_newxp', 'clouds_bg_middleplus_01b_newxp'][i % 3];
+    root.addChild(stageDeco(PIXI, name, x + 120, terrace.y + 70 + (i % 2) * 16, { ay: 1 }));
+  }
+  root.addChild(stageDeco(PIXI, 'clouds_bg_middleplus_01b_newxp', edge - 140, terrace.y + 150, { ay: 1 }));
+  root.addChild(stageDeco(PIXI, 'clouds_bg_middle_01a_newxp', edge - 230, terrace.y + 300, { ay: 1, alpha: 0.95 }));
   return root;
+}
+
+/** items/newxp_chain.js pull: the pull animation, CHAIN_PULL, and the location event "glitch" drops you. */
+function pullChain(engine) {
+  if (!run || run.stage !== 'clouds' || run.data.pulled) return;
+  run.data.pulled = true;
+  const { chain, arrow } = run.views;
+  if (arrow) arrow.visible = false;
+  if (chain && !chain.destroyed) {
+    const pull = kit.sheetFrames(engine.PIXI, CHAIN_ART.pull.url, CHAIN_ART.pull.cols, CHAIN_ART.pull.rows, CHAIN_ART.pull.count);
+    const go = () => {
+      if (chain.destroyed || !pull.frames.length) return;
+      chain.textures = pull.frames;
+      chain.loop = false;
+      chain.onComplete = () => { chain.visible = false; };
+      chain.gotoAndPlay(0);
+    };
+    if (pull.ready()) go();
+    else onLoaded(pull.base, () => setTimeout(go, 0));
+    chain.eventMode = 'none';
+    chain.cursor = 'default';
+  }
+  engine.playSound('CHAIN_PULL', { volume: 0.6 });
+  const plats = engine.platforms;
+  const i = plats.findIndex((p) => p.id === 'perch');
+  if (i >= 0) plats.splice(i, 1);
+  const p = P();
+  if (p) p.onGround = false;
+  rooted = false;
+  engine.setData('newxpLast', 'chain:pulled');
+}
+
+/** The letters lighten from the middle out once you land (CLOUD_LETTERS), each over CLOUD_LETTER_FADE_MS. */
+function lightLetters(now) {
+  const views = run?.views;
+  if (!views?.lit || !run.data.landedAt) return;
+  for (const { spr, ms } of views.lit) {
+    const k = (now - run.data.landedAt - ms) / CLOUD_LETTER_FADE_MS;
+    spr.alpha = Math.max(0, Math.min(1, k));
+  }
+}
+
+/** A phrase's words appear one after another once you stand past its spot on its cloud. */
+function revealPhrases(now, p) {
+  for (const ph of run?.views?.phrases || []) {
+    const t = ph.terrace;
+    if (!ph.shownAt && p && p.x >= t.box && p.x <= t.x2 + 40 && Math.abs(p.y - t.y) < 60) {
+      ph.shownAt = now;
+      engineRef?.setData('newxpLast', `words:${ph.id}`);
+    }
+    if (!ph.shownAt) continue;
+    ph.words.forEach((spr, i) => {
+      spr.alpha = Math.max(0, Math.min(1, (now - ph.shownAt - i * CLOUD_WORD_STAGGER_MS) / CLOUD_WORD_FADE_MS));
+    });
+  }
 }
 
 async function runClouds(t) {
@@ -1133,7 +1269,35 @@ async function runClouds(t) {
   hud({ meta: true, energy: true, mood: true, pack: true, actions: true });
   const L = buildClouds(engine);
   fadeIn();
-  await until(t, () => P()?.onGround);
+  // newxp_chain: you wait hidden above the ceiling until the chain is pulled.
+  setStep('chain');
+  rooted = true;
+  const waitAt = Date.now();
+  // Enter pulls it; taken first (capture) so the game's own Enter does not say "Nothing nearby".
+  const onKey = (e) => {
+    if (e.key !== 'Enter' || run?.stage !== 'clouds' || run.data.pulled) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    pullChain(engine);
+  };
+  if (typeof window !== 'undefined') window.addEventListener('keydown', onKey, true);
+  try {
+    await until(t, () => {
+      const arrow = run.views.arrow;
+      // The arrow shows after a few seconds and blinks (reconstructed from K2q5GXruLvE 0:22-0:24).
+      if (arrow && !run.data.pulled) {
+        const ms = Date.now() - waitAt - 4000;
+        arrow.alpha = ms < 0 ? 0 : (Math.floor(ms / 600) % 2 ? 0.35 : 1);
+      }
+      return run.data.pulled;
+    }, { help: () => pullChain(engine) });
+  } finally {
+    if (typeof window !== 'undefined') window.removeEventListener('keydown', onKey, true);
+  }
+  const first = L.terraces[0];
+  await until(t, () => P()?.onGround && Math.abs(P().y - first.y) < 12, { help: () => place(L.spawn.x, first.y) });
+  run.data.landedAt = Date.now();
+  run.data.terraces = L.terraces;
   setStep('move');
   instruction(LINES.moveInstructions);
   const startX = P().x;
@@ -1141,7 +1305,7 @@ async function runClouds(t) {
   await until(t, () => P().x - startX > 50, { help: () => place(startX + 80, P().y) });
   clearInstruction();
   setStep('walk');
-  // Past the edge and falling: on to training1. Testing the edge itself (not dropX, 10 px on)
+  // Past the last edge and falling: on to training1. Testing the edge itself (not dropX, 10 px on)
   // means an avatar that steps off slowly never lands on the catch floor below and stands
   // against the cloud's side.
   const edge = cloudEdge(L);
@@ -1160,46 +1324,55 @@ function buildTraining1(engine) {
   const root = new PIXI.Container();
   root.worldH = L.height;
   starVoid(PIXI, root, L.width, L.height, L.floorY);
-  // The mushroom stack (shroom_fade) under the three caps.
+  // You arrive down a striped shaft from a hole in green ground (K2q5GXruLvE 1:22-1:26):
+  // newxp_t1_striations_bg_01a, _01a, _middleplus_01a and _sun_01a over the spawn.
+  const sx = L.spawn.x;
+  root.addChild(stageDeco(PIXI, 'newxp_t1_striations_bg_01a', sx + 120, 235, { ay: 1 }));
+  root.addChild(stageDeco(PIXI, 'newxp_t1_striations_sun_01a', sx + 470, 70, { alpha: 0.9 }));
+  root.addChild(stageDeco(PIXI, 'newxp_t1_striations_01a', sx, 158, { ay: 0 }));
+  root.addChild(stageDeco(PIXI, 'newxp_t1_striations_middleplus_01a', sx, 166));
+  // The flamingo's rocks (rock_rubble_*_al1, newxp_misc.swf), where it waits (1:42-2:28).
+  root.addChild(stageDeco(PIXI, 'rock_rubble_01e_al1', 1240, L.floorY + 20, { ay: 1, scale: 0.55 }));
+  root.addChild(stageDeco(PIXI, 'rock_rubble_01a_al1', L.mushroom.x, L.floorY + 20, { ay: 1, scale: 0.7 }));
+  // The mushroom stack (shroom_fade): mushroom_funnel_2 caps on the green glow, fading in.
   const shrooms = new PIXI.Container();
   shrooms.alpha = 0;
-  for (const cap of L.platforms.filter((q) => q.style === 'mushroom')) {
-    const h = L.floorY - cap.y1 + 26;
-    shrooms.addChild(kit.deco(PIXI, 'mushroom_funnel_1', (cap.x1 + cap.x2) / 2, L.floorY + 8, { scale: h / 184 }));
+  const caps = L.platforms.filter((q) => q.style === 'mushroom');
+  shrooms.addChild(stageDeco(PIXI, 'greenbase_01a_newxpblack', (caps[0].x1 + caps.at(-1).x2) / 2, L.floorY + 6));
+  for (const cap of caps) {
+    const s = ((cap.x2 - cap.x1) * 1.2) / 94;
+    shrooms.addChild(stageDeco(PIXI, 'mushroom_funnel_2', (cap.x1 + cap.x2) / 2, cap.y1 - 8 * s, { ay: 0, scale: s }));
   }
+  shrooms.addChild(stageDeco(PIXI, 'bling_mushroom_bunch_ground_1', caps[0].x1 - 20, L.floorY + 8, { ay: 1 }));
   root.addChild(shrooms);
   drawPlatforms(PIXI, root, L.platforms);
-  // The sloth's tree: its branches become platforms once it hides (hideTree).
-  // A clean vector tree on isle_b (the archive has no newxp tree art).
-  const tree = new PIXI.Graphics();
-  tree.poly([2282, 1352, 2318, 1352, 2310, 1180, 2296, 1060, 2290, 1180]).fill(0x6e4a2b);
-  tree.moveTo(2300, 1200).lineTo(2180, 1110);
-  tree.moveTo(2302, 1160).lineTo(2420, 1080);
-  tree.stroke({ width: 10, color: 0x6e4a2b, alpha: 1 });
-  for (const [x, y, r] of [[2296, 1040, 70], [2200, 1090, 50], [2400, 1060, 56], [2250, 1000, 46], [2350, 990, 50]]) {
-    tree.circle(x, y, r).fill({ color: 0x3f7f3a, alpha: 0.95 });
-    tree.circle(x - r * 0.25, y - r * 0.25, r * 0.55).fill({ color: 0x5aa04a, alpha: 0.6 });
-  }
+  // The sloth's tree on the blue island (tree_plane_*_g1, newxp_misc.swf; Snap TR1 PIF5BPPLOK535TE 58004):
+  // its branches become platforms once it hides (hideTree).
+  const isle = L.platforms.find((q) => q.id === 'isle_b');
+  const tree = new PIXI.Container();
+  tree.addChild(stageDeco(PIXI, 'tree_plane_trunk_01c_g1', (isle.x1 + isle.x2) / 2, isle.y1 + 6, { ay: 1 }));
+  tree.addChild(stageDeco(PIXI, 'tree_plane_foliage_01a_g1', (isle.x1 + isle.x2) / 2 - 5, 1075, { scale: 0.8 }));
   root.addChild(tree);
-  const branches = new PIXI.Graphics();
-  for (const p of L.platforms.filter((q) => q.tree)) kit.drawPlatform(branches, { ...p, style: 'branch' });
+  const branches = new PIXI.Container();
+  for (const p of L.platforms.filter((q) => q.tree)) {
+    branches.addChild(stageDeco(PIXI, 'tree_plane_branch_01a_g1', (p.x1 + p.x2) / 2, p.y1 - 6, { ay: 0, sx: ((p.x2 - p.x1) * 1.1) / 86, sy: 1.2 }));
+  }
   branches.alpha = 0;
   root.addChild(branches);
-  const ladder = new PIXI.Graphics();
-  for (const l of L.ladders) kit.drawLadder(ladder, l, { rail: 0xc8b85a, rung: 0xe4d67a });
-  root.addChild(ladder);
-  // wall1: a dim glass wall until Walk Speed I.
-  const wall = new PIXI.Graphics();
-  wall.roundRect(1740, L.floorY - 400, 20, 400, 8).fill({ color: 0x8fb8ff, alpha: 0.12 });
+  // The starry ladder (ladder_starry_1a_newxpblack), two lengths up to the top (3:08-3:14).
+  for (const l of L.ladders) {
+    const half = (l.yBot - l.yTop) / 2;
+    for (let i = 0; i < 2; i++) root.addChild(stageDeco(PIXI, 'ladder_starry_1a_newxpblack', l.x, l.yBot - i * half, { ay: 1, sx: 1, sy: half / 232.7 }));
+  }
+  // wall1: a dark wall until Walk Speed I.
+  const wall = wallArt(PIXI, L.barriers.find((b) => b.id === 'wall1'));
   root.addChild(wall);
-  // The tube (the teleport to training2) on the top island.
-  const tube = new PIXI.Graphics();
-  tube.roundRect(L.tube.x - 70, L.tube.y - 330, 140, 60, 12).fill(0x9aa3ad);
-  tube.rect(L.tube.x - 50, L.tube.y - 270, 100, 270).fill({ color: 0xcfe9ff, alpha: 0.28 });
-  tube.ellipse(L.tube.x, L.tube.y, 70, 12).fill(0x9aa3ad);
-  root.addChild(tube);
+  // The tube (the teleport to training2) on the top island: Teleporter_Base and its beam (newxp_misc.swf).
+  root.addChild(stageDeco(PIXI, 'Teleporter_Base', L.tube.x, L.tube.y + 14, { ay: 1 }));
+  const beam = stageDeco(PIXI, 'Teleporter_Beam', L.tube.x, L.tube.y + 14, { ay: 1, alpha: 0 });
+  root.addChild(beam);
   enterNewxpScene(engine, 'training1', L, root, 'Training Level One');
-  run.views = { shrooms, tree, branches, wall };
+  run.views = { shrooms, tree, branches, wall, beam };
   return L;
 }
 
@@ -1411,7 +1584,8 @@ async function runTraining1(t) {
   rooted = false;
   setStep('tube');
   await until(t, () => inBox(L.tube.box, P().x, P().y), { help: () => place(L.tube.x, L.tube.y) });
-  // 'tp' hitbox: playHitAnimation('hit1', 5 s), teleport to training2.
+  // 'tp' hitbox: playHitAnimation('hit1', 5 s), teleport to training2; the tube's beam lights (5:08-5:12).
+  if (run.views.beam) run.views.beam.alpha = 1;
   engine.playHit('hit1', 1200);
   engine.playSound('TELEPORT_AWAY', { volume: 0.5 });
   await sleep(t, 1200);
@@ -1422,25 +1596,30 @@ async function runTraining1(t) {
 /* Stage: training2 (the Dustbunny)                                      */
 /* ------------------------------------------------------------------ */
 
+/** Each style's station (K2q5GXruLvE 7:36-7:56): tube, target ring, CHOOSE board and picture. */
+const STYLE_TARGETS = Object.freeze({ meadow: 'newxpblack_target_01a', firebog: 'newxpblack_target_01b', uralia: 'newxpblack_target_01c' });
+
 function buildTraining2(engine) {
   const { PIXI } = engine;
   const L = training2Layout();
   const root = new PIXI.Container();
   root.worldH = L.height;
   starVoid(PIXI, root, L.width, L.height, L.floorY);
+  // The green glow the tables stand on (greenbase_01a_newxpblack, 4:04-6:32).
+  for (const tab of Object.values(L.tables)) root.addChild(stageDeco(PIXI, 'greenbase_01a_newxpblack', tab.x, L.floorY + 4, { scale: 0.95 }));
   drawPlatforms(PIXI, root, L.platforms);
   const g = new PIXI.Graphics();
-  // Table one (white cloth) and the wooden drinks bench.
+  // Table one (white cloth) and the wooden drinks bench: no Tiny Speck art for them survives in
+  // the CC0 sets, so they stay drawn.
   g.ellipse(L.tables.food.x, L.floorY - 76, 120, 18).fill(0xf4f4f4);
   g.rect(L.tables.food.x - 120, L.floorY - 76, 240, 70).fill(0xe6e6e6);
   g.roundRect(L.tables.drinks.x - 130, L.floorY - 70, 260, 66, 8).fill(0x9a5a2b);
   g.roundRect(L.tables.drinks.x - 130, L.floorY - 74, 260, 10, 4).fill(0xb87240);
   root.addChild(g);
+  // The walls are Tiny Speck's dark wall panels (the tube building's, 7:20-7:32).
   const walls = {};
   for (const b of L.barriers.filter((w) => w.id !== 'left')) {
-    const w = new PIXI.Graphics();
-    w.roundRect(b.x - (b.id === 'tube_building' ? 40 : 10), b.y, b.id === 'tube_building' ? 80 : 20, b.h, 10);
-    w.fill({ color: b.id === 'tube_building' ? 0x3d4450 : 0x8fb8ff, alpha: b.id === 'tube_building' ? 0.95 : 0.14 });
+    const w = wallArt(PIXI, b);
     root.addChild(w);
     walls[b.id] = w;
   }
@@ -1450,23 +1629,21 @@ function buildTraining2(engine) {
   egg.x = L.eggPlant.x;
   egg.y = L.eggPlant.y + 8;
   egg.scale.set(0.8);
-  // The Home Street Selection Machine behind the tube wall.
+  // The Go talk to your Magic Rock sign, on the way to the rock (sign_t2streetstyle_newxp, 7:36).
+  root.addChild(stageDeco(PIXI, 'sign_t2streetstyle_newxp', 3150, L.floorY + 6, { ay: 1 }));
+  // The Home Street Selection Machine: a station per style (homestreet_ticket_dispenser.js choices).
   const machine = new PIXI.Container();
-  const body = new PIXI.Graphics();
-  body.roundRect(3620, L.floorY - 470, 440, 90, 30).fill(0x7d858f);
-  for (let i = 0; i < 12; i++) body.circle(3660 + i * 34, L.floorY - 425, 8);
-  body.fill(0x5d6570);
-  machine.addChild(body);
-  const panelColors = { meadow: 0x6fb45a, firebog: 0xb5543c, uralia: 0x7a5fb0 };
+  const first = L.machine.choices[0];
+  machine.addChild(stageDeco(PIXI, 'newxp_homestreetchoosingfacilitysign', first.x - 160, L.floorY - 290));
   for (const c of L.machine.choices) {
-    const p = new PIXI.Graphics();
-    p.roundRect(c.x - 58, L.floorY - 190, 116, 150, 10).fill(panelColors[c.style]);
-    p.roundRect(c.x - 52, L.floorY - 182, 104, 64, 8).fill({ color: 0x1d2a44, alpha: 0.85 });
-    machine.addChild(p);
-    machine.addChild(kit.label(PIXI, c.label.replace('Pick ', 'Pick\n'), c.x, L.floorY - 150, { size: 11, fill: 0xffffff }));
+    machine.addChild(stageDeco(PIXI, STYLE_TARGETS[c.style], c.x, L.floorY + 4));
+    machine.addChild(stageDeco(PIXI, 'newxpblack_tube_metal_01a_back', c.x, L.floorY - 240, { ay: 1 }));
+    machine.addChild(stageDeco(PIXI, 'newxpblack_tube_metal_01a_front', c.x, L.floorY - 230, { ay: 1 }));
+    machine.addChild(stageDeco(PIXI, `newxpblack_choosestreetstyle_blueprint_${c.style}`, c.x - 160, L.floorY - 96));
+    machine.addChild(stageDeco(PIXI, 'newxpblack_choosestreetstyle_pole', c.x + 222, L.floorY + 2, { ay: 1 }));
+    machine.addChild(stageDeco(PIXI, `newxpblack_choosestreetstyle_${c.style}`, c.x + 160, L.floorY - 104));
   }
   root.addChild(machine);
-  machine.addChild(kit.label(PIXI, LINES.machine, 3840, L.floorY - 360, { size: 15, fill: 0xd7dde5 }));
   enterNewxpScene(engine, 'training2', L, root, 'Training Level Two');
   run.views = { walls, root };
   run.data.egg = egg;
@@ -1706,6 +1883,11 @@ async function runTraining2(t) {
   });
   run.data.panels = panels;
   run.data.style = '';
+  // QA: &newxphold=machine stops the autoplay here, so the stations can be walked to and stood on.
+  if (holdAt === 'machine' && auto) {
+    auto = false;
+    engine.setData('newxpAutoplay', 'hold:machine');
+  }
   await until(t, () => {
     const p = P();
     const c = L.machine.choices.find((m) => Math.abs(p.x - m.x) < 40 && p.y > L.floorY - 20);
@@ -3361,13 +3543,15 @@ export const newxpFeature = {
       const next = document.querySelector('#award-screen [data-award-next]');
       if (next && !next.closest('[hidden]')) next.click();
     }
-    if (run?.stage === 'clouds' && run.data.cloudEdge) {
+    if (run?.stage === 'clouds' && run.data.terraces) {
       const p = P();
-      const x = cloudStepOff(run.data.cloudEdge, p);
+      const x = cloudStepOffAny(run.data.terraces, p);
       if (x != null) {
         p.x = x;
         p.onGround = false;
       }
+      lightLetters(Date.now());
+      revealPhrases(Date.now(), p);
     }
     stepNpcs(dtMs);
     akStep(dtMs);

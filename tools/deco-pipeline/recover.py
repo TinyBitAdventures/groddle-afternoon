@@ -67,6 +67,55 @@ SCENE_DECOS = {
     'bureaucratic_hall_sign_wait_1': 'the PLEASE WAIT HERE FOR THE NEXT AVAILABLE AGENT stand',
     'bureaucratic_hall_sign_1': 'the Department of Administrative Affairs, Ministry of Departments lettering',
 }
+# The new-player tutorial's three instance templates (newxp_intro LIFBFC7TDJ535UL, newxp_training1
+# LIFBLMAVDJ53NP1, newxp_training2 LIFD0KCDEJ53L7K) are not in the locations dump either. Their art
+# is embedded in newxp_cloud.swf, the bundle that carries the Cloud Level and the newxpblack
+# training rooms. js/features/newxp-feature.js places them (placement rebuilt from the recording
+# K2q5GXruLvE and the Snaps of Cloud Intro and TR1; see js/newxp.js CLOUD_WORDS).
+_NEWXP_WORDS = ('the eleven giants who thought and sang imagined everything into existence_ellipses ellipses these '
+                'are sometimes lucky enough to imagine someone like you_period you have your own imagination_comma '
+                'can help grow shape this world_period lets go_exclamation').split()
+SCENE_DECOS.update({f'newxptext_{w}': f'the Cloud Level word {w.replace("_", " ")} (white lettering)' for w in _NEWXP_WORDS})
+SCENE_DECOS.update({f'newxp_glitchlogo_stone_{c}_01a': f'the stone letter {c} of the Cloud Level Glitch logo' for c in 'glitch'})
+SCENE_DECOS.update({n: 'the same stone letter, unlit (it lightens as you land)' for n in (
+    'newxp_glitchlogo_stone_g_dark01a', 'newxp_glitchlogo_stone_l_dark_01a', 'newxp_glitchlogo_stone_i_dark_01a',
+    'newxp_glitchlogo_stone_t_dark_01a', 'newxp_glitchlogo_stone_c_dark_01a', 'newxp_glitchlogo_stone_h_dark_01a')})
+SCENE_DECOS.update({
+    'newxp_clicktopull_arrow': 'the click to pull arrow under the Cloud Level chain',
+    'newxp_t1_striations_bg_01a': 'Training Level One: the sky and green ground above the shaft',
+    'newxp_t1_striations_middleplus_01a': 'Training Level One: the green lip of the hole',
+    'newxp_t1_striations_01a': 'Training Level One: the striped shaft you fall down',
+    'newxp_t1_striations_sun_01a': 'Training Level One: the sun over the hole',
+    'floatingplatform_blue_small_01a_newxpblack': 'a blue floating platform',
+    'floatingplatform_blue_medium_01a_newxpblack': 'a blue floating platform',
+    'floatingplatform_green_small_01a_newxpblack': 'a green floating platform',
+    'floatingplatform_green_medium_01a_newxpblack': 'a green floating platform (the top of Training Level One, the Egg Plant ledge)',
+    'floatingplatform_red_small_01a_newxpblack': 'a red floating platform',
+    'floatingplatform_red_medium_01a_newxpblack': 'a red floating platform (the Magic Rock ledge)',
+    'floatingplatform_yellow_small_01a_newxpblack': 'a yellow floating platform',
+    'floatingplatform_yellow_medium_01a_newxpblack': 'a yellow floating platform',
+    'ladder_starry_1a_newxpblack': 'the starry ladder up to the top of Training Level One',
+    'groundstars_bg1_01a_newxpblack': 'the star field, far row',
+    'groundstars_bg2_01a_newxpblack': 'the star field, far row',
+    'groundstars_middleback_01a_newxpblack': 'the star field, behind the walking line',
+    'groundstars_middleplus_01a_newxpblack': 'the star field, in front of the walking line',
+    'newxpblack_wallcover_middle_01a': 'the dark wall of Training Level Two',
+    'newxpblack_tube_metal_01a_front': 'the holey tube over a home street style station',
+    'newxpblack_tube_metal_01a_back': 'the back of the holey tube',
+    'newxpblack_target_01a': 'the target ring under a style tube',
+    'newxpblack_target_01b': 'the target ring under a style tube',
+    'newxpblack_target_01c': 'the target ring under a style tube',
+    'newxpblack_choosestreetstyle_meadow': 'the Meadow style picture',
+    'newxpblack_choosestreetstyle_firebog': 'the Firebog style picture',
+    'newxpblack_choosestreetstyle_uralia': 'the Uralia style picture',
+    'newxpblack_choosestreetstyle_blueprint_meadow': 'the CHOOSE MEADOW STYLE board',
+    'newxpblack_choosestreetstyle_blueprint_firebog': 'the CHOOSE FIREBOG STYLE board',
+    'newxpblack_choosestreetstyle_blueprint_uralia': 'the CHOOSE URALIA STYLE board',
+    'newxpblack_choosestreetstyle_pole': 'the pole a style picture stands on',
+    'newxp_homestreetchoosingfacilitysign': 'the Home Street Choosing Facility plaque',
+    'homestreetstyle_sign_large_newxpblack': 'the hanging HOME STREET STYLE sign',
+    'sign_t2streetstyle_newxp': 'the Go talk to your Magic Rock sign',
+})
 
 
 def sha(path):

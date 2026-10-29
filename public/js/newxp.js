@@ -22,8 +22,12 @@
  * G*.xml for them in the archive). The client overlays' text is Tiny Speck's
  * CC0 overlay art (glitch-overlays/*_instructions.fla, newxp_img1/2/3_overlay.fla,
  * inventory_instructions_overlay.fla) and glitch-client strings and callout
- * PNGs; where the archive has none (the cloud words, first_eat, first_drink)
- * the copy is the remake's own (G310, research/coverage/g310-copy-provenance.md).
+ * PNGs; where the archive has none (first_eat, first_drink) the copy is the
+ * remake's own (G310, research/coverage/g310-copy-provenance.md). The Cloud
+ * Level's words and every piece of the three levels' scenery are Tiny Speck's
+ * own art from newxp_cloud.swf and newxp_misc.swf (CC0): see CLOUD_WORDS and
+ * the layouts' `art`; where they stand is rebuilt from the recording
+ * K2q5GXruLvE (rudiglitch, 2012) and the Snaps "Cloud Intro" and "TR1".
  * Gentle Island (hub 129, six streets) and the Animal Kinship / Light Green
  * Thumb practice streets are imported and used as they are.
  *
@@ -208,12 +212,7 @@ export const LINES = Object.freeze({
   // newxp_intro.js 11-18 move_instructions_overlay: the words on the CC0 overlay
   // art, glitch-overlays/move_instructions.fla LIBRARY/move-overlay.png (two lines).
   moveInstructions: 'Use Arrow Keys to move!<br>(or W,A,S,D Keys if you prefer)',
-  // The cloud level's words were street art in the lost newxp_intro template
-  // (no CC0 copy survives): remake copy, G310.
-  cloudBeats: [
-    'Welcome to Ur.',
-    'Head right and drop through the clouds.',
-  ],
+  // The Cloud Level's own words are Tiny Speck's lettering art, not copy: see CLOUD_WORDS.
   // inc_data_overlays.js 148-152, 165 instruction overlays: the words on each
   // CC0 overlay's art (the bitmap its DOMDocument places), glitch-overlays/
   // button_instructions.fla button-overlay2.png, jump_instructions.fla
@@ -569,26 +568,111 @@ export function inHitBox(box, x, y, bodyH = AVATAR_BODY_H) {
 
 const plat = (id, x1, y1, x2, y2 = y1, style = 'invisible', extra = {}) => ({ id, x1, y1, x2, y2, style, ...extra });
 
-/** newxp_intro: the cloud level. Fall in, walk right past the giant words, drop through. */
+/**
+ * The Cloud Level's words: Tiny Speck's white lettering, one deco per word
+ * (newxp_cloud.swf newxptext_*, CC0; the art is the words, so no copy is
+ * written here). Four phrases, each on its own cloud, in the order and line
+ * breaks of the recording K2q5GXruLvE (0:47-1:22) and the Snap "Cloud Intro"
+ * (PIF5BPPLOK535TE 57976). Each row is [word, dx, dy, degrees, scale]: the
+ * word's centre from the phrase's anchor (its centre x, the cloud's walking
+ * line), measured off the recording at its 0.52 view scale (every word at its
+ * stage size but "YOU." and LET'S GO!). Placement is reconstructed: the
+ * template that placed them is lost.
+ */
+export const CLOUD_WORDS = Object.freeze({
+  eleven: [
+    ['the', -225, -285, 3], ['eleven', -98, -279, 0], ['giants', 63, -287, -1], ['who', 208, -281, -1],
+    ['thought', -165, -229, -1.5], ['and', -12, -223, -2], ['sang', 104, -225, 3], ['and', 225, -223, -2.5],
+    ['imagined', -160, -173, 0], ['everything', 73, -173, 1.5],
+    ['into', -217, -131, -0.5], ['existence_ellipses', -42, -127, 1.5],
+  ],
+  lucky: [
+    ['ellipses', -212, -250, 0], ['these', -131, -258, 0.5], ['giants', 24, -263, 0.5], ['are', 166, -263, 0.5],
+    ['sometimes', -110, -208, 0], ['lucky', 94, -210, -0.5],
+    ['enough', -152, -158, 0], ['to', -15, -162, 0], ['imagine', 104, -162, -1],
+    ['someone', -133, -110, 0], ['like', 40, -96, -3], ['you_period', 171, -94, 2, 1.17],
+  ],
+  imagination: [
+    ['you', -192, -265, -0.5], ['have', -71, -273, -1.5], ['your', 60, -283, -1.5], ['own', 187, -290, 0.5],
+    ['imagination_comma', -121, -221, -3], ['and', 85, -233, -5], ['you', 194, -237, -2],
+    ['can', -183, -173, -5], ['help', -73, -177, -5], ['grow', 63, -187, -1], ['and', 190, -185, -6],
+    ['shape', -137, -123, -1], ['this', -10, -129, 0.5], ['world_period', 123, -135, -3],
+  ],
+  go: [['lets', -92, -156, -0.5, 2], ['go_exclamation', 106, -154, -2, 2]],
+});
+/** The deco a CLOUD_WORDS row draws. */
+export const cloudWordDeco = (word) => `newxptext_${word}`;
+/**
+ * The stone GLITCH letters on the first cloud (newxp_cloud.swf
+ * newxp_glitchlogo_stone_*, CC0): [letter, dx from the l, base below the
+ * walking line, ms after landing that it lightens]. Measured off
+ * K2q5GXruLvE 0:31-0:41: the letters are unlit (the _dark decos) when you
+ * land and lighten one by one from the middle out; the timing is
+ * reconstructed from the recording.
+ */
+export const CLOUD_LETTERS = Object.freeze([
+  ['g', -240, 106, 2200], ['l', 0, 112, 0], ['i', 114, 90, 300], ['t', 227, 119, 600], ['c', 368, 88, 1600], ['h', 542, 194, 3000],
+]);
+export const cloudLetterDeco = (c, dark = false) => (dark
+  ? (c === 'g' ? 'newxp_glitchlogo_stone_g_dark01a' : `newxp_glitchlogo_stone_${c}_dark_01a`)
+  : `newxp_glitchlogo_stone_${c}_01a`);
+/** locations/inc_geo.js geo_deco_toggle_visibility: a deco fades in over 400 ms unless told otherwise. */
+export const CLOUD_WORD_FADE_MS = 400;
+/** One word after another, about three a second (K2q5GXruLvE 0:47-0:50, 0:57-0:60): reconstructed. */
+export const CLOUD_WORD_STAGGER_MS = 300;
+export const CLOUD_LETTER_FADE_MS = 1000;
+
+/**
+ * newxp_intro: the Cloud Level (geo jump x 32, y -4171: you start high up).
+ * As the recording has it: you wait above a cloud ceiling with Tiny Speck's
+ * chain hanging under it (items/newxp_chain.js: pull broadcasts the location
+ * event "glitch"); pulling it drops you onto the first cloud and the stone
+ * GLITCH letters; from there each cloud ends in a drop onto a lower one, and
+ * each holds one phrase, its words appearing as you reach it; LET'S GO! is
+ * on the last, and walking off it falls through to Training Level One.
+ * Terraces, drop heights and the trigger spots are rebuilt from the
+ * recording (the template is lost); a phrase starts to appear where you
+ * land on its cloud (`box`, just past the edge above), so it is whole
+ * before you walk past it. Each lower cloud starts under the end of
+ * the one above, so a step off always lands; a wall at its left end keeps
+ * you from walking off backwards.
+ */
 export function cloudsLayout() {
-  const W = 3800;
-  const H = 1400;
-  const CLOUD = 1000;
+  const W = 5400;
+  const H = 4200;
+  const PERCH = 210;
+  const terraces = [
+    { id: 'cloud_1', x1: 0, x2: 1250, y: 1400 },
+    { id: 'cloud_2', x1: 950, x2: 2350, y: 1950, phrase: 'eleven', at: 1700, box: 1260 },
+    { id: 'cloud_3', x1: 2050, x2: 3350, y: 2500, phrase: 'lucky', at: 2760, box: 2360 },
+    { id: 'cloud_4', x1: 3050, x2: 4350, y: 3050, phrase: 'imagination', at: 3760, box: 3360 },
+    { id: 'cloud', x1: 4050, x2: 5000, y: 3600, phrase: 'go', at: 4580, box: 4360 },
+  ];
   return {
     width: W,
     height: H,
-    cloudY: CLOUD,
-    spawn: { x: 260, y: 160 },
+    cloudY: terraces[0].y,
+    spawn: { x: 520, y: PERCH - 10 },
+    // Hidden in the ceiling: the avatar waits here until the chain is pulled.
+    perch: { id: 'perch', x1: 440, x2: 600, y: PERCH },
+    ceilingY: 300,
+    // The chain hangs where you fall (K2q5GXruLvE 0:12-0:24); top of its 58 x 505 frame.
+    chain: { x: 520, top: 18, w: 58, h: 505 },
+    terraces,
+    letters: { x: 390, y: terraces[0].y },
     platforms: [
-      plat('cloud', 0, CLOUD, 3350, CLOUD, 'cloud'),
-      plat('below', 3360, H - 30, W, H - 30),
+      plat('perch', 440, PERCH, 600, PERCH),
+      ...terraces.map((t) => plat(t.id, t.x1, t.y, t.x2, t.y, 'cloud')),
+      plat('below', 5010, H - 30, W, H - 30),
     ],
     walls: [],
-    barriers: [{ id: 'cloud_back', x: 30, y: CLOUD - 600, h: 600, pc_perm: null }],
-    beats: LINES.cloudBeats.map((text, i) => ({ text, x: 800 + i * 1400, y: CLOUD - 190 })),
-    // Falling past this line (beyond the cloud edge) lands in training1.
-    dropX: 3360,
-    dropY: CLOUD + 120,
+    barriers: [
+      { id: 'cloud_back', x: 30, y: terraces[0].y - 600, h: 600, pc_perm: null },
+      ...terraces.slice(1).map((t) => ({ id: `back_${t.id}`, x: t.x1 + 10, y: t.y - 440, h: 440, pc_perm: null })),
+    ],
+    // Falling past this line (beyond the last cloud's edge) lands in training1.
+    dropX: 5010,
+    dropY: terraces.at(-1).y + 120,
   };
 }
 
@@ -603,12 +687,12 @@ export function training1Layout() {
     plat('cap1', 2330, 1564, 2420, 1564, 'mushroom'),
     plat('cap2', 2450, 1528, 2540, 1528, 'mushroom'),
     plat('cap3', 2570, 1492, 2660, 1492, 'mushroom'),
-    plat('isle_a', 2390, 1420, 2540, 1420, 'grass'),
-    plat('isle_b', 2220, 1350, 2380, 1350, 'pool'),
-    plat('isle_c', 1990, 1280, 2150, 1280, 'red'),
+    plat('isle_a', 2390, 1420, 2540, 1420, 'grass', { art: 'floatingplatform_green_small_01a_newxpblack' }),
+    plat('isle_b', 2220, 1350, 2380, 1350, 'pool', { art: 'floatingplatform_blue_small_01a_newxpblack' }),
+    plat('isle_c', 1990, 1280, 2150, 1280, 'red', { art: 'floatingplatform_red_small_01a_newxpblack' }),
     plat('tree_d', 2180, 1210, 2340, 1210, 'branch', { tree: true }),
     plat('tree_e', 2380, 1140, 2520, 1140, 'branch', { tree: true }),
-    plat('top', 2380, 760, 3150, 760, 'grass'),
+    plat('top', 2380, 760, 3150, 760, 'grass', { art: 'floatingplatform_green_medium_01a_newxpblack' }),
   ];
   return {
     width: 3200,
@@ -651,18 +735,22 @@ export function training2Layout() {
   const FLOOR = 1400;
   const X = (sx) => sx + 3000;
   return {
-    width: 4100,
+    // 5600 wide (was 4100): each style station is a Tiny Speck tube, target, board and picture (530 px),
+    // and the Magic Rock's ledge stands past them, as the recording has it (K2q5GXruLvE 7:56-8:20).
+    width: 5600,
     height: 1500,
     floorY: FLOOR,
     spawn: { x: X(-2776), y: 500 },
     platforms: [
-      plat('floor', 0, FLOOR, 4100, FLOOR, 'stars'),
-      plat('egg_p1', 2600, 1325, 2720, 1325, 'grass'),
-      plat('egg_p2', 2740, 1250, 2860, 1250, 'pool'),
-      plat('egg_p3', 2880, 1175, 3000, 1175, 'red'),
-      plat('egg_ledge', 3020, 1100, 3250, 1100, 'grass'),
-      plat('rock_step', 3330, 1330, 3440, 1330, 'grass'),
-      plat('rock_ledge', 3470, 1260, 3620, 1260, 'grass'),
+      plat('floor', 0, FLOOR, 5600, FLOOR, 'stars'),
+      // The Egg Plant's climb as the recording shows it (K2q5GXruLvE 6:44-7:16): red, blue, then
+      // the green ledge; the Magic Rock on a red ledge past a yellow step, beyond the stations (7:58-8:20).
+      plat('egg_p1', 2600, 1325, 2720, 1325, 'grass', { art: 'floatingplatform_red_small_01a_newxpblack' }),
+      plat('egg_p2', 2740, 1250, 2860, 1250, 'pool', { art: 'floatingplatform_blue_small_01a_newxpblack' }),
+      plat('egg_p3', 2880, 1175, 3000, 1175, 'red', { art: 'floatingplatform_yellow_small_01a_newxpblack' }),
+      plat('egg_ledge', 3020, 1100, 3250, 1100, 'grass', { art: 'floatingplatform_green_medium_01a_newxpblack' }),
+      plat('rock_step', 5200, 1330, 5310, 1330, 'grass', { art: 'floatingplatform_yellow_small_01a_newxpblack' }),
+      plat('rock_ledge', 5340, 1260, 5490, 1260, 'grass', { art: 'floatingplatform_red_medium_01a_newxpblack' }),
     ],
     ladders: [],
     barriers: [
@@ -689,12 +777,14 @@ export function training2Layout() {
       img_pickup_egg_b: { x: 2940, y: 1139 },
     },
     eggPlant: { x: X(57) + 60, y: 1100 }, // source trant_egg x 57 (+60 onto the rebuilt ledge)
-    rock: { x: 3545, y: 1260 },
+    rock: { x: 5415, y: 1260 },
     // Panel words: the machine's verb names, items/homestreet_ticket_dispenser.js 112, 78, 44.
-    machine: { x: 3820, y: FLOOR, choices: [
+    // One station per style, as the recording has them (K2q5GXruLvE 7:36-7:56): a holey tube over a
+    // target ring, the CHOOSE <STYLE> STYLE board and the style's picture. You stand on the ring.
+    machine: { x: 4240, y: FLOOR, choices: [
       { style: 'meadow', label: 'Pick Meadow Style', x: 3700 },
-      { style: 'firebog', label: 'Pick Firebog Style', x: 3840 },
-      { style: 'uralia', label: 'Pick Uralia Style', x: 3980 },
+      { style: 'firebog', label: 'Pick Firebog Style', x: 4240 },
+      { style: 'uralia', label: 'Pick Uralia Style', x: 4780 },
     ] },
     boxes: {
       to_food: { x: 1300, y: FLOOR, w: 80, h: 300 },
@@ -702,8 +792,8 @@ export function training2Layout() {
       to_drink: { x: 1800, y: FLOOR, w: 60, h: 300 },
       leave_drink: { x: 2230, y: FLOOR, w: 50, h: 300 },
       dustbunny_egg: { x: 2400, y: FLOOR, w: 80, h: 300 },
-      magicrock_reveal: { x: 3200, y: FLOOR, w: 120, h: 300 },
-      magicrock_talk: { x: 3545, y: 1260, w: 200, h: 140 },
+      magicrock_reveal: { x: 5000, y: FLOOR, w: 120, h: 300 },
+      magicrock_talk: { x: 5415, y: 1260, w: 200, h: 140 },
     },
   };
 }
