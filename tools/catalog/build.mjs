@@ -32,6 +32,7 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 import { siteNav } from '../changelog/build.mjs';
+import { mapTags } from '../data-versions/build.mjs';
 import { literalFrom, readItemTags } from '../inventory/gsjs-data.mjs';
 import { supplyConversions } from '../job-obtainable.mjs';
 
@@ -707,7 +708,7 @@ const shell = ({ p, title, description, body, script }) => `<!doctype html>
   <link rel="stylesheet" href="${p}restoration/restoration.css" />
   <link rel="stylesheet" href="${p}changelog/changelog.css" />
   <link rel="stylesheet" href="${p}site/site-nav.css" />
-  <script src="${p}site/theme.js"></script>
+${script ? mapTags(p) : ''}  <script src="${p}site/theme.js"></script>
   <link rel="stylesheet" href="${p}items/catalog.css" />
   <link rel="icon" href="${p}favicon.svg?v=arch" type="image/svg+xml" />
   <link rel="icon" href="${p}favicon.ico?v=arch" sizes="32x32" />

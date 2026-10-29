@@ -59,6 +59,9 @@ ln -s "$here/node_modules" "$work/game/node_modules"
 # It reads the other two repos through git at their tags, so it is pointed at the real clones (the export has no .git).
 GRODDLE_SERVER_DIR=${GRODDLE_SERVER_DIR:-$AUDIT/groddle-afternoon-server} GRODDLE_SITE_DIR="$SITE_REPO" \
   node "$work/game/tools/codebase/build-data.mjs" --release="$RELEASE" --out="$work/game/public/codebase/data.json"
+# Content keys for every data and art URL (js/data-urls.js), rebuilt after the builds above so the restoration
+# and Code data get keys too: a file changed since the last deploy gets a URL Kinsta's CDN has never cached.
+(cd "$work/game" && node tools/data-versions/build.mjs --built) || { echo "the data keys were not built" >&2; exit 1; }
 # The header menu is content on the live site (Minn Admin, Design, Navigation): write the live one in.
 "${SSH[@]}" "$HOST" 'cd ~/public && wp post list --post_type=wp_navigation --post_status=publish --fields=ID,post_date --format=json' > "$work/menus.json"
 menu=$(node -e 'const m = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8") || "[]"); m.sort((a, b) => (a.post_date === b.post_date ? b.ID - a.ID : (a.post_date < b.post_date ? 1 : -1))); console.log(m[0]?.ID || "");' "$work/menus.json")

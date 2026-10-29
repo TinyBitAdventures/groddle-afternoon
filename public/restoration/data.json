@@ -2640,9 +2640,14 @@
   ]
  },
  "git": {
-  "commits": 695,
+  "commits": 696,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-28",
+    "kind": "fix",
+    "text": "A Glitch resting on a ladder holds still instead of bobbing and cycling"
+   },
    {
     "date": "2026-10-28",
     "kind": "improve",
@@ -2757,14 +2762,9 @@
     "date": "2026-10-28",
     "kind": "fix",
     "text": "An open bag's icon is no longer cut off, and the verb's cancel button stays sharp"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "fix",
-    "text": "Each tree plays its own harvest sound again"
    }
   ]
  },
- "tests": 404,
+ "tests": 405,
  "generatedAt": "2026-10-28"
 }

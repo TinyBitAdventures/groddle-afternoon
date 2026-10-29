@@ -1,0 +1,214 @@
+#!/usr/bin/env node
+/**
+ * Writes public/js/data-versions.js, the content keys js/data-urls.js puts on
+ * every data and art URL the game fetches at runtime (`?v=<key>`), and the
+ * map's own key in every page that loads it (`js/data-versions.js?v=<key>`).
+ *
+ * The map is a delta against an epoch commit: a file under public/ whose
+ * extension is in EXT and that is added or changed since the epoch (tracked
+ * or not yet tracked) gets the first 8 hex of its sha256; every other such
+ * file gets the epoch's key (its first 8 hex). So a change, or a new file, gets
+ * a URL no browser or CDN has seen, an unchanged file keeps its URL from
+ * release to release, and only git and the changed files are read (the 1,460
+ * street JSON files and the art cost a `git diff`, not a hash each).
+ * `--epoch=<commit>` starts a new epoch: every URL changes once, and the map
+ * is empty again (worth it when it has grown into the thousands).
+ *
+ * Files built at deploy (BUILT: the restoration report and the Code page
+ * data) change on every build, so the committed map leaves them out (they
+ * take the epoch key; their pages fetch with cache: 'no-cache'), and
+ * tools/deploy/kinsta.sh runs this with --built after building them.
+ *
+ * Anything that writes under public/ (street builders, build-restoration,
+ * art pipelines) leaves the map stale until this is rerun: --check, which
+ * tests/data-versions.test.js runs, fails and names the files.
+ *
+ *   node tools/data-versions/build.mjs                 write the map and the pages' keys
+ *   node tools/data-versions/build.mjs --check         exit 1 when either is stale
+ *   node tools/data-versions/build.mjs --built         deploy: also key the BUILT files
+ *   node tools/data-versions/build.mjs --epoch=HEAD    start a new epoch at a commit
+ */
+import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
+export const MAP_PATH = 'public/js/data-versions.js';
+
+/** Versioned extensions (keep in step with public/js/data-urls.js EXT). */
+export const EXT = /\.(?:json|png|webp|jpe?g|gif|svg|mp3|ogg|wav|m4a|atlas|xml)$/i;
+
+/** Built by tools/deploy/kinsta.sh (and the lead's build-restoration run), so only keyed with --built. */
+export const BUILT = ['restoration/data.json', 'restoration/history.json', 'codebase/data.json'];
+
+/** The page tag's key: `data-versions.js?v=<8 hex>`. */
+export const PAGE_KEY = /(data-versions\.js\?v=)[0-9a-f]{8}/g;
+
+const git = (root, args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', maxBuffer: 1 << 28 });
+const list = (out) => out.split('\0').filter(Boolean);
+export const shortHash = (buf) => createHash('sha256').update(buf).digest('hex').slice(0, 8);
+
+/** The epoch commit the map in `root` was built against ('' when there is none). */
+export function currentEpoch(root = ROOT) {
+  try {
+    const m = /epoch commit ([0-9a-f]{40})/.exec(readFileSync(join(root, MAP_PATH), 'utf8'));
+    return m ? m[1] : '';
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * The map for the tree in `root`.
+ * @param {{ root?: string, epoch?: string, built?: boolean }} [opts]
+ * @returns {{ epoch: string, files: Record<string, string>, source: string, key: string }}
+ */
+export function buildDataVersions({ root = ROOT, epoch = currentEpoch(root), built = false } = {}) {
+  if (!epoch) throw new Error(`${MAP_PATH} names no epoch commit: run node tools/data-versions/build.mjs --epoch=HEAD`);
+  let commit;
+  try {
+    commit = git(root, ['rev-parse', '--verify', '--quiet', `${epoch}^{commit}`]).trim();
+  } catch {
+    throw new Error(`epoch commit ${epoch} is not in this clone (a shallow clone, or rewritten history): run node tools/data-versions/build.mjs --epoch=HEAD`);
+  }
+  const changed = new Set([
+    ...list(git(root, ['diff', '--name-only', '--no-renames', '--diff-filter=AMT', '-z', commit, '--', 'public'])),
+    ...list(git(root, ['ls-files', '--others', '--exclude-standard', '-z', '--', 'public'])),
+  ]);
+  const files = {};
+  const take = (rel) => {
+    const file = join(root, 'public', rel);
+    if (existsSync(file)) files[rel] = shortHash(readFileSync(file));
+  };
+  for (const f of changed) {
+    const rel = f.slice('public/'.length);
+    if (!EXT.test(rel) || BUILT.includes(rel)) continue;
+    take(rel);
+  }
+  if (built) for (const rel of BUILT) take(rel);
+  const sorted = Object.fromEntries(Object.keys(files).sort().map((k) => [k, files[k]]));
+  const source = render(commit, sorted, built);
+  return { epoch: commit, files: sorted, source, key: shortHash(source) };
+}
+
+function render(commit, files, built) {
+  const rows = Object.entries(files).map(([k, v]) => `    ${JSON.stringify(k)}: ${JSON.stringify(v)},`);
+  return [
+    '// Generated by tools/data-versions/build.mjs: never edit by hand, rerun it after changing anything under public/.',
+    `// Content keys for js/data-urls.js against epoch commit ${commit}${built ? ' (deploy build, with the BUILT files)' : ''}:`,
+    '// a data or art file listed here is fetched as <path>?v=<its key>, every other one as <path>?v=<epoch>.',
+    '(function (g) {',
+    "  var s = g.document && g.document.currentScript;",
+    '  g.GRODDLE_DATA_VERSIONS = {',
+    "    root: s && s.src ? new URL('../', s.src).href : '',",
+    `    epoch: '${commit.slice(0, 8)}',`,
+    rows.length ? '    files: {' : '    files: {},',
+    ...(rows.length ? [...rows.map((r) => `  ${r}`), '    },'] : []),
+    '  };',
+    "})(typeof globalThis !== 'undefined' ? globalThis : this);",
+    '',
+  ].join('\n');
+}
+
+/** The key pages load the committed map under (the hash of public/js/data-versions.js as it is). */
+export function mapKey(root = ROOT) {
+  try {
+    return shortHash(readFileSync(join(root, MAP_PATH)));
+  } catch {
+    return '00000000';
+  }
+}
+
+/** The js/data-urls.js key (bump it when that file changes). */
+export const HOOK_SRC = 'js/data-urls.js?v=g420-1';
+
+/**
+ * The two script tags a page that runs scripts loads first, for page builders (tools/catalog/build.mjs):
+ * `prefix` is the page's way back to the game root ('', '../').
+ */
+export function mapTags(prefix = '', root = ROOT) {
+  return [
+    '  <!-- Content keys for data and art URLs (js/data-urls.js): before every other script. -->',
+    `  <script src="${prefix}js/data-versions.js?v=${mapKey(root)}"></script>`,
+    `  <script src="${prefix}${HOOK_SRC}"></script>`,
+    '',
+  ].join('\n');
+}
+
+/** Every page under public/ that loads the map (tracked or new). */
+export function mapPages(root = ROOT) {
+  const out = [
+    ...list(git(root, ['ls-files', '-z', '--', 'public'])),
+    ...list(git(root, ['ls-files', '--others', '--exclude-standard', '-z', '--', 'public'])),
+  ].filter((f) => f.endsWith('.html') && existsSync(join(root, f)));
+  return out.filter((f) => readFileSync(join(root, f), 'utf8').includes('data-versions.js?v='));
+}
+
+/** Pages whose map key differs from `key`, with their text rewritten. */
+export function stalePages(root, key) {
+  const stale = [];
+  for (const f of mapPages(root)) {
+    const text = readFileSync(join(root, f), 'utf8');
+    const next = text.replace(PAGE_KEY, (m, a) => `${a}${key}`);
+    if (next !== text) stale.push({ file: f, text: next });
+  }
+  return stale;
+}
+
+function main(argv) {
+  const arg = (name) => argv.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3);
+  const check = argv.includes('--check');
+  const built = argv.includes('--built');
+  const epochArg = arg('epoch');
+  const root = ROOT;
+  const map = buildDataVersions({ root, built, ...(epochArg ? { epoch: epochArg } : {}) });
+  const target = join(root, MAP_PATH);
+  const current = existsSync(target) ? readFileSync(target, 'utf8') : '';
+  const pages = stalePages(root, map.key);
+  const count = Object.keys(map.files).length;
+  if (check) {
+    const problems = [];
+    if (current !== map.source) {
+      const old = parseFiles(current);
+      const names = new Set([...Object.keys(old), ...Object.keys(map.files)]);
+      const diff = [...names].filter((n) => old[n] !== map.files[n]).sort();
+      problems.push(`${MAP_PATH} is stale${diff.length ? ` (${diff.length} file${diff.length === 1 ? '' : 's'}: ${diff.slice(0, 8).join(', ')}${diff.length > 8 ? ', ...' : ''})` : ''}`);
+    }
+    for (const p of pages) problems.push(`${p.file} loads an old js/data-versions.js key`);
+    if (problems.length) {
+      console.error(`${problems.join('\n')}\nrun node tools/data-versions/build.mjs`);
+      process.exit(1);
+    }
+    console.log(`${MAP_PATH} is current (${count} files keyed against epoch ${map.epoch.slice(0, 8)})`);
+    return;
+  }
+  if (current !== map.source) writeFileSync(target, map.source);
+  for (const p of pages) writeFileSync(join(root, p.file), p.text);
+  console.log(`${MAP_PATH}: ${count} files keyed against epoch ${map.epoch.slice(0, 8)}${built ? ' with the deploy builds' : ''}; key ${map.key} in ${mapPages(root).length} pages (${pages.length} updated)`);
+  if (count > 2000) console.log('the map is large: start a new epoch at a release (--epoch=HEAD)');
+}
+
+/** The `files` rows of a map's source. */
+export function parseFiles(source) {
+  const out = {};
+  for (const m of String(source).matchAll(/^\s+("(?:[^"\\]|\\.)*"): "([0-9a-f]{8})",$/gm)) out[JSON.parse(m[1])] = m[2];
+  return out;
+}
+
+const isMain = (() => {
+  try {
+    return Boolean(process.argv[1]) && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+})();
+if (isMain) {
+  try {
+    main(process.argv.slice(2));
+  } catch (err) {
+    console.error(err.message);
+    process.exit(1);
+  }
+}
