@@ -1119,6 +1119,7 @@
       "assets/streets/GIF10RP1DBU11NU.json": "879c3789",
       "assets/streets/GIF153KDV872SE5.json": "8c8cc3e3",
       "assets/streets/GIFF8A7EAO72NPH.json": "185a8b0c",
+      "assets/streets/GIFM2QAIQ1C31JV.json": "bfc3d26c",
       "assets/streets/GIFM4BD43383DKV.json": "264aa464",
       "assets/streets/GIFR1RLV0G43647.json": "db288edb",
       "assets/streets/GLI1D2QFT571VQT.json": "ae8aa43e",

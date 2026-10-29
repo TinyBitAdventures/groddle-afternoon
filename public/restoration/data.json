@@ -2661,9 +2661,14 @@
   ]
  },
  "git": {
-  "commits": 730,
+  "commits": 732,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "new",
+    "text": "A share card and link previews for every page"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2778,11 +2783,6 @@
     "date": "2026-10-28",
     "kind": "fix",
     "text": "Streets, data and art changed in a release load fresh without a hard refresh"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "fix",
-    "text": "A Glitch resting on a ladder holds still instead of bobbing and cycling"
    }
   ]
  },

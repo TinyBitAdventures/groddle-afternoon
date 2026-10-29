@@ -410,7 +410,8 @@ export function penumbraStreet() {
   const platforms = FLOORS.map((f) => {
     const a = world(f.x0, f.y);
     const b = world(f.x1, f.y);
-    return { id: `plat_${f.id}`, x1: a.x, y1: a.y, x2: b.x, y2: b.y, pc_perm: null };
+    // -1: a floor you can jump up through; the room is rebuilt from video, so its floors are the plain kind (null would be hard both ways).
+    return { id: `plat_${f.id}`, x1: a.x, y1: a.y, x2: b.x, y2: b.y, pc_perm: -1 };
   });
   const barriers = [
     ...SWITCH_WALLS.map((w) => {

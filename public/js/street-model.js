@@ -81,8 +81,10 @@ export function platformsScreen(street) {
     const a = worldToScreen(street, p.x1, p.y1);
     const b = worldToScreen(street, p.x2, p.y2);
     // The source line's permeability (platform_line pc_perm): 1 is an underside or
-    // ceiling, solid only from below, never ground to stand or place things on.
-    const pcPerm = Number.isFinite(p.pc_perm) ? p.pc_perm : null;
+    // ceiling, solid only from below, never ground to stand or place things on; null
+    // (the source's <null id="platform_pc_perm"/>) is hard both ways. A line with no
+    // pc_perm at all (built by hand) is a plain floor.
+    const pcPerm = Number.isFinite(p.pc_perm) ? p.pc_perm : p.pc_perm === null ? null : undefined;
     // ensure left→right for queries
     if (a.x <= b.x) {
       return { id: p.id, x1: a.x, y1: a.y, x2: b.x, y2: b.y, pcPerm };
@@ -286,13 +288,14 @@ export function isStandable(p) {
 }
 
 /**
- * A line that stops a rising head: the source's pc_perm 1. null (hard both
- * ways in the source) is left out: rebuilt puzzle rooms (Penumbra, Kristel
- * Kaos) write null for plain floors, and js/features/puzzles-feature.js
- * already treats null as a ceiling on the puzzle streets that need it.
+ * A line that stops a rising head: the source's pc_perm 1, and null, hard both
+ * ways (PlatformLine.as pc_solid_from_bottom 345-347: only -1 and 0 let a head
+ * through). Tiny Speck drew null lines over tunnels and tubes, so a jump inside
+ * Flipside's swiss pipe stops at its roof (Austin 2026-10-29). 82 lines on 21
+ * streets; a hand-built line (no pc_perm) never does.
  */
 export function isSolidFromBelow(p) {
-  return p?.pcPerm === 1;
+  return p?.pcPerm === 1 || p?.pcPerm === null;
 }
 
 /**
