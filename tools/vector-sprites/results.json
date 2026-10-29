@@ -36949,5 +36949,72 @@
    0.9729,
    0.9726
   ]
+ },
+ "assets/sprites/hell/bunch_of_grapes_hell-world.png": {
+  "animal": "hell-grapes-world",
+  "swf": "misc/bunch_of_grapes_hell/bunch_of_grapes_hell.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   2,
+   5
+  ],
+  "swfLabelFrames": 4,
+  "cells": 4,
+  "fw": 70,
+  "fh": 39,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -208,
+   -321
+  ],
+  "score": 0.9711,
+  "minFrame": 0.9688,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/hell/bunch_of_grapes_hell-world@3x.webp",
+  "bytes": 39804,
+  "firstDraw": true,
+  "frameScores": [
+   0.9688,
+   0.9703,
+   0.9718,
+   0.9734
+  ]
+ },
+ "assets/sprites/small-items/funpickle_1.png": {
+  "animal": "funpickle-still",
+  "swf": "misc/special_item_that_only_beta_testers_get/special_item_that_only_beta_testers_get.swf",
+  "sprite": 4,
+  "label": "1",
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 125,
+  "fh": 227,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -40,
+   -21
+  ],
+  "score": 0.9637,
+  "minFrame": 0.9637,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/small-items/funpickle_1@3x.webp",
+  "bytes": 22646,
+  "firstDraw": true,
+  "frameScores": [
+   0.9637
+  ]
  }
 }

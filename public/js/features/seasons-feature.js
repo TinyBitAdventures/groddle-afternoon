@@ -43,7 +43,7 @@ import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
 import { rollDropTable } from '../drop-tables.js';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=note-g175';
 import { payDrop } from './drops-feature.js?v=drops-8';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=g446-3';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=g446-4';
 import { SEASON_DATA } from '../seasons-data.js';
 import {
   CANDY_CLASSES,

@@ -1,5 +1,5 @@
 {
- "about": "World still items the stills sweep (lane SPRITES, 2026-10-29) found drawn at 1.5+ need/available at 3 device px per world px, each from its own CC0 SWF in glitch-items: the Visiting Stone, notes, gift boxes, notice boards and the left mailbox (features/street-furniture-feature.js), the home furniture base pieces (furniture/furniture_base and bag_furniture_cabinet_base, js/home-decor.js), the street-job sign stake, the Party ATM, the Rook Hall speaker and the Butler's box (js/butler.js BUTLER_BOX_ART). Root-timeline items render from a copy with a padded stage (padStage). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/stills.json",
+ "about": "World still items the stills sweep (lane SPRITES, 2026-10-29) found drawn at 1.5+ need/available at 3 device px per world px, each from its own CC0 SWF in glitch-items: the Visiting Stone, notes, gift boxes, notice boards and the left mailbox (features/street-furniture-feature.js), the home furniture base pieces (furniture/furniture_base and bag_furniture_cabinet_base, js/home-decor.js), the street-job sign stake, the Party ATM, the Rook Hall speaker and the Butler's box (js/butler.js BUTLER_BOX_ART); G446: Hell's Bunch of Grapes on the floor (js/hell.js, four states) and Señor Funpickle's still (features/funpickle-feature.js). Root-timeline items render from a copy with a padded stage (padStage). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/stills.json",
  "firstDraw": true,
  "jobs": [
   {
@@ -989,6 +989,38 @@
      "frames": 1,
      "swfStart": 1,
      "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "hell-grapes-world",
+   "swf": "misc/bunch_of_grapes_hell/bunch_of_grapes_hell.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/hell/bunch_of_grapes_hell-world.png",
+     "fw": 70,
+     "fh": 39,
+     "cols": 4,
+     "frames": 4,
+     "swfStart": 2,
+     "swfCount": 4
+    }
+   ]
+  },
+  {
+   "name": "funpickle-still",
+   "swf": "misc/special_item_that_only_beta_testers_get/special_item_that_only_beta_testers_get.swf",
+   "sprite": 4,
+   "sheets": [
+    {
+     "path": "assets/sprites/small-items/funpickle_1.png",
+     "label": "1",
+     "fw": 125,
+     "fh": 227,
+     "cols": 1,
+     "frames": 1
     }
    ]
   }

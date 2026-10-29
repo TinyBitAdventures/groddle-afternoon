@@ -7,6 +7,10 @@
   "swf": "~/Documents/glitch-audit/glitch-items/misc/physics/anti_gravitys_rainbow/anti_gravitys_rainbow.swf",
   "seed": true
  },
+ "antique_spigot": {
+  "swf": "~/Documents/glitch-audit/glitch-items/rare_items/antique_spigot/antique_spigot.swf",
+  "frame": "iconic"
+ },
  "artifact_butterfly_hair_clip_piece1": {
   "swf": "~/Documents/glitch-audit/glitch-items/artifacts/artifact_butterfly_hair_clip_piece1/artifact_butterlfy_hair_clip_piece1.swf"
  },
@@ -30,6 +34,10 @@
  "bag_alchemistry_kit": {
   "swf": "~/Documents/glitch-audit/glitch-items/misc/bag_generic/bag_alchemistry_kit/bag_alchemistry_kit.swf",
   "oga": "~/Documents/glitch-audit/opengameart/extracted_g174/glitch-assets/bag_alchemistry_kit/bag_alchemistry_kit__x1_1_png_1354832225.png"
+ },
+ "bag_bigger": {
+  "swf": "~/Documents/glitch-audit/glitch-items/misc/bag_bigger/bag_bigger.swf",
+  "frame": "iconic"
  },
  "bag_bigger_blue": {
   "swf": "~/Documents/glitch-audit/glitch-items/misc/bag_bigger/bag_bigger_blue/bag_bigger_blue.swf",
@@ -267,6 +275,14 @@
   "frame": "iconic",
   "oga": "~/Documents/glitch-audit/opengameart/extracted_g174/glitch-assets/card_carrying_qualification/card_carrying_qualification__x1_iconic_png_1354833115.png"
  },
+ "class_axe": {
+  "swf": "~/Documents/glitch-audit/glitch-items/tools/hatchet/class_axe/class_axe.swf",
+  "frame": "iconic"
+ },
+ "class_axe_broken": {
+  "swf": "~/Documents/glitch-audit/glitch-items/tools/hatchet/class_axe/class_axe.swf",
+  "frame": "broken_iconic"
+ },
  "club_house_picture": {
   "swf": "~/Documents/glitch-audit/glitch-items/quest_items/club_house_picture/club_house_picture.swf",
   "seed": true,
@@ -290,6 +306,14 @@
  "cornucopia_herbs": {
   "swf": "~/Documents/glitch-audit/glitch-items/misc/cornucopia_herbs/cornucopia_herbs.swf",
   "seed": true
+ },
+ "crabato_juice": {
+  "swf": "~/Documents/glitch-audit/glitch-items/drink/crabato_juice/crabato_juice.swf",
+  "frame": "iconic"
+ },
+ "crabphones": {
+  "swf": "~/Documents/glitch-audit/glitch-items/misc/crabphones/crabphones.swf",
+  "frame": "iconic"
  },
  "crown_game_lock": {
   "swf": "~/Documents/glitch-audit/glitch-items/misc/crown_game_lock/crown_game_lock.swf",
@@ -377,6 +401,14 @@
  "firefly_whistle": {
   "swf": "~/Documents/glitch-audit/glitch-items/quest_items/firefly_whistle/firefly_whistle.swf",
   "seed": true
+ },
+ "fortune": {
+  "swf": "~/Documents/glitch-audit/glitch-items/misc/fortune/fortune.swf",
+  "frame": "iconic"
+ },
+ "fortune_cookie_withnote": {
+  "swf": "~/Documents/glitch-audit/glitch-items/misc/fortune_cookie/fortune_cookie.swf",
+  "frame": "withnote_iconic"
  },
  "fox_bait": {
   "swf": "~/Documents/glitch-audit/glitch-items/misc/fox_bait/fox_bait.swf",
@@ -545,6 +577,10 @@
  "golgi_apparatus": {
   "swf": "~/Documents/glitch-audit/glitch-items/misc/golgi_apparatus/golgi_apparatus.swf",
   "oga": "~/Documents/glitch-audit/opengameart/extracted_g174/glitch-assets/golgi_apparatus/golgi_apparatus__x1_1_png_1354834547.png"
+ },
+ "grain_bushel": {
+  "swf": "~/Documents/glitch-audit/glitch-items/misc/grain_bushel/grain_bushel.swf",
+  "frame": "iconic"
  },
  "grand_ol_grinder": {
   "swf": "~/Documents/glitch-audit/glitch-items/tools/ore_grinder/grand_ol_grinder/grand_ol_grinder.swf",
@@ -829,6 +865,11 @@
   "swf": "~/Documents/glitch-audit/glitch-items/misc/note_pole/note_pole.swf",
   "seed": true
  },
+ "npc_cactus": {
+  "swf": "~/Documents/glitch-audit/glitch-items/inhabitants/cactus/npc_cactus.swf",
+  "sprite": 52,
+  "frame": "idle"
+ },
  "npc_deimaginator": {
   "swf": "~/Documents/glitch-audit/glitch-items/inhabitants/deimaginator/npc_deimaginator.swf"
  },
@@ -935,6 +976,10 @@
  "pile_of_currants": {
   "swf": "~/Documents/glitch-audit/glitch-items/misc/pile_of_currants/pile_of_currants.swf",
   "oga": "~/Documents/glitch-audit/opengameart/extracted_g174/glitch-assets/pile_of_currants/pile_of_currants__x1_1_png_1354840042.png"
+ },
+ "plate_of_beans": {
+  "swf": "~/Documents/glitch-audit/glitch-items/misc/plate_of_beans/plate_of_beans.swf",
+  "frame": "iconic"
  },
  "portal": {
   "swf": "~/Documents/glitch-audit/glitch-items/misc/portal/portal.swf",
@@ -1140,6 +1185,9 @@
  "rook_hall_speaker": {
   "swf": "~/Documents/glitch-audit/glitch-items/quest_items/rook_hall_speaker/rook_hall_speaker.swf",
   "oga": "~/Documents/glitch-audit/opengameart/extracted_g174/glitch-assets/rook_hall_speaker/rook_hall_speaker__x1_stop_png_1354835940.png"
+ },
+ "rube_potato": {
+  "swf": "~/Documents/glitch-audit/glitch-items/rare_items/rube_potato/rube_potato.swf"
  },
  "seed_strawberry": {
   "swf": "~/Documents/glitch-audit/glitch-items/seeds/seed_strawberry/seed_strawberry.swf",

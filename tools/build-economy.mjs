@@ -95,6 +95,9 @@ const CATALOGS = new Set([
   // ITEMBANDS: the item holder of every class (tools/build-item-bands.mjs).
   'public/js/item-bands-data.js',
   'public/assets/content/trade-items.json',
+  // The content keys of every asset URL (tools/data-versions/build.mjs): a 3x icon file names its
+  // class without granting it (G446: rube_potato@3x.png lifted Rube Shaped Potato's credit gate).
+  'public/js/data-versions.js',
 ]);
 
 export function unitValue(classTsid) {

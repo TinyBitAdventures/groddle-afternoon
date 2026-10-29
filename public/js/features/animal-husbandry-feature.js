@@ -51,7 +51,7 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g446-3';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g446-4';
 import { nearestSurfaceY } from '../walk-surface.js?v=g442-6';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g446-2';
 import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js';
@@ -105,7 +105,7 @@ import {
 import { loseEnergy, shiftMetabolic } from '../metabolics.js';
 import { textureFromUrl } from '../textures.js';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g446-3';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g446-4';
 import { grantMoodXp } from '../mood-xp.js';
 import { itemZ } from '../item-bands.js?v=g429-1';
 

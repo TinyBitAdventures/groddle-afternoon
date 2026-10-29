@@ -28,7 +28,7 @@ import {
   forestMachineRoomStreet,
   isForestMachineRoomTsid,
 } from '../public/js/forest-machine-room.js';
-import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=g446-3';
+import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=g446-4';
 import { FEATURES } from '../public/js/features/index.js?v=registry-278';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

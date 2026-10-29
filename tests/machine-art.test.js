@@ -37,13 +37,13 @@ import {
   packMakeState,
   roomMachineState,
   setMachineArtFrame,
-} from '../public/js/machine-art.js?v=g446-3';
+} from '../public/js/machine-art.js?v=g446-4';
 import { MACHINE_IDS } from '../public/js/machines.js?v=g403-1';
 import { MACHINE_EXTRA_WAIT_MS, machineTank, tankFuel } from '../public/js/machine-rooms.js?v=g403-1';
 import { craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=g403-1';
 import { platformsScreen } from '../public/js/street-model.js?v=g442-6';
-import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=g446-3';
-import { machineArtFeature } from '../public/js/features/machine-art-feature.js?v=g446-3';
+import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=g446-4';
+import { machineArtFeature } from '../public/js/features/machine-art-feature.js?v=g446-4';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -238,7 +238,7 @@ describe('G193 machine art: which state shows when', () => {
 describe('G193 machine art: wiring', () => {
   it('room machines draw the states and lost the wobble and drawn light', () => {
     const src = read('js/features/machine-rooms-feature.js');
-    assert.match(src, /from '\.\.\/machine-art\.js\?v=g446-3'/);
+    assert.match(src, /from '\.\.\/machine-art\.js\?v=g446-4'/);
     assert.match(src, /roomMachineState\(\{ job, waiting, collectedAt: collectedAt\[m\.def\.id\] \}, t\)/);
     assert.match(src, /m\.sprite\.texture = m\.frames\[k\]/);
     assert.doesNotMatch(src, /sprite\.rotation|light\.circle|blinkReadyLight: the ready state/);
@@ -247,7 +247,7 @@ describe('G193 machine art: wiring', () => {
   it('the Make panel plays a pack machine\'s states and its hand-over', () => {
     const game = read('game.js');
     const css = read('style.css');
-    assert.match(game, /import \{[^}]*machineArtHtml[^}]*\} from '\.\/js\/machine-art\.js\?v=g446-3'/);
+    assert.match(game, /import \{[^}]*machineArtHtml[^}]*\} from '\.\/js\/machine-art\.js\?v=g446-4'/);
     assert.match(game, /\|\| machineArtHtml\(recipe\.tool, \{ label: /);
     assert.match(game, /const \{ state, since \} = packMakeState\(ms\);\n\s+setMachineArtFrame\(machineArt, state, ms - since\);/);
     assert.match(game, /playMachineHandOver\(resEl\.querySelector\('\[data-machine-art\]'\)\)/);
@@ -256,7 +256,7 @@ describe('G193 machine art: wiring', () => {
     assert.match(game, /showMakeResult\(record\.lowFuel \? \{ \.\.\.result, lowFuel: true \} : result, record\.key\)/);
     assert.match(game, /result\.lowFuel \? `<span class="mr-machine-say" role="status">\$\{LOW_FUEL_LINE\}<\/span>`/);
     assert.match(css, /\.make-progress \.mp-tool-machine,\n\.make-result \.mr-machine \{[\s\S]*?animation: none;[\s\S]*?transform: translateX\(-50%\) scale\(var\(--mp-scale\)\);/);
-    assert.match(read('js/features/index.js'), /import \{ machineArtFeature \} from '\.\/machine-art-feature\.js\?v=g446-3'; FEATURES\.push\(machineArtFeature\);/);
+    assert.match(read('js/features/index.js'), /import \{ machineArtFeature \} from '\.\/machine-art-feature\.js\?v=g446-4'; FEATURES\.push\(machineArtFeature\);/);
   });
 });
 

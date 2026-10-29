@@ -2213,7 +2213,7 @@
  },
  "icons": {
   "items": 1071,
-  "sharp": 1056
+  "sharp": 1068
  },
  "imagination": {
   "total": 275,
@@ -2663,9 +2663,14 @@
   ]
  },
  "git": {
-  "commits": 741,
+  "commits": 742,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "improve",
+    "text": "Sad piggies, eating piggies and sitting chickens draw sharp on Retina"
+   },
    {
     "date": "2026-10-29",
     "kind": "improve",
@@ -2780,11 +2785,6 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "Dirt fills the gaps between the underground patches again, no more white spike by the chat box"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "The Zilloween ghost floats in the sky behind the street, not as a pale cone on the path"
    }
   ]
  },
