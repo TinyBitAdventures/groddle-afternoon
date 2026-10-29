@@ -26,7 +26,7 @@ import { remakeStatus } from '../public/js/imagination-remake.js';
 import { SHOTS } from './restoration/shots.mjs';
 import { playFor, playHref } from './restoration/play-links.mjs';
 import { DESIGNERS, DESIGNER_LEVELS, TEXT_LEVELS } from './restoration/designer-levels.mjs';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
 import { ROOM_NOTES } from './restoration/rooms.mjs';
 import { parseQuestConversation } from '../public/js/quests.js';
 import { seasonsData } from './restoration/seasons.mjs';
