@@ -505,7 +505,7 @@ import {
   recipeToolInUse,
 } from './js/making.js?v=g403-1';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=g191-1';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=g446-1';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=g446-3';
 import {
   createGarden,
   tickGarden,
@@ -834,7 +834,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=g373-1';
 import { installHiresDecos } from './js/deco-hires.js?v=g443-1';
 import { loadMutedPreference, saveMutedPreference } from './js/audio-pref.js';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js';
-import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=g446-1';
+import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=g446-3';
 import { denseSprite } from './js/sprite-dense.js?v=g430-1';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';

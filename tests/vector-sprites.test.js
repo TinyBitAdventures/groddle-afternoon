@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HIRES_SPRITES, SPLIT_SPRITES, hiresSpriteUrl, installHiresSprites, upgradeSource } from '../public/js/sprite-hires.js?v=g446-1';
+import { HIRES_SPRITES, SPLIT_SPRITES, hiresSpriteUrl, installHiresSprites, upgradeSource } from '../public/js/sprite-hires.js?v=g446-3';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -35,7 +35,7 @@ describe('3x vector sprite sheets', () => {
     assert.ok(HIRES_SPRITES.has(walkUrl));
     assert.match(hiresSpriteUrl(walkUrl), /@3x\.(png|webp)$/);
     assert.match(hiresSpriteUrl(`./${walkUrl}?v=2`), /@3x\.(png|webp)\?v=2$/);
-    assert.equal(hiresSpriteUrl('assets/sprites/npc_piggy__x1_chew_png_1354829433.png'), null);
+    assert.equal(hiresSpriteUrl('assets/sprites/npc_piggy__x1_look_screen_png_1354829434.png'), null);
     assert.equal(hiresSpriteUrl(hiresSpriteUrl(walkUrl)), null);
   });
 

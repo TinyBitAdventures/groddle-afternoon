@@ -1,13 +1,16 @@
 {
-  "about": "Animal sheets the game draws in the world, paired with their vector SWF (glitch-items, CC0; the butterfly is glitch-items misc/npc/npc_butterfly/npc_butterfly.swf, commit 9a64021, sha1 63bafbd0648a4e3a629adceba425c83d1e889f48). path is relative to public/; label is the SWF FrameLabel shown in cell `first` (default 0); frames = cells to fill. Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/animals.json",
+  "about": "Animal sheets the game draws in the world, paired with their vector SWF (glitch-items, CC0; the butterfly is glitch-items misc/npc/npc_butterfly/npc_butterfly.swf, commit 9a64021, sha1 63bafbd0648a4e3a629adceba425c83d1e889f48). path is relative to public/; label is the SWF FrameLabel shown in cell `first` (default 0); frames = cells to fill; a sheet with firstDraw swaps to 3x only when first drawn (the piggy and chicken sad clips, which js/features/animal-mood-feature.js preloads at boot). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/animals.json",
   "jobs": [
     { "name": "piggy", "swf": "inhabitants/piggy/npc_piggy.swf", "sprite": 79, "sheets": [
       { "path": "assets/sprites/npc_piggy__x1_walk_png_1354829432.png", "label": "walk", "fw": 88, "fh": 62, "cols": 8, "frames": 24 },
-      { "path": "assets/sprites/npc_piggy__x1_nibble_png_1354829441.png", "label": "nibble", "fw": 88, "fh": 62, "cols": 10, "frames": 60 }
+      { "path": "assets/sprites/npc_piggy__x1_nibble_png_1354829441.png", "label": "nibble", "fw": 88, "fh": 62, "cols": 10, "frames": 60 },
+      { "path": "assets/sprites/npc_piggy__x1_chew_png_1354829433.png", "label": "chew", "fw": 88, "fh": 62, "cols": 11, "frames": 53, "firstDraw": true },
+      { "path": "assets/sprites/npc_piggy__x1_too_much_nibble_png_1354829441.png", "label": "too_much_nibble", "fw": 88, "fh": 62, "cols": 11, "frames": 65, "firstDraw": true }
     ] },
     { "name": "chicken", "swf": "inhabitants/chicken/npc_chicken.swf", "sprite": 183, "sheets": [
       { "path": "assets/sprites/npc_chicken__x1_walk_png_1354830385.png", "label": "walk", "fw": 148, "fh": 110, "cols": 6, "frames": 24 },
-      { "path": "assets/sprites/npc_chicken__x1_pecking_once_png_1354830398.png", "label": "pecking_once", "fw": 148, "fh": 110, "cols": 6, "frames": 32 }
+      { "path": "assets/sprites/npc_chicken__x1_pecking_once_png_1354830398.png", "label": "pecking_once", "fw": 148, "fh": 110, "cols": 6, "frames": 32 },
+      { "path": "assets/sprites/animals/npc_chicken_sit.png", "label": "sit", "fw": 148, "fh": 110, "cols": 5, "frames": 20, "firstDraw": true }
     ] },
     { "name": "batterfly", "swf": "inhabitants/batterfly/npc_batterfly.swf", "sprite": 81, "sheets": [
       { "path": "assets/sprites/animals/npc_batterfly_profile.webp", "label": "profile", "fw": 111, "fh": 96, "cols": 8, "frames": 40 },

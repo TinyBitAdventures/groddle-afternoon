@@ -2663,9 +2663,14 @@
   ]
  },
  "git": {
-  "commits": 740,
+  "commits": 741,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "improve",
+    "text": "Loading-card street pictures are sharp on Retina screens"
+   },
    {
     "date": "2026-10-29",
     "kind": "improve",
@@ -2780,11 +2785,6 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "The Zilloween ghost floats in the sky behind the street, not as a pale cone on the path"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "new",
-    "text": "A mystery quoin turns into iMG, mood, energy or currants"
    }
   ]
  },

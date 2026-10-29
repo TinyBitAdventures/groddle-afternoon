@@ -15,7 +15,7 @@ import {
   rockClassFor,
   rockItems,
   soilKeyMap,
-} from '../public/js/features/homes-feature.js?v=g446-2';
+} from '../public/js/features/homes-feature.js?v=g446-3';
 import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js';
 import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js';
 import { canPlantBean } from '../public/js/patches.js?v=g414-1';

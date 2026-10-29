@@ -9,6 +9,7 @@
 export const HIRES_SPRITES = new Map([
   ["assets/sprites/animals/npc_batterfly_chew.webp", "assets/sprites/animals/npc_batterfly_chew@3x.webp"],
   ["assets/sprites/animals/npc_batterfly_profile.webp", "assets/sprites/animals/npc_batterfly_profile@3x.webp"],
+  ["assets/sprites/animals/npc_chicken_sit.png", "assets/sprites/animals/npc_chicken_sit@3x.webp"],
   ["assets/sprites/avatar/vector/angry.webp", "assets/sprites/avatar/vector/angry@3x.webp"],
   ["assets/sprites/avatar/vector/base.webp", "assets/sprites/avatar/vector/base@3x.webp"],
   ["assets/sprites/avatar/vector/climb.webp", "assets/sprites/avatar/vector/climb@3x.webp"],
@@ -245,7 +246,9 @@ export const HIRES_SPRITES = new Map([
   ["assets/sprites/npc_butterfly__x1_rest-angle1_png_1354829530.png", "assets/sprites/npc_butterfly__x1_rest-angle1_png_1354829530@3x.webp"],
   ["assets/sprites/npc_chicken__x1_pecking_once_png_1354830398.png", "assets/sprites/npc_chicken__x1_pecking_once_png_1354830398@3x.webp"],
   ["assets/sprites/npc_chicken__x1_walk_png_1354830385.png", "assets/sprites/npc_chicken__x1_walk_png_1354830385@3x.webp"],
+  ["assets/sprites/npc_piggy__x1_chew_png_1354829433.png", "assets/sprites/npc_piggy__x1_chew_png_1354829433@3x.webp"],
   ["assets/sprites/npc_piggy__x1_nibble_png_1354829441.png", "assets/sprites/npc_piggy__x1_nibble_png_1354829441@3x.webp"],
+  ["assets/sprites/npc_piggy__x1_too_much_nibble_png_1354829441.png", "assets/sprites/npc_piggy__x1_too_much_nibble_png_1354829441@3x.webp"],
   ["assets/sprites/npc_piggy__x1_walk_png_1354829432.png", "assets/sprites/npc_piggy__x1_walk_png_1354829432@3x.webp"],
   ["assets/sprites/parties/party_atm.png", "assets/sprites/parties/party_atm@3x.webp"],
   ["assets/sprites/pet-rock/pet_rock_idle_fit.png", "assets/sprites/pet-rock/pet_rock_idle_fit@3x.webp"],
@@ -575,6 +578,7 @@ export const SPLIT_SPRITES = new Map([
  * installHiresFirstDraw swaps them in place on first upload.
  */
 export const FIRST_DRAW_SPRITES = new Set([
+  "assets/sprites/animals/npc_chicken_sit.png",
   "assets/sprites/avatar/vector/angry.webp",
   "assets/sprites/avatar/vector/base.webp",
   "assets/sprites/avatar/vector/climb.webp",
@@ -797,6 +801,8 @@ export const FIRST_DRAW_SPRITES = new Set([
   "assets/sprites/newxp/rock_appear.png",
   "assets/sprites/newxp/rock_read.png",
   "assets/sprites/newxp/rock_talk.png",
+  "assets/sprites/npc_piggy__x1_chew_png_1354829433.png",
+  "assets/sprites/npc_piggy__x1_too_much_nibble_png_1354829441.png",
   "assets/sprites/parties/party_atm.png",
   "assets/sprites/quest-rooms/back_alley/bot_attract.png",
   "assets/sprites/quest-rooms/back_alley/bot_move.png",

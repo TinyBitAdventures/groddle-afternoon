@@ -48,7 +48,7 @@ import {
 } from '../public/js/animal-husbandry.js?v=g414-1';
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=g414-1';
 import { getVerbsFor, runVerb } from '../public/content.js?v=g414-1';
-import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=g446-2';
+import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=g446-3';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');

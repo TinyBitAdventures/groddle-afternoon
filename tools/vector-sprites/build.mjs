@@ -27,7 +27,7 @@
  *    part is rejected, before rendering.
  *  - "webp": true (manifest) always writes lossless WebP, even when it saves
  *    less than a fifth over PNG (seasons.json: one format per folder).
- *  - "firstDraw": true (manifest or job) keeps the sheet out of the eager
+ *  - "firstDraw": true (manifest, job or sheet) keeps the sheet out of the eager
  *    URL route: it swaps to 3x when the renderer first draws it.
  *  - job "character": sheets sharing one are all-or-nothing (a character
  *    that is sharp in one state and soft in the next looks broken), so one
@@ -848,7 +848,7 @@ async function main() {
       animal: job.name,
       ...(job.character ? { character: job.character } : {}),
       ...summary,
-      ...((job.firstDraw ?? manifest.firstDraw) ? { firstDraw: true } : {}),
+      ...((sheet.firstDraw ?? job.firstDraw ?? manifest.firstDraw) ? { firstDraw: true } : {}),
       frameScores: frames?.map((f) => f.score),
     };
   };
