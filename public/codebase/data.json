@@ -6,25 +6,25 @@
    "id": "game",
    "name": "groddle-afternoon",
    "url": "https://github.com/TinyBitAdventures/groddle-afternoon",
-   "ref": "v0.4.3",
-   "commit": "116826df",
+   "ref": "v0.4.4",
+   "commit": "1dec0d63",
    "licence": "MIT",
    "history": {
-    "commits": 725,
+    "commits": 728,
     "first": "2026-10-19",
     "latest": "2026-10-29"
    },
    "code": {
-    "files": 1075,
-    "lines": 391713,
-    "bytes": 17528687
+    "files": 1076,
+    "lines": 391745,
+    "bytes": 17530417
    },
    "languages": [
     {
      "id": "javascript",
      "label": "JavaScript",
-     "files": 1024,
-     "lines": 372892
+     "files": 1025,
+     "lines": 372924
     },
     {
      "id": "css",
@@ -69,15 +69,15 @@
      "id": "tests",
      "label": "Tests",
      "path": "tests/",
-     "files": 433,
-     "lines": 99200
+     "files": 434,
+     "lines": 99230
     },
     {
      "id": "features",
      "label": "Feature modules",
      "path": "public/js/features/",
      "files": 115,
-     "lines": 88206
+     "lines": 88208
     },
     {
      "id": "tools",
@@ -134,7 +134,7 @@
      "id": "data",
      "label": "Data (JSON)",
      "files": 3025,
-     "bytes": 178003240
+     "bytes": 178004184
     },
     {
      "id": "generated",
@@ -163,10 +163,10 @@
      "bytes": 2298
     }
    ],
-   "totalFiles": 22330,
+   "totalFiles": 22331,
    "tests": {
-    "files": 420,
-    "cases": 5673,
+    "files": 421,
+    "cases": 5675,
     "runner": "node --test"
    }
   },
@@ -284,25 +284,25 @@
    "id": "site",
    "name": "groddle-afternoon-site",
    "url": "https://github.com/TinyBitAdventures/groddle-afternoon-site",
-   "ref": "v0.4.3",
-   "commit": "b2099701",
+   "ref": "v0.4.4",
+   "commit": "a04b5620",
    "licence": "MIT",
    "history": {
-    "commits": 83,
+    "commits": 84,
     "first": "2026-10-24",
     "latest": "2026-10-29"
    },
    "code": {
     "files": 77,
-    "lines": 17052,
-    "bytes": 852304
+    "lines": 17055,
+    "bytes": 852427
    },
    "languages": [
     {
      "id": "php",
      "label": "PHP",
      "files": 66,
-     "lines": 15833
+     "lines": 15836
     },
     {
      "id": "css",
@@ -343,7 +343,7 @@
      "label": "Pages, blocks and menu",
      "path": "the rest of src/",
      "files": 31,
-     "lines": 4645
+     "lines": 4648
     },
     {
      "id": "styles",
@@ -379,7 +379,7 @@
     },
     {
      "path": "src/PlayerPages.php",
-     "lines": 546
+     "lines": 549
     }
    ],
    "notCode": [
