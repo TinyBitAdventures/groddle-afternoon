@@ -21,7 +21,7 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 
 import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-10';
-import { FORM_COPY, fillCopy, signUpOutcome, verifyLinkFrom, verifyOutcome, resetLinkFrom } from '../public/js/account-forms.js?v=g399-1';
+import { FORM_COPY, fillCopy, signUpOutcome, verifyLinkFrom, verifyOutcome, resetLinkFrom } from '../public/js/account-forms.js?v=g436-1';
 import { HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

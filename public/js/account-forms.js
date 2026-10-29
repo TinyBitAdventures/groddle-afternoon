@@ -199,6 +199,7 @@ export const FORM_COPY = Object.freeze({
     nameHelp: 'What other players see. 3 to 19 letters, numbers, spaces, - or _.',
     passwordHelp: 'At least 8 characters.',
     emailHelp: 'You sign in with it, and password resets go to it.',
+    privacy: 'Privacy policy',
   },
   forgot: {
     title: 'Reset your password',
@@ -319,6 +320,8 @@ const STYLE = `
 .acct-link { justify-self: center; border: 0; padding: 0.2rem; background: none; box-shadow: none; font: inherit; font-weight: 700; color: #2e5a20;
   text-decoration: underline; cursor: pointer; }
 .acct-message { margin: 0; font-weight: 600; color: #4c6b2e; }
+.acct-fine { margin: 0; text-align: center; font-size: 0.85rem; }
+.acct-fine a { color: #2e5a20; }
 .acct-message:empty { display: none; }
 .acct-message[data-tone="bad"] { color: #a33b22; }
 .acct-field[hidden], .acct-submit[hidden], .acct-message[hidden] { display: none; }
@@ -419,7 +422,10 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
     resend: el('div', { class: 'acct-turnstile', 'data-account-turnstile': 'resend' }),
     forgot: el('div', { class: 'acct-turnstile', 'data-account-turnstile': 'forgot' }),
   };
-  signup.append(googleRows.signup.wrap, suEmail.wrap, suPass.wrap, suName.wrap, trap, slots.signup, suSubmit);
+  // The privacy policy opens in a new tab so the form keeps what was typed.
+  const privacy = el('p', { class: 'acct-fine' });
+  privacy.append(el('a', { href: '/privacy-policy/', target: '_blank', rel: 'noopener' }, FORM_COPY.signup.privacy));
+  signup.append(googleRows.signup.wrap, suEmail.wrap, suPass.wrap, suName.wrap, trap, slots.signup, suSubmit, privacy);
 
   // Forgot your password
   const forgot = el('form', { class: 'acct-form', id: `acct-forgot-${n}`, 'data-form': 'forgot', novalidate: true, hidden: true });

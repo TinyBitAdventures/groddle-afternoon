@@ -693,7 +693,7 @@ function waysFor(id, remake, evidence, quests, takeable) {
 
 const FOOT = (p) => `  <footer class="foot">
     <div class="wrap">
-      <p>A <a href="https://tinybitadventures.com">fan remake</a> of Tiny Speck’s Glitch · <a href="${p}credits/">Credits</a></p>
+      <p>A <a href="https://tinybitadventures.com">fan remake</a> of Tiny Speck’s Glitch · <a href="${p}credits/">Credits</a> · <a href="${p}privacy-policy/">Privacy</a></p>
       <p><a href="${p}">Home</a> · <a href="${p}play/">Play Groddle Afternoon</a> · <a href="${p}restoration/">Restoration report</a> · <a href="${p}items/">Item catalog</a></p>
     </div>
   </footer>`;
