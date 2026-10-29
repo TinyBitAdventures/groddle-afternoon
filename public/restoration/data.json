@@ -2665,9 +2665,14 @@
   ]
  },
  "git": {
-  "commits": 744,
+  "commits": 745,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "improve",
+    "text": "Legalize It and We're Off to See the Lizard run on the real subway stations and street"
+   },
    {
     "date": "2026-10-29",
     "kind": "new",
@@ -2782,11 +2787,6 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "Street project signs and Zilloween pumpkins stand in front of the trees"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "Nothing opens over or behind the start card; a skill learned while away waits for Start"
    }
   ]
  },

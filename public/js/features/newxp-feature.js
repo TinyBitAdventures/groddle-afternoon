@@ -294,6 +294,7 @@ body.nx-island-map #map-panel .map-feature-card:not(.nx-map-card),body.nx-island
 #map-panel.nx-map-progress .map-street[data-tsid="GA94UK1BH3D3FJL"] .map-seg{animation:nx-map-pulse 1s ease-in-out infinite}
 .nx-map-card{margin:0 0 8px;padding:8px 12px;border-radius:10px;background:#fff6d6;color:#5b4300;font:800 13px Nunito,"Trebuchet MS",sans-serif;text-align:center}
 body.nx-hide-actions .top-actions>:not(#mute-btn),body.nx-hide-actions .quest-tracker{visibility:hidden}
+body.nx-hide-chat #local-chat-dock{visibility:hidden}
 `;
 
 function el(tag, attrs = {}, html = '') {
@@ -675,6 +676,8 @@ function hud(parts = {}) {
   b.toggle('nx-hide-mood', Boolean(parts.mood));
   b.toggle('nx-hide-pack', Boolean(parts.pack));
   b.toggle('nx-hide-actions', Boolean(parts.actions));
+  // Nobody else is in the clouds or the training rooms, so Local chat waits for the home street.
+  b.toggle('nx-hide-chat', Boolean(parts.chat));
 }
 
 function showPill(on) {
@@ -1078,6 +1081,9 @@ function stageDeco(PIXI, name, x, y, { ax = 0.5, ay = 0.5, scale = 1, sx = null,
   return spr;
 }
 
+/** Camera look while you wait at the chain: shows the arrow's bottom (world y 667) in a 408 px view. */
+const CHAIN_LOOK_Y = 370;
+
 /** newxp_chain's 58 x 505 x1 sheets (OGA extracted_newxp newxp_chain, CC0): hang loops, pull plays once. */
 const CHAIN_ART = Object.freeze({
   hang: { url: `${ART}chain_hang.png`, cols: 15, rows: 4, count: 60 },
@@ -1266,12 +1272,16 @@ function revealPhrases(now, p) {
 
 async function runClouds(t) {
   const engine = engineRef;
-  hud({ meta: true, energy: true, mood: true, pack: true, actions: true });
+  hud({ meta: true, energy: true, mood: true, pack: true, actions: true, chat: true });
   const L = buildClouds(engine);
   fadeIn();
   // newxp_chain: you wait hidden above the ceiling until the chain is pulled.
   setStep('chain');
   rooted = true;
+  // Frame the hanging chain and its click-to-pull arrow (world y ~230-670) below the hidden avatar:
+  // the camera stops at the level's top, which left the arrow under the bottom edge.
+  engine.setCameraLook?.(0, CHAIN_LOOK_Y);
+  engine.snapCamera?.();
   const waitAt = Date.now();
   // Enter pulls it; taken first (capture) so the game's own Enter does not say "Nothing nearby".
   const onKey = (e) => {
@@ -1293,6 +1303,7 @@ async function runClouds(t) {
     }, { help: () => pullChain(engine) });
   } finally {
     if (typeof window !== 'undefined') window.removeEventListener('keydown', onKey, true);
+    engine.setCameraLook?.(0, 0);
   }
   const first = L.terraces[0];
   await until(t, () => P()?.onGround && Math.abs(P().y - first.y) < 12, { help: () => place(L.spawn.x, first.y) });
@@ -1378,7 +1389,7 @@ function buildTraining1(engine) {
 
 async function runTraining1(t) {
   const engine = engineRef;
-  hud({ meta: true, energy: true, mood: true, pack: true, actions: true });
+  hud({ meta: true, energy: true, mood: true, pack: true, actions: true, chat: true });
   const L = buildTraining1(engine);
   fadeIn();
   const fl = makeNpc(engine, 'flamingo', L.flamingo.x, L.flamingo.y, { register: true, subtitle: 'Not a patient Flamingo' });
@@ -1660,7 +1671,7 @@ function clickPackUse(engine, classTsid) {
 async function runTraining2(t) {
   const engine = engineRef;
   // hideUIOnLoad: pack until the first pickup, energy until food, mood until a drink.
-  hud({ meta: true, energy: true, mood: true, pack: true, actions: true });
+  hud({ meta: true, energy: true, mood: true, pack: true, actions: true, chat: true });
   const L = buildTraining2(engine);
   fadeIn();
   const pc = engine.pc;
@@ -1703,7 +1714,7 @@ async function runTraining2(t) {
   clearInstruction();
   // first_inv_overlay, then the pack appears.
   await overlay(t, LINES.firstInventory);
-  hud({ meta: true, energy: true, mood: true, pack: false, actions: true });
+  hud({ meta: true, energy: true, mood: true, pack: false, actions: true, chat: true });
   // food_wait_eat: the slot callout and the nagging.
   setStep('food_wait_eat');
   run.data.eaten = false;
@@ -1726,7 +1737,7 @@ async function runTraining2(t) {
   engine.updateHud();
   await overlay(t, { title: LINES.firstEat, button: 'OK' });
   rooted = true;
-  hud({ meta: true, energy: false, mood: true, pack: false, actions: true });
+  hud({ meta: true, energy: false, mood: true, pack: false, actions: true, chat: true });
   instruction(LINES.watchEnergy);
   await sleep(t, 4000);
   clearInstruction();
@@ -1777,7 +1788,7 @@ async function runTraining2(t) {
   // drink_drank: the mood meter appears with its callout.
   rooted = true;
   await sleep(t, 2000);
-  hud({ meta: true, energy: false, mood: false, pack: false, actions: true });
+  hud({ meta: true, energy: false, mood: false, pack: false, actions: true, chat: true });
   instruction(LINES.keepMood);
   await sleep(t, 3750);
   clearInstruction();
