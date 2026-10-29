@@ -1282,16 +1282,6 @@ body.nx-hide-mood.nx-hide-energy .meta-vitals { visibility: hidden; }
   color: #2b3a44;
 }
 .chrome-btn:hover { background: #f0f7fb; }
-.feat-chrome-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.22rem;
-}
-.feat-chrome-btn img {
-  width: 18px;
-  height: 15px;
-  object-fit: contain;
-}
 .feat-chrome-btn.is-active {
   color: #6a4a85;
   border-color: #a98bc1;
@@ -1320,10 +1310,6 @@ body.nx-hide-mood.nx-hide-energy .meta-vitals { visibility: hidden; }
   .chrome-btn {
     padding: 0.27rem 0.34rem;
     font-size: 0.74rem;
-  }
-  .feat-chrome-btn img {
-    width: 15px;
-    height: 13px;
   }
 }
 

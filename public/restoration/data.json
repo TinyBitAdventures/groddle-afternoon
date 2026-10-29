@@ -2661,9 +2661,14 @@
   ]
  },
  "git": {
-  "commits": 722,
+  "commits": 723,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "Password managers skip the street chat and the game's other boxes"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2778,11 +2783,6 @@
     "date": "2026-10-28",
     "kind": "fix",
     "text": "Ceiling lamps hang over your Glitch, the newest window opens on top, and snow and puffs fall over the scenery"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "new",
-    "text": "Shrines, scraping, peat, digging, patches and more answer with their reward badges"
    }
   ]
  },

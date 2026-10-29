@@ -370,8 +370,6 @@ const PANEL_CSS = `
 .img-sparkle{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,rgba(255,255,255,.95) 0 1.4px,transparent 2px);
   background-size:38px 46px;opacity:.0;animation:img-sparkle 2.4s linear infinite;mix-blend-mode:screen}
 @keyframes img-sparkle{0%{opacity:0;background-position:0 0}50%{opacity:.55}100%{opacity:0;background-position:19px 23px}}
-.chrome-btn.img-chrome-btn{display:inline-flex;align-items:center;gap:4px}
-.chrome-btn.img-chrome-btn img{width:22px;height:17px;margin:-2px 0}
 .meta-stat.img-stat-link{cursor:pointer}
 .meta-stat.img-stat-link:hover{filter:brightness(1.08)}
 @media (max-width:640px){.img-card{--w:150px;--h:202px}.img-front .img-title{font-size:12px;padding:7px 8px}.img-front .img-cost{font-size:14px}
@@ -662,7 +660,8 @@ function installChrome() {
   ensurePanel();
   const skills = document.getElementById('skills-btn');
   const btn = el('button', { id: 'img-btn', type: 'button', class: 'chrome-btn img-chrome-btn', title: 'Imagination upgrades (U or X)' });
-  btn.append(el('img', { src: `${UI}imagination_button.png`, alt: '' }), document.createTextNode('Upgrades'));
+  // Text only, like the rest of the menu (Austin 2026-10-29); the iMG mark stays on the panel itself.
+  btn.append(document.createTextNode('Upgrades'));
   btn.addEventListener('click', () => (panel && !panel.hidden ? closePanel() : openPanel()));
   if (skills?.parentElement) skills.parentElement.insertBefore(btn, skills.nextSibling);
   const stat = document.getElementById('stat-img')?.closest('.meta-stat');
