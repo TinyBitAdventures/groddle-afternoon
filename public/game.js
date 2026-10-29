@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-252';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-254';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g405-1';
@@ -9042,6 +9042,10 @@ const engine = {
   /** Street deco sprites by XML deco id (street-render decoViews), for location events. */
   get decoViews() {
     return bgLayer?.decoViews || null;
+  },
+  /** The street view (street-render buildStreetView root): its layer planes, behind the entity layer. */
+  get streetView() {
+    return bgLayer || null;
   },
   /** A street loading card is up (G192): prompts, conversations and awards wait for it. */
   streetCardUp: () => streetCardUp(),

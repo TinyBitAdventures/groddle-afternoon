@@ -2661,9 +2661,14 @@
   ]
  },
  "git": {
-  "commits": 703,
+  "commits": 704,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "new",
+    "text": "A mystery quoin turns into iMG, mood, energy or currants"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2778,11 +2783,6 @@
     "date": "2026-10-28",
     "kind": "fix",
     "text": "Returning players load the new game, not their browser's copy of v0.1.0"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "fix",
-    "text": "Customize look first starts the tutorial from zero, and each bag button names its fill"
    }
   ]
  },

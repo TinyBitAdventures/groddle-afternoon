@@ -468,19 +468,64 @@ function spawnLantern(engine, pt, index) {
   decor.push({ kind: 'lantern', sprite: spr, target, glow, t: index * 1.7, face, talkUntil: 0, nextTalk: Date.now() + 4000 + index * 2500 });
 }
 
+/**
+ * The Zilloween sky ghost (designed: the source had no seasonal ghost) is
+ * Tiny Speck's background_ghost_transparent street deco: 336 x 496 at 0.42,
+ * drifting GHOST.drift px either side of its spot.
+ */
+export const GHOST = Object.freeze({ scale: 0.42, w: 141, h: 208, drift: 160, aboveGround: 260, clear: 60 });
+/** The ghost's slow fade: between these sprite alphas, over the art's own. */
+export const GHOST_ALPHA = Object.freeze({ min: 0.55, max: 0.85 });
+
+/**
+ * Where the ghost's foot hangs: GHOST.aboveGround over the street's ground
+ * line, and never lower than GHOST.clear above the highest walkway anywhere
+ * under its drift. On a street whose ground line is a hole or a lower level
+ * (The Great Hole to Ix: an upper path 260 px over the 75th-percentile floor)
+ * the old groundY - 260 stood it on the path, a pale cone around whoever
+ * walked through it. Kept inside the street's top (y 0).
+ */
+export function ghostFootY(platforms, baseX, groundY, g = GHOST) {
+  let top = Infinity;
+  const half = g.drift + g.w / 2;
+  for (let x = baseX - half; x <= baseX + half; x += 16) {
+    const y = landingY(platforms, x, -1e9);
+    if (y != null && y < top) top = y;
+  }
+  const foot = Math.min((groundY || 600) - g.aboveGround, top - g.clear);
+  return Math.max(g.h + 12, foot);
+}
+
+/**
+ * Tiny Speck drew this art as a deco on a plane behind the middleground (sky,
+ * bg_1, bg_2: Oktyabrya, Cebarkul, Ilmenskie, Ratna Vitteha; Piryan's are
+ * blacked-out middleground silhouettes), never over the walkway: the street
+ * view's slot just behind its middleground, else the entity layer's back.
+ */
+function ghostParent(engine) {
+  const view = engine.streetView;
+  const mid = view && !view.destroyed ? view.children?.find((c) => c.label === 'middleground') : null;
+  if (mid) return { parent: view, zIndex: mid.zIndex - 1 };
+  return { parent: engine.entityLayer, zIndex: 1 };
+}
+
 function spawnGhost(engine) {
   const { PIXI } = engine;
   const spr = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/background_ghost_transparent.png'));
   spr.anchor.set(0.5, 1);
-  spr.scale.set(0.42);
-  spr.alpha = 0.16;
+  spr.scale.set(GHOST.scale);
+  // The art's own alpha (about 0.7) is the faintness; a further 0.1-0.2 hid its eyes and left a cone.
+  spr.alpha = GHOST_ALPHA.max;
+  spr.eventMode = 'none';
   const w = engine.worldW || 2000;
   spr.x = w * (0.3 + ((String(engine.streetTsid).charCodeAt(3) || 7) % 5) * 0.1);
-  spr.y = (engine.groundY || 600) - 260;
-  spr.zIndex = 1;
-  engine.entityLayer.addChild(spr);
+  spr.y = ghostFootY(engine.platforms, spr.x, engine.groundY);
+  const { parent, zIndex } = ghostParent(engine);
+  spr.zIndex = zIndex;
+  parent.addChild(spr);
   decor.push({ kind: 'ghost', sprite: spr, t: 0, baseX: spr.x, baseY: spr.y });
 }
+
 
 function spawnCandyCanes(engine) {
   const street = engine.street || {};
@@ -1043,9 +1088,9 @@ function tickDecor(engine, dtMs, now) {
     d.t += dtMs / 1000;
     if (d.glow && !d.glow.destroyed) d.glow.alpha = 0.75 + Math.sin(d.t * 7.3) * 0.12 + Math.sin(d.t * 13.1) * 0.08;
     if (d.kind === 'ghost' && d.sprite && !d.sprite.destroyed) {
-      d.sprite.x = d.baseX + Math.sin(d.t * 0.21) * 160;
+      d.sprite.x = d.baseX + Math.sin(d.t * 0.21) * GHOST.drift;
       d.sprite.y = d.baseY + Math.sin(d.t * 0.9) * 10;
-      d.sprite.alpha = 0.1 + (Math.sin(d.t * 0.35) + 1) * 0.05;
+      d.sprite.alpha = GHOST_ALPHA.min + ((Math.sin(d.t * 0.35) + 1) / 2) * (GHOST_ALPHA.max - GHOST_ALPHA.min);
     }
     if ((d.kind === 'lantern' || d.kind === 'placed') && d.sprite?.stop && d.talkUntil && now > d.talkUntil) {
       d.talkUntil = 0;
