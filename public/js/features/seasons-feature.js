@@ -41,7 +41,7 @@ import { landingY, nearestSurfaceY } from '../walk-surface.js';
 import { isBatterflyHabitat } from '../animal-husbandry.js?v=g414-1';
 import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
 import { rollDropTable } from '../drop-tables.js';
-import { openNoteView, noteViewOpen } from '../note-view.js';
+import { openNoteView, noteViewOpen } from '../note-view.js?v=note-g175';
 import { payDrop } from './drops-feature.js?v=drops-8';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=g430-1';
 import { SEASON_DATA } from '../seasons-data.js';
@@ -342,6 +342,8 @@ function renderChip(engine) {
 .season-chip { display: inline-flex; align-items: center; gap: 0.3rem; margin-left: 0.45rem; padding: 0.05rem 0.5rem 0.05rem 0.2rem; border: 1px solid #e0c88f; border-radius: 999px; background: #fff6e0; color: #7a4a12; font: inherit; font-size: 0.78rem; font-weight: 700; cursor: pointer; vertical-align: middle; }
 .season-chip[data-season="glitchmas"] { background: #eef8ff; border-color: #a9cde8; color: #1f5a82; }
 .season-chip[data-season="pi_day"] { background: #eefaf0; border-color: #a7d6b0; color: #2f6a3a; }
+/* The nameplate lets clicks through to the street (pointer-events: none); the chip is a button, so it takes them back. */
+.season-chip { pointer-events: auto; cursor: pointer; }
 .season-chip img { width: 18px; height: 18px; object-fit: contain; }
 .season-chip:hover { filter: brightness(1.04); }
 @media (max-width: 640px) { .season-chip span { display: none; } .season-chip { padding-right: 0.2rem; } }
