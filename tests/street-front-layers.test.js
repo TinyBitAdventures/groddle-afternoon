@@ -168,7 +168,7 @@ describe('buildStreetView splits the layers', () => {
 describe('game wiring', () => {
   const game = read('public/game.js');
   it('stacks the street front between the entities and the speech/FX layer', () => {
-    assert.match(game, /world\.addChild\(bgLayer, entityLayer, streetFrontLayer, fxLayer\);/);
+    assert.match(game, /world\.addChild\(bgLayer, entityLayer, streetFrontLayer, atmosphere, fxLayer\);/);
   });
   it('follows every scene swap: on street entry and every frame', () => {
     assert.match(game, /world\.addChildAt\(bgLayer, 0\);\n\s*syncStreetFront\(\);/);

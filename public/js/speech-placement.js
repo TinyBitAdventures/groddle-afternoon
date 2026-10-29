@@ -325,41 +325,57 @@ export function hudColumnBox(elements, canvas, viewW, viewH) {
 }
 
 /*
- * A bubble never sits over another Glitch's head (Austin 2026-10-27: a short
- * speaker's bubble covered the player beside it). The client hung each bubble
- * over its speaker and moved it at most 120 px (ChatBubble.as keepInBounds);
- * here a bubble that would cover a player is lifted clear of their head by up
- * to that much, its tail stretched down to the speaker.
+ * G357: a bubble keeps off another Glitch's head (Austin 2026-10-27: a short
+ * speaker's bubble covered the player beside it). The client never moved a
+ * bubble for an avatar; its own moves were the top-of-view push (above) and a
+ * sideways slide, so that is how a bubble gets off a head here (G427 below).
  */
 
-/** Gap kept between a lifted bubble and the head under it. */
+/** Gap kept between a bubble and the head beside it. */
 export const SPEECH_AVATAR_MARGIN = 6;
 
-/**
- * How far to lift a tip-down bubble (world or view units, y down) so its body
- * clears every avatar box it overlaps: `left`/`width`/`height` the body,
- * `tip` the tail's point, `avatars` boxes { left, right, top, bottom } (the
- * speaker's own left out), `maxLift` the most it may rise (the 120 px limit,
- * or less near the top of the view). Returns { lift, covered } (covered: an
- * avatar is still under it at maxLift).
+/** ChatBubble.as keepInBounds 160-169: the client moved a bubble sideways at most 100 px (adj_x_limit). */
+export const SPEECH_SLIDE_LIMIT = 100;
+
+/*
+ * G427 (Austin 2026-10-29, The Great Hole to Ix: a Jack-O-Lantern's bubble
+ * lifted over the player with a 250 px white tail). The client's pointer is
+ * one talk_bubble_point clip that never stretches (ChatBubble.as 374-379); a
+ * bubble moved sideways and its pointer slid along the bottom to stay on the
+ * speaker (keepInBounds 172-201). So a bubble that would cover a player now
+ * slides off their head the same way, at most SPEECH_SLIDE_LIMIT px, its
+ * tail the client's 11 px and its tip still over the speaker.
  */
-export function liftOverAvatars({ left, width, height, tip, avatars, maxLift = SPEECH_PUSH_LIMIT, margin = SPEECH_AVATAR_MARGIN }) {
-  const cap = Math.max(0, Math.min(SPEECH_PUSH_LIMIT, Number(maxLift) || 0));
-  const right = left + width;
-  let lift = 0;
-  for (let pass = 0; pass < 4; pass += 1) {
-    const bottom = tip - SPEECH_TAIL_HEIGHT - lift;
-    const top = bottom - height;
-    let need = lift;
-    for (const a of avatars || []) {
-      if (!a || !(a.right > a.left) || !(a.bottom > a.top)) continue;
-      if (right <= a.left - margin || left >= a.right + margin) continue;
-      if (bottom <= a.top - margin || top >= a.bottom) continue;
-      need = Math.max(need, tip - SPEECH_TAIL_HEIGHT - (a.top - margin));
-    }
-    if (need === lift) return { lift: Math.min(lift, cap), covered: false };
-    if (need > cap) return { lift: cap, covered: true };
-    lift = need;
+
+/**
+ * The smallest sideways move (world or view x) that takes a tip-down
+ * bubble's body off every avatar box it overlaps: `left`/`width`/`height` the
+ * body, `tip` the tail's point, `speakerX` where the tail must still point,
+ * `minLeft`/`maxRight` the view's edges, `avatars` boxes { left, right, top,
+ * bottom } (the speaker's own left out). Returns { dx, covered } (covered: no
+ * move within the limit clears them; dx is then 0).
+ */
+export function slideOffAvatars({
+  left, width, height, tip, speakerX, avatars,
+  minLeft = -Infinity, maxRight = Infinity,
+  limit = SPEECH_SLIDE_LIMIT, margin = SPEECH_AVATAR_MARGIN,
+}) {
+  const bottom = tip - SPEECH_TAIL_HEIGHT;
+  const top = bottom - height;
+  const heads = (avatars || []).filter((a) => a && a.right > a.left && a.bottom > a.top
+    && bottom > a.top - margin && top < a.bottom);
+  const covers = (dx) => heads.some((a) => left + dx + width > a.left - margin && left + dx < a.right + margin);
+  if (!covers(0)) return { dx: 0, covered: false };
+  // The tail's tip stays on the speaker, inside the body (placeSpeechTail's inset).
+  const lo = Math.max(-limit, minLeft - left, speakerX - (left + width - SPEECH_TAIL_TIP_INSET));
+  const hi = Math.min(limit, maxRight - width - left, speakerX - (left + SPEECH_TAIL_TIP_INSET));
+  const tries = [];
+  for (const a of heads) tries.push(a.right + margin - left, a.left - margin - width - left);
+  let best = null;
+  for (const dx of tries) {
+    if (dx < lo || dx > hi || covers(dx)) continue;
+    if (best === null || Math.abs(dx) < Math.abs(best)) best = dx;
   }
-  return { lift: Math.min(lift, cap), covered: false };
+  return best === null ? { dx: 0, covered: true } : { dx: best, covered: false };
 }
+

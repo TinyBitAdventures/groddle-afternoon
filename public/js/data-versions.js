@@ -443,6 +443,9 @@
       "assets/decos/groddle/treemoss_01c_al1.svg": "e356cabd",
       "assets/decos/groddle/treemoss_01c_et1.svg": "01620f55",
       "assets/decos/groddle/ufo_1@3x.webp": "eab082bd",
+      "assets/decos/groddle/ug_exface1.webp": "11e3dc45",
+      "assets/decos/groddle/ug_exface2.webp": "4008b596",
+      "assets/decos/groddle/ug_exface3.webp": "abdfe8de",
       "assets/decos/groddle/underground_plant_2@9.25x.webp": "5eb14a2a",
       "assets/decos/groddle/underground_plant_green_1@10.25x.webp": "53e37a70",
       "assets/decos/groddle/walking_plank_long_1@1.75x.webp": "eedf3724",
@@ -464,6 +467,8 @@
       "assets/decos/groddle/zutto_cloud_1@2.75x.webp": "da67211d",
       "assets/decos/groddle/zutto_cloud_2@1.75x.webp": "7d8b9bec",
       "assets/decos/groddle/zutto_hill_3.svg": "a3040dc6",
+      "assets/decos/manifest.json": "d12f56dc",
+      "assets/streets/missing-decos.json": "c96b1156",
     },
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

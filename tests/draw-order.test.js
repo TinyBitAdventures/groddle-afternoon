@@ -196,7 +196,7 @@ describe('player and item overlays draw over the street\'s front layers', () => 
   });
 
   it('the fx layer is drawn after the front layers', () => {
-    assert.match(game, /world\.addChild\(bgLayer, entityLayer, streetFrontLayer, fxLayer\);/);
+    assert.match(game, /world\.addChild\(bgLayer, entityLayer, streetFrontLayer, atmosphere, fxLayer\);/);
   });
 
   it('the Winter Walk snow falls over the front layers, under the bubbles and chip', () => {

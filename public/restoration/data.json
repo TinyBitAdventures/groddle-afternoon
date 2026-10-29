@@ -2661,9 +2661,14 @@
   ]
  },
  "git": {
-  "commits": 704,
+  "commits": 706,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "The Zilloween ghost floats in the sky behind the street, not as a pale cone on the path"
+   },
    {
     "date": "2026-10-29",
     "kind": "new",
@@ -2778,11 +2783,6 @@
     "date": "2026-10-28",
     "kind": "fix",
     "text": "The tutorial no longer leaves a new player on a street whose every road is still being built"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "fix",
-    "text": "Returning players load the new game, not their browser's copy of v0.1.0"
    }
   ]
  },

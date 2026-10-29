@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-254';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-255';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g405-1';
@@ -845,7 +845,7 @@ import { hidesChatBubble } from './js/hi-signs.js?v=hi-signs-4';
 import { GAME_MODE, isSolo } from './js/game-mode.js?v=mp2-1';
 import { saveStore } from './js/save-store.js?v=mp2-2';
 import { isNewMultiplayerPlayer, newPlayerInventory, newPlayerStats } from './js/new-player.js?v=mp5-1';
-import { clearSpeechOfBox, giveArtHeight, hudColumnBox, liftOverAvatars, placeSpeechTail, placeSpeechTip, speechOffsetFor, speechTailPoints } from './js/speech-placement.js?v=g357-1';
+import { clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechOffsetFor, speechTailPoints } from './js/speech-placement.js?v=g427-1';
 import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?v=g414-1';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=g412-1';
 
@@ -1150,6 +1150,8 @@ const keys = new Set();
 let app, world, bgLayer, entityLayer, fxLayer, player, prompt, camTarget, camY, portalSprites;
 /** Holds the street's layers above the middleground (street-render frontView), over entityLayer. */
 let streetFrontLayer = null;
+/** The Dametime atmosphere (updateDametimeChrome): a multiply wash between the street and fxLayer. */
+let atmosphere = null;
 let hoveredSignBoard = null;
 let cameraRightInset = 0;
 
@@ -1979,13 +1981,45 @@ function updateDametimeChrome(now = dametimeDisplayNow()) {
     // memories, white voids) is never tinted. The original client had no world tint at all.
     const preserveAuthoredLight = Boolean(currentStreet?.ownLight);
     overlay.dataset.phase = light.phase;
-    overlay.style.backgroundColor = light.cssColor;
-    overlay.style.opacity = preserveAuthoredLight ? '0' : light.opacity.toFixed(3);
     overlay.title = preserveAuthoredLight
       ? 'This place keeps its own light'
       : `${light.phase} in Ur`;
   }
+  // Drawn in Pixi under the speech bubbles (tickAtmosphere), not by the overlay over the canvas.
+  setAtmosphere(light.color, currentStreet?.ownLight ? 0 : light.opacity);
   return light;
+}
+
+/** The atmosphere eases to a new colour and strength over 2 s, as the overlay's CSS transition did. */
+const ATMOSPHERE_EASE_MS = 2000;
+const atmo = { from: { color: [255, 255, 255], opacity: 0 }, to: { color: [255, 255, 255], opacity: 0 }, at: 0 };
+
+function atmosphereAt(t) {
+  const k = clamp((t - atmo.at) / ATMOSPHERE_EASE_MS, 0, 1);
+  return {
+    color: atmo.from.color.map((c, i) => c + (atmo.to.color[i] - c) * k),
+    opacity: atmo.from.opacity + (atmo.to.opacity - atmo.from.opacity) * k,
+  };
+}
+
+function setAtmosphere(color, opacity) {
+  const to = { color: (color || [255, 255, 255]).map((c) => Number(c) || 0), opacity: Number(opacity) || 0 };
+  if (to.opacity === atmo.to.opacity && to.color.every((c, i) => c === atmo.to.color[i])) return;
+  const t = performance.now();
+  atmo.from = atmosphereAt(t);
+  atmo.to = to;
+  atmo.at = t;
+}
+
+function tickAtmosphere() {
+  if (!atmosphere || atmosphere.destroyed) return;
+  const now = atmosphereAt(performance.now());
+  const [r, g, b] = now.color.map((c) => clamp(Math.round(c), 0, 255));
+  atmosphere.tint = (r << 16) | (g << 8) | b;
+  atmosphere.alpha = now.opacity;
+  atmosphere.visible = now.opacity > 0.001;
+  const shown = atmosphere.visible ? `rgb(${r} ${g} ${b}) ${now.opacity.toFixed(3)}` : '';
+  if (app?.canvas && app.canvas.dataset.atmosphere !== shown) app.canvas.dataset.atmosphere = shown;
 }
 
 /**
@@ -5328,27 +5362,32 @@ function positionSpeechBubble(bubble) {
     place = { tip: clear.tip + cameraY, flip: clear.flip };
   }
   meta.overHud = clear?.how === 'over';
-  // G357: lifted clear of a player's head, at most 120 px and never out of view; eased so it doesn't jump.
-  const lift = place.flip ? { lift: 0 } : liftOverAvatars({
-    left: bubble.x - meta.width / 2, width: meta.width, height: meta.height, tip: place.tip,
-    avatars: speechAvoidBoxes(meta.target), maxLift: place.tip - lowestTip,
+  // G357/G427: slid off a player's head as the client slid bubbles (at most 100 px, the
+  // tail still on the speaker, ChatBubble.as 151-201), else hung under the speaker's feet
+  // when that fits; eased so it doesn't jump. The tail never stretches (ChatBubble.as 374-379).
+  const speakerX = spr.x + offset.x;
+  const slide = place.flip ? { dx: 0, covered: false } : slideOffAvatars({
+    left: bubble.x - meta.width / 2, width: meta.width, height: meta.height, tip: place.tip, speakerX,
+    avatars: speechAvoidBoxes(meta.target),
+    minLeft: cameraX + 12, maxRight: cameraX + horizontalLocationViewWidth() - 12,
   });
-  const shown = Number(meta.lift) || 0;
-  const nextLift = Math.abs(lift.lift - shown) < 0.5 ? lift.lift : shown + (lift.lift - shown) * 0.3;
+  if (slide.covered && below + 11 + meta.height <= cameraY + LOCATION_VIEW_H - 8) place = { tip: below, flip: true };
+  const shown = Number(meta.slide) || 0;
+  const nextSlide = Math.abs(slide.dx - shown) < 0.5 ? slide.dx : shown + (slide.dx - shown) * 0.3;
+  meta.slide = Math.round(nextSlide * 2) / 2;
+  bubble.x += meta.slide;
   // Clamped at the edge, the tail still points at the speaker (G233, ChatBubble.as 179-193).
-  const tail = placeSpeechTail({ bubbleX: bubble.x, width: meta.width, speakerX: spr.x + offset.x });
-  const liftPx = Math.round(nextLift * 2) / 2;
-  if (meta.tailAt !== `${tail.tip},${tail.base},${liftPx}`) {
-    meta.tailAt = `${tail.tip},${tail.base},${liftPx}`;
-    drawSpeechTail(meta.tailDown, meta.height, tail, false, 11 + liftPx);
+  const tail = placeSpeechTail({ bubbleX: bubble.x, width: meta.width, speakerX });
+  if (meta.tailAt !== `${tail.tip},${tail.base}`) {
+    meta.tailAt = `${tail.tip},${tail.base}`;
+    drawSpeechTail(meta.tailDown, meta.height, tail, false);
     drawSpeechTail(meta.tailUp, meta.height, tail, true);
   }
   const flip = place.flip;
   bubble.y = place.tip;
-  if (meta.flipped !== flip || meta.lift !== liftPx) {
+  if (meta.flipped !== flip) {
     meta.flipped = flip;
-    meta.lift = liftPx;
-    bubble.pivot.y = flip ? -11 : meta.height + 11 + liftPx;
+    bubble.pivot.y = flip ? -11 : meta.height + 11;
     if (meta.tailDown) meta.tailDown.visible = !flip;
     if (meta.tailUp) meta.tailUp.visible = flip;
   }
@@ -5365,7 +5404,7 @@ function positionSpeechBubble(bubble) {
     app.canvas.dataset.speechWidth = Number(meta.width).toFixed(2);
     app.canvas.dataset.speechTail = meta.tailAt;
     app.canvas.dataset.speechClear = clear?.how || '';
-    app.canvas.dataset.speechLift = `${Math.round(lift.lift)}${lift.covered ? ':covered' : ''}`;
+    app.canvas.dataset.speechSlide = `${Math.round(slide.dx)}${slide.covered ? ':covered' : ''}`;
   }
   return true;
 }
@@ -24285,7 +24324,15 @@ async function main() {
   // Street layers above the middleground draw over the avatars; speech and FX stay on top.
   streetFrontLayer = new PIXI.Container();
   streetFrontLayer.label = 'street-front-host';
-  world.addChild(bgLayer, entityLayer, streetFrontLayer, fxLayer);
+  // G427: the Dametime atmosphere washes the street, its avatars and its front layers, not the
+  // speech bubbles and FX over them (the CSS overlay over the whole canvas greyed bubbles at night).
+  atmosphere = new PIXI.Graphics().rect(-1e5, -1e5, 2e5, 2e5).fill(0xffffff);
+  atmosphere.label = 'dametime-atmosphere';
+  atmosphere.eventMode = 'none';
+  atmosphere.blendMode = 'multiply';
+  atmosphere.alpha = 0;
+  atmosphere.visible = false;
+  world.addChild(bgLayer, entityLayer, streetFrontLayer, atmosphere, fxLayer);
   app.stage.addChild(world);
 
   player = makePlayer();
@@ -26127,6 +26174,7 @@ async function main() {
   let dametimeTickAccum = 0;
   app.ticker.add((ticker) => {
     syncStreetFront();
+    tickAtmosphere();
     if (!state.started) return;
     const dt = Math.min(ticker.deltaTime, 2.5);
     updateCurrentAction((1000 / 60) * dt);
