@@ -20,7 +20,7 @@
  * drawn sharp (middleground and in front of it, unblurred).
  */
 import { HIRES_DECOS, HIRES_DECOS_BIG } from './deco-hires-list.js?v=g415-1';
-import { SHARP_DECOS } from './deco-sharp-list.js?v=g416-1';
+import { SHARP_DECOS } from './deco-sharp-list.js?v=g419-1';
 
 const DECO_PNG = /^(.*?(?:^|\/)assets\/decos\/groddle\/)([^/?#]+)\.png([?#].*)?$/;
 
@@ -102,35 +102,75 @@ export function isSharpDeco(url) {
 }
 
 /**
+ * Bytes one street may add for the sharp copies of decos on layers behind the middleground and on
+ * blurred layers (over the 2x/3x files they replace; 4 per pixel). Those layers are big and often
+ * all on screen, so the copies that would be magnified most go first (admitSharp).
+ */
+export const FAR_SHARP_BUDGET_BYTES = 96 * 1024 * 1024;
+
+/**
  * The sharp copy of a deco PNG URL to draw at `scale` backing px per view px, or null when the
- * file decoUrl's route picks (2x, or 3x above HIRES_DECO_SCALE) is already enough. Every
- * placement of a listed deco is covered: s is the largest near placement's view px per logical px.
- * - webp: { url: <name>@<res>x.webp, kind } (resolution from the name, logical size unchanged)
- * - svg: { url: <name>.svg?r=<res>, kind, width, height, resolution }: rasterise at width x height
- *   (js/textures.js textureFromUrl(url, { raw: true, width, height, resolution })); res is the need
- *   rounded up to an SVG_STEP and capped at maxSide on the longest side and SVG_MAX_PIXELS.
+ * file decoUrl's route picks (2x, or 3x above HIRES_DECO_SCALE; always 2x behind the
+ * middleground) is already enough. The list's s, sf and sb are the largest view px per logical px
+ * over a deco's near, far and blurred placements that need it; 0 means that kind of layer keeps
+ * the usual file.
+ * - near: `scale` / SHARP_SLACK texels per view px, over the 2x or 3x file;
+ * - `far: true` (behind the middleground): the same, over the 2x file those layers load;
+ * - `blurDensity` (a blurred layer: js/street-render.js blurBakeResolution): its bake's texels per
+ *   view px, which keeps nothing finer.
+ * Returns { url, kind, bytes, need, base, w, h } (w x h the logical size) and for svg { width, height, resolution }:
+ * - webp: <name>@<res>x.webp (resolution from the name, logical size unchanged)
+ * - svg: <name>.svg?r=<res>, rasterised at width x height (js/textures.js textureFromUrl(url,
+ *   { raw: true, width, height, resolution })); res is the need rounded up to an SVG_STEP and
+ *   capped at maxSide on the longest side and SVG_MAX_PIXELS.
  * @param {string} url
  * @param {number} scale renderer.resolution
- * @param {{ maxSide?: number, bigTextures?: boolean }} [opts]
+ * @param {{ maxSide?: number, bigTextures?: boolean, far?: boolean, blurDensity?: number }} [opts]
  */
-export function sharpDeco(url, scale, { maxSide = SVG_MAX_SIDE, bigTextures = false } = {}) {
+export function sharpDeco(url, scale, { maxSide = SVG_MAX_SIDE, bigTextures = false, far = false, blurDensity = 0 } = {}) {
   const m = DECO_PNG.exec(String(url || ''));
   if (!m) return null;
   const [, dir, name] = m;
   const row = SHARP_DECOS.get(name);
   if (!row) return null;
-  const [kind, s, w, h, res] = row;
+  const [kind, s, w, h, res, sf = 0, sb = 0] = row;
   const R = Number(scale) || 1;
-  const three = wantsHiresDecos(R) && (HIRES_DECOS.has(name) || (bigTextures && HIRES_DECOS_BIG.has(name)));
+  const three = !far && wantsHiresDecos(R) && (HIRES_DECOS.has(name) || (bigTextures && HIRES_DECOS_BIG.has(name)));
   const base = three ? 1.5 : 1;
-  const need = (R * s) / SHARP_SLACK;
+  const per = blurDensity > 0 ? sb : far ? sf : s;
+  if (!per) return null;
+  const need = blurDensity > 0 ? blurDensity * per : (R * per) / SHARP_SLACK;
   if (need <= base) return null;
-  if (kind === 'webp') return res > base ? { url: `${dir}${name}@${res}x.webp`, kind } : null;
+  if (kind === 'webp') {
+    if (!(res > base)) return null;
+    return { url: `${dir}${name}@${res}x.webp`, kind, bytes: Math.round(w * res) * Math.round(h * res) * 4, need, base, w, h };
+  }
   let r = SVG_STEP ** Math.ceil(Math.log(need) / Math.log(SVG_STEP) - 1e-9);
   r = Math.min(r, Math.min(maxSide, SVG_MAX_SIDE) / Math.max(w, h), Math.sqrt(SVG_MAX_PIXELS / (w * h)));
   if (r <= base) return null;
   r = Math.round(r * 1000) / 1000;
   const width = Math.max(1, Math.round(w * r));
   const height = Math.max(1, Math.round(h * r));
-  return { url: `${dir}${name}.svg?r=${r}`, kind, width, height, resolution: width / w };
+  return { url: `${dir}${name}.svg?r=${r}`, kind, width, height, resolution: width / w, bytes: width * height * 4, need, base, w, h };
+}
+
+/**
+ * Which of a street's far and blurred sharp copies to load: the most magnified first (need over
+ * the file it replaces), each once per URL, while the bytes they add stay within `budget`.
+ * @param {{ url: string, bytes: number, need: number, base: number, w: number, h: number }[]} picks
+ * @returns {Set<string>} admitted pick URLs
+ */
+export function admitSharp(picks, budget = FAR_SHARP_BUDGET_BYTES) {
+  const unique = new Map();
+  for (const p of picks) if (p && !unique.has(p.url)) unique.set(p.url, p);
+  const order = [...unique.values()].sort((a, b) => b.need / b.base - a.need / a.base || a.bytes - b.bytes);
+  const out = new Set();
+  let spent = 0;
+  for (const p of order) {
+    const cost = Math.max(0, p.bytes - Math.round(p.w * p.base) * Math.round(p.h * p.base) * 4);
+    if (spent + cost > budget) continue;
+    spent += cost;
+    out.add(p.url);
+  }
+  return out;
 }

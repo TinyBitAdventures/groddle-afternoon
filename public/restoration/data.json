@@ -2640,9 +2640,14 @@
   ]
  },
  "git": {
-  "commits": 696,
+  "commits": 697,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-28",
+    "kind": "fix",
+    "text": "Streets, data and art changed in a release load fresh without a hard refresh"
+   },
    {
     "date": "2026-10-28",
     "kind": "fix",
@@ -2757,11 +2762,6 @@
     "date": "2026-10-28",
     "kind": "improve",
     "text": "Solo play stays quiet and readable: no console 400, a clear verb word, honest map and quest counts, solid upgrade cards, a tidy pack"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "fix",
-    "text": "An open bag's icon is no longer cut off, and the verb's cancel button stays sharp"
    }
   ]
  },

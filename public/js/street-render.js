@@ -12,7 +12,7 @@ import {
 } from './street-model.js';
 import { availableStreetTsids } from './street-loader.js';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js';
-import { decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco } from './deco-hires.js?v=g416-1';
+import { admitSharp, decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco } from './deco-hires.js?v=g419-1';
 import { LADDER_TILE_Z, ladderTilePieces } from './ladder-tiling.js?v=g415-1';
 
 const DECO_BASE = 'assets/decos/groddle/';
@@ -1346,12 +1346,40 @@ export function buildStreetView(street, PIXI, opts = {}) {
 
   // Layers behind the middleground are distant parallax art, darkened or washed out by their
   // colour matrix: they load the 2x deco files even where js/deco-hires.js would pick 3x.
-  // The middleground and the layers in front of it (unblurred) take a deco's sharp copy when the
-  // screen needs more texels than its 2x/3x file has (sharpDeco: SVG at the need, or a sized
-  // WebP), and swap it when the renderer's resolution changes (refreshSharpDecos).
+  // A deco takes its sharp copy when the screen needs more texels than that file has
+  // (sharpDeco: SVG at the need, or a sized WebP): on the middleground and the layers in front of
+  // it always, behind it and on blurred layers (at their bake's density) within the street's
+  // FAR_SHARP_BUDGET_BYTES, most magnified first (admitSharp). Unblurred decos swap their copy
+  // when the renderer's resolution changes (refreshSharpDecos); a blurred layer keeps the copy
+  // its bake was made from.
   const renderer = opts.renderer;
   const bigTextures = () => (maxTextureSizeOf(renderer) || 4096) >= 8192;
-  const sharpPick = (url) => (renderer ? sharpDeco(url, renderer.resolution || 1, { bigTextures: bigTextures() }) : null);
+  const sharpPick = (url, far = false, blur = 0) => (renderer
+    ? sharpDeco(url, renderer.resolution || 1, {
+      bigTextures: bigTextures(),
+      far,
+      blurDensity: blur > 0 ? blurBakeResolution(blur, renderer.resolution) : 0,
+    })
+    : null);
+  const decoArt = (deco, available) => (available.has(deco.sprite) ? deco.sprite : DECO_TWINS[deco.sprite] || deco.sprite);
+  /** The far and blurred sharp copies this street can afford at the renderer's resolution now. */
+  const farSharp = () => {
+    const picks = [];
+    const mz = (street.layers || []).findIndex((layer) => layer.id === 'middleground');
+    const mlz = mz < 0 ? null : (street.layers[mz].z ?? mz);
+    (street.layers || []).forEach((layer, li) => {
+      if (!layerIsDrawn(layer)) return;
+      const far = mlz !== null && (layer.z ?? li) < mlz;
+      const blur = flashBlurSize(layer.filters?.blur);
+      if (!far && !blur) return;
+      for (const deco of layer.decos || []) {
+        const url = `${decoBase}${decoArt(deco, available)}.png`;
+        if (isSharpDeco(url)) picks.push(sharpPick(url, far, blur));
+      }
+    });
+    return admitSharp(picks);
+  };
+  let farAdmitted = farSharp();
   const sharpTexture = (pick) => textureFromUrl(pick.url, pick.kind === 'svg'
     ? { raw: true, width: pick.width, height: pick.height, resolution: pick.resolution }
     : { raw: true });
@@ -1414,9 +1442,10 @@ export function buildStreetView(street, PIXI, opts = {}) {
       }
       const url = `${decoBase}${sprite}.png`;
       const farUrl = far ? decoUrl(url) : null;
-      const sharp = !far && !blur && isSharpDeco(url);
-      const pick = sharp ? sharpPick(url) : null;
-      const tex = farUrl ? textureFromUrl(farUrl, { raw: true }) : pick ? sharpTexture(pick) : textureFromUrl(url);
+      const sharp = isSharpDeco(url);
+      let pick = sharp ? sharpPick(url, far, blur) : null;
+      if (pick && (far || blur) && !farAdmitted.has(pick.url)) pick = null;
+      const tex = pick ? sharpTexture(pick) : farUrl ? textureFromUrl(farUrl, { raw: true }) : textureFromUrl(url);
       const spr = new PIXI.Sprite(tex);
       spr.anchor.set(0.5, 1);
       // h_flip mirrors the deco about its registration point.
@@ -1438,7 +1467,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
       spr.glitchDecoName = deco.name || '';
       if (spr.glitchDecoId) decoViews.set(spr.glitchDecoId, spr);
       lc.addChild(spr);
-      if (sharp) sharpViews.push({ spr, url, pick, size: sizeDeco });
+      if (sharp && !blur) sharpViews.push({ spr, url, far, pick, size: sizeDeco });
       drawn += 1;
     }
     // Ladder tiling art (its own count, not a placed deco).
@@ -1459,7 +1488,13 @@ export function buildStreetView(street, PIXI, opts = {}) {
   /** Sharp decos drawn from their SVG / sized WebP right now, for QA (canvas data-sharp-decos). */
   root.sharpStats = () => {
     const live = sharpViews.filter((v) => !v.spr.destroyed);
-    return { listed: live.length, svg: live.filter((v) => v.pick?.kind === 'svg').length, webp: live.filter((v) => v.pick?.kind === 'webp').length };
+    return {
+      listed: live.length,
+      svg: live.filter((v) => v.pick?.kind === 'svg').length,
+      webp: live.filter((v) => v.pick?.kind === 'webp').length,
+      far: live.filter((v) => v.far && v.pick).length,
+      farAdmitted: farAdmitted.size,
+    };
   };
   /**
    * Pick each sharp deco's copy again for the renderer's resolution now (an SVG redrawn at the
@@ -1467,12 +1502,14 @@ export function buildStreetView(street, PIXI, opts = {}) {
    * renderer's resize event when the resolution changed.
    */
   root.refreshSharpDecos = () => {
+    farAdmitted = farSharp();
     for (const view of sharpViews) {
       if (view.spr.destroyed) continue;
-      const pick = sharpPick(view.url);
+      let pick = sharpPick(view.url, view.far);
+      if (pick && view.far && !farAdmitted.has(pick.url)) pick = null;
       if ((pick?.url || null) === (view.pick?.url || null)) continue;
       view.pick = pick;
-      const tex = pick ? sharpTexture(pick) : textureFromUrl(view.url);
+      const tex = pick ? sharpTexture(pick) : view.far ? textureFromUrl(decoUrl(view.url), { raw: true }) : textureFromUrl(view.url);
       onLoaded(tex.source, () => {
         if (view.spr.destroyed || view.pick !== pick) return;
         swapDecoTexture(PIXI, renderer, recolourCache, view.spr, tex);

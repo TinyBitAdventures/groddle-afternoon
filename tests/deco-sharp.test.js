@@ -10,9 +10,9 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SHARP_DECOS } from '../public/js/deco-sharp-list.js?v=g416-1';
+import { SHARP_DECOS } from '../public/js/deco-sharp-list.js?v=g419-1';
 import { HIRES_DECOS } from '../public/js/deco-hires-list.js?v=g415-1';
-import { SHARP_SLACK, SVG_MAX_PIXELS, SVG_MAX_SIDE, isSharpDeco, sharpDeco } from '../public/js/deco-hires.js?v=g416-1';
+import { FAR_SHARP_BUDGET_BYTES, SHARP_SLACK, SVG_MAX_PIXELS, SVG_MAX_SIDE, admitSharp, isSharpDeco, sharpDeco } from '../public/js/deco-hires.js?v=g419-1';
 import { resolutionOfUrl } from '../public/js/textures.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -38,10 +38,13 @@ describe('sharp deco files', () => {
   it('lists exactly the plan rows and ships each one', () => {
     assert.ok(SHARP_DECOS.size > 500, `${SHARP_DECOS.size} sharp decos`);
     assert.deepEqual([...SHARP_DECOS.keys()].sort(), [...rows.keys()].sort());
-    for (const [name, [kind, s, w, h, res]] of SHARP_DECOS) {
+    for (const [name, [kind, s, w, h, res, sf, sb]] of SHARP_DECOS) {
       const r = rows.get(name);
       assert.equal(kind, r.kind, name);
       assert.equal(s, r.s, name);
+      assert.equal(sf, r.sf || 0, name);
+      assert.equal(sb, r.sb || 0, name);
+      assert.ok(s > 0 || sf > 0 || sb > 0, `${name} is needed somewhere`);
       assert.deepEqual([w, h], r.size2, name);
       if (kind === 'svg') {
         const svg = readFileSync(join(decoDir, `${name}.svg`), 'utf8');
@@ -117,7 +120,7 @@ describe('sharpDeco picks the copy for the density', () => {
   });
 
   it('sized WebP only where the 2x/3x file is not enough', () => {
-    const [name, [, s, , , res]] = [...SHARP_DECOS].find(([, v]) => v[0] === 'webp');
+    const [name, [, s, , , res]] = [...SHARP_DECOS].find(([, v]) => v[0] === 'webp' && v[1] > 0);
     assert.equal(sharpDeco(url(name), 4).url, `assets/decos/groddle/${name}@${res}x.webp`);
     // Low enough density that the 2x file covers the worst placement: the normal route.
     const low = (SHARP_SLACK * 0.99) / s;
@@ -127,6 +130,34 @@ describe('sharpDeco picks the copy for the density', () => {
     assert.equal(isSharpDeco(url(plain)), false);
     assert.equal(isSharpDeco(url(name)), true);
     assert.equal(sharpDeco('assets/sprites/icons/apple.png', 4), null);
+  });
+});
+
+describe('far and blurred layers', () => {
+  it('far: the 2x file is the base and sf the scale; blurred: the bake density times sb', () => {
+    const [name, [kind, s, w, , , sf, sb]] = [...SHARP_DECOS].find(([, v]) => v[1] === 0 && v[5] > 0 && v[0] === 'svg');
+    assert.equal(sharpDeco(url(name), 4), null, 'no near need');
+    const pick = sharpDeco(url(name), 4, { far: true });
+    assert.equal(pick.kind, kind);
+    assert.equal(pick.base, 1);
+    assert.ok(Math.abs(pick.need - (4 * sf) / SHARP_SLACK) < 1e-9);
+    assert.ok(pick.width / w >= Math.min(pick.need, SVG_MAX_SIDE / w) - 1e-6 || pick.width * pick.height >= SVG_MAX_PIXELS * 0.99);
+    // At a density where the 2x file covers the far placement, the far layer keeps it.
+    assert.equal(sharpDeco(url(name), (SHARP_SLACK * 0.99) / sf, { far: true }), null);
+    void s; void sb;
+    const [bname, [, , , , , , bsb]] = [...SHARP_DECOS].find(([, v]) => v[6] > 0);
+    const bp = sharpDeco(url(bname), 4, { far: true, blurDensity: 2 });
+    assert.ok(Math.abs(bp.need - 2 * bsb) < 1e-9);
+    assert.equal(sharpDeco(url(bname), 4, { far: true, blurDensity: 0.99 / bsb }), null);
+  });
+
+  it('admitSharp takes the most magnified first, once per URL, within the budget', () => {
+    const p = (url, need, bytes) => ({ url, need, base: 1, bytes, w: 10, h: 10 });
+    const got = admitSharp([p('a', 2, 1000), p('b', 8, 3000), p('b', 8, 3000), p('c', 4, 2500)], 4000);
+    // b (8x) costs 2600, then c (4x) 2100 would pass 4000, then a (2x) 600 fits.
+    assert.deepEqual([...got].sort(), ['a', 'b']);
+    assert.equal(admitSharp([p('a', 2, 1000)], 0).size, 0);
+    assert.equal(FAR_SHARP_BUDGET_BYTES, 96 * 1024 * 1024);
   });
 });
 
@@ -190,7 +221,7 @@ describe('street-render draws sharp copies on the sharp layers', () => {
       }
     };
     globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => ({ drawImage() {} }) }) };
-    const { buildStreetView } = await import('../public/js/street-render.js?v=g416-1');
+    const { buildStreetView } = await import('../public/js/street-render.js?v=g419-1');
     const handlers = {};
     const renderer = {
       resolution: 1,
@@ -207,10 +238,15 @@ describe('street-render draws sharp copies on the sharp layers', () => {
     const chimney = () => view.frontView.children.flatMap((lc) => lc.children).find((c) => /chimney_yellow_front_01/.test(c.texture?.label || ''));
     // 1 x 2.35 / (4/3) = 1.76, up to 2.
     assert.match(chimney().texture.label, /chimney_yellow_front_01\.svg\?r=2$/);
-    // Layers behind the middleground keep the 2x files, listed or not.
+    // Layers behind the middleground load the 2x files, or a sharp copy where the deco has a far need.
     const far = view.children.filter((c) => c.label && c.label !== 'middleground' && !c.inFront && c.children).flatMap((lc) => lc.children);
     assert.ok(far.length > 50);
-    for (const spr of far) if (spr.texture?.label) assert.match(spr.texture.label, /\/[^/@]+\.webp$/, spr.texture.label);
+    for (const spr of far) {
+      const label = spr.texture?.label || '';
+      if (/\/[^/@]+\.webp$/.test(label) || !label) continue;
+      const name = label.replace(/^.*\/([^/@?]+?)(?:@[\d.]+x\.webp|\.svg\?r=.*)$/, '$1');
+      assert.ok(SHARP_DECOS.get(name)?.[5] > 0, `${label}: far copy without a far need`);
+    }
     await new Promise((r) => setTimeout(r, 10));
     assert.deepEqual([chimney().width, chimney().height], [268, 887]);
     assert.ok(view.sharpStats().svg >= 1);
@@ -228,5 +264,38 @@ describe('street-render draws sharp copies on the sharp layers', () => {
     assert.match(chimney().texture.label, /chimney_yellow_front_01\.svg\?r=2$/);
     view.destroy();
     assert.equal(handlers.resize.length, 0);
+  });
+
+  it('far layers: sharp copies within the street budget, the rest on their 2x files', async () => {
+    const { buildStreetView } = await import('../public/js/street-render.js?v=g419-1');
+    const manifest = new Set(JSON.parse(readFileSync(join(root, 'public/assets/decos/manifest.json'), 'utf8')));
+    const renderer = { resolution: 3.9, gl: { MAX_TEXTURE_SIZE: 1, getParameter: () => 8192 }, generateTexture: () => null, on() {}, off() {} };
+    for (const tsid of ['GA95U14319524O9', 'GHFC3I4EKMI20JD', 'GA9117J18492SRS']) {
+      const s = { ...street(tsid), gradient: null, signposts: [] };
+      s.layers = s.layers.map((l) => ({ ...l, filters: null }));
+      const view = buildStreetView(s, globalThis.PIXI, { available: manifest, renderer });
+      const midZ = s.layers.find((l) => l.id === 'middleground')?.z ?? 0;
+      const farLabels = new Set(s.layers.filter((l) => (l.z ?? 0) < midZ).map((l) => l.id));
+      const far = view.children.filter((c) => farLabels.has(c.label)).flatMap((lc) => lc.children || []);
+      const picks = [];
+      for (const l of s.layers.filter((l) => farLabels.has(l.id) && l.hidden !== true)) {
+        for (const d of l.decos || []) picks.push(sharpDeco(url(manifest.has(d.sprite) ? d.sprite : d.sprite), 3.9, { far: true, bigTextures: true }));
+      }
+      const admitted = admitSharp(picks);
+      const sharpUrls = new Set(far.map((c) => c.texture?.label).filter((l) => /\.svg\?r=|@(?!1\.5x)[\d.]+x\.webp$/.test(l || '')));
+      for (const u of sharpUrls) assert.ok(admitted.has(u), `${tsid}: ${u} not admitted`);
+      let cost = 0;
+      for (const u of admitted) {
+        const p = picks.find((x) => x?.url === u);
+        cost += p.bytes - Math.round(p.w) * Math.round(p.h) * 4;
+      }
+      assert.ok(cost <= FAR_SHARP_BUDGET_BYTES, `${tsid}: ${cost}`);
+      if (tsid === 'GA95U14319524O9') {
+        const tree = far.find((c) => /background_bottletree_1(\.svg\?r=|@)/.test(c.texture?.label || ''));
+        assert.ok(tree, 'Chakra Phool Herb Gardens: the far bottletree takes its sharp copy');
+      }
+      assert.ok(view.sharpStats().farAdmitted === admitted.size);
+      view.destroy();
+    }
   });
 });
