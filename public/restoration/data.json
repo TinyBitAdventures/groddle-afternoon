@@ -2661,9 +2661,14 @@
   ]
  },
  "git": {
-  "commits": 727,
+  "commits": 729,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "Clicking the Zilloween chip opens its card"
+   },
    {
     "date": "2026-10-29",
     "kind": "new",
@@ -2778,11 +2783,6 @@
     "date": "2026-10-28",
     "kind": "improve",
     "text": "Street Spirits, their lonely porthole and the tools in your hands draw sharp"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "improve",
-    "text": "Scenery that streets draw larger than its art is sharp again"
    }
   ]
  },

@@ -537,9 +537,9 @@ test.describe('conversations against GameServerJS (G185)', () => {
     const fn = game.slice(game.indexOf('function positionSpeechBubble'), game.indexOf('function showSpeechBubble'));
     // G214: the client's push over the speaker first (js/speech-placement.js placeSpeechTip, tests/speech-placement.test.js).
     assert.match(fn, /belowFits: below \+ 11 \+ meta\.height <= cameraY \+ LOCATION_VIEW_H - 8,/);
-    assert.match(fn, /const flip = place\.flip;\n  bubble\.y = place\.tip;/);
+    assert.match(fn, /const flip = place\.flip;[\s\S]*?bubble\.y = place\.tip;/);
     assert.match(fn, /bubble\.pivot\.y = flip \? -11 : meta\.height \+ 11;/);
-    assert.match(game, /bubble\.addChild\(bg, tailDown, tailUp, speaker, body\);/);
+    assert.match(game, /bubble\.addChild\(bg, speaker, body\);/);
   });
 
   test('a dressed spirit\'s bubble sits over its art, the 244 px Firebog too, not the 170 px cap (G202)', () => {
@@ -552,7 +552,7 @@ test.describe('conversations against GameServerJS (G185)', () => {
   });
 
   test('&spiritautoplay=far keeps the spirit in view on a short deck (G239, Somewhat Sump)', async () => {
-    const { spiritFarSpot } = await import('../public/js/features/street-spirits-feature.js?v=g430-1');
+    const { spiritFarSpot } = await import('../public/js/features/street-spirits-feature.js?v=g440-2');
     // A flat street: 330 px to the right on the spirit's own floor, camera untouched.
     const flat = [{ x1: 0, y1: 900, x2: 3000, y2: 900 }];
     assert.deepEqual(spiritFarSpot(flat, 1000, 900), { x: 1330, y: 900, lookY: 0 });

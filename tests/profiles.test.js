@@ -19,7 +19,7 @@ import {
   aboutCounter, aboutLength, avatarKeyOf, base64Bytes, cleanAbout, homeKeyOf, pngBase64, profileSlug, shortHash, shouldUpload, stillTransform,
 } from '../public/js/profiles.js?v=play-1';
 import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-10';
-import { FEATURES } from '../public/js/features/index.js?v=registry-267';
+import { FEATURES } from '../public/js/features/index.js?v=registry-268';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=g403-1';
 import { skillTitle } from '../public/js/skill-tree.js?v=g403-1';

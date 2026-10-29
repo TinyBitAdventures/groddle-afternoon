@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-267';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-268';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g434-1';
@@ -848,7 +848,7 @@ import { hidesChatBubble } from './js/hi-signs.js?v=hi-signs-4';
 import { GAME_MODE, isSolo } from './js/game-mode.js?v=mp2-1';
 import { saveStore } from './js/save-store.js?v=mp2-2';
 import { isNewMultiplayerPlayer, newPlayerInventory, newPlayerStats } from './js/new-player.js?v=mp5-1';
-import { clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechOffsetFor, speechTailPoints } from './js/speech-placement.js?v=g427-1';
+import { clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechBubbleOutline, speechOffsetFor } from './js/speech-placement.js?v=g440-1';
 import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?v=g414-1';
 import { itemZ } from './js/item-bands.js?v=g429-1';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=g412-1';
@@ -5453,18 +5453,18 @@ function positionSpeechBubble(bubble) {
   bubble.x += meta.slide;
   // Clamped at the edge, the tail still points at the speaker (G233, ChatBubble.as 179-193).
   const tail = placeSpeechTail({ bubbleX: bubble.x, width: meta.width, speakerX });
-  if (meta.tailAt !== `${tail.tip},${tail.base}`) {
-    meta.tailAt = `${tail.tip},${tail.base}`;
-    drawSpeechTail(meta.tailDown, meta.height, tail, false);
-    drawSpeechTail(meta.tailUp, meta.height, tail, true);
-  }
   const flip = place.flip;
+  meta.tailAt = `${tail.tip},${tail.base}`;
+  // One outline for the bubble and its tail, redrawn when the tail moves or flips.
+  const shape = `${meta.tailAt},${flip ? 'up' : 'down'}`;
+  if (meta.shapeAt !== shape) {
+    meta.shapeAt = shape;
+    drawSpeechBubble(meta.bg, meta.width, meta.height, tail, flip);
+  }
   bubble.y = place.tip;
   if (meta.flipped !== flip) {
     meta.flipped = flip;
     bubble.pivot.y = flip ? -11 : meta.height + 11;
-    if (meta.tailDown) meta.tailDown.visible = !flip;
-    if (meta.tailUp) meta.tailUp.visible = flip;
   }
   if (app?.canvas) {
     app.canvas.dataset.speechFlipped = flip ? '1' : '';
@@ -5490,13 +5490,12 @@ function positionSpeechBubble(bubble) {
  */
 const SPEECH_FILL_ALPHA = 1;
 
-/** One bubble tail, filled over the bubble's border, its two slanted sides outlined (js/speech-placement.js). */
-function drawSpeechTail(g, height, tail, up, length = 11) {
+/** The bubble and its tail as one filled, outlined shape, so it fades as one (js/speech-placement.js speechBubbleOutline). */
+function drawSpeechBubble(g, width, height, tail, up) {
   if (!g || g.destroyed) return;
-  const p = speechTailPoints({ height, tip: tail.tip, base: tail.base, up, length });
   g.clear();
-  g.poly(p.fill).fill({ color: 0xfffdf5, alpha: SPEECH_FILL_ALPHA });
-  g.moveTo(p.edge[0], p.edge[1]).lineTo(p.edge[2], p.edge[3]).lineTo(p.edge[4], p.edge[5]).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
+  for (const [op, ...args] of speechBubbleOutline({ width, height, tip: tail.tip, base: tail.base, up })) g[op](...args);
+  g.fill({ color: 0xfffdf5, alpha: SPEECH_FILL_ALPHA }).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
 }
 
 /**
@@ -5547,13 +5546,9 @@ function showSpeechBubble(target, speech) {
   const width = clamp(Math.max(body.width, named ? speaker.width : 0, slugRow?.width || 0) + 20, 60, 280);
   const head = named ? speaker.height + 4 : 0;
   const height = Math.ceil(9 + head + body.height + (slugRow ? 6 + slugRow.height : 0) + 9);
+  // The body and its tail, one shape (drawn by positionSpeechBubble, which aims the tail at the speaker;
+  // tail up for a bubble hung under its speaker).
   const bg = new PIXI.Graphics();
-  bg.roundRect(0, 0, width, height, 12).fill({ color: 0xfffdf5, alpha: SPEECH_FILL_ALPHA }).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
-  // Tails (drawn by positionSpeechBubble, which aims them at the speaker).
-  // The up tail is for a bubble hung under its speaker.
-  const tailDown = new PIXI.Graphics();
-  const tailUp = new PIXI.Graphics();
-  tailUp.visible = false;
   speaker.x = 10;
   speaker.y = 8;
   speaker.visible = named;
@@ -5561,7 +5556,7 @@ function showSpeechBubble(target, speech) {
   body.y = 8 + head;
 
   const bubble = new PIXI.Container();
-  bubble.addChild(bg, tailDown, tailUp, speaker, body);
+  bubble.addChild(bg, speaker, body);
   if (slugRow) {
     slugRow.x = 10;
     slugRow.y = body.y + body.height + 6;
@@ -5575,9 +5570,8 @@ function showSpeechBubble(target, speech) {
     target,
     width,
     height,
-    tailDown,
-    tailUp,
-    flipped: false,
+    bg,
+    flipped: null,
     life: 0,
     max: Math.max(210, Number(speech.durationMs || 5000) / (1000 / 60)),
   };

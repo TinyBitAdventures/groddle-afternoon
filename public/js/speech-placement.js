@@ -237,6 +237,26 @@ export function speechTailPoints({ height, tip, base, up = false, length = SPEEC
   };
 }
 
+/**
+ * The bubble and its tail as one outline: path steps for a Pixi Graphics
+ * (["moveTo", x, y], ["lineTo", x, y], ["arcTo", x1, y1, x2, y2, r], ["closePath"]),
+ * clockwise from the top-left corner, the tail on the bottom edge (or the top
+ * when `up`). One shape fills and strokes once, so the whole bubble fades as
+ * one: a separate tail drawn over the border showed a brighter seam and
+ * seemed to fade on its own (Austin 2026-10-29).
+ */
+export function speechBubbleOutline({ width, height, tip, base, up = false, radius = SPEECH_BUBBLE_RADIUS, half = SPEECH_TAIL_HALF, length = SPEECH_TAIL_HEIGHT }) {
+  const w = width;
+  const h = height;
+  const r = radius;
+  const steps = [['moveTo', r, 0]];
+  if (up) steps.push(['lineTo', base - half, 0], ['lineTo', tip, -length], ['lineTo', base + half, 0]);
+  steps.push(['lineTo', w - r, 0], ['arcTo', w, 0, w, r, r], ['lineTo', w, h - r], ['arcTo', w, h, w - r, h, r]);
+  if (!up) steps.push(['lineTo', base + half, h], ['lineTo', tip, h + length], ['lineTo', base - half, h]);
+  steps.push(['lineTo', r, h], ['arcTo', 0, h, 0, h - r, r], ['lineTo', 0, r], ['arcTo', 0, 0, r, 0, r], ['closePath']);
+  return steps;
+}
+
 /*
  * G269: a bubble never sits under the top-left HUD column (the activity
  * feed's popups and the buff strip over it). The client had no such column:

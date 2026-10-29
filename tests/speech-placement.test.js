@@ -28,9 +28,10 @@ import {
   speechBubbleRect,
   speechOffsetFor,
   slideOffAvatars,
+  speechBubbleOutline,
   speechTailPoints,
   SPEECH_SLIDE_LIMIT,
-} from '../public/js/speech-placement.js?v=g427-1';
+} from '../public/js/speech-placement.js?v=g440-1';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '../glitch-GameServerJS');
@@ -154,6 +155,18 @@ describe('placeSpeechTail (G233)', () => {
     assert.equal(SPEECH_TAIL_TIP_INSET, 10);
   });
 
+  it('speechBubbleOutline: body and tail as one closed path, the tail on the bottom edge or the top', () => {
+    const down = speechBubbleOutline({ width: 200, height: 60, tip: 140, base: 130 });
+    assert.deepEqual(down[0], ['moveTo', SPEECH_BUBBLE_RADIUS, 0]);
+    assert.deepEqual(down.at(-1), ['closePath']);
+    const wedge = (steps) => steps.filter(([op]) => op === 'lineTo').map(([, x, y]) => `${x},${y}`);
+    assert.ok(wedge(down).join(' ').includes(`${130 + SPEECH_TAIL_HALF},60 140,71 ${130 - SPEECH_TAIL_HALF},60`));
+    const up = speechBubbleOutline({ width: 200, height: 60, tip: 78, base: 78, up: true });
+    assert.ok(wedge(up).join(' ').startsWith(`${78 - SPEECH_TAIL_HALF},0 78,-11 ${78 + SPEECH_TAIL_HALF},0`));
+    assert.ok(!wedge(up).some((p) => p.endsWith(',71')));
+    assert.equal(down.filter(([op]) => op === 'arcTo').length, 4);
+  });
+
   it('speechTailPoints: the down wedge under the bubble, the up wedge over it, both over the border', () => {
     assert.deepEqual(speechTailPoints({ height: 60, tip: 140, base: 130 }), {
       fill: [121, 58, 140, 71, 139, 58],
@@ -211,7 +224,7 @@ describe('art heights', () => {
 describe('wiring', () => {
   it('game.js places every bubble through the module and gives registered targets art heights', () => {
     const game = read('public/game.js');
-    assert.match(game, /import \{ clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechOffsetFor, speechTailPoints \} from '\.\/js\/speech-placement\.js\?v=[\w-]+';/);
+    assert.match(game, /import \{ clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechBubbleOutline, speechOffsetFor \} from '\.\/js\/speech-placement\.js\?v=[\w-]+';/);
     assert.match(game, /function register\(target\) \{\n[^\n]*\n  giveArtHeight\(target\);\n  interactables\.push\(target\);/);
     const fn = game.slice(game.indexOf('function positionSpeechBubble'), game.indexOf('function showSpeechBubble'));
     assert.match(fn, /const offset = speechOffsetFor\(meta\.target\);\n  bubble\.x = clampWorldOverlayX\(spr\.x \+ offset\.x, meta\.width, 12\);/);
@@ -221,7 +234,9 @@ describe('wiring', () => {
     assert.match(fn, /const speakerX = spr\.x \+ offset\.x;/);
     assert.match(fn, /placeSpeechTail\(\{ bubbleX: bubble\.x, width: meta\.width, speakerX \}\)/);
     // G427: the tail is the client's one length (ChatBubble.as 374-379), never stretched.
-    assert.match(fn, /drawSpeechTail\(meta\.tailDown, meta\.height, tail, false\);\n\s*drawSpeechTail\(meta\.tailUp, meta\.height, tail, true\);/);
+    // One outline for body and tail (Austin 2026-10-29: a separate tail seemed to fade on its own).
+    assert.match(fn, /drawSpeechBubble\(meta\.bg, meta\.width, meta\.height, tail, flip\);/);
+    assert.doesNotMatch(game, /tailDown|tailUp|drawSpeechTail/);
     assert.match(fn, /bubble\.pivot\.y = flip \? -11 : meta\.height \+ 11;/);
     assert.doesNotMatch(fn, /lift/);
   });
