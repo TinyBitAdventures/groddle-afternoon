@@ -35,7 +35,7 @@ import { questInstancesFeature } from './quest-instances-feature.js?v=g450-1';
 import { partySpacesFeature } from './party-spaces-feature.js?v=party-15';
 import { seasonsFeature } from './seasons-feature.js?v=g448-4';
 import { cameraModeFeature } from './camera-mode-feature.js?v=g359-1';
-import { newxpFeature } from './newxp-feature.js?v=g448-2';
+import { newxpFeature } from './newxp-feature.js?v=g453-1';
 
 export { questFlagsFeature };
 
@@ -84,7 +84,7 @@ import { treeDeathFeature } from './tree-death-feature.js?v=g448-2'; FEATURES.pu
 import { enchantedForestFeature } from './enchanted-forest-feature.js?v=g442-6'; FEATURES.push(enchantedForestFeature);
 import { jujuBanditsFeature } from './juju-bandits-feature.js?v=g442-6'; FEATURES.push(jujuBanditsFeature);
 import { craftybotFeature } from './craftybot-feature.js?v=g448-4'; FEATURES.push(craftybotFeature);
-import { moodDecayFeature } from './mood-decay-feature.js?v=g448-4'; FEATURES.push(moodDecayFeature);
+import { moodDecayFeature } from './mood-decay-feature.js?v=g453-1'; FEATURES.push(moodDecayFeature);
 import { animalMoodFeature } from './animal-mood-feature.js?v=g448-4'; FEATURES.push(animalMoodFeature);
 import { butlerFeature } from './butler-feature.js?v=g448-4'; FEATURES.push(butlerFeature);
 import { mailCourierFeature } from './mail-courier-feature.js?v=g450-1'; FEATURES.push(mailCourierFeature);
@@ -127,7 +127,7 @@ import { familiarDialogFeature } from './familiar-dialog-feature.js?v=g434-1'; F
 import { spiritLonelinessFeature } from './spirit-loneliness-feature.js?v=g448-2'; FEATURES.push(spiritLonelinessFeature);
 import { funpickleFeature } from './funpickle-feature.js?v=g448-4'; FEATURES.push(funpickleFeature);
 import { qurazyFeature } from './qurazy-feature.js?v=g448-2'; FEATURES.push(qurazyFeature);
-import { energyDecayFeature } from './energy-decay-feature.js?v=g448-4'; FEATURES.push(energyDecayFeature);
+import { energyDecayFeature } from './energy-decay-feature.js?v=g453-1'; FEATURES.push(energyDecayFeature);
 import { partyFeature } from './party-feature.js?v=g442-6'; FEATURES.push(partyFeature);
 import { sharedQuoinsFeature } from './shared-quoins-feature.js?v=g424-1'; FEATURES.push(sharedQuoinsFeature);
 import { tradeFeature } from './trade-feature.js?v=g448-2'; FEATURES.push(tradeFeature);

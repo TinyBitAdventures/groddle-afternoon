@@ -2665,9 +2665,14 @@
   ]
  },
  "git": {
-  "commits": 749,
+  "commits": 750,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "improve",
+    "text": "Ice nubbins, the Dust Trap, the Firefly Jar and the mail frog draw sharp on Retina"
+   },
    {
     "date": "2026-10-29",
     "kind": "improve",
@@ -2782,11 +2787,6 @@
     "date": "2026-10-29",
     "kind": "new",
     "text": "Eat several Zilloween candies or pumpkin pies at once; Customize look first holds the skill panel until the builder closes"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "new",
-    "text": "Fathom analytics on the static game pages, added at deploy"
    }
   ]
  },

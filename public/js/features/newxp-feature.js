@@ -1580,6 +1580,8 @@ async function runTraining1(t) {
   await talk(t, fl, LINES.t1Look, { buttons: ['OK'] });
   if (!auto && typeof document !== 'undefined') {
     document.getElementById('avatar-btn')?.click();
+    // open_avatar_picker (newxp_training1.js 586) is Tiny Speck's new-player picker: the Start fresh tab.
+    document.querySelector('#avatar-tabs [data-slot="fresh"]')?.click();
     await sleep(t, 400);
     await until(t, () => document.getElementById('avatar-panel')?.hidden !== false);
   }

@@ -494,3 +494,12 @@ describe('newxp Gentle Island scripts (newbie_island.js and the street events)',
     for (const q of ISLAND_QUOINS) assert.ok(ISLAND_FLAGS.includes(q.event), q.event);
   });
 });
+
+describe('the look step opens the new-player picker', () => {
+  it('opens the builder on Start fresh, as open_avatar_picker did (newxp_training1.js 586)', () => {
+    const src = readFileSync(join(ROOT, 'js/features/newxp-feature.js'), 'utf8');
+    assert.match(src, /getElementById\('avatar-btn'\)\?\.click\(\);[\s\S]{0,200}#avatar-tabs \[data-slot="fresh"\]'\)\?\.click\(\)/);
+    const game = readFileSync(join(ROOT, 'game.js'), 'utf8');
+    assert.match(game, /\['fresh', 'Start fresh'\]/);
+  });
+});
