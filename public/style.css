@@ -2289,6 +2289,48 @@ button.play-context-head:focus-visible {
   background: #6aaa3a;
   color: #fff;
 }
+/* Eat how many? (js/eat-many.js): the original's count choices above the drop stepper's controls. */
+.pack-eat-quantity .pack-eat-title {
+  margin: 0 0 0.4rem;
+  color: #44392b;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+.pack-eat-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.45rem;
+}
+.pack-eat-quantity .pack-eat-choice {
+  min-width: 2.1rem;
+  min-height: 1.9rem;
+}
+.pack-eat-quantity .pack-eat-choice.is-selected {
+  border-color: #5a9e3e;
+  background: #edf7e7;
+  color: #2f6a24;
+}
+.pack-eat-quantity button:focus-visible {
+  outline: 2px solid #3f7fbf;
+  outline-offset: 1px;
+}
+.pack-eat-quantity button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+.pack-eat-preview {
+  justify-content: center;
+  margin: 0.45rem 0 0;
+}
+.pack-eat-note {
+  margin: 0.4rem 0 0;
+  color: #6f6352;
+  font-size: 0.66rem;
+  text-align: center;
+}
+.pack-eat-note span { white-space: nowrap; }
+.pack-eat-quantity .pack-drop-confirm-row .pack-pop-primary:hover { background: #5c9a2f; border-color: #4d8a33; }
 @keyframes pack-pop-in {
   from { opacity: 0; transform: translateY(5px) scale(0.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }

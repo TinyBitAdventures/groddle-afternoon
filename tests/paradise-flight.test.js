@@ -313,7 +313,7 @@ test("the dead can't activate a ticket, checked before the daily limit", () => {
 test('the pack popover offers Eat beside Activate and asks Hell before activating', () => {
   const game = fs.readFileSync(path.join(publicDir, 'game.js'), 'utf8');
   assert.match(game, /data-pack-eat-ticket title="\$\{escapeHtml\(PARADISE_TICKET_EAT\.tooltip\)\}">Eat one</);
-  assert.match(game, /function eatPackedParadiseTicket\(classTsid\)/);
+  assert.match(game, /function eatPackedParadiseTicket\(classTsid, count = 1\)/);
   assert.match(game, /features\.query\('isDead', engine\) === true/);
   assert.match(game, /quote\.reason === 'dead'\s*\? PARADISE_HELL_BLOCK/);
   assert.match(game, /Ticket to Paradise cards per day\./);

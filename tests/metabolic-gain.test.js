@@ -125,7 +125,7 @@ describe('the gain door (js/metabolics.js)', () => {
   it('game.js installs the feature host gate and sends the line unless quiet', () => {
     assert.match(game, /setMetabolicGainGate\(\(stat, \{ quiet = false \} = \{\}\) => \{\s*const gate = features\.metabolicGate\(stat, 'gain', engine\);\s*if \(gate\?\.ok === false && !quiet && gate\.msg\) pushActivity\(gate\.msg\);/);
     // The Paradise ticket was already gated (ef926515).
-    assert.match(game, /eatParadiseTicket\(\{ count: 1, energyAllowed: energyGate\.ok !== false \}\)/);
+    assert.match(game, /eatParadiseTicket\(\{ count: n, energyAllowed: energyGate\.ok !== false \}\)/);
   });
 });
 

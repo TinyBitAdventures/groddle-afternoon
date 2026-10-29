@@ -321,6 +321,6 @@ describe('feature gain sites ask the shared gate (source text)', () => {
 
   it('the Paradise ticket in game.js already asks before its 1 energy', () => {
     const game = src('game.js');
-    assert.match(game, /const energyGate = features\.metabolicGate\('energy', 'gain', engine\);\n\s*const eaten = eatParadiseTicket\(\{ count: 1, energyAllowed: energyGate\.ok !== false \}\);/);
+    assert.match(game, /const energyGate = features\.metabolicGate\('energy', 'gain', engine\);\n\s*const eaten = eatParadiseTicket\(\{ count: n, energyAllowed: energyGate\.ok !== false \}\);/);
   });
 });

@@ -464,18 +464,6 @@
       "assets/decos/groddle/zutto_cloud_1@2.75x.webp": "da67211d",
       "assets/decos/groddle/zutto_cloud_2@1.75x.webp": "7d8b9bec",
       "assets/decos/groddle/zutto_hill_3.svg": "a3040dc6",
-      "assets/sprites/giant-portraits/alph.webp": "3118265d",
-      "assets/sprites/giant-portraits/cosma.webp": "69f543a9",
-      "assets/sprites/giant-portraits/friendly.webp": "2bad0d25",
-      "assets/sprites/giant-portraits/grendaline.webp": "31e5c0da",
-      "assets/sprites/giant-portraits/humbaba.webp": "f8d5f5cf",
-      "assets/sprites/giant-portraits/lem.webp": "bf1ee8d4",
-      "assets/sprites/giant-portraits/mab.webp": "e42382e9",
-      "assets/sprites/giant-portraits/pot.webp": "0d9ffbda",
-      "assets/sprites/giant-portraits/spriggan.webp": "63b57d35",
-      "assets/sprites/giant-portraits/ti.webp": "9a7a7a60",
-      "assets/sprites/giant-portraits/zille.webp": "ab20178d",
-      "giants/data.json": "4d33b1db",
     },
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

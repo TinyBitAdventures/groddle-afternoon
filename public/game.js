@@ -605,6 +605,15 @@ import {
   resetFoodDay,
 } from './js/food.js?v=food-memory-8';
 import {
+  consumeTakesCount,
+  consumeCountCap,
+  consumeCountChoices,
+  clampConsumeCount,
+  previewConsume,
+  useItemMany,
+  recordFoodEatMany,
+} from './js/eat-many.js?v=g423-1';
+import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
   queueJump,
@@ -1647,6 +1656,9 @@ let packSelected = null;
 /** Pack action-card drop quantity state. */
 let packDropMode = false;
 let packDropQty = 1;
+/** Pack action-card "Eat how many?" chooser (js/eat-many.js). */
+let packEatMode = false;
+let packEatQty = 1;
 let vendorSprite = null;
 /** Active Phantom Glitch echo/final encounter for the authored ghost quest. */
 let phantomTarget = null;
@@ -2466,6 +2478,8 @@ function closePackPopover() {
   packSelected = null;
   packDropMode = false;
   packDropQty = 1;
+  packEatMode = false;
+  packEatQty = 1;
   const pop = document.getElementById('pack-popover');
   if (pop) {
     pop.hidden = true;
@@ -2947,6 +2961,46 @@ function getPackUseInfo(classTsid) {
   };
 }
 
+/**
+ * The pack card's count chooser for an eat or drink the source let take a
+ * count (js/eat-many.js; InteractionMenuController.as 974-993), or null.
+ * Ordinary eats and drinks only: a feature's own Eat (Licorice), a buff
+ * herb's Munch and a feature that limits eats one by one (seasonal candy,
+ * pumpkin pie: packUseGate) stay one at a time. Paradise tickets' Eat takes
+ * a count with no cap (paradise_ticket.js verbs.eat).
+ */
+function packEatManyInfo(classTsid, useInfo, stack) {
+  const have = Math.max(0, Math.floor(Number(stack) || 0));
+  if (have < 2 || !state.started) return null;
+  const plural = ITEM_CATALOG[classTsid]?.namePlural || `${ITEM_CATALOG[classTsid]?.label || 'item'}s`;
+  if (useInfo?.paradise) {
+    return { ticket: true, verb: 'Eat', plural, max: have, cap: { max: have, stack: have, cappedBy: null, full: false } };
+  }
+  if (!useInfo?.usable || useInfo.buff) return null;
+  if (useInfo.food && !useInfo.food.gate.ok) return null;
+  if (features.query('packUseInfo', classTsid, engine)) return null;
+  if (features.query('packUseGate', classTsid, engine) != null) return null;
+  const base = getItemUseInfo(classTsid);
+  if (base.verb !== useInfo.verb || !consumeTakesCount(classTsid, base)) return null;
+  const cap = consumeCountCap(base, pc, have, { energyMax: energyCap() });
+  if (cap.max < 2) return null;
+  return { ticket: false, verb: base.verb, kind: base.kind, info: base, plural, max: cap.max, cap };
+}
+
+/** The chooser's line for `qty`: the effects that count would give now. */
+function packEatPreview(many, useInfo, qty) {
+  if (many.ticket) {
+    const room = Math.max(0, energyCap() - (pc.energy || 0));
+    const fx = { xp: PARADISE_TICKET_EAT.imagination * qty };
+    if (Math.min(room, PARADISE_TICKET_EAT.energy * qty) > 0) fx.energy = Math.min(room, PARADISE_TICKET_EAT.energy * qty);
+    return fx;
+  }
+  return previewConsume(many.info, pc, qty, {
+    energyMax: energyCap(),
+    varietyImg: useInfo.food?.quote?.img || 0,
+  });
+}
+
 function showToolRepairFx(label, durationMs) {
   document.getElementById('tool-repair-fx')?.remove();
   const fx = document.createElement('div');
@@ -3050,6 +3104,8 @@ function renderPackPopover(classTsid, anchor = null) {
   if (packSelected && packSelected !== classTsid) {
     packDropMode = false;
     packDropQty = 1;
+    packEatMode = false;
+    packEatQty = 1;
   }
   packSelected = classTsid;
   packDropQty = normalizeStackQuantity(packDropQty, slot.count);
@@ -3192,6 +3248,55 @@ function renderPackPopover(classTsid, anchor = null) {
         </div>
       </div>`
     : '';
+  // Eat how many? (js/eat-many.js): the original's count chooser, "Just one" first.
+  const eatMany = packEatManyInfo(classTsid, useInfo, slot.count);
+  if (!eatMany) packEatMode = false;
+  if (eatMany) packEatQty = clampConsumeCount(packEatQty, eatMany.max);
+  const eatVerbLower = eatMany ? eatMany.verb.toLowerCase() : '';
+  const eatPrompt = eatMany && packEatMode && !packDropMode
+    ? (() => {
+        const qty = packEatQty;
+        const choices = consumeCountChoices(eatMany.max);
+        const chips = choices.map((n) => {
+          const label = n === 1
+            ? 'Just one'
+            : n === eatMany.max && !eatMany.cap.cappedBy
+              ? `All ${n}`
+              : String(n);
+          return `<button type="button" class="pack-eat-choice${n === qty ? ' is-selected' : ''}" data-pack-eat-choice="${n}" aria-pressed="${n === qty ? 'true' : 'false'}">${label}</button>`;
+        }).join('');
+        const preview = Object.entries(packEatPreview(eatMany, useInfo, qty))
+          .map(([stat, amount]) => `<span class="pack-pop-effect${amount < 0 ? ' loss' : ''}">${amount > 0 ? '+' : ''}${amount} ${escapeHtml(stat === 'xp' ? 'iMG' : stat)}</span>`)
+          .join('');
+        const left = eatMany.cap.stack - eatMany.max;
+        const capNote = eatMany.cap.cappedBy
+          ? `Your ${eatMany.cap.cappedBy} is full after ${eatMany.max}, so ${left === 1 ? 'the last one stays' : `the other ${left} stay`} in your pack.`
+          : '';
+        const fullNow = useInfo.food ? Math.round(useInfo.food.fullness.percent) : null;
+        const fullAfter = useInfo.food
+          ? Math.round(foodFullness({ foodToday: foodState.foodToday + (packEatPreview(eatMany, useInfo, qty).energy || 0) }, 100).percent)
+          : null;
+        const fullNote = useInfo.food && fullAfter !== fullNow ? `<span>${fullNow}% full today, then ${fullAfter}%</span>` : '';
+        return `<div class="pack-drop-quantity pack-eat-quantity" data-pack-eat-panel role="group" aria-labelledby="pack-eat-title">
+        <p id="pack-eat-title" class="pack-eat-title">${escapeHtml(eatMany.verb)} how many ${escapeHtml(eatMany.plural)}?</p>
+        <div class="pack-eat-choices">${chips}</div>
+        <div class="pack-drop-stepper">
+          <button type="button" data-pack-eat-dec aria-label="${escapeHtml(eatMany.verb)} one fewer" ${qty <= 1 ? 'disabled' : ''}>−</button>
+          <output aria-live="polite" data-pack-eat-count>${qty} of ${slot.count}</output>
+          <button type="button" data-pack-eat-inc aria-label="${escapeHtml(eatMany.verb)} one more" ${qty >= eatMany.max ? 'disabled' : ''}>+</button>
+        </div>
+        ${preview ? `<div class="pack-pop-effects pack-eat-preview" aria-live="polite">${preview}</div>` : ''}
+        ${capNote || fullNote ? `<p class="pack-eat-note">${escapeHtml(capNote)}${capNote && fullNote ? ' ' : ''}${fullNote}</p>` : ''}
+        <div class="pack-drop-confirm-row">
+          <button type="button" data-pack-eat-cancel>Cancel</button>
+          <button type="button" class="pack-pop-primary" data-pack-eat-confirm>${escapeHtml(eatMany.verb)} ${qty}</button>
+        </div>
+      </div>`;
+      })()
+    : '';
+  const eatManyButton = eatMany && !packEatMode
+    ? `<button type="button" class="pack-eat-more" data-pack-eat-many title="Choose how many to ${escapeHtml(eatVerbLower)}">${escapeHtml(eatMany.verb)} more…</button>`
+    : '';
 
   // emblem_base `spend` (sort_on 54, before Caress): unlock its skill or speed up study.
   const emblemSpend = emblemSpendVerb(classTsid);
@@ -3225,6 +3330,7 @@ function renderPackPopover(classTsid, anchor = null) {
       ${useInfo.usable ? `<button type="button" class="pack-pop-primary" data-pack-use ${useInfo.food && !useInfo.food.gate.ok ? 'disabled' : ''}>${escapeHtml(useInfo.verb)}${useInfo.singleAction ? '' : ' one'}</button>` : ''}
       ${(useInfo.paradise || useInfo.buff) && !useInfo.usable ? `<button type="button" class="pack-pop-primary" data-pack-use disabled title="${escapeHtml(useInfo.reason)}">${escapeHtml(useInfo.verb)}</button>` : ''}
       ${useInfo.paradise ? `<button type="button" class="pack-bear-action" data-pack-eat-ticket title="${escapeHtml(PARADISE_TICKET_EAT.tooltip)}">Eat one</button>` : ''}
+      ${eatManyButton}
       ${bearActionMarkup}
       ${bearReminisceMarkup}
       ${bearUpgradeMarkup}
@@ -3236,13 +3342,26 @@ function renderPackPopover(classTsid, anchor = null) {
       <button type="button" data-pack-drop ${packDropBlockReason(classTsid) ? `disabled title="${escapeHtml(packDropBlockReason(classTsid))}"` : ''}>Drop</button>
       ${canSellHere ? `<button type="button" class="pack-pop-sell" data-pack-sell>Sell for ◎ ${sellPrice}</button>` : ''}
     </div>
+    ${eatPrompt}
     ${dropPrompt}`;
   // updateHud redraws an open popover on every HUD change (buff timers, energy): rebuilding
   // the same markup swaps the buttons under the pointer and their hover blinks. Same content,
   // same buttons and listeners.
+  // A redraw while the eat chooser has focus (a count change, an energy tick) keeps it on the same control.
+  const focusedEat = pop.contains(document.activeElement) ? document.activeElement : null;
+  const keepFocus = focusedEat
+    ? ['data-pack-eat-choice', 'data-pack-eat-dec', 'data-pack-eat-inc', 'data-pack-eat-confirm', 'data-pack-eat-cancel', 'data-pack-eat-many']
+        .filter((name) => focusedEat.hasAttribute(name))
+        .map((name) => `[${name}${name === 'data-pack-eat-choice' ? `="${focusedEat.getAttribute(name)}"` : ''}]`)[0] || null
+    : null;
   const unchanged = pop.dataset.packFor === classTsid && pop.innerHTML !== '' && packPopoverMarkup === markup;
   if (!unchanged) {
     pop.innerHTML = markup;
+    if (keepFocus) {
+      const again = pop.querySelector(keepFocus);
+      const target = again && !again.disabled ? again : pop.querySelector('[data-pack-eat-confirm]');
+      target?.focus({ preventScroll: true });
+    }
     pop.dataset.packFor = classTsid;
     packPopoverMarkup = markup;
   }
@@ -3334,6 +3453,63 @@ function renderPackPopover(classTsid, anchor = null) {
   pop.querySelector('[data-pack-drop-confirm]')?.addEventListener('click', () => {
     dropPackItem(classTsid, packDropQty);
   });
+  if (eatMany) {
+    const setEatQty = (value) => {
+      packEatQty = clampConsumeCount(value, eatMany.max);
+      renderPackPopover(classTsid, sourceAnchor);
+    };
+    pop.querySelector('[data-pack-eat-many]')?.addEventListener('click', () => {
+      packEatMode = true;
+      packDropMode = false;
+      packEatQty = 1;
+      renderPackPopover(classTsid, sourceAnchor);
+      pop.querySelector('[data-pack-eat-confirm]')?.focus({ preventScroll: true });
+    });
+    pop.querySelectorAll('[data-pack-eat-choice]').forEach((button) => {
+      button.addEventListener('click', () => setEatQty(Number(button.dataset.packEatChoice)));
+    });
+    pop.querySelector('[data-pack-eat-dec]')?.addEventListener('click', () => setEatQty(packEatQty - 1));
+    pop.querySelector('[data-pack-eat-inc]')?.addEventListener('click', () => setEatQty(packEatQty + 1));
+    pop.querySelector('[data-pack-eat-cancel]')?.addEventListener('click', () => {
+      packEatMode = false;
+      packEatQty = 1;
+      renderPackPopover(classTsid, sourceAnchor);
+      pop.querySelector('[data-pack-eat-many]')?.focus({ preventScroll: true });
+    });
+    pop.querySelector('[data-pack-eat-confirm]')?.addEventListener('click', () => {
+      const n = clampConsumeCount(packEatQty, eatMany.max);
+      closePackPopover();
+      if (eatMany.ticket) eatPackedParadiseTicket(classTsid, n);
+      else usePackItem(classTsid, n);
+    });
+    // Keyboard: arrows or -/+ change the count, Home/End go to one/all, Esc closes only the chooser.
+    // The keys stop here so they never walk the avatar or reach the street's own Enter.
+    pop.querySelector('[data-pack-eat-panel]')?.addEventListener('keydown', (e) => {
+      const step = { ArrowLeft: -1, ArrowDown: -1, '-': -1, ArrowRight: 1, ArrowUp: 1, '+': 1, '=': 1 }[e.key];
+      if (step) {
+        e.preventDefault();
+        e.stopPropagation();
+        setEatQty(packEatQty + step);
+      } else if (e.key === 'Home' || e.key === 'End') {
+        e.preventDefault();
+        e.stopPropagation();
+        setEatQty(e.key === 'Home' ? 1 : eatMany.max);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        pop.querySelector('[data-pack-eat-cancel]')?.click();
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.stopPropagation();
+      }
+    });
+  }
+  pop.querySelector('[data-pack-drop]')?.addEventListener('click', () => {
+    packEatMode = false;
+  }, { capture: true });
+  if (app?.canvas) {
+    app.canvas.dataset.packEatMax = eatMany ? `${classTsid}:${eatMany.max}${eatMany.cap.cappedBy ? `:${eatMany.cap.cappedBy}` : ''}` : 'none';
+    app.canvas.dataset.packEatChooser = eatMany && packEatMode ? String(packEatQty) : 'closed';
+  }
 }
 
 /**
@@ -3468,6 +3644,8 @@ function renderPackRow(box, slots, opts = {}) {
         if (packSelected !== s.classTsid) {
           packDropMode = false;
           packDropQty = 1;
+          packEatMode = false;
+          packEatQty = 1;
         }
         renderPackPopover(s.classTsid, slot);
       }
@@ -3998,7 +4176,13 @@ function updateHud() {
   if (state.started) savePlayerState();
 }
 
-function usePackItem(classTsid) {
+/**
+ * The pack's Eat / Drink / Use. `count` above one is the card's "Eat how
+ * many?" (js/eat-many.js): one food_eat / drink_drink for the whole count,
+ * cut to what the energy or mood still needs, with one toast and one
+ * activity row.
+ */
+function usePackItem(classTsid, count = 1) {
   if (!state.started) return;
   if (features.query('runPackUse', classTsid, engine) === true) return;
   if (cubimalPackageInfo(classTsid)) {
@@ -4042,6 +4226,12 @@ function usePackItem(classTsid) {
   }
   const buffInfo = getBuffItemInfo(classTsid);
   const ordinaryInfo = buffInfo?.def ? null : getItemUseInfo(classTsid);
+  // How many go in: one, or the chosen count cut to the stack and the source caps.
+  let eatCount = 1;
+  if (!buffInfo?.def && Math.floor(Number(count) || 1) > 1 && consumeTakesCount(classTsid, ordinaryInfo)) {
+    const cap = consumeCountCap(ordinaryInfo, pc, countItem(inv, classTsid), { energyMax: energyCap() });
+    eatCount = Math.max(1, Math.min(Math.floor(Number(count)), cap.max));
+  }
   // Drinks never count toward fullness or food history in the source.
   const isFood = Boolean(
     ordinaryInfo?.usable && ordinaryInfo.effects?.energy && ordinaryInfo.kind !== 'drink'
@@ -4061,7 +4251,9 @@ function usePackItem(classTsid) {
   }
   const r = buffInfo?.def
     ? activateBuffItem(buffState, inv, pc, classTsid, Date.now(), { study: studyBuffContext(), dead: playerIsDead() })
-    : useItem(inv, pc, classTsid);
+    : eatCount > 1
+      ? useItemMany(inv, pc, classTsid, eatCount)
+      : useItem(inv, pc, classTsid);
   if (!r.ok) {
     toast(r.msgs[0] || 'Cannot use that.');
     return;
@@ -4073,23 +4265,27 @@ function usePackItem(classTsid) {
     if (sped.completed?.length) handleSkillCompletions(sped.completed);
     updateSkillChrome();
   }
-  emitGameEvent(`${classTsid}:${String(ordinaryInfo?.verb || 'use').toLowerCase()}`);
+  const eaten = eatCount > 1 ? r.count || eatCount : 1;
+  emitGameEvent(`${classTsid}:${String(ordinaryInfo?.verb || 'use').toLowerCase()}`, eaten);
   // food.js / drink.js: items_eaten, meals_eaten, items_drank (+ alcohol).
   if (ordinaryInfo?.usable) {
     const meta = ITEM_CATALOG[classTsid] || {};
-    for (const row of consumeAchievementCounters(classTsid, { kind: ordinaryInfo.kind, tags: meta.tags, baseCost: meta.baseCost })) {
+    for (const row of consumeAchievementCounters(classTsid, { kind: ordinaryInfo.kind, tags: meta.tags, baseCost: meta.baseCost, count: eaten })) {
       announceAchievementUpdates(applyAchievementProgress(achieveState, row.counter, row.amount, pc));
     }
   }
   let foodResult = null;
   if (isFood && r.effects?.energy > 0) {
-    foodResult = recordFoodEat(foodState, classTsid, {
+    const eatOpts = {
       baseEnergy: ordinaryInfo.effects.energy,
       appliedEnergy: r.effects.energy,
       energyMax: energyCap(),
       upgrades: pc.imaginationUpgrades || [],
       now: Date.now(),
-    });
+    };
+    foodResult = eaten > 1
+      ? recordFoodEatMany(foodState, classTsid, { ...eatOpts, count: eaten })
+      : recordFoodEat(foodState, classTsid, eatOpts);
     // include/food.js:157-164: over the daily limit, Stuffed until the next game day.
     if (foodResult.fullness?.stuffed) engine.applyBuff('stuffed', { durationSec: Math.max(1, Math.ceil(msUntilNewDay(Date.now()) / 1000)) });
     if (foodResult.bonus > 0) {
@@ -4131,6 +4327,7 @@ function usePackItem(classTsid) {
       burst(player.x, player.y - 45, 0xf0c85a, 12);
     }
   }
+  if (app?.canvas && ordinaryInfo?.usable) app.canvas.dataset.packEaten = `${classTsid}:${eaten}:${r.effects?.energy || 0}:${r.effects?.mood || 0}:${r.effects?.xp || 0}`;
   updateHud();
   if (isVendorOpen()) renderVendorList();
 }
@@ -18098,23 +18295,29 @@ function playerIsDead() {
   return features.query('isDead', engine) === true;
 }
 
-/** paradise_ticket.js verbs.eat: one ticket for 20 iMG + 1 energy and a quip. */
-function eatPackedParadiseTicket(classTsid) {
+/**
+ * paradise_ticket.js verbs.eat: 20 iMG + 1 energy and a quip for each ticket;
+ * `count` from the card's "Eat how many?" eats several in one go (the
+ * handler's this.count).
+ */
+function eatPackedParadiseTicket(classTsid, count = 1) {
   if (!state.started || !paradiseCourseForTicket(classTsid)) return false;
   const label = listPackSlots(inv).find((entry) => entry.classTsid === classTsid)?.label || 'Ticket to Paradise';
-  if (!removeItem(inv, classTsid, 1)) {
+  const n = Math.max(1, Math.min(Math.floor(Number(count) || 1), countItem(inv, classTsid)));
+  if (!removeItem(inv, classTsid, n)) {
     toast('That ticket is no longer in your pack.');
     return false;
   }
   const energyGate = features.metabolicGate('energy', 'gain', engine);
-  const eaten = eatParadiseTicket({ count: 1, energyAllowed: energyGate.ok !== false });
+  const eaten = eatParadiseTicket({ count: n, energyAllowed: energyGate.ok !== false });
   pc.imagination = (pc.imagination || 0) + eaten.imagination;
   if (eaten.energy > 0) pc.energy = Math.min(energyCap(), (pc.energy || 0) + eaten.energy);
-  emitGameEvent(`${classTsid}:eat`);
+  emitGameEvent(`${classTsid}:eat`, n);
   playSound(soundForConsume(classTsid, { drink: false }), { volume: 0.6, jitter: 0.05 });
   toast(eaten.quip, 3200);
+  const plural = ITEM_CATALOG[classTsid]?.namePlural || `${label}s`;
   pushActivity({
-    base: `You ate a ${label}. ${eaten.quip}`,
+    base: `You ate ${n > 1 ? `${n} ${plural}` : `a ${label}`}. ${eaten.quip}`,
     effects: eaten.energy > 0 ? { xp: eaten.imagination, energy: eaten.energy } : { xp: eaten.imagination },
   });
   if (energyGate.ok === false && energyGate.msg) pushActivity(energyGate.msg);
@@ -24264,10 +24467,15 @@ async function main() {
     const demoFood = getItemUseInfo(bootParams.get('fooddemo'))?.effects?.energy
       ? bootParams.get('fooddemo')
       : 'sammich';
-    inv[demoFood] = Math.max(1, inv[demoFood] || 0);
+    // `&foodcount=N` sets the stack (Eat how many?), `&foodenergy=N` the energy to start from.
+    const demoCount = Math.floor(Number(bootParams.get('foodcount')));
+    inv[demoFood] = Number.isFinite(demoCount) && demoCount > 0 ? demoCount : Math.max(1, inv[demoFood] || 0);
     // The variety bonus needs the Appreciation of Food Variety upgrade card.
     if (!pc.imaginationUpgrades.includes(FOOD_VARIETY_UPGRADE)) pc.imaginationUpgrades.push(FOOD_VARIETY_UPGRADE);
-    pc.energy = Math.min(pc.energy, 50);
+    const demoEnergy = Number(bootParams.get('foodenergy'));
+    pc.energy = bootParams.has('foodenergy') && Number.isFinite(demoEnergy)
+      ? Math.max(0, Math.min(energyCap(), demoEnergy))
+      : Math.min(pc.energy, 50);
     foodState.foodToday = 0;
     const age = String(bootParams.get('foodlast') || 'first').toLowerCase();
     if (age === 'recent') foodState.history[demoFood] = Date.now();
