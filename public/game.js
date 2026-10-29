@@ -570,6 +570,7 @@ import {
   headCeiling,
   isStandable,
 } from './js/street-model.js';
+import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=g422-1';
 import {
   buildStreetView,
   signpostNear,
@@ -6520,7 +6521,7 @@ function enterChoicesHere() {
     const d = interactReach(t);
     if (d < 100) near.push({ target: t, distance: d });
   }
-  const sign = currentStreet && !climb.active ? signpostNear(currentStreet, player.x, 140) : null;
+  const sign = currentStreet && !climb.active ? signpostNear(walkUpSignpostStreet(currentStreet), player.x, 140) : null;
   const connects = (sign?.signpost?.connects || []).filter((c) => c && !c.hidden);
   return buildEnterChoices({
     near,
@@ -20134,7 +20135,7 @@ function doTeleport() {
   }
   if (!currentStreet) return;
   const plan = planSignpostTravel(
-    currentStreet,
+    walkUpSignpostStreet(currentStreet),
     player.x,
     availableStreetTsids(),
     140,
@@ -22950,6 +22951,33 @@ function updateBuriedSignposts() {
   if (!conn) return;
   buriedTravelUntil = now + 3000;
   travelTo(conn.tsid, { label: conn.label, arrive: conn.arrive, via: 'door' });
+}
+
+let ladderTopTravelUntil = 0;
+
+/**
+ * Climbing to the top of a ladder whose signpost has no deck takes its link
+ * (Groddle Ladder's spine up to The Great Hole to Ix). The original had a
+ * Collision-triggered Teleporter there, since a climber gets no interactions
+ * (ladder-top-signposts.js). You stay on the ladder until the next street
+ * loads, so a refused trip leaves you holding the top, not falling.
+ */
+function updateLadderTopSignposts() {
+  if (!currentStreet || !player || !climb.active || isScreenFxBlocking()) return;
+  if (!climberAtLadderTop(climb.wall, player.y)) return;
+  const now = performance.now();
+  if (now < ladderTopTravelUntil) return;
+  const sign = ladderTopSignpostFor(currentStreet, climb.wall.id);
+  if (!sign) return;
+  const conn = pickConnection(sign, availableStreetTsids());
+  if (!conn) return;
+  ladderTopTravelUntil = now + 3000;
+  app.canvas.dataset.ladderTopSignpost = `${currentStreetTsid}:${sign.id}>${conn.tsid}`;
+  travelTo(conn.tsid, { label: conn.label, arrive: conn.arrive, via: 'door' }).then((res) => {
+    if (res?.ok === false || climb.active || !player?.climbing) return;
+    player.climbing = false;
+    setPlayerAnim('idle');
+  });
 }
 
 function grantShrineEmblem(target) {
@@ -25846,6 +25874,7 @@ async function main() {
     tickAvatarAfk();
     updateShrineWalkBy();
     updateBuriedSignposts();
+    updateLadderTopSignposts();
     updateHogHaul((1000 / 60) * dt);
     updateFourLetterQuest();
     updateLegalizeIt();
@@ -25932,7 +25961,7 @@ async function main() {
         recent || (nearHover && interactDistance(nearHover, player.x, player.y) < 160
           ? nearHover
           : nearestInteractable(100));
-      const nearSign = currentStreet ? signpostNear(currentStreet, player.x, 140) : null;
+      const nearSign = currentStreet ? signpostNear(walkUpSignpostStreet(currentStreet), player.x, 140) : null;
       const nearClimb = !climb.active
         ? findClimbWallNear(streetWalls, player.x, player.y, 42)
         : null;
