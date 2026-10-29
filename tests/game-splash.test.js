@@ -20,7 +20,7 @@ import {
   splashRays,
   splashTextX,
   splashTextY,
-} from '../public/js/game-splash.js?v=g448-1';
+} from '../public/js/game-splash.js?v=g448-2';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -109,7 +109,7 @@ describe('the art (tools/overlay-art, glitch-overlays FLAs)', () => {
     });
   }
   it('the manifest key moved with the new art', () => {
-    assert.match(read('js/overlay-art.js'), /overlays\.json\?v=g446-2/);
+    assert.match(read('js/overlay-art.js'), /overlays\.json\?v=g448-2/);
   });
 });
 
@@ -252,9 +252,52 @@ describe('show and leave', () => {
   });
 });
 
+describe('G448: SVG frames on a dense screen', () => {
+  it('a 2x screen draws the splash from its SVG frames into a canvas, held until it hides', async () => {
+    const { vectorArtStats } = await import('../public/js/overlay-art.js?v=g448-2');
+    const meta = manifest.race_winner;
+    const vtext = read(`assets/sprites/overlays/${meta.vector.file}`);
+    const savedFetch = globalThis.fetch;
+    const savedImage = globalThis.Image;
+    globalThis.fetch = async () => ({ ok: true, json: async () => JSON.parse(vtext) });
+    globalThis.Image = class { constructor() { this.complete = true; } async decode() {} };
+    try {
+      const dom = fakeDom();
+      dom.win.devicePixelRatio = 2;
+      dom.win.Image = globalThis.Image;
+      const drawn = [];
+      const make = dom.doc.createElement;
+      dom.doc.createElement = (tag) => Object.assign(make(tag), { getContext: () => ({ clearRect() {}, drawImage: (img, x, y, w, h) => drawn.push([w, h]) }) });
+      const data = {};
+      const splash = createGameSplash({ document: dom.doc, win: dom.win, mount: () => dom.body, setData: (k, v) => { data[k] = v; }, manifest: async () => manifest });
+      await splash.show({ key: 'race_winner', ...splashFor(false, 'Amp'), textDeltaY: 55, buttons: [{ label: 'Leave the Game' }] });
+      assert.equal(data.gameSplashArt, 'vector');
+      const art = dom.body.children[0].children[0].children[0].children[1];
+      assert.equal(art.style.backgroundImage, undefined, 'no sheet');
+      const canvas = art.children[0];
+      assert.equal(canvas.className, 'game-splash-canvas');
+      assert.equal(canvas.width, Math.round(meta.box[2] * 2));
+      assert.deepEqual(drawn[0], [canvas.width, canvas.height]);
+      assert.equal(vectorArtStats().find((e) => e.id.startsWith('race_winner@')).users, 1);
+      splash.hide();
+      dom.timers.at(-1).fn();
+      assert.equal(vectorArtStats().find((e) => e.id.startsWith('race_winner@')).users, 0, 'let go with the splash');
+      // A 1x screen keeps the sheet.
+      const flat = fakeDom();
+      const data1 = {};
+      await createGameSplash({ document: flat.doc, win: flat.win, mount: () => flat.body, setData: (k, v) => { data1[k] = v; }, manifest: async () => manifest })
+        .show({ key: 'race_winner', ...splashFor(false, 'Amp'), buttons: [] });
+      assert.equal(data1.gameSplashArt, 'sheet');
+    } finally {
+      globalThis.fetch = savedFetch;
+      globalThis.Image = savedImage;
+    }
+  });
+});
+
 describe('the game uses it', () => {
   it('races-feature: games_end_race / games_end_quoin_grab, and leaving mid-race just goes', () => {
-    assert.match(races, /import \{ QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor \} from '\.\.\/game-splash\.js\?v=g448-1';/);
+    assert.match(races, /import \{ QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor \} from '\.\.\/game-splash\.js\?v=g448-2';/);
     assert.match(races, /buttons: \[\{ label: splash\.leaveLabel, w: splash\.buttonW, value: 'leave', onClick: \(\) => leaveRace\(engine\) \}\],/);
     assert.match(races, /\} else setTimeout\(\(\) => leaveRace\(engine\), 0\);/);
     assert.match(races, /if \(splashShown\) engine\.hideGameSplash\?\.\(\);/);
@@ -263,7 +306,7 @@ describe('the game uses it', () => {
     assert.doesNotMatch(races, /raceResultCopy|moodMax/);
   });
   it('crowns-feature: games_end_it_game through engine.gameSplash, no card of its own', () => {
-    assert.match(crowns, /import \{ CROWNS_SPLASH, splashFor \} from '\.\.\/game-splash\.js\?v=g448-1';/);
+    assert.match(crowns, /import \{ CROWNS_SPLASH, splashFor \} from '\.\.\/game-splash\.js\?v=g448-2';/);
     assert.match(crowns, /engine\.gameSplash\?\.\(\{\s*key: CROWNS_SPLASH\.key,\s*\.\.\.splashFor\(res\.won, res\.winnerName\),\s*textDeltaY: CROWNS_SPLASH\.textDeltaY,/);
     assert.match(crowns, /value: 'again', onClick: \(\) => playAgain\(engine\)/);
     assert.match(crowns, /value: 'leave', onClick: \(\) => leave\(engine\)/);

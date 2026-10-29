@@ -45,7 +45,7 @@
 import { frameTexture, sourceFromUrl } from './textures.js';
 
 export const OVERLAY_BASE = 'assets/sprites/overlays/';
-export const OVERLAY_MANIFEST_URL = `${OVERLAY_BASE}overlays.json?v=g446-2`;
+export const OVERLAY_MANIFEST_URL = `${OVERLAY_BASE}overlays.json?v=g448-2`;
 /** Announcement.as 149-150. */
 export const OVERLAY_FADE = Object.freeze({ inMs: 200, outMs: 400 });
 
@@ -342,8 +342,26 @@ export function sheetTexture(PIXI, key, meta, cell) {
  * than this many device px per sheet texel (meta.scale texels per stage px).
  */
 export const VECTOR_OVER_SHEET = 1.2;
-/** The longest side of a vector overlay's canvas (device px). */
-export const VECTOR_MAX_SIDE = 2048;
+/** The longest side of a vector overlay's canvas (device px; G448: 3072, so the Rook's 930 px laser beams and the cracker draw sharp at 3.3). */
+export const VECTOR_MAX_SIDE = 3072;
+
+let overlayResolution = () => 1;
+
+/**
+ * G448: the resolution (device px per world px) a street overlay uses when
+ * its caller passes none: game.js hands the main renderer's once it is up,
+ * so every pc_, itemstack_ and location_overlay with SVG frames draws them
+ * on a dense screen. 1 until then (and in tests).
+ */
+export function setOverlayResolution(fn) {
+  overlayResolution = typeof fn === 'function' ? fn : () => 1;
+}
+
+/** The resolution set by setOverlayResolution (1 when none or not a positive number). */
+export function defaultOverlayResolution() {
+  const r = Number(overlayResolution());
+  return r > 0 ? r : 1;
+}
 
 /**
  * Device px per stage px where a street overlay is drawn: its fit to `wh`
@@ -367,12 +385,13 @@ export function vectorDensity(meta, density) {
 
 /**
  * The frames of a <key>.frames.json as whole SVGs, each carrying only the
- * shared outlines and ramps it uses (and the ones those use), its root
+ * shared outlines, ramps and filters it uses (and the ones those use), its root
  * sized w x h so the browser draws it at that size.
  */
 export function vectorFrameSvgs(data, w, h) {
   const defs = new Map();
-  for (const m of String(data?.defs || '').matchAll(/<(path|linearGradient|radialGradient)\b[^>]*? id="([^"]+)"[^>]*?(?:\/>|>[\s\S]*?<\/\1>)/g)) defs.set(m[2], m[0]);
+  // G448: shared glow filters too (the cracker's pull hand, the powders), not only outlines and ramps.
+  for (const m of String(data?.defs || '').matchAll(/<(path|linearGradient|radialGradient|filter)\b[^>]*? id="([^"]+)"[^>]*?(?:\/>|>[\s\S]*?<\/\1>)/g)) defs.set(m[2], m[0]);
   const refs = (text) => [...text.matchAll(/#(_[a-z]+\d+)/g)].map((m) => m[1]);
   return (data?.frames || []).map((frame) => {
     const used = new Set();
@@ -561,13 +580,14 @@ export function vectorTexture(PIXI, art) {
  * ends). `state` plays one of the overlay's states (G273), and
  * handle.setState(name) switches to another, from its start, the way a new
  * annc.state restarts the clip on its label. `resolution` (the renderer's,
- * device px per world px) lets a row with SVG frames draw them on a dense
- * screen (G446, vectorDensity; handle.art says which: 'sheet' or 'vector').
+ * device px per world px; G448: defaultOverlayResolution when not given)
+ * lets a row with SVG frames draw them on a dense screen (G446,
+ * vectorDensity; handle.art says which: 'sheet' or 'vector').
  * Returns { sprite, stop(), setState(), done, cancelled, art } (done resolves true once played, false when
  * the art is missing, it was stopped, or a street change cancelled it:
  * cancelled true, see cancelAllOverlays).
  */
-export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, durationMs = 2000, loop = true, delayMs = 0, holdMs = null, zIndex = 60, state = null, resolution = 1 } = {}) {
+export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, durationMs = 2000, loop = true, delayMs = 0, holdMs = null, zIndex = 60, state = null, resolution = null } = {}) {
   const handle = {
     sprite: null,
     stopped: false,
@@ -598,7 +618,7 @@ export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, 
   handle.done = loadOverlayManifest().then(async (manifest) => {
     const meta = manifest?.[key];
     const layerScale = Math.hypot(layer?.worldTransform?.a ?? 1, layer?.worldTransform?.b ?? 0) || 1;
-    const density = meta?.kind === 'sheet' ? vectorDensity(meta, overlayDensity(meta, { wh, resolution, layerScale })) : 0;
+    const density = meta?.kind === 'sheet' ? vectorDensity(meta, overlayDensity(meta, { wh, resolution: resolution ?? defaultOverlayResolution(), layerScale })) : 0;
     let vector = null;
     if (density > 0 && typeof Image === 'function') {
       vector = await holdVectorTexture(PIXI, key, meta, density);

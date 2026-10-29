@@ -59,7 +59,7 @@ export const OVERLAYS = Object.freeze({
   // catalog_buffs.js 2446-2510 sneezing_fit on_tick: pc_overlay
   // overlay_sneezing_powder, 300 x 300 at delta_y -110, 2 s (Señor Funpickle, G209).
   // G272: a WebP sheet (the PNG was 0.84 MB).
-  overlay_sneezing_powder: { fla: 'glitch-overlays/overlay_sneezing_powder.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85 },
+  overlay_sneezing_powder: { fla: 'glitch-overlays/overlay_sneezing_powder.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85, vector: true },
   // locations/location.js 730-760 spawnQurazy: announce_vp_overlay
   // o_qurazy_quoin_overlay for 10 s (x 50%, top_y -5%, fade_out_sec 3). Its
   // one main frame holds clips (the rays turn every 60 frames, the quoin
@@ -71,12 +71,12 @@ export const OVERLAYS = Object.freeze({
   // G251: the hand-drawn stand-ins swapped for the real art.
   // locations/inc_rook.js 697-707, 778-785 doOrbAttack: location_overlay
   // focusing_orb_laser_beam, 1 s, scaled 1 + min(n/6, 1) over 0.25 s.
-  focusing_orb_laser_beam: { fla: 'glitch-overlays/focusing_orb_laser_beam.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85 },
+  focusing_orb_laser_beam: { fla: 'glitch-overlays/focusing_orb_laser_beam.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85, vector: true },
   // items/include/shrines.js 1055-1071 launchAttack: itemstack_overlay
   // shrine_laser_beam_1/2/3 (2 = 100+ damage, 3 = an emblem), 2 s, delta 5 / 140.
-  shrine_laser_beam_1: { fla: 'glitch-overlays/shrine_laser_beam_1.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85 },
-  shrine_laser_beam_2: { fla: 'glitch-overlays/shrine_laser_beam_2.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85 },
-  shrine_laser_beam_3: { fla: 'glitch-overlays/shrine_laser_beam_3.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85 },
+  shrine_laser_beam_1: { fla: 'glitch-overlays/shrine_laser_beam_1.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85, vector: true },
+  shrine_laser_beam_2: { fla: 'glitch-overlays/shrine_laser_beam_2.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85, vector: true },
+  shrine_laser_beam_3: { fla: 'glitch-overlays/shrine_laser_beam_3.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85, vector: true },
   // players/player.js 3014-3029 show_rainbow: pc_overlay, 400 x 400, 4 s (the
   // 330 x 200 stage at 400/330); items/include/rook.js 208-222 the same box over
   // a fully revived trant or critter. stop() on frame 115 holds the last frame.
@@ -86,10 +86,10 @@ export const OVERLAYS = Object.freeze({
   rainbow_secretspot: { fla: 'glitch-overlays/rainbow_secretspot.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85, vector: true },
   // items/npc_piggy.js 1964-1971 (and npc_butterfly.js, npc_chicken.js):
   // itemstack_overlay smoke_puff, delta_y 95, 1.5 s; 24 fps, stop() on frame 21.
-  smoke_puff: { fla: 'glitch-overlays/smoke_puff.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85 },
+  smoke_puff: { fla: 'glitch-overlays/smoke_puff.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85, vector: true },
   // items/butler_box.js 114-121 (and item.js 499, location.js 2056 poof_in):
   // itemstack_overlay proto_puff, delta_y 125, 2 s; stop() on frame 46.
-  proto_puff: { fla: 'glitch-overlays/proto_puff.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85 },
+  proto_puff: { fla: 'glitch-overlays/proto_puff.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85, vector: true },
   // locations/inc_race.js 384 winner.show_rainbow('rainbow_winner'):
   // players/player.js 3014-3029, 3056-3058 the same 400 x 400 pc_overlay, 4 s,
   // sound RAINBOW_WINNER (G272).
@@ -108,7 +108,7 @@ export const OVERLAYS = Object.freeze({
   // marker's overlay_cancel 600 ms later: the clip secretLocationMarker loops
   // 'active' (frame 89 gotoAndPlay('active')) and plays 'off' to its stop()
   // on frame 117 when the spot is found.
-  secret_location_marker: { fla: 'glitch-overlays/secret_location_marker.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85, states: { symbol: 'secretLocationMarker', labels: ['active', 'off'] } },
+  secret_location_marker: { fla: 'glitch-overlays/secret_location_marker.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85, states: { symbol: 'secretLocationMarker', labels: ['active', 'off'] }, vector: true },
   // locations/inc_rook.js 455-500 orbAttackAnnc: pc_overlay focusing_orb_attack,
   // delta_y -163, no width (1:1), state orb1 (no one joined), orb2 (1-2),
   // orb3 (3-5), orb4 (6-9) or orbBreak (10+, the orb overloads); each orb
@@ -120,6 +120,7 @@ export const OVERLAYS = Object.freeze({
     step: 1,
     webp: 0.85,
     states: { symbol: 'focusingOrb', labels: ['orb1', 'orb2', 'orb3', 'orb4', 'orbBreak'] },
+    vector: true,
     // A near-white (#FCFCFC) hand-drawn outline sits on the main stage beside
     // the orb clip, in its layer: an authoring sketch, left out (follow-up:
     // confirm against the rook-attack videos).
@@ -128,7 +129,7 @@ export const OVERLAYS = Object.freeze({
   // items/include/icon.js 585-600 showBonus: pc_overlay icon_giant_love, 300 x
   // 300 (the 233 x 233 stage at 1.29), delta_y -30, 3.25 s, sound
   // ICON_GIANT_LOVE (G272).
-  icon_giant_love: { fla: 'glitch-overlays/icon_giant_love.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85 },
+  icon_giant_love: { fla: 'glitch-overlays/icon_giant_love.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85, vector: true },
   // items/catalog_buffs.js 710-722 feeling_called_love on_apply:
   // announce_add_indicator('feeling_called_love', 'amorous_philtre_heart'), one
   // frame (G272; js/features/potions-feature.js draws its own heart for now).
@@ -139,14 +140,14 @@ export const OVERLAYS = Object.freeze({
   // game_splash_screen whose graphic waits on the first frame of its label,
   // you_winner or other_winner, and plays it once the splash has faded in
   // (GameSplashScreenView.as 263-269, 303-309); both labels stop on their last frame.
-  race_winner: { fla: 'glitch-overlays/race_winner.fla', kind: 'sheet', scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'holder', labels: ['other_winner', 'you_winner'] } },
+  race_winner: { fla: 'glitch-overlays/race_winner.fla', kind: 'sheet', scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'holder', labels: ['other_winner', 'you_winner'] }, vector: true },
   // games_end_quoin_grab 1529-1600: Grab 'Em Good's own (text_delta_y 0).
-  grabemgood_winner: { fla: 'glitch-overlays/grabemgood_winner.fla', kind: 'sheet', scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'holder', labels: ['other_winner', 'you_winner'] } },
-  thegreathoghaul_winner: { fla: 'glitch-overlays/thegreathoghaul_winner.fla', kind: 'sheet', scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'holder', labels: ['other_winner', 'you_winner'] } },
+  grabemgood_winner: { fla: 'glitch-overlays/grabemgood_winner.fla', kind: 'sheet', scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'holder', labels: ['other_winner', 'you_winner'] }, vector: true },
+  thegreathoghaul_winner: { fla: 'glitch-overlays/thegreathoghaul_winner.fla', kind: 'sheet', scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'holder', labels: ['other_winner', 'you_winner'] }, vector: true },
   // G304: games_end_it_game 613-730 (Game of Crowns): the same splash, text_delta_y 25,
   // with Play Again and Leave the Game. (crown_game_winner_you / _someone_else are
   // Math Mayhem's vp_overlays, games_end_math_mayhem 1050-1115, not this game's.)
-  game_of_crowns_winner: { fla: 'glitch-overlays/game_of_crowns_winner.fla', kind: 'sheet', scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'holder', labels: ['other_winner', 'you_winner'] } },
+  game_of_crowns_winner: { fla: 'glitch-overlays/game_of_crowns_winner.fla', kind: 'sheet', scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'holder', labels: ['other_winner', 'you_winner'] }, vector: true },
   // G304: the splash's rays (GameSplashScreenView.as 37, 91: new Rays('combinedSlow');
   // Rays.as: the client's own TSEngineAssets/level_up_rays.fla, scene combinedSlow, at
   // SCALE_DEFAULT 1.5). The scene's one frame holds the clip raysCombinedSlow: two

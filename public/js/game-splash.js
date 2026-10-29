@@ -48,9 +48,12 @@
  * only the website's), so the name keeps the outlined label look; the
  * recording shows no shade behind the splash (the street stays full
  * strength), which is what the remake draws.
+ * G448: on a dense screen (more device px per stage px than the 1.5x sheet
+ * has) the graphic is drawn from its SVG frames into a canvas, held until
+ * the splash hides; the sheet stays for 1x screens and as the fallback.
  */
 
-import { OVERLAY_BASE, loadOverlayManifest, sheetCell, stateFrameAt } from './overlay-art.js?v=g448-1';
+import { OVERLAY_BASE, holdVectorArt, loadOverlayManifest, sheetCell, stateFrameAt, vectorDensity } from './overlay-art.js?v=g448-2';
 
 /** An art URL with its content key (js/data-urls.js groddleDataUrl); as it is in Node and on a page without the map. */
 const keyedArt = (url) => (typeof globalThis.groddleDataUrl === 'function' ? globalThis.groddleDataUrl(url) : url);
@@ -240,7 +243,11 @@ export function createGameSplash(opts = {}) {
     win.removeEventListener('resize', place);
     mine.el.classList.add('is-out');
     mine.el.classList.remove('is-in');
-    win.setTimeout(() => mine.el.remove(), SPLASH_FADE_OUT_MS);
+    win.setTimeout(() => {
+      mine.el.remove();
+      // G448: the SVG frames go once the splash has faded out.
+      mine.release?.();
+    }, SPLASH_FADE_OUT_MS);
     setData('gameSplash', '');
   }
 
@@ -257,6 +264,21 @@ export function createGameSplash(opts = {}) {
       meta = null;
     }
     if (mine !== token) return false;
+    const scale = viewScale();
+    const dpr = Math.min(3, Number(win.devicePixelRatio) || 1);
+    const density = meta && typeof win.Image === 'function' ? vectorDensity(meta, scale * dpr) : 0;
+    let vector = null;
+    if (density > 0) {
+      const hold = holdVectorArt(key, meta, density);
+      vector = await hold.ready.then((art) => ({ art, release: hold.release }), () => {
+        hold.release();
+        return null;
+      });
+      if (mine !== token) {
+        vector?.release();
+        return false;
+      }
+    }
     ensureStyle();
     root = doc.createElement('div');
     root.className = 'game-splash';
@@ -265,7 +287,6 @@ export function createGameSplash(opts = {}) {
     root.setAttribute('aria-label', text ? `${text} is the winner` : 'You are the winner');
     (opts.mount?.() || doc.body).appendChild(root);
     place();
-    const scale = viewScale();
     const block = doc.createElement('div');
     block.className = 'game-splash-block';
     const graphic = doc.createElement('div');
@@ -297,6 +318,7 @@ export function createGameSplash(opts = {}) {
     } else setData('gameSplashRays', '');
     const art = doc.createElement('div');
     art.className = 'game-splash-art';
+    let canvas = null;
     const name = doc.createElement('p');
     name.className = 'game-splash-name';
     name.textContent = text;
@@ -305,12 +327,21 @@ export function createGameSplash(opts = {}) {
       const cellW = meta.cell[0] / meta.scale;
       const cellH = meta.cell[1] / meta.scale;
       const rows = Math.ceil((Math.max(...meta.order) + 1) / meta.cols);
-      Object.assign(art.style, {
-        width: `${bw * scale}px`,
-        height: `${bh * scale}px`,
-        backgroundImage: `url("${keyedArt(`${OVERLAY_BASE}${meta.file}`)}")`,
-        backgroundSize: `${meta.cols * cellW * scale}px ${rows * cellH * scale}px`,
-      });
+      Object.assign(art.style, { width: `${bw * scale}px`, height: `${bh * scale}px` });
+      if (vector) {
+        canvas = doc.createElement('canvas');
+        canvas.className = 'game-splash-canvas';
+        canvas.width = Math.max(1, Math.round(bw * scale * dpr));
+        canvas.height = Math.max(1, Math.round(bh * scale * dpr));
+        Object.assign(canvas.style, { position: 'absolute', left: '0px', top: '0px', width: `${bw * scale}px`, height: `${bh * scale}px` });
+        art.appendChild(canvas);
+      } else {
+        Object.assign(art.style, {
+          backgroundImage: `url("${keyedArt(`${OVERLAY_BASE}${meta.file}`)}")`,
+          backgroundSize: `${meta.cols * cellW * scale}px ${rows * cellH * scale}px`,
+        });
+      }
+      setData('gameSplashArt', vector ? 'vector' : 'sheet');
       name.style.top = `${splashTextY(meta, textDeltaY, nameY) * scale}px`;
       name.style.left = `${splashTextX(meta) * scale}px`;
       name.style.setProperty('--splash-name-size', `${Math.round(26 * scale)}px`);
@@ -335,12 +366,24 @@ export function createGameSplash(opts = {}) {
     }
     block.append(graphic, row);
     root.appendChild(block);
-    current = { el: root, buttons, ready: false, raf: 0 };
+    current = { el: root, buttons, ready: false, raf: 0, release: vector?.release || null };
     const cur = current;
+    let shown = -1;
     const drawFrame = (frame) => {
       if (!meta) return;
-      const c = sheetCell(meta, frame);
-      art.style.backgroundPosition = `${-c.x * scale}px ${-c.y * scale}px`;
+      if (vector && canvas) {
+        const cell = meta.vector.order[Math.max(0, Math.min(meta.order.length - 1, frame))];
+        const img = vector.art.imgs[cell];
+        if (cell !== shown && img?.complete) {
+          shown = cell;
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        }
+      } else {
+        const c = sheetCell(meta, frame);
+        art.style.backgroundPosition = `${-c.x * scale}px ${-c.y * scale}px`;
+      }
       setData('gameSplashFrame', String(frame));
     };
     // Waits on the label's first frame (loadGraphic 303-309) until faded in.

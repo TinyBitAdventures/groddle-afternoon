@@ -34,8 +34,8 @@
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { grantMoodXp } from '../mood-xp.js';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
-import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, standPlacement, trackOverlay } from '../overlay-art.js?v=g448-1';
-import { vpOverlay } from '../quest-rooms/vp-overlay.js?v=g448-1';
+import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, standPlacement, trackOverlay } from '../overlay-art.js?v=g448-2';
+import { vpOverlay } from '../quest-rooms/vp-overlay.js?v=g448-2';
 import {
   GAME_BOX,
   GAME_STAGES,

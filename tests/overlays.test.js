@@ -60,7 +60,12 @@ after(() => {
   }
 });
 
-const overlays = () => import('../public/js/overlays.js?v=g448-1');
+/** G448: the overlays-more rows that also keep SVG frames (besides the rainbows). */
+const G448_MORE = ['321_countdown', 'rook_feathers_falling', 'musicblock_notes', 'target_effect_powder_extreme', 'target_effect_powder_mild', 'glitchmas_cracker', 'shrine_power_up', 'phantom_glitch', 'avatar_power_up'];
+/** G448: the overlays.json rows that do. */
+const G448_ART = ['overlay_sneezing_powder', 'focusing_orb_laser_beam', 'shrine_laser_beam_1', 'shrine_laser_beam_2', 'shrine_laser_beam_3', 'smoke_puff', 'proto_puff', 'secret_location_marker', 'icon_giant_love', 'race_winner', 'grabemgood_winner', 'thegreathoghaul_winner', 'game_of_crowns_winner', 'focusing_orb_attack'];
+
+const overlays = () => import('../public/js/overlays.js?v=g448-2');
 const flush = async (n = 3) => {
   for (let i = 0; i < n; i += 1) {
     await new Promise((r) => setTimeout(r, 0));
@@ -276,8 +281,8 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
     assert.equal(data.frames.length, r.vector.frames);
     // 0.82 MB as built (about 100 KB gzipped), under the 1.3 MB sheet.
     assert.ok(readFileSync(vfile).length < 1_000_000);
-    // G446: every 400 px rainbow (and the charades arc), nothing else.
-    for (const [key, m] of Object.entries(manifest)) assert.equal(Boolean(m.vector), /^rainbow_|^charades_gameover$/.test(key), key);
+    // G446: every 400 px rainbow (and the charades arc); G448: the other FLA overlays the audit found soft.
+    for (const [key, m] of Object.entries(manifest)) assert.equal(Boolean(m.vector), /^rainbow_|^charades_gameover$/.test(key) || G448_MORE.includes(key), key);
   });
 
   it('vectorDensity: the sheet on a 1x screen, the SVG frames from 1.5 device px per stage px, capped', async () => {
@@ -368,7 +373,7 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
     // Nothing shows the race winner's rainbow (desk decisions), so it has no SVG frames.
     assert.ok(!art.rainbow_winner.vector);
     for (const f of ['player-verbs-mp-feature', 'rook-attack-feature', 'secret-spots-feature']) assert.match(read(`js/features/${f}.js`), /resolution: engine\.resolution \|\| 1/, f);
-    const oa = await import('../public/js/overlay-art.js?v=g448-1');
+    const oa = await import('../public/js/overlay-art.js?v=g448-2');
     const ov = await overlays();
     assert.equal(ov.vectorDensity, oa.vectorDensity, 'one vector path');
     const y = art.rainbow_youdidit;
@@ -502,6 +507,80 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
     }
   });
 
+  it('G448: the powders, notes, splashes, countdown, puffs, marker, giant love, cracker, Rook overlays and the phantom keep SVG frames, states and all', () => {
+    const art = JSON.parse(readFileSync(join(pub, 'assets/sprites/overlays/overlays.json'), 'utf8'));
+    for (const [rows, keys] of [[manifest, G448_MORE], [art, G448_ART]]) {
+      for (const key of keys) {
+        const m = rows[key];
+        assert.equal(m.vector.file, `${key}.frames.json`, key);
+        assert.equal(m.vector.order.length, m.frames, key);
+        const data = readFileSync(join(pub, 'assets/sprites/overlays', m.vector.file));
+        assert.equal(data.length, m.vector.bytes, key);
+        assert.equal(JSON.parse(data).frames.length, m.vector.frames, key);
+        assert.ok(data.length < 2_100_000, key);
+      }
+    }
+    // Every overlays.json row with SVG frames is a G446 rainbow or one of these.
+    for (const [key, m] of Object.entries(art)) assert.equal(Boolean(m.vector), /^rainbow_(youdidit|fullyrevived|secretspot)$/.test(key) || G448_ART.includes(key), key);
+    // game.js sets the default resolution, so callers that pass none (puffs, the marker, giant love) draw them too.
+    assert.match(read('game.js'), /setOverlayResolution\(\(\) => app\?\.renderer\?\.resolution \|\| 1\)/);
+  });
+
+  it('G448: vectorFrameSvgs keeps the shared glow filters a frame uses (the cracker\'s pull hand)', async () => {
+    const { vectorFrameSvgs } = await overlays();
+    const data = JSON.parse(readFileSync(join(pub, 'assets/sprites/overlays/glitchmas_cracker.frames.json'), 'utf8'));
+    const svgs = vectorFrameSvgs(data, 100, 50);
+    const withFilter = svgs.filter((svg) => /filter="url\(#_f\d+\)"/.test(svg));
+    assert.ok(withFilter.length > 0);
+    for (const svg of withFilter) for (const m of svg.matchAll(/filter="url\(#(_f\d+)\)"/g)) assert.match(svg, new RegExp(`<filter id="${m[1]}"`));
+  });
+
+  it('G448: playOverlay uses the default resolution when given none; the countdown window overlay draws SVG frames on a dense screen', async () => {
+    const ov = await overlays();
+    const oa = await import('../public/js/overlay-art.js?v=g448-2');
+    const m = manifest['321_countdown'];
+    const vtext = readFileSync(join(pub, 'assets/sprites/overlays', m.vector.file), 'utf8');
+    const savedFetch = globalThis.fetch;
+    const savedImage = globalThis.Image;
+    const savedDoc = globalThis.document;
+    const savedDpr = globalThis.devicePixelRatio;
+    const draws = [];
+    globalThis.fetch = async (url) => (String(url).includes(m.vector.file) ? { ok: true, json: async () => JSON.parse(vtext) } : savedFetch(url));
+    globalThis.Image = class { constructor() { this.complete = true; } async decode() {} set src(v) { this._src = v; queueMicrotask(() => this.onload?.()); } get src() { return this._src; } };
+    const host = { clientWidth: 960, clientHeight: 540, children: [], appendChild(c) { this.children.push(c); c.isConnected = true; } };
+    globalThis.document = { ...savedDoc, getElementById: () => null, createElement: () => ({ width: 0, height: 0, dataset: {}, style: { setProperty() {} }, isConnected: false, getContext: () => ({ clearRect() {}, drawImage: (img, ...a) => draws.push(a.length) }), remove() { this.isConnected = false; } }) };
+    try {
+      const play = async (dpr, scale) => {
+        globalThis.devicePixelRatio = dpr;
+        draws.length = 0;
+        const h = ov.playWindowOverlay('321_countdown', { host, rect: { left: 0, top: 0, width: 960, height: 540, scale }, wh: 350, durationMs: 4000, loop: false, holdMs: 1000 });
+        await flush(6);
+        h.stop();
+        await flush(2);
+        await h.done;
+        return { h, draws: [...draws] };
+      };
+      const dense = await play(2, 1.6);
+      assert.equal(dense.h.art, 'vector');
+      assert.equal(dense.draws[0], 4, 'the whole SVG frame, not a sheet cell');
+      const flat = await play(1, 1);
+      assert.equal(flat.h.art, 'sheet');
+      assert.equal(flat.draws[0], 8);
+      // No resolution passed: the one set by game.js.
+      oa.setOverlayResolution(() => 3.3);
+      assert.equal(oa.defaultOverlayResolution(), 3.3);
+      oa.setOverlayResolution(() => 'x');
+      assert.equal(oa.defaultOverlayResolution(), 1);
+      oa.setOverlayResolution(null);
+    } finally {
+      globalThis.fetch = savedFetch;
+      globalThis.Image = savedImage;
+      globalThis.document = savedDoc;
+      if (savedDpr === undefined) delete globalThis.devicePixelRatio;
+      else globalThis.devicePixelRatio = savedDpr;
+    }
+  });
+
   it('game.js hands the renderer\'s resolution to the rainbows', () => {
     const game = read('game.js');
     assert.match(game, /showRainbow\(PIXI, key, \{.*resolution: app\?\.renderer\?\.resolution \|\| 1 \}\)/);
@@ -514,7 +593,7 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
 describe('wiring', () => {
   const game = read('game.js');
   it('game.js: quoin limit, super harvest, wheel and donation rainbows; musicblock notes; the phantom; the solo Hog Haul countdown', () => {
-    assert.match(game, /import \{[^}]*showRainbow[^}]*\} from '\.\/js\/overlays\.js\?v=g448-1'/);
+    assert.match(game, /import \{[^}]*showRainbow[^}]*\} from '\.\/js\/overlays\.js\?v=g448-2'/);
     assert.match(game, /playerRainbow\(result\.dailyLimit === 150 \? 'rainbow_150coinstoday' : 'rainbow_100coinstoday'\)/);
     assert.match(game, /if \(!paradiseRun\) playerRainbow/);
     assert.match(game, /playerRainbow\('rainbow_superharvest'/);

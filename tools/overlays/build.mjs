@@ -74,7 +74,7 @@ export const OVERLAYS = Object.freeze({
   rainbow_superdonation: rainbow('rainbow_superdonation'),
   charades_gameover: rainbow('charades_gameover'),
   // G394: 350 px over the 362 x 199 stage; the one main frame holds the 106-frame 321go clip (stop()).
-  '321_countdown': { fla: fla('321_countdown'), scale: 1.5, step: 1, webp: 0.85 },
+  '321_countdown': { fla: fla('321_countdown'), scale: 1.5, step: 1, webp: 0.85, vector: true },
   // G373 fox_bait.js 127-138: 150 x 150.
   fox_bait_ignite: { fla: fla('fox_bait_ignite'), scale: 1.5, step: 1, webp: 0.85 },
   // G372 dust_trap.js organelleOverlay 214-233.
@@ -83,30 +83,30 @@ export const OVERLAYS = Object.freeze({
   super_old_mitochondrial_dna: small('super_old_mitochondrial_dna'),
   golgi_apparatus: small('golgi_apparatus'),
   // G377: the feathers clip plays once (stop()); the dice and the 12-sided die have states.
-  rook_feathers_falling: { fla: fla('rook_feathers_falling'), scale: 1, step: 1, webp: 0.85 },
+  rook_feathers_falling: { fla: fla('rook_feathers_falling'), scale: 1, step: 1, webp: 0.85, vector: true },
   dice_overlay: small('dice_overlay', { scale: 1.5, states: { symbol: 'diceOverlay', labels: ['spin', 'roll1', 'roll2', 'roll3', 'roll4', 'roll5', 'roll6'] } }),
   twelve_sided_die: small('twelve_sided_die', {
     scale: 1.5,
     states: { symbol: 'twelveSidedDie', labels: ['spin', 'roll_alph', 'roll_cosma', 'roll_friendly', 'roll_grendaline', 'roll_humbaba', 'roll_lem', 'roll_mab', 'roll_pot', 'roll_spriggan', 'roll_ti', 'roll_zille', 'roll_rook'] },
   }),
   // G378 (jellisac_splatter_on_shrine waits on the Jellisac Hands slather verb; not built).
-  musicblock_notes: small('musicblock_notes'),
+  musicblock_notes: small('musicblock_notes', { vector: true }),
   // G379.
   petrified_rock_open_overlay: { fla: fla('petrified_rock_open_overlay'), scale: 1.5, step: 1, webp: 0.85 },
   // G380: 300 px over the ~200 px stages.
-  target_effect_powder_extreme: { fla: fla('target_effect_powder_extreme'), scale: 1.5, step: 1, webp: 0.85 },
-  target_effect_powder_mild: { fla: fla('target_effect_powder_mild'), scale: 1.5, step: 1, webp: 0.85 },
+  target_effect_powder_extreme: { fla: fla('target_effect_powder_extreme'), scale: 1.5, step: 1, webp: 0.85, vector: true },
+  target_effect_powder_mild: { fla: fla('target_effect_powder_mild'), scale: 1.5, step: 1, webp: 0.85, vector: true },
   // G381: waiting loops, grab plays into pull.
-  glitchmas_cracker: { fla: fla('glitchmas_cracker'), scale: 1, step: 1, webp: 0.85, states: { symbol: 'glitchmasCracker', labels: ['waiting', 'grab'] } },
+  glitchmas_cracker: { fla: fla('glitchmas_cracker'), scale: 1, step: 1, webp: 0.85, states: { symbol: 'glitchmasCracker', labels: ['waiting', 'grab'] }, vector: true },
   // G382 (click_to_prime is left out: it is the clickable prompt to prime, not built).
   click_to_donate: { fla: fla('click_to_donate'), scale: 1.5, step: 1, webp: 0.85 },
-  shrine_power_up: { fla: fla('shrine_power_up'), scale: 1, step: 1, webp: 0.85, states: { symbol: 'shrinePowerUp', labels: ['charge', 'ready', 'off'] } },
+  shrine_power_up: { fla: fla('shrine_power_up'), scale: 1, step: 1, webp: 0.85, states: { symbol: 'shrinePowerUp', labels: ['charge', 'ready', 'off'] }, vector: true },
   // G391: the Hell Hole hint arrow (75 px over the 140 px stage).
   right_arrow: { fla: fla('right_arrow'), scale: 1, step: 1, webp: 0.85 },
   // G389.
-  phantom_glitch: { fla: fla('phantom_glitch'), scale: 1.25, step: 1, webp: 0.85 },
+  phantom_glitch: { fla: fla('phantom_glitch'), scale: 1.25, step: 1, webp: 0.85, vector: true },
   // G390: charge, ready, off.
-  avatar_power_up: { fla: fla('avatar_power_up'), scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'avatarPowerUp', labels: ['charge', 'ready', 'off'] } },
+  avatar_power_up: { fla: fla('avatar_power_up'), scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'avatarPowerUp', labels: ['charge', 'ready', 'off'] }, vector: true },
   // G392.
   tower_sign_scaffolding_overlay: small('tower_sign_scaffolding_overlay'),
   // G393: the new player's skill cards (one frame each; art only, the flow is Austin's call). The

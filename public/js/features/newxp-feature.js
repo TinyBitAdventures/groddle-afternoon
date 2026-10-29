@@ -126,7 +126,7 @@ import { locationEventsApi } from './location-events-feature.js?v=location-event
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
-import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g448-1';
+import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g448-2';
 import { HOME_MACHINE } from '../home-ticket.js?v=g449-1';
 import { createAnimalState } from '../animals.js?v=g414-1';
 import {

@@ -32,6 +32,7 @@ import {
   VECTOR_MAX_SIDE,
   VECTOR_LINGER_MS,
   VECTOR_OVER_SHEET,
+  defaultOverlayResolution,
   holdVectorArt,
   holdVectorTexture,
   overlayAlpha,
@@ -45,13 +46,13 @@ import {
   vectorArtStats,
   vectorDensity,
   vectorFrameSvgs,
-} from './overlay-art.js?v=g448-1';
+} from './overlay-art.js?v=g448-2';
 
 // G446: the SVG-frame helpers live in overlay-art.js (playSheetOverlay draws its rainbows the same way).
 // G448: an overlay holds its decoded frames only while it plays (holdVectorTexture).
 export { VECTOR_LINGER_MS, VECTOR_MAX_SIDE, VECTOR_OVER_SHEET, holdVectorArt, overlayDensity, vectorArtStats, vectorDensity, vectorFrameSvgs };
 
-export const MORE_MANIFEST_URL = `${OVERLAY_BASE}overlays-more.json?v=g446-2`;
+export const MORE_MANIFEST_URL = `${OVERLAY_BASE}overlays-more.json?v=g448-2`;
 
 /** show_rainbow (players/player.js 3014-3029): pc_overlay, 400 x 400 at the avatar, delta 0, 4 s. */
 export const RAINBOW = Object.freeze({ wh: 400, durationMs: 4000 });
@@ -140,11 +141,11 @@ export function timelineMs(meta) {
  * read every frame so it follows an avatar or a stack); `wh` fits the stage
  * (0: 1:1); `durationMs` 0 plays until stop() (or `alive()` turns false).
  * `holdMs` freezes it at that moment for screenshots. `resolution` (the
- * renderer's, device px per world px) lets a row with SVG frames draw them
- * on a dense screen (vectorDensity; handle.art says which: 'sheet' or
+ * renderer's, device px per world px; G448: defaultOverlayResolution when
+ * not given) lets a row with SVG frames draw them on a dense screen (vectorDensity; handle.art says which: 'sheet' or
  * 'vector'). Returns { sprite, stop(), setState(name), done, cancelled, art }.
  */
-export function playOverlay(PIXI, key, { layer, at, wh = 0, durationMs = 2000, loop = true, delayMs = 0, holdMs = null, zIndex = 100000, state = null, alive = null, onFrame = null, resolution = 1 } = {}) {
+export function playOverlay(PIXI, key, { layer, at, wh = 0, durationMs = 2000, loop = true, delayMs = 0, holdMs = null, zIndex = 100000, state = null, alive = null, onFrame = null, resolution = null } = {}) {
   const handle = {
     key,
     sprite: null,
@@ -175,7 +176,7 @@ export function playOverlay(PIXI, key, { layer, at, wh = 0, durationMs = 2000, l
   handle.done = loadMoreOverlays().then(async (manifest) => {
     const meta = manifest?.[key];
     const layerScale = Math.hypot(layer?.worldTransform?.a ?? 1, layer?.worldTransform?.b ?? 0) || 1;
-    const density = meta ? vectorDensity(meta, overlayDensity(meta, { wh, resolution, layerScale })) : 0;
+    const density = meta ? vectorDensity(meta, overlayDensity(meta, { wh, resolution: resolution ?? defaultOverlayResolution(), layerScale })) : 0;
     let vector = null;
     if (density > 0 && typeof Image === 'function') {
       vector = await holdVectorTexture(PIXI, key, meta, density);
@@ -243,7 +244,7 @@ export function playOverlay(PIXI, key, { layer, at, wh = 0, durationMs = 2000, l
  * show_rainbow(key, delay) at an avatar: the 400 x 400 pc_overlay for 4 s,
  * held on its last frame (the rainbow SWFs stop() on frame 115).
  */
-export function showRainbow(PIXI, key, { layer, at, delayMs = null, holdMs = null, resolution = 1 } = {}) {
+export function showRainbow(PIXI, key, { layer, at, delayMs = null, holdMs = null, resolution = null } = {}) {
   const use = OVERLAY_USES[key] || RAINBOW;
   return playOverlay(PIXI, key, { layer, at, wh: RAINBOW.wh, durationMs: RAINBOW.durationMs, loop: false, delayMs: delayMs ?? use.delayMs ?? 0, holdMs, resolution });
 }
@@ -305,12 +306,14 @@ export function windowPlacement(meta, rect, { wh = 0, x = 0.5, y = 0.5, topY = n
  * Play a sheet over the location viewport (vp_overlay) inside `host` (an
  * element positioned over the view; default #game-root with locationRect()).
  * `place(meta, rect)` may return its own { left, top, width, height } (CSS px
- * in the host). durationMs 0 plays until stop(). Returns { canvas, stop(),
- * setState(), done } (done: true once played, false when stopped or the art
- * is missing, null when a street change cancelled it).
+ * in the host). durationMs 0 plays until stop(). A row with SVG frames
+ * draws those when the canvas has more device px per stage px than the
+ * sheet (G448, the 321 countdown; handle.art 'vector' or 'sheet'). Returns
+ * { canvas, stop(), setState(), done, art } (done: true once played, false
+ * when stopped or the art is missing, null when a street change cancelled it).
  */
 export function playWindowOverlay(key, { host = null, rect = null, place = null, wh = 0, x = 0.5, y = 0.5, topY = null, durationMs = 2000, loop = true, state = null, holdMs = null, zIndex = 86, className = 'overlay-more' } = {}) {
-  const handle = { key, canvas: null, stopped: false, cancelled: false, state, stateAt: null, done: null,
+  const handle = { key, canvas: null, stopped: false, cancelled: false, state, stateAt: null, done: null, art: null,
     stop() { handle.stopped = true; },
     setState(name) { if (name !== handle.state) { handle.state = name; handle.stateAt = null; } } };
   const doc = globalThis.document;
@@ -324,18 +327,35 @@ export function playWindowOverlay(key, { host = null, rect = null, place = null,
   handle.done = loadMoreOverlays().then(async (manifest) => {
     const meta = manifest?.[key];
     if (!meta) return false;
-    const img = await sheetImage(meta);
-    if (handle.stopped) return false;
-    if (handle.cancelled) return null;
     const r = rect || (host ? { left: 0, top: 0, width: host.clientWidth, height: host.clientHeight, scale: locationRect(doc)?.scale || 1 } : locationRect(doc));
     if (!r) return false;
     const at = place ? place(meta, r) : windowPlacement(meta, r, { wh, x, y, topY });
     const dpr = Math.min(2, globalThis.devicePixelRatio || 1);
+    const cw = Math.max(1, Math.round(at.width * dpr));
+    const ch = Math.max(1, Math.round(at.height * dpr));
+    // G448: a row with SVG frames draws them when the canvas asks for more than the sheet has.
+    const density = typeof Image === 'function' ? vectorDensity(meta, cw / Math.max(1, meta.box[2])) : 0;
+    let vector = null;
+    if (density > 0) {
+      const hold = holdVectorArt(key, meta, density);
+      vector = await hold.ready.then((art) => ({ art, release: hold.release }), () => {
+        hold.release();
+        return null;
+      });
+    }
+    // The sheet only when there are no SVG frames to draw (or they failed).
+    const img = vector ? null : await sheetImage(meta);
+    if (handle.stopped || handle.cancelled) {
+      vector?.release();
+      return handle.stopped ? false : null;
+    }
     const canvas = doc.createElement('canvas');
     canvas.className = className;
     canvas.dataset.overlay = key;
-    canvas.width = Math.max(1, Math.round(at.width * dpr));
-    canvas.height = Math.max(1, Math.round(at.height * dpr));
+    canvas.dataset.overlayArt = vector ? 'vector' : 'sheet';
+    handle.art = vector ? 'vector' : 'sheet';
+    canvas.width = cw;
+    canvas.height = ch;
     Object.assign(canvas.style, { position: 'absolute', left: `${(host ? 0 : r.left) + at.left}px`, top: `${(host ? 0 : r.top) + at.top}px`, pointerEvents: 'none', zIndex: String(zIndex), opacity: '0' });
     canvas.style.setProperty('width', `${at.width}px`, 'important');
     canvas.style.setProperty('height', `${at.height}px`, 'important');
@@ -354,16 +374,20 @@ export function playWindowOverlay(key, { host = null, rect = null, place = null,
         const ms = holdMs != null ? holdMs : (globalThis.performance?.now?.() ?? Date.now()) - t0;
         if (handle.stopped || handle.cancelled || !canvas.isConnected || (holdMs == null && ms >= life)) {
           canvas.remove();
+          vector?.release();
           resolve(handle.cancelled ? null : !handle.stopped);
           return;
         }
         if (handle.stateAt == null) handle.stateAt = holdMs != null ? 0 : ms;
         const frame = moreFrameAt(meta, ms - handle.stateAt, { state: handle.state, loop });
-        const cell = meta.order[Math.min(meta.order.length - 1, frame)];
-        if (cell !== shown) {
+        const f = Math.min(meta.order.length - 1, frame);
+        const cell = vector ? meta.vector.order[f] : meta.order[f];
+        const svg = vector?.art.imgs[cell];
+        if (cell !== shown && (!vector || svg?.complete)) {
           shown = cell;
           ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, (cell % meta.cols) * cellW, Math.floor(cell / meta.cols) * cellH, cellW, cellH, 0, 0, canvas.width, canvas.height);
+          if (vector) ctx.drawImage(svg, 0, 0, canvas.width, canvas.height);
+          else ctx.drawImage(img, (cell % meta.cols) * cellW, Math.floor(cell / meta.cols) * cellH, cellW, cellH, 0, 0, canvas.width, canvas.height);
         }
         canvas.dataset.overlayFrame = String(frame);
         canvas.style.opacity = String(holdMs != null || forever ? Math.min(1, ms / OVERLAY_FADE.inMs) : overlayAlpha(ms, durationMs));

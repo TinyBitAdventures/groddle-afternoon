@@ -2665,9 +2665,14 @@
   ]
  },
  "git": {
-  "commits": 746,
+  "commits": 747,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "A rainbow lets its decoded SVG frames go once it ends"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2782,11 +2787,6 @@
     "date": "2026-10-29",
     "kind": "improve",
     "text": "The Visiting Stone, project signs, notice boards, home furniture and other world items draw sharp"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "new",
-    "text": "183 street decos Tiny Speck drew but the game never shipped, on 695 streets"
    }
   ]
  },
