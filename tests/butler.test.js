@@ -69,10 +69,10 @@ import {
 } from '../public/js/butler.js';
 import { canOptIn, stoneVog, STONE_TEXT } from '../public/js/street-furniture.js';
 import { NEIGHBOURS, neighbourById, normalizeNeighbourState, visitorLetter } from '../public/js/neighbours.js';
-import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js?v=g431-1';
+import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js?v=g430-1';
 // The URL clubhouse.js imports, so these share its Butler.
-import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=g431-1';
-import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js?v=g431-1';
+import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=g430-1';
+import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js?v=g430-1';
 import { BUTLER_FEET, ButlerPainter, clipRange, drawList } from '../public/js/butler-rig.js';
 import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
@@ -361,7 +361,8 @@ describe('copy and source numbers', () => {
 
   it('ships only the loading fallback (Look 1 idle0 + walk4), every clip standing in on it, at the measured grid', () => {
     const dir = join(PUBLIC, 'assets/sprites/butler');
-    const sheets = readdirSync(dir).filter((f) => f.endsWith('.webp')).sort();
+    // butler_box@3x.webp is the box's sharp twin (tools/vector-sprites/stills.json), not a clip.
+    const sheets = readdirSync(dir).filter((f) => f.endsWith('.webp') && !/@\d+x\.webp$/.test(f)).sort();
     assert.deepEqual(sheets, BUTLER_FALLBACK.clips.map((c) => `butler_${BUTLER_FALLBACK.look}_${c}.webp`).sort());
     assert.deepEqual([fallbackClip('walk3'), fallbackClip('stepBack'), fallbackClip('wave'), fallbackClip('turnBack'), fallbackClip('walk4')], ['walk4', 'walk4', 'idle0', 'idle0', 'walk4']);
     for (const look of BUTLER_LOOKS) {
@@ -436,7 +437,7 @@ describe('Visiting Stone hand-off (street-furniture.js)', () => {
 
   it('wires the feature through one import line and the delivery hand-off', () => {
     const index = readFileSync(join(PUBLIC, 'js/features/index.js'), 'utf8');
-    assert.match(index, /import \{ butlerFeature \} from '\.\/butler-feature\.js\?v=g431-1'; FEATURES\.push\(butlerFeature\);/);
+    assert.match(index, /import \{ butlerFeature \} from '\.\/butler-feature\.js\?v=g430-1'; FEATURES\.push\(butlerFeature\);/);
     const sf = readFileSync(join(PUBLIC, 'js/features/street-furniture-feature.js'), 'utf8');
     assert.match(sf, /butlerApi\.receiveVisitor\(engine, letter\)\) engine\.deliverMail\?\.\(letter\)/);
     assert.match(sf, /optInDone\(butlerApi\.label\(\) \|\| STONE_BUTLER_STANDIN\)/);

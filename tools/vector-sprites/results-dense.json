@@ -2721,5 +2721,39 @@
    0.9927,
    0.9619
   ]
+ },
+ "assets/sprites/spinning-wheel/stoot-doll.png": {
+  "animal": "stoot-doll",
+  "swf": "rare_items/stoot_barfield_pullstring_doll/stoot_barfield_pullstring_doll.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 59,
+  "fh": 59,
+  "mirror": false,
+  "shift": 0,
+  "density": 5,
+  "offset": [
+   -295,
+   -291
+  ],
+  "cols": 1,
+  "first": 0,
+  "score": 0.9828,
+  "minFrame": 0.9828,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/spinning-wheel/stoot-doll@5x.webp",
+  "bytes": 37794,
+  "frameScores": [
+   0.9828
+  ]
  }
 }

@@ -1,0 +1,996 @@
+{
+ "about": "World still items the stills sweep (lane SPRITES, 2026-10-29) found drawn at 1.5+ need/available at 3 device px per world px, each from its own CC0 SWF in glitch-items: the Visiting Stone, notes, gift boxes, notice boards and the left mailbox (features/street-furniture-feature.js), the home furniture base pieces (furniture/furniture_base and bag_furniture_cabinet_base, js/home-decor.js), the street-job sign stake, the Party ATM, the Rook Hall speaker and the Butler's box (js/butler.js BUTLER_BOX_ART). Root-timeline items render from a copy with a padded stage (padStage). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/stills.json",
+ "firstDraw": true,
+ "jobs": [
+  {
+   "name": "visiting-stone",
+   "swf": "misc/visiting_stone/visiting_stone.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/street-furniture/visiting-stone.png",
+     "fw": 101,
+     "fh": 155,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "note-world",
+   "swf": "misc/note/note.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/street-furniture/note-world.png",
+     "fw": 45,
+     "fh": 14,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 2,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "gift-box-wrapped",
+   "swf": "misc/bag_gift_box/bag_gift_box_wrapped/bag_gift_box_wrapped.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/street-furniture/gift-box-wrapped.png",
+     "fw": 52,
+     "fh": 49,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "gift-box-open",
+   "swf": "misc/bag_generic/bag_gift_box/bag_gift_box.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/street-furniture/gift-box-open.png",
+     "fw": 56,
+     "fh": 49,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "notice-board",
+   "swf": "misc/bag_notice_board/bag_notice_board.swf",
+   "sprite": 13,
+   "sheets": [
+    {
+     "path": "assets/sprites/street-furniture/notice-board-m0.png",
+     "label": "m0",
+     "fw": 212,
+     "fh": 147,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/street-furniture/notice-board-m1.png",
+     "label": "m1",
+     "fw": 212,
+     "fh": 147,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/street-furniture/notice-board-m2.png",
+     "label": "m2",
+     "fw": 212,
+     "fh": 147,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/street-furniture/notice-board-m3.png",
+     "label": "m3",
+     "fw": 212,
+     "fh": 147,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/street-furniture/notice-board-m4.png",
+     "label": "m4",
+     "fw": 212,
+     "fh": 147,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/street-furniture/notice-board-m5.png",
+     "label": "m5",
+     "fw": 212,
+     "fh": 147,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/street-furniture/notice-board-m6.png",
+     "label": "m6",
+     "fw": 212,
+     "fh": 147,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/street-furniture/notice-board-m7.png",
+     "label": "m7",
+     "fw": 212,
+     "fh": 147,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/street-furniture/notice-board-m8.png",
+     "label": "m8",
+     "fw": 212,
+     "fh": 147,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/street-furniture/notice-board-m9.png",
+     "label": "m9",
+     "fw": 212,
+     "fh": 147,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/street-furniture/notice-board-m10.png",
+     "label": "m10",
+     "fw": 212,
+     "fh": 147,
+     "cols": 1,
+     "frames": 1
+    }
+   ]
+  },
+  {
+   "name": "mailbox-left",
+   "swf": "misc/npc/npc_mailbox/npc_mailbox.swf",
+   "sprite": 28,
+   "sheets": [
+    {
+     "path": "assets/sprites/street-furniture/mailbox-left-idle.png",
+     "label": "idle",
+     "fw": 97,
+     "fh": 146,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/street-furniture/mailbox-left-has-mail-idle.png",
+     "label": "has_mail_idle",
+     "fw": 97,
+     "fh": 146,
+     "cols": 1,
+     "frames": 1
+    },
+    {
+     "path": "assets/sprites/street-furniture/mailbox-left-has-mail.png",
+     "label": "has_mail",
+     "fw": 97,
+     "fh": 146,
+     "cols": 10,
+     "frames": 73
+    },
+    {
+     "path": "assets/sprites/street-furniture/mailbox-left-interact.png",
+     "label": "interact",
+     "fw": 97,
+     "fh": 146,
+     "cols": 9,
+     "frames": 9
+    },
+    {
+     "path": "assets/sprites/street-furniture/mailbox-left-all-done.png",
+     "label": "all_done",
+     "fw": 97,
+     "fh": 146,
+     "cols": 8,
+     "frames": 22
+    }
+   ]
+  },
+  {
+   "name": "bag_furniture_sdb",
+   "swf": "furniture/furniture_base/bag_furniture_sdb/bag_furniture_sdb.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/bag_furniture_sdb.png",
+     "fw": 67,
+     "fh": 70,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_armchair",
+   "swf": "furniture/furniture_base/furniture_armchair/furniture_armchair.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_armchair.png",
+     "fw": 118,
+     "fh": 90,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_bed",
+   "swf": "furniture/furniture_base/furniture_bed/furniture_bed.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_bed.png",
+     "fw": 284,
+     "fh": 112,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_bench",
+   "swf": "furniture/furniture_base/furniture_bench/furniture_bench.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_bench.png",
+     "fw": 224,
+     "fh": 53,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_bookcase",
+   "swf": "furniture/furniture_base/furniture_bookcase/furniture_bookcase.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_bookcase.png",
+     "fw": 149,
+     "fh": 159,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_cabinet",
+   "swf": "furniture/furniture_base/furniture_cabinet/furniture_cabinet.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_cabinet.png",
+     "fw": 158,
+     "fh": 169,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_ceilingdeco",
+   "swf": "furniture/furniture_base/furniture_ceilingdeco/furniture_ceilingdeco.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_ceilingdeco.png",
+     "fw": 71,
+     "fh": 84,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_ceilinglamp",
+   "swf": "furniture/furniture_base/furniture_ceilinglamp/furniture_ceilinglamp.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_ceilinglamp.png",
+     "fw": 82,
+     "fh": 51,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_chair",
+   "swf": "furniture/furniture_base/furniture_chair/furniture_chair.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_chair.png",
+     "fw": 72,
+     "fh": 93,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_coffeetable",
+   "swf": "furniture/furniture_base/furniture_coffeetable/furniture_coffeetable.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_coffeetable.png",
+     "fw": 258,
+     "fh": 62,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_counter",
+   "swf": "furniture/furniture_base/furniture_counter/furniture_counter.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_counter.png",
+     "fw": 198,
+     "fh": 81,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_desk",
+   "swf": "furniture/furniture_base/furniture_desk/furniture_desk.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_desk.png",
+     "fw": 168,
+     "fh": 72,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_floorlamp",
+   "swf": "furniture/furniture_base/furniture_floorlamp/furniture_floorlamp.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_floorlamp.png",
+     "fw": 50,
+     "fh": 176,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_lamp",
+   "swf": "furniture/furniture_base/furniture_lamp/furniture_lamp.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_lamp.png",
+     "fw": 89,
+     "fh": 57,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_largebackfloordeco",
+   "swf": "furniture/furniture_base/furniture_largebackfloordeco/furniture_largebackfloordeco.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_largebackfloordeco.png",
+     "fw": 118,
+     "fh": 166,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_largefrontfloordeco",
+   "swf": "furniture/furniture_base/furniture_largefrontfloordeco/furniture_largefrontfloordeco.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_largefrontfloordeco.png",
+     "fw": 155,
+     "fh": 143,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_largetabledeco",
+   "swf": "furniture/furniture_base/furniture_largetabledeco/furniture_largetabledeco.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_largetabledeco.png",
+     "fw": 99,
+     "fh": 83,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_largewalldeco",
+   "swf": "furniture/furniture_base/furniture_largewalldeco/furniture_largewalldeco.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_largewalldeco.png",
+     "fw": 88,
+     "fh": 134,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_largewindow",
+   "swf": "furniture/furniture_base/furniture_largewindow/furniture_largewindow.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_largewindow.png",
+     "fw": 93,
+     "fh": 117,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_loveseat",
+   "swf": "furniture/furniture_base/furniture_loveseat/furniture_loveseat.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_loveseat.png",
+     "fw": 180,
+     "fh": 99,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_painting",
+   "swf": "furniture/furniture_base/furniture_painting/furniture_painting.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_painting.png",
+     "fw": 77,
+     "fh": 113,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_roomdeco",
+   "swf": "furniture/furniture_base/furniture_roomdeco/furniture_roomdeco.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_roomdeco.png",
+     "fw": 118,
+     "fh": 166,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_rug",
+   "swf": "furniture/furniture_base/furniture_rug/furniture_rug.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_rug.png",
+     "fw": 211,
+     "fh": 65,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_shelf",
+   "swf": "furniture/furniture_base/furniture_shelf/furniture_shelf.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_shelf.png",
+     "fw": 233,
+     "fh": 47,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_sidetable",
+   "swf": "furniture/furniture_base/furniture_sidetable/furniture_sidetable.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_sidetable.png",
+     "fw": 62,
+     "fh": 54,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_smallbackfloordeco",
+   "swf": "furniture/furniture_base/furniture_smallbackfloordeco/furniture_smallbackfloordeco.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_smallbackfloordeco.png",
+     "fw": 93,
+     "fh": 86,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_smallfrontfloordeco",
+   "swf": "furniture/furniture_base/furniture_smallfrontfloordeco/furniture_smallfrontfloordeco.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_smallfrontfloordeco.png",
+     "fw": 58,
+     "fh": 93,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_smalltabledeco",
+   "swf": "furniture/furniture_base/furniture_smalltabledeco/furniture_smalltabledeco.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_smalltabledeco.png",
+     "fw": 49,
+     "fh": 62,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_smallwalldeco",
+   "swf": "furniture/furniture_base/furniture_smallwalldeco/furniture_smallwalldeco.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_smallwalldeco.png",
+     "fw": 64,
+     "fh": 80,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_smallwindow",
+   "swf": "furniture/furniture_base/furniture_smallwindow/furniture_smallwindow.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_smallwindow.png",
+     "fw": 75,
+     "fh": 76,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_sofa",
+   "swf": "furniture/furniture_base/furniture_sofa/furniture_sofa.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_sofa.png",
+     "fw": 244,
+     "fh": 108,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_stool",
+   "swf": "furniture/furniture_base/furniture_stool/furniture_stool.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_stool.png",
+     "fw": 62,
+     "fh": 48,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_table",
+   "swf": "furniture/furniture_base/furniture_table/furniture_table.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_table.png",
+     "fw": 219,
+     "fh": 85,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_tabledeco",
+   "swf": "furniture/furniture_base/furniture_tabledeco/furniture_tabledeco.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_tabledeco.png",
+     "fw": 49,
+     "fh": 62,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_tablelamp",
+   "swf": "furniture/furniture_base/furniture_tablelamp/furniture_tablelamp.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_tablelamp.png",
+     "fw": 40,
+     "fh": 65,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_walldeco",
+   "swf": "furniture/furniture_base/furniture_walldeco/furniture_walldeco.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_walldeco.png",
+     "fw": 64,
+     "fh": 80,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_walldecor",
+   "swf": "furniture/furniture_base/furniture_walldecor/furniture_walldecor.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_walldecor.png",
+     "fw": 64,
+     "fh": 80,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "furniture_walllamp",
+   "swf": "furniture/furniture_base/furniture_walllamp/furniture_walllamp.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/furniture_walllamp.png",
+     "fw": 43,
+     "fh": 72,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "bag_furniture_cabinet",
+   "swf": "furniture/bag_furniture_cabinet_base/bag_furniture_cabinet/bag_furniture_cabinet.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/bag_furniture_cabinet.png",
+     "fw": 142,
+     "fh": 187,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "bag_furniture_largecabinet",
+   "swf": "furniture/bag_furniture_cabinet_base/bag_furniture_largecabinet/furniture_largecabinet.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/bag_furniture_largecabinet.png",
+     "fw": 158,
+     "fh": 169,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "bag_furniture_smallcabinet",
+   "swf": "furniture/bag_furniture_cabinet_base/bag_furniture_smallcabinet/bag_furniture_smallcabinet.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/bag_furniture_smallcabinet.png",
+     "fw": 168,
+     "fh": 77,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "bag_furniture_wallcabinet",
+   "swf": "furniture/bag_furniture_cabinet_base/bag_furniture_wallcabinet/bag_furniture_wallcabinet.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/furniture/bag_furniture_wallcabinet.png",
+     "fw": 88,
+     "fh": 129,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "sign-stake",
+   "swf": "misc/sign_stake/sign_stake.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/street-jobs/sign_stake.png",
+     "fw": 67,
+     "fh": 105,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "party-atm",
+   "swf": "misc/npc/party_atm/party_atm.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/parties/party_atm.png",
+     "fw": 122,
+     "fh": 138,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "rook-hall-speaker",
+   "swf": "quest_items/rook_hall_speaker/rook_hall_speaker.swf",
+   "sprite": 166,
+   "sheets": [
+    {
+     "path": "assets/sprites/quests/rook-museum/rook_hall_speaker__x1_stop_png_1354835940.png",
+     "label": "stop",
+     "fw": 54,
+     "fh": 83,
+     "cols": 1,
+     "frames": 1
+    }
+   ]
+  },
+  {
+   "name": "butler-box",
+   "swf": "misc/butler_box/butler_box.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/butler/butler_box.png",
+     "fw": 104,
+     "fh": 101,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  }
+ ]
+}

@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=g417-1';
+import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=g430-1';
 import { HIRES_ICONS } from '../public/js/icon-hires.js?v=g373-1';
 import {
   CANDY_DAILY_MAX,
@@ -278,7 +278,7 @@ describe('Egg Hunt and Pi Day', () => {
   });
 
   it('counts each egg into the collection however it arrives, then gives the trophy for them (seasons-feature)', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=g429-1');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=g430-1');
     const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=catalog-unified-7');
     const unlocked = [];
     const counted = {};
@@ -338,7 +338,7 @@ describe('supply paths', () => {
 
 describe('a ?season= preview leaves the save alone (G342)', () => {
   it('a carved pumpkin survives previewing another season, and the save still remembers Zilloween', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=g429-1');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=g430-1');
     const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=catalog-unified-7');
     const inv = createInventory();
     addItem(inv, 'pumpkin_carved_1', 2);
@@ -364,7 +364,7 @@ describe('the Zilloween sky ghost stays in the sky (G426)', () => {
   const load = (tsid) => JSON.parse(readFileSync(join(root, `assets/streets/${tsid}.json`), 'utf8'));
 
   it('hangs clear of every walkway under its drift on The Great Hole to Ix (Austin 2026-10-29: a cone on the path)', async () => {
-    const { GHOST, ghostFootY } = await import('../public/js/features/seasons-feature.js?v=g429-1');
+    const { GHOST, ghostFootY } = await import('../public/js/features/seasons-feature.js?v=g430-1');
     const { platformsScreen, streetWidth } = await import('../public/js/street-model.js');
     const { landingY } = await import('../public/js/walk-surface.js');
     const street = load('GLI2VDR4JRD1AEG');
@@ -383,7 +383,7 @@ describe('the Zilloween sky ghost stays in the sky (G426)', () => {
   });
 
   it('keeps groundY - 260 on a flat street, and draws behind the middleground at the art\'s own faintness', async () => {
-    const { GHOST, GHOST_ALPHA, ghostFootY } = await import('../public/js/features/seasons-feature.js?v=g429-1');
+    const { GHOST, GHOST_ALPHA, ghostFootY } = await import('../public/js/features/seasons-feature.js?v=g430-1');
     const flat = [{ x1: 0, y1: 900, x2: 4000, y2: 900 }];
     assert.equal(ghostFootY(flat, 1200, 900), 900 - GHOST.aboveGround);
     assert.equal(ghostFootY(flat, 1200, 300), GHOST.h + 12, 'clamped inside the street top');

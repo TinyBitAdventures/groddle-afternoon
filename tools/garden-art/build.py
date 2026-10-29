@@ -10,7 +10,8 @@ SWF or FLA match), so they are redrawn here at the same sizes and anchors:
   public/assets/sprites/garden/plot_dirty.png  128 x 96  dry soil with weed sprouts
   public/assets/sprites/garden/bed_frame_wood.png 280 x 110  bevelled wooden frame around dark soil
 
-Shapes are drawn at 4x and box-downsampled, so the output is the same on every run.
+Shapes are drawn at 4x and box-downsampled, so the output is the same on every run;
+bed_frame_wood@3x.png is the bed at 3x (4x shapes, Lanczos to 3x) for dense screens.
 
   python3.11 -I tools/garden-art/build.py          (write)
   python3.11 -I tools/garden-art/build.py --check  (exit 1 when a file differs)
@@ -69,7 +70,7 @@ def plot(state):
     return im.resize((w, h), Image.BOX)
 
 
-def bed_frame():
+def bed_frame(scale=1):
     w, h = 280, 110
     im = Image.new('RGBA', (w * SS, h * SS), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
@@ -79,7 +80,7 @@ def bed_frame():
     box(d, [14, 18, 266, 94], (96, 64, 36, 255), 'rounded', radius=4)
     box(d, [18, 22, 262, 90], (72, 48, 30, 255), 'rounded', radius=3)
     box(d, [18, 22, 262, 30], (58, 38, 24, 255))
-    return im.resize((w, h), Image.BOX)
+    return im.resize((w * scale, h * scale), Image.BOX if scale == 1 else Image.LANCZOS)
 
 
 def png_bytes(im):
@@ -91,6 +92,9 @@ def png_bytes(im):
 def main():
     files = {f'plot_{s}.png': plot(s) for s in ('dry', 'wet', 'dirty')}
     files['bed_frame_wood.png'] = bed_frame()
+    # The bed is drawn at scale 1 in the world: a 3x render for dense screens (lane SPRITES
+    # 2026-10-29), listed in tools/vector-sprites/results.json so js/sprite-hires.js routes it.
+    files['bed_frame_wood@3x.png'] = bed_frame(3)
     check = '--check' in sys.argv
     bad = 0
     for name, im in files.items():

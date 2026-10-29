@@ -70,7 +70,7 @@ import { energyMax, metabolicGain, moodMax, loseEnergy, loseMood } from '../meta
 import { levitationCards } from '../imagination-effects.js?v=g403-1';
 import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js?v=g403-1';
 import { sourceFromUrl } from '../textures.js';
-import { denseSprite } from '../sprite-dense.js?v=g417-1';
+import { denseSprite } from '../sprite-dense.js?v=g430-1';
 import { rainbowSound, showRainbow } from '../overlays.js?v=g392-1';
 import { moodScaledXp } from '../mood-xp.js';
 import { createMinnAccount } from '../minn-account.js?v=nbhome-10';

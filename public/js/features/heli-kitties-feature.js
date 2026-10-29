@@ -27,7 +27,7 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g417-1';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g430-1';
 import { landingY, nearestSurfaceY, walkSurfaceY } from '../walk-surface.js';
 import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js';
 import {

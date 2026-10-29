@@ -37,9 +37,9 @@ import {
 import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=catalog-unified-7';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=g403-1';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-259';
-import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=g417-1';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=g417-1';
+import { FEATURES } from '../public/js/features/index.js?v=registry-258';
+import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=g430-1';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=g430-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

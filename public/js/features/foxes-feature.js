@@ -48,7 +48,7 @@ import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unifie
 import { getToolCondition } from '../tools.js?v=woodcutting-test-8';
 import { worldToScreen } from '../street-model.js';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=g392-1';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g417-1';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g430-1';
 import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js';
 import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js';
 import {

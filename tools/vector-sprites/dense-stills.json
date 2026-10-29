@@ -1,0 +1,25 @@
+{
+ "about": "The Stoot Barfield Pullstring Doll at 5x (rare_items/stoot_barfield_pullstring_doll, CC0): game.js draws its 59 px art at 1.55 on the Spinning Wheel ticket (need 4.65 at 3 device px per world px). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/dense-stills.json",
+ "density": 5,
+ "results": "results-dense.json",
+ "module": "js/sprite-dense.js",
+ "jobs": [
+  {
+   "name": "stoot-doll",
+   "swf": "rare_items/stoot_barfield_pullstring_doll/stoot_barfield_pullstring_doll.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/spinning-wheel/stoot-doll.png",
+     "fw": 59,
+     "fh": 59,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  }
+ ]
+}

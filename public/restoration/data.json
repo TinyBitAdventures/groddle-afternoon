@@ -2661,9 +2661,14 @@
   ]
  },
  "git": {
-  "commits": 710,
+  "commits": 711,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "new",
+    "text": "183 street decos Tiny Speck drew but the game never shipped, on 695 streets"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2778,14 +2783,9 @@
     "date": "2026-10-28",
     "kind": "fix",
     "text": "Walking down a hill stays on the slope instead of hopping down it"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "new",
-    "text": "A connected game shows an administrator's message, sign-out, gift and refill"
    }
   ]
  },
- "tests": 413,
+ "tests": 414,
  "generatedAt": "2026-10-29"
 }

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-259';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-258';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g428-1';
@@ -504,7 +504,7 @@ import {
   recipeToolInUse,
 } from './js/making.js?v=g403-1';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=g191-1';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=g417-1';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=g430-1';
 import {
   createGarden,
   tickGarden,
@@ -832,7 +832,8 @@ import { installHiresIcons } from './js/icon-hires.js?v=g373-1';
 import { installHiresDecos } from './js/deco-hires.js?v=g431-1';
 import { loadMutedPreference, saveMutedPreference } from './js/audio-pref.js';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js';
-import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=g417-1';
+import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=g430-1';
+import { denseSprite } from './js/sprite-dense.js?v=g430-1';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g367-1';
@@ -7253,6 +7254,17 @@ function spawnSpinningWheel({ now = Date.now() } = {}) {
   return spinningWheelTarget;
 }
 
+/**
+ * The Stoot Barfield Pullstring Doll's art (59 px, drawn at 1.18 on the ground and 1.55 in the
+ * memorial): its 5x render (js/sprite-dense.js, rare_items/stoot_barfield_pullstring_doll.swf, CC0;
+ * js/textures.js reads resolution 5 from the name, so the drawn size is unchanged) on dense screens.
+ */
+const STOOT_DOLL_ART = 'assets/sprites/spinning-wheel/stoot-doll.png';
+function stootDollTexture() {
+  const dense = denseSprite(STOOT_DOLL_ART, 1.18 * (app?.renderer?.resolution || window.devicePixelRatio || 1));
+  return textureFromUrl(dense?.parts.length === 1 ? dense.parts[0][0] : STOOT_DOLL_ART);
+}
+
 function spawnStootMemorial() {
   if (
     !entityLayer ||
@@ -7274,7 +7286,7 @@ function spawnStootMemorial() {
   frame.roundRect(-104, -220, 208, 146, 10).stroke({ width: 2, color: 0xe5cc82, alpha: 0.72 });
   const glow = new PIXI.Graphics();
   glow.ellipse(0, -145, 150, 94).fill({ color: 0xffe6a0, alpha: 0.12 });
-  const portrait = new PIXI.Sprite(textureFromUrl('assets/sprites/spinning-wheel/stoot-doll.png'));
+  const portrait = new PIXI.Sprite(stootDollTexture());
   portrait.anchor.set(0.5);
   portrait.scale.set(1.55);
   portrait.y = -150;
@@ -7299,7 +7311,7 @@ function spawnStootMemorial() {
   memorial.addChild(shadow, frame, glow, portrait, title, inscription);
   entityLayer.addChild(memorial);
 
-  const doll = new PIXI.Sprite(textureFromUrl('assets/sprites/spinning-wheel/stoot-doll.png'));
+  const doll = new PIXI.Sprite(stootDollTexture());
   doll.anchor.set(0.5, 1);
   doll.scale.set(1.18);
   doll.x = memorial.x - 132;

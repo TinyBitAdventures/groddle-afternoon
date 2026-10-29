@@ -34176,5 +34176,2237 @@
    0.0911,
    1
   ]
+ },
+ "assets/sprites/street-furniture/visiting-stone.png": {
+  "animal": "visiting-stone",
+  "swf": "misc/visiting_stone/visiting_stone.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 101,
+  "fh": 155,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -610,
+   -561
+  ],
+  "score": 0.9858,
+  "minFrame": 0.9858,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/visiting-stone@3x.webp",
+  "bytes": 45452,
+  "firstDraw": true,
+  "frameScores": [
+   0.9858
+  ]
+ },
+ "assets/sprites/street-furniture/note-world.png": {
+  "animal": "note-world",
+  "swf": "misc/note/note.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   2,
+   2
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 45,
+  "fh": 14,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -178,
+   -198
+  ],
+  "score": 0.9621,
+  "minFrame": 0.9621,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/note-world@3x.webp",
+  "bytes": 3178,
+  "firstDraw": true,
+  "frameScores": [
+   0.9621
+  ]
+ },
+ "assets/sprites/street-furniture/gift-box-wrapped.png": {
+  "animal": "gift-box-wrapped",
+  "swf": "misc/bag_gift_box/bag_gift_box_wrapped/bag_gift_box_wrapped.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 52,
+  "fh": 49,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -154,
+   -146
+  ],
+  "score": 0.9761,
+  "minFrame": 0.9761,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/gift-box-wrapped@3x.png",
+  "bytes": 10392,
+  "firstDraw": true,
+  "frameScores": [
+   0.9761
+  ]
+ },
+ "assets/sprites/street-furniture/gift-box-open.png": {
+  "animal": "gift-box-open",
+  "swf": "misc/bag_generic/bag_gift_box/bag_gift_box.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 56,
+  "fh": 49,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -166,
+   -147
+  ],
+  "score": 0.9837,
+  "minFrame": 0.9837,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/gift-box-open@3x.webp",
+  "bytes": 6098,
+  "firstDraw": true,
+  "frameScores": [
+   0.9837
+  ]
+ },
+ "assets/sprites/street-furniture/notice-board-m0.png": {
+  "animal": "notice-board",
+  "swf": "misc/bag_notice_board/bag_notice_board.swf",
+  "sprite": 13,
+  "label": "m0",
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 212,
+  "fh": 147,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   3,
+   1
+  ],
+  "score": 0.992,
+  "minFrame": 0.992,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/notice-board-m0@3x.webp",
+  "bytes": 149490,
+  "firstDraw": true,
+  "frameScores": [
+   0.992
+  ]
+ },
+ "assets/sprites/street-furniture/notice-board-m1.png": {
+  "animal": "notice-board",
+  "swf": "misc/bag_notice_board/bag_notice_board.swf",
+  "sprite": 13,
+  "label": "m1",
+  "swfFrames": [
+   2,
+   2
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 212,
+  "fh": 147,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   3,
+   1
+  ],
+  "score": 0.9918,
+  "minFrame": 0.9918,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/notice-board-m1@3x.webp",
+  "bytes": 150110,
+  "firstDraw": true,
+  "frameScores": [
+   0.9918
+  ]
+ },
+ "assets/sprites/street-furniture/notice-board-m2.png": {
+  "animal": "notice-board",
+  "swf": "misc/bag_notice_board/bag_notice_board.swf",
+  "sprite": 13,
+  "label": "m2",
+  "swfFrames": [
+   3,
+   3
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 212,
+  "fh": 147,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   3,
+   1
+  ],
+  "score": 0.9915,
+  "minFrame": 0.9915,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/notice-board-m2@3x.webp",
+  "bytes": 150800,
+  "firstDraw": true,
+  "frameScores": [
+   0.9915
+  ]
+ },
+ "assets/sprites/street-furniture/notice-board-m3.png": {
+  "animal": "notice-board",
+  "swf": "misc/bag_notice_board/bag_notice_board.swf",
+  "sprite": 13,
+  "label": "m3",
+  "swfFrames": [
+   4,
+   4
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 212,
+  "fh": 147,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   3,
+   1
+  ],
+  "score": 0.9914,
+  "minFrame": 0.9914,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/notice-board-m3@3x.webp",
+  "bytes": 151594,
+  "firstDraw": true,
+  "frameScores": [
+   0.9914
+  ]
+ },
+ "assets/sprites/street-furniture/notice-board-m4.png": {
+  "animal": "notice-board",
+  "swf": "misc/bag_notice_board/bag_notice_board.swf",
+  "sprite": 13,
+  "label": "m4",
+  "swfFrames": [
+   5,
+   5
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 212,
+  "fh": 147,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   3,
+   1
+  ],
+  "score": 0.9911,
+  "minFrame": 0.9911,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/notice-board-m4@3x.webp",
+  "bytes": 152226,
+  "firstDraw": true,
+  "frameScores": [
+   0.9911
+  ]
+ },
+ "assets/sprites/street-furniture/notice-board-m5.png": {
+  "animal": "notice-board",
+  "swf": "misc/bag_notice_board/bag_notice_board.swf",
+  "sprite": 13,
+  "label": "m5",
+  "swfFrames": [
+   6,
+   6
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 212,
+  "fh": 147,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   3,
+   1
+  ],
+  "score": 0.9908,
+  "minFrame": 0.9908,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/notice-board-m5@3x.webp",
+  "bytes": 152948,
+  "firstDraw": true,
+  "frameScores": [
+   0.9908
+  ]
+ },
+ "assets/sprites/street-furniture/notice-board-m6.png": {
+  "animal": "notice-board",
+  "swf": "misc/bag_notice_board/bag_notice_board.swf",
+  "sprite": 13,
+  "label": "m6",
+  "swfFrames": [
+   7,
+   7
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 212,
+  "fh": 147,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   3,
+   1
+  ],
+  "score": 0.9905,
+  "minFrame": 0.9905,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/notice-board-m6@3x.webp",
+  "bytes": 153412,
+  "firstDraw": true,
+  "frameScores": [
+   0.9905
+  ]
+ },
+ "assets/sprites/street-furniture/notice-board-m7.png": {
+  "animal": "notice-board",
+  "swf": "misc/bag_notice_board/bag_notice_board.swf",
+  "sprite": 13,
+  "label": "m7",
+  "swfFrames": [
+   8,
+   8
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 212,
+  "fh": 147,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   3,
+   0
+  ],
+  "score": 0.9904,
+  "minFrame": 0.9904,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/notice-board-m7@3x.webp",
+  "bytes": 153800,
+  "firstDraw": true,
+  "frameScores": [
+   0.9904
+  ]
+ },
+ "assets/sprites/street-furniture/notice-board-m8.png": {
+  "animal": "notice-board",
+  "swf": "misc/bag_notice_board/bag_notice_board.swf",
+  "sprite": 13,
+  "label": "m8",
+  "swfFrames": [
+   9,
+   9
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 212,
+  "fh": 147,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   3,
+   0
+  ],
+  "score": 0.9903,
+  "minFrame": 0.9903,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/notice-board-m8@3x.webp",
+  "bytes": 154146,
+  "firstDraw": true,
+  "frameScores": [
+   0.9903
+  ]
+ },
+ "assets/sprites/street-furniture/notice-board-m9.png": {
+  "animal": "notice-board",
+  "swf": "misc/bag_notice_board/bag_notice_board.swf",
+  "sprite": 13,
+  "label": "m9",
+  "swfFrames": [
+   10,
+   10
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 212,
+  "fh": 147,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   3,
+   0
+  ],
+  "score": 0.9902,
+  "minFrame": 0.9902,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/notice-board-m9@3x.webp",
+  "bytes": 154538,
+  "firstDraw": true,
+  "frameScores": [
+   0.9902
+  ]
+ },
+ "assets/sprites/street-furniture/notice-board-m10.png": {
+  "animal": "notice-board",
+  "swf": "misc/bag_notice_board/bag_notice_board.swf",
+  "sprite": 13,
+  "label": "m10",
+  "swfFrames": [
+   11,
+   11
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 212,
+  "fh": 147,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   3,
+   0
+  ],
+  "score": 0.9901,
+  "minFrame": 0.9901,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/notice-board-m10@3x.webp",
+  "bytes": 154848,
+  "firstDraw": true,
+  "frameScores": [
+   0.9901
+  ]
+ },
+ "assets/sprites/street-furniture/mailbox-left-idle.png": {
+  "animal": "mailbox-left",
+  "swf": "misc/npc/npc_mailbox/npc_mailbox.swf",
+  "sprite": 28,
+  "label": "idle",
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 97,
+  "fh": 146,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -6,
+   1
+  ],
+  "score": 0.9857,
+  "minFrame": 0.9857,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/mailbox-left-idle@3x.webp",
+  "bytes": 17568,
+  "firstDraw": true,
+  "frameScores": [
+   0.9857
+  ]
+ },
+ "assets/sprites/street-furniture/mailbox-left-has-mail-idle.png": {
+  "animal": "mailbox-left",
+  "swf": "misc/npc/npc_mailbox/npc_mailbox.swf",
+  "sprite": 28,
+  "label": "has_mail_idle",
+  "swfFrames": [
+   2,
+   2
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 97,
+  "fh": 146,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -6,
+   1
+  ],
+  "score": 0.9853,
+  "minFrame": 0.9853,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/mailbox-left-has-mail-idle@3x.webp",
+  "bytes": 17224,
+  "firstDraw": true,
+  "frameScores": [
+   0.9853
+  ]
+ },
+ "assets/sprites/street-furniture/mailbox-left-has-mail.png": {
+  "animal": "mailbox-left",
+  "swf": "misc/npc/npc_mailbox/npc_mailbox.swf",
+  "sprite": 28,
+  "label": "has_mail",
+  "swfFrames": [
+   3,
+   75
+  ],
+  "swfLabelFrames": 73,
+  "cells": 73,
+  "fw": 97,
+  "fh": 146,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -6,
+   1
+  ],
+  "score": 0.9821,
+  "minFrame": 0.9784,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/mailbox-left-has-mail@3x.webp",
+  "bytes": 714466,
+  "firstDraw": true,
+  "frameScores": [
+   0.9853,
+   0.9786,
+   0.9813,
+   0.9833,
+   0.983,
+   0.9826,
+   0.9822,
+   0.982,
+   0.9807,
+   0.9818,
+   0.9832,
+   0.9822,
+   0.9812,
+   0.9826,
+   0.9821,
+   0.9826,
+   0.9822,
+   0.982,
+   0.9807,
+   0.9818,
+   0.9832,
+   0.9822,
+   0.9812,
+   0.9826,
+   0.9821,
+   0.9826,
+   0.9822,
+   0.982,
+   0.9807,
+   0.9818,
+   0.9832,
+   0.9822,
+   0.9812,
+   0.9826,
+   0.9821,
+   0.9826,
+   0.9822,
+   0.982,
+   0.9807,
+   0.9818,
+   0.9832,
+   0.9834,
+   0.9822,
+   0.9824,
+   0.9815,
+   0.9834,
+   0.9824,
+   0.9836,
+   0.9835,
+   0.9784,
+   0.9804,
+   0.9826,
+   0.9838,
+   0.9795,
+   0.9842,
+   0.983,
+   0.9819,
+   0.981,
+   0.984,
+   0.9807,
+   0.9807,
+   0.9807,
+   0.9807,
+   0.9823,
+   0.9813,
+   0.9809,
+   0.982,
+   0.9834,
+   0.9822,
+   0.9838,
+   0.9812,
+   0.9831,
+   0.9813
+  ]
+ },
+ "assets/sprites/street-furniture/mailbox-left-interact.png": {
+  "animal": "mailbox-left",
+  "swf": "misc/npc/npc_mailbox/npc_mailbox.swf",
+  "sprite": 28,
+  "label": "interact",
+  "swfFrames": [
+   76,
+   84
+  ],
+  "swfLabelFrames": 9,
+  "cells": 9,
+  "fw": 97,
+  "fh": 146,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -6,
+   1
+  ],
+  "score": 0.9844,
+  "minFrame": 0.9829,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/mailbox-left-interact@3x.webp",
+  "bytes": 42332,
+  "firstDraw": true,
+  "frameScores": [
+   0.9853,
+   0.9853,
+   0.9855,
+   0.9848,
+   0.9835,
+   0.9837,
+   0.984,
+   0.9829,
+   0.9843
+  ]
+ },
+ "assets/sprites/street-furniture/mailbox-left-all-done.png": {
+  "animal": "mailbox-left",
+  "swf": "misc/npc/npc_mailbox/npc_mailbox.swf",
+  "sprite": 28,
+  "label": "all_done",
+  "swfFrames": [
+   85,
+   106
+  ],
+  "swfLabelFrames": 22,
+  "cells": 22,
+  "fw": 97,
+  "fh": 146,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -6,
+   1
+  ],
+  "score": 0.9851,
+  "minFrame": 0.9837,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-furniture/mailbox-left-all-done@3x.webp",
+  "bytes": 64208,
+  "firstDraw": true,
+  "frameScores": [
+   0.9843,
+   0.9842,
+   0.9848,
+   0.9851,
+   0.9837,
+   0.9844,
+   0.9848,
+   0.9855,
+   0.9851,
+   0.9849,
+   0.9851,
+   0.9848,
+   0.9852,
+   0.9852,
+   0.9852,
+   0.9855,
+   0.9856,
+   0.9856,
+   0.9857,
+   0.9856,
+   0.9856,
+   0.9857
+  ]
+ },
+ "assets/sprites/furniture/bag_furniture_sdb.png": {
+  "animal": "bag_furniture_sdb",
+  "swf": "furniture/furniture_base/bag_furniture_sdb/bag_furniture_sdb.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 67,
+  "fh": 70,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -189,
+   -181
+  ],
+  "score": 0.9865,
+  "minFrame": 0.9865,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/bag_furniture_sdb@3x.webp",
+  "bytes": 17100,
+  "firstDraw": true,
+  "frameScores": [
+   0.9865
+  ]
+ },
+ "assets/sprites/furniture/furniture_armchair.png": {
+  "animal": "furniture_armchair",
+  "swf": "furniture/furniture_base/furniture_armchair/furniture_armchair.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 118,
+  "fh": 90,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -375,
+   -345
+  ],
+  "score": 0.9894,
+  "minFrame": 0.9894,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_armchair@3x.webp",
+  "bytes": 32644,
+  "firstDraw": true,
+  "frameScores": [
+   0.9894
+  ]
+ },
+ "assets/sprites/furniture/furniture_bed.png": {
+  "animal": "furniture_bed",
+  "swf": "furniture/furniture_base/furniture_bed/furniture_bed.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 284,
+  "fh": 112,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -875,
+   -473
+  ],
+  "score": 0.9724,
+  "minFrame": 0.9724,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_bed@3x.webp",
+  "bytes": 57264,
+  "firstDraw": true,
+  "frameScores": [
+   0.9724
+  ]
+ },
+ "assets/sprites/furniture/furniture_bench.png": {
+  "animal": "furniture_bench",
+  "swf": "furniture/furniture_base/furniture_bench/furniture_bench.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 224,
+  "fh": 53,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -739,
+   -183
+  ],
+  "score": 0.9563,
+  "minFrame": 0.9563,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_bench@3x.webp",
+  "bytes": 25904,
+  "firstDraw": true,
+  "frameScores": [
+   0.9563
+  ]
+ },
+ "assets/sprites/furniture/furniture_bookcase.png": {
+  "animal": "furniture_bookcase",
+  "swf": "furniture/furniture_base/furniture_bookcase/furniture_bookcase.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 149,
+  "fh": 159,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -462,
+   -540
+  ],
+  "score": 0.9847,
+  "minFrame": 0.9847,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_bookcase@3x.webp",
+  "bytes": 39898,
+  "firstDraw": true,
+  "frameScores": [
+   0.9847
+  ]
+ },
+ "assets/sprites/furniture/furniture_cabinet.png": {
+  "animal": "furniture_cabinet",
+  "swf": "furniture/furniture_base/furniture_cabinet/furniture_cabinet.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 158,
+  "fh": 169,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -487,
+   -547
+  ],
+  "score": 0.9948,
+  "minFrame": 0.9948,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_cabinet@3x.webp",
+  "bytes": 59720,
+  "firstDraw": true,
+  "frameScores": [
+   0.9948
+  ]
+ },
+ "assets/sprites/furniture/furniture_ceilingdeco.png": {
+  "animal": "furniture_ceilingdeco",
+  "swf": "furniture/furniture_base/furniture_ceilingdeco/furniture_ceilingdeco.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 71,
+  "fh": 84,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -205,
+   -495
+  ],
+  "score": 0.9796,
+  "minFrame": 0.9796,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_ceilingdeco@3x.webp",
+  "bytes": 13640,
+  "firstDraw": true,
+  "frameScores": [
+   0.9796
+  ]
+ },
+ "assets/sprites/furniture/furniture_ceilinglamp.png": {
+  "animal": "furniture_ceilinglamp",
+  "swf": "furniture/furniture_base/furniture_ceilinglamp/furniture_ceilinglamp.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 82,
+  "fh": 51,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -237,
+   -302
+  ],
+  "score": 0.9807,
+  "minFrame": 0.9807,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_ceilinglamp@3x.webp",
+  "bytes": 6612,
+  "firstDraw": true,
+  "frameScores": [
+   0.9807
+  ]
+ },
+ "assets/sprites/furniture/furniture_chair.png": {
+  "animal": "furniture_chair",
+  "swf": "furniture/furniture_base/furniture_chair/furniture_chair.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 72,
+  "fh": 93,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -232,
+   -324
+  ],
+  "score": 0.9317,
+  "minFrame": 0.9317,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_chair@3x.webp",
+  "bytes": 33254,
+  "firstDraw": true,
+  "frameScores": [
+   0.9317
+  ]
+ },
+ "assets/sprites/furniture/furniture_coffeetable.png": {
+  "animal": "furniture_coffeetable",
+  "swf": "furniture/furniture_base/furniture_coffeetable/furniture_coffeetable.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 258,
+  "fh": 62,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -904,
+   -272
+  ],
+  "score": 0.9885,
+  "minFrame": 0.9885,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_coffeetable@3x.webp",
+  "bytes": 24564,
+  "firstDraw": true,
+  "frameScores": [
+   0.9885
+  ]
+ },
+ "assets/sprites/furniture/furniture_counter.png": {
+  "animal": "furniture_counter",
+  "swf": "furniture/furniture_base/furniture_counter/furniture_counter.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 198,
+  "fh": 81,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -594,
+   -309
+  ],
+  "score": 0.9565,
+  "minFrame": 0.9565,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_counter@3x.webp",
+  "bytes": 33472,
+  "firstDraw": true,
+  "frameScores": [
+   0.9565
+  ]
+ },
+ "assets/sprites/furniture/furniture_desk.png": {
+  "animal": "furniture_desk",
+  "swf": "furniture/furniture_base/furniture_desk/furniture_desk.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 168,
+  "fh": 72,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -600,
+   -283
+  ],
+  "score": 0.9809,
+  "minFrame": 0.9809,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_desk@3x.webp",
+  "bytes": 24058,
+  "firstDraw": true,
+  "frameScores": [
+   0.9809
+  ]
+ },
+ "assets/sprites/furniture/furniture_floorlamp.png": {
+  "animal": "furniture_floorlamp",
+  "swf": "furniture/furniture_base/furniture_floorlamp/furniture_floorlamp.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 50,
+  "fh": 176,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -152,
+   -573
+  ],
+  "score": 0.9697,
+  "minFrame": 0.9697,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_floorlamp@3x.webp",
+  "bytes": 9810,
+  "firstDraw": true,
+  "frameScores": [
+   0.9697
+  ]
+ },
+ "assets/sprites/furniture/furniture_lamp.png": {
+  "animal": "furniture_lamp",
+  "swf": "furniture/furniture_base/furniture_lamp/furniture_lamp.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 89,
+  "fh": 57,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -267,
+   -335
+  ],
+  "score": 0.9791,
+  "minFrame": 0.9791,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_lamp@3x.webp",
+  "bytes": 7032,
+  "firstDraw": true,
+  "frameScores": [
+   0.9791
+  ]
+ },
+ "assets/sprites/furniture/furniture_largebackfloordeco.png": {
+  "animal": "furniture_largebackfloordeco",
+  "swf": "furniture/furniture_base/furniture_largebackfloordeco/furniture_largebackfloordeco.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 118,
+  "fh": 166,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -361,
+   -567
+  ],
+  "score": 0.9561,
+  "minFrame": 0.9561,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_largebackfloordeco@3x.webp",
+  "bytes": 56532,
+  "firstDraw": true,
+  "frameScores": [
+   0.9561
+  ]
+ },
+ "assets/sprites/furniture/furniture_largefrontfloordeco.png": {
+  "animal": "furniture_largefrontfloordeco",
+  "swf": "furniture/furniture_base/furniture_largefrontfloordeco/furniture_largefrontfloordeco.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 155,
+  "fh": 143,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -472,
+   -456
+  ],
+  "score": 0.9487,
+  "minFrame": 0.9487,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_largefrontfloordeco@3x.webp",
+  "bytes": 45558,
+  "firstDraw": true,
+  "frameScores": [
+   0.9487
+  ]
+ },
+ "assets/sprites/furniture/furniture_largetabledeco.png": {
+  "animal": "furniture_largetabledeco",
+  "swf": "furniture/furniture_base/furniture_largetabledeco/furniture_largetabledeco.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 99,
+  "fh": 83,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -302,
+   -284
+  ],
+  "score": 0.9614,
+  "minFrame": 0.9614,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_largetabledeco@3x.webp",
+  "bytes": 29626,
+  "firstDraw": true,
+  "frameScores": [
+   0.9614
+  ]
+ },
+ "assets/sprites/furniture/furniture_largewalldeco.png": {
+  "animal": "furniture_largewalldeco",
+  "swf": "furniture/furniture_base/furniture_largewalldeco/furniture_largewalldeco.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 88,
+  "fh": 134,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -261,
+   -431
+  ],
+  "score": 0.9681,
+  "minFrame": 0.9681,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_largewalldeco@3x.webp",
+  "bytes": 21072,
+  "firstDraw": true,
+  "frameScores": [
+   0.9681
+  ]
+ },
+ "assets/sprites/furniture/furniture_largewindow.png": {
+  "animal": "furniture_largewindow",
+  "swf": "furniture/furniture_base/furniture_largewindow/furniture_largewindow.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 93,
+  "fh": 117,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -279,
+   -350
+  ],
+  "score": 0.9944,
+  "minFrame": 0.9944,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_largewindow@3x.webp",
+  "bytes": 18038,
+  "firstDraw": true,
+  "frameScores": [
+   0.9944
+  ]
+ },
+ "assets/sprites/furniture/furniture_loveseat.png": {
+  "animal": "furniture_loveseat",
+  "swf": "furniture/furniture_base/furniture_loveseat/furniture_loveseat.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 180,
+  "fh": 99,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -556,
+   -365
+  ],
+  "score": 0.9763,
+  "minFrame": 0.9763,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_loveseat@3x.webp",
+  "bytes": 33036,
+  "firstDraw": true,
+  "frameScores": [
+   0.9763
+  ]
+ },
+ "assets/sprites/furniture/furniture_painting.png": {
+  "animal": "furniture_painting",
+  "swf": "furniture/furniture_base/furniture_painting/furniture_painting.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 77,
+  "fh": 113,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -229,
+   -340
+  ],
+  "score": 0.9892,
+  "minFrame": 0.9892,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_painting@3x.webp",
+  "bytes": 10962,
+  "firstDraw": true,
+  "frameScores": [
+   0.9892
+  ]
+ },
+ "assets/sprites/furniture/furniture_roomdeco.png": {
+  "animal": "furniture_roomdeco",
+  "swf": "furniture/furniture_base/furniture_roomdeco/furniture_roomdeco.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 118,
+  "fh": 166,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -361,
+   -567
+  ],
+  "score": 0.9562,
+  "minFrame": 0.9562,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_roomdeco@3x.webp",
+  "bytes": 56450,
+  "firstDraw": true,
+  "frameScores": [
+   0.9562
+  ]
+ },
+ "assets/sprites/furniture/furniture_rug.png": {
+  "animal": "furniture_rug",
+  "swf": "furniture/furniture_base/furniture_rug/furniture_rug.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 211,
+  "fh": 65,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -639,
+   -266
+  ],
+  "score": 0.9908,
+  "minFrame": 0.9908,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_rug@3x.webp",
+  "bytes": 64908,
+  "firstDraw": true,
+  "frameScores": [
+   0.9908
+  ]
+ },
+ "assets/sprites/furniture/furniture_shelf.png": {
+  "animal": "furniture_shelf",
+  "swf": "furniture/furniture_base/furniture_shelf/furniture_shelf.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 233,
+  "fh": 47,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -662,
+   -176
+  ],
+  "score": 0.9775,
+  "minFrame": 0.9775,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_shelf@3x.webp",
+  "bytes": 13764,
+  "firstDraw": true,
+  "frameScores": [
+   0.9775
+  ]
+ },
+ "assets/sprites/furniture/furniture_sidetable.png": {
+  "animal": "furniture_sidetable",
+  "swf": "furniture/furniture_base/furniture_sidetable/furniture_sidetable.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 62,
+  "fh": 54,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -185,
+   -219
+  ],
+  "score": 0.9698,
+  "minFrame": 0.9698,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_sidetable@3x.webp",
+  "bytes": 16476,
+  "firstDraw": true,
+  "frameScores": [
+   0.9698
+  ]
+ },
+ "assets/sprites/furniture/furniture_smallbackfloordeco.png": {
+  "animal": "furniture_smallbackfloordeco",
+  "swf": "furniture/furniture_base/furniture_smallbackfloordeco/furniture_smallbackfloordeco.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 93,
+  "fh": 86,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -287,
+   -311
+  ],
+  "score": 0.9549,
+  "minFrame": 0.9549,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_smallbackfloordeco@3x.webp",
+  "bytes": 27952,
+  "firstDraw": true,
+  "frameScores": [
+   0.9549
+  ]
+ },
+ "assets/sprites/furniture/furniture_smallfrontfloordeco.png": {
+  "animal": "furniture_smallfrontfloordeco",
+  "swf": "furniture/furniture_base/furniture_smallfrontfloordeco/furniture_smallfrontfloordeco.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 58,
+  "fh": 93,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -180,
+   -314
+  ],
+  "score": 0.9536,
+  "minFrame": 0.9536,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_smallfrontfloordeco@3x.webp",
+  "bytes": 17710,
+  "firstDraw": true,
+  "frameScores": [
+   0.9536
+  ]
+ },
+ "assets/sprites/furniture/furniture_smalltabledeco.png": {
+  "animal": "furniture_smalltabledeco",
+  "swf": "furniture/furniture_base/furniture_smalltabledeco/furniture_smalltabledeco.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 49,
+  "fh": 62,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -151,
+   -203
+  ],
+  "score": 0.9375,
+  "minFrame": 0.9375,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_smalltabledeco@3x.webp",
+  "bytes": 16434,
+  "firstDraw": true,
+  "frameScores": [
+   0.9375
+  ]
+ },
+ "assets/sprites/furniture/furniture_smallwalldeco.png": {
+  "animal": "furniture_smallwalldeco",
+  "swf": "furniture/furniture_base/furniture_smallwalldeco/furniture_smallwalldeco.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 64,
+  "fh": 80,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -192,
+   -266
+  ],
+  "score": 0.9777,
+  "minFrame": 0.9777,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_smallwalldeco@3x.webp",
+  "bytes": 12528,
+  "firstDraw": true,
+  "frameScores": [
+   0.9777
+  ]
+ },
+ "assets/sprites/furniture/furniture_smallwindow.png": {
+  "animal": "furniture_smallwindow",
+  "swf": "furniture/furniture_base/furniture_smallwindow/furniture_smallwindow.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 75,
+  "fh": 76,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -223,
+   -225
+  ],
+  "score": 0.99,
+  "minFrame": 0.99,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_smallwindow@3x.webp",
+  "bytes": 24924,
+  "firstDraw": true,
+  "frameScores": [
+   0.99
+  ]
+ },
+ "assets/sprites/furniture/furniture_sofa.png": {
+  "animal": "furniture_sofa",
+  "swf": "furniture/furniture_base/furniture_sofa/furniture_sofa.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 244,
+  "fh": 108,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -755,
+   -392
+  ],
+  "score": 0.986,
+  "minFrame": 0.986,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_sofa@3x.webp",
+  "bytes": 44368,
+  "firstDraw": true,
+  "frameScores": [
+   0.986
+  ]
+ },
+ "assets/sprites/furniture/furniture_stool.png": {
+  "animal": "furniture_stool",
+  "swf": "furniture/furniture_base/furniture_stool/furniture_stool.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 62,
+  "fh": 48,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -231,
+   -181
+  ],
+  "score": 0.9724,
+  "minFrame": 0.9724,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_stool@3x.webp",
+  "bytes": 14596,
+  "firstDraw": true,
+  "frameScores": [
+   0.9724
+  ]
+ },
+ "assets/sprites/furniture/furniture_table.png": {
+  "animal": "furniture_table",
+  "swf": "furniture/furniture_base/furniture_table/furniture_table.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 219,
+  "fh": 85,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -671,
+   -328
+  ],
+  "score": 0.9822,
+  "minFrame": 0.9822,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_table@3x.webp",
+  "bytes": 38158,
+  "firstDraw": true,
+  "frameScores": [
+   0.9822
+  ]
+ },
+ "assets/sprites/furniture/furniture_tabledeco.png": {
+  "animal": "furniture_tabledeco",
+  "swf": "furniture/furniture_base/furniture_tabledeco/furniture_tabledeco.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 49,
+  "fh": 62,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -153,
+   -185
+  ],
+  "score": 0.9441,
+  "minFrame": 0.9441,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_tabledeco@3x.webp",
+  "bytes": 16384,
+  "firstDraw": true,
+  "frameScores": [
+   0.9441
+  ]
+ },
+ "assets/sprites/furniture/furniture_tablelamp.png": {
+  "animal": "furniture_tablelamp",
+  "swf": "furniture/furniture_base/furniture_tablelamp/furniture_tablelamp.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 40,
+  "fh": 65,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -119,
+   -194
+  ],
+  "score": 0.9778,
+  "minFrame": 0.9778,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_tablelamp@3x.webp",
+  "bytes": 3446,
+  "firstDraw": true,
+  "frameScores": [
+   0.9778
+  ]
+ },
+ "assets/sprites/furniture/furniture_walldeco.png": {
+  "animal": "furniture_walldeco",
+  "swf": "furniture/furniture_base/furniture_walldeco/furniture_walldeco.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 64,
+  "fh": 80,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -192,
+   -266
+  ],
+  "score": 0.9777,
+  "minFrame": 0.9777,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_walldeco@3x.webp",
+  "bytes": 12528,
+  "firstDraw": true,
+  "frameScores": [
+   0.9777
+  ]
+ },
+ "assets/sprites/furniture/furniture_walldecor.png": {
+  "animal": "furniture_walldecor",
+  "swf": "furniture/furniture_base/furniture_walldecor/furniture_walldecor.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 64,
+  "fh": 80,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -192,
+   -266
+  ],
+  "score": 0.9777,
+  "minFrame": 0.9777,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_walldecor@3x.webp",
+  "bytes": 12528,
+  "firstDraw": true,
+  "frameScores": [
+   0.9777
+  ]
+ },
+ "assets/sprites/furniture/furniture_walllamp.png": {
+  "animal": "furniture_walllamp",
+  "swf": "furniture/furniture_base/furniture_walllamp/furniture_walllamp.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 43,
+  "fh": 72,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -129,
+   -215
+  ],
+  "score": 0.9824,
+  "minFrame": 0.9824,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/furniture_walllamp@3x.webp",
+  "bytes": 4610,
+  "firstDraw": true,
+  "frameScores": [
+   0.9824
+  ]
+ },
+ "assets/sprites/furniture/bag_furniture_cabinet.png": {
+  "animal": "bag_furniture_cabinet",
+  "swf": "furniture/bag_furniture_cabinet_base/bag_furniture_cabinet/bag_furniture_cabinet.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 142,
+  "fh": 187,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -590,
+   -632
+  ],
+  "score": 0.9921,
+  "minFrame": 0.9921,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/bag_furniture_cabinet@3x.webp",
+  "bytes": 78510,
+  "firstDraw": true,
+  "frameScores": [
+   0.9921
+  ]
+ },
+ "assets/sprites/furniture/bag_furniture_largecabinet.png": {
+  "animal": "bag_furniture_largecabinet",
+  "swf": "furniture/bag_furniture_cabinet_base/bag_furniture_largecabinet/furniture_largecabinet.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 158,
+  "fh": 169,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -487,
+   -547
+  ],
+  "score": 0.9948,
+  "minFrame": 0.9948,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/bag_furniture_largecabinet@3x.webp",
+  "bytes": 59720,
+  "firstDraw": true,
+  "frameScores": [
+   0.9948
+  ]
+ },
+ "assets/sprites/furniture/bag_furniture_smallcabinet.png": {
+  "animal": "bag_furniture_smallcabinet",
+  "swf": "furniture/bag_furniture_cabinet_base/bag_furniture_smallcabinet/bag_furniture_smallcabinet.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 168,
+  "fh": 77,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -509,
+   -325
+  ],
+  "score": 0.9905,
+  "minFrame": 0.9905,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/bag_furniture_smallcabinet@3x.webp",
+  "bytes": 47658,
+  "firstDraw": true,
+  "frameScores": [
+   0.9905
+  ]
+ },
+ "assets/sprites/furniture/bag_furniture_wallcabinet.png": {
+  "animal": "bag_furniture_wallcabinet",
+  "swf": "furniture/bag_furniture_cabinet_base/bag_furniture_wallcabinet/bag_furniture_wallcabinet.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 88,
+  "fh": 129,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -262,
+   -384
+  ],
+  "score": 0.9874,
+  "minFrame": 0.9874,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/furniture/bag_furniture_wallcabinet@3x.webp",
+  "bytes": 41456,
+  "firstDraw": true,
+  "frameScores": [
+   0.9874
+  ]
+ },
+ "assets/sprites/street-jobs/sign_stake.png": {
+  "animal": "sign-stake",
+  "swf": "misc/sign_stake/sign_stake.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 67,
+  "fh": 105,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -199,
+   -315
+  ],
+  "score": 0.9552,
+  "minFrame": 0.9552,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-jobs/sign_stake@3x.webp",
+  "bytes": 22246,
+  "firstDraw": true,
+  "frameScores": [
+   0.9552
+  ]
+ },
+ "assets/sprites/parties/party_atm.png": {
+  "animal": "party-atm",
+  "swf": "misc/npc/party_atm/party_atm.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 122,
+  "fh": 138,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -379,
+   -413
+  ],
+  "score": 0.9658,
+  "minFrame": 0.9658,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/parties/party_atm@3x.webp",
+  "bytes": 76470,
+  "firstDraw": true,
+  "frameScores": [
+   0.9658
+  ]
+ },
+ "assets/sprites/quests/rook-museum/rook_hall_speaker__x1_stop_png_1354835940.png": {
+  "animal": "rook-hall-speaker",
+  "swf": "quest_items/rook_hall_speaker/rook_hall_speaker.swf",
+  "sprite": 166,
+  "label": "stop",
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 54,
+  "fh": 83,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -3,
+   1
+  ],
+  "score": 0.9784,
+  "minFrame": 0.9784,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/quests/rook-museum/rook_hall_speaker__x1_stop_png_1354835940@3x.webp",
+  "bytes": 19626,
+  "firstDraw": true,
+  "frameScores": [
+   0.9784
+  ]
+ },
+ "assets/sprites/garden/bed_frame_wood.png": {
+  "animal": "garden-bed",
+  "character": "garden-bed",
+  "source": "tools/garden-art",
+  "status": "ok",
+  "hires": "assets/sprites/garden/bed_frame_wood@3x.png",
+  "bytes": 5595,
+  "cells": 1,
+  "fw": 280,
+  "fh": 110,
+  "scoreKind": "our own art redrawn at 3x by tools/garden-art (no SWF)",
+  "score": 1,
+  "minFrame": 1,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   1
+  ]
+ },
+ "assets/sprites/butler/butler_box.png": {
+  "animal": "butler-box",
+  "swf": "misc/butler_box/butler_box.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 104,
+  "fh": 101,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -310,
+   -303
+  ],
+  "score": 0.9936,
+  "minFrame": 0.9936,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/butler/butler_box@3x.webp",
+  "bytes": 28950,
+  "firstDraw": true,
+  "frameScores": [
+   0.9936
+  ]
  }
 }

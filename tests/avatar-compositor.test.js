@@ -18,7 +18,7 @@ import {
 } from '../public/js/avatar-looks.js';
 import { CORE_FRAMES, IDLE_FRAMES, IDLE_SHEETS, SHEET_FRAMES } from '../public/js/avatar-anims.js';
 import { VECTOR_AVATAR, VECTOR_AVATAR_HIRES } from '../public/js/avatar-vector-sheets.js';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=g417-1';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=g430-1';
 import { compactD } from '../tools/avatar-compositor/shapes.mjs';
 import { customEase, easeAt, layerAt, readSymbol, tweenElement } from '../tools/avatar-compositor/xfl.mjs';
 
