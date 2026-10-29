@@ -2661,9 +2661,14 @@
   ]
  },
  "git": {
-  "commits": 733,
+  "commits": 734,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "Notice Boards, Mailboxes and Visiting Stones never stand in front of a door"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2778,11 +2783,6 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "Climbing to the top of Groddle Ladder takes you to The Great Hole to Ix"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "improve",
-    "text": "Distant scenery behind the street is sharp too"
    }
   ]
  },

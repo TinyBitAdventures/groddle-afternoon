@@ -278,7 +278,7 @@ describe('Egg Hunt and Pi Day', () => {
   });
 
   it('counts each egg into the collection however it arrives, then gives the trophy for them (seasons-feature)', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=g442-6');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=g444-1');
     const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=catalog-unified-7');
     const unlocked = [];
     const counted = {};
@@ -338,7 +338,7 @@ describe('supply paths', () => {
 
 describe('a ?season= preview leaves the save alone (G342)', () => {
   it('a carved pumpkin survives previewing another season, and the save still remembers Zilloween', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=g442-6');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=g444-1');
     const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=catalog-unified-7');
     const inv = createInventory();
     addItem(inv, 'pumpkin_carved_1', 2);
@@ -355,42 +355,13 @@ describe('a ?season= preview leaves the save alone (G342)', () => {
 });
 
 
-describe('the Zilloween sky ghost stays in the sky (G426)', () => {
-  // game.js: GROUND_Y is the 75th-percentile platform of the street.
-  const groundLine = (plats) => {
-    const ys = plats.map((p) => (p.y1 + p.y2) / 2).sort((a, b) => a - b);
-    return ys[Math.floor(ys.length * 0.75)] || plats[0]?.y1 || 800;
-  };
-  const load = (tsid) => JSON.parse(readFileSync(join(root, `assets/streets/${tsid}.json`), 'utf8'));
-
-  it('hangs clear of every walkway under its drift on The Great Hole to Ix (Austin 2026-10-29: a cone on the path)', async () => {
-    const { GHOST, ghostFootY } = await import('../public/js/features/seasons-feature.js?v=g442-6');
-    const { platformsScreen, streetWidth } = await import('../public/js/street-model.js?v=g442-6');
-    const { landingY } = await import('../public/js/walk-surface.js?v=g442-6');
-    const street = load('GLI2VDR4JRD1AEG');
-    const plats = platformsScreen(street);
-    const groundY = groundLine(plats);
-    // spawnGhost: 'GLI2V...'.charCodeAt(3) % 5 === 0, so 0.3 of the width (by Follybottom Stritt's signpost).
-    const baseX = streetWidth(street) * 0.3;
-    const foot = ghostFootY(plats, baseX, groundY);
-    const half = GHOST.drift + GHOST.w / 2;
-    let walkway = Infinity;
-    for (let x = baseX - half; x <= baseX + half; x += 8) walkway = Math.min(walkway, landingY(plats, x, -1e9) ?? Infinity);
-    assert.ok(Number.isFinite(walkway));
-    assert.ok(walkway - (groundY - GHOST.aboveGround) < GHOST.h, 'the old groundY - 260 foot stood on the upper path');
-    assert.ok(walkway - foot >= GHOST.clear - 1, `foot ${foot} vs walkway ${walkway}`);
-    assert.ok(foot - GHOST.h >= 0, 'the head stays inside the street');
-  });
-
-  it('keeps groundY - 260 on a flat street, and draws behind the middleground at the art\'s own faintness', async () => {
-    const { GHOST, GHOST_ALPHA, ghostFootY } = await import('../public/js/features/seasons-feature.js?v=g442-6');
-    const flat = [{ x1: 0, y1: 900, x2: 4000, y2: 900 }];
-    assert.equal(ghostFootY(flat, 1200, 900), 900 - GHOST.aboveGround);
-    assert.equal(ghostFootY(flat, 1200, 300), GHOST.h + 12, 'clamped inside the street top');
-    assert.ok(GHOST_ALPHA.min >= 0.5 && GHOST_ALPHA.max <= 1, 'the eyes stay readable');
+describe('no Zilloween sky ghost (Austin 2026-10-29)', () => {
+  // The source had no seasonal ghost; the remake's own sky ghost (Tiny Speck's
+  // background_ghost_transparent deco) looked like the Phantom of Notice the
+  // Unnoticeable and sent players after it, so it is gone. The Phantom stays.
+  it('the seasons feature draws none', () => {
     const src = readFileSync(join(root, 'js/features/seasons-feature.js'), 'utf8');
-    assert.match(src, /engine\.streetView/);
-    assert.match(src, /label === 'middleground'\) : null;\n  if \(mid\) return \{ parent: view, zIndex: mid\.zIndex - 1 \};/);
-    assert.match(readFileSync(join(root, 'game.js'), 'utf8'), /get streetView\(\) \{\n    return bgLayer \|\| null;/);
+    assert.doesNotMatch(src, /spawnGhost|background_ghost_transparent|kind: 'ghost'/);
+    assert.match(readFileSync(join(root, 'js/ghost-quest.js'), 'utf8'), /export const PHANTOM_QUEST_ID = 'phantom_glitch';/);
   });
 });

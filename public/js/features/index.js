@@ -33,7 +33,7 @@ import { masterGardenFeature } from './master-garden-feature.js?v=g403-1';
 import { animalHusbandryFeature } from './animal-husbandry-feature.js?v=g442-6';
 import { questInstancesFeature } from './quest-instances-feature.js?v=g434-1';
 import { partySpacesFeature } from './party-spaces-feature.js?v=party-15';
-import { seasonsFeature } from './seasons-feature.js?v=g442-6';
+import { seasonsFeature } from './seasons-feature.js?v=g444-1';
 import { cameraModeFeature } from './camera-mode-feature.js?v=g359-1';
 import { newxpFeature } from './newxp-feature.js?v=g424-1';
 
