@@ -2663,9 +2663,14 @@
   ]
  },
  "git": {
-  "commits": 739,
+  "commits": 740,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "improve",
+    "text": "Every rainbow the game shows draws sharp on Retina screens"
+   },
    {
     "date": "2026-10-29",
     "kind": "improve",
@@ -2780,11 +2785,6 @@
     "date": "2026-10-29",
     "kind": "new",
     "text": "A mystery quoin turns into iMG, mood, energy or currants"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "Quest text shows its bold and links, and Phantom cold spots beat and say how to notice"
    }
   ]
  },

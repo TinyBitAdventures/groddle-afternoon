@@ -16,10 +16,16 @@ import { buildStreetView, loadDecoManifest } from './js/street-render.js';
 import { streetWidth, streetHeight } from './js/street-model.js';
 
 const PIXI = globalThis.PIXI;
-const OUT_W = 840;
-const OUT_H = 160;
+/**
+ * The card shows the 840 x 160 strip in a 980 x 160 CSS box (object-fit: cover), so a 2x
+ * screen wants about 2.33 px per strip px: the strip is written `scale` (?scale=, default
+ * 2.5, G446) times that size, 2100 x 400.
+ */
+const SCALE = Number(new URLSearchParams(location.search).get('scale')) || 2.5;
+const OUT_W = Math.round(840 * SCALE);
+const OUT_H = Math.round(160 * SCALE);
 /** Drawn at this multiple of the strip, then box-filtered down (no mipmaps in Pixi). */
-const OVER = 4;
+const OVER = SCALE >= 2 ? 2 : 4;
 
 PIXI.Filter.defaultOptions.resolution = 'inherit';
 installPixiFixes(PIXI);
@@ -63,7 +69,10 @@ window.renderStrip = async (file) => {
   }
   const sky = view.children.find((c) => c.zIndex === -1100);
   if (sky) { sky.x = 0; sky.y = 0; sky.width = W; sky.height = H; }
-  const left = await settle(view);
+  // Layers above the middleground live in view.frontView since 71eea704 (they cover the avatars
+  // in the game); the strip draws them over the view with its transform (G446: they had dropped out).
+  const front = view.frontView || null;
+  const left = await settle(view) + (front ? await settle(front) : 0);
   // Blurred and recoloured layers bake once their textures arrive.
   await new Promise((r) => setTimeout(r, 400));
   const s = (OUT_W * OVER) / W;
@@ -71,6 +80,11 @@ window.renderStrip = async (file) => {
   view.x = 0;
   view.y = OUT_H * OVER - H * s;
   app.stage.addChild(view);
+  if (front) {
+    front.position.copyFrom(view.position);
+    front.scale.copyFrom(view.scale);
+    app.stage.addChild(front);
+  }
   app.render();
   const big = app.canvas;
   // Halve with smoothing until the strip size (a cheap box filter).
@@ -89,8 +103,9 @@ window.renderStrip = async (file) => {
     g.drawImage(src, 0, 0, w, h);
     src = c;
   }
-  const url = src.toDataURL('image/jpeg', 0.86);
+  const url = src.toDataURL('image/jpeg', Number(new URLSearchParams(location.search).get('q')) || 0.75);
   const drawn = view.decoDrawn;
+  if (front) app.stage.removeChild(front);
   app.stage.removeChild(view);
   view.destroy({ children: true });
   return { url, W, H, missing: left, drawn };

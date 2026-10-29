@@ -7,14 +7,15 @@
  * the same kind of picture with the game's own street renderer
  * (public/js/street-render.js over the CC0 glitch-locations decos): the whole
  * street, every parallax layer scaled to the street's width and stood on its
- * bottom, the bottom band of it at 840 px wide (tools/loading-strips/render.html).
+ * bottom, the bottom band of it at 840 px wide (tools/loading-strips/render.html), written
+ * at 2.5x (2100 x 400, G446) so the card is sharp on a Retina screen.
  * Only the streets that had a CDN strip get one (streets.json); every other
  * street's card has no picture, as before.
  *
  * Writes public/assets/loading-strips/<street>.jpg and
  * public/assets/content/loading-images.json (card key -> { local, tsid }).
  *
- *   node tools/loading-strips/build.mjs [--only <tsid,...>] [--port 8797]
+ *   node tools/loading-strips/build.mjs [--only <tsid,...>] [--port 8797] [--scale 2.5] [--quality 0.75]
  *   node tools/loading-strips/build.mjs --check   (map and files agree; no browser)
  *
  * Takes the browser lock (BROWSER_LOCK, a mkdir lock) for the headless run.
@@ -30,6 +31,12 @@ const PUBLIC = join(ROOT, 'public');
 export const STRIP_DIR = 'assets/loading-strips';
 const MAP = join(PUBLIC, 'assets/content/loading-images.json');
 const STREETS = JSON.parse(readFileSync(join(HERE, 'streets.json'), 'utf8')).keys;
+/**
+ * G446: strips are 2.5x the card's 840 x 160 (2100 x 400), sharp on a 2x screen (the card
+ * draws them 980 px wide), JPEG quality 0.75 (82 strips, 7.5 MB); --scale and --quality override.
+ */
+export const SCALE = Number(process.argv.includes('--scale') ? process.argv[process.argv.indexOf('--scale') + 1] : 2.5);
+export const QUALITY = Number(process.argv.includes('--quality') ? process.argv[process.argv.indexOf('--quality') + 1] : 0.75);
 
 const arg = (name, fallback = null) => {
   const i = process.argv.indexOf(name);
@@ -81,7 +88,7 @@ async function build() {
     const context = await browser.newContext({ viewport: { width: 900, height: 300 } });
     const page = await context.newPage();
     page.on('pageerror', (e) => console.log(`pageerror: ${e.message}`));
-    await page.goto(`http://127.0.0.1:${port}/tools/loading-strips/render.html`);
+    await page.goto(`http://127.0.0.1:${port}/tools/loading-strips/render.html?scale=${SCALE}&q=${QUALITY}`);
     await page.waitForFunction(() => window.stripReady === true, null, { timeout: 60000 });
     const index = JSON.parse(readFileSync(join(PUBLIC, 'assets/streets/index.json'), 'utf8')).streets;
     const only = arg('--only') ? new Set(arg('--only').split(',')) : null;
