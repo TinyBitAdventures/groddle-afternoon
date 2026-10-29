@@ -30,8 +30,10 @@ import {
   OVERLAY_BASE,
   OVERLAY_FADE,
   VECTOR_MAX_SIDE,
+  VECTOR_LINGER_MS,
   VECTOR_OVER_SHEET,
-  loadVectorArt,
+  holdVectorArt,
+  holdVectorTexture,
   overlayAlpha,
   overlayDensity,
   overlayFrameAt,
@@ -40,13 +42,14 @@ import {
   standPlacement,
   stateFrameAt,
   trackOverlay,
+  vectorArtStats,
   vectorDensity,
   vectorFrameSvgs,
-  vectorTexture,
-} from './overlay-art.js?v=g446-2';
+} from './overlay-art.js?v=g448-1';
 
 // G446: the SVG-frame helpers live in overlay-art.js (playSheetOverlay draws its rainbows the same way).
-export { VECTOR_MAX_SIDE, VECTOR_OVER_SHEET, loadVectorArt, overlayDensity, vectorDensity, vectorFrameSvgs };
+// G448: an overlay holds its decoded frames only while it plays (holdVectorTexture).
+export { VECTOR_LINGER_MS, VECTOR_MAX_SIDE, VECTOR_OVER_SHEET, holdVectorArt, overlayDensity, vectorArtStats, vectorDensity, vectorFrameSvgs };
 
 export const MORE_MANIFEST_URL = `${OVERLAY_BASE}overlays-more.json?v=g446-2`;
 
@@ -175,7 +178,7 @@ export function playOverlay(PIXI, key, { layer, at, wh = 0, durationMs = 2000, l
     const density = meta ? vectorDensity(meta, overlayDensity(meta, { wh, resolution, layerScale })) : 0;
     let vector = null;
     if (density > 0 && typeof Image === 'function') {
-      vector = await loadVectorArt(key, meta, density).then((art) => vectorTexture(PIXI, art), () => null);
+      vector = await holdVectorTexture(PIXI, key, meta, density);
     }
     return { meta, vector };
   }).then(({ meta, vector }) => new Promise((resolve) => {

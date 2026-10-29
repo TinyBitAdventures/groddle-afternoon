@@ -18,7 +18,9 @@
  *   smoke_puff a critter vanishes in and proto_puff (a box opening).
  * - G446: the four 400 px rainbows (winner, you did it, fully revived, secret
  *   spot) also keep SVG frames; on a dense screen playSheetOverlay draws
- *   those (the same path as js/overlays.js, vectorDensity / loadVectorArt).
+ *   those (the same path as js/overlays.js, vectorDensity / holdVectorTexture).
+ * - G448: the decoded SVG frames are held only while an overlay draws them
+ *   (holdVectorArt), and let go VECTOR_LINGER_MS after the last one ends.
  * - G272/G273: rainbow_winner (a race win), poisoned (a poisoned tree),
  *   rooked (a fallen swoonerfly), and two overlays with states (the
  *   client's annc.state, a frame label the SWF's start() jumps to):
@@ -387,23 +389,58 @@ export function vectorFrameSvgs(data, w, h) {
   });
 }
 
-const vectorArt = new Map(); // `${key}@${density}` -> Promise<{ imgs, w, h, density }>
+/**
+ * G448: how long an overlay's decoded SVG frames stay after the last overlay
+ * drawing them ends (ms). One that plays again within it (a second super
+ * harvest, the same rainbow twice in a row) reuses them; after it they are
+ * let go (each rainbow is about 100 decoded SVG documents).
+ */
+export const VECTOR_LINGER_MS = 2000;
 
-/** An overlay's SVG frames as decoded images sized for `density`, once per density. */
-export function loadVectorArt(key, meta, density) {
+const vectorArt = new Map(); // `${key}@${density}` -> { ready: Promise<{ imgs, urls, w, h, density }>, users, timer }
+
+/** Let an overlay's decoded frames go: their blob URLs revoked, each image's src dropped. */
+function freeVectorArt(art) {
+  for (const url of art.urls) {
+    try {
+      URL.revokeObjectURL(url);
+    } catch {
+      /* already gone */
+    }
+  }
+  for (const img of art.imgs) {
+    if (typeof img?.removeAttribute === 'function') img.removeAttribute('src');
+    else if (img) img.src = '';
+  }
+  art.imgs.length = 0;
+  art.urls.length = 0;
+}
+
+/**
+ * Hold an overlay's SVG frames, decoded at `density` (shared by every overlay
+ * holding the same key and density). Returns { ready: Promise<art>,
+ * release() }: release() once the overlay is done with them (only the first
+ * call counts); when no one holds them any more they are freed after
+ * VECTOR_LINGER_MS.
+ */
+export function holdVectorArt(key, meta, density) {
   const id = `${key}@${density}`;
-  let p = vectorArt.get(id);
-  if (!p) {
-    p = (async () => {
+  let entry = vectorArt.get(id);
+  if (!entry) {
+    entry = { ready: null, users: 0, timer: null };
+    entry.ready = (async () => {
       const res = await fetch(`${OVERLAY_BASE}${meta.vector.file}?v=${meta.vector.sha256.slice(0, 8)}`);
       if (!res.ok) throw new Error(`${meta.vector.file} ${res.status}`);
       const [, , bw, bh] = meta.box;
       const w = Math.max(1, Math.round(bw * density));
       const h = Math.max(1, Math.round(bh * density));
+      const urls = [];
       const imgs = await Promise.all(vectorFrameSvgs(await res.json(), w, h).map(async (svg) => {
         const img = new Image();
         img.decoding = 'async';
-        img.src = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+        const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+        urls.push(url);
+        img.src = url;
         try {
           await img.decode();
         } catch {
@@ -411,12 +448,72 @@ export function loadVectorArt(key, meta, density) {
         }
         return img;
       }));
-      return { imgs, w, h, density };
+      return { imgs, urls, w, h, density };
     })();
-    p.catch(() => vectorArt.delete(id));
-    vectorArt.set(id, p);
+    const mine = entry;
+    entry.ready.catch(() => {
+      if (vectorArt.get(id) === mine) vectorArt.delete(id);
+    });
+    vectorArt.set(id, entry);
   }
-  return p;
+  entry.users += 1;
+  if (entry.timer) clearTimeout(entry.timer);
+  entry.timer = null;
+  const held = entry;
+  let released = false;
+  return {
+    ready: held.ready,
+    release() {
+      if (released) return;
+      released = true;
+      held.users -= 1;
+      if (held.users > 0 || vectorArt.get(id) !== held) return;
+      const free = () => {
+        held.timer = null;
+        if (held.users > 0 || vectorArt.get(id) !== held) return;
+        vectorArt.delete(id);
+        held.ready.then(freeVectorArt, () => {});
+      };
+      if (VECTOR_LINGER_MS > 0 && typeof setTimeout === 'function') {
+        held.timer = setTimeout(free, VECTOR_LINGER_MS);
+        held.timer?.unref?.();
+      } else free();
+    },
+  };
+}
+
+/** QA: the overlays whose SVG frames are decoded now (`key@density`), how many hold each, and whether it is lingering. */
+export function vectorArtStats() {
+  return [...vectorArt.entries()].map(([id, e]) => ({ id, users: e.users, lingering: Boolean(e.timer) }));
+}
+
+/**
+ * The canvas texture an overlay draws its SVG frames into (vectorTexture),
+ * holding the frames while it lives: destroy() lets the texture, its canvas
+ * and the hold go. Resolves null when the frames fail to load (the caller
+ * draws the sheet).
+ */
+export async function holdVectorTexture(PIXI, key, meta, density) {
+  const hold = holdVectorArt(key, meta, density);
+  let tex = null;
+  try {
+    tex = vectorTexture(PIXI, await hold.ready);
+  } catch {
+    tex = null;
+  }
+  if (!tex) {
+    hold.release();
+    return null;
+  }
+  const drop = tex.destroy;
+  let gone = false;
+  tex.destroy = () => {
+    if (gone) return;
+    gone = true;
+    drop();
+    hold.release();
+  };
+  return tex;
 }
 
 /**
@@ -447,6 +544,9 @@ export function vectorTexture(PIXI, art) {
     },
     destroy() {
       texture.destroy(true);
+      // G448: the canvas's pixels go now, not when it is collected.
+      canvas.width = 0;
+      canvas.height = 0;
     },
   };
 }
@@ -501,7 +601,7 @@ export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, 
     const density = meta?.kind === 'sheet' ? vectorDensity(meta, overlayDensity(meta, { wh, resolution, layerScale })) : 0;
     let vector = null;
     if (density > 0 && typeof Image === 'function') {
-      vector = await loadVectorArt(key, meta, density).then((art) => vectorTexture(PIXI, art), () => null);
+      vector = await holdVectorTexture(PIXI, key, meta, density);
     }
     return { meta, vector };
   }).then(({ meta, vector }) => new Promise((resolve) => {

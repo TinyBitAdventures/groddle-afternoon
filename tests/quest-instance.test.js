@@ -230,7 +230,7 @@ describe('Vision Quest (vision_quest)', () => {
 
 describe("Mr. Block's playroom (kids_room)", () => {
   it('has the 24 source words, the doneSpelling tiers and letter gifts', async () => {
-    const mod = await import('../public/js/quest-rooms/kids-room.js?v=g446-2');
+    const mod = await import('../public/js/quest-rooms/kids-room.js?v=g448-1');
     assert.equal(mod.WORD_UP_WORDS.length, 24);
     assert.equal(mod.SPELL_MS, 180_000);
     assert.deepEqual([2, 3, 9, 10, 19, 20].map((n) => mod.spellingTier(n).id),

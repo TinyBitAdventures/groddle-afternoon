@@ -2665,9 +2665,14 @@
   ]
  },
  "git": {
-  "commits": 745,
+  "commits": 746,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "The tutorial's chain and its click-to-pull arrow are in view, and Local chat waits for the home street"
+   },
    {
     "date": "2026-10-29",
     "kind": "improve",
@@ -2782,11 +2787,6 @@
     "date": "2026-10-29",
     "kind": "new",
     "text": "183 street decos Tiny Speck drew but the game never shipped, on 695 streets"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "Street project signs and Zilloween pumpkins stand in front of the trees"
    }
   ]
  },

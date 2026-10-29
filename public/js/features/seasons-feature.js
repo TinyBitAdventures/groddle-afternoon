@@ -43,7 +43,7 @@ import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
 import { rollDropTable } from '../drop-tables.js';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=note-g175';
 import { payDrop } from './drops-feature.js?v=drops-8';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=g446-4';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=g448-1';
 import { SEASON_DATA } from '../seasons-data.js';
 import {
   CANDY_CLASSES,
@@ -99,7 +99,7 @@ import {
   yetiQuote,
 } from '../seasons.js?v=g433-1';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
-import { playOverlay } from '../overlays.js?v=g446-2';
+import { playOverlay } from '../overlays.js?v=g448-1';
 import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const SEASONS_FEATURE_ID = 'seasons';

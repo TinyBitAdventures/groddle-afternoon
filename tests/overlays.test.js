@@ -60,7 +60,7 @@ after(() => {
   }
 });
 
-const overlays = () => import('../public/js/overlays.js?v=g446-2');
+const overlays = () => import('../public/js/overlays.js?v=g448-1');
 const flush = async (n = 3) => {
   for (let i = 0; i < n; i += 1) {
     await new Promise((r) => setTimeout(r, 0));
@@ -368,7 +368,7 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
     // Nothing shows the race winner's rainbow (desk decisions), so it has no SVG frames.
     assert.ok(!art.rainbow_winner.vector);
     for (const f of ['player-verbs-mp-feature', 'rook-attack-feature', 'secret-spots-feature']) assert.match(read(`js/features/${f}.js`), /resolution: engine\.resolution \|\| 1/, f);
-    const oa = await import('../public/js/overlay-art.js?v=g446-2');
+    const oa = await import('../public/js/overlay-art.js?v=g448-1');
     const ov = await overlays();
     assert.equal(ov.vectorDensity, oa.vectorDensity, 'one vector path');
     const y = art.rainbow_youdidit;
@@ -415,6 +415,93 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
     }
   });
 
+  it('G448: the decoded frames are held while a rainbow plays, shared by one that overlaps, and let go after the last ends', async (t) => {
+    const ov = await overlays();
+    const { holdVectorArt, vectorArtStats, VECTOR_LINGER_MS } = ov;
+    const vtext = readFileSync(vfile, 'utf8');
+    const savedFetch = globalThis.fetch;
+    const savedImage = globalThis.Image;
+    const savedDoc = globalThis.document;
+    let fetches = 0;
+    const imgs = [];
+    globalThis.fetch = async (url) => {
+      if (String(url).includes(r.vector.file)) {
+        fetches += 1;
+        return { ok: true, json: async () => JSON.parse(vtext) };
+      }
+      return savedFetch(url);
+    };
+    globalThis.Image = class { constructor() { this.complete = true; imgs.push(this); } async decode() {} removeAttribute(n) { if (n === 'src') delete this.src; } };
+    const canvases = [];
+    globalThis.document = { ...savedDoc, createElement: () => { const c = { width: 0, height: 0, getContext: () => ({ clearRect() {}, drawImage() {} }) }; canvases.push(c); return c; } };
+    const pixi = {
+      ...FAKE_PIXI,
+      CanvasSource: class { constructor(o) { Object.assign(this, o); } update() {} },
+      Texture: class { constructor(o) { Object.assign(this, o); } once() {} destroy() { this.destroyed = true; } },
+    };
+    t.mock.timers.enable({ apis: ['setTimeout'] });
+    try {
+      const id = (d) => `rainbow_superharvest@${d}`;
+      const a = holdVectorArt('rainbow_superharvest', r, 2.75);
+      const b = holdVectorArt('rainbow_superharvest', r, 2.75);
+      assert.equal(a.ready, b.ready, 'one decode for both');
+      const art = await a.ready;
+      assert.equal(fetches, 1);
+      assert.equal(art.imgs.length, r.vector.frames);
+      a.release();
+      a.release();
+      assert.deepEqual(vectorArtStats().find((e) => e.id === id(2.75)), { id: id(2.75), users: 1, lingering: false }, 'the overlapping one still draws');
+      b.release();
+      assert.equal(vectorArtStats().find((e) => e.id === id(2.75)).lingering, true);
+      // Played again within the linger: the same frames.
+      const c = holdVectorArt('rainbow_superharvest', r, 2.75);
+      assert.equal(c.ready, a.ready);
+      c.release();
+      t.mock.timers.tick(VECTOR_LINGER_MS);
+      await new Promise((res) => setImmediate(res));
+      assert.equal(vectorArtStats().find((e) => e.id === id(2.75)), undefined, 'let go');
+      assert.equal(art.imgs.length, 0);
+      assert.ok(imgs.every((img) => img.src === undefined), 'every image\'s src dropped');
+      // Twice in a row after that: decoded again, from a fresh fetch.
+      const d = holdVectorArt('rainbow_superharvest', r, 2.75);
+      assert.notEqual(d.ready, a.ready);
+      assert.equal((await d.ready).imgs.length, r.vector.frames);
+      assert.equal(fetches, 2);
+      d.release();
+      t.mock.timers.tick(VECTOR_LINGER_MS);
+      await new Promise((res) => setImmediate(res));
+      // playOverlay holds them (at a density no earlier test left lingering) for its life and lets the texture, its canvas and the hold go at the end.
+      const layer = { destroyed: false, addChild() {} };
+      const h = ov.playOverlay(pixi, 'rainbow_superharvest', { layer, at: () => ({ x: 500, y: 300 }), wh: 400, durationMs: 4000, loop: false, holdMs: 2000, resolution: 2.6 });
+      for (let i = 0; i < 6; i += 1) {
+        await new Promise((res) => setImmediate(res));
+        const q = rafQueue;
+        rafQueue = [];
+        for (const fn of q) fn(0);
+      }
+      assert.equal(h.art, 'vector');
+      assert.equal(vectorArtStats().filter((e) => e.users > 0).length, 1);
+      h.stop();
+      for (let i = 0; i < 3; i += 1) {
+        await new Promise((res) => setImmediate(res));
+        const q = rafQueue;
+        rafQueue = [];
+        for (const fn of q) fn(0);
+      }
+      await h.done;
+      assert.equal(vectorArtStats().filter((e) => e.users > 0).length, 0);
+      assert.equal(canvases.at(-1).width, 0, 'the canvas pixels go with the texture');
+      t.mock.timers.tick(VECTOR_LINGER_MS);
+      await new Promise((res) => setImmediate(res));
+      assert.equal(vectorArtStats().filter((e) => /@(2\.75|3\.25)$/.test(e.id)).length, 0);
+    } finally {
+      t.mock.timers.reset();
+      globalThis.fetch = savedFetch;
+      globalThis.Image = savedImage;
+      globalThis.document = savedDoc;
+    }
+  });
+
   it('game.js hands the renderer\'s resolution to the rainbows', () => {
     const game = read('game.js');
     assert.match(game, /showRainbow\(PIXI, key, \{.*resolution: app\?\.renderer\?\.resolution \|\| 1 \}\)/);
@@ -427,7 +514,7 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
 describe('wiring', () => {
   const game = read('game.js');
   it('game.js: quoin limit, super harvest, wheel and donation rainbows; musicblock notes; the phantom; the solo Hog Haul countdown', () => {
-    assert.match(game, /import \{[^}]*showRainbow[^}]*\} from '\.\/js\/overlays\.js\?v=g446-2'/);
+    assert.match(game, /import \{[^}]*showRainbow[^}]*\} from '\.\/js\/overlays\.js\?v=g448-1'/);
     assert.match(game, /playerRainbow\(result\.dailyLimit === 150 \? 'rainbow_150coinstoday' : 'rainbow_100coinstoday'\)/);
     assert.match(game, /if \(!paradiseRun\) playerRainbow/);
     assert.match(game, /playerRainbow\('rainbow_superharvest'/);

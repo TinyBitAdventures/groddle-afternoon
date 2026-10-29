@@ -87,7 +87,7 @@ import {
 } from '../resource-nodes.js?v=g414-1';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js';
 import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=g403-1';
-import { vpSequence } from '../quest-rooms/vp-overlay.js?v=g446-2';
+import { vpSequence } from '../quest-rooms/vp-overlay.js?v=g448-1';
 import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';

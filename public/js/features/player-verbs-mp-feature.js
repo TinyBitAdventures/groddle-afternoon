@@ -41,8 +41,8 @@ import { grantMoodXp } from '../mood-xp.js';
 import { ensureQuestOfferState } from '../quest-offers.js?v=g403-1';
 import { getMusicblock, isMusicblock } from '../musicblocks.js?v=g403-1';
 import { GAME_DAY_MS } from '../game-day.js';
-import { playSheetOverlay } from '../overlay-art.js?v=g446-2';
-import { showRainbow } from '../overlays.js?v=g446-2';
+import { playSheetOverlay } from '../overlay-art.js?v=g448-1';
+import { showRainbow } from '../overlays.js?v=g448-1';
 import {
   CHARADES_BUFF,
   CHARADES_POTION,
