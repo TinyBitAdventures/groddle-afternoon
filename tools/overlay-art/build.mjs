@@ -17,13 +17,18 @@
  *   sheet only: scale, cell: [w, h], cols, order: [cell per frame],
  *   states: { <label>: { from, frames, loop } } (G273: an overlay whose
  *   client state, annc.state, puts a clip on a frame label; each state's
- *   frames run from `from` in `order`, looping or held on the last) } }
+ *   frames run from `from` in `order`, looping or held on the last),
+ *   vector: { file, frames, order, bytes, sha256 } (G446: a sheet config with
+ *   `vector: true` also keeps its frames as SVG, <key>.frames.json over the
+ *   built box, the same as tools/overlays' rainbows; js/overlay-art.js
+ *   playSheetOverlay draws them at the screen's density on a dense screen) } }
  * The game places the stage the way the client did (ArbitrarySWFView at 1:1
  * when no size is given, else fitted to the width x height box): centred on
  * the point for a window overlay (vp_overlay), standing on it (registration
  * center_bottom) for pc_, itemstack_ and location_overlay.
  *
  * Usage: node tools/overlay-art/build.mjs [key...]   (all by default)
+ *        node tools/overlay-art/build.mjs --vector [key...]   (only the SVG frames of the vector sheets, from the built box; no Chrome)
  *        node tools/overlay-art/build.mjs --check    (overlays.json matches the FLAs)
  */
 import { createHash } from 'node:crypto';
@@ -75,9 +80,10 @@ export const OVERLAYS = Object.freeze({
   // players/player.js 3014-3029 show_rainbow: pc_overlay, 400 x 400, 4 s (the
   // 330 x 200 stage at 400/330); items/include/rook.js 208-222 the same box over
   // a fully revived trant or critter. stop() on frame 115 holds the last frame.
-  rainbow_youdidit: { fla: 'glitch-overlays/rainbow_youdidit.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85 },
-  rainbow_fullyrevived: { fla: 'glitch-overlays/rainbow_fullyrevived.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85 },
-  rainbow_secretspot: { fla: 'glitch-overlays/rainbow_secretspot.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85 },
+  // G446: the 400 px rainbows the game shows also keep SVG frames (vector), drawn sharp on dense screens.
+  rainbow_youdidit: { fla: 'glitch-overlays/rainbow_youdidit.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85, vector: true },
+  rainbow_fullyrevived: { fla: 'glitch-overlays/rainbow_fullyrevived.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85, vector: true },
+  rainbow_secretspot: { fla: 'glitch-overlays/rainbow_secretspot.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85, vector: true },
   // items/npc_piggy.js 1964-1971 (and npc_butterfly.js, npc_chicken.js):
   // itemstack_overlay smoke_puff, delta_y 95, 1.5 s; 24 fps, stop() on frame 21.
   smoke_puff: { fla: 'glitch-overlays/smoke_puff.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85 },
@@ -87,6 +93,7 @@ export const OVERLAYS = Object.freeze({
   // locations/inc_race.js 384 winner.show_rainbow('rainbow_winner'):
   // players/player.js 3014-3029, 3056-3058 the same 400 x 400 pc_overlay, 4 s,
   // sound RAINBOW_WINNER (G272).
+  // No SVG frames (G446): nothing shows it (js/race-render.js drawWinnerRainbow has no caller; tests/desk-decisions.test.js).
   rainbow_winner: { fla: 'glitch-overlays/rainbow_winner.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85 },
   // G273, drawn now that the reader follows motion guides, strokes and frame
   // scripts.
@@ -243,8 +250,55 @@ export function checkOverlays() {
     for (const layer of m.layers || []) if (!existsSync(join(outDir, layer.file))) bad.push(`${key}: no ${layer.file}`);
     if (Boolean(m.states) !== Boolean(cfg.states)) bad.push(`${key}: states`);
     if (cfg.webp && !m.file.endsWith('.webp')) bad.push(`${key}: not WebP`);
+    if (Boolean(m.vector) !== Boolean(cfg.vector)) bad.push(`${key}: vector frames ${cfg.vector ? 'not built' : 'not in the config'}`);
+    if (m.vector) {
+      const vout = join(outDir, m.vector.file);
+      if (!existsSync(vout)) { bad.push(`${key}: no ${m.vector.file}`); continue; }
+      const vbuf = readFileSync(vout);
+      if (vbuf.length !== m.vector.bytes || sha256(vbuf) !== m.vector.sha256) bad.push(`${key}: ${m.vector.file} differs from the manifest`);
+      if (m.vector.order.length !== m.frames || Math.max(...m.vector.order) + 1 !== m.vector.frames) bad.push(`${key}: vector order`);
+      // The SVG frames are drawn without Chrome, so they can be redrawn and compared.
+      if (vectorFrames(cfg, m.box).text !== vbuf.toString('utf8')) bad.push(`${key}: ${m.vector.file} is not what the FLA draws`);
+    }
   }
   return bad;
+}
+
+const sha256 = (buf) => createHash('sha256').update(buf).digest('hex');
+
+/**
+ * The SVG frames of a sheet overlay over its built box (`row.box`), as
+ * { text (the frames.json), order (timeline frame -> unique frame) }: pure
+ * Node, so --check can redraw them from the FLA and compare. Used for the
+ * `vector: true` sheets here and in tools/overlays (G441, G446).
+ */
+export function vectorFrames(cfg, box) {
+  const doc = scrub(loadFla(join(audit, cfg.fla), { scene: cfg.scene }), cfg.scrub);
+  const plan = framePlan({ kind: 'sheet', ...cfg }, doc);
+  const unique = [];
+  const seen = new Map();
+  const order = plan.picks.map(({ n, start }) => {
+    const svg = frameSvg(doc, n, { box, start });
+    if (!seen.has(svg)) {
+      seen.set(svg, unique.length);
+      unique.push(svg);
+    }
+    return seen.get(svg);
+  });
+  const { defs, frames } = shareFrames(unique);
+  const text = `{"defs":${JSON.stringify(defs)},\n"frames":[\n${frames.map((f) => JSON.stringify(f)).join(',\n')}\n]}\n`;
+  return { text, order };
+}
+
+/** Write <key>.frames.json into `dir` over the row's box; returns the row's `vector` entry. */
+export function writeVectorFrames(dir, key, cfg, row) {
+  const { text, order } = vectorFrames(cfg, row.box);
+  const file = `${key}.frames.json`;
+  const buf = Buffer.from(text);
+  writeFileSync(join(dir, file), buf);
+  const frames = Math.max(...order) + 1;
+  console.log(`${key}: ${order.length} SVG frames (${frames} unique), ${(buf.length / 1024).toFixed(0)} KB`);
+  return { file, frames, order, bytes: buf.length, sha256: sha256(buf) };
 }
 
 async function launch() {
@@ -484,14 +538,31 @@ async function build(keys) {
       const out = cfg.scale === 1 ? `${key}.${ext}` : `${key}@${cfg.scale}x.${ext}`;
       writeFileSync(join(outDir, out), Buffer.from(dataUrl.split(',')[1], 'base64'));
       manifest[key] = { ...base, file: out, scale: cfg.scale, cell: [cellW, cellH], cols, order };
+      if (cfg.vector) manifest[key].vector = writeVectorFrames(outDir, key, cfg, { box: box.map(round2) });
       console.log(`${key}: ${picks.length} frames (${unique} unique), cell ${cellW}x${cellH}, ${cols} cols, box ${box.join(',')}`);
     }
   } finally {
     await browser.close();
   }
+  writeManifest(manifest);
+}
+
+function writeManifest(manifest) {
   const sorted = Object.fromEntries(Object.keys(manifest).sort().map((k) => [k, manifest[k]]));
   for (const m of Object.values(sorted)) m.box = m.box.map(round2);
   writeFileSync(manifestPath, `${JSON.stringify(sorted, (k, v) => (Array.isArray(v) && v.every((x) => typeof x === 'number') ? `[${v.join(', ')}]` : v), 1).replace(/"\[([^"]*)\]"/g, '[$1]')}\n`);
+}
+
+/** --vector: only the SVG frames of the vector sheets, over each row's built box (no Chrome). */
+function buildVectors(keys) {
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+  for (const key of keys) {
+    const cfg = OVERLAYS[key];
+    if (!cfg?.vector) throw new Error(`${key}: not a vector sheet`);
+    if (!manifest[key]) throw new Error(`${key}: build the sheet first`);
+    manifest[key].vector = writeVectorFrames(outDir, key, cfg, manifest[key]);
+  }
+  writeManifest(manifest);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
@@ -503,5 +574,8 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
       process.exit(1);
     }
     console.log('overlays.json matches the FLAs');
+  } else if (args.includes('--vector')) {
+    const keys = args.filter((a) => a !== '--vector');
+    buildVectors(keys.length ? keys : Object.keys(OVERLAYS).filter((k) => OVERLAYS[k].vector));
   } else await build(args.length ? args : Object.keys(OVERLAYS));
 }

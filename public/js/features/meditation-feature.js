@@ -71,7 +71,7 @@ import { levitationCards } from '../imagination-effects.js?v=g403-1';
 import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js?v=g403-1';
 import { sourceFromUrl } from '../textures.js';
 import { denseSprite } from '../sprite-dense.js?v=g430-1';
-import { rainbowSound, showRainbow } from '../overlays.js?v=g441-1';
+import { rainbowSound, showRainbow } from '../overlays.js?v=g446-2';
 import { moodScaledXp } from '../mood-xp.js';
 import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
 import { getSkillPackageOverride } from '../skill-packages.js';
@@ -308,7 +308,7 @@ function destroyMeditationFx(engine) {
 function showMaxRelax(engine) {
   const player = engine.player;
   if (!player) return;
-  showRainbow(engine.PIXI, 'rainbow_maxrelax', { layer: engine.fxLayer || engine.entityLayer, at: () => ({ x: player.x, y: player.y }) });
+  showRainbow(engine.PIXI, 'rainbow_maxrelax', { layer: engine.fxLayer || engine.entityLayer, at: () => ({ x: player.x, y: player.y }), resolution: engine.resolution || 1 });
   engine.playSound?.(rainbowSound('rainbow_maxrelax'), { volume: 0.5 });
   engine.setData?.('rainbow', 'rainbow_maxrelax');
 }

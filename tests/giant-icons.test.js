@@ -260,7 +260,7 @@ describe('icon conversations (G202: the shared record)', () => {
   });
 
   it('a version 1 save hands its talked list to the record once, in either restore order', async () => {
-    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=g442-6');
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=g446-2');
     const old = { version: 1, talked: ['icon_humbaba_1', 'icon_alph_1'] };
     const saved = { completed: { npc_chicken: { chickens_cautionary_tales_1: 700 } } };
     const t0 = Date.now();
@@ -299,7 +299,7 @@ describe('imagination cards', () => {
 
 describe('giant icons feature', () => {
   it('offers the source pack verbs and iconizes through the engine', async () => {
-    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=g442-6');
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js?v=g446-2');
     giantIconsFeature._reset();
     const events = [];
     const granted = [];

@@ -49,7 +49,7 @@ import {
   streetKeyFor,
   triggerSecretSpot,
 } from '../secret-spots.js?v=secrets-1';
-import { playSheetOverlay } from '../overlay-art.js?v=g311-1';
+import { playSheetOverlay } from '../overlay-art.js?v=g446-2';
 
 export const SECRET_SPOTS_FEATURE_ID = 'secret-spots';
 const MARKER_Z = 4;
@@ -189,6 +189,7 @@ function playRainbow(engine) {
     durationMs: SECRET_TIMING.rainbow,
     loop: false,
     holdMs: hold ? 3000 : null,
+    resolution: engine.resolution || 1,
   });
 }
 

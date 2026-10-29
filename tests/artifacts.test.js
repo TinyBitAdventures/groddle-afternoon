@@ -30,8 +30,8 @@ import {
   rollCrack,
   stackMaxFor,
 } from '../public/js/artifacts.js';
-import { artifactsFeature, finishCrack } from '../public/js/features/artifacts-feature.js?v=g441-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-276';
+import { artifactsFeature, finishCrack } from '../public/js/features/artifacts-feature.js?v=g446-2';
+import { FEATURES } from '../public/js/features/index.js?v=registry-278';
 import { DROP_ITEMS, DROP_TABLES, rollDropTable } from '../public/js/drop-tables.js';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=woodcutting-test-8';

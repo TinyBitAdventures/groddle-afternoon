@@ -16,6 +16,9 @@
  *   fight's focusing_orb_laser_beam and shrine_laser_beam_1/2/3, the
  *   rainbow_youdidit / rainbow_fullyrevived / rainbow_secretspot arcs, the
  *   smoke_puff a critter vanishes in and proto_puff (a box opening).
+ * - G446: the four 400 px rainbows (winner, you did it, fully revived, secret
+ *   spot) also keep SVG frames; on a dense screen playSheetOverlay draws
+ *   those (the same path as js/overlays.js, vectorDensity / loadVectorArt).
  * - G272/G273: rainbow_winner (a race win), poisoned (a poisoned tree),
  *   rooked (a fallen swoonerfly), and two overlays with states (the
  *   client's annc.state, a frame label the SWF's start() jumps to):
@@ -40,7 +43,7 @@
 import { frameTexture, sourceFromUrl } from './textures.js';
 
 export const OVERLAY_BASE = 'assets/sprites/overlays/';
-export const OVERLAY_MANIFEST_URL = `${OVERLAY_BASE}overlays.json?v=g304-1`;
+export const OVERLAY_MANIFEST_URL = `${OVERLAY_BASE}overlays.json?v=g446-2`;
 /** Announcement.as 149-150. */
 export const OVERLAY_FADE = Object.freeze({ inMs: 200, outMs: 400 });
 
@@ -326,6 +329,128 @@ export function sheetTexture(PIXI, key, meta, cell) {
   return t;
 }
 
+/* ------------------------------------------------------------------ */
+/* SVG frames on dense screens (G441, G446)                             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * G441: an overlay with SVG frames (a sheet row's `vector`, <key>.frames.json,
+ * built by tools/overlays and tools/overlay-art) draws them, at the screen's
+ * own density into one canvas the sprite shows, once the screen asks for more
+ * than this many device px per sheet texel (meta.scale texels per stage px).
+ */
+export const VECTOR_OVER_SHEET = 1.2;
+/** The longest side of a vector overlay's canvas (device px). */
+export const VECTOR_MAX_SIDE = 2048;
+
+/**
+ * Device px per stage px where a street overlay is drawn: its fit to `wh`
+ * (0: 1:1) times the renderer's resolution and the layer's own scale.
+ */
+export function overlayDensity(meta, { wh = 0, resolution = 1, layerScale = 1 } = {}) {
+  const [sw, sh] = meta?.stage || [1, 1];
+  return (wh > 0 ? wh / Math.max(sw, sh) : 1) * (Number(resolution) > 0 ? Number(resolution) : 1) * (Number(layerScale) > 0 ? Number(layerScale) : 1);
+}
+
+/**
+ * The density (device px per stage px, in quarter steps, the canvas capped
+ * at VECTOR_MAX_SIDE) to draw an overlay's SVG frames at, or 0 when the
+ * sheet is sharp enough there (or there are no SVG frames).
+ */
+export function vectorDensity(meta, density) {
+  if (!meta?.vector || !(density > (meta.scale || 1) * VECTOR_OVER_SHEET)) return 0;
+  const [, , bw, bh] = meta.box;
+  return Math.max(0.25, Math.min(Math.ceil(density * 4), Math.floor((VECTOR_MAX_SIDE / Math.max(bw, bh)) * 4)) / 4);
+}
+
+/**
+ * The frames of a <key>.frames.json as whole SVGs, each carrying only the
+ * shared outlines and ramps it uses (and the ones those use), its root
+ * sized w x h so the browser draws it at that size.
+ */
+export function vectorFrameSvgs(data, w, h) {
+  const defs = new Map();
+  for (const m of String(data?.defs || '').matchAll(/<(path|linearGradient|radialGradient)\b[^>]*? id="([^"]+)"[^>]*?(?:\/>|>[\s\S]*?<\/\1>)/g)) defs.set(m[2], m[0]);
+  const refs = (text) => [...text.matchAll(/#(_[a-z]+\d+)/g)].map((m) => m[1]);
+  return (data?.frames || []).map((frame) => {
+    const used = new Set();
+    const todo = refs(frame);
+    while (todo.length) {
+      const id = todo.pop();
+      if (used.has(id) || !defs.has(id)) continue;
+      used.add(id);
+      todo.push(...refs(defs.get(id)));
+    }
+    const own = [...used].map((id) => defs.get(id)).join('');
+    const svg = frame.includes('<defs>') ? frame.replace('<defs>', `<defs>${own}`) : frame.replace(/^(<svg[^>]*>)/, `$1<defs>${own}</defs>`);
+    return svg.replace(/^<svg([^>]*?) width="[^"]*" height="[^"]*"/, `<svg$1 width="${w}" height="${h}"`);
+  });
+}
+
+const vectorArt = new Map(); // `${key}@${density}` -> Promise<{ imgs, w, h, density }>
+
+/** An overlay's SVG frames as decoded images sized for `density`, once per density. */
+export function loadVectorArt(key, meta, density) {
+  const id = `${key}@${density}`;
+  let p = vectorArt.get(id);
+  if (!p) {
+    p = (async () => {
+      const res = await fetch(`${OVERLAY_BASE}${meta.vector.file}?v=${meta.vector.sha256.slice(0, 8)}`);
+      if (!res.ok) throw new Error(`${meta.vector.file} ${res.status}`);
+      const [, , bw, bh] = meta.box;
+      const w = Math.max(1, Math.round(bw * density));
+      const h = Math.max(1, Math.round(bh * density));
+      const imgs = await Promise.all(vectorFrameSvgs(await res.json(), w, h).map(async (svg) => {
+        const img = new Image();
+        img.decoding = 'async';
+        img.src = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+        try {
+          await img.decode();
+        } catch {
+          /* drawn when it arrives */
+        }
+        return img;
+      }));
+      return { imgs, w, h, density };
+    })();
+    p.catch(() => vectorArt.delete(id));
+    vectorArt.set(id, p);
+  }
+  return p;
+}
+
+/**
+ * A canvas texture the vector frames are drawn into (logical size = the box,
+ * resolution = density, so the sprite keeps the sheet's sizes). Returns
+ * { texture, draw(cell), destroy() } or null without a DOM or CanvasSource.
+ */
+export function vectorTexture(PIXI, art) {
+  const doc = globalThis.document;
+  if (!doc?.createElement || !PIXI?.CanvasSource || !PIXI?.Texture) return null;
+  const canvas = doc.createElement('canvas');
+  canvas.width = art.w;
+  canvas.height = art.h;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+  const source = new PIXI.CanvasSource({ resource: canvas, resolution: art.density, scaleMode: 'linear' });
+  const texture = new PIXI.Texture({ source });
+  let shown = -1;
+  return {
+    texture,
+    draw(cell) {
+      const img = art.imgs[cell];
+      if (cell === shown || !img?.complete) return;
+      shown = cell;
+      ctx.clearRect(0, 0, art.w, art.h);
+      ctx.drawImage(img, 0, 0, art.w, art.h);
+      source.update();
+    },
+    destroy() {
+      texture.destroy(true);
+    },
+  };
+}
+
 /**
  * Play a sheet overlay in the street (pc_, itemstack_ or location_overlay):
  * a Pixi sprite on `layer`, standing on `at()` (world px, re-read every frame
@@ -335,17 +460,20 @@ export function sheetTexture(PIXI, key, meta, cell) {
  * `delayMs`. `holdMs` freezes it at that moment for screenshots (it never
  * ends). `state` plays one of the overlay's states (G273), and
  * handle.setState(name) switches to another, from its start, the way a new
- * annc.state restarts the clip on its label. Returns { sprite, stop(),
- * setState(), done, cancelled } (done resolves true once played, false when
+ * annc.state restarts the clip on its label. `resolution` (the renderer's,
+ * device px per world px) lets a row with SVG frames draw them on a dense
+ * screen (G446, vectorDensity; handle.art says which: 'sheet' or 'vector').
+ * Returns { sprite, stop(), setState(), done, cancelled, art } (done resolves true once played, false when
  * the art is missing, it was stopped, or a street change cancelled it:
  * cancelled true, see cancelAllOverlays).
  */
-export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, durationMs = 2000, loop = true, delayMs = 0, holdMs = null, zIndex = 60, state = null } = {}) {
+export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, durationMs = 2000, loop = true, delayMs = 0, holdMs = null, zIndex = 60, state = null, resolution = 1 } = {}) {
   const handle = {
     sprite: null,
     stopped: false,
     cancelled: false,
     done: null,
+    art: null,
     state,
     stateAt: null,
     stop() { handle.stopped = true; },
@@ -367,13 +495,26 @@ export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, 
   liveOverlays.add(handle);
   const clock = () => globalThis.performance?.now?.() ?? Date.now();
   const startAt = clock() + Math.max(0, Number(delayMs) || 0);
-  handle.done = loadOverlayManifest().then((manifest) => new Promise((resolve) => {
+  handle.done = loadOverlayManifest().then(async (manifest) => {
     const meta = manifest?.[key];
+    const layerScale = Math.hypot(layer?.worldTransform?.a ?? 1, layer?.worldTransform?.b ?? 0) || 1;
+    const density = meta?.kind === 'sheet' ? vectorDensity(meta, overlayDensity(meta, { wh, resolution, layerScale })) : 0;
+    let vector = null;
+    if (density > 0 && typeof Image === 'function') {
+      vector = await loadVectorArt(key, meta, density).then((art) => vectorTexture(PIXI, art), () => null);
+    }
+    return { meta, vector };
+  }).then(({ meta, vector }) => new Promise((resolve) => {
     if (!meta || meta.kind !== 'sheet' || handle.stopped || handle.cancelled || layer.destroyed) {
+      vector?.destroy();
       resolve(false);
       return;
     }
-    const sprite = new PIXI.Sprite(sheetTexture(PIXI, key, meta, meta.order[0]));
+    handle.art = vector ? 'vector' : 'sheet';
+    // The SVG frames are numbered on their own (identical frames kept once, meta.vector.order).
+    const cellOf = (frame) => (vector ? meta.vector.order : meta.order)[Math.min(meta.order.length - 1, frame)];
+    if (vector) vector.draw(cellOf(0));
+    const sprite = new PIXI.Sprite(vector ? vector.texture : sheetTexture(PIXI, key, meta, meta.order[0]));
     sprite.eventMode = 'none';
     sprite.zIndex = zIndex;
     sprite.alpha = 0;
@@ -384,6 +525,7 @@ export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, 
     const life = overlayLifeMs(durationMs);
     const finish = (ok) => {
       if (!sprite.destroyed) sprite.destroy();
+      vector?.destroy();
       resolve(ok);
     };
     const step = () => {
@@ -401,8 +543,8 @@ export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, 
         const p = at();
         if (handle.stateAt == null) handle.stateAt = ms;
         const frame = handle.state ? stateFrameAt(meta, handle.state, holdMs != null ? holdMs : ms - handle.stateAt) : overlayFrameAt(meta, ms, { loop });
-        const cell = meta.order[Math.min(meta.order.length - 1, frame)];
-        sprite.texture = sheetTexture(PIXI, key, meta, cell);
+        if (vector) vector.draw(cellOf(frame));
+        else sprite.texture = sheetTexture(PIXI, key, meta, cellOf(frame));
         const place = standPlacement(meta, p.x, p.y, wh, zoomAt ? zoomAt(ms) : 1);
         sprite.x = place.left;
         sprite.y = place.top;

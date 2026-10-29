@@ -41,8 +41,8 @@ import { grantMoodXp } from '../mood-xp.js';
 import { ensureQuestOfferState } from '../quest-offers.js?v=g403-1';
 import { getMusicblock, isMusicblock } from '../musicblocks.js?v=g403-1';
 import { GAME_DAY_MS } from '../game-day.js';
-import { playSheetOverlay } from '../overlay-art.js?v=g311-1';
-import { showRainbow } from '../overlays.js?v=g441-1';
+import { playSheetOverlay } from '../overlay-art.js?v=g446-2';
+import { showRainbow } from '../overlays.js?v=g446-2';
 import {
   CHARADES_BUFF,
   CHARADES_POTION,
@@ -170,7 +170,7 @@ function createSession(engine, client) {
     const p = engine.player;
     if (!p || !engine.PIXI) return;
     // show_rainbow (players/player.js 3014-3029): 400 x 400 at the avatar, 4 s.
-    playSheetOverlay(engine.PIXI, 'rainbow_youdidit', { layer: engine.fxLayer || engine.entityLayer, at: () => ({ x: p.x, y: p.y }), wh: 400, durationMs: 4000, loop: false });
+    playSheetOverlay(engine.PIXI, 'rainbow_youdidit', { layer: engine.fxLayer || engine.entityLayer, at: () => ({ x: p.x, y: p.y }), wh: 400, durationMs: 4000, loop: false, resolution: engine.resolution || 1 });
   }
 
   // —— Pickers ——
@@ -397,7 +397,7 @@ function createSession(engine, client) {
       say(CHARADES_TEXT.timeout);
       // G373 catalog_buffs.js 412-419: nobody guessed, show_rainbow('charades_gameover') at the drinker.
       const p = engine.player;
-      if (p) showRainbow(engine.PIXI, 'charades_gameover', { layer: engine.fxLayer || engine.entityLayer, at: () => ({ x: p.x, y: p.y }) });
+      if (p) showRainbow(engine.PIXI, 'charades_gameover', { layer: engine.fxLayer || engine.entityLayer, at: () => ({ x: p.x, y: p.y }), resolution: engine.resolution || 1 });
     } else if (why === 'left') {
       say(CHARADES_TEXT.left);
     }

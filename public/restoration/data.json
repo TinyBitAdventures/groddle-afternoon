@@ -2663,9 +2663,14 @@
   ]
  },
  "git": {
-  "commits": 738,
+  "commits": 739,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "improve",
+    "text": "Butterflies draw sharp on Retina again, from Tiny Speck's CC0 SWF"
+   },
    {
     "date": "2026-10-29",
     "kind": "new",
@@ -2780,11 +2785,6 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "Quest text shows its bold and links, and Phantom cold spots beat and say how to notice"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "new",
-    "text": "Eat or drink several at once from the pack card"
    }
   ]
  },

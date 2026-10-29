@@ -88,8 +88,8 @@ import {
 import { shrinePrimeBonus } from '../imagination-effects.js?v=g403-1';
 import { grantMoodXp } from '../mood-xp.js';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js';
-import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g311-1';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=g441-1';
+import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g446-2';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=g446-2';
 import {
   MP_ROOK,
   MP_ROOK_TEXT,
@@ -923,6 +923,8 @@ function playArt(engine, key, opts) {
   const h = playSheetOverlay(engine.PIXI, key, {
     layer: frontLayer(engine) || engine.entityLayer,
     holdMs: hold != null && hold !== '' && Number.isFinite(Number(hold)) ? Number(hold) : null,
+    // G446: a rainbow with SVG frames draws them on a dense screen.
+    resolution: engine.resolution || 1,
     ...opts,
   });
   artOverlays.push(h);

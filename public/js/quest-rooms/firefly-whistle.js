@@ -57,7 +57,7 @@
  * Tiny Speck SWF (glitch-items/quest_items/firefly_whistle) at 2x.
  */
 
-import { advanceVpOverlay, vpOverlay, vpSequence } from './vp-overlay.js?v=ffw-2';
+import { advanceVpOverlay, vpOverlay, vpSequence } from './vp-overlay.js?v=g446-2';
 import { ENTRY, FLOOR, H, W, buildFront, buildLab, labPlatforms, sx, sy } from './firefly-whistle-scene.js?v=ffw-3';
 import { onLoaded, textureFromUrl } from '../textures.js';
 import { goToFallingLevel, withFallingRoom } from './falling-room.js?v=fall-3';

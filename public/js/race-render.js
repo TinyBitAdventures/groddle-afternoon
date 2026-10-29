@@ -10,7 +10,7 @@
  */
 
 import { textureFromUrl } from './textures.js';
-import { playSheetOverlay } from './overlay-art.js?v=g311-1';
+import { playSheetOverlay } from './overlay-art.js?v=g446-2';
 
 const DECO_DIR = 'assets/decos/groddle/';
 

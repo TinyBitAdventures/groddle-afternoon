@@ -17,7 +17,7 @@
  * public/assets/sprites/overlays/overlays-more.json (the same row shape as
  * overlays.json, so overlay-art.js's cellRect / standPlacement read it).
  *
- * G441: a config with `vector: true` also keeps its frames as SVG
+ * G441 (G446: every rainbow here): a config with `vector: true` also keeps its frames as SVG
  * (<key>.frames.json, the same SVG the sheet is rasterised from, at 1:1 over
  * the box, identical frames once, outlines and gradient ramps shared as in
  * overlay-art's shareFrames). The sheet is drawn 1.25 texels per stage px,
@@ -37,7 +37,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { frameSvg, loadFla } from '../overlay-art/xfl-svg.mjs';
 import { readZip } from '../avatar-compositor/xfl.mjs';
-import { framePlan, scrub, shareFrames } from '../overlay-art/build.mjs';
+import { framePlan, scrub, vectorFrames, writeVectorFrames } from '../overlay-art/build.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const spike = join(here, '../..');
@@ -54,7 +54,8 @@ const small = (k, extra = {}) => ({ fla: fla(k), scale: 2, step: 1, webp: 0.85, 
 // progress bar instead whenever the announcement has word_progress
 // (InLocationAnnouncementOverlay.as 441-442), which every one of those calls
 // sends; only the 40 px bubble other players see uses them.
-const rainbow = (k) => ({ fla: fla(k), scale: 1.25, step: 1, webp: 0.8 });
+// G441/G446: every 400 px rainbow also keeps its frames as SVG (vector), drawn sharp on dense screens.
+const rainbow = (k) => ({ fla: fla(k), scale: 1.25, step: 1, webp: 0.8, vector: true });
 
 /**
  * Where each is shown lives with the player (public/js/overlays.js
@@ -68,8 +69,7 @@ export const OVERLAYS = Object.freeze({
   rainbow_100coinstoday: rainbow('rainbow_100coinstoday'),
   rainbow_150coinstoday: rainbow('rainbow_150coinstoday'),
   rainbow_maxrelax: rainbow('rainbow_maxrelax'),
-  // G441: the super harvest arc also as SVG frames, drawn sharp on dense screens.
-  rainbow_superharvest: { ...rainbow('rainbow_superharvest'), vector: true },
+  rainbow_superharvest: rainbow('rainbow_superharvest'),
   rainbow_spindoctor: rainbow('rainbow_spindoctor'),
   rainbow_superdonation: rainbow('rainbow_superdonation'),
   charades_gameover: rainbow('charades_gameover'),
@@ -290,39 +290,8 @@ async function buildOne(page, key, cfg) {
   };
 }
 
-/**
- * The SVG frames of an overlay over its built box (`row.box`), as
- * { text (the frames.json), order (timeline frame -> unique frame) }: pure
- * Node, so --check can redraw them from the FLA and compare.
- */
-export function vectorFrames(cfg, box) {
-  const doc = scrub(loadFla(join(audit, cfg.fla)), cfg.scrub);
-  const plan = framePlan({ kind: 'sheet', ...cfg }, doc);
-  const unique = [];
-  const seen = new Map();
-  const order = plan.picks.map(({ n, start }) => {
-    const svg = frameSvg(doc, n, { box, start });
-    if (!seen.has(svg)) {
-      seen.set(svg, unique.length);
-      unique.push(svg);
-    }
-    return seen.get(svg);
-  });
-  const { defs, frames } = shareFrames(unique);
-  const text = `{"defs":${JSON.stringify(defs)},\n"frames":[\n${frames.map((f) => JSON.stringify(f)).join(',\n')}\n]}\n`;
-  return { text, order };
-}
-
 /** Write <key>.frames.json beside the sheet; returns the row's `vector` entry. */
-function buildVector(key, cfg, row) {
-  const { text, order } = vectorFrames(cfg, row.box);
-  const file = `${key}.frames.json`;
-  const buf = Buffer.from(text);
-  writeFileSync(join(OUT_DIR, file), buf);
-  const frames = Math.max(...order) + 1;
-  console.log(`${key}: ${order.length} SVG frames (${frames} unique), ${(buf.length / 1024).toFixed(0)} KB`);
-  return { file, frames, order, bytes: buf.length, sha256: sha(buf) };
-}
+const buildVector = (key, cfg, row) => writeVectorFrames(OUT_DIR, key, cfg, row);
 
 function writeManifest(manifest) {
   const sorted = Object.fromEntries(Object.keys(manifest).sort().map((k) => [k, manifest[k]]));

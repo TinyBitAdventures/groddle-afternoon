@@ -24,7 +24,7 @@ import {
   stepKitty,
 } from '../public/js/heli-kitties.js?v=g414-1';
 import { KITTY_SHEETS, heliKittiesFeature, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=g446-1';
-import { foxesFeature } from '../public/js/features/foxes-feature.js?v=g446-1';
+import { foxesFeature } from '../public/js/features/foxes-feature.js?v=g446-2';
 import { createFeatureHost } from '../public/js/feature-host.js';
 import { setWildlifeCatalog } from '../public/js/wildlife.js';
 import { readFileSync } from 'node:fs';

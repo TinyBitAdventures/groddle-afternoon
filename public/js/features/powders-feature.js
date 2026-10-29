@@ -98,8 +98,8 @@ import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { DEAD_TRANT_CLASSES } from '../patches.js?v=g414-1';
 import { hellFeature } from './hell-feature.js?v=hell-16';
 import { grantMoodXp } from '../mood-xp.js';
-import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=g311-1';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=g441-1';
+import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=g446-2';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=g446-2';
 import {
   POWDER_MP,
   POWDER_MP_TEXT,

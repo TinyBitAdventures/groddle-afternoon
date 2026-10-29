@@ -40,7 +40,7 @@
  */
 
 import { onLoaded, textureFromUrl } from '../textures.js';
-import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g311-1';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g446-2';
 import { BACK_ALLEY_FILES } from './back-alley-art.js';
 
 export const QUEST = 'fuelmaking_refuel_robot';

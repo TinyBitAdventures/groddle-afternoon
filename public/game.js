@@ -4,12 +4,12 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-276';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-278';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g434-1';
 import { createWindowStack } from './js/window-stack.js?v=g428-1';
-import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=g434-1';
+import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=g446-2';
 import {
   actionDurationFor,
   createTimedAction,
@@ -18,7 +18,7 @@ import {
 } from './js/action-timing.js?v=timed-actions-1';
 import { createWordProgressView, wordAnchor, heldActionDelta, MAX_PUSH_DOWN } from './js/word-progress.js?v=g387-1';
 // G374/G375/G378: Tiny Speck's quoin-limit and super-harvest rainbows and the musicblock notes.
-import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=g441-1';
+import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=g446-2';
 import {
   createQuestState,
   assignQuest,
@@ -841,7 +841,7 @@ import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g367-1';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=g432-1';
-import { cancelAllOverlays, playPoofIn } from './js/overlay-art.js?v=g311-1';
+import { cancelAllOverlays, playPoofIn } from './js/overlay-art.js?v=g446-2';
 import * as textureUrls from './js/textures.js';
 import { installPixiFixes } from './js/pixi-fixes.js';
 import { hidesChatBubble } from './js/hi-signs.js?v=hi-signs-4';
@@ -8941,6 +8941,10 @@ const engine = {
   },
   get fxLayer() {
     return fxLayer;
+  },
+  /** Device px per world px (js/render-density.js); G446: overlays with SVG frames draw at it. */
+  get resolution() {
+    return app?.renderer?.resolution || 1;
   },
   get player() {
     return player;
