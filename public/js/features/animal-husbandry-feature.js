@@ -105,8 +105,9 @@ import {
 import { loseEnergy, shiftMetabolic } from '../metabolics.js';
 import { textureFromUrl } from '../textures.js';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g417-1';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g429-1';
 import { grantMoodXp } from '../mood-xp.js';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
 export const BATTERFLY_GROUP = 'batterfly';
@@ -364,7 +365,7 @@ function dropPlop(engine, x, seedClass, seedCount, { silent = false, refY } = {}
 }
 
 function buildPile(engine, kind, row) {
-  const spr = makeSprite(engine, kind === 'guano' ? ART.guano : ART.plop, { scale: 1, z: 19 });
+  const spr = makeSprite(engine, kind === 'guano' ? ART.guano : ART.plop, { scale: 1, z: itemZ(kind === 'guano' ? 'guano' : 'plop', 1) });
   spr.x = row.x;
   spr.y = row.y + 2;
   spr._worldHitW = 40;
@@ -421,7 +422,7 @@ function buildExtraAnimal(engine, row) {
   spr.baseScale = scale;
   spr.scale.set(scale);
   spr.animationSpeed = row.classId === 'npc_butterfly' ? 0.25 : 0.13;
-  spr.zIndex = row.classId === 'npc_butterfly' ? 40 : 20;
+  spr.zIndex = itemZ(row.classId, row.classId === 'npc_butterfly' ? 5 : 2);
   spr.play();
   const ground = surfaceAt(engine, row.x);
   spr.x = row.x;
@@ -634,7 +635,7 @@ function landStarvedRemains(engine) {
 
 function buildPlaced(engine, kind, row) {
   const scale = kind === 'stick' ? 0.5 : 1;
-  const spr = makeSprite(engine, ART[row.classTsid], { scale, z: 17 });
+  const spr = makeSprite(engine, ART[row.classTsid], { scale, z: itemZ(row.classTsid, { background: 7, normal: 3 }) });
   spr.x = row.x;
   spr.y = surfaceAt(engine, row.x) + 2;
   spr._worldHitW = kind === 'stick' ? 50 : 70;

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-256';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-257';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g428-1';
@@ -847,6 +847,7 @@ import { saveStore } from './js/save-store.js?v=mp2-2';
 import { isNewMultiplayerPlayer, newPlayerInventory, newPlayerStats } from './js/new-player.js?v=mp5-1';
 import { clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechOffsetFor, speechTailPoints } from './js/speech-placement.js?v=g427-1';
 import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?v=g414-1';
+import { itemZ } from './js/item-bands.js?v=g429-1';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=g412-1';
 
 /** @type {object|null} assets/maps/index.json */
@@ -7229,7 +7230,7 @@ function spawnSpinningWheel({ now = Date.now() } = {}) {
   sprite.scale.set(0.72);
   sprite.x = clamp(player.x + 100, 95, Math.max(95, WORLD_W - 100));
   sprite.y = resolveGround(sprite.x, player.y) + 2;
-  sprite.zIndex = 43;
+  sprite.zIndex = itemZ('npc_spinning_wheel', 9);
   // The 514×450 animation cell includes transparent registration padding.
   sprite._worldHitW = 155;
   sprite._worldHitH = 215;
@@ -7303,7 +7304,7 @@ function spawnStootMemorial() {
   doll.scale.set(1.18);
   doll.x = memorial.x - 132;
   doll.y = ground + 1;
-  doll.zIndex = 44;
+  doll.zIndex = itemZ(STOOT_DOLL_ID, 12);
   doll._worldHitW = 68;
   doll._worldHitH = 76;
   entityLayer.addChild(doll);
@@ -9701,7 +9702,7 @@ function spawnPiggies(xs) {
     spr.vx = (i % 2 === 0 ? 1 : -1) * 0.45;
     spr.baseX = x;
     spr.range = 90;
-    spr.zIndex = 20;
+    spr.zIndex = itemZ('npc_piggy', 2);
     spr.playPet = (durationMs = 0) => {
       const actionFrames = textures.piggyNibble.frames.slice(0, 10);
       spr.textures = actionFrames;
@@ -9748,7 +9749,7 @@ function spawnChickens(xs) {
     spr.vx = i % 2 ? -0.5 : 0.5;
     spr.baseX = x;
     spr.range = 100;
-    spr.zIndex = 18;
+    spr.zIndex = itemZ('npc_chicken', 1);
     spr.playSqueeze = (durationMs = 0) => {
       const actionFrames = textures.chickenPeck.frames.slice(0, 6);
       spr.textures = actionFrames;
@@ -9790,7 +9791,7 @@ function spawnButterflies(xs, flyingSpots) {
     spr.scale.set(ENTITY_SCALE.butterfly);
     spr.x = x;
     spr.y = GROUND_Y + 2;
-    spr.zIndex = 22;
+    spr.zIndex = itemZ('npc_butterfly', 3);
     spr.bob = i;
     spr._ambient = false;
     entityLayer.addChild(spr);
@@ -9827,7 +9828,7 @@ function spawnButterflies(xs, flyingSpots) {
     b.baseY = b.y;
     b.vx = 0.65;
     b.phase = i;
-    b.zIndex = 40;
+    b.zIndex = itemZ('npc_butterfly', 5);
     b.play();
     b._ambient = true;
     entityLayer.addChild(b);
@@ -9930,8 +9931,8 @@ function spawnTrees(spots) {
     spr.scale.set(spr._woodDirection * s, s);
     spr.x = x;
     spr.y = y;
-    // Above ground apples/quoins clutter, below airborne NPCs — avoid burial under y-sort
-    spr.zIndex = 16;
+    // Trants and Wood Trees are in_background (BG_ITEM): under apples, signs and every other item.
+    spr.zIndex = itemZ(classId, 6);
     // Tall plants (egg/fruit) can span > half the view; keep full texture, no mask
     spr.mask = null;
     entityLayer.addChild(spr);
@@ -10045,7 +10046,7 @@ function spawnApples(xs) {
     spr.y = GROUND_Y + 2;
     spr.bob = Math.random() * 6;
     spr._naturalIndex = i;
-    spr.zIndex = 15;
+    spr.zIndex = itemZ('apple', 4);
     entityLayer.addChild(spr);
     list.push(spr);
     register({
@@ -10072,7 +10073,7 @@ function spawnMusicblockDrop(point, exactPlacement = false) {
   // Desk DROPHOVER (G297): it sits on the ground like every other dropped
   // item (no hover, bob or pulse), drawn in front of street furniture as they are.
   spr.y = point.y;
-  spr.zIndex = 43;
+  spr.zIndex = itemZ(def.classTsid, 12);
   // G286: no drawn glow behind it. musicblock_*.js and musicblock_base set no
   // glow or highlight state, and the client only glows an itemstack under the
   // pointer or a drag (LocationItemstackView.as 408-424, AbstractItemstackView.as 457-486),
@@ -10115,7 +10116,7 @@ function spawnDroppedItemStack(stack) {
   spr.baseY = stack.y;
   spr.y = stack.y;
   // Dropped stacks must stay legible in front of large vendors/gardens at crowded spawns.
-  spr.zIndex = 43;
+  spr.zIndex = itemZ(stack.classTsid, 12);
   spr.worldItemId = stack.id;
   spr.bob = (stack.id.match(/(\d+)$/)?.[1] || 0) * 0.7;
 
@@ -10319,7 +10320,7 @@ function spawnWorldQuoin(spot, typeId = 'xp', opts = {}) {
   q.summersDayRewardIndex = Number.isInteger(opts.summersDayRewardIndex)
     ? opts.summersDayRewardIndex
     : null;
-  q.zIndex = 25;
+  q.zIndex = itemZ('quoin', 4);
   entityLayer.addChild(q);
   return q;
 }
@@ -15935,7 +15936,7 @@ function spawnRookEgg() {
   sprite.scale.set(0.84);
   sprite.position.set(2140, 784);
   // rook_egg is in_background (BG_ITEM): under the avatars. The Crushers stay over them.
-  sprite.zIndex = 40;
+  sprite.zIndex = itemZ('rook_egg', 9);
   sprite.eventMode = 'static';
   sprite.cursor = 'pointer';
   sprite._rookHitW = 145;
@@ -19700,7 +19701,7 @@ function spawnHomeSceneTargets(room) {
     mailbox.anchor.set(0.5, 1);
     mailbox.x = 430;
     mailbox.y = GROUND_Y;
-    mailbox.zIndex = 30;
+    mailbox.zIndex = itemZ('npc_mailbox', 4);
     entityLayer.addChild(mailbox);
     homeMailboxTarget = register({
       classId: 'npc_mailbox',
@@ -23598,7 +23599,7 @@ async function spawnShrine(placement = null) {
   spr.gotoAndStop(0);
   spr.x = clamp(point.x + (placement ? 0 : -95), 90, Math.max(90, WORLD_W - 90));
   spr.y = point.y + 2;
-  spr.zIndex = 19;
+  spr.zIndex = itemZ(`npc_shrine_${giant.id}`, 8);
   spr.eventMode = 'static';
   spr.cursor = 'pointer';
   entityLayer.addChild(spr);
@@ -23622,7 +23623,7 @@ function spawnVendorNpc(placement = null) {
   const g = new PIXI.Container();
   g.x = placement ? p.x : p.x + 120;
   g.y = p.y;
-  g.zIndex = 40;
+  g.zIndex = itemZ(activeVendor.id, 5);
   const body = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/vendor.png'));
   body.anchor.set(0.5, 1);
   body.scale.set(0.25);
@@ -23719,7 +23720,7 @@ function spawnGarden(opts = {}) {
   const root = new PIXI.Container();
   root.x = originX;
   root.y = originY;
-  root.zIndex = 18;
+  root.zIndex = itemZ('garden_new', 8);
   root.eventMode = 'none';
 
   const wood = new PIXI.Sprite(textureFromUrl('assets/sprites/garden/bed_frame_wood.png'));
@@ -23747,7 +23748,7 @@ function spawnGarden(opts = {}) {
   const bedFoot = new PIXI.Container();
   bedFoot.x = originX;
   bedFoot.y = originY;
-  bedFoot.zIndex = 17;
+  bedFoot.zIndex = itemZ('garden_new', 7);
   const footGfx = new PIXI.Graphics();
   footGfx.rect(-bedW / 2, -10, bedW, 12).fill({ color: 0xffffff, alpha: 0.001 });
   bedFoot.addChild(footGfx);
@@ -23773,7 +23774,7 @@ function spawnGarden(opts = {}) {
       originX - bedW / 2 + GARDEN_PAD_X + (c - 1) * GARDEN_CELL_W + GARDEN_CELL_W / 2;
     cell.y =
       originY - bedH + GARDEN_PAD_Y + r * GARDEN_CELL_H;
-    cell.zIndex = 19 + r;
+    cell.zIndex = itemZ('garden_plot', 9 + r * 0.3);
     // Explicit hit size (Containers report 0 size until children drawn)
     cell.hitArea = new PIXI.Rectangle(
       -GARDEN_CELL_W / 2,
@@ -24017,7 +24018,7 @@ function spawnMineRock(classTsid, x, y, index = 0) {
   const root = new PIXI.Container();
   root.x = x;
   root.y = y;
-  root.zIndex = 22;
+  root.zIndex = itemZ(def.classTsid, 9.5);
   root.eventMode = 'static';
   root.cursor = 'pointer';
   // Hit box ~ rock width

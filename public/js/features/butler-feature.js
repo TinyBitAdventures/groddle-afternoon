@@ -68,7 +68,7 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackItemSlots, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { homeStreetLayout, towerItem } from '../home-cultivation.js?v=home-cultivation-5';
-import { homesFeature } from './homes-feature.js?v=g419-1';
+import { homesFeature } from './homes-feature.js?v=g429-1';
 import { towerApi } from './home-tower-feature.js?v=g419-1';
 import { levelInfoForXp } from '../progression.js?v=progression-1';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
@@ -132,12 +132,14 @@ import {
   teachButler,
   visitorsReport,
 } from '../butler.js?v=butler-9';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const BUTLER_FEATURE_ID = 'butler';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
 /** The box (and so the first post) stands right of the door, inside the house lot. */
 const BOX_RX = 300;
-const Z = 29;
+/** The butler (bag_butler) is a foreground item; its box (butler_box) a normal one (item-bands.js). */
+const Z = Object.freeze({ box: itemZ('butler_box', 9), butler: itemZ('bag_butler', 4) });
 
 let st = createButlerState();
 let view = null; // { box, butler }
@@ -410,7 +412,7 @@ function spawnBox(engine) {
   spr.anchor.set(0.5, 0.97);
   spr.x = houseX() + BOX_RX;
   spr.y = engine.groundY + 2;
-  spr.zIndex = Z;
+  spr.zIndex = Z.box;
   engine.entityLayer.addChild(spr);
   const target = engine.register({
     classId: BUTLER_BOX.CLASS,
@@ -434,7 +436,7 @@ function subtitle() {
 function spawnButler(engine) {
   const { PIXI } = engine;
   const box = new PIXI.Container();
-  box.zIndex = Z;
+  box.zIndex = Z.butler;
   const art = ensureRigArt(engine);
   let anim;
   let rig = null;

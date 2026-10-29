@@ -114,6 +114,7 @@ import { grantMoodXp } from '../mood-xp.js';
 import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
 import { normalizeGroups } from '../groups.js?v=g326-1';
 import { textureFromUrl } from '../textures.js';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
 const BOARD_CLASS = 'street_job_board';
@@ -267,7 +268,8 @@ function spawnBoard(engine, point) {
   spr.addChild(plate);
   spr.x = point.x;
   spr.y = point.y + 2;
-  spr.zIndex = 6;
+  // Tiny Speck's sign_stake (neither in_background nor in_foreground): a normal item, over the trees.
+  spr.zIndex = itemZ(BOARD_CLASS, 1);
   spr._worldHitW = 70;
   spr._worldHitH = 110;
   engine.entityLayer.addChild(spr);

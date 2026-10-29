@@ -92,9 +92,11 @@ import {
   resetBaqalaTimes,
 } from '../ancestral-nostalgia.js?v=g39-nostalgia-1';
 import { NOSTALGIA_BOOT_STREETS } from '../ancestral-nostalgia-data.js?v=g39-nostalgia-1';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const JUJU_FEATURE_ID = 'juju-bandits';
-const Z = 30;
+/** npc_juju_bandit is a foreground item (item-bands.js). */
+const Z = itemZ('npc_juju_bandit', 4);
 const FPS_SPEED = 0.5; // 30 fps sheets on a 60 fps ticker
 /** The tallest lip it walks up (it never jumps; apiFindPath had npc_can_jump false). */
 const STEP_UP = 30;

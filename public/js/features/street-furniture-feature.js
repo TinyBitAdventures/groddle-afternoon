@@ -116,8 +116,9 @@ import {
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=neighbours-4';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=note-g175';
 import { textureFromUrl } from '../textures.js';
-import { butlerApi } from './butler-feature.js?v=g419-1';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=g419-1';
+import { butlerApi } from './butler-feature.js?v=g429-1';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=g429-1';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';
 const PLAYER_ID = 'player';
@@ -403,7 +404,7 @@ function buildMailbox(engine, x, y) {
   spr.anchor.set(0.5, 0.99);
   spr.x = x;
   spr.y = y + 2;
-  spr.zIndex = 14;
+  spr.zIndex = itemZ(MAILBOX_CLASS, 4);
   spr._worldHitW = 70;
   spr._worldHitH = 140;
   engine.entityLayer.addChild(spr);
@@ -469,7 +470,7 @@ function buildNote(engine, x, y, index, row) {
   spr.x = x;
   spr.y = y + 1;
   spr.rotation = ((index * 37) % 11 - 5) * 0.02;
-  spr.zIndex = 9;
+  spr.zIndex = itemZ(NOTE_CLASS, 3);
   spr._worldHitW = 60;
   spr._worldHitH = 36;
   engine.entityLayer.addChild(spr);
@@ -550,7 +551,7 @@ function buildBoard(engine, x, y, index, opts = {}) {
   spr.anchor.set(0.5, 0.99);
   spr.x = x;
   spr.y = y + 2;
-  spr.zIndex = 6;
+  spr.zIndex = itemZ(BOARD_CLASS, 0.5);
   engine.entityLayer.addChild(spr);
   const entity = { sprite: spr, index, target: null, pins: opts.pins || null };
   entity.target = engine.register({
@@ -638,7 +639,7 @@ function buildStone(engine, x, y, index, opts = {}) {
   spr.anchor.set(0.5, 0.99);
   spr.x = x;
   spr.y = y + 3;
-  spr.zIndex = 7;
+  spr.zIndex = itemZ(STONE_CLASS, 2);
   engine.entityLayer.addChild(spr);
   const dir = opts.dir || (opts.home ? 'right' : slot(engine).stoneDir[index]) || 'right';
   spr.scale.x = dir === 'left' ? -1 : 1;

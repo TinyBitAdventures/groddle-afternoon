@@ -9,6 +9,11 @@
  * LAYERS3: ceiling furniture hangs over the avatars (FG_FURN), the newest window is on top
  * (TSMainView.addView), and player and item overlays draw in the overlay holder, over a street's
  * front layers (AnnouncementController.addItemOrPcOverlayWhereItGoes 495-540).
+ * ITEMBANDS: which of the three item holders a class draws in comes from its itemDef flags
+ * (LocationRenderer.placeItemstackInMG 1508-1517); js/item-bands-data.js is generated from
+ * GameServerJS by tools/build-item-bands.mjs and js/item-bands.js turns a class into its band's z
+ * (background 10-19, normal 20-34, foreground 35-48). A street project sign (sign_stake) and a
+ * Zilloween pumpkin are normal items, so they draw in front of a trant (in_background).
  * Run: node --test tests/draw-order.test.js
  */
 import { describe, it } from 'node:test';
@@ -20,10 +25,14 @@ import { remoteAvatarZ } from '../public/js/features/realtime-feature.js?v=g413-
 import { FRONT_FURNITURE_SLOTS, furnitureDrawsInFront } from '../public/js/home-decor.js?v=g418-1';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js';
 import { SCREEN_SELECTOR, WINDOW_SELECTOR, stackZ } from '../public/js/window-stack.js?v=g428-1';
+import { BAND_Z, bandClass, itemBand, itemZ, knownItemClass } from '../public/js/item-bands.js?v=g429-1';
+import { BACKGROUND_CLASSES, FOREGROUND_CLASSES, FOREMOST_CLASSES, NORMAL_CLASSES } from '../public/js/item-bands-data.js?v=g429-1';
+import { buildItemBands, render as renderItemBands } from '../tools/build-item-bands.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (rel) => readFileSync(join(here, '..', rel), 'utf8');
 const clientRoot = join(here, '../../glitch-client/com/tinyspeck/engine');
+const gsjsRoot = join(here, '../../glitch-GameServerJS');
 const PLAYER_Z = 50;
 
 /** The first `<name>.zIndex = n` after `marker` in `src`. */
@@ -59,7 +68,6 @@ describe('world items and NPCs draw under the player', () => {
   const game = read('public/game.js');
   for (const [what, marker, name] of [
     ['Mr. Hairball (npc_dustbunny)', 'function spawnMrHairball()'],
-    ['the Rook Egg (rook_egg, in_background)', 'function spawnRookEgg()'],
     ['the museum speakers (rook_hall_speaker)', 'function makeRookMuseumSpeaker(exhibit)'],
     ['Greeterbot Sentry G-42', 'function spawnRookMuseumGreeter()'],
     ["Storyland's wall buttons (wall_button)", "root.name = `greedy-story-act-${actIndex + 1}`;", 'root'],
@@ -68,9 +76,15 @@ describe('world items and NPCs draw under the player', () => {
     it(what, () => assert.ok(zAfter(game, marker, name) < 49, `${what} z ${zAfter(game, marker, name)}`));
   }
 
+  it('the Rook Egg (rook_egg, in_background)', () => {
+    assert.match(game, /function spawnRookEgg\(\) \{[\s\S]{0,400}sprite\.zIndex = itemZ\('rook_egg', 9\);/);
+    assert.ok(itemZ('rook_egg', 9) < 49);
+  });
+
   it('fireflies, the courier frog and racing cubimals (in_foreground items)', () => {
     const nodes = read('public/js/features/resource-nodes-feature.js');
-    assert.ok(Number(/firefly: (\d+)/.exec(nodes)[1]) < 49);
+    assert.match(nodes, /root\.zIndex = itemZ\(entity\.classTsid, Z\.firefly\);/);
+    assert.equal(itemBand('npc_firefly'), 'foreground');
     assert.ok(Number(/const FROG_Z = (\d+);/.exec(read('public/js/features/mail-courier-feature.js'))[1]) < 49);
     assert.ok(Number(/const RACER_Z = (\d+);/.exec(read('public/js/features/cubimal-race-feature.js'))[1]) < 49);
   });
@@ -233,5 +247,105 @@ describe('player and item overlays draw over the street\'s front layers', () => 
   it('in-world overlays stay in the street: the phantom (a location overlay) and the secret spot marker', () => {
     assert.match(game, /playOverlay\(PIXI, 'phantom_glitch', \{ layer: entityLayer,/);
     assert.match(read('public/js/features/secret-spots-feature.js'), /'secret_location_marker', \{\s*layer: engine\.entityLayer/);
+  });
+});
+
+describe('item bands from the source (ITEMBANDS)', () => {
+  it('the client picks a holder from in_background, then in_foreground, then in_foremostground', { skip: !existsSync(clientRoot) && 'glitch-client not beside the repo' }, () => {
+    const loc = readFileSync(join(clientRoot, 'view/renderer/LocationRenderer.as'), 'utf8');
+    assert.match(loc, /if \(lis\.item\.in_background === true\) \{\s*mgr\.addBackgroundItem\(lis\);\s*\} else if \(lis\.item\.in_foreground === true\) \{\s*mgr\.addForegroundItem\(lis\);\s*\} else if \(lis\.item\.in_foremostground === true\) \{\s*mgr\.addForemostGroundItem\(lis\);\s*\} else \{\s*mgr\.addNormalItem\(lis\);/);
+    // Within a holder, stacks go in by stack z, each under the holder's marker: the later one on top.
+    assert.match(loc, /getItemstacksASortedByZ\(loc\.itemstack_tsid_list\)/);
+    assert.match(readFileSync(join(clientRoot, 'view/renderer/MiddleGroundRenderer.as'), 'utf8'), /addNormalItem\(iiv:LocationItemstackView\):void \{\s*addUnder\(LocationItemstackView\(iiv\), NRM_ITEM\);/);
+  });
+
+  it('item-bands-data.js is current with GameServerJS', { skip: !existsSync(gsjsRoot) && 'glitch-GameServerJS not beside the repo' }, () => {
+    assert.equal(read('public/js/item-bands-data.js'), renderItemBands(buildItemBands(gsjsRoot)), 'run node tools/build-item-bands.mjs');
+    const trant = readFileSync(join(gsjsRoot, 'items/trant_spice.js'), 'utf8').split('\n');
+    assert.match(trant[1186], /in_background\s*:\s*true/);
+    assert.match(trant[1187], /in_foreground\s*:\s*false/);
+    const sign = readFileSync(join(gsjsRoot, 'items/sign_stake.js'), 'utf8');
+    assert.match(sign, /in_background\s*:\s*false,\s*in_foreground\s*:\s*false/);
+  });
+
+  it('every class has one band; the lists are sorted and disjoint', () => {
+    const all = [...BACKGROUND_CLASSES, ...NORMAL_CLASSES, ...FOREGROUND_CLASSES, ...FOREMOST_CLASSES];
+    assert.equal(new Set(all).size, all.length);
+    assert.ok(BACKGROUND_CLASSES.length > 150 && FOREGROUND_CLASSES.length > 100 && NORMAL_CLASSES.length > 900);
+    assert.deepEqual([...FOREMOST_CLASSES], ['crusher']);
+  });
+
+  it('a few classes in each band', () => {
+    for (const cls of ['trant_spice', 'trant_fruit', 'wood_tree', 'patch', 'rock_metal_1', 'peat_1', 'dirt_pile', 'npc_shrine_cosma', 'npc_mailbox', 'bag_notice_board', 'npc_spinning_wheel', 'npc_mail_dispatcher', 'rook_egg']) assert.equal(itemBand(cls), 'background', cls);
+    for (const cls of ['sign_stake', 'pumpkin_lit_1', 'pumpkin_carved_3', 'apple', 'mortar_barnacle', 'ice_knob', 'visiting_stone', 'note', 'icon_cosma', 'fox_bait', 'musicblock_d_blue_01', 'npc_swoonerfly']) assert.equal(itemBand(cls), 'normal', cls);
+    for (const cls of ['npc_piggy', 'npc_chicken', 'npc_butterfly', 'quoin', 'street_spirit', 'npc_bureaucrat', 'npc_rube', 'npc_fox', 'npc_juju_bandit', 'bag_butler', 'npc_firefly', 'npc_salmon']) assert.equal(itemBand(cls), 'foreground', cls);
+    assert.equal(itemBand('crusher'), 'foremost');
+  });
+
+  it('remake stand-ins draw as the class they stand for', () => {
+    assert.equal(bandClass('street_job_board'), 'sign_stake');
+    assert.equal(bandClass('street_spirit_groceries'), 'street_spirit');
+    assert.equal(itemBand('garden_plot'), 'background');
+    assert.equal(itemBand('a_class_the_server_never_had'), 'normal');
+    assert.equal(knownItemClass('a_class_the_server_never_had'), false);
+  });
+
+  it('bands stack background < normal < foreground < other players < you < foremost', () => {
+    const top = (cls) => itemZ(cls, 1000);
+    assert.ok(top('trant_spice') < itemZ('sign_stake'));
+    assert.ok(top('sign_stake') < itemZ('npc_piggy'));
+    assert.ok(top('npc_piggy') < remoteAvatarZ(0));
+    assert.ok(remoteAvatarZ(8999) < PLAYER_Z && PLAYER_Z < itemZ('crusher'));
+    assert.equal(itemZ('npc_mailbox', 4), BAND_Z.background + 4);
+    assert.equal(itemZ('mortar_barnacle', { background: 9.2, normal: 1 }), BAND_Z.normal + 1);
+    assert.equal(itemZ('peat_1', { background: 9.2, normal: 1 }), BAND_Z.background + 9.2);
+  });
+
+  it('a street project sign draws in front of a Spice Plant (The Great Hole to Ix)', () => {
+    const jobs = read('public/js/features/street-jobs-feature.js');
+    assert.match(jobs, /const BOARD_CLASS = 'street_job_board';/);
+    assert.match(jobs, /function spawnBoard[\s\S]{0,700}spr\.zIndex = itemZ\(BOARD_CLASS, 1\);/);
+    const game = read('public/game.js');
+    assert.match(game, /function spawnTrees[\s\S]{0,4000}spr\.zIndex = itemZ\(classId, 6\);/);
+    assert.ok(itemZ('street_job_board', 1) > itemZ('trant_spice', 6));
+  });
+
+  it('a Zilloween Jack-O-Lantern draws in front of a trant (Tii Street)', () => {
+    const seasons = read('public/js/features/seasons-feature.js');
+    assert.match(seasons, /function spawnLantern[\s\S]{0,500}spr\.zIndex = itemZ\(litClass\(face\), 1\);/);
+    assert.match(seasons, /function spawnPlaced[\s\S]{0,500}spr\.zIndex = itemZ\(row\.cls, 1\);/);
+    for (const n of [1, 2, 3, 4, 5]) {
+      assert.ok(itemZ(`pumpkin_lit_${n}`, 1) > itemZ('trant_spice', 6));
+      assert.ok(itemZ(`pumpkin_carved_${n}`, 1) > itemZ('trant_spice', 6));
+    }
+  });
+
+  for (const [what, file, pattern] of [
+    ['apples', 'public/game.js', /spr\.zIndex = itemZ\('apple', 4\);/],
+    ['piggies', 'public/game.js', /spr\.zIndex = itemZ\('npc_piggy', 2\);/],
+    ['quoins', 'public/game.js', /q\.zIndex = itemZ\('quoin', 4\);/],
+    ['shrines', 'public/game.js', /spr\.zIndex = itemZ\(`npc_shrine_\$\{giant\.id\}`, 8\);/],
+    ['mining rocks', 'public/game.js', /root\.zIndex = itemZ\(def\.classTsid, 9\.5\);/],
+    ['dropped stacks', 'public/game.js', /spr\.zIndex = itemZ\(stack\.classTsid, 12\);/],
+    ['the vendor', 'public/game.js', /g\.zIndex = itemZ\(activeVendor\.id, 5\);/],
+    ['vendor NPCs', 'public/js/features/vendor-npcs-feature.js', /spr\.zIndex = itemZ\(classTsid, 5\);/],
+    ['the street mailbox', 'public/js/features/street-furniture-feature.js', /spr\.zIndex = itemZ\(MAILBOX_CLASS, 4\);/],
+    ['the notice board', 'public/js/features/street-furniture-feature.js', /spr\.zIndex = itemZ\(BOARD_CLASS, 0\.5\);/],
+    ['peat, barnacles and the paper tree', 'public/js/features/resource-nodes-feature.js', /sprite\.zIndex = itemZ\(entity\.classTsid, entity\.classTsid === 'paper_tree' \? Z\.paper : Z\.ground\);/],
+    ['the supply clerk', 'public/js/features/supply-feature.js', /spr\.zIndex = itemZ\(CLERK_CLASS, 0\);/],
+    ['Rube', 'public/js/features/rube-feature.js', /spr\.zIndex = itemZ\(RUBE_CLASS, 0\);/],
+    ['Giant icons', 'public/js/features/giant-icons-feature.js', /spr\.zIndex = itemZ\(def\.iconClass, 2\);/],
+    ['swoonerflies', 'public/js/features/swoonerflies-feature.js', /spr\.zIndex = itemZ\(SWOONERFLY_CLASS, 10\);/],
+  ]) {
+    it(`${what} draw in their band`, () => assert.match(read(file), pattern));
+  }
+
+  it('every literal class handed to itemZ is a real class', () => {
+    const files = ['public/game.js', ...['street-jobs', 'seasons', 'street-furniture', 'resource-nodes', 'foxes', 'heli-kitties', 'juju-bandits', 'butler', 'craftybot', 'rube', 'supply', 'giant-icons', 'mail-courier', 'rook-attack', 'animal-husbandry', 'yard-verbs-mp', 'neighbours-mp', 'small-items', 'item-verbs-more', 'vendor-npcs', 'potions', 'swoonerflies'].map((f) => `public/js/features/${f}-feature.js`)];
+    for (const f of files) {
+      const src = read(f);
+      assert.match(src, /import \{ itemZ \} from '\.\.?\/(js\/)?item-bands\.js\?v=g429-1';/, f);
+      for (const m of src.matchAll(/itemZ\('([a-z0-9_]+)'/g)) assert.ok(knownItemClass(m[1]), `${f}: ${m[1]}`);
+    }
   });
 });

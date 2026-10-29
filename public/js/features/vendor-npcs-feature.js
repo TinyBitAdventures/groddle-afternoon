@@ -51,6 +51,7 @@ import {
   vendorNpcsFor,
   vendorSheet,
 } from '../vendor-npcs.js';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const VENDOR_NPCS_FEATURE_ID = 'vendor-npcs';
 const ATTRACT_RADIUS = 200; // npc_gardening_vendor.js onPathing: players within 200px
@@ -110,7 +111,7 @@ function spawn(engine, classTsid, point) {
   spr.anchor.set(anchor.x, anchor.y);
   spr.x = point.x;
   spr.y = point.y + 2;
-  spr.zIndex = 40;
+  spr.zIndex = itemZ(classTsid, 5);
   spr._worldHitW = Math.round(crop.w * 0.8);
   spr._worldHitH = Math.round(crop.h * 0.9);
   engine.entityLayer.addChild(spr);

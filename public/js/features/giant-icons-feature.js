@@ -71,6 +71,7 @@ import { playSheetOverlay } from '../overlay-art.js?v=g311-1';
 import { grantMoodXp } from '../mood-xp.js';
 import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted, toldRecord } from '../conversations.js?v=g202-1';
 import { TELLERS } from '../conversations-data.js?v=g202-1';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const ICONS_FEATURE_ID = 'giant-icons';
 const WORLD_ART = (iconClass) => `assets/sprites/giant-icons/${iconClass}.png`;
@@ -250,7 +251,7 @@ function spawnIcon(engine, row) {
   spr.anchor.set(0.5, 1);
   spr.x = row.x;
   spr.y = row.y + 2;
-  spr.zIndex = 7;
+  spr.zIndex = itemZ(def.iconClass, 2);
   spr._worldHitW = 90;
   spr._worldHitH = 110;
   engine.entityLayer.addChild(spr);

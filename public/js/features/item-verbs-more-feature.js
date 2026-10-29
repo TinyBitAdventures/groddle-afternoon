@@ -114,6 +114,7 @@ import {
   vvSniffButton,
   JUJU_POWDER,
 } from '../item-verbs-more.js?v=g391-1';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const ITEM_VERBS_MORE_FEATURE_ID = 'item-verbs-more';
 
@@ -542,7 +543,7 @@ function drawJoy(engine, joy) {
   spr.baseScale = 0.9;
   spr.scale.set(0.9);
   spr.animationSpeed = 0.4;
-  spr.zIndex = 26;
+  spr.zIndex = itemZ('npc_bundle_of_joy', 4);
   spr.eventMode = 'none';
   spr.label = 'bundle-of-joy';
   spr.x = joy.x;

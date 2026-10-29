@@ -83,6 +83,7 @@ import {
   stepFox,
 } from '../foxes.js?v=g414-1';
 import { FOX_FLURRY_COUNTER, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=g414-1';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const FOX_FEATURE_ID = 'foxes';
 const PLAYER_NAME = 'Glitch';
@@ -91,7 +92,8 @@ const RANGER_SCALE = 1.3;
 const BAIT_SCALE = 0.9;
 const REACH_X = 300;
 const REACH_Y = 220;
-const Z = Object.freeze({ ranger: 19, bait: 21, fox: 23 });
+/** npc_fox and npc_fox_ranger are foreground items, fox_bait a normal one (item-bands.js). */
+const Z = Object.freeze({ ranger: itemZ(FOX_RANGER_ID, 3), bait: itemZ('fox_bait', 1), fox: itemZ(FOX_ID, 4) });
 
 const DIR = 'assets/sprites/foxes/';
 const sheet = (name, fw, fh, cols, frames, first = 0) => Object.freeze({ path: `${DIR}${name}.png`, fw, fh, cols, frames, first });

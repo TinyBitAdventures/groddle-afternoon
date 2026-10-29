@@ -43,7 +43,7 @@ import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
 import { rollDropTable } from '../drop-tables.js';
 import { openNoteView, noteViewOpen } from '../note-view.js';
 import { payDrop } from './drops-feature.js?v=drops-8';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=g417-1';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=g429-1';
 import { SEASON_DATA } from '../seasons-data.js';
 import {
   CANDY_CLASSES,
@@ -97,6 +97,7 @@ import {
 } from '../seasons.js';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { playOverlay } from '../overlays.js?v=g392-1';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const SEASONS_FEATURE_ID = 'seasons';
 const LANTERN_GROUP = 'seasons:lantern';
@@ -448,7 +449,8 @@ function spawnLantern(engine, pt, index) {
   spr.anchor.set(0.5, 1);
   spr.x = pt.x;
   spr.y = y + 3;
-  spr.zIndex = 6;
+  // pumpkin_lit_N is a normal item (NRM_ITEM): in front of the trants beside the path.
+  spr.zIndex = itemZ(litClass(face), 1);
   spr.animationSpeed = 0.5;
   spr.loop = true;
   spr.gotoAndStop(0);
@@ -594,7 +596,7 @@ function spawnPlaced(engine, row) {
   spr.anchor.set(0.5, 1);
   spr.x = row.x;
   spr.y = y + 3;
-  spr.zIndex = 6;
+  spr.zIndex = itemZ(row.cls, 1);
   if (lit) {
     spr.animationSpeed = 0.5;
     spr.gotoAndStop(0);

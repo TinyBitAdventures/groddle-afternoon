@@ -81,8 +81,8 @@ import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=home-
 import { tickGarden } from '../garden.js?v=g403-1';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=butler-rig-1';
 import { normalizeButlerParts } from '../butler.js?v=butler-9';
-import { butlerApi } from './butler-feature.js?v=g419-1';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=g419-1';
+import { butlerApi } from './butler-feature.js?v=g429-1';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=g429-1';
 import {
   BUTLER_MESSAGE_MAX,
   KEY_VERB,
@@ -121,6 +121,7 @@ import {
   TENDED_KEEP,
   visitSceneTsid,
 } from '../neighbours-mp.js?v=g328-4';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const NEIGHBOURS_MP_FEATURE_ID = 'neighbours-mp';
 const OWN_VERBS = new Set([VISIT_VERB.id, KEY_VERB.id, 'neighbour_noop']);
@@ -507,7 +508,7 @@ function createSession(engine, client) {
     // bag_butler.js target_loc: its post, else 300 px right of the house (butler-feature BOX_RX).
     const x = Math.max(60, Math.min(layout.width - 60, layout.houseX + (b.post ?? 300)));
     const box = new PIXI.Container();
-    box.zIndex = 29;
+    box.zIndex = itemZ('bag_butler', 4);
     box.x = x;
     box.y = (Number(groundY) || engine.groundY || 0) + 2;
     engine.entityLayer.addChild(box);

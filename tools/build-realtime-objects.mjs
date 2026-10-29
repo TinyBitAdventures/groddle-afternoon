@@ -61,7 +61,7 @@ import { ARBOROLOGY_HARVEST, TRANT_META } from '../public/js/trants.js';
 import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js';
 import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js';
 import { locationIsDepressing } from '../public/js/animal-mood.js';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=g429-1';
 import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

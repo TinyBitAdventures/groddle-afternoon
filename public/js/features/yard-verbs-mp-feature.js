@@ -44,7 +44,7 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textur
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=home-cultivation-5';
 import { readVisitScene } from '../neighbours-mp.js?v=g328-4';
 import { saveStore } from '../save-store.js?v=mp2-2';
-import { STREET_GROUND_Y } from './homes-feature.js?v=g419-1';
+import { STREET_GROUND_Y } from './homes-feature.js?v=g429-1';
 import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=g414-1';
 import {
   YARD_STREET,
@@ -62,6 +62,7 @@ import {
   visitorAnimalState,
   visitorTreeState,
 } from '../yard-verbs-mp.js?v=g414-1';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export { YARD_VERBS_MP_ID };
 
@@ -208,7 +209,7 @@ function createSession(engine, client) {
     spr.baseScale = scale;
     spr.scale.set(scale);
     spr.animationSpeed = classId === 'npc_butterfly' ? 0.25 : 0.13;
-    spr.zIndex = classId === 'npc_butterfly' ? 40 : 20;
+    spr.zIndex = itemZ(classId, classId === 'npc_butterfly' ? 5 : 2);
     spr.play();
     const playOnce = (key, slice, walkKey, walkSlice, speed) => (durationMs = 0) => {
       const actionFrames = (t[key]?.frames || []).slice(...slice);

@@ -26,7 +26,7 @@ import {
   visitorAnimalState,
   visitorTreeState,
 } from '../public/js/yard-verbs-mp.js?v=g414-1';
-import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=g419-1';
+import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=g429-1';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -149,7 +149,7 @@ describe('solo never runs it', () => {
   });
   it('is registered before street-objects under one key', () => {
     const index = readFileSync(join(root, 'public/js/features/index.js'), 'utf8');
-    const at = index.indexOf("yard-verbs-mp-feature.js?v=g419-1'");
+    const at = index.indexOf("yard-verbs-mp-feature.js?v=g429-1'");
     assert.ok(at > 0 && at < index.indexOf('street-objects-feature.js'));
     const feature = readFileSync(join(root, 'public/js/features/yard-verbs-mp-feature.js'), 'utf8');
     assert.match(feature, /yard-verbs-mp\.js\?v=g414-1'/);

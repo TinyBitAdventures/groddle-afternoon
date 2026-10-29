@@ -104,6 +104,7 @@ import {
   syncKeys,
   syncObjs,
 } from '../rook-mp.js?v=g334-1';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
 const VIEW_W = 960;
@@ -993,7 +994,7 @@ function spawnForehorseman(engine) {
   spr.play();
   spr.x = x;
   spr.y = y + 2;
-  spr.zIndex = 24;
+  spr.zIndex = itemZ('npc_forehorseman', 4);
   spr.scale.set(0.78);
   spr._worldHitW = 90;
   spr._worldHitH = 150;

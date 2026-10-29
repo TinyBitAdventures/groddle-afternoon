@@ -2661,9 +2661,14 @@
   ]
  },
  "git": {
-  "commits": 708,
+  "commits": 709,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "Nothing opens over or behind the start card; a skill learned while away waits for Start"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2778,11 +2783,6 @@
     "date": "2026-10-28",
     "kind": "fix",
     "text": "The multiplayer save status sits in the pack and stops flickering"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "new",
-    "text": "/tp lets an administrator free a stuck player"
    }
   ]
  },

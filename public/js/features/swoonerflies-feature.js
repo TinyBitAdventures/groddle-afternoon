@@ -17,11 +17,13 @@
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g417-1';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js';
 import {
+  SWOONERFLY_CLASS,
   SWOONERFLY_PLACEMENT_KEY,
   SWOONERFLY_SHEET,
   swoonerflyPlacementGroups,
   swoonerfliesFor,
 } from '../swoonerflies.js?v=g369-1';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const SWOONERFLIES_FEATURE_ID = 'swoonerflies';
 
@@ -37,7 +39,8 @@ function spawn(engine, point) {
   spr.anchor.set(0.5, 1);
   spr.x = point.x;
   spr.y = point.y;
-  spr.zIndex = 40;
+  // npc_swoonerfly sets neither flag (items/npc_swoonerfly.js itemDef): a normal item.
+  spr.zIndex = itemZ(SWOONERFLY_CLASS, 10);
   spr.eventMode = 'none';
   spr.loop = true;
   spr.animationSpeed = pixiSpeed(SWOONERFLY_SHEET.fps);

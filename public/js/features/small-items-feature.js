@@ -27,7 +27,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inv
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g417-1';
 import { nearestSurfaceY } from '../walk-surface.js';
 import { openNoteView, openNotePicker } from '../note-view.js?v=note-g175';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=g419-1';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=g429-1';
 import {
   BALL,
   BALL_HIT,
@@ -50,6 +50,7 @@ import {
   planBallHit,
   reconcileFortunes,
 } from '../small-items.js?v=g155-1';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const SMALL_ITEMS_FEATURE_ID = 'small-items';
 const BALL_GROUP = 'smallItemsBall';
@@ -277,7 +278,7 @@ function spawnBall(engine, point, { persist = true } = {}) {
   sprite.y = y - BALL_HIT.draw.lift;
   sprite.width = BALL_HIT.draw.w;
   sprite.height = BALL_HIT.draw.h;
-  sprite.zIndex = 18;
+  sprite.zIndex = itemZ(BALL, 2);
   sprite.eventMode = 'static';
   sprite.cursor = 'pointer';
   engine.entityLayer.addChild(sprite);

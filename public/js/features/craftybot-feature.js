@@ -46,7 +46,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } fr
 import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=woodcutting-test-8';
 import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=g403-1';
 import { listDroppedStacks } from '../world-items.js?v=world-items-4';
-import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=g419-1';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=g429-1';
 import {
   CRAFTYBOT,
   CRAFTYBOT_BOX,
@@ -85,6 +85,7 @@ import {
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g311-1';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const CRAFTYBOT_FEATURE_ID = 'craftybot';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -514,7 +515,7 @@ function spawnBox(engine) {
   spr.anchor.set(0.5, 0.96);
   spr.x = boxX(engine);
   spr.y = groundYAt(engine, spr.x, 'interior') + 2;
-  spr.zIndex = 27;
+  spr.zIndex = itemZ(BOX, 7);
   engine.entityLayer.addChild(spr);
   const target = engine.register({
     classId: BOX,
@@ -533,9 +534,9 @@ function spawnBot(engine) {
   spr.anchor.set(ANCHOR.x, ANCHOR.y);
   spr.animationSpeed = FPS / 60;
   spr.x = bot.xNow ?? bot.x;
-  spr.zIndex = 29;
+  spr.zIndex = itemZ(BOT, 4);
   const box = new PIXI.Container();
-  box.zIndex = 29;
+  box.zIndex = itemZ(BOT, 4);
   box.addChild(spr);
   box.x = spr.x;
   spr.x = 0;

@@ -64,6 +64,7 @@ import {
 } from '../bureaucracy.js';
 import { frameTexture, sourceFromUrl } from '../textures.js';
 import { setMetalMakingMusic } from '../sound-moments.js?v=g393-1';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const SUPPLY_FEATURE_ID = 'supply';
 export const CLERK_CLASS = 'npc_bureaucrat';
@@ -101,7 +102,8 @@ function spawnClerk(engine, point) {
   spr.anchor.set(0.5, 1);
   spr.x = point.x;
   spr.y = point.y + 2;
-  spr.zIndex = 6;
+  // npc_bureaucrat is a foreground item: in front of the trees and the project sign.
+  spr.zIndex = itemZ(CLERK_CLASS, 0);
   spr._worldHitW = 60;
   spr._worldHitH = 90;
   engine.entityLayer.addChild(spr);

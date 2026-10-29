@@ -47,6 +47,7 @@ import {
   rollScare,
   stepKitty,
 } from '../heli-kitties.js?v=g414-1';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const KITTY_FEATURE_ID = 'heli-kitties';
 export const KITTY_GROUP = 'kitty';
@@ -129,7 +130,7 @@ function buildKitty(engine, kitty) {
   const frames = loader.frames(KITTY_SHEETS['3appear']);
   const spr = new PIXI.AnimatedSprite(frames.length ? frames : [PIXI.Texture.EMPTY]);
   spr.anchor.set(0.57, 0.92);
-  spr.zIndex = 22;
+  spr.zIndex = itemZ(KITTY_ID, 3);
   spr._worldHitW = 62;
   spr._worldHitH = 92;
   spr.loop = false;

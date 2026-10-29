@@ -92,6 +92,8 @@ const CATALOGS = new Set([
   'public/js/sprite-hires.js',
   // G152: stackmax and bag-kind sets for every takeable class (tools/build-pack-slots.mjs).
   'public/js/pack-slots-data.js',
+  // ITEMBANDS: the item holder of every class (tools/build-item-bands.mjs).
+  'public/js/item-bands-data.js',
   'public/assets/content/trade-items.json',
 ]);
 

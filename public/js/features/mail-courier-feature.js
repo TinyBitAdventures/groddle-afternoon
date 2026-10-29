@@ -79,6 +79,7 @@ import {
   sendCarriedToMailbox,
   sendDueToMailbox,
 } from '../mail-courier.js?v=mailnpc-1';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const MAIL_COURIER_FEATURE_ID = 'mail-courier';
 const FROG_CLASS = 'npc_yoga_frog';
@@ -96,7 +97,8 @@ const DISPATCHER_DX = -125;
  * client's item holders sit below the avatar holders (MiddleGroundRenderer.setupEndShapes 111-171).
  */
 const FROG_Z = 40;
-const DISPATCHER_Z = 28;
+/** npc_mail_dispatcher is a background item, over the mailbox beside it (item-bands.js). */
+const DISPATCHER_Z = itemZ(DISPATCHER_CLASS, 5);
 
 let state = normalizeCourierState();
 let frog = null;

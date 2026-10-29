@@ -129,9 +129,10 @@ import {
 } from '../potions.js?v=g391-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { patchesFeature } from './patches-feature.js?v=g414-1';
-import { homesFeature } from './homes-feature.js?v=g419-1';
+import { homesFeature } from './homes-feature.js?v=g429-1';
 import { streetTreeIndex } from './tree-death-feature.js?v=g414-1';
 import { questRoomConverse } from './quest-instances-feature.js?v=g424-1';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const POTIONS_FEATURE_ID = 'potions';
 const LOVE = 'feeling_called_love';
@@ -661,7 +662,7 @@ function drawItem(engine, item) {
   spr.anchor.set(art.anchorX / art.cellW, art.anchorY / art.cellH);
   spr.scale.set(art.scale);
   spr.animationSpeed = 0.5 * (30 / 60);
-  spr.zIndex = 35;
+  spr.zIndex = itemZ(item.classTsid, 12);
   spr.eventMode = 'none';
   spr.x = item.x;
   spr.y = item.y + 4;

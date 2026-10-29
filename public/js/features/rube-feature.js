@@ -45,6 +45,7 @@ import {
   streetCanHostRube,
 } from '../rube.js';
 import { frameTexture, sourceFromUrl } from '../textures.js';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const RUBE_FEATURE_ID = 'rube';
 const SONG = 'assets/audio/ambient/The_Rube_Song_1290596637.mp3';
@@ -173,7 +174,7 @@ function spawnRube(engine, { summoned = false, near = false } = {}) {
   spr.anchor.set(0.5, 0.97);
   spr.x = x;
   spr.y = ground;
-  spr.zIndex = 8;
+  spr.zIndex = itemZ(RUBE_CLASS, 0);
   spr._worldHitW = 70;
   spr._worldHitH = 140;
   engine.entityLayer.addChild(spr);

@@ -88,6 +88,7 @@ import {
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js';
 import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=g403-1';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=ffw-2';
+import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';
 export const RESOURCE_GROUP_PREFIX = 'resource:';
@@ -132,7 +133,12 @@ export const FIREFLY_OFFER_LINES = Object.freeze([
   { lines: ['... Fireflies!'], durationMs: 2500 },
 ]);
 /** Every node is an item, so all of them draw under the avatars (50); npc_firefly is in_foreground (FG_ITEM). */
-const Z = Object.freeze({ tree: 14, paper: 16, ground: 21, trap: 19, salmon: 24, firefly: 40 });
+/**
+ * Offsets inside each class's item band (item-bands.js). Peat, dirt, jellisac, the sloth's tree and
+ * the paper tree are background items (with the trants, 16); barnacles, ice knobs and dust traps
+ * normal; fireflies and salmon foreground.
+ */
+const Z = Object.freeze({ tree: 4, paper: 6, ground: Object.freeze({ background: 9.2, normal: 1 }), trap: 0.5, salmon: 4, firefly: 5 });
 
 // ---------------------------------------------------------------------------
 // Pure helpers (tested in tests/resource-nodes-feature.test.js)
@@ -661,7 +667,7 @@ function buildGroundView(engine, entity) {
   sprite.anchor.set(0.5, frame?.sheet ? footAnchor(frame.sheet, frame.frameIndex) : 1);
   sprite.x = entity.x;
   sprite.y = entity.y + 2;
-  sprite.zIndex = entity.classTsid === 'paper_tree' ? Z.paper : Z.ground;
+  sprite.zIndex = itemZ(entity.classTsid, entity.classTsid === 'paper_tree' ? Z.paper : Z.ground);
   if (entity.classTsid !== 'paper_tree') {
     sprite._worldHitW = Math.max(46, frame?.sheet?.frameWidth || 46);
     sprite._worldHitH = Math.max(40, frame?.sheet?.frameHeight || 40);
@@ -677,7 +683,7 @@ function buildFireflyView(engine, entity) {
   const frames = sheetFrames(engine, frame.sheet);
   if (!frames.length) return;
   const root = new PIXI.Container();
-  root.zIndex = Z.firefly;
+  root.zIndex = itemZ(entity.classTsid, Z.firefly);
   root._worldHitW = 72;
   root._worldHitH = 64;
   const glow = new PIXI.Sprite(svgTextures?.glow || PIXI.Texture.EMPTY);
@@ -725,7 +731,7 @@ function buildSalmonView(engine, entity) {
   const swim = sheetFrames(engine, def.sprite.sheets.swimRight);
   if (!swim.length) return;
   const root = new PIXI.Container();
-  root.zIndex = Z.salmon;
+  root.zIndex = itemZ(entity.classTsid, Z.salmon);
   root._worldHitW = 64;
   root._worldHitH = 44;
   const fish = new PIXI.AnimatedSprite(swim);
@@ -796,7 +802,7 @@ function buildDustTrapView(engine, entity) {
   const sprite = new PIXI.Sprite(PIXI.Texture.EMPTY);
   sprite.x = entity.x;
   sprite.y = entity.y + 2;
-  sprite.zIndex = Z.trap;
+  sprite.zIndex = itemZ(entity.classTsid, Z.trap);
   engine.entityLayer.addChild(sprite);
   // Collision-only in GSJS: no menu target, so E never selects it by accident.
   entity.view = { kind: 'trap', sprite };
@@ -823,7 +829,7 @@ function buildSlothView(engine, entity) {
   const root = new PIXI.Container();
   root.x = entity.x;
   root.y = entity.y + 2;
-  root.zIndex = Z.tree;
+  root.zIndex = itemZ(entity.classTsid, Z.tree);
   // Hit box: the hanging column under the branch, so the avatar can reach it from the ground.
   root._worldHitW = 120;
   root._worldHitH = (SLOTH_TREE.baseY - SLOTH_TREE.branchTop + 30) * SLOTH_SCALE;
