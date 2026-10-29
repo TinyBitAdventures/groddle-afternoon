@@ -660,6 +660,7 @@ import { facingScaleX, facingFromVelocity } from './js/avatar.js';
 import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js';
 import { landingY } from './js/walk-surface.js';
 import { holdCloseToFloor, stickToSlope } from './js/slope-walk.js?v=g411-1';
+import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=g421-1';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=npc-glitch-1';
 import { bakeIdleSheet, bakeLook, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareLook } from './js/avatar-compositor.js';
@@ -8147,7 +8148,8 @@ function glitchAnimState(requested) {
   const now = Date.now();
   if (requested === 'climb') {
     idleClock.reset();
-    return 'climb';
+    // AvatarAnimationState: CLIMB while moving on the ladder, CLIMB_PAUSE at rest (js/ladder-anim.js).
+    return ladderAnimState(player.vy);
   }
   // onGround flickers on slopes; a few frames off the floor make it a jump or fall.
   const airborne = !player.onGround && (player.airFrames || 0) > 3;
@@ -8186,11 +8188,22 @@ function glitchAnimState(requested) {
 
 function applyGlitchState(st) {
   if (player.glitchState === st) {
-    if ((st === 'walk1x' || st === 'walk2x' || (st === 'climb' && player.vy !== 0)) && player.playing === false) player.play();
+    if ((st === 'walk1x' || st === 'walk2x' || st === 'climb') && player.playing === false) player.play();
+    return;
+  }
+  // AbstractAvatarView: CLIMB_PAUSE after CLIMB stops on the frame showing; climbing again runs on from it.
+  const swap = player.textures === player.anims.climb ? ladderSwap(player.glitchState, st) : null;
+  if (swap) {
+    player.glitchState = st;
+    if (app?.canvas) app.canvas.dataset.playerAnim = st;
+    // A climb sheet first shown paused was set not to loop.
+    player.loop = true;
+    if (swap === 'stop') player.stop();
+    else player.play();
     return;
   }
   const idles = Boolean(player.pack?.idleLoader);
-  const { anim, loop, then } = animForState(st, { idles });
+  const { anim, loop, then, hold } = animForState(st, { idles });
   player.glitchState = st;
   if (app?.canvas) {
     app.canvas.dataset.playerAnim = st;
@@ -8209,7 +8222,7 @@ function applyGlitchState(st) {
         player.gotoAndPlay(0);
       }
     : null;
-  if (player.textures.length < 2) player.gotoAndStop(0);
+  if (player.textures.length < 2 || hold) player.gotoAndStop(0);
   else player.gotoAndPlay(0);
   applyPlayerFacing();
 }
@@ -10793,7 +10806,8 @@ function handleInput() {
     // CLIMB vs CLIMB_PAUSE: the cycle runs only while the avatar moves on the
     // ladder; at rest (or held against the top) it holds the current frame.
     if (climb.active) {
-      if (player.vy !== 0) setPlayerAnim('climb');
+      // The Glitch sheets pick climb or climbPause from vy (glitchAnimState).
+      if (player.vy !== 0 || player.anims) setPlayerAnim('climb');
       else if (player.playing) player.stop();
     }
     applyPlayerFacing();
@@ -10886,9 +10900,9 @@ function physics(dt) {
     player.y = clamp(player.y, wall.yTop + 2, wall.yBot);
     player.vx = 0;
     player.onGround = false;
-    // Climb bob
-    player.walkPhase += dt * 0.35;
-    player.pivot.y = Math.sin(player.walkPhase) * 1.5;
+    // The client never bobs a climber; only a sheetless avatar on the move gets a climb read.
+    if (player.vy !== 0) player.walkPhase += dt * 0.35;
+    player.pivot.y = climbBobY({ sheets: Boolean(player.anims), vy: player.vy, phase: player.walkPhase });
   } else {
     const movementBuff = combinedPhysics();
     // On the floor before this frame's move (a jump in handleInput already left it).
@@ -25748,6 +25762,10 @@ async function main() {
         vx: player?.vx ?? null,
         vy: player?.vy ?? null,
         onGround: Boolean(player?.onGround),
+        // Ladder QA: the cycle runs (playing) only while climbing moves; pivotY is any drawn bob.
+        climbing: Boolean(climb.active),
+        playing: player?.playing ?? null,
+        pivotY: player?.pivot?.y ?? null,
         sx: player?.scale?.x ?? null,
         afk: afkState.afk,
         standingMs: idleClock.standingMs(Date.now()),

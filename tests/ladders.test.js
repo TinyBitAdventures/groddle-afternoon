@@ -62,7 +62,10 @@ describe('climbing input (game.js)', () => {
   });
 
   it('runs the climb cycle only while moving on the ladder (CLIMB_PAUSE holds the frame)', () => {
-    assert.match(game, /if \(player\.vy !== 0\) setPlayerAnim\('climb'\);\s*else if \(player\.playing\) player\.stop\(\);/);
-    assert.match(game, /st === 'climb' && player\.vy !== 0\) \) && player\.playing === false|\(st === 'climb' && player\.vy !== 0\)\) && player\.playing === false/);
+    // The Glitch sheets report climb or climbPause from vy (js/ladder-anim.js, tests/ladder-anim.test.js);
+    // the sheetless fallback still stops its cycle at rest.
+    assert.match(game, /if \(player\.vy !== 0 \|\| player\.anims\) setPlayerAnim\('climb'\);\s*(?:\/\/[^\n]*\s*)?else if \(player\.playing\) player\.stop\(\);/);
+    assert.match(game, /return ladderAnimState\(player\.vy\);/);
+    assert.match(game, /if \(swap === 'stop'\) player\.stop\(\);\s*else player\.play\(\);/);
   });
 });
