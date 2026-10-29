@@ -7,6 +7,7 @@
     root: s && s.src ? new URL('../', s.src).href : '',
     epoch: 'df15aba7',
     files: {
+      "assets/content/puzzle-triggers.json": "e0bbd49b",
       "assets/decos/animated/Glints_3.json": "1f110e8e",
       "assets/decos/animated/Glints_3.webp": "9942c793",
       "assets/decos/animated/Glints_5.json": "fdc67c59",

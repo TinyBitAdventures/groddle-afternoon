@@ -19,6 +19,9 @@ import {
   SUMMERS_DAY_QURAZY_OFFSETS,
   SUMMERS_DAY_REPEAT_COOLDOWN_MS,
   SUMMERS_DAY_REPEAT_QUEST_ID,
+  SUMMERS_DAY_ROUTE,
+  SUMMERS_DAY_SOURCE_SPAWN,
+  SUMMERS_DAY_STREET_TSID,
   advanceSummersDayCheckpoint,
   canOfferSummersDay,
   collectSummersDayBonusQuoin,
@@ -31,7 +34,8 @@ import {
   summersDayObjective,
   summersDayQurazyPoints,
   summersDayRemainingMs,
-} from '../public/js/summers-day.js';
+  summersDayStreetPoint,
+} from '../public/js/summers-day.js?v=g452-1';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -63,13 +67,86 @@ test('A Summer’s Day preserves the source quest ids, production templates, and
   });
 });
 
-test('the recovered collision event graph advances in order and is idempotent', () => {
+test('the street\'s moments count once each, in any order, and the go_bonus box ends the memory', () => {
   const run = createSummersDayRun({ now: 0 });
-  assert.equal(advanceSummersDayCheckpoint(run, 'stone_1', 100).reason, 'out_of_order');
   assert.equal(advanceSummersDayCheckpoint(run, 'bird_1', 100).ok, true);
   assert.equal(advanceSummersDayCheckpoint(run, 'bird_1', 200).reason, 'already_complete');
+  assert.equal(advanceSummersDayCheckpoint(run, 'nope', 200).reason, 'unknown');
   assert.equal(run.checkpoints.length, 1);
   assert.match(summersDayObjective(run), /first stone/i);
+  // Each source event gates only on its own flag: a player may take the orbs in any order.
+  assert.equal(advanceSummersDayCheckpoint(run, 'orb_3', 300).ok, true);
+  assert.match(summersDayObjective(run), /first stone/i);
+  assert.equal(enterSummersDayBonus(run, 400).reason, 'main_incomplete');
+  // callback_blue_and_white_go_bonus asked for nothing else.
+  assert.equal(advanceSummersDayCheckpoint(run, 'exit', 500).reason, 'main_complete');
+  assert.equal(enterSummersDayBonus(run, 600).ok, true);
+  // The second stone raises the boulder the first dot hangs off.
+  assert.ok(SUMMERS_DAY_CHECKPOINTS.indexOf('stone_2') < SUMMERS_DAY_CHECKPOINTS.indexOf('dot_1'));
+});
+
+const LOCATIONS = path.join(root, '../streets/mnt/stos/location_data');
+const puzzle = JSON.parse(fs.readFileSync(path.join(root, 'public/assets/content/puzzle-triggers.json'), 'utf8'))
+  .streets[SUMMERS_DAY_STREET_TSID];
+const summerStreet = JSON.parse(fs.readFileSync(path.join(root, `public/assets/streets/${SUMMERS_DAY_STREET_TSID}.json`), 'utf8'));
+
+test('the memory is Tiny Speck\'s imported copy of the main template', { skip: !fs.existsSync(LOCATIONS) }, () => {
+  const xml = fs.readFileSync(path.join(LOCATIONS, 'LNVV9IM8PL4301V.xml'), 'utf8');
+  assert.match(xml, /<str id="instance_of">LNVIH6NU3M13MJJ<\/str>/);
+  assert.match(xml, /<str id="instance_id">blue_and_white<\/str>/);
+  // The signs print the street's own sign_txt, word for word.
+  const g = fs.readFileSync(path.join(LOCATIONS, 'GNVV9IM8PL4301V.xml'), 'utf8');
+  const unescape = (t) => t.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+  for (const [id, text] of Object.entries(puzzle.signs)) {
+    const at = g.indexOf(`<object id="${id}">`);
+    assert.ok(at > 0, id);
+    const body = g.slice(at, g.indexOf('</object>', at));
+    assert.equal(unescape(/<str id="sign_txt">([^<]*)<\/str>/.exec(body)[1]), text, id);
+  }
+});
+
+test('the rebuilt boxes run the street\'s own events and report every moment once', () => {
+  assert.equal(summerStreet.tsid, SUMMERS_DAY_STREET_TSID);
+  assert.equal(Object.keys(summerStreet.events).length, 44);
+  assert.equal(puzzle.instance, 'summers-day');
+  assert.equal(puzzle.strict, true);
+  const moments = puzzle.triggers.filter((t) => t.moment).map((t) => t.moment);
+  assert.deepEqual([...moments].sort(), [...SUMMERS_DAY_CHECKPOINTS].sort());
+  for (const t of puzzle.triggers) {
+    for (const name of [...(t.onEnter || []), ...(t.onExit || [])]) assert.ok(summerStreet.events[name], `${t.id}: ${name}`);
+  }
+  // The exit is the archived box itself, not a rebuilt one.
+  const exit = puzzle.triggers.find((t) => t.moment === 'exit');
+  const box = summerStreet.boxes.find((b) => b.id === 'blue_and_white_go_bonus');
+  assert.deepEqual([exit.x, exit.y, exit.w, exit.h], [box.x, box.y, box.w, box.h]);
+  // The swim is the street's set_phys / reset_phys, not a remake buoyancy.
+  const water = puzzle.triggers.find((t) => t.moment === 'water');
+  assert.deepEqual(water.onEnter, ['set_phys', 'swim_on']);
+  assert.ok(summerStreet.events.set_phys.some((a) => a.type === 'physics' && a.param === 'jetpack' && a.value === 1));
+  assert.ok(puzzle.triggers.filter((t) => t.onEnter.includes('reset_phys')).length >= 2);
+  // The drowning teleporter lands in a reset box.
+  const drown = puzzle.triggers.find((t) => t.teleport);
+  const reset = puzzle.triggers.filter((t) => t.onEnter.includes('reset_phys'));
+  assert.ok(reset.some((t) => Math.abs(drown.teleport.x - t.x) <= t.w / 2 && drown.teleport.y <= t.y && drown.teleport.y >= t.y - t.h));
+  // Spawn: onStarted's questInstanceLocation x, y in the street's screen space.
+  assert.deepEqual(puzzle.start, summersDayStreetPoint(SUMMERS_DAY_SOURCE_SPAWN));
+});
+
+test('the QA route stands inside each moment\'s box', () => {
+  const bodyH = 58; // the 0.622 pc_scale avatar, as puzzles-feature measures it
+  for (const step of SUMMERS_DAY_ROUTE) {
+    const at = summersDayStreetPoint(step);
+    const boxes = step.id === 'reset'
+      ? puzzle.triggers.filter((t) => t.onEnter.includes('reset_phys'))
+      : puzzle.triggers.filter((t) => t.moment === step.id);
+    const hit = boxes.some((t) => {
+      if (Math.abs(at.x - t.x) > t.w / 2) return false;
+      const top = t.y - t.h;
+      const bottom = t.y + 4;
+      return t.body ? at.y >= top && at.y - bodyH <= bottom : at.y <= bottom && at.y >= top;
+    });
+    assert.ok(hit, step.id);
+  }
 });
 
 test('the main memory opens the two-minute Annex and Annex quoins are unique', () => {
@@ -158,20 +235,12 @@ test('main and Annex expiry are exact and block late progress', () => {
   assert.equal(collectSummersDayBonusQuoin(annex, 0, 121000).reason, 'expired');
 });
 
-test('client integration uses recovered clean decos, HUD, buoyancy, and deterministic QA', () => {
+test('client integration runs the real street, its HUD and deterministic QA', () => {
   const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
   const html = fs.readFileSync(path.join(root, 'public/play/index.html'), 'utf8');
   const css = fs.readFileSync(path.join(root, 'public/style.css'), 'utf8');
-  for (const file of [
-    'backhill1_blue.png',
-    'boulder_1.png',
-    'wall_shelf1.png',
-    'pulseDot.png',
-    'water_ripple_double_1.png',
-    'owl_1.png',
-    'firebog_ladder.png',
-    'vine_rope.png',
-  ]) {
+  // The Annex is still drawn from its recovered decos.
+  for (const file of ['pulseDot.png', 'firebog_ladder.png']) {
     assert.equal(
       fs.existsSync(path.join(root, 'public/assets/decos/groddle', file.replace(/\.png$/, '.webp'))),
       true,
@@ -180,19 +249,26 @@ test('client integration uses recovered clean decos, HUD, buoyancy, and determin
   }
   assert.match(game, /startSummersDay/);
   assert.match(game, /advanceSummersDayMoment/);
-  assert.match(game, /handleSummersDayBuoyancyInput/);
+  assert.match(game, /await enterStreet\(SUMMERS_DAY_STREET_TSID, \{/);
+  assert.match(game, /heldInstance: \(\) => summersDayHeldInstance\(\)/);
   assert.match(game, /summerautoplay/);
   assert.match(game, /source-pulse-dots-and-ladder/);
-  assert.match(game, /white-memory-silhouettes/);
-  assert.match(game, /source-white-owl/);
+  assert.match(game, /tiny-speck-street/);
+  assert.match(game, /source-flitterbug/);
   assert.match(game, /recovered-firebog-ladder/);
   assert.match(game, /summerDayAnnexDotReward/);
   assert.match(game, /summerDayGuide/);
+  // The drawn stand-ins are gone: the street, its flitterbugs and its own swim replace them.
+  for (const gone of ['drawSummersDayMainBackground', 'makeSummersDayCheckpoint', 'handleSummersDayBuoyancyInput', 'summersDayBuoyancyPhysics', 'white-memory-silhouettes', 'source-white-owl', 'owl_1.png']) {
+    assert.doesNotMatch(game, new RegExp(gone), gone);
+  }
   // G99: the memory opts out of the Dametime tint through the general ownLight flag.
+  assert.match(game, /The memory's blue-and-white light is its own: no Dametime tint\.\n\s*currentStreet\.ownLight = true/);
   assert.match(game, /The memory's blue-and-white light is its own: no Dametime tint\.\n\s*ownLight: true/);
   assert.match(game, /const preserveAuthoredLight = Boolean\(currentStreet\?\.ownLight\)/);
   assert.match(game, /SUMMERS_DAY_COMPLETION\.replace\('\{pc_label\}', 'friend'\)/);
   assert.match(game, /dataset\.summerDayMainTsid/);
+  assert.match(game, /dataset\.summerDayStreet = SUMMERS_DAY_STREET_TSID/);
   assert.match(html, /id="summers-day-hud"/);
   assert.match(html, /summer=summers-day-7/);
   assert.match(css, /\.summers-day-hud/);

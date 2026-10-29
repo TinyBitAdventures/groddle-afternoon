@@ -5145,6 +5145,357 @@
     ]
    },
    "eventsWhy": "The Collision-triggered Teleporter back to Umbra (items/teleporter.js 55-77); its target_x/y are lost, so it lands on plat_1351549922585."
+  },
+  "GNVV9IM8PL4301V": {
+   "name": "A Summer's Day",
+   "blurb": "The Giants' shared memory of a summer's day: the private five-minute instance (quests/blue_and_white_part1.js, _part2.js).",
+   "instance": "summers-day",
+   "strict": true,
+   "physics": {
+    "jump": 1.15
+   },
+   "physicsWhy": "The client caught ledges with two 15 px collision circles at the feet and head (AvatarPhysicsHandler calcCircleGap, solver), so its 100 px apex and 187 px running jump at this street’s vy_max 489 and vx_max 228 still landed on the steps the street spaces 118 px up (shelf 628 to 627) and 216 px across (the pier to the water platform). The remake lands on the line itself, so the memory’s jump gets x1.15 (apex 98 to 130 px, run 194 to 223 px) to reach the same steps",
+   "mapCard": false,
+   "emptyEcology": true,
+   "start": {
+    "x": 4709,
+    "y": 742
+   },
+   "signsWhy": "sign_txt of the street's seven firebog_sign_blank decos (G XML GNVV9IM8PL4301V.xml, sign_css_class default_deco_sign), keyed by the deco ids the events show and hide; the client printed the text on the sign, and the recording shows it white on the memory's light",
+   "signs": {
+    "firebog_sign_blank_1335378517202": "Hey, I'm up here!<br> Can you reach me?",
+    "firebog_sign_blank_1335378517218": "Not bad.<br> Try this next one.",
+    "firebog_sign_blank_1335391499967": "Ok. Now, the <br> glowing orb?",
+    "firebog_sign_blank_1335401803850": "Oh! Spacebar to swim!",
+    "firebog_sign_blank_1337208228297": "Oh. Can't swim.",
+    "firebog_sign_blank_1335478834099": "Almost there",
+    "firebog_sign_blank_1335491308265": "Wow, You're pretty good! <br> I've got something upstairs for you."
+   },
+   "triggers": [
+    {
+     "id": "sign_1",
+     "x": 4018,
+     "y": 830,
+     "w": 417,
+     "h": 200,
+     "onEnter": [
+      "firts_ign_show"
+     ],
+     "why": "firts_ign_show only fades in the first sign (3010, -258: \"Hey, I'm up here!\"). Box: the ground between the open wall line at x 3227 (wall_1335375752706, pc_perm 0: no collision, the edge the box sat on) and the rock under the first flitterbug (boulder_1_1335378517189, right edge 2808), the first stretch you walk west from the spawn (3709, -258); Mjo6k3dmrdI (HburgerGlitch, A Summer’s Day Quest) 0:36 shows the line there"
+    },
+    {
+     "id": "owl_1",
+     "x": 3902,
+     "y": 615,
+     "w": 68,
+     "h": 82,
+     "body": true,
+     "onEnter": [
+      "flutter_wings"
+     ],
+     "moment": "bird_1",
+     "why": "flutter_wings hides flitterbug_limbo1_1335572507954 (2902, -385, 68 x 82), so the box is that bird: the avatar touches it jumping from the rock top (plats 191/192, y -261..-266), 120 px under it. It swaps the first sign for \"Not bad. Try this next one.\" and opens wall_1335378517236 (x 2683) 1.5 s later (wall1_delay)"
+    },
+    {
+     "id": "stone_1",
+     "x": 3393,
+     "y": 860,
+     "w": 57,
+     "h": 40,
+     "onEnter": [
+      "button_down"
+     ],
+     "moment": "stone_1",
+     "why": "button_down switches off plat_1335389378242 (x 2379-2406, y -158) and hides backhill1_blue_1335389378232 (2396, -145, 57 x 25): the pressure stone is that small hill and its raised top. Standing on it raises boulder_1_1335378517244 and its top plat 246 (x 2228-2322, y -368) for 5 s (button_up), the step to the second bird’s pillar"
+    },
+    {
+     "id": "owl_2",
+     "x": 3038,
+     "y": 541,
+     "w": 68,
+     "h": 82,
+     "body": true,
+     "onEnter": [
+      "owl2_off"
+     ],
+     "moment": "bird_2",
+     "why": "owl2_off hides flitterbug_limbo1_1335572507955 (2038, -459), which sits on the pillar top (plats 247/248, y -418..-424): standing there touches it. wall2_delay then opens wall_1335389378235 (x 1973) onto the pier and shows \"Ok. Now, the glowing orb?\""
+    },
+    {
+     "id": "water",
+     "x": 2418,
+     "y": 1000,
+     "w": 806,
+     "h": 253,
+     "onEnter": [
+      "set_phys",
+      "swim_on"
+     ],
+     "moment": "water",
+     "why": "The pool: no floor between the left bank (wall_1335577138905, x 1005, solid from -245 down) and the pier’s end post (wall_1335577138906, x 1822, solid -379..13), surface at y -253 (the bottom edge of background_ghost_transparent_2 and the water_ripple_single_1 line on realmid). Feet under the surface run set_phys (jetpack, vx_max x0.1, vy_max x0.1, vy_jump x0.2, WATER_SPLASH) and swim_on (\"Oh! Spacebar to swim!\", skipped once dontswim is set); the swim lasts until a reset box. Recording 1:08-1:10: the sign shows as the player sinks"
+    },
+    {
+     "id": "drown",
+     "x": 2418,
+     "y": 870,
+     "w": 806,
+     "h": 50,
+     "onEnter": [
+      "cant_swim_on"
+     ],
+     "teleport": {
+      "x": 2790,
+      "y": 624
+     },
+     "why": "The archive’s one Collision-triggered Teleporter plus the box that fired cant_swim_on: sinking to the bottom of the pool puts you back on the pier under \"Oh. Can’t swim.\" (1791, -359), and dontswim keeps the spacebar sign from coming back. Recording 1:09-1:13: the player sinks, then stands on the pier under that line; the lost teleporter’s target is the pier deck under the sign (1790, -376). The box lies on the pool floor the remake gives a street with no platform there (its ground line, y -130): about 120 px under the surface, which the sink cap of 49 px/s covers in the recording’s 2-3 s"
+    },
+    {
+     "id": "reset_pier",
+     "x": 2789,
+     "y": 640,
+     "w": 394,
+     "h": 80,
+     "onEnter": [
+      "reset_phys"
+     ],
+     "why": "reset_phys (every swim setting back) on the pier deck (plats 883-888, x 1592-1986, y -374..-405): climbing back onto it, or the teleporter landing you there, ends the swim. Walking out to the pier before the water runs it with nothing to reset"
+    },
+    {
+     "id": "orb_1",
+     "x": 2379,
+     "y": 620,
+     "w": 60,
+     "h": 29,
+     "body": true,
+     "onEnter": [
+      "ball_3"
+     ],
+     "moment": "orb_1",
+     "why": "ball_3 hides pulseDot_1335563642983 (1379, -380, 29 x 29), the lowest orb, 127 px over the surface: it shows shelf 626 (plat 843, x 1477-1556, y -480). Width 60 = the dot plus the avatar’s half width either side"
+    },
+    {
+     "id": "orb_2",
+     "x": 2436,
+     "y": 368,
+     "w": 60,
+     "h": 29,
+     "body": true,
+     "onEnter": [
+      "ball_1"
+     ],
+     "moment": "orb_2",
+     "why": "ball_1 hides pulseDot_1335563642982 (1436, -632) and shows shelf 628 (plat 840, x 1706-1789, y -546)"
+    },
+    {
+     "id": "orb_3",
+     "x": 2747,
+     "y": 325,
+     "w": 60,
+     "h": 29,
+     "body": true,
+     "onEnter": [
+      "ball_2"
+     ],
+     "moment": "orb_3",
+     "why": "ball_2 hides pulseDot_1335563642984 (1747, -675) and shows shelf 627 (plat 841, x 1601-1684, y -664)"
+    },
+    {
+     "id": "orb_4",
+     "x": 2621,
+     "y": 284,
+     "w": 60,
+     "h": 29,
+     "body": true,
+     "onEnter": [
+      "ball_4"
+     ],
+     "moment": "orb_4",
+     "why": "ball_4 hides pulseDot_1335563642985 (1621, -716), the top of the chain: it takes the three shelves away and raises the water platform (boulders 094-096, plat 097 x 1244-1376, y -368). The L XML hidden_decos timestamps play the chain 983, 982, 984, 985"
+    },
+    {
+     "id": "reset_bank",
+     "x": 1936,
+     "y": 770,
+     "w": 152,
+     "h": 110,
+     "onEnter": [
+      "reset_phys"
+     ],
+     "why": "reset_phys on the left bank (plats 953/098, x 860-1012, y -244..-287), where you climb out of the pool west of wall 1005; the third flitterbug sits right over it"
+    },
+    {
+     "id": "owl_3",
+     "x": 1921,
+     "y": 668,
+     "w": 68,
+     "h": 82,
+     "body": true,
+     "onEnter": [
+      "owl3_off"
+     ],
+     "moment": "bird_3",
+     "why": "owl3_off hides flitterbug_limbo1_1335572507956 (921, -332), standing on the bank (y -290..-303): you touch it as you climb out. It shows \"Almost there\" (541, -338)"
+    },
+    {
+     "id": "stone_2",
+     "x": 1069,
+     "y": 800,
+     "w": 57,
+     "h": 40,
+     "onEnter": [
+      "button2_down"
+     ],
+     "moment": "stone_2",
+     "why": "button2_down switches off plat_1335566503953 (x 56-82, y -223) and hides backhill1_blue_1335566503941 (71, -207): the second pressure stone. It raises boulder_1_1335566503937 (310, -211) and its top plats 938/939 (x 261-362, y -406..-416) for 5 s, reached from the stump (plats x 446-629, y -374..-384)"
+    },
+    {
+     "id": "dot_1",
+     "x": 1106,
+     "y": 474,
+     "w": 60,
+     "h": 29,
+     "body": true,
+     "onEnter": [
+      "dot_1"
+     ],
+     "moment": "dot_1",
+     "why": "dot_1 hides pulseDot_1335556678602 (106, -526; shown by 3_dots_show on arrival) and shows shelf 946 (plat 947, x 3-86, y -445), a jump west off the raised boulder"
+    },
+    {
+     "id": "dot_2",
+     "x": 877,
+     "y": 421,
+     "w": 60,
+     "h": 29,
+     "body": true,
+     "onEnter": [
+      "dot_2"
+     ],
+     "moment": "dot_2",
+     "why": "dot_2 hides pulseDot_1335563642980 (-123, -579) and shows shelf 948 (plat 949, x -255..-172, y -459)"
+    },
+    {
+     "id": "dot_3",
+     "x": 624,
+     "y": 417,
+     "w": 60,
+     "h": 29,
+     "body": true,
+     "onEnter": [
+      "dot_3"
+     ],
+     "moment": "dot_3",
+     "why": "dot_3 hides pulseDot_1335563642981 (-376, -583) and shows shelf 950 (plat 951, x -506..-423, y -457)"
+    },
+    {
+     "id": "owl_4",
+     "x": 169,
+     "y": 546,
+     "w": 68,
+     "h": 82,
+     "body": true,
+     "onEnter": [
+      "owl4_off"
+     ],
+     "moment": "bird_4",
+     "why": "owl4_off hides flitterbug_limbo1_1335572507957 (-831, -454), standing on the rock top (plats 262-264, x -999..-778, y -390..-403): it fades in the ladder art (firebog_ladder 982/983 over ladder_1335492996984) and \"Wow, You’re pretty good! I’ve got something upstairs for you.\""
+    },
+    {
+     "id": "exit",
+     "x": 75,
+     "y": 100,
+     "w": 125,
+     "h": 100,
+     "onEnter": [],
+     "moment": "exit",
+     "why": "Not rebuilt: the archived G XML box blue_and_white_go_bonus (screen 75, 100, 125 x 100) at the top of the ladder (x -925, y -998..-458). Its id is the quest callback it ran, callback_blue_and_white_go_bonus (quests/blue_and_white_part2.js 64-71): questInstanceLocation(pc, 'blue_and_white_bonus', 380, -70, 2*60), the Annex"
+    }
+   ],
+   "quoins": [],
+   "platforms": [
+    {
+     "id": "plat_1335491308267",
+     "x1": -687,
+     "y1": -430,
+     "x2": -604,
+     "y2": -430,
+     "pc_perm": -1,
+     "why": "owl4_off switches off plat_1335491308267, which the archived geometry no longer holds; its id is of the batch that made the rock top (plats 262-264) and the last sign (265). From the last dot shelf (951, x -506) to the rock (x -778) is 272 px, past any jump at this street’s physics, so it is put back as the step between them, as wide as the dot shelves (83 px) and between their heights; owl4_off takes it away as written"
+    }
+   ],
+   "decos": [
+    {
+     "sprite": "wall_shelf1",
+     "x": -645,
+     "y": -409,
+     "w": 109,
+     "h": 29,
+     "z": 45,
+     "r": 0,
+     "id": "wall_shelf1_rebuilt_267",
+     "why": "The step plat_1335491308267 wears the street’s own wall_shelf1, like the three dot shelves (deco 21 px under its platform, centred on it)"
+    }
+   ],
+   "events": {
+    "owl4_off": [
+     {
+      "type": "flag_has_exit",
+      "flag": "end"
+     },
+     {
+      "type": "deco_hide",
+      "deco": "flitterbug_limbo1_1335572507957",
+      "fade": 300
+     },
+     {
+      "type": "deco_show",
+      "deco": "firebog_sign_blank_1335491308265",
+      "fade": 4000
+     },
+     {
+      "type": "plat",
+      "plat": "plat_1335491308267",
+      "pc_perm": 0
+     },
+     {
+      "type": "deco_hide",
+      "deco": "wall_shelf1_rebuilt_267",
+      "fade": 300
+     },
+     {
+      "type": "deco_show",
+      "deco": "firebog_ladder_1335492996982",
+      "fade": 10000
+     },
+     {
+      "type": "deco_show",
+      "deco": "firebog_ladder_1335492996983",
+      "fade": 10000
+     },
+     {
+      "type": "deco_hide",
+      "deco": "vine_rope_1335492996985",
+      "fade": 300
+     },
+     {
+      "type": "deco_show",
+      "deco": "firebog_arrow_2_1335492996986",
+      "fade": 6000
+     },
+     {
+      "type": "play_sound",
+      "name": "FLITTERBUG_COLLISION",
+      "loops": 1,
+      "all": true,
+      "url": "assets/audio/flitterbug_collision.mp3"
+     },
+     {
+      "type": "flag_set",
+      "flag": "end"
+     }
+    ]
+   },
+   "eventsWhy": "owl4_off as archived, plus a deco_hide for the rebuilt step’s shelf beside its plat off, so the shelf goes when the platform does"
   }
  }
 }

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g450-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-302';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-303';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g434-1';
@@ -143,10 +143,8 @@ import {
   SUMMERS_DAY_BONUS_DOT_COUNT,
   SUMMERS_DAY_BONUS_DOT_IMG,
   SUMMERS_DAY_BONUS_PRODUCTION_TSID,
-  SUMMERS_DAY_CHECKPOINTS,
   SUMMERS_DAY_COMPLETION,
   SUMMERS_DAY_FIRST_PRODUCTION_TSID,
-  SUMMERS_DAY_MAIN_ID,
   SUMMERS_DAY_MAIN_PRODUCTION_TSID,
   SUMMERS_DAY_OFFER,
   SUMMERS_DAY_QUEST_ID,
@@ -154,6 +152,9 @@ import {
   SUMMERS_DAY_REPEAT_COMPLETION,
   SUMMERS_DAY_REPEAT_OFFER,
   SUMMERS_DAY_REPEAT_QUEST_ID,
+  SUMMERS_DAY_ROUTE,
+  SUMMERS_DAY_SOURCE_SPAWN,
+  SUMMERS_DAY_STREET_TSID,
   abandonSummersDay,
   advanceSummersDayCheckpoint,
   canOfferSummersDay,
@@ -164,11 +165,13 @@ import {
   expireSummersDay,
   finishSummersDay,
   markSummersDayOffered,
+  summersDayNextCheckpoint,
   summersDayObjective,
   summersDayProgress,
   summersDayQurazyPoints,
   summersDayRemainingMs,
-} from './js/summers-day.js?v=summers-day-3';
+  summersDayStreetPoint,
+} from './js/summers-day.js?v=g452-1';
 import {
   ROOK_CRUSHERS,
   ROOK_EGG_INITIAL_STATE,
@@ -1743,17 +1746,18 @@ let winterSnow = null;
 let winterWalkStartPromise = null;
 let winterWalkTransitionBusy = false;
 let winterWalkAutoNextAt = 0;
-/** Transient source-authored A Summer's Day memory and Annex. */
+/**
+ * A Summer's Day: the private memory is Tiny Speck's imported street (GNVV9IM8PL4301V,
+ * its own scripts and the rebuilt boxes: puzzles-feature), the Annex a drawn scene.
+ */
 let summersDayRun = null;
 let summersDaySourceLocation = null;
-let summersDayCheckpoints = [];
-let summersDayPlatforms = [];
 let summersDayBonusQuoins = [];
 let summersDayExit = null;
 let summersDayStartPromise = null;
 let summersDayTransitionBusy = false;
 let summersDayAutoNextAt = 0;
-let summersDayWaterLine = null;
+let summersDayAutoStep = 0;
 /** Transient Rooks' Woods Crusher gauntlet. */
 let rookWoodsState = null;
 let rookWoodsSourceLocation = null;
@@ -9395,6 +9399,12 @@ const engine = {
   questFlag(flag) {
     questFlagsFeature.set(flag);
   },
+  /** The private instance holding an archived street ('summers-day'), else null. */
+  heldInstance: () => summersDayHeldInstance(),
+  /** A rebuilt box with a `moment` was entered (puzzles-feature). */
+  instanceMoment(moment) {
+    if (summersDayHeldInstance()) advanceSummersDayMoment(moment);
+  },
   /**
    * A source prompt (prompts_add). `timeout` (seconds, as GSJS prompts_add passes it) or
    * `timeoutMs` closes it on its own; `onTimeout(choice)` gets `timeoutValue`
@@ -11112,6 +11122,12 @@ function streetPhysicsTripleJump(buff, result) {
 /** Air drag and the vy_max cap, only on streets/events that set them. */
 function streetPhysicsFreeFall(buff, dt) {
   if (buff.airDrag > 0 && !player.onGround) player.vy *= Math.max(0, 1 - (buff.airDrag * dt) / 60);
+  // A swim (jetpack) bounds vx to vx_max every frame, as boundAvatarVelocities does: a
+  // run-up into A Summer's Day's pool no longer carries you across it at walking speed.
+  if (buff.jetpack) {
+    const vxCap = 4.4 * buff.speed;
+    player.vx = clamp(player.vx, -vxCap, vxCap);
+  }
   if (buff.vyMax) {
     const cap = STREET_PHYSICS_TERMINAL_VY * buff.vyMax;
     player.vy = clamp(player.vy, -(buff.gravity < 0 ? cap : cap * 2), cap);
@@ -11145,10 +11161,6 @@ function handleInput() {
       clearJumpQueue(jumpState);
       handleParadiseFlightInput();
     }
-    return;
-  }
-  if (summersDayInBuoyancy()) {
-    handleSummersDayBuoyancyInput();
     return;
   }
   if (pc.energy <= 0 && features.query('allowZeroEnergyMovement', engine) !== true) {
@@ -11305,8 +11317,6 @@ function physics(dt) {
       paradiseCourseRuntime.physics(paradiseCourseHost(), paradiseCourse(), dt);
     } else if (paradiseCourse()?.movement === 'slide') paradiseSlidePhysics(dt);
     else paradiseFlightPhysics(dt);
-  } else if (summersDayInBuoyancy()) {
-    summersDayBuoyancyPhysics(dt);
   } else if (menuTarget || currentAction) {
     // still bob quoins / butterflies ambient
   } else if (climb.active && climb.wall) {
@@ -14803,12 +14813,19 @@ function updateWinterWalk(dt) {
 function summersDayIsInstanced() {
   return Boolean(
     summersDayRun &&
-      [SUMMERS_DAY_MAIN_ID, SUMMERS_DAY_BONUS_ID].includes(currentStreetTsid)
+      [SUMMERS_DAY_STREET_TSID, SUMMERS_DAY_BONUS_ID].includes(currentStreetTsid)
   );
 }
 
+/** The instance holding the imported street now (puzzles-feature runs its boxes inside it). */
+function summersDayHeldInstance() {
+  return summersDayRun?.stage === 'main' && currentStreetTsid === SUMMERS_DAY_STREET_TSID
+    ? 'summers-day'
+    : null;
+}
+
 function summersDayLocationLabel(tsid = currentStreetTsid) {
-  if (tsid === SUMMERS_DAY_MAIN_ID) {
+  if (tsid === SUMMERS_DAY_STREET_TSID) {
     // G363: the blue_and_white instance (blue_and_white_part1.js 98): no hub line (location.js 3311).
     return { street: 'A Summer’s Day', hub: '' };
   }
@@ -14816,150 +14833,6 @@ function summersDayLocationLabel(tsid = currentStreetTsid) {
     return { street: 'Annex of A Summer’s Day', hub: '' };
   }
   return null;
-}
-
-function summerDeco(url, x, y, scale, opts = {}) {
-  const sprite = new PIXI.Sprite(textureFromUrl(url));
-  sprite.anchor.set(opts.anchorX ?? 0.5, opts.anchorY ?? 1);
-  sprite.position.set(x, y);
-  sprite.scale.set((opts.flip ? -1 : 1) * scale, scale);
-  sprite.tint = opts.tint ?? 0xffffff;
-  sprite.alpha = opts.alpha ?? 1;
-  sprite.zIndex = opts.zIndex ?? -100;
-  return sprite;
-}
-
-function drawSummersDayMainBackground() {
-  const root = new PIXI.Container();
-  root.label = 'summers-day-main-background';
-  root.sortableChildren = true;
-  root.worldW = 4200;
-  root.worldH = 940;
-
-  const sky = new PIXI.Graphics();
-  sky.rect(0, 0, root.worldW, root.worldH).fill(0xf8fcff);
-  sky.rect(0, 260, root.worldW, 680).fill({ color: 0xd7eff7, alpha: 0.82 });
-  sky.zIndex = -1000;
-  root.addChild(sky);
-
-  const far = new PIXI.Graphics();
-  far.zIndex = -940;
-  far.poly([
-    0, 690, 240, 535, 510, 640, 790, 480, 1060, 630, 1360, 455,
-    1680, 610, 1990, 500, 2290, 635, 2610, 470, 2920, 615, 3220, 490,
-    3530, 620, 3860, 475, 4200, 610, 4200, 940, 0, 940,
-  ]);
-  far.fill({ color: 0xb7dce8, alpha: 0.74 });
-  root.addChild(far);
-
-  for (let i = 0; i < 9; i += 1) {
-    root.addChild(
-      summerDeco(
-        'assets/decos/groddle/backhill1_blue.png',
-        210 + i * 505,
-        805 - (i % 3) * 20,
-        0.62 + (i % 2) * 0.08,
-        { alpha: 0.52, flip: i % 2 === 1, zIndex: -900 }
-      )
-    );
-  }
-
-  const water = new PIXI.Graphics();
-  water.zIndex = -760;
-  water.roundRect(1190, 770, 1260, 154, 54).fill({ color: 0x9ed6e7, alpha: 0.82 });
-  for (let x = 1235; x < 2410; x += 150) {
-    water.moveTo(x, 808 + (x % 300 ? 8 : 0));
-    water.bezierCurveTo(x + 34, 795, x + 75, 825, x + 116, 808);
-  }
-  water.stroke({ width: 4, color: 0xf8fdff, alpha: 0.8 });
-  root.addChild(water);
-  root.summersDayWater = water;
-
-  const terrain = new PIXI.Graphics();
-  terrain.zIndex = -720;
-  terrain.setFillStyle(0xf9fdff);
-  terrain.setStrokeStyle({ width: 3, color: 0xd8f1f8, alpha: 0.76 });
-  terrain.poly([0, 820, 1160, 820, 1240, 900, 0, 940]).fill().stroke();
-  terrain.poly([2400, 790, 2920, 790, 3050, 940, 2320, 940]).fill().stroke();
-  terrain.poly([2860, 740, 4200, 350, 4200, 940, 3000, 940]).fill().stroke();
-  root.addChild(terrain);
-
-  const platforms = [
-    { x1: 0, y1: 820, x2: 1190, y2: 820, visibleAt: 0 },
-    { x1: 720, y1: 710, x2: 1040, y2: 710, visibleAt: 2 },
-    { x1: 1120, y1: 790, x2: 1420, y2: 790, visibleAt: 3 },
-    { x1: 1450, y1: 730, x2: 1690, y2: 730, visibleAt: 4 },
-    { x1: 1700, y1: 655, x2: 1940, y2: 655, visibleAt: 5 },
-    { x1: 1950, y1: 585, x2: 2190, y2: 585, visibleAt: 6 },
-    { x1: 2200, y1: 695, x2: 2460, y2: 695, visibleAt: 7 },
-    { x1: 2380, y1: 790, x2: 2940, y2: 790, visibleAt: 8 },
-    { x1: 2790, y1: 710, x2: 3080, y2: 710, visibleAt: 9 },
-    { x1: 3030, y1: 625, x2: 3320, y2: 625, visibleAt: 10 },
-    { x1: 3260, y1: 540, x2: 3540, y2: 540, visibleAt: 11 },
-    { x1: 3490, y1: 455, x2: 3770, y2: 455, visibleAt: 12 },
-    { x1: 3720, y1: 365, x2: 4140, y2: 365, visibleAt: 13 },
-  ];
-  root.platformsScreen = platforms;
-  root.summersDayPlatformSprites = [];
-  for (let index = 1; index < platforms.length; index += 1) {
-    const platform = platforms[index];
-    const shelf = new PIXI.Graphics();
-    shelf.zIndex = -650;
-    shelf.roundRect(
-      platform.x1,
-      platform.y1 - 10,
-      platform.x2 - platform.x1,
-      20,
-      10
-    );
-    shelf.fill({ color: 0xf9fdff, alpha: 0.99 });
-    shelf.alpha = platform.visibleAt <= 1 ? 0.95 : 0.14;
-    shelf._visibleAt = platform.visibleAt;
-    root.addChild(shelf);
-    root.summersDayPlatformSprites.push(shelf);
-  }
-
-  for (let i = 0; i < 7; i += 1) {
-    const pillar = new PIXI.Graphics();
-    const x = 520 + i * 590;
-    const y = i < 4 ? 840 : 640 - (i - 4) * 85;
-    const width = 124 + (i % 3) * 24;
-    const height = 92 + ((i * 37) % 118);
-    pillar.zIndex = -610;
-    pillar.roundRect(x - width / 2, y - height, width, height, 30).fill({ color: 0xf9fdff, alpha: 0.92 });
-    root.addChild(pillar);
-  }
-
-  const vine = summerDeco(
-    'assets/decos/groddle/vine_rope.png',
-    3920,
-    700,
-    0.43,
-    { alpha: 0.72, zIndex: -580 }
-  );
-  root.addChild(vine);
-  root.summersDayVine = vine;
-  const ladder = summerDeco(
-    'assets/decos/groddle/firebog_ladder.png',
-    3930,
-    720,
-    0.62,
-    { alpha: 0.1, zIndex: -570 }
-  );
-  root.addChild(ladder);
-  root.summersDayLadder = ladder;
-
-  const ripple = summerDeco(
-    'assets/decos/groddle/water_ripple_double_1.png',
-    1850,
-    815,
-    1.75,
-    { anchorY: 0.5, alpha: 0.72, tint: 0xdff7ff, zIndex: -560 }
-  );
-  root.addChild(ripple);
-  summersDayWaterLine = ripple;
-  root.summersDayMainArt = 'white-memory-silhouettes';
-  return root;
 }
 
 function drawSummersDayBonusBackground() {
@@ -15020,90 +14893,6 @@ function drawSummersDayBonusBackground() {
   }
   root.summersDayAnnexArt = 'source-pulse-dots-and-ladder';
   return root;
-}
-
-function makeSummersDayCheckpoint(id, x, y, index) {
-  let sprite;
-  let guideText = null;
-  if (id.startsWith('bird')) {
-    sprite = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/owl_1.png'));
-    sprite.anchor.set(0.5, 1);
-    sprite.scale.set(0.36);
-    const memoryWhite = new PIXI.ColorMatrixFilter();
-    memoryWhite.greyscale(1, false);
-    memoryWhite.brightness(5, true);
-    sprite.filters = [memoryWhite];
-    guideText = new PIXI.Text({ text: SUMMERS_DAY_GUIDE_LINES[id] || '', style: {
-      fontFamily: 'Trebuchet MS, sans-serif',
-      fontSize: 18,
-      fontWeight: '700',
-      fill: 0xffffff,
-      align: 'center',
-      dropShadow: { blur: 3, color: 0x6ca8bb, distance: 1 },
-    } });
-    guideText.anchor.set(0.5, 1);
-    guideText.position.set(
-      x + (index % 2 === 0 ? 138 : -138),
-      y - 54
-    );
-    guideText.alpha = 0;
-    guideText.zIndex = 39;
-  } else if (id.startsWith('orb') || id.startsWith('dot')) {
-    sprite = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/pulseDot.png'));
-    sprite.anchor.set(0.5);
-    sprite.scale.set(id.startsWith('orb') ? 0.76 : 0.62);
-  } else if (id.startsWith('stone')) {
-    sprite = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/boulder_1.png'));
-    sprite.anchor.set(0.5, 1);
-    sprite.scale.set(0.115);
-  } else if (id === 'water') {
-    sprite = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/water_ripple_double_1.png'));
-    sprite.anchor.set(0.5);
-    sprite.scale.set(0.72);
-  } else {
-    const marker = new PIXI.Graphics();
-    marker.roundRect(-24, -72, 48, 72, 20).fill({ color: 0xffffff, alpha: 0.86 });
-    marker.roundRect(-24, -72, 48, 72, 20).stroke({ width: 3, color: 0x77b9cd, alpha: 0.88 });
-    sprite = marker;
-  }
-  sprite.position.set(x, y);
-  sprite.alpha = index === 0 ? 1 : 0.14;
-  sprite.zIndex = 38;
-  sprite._summerBaseScaleX = sprite.scale.x;
-  sprite._summerBaseScaleY = sprite.scale.y;
-  entityLayer.addChild(sprite);
-  if (guideText) entityLayer.addChild(guideText);
-  return { id, index, x, y, sprite, guideText, completed: false };
-}
-
-function revealSummersDayProgress() {
-  const count = summersDayRun?.checkpoints?.length || 0;
-  for (const checkpoint of summersDayCheckpoints) {
-    checkpoint.completed = checkpoint.index < count;
-    checkpoint.sprite.alpha = checkpoint.completed ? 0.24 : checkpoint.index === count ? 1 : 0.12;
-    checkpoint.sprite.tint = checkpoint.completed ? 0xa9cbd5 : 0xffffff;
-    if (checkpoint.guideText) {
-      checkpoint.guideText.alpha = checkpoint.index === count ? 0.96 : 0;
-    }
-  }
-  for (const shelf of bgLayer?.summersDayPlatformSprites || []) {
-    shelf.alpha = shelf._visibleAt <= count ? 0.92 : 0.12;
-  }
-  if (bgLayer?.summersDayVine) bgLayer.summersDayVine.alpha = count >= 14 ? 0.12 : 0.74;
-  if (bgLayer?.summersDayLadder) bgLayer.summersDayLadder.alpha = count >= 14 ? 0.96 : 0.1;
-}
-
-function spawnSummersDayMainSequence() {
-  const points = [
-    [360, 820], [610, 820], [900, 710], [1260, 790], [1520, 730],
-    [1770, 655], [2020, 585], [2280, 695], [2550, 790], [2860, 710],
-    [3090, 625], [3330, 540], [3550, 455], [3760, 365], [3990, 365],
-  ];
-  summersDayCheckpoints = SUMMERS_DAY_CHECKPOINTS.map((id, index) =>
-    makeSummersDayCheckpoint(id, points[index][0], points[index][1], index)
-  );
-  revealSummersDayProgress();
-  summersDayExit = summersDayCheckpoints.at(-1);
 }
 
 function spawnSummersDayBonusRoom() {
@@ -15179,7 +14968,7 @@ function renderSummersDayHud() {
     app.canvas.dataset.summerDayStatus = summersDayRun.status;
     app.canvas.dataset.summerDayStage = summersDayRun.stage;
     app.canvas.dataset.summerDayCheckpoint =
-      SUMMERS_DAY_CHECKPOINTS[summersDayRun.checkpoints.length] || 'complete';
+      summersDayNextCheckpoint(summersDayRun) || 'complete';
     app.canvas.dataset.summerDayProgress = `${progress.current}/${progress.total}`;
     app.canvas.dataset.summerDayRemaining = String(remaining);
     app.canvas.dataset.summerDayBonusQuoins = `${progress.bonusCollected}/${progress.bonusTotal}`;
@@ -15187,9 +14976,11 @@ function renderSummersDayHud() {
     app.canvas.dataset.summerDayObjective = summersDayObjective(summersDayRun);
     app.canvas.dataset.summerDayMainTsid = SUMMERS_DAY_MAIN_PRODUCTION_TSID;
     app.canvas.dataset.summerDayBonusTsid = SUMMERS_DAY_BONUS_PRODUCTION_TSID;
+    // The memory is Tiny Speck's own street, its guides the street's flitterbug_limbo1 decos.
     app.canvas.dataset.summerDayMainArt =
-      bgLayer?.summersDayMainArt || 'not-in-main';
-    app.canvas.dataset.summerDayGuideArt = 'source-white-owl';
+      summersDayRun.stage === 'main' ? 'tiny-speck-street' : 'not-in-main';
+    app.canvas.dataset.summerDayStreet = SUMMERS_DAY_STREET_TSID;
+    app.canvas.dataset.summerDayGuideArt = 'source-flitterbug';
     app.canvas.dataset.summerDayAnnexArt =
       bgLayer?.summersDayAnnexArt || 'not-in-annex';
     app.canvas.dataset.summerDayAnnexDots = String(SUMMERS_DAY_BONUS_DOT_COUNT);
@@ -15197,23 +14988,20 @@ function renderSummersDayHud() {
     app.canvas.dataset.summerDayAnnexExit =
       summersDayExit?.art || 'not-in-annex';
     app.canvas.dataset.summerDayGuide =
-      SUMMERS_DAY_GUIDE_LINES[
-        SUMMERS_DAY_CHECKPOINTS[summersDayRun.checkpoints.length]
-      ] || '';
+      SUMMERS_DAY_GUIDE_LINES[summersDayNextCheckpoint(summersDayRun)] || '';
   }
 }
 
-function setupSummersDayStage(stage) {
+/** The Annex (LNVIL1E14M13K5I, not archived): the drawn shaft, its dots and ladder. */
+function setupSummersDayAnnex() {
   clearWorldEntities();
   if (bgLayer && world) {
     world.removeChild(bgLayer);
     bgLayer.destroy({ children: true });
   }
-  bgLayer = stage === 'bonus'
-    ? drawSummersDayBonusBackground()
-    : drawSummersDayMainBackground();
+  bgLayer = drawSummersDayBonusBackground();
   world.addChildAt(bgLayer, 0);
-  currentStreetTsid = stage === 'bonus' ? SUMMERS_DAY_BONUS_ID : SUMMERS_DAY_MAIN_ID;
+  currentStreetTsid = SUMMERS_DAY_BONUS_ID;
   const label = summersDayLocationLabel();
   currentStreet = {
     tsid: currentStreetTsid,
@@ -15226,19 +15014,15 @@ function setupSummersDayStage(stage) {
     ownLight: true,
   };
   WORLD_W = bgLayer.worldW;
-  GROUND_Y = stage === 'bonus' ? 1430 : 820;
+  GROUND_Y = 1430;
   streetPlatforms = bgLayer.platformsScreen || [];
-  summersDayPlatforms = streetPlatforms;
-  streetWalls = stage === 'main'
-    ? [{ x: 3930, yTop: 350, yBot: 720 }]
-    : [];
+  streetWalls = [];
   climb = { active: false, wall: null };
   Object.assign(jumpState, createJumpState(movementNow()));
-  if (stage === 'bonus') spawnSummersDayBonusRoom();
-  else spawnSummersDayMainSequence();
+  spawnSummersDayBonusRoom();
   if (player) {
-    player.x = stage === 'bonus' ? 380 : 170;
-    player.y = stage === 'bonus' ? 1430 : 820;
+    player.x = 380;
+    player.y = 1430;
     player.vx = 0;
     player.vy = 0;
     player.onGround = true;
@@ -15246,7 +15030,7 @@ function setupSummersDayStage(stage) {
     noteGrounded(jumpState, true, movementNow());
   }
   camTarget = cameraTargetForPlayer(player.x);
-  const summerCameraAnchor = stage === 'bonus' ? 0.64 : 0.56;
+  const summerCameraAnchor = 0.64;
   camY = cameraTargetY(
     player.y,
     activeCameraWorldHeight(summerCameraAnchor),
@@ -15255,6 +15039,10 @@ function setupSummersDayStage(stage) {
   );
   world.x = -camTarget;
   world.y = -camY;
+  summersDayNameplate(label);
+}
+
+function summersDayNameplate(label) {
   const name = document.getElementById('street-name');
   if (name) {
     name.textContent = label.hub ? `${label.street} · ${label.hub}` : label.street;
@@ -15266,11 +15054,34 @@ function setupSummersDayStage(stage) {
   updateHud();
 }
 
+/**
+ * The main memory: Tiny Speck's own copy of the template, held as the private instance.
+ * Its arrival scripts, physics (pc_scale 0.622) and rebuilt boxes start in enterStreet's
+ * feature hooks; onStarted's 3709, -258 is the spawn.
+ */
+async function setupSummersDayMain() {
+  const spawn = summersDayStreetPoint(SUMMERS_DAY_SOURCE_SPAWN);
+  summersDayAutoStep = 0;
+  await enterStreet(SUMMERS_DAY_STREET_TSID, {
+    spawnX: spawn.x,
+    spawnY: spawn.y,
+    quiet: true,
+    bypassFeatureGates: true,
+  });
+  if (!summersDayRun || currentStreetTsid !== SUMMERS_DAY_STREET_TSID) return;
+  const label = summersDayLocationLabel();
+  currentStreet.label = label.street;
+  currentStreet.hubName = label.hub;
+  // The memory's blue-and-white light is its own: no Dametime tint.
+  currentStreet.ownLight = true;
+  summersDayNameplate(label);
+}
+
 async function transitionIntoSummersDay(stage, useTransition = true) {
-  const setup = () => setupSummersDayStage(stage);
+  const setup = () => (stage === 'bonus' ? setupSummersDayAnnex() : setupSummersDayMain());
   const el = document.getElementById('screen-transition');
   if (!useTransition || !el) {
-    setup();
+    await setup();
     return;
   }
   const label = stage === 'bonus' ? 'Annex of A Summer’s Day' : 'A Summer’s Day';
@@ -15327,29 +15138,16 @@ async function startSummersDay(opts = {}) {
   }
 }
 
-function advanceSummersDayMoment(entry) {
-  if (!entry || !summersDayRun || entry.completed) return false;
-  const result = advanceSummersDayCheckpoint(summersDayRun, entry.id, Date.now());
+/**
+ * A moment the street fired (puzzles-feature, engine.instanceMoment): its own events
+ * already showed the signs, moved the stones and played the sounds.
+ */
+function advanceSummersDayMoment(id) {
+  if (!summersDayRun || summersDayRun.stage !== 'main' || !summersDayIsInstanced()) return false;
+  const result = advanceSummersDayCheckpoint(summersDayRun, id, Date.now());
   if (!result.ok) return false;
-  entry.completed = true;
-  playSfx(entry.id.startsWith('bird') ? 'alert' : 'quest', {
-    volume: 0.44,
-    rate: 0.9 + entry.index * 0.018,
-  });
-  burst(entry.x, entry.y - 28, entry.id === 'water' ? 0x8bd0e5 : 0xbdeafb, 14);
-  if (entry.id === 'water') {
-    toast('Oh. Can’t swim.', 2500);
-    pushActivity('Oh. Can’t swim.');
-  } else if (entry.id === 'orb_4') {
-    toast('The water remembers how to hold you.', 2600);
-  } else if (entry.id === 'bird_4') {
-    toast('Almost there.', 2200);
-  }
-  revealSummersDayProgress();
   renderSummersDayHud();
-  if (entry.id === 'exit') {
-    enterSummersDayAnnex();
-  }
+  if (id === 'exit') enterSummersDayAnnex();
   return true;
 }
 
@@ -15386,11 +15184,8 @@ async function returnFromSummersDay({ expired = false, abandon = false, completi
   keys.clear();
   summersDayRun = null;
   summersDaySourceLocation = null;
-  summersDayCheckpoints = [];
-  summersDayPlatforms = [];
   summersDayBonusQuoins = [];
   summersDayExit = null;
-  summersDayWaterLine = null;
   const hud = document.getElementById('summers-day-hud');
   if (hud) hud.hidden = true;
   try {
@@ -15466,47 +15261,13 @@ function confirmLeaveSummersDay() {
   });
 }
 
+/** In the pool's swim: the street's own set_phys (jetpack) is on until a reset_phys box. */
 function summersDayInBuoyancy() {
   return Boolean(
     summersDayRun?.stage === 'main' &&
-      player &&
-      player.x >= 1270 &&
-      player.x <= 2440 &&
-      player.y >= 500
+      summersDayIsInstanced() &&
+      features.physics(engine).jetpack === true
   );
-}
-
-function handleSummersDayBuoyancyInput() {
-  const left = keys.has('ArrowLeft') || keys.has('a') || keys.has('A');
-  const right = keys.has('ArrowRight') || keys.has('d') || keys.has('D');
-  const lift =
-    keys.has(' ') ||
-    keys.has('ArrowUp') ||
-    keys.has('w') ||
-    keys.has('W');
-  const down = keys.has('ArrowDown') || keys.has('s') || keys.has('S');
-  if (left && !right) player.vx = Math.max(-2.8, player.vx - 0.13);
-  else if (right && !left) player.vx = Math.min(2.8, player.vx + 0.13);
-  else player.vx *= 0.94;
-  if (lift && !down) player.vy = Math.max(-2.45, player.vy - 0.16);
-  else if (down && !lift) player.vy = Math.min(2.3, player.vy + 0.13);
-  else player.vy += 0.035;
-  player.vy *= 0.97;
-  player.onGround = false;
-  clearJumpQueue(jumpState);
-  applyPlayerFacing();
-  setPlayerAnim(Math.abs(player.vx) + Math.abs(player.vy) > 0.25 ? 'walk' : 'idle');
-}
-
-function summersDayBuoyancyPhysics(dt) {
-  player.x = clamp(player.x + player.vx * dt, 1250, 2460);
-  player.y = clamp(player.y + player.vy * dt, 535, 830);
-  if (player.x <= 1252 && player.vx < 0) player.vx *= -0.2;
-  if (player.x >= 2458 && player.vx > 0) player.vx *= -0.2;
-  if (player.y <= 537 && player.vy < 0) player.vy *= -0.18;
-  if (player.y >= 828 && player.vy > 0) player.vy *= -0.18;
-  player.rotation += (clamp(player.vy * 0.018, -0.1, 0.1) - player.rotation) * dampingAlpha(0.14, dt);
-  if (app?.canvas) app.canvas.dataset.summerDayBuoyancy = '1';
 }
 
 function updateSummersDay(dt) {
@@ -15521,27 +15282,7 @@ function updateSummersDay(dt) {
     returnFromSummersDay({ expired: true });
     return;
   }
-  if (summersDayWaterLine) {
-    summersDayWaterLine.alpha = 0.62 + Math.sin(time * 0.05) * 0.12;
-    summersDayWaterLine.scale.x = 1.72 + Math.sin(time * 0.035) * 0.05;
-  }
-  if (summersDayRun.stage === 'main') {
-    const next = summersDayCheckpoints[summersDayRun.checkpoints.length];
-    if (next?.sprite) {
-      const pulse = 1 + Math.sin(time * 0.09 + next.index) * 0.09;
-      next.sprite.scale.set(
-        next.sprite._summerBaseScaleX * pulse,
-        next.sprite._summerBaseScaleY * pulse
-      );
-      if (
-        !menuTarget &&
-        Math.hypot(next.x - player.x, next.y - player.y) < (next.id === 'water' ? 105 : 78)
-      ) {
-        advanceSummersDayMoment(next);
-        return;
-      }
-    }
-  } else {
+  if (summersDayRun.stage !== 'main') {
     for (const entry of summersDayBonusQuoins) {
       if (entry.collected || !entry.sprite?.parent) continue;
       entry.sprite._summerPhase += 0.05 * dt;
@@ -15584,11 +15325,7 @@ function updateSummersDay(dt) {
   const autoplay = new URLSearchParams(location.search).get('summerautoplay');
   const autoplayActive =
     autoplay === '1' ||
-    (autoplay === 'main' && summersDayRun.stage === 'main') ||
-    (autoplay === 'water' &&
-      summersDayRun.stage === 'main' &&
-      summersDayRun.checkpoints.length < 5) ||
-    (autoplay === 'bonus' && summersDayRun.stage === 'main');
+    (['main', 'water', 'bonus'].includes(autoplay) && summersDayRun.stage === 'main');
   if (autoplayActive && now >= summersDayAutoNextAt) {
     summersDayAutoNextAt = now + 190;
     if (isQuestDialogueOpen()) {
@@ -15596,14 +15333,7 @@ function updateSummersDay(dt) {
       return;
     }
     if (summersDayRun.stage === 'main') {
-      const next = summersDayCheckpoints[summersDayRun.checkpoints.length];
-      if (next) {
-        player.x = next.x;
-        player.y = next.y;
-        player.vx = 0;
-        player.vy = 0;
-        player.onGround = true;
-      }
+      summersDayAutoplayStep(autoplay);
     } else {
       const nextQuoin = summersDayBonusQuoins.find(
         (entry) => !entry.collected && entry.sprite?.parent
@@ -15618,8 +15348,33 @@ function updateSummersDay(dt) {
       }
     }
   }
-  if (app?.canvas && !summersDayInBuoyancy()) app.canvas.dataset.summerDayBuoyancy = '0';
+  if (app?.canvas) app.canvas.dataset.summerDayBuoyancy = summersDayInBuoyancy() ? '1' : '0';
   renderSummersDayHud();
+}
+
+/**
+ * QA autoplay on the real street: stand in each rebuilt box in turn (SUMMERS_DAY_ROUTE)
+ * and let the street's own events run; `reset` steps wait for the swim to end. `water`
+ * stays hovering at the first orb, swimming.
+ */
+function summersDayAutoplayStep(mode) {
+  if (!summersDayIsInstanced() || currentStreetTsid !== SUMMERS_DAY_STREET_TSID) return;
+  const reached = new Set(summersDayRun.checkpoints);
+  while (summersDayAutoStep < SUMMERS_DAY_ROUTE.length) {
+    const step = SUMMERS_DAY_ROUTE[summersDayAutoStep];
+    const done = step.id === 'reset' ? !summersDayInBuoyancy() && reached.has('orb_4') : reached.has(step.id);
+    if (!done) break;
+    if (mode === 'water' && step.id === 'orb_1') break;
+    summersDayAutoStep += 1;
+  }
+  const step = SUMMERS_DAY_ROUTE[summersDayAutoStep];
+  if (!step) return;
+  const at = summersDayStreetPoint(step);
+  player.x = at.x;
+  player.y = at.y;
+  player.vx = 0;
+  player.vy = 0;
+  player.onGround = false;
 }
 
 function rookWoodsIsInstanced() {
@@ -19922,11 +19677,8 @@ function clearWorldEntities() {
   clearWinterAtmosphere();
   winterWalkMotes = [];
   winterWalkPortal = null;
-  summersDayCheckpoints = [];
-  summersDayPlatforms = [];
   summersDayBonusQuoins = [];
   summersDayExit = null;
-  summersDayWaterLine = null;
   rookCrushers = [];
   rookEggTarget = null;
   rookHitFx = null;

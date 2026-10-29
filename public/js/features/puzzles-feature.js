@@ -23,6 +23,14 @@
  * from the verb (events_broadcast, target_pc), so they register as targets
  * on their beam art and never fire on contact.
  *
+ * A street entry with `instance` (A Summer's Day: 'summers-day') belongs to a private
+ * quest instance that game.js holds on the imported street: its triggers and scripts run
+ * only while engine.heldInstance() names that instance, never on a plain visit. Such
+ * entries may add `signs` (deco id -> the deco's archived sign_txt, drawn while the
+ * street's events show the deco), triggers with `teleport` (the lost Collision-triggered
+ * Teleporter: stand there) and triggers with `moment` (reported to the instance through
+ * engine.instanceMoment when the avatar enters them).
+ *
  * QA: ?autostart=1&questoffer=off&puzzledemo=<tsid> travels to a puzzle
  * street and stands at its start; &puzzleautoplay=1 walks the triggers in
  * order by placing the avatar on each (1.2 s apart), collects every quoin,
@@ -33,7 +41,7 @@
  * puzzleRespawns, puzzleComplete, puzzleReward, puzzleDemo.
  */
 
-import { locationEventsApi } from './location-events-feature.js?v=location-events-9';
+import { locationEventsApi } from './location-events-feature.js?v=g452-1';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g424-1';
 import {
   PUZZLE_DATA_URL,
@@ -93,13 +101,40 @@ const defFor = (tsid) => data?.[key(tsid)] || null;
  */
 function patchStreet(street) {
   const def = defFor(street?.tsid);
-  if (!def?.events || !street) return;
-  street.events = { ...(street.events || {}), ...def.events };
+  if (!def || !street) return;
+  if (def.events) street.events = { ...(street.events || {}), ...def.events };
+  // Geometry a street's own events still name but the archive lost (`platforms`, source
+  // space, each with its `why`), with the art that marks it (`decos`, middleground).
+  for (const plat of def.platforms || []) {
+    if (!(street.platforms || []).some((pl) => pl.id === plat.id)) {
+      const { why, ...row } = plat;
+      (street.platforms ||= []).push(row);
+    }
+  }
+  const mg = (street.layers || []).find((layer) => layer.id === 'middleground');
+  for (const deco of def.decos || []) {
+    if (mg && !mg.decos.some((d) => d.id === deco.id)) {
+      const { why, ...row } = deco;
+      mg.decos.push(row);
+    }
+  }
 }
 
 locationEventsApi.register({
   strict: (street) => defFor(street?.tsid)?.strict === true,
+  // A private instance on an archived street runs that street's own scripts.
+  instance: (street, engine) => {
+    const def = defFor(street?.tsid);
+    return Boolean(def?.instance && engine?.heldInstance?.() === def.instance);
+  },
 });
+
+/** May this entry run now? Plain entries off instances; instance entries only inside their own. */
+function runsHere(engine, def) {
+  if (!def) return false;
+  if (def.instance) return engine.heldInstance?.() === def.instance;
+  return !engine.transientInstance();
+}
 
 /* ------------------------------------------------------------------ */
 /* Quoins                                                              */
@@ -236,6 +271,65 @@ function stepBubbles() {
   }
 }
 
+/**
+ * The street's own sign text (instance entries' `signs`): each label follows its sign
+ * deco's show, hide and fade from the street's events.
+ */
+function spawnSigns(engine, street, def) {
+  const { PIXI } = engine;
+  if (!def.signs || !PIXI?.Text) return;
+  const mg = (street.layers || []).find((layer) => layer.id === 'middleground');
+  const bounds = street.bounds || { l: 0, t: 0 };
+  for (const deco of mg?.decos || []) {
+    const text = def.signs[deco.id];
+    if (!text) continue;
+    const label = new PIXI.Text({
+      text: String(text).replace(/\s*<br>\s*/g, '\n'),
+      style: {
+        fontFamily: 'Nunito, "Trebuchet MS", sans-serif',
+        fontWeight: '700',
+        fontSize: 15,
+        fill: 0xffffff,
+        align: 'center',
+        lineHeight: 18,
+        wordWrap: true,
+        wordWrapWidth: Math.max(160, (deco.w || 400) * 0.9),
+        // The recording's white lettering with a soft blue edge, readable on the pale sky.
+        dropShadow: { color: 0x2f6f8a, alpha: 0.55, blur: 3, distance: 1, angle: Math.PI / 2 },
+      },
+    });
+    label.resolution = 3;
+    label.anchor.set(0.5, 0.5);
+    // Middleground decos are source space, bottom-centre: the text sits on the sign's middle.
+    label.x = deco.x - bounds.l;
+    label.y = deco.y - bounds.t - (deco.h || 248) / 2;
+    label.zIndex = 36;
+    label.visible = false;
+    engine.entityLayer.addChild(label);
+    run.sprites.push(label);
+    run.signs.push({ id: deco.id, label });
+  }
+}
+
+function syncSigns(engine) {
+  if (!run?.signs?.length) return;
+  const views = engine.decoViews;
+  const shown = [];
+  for (const row of run.signs) {
+    if (row.label.destroyed) continue;
+    const view = views?.get(row.id);
+    const visible = Boolean(view && !view.destroyed && view.visible && view.alpha > 0);
+    row.label.visible = visible;
+    row.label.alpha = view ? view.alpha : 0;
+    if (visible) shown.push(row.id.slice(-4));
+  }
+  const data = shown.join(' ');
+  if (data !== run.signData) {
+    run.signData = data;
+    engine.setData('puzzleSigns', data);
+  }
+}
+
 function startRun(engine, street, def) {
   run = {
     tsid: key(street.tsid),
@@ -262,7 +356,10 @@ function startRun(engine, street, def) {
     ceilings: def.ceilings
       ? new Set((street.platforms || []).filter((pl) => pl.pc_perm == null || Number(pl.pc_perm) === 1).map((pl) => pl.id))
       : null,
+    signs: [],
+    signData: null,
   };
+  spawnSigns(engine, street, def);
   spawnQuoins(engine, def);
   spawnArt(engine, def);
   spawnBubbles(engine, def);
@@ -455,6 +552,16 @@ function stepRun(engine) {
       run.toasted.add(edge.trigger.id);
       engine.toast(edge.trigger.toast);
     }
+    // An instance's moment (A Summer's Day's birds, stones, water, orbs and dots).
+    if (edge.edge === 'enter' && edge.trigger.moment) engine.instanceMoment?.(edge.trigger.moment, edge.trigger.id);
+    if (!run) return;
+    // The lost Collision-triggered Teleporter: stand at its target.
+    if (edge.edge === 'enter' && edge.trigger.teleport) {
+      place(engine, edge.trigger.teleport.x, edge.trigger.teleport.y);
+      run.inside.delete(edge.trigger.id);
+      run.prevY = engine.player?.y ?? null;
+      return;
+    }
     if (edge.edge === 'enter' && edge.trigger.respawn) {
       respawn(engine, edge.trigger.respawnText || 'Ouch! Back to the last safe spot.');
       run.inside.delete(edge.trigger.id);
@@ -481,6 +588,7 @@ function stepRun(engine) {
     if (view.spr && !view.spr.destroyed) view.spr.alpha = (view.a.alpha ?? 0.6) * (0.85 + Math.sin(view.phase) * 0.15);
   }
   stepBubbles();
+  syncSigns(engine);
   takeQuoins(engine);
   if (run.def.fallY != null && p.y > run.def.fallY) respawn(engine, 'Whoops! Back to the ledge.');
   const exit = run.def.exit;
@@ -738,11 +846,12 @@ export const puzzlesFeature = {
 
   onStreetEnter(street, engine) {
     clearRun(engine);
-    if (!street || engine.transientInstance() || engine.homeContext?.().inHome) return;
+    if (!street || engine.homeContext?.().inHome) return;
+    if (engine.transientInstance() && !engine.heldInstance?.()) return;
     const tsid = street.tsid;
     const setup = () => {
       const def = defFor(tsid);
-      if (!def || key(engine.streetTsid) !== key(tsid) || run) return;
+      if (!def || !runsHere(engine, def) || key(engine.streetTsid) !== key(tsid) || run) return;
       startRun(engine, street, def);
     };
     if (data) setup();
@@ -751,6 +860,7 @@ export const puzzlesFeature = {
         if (key(engine.streetTsid) !== key(tsid)) return;
         // The street arrived before the trigger data: rerun its scripts strictly.
         const def = defFor(tsid);
+        if (!runsHere(engine, def)) return;
         if (def?.events || (def?.strict && !locationEventsApi.strict())) {
           patchStreet(street);
           locationEventsApi.restart(engine);
@@ -767,18 +877,18 @@ export const puzzlesFeature = {
   onTick(dtMs, now, engine) {
     if (!engine.started) return;
     demoStep(engine, now);
-    if (run && !engine.transientInstance()) stepRun(engine);
+    if (run && runsHere(engine, run.def)) stepRun(engine);
     publish(engine, now);
   },
 
   /** game.js leaves head-against-ceiling to clampCeiling/stepInverted on these streets. */
   ownsCeilings(engine) {
-    return run?.ceilings && !engine?.transientInstance?.() ? true : null;
+    return run?.ceilings && runsHere(engine, run.def) ? true : null;
   },
 
   physics(engine) {
     const def = run?.def;
-    if (!def || engine.transientInstance()) return null;
+    if (!def || !runsHere(engine, def)) return null;
     const p = def.physics || {};
     const src = def.sourcePhysics ? SOURCE_PHYSICS : { speed: 1, gravity: 1 };
     return { speed: src.speed * (p.speed ?? 1), jump: p.jump ?? 1, gravity: src.gravity * (p.gravity ?? 1) };

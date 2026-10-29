@@ -6535,14 +6535,15 @@ header.top-bar + .sub { display: none; }
   50% { transform: scale(1.05); }
 }
 
+/* A compact card at the top right: the street's own signs and flitterbugs hang above
+   the avatar, where a centred card would cover them (G452). */
 .summers-day-hud {
   position: absolute;
   z-index: 80;
   top: 66px;
-  left: 50%;
-  width: min(650px, calc(100% - 32px));
-  padding: 10px 14px 11px;
-  transform: translateX(-50%);
+  right: 16px;
+  width: min(330px, calc(100% - 32px));
+  padding: 8px 12px 9px;
   color: #285a6b;
   border: 2px solid rgba(255, 255, 255, 0.94);
   border-radius: 16px;
@@ -6626,8 +6627,9 @@ header.top-bar + .sub { display: none; }
 }
 .summers-day-progress {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 22px;
+  gap: 4px 16px;
   color: #6190a0;
   font-size: 0.7rem;
   font-weight: 800;

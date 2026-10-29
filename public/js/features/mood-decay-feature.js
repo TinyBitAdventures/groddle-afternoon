@@ -34,7 +34,7 @@ import {
 import { loseMood, moodMax } from '../metabolics.js';
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=g449-1';
 import { homesFeature } from './homes-feature.js?v=g448-4';
-import { newxpFeature } from './newxp-feature.js?v=g453-1';
+import { newxpFeature } from './newxp-feature.js?v=g452-1';
 import { meditationFeature } from './meditation-feature.js?v=g448-2';
 
 export const MOOD_DECAY_FEATURE_ID = 'mood-decay';

@@ -139,12 +139,13 @@
    "group": "world",
    "name": "Street scripts and puzzles",
    "status": "rebuilt",
-   "blurb": "Archived street event scripts run again; puzzle streets got their lost switches and triggers rebuilt. Shim Shiri’s Light Beams are clicked to Beam Up into the gut tubes.",
+   "blurb": "Archived street event scripts run again; puzzle streets got their lost switches and triggers rebuilt. Shim Shiri’s Light Beams are clicked to Beam Up into the gut tubes. A Summer’s Day runs on its own archived street the same way: its 44 scripts, with the lost boxes behind its flitterbugs, pressure stones, pool, orbs and pulse dots rebuilt.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/features/location-events-feature.js",
-    "public/js/features/puzzles-feature.js"
+    "public/js/features/puzzles-feature.js",
+    "public/assets/content/puzzle-triggers.json"
    ],
    "shot": "shots/street-events.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&puzzledemo=GHVOD0F3T403694&practice=1"
@@ -820,7 +821,7 @@
    "group": "quests",
    "name": "Hand-built story quests",
    "status": "rebuilt",
-   "blurb": "Phantom Glitch, Rooks’ Woods, Museum of the Rook, Winter Walk, A Summer’s Day, Ilmenskie Jones, Legalize It and more.",
+   "blurb": "Phantom Glitch, Rooks’ Woods, Museum of the Rook, Winter Walk, A Summer’s Day, Ilmenskie Jones, Legalize It and more. A Summer’s Day is Tiny Speck’s own memory street, archived as a copy of its template: its flitterbugs, signs, pressure stones, pool, glowing orbs and ladder, with only its Annex drawn.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
@@ -2665,9 +2666,14 @@
   ]
  },
  "git": {
-  "commits": 750,
+  "commits": 751,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "improve",
+    "text": "The tutorial's look step opens Tiny Speck's new-player picker"
+   },
    {
     "date": "2026-10-29",
     "kind": "improve",
@@ -2782,11 +2788,6 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "Art in the page markup, style sheets and script-set backgrounds loads fresh after a release"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "new",
-    "text": "Eat several Zilloween candies or pumpkin pies at once; Customize look first holds the skill panel until the builder closes"
    }
   ]
  },

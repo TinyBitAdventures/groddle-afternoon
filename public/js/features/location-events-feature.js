@@ -19,7 +19,9 @@
  *   god-only debug teleports and inverted gravity stay unsupported.
  * - Streets other systems own (party spaces, Paradise, A Summer's Day, The
  *   Greedy Street Spirit, Winter Walk), transient instances, feature scenes
- *   and homes are left alone.
+ *   and homes are left alone, unless a trigger feature's instance hook claims
+ *   the street for the instance holding it (A Summer's Day's private memory
+ *   runs GNVV9IM8PL4301V's own 44 scripts that way, puzzles-feature).
  *
  * QA: ?autostart=1&questoffer=off&physicsdemo=<tsid> travels there and
  * publishes the multipliers (physicsStreet, physicsActive, physicsSpeed,
@@ -458,8 +460,9 @@ export const locationEventsApi = {
    * arrival chain again with the hooks consulted afresh.
    */
   restart(engine) {
-    if (!current?.street) return false;
-    const street = current.street;
+    // An owned street's scripts never started until a hook's data claimed it.
+    const street = current?.street || engine.street;
+    if (!street) return false;
     for (const plat of stash.values()) engine.platforms?.push(plat);
     stash = new Map();
     locationEventsFeature.onStreetEnter(street, engine);
@@ -488,7 +491,7 @@ export const locationEventsFeature = {
     unsupported = 0;
     lastData = 0;
     const instanced = Boolean(street && engine.transientInstance() && instanceAllowed(street, engine));
-    if (!street || streetOwner(street.tsid) || (engine.transientInstance() && !instanced) || engine.homeContext?.().inHome) {
+    if (!street || (streetOwner(street.tsid) && !instanced) || (engine.transientInstance() && !instanced) || engine.homeContext?.().inHome) {
       publish(engine, clock, null);
       return;
     }

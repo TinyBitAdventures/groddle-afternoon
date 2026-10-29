@@ -1,7 +1,18 @@
+/**
+ * A Summer's Day (GSJS quests/blue_and_white_part1.js and _part2.js): a five-minute
+ * private memory, then the two-minute Annex.
+ *
+ * The main memory is Tiny Speck's own street: the archive kept one instantiated copy of
+ * the main template LNVIH6NU3M13MJJ as LNVV9IM8PL4301V (L XML `instance_of`), imported as
+ * GNVV9IM8PL4301V with its geometry, decos and 44 event scripts. game.js holds that street
+ * as the private instance; location-events runs its scripts and the puzzles feature
+ * rebuilds the 20 lost Collision-triggered Event Boxes and the Teleporter
+ * (assets/content/puzzle-triggers.json), reporting each moment below as it fires.
+ * The Annex (LNVIL1E14M13K5I) was not archived and stays a drawn scene.
+ */
 export const SUMMERS_DAY_QUEST_ID = 'blue_and_white_part1';
 export const SUMMERS_DAY_REPEAT_QUEST_ID = 'blue_and_white_part2';
 
-export const SUMMERS_DAY_MAIN_ID = 'SUMMERS_DAY_MAIN';
 export const SUMMERS_DAY_BONUS_ID = 'SUMMERS_DAY_BONUS';
 export const SUMMERS_DAY_MAIN_PRODUCTION_TSID = 'LNVIH6NU3M13MJJ';
 export const SUMMERS_DAY_MAIN_DEV_TSID = 'LPF101OO2B13DEQ';
@@ -16,9 +27,22 @@ export const SUMMERS_DAY_BONUS_DOT_COUNT = 8;
 export const SUMMERS_DAY_BONUS_DOT_IMG = 8;
 export const SUMMERS_DAY_FIRST_OFFER_COOLDOWN_MS = 4 * 60 * 60 * 1000;
 export const SUMMERS_DAY_REPEAT_COOLDOWN_MS = 60 * 60 * 1000;
+/** The imported copy of the main template (LNVV9IM8PL4301V instance_of LNVIH6NU3M13MJJ). */
+export const SUMMERS_DAY_STREET_TSID = 'GNVV9IM8PL4301V';
+/** Its bounds (G XML l/t): source x, y to the street's screen space. */
+export const SUMMERS_DAY_STREET_BOUNDS = Object.freeze({ l: -1000, t: -1000 });
+/** onStarted: questInstanceLocation(pc, 'blue_and_white', 3709, -258, 5*60). */
 export const SUMMERS_DAY_SOURCE_SPAWN = Object.freeze({ x: 3709, y: -258 });
 export const SUMMERS_DAY_BONUS_SPAWN = Object.freeze({ x: 380, y: -70 });
 
+/**
+ * The street's moments, in the order its geometry plays them (east to west from the
+ * spawn). Each is one recovered event: bird = flitterbug flutter_wings / owl2_off /
+ * owl3_off / owl4_off, stone = button_down / button2_down, water = set_phys, orb =
+ * ball_3, ball_1, ball_2, ball_4 (the pulseDot chain), dot = dot_1-3, exit = the
+ * archived blue_and_white_go_bonus box above the ladder. stone_2 comes before dot_1:
+ * the first dot hangs off the boulder the second stone raises.
+ */
 export const SUMMERS_DAY_CHECKPOINTS = Object.freeze([
   'bird_1',
   'stone_1',
@@ -29,14 +53,51 @@ export const SUMMERS_DAY_CHECKPOINTS = Object.freeze([
   'orb_3',
   'orb_4',
   'bird_3',
-  'dot_1',
   'stone_2',
+  'dot_1',
   'dot_2',
   'dot_3',
   'bird_4',
   'exit',
 ]);
 
+/**
+ * Where the QA autoplay (&summerautoplay) stands for each moment, in source x, y (feet):
+ * inside the matching rebuilt box of puzzle-triggers.json (tests/summers-day.test.js
+ * checks each one). `reset` points are the reset_phys boxes on the way out of the water.
+ */
+export const SUMMERS_DAY_ROUTE = Object.freeze([
+  Object.freeze({ id: 'bird_1', x: 2902, y: -370 }),
+  Object.freeze({ id: 'stone_1', x: 2393, y: -150 }),
+  Object.freeze({ id: 'bird_2', x: 2038, y: -424 }),
+  Object.freeze({ id: 'water', x: 1500, y: -200 }),
+  Object.freeze({ id: 'orb_1', x: 1379, y: -360 }),
+  Object.freeze({ id: 'orb_2', x: 1436, y: -612 }),
+  Object.freeze({ id: 'orb_3', x: 1747, y: -655 }),
+  Object.freeze({ id: 'orb_4', x: 1621, y: -696 }),
+  Object.freeze({ id: 'reset', x: 940, y: -295 }),
+  Object.freeze({ id: 'bird_3', x: 921, y: -300 }),
+  Object.freeze({ id: 'stone_2', x: 69, y: -212 }),
+  Object.freeze({ id: 'dot_1', x: 106, y: -506 }),
+  Object.freeze({ id: 'dot_2', x: -123, y: -559 }),
+  Object.freeze({ id: 'dot_3', x: -376, y: -563 }),
+  Object.freeze({ id: 'bird_4', x: -831, y: -400 }),
+  Object.freeze({ id: 'exit', x: -925, y: -910 }),
+]);
+
+/** Source x, y to the imported street's screen space. */
+export function summersDayStreetPoint(point) {
+  return {
+    x: (Number(point?.x) || 0) - SUMMERS_DAY_STREET_BOUNDS.l,
+    y: (Number(point?.y) || 0) - SUMMERS_DAY_STREET_BOUNDS.t,
+  };
+}
+
+/**
+ * The four flitterbug lines. The street prints them itself: they are the sign_txt of its
+ * firebog_sign_blank decos (G XML 1335378517202, 1335378517218, 1335478834099,
+ * 1335491308265), which the recording shows word for word; the HUD's guide data uses these.
+ */
 export const SUMMERS_DAY_GUIDE_LINES = Object.freeze({
   bird_1: 'Hey, I’m up here!\nCan you reach me?',
   bird_2: 'Not bad.\nTry this next one.',
@@ -146,34 +207,42 @@ export function summersDayRemainingMs(run, now = Date.now()) {
   return Math.max(0, Number(run.expiresAt) - now);
 }
 
+/**
+ * A moment the street fired. Any order counts (the street had no checkpoint order of its
+ * own: each event only gates on its own flag), each once; `exit` (the go_bonus box) ends
+ * the main memory whatever else was reached, as the box's callback did.
+ */
 export function advanceSummersDayCheckpoint(run, checkpoint, now = Date.now()) {
   if (!run || run.stage !== 'main') return { ok: false, reason: 'wrong_stage', run };
   if (summersDayRemainingMs(run, now) <= 0) {
     expireSummersDay(run, null, now);
     return { ok: false, reason: 'expired', run };
   }
-  const expected = SUMMERS_DAY_CHECKPOINTS[run.checkpoints.length];
-  if (checkpoint !== expected) {
-    return {
-      ok: false,
-      reason: run.checkpoints.includes(checkpoint) ? 'already_complete' : 'out_of_order',
-      expected,
-      run,
-    };
+  if (!SUMMERS_DAY_CHECKPOINTS.includes(checkpoint)) {
+    return { ok: false, reason: 'unknown', run };
+  }
+  if (run.checkpoints.includes(checkpoint)) {
+    return { ok: false, reason: 'already_complete', run };
   }
   run.checkpoints.push(checkpoint);
   return {
     ok: true,
     reason: checkpoint === 'exit' ? 'main_complete' : 'advanced',
     checkpoint,
-    next: SUMMERS_DAY_CHECKPOINTS[run.checkpoints.length] || null,
+    next: summersDayNextCheckpoint(run),
     run,
   };
 }
 
+/** The first moment of the street's order not reached yet (null when all are). */
+export function summersDayNextCheckpoint(run) {
+  const done = new Set(run?.checkpoints || []);
+  return SUMMERS_DAY_CHECKPOINTS.find((id) => !done.has(id)) || null;
+}
+
 export function enterSummersDayBonus(run, now = Date.now()) {
   if (!run || run.stage !== 'main') return { ok: false, reason: 'wrong_stage', run };
-  if (run.checkpoints.at(-1) !== 'exit') return { ok: false, reason: 'main_incomplete', run };
+  if (!run.checkpoints.includes('exit')) return { ok: false, reason: 'main_incomplete', run };
   if (summersDayRemainingMs(run, now) <= 0) {
     expireSummersDay(run, null, now);
     return { ok: false, reason: 'expired', run };
@@ -275,7 +344,7 @@ export function summersDayObjective(run) {
   if (run.status === 'expired') return 'The summer memory faded';
   if (run.status === 'complete') return 'A Summer’s Day complete';
   if (run.stage === 'bonus') return 'Climb through the Annex and find the way home';
-  const next = SUMMERS_DAY_CHECKPOINTS[run.checkpoints.length];
+  const next = summersDayNextCheckpoint(run);
   const objectives = {
     bird_1: 'Walk into the pale woods',
     stone_1: 'Follow the owl to the first stone',
@@ -286,8 +355,8 @@ export function summersDayObjective(run) {
     orb_3: 'Keep the memory moving',
     orb_4: 'Wake the water platform',
     bird_3: 'Follow the owl beyond the pool',
-    dot_1: 'Touch the first pulse dot',
     stone_2: 'Press the second stone',
+    dot_1: 'Touch the first pulse dot',
     dot_2: 'Reach the next pulse dot',
     dot_3: 'Complete the chain of lights',
     bird_4: 'Find the last owl',

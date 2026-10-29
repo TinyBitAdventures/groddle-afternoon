@@ -19,7 +19,7 @@ import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=nbho
 import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=g436-2';
 import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=g436-1';
 import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=g436-3';
-import { FEATURES } from '../public/js/features/index.js?v=registry-302';
+import { FEATURES } from '../public/js/features/index.js?v=registry-303';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=mp2-1';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=mp2-2';
 import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
