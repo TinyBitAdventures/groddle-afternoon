@@ -1042,6 +1042,8 @@
       "assets/sprites/furniture/furniture_walldecor@3x.webp": "267246b1",
       "assets/sprites/furniture/furniture_walllamp@3x.webp": "bc509070",
       "assets/sprites/garden/bed_frame_wood@3x.png": "d14e9fc6",
+      "assets/sprites/overlays/overlays-more.json": "ef4afff9",
+      "assets/sprites/overlays/rainbow_superharvest.frames.json": "97e6b22f",
       "assets/sprites/parties/party_atm@3x.webp": "7e6d2730",
       "assets/sprites/quests/rook-museum/rook_hall_speaker__x1_stop_png_1354835940@3x.webp": "a9ab22a7",
       "assets/sprites/spinning-wheel/stoot-doll@5x.webp": "72b2603a",

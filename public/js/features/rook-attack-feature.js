@@ -89,7 +89,7 @@ import { shrinePrimeBonus } from '../imagination-effects.js?v=g403-1';
 import { grantMoodXp } from '../mood-xp.js';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js';
 import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g311-1';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=g392-1';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=g441-1';
 import {
   MP_ROOK,
   MP_ROOK_TEXT,

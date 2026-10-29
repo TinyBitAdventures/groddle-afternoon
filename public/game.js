@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-273';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-271';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g434-1';
@@ -18,7 +18,7 @@ import {
 } from './js/action-timing.js?v=timed-actions-1';
 import { createWordProgressView, wordAnchor, heldActionDelta, MAX_PUSH_DOWN } from './js/word-progress.js?v=g387-1';
 // G374/G375/G378: Tiny Speck's quoin-limit and super-harvest rainbows and the musicblock notes.
-import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=g392-1';
+import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=g441-1';
 import {
   createQuestState,
   assignQuest,
@@ -5784,7 +5784,8 @@ function burst(x, y, color = 0xffe066, n = 10) {
 function playerRainbow(key, { delayMs = null, sound = true } = {}) {
   if (!entityLayer || !player) return null;
   const p = player;
-  const h = showRainbow(PIXI, key, { layer: fxLayer || entityLayer, at: () => ({ x: p.x, y: p.y }), delayMs });
+  // G441: the renderer's resolution lets a rainbow with SVG frames draw sharp on a dense screen.
+  const h = showRainbow(PIXI, key, { layer: fxLayer || entityLayer, at: () => ({ x: p.x, y: p.y }), delayMs, resolution: app?.renderer?.resolution || 1 });
   if (sound && rainbowSound(key)) setTimeout(() => playSound(rainbowSound(key), { volume: 0.5 }), delayMs ?? OVERLAY_USES[key]?.delayMs ?? 0);
   if (app?.canvas) app.canvas.dataset.rainbow = key;
   return h;
@@ -5808,7 +5809,12 @@ function showSuperHarvestFx(target, itemClassTsid, amount) {
     app.canvas.dataset.superHarvestItem = itemId;
     app.canvas.dataset.superHarvestAmount = String(count);
   }
-  h?.done.then(() => { if (app?.canvas) app.canvas.dataset.superHarvestFx = 'complete'; });
+  h?.done.then(() => {
+    if (!app?.canvas) return;
+    app.canvas.dataset.superHarvestFx = 'complete';
+    // QA: 'vector' when it drew the SVG frames, 'sheet' for the WebP sheet.
+    app.canvas.dataset.superHarvestArt = h.art || '';
+  });
   return h;
 }
 

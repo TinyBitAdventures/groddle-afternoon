@@ -60,7 +60,7 @@ after(() => {
   }
 });
 
-const overlays = () => import('../public/js/overlays.js?v=g392-1');
+const overlays = () => import('../public/js/overlays.js?v=g441-1');
 const flush = async (n = 3) => {
   for (let i = 0; i < n; i += 1) {
     await new Promise((r) => setTimeout(r, 0));
@@ -265,10 +265,98 @@ describe('js/overlays.js players', () => {
   });
 });
 
+describe('G441: the super harvest arc drawn from its SVG frames on dense screens', () => {
+  const r = manifest.rainbow_superharvest;
+  const vfile = join(pub, 'assets/sprites/overlays', r.vector.file);
+
+  it('the build keeps the arc\'s SVG frames beside the sheet, one per unique frame, lean', () => {
+    assert.equal(r.vector.file, 'rainbow_superharvest.frames.json');
+    assert.equal(r.vector.order.length, r.frames);
+    const data = JSON.parse(readFileSync(vfile, 'utf8'));
+    assert.equal(data.frames.length, r.vector.frames);
+    // 0.82 MB as built (about 100 KB gzipped), under the 1.3 MB sheet.
+    assert.ok(readFileSync(vfile).length < 1_000_000);
+    // Only the rainbows that asked for it.
+    for (const [key, m] of Object.entries(manifest)) if (key !== 'rainbow_superharvest') assert.ok(!m.vector, key);
+  });
+
+  it('vectorDensity: the sheet on a 1x screen, the SVG frames from 1.5 device px per stage px, capped', async () => {
+    const { overlayDensity, vectorDensity, VECTOR_MAX_SIDE } = await overlays();
+    const at = (resolution) => vectorDensity(r, overlayDensity(r, { wh: 400, resolution }));
+    assert.equal(at(1), 0);
+    assert.equal(at(1.2), 0);
+    assert.equal(at(2), Math.ceil((400 / 330) * 2 * 4) / 4);
+    assert.ok(at(3.3) >= (400 / 330) * 3.3);
+    assert.ok(at(40) * Math.max(r.box[2], r.box[3]) <= VECTOR_MAX_SIDE + 1);
+    assert.equal(vectorDensity(manifest.rainbow_maxrelax, 4), 0, 'no SVG frames: the sheet');
+  });
+
+  it('vectorFrameSvgs: each frame carries only the shared shapes it uses, sized to the canvas', async () => {
+    const { vectorFrameSvgs } = await overlays();
+    const data = JSON.parse(readFileSync(vfile, 'utf8'));
+    const svgs = vectorFrameSvgs(data, 755, 473);
+    assert.equal(svgs.length, data.frames.length);
+    for (const svg of svgs) {
+      assert.match(svg, /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" width="755" height="473" viewBox="/);
+      const ids = new Set([...svg.matchAll(/ id="([^"]+)"/g)].map((m) => m[1]));
+      for (const m of svg.matchAll(/#(_[a-z]+\d+)/g)) assert.ok(ids.has(m[1]), `${m[1]} defined`);
+      assert.ok(svg.length < data.defs.length, 'not the whole shared set');
+    }
+  });
+
+  it('playOverlay draws the SVG frames on a dense screen and the sheet on a 1x one, at the same size', async () => {
+    const { playOverlay } = await overlays();
+    const savedFetch = globalThis.fetch;
+    const savedImage = globalThis.Image;
+    const draws = [];
+    const vtext = readFileSync(vfile, 'utf8');
+    globalThis.fetch = async (url) => (String(url).includes(r.vector.file) ? { ok: true, json: async () => JSON.parse(vtext) } : savedFetch(url));
+    globalThis.Image = class { constructor() { this.complete = true; } async decode() {} };
+    const pixi = {
+      ...FAKE_PIXI,
+      CanvasSource: class { constructor(o) { Object.assign(this, o); this.updates = 0; } update() { this.updates += 1; } },
+      Texture: class { constructor(o) { Object.assign(this, o); } once() {} destroy() { this.destroyed = true; } },
+    };
+    const savedDoc = globalThis.document;
+    globalThis.document = { ...savedDoc, createElement: () => ({ width: 0, height: 0, getContext: () => ({ clearRect() {}, drawImage: (img, x, y, w, h) => draws.push([w, h]) }) }) };
+    try {
+      const play = async (resolution) => {
+        const added = [];
+        const layer = { destroyed: false, addChild: (s) => added.push(s) };
+        const h = playOverlay(pixi, 'rainbow_superharvest', { layer, at: () => ({ x: 500, y: 300 }), wh: 400, durationMs: 4000, loop: false, holdMs: 2000, resolution });
+        await flush(6);
+        h.stop();
+        await flush(2);
+        await h.done;
+        return { h, s: added[0] };
+      };
+      const dense = await play(3.3);
+      assert.equal(dense.h.art, 'vector');
+      assert.ok(dense.s.texture.source instanceof pixi.CanvasSource);
+      assert.ok(dense.s.texture.source.resolution >= (400 / 330) * 3.3);
+      assert.ok(draws.length >= 1 && draws[0][0] >= r.box[2] * 4, 'drawn at the screen\'s density');
+      assert.ok(dense.s.texture.destroyed, 'the canvas texture goes with the sprite');
+      const flat = await play(1);
+      assert.equal(flat.h.art, 'sheet');
+      assert.ok(Math.abs(dense.s.width - flat.s.width) < 0.01 && Math.abs(dense.s.y - flat.s.y) < 0.01);
+    } finally {
+      globalThis.fetch = savedFetch;
+      globalThis.Image = savedImage;
+      globalThis.document = savedDoc;
+    }
+  });
+
+  it('game.js hands the renderer\'s resolution to the rainbows', () => {
+    const game = read('game.js');
+    assert.match(game, /showRainbow\(PIXI, key, \{.*resolution: app\?\.renderer\?\.resolution \|\| 1 \}\)/);
+    assert.match(game, /dataset\.superHarvestArt = h\.art/);
+  });
+});
+
 describe('wiring', () => {
   const game = read('game.js');
   it('game.js: quoin limit, super harvest, wheel and donation rainbows; musicblock notes; the phantom; the solo Hog Haul countdown', () => {
-    assert.match(game, /import \{[^}]*showRainbow[^}]*\} from '\.\/js\/overlays\.js\?v=g392-1'/);
+    assert.match(game, /import \{[^}]*showRainbow[^}]*\} from '\.\/js\/overlays\.js\?v=g441-1'/);
     assert.match(game, /playerRainbow\(result\.dailyLimit === 150 \? 'rainbow_150coinstoday' : 'rainbow_100coinstoday'\)/);
     assert.match(game, /if \(!paradiseRun\) playerRainbow/);
     assert.match(game, /playerRainbow\('rainbow_superharvest'/);

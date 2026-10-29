@@ -73,7 +73,7 @@ import { furnitureSize } from '../home-decor.js?v=g418-1';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js';
 import { POTION_ART } from '../potion-art.js?v=g149-1';
 import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=progression-1';
-import { overlayOrStandIn } from '../overlay-stand-in.js?v=g391-1';
+import { overlayOrStandIn } from '../overlay-stand-in.js?v=g441-1';
 import { playPoofIn, playSheetOverlay } from '../overlay-art.js?v=g311-1';
 import {
   ANIMAL_BABIES,

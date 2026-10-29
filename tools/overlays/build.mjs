@@ -17,7 +17,16 @@
  * public/assets/sprites/overlays/overlays-more.json (the same row shape as
  * overlays.json, so overlay-art.js's cellRect / standPlacement read it).
  *
+ * G441: a config with `vector: true` also keeps its frames as SVG
+ * (<key>.frames.json, the same SVG the sheet is rasterised from, at 1:1 over
+ * the box, identical frames once, outlines and gradient ramps shared as in
+ * overlay-art's shareFrames). The sheet is drawn 1.25 texels per stage px,
+ * for a 1x screen; on a dense one (a Retina window draws the 400 px rainbow
+ * at about 4 device px per stage px) js/overlays.js draws these frames at the
+ * screen's own density instead.
+ *
  * Usage: node tools/overlays/build.mjs [key...]   (all by default; needs Chrome)
+ *        node tools/overlays/build.mjs --vector [key...]   (only the SVG frames, from the built box; no Chrome)
  *        node tools/overlays/build.mjs --check    (the manifest matches the FLAs and the files)
  * PLAYWRIGHT_CORE may name a playwright-core build (the repo's playwright
  * otherwise). The FLA is data: it is only inflated and parsed, nothing runs.
@@ -28,7 +37,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { frameSvg, loadFla } from '../overlay-art/xfl-svg.mjs';
 import { readZip } from '../avatar-compositor/xfl.mjs';
-import { framePlan, scrub } from '../overlay-art/build.mjs';
+import { framePlan, scrub, shareFrames } from '../overlay-art/build.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const spike = join(here, '../..');
@@ -59,7 +68,8 @@ export const OVERLAYS = Object.freeze({
   rainbow_100coinstoday: rainbow('rainbow_100coinstoday'),
   rainbow_150coinstoday: rainbow('rainbow_150coinstoday'),
   rainbow_maxrelax: rainbow('rainbow_maxrelax'),
-  rainbow_superharvest: rainbow('rainbow_superharvest'),
+  // G441: the super harvest arc also as SVG frames, drawn sharp on dense screens.
+  rainbow_superharvest: { ...rainbow('rainbow_superharvest'), vector: true },
   rainbow_spindoctor: rainbow('rainbow_spindoctor'),
   rainbow_superdonation: rainbow('rainbow_superdonation'),
   charades_gameover: rainbow('charades_gameover'),
@@ -280,6 +290,40 @@ async function buildOne(page, key, cfg) {
   };
 }
 
+/**
+ * The SVG frames of an overlay over its built box (`row.box`), as
+ * { text (the frames.json), order (timeline frame -> unique frame) }: pure
+ * Node, so --check can redraw them from the FLA and compare.
+ */
+export function vectorFrames(cfg, box) {
+  const doc = scrub(loadFla(join(audit, cfg.fla)), cfg.scrub);
+  const plan = framePlan({ kind: 'sheet', ...cfg }, doc);
+  const unique = [];
+  const seen = new Map();
+  const order = plan.picks.map(({ n, start }) => {
+    const svg = frameSvg(doc, n, { box, start });
+    if (!seen.has(svg)) {
+      seen.set(svg, unique.length);
+      unique.push(svg);
+    }
+    return seen.get(svg);
+  });
+  const { defs, frames } = shareFrames(unique);
+  const text = `{"defs":${JSON.stringify(defs)},\n"frames":[\n${frames.map((f) => JSON.stringify(f)).join(',\n')}\n]}\n`;
+  return { text, order };
+}
+
+/** Write <key>.frames.json beside the sheet; returns the row's `vector` entry. */
+function buildVector(key, cfg, row) {
+  const { text, order } = vectorFrames(cfg, row.box);
+  const file = `${key}.frames.json`;
+  const buf = Buffer.from(text);
+  writeFileSync(join(OUT_DIR, file), buf);
+  const frames = Math.max(...order) + 1;
+  console.log(`${key}: ${order.length} SVG frames (${frames} unique), ${(buf.length / 1024).toFixed(0)} KB`);
+  return { file, frames, order, bytes: buf.length, sha256: sha(buf) };
+}
+
 function writeManifest(manifest) {
   const sorted = Object.fromEntries(Object.keys(manifest).sort().map((k) => [k, manifest[k]]));
   const text = JSON.stringify(sorted, (k, v) => (Array.isArray(v) && v.every((x) => typeof x === 'number') ? `[${v.join(', ')}]` : v), 1).replace(/"\[([^"]*)\]"/g, '[$1]');
@@ -297,12 +341,25 @@ async function build(keys) {
     for (const key of keys) {
       if (!OVERLAYS[key]) throw new Error(`unknown overlay ${key}`);
       manifest[key] = await buildOne(page, key, OVERLAYS[key]);
+      if (OVERLAYS[key].vector) manifest[key].vector = buildVector(key, OVERLAYS[key], manifest[key]);
       writeManifest(manifest);
     }
   } finally {
     await browser.close();
   }
   for (const k of Object.keys(manifest)) if (!OVERLAYS[k]) delete manifest[k];
+  writeManifest(manifest);
+}
+
+/** --vector: only the SVG frames, over each row's built box (no Chrome). */
+function buildVectors(keys) {
+  const manifest = JSON.parse(readFileSync(MANIFEST, 'utf8'));
+  for (const key of keys) {
+    const cfg = OVERLAYS[key];
+    if (!cfg?.vector) throw new Error(`${key}: not a vector overlay`);
+    if (!manifest[key]) throw new Error(`${key}: build the sheet first`);
+    manifest[key].vector = buildVector(key, cfg, manifest[key]);
+  }
   writeManifest(manifest);
 }
 
@@ -325,11 +382,25 @@ export function checkOverlays() {
     if (m.scale !== cfg.scale || m.src !== cfg.fla) bad.push(`${key}: config changed`);
     if (m.order.length !== m.frames) bad.push(`${key}: order`);
     if (Boolean(m.states) !== Boolean(cfg.states)) bad.push(`${key}: states`);
+    if (Boolean(m.vector) !== Boolean(cfg.vector)) bad.push(`${key}: vector frames ${cfg.vector ? 'not built' : 'not in the config'}`);
+    let vbuf = null;
+    if (m.vector) {
+      const vout = join(OUT_DIR, m.vector.file);
+      if (!existsSync(vout)) bad.push(`${key}: no ${m.vector.file}`);
+      else {
+        vbuf = readFileSync(vout);
+        if (vbuf.length !== m.vector.bytes || sha(vbuf) !== m.vector.sha256) bad.push(`${key}: ${m.vector.file} differs from the manifest`);
+        if (m.vector.order.length !== m.frames || Math.max(...m.vector.order) + 1 !== m.vector.frames) bad.push(`${key}: vector order`);
+        if (JSON.parse(vbuf.toString('utf8')).frames.length !== m.vector.frames) bad.push(`${key}: vector frame count`);
+      }
+    }
     const src = join(audit, cfg.fla);
     if (!existsSync(src)) continue; // glitch-overlays not beside the game: the files alone are checked
     if (sha(readFileSync(src), 'sha1') !== m.fla) { bad.push(`${key}: FLA changed`); continue; }
     const plan = framePlan({ kind: 'sheet', ...cfg }, scrub(loadFla(src), cfg.scrub));
     if (plan.picks.length !== m.frames) bad.push(`${key}: frame count ${plan.picks.length}, built ${m.frames}`);
+    // The SVG frames are drawn without Chrome, so they can be redrawn and compared.
+    if (vbuf && vectorFrames(cfg, m.box).text !== vbuf.toString('utf8')) bad.push(`${key}: ${m.vector.file} is not what the FLA draws`);
   }
   return bad;
 }
@@ -343,5 +414,8 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
       process.exit(1);
     }
     console.log(`overlays-more.json matches the FLAs (${Object.keys(OVERLAYS).length} overlays)`);
+  } else if (args.includes('--vector')) {
+    const keys = args.filter((a) => a !== '--vector');
+    buildVectors(keys.length ? keys : Object.keys(OVERLAYS).filter((k) => OVERLAYS[k].vector));
   } else await build(args.length ? args : Object.keys(OVERLAYS));
 }

@@ -184,7 +184,7 @@ describe('the shared street of a race scene', () => {
   });
 
   it('races-feature answers only in a multiplayer match', async () => {
-    const { racesFeature } = await import('../public/js/features/races-feature.js?v=g442-6');
+    const { racesFeature } = await import('../public/js/features/races-feature.js?v=g441-1');
     assert.equal(racesFeature.realtimeStreet({ inScene: () => true }), null, 'no match: nothing shared');
     // No hub line: getLoadingInfo sends instances no hub_name (locations/location.js 3311).
     assert.deepEqual(racesFeature.labelFor('RACE_00000000000000A1'), { street: 'A race', hub: '', hubId: 'scene' });

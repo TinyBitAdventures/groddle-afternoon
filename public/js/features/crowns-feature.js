@@ -21,7 +21,7 @@
  */
 
 import { crowdScaleX } from '../avatar-anims.js';
-import { OVERLAY_USES, playCountdownArt, playWindowOverlay } from '../overlays.js?v=g392-1';
+import { OVERLAY_USES, playCountdownArt, playWindowOverlay } from '../overlays.js?v=g441-1';
 import {
   CROWNS_ID,
   CROWNS_LADDERS,
