@@ -313,6 +313,8 @@ describe('engine.prompt and its callers', () => {
 
   it('the Bureaucrat end prompt is a stacked prompt (npc_bureaucrat.js 909-917)', { skip: !existsSync(gsjs) && 'no GSJS checkout' }, () => {
     assert.match(readFileSync(join(gsjs, 'items/npc_bureaucrat.js'), 'utf8'), /function showEndPrompt\(pc\)\{[\s\S]{0,80}pc\.prompts_add\(\{/);
-    assert.match(game, /engine\.prompt\(\{\s*text: 'Thank you for your business\./);
+    // js/bureaucratic-hall.js endPrompt, through the hall feature's host (engine.prompt).
+    assert.match(read('js/bureaucratic-hall.js'), /host\.prompt\(\{ text: HALL_TEXT\.endPrompt, choices: \[\{ label: 'OK', value: 'ok' \}\], timeout: 10 \}\);/);
+    assert.match(read('js/features/bureaucratic-halls-feature.js'), /prompt: \(opts\) => engine\.prompt\?\.\(opts\),/);
   });
 });

@@ -158,7 +158,10 @@ test('client integration ships recovered clean quest art and a playable route', 
   assert.match(game, /startLegalizeIt/);
   assert.match(game, /handleLegalizeTarget/);
   assert.match(game, /legalizeautoplay/);
-  assert.match(game, /legalizeWaitStartedAt >=? 10_000|now - legalizeWaitStartedAt >= 10_000/);
+  // The waiting area, Please Wait and the calls are the shared hall visit (js/bureaucratic-hall.js).
+  assert.match(game, /features\.query\('bureaucraticHallFlow', engine, \{/);
+  assert.match(game, /const LEGALIZE_HALL_QUESTION = HALL_QUESTIONS\.findIndex\(\(qn\) => qn\.options\.join\('\|'\) === 'Beige\|Other'\);/);
+  assert.doesNotMatch(game, /legalizeWaitStartedAt/);
   assert.match(game, /recovered-animated-bureaucrats/);
   assert.match(game, /Beige\|Other/);
   assert.match(content, /legalize_transit_gate/);

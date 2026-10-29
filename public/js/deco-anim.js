@@ -19,7 +19,7 @@
  *   of the decos under and over them.
  */
 import { ANIM_DECOS } from './deco-anim-list.js?v=g435-1';
-import { wantsHiresDecos } from './deco-hires.js?v=g435-1';
+import { wantsHiresDecos } from './deco-hires.js?v=g443-1';
 import { isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js';
 
 export const ANIM_BASE = 'assets/decos/animated/';

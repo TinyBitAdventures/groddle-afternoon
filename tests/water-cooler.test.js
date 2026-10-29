@@ -21,7 +21,7 @@ import {
   getWaterState,
 } from '../public/js/water-cooler.js';
 import { addItem, countItem, removeItem } from '../public/js/inventory.js';
-import { COOLER_X, DRINK_VERB, GET_WATER_VERB, bureaucraticHallsFeature } from '../public/js/features/bureaucratic-halls-feature.js';
+import { COOLER_X, DRINK_VERB, GET_WATER_VERB, bureaucraticHallsFeature } from '../public/js/features/bureaucratic-halls-feature.js?v=g443-1';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -126,13 +126,14 @@ function fakeEngine(over = {}) {
 describe('Water Cooler in the hall (bureaucratic-halls-feature)', () => {
   beforeEach(() => bureaucraticHallsFeature._reset());
 
-  it('stands in every hall, right of the counter, with Get water from', () => {
+  it('stands in every hall, in the desk room, with Get water from', () => {
     const { engine, calls } = fakeEngine();
     bureaucraticHallsFeature.runVerbOverride({ classId: 'street_door', door: { id: 'door_1300484753304', x: 900, y: 830 } }, 'hall_enter', engine);
     const cooler = calls.registered.find((t) => t.classId === 'water_cooler');
     assert.ok(cooler);
     assert.equal(cooler.label, 'Water Cooler');
-    assert.ok(COOLER_X > 1480 && COOLER_X + WATER_COOLER.w / 2 < 1600, 'clear of the counter, inside the room');
+    // The desk ends at backdrop x 548, the partition starts at 625 (bureaucratic_hall_bg).
+    assert.ok(COOLER_X - WATER_COOLER.w / 2 > 525 && COOLER_X + WATER_COOLER.w / 2 < 640, 'between the desk and the partition');
     const [verb] = bureaucraticHallsFeature.verbsFor(cooler, engine);
     assert.equal(verb.id, GET_WATER_VERB);
     assert.equal(verb.label, 'Get water from');

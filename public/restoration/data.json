@@ -656,11 +656,13 @@
    "group": "economy",
    "name": "Bureaucratic Halls",
    "status": "rebuilt",
-   "blurb": "The hall doors on Gregarious Grange, Chego Chase and Baeli Bray open again: the Bureaucratic Hall, the Andra and the Muufo halls, where the bureaucrats behind the counter sell the Card-Carrying Qualification, Your Papers and General Building Permits. The halls themselves were never archived, so all three use the one hall rebuilt for Legalize It. Every hall has its Water Cooler; a Cup of Water tastes bureaucratic-y and brings on Being Watched.",
+   "blurb": "The hall doors on Gregarious Grange, Chego Chase and Baeli Bray open again onto the Bureaucratic Hall and the Andra and Muufo halls, drawn in Tiny Speck’s own hall art: the desk room, the waiting wall with its orange chairs, the WAITING AREA plaque, the PLEASE WAIT stand and the counter. A bureaucrat comes over to greet you and sends you to the waiting area. Wait ten seconds without moving (move, and you are told to just wait) and one comes to call you. Talk to them for a Card-Carrying Qualification, Your Papers or a General Building Permit, get passed along, answer the random question and pay the fee. The halls’ layout was never archived, so where the signs hang is ours. Every hall has its Water Cooler; a Cup of Water tastes bureaucratic-y and brings on Being Watched.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/features/bureaucratic-halls-feature.js",
+    "public/js/bureaucratic-hall.js",
+    "public/assets/decos/groddle/bureaucratic_hall_bg.webp",
     "public/js/bureaucracy.js"
    ],
    "shot": null,
@@ -2661,9 +2663,14 @@
   ]
  },
  "git": {
-  "commits": 736,
+  "commits": 737,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "The Enter hint draws over a Rook attack's skulls and feathers"
+   },
    {
     "date": "2026-10-29",
     "kind": "improve",
@@ -2778,14 +2785,9 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "The inventory stops counting a QA demo's items as obtainable"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "The restoration report counts working skills again (104 of 110)"
    }
   ]
  },
- "tests": 425,
+ "tests": 426,
  "generatedAt": "2026-10-29"
 }

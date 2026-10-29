@@ -25,14 +25,15 @@ test('G246 clerk sheets stop before their empty cells and play at the SWF\'s 30 
 });
 
 test('G247 hall: glass doors, then the chairs, then the counter, none overlapping', () => {
+  // BHALL: the chairs are Tiny Speck's, painted into bureaucratic_hall_bg (backdrop x 640-1230);
+  // the doors sit on the desk room's wall and the counter starts at the helpers' limit.
   const game = read('game.js');
-  assert.match(game, /for \(const x of \[250, 340, 430, 520\]\)/);
+  assert.doesNotMatch(game, /for \(const x of \[250, 340, 430, 520\]\)/);
   const halls = read('js/features/bureaucratic-halls-feature.js');
-  for (const src of [game, halls]) {
-    assert.match(src, /counter\.position\.set\(1050, (GROUND_Y|ROOM\.ground)\);\n  counter\.width = 860;/);
-  }
-  // Doors end near x 190 (EXIT_X 70); chairs run 250-578; the counter starts at 1050 - 430 = 620.
-  assert.match(halls, /const EXIT_X = 70;/);
+  assert.match(game, /counter\.position\.set\(HALL_LAYOUT\.counterLeft, HALL\.ground \+ 4\);\n  counter\.width = 811;/);
+  assert.match(halls, /counter\.position\.set\(HALL_LAYOUT\.counterLeft, HALL\.ground \+ 4\);\n  counter\.width = 811;/);
+  assert.match(halls, /const EXIT_X = HALL_LAYOUT\.exitX;/);
+  assert.match(read('js/bureaucratic-hall.js'), /exitX: 72,/);
 });
 
 test('G248 lit pumpkins have no drawn rings round them', () => {

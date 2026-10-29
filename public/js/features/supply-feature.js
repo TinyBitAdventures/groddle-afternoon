@@ -9,12 +9,12 @@
  *    Collect the Hooch it makes, one every 140 seconds, offline too.
  *  - Butterfly Milk, Butter, the four Cheeses and every herb: Shake,
  *    Compress, Age, Poke and Shuck (js/item-transforms.js).
- *  - The Bureaucrats inside the Bureaucratic Halls (bureaucratic-halls-feature.js,
- *    behind the doors on Gregarious Grange, Baeli Bray and Chego Chase)
- *    sell Your Papers and General Building Permits to those with
- *    Bureaucratic Arts, and a Card-Carrying Qualification to anyone without
- *    its badge (js/bureaucracy.js): their verbs live here. Complete Your
- *    Papers in the pack for the You Have Papers badge.
+ *  - Your Papers and General Building Permits for those with Bureaucratic
+ *    Arts, and a Card-Carrying Qualification for anyone without its badge
+ *    (js/bureaucracy.js). Inside the Bureaucratic Halls the bureaucrats sell
+ *    them through the hall's visit (bureaucratic-halls-feature.js,
+ *    js/bureaucratic-hall.js); the clerk verbs here are the QA street clerk's.
+ *    Complete Your Papers in the pack for the You Have Papers badge.
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&supplydemo=1 grants a Machine Stand,
  *     every part, Fuel Cells, a Still with Grain, Butterfly Milk, herbs and

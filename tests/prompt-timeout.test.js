@@ -239,7 +239,12 @@ describe('the game wires them', () => {
     assert.match(read(join(PUBLIC, 'js/features/hell-feature.js')), /const timed = effect\.timeoutMs > 0 \? \{ timeoutMs: effect\.timeoutMs \} : \{\};/);
     assert.match(read(join(PUBLIC, 'js/features/teleportation-feature.js')), /title: out\.script\.title, text: out\.message, timeout: 15 \}/);
     // items/npc_bureaucrat.js showEndPrompt 909-917 (G294: the stack, no heading).
-    assert.match(game, /engine\.prompt\(\{\s*text: 'Thank you for your business\. To conduct another transaction, you must exit and re-enter the Hall\.',\s*choices: \[\{ label: 'OK', value: 'ok' \}\],\s*timeout: 10,\s*\}\);/);
+    const hall = read(join(PUBLIC, 'js/bureaucratic-hall.js'));
+    assert.match(hall, /endPrompt: 'Thank you for your business\. To conduct another transaction, you must exit and re-enter the Hall\.',/);
+    assert.match(hall, /host\.prompt\(\{ text: HALL_TEXT\.endPrompt, choices: \[\{ label: 'OK', value: 'ok' \}\], timeout: 10 \}\);/);
+    // player.js 1897-1898 and location.js 1109: "Just wait!" times out in 3 s as OK, the card prompt in 10.
+    assert.match(hall, /text: HALL_TEXT\.justWait,\s*choices: \[\{ label: 'OK', value: 'ok' \}\],\s*timeout: 3,\s*timeoutValue: 'ok',/);
+    assert.match(hall, /host\.prompt\(\{ text: HALL_TEXT\.cardNoSkill, choices: \[\{ label: 'OK', value: 'ok' \}\], timeout: 10 \}\);/);
     assert.match(read(join(PUBLIC, 'js/quest-rooms/top-of-tree.js')), /ctx\.prompt\(\{ text: JUMP_OFF_LINE, choices: \[\{ label: 'Ok', value: '' \}\], timeout: 10, timeoutValue: '' \}\)/);
     assert.match(read(join(PUBLIC, 'js/features/quest-instances-feature.js')), /const ms = promptTimeoutMs\(\{ timeout \}\);/);
     // The subway's stop prompt already ran its own (inc_transit.js 378-382, timeout_value 'timeout').

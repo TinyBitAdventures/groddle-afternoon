@@ -16,8 +16,8 @@ import {
   HALL_LEAVE_VERB,
   bureaucraticHallsFeature,
   hallSceneTsid,
-} from '../public/js/features/bureaucratic-halls-feature.js';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=g429-1';
+} from '../public/js/features/bureaucratic-halls-feature.js?v=g443-1';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=g443-1';
 import { LEGALIZE_HALL_TSID } from '../public/js/legalize-it.js?v=legalize-2';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -75,7 +75,7 @@ describe('hall doors', () => {
     for (const def of Object.values(HALL_DOORS)) assert.notEqual(hallSceneTsid(def.tsid), LEGALIZE_HALL_TSID);
   });
 
-  it('Enter opens the hall: scene, glass doors, four bureaucrats with the clerk verbs', () => {
+  it('Enter opens the hall: scene, glass doors, four bureaucrats running the hall visit', () => {
     const { engine, calls } = fakeEngine();
     const door = { id: 'door_1321408650118', x: 939, y: 830 };
     const target = { classId: 'street_door', door };
@@ -91,11 +91,20 @@ describe('hall doors', () => {
     assert.ok(exit);
     const clerks = calls.registered.filter((t) => t.classId === 'npc_bureaucrat');
     assert.equal(clerks.length, 4);
-    assert.ok(clerks.every((c) => c.featureId === 'supply'));
+    assert.ok(clerks.every((c) => c.featureId === 'bureaucratic-halls'));
+    // Arrival at the door connect's (-857, -153) on the backdrop.
+    assert.deepEqual(scene.spawn, { x: 249, y: 547 });
+    assert.equal(scene.groundY, 572);
+    // Talk to only once a bureaucrat helps you (npc_bureaucrat.js verbs.talk_to conditions).
+    const [talk] = bureaucraticHallsFeature.verbsFor(clerks[0], engine);
+    assert.equal(talk.id, 'talk_to');
+    assert.equal(talk.enabled, false);
+    assert.equal(talk.reason, 'Please approach the counter for assistance.');
+    assert.ok(bureaucraticHallsFeature._state().flow, 'the visit runs');
     assert.equal(bureaucraticHallsFeature._state().hall.tsid, 'LDOCV86VHCD245F');
   });
 
-  it('the bureaucrats sell the documents (supply feature verbs)', () => {
+  it('the supply feature\'s street clerk (QA) still sells the documents', () => {
     const verbs = supplyFeature.verbsFor({ classId: 'npc_bureaucrat' }, { learnedSkills: [], unlockedAchievements: [], pc: { currants: 100 } });
     assert.deepEqual(verbs.map((v) => v.id), ['buy:card_carrying_qualification', 'buy:your_papers', 'buy:general_building_permit']);
     assert.equal(verbs[0].enabled, true);
@@ -111,6 +120,7 @@ describe('hall doors', () => {
     assert.equal(calls.entered[0].tsid, 'GA91JUQT2G82GUL');
     assert.equal(calls.entered[0].spawnX, 1115);
     assert.equal(bureaucraticHallsFeature._state().hall, null);
+    assert.equal(bureaucraticHallsFeature._state().flow, null, 'leaving ends the visit');
   });
 
   it('stays shut inside an instance and behind a travel gate', () => {

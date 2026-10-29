@@ -12,29 +12,43 @@
  * waiting area and Please Wait rules (locations/location.js:810, 1076;
  * players/player.js:1891; items/npc_bureaucrat.js:735), and the Grange and
  * Andra doors share the same arrival point (-857, -153). The halls' own
- * geometry is lost, so every door opens the one hall the remake built for
- * Legalize It (game.js drawBureaucraticHall): four bureaucrats behind the
- * counter and the hall's glass doors (door_asset_bureaucratic_hall_int) back
- * out to the street.
+ * geometry is lost; their art is not: every door opens one hall drawn from
+ * Tiny Speck's bldg_int_bhall.swf (game.js drawBureaucraticHall, layout in
+ * js/bureaucratic-hall.js), four bureaucrats behind the counter and the
+ * hall's glass doors (door_asset_bureaucratic_hall_int) back out to the street.
  *
- * The bureaucrats sell what npc_bureaucrat.js getItems lists (store 17): the
- * Card-Carrying Qualification, Your Papers and the General Building Permit,
- * through the supply feature's clerk verbs (js/bureaucracy.js). The greeting,
- * waiting area and random questions are not rebuilt outside Legalize It.
+ * The bureaucrats run the source's whole visit in every hall (js/bureaucratic-hall.js
+ * createHallFlow): one greets you, sends you to the waiting area, Please Wait
+ * (10 s, and "Just wait!" if you act), then one comes over to help: Talk to
+ * lists what npc_bureaucrat.js getItems allows (store 17: the Card-Carrying
+ * Qualification, Your Papers, the General Building Permit), passes you on,
+ * asks its random question and takes the fee. Legalize It's hall (game.js
+ * spawnLegalizeHall) runs the same flow through the `bureaucraticHallFlow`
+ * query, with the recorded session's choices fixed.
  *
  * Every hall has its Water Cooler (js/water-cooler.js: items/water_cooler.js
  * get_water, 2 energy for a Cup of Water). Drinking the cup (cup_of_water.js
  * drink: 5 mood) puts Being Watched (quests/stale_but_necessary.js) to the
  * player at once, as quests_offer(id, true) did; accepting it starts the
  * quest's room through the quest-instances feature. Where the cooler stands
- * is ours (the halls' geometry is lost): right of the counter, clear of the
- * glass doors, the chairs and the counter.
+ * is ours (the halls' geometry is lost): in the desk room by the partition,
+ * clear of the glass doors and the desk.
+ *
+ * Multiplayer: the bureaucrats are each player's own (no server state), as
+ * the rest of the hall is; in the source they were shared and one helped one
+ * player at a time.
  *
  * QA: ?autostart=1&questoffer=off&doordemo=GA5I10NJDL52TKD (Chego Chase),
  *   doordemo=GA91JUQT2G82GUL (Baeli Bray) or doordemo=GLI32G3NUTD100I&doorindex=1
  *   (Gregarious Grange) stands you at the hall door; add &hallautoplay=1 to
  *   walk in (doorautoplay=1 goes through the doors feature, which refuses a
- *   door with no street). Canvas: hallScene, hallLast.
+ *   door with no street). &halldemo=<hall tsid> (LIF101O8CDQ1AMU,
+ *   LDOCV86VHCD245F, LIF2E3LVGK82J7Q) walks you in from wherever you start.
+ *   &hallautoplay=flow then answers every conversation with its first choice,
+ *   steps into the waiting area and skips the walks and the wait, through to
+ *   the purchase. Canvas: hallScene, hallLast, hallFlow (arrived, greeting,
+ *   go_wait, waiting, refused, helped, called, talking, handoff, question,
+ *   confirm, done, left), hallStep, hallHelper, hallBuff, hallRefusals, hallClerks.
  */
 
 import { LEGALIZE_CLERKS } from '../legalize-it.js?v=legalize-2';
@@ -44,12 +58,12 @@ import { acceptOffer, ensureQuestOfferState, markOffered, questStatus } from '..
 import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
 import { parseQuestConversation } from '../quests.js?v=item-buffs-7';
 import { CUP_CLASS, CUP_OF_WATER, WATER_COOLER, WATER_COOLER_CLASS, drinkCup, getWater, getWaterState } from '../water-cooler.js?v=g352-1';
+import { BUREAUCRAT_CLASS, HALL, HALL_LAYOUT, HALL_TEXT, PLEASE_WAIT_BUFF, TALK_VERB, createHallFlow } from '../bureaucratic-hall.js?v=g443-1';
+import { questRoomConverse } from './quest-instances-feature.js?v=g434-1';
 
 export const HALLS_FEATURE_ID = 'bureaucratic-halls';
 export const HALL_ENTER_VERB = 'hall_enter';
 export const HALL_LEAVE_VERB = 'hall_leave';
-/** features/supply-feature.js owns npc_bureaucrat verbs (buy the documents). */
-const CLERK_FEATURE_ID = 'supply';
 const CUP_QUEST_ID = 'stale_but_necessary';
 
 /** Street door id -> the hall behind it (location XML door connects). */
@@ -70,10 +84,10 @@ export function hallForDoor(target) {
   return HALL_DOORS[target.door?.id] || null;
 }
 
-const ROOM = Object.freeze({ width: 1600, height: 760, ground: 620, spawnX: 150 });
-const EXIT_X = 70;
-/** Ours: right of the counter (x 620-1480), inside the room's 1600 px. */
-export const COOLER_X = 1536;
+const ROOM = Object.freeze({ width: HALL.width, height: HALL.height, ground: HALL.ground, spawnX: HALL_LAYOUT.arrival.x, spawnY: HALL_LAYOUT.arrival.y });
+const EXIT_X = HALL_LAYOUT.exitX;
+/** Ours: in the desk room, between the desk (x 254-548) and the partition (x 625). */
+export const COOLER_X = 580;
 const COOLER_ART = 'assets/sprites/icons/water_cooler@3x.png';
 export const GET_WATER_VERB = WATER_COOLER.verb.id;
 export const DRINK_VERB = 'cup_drink';
@@ -82,6 +96,10 @@ const COUNTER_ART = 'assets/decos/groddle/bureaucratic_hall_counter_1.png';
 
 let hall = null; // { def, returnTo }
 let last = '';
+/** The hall visit running now (this feature's halls or Legalize It's): js/bureaucratic-hall.js createHallFlow. */
+let flow = null;
+let flowTargets = [];
+let autoAt = 0;
 let demoDone = false;
 let demoAt = 0;
 
@@ -105,27 +123,27 @@ function spawnHall(engine, kit) {
     subtitle: `Back out to ${hall.def.streetLabel}`,
     sprite: door,
   });
-  LEGALIZE_CLERKS.forEach((clerk, index) => {
-    const spr = kit.clerk(index, 850 + index * 170, 555, 0.84);
+  const clerks = LEGALIZE_CLERKS.map((clerk, index) => {
+    const x = HALL_LAYOUT.clerkHomes[index];
+    const spr = kit.clerk(index, x, HALL_LAYOUT.clerkBackY, 1);
     spr.zIndex = 40;
     engine.entityLayer.addChild(spr);
-    engine.register({
-      classId: 'npc_bureaucrat',
-      featureId: CLERK_FEATURE_ID,
+    return engine.register({
+      classId: BUREAUCRAT_CLASS,
+      featureId: HALLS_FEATURE_ID,
       label: clerk.name,
       subtitle: hall.def.label,
       sprite: spr,
+      state: { clerkIndex: index },
     });
   });
   const counter = kit.sprite(COUNTER_ART);
-  counter.anchor.set(0.5, 1);
-  // x 620-1480 as in game.js spawnLegalizeHall: clear of the doors and the waiting-area chairs.
-  counter.position.set(1050, ROOM.ground);
-  counter.width = 860;
-  counter.height = 132;
+  counter.anchor.set(0, 1);
+  placeCounter(counter);
   counter.zIndex = 44;
   counter.eventMode = 'none';
   engine.entityLayer.addChild(counter);
+  startFlow(engine, clerks, { label: hall.def.label });
   const cooler = kit.sprite(COOLER_ART);
   cooler.anchor.set(0.5, 1);
   cooler.position.set(COOLER_X, ROOM.ground + 2);
@@ -141,6 +159,117 @@ function spawnHall(engine, kit) {
     subtitle: hall.def.label,
     sprite: cooler,
   });
+}
+
+/**
+ * The counter (bureaucratic_hall_counter_1, its stage size 811 x 103) across
+ * the backdrop's counter opening, its left end at the helpers' limit (ours):
+ * it runs on past the hall's right edge, as the opening does.
+ */
+export function placeCounter(counter) {
+  counter.position.set(HALL_LAYOUT.counterLeft, HALL.ground + 4);
+  counter.width = 811;
+  counter.height = 103;
+}
+
+const escapeHtml = (text) => String(text ?? '').replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
+
+/** Pose a bureaucrat sprite: the OGA sheets face right, so dir 'left' (npc_bureaucrat.js onCreate) flips them. */
+function poseClerk(spr, pose) {
+  if (!spr || spr.destroyed) return;
+  spr.position.set(Math.round(pose.x), pose.y);
+  const sx = Math.abs(spr.scale.x) || 1;
+  spr.scale.x = pose.dir === 'left' ? -sx : sx;
+  spr.zIndex = pose.behind ? 40 : 48;
+  const want = pose.anim;
+  if (spr._hallAnim !== want) {
+    const sheet = { talk: spr.texturesTalk, walk1: spr.texturesWalk1, walk2: spr.texturesWalk2 }[want] || spr.texturesIdle;
+    if (sheet?.length && typeof spr.gotoAndPlay === 'function') {
+      spr.textures = sheet;
+      spr.animationSpeed = 0.5;
+      spr.gotoAndPlay(0);
+    }
+    spr._hallAnim = want;
+  }
+}
+
+/** The host js/bureaucratic-hall.js asks: the engine, the bureaucrats' targets and their sprites. */
+function hallHost(engine, targets, { label = 'Bureaucratic Hall', buy = null } = {}) {
+  return {
+    now: () => Date.now(),
+    player: () => ({ x: Number(engine.player?.x) || 0, y: Number(engine.player?.y) || 0 }),
+    pcLabel: () => escapeHtml(engine.playerLabel || 'Ur'),
+    clerkCount: targets.length,
+    clerkLabel: (i) => targets[i]?.label || 'Bureaucrat',
+    drawClerk: (i, pose) => poseClerk(targets[i]?.sprite, pose),
+    say: (i, text) => targets[i] && engine.say?.(targets[i], text, 5000),
+    converse: (i, { text, choices }) =>
+      questRoomConverse(engine, { title: targets[i]?.label || 'Bureaucrat', kicker: label, beats: [{ text, response: '' }], choices, look: 'conversation' }),
+    prompt: (opts) => engine.prompt?.(opts),
+    removePrompt: (uid) => engine.removePrompt?.(uid),
+    applyBuff: () => engine.applyBuff?.(PLEASE_WAIT_BUFF),
+    removeBuff: () => {
+      if (engine.hasBuff?.(PLEASE_WAIT_BUFF)) engine.removeBuff?.(PLEASE_WAIT_BUFF);
+    },
+    acting: () => Boolean(engine.acting?.()),
+    learned: () => engine.learnedSkills || [],
+    achievements: () => engine.unlockedAchievements || [],
+    buy: buy || ((item) => buyItem(engine, item)),
+    activity: (text) => engine.pushActivity?.(text),
+    setData: (key, value) => engine.setData?.(key, value),
+  };
+}
+
+/** The purchase (npc_bureaucrat.js 579-593): currants first, then room in the pack; the item comes from the bureaucrat. */
+function buyItem(engine, item) {
+  const pc = engine.pc;
+  if ((pc?.currants || 0) < item.cost) return 'broke';
+  const room = engine.query?.('packRoom', item.classTsid, 1, engine);
+  if (Number.isFinite(room) && room < 1) return 'room';
+  pc.currants -= item.cost;
+  addItem(engine.inv, item.classTsid, 1);
+  engine.pushActivity?.(`You paid ${item.cost} currants and received ${/^Your /.test(item.label) ? '' : 'a '}${item.label}.`);
+  engine.playSound?.('PURCHASE_ITEM', { volume: 0.5 });
+  engine.refreshPack?.();
+  engine.updateHud?.();
+  engine.save?.();
+  return 'ok';
+}
+
+/** Start the visit for the bureaucrats now in the room (`targets`, in their order). */
+export function startFlow(engine, targets, { label, script = null, buy = null, start = null } = {}) {
+  flow?.end();
+  flowTargets = targets;
+  flow = createHallFlow(hallHost(engine, targets, { label, buy }), { script, start });
+  return flow;
+}
+
+/** QA: one step of the visit (conversations take their first choice; walks and the wait are skipped). */
+export function hallAutoStep(engine) {
+  if (!flow) return '';
+  const button = typeof document !== 'undefined' ? document.querySelector('#qi-dialogue:not([hidden]) [data-qi-choices] button') : null;
+  if (button) {
+    button.click();
+    return 'answer';
+  }
+  const v = flow.state;
+  if (v.waiting && engine.player) {
+    engine.player.x = Math.round((HALL_LAYOUT.waitingArea[0] + HALL_LAYOUT.waitingArea[1]) / 2);
+    return 'step-in';
+  }
+  if (flow.clerks.some((c) => c.target != null)) {
+    flow.hurryClerks();
+    return 'walk';
+  }
+  if (v.buffOn) {
+    flow.hurryWait();
+    return 'wait';
+  }
+  if (v.phase === 'called' && v.helping >= 0) {
+    flow.talk(v.helping);
+    return 'talk';
+  }
+  return '';
 }
 
 /** The cup in the shared catalog (cup_of_water.js label, description, base_cost, stackmax, tags). */
@@ -251,7 +380,6 @@ export function enterHall(engine, def, door = null) {
   const kit = engine.bureaucraticHall();
   const { layer } = kit;
   // The camera keeps the pack's allowance below the floor: carry the floor's grey on down.
-  if (engine.PIXI?.Graphics) layer.addChild(new engine.PIXI.Graphics().rect(0, ROOM.height, ROOM.width, 240).fill(0x77766d));
   engine.playSound?.('DOOR_OPEN', { volume: 0.6 });
   engine.enterScene({
     tsid: scene,
@@ -262,7 +390,8 @@ export function enterHall(engine, def, door = null) {
     background: layer,
     platforms: layer.platformsScreen,
     walls: [],
-    spawn: { x: ROOM.spawnX, y: ROOM.ground },
+    groundY: ROOM.ground,
+    spawn: { x: ROOM.spawnX, y: ROOM.spawnY },
     returnTo,
     ownLight: true,
   });
@@ -280,10 +409,19 @@ export async function leaveHall(engine) {
   const tsid = back.tsid || hall.def.street;
   last = `leave:${hall.def.tsid}`;
   hall = null;
+  flow?.end();
+  flow = null;
   engine.playSound?.('DOOR_OPEN', { volume: 0.6 });
   await engine.enter(tsid, { spawnX: back.x, spawnY: back.y, quiet: true, bypassFeatureGates: true });
   publish(engine);
   return true;
+}
+
+/** &halldemo=<hall tsid>: walk into that hall from the street you start on. */
+function runHallDemo(engine) {
+  const def = Object.values(HALL_DOORS).find((d) => d.tsid === engine.param?.('halldemo'));
+  demoDone = true;
+  if (def) enterHall(engine, def, { x: engine.player?.x, y: engine.player?.y });
 }
 
 function runDemo(engine, now) {
@@ -299,17 +437,50 @@ export const bureaucraticHallsFeature = {
   id: HALLS_FEATURE_ID,
 
   onStreetEnter(street, engine) {
-    if (!demoDone && engine.param?.('hallautoplay') === '1') demoAt = Date.now() + 1800;
+    if (!demoDone && engine.param?.('halldemo')) demoAt = Date.now() + 1800;
+    else if (!demoDone && engine.param?.('hallautoplay') === '1') demoAt = Date.now() + 1800;
     publish(engine);
   },
 
   onTick(dtMs, now, engine) {
-    if (demoAt && now >= demoAt && !engine.busy?.()) runDemo(engine, now);
+    if (demoAt && now >= demoAt && !engine.busy?.()) {
+      if (engine.param?.('halldemo')) {
+        demoAt = 0;
+        runHallDemo(engine);
+      } else runDemo(engine, now);
+    }
+    if (!flow) return;
+    flow.tick(dtMs);
+    if (engine.param?.('hallautoplay') === 'flow' && now >= autoAt) {
+      autoAt = now + 250;
+      hallAutoStep(engine);
+    }
+  },
+
+  /** A verb, a pack use or a badge counter: Please Wait allows none of them (player.js 1886-1904). */
+  onEvent(counter) {
+    if (flow?.state.buffOn && typeof counter === 'string' && !counter.startsWith('npc_bureaucrat:')) flow.noteAction(counter);
   },
 
   onStreetClear() {
-    // Leaving the scene any way (the glass doors, the Map, a teleport) leaves the hall.
+    // Leaving the scene any way (the glass doors, the Map, a teleport) leaves the hall (location.js 810-819).
     hall = null;
+    flow?.end();
+    flow = null;
+    flowTargets = [];
+  },
+
+  /**
+   * Legalize It's hall (game.js spawnLegalizeHall) runs this hall's visit:
+   * `targets` are its bureaucrats, `script` fixes the recorded session's choices.
+   */
+  bureaucraticHallFlow(engine, opts = {}) {
+    return startFlow(engine, opts.targets || [], opts);
+  },
+
+  /** QA for Legalize It's autoplay: one step of the visit. */
+  hallAutoStep(engine) {
+    return hallAutoStep(engine) || null;
   },
 
   /** The hall doors (doors-feature draws them; their connect has no street): Enter opens the hall. */
@@ -326,6 +497,11 @@ export const bureaucraticHallsFeature = {
   },
 
   verbsFor(target, engine) {
+    if (target?.classId === BUREAUCRAT_CLASS) {
+      const i = flowTargets.indexOf(target);
+      const st = flow && i >= 0 ? flow.talkState(i) : { enabled: false, reason: HALL_TEXT.approach };
+      return [{ id: TALK_VERB, label: 'Talk to', sort: 50, enabled: st.enabled, reason: st.reason, energy: 0, durationMs: 0, tooltip: HALL_TEXT.talkTooltip }];
+    }
     if (target?.classId === WATER_COOLER_CLASS) {
       const st = getWaterState({ room: engine ? cupRoom(engine) : null });
       return [{ id: GET_WATER_VERB, label: WATER_COOLER.verb.label, sort: 50, enabled: st.enabled, reason: st.reason, energy: WATER_COOLER.energy, durationMs: 0, tooltip: WATER_COOLER.verb.tooltip }];
@@ -335,6 +511,12 @@ export const bureaucraticHallsFeature = {
   },
 
   runVerb(target, verbId, engine) {
+    if (target?.classId === BUREAUCRAT_CLASS && verbId === TALK_VERB) {
+      const i = flowTargets.indexOf(target);
+      if (flow && i >= 0 && flow.talkState(i).enabled) flow.talk(i);
+      else engine.toast?.(HALL_TEXT.approach);
+      return true;
+    }
     if (target?.classId === WATER_COOLER_CLASS && verbId === GET_WATER_VERB) return runGetWater(engine);
     if (target?.classId !== 'bureaucratic_hall_exit' || verbId !== HALL_LEAVE_VERB) return false;
     leaveHall(engine);
@@ -359,9 +541,13 @@ export const bureaucraticHallsFeature = {
 
   /** Tests. */
   _state() {
-    return { hall: hall ? { tsid: hall.def.tsid, returnTo: { ...hall.returnTo } } : null, last };
+    return { hall: hall ? { tsid: hall.def.tsid, returnTo: { ...hall.returnTo } } : null, last, flow };
   },
   _reset() {
+    flow?.end();
+    flow = null;
+    flowTargets = [];
+    autoAt = 0;
     hall = null;
     last = '';
     demoDone = false;

@@ -115,6 +115,92 @@
    ],
    "png_sha": "08e09832565db608"
   },
+  "bureaucratic_hall_bg": {
+   "swf": "bundle:bldg_int_bhall.swf#bureaucratic_hall_bg",
+   "swf_sha": "3e704f0ef79809d2",
+   "stage": [
+    2212.45,
+    700.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [
+    "groddle1.swf",
+    "bureaucratic_hall_bg.swf"
+   ],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the whole hall: desk room, waiting wall with its chairs, counter opening",
+   "png": [
+    4425,
+    1400
+   ],
+   "png_sha": "59b80e2645cbcf9e"
+  },
+  "bureaucratic_hall_sign_1": {
+   "swf": "bundle:bldg_int_bhall.swf#bureaucratic_hall_sign_1",
+   "swf_sha": "c1c6bd40d24319f2",
+   "stage": [
+    406.25,
+    59.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [
+    "groddle1.swf",
+    "bureaucratic_hall_sign_1.swf"
+   ],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the Department of Administrative Affairs, Ministry of Departments lettering",
+   "png": [
+    813,
+    120
+   ],
+   "png_sha": "2d48bf4b4f45b3c0"
+  },
+  "bureaucratic_hall_sign_wait_1": {
+   "swf": "bundle:bldg_int_bhall.swf#bureaucratic_hall_sign_wait_1",
+   "swf_sha": "f5c6deeb4484477e",
+   "stage": [
+    66.15,
+    123.3
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the PLEASE WAIT HERE FOR THE NEXT AVAILABLE AGENT stand",
+   "png": [
+    133,
+    247
+   ],
+   "png_sha": "7ce76ae7fe687af0"
+  },
+  "bureaucratic_hall_waitingroom_1": {
+   "swf": "bundle:bldg_int_bhall.swf#bureaucratic_hall_waitingroom_1",
+   "swf_sha": "5e4f9a0c4c95afa5",
+   "stage": [
+    89.2,
+    87.45
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the waiting-room pictogram (a seated figure and a clock)",
+   "png": [
+    179,
+    175
+   ],
+   "png_sha": "9426053de15adad1"
+  },
   "bush_greenExplody": {
    "swf": "bundle:newxp.swf#bush_greenExplody",
    "swf_sha": "4c7411e63f9267ef",
@@ -2793,6 +2879,26 @@
     74
    ],
    "png_sha": "5e2cd35fc1eda38a"
+  },
+  "sign_waiting_area": {
+   "swf": "bundle:bldg_int_bhall.swf#sign_waiting_area",
+   "swf_sha": "b61874ac146efdaf",
+   "stage": [
+    86.85,
+    42.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the WAITING AREA plaque",
+   "png": [
+    174,
+    86
+   ],
+   "png_sha": "6d8bdba43ff8f309"
   },
   "sky_greenGradient": {
    "swf": "bundle:corey3.swf#sky_greenGradient",

@@ -14,7 +14,7 @@ import { dirname, join } from 'node:path';
 import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { ANIM_DECOS } from '../public/js/deco-anim-list.js?v=g435-1';
-import { ANIM_FPS, clockFrame, isAnimatedDeco, pickStrip, stripFrames, timelineTextures } from '../public/js/deco-anim.js?v=g435-1';
+import { ANIM_FPS, clockFrame, isAnimatedDeco, pickStrip, stripFrames, timelineTextures } from '../public/js/deco-anim.js?v=g443-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -289,7 +289,7 @@ describe('street-render plays flagged decos and pauses them off screen', () => {
       return { ok: true, json: async () => anim(m[1]) };
     };
     try {
-      const { buildStreetView } = await import('../public/js/street-render.js?v=g442-6');
+      const { buildStreetView } = await import('../public/js/street-render.js?v=g443-1');
       const manifest = new Set(JSON.parse(read('public/assets/decos/manifest.json')));
       const s = { ...JSON.parse(read('public/assets/streets/GUVBP2STKQJ24PT.json')), gradient: null, signposts: [] };
       // The fake has no colour filters: drop the layers' filters so nothing bakes.

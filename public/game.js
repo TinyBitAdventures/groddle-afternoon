@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-275';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-277';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g434-1';
@@ -120,6 +120,7 @@ import {
   requestLegalizeQualification,
   travelToGregarious,
 } from './js/legalize-it.js?v=legalize-2';
+import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=g443-1';
 import {
   WINTER_HAVEN_STREET_ID,
   WINTER_MOTE_REWARDS,
@@ -581,7 +582,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=g442-6';
+} from './js/street-render.js?v=g443-1';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -830,7 +831,7 @@ import {
 } from './js/sound-moments.js?v=g393-1';
 import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from './js/metabolics.js';
 import { installHiresIcons } from './js/icon-hires.js?v=g373-1';
-import { installHiresDecos } from './js/deco-hires.js?v=g435-1';
+import { installHiresDecos } from './js/deco-hires.js?v=g443-1';
 import { loadMutedPreference, saveMutedPreference } from './js/audio-pref.js';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=g430-1';
@@ -974,6 +975,7 @@ const SHEETS = {
     fw: 70, fh: 65, cols: 6, rows: 1,
   },
   // The sheets end in empty cells (idle 57 of 60, talk 26 of 27): played, the clerks vanished each loop.
+  // walk1 (24 cells) and walk2 (12) are full: greeting and strolling, and helping (npc_bureaucrat.js setAndBroadcastState).
   bureaucrat0Idle: {
     url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995.png',
     fw: 97, fh: 89, cols: 10, rows: 6, frameCount: 57,
@@ -981,6 +983,14 @@ const SHEETS = {
   bureaucrat0Talk: {
     url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_talk_png_1354832993.png',
     fw: 97, fh: 89, cols: 9, rows: 3, frameCount: 26,
+  },
+  bureaucrat0Walk1: {
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_walk1_png_1354832991.png',
+    fw: 97, fh: 89, cols: 8, rows: 3,
+  },
+  bureaucrat0Walk2: {
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_walk2_png_1354832992.png',
+    fw: 97, fh: 89, cols: 6, rows: 2,
   },
   bureaucrat1Idle: {
     url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_idle1_png_1354833004.png',
@@ -990,6 +1000,14 @@ const SHEETS = {
     url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_talk_png_1354833002.png',
     fw: 97, fh: 91, cols: 9, rows: 3, frameCount: 26,
   },
+  bureaucrat1Walk1: {
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_walk1_png_1354832999.png',
+    fw: 97, fh: 91, cols: 8, rows: 3,
+  },
+  bureaucrat1Walk2: {
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_walk2_png_1354833000.png',
+    fw: 97, fh: 91, cols: 6, rows: 2,
+  },
   bureaucrat2Idle: {
     url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_idle1_png_1354833012.png',
     fw: 97, fh: 96, cols: 10, rows: 6, frameCount: 57,
@@ -998,6 +1016,14 @@ const SHEETS = {
     url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_talk_png_1354833010.png',
     fw: 97, fh: 96, cols: 9, rows: 3, frameCount: 26,
   },
+  bureaucrat2Walk1: {
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_walk1_png_1354833008.png',
+    fw: 97, fh: 96, cols: 8, rows: 3,
+  },
+  bureaucrat2Walk2: {
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_walk2_png_1354833009.png',
+    fw: 97, fh: 96, cols: 6, rows: 2,
+  },
   bureaucrat3Idle: {
     url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_idle1_png_1354833021.png',
     fw: 97, fh: 101, cols: 10, rows: 6, frameCount: 57,
@@ -1005,6 +1031,14 @@ const SHEETS = {
   bureaucrat3Talk: {
     url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_talk_png_1354833019.png',
     fw: 97, fh: 101, cols: 9, rows: 3, frameCount: 26,
+  },
+  bureaucrat3Walk1: {
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_walk1_png_1354833017.png',
+    fw: 97, fh: 101, cols: 8, rows: 3,
+  },
+  bureaucrat3Walk2: {
+    url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_walk2_png_1354833018.png',
+    fw: 97, fh: 101, cols: 6, rows: 2,
   },
   quoin: {
     url: QUOIN_SHEET.url,
@@ -1700,7 +1734,6 @@ let legalizeStartPromise = null;
 let legalizeTransitionBusy = false;
 let legalizeTargets = [];
 let legalizeAutoNextAt = 0;
-let legalizeWaitStartedAt = 0;
 /** Transient source-authored Winter Walk and Winter Haven instance. */
 let winterWalkState = null;
 let winterWalkSourceLocation = null;
@@ -8927,6 +8960,10 @@ const engine = {
   get groundY() {
     return GROUND_Y;
   },
+  /** The name the world calls you by ({pc_label}: "Ur" in solo). */
+  get playerLabel() {
+    return playerSpeechTarget?.label || 'Ur';
+  },
   /** The player's look (character builder), for others to draw (multiplayer). */
   get playerAppearance() {
     return playerAppearance;
@@ -9589,7 +9626,7 @@ const engine = {
     bgLayer.worldH ||= scene.height;
     world.addChildAt(bgLayer, 0);
     WORLD_W = scene.width;
-    GROUND_Y = scene.height - 80;
+    GROUND_Y = Number.isFinite(scene.groundY) ? scene.groundY : scene.height - 80;
     streetPlatforms = scene.platforms || [];
     streetWalls = scene.walls || [];
     climb = { active: false, wall: null };
@@ -13124,56 +13161,48 @@ function drawGregariousGrangeExterior() {
   return layer;
 }
 
+/**
+ * Tiny Speck's own Bureaucratic Hall (bldg_int_bhall.swf, glitch-locations,
+ * CC0): the whole-room backdrop bureaucratic_hall_bg (desk room, the waiting
+ * wall with its orange chairs, the counter opening), drawn 1:1 at its stage
+ * size; js/bureaucratic-hall.js maps the source's x numbers onto it. The
+ * chairs are painted into the backdrop: scenery, nothing to sit on (no chair
+ * item or verb exists in the source). The hall's location XML is lost, so
+ * where the signs hang is our reconstruction: the WAITING AREA plaque and
+ * the waiting-room pictogram on the wall over the chairs, the PLEASE WAIT
+ * stand at the waiting line (source x -220), the Department of
+ * Administrative Affairs lettering on the counter's lintel, the TV and the
+ * light where the remake's hall had them.
+ */
 function drawBureaucraticHall() {
-  const layer = legalizeRoomBase('legalize-bureaucratic-hall');
-  const room = new PIXI.Graphics();
-  room.rect(0, 0, 1600, 620).fill(0xe7e3d4);
-  room.rect(0, 500, 1600, 120).fill(0xd4cfbd);
-  room.rect(0, 620, 1600, 140).fill(0x77766d);
-  for (let x = 0; x < 1600; x += 120) {
-    room.moveTo(x, 620);
-    room.lineTo(x + 60, 760);
-  }
-  room.stroke({ width: 2, color: 0xb9b3a1, alpha: 0.5 });
-  // Chairs and plaque start right of the hall's glass doors (bureaucratic-halls-feature EXIT_X 70, about 190 px wide).
-  for (const x of [250, 340, 430, 520]) {
-    room.roundRect(x, 526, 58, 15, 6);
-    room.roundRect(x + 5, 541, 48, 36, 5);
-    room.rect(x + 11, 575, 6, 45);
-    room.rect(x + 41, 575, 6, 45);
-  }
-  room.fill(0x9a5735);
-  layer.addChild(room);
-
-  const waiting = new PIXI.Text({ text: 'WAITING\nAREA', style: {
-    fontFamily: 'Trebuchet MS, sans-serif',
-    fontSize: 17,
-    fontWeight: '900',
-    fill: 0xeee9d9,
-    align: 'center',
-  } });
-  waiting.anchor.set(0.5);
-  waiting.position.set(415, 460);
-  const plaque = new PIXI.Graphics();
-  plaque.roundRect(355, 420, 120, 76, 5).fill(0x4a4b46);
-  layer.addChild(plaque, waiting);
-
-  const tv = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/bureaucratic_hall_tv_1.png'));
-  tv.anchor.set(0.5);
-  tv.position.set(690, 215);
-  tv.scale.set(0.72);
-  layer.addChild(tv);
-
-  const light = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/bureaucratic_hall_light_1.png'));
-  light.anchor.set(0.5, 0);
-  light.position.set(1110, 18);
-  light.scale.set(1.35);
-  layer.addChild(light);
+  const layer = legalizeRoomBase('legalize-bureaucratic-hall', HALL.width, HALL.height, HALL.ground);
+  layer.worldW = HALL.width;
+  layer.groundY = HALL.ground;
+  // The camera keeps the pack's allowance below the floor: the backdrop's dirt carries on down.
+  const under = new PIXI.Graphics();
+  under.rect(0, HALL.height - 2, HALL.width, 300).fill(0x5d5140);
+  layer.addChild(under);
+  // Decos ship at 2x (js/deco-hires.js): scale 0.5 is their stage size.
+  const deco = (name, x, y, { ax = 0.5, ay = 0.5, scale = 0.5 } = {}) => {
+    const spr = new PIXI.Sprite(textureFromUrl(`assets/decos/groddle/${name}.png`));
+    spr.anchor.set(ax, ay);
+    spr.position.set(x, y);
+    spr.scale.set(scale);
+    layer.addChild(spr);
+    return spr;
+  };
+  deco('bureaucratic_hall_bg', 0, 0, { ax: 0, ay: 0 });
+  deco('bureaucratic_hall_waitingroom_1', 900, 336);
+  deco('sign_waiting_area', 1012, 338);
+  deco('bureaucratic_hall_sign_wait_1', HALL_LAYOUT.waitingLine, HALL.ground - 12, { ay: 1 });
+  deco('bureaucratic_hall_sign_1', 1810, 196);
+  deco('bureaucratic_hall_tv_1', 1330, 178, { scale: 0.72 });
+  deco('bureaucratic_hall_light_1', 980, 74, { ay: 0, scale: 1.35 });
   layer.sortableChildren = true;
   return layer;
 }
 
-function installLegalizeScene(layer, { tsid, label, hubName, spawnX }) {
+function installLegalizeScene(layer, { tsid, label, hubName, spawnX, spawnY = null }) {
   clearWorldEntities();
   if (bgLayer && world) {
     world.removeChild(bgLayer);
@@ -13185,19 +13214,19 @@ function installLegalizeScene(layer, { tsid, label, hubName, spawnX }) {
     tsid,
     label,
     hubName,
-    bounds: { l: 0, r: 1600, t: 0, b: 760 },
+    bounds: { l: 0, r: layer.worldW || 1600, t: 0, b: layer.worldH || 760 },
     platforms: layer.platformsScreen,
     signposts: [],
   };
   currentStreetTsid = tsid;
-  WORLD_W = 1600;
-  GROUND_Y = 620;
+  WORLD_W = layer.worldW || 1600;
+  GROUND_Y = layer.groundY || 620;
   streetPlatforms = layer.platformsScreen;
   streetWalls = [];
   climb = { active: false, wall: null };
   Object.assign(jumpState, createJumpState(movementNow()));
   if (player) {
-    player.position.set(spawnX, GROUND_Y);
+    player.position.set(spawnX, spawnY ?? GROUND_Y);
     player.vx = 0;
     player.vy = 0;
     player.onGround = true;
@@ -13226,6 +13255,8 @@ function makeLegalizeBureaucrat(index, x, y, scale = 0.86) {
   const spr = new PIXI.AnimatedSprite(idle?.length ? idle : [fallback]);
   spr.texturesIdle = idle?.length ? idle : [fallback];
   spr.texturesTalk = talk?.length ? talk : spr.texturesIdle;
+  spr.texturesWalk1 = textures[`bureaucrat${index}Walk1`]?.frames?.length ? textures[`bureaucrat${index}Walk1`].frames : spr.texturesIdle;
+  spr.texturesWalk2 = textures[`bureaucrat${index}Walk2`]?.frames?.length ? textures[`bureaucrat${index}Walk2`].frames : spr.texturesWalk1;
   spr.anchor.set(0.5, 1);
   spr.position.set(x, y);
   spr.scale.set(scale);
@@ -13400,14 +13431,17 @@ function spawnLegalizeHall() {
     tsid: LEGALIZE_HALL_TSID,
     label: 'Bureaucratic Hall',
     hubName: 'Gregarious Grange',
-    spawnX: 135,
+    spawnX: HALL_LAYOUT.arrival.x,
+    spawnY: HALL_LAYOUT.arrival.y,
   });
   legalizeTargets = LEGALIZE_CLERKS.map((clerk, index) => {
-    const spr = makeLegalizeBureaucrat(index, 850 + index * 170, 555, 0.84);
+    const spr = makeLegalizeBureaucrat(index, HALL_LAYOUT.clerkHomes[index], HALL_LAYOUT.clerkBackY, 1);
     spr.zIndex = 40;
     entityLayer.addChild(spr);
+    // The hall's visit (features/bureaucratic-halls-feature.js) owns the bureaucrats' verbs.
     return register({
       classId: 'npc_bureaucrat',
+      featureId: 'bureaucratic-halls',
       label: clerk.name,
       subtitle: index === legalizeRun.clerkIndex ? 'Handling your application' : 'Not your department',
       sprite: spr,
@@ -13415,16 +13449,81 @@ function spawnLegalizeHall() {
     });
   });
   const counter = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/bureaucratic_hall_counter_1.png'));
-  counter.anchor.set(0.5, 1);
-  // x 620-1480: behind the four clerks, clear of the waiting-area chairs (x 250-578).
-  counter.position.set(1050, GROUND_Y);
-  counter.width = 860;
-  counter.height = 132;
+  counter.anchor.set(0, 1);
+  // The same counter as every hall's (features/bureaucratic-halls-feature.js placeCounter).
+  counter.position.set(HALL_LAYOUT.counterLeft, HALL.ground + 4);
+  counter.width = 811;
+  counter.height = 103;
   counter.zIndex = 44;
   counter.eventMode = 'none';
   entityLayer.addChild(counter);
+  // Legalize It runs the hall's own visit, with the recorded session's choices.
+  const done = ['card_owned', 'complete'].includes(legalizeRun.stage);
+  features.query('bureaucraticHallFlow', engine, {
+    targets: legalizeTargets.slice(),
+    label: 'Bureaucratic Hall',
+    script: legalizeHallScript(),
+    start: done ? 'done' : null,
+  });
   refreshLegalizeClerks();
   renderLegalizeHud();
+}
+
+/**
+ * The recorded Legalize It session through the shared hall visit
+ * (js/bureaucratic-hall.js): the first clerk is called with "Attention, Ur!
+ * When you're ready?" (helping_ready 6), passes you on with
+ * purchasing_step1 1 to the second, who asks purchasing_step2 1 and the
+ * recorded "Your favorite color?" (Beige / Other), with no further transfer,
+ * then purchasing_confirm 0 and the 50-currant fee. Each step moves the
+ * quest's own state (js/legalize-it.js).
+ */
+const LEGALIZE_HALL_PICKS = Object.freeze({ helping_ready: 6, purchasing_step1: 1, purchasing_step2: 1, purchasing_confirm: 0 });
+const LEGALIZE_HALL_QUESTION = HALL_QUESTIONS.findIndex((qn) => qn.options.join('|') === 'Beige|Other');
+
+function legalizeHallScript() {
+  const refresh = () => {
+    refreshLegalizeClerks();
+    renderLegalizeHud();
+  };
+  return {
+    pick: (kind) => LEGALIZE_HALL_PICKS[kind] ?? null,
+    question: () => LEGALIZE_HALL_QUESTION,
+    handoff: () => false,
+    helperFor: () => (legalizeRun ? legalizeRun.clerkIndex : null),
+    onHelp: (index) => {
+      if (!legalizeRun) return;
+      // The clerk who comes over handles the application (the nearest free one, as in every hall).
+      legalizeRun.clerkIndex = Math.max(0, Math.min(LEGALIZE_CLERKS.length - 1, index));
+      const called = callLegalizeApplicant(legalizeRun);
+      if (called.ok) pushActivity(`${called.clerk.name} calls you to the counter.`);
+      refresh();
+    },
+    onTalk: () => {
+      if (legalizeRun) beginLegalizeApplication(legalizeRun);
+      refresh();
+    },
+    onItem: () => {
+      if (legalizeRun) requestLegalizeQualification(legalizeRun);
+      refresh();
+    },
+    onAnswer: (optionIndex) => {
+      if (legalizeRun) answerLegalizeQuestion(legalizeRun, Math.min(1, optionIndex));
+    },
+    onPurchase: () => finishLegalizePurchase(),
+    onEnd: (bought) => {
+      if (bought || !legalizeRun || ['card_owned', 'complete'].includes(legalizeRun.stage)) return;
+      // Nevermind: the application starts over. The quest's hall has no street door, so walking
+      // back into the desk room is the "exit and re-enter" (a fresh visit greets you there).
+      Object.assign(legalizeRun, { stage: 'hall_waiting', handoffs: 0, clerkIndex: 0 });
+      setTimeout(() => {
+        if (currentStreetTsid !== LEGALIZE_HALL_TSID || !legalizeRun) return;
+        features.query('bureaucraticHallFlow', engine, { targets: legalizeTargets.slice(), label: 'Bureaucratic Hall', script: legalizeHallScript() });
+        refresh();
+      }, 1000);
+      refresh();
+    },
+  };
 }
 
 function refreshLegalizeClerks() {
@@ -13439,119 +13538,16 @@ function refreshLegalizeClerks() {
       : current
         ? 'Please wait to be called'
         : 'Not your department';
-    target.sprite.alpha = called ? 1 : 0.82;
-    target.sprite.position.set(called ? 520 + index * 70 : 850 + index * 170, called ? GROUND_Y : 555);
-    target.sprite.zIndex = called ? 48 : 40;
   }
-  entityLayer.sortChildren();
   renderLegalizeHud();
 }
 
-function callNextLegalizeClerk() {
-  const called = callLegalizeApplicant(legalizeRun);
-  if (!called.ok) return called;
-  refreshLegalizeClerks();
-  const target = legalizeTargets.find(
-    (entry) =>
-      entry.classId === 'npc_bureaucrat' &&
-      Number(entry.state?.clerkIndex) === Number(legalizeRun.clerkIndex)
-  );
-  if (target) {
-    setLegalizeBureaucratAnimation(target, 'talk', 5200);
-    showSpeechBubble(target, {
-      speaker: called.clerk.name,
-      text: 'Attention, Ur! When you’re ready?',
-      durationMs: 5200,
-    });
-  }
-  pushActivity(`${called.clerk.name} calls you to the counter.`);
-  return called;
-}
-
-function openLegalizeQuestion(result) {
-  openScriptedQuestDialogue({
-    title: result.clerk.name,
-    kicker: 'Bureaucratic Hall',
-    beats: [{
-      text: 'I understand you’re here to procure yourself a Card-Carrying Qualification, is that right?',
-      response: 'YES',
-    }],
-    primaryLabel: 'YES',
-    onComplete: () => openLegalizeQuestionChoice(result),
-  });
-}
-
-function openLegalizeQuestionChoice(result) {
-  const options = result.question.options;
-  openScriptedQuestDialogue({
-    title: result.clerk.name,
-    kicker: 'Bureaucratic Hall',
-    beats: [{ text: result.question.text, response: options[0] }],
-    primaryLabel: options[0],
-    cancelLabel: options[1],
-    cancelable: true,
-    onComplete: () => resolveLegalizeAnswer(0),
-    onCancel: () => resolveLegalizeAnswer(1),
-  });
-}
-
-function openLegalizeItemSelection(result) {
-  openScriptedQuestDialogue({
-    title: result.clerk.name,
-    kicker: 'Available documentation',
-    beats: [{
-      text: 'The following items are available to you:',
-      response: `Card-Carrying Qualification (${LEGALIZE_CARD_COST}c)`,
-    }],
-    primaryLabel: `Qualification (${LEGALIZE_CARD_COST}c)`,
-    cancelLabel: 'Nevermind',
-    cancelable: true,
-    onComplete: transferLegalizeRequest,
-  });
-}
-
-function transferLegalizeRequest() {
-  const result = requestLegalizeQualification(legalizeRun);
-  if (!result.ok) return;
-  refreshLegalizeClerks();
-  openScriptedQuestDialogue({
-    title: LEGALIZE_CLERKS[0].name,
-    kicker: 'Application transferred',
-    beats: [{
-      text: `I understand you’re hoping to attain a Card-Carrying Qualification, Ur. That’s a matter for ${result.clerk.name}. Let me find out if they’re in the office this week.`,
-      response: 'OK',
-    }],
-    onComplete: callNextLegalizeClerk,
-  });
-}
-
-function resolveLegalizeAnswer(optionIndex) {
-  const result = answerLegalizeQuestion(legalizeRun, optionIndex);
-  if (!result.ok) return;
-  openScriptedQuestDialogue({
-    title: result.clerk.name,
-    kicker: 'Application approved',
-    beats: [{
-      text: `Very well. The fee is ${LEGALIZE_CARD_COST}. We only accept cash.`,
-      response: `Pay ${LEGALIZE_CARD_COST}`,
-    }],
-    primaryLabel: `Pay ${LEGALIZE_CARD_COST}`,
-    cancelLabel: 'Nevermind',
-    cancelable: true,
-    onComplete: finishLegalizePurchase,
-  });
-}
-
+/** The fee paid (the hall visit's Pay 50): the quest's purchase; 'ok' or 'broke' for the visit. */
 function finishLegalizePurchase() {
   const result = purchaseQualification(legalizeRun, pc.currants, Date.now());
   if (!result.ok) {
     toast(`You need ${result.shortfall} more currants.`);
-    openScriptedQuestDialogue({
-      title: LEGALIZE_CLERKS[legalizeRun.clerkIndex].name,
-      kicker: 'Insufficient funds',
-      beats: [{ text: "Oops, you don't have enough for that. Come back when you do.", response: 'OK' }],
-    });
-    return;
+    return 'broke';
   }
   pc.currants -= result.cost;
   addItem(inv, LEGALIZE_CARD_ID, 1);
@@ -13560,15 +13556,11 @@ function finishLegalizePurchase() {
   pushActivity(`You paid ${result.cost} currants and received a Card-Carrying Qualification.`);
   floatText(player.x, player.y - 90, 'Qualification acquired', 0xffe066);
   burst(player.x, player.y - 50, 0xffe066, 15);
+  refreshLegalizeClerks();
   renderLegalizeHud();
   updateHud();
-  // items/npc_bureaucrat.js showEndPrompt 909-917: prompts_add, text and one OK, timeout 10 (G198);
-  // G294: a normal prompt, so the bottom-right stack, with no heading.
-  engine.prompt({
-    text: 'Thank you for your business. To conduct another transaction, you must exit and re-enter the Hall.',
-    choices: [{ label: 'OK', value: 'ok' }],
-    timeout: 10,
-  });
+  // The visit then shows items/npc_bureaucrat.js showEndPrompt (js/bureaucratic-hall.js).
+  return 'ok';
 }
 
 function handleLegalizeTarget(target, verbId) {
@@ -13634,40 +13626,17 @@ function handleLegalizeTarget(target, verbId) {
       result = enterBureaucraticHall(legalizeRun);
       spawn = spawnLegalizeHall;
       activity = 'You enter the Bureaucratic Hall.';
-      message = 'Please move into the waiting area to your left.';
+      message = '';
     }
     if (!result.ok || !spawn) return;
     legalizeTransitionBusy = true;
     spawn();
     legalizeTransitionBusy = false;
     pushActivity(activity);
-    toast(message, 4200);
-    if (action === 'enter_hall') {
-      openScriptedQuestDialogue({
-        title: 'Bureaucrat',
-        kicker: 'Bureaucratic Hall',
-        beats: [{
-          text: 'Ur! We will be with you as soon as possible. Now please go and wait.',
-          response: 'Go and wait',
-        }],
-      });
-    }
+    // In the hall a bureaucrat greets you (js/bureaucratic-hall.js), as in every hall.
+    if (message) toast(message, 4200);
     return;
   }
-  if (target.classId !== 'npc_bureaucrat' || verbId !== 'talk_to') return;
-  if (Number(target.state?.clerkIndex) !== Number(legalizeRun.clerkIndex)) {
-    toast('This is not the clerk handling your application.');
-    return;
-  }
-  const result = beginLegalizeApplication(legalizeRun);
-  if (!result.ok) {
-    toast('Please wait until your name is called.');
-    return;
-  }
-  refreshLegalizeClerks();
-  setLegalizeBureaucratAnimation(target, 'talk', 7000);
-  if (result.reason === 'item_selection') openLegalizeItemSelection(result);
-  else openLegalizeQuestion(result);
 }
 
 function activateLegalizeCard() {
@@ -13754,12 +13723,10 @@ async function startLegalizeIt(opts = {}) {
       pushActivity('You return to Gregarious Grange.');
       toast('Enter the Bureaucratic Hall across the meadow.', 3600);
     } else {
+      // location.js 810-819: leaving the hall cleared the visit, so an application under way starts over.
+      if (['hall_called', 'hall_processing'].includes(stage)) Object.assign(legalizeRun, { stage: 'hall_waiting', handoffs: 0, clerkIndex: 0 });
       spawnLegalizeHall();
       pushActivity('You return to the Bureaucratic Hall on Gregarious Grange.');
-      if (stage === 'hall_waiting') {
-        legalizeWaitStartedAt = 0;
-        toast('Please move into the waiting area.', 3600);
-      }
     }
     renderLegalizeHud();
     updateHud();
@@ -13787,7 +13754,6 @@ async function leaveLegalizeIt({ abandon = false } = {}) {
   legalizeRun = null;
   legalizeSourceLocation = null;
   legalizeTargets = [];
-  legalizeWaitStartedAt = 0;
   const hud = document.getElementById('legalize-hud');
   if (hud) hud.hidden = true;
   try {
@@ -13834,26 +13800,7 @@ function updateLegalizeIt() {
       setLegalizeBureaucratAnimation(target, 'idle');
     }
   }
-  if (
-    currentStreetTsid === LEGALIZE_HALL_TSID &&
-    legalizeRun.stage === 'hall_waiting' &&
-    legalizeRun.handoffs === 0 &&
-    player.x >= 250
-  ) {
-    if (!legalizeWaitStartedAt) {
-      legalizeWaitStartedAt = now;
-      // location.js:1123 waiting_area: buffs_apply('please_wait') (10 s), shown in the buff tray.
-      if (!hasBuff(buffState, 'please_wait', now)) engine.applyBuff('please_wait');
-    }
-    if (now - legalizeWaitStartedAt >= 10_000) callNextLegalizeClerk();
-  } else if (
-    legalizeRun.stage === 'hall_waiting' &&
-    legalizeRun.handoffs === 0 &&
-    player.x < 250
-  ) {
-    legalizeWaitStartedAt = 0;
-    if (hasBuff(buffState, 'please_wait', now)) engine.removeBuff('please_wait');
-  }
+  // The waiting area, Please Wait and the calls are the hall's own visit (features/bureaucratic-halls-feature.js).
   const autoplayMode =
     new URLSearchParams(location.search).get('legalizeautoplay') || '';
   const autoplay = ['1', 'hall', 'purchase'].includes(autoplayMode);
@@ -13904,19 +13851,9 @@ function updateLegalizeIt() {
       (entry) => entry.state?.routeAction === 'enter_hall'
     );
     if (hall) handleLegalizeTarget(hall, 'enter');
-  } else if (legalizeRun.stage === 'hall_waiting') {
-    player.x = 300;
-    if (legalizeRun.handoffs === 0) legalizeWaitStartedAt = now - 10_000;
-  } else if (['hall_called', 'hall_processing'].includes(legalizeRun.stage)) {
-    const clerk = legalizeTargets.find(
-      (entry) =>
-        entry.classId === 'npc_bureaucrat' &&
-        Number(entry.state?.clerkIndex) === Number(legalizeRun.clerkIndex)
-    );
-    if (clerk) {
-      player.position.set(clerk.sprite.x - 70, GROUND_Y);
-      handleLegalizeTarget(clerk, 'talk_to');
-    }
+  } else if (['hall_waiting', 'hall_called', 'hall_processing'].includes(legalizeRun.stage)) {
+    // One step of the hall's visit: answer, step into the waiting area, skip the walks and the wait.
+    features.query('hallAutoStep', engine);
   } else if (legalizeRun.stage === 'card_owned') {
     activateLegalizeCard();
   }

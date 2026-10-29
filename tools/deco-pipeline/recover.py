@@ -56,6 +56,19 @@ HELD = {
 }
 
 
+# Decos no archived street places, for rooms the remake rebuilds because their location is lost.
+# The Bureaucratic Hall interiors (LIF101O8CDQ1AMU, LDOCV86VHCD245F, LIF2E3LVGK82J7Q) are not in the
+# locations dump, but their art is: every piece below is embedded in bldg_int_bhall.swf, the hall's
+# own bundle. game.js drawBureaucraticHall places them (the placement is ours).
+SCENE_DECOS = {
+    'bureaucratic_hall_bg': 'the whole hall: desk room, waiting wall with its chairs, counter opening',
+    'sign_waiting_area': 'the WAITING AREA plaque',
+    'bureaucratic_hall_waitingroom_1': 'the waiting-room pictogram (a seated figure and a clock)',
+    'bureaucratic_hall_sign_wait_1': 'the PLEASE WAIT HERE FOR THE NEXT AVAILABLE AGENT stand',
+    'bureaucratic_hall_sign_1': 'the Department of Administrative Affairs, Ministry of Departments lettering',
+}
+
+
 def sha(path):
     return hashlib.sha256(open(path, 'rb').read()).hexdigest()
 
@@ -118,6 +131,7 @@ def cmd_recover(args):
     manifest = json.load(open(MANIFEST))
     twins = sharp.deco_twins()
     miss = missing_now(place, manifest, twins)
+    miss += [n for n in SCENE_DECOS if n not in manifest and n not in miss]
     if args.only:
         only = set(args.only.split(','))
         miss = [n for n in miss if n in only]
@@ -141,7 +155,9 @@ def cmd_recover(args):
         todo.append((n, swf, {
             'swf': audit.swf_label(swf, work), 'swf_sha': mine[:16], 'stage': info['stage'],
             'root_frames': root, 'sprite_frames': longest, 'frame': 1,
-            'variants_differ': others, 'placed': place[n]['count'], 'streets': place[n]['streets'],
+            'variants_differ': others, 'placed': (place.get(n) or {}).get('count', 0),
+            'streets': (place.get(n) or {}).get('streets', 0),
+            **({'scene': SCENE_DECOS[n]} if n in SCENE_DECOS else {}),
         }))
     print(f'{len(todo)} decos to recover', flush=True)
     done = []
@@ -194,6 +210,8 @@ def cmd_audit(args):
     """Score the recovered decos (tools/deco-audit audit --only) and merge their rows into report.json."""
     rec = read_json(RECOVERED, {'decos': {}})['decos']
     names = sorted(n for n in rec if os.path.exists(os.path.join(SRC, n + '.png')))
+    if args.only:
+        names = [n for n in names if n in set(args.only.split(','))]
     real = audit.REPORT
     tmp = os.path.join(args.work, 'report-recovered.json')
     audit.REPORT = tmp
@@ -245,6 +263,9 @@ def cmd_check(args):
     index = audit.bundle_index()
     cands = audit.swf_candidates()
     left = [n for n in miss if n not in HELD and sources(n, place, index, cands)]
+    for n in SCENE_DECOS:
+        if n not in rec:
+            problems.append(f'{n}: a rebuilt room draws it but it is not recovered (run --only {n})')
     for n in HELD:
         if n in manifest or n in rec:
             problems.append(f'{n}: held ({HELD[n]}) but shipped')
