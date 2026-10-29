@@ -33,15 +33,16 @@ describe('the start card holds what the game raises at boot', () => {
     assert.ok(start > 0 && start < card && card < gates && gates < show, 'afterStart, afterStreetCard, the gates, then the screen');
     // One promise chain (awardQueue): screens raised at boot show in the order they were raised.
     assert.match(fn, /awardQueue = awardQueue\s*\n\s*\/\/ STARTCARD/);
-    assert.match(fn, /noteScreenHold\('start card'\)/);
-    assert.match(game, /function afterStart\(\) \{\s*if \(state\.started\) return Promise\.resolve\(\);/);
+    assert.match(fn, /noteScreenHold\(state\.started \? 'look builder' : 'start card'\)/);
+    assert.match(game, /function afterStart\(\) \{\s*if \(!startHeld\(\)\) return Promise\.resolve\(\);/);
+    assert.match(game, /function startHeld\(\) \{\s*return !state\.started \|\| startLookHold;/);
   });
 
   it('beginGame lets them go once the card is down, before the new day', () => {
     const fn = between(game, 'async function beginGame()', "document.getElementById('start-btn').addEventListener");
     const hide = fn.indexOf("getElementById('overlay').classList.add('hidden')");
     const started = fn.indexOf('state.started = true;');
-    const release = fn.indexOf('releaseStartWaiters();');
+    const release = fn.indexOf('releaseStartWaiters();', fn.indexOf('if (!startLookHold) {'));
     const prompts = fn.indexOf('promptStack?.flush();');
     const newDay = fn.indexOf('await maybeNewDay(');
     assert.ok(hide >= 0 && hide < started && started < release && release < newDay, 'released after started, before maybeNewDay queues the new day');
@@ -57,18 +58,75 @@ describe('the start card holds what the game raises at boot', () => {
 
   it('holds scripted dialogs, quest offers and prompts until the start', () => {
     const hold = between(game, 'function holdScriptedDialog(opts)', 'function familiarWaitsForScreen(');
-    assert.match(hold, /!\(!state\.started \|\| menuTarget/);
+    assert.match(hold, /!\(startHeld\(\) \|\| menuTarget/);
     const release = between(game, 'function releaseHeldScriptedDialog()', 'function closeQuestDialogue(');
-    assert.match(release, /if \(!state\.started \|\| !heldScriptedDialogs\.length/);
-    assert.match(game, /questOffersHeld: \(\) => !state\.started \|\| features\.query\('holdQuestOffers', engine\) === true/);
+    assert.match(release, /if \(startHeld\(\) \|\| !heldScriptedDialogs\.length/);
+    assert.match(game, /questOffersHeld: \(\) => startHeld\(\) \|\| features\.query\('holdQuestOffers', engine\) === true/);
     assert.match(game, /afterStart: \(\) => afterStart\(\),/);
-    assert.match(between(game, 'function promptStackUi()', 'function isVogOpen()'), /held: \(\) => !state\.started,/);
+    assert.match(between(game, 'function promptStackUi()', 'function isVogOpen()'), /held: \(\) => startHeld\(\),/);
   });
 
   it('a skill finished while away completes at boot, before the card is answered', () => {
     // The boot catch-up (a returning save) and the QA route that stands in for it.
     assert.match(game, /handleSkillCompletions\(tickSkillStudy\(skillState, Date\.now\(\)\)\.completed, \{ offline: true \}\);\s*backfillStreetVisits\(\);/);
     assert.match(game, /skillState\.queue\[demoSkill\]\.endsAt = Date\.now\(\) \+ Math\.min\(-1, remaining\) \* 1000;\s*handleSkillCompletions\(tickSkillStudy\(skillState, Date\.now\(\)\)\.completed, \{ offline: true \}\);/);
+  });
+});
+
+// LOOKHOLD (Austin 2026-10-29): with "Customize look first" the skill-learned panel opened over
+// the look builder; it and the other held screens now wait until the builder closes.
+describe('Customize look first holds them until the look builder closes', () => {
+  it('beginGame keeps the hold when the builder opens from the card', () => {
+    const fn = between(game, 'async function beginGame()', "document.getElementById('start-btn').addEventListener");
+    const started = fn.indexOf('state.started = true;');
+    const hold = fn.indexOf('if (openBuilderOnStart) startLookHold = true;');
+    const restack = fn.indexOf('windowStack?.restack();');
+    const gated = fn.indexOf('if (!startLookHold) {');
+    const release = fn.indexOf('releaseStartWaiters();', gated);
+    const prompts = fn.indexOf('promptStack?.flush();', gated);
+    assert.ok(started < hold && hold < restack && restack < gated && gated < release && release < prompts, 'the card lets its top place go; the waiters wait');
+    // The builder opens, and a missing builder never strands the hold.
+    assert.match(fn, /openAvatarPanel\(\);\s*if \(app\?\.canvas && startLookHold\) app\.canvas\.dataset\.startLookHold = 'held';[\s\S]*?if \(!isAvatarOpen\(\)\) releaseStartLookHold\(\);/);
+  });
+
+  it('closing the builder lets them go, in order; queued screens name the builder as their hold', () => {
+    const close = between(game, 'function closeAvatarPanel()', 'const VECTOR_BUILDER_TABS');
+    assert.match(close, /const wasOpen = Boolean\(panel && !panel\.hidden\);/);
+    assert.match(close, /if \(wasOpen\) releaseStartLookHold\(\);/);
+    const release = between(game, 'function releaseStartLookHold()', '/** A visible element by id');
+    assert.match(release, /if \(!startLookHold\) return;\s*startLookHold = false;/);
+    assert.ok(release.indexOf('releaseStartWaiters();') < release.indexOf('promptStack?.flush();'), 'screens and the panel first, then prompts');
+    assert.match(between(game, 'function queueScreen(', 'function noteScreenHold('), /if \(startHeld\(\)\) noteScreenHold\(state\.started \? 'look builder' : 'start card'\);/);
+  });
+
+  it('the familiar panel waits through the builder too (afterStart)', async () => {
+    _resetFamiliarDialog();
+    const data = {};
+    // A stand-in for game.js's gate: started, but the builder from the card is open.
+    let started = true;
+    let lookHold = true;
+    const waiters = [];
+    const held = () => !started || lookHold;
+    const afterStart = () => (held() ? new Promise((r) => waiters.push(r)) : Promise.resolve());
+    const engine = {
+      param: () => null,
+      get started() { return started; },
+      setData: (k, v) => { data[k] = v; },
+      skillLearnedInfo: (id) => ({ classTsid: id, name: id, learned: '', next: [] }),
+      afterStart,
+      afterStreetCard: async () => {},
+      playSound: () => {},
+    };
+    familiarDialogFeature.init(engine);
+    familiarDialogFeature.onEvent('skill_learned:croppery_2', 1, engine);
+    await tick();
+    assert.equal(data.familiarLast, undefined, 'nothing over the look builder');
+    lookHold = false; // closeAvatarPanel -> releaseStartLookHold
+    for (const r of waiters.splice(0)) r();
+    await tick();
+    await tick();
+    assert.equal(data.familiarLast, 'croppery_2');
+    _resetFamiliarDialog();
   });
 });
 

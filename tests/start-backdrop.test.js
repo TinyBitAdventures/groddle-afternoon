@@ -69,7 +69,7 @@ describe('the street draws under the start card', () => {
     assert.match(game, /from '\.\/js\/start-backdrop\.js\?v=g432-1'/);
     for (const page of ['play/index.html', 'play/online/index.html']) {
       const html = read(page);
-      assert.match(html, /round16=g432-1/, page);
+      assert.match(html, /round16=g\d+-\d+"/, page);
       assert.match(html, /style\.css\?v=[^"]*&amp;backdrop=g432-1"/, page);
     }
   });

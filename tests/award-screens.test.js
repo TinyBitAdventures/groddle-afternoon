@@ -374,7 +374,7 @@ describe('the game wires the screens', () => {
     assert.doesNotMatch(game, /NEW_DAY_HOLD_MS|holdMs: 1_800/);
     assert.match(game, /screen: update\.def\.category === 'trophies' \? 'collection' : undefined,/);
     // The serial queue (one screen after another), now gated (G364).
-    assert.match(game, /awardQueue = awardQueue\n(?:\s*\/\/[^\n]*\n)*\s*\.then\(\(\) => \{\n\s*if \(!state\.started\) noteScreenHold\('start card'\);\n\s*return afterStart\(\);\n\s*\}\)\n[^\n]*\n\s*\.then\(\(\) => afterStreetCard\(\)\)\n[^\n]*\n\s*\.then\(\(\) => waitForScreenGates\(screenGateState, \{ requiresFocus, closedAt: screenClosedAt, onHold: noteScreenHold \}\)\)\n\s*\.then\(show\)/);
+    assert.match(game, /awardQueue = awardQueue\n(?:\s*\/\/[^\n]*\n)*\s*\.then\(\(\) => \{\n\s*if \(startHeld\(\)\) noteScreenHold\(state\.started \? 'look builder' : 'start card'\);\n\s*return afterStart\(\);\n\s*\}\)\n[^\n]*\n\s*\.then\(\(\) => afterStreetCard\(\)\)\n[^\n]*\n\s*\.then\(\(\) => waitForScreenGates\(screenGateState, \{ requiresFocus, closedAt: screenClosedAt, onHold: noteScreenHold \}\)\)\n\s*\.then\(show\)/);
     assert.match(game, /return queueScreen\(async \(\) => \{\n\s*const el = document\.getElementById\('award-screen'\);[\s\S]{0,140}await showAwardScreen\(el, payload\);/);
     const html = read('play/index.html');
     assert.match(html, /<button type="button" class="new-day-btn" data-nd-ok>Onwards and upwards!<\/button>/);

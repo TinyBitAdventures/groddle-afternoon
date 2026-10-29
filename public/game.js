@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-258';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-261';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g428-1';
@@ -612,9 +612,10 @@ import {
   consumeCountChoices,
   clampConsumeCount,
   previewConsume,
+  limitCountCap,
   useItemMany,
   recordFoodEatMany,
-} from './js/eat-many.js?v=g423-1';
+} from './js/eat-many.js?v=g433-1';
 import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
@@ -2194,7 +2195,7 @@ function queueScreen(show, { requiresFocus = true } = {}) {
     // STARTCARD: nothing shows over (or under) the start card; a skill finished while away
     // waits until the player starts (Start exploring, Customize look first, the tutorial, Skip).
     .then(() => {
-      if (!state.started) noteScreenHold('start card');
+      if (startHeld()) noteScreenHold(state.started ? 'look builder' : 'start card');
       return afterStart();
     })
     // TSFrontController.tryShowScreenViewFromQ 3396: screens wait for the loading card (G192).
@@ -2223,14 +2224,35 @@ function noteScreenHold(why) {
  */
 const startWaiters = [];
 
-/** Resolves once the player has started (state.started). */
+/**
+ * LOOKHOLD (Austin 2026-10-29): "Customize look first" (or the look buttons before the start)
+ * opens the look builder as the card goes; what waits for the start keeps waiting until the
+ * builder closes, so the skill-learned panel never opens over it.
+ */
+let startLookHold = false;
+
+/** True while the start card is up, or the look builder opened from it is. */
+function startHeld() {
+  return !state.started || startLookHold;
+}
+
+/** Resolves once the player has started (state.started) and closed a look builder opened from the card. */
 function afterStart() {
-  if (state.started) return Promise.resolve();
+  if (!startHeld()) return Promise.resolve();
   return new Promise((resolve) => startWaiters.push(resolve));
 }
 
 function releaseStartWaiters() {
   for (const resolve of startWaiters.splice(0)) resolve();
+}
+
+/** LOOKHOLD: the builder from the start card has closed; what waited goes now, in order. */
+function releaseStartLookHold() {
+  if (!startLookHold) return;
+  startLookHold = false;
+  if (app?.canvas) app.canvas.dataset.startLookHold = 'released';
+  releaseStartWaiters();
+  promptStack?.flush();
 }
 
 /** A visible element by id (not [hidden]). */
@@ -3034,9 +3056,10 @@ function getPackUseInfo(classTsid) {
  * The pack card's count chooser for an eat or drink the source let take a
  * count (js/eat-many.js; InteractionMenuController.as 974-993), or null.
  * Ordinary eats and drinks only: a feature's own Eat (Licorice), a buff
- * herb's Munch and a feature that limits eats one by one (seasonal candy,
- * pumpkin pie: packUseGate) stay one at a time. Paradise tickets' Eat takes
- * a count with no cap (paradise_ticket.js verbs.eat).
+ * herb's Munch and a feature gate with no count rule stay one at a time.
+ * Seasonal candy and pumpkin pie take a count up to what their daily limit
+ * leaves (packEatLimit; birch_candy.js 133-146, pumpkin_pie.js 100-112).
+ * Paradise tickets' Eat takes a count with no cap (paradise_ticket.js verbs.eat).
  */
 function packEatManyInfo(classTsid, useInfo, stack) {
   const have = Math.max(0, Math.floor(Number(stack) || 0));
@@ -3048,12 +3071,15 @@ function packEatManyInfo(classTsid, useInfo, stack) {
   if (!useInfo?.usable || useInfo.buff) return null;
   if (useInfo.food && !useInfo.food.gate.ok) return null;
   if (features.query('packUseInfo', classTsid, engine)) return null;
-  if (features.query('packUseGate', classTsid, engine) != null) return null;
+  // A feature's daily limit (candy 11, pie 5) lets a count through while it is open.
+  const limit = features.query('packEatLimit', classTsid, engine);
+  const gate = features.query('packUseGate', classTsid, engine);
+  if (gate != null && !(limit && gate.ok !== false)) return null;
   const base = getItemUseInfo(classTsid);
   if (base.verb !== useInfo.verb || !consumeTakesCount(classTsid, base)) return null;
-  const cap = consumeCountCap(base, pc, have, { energyMax: energyCap() });
+  const cap = limitCountCap(consumeCountCap(base, pc, have, { energyMax: energyCap() }), limit);
   if (cap.max < 2) return null;
-  return { ticket: false, verb: base.verb, kind: base.kind, info: base, plural, max: cap.max, cap };
+  return { ticket: false, verb: base.verb, kind: base.kind, info: base, plural, max: cap.max, cap, limit };
 }
 
 /** The chooser's line for `qty`: the effects that count would give now. */
@@ -3064,10 +3090,31 @@ function packEatPreview(many, useInfo, qty) {
     if (Math.min(room, PARADISE_TICKET_EAT.energy * qty) > 0) fx.energy = Math.min(room, PARADISE_TICKET_EAT.energy * qty);
     return fx;
   }
-  return previewConsume(many.info, pc, qty, {
+  const fx = previewConsume(many.info, pc, qty, {
     energyMax: energyCap(),
     varietyImg: useInfo.food?.quote?.img || 0,
   });
+  // The candy that makes eleven aches: -10 mood (birch_candy.js 159-161).
+  if (many.limit?.toothacheMood && qty >= many.limit.left) {
+    const lost = Math.min(many.limit.toothacheMood, Math.max(0, (pc.mood || 0) + (fx.mood || 0)));
+    if (lost > 0) fx.mood = (fx.mood || 0) - lost;
+    if (!fx.mood) delete fx.mood;
+  }
+  return fx;
+}
+
+/** The chooser's line when a daily limit or the energy cuts the count, or `qty` makes eleven candies. */
+function packEatCapNote(many, qty) {
+  const left = many.cap.stack - many.max;
+  const rest = left === 1 ? 'the last one stays' : `the other ${left} stay`;
+  if (many.limit?.kind === 'candy' && many.cap.cappedBy !== 'candy' && qty >= many.limit.left) {
+    return 'That makes eleven today: the last one brings a toothache.';
+  }
+  if (many.cap.cappedBy === 'candy') {
+    return `Eleven candies a day: ${many.max} more today and the last one brings a toothache, so ${rest} in your pack.`;
+  }
+  if (many.cap.cappedBy === 'pie') return `Five pies a day: ${many.max} more today, so ${rest} in your pack.`;
+  return many.cap.cappedBy ? `Your ${many.cap.cappedBy} is full after ${many.max}, so ${rest} in your pack.` : '';
 }
 
 function showToolRepairFx(label, durationMs) {
@@ -3337,10 +3384,7 @@ function renderPackPopover(classTsid, anchor = null) {
         const preview = Object.entries(packEatPreview(eatMany, useInfo, qty))
           .map(([stat, amount]) => `<span class="pack-pop-effect${amount < 0 ? ' loss' : ''}">${amount > 0 ? '+' : ''}${amount} ${escapeHtml(stat === 'xp' ? 'iMG' : stat)}</span>`)
           .join('');
-        const left = eatMany.cap.stack - eatMany.max;
-        const capNote = eatMany.cap.cappedBy
-          ? `Your ${eatMany.cap.cappedBy} is full after ${eatMany.max}, so ${left === 1 ? 'the last one stays' : `the other ${left} stay`} in your pack.`
-          : '';
+        const capNote = packEatCapNote(eatMany, qty);
         const fullNow = useInfo.food ? Math.round(useInfo.food.fullness.percent) : null;
         const fullAfter = useInfo.food
           ? Math.round(foodFullness({ foodToday: foodState.foodToday + (packEatPreview(eatMany, useInfo, qty).energy || 0) }, 100).percent)
@@ -4299,7 +4343,9 @@ function usePackItem(classTsid, count = 1) {
   // How many go in: one, or the chosen count cut to the stack and the source caps.
   let eatCount = 1;
   if (!buffInfo?.def && Math.floor(Number(count) || 1) > 1 && consumeTakesCount(classTsid, ordinaryInfo)) {
-    const cap = consumeCountCap(ordinaryInfo, pc, countItem(inv, classTsid), { energyMax: energyCap() });
+    // Candy and pie: cut to today's limit first, then the energy (packEatLimit).
+    const limit = features.query('packEatLimit', classTsid, engine);
+    const cap = limitCountCap(consumeCountCap(ordinaryInfo, pc, countItem(inv, classTsid), { energyMax: energyCap() }), limit);
     eatCount = Math.max(1, Math.min(Math.floor(Number(count)), cap.max));
   }
   // Drinks never count toward fullness or food history in the source.
@@ -4337,6 +4383,8 @@ function usePackItem(classTsid, count = 1) {
   }
   const eaten = eatCount > 1 ? r.count || eatCount : 1;
   emitGameEvent(`${classTsid}:${String(ordinaryInfo?.verb || 'use').toLowerCase()}`, eaten);
+  // A batch that met a feature's cap (the toothache, the fifth pie) says its line in the one toast.
+  const capLine = eaten > 1 ? features.query('packEatLine', classTsid, engine) : null;
   // food.js / drink.js: items_eaten, meals_eaten, items_drank (+ alcohol).
   if (ordinaryInfo?.usable) {
     const meta = ITEM_CATALOG[classTsid] || {};
@@ -4378,7 +4426,7 @@ function usePackItem(classTsid, count = 1) {
       : foodResult?.fullness?.percent >= 50
         ? ' You are starting to feel kinda full.'
         : '';
-  toast(`${r.msgs[0]}${buffSuffix}${fullnessSuffix}`, r.pending || foodResult?.bonus ? 4400 : 3200);
+  toast(`${r.msgs[0]}${buffSuffix}${fullnessSuffix}${capLine ? ` ${capLine}` : ''}`, r.pending || foodResult?.bonus || capLine ? 4400 : 3200);
   if (r.effects) {
     pushActivity({ base: r.msgs[0] || 'You used an item', effects: r.effects });
   } else {
@@ -6924,7 +6972,7 @@ function promptStackUi() {
     mount: () => document.getElementById('game-root'),
     viewHeight: () => locationViewRect()?.height || 0,
     // STARTCARD: prompts raised while the start card is up wait in the queue (beginGame flushes it).
-    held: () => !state.started,
+    held: () => startHeld(),
     playSound: (key) => playSound(key, { volume: 0.45 }),
     setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
   });
@@ -8127,8 +8175,11 @@ function openAvatarPanel() {
 
 function closeAvatarPanel() {
   const panel = document.getElementById('avatar-panel');
+  const wasOpen = Boolean(panel && !panel.hidden);
   if (panel) panel.hidden = true;
   stopAvatarPreviewLoop();
+  // LOOKHOLD: the builder from the start card closing lets the held screens go.
+  if (wasOpen) releaseStartLookHold();
 }
 
 /** Builder tabs: Tiny Speck's starter picker, then the vector Glitch's parts. */
@@ -9081,7 +9132,7 @@ const engine = {
   acting: () => Boolean(currentAction || menuTarget),
   questDialogueOpen: () => isQuestDialogueOpen(),
   /** True while a feature holds the Magic Rock quiet (rook attack, Naraka, meditation). */
-  questOffersHeld: () => !state.started || features.query('holdQuestOffers', engine) === true,
+  questOffersHeld: () => startHeld() || features.query('holdQuestOffers', engine) === true,
   /** STARTCARD: resolves once the player has left the start card (familiar-dialog-feature waits on it). */
   afterStart: () => afterStart(),
   /** A quest offer: the recovered beats, then accept / decline. `inLog` opens it inside the Quests dialog (G225). */
@@ -21190,7 +21241,7 @@ function holdScriptedDialog(opts) {
   // onEmergencyTick 335-340); with one card, the croak prompt used to push Hell's offer off.
   const underEmergency = !opts?.offer && isQuestDialogueOpen() && questDialogueState?.urgent === true;
   // STARTCARD: and anything raised while the start card is up waits for the player to start.
-  if (!opts || !(!state.started || menuTarget || enterChooser?.isOpen() || underEmergency || familiarWaitsForScreen(opts))) return false;
+  if (!opts || !(startHeld() || menuTarget || enterChooser?.isOpen() || underEmergency || familiarWaitsForScreen(opts))) return false;
   heldScriptedDialogs.push(opts);
   if (app?.canvas) app.canvas.dataset.dialogHeld = String(heldScriptedDialogs.length);
   return true;
@@ -21210,7 +21261,7 @@ function familiarWaitsForScreen(opts) {
 }
 
 function releaseHeldScriptedDialog() {
-  if (!state.started || !heldScriptedDialogs.length || menuTarget || enterChooser?.isOpen() || isQuestDialogueOpen() || isVogOpen()) return;
+  if (startHeld() || !heldScriptedDialogs.length || menuTarget || enterChooser?.isOpen() || isQuestDialogueOpen() || isVogOpen()) return;
   if (familiarWaitsForScreen(heldScriptedDialogs[0])) return;
   const next = heldScriptedDialogs.shift();
   // G228: a held VOG goes back to its own overlay.
@@ -24618,6 +24669,8 @@ async function main() {
     // `&foodcount=N` sets the stack (Eat how many?), `&foodenergy=N` the energy to start from.
     const demoCount = Math.floor(Number(bootParams.get('foodcount')));
     inv[demoFood] = Number.isFinite(demoCount) && demoCount > 0 ? demoCount : Math.max(1, inv[demoFood] || 0);
+    // `&foodonly=1`: nothing else in the pack, so a food the full starter pack would leave in the magic rock shows.
+    if (bootParams.get('foodonly') === '1') for (const cls of Object.keys(inv)) if (cls !== demoFood) delete inv[cls];
     // The variety bonus needs the Appreciation of Food Variety upgrade card.
     if (!pc.imaginationUpgrades.includes(FOOD_VARIETY_UPGRADE)) pc.imaginationUpgrades.push(FOOD_VARIETY_UPGRADE);
     const demoEnergy = Number(bootParams.get('foodenergy'));
@@ -25935,11 +25988,15 @@ async function main() {
     if (state.started) return;
     document.getElementById('overlay').classList.add('hidden');
     state.started = true;
+    // LOOKHOLD: with "Customize look first" it all waits for the builder to close instead.
+    if (openBuilderOnStart) startLookHold = true;
     // STARTCARD: what was raised while the card was up goes now, in order (screens, the
     // familiar's panel, prompts); the stack lets the card's top place go.
     windowStack?.restack();
-    releaseStartWaiters();
-    promptStack?.flush();
+    if (!startLookHold) {
+      releaseStartWaiters();
+      promptStack?.flush();
+    }
     // QA (G357, before the audio wait, which never settles under autostart): &speechdemo=<line> stands the player beside the nearest short speaker
     // (animals first, &speechclass=<classId> to pick) and has it say the line every 4 s.
     const speechDemo = bootParams.get('speechdemo');
@@ -25991,6 +26048,9 @@ async function main() {
     if (openBuilderOnStart) {
       openBuilderOnStart = false;
       openAvatarPanel();
+      if (app?.canvas && startLookHold) app.canvas.dataset.startLookHold = 'held';
+      // LOOKHOLD: no builder to wait for (its panel missing) lets everything go now.
+      if (!isAvatarOpen()) releaseStartLookHold();
     }
     // New day if 4 real hours elapsed (or ?newday=1 for a demo fire)
     const params = new URLSearchParams(location.search);

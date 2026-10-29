@@ -244,6 +244,7 @@ export const SOURCE_LINES = Object.freeze({
   forgot: 'Ok, forgot that one.',
   toothache: (lost) => `OW! TOOTHACHE! Stupid candy. Stupid, delicious, scrumptious, addictive candy. No more candy today. You lose ${lost} mood.`,
   noMoreCandy: "No more candy today. You don't want toothache again.",
+  noMorePie: 'No more pie. You cannot possibly eat another slice.',
   candyEaten: "Hey! They're eating the candy! They like it! Yay!",
   crackerWait: 'You are waiting for somebody to help pull your Glitchmas Cracker.',
   crackerAway: 'You put your Glitchmas Cracker away.',
@@ -390,13 +391,31 @@ export function candyEatGate(state, dayKey) {
   return dailyRow(state, dayKey).candy >= CANDY_DAILY_MAX ? { ok: false, msg: SOURCE_LINES.noMoreCandy } : { ok: true };
 }
 
-/** pumpkin_pie: five pies a game day. */
+/** pumpkin_pie specialConditions (pumpkin_pie.js 238-261): five pies a game day, then its line. */
 export function pieEatGate(state, dayKey) {
-  return dailyRow(state, dayKey).pies >= PIE_DAILY_MAX ? { ok: false, msg: 'You can only eat five pies a day.' } : { ok: true };
+  return dailyRow(state, dayKey).pies >= PIE_DAILY_MAX ? { ok: false, msg: SOURCE_LINES.noMorePie } : { ok: true };
 }
 
 /**
- * One candy eaten (the remake eats one at a time). Returns
+ * How many more one Eat may take today (Eat how many?, js/eat-many.js), or null for
+ * other items. Candy: num_can_eat = 11 - candy_eaten today, msg.count cut to it, the
+ * last one aches (items/birch_candy.js 134-141, 159-164; corn_syrup_squares.js and
+ * carobish_treats.js the same). Pie: num_can_eat = 5 - pies_eaten today
+ * (items/pumpkin_pie.js 100-109). Returns { kind, daily, eaten, left, toothacheMood? }.
+ */
+export function dailyEatLimit(state, dayKey, classTsid) {
+  const row = dailyRow(state, dayKey);
+  if (CANDY_CLASSES.includes(classTsid)) {
+    return { kind: 'candy', daily: CANDY_DAILY_MAX, eaten: row.candy, left: Math.max(0, CANDY_DAILY_MAX - row.candy), toothacheMood: TOOTHACHE_MOOD };
+  }
+  if (classTsid === 'pumpkin_pie') {
+    return { kind: 'pie', daily: PIE_DAILY_MAX, eaten: row.pies, left: Math.max(0, PIE_DAILY_MAX - row.pies) };
+  }
+  return null;
+}
+
+/**
+ * One candy eaten (a batch calls this once per candy, in order). Returns
  * { total, toothache, rush: 'apply' | 'extend' | null, counter }.
  * Source: the eleventh candy aches and gives no Sugar Rush; a rush already
  * running is extended by one buff duration per candy.

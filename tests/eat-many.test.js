@@ -15,10 +15,14 @@ import {
   consumeCountChoices,
   clampConsumeCount,
   previewConsume,
+  limitCountCap,
   useItemMany,
   recordFoodEatMany,
-} from '../public/js/eat-many.js?v=g423-1';
-import { getItemUseInfo, registerItemUse, useItem, countItem } from '../public/js/inventory.js?v=catalog-unified-7';
+} from '../public/js/eat-many.js?v=g433-1';
+import { CANDY_CLASSES, CANDY_DAILY_MAX, PIE_DAILY_MAX, SOURCE_LINES, dailyEatLimit, pieEatGate } from '../public/js/seasons.js?v=g433-1';
+import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=g433-1';
+import { getGameDayKey } from '../public/js/game-day.js?v=dametime-4';
+import { createInventory, getItemUseInfo, registerItemUse, useItem, countItem } from '../public/js/inventory.js?v=catalog-unified-7';
 import { FOOD_VARIETY_UPGRADE, createFoodState, recordFoodEat } from '../public/js/food.js?v=food-memory-8';
 
 const root = join(import.meta.dirname, '..');
@@ -219,7 +223,9 @@ describe('the pack card chooser', () => {
     assert.match(fn, /useInfo\.buff\) return null;/);
     assert.match(fn, /useInfo\.food && !useInfo\.food\.gate\.ok\) return null;/);
     assert.match(fn, /features\.query\('packUseInfo', classTsid, engine\)\) return null;/);
-    assert.match(fn, /features\.query\('packUseGate', classTsid, engine\) != null\) return null;/);
+    // A feature gate keeps it single unless the feature also gives a count rule (candy, pie) and is open.
+    assert.match(fn, /const limit = features\.query\('packEatLimit', classTsid, engine\);/);
+    assert.match(fn, /if \(gate != null && !\(limit && gate\.ok !== false\)\) return null;/);
     assert.match(fn, /if \(cap\.max < 2\) return null;/);
   });
 
@@ -227,5 +233,146 @@ describe('the pack card chooser', () => {
     const css = readFileSync(join(root, 'public/style.css'), 'utf8');
     assert.match(css, /\.pack-eat-quantity \.pack-eat-choice\.is-selected \{/);
     assert.match(css, /\.pack-eat-quantity button:focus-visible \{/);
+  });
+});
+
+describe('seasonal candy and pumpkin pie take a count (Austin 2026-10-29)', () => {
+  const item = (name) => readFileSync(join(gsjs, 'items', name), 'utf8');
+  const noGsjs = !existsSync(join(gsjs, 'items')) && 'no GSJS checkout';
+
+  it('cuts the count to what is left today, as the handlers did', { skip: noGsjs }, () => {
+    for (const cls of CANDY_CLASSES) {
+      const src = item(`${cls}.js`);
+      // birch_candy.js 134-141: num_can_eat = 11 - candy_eaten today; msg.count cut to it.
+      assert.match(src, /var num_can_eat = 11 - num_candies_eaten;\s*\/\/ Don't let the player eat more than the number that gives them toothache\.\s*if \(msg\.count > num_can_eat\) \{\s*msg\.count = num_can_eat;/);
+      // 159-164: one toothache when the batch makes eleven, -10 mood, and the last one gives no rush.
+      assert.match(src, /if \(\(num_candies_eaten \+ num\) >= 11\) \{\s*var mood_loss = Math\.abs\(pc\.metabolics_lose_mood\(10\)\);/);
+      assert.match(src, /num -= 1; \/\/ subtract one - the final candy doesn't give sugar rush/);
+    }
+    assert.equal(CANDY_DAILY_MAX, 11);
+    const pie = item('pumpkin_pie.js');
+    // pumpkin_pie.js 100-117: num_can_eat = 5 - pies_eaten; pies_eaten += msg.count; Full of Pie once.
+    assert.match(pie, /var num_can_eat = 5 - num_pies_eaten;[\s\S]*?msg\.count = num_can_eat;/);
+    assert.match(pie, /pc\.achievements_increment_daily\('pies_eaten', 'pumpkin', msg\.count\);\s*pc\.buffs_apply\('full_of_pie'\);/);
+    assert.equal(PIE_DAILY_MAX, 5);
+    // 254-257: the line once the five are eaten.
+    assert.ok(pie.includes(`reason:"${SOURCE_LINES.noMorePie}"`));
+    // food.js 207: food_eat hands back the count it really ate (the energy cut), which the
+    // candy and pie handlers then count.
+    assert.match(readFileSync(join(gsjs, 'items/include/food.js'), 'utf8'), /\n\tmsg\.count = count;\n\treturn true;/);
+  });
+
+  it('dailyEatLimit and limitCountCap: the daily limit first, then the energy', () => {
+    const day = 'd1';
+    const st = { daily: { day, candy: 8, pies: 3, nog: 0, pi: 0, treats: {} } };
+    const candy = dailyEatLimit(st, day, 'birch_candy');
+    assert.deepEqual(candy, { kind: 'candy', daily: 11, eaten: 8, left: 3, toothacheMood: 10 });
+    assert.deepEqual(dailyEatLimit(st, day, 'pumpkin_pie'), { kind: 'pie', daily: 5, eaten: 3, left: 2 });
+    assert.equal(dailyEatLimit(st, day, 'meat'), null);
+    // Five candies, energy for all five: three today, named by the candy limit.
+    const roomy = { max: 5, stack: 5, need: 9, cappedBy: null, full: false };
+    assert.deepEqual(limitCountCap(roomy, candy), { ...roomy, max: 3, cappedBy: 'candy', limit: candy });
+    // Energy for only two: the energy cut binds.
+    const tight = { max: 2, stack: 5, need: 2, cappedBy: 'energy', full: false };
+    assert.equal(limitCountCap(tight, candy).max, 2);
+    assert.equal(limitCountCap(tight, candy).cappedBy, 'energy');
+    // Three in the pack and three left: not capped (the note says the last one aches instead).
+    const three = { max: 3, stack: 3, need: 9, cappedBy: null, full: false };
+    assert.equal(limitCountCap(three, candy).cappedBy, null);
+    assert.equal(limitCountCap(roomy, null), roomy);
+    assert.deepEqual(pieEatGate({ daily: { day, candy: 0, pies: 5, nog: 0, pi: 0, treats: {} } }, day), { ok: false, msg: 'No more pie. You cannot possibly eat another slice.' });
+  });
+
+  /** A seasons-feature engine with the buffs and lines it touches. */
+  function seasonEngine({ mood = 50 } = {}) {
+    const buffs = {};
+    const calls = { apply: [], extend: [], toasts: [], activity: [], achievements: [] };
+    const engine = {
+      pc: { mood, energy: 50 },
+      inv: createInventory(),
+      param: () => null,
+      hasBuff: (id) => Boolean(buffs[id]),
+      applyBuff: (id, opts = {}) => {
+        if (opts.extendMs && buffs[id]) { buffs[id] += opts.extendMs; calls.extend.push(id); return; }
+        buffs[id] = 120_000;
+        calls.apply.push(id);
+      },
+      achievement: (counter, n) => calls.achievements.push([counter, n]),
+      toast: (msg) => calls.toasts.push(msg),
+      pushActivity: (row) => calls.activity.push(typeof row === 'string' ? row : row.base),
+      updateHud: () => {},
+      save: () => {},
+      setData: () => {},
+    };
+    return { engine, buffs, calls };
+  }
+
+  it('three candies with eight eaten: the rule three times in order, one toothache, no toast of its own', () => {
+    seasonsFeature._reset();
+    seasonsFeature.restore({ daily: { day: getGameDayKey(Date.now()), candy: 8, pies: 0, nog: 0, pi: 0, treats: {} } }, null);
+    const { engine, buffs, calls } = seasonEngine({ mood: 50 });
+    assert.deepEqual(seasonsFeature.packEatLimit('birch_candy'), { kind: 'candy', daily: 11, eaten: 8, left: 3, toothacheMood: 10 });
+    seasonsFeature.onEvent('birch_candy:eat', 3, engine);
+    assert.equal(seasonsFeature._state().state.daily.candy, 11);
+    // The ninth applies the rush, the tenth extends it, the eleventh aches (birch_candy.js 159-189).
+    assert.deepEqual(calls.apply, ['sugar_rush']);
+    assert.deepEqual(calls.extend, ['sugar_rush']);
+    assert.equal(buffs.sugar_rush, 240_000);
+    assert.equal(engine.pc.mood, 40);
+    assert.deepEqual(calls.toasts, [], 'the pack shows the one toast');
+    const line = 'OW! TOOTHACHE! Stupid candy. Stupid, delicious, scrumptious, addictive candy. No more candy today. You lose 10 mood.';
+    assert.deepEqual(calls.activity, [line]);
+    assert.equal(seasonsFeature.packEatLine('corn_syrup_squares'), null);
+    assert.equal(seasonsFeature.packEatLine('birch_candy'), line);
+    assert.equal(seasonsFeature.packEatLine('birch_candy'), null, 'once');
+    assert.equal(seasonsFeature.packUseGate('birch_candy').ok, false);
+    assert.equal(seasonsFeature.packUseGate('birch_candy').msg, "No more candy today. You don't want toothache again.");
+    seasonsFeature._reset();
+  });
+
+  it('a running Sugar Rush is extended once per candy; one candy still says its own toothache', () => {
+    seasonsFeature._reset();
+    seasonsFeature.restore({ daily: { day: getGameDayKey(Date.now()), candy: 2, pies: 0, nog: 0, pi: 0, treats: {} } }, null);
+    const { engine, buffs, calls } = seasonEngine();
+    buffs.sugar_rush = 120_000;
+    seasonsFeature.onEvent('carobish_treats:eat', 2, engine);
+    assert.deepEqual(calls.extend, ['sugar_rush', 'sugar_rush'], 'num + 1 then (num - 1) durations: two more');
+    assert.equal(buffs.sugar_rush, 360_000);
+    seasonsFeature.restore({ daily: { day: getGameDayKey(Date.now()), candy: 10, pies: 0, nog: 0, pi: 0, treats: {} } }, null);
+    seasonsFeature.onEvent('birch_candy:eat', 1, engine);
+    assert.equal(calls.toasts.length, 1, 'a single eat keeps its own line');
+    assert.equal(seasonsFeature.packEatLine('birch_candy'), null);
+    seasonsFeature._reset();
+  });
+
+  it('pies: the count added once, Full of Pie once, and the source line when the batch makes five', () => {
+    seasonsFeature._reset();
+    seasonsFeature.restore({ daily: { day: getGameDayKey(Date.now()), candy: 0, pies: 3, nog: 0, pi: 0, treats: {} } }, null);
+    const { engine, calls } = seasonEngine();
+    assert.equal(seasonsFeature.packEatLimit('pumpkin_pie').left, 2);
+    seasonsFeature.onEvent('pumpkin_pie:eat', 2, engine);
+    assert.equal(seasonsFeature._state().state.daily.pies, 5);
+    assert.deepEqual(calls.apply, ['full_of_pie']);
+    assert.equal(seasonsFeature.packEatLine('pumpkin_pie'), SOURCE_LINES.noMorePie);
+    assert.equal(seasonsFeature.packUseGate('pumpkin_pie').msg, SOURCE_LINES.noMorePie);
+    seasonsFeature._reset();
+  });
+
+  it('the pack card offers the count, cut to the limit, with the cap note and one summary toast', () => {
+    const info = game.slice(game.indexOf('function packEatManyInfo('), game.indexOf('function packEatPreview('));
+    assert.match(info, /const cap = limitCountCap\(consumeCountCap\(base, pc, have, \{ energyMax: energyCap\(\) \}\), limit\);/);
+    assert.match(info, /max: cap\.max, cap, limit \};/);
+    const preview = game.slice(game.indexOf('function packEatPreview('), game.indexOf('function packEatCapNote('));
+    assert.match(preview, /many\.limit\?\.toothacheMood && qty >= many\.limit\.left/);
+    const note = game.slice(game.indexOf('function packEatCapNote('), game.indexOf('function showToolRepairFx('));
+    assert.match(note, /Eleven candies a day: \$\{many\.max\} more today and the last one brings a toothache, so \$\{rest\} in your pack\./);
+    assert.match(note, /Five pies a day: \$\{many\.max\} more today, so \$\{rest\} in your pack\./);
+    assert.match(note, /That makes eleven today: the last one brings a toothache\./);
+    const use = game.slice(game.indexOf('function usePackItem('), game.indexOf('function openPackedCubimalBox('));
+    assert.match(use, /const limit = features\.query\('packEatLimit', classTsid, engine\);\s*const cap = limitCountCap\(consumeCountCap\(ordinaryInfo, pc, countItem\(inv, classTsid\), \{ energyMax: energyCap\(\) \}\), limit\);/);
+    assert.match(use, /const capLine = eaten > 1 \? features\.query\('packEatLine', classTsid, engine\) : null;/);
+    assert.match(use, /\$\{capLine \? ` \$\{capLine\}` : ''\}`/);
+    // The gate still refuses the eat that would pass the limit.
+    assert.ok(use.indexOf("features.query('packUseGate', classTsid, engine)") < use.indexOf("features.query('packEatLimit', classTsid, engine)"));
   });
 });

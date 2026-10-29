@@ -47,6 +47,7 @@ import { resourceNodesFeature } from './resource-nodes-feature.js?v=g430-1';
 import { SEASON_DATA } from '../seasons-data.js';
 import {
   CANDY_CLASSES,
+  CANDY_DAILY_MAX,
   CARVE,
   CARVED_CLASSES,
   CRACKER,
@@ -54,6 +55,7 @@ import {
   LIGHT,
   LIT_CLASSES,
   NOG,
+  PIE_DAILY_MAX,
   PUMPKIN_CLASSES,
   PUMPKIN_SPEECH,
   SEASONAL_ITEMS,
@@ -69,6 +71,7 @@ import {
   carveOutcome,
   createSeasonState,
   crackerNote,
+  dailyEatLimit,
   dailyRow,
   daysLeft,
   estimatePi,
@@ -94,7 +97,7 @@ import {
   teachPhrase,
   yetiMailDue,
   yetiQuote,
-} from '../seasons.js';
+} from '../seasons.js?v=g433-1';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { playOverlay } from '../overlays.js?v=g392-1';
 import { itemZ } from '../item-bands.js?v=g429-1';
@@ -127,6 +130,8 @@ let autoplayAt = 0;
 let autoplayStep = 0;
 let autoplayLog = [];
 let demoDone = false;
+let eatQaDone = false;
+let batchLine = null; // { cls, line }: the cap line a batch eat leaves for the pack's one toast
 let engineRef = null;
 let eggsOwned = null; // egg kinds in the pack at the last look (null before the first)
 let eggDemoDone = false;
@@ -1152,6 +1157,17 @@ function tickEggs(engine, now = Date.now()) {
 
 /* ----------------------------------------------------------------------- QA */
 
+/** QA: &candyeaten=N / &pieseaten=N set today's candy or pie count once (Eat how many?'s caps). */
+function eatQaSetup(engine) {
+  if (eatQaDone) return;
+  eatQaDone = true;
+  const row = dailyRow(state, dayKey());
+  const candy = Number(engine.param?.('candyeaten'));
+  const pies = Number(engine.param?.('pieseaten'));
+  if (engine.param?.('candyeaten') != null && Number.isFinite(candy)) row.candy = Math.max(0, Math.min(CANDY_DAILY_MAX, Math.floor(candy)));
+  if (engine.param?.('pieseaten') != null && Number.isFinite(pies)) row.pies = Math.max(0, Math.min(PIE_DAILY_MAX, Math.floor(pies)));
+}
+
 function demoSetup(engine) {
   const demo = engine.param?.('seasondemo') || engine.param?.('seasonautoplay');
   if (demoDone || !demo) return;
@@ -1363,8 +1379,22 @@ export const seasonsFeature = {
     return null;
   },
 
+  /** Eat how many? (js/eat-many.js): how many more candy or pie today allows (seasons.js dailyEatLimit). */
+  packEatLimit(classTsid) {
+    return dailyEatLimit(state, dayKey(), classTsid);
+  },
+
+  /** The cap line a batch eat of `classTsid` just left (the toothache, no more pie), once. */
+  packEatLine(classTsid) {
+    if (!batchLine || batchLine.cls !== classTsid) return null;
+    const line = batchLine.line;
+    batchLine = null;
+    return line;
+  },
+
   onStreetEnter(street, engine) {
     refreshSeason(engine, true);
+    eatQaSetup(engine);
     demoSetup(engine);
     spawnAll(engine);
   },
@@ -1422,28 +1452,49 @@ export const seasonsFeature = {
     }
   },
 
-  /** Native Eat side effects (the generic pack Eat already paid the energy). */
+  /** Native Eat side effects (the generic pack Eat already paid the energy); `amount` is how many went in. */
   onEvent(counter, amount, engine) {
     const m = String(counter).match(/^([a-z0-9_]+):eat$/);
     if (!m) return;
-    seasonsFeature._afterEat(engine, m[1]);
+    seasonsFeature._afterEat(engine, m[1], amount);
   },
 
-  _afterEat(engine, cls) {
+  /**
+   * `count` from the pack's Eat how many? Candy runs its rule once per candy, in order
+   * (birch_candy.js 146-189 did the batch at once: candy_eaten += num, one toothache when
+   * the total reaches 11 and no rush for that last one, the rush applied once and extended
+   * one duration for each other candy). Pie: pies_eaten += count and Full of Pie once
+   * (pumpkin_pie.js 112-117). A batch keeps its cap line for the pack's one toast.
+   */
+  _afterEat(engine, cls, count = 1) {
     const day = dayKey();
+    const n = Math.max(1, Math.floor(Number(count) || 1));
+    if (n > 1) batchLine = null;
     if (CANDY_CLASSES.includes(cls)) {
-      const res = recordCandyEaten(state, day, { zilloween: isOn('zilloween'), hasRush: engine.hasBuff?.('sugar_rush') });
-      if (res.counter) engine.achievement?.(res.counter, 1);
-      if (res.toothache) {
-        const lost = -grant(engine, 'mood', -10);
-        say(engine, SOURCE_LINES.toothache(lost), false);
-      } else if (res.rush === 'apply') engine.applyBuff?.('sugar_rush');
-      else if (res.rush === 'extend') engine.applyBuff?.('sugar_rush', { extendMs: 120_000 });
+      for (let i = 0; i < n; i++) {
+        const res = recordCandyEaten(state, day, { zilloween: isOn('zilloween'), hasRush: engine.hasBuff?.('sugar_rush') });
+        if (res.counter) engine.achievement?.(res.counter, 1);
+        if (res.toothache) {
+          const lost = -grant(engine, 'mood', -10);
+          const line = SOURCE_LINES.toothache(lost);
+          if (n > 1) {
+            // One toast for the batch: the pack's "You ate 3 …" carries this line (packEatLine).
+            last = line;
+            engine.pushActivity?.(line);
+            batchLine = { cls, line };
+          } else say(engine, line, false);
+        } else if (res.rush === 'apply') engine.applyBuff?.('sugar_rush');
+        else if (res.rush === 'extend') engine.applyBuff?.('sugar_rush', { extendMs: 120_000 });
+      }
     } else if (cls === 'pepitas') {
       engine.applyBuff?.('smug_healthy_glow');
     } else if (cls === 'pumpkin_pie') {
-      dailyRow(state, day).pies += 1;
+      const row = dailyRow(state, day);
+      row.pies += n;
       engine.applyBuff?.('full_of_pie');
+      // The next Eat is disabled with the source's line (pumpkin_pie.js 254-257); a batch that
+      // reached the five says it in its toast.
+      if (n > 1 && row.pies >= PIE_DAILY_MAX) batchLine = { cls, line: SOURCE_LINES.noMorePie };
     } else if (EGG_CLASSES.includes(cls)) {
       engine.applyBuff?.('chocolate_high');
     } else return;
@@ -1655,6 +1706,8 @@ export const seasonsFeature = {
     cracker = null;
     pendingBoosts = [];
     demoDone = false;
+    eatQaDone = false;
+    batchLine = null;
     eggsOwned = null;
     eggDemoDone = false;
     eggCheckAt = 0;

@@ -25,6 +25,9 @@
  * Verbs with is_single (GSJS items/*.js) stay one at a time: Licorice and the
  * Sno Cones' eat, twenty drinks (the buff drinks), every herb's munch and
  * essence's imbibe (js/buffs.js keeps those single already).
+ *
+ * Seasonal candy and pumpkin pie take a count too, cut first to what their
+ * daily limit leaves (limitCountCap; the feature runs its rule for each one).
  */
 
 import { ITEM_CATALOG, countItem, getItemUseInfo, removeItem, useItem } from './inventory.js?v=catalog-unified-7';
@@ -105,6 +108,26 @@ export function consumeCountCap(info, pc, stack, { energyMax = 100 } = {}) {
   const need = Math.ceil(room / per);
   const capped = need < have;
   return { max: capped ? need : have, stack: have, need, cappedBy: capped ? 'energy' : null, full: false };
+}
+
+/**
+ * A feature's daily limit on top of consumeCountCap: seasonal candy and
+ * pumpkin pie cut msg.count to what is left today before food_eat looks at
+ * the energy (items/birch_candy.js 133-146, items/pumpkin_pie.js 100-112).
+ * `limit` is { kind, left, ... } (js/seasons.js dailyEatLimit) or null.
+ * Returns the cap with max no more than `left`, cappedBy the limit's kind
+ * when that is the cut that binds, and `limit` kept for the chooser's line.
+ */
+export function limitCountCap(cap, limit) {
+  if (!cap || !limit) return cap;
+  const left = Math.max(0, whole(limit.left));
+  const out = { ...cap, limit };
+  // The daily limit is looked at first, so it is the one named when it and the energy cut alike.
+  if (left <= cap.max && left < cap.stack) {
+    out.max = left;
+    out.cappedBy = limit.kind;
+  }
+  return out;
 }
 
 /**

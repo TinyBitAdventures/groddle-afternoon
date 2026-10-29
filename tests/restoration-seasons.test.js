@@ -13,7 +13,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { EGG_HUNT, SEASONS, SEASON_IDS, calendarSeasons, isDametimeZilloween } from '../public/js/seasons.js';
+import { EGG_HUNT, SEASONS, SEASON_IDS, calendarSeasons, isDametimeZilloween } from '../public/js/seasons.js?v=g433-1';
 import { dametimeParts } from '../public/js/game-day.js';
 import { seasonsData } from '../tools/restoration/seasons.mjs';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
