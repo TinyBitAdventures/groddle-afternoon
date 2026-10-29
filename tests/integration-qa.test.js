@@ -57,7 +57,7 @@ test.describe('integration playtest regressions', () => {
     assert.equal(host.query('holdQuestOffers', { streetTsid: 'L1' }), null);
     const offers = fs.readFileSync(path.join(root, 'public/js/features/quest-offers-feature.js'), 'utf8');
     assert.match(offers, /engine\.busy\(\) \|\| engine\.questOffersHeld\?\.\(\)/);
-    assert.match(game, /questOffersHeld: \(\) => features\.query\('holdQuestOffers', engine\) === true/);
+    assert.match(game, /questOffersHeld: \(\) => (?:!state\.started \|\| )?features\.query\('holdQuestOffers', engine\) === true/);
     const meditation = fs.readFileSync(path.join(root, 'public/js/features/meditation-feature.js'), 'utf8');
     assert.match(meditation, /holdQuestOffers\(\) \{\n    return session \? true : null;/);
   });

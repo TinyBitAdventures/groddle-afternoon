@@ -2661,9 +2661,19 @@
   ]
  },
  "git": {
-  "commits": 706,
+  "commits": 708,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "Speech bubbles keep a short tail and their cream at night"
+   },
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "Dirt fills the gaps between the underground patches again, no more white spike by the chat box"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2773,19 +2783,9 @@
     "date": "2026-10-28",
     "kind": "new",
     "text": "/tp lets an administrator free a stuck player"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "improve",
-    "text": "The Magic Rock, the GIGPDS and the Mailbox draw sharp, and the top bar keeps one even gap"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "fix",
-    "text": "The tutorial no longer leaves a new player on a street whose every road is still being built"
    }
   ]
  },
- "tests": 411,
+ "tests": 412,
  "generatedAt": "2026-10-29"
 }

@@ -4,11 +4,11 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-255';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-256';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
-import { createPromptStack } from './js/prompt-stack.js?v=g405-1';
-import { createWindowStack } from './js/window-stack.js?v=g418-1';
+import { createPromptStack } from './js/prompt-stack.js?v=g428-1';
+import { createWindowStack } from './js/window-stack.js?v=g428-1';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=g311-1';
 import {
   actionDurationFor,
@@ -2188,6 +2188,12 @@ function queueScreen(show, { requiresFocus = true } = {}) {
   // G213: queued screens count as up, so a quest offer check does not slip in before one shows.
   awardsPending += 1;
   awardQueue = awardQueue
+    // STARTCARD: nothing shows over (or under) the start card; a skill finished while away
+    // waits until the player starts (Start exploring, Customize look first, the tutorial, Skip).
+    .then(() => {
+      if (!state.started) noteScreenHold('start card');
+      return afterStart();
+    })
     // TSFrontController.tryShowScreenViewFromQ 3396: screens wait for the loading card (G192).
     .then(() => afterStreetCard())
     // G364: and for the rest of its gates (js/screen-queue.js), checked again every second.
@@ -2204,6 +2210,24 @@ function queueScreen(show, { requiresFocus = true } = {}) {
 
 function noteScreenHold(why) {
   if (app?.canvas) app.canvas.dataset.screenQueueHold = why || '';
+}
+
+/**
+ * STARTCARD: what waits for the start card ("Welcome to a scrap of Ur"): the queued screens,
+ * the familiar's skill-learned panel, prompts and scripted dialogs raised at boot (a skill
+ * finished while away, the eleventh-skill badge). They go in the order they were raised once
+ * beginGame runs. The card is the remake's own (no client equivalent).
+ */
+const startWaiters = [];
+
+/** Resolves once the player has started (state.started). */
+function afterStart() {
+  if (state.started) return Promise.resolve();
+  return new Promise((resolve) => startWaiters.push(resolve));
+}
+
+function releaseStartWaiters() {
+  for (const resolve of startWaiters.splice(0)) resolve();
 }
 
 /** A visible element by id (not [hidden]). */
@@ -6896,6 +6920,8 @@ function promptStackUi() {
     document,
     mount: () => document.getElementById('game-root'),
     viewHeight: () => locationViewRect()?.height || 0,
+    // STARTCARD: prompts raised while the start card is up wait in the queue (beginGame flushes it).
+    held: () => !state.started,
     playSound: (key) => playSound(key, { volume: 0.45 }),
     setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
   });
@@ -9041,7 +9067,9 @@ const engine = {
   acting: () => Boolean(currentAction || menuTarget),
   questDialogueOpen: () => isQuestDialogueOpen(),
   /** True while a feature holds the Magic Rock quiet (rook attack, Naraka, meditation). */
-  questOffersHeld: () => features.query('holdQuestOffers', engine) === true,
+  questOffersHeld: () => !state.started || features.query('holdQuestOffers', engine) === true,
+  /** STARTCARD: resolves once the player has left the start card (familiar-dialog-feature waits on it). */
+  afterStart: () => afterStart(),
   /** A quest offer: the recovered beats, then accept / decline. `inLog` opens it inside the Quests dialog (G225). */
   // G229: declinable false is an offer with only its accept button (quest.js 1119-1124: a quest that
   // cannot be started later has one choice); the X and Escape still close it where they would.
@@ -21147,7 +21175,8 @@ function holdScriptedDialog(opts) {
   // addPrompt 330-354) and shows an emergency whatever prompts are up (QuestsDialog.as
   // onEmergencyTick 335-340); with one card, the croak prompt used to push Hell's offer off.
   const underEmergency = !opts?.offer && isQuestDialogueOpen() && questDialogueState?.urgent === true;
-  if (!opts || !(menuTarget || enterChooser?.isOpen() || underEmergency || familiarWaitsForScreen(opts))) return false;
+  // STARTCARD: and anything raised while the start card is up waits for the player to start.
+  if (!opts || !(!state.started || menuTarget || enterChooser?.isOpen() || underEmergency || familiarWaitsForScreen(opts))) return false;
   heldScriptedDialogs.push(opts);
   if (app?.canvas) app.canvas.dataset.dialogHeld = String(heldScriptedDialogs.length);
   return true;
@@ -21167,7 +21196,7 @@ function familiarWaitsForScreen(opts) {
 }
 
 function releaseHeldScriptedDialog() {
-  if (!heldScriptedDialogs.length || menuTarget || enterChooser?.isOpen() || isQuestDialogueOpen() || isVogOpen()) return;
+  if (!state.started || !heldScriptedDialogs.length || menuTarget || enterChooser?.isOpen() || isQuestDialogueOpen() || isVogOpen()) return;
   if (familiarWaitsForScreen(heldScriptedDialogs[0])) return;
   const next = heldScriptedDialogs.shift();
   // G228: a held VOG goes back to its own overlay.
@@ -24549,6 +24578,11 @@ async function main() {
     const remaining = Number(bootParams.get('skillremaining'));
     if (Number.isFinite(remaining) && remaining > 0) {
       skillState.queue[demoSkill].endsAt = Date.now() + Math.max(1, remaining) * 1000;
+    } else if (Number.isFinite(remaining) && (bootParams.get('skillremaining') || '').trim() !== '') {
+      // STARTCARD QA: `&skillremaining=0` or less (seconds ago) finished while the player was
+      // away: the boot catch-up a returning save gets (the skill-learned panel waits for Start).
+      skillState.queue[demoSkill].endsAt = Date.now() + Math.min(-1, remaining) * 1000;
+      handleSkillCompletions(tickSkillStudy(skillState, Date.now()).completed, { offline: true });
     }
     focusSkillInPanel(demoSkill);
   }
@@ -25887,6 +25921,11 @@ async function main() {
     if (state.started) return;
     document.getElementById('overlay').classList.add('hidden');
     state.started = true;
+    // STARTCARD: what was raised while the card was up goes now, in order (screens, the
+    // familiar's panel, prompts); the stack lets the card's top place go.
+    windowStack?.restack();
+    releaseStartWaiters();
+    promptStack?.flush();
     // QA (G357, before the audio wait, which never settles under autostart): &speechdemo=<line> stands the player beside the nearest short speaker
     // (animals first, &speechclass=<classId> to pick) and has it say the line every 4 s.
     const speechDemo = bootParams.get('speechdemo');

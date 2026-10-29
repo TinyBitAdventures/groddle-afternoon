@@ -35,18 +35,26 @@ export const WINDOW_SELECTOR = [
 ].join(', ');
 /** Full-screen views (BaseScreenView): over every dialog, as changeDialogsZ puts them. */
 export const SCREEN_SELECTOR = '.award-screen, .new-day-screen, .giant-screen';
+/**
+ * STARTCARD: the start card ("Welcome to a scrap of Ur", #overlay) is over everything while it is
+ * up: over the windows and the screens, whatever opened after it. The remake's own card (the client
+ * had none); game.js holds the screens, the familiar's panel and prompts until the player starts.
+ */
+export const START_CARD_SELECTOR = '#overlay';
 /** Not windows: the docked prompt stack, the player menu, the pack's item card, the hotkey sheet. */
 export const NOT_WINDOW_SELECTOR = '.prompt-stack, #player-menu, #pack-popover, .hotkeys-shade, .boot-loader';
 
 /**
  * The z-index for each open window, in the order given (oldest first): each at least its own
- * CSS value and one above the window before it. `rows`: [{ base, screen }]; screens go after
- * every other window (their relative order kept). Returns the z values in the input's order.
+ * CSS value and one above the window before it. `rows`: [{ base, screen, top }]; screens go after
+ * every other window and the start card (`top`) after the screens (each group's order kept).
+ * Returns the z values in the input's order.
  */
 export function stackZ(rows) {
+  const rank = (row) => (row.top ? 2 : row.screen ? 1 : 0);
   const order = rows
     .map((row, i) => ({ row, i }))
-    .sort((a, b) => Number(Boolean(a.row.screen)) - Number(Boolean(b.row.screen)) || a.i - b.i);
+    .sort((a, b) => rank(a.row) - rank(b.row) || a.i - b.i);
   const out = new Array(rows.length);
   let prev = -Infinity;
   for (const { row, i } of order) {
@@ -81,7 +89,7 @@ export function createWindowStack({ doc = globalThis.document, onChange = null }
 
   function windows() {
     const roots = new Set();
-    for (const el of doc.querySelectorAll(`${WINDOW_SELECTOR}, ${SCREEN_SELECTOR}`)) {
+    for (const el of doc.querySelectorAll(`${WINDOW_SELECTOR}, ${SCREEN_SELECTOR}, ${START_CARD_SELECTOR}`)) {
       if (el.closest(NOT_WINDOW_SELECTOR)) continue;
       const root = stackingRoot(el);
       if (!root.closest(NOT_WINDOW_SELECTOR)) roots.add(root);
@@ -105,7 +113,11 @@ export function createWindowStack({ doc = globalThis.document, onChange = null }
       else if (el.dataset.windowZ != null) baseZ(el);
     }
     open.sort((a, b) => (opened.get(a) || 0) - (opened.get(b) || 0));
-    const rows = open.map((el) => ({ base: baseZ(el), screen: el.matches(SCREEN_SELECTOR) || Boolean(el.querySelector(SCREEN_SELECTOR)) }));
+    const rows = open.map((el) => ({
+      base: baseZ(el),
+      screen: el.matches(SCREEN_SELECTOR) || Boolean(el.querySelector(SCREEN_SELECTOR)),
+      top: el.matches(START_CARD_SELECTOR),
+    }));
     const zs = stackZ(rows);
     open.forEach((el, i) => {
       if (zs[i] === rows[i].base) return;

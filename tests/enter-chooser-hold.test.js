@@ -46,8 +46,8 @@ describe('offers wait for the chooser and verb menus', () => {
     assert.match(open, /^function openScriptedQuestDialogue\(\{[\s\S]{0,600}?\}\) \{\s*\/\/ G217[^\n]*\n\s*if \(holdScriptedDialog\(arguments\[0\]\)\) return;\s*(?:\/\/ G225[^\n]*\n\s*if \(!inLog\) )?closeQuestPanel\(\);/);
     // G267: also held while an emergency offer is up (a prompt or line, not another offer);
     // G364: familiar talk also waits for an open screen (TSFrontController.as 2134).
-    assert.match(game, /function holdScriptedDialog\(opts\) \{(?:\s*\/\/[^\n]*)*\s*const underEmergency = !opts\?\.offer && isQuestDialogueOpen\(\) && questDialogueState\?\.urgent === true;\s*if \(!opts \|\| !\(menuTarget \|\| enterChooser\?\.isOpen\(\) \|\| underEmergency(?: \|\| familiarWaitsForScreen\(opts\))?\)\) return false;/);
-    assert.match(game, /function releaseHeldScriptedDialog\(\) \{\s*if \(!heldScriptedDialogs\.length \|\| menuTarget \|\| enterChooser\?\.isOpen\(\) \|\| isQuestDialogueOpen\(\) \|\| isVogOpen\(\)\) return;/);
+    assert.match(game, /function holdScriptedDialog\(opts\) \{(?:\s*\/\/[^\n]*)*\s*const underEmergency = !opts\?\.offer && isQuestDialogueOpen\(\) && questDialogueState\?\.urgent === true;(?:\s*\/\/[^\n]*)*\s*if \(!opts \|\| !\((?:!state\.started \|\| )?menuTarget \|\| enterChooser\?\.isOpen\(\) \|\| underEmergency(?: \|\| familiarWaitsForScreen\(opts\))?\)\) return false;/);
+    assert.match(game, /function releaseHeldScriptedDialog\(\) \{\s*if \((?:!state\.started \|\| )?!heldScriptedDialogs\.length \|\| menuTarget \|\| enterChooser\?\.isOpen\(\) \|\| isQuestDialogueOpen\(\) \|\| isVogOpen\(\)\) return;/);
     assert.match(game, /features\.tick\(\(1000 \/ 60\) \* dt, Date\.now\(\), engine\);\s*releaseHeldScriptedDialog\(\);/);
   });
 

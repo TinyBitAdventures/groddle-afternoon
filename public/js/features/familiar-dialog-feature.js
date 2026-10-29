@@ -34,7 +34,8 @@
  *     in beside it (G219). The voice-of-rock overlay (G220):
  *     &questdemo=high_jump (the High Jumper's tree-top line).
  *     Canvas: familiarPanel (open class or ''), familiarQueue, familiarLast,
- *     familiarHeld ('screen' while a screen holds the panel).
+ *     familiarHeld ('screen' while a screen holds the panel, 'start' while the start card
+ *     does). A skill finished while away: &skilldemo=<class>&skillremaining=-60 (no autostart).
  */
 
 import { CARD_ART_LAYERS } from '../imagination-data.js';
@@ -153,6 +154,11 @@ async function showNext(engine) {
   open = { classTsid };
   render(engine, info);
   setData(engine);
+  // STARTCARD: a skill that finished while the player was away (the boot catch-up) waits for
+  // the start card to go (engine.afterStart), so the panel never shows over it.
+  if (engine.started === false) engine.setData?.('familiarHeld', 'start');
+  await engine.afterStart?.();
+  if (open?.classTsid !== classTsid) return;
   // Like the client's interval while the familiar is hidden: wait for the loading card,
   // then (G364) for any screen showing, then the card again if a street change came meanwhile.
   await engine.afterStreetCard?.();

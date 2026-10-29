@@ -143,7 +143,7 @@ describe('2. no quest offers during the tutorial', () => {
     assert.ok(src.indexOf('quest-offers-feature.js') < src.indexOf('newxp-feature.js'));
     assert.match(feature, /holdQuestOffers\(engine\) \{\n\s+if \(pendingStage \|\| active\(\)\) return true;\n\s+return isNewxpSceneTsid\(engine\?\.streetTsid\) \? true : null;/);
     assert.match(read('public/js/features/quest-offers-feature.js'), /if \(offerOpen \|\| engine\.busy\(\) \|\| engine\.questOffersHeld\?\.\(\)\) return false;/);
-    assert.match(game, /questOffersHeld: \(\) => features\.query\('holdQuestOffers', engine\) === true,/);
+    assert.match(game, /questOffersHeld: \(\) => (?:!state\.started \|\| )?features\.query\('holdQuestOffers', engine\) === true,/);
   });
 
   it('cites inc_quests.js', { skip: !existsSync(gsjs) && 'no GSJS checkout' }, () => {

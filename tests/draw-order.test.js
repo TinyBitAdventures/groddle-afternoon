@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 import { remoteAvatarZ } from '../public/js/features/realtime-feature.js?v=g413-1';
 import { FRONT_FURNITURE_SLOTS, furnitureDrawsInFront } from '../public/js/home-decor.js?v=g418-1';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js';
-import { SCREEN_SELECTOR, WINDOW_SELECTOR, stackZ } from '../public/js/window-stack.js?v=g418-1';
+import { SCREEN_SELECTOR, WINDOW_SELECTOR, stackZ } from '../public/js/window-stack.js?v=g428-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (rel) => readFileSync(join(here, '..', rel), 'utf8');

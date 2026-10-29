@@ -733,7 +733,7 @@ describe('G192 the loading card first', () => {
   it('dialogs hide and award screens queue while a card is up', () => {
     assert.match(read(join(PUBLIC, 'style.css')), /html\[data-street-cards\] \.quest-dialogue \{ visibility: hidden; \}/);
     const game = read(join(PUBLIC, 'game.js'));
-    assert.match(game, /awardQueue = awardQueue\n[^\n]*\n\s*\.then\(\(\) => afterStreetCard\(\)\)\n[^\n]*\n\s*\.then\(\(\) => waitForScreenGates\(screenGateState, \{ requiresFocus, closedAt: screenClosedAt, onHold: noteScreenHold \}\)\)\n\s*\.then\(show\)/);
+    assert.match(game, /awardQueue = awardQueue\n(?:\s*\/\/[^\n]*\n)*\s*\.then\(\(\) => \{\n\s*if \(!state\.started\) noteScreenHold\('start card'\);\n\s*return afterStart\(\);\n\s*\}\)\n[^\n]*\n\s*\.then\(\(\) => afterStreetCard\(\)\)\n[^\n]*\n\s*\.then\(\(\) => waitForScreenGates\(screenGateState, \{ requiresFocus, closedAt: screenClosedAt, onHold: noteScreenHold \}\)\)\n\s*\.then\(show\)/);
   });
 
   function hellEngine() {

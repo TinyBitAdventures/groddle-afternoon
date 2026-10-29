@@ -36,7 +36,7 @@ import {
   familiarDialogFeature,
   familiarDialogOpen,
   queueSkillLearned,
-} from '../public/js/features/familiar-dialog-feature.js?v=g405-1';
+} from '../public/js/features/familiar-dialog-feature.js?v=g428-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');
@@ -240,7 +240,7 @@ describe('skill learned panel (G218)', () => {
     assert.match(game, /openSkillTree\(classTsid = ''\) \{/);
     const index = read('js/features/index.js');
     // Registered (G185 appends the loneliness feature after it; neither answers the other's first-answer hooks).
-    assert.match(index, /^import \{ familiarDialogFeature \} from '\.\/familiar-dialog-feature\.js\?v=g405-1'; FEATURES\.push\(familiarDialogFeature\);$/m);
+    assert.match(index, /^import \{ familiarDialogFeature \} from '\.\/familiar-dialog-feature\.js\?v=g428-1'; FEATURES\.push\(familiarDialogFeature\);$/m);
   });
 });
 

@@ -137,8 +137,9 @@ html[data-street-cards] .prompt-stack { visibility: hidden; }
  *   location view's height (for the half-height rule), playSound(key),
  *   setData(key, value), timer(fn, ms) -> cancel (prompt timeouts; screen-fx
  *   cardPausedTimeout by default), later(fn, ms) / every(fn, ms) -> cancel
- *   (fades and the 5 s check; tests pass fakes).
- * Returns { add(opts) -> uid, remove(uid), has(uid), shown(), queued(), clear(), root }.
+ *   (fades and the 5 s check; tests pass fakes), held() -> true while nothing may show
+ *   (STARTCARD: the start card is up; the prompts wait in the queue, timers not armed).
+ * Returns { add(opts) -> uid, remove(uid), has(uid), shown(), queued(), flush(), clear(), root }.
  */
 export function createPromptStack(opts = {}) {
   const doc = opts.document;
@@ -255,7 +256,7 @@ export function createPromptStack(opts = {}) {
   }
 
   function fill() {
-    while (queue.length && promptStackHasRoom(stackHeight(), opts.viewHeight?.() || 0)) show(queue.shift());
+    while (queue.length && !opts.held?.() && promptStackHasRoom(stackHeight(), opts.viewHeight?.() || 0)) show(queue.shift());
     if (queue.length && !stopRecheck) stopRecheck = every(fill, PROMPT_RECHECK_MS);
     if (!queue.length && stopRecheck) {
       stopRecheck();
@@ -325,6 +326,10 @@ export function createPromptStack(opts = {}) {
     },
     shown: () => shown.filter((p) => !p.leaving).map((p) => ({ uid: p.uid, text: p.text })),
     queued: () => queue.map((p) => ({ uid: p.uid, text: p.text })),
+    /** Show what waited (held() has just gone false) without waiting for the 5 s check. */
+    flush() {
+      fill();
+    },
     /** Click a shown prompt's choice by index (QA). */
     choose(uid, index = 0) {
       const p = shown.find((row) => row.uid === String(uid));
