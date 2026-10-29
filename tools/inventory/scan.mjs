@@ -995,7 +995,7 @@ export function createResolver(index, opts = {}) {
  * Returns { emissions: [{ tag, pattern, text, file, line, callee, qa }], unresolved: [...] }.
  * `qa` marks calls inside functions that read URL params (QA/demo seeding).
  */
-export function scanEmissions(index, emitters, { keyTableKeys, qaRe = /engine\.param\(|searchParams|URLSearchParams/ } = {}) {
+export function scanEmissions(index, emitters, { keyTableKeys, qaRe = QA_RE } = {}) {
   const resolver = createResolver(index, { keyTableKeys });
   const emissions = [];
   const unresolved = [];
@@ -1141,7 +1141,7 @@ export function contextLiterals(index) {
 }
 
 /** Whether a node sits in a function that reads URL params: QA and demo seeding, never evidence (as scanEmissions' `qa`). */
-const QA_RE = /engine\.param\(|searchParams|URLSearchParams/;
+const QA_RE = /engine\.param(?:\?\.)?\(|searchParams|URLSearchParams/;
 /**
  * Whether `pos` runs in QA or demo seeding: an enclosing function, out to the innermost named one,
  * whose own code reads URL params. Nested functions that do not hold `pos` are not its own code:

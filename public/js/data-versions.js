@@ -476,7 +476,6 @@
       "assets/sprites/giant-portraits/ti.webp": "9a7a7a60",
       "assets/sprites/giant-portraits/zille.webp": "ab20178d",
       "giants/data.json": "4d33b1db",
-      "items/data.json": "19a93970",
     },
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

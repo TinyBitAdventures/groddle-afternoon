@@ -337,6 +337,18 @@ describe('item detector: taking an item is not a way to get it (G176)', () => {
     return new Map(itemGrantReach({ index, emissions: [...(by.item || []), ...w.emissions], unresolved: [...unresolved, ...w.unresolved], itemIds: new Set(itemIds) }));
   };
 
+  it('does not count a QA demo that reads params with engine.param?.() as a grant (item-verbs-more-feature.js setupDemo)', () => {
+    const reach = grantsOf([
+      ['js/demo.js', `import { addItem } from './inventory.js';
+        const DEMO_ITEMS = ['butterfly_net'];
+        export function setupDemo(engine) {
+          if (engine.param?.('packverbdemo') !== '1') return;
+          for (const cls of DEMO_ITEMS) addItem(engine.inv, cls, 1);
+        }`],
+    ], ['butterfly_net']);
+    assert.equal(reach.has('butterfly_net'), false);
+  });
+
   it('does not count a consumed item as a grant (hell-bar-feature.js and drink_ticket)', () => {
     const reach = grantsOf([
       ['js/hell.js', `export const TICKET_CLASS = 'drink_ticket';
