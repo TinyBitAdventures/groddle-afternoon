@@ -23,7 +23,7 @@ const tool = readFileSync(join(root, 'tools/deco-pipeline/recover.py'), 'utf8');
 describe('recovered street decos (G431)', () => {
   it('ships every recovered deco: source PNG, manifest entry, 2x WebP, frame 1 of its SWF', () => {
     const names = Object.keys(rec);
-    assert.ok(names.length >= 183, `${names.length} recovered`);
+    assert.ok(names.length >= 185, `${names.length} recovered`);
     for (const n of names) {
       assert.ok(manifest.has(n), `${n} in manifest.json`);
       assert.ok(existsSync(join(root, `assets-src/decos/groddle/${n}.png`)), `${n}.png source`);
@@ -35,11 +35,20 @@ describe('recovered street decos (G431)', () => {
     for (const n of ['tree_group_bg2_1', 'mountain_trees_darker_1', 'tree_coniferous_bare_1']) assert.ok(rec[n], n);
   });
 
-  it('keeps out the decos the client never showed still, and the placeholder photo', () => {
-    for (const n of ['bubble_test', 'stars_fade', 'rook_hall_placeholder_painting']) {
+  it('keeps out the placeholder photo', () => {
+    for (const n of ['rook_hall_placeholder_painting']) {
       assert.ok(!manifest.has(n), `${n} held`);
       assert.ok(missing.missing.includes(n), `${n} listed missing`);
       assert.match(tool, new RegExp(`'${n}': '`), `${n} has a reason in recover.py HELD`);
+    }
+  });
+
+  it('ships the decos the client only played once they play (G435: their frame 1 is the still)', () => {
+    for (const n of ['bubble_test', 'stars_fade']) {
+      assert.ok(manifest.has(n), `${n} shipped`);
+      assert.ok(!missing.missing.includes(n), `${n} not missing`);
+      assert.ok(rec[n], `${n} recovered`);
+      assert.ok(existsSync(join(root, `public/assets/decos/animated/${n}.json`)), `${n} has a strip`);
     }
   });
 

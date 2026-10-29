@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-265';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-266';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g434-1';
@@ -581,7 +581,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=g431-1';
+} from './js/street-render.js?v=g435-1';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -830,7 +830,7 @@ import {
 } from './js/sound-moments.js?v=g393-1';
 import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from './js/metabolics.js';
 import { installHiresIcons } from './js/icon-hires.js?v=g373-1';
-import { installHiresDecos } from './js/deco-hires.js?v=g431-1';
+import { installHiresDecos } from './js/deco-hires.js?v=g435-1';
 import { loadMutedPreference, saveMutedPreference } from './js/audio-pref.js';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=g430-1';
@@ -26196,6 +26196,10 @@ async function main() {
         gpuTextureMB: +(bytes / 1048576).toFixed(1),
         images: textureUrls.textureStats(),
       };
+    },
+    /** Street decos that play (js/deco-anim.js, G435): placed, strips in, playing, stopped off screen; `detail` adds each one's stage box. */
+    animDecos(detail = false) {
+      return bgLayer?.animStats?.(detail) || null;
     },
     /** Idle/AFK QA (&idledemo=1): loaded idle sheets with load/bake ms, AFK and the idle timer. */
     /** World quoins as drawn: sprite y plus the frame's baked bob (QA for js/quoin-motion.js). */

@@ -4,7 +4,6 @@ House_back_Medium_noWindows_02
 House_back_Medium_noWindows_03
 House_back_Medium_noWindows_04
 House_back_Small_noWindows_03
-bubble_test
 bush_ribbon_2
 cloud_vpuff2
 corey2_sky_borealis
@@ -35,4 +34,3 @@ patch_hill4
 rook_hall_placeholder_painting
 sky_ceruleanGradient
 sky_pinkGradient
-stars_fade

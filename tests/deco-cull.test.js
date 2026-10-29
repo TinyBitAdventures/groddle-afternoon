@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { decoBox } from '../public/js/street-render.js?v=g431-1';
+import { decoBox } from '../public/js/street-render.js?v=g435-1';
 
 describe('deco culling box', () => {
   it('skips children it cannot measure instead of throwing (blank "And so it begins..." street)', () => {

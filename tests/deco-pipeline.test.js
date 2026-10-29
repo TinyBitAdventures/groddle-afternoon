@@ -9,10 +9,10 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HIRES_DECOS, HIRES_DECOS_BIG } from '../public/js/deco-hires-list.js?v=g431-1';
-import { decoUrl, installHiresDecos, wantsHiresDecos } from '../public/js/deco-hires.js?v=g431-1';
+import { HIRES_DECOS, HIRES_DECOS_BIG } from '../public/js/deco-hires-list.js?v=g435-1';
+import { decoUrl, installHiresDecos, wantsHiresDecos } from '../public/js/deco-hires.js?v=g435-1';
 import { resolutionOfUrl } from '../public/js/textures.js';
-import { recolourBudgetBytes } from '../public/js/street-render.js?v=g431-1';
+import { recolourBudgetBytes } from '../public/js/street-render.js?v=g435-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const decoDir = join(root, 'public/assets/decos/groddle');
@@ -125,6 +125,8 @@ describe('deco WebP pipeline', () => {
   it('counts recolour bakes at logical size, so 3x decos keep layers baked', () => {
     assert.equal(recolourBudgetBytes({ width: 100, height: 50, pixelWidth: 150, pixelHeight: 75, resolution: 1.5 }), 20000);
     assert.equal(recolourBudgetBytes({ width: 100, height: 50, pixelWidth: 100, pixelHeight: 50, resolution: 1 }), 20000);
+    // A frame strip below 1 texel per logical px (G435) counts its pixels.
+    assert.equal(recolourBudgetBytes({ width: 400, height: 200, pixelWidth: 100, pixelHeight: 50, resolution: 0.25 }), 20000);
     const src = readFileSync(join(root, 'public/js/street-render.js'), 'utf8');
     // Layers behind the middleground load the 2x files directly.
     assert.match(src, /const far = middleLayerZ !== null && \(layer\.z \?\? li\) < middleLayerZ;/);

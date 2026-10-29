@@ -12,8 +12,9 @@ import {
 } from './street-model.js';
 import { availableStreetTsids } from './street-loader.js';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js';
-import { admitSharp, decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco } from './deco-hires.js?v=g431-1';
+import { admitSharp, decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco } from './deco-hires.js?v=g435-1';
 import { LADDER_TILE_Z, ladderTilePieces } from './ladder-tiling.js?v=g415-1';
+import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } from './deco-anim.js?v=g435-1';
 
 const DECO_BASE = 'assets/decos/groddle/';
 /**
@@ -423,6 +424,7 @@ function colourFilter(PIXI, filters) {
   if (!matrix) return null;
   const cm = new PIXI.ColorMatrixFilter();
   cm.matrix = matrix;
+  cm.glitchFilters = filters;
   return cm;
 }
 
@@ -642,6 +644,11 @@ function childBox(PIXI, child) {
  * parallax). A layer that is ready before anything culls it (a strip render) bakes every tile.
  * The old single bake of the whole layer at half resolution, scaled up on screen, smeared a
  * blur of 1 (none in the client) into unreadable signs (Surveyor's Stroll's clipboard).
+ * Decos that play (G435, js/deco-anim.js) stay out of the tiles, since a bake is one frame and the
+ * client blurred its layers live: each is drawn live through the layer's colour and box blur at the
+ * bake's density (cheap: the blur leaves nothing finer anyway), and the baked decos are split into
+ * bands at them (decos under the first, between two, over the last), each band its own tiles, so
+ * the layer keeps its z order. Vivara's stars_fade (on a blur 7 layer) twinkles this way.
  */
 function bakeBlurredLayer(lc, size, colour, state) {
   const { PIXI, renderer } = state;
@@ -656,7 +663,20 @@ function bakeBlurredLayer(lc, size, colour, state) {
     const res = blurBakeResolution(size, renderer.resolution);
     const pad = blurTilePad(size);
     const decos = lc.removeChildren();
-    const boxes = decos.map((child) => childBox(PIXI, child));
+    // Decos that play (js/deco-anim.js) cannot sit in a bake: they stay live, drawn through the
+    // layer's colour and blur at the bake's density, and the baked decos are cut into bands at
+    // them (under, between, over) so the layer's z order holds.
+    const order = decos.map((child, i) => ({ child, i })).sort((a, b) => (a.child.zIndex || 0) - (b.child.zIndex || 0) || a.i - b.i);
+    const live = [];
+    const bands = [[]];
+    for (const { child } of order) {
+      if (child.decoAnim) {
+        live.push(child);
+        bands.push([]);
+      } else {
+        bands[bands.length - 1].push(child);
+      }
+    }
     // The decos stay in the layer, hidden, so features that find one by id (location events,
     // newxp sign labels) still see its parent chain; a tile redraws when one of its decos is
     // shown, hidden, faded or tinted (refreshBlurTiles).
@@ -664,6 +684,7 @@ function bakeBlurredLayer(lc, size, colour, state) {
     parked.visible = false;
     parked.label = 'blur-decos';
     for (const child of decos) {
+      if (child.decoAnim) continue;
       child.culled = false;
       parked.addChild(child);
     }
@@ -676,22 +697,36 @@ function bakeBlurredLayer(lc, size, colour, state) {
       filters: [...(colour ? [colour] : []), flashBoxBlurFilter(PIXI, size, true), flashBoxBlurFilter(PIXI, size, false)],
       tiles: [],
     };
-    for (const plan of planBlurTiles(boxes, pad)) {
-      const spr = new PIXI.Sprite(PIXI.Texture.EMPTY);
-      spr.x = plan.x;
-      spr.y = plan.y;
-      spr.visible = false;
-      const tile = { ...plan, items: plan.items.map((i) => decos[i]), layer, sprite: spr, texture: null, bytes: 0, seen: 0 };
-      spr.blurTile = tile;
-      layer.tiles.push(tile);
-      lc.addChild(spr);
+    bands.forEach((band, k) => {
+      const boxes = band.map((child) => childBox(PIXI, child));
+      for (const plan of planBlurTiles(boxes, pad)) {
+        const spr = new PIXI.Sprite(PIXI.Texture.EMPTY);
+        spr.x = plan.x;
+        spr.y = plan.y;
+        spr.visible = false;
+        if (live.length) spr.zIndex = 2 * k;
+        const tile = { ...plan, items: plan.items.map((i) => band[i]), layer, sprite: spr, texture: null, bytes: 0, seen: 0 };
+        spr.blurTile = tile;
+        layer.tiles.push(tile);
+        lc.addChild(spr);
+      }
+    });
+    if (live.length) {
+      const liveFilters = [...(colour ? [colourFilter(PIXI, colour.glitchFilters)] : []), flashBoxBlurFilter(PIXI, size, true), flashBoxBlurFilter(PIXI, size, false)];
+      for (const filter of liveFilters) filter.resolution = res;
+      layer.live = live;
+      live.forEach((child, k) => {
+        child.zIndex = 2 * k + 1;
+        child.filters = liveFilters;
+        lc.addChild(child);
+      });
     }
     lc.addChild(parked);
     lc.filters = null;
     lc.blurLayer = layer;
     // Upload the decos' art now, while the street loads, as the old whole-layer bake did: a
     // first upload in a tile bake mid-walk cost a 100 ms frame on Dasas Terrace.
-    const sources = new Set(decos.map((child) => child.texture?.source).filter((source) => source && isLoaded(source)));
+    const sources = new Set(decos.filter((child) => !child.decoAnim).map((child) => child.texture?.source).filter((source) => source && isLoaded(source)));
     for (const source of sources) {
       try {
         renderer.texture?.initSource?.(source);
@@ -835,9 +870,15 @@ function evictBlurTiles(state, now, squeeze = false) {
  */
 export const RECOLOUR_BUDGET_BYTES = 192 * 1024 * 1024;
 
-/** Budget bytes for a deco texture: its logical size, whatever resolution its file has. */
+/**
+ * Budget bytes for a deco texture: its logical size, whatever resolution its file has, or its
+ * pixels when it has fewer (a deco's frame strip drawn below 1 texel per logical px, G435, whose
+ * logical size is every frame side by side at the still's size).
+ */
 export function recolourBudgetBytes(base) {
-  return Math.ceil(base.width) * Math.ceil(base.height) * 4;
+  const logical = Math.ceil(base.width) * Math.ceil(base.height) * 4;
+  const pixels = base.pixelWidth > 0 && base.pixelHeight > 0 ? base.pixelWidth * base.pixelHeight * 4 : logical;
+  return Math.min(logical, pixels);
 }
 
 /** A recoloured texture nobody has been near for this long is freed. */
@@ -882,6 +923,8 @@ function bakeRecolour(PIXI, renderer, base, colour) {
  * keep the live filter. Each recoloured texture remembers its decos, so
  * cullDecos can free it while they are all far off screen and bake it again
  * (see evictRecolours / ensureRecoloured) when one comes back.
+ * A deco that plays (js/deco-anim.js) is recoloured by its whole strip, once, and draws its frames
+ * from that copy (setDecoTexture; recolourAnim when the strip arrives after the bake).
  * @param {{ textures: Map<string, any>, entries: Map<string, any>, bytes: number }} cache per street
  */
 function bakeLayerColour(PIXI, renderer, lc, colour, cache) {
@@ -893,8 +936,8 @@ function bakeLayerColour(PIXI, renderer, lc, colour, cache) {
     let bytes = 0;
     const fresh = new Set();
     for (const spr of sprites) {
-      const base = spr.texture.source;
-      if (!isLoaded(spr.texture) || cache.textures.has(`${key}|${base.uid}`) || fresh.has(base)) continue;
+      const base = lookOf(spr).source;
+      if (!isLoaded(lookOf(spr)) || cache.textures.has(`${key}|${base.uid}`) || fresh.has(base)) continue;
       fresh.add(base);
       bytes += recolourBudgetBytes(base);
     }
@@ -902,22 +945,12 @@ function bakeLayerColour(PIXI, renderer, lc, colour, cache) {
     cache.bytes += bytes;
     const now = performance.now();
     for (const spr of sprites) {
-      if (!isLoaded(spr.texture)) continue;
-      const original = spr.texture;
-      const base = original.source;
-      const id = `${key}|${base.uid}`;
-      let entry = cache.entries.get(id);
-      if (!entry) {
-        entry = { id, base, colour, texture: bakeRecolour(PIXI, renderer, base, colour), users: new Set(), seen: now, bytes: recolourBudgetBytes(base) };
-        cache.entries.set(id, entry);
-        cache.textures.set(id, entry.texture);
-      }
-      entry.users.add(spr);
-      spr.recolour = { entry, original };
-      spr.texture = entry.texture;
+      const original = lookOf(spr);
+      if (!isLoaded(original)) continue;
+      recolourDeco(PIXI, renderer, cache, spr, original, colour, key, now);
     }
     lc.filters = null;
-    lc.recoloured = true;
+    lc.recoloured = { colour, key };
   };
   const pending = new Set(sprites.map((spr) => spr.texture.source).filter((base) => !isLoaded(base)));
   if (!pending.size) {
@@ -935,6 +968,48 @@ function bakeLayerColour(PIXI, renderer, lc, colour, cache) {
   }
 }
 
+/** The whole texture a deco's look comes from: a playing deco's strip, else its texture. */
+function lookOf(spr) {
+  return spr.decoAnim?.ready ? spr.decoAnim.original : spr.texture;
+}
+
+/** Point a deco at the layer colour's bake of `original` (baked here once per texture). */
+function recolourDeco(PIXI, renderer, cache, spr, original, colour, key, now) {
+  const base = original.source;
+  const id = `${key}|${base.uid}`;
+  let entry = cache.entries.get(id);
+  if (!entry) {
+    entry = { id, base, colour, texture: bakeRecolour(PIXI, renderer, base, colour), users: new Set(), seen: now, bytes: recolourBudgetBytes(base) };
+    cache.entries.set(id, entry);
+    cache.textures.set(id, entry.texture);
+  }
+  spr.recolour?.entry.users.delete(spr);
+  entry.users.add(spr);
+  spr.recolour = { entry, original };
+  if (!entry.texture) ensureRecoloured(PIXI, renderer, cache, spr);
+  else setDecoTexture(PIXI, spr, entry.texture);
+}
+
+/**
+ * A playing deco's strip arrived on a recoloured layer: bake the strip through the layer's colour
+ * (within the street's budget), else it stays on its recoloured still. Returns true when handled.
+ */
+function recolourAnim(PIXI, renderer, cache, spr, lc) {
+  const rc = lc.recoloured;
+  if (!rc || !renderer || lc.destroyed) return false;
+  const base = spr.decoAnim.original.source;
+  if (!cache.textures.has(`${rc.key}|${base.uid}`)) {
+    const bytes = recolourBudgetBytes(base);
+    if (cache.bytes + bytes > RECOLOUR_BUDGET_BYTES) {
+      spr.decoAnim.ready = false;
+      return true;
+    }
+    cache.bytes += bytes;
+  }
+  recolourDeco(PIXI, renderer, cache, spr, spr.decoAnim.original, rc.colour, rc.key, performance.now());
+  return true;
+}
+
 /** Bake a freed recoloured texture again for a deco coming into view. */
 function ensureRecoloured(PIXI, renderer, cache, spr) {
   const entry = spr.recolour?.entry;
@@ -942,7 +1017,7 @@ function ensureRecoloured(PIXI, renderer, cache, spr) {
   entry.texture = bakeRecolour(PIXI, renderer, entry.base, entry.colour);
   cache.textures.set(entry.id, entry.texture);
   cache.rebakes += 1;
-  for (const user of entry.users) if (!user.destroyed) user.texture = entry.texture;
+  for (const user of entry.users) if (!user.destroyed) setDecoTexture(PIXI, user, entry.texture);
 }
 
 /**
@@ -986,7 +1061,7 @@ function evictRecolours(cache, now) {
     }
     if (now - entry.seen < RECOLOUR_EVICT_MS) continue;
     // The decos are culled: park them on their (shared) original texture.
-    for (const user of entry.users) if (!user.destroyed) user.texture = user.recolour.original;
+    for (const user of entry.users) if (!user.destroyed) setDecoTexture(cache.PIXI, user, user.recolour.original);
     entry.texture.destroy(true);
     entry.texture = null;
     cache.textures.delete(entry.id);
@@ -1260,6 +1335,7 @@ function cullLayer(lc, camX, camY, vpW, vpH, rebake, now) {
     const out = b.x1 < x0 || b.x0 > x1 || b.y1 < y0 || b.y0 > y1;
     if (!out && child.recolour && !child.recolour.entry.texture) rebake(child);
     child.culled = out;
+    if (child.decoAnim) syncAnim(child, now);
     if (out) culled += 1;
   }
   return culled;
@@ -1281,7 +1357,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
   const available = opts.available || decoManifest || new Set();
   const root = new PIXI.Container();
   root.sortableChildren = true;
-  const recolourCache = { textures: new Map(), entries: new Map(), bytes: 0, evictions: 0, rebakes: 0, lastEvict: 0 };
+  const recolourCache = { PIXI, textures: new Map(), entries: new Map(), bytes: 0, evictions: 0, rebakes: 0, lastEvict: 0 };
   root.recolourCache = recolourCache;
   /** Ladder tiles drawn from the street's ladders' `tiling` (addLadderTiles). */
   root.ladderTiles = 0;
@@ -1362,6 +1438,10 @@ export function buildStreetView(street, PIXI, opts = {}) {
     })
     : null);
   const decoArt = (deco, available) => (available.has(deco.sprite) ? deco.sprite : DECO_TWINS[deco.sprite] || deco.sprite);
+  /** Placements that play their deco's timeline (js/deco-anim.js), all on one clock from now. */
+  const animClock = performance.now();
+  const animViews = [];
+  const animates = (deco, art) => Boolean(PIXI.AnimatedSprite) && isAnimatedDeco(deco, art);
   /** The far and blurred sharp copies this street can afford at the renderer's resolution now. */
   const farSharp = () => {
     const picks = [];
@@ -1374,7 +1454,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
       if (!far && !blur) return;
       for (const deco of layer.decos || []) {
         const url = `${decoBase}${decoArt(deco, available)}.png`;
-        if (isSharpDeco(url)) picks.push(sharpPick(url, far, blur));
+        if (isSharpDeco(url) && !animates(deco, decoArt(deco, available))) picks.push(sharpPick(url, far, blur));
       }
     });
     return admitSharp(picks);
@@ -1442,11 +1522,13 @@ export function buildStreetView(street, PIXI, opts = {}) {
       }
       const url = `${decoBase}${sprite}.png`;
       const farUrl = far ? decoUrl(url) : null;
-      const sharp = isSharpDeco(url);
+      // A playing deco draws its strip (the still until it loads), never a sharp copy.
+      const animated = animates(deco, sprite);
+      const sharp = !animated && isSharpDeco(url);
       let pick = sharp ? sharpPick(url, far, blur) : null;
       if (pick && (far || blur) && !farAdmitted.has(pick.url)) pick = null;
       const tex = pick ? sharpTexture(pick) : farUrl ? textureFromUrl(farUrl, { raw: true }) : textureFromUrl(url);
-      const spr = new PIXI.Sprite(tex);
+      const spr = animated ? new PIXI.AnimatedSprite([tex]) : new PIXI.Sprite(tex);
       spr.anchor.set(0.5, 1);
       // h_flip mirrors the deco about its registration point.
       const sizeDeco = () => {
@@ -1468,6 +1550,17 @@ export function buildStreetView(street, PIXI, opts = {}) {
       if (spr.glitchDecoId) decoViews.set(spr.glitchDecoId, spr);
       lc.addChild(spr);
       if (sharp && !blur) sharpViews.push({ spr, url, far, pick, size: sizeDeco });
+      if (animated) {
+        attachAnim(PIXI, spr, sprite, {
+          clock: animClock,
+          resolution: renderer?.resolution || 1,
+          far,
+          blur,
+          size: sizeDeco,
+          onReady: (s) => (s.parent === lc && lc.recoloured ? recolourAnim(PIXI, renderer, recolourCache, s, lc) : false),
+        });
+        animViews.push(spr);
+      }
       drawn += 1;
     }
     // Ladder tiling art (its own count, not a placed deco).
@@ -1485,6 +1578,30 @@ export function buildStreetView(street, PIXI, opts = {}) {
     buildGroundSkirt(PIXI, opts.renderer, root, ground, W, sourceH, skirtDepth, fallback);
   }
   root.decoDrawn = drawn;
+  /** Decos that play, for QA (canvas data-anim-decos): placed, strips in, playing, stopped off screen. */
+  root.animStats = (detail = false) => {
+    const live = animViews.filter((s) => !s.destroyed);
+    const ready = live.filter((s) => s.decoAnim?.ready);
+    const strips = new Set(ready.map((s) => s.decoAnim.url));
+    return {
+      placed: live.length,
+      ready: ready.length,
+      playing: ready.filter((s) => s.playing).length,
+      stopped: ready.filter((s) => !s.playing).length,
+      strips: strips.size,
+      threeX: [...strips].filter((u) => /@1\.5x\.webp$/.test(u)).length,
+      // Still on their first frame: strip not in yet, or a recoloured layer past its budget.
+      still: [...new Set(live.filter((s) => !s.decoAnim?.ready).map((s) => s.decoAnim?.name))],
+      // With `detail`: each deco, its frame and its box on the stage (QA crops).
+      ...(detail ? {
+        views: live.map((s) => {
+          const b = s.getBounds?.();
+          return { name: s.decoAnim?.name, playing: Boolean(s.playing), frame: s.currentFrame, box: b ? [b.x, b.y, b.width, b.height].map(Math.round) : null };
+        }),
+      } : {}),
+    };
+  };
+  root.animViews = animViews;
   /** Sharp decos drawn from their SVG / sized WebP right now, for QA (canvas data-sharp-decos). */
   root.sharpStats = () => {
     const live = sharpViews.filter((v) => !v.spr.destroyed);

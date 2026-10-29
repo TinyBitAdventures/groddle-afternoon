@@ -3,12 +3,17 @@
  * each layer's canvas size (w, h), its `filtersNEW` colour treatment
  * (brightness, contrast, saturation, tintColor, tintAmount, blur), and the
  * location's sky `gradient` (top, bottom), its `music_file` override, plus each
- * deco's `h_flip` and
- * `hidden` flags, and each layer's `is_hidden` (as `hidden`). Source: tinyspeck/glitch-locations
- * (CC0). Edits assets/streets/*.json in place; safe to re-run.
+ * deco's `h_flip`, `hidden` and `animated` flags, and each layer's `is_hidden` (as `hidden`).
+ * Source: tinyspeck/glitch-locations (CC0). Edits assets/streets/*.json in place; safe to re-run.
+ *
+ * `animated`: the client plays a placed deco's timeline only when the placement says so
+ * (DecoRenderer.as 301-305: MCUtil.recursivePlay, else recursiveGotoAndStop on frame 1), at the
+ * stage's 30 fps (TSEngineConstants.TARGET_FRAMERATE). js/street-render.js plays those decos from
+ * the strips in assets/decos/animated/ (tools/deco-pipeline/animate.py).
  *
  * Run from spike root:
- *   node build-street-layers.mjs
+ *   node build-street-layers.mjs           (write)
+ *   node build-street-layers.mjs --check   (exit 1 if any street JSON would change)
  */
 
 import { readFile, writeFile, readdir, access } from 'node:fs/promises';
@@ -21,6 +26,7 @@ const xmlRoot =
   process.env.GRODDLE_LOCATION_XML ||
   decodeURIComponent(new URL('../streets/mnt/stos/location_data', import.meta.url).pathname);
 
+const CHECK = process.argv.includes('--check');
 const FILTER_KEYS = ['brightness', 'contrast', 'saturation', 'tintColor', 'tintAmount', 'blur'];
 
 async function readable(path) {
@@ -111,6 +117,7 @@ function decoFlags(layerBody) {
     const flags = {
       flip: /<bool id="h_flip">true<\/bool>/.test(deco.body),
       hidden: /<bool id="hidden">true<\/bool>/.test(deco.body),
+      animated: /<bool id="animated">true<\/bool>/.test(deco.body),
     };
     if (!byKey.has(key)) byKey.set(key, []);
     byKey.get(key).push(flags);
@@ -122,6 +129,8 @@ let updated = 0;
 let flipped = 0;
 let hiddenDecos = 0;
 let hiddenLayers = 0;
+let animatedDecos = 0;
+const stale = [];
 let filtered = 0;
 let gradients = 0;
 for (const file of files) {
@@ -138,6 +147,7 @@ for (const file of files) {
   }
   if (!xmlPath) continue;
   const xml = await readFile(xmlPath, 'utf8');
+  const before = CHECK ? JSON.stringify(street) : null;
 
   // The location's music override (announce_music on entry), e.g. HELL.
   const music = xml.match(/<str id="music_file">([^<]+)<\/str>/)?.[1]?.trim();
@@ -197,13 +207,27 @@ for (const file of files) {
         } else {
           delete deco.hidden;
         }
+        if (flag?.animated) {
+          deco.animated = true;
+          animatedDecos += 1;
+        } else {
+          delete deco.animated;
+        }
       }
     }
   }
-  await writeFile(path, `${JSON.stringify(street)}\n`);
+  if (CHECK) {
+    if (JSON.stringify(street) !== before) stale.push(file);
+  } else {
+    await writeFile(path, `${JSON.stringify(street)}\n`);
+  }
   updated += 1;
 }
 console.log(
-  `Updated ${updated} streets: ${gradients} gradients, ${filtered} filtered layers, ` +
-    `${flipped} flipped decos, ${hiddenDecos} hidden decos, ${hiddenLayers} hidden layers.`
+  `${CHECK ? 'Checked' : 'Updated'} ${updated} streets: ${gradients} gradients, ${filtered} filtered layers, ` +
+    `${flipped} flipped decos, ${hiddenDecos} hidden decos, ${animatedDecos} animated decos, ${hiddenLayers} hidden layers.`
 );
+if (CHECK && stale.length) {
+  console.log(`${stale.length} street files are stale (run node build-street-layers.mjs): ${stale.slice(0, 8).join(', ')}`);
+  process.exit(1);
+}

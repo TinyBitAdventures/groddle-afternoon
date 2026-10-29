@@ -28,7 +28,7 @@ import {
   vicarsPeakEcology,
 } from '../public/js/vicars-peak.js';
 import { vicarsPeakFeature } from '../public/js/features/vicars-peak-feature.js';
-import { FEATURES } from '../public/js/features/index.js?v=registry-265';
+import { FEATURES } from '../public/js/features/index.js?v=registry-266';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

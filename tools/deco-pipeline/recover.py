@@ -48,10 +48,9 @@ ZOOM = 2
 
 # Left missing on purpose (each still listed in missing-decos.json):
 HELD = {
-    # Every source placement is flagged animated (location XML <bool id="animated">), which the
-    # imported street JSON dropped and the renderer cannot play yet: no still frame was ever shown.
-    'bubble_test': 'animated on all 6 placements (270-frame rising bubbles); frame 1 is a faint blob',
-    'stars_fade': 'animated on 8 of 9 placements (a 30-frame twinkle); frame 1 is empty',
+    # bubble_test and stars_fade (animated on every or all but one placement) were held here until
+    # G435 made the renderer play animated placements (tools/deco-pipeline/animate.py): their frame 1
+    # is the still those placements start from.
     # A photograph of a real person, a designer placeholder on the dev street unnnn only.
     'rook_hall_placeholder_painting': 'a photo of a real person (placeholder on unnnn); a product call',
 }

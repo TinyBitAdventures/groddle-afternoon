@@ -1,7 +1,7 @@
 {
   "referenced": 2891,
-  "present": 2853,
-  "missingCount": 38,
+  "present": 2855,
+  "missingCount": 36,
   "missing": [
     "House_back_Large_noWindows_01",
     "House_back_Large_noWindows_02",
@@ -9,7 +9,6 @@
     "House_back_Medium_noWindows_03",
     "House_back_Medium_noWindows_04",
     "House_back_Small_noWindows_03",
-    "bubble_test",
     "bush_ribbon_2",
     "cloud_vpuff2",
     "corey2_sky_borealis",
@@ -39,7 +38,6 @@
     "patch_hill4",
     "rook_hall_placeholder_painting",
     "sky_ceruleanGradient",
-    "sky_pinkGradient",
-    "stars_fade"
+    "sky_pinkGradient"
   ]
 }

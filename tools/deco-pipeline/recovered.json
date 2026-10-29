@@ -20,6 +20,25 @@
    ],
    "png_sha": "3d91c4b9f476bf59"
   },
+  "bubble_test": {
+   "swf": "bundle:quest06.swf#bubble_test",
+   "swf_sha": "3e9991bf3bed4041",
+   "stage": [
+    137.1,
+    105.15
+   ],
+   "root_frames": 270,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 6,
+   "streets": 6,
+   "png": [
+    275,
+    211
+   ],
+   "png_sha": "dee2ad4142fcebde"
+  },
   "building_asset_green": {
    "swf": "bundle:meomi2.swf#building_asset_green",
    "swf_sha": "d367e408de683430",
@@ -2812,6 +2831,25 @@
     2090
    ],
    "png_sha": "e71a2855fbd7b782"
+  },
+  "stars_fade": {
+   "swf": "bundle:zutto1.swf#stars_fade",
+   "swf_sha": "ff46c9cfe23eb08d",
+   "stage": [
+    1374.8,
+    383.45
+   ],
+   "root_frames": 1,
+   "sprite_frames": 30,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 9,
+   "streets": 2,
+   "png": [
+    2750,
+    767
+   ],
+   "png_sha": "4fdf788f0de86152"
   },
   "stripes_background": {
    "swf": "bundle:firebog.swf#stripes_background",

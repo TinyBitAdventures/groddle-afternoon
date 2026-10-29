@@ -144,6 +144,7 @@ export const SHARP_DECOS = new Map([
 ["bridge",["webp",1.0056,846,180,3.25,0.5248,0]],
 ["bridge_tile",["svg",1.0787,186,216,0,0,0]],
 ["broken_vase_piece_3",["svg",0,72,54,0,0.5,0]],
+["bubble_test",["webp",0.4982,275,211,1.75,0,0]],
 ["bugs_1",["webp",0.6711,76,82,2.75,0.9079,0]],
 ["bureaucratic_hall_counter_1",["svg",0.5291,1620,206,0,0,0]],
 ["bureaucratic_hall_light_1",["svg",0,624,100,0,3.23,0]],
