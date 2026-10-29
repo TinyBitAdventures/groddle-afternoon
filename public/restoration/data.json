@@ -2661,9 +2661,14 @@
   ]
  },
  "git": {
-  "commits": 709,
+  "commits": 710,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "Street project signs and Zilloween pumpkins stand in front of the trees"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2778,14 +2783,9 @@
     "date": "2026-10-28",
     "kind": "new",
     "text": "A connected game shows an administrator's message, sign-out, gift and refill"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "fix",
-    "text": "The multiplayer save status sits in the pack and stops flickering"
    }
   ]
  },
- "tests": 412,
+ "tests": 413,
  "generatedAt": "2026-10-29"
 }

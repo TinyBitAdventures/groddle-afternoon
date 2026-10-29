@@ -1,0 +1,3482 @@
+{
+ "about": "G431: decos recovered by tools/deco-pipeline/recover.py",
+ "decos": {
+  "blank": {
+   "swf": "bundle:subway1.swf#blank",
+   "swf_sha": "32d6afcb91bfd637",
+   "stage": [
+    168.95,
+    77.8
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 5,
+   "streets": 2,
+   "png": [
+    338,
+    156
+   ],
+   "png_sha": "3d91c4b9f476bf59"
+  },
+  "building_asset_green": {
+   "swf": "bundle:meomi2.swf#building_asset_green",
+   "swf_sha": "d367e408de683430",
+   "stage": [
+    402.0,
+    553.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 1,
+   "png": [
+    804,
+    1106
+   ],
+   "png_sha": "e75c8456c873352a"
+  },
+  "building_asset_orange": {
+   "swf": "bundle:meomi2.swf#building_asset_orange",
+   "swf_sha": "bf574bf23a69d211",
+   "stage": [
+    803.0,
+    764.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 1,
+   "png": [
+    1606,
+    1528
+   ],
+   "png_sha": "3d426e460c714cc1"
+  },
+  "building_asset_orangesmall": {
+   "swf": "bundle:meomi2.swf#building_asset_orangesmall",
+   "swf_sha": "afe82d0990a852f8",
+   "stage": [
+    333.0,
+    286.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 8,
+   "streets": 1,
+   "png": [
+    666,
+    572
+   ],
+   "png_sha": "cc73c1d28683cc77"
+  },
+  "building_asset_skinny": {
+   "swf": "bundle:meomi2.swf#building_asset_skinny",
+   "swf_sha": "85ab6dbf2f8bcbc5",
+   "stage": [
+    344.0,
+    792.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 1,
+   "png": [
+    688,
+    1584
+   ],
+   "png_sha": "08e09832565db608"
+  },
+  "bush_greenExplody": {
+   "swf": "bundle:newxp.swf#bush_greenExplody",
+   "swf_sha": "4c7411e63f9267ef",
+   "stage": [
+    185.25,
+    107.05
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 36,
+   "streets": 36,
+   "png": [
+    371,
+    215
+   ],
+   "png_sha": "9fc545ff9b51b556"
+  },
+  "bush_lightPuff2": {
+   "swf": "bundle:newxp.swf#bush_lightPuff2",
+   "swf_sha": "b9b9f786cef77f61",
+   "stage": [
+    104.9,
+    83.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 36,
+   "streets": 36,
+   "png": [
+    210,
+    168
+   ],
+   "png_sha": "b341732d48e33bc4"
+  },
+  "cave_platform_4_rev1": {
+   "swf": "bundle:zutto1.swf#cave_platform_4_rev1",
+   "swf_sha": "d4d2d0a5e6c4e5dd",
+   "stage": [
+    358.75,
+    406.8
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 9,
+   "streets": 3,
+   "png": [
+    718,
+    814
+   ],
+   "png_sha": "2b94b86689e4bb3b"
+  },
+  "cityscape_asset_01": {
+   "swf": "bundle:meomi2.swf#cityscape_asset_01",
+   "swf_sha": "6d6b3574d0f3dc88",
+   "stage": [
+    2486.0,
+    890.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 3,
+   "streets": 1,
+   "png": [
+    4972,
+    1780
+   ],
+   "png_sha": "b81c1132d7250f79"
+  },
+  "cityscape_asset_02": {
+   "swf": "bundle:meomi2.swf#cityscape_asset_02",
+   "swf_sha": "974ba70cd8b04372",
+   "stage": [
+    2486.0,
+    779.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 1,
+   "png": [
+    4972,
+    1558
+   ],
+   "png_sha": "0f8db82288524f05"
+  },
+  "cloud_blueShade3": {
+   "swf": "bundle:corey3.swf#cloud_blueShade3",
+   "swf_sha": "a1589f35ed75d8f5",
+   "stage": [
+    390.7,
+    50.05
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 12,
+   "streets": 2,
+   "png": [
+    782,
+    101
+   ],
+   "png_sha": "051afc4adcc31848"
+  },
+  "cloud_transluce3aw": {
+   "swf": "bundle:newxp.swf#cloud_transluce3aw",
+   "swf_sha": "581a0050db3d03db",
+   "stage": [
+    247.8,
+    115.2
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 305,
+   "streets": 40,
+   "png": [
+    496,
+    231
+   ],
+   "png_sha": "34ba03194133ee1c"
+  },
+  "cloud_transluce5": {
+   "swf": "bundle:corey3.swf#cloud_transluce5",
+   "swf_sha": "7e1ee7f11eee6a08",
+   "stage": [
+    144.65,
+    111.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 4,
+   "streets": 2,
+   "png": [
+    290,
+    222
+   ],
+   "png_sha": "3736079f1e9fc143"
+  },
+  "corey3_bush_lightPuff2": {
+   "swf": "bundle:corey3.swf#corey3_bush_lightPuff2",
+   "swf_sha": "b9b9f786cef77f61",
+   "stage": [
+    104.9,
+    83.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 6,
+   "streets": 4,
+   "png": [
+    210,
+    168
+   ],
+   "png_sha": "b341732d48e33bc4"
+  },
+  "corey3_cover_bush1": {
+   "swf": "bundle:corey3.swf#corey3_cover_bush1",
+   "swf_sha": "c971213b2ca4d449",
+   "stage": [
+    713.25,
+    72.8
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 21,
+   "streets": 5,
+   "png": [
+    1427,
+    146
+   ],
+   "png_sha": "bec472122014c979"
+  },
+  "corey3_cover_bush2": {
+   "swf": "bundle:corey3.swf#corey3_cover_bush2",
+   "swf_sha": "999f834bf1424394",
+   "stage": [
+    836.4,
+    64.3
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 4,
+   "streets": 2,
+   "png": [
+    1673,
+    129
+   ],
+   "png_sha": "4b7e3697e7f27ef8"
+  },
+  "corey3_dirt_slice1": {
+   "swf": "bundle:corey3.swf#corey3_dirt_slice1",
+   "swf_sha": "12ed25bc414cf633",
+   "stage": [
+    693.45,
+    48.3
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 3,
+   "streets": 3,
+   "png": [
+    1387,
+    97
+   ],
+   "png_sha": "203b2c537abdffed"
+  },
+  "corey3_fence_wood1": {
+   "swf": "bundle:corey3.swf#corey3_fence_wood1",
+   "swf_sha": "cb22003ba37e59c5",
+   "stage": [
+    231.8,
+    53.2
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    464,
+    107
+   ],
+   "png_sha": "fc339b4bf1cfbd8f"
+  },
+  "corey3_fence_wood2": {
+   "swf": "bundle:corey3.swf#corey3_fence_wood2",
+   "swf_sha": "94d8ab4d81dbc328",
+   "stage": [
+    295.1,
+    55.8
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 27,
+   "streets": 4,
+   "png": [
+    591,
+    112
+   ],
+   "png_sha": "c7ac24ddcc5bf012"
+  },
+  "corey3_forestCanopy_flatTop": {
+   "swf": "bundle:corey3.swf#corey3_forestCanopy_flatTop",
+   "swf_sha": "3fe32e1a68396de4",
+   "stage": [
+    292.7,
+    236.2
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 2,
+   "png": [
+    586,
+    473
+   ],
+   "png_sha": "21207abaa2f9c62b"
+  },
+  "corey3_forestCanopy_whole": {
+   "swf": "bundle:corey3.swf#corey3_forestCanopy_whole",
+   "swf_sha": "97709e0e4ab09861",
+   "stage": [
+    292.65,
+    246.5
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 7,
+   "streets": 2,
+   "png": [
+    586,
+    493
+   ],
+   "png_sha": "169006fb6f5b6e6f"
+  },
+  "corey3_forestShape_fluff": {
+   "swf": "bundle:corey3.swf#corey3_forestShape_fluff",
+   "swf_sha": "adc46df9f54cc7a1",
+   "stage": [
+    367.35,
+    117.05
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 21,
+   "streets": 4,
+   "png": [
+    735,
+    235
+   ],
+   "png_sha": "88739885f91e2e29"
+  },
+  "corey3_forestShape_pine": {
+   "swf": "bundle:corey3.swf#corey3_forestShape_pine",
+   "swf_sha": "faa5e62efef16bbf",
+   "stage": [
+    384.55,
+    129.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 23,
+   "streets": 5,
+   "png": [
+    770,
+    260
+   ],
+   "png_sha": "ce250d70c220555c"
+  },
+  "corey3_grassSlice_dirtEdge": {
+   "swf": "bundle:corey3.swf#corey3_grassSlice_dirtEdge",
+   "swf_sha": "9c46a26466e3177f",
+   "stage": [
+    174.8,
+    49.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 48,
+   "streets": 4,
+   "png": [
+    350,
+    100
+   ],
+   "png_sha": "2912f5998429b2ce"
+  },
+  "corey3_grassSlice_f1": {
+   "swf": "bundle:corey3.swf#corey3_grassSlice_f1",
+   "swf_sha": "bc1a7feb730be632",
+   "stage": [
+    160.0,
+    60.1
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 13,
+   "streets": 1,
+   "png": [
+    320,
+    121
+   ],
+   "png_sha": "745073208a11d0a2"
+  },
+  "corey3_grassSlice_f2": {
+   "swf": "bundle:corey3.swf#corey3_grassSlice_f2",
+   "swf_sha": "3b09f60ccc9a948d",
+   "stage": [
+    160.0,
+    59.75
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 6,
+   "streets": 1,
+   "png": [
+    320,
+    120
+   ],
+   "png_sha": "67d01051da3793c3"
+  },
+  "corey3_grassSlice_f3": {
+   "swf": "bundle:corey3.swf#corey3_grassSlice_f3",
+   "swf_sha": "0d57139e95dfd435",
+   "stage": [
+    160.0,
+    58.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 3,
+   "streets": 1,
+   "png": [
+    320,
+    118
+   ],
+   "png_sha": "85ff919e581cb452"
+  },
+  "corey3_grassSlice_f4": {
+   "swf": "bundle:corey3.swf#corey3_grassSlice_f4",
+   "swf_sha": "abcab8c66c50eb9e",
+   "stage": [
+    160.0,
+    56.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 12,
+   "streets": 3,
+   "png": [
+    320,
+    114
+   ],
+   "png_sha": "b30205e3c1c0dece"
+  },
+  "corey3_grassSlice_f5": {
+   "swf": "bundle:corey3.swf#corey3_grassSlice_f5",
+   "swf_sha": "0e0e1786717906a8",
+   "stage": [
+    160.35,
+    62.75
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 19,
+   "streets": 4,
+   "png": [
+    321,
+    126
+   ],
+   "png_sha": "1957cf87db0cc3cb"
+  },
+  "corey3_grassSlice_h2": {
+   "swf": "bundle:corey3.swf#corey3_grassSlice_h2",
+   "swf_sha": "e2df6f4b99f869de",
+   "stage": [
+    40.0,
+    76.1
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 4,
+   "streets": 2,
+   "png": [
+    80,
+    153
+   ],
+   "png_sha": "f13f683d30d42baf"
+  },
+  "corey3_hill_green1": {
+   "swf": "bundle:corey3.swf#corey3_hill_green1",
+   "swf_sha": "25468130f3a37854",
+   "stage": [
+    725.5,
+    251.7
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 6,
+   "streets": 2,
+   "png": [
+    1451,
+    504
+   ],
+   "png_sha": "ce24145d10408db0"
+  },
+  "corey3_hill_green2": {
+   "swf": "bundle:corey3.swf#corey3_hill_green2",
+   "swf_sha": "09cb2326caf94283",
+   "stage": [
+    801.2,
+    228.2
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    1603,
+    457
+   ],
+   "png_sha": "21a01400d2ccae21"
+  },
+  "corey3_hills_tinyPiny": {
+   "swf": "bundle:corey3.swf#corey3_hills_tinyPiny",
+   "swf_sha": "70f35f6f8e4ea3b0",
+   "stage": [
+    450.0,
+    298.55
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 18,
+   "streets": 5,
+   "png": [
+    900,
+    598
+   ],
+   "png_sha": "8600d7a69c84aa79"
+  },
+  "corey3_hills_tinyPiny_n1": {
+   "swf": "bundle:corey3.swf#corey3_hills_tinyPiny_n1",
+   "swf_sha": "b92dd32fdd54fe1e",
+   "stage": [
+    809.15,
+    259.3
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 52,
+   "streets": 12,
+   "png": [
+    1619,
+    519
+   ],
+   "png_sha": "eaf242a9a2458ddf"
+  },
+  "corey3_hills_tinyPiny_n2": {
+   "swf": "bundle:corey3.swf#corey3_hills_tinyPiny_n2",
+   "swf_sha": "02b8a83b11302416",
+   "stage": [
+    842.5,
+    322.95
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 117,
+   "streets": 10,
+   "png": [
+    1685,
+    646
+   ],
+   "png_sha": "9315d291316b032d"
+  },
+  "corey3_mountain_cut2": {
+   "swf": "bundle:corey3.swf#corey3_mountain_cut2",
+   "swf_sha": "b08efab78d2f3117",
+   "stage": [
+    531.3,
+    142.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 30,
+   "streets": 7,
+   "png": [
+    1063,
+    284
+   ],
+   "png_sha": "59221699418d1f01"
+  },
+  "corey3_patch_hill1": {
+   "swf": "bundle:corey3.swf#corey3_patch_hill1",
+   "swf_sha": "e8ff6d697018ea21",
+   "stage": [
+    851.55,
+    96.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 336,
+   "streets": 12,
+   "png": [
+    1704,
+    192
+   ],
+   "png_sha": "6dfcb417eb6b45cf"
+  },
+  "corey3_platform_bench_1": {
+   "swf": "bundle:corey3.swf#corey3_platform_bench_1",
+   "swf_sha": "88438d875ecfe045",
+   "stage": [
+    280.2,
+    98.25
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 1,
+   "png": [
+    561,
+    197
+   ],
+   "png_sha": "7d68c26bc425392e"
+  },
+  "corey3_platform_bench_2": {
+   "swf": "bundle:corey3.swf#corey3_platform_bench_2",
+   "swf_sha": "5d3fa827871fd352",
+   "stage": [
+    513.7,
+    132.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 3,
+   "streets": 1,
+   "png": [
+    1028,
+    266
+   ],
+   "png_sha": "e2394970aa5442c5"
+  },
+  "corey3_platform_bench_4": {
+   "swf": "bundle:corey3.swf#corey3_platform_bench_4",
+   "swf_sha": "a35f9a347be2ead2",
+   "stage": [
+    331.95,
+    103.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 4,
+   "streets": 1,
+   "png": [
+    664,
+    206
+   ],
+   "png_sha": "7ba4d33de8670afd"
+  },
+  "corey3_shroom_amanita": {
+   "swf": "bundle:corey3.swf#corey3_shroom_amanita",
+   "swf_sha": "e7d7f371016be282",
+   "stage": [
+    121.8,
+    156.2
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 3,
+   "streets": 3,
+   "png": [
+    244,
+    313
+   ],
+   "png_sha": "c246f680e0488522"
+  },
+  "corey3_shroom_aqua1": {
+   "swf": "bundle:corey3.swf#corey3_shroom_aqua1",
+   "swf_sha": "1164ed607a8e8c6d",
+   "stage": [
+    47.75,
+    88.8
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 3,
+   "streets": 3,
+   "png": [
+    96,
+    178
+   ],
+   "png_sha": "c10d2a5d2c34ebcd"
+  },
+  "corey3_shroom_aqua2": {
+   "swf": "bundle:corey3.swf#corey3_shroom_aqua2",
+   "swf_sha": "05c03bc0d1d86a4c",
+   "stage": [
+    63.3,
+    129.35
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 3,
+   "streets": 3,
+   "png": [
+    127,
+    259
+   ],
+   "png_sha": "62f9c75610680e01"
+  },
+  "corey3_treeStump": {
+   "swf": "bundle:corey3.swf#corey3_treeStump",
+   "swf_sha": "55574c6caa262172",
+   "stage": [
+    48.1,
+    24.7
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 4,
+   "streets": 4,
+   "png": [
+    97,
+    50
+   ],
+   "png_sha": "7fb54331d2c2c861"
+  },
+  "corey3_treeStump2": {
+   "swf": "bundle:corey3.swf#corey3_treeStump2",
+   "swf_sha": "3a319cb10985e2bc",
+   "stage": [
+    58.6,
+    30.05
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 4,
+   "streets": 2,
+   "png": [
+    118,
+    61
+   ],
+   "png_sha": "45afc5e9ff9d100e"
+  },
+  "corey3_tree_camoPine": {
+   "swf": "bundle:corey3.swf#corey3_tree_camoPine",
+   "swf_sha": "680fcd9566dd5633",
+   "stage": [
+    49.9,
+    126.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    100,
+    254
+   ],
+   "png_sha": "257fbb6333937170"
+  },
+  "corey3_tree_camoPine_n1": {
+   "swf": "bundle:corey3.swf#corey3_tree_camoPine_n1",
+   "swf_sha": "12a3941bb74d9b05",
+   "stage": [
+    72.6,
+    130.15
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    146,
+    261
+   ],
+   "png_sha": "4182101eba0a7732"
+  },
+  "corey3_tree_camoPine_n2": {
+   "swf": "bundle:corey3.swf#corey3_tree_camoPine_n2",
+   "swf_sha": "00238fec7a74924b",
+   "stage": [
+    69.65,
+    127.5
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 1,
+   "png": [
+    140,
+    255
+   ],
+   "png_sha": "f7cb8413d67cefbc"
+  },
+  "corey3_tree_camoPine_n4": {
+   "swf": "bundle:corey3.swf#corey3_tree_camoPine_n4",
+   "swf_sha": "fc279b61014a62c8",
+   "stage": [
+    53.65,
+    146.7
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    108,
+    294
+   ],
+   "png_sha": "c41afed3e28bc795"
+  },
+  "corey3_tree_furryFlat3": {
+   "swf": "bundle:corey3.swf#corey3_tree_furryFlat3",
+   "swf_sha": "2989ca36b30394f4",
+   "stage": [
+    82.25,
+    98.35
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    165,
+    197
+   ],
+   "png_sha": "b84fe06d1f4403fe"
+  },
+  "corey3_tree_pineCluster1": {
+   "swf": "bundle:corey3.swf#corey3_tree_pineCluster1",
+   "swf_sha": "6561f385089d38ae",
+   "stage": [
+    148.6,
+    106.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 14,
+   "streets": 4,
+   "png": [
+    298,
+    214
+   ],
+   "png_sha": "77b0f8dc10c123b6"
+  },
+  "corey3_tree_pineCluster2": {
+   "swf": "bundle:corey3.swf#corey3_tree_pineCluster2",
+   "swf_sha": "b9f0bc62e995d399",
+   "stage": [
+    116.6,
+    87.2
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 35,
+   "streets": 8,
+   "png": [
+    234,
+    175
+   ],
+   "png_sha": "950dbb94147ec109"
+  },
+  "corey3_tree_pineCluster3": {
+   "swf": "bundle:corey3.swf#corey3_tree_pineCluster3",
+   "swf_sha": "bd02e014ed2e74de",
+   "stage": [
+    177.55,
+    76.7
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 220,
+   "streets": 10,
+   "png": [
+    356,
+    154
+   ],
+   "png_sha": "6b3cbe757f980a24"
+  },
+  "corey3_tree_pineCluster4": {
+   "swf": "bundle:corey3.swf#corey3_tree_pineCluster4",
+   "swf_sha": "19bc18f558db3021",
+   "stage": [
+    163.05,
+    112.7
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 31,
+   "streets": 7,
+   "png": [
+    327,
+    226
+   ],
+   "png_sha": "762109b7e91a0db3"
+  },
+  "corey3_tree_redBare1": {
+   "swf": "bundle:corey3.swf#corey3_tree_redBare1",
+   "swf_sha": "db6b346d97285a1d",
+   "stage": [
+    104.1,
+    219.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 8,
+   "streets": 3,
+   "png": [
+    209,
+    440
+   ],
+   "png_sha": "29a9b2ef8ab4163d"
+  },
+  "corey3_tree_redBare3": {
+   "swf": "bundle:corey3.swf#corey3_tree_redBare3",
+   "swf_sha": "d18fb754f0a85651",
+   "stage": [
+    183.8,
+    215.4
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 3,
+   "streets": 2,
+   "png": [
+    368,
+    431
+   ],
+   "png_sha": "2c2bcfc3ba5b4f41"
+  },
+  "corey3_tree_redBare_n1": {
+   "swf": "bundle:corey3.swf#corey3_tree_redBare_n1",
+   "swf_sha": "d28821da7c85aa91",
+   "stage": [
+    157.55,
+    213.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 29,
+   "streets": 10,
+   "png": [
+    316,
+    428
+   ],
+   "png_sha": "f78a5d632c6582c6"
+  },
+  "corey3_tree_redBare_n2": {
+   "swf": "bundle:corey3.swf#corey3_tree_redBare_n2",
+   "swf_sha": "44ad796884e32d59",
+   "stage": [
+    191.2,
+    225.55
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 18,
+   "streets": 7,
+   "png": [
+    383,
+    452
+   ],
+   "png_sha": "645eb1e5e27f0888"
+  },
+  "corey3_tree_redBare_n3": {
+   "swf": "bundle:corey3.swf#corey3_tree_redBare_n3",
+   "swf_sha": "42634aa93970736e",
+   "stage": [
+    197.1,
+    192.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 12,
+   "streets": 4,
+   "png": [
+    395,
+    384
+   ],
+   "png_sha": "10d0ac2e065bf1ee"
+  },
+  "corey3_tree_upCurly": {
+   "swf": "bundle:corey3.swf#corey3_tree_upCurly",
+   "swf_sha": "a8cb0b1cbee681b2",
+   "stage": [
+    48.3,
+    120.05
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 12,
+   "streets": 4,
+   "png": [
+    97,
+    241
+   ],
+   "png_sha": "7c7e4402f29ba00e"
+  },
+  "corey3_tree_upCurly_n1": {
+   "swf": "bundle:corey3.swf#corey3_tree_upCurly_n1",
+   "swf_sha": "2f576d4fba10a429",
+   "stage": [
+    50.7,
+    89.5
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 1,
+   "png": [
+    102,
+    179
+   ],
+   "png_sha": "df3e0dd03ef9f335"
+  },
+  "corey_cover_clover1": {
+   "swf": "bundle:corey3.swf#corey_cover_clover1",
+   "swf_sha": "8ed480a9f88e770b",
+   "stage": [
+    324.1,
+    71.1
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 39,
+   "streets": 8,
+   "png": [
+    649,
+    143
+   ],
+   "png_sha": "49be19b8e3e91b1d"
+  },
+  "corey_cover_clover2": {
+   "swf": "bundle:corey3.swf#corey_cover_clover2",
+   "swf_sha": "474e7a3a9b1e340a",
+   "stage": [
+    128.55,
+    45.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 32,
+   "streets": 8,
+   "png": [
+    258,
+    90
+   ],
+   "png_sha": "752f4a107361b47d"
+  },
+  "cover_bush1": {
+   "swf": "bundle:newxp.swf#cover_bush1",
+   "swf_sha": "c971213b2ca4d449",
+   "stage": [
+    713.25,
+    72.8
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 36,
+   "streets": 36,
+   "png": [
+    1427,
+    146
+   ],
+   "png_sha": "bec472122014c979"
+  },
+  "cover_clover1": {
+   "swf": "bundle:newxp.swf#cover_clover1",
+   "swf_sha": "8ed480a9f88e770b",
+   "stage": [
+    324.1,
+    71.1
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 36,
+   "streets": 36,
+   "png": [
+    649,
+    143
+   ],
+   "png_sha": "49be19b8e3e91b1d"
+  },
+  "cover_clover2": {
+   "swf": "bundle:newxp.swf#cover_clover2",
+   "swf_sha": "474e7a3a9b1e340a",
+   "stage": [
+    128.55,
+    45.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 36,
+   "streets": 36,
+   "png": [
+    258,
+    90
+   ],
+   "png_sha": "752f4a107361b47d"
+  },
+  "door_asset_caveentrance": {
+   "swf": "bundle:zutto1.swf#door_asset_caveentrance",
+   "swf_sha": "910abb7875b6e9f8",
+   "stage": [
+    177.7,
+    211.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 1,
+   "png": [
+    356,
+    424
+   ],
+   "png_sha": "d1f265ff6795d190"
+  },
+  "door_asset_green": {
+   "swf": "bundle:meomi2.swf#door_asset_green",
+   "swf_sha": "71fd4477143df83a",
+   "stage": [
+    100.0,
+    161.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    200,
+    322
+   ],
+   "png_sha": "e5e8501f9465b22c"
+  },
+  "door_asset_maroon": {
+   "swf": "bundle:meomi2.swf#door_asset_maroon",
+   "swf_sha": "6cf2187a4002bd5f",
+   "stage": [
+    103.0,
+    128.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    206,
+    256
+   ],
+   "png_sha": "e32607d90b671b50"
+  },
+  "door_asset_tan": {
+   "swf": "bundle:meomi2.swf#door_asset_tan",
+   "swf_sha": "51536c5afc61a2c3",
+   "stage": [
+    84.0,
+    122.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    168,
+    244
+   ],
+   "png_sha": "49231a347ba97c2d"
+  },
+  "door_asset_yellow": {
+   "swf": "bundle:meomi2.swf#door_asset_yellow",
+   "swf_sha": "a189ebfd2b12be46",
+   "stage": [
+    82.0,
+    120.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 21,
+   "streets": 1,
+   "png": [
+    164,
+    240
+   ],
+   "png_sha": "be9e8372863e5c84"
+  },
+  "fence_wood2": {
+   "swf": "bundle:newxp.swf#fence_wood2",
+   "swf_sha": "94d8ab4d81dbc328",
+   "stage": [
+    295.1,
+    55.8
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 6,
+   "streets": 2,
+   "png": [
+    591,
+    112
+   ],
+   "png_sha": "c7ac24ddcc5bf012"
+  },
+  "fence_wood3": {
+   "swf": "bundle:newxp.swf#fence_wood3",
+   "swf_sha": "7c0981a647f0d67a",
+   "stage": [
+    110.05,
+    55.35
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 4,
+   "streets": 2,
+   "png": [
+    221,
+    111
+   ],
+   "png_sha": "06eaa4a7ef800b36"
+  },
+  "floor_shadow_left_open": {
+   "swf": "bundle:home_groddle.swf#floor_shadow_left_open",
+   "swf_sha": "653a562c098cc4de",
+   "stage": [
+    300.0,
+    108.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 3,
+   "streets": 1,
+   "png": [
+    600,
+    216
+   ],
+   "png_sha": "d3622b069574f6d5"
+  },
+  "flower_4n2": {
+   "swf": "bundle:newxp.swf#flower_4n2",
+   "swf_sha": "ff25ebda922a73f3",
+   "stage": [
+    109.9,
+    144.5
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 40,
+   "streets": 39,
+   "png": [
+    220,
+    289
+   ],
+   "png_sha": "905bfdd854d7b9c4"
+  },
+  "flower_9d": {
+   "swf": "bundle:newxp.swf#flower_9d",
+   "swf_sha": "2e10bfc6bb39d25b",
+   "stage": [
+    42.35,
+    104.2
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 2,
+   "png": [
+    85,
+    209
+   ],
+   "png_sha": "5aa526e082968498"
+  },
+  "flower_9h": {
+   "swf": "bundle:newxp.swf#flower_9h",
+   "swf_sha": "997d07d641a947f1",
+   "stage": [
+    41.8,
+    96.1
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 36,
+   "streets": 36,
+   "png": [
+    84,
+    193
+   ],
+   "png_sha": "e2f42f02bed74fd4"
+  },
+  "forestShape_fluff": {
+   "swf": "bundle:newxp.swf#forestShape_fluff",
+   "swf_sha": "adc46df9f54cc7a1",
+   "stage": [
+    367.35,
+    117.05
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 52,
+   "streets": 38,
+   "png": [
+    735,
+    235
+   ],
+   "png_sha": "88739885f91e2e29"
+  },
+  "forestShape_pine": {
+   "swf": "bundle:newxp.swf#forestShape_pine",
+   "swf_sha": "faa5e62efef16bbf",
+   "stage": [
+    384.55,
+    129.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 42,
+   "streets": 38,
+   "png": [
+    770,
+    260
+   ],
+   "png_sha": "ce250d70c220555c"
+  },
+  "grassSlice_dirtEdge": {
+   "swf": "bundle:newxp.swf#grassSlice_dirtEdge",
+   "swf_sha": "9c46a26466e3177f",
+   "stage": [
+    174.8,
+    49.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 8,
+   "streets": 2,
+   "png": [
+    350,
+    100
+   ],
+   "png_sha": "2912f5998429b2ce"
+  },
+  "grassSlice_extended": {
+   "swf": "bundle:newxp.swf#grassSlice_extended",
+   "swf_sha": "3e46fc043bf3d242",
+   "stage": [
+    945.8,
+    72.8
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 269,
+   "streets": 49,
+   "png": [
+    1892,
+    146
+   ],
+   "png_sha": "0ab2759f5d5ec512"
+  },
+  "grassSlice_f1": {
+   "swf": "bundle:newxp.swf#grassSlice_f1",
+   "swf_sha": "bc1a7feb730be632",
+   "stage": [
+    160.0,
+    60.1
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 2,
+   "png": [
+    320,
+    121
+   ],
+   "png_sha": "745073208a11d0a2"
+  },
+  "grassSlice_f2": {
+   "swf": "bundle:newxp.swf#grassSlice_f2",
+   "swf_sha": "3b09f60ccc9a948d",
+   "stage": [
+    160.0,
+    59.75
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 2,
+   "png": [
+    320,
+    120
+   ],
+   "png_sha": "67d01051da3793c3"
+  },
+  "grassSlice_f4": {
+   "swf": "bundle:newxp.swf#grassSlice_f4",
+   "swf_sha": "abcab8c66c50eb9e",
+   "stage": [
+    160.0,
+    56.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 4,
+   "streets": 2,
+   "png": [
+    320,
+    114
+   ],
+   "png_sha": "b30205e3c1c0dece"
+  },
+  "grassSlice_h1": {
+   "swf": "bundle:newxp.swf#grassSlice_h1",
+   "swf_sha": "7ce6d75e65636b8e",
+   "stage": [
+    160.0,
+    66.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 4,
+   "streets": 2,
+   "png": [
+    320,
+    132
+   ],
+   "png_sha": "ad69a197b07e92ea"
+  },
+  "grass_asset_01": {
+   "swf": "bundle:meomi2.swf#grass_asset_01",
+   "swf_sha": "a4a4e0f805ad2a8e",
+   "stage": [
+    40.0,
+    60.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 6,
+   "streets": 1,
+   "png": [
+    80,
+    120
+   ],
+   "png_sha": "df82a53caca4af28"
+  },
+  "grass_asset_02": {
+   "swf": "bundle:meomi2.swf#grass_asset_02",
+   "swf_sha": "0bb5a0846fc8758f",
+   "stage": [
+    40.0,
+    64.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 9,
+   "streets": 1,
+   "png": [
+    80,
+    128
+   ],
+   "png_sha": "936acb7cbc90621e"
+  },
+  "grass_asset_03": {
+   "swf": "bundle:meomi2.swf#grass_asset_03",
+   "swf_sha": "72e0de161e354f75",
+   "stage": [
+    65.0,
+    56.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 11,
+   "streets": 1,
+   "png": [
+    130,
+    112
+   ],
+   "png_sha": "35afba295bd95f30"
+  },
+  "grass_firy2": {
+   "swf": "bundle:corey3.swf#grass_firy2",
+   "swf_sha": "b2c11ec71a703f9d",
+   "stage": [
+    104.9,
+    77.2
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    210,
+    155
+   ],
+   "png_sha": "4db1a202599d1872"
+  },
+  "grass_firy5": {
+   "swf": "bundle:corey3.swf#grass_firy5",
+   "swf_sha": "50ff22da1e09a6b7",
+   "stage": [
+    131.8,
+    89.3
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    264,
+    179
+   ],
+   "png_sha": "e6ee7e34be2ac925"
+  },
+  "grass_firy7": {
+   "swf": "bundle:corey3.swf#grass_firy7",
+   "swf_sha": "6ce9e798b7d3fd48",
+   "stage": [
+    102.65,
+    77.35
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    206,
+    155
+   ],
+   "png_sha": "c8cbdb3b57a609f0"
+  },
+  "grass_transparent_scene_1": {
+   "swf": "bundle:firebog.swf#grass_transparent_scene_1",
+   "swf_sha": "64ca00b52a3d6d34",
+   "stage": [
+    47.0,
+    39.95
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 383,
+   "streets": 58,
+   "png": [
+    94,
+    80
+   ],
+   "png_sha": "cce1e19accfe252d"
+  },
+  "green_sky": {
+   "swf": "bundle:firebog.swf#green_sky",
+   "swf_sha": "b15a5a765c536b82",
+   "stage": [
+    1616.95,
+    398.95
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    3234,
+    798
+   ],
+   "png_sha": "37b1c93e46a392d1"
+  },
+  "groddle_grassSlice_h1": {
+   "swf": "bundle:corey3.swf#groddle_grassSlice_h1",
+   "swf_sha": "7ce6d75e65636b8e",
+   "stage": [
+    160.0,
+    66.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 50,
+   "streets": 6,
+   "png": [
+    320,
+    132
+   ],
+   "png_sha": "ad69a197b07e92ea"
+  },
+  "groddle_mountain_cut1": {
+   "swf": "bundle:corey3.swf#groddle_mountain_cut1",
+   "swf_sha": "d0255c6a06200b2b",
+   "stage": [
+    434.45,
+    132.3
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 43,
+   "streets": 7,
+   "png": [
+    869,
+    265
+   ],
+   "png_sha": "88cecb2ddf9cec24"
+  },
+  "groddle_mountain_cut3": {
+   "swf": "bundle:corey3.swf#groddle_mountain_cut3",
+   "swf_sha": "a42594c2cd9fccd2",
+   "stage": [
+    606.7,
+    142.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 67,
+   "streets": 10,
+   "png": [
+    1214,
+    284
+   ],
+   "png_sha": "637d8a3a8afd959f"
+  },
+  "groddle_mountain_cut4": {
+   "swf": "bundle:corey3.swf#groddle_mountain_cut4",
+   "swf_sha": "47cdfbd8aa8612e0",
+   "stage": [
+    700.0,
+    128.2
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 21,
+   "streets": 7,
+   "png": [
+    1400,
+    257
+   ],
+   "png_sha": "8b515474293a0145"
+  },
+  "groddle_mountains_cutout": {
+   "swf": "bundle:corey3.swf#groddle_mountains_cutout",
+   "swf_sha": "bea16870aa12d48b",
+   "stage": [
+    905.0,
+    139.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 65,
+   "streets": 12,
+   "png": [
+    1810,
+    280
+   ],
+   "png_sha": "49ce16f27e17a575"
+  },
+  "groddle_patch_flat4": {
+   "swf": "bundle:corey3.swf#groddle_patch_flat4",
+   "swf_sha": "6f697a5841046183",
+   "stage": [
+    780.55,
+    101.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 45,
+   "streets": 5,
+   "png": [
+    1562,
+    204
+   ],
+   "png_sha": "128660b6d64aea30"
+  },
+  "groddle_sign_blank_plank": {
+   "swf": "bundle:groddle1.swf#groddle_sign_blank_plank",
+   "swf_sha": "a193b296fa9280bc",
+   "stage": [
+    240.05,
+    88.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 8,
+   "streets": 5,
+   "png": [
+    481,
+    178
+   ],
+   "png_sha": "4b69b5a2db0b57d4"
+  },
+  "ground_large_1": {
+   "swf": "bundle:zutto1.swf#ground_large_1",
+   "swf_sha": "844411ebd7b71c1b",
+   "stage": [
+    164.55,
+    568.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    330,
+    1138
+   ],
+   "png_sha": "a402050e2fa87504"
+  },
+  "ground_large_2": {
+   "swf": "bundle:zutto1.swf#ground_large_2",
+   "swf_sha": "cc30380845aa127b",
+   "stage": [
+    493.55,
+    567.85
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 12,
+   "streets": 3,
+   "png": [
+    988,
+    1136
+   ],
+   "png_sha": "f1dbc463eef3f4c2"
+  },
+  "hill_distant1": {
+   "swf": "bundle:corey3.swf#hill_distant1",
+   "swf_sha": "ece02a82f0a3cfb7",
+   "stage": [
+    1015.65,
+    232.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    2032,
+    466
+   ],
+   "png_sha": "ec3692fa5a239ada"
+  },
+  "hill_distant2": {
+   "swf": "bundle:corey3.swf#hill_distant2",
+   "swf_sha": "5461f08075f095ca",
+   "stage": [
+    1914.45,
+    320.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 1,
+   "png": [
+    3829,
+    642
+   ],
+   "png_sha": "b7527edb6f1e9aa0"
+  },
+  "hills_bg1_1": {
+   "swf": "bundle:corey3.swf#hills_bg1_1",
+   "swf_sha": "4258394ae998eae9",
+   "stage": [
+    1309.05,
+    220.8
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 7,
+   "streets": 1,
+   "png": [
+    2619,
+    442
+   ],
+   "png_sha": "e7dfb4c2705a35dc"
+  },
+  "hills_bg1_2": {
+   "swf": "bundle:corey3.swf#hills_bg1_2",
+   "swf_sha": "f84b3542767517da",
+   "stage": [
+    873.6,
+    181.5
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    1748,
+    363
+   ],
+   "png_sha": "bf1fd53e5a3f2fb9"
+  },
+  "hills_bg2_transitionhill_1": {
+   "swf": "bundle:corey3.swf#hills_bg2_transitionhill_1",
+   "swf_sha": "eb989235f54489ae",
+   "stage": [
+    986.85,
+    105.15
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 15,
+   "streets": 2,
+   "png": [
+    1974,
+    211
+   ],
+   "png_sha": "c0be07383778c84a"
+  },
+  "hills_tinyPiny_n1": {
+   "swf": "bundle:newxp.swf#hills_tinyPiny_n1",
+   "swf_sha": "b92dd32fdd54fe1e",
+   "stage": [
+    809.15,
+    259.3
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 36,
+   "streets": 36,
+   "png": [
+    1619,
+    519
+   ],
+   "png_sha": "eaf242a9a2458ddf"
+  },
+  "hills_tinyPiny_n2": {
+   "swf": "bundle:newxp.swf#hills_tinyPiny_n2",
+   "swf_sha": "02b8a83b11302416",
+   "stage": [
+    842.5,
+    322.95
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 72,
+   "streets": 36,
+   "png": [
+    1685,
+    646
+   ],
+   "png_sha": "9315d291316b032d"
+  },
+  "hole_cover": {
+   "swf": "bundle:corey3.swf#hole_cover",
+   "swf_sha": "ec146fe851b6ee56",
+   "stage": [
+    137.55,
+    113.75
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 2,
+   "png": [
+    276,
+    228
+   ],
+   "png_sha": "cf6fcbc9f7e2442e"
+  },
+  "hole_rear": {
+   "swf": "bundle:corey3.swf#hole_rear",
+   "swf_sha": "126394d4904e2cff",
+   "stage": [
+    114.2,
+    128.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 2,
+   "png": [
+    229,
+    258
+   ],
+   "png_sha": "a5c1dd7500263431"
+  },
+  "house_asset_orange": {
+   "swf": "bundle:meomi2.swf#house_asset_orange",
+   "swf_sha": "7c0ef330029e25e0",
+   "stage": [
+    448.0,
+    355.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    896,
+    710
+   ],
+   "png_sha": "fe6c0ef0d20bebb0"
+  },
+  "house_asset_turquoise": {
+   "swf": "bundle:meomi2.swf#house_asset_turquoise",
+   "swf_sha": "744cb1cc8e6a9565",
+   "stage": [
+    327.0,
+    365.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    654,
+    730
+   ],
+   "png_sha": "7a5b33a4a65e5128"
+  },
+  "house_asset_yellow": {
+   "swf": "bundle:meomi2.swf#house_asset_yellow",
+   "swf_sha": "e45d02d327b4dfbd",
+   "stage": [
+    336.0,
+    349.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    672,
+    698
+   ],
+   "png_sha": "c4e5b6863e625aec"
+  },
+  "ladder_int_hole_back": {
+   "swf": "bundle:firebog.swf#ladder_int_hole_back",
+   "swf_sha": "d965082cd496d24f",
+   "stage": [
+    130.15,
+    32.3
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 3,
+   "streets": 2,
+   "png": [
+    261,
+    65
+   ],
+   "png_sha": "7aa65cd1b46278d6"
+  },
+  "ladder_tile_cap_1_metal": {
+   "swf": "bundle:meomi2.swf#ladder_tile_cap_1_metal",
+   "swf_sha": "825a9c6660af2ec2",
+   "stage": [
+    64.0,
+    50.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    128,
+    100
+   ],
+   "png_sha": "9988c7371712ad56"
+  },
+  "meomi2_sky_day": {
+   "swf": "bundle:meomi2.swf#meomi2_sky_day",
+   "swf_sha": "c4b99b282ffed80d",
+   "stage": [
+    1325.7,
+    1044.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    2652,
+    2090
+   ],
+   "png_sha": "d649ae0c8d2be6f2"
+  },
+  "moon_asset_plain": {
+   "swf": "bundle:meomi2.swf#moon_asset_plain",
+   "swf_sha": "e3658a9082b6ebb1",
+   "stage": [
+    90.0,
+    90.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 3,
+   "streets": 3,
+   "png": [
+    180,
+    180
+   ],
+   "png_sha": "28a68b3b212a1e28"
+  },
+  "mountain_cut1": {
+   "swf": "bundle:newxp.swf#mountain_cut1",
+   "swf_sha": "d0255c6a06200b2b",
+   "stage": [
+    434.45,
+    132.3
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 36,
+   "streets": 36,
+   "png": [
+    869,
+    265
+   ],
+   "png_sha": "88cecb2ddf9cec24"
+  },
+  "mountain_cut4": {
+   "swf": "bundle:newxp.swf#mountain_cut4",
+   "swf_sha": "47cdfbd8aa8612e0",
+   "stage": [
+    700.0,
+    128.2
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 72,
+   "streets": 36,
+   "png": [
+    1400,
+    257
+   ],
+   "png_sha": "8b515474293a0145"
+  },
+  "mountain_trees_darker_1": {
+   "swf": "bundle:groddle1.swf#mountain_trees_darker_1",
+   "swf_sha": "386752362c2b3617",
+   "stage": [
+    1010.15,
+    428.8
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 996,
+   "streets": 348,
+   "png": [
+    2021,
+    858
+   ],
+   "png_sha": "c210fbbde1a4989c"
+  },
+  "mountains_cutout": {
+   "swf": "bundle:newxp.swf#mountains_cutout",
+   "swf_sha": "bea16870aa12d48b",
+   "stage": [
+    905.0,
+    139.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 72,
+   "streets": 36,
+   "png": [
+    1810,
+    280
+   ],
+   "png_sha": "49ce16f27e17a575"
+  },
+  "patch_hilite1": {
+   "swf": "bundle:corey3.swf#patch_hilite1",
+   "swf_sha": "0a4d7a46fbbfd0fb",
+   "stage": [
+    313.4,
+    42.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 110,
+   "streets": 12,
+   "png": [
+    627,
+    86
+   ],
+   "png_sha": "64635363f0720477"
+  },
+  "patch_hilite2": {
+   "swf": "bundle:corey3.swf#patch_hilite2",
+   "swf_sha": "feebfa1f9996c844",
+   "stage": [
+    479.35,
+    80.95
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 6,
+   "streets": 4,
+   "png": [
+    959,
+    162
+   ],
+   "png_sha": "cb364aa60573de94"
+  },
+  "patch_hilite3": {
+   "swf": "bundle:corey3.swf#patch_hilite3",
+   "swf_sha": "1d18f6fe56cd4258",
+   "stage": [
+    142.4,
+    52.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 7,
+   "streets": 4,
+   "png": [
+    285,
+    106
+   ],
+   "png_sha": "c12ba50e90c299b2"
+  },
+  "patch_hilite4": {
+   "swf": "bundle:corey3.swf#patch_hilite4",
+   "swf_sha": "5ea05bac2b4b2867",
+   "stage": [
+    141.15,
+    42.25
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 4,
+   "streets": 4,
+   "png": [
+    283,
+    85
+   ],
+   "png_sha": "3795356d8445a3b3"
+  },
+  "patch_hilite5": {
+   "swf": "bundle:corey3.swf#patch_hilite5",
+   "swf_sha": "6474999a43e9e4ab",
+   "stage": [
+    435.05,
+    40.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 3,
+   "streets": 1,
+   "png": [
+    871,
+    82
+   ],
+   "png_sha": "9c74d9fbb2ce4f94"
+  },
+  "patch_hilite6": {
+   "swf": "bundle:corey3.swf#patch_hilite6",
+   "swf_sha": "15c997ee649cc3c4",
+   "stage": [
+    403.4,
+    55.4
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 3,
+   "streets": 2,
+   "png": [
+    807,
+    111
+   ],
+   "png_sha": "a186f61d6bd98b60"
+  },
+  "patch_hilite7": {
+   "swf": "bundle:corey3.swf#patch_hilite7",
+   "swf_sha": "71689e76012ed3c6",
+   "stage": [
+    777.8,
+    74.55
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 10,
+   "streets": 4,
+   "png": [
+    1556,
+    150
+   ],
+   "png_sha": "d21f18a63b2e4204"
+  },
+  "patch_rough1": {
+   "swf": "bundle:corey3.swf#patch_rough1",
+   "swf_sha": "b05deaa2f7cedf83",
+   "stage": [
+    728.3,
+    162.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 36,
+   "streets": 8,
+   "png": [
+    1457,
+    326
+   ],
+   "png_sha": "9192baad052670a0"
+  },
+  "patch_rough2": {
+   "swf": "bundle:newxp.swf#patch_rough2",
+   "swf_sha": "43219d6ee621b92b",
+   "stage": [
+    834.8,
+    155.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 587,
+   "streets": 41,
+   "png": [
+    1670,
+    312
+   ],
+   "png_sha": "57bb4b16091d49a3"
+  },
+  "patch_rough3": {
+   "swf": "bundle:corey3.swf#patch_rough3",
+   "swf_sha": "7fe50c446da36927",
+   "stage": [
+    585.3,
+    189.1
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 20,
+   "streets": 7,
+   "png": [
+    1171,
+    379
+   ],
+   "png_sha": "7d0f38ea435003c5"
+  },
+  "patch_rough4": {
+   "swf": "bundle:corey3.swf#patch_rough4",
+   "swf_sha": "05eb804762111f43",
+   "stage": [
+    909.2,
+    301.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 16,
+   "streets": 7,
+   "png": [
+    1819,
+    604
+   ],
+   "png_sha": "87b65ece83aff083"
+  },
+  "patch_rough5": {
+   "swf": "bundle:corey3.swf#patch_rough5",
+   "swf_sha": "380c60ad24331544",
+   "stage": [
+    460.3,
+    106.8
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 66,
+   "streets": 9,
+   "png": [
+    921,
+    214
+   ],
+   "png_sha": "103c30525abddeb8"
+  },
+  "patch_rough6": {
+   "swf": "bundle:corey3.swf#patch_rough6",
+   "swf_sha": "59b4016ff4ff2ba0",
+   "stage": [
+    531.75,
+    119.55
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 136,
+   "streets": 12,
+   "png": [
+    1064,
+    240
+   ],
+   "png_sha": "662ad7f6def35b40"
+  },
+  "patch_rough7": {
+   "swf": "bundle:corey3.swf#patch_rough7",
+   "swf_sha": "491acd186dc03581",
+   "stage": [
+    1412.7,
+    182.4
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 42,
+   "streets": 8,
+   "png": [
+    2826,
+    365
+   ],
+   "png_sha": "72a526a61d7230d9"
+  },
+  "patch_roughHill1": {
+   "swf": "bundle:newxp.swf#patch_roughHill1",
+   "swf_sha": "8998e33e0dca942a",
+   "stage": [
+    601.7,
+    180.3
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 76,
+   "streets": 39,
+   "png": [
+    1204,
+    361
+   ],
+   "png_sha": "1d029789ff9e818c"
+  },
+  "patch_roughHill2": {
+   "swf": "bundle:corey3.swf#patch_roughHill2",
+   "swf_sha": "72c92555e16151ea",
+   "stage": [
+    723.65,
+    208.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 35,
+   "streets": 10,
+   "png": [
+    1448,
+    418
+   ],
+   "png_sha": "8c1b98eb981b3051"
+  },
+  "plat_tile_cap_0_sidewalk": {
+   "swf": "bundle:meomi2.swf#plat_tile_cap_0_sidewalk",
+   "swf_sha": "c73a12a4f8c4a40f",
+   "stage": [
+    50.0,
+    130.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    100,
+    260
+   ],
+   "png_sha": "1df8af5730e53ed7"
+  },
+  "plat_tile_cap_1_sidewalk": {
+   "swf": "bundle:meomi2.swf#plat_tile_cap_1_sidewalk",
+   "swf_sha": "03e3c0f858ecee30",
+   "stage": [
+    50.0,
+    130.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    100,
+    260
+   ],
+   "png_sha": "1166734f31a848d6"
+  },
+  "plat_tile_center_01_sidewalk": {
+   "swf": "bundle:meomi2.swf#plat_tile_center_01_sidewalk",
+   "swf_sha": "164e1d31995efcf4",
+   "stage": [
+    50.0,
+    130.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    100,
+    260
+   ],
+   "png_sha": "db157e9ed95a7e5d"
+  },
+  "plat_tile_center_02_sidewalk": {
+   "swf": "bundle:meomi2.swf#plat_tile_center_02_sidewalk",
+   "swf_sha": "d32a506a8551483a",
+   "stage": [
+    50.0,
+    130.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    100,
+    260
+   ],
+   "png_sha": "ec22e9d14dd4f1c9"
+  },
+  "plat_tile_center_03_sidewalk": {
+   "swf": "bundle:meomi2.swf#plat_tile_center_03_sidewalk",
+   "swf_sha": "7a4c7a29f186952c",
+   "stage": [
+    50.0,
+    130.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 102,
+   "streets": 1,
+   "png": [
+    100,
+    260
+   ],
+   "png_sha": "511a4649608db85d"
+  },
+  "rook_hall_placeholder_caveman": {
+   "swf": "bundle:firebog.swf#rook_hall_placeholder_caveman",
+   "swf_sha": "24029e72d4c6df4a",
+   "stage": [
+    133.1,
+    173.1
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 6,
+   "streets": 1,
+   "png": [
+    267,
+    347
+   ],
+   "png_sha": "3778a65d4797de55"
+  },
+  "rook_hall_placeholder_old_shrine": {
+   "swf": "bundle:firebog.swf#rook_hall_placeholder_old_shrine",
+   "swf_sha": "917987e19129e72d",
+   "stage": [
+    221.9,
+    138.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 6,
+   "streets": 1,
+   "png": [
+    444,
+    278
+   ],
+   "png_sha": "bd129874fea450a6"
+  },
+  "shadow_generic_02": {
+   "swf": "bundle:leavens1.swf#shadow_generic_02",
+   "swf_sha": "608ea0617fad83cf",
+   "stage": [
+    252.0,
+    37.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 4,
+   "streets": 1,
+   "png": [
+    504,
+    74
+   ],
+   "png_sha": "5e2cd35fc1eda38a"
+  },
+  "sky_greenGradient": {
+   "swf": "bundle:corey3.swf#sky_greenGradient",
+   "swf_sha": "2e1de26615da9f65",
+   "stage": [
+    799.1,
+    239.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    1599,
+    480
+   ],
+   "png_sha": "e97697edea062fad"
+  },
+  "sky_night": {
+   "swf": "bundle:meomi2.swf#sky_night",
+   "swf_sha": "b3791331236e8d77",
+   "stage": [
+    1326.1,
+    1044.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 1,
+   "png": [
+    2653,
+    2090
+   ],
+   "png_sha": "e71a2855fbd7b782"
+  },
+  "stripes_background": {
+   "swf": "bundle:firebog.swf#stripes_background",
+   "swf_sha": "b0a45b88c96ed42a",
+   "stage": [
+    2338.3,
+    827.95
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 20,
+   "streets": 16,
+   "png": [
+    4677,
+    1656
+   ],
+   "png_sha": "5dc646a82380c8fc"
+  },
+  "sun_asset_plain": {
+   "swf": "bundle:meomi2.swf#sun_asset_plain",
+   "swf_sha": "8ea513becc4cd037",
+   "stage": [
+    175.0,
+    175.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    350,
+    350
+   ],
+   "png_sha": "834a0253a2efbf84"
+  },
+  "treeStump3": {
+   "swf": "bundle:corey3.swf#treeStump3",
+   "swf_sha": "13be0d740a23d83e",
+   "stage": [
+    79.3,
+    64.3
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 2,
+   "png": [
+    159,
+    129
+   ],
+   "png_sha": "8108777ad92b389e"
+  },
+  "tree_asset_blueblossom": {
+   "swf": "bundle:meomi2.swf#tree_asset_blueblossom",
+   "swf_sha": "fadae21c97d745c8",
+   "stage": [
+    352.0,
+    325.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 4,
+   "streets": 2,
+   "png": [
+    704,
+    650
+   ],
+   "png_sha": "22f8e35ec2d6605b"
+  },
+  "tree_asset_bluetall": {
+   "swf": "bundle:meomi2.swf#tree_asset_bluetall",
+   "swf_sha": "f2366213c99eb821",
+   "stage": [
+    350.0,
+    388.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 5,
+   "streets": 1,
+   "png": [
+    700,
+    776
+   ],
+   "png_sha": "d2f3bb34fb5114c8"
+  },
+  "tree_asset_bonsai": {
+   "swf": "bundle:meomi2.swf#tree_asset_bonsai",
+   "swf_sha": "6e8b0475790e5fca",
+   "stage": [
+    692.0,
+    530.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 4,
+   "streets": 1,
+   "png": [
+    1384,
+    1060
+   ],
+   "png_sha": "49fdb2c03ced9747"
+  },
+  "tree_asset_pinkblossom": {
+   "swf": "bundle:meomi2.swf#tree_asset_pinkblossom",
+   "swf_sha": "3d5be14cb393398f",
+   "stage": [
+    352.0,
+    325.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 6,
+   "streets": 2,
+   "png": [
+    704,
+    650
+   ],
+   "png_sha": "41f972d3f893ca06"
+  },
+  "tree_asset_pinktall": {
+   "swf": "bundle:meomi2.swf#tree_asset_pinktall",
+   "swf_sha": "e02440b0d7acc004",
+   "stage": [
+    350.0,
+    395.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 1,
+   "png": [
+    700,
+    790
+   ],
+   "png_sha": "7d640d13a94693cc"
+  },
+  "tree_coniferous_bare_1": {
+   "swf": "bundle:groddle1.swf#tree_coniferous_bare_1",
+   "swf_sha": "ef5ef5686287f479",
+   "stage": [
+    289.05,
+    593.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 309,
+   "streets": 134,
+   "png": [
+    579,
+    1188
+   ],
+   "png_sha": "bfd3b884ffbb66dc"
+  },
+  "tree_darkPointy": {
+   "swf": "bundle:newxp.swf#tree_darkPointy",
+   "swf_sha": "78ed11706882fbd0",
+   "stage": [
+    32.1,
+    110.7
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 72,
+   "streets": 36,
+   "png": [
+    65,
+    222
+   ],
+   "png_sha": "b47178fcd90b8e50"
+  },
+  "tree_furryFlat1": {
+   "swf": "bundle:newxp.swf#tree_furryFlat1",
+   "swf_sha": "e08c919a62d0ec7e",
+   "stage": [
+    83.4,
+    108.4
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 108,
+   "streets": 36,
+   "png": [
+    167,
+    217
+   ],
+   "png_sha": "de9702dc76207548"
+  },
+  "tree_furryFlat3": {
+   "swf": "bundle:newxp.swf#tree_furryFlat3",
+   "swf_sha": "2989ca36b30394f4",
+   "stage": [
+    82.25,
+    98.35
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 38,
+   "streets": 38,
+   "png": [
+    165,
+    197
+   ],
+   "png_sha": "b84fe06d1f4403fe"
+  },
+  "tree_group_bg2_1": {
+   "swf": "bundle:groddle1.swf#tree_group_bg2_1",
+   "swf_sha": "575ffe8ba99d1a40",
+   "stage": [
+    438.2,
+    573.6
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2909,
+   "streets": 345,
+   "png": [
+    877,
+    1148
+   ],
+   "png_sha": "b7530ceb44ac3b44"
+  },
+  "tree_pineCluster1": {
+   "swf": "bundle:newxp.swf#tree_pineCluster1",
+   "swf_sha": "6561f385089d38ae",
+   "stage": [
+    148.6,
+    106.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 36,
+   "streets": 36,
+   "png": [
+    298,
+    214
+   ],
+   "png_sha": "77b0f8dc10c123b6"
+  },
+  "tree_pineCluster2": {
+   "swf": "bundle:newxp.swf#tree_pineCluster2",
+   "swf_sha": "b9f0bc62e995d399",
+   "stage": [
+    116.6,
+    87.2
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 36,
+   "streets": 36,
+   "png": [
+    234,
+    175
+   ],
+   "png_sha": "950dbb94147ec109"
+  },
+  "tree_pineCluster3": {
+   "swf": "bundle:newxp.swf#tree_pineCluster3",
+   "swf_sha": "bd02e014ed2e74de",
+   "stage": [
+    177.55,
+    76.7
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 36,
+   "streets": 36,
+   "png": [
+    356,
+    154
+   ],
+   "png_sha": "6b3cbe757f980a24"
+  },
+  "tree_pineCluster4": {
+   "swf": "bundle:newxp.swf#tree_pineCluster4",
+   "swf_sha": "19bc18f558db3021",
+   "stage": [
+    163.05,
+    112.7
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 36,
+   "streets": 36,
+   "png": [
+    327,
+    226
+   ],
+   "png_sha": "762109b7e91a0db3"
+  },
+  "tree_redBare_n1": {
+   "swf": "bundle:newxp.swf#tree_redBare_n1",
+   "swf_sha": "d28821da7c85aa91",
+   "stage": [
+    157.55,
+    213.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 36,
+   "streets": 36,
+   "png": [
+    316,
+    428
+   ],
+   "png_sha": "f78a5d632c6582c6"
+  },
+  "tree_upCurly": {
+   "swf": "bundle:newxp.swf#tree_upCurly",
+   "swf_sha": "a8cb0b1cbee681b2",
+   "stage": [
+    48.3,
+    120.05
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 72,
+   "streets": 36,
+   "png": [
+    97,
+    241
+   ],
+   "png_sha": "7c7e4402f29ba00e"
+  },
+  "tree_upCurly_n1": {
+   "swf": "bundle:newxp.swf#tree_upCurly_n1",
+   "swf_sha": "2f576d4fba10a429",
+   "stage": [
+    50.7,
+    89.5
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 36,
+   "streets": 36,
+   "png": [
+    102,
+    179
+   ],
+   "png_sha": "df3e0dd03ef9f335"
+  },
+  "tree_upCurly_n3": {
+   "swf": "bundle:newxp.swf#tree_upCurly_n3",
+   "swf_sha": "36e062ae61795139",
+   "stage": [
+    59.4,
+    100.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 36,
+   "streets": 36,
+   "png": [
+    119,
+    202
+   ],
+   "png_sha": "132693aeddd9822b"
+  },
+  "ug_boulders1": {
+   "swf": "bundle:corey3.swf#ug_boulders1",
+   "swf_sha": "94a5fc65c3680ff8",
+   "stage": [
+    123.15,
+    63.3
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 8,
+   "streets": 1,
+   "png": [
+    247,
+    127
+   ],
+   "png_sha": "7d69bf7eae6209d3"
+  },
+  "ug_boulders2": {
+   "swf": "bundle:corey3.swf#ug_boulders2",
+   "swf_sha": "f05f319cf54f315d",
+   "stage": [
+    135.35,
+    76.15
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 8,
+   "streets": 1,
+   "png": [
+    271,
+    153
+   ],
+   "png_sha": "ddb898e189f7738d"
+  },
+  "ug_boulders3": {
+   "swf": "bundle:corey3.swf#ug_boulders3",
+   "swf_sha": "7de49942fe2bbdbf",
+   "stage": [
+    177.2,
+    83.05
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 27,
+   "streets": 1,
+   "png": [
+    355,
+    167
+   ],
+   "png_sha": "1cb4c666157b3597"
+  },
+  "ug_boulders4": {
+   "swf": "bundle:corey3.swf#ug_boulders4",
+   "swf_sha": "6bbc3d66ffe3c046",
+   "stage": [
+    125.95,
+    59.95
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 9,
+   "streets": 1,
+   "png": [
+    252,
+    120
+   ],
+   "png_sha": "e25cade42ddfa41c"
+  },
+  "ug_bricks2b": {
+   "swf": "bundle:corey3.swf#ug_bricks2b",
+   "swf_sha": "3a41c50d8479189c",
+   "stage": [
+    215.95,
+    86.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 19,
+   "streets": 1,
+   "png": [
+    432,
+    174
+   ],
+   "png_sha": "7e0ddb78e8e3ac20"
+  },
+  "ug_bricks3": {
+   "swf": "bundle:corey3.swf#ug_bricks3",
+   "swf_sha": "a0c9b6acb8df0933",
+   "stage": [
+    339.3,
+    47.25
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    679,
+    95
+   ],
+   "png_sha": "654a78e37315ddf0"
+  },
+  "ug_floor1": {
+   "swf": "bundle:corey3.swf#ug_floor1",
+   "swf_sha": "371bf285b05f9ce1",
+   "stage": [
+    569.4,
+    64.35
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 18,
+   "streets": 1,
+   "png": [
+    1139,
+    129
+   ],
+   "png_sha": "aa173ff02e5c27c4"
+  },
+  "ug_floor2": {
+   "swf": "bundle:corey3.swf#ug_floor2",
+   "swf_sha": "83d6eabafa851e9f",
+   "stage": [
+    489.55,
+    54.95
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 25,
+   "streets": 1,
+   "png": [
+    980,
+    110
+   ],
+   "png_sha": "61f032e834f669d2"
+  },
+  "ug_overlay": {
+   "swf": "bundle:corey3.swf#ug_overlay",
+   "swf_sha": "937683872c50dd78",
+   "stage": [
+    500.0,
+    300.2
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 2,
+   "png": [
+    1000,
+    601
+   ],
+   "png_sha": "c77c3491f33b588c"
+  },
+  "ug_sliceUnderside1": {
+   "swf": "bundle:corey3.swf#ug_sliceUnderside1",
+   "swf_sha": "589c3f1a9a8c07a9",
+   "stage": [
+    301.2,
+    19.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 4,
+   "streets": 2,
+   "png": [
+    603,
+    40
+   ],
+   "png_sha": "0771838d2e54a69e"
+  },
+  "ug_sliceUnderside2": {
+   "swf": "bundle:corey3.swf#ug_sliceUnderside2",
+   "swf_sha": "12d02852ef5dbbb8",
+   "stage": [
+    301.25,
+    24.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 10,
+   "streets": 2,
+   "png": [
+    603,
+    48
+   ],
+   "png_sha": "7ae676d5779029b5"
+  },
+  "ug_wall": {
+   "swf": "bundle:corey3.swf#ug_wall",
+   "swf_sha": "2b80eb8182a36aa7",
+   "stage": [
+    567.85,
+    177.1
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    1136,
+    355
+   ],
+   "png_sha": "e212b2c44e7f126e"
+  },
+  "wallpaper_end_shadow": {
+   "swf": "bundle:home_groddle.swf#wallpaper_end_shadow",
+   "swf_sha": "8b3fc756c8bcd4fe",
+   "stage": [
+    133.0,
+    458.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 7,
+   "streets": 2,
+   "png": [
+    266,
+    916
+   ],
+   "png_sha": "2f38b03628bc77b7"
+  },
+  "woodbeam_balcony_left": {
+   "swf": "bundle:home_groddle.swf#woodbeam_balcony_left",
+   "swf_sha": "d9c46dc88d06514f",
+   "stage": [
+    300.0,
+    408.0
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 1,
+   "streets": 1,
+   "png": [
+    600,
+    816
+   ],
+   "png_sha": "19179018ddedbddd"
+  }
+ }
+}
