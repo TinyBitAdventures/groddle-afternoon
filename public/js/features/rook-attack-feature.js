@@ -498,6 +498,8 @@ function ensureUi(engine) {
   const hud = new PIXI.Container();
   hud.eventMode = 'none';
   root.addChild(sky, rookLayer, front, fxLayer, tint, textLayer, hud);
+  // A street overlay: the interaction hint stays above it (game.js syncPromptLayer).
+  root.label = 'world-overlay';
   stage.addChild(root);
   ui = { root, sky, rookLayer, front, fxLayer, tint, textLayer, hud, rook: null, head: null, headClip: '', headLock: 0, badge: null };
   buildHud(engine);

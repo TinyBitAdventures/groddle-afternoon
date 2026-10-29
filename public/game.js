@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-271';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-275';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g434-1';
@@ -1151,7 +1151,7 @@ const SHEETS = {
 };
 
 const keys = new Set();
-let app, world, bgLayer, entityLayer, fxLayer, player, prompt, camTarget, camY, portalSprites;
+let app, world, bgLayer, entityLayer, fxLayer, player, prompt, promptLayer, camTarget, camY, portalSprites;
 /** Holds the street's layers above the middleground (street-render frontView), over entityLayer. */
 let streetFrontLayer = null;
 /** The Dametime atmosphere (updateDametimeChrome): a multiply wash between the street and fxLayer. */
@@ -5030,6 +5030,26 @@ function trantDisplayScale(tex, opts = {}) {
   const maxScale = opts.maxScale ?? 1;
   const baseH = Math.max(1, tex?.height || targetH);
   return Math.min(maxScale, targetH / baseH);
+}
+
+/** The hint's layer tracks the world's camera at draw time, after every update moved the world this frame. */
+function syncPromptLayer() {
+  if (!promptLayer || !world) return;
+  promptLayer.position.copyFrom(world.position);
+  promptLayer.scale.copyFrom(world.scale);
+  promptLayer.pivot.copyFrom(world.pivot);
+}
+
+/** Once a tick: the hint's layer sits just above the world and any street overlay ('world-overlay'), under the rest. */
+function orderPromptLayer() {
+  const stage = promptLayer?.parent;
+  if (!stage || !world) return;
+  const others = stage.children.filter((c) => c !== promptLayer);
+  let top = others.indexOf(world);
+  others.forEach((c, i) => {
+    if (c.label === 'world-overlay' && i > top) top = i;
+  });
+  if (top >= 0 && stage.getChildIndex(promptLayer) !== top + 1) stage.addChildAt(promptLayer, top + 1);
 }
 
 /**
@@ -24435,7 +24455,15 @@ async function main() {
 
   prompt = makePromptChip();
   prompt.visible = false;
-  fxLayer.addChild(prompt);
+  // The interaction hint is read and acted on, so it draws over the street's own overlays
+  // (the Rook attack's skulls and feathers, rook-attack-feature's label 'world-overlay')
+  // on a stage layer that follows the camera; screen-wide fades and cards stay above it.
+  promptLayer = new PIXI.Container();
+  promptLayer.label = 'prompt-layer';
+  promptLayer.eventMode = 'none';
+  promptLayer.addChild(prompt);
+  promptLayer.onRender = syncPromptLayer;
+  app.stage.addChild(promptLayer);
 
   // Load mined GSJS catalogs (quests / achievements / skills / buffs)
   await loadContentCatalogs();
@@ -26320,6 +26348,7 @@ async function main() {
   };
   app.ticker.add((ticker) => {
     syncStreetFront();
+    orderPromptLayer();
     tickAtmosphere();
     if (!state.started) {
       drawStreetFrame();

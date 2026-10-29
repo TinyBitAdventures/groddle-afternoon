@@ -2661,9 +2661,14 @@
   ]
  },
  "git": {
-  "commits": 735,
+  "commits": 736,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "improve",
+    "text": "The Super Harvest rainbow draws sharp on Retina screens"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2778,14 +2783,9 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "The restoration report counts working skills again (104 of 110)"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "Climbing to the top of Groddle Ladder takes you to The Great Hole to Ix"
    }
   ]
  },
- "tests": 424,
+ "tests": 425,
  "generatedAt": "2026-10-29"
 }
