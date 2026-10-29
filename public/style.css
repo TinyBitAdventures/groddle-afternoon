@@ -1471,13 +1471,13 @@ body.nx-hide-mood.nx-hide-energy .meta-vitals { visibility: hidden; }
   padding: 0;
   border: 0;
   /* cancel.svg redraws the client's 20 x 21 word_dismisser_cancel.png so it stays sharp when the view scales. */
-  background: url("assets/sprites/word-progress/cancel.svg") no-repeat 0 0 / 20px 21px;
+  background: url("assets/sprites/word-progress/cancel.svg?v=df15aba7") no-repeat 0 0 / 20px 21px;
   cursor: pointer;
   pointer-events: auto;
 }
 .word-progress-cancel:hover,
 .word-progress-cancel:focus-visible {
-  background-image: url("assets/sprites/word-progress/cancel_hover.svg");
+  background-image: url("assets/sprites/word-progress/cancel_hover.svg?v=df15aba7");
 }
 .word-progress-cancel:focus-visible { outline: 2px solid #fff; outline-offset: 1px; border-radius: 50%; }
 .word-progress-cancel[hidden] { display: none; }
@@ -2229,7 +2229,7 @@ button.play-context-head:focus-visible {
   grid-row: 1 / span 2;
   width: 51px;
   height: 46px;
-  background: url('assets/sprites/making/tinkertool-work@3x.webp') 0 0 / var(--mp-sheet-w) var(--mp-sheet-h) no-repeat;
+  background: url('assets/sprites/making/tinkertool-work@3x.webp?v=df15aba7') 0 0 / var(--mp-sheet-w) var(--mp-sheet-h) no-repeat;
   animation:
     make-tool-sheet-x var(--mp-row-dur) steps(var(--mp-cols), end) infinite,
     make-tool-sheet-y calc(var(--mp-row-dur) * var(--mp-rows)) steps(var(--mp-rows), end) infinite;
@@ -7637,7 +7637,7 @@ header.top-bar + .sub { display: none; }
 @media (prefers-reduced-motion: reduce) { .fam-rays svg { animation: none; } }
 .fam-close {
   width: 22px; height: 22px; padding: 0; border: 0; border-radius: 4px; cursor: pointer;
-  background: #0a181d url('assets/ui/familiar/close_x_small_gray.png') center / 20px 20px no-repeat;
+  background: #0a181d url('assets/ui/familiar/close_x_small_gray.png?v=df15aba7') center / 20px 20px no-repeat;
   box-shadow: inset 0 0 0 1px rgba(204, 204, 204, 0.25);
 }
 .fam-close:hover, .fam-close:focus-visible { box-shadow: inset 0 0 0 1px #ccc; }

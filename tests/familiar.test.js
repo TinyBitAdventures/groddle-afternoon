@@ -28,7 +28,7 @@ import {
   skillLearnedModel,
   truncateLabel,
   vogLayout,
-} from '../public/js/familiar.js?v=g405-1';
+} from '../public/js/familiar.js?v=g434-1';
 import { CARD_ART_LAYERS } from '../public/js/imagination-data.js';
 import {
   _resetFamiliarDialog,
@@ -36,7 +36,7 @@ import {
   familiarDialogFeature,
   familiarDialogOpen,
   queueSkillLearned,
-} from '../public/js/features/familiar-dialog-feature.js?v=g428-1';
+} from '../public/js/features/familiar-dialog-feature.js?v=g434-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');
@@ -70,7 +70,7 @@ describe('pet_rock art (CC0 OGA sheet)', () => {
     const cy = sheet.bbox.y + sheet.bbox.h / 2;
     assert.ok(cx - side / 2 >= 0 && cx + side / 2 <= sheet.cellW, 'no neighbour cell across');
     assert.ok(cy - side / 2 >= 0 && cy + side / 2 <= sheet.cellH, 'no neighbour cell down');
-    assert.match(read('js/familiar.js'), /backgroundImage = `url\("\$\{sheet\.hires \|\| sheet\.src\}"\)`/);
+    assert.match(read('js/familiar.js'), /backgroundImage = `url\("\$\{keyedArt\(sheet\.hires \|\| sheet\.src\)\}"\)`/);
   });
 
   it('fits the rock into its box like ItemIconView and steps through the grid', () => {
@@ -240,7 +240,7 @@ describe('skill learned panel (G218)', () => {
     assert.match(game, /openSkillTree\(classTsid = ''\) \{/);
     const index = read('js/features/index.js');
     // Registered (G185 appends the loneliness feature after it; neither answers the other's first-answer hooks).
-    assert.match(index, /^import \{ familiarDialogFeature \} from '\.\/familiar-dialog-feature\.js\?v=g428-1'; FEATURES\.push\(familiarDialogFeature\);$/m);
+    assert.match(index, /^import \{ familiarDialogFeature \} from '\.\/familiar-dialog-feature\.js\?v=g434-1'; FEATURES\.push\(familiarDialogFeature\);$/m);
   });
 });
 

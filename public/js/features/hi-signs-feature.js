@@ -117,6 +117,9 @@ import {
   yourSignLine,
 } from '../hi-signs-mp.js?v=g327-1';
 
+/** An art URL with its content key (js/data-urls.js groddleDataUrl); as it is in Node and on a page without the map. */
+const keyedArt = (url) => (typeof globalThis.groddleDataUrl === 'function' ? globalThis.groddleDataUrl(url) : url);
+
 export const HI_FEATURE_ID = 'hi-signs';
 /** The player's label in the Butler's lines (as BUTLER_INTRO: the remake's players have no name). */
 const PC_LABEL = 'friend';
@@ -868,7 +871,7 @@ function signImg(variant, size = 30) {
   icon.setAttribute('aria-hidden', 'true');
   icon.style.width = `${size}px`;
   icon.style.height = `${size}px`;
-  icon.style.backgroundImage = `url("${sheet.url}")`;
+  icon.style.backgroundImage = `url("${keyedArt(sheet.url)}")`;
   icon.style.backgroundSize = `${sheet.w * k}px ${sheet.h * k}px`;
   icon.style.backgroundPosition = `${-(sheet.ax - box / 2) * k}px ${-(sheet.ay - box / 2) * k}px`;
   return icon;

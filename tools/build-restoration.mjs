@@ -100,13 +100,15 @@ const ROOM_TITLES = {
   color_unblocking: 'Color Unblocking', light_perspective: 'Walk Toward the Light', radiant_glare: 'Radiant Glare',
   picto_pattern: 'Picto-Pattern', tile_puzzle: 'An Old Fashioned B&E', clubhouse: 'Join the Club',
   operation_grow: 'Operation: Grow', gwendolyn: "Gwendolyn's Task", penalty: 'Smuggle the Smuggler',
+  firefly_whistle: 'Firefly Whistle',
 };
 
 function roomStats() {
   const quests = json('assets/content/quests.json');
   const rooms = new Map();
   for (const [questId, roomId] of Object.entries(QUEST_ROOMS)) {
-    if (!rooms.has(roomId)) rooms.set(roomId, { id: roomId, title: ROOM_TITLES[roomId] || roomId, quests: [] });
+    // A room without a title of its own takes its first quest's (GSJS quests/<id>.js `title`), never its code name.
+    if (!rooms.has(roomId)) rooms.set(roomId, { id: roomId, title: ROOM_TITLES[roomId] || quests[questId]?.title || roomId, quests: [] });
     rooms.get(roomId).quests.push(quests[questId]?.title || questId);
   }
   const firstQuest = Object.fromEntries(Object.entries(QUEST_ROOMS).reverse().map(([q, room]) => [room, q]));

@@ -23,8 +23,18 @@
  * art pipelines) leaves the map stale until this is rerun: --check, which
  * tests/data-versions.test.js runs, fails and names the files.
  *
- *   node tools/data-versions/build.mjs                 write the map and the pages' keys
- *   node tools/data-versions/build.mjs --check         exit 1 when either is stale
+ * The same keys go into the files a browser reads without the hook
+ * (2026-10-29): every HTML and CSS file under public/ (not vendor/) gets
+ * `?v=<key>` on each data or art URL in its markup (src, srcset, href,
+ * poster, style="" and <style> url()) and its url() rules, resolved against
+ * the page's <base> or the style sheet's folder (keyAssetUrls). Inline
+ * scripts are left alone (the hook keys what they set). The page builders
+ * (tools/catalog, tools/changelog, tools/play-online) key their own output
+ * with the committed map (committedMap), so their --check agrees; this
+ * rewrites every file that is behind, and --check names them.
+ *
+ *   node tools/data-versions/build.mjs                 write the map, the pages' keys and the HTML/CSS asset keys
+ *   node tools/data-versions/build.mjs --check         exit 1 when any of them is stale
  *   node tools/data-versions/build.mjs --built         deploy: also key the BUILT files
  *   node tools/data-versions/build.mjs --epoch=HEAD    start a new epoch at a commit
  */
@@ -122,7 +132,150 @@ export function mapKey(root = ROOT) {
 }
 
 /** The js/data-urls.js key (bump it when that file changes). */
-export const HOOK_SRC = 'js/data-urls.js?v=g420-1';
+export const HOOK_SRC = 'js/data-urls.js?v=g434-1';
+
+/* ------------------------------------------------------------------ */
+/* Keys written into HTML and CSS                                        */
+/* ------------------------------------------------------------------ */
+
+/** The key of a path relative to public/ (`map.files[path]`, else the epoch's for a versioned extension, else ''). */
+export function keyOf(map, path) {
+  const own = Object.prototype.hasOwnProperty.call(map.files, path) ? map.files[path] : '';
+  return own || (EXT.test(path) ? String(map.epoch).slice(0, 8) : '');
+}
+
+/** `url` with its `v` parameter set to `key`, the other parameters and the hash kept (js/data-urls.js withKey). */
+function withKey(url, key) {
+  const hashAt = url.indexOf('#');
+  const hash = hashAt < 0 ? '' : url.slice(hashAt);
+  const rest = hashAt < 0 ? url : url.slice(0, hashAt);
+  const q = rest.indexOf('?');
+  if (q < 0) return `${rest}?v=${key}${hash}`;
+  const params = rest.slice(q + 1).split('&').filter((p) => p && !/^v(?:=|$)/.test(p));
+  return `${rest.slice(0, q)}?${['v=' + key, ...params].join('&')}${hash}`;
+}
+
+const ORIGIN = 'https://groddle.invalid/';
+/** Other schemes, protocol-relative and fragment URLs, and template text, which are never files of the game. */
+const NOT_A_FILE = /^(?:[a-z][a-z0-9+.-]*:|\/\/|#)|\$\{|\{\{|[<>\s]/i;
+
+/**
+ * The keyed form of one URL written in a file, resolved against `base` (a folder URL under ORIGIN):
+ * unchanged when it is not a versioned file of the game.
+ */
+export function keyAssetUrl(url, base, map) {
+  if (!url || NOT_A_FILE.test(url)) return url;
+  let abs;
+  try {
+    abs = new URL(url, base);
+  } catch {
+    return url;
+  }
+  if (abs.origin !== new URL(ORIGIN).origin) return url;
+  let path;
+  try {
+    path = decodeURIComponent(abs.pathname.slice(1));
+  } catch {
+    return url;
+  }
+  const key = keyOf(map, path);
+  return key ? withKey(url, key) : url;
+}
+
+const CSS_URL = /(url\(\s*)(&quot;|&#39;|["']?)([^"'()\s]*?)\2(\s*\))/gi;
+/** CSS text with each url(...) keyed (quoted, unquoted, or with &quot; quotes inside an HTML attribute). */
+export function keyCss(css, base, map) {
+  return css.replace(CSS_URL, (all, open, q, value, close) => {
+    if (!value) return all;
+    const entity = q.startsWith('&');
+    const raw = entity ? value.replace(/&amp;/g, '&') : value;
+    const next = keyAssetUrl(raw, base, map);
+    return next === raw ? all : open + q + (entity ? next.replace(/&/g, '&amp;') : next) + q + close;
+  });
+}
+
+const URL_ATTR = /(\s(src|href|poster|data-src|xlink:href|srcset|style)\s*=\s*)(?:"([^"]*)"|'([^']*)')/gi;
+/** HTML with every data or art URL in its attributes and <style> blocks keyed; <script> bodies are left as they are. */
+export function keyHtml(html, base, map) {
+  const pageBase = (() => {
+    const m = /<base\s[^>]*\bhref\s*=\s*["']([^"']+)["']/i.exec(html);
+    try {
+      return m ? new URL(m[1].replace(/&amp;/g, '&'), base).href : base;
+    } catch {
+      return base;
+    }
+  })();
+  const attrs = (text) => text.replace(URL_ATTR, (all, pre, name, dq, sq) => {
+    const value = dq ?? sq;
+    const q = dq != null ? '"' : "'";
+    const lower = name.toLowerCase();
+    let next;
+    if (lower === 'style') next = keyCss(value, pageBase, map);
+    else if (lower === 'srcset') {
+      next = value.split(',').map((part) => {
+        const m = /^(\s*)(\S+)(.*)$/s.exec(part);
+        if (!m) return part;
+        const raw = m[2].replace(/&amp;/g, '&');
+        const keyed = keyAssetUrl(raw, pageBase, map);
+        return keyed === raw ? part : m[1] + keyed.replace(/&/g, '&amp;') + m[3];
+      }).join(',');
+    } else {
+      const raw = value.replace(/&amp;/g, '&');
+      const keyed = keyAssetUrl(raw, pageBase, map);
+      next = keyed === raw ? value : keyed.replace(/&/g, '&amp;');
+    }
+    return next === value ? all : pre + q + next + q;
+  });
+  // Script bodies pass through; <style> bodies are CSS; the rest is markup.
+  return html.split(/(<script\b[^>]*>[\s\S]*?<\/script\s*>|<style\b[^>]*>[\s\S]*?<\/style\s*>)/i).map((part, i) => {
+    if (i % 2 === 0) return attrs(part);
+    if (/^<script/i.test(part)) {
+      const open = /^<script\b[^>]*>/i.exec(part)[0];
+      return attrs(open) + part.slice(open.length);
+    }
+    const open = /^<style\b[^>]*>/i.exec(part)[0];
+    return open + keyCss(part.slice(open.length), pageBase, map);
+  }).join('');
+}
+
+/** `text` of the file at `rel` (relative to public/, .html or .css) with its asset URLs keyed from `map`. */
+export function keyAssetUrls(text, rel, map) {
+  const base = new URL(rel.replace(/[^/]*$/, ''), ORIGIN).href;
+  if (/\.css$/i.test(rel)) return keyCss(text, base, map);
+  if (/\.html?$/i.test(rel)) return keyHtml(text, base, map);
+  return text;
+}
+
+/** The map as committed in `root` (public/js/data-versions.js): what the page builders key their output with. */
+export function committedMap(root = ROOT) {
+  let source = '';
+  try {
+    source = readFileSync(join(root, MAP_PATH), 'utf8');
+  } catch {
+    return { epoch: '', files: {} };
+  }
+  return { epoch: /epoch: '([0-9a-f]{8})'/.exec(source)?.[1] || '', files: parseFiles(source) };
+}
+
+/** Every HTML and CSS file under public/ the browser reads as written (tracked or new; not vendor/). */
+export function keyedFiles(root = ROOT) {
+  return [
+    ...list(git(root, ['ls-files', '-z', '--', 'public'])),
+    ...list(git(root, ['ls-files', '--others', '--exclude-standard', '-z', '--', 'public'])),
+  ].filter((f) => /\.(?:html?|css)$/i.test(f) && !f.startsWith('public/vendor/') && existsSync(join(root, f)));
+}
+
+/** Files whose asset keys differ from `map`, with their text rewritten. */
+export function staleAssetFiles(root, map) {
+  if (!map.epoch) return [];
+  const stale = [];
+  for (const f of keyedFiles(root)) {
+    const text = readFileSync(join(root, f), 'utf8');
+    const next = keyAssetUrls(text, f.slice('public/'.length), map);
+    if (next !== text) stale.push({ file: f, text: next });
+  }
+  return stale;
+}
 
 /**
  * The two script tags a page that runs scripts loads first, for page builders (tools/catalog/build.mjs):
@@ -168,6 +321,7 @@ function main(argv) {
   const current = existsSync(target) ? readFileSync(target, 'utf8') : '';
   const pages = stalePages(root, map.key);
   const count = Object.keys(map.files).length;
+  const assetMap = { epoch: map.epoch, files: map.files };
   if (check) {
     const problems = [];
     if (current !== map.source) {
@@ -177,6 +331,8 @@ function main(argv) {
       problems.push(`${MAP_PATH} is stale${diff.length ? ` (${diff.length} file${diff.length === 1 ? '' : 's'}: ${diff.slice(0, 8).join(', ')}${diff.length > 8 ? ', ...' : ''})` : ''}`);
     }
     for (const p of pages) problems.push(`${p.file} loads an old js/data-versions.js key`);
+    const assets = staleAssetFiles(root, assetMap);
+    if (assets.length) problems.push(`${assets.length} HTML/CSS file${assets.length === 1 ? '' : 's'} with unkeyed or old asset URLs (${assets.slice(0, 8).map((a) => a.file).join(', ')}${assets.length > 8 ? ', ...' : ''})`);
     if (problems.length) {
       console.error(`${problems.join('\n')}\nrun node tools/data-versions/build.mjs`);
       process.exit(1);
@@ -186,7 +342,10 @@ function main(argv) {
   }
   if (current !== map.source) writeFileSync(target, map.source);
   for (const p of pages) writeFileSync(join(root, p.file), p.text);
-  console.log(`${MAP_PATH}: ${count} files keyed against epoch ${map.epoch.slice(0, 8)}${built ? ' with the deploy builds' : ''}; key ${map.key} in ${mapPages(root).length} pages (${pages.length} updated)`);
+  // After the map key: a page's text is keyed as it now stands.
+  const assets = staleAssetFiles(root, assetMap);
+  for (const a of assets) writeFileSync(join(root, a.file), a.text);
+  console.log(`${MAP_PATH}: ${count} files keyed against epoch ${map.epoch.slice(0, 8)}${built ? ' with the deploy builds' : ''}; key ${map.key} in ${mapPages(root).length} pages (${pages.length} updated); asset URLs keyed in ${assets.length} HTML/CSS files`);
   if (count > 2000) console.log('the map is large: start a new epoch at a release (--epoch=HEAD)');
 }
 

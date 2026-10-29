@@ -59,7 +59,7 @@ import { wallsScreen } from '../street-model.js';
 import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
-import { CROWNS_SPLASH, splashFor } from '../game-splash.js?v=g311-1';
+import { CROWNS_SPLASH, splashFor } from '../game-splash.js?v=g434-1';
 import { saveStore } from '../save-store.js?v=mp2-2';
 import {
   CROWNS_MP_TEXT,

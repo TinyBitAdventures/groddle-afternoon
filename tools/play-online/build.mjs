@@ -17,6 +17,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { committedMap, keyAssetUrls } from '../data-versions/build.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SOURCE = join(root, 'public/play/index.html');
@@ -130,7 +131,8 @@ export function buildOnlinePage(play) {
   html = swap(html, '</head>', `${ONLINE_STYLE}\n</head>`, '</head>');
   html = swap(html, /<body class="([^"]*)">\n/, (m, cls) => `<body class="${cls} online-gated">\n${GATE}\n`, 'its <body>');
   html = swap(html, /  <script type="module" src="(game\.js\?[^"]*)"><\/script>/, (m, src) => `  <!-- game.js loads once the multiplayer save is in memory (js/online-boot.js). -->\n  <script type="module" id="online-boot" src="${ONLINE_BOOT_SRC}" data-game="${src}"></script>`, 'the game.js module');
-  return html;
+  // The gate's art and the shell's carry content keys, as the solo page's do (tools/data-versions/build.mjs).
+  return keyAssetUrls(html, 'play/online/index.html', committedMap(root));
 }
 
 const isMain = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];

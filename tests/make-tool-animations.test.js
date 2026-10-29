@@ -185,7 +185,8 @@ describe('G188 Make panel tool animations', () => {
     const t = MAKE_TOOL_SHEETS.tinkertool;
     const rule = /\.tool-repair-sprite \{([\s\S]*?)\n\}/.exec(css)?.[1] || '';
     const rows = t.frames / t.cols;
-    assert.match(rule, new RegExp(`url\\('${t.url.replace(/[.@]/g, '\\$&')}'\\)`));
+    // The sheet's URL carries its content key (tools/data-versions/build.mjs keys style.css).
+    assert.match(rule, new RegExp(`url\\('${t.url.replace(/[.@]/g, '\\$&')}\\?v=[0-9a-f]{8}'\\)`));
     assert.match(rule, new RegExp(`--mp-sheet-w: ${t.cols * t.fw}px;`));
     assert.match(rule, new RegExp(`--mp-sheet-h: ${rows * t.fh}px;`));
     assert.match(rule, new RegExp(`--mp-cols: ${t.cols};`));

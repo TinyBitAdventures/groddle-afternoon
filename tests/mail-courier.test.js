@@ -219,13 +219,13 @@ describe('mail npc art (tools/mail-npc-art/build.mjs)', () => {
 describe('mail courier feature', () => {
   it('is registered once under its key', () => {
     const index = readFileSync(join(pub, 'js/features/index.js'), 'utf8');
-    assert.equal(index.match(/mail-courier-feature\.js\?v=g429-1/g)?.length, 1);
+    assert.equal(index.match(/mail-courier-feature\.js\?v=g434-1/g)?.length, 1);
   });
 
   it('calls the frog with the source prompt once a letter is due, and waits in an instance', async () => {
     mock.timers.enable({ apis: ['Date'], now: 1_000_000 });
     try {
-      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?v=g429-1');
+      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?v=g434-1');
       const st = createMailboxState();
       const prompts = [];
       let instance = false;

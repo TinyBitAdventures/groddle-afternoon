@@ -25,6 +25,9 @@
  */
 
 /** Flash frame rate of the familiar art and both ray FLAs (DOMDocument frameRate="30"). */
+/** An art URL with its content key (js/data-urls.js groddleDataUrl); as it is in Node and on a page without the map. */
+const keyedArt = (url) => (typeof globalThis.groddleDataUrl === 'function' ? globalThis.groddleDataUrl(url) : url);
+
 export const FAMILIAR_FPS = 30;
 
 /**
@@ -318,7 +321,8 @@ export function mountPetRock(el, { size = QUEST_ROCK_WH, state = 'idle' } = {}) 
   el.classList.add('pet-rock');
   el.style.width = `${size}px`;
   el.style.height = `${size}px`;
-  el.style.backgroundImage = `url("${sheet.hires || sheet.src}")`;
+  // The sheet's content key (js/data-urls.js): element.style's image properties are not seen by the hook.
+  el.style.backgroundImage = `url("${keyedArt(sheet.hires || sheet.src)}")`;
   el.style.backgroundRepeat = 'no-repeat';
   paintRock(rock);
   if (!rockTimer && typeof setInterval === 'function') rockTimer = setInterval(tickRocks, 1000 / FAMILIAR_FPS);

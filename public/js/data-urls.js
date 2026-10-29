@@ -17,13 +17,22 @@
  *   maps, manifests, audio), wherever it is written, with no call-site change;
  * - <img> src and srcset set from script (.src, .srcset, setAttribute): every
  *   Pixi texture (js/textures.js), the avatar compositor, DOM icons;
- * - <img> tags in HTML strings given to innerHTML and insertAdjacentHTML.
+ * - <img> tags in HTML strings given to innerHTML and insertAdjacentHTML;
+ * - CSS url() set from script (2026-10-29): element.style's cssText and
+ *   setProperty (custom properties too), a style attribute (setAttribute, and
+ *   style="" in HTML strings), and the text of a <style> element. Chrome keeps
+ *   element.style's named properties (backgroundImage, background, ...) on each
+ *   declaration rather than its prototype, out of the hook's reach, so a module
+ *   that sets one to an image passes the URL through groddleDataUrl first
+ *   (tests/data-versions.test.js holds the game to that); where a browser does
+ *   define them on the prototype, they are keyed here too.
  *
  * An existing `v=` parameter is replaced (the old hand-made data keys, and a
  * 3x srcset made from its 1x src by js/icon-hires.js), other parameters stay.
- * Not seen here: <img> in a page's own markup and CSS url() (style sheets and
- * style.backgroundImage); use groddleDataUrl(path) there. Without the map
- * (Node, tests, a page without the two scripts) every URL is left as it is.
+ * A page's own markup and style sheets carry their keys already:
+ * tools/data-versions/build.mjs writes them into every HTML and CSS file under
+ * public/ (keyAssetUrls). Without the map (Node, tests, a page without the two
+ * scripts) every URL is left as it is.
  *
  * Load order: both are plain (classic) scripts ahead of every other script
  * with a src and every module, so they run before anything captures fetch:
@@ -114,7 +123,9 @@
   var IMG_TAG = /<img\b[^>]*>/gi;
   var IMG_ATTR = /(\s(src|srcset)\s*=\s*)(["'])([^"']*)\3/gi;
   function dataHtml(html) {
-    if (typeof html !== 'string' || html.indexOf('<') < 0 || !/<img\b/i.test(html) || !versions()) return html;
+    if (typeof html !== 'string' || html.indexOf('<') < 0 || !versions()) return html;
+    if (html.indexOf('url(') >= 0) html = dataStyleAttrs(html);
+    if (!/<img\b/i.test(html)) return html;
     return html.replace(IMG_TAG, function (tag) {
       return tag.replace(IMG_ATTR, function (all, pre, name, q, value) {
         var raw = value.replace(/&amp;/g, '&');
@@ -124,9 +135,34 @@
     });
   }
 
+  /** CSS text with each url(...) keyed (quoted, unquoted, or quoted with &quot; inside an HTML attribute). */
+  var CSS_URL = /(url\(\s*)(&quot;|&#39;|["']?)([^"'()\s]*?)\2(\s*\))/gi;
+  function dataCss(text) {
+    if (typeof text !== 'string' || text.indexOf('url(') < 0 || !versions()) return text;
+    return text.replace(CSS_URL, function (all, open, q, value, close) {
+      if (!value) return all;
+      var raw = q.charAt(0) === '&' ? value.replace(/&amp;/g, '&') : value;
+      var next = dataUrl(raw);
+      if (next === raw) return all;
+      return open + q + (q.charAt(0) === '&' ? String(next).replace(/&/g, '&amp;') : next) + q + close;
+    });
+  }
+
+  var STYLE_ATTR = /(\sstyle\s*=\s*)(?:"([^"]*)"|'([^']*)')/gi;
+  function dataStyleAttrs(html) {
+    return html.replace(STYLE_ATTR, function (all, pre, dq, sq) {
+      var value = dq != null ? dq : sq;
+      var next = dataCss(value);
+      if (next === value) return all;
+      var q = dq != null ? '"' : "'";
+      return pre + q + next + q;
+    });
+  }
+
   g.groddleDataUrl = dataUrl;
   g.groddleDataSrcset = dataSrcset;
   g.groddleDataHtml = dataHtml;
+  g.groddleDataCss = dataCss;
 
   // fetch: GET and HEAD only (API posts and the like never carry these extensions anyway).
   var nativeFetch = g.fetch;
@@ -170,10 +206,13 @@
     var setAttribute = El.prototype.setAttribute;
     if (typeof setAttribute === 'function') {
       El.prototype.setAttribute = function (name, value) {
-        if (Img && this instanceof Img && typeof value === 'string') {
+        if (typeof value === 'string') {
           var n = String(name).toLowerCase();
-          if (n === 'src') value = dataUrl(value);
-          else if (n === 'srcset') value = dataSrcset(value);
+          if (n === 'style') value = dataCss(value);
+          else if (Img && this instanceof Img) {
+            if (n === 'src') value = dataUrl(value);
+            else if (n === 'srcset') value = dataSrcset(value);
+          }
         }
         return setAttribute.call(this, name, value);
       };
@@ -185,5 +224,38 @@
         return insertAdjacentHTML.call(this, where, dataHtml(html));
       };
     }
+  }
+
+  // element.style: cssText and setProperty, and the properties that take an image where the browser
+  // defines them on the declaration's prototype chain (CSS2Properties and the like; not Chrome).
+  var cssValue = function (v) { return typeof v === 'string' ? dataCss(v) : v; };
+  var Decl = g.CSSStyleDeclaration;
+  var sample = g.document && g.document.documentElement && g.document.documentElement.style;
+  var declProtos = [];
+  for (var dp = sample ? Object.getPrototypeOf(sample) : Decl && Decl.prototype; dp && dp !== Object.prototype; dp = Object.getPrototypeOf(dp)) declProtos.push(dp);
+  var CSS_PROPS = ['background', 'backgroundImage', 'cssText', 'mask', 'maskImage', 'webkitMask', 'webkitMaskImage',
+    'borderImage', 'borderImageSource', 'listStyle', 'listStyleImage', 'content', 'cursor'];
+  CSS_PROPS.forEach(function (name) {
+    for (var i = 0; i < declProtos.length; i += 1) {
+      if (Object.prototype.hasOwnProperty.call(declProtos[i], name)) { wrapSetter(declProtos[i], name, cssValue); return; }
+    }
+  });
+  if (Decl && Decl.prototype && typeof Decl.prototype.setProperty === 'function') {
+    var setProperty = Decl.prototype.setProperty;
+    Decl.prototype.setProperty = function (name, value, priority) {
+      return arguments.length > 2 ? setProperty.call(this, name, cssValue(value), priority) : setProperty.call(this, name, cssValue(value));
+    };
+  }
+  // A <style> element's text (features add their panels' CSS this way): its own textContent, over Node's.
+  var StyleEl = g.HTMLStyleElement;
+  var NodeProto = g.Node && g.Node.prototype;
+  var text = NodeProto && Object.getOwnPropertyDescriptor(NodeProto, 'textContent');
+  if (StyleEl && StyleEl.prototype && text && text.set && !Object.prototype.hasOwnProperty.call(StyleEl.prototype, 'textContent')) {
+    Object.defineProperty(StyleEl.prototype, 'textContent', {
+      configurable: true,
+      enumerable: text.enumerable,
+      get: text.get,
+      set: function (value) { text.set.call(this, cssValue(value)); },
+    });
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this);

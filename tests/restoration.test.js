@@ -96,6 +96,16 @@ describe('restoration data', () => {
     assert.equal(data.rooms.total, new Set(Object.values(QUEST_ROOMS)).size);
     assert.ok(data.quests.playable > 100);
   });
+
+  it('every room card shows a name, never its code id (firefly_whistle, 2026-10-29)', async () => {
+    const data = await buildRestorationData();
+    for (const room of data.rooms.rooms) {
+      assert.notEqual(room.title, room.id, `${room.id} shows its code name`);
+      assert.doesNotMatch(room.title, /^[a-z0-9]+(?:_[a-z0-9]+)+$/, `${room.id}: ${room.title}`);
+    }
+    const firefly = data.rooms.rooms.find((r) => r.id === 'firefly_whistle');
+    assert.equal(firefly?.title, 'Firefly Whistle', "GSJS quests/firefly_whistle.js title");
+  });
 });
 
 describe('every-change history', () => {

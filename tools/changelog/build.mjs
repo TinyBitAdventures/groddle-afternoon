@@ -18,6 +18,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { plain } from './html.mjs';
+import { committedMap, keyAssetUrls } from '../data-versions/build.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..', '..');
@@ -346,6 +347,9 @@ export function buildPages(data = loadPosts(), since = historySince()) {
     });
   }
   files['changelog.html'] = redirectPage(published);
+  // Their images carry content keys (tools/data-versions/build.mjs keyAssetUrls).
+  const keys = committedMap();
+  for (const path of Object.keys(files)) files[path] = keyAssetUrls(files[path], path, keys);
   return files;
 }
 

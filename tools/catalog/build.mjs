@@ -32,7 +32,7 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 import { siteNav } from '../changelog/build.mjs';
-import { mapTags } from '../data-versions/build.mjs';
+import { committedMap, keyAssetUrls, mapTags } from '../data-versions/build.mjs';
 import { literalFrom, readItemTags } from '../inventory/gsjs-data.mjs';
 import { supplyConversions } from '../job-obtainable.mjs';
 
@@ -653,6 +653,9 @@ export async function buildCatalog({ inventory = readInventory(), evidence = rea
       prev: entries[i - 1], next: entries[i + 1], remake, inCatalog, names, musicCards, quests, total: entries.length, index: i,
     });
   });
+  // Each page's icons and art carry their content keys (tools/data-versions/build.mjs keyAssetUrls).
+  const keys = committedMap();
+  for (const path of Object.keys(files)) if (path.endsWith('.html')) files[path] = keyAssetUrls(files[path], path, keys);
   return { files, data, excludedIds: excluded };
 }
 

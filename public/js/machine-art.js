@@ -41,6 +41,9 @@ import { SPLIT_SPRITES } from './sprite-hires.js?v=g430-1';
 
 export { MACHINE_ART_SHEETS };
 
+/** An art URL with its content key (js/data-urls.js groddleDataUrl); as it is in Node and on a page without the map. */
+const keyedArt = (url) => (typeof globalThis.groddleDataUrl === 'function' ? globalThis.groddleDataUrl(url) : url);
+
 export const MACHINE_ART_FPS = 30;
 export const MACHINE_ART_IDS = Object.freeze(Object.keys(MACHINE_ART_SHEETS));
 
@@ -191,14 +194,14 @@ export function machineFrameBackground(classTsid, k, parts = null) {
     const [url, from, count, cols] = part;
     const j = k - from;
     return {
-      image: `url('${url}')`,
+      image: `url('${keyedArt(url)}')`,
       size: `${cols * s.fw}px ${Math.ceil(count / cols) * s.fh}px`,
       position: `${-(j % cols) * s.fw}px ${-Math.floor(j / cols) * s.fh}px`,
     };
   }
   const r = machineFrameRect(classTsid, k);
   return {
-    image: `url('${s.url}')`,
+    image: `url('${keyedArt(s.url)}')`,
     size: `${s.cols * s.fw}px ${Math.ceil(s.frames / s.cols) * s.fh}px`,
     position: `${-r.x}px ${-r.y}px`,
   };

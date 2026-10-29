@@ -1435,7 +1435,7 @@
    },
    {
     "id": "firefly_whistle",
-    "title": "firefly_whistle",
+    "title": "Firefly Whistle",
     "quests": [
      "Firefly Whistle"
     ],
@@ -2661,9 +2661,14 @@
   ]
  },
  "git": {
-  "commits": 716,
+  "commits": 722,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "Art in the page markup, style sheets and script-set backgrounds loads fresh after a release"
+   },
    {
     "date": "2026-10-29",
     "kind": "new",
@@ -2778,14 +2783,9 @@
     "date": "2026-10-28",
     "kind": "new",
     "text": "Shrines, scraping, peat, digging, patches and more answer with their reward badges"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "fix",
-    "text": "NPCs, eggs, buttons and fireflies stand behind your Glitch again"
    }
   ]
  },
- "tests": 417,
+ "tests": 418,
  "generatedAt": "2026-10-29"
 }

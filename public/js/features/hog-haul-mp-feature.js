@@ -32,7 +32,7 @@ import {
   pigPose,
   touches,
 } from '../hog-haul-mp.js?v=g334-hog-1';
-import { HOG_HAUL_SPLASH, splashFor } from '../game-splash.js?v=g311-1';
+import { HOG_HAUL_SPLASH, splashFor } from '../game-splash.js?v=g434-1';
 import { grantMoodXp } from '../mood-xp.js';
 import { playCountdownArt } from '../overlays.js?v=g392-1';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';

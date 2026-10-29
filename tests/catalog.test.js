@@ -10,6 +10,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { GSJS, INVENTORY_DB, readInventory } from '../tools/catalog/build.mjs';
 import { siteNav } from '../tools/changelog/build.mjs';
+import { committedMap, keyAssetUrls } from '../tools/data-versions/build.mjs';
 import { servedByMinn } from './minn-served.js';
 
 const spike = join(import.meta.dirname, '..');
@@ -108,7 +109,7 @@ describe('item catalog', () => {
       const html = pages.find((p) => p.id === item.id).html;
       if (item.icon) {
         assert.ok(existsSync(join(pub, 'assets/sprites/icons', `${item.id}.png`)), item.id);
-        assert.match(html, new RegExp(`src="\\.\\./\\.\\./assets/sprites/icons/${item.id}${item.icon === 3 ? '@3x' : ''}\\.png"`), item.id);
+        assert.match(html, new RegExp(`src="\\.\\./\\.\\./assets/sprites/icons/${item.id}${item.icon === 3 ? '@3x' : ''}\\.png\\?v=[0-9a-f]{8}"`), item.id);
       } else {
         assert.match(html, /<span class="cat-hero-icon cat-ph" aria-hidden="true"><\/span>/, item.id);
       }
@@ -118,7 +119,8 @@ describe('item catalog', () => {
   it('carries the shared site header on every page', () => {
     for (const page of [index, ...pages]) {
       const p = page === index ? '../' : '../../';
-      assert.ok(page.html.includes(siteNav(p, 'items')), page.file);
+      // The header's mark carries its content key, as every image on the page does (keyAssetUrls).
+      assert.ok(page.html.includes(keyAssetUrls(siteNav(p, 'items'), page.file, committedMap())), page.file);
       assert.ok(page.html.includes(`<link rel="stylesheet" href="${p}site/site-nav.css" />`), page.file);
       assert.ok(page.html.indexOf('<nav class="site-nav"') < page.html.indexOf('<header'), page.file);
     }

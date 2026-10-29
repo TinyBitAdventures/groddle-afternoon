@@ -39,7 +39,7 @@
  */
 
 import { CARD_ART_LAYERS } from '../imagination-data.js';
-import { skillArtFor, skillLearnedModel } from '../familiar.js?v=g405-1';
+import { skillArtFor, skillLearnedModel } from '../familiar.js?v=g434-1';
 
 /** FamiliarDialog grow / shrink: 0.3 s (start 340-343, end 253-268). */
 export const FAMILIAR_GROW_MS = 300;

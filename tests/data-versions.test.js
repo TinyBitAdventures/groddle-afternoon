@@ -17,11 +17,16 @@ import {
   BUILT,
   EXT,
   MAP_PATH,
+  HOOK_SRC,
   buildDataVersions,
+  committedMap,
   currentEpoch,
+  keyAssetUrls,
+  keyedFiles,
   mapPages,
   parseFiles,
   shortHash,
+  staleAssetFiles,
   stalePages,
 } from '../tools/data-versions/build.mjs';
 
@@ -88,6 +93,44 @@ const mapSource = (files, epoch = 'e0e0e0e0') => [
   '})(globalThis);',
 ].join('\n');
 
+/** A browser-ish global with element.style (a CSSStyleDeclaration with accessors), Node.textContent and <style>. */
+function cssBrowser(mapSource) {
+  class FakeNode {
+    constructor() { this.text = ''; }
+  }
+  Object.defineProperty(FakeNode.prototype, 'textContent', { configurable: true, enumerable: true, get() { return this.text; }, set(v) { this.text = String(v); } });
+  class FakeDecl {
+    constructor() { this.props = {}; this.priority = {}; }
+    setProperty(name, value, priority) { this.props[name] = String(value); if (priority) this.priority[name] = priority; }
+  }
+  for (const name of ['background', 'backgroundImage', 'cssText']) {
+    Object.defineProperty(FakeDecl.prototype, name, { configurable: true, enumerable: true, get() { return this.props[name] ?? ''; }, set(v) { this.props[name] = String(v); } });
+  }
+  class FakeElement extends FakeNode {
+    constructor() { super(); this.attrs = {}; this.html = ''; this.style = new FakeDecl(); }
+    setAttribute(name, value) { this.attrs[name] = String(value); }
+    getAttribute(name) { return this.attrs[name] ?? null; }
+  }
+  Object.defineProperty(FakeElement.prototype, 'innerHTML', { configurable: true, enumerable: true, get() { return this.html; }, set(v) { this.html = String(v); } });
+  class FakeStyleElement extends FakeElement {}
+  class FakeImage extends FakeElement {}
+  const g = {
+    URL,
+    Node: FakeNode,
+    Element: FakeElement,
+    HTMLImageElement: FakeImage,
+    HTMLStyleElement: FakeStyleElement,
+    CSSStyleDeclaration: FakeDecl,
+    document: { baseURI: 'https://groddle.test/', currentScript: { src: 'https://groddle.test/js/data-versions.js?v=x' }, documentElement: { style: new FakeDecl() } },
+  };
+  g.globalThis = g;
+  const ctx = vm.createContext(g);
+  vm.runInContext(mapSource, ctx);
+  g.document.currentScript = null;
+  vm.runInContext(HOOK, ctx);
+  return { g, FakeElement, FakeStyleElement };
+}
+
 describe('data-versions map (tools/data-versions/build.mjs)', () => {
   const epoch = currentEpoch(root);
   let hasEpoch = Boolean(epoch);
@@ -119,6 +162,82 @@ describe('data-versions map (tools/data-versions/build.mjs)', () => {
     assert.ok(at > deploy.indexOf('tools/build-restoration.mjs'), 'after the restoration build');
     assert.ok(at > deploy.indexOf('tools/codebase/build-data.mjs'), 'after the Code page data');
     assert.ok(at < deploy.indexOf('echo "2/6'), 'before anything is copied');
+  });
+});
+
+describe('asset keys written into HTML and CSS (2026-10-29)', () => {
+  const epoch = currentEpoch(root);
+  let hasEpoch = Boolean(epoch);
+  if (hasEpoch) {
+    try { git(root, 'cat-file', '-e', `${epoch}^{commit}`); } catch { hasEpoch = false; }
+  }
+  const map = { epoch: 'e0e0e0e0', files: { 'assets/sprites/x.webp': '99887766' } };
+
+  it('every HTML and CSS file under public/ carries the current keys (node tools/data-versions/build.mjs)', { skip: !hasEpoch && 'the epoch commit is not in this clone' }, () => {
+    const built = buildDataVersions({ root });
+    const stale = staleAssetFiles(root, { epoch: built.epoch, files: built.files }).map((f) => f.file);
+    assert.deepEqual(stale.slice(0, 20), [], `${stale.length} files: run node tools/data-versions/build.mjs`);
+  });
+
+  it('no data or art URL in markup, a style attribute, a <style> block or a style sheet is left without ?v=<key>', () => {
+    const VERSIONED = /\.(?:json|png|webp|jpe?g|gif|svg|mp3|ogg|wav|m4a|atlas|xml)(?:[?#]|$)/i;
+    const external = (u) => /^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/i.test(u) || /\$\{|\{\{/.test(u);
+    const unkeyed = (u) => !external(u) && VERSIONED.test(u) && !/[?&]v=[0-9a-f]{8}(?:[&#]|$)/.test(u.replace(/&amp;/g, '&'));
+    const files = keyedFiles(root);
+    assert.ok(files.length > 1000, `HTML and CSS files: ${files.length}`);
+    const problems = [];
+    for (const f of files) {
+      let text = read(f);
+      if (f.endsWith('.html')) text = text.replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, (m) => /^<script\b[^>]*>/i.exec(m)[0]);
+      const urls = [];
+      for (const m of text.matchAll(/\s(src|href|poster|data-src|xlink:href|srcset)\s*=\s*(["'])([^"']*)\2/gi)) {
+        if (m[1].toLowerCase() === 'srcset') urls.push(...m[3].split(',').map((p) => p.trim().split(/\s+/)[0]));
+        else urls.push(m[3]);
+      }
+      for (const m of text.matchAll(/url\(\s*(&quot;|&#39;|["']?)([^"'()\s]*?)\1\s*\)/gi)) urls.push(m[2]);
+      for (const u of urls) if (unkeyed(u)) problems.push(`${f}: ${u}`);
+    }
+    assert.deepEqual(problems.slice(0, 20), [], `${problems.length} unkeyed: run node tools/data-versions/build.mjs`);
+  });
+
+  it('the page builders key their own output, so their --check agrees (catalog, changelog, play-online)', () => {
+    for (const tool of ['tools/catalog/build.mjs', 'tools/changelog/build.mjs', 'tools/play-online/build.mjs']) {
+      const text = read(tool);
+      assert.ok(text.includes('keyAssetUrls(') && text.includes('committedMap('), `${tool} keys its pages with the committed map`);
+    }
+    assert.equal(committedMap(root).epoch, currentEpoch(root).slice(0, 8));
+    const play = read('public/play/index.html');
+    assert.match(play, /<img src="assets\/sprites\/feat_badge_small\.png\?v=[0-9a-f]{8}"/, 'the solo shell\'s own <img> tags');
+    assert.match(read('public/play/online/index.html'), /<img src="favicon\.svg\?v=[0-9a-f]{8}"/, 'the sign-in gate');
+    assert.match(read('public/style.css'), /url\("assets\/sprites\/word-progress\/cancel\.svg\?v=[0-9a-f]{8}"\)/);
+    assert.match(read('public/restoration/restoration.css'), /url\('\.\.\/assets\/sprites\/mining\/rock_sparkly\.png\?v=[0-9a-f]{8}'\)/);
+    assert.ok(play.includes(`<script src="${HOOK_SRC}"></script>`), 'the solo shell loads the hook under its current key');
+  });
+
+  it('resolves against the page\'s <base> or the style sheet\'s folder, and replaces a hand-made v=', () => {
+    assert.equal(keyAssetUrls('<base href="../" /><img src="assets/sprites/x.webp" alt="">', 'play/index.html', map), '<base href="../" /><img src="assets/sprites/x.webp?v=99887766" alt="">');
+    assert.equal(keyAssetUrls('<img src="../../assets/sprites/x.webp">', 'items/apple/index.html', map), '<img src="../../assets/sprites/x.webp?v=99887766">');
+    assert.equal(keyAssetUrls('<img src="/assets/sprites/x.webp">', 'index.html', map), '<img src="/assets/sprites/x.webp?v=99887766">');
+    assert.equal(keyAssetUrls('.a{background:url(../assets/sprites/x.webp)}', 'restoration/restoration.css', map), '.a{background:url(../assets/sprites/x.webp?v=99887766)}');
+    assert.equal(keyAssetUrls('<link rel="icon" href="favicon.svg?v=arch&amp;t=1" />', 'index.html', map), '<link rel="icon" href="favicon.svg?v=e0e0e0e0&amp;t=1" />');
+    assert.equal(keyAssetUrls('<img srcset="assets/sprites/x.webp 1x, assets/a@3x.png 3x">', 'index.html', map), '<img srcset="assets/sprites/x.webp?v=99887766 1x, assets/a@3x.png?v=e0e0e0e0 3x">');
+    assert.equal(keyAssetUrls('<span style="background:url(&quot;assets/a.png&quot;)"></span><style>.b{background:url(\'assets/b.png\')}</style>', 'index.html', map), '<span style="background:url(&quot;assets/a.png?v=e0e0e0e0&quot;)"></span><style>.b{background:url(\'assets/b.png?v=e0e0e0e0\')}</style>');
+  });
+
+  it('leaves scripts, pages, other sites (the Fathom script), data: URLs and template text alone', () => {
+    const html = [
+      '<script src="https://cdn.usefathom.com/script.js" data-site="X" defer></script>',
+      '<script>img.src = "assets/a.png"; el.innerHTML = `<img src="${p}assets/a.png">`;</script>',
+      '<a href="play/">Play</a><link rel="stylesheet" href="style.css?v=g1" /><script src="js/data-urls.js?v=g1"></script>',
+      '<img src="data:image/png;base64,AAAA"><img src="https://cdn.example/a.png"><img src="${p}assets/a.png"><a href="#top">top</a>',
+    ].join('\n');
+    assert.equal(keyAssetUrls(html, 'index.html', map), html);
+    assert.equal(keyAssetUrls('const x = "assets/a.png";', 'js/x.js', map), 'const x = "assets/a.png";', 'only HTML and CSS');
+  });
+
+  it('is idempotent: keyed text keys to itself', () => {
+    const once = keyAssetUrls('<img src="assets/sprites/x.webp"><i style="background:url(assets/a.png)"></i>', 'index.html', map);
+    assert.equal(keyAssetUrls(once, 'index.html', map), once);
   });
 });
 
@@ -220,6 +339,51 @@ describe('js/data-urls.js', () => {
     assert.equal(div.innerHTML, '<b>no images</b><img src="assets/sprites/x.webp?v=99887766">');
   });
 
+  it('keys CSS url() set from script: cssText, setProperty, style attributes and <style> text (2026-10-29)', () => {
+    const c = cssBrowser(mapSource({ 'assets/sprites/x.webp': '99887766' }));
+    const el = new c.FakeElement();
+    el.style.backgroundImage = 'url("assets/sprites/x.webp")';
+    assert.equal(el.style.backgroundImage, 'url("assets/sprites/x.webp?v=99887766")', 'a property on the prototype (not Chrome)');
+    el.style.background = "#000 url('assets/a.png') no-repeat";
+    assert.equal(el.style.background, "#000 url('assets/a.png?v=e0e0e0e0') no-repeat");
+    el.style.background = 'linear-gradient(#fff, #000)';
+    assert.equal(el.style.background, 'linear-gradient(#fff, #000)', 'no url(): as it was');
+    el.style.cssText = 'width:4px;background-image:url(assets/sprites/x.webp?v=old)';
+    assert.equal(el.style.cssText, 'width:4px;background-image:url(assets/sprites/x.webp?v=99887766)');
+    el.style.setProperty('--word-progress-sheet', 'url("assets/a.png")');
+    assert.equal(el.style.props['--word-progress-sheet'], 'url("assets/a.png?v=e0e0e0e0")');
+    el.style.setProperty('--x', '4px', 'important');
+    assert.deepEqual([el.style.props['--x'], el.style.priority['--x']], ['4px', 'important']);
+    el.setAttribute('style', '--hsd-ic:url(assets/a.png)');
+    assert.equal(el.getAttribute('style'), '--hsd-ic:url(assets/a.png?v=e0e0e0e0)');
+    el.innerHTML = `<span class="mp-tool" style="background-image:url('assets/sprites/x.webp')"></span><span style="background:url(&quot;assets/a.png&quot;)"></span><svg><rect fill="url(#g)"/></svg>`;
+    assert.equal(el.innerHTML, `<span class="mp-tool" style="background-image:url('assets/sprites/x.webp?v=99887766')"></span><span style="background:url(&quot;assets/a.png?v=e0e0e0e0&quot;)"></span><svg><rect fill="url(#g)"/></svg>`);
+    const style = new c.FakeStyleElement();
+    style.textContent = ".board-card { background: #c99e67 url('assets/a.png') center / cover; }";
+    assert.equal(style.textContent, ".board-card { background: #c99e67 url('assets/a.png?v=e0e0e0e0') center / cover; }");
+    const p = new c.FakeElement();
+    p.textContent = 'url("assets/a.png")';
+    assert.equal(p.textContent, 'url("assets/a.png")', 'only a <style> element\'s text');
+    el.style.backgroundImage = 'url(data:image/png;base64,AAAA), url("https://cdn.example/a.png")';
+    assert.equal(el.style.backgroundImage, 'url(data:image/png;base64,AAAA), url("https://cdn.example/a.png")');
+  });
+
+  it('every module that sets an image on element.style keys it first (Chrome keeps those properties out of the hook\'s reach)', () => {
+    const files = git(root, 'ls-files', 'public').split('\n').filter((f) => /\.m?js$/.test(f) && !f.startsWith('public/vendor/') && f !== 'public/js/data-urls.js');
+    const PROP = /\.style\.(?:background|backgroundImage|mask|maskImage|webkitMask|webkitMaskImage|borderImage|borderImageSource|listStyle|listStyleImage|content|cursor)\s*=(?!=)([^;\n]*)|\b(?:backgroundImage|maskImage|borderImageSource|listStyleImage)\s*:\s*([^,\n]*url\([^,\n]*)/g;
+    const problems = [];
+    for (const f of files) {
+      for (const m of read(f).matchAll(PROP)) {
+        const value = m[1] ?? m[2];
+        if (/url\(/.test(value) && !/keyedArt\(|groddleDataUrl\(/.test(value)) problems.push(`${f}: ${m[0].trim()}`);
+      }
+    }
+    assert.deepEqual(problems, [], 'pass the URL through groddleDataUrl (or the module\'s keyedArt) before element.style takes it');
+    for (const f of ['public/js/familiar.js', 'public/js/game-splash.js', 'public/js/machine-art.js', 'public/js/features/hi-signs-feature.js']) {
+      assert.match(read(f), /const keyedArt = \(url\) => \(typeof globalThis\.groddleDataUrl === 'function' \? globalThis\.groddleDataUrl\(url\) : url\);/, f);
+    }
+  });
+
   it('does nothing without a map (Node, tests, a page without js/data-versions.js)', () => {
     const g = { URL, document: { baseURI: 'https://groddle.test/play/' }, fetch: (u) => u };
     g.globalThis = g;
@@ -287,6 +451,22 @@ describe('a changed file changes its URL (a scratch repository)', () => {
       const map = buildDataVersions({ root: dir, epoch });
       assert.deepEqual(parseFiles(map.source), map.files);
       assert.throws(() => buildDataVersions({ root: dir, epoch: '0123456789abcdef0123456789abcdef01234567' }), /not in this clone/);
+    });
+
+    it('a page\'s <img> and a style sheet\'s url() follow a re-rendered image to its new key', () => {
+      put('public/play/index.html', '<base href="../" />\n<img src="assets/decos/tree.webp" alt="" />\n');
+      put('public/style.css', '.t { background: url("assets/decos/tree.webp"); }\n');
+      const map = buildDataVersions({ root: dir, epoch });
+      const stale = Object.fromEntries(staleAssetFiles(dir, map).map((f) => [f.file, f.text]));
+      const key = shortHash(Buffer.from('webp-2'));
+      assert.equal(stale['public/play/index.html'], `<base href="../" />\n<img src="assets/decos/tree.webp?v=${key}" alt="" />\n`);
+      assert.equal(stale['public/style.css'], `.t { background: url("assets/decos/tree.webp?v=${key}"); }\n`);
+      put('public/play/index.html', stale['public/play/index.html']);
+      put('public/style.css', stale['public/style.css']);
+      assert.deepEqual(staleAssetFiles(dir, map), [], 'current once written');
+      put('public/assets/decos/tree.webp', 'webp-3');
+      const next = buildDataVersions({ root: dir, epoch });
+      assert.deepEqual(staleAssetFiles(dir, next).map((f) => f.file).sort(), ['public/play/index.html', 'public/style.css'], 'stale again after the image changes');
     });
 
     it('the pages that load the map get its key', () => {

@@ -52,6 +52,9 @@
 
 import { OVERLAY_BASE, loadOverlayManifest, sheetCell, stateFrameAt } from './overlay-art.js?v=g311-1';
 
+/** An art URL with its content key (js/data-urls.js groddleDataUrl); as it is in Node and on a page without the map. */
+const keyedArt = (url) => (typeof globalThis.groddleDataUrl === 'function' ? globalThis.groddleDataUrl(url) : url);
+
 /** GameSplashScreenView.as 37 RAYS_SCENE, drawn as overlays.json level_up_rays. */
 export const SPLASH_RAYS_KEY = 'level_up_rays';
 
@@ -305,7 +308,7 @@ export function createGameSplash(opts = {}) {
       Object.assign(art.style, {
         width: `${bw * scale}px`,
         height: `${bh * scale}px`,
-        backgroundImage: `url("${OVERLAY_BASE}${meta.file}")`,
+        backgroundImage: `url("${keyedArt(`${OVERLAY_BASE}${meta.file}`)}")`,
         backgroundSize: `${meta.cols * cellW * scale}px ${rows * cellH * scale}px`,
       });
       name.style.top = `${splashTextY(meta, textDeltaY, nameY) * scale}px`;

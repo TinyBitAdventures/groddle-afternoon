@@ -9,12 +9,12 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { START_CARD_SELECTOR, SCREEN_SELECTOR, WINDOW_SELECTOR, stackZ } from '../public/js/window-stack.js?v=g428-1';
-import { createPromptStack } from '../public/js/prompt-stack.js?v=g428-1';
+import { createPromptStack } from '../public/js/prompt-stack.js?v=g434-1';
 import {
   _resetFamiliarDialog,
   familiarDialogFeature,
   familiarDialogOpen,
-} from '../public/js/features/familiar-dialog-feature.js?v=g428-1';
+} from '../public/js/features/familiar-dialog-feature.js?v=g434-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
