@@ -4,12 +4,13 @@
 
 Each SWF (glitch-items, CC0) is rewritten with a stage three times its size
 (tools/icon-hires/swfinfo.rewrite: furniture art runs past its authored stage),
-then FFDec (Java 21, -ignorebackground) exports frame 1 at zoom 2, one JVM per
-batch. The render is trimmed to the art: the game draws a piece with the
+then FFDec (Java 21, -ignorebackground) exports frame 1 at zoom 3 (G448; zoom 2
+until then, soft on a 3.3x Retina backing store), one JVM per batch. The render is trimmed to the art: the game draws a piece with the
 bottom centre of that box on its foot point (ceiling pieces: the top centre),
 which is how the recovered base frames sit (a base SWF at zoom 1 trims to its
-OGA x1 frame exactly). The canvas is padded to even sides so the 1x size is
-whole, and written as public/assets/sprites/furniture/upgrades/<class>/<id>@2x.webp
+OGA x1 frame exactly). The canvas is padded to sides a multiple of 3 so the 1x
+size is whole, and written as public/assets/sprites/furniture/upgrades/<class>/<id>@3x.webp
+(js/textures.js reads the 3 from the name, so the sprite keeps its 1x size)
 (cwebp, quality 88, sharp_yuv, lossless alpha). art.json records each key's
 1x size and the SWF's hash; unchanged keys are skipped unless --force.
 """
@@ -25,7 +26,7 @@ ART = os.path.join(HERE, 'art.json')
 OUT = os.path.join(SPIKE, 'public/assets/sprites/furniture/upgrades')
 JAVA = '/opt/homebrew/opt/openjdk@21/bin/java'
 FFDEC = os.path.expanduser('~/Documents/glitch-audit/tools/ffdec/ffdec.jar')
-ZOOM = 2
+ZOOM = 3
 BATCH = 80
 
 
@@ -65,7 +66,7 @@ def main(args):
         src = os.path.expanduser(p['swf'])
         digest = sha(src)
         cls, uid = key.split('/')
-        dst = os.path.join(OUT, cls, f'{uid}@2x.webp')
+        dst = os.path.join(OUT, cls, f'{uid}@{ZOOM}x.webp')
         if not force and art.get(key, {}).get('sha') == digest and os.path.exists(dst):
             continue
         todo.append((key, src, digest, dst))
@@ -97,7 +98,7 @@ def main(args):
                 print('  empty render', key)
                 art.pop(key, None)
                 continue
-            W, H = w + (w % 2), h + (h % 2)
+            W, H = w + (-w % ZOOM), h + (-h % ZOOM)
             os.makedirs(os.path.dirname(dst), exist_ok=True)
             tmp = os.path.join(work, 'tmp.png')
             subprocess.run(['magick', png, '-crop', f'{w}x{h}+{x}+{y}', '+repage', '-background', 'none',

@@ -20,9 +20,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 165,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/304@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/304@3x.webp",
      "w": 169,
-     "h": 202
+     "h": 201
     }
    },
    "305": {
@@ -31,7 +31,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 170,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/305@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/305@3x.webp",
      "w": 137,
      "h": 207
     }
@@ -43,9 +43,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 179,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/306@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/306@3x.webp",
      "w": 179,
-     "h": 210
+     "h": 211
     }
    },
    "307": {
@@ -55,7 +55,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 166,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/307@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/307@3x.webp",
      "w": 135,
      "h": 196
     }
@@ -67,9 +67,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 155,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/327@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/327@3x.webp",
      "w": 150,
-     "h": 201
+     "h": 200
     }
    },
    "352": {
@@ -78,7 +78,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 170,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/352@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/352@3x.webp",
      "w": 129,
      "h": 199
     }
@@ -89,7 +89,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 175,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/396@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/396@3x.webp",
      "w": 137,
      "h": 207
     }
@@ -101,7 +101,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 179,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/514@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/514@3x.webp",
      "w": 120,
      "h": 213
     }
@@ -111,7 +111,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 40,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/626@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/626@3x.webp",
      "w": 168,
      "h": 215
     }
@@ -122,8 +122,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/657@2x.webp",
-     "w": 174,
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/657@3x.webp",
+     "w": 175,
      "h": 180
     }
    },
@@ -133,9 +133,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/669@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/669@3x.webp",
      "w": 187,
-     "h": 215
+     "h": 214
     }
    },
    "689": {
@@ -145,7 +145,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 188,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/689@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/689@3x.webp",
      "w": 136,
      "h": 218
     }
@@ -157,7 +157,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 188,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/702@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_cabinet/702@3x.webp",
      "w": 136,
      "h": 218
     }
@@ -172,7 +172,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/214@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/214@3x.webp",
      "w": 67,
      "h": 75
     }
@@ -182,8 +182,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 5,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/215@2x.webp",
-     "w": 65,
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/215@3x.webp",
+     "w": 66,
      "h": 78
     }
    },
@@ -192,7 +192,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 5,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/216@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/216@3x.webp",
      "w": 67,
      "h": 75
     }
@@ -202,7 +202,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/217@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/217@3x.webp",
      "w": 67,
      "h": 74
     }
@@ -212,7 +212,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 5,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/218@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/218@3x.webp",
      "w": 65,
      "h": 73
     }
@@ -222,7 +222,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/231@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/231@3x.webp",
      "w": 67,
      "h": 73
     }
@@ -232,8 +232,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 12,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/232@2x.webp",
-     "w": 62,
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/232@3x.webp",
+     "w": 63,
      "h": 74
     }
    },
@@ -242,7 +242,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/233@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/233@3x.webp",
      "w": 67,
      "h": 75
     }
@@ -252,7 +252,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/234@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/234@3x.webp",
      "w": 67,
      "h": 73
     }
@@ -262,9 +262,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 5,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/261@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/261@3x.webp",
      "w": 61,
-     "h": 73
+     "h": 72
     }
    },
    "263": {
@@ -272,7 +272,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 5,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/263@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/263@3x.webp",
      "w": 61,
      "h": 72
     }
@@ -282,9 +282,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 5,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/264@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/264@3x.webp",
      "w": 61,
-     "h": 73
+     "h": 72
     }
    },
    "265": {
@@ -292,9 +292,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 8,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/265@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/265@3x.webp",
      "w": 61,
-     "h": 73
+     "h": 72
     }
    },
    "266": {
@@ -302,7 +302,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 8,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/266@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/266@3x.webp",
      "w": 61,
      "h": 72
     }
@@ -312,7 +312,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/267@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/267@3x.webp",
      "w": 61,
      "h": 72
     }
@@ -322,9 +322,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 8,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/268@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/268@3x.webp",
      "w": 61,
-     "h": 73
+     "h": 72
     }
    },
    "441": {
@@ -333,7 +333,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/441@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/441@3x.webp",
      "w": 78,
      "h": 79
     }
@@ -343,8 +343,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 12,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/442@2x.webp",
-     "w": 62,
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/442@3x.webp",
+     "w": 63,
      "h": 74
     }
    },
@@ -353,7 +353,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/508@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/508@3x.webp",
      "w": 78,
      "h": 101
     }
@@ -363,7 +363,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/509@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/509@3x.webp",
      "w": 79,
      "h": 107
     }
@@ -373,8 +373,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/510@2x.webp",
-     "w": 85,
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/510@3x.webp",
+     "w": 84,
      "h": 106
     }
    },
@@ -384,9 +384,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/544@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/544@3x.webp",
      "w": 112,
-     "h": 110
+     "h": 105
     }
    },
    "545": {
@@ -395,7 +395,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/545@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/545@3x.webp",
      "w": 98,
      "h": 93
     }
@@ -405,9 +405,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 8,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/546@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/546@3x.webp",
      "w": 61,
-     "h": 73
+     "h": 72
     }
    },
    "547": {
@@ -415,7 +415,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 8,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/547@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/547@3x.webp",
      "w": 61,
      "h": 72
     }
@@ -425,8 +425,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/548@2x.webp",
-     "w": 63,
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/548@3x.webp",
+     "w": 64,
      "h": 85
     }
    },
@@ -435,7 +435,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/549@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/549@3x.webp",
      "w": 78,
      "h": 100
     }
@@ -446,7 +446,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/550@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/550@3x.webp",
      "w": 73,
      "h": 81
     }
@@ -456,9 +456,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/551@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/551@3x.webp",
      "w": 61,
-     "h": 74
+     "h": 73
     }
    },
    "552": {
@@ -466,9 +466,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/552@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/552@3x.webp",
      "w": 57,
-     "h": 70
+     "h": 71
     }
    },
    "554": {
@@ -476,7 +476,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/554@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/554@3x.webp",
      "w": 62,
      "h": 78
     }
@@ -486,9 +486,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/555@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/555@3x.webp",
      "w": 74,
-     "h": 74
+     "h": 75
     }
    },
    "556": {
@@ -496,9 +496,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/556@2x.webp",
-     "w": 74,
-     "h": 74
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/556@3x.webp",
+     "w": 75,
+     "h": 73
     }
    },
    "557": {
@@ -506,7 +506,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 5,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/557@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/557@3x.webp",
      "w": 78,
      "h": 74
     }
@@ -516,8 +516,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/558@2x.webp",
-     "w": 73,
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/558@3x.webp",
+     "w": 74,
      "h": 74
     }
    },
@@ -526,7 +526,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/562@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/562@3x.webp",
      "w": 56,
      "h": 74
     }
@@ -536,7 +536,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 5,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/563@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/563@3x.webp",
      "w": 59,
      "h": 75
     }
@@ -546,9 +546,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 12,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/564@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/564@3x.webp",
      "w": 70,
-     "h": 74
+     "h": 75
     }
    },
    "565": {
@@ -557,8 +557,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/565@2x.webp",
-     "w": 63,
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/565@3x.webp",
+     "w": 64,
      "h": 80
     }
    },
@@ -568,9 +568,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/566@2x.webp",
-     "w": 67,
-     "h": 75
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/566@3x.webp",
+     "w": 68,
+     "h": 74
     }
    },
    "567": {
@@ -578,9 +578,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 8,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/567@2x.webp",
-     "w": 63,
-     "h": 71
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/567@3x.webp",
+     "w": 64,
+     "h": 70
     }
    },
    "568": {
@@ -589,7 +589,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/568@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/568@3x.webp",
      "w": 80,
      "h": 95
     }
@@ -599,8 +599,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 5,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/569@2x.webp",
-     "w": 75,
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/569@3x.webp",
+     "w": 76,
      "h": 74
     }
    },
@@ -609,8 +609,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/570@2x.webp",
-     "w": 76,
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/570@3x.webp",
+     "w": 77,
      "h": 74
     }
    },
@@ -619,7 +619,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/571@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/571@3x.webp",
      "w": 74,
      "h": 72
     }
@@ -630,7 +630,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/572@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/572@3x.webp",
      "w": 78,
      "h": 88
     }
@@ -641,7 +641,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/573@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_sdb/573@3x.webp",
      "w": 78,
      "h": 88
     }
@@ -657,9 +657,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 44,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/303@2x.webp",
-     "w": 173,
-     "h": 82
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/303@3x.webp",
+     "w": 172,
+     "h": 81
     }
    },
    "308": {
@@ -669,7 +669,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 45,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/308@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/308@3x.webp",
      "w": 171,
      "h": 80
     }
@@ -680,7 +680,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 40,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/325@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/325@3x.webp",
      "w": 171,
      "h": 77
     }
@@ -691,9 +691,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 46,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/326@2x.webp",
-     "w": 186,
-     "h": 83
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/326@3x.webp",
+     "w": 183,
+     "h": 81
     }
    },
    "348": {
@@ -701,7 +701,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 40,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/348@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/348@3x.webp",
      "w": 151,
      "h": 70
     }
@@ -712,9 +712,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 43,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/349@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/349@3x.webp",
      "w": 175,
-     "h": 85
+     "h": 84
     }
    },
    "350": {
@@ -723,7 +723,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 45,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/350@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/350@3x.webp",
      "w": 158,
      "h": 80
     }
@@ -734,7 +734,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 43,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/397@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/397@3x.webp",
      "w": 169,
      "h": 78
     }
@@ -745,7 +745,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 61,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/439@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/439@3x.webp",
      "w": 160,
      "h": 103
     }
@@ -756,9 +756,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 52,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/627@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_smallcabinet/627@3x.webp",
      "w": 146,
-     "h": 99
+     "h": 98
     }
    }
   }
@@ -771,7 +771,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 40,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_wallcabinet/298@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_wallcabinet/298@3x.webp",
      "w": 93,
      "h": 91
     }
@@ -781,7 +781,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_wallcabinet/300@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_wallcabinet/300@3x.webp",
      "w": 109,
      "h": 136
     }
@@ -792,9 +792,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_wallcabinet/309@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_wallcabinet/309@3x.webp",
      "w": 88,
-     "h": 122
+     "h": 121
     }
    },
    "324": {
@@ -802,7 +802,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_wallcabinet/324@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_wallcabinet/324@3x.webp",
      "w": 100,
      "h": 118
     }
@@ -813,9 +813,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_wallcabinet/347@2x.webp",
-     "w": 101,
-     "h": 123
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_wallcabinet/347@3x.webp",
+     "w": 100,
+     "h": 122
     }
    },
    "351": {
@@ -823,9 +823,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_wallcabinet/351@2x.webp",
-     "w": 100,
-     "h": 131
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_wallcabinet/351@3x.webp",
+     "w": 99,
+     "h": 130
     }
    },
    "398": {
@@ -833,7 +833,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_wallcabinet/398@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_wallcabinet/398@3x.webp",
      "w": 94,
      "h": 135
     }
@@ -843,7 +843,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/bag_furniture_wallcabinet/628@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/bag_furniture_wallcabinet/628@3x.webp",
      "w": 113,
      "h": 154
     }
@@ -859,8 +859,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 36,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/2@2x.webp",
-     "w": 135,
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/2@3x.webp",
+     "w": 136,
      "h": 136
     }
    },
@@ -870,7 +870,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 31,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/6@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/6@3x.webp",
      "w": 126,
      "h": 115
     }
@@ -881,7 +881,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 34,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/9@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/9@3x.webp",
      "w": 118,
      "h": 142
     }
@@ -892,9 +892,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 22,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/10@2x.webp",
-     "w": 124,
-     "h": 114
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/10@3x.webp",
+     "w": 125,
+     "h": 115
     }
    },
    "42": {
@@ -903,7 +903,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 28,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/42@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/42@3x.webp",
      "w": 123,
      "h": 96
     }
@@ -914,9 +914,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 34,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/46@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/46@3x.webp",
      "w": 158,
-     "h": 120
+     "h": 119
     }
    },
    "47": {
@@ -925,7 +925,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 22,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/47@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/47@3x.webp",
      "w": 146,
      "h": 113
     }
@@ -937,8 +937,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 37,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/223@2x.webp",
-     "w": 135,
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/223@3x.webp",
+     "w": 136,
      "h": 136
     }
    },
@@ -948,8 +948,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 37,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/224@2x.webp",
-     "w": 135,
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/224@3x.webp",
+     "w": 136,
      "h": 136
     }
    },
@@ -959,7 +959,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 30,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/225@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/225@3x.webp",
      "w": 126,
      "h": 115
     }
@@ -970,7 +970,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 30,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/226@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/226@3x.webp",
      "w": 126,
      "h": 115
     }
@@ -981,7 +981,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 36,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/227@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/227@3x.webp",
      "w": 118,
      "h": 141
     }
@@ -992,8 +992,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 37,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/228@2x.webp",
-     "w": 135,
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/228@3x.webp",
+     "w": 136,
      "h": 136
     }
    },
@@ -1004,8 +1004,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 27,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/240@2x.webp",
-     "w": 213,
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/240@3x.webp",
+     "w": 214,
      "h": 98
     }
    },
@@ -1015,7 +1015,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 29,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/241@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/241@3x.webp",
      "w": 205,
      "h": 96
     }
@@ -1026,7 +1026,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 22,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/482@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/482@3x.webp",
      "w": 118,
      "h": 91
     }
@@ -1037,7 +1037,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 24,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/486@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/486@3x.webp",
      "w": 118,
      "h": 99
     }
@@ -1048,8 +1048,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 11,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/506@2x.webp",
-     "w": 166,
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/506@3x.webp",
+     "w": 165,
      "h": 98
     }
    },
@@ -1059,7 +1059,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 23,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/516@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/516@3x.webp",
      "w": 127,
      "h": 118
     }
@@ -1070,7 +1070,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 15,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/517@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/517@3x.webp",
      "w": 163,
      "h": 116
     }
@@ -1081,7 +1081,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 32,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/586@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/586@3x.webp",
      "w": 137,
      "h": 203
     }
@@ -1092,7 +1092,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 33,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/587@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/587@3x.webp",
      "w": 137,
      "h": 203
     }
@@ -1104,7 +1104,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 33,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_armchair/588@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_armchair/588@3x.webp",
      "w": 137,
      "h": 203
     }
@@ -1120,7 +1120,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 20,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/3@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/3@3x.webp",
      "w": 296,
      "h": 159
     }
@@ -1131,7 +1131,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 11,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/18@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/18@3x.webp",
      "w": 254,
      "h": 148
     }
@@ -1142,8 +1142,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 11,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/19@2x.webp",
-     "w": 291,
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/19@3x.webp",
+     "w": 292,
      "h": 213
     }
    },
@@ -1153,9 +1153,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 2,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/87@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/87@3x.webp",
      "w": 291,
-     "h": 110
+     "h": 111
     }
    },
    "105": {
@@ -1165,7 +1165,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 13,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/105@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/105@3x.webp",
      "w": 263,
      "h": 147
     }
@@ -1177,7 +1177,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 24,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/106@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/106@3x.webp",
      "w": 300,
      "h": 151
     }
@@ -1188,8 +1188,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 12,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/160@2x.webp",
-     "w": 244,
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/160@3x.webp",
+     "w": 245,
      "h": 236
     }
    },
@@ -1199,7 +1199,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 18,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/195@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/195@3x.webp",
      "w": 301,
      "h": 169
     }
@@ -1211,9 +1211,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 32,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/272@2x.webp",
-     "w": 265,
-     "h": 164
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/272@3x.webp",
+     "w": 263,
+     "h": 163
     }
    },
    "281": {
@@ -1223,7 +1223,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 14,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/281@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/281@3x.webp",
      "w": 228,
      "h": 208
     }
@@ -1234,9 +1234,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 11,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/461@2x.webp",
-     "w": 260,
-     "h": 111
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/461@3x.webp",
+     "w": 258,
+     "h": 110
     }
    },
    "462": {
@@ -1245,9 +1245,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 15,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/462@2x.webp",
-     "w": 260,
-     "h": 111
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/462@3x.webp",
+     "w": 258,
+     "h": 110
     }
    },
    "463": {
@@ -1256,7 +1256,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 8,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/463@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/463@3x.webp",
      "w": 236,
      "h": 147
     }
@@ -1267,7 +1267,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 8,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/464@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/464@3x.webp",
      "w": 236,
      "h": 147
     }
@@ -1278,7 +1278,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 42,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/465@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/465@3x.webp",
      "w": 281,
      "h": 94
     }
@@ -1289,8 +1289,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 12,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/466@2x.webp",
-     "w": 244,
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/466@3x.webp",
+     "w": 243,
      "h": 94
     }
    },
@@ -1300,7 +1300,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 9,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/467@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/467@3x.webp",
      "w": 274,
      "h": 118
     }
@@ -1310,7 +1310,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 40,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/507@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/507@3x.webp",
      "w": 236,
      "h": 83
     }
@@ -1321,9 +1321,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 11,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/512@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/512@3x.webp",
      "w": 240,
-     "h": 102
+     "h": 101
     }
    },
    "523": {
@@ -1332,9 +1332,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 17,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/523@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/523@3x.webp",
      "w": 239,
-     "h": 133
+     "h": 132
     }
    },
    "654": {
@@ -1344,8 +1344,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 9,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/654@2x.webp",
-     "w": 337,
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/654@3x.webp",
+     "w": 336,
      "h": 173
     }
    },
@@ -1356,9 +1356,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 24,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/671@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/671@3x.webp",
      "w": 264,
-     "h": 148
+     "h": 147
     }
    },
    "691": {
@@ -1369,7 +1369,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 6,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/691@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/691@3x.webp",
      "w": 220,
      "h": 112
     }
@@ -1382,7 +1382,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 9,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bed/706@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bed/706@3x.webp",
      "w": 216,
      "h": 110
     }
@@ -1398,7 +1398,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 17,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bench/29@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bench/29@3x.webp",
      "w": 184,
      "h": 66
     }
@@ -1409,7 +1409,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 19,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bench/30@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bench/30@3x.webp",
      "w": 168,
      "h": 48
     }
@@ -1421,7 +1421,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 17,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bench/124@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bench/124@3x.webp",
      "w": 225,
      "h": 57
     }
@@ -1432,7 +1432,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 15,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bench/161@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bench/161@3x.webp",
      "w": 223,
      "h": 52
     }
@@ -1444,8 +1444,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 11,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bench/277@2x.webp",
-     "w": 223,
+     "path": "assets/sprites/furniture/upgrades/furniture_bench/277@3x.webp",
+     "w": 222,
      "h": 55
     }
    },
@@ -1456,9 +1456,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 17,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bench/334@2x.webp",
-     "w": 216,
-     "h": 52
+     "path": "assets/sprites/furniture/upgrades/furniture_bench/334@3x.webp",
+     "w": 215,
+     "h": 51
     }
    },
    "361": {
@@ -1467,9 +1467,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 21,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bench/361@2x.webp",
-     "w": 217,
-     "h": 61
+     "path": "assets/sprites/furniture/upgrades/furniture_bench/361@3x.webp",
+     "w": 216,
+     "h": 60
     }
    },
    "364": {
@@ -1478,9 +1478,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 20,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bench/364@2x.webp",
-     "w": 217,
-     "h": 61
+     "path": "assets/sprites/furniture/upgrades/furniture_bench/364@3x.webp",
+     "w": 216,
+     "h": 60
     }
    },
    "515": {
@@ -1489,7 +1489,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 14,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bench/515@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bench/515@3x.webp",
      "w": 171,
      "h": 49
     }
@@ -1501,8 +1501,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 14,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bench/524@2x.webp",
-     "w": 217,
+     "path": "assets/sprites/furniture/upgrades/furniture_bench/524@3x.webp",
+     "w": 218,
      "h": 53
     }
    },
@@ -1512,8 +1512,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 26,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bench/580@2x.webp",
-     "w": 208,
+     "path": "assets/sprites/furniture/upgrades/furniture_bench/580@3x.webp",
+     "w": 207,
      "h": 103
     }
    },
@@ -1523,7 +1523,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 22,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bench/581@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bench/581@3x.webp",
      "w": 216,
      "h": 99
     }
@@ -1534,7 +1534,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 27,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bench/629@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bench/629@3x.webp",
      "w": 232,
      "h": 74
     }
@@ -1549,7 +1549,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 40,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/154@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/154@3x.webp",
      "w": 100,
      "h": 176
     }
@@ -1559,7 +1559,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": false,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/189@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/189@3x.webp",
      "w": 48,
      "h": 170
     }
@@ -1569,9 +1569,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 55,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/190@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/190@3x.webp",
      "w": 72,
-     "h": 158
+     "h": 157
     }
    },
    "379": {
@@ -1580,9 +1580,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/379@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/379@3x.webp",
      "w": 148,
-     "h": 185
+     "h": 184
     }
    },
    "452": {
@@ -1591,7 +1591,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/452@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/452@3x.webp",
      "w": 40,
      "h": 137
     }
@@ -1601,7 +1601,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/453@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/453@3x.webp",
      "w": 81,
      "h": 177
     }
@@ -1611,7 +1611,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/454@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/454@3x.webp",
      "w": 84,
      "h": 164
     }
@@ -1621,7 +1621,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/455@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/455@3x.webp",
      "w": 104,
      "h": 236
     }
@@ -1632,9 +1632,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/456@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/456@3x.webp",
      "w": 97,
-     "h": 130
+     "h": 131
     }
    },
    "457": {
@@ -1643,7 +1643,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/457@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/457@3x.webp",
      "w": 101,
      "h": 142
     }
@@ -1653,7 +1653,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/458@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/458@3x.webp",
      "w": 264,
      "h": 84
     }
@@ -1663,7 +1663,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/468@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/468@3x.webp",
      "w": 79,
      "h": 96
     }
@@ -1673,7 +1673,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/469@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/469@3x.webp",
      "w": 90,
      "h": 102
     }
@@ -1683,7 +1683,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/470@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/470@3x.webp",
      "w": 118,
      "h": 99
     }
@@ -1693,7 +1693,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/471@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/471@3x.webp",
      "w": 106,
      "h": 71
     }
@@ -1704,9 +1704,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/472@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/472@3x.webp",
      "w": 94,
-     "h": 99
+     "h": 100
     }
    },
    "473": {
@@ -1715,7 +1715,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/473@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/473@3x.webp",
      "w": 201,
      "h": 94
     }
@@ -1726,7 +1726,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/474@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/474@3x.webp",
      "w": 188,
      "h": 109
     }
@@ -1737,7 +1737,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/475@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/475@3x.webp",
      "w": 202,
      "h": 101
     }
@@ -1748,7 +1748,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/476@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/476@3x.webp",
      "w": 173,
      "h": 85
     }
@@ -1758,7 +1758,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/532@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/532@3x.webp",
      "w": 184,
      "h": 70
     }
@@ -1769,7 +1769,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/602@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/602@3x.webp",
      "w": 97,
      "h": 110
     }
@@ -1780,7 +1780,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/603@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/603@3x.webp",
      "w": 84,
      "h": 100
     }
@@ -1790,7 +1790,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/604@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/604@3x.webp",
      "w": 78,
      "h": 102
     }
@@ -1800,7 +1800,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/613@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/613@3x.webp",
      "w": 88,
      "h": 111
     }
@@ -1811,7 +1811,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/648@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/648@3x.webp",
      "w": 114,
      "h": 296
     }
@@ -1821,7 +1821,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/653@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilingdeco/653@3x.webp",
      "w": 272,
      "h": 71
     }
@@ -1836,7 +1836,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/84@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/84@3x.webp",
      "w": 276,
      "h": 62
     }
@@ -1846,7 +1846,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/85@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/85@3x.webp",
      "w": 305,
      "h": 78
     }
@@ -1856,7 +1856,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/86@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/86@3x.webp",
      "w": 95,
      "h": 126
     }
@@ -1866,9 +1866,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 40,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/92@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/92@3x.webp",
      "w": 81,
-     "h": 66
+     "h": 67
     }
    },
    "153": {
@@ -1877,7 +1877,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/153@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/153@3x.webp",
      "w": 175,
      "h": 46
     }
@@ -1887,8 +1887,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/172@2x.webp",
-     "w": 62,
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/172@3x.webp",
+     "w": 63,
      "h": 179
     }
    },
@@ -1898,8 +1898,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/276@2x.webp",
-     "w": 167,
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/276@3x.webp",
+     "w": 166,
      "h": 111
     }
    },
@@ -1909,9 +1909,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/357@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/357@3x.webp",
      "w": 47,
-     "h": 107
+     "h": 108
     }
    },
    "424": {
@@ -1920,7 +1920,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/424@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/424@3x.webp",
      "w": 80,
      "h": 181
     }
@@ -1931,7 +1931,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/491@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/491@3x.webp",
      "w": 75,
      "h": 55
     }
@@ -1942,7 +1942,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/530@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/530@3x.webp",
      "w": 100,
      "h": 61
     }
@@ -1952,7 +1952,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/536@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/536@3x.webp",
      "w": 47,
      "h": 97
     }
@@ -1962,7 +1962,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/543@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/543@3x.webp",
      "w": 44,
      "h": 66
     }
@@ -1972,7 +1972,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/576@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/576@3x.webp",
      "w": 33,
      "h": 44
     }
@@ -1983,9 +1983,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/578@2x.webp",
-     "w": 76,
-     "h": 52
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/578@3x.webp",
+     "w": 77,
+     "h": 53
     }
    },
    "593": {
@@ -1993,9 +1993,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/593@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/593@3x.webp",
      "w": 61,
-     "h": 17
+     "h": 18
     }
    },
    "594": {
@@ -2003,7 +2003,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/594@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/594@3x.webp",
      "w": 234,
      "h": 20
     }
@@ -2013,7 +2013,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/595@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/595@3x.webp",
      "w": 36,
      "h": 73
     }
@@ -2023,7 +2023,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/596@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/596@3x.webp",
      "w": 65,
      "h": 101
     }
@@ -2033,8 +2033,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/637@2x.webp",
-     "w": 84,
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/637@3x.webp",
+     "w": 85,
      "h": 63
     }
    },
@@ -2044,7 +2044,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/661@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/661@3x.webp",
      "w": 83,
      "h": 63
     }
@@ -2056,7 +2056,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "isNew": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/696@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_ceilinglamp/696@3x.webp",
      "w": 79,
      "h": 271
     }
@@ -2072,7 +2072,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 32,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/1@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/1@3x.webp",
      "w": 78,
      "h": 105
     }
@@ -2084,9 +2084,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 22,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/5@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/5@3x.webp",
      "w": 85,
-     "h": 123
+     "h": 124
     }
    },
    "11": {
@@ -2095,7 +2095,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 26,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/11@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/11@3x.webp",
      "w": 73,
      "h": 95
     }
@@ -2106,7 +2106,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 30,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/12@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/12@3x.webp",
      "w": 71,
      "h": 95
     }
@@ -2117,9 +2117,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 27,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/13@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/13@3x.webp",
      "w": 74,
-     "h": 100
+     "h": 99
     }
    },
    "14": {
@@ -2128,7 +2128,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 31,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/14@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/14@3x.webp",
      "w": 71,
      "h": 95
     }
@@ -2139,7 +2139,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 33,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/15@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/15@3x.webp",
      "w": 69,
      "h": 99
     }
@@ -2150,7 +2150,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 28,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/27@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/27@3x.webp",
      "w": 87,
      "h": 107
     }
@@ -2161,7 +2161,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 34,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/39@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/39@3x.webp",
      "w": 97,
      "h": 103
     }
@@ -2172,7 +2172,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 36,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/41@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/41@3x.webp",
      "w": 90,
      "h": 111
     }
@@ -2183,7 +2183,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 26,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/44@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/44@3x.webp",
      "w": 78,
      "h": 99
     }
@@ -2194,9 +2194,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 22,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/45@2x.webp",
-     "w": 75,
-     "h": 86
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/45@3x.webp",
+     "w": 74,
+     "h": 87
     }
    },
    "103": {
@@ -2205,7 +2205,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 23,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/103@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/103@3x.webp",
      "w": 74,
      "h": 106
     }
@@ -2216,7 +2216,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 53,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/104@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/104@3x.webp",
      "w": 101,
      "h": 86
     }
@@ -2228,9 +2228,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 17,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/110@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/110@3x.webp",
      "w": 92,
-     "h": 72
+     "h": 71
     }
    },
    "112": {
@@ -2240,7 +2240,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 19,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/112@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/112@3x.webp",
      "w": 130,
      "h": 106
     }
@@ -2251,7 +2251,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 23,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/480@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/480@3x.webp",
      "w": 71,
      "h": 100
     }
@@ -2262,7 +2262,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 25,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_chair/662@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_chair/662@3x.webp",
      "w": 70,
      "h": 144
     }
@@ -2278,7 +2278,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 29,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/54@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/54@3x.webp",
      "w": 209,
      "h": 53
     }
@@ -2289,9 +2289,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 21,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/61@2x.webp",
-     "w": 260,
-     "h": 60
+     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/61@3x.webp",
+     "w": 261,
+     "h": 61
     }
    },
    "107": {
@@ -2301,7 +2301,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 26,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/107@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/107@3x.webp",
      "w": 222,
      "h": 56
     }
@@ -2312,7 +2312,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 20,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/194@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/194@3x.webp",
      "w": 261,
      "h": 69
     }
@@ -2323,7 +2323,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 25,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/244@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/244@3x.webp",
      "w": 209,
      "h": 59
     }
@@ -2335,7 +2335,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 34,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/280@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/280@3x.webp",
      "w": 180,
      "h": 73
     }
@@ -2346,7 +2346,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 19,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/362@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/362@3x.webp",
      "w": 217,
      "h": 68
     }
@@ -2357,7 +2357,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 28,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/437@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/437@3x.webp",
      "w": 238,
      "h": 86
     }
@@ -2368,7 +2368,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 30,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/438@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/438@3x.webp",
      "w": 186,
      "h": 68
     }
@@ -2379,8 +2379,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 25,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/484@2x.webp",
-     "w": 199,
+     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/484@3x.webp",
+     "w": 198,
      "h": 63
     }
    },
@@ -2390,9 +2390,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 21,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/521@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/521@3x.webp",
      "w": 224,
-     "h": 63
+     "h": 62
     }
    },
    "674": {
@@ -2402,7 +2402,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 34,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/674@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/674@3x.webp",
      "w": 229,
      "h": 81
     }
@@ -2414,8 +2414,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 33,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/698@2x.webp",
-     "w": 118,
+     "path": "assets/sprites/furniture/upgrades/furniture_coffeetable/698@3x.webp",
+     "w": 117,
      "h": 78
     }
    }
@@ -2430,7 +2430,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 36,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/78@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/78@3x.webp",
      "w": 218,
      "h": 73
     }
@@ -2441,7 +2441,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 38,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/80@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/80@3x.webp",
      "w": 228,
      "h": 76
     }
@@ -2452,9 +2452,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 37,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/82@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/82@3x.webp",
      "w": 227,
-     "h": 73
+     "h": 72
     }
    },
    "253": {
@@ -2463,7 +2463,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 36,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/253@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/253@3x.webp",
      "w": 286,
      "h": 78
     }
@@ -2474,7 +2474,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 50,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/254@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/254@3x.webp",
      "w": 285,
      "h": 92
     }
@@ -2485,9 +2485,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 37,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/255@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/255@3x.webp",
      "w": 286,
-     "h": 76
+     "h": 77
     }
    },
    "256": {
@@ -2496,7 +2496,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 38,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/256@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/256@3x.webp",
      "w": 388,
      "h": 75
     }
@@ -2507,7 +2507,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 38,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/257@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/257@3x.webp",
      "w": 363,
      "h": 82
     }
@@ -2518,7 +2518,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 38,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/258@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/258@3x.webp",
      "w": 337,
      "h": 84
     }
@@ -2529,7 +2529,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 35,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/284@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/284@3x.webp",
      "w": 285,
      "h": 82
     }
@@ -2540,9 +2540,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 34,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/285@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/285@3x.webp",
      "w": 229,
-     "h": 75
+     "h": 74
     }
    },
    "408": {
@@ -2552,8 +2552,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 40,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/408@2x.webp",
-     "w": 225,
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/408@3x.webp",
+     "w": 226,
      "h": 77
     }
    },
@@ -2564,9 +2564,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 38,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/477@2x.webp",
-     "w": 196,
-     "h": 78
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/477@3x.webp",
+     "w": 195,
+     "h": 77
     }
    },
    "488": {
@@ -2575,7 +2575,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 35,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/488@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/488@3x.webp",
      "w": 229,
      "h": 70
     }
@@ -2587,7 +2587,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 21,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/518@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/518@3x.webp",
      "w": 224,
      "h": 65
     }
@@ -2598,9 +2598,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 33,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/539@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/539@3x.webp",
      "w": 222,
-     "h": 74
+     "h": 73
     }
    },
    "540": {
@@ -2609,7 +2609,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 35,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/540@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/540@3x.webp",
      "w": 209,
      "h": 73
     }
@@ -2620,9 +2620,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 34,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/541@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/541@3x.webp",
      "w": 222,
-     "h": 73
+     "h": 72
     }
    },
    "579": {
@@ -2632,8 +2632,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 52,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/579@2x.webp",
-     "w": 282,
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/579@3x.webp",
+     "w": 281,
      "h": 97
     }
    },
@@ -2643,9 +2643,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 37,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/589@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/589@3x.webp",
      "w": 236,
-     "h": 77
+     "h": 76
     }
    },
    "590": {
@@ -2654,9 +2654,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 38,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/590@2x.webp",
-     "w": 235,
-     "h": 77
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/590@3x.webp",
+     "w": 236,
+     "h": 76
     }
    },
    "591": {
@@ -2665,7 +2665,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 29,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/591@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/591@3x.webp",
      "w": 235,
      "h": 81
     }
@@ -2677,7 +2677,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 40,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/641@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/641@3x.webp",
      "w": 263,
      "h": 83
     }
@@ -2688,9 +2688,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 38,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/650@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/650@3x.webp",
      "w": 253,
-     "h": 98
+     "h": 97
     }
    },
    "676": {
@@ -2701,7 +2701,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 36,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/676@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/676@3x.webp",
      "w": 238,
      "h": 74
     }
@@ -2714,7 +2714,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 37,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_counter/704@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_counter/704@3x.webp",
      "w": 238,
      "h": 74
     }
@@ -2730,7 +2730,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 33,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_desk/68@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_desk/68@3x.webp",
      "w": 172,
      "h": 89
     }
@@ -2741,7 +2741,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 36,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_desk/69@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_desk/69@3x.webp",
      "w": 172,
      "h": 118
     }
@@ -2753,7 +2753,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 38,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_desk/151@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_desk/151@3x.webp",
      "w": 157,
      "h": 80
     }
@@ -2765,7 +2765,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 35,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_desk/238@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_desk/238@3x.webp",
      "w": 181,
      "h": 123
     }
@@ -2777,9 +2777,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 43,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_desk/478@2x.webp",
-     "w": 165,
-     "h": 79
+     "path": "assets/sprites/furniture/upgrades/furniture_desk/478@3x.webp",
+     "w": 160,
+     "h": 76
     }
    },
    "660": {
@@ -2788,7 +2788,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 46,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_desk/660@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_desk/660@3x.webp",
      "w": 199,
      "h": 104
     }
@@ -2800,9 +2800,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 41,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_desk/681@2x.webp",
-     "w": 163,
-     "h": 85
+     "path": "assets/sprites/furniture/upgrades/furniture_desk/681@3x.webp",
+     "w": 161,
+     "h": 83
     }
    },
    "700": {
@@ -2813,7 +2813,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 41,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_desk/700@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_desk/700@3x.webp",
      "w": 157,
      "h": 77
     }
@@ -2829,7 +2829,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 127,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/269@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/269@3x.webp",
      "w": 213,
      "h": 338
     }
@@ -2841,9 +2841,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 4,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/395@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/395@3x.webp",
      "w": 240,
-     "h": 305
+     "h": 303
     }
    },
    "413": {
@@ -2852,9 +2852,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 106,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/413@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/413@3x.webp",
      "w": 216,
-     "h": 139
+     "h": 137
     }
    },
    "713": {
@@ -2863,8 +2863,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 74,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/713@2x.webp",
-     "w": 140,
+     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/713@3x.webp",
+     "w": 139,
      "h": 227
     }
    },
@@ -2874,7 +2874,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 76,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/714@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/714@3x.webp",
      "w": 126,
      "h": 339
     }
@@ -2885,7 +2885,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 10,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/715@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/715@3x.webp",
      "w": 130,
      "h": 133
     }
@@ -2896,9 +2896,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 60,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/716@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/716@3x.webp",
      "w": 156,
-     "h": 164
+     "h": 161
     }
    },
    "717": {
@@ -2907,9 +2907,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 102,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/717@2x.webp",
-     "w": 220,
-     "h": 139
+     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/717@3x.webp",
+     "w": 221,
+     "h": 136
     }
    },
    "719": {
@@ -2918,9 +2918,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 106,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/719@2x.webp",
-     "w": 152,
-     "h": 182
+     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/719@3x.webp",
+     "w": 149,
+     "h": 181
     }
    },
    "720": {
@@ -2929,7 +2929,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 51,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/720@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/720@3x.webp",
      "w": 166,
      "h": 112
     }
@@ -2939,9 +2939,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/721@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_fireplace/721@3x.webp",
      "w": 150,
-     "h": 148
+     "h": 147
     }
    }
   }
@@ -2954,7 +2954,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/83@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/83@3x.webp",
      "w": 66,
      "h": 182
     }
@@ -2964,7 +2964,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/91@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/91@3x.webp",
      "w": 59,
      "h": 171
     }
@@ -2975,9 +2975,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/114@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/114@3x.webp",
      "w": 86,
-     "h": 197
+     "h": 199
     }
    },
    "116": {
@@ -2985,9 +2985,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/116@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/116@3x.webp",
      "w": 84,
-     "h": 199
+     "h": 200
     }
    },
    "155": {
@@ -2995,7 +2995,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 40,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/155@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/155@3x.webp",
      "w": 101,
      "h": 197
     }
@@ -3006,7 +3006,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/278@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/278@3x.webp",
      "w": 82,
      "h": 186
     }
@@ -3017,7 +3017,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/355@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/355@3x.webp",
      "w": 56,
      "h": 178
     }
@@ -3027,9 +3027,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/422@2x.webp",
-     "w": 76,
-     "h": 251
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/422@3x.webp",
+     "w": 77,
+     "h": 252
     }
    },
    "430": {
@@ -3037,7 +3037,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/430@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/430@3x.webp",
      "w": 92,
      "h": 172
     }
@@ -3048,7 +3048,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/483@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/483@3x.webp",
      "w": 48,
      "h": 209
     }
@@ -3058,7 +3058,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/487@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/487@3x.webp",
      "w": 66,
      "h": 184
     }
@@ -3068,7 +3068,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/527@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/527@3x.webp",
      "w": 104,
      "h": 188
     }
@@ -3079,8 +3079,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/535@2x.webp",
-     "w": 77,
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/535@3x.webp",
+     "w": 76,
      "h": 178
     }
    },
@@ -3089,9 +3089,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/597@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/597@3x.webp",
      "w": 112,
-     "h": 187
+     "h": 188
     }
    },
    "598": {
@@ -3099,7 +3099,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/598@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/598@3x.webp",
      "w": 65,
      "h": 87
     }
@@ -3109,9 +3109,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/638@2x.webp",
-     "w": 110,
-     "h": 128
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/638@3x.webp",
+     "w": 109,
+     "h": 129
     }
    },
    "639": {
@@ -3120,8 +3120,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/639@2x.webp",
-     "w": 145,
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/639@3x.webp",
+     "w": 146,
      "h": 182
     }
    },
@@ -3130,7 +3130,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/659@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_floorlamp/659@3x.webp",
      "w": 76,
      "h": 180
     }
@@ -3146,7 +3146,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 29,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/26@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/26@3x.webp",
      "w": 172,
      "h": 102
     }
@@ -3157,7 +3157,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 21,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/28@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/28@3x.webp",
      "w": 168,
      "h": 108
     }
@@ -3169,7 +3169,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 26,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/149@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/149@3x.webp",
      "w": 223,
      "h": 124
     }
@@ -3181,7 +3181,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 24,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/279@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/279@3x.webp",
      "w": 216,
      "h": 161
     }
@@ -3192,9 +3192,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 25,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/360@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/360@3x.webp",
      "w": 228,
-     "h": 113
+     "h": 112
     }
    },
    "365": {
@@ -3203,9 +3203,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 24,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/365@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/365@3x.webp",
      "w": 228,
-     "h": 113
+     "h": 112
     }
    },
    "582": {
@@ -3214,7 +3214,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 76,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/582@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/582@3x.webp",
      "w": 189,
      "h": 105
     }
@@ -3225,9 +3225,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 78,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/583@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/583@3x.webp",
      "w": 189,
-     "h": 105
+     "h": 108
     }
    },
    "584": {
@@ -3237,7 +3237,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 25,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/584@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/584@3x.webp",
      "w": 158,
      "h": 107
     }
@@ -3248,7 +3248,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 26,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/585@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/585@3x.webp",
      "w": 158,
      "h": 109
     }
@@ -3260,9 +3260,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 27,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/643@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/643@3x.webp",
      "w": 211,
-     "h": 141
+     "h": 140
     }
    },
    "697": {
@@ -3273,7 +3273,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 20,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/697@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_loveseat/697@3x.webp",
      "w": 169,
      "h": 167
     }
@@ -3288,7 +3288,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/137@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/137@3x.webp",
      "w": 133,
      "h": 192
     }
@@ -3299,7 +3299,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/156@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/156@3x.webp",
      "w": 69,
      "h": 193
     }
@@ -3309,7 +3309,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/171@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/171@3x.webp",
      "w": 59,
      "h": 155
     }
@@ -3320,7 +3320,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/173@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/173@3x.webp",
      "w": 121,
      "h": 154
     }
@@ -3331,9 +3331,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/174@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/174@3x.webp",
      "w": 143,
-     "h": 135
+     "h": 134
     }
    },
    "175": {
@@ -3341,7 +3341,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/175@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/175@3x.webp",
      "w": 131,
      "h": 156
     }
@@ -3351,7 +3351,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/176@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/176@3x.webp",
      "w": 164,
      "h": 155
     }
@@ -3362,7 +3362,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 103,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/193@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/193@3x.webp",
      "w": 158,
      "h": 124
     }
@@ -3372,7 +3372,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": false,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/205@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/205@3x.webp",
      "w": 162,
      "h": 155
     }
@@ -3383,9 +3383,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/206@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/206@3x.webp",
      "w": 124,
-     "h": 203
+     "h": 202
     }
    },
    "311": {
@@ -3393,7 +3393,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/311@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/311@3x.webp",
      "w": 140,
      "h": 460
     }
@@ -3405,9 +3405,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 232,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/312@2x.webp",
-     "w": 491,
-     "h": 283
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/312@3x.webp",
+     "w": 486,
+     "h": 281
     }
    },
    "328": {
@@ -3416,7 +3416,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/328@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/328@3x.webp",
      "w": 107,
      "h": 126
     }
@@ -3427,9 +3427,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/330@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/330@3x.webp",
      "w": 87,
-     "h": 94
+     "h": 93
     }
    },
    "331": {
@@ -3438,7 +3438,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/331@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/331@3x.webp",
      "w": 76,
      "h": 142
     }
@@ -3449,9 +3449,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/332@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/332@3x.webp",
      "w": 82,
-     "h": 157
+     "h": 156
     }
    },
    "333": {
@@ -3460,9 +3460,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/333@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/333@3x.webp",
      "w": 113,
-     "h": 214
+     "h": 213
     }
    },
    "402": {
@@ -3471,7 +3471,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": false,
     "platY": 118,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/402@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/402@3x.webp",
      "w": 117,
      "h": 135
     }
@@ -3482,7 +3482,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/435@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/435@3x.webp",
      "w": 142,
      "h": 311
     }
@@ -3492,7 +3492,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/436@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/436@3x.webp",
      "w": 180,
      "h": 115
     }
@@ -3502,7 +3502,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 75,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/459@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/459@3x.webp",
      "w": 147,
      "h": 130
     }
@@ -3512,7 +3512,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/494@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/494@3x.webp",
      "w": 66,
      "h": 139
     }
@@ -3522,9 +3522,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/553@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/553@3x.webp",
      "w": 69,
-     "h": 75
+     "h": 74
     }
    },
    "574": {
@@ -3532,7 +3532,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/574@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/574@3x.webp",
      "w": 69,
      "h": 74
     }
@@ -3542,9 +3542,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/575@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/575@3x.webp",
      "w": 69,
-     "h": 74
+     "h": 75
     }
    },
    "619": {
@@ -3552,9 +3552,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/619@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/619@3x.webp",
      "w": 95,
-     "h": 366
+     "h": 367
     }
    },
    "623": {
@@ -3562,7 +3562,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/623@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/623@3x.webp",
      "w": 63,
      "h": 209
     }
@@ -3573,7 +3573,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 172,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/634@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/634@3x.webp",
      "w": 135,
      "h": 209
     }
@@ -3584,8 +3584,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/640@2x.webp",
-     "w": 96,
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/640@3x.webp",
+     "w": 97,
      "h": 75
     }
    },
@@ -3594,7 +3594,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/644@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/644@3x.webp",
      "w": 108,
      "h": 131
     }
@@ -3604,7 +3604,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/645@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/645@3x.webp",
      "w": 108,
      "h": 131
     }
@@ -3614,7 +3614,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/646@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/646@3x.webp",
      "w": 108,
      "h": 131
     }
@@ -3624,7 +3624,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/647@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/647@3x.webp",
      "w": 108,
      "h": 131
     }
@@ -3634,7 +3634,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/663@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/663@3x.webp",
      "w": 290,
      "h": 235
     }
@@ -3645,7 +3645,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "isNew": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/682@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/682@3x.webp",
      "w": 55,
      "h": 184
     }
@@ -3657,7 +3657,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "isNew": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/683@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/683@3x.webp",
      "w": 67,
      "h": 146
     }
@@ -3669,7 +3669,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "isNew": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/684@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/684@3x.webp",
      "w": 71,
      "h": 61
     }
@@ -3680,9 +3680,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "isNew": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/685@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/685@3x.webp",
      "w": 71,
-     "h": 62
+     "h": 61
     }
    },
    "686": {
@@ -3691,8 +3691,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "isNew": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/686@2x.webp",
-     "w": 60,
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/686@3x.webp",
+     "w": 61,
      "h": 74
     }
    },
@@ -3702,7 +3702,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "isNew": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/705@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_roomdeco/705@3x.webp",
      "w": 55,
      "h": 184
     }
@@ -3718,9 +3718,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 29,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/117@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/117@3x.webp",
      "w": 220,
-     "h": 69
+     "h": 70
     }
    },
    "127": {
@@ -3728,7 +3728,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/127@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/127@3x.webp",
      "w": 211,
      "h": 65
     }
@@ -3738,7 +3738,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/128@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/128@3x.webp",
      "w": 213,
      "h": 61
     }
@@ -3749,7 +3749,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/129@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/129@3x.webp",
      "w": 211,
      "h": 62
     }
@@ -3759,7 +3759,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/130@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/130@3x.webp",
      "w": 211,
      "h": 66
     }
@@ -3769,7 +3769,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/131@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/131@3x.webp",
      "w": 216,
      "h": 68
     }
@@ -3779,7 +3779,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/132@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/132@3x.webp",
      "w": 213,
      "h": 64
     }
@@ -3789,7 +3789,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/133@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/133@3x.webp",
      "w": 213,
      "h": 60
     }
@@ -3799,7 +3799,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/134@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/134@3x.webp",
      "w": 213,
      "h": 61
     }
@@ -3809,7 +3809,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/135@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/135@3x.webp",
      "w": 232,
      "h": 65
     }
@@ -3820,8 +3820,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/159@2x.webp",
-     "w": 196,
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/159@3x.webp",
+     "w": 195,
      "h": 56
     }
    },
@@ -3830,7 +3830,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/245@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/245@3x.webp",
      "w": 427,
      "h": 71
     }
@@ -3840,7 +3840,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/246@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/246@3x.webp",
      "w": 427,
      "h": 71
     }
@@ -3851,7 +3851,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/310@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/310@3x.webp",
      "w": 219,
      "h": 109
     }
@@ -3862,9 +3862,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/353@2x.webp",
-     "w": 220,
-     "h": 85
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/353@3x.webp",
+     "w": 221,
+     "h": 84
     }
    },
    "412": {
@@ -3874,7 +3874,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 11,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/412@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/412@3x.webp",
      "w": 219,
      "h": 97
     }
@@ -3884,9 +3884,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/416@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/416@3x.webp",
      "w": 296,
-     "h": 61
+     "h": 60
     }
    },
    "418": {
@@ -3894,7 +3894,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/418@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/418@3x.webp",
      "w": 326,
      "h": 67
     }
@@ -3904,7 +3904,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/451@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/451@3x.webp",
      "w": 312,
      "h": 76
     }
@@ -3914,7 +3914,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/513@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/513@3x.webp",
      "w": 215,
      "h": 65
     }
@@ -3926,7 +3926,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "isNew": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/678@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/678@3x.webp",
      "w": 242,
      "h": 61
     }
@@ -3939,7 +3939,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 8,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/679@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/679@3x.webp",
      "w": 277,
      "h": 80
     }
@@ -3950,9 +3950,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_rug/707@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_rug/707@3x.webp",
      "w": 238,
-     "h": 59
+     "h": 58
     }
    }
   }
@@ -3966,9 +3966,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 52,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/93@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/93@3x.webp",
      "w": 226,
-     "h": 50
+     "h": 46
     }
    },
    "94": {
@@ -3977,9 +3977,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 52,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/94@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/94@3x.webp",
      "w": 225,
-     "h": 53
+     "h": 49
     }
    },
    "95": {
@@ -3988,9 +3988,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 53,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/95@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/95@3x.webp",
      "w": 225,
-     "h": 52
+     "h": 49
     }
    },
    "96": {
@@ -3999,9 +3999,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 50,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/96@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/96@3x.webp",
      "w": 226,
-     "h": 78
+     "h": 74
     }
    },
    "97": {
@@ -4010,9 +4010,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 61,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/97@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/97@3x.webp",
      "w": 228,
-     "h": 95
+     "h": 91
     }
    },
    "98": {
@@ -4021,9 +4021,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 25,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/98@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/98@3x.webp",
      "w": 151,
-     "h": 35
+     "h": 34
     }
    },
    "99": {
@@ -4032,7 +4032,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 21,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/99@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/99@3x.webp",
      "w": 151,
      "h": 37
     }
@@ -4043,7 +4043,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 23,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/100@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/100@3x.webp",
      "w": 152,
      "h": 32
     }
@@ -4054,9 +4054,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 28,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/101@2x.webp",
-     "w": 151,
-     "h": 62
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/101@3x.webp",
+     "w": 152,
+     "h": 63
     }
    },
    "102": {
@@ -4065,7 +4065,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 36,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/102@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/102@3x.webp",
      "w": 151,
      "h": 78
     }
@@ -4076,9 +4076,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 53,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/123@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/123@3x.webp",
      "w": 188,
-     "h": 53
+     "h": 49
     }
    },
    "148": {
@@ -4088,9 +4088,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 43,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/148@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/148@3x.webp",
      "w": 239,
-     "h": 68
+     "h": 65
     }
    },
    "344": {
@@ -4100,9 +4100,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 51,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/344@2x.webp",
-     "w": 227,
-     "h": 72
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/344@3x.webp",
+     "w": 226,
+     "h": 69
     }
    },
    "411": {
@@ -4112,8 +4112,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 37,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/411@2x.webp",
-     "w": 226,
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/411@3x.webp",
+     "w": 225,
      "h": 46
     }
    },
@@ -4123,9 +4123,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 56,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/426@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/426@3x.webp",
      "w": 214,
-     "h": 44
+     "h": 45
     }
    },
    "427": {
@@ -4134,7 +4134,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 78,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/427@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/427@3x.webp",
      "w": 190,
      "h": 94
     }
@@ -4146,9 +4146,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 53,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/489@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/489@3x.webp",
      "w": 226,
-     "h": 44
+     "h": 41
     }
    },
    "490": {
@@ -4157,9 +4157,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 53,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/490@2x.webp",
-     "w": 227,
-     "h": 45
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/490@3x.webp",
+     "w": 226,
+     "h": 41
     }
    },
    "511": {
@@ -4168,9 +4168,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 54,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/511@2x.webp",
-     "w": 250,
-     "h": 45
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/511@3x.webp",
+     "w": 249,
+     "h": 39
     }
    },
    "533": {
@@ -4179,7 +4179,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 50,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/533@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/533@3x.webp",
      "w": 219,
      "h": 40
     }
@@ -4190,9 +4190,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 51,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/592@2x.webp",
-     "w": 230,
-     "h": 41
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/592@3x.webp",
+     "w": 229,
+     "h": 37
     }
    },
    "614": {
@@ -4201,9 +4201,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 50,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/614@2x.webp",
-     "w": 230,
-     "h": 43
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/614@3x.webp",
+     "w": 229,
+     "h": 39
     }
    },
    "642": {
@@ -4213,7 +4213,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 55,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/642@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/642@3x.webp",
      "w": 226,
      "h": 57
     }
@@ -4224,9 +4224,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 53,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/651@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/651@3x.webp",
      "w": 250,
-     "h": 51
+     "h": 48
     }
    },
    "652": {
@@ -4235,9 +4235,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 56,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/652@2x.webp",
-     "w": 201,
-     "h": 48
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/652@3x.webp",
+     "w": 196,
+     "h": 44
     }
    },
    "677": {
@@ -4247,9 +4247,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 56,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/677@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/677@3x.webp",
      "w": 226,
-     "h": 69
+     "h": 65
     }
    },
    "703": {
@@ -4259,9 +4259,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 59,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_shelf/703@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_shelf/703@3x.webp",
      "w": 226,
-     "h": 69
+     "h": 65
     }
    }
   }
@@ -4275,7 +4275,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 27,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/67@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/67@3x.webp",
      "w": 62,
      "h": 59
     }
@@ -4286,7 +4286,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 37,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/89@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/89@3x.webp",
      "w": 62,
      "h": 62
     }
@@ -4297,7 +4297,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 39,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/90@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/90@3x.webp",
      "w": 99,
      "h": 69
     }
@@ -4309,7 +4309,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 32,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/109@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/109@3x.webp",
      "w": 87,
      "h": 67
     }
@@ -4320,7 +4320,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 29,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/113@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/113@3x.webp",
      "w": 83,
      "h": 54
     }
@@ -4332,8 +4332,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 35,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/115@2x.webp",
-     "w": 114,
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/115@3x.webp",
+     "w": 115,
      "h": 70
     }
    },
@@ -4344,9 +4344,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 30,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/157@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/157@3x.webp",
      "w": 62,
-     "h": 61
+     "h": 62
     }
    },
    "162": {
@@ -4355,7 +4355,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 30,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/162@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/162@3x.webp",
      "w": 64,
      "h": 66
     }
@@ -4366,7 +4366,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 36,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/199@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/199@3x.webp",
      "w": 102,
      "h": 70
     }
@@ -4377,7 +4377,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 23,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/242@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/242@3x.webp",
      "w": 99,
      "h": 59
     }
@@ -4389,9 +4389,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 26,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/409@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/409@3x.webp",
      "w": 97,
-     "h": 62
+     "h": 61
     }
    },
    "415": {
@@ -4400,7 +4400,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 38,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/415@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/415@3x.webp",
      "w": 89,
      "h": 71
     }
@@ -4411,7 +4411,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 17,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/495@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/495@3x.webp",
      "w": 62,
      "h": 49
     }
@@ -4422,8 +4422,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 34,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/496@2x.webp",
-     "w": 70,
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/496@3x.webp",
+     "w": 69,
      "h": 70
     }
    },
@@ -4433,7 +4433,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 38,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/497@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/497@3x.webp",
      "w": 74,
      "h": 82
     }
@@ -4444,8 +4444,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 45,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/498@2x.webp",
-     "w": 60,
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/498@3x.webp",
+     "w": 59,
      "h": 77
     }
    },
@@ -4456,7 +4456,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 35,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/500@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/500@3x.webp",
      "w": 61,
      "h": 66
     }
@@ -4468,9 +4468,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 19,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/501@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/501@3x.webp",
      "w": 67,
-     "h": 53
+     "h": 52
     }
    },
    "503": {
@@ -4480,7 +4480,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 56,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/503@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/503@3x.webp",
      "w": 69,
      "h": 87
     }
@@ -4491,7 +4491,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 32,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/504@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/504@3x.webp",
      "w": 60,
      "h": 62
     }
@@ -4502,9 +4502,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 30,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/505@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/505@3x.webp",
      "w": 59,
-     "h": 62
+     "h": 61
     }
    },
    "519": {
@@ -4513,7 +4513,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 31,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/519@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/519@3x.webp",
      "w": 109,
      "h": 67
     }
@@ -4524,8 +4524,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 32,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/520@2x.webp",
-     "w": 82,
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/520@3x.webp",
+     "w": 81,
      "h": 63
     }
    },
@@ -4535,7 +4535,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 45,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/537@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/537@3x.webp",
      "w": 69,
      "h": 78
     }
@@ -4546,7 +4546,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 56,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/538@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/538@3x.webp",
      "w": 69,
      "h": 85
     }
@@ -4557,9 +4557,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 31,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/630@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/630@3x.webp",
      "w": 67,
-     "h": 66
+     "h": 65
     }
    },
    "673": {
@@ -4569,7 +4569,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 36,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/673@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/673@3x.webp",
      "w": 114,
      "h": 75
     }
@@ -4582,9 +4582,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 36,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/693@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/693@3x.webp",
      "w": 66,
-     "h": 68
+     "h": 67
     }
    },
    "694": {
@@ -4595,7 +4595,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 37,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/694@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/694@3x.webp",
      "w": 66,
      "h": 68
     }
@@ -4608,9 +4608,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 36,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/695@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sidetable/695@3x.webp",
      "w": 57,
-     "h": 66
+     "h": 65
     }
    }
   }
@@ -4624,7 +4624,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 27,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/16@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/16@3x.webp",
      "w": 249,
      "h": 110
     }
@@ -4635,8 +4635,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 25,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/17@2x.webp",
-     "w": 252,
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/17@3x.webp",
+     "w": 251,
      "h": 164
     }
    },
@@ -4647,9 +4647,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 24,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/158@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/158@3x.webp",
      "w": 270,
-     "h": 217
+     "h": 215
     }
    },
    "196": {
@@ -4658,7 +4658,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 31,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/196@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/196@3x.webp",
      "w": 175,
      "h": 121
     }
@@ -4669,7 +4669,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 29,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/197@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/197@3x.webp",
      "w": 173,
      "h": 108
     }
@@ -4680,7 +4680,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 26,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/243@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/243@3x.webp",
      "w": 278,
      "h": 117
     }
@@ -4692,7 +4692,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 18,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/345@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/345@3x.webp",
      "w": 224,
      "h": 138
     }
@@ -4703,9 +4703,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 26,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/359@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/359@3x.webp",
      "w": 298,
-     "h": 113
+     "h": 112
     }
    },
    "366": {
@@ -4714,9 +4714,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 26,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/366@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/366@3x.webp",
      "w": 298,
-     "h": 113
+     "h": 112
     }
    },
    "404": {
@@ -4725,9 +4725,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 23,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/404@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/404@3x.webp",
      "w": 270,
-     "h": 216
+     "h": 215
     }
    },
    "405": {
@@ -4736,9 +4736,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 23,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/405@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/405@3x.webp",
      "w": 270,
-     "h": 216
+     "h": 215
     }
    },
    "406": {
@@ -4746,7 +4746,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": false,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/406@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/406@3x.webp",
      "w": 270,
      "h": 217
     }
@@ -4757,7 +4757,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 19,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/485@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/485@3x.webp",
      "w": 239,
      "h": 114
     }
@@ -4768,9 +4768,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 35,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/526@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/526@3x.webp",
      "w": 223,
-     "h": 130
+     "h": 129
     }
    },
    "577": {
@@ -4778,7 +4778,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": false,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/577@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/577@3x.webp",
      "w": 573,
      "h": 143
     }
@@ -4790,7 +4790,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 17,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/656@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/656@3x.webp",
      "w": 234,
      "h": 136
     }
@@ -4802,9 +4802,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 28,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/692@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/692@3x.webp",
      "w": 227,
-     "h": 102
+     "h": 101
     }
    },
    "701": {
@@ -4814,9 +4814,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 25,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_sofa/701@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_sofa/701@3x.webp",
      "w": 227,
-     "h": 102
+     "h": 101
     }
    }
   }
@@ -4830,7 +4830,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 33,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_stool/24@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_stool/24@3x.webp",
      "w": 65,
      "h": 52
     }
@@ -4841,7 +4841,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 33,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_stool/25@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_stool/25@3x.webp",
      "w": 64,
      "h": 54
     }
@@ -4852,7 +4852,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 12,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_stool/49@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_stool/49@3x.webp",
      "w": 100,
      "h": 44
     }
@@ -4864,9 +4864,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 21,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_stool/53@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_stool/53@3x.webp",
      "w": 109,
-     "h": 54
+     "h": 55
     }
    },
    "111": {
@@ -4876,7 +4876,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 20,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_stool/111@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_stool/111@3x.webp",
      "w": 99,
      "h": 76
     }
@@ -4887,9 +4887,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 30,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_stool/169@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_stool/169@3x.webp",
      "w": 57,
-     "h": 49
+     "h": 48
     }
    },
    "198": {
@@ -4898,7 +4898,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 20,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_stool/198@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_stool/198@3x.webp",
      "w": 108,
      "h": 54
     }
@@ -4910,7 +4910,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 20,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_stool/354@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_stool/354@3x.webp",
      "w": 67,
      "h": 50
     }
@@ -4922,7 +4922,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 32,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_stool/419@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_stool/419@3x.webp",
      "w": 82,
      "h": 61
     }
@@ -4933,7 +4933,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 34,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_stool/420@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_stool/420@3x.webp",
      "w": 82,
      "h": 61
     }
@@ -4944,7 +4944,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 27,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_stool/440@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_stool/440@3x.webp",
      "w": 72,
      "h": 66
     }
@@ -4955,7 +4955,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 10,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_stool/525@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_stool/525@3x.webp",
      "w": 82,
      "h": 46
     }
@@ -4967,9 +4967,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 29,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_stool/655@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_stool/655@3x.webp",
      "w": 67,
-     "h": 58
+     "h": 57
     }
    },
    "675": {
@@ -4979,7 +4979,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 17,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_stool/675@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_stool/675@3x.webp",
      "w": 99,
      "h": 76
     }
@@ -4995,7 +4995,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 52,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_table/59@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_table/59@3x.webp",
      "w": 241,
      "h": 90
     }
@@ -5006,9 +5006,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 53,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_table/60@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_table/60@3x.webp",
      "w": 210,
-     "h": 84
+     "h": 83
     }
    },
    "62": {
@@ -5017,7 +5017,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 48,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_table/62@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_table/62@3x.webp",
      "w": 181,
      "h": 95
     }
@@ -5028,8 +5028,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 51,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_table/63@2x.webp",
-     "w": 228,
+     "path": "assets/sprites/furniture/upgrades/furniture_table/63@3x.webp",
+     "w": 229,
      "h": 88
     }
    },
@@ -5039,7 +5039,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 57,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_table/168@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_table/168@3x.webp",
      "w": 178,
      "h": 97
     }
@@ -5051,9 +5051,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 48,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_table/187@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_table/187@3x.webp",
      "w": 164,
-     "h": 89
+     "h": 88
     }
    },
    "335": {
@@ -5063,7 +5063,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "platY": 43,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_table/335@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_table/335@3x.webp",
      "w": 166,
      "h": 80
     }
@@ -5074,7 +5074,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 55,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_table/363@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_table/363@3x.webp",
      "w": 224,
      "h": 100
     }
@@ -5085,7 +5085,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 58,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_table/417@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_table/417@3x.webp",
      "w": 156,
      "h": 90
     }
@@ -5096,7 +5096,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 53,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_table/481@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_table/481@3x.webp",
      "w": 195,
      "h": 87
     }
@@ -5107,7 +5107,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 48,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_table/534@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_table/534@3x.webp",
      "w": 174,
      "h": 87
     }
@@ -5118,7 +5118,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 51,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_table/615@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_table/615@3x.webp",
      "w": 231,
      "h": 87
     }
@@ -5129,7 +5129,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 49,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_table/616@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_table/616@3x.webp",
      "w": 231,
      "h": 87
     }
@@ -5140,7 +5140,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "platY": 45,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_table/631@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_table/631@3x.webp",
      "w": 177,
      "h": 88
     }
@@ -5152,9 +5152,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 45,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_table/680@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_table/680@3x.webp",
      "w": 221,
-     "h": 85
+     "h": 86
     }
    },
    "699": {
@@ -5164,7 +5164,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "isNew": true,
     "platY": 45,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_table/699@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_table/699@3x.webp",
      "w": 221,
      "h": 85
     }
@@ -5179,7 +5179,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/118@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/118@3x.webp",
      "w": 21,
      "h": 36
     }
@@ -5189,7 +5189,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/119@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/119@3x.webp",
      "w": 36,
      "h": 31
     }
@@ -5199,9 +5199,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/120@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/120@3x.webp",
      "w": 60,
-     "h": 63
+     "h": 64
     }
    },
    "121": {
@@ -5209,9 +5209,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/121@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/121@3x.webp",
      "w": 48,
-     "h": 75
+     "h": 74
     }
    },
    "138": {
@@ -5219,7 +5219,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/138@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/138@3x.webp",
      "w": 56,
      "h": 83
     }
@@ -5230,7 +5230,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/139@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/139@3x.webp",
      "w": 66,
      "h": 78
     }
@@ -5240,9 +5240,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/179@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/179@3x.webp",
      "w": 56,
-     "h": 34
+     "h": 33
     }
    },
    "202": {
@@ -5250,7 +5250,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/202@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/202@3x.webp",
      "w": 39,
      "h": 82
     }
@@ -5260,8 +5260,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/203@2x.webp",
-     "w": 37,
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/203@3x.webp",
+     "w": 36,
      "h": 52
     }
    },
@@ -5270,7 +5270,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": false,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/204@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/204@3x.webp",
      "w": 64,
      "h": 43
     }
@@ -5280,8 +5280,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/236@2x.webp",
-     "w": 30,
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/236@3x.webp",
+     "w": 29,
      "h": 46
     }
    },
@@ -5290,7 +5290,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/283@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/283@3x.webp",
      "w": 83,
      "h": 50
     }
@@ -5300,7 +5300,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/295@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/295@3x.webp",
      "w": 73,
      "h": 73
     }
@@ -5310,7 +5310,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/297@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/297@3x.webp",
      "w": 113,
      "h": 78
     }
@@ -5321,7 +5321,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/342@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/342@3x.webp",
      "w": 47,
      "h": 58
     }
@@ -5332,7 +5332,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/343@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/343@3x.webp",
      "w": 60,
      "h": 50
     }
@@ -5343,8 +5343,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/346@2x.webp",
-     "w": 45,
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/346@3x.webp",
+     "w": 46,
      "h": 54
     }
    },
@@ -5354,7 +5354,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/356@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/356@3x.webp",
      "w": 64,
      "h": 57
     }
@@ -5365,8 +5365,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/358@2x.webp",
-     "w": 78,
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/358@3x.webp",
+     "w": 77,
      "h": 98
     }
    },
@@ -5376,7 +5376,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": false,
     "platY": 45,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/373@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/373@3x.webp",
      "w": 81,
      "h": 57
     }
@@ -5387,7 +5387,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": false,
     "platY": 44,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/374@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/374@3x.webp",
      "w": 81,
      "h": 57
     }
@@ -5398,7 +5398,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": false,
     "platY": 43,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/375@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/375@3x.webp",
      "w": 81,
      "h": 57
     }
@@ -5409,7 +5409,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": false,
     "platY": 25,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/376@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/376@3x.webp",
      "w": 231,
      "h": 37
     }
@@ -5420,7 +5420,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": false,
     "platY": 25,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/377@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/377@3x.webp",
      "w": 231,
      "h": 37
     }
@@ -5431,7 +5431,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": false,
     "platY": 43,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/378@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/378@3x.webp",
      "w": 81,
      "h": 57
     }
@@ -5442,8 +5442,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/423@2x.webp",
-     "w": 47,
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/423@3x.webp",
+     "w": 48,
      "h": 56
     }
    },
@@ -5453,7 +5453,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/599@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/599@3x.webp",
      "w": 85,
      "h": 73
     }
@@ -5463,9 +5463,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/617@2x.webp",
-     "w": 66,
-     "h": 61
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/617@3x.webp",
+     "w": 67,
+     "h": 62
     }
    },
    "618": {
@@ -5473,7 +5473,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/618@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/618@3x.webp",
      "w": 67,
      "h": 62
     }
@@ -5483,7 +5483,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/622@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/622@3x.webp",
      "w": 60,
      "h": 51
     }
@@ -5494,7 +5494,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/632@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/632@3x.webp",
      "w": 33,
      "h": 51
     }
@@ -5504,9 +5504,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/708@2x.webp",
-     "w": 50,
-     "h": 51
+     "path": "assets/sprites/furniture/upgrades/furniture_tabledeco/708@3x.webp",
+     "w": 51,
+     "h": 52
     }
    }
   }
@@ -5519,8 +5519,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/126@2x.webp",
-     "w": 47,
+     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/126@3x.webp",
+     "w": 46,
      "h": 60
     }
    },
@@ -5529,7 +5529,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/188@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/188@3x.webp",
      "w": 17,
      "h": 69
     }
@@ -5539,7 +5539,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/239@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/239@3x.webp",
      "w": 35,
      "h": 82
     }
@@ -5549,7 +5549,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/273@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/273@3x.webp",
      "w": 63,
      "h": 88
     }
@@ -5559,9 +5559,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/282@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/282@3x.webp",
      "w": 59,
-     "h": 65
+     "h": 64
     }
    },
    "421": {
@@ -5570,9 +5570,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/421@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/421@3x.webp",
      "w": 56,
-     "h": 64
+     "h": 65
     }
    },
    "425": {
@@ -5580,7 +5580,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/425@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/425@3x.webp",
      "w": 48,
      "h": 75
     }
@@ -5590,9 +5590,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/432@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/432@3x.webp",
      "w": 75,
-     "h": 92
+     "h": 91
     }
    },
    "479": {
@@ -5600,7 +5600,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/479@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/479@3x.webp",
      "w": 49,
      "h": 89
     }
@@ -5610,9 +5610,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/492@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/492@3x.webp",
      "w": 49,
-     "h": 70
+     "h": 71
     }
    },
    "528": {
@@ -5620,9 +5620,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 10,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/528@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/528@3x.webp",
      "w": 50,
-     "h": 63
+     "h": 62
     }
    },
    "633": {
@@ -5630,7 +5630,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/633@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/633@3x.webp",
      "w": 76,
      "h": 60
     }
@@ -5641,8 +5641,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/666@2x.webp",
-     "w": 66,
+     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/666@3x.webp",
+     "w": 65,
      "h": 52
     }
    },
@@ -5652,7 +5652,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "isNew": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/690@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_tablelamp/690@3x.webp",
      "w": 50,
      "h": 103
     }
@@ -5667,7 +5667,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/122@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/122@3x.webp",
      "w": 98,
      "h": 246
     }
@@ -5677,7 +5677,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/136@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/136@3x.webp",
      "w": 84,
      "h": 50
     }
@@ -5687,8 +5687,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/141@2x.webp",
-     "w": 154,
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/141@3x.webp",
+     "w": 155,
      "h": 49
     }
    },
@@ -5698,7 +5698,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/163@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/163@3x.webp",
      "w": 113,
      "h": 136
     }
@@ -5709,7 +5709,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/164@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/164@3x.webp",
      "w": 131,
      "h": 130
     }
@@ -5720,7 +5720,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/165@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/165@3x.webp",
      "w": 144,
      "h": 132
     }
@@ -5731,7 +5731,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/180@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/180@3x.webp",
      "w": 164,
      "h": 110
     }
@@ -5742,9 +5742,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/181@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/181@3x.webp",
      "w": 83,
-     "h": 90
+     "h": 89
     }
    },
    "182": {
@@ -5753,7 +5753,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/182@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/182@3x.webp",
      "w": 100,
      "h": 127
     }
@@ -5764,7 +5764,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/183@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/183@3x.webp",
      "w": 137,
      "h": 125
     }
@@ -5775,7 +5775,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/184@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/184@3x.webp",
      "w": 110,
      "h": 143
     }
@@ -5786,9 +5786,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/185@2x.webp",
-     "w": 207,
-     "h": 87
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/185@3x.webp",
+     "w": 208,
+     "h": 86
     }
    },
    "191": {
@@ -5797,7 +5797,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/191@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/191@3x.webp",
      "w": 149,
      "h": 86
     }
@@ -5808,7 +5808,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/192@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/192@3x.webp",
      "w": 117,
      "h": 74
     }
@@ -5819,7 +5819,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/207@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/207@3x.webp",
      "w": 55,
      "h": 76
     }
@@ -5830,7 +5830,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/208@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/208@3x.webp",
      "w": 146,
      "h": 60
     }
@@ -5840,8 +5840,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/210@2x.webp",
-     "w": 67,
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/210@3x.webp",
+     "w": 68,
      "h": 79
     }
    },
@@ -5850,7 +5850,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/211@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/211@3x.webp",
      "w": 67,
      "h": 88
     }
@@ -5861,7 +5861,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/296@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/296@3x.webp",
      "w": 104,
      "h": 202
     }
@@ -5872,7 +5872,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/338@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/338@3x.webp",
      "w": 25,
      "h": 100
     }
@@ -5883,7 +5883,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/339@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/339@3x.webp",
      "w": 24,
      "h": 77
     }
@@ -5894,7 +5894,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/340@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/340@3x.webp",
      "w": 64,
      "h": 129
     }
@@ -5905,7 +5905,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/341@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/341@3x.webp",
      "w": 37,
      "h": 59
     }
@@ -5915,9 +5915,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/399@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/399@3x.webp",
      "w": 123,
-     "h": 139
+     "h": 138
     }
    },
    "400": {
@@ -5925,7 +5925,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/400@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/400@3x.webp",
      "w": 123,
      "h": 101
     }
@@ -5935,9 +5935,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/401@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/401@3x.webp",
      "w": 125,
-     "h": 114
+     "h": 113
     }
    },
    "410": {
@@ -5946,7 +5946,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/410@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/410@3x.webp",
      "w": 332,
      "h": 92
     }
@@ -5957,7 +5957,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/433@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/433@3x.webp",
      "w": 100,
      "h": 183
     }
@@ -5967,9 +5967,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/434@2x.webp",
-     "w": 440,
-     "h": 268
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/434@3x.webp",
+     "w": 438,
+     "h": 266
     }
    },
    "460": {
@@ -5977,7 +5977,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 40,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/460@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/460@3x.webp",
      "w": 107,
      "h": 71
     }
@@ -5987,7 +5987,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/605@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/605@3x.webp",
      "w": 195,
      "h": 71
     }
@@ -5997,7 +5997,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/606@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/606@3x.webp",
      "w": 82,
      "h": 74
     }
@@ -6007,7 +6007,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/607@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/607@3x.webp",
      "w": 71,
      "h": 96
     }
@@ -6017,9 +6017,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/608@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/608@3x.webp",
      "w": 97,
-     "h": 65
+     "h": 66
     }
    },
    "609": {
@@ -6028,9 +6028,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/609@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/609@3x.webp",
      "w": 48,
-     "h": 68
+     "h": 69
     }
    },
    "610": {
@@ -6039,7 +6039,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/610@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/610@3x.webp",
      "w": 113,
      "h": 94
     }
@@ -6049,7 +6049,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/611@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/611@3x.webp",
      "w": 83,
      "h": 94
     }
@@ -6060,7 +6060,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/612@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/612@3x.webp",
      "w": 144,
      "h": 51
     }
@@ -6071,7 +6071,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": false,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/636@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/636@3x.webp",
      "w": 47,
      "h": 109
     }
@@ -6081,9 +6081,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/649@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/649@3x.webp",
      "w": 263,
-     "h": 288
+     "h": 287
     }
    },
    "687": {
@@ -6093,7 +6093,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "subscriberOnly": true,
     "isNew": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/687@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/687@3x.webp",
      "w": 160,
      "h": 49
     }
@@ -6104,8 +6104,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "isNew": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/688@2x.webp",
-     "w": 133,
+     "path": "assets/sprites/furniture/upgrades/furniture_walldeco/688@3x.webp",
+     "w": 134,
      "h": 115
     }
    }
@@ -6120,9 +6120,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": false,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/125@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/125@3x.webp",
      "w": 78,
-     "h": 61
+     "h": 62
     }
    },
    "142": {
@@ -6130,7 +6130,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/142@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/142@3x.webp",
      "w": 59,
      "h": 65
     }
@@ -6140,7 +6140,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/144@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/144@3x.webp",
      "w": 41,
      "h": 68
     }
@@ -6150,7 +6150,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/145@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/145@3x.webp",
      "w": 40,
      "h": 76
     }
@@ -6160,7 +6160,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/146@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/146@3x.webp",
      "w": 78,
      "h": 57
     }
@@ -6170,7 +6170,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 0,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/147@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/147@3x.webp",
      "w": 30,
      "h": 65
     }
@@ -6180,7 +6180,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/167@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/167@3x.webp",
      "w": 74,
      "h": 46
     }
@@ -6190,7 +6190,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/170@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/170@3x.webp",
      "w": 61,
      "h": 79
     }
@@ -6200,7 +6200,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/431@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/431@3x.webp",
      "w": 63,
      "h": 96
     }
@@ -6210,8 +6210,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/529@2x.webp",
-     "w": 62,
+     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/529@3x.webp",
+     "w": 63,
      "h": 90
     }
    },
@@ -6220,8 +6220,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/542@2x.webp",
-     "w": 55,
+     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/542@3x.webp",
+     "w": 54,
      "h": 77
     }
    },
@@ -6230,8 +6230,8 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 15,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/600@2x.webp",
-     "w": 152,
+     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/600@3x.webp",
+     "w": 153,
      "h": 36
     }
    },
@@ -6241,9 +6241,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/601@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/601@3x.webp",
      "w": 29,
-     "h": 168
+     "h": 169
     }
    },
    "635": {
@@ -6252,7 +6252,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/635@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/635@3x.webp",
      "w": 65,
      "h": 85
     }
@@ -6263,9 +6263,9 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "visible": true,
     "subscriberOnly": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/672@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_walllamp/672@3x.webp",
      "w": 108,
-     "h": 62
+     "h": 63
     }
    }
   }
@@ -6278,7 +6278,7 @@ export const FURNITURE_UPGRADES = Object.freeze({
     "credits": 25,
     "visible": true,
     "art": {
-     "path": "assets/sprites/furniture/upgrades/furniture_bookcase/32@2x.webp",
+     "path": "assets/sprites/furniture/upgrades/furniture_bookcase/32@3x.webp",
      "w": 149,
      "h": 215
     }

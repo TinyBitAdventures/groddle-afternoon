@@ -141,7 +141,8 @@ export async function build() {
       const surface = surfaceFrom(u.plats);
       if (surface) row.platY = surface;
       if (a && swf) {
-        row.art = { path: `${ART_DIR}/${cls}/${id}@2x.webp`, w: a.w, h: a.h };
+        // G448: rendered at 3x (tools/furniture-upgrades/render.py ZOOM).
+        row.art = { path: `${ART_DIR}/${cls}/${id}@3x.webp`, w: a.w, h: a.h };
         counts.withArt += 1;
       } else {
         missingArt.push({ key, swf: swfName(u.swf), why: swf ? 'not rendered yet' : 'no SWF in glitch-items' });

@@ -51,7 +51,7 @@
  */
 
 import { textureFromUrl } from '../textures.js';
-import { butlerApi } from '../features/butler-feature.js?v=g448-2';
+import { butlerApi } from '../features/butler-feature.js?v=g448-3';
 
 export const ROOM_MS = 5 * 60 * 1000; // source: questInstanceLocation(..., 5*60)
 export const PICTURE_REACH = 175; // source: club_house_picture jump_in conditions

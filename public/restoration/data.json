@@ -2665,9 +2665,14 @@
   ]
  },
  "git": {
-  "commits": 747,
+  "commits": 748,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "improve",
+    "text": "Powders, splashes, the countdown, puffs, the Rook's overlays and the phantom draw sharp on Retina"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2782,11 +2787,6 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "The street behind the start card is fully drawn, and the card fades in over it"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "improve",
-    "text": "The Visiting Stone, project signs, notice boards, home furniture and other world items draw sharp"
    }
   ]
  },

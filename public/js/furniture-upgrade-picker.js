@@ -15,7 +15,7 @@
  * applies the choice.
  */
 
-import { listHasPaid, listUpgrades, purseText, saveButtonText, UPGRADE_TEXT } from './furniture-upgrades.js?v=furnup-2';
+import { listHasPaid, listUpgrades, purseText, saveButtonText, UPGRADE_TEXT } from './furniture-upgrades.js?v=g448-3';
 
 const CSS = `
 .furn-upgrade{position:absolute;left:50%;top:56px;transform:translateX(-50%);z-index:46;width:min(572px,calc(100% - 20px));max-height:calc(100% - 150px);display:flex;flex-direction:column;background:#fffdf7;border-radius:14px;box-shadow:0 12px 32px rgba(40,30,20,.28);border:1px solid rgba(90,70,40,.18);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;color:#2b2a33;overflow:hidden}
@@ -143,6 +143,16 @@ function artPath(option) {
   return option.art?.path || current.baseArt || '';
 }
 
+/**
+ * An <img>'s src, with a density srcset for a style's `@3x` file (G448), so it
+ * lays out at `zoom` times the piece's 1x size whatever the file's density.
+ * The preview draws styles at zoom 2, as it did when they were `@2x` files.
+ */
+export function artImgAttrs(src, zoom = 1) {
+  const m = /@(\d+(?:\.\d+)?)x\.[a-z0-9]+$/i.exec(String(src || '').split('?')[0]);
+  return m ? { src, srcset: `${src} ${+(Number(m[1]) / zoom).toFixed(3)}x` } : { src };
+}
+
 function render() {
   if (!current || !root) return;
   const chosen = current.chosen;
@@ -152,7 +162,7 @@ function render() {
     el('button', { type: 'button', class: 'fu-close', 'aria-label': 'Close', text: '×', onclick: () => closeUpgradePicker(true) }),
   ]);
   const preview = el('div', { class: 'fu-prev' }, [
-    el('div', { class: 'fu-box' }, [el('img', { src: chosen ? artPath(chosen) : current.baseArt || '', alt: '' })]),
+    el('div', { class: 'fu-box' }, [el('img', { ...artImgAttrs(chosen ? artPath(chosen) : current.baseArt || '', 2), alt: '' })]),
     el('strong', { text: chosen?.label || current.baseLabel }),
   ]);
   const grid = el('div', { class: 'fu-grid' }, current.options.map((option) => el('button', {
@@ -163,7 +173,7 @@ function render() {
     onclick: () => chooseUpgrade(option.id),
   }, [
     option.isNew ? el('span', { class: 'fu-new', text: 'NEW' }) : null,
-    el('img', { src: artPath(option), alt: '', loading: 'lazy' }),
+    el('img', { ...artImgAttrs(artPath(option)), alt: '', loading: 'lazy' }),
     el('span', { class: 'fu-label', text: option.label }),
     el('span', { class: 'fu-price', text: option.text }),
   ])));

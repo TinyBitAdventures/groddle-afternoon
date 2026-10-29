@@ -11,7 +11,7 @@ import {
   FURNITURE_UPGRADE_COUNTS,
   FURNITURE_UPGRADES_LEFT_OUT,
   FURNITURE_UPGRADES_MISSING_ART,
-} from '../public/js/furniture-upgrades-data.js';
+} from '../public/js/furniture-upgrades-data.js?v=g448-3';
 import {
   applyBonusUpgrade,
   applyUpgrade,
@@ -23,7 +23,7 @@ import {
   saveButtonText,
   upgradeVerb,
   UPGRADE_TEXT,
-} from '../public/js/furniture-upgrades.js';
+} from '../public/js/furniture-upgrades.js?v=g448-3';
 import {
   createHomeDecorState,
   furnitureSize,
@@ -33,11 +33,11 @@ import {
   pickUpFurniture,
   placeFurniture,
   surfaceHeight,
-} from '../public/js/home-decor.js?v=g418-1';
+} from '../public/js/home-decor.js?v=g448-3';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js';
 import { IMAGINATION_UPGRADES, upgradeStatus, DEALT_SECRET_CARDS } from '../public/js/imagination.js?v=g403-1';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=g403-1';
-import { visitorHomeState } from '../public/js/features/homes-feature.js?v=g448-2';
+import { visitorHomeState } from '../public/js/features/homes-feature.js?v=g448-3';
 
 const spike = join(import.meta.dirname, '..');
 const pub = join(spike, 'public');
@@ -82,15 +82,24 @@ describe('upgrade data (tools/furniture-upgrades/build.mjs)', () => {
     assert.equal(chair.upgrades['5'].visible, false);
   });
 
-  it('ships each upgrade as a 2x WebP twice its recorded size', () => {
+  it('ships each upgrade as a 3x WebP three times its recorded size (G448)', () => {
     for (const [cls, def] of Object.entries(FURNITURE_UPGRADES)) {
       for (const [id, row] of Object.entries(def.upgrades)) {
         const file = join(pub, row.art.path);
         assert.ok(existsSync(file), `${cls}/${id}`);
-        assert.match(row.art.path, new RegExp(`^assets/sprites/furniture/upgrades/${cls}/${id}@2x\\.webp$`));
-        if (Number(id) % 7 === 0) assert.deepEqual(webpSize(file), { w: row.art.w * 2, h: row.art.h * 2 }, `${cls}/${id}`);
+        assert.match(row.art.path, new RegExp(`^assets/sprites/furniture/upgrades/${cls}/${id}@3x\\.webp$`));
+        if (Number(id) % 7 === 0) assert.deepEqual(webpSize(file), { w: row.art.w * 3, h: row.art.h * 3 }, `${cls}/${id}`);
       }
     }
+  });
+
+  it('the picker gives a style\'s 3x file a density srcset: tiles at its 1x size, the preview at 2x as before', async () => {
+    const { artImgAttrs } = await import('../public/js/furniture-upgrade-picker.js?v=g448-3');
+    const path = FURNITURE_UPGRADES.furniture_chair.upgrades['1'].art.path;
+    assert.deepEqual(artImgAttrs(path), { src: path, srcset: `${path} 3x` });
+    assert.deepEqual(artImgAttrs(path, 2), { src: path, srcset: `${path} 1.5x` });
+    assert.deepEqual(artImgAttrs('assets/sprites/furniture/furniture_chair.png'), { src: 'assets/sprites/furniture/furniture_chair.png' });
+    assert.deepEqual(artImgAttrs(''), { src: '' });
   });
 });
 
@@ -260,8 +269,8 @@ describe('Bonus Furniture Upgrade I-III (construction_tool.js 330-380)', () => {
 describe('wiring and copy', () => {
   it('draws, picks and rolls from the homes feature', () => {
     const src = readFileSync(join(pub, 'js/features/homes-feature.js'), 'utf8');
-    assert.match(src, /from '\.\.\/furniture-upgrades\.js\?v=furnup-2'/);
-    assert.match(src, /from '\.\.\/furniture-upgrade-picker\.js\?v=furnup-2'/);
+    assert.match(src, /from '\.\.\/furniture-upgrades\.js\?v=g448-3'/);
+    assert.match(src, /from '\.\.\/furniture-upgrade-picker\.js\?v=g448-3'/);
     assert.match(src, /pieceArt\(item\.classTsid, upgradeId\)/);
     assert.match(src, /counter\.startsWith\('making_recipe:'\)\) bonusFurnitureUpgrade/);
     assert.match(src, /towerDecor\.map\(\(\{ storage, styles, \.\.\.rest \}\)/);

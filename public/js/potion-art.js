@@ -5,54 +5,54 @@
 export const POTION_ART = Object.freeze({
  "avatar_embiggenifier": {
   "url": "assets/sprites/potions/avatar_embiggenifier.webp",
-  "cellW": 214,
-  "cellH": 210,
+  "cellW": 424,
+  "cellH": 419,
   "cols": 7,
   "frames": 40,
-  "scale": 0.666667,
-  "anchorX": 113.0,
-  "anchorY": 207,
+  "scale": 0.333333,
+  "anchorX": 220.0,
+  "anchorY": 418,
   "labels": {
    "loop": [
     0,
     40
    ]
   },
-  "source": "glitch-items/misc/physics/avatar_embiggenifier/avatar_embiggenifier.swf sprite 59, every 2 frame(s) at zoom 1.5"
+  "source": "glitch-items/misc/physics/avatar_embiggenifier/avatar_embiggenifier.swf sprite 59, every 2 frame(s) at zoom 3"
  },
  "avatar_smallifier": {
   "url": "assets/sprites/potions/avatar_smallifier.webp",
-  "cellW": 214,
-  "cellH": 219,
+  "cellW": 424,
+  "cellH": 436,
   "cols": 7,
   "frames": 40,
-  "scale": 0.666667,
-  "anchorX": 113.0,
-  "anchorY": 216,
+  "scale": 0.333333,
+  "anchorX": 220.0,
+  "anchorY": 435,
   "labels": {
    "loop": [
     0,
     40
    ]
   },
-  "source": "glitch-items/misc/physics/avatar_smallifier/avatar_smallifier.swf sprite 59, every 2 frame(s) at zoom 1.5"
+  "source": "glitch-items/misc/physics/avatar_smallifier/avatar_smallifier.swf sprite 59, every 2 frame(s) at zoom 3"
  },
  "anti_gravitys_rainbow": {
   "url": "assets/sprites/potions/anti_gravitys_rainbow.webp",
-  "cellW": 213,
-  "cellH": 227,
+  "cellW": 424,
+  "cellH": 452,
   "cols": 6,
   "frames": 30,
-  "scale": 0.666667,
-  "anchorX": 110.5,
-  "anchorY": 225,
+  "scale": 0.333333,
+  "anchorX": 220.5,
+  "anchorY": 451,
   "labels": {
    "loop": [
     0,
     30
    ]
   },
-  "source": "glitch-items/misc/physics/anti_gravitys_rainbow/anti_gravitys_rainbow.swf sprite 47, every 2 frame(s) at zoom 1.5"
+  "source": "glitch-items/misc/physics/anti_gravitys_rainbow/anti_gravitys_rainbow.swf sprite 47, every 2 frame(s) at zoom 3"
  },
  "scion_of_purple": {
   "url": "assets/sprites/potions/scion_of_purple.webp",
@@ -85,13 +85,13 @@ export const POTION_ART = Object.freeze({
  },
  "scion_of_purple_fade": {
   "url": "assets/sprites/potions/scion_of_purple_fade.webp",
-  "cellW": 360,
-  "cellH": 212,
+  "cellW": 720,
+  "cellH": 423,
   "cols": 5,
   "frames": 32,
-  "scale": 2.0,
-  "anchorX": 171.2,
-  "anchorY": 194.5,
+  "scale": 1.0,
+  "anchorX": 342.5,
+  "anchorY": 389,
   "labels": {
    "fadeIn": [
     0,

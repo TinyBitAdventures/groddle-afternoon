@@ -40,7 +40,7 @@ import { frameTexture, sourceFromUrl } from '../textures.js';
 import { playPoofIn } from '../overlay-art.js?v=g448-2';
 import { STREET_INDEX } from '../street-loader.js?v=g442-6';
 import { getAchievementCatalog } from '../content-catalogs.js?v=g403-1';
-import { POTION_ART } from '../potion-art.js?v=g149-1';
+import { POTION_ART } from '../potion-art.js?v=g448-3';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import {
   EMPEROR,
@@ -61,7 +61,7 @@ import {
   scionWords,
 } from '../purple-journey.js?v=g150-2';
 import { VOYAGE_FLOOR, VOYAGE_H, VOYAGE_OFFSET, VOYAGE_W, buildVoyageScene } from '../purple-journey-scene.js?v=g150-1';
-import { homesFeature } from './homes-feature.js?v=g448-2';
+import { homesFeature } from './homes-feature.js?v=g448-3';
 
 export const PURPLE_FEATURE_ID = 'purple-journey';
 /** The scene's own TSID (the template is LNVV4OTMAUG2PQV). */

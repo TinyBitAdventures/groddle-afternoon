@@ -27,26 +27,30 @@ SPIKE = os.path.dirname(HERE)
 PUBLIC = os.path.join(SPIKE, 'public')
 OUT = os.path.join(PUBLIC, 'assets', 'sprites', 'potions')
 OUT_JS = os.path.join(PUBLIC, 'js', 'potion-art.js')
-AUDIT = os.path.dirname(SPIKE)
+# GLITCH_AUDIT names the audit workspace when the spike is a worktree elsewhere.
+AUDIT = os.environ.get('GLITCH_AUDIT') or os.path.dirname(SPIKE)
 ITEMS = os.path.join(AUDIT, 'glitch-items')
 JAVA = '/opt/homebrew/opt/openjdk@21/bin/java'
 FFDEC = os.path.join(AUDIT, 'tools', 'ffdec', 'ffdec.jar')
 
 # item -> swf, sprite id, zoom, reference frame (its alpha box bottom centre is the anchor), sheets.
 # A sheet: name, labels [(label, first, last)] (1-based SWF frames), step, resize, WebP quality.
+# G448: the clouds and the rainbow at zoom 3 (1.5 was 2.2x soft on a 3.3x Retina backing store), the
+# Scion's fade bursts at its main sheet's density (resize 0.5 drew them 6.6x soft). The Scion's main
+# sheet stays at zoom 1: zoom 2 would be 164 MB of GPU for its 86 cells.
 JOBS = {
-    'avatar_embiggenifier': ('misc/physics/avatar_embiggenifier/avatar_embiggenifier.swf', 59, 1.5, 1, [
+    'avatar_embiggenifier': ('misc/physics/avatar_embiggenifier/avatar_embiggenifier.swf', 59, 3, 1, [
         ('avatar_embiggenifier', [('loop', 1, 79)], 2, 1, 86),
     ]),
-    'avatar_smallifier': ('misc/physics/avatar_smallifier/avatar_smallifier.swf', 59, 1.5, 1, [
+    'avatar_smallifier': ('misc/physics/avatar_smallifier/avatar_smallifier.swf', 59, 3, 1, [
         ('avatar_smallifier', [('loop', 1, 79)], 2, 1, 86),
     ]),
-    'anti_gravitys_rainbow': ('misc/physics/anti_gravitys_rainbow/anti_gravitys_rainbow.swf', 47, 1.5, 1, [
+    'anti_gravitys_rainbow': ('misc/physics/anti_gravitys_rainbow/anti_gravitys_rainbow.swf', 47, 3, 1, [
         ('anti_gravitys_rainbow', [('loop', 1, 60)], 2, 1, 86),
     ]),
     'scion_of_purple': ('inhabitants/scion_of_purple/purple_apparition.swf', 81, 1, 127, [
         ('scion_of_purple', [('talk', 47, 126), ('idle0', 127, 195), ('idle1', 196, 264), ('idle2', 265, 302)], 3, 1, 88),
-        ('scion_of_purple_fade', [('fadeIn', 1, 46), ('fadeOut', 303, 348)], 3, 0.5, 82),
+        ('scion_of_purple_fade', [('fadeIn', 1, 46), ('fadeOut', 303, 348)], 3, 1, 82),
     ]),
 }
 
