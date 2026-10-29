@@ -40,11 +40,14 @@ function uniqueSpritesNeeded() {
   return { need, instances };
 }
 
-/** Deco stems shipped as 2x WebP (tools/deco-pipeline; the @1.5x files are their 3x copies). */
+/**
+ * Deco stems shipped as 2x WebP (tools/deco-pipeline; the @1.5x files are their 3x copies and
+ * <name>@<res>x.webp the sized copies of tools/deco-pipeline/sharp.py).
+ */
 function pngStemsOnDisk() {
   const stems = new Set();
   for (const name of readdirSync(decoDir)) {
-    if (!name.endsWith('.webp') || name.endsWith('@1.5x.webp')) continue;
+    if (!name.endsWith('.webp') || /@[\d.]+x\.webp$/.test(name)) continue;
     const full = join(decoDir, name);
     const st = statSync(full);
     if (st.size < 30) continue;

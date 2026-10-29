@@ -2640,9 +2640,14 @@
   ]
  },
  "git": {
-  "commits": 691,
+  "commits": 692,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-28",
+    "kind": "fix",
+    "text": "Ceiling lamps hang over your Glitch, the newest window opens on top, and snow and puffs fall over the scenery"
+   },
    {
     "date": "2026-10-28",
     "kind": "new",
@@ -2757,14 +2762,9 @@
     "date": "2026-10-28",
     "kind": "improve",
     "text": "Tiny Speck's own rainbows, race countdown, game logos and street overlays play where the original showed them"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "fix",
-    "text": "Thirty quests count the way the original did, with Slather and Give a cubimal to"
    }
   ]
  },
- "tests": 400,
+ "tests": 401,
  "generatedAt": "2026-10-28"
 }

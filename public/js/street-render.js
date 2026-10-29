@@ -12,7 +12,7 @@ import {
 } from './street-model.js';
 import { availableStreetTsids } from './street-loader.js';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js';
-import { decoUrl } from './deco-hires.js?v=g415-1';
+import { decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco } from './deco-hires.js?v=g416-1';
 import { LADDER_TILE_Z, ladderTilePieces } from './ladder-tiling.js?v=g415-1';
 
 const DECO_BASE = 'assets/decos/groddle/';
@@ -945,6 +945,30 @@ function ensureRecoloured(PIXI, renderer, cache, spr) {
   for (const user of entry.users) if (!user.destroyed) user.texture = entry.texture;
 }
 
+/**
+ * Point a deco at another copy of its art (a sharp copy at another resolution). A recoloured
+ * deco keeps its colour: its shared bake is redone from the new copy.
+ */
+function swapDecoTexture(PIXI, renderer, cache, spr, texture) {
+  const rc = spr.recolour;
+  if (!rc) {
+    spr.texture = texture;
+    return;
+  }
+  rc.original = texture;
+  const entry = rc.entry;
+  if (entry.base !== texture.source) {
+    entry.base = texture.source;
+    if (entry.texture) {
+      entry.texture.destroy(true);
+      entry.texture = null;
+      cache.textures.delete(entry.id);
+    }
+  }
+  if (!entry.texture) ensureRecoloured(PIXI, renderer, cache, spr);
+  else spr.texture = entry.texture;
+}
+
 /** Free recoloured textures whose decos have all been culled for a while. */
 function evictRecolours(cache, now) {
   for (const entry of cache.entries.values()) {
@@ -1322,6 +1346,17 @@ export function buildStreetView(street, PIXI, opts = {}) {
 
   // Layers behind the middleground are distant parallax art, darkened or washed out by their
   // colour matrix: they load the 2x deco files even where js/deco-hires.js would pick 3x.
+  // The middleground and the layers in front of it (unblurred) take a deco's sharp copy when the
+  // screen needs more texels than its 2x/3x file has (sharpDeco: SVG at the need, or a sized
+  // WebP), and swap it when the renderer's resolution changes (refreshSharpDecos).
+  const renderer = opts.renderer;
+  const bigTextures = () => (maxTextureSizeOf(renderer) || 4096) >= 8192;
+  const sharpPick = (url) => (renderer ? sharpDeco(url, renderer.resolution || 1, { bigTextures: bigTextures() }) : null);
+  const sharpTexture = (pick) => textureFromUrl(pick.url, pick.kind === 'svg'
+    ? { raw: true, width: pick.width, height: pick.height, resolution: pick.resolution }
+    : { raw: true });
+  /** @type {{ spr: any, url: string, pick: any, size: () => void }[]} */
+  const sharpViews = [];
   const middleZ = (street.layers || []).findIndex((layer) => layer.id === 'middleground');
   const middleLayerZ = middleZ < 0 ? null : (street.layers[middleZ].z ?? middleZ);
   const layerContainers = [];
@@ -1356,6 +1391,8 @@ export function buildStreetView(street, PIXI, opts = {}) {
     const colour = colourFilter(PIXI, layer.filters);
     if (colour) lc.filters = [colour];
     const far = middleLayerZ !== null && (layer.z ?? li) < middleLayerZ;
+    // A blur under 2 is no blur in the client (flashBlurSize): those layers only recolour.
+    const blur = flashBlurSize(layer.filters?.blur);
 
     for (const deco of layer.decos || []) {
       // Archived `middleground` decos use location/world coordinates, while
@@ -1377,7 +1414,9 @@ export function buildStreetView(street, PIXI, opts = {}) {
       }
       const url = `${decoBase}${sprite}.png`;
       const farUrl = far ? decoUrl(url) : null;
-      const tex = farUrl ? textureFromUrl(farUrl, { raw: true }) : textureFromUrl(url);
+      const sharp = !far && !blur && isSharpDeco(url);
+      const pick = sharp ? sharpPick(url) : null;
+      const tex = farUrl ? textureFromUrl(farUrl, { raw: true }) : pick ? sharpTexture(pick) : textureFromUrl(url);
       const spr = new PIXI.Sprite(tex);
       spr.anchor.set(0.5, 1);
       // h_flip mirrors the deco about its registration point.
@@ -1399,12 +1438,11 @@ export function buildStreetView(street, PIXI, opts = {}) {
       spr.glitchDecoName = deco.name || '';
       if (spr.glitchDecoId) decoViews.set(spr.glitchDecoId, spr);
       lc.addChild(spr);
+      if (sharp) sharpViews.push({ spr, url, pick, size: sizeDeco });
       drawn += 1;
     }
     // Ladder tiling art (its own count, not a placed deco).
     if (layer.id === 'middleground') root.ladderTiles = addLadderTiles(PIXI, lc, street, available, decoBase);
-    // A blur under 2 is no blur in the client (flashBlurSize): those layers only recolour.
-    const blur = flashBlurSize(layer.filters?.blur);
     if (blur > 0 && opts.renderer) bakeBlurredLayer(lc, blur, colour, blurState);
     else if (colour && opts.renderer) bakeLayerColour(PIXI, opts.renderer, lc, colour, recolourCache);
     lc.inFront = layerDrawsInFront(layer, li, middleLayerZ);
@@ -1418,6 +1456,47 @@ export function buildStreetView(street, PIXI, opts = {}) {
     buildGroundSkirt(PIXI, opts.renderer, root, ground, W, sourceH, skirtDepth, fallback);
   }
   root.decoDrawn = drawn;
+  /** Sharp decos drawn from their SVG / sized WebP right now, for QA (canvas data-sharp-decos). */
+  root.sharpStats = () => {
+    const live = sharpViews.filter((v) => !v.spr.destroyed);
+    return { listed: live.length, svg: live.filter((v) => v.pick?.kind === 'svg').length, webp: live.filter((v) => v.pick?.kind === 'webp').length };
+  };
+  /**
+   * Pick each sharp deco's copy again for the renderer's resolution now (an SVG redrawn at the
+   * new need, a sized WebP, or back to the 2x/3x file) and swap it in once loaded. Runs on the
+   * renderer's resize event when the resolution changed.
+   */
+  root.refreshSharpDecos = () => {
+    for (const view of sharpViews) {
+      if (view.spr.destroyed) continue;
+      const pick = sharpPick(view.url);
+      if ((pick?.url || null) === (view.pick?.url || null)) continue;
+      view.pick = pick;
+      const tex = pick ? sharpTexture(pick) : textureFromUrl(view.url);
+      onLoaded(tex.source, () => {
+        if (view.spr.destroyed || view.pick !== pick) return;
+        swapDecoTexture(PIXI, renderer, recolourCache, view.spr, tex);
+        view.size();
+      });
+    }
+  };
+  if (sharpViews.length && typeof renderer?.on === 'function') {
+    let lastResolution = renderer.resolution;
+    let timer = null;
+    const onResize = () => {
+      if (renderer.resolution === lastResolution) return;
+      lastResolution = renderer.resolution;
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (!root.destroyed) root.refreshSharpDecos();
+      }, 250);
+    };
+    renderer.on('resize', onResize);
+    root.once('destroyed', () => {
+      clearTimeout(timer);
+      renderer.off?.('resize', onResize);
+    });
+  }
   /** Labels of the layers drawn over the avatars, for QA (canvas data-street-front-layers). */
   root.frontLayers = layerContainers.filter((lc) => lc.inFront).map((lc) => lc.label);
   root.decoViews = decoViews;

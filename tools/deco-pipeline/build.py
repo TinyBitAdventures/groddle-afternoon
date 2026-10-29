@@ -629,6 +629,8 @@ def cmd_check(args):
     known = set(names)
     for f in os.listdir(OUT):
         stem = f[:-len('@1.5x.webp')] if f.endswith('@1.5x.webp') else f.rsplit('.', 1)[0]
+        if f.endswith('.webp') and not f.endswith('@1.5x.webp') and '@' in f:
+            continue  # sized copies made by sharp.py (its --check covers them)
         if f.endswith('.png'):
             problems.append(f'{f}: PNG in the shipped deco folder (sources live in assets-src/decos)')
         elif f.endswith('.webp') and stem not in known:
