@@ -1,7 +1,7 @@
 {
   "referenced": 2890,
-  "present": 75,
-  "missingCount": 2815,
+  "present": 78,
+  "missingCount": 2812,
   "missing": [
     "Brain_stem_large",
     "Brain_stem_single",
@@ -2666,9 +2666,6 @@
     "ug_boulders4",
     "ug_bricks2b",
     "ug_bricks3",
-    "ug_exface1",
-    "ug_exface2",
-    "ug_exface3",
     "ug_floor1",
     "ug_floor2",
     "ug_ground_1",

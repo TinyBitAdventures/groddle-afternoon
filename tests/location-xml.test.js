@@ -144,6 +144,18 @@ describe('deco coverage inventory', () => {
     );
     assert.ok(Array.isArray(manifest));
     assert.ok(manifest.length >= 1);
+    // G427: the underground backdrops behind the cross-section patches (glitch-locations
+    // groddle1.swf / corey3.swf bundles, FFDec frame 1 at 2x). Without ug_exface3 the sky
+    // gradient showed through the gaps between patches (The Great Hole to Ix, a white spike).
+    for (const name of ['ug_exface1', 'ug_exface2', 'ug_exface3']) {
+      assert.ok(manifest.includes(name), `${name} in manifest.json`);
+      assert.ok(!inv.missing.includes(name), `${name} not listed missing`);
+      assert.ok(existsSync(join(ROOT, `public/assets/decos/groddle/${name}.webp`)), `${name}.webp ships`);
+      assert.ok(existsSync(join(ROOT, `assets-src/decos/groddle/${name}.png`)), `${name}.png source`);
+    }
+    const hole = JSON.parse(readFileSync(join(STREETS, 'GLI2VDR4JRD1AEG.json'), 'utf8'));
+    const backdrop = hole.layers.find((l) => l.id === 'middleplus').decos.find((d) => d.sprite === 'ug_exface3');
+    assert.deepEqual([backdrop.w, backdrop.h, backdrop.z], [2355, 496, 1], 'the patches (z 4-28) sit on it');
     // shipped presence check for known groddle sprites
     for (const name of ['dirt_platform_short', 'tree_coniferous_fg_1']) {
       if (manifest.includes(name)) {
