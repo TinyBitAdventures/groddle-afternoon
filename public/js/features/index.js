@@ -7,7 +7,7 @@
 import { questFlagsFeature } from './quest-flags-feature.js?v=flags-1';
 import { hellFeature } from './hell-feature.js?v=hell-16';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=g417-1';
-import { questOffersFeature } from './quest-offers-feature.js?v=g403-1';
+import { questOffersFeature } from './quest-offers-feature.js?v=g425-1';
 import { meditationFeature } from './meditation-feature.js?v=g417-1';
 import { teleportationFeature } from './teleportation-feature.js?v=teleport-18';
 import { racesFeature } from './races-feature.js?v=g405-1';

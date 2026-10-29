@@ -3133,6 +3133,11 @@ button.play-context-head:focus-visible {
   display: block;
   margin-bottom: 0.15rem;
 }
+/* An item or skill name linked in the quest copy (<a href="event:item|...">, js/quest-text.js). */
+.q-link {
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
 .quest-log-body .q-bar {
   height: 6px;
   background: #e0e8d8;

@@ -2645,9 +2645,14 @@
   ]
  },
  "git": {
-  "commits": 701,
+  "commits": 702,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "new",
+    "text": "Eat or drink several at once from the pack card"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2762,14 +2767,9 @@
     "date": "2026-10-28",
     "kind": "new",
     "text": "Continue with Google on the sign-in card"
-   },
-   {
-    "date": "2026-10-28",
-    "kind": "improve",
-    "text": "The account card carries Cloudflare Turnstile on the forms that send email"
    }
   ]
  },
- "tests": 408,
+ "tests": 410,
  "generatedAt": "2026-10-29"
 }

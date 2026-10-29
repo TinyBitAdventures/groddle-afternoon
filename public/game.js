@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-247';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-253';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g405-1';
@@ -30,6 +30,8 @@ import {
   parseQuestConversation,
   cleanQuestMarkup,
 } from './js/quests.js?v=item-buffs-7';
+// Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
+import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=g425-1';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
 import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=g403-1';
 import {
@@ -1662,6 +1664,8 @@ let packEatQty = 1;
 let vendorSprite = null;
 /** Active Phantom Glitch echo/final encounter for the authored ghost quest. */
 let phantomTarget = null;
+/** HEARTBEAT while an echo haunts this street (phantom_glitch.js onEnterLocation 437-438). */
+let phantomHeartbeat = null;
 /** Transient multiplayer-style instance; intentionally excluded from player saves. */
 let hogHaulState = null;
 let hogHaulSourceLocation = null;
@@ -2427,7 +2431,11 @@ function renderQuestTracker() {
     for (const req of quest.requirements) {
       const label = document.createElement('div');
       label.className = 'quest-tracker-req';
-      label.innerHTML = `<span>${escapeHtml(req.desc)}</span><strong>${req.current}/${req.total}</strong>`;
+      const desc = document.createElement('span');
+      renderQuestText(desc, req.desc);
+      const count = document.createElement('strong');
+      count.textContent = `${req.current}/${req.total}`;
+      label.append(desc, count);
       card.appendChild(label);
       const bar = document.createElement('div');
       bar.className = 'quest-tracker-bar';
@@ -3932,7 +3940,8 @@ function updateHud() {
       for (const r of p.requirements || []) {
         const row = document.createElement('div');
         row.className = 'q-req';
-        row.textContent = `${r.desc}: ${r.current} / ${r.num}`;
+        // QuestTracker.as 212-214: "desc (got/need)" when more than one is needed.
+        renderQuestText(row, questRequirementText(r.desc, r.current, r.num));
         card.appendChild(row);
         const bar = document.createElement('div');
         bar.className = 'q-bar';
@@ -11443,8 +11452,28 @@ function showGhostVignette(text, durationMs = 2800) {
   }, durationMs);
 }
 
+/**
+ * phantom_glitch.js onEnterLocation 437-438: on a haunted street the player hears
+ * announce_sound('HEARTBEAT', 1000000), a loop that lasts the visit; clickPhantom (323)
+ * and onExitLocation (442-445) stop it. HEARTBEAT has no recovered file, so
+ * js/synth-sfx.js's heartbeat recipe beats about once a second.
+ */
+function startPhantomHeartbeat() {
+  stopPhantomHeartbeat();
+  phantomHeartbeat = playSoundLoop('HEARTBEAT', { intervalMs: 1100, volume: 0.55, jitter: 0 });
+  if (app?.canvas) app.canvas.dataset.ghostHeartbeat = state.muted ? 'muted' : 'playing';
+}
+
+function stopPhantomHeartbeat() {
+  if (!phantomHeartbeat) return;
+  phantomHeartbeat.stop();
+  phantomHeartbeat = null;
+  if (app?.canvas) app.canvas.dataset.ghostHeartbeat = 'stopped';
+}
+
 function removePhantomTarget(target = phantomTarget) {
   if (!target) return;
+  if (target === phantomTarget) stopPhantomHeartbeat();
   interactables = interactables.filter((entry) => entry !== target);
   if (target.sprite?.parent) target.sprite.parent.removeChild(target.sprite);
   if (target.sprite && !target.sprite.destroyed) target.sprite.destroy({ children: true });
@@ -11514,12 +11543,28 @@ function spawnPhantomQuestEncounter() {
     },
   });
   const makeReadableAt = encounter.kind === 'final' ? 12 : 9;
+  const target = phantomTarget;
+  // An echo's line waits until its shape can be read (frame 9), after the street's own arrival
+  // lines, so it is the newest activity popup. The source shows the shape and plays the heartbeat
+  // with no words and answers only a click (showPhantom 447-461); until the first is noticed, say how.
+  const announceEcho = () => {
+    if (encounter.kind !== 'echo' || target.state.announced || phantomTarget !== target) return;
+    target.state.announced = true;
+    const first = encounter.found === 0;
+    pushActivity(
+      first
+        ? 'You feel a chill. Something half-imagined is nearby. Click the faint shape, or stand by it and press Enter, to notice it.'
+        : 'You feel a chill. Something half-imagined is nearby.'
+    );
+    if (app?.canvas) app.canvas.dataset.ghostHint = first ? 'first' : 'chill';
+  };
   sprite.onFrameChange = (frame) => {
     if (frame < makeReadableAt || !phantomTarget || phantomTarget.sprite !== sprite) return;
     phantomTarget.state.appearing = false;
     sprite.eventMode = 'static';
     sprite.onFrameChange = null;
     if (app?.canvas) app.canvas.dataset.ghostMaterialized = 'true';
+    announceEcho();
   };
   sprite.onComplete = () => {
     if (sprite.destroyed) return;
@@ -11527,6 +11572,7 @@ function spawnPhantomQuestEncounter() {
     sprite.eventMode = 'static';
     if (phantomTarget?.sprite === sprite) phantomTarget.state.appearing = false;
     if (app?.canvas) app.canvas.dataset.ghostAppearAnimation = 'complete';
+    announceEcho();
   };
   recentInteractionTarget = phantomTarget;
   recentInteractionUntil = Date.now() + 10_000;
@@ -11534,9 +11580,7 @@ function spawnPhantomQuestEncounter() {
     app.canvas.dataset.ghostEncounter = encounter.kind;
     app.canvas.dataset.ghostStreet = currentStreetTsid;
   }
-  if (encounter.kind === 'echo') {
-    pushActivity('You feel a chill. Something half-imagined is nearby.');
-  }
+  if (encounter.kind === 'echo') startPhantomHeartbeat();
   return phantomTarget;
 }
 
@@ -11603,6 +11647,7 @@ function handlePhantomInteraction(target, verbId) {
       toast('The shape has already faded.');
       return;
     }
+    stopPhantomHeartbeat();
     const updates = applyQuestProgress(questState, 'found_ghost', 1, pc);
     showGhostVignette(result.whisper);
     pushActivity(
@@ -19888,6 +19933,7 @@ function clearWorldEntities() {
   spinningWheelLastPhase = '';
   spinningWheelPrompted = false;
   stootDollTarget = null;
+  stopPhantomHeartbeat();
   phantomTarget = null;
   if (hogHaulCarrySprite?.parent) hogHaulCarrySprite.parent.removeChild(hogHaulCarrySprite);
   if (hogHaulCarrySprite && !hogHaulCarrySprite.destroyed) hogHaulCarrySprite.destroy();
@@ -20825,7 +20871,7 @@ function appendStoryQuestOffers(box) {
     title.textContent = def.title;
     const desc = document.createElement('div');
     desc.className = 'q-req';
-    desc.textContent = cleanQuestMarkup(def.desc);
+    renderQuestText(desc, def.desc);
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'content-action-btn';
@@ -20884,7 +20930,7 @@ function renderQuestDialogueBeat() {
     title.hidden = !def && questDialogueState.title === null;
     title.textContent = def?.title || questDialogueState.title || 'Quest';
   }
-  if (copy) copy.textContent = beat.text;
+  if (copy) renderQuestText(copy, beat.markup ?? beat.text);
   if (next) {
     const finalBeat = index >= beats.length - 1;
     next.textContent =
@@ -20948,7 +20994,7 @@ function openQuestDialogue(classTsid) {
   questDialogueState = {
     mode: 'offer',
     def,
-    beats: parseQuestConversation(def.offer),
+    beats: withQuestMarkup(parseQuestConversation(def.offer), def.offer),
     index: 0,
     kicker: 'Magic Rock',
   };
@@ -26027,6 +26073,7 @@ async function main() {
         busy: engine.busy(),
         acting: !!currentAction,
         menu: menuTarget ? (menuTarget.label || menuTarget.classId) : '',
+        prompt: prompt?.visible ? { key: prompt.promptKey, label: prompt.promptLabel } : null,
         interactables: interactables
           .filter((it) => it?.sprite && !it.sprite.destroyed)
           .map((it) => ({ classId: it.classId, label: it.label || '', featureId: it.featureId || '', x: it.sprite.x, y: it.sprite.y, page: toPage(it.sprite.x, it.sprite.y - 20) })),

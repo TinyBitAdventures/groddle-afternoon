@@ -39,7 +39,7 @@ import {
   SLATHER_VERB,
   SLATHER_COPY,
 } from '../public/js/features/quest-verbs-feature.js?v=g390-1';
-import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=g403-1';
+import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=g425-1';
 import {
   giveCubimalVerb,
   GIVE_CUBIMAL_VERB,

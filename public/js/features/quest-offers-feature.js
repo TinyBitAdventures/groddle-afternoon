@@ -106,6 +106,7 @@ import {
   SEED_TO_SCYTHE,
 } from '../quest-offers.js?v=g403-1';
 import { parseQuestConversation } from '../quests.js?v=item-buffs-7';
+import { questRequirementText, renderQuestText, withQuestMarkup } from '../quest-text.js?v=g425-1';
 import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unified-7';
 import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
 
@@ -310,7 +311,7 @@ export function putOffCards(engine) {
     for (const r of def.requirements || []) {
       const row = document.createElement('div');
       row.className = 'q-req';
-      row.textContent = `${r.desc}: 0 / ${r.num}`;
+      renderQuestText(row, questRequirementText(r.desc, 0, r.num));
       card.appendChild(row);
     }
     const go = document.createElement('button');
@@ -422,7 +423,8 @@ function openOffer(engine, card, { inLog = false } = {}) {
   engine.offerQuestDialogue({
     title: card.def.title,
     kicker: 'Magic Rock',
-    beats: card.beats,
+    // The offer's own <b>/<i> on each page (QuestConversationUI sets htmlText).
+    beats: withQuestMarkup(card.beats, card.def.offer || card.def.desc),
     acceptLabel: card.acceptLabel,
     declineLabel: card.declineLabel,
     declinable: card.startable === true,
