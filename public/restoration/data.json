@@ -184,7 +184,7 @@
    "group": "world",
    "name": "The Ur subway",
    "status": "rebuilt",
-   "blurb": "Twelve stations under Ur on one loop, the Red Line one way and the Blue Line the other. Go down the station stairs on Gregarious Grange, Groddle Forest Junction or any of the other ten, push A Red Button for a 50-currant ticket (Your Papers must be in order), ride, and get off at any stop or stay on for the next. Ride counts earn Subwayfarer, Ground Hogger, Commuter Mug and Chute Jockey. The fares, lines, announcements, gate and badges come from the source; the stations and the train were never archived, so they are rebuilt from players’ footage with Tiny Speck’s own subway art. With nobody else to wait for, the train leaves ten seconds after you board.",
+   "blurb": "Twelve stations under Ur on one loop, the Red Line one way and the Blue Line the other. Go down the station stairs on Gregarious Grange, Groddle Forest Junction or any of the other ten, push A Red Button for a 50-currant ticket (Your Papers must be in order), ride, and get off at any stop or stay on for the next. Ride counts earn Subwayfarer, Ground Hogger, Commuter Mug and Chute Jockey. The fares, lines, announcements, gate and badges come from the source; the stations and the train were never archived, so they are rebuilt from players’ footage with Tiny Speck’s own subway art. With nobody else to wait for, the train leaves ten seconds after you board. The quests use the same stations: Legalize It starts when Gregarious Grange’s Red Button turns you away for want of papers, and the robot in We’re Off to See the Lizard waits on whichever station you go down to.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
@@ -1853,9 +1853,9 @@
     "note": {
      "tagline": "A shady deal, a fuel cell and a stranded robot.",
      "about": "We're Off to See the Lizard: a Shady Bureaucrat in the back alley asks you to refuel a maintenance robot stuck in a subway station.",
-     "play": "Hear the proposition, make a Fuel Cell in a Fuelmaker, take any subway door, find the robot on the platform and refuel it.",
+     "play": "Hear the proposition, make a Fuel Cell in a Fuelmaker, go down to any subway station, find the robot on the platform and refuel it.",
      "source": "The Bureaucrat's four lines, the three-minute alley clock, the robot's lines and the rewards.",
-     "rebuilt": "The alley is laid out from a player's Snap of the meeting: a dark forest, a tall pale brick wall, a shaft of light, the Bureaucrat before a small grey hut and a fallen red log on the path, all from Tiny Speck's own forest pieces. The subway platform is rebuilt from two subway recordings; the remake has no subway network, so any subway door opens it.",
+     "rebuilt": "The alley is laid out from a player's Snap of the meeting: a dark forest, a tall pale brick wall, a shaft of light, the Bureaucrat before a small grey hut and a fallen red log on the path, all from Tiny Speck's own forest pieces; Legalize It's Shady Bureaucrat meets you in the same alley. The robot waits on the real stations of the Ur subway, in Tiny Speck's own subway art, at the spot the source puts it.",
      "footage": []
     }
    }
@@ -2665,9 +2665,14 @@
   ]
  },
  "git": {
-  "commits": 743,
+  "commits": 744,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "new",
+    "text": "The tutorial is Tiny Speck's own clouds, giant words and training rooms"
+   },
    {
     "date": "2026-10-29",
     "kind": "improve",
@@ -2782,11 +2787,6 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "Nothing opens over or behind the start card; a skill learned while away waits for Start"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "Speech bubbles keep a short tail and their cream at night"
    }
   ]
  },

@@ -258,44 +258,23 @@ export function getVerbsFor(target, ctx) {
 
   if (classId === 'legalize_transit_gate') {
     const action = target?.state?.routeAction;
-    const expectedStage = action === 'depart_back_alley'
-      ? 'gregarious_departure'
-      : action === 'travel_gregarious'
-        ? 'back_alley_station'
-        : 'gregarious_arrival';
+    // game.js legalizeRealTarget: Gregarious Grange Subway Station's stairs once back from The Back Alley.
+    const expectedStage = action === 'depart_back_alley' ? 'gregarious_departure' : 'gregarious_arrival';
     const verbId = action === 'exit_gregarious_station' ? 'exit' : 'travel';
     add(verbId, verbId === 'exit' ? 'exit station' : 'travel', {
       sort: 10,
       enabled: Boolean(s.legalizeState) && s.legalizeState.stage === expectedStage,
-      tooltip:
-        action === 'depart_back_alley'
-          ? 'Travel to The Back Alley'
-          : action === 'travel_gregarious'
-            ? 'Travel to Gregarious Grange'
-            : 'Exit to Gregarious Grange',
-    });
-  }
-
-  if (classId === 'legalize_subway_entrance') {
-    add('enter', 'enter station', {
-      sort: 10,
-      enabled:
-        Boolean(s.legalizeState) &&
-        s.legalizeState.stage === 'back_alley_briefed',
-      reason:
-        s.legalizeState?.stage === 'back_alley'
-          ? 'Speak with the Shady Bureaucrat first.'
-          : '',
-      tooltip: 'Enter The Back Alley Subway Station',
+      tooltip: action === 'depart_back_alley' ? 'Travel to The Back Alley' : 'Exit to Gregarious Grange',
     });
   }
 
   if (classId === 'legalize_hall_entrance') {
+    // game.js legalizeRealTarget: Gregarious Grange's own hall door, into the quest's hall.
     add('enter', 'enter hall', {
       sort: 10,
       enabled:
         Boolean(s.legalizeState) &&
-        s.legalizeState.stage === 'grange_exterior',
+        ['grange_exterior', 'hall_waiting', 'hall_called', 'hall_processing'].includes(s.legalizeState.stage),
       tooltip: 'Enter the Bureaucratic Hall',
     });
   }

@@ -140,7 +140,7 @@ function loadRoom(roomId) {
     const path = roomModulePath(roomId).replace(/^\.\//, '../quest-rooms/');
     loading.set(
       roomId,
-      import(`${path}?v=rooms-g388`)
+      import(`${path}?v=rooms-g450-1`)
         .then((mod) => {
           const def = mod.room || mod.default || null;
           loaded.set(roomId, def);
@@ -680,7 +680,8 @@ function makeContext(engine) {
     /** Register an interactable owned by this room. */
     register(target) {
       engine.entityLayer.addChild(target.sprite);
-      const t = engine.register({ ...target, featureId: QUEST_INSTANCES_FEATURE_ID, qiRoom: room?.id });
+      // A world hook's target names its room (no room runs then).
+      const t = engine.register({ ...target, featureId: QUEST_INSTANCES_FEATURE_ID, qiRoom: room?.id || target.qiRoom });
       c.targets.push(t);
       return t;
     },

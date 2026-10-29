@@ -6,11 +6,9 @@ import { fileURLToPath } from 'node:url';
 
 import {
   LEGALIZE_BACK_ALLEY_BEATS,
-  LEGALIZE_BACK_ALLEY_STATION_TSID,
   LEGALIZE_BACK_ALLEY_TSID,
   LEGALIZE_CARD_COST,
   LEGALIZE_CARD_ID,
-  LEGALIZE_GRANGE_STATION_TSID,
   LEGALIZE_GRANGE_TSID,
   LEGALIZE_HALL_TSID,
   LEGALIZE_QUEST_ID,
@@ -30,7 +28,7 @@ import {
   purchaseQualification,
   requestLegalizeQualification,
   travelToGregarious,
-} from '../public/js/legalize-it.js';
+} from '../public/js/legalize-it.js?v=g450-1';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -39,8 +37,6 @@ test('Legalize It preserves the source quest ids, fee, and reward', () => {
   assert.equal(LEGALIZE_BACK_ALLEY_TSID, 'LIF177DTS6T1KFG');
   assert.equal(LEGALIZE_GRANGE_TSID, 'LLI32G3NUTD100I');
   assert.equal(LEGALIZE_HALL_TSID, 'LIF101O8CDQ1AMU');
-  assert.equal(LEGALIZE_GRANGE_STATION_TSID, 'LEGALIZE_GREGARIOUS_SUBWAY');
-  assert.equal(LEGALIZE_BACK_ALLEY_STATION_TSID, 'LEGALIZE_BACK_ALLEY_SUBWAY');
   assert.equal(LEGALIZE_CARD_ID, 'card_carrying_qualification');
   assert.equal(LEGALIZE_CARD_COST, 50);
   assert.deepEqual(LEGALIZE_REWARD, {
@@ -52,10 +48,11 @@ test('Legalize It preserves the source quest ids, fee, and reward', () => {
 test('the recorded route makes the full subway round trip before entering the hall', () => {
   const state = createLegalizeState({ tsid: 'GLI2V0UN7RD1T2J', x: 300, y: 700 });
   assert.equal(state.stage, 'gregarious_departure');
-  assert.match(legalizeObjective(state), /subway to The Back Alley/);
+  assert.match(legalizeObjective(state), /Push A Red Button/);
   assert.equal(departForBackAlley(state).reason, 'arrived_back_alley');
   assert.match(legalizeObjective(state), /shady Bureaucrat/);
   assert.equal(completeBackAlleyBriefing(state).reason, 'briefed');
+  assert.match(legalizeObjective(state), /Gregarious Grange Subway Station/);
   assert.equal(enterBackAlleyStation(state).reason, 'entered_back_alley_station');
   assert.equal(travelToGregarious(state).reason, 'arrived_gregarious_station');
   assert.equal(exitToGregariousGrange(state).reason, 'entered_gregarious_grange');
@@ -165,7 +162,17 @@ test('client integration ships recovered clean quest art and a playable route', 
   assert.match(game, /recovered-animated-bureaucrats/);
   assert.match(game, /Beige\|Other/);
   assert.match(content, /legalize_transit_gate/);
-  assert.match(content, /legalize_subway_entrance/);
+  // The route runs on the real places: Gregarious Grange's own station (subway feature), the
+  // imported street with its hall door, and the one Back Alley set. No drawn stand-ins are left.
+  assert.doesNotMatch(content, /legalize_subway_entrance/);
+  for (const gone of ['drawGregariousGrangeExterior', 'drawLegalizeSubwayStation', 'drawLegalizeBackAlley', 'spawnLegalizeTransitGate', 'spawnLegalizeBackAlleyStation', 'LEGALIZE_GRANGE_STATION_TSID', 'LEGALIZE_BACK_ALLEY_STATION_TSID']) {
+    assert.doesNotMatch(game, new RegExp(`\\b${gone}\\b`), gone);
+  }
+  assert.match(game, /const LEGALIZE_STATION = surfaceStation\(LEGALIZE_GRANGE_TSID\);/);
+  assert.match(game, /const LEGALIZE_HALL_DOOR = 'door_1300484753304';/);
+  assert.match(game, /const LEGALIZE_STAIRS_DOOR = 'door_subway_stairs';/);
+  assert.match(game, /from '\.\/js\/quest-rooms\/back-alley-set\.js\?v=g\d+-\d+'/);
+  assert.match(game, /papersRefused: \(\) => legalizeGateRefused\(\)/);
   assert.match(content, /legalize_hall_entrance/);
   assert.match(content, /npc_back_alley_bureaucrat/);
   assert.match(content, /npc_bureaucrat/);

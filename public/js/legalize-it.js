@@ -12,8 +12,6 @@ export const LEGALIZE_QUEST_ID = 'card_carrying_qualification';
 export const LEGALIZE_BACK_ALLEY_TSID = 'LIF177DTS6T1KFG';
 export const LEGALIZE_GRANGE_TSID = 'LLI32G3NUTD100I';
 export const LEGALIZE_HALL_TSID = 'LIF101O8CDQ1AMU';
-export const LEGALIZE_GRANGE_STATION_TSID = 'LEGALIZE_GREGARIOUS_SUBWAY';
-export const LEGALIZE_BACK_ALLEY_STATION_TSID = 'LEGALIZE_BACK_ALLEY_SUBWAY';
 export const LEGALIZE_CARD_ID = 'card_carrying_qualification';
 export const LEGALIZE_PAPERS_ID = 'your_papers';
 export const LEGALIZE_CARD_COST = 50;
@@ -279,9 +277,11 @@ export function activateQualification(state, hasCard = true, now = Date.now()) {
 
 export function legalizeObjective(state) {
   if (!state) return 'Visit the Back Alley';
-  if (state.stage === 'gregarious_departure') return 'Take the subway to The Back Alley';
+  // subway_gate.js 158: A Red Button turns you away for want of papers, and The Back Alley opens.
+  if (state.stage === 'gregarious_departure') return 'Push A Red Button in the subway station';
   if (state.stage === 'back_alley') return 'Speak with the shady Bureaucrat';
-  if (state.stage === 'back_alley_briefed') return 'Enter The Back Alley subway station';
+  // npc_bureaucrat.js 795: instances_exit, back to the station you came from.
+  if (state.stage === 'back_alley_briefed') return 'Back to Gregarious Grange Subway Station';
   if (state.stage === 'back_alley_station') return 'Take the subway to Gregarious Grange';
   if (state.stage === 'gregarious_arrival') return 'Exit Gregarious Grange Subway Station';
   if (state.stage === 'grange_exterior') return 'Enter the Bureaucratic Hall';

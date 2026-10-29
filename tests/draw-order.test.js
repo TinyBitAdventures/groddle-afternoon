@@ -232,7 +232,7 @@ describe('player and item overlays draw over the street\'s front layers', () => 
     ['the charades rainbows', 'public/js/features/player-verbs-mp-feature.js', /'rainbow_youdidit', \{ layer: engine\.fxLayer \|\| engine\.entityLayer/],
     ['racing cubimals poofing in', 'public/js/features/cubimal-race-feature.js', /playPoofIn\(engine\.PIXI, \{ layer: engine\.fxLayer \|\| engine\.entityLayer/],
     ['purple quoins poofing in', 'public/js/features/purple-journey-feature.js', /playPoofIn\(PIXI, \{ layer: engine\.fxLayer \|\| engine\.entityLayer/],
-    ['the maintenance bot smoke', 'public/js/quest-rooms/back-alley.js', /'smoke_puff', \{ layer: ctx\.engine\.fxLayer \|\| ctx\.engine\.entityLayer/],
+    ['the maintenance bot smoke', 'public/js/quest-rooms/back-alley.js', /'smoke_puff', \{ layer: wctx\.engine\.fxLayer \|\| wctx\.engine\.entityLayer/],
     ["Mr. Block's letter blocks", 'public/game.js', /playPoofIn\(PIXI, \{ layer: fxLayer \|\| entityLayer, x: spr\.x, bottom: spr\.y/],
   ]) {
     it(what, () => assert.match(read(file), pattern));

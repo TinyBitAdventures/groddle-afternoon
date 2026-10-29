@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g414-1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g450-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-282';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-284';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g434-1';
@@ -95,12 +95,10 @@ import {
 } from './js/ilmenskie-quest.js?v=ilmenskie-1';
 import {
   LEGALIZE_BACK_ALLEY_BEATS,
-  LEGALIZE_BACK_ALLEY_STATION_TSID,
   LEGALIZE_BACK_ALLEY_TSID,
   LEGALIZE_CARD_COST,
   LEGALIZE_CARD_ID,
   LEGALIZE_CLERKS,
-  LEGALIZE_GRANGE_STATION_TSID,
   LEGALIZE_GRANGE_TSID,
   LEGALIZE_HALL_TSID,
   LEGALIZE_QUEST_ID,
@@ -119,8 +117,10 @@ import {
   purchaseQualification,
   requestLegalizeQualification,
   travelToGregarious,
-} from './js/legalize-it.js?v=legalize-2';
+} from './js/legalize-it.js?v=g450-1';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=g443-1';
+import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=play-1';
+import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=g450-1';
 import {
   WINTER_HAVEN_STREET_ID,
   WINTER_MOTE_REWARDS,
@@ -4117,7 +4117,7 @@ function updateHud() {
         puzzleButton.addEventListener('click', () => startFourLetterQuest());
         card.appendChild(puzzleButton);
       }
-      if (p.active && p.def.classTsid === LEGALIZE_QUEST_ID && !legalizeIsInstanced()) {
+      if (p.active && p.def.classTsid === LEGALIZE_QUEST_ID && !legalizeOnRoute()) {
         const legalizeButton = document.createElement('button');
         legalizeButton.type = 'button';
         legalizeButton.className = 'content-action-btn';
@@ -5905,6 +5905,8 @@ let musicblockNotes = null;
 // —— Verb menu (HTML) ——
 /** A target's verb menu (engine.targetVerbs: pack verbs that proxy to a nearby target read it too). */
 function menuVerbsFor(target) {
+  // Legalize It's steps on the station's stairs and the street's hall door (legalizeRealTarget).
+  target = legalizeRealTarget(target) || target;
   // A feature may take over any target's menu (rooked trees/animals, shrines under attack).
   return features.query('verbOverride', target, engine) ?? features.verbsFor(target, engine) ?? features.decorateVerbs(target, getVerbsFor(target, {
     pc,
@@ -6482,6 +6484,12 @@ const SPEECH_REACTION_VERBS = new Set([
 ]);
 
 function executeVerb(target, verbId) {
+  // Legalize It's steps on the station's stairs and the street's hall door.
+  const legalizeStep = legalizeRealTarget(target);
+  if (legalizeStep) {
+    handleLegalizeTarget(legalizeStep, verbId);
+    return;
+  }
   if (features.query('runVerbOverride', target, verbId, engine) === true) return;
   if (features.runVerb(target, verbId, engine)) {
     playFeatureVerbSound(target, verbId);
@@ -6516,7 +6524,6 @@ function executeVerb(target, verbId) {
   if (
     [
       'legalize_transit_gate',
-      'legalize_subway_entrance',
       'legalize_hall_entrance',
       'npc_back_alley_bureaucrat',
       'npc_bureaucrat',
@@ -9605,6 +9612,8 @@ const engine = {
   inScene() {
     return Boolean(engine.sceneTsid && currentStreetTsid === engine.sceneTsid);
   },
+  /** The subway gate's papers refusal was OK'd (features/subway-feature.js): Legalize It's way into The Back Alley. */
+  papersRefused: () => legalizeGateRefused(),
   /** Legalize It's Bureaucratic Hall room and clerk art, for the hall doors (features/bureaucratic-halls-feature.js). */
   bureaucraticHall: () => ({
     layer: drawBureaucraticHall(),
@@ -12921,17 +12930,89 @@ const LEGALIZE_BUREAUCRAT_ART = [
   'npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_iconic_png_1354833015.png',
 ];
 
+/**
+ * Legalize It runs on the real places (card_carrying_qualification.js,
+ * subway_gate.js, npc_bureaucrat.js, location.js): Gregarious Grange's own
+ * subway station (features/subway-feature.js, Tiny Speck's subway1.swf), the
+ * imported Gregarious Grange street (GLI32G3NUTD100I) with its hall door,
+ * and the two places only the quest opens, The Back Alley instance (the one
+ * set, js/quest-rooms/back-alley-set.js) and the Bureaucratic Hall.
+ */
+const LEGALIZE_STATION = surfaceStation(LEGALIZE_GRANGE_TSID);
+const LEGALIZE_STATION_STREET = LEGALIZE_STATION.streetTsid;
+const LEGALIZE_GRANGE_STREET = LEGALIZE_STATION.surfaceStreetTsid;
+/** The street's hall door (location XML; features/bureaucratic-halls-feature.js HALL_DOORS) and the station's stairs (js/subway.js stationStreet). */
+const LEGALIZE_HALL_DOOR = 'door_1300484753304';
+const LEGALIZE_STAIRS_DOOR = 'door_subway_stairs';
+/** Down the stairs from the street (its subway door door_1300233269757 connects at x -575). */
+const LEGALIZE_STATION_ARRIVAL = stationArrival(-575);
+/** In front of A Red Button, where the refusal found you: instances_exit puts you back there. */
+const LEGALIZE_GATE_SPOT = stationScreen(STATION_X.gate - 70);
+/** Up the stairs: in front of the street's subway entrance (the stairs door's connect arrive). */
+const LEGALIZE_GRANGE_ARRIVAL = Object.freeze({ x: 3430, y: 910 });
+/** npc_bureaucrat.js 784: the halls the Bureaucrat marks on your map (prod), as streets. */
+const LEGALIZE_HALL_STREETS = Object.freeze(['GLI32G3NUTD100I', 'GA91JUQT2G82GUL', 'GA5I10NJDL52TKD']);
+
+/** The two places only the quest opens: The Back Alley instance and its Bureaucratic Hall. */
 function legalizeIsInstanced() {
+  return Boolean(legalizeRun && [LEGALIZE_BACK_ALLEY_TSID, LEGALIZE_HALL_TSID].includes(currentStreetTsid));
+}
+
+/** The application under way, also after a reload or a walk away and back. */
+function legalizeRouteState() {
+  if (legalizeRun) return legalizeRun;
+  if (!questState.active?.[LEGALIZE_QUEST_ID] || !questState.story?.legalize) return null;
+  legalizeRun = ensureLegalizeState(questState);
+  legalizeSourceLocation = legalizeRun.sourceLocation || null;
+  return legalizeRun;
+}
+
+/** On one of the route's places (the station, the street, the alley, the hall). */
+function legalizeOnRoute() {
   return Boolean(
-    legalizeRun &&
-      [
-        LEGALIZE_GRANGE_STATION_TSID,
-        LEGALIZE_BACK_ALLEY_TSID,
-        LEGALIZE_BACK_ALLEY_STATION_TSID,
-        LEGALIZE_GRANGE_TSID,
-        LEGALIZE_HALL_TSID,
-      ].includes(currentStreetTsid)
+    legalizeRouteState() &&
+      [LEGALIZE_STATION_STREET, LEGALIZE_GRANGE_STREET, LEGALIZE_BACK_ALLEY_TSID, LEGALIZE_HALL_TSID].includes(currentStreetTsid)
   );
+}
+
+/**
+ * The real door that carries a step, as the target content.js knows: the
+ * station's stairs once you are back from the alley (Exit) and the street's
+ * hall door on the way to the application (Enter). null otherwise.
+ */
+function legalizeRealTarget(target) {
+  if (target?.classId !== 'street_door' || !legalizeOnRoute()) return null;
+  const id = target.door?.id;
+  const stage = legalizeRun.stage;
+  const as = (classId, routeAction) => ({
+    classId,
+    label: target.label,
+    subtitle: target.subtitle,
+    sprite: target.sprite,
+    state: { legalizeState: legalizeRun, routeAction },
+  });
+  if (currentStreetTsid === LEGALIZE_STATION_STREET && id === LEGALIZE_STAIRS_DOOR && stage === 'gregarious_arrival') {
+    return as('legalize_transit_gate', 'exit_gregarious_station');
+  }
+  if (
+    currentStreetTsid === LEGALIZE_GRANGE_STREET && id === LEGALIZE_HALL_DOOR &&
+    ['grange_exterior', 'hall_waiting', 'hall_called', 'hall_processing'].includes(stage)
+  ) {
+    return as('legalize_hall_entrance', 'enter_hall');
+  }
+  return null;
+}
+
+/**
+ * subway_gate.js onConversation 'ok' after the papers refusal (the subway
+ * feature's Red Button): on the quest's first step it is the way into The
+ * Back Alley, as the quest's onStarted instance was. True when it went.
+ */
+function legalizeGateRefused() {
+  if (!legalizeOnRoute() || currentStreetTsid !== LEGALIZE_STATION_STREET) return false;
+  if (legalizeRun.stage !== 'gregarious_departure') return false;
+  handleLegalizeTarget({ classId: 'legalize_transit_gate', state: { legalizeState: legalizeRun, routeAction: 'depart_back_alley' } }, 'travel');
+  return true;
 }
 
 function legalizeStageProgress(state = legalizeRun) {
@@ -12945,7 +13026,7 @@ function legalizeStageProgress(state = legalizeRun) {
 
 function renderLegalizeHud() {
   const hud = document.getElementById('legalize-hud');
-  const visible = legalizeIsInstanced();
+  const visible = legalizeOnRoute();
   if (hud) hud.hidden = !visible;
   if (!visible) return;
   const progress = legalizeStageProgress();
@@ -12992,7 +13073,8 @@ function renderLegalizeHud() {
         .includes(legalizeRun.stage)
         ? '1'
         : '0';
-    app.canvas.dataset.legalizeArt = 'recovered-subway-forest-hall';
+    app.canvas.dataset.legalizeArt = 'subway1-station>back-alley-set>gregarious-grange-street>bhall';
+    app.canvas.dataset.legalizePlace = currentStreetTsid || '';
     app.canvas.dataset.legalizeClerkArt = 'recovered-animated-bureaucrats';
     app.canvas.dataset.legalizeQuestion = 'Beige|Other';
   }
@@ -13005,163 +13087,6 @@ function legalizeRoomBase(name, width = 1600, height = 760, groundY = 620) {
   layer.platformsScreen = [
     { id: `${name}-floor`, x1: 0, y1: groundY, x2: width, y2: groundY, pc_perm: 1 },
   ];
-  return layer;
-}
-
-function drawLegalizeSubwayStation(stationName, destinationName) {
-  const layer = legalizeRoomBase(`legalize-subway-${stationName.toLowerCase().replace(/\W+/g, '-')}`);
-  const wall = new PIXI.Graphics();
-  wall.rect(0, 0, 1600, 620).fill(0x747774);
-  wall.rect(0, 0, 1600, 92).fill(0x2d302f);
-  for (let x = 35; x < 1600; x += 205) wall.rect(x, 100, 7, 480);
-  wall.fill(0x4f5351);
-  layer.addChild(wall);
-
-  const train = new PIXI.Graphics();
-  train.label = 'legalize-subway-train';
-  train.setStrokeStyle({ width: 5, color: 0x3c4546, alpha: 1 });
-  train.roundRect(165, 260, 1120, 278, 74).fill(0xe4e6df).stroke();
-  train.setFillStyle(0x58676a);
-  train.roundRect(240, 300, 410, 118, 22).fill().stroke();
-  train.roundRect(690, 300, 410, 118, 22).fill().stroke();
-  train.setFillStyle({ color: 0xa9c1c2, alpha: 0.72 });
-  train.roundRect(272, 317, 160, 84, 14).fill().stroke();
-  train.roundRect(452, 317, 160, 84, 14).fill().stroke();
-  train.roundRect(722, 317, 160, 84, 14).fill().stroke();
-  train.roundRect(902, 317, 160, 84, 14).fill().stroke();
-  train.zIndex = 1;
-  layer.addChild(train);
-
-  const platform = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/subway_platform_1.png'));
-  platform.anchor.set(0, 1);
-  platform.position.set(0, 760);
-  platform.width = 1600;
-  platform.height = 414;
-  platform.zIndex = 0;
-  layer.addChild(platform);
-  // Re-add the train after the opaque platform PNG so it remains visible.
-  layer.addChild(train);
-
-  const title = new PIXI.Text({ text: stationName.toUpperCase(), style: {
-    fontFamily: 'Trebuchet MS, sans-serif',
-    fontSize: 23,
-    fontWeight: '900',
-    fill: 0xd9d6c7,
-    letterSpacing: 3,
-  } });
-  title.anchor.set(0.5);
-  title.position.set(800, 115);
-  title.alpha = 0.72;
-  title.zIndex = 2;
-  layer.addChild(title);
-
-  const destination = new PIXI.Text({ text: `NEXT TRAIN · ${destinationName}`, style: {
-    fontFamily: 'Trebuchet MS, sans-serif',
-    fontSize: 16,
-    fontWeight: '700',
-    fill: 0xf1efe2,
-  } });
-  destination.anchor.set(0.5);
-  destination.position.set(800, 154);
-  destination.alpha = 0.76;
-  destination.zIndex = 2;
-  layer.addChild(destination);
-  return layer;
-}
-
-function drawLegalizeBackAlley() {
-  const layer = legalizeRoomBase('legalize-back-alley-forest');
-  const sky = new PIXI.Graphics();
-  sky.rect(0, 0, 1600, 620).fill(0x142d20);
-  sky.ellipse(790, 300, 680, 310).fill({ color: 0x285039, alpha: 0.74 });
-  sky.poly([560, 0, 850, 0, 1060, 620, 770, 620]).fill({ color: 0xa8dca3, alpha: 0.13 });
-  layer.addChild(sky);
-
-  const rearTrees = [
-    ['tree_background_01.png', 80, 500, 1.65],
-    ['tree_background_02.png', 310, 500, 1.7],
-    ['tree_background_03.png', 530, 500, 1.8],
-    ['tree_background_02.png', 780, 500, 1.55],
-    ['tree_background_01.png', 1080, 500, 1.75],
-    ['tree_background_03.png', 1390, 500, 1.9],
-  ];
-  for (const [file, x, y, scale] of rearTrees) {
-    const tree = new PIXI.Sprite(textureFromUrl(`assets/decos/groddle/${file}`));
-    tree.anchor.set(0.5, 1);
-    tree.position.set(x, y);
-    tree.scale.set(scale);
-    tree.alpha = 0.72;
-    layer.addChild(tree);
-  }
-
-  const hole = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/forest_hole_back.png'));
-  hole.anchor.set(0.5, 1);
-  hole.position.set(285, 620);
-  hole.scale.set(1.05);
-  layer.addChild(hole);
-
-  const floor = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/ground_forest_terrain_plat_01.png'));
-  floor.anchor.set(0.5, 1);
-  floor.position.set(800, 760);
-  floor.width = 1660;
-  floor.height = 238;
-  layer.addChild(floor);
-
-  const frontTrees = [
-    ['tree_front_02.png', 90, 655, 0.68],
-    ['tree_dark_1.png', 1510, 660, 0.58],
-    ['tree_front_01.png', 1240, 640, 0.92],
-  ];
-  for (const [file, x, y, scale] of frontTrees) {
-    const tree = new PIXI.Sprite(textureFromUrl(`assets/decos/groddle/${file}`));
-    tree.anchor.set(0.5, 1);
-    tree.position.set(x, y);
-    tree.scale.set(scale);
-    tree.alpha = 0.96;
-    layer.addChild(tree);
-  }
-  layer.sortableChildren = true;
-  return layer;
-}
-
-function drawGregariousGrangeExterior() {
-  const layer = legalizeRoomBase('legalize-gregarious-grange');
-  const meadow = new PIXI.Graphics();
-  meadow.rect(0, 0, 1600, 620).fill(0xbde8ef);
-  meadow.ellipse(320, 590, 760, 260);
-  meadow.ellipse(1180, 590, 880, 285);
-  meadow.rect(0, 520, 1600, 240);
-  meadow.fill(0x7fb45e);
-  meadow.rect(0, 610, 1600, 150).fill(0x5b933f);
-  layer.addChild(meadow);
-
-  for (const [file, x, scale] of [
-    ['tree_deciduous1.png', 170, 1.2],
-    ['tree_deciduous2.png', 455, 1.12],
-    ['tree_deciduous3.png', 1450, 1.08],
-  ]) {
-    const tree = new PIXI.Sprite(textureFromUrl(`assets/decos/groddle/${file}`));
-    tree.anchor.set(0.5, 1);
-    tree.position.set(x, 620);
-    tree.scale.set(scale);
-    layer.addChild(tree);
-  }
-
-  const subway = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/subway_station_entrance.png'));
-  subway.anchor.set(0.5, 1);
-  subway.position.set(335, 620);
-  subway.scale.set(0.34);
-  subway.alpha = 0.92;
-  layer.addChild(subway);
-
-  const flowers = new PIXI.Graphics();
-  for (let i = 0; i < 44; i++) {
-    const x = 30 + ((i * 149) % 1540);
-    const y = 548 + ((i * 37) % 58);
-    flowers.circle(x, y, 2.5).fill(i % 3 === 0 ? 0xffffff : i % 3 === 1 ? 0xffdf6b : 0xf0a7d8);
-  }
-  layer.addChild(flowers);
-  layer.sortableChildren = true;
   return layer;
 }
 
@@ -13283,59 +13208,59 @@ function setLegalizeBureaucratAnimation(target, mode = 'idle', durationMs = 0) {
   spr._legalizeAnimationUntil = durationMs ? Date.now() + durationMs : 0;
 }
 
-function spawnLegalizeTransitGate({
-  label,
-  subtitle,
-  action,
-  x = 1370,
-  scale = 3.4,
-}) {
-  const gate = new PIXI.Sprite(textureFromUrl(`${LEGALIZE_ASSET_ROOT}/subway_gate__x1_1_png_1354832987.png`));
-  gate.anchor.set(0.5, 1);
-  gate.position.set(x, GROUND_Y);
-  gate.scale.set(scale);
-  gate.zIndex = 42;
-  entityLayer.addChild(gate);
-  const target = register({
-    classId: 'legalize_transit_gate',
-    label,
-    subtitle,
-    sprite: gate,
-    state: { legalizeState: legalizeRun, routeAction: action },
-  });
-  legalizeTargets.push(target);
-  return target;
-}
-
-function spawnLegalizeDepartureStation() {
-  installLegalizeScene(
-    drawLegalizeSubwayStation('Gregarious Grange Subway Station', 'The Back Alley'),
-    {
-      tsid: LEGALIZE_GRANGE_STATION_TSID,
-      label: 'Gregarious Grange Subway Station',
-      hubName: 'Groddle Meadow',
-      spawnX: 220,
-    }
-  );
+/** Into a real street of the route, with its loading card, standing at `spot` (screen space). */
+async function legalizeEnterStreet(tsid, spot) {
   legalizeTargets = [];
-  spawnLegalizeTransitGate({
-    label: 'Subway Map',
-    subtitle: 'Travel to The Back Alley',
-    action: 'depart_back_alley',
-  });
+  legalizeTransitionBusy = true;
+  try {
+    await enterStreetWithTransition(tsid, { spawnX: spot.x, spawnY: spot.y });
+  } finally {
+    legalizeTransitionBusy = false;
+  }
   renderLegalizeHud();
 }
 
+/** The quest's own place: the loading card (the client's "Entering ..."), then the scene. */
+async function legalizeSceneTransition(label, setup) {
+  const el = document.getElementById('screen-transition');
+  if (!el || new URLSearchParams(location.search).get('legalizefx') === '0') {
+    setup();
+    return;
+  }
+  await runStreetTransition(el, {
+    fromLabel: currentStreet?.label || '',
+    fromHub: currentStreet?.hubName || '',
+    toLabel: label,
+    toHub: '',
+    topColor: 0x26302a,
+    bottomColor: 0x121714,
+    onMid: async () => setup(),
+  });
+}
+
+/** Gregarious Grange Subway Station, the real one, down its stairs (the quest's first step: its Red Button). */
+function spawnLegalizeDepartureStation() {
+  return legalizeEnterStreet(LEGALIZE_STATION_STREET, LEGALIZE_STATION_ARRIVAL);
+}
+
+/**
+ * The Back Alley (LIF177DTS6T1KFG, the instance onStarted copies): the one
+ * set We're Off to See the Lizard uses too, its Shady Bureaucrat where that
+ * room has him, and you arriving where that room puts you.
+ */
 function spawnLegalizeBackAlley() {
-  installLegalizeScene(drawLegalizeBackAlley(), {
+  const layer = drawAlley(PIXI);
+  layer.name = 'legalize-back-alley';
+  layer.groundY = ALLEY.FLOOR;
+  layer.platformsScreen = [{ id: 'ba_floor', x1: 0, y1: ALLEY.FLOOR, x2: ALLEY.W, y2: ALLEY.FLOOR, pc_perm: 1 }];
+  installLegalizeScene(layer, {
     tsid: LEGALIZE_BACK_ALLEY_TSID,
     label: 'The Back Alley',
     hubName: '', // G363: the back_alley instance (card_carrying_qualification.js 88): no hub line (location.js 3311)
-    spawnX: 1120,
+    spawnX: ALLEY.spawnX,
   });
   legalizeTargets = [];
-
-  const shady = makeLegalizeBureaucrat(0, 880, GROUND_Y, 0.88);
+  const shady = makeLegalizeBureaucrat(0, SHADY.x, SHADY.y, SHADY.scale);
   shady.zIndex = 43;
   entityLayer.addChild(shady);
   legalizeTargets.push(register({
@@ -13348,86 +13273,17 @@ function spawnLegalizeBackAlley() {
     sprite: shady,
     state: { legalizeState: legalizeRun },
   }));
-
-  const entrance = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/subway_station_entrance.png'));
-  entrance.anchor.set(0.5, 1);
-  entrance.position.set(285, GROUND_Y);
-  entrance.scale.set(0.53);
-  entrance.zIndex = 41;
-  entityLayer.addChild(entrance);
-  legalizeTargets.push(register({
-    classId: 'legalize_subway_entrance',
-    label: 'Back Alley Subway',
-    subtitle:
-      legalizeRun.stage === 'back_alley_briefed'
-        ? 'Return to Gregarious Grange'
-        : 'Speak with the Bureaucrat first',
-    sprite: entrance,
-    state: { legalizeState: legalizeRun, routeAction: 'enter_back_alley_station' },
-  }));
   renderLegalizeHud();
 }
 
-function spawnLegalizeBackAlleyStation() {
-  installLegalizeScene(
-    drawLegalizeSubwayStation('The Back Alley Subway Station', 'Gregarious Grange'),
-    {
-      tsid: LEGALIZE_BACK_ALLEY_STATION_TSID,
-      label: 'The Back Alley Subway Station',
-      hubName: '', // G363: inside the back_alley instance: no hub line (location.js 3311)
-      spawnX: 220,
-    }
-  );
-  legalizeTargets = [];
-  spawnLegalizeTransitGate({
-    label: 'Subway Map',
-    subtitle: 'Travel to Gregarious Grange',
-    action: 'travel_gregarious',
-  });
-  renderLegalizeHud();
-}
-
+/** Back from the alley: instances_exit returns you to the station, in front of the gate. */
 function spawnLegalizeGregariousStation() {
-  installLegalizeScene(
-    drawLegalizeSubwayStation('Gregarious Grange Subway Station', 'Gregarious Grange'),
-    {
-      tsid: LEGALIZE_GRANGE_STATION_TSID,
-      label: 'Gregarious Grange Subway Station',
-      hubName: 'Groddle Meadow',
-      spawnX: 220,
-    }
-  );
-  legalizeTargets = [];
-  spawnLegalizeTransitGate({
-    label: 'Station Exit',
-    subtitle: 'Exit to Gregarious Grange',
-    action: 'exit_gregarious_station',
-  });
-  renderLegalizeHud();
+  return legalizeEnterStreet(LEGALIZE_STATION_STREET, LEGALIZE_GATE_SPOT);
 }
 
+/** Up the stairs onto the imported Gregarious Grange, its Bureaucratic Hall along the street. */
 function spawnLegalizeGregariousExterior() {
-  installLegalizeScene(drawGregariousGrangeExterior(), {
-    tsid: LEGALIZE_GRANGE_TSID,
-    label: 'Gregarious Grange',
-    hubName: 'Groddle Meadow',
-    spawnX: 390,
-  });
-  legalizeTargets = [];
-  const hall = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/bureaucratic_hall_exterior_1.png'));
-  hall.anchor.set(0.5, 1);
-  hall.position.set(1110, GROUND_Y);
-  hall.scale.set(0.27);
-  hall.zIndex = 42;
-  entityLayer.addChild(hall);
-  legalizeTargets.push(register({
-    classId: 'legalize_hall_entrance',
-    label: 'Bureaucratic Hall',
-    subtitle: 'Bureau of Administrative Affairs · Ministry of Departments', // Tiny Speck blog 2011-02-27 (research/wayback/raw/blog)
-    sprite: hall,
-    state: { legalizeState: legalizeRun, routeAction: 'enter_hall' },
-  }));
-  renderLegalizeHud();
+  return legalizeEnterStreet(LEGALIZE_GRANGE_STREET, LEGALIZE_GRANGE_ARRIVAL);
 }
 
 function spawnLegalizeHall() {
@@ -13567,40 +13423,68 @@ function finishLegalizePurchase() {
   return 'ok';
 }
 
-function handleLegalizeTarget(target, verbId) {
-  if (!legalizeIsInstanced() || !target) return;
-  if (target.classId === 'npc_back_alley_bureaucrat' && verbId === 'talk_to') {
-    if (legalizeRun.stage !== 'back_alley') {
-      toast('The Bureaucratic Hall on Gregarious Grange is marked on your route.');
-      return;
-    }
-    setLegalizeBureaucratAnimation(target, 'talk', 13_000);
-    openScriptedQuestDialogue({
-      title: 'Shady Bureaucrat',
-      kicker: 'The Back Alley',
-      beats: LEGALIZE_BACK_ALLEY_BEATS,
-      onComplete: () => {
-        const result = completeBackAlleyBriefing(legalizeRun);
-        if (!result.ok) return;
-        setLegalizeBureaucratAnimation(target, 'idle');
-        target.subtitle = 'The closest Hall is marked on your route.';
-        const entrance = legalizeTargets.find(
-          (entry) => entry.classId === 'legalize_subway_entrance'
-        );
-        if (entrance) entrance.subtitle = 'Return to Gregarious Grange';
-        pushActivity('The Shady Bureaucrat marks the Bureaucratic Hall on your route.');
-        renderLegalizeHud();
-      },
-    });
+/** The Shady Bureaucrat's proposition (npc_bureaucrat.js propositionPlayer, no back_alley_business). */
+function legalizeBriefing(target) {
+  if (legalizeRun.stage !== 'back_alley') {
+    toast('The Bureaucratic Hall on Gregarious Grange is marked on your route.');
     return;
   }
-  if (
-    [
-      'legalize_transit_gate',
-      'legalize_subway_entrance',
-      'legalize_hall_entrance',
-    ].includes(target.classId)
-  ) {
+  if (isQuestDialogueOpen()) return;
+  setLegalizeBureaucratAnimation(target, 'talk', 13_000);
+  openScriptedQuestDialogue({
+    title: 'Shady Bureaucrat',
+    kicker: 'The Back Alley',
+    beats: LEGALIZE_BACK_ALLEY_BEATS,
+    onComplete: () => {
+      const result = completeBackAlleyBriefing(legalizeRun);
+      if (!result.ok) return;
+      setLegalizeBureaucratAnimation(target, 'idle');
+      target.subtitle = 'The closest Hall is marked on your route.';
+      // npc_bureaucrat.js 782-794: buildPath to the closest of the three halls from where you came in.
+      features.query('mapRoute', 'set', { from: LEGALIZE_STATION_STREET, to: [...LEGALIZE_HALL_STREETS], source: LEGALIZE_QUEST_ID, quest: LEGALIZE_QUEST_ID }, engine);
+      pushActivity('The Shady Bureaucrat marks the Bureaucratic Hall on your route.');
+      renderLegalizeHud();
+      // ... then instances_exit('back_alley'): back where you were.
+      setTimeout(() => legalizeLeaveAlley(), 500);
+    },
+  });
+}
+
+/** One step's place change, then its activity line and hint. */
+async function legalizeRunStep(spawn, activity, message) {
+  legalizeTransitionBusy = true;
+  try {
+    await spawn();
+  } finally {
+    legalizeTransitionBusy = false;
+  }
+  if (activity) pushActivity(activity);
+  if (message) toast(message, 4200);
+  renderLegalizeHud();
+}
+
+/**
+ * Out of the alley the source way, straight back to Gregarious Grange
+ * Subway Station: the route's two subway steps (js/legalize-it.js) both run,
+ * with no Back Alley station or train between (the source has neither).
+ */
+async function legalizeLeaveAlley() {
+  if (!legalizeRun || legalizeRun.stage !== 'back_alley_briefed' || currentStreetTsid !== LEGALIZE_BACK_ALLEY_TSID) return;
+  if (!enterBackAlleyStation(legalizeRun).ok || !travelToGregarious(legalizeRun).ok) return;
+  await legalizeRunStep(
+    spawnLegalizeGregariousStation,
+    'You leave The Back Alley for Gregarious Grange Subway Station.',
+    'Exit the station to reach the Bureaucratic Hall.'
+  );
+}
+
+function handleLegalizeTarget(target, verbId) {
+  if (!legalizeOnRoute() || !target) return;
+  if (target.classId === 'npc_back_alley_bureaucrat' && verbId === 'talk_to') {
+    legalizeBriefing(target);
+    return;
+  }
+  if (['legalize_transit_gate', 'legalize_hall_entrance'].includes(target.classId)) {
     const action = target.state?.routeAction;
     let result = { ok: false };
     let spawn = null;
@@ -13608,38 +13492,29 @@ function handleLegalizeTarget(target, verbId) {
     let message = '';
     if (action === 'depart_back_alley' && verbId === 'travel') {
       result = departForBackAlley(legalizeRun);
-      spawn = spawnLegalizeBackAlley;
-      activity = 'The subway carries you into The Back Alley.';
+      spawn = () => legalizeSceneTransition('The Back Alley', spawnLegalizeBackAlley);
+      activity = 'You are whisked away to The Back Alley.';
       message = 'Find the Shady Bureaucrat in the forest.';
-    } else if (action === 'enter_back_alley_station' && verbId === 'enter') {
-      result = enterBackAlleyStation(legalizeRun);
-      spawn = spawnLegalizeBackAlleyStation;
-      activity = 'You enter The Back Alley Subway Station.';
-      message = 'Take the train back to Gregarious Grange.';
-    } else if (action === 'travel_gregarious' && verbId === 'travel') {
-      result = travelToGregarious(legalizeRun);
-      spawn = spawnLegalizeGregariousStation;
-      activity = 'The subway returns you to Gregarious Grange.';
-      message = 'Exit the station to reach the Bureaucratic Hall.';
     } else if (action === 'exit_gregarious_station' && verbId === 'exit') {
       result = exitToGregariousGrange(legalizeRun);
       spawn = spawnLegalizeGregariousExterior;
       activity = 'You step out onto Gregarious Grange.';
-      message = 'The Bureaucratic Hall is just across the meadow.';
+      message = 'The Bureaucratic Hall is along the street to the left.';
     } else if (action === 'enter_hall' && verbId === 'enter') {
-      result = enterBureaucraticHall(legalizeRun);
+      if (legalizeRun.stage === 'grange_exterior') {
+        result = enterBureaucraticHall(legalizeRun);
+      } else if (['hall_waiting', 'hall_called', 'hall_processing'].includes(legalizeRun.stage)) {
+        // location.js 810-819: leaving the hall cleared the visit, so an application under way starts over.
+        Object.assign(legalizeRun, { stage: 'hall_waiting', handoffs: 0, clerkIndex: 0 });
+        result = { ok: true };
+      }
       spawn = spawnLegalizeHall;
       activity = 'You enter the Bureaucratic Hall.';
       message = '';
     }
     if (!result.ok || !spawn) return;
-    legalizeTransitionBusy = true;
-    spawn();
-    legalizeTransitionBusy = false;
-    pushActivity(activity);
     // In the hall a bureaucrat greets you (js/bureaucratic-hall.js), as in every hall.
-    if (message) toast(message, 4200);
-    return;
+    legalizeRunStep(spawn, activity, message);
   }
 }
 
@@ -13685,7 +13560,7 @@ function activateLegalizeCard() {
 
 async function startLegalizeIt(opts = {}) {
   if (legalizeStartPromise) return legalizeStartPromise;
-  if (legalizeIsInstanced()) return legalizeRun;
+  if (legalizeOnRoute()) return legalizeRun;
   legalizeStartPromise = (async () => {
     if (!questState.active?.[LEGALIZE_QUEST_ID]) {
       const assigned = assignQuest(questState, LEGALIZE_QUEST_ID, { ignorePrereq: true });
@@ -13700,32 +13575,26 @@ async function startLegalizeIt(opts = {}) {
     legalizeRun.sourceLocation ||= createLegalizeState(legalizeSourceLocation).sourceLocation;
     legalizeSourceLocation = legalizeRun.sourceLocation || legalizeSourceLocation;
     savePlayerLocation(legalizeSourceLocation);
+    // A save from before the route ran on the real places: the alley's station is the real one.
+    if (legalizeRun.stage === 'back_alley_station') travelToGregarious(legalizeRun);
     const stage = legalizeRun.stage;
     if (stage === 'gregarious_departure') {
-      spawnLegalizeDepartureStation();
+      await spawnLegalizeDepartureStation();
       pushActivity('You arrive at Gregarious Grange Subway Station.');
-      toast('Take the subway to The Back Alley.', 3600);
+      toast('Push A Red Button at the gate.', 3600);
     } else if (['back_alley', 'back_alley_briefed'].includes(stage)) {
-      spawnLegalizeBackAlley();
+      await legalizeSceneTransition('The Back Alley', spawnLegalizeBackAlley);
       pushActivity('You arrive in the forest at The Back Alley.');
-      toast(
-        stage === 'back_alley'
-          ? 'Find the Shady Bureaucrat.'
-          : 'Return through The Back Alley Subway Station.',
-        3600
-      );
-    } else if (stage === 'back_alley_station') {
-      spawnLegalizeBackAlleyStation();
-      pushActivity('You return to The Back Alley Subway Station.');
-      toast('Take the subway to Gregarious Grange.', 3600);
+      if (stage === 'back_alley') toast('Find the Shady Bureaucrat.', 3600);
+      else setTimeout(() => legalizeLeaveAlley(), 500);
     } else if (stage === 'gregarious_arrival') {
-      spawnLegalizeGregariousStation();
+      await spawnLegalizeGregariousStation();
       pushActivity('You arrive at Gregarious Grange Subway Station.');
       toast('Exit the station to Gregarious Grange.', 3600);
     } else if (stage === 'grange_exterior') {
-      spawnLegalizeGregariousExterior();
+      await spawnLegalizeGregariousExterior();
       pushActivity('You return to Gregarious Grange.');
-      toast('Enter the Bureaucratic Hall across the meadow.', 3600);
+      toast('Enter the Bureaucratic Hall along the street.', 3600);
     } else {
       // location.js 810-819: leaving the hall cleared the visit, so an application under way starts over.
       if (['hall_called', 'hall_processing'].includes(stage)) Object.assign(legalizeRun, { stage: 'hall_waiting', handoffs: 0, clerkIndex: 0 });
@@ -13777,7 +13646,7 @@ async function leaveLegalizeIt({ abandon = false } = {}) {
 }
 
 function confirmLeaveLegalizeIt() {
-  if (!legalizeIsInstanced()) return;
+  if (!legalizeOnRoute()) return;
   openScriptedQuestDialogue({
     title: 'Legalize It',
     kicker: 'Leave the application?',
@@ -13791,7 +13660,7 @@ function confirmLeaveLegalizeIt() {
 }
 
 function updateLegalizeIt() {
-  if (!legalizeIsInstanced() || legalizeTransitionBusy || !player) return;
+  if (!legalizeOnRoute() || legalizeTransitionBusy || !player) return;
   const now = Date.now();
   for (const target of legalizeTargets) {
     const sprite = target?.sprite;
@@ -13803,6 +13672,14 @@ function updateLegalizeIt() {
     ) {
       setLegalizeBureaucratAnimation(target, 'idle');
     }
+  }
+  // The back_alley_entered box (location.js 1314-1321): walking in starts the Bureaucrat's proposition.
+  if (
+    currentStreetTsid === LEGALIZE_BACK_ALLEY_TSID && legalizeRun.stage === 'back_alley' &&
+    inEnteredBox(player.x) && !isQuestDialogueOpen()
+  ) {
+    const shady = legalizeTargets.find((entry) => entry.classId === 'npc_back_alley_bureaucrat');
+    if (shady) legalizeBriefing(shady);
   }
   // The waiting area, Please Wait and the calls are the hall's own visit (features/bureaucratic-halls-feature.js).
   const autoplayMode =
@@ -13822,39 +13699,34 @@ function updateLegalizeIt() {
     return;
   }
   if (autoplayMode === 'purchase' && legalizeRun.stage === 'card_owned') return;
-  if (legalizeRun.stage === 'gregarious_departure') {
-    const gate = legalizeTargets.find(
-      (entry) => entry.state?.routeAction === 'depart_back_alley'
-    );
-    if (gate) handleLegalizeTarget(gate, 'travel');
-  } else if (legalizeRun.stage === 'back_alley') {
-    const shady = legalizeTargets.find(
-      (entry) => entry.classId === 'npc_back_alley_bureaucrat'
-    );
-    if (shady) {
-      player.position.set(shady.sprite.x - 45, GROUND_Y);
-      handleLegalizeTarget(shady, 'talk_to');
+  const streetDoor = (id) => interactables.find((t) => t.classId === 'street_door' && t.door?.id === id);
+  if (legalizeRun.stage === 'gregarious_departure' && currentStreetTsid === LEGALIZE_STATION_STREET) {
+    // Push A Red Button, then OK on the papers refusal.
+    const ok = document.querySelector('.subway-dialog button[data-value="ok"]');
+    if (ok) {
+      ok.click();
+      return;
     }
-  } else if (legalizeRun.stage === 'back_alley_briefed') {
-    const entrance = legalizeTargets.find(
-      (entry) => entry.state?.routeAction === 'enter_back_alley_station'
-    );
-    if (entrance) handleLegalizeTarget(entrance, 'enter');
-  } else if (legalizeRun.stage === 'back_alley_station') {
-    const gate = legalizeTargets.find(
-      (entry) => entry.state?.routeAction === 'travel_gregarious'
-    );
-    if (gate) handleLegalizeTarget(gate, 'travel');
-  } else if (legalizeRun.stage === 'gregarious_arrival') {
-    const exit = legalizeTargets.find(
-      (entry) => entry.state?.routeAction === 'exit_gregarious_station'
-    );
-    if (exit) handleLegalizeTarget(exit, 'exit');
-  } else if (legalizeRun.stage === 'grange_exterior') {
-    const hall = legalizeTargets.find(
-      (entry) => entry.state?.routeAction === 'enter_hall'
-    );
-    if (hall) handleLegalizeTarget(hall, 'enter');
+    const gate = interactables.find((t) => t.classId === 'subway_gate');
+    if (gate && !document.querySelector('.subway-dialog')) {
+      player.x = gate.sprite.x - 70;
+      executeVerb(gate, 'push');
+    }
+  } else if (legalizeRun.stage === 'back_alley' && currentStreetTsid === LEGALIZE_BACK_ALLEY_TSID) {
+    // Walk into the entered box.
+    player.x = ALLEY.triggerX - 40;
+  } else if (legalizeRun.stage === 'gregarious_arrival' && currentStreetTsid === LEGALIZE_STATION_STREET) {
+    const stairs = streetDoor(LEGALIZE_STAIRS_DOOR);
+    if (stairs) {
+      player.x = stairs.sprite.x + 40;
+      executeVerb(stairs, 'exit');
+    }
+  } else if (legalizeRun.stage === 'grange_exterior' && currentStreetTsid === LEGALIZE_GRANGE_STREET) {
+    const hall = streetDoor(LEGALIZE_HALL_DOOR);
+    if (hall) {
+      player.x = hall.sprite.x;
+      executeVerb(hall, 'enter');
+    }
   } else if (['hall_waiting', 'hall_called', 'hall_processing'].includes(legalizeRun.stage)) {
     // One step of the hall's visit: answer, step into the waiting area, skip the walks and the wait.
     features.query('hallAutoStep', engine);

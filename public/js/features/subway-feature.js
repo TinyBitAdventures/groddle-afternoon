@@ -477,6 +477,8 @@ function pushGate(engine) {
   if (refusal) {
     openDialog(engine, { id: `refused-${refusal.code}`, kicker: TEXT.gateLabel, paras: [refusal.text], choices: [{ label: TEXT.ok, value: 'ok', primary: true }] }, () => {
       if (refusal.code !== 'papers') return;
+      // subway_gate.js 158: no card yet, so on to Legalize It (game.js: the quest's way into The Back Alley).
+      if (engine.papersRefused?.()) return;
       const hint = papersHint({
         hasCardBadge: (engine.unlockedAchievements || []).includes(CARD_BADGE),
         hasPapersItem: countItem(engine.inv, 'your_papers') > 0,

@@ -171,7 +171,7 @@ describe('wiring: the stand-ins are gone', () => {
       assert.match(src, /playSheetOverlay\(engine\.PIXI, 'proto_puff'/, f);
       assert.doesNotMatch(src, /function puff\(engine, x, y\)/, f);
     }
-    assert.match(read('js/quest-rooms/back-alley.js'), /playSheetOverlay\(ctx\.PIXI, 'smoke_puff'/);
+    assert.match(read('js/quest-rooms/back-alley.js'), /playSheetOverlay\(wctx\.PIXI, 'smoke_puff'/);
   });
 
   it('play_glitch and the sneeze stand on their points too', () => {

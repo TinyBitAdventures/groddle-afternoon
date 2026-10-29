@@ -2,7 +2,9 @@
  * We're Off to See the Lizard (public/js/quest-rooms/back-alley.js): source
  * constants and dialogue from quests/fuelmaking_refuel_robot.js,
  * items/npc_bureaucrat.js and items/npc_maintenance_bot.js; the subway door
- * table against the imported streets; the world hooks on a stub context.
+ * table against the imported streets; the bot on the real stations (js/subway.js)
+ * and the world hooks on a stub context; the one Back Alley set it shares with
+ * Legalize It.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -32,17 +34,18 @@ import {
   PUFF_DY,
   QUEST,
   REVIVE,
-  STATION,
   SUBWAY_STREETS,
   alleyPlatforms,
   botVerbs,
-  chooseStage,
+  botSpot,
+  botWaits,
   inBotBox,
   nearestStation,
   room,
   stationForDoor,
-  stationPlatforms,
-} from '../public/js/quest-rooms/back-alley.js?v=g446-2';
+} from '../public/js/quest-rooms/back-alley.js?v=g450-1';
+import * as alleySet from '../public/js/quest-rooms/back-alley-set.js?v=g450-1';
+import { STATION_FLOOR, STATIONS, stationArrival, stationByTsid, surfaceStation } from '../public/js/subway.js?v=play-1';
 import { BACK_ALLEY_FILES } from '../public/js/quest-rooms/back-alley-art.js';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js';
 
@@ -108,7 +111,10 @@ describe("We're Off to See the Lizard (fuelmaking_refuel_robot) source", () => {
     assert.ok(existsSync(join(root, 'public', room.icon)));
     for (const f of ['bot_move.png', 'bot_attract.png']) assert.ok(existsSync(join(root, 'public/assets/sprites/quest-rooms/back_alley', f)), f);
     for (const f of ['bot_talk.png']) assert.ok(existsSync(join(root, 'public/assets/sprites/quest-rooms/le_miserable', f)), f);
-    for (const d of ['subway_platform_1', 'forest_hole_back', 'ground_forest_terrain_plat_01', 'tree_background_01', 'tree_background_02', 'tree_background_03', 'tree_front_01', 'tree_front_02']) {
+    const set = readFileSync(join(root, 'public/js/quest-rooms/back-alley-set.js'), 'utf8');
+    const decos = [...set.matchAll(/'((?:tree|bush|groddle|wallpaper|platform|forest)_[a-z0-9_]+)'/g)].map((m) => m[1]);
+    assert.ok(decos.length >= 10, 'the set draws from the Groddle decos');
+    for (const d of new Set(decos)) {
       assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${d}.webp`)), d);
     }
   });
@@ -164,9 +170,21 @@ describe('Subway stations', () => {
     assert.equal(nearestStation('999').label, 'Gregarious Grange');
   });
 
-  it('opens the alley until the Bureaucrat has spoken', () => {
-    assert.equal(chooseStage({ talked: false }), 'alley');
-    assert.equal(chooseStage({ talked: true }), 'station');
+  it('puts every street in the table on a real station of the Ur subway', () => {
+    for (const row of SUBWAY_STREETS) {
+      const station = surfaceStation(row.street);
+      assert.ok(station, row.label);
+      assert.equal(stationByTsid(station.streetTsid), station);
+    }
+    assert.equal(STATIONS.length, SUBWAY_STREETS.length, 'all twelve stations');
+  });
+
+  it('keeps the bot waiting on any station from the meeting until it is refuelled', () => {
+    assert.equal(botWaits({ active: true, talked: false, station: true }), false, 'not before the Bureaucrat has spoken');
+    assert.equal(botWaits({ active: true, talked: true, station: true }), true);
+    assert.equal(botWaits({ active: true, talked: true, station: false }), false, 'stations only');
+    assert.equal(botWaits({ active: true, talked: true, refueled: true, station: true }), false);
+    assert.equal(botWaits({ active: false, talked: true, station: true }), false);
   });
 });
 
@@ -196,14 +214,24 @@ describe('Back Alley and station geometry', () => {
     assert.ok(Math.abs(S.log.left + w - S.log.right) <= 2, 'the log span is the art width');
   });
 
-  it('keeps the bot the source 778 px from the arrival and everything in reach', () => {
-    const [platform] = stationPlatforms(kit);
-    assert.equal(STATION.botX - STATION.spawnX, 778);
-    assert.ok(STATION.botX < platform.x2 - 100);
-    assert.ok(STATION.exitX < STATION.spawnX);
-    assert.ok(platform.x2 <= STATION.trainX, 'the train is not walkable');
-    // The exit sign and bot sit on the floor: well inside the visible band.
-    assert.ok(STATION.FLOOR - (STATION.FLOOR - 150) <= BAND);
+  it('stands the bot at the source x 198 on the station floor, 778 px from the stairs arrival', () => {
+    const spot = botSpot();
+    const arrive = stationArrival(-580);
+    assert.equal(spot.x - arrive.x, 778);
+    assert.equal(spot.y, arrive.y, 'on the platform floor');
+    assert.equal(STATION_FLOOR, -136);
+    assert.ok(Math.abs(STATION_FLOOR - BOT_SOURCE.y) <= 10, 'the source y -140 is the floor');
+  });
+
+  it('is the one set Legalize It draws too', () => {
+    assert.equal(alleySet.BACK_ALLEY_TSID, 'LIF177DTS6T1KFG');
+    assert.equal(ALLEY, alleySet.ALLEY);
+    assert.equal(ALLEY_SET, alleySet.ALLEY_SET);
+    assert.ok(alleySet.inEnteredBox(ALLEY.triggerX) && !alleySet.inEnteredBox(ALLEY.spawnX));
+    assert.equal(alleySet.SHADY.x, ALLEY.bureaucratX);
+    const game = readFileSync(join(root, 'public/game.js'), 'utf8');
+    assert.match(game, /import \{ ALLEY, SHADY, drawAlley, inEnteredBox \} from '\.\/js\/quest-rooms\/back-alley-set\.js\?v=g450-1';/);
+    assert.match(game, /const layer = drawAlley\(PIXI\);/);
   });
 });
 
@@ -222,30 +250,27 @@ describe('World hooks', () => {
   }
   const subwayDoor = { classId: 'street_door', door: { connect: { label: 'Gregarious Grange Subway Station', tsid: 'LCR177QO65T1EON' } } };
 
-  it('leaves subway doors alone until the Bureaucrat has spoken', () => {
-    const { wctx } = world({});
-    assert.equal(room.world.verbOverride(wctx, subwayDoor), null);
+  it('leaves subway doors to the subway feature: the stations are the real ones', () => {
+    assert.equal(room.world.verbOverride, undefined);
+    assert.equal(room.world.runVerbOverride, undefined);
+    const { wctx } = world({ talk_to_bureaucrat: 1 });
+    assert.deepEqual(room.world.verbs(wctx, subwayDoor), []);
   });
 
-  it('opens the station from a subway door after the meeting', () => {
-    const { wctx, log } = world({ talk_to_bureaucrat: 1 });
-    room.world.onTick(wctx);
-    const verbs = room.world.verbOverride(wctx, subwayDoor);
-    assert.equal(verbs[0].id, 'ba_station');
-    assert.equal(room.world.verbOverride(wctx, { classId: 'street_door', door: { connect: { label: 'Bureaucratic Hall' } } }), null);
-    assert.equal(room.world.runVerbOverride(wctx, subwayDoor, 'ba_station'), true);
-    assert.deepEqual(log.started, [QUEST]);
-    assert.equal(room.firstStage(QUEST), 'station');
-    assert.equal(room.durationFor(QUEST), 0, 'a station has no clock');
-    const ctx = { data: {}, run: { returnTo: { tsid: 'GLI32G3NUTD100I' } }, engine: { street: { hubId: '58' } } };
-    room.start(ctx);
-    assert.equal(ctx.data.station.station, 'Gregarious Grange Subway Station');
-    assert.equal(ctx.data.station.label, 'Gregarious Grange');
-  });
-
-  it('closes the door again once the bot is refuelled', () => {
-    const { wctx } = world({ talk_to_bureaucrat: 1, refuel_bot: 1 });
-    assert.equal(room.world.verbOverride(wctx, subwayDoor), null);
+  it('puts no bot on a street that is not a station, nor before the meeting', () => {
+    const calls = [];
+    const stub = (progress, tsid) => {
+      const { wctx } = world(progress);
+      wctx.register = (t) => { calls.push(t); return t; };
+      wctx.setData = () => {};
+      room.world.onStreetEnter(wctx, { tsid });
+      return wctx;
+    };
+    const station = surfaceStation('GLI32G3NUTD100I').streetTsid;
+    stub({ talk_to_bureaucrat: 1 }, 'GLI32G3NUTD100I');
+    stub({}, station);
+    stub({ talk_to_bureaucrat: 1, refuel_bot: 1 }, station);
+    assert.equal(calls.length, 0);
   });
 
   it('counts a Fuelmaker run and turns in when the bot is already fixed', () => {
@@ -262,6 +287,7 @@ describe('World hooks', () => {
 
   it('starts in the alley with the 3-minute clock before the meeting', () => {
     const { wctx } = world({});
+    wctx.param = () => '';
     room.world.onTick(wctx);
     assert.equal(room.firstStage(QUEST), 'alley');
     assert.equal(room.durationFor(QUEST), ALLEY_MS);
