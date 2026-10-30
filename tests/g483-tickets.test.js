@@ -377,8 +377,14 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
 
   it('an administrator\'s reply emails the player once until they read it, within the site\'s mail ceiling', () => {
     const php = src('src/AdminTickets.php');
-    assert.match(php, /\$waiting = TicketStore::unreadFor\(\$row, TicketStore::PLAYER\);/);
-    assert.match(php, /\$delivery = \$waiting \? 'unread' : \$this->mail\(/);
+    assert.match(php, /\$waiting = \$email && \$this->mailWaiting\(\$row\);/);
+    assert.match(php, /\$delivery = !\$email \? 'note' : \(\$waiting \? 'unread' : \$this->mail\(/);
+    // Waiting means an emailed reply they have not read: unread news and a 'mailed' reply logged since they read it.
+    const waiting = php.slice(php.indexOf('private function mailWaiting('), php.indexOf('private function mail('));
+    assert.match(waiting, /TicketStore::unreadFor\(\$row, TicketStore::PLAYER\)/);
+    assert.match(waiting, /kind = 'reply' AND delivery = 'mailed' AND detail LIKE \?/);
+    assert.match(waiting, /'\{"ticket":' \. \(int\) \$row\['id'\] \. ',%'/);
+    assert.match(waiting, /AND at > \?/);
     assert.match(php, /overHourCap\(\$now, 'report reply'\)/);
     assert.match(php, /\$limits->record\(MailLimits::REPLY,/);
     assert.match(src('src/MailLimits.php'), /public const REPLY = 'reply';/);
@@ -388,10 +394,30 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
     assert.doesNotMatch(src('src/TicketMigration.php'), /mail\(/);
   });
 
+  it('an administrator can reply without an email: a note, logged as delivery note, the player still sees it (Austin 2026-10-30)', async () => {
+    const php = src('src/AdminTickets.php');
+    assert.match(php, /\$email = \(\$body\['email'\] \?\? true\) !== false;/, 'emailing stays the default');
+    assert.match(php, /AdminConsole::recordAction\(\$this->minn->db, \$admin->id, \$player, 'reply', \[.*\], \$delivery, \$now\);/);
+    assert.match(php, /'note' => "Note added\. \{\$name\} sees it in the game; no email went\.",/);
+    // The note is a message like any reply: the same store call, so the thread and the badge show it.
+    assert.match(php, /\$this->store\(\)->add\(\(int\) \$row\['id'\], \$admin->id, TicketStore::ADMIN, \$message, \$now\);\s*\$delivery = /);
+    const page = src('src/AdminConsolePage.php');
+    assert.match(page, /<label class="console-check"><input type="checkbox" name="noemail" data-console-reply-noemail \/> Don't email<\/label>/);
+    assert.ok(!/data-console-reply-noemail[^>]*checked/.test(page), 'unticked: emailing is the default');
+    const js = src('console/console.js');
+    assert.match(js, /body: \{ message: text, email: !noEmail\.checked \}/);
+    const mod = await import(pathToFileURL(sitePath('console/console.js')).href);
+    assert.deepEqual(mod.replyFormWords(false).send, 'Send reply');
+    assert.deepEqual(mod.replyFormWords(true).send, 'Add note');
+    assert.match(mod.replyFormWords(true).placeholder, /No email goes/);
+    assert.equal(mod.logWords({ kind: 'reply', player: { name: 'Ada' }, detail: { subject: 'Pigs' }, delivery: 'note' }), 'replied to Ada\'s report “Pigs” (a note, not emailed)');
+    for (const w of [...Object.values(mod.replyFormWords(true)), ...Object.values(mod.replyFormWords(false))]) assert.ok(!/[—–]/.test(w), w);
+  });
+
   it('the console has a Reports tab: list, thread, reply, close and reopen, and the old reports\' button', async () => {
     const page = src('src/AdminConsolePage.php');
     for (const hook of ['data-console-tab="reports"', 'data-console-tickets', 'data-console-thread', 'data-console-reply', 'data-console-thread-close', 'data-console-thread-reopen', 'data-console-migrate', 'data-console-ticket-filter']) assert.ok(page.includes(hook), hook);
-    assert.match(page, /ASSET_KEY = 'g491-1'/);
+    assert.match(page, /ASSET_KEY = 'g491-2'/);
     const js = src('console/console.js');
     for (const route of ["admin/tickets?status=", "admin/tickets/${id}", "admin/tickets/${tickets.open}/reply", "admin/tickets/${tickets.open}/${kind}", "admin/tickets/migrate"]) assert.ok(js.includes(route), route);
     assert.match(js, /el\('p', \{ class: 'console-msg-body', text: m\.body \}\)/, 'messages set as text');
