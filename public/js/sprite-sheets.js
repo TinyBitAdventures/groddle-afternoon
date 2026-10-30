@@ -1,4 +1,4 @@
-import { upgradeSource } from './sprite-hires.js?v=bf62077e';
+import { upgradeSource } from './sprite-hires.js?v=e2867181';
 import { frameTexture, loadTexture, whenLoaded } from './textures.js?v=01a295a1';
 
 /**

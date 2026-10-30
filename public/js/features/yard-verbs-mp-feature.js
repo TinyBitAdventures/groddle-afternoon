@@ -44,7 +44,7 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textur
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=9d3a8ec3';
 import { readVisitScene } from '../neighbours-mp.js?v=31a75688';
 import { saveStore } from '../save-store.js?v=b74a8113';
-import { STREET_GROUND_Y } from './homes-feature.js?v=8995a326';
+import { STREET_GROUND_Y } from './homes-feature.js?v=aa16dd07';
 import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=22fe1430';
 import {
   YARD_STREET,

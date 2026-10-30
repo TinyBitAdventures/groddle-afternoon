@@ -29,7 +29,7 @@ import {
   midTowerRoomByTsid,
   midTowerRoomStreet,
 } from '../public/js/tower-mid-rooms.js?v=15143f80';
-import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=00b35857';
+import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=d9f7ec0b';
 import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=b6ae268a';
 import { populationForStreet } from '../public/js/street-ecology.js?v=dbcefe18';
 

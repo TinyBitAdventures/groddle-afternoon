@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e2372a6b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5ee36fdd';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a57a5976';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -532,7 +532,7 @@ import {
   recipeToolInUse,
 } from './js/making.js?v=9e538296';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=2ce23a81';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=f86a1ce6';
 import {
   createGarden,
   tickGarden,
@@ -865,7 +865,7 @@ import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreferen
 import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=0fbf7744';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
-import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=bf62077e';
+import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=e2867181';
 import { denseSprite } from './js/sprite-dense.js?v=8e0109eb';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from './js/notify.js?v=3383e8be';

@@ -42142,5 +42142,37 @@
   "frameScores": [
    0.9791
   ]
+ },
+ "assets/sprites/races/race_ticket_dispenser.png": {
+  "animal": "race-ticket-dispenser",
+  "swf": "misc/race_ticket_dispenser/race_ticket_dispenser.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 58,
+  "fh": 94,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -173,
+   -280
+  ],
+  "score": 0.9822,
+  "minFrame": 0.9822,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/races/race_ticket_dispenser@3x.webp",
+  "bytes": 18360,
+  "firstDraw": true,
+  "frameScores": [
+   0.9822
+  ]
  }
 }

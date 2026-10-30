@@ -2113,6 +2113,7 @@
       "assets/sprites/quests/rook-museum/rook_hall_speaker__x1_stop_png_1354835940@3x.webp": "a9ab22a7",
       "assets/sprites/quests/rook-woods/crusher@3x.webp": "3a6386ff",
       "assets/sprites/races/hogtied_piggy__x1_1_png_1354830331@3x.webp": "271e28f7",
+      "assets/sprites/races/race_ticket_dispenser@3x.webp": "ea67620d",
       "assets/sprites/resources/dust-trap-down@3x.webp": "5116d6f7",
       "assets/sprites/resources/dust-trap-idle@3x.webp": "7eb9fe60",
       "assets/sprites/resources/dust-trap-smack-down@3x.png": "961161f7",

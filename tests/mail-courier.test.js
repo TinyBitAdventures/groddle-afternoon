@@ -216,7 +216,7 @@ describe('mail npc art (tools/mail-npc-art/build.mjs)', () => {
   });
 
   it('G448: the frog\'s 28 sheets have 3x renders from npc_yoga_frog.swf that swap in on first draw', async () => {
-    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=bf62077e');
+    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=e2867181');
     const results = JSON.parse(readFileSync(join(root, 'tools/vector-sprites/results.json'), 'utf8'));
     let n = 0;
     for (const label of Object.keys(FROG_ART.sheets)) {
@@ -244,7 +244,7 @@ describe('mail courier feature', () => {
   it('calls the frog with the source prompt once a letter is due, and waits in an instance', async () => {
     mock.timers.enable({ apis: ['Date'], now: 1_000_000 });
     try {
-      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?v=1d33b8b9');
+      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?v=f748b2c1');
       const st = createMailboxState();
       const prompts = [];
       let instance = false;

@@ -1,5 +1,5 @@
 {
- "about": "World still items the stills sweep (lane SPRITES, 2026-10-29) found drawn at 1.5+ need/available at 3 device px per world px, each from its own CC0 SWF in glitch-items: the Visiting Stone, notes, gift boxes, notice boards and the left mailbox (features/street-furniture-feature.js), the home furniture base pieces (furniture/furniture_base and bag_furniture_cabinet_base, js/home-decor.js), the street-job sign stake, the Party ATM, the Rook Hall speaker and the Butler's box (js/butler.js BUTLER_BOX_ART); G446: Hell's Bunch of Grapes on the floor (js/hell.js, four states) and Señor Funpickle's still (features/funpickle-feature.js). Root-timeline items render from a copy with a padded stage (padStage). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/stills.json",
+ "about": "World still items the stills sweep (lane SPRITES, 2026-10-29) found drawn at 1.5+ need/available at 3 device px per world px, each from its own CC0 SWF in glitch-items: the Visiting Stone, notes, gift boxes, notice boards and the left mailbox (features/street-furniture-feature.js), the home furniture base pieces (furniture/furniture_base and bag_furniture_cabinet_base, js/home-decor.js), the street-job sign stake, the Party ATM, the Rook Hall speaker and the Butler's box (js/butler.js BUTLER_BOX_ART); G446: Hell's Bunch of Grapes on the floor (js/hell.js, four states) and Señor Funpickle's still (features/funpickle-feature.js). SHARP3 (2026-10-30, Original zoom draws the street at about 2.9 backing px per world px on a 1440 px Retina window): the Race Ticket Dispenser (features/races-feature.js). Root-timeline items render from a copy with a padded stage (padStage). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/stills.json",
  "firstDraw": true,
  "jobs": [
   {
@@ -1034,6 +1034,23 @@
      "path": "assets/sprites/races/hogtied_piggy__x1_1_png_1354830331.png",
      "fw": 45,
      "fh": 40,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "race-ticket-dispenser",
+   "swf": "misc/race_ticket_dispenser/race_ticket_dispenser.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/races/race_ticket_dispenser.png",
+     "fw": 58,
+     "fh": 94,
      "cols": 1,
      "frames": 1,
      "swfStart": 1,
