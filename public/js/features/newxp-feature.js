@@ -102,6 +102,7 @@ import {
   inHitBox,
   isNewxpSceneTsid,
   islandExitOpen,
+  exitBoxAction,
   nextStage,
   normalizeNewxpSave,
   pickNewxpExit,
@@ -114,7 +115,7 @@ import {
   training2Layout,
   tutorialPhysics,
   vogPages,
-} from '../newxp.js?v=g449-1';
+} from '../newxp.js?v=g481-2';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=g424-1';
 import { soundForQuoin } from '../sound-moments.js?v=g393-1';
@@ -127,7 +128,7 @@ import * as kit from '../quest-rooms/kit.js?v=g458-1';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g463-2';
-import { HOME_MACHINE } from '../home-ticket.js?v=g449-1';
+import { HOME_MACHINE } from '../home-ticket.js?v=g481-2';
 import { createAnimalState } from '../animals.js?v=g478-1';
 import {
   AK_ANIMALS,
@@ -2700,6 +2701,38 @@ async function leaveIsland(engine) {
   islandEnter(engine);
 }
 
+let exitBoxBusy = false;
+/**
+ * newbie_island.js hitBox gentle_island_exit (24-29): the box at the end of Gentle Island Exit, under
+ * the down arrow, sends anyone in it to a newxp exit (player.js teleportHome 2041-2045), whether or not
+ * the tutorial is running. The tutorial's last step goes through leaveIsland (islandTick); everyone
+ * else is just taken off the island, the save left as it is.
+ */
+function exitBoxTick(engine) {
+  const box = ISLAND_BOXES.gentle_island_exit;
+  if (exitBoxBusy || engine.streetTsid !== box.tsid || exitBoxAction(save) !== 'teleport') return;
+  const p = P();
+  if (!p || !inHitBox(box, p.x, p.y) || islandBusy || engine.busy?.()) return;
+  exitBoxBusy = true;
+  takeExitBox(engine)
+    .catch((err) => console.warn('newxp exit box', err))
+    .finally(() => { exitBoxBusy = false; });
+}
+
+async function takeExitBox(engine) {
+  const from = engine.streetTsid;
+  const open = await exitRoads(engine);
+  if (engine.streetTsid !== from) return;
+  const exit = pickOpenExit(Math.random, (tsid) => engine.streetExists(tsid), open);
+  if (!exit) return;
+  engine.setData('newxpExit', exit.tsid);
+  engine.setData('newxpExitBox', 'teleport');
+  await fadeOut();
+  await engine.enter(exit.tsid, { quiet: true, bypassFeatureGates: true });
+  dropAtExit(engine, exit);
+  fadeIn();
+}
+
 let strandChecked = '';
 let strandRetryAt = 0;
 /**
@@ -2791,6 +2824,7 @@ function islandTick(engine, now) {
   const exitBox = ISLAND_BOXES.gentle_island_exit;
   if (tsid === exitBox.tsid && inHitBox(exitBox, p.x, p.y) && islandExitOpen(save.island) && !run.data.leaving) {
     run.data.leaving = true;
+    engine.setData('newxpExitBox', 'tutorial');
     leaveIsland(engine).finally(() => { if (run) run.data.leaving = false; });
   }
   if (save.island === 'quest_given' && questDone(engine, 'buy_two_bags') && !islandBusy) {
@@ -3544,6 +3578,7 @@ export const newxpFeature = {
         })
         .catch((err) => console.warn('newxp stranded', err));
     }
+    exitBoxTick(engine);
     if (!active()) {
       publish(engine, now);
       return;

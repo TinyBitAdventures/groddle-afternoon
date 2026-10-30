@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 827,
+  "commits": 828,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "Things on another level, behind a floor, are no longer offered by Enter or a click"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "Classic's chat panes share the column on a divider you can drag, as 2012's did"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "In Classic, Skills, Buffs, Badges, Quests and the Map open as the 2012 windows"
    }
   ]
  },
- "tests": 461,
+ "tests": 462,
  "generatedAt": "2026-10-30"
 }

@@ -493,6 +493,19 @@ export function islandExitOpen(island) {
   return island === 'leaving';
 }
 
+/**
+ * What the Gentle Island Exit box does for this save. newbie_island.js hitBox
+ * gentle_island_exit (24-29) checks nothing: it sends anyone in it through
+ * player.js teleportHome (2041-2045), a random config.newxp_exits street.
+ * 'tutorial': the tutorial is on the island's last step, so the box also ends
+ * On to the Big Time (leaveIsland); 'teleport': anyone else (the tutorial done,
+ * skipped or never started, or a step the island's own gates skip) just goes.
+ */
+export function exitBoxAction(save) {
+  if (save?.status === 'active' && save?.stage === 'island' && islandExitOpen(save?.island)) return 'tutorial';
+  return 'teleport';
+}
+
 export function normalizeNewxpSave(seed = {}) {
   const s = seed && typeof seed === 'object' ? seed : {};
   const status = ['off', 'active', 'done', 'skipped'].includes(s.status) ? s.status : 'off';

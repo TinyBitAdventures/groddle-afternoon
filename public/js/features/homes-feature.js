@@ -213,7 +213,7 @@ import {
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=g253-1';
 import { getGameDayKey } from '../game-day.js?v=dametime-4';
-import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=g449-1';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=g481-2';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-6';
 import {
   DOOR_CLASS,
