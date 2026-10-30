@@ -4,10 +4,10 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-2';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-330';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-341';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g463-1';
-import { createPromptStack } from './js/prompt-stack.js?v=g463-1';
+import { createPromptStack } from './js/prompt-stack.js?v=g470-1';
 import { createWindowStack } from './js/window-stack.js?v=g428-1';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=g463-2';
 import {
@@ -675,10 +675,11 @@ import {
   streetCardUp,
   STREET_CARD_UP,
   POL_OWNER_SIZE,
-} from './js/screen-fx.js?v=g434-1';
+} from './js/screen-fx.js?v=g470-1';
+import { momentMoreText } from './js/ui/moment-card.js?v=g470-1';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=g459-1';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=g434-1';
-import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=g434-1';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=g470-1';
 import {
   planTravel,
   listMapDestinations,
@@ -2479,6 +2480,7 @@ function enqueueAward(payload) {
 function queueScreen(show, { requiresFocus = true } = {}) {
   // G213: queued screens count as up, so a quest offer check does not slip in before one shows.
   awardsPending += 1;
+  noteScreensWaiting();
   awardQueue = awardQueue
     // STARTCARD: nothing shows over (or under) the start card; a skill finished while away
     // waits until the player starts (Start exploring, Customize look first, the tutorial, Skip).
@@ -2496,8 +2498,18 @@ function queueScreen(show, { requiresFocus = true } = {}) {
       awardsPending = Math.max(0, awardsPending - 1);
       screenClosedAt = performance.now();
       noteScreenHold('');
+      noteScreensWaiting();
     });
   return awardQueue;
+}
+
+/** HUB: the modern moment card's "N more" (js/ui/moment-card.js): screens queued behind the one showing. */
+function noteScreensWaiting() {
+  const more = document.getElementById('award-screen')?.querySelector('[data-award-more]');
+  if (!more) return;
+  const text = momentMoreText(awardsPending - 1);
+  more.textContent = text;
+  more.hidden = !text;
 }
 
 function noteScreenHold(why) {
@@ -26220,6 +26232,24 @@ async function main() {
       entries: () => notify.entries.map((e) => ({ kind: e.kind, text: e.text, count: e.count })),
       stats: () => ({ ...notify.stats, unread: notify.unread }),
       grantBadge: (id) => engine.grantAchievement(id),
+      /**
+       * HUB QA: finish a quest through the game's own path (assign, complete, its rewards and its
+       * award screen, paged when the quest has completion text), e.g. animalkinship_pet_piggies.
+       */
+      completeQuest(id) {
+        try {
+          if (!questState.active[id]) assignQuest(questState, id, { ignorePrereq: true });
+          const result = completeQuest(questState, id, pc);
+          if (!result.ok) return false;
+          announceQuestCompletions([{ classTsid: id, completed: true, rewards: result.rewards, def: result.def }]);
+          updateHud();
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      /** HUB QA: how many award, new-day and Giant screens are queued or showing. */
+      screensPending: () => awardsPending,
     },
     /** Renderer QA: backend, Pixi version and GPU texture use (tools/perf, tools/playtest). */
     renderStats() {

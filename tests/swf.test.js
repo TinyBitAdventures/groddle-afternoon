@@ -25,7 +25,7 @@ import {
   wrangleMessage,
 } from '../public/js/swf.js?v=g190-1';
 import { swfFeature } from '../public/js/features/swf-feature.js?v=g463-2';
-import { FEATURES } from '../public/js/features/index.js?v=registry-330';
+import { FEATURES } from '../public/js/features/index.js?v=registry-341';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
 import { DROP_ITEMS, DROP_TABLES } from '../public/js/drop-tables-data.js';
 

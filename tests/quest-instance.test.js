@@ -388,7 +388,7 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
   };
 
   it('a run lost to a reload marks a startable quest failed, not a retry prompt', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g463-1');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g470-1');
     const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=g403-1');
     assert.equal(getQuestCatalog().mental_block?.needsStart, true);
     assert.notEqual(getQuestCatalog().help_juju_bandits?.needsStart, true, 'no onStarted in GSJS');
@@ -452,7 +452,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('a reload removes a source-removed quest and its offers, and keeps the prompt for the three', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g463-1');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g470-1');
     const { questStatus } = await import('../public/js/quest-offers.js?v=g403-1');
     const t = Date.now() - 60_000;
     questInstancesFeature.restore({ memory: {}, retry: { tower_quest: t, le_miserable_part_2: t, smuggle_the_smuggler_part2: t } });
@@ -480,7 +480,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('has no map card', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g463-1');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g470-1');
     assert.equal(questInstancesFeature.mapCards, undefined);
     const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
     assert.doesNotMatch(src, /Unfinished quest places/);

@@ -749,6 +749,19 @@
   --overlay-dim: rgba(0, 0, 0, 0.4);
   --shadow: rgba(64, 40, 16, 0.16);
 
+  /* HUB: the big moment card (the HUD mock's final sizes; its cqw is vw here) */
+  --moment-w: clamp(460px, 41vw, 640px);
+  --fs-moment-title: clamp(2.125rem, 3vw, 2.5rem); /* 34-40px: the mock's --fs-display for the card */
+  --moment-art: 166px;        /* badge and level art, 1.6x the old 104 */
+  --moment-art-book: 140px;   /* the quest book (86x58 source) */
+  --moment-burst: 192px;      /* the ray burst behind the art */
+  --moment-rays: rgba(255, 200, 60, 0.55);
+  --moment-rays-clear: rgba(255, 200, 60, 0);
+  --art-shadow: rgba(0, 0, 0, 0.28);
+  /* HUB: the Imagination hub dims the world, clear round the avatar */
+  --hub-dim-centre: rgba(10, 8, 30, 0.05);
+  --hub-dim-mid: rgba(10, 8, 30, 0.45);
+  --hub-dim-edge: rgba(10, 8, 30, 0.62);
   /* Classic interface (public/css/classic.css, every rule under :root[data-ui="classic"]; classic-spec
      build-plan §3). Written by hand: each value names its source in the 2012 client's code
      (com/tinyspeck/engine). "code default" is the fallback the client passed to CSSManager, since the
@@ -9733,3 +9746,220 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4)); }
 }
 /* —— end PAPER —— */
+
+/* —— HUB —— */
+/* The big moment card (js/ui/moment-card.js; the award, badge, trophy, level-up and
+   quest-complete screens of js/screen-fx.js showAwardScreen). The HUD mock's "big moment":
+   one cream card under a strong scrim, the art in a ray burst on its top edge. The screen's
+   fades, its "stays until input" rule and its buttons are screen-fx.js's, unchanged. */
+[data-ui="modern"] .award-screen,
+[data-ui="modern"] .award-screen[data-kind="quest"],
+[data-ui="modern"] .award-screen[data-kind="level"],
+[data-ui="modern"] .award-screen[data-paged="true"] {
+  place-items: center;
+  padding: calc(var(--hud-h) + var(--space-5)) var(--space-4) var(--space-4);
+  box-sizing: border-box;
+  background: var(--scrim-strong);
+}
+[data-ui="modern"] .award-screen .award-rays { display: none; }
+[data-ui="modern"] .award-screen .award-card,
+[data-ui="modern"] .award-screen[data-paged="true"] .award-card {
+  position: relative;
+  width: var(--moment-w);
+  max-width: calc(100% - 2 * var(--space-4));
+  min-height: 0;
+  box-sizing: border-box;
+  margin-top: calc(var(--moment-burst) * 0.5);
+  padding: var(--space-6) var(--space-6) 28px;
+  border: 0;
+  border-radius: var(--radius-l);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-3);
+  color: var(--text);
+  font-family: var(--font-ui);
+  text-align: center;
+  text-shadow: none;
+}
+[data-ui="modern"] .award-screen.is-visible .award-card { animation: momentIn 320ms var(--ease-out) both; }
+@keyframes momentIn { from { opacity: 0; transform: translateY(10px) scale(0.92); } }
+/* The art and its burst: 192 px, two thirds of it above the card's top edge. */
+[data-ui="modern"] .award-screen .award-badge,
+[data-ui="modern"] .award-screen[data-paged="true"] .award-badge {
+  position: relative;
+  top: auto;
+  left: auto;
+  width: var(--moment-burst);
+  height: var(--moment-burst);
+  margin: calc(var(--space-6) * -1 - var(--moment-burst) * 0.5) auto var(--space-2);
+  display: grid;
+  place-items: center;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--accent);
+  font-size: var(--fs-hero);
+  animation: awardPop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+[data-ui="modern"] .award-screen .award-badge::before {
+  content: "";
+  position: absolute;
+  inset: -29px;
+  border-radius: var(--radius-round);
+  background: repeating-conic-gradient(from 0deg, var(--moment-rays) 0deg 10deg, var(--moment-rays-clear) 10deg 22deg);
+  -webkit-mask: radial-gradient(circle, var(--c-black) 35%, transparent 70%);
+  mask: radial-gradient(circle, var(--c-black) 35%, transparent 70%);
+  animation: awardSpin 14s linear infinite;
+  pointer-events: none;
+}
+[data-ui="modern"] .award-screen .award-badge img,
+[data-ui="modern"] .award-screen[data-paged="true"] .award-badge img {
+  position: relative;
+  width: var(--moment-art);
+  height: var(--moment-art);
+  object-fit: contain;
+  filter: drop-shadow(0 6px 12px var(--art-shadow));
+}
+[data-ui="modern"] .award-screen[data-art="book"] .award-badge img { width: var(--moment-art-book); height: auto; }
+[data-ui="modern"] .award-screen .award-badge span { position: relative; }
+[data-ui="modern"] .award-screen .award-kicker,
+[data-ui="modern"] .award-screen[data-paged="true"] .award-kicker {
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: var(--fs-base);
+  font-weight: var(--fw-heavy);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 1;
+  text-shadow: none;
+}
+[data-ui="modern"] .award-screen .award-title,
+[data-ui="modern"] .award-screen[data-paged="true"] .award-title {
+  display: block;
+  margin: 6px 0 10px;
+  font-size: var(--fs-moment-title);
+  font-weight: var(--fw-heavy);
+  line-height: 1.1;
+  color: var(--text);
+  text-shadow: none;
+  overflow-wrap: anywhere;
+}
+[data-ui="modern"] .award-screen .award-body,
+[data-ui="modern"] .award-screen[data-paged="true"] .award-body {
+  min-height: 0;
+  margin: 0 auto var(--space-4);
+  max-width: 34em;
+  font-size: var(--fs-lead);
+  line-height: var(--lh-body);
+  color: var(--text-muted);
+  opacity: 1;
+  white-space: pre-line;
+}
+[data-ui="modern"] .award-screen .award-sub,
+[data-ui="modern"] .award-screen[data-paged="true"] .award-sub {
+  margin: 0 auto;
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  color: var(--text-muted);
+  opacity: 1;
+}
+/* Reward chips: 38 px tall, 16 px words, 26 px icons. */
+[data-ui="modern"] .award-screen .award-sub.has-reward-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+[data-ui="modern"] .award-screen .award-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  box-shadow: none;
+  color: var(--text);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-heavy);
+  line-height: var(--lh-none);
+}
+[data-ui="modern"] .award-screen .award-reward:has(.award-reward-icon) { padding-left: 8px; }
+[data-ui="modern"] .award-screen .award-reward-icon { width: 26px; height: 26px; object-fit: contain; }
+/* The button: 44 px tall, 16 px words, the accent (its label and entrance are the client's). */
+[data-ui="modern"] .award-screen .award-next,
+[data-ui="modern"] .award-screen[data-okin="true"] .award-next,
+[data-ui="modern"] .award-screen[data-paged="true"] .award-next {
+  display: block;
+  min-width: 0;
+  min-height: 44px;
+  margin: var(--space-5) auto 0;
+  padding: 0 var(--space-5);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  box-shadow: var(--shadow-1);
+  color: var(--accent-text);
+  font: inherit;
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-heavy);
+  text-shadow: none;
+  cursor: pointer;
+}
+[data-ui="modern"] .award-screen .award-next[hidden] { display: none !important; }
+[data-ui="modern"] .award-screen .award-next:hover,
+[data-ui="modern"] .award-screen[data-okin="true"] .award-next:hover,
+[data-ui="modern"] .award-screen[data-paged="true"] .award-next:hover { background: var(--accent-hover); }
+[data-ui="modern"] .award-screen .award-next:focus-visible {
+  background: var(--accent-hover);
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+/* The quest book's close control and the queued line sit in the card's top corners. */
+[data-ui="modern"] .award-screen[data-paged="true"] .award-close {
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  font-size: var(--fs-3xl);
+  text-shadow: none;
+}
+[data-ui="modern"] .award-screen[data-paged="true"] .award-close:hover,
+[data-ui="modern"] .award-screen[data-paged="true"] .award-close:focus-visible { color: var(--text); background: var(--surface-hover); }
+.award-more { display: none; }
+[data-ui="modern"] .award-screen .award-more:not([hidden]) {
+  display: block;
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  font-size: var(--fs-base);
+  font-weight: var(--fw-heavy);
+  color: var(--text-muted);
+}
+[data-ui="modern"] .award-screen[data-paged="true"] .award-more:not([hidden]) { right: 56px; top: 18px; }
+/* A badge's familiar lands beside the burst, its bubble above it. */
+[data-ui="modern"] .award-screen .award-familiar {
+  left: calc(50% + var(--moment-burst) * 0.5 - 4px);
+  top: calc(var(--space-6) - 68px);
+}
+/* The rock says the kicker's words in its bubble (AchievementView), so the card drops the line. */
+[data-ui="modern"] .award-screen[data-familiar="true"] .award-kicker { display: none; }
+[data-ui="modern"] .award-screen .award-familiar-bubble { color: var(--text); font-size: var(--fs-md); box-shadow: var(--shadow-2); }
+@media (max-width: 640px) {
+  [data-ui="modern"] .award-screen .award-familiar { left: auto; right: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-ui="modern"] .award-screen.is-visible .award-card,
+  [data-ui="modern"] .award-screen .award-badge,
+  [data-ui="modern"] .award-screen .award-badge::before { animation: none; }
+}
+/* —— end HUB —— */

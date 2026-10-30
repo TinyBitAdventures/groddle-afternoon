@@ -2671,9 +2671,19 @@
   ]
  },
  "git": {
-  "commits": 788,
+  "commits": 790,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "In Classic, the online bug icon sits beside help and the level pill loses its old card"
+   },
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "Classic's imagination hub on X: the seven clouds for Skills, Quests, Upgrades, looks, Teleport and home"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2783,19 +2793,9 @@
     "date": "2026-10-30",
     "kind": "fix",
     "text": "A note's red pin shows whole instead of being cut off at the top"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "new",
-    "text": "Low energy and mood turn amber and red, and a click offers something to eat"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "The game fills the window and shows more world on bigger screens"
    }
   ]
  },
- "tests": 445,
+ "tests": 446,
  "generatedAt": "2026-10-30"
 }

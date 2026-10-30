@@ -9,6 +9,7 @@
 
 import { ACHIEVEMENT_DROP, ACHIEVEMENT_ROCK_WH, achievementBubbleText, easeOutBounce, mountPetRock } from './familiar.js?v=g434-1';
 import { formatLoadingTime, ordinal } from './exploration.js';
+import { isModernSkin, momentArt, momentArtShape, rewardChips } from './ui/moment-card.js?v=g470-1';
 
 /**
  * Street-load timings (seconds).
@@ -336,6 +337,28 @@ export function awardRewardTokens(subtitle = '') {
         : 'item';
       return { text, kind };
     });
+}
+
+/**
+ * Fills `sub` with reward pills (awardRewardTokens). The modern card gives each the icon
+ * js/ui/moment-card.js names (iMG, currants, a Giant's emblem).
+ */
+function fillRewardTokens(sub, rewards, { icons = false } = {}) {
+  sub.replaceChildren();
+  for (const reward of rewards) {
+    const token = document.createElement('span');
+    token.className = `award-reward award-reward--${reward.kind}`;
+    if (icons && reward.icon) {
+      const icon = document.createElement('img');
+      icon.src = reward.icon;
+      icon.alt = '';
+      icon.className = 'award-reward-icon';
+      token.appendChild(icon);
+    }
+    token.appendChild(document.createTextNode(reward.text));
+    sub.appendChild(token);
+  }
+  sub.classList.toggle('has-reward-tokens', rewards.length > 0);
 }
 
 /**
@@ -1158,6 +1181,7 @@ export async function showNewDayScreen(el, { button = el?.querySelector?.('[data
  */
 async function showAwardPages(el, { payload, pages, next, close, body, sub }) {
   const win = globalThis.window;
+  const modern = isModernSkin();
   const swallow = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -1186,17 +1210,9 @@ async function showAwardPages(el, { payload, pages, next, close, body, sub }) {
         body.hidden = !page.text;
       }
       if (sub) {
-        sub.replaceChildren();
-        const rewards = awardRewardTokens(payload.subtitle);
-        if (final && rewards.length) {
-          for (const reward of rewards) {
-            const token = document.createElement('span');
-            token.className = `award-reward award-reward--${reward.kind}`;
-            token.textContent = reward.text;
-            sub.appendChild(token);
-          }
-        }
-        sub.classList.toggle('has-reward-tokens', final && rewards.length > 0);
+        const tokens = awardRewardTokens(payload.subtitle);
+        const chips = modern ? rewardChips(tokens) : [];
+        fillRewardTokens(sub, final ? (chips.length ? chips : tokens) : [], { icons: modern });
         sub.hidden = !final || !payload.subtitle;
       }
       next.textContent = page.response;
@@ -1270,6 +1286,11 @@ export async function showAwardScreen(el, payload) {
   const pages = normalizeAwardPages(payload);
   const paged = pages.length > 0 && next;
   const screen = awardScreenKind(payload);
+  // The modern skin's big moment card (js/ui/moment-card.js): art for every moment, reward chips.
+  const modern = isModernSkin();
+  const art = modern ? momentArt(payload) : payload.iconUrl;
+  if (modern && art) el.dataset.art = momentArtShape(art);
+  else delete el.dataset.art;
 
   const kickers = {
     achievement: 'New Achievement!',
@@ -1285,8 +1306,12 @@ export async function showAwardScreen(el, payload) {
     body.hidden = !bodyText;
   }
   if (sub) {
-    sub.textContent = awardText(payload.subtitle);
-    sub.classList.remove('has-reward-tokens');
+    const chips = modern && !paged ? rewardChips(awardRewardTokens(awardText(payload.subtitle))) : [];
+    if (chips.length) fillRewardTokens(sub, chips, { icons: true });
+    else {
+      sub.textContent = awardText(payload.subtitle);
+      sub.classList.remove('has-reward-tokens');
+    }
     sub.hidden = !payload.subtitle || Boolean(paged);
   }
   if (next) next.hidden = true;
@@ -1296,10 +1321,10 @@ export async function showAwardScreen(el, payload) {
   }
   // Real badge PNG when available (Wayback / assets/badges)
   if (img && glyph) {
-    if (payload.iconUrl) {
+    if (art) {
       img.hidden = false;
       img.alt = payload.title || 'Badge';
-      img.src = payload.iconUrl;
+      img.src = art;
       glyph.hidden = true;
       img.onerror = () => {
         img.hidden = true;
