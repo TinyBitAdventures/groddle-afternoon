@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 777,
+  "commits": 778,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "The energy, mood and level numbers sit in the middle of their rings, and \"100\" fits with room to spare"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-29",
     "kind": "new",
     "text": "A Summer's Day is Tiny Speck's own memory street, with its flitterbugs, signs, stones, pool and orbs"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "improve",
-    "text": "The tutorial's look step opens Tiny Speck's new-player picker"
    }
   ]
  },
- "tests": 437,
+ "tests": 438,
  "generatedAt": "2026-10-30"
 }
