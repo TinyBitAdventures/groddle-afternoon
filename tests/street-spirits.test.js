@@ -45,7 +45,7 @@ import {
   offeredFor,
   talkBeats,
 } from '../public/js/street-spirit-talks.js';
-import { runVerb } from '../public/content.js?v=g454-1';
+import { runVerb } from '../public/content.js?v=g455-1';
 import { CONVERSATIONS } from '../public/js/conversations-data.js?v=g202-1';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

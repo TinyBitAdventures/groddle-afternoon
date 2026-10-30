@@ -1,0 +1,153 @@
+{
+ "zoom": 3,
+ "pieces": [
+  {
+   "name": "crusher",
+   "source": "item:misc/crusher/crusher.swf",
+   "swf": "9d8d597c040d7324",
+   "file": "assets/sprites/quests/rook-woods/crusher@3x.webp",
+   "stage": [
+    130,
+    128
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 130,
+   "h": 128,
+   "bytes": 23600,
+   "lossless": false,
+   "error": 1.44,
+   "webp": "3a6386ff537b2d93"
+  },
+  {
+   "name": "rook_hall_painting_01_deco",
+   "source": "bundle:firebog.swf#rook_hall_painting_01_deco",
+   "swf": "5991621ea445c894",
+   "window": [
+    17.95,
+    17.3,
+    400,
+    244
+   ],
+   "picture": "painting-1c.jpg",
+   "file": "assets/sprites/quests/rook-museum/rook_hall_painting_01_frame@3x.webp",
+   "stage": [
+    429,
+    313
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 429,
+   "h": 308,
+   "bytes": 73662,
+   "lossless": false,
+   "error": 0.99,
+   "webp": "343a9f3acab397b0"
+  },
+  {
+   "name": "rook_hall_painting_02_deco",
+   "source": "bundle:firebog.swf#rook_hall_painting_02_deco",
+   "swf": "78939d021dbb322c",
+   "window": [
+    17.95,
+    17.3,
+    400,
+    244
+   ],
+   "picture": "painting-2a.jpg",
+   "file": "assets/sprites/quests/rook-museum/rook_hall_painting_02_frame@3x.webp",
+   "stage": [
+    429,
+    313
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 429,
+   "h": 308,
+   "bytes": 77498,
+   "lossless": false,
+   "error": 1.08,
+   "webp": "31ed336275d9ddc0"
+  },
+  {
+   "name": "rook_hall_painting_03_deco",
+   "source": "bundle:firebog.swf#rook_hall_painting_03_deco",
+   "swf": "418e0a162e3bc227",
+   "window": [
+    17.95,
+    17.3,
+    400,
+    244
+   ],
+   "picture": "painting-3a.jpg",
+   "file": "assets/sprites/quests/rook-museum/rook_hall_painting_03_frame@3x.webp",
+   "stage": [
+    429,
+    313
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 429,
+   "h": 308,
+   "bytes": 73108,
+   "lossless": false,
+   "error": 0.98,
+   "webp": "984a666a6b9b0f95"
+  },
+  {
+   "name": "rook_hall_painting_04_deco",
+   "source": "bundle:firebog.swf#rook_hall_painting_04_deco",
+   "swf": "a71b9f21d0ae4d55",
+   "window": [
+    17.95,
+    17.3,
+    400,
+    244
+   ],
+   "picture": "painting-4c.jpg",
+   "file": "assets/sprites/quests/rook-museum/rook_hall_painting_04_frame@3x.webp",
+   "stage": [
+    429,
+    313
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 429,
+   "h": 308,
+   "bytes": 71010,
+   "lossless": false,
+   "error": 0.92,
+   "webp": "a9523fb5228e5317"
+  },
+  {
+   "name": "rook_hall_placeholder_squawk_stand",
+   "source": "bundle:firebog.swf#rook_hall_placeholder_squawk_stand",
+   "swf": "401cd9533f8c560f",
+   "file": "assets/sprites/quests/rook-museum/rook_hall_placeholder_squawk_stand@3x.webp",
+   "stage": [
+    57,
+    168
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 57,
+   "h": 167,
+   "bytes": 2994,
+   "lossless": false,
+   "error": 1.96,
+   "webp": "5c7c019d25f6df77"
+  }
+ ]
+}

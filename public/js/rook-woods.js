@@ -10,9 +10,16 @@
  * The production instance geometry was not published with the locations dump,
  * so the runtime uses a clean authored route while preserving the source quest
  * contract, two-minute timer, Crusher cycle, tool gates, and four-hit Egg smash.
+ *
+ * Art: the Crushers are Tiny Speck's own crusher.swf (glitch-items, CC0; one
+ * still, the SWF has no states) and the Egg rests in the shipped rook_nest deco
+ * (original_hell/rook_nest.swf, CC0), both through js/rook-art.js and the deco
+ * set. No archived street or GSJS file places anything in the Woods, so the
+ * route, the Crusher spots and the nest's spot are ours.
  */
 
 import { canUseTool } from './tools.js?v=woodcutting-test-8';
+import { ROOK_ART } from './rook-art.js?v=g455-1';
 
 export const ROOK_QUEST_ID = 'rook_egg_smash';
 export const ROOK_WOODS_STREET_ID = 'LLI1AD8LUCH109E';
@@ -103,6 +110,38 @@ export const ROOK_CRUSHERS = Object.freeze([
     size: 120,
   }),
 ]);
+
+/** crusher.swf (glitch-items misc/crusher, CC0): its one still, rendered at 3x by tools/rook-art/build.py. */
+export const ROOK_CRUSHER_ART = Object.freeze({
+  swf: 'crusher.swf',
+  file: ROOK_ART.crusher.file,
+  w: ROOK_ART.crusher.w,
+  h: ROOK_ART.crusher.h,
+});
+
+/**
+ * Drawn size of a Crusher: the art's longer side at the spec's `size`, the
+ * footprint the remake's collision (crusherHitsAvatar) was tuned to. The
+ * source hit box is 125 x 125 (crusher.js apiSetHitBox) for the 130 x 128 art.
+ */
+export function crusherArtScale(spec) {
+  const size = Math.max(1, finite(spec?.size, 120));
+  return size / Math.max(ROOK_CRUSHER_ART.w, ROOK_CRUSHER_ART.h);
+}
+
+/**
+ * The Rook Egg's nest: the rook_nest deco, a black twig silhouette like the
+ * wood's own trees (stage 194.75 x 83.7; streets stretch it, Blackwater to
+ * 581 x 127). Bottom-centre, world px, under the Egg at x 2140
+ * (spawnRookEgg); the size is ours.
+ */
+export const ROOK_NEST = Object.freeze({
+  asset: 'rook_nest.png',
+  x: 2140,
+  y: 806,
+  w: 310,
+  h: 112,
+});
 
 export const ROOK_FOREST_ART_ID = 'clean-layered-silhouettes';
 

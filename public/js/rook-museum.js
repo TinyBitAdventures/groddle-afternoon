@@ -6,7 +6,18 @@
  * - quests/rook_hall.js
  * - items/rook_hall_speaker.js
  * - items/npc_quest_widget.js
+ *
+ * Layout: the instance template (LA91BDTNHS82D36) is not in the locations
+ * dump, but the GSJS keeps its key points in the instance's own coordinates
+ * (ROOK_MUSEUM_SOURCE): where you arrive, where Greeterbot starts and where it
+ * goes, where each painting overlay plays and where each speaker puts you.
+ * The hall is laid out on those points; everything between them (door,
+ * windows, bench, speakers, orb and shrine spots) is placed from the three
+ * player recordings of the museum (WyBQqq8TMVc, 53YLN1SHLU4, dTqJiZDUZBY;
+ * reference only, never shipped as pixels).
  */
+
+import { ROOK_ART } from './rook-art.js?v=g455-1';
 
 export const ROOK_HALL_START_QUEST_ID = 'rook_hall_start';
 export const ROOK_HALL_QUEST_ID = 'rook_hall';
@@ -14,6 +25,65 @@ export const ROOK_MUSEUM_STREET_ID = 'INSTANCE_ROOK_MUSEUM';
 export const ROOK_MUSEUM_PRODUCTION_TSID = 'LA91BDTNHS82D36';
 export const ROOK_MUSEUM_EXHIBIT_COUNT = 6;
 export const ROOK_MUSEUM_REWARD = Object.freeze({ xp: 400 });
+
+/**
+ * The museum's points in the instance's own coordinates (x right, y down,
+ * the floor about y -94).
+ * - entry: rook_hall.js startMuseum, questInstanceLocation(pc, 'rook_museum', -2270, -136).
+ * - greeterStart: rook_hall.js onEnterLocation, createItemStack('npc_quest_widget', 1, -2132, -196).
+ * - greeterEnd: rook_hall.js callback_widgetConversation, move_to_xy {x: 2200, y: -100}.
+ * - overlays: rook_hall_speaker.js play(), the location_overlay x, y per button
+ *   (centre-bottom registration, InLocationAnnouncementOverlay.as 439): the
+ *   overlay is the painting deco's own 429 x 312 stage, so it is where the
+ *   framed painting hangs.
+ * - avatar: rook_hall_speaker.js play(), move_avatar per button (where the
+ *   lesson stands you, and which way you face).
+ * - floorY: the lowest avatar point (button_5, -94). The recordings put the
+ *   frames' bottom edge about 93 px over the feet, which agrees: -190 + 93.
+ */
+export const ROOK_MUSEUM_SOURCE = Object.freeze({
+  entry: Object.freeze({ x: -2270, y: -136 }),
+  greeterStart: Object.freeze({ x: -2132, y: -196 }),
+  greeterEnd: Object.freeze({ x: 2200, y: -100 }),
+  overlays: Object.freeze({
+    button_1: Object.freeze({ overlay: 'rook_hall_painting_01', x: -1180, y: -190 }),
+    button_2: Object.freeze({ overlay: 'rook_hall_painting_02', x: -469, y: -189 }),
+    button_4: Object.freeze({ overlay: 'rook_hall_painting_03', x: 541, y: -189 }),
+    button_6: Object.freeze({ overlay: 'rook_hall_painting_04', x: 1750, y: -187 }),
+  }),
+  avatar: Object.freeze({
+    button_1: Object.freeze({ x: -1036, y: -141, face: 'left' }),
+    button_2: Object.freeze({ x: -372, y: -141, face: 'left' }),
+    button_3: Object.freeze({ x: -16, y: -125, face: 'right' }),
+    button_4: Object.freeze({ x: 696, y: -136, face: 'left' }),
+    button_5: Object.freeze({ x: 1217, y: -94, face: 'left' }),
+    button_6: Object.freeze({ x: 1886, y: -133, face: 'left' }),
+  }),
+  floorY: -94,
+});
+
+/**
+ * The remake's world for the instance: source x + 2600, source y + 594 (the
+ * floor at y 500). The ends are ours: the left wall just past the arrival
+ * door, the right one past Greeterbot's last spot.
+ */
+export const ROOK_MUSEUM_WORLD = Object.freeze({
+  left: -2600,
+  right: 2500,
+  floorY: 500,
+  height: 620,
+});
+
+/** A source point in world px. */
+export function rookMuseumWorldPoint(x, y = ROOK_MUSEUM_SOURCE.floorY) {
+  return {
+    x: x - ROOK_MUSEUM_WORLD.left,
+    y: y - ROOK_MUSEUM_SOURCE.floorY + ROOK_MUSEUM_WORLD.floorY,
+  };
+}
+
+const worldX = (x) => rookMuseumWorldPoint(x).x;
+const overlayX = (id) => worldX(ROOK_MUSEUM_SOURCE.overlays[id].x);
 
 export const ROOK_MUSEUM_GREETING = Object.freeze([
   {
@@ -88,7 +158,7 @@ export const ROOK_MUSEUM_EXHIBITS = Object.freeze([
     kind: 'painting',
     title: 'The Rook, Enemy of Imagination',
     shortTitle: 'The Rook',
-    x: 570,
+    x: overlayX('button_1'),
     painting: 1,
     pages: Object.freeze([
       'Back in the early ages of Ur, when small islands formed spontaneously from the primordial chaos, only to be rendered unrecognizable moments later by the constant ebb and flow of imagination, the ancient Glitchian tribes suffered under constant threats to their very survival.',
@@ -106,7 +176,7 @@ export const ROOK_MUSEUM_EXHIBITS = Object.freeze([
     kind: 'painting',
     title: 'The Birth of Martial Imagination',
     shortTitle: 'Martial Imagination',
-    x: 1040,
+    x: overlayX('button_2'),
     painting: 2,
     pages: Object.freeze([
       'Noticing the capability of a particularly strong, focused and concentrated burst of imagination to temporarily stun the Rook, ascetics and yogis of the Meadow Tribes set to work to develop a more reliable method of harnessing this defensive action.',
@@ -120,7 +190,8 @@ export const ROOK_MUSEUM_EXHIBITS = Object.freeze([
     kind: 'orb',
     title: 'Ancient Focusing Orb',
     shortTitle: 'Focusing Orb',
-    x: 1490,
+    // You face right at -16 (move_avatar): the orb stands to your right.
+    x: worldX(ROOK_MUSEUM_SOURCE.avatar.button_3.x + 100),
     pages: Object.freeze([
       'While the lustre of this ancient Focusing Orb has faded with the passing of generations, in ages long past, its flawless surface of spun crystal acted as a nexus for the imaginations of our Glitchian ancestors, and as a potent weapon against the Rook.',
       ...ORB_LESSON,
@@ -132,7 +203,7 @@ export const ROOK_MUSEUM_EXHIBITS = Object.freeze([
     kind: 'painting',
     title: 'Esquibeth of Inari',
     shortTitle: 'The Pious Esquibeth',
-    x: 1940,
+    x: overlayX('button_4'),
     painting: 3,
     pages: Object.freeze([
       'Generations struggled to find a way to fight back against the Rook and end its destruction of creativity.',
@@ -145,7 +216,10 @@ export const ROOK_MUSEUM_EXHIBITS = Object.freeze([
     kind: 'shrine',
     title: 'Primitive Shrine Holofilm',
     shortTitle: 'Shrine Holofilm',
-    x: 2390,
+    // You face left at 1217 (move_avatar): the shrine is on your left. The
+    // holofilm art keeps its left half for the projection, so the stone shrine
+    // (its right half) stands about 110 px left of you.
+    x: worldX(ROOK_MUSEUM_SOURCE.avatar.button_5.x - 210),
     pages: Object.freeze([
       'The holofilm which follows demonstrates a pious primitive priming the shrine for an attack.',
       'Discovered half-buried in a rock face at Ekorran Roughs, it would be easy to overlook the coarse stonework of this ancient shrine as simply another natural feature.',
@@ -159,7 +233,7 @@ export const ROOK_MUSEUM_EXHIBITS = Object.freeze([
     kind: 'painting',
     title: 'Secret Rook Battle Plans',
     shortTitle: 'Rook Battle Plans',
-    x: 2840,
+    x: overlayX('button_6'),
     painting: 4,
     pages: Object.freeze([
       'As ancient legends tell it, these battle plans were recovered from an abandoned nest after a series of courageous attacks repulsed the Rook entirely from the Isle of Uralia.',
@@ -168,6 +242,90 @@ export const ROOK_MUSEUM_EXHIBITS = Object.freeze([
     ]),
   }),
 ]);
+
+/** The framed paintings: the deco frame alone (js/rook-art.js) over the window its picture fills. */
+export const ROOK_MUSEUM_PAINTING_ART = Object.freeze({
+  1: ROOK_ART.rook_hall_painting_01_deco,
+  2: ROOK_ART.rook_hall_painting_02_deco,
+  3: ROOK_ART.rook_hall_painting_03_deco,
+  4: ROOK_ART.rook_hall_painting_04_deco,
+});
+
+/** The squawk stand under the shrine exhibit's speaker (js/rook-art.js). */
+export const ROOK_MUSEUM_STAND_ART = ROOK_ART.rook_hall_placeholder_squawk_stand;
+
+/** Where a painting hangs: its overlay's centre-bottom (rook_hall_speaker.js play()), world px. */
+export function rookMuseumOverlayPoint(exhibitId) {
+  const at = ROOK_MUSEUM_SOURCE.overlays[exhibitId];
+  return at ? rookMuseumWorldPoint(at.x, at.y) : null;
+}
+
+/**
+ * The paintings' overlay (glitch-overlays rook_hall_painting_0N.fla, symbol
+ * "All", 24 fps, 130 frames, the same timeline in all four): the three frames
+ * cross-fade in the frame's window, c to a over frames 0-9, a to b over 39-49,
+ * b to c over 79-89, then c holds to the loop. Layers bottom to top: c (79 on),
+ * b (39-89), a (0-49), c again (0-9). A tween runs from its keyframe to the
+ * next one (alpha 1 to 0 over 9 or 10 frames).
+ */
+export const ROOK_MUSEUM_PAINTING_LOOP = Object.freeze({
+  fps: 24,
+  frames: 130,
+  layers: Object.freeze([
+    Object.freeze({ frame: 'c', from: 79, to: 130, fadeFrom: 130 }),
+    Object.freeze({ frame: 'b', from: 39, to: 90, fadeFrom: 79 }),
+    Object.freeze({ frame: 'a', from: 0, to: 50, fadeFrom: 39 }),
+    Object.freeze({ frame: 'c', from: 0, to: 10, fadeFrom: 0 }),
+  ]),
+});
+
+/** Each loop layer's alpha at an elapsed time (ms), bottom to top. */
+export function rookMuseumPaintingAlphas(elapsedMs = 0) {
+  const { fps, frames, layers } = ROOK_MUSEUM_PAINTING_LOOP;
+  const f = ((Math.floor((Math.max(0, Number(elapsedMs) || 0) * fps) / 1000) % frames) + frames) % frames;
+  return layers.map((layer) => {
+    if (f < layer.from || f >= layer.to) return 0;
+    if (f < layer.fadeFrom) return 1;
+    const span = layer.to - 1 - layer.fadeFrom;
+    return span > 0 ? Math.max(0, 1 - (f - layer.fadeFrom) / span) : 1;
+  });
+}
+
+/**
+ * The hall around the exhibits, world px (floor y 500; bottom-centre unless
+ * noted). Source points come through rookMuseumWorldPoint; the rest is ours,
+ * measured off the recordings (53YLN1SHLU4 frames, about 2 world px per frame
+ * px across and 2.45 down; the paintings' left edges land within 20 px of
+ * the source overlays, which checks the scale): the arrival door under a
+ * "Mezzanine" plaque at the left end, an "Exhibits" arrow sign over a long
+ * bench (the bench deco stretched to 260 px, as the recordings show it), a
+ * pointed window over the bench, between paintings 1 and 2, behind the orb,
+ * on both sides of the shrine and over Greeterbot's last spot, a spotlight
+ * over the orb and the shrine, each painting's speaker hung right of its
+ * frame (bottom 76 px over the floor), the orb's on its pedestal, the
+ * shrine's on a squawk stand. Wall, windows, door, plaque and shadows are
+ * the Jethimadh Tower's own decos, as the Mezzanine and the Hall
+ * of Rejected Concepts use them.
+ */
+export const ROOK_MUSEUM_HALL = Object.freeze({
+  spawn: Object.freeze(rookMuseumWorldPoint(ROOK_MUSEUM_SOURCE.entry.x)),
+  greeterStart: Object.freeze(rookMuseumWorldPoint(ROOK_MUSEUM_SOURCE.greeterStart.x, ROOK_MUSEUM_SOURCE.greeterStart.y)),
+  greeterEnd: Object.freeze(rookMuseumWorldPoint(ROOK_MUSEUM_SOURCE.greeterEnd.x, ROOK_MUSEUM_SOURCE.greeterEnd.y)),
+  // npc_quest_widget variant widgetWood (rook_hall.js onEnterLocation): the Mezzanine Greeterbot's art.
+  greeterArt: 'assets/sprites/quests/rook-museum/greeterbot_widgetWood_idle@2x.png',
+  door: Object.freeze({ x: 170, w: 196, h: 214 }),
+  plaque: Object.freeze({ x: 170, text: 'Mezzanine' }),
+  arrow: Object.freeze({ x: 620, y: 390, w: 140, h: 93, text: 'Exhibits' }),
+  bench: Object.freeze({ x: 826, w: 260, h: 62 }),
+  windows: Object.freeze([826, 1774, 2684, 3478, 3897, 4824]),
+  windowSize: Object.freeze({ w: 72, h: 200, bottom: 334 }),
+  spotlights: Object.freeze(['button_3', 'button_5']),
+  paintingSpeaker: Object.freeze({ dx: 258, bottom: 424 }),
+  orbSpeaker: Object.freeze({ dx: 0, bottom: 482 }),
+  shrineStand: Object.freeze({ x: worldX(ROOK_MUSEUM_SOURCE.avatar.button_5.x + 40) }),
+  // Multiply tint on jethimadh_int_bg_center, as the Hall of Rejected Concepts (js/hall-rejected-concepts.js HALL.wallTint).
+  wallTint: 0xdff2e9,
+});
 
 export function createRookMuseumState(opts = {}) {
   return {

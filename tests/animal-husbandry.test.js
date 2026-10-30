@@ -47,7 +47,7 @@ import {
   takePlop,
 } from '../public/js/animal-husbandry.js?v=g454-1';
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=g454-1';
-import { getVerbsFor, runVerb } from '../public/content.js?v=g454-1';
+import { getVerbsFor, runVerb } from '../public/content.js?v=g455-1';
 import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=g454-1';
 
 const here = dirname(fileURLToPath(import.meta.url));

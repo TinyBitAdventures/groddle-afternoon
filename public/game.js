@@ -2,7 +2,7 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g454-1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-305';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
@@ -177,17 +177,20 @@ import {
 } from './js/summers-day.js?v=g452-2';
 import {
   ROOK_CRUSHERS,
+  ROOK_CRUSHER_ART,
   ROOK_EGG_INITIAL_STATE,
   ROOK_FOREST_ART_ID,
   ROOK_FOREST_DECOS,
   ROOK_FOREST_DEPTH_LAYERS,
   ROOK_FOREST_LIMBS,
+  ROOK_NEST,
   ROOK_QUEST_ID,
   ROOK_WOODS_DURATION_MS,
   ROOK_WOODS_STREET_ID,
   beginRookWoods,
   completeRookEggSmash,
   createRookWoodsState,
+  crusherArtScale,
   crusherHitsAvatar,
   crusherMoodLoss,
   crusherPosition,
@@ -197,7 +200,7 @@ import {
   rookEggStateForProgress,
   rookWoodsObjective,
   rookWoodsRemainingMs,
-} from './js/rook-woods.js?v=rook-woods-9';
+} from './js/rook-woods.js?v=g455-1';
 import {
   ROOK_HALL_QUEST_ID,
   ROOK_HALL_START_QUEST_ID,
@@ -205,16 +208,22 @@ import {
   ROOK_MUSEUM_EXHIBIT_COUNT,
   ROOK_MUSEUM_EXHIBITS,
   ROOK_MUSEUM_GREETING,
+  ROOK_MUSEUM_HALL,
+  ROOK_MUSEUM_PAINTING_ART,
   ROOK_MUSEUM_PRODUCTION_TSID,
+  ROOK_MUSEUM_STAND_ART,
   ROOK_MUSEUM_STREET_ID,
   ROOK_MUSEUM_TOUR_INTRO,
+  ROOK_MUSEUM_WORLD,
   beginRookMuseumTour,
   completeRookMuseum,
   createRookMuseumState,
   getRookMuseumExhibit,
   rookMuseumObjective,
+  rookMuseumOverlayPoint,
+  rookMuseumPaintingAlphas,
   visitRookMuseumExhibit,
-} from './js/rook-museum.js?v=rook-museum-1';
+} from './js/rook-museum.js?v=g455-1';
 import {
   DE_EMBIGGENIFY_PART2_QUEST_ID,
   DE_EMBIGGENIFY_QUEST_ID,
@@ -1782,6 +1791,7 @@ let rookMuseumTransitionBusy = false;
 let rookMuseumActiveExhibit = null;
 let rookMuseumPageIndex = 0;
 let rookMuseumArtTimer = null;
+let rookMuseumArtStartedAt = 0;
 let rookMuseumAutoNextAt = 0;
 /** Transient source-authored miniature quest in Eesti Life Catalogue Page 17. */
 let deEmbiggenifyState = null;
@@ -15489,14 +15499,15 @@ function drawRookWoodsBackground() {
   foreground.fill(0x080b09);
   root.addChild(foreground);
 
-  const nest = new PIXI.Graphics();
+  // The Egg's nest: the rook_nest deco (js/rook-woods.js ROOK_NEST).
+  const nest = new PIXI.Sprite(textureFromUrl(`assets/decos/groddle/${ROOK_NEST.asset}`));
+  nest.anchor.set(0.5, 1);
+  nest.position.set(ROOK_NEST.x, ROOK_NEST.y);
+  nest.width = ROOK_NEST.w;
+  nest.height = ROOK_NEST.h;
   nest.zIndex = -25;
-  for (let i = 0; i < 18; i += 1) {
-    const angle = (i / 18) * Math.PI;
-    nest.moveTo(2070 - Math.cos(angle) * 78, 778 - Math.sin(angle) * 12);
-    nest.lineTo(2190 + Math.cos(angle * 1.7) * 34, 773 - Math.sin(angle * 1.3) * 28);
-  }
-  nest.stroke({ width: 6, color: 0x241a12, alpha: 1 });
+  nest.eventMode = 'none';
+  nest.name = 'rook-nest';
   root.addChild(nest);
 
   const birds = new PIXI.Graphics();
@@ -15516,47 +15527,14 @@ function drawRookWoodsBackground() {
   return root;
 }
 
+/** A Crusher: Tiny Speck's crusher.swf still (js/rook-woods.js ROOK_CRUSHER_ART), centred on its position. */
 function drawRookCrusher(spec) {
-  const root = new PIXI.Container();
+  const root = new PIXI.Sprite(textureFromUrl(ROOK_CRUSHER_ART.file));
   root.name = `rook-crusher-${spec.id}`;
+  root.anchor.set(0.5, 0.5);
+  root.scale.set(crusherArtScale(spec));
   root.zIndex = 58;
   root.eventMode = 'none';
-
-  const shadow = new PIXI.Graphics();
-  shadow.ellipse(0, spec.size * 0.48, spec.size * 0.52, 15).fill({ color: 0x050706, alpha: 0.52 });
-  root.addChild(shadow);
-
-  const body = new PIXI.Graphics();
-  const half = spec.size / 2;
-  body.setStrokeStyle({ width: 4, color: 0x151812, alpha: 0.9 });
-  body.roundRect(-half, -half, spec.size, spec.size, 17).fill(0x4b5142).stroke();
-  body.poly([
-    -half + 9, -half + 10,
-    half - 13, -half + 10,
-    half - 24, -half + 31,
-    -half + 18, -half + 27,
-  ]).fill({ color: 0x68705c, alpha: 0.46 }).stroke();
-  body.poly([
-    half - 22, -half + 30,
-    half - 8, -half + 13,
-    half - 8, half - 13,
-    half - 27, half - 5,
-  ]).fill({ color: 0x272c24, alpha: 0.52 }).stroke();
-  const pocks = [
-    [-0.25, -0.22, 0.1],
-    [0.22, -0.29, 0.075],
-    [-0.12, 0.19, 0.08],
-    [0.29, 0.23, 0.11],
-    [-0.34, 0.31, 0.055],
-  ];
-  for (const [px, py, radius] of pocks) {
-    body.ellipse(px * spec.size, py * spec.size, radius * spec.size, radius * spec.size * 0.78).fill({ color: 0x252a22, alpha: 0.75 }).stroke();
-    body.setStrokeStyle({ width: 2, color: 0x7d836c, alpha: 0.25 });
-    body.ellipse(px * spec.size - 2, py * spec.size - 2, radius * spec.size * 0.72, radius * spec.size * 0.5).stroke();
-  }
-  root.addChild(body);
-  root._body = body;
-  root._shadow = shadow;
   root._lastPhase = '';
   return root;
 }
@@ -15699,6 +15677,8 @@ function setupRookWoodsInstance() {
     app.canvas.dataset.rookForestLayers = String(ROOK_FOREST_DEPTH_LAYERS.length);
     app.canvas.dataset.rookForestDecos = String(ROOK_FOREST_DECOS.length);
     app.canvas.dataset.rookForestLimbs = String(ROOK_FOREST_LIMBS.length);
+    app.canvas.dataset.rookCrusherArt = ROOK_CRUSHER_ART.swf;
+    app.canvas.dataset.rookNestArt = ROOK_NEST.asset.replace(/\.png$/, '');
   }
   savePlayerLocation(rookWoodsSourceLocation);
   renderRookWoodsHud();
@@ -15942,8 +15922,6 @@ function updateRookWoods(dt) {
     entry.position = position;
     entry.sprite.position.set(position.x, position.y);
     const impact = position.phase === 'impact';
-    entry.sprite._body.scale.set(impact ? 1.04 : 1, impact ? 0.96 : 1);
-    entry.sprite._shadow.alpha = impact ? 0.75 : 0.42;
     if (impact && entry.sprite._lastPhase !== 'impact') {
       burst(position.x, position.y + entry.spec.size * 0.45, 0x7d765f, 12);
       playSfx('pickup', { volume: 0.24, rate: 0.42 });
@@ -16004,62 +15982,91 @@ function rookMuseumIsInstanced() {
   return Boolean(rookMuseumState && currentStreetTsid === ROOK_MUSEUM_STREET_ID);
 }
 
+/** A tower deco in the museum hall: bottom-centre at (x, y), world px, turned `r` degrees. */
+function addRookMuseumDeco(root, name, x, y, w, h, { z = -900, r = 0, tint, alpha = 1, flip = false } = {}) {
+  const sprite = new PIXI.Sprite(textureFromUrl(`assets/decos/groddle/${name}.png`));
+  sprite.anchor.set(0.5, 1);
+  sprite.position.set(x, y);
+  sprite.width = w;
+  sprite.height = h;
+  if (flip) sprite.scale.x *= -1;
+  sprite.rotation = (r * Math.PI) / 180;
+  if (tint !== undefined) sprite.tint = tint;
+  sprite.alpha = alpha;
+  sprite.zIndex = z;
+  sprite.eventMode = 'none';
+  root.addChild(sprite);
+  return sprite;
+}
+
+/** Plaque and sign lettering in the tower rooms' style (features/tower-rooms-feature.js drawSigns). */
+function addRookMuseumSignText(root, text, x, y, z) {
+  const label = new PIXI.Text({ text, style: {
+    fontFamily: '"Trebuchet MS", sans-serif',
+    fontSize: text.length > 10 ? 15 : 19,
+    fontWeight: '700',
+    fill: 0xf3e2b8,
+    stroke: { color: 0x2b1a0e, width: 3 },
+    align: 'center',
+  } });
+  label.resolution = 3;
+  label.anchor.set(0.5, 0.5);
+  label.position.set(x, y);
+  label.zIndex = z;
+  label.eventMode = 'none';
+  root.addChild(label);
+  return label;
+}
+
+/**
+ * The museum hall (js/rook-museum.js ROOK_MUSEUM_HALL): the Jethimadh Tower's
+ * wood wall, pointed windows, arrival door and plaque, sign, bench and
+ * spotlights, all Tiny Speck's decos.
+ */
 function drawRookMuseumBackground() {
+  const hall = ROOK_MUSEUM_HALL;
+  const floor = ROOK_MUSEUM_WORLD.floorY;
   const root = new PIXI.Container();
   root.sortableChildren = true;
-  root.worldW = 3300;
-  root.worldH = 620;
-  root.sourceWorldH = 620;
+  root.worldW = ROOK_MUSEUM_WORLD.right - ROOK_MUSEUM_WORLD.left;
+  root.worldH = ROOK_MUSEUM_WORLD.height;
+  root.sourceWorldH = ROOK_MUSEUM_WORLD.height;
+  const H = root.worldH;
 
-  const wall = new PIXI.Graphics();
-  wall.zIndex = -1000;
-  wall.rect(0, 0, root.worldW, root.worldH).fill(0x2c1b15);
-  wall.rect(0, 40, root.worldW, 450).fill(0x6f472e);
-  for (let x = 0; x < root.worldW; x += 86) wall.rect(x, 40, 4, 450);
-  wall.fill(0x54321f);
-  wall.rect(0, 0, root.worldW, 46);
-  wall.rect(0, 482, root.worldW, 138);
-  wall.fill(0x281913);
-  wall.rect(0, 474, root.worldW, 12).fill(0x9b6b3c);
-  for (let x = 0; x < root.worldW; x += 145) wall.rect(x, 504, 110, 4);
-  wall.fill({ color: 0xc69a5c, alpha: 0.24 });
-  root.addChild(wall);
-
-  for (let x = 340; x < root.worldW; x += 470) {
-    const light = new PIXI.Graphics();
-    light.zIndex = -900;
-    light.poly([x - 95, 48, x + 95, 48, x + 180, 482, x - 180, 482]).fill({ color: 0xffe9aa, alpha: 0.045 });
-    root.addChild(light);
+  // Wall: the corridors' wood backdrop tiled along the hall, as the Hall of Rejected Concepts.
+  const tile = 760;
+  for (let x = tile / 2 - 60, i = 0; x < root.worldW + tile / 2; x += tile, i += 1) {
+    addRookMuseumDeco(root, 'jethimadh_int_bg_center', x, H + 60, tile + 120, H + 120, { z: -1000 + (i % 2), tint: hall.wallTint });
   }
-
-  const trim = new PIXI.Graphics();
-  trim.zIndex = -40;
-  trim.moveTo(0, 475);
-  trim.lineTo(root.worldW, 475);
-  trim.stroke({ width: 3, color: 0xd3aa69, alpha: 0.55 });
-  trim.moveTo(0, 500);
-  trim.lineTo(root.worldW, 500).stroke({ width: 2, color: 0x1f120d, alpha: 0.8 });
-  root.addChild(trim);
+  // firebog_linear_gradient_shadow: opaque on its left, turned 90 to darken the ceiling, -90 the floor.
+  const run = 700;
+  for (let x = -100; x < root.worldW + 100; x += run) {
+    addRookMuseumDeco(root, 'firebog_linear_gradient_shadow', x, 110, 220, run + 2, { z: -990, r: 90 });
+    addRookMuseumDeco(root, 'firebog_linear_gradient_shadow', x + run, floor + 60, 200, run + 2, { z: -990, r: -90 });
+  }
+  for (const x of hall.windows) {
+    addRookMuseumDeco(root, 'jethimadh_tower_window_1', x, hall.windowSize.bottom, hall.windowSize.w, hall.windowSize.h, { z: -950 });
+  }
+  // A spotlight over the orb and the shrine (the recordings), doubled as in the Hall: the cone is faint.
+  for (const id of hall.spotlights) {
+    const exhibit = getRookMuseumExhibit(id);
+    const cx = exhibit.kind === 'shrine' ? exhibit.x + 101 : exhibit.x;
+    for (const k of [0, 1]) addRookMuseumDeco(root, 'rookhall_spotlight', cx, floor - 30, 210 - k * 40, 600, { z: -940 + k });
+  }
+  addRookMuseumDeco(root, 'door_asset_jethimadh_int', hall.door.x, floor, hall.door.w, hall.door.h, { z: -930 });
+  const plaqueY = floor - hall.door.h + 4;
+  addRookMuseumDeco(root, 'jethimadh_int_door_sign', hall.plaque.x, plaqueY, 188, 110, { z: -925 });
+  addRookMuseumDeco(root, 'firebog_sign_blank', hall.plaque.x, plaqueY - 17, 138, 80, { z: -924 });
+  addRookMuseumSignText(root, hall.plaque.text, hall.plaque.x, plaqueY - 17 - 40 + 4, -923);
+  addRookMuseumDeco(root, 'sign_arrow_1', hall.arrow.x, hall.arrow.y, hall.arrow.w, hall.arrow.h, { z: -925 });
+  addRookMuseumSignText(root, hall.arrow.text, hall.arrow.x - 8, hall.arrow.y - hall.arrow.h / 2 + 4, -924);
+  addRookMuseumDeco(root, 'bench', hall.bench.x, floor + 4, hall.bench.w, hall.bench.h, { z: -920 });
 
   root.platformsScreen = [
-    { id: 'rook-museum-floor', x1: 0, y1: 500, x2: root.worldW, y2: 500, pc_perm: 1 },
+    { id: 'rook-museum-floor', x1: 0, y1: floor, x2: root.worldW, y2: floor, pc_perm: 1 },
   ];
   root.signViews = [];
   return root;
-}
-
-function makeRookMuseumPlacard(exhibit) {
-  const label = new PIXI.Text({ text: exhibit.shortTitle, style: {
-    fontFamily: 'Trebuchet MS, sans-serif',
-    fontSize: 14,
-    fontWeight: '700',
-    fill: 0xf2dab0,
-    align: 'center',
-  } });
-  label.anchor.set(0.5, 1);
-  label.position.set(exhibit.x, 453);
-  label.zIndex = 42;
-  entityLayer.addChild(label);
 }
 
 function makeRookMuseumSpeaker(exhibit) {
@@ -16067,8 +16074,16 @@ function makeRookMuseumSpeaker(exhibit) {
     textureFromUrl(`${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_speaker__x1_stop_png_1354835940.png`)
   );
   sprite.anchor.set(0.5, 1);
-  sprite.scale.set(0.68);
-  sprite.position.set(exhibit.x + 168, 502);
+  const hall = ROOK_MUSEUM_HALL;
+  if (exhibit.kind === 'painting') {
+    sprite.position.set(exhibit.x + hall.paintingSpeaker.dx, hall.paintingSpeaker.bottom);
+  } else if (exhibit.kind === 'orb') {
+    sprite.position.set(exhibit.x + hall.orbSpeaker.dx, hall.orbSpeaker.bottom);
+  } else {
+    // On the squawk stand, over its board.
+    const stand = ROOK_MUSEUM_STAND_ART;
+    sprite.position.set(hall.shrineStand.x, ROOK_MUSEUM_WORLD.floorY - stand.h + 83);
+  }
   // rook_hall_speaker is in_foreground (FG_ITEM), still under the avatars (MiddleGroundRenderer 111-171).
   sprite.zIndex = 44;
   sprite.eventMode = 'static';
@@ -16085,67 +16100,66 @@ function makeRookMuseumSpeaker(exhibit) {
   return target;
 }
 
+/** A framed painting: its picture in the window, the deco's frame over it (js/rook-art.js). */
+function makeRookMuseumPainting(exhibit) {
+  const art = ROOK_MUSEUM_PAINTING_ART[exhibit.painting];
+  const root = new PIXI.Container();
+  root.name = `rook-museum-painting-${exhibit.painting}`;
+  // The overlay point is the stage's centre-bottom.
+  const at = rookMuseumOverlayPoint(exhibit.id);
+  root.position.set(at.x - art.stage[0] / 2, at.y - art.stage[1]);
+  const [wx, wy, ww, wh] = art.window;
+  const picture = new PIXI.Sprite(textureFromUrl(`${ROOK_MUSEUM_ASSET_ROOT}/paintings/${art.picture}`));
+  picture.position.set(wx, wy);
+  picture.width = ww;
+  picture.height = wh;
+  root.addChild(picture);
+  const frame = new PIXI.Sprite(textureFromUrl(art.file));
+  frame.position.set(art.trim[0], art.trim[1]);
+  root.addChild(frame);
+  root.eventMode = 'none';
+  return root;
+}
+
 function spawnRookMuseumExhibits() {
   rookMuseumTargets = [];
+  const floor = ROOK_MUSEUM_WORLD.floorY;
   for (const exhibit of ROOK_MUSEUM_EXHIBITS) {
     let sprite;
     if (exhibit.kind === 'painting') {
-      sprite = new PIXI.Sprite(
-        textureFromUrl(`${ROOK_MUSEUM_ASSET_ROOT}/paintings/painting-${exhibit.painting}c.jpg`)
-      );
-      sprite.anchor.set(0.5, 1);
-      sprite.width = 330;
-      sprite.height = 201;
-      sprite.position.set(exhibit.x, 408);
+      sprite = makeRookMuseumPainting(exhibit);
     } else if (exhibit.kind === 'orb') {
       sprite = new PIXI.Sprite(
         textureFromUrl(`${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_focusing_orb__x1_1_png_1354835872.png`)
       );
       sprite.anchor.set(0.5, 1);
-      sprite.scale.set(0.86);
-      sprite.position.set(exhibit.x, 425);
+      sprite.position.set(exhibit.x, floor);
     } else {
       sprite = new PIXI.Sprite(
         textureFromUrl(`${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_shrine_holofilm__x1_stop_png_1354835839.png`)
       );
       sprite.anchor.set(0.5, 1);
-      sprite.scale.set(0.66);
-      sprite.position.set(exhibit.x, 420);
+      sprite.position.set(exhibit.x, floor + 15);
+      const stand = new PIXI.Sprite(textureFromUrl(ROOK_MUSEUM_STAND_ART.file));
+      stand.anchor.set(0.5, 1);
+      stand.position.set(ROOK_MUSEUM_HALL.shrineStand.x, floor + 1);
+      stand.zIndex = 40;
+      stand.eventMode = 'none';
+      entityLayer.addChild(stand);
     }
     sprite.zIndex = 35;
     entityLayer.addChild(sprite);
-    makeRookMuseumPlacard(exhibit);
     makeRookMuseumSpeaker(exhibit);
   }
 }
 
 function spawnRookMuseumGreeter() {
-  const sprite = new PIXI.Container();
+  // npc_quest_widget, variant widgetWood (rook_hall.js onEnterLocation): the Mezzanine Greeterbot's art.
+  const sprite = new PIXI.Sprite(textureFromUrl(ROOK_MUSEUM_HALL.greeterArt));
+  sprite.anchor.set(0.5, 1);
   // An NPC is an item: under the avatars (MiddleGroundRenderer 111-171).
   sprite.zIndex = 46;
-  const shadow = new PIXI.Graphics();
-  shadow.ellipse(0, 0, 38, 9).fill({ color: 0x1d100b, alpha: 0.35 });
-  sprite.addChild(shadow);
-  const body = new PIXI.Graphics();
-  body.setStrokeStyle({ width: 3, color: 0x4e301e, alpha: 0.9 });
-  body.roundRect(-31, -96, 62, 72, 14).fill(0x9b744c).stroke();
-  body.roundRect(-38, -144, 76, 54, 18).fill(0xc49a63).stroke();
-  body.setFillStyle(0xead6a5);
-  body.circle(-13, -119, 7).fill().stroke();
-  body.circle(13, -119, 7).fill().stroke();
-  body.setFillStyle(0x754534);
-  body.circle(-13, -119, 3).fill().stroke();
-  body.circle(13, -119, 3).fill().stroke();
-  body.circle(0, -59, 7).fill(0xc44f3f).stroke();
-  sprite.addChild(body);
-  const antenna = new PIXI.Graphics();
-  antenna.setStrokeStyle({ width: 3, color: 0x765238, alpha: 1 });
-  antenna.moveTo(0, -145);
-  antenna.lineTo(0, -164);
-  antenna.stroke();
-  antenna.circle(0, -168, 6).fill(0xe0b85e).stroke();
-  sprite.addChild(antenna);
-  sprite.position.set(185, 500);
+  sprite.position.set(ROOK_MUSEUM_HALL.greeterStart.x, ROOK_MUSEUM_HALL.greeterStart.y);
   sprite.eventMode = 'static';
   sprite.cursor = 'pointer';
   entityLayer.addChild(sprite);
@@ -16195,8 +16209,44 @@ function isRookMuseumExhibitOpen() {
 }
 
 function clearRookMuseumArtTimer() {
-  if (rookMuseumArtTimer) clearTimeout(rookMuseumArtTimer);
+  if (rookMuseumArtTimer) clearInterval(rookMuseumArtTimer);
   rookMuseumArtTimer = null;
+}
+
+/**
+ * A painting exhibit: the deco's frame with the overlay's three frames
+ * cross-fading in its window (js/rook-museum.js ROOK_MUSEUM_PAINTING_LOOP),
+ * from when the exhibit opened, at the overlay's 24 fps.
+ */
+function playRookMuseumPainting(painting, exhibit) {
+  const art = ROOK_MUSEUM_PAINTING_ART[exhibit.painting];
+  const base = `${ROOK_MUSEUM_ASSET_ROOT}/paintings/painting-${exhibit.painting}`;
+  const [wx, wy, ww, wh] = art.window;
+  const pct = (v, of) => `${(100 * v / of).toFixed(3)}%`;
+  const frame = painting.querySelector('[data-rook-museum-frame]');
+  if (frame) {
+    frame.src = art.file;
+    frame.alt = exhibit.title;
+  }
+  painting.style.aspectRatio = `${art.w} / ${art.h}`;
+  const layers = [...painting.querySelectorAll('[data-rook-museum-layer]')];
+  ['c', 'b', 'a', 'c'].forEach((letter, i) => {
+    const img = layers[i];
+    if (!img) return;
+    img.src = `${base}${letter}.jpg`;
+    Object.assign(img.style, {
+      left: pct(wx - art.trim[0], art.w),
+      top: pct(wy - art.trim[1], art.h),
+      width: pct(ww, art.w),
+      height: pct(wh, art.h),
+    });
+  });
+  const tick = () => {
+    const alphas = rookMuseumPaintingAlphas(Date.now() - rookMuseumArtStartedAt);
+    layers.forEach((img, i) => { img.style.opacity = String(alphas[i] ?? 0); });
+  };
+  tick();
+  rookMuseumArtTimer = setInterval(tick, 1000 / 24);
 }
 
 function renderRookMuseumExhibitPage() {
@@ -16219,12 +16269,13 @@ function renderRookMuseumExhibitPage() {
   if (copy) copy.textContent = exhibit.pages[rookMuseumPageIndex] || '';
   if (count) count.textContent = `${rookMuseumPageIndex + 1} / ${exhibit.pages.length}`;
   if (next) next.textContent = rookMuseumPageIndex >= exhibit.pages.length - 1 ? 'Finish exhibit' : 'Continue';
+  const painting = panel?.querySelector('[data-rook-museum-painting]');
+  art.hidden = exhibit.kind === 'painting';
+  if (painting) painting.hidden = exhibit.kind !== 'painting';
   if (exhibit.kind === 'painting') {
-    const base = `${ROOK_MUSEUM_ASSET_ROOT}/paintings/painting-${exhibit.painting}`;
-    art.src = `${base}a.jpg`;
-    art.alt = exhibit.title;
-    rookMuseumArtTimer = setTimeout(() => { art.src = `${base}b.jpg`; }, 280);
-    setTimeout(() => { if (rookMuseumActiveExhibit === exhibit) art.src = `${base}c.jpg`; }, 560);
+    art.removeAttribute('src');
+    art.alt = '';
+    if (painting) playRookMuseumPainting(painting, exhibit);
     if (glow) glow.hidden = true;
   } else if (exhibit.kind === 'orb') {
     art.src = `${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_focusing_orb__x1_1_png_1354835872.png`;
@@ -16252,6 +16303,7 @@ function openRookMuseumExhibit(exhibit) {
   }
   rookMuseumActiveExhibit = exhibit;
   rookMuseumPageIndex = 0;
+  rookMuseumArtStartedAt = Date.now();
   const panel = document.getElementById('rook-museum-exhibit');
   if (panel) panel.hidden = false;
   playSfx('alert', { volume: 0.35, rate: 0.86 });
@@ -16297,7 +16349,10 @@ function beginRookMuseumOrientation() {
       beats: ROOK_MUSEUM_TOUR_INTRO,
       onComplete: () => {
         beginRookMuseumTour(rookMuseumState);
-        if (rookMuseumGreeter?.sprite) rookMuseumGreeter.sprite.x = 3150;
+        // rook_hall.js callback_widgetConversation: move_to_xy 2200, -100.
+        if (rookMuseumGreeter?.sprite) {
+          rookMuseumGreeter.sprite.position.set(ROOK_MUSEUM_HALL.greeterEnd.x, ROOK_MUSEUM_HALL.greeterEnd.y);
+        }
         pushActivity('Greeterbot asked you to study all six Rook exhibits.');
         renderRookMuseumHud();
         updateHud();
@@ -16410,7 +16465,7 @@ function setupRookMuseumInstance() {
   };
   currentStreetTsid = ROOK_MUSEUM_STREET_ID;
   WORLD_W = bgLayer.worldW;
-  GROUND_Y = 500;
+  GROUND_Y = ROOK_MUSEUM_WORLD.floorY;
   streetPlatforms = bgLayer.platformsScreen;
   streetWalls = [];
   climb = { active: false, wall: null };
@@ -16418,7 +16473,8 @@ function setupRookMuseumInstance() {
   spawnRookMuseumExhibits();
   spawnRookMuseumGreeter();
   if (player) {
-    player.position.set(115, GROUND_Y);
+    // rook_hall.js: questInstanceLocation(pc, 'rook_museum', -2270, -136).
+    player.position.set(ROOK_MUSEUM_HALL.spawn.x, GROUND_Y);
     player.vx = 0;
     player.vy = 0;
     player.onGround = true;

@@ -6,12 +6,14 @@ import { fileURLToPath } from 'node:url';
 
 import {
   ROOK_CRUSHERS,
+  ROOK_CRUSHER_ART,
   ROOK_EGG_INITIAL_STATE,
   ROOK_EGG_SMASHED_STATE,
   ROOK_FOREST_ART_ID,
   ROOK_FOREST_DECOS,
   ROOK_FOREST_DEPTH_LAYERS,
   ROOK_FOREST_LIMBS,
+  ROOK_NEST,
   ROOK_QUEST_ID,
   ROOK_REWARD,
   ROOK_TOOL_PROFILES,
@@ -20,6 +22,7 @@ import {
   beginRookWoods,
   completeRookEggSmash,
   createRookWoodsState,
+  crusherArtScale,
   crusherCycleMs,
   crusherHitsAvatar,
   crusherMoodLoss,
@@ -29,7 +32,7 @@ import {
   recordCrusherHit,
   rookEggStateForProgress,
   rookWoodsRemainingMs,
-} from '../public/js/rook-woods.js';
+} from '../public/js/rook-woods.js?v=g455-1';
 import {
   createToolConditionState,
   setToolRemaining,
@@ -182,5 +185,37 @@ test('Rooks’ Woods uses a deterministic clean-asset forest with readable depth
   const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
   assert.match(game, /rookForestArt/);
   assert.match(game, /ROOK_FOREST_DEPTH_LAYERS/);
-  assert.match(game, /rook-woods\.js\?v=rook-woods-9/);
+  assert.match(game, /rook-woods\.js\?v=[\w-]+'/);
+});
+
+test('the Crushers are crusher.swf and the Egg sits in the rook_nest deco', () => {
+  // crusher.swf (glitch-items, CC0) is one DefineShape on a one-frame timeline: one still.
+  const plan = JSON.parse(fs.readFileSync(path.join(root, 'tools/rook-art/plan.json'), 'utf8'));
+  const row = plan.pieces.find((p) => p.name === 'crusher');
+  assert.equal(row.source, 'item:misc/crusher/crusher.swf');
+  assert.equal(ROOK_CRUSHER_ART.swf, 'crusher.swf');
+  assert.equal(ROOK_CRUSHER_ART.file, `assets/${row.file.slice('assets/'.length)}`);
+  assert.match(ROOK_CRUSHER_ART.file, /@3x\.webp$/);
+  assert.equal(fs.existsSync(path.join(root, 'public', ROOK_CRUSHER_ART.file)), true);
+  assert.deepEqual([ROOK_CRUSHER_ART.w, ROOK_CRUSHER_ART.h], [row.w, row.h]);
+  // Drawn at each spec's size (the footprint the collision bounds were tuned to); bounds unchanged.
+  for (const spec of ROOK_CRUSHERS) {
+    const drawn = Math.max(ROOK_CRUSHER_ART.w, ROOK_CRUSHER_ART.h) * crusherArtScale(spec);
+    assert.ok(Math.abs(drawn - spec.size) < 1e-9, spec.id);
+  }
+  assert.deepEqual(ROOK_CRUSHERS.map((c) => c.size), [118, 112, 116, 120]);
+
+  assert.equal(ROOK_NEST.asset, 'rook_nest.png');
+  assert.equal(fs.existsSync(path.join(root, 'public/assets/decos/groddle/rook_nest.webp')), true);
+  assert.ok(ROOK_NEST.w > 171 * 0.84, 'the nest is wider than the Egg');
+
+  const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
+  const crusher = game.slice(game.indexOf('function drawRookCrusher(spec)'), game.indexOf('function spawnRookCrushers()'));
+  assert.match(crusher, /textureFromUrl\(ROOK_CRUSHER_ART\.file\)/);
+  assert.doesNotMatch(crusher, /PIXI\.Graphics/);
+  const bg = game.slice(game.indexOf('function drawRookWoodsBackground()'), game.indexOf('function drawRookCrusher(spec)'));
+  assert.match(bg, /ROOK_NEST\.asset/);
+  assert.doesNotMatch(bg, /const nest = new PIXI\.Graphics/);
+  assert.match(game, /rookCrusherArt = ROOK_CRUSHER_ART\.swf/);
+  assert.match(game, /rookNestArt = /);
 });

@@ -821,12 +821,16 @@
    "group": "quests",
    "name": "Hand-built story quests",
    "status": "rebuilt",
-   "blurb": "Phantom Glitch, Rooks’ Woods, Museum of the Rook, Winter Walk, A Summer’s Day, Ilmenskie Jones, Legalize It and more. A Summer’s Day is Tiny Speck’s own memory street, archived as a copy of its template: its flitterbugs, signs, pressure stones, pool, glowing orbs and ladder, with only its Annex drawn.",
+   "blurb": "Phantom Glitch, Rooks’ Woods, Museum of the Rook, Winter Walk, A Summer’s Day, Ilmenskie Jones, Legalize It and more. A Summer’s Day is Tiny Speck’s own memory street, archived as a copy of its template: its flitterbugs, signs, pressure stones, pool, glowing orbs and ladder, with only its Annex drawn. Rooks’ Woods’ Crushers are Tiny Speck’s own crusher art, and the Rook Egg rests in their rook nest. The Museum of the Rook is laid out on the points its quest code kept (where you arrive, where Greeterbot waits and goes, where each painting hangs and where each speaker stands you): Tiny Speck’s framed paintings with their brass plaques, each lesson playing its three frames inside the real frame, the tower’s wood wall and pointed windows, the Mezzanine door and plaque, the Exhibits sign, the bench, spotlights over the orb and the shrine, the shrine’s speaker on its stand, and the wooden Greeterbot.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/ghost-quest.js",
     "public/js/rook-woods.js",
+    "public/js/rook-museum.js",
+    "public/js/rook-art.js",
+    "public/assets/sprites/quests/rook-woods/crusher@3x.webp",
+    "public/assets/sprites/quests/rook-museum/rook_hall_painting_01_frame@3x.webp",
     "public/js/winter-walk.js",
     "public/js/summers-day.js"
    ],
@@ -2666,9 +2670,14 @@
   ]
  },
  "git": {
-  "commits": 754,
+  "commits": 756,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "You walk behind a subway station's column"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2783,11 +2792,6 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "Clicking the Zilloween chip opens its card"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "new",
-    "text": "Street decos play where the original played them: glints, steam, waves, grass, stars and 49 more"
    }
   ]
  },

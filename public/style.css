@@ -3285,10 +3285,29 @@ html[data-street-cards] .activity-feed { visibility: hidden; }
   filter: drop-shadow(0 8px 12px rgba(0,0,0,0.5));
   transition: transform 220ms ease, opacity 180ms ease, filter 220ms ease;
 }
-.rook-museum-exhibit-visual.is-painting img {
+/* A painting: the deco's own frame (rook_hall_painting_0N_frame@3x) over the overlay's three frames. */
+.rook-museum-painting {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  border: 10px solid #7a4c27;
-  outline: 2px solid #d7a95d;
+  max-width: 429px;
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,0.5));
+}
+.rook-museum-painting[hidden],
+.rook-museum-exhibit-visual img[hidden] { display: none; }
+.rook-museum-exhibit-visual .rook-museum-painting img {
+  position: absolute;
+  max-width: none;
+  max-height: none;
+  object-fit: fill;
+  filter: none;
+  transition: none;
+}
+.rook-museum-exhibit-visual .rook-museum-painting img.rook-museum-painting-frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
 }
 .rook-museum-exhibit-visual.is-orb img {
   transform: scale(var(--rook-orb-scale, 0.72));
