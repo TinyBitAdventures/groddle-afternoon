@@ -749,6 +749,74 @@
   --overlay-dim: rgba(0, 0, 0, 0.4);
   --shadow: rgba(64, 40, 16, 0.16);
 
+  /* Classic interface (public/css/classic.css, every rule under :root[data-ui="classic"]; classic-spec
+     build-plan §3). Written by hand: each value names its source in the 2012 client's code
+     (com/tinyspeck/engine). "code default" is the fallback the client passed to CSSManager, since the
+     server sheet that held the real values is lost. PROPOSED values were read by eye from the named
+     reference frame and are a design choice, not a fact. Translucent uses go through color-mix().
+     Only classic.css may use these, and classic.css uses only these (tools/tokens/convert.mjs). */
+  /* classic:start */
+  --c-classic-page: #e6ecee;              /* the stage: main_layout.backgroundColor (code default), LayoutModel.as:19 */
+  --c-classic-panel: #ffffff;             /* chat column, dialogs: RightSideView.as:1124, Dialog.as:50 */
+  --c-classic-ink: #000000;               /* window outline at .37 and halo at .15: Dialog.as, WindowBorder.as */
+  --c-classic-well: #ececec;              /* big dialog body, button highlight: BigDialog.as:42, Button.as:698-741 */
+  --c-classic-rule: #d2d2d2;              /* big dialog body rules: BigDialog.as:41 */
+  --c-classic-title-rule: #c8d6dc;        /* chat pane title rule: ChatArea.as:480-481 */
+  --c-classic-input: #e7ecee;             /* chat input: InputField.as:106-134 */
+  --c-classic-input-border: #b3c4cd;
+  --c-classic-input-hi: #f5f5ce;          /* input hover and focus */
+  --c-classic-input-hi-border: #c3c38e;
+  --c-classic-energy-track: #bfced3;      /* EnergyBar.as:48 */
+  --c-classic-slot-ring: #d1d6d7;         /* pack slot border (code default): PackSlot.as:39,93 */
+  --c-classic-count: #676767;             /* pack counts, Arial bold 10: PackItemstackView.as:48-63 */
+  --c-classic-wear: #277d8d;              /* tool wear: ItemstackStatusBar.as:11-13 */
+  --c-classic-wear-low: #dd4a2e;
+  --c-classic-wear-track: #bbdadf;
+  --c-classic-tab-off: #78898a;           /* inactive pack tab (code default): PackTabberUI.as:60-61 */
+  --c-classic-focus: #53e5ff;             /* keyboard focus glow: StaticFilters.as:284-293 */
+  --c-classic-online: #548500;            /* contacts: ContactElement.as:61-69 */
+  --c-classic-online-dot: #97be00;
+  --c-classic-contact-hover: #d79035;
+  --c-classic-offline: #999999;
+  --c-classic-you: #aa322a;               /* "You" in chat (code default): RightSideManager.as:94-95 */
+  --c-classic-unread: #c71700;            /* contact unread */
+  --c-classic-unread-pane: #b1b7ba;       /* pane unread pill */
+  --c-classic-unread-mail: #a8031d;       /* mail unread badge: MailDialog.as */
+  --c-classic-prompt: #393b32;            /* prompt card, used at .9 (code default): PromptView.as:367-368 */
+  --c-classic-tip: #f8f6b4;               /* tooltip: TipDisplayManager.as:28-32 */
+  --c-classic-dark: #0a181d;              /* quest offer and familiar box, used at .9: QuestConversationUI.as:54-55 */
+  --c-classic-close: #c33823;             /* window close X: Dialog.as:221-243 */
+  --c-classic-close-hover: #e5aaa1;
+  --c-classic-slug-gain: #c1d76e;         /* reward pills: Slug.as:50-64 */
+  --c-classic-slug-loss: #efc6c1;
+  --c-classic-btn: #dbdbdb;               /* button fill (code fallback): FormElement.as:15-42 */
+  --c-classic-btn-shade: #cecece;         /* button bottom and right edge */
+  --c-classic-scroll-track: #f5f5f5;      /* scrollbar: Dialog.as */
+  --c-classic-scroll-handle: #fefefe;
+  --c-classic-scroll-border: #a3a3a3;
+  --c-classic-link: #205c76;              /* Add Friends label (code), reused for links: ContactList.as:120-136 */
+  --c-classic-text: #4b5357;              /* PROPOSED, from frame ref/video-2011-quest-complete.jpg (chat lines) */
+  --c-classic-title: #3d4447;             /* PROPOSED, from frame ref/video-2011-quest-complete.jpg ("Make Orange Juices") */
+  --c-classic-btn-minor-top: #f6f6f6;     /* PROPOSED, from frame ref/video-2011-quest-complete.jpg ("Back to recipes", "Done") */
+  --c-classic-btn-minor-bottom: #dedede;  /* PROPOSED, same frame */
+  --c-classic-btn-minor-border: #b9c0c2;  /* PROPOSED, same frame */
+  --c-classic-btn-minor-label: #2d5c70;   /* PROPOSED, same frame */
+  --c-classic-btn-dark-top: #3a4448;      /* PROPOSED, from frame ref/video-2011-quest-complete.jpg ("Yeah!") */
+  --c-classic-btn-dark-bottom: #1f282b;   /* PROPOSED, same frame */
+  --c-classic-btn-dark-label: #ffffff;    /* PROPOSED, same frame */
+  /* classic:end */
+  /* Classic type: the 2012 faces (VAG Rounded, Helvetica) are proprietary, so Nunito 800 stands in for
+     titles, names, labels and big numbers, and the system Helvetica/Arial stack carries body text. The
+     pack count's Arial bold 10 is a fact (PackItemstackView.as:48-63); the other sizes are PROPOSED. */
+  --font-classic-title: Nunito, "Arial Rounded MT Bold", sans-serif;
+  --font-classic-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-classic-count: Arial, sans-serif;
+  --fs-classic-count: var(--fs-2xs);      /* 10px */
+  --fs-classic-energy: var(--fs-xs);      /* 11px, PROPOSED */
+  --fs-classic-body: var(--fs-sm);        /* 12px, PROPOSED: body text and chat */
+  --fs-classic-pane: var(--fs-lg);        /* 16px, PROPOSED: chat pane titles */
+  --fs-classic-window: var(--fs-2xl);     /* 20px, PROPOSED: window titles */
+
   /* Side insets: what the HUD covers at each edge, so what centres in the free width keeps clear.
      The Social drawer (js/ui/social-drawer.js) sets --inset-r on #game-root: 316px open, 60px as the rail. */
   --inset-l: 0px;

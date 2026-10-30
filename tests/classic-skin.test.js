@@ -1,0 +1,128 @@
+/**
+ * The Classic skin stays a layer over the modern game (classic-spec build-plan
+ * §1, §5): every rule in public/css/classic.css is scoped under
+ * :root[data-ui="classic"], its colours come only from the --c-classic-*
+ * palette (and that palette from nowhere else), it never hides the elements
+ * slugs, measured zones and tests read, no Classic module draws a canvas, and
+ * no Classic file names the trademark or uses an em-dash.
+ */
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync, readdirSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { allDeclarations, maskCss, readTokens } from '../tools/tokens/css-sources.mjs';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const read = (p) => readFileSync(join(root, p), 'utf8');
+const CSS = 'public/css/classic.css';
+const SCOPE = ':root[data-ui="classic"]';
+const classicJs = readdirSync(join(root, 'public/js/classic')).filter((f) => f.endsWith('.js')).map((f) => `public/js/classic/${f}`);
+
+/** Each style rule's selector list, @media / @supports blocks opened (masked text, so comments and strings are gone). */
+function selectors(text) {
+  const masked = maskCss(text);
+  const out = [];
+  let depth = 0;
+  let start = 0;
+  const atStack = [];
+  for (let i = 0; i < masked.length; i++) {
+    const c = masked[i];
+    if (c === '{') {
+      // Structure from the masked text, words from the original (strings like "classic" kept, comments dropped).
+      const prelude = text.slice(start, i).replace(/\/\*[\s\S]*?\*\//g, ' ').trim().replace(/\s+/g, ' ');
+      if (prelude.startsWith('@')) atStack.push(depth);
+      else out.push(prelude);
+      depth++;
+      start = i + 1;
+    } else if (c === '}') {
+      depth--;
+      if (atStack.length && atStack[atStack.length - 1] === depth) atStack.pop();
+      start = i + 1;
+    } else if (c === ';') start = i + 1;
+  }
+  return out;
+}
+
+describe('Classic skin: classic.css', () => {
+  const text = read(CSS);
+
+  it('every selector is under :root[data-ui="classic"]', () => {
+    const list = selectors(text);
+    assert.ok(list.length > 10, `${list.length} rules`);
+    const bad = [];
+    for (const sel of list) for (const part of sel.split(',')) if (!part.trim().startsWith(SCOPE)) bad.push(part.trim());
+    assert.deepEqual(bad, []);
+  });
+
+  it('the selector reader sees nested and grouped rules', () => {
+    assert.deepEqual(selectors('a, b { x: 1 } @media (min-width: 1px) { c { y: 2 } } /* d { } */'), ['a, b', 'c']);
+  });
+
+  it('its colours are the Classic palette only, and the palette is used nowhere else', () => {
+    const tokens = readTokens(root);
+    const classic = [...tokens.keys()].filter((n) => n.startsWith('--c-classic-'));
+    assert.ok(classic.length >= 30, `${classic.length} Classic colours`);
+    for (const n of ['--c-classic-page', '--c-classic-panel', '--c-classic-close', '--c-classic-focus', '--c-classic-text', '--c-classic-title']) assert.ok(tokens.has(n), n);
+    for (const n of ['--font-classic-title', '--font-classic-body', '--fs-classic-body', '--fs-classic-window']) assert.ok(tokens.has(n), n);
+    const bad = [];
+    for (const d of allDeclarations(root)) {
+      for (const m of d.value.matchAll(/var\((--c-[\w-]+)/g)) {
+        const isClassic = m[1].startsWith('--c-classic-');
+        if (d.file === CSS && !isClassic) bad.push(`${d.file}: ${m[1]} in ${d.selector}`);
+        if (d.file !== CSS && isClassic) bad.push(`${d.file}: ${m[1]} in ${d.selector}`);
+      }
+    }
+    assert.deepEqual(bad, []);
+  });
+
+  it('the colours the spec read off a reference frame say so', () => {
+    const style = read('public/style.css');
+    const block = style.slice(style.indexOf('/* classic:start */'), style.indexOf('/* classic:end */'));
+    for (const n of ['--c-classic-text', '--c-classic-title', '--c-classic-btn-minor-top', '--c-classic-btn-dark-top']) {
+      assert.match(block, new RegExp(`${n}: #[0-9a-f]{6};\\s*/\\* PROPOSED, from frame ref/`), n);
+    }
+    for (const n of ['--c-classic-page', '--c-classic-slot-ring', '--c-classic-tab-off', '--c-classic-you']) {
+      assert.match(block, new RegExp(`${n}: #[0-9a-f]{6};\\s*/\\*[^*]*code default`), n);
+    }
+  });
+
+  it('never hides an element slugs, zones, speech or tests read (build-plan §5)', () => {
+    const KEEP = ['#stat-img', '#stat-xp', '#bar-energy', '#bar-mood', '#stat-currants', '#street-nameplate', '#buff-strip', '#local-chat-dock', '#pack-bar',
+      '#player-menu-btn', 'header.top-bar', '.top-bar', '#mute-btn', '#more-btn', '#more-list', '#notify-notices', '#activity-history', '#quest-tracker-list', '#verb-menu', '.pack-slot', '#game-root', 'canvas'];
+    const bad = [];
+    for (const d of allDeclarations(root).filter((x) => x.file === CSS)) {
+      const hides = (d.prop === 'display' && /\bnone\b/.test(d.value)) || (d.prop === 'visibility' && /hidden/.test(d.value) && !/notify-notices/.test(d.selector));
+      if (!hides) continue;
+      for (const part of d.selector.split(',')) {
+        const last = part.trim().split(/\s+/).pop();
+        if (KEEP.some((k) => last === k || last.startsWith(`${k}:`) || last.startsWith(`${k}[`) || last.startsWith(`${k}.`))) bad.push(part.trim());
+      }
+    }
+    assert.deepEqual(bad, []);
+  });
+
+  it('linked after style.css on both play pages', () => {
+    for (const page of ['public/play/index.html', 'public/play/online/index.html']) {
+      const html = read(page);
+      const style = html.indexOf('href="style.css?v=');
+      const classic = html.indexOf('<link rel="stylesheet" href="css/classic.css?v=');
+      assert.ok(style > 0 && classic > style, page);
+      assert.ok(classic < html.indexOf('<script type="module"'), `${page}: before the game`);
+    }
+  });
+});
+
+describe('Classic skin: modules and copy', () => {
+  it('no Classic module makes a canvas (tools read the first canvas on the page)', () => {
+    for (const f of classicJs) assert.doesNotMatch(read(f), /createElement\(\s*['"]canvas['"]\s*\)|<canvas/i, f);
+  });
+
+  it('no Classic file names the trademark or uses an em-dash', () => {
+    for (const f of [...classicJs, CSS]) {
+      const src = read(f);
+      assert.doesNotMatch(src, /glitch/i, f);
+      assert.doesNotMatch(src, /—/, f);
+    }
+  });
+});

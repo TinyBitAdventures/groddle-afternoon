@@ -1,7 +1,8 @@
 // Where the game's CSS lives, and its declarations, for the design tokens (tools/tokens/convert.mjs)
 // and their lint (tests/design-tokens.test.js).
 //
-// Sources: public/style.css, and every CSS template literal in public/*.js and public/js/**
+// Sources: public/style.css, the stylesheets in public/css/ (public/css/classic.css, the Classic
+// interface), and every CSS template literal in public/*.js and public/js/**
 // (the stylesheets modules inject with a <style> element), plus the online page's style block
 // in tools/play-online/build.mjs. A literal counts as CSS when it holds a `selector { prop: value }`
 // rule once `${...}` is masked. Inline style strings (style="...", cssText) are not covered.
@@ -123,6 +124,14 @@ export function cssSources(root) {
     regions.push({ start: b + TOKENS_END.length, end: style.length });
   } else regions.push({ start: 0, end: style.length });
   out.push({ file: stylePath, text: style, regions: regions.map((r) => ({ ...r, masked: maskCss(style.slice(r.start, r.end)) })) });
+  const cssDir = path.join(root, 'public/css');
+  if (fs.existsSync(cssDir)) {
+    for (const f of fs.readdirSync(cssDir).filter((x) => x.endsWith('.css')).sort()) {
+      const file = `public/css/${f}`;
+      const text = fs.readFileSync(path.join(root, file), 'utf8');
+      out.push({ file, text, regions: [{ start: 0, end: text.length, masked: maskCss(text) }] });
+    }
+  }
   const js = [
     ...fs.readdirSync(path.join(root, 'public')).filter((f) => /\.m?js$/.test(f)).map((f) => path.join(root, 'public', f)),
     ...walkFiles(path.join(root, 'public/js')),

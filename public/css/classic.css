@@ -1,0 +1,119 @@
+/* The Classic interface: the late-2012 client's chrome over the same game (classic-spec spec.md).
+   Every rule is under :root[data-ui="classic"] (js/classic/ui-mode.js sets it), so Modern never sees
+   one. Colours, type and sizes come only from the --c-classic-* / --font-classic-* / --fs-classic-*
+   tokens in style.css's token block; tests/design-tokens.test.js lints this file and
+   tests/classic-skin.test.js checks the scoping. Art is public/assets/classic/ (tools/classic-art).
+
+   So far: the Preferences window in the 2012 dialog shell (spec §12a, §13). The frame, the top bar,
+   the chat column, the growl line, the pack and the verb menu follow. */
+
+/* == Preferences (js/classic/classic-prefs.js) in the dialog shell: Dialog.as 34-488, WindowBorder.as,
+   BigDialog.as; PrefsDialog.as 44-275 (450 wide, body at least 200). No modal shade: windows float over
+   the live game. */
+:root[data-ui="classic"] .prefs-shade {
+  background: transparent;
+  pointer-events: none;
+}
+:root[data-ui="classic"] .prefs-window {
+  pointer-events: auto;
+  width: min(450px, 100%);
+  padding: 0;
+  border-radius: var(--radius-xs);
+  background: var(--c-classic-panel);
+  color: var(--c-classic-text);
+  font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body);
+  /* 1 px black at .37, then a 6 px ring of black at .15 (spec §12a: outline and halo, no drop shadow). */
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--c-classic-ink) 37%, transparent),
+    0 0 1px 7px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+}
+:root[data-ui="classic"] .prefs-window h2 {
+  margin: 0;
+  padding: var(--sp-5) 56px var(--sp-5) var(--sp-10);
+  min-height: 35px;
+  color: var(--c-classic-title);
+  font: 800 var(--fs-classic-window)/var(--lh-tight) var(--font-classic-title);
+}
+/* The body is a grey well between two rules (BigDialog.as 41-42). */
+:root[data-ui="classic"] .prefs-window fieldset,
+:root[data-ui="classic"] .prefs-window .prefs-choice.prefs-size {
+  margin: 0;
+  padding: var(--sp-5) var(--sp-10);
+  background: var(--c-classic-well);
+}
+:root[data-ui="classic"] .prefs-window fieldset {
+  border-top: 1px solid var(--c-classic-rule);
+  min-height: 120px;
+}
+:root[data-ui="classic"] .prefs-window .prefs-size {
+  min-height: 80px;
+  border-bottom: 1px solid var(--c-classic-rule);
+}
+:root[data-ui="classic"] .prefs-window .prefs-size[hidden] { display: none; }
+:root[data-ui="classic"] .prefs-window fieldset:has(+ .prefs-size[hidden]) { border-bottom: 1px solid var(--c-classic-rule); min-height: 200px; }
+:root[data-ui="classic"] .prefs-window legend {
+  float: left;
+  width: 100%;
+  margin: 0 0 var(--sp-3);
+  color: var(--c-classic-title);
+  font: 800 var(--fs-classic-pane)/var(--lh-tight) var(--font-classic-title);
+}
+:root[data-ui="classic"] .prefs-window .prefs-choice { clear: left; padding: var(--sp-2) 0; }
+:root[data-ui="classic"] .prefs-window .prefs-choice small,
+:root[data-ui="classic"] .prefs-window .prefs-note { color: var(--c-classic-text); font-size: var(--fs-classic-body); }
+:root[data-ui="classic"] .prefs-window input[type="radio"] { accent-color: var(--c-classic-link); }
+/* The client's own checkbox art (cb_unchecked.png, cb_checked.png, 18 x 18). */
+:root[data-ui="classic"] .prefs-window input[type="checkbox"] {
+  appearance: none;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  background: url("../assets/classic/cb_unchecked.png?v=6c5e383b") no-repeat center / 18px 18px;
+  cursor: pointer;
+}
+:root[data-ui="classic"] .prefs-window input[type="checkbox"]:checked { background-image: url("../assets/classic/cb_checked.png?v=97042d1e"); }
+:root[data-ui="classic"] .prefs-window .prefs-foot { margin: 0; padding: var(--sp-5) var(--sp-10); min-height: 9px; }
+/* Done as a minor button (PROPOSED colours, build-plan §3). */
+:root[data-ui="classic"] .prefs-window .prefs-done {
+  padding: var(--sp-3) var(--sp-8);
+  border: 1px solid var(--c-classic-btn-minor-border);
+  border-radius: var(--radius-xs);
+  color: var(--c-classic-btn-minor-label);
+  background: linear-gradient(180deg, var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom));
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--c-classic-ink) 30%, transparent);
+  font: 800 var(--fs-classic-body)/var(--lh-normal) var(--font-classic-title);
+}
+:root[data-ui="classic"] .prefs-window .prefs-done:hover { background: linear-gradient(180deg, var(--c-classic-panel), var(--c-classic-btn-minor-top)); }
+/* The close: a white 30 x 30 square 16 px in from the top right, a 10 x 10 cross in a 3 px red stroke
+   with square caps; hover adds an inner pink glow (Dialog.as 221-243). */
+:root[data-ui="classic"] .prefs-window .prefs-close {
+  top: 6px;
+  right: 16px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 0;
+  background: var(--c-classic-panel);
+  color: transparent;
+  overflow: hidden;
+}
+:root[data-ui="classic"] .prefs-window .prefs-close::before,
+:root[data-ui="classic"] .prefs-window .prefs-close::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 3px;
+  background: var(--c-classic-close);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+:root[data-ui="classic"] .prefs-window .prefs-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
+:root[data-ui="classic"] .prefs-window .prefs-close:hover { box-shadow: inset 0 0 6px var(--c-classic-close-hover); }
+/* Keyboard focus: the client's cyan glow (StaticFilters.as 284-293). */
+:root[data-ui="classic"] .prefs-window button:focus-visible,
+:root[data-ui="classic"] .prefs-window input:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--c-classic-focus);
+}

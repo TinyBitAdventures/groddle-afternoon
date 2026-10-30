@@ -11,6 +11,12 @@
 //                  moves layouts)
 //   --report=FILE  write the full mapping (every change) as JSON
 //
+// The Classic interface (public/css/classic.css, every rule under :root[data-ui="classic"]) has its own
+// palette, --c-classic-*, written by hand between the classic:start / classic:end markers of the token
+// block with the source of each value. Its colours map only onto that palette, the rest of the game's
+// never do, and with --add a new Classic colour becomes a --c-classic-<family>-<L> entry before
+// classic:end (the hand-written lines and their comments stay as they are).
+//
 // It only touches raw literals, so it is safe to re-run after other work lands: tokens already in
 // place stay, new raw values are mapped to the nearest token (role first: a `color` prefers --text-*,
 // a background --surface-*, a border --border-*), and with --add new colours become palette entries.
@@ -34,6 +40,11 @@ const REPORT = opt('--report', '');
 const STYLE = 'public/style.css';
 const PALETTE_START = '/* palette:start */';
 const PALETTE_END = '/* palette:end */';
+const CLASSIC_START = '/* classic:start */';
+const CLASSIC_END = '/* classic:end */';
+const CLASSIC_CSS = 'public/css/classic.css';
+const CLASSIC = '--c-classic-';
+const isClassicToken = (name) => name.startsWith(CLASSIC);
 
 // ---- token block --------------------------------------------------------------------------------
 
@@ -132,11 +143,13 @@ const jumps = [];
 const misses = [];
 const changes = [];
 
-function bestColour(rgba, role, { paletteOnly = false } = {}) {
+function bestColour(rgba, role, { paletteOnly = false, classic = false } = {}) {
   const alpha = rgba[3];
   let best = null;
   for (const t of colourTokens) {
     if (paletteOnly && t.role !== 'palette') continue;
+    // Classic's palette is Classic's alone, both ways.
+    if (isClassicToken(t.name) !== classic) continue;
     const sameAlpha = Math.abs(t.rgba[3] - alpha) <= 0.015;
     if (!sameAlpha && t.rgba[3] < 1) continue;
     const d = deltaE(rgba, t.rgba);
@@ -339,7 +352,7 @@ function transform(d, file) {
       if (edits.some((e) => c.index >= e.start && c.index < e.end)) continue;
       const from = d.value.slice(c.index, c.index + c.length);
       if (allowed(file, d.selector, from)) continue;
-      const best = bestColour(c.rgba, role);
+      const best = bestColour(c.rgba, role, { classic: file === CLASSIC_CSS });
       if (best) edits.push({ start: c.index, end: c.index + c.length, text: best.text, kind: 'colour', from, d: best.d, role });
       else misses.push({ file, selector: d.selector, prop, value: from, rgba: c.rgba, role });
     }
@@ -383,7 +396,8 @@ function paletteEntries(text) {
 if (ADD) {
   // Seeds: raw colours written in the token block itself (semantic picks) become palette entries first.
   const counts = new Map();
-  const bump = (rgb, n = 1) => { const k = rgb.map((v) => Math.round(v)).join(','); counts.set(k, (counts.get(k) || 0) + n); };
+  const classicCounts = new Map();
+  const bump = (rgb, n = 1, into = counts) => { const k = rgb.map((v) => Math.round(v)).join(','); into.set(k, (into.get(k) || 0) + n); };
   const seeds = [];
   for (const [name, v] of tokens) {
     if (name.startsWith('--c-') || /^--(fs|lh|sp|radius|z|font)-/.test(name) || /^--shadow-\d$/.test(name)) continue;
@@ -394,22 +408,30 @@ if (ADD) {
     if (!COLOUR_PROP.test(d.prop) || /mask/.test(d.prop)) continue;
     for (const c of colourLiterals(d.maskedValue, true)) {
       if (allowed(d.file, d.selector, d.value.slice(c.index, c.index + c.length))) continue;
-      bump(c.rgba.slice(0, 3));
+      bump(c.rgba.slice(0, 3), 1, d.file === CLASSIC_CSS ? classicCounts : counts);
     }
   }
-  const palette = colourTokens.filter((t) => t.role === 'palette');
+  const palette = colourTokens.filter((t) => t.role === 'palette' && !isClassicToken(t.name));
+  const classicPalette = colourTokens.filter((t) => isClassicToken(t.name));
   const taken = new Set(tokens.keys());
   const added = [];
-  const consider = (rgb, seed = false) => {
-    if (palette.some((t) => deltaE(t.rgba, rgb) <= (seed ? 0.01 : TOL))) return;
-    const name = paletteName(rgb, taken);
+  const consider = (rgb, seed = false, classic = false) => {
+    const list = classic ? classicPalette : palette;
+    if (list.some((t) => deltaE(t.rgba, rgb) <= (seed ? 0.01 : TOL))) return;
+    let name = paletteName(rgb, taken);
+    if (classic) {
+      const base = CLASSIC + name.slice(4);
+      name = base;
+      for (const sfx of 'bcdefghijklmnopqrstuvwxyz') { if (!taken.has(name)) break; name = base + sfx; }
+    }
     taken.add(name);
-    const entry = { name, rgba: [...rgb, 1], role: 'palette' };
-    palette.push(entry);
+    const entry = { name, rgba: [...rgb, 1], role: 'palette', classic };
+    list.push(entry);
     added.push(entry);
   };
   for (const s of seeds) consider(s, true);
   for (const [k] of [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))) consider(k.split(',').map(Number));
+  for (const [k] of [...classicCounts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))) consider(k.split(',').map(Number), false, true);
   if (added.length) {
     for (const e of added) tokens.set(e.name, hex(e.rgba));
     // Semantic tokens written as raw colours now point at their palette entry.
@@ -446,8 +468,18 @@ function renderBlock(blockText) {
     if (!tokens.has(name) || name.startsWith('--c-')) return all;
     return `${name}${sep}${tokens.get(name)};`;
   });
+  // New Classic entries go before classic:end; the hand-written ones stay as written.
+  const ca = text.indexOf(CLASSIC_START);
+  const cb = text.indexOf(CLASSIC_END);
+  const fresh = [...tokens].filter(([n]) => isClassicToken(n) && (ca < 0 || !new RegExp(`${n}\\s*:`).test(text.slice(ca, cb))));
+  if (fresh.length) {
+    if (ca < 0 || cb < ca) throw new Error(`token block has no ${CLASSIC_START} / ${CLASSIC_END} markers`);
+    const lines = fresh.map(([n, v]) => `  ${n}: ${v};\n`).join('');
+    const at = text.lastIndexOf('\n', cb) + 1;
+    text = text.slice(0, at) + lines + text.slice(at);
+  }
   const { a, b } = paletteEntries(text);
-  const entries = [...tokens].filter(([n]) => n.startsWith('--c-')).map(([name, v]) => ({ name, v, c: parseColour(v) }));
+  const entries = [...tokens].filter(([n]) => n.startsWith('--c-') && !isClassicToken(n)).map(([name, v]) => ({ name, v, c: parseColour(v) }));
   const order = ['white', 'grey', 'black', 'cream', 'sand', 'umber', 'brown', 'orange', 'gold', 'yellow', 'lime', 'sage', 'green', 'teal', 'sky', 'blue', 'slate', 'navy', 'violet', 'plum', 'mauve', 'pink', 'red'];
   const fam = (e) => (e.name === '--c-white' ? 'white' : e.name === '--c-black' ? 'black' : family(e.c));
   entries.sort((x, y) => order.indexOf(fam(x)) - order.indexOf(fam(y)) || oklch(y.c)[0] - oklch(x.c)[0] || x.name.localeCompare(y.name));
