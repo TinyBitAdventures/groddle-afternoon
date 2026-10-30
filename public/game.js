@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-2';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-316';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-315';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g434-1';
@@ -18,7 +18,7 @@ import {
 } from './js/action-timing.js?v=timed-actions-1';
 import { createWordProgressView, wordAnchor, heldActionDelta, MAX_PUSH_DOWN } from './js/word-progress.js?v=g387-1';
 // G374/G375/G378: Tiny Speck's quoin-limit and super-harvest rainbows and the musicblock notes.
-import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=g448-2';
+import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=g458-1';
 import {
   createQuestState,
   assignQuest,
@@ -120,7 +120,7 @@ import {
 } from './js/legalize-it.js?v=g450-1';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=g443-1';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=g454-1';
-import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=g450-1';
+import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=g458-1';
 import {
   WINTER_HAVEN_STREET_ID,
   WINTER_MOTE_REWARDS,
@@ -652,7 +652,7 @@ import {
   cameraWorldHeightForGround,
 } from './js/movement.js?v=movement-6';
 import { renderResolution, RESOLUTION_STEP } from './js/render-density.js';
-import { DEFAULT_VP_H, MAX_VP_H, locationViewHeightFor, sceneViewCap } from './js/location-view.js?v=viewheight-1';
+import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap } from './js/location-view.js?v=g458-1';
 import {
   levelInfoForXp,
   reconcilePlayerProgression,
@@ -919,7 +919,14 @@ function playerHubId() {
   );
 }
 
-const VIEW_W = 960;
+/**
+ * The view's width in world px: 960 at boot, then the window's (g458,
+ * js/location-view.js stageFor, set by syncLocationViewHeight): about 1:1 up
+ * to 1680 x 720, magnified past that, never under 960 x 408.
+ */
+let VIEW_W = LOCATION_VIEW_W;
+/** CSS px per world px on screen (syncLocationViewHeight). */
+let STAGE_SCALE = 1;
 // Tiny Speck's TSMainView subtracts MIN_PACK_HEIGHT (132px) before setting
 // loc_vp_h. Our pack overlays the Pixi canvas, so camera framing must use the
 // same shorter location viewport or low platforms disappear behind the pack.
@@ -1414,48 +1421,81 @@ function syncRenderResolution() {
   app.canvas.dataset.renderResolution = String(next);
 }
 
-/** The scene whose height last held the location view (syncLocationViewHeight). */
+/** The scene whose size last held the view (syncLocationViewHeight). */
 let viewSceneLayer = null;
 
+/** `?viewh=<px>` (QA, the restoration and landing shots): the old page, a 960 px view scaled to the width. */
+const PINNED_VIEW_H = Number(new URLSearchParams(location.search).get('viewh')) || 0;
+if (PINNED_VIEW_H > 0) document.documentElement.classList.add('stage-pinned');
+
 /**
- * VIEWHEIGHT = grow (js/location-view.js): the room the window leaves under
- * the top bar, in view pixels, less the pack allowance, 400 to 600 px.
- * `?viewh=<px>` pins the window's share for QA and the restoration shots.
+ * The stage for the window (g458, js/location-view.js stageFor): the CSS room
+ * #game-root leaves under the top bar, the current scene's own width and
+ * height (TSMainView's smallest layer), and `viewh` for the pinned layout.
  */
-function measureLocationViewHeight() {
+function measureStage() {
   const root = document.getElementById('game-root');
-  if (!root) return DEFAULT_VP_H;
-  const host = app?.canvas?.isConnected ? app.canvas : root;
-  const rect = host.getBoundingClientRect();
-  const wrap = root.parentElement ? getComputedStyle(root.parentElement) : null;
-  const below = (parseFloat(wrap?.paddingBottom) || 0) + (parseFloat(getComputedStyle(root).borderBottomWidth) || 0);
-  return locationViewHeightFor({
-    availableHeight: window.innerHeight - (rect.top + window.scrollY) - below,
-    displayWidth: rect.width || root.clientWidth,
-    viewWidth: VIEW_W,
+  const sceneHeight = sceneViewCap(bgLayer);
+  if (!root) return stageFor({ sceneHeight });
+  if (PINNED_VIEW_H > 0) {
+    const host = app?.canvas?.isConnected ? app.canvas : root;
+    return stageFor({ width: host.getBoundingClientRect().width || root.clientWidth, height: 1, pinnedHeight: PINNED_VIEW_H, sceneHeight });
+  }
+  return stageFor({
+    width: root.clientWidth,
+    height: root.clientHeight,
     packReserve: PACK_VIEW_RESERVE,
-    sceneHeight: sceneViewCap(bgLayer),
-    forced: new URLSearchParams(location.search).get('viewh'),
+    sceneWidth: sceneViewWidthCap(bgLayer, WORLD_W),
+    sceneHeight,
   });
 }
 
-/** Resize the canvas to the window's location view, live; true when it changed. */
+/**
+ * Size the canvas to the window, live; true when the view changed. The view
+ * grows with the window at about 1:1 (VIEWHEIGHT = grow, now in both axes),
+ * a scene smaller than it magnifies to fill, and the canvas always fills
+ * #game-root, so the page never scrolls (style.css STAGE block).
+ */
 function syncLocationViewHeight() {
   viewSceneLayer = bgLayer;
-  const next = measureLocationViewHeight();
-  if (next === LOCATION_VIEW_H) return false;
+  const stage = measureStage();
+  const root = document.getElementById('game-root');
+  if (root && !stage.pinned) {
+    // Only a view held under the window's height (a portrait phone) leaves a band above the canvas.
+    const band = root.clientHeight - stage.cssHeight;
+    if (band >= 1) {
+      root.style.setProperty('--stage-h', `${stage.cssHeight.toFixed(2)}px`);
+      root.style.setProperty('--stage-gap', `${band.toFixed(2)}px`);
+    } else {
+      root.style.removeProperty('--stage-h');
+      root.style.removeProperty('--stage-gap');
+    }
+  }
+  STAGE_SCALE = stage.scale;
+  const next = stage.viewH;
+  if (next === LOCATION_VIEW_H && stage.viewW === VIEW_W) return false;
   const grew = next - LOCATION_VIEW_H;
   LOCATION_VIEW_H = next;
   VIEW_H = next + PACK_VIEW_RESERVE;
+  VIEW_W = stage.viewW;
   if (app?.renderer) {
-    app.renderer.resize(VIEW_W, VIEW_H, app.renderer.resolution);
+    // A scene can change the scale without the canvas changing size: keep the density with it.
+    const resolution = renderResolution(stage.cssWidth, VIEW_W, window.devicePixelRatio || 1);
+    app.renderer.resize(VIEW_W, VIEW_H, resolution);
+    app.canvas.dataset.renderResolution = String(resolution);
     app.canvas.dataset.locationViewportHeight = String(LOCATION_VIEW_H);
+    app.canvas.dataset.viewWidth = String(VIEW_W);
+    app.canvas.dataset.stageScale = STAGE_SCALE.toFixed(3);
   }
   // CameraMan scales y_cam_offset with loc_vp_h: the avatar keeps its share of the view.
   if (world && Number.isFinite(camY)) {
     const anchor = streetCameraAnchor();
     camY = clamp(camY - grew * anchor, 0, Math.max(0, activeCameraWorldHeight(anchor) - LOCATION_VIEW_H));
     world.y = -Math.round(camY * 2) / 2;
+  }
+  if (world && player && Number.isFinite(WORLD_W)) {
+    camTarget = cameraTargetForPlayer(player.x, player.vx || 0);
+    world.x = -Math.round(camTarget * 2) / 2;
   }
   return true;
 }
@@ -1485,6 +1525,9 @@ function syncCameraSafeArea() {
 }
 
 function cameraTargetForPlayer(playerX, velocityX = 0) {
+  // A scene narrower than the view (only where the 408 px floor holds the scale) sits centred.
+  const spare = VIEW_W - WORLD_W;
+  if (spare > 0) return -Math.round(spare / 2);
   return cameraTargetX(playerX, velocityX, WORLD_W, VIEW_W, 4.4, cameraRightInset);
 }
 
@@ -7193,7 +7236,8 @@ function gameSplashUi() {
     document,
     mount: () => document.getElementById('game-root'),
     rect: () => locationViewRect(),
-    viewWidth: VIEW_W,
+    // Read on every show: the view follows the window (g458).
+    get viewWidth() { return VIEW_W; },
     playSound: (key) => playSound(key, { volume: 0.45 }),
     setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
   });
@@ -8246,7 +8290,8 @@ let heldGlitchAnims = new Set();
 /** Device pixels per art pixel decide the bake: 3x like js/sprite-hires.js, else 1x. */
 function vectorBakeScale() {
   const dpr = window.devicePixelRatio || 1;
-  return dpr * Math.max(1, (window.innerWidth || VIEW_W) / VIEW_W) >= 1.5 ? 3 : 1;
+  // The stage's zoom (g458: about 1:1 to 1680 px wide, then magnified), not the window over 960.
+  return dpr * Math.max(1, STAGE_SCALE) >= 1.5 ? 3 : 1;
 }
 
 function vectorDefaultPack(key) {
@@ -14488,7 +14533,8 @@ function spawnWinterSnow() {
   snow.eventMode = 'none';
 
   const veil = new PIXI.Graphics();
-  veil.rect(0, 0, VIEW_W, MAX_VP_H + PACK_VIEW_RESERVE).fill({ color: winterWalkState?.stage === 'haven' ? 0x18345f : 0xc9efff, alpha: 0.055 });
+  // A unit square stretched to the view each frame (updateWinterSnow): the view follows the window.
+  veil.rect(0, 0, 1, 1).fill({ color: winterWalkState?.stage === 'haven' ? 0x18345f : 0xc9efff, alpha: 0.055 });
   veil._winterVeil = true;
   snow.addChild(veil);
 
@@ -14518,7 +14564,11 @@ function updateWinterSnow(dt) {
   const left = Number.isFinite(camTarget) ? camTarget : 0;
   const top = Number.isFinite(camY) ? camY : 0;
   const veil = winterSnow.children.find((child) => child._winterVeil);
-  if (veil) veil.position.set(left, top);
+  if (veil) {
+    veil.position.set(left, top);
+    veil.width = VIEW_W;
+    veil.height = VIEW_H;
+  }
   for (const flake of winterSnow.children) {
     if (!flake._winterFlake) continue;
     flake._phase += 0.018 * dt;
@@ -24061,7 +24111,7 @@ async function main() {
   // 3x pack icons in Pixi sprites and <img>s, at their original sizes.
   installHiresIcons(textureUrls);
   // 3x animal sheets from the vector SWFs (js/sprite-hires.js), same frame rects.
-  installHiresSprites(textureUrls);
+  installHiresSprites(textureUrls, { viewWidth: LOCATION_VIEW_W * Math.max(1, STAGE_SCALE) });
   // Street decos load as WebP, 3x on Retina (js/deco-hires.js), same logical sizes.
   installHiresDecos(textureUrls, { renderer: () => app?.renderer });
   app = new PIXI.Application();
@@ -24088,6 +24138,11 @@ async function main() {
   app.canvas.dataset.mode = GAME_MODE;
   app.canvas.tabIndex = 0;
   root.insertBefore(app.canvas, document.getElementById('overlay'));
+  // The stage the window gave before the canvas existed (syncLocationViewHeight).
+  app.canvas.dataset.viewWidth = String(VIEW_W);
+  app.canvas.dataset.stageScale = STAGE_SCALE.toFixed(3);
+  app.canvas.dataset.locationViewportHeight = String(LOCATION_VIEW_H);
+  syncLocationViewHeight();
   syncRenderResolution();
   // Panels and the HUD can resize the canvas without a window resize.
   if (typeof ResizeObserver === 'function') new ResizeObserver(() => { syncLocationViewHeight(); syncRenderResolution(); }).observe(app.canvas);

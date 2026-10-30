@@ -34,7 +34,7 @@ import {
 } from '../hog-haul-mp.js?v=g334-hog-1';
 import { HOG_HAUL_SPLASH, splashFor } from '../game-splash.js?v=g448-2';
 import { grantMoodXp } from '../mood-xp.js';
-import { playCountdownArt } from '../overlays.js?v=g448-2';
+import { playCountdownArt } from '../overlays.js?v=g458-1';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
 
 const HOLD = 'hog-haul-mp';

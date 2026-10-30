@@ -237,9 +237,10 @@ export function buildRubeYardBackground(PIXI, kit) {
   yard.addChild(eyes);
   root.eyeGlow = eyes;
   // The far canopy scrolls sideways only (vertical parallax would sink it behind the banks).
-  root.updateParallax = (camX = 0, camY = 0) => {
+  root.updateParallax = (camX = 0, camY = 0, viewW = 0, viewH = 0, canvasH = viewH) => {
     sky.x = camX;
     sky.y = camY;
+    kit.fillView?.(sky, viewW, canvasH);
     far.x = camX * (1 - far.factor);
   };
   const top = new PIXI.Graphics();

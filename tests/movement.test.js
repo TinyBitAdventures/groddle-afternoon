@@ -27,7 +27,7 @@ import {
   cameraWorldHeightForGround,
 } from '../public/js/movement.js';
 import { streetHeight, platformsScreen } from '../public/js/street-model.js?v=g442-6';
-import { MIN_VP_H, MAX_VP_H, VIEW_FLOOR_H, locationViewHeightFor } from '../public/js/location-view.js';
+import { MIN_VP_H, MAX_VP_H, VIEW_CEIL_H, VIEW_FLOOR_H, locationViewHeightFor } from '../public/js/location-view.js?v=g458-1';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -225,17 +225,20 @@ test.describe('smooth directional camera and client wiring', () => {
     }
   });
 
-  test('keeps the lowest platform above the pack in every imported street at 408 and 600', () => {
+  test('keeps the lowest platform above the pack in every imported street at 408, 600 and 720', () => {
     const streetsDir = path.join(root, 'public/assets/streets');
     const streetFiles = fs.readdirSync(streetsDir)
       .filter((file) => file.endsWith('.json') && file !== 'index.json');
     let checked = 0;
-    for (const windowView of [VIEW_FLOOR_H, MAX_VP_H]) {
+    for (const windowView of [VIEW_FLOOR_H, MAX_VP_H, VIEW_CEIL_H]) {
       for (const file of streetFiles) {
         const street = JSON.parse(fs.readFileSync(path.join(streetsDir, file), 'utf8'));
         if (!street?.bounds || !Array.isArray(street.platforms) || !street.platforms.length) continue;
         // TSMainView: a street shorter than the window's view holds it (never under 408).
-        const locationViewHeight = locationViewHeightFor({ forced: windowView, sceneHeight: streetHeight(street) });
+        // Since g458 (stageFor) the stage magnifies a shorter street until it fills the view instead.
+        const locationViewHeight = windowView > MAX_VP_H
+          ? Math.max(VIEW_FLOOR_H, Math.min(windowView, streetHeight(street)))
+          : locationViewHeightFor({ forced: windowView, sceneHeight: streetHeight(street) });
         const platforms = platformsScreen(street);
         const lowestPlatformY = Math.max(
           ...platforms.flatMap((platform) => [platform.y1, platform.y2])
@@ -258,7 +261,7 @@ test.describe('smooth directional camera and client wiring', () => {
         checked += 1;
       }
     }
-    assert.ok(checked > 2_800, `expected the full street catalog twice, checked ${checked}`);
+    assert.ok(checked > 4_200, `expected the full street catalog three times, checked ${checked}`);
   });
 
   test('keeps camera damping equivalent across split frames', () => {
@@ -288,7 +291,7 @@ test.describe('smooth directional camera and client wiring', () => {
     assert.match(game, /const PACK_VIEW_RESERVE = 132/);
     assert.match(game, /let VIEW_H = LOCATION_VIEW_H \+ PACK_VIEW_RESERVE/);
     assert.match(game, /VIEW_H = next \+ PACK_VIEW_RESERVE/);
-    assert.match(game, /app\.renderer\.resize\(VIEW_W, VIEW_H, app\.renderer\.resolution\)/);
+    assert.match(game, /app\.renderer\.resize\(VIEW_W, VIEW_H, resolution\)/);
     assert.match(game, /window\.addEventListener\('resize', \(\) => \{\n    syncCameraSafeArea\(\);\n    syncLocationViewHeight\(\);/);
     assert.match(game, /cameraBottomPadding: cameraBottomSlack\(LOCATION_VIEW_H\)/);
     assert.match(game, /cameraTargetY\(player\.y, streetH, LOCATION_VIEW_H\)/);

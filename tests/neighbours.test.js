@@ -28,7 +28,7 @@ import {
   recordVisit,
   visitorLetter,
 } from '../public/js/neighbours.js';
-import { SCENE_DECO_SIZES, SCENE_STYLES, neighbourPlatforms, propPlan } from '../public/js/features/neighbour-scene.js';
+import { SCENE_DECO_SIZES, SCENE_STYLES, neighbourPlatforms, propPlan } from '../public/js/features/neighbour-scene.js?v=g458-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const DECO = join(root, 'assets/decos/groddle');

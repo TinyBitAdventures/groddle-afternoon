@@ -65,7 +65,7 @@ const G448_MORE = ['321_countdown', 'rook_feathers_falling', 'musicblock_notes',
 /** G448: the overlays.json rows that do. */
 const G448_ART = ['overlay_sneezing_powder', 'focusing_orb_laser_beam', 'shrine_laser_beam_1', 'shrine_laser_beam_2', 'shrine_laser_beam_3', 'smoke_puff', 'proto_puff', 'secret_location_marker', 'icon_giant_love', 'race_winner', 'grabemgood_winner', 'thegreathoghaul_winner', 'game_of_crowns_winner', 'focusing_orb_attack'];
 
-const overlays = () => import('../public/js/overlays.js?v=g448-2');
+const overlays = () => import('../public/js/overlays.js?v=g458-1');
 const flush = async (n = 3) => {
   for (let i = 0; i < n; i += 1) {
     await new Promise((r) => setTimeout(r, 0));
@@ -593,7 +593,7 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
 describe('wiring', () => {
   const game = read('game.js');
   it('game.js: quoin limit, super harvest, wheel and donation rainbows; musicblock notes; the phantom; the solo Hog Haul countdown', () => {
-    assert.match(game, /import \{[^}]*showRainbow[^}]*\} from '\.\/js\/overlays\.js\?v=g448-2'/);
+    assert.match(game, /import \{[^}]*showRainbow[^}]*\} from '\.\/js\/overlays\.js\?v=g458-1'/);
     assert.match(game, /playerRainbow\(result\.dailyLimit === 150 \? 'rainbow_150coinstoday' : 'rainbow_100coinstoday'\)/);
     assert.match(game, /if \(!paradiseRun\) playerRainbow/);
     assert.match(game, /playerRainbow\('rainbow_superharvest'/);

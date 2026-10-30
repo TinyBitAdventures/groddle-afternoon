@@ -259,9 +259,10 @@ export function buildGrowBackground(PIXI, kit, geo) {
   tufts(TUNNEL + 24, TUNNEL_X2 + 30, W + 20, 60, 800);
 
   // Horizon and hills scroll sideways only; vertical parallax would sink them under the field.
-  root.updateParallax = (camX = 0, camY = 0) => {
+  root.updateParallax = (camX = 0, camY = 0, viewW = 0, viewH = 0, canvasH = viewH) => {
     sky.x = camX;
     sky.y = camY;
+    kit.fillView?.(sky, viewW, canvasH);
     for (const c of [far, mid]) c.x = camX * (1 - c.factor);
   };
   return root;

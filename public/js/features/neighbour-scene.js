@@ -11,7 +11,8 @@ import { NEIGHBOUR_SCENE, hash01, neighbourLayout } from '../neighbours.js?v=nei
 import { textureFromUrl } from '../textures.js';
 
 const DECO = 'assets/decos/groddle/';
-const VIEW_W = 960;
+/** The widest view the parallax layers must cover (js/location-view.js: 1680, wider on ultrawide windows). */
+const VIEW_W = 2000;
 
 /** Exact source sizes of every deco used here. */
 export const SCENE_DECO_SIZES = Object.freeze({

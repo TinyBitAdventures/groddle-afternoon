@@ -280,7 +280,7 @@ function ensureCss() {
   document.head.appendChild(style);
 }
 
-/** The location viewport inside #game-root, in CSS px, and the logical-px scale (960 wide). */
+/** The location viewport inside #game-root, in CSS px, and the logical-px scale (the view's width, g458). */
 function viewport() {
   const root = rootEl();
   const canvas = root?.querySelector('canvas:not(.lonely-portrait):not(.lonely-fireworks)');
@@ -288,7 +288,7 @@ function viewport() {
   const r = root.getBoundingClientRect();
   const c = canvas.getBoundingClientRect();
   if (!c.width) return null;
-  const scale = c.width / 960;
+  const scale = c.width / (Number(canvas.dataset?.viewWidth) || 960);
   const rail = document.getElementById('play-context');
   const railRect = rail && rail.offsetParent !== null ? rail.getBoundingClientRect() : null;
   const right = railRect && railRect.left > c.left && railRect.left < c.right ? railRect.left : c.right;
@@ -575,7 +575,7 @@ export async function fireworksUnder(engine, at, vp, durationMs) {
     return false;
   }
   const { meta, imgs } = art;
-  // The viewport in logical px (960 wide), drawn at the screen's resolution.
+  // The viewport in logical px (the view's width), drawn at the screen's resolution.
   const w = Math.max(1, Math.round(vp.width / vp.scale));
   const h = Math.max(1, Math.round(vp.height / vp.scale));
   const res = Math.min(2, Math.max(1, vp.scale * (globalThis.devicePixelRatio || 1)));

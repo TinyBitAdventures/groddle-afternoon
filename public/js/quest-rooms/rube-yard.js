@@ -23,7 +23,7 @@
  */
 
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js';
-import { YARD_FRONT, YARD_H, YARD_W, buildRubeYardBackground, yardDeco } from '../rube-yard-scene.js?v=g66-1';
+import { YARD_FRONT, YARD_H, YARD_W, buildRubeYardBackground, yardDeco } from '../rube-yard-scene.js?v=g458-1';
 
 const W = YARD_W;
 const H = YARD_H;

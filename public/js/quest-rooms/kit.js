@@ -30,7 +30,26 @@ export function gradient(PIXI, stops, width, height) {
   const sprite = new PIXI.Sprite(PIXI.Texture.from(canvas));
   sprite.width = width;
   sprite.height = height;
+  // On a screen-fixed layer it stretches to a view larger than it (fillView, g458).
+  sprite.viewFill = { w: width, h: height };
   return sprite;
+}
+
+/**
+ * Stretch a screen-fixed layer's gradients (and anything else marked
+ * `viewFill = { w, h }`) to cover the view: rooms drew their skies for the
+ * old 960 px view, and the view now follows the window (g458).
+ */
+export function fillView(layer, viewW, viewH) {
+  const w = Number(viewW) || 0;
+  const h = Number(viewH) || 0;
+  if (!layer || !(w > 0)) return;
+  for (const child of layer.children || []) {
+    const fill = child.viewFill;
+    if (!fill) continue;
+    child.width = Math.max(fill.w, w);
+    child.height = Math.max(fill.h, h);
+  }
 }
 
 /**
@@ -52,10 +71,11 @@ export function sceneRoot(PIXI, width, height) {
     if (factor !== 1) layers.push(c);
     return c;
   };
-  root.updateParallax = (camX = 0, camY = 0) => {
+  root.updateParallax = (camX = 0, camY = 0, viewW = 0, viewH = 0, canvasH = viewH) => {
     for (const c of layers) {
       c.x = camX * (1 - c.factor);
       c.y = camY * (1 - c.factor);
+      if (c.factor === 0) fillView(c, viewW, canvasH);
     }
   };
   return root;

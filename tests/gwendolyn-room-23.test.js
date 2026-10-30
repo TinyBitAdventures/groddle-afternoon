@@ -12,7 +12,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import * as kit from '../public/js/quest-rooms/kit.js';
+import * as kit from '../public/js/quest-rooms/kit.js?v=g458-1';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=g403-1';
 import { acceptOffer, ensureQuestOfferState, npcQuestOffers, pendingQuestOffers, turnInQuest } from '../public/js/quest-offers.js?v=g403-1';
 import { XP_FOR_LEVEL } from '../public/js/progression.js';
@@ -50,7 +50,7 @@ import {
   leadPath,
   room23Street,
 } from '../public/js/gwendolyn-room-23.js?v=g403-1';
-import { gwendolynRoom23Feature } from '../public/js/features/gwendolyn-room-23-feature.js?v=g403-1';
+import { gwendolynRoom23Feature } from '../public/js/features/gwendolyn-room-23-feature.js?v=g458-1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = (p) => join(spike, 'public', p);

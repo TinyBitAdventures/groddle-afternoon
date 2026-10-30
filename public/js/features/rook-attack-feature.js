@@ -89,7 +89,7 @@ import { shrinePrimeBonus } from '../imagination-effects.js?v=g403-1';
 import { grantMoodXp } from '../mood-xp.js';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js';
 import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g448-2';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=g448-2';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=g458-1';
 import {
   MP_ROOK,
   MP_ROOK_TEXT,
@@ -107,11 +107,14 @@ import {
 import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
+/** The view the fight's screen art was laid out on; syncFront centres it in a wider one (g458). */
 const VIEW_W = 960;
 const VIEW_H = 408;
 // The whole canvas: the pack allowance below the location viewport shows street too.
-// The view grows with the window up to 600 px (js/location-view.js), so cover 600 + 132.
-const SCREEN_H = 732;
+// The view grows with the window up to 1680 x 720 (js/location-view.js), so cover 720 + 132
+// and SCREEN_PAD either side of the centred 960 px frame.
+const SCREEN_H = 852;
+const SCREEN_PAD = 400;
 const PLAYER_LABEL = 'Ur';
 const ORB_CLASS = 'focusing_orb';
 const BALM_CLASS = 'potion_rook_balm';
@@ -477,7 +480,7 @@ function ensureUi(engine) {
   const root = new PIXI.Container();
   root.eventMode = 'passive';
   const sky = new PIXI.Graphics();
-  sky.rect(0, 0, VIEW_W, SCREEN_H).fill({ color: 0x1b1030, alpha: 1 });
+  sky.rect(-SCREEN_PAD, 0, VIEW_W + 2 * SCREEN_PAD, SCREEN_H).fill({ color: 0x1b1030, alpha: 1 });
   sky.alpha = 0;
   sky.eventMode = 'none';
   const rookLayer = new PIXI.Container();
@@ -512,7 +515,12 @@ function syncFront(engine) {
   const f = ui?.front;
   if (!f || f.destroyed) return;
   const cam = engine.camera;
-  f.x = -cam.x;
+  // The screen art (Rook, banners, silhouettes) keeps its 960 px layout, centred in a wider
+  // view; the badge stays in the view's top right. The front layer stays on the world.
+  const spare = Math.max(0, Math.round(((cam.w || VIEW_W) - VIEW_W) / 2));
+  ui.root.x = spare;
+  if (ui.hud && !ui.hud.destroyed) ui.hud.x = spare;
+  f.x = -cam.x - spare;
   f.y = -cam.y;
 }
 
@@ -718,7 +726,7 @@ function updateOverlays(engine) {
   let k = 1;
   if (el < cur.inMs) k = el / cur.inMs;
   else if (el > cur.inMs + cur.holdMs) k = 1 - (el - cur.inMs - cur.holdMs) / cur.outMs;
-  ui.tint.rect(0, 0, VIEW_W, SCREEN_H).fill({ color: cur.color, alpha: cur.alpha * k });
+  ui.tint.rect(-SCREEN_PAD, 0, VIEW_W + 2 * SCREEN_PAD, SCREEN_H).fill({ color: cur.color, alpha: cur.alpha * k });
   ui.textLayer.alpha = Math.max(0, Math.min(1, k * 1.15));
 }
 

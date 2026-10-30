@@ -13,7 +13,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
-import * as kit from '../public/js/quest-rooms/kit.js';
+import * as kit from '../public/js/quest-rooms/kit.js?v=g458-1';
 import {
   ALLEY,
   ALLEY_ART,
@@ -43,8 +43,8 @@ import {
   nearestStation,
   room,
   stationForDoor,
-} from '../public/js/quest-rooms/back-alley.js?v=g454-1';
-import * as alleySet from '../public/js/quest-rooms/back-alley-set.js?v=g450-1';
+} from '../public/js/quest-rooms/back-alley.js?v=g458-1';
+import * as alleySet from '../public/js/quest-rooms/back-alley-set.js?v=g458-1';
 import { STATION_FLOOR, STATIONS, stationArrival, stationByTsid, surfaceStation } from '../public/js/subway.js?v=g454-1';
 import { BACK_ALLEY_FILES } from '../public/js/quest-rooms/back-alley-art.js';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js';
@@ -230,7 +230,7 @@ describe('Back Alley and station geometry', () => {
     assert.ok(alleySet.inEnteredBox(ALLEY.triggerX) && !alleySet.inEnteredBox(ALLEY.spawnX));
     assert.equal(alleySet.SHADY.x, ALLEY.bureaucratX);
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
-    assert.match(game, /import \{ ALLEY, SHADY, drawAlley, inEnteredBox \} from '\.\/js\/quest-rooms\/back-alley-set\.js\?v=g450-1';/);
+    assert.match(game, /import \{ ALLEY, SHADY, drawAlley, inEnteredBox \} from '\.\/js\/quest-rooms\/back-alley-set\.js\?v=g458-1';/);
     assert.match(game, /const layer = drawAlley\(PIXI\);/);
   });
 });

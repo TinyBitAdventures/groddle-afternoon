@@ -543,6 +543,8 @@ function vignette(PIXI) {
   const spr = new PIXI.Sprite(vignetteCanvas ? PIXI.Texture.from(vignetteCanvas) : PIXI.Texture.EMPTY);
   spr.width = 960;
   spr.height = 540;
+  // Stretched over a wider view by kit.fillView (g458).
+  spr.viewFill = { w: 960, h: 540 };
   return spr;
 }
 

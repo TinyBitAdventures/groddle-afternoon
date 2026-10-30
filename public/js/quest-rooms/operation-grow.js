@@ -34,7 +34,7 @@
 
 import { JUMP_GAP, JUMP_RISE } from './puzzle-kit.js?v=cu-1';
 import { textureFromUrl } from '../textures.js';
-import { buildGrowBackground, makeStalk } from '../operation-grow-scene.js?v=g109-1';
+import { buildGrowBackground, makeStalk } from '../operation-grow-scene.js?v=g458-1';
 
 export const W = 2500;
 export const H = 960;

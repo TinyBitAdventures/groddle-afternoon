@@ -123,7 +123,7 @@ import { assignQuest, completeQuest } from '../quests.js?v=item-buffs-7';
 import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=g403-1';
 import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
 import { locationEventsApi } from './location-events-feature.js?v=g452-1';
-import * as kit from '../quest-rooms/kit.js?v=qi-1';
+import * as kit from '../quest-rooms/kit.js?v=g458-1';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g448-2';
@@ -364,8 +364,9 @@ function canvasRect() {
 /** World point to viewport (fixed) pixels. */
 function pageOf(wx, wy) {
   const r = canvasRect();
-  const cam = engineRef?.camera || { x: 0, y: 0 };
-  const s = r.width / 960;
+  const cam = engineRef?.camera || { x: 0, y: 0, w: 960 };
+  // CSS px per world px: the view follows the window (g458), so measure against its width.
+  const s = r.width / (cam.w || 960);
   return { x: r.left + (wx - cam.x) * s, y: r.top + (wy - cam.y) * s, rect: r };
 }
 
@@ -396,7 +397,7 @@ function positionBubbles() {
   ui.fade.style.width = `${r.width}px`;
   ui.fade.style.height = `${r.height}px`;
   ui.instr.style.left = `${r.left + r.width / 2}px`;
-  ui.instr.style.top = `${r.top + Math.min(r.height - 60, (engineRef?.camera?.h || 408) * (r.width / 960) - 44)}px`;
+  ui.instr.style.top = `${r.top + Math.min(r.height - 60, (engineRef?.camera?.h || 408) * (r.width / (engineRef?.camera?.w || 960)) - 44)}px`;
   ui.pill.style.left = `${r.left + 10}px`;
   ui.pill.style.top = `${r.top + 10}px`;
 }

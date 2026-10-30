@@ -195,14 +195,16 @@ async function showSpawnOverlay(engine) {
   const run = ++bannerRun;
   if (!(await afterStartCard(engine, run)) || run !== bannerRun) return;
   const root = typeof document === 'undefined' ? null : document.getElementById('game-root');
-  const c = root?.querySelector('canvas:not(.overlay-art):not(.lonely-fireworks):not(.lonely-portrait)')?.getBoundingClientRect();
+  const stageCanvas = root?.querySelector('canvas:not(.overlay-art):not(.lonely-fireworks):not(.lonely-portrait)');
+  const c = stageCanvas?.getBoundingClientRect();
   if (!c?.width) {
     engine.toast?.(QURAZY_SPAWN_LINE);
     return;
   }
   const r = root.getBoundingClientRect();
   const rect = { left: c.left - r.left, top: c.top - r.top, width: c.width, height: c.height };
-  const scale = c.width / 960;
+  // CSS px per game px: the view follows the window (g458; game.js writes its width on the canvas).
+  const scale = c.width / (Number(stageCanvas.dataset?.viewWidth) || 960);
   // The art box (overlays.json); playVectorOverlay reads the same cached manifest.
   const meta = await loadOverlayManifest().then((m) => m?.[QURAZY_OVERLAY.key] || null, () => null);
   if (run !== bannerRun) return;

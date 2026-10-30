@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 762,
+  "commits": 763,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "One notification system: notices top centre, gains rise and land in an Activity log, big moments wait their turn"
+   },
    {
     "date": "2026-10-29",
     "kind": "improve",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-29",
     "kind": "new",
     "text": "The Bureaucratic Halls greet you, make you wait, and serve you"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "The Enter hint draws over a Rook attack's skulls and feathers"
    }
   ]
  },

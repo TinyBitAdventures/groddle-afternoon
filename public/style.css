@@ -8133,3 +8133,39 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
   .notify-notices { transition: none; }
 }
 /* ======================== end NOTIFY ======================== */
+
+/* ===== STAGE (g458, UI audit 1): the game fills the window and the page never scrolls =====
+   #wrap is the window's height: the top bar, then #game-root takes the rest. The canvas fills
+   #game-root exactly (game.js syncLocationViewHeight sizes the world to it, js/location-view.js
+   stageFor), so a bigger window shows more world instead of magnifying it. No page frame.
+   ?viewh=<px> (html.stage-pinned: QA, the restoration and landing shots) keeps the old page. */
+html:not(.stage-pinned) body { min-height: 0; }
+html:not(.stage-pinned) #wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  padding: 0;
+  overflow: hidden;
+  /* clip, not just hidden: nothing (a focus, a scroll into view) can scroll the game away. */
+  overflow: clip;
+}
+html:not(.stage-pinned) #wrap > .top-bar {
+  flex: 0 0 auto;
+  border-width: 0 0 1px;
+  border-radius: 0;
+}
+html:not(.stage-pinned) #wrap > #game-root {
+  flex: 1 1 0;
+  min-height: 0;
+  /* Award rays and the like hang past the edge: clip them without making a scroll range. */
+  overflow: clip;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+/* A view held under the window's height (a portrait phone) sits on the pack: --stage-gap above. */
+html:not(.stage-pinned) #game-root > canvas[role="application"] {
+  height: var(--stage-h, 100%) !important;
+  margin-top: var(--stage-gap, 0px);
+}

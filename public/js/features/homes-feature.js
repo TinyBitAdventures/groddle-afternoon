@@ -256,8 +256,8 @@ const HOME_INTERIOR_TSID = 'RH_HOME_INT';
  */
 const TOWER_DROP_PREFIX = 'RH_HOME_TOWER_';
 const HOUSE_FLOOR_DROP_PREFIX = 'RH_HOME_FLOOR_';
-const VIEW_W = 960;
-const VIEW_H = 540;
+/** The widest view the parallax layers must cover (js/location-view.js: 1680, wider on ultrawide windows). */
+const VIEW_W = 2000;
 const DECO = 'assets/decos/groddle/';
 /** The house interior and Tower floors: walk line of the room shell. */
 const GROUND_Y = 620;
@@ -3945,8 +3945,10 @@ function updateGhost(engine) {
 function worldPoint(engine, event) {
   const canvas = event.target;
   const rect = canvas.getBoundingClientRect();
-  const sx = (event.clientX - rect.left) * (VIEW_W / rect.width);
-  const sy = (event.clientY - rect.top) * (VIEW_H / rect.height);
+  // CSS px per view px: the view follows the window (g458).
+  const k = (engine.camera?.w || 960) / rect.width;
+  const sx = (event.clientX - rect.left) * k;
+  const sy = (event.clientY - rect.top) * k;
   const p = engine.entityLayer.toLocal(new engine.PIXI.Point(sx, sy));
   return { x: p.x, y: p.y };
 }

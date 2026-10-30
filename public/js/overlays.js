@@ -265,7 +265,9 @@ export function locationRect(doc = globalThis.document, viewW = 960, locH = 0.72
   const c = canvas.getBoundingClientRect();
   const pack = doc.getElementById('pack-bar')?.getBoundingClientRect();
   const bottom = pack && pack.height > 0 && pack.top > c.top && pack.top < c.bottom ? pack.top : c.top + c.height * locH;
-  return { left: c.left - r.left - root.clientLeft, top: c.top - r.top - root.clientTop, width: c.width, height: bottom - c.top, scale: c.width / viewW };
+  // The view follows the window (g458): game.js writes its width on the canvas.
+  const vw = Number(canvas.dataset?.viewWidth) || viewW;
+  return { left: c.left - r.left - root.clientLeft, top: c.top - r.top - root.clientTop, width: c.width, height: bottom - c.top, scale: c.width / vw };
 }
 
 const sheetImages = new Map();

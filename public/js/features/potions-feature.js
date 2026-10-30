@@ -73,7 +73,7 @@ import { furnitureSize } from '../home-decor.js?v=g448-3';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js';
 import { POTION_ART } from '../potion-art.js?v=g448-3';
 import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=progression-1';
-import { overlayOrStandIn } from '../overlay-stand-in.js?v=g448-2';
+import { overlayOrStandIn } from '../overlay-stand-in.js?v=g458-1';
 import { playPoofIn, playSheetOverlay } from '../overlay-art.js?v=g448-2';
 import {
   ANIMAL_BABIES,
@@ -129,9 +129,9 @@ import {
 } from '../potions.js?v=g391-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { patchesFeature } from './patches-feature.js?v=g442-6';
-import { homesFeature } from './homes-feature.js?v=g457-3';
+import { homesFeature } from './homes-feature.js?v=g458-3';
 import { streetTreeIndex } from './tree-death-feature.js?v=g448-2';
-import { questRoomConverse } from './quest-instances-feature.js?v=g452-1';
+import { questRoomConverse } from './quest-instances-feature.js?v=g458-1';
 import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const POTIONS_FEATURE_ID = 'potions';

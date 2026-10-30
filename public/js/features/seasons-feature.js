@@ -99,7 +99,7 @@ import {
   yetiQuote,
 } from '../seasons.js?v=g433-1';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
-import { playOverlay } from '../overlays.js?v=g448-2';
+import { playOverlay } from '../overlays.js?v=g458-1';
 import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const SEASONS_FEATURE_ID = 'seasons';

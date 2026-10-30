@@ -15,11 +15,13 @@
  *   view at every height (0.5 + 150 / 600 = 0.75): 300 px down a 400 px
  *   view, 450 px down a 600 px one (js/movement.js cameraTargetY).
  *
- * The remake scales its 960 px wide view to the page width, so the window's
- * room is measured in view pixels: the CSS height left under the top bar,
- * divided by the canvas's CSS-per-view-pixel scale. The pack overlays the
- * bottom MIN_PACK_HEIGHT of the canvas (the camera never frames the avatar
- * there), so the canvas is the location view plus that allowance.
+ * Since g458 the stage fits the window in both axes (stageFor, below): the
+ * world is drawn near 1:1 and a bigger window shows more of it, as the
+ * original did up to 1000 x 600. The pack overlays the bottom MIN_PACK_HEIGHT
+ * of the canvas (the camera never frames the avatar there), so the canvas is
+ * the location view plus that allowance. locationViewHeightFor is the older
+ * rule for a 960 px view scaled to the page width; `viewh` (QA, the
+ * restoration and landing shots) still lays the stage out that way.
  *
  * Remake choices: the smallest view is the remake's old fixed 408 px (a 540 px
  * canvas), 8 px over min_vp_h, so small windows keep exactly the framing
@@ -33,8 +35,22 @@
 export const MIN_VP_H = 400;
 export const MAX_VP_H = 600;
 export const MIN_PACK_HEIGHT = 132;
-/** The remake's view width in view pixels (the canvas scales it to the page). */
+/** The remake's old fixed view width, now the narrowest view (stageFor). */
 export const LOCATION_VIEW_W = 960;
+/** The widest view before the stage magnifies instead (stageFor). */
+export const VIEW_MAX_W = 1680;
+/**
+ * The tallest view before the stage magnifies instead: 1.2x the source's
+ * max_vp_h, so 1440 x 900 still draws 1:1. Streets are 1000 px or taller
+ * (all but 38 of 1,463 imported), and a shorter scene holds the view.
+ */
+export const VIEW_CEIL_H = 720;
+/**
+ * Where a narrow, tall window (where the 960 px width floor wins) stops
+ * growing the view and leaves a band above the canvas instead: streets are
+ * 1000 px tall or more (all but 38 of 1,463 imported).
+ */
+export const VIEW_HOLD_H = 1000;
 /** The remake's smallest view: its old fixed 408 px, inside the source's 400-600. */
 export const VIEW_FLOOR_H = 408;
 /** Before the page can be measured (boot, tests): the smallest view. */
@@ -109,4 +125,82 @@ export function sceneViewCap(layer) {
     }
   }
   return h > 0 ? h : NaN;
+}
+
+/** A street layer or room narrower than the view: its width (and its layers'), like sceneViewCap. */
+export function sceneViewWidthCap(layer, worldWidth) {
+  if (!layer) return finite(worldWidth);
+  let w = finite(layer.worldW, finite(worldWidth));
+  const street = layer.street;
+  if (street && Array.isArray(street.layers)) {
+    for (const l of street.layers) {
+      const lw = finite(l?.w);
+      if (lw > 0) w = Number.isFinite(w) ? Math.min(w, lw) : lw;
+    }
+  }
+  return w > 0 ? w : NaN;
+}
+
+/**
+ * The stage for a window (g458, Austin's UI audit): how many CSS px one world
+ * px takes (scale) and the view that buys, in world px.
+ *
+ * - 1:1 by default, so a bigger window shows more world (the original showed
+ *   up to 1000 x 600 at 1:1; 1280 x 800 now shows about 1280 x 600).
+ * - Past VIEW_MAX_W x VIEW_CEIL_H the stage magnifies instead, so a large
+ *   monitor does not draw the art tiny (2x/3x art keeps it sharp).
+ * - Under LOCATION_VIEW_W x VIEW_FLOOR_H it shrinks, so the smallest view
+ *   every room was tuned for always fits.
+ * - A scene narrower or shorter than that view magnifies until it fills it
+ *   (homes, short rooms), never past the floors.
+ * - The canvas fills the room exactly, so the page never scrolls; only a view
+ *   held at VIEW_HOLD_H (a portrait phone, where the width floor wins) leaves
+ *   a band above.
+ *
+ * width/height: the CSS room for the canvas (the game area under the top bar).
+ * pinnedHeight: `viewh` (QA): the old layout, a LOCATION_VIEW_W view scaled to
+ * the page width with that location height (the canvas may then outgrow the
+ * window, as before).
+ */
+export function stageFor({
+  width,
+  height,
+  packReserve = MIN_PACK_HEIGHT,
+  sceneWidth,
+  sceneHeight,
+  pinnedHeight,
+} = {}) {
+  const W = finite(width);
+  const H = finite(height);
+  const pack = finite(packReserve, MIN_PACK_HEIGHT);
+  const pinned = finite(pinnedHeight);
+  if (pinned > 0 || !(W > 0) || !(H > 0)) {
+    const viewW = LOCATION_VIEW_W;
+    const viewH = locationViewHeightFor({ forced: pinned > 0 ? pinned : NaN, sceneHeight });
+    const scale = W > 0 ? W / viewW : 1;
+    return { scale, viewW, viewH, canvasH: viewH + pack, cssWidth: viewW * scale, cssHeight: (viewH + pack) * scale, pinned: pinned > 0 };
+  }
+  const floorH = VIEW_FLOOR_H + pack;
+  let scale = W < LOCATION_VIEW_W || H < floorH
+    ? Math.min(W / LOCATION_VIEW_W, H / floorH)
+    : Math.max(1, W / VIEW_MAX_W, H / (VIEW_CEIL_H + pack));
+  const sw = finite(sceneWidth) > 0 ? Math.max(LOCATION_VIEW_W, finite(sceneWidth)) : Infinity;
+  const sh = finite(sceneHeight) > 0 ? Math.max(VIEW_FLOOR_H, finite(sceneHeight)) : Infinity;
+  scale = Math.max(scale, W / sw, H / (sh + pack));
+  scale = Math.min(scale, W / LOCATION_VIEW_W, H / floorH);
+  const viewW = Math.round(W / scale);
+  const room = Math.floor(H / scale + 1e-6) - pack;
+  // A scene a few px shorter than the floors leave shows its ground skirt (the camera frames it);
+  // only a portrait window, where the width floor wins, is held (VIEW_HOLD_H).
+  const viewH = Math.max(VIEW_FLOOR_H, Math.min(room, VIEW_HOLD_H));
+  const held = viewH < room;
+  return {
+    scale,
+    viewW,
+    viewH,
+    canvasH: viewH + pack,
+    cssWidth: W,
+    cssHeight: held ? (viewH + pack) * scale : H,
+    pinned: false,
+  };
 }
