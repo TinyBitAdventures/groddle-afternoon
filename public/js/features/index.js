@@ -154,4 +154,4 @@ import { itemVerbsMoreFeature } from './item-verbs-more-feature.js?v=g463-2'; FE
 import { questPinsFeature } from './quest-pins-feature.js?v=g469-3'; FEATURES.push(questPinsFeature);
 import { streetObjectsFeature } from './street-objects-feature.js?v=g454-1'; FEATURES.push(streetObjectsFeature);
 import { realtimeFeature } from './realtime-feature.js?v=g466-1'; FEATURES.push(realtimeFeature);
-import { accountBackupFeature } from './account-backup-feature.js?v=g463-1'; FEATURES.push(accountBackupFeature);
+import { accountBackupFeature } from './account-backup-feature.js?v=g477-1'; FEATURES.push(accountBackupFeature);

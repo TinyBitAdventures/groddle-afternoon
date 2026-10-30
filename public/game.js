@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-2';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-344';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-352';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g463-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g470-1';
@@ -861,10 +861,10 @@ import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from '.
 import { mountNotifyView } from './js/notify-view.js?v=g469-2';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g468-13';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=g472-5';
-import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=g469-2';
-import { createQuestTracker } from './js/ui/quest-tracker.js?v=g469-3';
+import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=g477-1';
+import { createQuestTracker } from './js/ui/quest-tracker.js?v=g477-1';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=g472-7';
-import { bindVerbMenu, focusVerbRow, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=g469-1';
+import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=g477-1';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g470-2';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
@@ -2969,6 +2969,8 @@ function positionPackPopover(pop, anchor) {
   if (!bar || !anchor) return;
   const barRect = bar.getBoundingClientRect();
   const anchorRect = anchor.getBoundingClientRect();
+  // One footer height for every row, so the card never shifts under the pointer.
+  lockVerbMenuSize(pop);
   const popWidth = pop.offsetWidth || 300;
   const anchorCenter = anchorRect.left - barRect.left + anchorRect.width / 2;
   // Inside the band's padding: a drawer's --inset-r keeps the card out from under it.
@@ -3831,6 +3833,7 @@ function renderPackPopover(classTsid, anchor = null) {
   bindVerbMenu(pop);
   if (!unchanged) {
     pop.innerHTML = markup;
+    delete pop.dataset.vmLock;
     if (keepFocus) {
       const again = pop.querySelector(keepFocus);
       const target = again && !again.disabled ? again : pop.querySelector('[data-pack-eat-confirm], [data-pack-drop-confirm]');
@@ -6620,6 +6623,7 @@ function renderVerbMenu(target, verbs, level = null) {
   }
   menu.dataset.vmLevel = level ? level.verbId : '';
   menu.dataset.vmDefault = '';
+  delete menu.dataset.vmLock;
   list.innerHTML = '';
   const add = (row, onPick) => {
     const li = document.createElement('li');
@@ -6725,6 +6729,8 @@ function placeMenuAtTarget(menu, target, dataKey) {
   const root = document.getElementById('game-root');
   if (!menu || !root || menu.hidden) return;
   const card = menu.querySelector('.verb-menu-card') || menu;
+  // One footer height for every row, so the card never shifts under the pointer.
+  lockVerbMenuSize(menu);
   const rr = root.getBoundingClientRect();
   const anchor = targetPageRect(target, rr);
   if (!anchor) return;
