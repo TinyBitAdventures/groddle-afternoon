@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g478-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-360';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-358';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=g481-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g463-1';
@@ -397,7 +397,7 @@ import {
   listLearnedSkills,
 } from './js/skills.js?v=study-6';
 import { skillTitle, spendEmblemForSkill } from './js/skill-tree.js?v=g403-1';
-import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=g403-1';
+import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=g480-2';
 import {
   createBuffState,
   applyBuff,

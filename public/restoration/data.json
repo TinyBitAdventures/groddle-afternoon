@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 829,
+  "commits": 830,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "C no longer opens Make where Camera Mode can't start, such as on the Winter Walk"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "fix",
     "text": "The New Day screen's mountains are sharp at any window size"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "Classic's folded contact strip shows each chat's icon and count, with its name in the tooltip"
    }
   ]
  },
- "tests": 462,
+ "tests": 463,
  "generatedAt": "2026-10-30"
 }

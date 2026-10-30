@@ -38,7 +38,7 @@ import {
   spendFavorOnStudy,
 } from '../public/js/shrines.js';
 import { emblemUnlockSkillFor } from '../public/js/skill-tree.js?v=g403-1';
-import { studyGiantsLine } from '../public/js/skills-panel.js?v=g403-1';
+import { studyGiantsLine } from '../public/js/skills-panel.js?v=g480-2';
 import { EMITTED_EVENTS, routeQuestEvent, acceptOffer, requirementRoute } from '../public/js/quest-offers.js?v=g403-1';
 import { createQuestState } from '../public/js/quests.js';
 import { getQuestCatalog } from '../public/js/content-catalogs.js?v=g403-1';

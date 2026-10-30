@@ -26,7 +26,7 @@
  */
 
 import { getQuestCatalog, getSkillCatalog } from '../content-catalogs.js?v=g403-1';
-import { focusSkillInPanel } from '../skills-panel.js?v=g403-1';
+import { focusSkillInPanel } from '../skills-panel.js?v=g480-2';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
 import {
   UNLEARN_CARD,

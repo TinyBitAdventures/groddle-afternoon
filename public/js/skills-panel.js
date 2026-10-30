@@ -457,20 +457,54 @@ function unlearnButton(entry, ctx, actions, rerender) {
  * Render (or refresh) the Skills panel.
  * @param {{ box: HTMLElement, meta?: HTMLElement|null, state: object, ctx: object, actions: { start: Function, pause: Function, resume: Function, spendEmblem: Function } }} args
  */
+/**
+ * Bring `live` to match `next` while keeping every node that did not change.
+ * The panel redraws on the study ticker and on every HUD update; replacing the
+ * rows outright swapped the Start learning button for a new one between a
+ * press and its release, so the click went nowhere and needed another try.
+ * Unchanged nodes stay (their listeners only call actions by skill id, and
+ * `rerender` reads the newest arguments), changed ones are patched or replaced.
+ */
+export function patchChildren(live, next) {
+  const fresh = [...next.childNodes];
+  for (let i = 0; i < fresh.length; i++) {
+    const want = fresh[i];
+    const have = live.childNodes[i];
+    if (!have) {
+      live.appendChild(want);
+    } else if (have.isEqualNode(want)) {
+      continue;
+    } else if (have.nodeType === 1 && want.nodeType === 1 && have.tagName === want.tagName && have.tagName !== 'BUTTON'
+      && (have.dataset?.skill || '') === (want.dataset?.skill || '')) {
+      for (const { name } of [...have.attributes]) if (!want.hasAttribute(name)) have.removeAttribute(name);
+      for (const { name, value } of [...want.attributes]) if (have.getAttribute(name) !== value) have.setAttribute(name, value);
+      patchChildren(have, want);
+    } else {
+      live.replaceChild(want, have);
+    }
+  }
+  while (live.childNodes.length > fresh.length) live.lastChild.remove();
+}
+
 export function renderSkillTreePanel({ box, meta, state, ctx, actions, now = Date.now() }) {
   if (!box) return;
-  const rerender = () => renderSkillTreePanel({ box, meta, state, ctx, actions, now: Date.now() });
-  let study = box.querySelector(':scope > .skill-tree-study');
+  // Kept nodes hold the first render's `rerender`: it always draws with the newest arguments.
+  box._skillTreeArgs = { box, meta, state, ctx, actions };
+  const rerender = () => renderSkillTreePanel({ ...box._skillTreeArgs, now: Date.now() });
+  let studyLive = box.querySelector(':scope > .skill-tree-study');
   let toolbar = box.querySelector(':scope > .skill-tree-toolbar');
-  let list = box.querySelector(':scope > .skill-tree-list');
-  if (!study || !toolbar || !list) {
+  let listLive = box.querySelector(':scope > .skill-tree-list');
+  if (!studyLive || !toolbar || !listLive) {
     box.innerHTML = '';
-    study = el('div', 'skill-tree-study');
-    box.appendChild(study);
+    studyLive = el('div', 'skill-tree-study');
+    box.appendChild(studyLive);
     toolbar = buildToolbar(box, rerender);
-    list = el('div', 'skill-tree-list');
-    box.appendChild(list);
+    listLive = el('div', 'skill-tree-list');
+    box.appendChild(listLive);
   }
+  // Drawn off the page, then patched in (patchChildren), so buttons stay under the pointer.
+  const study = el('div', 'skill-tree-study');
+  const list = el('div', 'skill-tree-list');
 
   const counts = skillTreeCounts(state, ctx, now);
   if (meta) {
@@ -489,7 +523,6 @@ export function renderSkillTreePanel({ box, meta, state, ctx, actions, now = Dat
   if (category && category.value !== String(ui.category)) category.value = String(ui.category);
 
   // Active and paused studies stay pinned above the tree.
-  study.innerHTML = '';
   const unlearning = ctx.unlearning?.active;
   if (unlearning) {
     const card = el('div', 'skill-study-card unlearning');
@@ -539,7 +572,6 @@ export function renderSkillTreePanel({ box, meta, state, ctx, actions, now = Dat
   }
 
   const tree = filterSkillTree(state, { query: ui.query, filter: ui.filter, category: ui.category }, ctx, now);
-  list.innerHTML = '';
   if (!tree.total) {
     list.appendChild(el('div', 'skill-tree-empty', 'No skills match. Try another word or filter.'));
   }
@@ -562,8 +594,11 @@ export function renderSkillTreePanel({ box, meta, state, ctx, actions, now = Dat
     list.appendChild(section);
   }
 
+  patchChildren(studyLive, study);
+  patchChildren(listLive, list);
+
   if (ui.focus) {
-    const target = list.querySelector(`[data-skill="${ui.focus}"]`);
+    const target = listLive.querySelector(`[data-skill="${ui.focus}"]`);
     ui.focus = null;
     target?.scrollIntoView?.({ block: 'nearest' });
   }
