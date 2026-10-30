@@ -29,17 +29,83 @@ export const PACK_SEARCH_LABEL = 'Search pack and bags';
 export const PACK_HELP = 'Click for actions · Shift-click to quick use';
 
 /**
- * The band's free width for what floats over the row (the tray, the tooltip, a stack's card): inside
- * its padding, which a drawer or sheet sets through --inset-l / --inset-r, so nothing slides under them.
+ * The band's free width for what floats over the row (the tray, the tooltip, a stack's card): clear of
+ * a left sheet's --inset-l and the drawer's --inset-r (8 px at least) whether or not the row itself
+ * moved for them (packRowClearance), so nothing that rises above the row slides under them.
  * Returns { min, max } in band px for a box of width `w`.
  */
 export function packBandRange(band, w = 0) {
   const width = band?.getBoundingClientRect?.().width || 0;
   const cs = band && globalThis.getComputedStyle ? globalThis.getComputedStyle(band) : null;
-  const padL = parseFloat(cs?.paddingLeft) || 8;
-  const padR = parseFloat(cs?.paddingRight) || 8;
-  const min = padL;
+  const inset = (name) => parseFloat(cs?.getPropertyValue?.(name)) || 0;
+  const min = Math.max(8, inset('--inset-l'));
+  const padR = Math.max(8, inset('--inset-r'));
   return { min, max: Math.max(min, width - padR - w) };
+}
+
+/**
+ * PURE: how far the row itself steps aside for a left sheet and the drawer. The row stays centred in
+ * the window, and takes a side's inset only when that side's box reaches below the row's top (a short
+ * window, a tall sheet, a drawer down to the floor); a sheet or drawer that ends above the row leaves it
+ * where it is. `left` / `right`: { inset, bottom } (px, the same frame as rowTop) or null.
+ * @returns {{ left: number, right: number }}
+ */
+export function packRowClearance({ rowTop, left = null, right = null }) {
+  const need = (o) => (o && Number(o.inset) > 0 && Number(o.bottom) > rowTop ? Math.round(Number(o.inset)) : 0);
+  return { left: need(left), right: need(right) };
+}
+
+/**
+ * Keeps the band's --pack-clear-l / --pack-clear-r (its padding, style.css) on packRowClearance from
+ * the real rects: the open side sheet (the root's data-sheet) with --inset-l, the drawer with --inset-r.
+ * It follows the insets, the sheet, the drawer and the row as they change (resize, open, close).
+ */
+export function mountPackClearance({ root, band, row, drawer = () => null, setData = () => {} } = {}) {
+  if (!root || !band || !row) return { sync() {} };
+  const doc = root.ownerDocument || globalThis.document;
+  // The computed insets: a skin that pins one (Classic's --inset-l) has the last word.
+  const px = (name) => {
+    try {
+      return parseFloat(globalThis.getComputedStyle(root).getPropertyValue(name)) || 0;
+    } catch {
+      return parseFloat(root.style.getPropertyValue(name)) || 0;
+    }
+  };
+  const shown = (e) => Boolean(e && !e.hidden && e.getClientRects?.().length);
+  let frame = 0;
+  let last = '';
+  function sync() {
+    frame = 0;
+    const rowRect = row.getBoundingClientRect();
+    if (!rowRect.height) return;
+    const sheet = root.dataset.sheet ? doc.getElementById(root.dataset.sheet) : null;
+    const side = drawer();
+    const box = (e, inset) => (shown(e) && inset > 0 ? { inset, bottom: e.getBoundingClientRect().bottom } : null);
+    const out = packRowClearance({ rowTop: rowRect.top, left: box(sheet, px('--inset-l')), right: box(side, px('--inset-r')) });
+    const key = `${out.left},${out.right}`;
+    if (key === last) return;
+    last = key;
+    band.style.setProperty('--pack-clear-l', `${out.left}px`);
+    band.style.setProperty('--pack-clear-r', `${out.right}px`);
+    setData('packClear', key);
+  }
+  const soon = () => {
+    if (!frame) frame = (globalThis.requestAnimationFrame || ((f) => setTimeout(f, 16)))(sync);
+  };
+  if (typeof MutationObserver === 'function') {
+    new MutationObserver(soon).observe(root, { attributes: true, attributeFilter: ['style', 'data-sheet', 'data-ui'] });
+  }
+  if (typeof ResizeObserver === 'function') {
+    const ro = new ResizeObserver(soon);
+    ro.observe(row);
+    ro.observe(root);
+    for (const e of root.querySelectorAll('.ui-sheet, #achieve-panel, #skills-panel, #buffs-panel')) ro.observe(e);
+    const d = drawer();
+    if (d) ro.observe(d);
+  }
+  globalThis.addEventListener?.('resize', soon);
+  sync();
+  return { sync };
 }
 
 /**

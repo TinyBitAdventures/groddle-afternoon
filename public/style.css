@@ -2558,12 +2558,15 @@ button.play-context-head:focus-visible {
   display: flex;
   justify-content: center;
   box-sizing: border-box;
-  /* A right-hand drawer or left sheet narrows the band, so the row centres on the world left between them. */
-  /* The Social drawer's --inset-r (316px open, 60px as the rail, 0 hidden) already holds its gaps; 8px at least. */
-  padding: 0 max(var(--pack-inset), var(--inset-r, 0px)) var(--pack-inset) max(var(--pack-inset), var(--inset-l, 0px));
+  /* The row stays centred in the window. A left sheet or the drawer narrows the band only when it reaches
+     down past the row's top (js/ui/pack-row.js mountPackClearance sets --pack-clear-l / -r from their
+     --inset-l / --inset-r, which already hold their gaps); 8px at least. */
+  padding: 0 max(var(--pack-inset), var(--pack-clear-r, 0px)) var(--pack-inset) max(var(--pack-inset), var(--pack-clear-l, 0px));
   pointer-events: none;
   line-height: var(--lh-snug);
+  transition: padding var(--motion-med) var(--ease-out);
 }
+@media (prefers-reduced-motion: reduce) { .pack-bar { transition: none; } }
 .pack-row {
   position: relative;
   display: flex;

@@ -16,12 +16,13 @@ import {
   PACK_SEARCH_LABEL,
   packBandRange,
   packCountText,
+  packRowClearance,
   packTipPlacement,
   packSearchEntries,
   packSearchMatch,
   packSlotTip,
   trayColumns,
-} from '../public/js/ui/pack-row.js?v=g467-5';
+} from '../public/js/ui/pack-row.js?v=g472-2';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -41,17 +42,36 @@ describe('pack row: the pure parts', () => {
     assert.deepEqual(packSearchEntries([{ label: 'x', cls: 'apple' }], 'apple', (e) => e.cls).length, 1);
   });
 
-  it('what floats over the row stays inside the band\'s insets (a drawer\'s --inset-r)', () => {
+  it('what floats over the row stays clear of the drawer\'s --inset-r and a sheet\'s --inset-l, moved row or not', () => {
     const band = { getBoundingClientRect: () => ({ width: 1024 }) };
     const was = globalThis.getComputedStyle;
-    globalThis.getComputedStyle = () => ({ paddingLeft: '8px', paddingRight: '316px' });
+    const insets = { '--inset-l': '0px', '--inset-r': '316px' };
+    // The row's own padding (--pack-clear-*) is 8px: the floating things still keep to the insets.
+    globalThis.getComputedStyle = () => ({ paddingLeft: '8px', paddingRight: '8px', getPropertyValue: (n) => insets[n] || '' });
     try {
       assert.deepEqual(packBandRange(band, 300), { min: 8, max: 408 });
       assert.deepEqual(packBandRange(band, 900), { min: 8, max: 8 });
+      insets['--inset-l'] = '376px';
+      insets['--inset-r'] = '0px';
+      assert.deepEqual(packBandRange(band, 300), { min: 376, max: 716 });
     } finally { globalThis.getComputedStyle = was; }
     const view = read('public/js/ui/pack-row.js');
     assert.match(view, /left = Math\.max\(range\.min, Math\.min\(left, range\.max\)\);/);
     assert.match(read('public/game.js'), /const range = packBandRange\(bar, popWidth\);\s+const left = clamp\(anchorCenter - popWidth \/ 2, range\.min, range\.max\);/);
+  });
+
+  it('the row stays centred unless a sheet or the drawer reaches below its top', () => {
+    // Make ends at y 490 over a row at 1170: nothing moves.
+    assert.deepEqual(packRowClearance({ rowTop: 1170, left: { inset: 376, bottom: 490 }, right: { inset: 60, bottom: 160 } }), { left: 0, right: 0 });
+    // A short window: the sheet's bottom reaches past the row's top, so the row clears it.
+    assert.deepEqual(packRowClearance({ rowTop: 540, left: { inset: 376, bottom: 552 }, right: null }), { left: 376, right: 0 });
+    // A drawer down to the floor clears on the right; one that ends at the row's top does not.
+    assert.deepEqual(packRowClearance({ rowTop: 728, left: null, right: { inset: 316, bottom: 792 } }), { left: 0, right: 316 });
+    assert.deepEqual(packRowClearance({ rowTop: 728, right: { inset: 316, bottom: 728 } }), { left: 0, right: 0 });
+    // Nothing open, or an inset of 0 (Classic pins --inset-l): nothing moves.
+    assert.deepEqual(packRowClearance({ rowTop: 728, left: { inset: 0, bottom: 900 } }), { left: 0, right: 0 });
+    const game = read('public/game.js');
+    assert.match(game, /mountPackClearance\(\{\s+root: document\.getElementById\('game-root'\),\s+band: document\.getElementById\('pack-bar'\),\s+row: document\.getElementById\('pack-row'\),/);
   });
 
   it('with a tray open, the open bag shows no tip and tips near the tray go above it', () => {
@@ -113,8 +133,11 @@ describe('pack row: the page', () => {
     assert.match(block, /\n\.pack-bag-row \{[^}]*position: absolute;[^}]*bottom: calc\(100% \+ 8px\);[^}]*pointer-events: auto;/);
     assert.match(block, /\.pack-slots \.pack-slot\.is-single \.count \{ display: none; \}/);
     assert.match(block, /@media \(prefers-reduced-motion: reduce\) \{[^@]*\.pack-bag-row \{ animation: none; \}/);
-    // The Social drawer (js/ui/social-drawer.js) or a sheet narrows the band (--inset-l / --inset-r on #game-root).
-    assert.match(block, /padding: 0 max\(var\(--pack-inset\), var\(--inset-r, 0px\)\) var\(--pack-inset\) max\(var\(--pack-inset\), var\(--inset-l, 0px\)\);/);
+    // The row stays centred; a sheet or the drawer that reaches past its top narrows the band (mountPackClearance).
+    assert.match(block, /padding: 0 max\(var\(--pack-inset\), var\(--pack-clear-r, 0px\)\) var\(--pack-inset\) max\(var\(--pack-inset\), var\(--pack-clear-l, 0px\)\);/);
+    // A short ease when it does step aside, none under reduced motion.
+    assert.match(block, /\n\.pack-bar \{[^}]*transition: padding [^;]+;/);
+    assert.match(block, /@media \(prefers-reduced-motion: reduce\) \{ \.pack-bar \{ transition: none; \} \}/);
   });
 });
 

@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 808,
+  "commits": 809,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "The Rube faces the way he walks, and never blinks out as his animations change"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "new",
     "text": "Classic's growl line: notices one at a time at the world's bottom-left, and the 2012 prompt cards"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "new",
-    "text": "Classic's chat column: the contact strip and the \"Local Chat / Activity\" pane in the 2012 look"
    }
   ]
  },

@@ -440,7 +440,7 @@ import {
   isToolItem,
 } from './js/inventory.js?v=catalog-unified-7';
 import { PACK_COPY } from './js/pack-slots.js?v=g152-2';
-import { createPackRow, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=g467-5';
+import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=g472-2';
 import { listAnimalFeedOptions } from './js/animals.js?v=g454-1';
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g454-1';
 import {
@@ -24756,6 +24756,15 @@ async function main() {
       setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
     });
   }
+  // The one-row pack stays centred in the window; it steps aside only for a sheet or the drawer that
+  // reaches down past its top (js/ui/pack-row.js packRowClearance).
+  mountPackClearance({
+    root: document.getElementById('game-root'),
+    band: document.getElementById('pack-bar'),
+    row: document.getElementById('pack-row'),
+    drawer: () => document.getElementById('local-chat-dock'),
+    setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
+  });
   bindTabs(document.getElementById('quest-tabs'), {
     onSelect: (tab) => {
       questSheet.setTab(tab);
