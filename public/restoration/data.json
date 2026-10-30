@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 846,
+  "commits": 847,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "Players always get the newest game code: every script and style sheet is keyed by its content"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "fix",
     "text": "Classic's Quests, Make and window titles match their reference frames side by side"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Classic's conversations, prompts and Quest complete! take 2012's dark box, and Eat how many? its quantity picker"
    }
   ]
  },

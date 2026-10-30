@@ -15,11 +15,12 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 
 import {
-  AVATAR_STILL, AVATAR_TILE, FAILURE_BACKOFF_MS, HOME_MAX_BYTES, HOME_REFRESH_MS, PROFILE_ABOUT_MAX, PROFILE_COPY, RETRY_MS,
-  aboutCounter, aboutLength, avatarKeyOf, base64Bytes, cleanAbout, homeKeyOf, pngBase64, profileSlug, shortHash, shouldUpload, stillTransform,
-} from '../public/js/profiles.js?v=e5edbd6a';
+  AVATAR_STILL, AVATAR_TILE, FAILURE_BACKOFF_MS, HOME_BACKDROP, HOME_MAX, HOME_MAX_BYTES, HOME_QUALITY, HOME_REFRESH_MS, HOME_RESOLUTION, HOME_TYPES, HOME_WIDTHS,
+  PROFILE_ABOUT_MAX, PROFILE_COPY, RETRY_MS,
+  aboutCounter, aboutLength, avatarKeyOf, base64Bytes, cleanAbout, homeKeyOf, homeSizes, imageBase64, pngBase64, profileSlug, shortHash, shouldUpload, stillTransform,
+} from '../public/js/profiles.js?v=174a1a84';
 import { createMinnAccount } from '../public/js/minn-account.js?v=81339760';
-import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
+import { FEATURES } from '../public/js/features/index.js?v=5ee36fdd';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { skillTitle } from '../public/js/skill-tree.js?v=cf7bc81f';
@@ -53,8 +54,39 @@ describe('profile rules (js/profiles.js)', () => {
     assert.equal(homeKeyOf('meadow', t), homeKeyOf('meadow', t + 1000));
     assert.notEqual(homeKeyOf('meadow', t), homeKeyOf('firebog', t));
     assert.notEqual(homeKeyOf('meadow', t), homeKeyOf('meadow', t + HOME_REFRESH_MS));
-    assert.match(homeKeyOf('<script>', t), /^h1-script-/);
-    assert.match(homeKeyOf('', t), /^h1-meadow-/);
+    assert.match(homeKeyOf('<script>', t), /^h2-script-/);
+    assert.match(homeKeyOf('', t), /^h2-meadow-/);
+    assert.match(homeKeyOf('meadow', t), /^[A-Za-z0-9:._-]{1,64}$/, 'a key the site takes');
+  });
+
+  it('a home picture from before the sharp one (h1, 960 PNG) is out of date, so the next visit home replaces it', () => {
+    const t = 1_800_000_000_000;
+    const old = `h1-meadow-${Math.floor(t / HOME_REFRESH_MS).toString(36)}`;
+    assert.equal(shouldUpload({ held: { key: old }, key: homeKeyOf('meadow', t), now: t }), true);
+  });
+
+  it('draws the home at 2x, up to 1920 x 1080, WebP then JPEG, within the site\'s limits (HomePicture)', () => {
+    assert.equal(HOME_RESOLUTION, 2);
+    assert.deepEqual(HOME_WIDTHS, [1920, 1440, 1280, 960]);
+    assert.deepEqual(HOME_MAX, { w: 1920, h: 1080 });
+    assert.deepEqual(HOME_TYPES, ['image/webp', 'image/jpeg']);
+    assert.ok(HOME_QUALITY >= 0.8 && HOME_QUALITY <= 0.9);
+    assert.equal(HOME_BACKDROP, '#8ec8e8', 'the renderer background (game.js app.init)');
+    assert.match(read('public/game.js'), /background: 0x8ec8e8,/);
+    // A 1280 x 800 window: the view is 1280 x 668, 2560 x 1336 at 2x.
+    assert.deepEqual(homeSizes(2560, 1336), [{ w: 1920, h: 1002 }, { w: 1440, h: 752 }, { w: 1280, h: 668 }, { w: 960, h: 501 }]);
+    // A 1920 x 1080 window's wide view (3360 x 1440 at 2x): every size keeps the shape.
+    assert.deepEqual(homeSizes(3360, 1440)[0], { w: 1920, h: 823 });
+    // A tall view is held to 1080 high, each size once.
+    const tall = homeSizes(1920, 1440);
+    assert.deepEqual(tall[0], { w: 1440, h: 1080 });
+    assert.equal(new Set(tall.map((s) => s.w)).size, tall.length);
+    for (const { w, h } of [...homeSizes(2560, 1336), ...tall, ...homeSizes(3360, 1440), ...homeSizes(1920, 816)]) {
+      assert.ok(w <= 1920 && h <= 1080 && w >= 240 && h >= 80, `${w}x${h}`);
+    }
+    // A view smaller than a width is never blown up.
+    assert.deepEqual(homeSizes(1000, 500).map((s) => s.w), [1000, 960]);
+    assert.deepEqual(homeSizes(0, 10), []);
   });
 
   it('uploads only when the site holds another picture, throttled', () => {
@@ -81,9 +113,14 @@ describe('profile rules (js/profiles.js)', () => {
     assert.deepEqual([x2[3], x2[4], x2[5]], [3.52, 172, 496 - 8]);
   });
 
-  it('reads base64 out of a PNG data URL only', () => {
+  it('reads base64 out of a PNG data URL only (the avatar), and out of WebP, JPEG or PNG for the home', () => {
     assert.equal(pngBase64('data:image/png;base64,QUJD'), 'QUJD');
     assert.equal(pngBase64('data:image/jpeg;base64,QUJD'), '');
+    assert.deepEqual(imageBase64('data:image/webp;base64,QUJD'), { type: 'image/webp', b64: 'QUJD' });
+    assert.deepEqual(imageBase64('data:image/jpeg;base64,QUJD'), { type: 'image/jpeg', b64: 'QUJD' });
+    assert.deepEqual(imageBase64('data:image/png;base64,QUJD'), { type: 'image/png', b64: 'QUJD' });
+    assert.deepEqual(imageBase64('data:image/gif;base64,QUJD'), { type: '', b64: '' });
+    assert.deepEqual(imageBase64(null), { type: '', b64: '' });
     assert.equal(base64Bytes('QUJD'), 3);
     assert.equal(base64Bytes('QUI='), 2);
     assert.equal(HOME_MAX_BYTES, 600 * 1024);
@@ -158,8 +195,17 @@ describe('the profiles feature', () => {
     assert.match(src, /from '\.\.\/avatar-compositor\.js\?v=[0-9a-f]{8}'/, 'the same module instance game.js uses');
     assert.match(src, /s\.account\.uploadAvatar\(pictures\)/);
     assert.match(src, /s\.account\.uploadHome\(\{ key, home \}\)/);
-    assert.match(src, /engine\.snapshotView\?\.\(/);
+    assert.match(src, /engine\.snapshotView\?\.\(\{ resolution: HOME_RESOLUTION \}\)/);
     assert.match(read('public/game.js'), /snapshotView\(\{ resolution = 1 \} = \{\}\) \{\n\s*if \(!app\?\.renderer \|\| !app\.stage\) return null;/);
+    // The Pixi stage only: the HUD (top bar, pack, chat) is DOM, never in the picture.
+    assert.match(read('public/game.js'), /app\.renderer\.extract\.canvas\(\{ target: app\.stage, frame: new PIXI\.Rectangle\(0, 0, VIEW_W, LOCATION_VIEW_H\), resolution \}\)/);
+  });
+
+  it('writes WebP, and JPEG where the canvas cannot (Safari hands back a PNG for WebP)', () => {
+    assert.match(src, /canvas\.toBlob\(resolve, type, HOME_QUALITY\)/);
+    assert.match(src, /if \(!blob \|\| blob\.type !== type\) return null;/);
+    assert.match(src, /for \(const type of HOME_TYPES\)/);
+    assert.match(src, /ctx\.fillStyle = HOME_BACKDROP;/, 'flattened on the sky, so a JPEG has no black');
   });
 
   it('sets the description as text and links the page in a new tab', () => {
@@ -172,7 +218,7 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
   it('declares groddle_profiles and bumps the version', () => {
     const manifest = JSON.parse(site('minn.json'));
     const cols = manifest.tables.groddle_profiles.join('\n');
-    for (const c of ['user_id bigint(20) unsigned NOT NULL', "about varchar(500) NOT NULL DEFAULT ''", 'avatar mediumblob NULL', 'tile mediumblob NULL', 'home mediumblob NULL', 'avatar_key varchar(64)', 'home_key varchar(64)', 'updated_at datetime NOT NULL', 'PRIMARY KEY  (user_id)']) {
+    for (const c of ['user_id bigint(20) unsigned NOT NULL', "about varchar(500) NOT NULL DEFAULT ''", 'avatar mediumblob NULL', 'tile mediumblob NULL', 'home mediumblob NULL', 'avatar_key varchar(64)', 'home_key varchar(64)', "home_type varchar(16) NOT NULL DEFAULT 'image/png'", 'home_w smallint(5) unsigned NOT NULL DEFAULT 0', 'home_h smallint(5) unsigned NOT NULL DEFAULT 0', 'home_small mediumblob NULL', 'updated_at datetime NOT NULL', 'PRIMARY KEY  (user_id)']) {
       assert.ok(cols.includes(c), c);
     }
   });
@@ -191,7 +237,7 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
     assert.deepEqual(routes('PlayerPages.php'), [
       'Get /players Public',
       'Get /players/ Public',
-      'Get /players/{id:\\d+}/{kind:avatar|tile|home} Public',
+      'Get /players/{id:\\d+}/{kind:avatar|tile|home|home-small} Public',
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*} Public',
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/ Public',
       'Get /players/{slug:[a-z0-9][a-z0-9.-]*}/{tab:skills|achievements|buddies} Public',
@@ -207,9 +253,11 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
     assert.match(p, /FROM_BASE64\(\?\)/, 'blobs through text the database door takes');
   });
 
-  it('serves pictures as PNG with nosniff and a versioned cache', () => {
+  it('serves pictures as their stored type (only the three HomePicture keeps) with nosniff and a versioned cache', () => {
     const pages = site('src/PlayerPages.php');
-    assert.match(pages, /'Content-Type' => 'image\/png'/);
+    assert.match(pages, /\$contentType = in_array\(\$row\['type'\] \?\? null, HomePicture::TYPES, true\) \? \$row\['type'\] : 'image\/png';/);
+    assert.match(pages, /'Content-Type' => \$contentType,/);
+    assert.match(site('src/HomePicture.php'), /public const TYPES = \['png' => 'image\/png', 'jpeg' => 'image\/jpeg', 'webp' => 'image\/webp'\];/);
     assert.match(pages, /'X-Content-Type-Options' => 'nosniff'/);
     assert.match(pages, /\$request->query\('v'\) === \$stamp \? 'public, max-age=31536000, immutable'/);
   });
@@ -248,11 +296,10 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
     assert.equal(out.avatar, 'ok:344x496:344x496:png');
     assert.equal(out['avatar data url'], 'ok:344x496:344x496:png');
     assert.equal(out.tile, 'ok:200x288:200x288:png');
-    assert.equal(out.home, 'ok:960x408:960x408:png');
     for (const k of ['jpeg data url', 'jpeg bytes', 'html']) assert.equal(out[k], 'groddle_profile_image:415', k);
     for (const k of ['not a string', 'not base64', 'bad crc', 'cut short', 'bytes after IEND']) assert.equal(out[k], 'groddle_profile_image:400', k);
-    for (const k of ['too wide', 'too small', 'home too tall']) assert.equal(out[k], 'groddle_profile_size:400', k);
-    assert.equal(out['unknown kind'], 'groddle_profile_kind:400');
+    for (const k of ['too wide', 'too small']) assert.equal(out[k], 'groddle_profile_size:400', k);
+    for (const k of ['unknown kind', 'home is HomePicture\'s']) assert.equal(out[k], 'groddle_profile_kind:400', k);
     assert.equal(out['too many bytes'], 'groddle_profile_too_large:413');
     if (out.gd === 'yes') assert.equal(out['a text chunk is dropped by the re-encode'], 'ok:dropped');
     assert.equal(out['about trims and keeps lines'], 'ok:Hello\nthere\n\nfriend');
@@ -261,6 +308,52 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
     assert.equal(out.slug, 'zz-prof-a-12,bo-peep,bo-peep,x,review-glitch');
     // No .png: Kinsta's nginx answers a missing .png file itself, so PHP never saw those (2026-10-29).
     assert.equal(out['image url'], '/players/57/tile?v=1793037600');
+  });
+
+  it('HomePicture takes well formed WebP, JPEG and PNG within limits, keeps what GD writes with a phone copy, and refuses crafted files (php)', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
+    let out;
+    try {
+      out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/profiles/home-picture.php'), engine, SITE_DIR], { encoding: 'utf8' }));
+    } catch (err) {
+      if (err.code === 'ENOENT') return; // no php here
+      throw err;
+    }
+    if (out.gd !== 'yes') return; // the good pictures are made with GD's WebP
+    const kept = out['gd writes webp'] === 'yes' ? 'image/webp' : 'image/jpeg';
+    const fmt = kept.slice(6);
+    for (const k of ['webp 1920', 'webp data url', 'jpeg 1920', 'png 1920', 'jpeg said to be png']) {
+      assert.equal(out[k], `ok:${kept}:1920x1002:${fmt}:1920x1002:small=1080x564:${fmt}:1080x564`, k);
+    }
+    assert.equal(out['webp lossless (VP8L)'], `ok:${kept}:1280x668:${fmt}:1280x668:small=1080x564:${fmt}:1080x564`);
+    assert.equal(out['webp 1920x1080'], `ok:${kept}:1920x1080:${fmt}:1920x1080:small=1080x608:${fmt}:1080x608`);
+    assert.equal(out['png 960 (the old game)'], `ok:${kept}:960x501:${fmt}:960x501:small=none`, 'no phone copy of a picture already that small');
+    assert.equal(out['exif is dropped'], 'ok:dropped');
+    // Wrong magic: the bytes decide, never the data URL.
+    for (const k of ['gif', 'gif data url', 'svg data url', 'html', 'riff wave']) assert.equal(out[k], 'groddle_profile_image:415', k);
+    for (const k of ['not a string', 'not base64']) assert.equal(out[k], 'groddle_profile_image:400', k);
+    assert.equal(out['too many bytes'], 'groddle_profile_too_large:413');
+    // Dimensions from the headers.
+    for (const k of ['too wide', 'too tall', 'too small']) assert.equal(out[k], 'groddle_profile_size:400', k);
+    for (const k of ['vp8x canvas is not the image', 'animated flag', 'anim chunk', 'unknown chunk', 'two images', 'bytes after the riff', 'riff size lies', 'webp cut short', 'vp8 not a key frame', 'jpeg cut short', 'bytes after the jpeg', 'bytes after the png']) {
+      assert.equal(out[k], 'groddle_profile_image:400', k);
+    }
+  });
+
+  it('the profile page offers the phone copy by width, with the picture\'s size (no jump as it loads)', () => {
+    const pages = site('src/PlayerPages.php');
+    assert.match(pages, /'home-small' => \['home_small', 'home_at', 'home_type'\]/);
+    assert.match(pages, /home_small IS NOT NULL AS home_has_small/);
+    assert.match(pages, /\$srcset = Profiles::imageUrl\(\$id, 'home-small', \$at\) \. ' ' \. HomePicture::SMALL_W \. 'w, ' \. \$full \. " \{\$w\}w";/);
+    assert.match(pages, /private const HOME_SIZES = '\(min-width: 1160px\) 1096px, \(min-width: 641px\) calc\(100vw - 64px\), calc\(100vw - 32px\)';/);
+    const hp = site('src/HomePicture.php');
+    assert.match(hp, /public const SMALL_W = 1080;/);
+    assert.match(hp, /public const MAX_W = 1920;\n\s+public const MAX_H = 1080;/);
+    assert.match(hp, /public const MAX_BYTES = \d+ \* 1024;/);
+    const max = Number(/public const MAX_BYTES = (\d+) \* 1024;/.exec(hp)[1]) * 1024;
+    assert.equal(HOME_MAX_BYTES, max, 'the game and the site agree on the limit');
+    const p = site('src/Profiles.php');
+    assert.match(p, /\$home = HomePicture::accept\(\$body\['home'\] \?\? null\);/);
+    assert.match(p, /home_type = \?, home_w = \?, home_h = \?, home_small = FROM_BASE64\(\?\)/);
   });
 });
 

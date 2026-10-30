@@ -22,10 +22,23 @@ export const AVATAR_FRAME = 801;
 /** Pictures are drawn at 2x for sharp screens; the site takes up to 2x. */
 export const PICTURE_RESOLUTION = 2;
 
-/** The largest home picture the site keeps (src/ProfilePng.php KINDS home). */
+/**
+ * The home picture (site src/HomePicture.php): the view drawn at 2x, so the
+ * profile's street (up to 1096 CSS px wide) is sharp on a sharp screen; at
+ * most 1920 x 1080 and HOME_MAX_BYTES, as WebP (JPEG where the browser
+ * cannot write WebP), flattened on the renderer's sky so nothing is clear.
+ */
+export const HOME_RESOLUTION = 2;
+export const HOME_MAX = Object.freeze({ w: 1920, h: 1080 });
 export const HOME_MAX_BYTES = 600 * 1024;
 /** Widths tried for the home picture, widest first, until it fits HOME_MAX_BYTES. */
-export const HOME_WIDTHS = Object.freeze([960, 720, 560]);
+export const HOME_WIDTHS = Object.freeze([1920, 1440, 1280, 960]);
+/** The encoder's quality for WebP and JPEG. */
+export const HOME_QUALITY = 0.85;
+/** The types tried, in order; a browser that cannot write one hands back a PNG and the next is tried. */
+export const HOME_TYPES = Object.freeze(['image/webp', 'image/jpeg']);
+/** The renderer's background (game.js app.init background), behind anything clear in the view. */
+export const HOME_BACKDROP = '#8ec8e8';
 
 /** A new home picture at most this often while the player is home (the home's key changes with it). */
 export const HOME_REFRESH_MS = 6 * 60 * 60 * 1000;
@@ -76,10 +89,40 @@ export function avatarKeyOf(lookKeyText) {
   return `a1-${shortHash(lookKeyText)}-${String(lookKeyText ?? '').length.toString(36)}`;
 }
 
-/** The key a home picture is made from: the home's style and a HOME_REFRESH_MS bucket, so decorating shows within hours. */
+/**
+ * The key a home picture is made from: the drawing's version, the home's
+ * style and a HOME_REFRESH_MS bucket, so decorating shows within hours. h2
+ * is the sharp 2x WebP picture: an h1 picture (960 PNG) is out of date, so
+ * the next visit home replaces it.
+ */
 export function homeKeyOf(style, now = Date.now()) {
   const safe = String(style || 'meadow').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 24) || 'meadow';
-  return `h1-${safe}-${Math.floor(Number(now) / HOME_REFRESH_MS).toString(36)}`;
+  return `h2-${safe}-${Math.floor(Number(now) / HOME_REFRESH_MS).toString(36)}`;
+}
+
+/**
+ * The sizes to try for a view of viewW x viewH pixels: each of HOME_WIDTHS,
+ * never wider than the view nor past HOME_MAX in either direction, keeping
+ * the view's shape; each size once, widest first.
+ *
+ * @returns {{ w: number, h: number }[]}
+ */
+export function homeSizes(viewW, viewH, { widths = HOME_WIDTHS, max = HOME_MAX } = {}) {
+  const vw = Number(viewW);
+  const vh = Number(viewH);
+  if (!(vw > 0 && vh > 0)) return [];
+  const out = [];
+  const seen = new Set();
+  for (const width of widths) {
+    let w = Math.min(width, vw, max.w);
+    if (Math.round((vh * w) / vw) > max.h) w = Math.floor((max.h * vw) / vh);
+    w = Math.max(1, Math.floor(w));
+    const h = Math.max(1, Math.min(max.h, Math.round((vh * w) / vw)));
+    if (seen.has(w)) continue;
+    seen.add(w);
+    out.push({ w, h });
+  }
+  return out.sort((a, b) => b.w - a.w);
 }
 
 /**
@@ -119,6 +162,12 @@ export function stillTransform(bounds, { w = AVATAR_STILL.w, h = AVATAR_STILL.h,
 export function pngBase64(dataUrl) {
   const prefix = 'data:image/png;base64,';
   return typeof dataUrl === 'string' && dataUrl.startsWith(prefix) ? dataUrl.slice(prefix.length) : '';
+}
+
+/** The base64 inside a WebP, JPEG or PNG data URL, with its type ({ type: '', b64: '' } for anything else). */
+export function imageBase64(dataUrl) {
+  const m = typeof dataUrl === 'string' ? /^data:image\/(webp|jpeg|png);base64,/.exec(dataUrl) : null;
+  return m ? { type: `image/${m[1]}`, b64: dataUrl.slice(m[0].length) } : { type: '', b64: '' };
 }
 
 /** Bytes a base64 string decodes to. */

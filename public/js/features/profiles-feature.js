@@ -14,9 +14,11 @@
  *   look differs from the one the site holds, while the character saves to
  *   the site (not after a save conflict or a sign-out).
  * - The home street, as the player sees it: the view drawn by the renderer
- *   (engine.snapshotView) after a few settled seconds on their own home
- *   street, when the site has none or the home's key moved on (its style,
- *   or six hours: decorating shows the next visit). The website's profile
+ *   (engine.snapshotView, the Pixi stage only, so none of the HUD) at 2x
+ *   after a few settled seconds on their own home street, when the site has
+ *   none or the home's key moved on (its style, or six hours: decorating
+ *   shows the next visit). Up to 1920 wide as WebP, or JPEG where the
+ *   browser cannot write WebP (profiles.js HOME_*). The website's profile
  *   header was a panorama of the home street (homes/.../header-*.jpg).
  * - The description: Menu > Account gets "Your profile" (a text box with a
  *   character count, Save, and "See your profile"), through the
@@ -35,9 +37,10 @@ import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-com
 import { drawListBounds } from '../avatar-rig.js?v=b67f0da8';
 import { lookKey, resolveLook } from '../avatar-looks.js?v=64fab53e';
 import {
-  AVATAR_FRAME, AVATAR_STILL, AVATAR_TILE, FAILURE_BACKOFF_MS, HOME_MAX_BYTES, HOME_SETTLE_MS, HOME_WIDTHS, PICTURE_RESOLUTION, PROFILE_COPY,
-  aboutCounter, avatarKeyOf, base64Bytes, homeKeyOf, pngBase64, shouldUpload, stillTransform,
-} from '../profiles.js?v=e5edbd6a';
+  AVATAR_FRAME, AVATAR_STILL, AVATAR_TILE, FAILURE_BACKOFF_MS, HOME_BACKDROP, HOME_MAX_BYTES, HOME_QUALITY, HOME_RESOLUTION, HOME_SETTLE_MS, HOME_TYPES,
+  PICTURE_RESOLUTION, PROFILE_COPY,
+  aboutCounter, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, stillTransform,
+} from '../profiles.js?v=174a1a84';
 
 export const PROFILES_FEATURE_ID = 'profiles';
 
@@ -58,7 +61,7 @@ function create(engine) {
     checkAt: 0,
     homeSince: 0,
     avatar: { lastTry: 0, failedAt: 0, busy: false, status: 'idle' },
-    home: { lastTry: 0, failedAt: 0, busy: false, status: 'idle' },
+    home: { lastTry: 0, failedAt: 0, busy: false, status: 'idle', picture: null },
   };
   globalThis.groddleProfiles = {
     state: () => ({ profile: s.profile, avatar: { ...s.avatar }, home: { ...s.home }, homeSince: s.homeSince }),
@@ -161,24 +164,65 @@ async function uploadAvatar(engine, s, { force = false } = {}) {
   }
 }
 
-/** The home street as the player sees it, as a base64 PNG no larger than the site keeps. */
-function drawHome(engine) {
-  const view = engine.snapshotView?.({ resolution: 1 });
-  if (!view?.width || !view?.height) return '';
-  for (const width of HOME_WIDTHS) {
-    const w = Math.min(width, view.width);
-    const h = Math.round((view.height * w) / view.width);
-    const c = document.createElement('canvas');
-    c.width = w;
-    c.height = h;
-    const ctx = c.getContext('2d');
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(view, 0, 0, w, h);
-    const b64 = pngBase64(c.toDataURL('image/png'));
-    if (b64 && base64Bytes(b64) <= HOME_MAX_BYTES) return b64;
+/** Whether this browser's canvas writes each type (learned on the first try: Safari hands back a PNG for a type it cannot write). */
+const encoders = {};
+
+/** A canvas as a base64 picture of `type`, or null when the browser wrote another type. */
+async function encodeCanvas(canvas, type) {
+  let dataUrl = '';
+  if (typeof canvas.toBlob === 'function' && typeof FileReader === 'function') {
+    // toBlob encodes off the main thread where the browser can.
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, type, HOME_QUALITY));
+    if (!blob || blob.type !== type) return null;
+    dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(blob);
+    });
+  } else {
+    dataUrl = canvas.toDataURL(type, HOME_QUALITY);
   }
-  return '';
+  const picture = imageBase64(dataUrl);
+  return picture.type === type && picture.b64 ? picture : null;
+}
+
+/**
+ * The home street as the player sees it: the view at 2x, the widest size
+ * that fits the site's limit, as WebP (JPEG where the browser cannot write
+ * WebP). { b64, type, w, h, bytes } or null.
+ */
+async function drawHome(engine) {
+  const view = engine.snapshotView?.({ resolution: HOME_RESOLUTION });
+  if (!view?.width || !view?.height) return null;
+  try {
+    for (const { w, h } of homeSizes(view.width, view.height)) {
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = HOME_BACKDROP;
+      ctx.fillRect(0, 0, w, h);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(view, 0, 0, w, h);
+      for (const type of HOME_TYPES) {
+        if (encoders[type] === false) continue;
+        const picture = await encodeCanvas(c, type);
+        encoders[type] = Boolean(picture);
+        if (!picture) continue;
+        const bytes = base64Bytes(picture.b64);
+        if (bytes <= HOME_MAX_BYTES) return { ...picture, w, h, bytes };
+        // Too large in the best type this browser writes: the next size down, not a larger type.
+        break;
+      }
+    }
+    return null;
+  } finally {
+    // The 2x view is large (about 3360 x 1440 on a big window): let it go now.
+    view.width = 0;
+    view.height = 0;
+  }
 }
 
 async function uploadHome(engine, s, { force = false } = {}) {
@@ -193,8 +237,10 @@ async function uploadHome(engine, s, { force = false } = {}) {
     if (!force && !shouldUpload({ held: profile?.home, key, now, lastTry: s.home.lastTry, failedAt: s.home.failedAt })) return false;
     s.home.lastTry = now;
     mark(engine, s, 'home', 'uploading');
-    const home = drawHome(engine);
-    if (!home) throw new Error('the view could not be drawn small enough');
+    const picture = await drawHome(engine);
+    if (!picture) throw new Error('the view could not be drawn small enough');
+    s.home.picture = { type: picture.type, w: picture.w, h: picture.h, bytes: picture.bytes };
+    const home = picture.b64;
     s.profile = await s.account.uploadHome({ key, home });
     s.home.failedAt = 0;
     mark(engine, s, 'home', 'uploaded');
