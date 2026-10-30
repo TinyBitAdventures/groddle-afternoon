@@ -16,10 +16,11 @@ test('Enter and Space go to a focused dialog button before any world key', () =>
   assert.ok(game.indexOf('tryOpenNearestMenu({ nearestFirst', at) > at);
 });
 
-test('focusedDialogButton only answers for buttons inside an open dialog', () => {
+test('focusedDialogButton only answers for buttons inside an open dialog or the pack', () => {
   const fn = game.slice(game.indexOf('function focusedDialogButton()'), game.indexOf('function isQuestDialogueOpen()'));
   assert.match(fn, /closest\?\.\('button, \[role="button"\]'\)/);
   assert.match(fn, /button\.disabled/);
-  assert.match(fn, /closest\('dialog, \[role="dialog"\], \[aria-modal="true"\], \.glitch-modal'\)/);
+  // The pack row's buttons too (phase 2): Enter on a focused bag opens its tray, not the nearest menu.
+  assert.match(fn, /closest\('dialog, \[role="dialog"\], \[aria-modal="true"\], \.glitch-modal, #pack-bar'\)/);
   assert.match(fn, /!dialog\.hidden/);
 });

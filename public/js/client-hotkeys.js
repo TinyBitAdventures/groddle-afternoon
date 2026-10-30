@@ -25,8 +25,8 @@ export const CLIENT_KEY_TABLE = Object.freeze([
   { key: 'M', handler: 'mKeyHandler', action: 'map' },
   { key: 'Shift+L', handler: 'shiftLKeyHandler', action: 'looks' },
   { key: 'Shift+D', handler: 'shiftDKeyHandler', action: 'decorate' },
-  { key: 'Shift+F', handler: 'shiftFKeyHandler', action: null, why: 'no inventory search in the pack' },
-  { key: '`', handler: 'shiftFKeyHandler', action: null, why: 'no inventory search in the pack' },
+  { key: 'Shift+F', handler: 'shiftFKeyHandler', action: 'pack-search' },
+  { key: '`', handler: 'shiftFKeyHandler', action: 'pack-search' },
   { key: 'Shift+K', handler: 'shiftKKeyHandler', action: 'keyring' },
   { key: 'Shift+M', handler: 'shiftMKeyHandler', action: null, why: 'no chat map (the right-hand minimap tab)' },
   { key: 'Shift+/', handler: 'shiftSlashKeyHandler', action: 'hotkeys' },
@@ -39,12 +39,14 @@ export const CLIENT_KEY_TABLE = Object.freeze([
  * The remake's answer to a keydown, or null. Ctrl, Alt and Cmd combinations are
  * the browser's (Cmd+, Cmd+Z), never the game's.
  * @param {{ key: string, code?: string, shiftKey?: boolean, ctrlKey?: boolean, altKey?: boolean, metaKey?: boolean }} e
- * @returns {'map'|'player-menu'|'looks'|'keyring'|'decorate'|'hotkeys'|null}
+ * @returns {'map'|'player-menu'|'looks'|'keyring'|'decorate'|'hotkeys'|'pack-search'|null}
  */
 export function clientKeyAction(e) {
   if (!e || e.metaKey || e.ctrlKey || e.altKey) return null;
   if (isHotkeySheetKey(e)) return 'hotkeys';
   const k = String(e.key || '').toLowerCase();
+  // shiftFKeyHandler 846-855 for both (655: "same as inventory search"): the pack's search.
+  if (k === '`' || (e.code === 'Backquote' && !e.shiftKey)) return 'pack-search';
   if (!e.shiftKey) {
     if (k === 'm') return 'map';
     if (k === 'z') return 'player-menu';
@@ -53,6 +55,7 @@ export function clientKeyAction(e) {
   if (k === 'l') return 'looks';
   if (k === 'k') return 'keyring';
   if (k === 'd') return 'decorate';
+  if (k === 'f') return 'pack-search';
   return null;
 }
 
@@ -95,6 +98,7 @@ export function hotkeySections({ keyring = false } = {}) {
         ['Show Map', [['M'], ['G']]],
         ['Teleport', [['Shift', 'T']]],
         ...(keyring ? [['Key Ring', [['Shift', 'K']]]] : []),
+        ['Inventory Search', [['Shift', 'F'], ['`']]],
         ['Verbs', [['Enter'], ['E']]],
       ],
     },

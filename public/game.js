@@ -440,10 +440,7 @@ import {
   isToolItem,
 } from './js/inventory.js?v=catalog-unified-7';
 import { PACK_COPY } from './js/pack-slots.js?v=g152-2';
-import {
-  packPagerState,
-  packPageTarget,
-} from './js/pack-pager.js?v=original-pager-1';
+import { createPackRow, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=g467-1';
 import { listAnimalFeedOptions } from './js/animals.js?v=g454-1';
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g454-1';
 import {
@@ -859,7 +856,7 @@ import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from '.
 import { mountNotifyView } from './js/notify-view.js?v=g466-1';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g466-1';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g465-1';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g467-1';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=g432-1';
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=g463-2';
@@ -1339,13 +1336,23 @@ function shownElement(node) {
  * handler has already let typing in a field through. Returns true when the key
  * was taken (the caller stops there).
  *
+ * Shift+F and backquote: Inventory Search (shiftFKeyHandler 846-855, 655), the
+ * pack's search (js/ui/pack-row.js), not while Gentle Island hides the pack.
+ *
  * Left out, with nothing behind them here: comma Preferences (commaKeyHandler
- * 806-814, PrefsDialog), I Info-getting Mode (iKeyHandler 870-891), Shift+F and
- * backquote Inventory Search (shiftFKeyHandler 846-855, 655), Shift+M the chat
+ * 806-814, PrefsDialog), I Info-getting Mode (iKeyHandler 870-891), Shift+M the chat
  * map's minimap tab (shiftMKeyHandler 925-940). F stays the remake's apple.
  */
 function clientShortcutKey(e) {
   const action = clientKeyAction(e);
+  if (action === 'pack-search') {
+    if (document.body.classList.contains('nx-hide-pack') || !shownElement(document.getElementById('pack-bar'))) return false;
+    // The key must not type itself into the field it focuses.
+    e.preventDefault();
+    keys.delete(e.key);
+    if (!e.repeat) packRow.openSearch();
+    return true;
+  }
   // Z: the player menu (zKeyHandler 1031-1042: TSFrontController.togglePlayerMenu),
   // not where the location hides the mood (no_mood; newxp-feature's nx-hide-mood).
   if (action === 'player-menu') {
@@ -2860,7 +2867,7 @@ function closePackPopover() {
     delete pop.dataset.packFor;
   }
   packPopoverMarkup = '';
-  document.querySelectorAll('.pack-slot[data-tsid]').forEach((slot) => {
+  document.querySelectorAll('.pack-slot[data-tsid]:not(.pack-bag)').forEach((slot) => {
     slot.classList.remove('active');
     slot.setAttribute('aria-expanded', 'false');
   });
@@ -2871,76 +2878,47 @@ function isPackPopoverOpen() {
   return Boolean(packSelected && pop && !pop.hidden);
 }
 
-function packSlotStep(box) {
-  const slots = [...box.querySelectorAll('.pack-slot')];
-  if (slots.length > 1) {
-    const measured = slots[1].offsetLeft - slots[0].offsetLeft;
-    if (measured > 0) return measured;
+/**
+ * The modern pack row's view (js/ui/pack-row.js): search, the pager, the count, the tray's place
+ * and the slots' tooltip. game.js draws the slots (renderPackRow) and wires the row here.
+ */
+const packRow = createPackRow({
+  document,
+  setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
+  onQuery: () => renderPackBar(),
+  onScroll: () => {
+    if (!isPackPopoverOpen()) return;
+    const anchor = findPackSlotElement(packSelected);
+    if (anchor) positionPackPopover(document.getElementById('pack-popover'), anchor);
+  },
+  tipFor: (el) => packTipFor(el),
+});
+
+/** A pack slot's tooltip: its name and count, and what a click and a Shift-click do. */
+function packTipFor(el) {
+  if (el.classList.contains('pack-ghost')) return { title: el.getAttribute('aria-label') || '' };
+  if (el.dataset.packTip) return { title: el.dataset.packTip, sub: el.dataset.packTipSub || '' };
+  const cls = el.dataset.tsid;
+  if (!cls) return null;
+  if (el.dataset.packBag) {
+    const layout = features.query('packLayout', engine);
+    const box = layout?.bags?.[el.dataset.packBag];
+    if (!box) return null;
+    return packSlotTip({ bag: { label: box.label, used: box.slots.length, capacity: box.capacity, open: features.query('packOpenBag') === box.key } });
   }
-  return (slots[0]?.getBoundingClientRect().width || 44) + 5;
-}
-
-function refreshPackPager(box) {
-  if (!box) return;
-  const shell = box.closest('.pack-row-shell');
-  if (!shell) return;
-  let pager = packPagerState(box);
-  shell.classList.toggle('has-overflow', pager.overflow);
-  // Adding the two original-style 22px controls narrows the row. Measure the
-  // resulting viewport before publishing the exact end position.
-  pager = packPagerState(box);
-  shell.classList.toggle('can-scroll-back', pager.canBack);
-  shell.classList.toggle('can-scroll-forward', pager.canForward);
-  const back = shell.querySelector('[data-pack-scroll="-1"]');
-  const forward = shell.querySelector('[data-pack-scroll="1"]');
-  if (back) back.disabled = !pager.canBack;
-  if (forward) forward.disabled = !pager.canForward;
-  box.dataset.packOverflow = pager.overflow ? '1' : '0';
-  box.dataset.packScrollLeft = String(Math.round(pager.left));
-  box.dataset.packScrollMax = String(Math.round(pager.max));
-  if (app?.canvas) {
-    const prefix = box.id === 'pack-tools' ? 'packTool' : 'packItem';
-    app.canvas.dataset[`${prefix}Overflow`] = pager.overflow ? '1' : '0';
-    app.canvas.dataset[`${prefix}ScrollLeft`] = String(Math.round(pager.left));
-    app.canvas.dataset[`${prefix}ScrollMax`] = String(Math.round(pager.max));
-  }
-}
-
-function scrollPackRow(box, direction) {
-  if (!box) return;
-  const target = packPageTarget(box, direction, packSlotStep(box));
-  box.scrollTo({ left: target, behavior: 'smooth' });
-  window.setTimeout(() => refreshPackPager(box), 240);
-}
-
-function setupPackPager(box) {
-  if (!box || box.dataset.packPagerReady === '1') return;
-  box.dataset.packPagerReady = '1';
-  const shell = box.closest('.pack-row-shell');
-  shell?.querySelectorAll('[data-pack-scroll]').forEach((button) => {
-    button.addEventListener('click', () => scrollPackRow(box, Number(button.dataset.packScroll)));
+  const isTool = el.classList.contains('pack-tool');
+  const use = isTool ? null : getPackUseInfo(cls);
+  return packSlotTip({
+    label: el.dataset.packName || ITEM_CATALOG[cls]?.label || cls.replace(/_/g, ' '),
+    count: Number(el.dataset.packCount) || countItem(inv, cls),
+    tool: isTool,
+    quickVerb: use?.usable ? use.verb : '',
+    inBag: el.dataset.packInBag || '',
   });
-  box.addEventListener('scroll', () => {
-    refreshPackPager(box);
-    if (isPackPopoverOpen()) {
-      const anchor = findPackSlotElement(packSelected);
-      if (anchor) positionPackPopover(document.getElementById('pack-popover'), anchor);
-    }
-  }, { passive: true });
-  box.addEventListener('wheel', (event) => {
-    const pager = packPagerState(box);
-    if (!pager.overflow || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-    event.preventDefault();
-    box.scrollBy({ left: event.deltaY, behavior: 'auto' });
-  }, { passive: false });
 }
 
 function refreshPackPagers() {
-  for (const id of ['pack-items', 'pack-tools']) {
-    const box = document.getElementById(id);
-    setupPackPager(box);
-    refreshPackPager(box);
-  }
+  packRow.refreshPager();
 }
 
 function positionPackPopover(pop, anchor) {
@@ -2950,8 +2928,14 @@ function positionPackPopover(pop, anchor) {
   const anchorRect = anchor.getBoundingClientRect();
   const popWidth = pop.offsetWidth || 300;
   const anchorCenter = anchorRect.left - barRect.left + anchorRect.width / 2;
-  const left = clamp(anchorCenter - popWidth / 2, 8, Math.max(8, barRect.width - popWidth - 8));
+  // Inside the band's padding: a drawer's --inset-r keeps the card out from under it.
+  const range = packBandRange(bar, popWidth);
+  const left = clamp(anchorCenter - popWidth / 2, range.min, range.max);
   pop.style.left = `${Math.round(left)}px`;
+  // Over the row, or over the open bag's tray when the stack is in it (js/ui/pack-row.js).
+  const tray = anchor.closest?.('#pack-bag');
+  const floor = tray ? tray.getBoundingClientRect().top : barRect.top;
+  pop.style.bottom = `${Math.round(barRect.bottom - floor + 9)}px`;
   const arrowLeft = clamp(anchorCenter - left, 20, popWidth - 20);
   pop.style.setProperty('--pack-arrow-left', `${Math.round(arrowLeft)}px`);
 }
@@ -3761,7 +3745,8 @@ function renderPackPopover(classTsid, anchor = null) {
     packPopoverMarkup = markup;
   }
 
-  document.querySelectorAll('.pack-slot[data-tsid]').forEach((el) => {
+  // A bag button's aria-expanded is its tray's (renderPackRow), not the card's.
+  document.querySelectorAll('.pack-slot[data-tsid]:not(.pack-bag)').forEach((el) => {
     const selected = el.dataset.tsid === classTsid;
     el.classList.toggle('active', selected);
     el.setAttribute('aria-expanded', selected ? 'true' : 'false');
@@ -3915,12 +3900,31 @@ function renderPackPopover(classTsid, anchor = null) {
  */
 function renderPackRow(box, slots, opts = {}) {
   if (!box) return;
-  if (box.classList.contains('pack-items') || box.classList.contains('pack-tools')) setupPackPager(box);
+  // updateHud runs about once a second: a row whose slots have not changed keeps its buttons, so the
+  // focus, a hover, the pager's scroll and a drag in progress survive (js/ui/pack-row.js).
+  const sig = packRowSignature(slots, opts);
+  if (box.dataset.packSig === sig && box.childElementCount) {
+    if (box.id === 'pack-items') packRow.refreshPager();
+    return;
+  }
+  box.dataset.packSig = sig;
   box.innerHTML = '';
   if (opts.container) box.dataset.packContainer = opts.container;
   const emptyCount = opts.emptyCount ?? 4;
   // G152: with the slot layout the free slots always show (drop targets); otherwise only an empty row shows boxes.
   const appendEmpties = () => {
+    // The modern row shows the free slots as one ghost slot, "+N", still a drop target (js/ui/pack-row.js).
+    if (opts.ghost) {
+      if (emptyCount < 1) return;
+      const ghost = document.createElement('div');
+      ghost.className = 'pack-slot pack-empty pack-ghost';
+      ghost.setAttribute('role', 'listitem');
+      ghost.setAttribute('aria-label', `${emptyCount} free ${emptyCount === 1 ? 'slot' : 'slots'}`);
+      ghost.textContent = `+${emptyCount}`;
+      if (opts.container) ghost.dataset.packContainer = opts.container;
+      box.appendChild(ghost);
+      return;
+    }
     for (let i = 0; i < emptyCount; i++) {
       const empty = document.createElement('div');
       empty.className = 'pack-slot pack-empty';
@@ -3932,7 +3936,7 @@ function renderPackRow(box, slots, opts = {}) {
   if (!slots.length && !opts.fillEmpty) {
     appendEmpties();
     if (opts.rock) box.appendChild(packRockChip(opts.rock));
-    refreshPackPager(box);
+    if (box.id === 'pack-items') packRow.refreshPager();
     return;
   }
   for (const s of slots) {
@@ -3942,7 +3946,7 @@ function renderPackRow(box, slots, opts = {}) {
       : s.isTool || opts.toolRow
         ? trackedCondition
         : null;
-    const named = features.query('itemDisplayName', s.classTsid);
+    const named = packNamed(s.classTsid);
     const shownLabel = named ? `${named.label} (${named.kind})` : s.label;
     const slot = document.createElement('button');
     slot.type = 'button';
@@ -3955,10 +3959,11 @@ function renderPackRow(box, slots, opts = {}) {
       `${shownLabel} × ${s.count}${toolCondition?.tracked ? `, ${toolCondition.broken ? 'broken' : `${Math.round(toolCondition.percent * 100)} percent condition`}` : ''}`
     );
     if (toolCondition?.broken) slot.classList.add('is-broken');
-    slot.title = s.isTool || opts.toolRow
-      ? `${s.label} (tool)${toolCondition?.tracked ? ` · ${toolCondition.remaining}/${toolCondition.capacity} condition` : ''} · click for actions`
-      : `${shownLabel} × ${s.count} · click for actions`;
+    // The modern row's tooltip (js/ui/pack-row.js packSlotTip) says this; no browser title on top of it.
     slot.dataset.tsid = s.classTsid;
+    slot.dataset.packCount = String(s.count);
+    slot.dataset.packName = shownLabel;
+    if (s.inBag) slot.dataset.packInBag = s.inBag.label;
     const canDragToVendor = !(s.isTool || opts.toolRow);
     // G152: a slot from the pack layout knows where it sits, so it can be dragged between the pack and a bag.
     const inLayout = s.container != null;
@@ -3973,7 +3978,7 @@ function renderPackRow(box, slots, opts = {}) {
       slot.setAttribute('aria-haspopup', 'true');
       slot.setAttribute('aria-expanded', s.bag.open ? 'true' : 'false');
       slot.setAttribute('aria-label', `${s.bag.label || shownLabel}, ${s.bag.used} of ${s.bag.capacity} slots used, ${s.bag.open ? 'open' : 'closed'}`);
-      slot.title = `${s.bag.label || shownLabel} · ${s.bag.used}/${s.bag.capacity} · click to ${s.bag.open ? 'close' : 'open'}`;
+      slot.setAttribute('aria-controls', 'pack-bag');
     }
     slot.draggable = canDragToVendor || inLayout;
     if (s.icon) {
@@ -3997,15 +4002,26 @@ function renderPackRow(box, slots, opts = {}) {
     } else {
       slot.textContent = s.label.slice(0, 2);
     }
+    if (s.inBag) {
+      // A search result from inside a bag carries the bag's icon (js/ui/pack-row.js).
+      const badge = document.createElement('img');
+      badge.className = 'pack-slot-inbag';
+      badge.src = itemIconUrl(s.inBag.cls);
+      badge.alt = '';
+      slot.appendChild(badge);
+      slot.setAttribute('aria-label', `${slot.getAttribute('aria-label')}, in ${s.inBag.label}`);
+    }
     if (s.bag) {
       // PackSlot.as:147-176, 197-213: the opener strip under a bag shows used/total; it opens the bag's Options.
       const opener = document.createElement('span');
       opener.className = 'pack-bag-opener';
       opener.dataset.packOpener = '1';
-      opener.title = PACK_COPY.options;
       opener.innerHTML = `<b>${s.bag.used}/${s.bag.capacity}</b><i aria-hidden="true"></i>`;
+      // The modern bag button draws the opener as its fill bar; the tray's Options opens the bag's card.
+      opener.style.setProperty('--pack-fill', String(s.bag.capacity ? Math.min(1, s.bag.used / s.bag.capacity) : 0));
       slot.appendChild(opener);
     } else if (!(s.isTool || opts.toolRow) || s.count > 1) {
+      if (s.count < 2) slot.classList.add('is-single');
       const c = document.createElement('span');
       c.className = 'count';
       c.textContent = s.count;
@@ -4024,6 +4040,7 @@ function renderPackRow(box, slots, opts = {}) {
       // G152: clicking a bag opens or closes it (one at a time); its opener strip opens its Options.
       if (s.bag && !event.target?.closest?.('[data-pack-opener]')) {
         closePackPopover();
+        packTrayFocusOnOpen = true;
         features.query('packToggleBag', s.bag.key, engine);
         playSound('CLICK_SUCCESS', { volume: 0.4 });
         updateHud();
@@ -4095,7 +4112,25 @@ function renderPackRow(box, slots, opts = {}) {
   }
   if (opts.fillEmpty) appendEmpties();
   if (opts.rock) box.appendChild(packRockChip(opts.rock));
-  refreshPackPager(box);
+  if (box.id === 'pack-items') packRow.refreshPager();
+}
+
+/** A stack's shown name in the pack: a named Cubimal goes by its name (features/cubimal-race-feature.js). */
+function packNamed(classTsid) {
+  return features.query('itemDisplayName', classTsid);
+}
+
+/** What a pack row draws, as text: the same text draws the same buttons (renderPackRow). */
+function packRowSignature(slots, opts) {
+  return JSON.stringify([
+    // The selected stack is not part of it: renderPackPopover marks it (active, aria-expanded) on the same buttons.
+    opts.emptyCount ?? 4, Boolean(opts.ghost), Boolean(opts.fillEmpty), Boolean(opts.toolRow), opts.container || '', opts.rock || null, opts.query || '',
+    slots.map((s) => {
+      const c = getToolCondition(toolState, s.classTsid);
+      return [s.classTsid, s.count, s.container ?? '', s.index ?? '', s.icon || '', s.bag ? [s.bag.used, s.bag.capacity, s.bag.open, s.bag.label] : 0,
+        s.inBag?.label || '', packNamed(s.classTsid)?.label || '', c.tracked ? [c.remaining, c.broken] : 0];
+    }),
+  ]);
 }
 
 /** G152: the stack being dragged inside the pack ({ container, index, cls, bag }). */
@@ -4145,65 +4180,55 @@ function packLayoutEntry(slot, container, index, layout, openKey) {
   return entry;
 }
 
-/** G152: the open bag's own row of slots above the pack (PackDisplayManager.as:1101-1185). */
+/**
+ * G152: the open bag (PackDisplayManager.as:1101-1185, one open at a time), in the modern pack a tray
+ * over the row anchored to its bag (js/ui/pack-row.js placeTray): its stacks with the same click, Shift-click
+ * and drags as the row, one ghost slot for its free slots, its Options (the client's opener strip) and a close.
+ */
 function renderOpenBagRow(layout, openKey) {
-  const rows = document.querySelector('#pack-bar .pack-rows');
-  if (!rows) return;
-  let row = document.getElementById('pack-bag');
-  if (!row) {
-    row = document.createElement('div');
-    row.id = 'pack-bag';
-    row.className = 'pack-bag-row';
-    row.setAttribute('role', 'group');
-    row.hidden = true;
-    rows.insertBefore(row, rows.firstChild);
-  }
   const box = openKey ? layout?.bags?.[openKey] : null;
-  if (!box) {
-    row.hidden = true;
-    row.innerHTML = '';
-    delete row.dataset.packBag;
-    return;
-  }
-  row.hidden = false;
-  row.dataset.packBag = box.key;
-  row.dataset.packContainer = box.key;
-  row.setAttribute('aria-label', `${box.label}, ${box.slots.length} of ${box.capacity} slots used`);
-  row.innerHTML = '';
-  const head = document.createElement('div');
-  head.className = 'pack-bag-head';
-  head.innerHTML = `<img src="${itemIconUrl(box.cls)}" alt="" /><strong>${escapeHtml(box.label)}</strong><span>${box.slots.length}/${box.capacity}</span>`;
-  const close = document.createElement('button');
-  close.type = 'button';
-  close.className = 'pack-bag-close';
-  close.setAttribute('aria-label', `Close ${box.label}`);
-  close.textContent = '×';
-  close.addEventListener('click', () => {
-    features.query('packToggleBag', box.key, engine);
-    updateHud();
+  const bagEl = box ? document.querySelector(`.pack-slot[data-pack-bag="${box.key}"]`) : null;
+  const free = box ? Math.max(0, box.capacity - box.slots.length) : 0;
+  const tray = packRow.drawTray(box && {
+    key: box.key,
+    label: box.label,
+    icon: itemIconUrl(box.cls),
+    used: box.slots.length,
+    capacity: box.capacity,
+    // The same bag with the same stacks keeps its tray as it is (updateHud runs about once a second).
+    sig: JSON.stringify([box.key, box.label, box.capacity, box.slots.map((x) => [x.cls, x.count])]),
+    cells: box.slots.length + (free && box.slots.length ? 1 : 0),
+    // PackSlot.as:310-313: the opener strip's Options, here a button in the tray's head.
+    optionsLabel: PACK_COPY.options,
+    onOptions: () => {
+      if (packSelected === box.cls && isPackPopoverOpen()) closePackPopover();
+      else renderPackPopover(box.cls, document.querySelector(`.pack-slot[data-pack-bag="${box.key}"]`));
+    },
+    onClose: () => closePackTray({ focusBag: true }),
   });
-  head.appendChild(close);
-  row.appendChild(head);
-  const slots = document.createElement('div');
-  slots.className = 'pack-slots pack-bag-slots';
-  slots.setAttribute('role', 'list');
-  slots.dataset.packContainer = box.key;
-  row.appendChild(slots);
-  renderPackRow(slots, box.slots.map((slot, i) => packLayoutEntry(slot, box.key, i, layout, openKey)), {
-    emptyCount: Math.max(0, box.capacity - box.slots.length),
-    fillEmpty: true,
-    container: box.key,
-  });
-  // Centred over the bag's slot, kept inside the pack (placeContainer, PackDisplayManager.as:1170-1185).
-  const bagEl = document.querySelector(`.pack-slot[data-pack-bag="${box.key}"]`);
-  const rowsRect = rows.getBoundingClientRect();
-  if (bagEl && rowsRect.width) {
-    const r = bagEl.getBoundingClientRect();
-    const width = row.offsetWidth || 0;
-    const centre = r.left - rowsRect.left + r.width / 2;
-    const left = Math.max(0, Math.min(centre - width / 2, rowsRect.width - width));
-    row.style.marginLeft = `${Math.round(left)}px`;
+  if (tray?.slots) {
+    renderPackRow(tray.slots, box.slots.map((slot, i) => packLayoutEntry(slot, box.key, i, layout, openKey)), {
+      emptyCount: box.slots.length ? free : 0,
+      fillEmpty: true,
+      ghost: true,
+      container: box.key,
+    });
   }
+  if (tray) packRow.settleTray(tray, bagEl, { focusOnOpen: packTrayFocusOnOpen });
+  packTrayFocusOnOpen = false;
+}
+
+/** The next tray drawn takes the focus (a keyboard or pointer open of its bag), not one restored from the save. */
+let packTrayFocusOnOpen = false;
+
+/** Close the open bag's tray (Escape, a click elsewhere, its close button). */
+function closePackTray({ focusBag = false } = {}) {
+  const key = features.query('packOpenBag') || '';
+  if (!key) return false;
+  features.query('packToggleBag', key, engine);
+  renderPackBar();
+  if (focusBag) document.querySelector(`.pack-slot[data-pack-bag="${key}"]`)?.focus();
+  return true;
 }
 
 /** G152: drops inside the pack bar move a stack between the pack and a bag. */
@@ -4246,6 +4271,72 @@ function setupPackDrops() {
     playSound(result?.ok ? 'CLICK_SUCCESS' : 'CLICK_FAILURE', { volume: 0.45 });
     updateHud();
   });
+}
+
+/**
+ * The pack (modern, js/ui/pack-row.js): one row of the bags, then the stacks (items, then tools), one
+ * ghost slot for the free slots, the count and search; the open bag's tray over it. G152's 16 slots
+ * (features/bags-feature.js packLayout): bags take pack slots, the magic rock holds what does not fit.
+ * A search lists the matching stacks from the pack and from inside every bag.
+ */
+function renderPackBar() {
+  syncEmotionalBearCatalog();
+  const bagsBox = document.getElementById('pack-bags');
+  const itemsBox = document.getElementById('pack-items');
+  if (!itemsBox) return;
+  const packLayout = features.query('packLayout', engine);
+  const query = packRow.query();
+  if (!packLayout) {
+    const rows = listPackRows(inv);
+    renderPackRow(bagsBox, [], { emptyCount: 0 });
+    const all = [...rows.items, ...rows.tools];
+    renderPackRow(itemsBox, query ? packSearchEntries(all, query) : all, { emptyCount: 0 });
+    return;
+  }
+  setupPackDrops();
+  const openKey = features.query('packOpenBag') || '';
+  const bagRow = [];
+  const itemRow = [];
+  const toolRow = [];
+  packLayout.pack.slots.forEach((slot, i) => {
+    const entry = packLayoutEntry(slot, 'pack', i, packLayout, openKey);
+    if (slot.kind === 'bag') bagRow.push(entry);
+    else (entry.isTool ? toolRow : itemRow).push(entry);
+  });
+  renderPackRow(bagsBox, bagRow, { emptyCount: 0, container: 'pack' });
+  if (query) {
+    const found = [...itemRow, ...toolRow];
+    for (const box of Object.values(packLayout.bags)) {
+      box.slots.forEach((slot, i) => {
+        if (slot.kind === 'bag') return;
+        found.push({ ...packLayoutEntry(slot, box.key, i, packLayout, openKey), inBag: { cls: box.cls, label: box.label } });
+      });
+    }
+    const labelOf = (e) => packNamed(e.classTsid)?.label || e.label;
+    const hits = packSearchEntries(found, query, labelOf);
+    renderPackRow(itemsBox, hits, { emptyCount: 0, container: 'pack', query });
+    if (!hits.length) packRow.markNoMatches(itemsBox, query);
+    if (app?.canvas) app.canvas.dataset.packSearchHits = String(hits.length);
+  } else {
+    renderPackRow(itemsBox, [...itemRow, ...toolRow], {
+      emptyCount: packLayout.free, fillEmpty: true, ghost: true, container: 'pack',
+      rock: packLayout.rockStacks ? packLayout.rock : null,
+    });
+  }
+  const bagBoxes = Object.values(packLayout.bags);
+  const count = packCountText({
+    used: packLayout.pack.slots.length,
+    capacity: packLayout.pack.capacity || packLayout.pack.slots.length + packLayout.free,
+    bags: bagBoxes.length,
+    bagFree: bagBoxes.reduce((n, box) => n + Math.max(0, box.capacity - box.slots.length), 0),
+  });
+  const countEl = document.getElementById('pack-count');
+  if (countEl) {
+    countEl.textContent = count.text;
+    countEl.setAttribute('aria-label', count.label);
+    countEl.dataset.packTipSub = count.label;
+  }
+  renderOpenBagRow(packLayout, openKey);
 }
 
 /** G255: the quest log markup last drawn (updateHud redraws only when it changes). */
@@ -4539,35 +4630,7 @@ function updateHud() {
   });
   refreshVitalsMenu();
 
-  // Dual-row pack: items (top) + tools (bottom), currants already set above
-  syncEmotionalBearCatalog();
-  const itemsBox = document.getElementById('pack-items');
-  const toolsBox = document.getElementById('pack-tools');
-  // G152: 16 pack slots shared by both rows (tools and toolboxes below, the rest and the free slots above),
-  // each bag's slots in its own row when open, and what the magic rock holds (features/bags-feature.js).
-  const packLayout = (itemsBox || toolsBox) ? features.query('packLayout', engine) : null;
-  if (packLayout) {
-    setupPackDrops();
-    const openKey = features.query('packOpenBag') || '';
-    const itemRow = [];
-    const toolRow = [];
-    packLayout.pack.slots.forEach((slot, i) => {
-      const entry = packLayoutEntry(slot, 'pack', i, packLayout, openKey);
-      const toolSlot = slot.kind === 'bag' ? entry.bag.holds === 'tool' : entry.isTool;
-      (toolSlot ? toolRow : itemRow).push(entry);
-    });
-    renderPackRow(itemsBox, itemRow, { emptyCount: packLayout.free, fillEmpty: true, container: 'pack', rock: packLayout.rockStacks ? packLayout.rock : null });
-    renderPackRow(toolsBox, toolRow, { emptyCount: 0, toolRow: true, container: 'pack' });
-    renderOpenBagRow(packLayout, openKey);
-  } else if (itemsBox || toolsBox) {
-    const rows = listPackRows(inv);
-    renderPackRow(itemsBox, rows.items, { emptyCount: 6 });
-    renderPackRow(toolsBox, rows.tools, { emptyCount: 4, toolRow: true });
-  } else {
-    // Fallback single strip if dual-row markup missing
-    const box = document.getElementById('inventory');
-    renderPackRow(box, listPackSlots(inv), { emptyCount: 4 });
-  }
+  renderPackBar();
   if (packSelected) renderPackPopover(packSelected);
   updateLocalChatDockPosition();
   updateHomeChrome();
@@ -21215,7 +21278,9 @@ function closeQuestDialogue(opts = {}) {
 function focusedDialogButton() {
   const button = document.activeElement?.closest?.('button, [role="button"]');
   if (!button || button.disabled) return null;
-  const dialog = button.closest('dialog, [role="dialog"], [aria-modal="true"], .glitch-modal');
+  // The pack row's buttons too: Enter or Space on a focused bag or stack presses it (opens the tray or
+  // the stack's actions), never the nearest thing's menu or a jump.
+  const dialog = button.closest('dialog, [role="dialog"], [aria-modal="true"], .glitch-modal, #pack-bar');
   return dialog && !dialog.hidden ? button : null;
 }
 
@@ -25442,6 +25507,8 @@ async function main() {
   document.getElementById('de-embiggenify-leave-btn')?.addEventListener('click', confirmLeaveDeEmbiggenify);
   document.getElementById('paradise-flight-leave-btn')?.addEventListener('click', confirmLeaveParadise);
   document.addEventListener('pointerdown', (e) => {
+    // A click outside the pack closes the open bag's tray (its bag, the stacks and the stack's card keep it).
+    if (features.query('packOpenBag') && !e.target?.closest?.('#pack-bag, #pack-popover, .pack-slot, .verb-menu')) closePackTray();
     if (!isPackPopoverOpen()) return;
     const pop = document.getElementById('pack-popover');
     if (pop?.contains(e.target) || e.target?.closest?.('.pack-slot[data-tsid]')) return;
@@ -25501,6 +25568,13 @@ async function main() {
       }
       if (currentAction) {
         cancelCurrentAction();
+        return;
+      }
+      // The open bag's tray (js/ui/pack-row.js), back to its bag.
+      if (closePackTray({ focusBag: Boolean(document.activeElement?.closest?.('#pack-bar')) })) return;
+      // The pack's search, from one of its results (the field takes its own Escape).
+      if (packRow.isSearching() && document.activeElement?.closest?.('#pack-bar')) {
+        packRow.closeSearch();
         return;
       }
       closeVerbMenu();
@@ -26199,7 +26273,8 @@ async function main() {
       const toPage = (wx, wy) => ({ x: rect.left + (wx + world.x) * sx, y: rect.top + (wy + world.y) * sy });
       return {
         street: currentStreet ? { tsid: currentStreet.tsid, label: currentStreet.label, hub: currentStreet.hub || '' } : null,
-        player: { x: player.x, y: player.y, vx: player.vx, vy: player.vy, onGround: !!player.onGround, climbing: !!climb.active, energy: pc.energy, mood: pc.mood },
+        // page: the feet in page px (the modern pack floats over the world: nothing the camera frames may sit under it).
+        player: { x: player.x, y: player.y, vx: player.vx, vy: player.vy, onGround: !!player.onGround, climbing: !!climb.active, energy: pc.energy, mood: pc.mood, page: toPage(player.x, player.y) },
         busy: engine.busy(),
         acting: !!currentAction,
         menu: menuTarget ? (menuTarget.label || menuTarget.classId) : '',
@@ -26242,6 +26317,7 @@ async function main() {
     onMail: () => { if (state.started) openMailboxPanel(); },
     onPlayerCard: () => document.getElementById('player-menu-btn')?.click(),
   });
+  packRow.install();
   document.querySelector('.top-actions')?.addEventListener('click', () => {
     if (currentAction) cancelCurrentAction({ quiet: true });
     closePackPopover();

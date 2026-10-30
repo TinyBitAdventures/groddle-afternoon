@@ -33,7 +33,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex" />
   <title>Groddle Afternoon · Multiplayer</title>
-    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;tools=g183-1&amp;make=g191-1&amp;rock=g211-1&amp;route=g192-1&amp;prompt=g198-1&amp;machines=g193-1&amp;skills=g367-1&amp;chooser=g206-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=ticket-1&amp;card=g249-1&amp;offers=g229-1&amp;buffs=g256-1&amp;speech=g269-1&amp;banner=g297-1&amp;pop=g332-1&amp;bags=g394-1&amp;maptp=g356-1&amp;hud2=g361-1&amp;award=g385-1&amp;wordprog=g394-1&amp;overlays=g392-1&amp;polish=g396-1&amp;hud3=g402-1&amp;questtext=g425-1&amp;eat=g423-1&amp;assetkeys=g434-1&amp;menu=g438-1&amp;summerhud=g452-1&amp;rookmuseum=g455-1&amp;notify=g459-1&amp;stage=g458-1&amp;vitals=g458-2&amp;tokens=g463-1&amp;zoverlay=g463-2&amp;nunito=g465-1&amp;paper=g465-2&amp;topbar=g465-3&amp;social=g466-1&amp;backdrop=g432-1" />
+    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;tools=g183-1&amp;make=g191-1&amp;rock=g211-1&amp;route=g192-1&amp;prompt=g198-1&amp;machines=g193-1&amp;skills=g367-1&amp;chooser=g206-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=g467-1&amp;badgebrowser=full-catalog-2&amp;home=ticket-1&amp;card=g249-1&amp;offers=g229-1&amp;buffs=g256-1&amp;speech=g269-1&amp;banner=g297-1&amp;pop=g332-1&amp;bags=g394-1&amp;maptp=g356-1&amp;hud2=g361-1&amp;award=g385-1&amp;wordprog=g394-1&amp;overlays=g392-1&amp;polish=g396-1&amp;hud3=g402-1&amp;questtext=g425-1&amp;eat=g423-1&amp;assetkeys=g434-1&amp;menu=g438-1&amp;summerhud=g452-1&amp;rookmuseum=g455-1&amp;notify=g459-1&amp;stage=g458-1&amp;vitals=g458-2&amp;tokens=g463-1&amp;zoverlay=g463-2&amp;nunito=g465-1&amp;paper=g465-2&amp;topbar=g465-3&amp;social=g466-1&amp;backdrop=g432-1" />
   <!-- The UI font, self-hosted (style.css @font-face; OFL in assets/fonts/nunito/): the roman latin file, before first paint. -->
   <link rel="preload" href="assets/fonts/nunito/nunito-roman-latin.woff2" as="font" type="font/woff2" crossorigin />
   <!-- Content keys for data and art URLs (js/data-urls.js): before every other script. -->
@@ -857,27 +857,32 @@
         </form>
       </section>
 
-      <!-- Bottom pack bar (Glitch-style dual row: items + tools) -->
+      <!-- The pack (modern, js/ui/pack-row.js): one centred floating row. Bags, then the stacks,
+           the free slots, a pager only when the row overflows, the slot count and search (Shift+F or `). -->
       <div class="pack-bar" id="pack-bar">
-        <div class="pack-rows">
-          <div class="pack-row-shell" data-pack-pager="items">
-            <button type="button" class="pack-scroll pack-scroll-left" data-pack-scroll="-1"
-              aria-label="Previous items" title="Previous items">‹</button>
-            <div id="pack-items" class="pack-slots pack-items" role="list" aria-label="Items"></div>
-            <button type="button" class="pack-scroll pack-scroll-right" data-pack-scroll="1"
-              aria-label="More items" title="More items">›</button>
+        <nav class="pack-row" id="pack-row" aria-label="Pack">
+          <div id="pack-bags" class="pack-slots pack-bags" role="list" aria-label="Bags"></div>
+          <span class="pack-vsep" aria-hidden="true"></span>
+          <div id="pack-items" class="pack-slots pack-items" role="list" aria-label="Items" aria-describedby="pack-hint"></div>
+          <button type="button" class="pack-pager" id="pack-pager" data-pack-scroll="1" aria-label="More items" data-pack-tip="More items" hidden>
+            <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="m8 5 5 5-5 5"/></svg>
+          </button>
+          <span class="pack-count" id="pack-count" role="img" tabindex="0" data-pack-tip="Pack" aria-label="Pack slots">0/16</span>
+          <div class="pack-search" id="pack-search" hidden>
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3" stroke-linecap="round"/></svg>
+            <input id="pack-search-input" type="text" placeholder="Search pack and bags" aria-label="Search pack and bags" aria-describedby="pack-hint" autocomplete="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-bwignore data-form-type="other" />
+            <button type="button" class="pack-search-close" id="pack-search-close" aria-label="Close search">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8"/></svg>
+            </button>
           </div>
-          <div class="pack-row-shell" data-pack-pager="tools">
-            <button type="button" class="pack-scroll pack-scroll-left" data-pack-scroll="-1"
-              aria-label="Previous tools" title="Previous tools">‹</button>
-            <div id="pack-tools" class="pack-slots pack-tools" role="list" aria-label="Tools"></div>
-            <button type="button" class="pack-scroll pack-scroll-right" data-pack-scroll="1"
-              aria-label="More tools" title="More tools">›</button>
-          </div>
-          <!-- legacy id kept for tests/selectors; mirrors items row -->
-          <div id="inventory" class="pack-slots pack-items pack-legacy" hidden aria-hidden="true"></div>
-        </div>
-        <div class="pack-hint">Click for actions<br/>Shift-click to quick use</div>
+          <button type="button" class="pack-search-btn" id="pack-search-btn" aria-label="Search pack (Shift F)" aria-keyshortcuts="Shift+F `" aria-expanded="false" aria-controls="pack-search" data-pack-tip="Search pack · Shift F">
+            <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13 13 4 4" stroke-linecap="round"/></svg>
+          </button>
+          <p class="pack-hint visually-hidden" id="pack-hint">Click for actions<br/>Shift-click to quick use</p>
+        </nav>
+        <div class="pack-tip" id="pack-tip" role="tooltip" hidden></div>
+        <!-- legacy id kept for tests/selectors -->
+        <div id="inventory" class="pack-slots pack-items pack-legacy" hidden aria-hidden="true"></div>
         <section id="pack-popover" class="pack-popover" role="dialog" aria-modal="false" aria-labelledby="pack-popover-title" hidden></section>
       </div>
 
@@ -941,6 +946,6 @@
   <!-- Password managers skip the game's own boxes (chat, searches, names); the account forms keep autofill. -->
   <script type="module" src="js/no-autofill.js?v=g437-1"></script>
   <!-- game.js loads once the multiplayer save is in memory (js/online-boot.js). -->
-  <script type="module" id="online-boot" src="js/online-boot.js?v=g463-1" data-game="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=g378-1&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g466-1"></script>
+  <script type="module" id="online-boot" src="js/online-boot.js?v=g463-1" data-game="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=g467-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=g378-1&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g467-1"></script>
 </body>
 </html>

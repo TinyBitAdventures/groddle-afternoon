@@ -410,13 +410,13 @@ describe('UI wiring', () => {
     assert.ok(html.includes('id="make-result"'));
     assert.ok(html.includes('js/notify-view.js') || readFileSync(join(__dirname, '../public/game.js'), 'utf8').includes("from './js/notify-view.js?v="));
     assert.ok(html.includes('id="pack-items"'));
-    assert.ok(html.includes('id="pack-tools"'));
+    assert.ok(html.includes('id="pack-bags"'));
     assert.ok(html.includes('id="stat-currants"'));
     assert.ok(html.includes('vendor-shelf') || html.includes('id="vendor-list"'));
     const css = readFileSync(join(__dirname, '../public/style.css'), 'utf8');
     assert.ok(css.includes('act-loss'));
     assert.ok(css.includes('act-gain'));
-    assert.ok(css.includes('pack-tools') || css.includes('pack-rows'));
+    assert.ok(css.includes('.pack-row {'));
     assert.ok(css.includes('make-tool-work'));
     assert.ok(css.includes('.mp-stage'));
     assert.ok(css.includes('.make-progress[hidden]'));

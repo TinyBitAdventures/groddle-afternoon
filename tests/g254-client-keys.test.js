@@ -7,8 +7,9 @@
  * I (iKeyHandler 870-891), Z (zKeyHandler 1031-1042) and comma
  * (commaKeyHandler 806-814). The remake answers M (map, G kept), Z (player
  * menu), Shift+L (looks), Shift+K (multiplayer keyring), Shift+D (decorate where
- * you can) and holding ? (the hotkey sheet, view/ui/Hotkeys.as + hotkeys.png);
- * comma, I, Shift+F, backquote and Shift+M have no panel here and stay unbound.
+ * you can), Shift+F and backquote (the pack's search, phase 2) and holding ? (the
+ * hotkey sheet, view/ui/Hotkeys.as + hotkeys.png); comma, I and Shift+M have no
+ * panel here and stay unbound.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -27,7 +28,7 @@ import {
   hotkeyText,
   isHotkeySheetRelease,
   isPlainKey,
-} from '../public/js/client-hotkeys.js?v=g465-1';
+} from '../public/js/client-hotkeys.js?v=g467-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(here, '../public');
@@ -73,6 +74,7 @@ describe('G254: the client key table', () => {
     assert.match(src, /if ?\(!ACLDialog\.instance\.parent\)\{\s+ACLDialog\.instance\.start\(\);\s+\}\s+else \{\s+ACLDialog\.instance\.end\(true\);/);
     assert.match(src, /Hotkeys\.instance\.show\(\);\s+KeyBeacon\.instance\.addEventListener\(KeyBeacon\.KEY_UP_\+Keyboard\.SHIFT, shiftSlashKeyHandler/);
     assert.match(src, /zKeyHandler[\s\S]{0,400}TSFrontController\.instance\.togglePlayerMenu\(\);/);
+    assert.match(src, /shiftFKeyHandler[\s\S]{0,400}\/\/inventory search\s+YouDisplayManager\.instance\.pack_tabber\.showInventorySearch\(\);/);
     // Every one of them returns while a text field has focus.
     for (const h of ['mKeyHandler', 'shiftLKeyHandler', 'shiftDKeyHandler', 'shiftKKeyHandler', 'shiftSlashKeyHandler', 'zKeyHandler']) {
       const at = src.indexOf(`private function ${h}(`);
@@ -106,8 +108,9 @@ describe('G254: clientKeyAction', () => {
       [key('D', { shiftKey: true }), 'decorate'],
       [key('?', { shiftKey: true, code: 'Slash' }), 'hotkeys'],
       [key('/', { shiftKey: true, code: 'Slash' }), 'hotkeys'],
-      [key(','), null], [key('i'), null], [key('`'), null],
-      [key('F', { shiftKey: true }), null],
+      [key(','), null], [key('i'), null],
+      [key('`'), 'pack-search'], [key('F', { shiftKey: true }), 'pack-search'],
+      [key('f'), null], [key('~', { shiftKey: true, code: 'Backquote' }), null],
       [key('M', { shiftKey: true }), null],
       [key('Z', { shiftKey: true }), null],
       [key('l'), null], [key('k'), null], [key('d'), null],
@@ -153,7 +156,8 @@ describe('G254: the hotkey sheet lists only keys the remake answers', () => {
     assert.ok(!solo.some((row) => row.startsWith('Key Ring')));
     assert.ok(mp.includes('Key Ring: Shift+K'));
     const all = mp.join('\n');
-    for (const gone of [/Preferences/, /Info-getting/, /Inventory Search/, /Zoom/, /: ,/, /Shift\+F/, /Shift\+M/, /\bI\b$/m]) {
+    assert.ok(solo.includes('Inventory Search: Shift+F or `'), 'hotkeys.png: Inventory Search: Shift+F');
+    for (const gone of [/Preferences/, /Info-getting/, /Zoom/, /: ,/, /Shift\+M/, /\bI\b$/m]) {
       assert.doesNotMatch(all, gone);
     }
     assert.doesNotMatch(all, /—/, 'no em-dashes in player copy');

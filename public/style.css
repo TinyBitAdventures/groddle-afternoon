@@ -2400,208 +2400,159 @@ button.play-context-head:focus-visible {
   }
 }
 
-/* Bottom pack — dual row like original (items over tools) */
-/* The legacy #inventory row stays in the DOM for old code paths; [hidden]
-   must win over .pack-slots' display rule or it leaves an empty third row. */
+/* —— PACK —— */
+/* Phase 2, the HUD mock's one-row pack (js/ui/pack-row.js, game.js renderPackBar).
+   One centred floating row over the world: the bags with their fill bars, a divider, the stacks
+   (items, then tools), one ghost slot "+N" for the free slots, a pager only when the row overflows,
+   the slot count and search (Shift+F or `). The open bag is a tray over the row by its bag.
+   #pack-bar is the band the row floats in: it lets clicks and drops through to the world around the
+   row (pointer-events), and its top is the row's top, so --pack-live-height and everything that
+   stops above the pack (side panels, the Map, modals, prompts) follow the row. */
+/* What stops above the pack before game.js first measures it (updateLocalChatDockPosition sets it
+   inline): the 56px row, its 8px inset, then 8px of air. */
+#game-root { --pack-live-height: 72px; }
+/* The legacy #inventory row stays in the DOM for old code paths; [hidden] must win over .pack-slots. */
 .pack-slots[hidden] { display: none !important; }
 .pack-bar {
+  --pack-slot: 44px;
+  --pack-inset: 8px;
   position: absolute;
   left: 0; right: 0; bottom: 0;
   /* Keep the pack usable while vendor/making overlays are open, like Glitch. */
   z-index: calc(var(--z-panel) + 10);
   display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  padding: var(--sp-3) 0.55rem var(--sp-3);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-parchment) 94%, transparent), color-mix(in srgb, var(--surface-sunken) 97%, transparent));
-  border-top: 1px solid var(--border-strong);
+  justify-content: center;
+  box-sizing: border-box;
+  /* A right-hand drawer or left sheet narrows the band, so the row centres on the world left between them. */
+  /* The Social drawer's --inset-r (316px open, 60px as the rail, 0 hidden) already holds its gaps; 8px at least. */
+  padding: 0 max(var(--pack-inset), var(--inset-r, 0px)) var(--pack-inset) max(var(--pack-inset), var(--inset-l, 0px));
+  pointer-events: none;
   line-height: var(--lh-snug);
 }
-.pack-currants {
+.pack-row {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
-  font-weight: 800;
-  color: var(--currants);
-  min-width: 4.2rem;
-  font-size: var(--fs-base);
-  flex-shrink: 0;
-}
-.pack-currants .currant-coin {
-  font-size: var(--fs-xl);
-  line-height: var(--lh-none);
-}
-.pack-currants-text {
-  display: flex;
-  flex-direction: column;
-  line-height: var(--lh-tight);
-}
-.pack-currants-label {
-  font-size: var(--fs-2xs);
-  font-weight: 600;
-  opacity: 0.7;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-.pack-rows {
-  display: flex;
-  flex-direction: column;
   gap: var(--sp-2);
-  flex: 1;
+  box-sizing: border-box;
+  height: 56px;
+  max-width: 100%;
   min-width: 0;
+  padding: 0 var(--sp-3);
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-2);
+  color: var(--text);
+  pointer-events: auto;
 }
-.pack-row-shell {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-items: stretch;
-  min-width: 0;
-}
-.pack-row-shell.has-overflow {
-  grid-template-columns: 22px minmax(0, 1fr) 22px;
-}
-.pack-scroll {
-  display: none;
-  position: relative;
-  z-index: calc(var(--z-raised) + 1);
-  width: 22px;
-  min-width: 22px;
-  padding: 0;
-  border: 1px solid var(--c-sand-75);
-  background: linear-gradient(180deg, var(--surface-card), var(--surface-sunken));
-  color: var(--c-sage-48);
-  font: 800 var(--fs-2xl)/var(--lh-none) var(--font-ui);
-  text-shadow: 0 1px var(--c-white);
-  cursor: pointer;
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--c-black) 12%, transparent);
-}
-.pack-row-shell.has-overflow .pack-scroll { display: block; }
-.pack-scroll-left {
-  border-radius: var(--radius-md) 0 0 var(--radius-md);
-  border-right: 0;
-}
-.pack-scroll-right {
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  border-left: 0;
-}
-.pack-scroll:hover:not(:disabled),
-.pack-scroll:focus-visible {
-  background: linear-gradient(180deg, var(--surface-card), var(--c-lime-87));
-  color: var(--c-green-51);
-  outline: 2px solid color-mix(in srgb, var(--status-good) 35%, transparent);
-  outline-offset: -2px;
-}
-.pack-scroll:disabled {
-  color: var(--c-sand-73b);
-  cursor: default;
-  opacity: 0.58;
-}
-.pack-row-shell.can-scroll-back::before,
-.pack-row-shell.can-scroll-forward::after {
-  content: "";
-  position: absolute;
-  z-index: var(--z-raised);
-  top: 1px;
-  bottom: 1px;
-  width: 8px;
-  pointer-events: none;
-}
-.pack-row-shell.can-scroll-back::before {
-  left: 22px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--c-sand-36b) 18%, transparent), transparent);
-}
-.pack-row-shell.can-scroll-forward::after {
-  right: 22px;
-  background: linear-gradient(270deg, color-mix(in srgb, var(--c-sand-36b) 18%, transparent), transparent);
+.pack-vsep {
+  flex: none;
+  width: 1px;
+  height: 32px;
+  margin: 0 var(--sp-2);
+  background: var(--border-strong);
 }
 .pack-slots {
   display: flex;
-  gap: var(--sp-2);
-  overflow-x: auto;
+  gap: var(--sp-1);
   min-width: 0;
-  /* The row scrolls sideways, so it clips everything outside its padding box: 5px above and below
-     leaves room for a selected slot's lift and ring and an open bag's edge (Austin 2026-10-28), and
-     the matching negative margin keeps the pack the height it was (0.08rem padding before). */
-  padding: 5px 0;
-  margin-block: calc(0.08rem - 5px);
-  /* Min heights grow by the same amount, so an empty row keeps its height too. */
-  min-height: calc(44px + 10px - 0.16rem);
+}
+/* No bags yet (a new character): no bag group and no divider. */
+.pack-slots.pack-bags:empty,
+.pack-slots.pack-bags:empty + .pack-vsep { display: none; }
+.pack-slots.pack-bags { flex: none; }
+.pack-slots.pack-items {
+  flex: 0 1 auto;
+  align-items: center;
+  overflow-x: auto;
+  /* The row scrolls sideways, so it clips outside its padding box: room for a slot's lift and focus ring. */
+  padding: 6px 4px;
+  margin: 0 -4px;
   scrollbar-width: none;
   overscroll-behavior-x: contain;
   scroll-behavior: smooth;
 }
 .pack-slots::-webkit-scrollbar { display: none; }
-.pack-slots.pack-tools {
-  min-height: calc(42px + 10px - 0.16rem);
-}
+/* More than fits: the far edge fades, and the near one once paged on. */
+.pack-slots.pack-items.is-over { -webkit-mask-image: linear-gradient(90deg, var(--c-black) 88%, transparent); mask-image: linear-gradient(90deg, var(--c-black) 88%, transparent); }
+.pack-slots.pack-items.is-scrolled { -webkit-mask-image: linear-gradient(90deg, transparent, var(--c-black) 8%); mask-image: linear-gradient(90deg, transparent, var(--c-black) 8%); }
+.pack-slots.pack-items.is-over.is-scrolled { -webkit-mask-image: linear-gradient(90deg, transparent, var(--c-black) 8%, var(--c-black) 88%, transparent); mask-image: linear-gradient(90deg, transparent, var(--c-black) 8%, var(--c-black) 88%, transparent); }
 .pack-slots .inv-slot,
 .pack-slots .pack-slot {
   position: relative;
-  width: 44px;
-  height: 44px;
-  flex: 0 0 44px;
-  background: var(--surface-card);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--c-black) 8%, transparent);
+  flex: none;
+  width: var(--pack-slot);
+  height: var(--pack-slot);
+  display: grid;
+  place-items: center;
   padding: 0;
-  font: inherit;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: transparent;
   color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: background 120ms ease-out, transform 120ms ease-out, box-shadow 120ms ease-out;
 }
-.pack-slots.pack-tools .pack-slot {
-  width: 40px;
-  height: 40px;
-  flex-basis: 40px;
-  background: var(--surface-card);
-}
-.pack-slots .pack-slot:hover { border-color: var(--border-moss); background: var(--surface-moss); }
+.pack-slots .pack-slot:hover { background: var(--surface-parchment); transform: translateY(-2px); }
+.pack-slots .pack-slot:focus-visible { outline: 2px solid var(--c-sky-57); outline-offset: 2px; }
 .pack-slots .pack-slot.active {
-  border-color: var(--status-good);
   background: var(--surface-moss);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--status-good) 28%, transparent), 0 2px 5px color-mix(in srgb, var(--c-black) 12%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--status-good) 45%, transparent), var(--shadow-1);
   transform: translateY(-2px);
 }
 .pack-slots .pack-slot.is-dragging {
   opacity: 0.42;
-  border-color: var(--status-info);
   transform: translateY(-4px) scale(0.96);
 }
-.pack-slots .pack-slot.pack-tool { border-color: var(--c-sand-75); }
 .pack-slots .pack-slot img {
-  max-width: 30px;
-  max-height: 30px;
-  image-rendering: auto;
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  pointer-events: none;
 }
 .pack-slots .pack-slot .count {
   position: absolute;
   right: 2px;
   bottom: 1px;
-  font-size: var(--fs-2xs);
-  font-weight: 800;
+  padding: 0 var(--sp-2);
+  border-radius: var(--radius-pill);
+  background: var(--surface-bright);
+  box-shadow: var(--shadow-1);
   color: var(--text);
-  text-shadow: 0 0 2px var(--c-white);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  line-height: 15px;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+/* One of a thing shows no count (the mock); the label still says it. */
+.pack-slots .pack-slot.is-single .count { display: none; }
+/* A search result from inside a bag carries its bag's icon. */
+.pack-slots .pack-slot img.pack-slot-inbag {
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  width: 16px;
+  height: 13px;
 }
 .pack-slot-wear {
   position: absolute;
-  left: 5px;
-  right: 5px;
+  left: 7px;
+  right: 7px;
   bottom: 3px;
-  height: 4px;
+  height: 3px;
   overflow: hidden;
   border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--c-sand-28) 28%, transparent);
-  box-shadow: 0 1px 0 color-mix(in srgb, var(--c-white) 35%, transparent);
+  background: var(--surface-sunken);
   pointer-events: none;
 }
 .pack-slot-wear i {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--status-warn), var(--c-lime-77) 45%, var(--c-green-67));
+  background: var(--status-good);
   transition: width 180ms ease;
 }
 .pack-slots .pack-slot.is-broken {
@@ -2610,104 +2561,204 @@ button.play-context-head:focus-visible {
 }
 .pack-slot.is-broken .pack-slot-wear i { background: var(--status-danger); }
 .pack-slots .pack-empty {
-  opacity: 0.45;
-  border-style: dashed;
+  border: 1.5px dashed var(--border-strong);
   cursor: default;
 }
-/* G152 bags: a bag in a pack slot with its opener strip (PackSlot.as:106-176), the open bag's row above the
-   pack (PackContainerView.as:213-219 background 0xc6d2d3, border 0xb2bfc0) and the magic rock's chip. */
-.pack-slots .pack-slot.pack-bag {
-  flex-direction: column;
-  /* The icon centred in the space above the 13px opener strip (it hugged the top edge). */
-  justify-content: center;
-  padding: 0 0 13px;
-  overflow: hidden;
+.pack-slots .pack-slot.pack-empty:hover { background: transparent; transform: none; }
+/* The free slots as one ghost slot, "+N": still where a stack dropped from a bag lands. */
+.pack-slots .pack-slot.pack-ghost {
+  width: 40px;
+  height: 40px;
+  margin: 2px;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
-.pack-slots .pack-slot.pack-bag img { max-width: 26px; max-height: 26px; }
+/* G152 bags: the bag buttons, each with its fill bar (the client's opener strip, PackSlot.as:147-176,
+   drawn as a bar: its Options are in the tray's head), and the magic rock's chip. */
+.pack-slots .pack-slot.pack-bag {
+  width: 40px;
+  place-items: start center;
+  padding-top: 3px;
+}
+.pack-slots .pack-slot.pack-bag img { width: 30px; height: 26px; }
 .pack-bag-opener {
   position: absolute;
-  left: 0; right: 0; bottom: 0;
-  height: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 var(--sp-2);
-  background: var(--c-grey-94);
-  border-top: 1px solid var(--c-grey-87);
-  font-size: var(--fs-2xs);
-  line-height: var(--lh-none);
-  color: var(--text-hud);
+  left: 8px; right: 8px; bottom: 6px;
+  height: 4px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--text-muted) calc(var(--pack-fill, 0) * 100%), var(--surface-sunken) 0);
+  pointer-events: none;
 }
-.pack-bag-opener i {
-  width: 5px; height: 5px;
-  border-radius: var(--radius-round);
-  background: var(--c-slate-55);
+.pack-bag-opener b,
+.pack-bag-opener i { display: none; }
+.pack-slots .pack-slot.pack-bag.is-open { background: var(--surface-moss); transform: none; }
+.pack-slots .pack-slot.is-drop-target {
+  background: var(--surface-moss);
+  box-shadow: 0 0 0 2px var(--status-info);
+  opacity: 1;
 }
-.pack-slots .pack-slot.pack-bag.is-open {
-  /* The open bag's slot stays in the row (no lift, which the sideways-scrolling row clipped) and keeps its
-     rounded corners: the client squared them where the slot joined the bag panel (PackSlot.as drawFullBox
-     127-130), but here the panel sits apart, so square corners read as cut off (Austin 2026-10-28). */
-  background: var(--c-slate-61);
-  border-color: var(--c-slate-58);
-}
-.pack-slots .pack-slot.pack-bag.is-open .pack-bag-opener { background: var(--c-slate-61); color: var(--text-inverse); border-top-color: var(--c-slate-58); }
-.pack-slots .pack-slot.pack-bag.is-open .pack-bag-opener i { background: var(--surface-bright); }
-.pack-bag-row {
-  align-self: flex-start;
-  max-width: 100%;
-  box-sizing: border-box;
-  padding: var(--sp-2) var(--sp-3) 5px;
-  background: var(--c-slate-87);
-  border: 1px solid var(--c-slate-79);
+.pack-slots .pack-slot.pack-rock { background: var(--surface-parchment); }
+.pack-slots .pack-slot.pack-rock img { width: 28px; height: 28px; }
+.pack-pager,
+.pack-search-btn {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
   border-radius: var(--radius-lg);
-  box-shadow: 0 1px 3px color-mix(in srgb, var(--c-black) 12%, transparent);
-  animation: pack-bag-in 0.3s ease-in;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 120ms ease-out;
+}
+.pack-pager:hover,
+.pack-search-btn:hover { background: var(--surface-parchment); }
+.pack-pager:focus-visible,
+.pack-search-btn:focus-visible,
+.pack-count:focus-visible,
+.pack-search-close:focus-visible,
+.pack-bag-options:focus-visible,
+.pack-bag-close:focus-visible { outline: 2px solid var(--c-sky-57); outline-offset: 2px; }
+.pack-pager[hidden],
+.pack-search-btn[hidden],
+.pack-search[hidden] { display: none; }
+.pack-count {
+  flex: none;
+  padding: 0 var(--sp-2) 0 var(--sp-1);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.pack-search {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  height: 36px;
+  padding: 0 var(--sp-2) 0 var(--sp-5);
+  box-sizing: border-box;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-bright);
+  color: var(--text-muted);
+}
+.pack-search:focus-within { outline: 2px solid var(--c-sky-57); outline-offset: 2px; }
+.pack-search input {
+  width: 150px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-md);
+  outline: none;
+}
+.pack-search input::placeholder { color: var(--text-muted); opacity: 1; }
+.pack-search-close,
+.pack-bag-options,
+.pack-bag-close {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.pack-search-close:hover,
+.pack-bag-options:hover,
+.pack-bag-close:hover { background: var(--surface-parchment); color: var(--text); }
+.pack-search-empty {
+  align-self: center;
+  padding: 0 var(--sp-4);
+  color: var(--text-muted);
+  font-size: var(--fs-md);
+  white-space: nowrap;
+}
+/* The open bag: a tray over the row, its left edge by its bag (js/ui/pack-row.js placeTray). */
+.pack-bag-row {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  z-index: var(--z-raised);
+  box-sizing: border-box;
+  max-width: calc(100% - 16px);
+  padding: var(--sp-4);
+  background: var(--surface-bright);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-3);
+  color: var(--text);
+  pointer-events: auto;
+  transform-origin: bottom left;
+  animation: pack-tray-in 180ms cubic-bezier(.2, .8, .2, 1);
 }
 .pack-bag-row[hidden] { display: none; }
-@keyframes pack-bag-in { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .pack-bag-row { animation: none; } }
+@keyframes pack-tray-in { from { opacity: 0; transform: translateY(4px) scale(0.98); } to { opacity: 1; transform: none; } }
 .pack-bag-head {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
-  font-size: var(--fs-xs);
-  color: var(--c-navy-40);
-  margin-bottom: 3px;
+  gap: var(--sp-4);
+  padding: 0 0 var(--sp-3) var(--sp-2);
+  font-size: var(--fs-md);
 }
-.pack-bag-head img { width: 16px; height: 16px; }
-.pack-bag-head span { opacity: 0.75; }
-.pack-bag-close {
-  margin-left: auto;
-  border: 0;
-  background: transparent;
-  font: 800 var(--fs-lg)/var(--lh-none) var(--font-ui);
-  color: var(--text-hud);
-  cursor: pointer;
-  padding: 0 var(--sp-1);
-}
+.pack-bag-head img { width: 26px; height: 22px; object-fit: contain; }
+.pack-bag-head strong { font-weight: 800; }
+.pack-bag-head span { flex: 1; color: var(--text-muted); font-weight: 700; font-variant-numeric: tabular-nums; }
 .pack-slots.pack-bag-slots {
-  flex-wrap: wrap;
-  overflow: visible;
-  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--pack-tray-cols, 8), var(--pack-slot));
+  gap: var(--sp-1);
 }
-.pack-slots.pack-bag-slots .pack-slot { width: 40px; height: 40px; flex-basis: 40px; }
-.pack-slots .pack-slot.is-drop-target {
-  border-color: var(--status-info);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--status-info) 45%, transparent);
-  opacity: 1;
+.pack-slots.pack-bag-slots:empty { display: none; }
+.pack-bag-empty {
+  width: 300px;
+  max-width: 100%;
+  margin: 0;
+  padding: var(--sp-6) var(--sp-4);
+  color: var(--text-muted);
+  font-size: var(--fs-md);
 }
-.pack-slots .pack-slot.pack-rock {
-  background: var(--surface-parchment);
-  border-color: var(--c-gold-74);
-}
-.pack-slots .pack-slot.pack-rock img { max-width: 28px; max-height: 28px; }
-.pack-hint {
-  font-size: var(--fs-2xs);
-  opacity: 0.5;
+/* The slots' tooltip: name and count, then what a click and a Shift-click do (the old visible hint). */
+.pack-tip {
+  position: absolute;
+  z-index: calc(var(--z-notice) + 4);
+  display: flex;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--radius-lg);
+  background: var(--surface-dark);
+  box-shadow: var(--shadow-2);
+  color: var(--text-on-dark);
+  font-size: var(--fs-sm);
+  font-weight: 700;
   white-space: nowrap;
-  max-width: 7.8rem;
-  text-align: right;
-  flex-shrink: 0;
+  pointer-events: none;
+}
+.pack-tip[hidden] { display: none; }
+.pack-tip-sub { font-weight: 600; opacity: 0.86; }
+.pack-tip-sub::before { content: "· "; }
+@media (prefers-reduced-motion: reduce) {
+  .pack-slots .pack-slot,
+  .pack-pager,
+  .pack-search-btn { transition: none; }
+  .pack-slots .pack-slot:hover,
+  .pack-slots .pack-slot.active { transform: none; }
+  .pack-bag-row { animation: none; }
+  .pack-slots.pack-items { scroll-behavior: auto; }
 }
 
 .pack-popover {
@@ -3098,7 +3149,6 @@ button.play-context-head:focus-visible {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 @media (max-width: 620px) {
-  .pack-hint { display: none; }
   .pack-popover { left: 8px !important; right: 8px; width: auto; }
   .pack-popover::after { display: none; }
 }
@@ -5589,42 +5639,6 @@ body.buff-purple-pulse::after {
   .activity-history-line {
     padding: var(--sp-3) var(--sp-1);
     font-size: var(--fs-sm);
-  }
-  .pack-bar {
-    gap: 0.7rem;
-    padding: 0.45rem 0.7rem var(--sp-4);
-  }
-  .pack-currants {
-    min-width: 4.8rem;
-    font-size: var(--fs-lg);
-  }
-  .pack-currants .currant-coin { font-size: var(--fs-2xl); }
-  .pack-currants-label { font-size: var(--fs-2xs); }
-  .pack-rows { gap: var(--sp-2); }
-  .pack-slots {
-    gap: 0.34rem;
-    min-height: calc(52px + 10px - 0.16rem);
-  }
-  .pack-slots.pack-tools { min-height: calc(48px + 10px - 0.16rem); }
-  .pack-slots .inv-slot,
-  .pack-slots .pack-slot {
-    width: 52px;
-    height: 52px;
-    flex-basis: 52px;
-  }
-  .pack-slots.pack-tools .pack-slot {
-    width: 48px;
-    height: 48px;
-    flex-basis: 48px;
-  }
-  .pack-slots .pack-slot img {
-    max-width: 37px;
-    max-height: 37px;
-  }
-  .pack-slots .pack-slot .count { font-size: var(--fs-sm); }
-  .pack-hint {
-    max-width: 9rem;
-    font-size: var(--fs-xs);
   }
 }
 

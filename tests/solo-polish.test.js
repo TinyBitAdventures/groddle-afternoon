@@ -249,20 +249,17 @@ describe('style.css: word outline and solid dimmed upgrade cards', () => {
     assert.match(css, /\.nx-hand \.nx-up\.dim > img:is\(\[src\*="\/suit_"\], \[src\*="\/art_"\], \[src\*="\/icon_"\]\),/);
   });
 
-  it('a bag\'s icon is centred above its 13px opener strip', () => {
-    assert.match(css, /\.pack-slots \.pack-slot\.pack-bag \{\n\s+flex-direction: column;\n[^}]*justify-content: center;\n\s+padding: 0 0 13px;/);
-    assert.match(css, /\.pack-bag-opener \{[^}]*height: 13px;/);
+  it('a bag button keeps its icon above its fill bar (the opener strip, drawn as a bar)', () => {
+    assert.match(css, /\.pack-slots \.pack-slot\.pack-bag \{[^}]*place-items: start center;[^}]*padding-top: 3px;/);
+    assert.match(css, /\.pack-bag-opener \{[^}]*bottom: 6px;[^}]*height: 4px;[^}]*calc\(var\(--pack-fill, 0\) \* 100%\)/);
   });
 
-  it('the pack rows leave room for a selected slot\'s lift and ring without growing the pack', () => {
-    const row = css.match(/\n\.pack-slots \{[^}]*\}/)[0];
+  it('the pack row leaves room for a selected slot\'s lift and ring inside its 56px', () => {
+    const row = css.match(/\n\.pack-slots\.pack-items \{[^}]*\}/)[0];
     assert.match(row, /overflow-x: auto;/);
-    assert.match(row, /padding: 5px 0;/);
-    assert.match(row, /margin-block: calc\(0\.08rem - 5px\);/);
-    assert.match(row, /min-height: calc\(44px \+ 10px - 0\.16rem\);/);
-    assert.match(css, /\.pack-slots\.pack-tools \{\n\s+min-height: calc\(42px \+ 10px - 0\.16rem\);/);
-    assert.match(css, /\.pack-slots \{\n\s+gap: 0\.34rem;\n\s+min-height: calc\(52px \+ 10px - 0\.16rem\);/);
-    // What needs the room: the lift (2px) and the ring (2px) of .active.
+    // 6px above and below a 44px slot fill the 56px row: the lift (2px) and the ring (2px + 2px offset) fit.
+    assert.match(row, /padding: 6px 4px;/);
+    assert.match(css, /\.pack-row \{[^}]*height: 56px;/);
     assert.match(css, /\.pack-slots \.pack-slot\.active \{[^}]*box-shadow: 0 0 0 2px [^}]*transform: translateY\(-2px\);/);
   });
 

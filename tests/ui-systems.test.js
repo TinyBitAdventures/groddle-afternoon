@@ -100,10 +100,11 @@ describe('pack / inventory', () => {
     assert.equal(isToolItem('apple'), false);
     assert.equal(rows.itemCount, items.length);
     assert.equal(rows.toolCount, tools.length);
-    // HTML pack has two row containers; currants live in the top bar only
+    // The modern pack is one row (bags, then items and tools); currants live in the top bar only
     const html = readFileSync(join(__dirnameUi, '../public/play/index.html'), 'utf8');
     assert.ok(html.includes('id="pack-items"'));
-    assert.ok(html.includes('id="pack-tools"'));
+    assert.ok(html.includes('id="pack-bags"'));
+    assert.ok(!html.includes('id="pack-tools"'));
     assert.ok(html.includes('id="stat-currants"'));
     assert.ok(!html.includes('id="pack-currants"'));
   });

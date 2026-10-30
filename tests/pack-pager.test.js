@@ -54,16 +54,17 @@ test('pack pager advances by whole slots and clamps the final page', () => {
   }, -1, 48), 0);
 });
 
-test('pack chrome ships discoverable controls and non-clipping scroll behavior', () => {
+test('the one-row pack pages only when it overflows, and never clips a slot', () => {
   const html = readFileSync(join(here, '../public/play/index.html'), 'utf8');
   const css = readFileSync(join(here, '../public/style.css'), 'utf8');
-  const game = readFileSync(join(here, '../public/game.js'), 'utf8');
-  assert.match(html, /data-pack-pager="items"[\s\S]*?aria-label="Previous items"/);
-  assert.match(html, /data-pack-pager="tools"[\s\S]*?aria-label="More tools"/);
-  assert.match(css, /\.pack-row-shell\.has-overflow[\s\S]*?22px/);
-  assert.match(css, /\.pack-slots\s*\{[\s\S]*?overflow-x:\s*auto/);
-  assert.match(game, /function setupPackPager/);
-  assert.match(game, /data-pack-scroll/);
-  assert.match(game, /event\.preventDefault\(\)/);
-  assert.match(game, /\`\$\{prefix\}ScrollMax\`/);
+  const view = readFileSync(join(here, '../public/js/ui/pack-row.js'), 'utf8');
+  // One pager after the stacks (the mock): hidden until the row overflows, a page on and back to the start.
+  assert.match(html, /id="pack-items"[\s\S]*?<button type="button" class="pack-pager" id="pack-pager" data-pack-scroll="1" aria-label="More items"[^>]*hidden>/);
+  assert.match(css, /\.pack-slots\.pack-items \{[^}]*overflow-x: auto;/);
+  assert.match(css, /\.pack-pager\[hidden\]/);
+  assert.match(view, /if \(pager\) pager\.hidden = !state\.overflow;/);
+  assert.match(view, /const target = state\.canForward \? packPageTarget\(box, 1, slotStep\(box\)\) : 0;/);
+  // A vertical wheel scrolls the row sideways while it overflows.
+  assert.match(view, /event\.preventDefault\(\);\s+box\.scrollBy\(\{ left: event\.deltaY/);
+  assert.match(view, /setData\(`packItem\$\{key\}`, value\)/);
 });

@@ -2671,9 +2671,19 @@
   ]
  },
  "git": {
-  "commits": 773,
+  "commits": 775,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "The pack is one floating row over the world, with bag trays and a search (Shift+F)"
+   },
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "A Social drawer on the right holds the Activity log, Local chat, your party, chat channels and buddies"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2783,19 +2793,9 @@
     "date": "2026-10-29",
     "kind": "improve",
     "text": "Ice nubbins, the Dust Trap, the Firefly Jar and the mail frog draw sharp on Retina"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "improve",
-    "text": "Furniture styles and the potion clouds draw sharp on Retina"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "improve",
-    "text": "Powders, splashes, the countdown, puffs, the Rook's overlays and the phantom draw sharp on Retina"
    }
   ]
  },
- "tests": 435,
+ "tests": 437,
  "generatedAt": "2026-10-30"
 }
