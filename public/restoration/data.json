@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 812,
+  "commits": 813,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "Upgrades and Snaps open in the panel shell's centred frame, in the warm paper colours"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "fix",
     "text": "In Classic, the online bug icon sits beside help and the level pill loses its old card"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "new",
-    "text": "Classic's imagination hub on X: the seven clouds for Skills, Quests, Upgrades, looks, Teleport and home"
    }
   ]
  },

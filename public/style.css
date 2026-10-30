@@ -10833,7 +10833,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 /* Parts only the modern skin draws (the sheet footers, key caps): another skin never shows them. */
 :root:not([data-ui="modern"]) :is(.mp-modern-only, #feat-panel .ui-sheet-key) { display: none !important; }
 /* The shell puts focus on a sheet's title (for the keys and screen readers), never a ring there. */
-:root:not([data-ui="modern"]) :is(#feat-panel, #vendor-panel, #imagination-panel) .ui-sheet-title:focus { outline: none; }
+:root:not([data-ui="modern"]) :is(#feat-panel, #vendor-panel, #imagination-panel, #home-panel, #mail-panel) .ui-sheet-title:focus { outline: none; }
 
 /* Feat: a side sheet (head, a body that scrolls, the footer line). */
 [data-ui="modern"] #feat-panel .feat-title-lockup { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: var(--space-2); }
@@ -11118,4 +11118,158 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   border-radius: var(--radius-xs);
 }
 @media (prefers-reduced-motion: reduce) { [data-ui="modern"] .snap-shade-win .snap-win { animation: none; } }
+/* Home and Mail: the shell's centred frame over a scrim (Home narrow, Mail wide for its two panes). */
+[data-ui="modern"] #game-root :is(#home-panel, #mail-panel).ui-sheet-center {
+  padding: calc(var(--hud-h) + 12px) var(--hud-inset) calc(var(--pack-live-height, 72px) + 8px);
+  background: var(--scrim);
+  backdrop-filter: none;
+}
+[data-ui="modern"] #game-root :is(#home-panel, #mail-panel)[hidden] { display: none; }
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-card, .mail-card) {
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  box-shadow: var(--shadow-3);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--fs-m);
+  animation: ui-sheet-center-in var(--motion-med) var(--ease-out);
+}
+[data-ui="modern"] #home-panel .home-card { width: min(520px, 100%); }
+[data-ui="modern"] #mail-panel .mail-card { width: min(900px, 100%); }
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-head, .mail-head) { flex: none; flex-wrap: nowrap; justify-content: flex-start; min-height: 0; border-bottom: 0; }
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-head-title, .mail-head-title) { flex: 1 1 auto; min-width: 0; }
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-kicker, .mail-kicker) { display: none; }
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-head, .mail-head) h2 { color: var(--text); font-size: var(--fs-xl); font-weight: var(--fw-heavy); line-height: var(--lh-tight); }
+[data-ui="modern"] #home-panel .home-head-mark { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: var(--radius-m); background: var(--surface-sunken); color: var(--text-muted); font-size: var(--fs-l); line-height: var(--lh-none); }
+[data-ui="modern"] #mail-panel .mail-head .ui-sheet-icon { width: 28px; max-height: 28px; }
+[data-ui="modern"] :is(#home-panel, #mail-panel) .kcap {
+  display: inline-grid;
+  place-items: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-heavy);
+  line-height: var(--lh-none);
+  color: var(--text-muted);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+}
+/* The buttons inside: the shell's pills (primary in the accent, the rest raised). */
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button:not(.verb-menu-x):not(.mail-row) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  margin: 0;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  box-shadow: none;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-m);
+  font-weight: var(--fw-heavy);
+  cursor: pointer;
+}
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button.btn-glitch-primary:not(.verb-menu-x):not(.mail-row) { border-color: var(--accent); background: var(--accent); color: var(--accent-text); }
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button:not(.verb-menu-x):not(.mail-row):hover:not(:disabled) { background: var(--surface-hover); }
+[data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-body, .mail-reader, .mail-head-actions) button.btn-glitch-primary:not(.verb-menu-x):not(.mail-row):hover:not(:disabled) { background: var(--accent-hover); }
+[data-ui="modern"] :is(#home-panel, #mail-panel) button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+[data-ui="modern"] :is(#home-panel, #mail-panel) button:disabled { border-color: var(--border); background: var(--surface-sunken); color: var(--text-muted); cursor: not-allowed; }
+/* Home: the owned card and the ticket machine. */
+[data-ui="modern"] #home-panel .home-body { max-height: none; padding: var(--space-1) var(--space-4) var(--space-4); }
+[data-ui="modern"] #home-panel .home-owned-hero { grid-template-columns: 72px 1fr; gap: var(--space-4); }
+[data-ui="modern"] #home-panel .home-owned-mark { width: 72px; font-size: var(--fs-2xl); box-shadow: none; }
+[data-ui="modern"] #home-panel .home-owned-hero h3 { margin: 0 0 2px; color: var(--text); font-size: var(--fs-l); font-weight: var(--fw-heavy); }
+[data-ui="modern"] #home-panel .home-owned-hero p { color: var(--text-muted); font-size: var(--fs-m); line-height: var(--lh-body); }
+[data-ui="modern"] #home-panel :is(.home-owned-actions, .home-purchase-bar, .home-ticket) { flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface-raised); }
+[data-ui="modern"] #home-panel .home-owned-meta { color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] #home-panel :is(.home-ticket-copy span, .home-purchase-copy span, .home-intro) { color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] #home-panel .home-style { border-radius: var(--radius-m); }
+/* Mail: the folders as the shell's tabs, the list and the letter side by side. */
+[data-ui="modern"] #mail-panel .mail-head-actions { flex: none; gap: var(--space-2); }
+[data-ui="modern"] #mail-panel .mail-tabs { flex: none; padding: 3px; background: var(--surface-sunken); }
+[data-ui="modern"] #mail-panel .mail-tabs button { padding: 0; border-radius: var(--radius-pill); background: transparent; }
+[data-ui="modern"] #mail-panel .mail-tabs button.active { background: var(--surface-raised); color: var(--text); box-shadow: var(--shadow-1); }
+[data-ui="modern"] #mail-panel .mail-layout { flex: 1 1 auto; min-height: 0; max-height: none; height: min(460px, 100%); margin: 0 var(--space-4) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-m); overflow: hidden; }
+[data-ui="modern"] #mail-panel .mail-list { border-right: 1px solid var(--border); background: var(--surface-sunken); scrollbar-width: thin; }
+[data-ui="modern"] #mail-panel .mail-row { padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); color: var(--text); font: inherit; }
+[data-ui="modern"] #mail-panel .mail-row:hover,
+[data-ui="modern"] #mail-panel .mail-row.is-selected { background: var(--surface-raised); }
+[data-ui="modern"] #mail-panel .mail-row:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+[data-ui="modern"] #mail-panel .mail-row-copy strong { font-weight: var(--fw-heavy); }
+[data-ui="modern"] #mail-panel :is(.mail-row-copy span, .mail-row time) { color: var(--text-muted); font-size: var(--fs-xs); }
+[data-ui="modern"] #mail-panel .mail-row.is-unread .mail-row-dot { background: var(--accent); box-shadow: none; }
+[data-ui="modern"] #mail-panel .mail-reader { padding: var(--space-4); background: var(--surface-raised); scrollbar-width: thin; }
+[data-ui="modern"] #mail-panel :is(.mail-message-from, .mail-message-time, .mail-empty) { color: var(--text-muted); }
+[data-ui="modern"] #mail-panel .mail-message-from { font-size: var(--fs-xs); letter-spacing: 0.06em; }
+[data-ui="modern"] #mail-panel .mail-message-title { color: var(--text); font-size: var(--fs-xl); font-weight: var(--fw-heavy); }
+[data-ui="modern"] #mail-panel .mail-message-body { margin: var(--space-4) 0; color: var(--text); font-size: var(--fs-m); line-height: var(--lh-body); }
+[data-ui="modern"] #mail-panel .mail-attachment { margin: 0 0 var(--space-4); padding: var(--space-2) var(--space-3); border: 1px dashed var(--border-strong); border-radius: var(--radius-m); background: var(--surface); }
+[data-ui="modern"] #mail-panel .mail-attachment-copy span { color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] #mail-panel .mail-compose-form label { color: var(--text-muted); font-size: var(--fs-xs); letter-spacing: 0.06em; }
+[data-ui="modern"] #mail-panel .mail-compose-form :is(select, textarea, input) { padding: var(--space-2) var(--space-3); border: 1px solid var(--border-strong); border-radius: var(--radius-m); background: var(--surface); color: var(--text); }
+[data-ui="modern"] #mail-panel .mail-compose-form :is(select, textarea, input):focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+[data-ui="modern"] #mail-panel .mail-compose-cost { border-radius: var(--radius-m); background: var(--surface-sunken); color: var(--text-muted); }
+[data-ui="modern"] #mail-panel .mail-compose-cost strong { color: var(--text); }
+@media (max-width: 760px) { [data-ui="modern"] #mail-panel .mail-layout { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { [data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-card, .mail-card) { animation: none; } }
+/* At home: Decorate and Cultivate (features/homes-feature.js .homes-bar) are a side sheet on the left,
+   under the pills, as the other sheets; Change Style (.homes-styles) the shell's centred frame. */
+[data-ui="modern"] #game-root .homes-bar {
+  left: var(--hud-inset);
+  right: auto;
+  top: calc(var(--hud-h) + 6px);
+  bottom: calc(var(--pack-live-height, 72px) + 8px);
+  width: min(var(--sheet-w), calc(100% - 2 * var(--hud-inset)));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  box-shadow: var(--shadow-3);
+  font-size: var(--fs-m);
+}
+[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  box-shadow: var(--shadow-3);
+}
+[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) header { gap: var(--space-2); padding: var(--space-3) var(--space-2) var(--space-2) var(--space-4); border-bottom: 0; background: none; }
+[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) header h3 { color: var(--text); font-size: var(--fs-xl); font-weight: var(--fw-heavy); line-height: var(--lh-tight); }
+[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) header small { color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) .hb-close { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: var(--radius-pill); color: var(--text-muted); font-size: var(--fs-2xl); }
+[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) .hb-close:hover { background: var(--surface-hover); color: var(--text); }
+[data-ui="modern"] #game-root .homes-bar nav { gap: 2px; margin: 0 var(--space-4) var(--space-2); padding: 3px; border-radius: var(--radius-pill); background: var(--surface-sunken); }
+[data-ui="modern"] #game-root .homes-bar nav button { flex: 1; height: 30px; padding: 0 var(--space-1); border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text-muted); font: inherit; font-size: var(--fs-s); font-weight: var(--fw-heavy); }
+[data-ui="modern"] #game-root .homes-bar nav button.on { background: var(--surface-raised); color: var(--text); box-shadow: var(--shadow-1); }
+[data-ui="modern"] #game-root .homes-bar .hb-body { margin-top: 0; padding: var(--space-1) var(--space-4) var(--space-3); border-top: 0; scrollbar-width: thin; }
+[data-ui="modern"] #game-root .homes-bar .hb-tile { border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface-raised); color: var(--text); font-size: var(--fs-xs); font-weight: var(--fw-bold); }
+[data-ui="modern"] #game-root .homes-bar .hb-tile:hover { border-color: var(--border-strong); background: var(--surface-hover); box-shadow: none; }
+[data-ui="modern"] #game-root .homes-bar .hb-tile.on { border-color: var(--accent); background: var(--accent-soft); }
+[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) :is(.hb-row, .hb-actions, .hs-actions) button {
+  min-height: 30px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-s);
+  font-weight: var(--fw-heavy);
+}
+[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) :is(.hb-row, .hb-actions, .hs-actions) button.primary { border-color: var(--accent); background: var(--accent); color: var(--accent-text); }
+[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+[data-ui="modern"] #game-root .homes-bar .hb-note { color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] #game-root .homes-bar .hb-sel { border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface-raised); }
+[data-ui="modern"] #game-root .homes-bar .hb-sel p { color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] #game-root .homes-bar h4 { color: var(--text-muted); font-size: var(--fs-xs); font-weight: var(--fw-heavy); letter-spacing: 0.06em; }
+[data-ui="modern"] #game-root .homes-styles .hs-sel { border-bottom: 1px solid var(--border); }
+[data-ui="modern"] #game-root .homes-styles .hs-name small { color: var(--text-muted); }
 /* —— end MPANELS —— */

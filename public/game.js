@@ -19672,11 +19672,16 @@ function renderHomePanel() {
     // G208: no home yet: the panel is the Home Street Selection Machine (js/home-ticket.js).
     if (title) title.textContent = HOME_MACHINE.label;
     renderTicketMachine(body, homeTicketHost());
+    const machineMeta = document.getElementById('home-meta');
+    if (machineMeta) machineMeta.textContent = '';
     return;
   }
 
   const style = HOME_STYLES[homeState.style] || HOME_STYLES.meadow;
   if (title) title.textContent = `${style.label} home`;
+  // MPANELS: the footer line (the owned card's own words).
+  const homeMeta = document.getElementById('home-meta');
+  if (homeMeta) homeMeta.textContent = homeState.inHome ? 'You are home' : 'One thought away';
   const locationCopy = homeState.inHome
     ? homeState.room === 'interior'
       ? 'You are inside your house.'
@@ -19975,9 +19980,19 @@ function renderMailboxPanel() {
   const list = document.getElementById('mail-list');
   if (!list) return;
   document.querySelectorAll('[data-mail-folder]').forEach((button) => {
-    button.classList.toggle('active', button.dataset.mailFolder === mailboxFolder);
+    const on = button.dataset.mailFolder === mailboxFolder;
+    button.classList.toggle('active', on);
+    // MPANELS: the folders are tabs (role=tab, the roving tabindex).
+    button.setAttribute('aria-selected', on ? 'true' : 'false');
+    button.tabIndex = on ? 0 : -1;
   });
   const rows = mailboxRows();
+  // MPANELS: the footer line: the folder's count and the unread.
+  const mailMeta = document.getElementById('mail-meta');
+  if (mailMeta) {
+    const unread = unreadMailCount(mailboxState, Date.now());
+    mailMeta.textContent = `${rows.length} ${rows.length === 1 ? 'message' : 'messages'} here · ${unread} unread`;
+  }
   if (!rows.some((message) => message.id === mailboxSelectedId)) {
     mailboxSelectedId = rows[0]?.id || null;
   }
@@ -24759,6 +24774,9 @@ async function main() {
         // MPANELS: Feat is a side sheet too.
         { id: 'feat-panel', close: () => closeFeatPanel() },
         { id: 'vendor-panel', close: () => closeVendor() },
+        // MPANELS: Home and Mail are the shell's centred size.
+        { id: 'home-panel', kind: 'center', close: () => closeHomePanel() },
+        { id: 'mail-panel', kind: 'center', close: () => closeMailboxPanel() },
         { id: 'map-panel', kind: 'center', close: () => closeMap() },
       ],
       setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
@@ -26238,6 +26256,19 @@ async function main() {
   });
   document.getElementById('mail-compose-btn')?.addEventListener('click', () => {
     renderMailboxCompose();
+  });
+  // MPANELS: the folder tabs move with the arrow keys, Home and End (the tab follows focus).
+  document.querySelector('#mail-panel .mail-tabs')?.addEventListener('keydown', (event) => {
+    const tabs = [...document.querySelectorAll('[data-mail-folder]')];
+    const at = tabs.indexOf(event.target?.closest?.('[data-mail-folder]'));
+    if (at < 0) return;
+    const next = { ArrowRight: at + 1, ArrowLeft: at - 1, Home: 0, End: tabs.length - 1 }[event.key];
+    if (next == null) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const tab = tabs[(next + tabs.length) % tabs.length];
+    tab.click();
+    tab.focus({ preventScroll: true });
   });
   document.querySelectorAll('[data-mail-folder]').forEach((button) => {
     button.addEventListener('click', () => {
