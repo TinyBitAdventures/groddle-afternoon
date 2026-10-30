@@ -868,9 +868,9 @@ import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=5919dfde';
 import { denseSprite } from './js/sprite-dense.js?v=8e0109eb';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
-import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from './js/notify.js?v=3383e8be';
-import { mountNotifyView } from './js/notify-view.js?v=402d1954';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=629bfb34';
+import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=d85330ff';
+import { mountNotifyView } from './js/notify-view.js?v=81d06119';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=5802b41c';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=3309a3d9';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=2a704f05';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=e2899b11';
@@ -2401,7 +2401,42 @@ function tickNotices() {
   else if (notifyModalSince === -Infinity) notifyModalSince = performance.now();
   const hold = toastHeld() ? 'card' : isScreenViewOpen() ? 'screen' : '';
   notifyView?.frame(performance.now(), { hold, dropBefore: notifyModalSince });
+  keepOfferCardClear();
   socialDrawer?.frame();
+}
+
+/** POLISH: how far the street's offer card sits under a banner now (px), while it is open. */
+let offerCardDropPx = 0;
+
+/**
+ * POLISH: the Magic Rock's offer card on the street (the familiar look, not inside the Quests
+ * dialog) sits under a banner that is up, the Qurazy line on arrival above all: the 2012 client
+ * drew the in-window overlay at the top of the viewport and the emergency card 80 px under the
+ * header, one over the other, never queued (js/notify.js offerCardDrop). The drop only grows
+ * while the card is open and goes when it closes.
+ */
+function keepOfferCardClear() {
+  const modal = document.getElementById('quest-dialogue');
+  const street = modal && !modal.hidden && modal.dataset.look === 'familiar' && modal.dataset.inLog !== 'true';
+  if (!street) {
+    if (offerCardDropPx && modal) modal.style.removeProperty('--fam-drop');
+    if (offerCardDropPx) setCanvasData('offerCardDrop', '');
+    offerCardDropPx = 0;
+    return;
+  }
+  const banners = notifyView?.bannerBoxes() || [];
+  if (!banners.length && !offerCardDropPx) return;
+  const root = document.getElementById('game-root')?.getBoundingClientRect();
+  const shown = modal.querySelector('.quest-dialogue-card')?.getBoundingClientRect();
+  if (!root || !shown?.height) return;
+  const card = { left: shown.left - root.left, right: shown.right - root.left, top: shown.top - root.top - offerCardDropPx, bottom: shown.bottom - root.top - offerCardDropPx };
+  const pack = document.getElementById('pack-bar')?.getBoundingClientRect();
+  const maxBottom = (pack?.height ? pack.top - root.top : root.height) - 8;
+  const drop = offerCardDrop(card, banners, { was: offerCardDropPx, maxBottom });
+  if (drop === offerCardDropPx) return;
+  offerCardDropPx = drop;
+  modal.style.setProperty('--fam-drop', `${drop}px`);
+  setCanvasData('offerCardDrop', String(drop));
 }
 
 /** The open panel (.glitch-modal: shrine, vendor, Feat, ...), if any. */

@@ -449,6 +449,32 @@ export function placeBelow(rect, obstacles = [], { margin = 6, maxBottom = Infin
   return { dy: 0, wait: true };
 }
 
+/** Space between a banner's art box and an offer card moved under it. */
+export const OFFER_CARD_GAP = 8;
+
+/**
+ * How far down (px) the Magic Rock's offer card on the street moves to sit
+ * under the banners (reserved zones such as the Qurazy line), as the 2012 client
+ * stacked them: the in-window overlay at the top of the viewport and the
+ * emergency card under it (QuestsDialog.as refresh 132-138: header_h + 80;
+ * nothing queued one behind the other). `card` is the card's rect where it sits
+ * with no drop. The drop only grows while the card is open (`was`), so a banner
+ * fading away never jumps the card back up under the player's pointer. Where no
+ * spot fits above `maxBottom` it goes as low as fits.
+ */
+export function offerCardDrop(card, banners = [], { was = 0, margin = OFFER_CARD_GAP, maxBottom = Infinity } = {}) {
+  const prev = Math.max(0, Number(was) || 0);
+  if (!card || !(card.bottom > card.top)) return prev;
+  const fit = placeBelow(card, banners, { margin, maxBottom });
+  let dy = fit.dy;
+  if (fit.wait) {
+    const hit = banners.filter((o) => card.left < o.right && card.right > o.left && card.top < o.bottom + margin && card.bottom > o.top - margin);
+    const want = hit.length ? Math.max(...hit.map((o) => o.bottom)) + margin - card.top : 0;
+    dy = Math.max(0, Math.min(want, maxBottom - card.bottom));
+  }
+  return Math.max(prev, Math.round(dy));
+}
+
 /**
  * Moves `rect` sideways (left or right, whichever is shorter and fits inside
  * [minLeft, maxRight]) to clear `obstacles`. Returns { dx, ok }.

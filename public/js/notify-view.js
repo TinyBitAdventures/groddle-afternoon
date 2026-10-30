@@ -15,7 +15,7 @@
  * there (activityLog: false: no panel, no button) and covers the right edge:
  * sideInset() says how much, and the stack centres in the width that is left.
  */
-import { placeBelow, placeBeside, plainText } from './notify.js?v=3383e8be';
+import { placeBelow, placeBeside, plainText } from './notify.js?v=d85330ff';
 
 const STACK_ID = 'notify-notices';
 const LOG_ID = 'activity-log';
@@ -431,6 +431,10 @@ export function mountNotifyView(notifier, { root, setData = () => {}, logButtonH
       const out = [...zones.banner];
       if (shownBox && notifier.notices.length && !holdWhy) out.push(shownBox);
       return out;
+    },
+    /** The banners alone (reserved zones and overlay canvases), in #game-root px: the street's offer card keeps under them. */
+    bannerBoxes() {
+      return [...zones.banner];
     },
     /** Speech that could not get clear sits over the stack: the stack fades under it. */
     setUnderSpeech(over) {

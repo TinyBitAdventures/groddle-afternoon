@@ -2671,13 +2671,23 @@
   ]
  },
  "git": {
-  "commits": 848,
+  "commits": 850,
   "since": "2026-10-19",
   "recent": [
    {
     "date": "2026-10-30",
     "kind": "improve",
+    "text": "Yard machines, graveside markers, Wine of the Dead and other world items draw sharp at Original zoom"
+   },
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
     "text": "The Race Ticket Dispenser draws sharp at Original zoom"
+   },
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "Home street pictures on profiles are sharp: drawn at 2x, up to 1920 wide, as WebP"
    },
    {
     "date": "2026-10-30",
@@ -2783,16 +2793,6 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "The Zoom slider's Wide and Original labels sit clear of its focus ring"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "new",
-    "text": "A Zoom slider brings the world in close, from today's wide view to the original game's size"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Classic's How many is the client's quantity picker wherever it asks: Feed, Eat more, Drop, Buy and Sell"
    }
   ]
  },

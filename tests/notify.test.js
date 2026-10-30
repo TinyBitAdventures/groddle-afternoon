@@ -18,13 +18,15 @@ import {
   stackFloat,
   placeBelow,
   placeBeside,
+  offerCardDrop,
+  OFFER_CARD_GAP,
   NOTICE_LIMIT,
   NOTICE_MS,
   LOG_LIMIT,
   REPEAT_MS,
   GAIN_BATCH_MS,
   FLOAT_LINE_PX,
-} from '../public/js/notify.js?v=3383e8be';
+} from '../public/js/notify.js?v=d85330ff';
 import { REMAKE_SCREEN_GATES, SCREEN_GATES, screenQueueHold, waitForScreenGates } from '../public/js/screen-queue.js?v=cf0132c0';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -320,6 +322,33 @@ describe('zones', () => {
     const talk = { left: 450, right: 700, top: 200, bottom: 320 };
     assert.deepEqual(placeBeside(card, [talk], { margin: 8, minLeft: 0, maxRight: 1000 }), { dx: -158, ok: true });
     assert.equal(placeBeside(card, [talk], { margin: 8, minLeft: 300, maxRight: 750 }).ok, false);
+  });
+
+  it('the street offer card sits under a banner, as the client stacked them, and never climbs back while open', () => {
+    // 1280 x 800: the card at the familiar look's 80 px, the Qurazy art box under the street pill.
+    const card = { left: 340, right: 940, top: 80, bottom: 280 };
+    const qurazy = { left: 465, right: 815, top: 60, bottom: 166 };
+    assert.equal(offerCardDrop(card, [qurazy]), 166 + OFFER_CARD_GAP - 80);
+    assert.equal(offerCardDrop(card, []), 0, 'no banner: the card stays at 80 px');
+    assert.equal(offerCardDrop(card, [{ left: 0, right: 300, top: 60, bottom: 200 }]), 0, 'a box beside it is clear');
+    // The banner fades: the drop it had stays until the card closes (game.js resets it then).
+    assert.equal(offerCardDrop(card, [], { was: 94 }), 94);
+    // A short window: as low as fits over the pack, never past it.
+    assert.equal(offerCardDrop(card, [qurazy], { maxBottom: 330 }), 50);
+    assert.equal(offerCardDrop(card, [qurazy], { maxBottom: 250 }), 0);
+    assert.equal(offerCardDrop(null, [qurazy], { was: 12 }), 12);
+  });
+
+  it('game.js keeps the street offer card under the banners every frame, and only on the street', () => {
+    const game = read('public/game.js');
+    assert.match(game, /notifyView\?\.frame\(performance\.now\(\), \{ hold, dropBefore: notifyModalSince \}\);\n\s+keepOfferCardClear\(\);/);
+    assert.match(game, /modal\.dataset\.look === 'familiar' && modal\.dataset\.inLog !== 'true'/);
+    assert.match(game, /const banners = notifyView\?\.bannerBoxes\(\) \|\| \[\];/);
+    assert.match(game, /modal\.style\.setProperty\('--fam-drop', `\$\{drop\}px`\);/);
+    assert.match(read('public/js/notify-view.js'), /bannerBoxes\(\) \{\n\s+return \[\.\.\.zones\.banner\];/);
+    const css = read('public/style.css');
+    assert.match(css, /\.quest-dialogue\[data-look="familiar"\] \{ place-items: start center; padding: calc\(80px \+ var\(--fam-drop, 0px\)\) /);
+    assert.match(css, /\.quest-dialogue\[data-look="familiar"\] \{ padding-top: calc\(56px \+ var\(--fam-drop, 0px\)\); \}/);
   });
 
   it('floats near one spot stack a line apart', () => {
