@@ -871,7 +871,7 @@ import { createQuestTracker } from './js/ui/quest-tracker.js?v=g477-1';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=g472-7';
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=g477-1';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g476-1';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g480-1';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=g432-1';
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=g463-2';
@@ -26390,7 +26390,8 @@ async function main() {
       // shiftKKeyHandler 962-978, shiftLKeyHandler 980-994), so neither closes a panel.
       if (isPlainKey(e, 'k')) closeSkillsPanel();
       if (e.key === 'y' || e.key === 'Y') closeBuffsPanel();
-      if (e.key === 'c' || e.key === 'C' || isPlainKey(e, 'n')) closeMakePanel();
+      // N only: C is Camera Mode's, never Make's (TSMainView.as cKeyHandler 790-800).
+      if (isPlainKey(e, 'n')) closeMakePanel();
       if (isPlainKey(e, 'l')) closeAvatarPanel();
       // A side sheet sits beside the world: walking, jumping, Enter and E (and the number keys, with
       // focus outside it) go on to the world; a modal panel keeps every key (js/ui/panel-shell.js).
@@ -26459,8 +26460,9 @@ async function main() {
     if (e.key === 'y' || e.key === 'Y') openBuffsPanel();
     // G226: shift+C toggles cultivation mode at home (TSMainView.as shiftCKeyHandler).
     if (e.shiftKey && (e.key === 'c' || e.key === 'C') && features.query('cultivateKey', engine)) return;
-    if (e.key === 'c' || e.key === 'C') openMakePanel();
-    // Phase 2: N is Make's key on the modern top bar (C still opens it; N was free).
+    // Phase 2: N is Make's key on the modern top bar. C is not: the client's cKeyHandler
+    // (TSMainView.as 790-800) only starts Camera Mode, and where Camera Mode cannot start
+    // (a quest instance, a verb, a panel) C does nothing, so it never falls through to Make.
     if (isPlainKey(e, 'n')) openMakePanel();
     if (e.key === 'v' || e.key === 'V') openVendor();
     if (e.key === 'l' || e.key === 'L') openAvatarPanel();

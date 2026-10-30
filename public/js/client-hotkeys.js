@@ -84,7 +84,7 @@ export function hotkeySections({ keyring = false, hub = false } = {}) {
         // HUB: in the modern skin X opens the Imagination hub, whose tiles answer their letters.
         ['Imagination Menu', [['X']], ...(hub ? ['(then S, Q, U, L, T or H)'] : [])],
         ['Quest Log', [['Q']]],
-        // Phase 2: the modern top bar's Make button (N was free; C opens it too).
+        // Phase 2: the modern top bar's Make button (N was free; C is Camera Mode only).
         ['Make', [['N']]],
         ['Skills', [['K'], ['Shift', 'S']]],
         ['Upgrades', [['U']]],

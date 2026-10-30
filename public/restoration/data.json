@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 828,
+  "commits": 829,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "Dropping off the end of Gentle Island Exit, under the down arrow, takes anyone off the island"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "fix",
     "text": "Classic's folded contact strip shows each chat's icon and count, with its name in the tooltip"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Classic's chat panes share the column on a divider you can drag, as 2012's did"
    }
   ]
  },

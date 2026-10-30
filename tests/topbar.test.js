@@ -101,10 +101,14 @@ describe('top bar markup and wiring', () => {
     assert.match(header, /data-menu-group="me"[\s\S]*data-menu-group="world"[\s\S]*data-menu-group="social"[^>]*hidden[\s\S]*data-menu-group="settings"/);
   });
 
-  it('N opens and closes Make; C still does', () => {
+  it('N opens and closes Make; C never does (bug report #8: C opened Make where Camera Mode could not start)', () => {
     assert.match(game, /if \(isPlainKey\(e, 'n'\)\) openMakePanel\(\);/);
-    assert.match(game, /if \(e\.key === 'c' \|\| e\.key === 'C' \|\| isPlainKey\(e, 'n'\)\) closeMakePanel\(\);/);
+    assert.match(game, /\n      if \(isPlainKey\(e, 'n'\)\) closeMakePanel\(\);/);
+    // TSMainView.as cKeyHandler 790-800: C only starts Camera Mode (camera-mode-feature.js).
+    assert.doesNotMatch(game, /e\.key === 'c' \|\| e\.key === 'C'\)\s*(open|close)MakePanel/);
+    assert.doesNotMatch(game, /e\.key === 'c' \|\| e\.key === 'C' \|\| isPlainKey\(e, 'n'\)/);
     assert.match(read('js/client-hotkeys.js'), /\['Make', \[\['N'\]\]\]/);
+    assert.match(read('js/client-hotkeys.js'), /\['Camera Mode', \[\['C'\]\]\]/);
   });
 
   it('Sound: the sliders scale the effects and music buses and are remembered; Mute is the game\'s own', () => {
