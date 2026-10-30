@@ -152,13 +152,24 @@ describe('Classic skin: modules and copy', () => {
 
   it('Skills, Buffs, Badges, Quests and the Map in the 2012 window shell; Upgrades the hub\'s sub-screen', () => {
     const css = read(CSS);
-    const shell = /#skills-panel, #buffs-panel, #achieve-panel, #quest-panel\) > \.side-card,\n:root\[data-ui="classic"\] #game-root #map-panel > \.map-card \{[^}]*border-radius: 4px;[^}]*0 0 0 1px color-mix\(in srgb, var\(--c-classic-ink\) 37%, transparent\),\n\s+0 0 1px 7px color-mix\(in srgb, var\(--c-classic-ink\) 15%, transparent\);/;
+    const shell = /#skills-panel, #buffs-panel, #achieve-panel, #quest-panel\) > \.side-card,\n:root\[data-ui="classic"\] #game-root #make-panel > \.make-card,\n:root\[data-ui="classic"\] #game-root #map-panel > \.map-card \{[^}]*border-radius: 4px;[^}]*0 0 0 1px color-mix\(in srgb, var\(--c-classic-ink\) 37%, transparent\),\n\s+0 0 1px 7px color-mix\(in srgb, var\(--c-classic-ink\) 15%, transparent\);/;
     assert.match(css, shell);
     assert.match(css, /#map-panel > \.map-card \{ width: min\(calc\(764 \* var\(--cu\)\), 100%\); \}/);
     assert.match(css, /width: min\(calc\(615 \* var\(--cu\)\), 100%\);/);
     assert.match(css, /\.verb-menu-x::before,[\s\S]{0,300}background: var\(--c-classic-close\);/);
     assert.match(css, /#imagination-panel:not\(\[hidden\]\) \{[^}]*color-mix\(in srgb, var\(--c-classic-ink\) 70%, transparent\)/);
     // No shade over the world for the windows.
-    assert.match(css, /#map-panel\):not\(\[hidden\]\) \{[^}]*background: none;[^}]*backdrop-filter: none;/);
+    assert.match(css, /#map-panel, #make-panel\):not\(\[hidden\]\) \{[^}]*background: none;[^}]*backdrop-filter: none;/);
+  });
+
+  it('window contents at the 2012 size: type FROM FRAME, the Quest Log rows, the footer buttons', () => {
+    const style = read('public/style.css');
+    for (const n of ['--fs-classic-window', '--fs-classic-row', '--fs-classic-row-title', '--fs-classic-button']) assert.match(style, new RegExp(`${n}: [^;]+; +/\\* \\d+px, FROM FRAME ref/`), n);
+    const css = read(CSS);
+    assert.match(css, /font-size: calc\(var\(--fs-classic-row\) \* var\(--cu-n, 1\)\);/);
+    assert.match(css, /border-bottom: 1px solid var\(--c-classic-row-rule\);/);
+    assert.match(css, /min-height: calc\(29 \* var\(--cu\)\);/, 'the 29 px footer buttons');
+    assert.match(css, /#make-panel > \.make-card \{ width: min\(calc\(614 \* var\(--cu\)\), 100%\); \}/);
+    assert.match(css, /#map-panel \.map-canvas \{[^}]*height: calc\(460 \* var\(--cu\)\);/);
   });
 });
