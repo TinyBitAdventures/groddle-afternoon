@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 794,
+  "commits": 795,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "Quests and Make open as one side sheet on the left, with tabs, a header and a footer; the Map is its centred size"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "new",
     "text": "The game's text is Nunito, served from the game itself with its open font licence"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "The Qurazy banner no longer draws over an open note or window"
    }
   ]
  },
- "tests": 448,
+ "tests": 449,
  "generatedAt": "2026-10-30"
 }

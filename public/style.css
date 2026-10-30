@@ -10690,4 +10690,116 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] #game-root #buffs-panel,
   [data-ui="modern"] #map-panel .map-card.map-hub { animation: none; }
 }
+/* Pinned quests (js/ui/quest-tracker.js): up to two, top left under the left pill; folds to a chip;
+   gone while a side sheet is open (the root's data-sheet). A skin that does not show it keeps it hidden. */
+.quest-pins { display: none; }
+[data-ui="modern"] #game-root #quest-pins:not([hidden]) {
+  position: absolute;
+  top: calc(var(--hud-h) + 6px);
+  left: var(--hud-inset);
+  z-index: var(--z-hud);
+  display: block;
+  box-sizing: border-box;
+  width: 244px;
+  padding: var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  box-shadow: var(--shadow-2);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--fs-m);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-tight);
+  transition: opacity var(--motion-med), transform var(--motion-med) var(--ease-out), visibility var(--motion-med);
+}
+[data-ui="modern"] #game-root[data-sheet] #quest-pins { opacity: 0; visibility: hidden; transform: translateX(-8px); pointer-events: none; }
+[data-ui="modern"] #quest-pins .quest-pins-head { display: flex; align-items: center; gap: var(--space-1); height: 24px; }
+[data-ui="modern"] #quest-pins .quest-pins-head img { width: 22px; height: auto; flex: none; }
+[data-ui="modern"] #quest-pins .quest-pins-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-s);
+  font-weight: var(--fw-heavy);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+[data-ui="modern"] #quest-pins .quest-pins-toggle {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+[data-ui="modern"] #quest-pins .quest-pins-toggle:hover { background: var(--surface-hover); color: var(--text); }
+[data-ui="modern"] #quest-pins .quest-pins-toggle svg { transition: transform var(--motion-fast); }
+[data-ui="modern"] #quest-pins.collapsed .quest-pins-toggle svg { transform: rotate(180deg); }
+[data-ui="modern"] #game-root #quest-pins.collapsed:not([hidden]) { width: auto; max-width: 300px; padding: 4px 4px 4px var(--space-2); border-radius: var(--radius-pill); }
+[data-ui="modern"] #quest-pins.collapsed .quest-pins-list { display: none; }
+[data-ui="modern"] #quest-pins.collapsed .quest-pins-title { text-transform: none; letter-spacing: 0; font-size: var(--fs-m); color: var(--text); padding-right: 4px; }
+[data-ui="modern"] #quest-pins .tq {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 6px var(--space-1);
+  border: 0;
+  border-radius: var(--radius-m);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+[data-ui="modern"] #quest-pins .tq:hover { background: var(--surface-hover); }
+[data-ui="modern"] #quest-pins :is(.tq, .quest-pins-toggle):focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+[data-ui="modern"] #quest-pins .tq-row { display: flex; justify-content: space-between; gap: var(--space-2); font-size: var(--fs-m); font-weight: var(--fw-heavy); }
+[data-ui="modern"] #quest-pins .tq-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+[data-ui="modern"] #quest-pins .tq-n { flex: none; font-variant-numeric: tabular-nums; }
+[data-ui="modern"] #quest-pins .tq-step { display: block; margin-top: 2px; font-size: var(--fs-s); color: var(--text-muted); }
+[data-ui="modern"] #quest-pins .tq-bar { display: block; height: 6px; margin-top: 6px; border-radius: 3px; background: var(--track); overflow: hidden; }
+[data-ui="modern"] #quest-pins .tq-bar i { display: block; height: 100%; background: var(--good); transition: width var(--motion-med) var(--ease-out); }
+/* The buff strip steps down under the tracker. */
+[data-ui="modern"] #game-root:not([data-sheet]) #quest-pins:not([hidden]) ~ #buff-strip { top: calc(var(--hud-h) + 6px + var(--quest-pins-h, 0px) + var(--space-2)); }
+@media (max-width: 760px) {
+  [data-ui="modern"] #game-root #quest-pins:not([hidden]) { top: calc(2 * var(--hud-h) + var(--space-4)); }
+  [data-ui="modern"] #game-root:not([data-sheet]) #quest-pins:not([hidden]) ~ #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4) + var(--quest-pins-h, 0px) + var(--space-2)); }
+}
+/* The Quests card's Pin button. */
+[data-ui="modern"] #quest .qc-pin {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  margin: var(--space-1) var(--space-2) 0 0;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-m);
+  font-weight: var(--fw-heavy);
+  cursor: pointer;
+}
+[data-ui="modern"] #quest .qc-pin:hover { background: var(--surface-hover); }
+[data-ui="modern"] #quest .qc-pin[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+[data-ui="modern"] #quest .qc-pin[aria-disabled="true"] { color: var(--text-muted); cursor: not-allowed; }
+[data-ui="modern"] #quest .qc-pin:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) {
+  [data-ui="modern"] #game-root #quest-pins:not([hidden]),
+  [data-ui="modern"] #quest-pins .tq-bar i,
+  [data-ui="modern"] #quest-pins .quest-pins-toggle svg { transition: none; }
+}
+/* A quest room's HUD (centred over the world) centres in the width an open side sheet leaves. */
+[data-ui="modern"] #game-root[data-sheet] :is(.four-letter-hud, .legalize-hud, .greedy-street-hud, .winter-walk-hud, .rook-woods-hud, .rook-museum-hud, .de-embiggenify-hud, .paradise-flight-hud, .hog-haul-hud) { left: calc(50% + var(--inset-l, 0px) / 2); }
 /* —— end VERBS —— */

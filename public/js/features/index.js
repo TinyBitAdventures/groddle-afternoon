@@ -151,6 +151,7 @@ import { homePoolMpFeature } from './home-pool-mp-feature.js?v=g375-1'; FEATURES
 import { yardVerbsMpFeature } from './yard-verbs-mp-feature.js?v=g463-2'; FEATURES.push(yardVerbsMpFeature);
 import { questVerbsFeature } from './quest-verbs-feature.js?v=g390-1'; FEATURES.push(questVerbsFeature);
 import { itemVerbsMoreFeature } from './item-verbs-more-feature.js?v=g463-2'; FEATURES.push(itemVerbsMoreFeature);
+import { questPinsFeature } from './quest-pins-feature.js?v=g469-3'; FEATURES.push(questPinsFeature);
 import { streetObjectsFeature } from './street-objects-feature.js?v=g454-1'; FEATURES.push(streetObjectsFeature);
 import { realtimeFeature } from './realtime-feature.js?v=g466-1'; FEATURES.push(realtimeFeature);
 import { accountBackupFeature } from './account-backup-feature.js?v=g463-1'; FEATURES.push(accountBackupFeature);

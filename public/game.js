@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-2';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-342';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-340';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g463-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g470-1';
@@ -860,7 +860,8 @@ import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from '.
 import { mountNotifyView } from './js/notify-view.js?v=g469-2';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g469-2';
 import { bindTabs, mountPanelShell } from './js/ui/panel-shell.js?v=g469-2';
-import { createQuestSheet } from './js/ui/quest-sheet.js?v=g469-2';
+import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=g469-2';
+import { createQuestTracker } from './js/ui/quest-tracker.js?v=g469-3';
 import { bindVerbMenu, focusVerbRow, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=g469-1';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g470-2';
@@ -4443,7 +4444,75 @@ const questSheet = createQuestSheet({
   setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
   // A card opened or closed in place is what the next draw makes: keep it (no redraw under the pointer).
   onToggle: () => { questLogDrawn = document.getElementById('quest')?.innerHTML ?? questLogDrawn; },
+  // VERBS: an active quest's card pins it to the tracker (two at most).
+  extraActions: (classTsid) => (classTsid ? [questPinButton(classTsid)] : []),
 });
+
+/** The pins (features/quest-pins-feature.js: up to two, in the player save). */
+function questPins() {
+  return features.get('quest-pins');
+}
+
+/** The Quests card's Pin button: "Pin to screen" or "Pinned"; a third pin says to unpin one first. */
+function questPinButton(classTsid) {
+  const pins = questPins();
+  const pinned = Boolean(pins?.isPinned(classTsid));
+  const full = !pinned && (pins?.pins().length || 0) >= 2;
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'qc-pin';
+  btn.dataset.questPin = classTsid;
+  btn.setAttribute('aria-pressed', pinned ? 'true' : 'false');
+  btn.innerHTML = `<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 2.5 13.5 6.5 11 7.5 8.5 10l.5 3-1.5 1.5-2.5-4-3 3M9.5 2.5 8.5 5 6 7.5l-3-.5L1.5 8.5" /></svg>${pinned ? 'Pinned' : 'Pin to screen'}`;
+  if (full) {
+    btn.setAttribute('aria-disabled', 'true');
+    btn.title = 'You can pin two quests. Unpin one first.';
+  }
+  btn.addEventListener('click', () => {
+    if (btn.getAttribute('aria-disabled') === 'true') {
+      toast('You can pin two quests. Unpin one first.', 2600);
+      return;
+    }
+    pins?.toggle(classTsid);
+    savePlayerState();
+    updateHud();
+    document.querySelector(`#quest [data-quest-pin="${classTsid}"]`)?.focus({ preventScroll: true });
+  });
+  return btn;
+}
+
+/** VERBS (js/ui/quest-tracker.js): the pinned quests under the left pill, ticking with their counts. */
+const questTracker = createQuestTracker({
+  el: document.getElementById('quest-pins'),
+  setData: (key, value) => { if (app?.canvas && app.canvas.dataset[key] !== value) app.canvas.dataset[key] = value; },
+  reducedMotion: () => Boolean(globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches),
+  onOpen: (classTsid) => {
+    questSheet.reveal(classTsid, 'active');
+    openQuestPanel();
+  },
+  onCollapse: (on) => {
+    questPins()?.setCollapsed(on);
+    savePlayerState();
+    updateHud();
+  },
+});
+
+function renderPinnedQuests() {
+  const pins = questPins();
+  if (!pins) return;
+  // A pinned quest that finished (or was given up) leaves the tracker.
+  if (state.started && pins.keepOnly(Object.keys(questState.active || {}))) savePlayerState();
+  const rows = pins.pins().map((classTsid) => {
+    const p = getQuestProgress(questState, classTsid);
+    if (!p?.active) return null;
+    return { classTsid, title: p.def.title || classTsid, ...questStep(p.requirements) };
+  }).filter(Boolean);
+  questTracker.render(rows, pins.collapsed());
+  const el = document.getElementById('quest-pins');
+  const root = document.getElementById('game-root');
+  const h = el && !el.hidden ? Math.round(el.offsetHeight) : 0;
+  if (root && root.style.getPropertyValue('--quest-pins-h') !== `${h}px`) root.style.setProperty('--quest-pins-h', `${h}px`);
+}
 
 function updateHud() {
   const spentRewardBuff = consumeRewardBuff(buffState, pc, Date.now());
@@ -4668,6 +4737,7 @@ function updateHud() {
     }
   }
   renderQuestTracker();
+  renderPinnedQuests();
   renderActivityHistory();
 
   // Achievements panel body
