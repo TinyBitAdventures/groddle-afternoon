@@ -17,9 +17,11 @@
  *   blurred layers keep these decos out of their baked tiles and draw them live through the
  *   layer's colour and box blur at the bake's density (bakeBlurredLayer), between the baked bands
  *   of the decos under and over them.
+ *
+ * Rebuilt rooms play a few decos with no placement at all through sceneAnim (below).
  */
-import { ANIM_DECOS } from './deco-anim-list.js?v=g435-1';
-import { wantsHiresDecos } from './deco-hires.js?v=g449-1';
+import { ANIM_DECOS } from './deco-anim-list.js?v=g457-1';
+import { wantsHiresDecos } from './deco-hires.js?v=g457-1';
 import { isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js';
 
 export const ANIM_BASE = 'assets/decos/animated/';
@@ -170,6 +172,28 @@ export function setAnimSource(PIXI, spr, source) {
 export function setDecoTexture(PIXI, spr, texture) {
   if (spr.decoAnim?.ready) setAnimSource(PIXI, spr, texture.source);
   else spr.texture = texture;
+}
+
+/**
+ * A deco a rebuilt room plays though no archived street places it (tools/deco-pipeline/animate.py
+ * SCENE_ANIMATED: An Autumn Day's falling leaves and girl): a PIXI.AnimatedSprite anchored at the
+ * stage's bottom centre, sized like js/quest-rooms/kit.js deco (scale 1 is the still's 2x pixel
+ * size, so 0.5 is the stage's own size), empty until its strip is in. `clock` sets where in the
+ * loop it starts; `hold` (a timeline frame) stops it there instead of playing.
+ */
+export function sceneAnim(PIXI, name, x, y, { scale = 1, flip = false, clock = performance.now(), hold = null, resolution = globalThis.devicePixelRatio || 1, ax = 0.5, ay = 1 } = {}) {
+  const spr = new PIXI.AnimatedSprite([PIXI.Texture.EMPTY]);
+  spr.anchor.set(ax, ay);
+  spr.scale.set(flip ? -scale : scale, scale);
+  spr.x = x;
+  spr.y = y;
+  const onReady = hold == null ? null : (s) => {
+    setAnimSource(PIXI, s, s.decoAnim.original.source);
+    s.gotoAndStop(Math.max(0, Math.floor(hold)) % s.totalFrames);
+    return true;
+  };
+  attachAnim(PIXI, spr, name, { clock, resolution, onReady });
+  return spr;
 }
 
 /** Play from the clock when on screen, stop when culled. */

@@ -112,7 +112,7 @@ export const ROOM_NOTES = Object.freeze({
     about: "An Autumn Day, the sequel to A Summer's Day, was a short shared memory of the Giants: a black-on-sunset wood and a feeling to recall.",
     play: 'Follow the crow, climb the floating words, and jump into the scrambled sentence to put "Almost forgot this feeling of …" back together. The last word picks a feeling room with a hidden Qurazy quoin.',
     source: 'The four linked places, the five-minute limit, the leave flag and the hourly repeat; the original AUTUMN_DAY music.',
-    rebuilt: "Layout and puzzle rebuilt from Lily Linguistic's recording; the feeling rooms beyond Wonder are drawn from their names. Players' Snaps give the backdrop every room shares: three hazy layers of gnarled trees with red leaf puffs (Tiny Speck's own limbo trees), two bare saplings, red bushes and a heavy vignette.",
+    rebuilt: "Layout and puzzle rebuilt from Lily Linguistic's recording; the feeling rooms beyond Wonder are drawn from their names. Players' Snaps give the backdrop every room shares: three hazy layers of gnarled trees with red leaf puffs (Tiny Speck's own limbo trees), two bare saplings, red bushes and a heavy vignette. The park bench, the falling leaves and the girl whose hair blows in the wind are Tiny Speck's own, from the memory's art file; the Snaps seat her at the end of the Comfort bench, and where the leaves fall is ours.",
     footage: [{ id: 'OuO_TtcfAyI', label: 'An Autumn Day (Lily Linguistic)' }],
   },
   esquibeth: {

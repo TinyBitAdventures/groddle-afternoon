@@ -38,10 +38,19 @@
  * framing the view, red bushes, a cattail sprig, a small fence at the far
  * right and a heavy vignette. The trees, puffs and sprigs are limbo1.swf's
  * CC0 decos (tools/room-art an_autumn_day); saplings and vignette are vectors.
+ *
+ * The memory's own decos survive in quest01.swf (CC0) though no archived
+ * location places them: the black park bench (bench_01_anautumnsday, a
+ * still), the falling leaves (falling_leaves_01*_anatumunsday, four one-leaf
+ * columns that play) and the girl whose hair blows in the wind
+ * (silhouette_girl_anautumsday, 33 frames). Three Snaps of the Comfort room
+ * (PHVU4BAI9S623BG, PHVJLT7S99527G2, PHF624MH10D2RFE) show her sitting at the
+ * left end of the bench, so she sits there; where the leaves fall is ours.
  */
 
 import { AN_AUTUMN_DAY_FILES } from '../an-autumn-day-art.js';
 import { textureFromUrl } from '../textures.js';
+import { sceneAnim } from '../deco-anim.js?v=g457-1';
 
 export const ROOM_ID = 'an_autumn_day';
 export const QUEST_ID = 'an_autumn_day';
@@ -372,15 +381,17 @@ function drawSapling(g, x, floor, h, seed) {
   g.stroke({ width: 1.5, color: INK, cap: 'round' });
 }
 
-function drawBench(g, x, seatY) {
-  for (let k = 0; k < 3; k++) g.roundRect(x - 60, seatY - 44 + k * 11, 120, 6, 2);
-  g.rect(x - 62, seatY - 3, 124, 7);
-  g.rect(x - 52, seatY - 48, 5, 50);
-  g.rect(x + 47, seatY - 48, 5, 50);
-  g.rect(x - 54, seatY, 6, 34);
-  g.rect(x + 48, seatY, 6, 34);
-  g.fill(INK);
+/**
+ * quest01.swf bench_01_anautumnsday (stage 132 x 61) at its own size: the seat's top edge is 33 px
+ * over the legs' feet, so the feet stand 33 px under the seat's walking line (props.bench.y).
+ */
+export const BENCH = Object.freeze({ deco: 'bench_01_anautumnsday', scale: 0.5, seatOverFeet: 33 });
+function bench(PIXI, kit, x, seatY) {
+  return kit.deco(PIXI, BENCH.deco, x, seatY + BENCH.seatOverFeet, { scale: BENCH.scale });
 }
+
+/** The girl of the Comfort Snaps, standing at the bench's left end behind its back (stage 60 x 91). */
+export const GIRL = Object.freeze({ deco: 'silhouette_girl_anautumsday', dx: -40, scale: 0.5 });
 
 function drawLamp(g, x, floor) {
   g.rect(x - 3, floor - 150, 6, 150);
@@ -569,7 +580,6 @@ function drawMain(ctx) {
   g.closePath();
   g.fill(INK);
   drawGround(g, W + PAD, H, FLOOR);
-  drawBench(g, props.bench.x, props.bench.y);
   drawFence(g, 4250, 4380, FLOOR);
   for (const x of props.lamps) drawLamp(g, x, FLOOR);
   for (const s of props.stones) drawStone(g, s, FLOOR);
@@ -583,6 +593,7 @@ function drawMain(ctx) {
   g.fill(INK);
   tufts(g, props.trunk.x1 + 10, props.trunk.x2 - 10, props.trunk.top, 12);
   world.addChild(g);
+  world.addChild(bench(PIXI, kit, props.bench.x, props.bench.y));
   const caption = wordText(PIXI, CAPTION, { size: 19, weight: '700', fill: 0xf4e6d6 });
   caption.x = CAPTION_AT.x;
   caption.y = CAPTION_AT.y;
@@ -638,19 +649,17 @@ function drawFeelingRoom(ctx, feeling) {
   root.layer(0, 8).addChild(vignette(PIXI));
   const world = root.layer(1, 4);
   for (const [x, s, sprig] of FEELING_BUSHES) bush(PIXI, world, x, FLOOR, s, sprig);
-  if (warm) {
-    world.addChild(kit.glow(PIXI, 780, FLOOR - 166, 0xffc56a, 90)).alpha = 0.32;
-    world.addChild(ghost(PIXI, kit, 560, FLOOR + 2, 0.24, 0.8));
-    world.addChild(ghost(PIXI, kit, 700, FLOOR + 2, 0.2, 0.8));
-  }
+  if (warm) world.addChild(kit.glow(PIXI, 780, FLOOR - 166, 0xffc56a, 90)).alpha = 0.32;
   const g = new PIXI.Graphics();
   // The two saplings that frame the view.
   for (const [x, h, seed] of FEELING_SAPLINGS) drawSapling(g, x, FLOOR, h, seed);
   drawGround(g, W + PAD, H, FLOOR);
-  drawBench(g, lay.bench.x, lay.bench.y);
   if (warm) drawLamp(g, 780, FLOOR);
   drawFence(g, 1260, 1390, FLOOR);
   world.addChild(g);
+  // The Comfort Snaps: the girl sits at the bench's left end, behind its back.
+  if (warm) world.addChild(sceneAnim(PIXI, GIRL.deco, lay.bench.x + GIRL.dx, FLOOR + 1, { scale: GIRL.scale, resolution: ctx.engine?.app?.renderer?.resolution }));
+  world.addChild(bench(PIXI, kit, lay.bench.x, lay.bench.y));
   const exit = wordText(PIXI, 'exit', { size: 16, weight: '800', fill: 0x2a1a14 });
   exit.x = lay.exit.x;
   exit.y = FLOOR - 14;
@@ -688,38 +697,43 @@ function redBirdSprite(ctx) {
   return spr;
 }
 
-function makeLeaves(ctx, layer, count, frozen) {
-  const { PIXI } = ctx;
-  const leaves = [];
-  for (let i = 0; i < count; i++) {
-    const g = new PIXI.Graphics();
-    g.ellipse(0, 0, 6, 3).fill({ color: i % 3 ? 0xb5281e : 0x7d1c14, alpha: 0.9 });
-    g.x = 80 + ((i * 397) % (ROOM.W - 160));
-    g.y = 60 + ((i * 211) % (ROOM.FLOOR - 120));
-    g.rotation = i;
-    g.seed = i * 1.7;
-    g.frozen = frozen;
-    layer.addChild(g);
-    leaves.push(g);
-  }
-  return leaves;
+/**
+ * quest01.swf's falling leaves: each a 140 x 360 column one leaf falls down, as [deco, first and
+ * last frame the leaf shows] (01a and 01c set off late, 01b lies blank after frame 222).
+ */
+export const LEAF_COLUMNS = Object.freeze([
+  Object.freeze(['falling_leaves_01_anatumunsday', 0, 118]),
+  Object.freeze(['falling_leaves_01a_anatumunsday', 22, 251]),
+  Object.freeze(['falling_leaves_01b_anatumunsday', 0, 221]),
+  Object.freeze(['falling_leaves_01c_anatumunsday', 48, 191]),
+]);
+/** Column height in world px (the stage's 360). */
+export const LEAF_FALL = 360;
+
+/**
+ * Leaf columns across a feeling room, each on its own clock; `frozen` (Stillness) holds every leaf
+ * in mid-air on a frame where it shows. Columns end between 380 px and the floor.
+ */
+export function leafColumns(count, frozen) {
+  return Array.from({ length: count }, (_, i) => {
+    const [deco, first, last] = LEAF_COLUMNS[i % LEAF_COLUMNS.length];
+    return {
+      deco,
+      x: 80 + ((i * 397) % (ROOM.W - 160)),
+      bottom: 380 + ((i * 211) % (ROOM.FLOOR - 380)),
+      flip: i % 2 === 1,
+      phase: i * 1733,
+      hold: frozen ? first + ((i * 37) % (last - first + 1)) : null,
+    };
+  });
 }
 
-function stepLeaves(leaves, dt, t) {
-  for (const l of leaves || []) {
-    if (l.destroyed) continue;
-    if (l.frozen) {
-      l.rotation = l.seed + Math.sin(t / 2600 + l.seed) * 0.04;
-      continue;
-    }
-    l.y += dt * 0.035;
-    l.x += Math.sin(t / 700 + l.seed) * dt * 0.03 - dt * 0.008;
-    l.rotation += dt * 0.0016;
-    if (l.y > ROOM.FLOOR + 4) {
-      l.y = -10;
-      l.x = 60 + Math.random() * (ROOM.W - 120);
-    }
-  }
+function makeLeaves(ctx, layer, count, frozen) {
+  const now = performance.now();
+  const resolution = ctx.engine?.app?.renderer?.resolution;
+  return leafColumns(count, frozen).map((c) => layer.addChild(sceneAnim(ctx.PIXI, c.deco, c.x, c.bottom, {
+    scale: 0.5, flip: c.flip, clock: now - c.phase, hold: c.hold, resolution,
+  })));
 }
 
 function qurazyKey(feeling) {
@@ -922,7 +936,6 @@ function tickFeeling(ctx, dt, t) {
   const scene = d.scene;
   if (!p || !scene) return;
   if (scene.caption && !scene.caption.destroyed) scene.caption.alpha = Math.min(1, (t - d.feelEnteredAt) / 1600);
-  stepLeaves(d.leaves, dt, t);
   const rb = d.redBird;
   if (rb && !rb.destroyed) {
     rb.y = feelingLayout('wonder').quoin.y - 6 + Math.sin(t / 700) * 8;

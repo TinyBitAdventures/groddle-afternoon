@@ -35,6 +35,10 @@ it most, as recover.py picks):
   sequence, per strip its density and frame rects), animated.json here (inputs, sizes, hashes) and
   public/js/deco-anim-list.js (name -> frames, loop start, 3x).
 
+Rebuilt rooms play a few decos no archived street places (SCENE_ANIMATED: An Autumn Day's falling
+leaves and the girl on the bench): the same strips, made at the stage's full 3x, with no still and
+no placements; js/deco-anim.js sceneAnim draws them.
+
 Usage (python3.11 has numpy + Pillow; FFDec needs Java 21; cwebp 1.6):
   python3.11 -I tools/deco-pipeline/animate.py --list
   python3.11 -I tools/deco-pipeline/animate.py --work <scratch> [--only a,b] [--batch 4]
@@ -77,6 +81,21 @@ SETTINGS = {'version': 1, 'fps': FPS, 'max_period': MAX_PERIOD, 'need': NEED_TEX
 # Frame scripts that change the loop (decompiled with FFDec -export script, data only):
 # hell_yelling_head_v2_fla.MainTimeline frame350: this.gotoAndPlay("half blink").
 LOOP_FROM = {'hell_yelling_head_v2': 'half blink'}
+
+# Decos no archived street places that a rebuilt room plays (its location is lost, its art is not):
+# name -> (bundle, what it is). They have no still in manifest.json (a room shows nothing until the
+# strip is in), take the 3x strip at the stage's full size, and count no placements. The rooms place
+# them through js/deco-anim.js sceneAnim.
+SCENE_ANIMATED = {
+    # An Autumn Day (js/quest-rooms/an-autumn-day.js): quest01.swf, the bundle with the memory's own
+    # decos. Each is one leaf falling down a 140 x 360 stage (frame 1 of 01a and 01c is blank: their
+    # leaf sets off at frame 23 and 49).
+    'falling_leaves_01_anatumunsday': ('quest01.swf', 'a leaf falling down a 140 x 360 column, 120 frames'),
+    'falling_leaves_01a_anatumunsday': ('quest01.swf', 'a leaf falling down a 140 x 360 column, from frame 23 of 277'),
+    'falling_leaves_01b_anatumunsday': ('quest01.swf', 'a leaf falling down a 140 x 360 column, 254 frames'),
+    'falling_leaves_01c_anatumunsday': ('quest01.swf', 'a leaf falling down a 140 x 360 column, frames 49 to 192 of 313'),
+    'silhouette_girl_anautumsday': ('quest01.swf', 'the girl on the bench, her hair blowing (33 frames)'),
+}
 
 CONTROL = {1, 4, 5, 12, 15, 18, 19, 26, 28, 43, 45, 70, 89}  # tags that belong to a timeline
 
@@ -421,6 +440,16 @@ def survey(work):
     cands = audit.swf_candidates()
     manifest = set(json.load(open(build.MANIFEST)))
     rows = []
+    for n, (bundle, what) in sorted(SCENE_ANIMATED.items()):
+        swf = audit.bundled_swf(work, bundle, n, index)
+        tl = timeline(swf)
+        info = swfinfo.read(swf)
+        r = {'name': n, 'placements': 0, 'streets': 0, 'scene': what, 'swf': audit.swf_label(swf, work),
+             'swf_sha': build.sha(swf)[:16], 'stage': info['stage'], 'root': tl['root'], 'nested': tl['nested'][:6],
+             'frames': loop_period(tl), 'loop_from': 0}
+        # One notional placement at the stage's size, so the strip is cut for full 3x.
+        rows.append((r, swf, [{'tsid': 'scene', 'layer': 'middleground', 'far': False, 'blur': 0, 'colour': False,
+                               'colour_key': '{}', 'w': info['stage'][0], 'h': info['stage'][1]}]))
     for n in sorted(places, key=lambda k: (-len(places[k]), k)):
         swf, label = source_for(n, stills, place, index, cands, work)
         r = {'name': n, 'placements': len(places[n]), 'streets': len({p['tsid'] for p in places[n]})}
@@ -471,7 +500,7 @@ def cmd_build(args):
         still = stills.get(n) or {}
         size2 = still.get('size2') or [max(1, round(r['stage'][0] * 2)), max(1, round(r['stage'][1] * 2))]
         r['size'] = size2
-        r['hires'] = bool(still.get('hires') and not still.get('big'))
+        r['hires'] = n in SCENE_ANIMATED or bool(still.get('hires') and not still.get('big'))
         r['need'] = round(need_scale(size2, places), 3)
         r['copies'] = copies(places)
         todo.append((r, swf))
@@ -580,11 +609,14 @@ def cmd_check(args):
     for n in places:
         if n not in plan['decos']:
             problems.append(f'{n}: flagged animated on {len(places[n])} placements but not in animated.json')
+    for n in SCENE_ANIMATED:
+        if not (plan['decos'].get(n) or {}).get('strips'):
+            problems.append(f'{n}: a rebuilt room plays it but it has no strip (run --only {n})')
     for n, r in plan['decos'].items():
-        if n not in places:
+        if n not in places and n not in SCENE_ANIMATED:
             problems.append(f'{n}: in animated.json but no placement is flagged animated now')
             continue
-        if r.get('placements') != len(places[n]):
+        if r.get('placements') != len(places.get(n, [])):
             problems.append(f'{n}: {len(places[n])} animated placements, animated.json says {r.get("placements")}')
         if r.get('skip'):
             if os.path.exists(os.path.join(OUT, n + '.json')):

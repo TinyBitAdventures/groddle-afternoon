@@ -1,6 +1,26 @@
 {
  "about": "G431: decos recovered by tools/deco-pipeline/recover.py",
  "decos": {
+  "bench_01_anautumnsday": {
+   "swf": "bundle:quest01.swf#bench_01_anautumnsday",
+   "swf_sha": "c00d6bf344cbce89",
+   "stage": [
+    132.2,
+    60.85
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the black park bench of every An Autumn Day room",
+   "png": [
+    265,
+    122
+   ],
+   "png_sha": "018d0790fecf379b"
+  },
   "blank": {
    "swf": "bundle:subway1.swf#blank",
    "swf_sha": "32d6afcb91bfd637",

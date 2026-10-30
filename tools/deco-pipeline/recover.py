@@ -116,6 +116,12 @@ SCENE_DECOS.update({
     'homestreetstyle_sign_large_newxpblack': 'the hanging HOME STREET STYLE sign',
     'sign_t2streetstyle_newxp': 'the Go talk to your Magic Rock sign',
 })
+# An Autumn Day's four memory rooms (LUVCCQSMDIB3HOI and its three feelings) are lost; their decos are
+# in quest01.swf. js/quest-rooms/an-autumn-day.js places the bench (the falling leaves and the girl play:
+# tools/deco-pipeline/animate.py SCENE_ANIMATED).
+SCENE_DECOS.update({
+    'bench_01_anautumnsday': 'the black park bench of every An Autumn Day room',
+})
 
 
 def sha(path):
