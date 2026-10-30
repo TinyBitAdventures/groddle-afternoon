@@ -46,6 +46,13 @@
   --lh-snug: 1.25;
   --lh-normal: 1.35;
   --lh-loose: 1.5;
+  --lh-body: 1.4;
+  /* The HUD mock's steps that the scale above lacks (its --fs-xs and --fs-xl match; its 22px and
+     28px are --fs-2xl and --fs-3xl there, here 20px and 24px, so those keep the game's values) */
+  --fs-s: var(--fs-sm);  /* 12px */
+  --fs-m: var(--fs-md);  /* 13px */
+  --fs-l: 0.9375rem;     /* 15px */
+  --fs-lead: 1.0625rem;  /* 17px */
 
   /* Spacing (the number is px / 2) */
   --sp-1: 0.125rem;  /* 2px */
@@ -61,6 +68,27 @@
   --sp-12: 1.5rem;   /* 24px */
   --sp-16: 2rem;     /* 32px */
   --sp-20: 2.5rem;   /* 40px */
+  /* The HUD mock's spacing names */
+  --space-1: var(--sp-2);  /* 4px */
+  --space-2: var(--sp-4);  /* 8px */
+  --space-3: var(--sp-6);  /* 12px */
+  --space-4: var(--sp-8);  /* 16px */
+  --space-5: var(--sp-12); /* 24px */
+  --space-6: var(--sp-16); /* 32px */
+
+  /* HUD layout (the mock's): the top band, the inset from the window edge, control and slot sizes */
+  --hud-h: 44px;
+  --hud-inset: 8px;
+  --hit: 36px;
+  --slot: 44px;
+  --drawer-w: 300px;
+  --rail-w: 44px;
+  --sheet-w: 360px;
+
+  /* Motion */
+  --motion-fast: 120ms;
+  --motion-med: 180ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   /* Radii */
   --radius-xs: 4px;
@@ -72,12 +100,17 @@
   --radius-3xl: 16px;
   --radius-pill: 999px;
   --radius-round: 50%;
+  /* The HUD mock's three radii */
+  --radius-s: var(--radius-sm);  /* 6px */
+  --radius-m: var(--radius-lg);  /* 10px */
+  --radius-l: var(--radius-2xl); /* 14px */
 
   /* Elevation */
-  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.2);
-  --shadow-2: 0 2px 8px rgba(0, 0, 0, 0.2);
-  --shadow-3: 0 10px 30px rgba(0, 0, 0, 0.35);
-  --shadow-4: 0 16px 48px rgba(0, 0, 0, 0.28);
+  /* Warm paper: brown-tinted, crisp */
+  --shadow-1: 0 1px 2px rgba(64, 40, 16, 0.2);
+  --shadow-2: 0 2px 4px rgba(64, 40, 16, 0.12), 0 8px 20px rgba(64, 40, 16, 0.2);
+  --shadow-3: 0 6px 12px rgba(40, 24, 8, 0.2), 0 20px 48px rgba(40, 24, 8, 0.34);
+  --shadow-4: 0 16px 48px rgba(40, 24, 8, 0.28);
 
   /* Stacking layers, lowest first */
   --z-below: -1;    /* behind its parent */
@@ -612,60 +645,109 @@
   --c-red-41: #7c2b25;
   --c-red-41b: #8a1010;
   --c-red-37: #5a3326;
+  /* warm paper (phase 2: the HUD mock's Warm paper direction) */
+  --c-cream-99c: #fffdf8;
+  --c-cream-98: #fff8ee;
+  --c-cream-97b: #fbf5ea;
+  --c-cream-94: #f4e9d6;
+  --c-cream-93b: #f2e8d6;
+  --c-sand-90b: #eadcc4;
+  --c-sand-87: #e2d2b4;
+  --c-sand-85b: #d6cbbe;
+  --c-gold-79c: #cdb792;
+  --c-gold-77c: #f2a31b;
+  --c-orange-71c: #e8862a;
+  --c-sand-54: #7d6a58;
+  --c-sand-46b: #6a5442;
+  --c-brown-53b: #9a5800;
+  --c-brown-44c: #7a4300;
+  --c-sand-28c: #33241a;
+  --c-sand-22: #1e1a16;
+  --c-violet-55d: #7e57c2;
+  --c-violet-49: #6b4c9e;
+  --c-violet-43c: #5a3e89;
+  --c-mauve-94c: #eee6f8;
+  --c-green-64: #4fa23a;
+  --c-green-47b: #276b2c;
+  --c-red-61b: #e0483c;
+  --c-red-53e: #bf3127;
+  --c-blue-61: #3e86d6;
+  --c-blue-57: #1f6feb;
   /* palette:end */
 
   /* Surfaces */
-  --surface-card: var(--c-cream-99);       /* cream card: verb menu, Map, side panels */
-  --surface-bright: var(--c-white);     /* white tiles, inputs */
-  --surface-parchment: var(--c-cream-93);  /* parchment: home bar, quiet buttons */
-  --surface-sunken: var(--c-sand-90);     /* tracks and wells */
+  --surface-card: var(--c-cream-97b);      /* cream card: verb menu, Map, side panels (paper --surface) */
+  --surface-bright: var(--c-cream-99c);    /* warm white tiles, inputs, popovers (paper --surface-raised) */
+  --surface-parchment: var(--c-cream-94);  /* parchment: home bar, quiet buttons (paper --surface-hover) */
+  --surface-sunken: var(--c-cream-93b);    /* tracks and wells */
   --surface-moss: var(--c-sage-96);       /* selected chips and slots */
   --surface-lilac: var(--c-mauve-95);      /* windows and quest cards */
   --surface-navy: var(--c-navy-20);       /* Flash-style dark boxes */
   --surface-dark: var(--c-sand-25);       /* dark cards and toasts */
   --card: var(--surface-card);
+  /* The HUD mock's names (Warm paper) */
+  --surface: var(--surface-card);
+  --surface-raised: var(--surface-bright);
+  --surface-hover: var(--c-cream-94);
+  --surface-tip: var(--c-sand-22);          /* tooltips */
+  --track: var(--c-sand-90b);               /* meter and ring tracks */
 
   /* Text */
-  --text: var(--c-mauve-29);
-  --text-heading: var(--c-mauve-33);
-  --text-muted: var(--c-sand-51);
-  --text-subtle: var(--c-sand-63);
+  --text: var(--c-sand-28c);               /* 13.7:1 on --surface */
+  --text-heading: var(--c-sand-28c);
+  --text-muted: var(--c-sand-46b);          /* 6.5:1 on --surface, 5.8:1 on --surface-sunken */
+  --text-subtle: var(--c-sand-54);          /* 4.7:1 on --surface */
   --text-brown: var(--c-sand-36);
   --text-moss: var(--c-green-42);
-  --text-danger: var(--c-red-50);
-  --text-inverse: var(--c-white);
+  --text-danger: var(--c-red-53e);
+  --text-inverse: var(--c-cream-99c);
   --text-on-dark: var(--c-cream-97);
   --text-hud: var(--c-slate-46);           /* numbers on the top bar's cards (6.8:1, js/vitals.js) */
   --ink: var(--text);
+  --text-tip: var(--c-cream-98);            /* on --surface-tip: 16.4:1 */
+  --text-tip-muted: var(--c-sand-85b);      /* 10.8:1 */
 
   /* Borders */
-  --border: var(--c-sand-89);
-  --border-strong: var(--c-sand-80);
+  --border: var(--c-sand-87);
+  --border-strong: var(--c-gold-79c);
   --border-grey: var(--c-sand-85);
   --border-sage: var(--c-sage-92);
   --border-moss: var(--c-lime-75);
 
   /* Accents and game stats */
-  --accent: var(--c-orange-68);
+  --accent: var(--c-violet-49);              /* white on it 6.7:1 */
+  --accent-hover: var(--c-violet-43c);
+  --accent-text: var(--c-white);
+  --accent-soft: var(--c-mauve-94c);         /* pressed and selected; --accent on it 5.5:1 */
+  --focus: var(--c-blue-57);                 /* the focus ring */
   --moss: var(--c-green-60);
-  --energy: var(--c-green-71);
-  --energy-hud: var(--c-sky-67);
-  --mood: var(--c-gold-77);
+  --energy: var(--c-orange-71c);
+  --energy-hud: var(--energy);
+  --mood: var(--c-green-64);
+  --xp: var(--c-blue-61);
   --currants: var(--c-gold-65);
-  --imagination: var(--c-plum-55);
+  --imagination: var(--c-violet-55d);
+  --img: var(--imagination);
 
   /* Status */
-  --status-good: var(--c-green-63);
-  --status-warn: var(--c-gold-76);
-  --status-danger: var(--c-red-55);
+  --status-good: var(--c-green-47b);         /* 6.0:1 on --surface: text-safe */
+  --status-warn: var(--c-gold-77c);          /* a fill; --warn is its text */
+  --status-danger: var(--c-red-53e);         /* 5.3:1 on --surface */
   --status-info: var(--c-sky-67b);
   --status-warn-soft: var(--c-cream-96c);   /* low vitals tint (js/vitals.js) */
   --status-danger-soft: var(--c-mauve-94b); /* critical vitals tint */
+  --good: var(--status-good);
+  --warn: var(--c-brown-53b);                /* 5.1:1 on --surface */
+  --warn-fill: var(--status-warn);
+  --danger: var(--status-danger);
+  --danger-fill: var(--c-red-61b);
 
   /* Overlays and shadow colour */
-  --overlay-scrim: rgba(20, 30, 40, 0.42);
+  --overlay-scrim: rgba(36, 22, 10, 0.4);
+  --scrim: var(--overlay-scrim);
+  --scrim-strong: rgba(36, 22, 10, 0.6);
   --overlay-dim: rgba(0, 0, 0, 0.4);
-  --shadow: rgba(40, 30, 20, 0.16);
+  --shadow: rgba(64, 40, 16, 0.16);
 }
 /* Modern skin (<html data-ui="modern">, the default): Nunito is the UI font. A Classic skin keeps --font-ui. */
 :root[data-ui="modern"] {
@@ -1055,7 +1137,7 @@ kbd {
   font-size: var(--fs-lg);
   font-weight: 700;
   color: var(--text-inverse);
-  background: linear-gradient(180deg, var(--c-orange-76), var(--accent));
+  background: linear-gradient(180deg, var(--c-orange-76), var(--c-orange-68));
   cursor: pointer;
   box-shadow: 0 3px 0 var(--c-orange-57);
 }

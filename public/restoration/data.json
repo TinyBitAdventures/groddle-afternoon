@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 770,
+  "commits": 771,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "The game's text is Nunito, served from the game itself with its open font licence"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "The tutorial's chain and its click-to-pull arrow are in view, and Local chat waits for the home street"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "improve",
-    "text": "Legalize It and We're Off to See the Lizard run on the real subway stations and street"
    }
   ]
  },
