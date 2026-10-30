@@ -739,8 +739,9 @@ export function mountSocialDrawer({
     if (typeof dock.checkVisibility === 'function' && !dock.checkVisibility({ visibilityProperty: true })) return { left: 0, right: 0 };
     const r = dock.getBoundingClientRect();
     const rr = root.getBoundingClientRect();
-    // Only a drawer on the right edge (a skin's stylesheet that has not loaded leaves it elsewhere).
-    if (!r.width || !r.height || r.left < rr.left + rr.width / 2) return { left: 0, right: 0 };
+    // Only a drawer on the right edge (a skin's stylesheet that has not loaded leaves it elsewhere),
+    // and not one beside the world (the Classic skin's chat column, css/classic.css).
+    if (!r.width || !r.height || r.left < rr.left + rr.width / 2 || r.left >= rr.right - 1) return { left: 0, right: 0 };
     // The width it is going to (not one caught halfway through the open or close transition).
     let w = r.width;
     try {
@@ -783,6 +784,10 @@ export function mountSocialDrawer({
     open: (opts = {}) => setOpen(true, { chosen: true, ...opts }),
     close: (opts = {}) => setOpen(false, { chosen: true, ...opts }),
     toggle: () => setOpen(!open, { chosen: true }),
+    /** Opens or closes it without keeping that as the player's choice (the Classic skin's column). */
+    present: (next) => setOpen(next),
+    /** Back to the player's own choice, or the default for the window (leaving the Classic skin). */
+    restore: () => setOpen(choice ?? defaultOpen(width())),
     select,
     focusInput,
     /** Opens the drawer on a tab with the input (the Feat panel's Gather fills it in), without keeping that as the player's choice. */

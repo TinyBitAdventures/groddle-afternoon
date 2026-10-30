@@ -18,6 +18,7 @@
  */
 import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=g468-1';
 import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=g468-1';
+import { installClassicChrome } from './classic-chrome.js?v=g468-2';
 
 export const PREFS_TITLE = 'Preferences';
 
@@ -164,7 +165,7 @@ export function createPreferences(doc) {
 }
 
 /**
- * The Menu item and the `,` key (game.js calls this once, after installMoreMenu).
+ * The Menu item, the `,` key and the Classic chrome (game.js calls this once, after installMoreMenu).
  * @param {{ doc?: Document }} [o]
  * @returns {{ prefs: ReturnType<typeof createPreferences> }}
  */
@@ -193,5 +194,6 @@ export function installInterfaceSettings({ doc = globalThis.document } = {}) {
     e.preventDefault();
     prefs.open();
   });
-  return { prefs };
+  const chrome = installClassicChrome({ doc });
+  return { prefs, chrome };
 }

@@ -854,7 +854,7 @@ import { denseSprite } from './js/sprite-dense.js?v=g430-1';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from './js/notify.js?v=g459-1';
 import { mountNotifyView } from './js/notify-view.js?v=g466-1';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g466-1';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g468-2';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g467-1';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
@@ -872,7 +872,7 @@ import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?
 import { itemZ } from './js/item-bands.js?v=g429-1';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=g412-1';
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=g468-1';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=g468-2';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -2268,8 +2268,12 @@ const notify = createNotifier({
     if (what === 'log' || what === 'notice') renderActivityHistory();
   },
 });
-/** Phase 2: the modern skin (<html data-ui="modern">, the default); a classic skin keeps the old chat dock. */
-const MODERN_UI = document.documentElement.dataset.ui !== 'classic';
+/**
+ * Phase 2: the Social drawer and its Activity log serve both skins, so the interface can switch at
+ * runtime (js/classic/ui-mode.js): Classic restyles the same drawer in place as the 2012 chat column
+ * (css/classic.css, js/classic/classic-frame.js). The old dock and Activity panel are no longer mounted.
+ */
+const MODERN_UI = true;
 const setCanvasData = (key, value) => {
   if (app?.canvas && app.canvas.dataset[key] !== value) app.canvas.dataset[key] = value;
 };

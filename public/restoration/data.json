@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 781,
+  "commits": 782,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "The Classic palette and type, and Preferences in the 2012 window look"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-29",
     "kind": "new",
     "text": "De-Embiggenify shrinks you onto Tiny Speck's own Eesti Life Catalog Page 17"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "new",
-    "text": "Rooks' Woods and the Museum of the Rook in Tiny Speck's own art, the museum laid out on its quest code's own points"
    }
   ]
  },
- "tests": 441,
+ "tests": 442,
  "generatedAt": "2026-10-30"
 }

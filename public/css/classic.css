@@ -4,8 +4,139 @@
    tokens in style.css's token block; tests/design-tokens.test.js lints this file and
    tests/classic-skin.test.js checks the scoping. Art is public/assets/classic/ (tools/classic-art).
 
-   So far: the Preferences window in the 2012 dialog shell (spec §12a, §13). The frame, the top bar,
-   the chat column, the growl line, the pack and the verb menu follow. */
+   The pieces: the frame (layout.md §4), Preferences in the 2012 dialog shell (spec §12a, §13). */
+
+/* == The frame (classic-spec layout.md §4; js/classic/classic-layout.js is the same rule in JS, tested).
+   One scale u for the chrome and the world, in CSS px per 2012 px:
+     u = max(1, min(W / (960 + C), H / 580, max(W / (1680 + C), H / 892)))
+   C is the horizontal chrome in u: 20 + the 313 right column + 20, or 20 + the 48 rail + 20 under
+   1313 px wide (open question 3). "Original window size" is u = 1 with the world capped at
+   1000 x 600 (+ the 132 pack reserve) and the block centred (TSMainView.as 1219-1287).
+   The world cell is #game-root; the game sizes its view in it with stageFor, unchanged. */
+:root[data-ui="classic"] {
+  --cu-c: 353;
+  --cu: max(1px, min(100vw / (960 + var(--cu-c)), 100vh / 580, max(100vw / (1680 + var(--cu-c)), 100vh / 892)));
+  --cf-right-w: calc((var(--cu-c) - 40) * var(--cu));
+  --cf-gutter-r: calc(20 * var(--cu));
+  --cf-header-h: calc(40 * var(--cu));
+  --cf-column-h: calc(100vh - 56 * var(--cu));
+}
+@media (max-width: 1312.98px) {
+  :root[data-ui="classic"] { --cu-c: 88; }
+}
+:root[data-ui="classic"][data-ui-size="original"] {
+  --cu: 1px;
+  --cf-gutter-r: max(20px, (100vw - 1000px - var(--cf-right-w)) / 2);
+  --cf-column-h: calc(min(100vh - 40px, 732px) - 10px);
+}
+:root[data-ui="classic"] body { background: var(--c-classic-page); }
+:root[data-ui="classic"]:not(.stage-pinned) #wrap {
+  display: grid;
+  grid-template-columns: calc(20 * var(--cu)) minmax(0, 1fr) var(--cf-right-w) calc(20 * var(--cu));
+  grid-template-rows: var(--cf-header-h) minmax(0, 1fr);
+  position: relative;
+  background: var(--c-classic-page);
+}
+:root[data-ui="classic"][data-ui-size="original"]:not(.stage-pinned) #wrap {
+  grid-template-columns: minmax(20px, 1fr) minmax(0, 1000px) var(--cf-right-w) minmax(20px, 1fr);
+  grid-template-rows: 40px minmax(0, 732px);
+  align-content: start;
+}
+/* The header: no bar, the page colour; its pieces float on it (GameHeaderUI.as). */
+:root[data-ui="classic"]:not(.stage-pinned) #wrap > header.top-bar {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  position: relative;
+  z-index: var(--z-hud);
+  height: var(--cf-header-h);
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+/* The world cell: the viewport's rounded top-left corner (radius 6, LayoutModel.as 7-19). Nothing in
+   the world dodges the chat column any more (it is beside the world), so the insets are 0. */
+:root[data-ui="classic"]:not(.stage-pinned) #wrap > #game-root {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  min-height: 0;
+  border-radius: calc(6 * var(--cu)) 0 0 0;
+  background: var(--c-classic-page);
+  --inset-r: 0px !important;
+  --inset-l: 0px !important;
+}
+/* The pack band: the canvas's bottom 132 world px, which the camera already keeps clear
+   (game.js PACK_VIEW_RESERVE), painted the page colour as the 2012 stage was. Over the world and its
+   tints, under the HUD and the pack. */
+:root[data-ui="classic"]:not(.stage-pinned) #game-root::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--cband-h, calc(132 * var(--cu)));
+  background: var(--c-classic-page);
+  z-index: calc(var(--z-world) + 4);
+  pointer-events: none;
+}
+/* The pack sits at the band's top, 10 in and 5 from the left (PackDisplayManager.as 63). */
+:root[data-ui="classic"]:not(.stage-pinned) #game-root .pack-bar {
+  top: auto;
+  bottom: 0;
+  height: var(--cband-h, calc(132 * var(--cu)));
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: calc(10 * var(--cu)) 0 0 calc(5 * var(--cu));
+}
+/* The right column is the Social drawer (js/ui/social-drawer.js), held open beside the world
+   (js/classic/classic-frame.js): the contact strip (the drawer's rail, 48u) and the 264u chat column,
+   from the header down to 16u above the stage's foot (RightSideView.as 53, 925, 1243-1245). */
+:root[data-ui="classic"] .local-chat-dock.social-drawer,
+:root[data-ui="classic"] .local-chat-dock.social-drawer.is-open {
+  position: fixed;
+  top: var(--cf-header-h);
+  right: var(--cf-gutter-r);
+  bottom: auto;
+  left: auto;
+  height: var(--cf-column-h);
+  width: var(--cf-right-w);
+  max-width: none;
+  min-height: 0;
+  flex-direction: row;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  transition: none;
+  z-index: var(--z-hud);
+}
+:root[data-ui="classic"] .social-drawer .social-rail,
+:root[data-ui="classic"] .social-drawer .social-rail[hidden] {
+  display: flex !important;
+  flex: 0 0 calc(48 * var(--cu));
+  width: calc(48 * var(--cu));
+  background: var(--c-classic-page);
+}
+:root[data-ui="classic"] .social-drawer .social-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: var(--c-classic-panel);
+}
+/* Under 1313 px the column folds to the rail; opened, the chat column hangs over the world from it. */
+@media (max-width: 1312.98px) {
+  :root[data-ui="classic"] .social-drawer.is-open .social-body {
+    position: absolute;
+    top: 0;
+    right: calc(48 * var(--cu));
+    bottom: 0;
+    width: calc(264 * var(--cu));
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--c-classic-ink) 37%, transparent);
+  }
+}
 
 /* == Preferences (js/classic/classic-prefs.js) in the dialog shell: Dialog.as 34-488, WindowBorder.as,
    BigDialog.as; PrefsDialog.as 44-275 (450 wide, body at least 200). No modal shade: windows float over
