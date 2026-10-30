@@ -860,7 +860,7 @@ import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from './js/notify.js?v=g459-1';
 import { mountNotifyView } from './js/notify-view.js?v=g469-2';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g468-13';
-import { bindTabs, mountPanelShell } from './js/ui/panel-shell.js?v=g469-2';
+import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=g472-3';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=g469-2';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=g469-3';
 import { bindVerbMenu, focusVerbRow, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=g469-1';
@@ -9715,7 +9715,8 @@ function panelOnScreen() {
   if (typeof document === 'undefined') return false;
   const sel = '.glitch-modal:not([hidden]), [id$="-panel"]:not([hidden])';
   const found = document.querySelectorAll ? [...document.querySelectorAll(sel)] : [document.querySelector(sel)].filter(Boolean);
-  return found.some((n) => typeof n.getClientRects !== 'function' || n.getClientRects().length > 0);
+  // A side sheet sits beside the world (js/ui/panel-shell.js SIDE_SHEET_IDS): it never makes the game busy.
+  return found.some((n) => !SIDE_SHEET_IDS.includes(n.id) && (typeof n.getClientRects !== 'function' || n.getClientRects().length > 0));
 }
 
 /** HUB: the modern skin's Imagination hub on X (js/ui/imagination-hub.js), mounted at boot. */
@@ -11865,11 +11866,7 @@ function gameplayInputBlocked() {
     isPackPopoverOpen() ||
     isMapOpen() ||
     isVendorOpen() ||
-    isQuestOpen() ||
-    isAchieveOpen() ||
-    isSkillsOpen() ||
-    isBuffsOpen() ||
-    isMakeOpen() ||
+    // Quests, Make, Badges, Skills, Buffs and Feat are side sheets: the avatar still walks (SIDE_SHEET_IDS).
     isGardenOpen() ||
     isAvatarOpen() ||
     isShrineOpen()
@@ -26127,7 +26124,13 @@ async function main() {
       if (e.key === 'y' || e.key === 'Y') closeBuffsPanel();
       if (e.key === 'c' || e.key === 'C' || isPlainKey(e, 'n')) closeMakePanel();
       if (isPlainKey(e, 'l')) closeAvatarPanel();
-      return;
+      // A side sheet sits beside the world: walking, jumping, Enter and E (and the number keys, with
+      // focus outside it) go on to the world; a modal panel keeps every key (js/ui/panel-shell.js).
+      const modal = isMailboxOpen() || isHomePanelOpen() || isVendorOpen() || isGardenOpen() || isAvatarOpen() || isShrineOpen();
+      const focused = document.activeElement;
+      const focusInSheet = inSideSheet(focused);
+      const focusOnControl = focusInSheet && Boolean(focused?.closest?.('button, [role="button"], [role="tab"], a[href], summary'));
+      if (modal || !sheetKeyToWorld(e, { focusInSheet, focusOnControl })) return;
     }
     // Verb menu open: let Enter activate the focused choice (native button);
     // Esc already handled. Arrow keys can move between choices.

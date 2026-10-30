@@ -16,7 +16,8 @@ const body = src.match(/function panelOnScreen\(\) \{[\s\S]*?\n\}/)[0];
 
 function load(nodes) {
   const document = { querySelectorAll: () => nodes };
-  return new Function('document', `${body}; return panelOnScreen;`)(document);
+  // The side sheets (js/ui/panel-shell.js SIDE_SHEET_IDS) sit beside the world and never count.
+  return new Function('document', 'SIDE_SHEET_IDS', `${body}; return panelOnScreen;`)(document, ['quest-panel', 'make-panel']);
 }
 const drawn = { getClientRects: () => [{}] };
 const notDrawn = { getClientRects: () => [] };
@@ -27,6 +28,10 @@ describe('panelOnScreen', () => {
   });
   it('a panel on screen counts', () => {
     assert.equal(load([notDrawn, drawn])(), true);
+  });
+  it('a side sheet on screen does not count (Quests, Make: the avatar walks beside them)', () => {
+    assert.equal(load([{ id: 'make-panel', ...drawn }])(), false);
+    assert.equal(load([{ id: 'make-panel', ...drawn }, { id: 'map-panel', ...drawn }])(), true);
   });
   it('busy() asks it instead of the bare selector', () => {
     assert.match(src, /\(!ignoreHome && homeIsInstanced\(\)\) \|\|\n\s+\/\/ Any open panel[^\n]*\n\s+panelOnScreen\(\)/);

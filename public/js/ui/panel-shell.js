@@ -182,3 +182,36 @@ export function selectTab(tablist, id) {
     t.tabIndex = on ? 0 : -1;
   }
 }
+
+/**
+ * The panels that sit beside the world rather than over it: the side sheets (and, in Classic, the
+ * same panels as its 2012 windows). They are not modal: the avatar walks, jumps and acts on the
+ * world while one is open. The Map, Upgrades, the How many chooser, conversations, screens and the
+ * prompts stay modal.
+ */
+export const SIDE_SHEET_IDS = Object.freeze(['quest-panel', 'make-panel', 'achieve-panel', 'skills-panel', 'buffs-panel', 'feat-panel']);
+
+/** True for an element that is one of the side sheets (or inside one). */
+export function inSideSheet(el) {
+  const sheet = el?.closest?.(SIDE_SHEET_IDS.map((id) => `#${id}`).join(', '));
+  return Boolean(sheet && !sheet.hidden);
+}
+
+/**
+ * PURE: with a side sheet open (and nothing modal), does a keydown go on to the world? A text field
+ * in the sheet already has the keys (game.js stops at an input). Walking (the arrows, W A S D) always
+ * goes through; Space, Enter and E go through unless a button in the sheet has focus (then they press
+ * it); the number keys go through unless focus is inside the sheet; other letters (the panels' own
+ * keys, the sheet's shortcuts) stay with the panels.
+ * @param {{ key: string, shiftKey?: boolean, ctrlKey?: boolean, metaKey?: boolean, altKey?: boolean }} e
+ * @param {{ focusInSheet?: boolean, focusOnControl?: boolean }} where
+ */
+export function sheetKeyToWorld(e, { focusInSheet = false, focusOnControl = false } = {}) {
+  if (!e || e.ctrlKey || e.metaKey || e.altKey) return false;
+  const k = String(e.key || '');
+  if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(k)) return true;
+  if (!e.shiftKey && ['w', 'a', 's', 'd'].includes(k.toLowerCase())) return true;
+  if (k === ' ' || k === 'Enter' || (!e.shiftKey && k.toLowerCase() === 'e')) return !focusOnControl;
+  if (/^[0-9]$/.test(k)) return !focusInSheet;
+  return false;
+}
