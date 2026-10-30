@@ -12,6 +12,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { resolveTokens } from './css-tokens.js';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -246,7 +247,7 @@ describe('G254: game.js wiring', () => {
   });
 
   it('style.css draws the sheet in the art\'s colours; the page names the new keys', () => {
-    const css = read('style.css');
+    const css = resolveTokens(read('style.css'));
     const at = css.indexOf('.hotkeys-shade {');
     assert.ok(at > 0);
     assert.match(css.slice(at, css.indexOf('}', at)), /background: rgba\(0, 0, 0, 0\.4\);/);

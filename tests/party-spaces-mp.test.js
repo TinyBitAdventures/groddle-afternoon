@@ -17,8 +17,8 @@ import { execFileSync, spawnSync } from 'node:child_process';
 
 import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../public/js/party-spaces-mp.js?v=g403-1';
 import { PARTY_PACKS, PARTY_SPACES, PARTY_TEXT, normalizePartyRecord } from '../public/js/party-spaces.js?v=g403-1';
-import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=party-15';
-import { sharedStreet } from '../public/js/features/realtime-feature.js?v=g442-6';
+import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=g463-1';
+import { sharedStreet } from '../public/js/features/realtime-feature.js?v=g463-1';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -309,9 +309,9 @@ describe('party spaces in solo', () => {
 
   it('is wired after the realtime client exists, with fresh keys', () => {
     const idx = read('public/js/features/index.js');
-    assert.ok(idx.includes("import { partySpacesFeature } from './party-spaces-feature.js?v=party-15';"));
+    assert.ok(idx.includes("import { partySpacesFeature } from './party-spaces-feature.js?v=g463-1';"));
     assert.ok(idx.includes("shared-quoins-feature.js?v=g424-1"));
-    assert.ok(idx.includes("trade-feature.js?v=g458-3"));
+    assert.ok(idx.includes("trade-feature.js?v=g463-1"));
   });
 });
 

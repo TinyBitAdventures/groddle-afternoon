@@ -241,58 +241,58 @@ function setStep(step) {
 
 const CSS = `
 .nx-bubble[hidden],.nx-say[hidden],.nx-vog[hidden],.nx-instr[hidden],.nx-card[hidden],.nx-pill[hidden],.nx-start[hidden]{display:none!important}
-.nx-bubble{position:fixed;z-index:60;max-width:300px;min-width:150px;background:#fff;color:#3b3b3b;border-radius:12px;padding:10px 12px 9px;
-  box-shadow:0 4px 14px rgba(0,0,0,.28);font:600 13px/1.35 Nunito,"Trebuchet MS",sans-serif;transform:translate(-50%,-100%);pointer-events:auto}
-.nx-bubble::after{content:"";position:absolute;left:50%;bottom:-8px;margin-left:-8px;border:8px solid transparent;border-bottom:0;border-top-color:#fff}
-.nx-bubble .nx-who{display:block;font-size:11px;color:#8a7f72;margin-bottom:2px;text-transform:uppercase;letter-spacing:.06em}
-.nx-bubble .nx-btns{display:flex;gap:6px;justify-content:center;margin-top:7px;flex-wrap:wrap}
-.nx-bubble button,.nx-card button,.nx-pill button,.nx-start button{font:800 12px Nunito,"Trebuchet MS",sans-serif;border:0;border-radius:6px;padding:5px 12px;cursor:pointer;
-  background:linear-gradient(#ffd977,#f4b63b);color:#5b3a00;box-shadow:0 2px 0 #c98f1d}
-.nx-bubble button.alt{background:#eee;color:#555;box-shadow:0 2px 0 #c9c9c9}
-.nx-bubble input{font:inherit;width:100%;box-sizing:border-box;margin-top:6px;padding:5px 7px;border:1px solid #c9c0b3;border-radius:6px}
-.nx-say{position:fixed;z-index:59;max-width:240px;background:#fff;color:#3b3b3b;border-radius:10px;padding:7px 10px;font:700 12.5px/1.3 Nunito,"Trebuchet MS",sans-serif;
-  box-shadow:0 3px 10px rgba(0,0,0,.25);transform:translate(-50%,-100%);pointer-events:none}
-.nx-vog{position:fixed;z-index:61;display:flex;align-items:center;justify-content:center;text-align:center;background:rgba(0,0,0,.45);cursor:pointer;
-  color:#fff;font:800 26px/1.25 Nunito,"Trebuchet MS",sans-serif;text-shadow:0 2px 4px rgba(0,0,0,.5);padding:20px;box-sizing:border-box}
-.nx-vog small{display:block;font-size:13px;font-weight:700;margin-top:10px;opacity:.8}
+.nx-bubble{position:fixed;z-index:calc(var(--z-notice) + 10);max-width:300px;min-width:150px;background:var(--surface-bright);color:var(--c-grey-35);border-radius:var(--radius-xl);padding:var(--sp-5) var(--sp-6) 9px;
+  box-shadow:0 4px 14px color-mix(in srgb, var(--c-black) 28%, transparent);font:600 var(--fs-md)/var(--lh-normal) var(--font-round);transform:translate(-50%,-100%);pointer-events:auto}
+.nx-bubble::after{content:"";position:absolute;left:50%;bottom:-8px;margin-left:-8px;border:8px solid transparent;border-bottom:0;border-top-color:var(--c-white)}
+.nx-bubble .nx-who{display:block;font-size:var(--fs-xs);color:var(--c-sand-60);margin-bottom:var(--sp-1);text-transform:uppercase;letter-spacing:.06em}
+.nx-bubble .nx-btns{display:flex;gap:var(--sp-3);justify-content:center;margin-top:7px;flex-wrap:wrap}
+.nx-bubble button,.nx-card button,.nx-pill button,.nx-start button{font:800 var(--fs-sm) var(--font-round);border:0;border-radius:var(--radius-sm);padding:5px var(--sp-6);cursor:pointer;
+  background:linear-gradient(var(--c-gold-90),var(--c-gold-81e));color:var(--c-umber-38);box-shadow:0 2px 0 var(--c-gold-70)}
+.nx-bubble button.alt{background:var(--c-grey-94);color:var(--c-grey-45);box-shadow:0 2px 0 var(--c-grey-84)}
+.nx-bubble input{font:inherit;width:100%;box-sizing:border-box;margin-top:var(--sp-3);padding:5px 7px;border:1px solid var(--border-strong);border-radius:var(--radius-sm)}
+.nx-say{position:fixed;z-index:calc(var(--z-notice) + 9);max-width:240px;background:var(--surface-bright);color:var(--c-grey-35);border-radius:var(--radius-lg);padding:7px var(--sp-5);font:700 var(--fs-sm)/var(--lh-snug) var(--font-round);
+  box-shadow:var(--shadow-2);transform:translate(-50%,-100%);pointer-events:none}
+.nx-vog{position:fixed;z-index:calc(var(--z-notice) + 11);display:flex;align-items:center;justify-content:center;text-align:center;background:color-mix(in srgb, var(--c-black) 45%, transparent);cursor:pointer;
+  color:var(--text-inverse);font:800 var(--fs-3xl)/var(--lh-snug) var(--font-round);text-shadow:0 2px 4px color-mix(in srgb, var(--c-black) 50%, transparent);padding:var(--sp-10);box-sizing:border-box}
+.nx-vog small{display:block;font-size:var(--fs-md);font-weight:700;margin-top:var(--sp-5);opacity:.8}
 .nx-vog .nx-vog-body{max-width:640px}
-.nx-vog .nx-vog-body p{margin:6px 0 0;font-size:16px;font-weight:700}
-.nx-vog button{margin-top:14px;font:800 14px Nunito,"Trebuchet MS",sans-serif;border:0;border-radius:999px;padding:7px 18px;background:#fff;color:#2f3f75;cursor:pointer}
-.nx-instr{position:fixed;z-index:58;transform:translateX(-50%);background:rgba(255,255,255,.92);color:#555;border-radius:999px;padding:6px 16px;
-  font:700 14px Nunito,"Trebuchet MS",sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.2);pointer-events:none;white-space:nowrap}
-.nx-instr b{color:#333}
+.nx-vog .nx-vog-body p{margin:var(--sp-3) 0 0;font-size:var(--fs-lg);font-weight:700}
+.nx-vog button{margin-top:var(--sp-7);font:800 var(--fs-base) var(--font-round);border:0;border-radius:var(--radius-pill);padding:7px var(--sp-9);background:var(--surface-bright);color:var(--c-navy-38b);cursor:pointer}
+.nx-instr{position:fixed;z-index:calc(var(--z-notice) + 8);transform:translateX(-50%);background:color-mix(in srgb, var(--surface-bright) 92%, transparent);color:var(--c-grey-45);border-radius:var(--radius-pill);padding:var(--sp-3) var(--sp-8);
+  font:700 var(--fs-base) var(--font-round);box-shadow:var(--shadow-2);pointer-events:none;white-space:nowrap}
+.nx-instr b{color:var(--c-grey-35)}
 /* G315: the hand's help text sits where the instruction overlay does; the client filled the viewport behind the hand
    (glitch-client ImgMenuView.as 323-336, beginFill(0, .7)), so an open card hides the instruction until it closes. */
 body:has(.nx-card:not([hidden])) .nx-instr{visibility:hidden}
-.nx-card{position:fixed;inset:0;z-index:62;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(10,10,20,.72);color:#fff;
-  font:700 14px Nunito,"Trebuchet MS",sans-serif;text-align:center}
-.nx-card h2{margin:0;font-size:34px;font-weight:800}
-.nx-hand{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
-.nx-up{position:relative;width:150px;height:202px;border:0;padding:0;border-radius:8px;overflow:hidden;cursor:pointer;background:#e2e7ea;box-shadow:0 6px 16px rgba(0,0,0,.45)}
+.nx-card{position:fixed;inset:0;z-index:calc(var(--z-notice) + 12);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-7);background:color-mix(in srgb, var(--c-navy-15) 72%, transparent);color:var(--text-inverse);
+  font:700 var(--fs-base) var(--font-round);text-align:center}
+.nx-card h2{margin:0;font-size:var(--fs-5xl);font-weight:800}
+.nx-hand{display:flex;gap:var(--sp-8);justify-content:center;flex-wrap:wrap}
+.nx-up{position:relative;width:150px;height:202px;border:0;padding:0;border-radius:var(--radius-md);overflow:hidden;cursor:pointer;background:var(--c-grey-94);box-shadow:0 6px 16px color-mix(in srgb, var(--c-black) 45%, transparent)}
 .nx-up img{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.nx-up .nx-up-name{position:absolute;left:4px;right:4px;bottom:4px;padding:7px 6px;background:rgba(0,0,0,.3);color:#fff;font:800 12px Nunito,sans-serif;border-radius:0 0 3px 3px}
-.nx-up .nx-up-cost{position:absolute;top:7px;right:9px;color:#fff;font:800 15px Nunito,sans-serif;text-shadow:0 -1px 1.5px rgba(0,0,0,.55)}
+.nx-up .nx-up-name{position:absolute;left:4px;right:4px;bottom:4px;padding:7px var(--sp-3);background:color-mix(in srgb, var(--c-black) 30%, transparent);color:var(--text-inverse);font:800 var(--fs-sm) var(--font-round);border-radius:0 0 var(--radius-xs) var(--radius-xs)}
+.nx-up .nx-up-cost{position:absolute;top:7px;right:9px;color:var(--text-inverse);font:800 var(--fs-base) var(--font-round);text-shadow:0 -1px 1.5px color-mix(in srgb, var(--c-black) 55%, transparent)}
 .nx-up.dim{opacity:.38;cursor:default}
-.nx-got{max-width:360px;background:#f4f8fb;color:#33384a;border-radius:12px;padding:16px 18px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
-.nx-got h3{margin:0 0 6px;font-size:22px}
-.nx-got p{margin:0 0 12px;font-weight:600}
-.nx-pill{position:fixed;z-index:57;display:flex;gap:8px;align-items:center;background:rgba(255,255,255,.9);border-radius:999px;padding:4px 6px 4px 12px;
-  font:800 12px Nunito,"Trebuchet MS",sans-serif;color:#4a4a58;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-.nx-pill button{background:#eceff5;color:#4a4a58;box-shadow:none;padding:3px 10px;border-radius:999px}
-.nx-fade{position:fixed;z-index:63;background:#000;opacity:0;pointer-events:none;transition:opacity .35s}
-.nx-start{margin:10px 0 6px;padding:10px 12px;border-radius:12px;background:#f3f7e8;border:1px solid #cfe0a8;text-align:center}
-.nx-start p{margin:0 0 8px;font-size:13px}
-.nx-start .nx-start-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.nx-start button.alt{background:#fff;color:#4a5a2a;box-shadow:0 2px 0 #cfe0a8}
+.nx-got{max-width:360px;background:var(--surface-bright);color:var(--c-navy-36);border-radius:var(--radius-xl);padding:var(--sp-8) var(--sp-9);box-shadow:var(--shadow-3)}
+.nx-got h3{margin:0 0 var(--sp-3);font-size:var(--fs-2xl)}
+.nx-got p{margin:0 0 var(--sp-6);font-weight:600}
+.nx-pill{position:fixed;z-index:calc(var(--z-notice) + 7);display:flex;gap:var(--sp-4);align-items:center;background:color-mix(in srgb, var(--surface-bright) 90%, transparent);border-radius:var(--radius-pill);padding:var(--sp-2) var(--sp-3) var(--sp-2) var(--sp-6);
+  font:800 var(--fs-sm) var(--font-round);color:var(--c-mauve-40);box-shadow:var(--shadow-2)}
+.nx-pill button{background:var(--surface-lilac);color:var(--c-mauve-40);box-shadow:none;padding:3px var(--sp-5);border-radius:var(--radius-pill)}
+.nx-fade{position:fixed;z-index:calc(var(--z-notice) + 13);background:var(--c-black);opacity:0;pointer-events:none;transition:opacity .35s}
+.nx-start{margin:var(--sp-5) 0 var(--sp-3);padding:var(--sp-5) var(--sp-6);border-radius:var(--radius-xl);background:var(--surface-moss);border:1px solid var(--c-lime-88);text-align:center}
+.nx-start p{margin:0 0 var(--sp-4);font-size:var(--fs-md)}
+.nx-start .nx-start-row{display:flex;gap:var(--sp-4);justify-content:center;flex-wrap:wrap}
+.nx-start button.alt{background:var(--surface-bright);color:var(--c-lime-44);box-shadow:0 2px 0 var(--c-lime-88)}
 body.nx-hide-meta .metabolics-cluster>:not(.meta-pill),body.nx-hide-energy .meta-pill.energy,body.nx-hide-mood .meta-pill.mood{visibility:hidden}
 body.nx-hide-pack #pack-bar{visibility:hidden}
 body.nx-hide-map #map-btn,body.nx-hide-map #street-nameplate,body.nx-hide-currants .meta-stat.currants{visibility:hidden}
 body.nx-island-map #map-panel .map-feature-card:not(.nx-map-card),body.nx-island-map #map-panel .map-home-card,body.nx-island-map #map-panel .map-quest-teleport,body.nx-island-map #map-panel .map-hub-picker{display:none!important}
-@keyframes nx-callout{0%,100%{box-shadow:0 0 0 0 rgba(255,214,90,.0)}50%{box-shadow:0 0 0 6px rgba(255,214,90,.85)}}
-.nx-callout{animation:nx-callout .9s ease-in-out 4;border-radius:8px}
-@keyframes nx-map-pulse{0%,100%{stroke:#ffd23f;stroke-width:9}50%{stroke:#fff6c2;stroke-width:13}}
+@keyframes nx-callout{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb, var(--c-gold-89) 0%, transparent)}50%{box-shadow:0 0 0 6px color-mix(in srgb, var(--c-gold-89) 85%, transparent)}}
+.nx-callout{animation:nx-callout .9s ease-in-out 4;border-radius:var(--radius-md)}
+@keyframes nx-map-pulse{0%,100%{stroke:var(--c-gold-88b);stroke-width:9}50%{stroke:var(--c-yellow-98b);stroke-width:13}}
 #map-panel.nx-map-progress .map-street[data-tsid="GA94UK1BH3D3FJL"] .map-seg{animation:nx-map-pulse 1s ease-in-out infinite}
-.nx-map-card{margin:0 0 8px;padding:8px 12px;border-radius:10px;background:#fff6d6;color:#5b4300;font:800 13px Nunito,"Trebuchet MS",sans-serif;text-align:center}
+.nx-map-card{margin:0 0 var(--sp-4);padding:var(--sp-4) var(--sp-6);border-radius:var(--radius-lg);background:var(--c-cream-97);color:var(--c-umber-40);font:800 var(--fs-md) var(--font-round);text-align:center}
 body.nx-hide-actions .top-actions>:not(#mute-btn),body.nx-hide-actions .quest-tracker{visibility:hidden}
 body.nx-hide-chat #local-chat-dock{visibility:hidden}
 `;

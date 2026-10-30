@@ -41,7 +41,7 @@ import { landingY, nearestSurfaceY } from '../walk-surface.js?v=g442-6';
 import { isBatterflyHabitat } from '../animal-husbandry.js?v=g454-1';
 import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
 import { rollDropTable } from '../drop-tables.js';
-import { openNoteView, noteViewOpen } from '../note-view.js?v=g462-1';
+import { openNoteView, noteViewOpen } from '../note-view.js?v=g463-1';
 import { payDrop } from './drops-feature.js?v=drops-8';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=g464-2';
 import { SEASON_DATA } from '../seasons-data.js';
@@ -339,15 +339,15 @@ function renderChip(engine) {
       const style = document.createElement('style');
       style.id = 'season-chip-style';
       style.textContent = `
-.season-chip { display: inline-flex; align-items: center; gap: 0.3rem; margin-left: 0.45rem; padding: 0.05rem 0.5rem 0.05rem 0.2rem; border: 1px solid #e0c88f; border-radius: 999px; background: #fff6e0; color: #7a4a12; font: inherit; font-size: 0.78rem; font-weight: 700; cursor: pointer; vertical-align: middle; }
-.season-chip[data-season="glitchmas"] { background: #eef8ff; border-color: #a9cde8; color: #1f5a82; }
-.season-chip[data-season="pi_day"] { background: #eefaf0; border-color: #a7d6b0; color: #2f6a3a; }
+.season-chip { display: inline-flex; align-items: center; gap: 0.3rem; margin-left: 0.45rem; padding: 0.05rem var(--sp-4) 0.05rem 0.2rem; border: 1px solid var(--c-gold-84b); border-radius: var(--radius-pill); background: var(--c-cream-99b); color: var(--c-brown-46); font: inherit; font-size: var(--fs-sm); font-weight: 700; cursor: pointer; vertical-align: middle; }
+.season-chip[data-season="glitchmas"] { background: var(--c-slate-98); border-color: var(--c-sky-84); color: var(--c-blue-44); }
+.season-chip[data-season="pi_day"] { background: var(--surface-moss); border-color: var(--c-green-83b); color: var(--c-green-48); }
 /* The nameplate lets clicks through to the street (pointer-events: none); the chip is a button, so it takes them back. */
 .season-chip { pointer-events: auto; cursor: pointer; }
 .season-chip img { width: 18px; height: 18px; object-fit: contain; }
 .season-chip:hover { filter: brightness(1.04); }
 @media (max-width: 640px) { .season-chip span { display: none; } .season-chip { padding-right: 0.2rem; } }
-.season-card-list { margin: 0.4rem 0 0; padding-left: 1.1rem; font-size: 0.86rem; line-height: 1.45; color: #4a3f2a; }
+.season-card-list { margin: var(--sp-3) 0 0; padding-left: var(--sp-9); font-size: var(--fs-base); line-height: var(--lh-loose); color: var(--text-brown); }
 `;
       document.head.appendChild(style);
     }

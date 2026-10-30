@@ -316,27 +316,27 @@ function poll(engine) {
 // —— Panel ———————————————————————————————————————————————————————————————
 
 const STYLE = `
-.solo-feats { margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(80, 60, 30, 0.18); }
-.solo-feats-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-.solo-feats-head h4 { margin: 0; font-size: 14px; }
-.solo-feats-head small { opacity: 0.75; font-size: 11px; }
-.solo-feats-copy { margin: 4px 0 8px; font-size: 11.5px; opacity: 0.8; }
-.solo-feats-list { display: grid; gap: 6px; }
-.solo-feat { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 6px 8px; border-radius: 8px; background: rgba(255, 255, 255, 0.55); }
-.solo-feat b { font-size: 12.5px; }
-.solo-feat span { font-size: 11px; opacity: 0.78; grid-column: 1 / -1; }
-.solo-feat em { font-style: normal; font-size: 11.5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.solo-feat i { grid-column: 1 / -1; height: 5px; border-radius: 3px; background: rgba(80, 60, 30, 0.14); overflow: hidden; }
-.solo-feat i::after { content: ''; display: block; height: 100%; width: var(--p, 0%); background: #e0a53b; }
-.solo-feat.done { background: rgba(214, 236, 196, 0.75); }
-.solo-feat.done i::after { background: #6aa84f; }
-.solo-feat small { grid-column: 1 / -1; font-size: 10.5px; color: #8a5a12; }
-.solo-feat.done small { color: #3f6f2a; }
-.world-feat { margin: 0 0 12px; padding: 0 0 10px; border-top: 0; border-bottom: 1px solid rgba(80, 60, 30, 0.18); }
+.solo-feats { margin-top: var(--sp-6); padding-top: var(--sp-5); border-top: 1px solid color-mix(in srgb, var(--c-umber-37) 18%, transparent); }
+.solo-feats-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-4); }
+.solo-feats-head h4 { margin: 0; font-size: var(--fs-base); }
+.solo-feats-head small { opacity: 0.75; font-size: var(--fs-xs); }
+.solo-feats-copy { margin: var(--sp-2) 0 var(--sp-4); font-size: var(--fs-xs); opacity: 0.8; }
+.solo-feats-list { display: grid; gap: var(--sp-3); }
+.solo-feat { display: grid; grid-template-columns: 1fr auto; gap: var(--sp-1) var(--sp-4); padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-md); background: color-mix(in srgb, var(--surface-bright) 55%, transparent); }
+.solo-feat b { font-size: var(--fs-sm); }
+.solo-feat span { font-size: var(--fs-xs); opacity: 0.78; grid-column: 1 / -1; }
+.solo-feat em { font-style: normal; font-size: var(--fs-xs); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.solo-feat i { grid-column: 1 / -1; height: 5px; border-radius: var(--radius-xs); background: color-mix(in srgb, var(--c-umber-37) 14%, transparent); overflow: hidden; }
+.solo-feat i::after { content: ''; display: block; height: 100%; width: var(--p, 0%); background: var(--status-warn); }
+.solo-feat.done { background: color-mix(in srgb, var(--c-lime-92) 75%, transparent); }
+.solo-feat.done i::after { background: var(--c-lime-68); }
+.solo-feat small { grid-column: 1 / -1; font-size: var(--fs-2xs); color: var(--c-umber-51); }
+.solo-feat.done small { color: var(--c-green-51); }
+.world-feat { margin: 0 0 var(--sp-6); padding: 0 0 var(--sp-5); border-top: 0; border-bottom: 1px solid color-mix(in srgb, var(--c-umber-37) 18%, transparent); }
 .world-feat .solo-feat i { position: relative; height: 8px; overflow: visible; }
-.world-feat .solo-feat i::after { border-radius: 3px; max-width: 100%; }
-.world-feat .solo-feat i b { position: absolute; top: -3px; width: 2px; height: 14px; background: rgba(80, 60, 30, 0.55); }
-.world-feat ol { grid-column: 1 / -1; margin: 4px 0 0; padding-left: 20px; font-size: 11.5px; }
+.world-feat .solo-feat i::after { border-radius: var(--radius-xs); max-width: 100%; }
+.world-feat .solo-feat i b { position: absolute; top: -3px; width: 2px; height: 14px; background: color-mix(in srgb, var(--c-umber-37) 55%, transparent); }
+.world-feat ol { grid-column: 1 / -1; margin: var(--sp-2) 0 0; padding-left: var(--sp-10); font-size: var(--fs-xs); }
 .world-feat ol li { font-variant-numeric: tabular-nums; }
 .world-feat ol li.me { font-weight: 700; }
 `;

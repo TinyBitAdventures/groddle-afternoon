@@ -68,8 +68,8 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackItemSlots, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { homeStreetLayout, towerItem } from '../home-cultivation.js?v=home-cultivation-5';
-import { homesFeature } from './homes-feature.js?v=g464-2';
-import { towerApi } from './home-tower-feature.js?v=g457-3';
+import { homesFeature } from './homes-feature.js?v=g463-1';
+import { towerApi } from './home-tower-feature.js?v=g463-1';
 import { levelInfoForXp } from '../progression.js?v=progression-1';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { NEIGHBOURS, NEIGHBOUR_ITEMS, neighbourById } from '../neighbours.js?v=neighbours-4';
@@ -522,43 +522,43 @@ function spawnView(engine) {
 
 const CSS = `
 #butler-dialog .butler-card { width: min(470px, calc(100vw - 32px)); }
-#butler-dialog .bd-body { display: flex; gap: 0.8rem; align-items: flex-start; padding: 0.2rem 0.95rem 0.4rem; }
+#butler-dialog .bd-body { display: flex; gap: 0.8rem; align-items: flex-start; padding: 0.2rem 0.95rem var(--sp-3); }
 #butler-dialog .bd-portrait { flex: 0 0 auto; width: 74px; height: 84px; display: flex; align-items: flex-end; justify-content: center; }
 #butler-dialog .bd-portrait img { max-width: 100%; max-height: 100%; image-rendering: auto; }
-#butler-dialog .bd-text { margin: 0.2rem 0 0.4rem; line-height: 1.4; white-space: pre-line; }
+#butler-dialog .bd-text { margin: 0.2rem 0 var(--sp-3); line-height: var(--lh-normal); white-space: pre-line; }
 #butler-dialog .bd-choices { display: flex; flex-wrap: wrap; gap: 0.45rem; justify-content: flex-end; padding: 0.3rem 0.95rem 0.95rem; }
 #butler-dialog .bd-choices.bd-stack { flex-direction: column; align-items: stretch; }
-#butler-dialog .bd-btn { font: inherit; border: 1px solid #e0d3bb; border-radius: 9px; padding: 0.4rem 0.85rem; background: #fffdf8; cursor: pointer; text-align: left; }
-#butler-dialog .bd-btn:hover, #butler-dialog .bd-btn:focus-visible { background: #f6efe1; }
-#butler-dialog .bd-btn.primary { border-color: #9cc47a; background: #e8f0dc; font-weight: 700; }
-#butler-dialog .bd-input { font: inherit; width: 100%; box-sizing: border-box; padding: 0.45rem 0.6rem; border: 1px solid #d9ccb3; border-radius: 8px; background: #fff; }
-#butler-dialog .bd-label { display: block; font-size: 0.82rem; opacity: 0.75; margin: 0.1rem 0 0.3rem; }
-#butler-dialog .bd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 0.4rem; max-height: 220px; overflow: auto; margin-top: 0.3rem; }
-#butler-dialog .bd-item { font: inherit; font-size: 0.72rem; border: 1px solid #e4d9c4; border-radius: 8px; background: #fff; padding: 0.3rem 0.2rem; display: grid; justify-items: center; gap: 0.15rem; cursor: pointer; }
-#butler-dialog .bd-item[aria-pressed="true"] { border-color: #8bb565; background: #eef5e4; }
+#butler-dialog .bd-btn { font: inherit; border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-3) var(--sp-7); background: var(--surface-card); cursor: pointer; text-align: left; }
+#butler-dialog .bd-btn:hover, #butler-dialog .bd-btn:focus-visible { background: var(--surface-parchment); }
+#butler-dialog .bd-btn.primary { border-color: var(--c-lime-77b); background: var(--surface-moss); font-weight: 700; }
+#butler-dialog .bd-input { font: inherit; width: 100%; box-sizing: border-box; padding: 0.45rem var(--sp-5); border: 1px solid var(--c-sand-86); border-radius: var(--radius-md); background: var(--surface-bright); }
+#butler-dialog .bd-label { display: block; font-size: var(--fs-md); opacity: 0.75; margin: var(--sp-1) 0 0.3rem; }
+#butler-dialog .bd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: var(--sp-3); max-height: 220px; overflow: auto; margin-top: 0.3rem; }
+#butler-dialog .bd-item { font: inherit; font-size: var(--fs-sm); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-bright); padding: 0.3rem 0.2rem; display: grid; justify-items: center; gap: var(--sp-1); cursor: pointer; }
+#butler-dialog .bd-item[aria-pressed="true"] { border-color: var(--c-lime-72); background: var(--surface-moss); }
 #butler-dialog .bd-item img { width: 36px; height: 36px; object-fit: contain; }
 #butler-dialog .bd-looks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem; margin-top: 0.3rem; }
-#butler-dialog .bd-look { font: inherit; font-size: 0.72rem; border: 1px solid #e4d9c4; border-radius: 9px; background: #fff; padding: 0.35rem; cursor: pointer; display: grid; justify-items: center; gap: 0.2rem; }
-#butler-dialog .bd-look[aria-pressed="true"] { border-color: #8bb565; background: #eef5e4; font-weight: 700; }
+#butler-dialog .bd-look { font: inherit; font-size: var(--fs-sm); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-bright); padding: var(--sp-3); cursor: pointer; display: grid; justify-items: center; gap: 0.2rem; }
+#butler-dialog .bd-look[aria-pressed="true"] { border-color: var(--c-lime-72); background: var(--surface-moss); font-weight: 700; }
 #butler-dialog .bd-look img { height: 78px; }
-#butler-dialog .bd-parts { font-size: 0.7rem; opacity: 0.75; line-height: 1.3; text-align: center; }
-#butler-dialog .bd-count { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.5rem; }
+#butler-dialog .bd-parts { font-size: var(--fs-xs); opacity: 0.75; line-height: var(--lh-snug); text-align: center; }
+#butler-dialog .bd-count { display: flex; gap: var(--sp-4); align-items: center; margin-top: var(--sp-4); }
 #butler-dialog .bd-count input { width: 5rem; }
 #butler-dialog .butler-card.bd-wide { width: min(560px, calc(100vw - 32px)); }
 #butler-dialog .bd-wide .bd-portrait, #butler-dialog .bd-wide .bd-text:empty { display: none; }
 #butler-dialog .bd-wide .bd-main { flex: 1 1 auto; min-width: 0; }
-#butler-dialog .bd-config { display: flex; gap: 0.9rem; align-items: center; }
+#butler-dialog .bd-config { display: flex; gap: var(--sp-7); align-items: center; }
 /* #game-root canvas is width 100% !important (style.css). */
 #game-root #butler-dialog .bd-config-preview, #butler-dialog .bd-config-preview { width: 150px !important; height: 180px !important; }
-#butler-dialog .bd-config-preview { flex: 0 0 auto; border-radius: 12px; background: radial-gradient(ellipse at 50% 92%, #e6dcc6 0 28%, transparent 29%), linear-gradient(#fbf7ee, #f1e8d6); }
+#butler-dialog .bd-config-preview { flex: 0 0 auto; border-radius: var(--radius-xl); background: radial-gradient(ellipse at 50% 92%, var(--surface-sunken) 0 28%, transparent 29%), linear-gradient(var(--surface-card), var(--surface-parchment)); }
 #butler-dialog .bd-config-rows { flex: 1 1 auto; display: grid; gap: 0.3rem; min-width: 0; }
-#butler-dialog .bd-config-row { display: grid; grid-template-columns: 2rem 1fr 2rem; align-items: center; gap: 0.35rem; border-bottom: 1px solid #efe6d4; padding-bottom: 0.25rem; }
-#butler-dialog .bd-arrow { font: inherit; font-size: 1.15rem; line-height: 1; width: 2rem; height: 2rem; border: 1px solid #e0d3bb; border-radius: 50%; background: #fffdf8; cursor: pointer; }
-#butler-dialog .bd-arrow:hover, #butler-dialog .bd-arrow:focus-visible { background: #f6efe1; }
-#butler-dialog .bd-config-label { display: grid; justify-items: center; gap: 0.12rem; font-size: 0.82rem; }
-#butler-dialog .bd-config-label span[data-bd-part-n] { font-size: 0.7rem; opacity: 0.7; }
-#butler-dialog .bd-dots { position: relative; width: 70%; height: 4px; border-radius: 2px; background: #ece2cf; }
-#butler-dialog .bd-dots::after { content: ''; position: absolute; top: -2px; width: 8px; height: 8px; border-radius: 50%; background: #8bb565; left: calc(var(--at, 0) * (100% - 8px)); }
+#butler-dialog .bd-config-row { display: grid; grid-template-columns: 2rem 1fr 2rem; align-items: center; gap: var(--sp-3); border-bottom: 1px solid var(--c-cream-93); padding-bottom: var(--sp-2); }
+#butler-dialog .bd-arrow { font: inherit; font-size: var(--fs-xl); line-height: var(--lh-none); width: 2rem; height: 2rem; border: 1px solid var(--border); border-radius: var(--radius-round); background: var(--surface-card); cursor: pointer; }
+#butler-dialog .bd-arrow:hover, #butler-dialog .bd-arrow:focus-visible { background: var(--surface-parchment); }
+#butler-dialog .bd-config-label { display: grid; justify-items: center; gap: var(--sp-1); font-size: var(--fs-md); }
+#butler-dialog .bd-config-label span[data-bd-part-n] { font-size: var(--fs-xs); opacity: 0.7; }
+#butler-dialog .bd-dots { position: relative; width: 70%; height: 4px; border-radius: var(--radius-xs); background: var(--surface-parchment); }
+#butler-dialog .bd-dots::after { content: ''; position: absolute; top: -2px; width: 8px; height: 8px; border-radius: var(--radius-round); background: var(--c-lime-72); left: calc(var(--at, 0) * (100% - 8px)); }
 #butler-dialog .bd-random { justify-self: center; margin-top: 0.2rem; text-align: center; }
 @media (max-width: 480px) {
   #butler-dialog .bd-config { flex-direction: column; }

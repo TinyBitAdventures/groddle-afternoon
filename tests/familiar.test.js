@@ -4,6 +4,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { resolveTokens } from './css-tokens.js';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -127,7 +128,7 @@ describe('quest card look (G211) and voice of rock (G220)', () => {
     for (const id of ['quest-dialogue-kicker', 'quest-dialogue-title', 'quest-dialogue-copy', 'quest-dialogue-next', 'quest-dialogue-cancel']) {
       assert.match(card, new RegExp(`id="${id}"`));
     }
-    const css = read('style.css');
+    const css = resolveTokens(read('style.css'));
     assert.match(css, /\.quest-dialogue\[data-look="familiar"\] \.quest-dialogue-bubble \{[^}]*rgba\(10, 24, 29, 0\.9\)/);
     assert.match(css, /\.quest-dialogue\[data-look="familiar"\]\[data-urgent="true"\] \.fam-rays \{ display: block; \}/);
     assert.match(css, /\.quest-dialogue\[data-look="vog"\] \.quest-dialogue-card \{[^}]*rgba\(0, 0, 0, 0\.7\)/);
@@ -348,7 +349,7 @@ describe('G225 familiar follow-ups', () => {
 
   it('builds the FamiliarDialog CONVERSATION panel and drops the orb everywhere', () => {
     assert.equal(FAMILIAR_DIALOG_MIN_W, 330);
-    const css = read('style.css');
+    const css = resolveTokens(read('style.css'));
     assert.doesNotMatch(css, /quest-dialogue-orb/);
     assert.match(css, /\.quest-dialogue\[data-look="conversation"\] \.quest-dialogue-card \{[^}]*top: 30px;[^}]*width: 360px;[^}]*rgba\(10, 24, 29, 0\.9\)/);
     assert.match(css, /\.quest-dialogue\[data-look="conversation"\] \.fam-head \{[^}]*border-bottom: 1px solid #49514f/);

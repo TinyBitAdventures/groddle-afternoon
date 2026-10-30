@@ -4,12 +4,12 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-2';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-325';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-326';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
-import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
-import { createPromptStack } from './js/prompt-stack.js?v=g434-1';
+import { createVogOverlay } from './js/vog-overlay.js?v=g463-1';
+import { createPromptStack } from './js/prompt-stack.js?v=g463-1';
 import { createWindowStack } from './js/window-stack.js?v=g428-1';
-import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=g448-2';
+import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=g463-1';
 import {
   actionDurationFor,
   createTimedAction,
@@ -26145,7 +26145,7 @@ async function main() {
     },
   };
   if (new URLSearchParams(location.search).has('soundtest')) {
-    import('./js/sound-test.js?v=g393-1').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
+    import('./js/sound-test.js?v=g463-1').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
       state.muted = false;
       if (audio.ctx?.state === 'suspended') {
         try { await audio.ctx.resume(); } catch (_) { /* opt-in */ }

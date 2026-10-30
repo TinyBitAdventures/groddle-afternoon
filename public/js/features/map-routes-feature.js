@@ -359,40 +359,40 @@ function ensureStyle() {
   const style = document.createElement('style');
   style.id = 'map-routes-style';
   style.textContent = `
-.route-gps{position:absolute;top:10px;right:10px;z-index:12;display:grid;grid-template-columns:30px 1fr auto;gap:6px;align-items:center;
-  max-width:min(300px,42%);padding:5px 6px 5px 8px;border:1px solid #c5bdaa;border-radius:12px 12px 12px 4px;background:rgba(255,253,247,.94);
-  box-shadow:0 2px 8px rgba(0,0,0,.14);color:#3d5a32;font:700 .8rem/1.25 "Trebuchet MS",sans-serif;pointer-events:auto}
+.route-gps{position:absolute;top:10px;right:10px;z-index:var(--z-hud);display:grid;grid-template-columns:30px 1fr auto;gap:var(--sp-3);align-items:center;
+  max-width:min(300px,42%);padding:5px var(--sp-3) 5px var(--sp-4);border:1px solid var(--border-strong);border-radius:var(--radius-xl) var(--radius-xl) var(--radius-xl) var(--radius-xs);background:color-mix(in srgb, var(--surface-card) 94%, transparent);
+  box-shadow:var(--shadow-2);color:var(--c-green-43);font:700 var(--fs-md)/var(--lh-snug) var(--font-ui);pointer-events:auto}
 .route-gps[hidden]{display:none}
 @media (max-width:700px){.route-gps{top:46px;max-width:calc(100% - 20px)}}
-.route-gps-arrow{width:28px;height:28px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:${ROUTE_COLOR_CSS};box-shadow:inset 0 0 0 2px #8a7a2a;cursor:pointer}
-.route-gps-arrow:hover,.route-gps-arrow:focus-visible{box-shadow:inset 0 0 0 2px #8a7a2a,0 0 0 3px rgba(240,242,88,.55);outline:none}
-.route-gps-arrow.walking{box-shadow:inset 0 0 0 2px #3d5a32,0 0 0 3px rgba(61,90,50,.35)}
+.route-gps-arrow{width:28px;height:28px;display:grid;place-items:center;padding:0;border:0;border-radius:var(--radius-round);background:${ROUTE_COLOR_CSS};box-shadow:inset 0 0 0 2px var(--c-gold-58);cursor:pointer}
+.route-gps-arrow:hover,.route-gps-arrow:focus-visible{box-shadow:inset 0 0 0 2px var(--c-gold-58),0 0 0 3px color-mix(in srgb, var(--c-yellow-93) 55%, transparent);outline:none}
+.route-gps-arrow.walking{box-shadow:inset 0 0 0 2px var(--c-green-43),0 0 0 3px color-mix(in srgb, var(--c-green-43) 35%, transparent)}
 .route-gps-arrow svg{transition:transform .15s linear}
-.route-gps-arrow.arrived{background:#cfe8b0;box-shadow:inset 0 0 0 2px #5f8a3a}
+.route-gps-arrow.arrived{background:var(--c-lime-90);box-shadow:inset 0 0 0 2px var(--c-lime-60)}
 .route-gps-text{min-width:0}
-.route-gps-to{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#3d5a32;background:none;border:0;padding:0;font:inherit;text-align:left;cursor:pointer}
+.route-gps-to{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--c-green-43);background:none;border:0;padding:0;font:inherit;text-align:left;cursor:pointer}
 .route-gps-to:hover{text-decoration:underline}
-.route-gps-next{display:block;font-weight:400;font-size:.74rem;color:#5c5444;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.route-gps-next{display:block;font-weight:400;font-size:var(--fs-sm);color:var(--c-sand-44);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .route-gps-next.off{font-style:italic}
-.route-gps-x{border:0;background:none;color:#8a8068;font:700 1rem/1 "Trebuchet MS",sans-serif;cursor:pointer;padding:2px 4px;align-self:start;opacity:.6}
+.route-gps-x{border:0;background:none;color:var(--c-sand-60);font:700 var(--fs-lg)/var(--lh-none) var(--font-ui);cursor:pointer;padding:var(--sp-1) var(--sp-2);align-self:start;opacity:.6}
 .route-gps-x:hover{opacity:1}
-.map-route-card{padding:6px 10px;border-radius:10px;background:#fffbe0;box-shadow:0 2px 8px rgba(0,0,0,.12);margin:0 0 8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.8rem}
-.map-route-card strong{font-size:.85rem}
+.map-route-card{padding:var(--sp-3) var(--sp-5);border-radius:var(--radius-lg);background:var(--c-cream-99b);box-shadow:0 2px 8px color-mix(in srgb, var(--c-black) 12%, transparent);margin:0 0 var(--sp-4);display:flex;gap:var(--sp-5);align-items:center;flex-wrap:wrap;font-size:var(--fs-md)}
+.map-route-card strong{font-size:var(--fs-base)}
 .map-route-card .map-route-icon{width:30px;height:30px;object-fit:contain;flex:none}
-.map-route-card .map-route-swatch{width:22px;height:8px;border-radius:4px;background:${MAP_ROUTE_CSS};box-shadow:0 0 0 1.5px #4a2408;flex:none}
+.map-route-card .map-route-swatch{width:22px;height:8px;border-radius:var(--radius-xs);background:${MAP_ROUTE_CSS};box-shadow:0 0 0 1.5px var(--c-brown-31);flex:none}
 .map-route-card .map-route-body{flex:1 1 220px;min-width:0}
-.map-route-card button{font:700 .74rem "Trebuchet MS",sans-serif;padding:3px 8px;border-radius:8px;border:1px solid #b9ae8e;background:#fff;color:#3d5a32;cursor:pointer}
-.map-route-card button[aria-pressed="true"]{background:${ROUTE_COLOR_CSS};border-color:#8a7a2a}
-.map-route-rooms{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;padding-top:4px;border-top:1px dashed #d8cc9a}
-.map-route-rooms-head{font-weight:700;color:#5c5444;margin-right:2px}
+.map-route-card button{font:700 var(--fs-sm) var(--font-ui);padding:3px var(--sp-4);border-radius:var(--radius-md);border:1px solid var(--c-gold-74);background:var(--surface-bright);color:var(--c-green-43);cursor:pointer}
+.map-route-card button[aria-pressed="true"]{background:${ROUTE_COLOR_CSS};border-color:var(--c-gold-58)}
+.map-route-rooms{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:var(--sp-2) var(--sp-3);align-items:center;padding-top:var(--sp-2);border-top:1px dashed var(--c-gold-84)}
+.map-route-rooms-head{font-weight:700;color:var(--c-sand-44);margin-right:var(--sp-1)}
 .map-route-rooms button{font-weight:400}
-.map-route-rooms button.locked::after{content:" (key)";color:#8a8068}
+.map-route-rooms button.locked::after{content:" (key)";color:var(--c-sand-60)}
 .map-route-line{fill:none;stroke:${MAP_ROUTE_CSS};stroke-width:8;stroke-linecap:round;pointer-events:none}
-.map-route-under{fill:none;stroke:#4a2408;stroke-width:13;stroke-linecap:round;stroke-opacity:.7;pointer-events:none}
-.map-route-ants{fill:none;stroke:#fffbe0;stroke-width:2;stroke-dasharray:6 9;stroke-linecap:round;pointer-events:none;animation:mapRouteAnts 1.1s linear infinite}
+.map-route-under{fill:none;stroke:var(--c-brown-31);stroke-width:13;stroke-linecap:round;stroke-opacity:.7;pointer-events:none}
+.map-route-ants{fill:none;stroke:var(--text-on-dark);stroke-width:2;stroke-dasharray:6 9;stroke-linecap:round;pointer-events:none;animation:mapRouteAnts 1.1s linear infinite}
 @keyframes mapRouteAnts{to{stroke-dashoffset:-30}}
 @media (prefers-reduced-motion: reduce){.map-route-ants{animation:none}}
-.map-route-pin{fill:${MAP_ROUTE_CSS};stroke:#4a2408;stroke-width:2.5;pointer-events:none}
+.map-route-pin{fill:${MAP_ROUTE_CSS};stroke:var(--c-brown-31);stroke-width:2.5;pointer-events:none}
 .map-route-exit{fill:none;stroke:${MAP_ROUTE_CSS};stroke-width:6;pointer-events:none}
 .hub-map-svg.route-picking .map-street{cursor:crosshair}
 `;

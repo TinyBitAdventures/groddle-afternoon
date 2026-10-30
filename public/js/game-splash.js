@@ -136,7 +136,7 @@ export function splashDoneButton(buttons) {
 }
 
 const CSS = `
-.game-splash { position: absolute; z-index: 520; pointer-events: none; opacity: 0; transition: opacity ${SPLASH_FADE_IN_MS}ms linear; }
+.game-splash { position: absolute; z-index: calc(var(--z-modal) + 40); pointer-events: none; opacity: 0; transition: opacity ${SPLASH_FADE_IN_MS}ms linear; }
 .game-splash.is-in { opacity: 1; }
 .game-splash.is-out { opacity: 0; visibility: hidden; transition: opacity ${SPLASH_FADE_OUT_MS}ms linear, visibility 0s linear ${SPLASH_FADE_OUT_MS}ms; }
 .game-splash.is-out .game-splash-buttons { pointer-events: none; }
@@ -147,24 +147,24 @@ html[data-street-cards] .game-splash { visibility: hidden; }
 .game-splash-rays { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: none;
   opacity: 0; transition: opacity ${SPLASH_RAYS_FADE_MS}ms linear ${SPLASH_RAYS_DELAY_MS}ms; }
 .game-splash-rays img { position: absolute; inset: 0; width: 100%; height: 100%; animation: gameSplashTurn linear infinite; }
-.game-splash-rays.is-standin { width: 200%; aspect-ratio: 826 / 586; border-radius: 50%;
-  background: repeating-conic-gradient(rgba(255, 255, 255, .22) 0deg 10deg, transparent 10deg 20deg);
+.game-splash-rays.is-standin { width: 200%; aspect-ratio: 826 / 586; border-radius: var(--radius-round);
+  background: repeating-conic-gradient(color-mix(in srgb, var(--surface-bright) 22%, transparent) 0deg 10deg, transparent 10deg 20deg);
   -webkit-mask-image: radial-gradient(closest-side, #000 35%, transparent 100%); mask-image: radial-gradient(closest-side, #000 35%, transparent 100%); }
 @keyframes gameSplashTurn { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .game-splash-rays img { animation: none; } }
 .game-splash.is-in .game-splash-rays.is-on { opacity: 1; }
 .game-splash-name { position: absolute; left: 50%; margin: 0; transform: translate(-50%, -50%); text-align: center; white-space: nowrap;
-  color: #fff; font: 900 var(--splash-name-size, 26px)/1 Nunito, 'Trebuchet MS', sans-serif; letter-spacing: .02em;
-  text-shadow: 0 0 2px #3b2a20, 0 0 3px #3b2a20, 0 2px 0 #3b2a20, 0 3px 6px rgba(0,0,0,.35); }
+  color: var(--text-inverse); font: 900 var(--splash-name-size, 26px)/var(--lh-none) var(--font-round); letter-spacing: .02em;
+  text-shadow: 0 0 2px var(--c-sand-30), 0 0 3px var(--c-sand-30), 0 2px 0 var(--c-sand-30), 0 3px 6px color-mix(in srgb, var(--c-black) 35%, transparent); }
 .game-splash-name:empty { display: none; }
-.game-splash-buttons { display: flex; gap: 10px; margin-top: ${SPLASH_BUTTON_GAP}px; pointer-events: auto; }
+.game-splash-buttons { display: flex; gap: var(--sp-5); margin-top: ${SPLASH_BUTTON_GAP}px; pointer-events: auto; }
 .game-splash-buttons button { min-width: 0; }
 /* Button type 'minor' (client.css .button_minor_*, not recovered): light, as recorded. */
-.game-splash-buttons .game-splash-minor { min-height: 28px; padding: 4px 14px; border: 1px solid #c9c4b8; border-radius: 6px; cursor: pointer;
-  color: #4d4a40; background: linear-gradient(#ffffff, #e9e6df); font: 700 13px/1.2 Nunito, 'Trebuchet MS', sans-serif;
-  box-shadow: 0 1px 2px rgba(0,0,0,.25); }
-.game-splash-buttons .game-splash-minor:hover { background: linear-gradient(#ffffff, #f3f1ec); }
-.game-splash-buttons .game-splash-minor:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.game-splash-buttons .game-splash-minor { min-height: 28px; padding: var(--sp-2) var(--sp-7); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); cursor: pointer;
+  color: var(--c-sand-39); background: linear-gradient(var(--surface-bright), var(--surface-parchment)); font: 700 var(--fs-md)/var(--lh-tight) var(--font-round);
+  box-shadow: var(--shadow-1); }
+.game-splash-buttons .game-splash-minor:hover { background: linear-gradient(var(--surface-bright), var(--c-grey-94)); }
+.game-splash-buttons .game-splash-minor:focus-visible { outline: 2px solid var(--c-white); outline-offset: 2px; }
 `;
 
 /**

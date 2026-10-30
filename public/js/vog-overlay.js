@@ -65,21 +65,21 @@ export function vogKeyAction(event) {
 }
 
 const CSS = `
-.vog-overlay{position:absolute;z-index:88;display:flex;align-items:center;justify-content:center;box-sizing:border-box;
+.vog-overlay{position:absolute;z-index:calc(var(--z-screen) + 8);display:flex;align-items:center;justify-content:center;box-sizing:border-box;
   pointer-events:auto;cursor:pointer;opacity:0;transition:opacity ${VOG_FADE_MS}ms ease-out}
 .vog-overlay[hidden]{display:none!important}
 .vog-overlay.is-shown{opacity:1}
-.vog-overlay .vog-box{display:flex;flex-direction:column;align-items:center;gap:2px;
+.vog-overlay .vog-box{display:flex;flex-direction:column;align-items:center;gap:var(--sp-1);
   width:clamp(min(100% - 32px, 280px), ${((VOG_WIDTH / VOG_VIEW_W) * 100).toFixed(2)}%, 100% - 32px)}
-.vog-overlay .vog-line{margin:0;text-align:center;color:#fff;
-  font:900 clamp(0.85rem,2.2vw + 0.3rem,1.75rem)/1.25 Nunito,'Trebuchet MS',sans-serif;
-  text-shadow:0 2px 0 #24303a,0 0 3px #24303a,0 0 14px rgba(0,0,0,.45)}
-.vog-overlay .vog-advance{display:inline-flex;align-items:center;gap:8px;height:30px;box-sizing:border-box;margin-top:2px;
-  padding:0 14px 0 10px;border-radius:6px;pointer-events:none;
-  font:700 13px/1 'Trebuchet MS',Nunito,sans-serif;color:#4a4f52;
-  background:linear-gradient(#fbfbfb,#dcdfe0);box-shadow:0 2px 0 #9aa1a3,0 3px 6px rgba(0,0,0,.25)}
+.vog-overlay .vog-line{margin:0;text-align:center;color:var(--text-inverse);
+  font:900 clamp(var(--fs-base),2.2vw + 0.3rem,var(--fs-4xl))/var(--lh-snug) var(--font-round);
+  text-shadow:0 2px 0 var(--c-navy-30),0 0 3px var(--c-navy-30),0 0 14px color-mix(in srgb, var(--c-black) 45%, transparent)}
+.vog-overlay .vog-advance{display:inline-flex;align-items:center;gap:var(--sp-4);height:30px;box-sizing:border-box;margin-top:var(--sp-1);
+  padding:0 var(--sp-7) 0 var(--sp-5);border-radius:var(--radius-sm);pointer-events:none;
+  font:700 var(--fs-md)/var(--lh-none) var(--font-ui);color:var(--c-grey-43);
+  background:linear-gradient(var(--surface-bright),var(--c-grey-90));box-shadow:0 2px 0 var(--c-grey-69),var(--shadow-2)}
 .vog-overlay .vog-advance::before{content:'';width:0;height:0;margin-top:1px;
-  border-left:8px solid #6b7275;border-top:5px solid transparent;border-bottom:5px solid transparent}
+  border-left:8px solid var(--c-slate-55);border-top:5px solid transparent;border-bottom:5px solid transparent}
 html[data-street-cards] .vog-overlay{visibility:hidden}
 @media (prefers-reduced-motion: reduce){.vog-overlay{transition:none}}
 `;

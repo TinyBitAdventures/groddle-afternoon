@@ -10,7 +10,7 @@ import { createFeatureHost } from '../public/js/feature-host.js';
 import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-7';
 import { createToolConditionState } from '../public/js/tools.js?v=woodcutting-test-8';
 import { meditationFeature } from '../public/js/features/meditation-feature.js?v=g458-1';
-import { teleportationFeature } from '../public/js/features/teleportation-feature.js';
+import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=g463-1';
 
 function fakeEngine(overrides = {}) {
   const toasts = [];

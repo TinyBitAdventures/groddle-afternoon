@@ -65,7 +65,7 @@
  * Canvas data: hiMpLast, hiBoard (sign:count,...), hiBoardOpen, hiYesterday.
  */
 
-import { butlerApi } from './butler-feature.js?v=g464-2';
+import { butlerApi } from './butler-feature.js?v=g463-1';
 import { metabolicGain, moodMax } from '../metabolics.js';
 import { frameTexture, sourceFromUrl } from '../textures.js';
 import {
@@ -844,17 +844,17 @@ function onHiBonus(engine, m) {
 // —— The Hi sign leaderboard (HiLeaderboard.as, in the clock's dialog) ——
 
 const BOARD_STYLE = `
-.hi-board { position: fixed; z-index: 70; top: 3.2rem; left: 50%; transform: translateX(-50%); width: min(27rem, calc(100vw - 2rem)); max-height: calc(100vh - 5rem); overflow: auto;
-  border-radius: 12px; padding: 0.8rem 0.95rem 0.9rem; background: #fbf8ef; color: #2b2a22; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); font: 13px/1.4 system-ui, sans-serif; }
+.hi-board { position: fixed; z-index: var(--z-dialog); top: 3.2rem; left: 50%; transform: translateX(-50%); width: min(27rem, calc(100vw - 2rem)); max-height: calc(100vh - 5rem); overflow: auto;
+  border-radius: var(--radius-xl); padding: 0.8rem 0.95rem var(--sp-7); background: var(--surface-card); color: var(--c-sand-28); box-shadow: var(--shadow-3); font: var(--fs-md)/var(--lh-normal) var(--font-system); }
 .hi-board[hidden] { display: none; }
-.hi-board h2 { margin: 0 0 0.35rem; font-size: 1rem; }
-.hi-board .hi-close { float: right; border: 0; background: transparent; font-size: 1.15rem; line-height: 1; cursor: pointer; color: #2b2a22; }
-.hi-board .hi-you { display: flex; align-items: center; gap: 0.5rem; margin: 0.2rem 0 0.4rem; font-weight: 600; }
+.hi-board h2 { margin: 0 0 var(--sp-3); font-size: var(--fs-lg); }
+.hi-board .hi-close { float: right; border: 0; background: transparent; font-size: var(--fs-xl); line-height: var(--lh-none); cursor: pointer; color: var(--c-sand-28); }
+.hi-board .hi-you { display: flex; align-items: center; gap: var(--sp-4); margin: 0.2rem 0 var(--sp-3); font-weight: 600; }
 .hi-board .hi-sign { display: inline-block; flex: none; background-repeat: no-repeat; }
-.hi-board .hi-more { border: 0; padding: 0; background: none; color: #027b94; font: inherit; font-weight: 700; cursor: pointer; }
-.hi-board .hi-desc { margin: 0.4rem 0; color: #4a463c; }
-.hi-board ol { list-style: none; margin: 0.5rem 0; padding: 0.55rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(7.6rem, 1fr)); gap: 0.25rem 0.6rem; border-radius: 10px; background: #f0ece0; }
-.hi-board li { display: flex; align-items: center; gap: 0.35rem; }
+.hi-board .hi-more { border: 0; padding: 0; background: none; color: var(--c-sky-54); font: inherit; font-weight: 700; cursor: pointer; }
+.hi-board .hi-desc { margin: var(--sp-3) 0; color: var(--c-sand-39); }
+.hi-board ol { list-style: none; margin: var(--sp-4) 0; padding: 0.55rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(7.6rem, 1fr)); gap: var(--sp-2) var(--sp-5); border-radius: var(--radius-lg); background: var(--surface-parchment); }
+.hi-board li { display: flex; align-items: center; gap: var(--sp-3); }
 .hi-board li b { margin-left: auto; }
 .hi-board .hi-yesterday { margin: 0.3rem 0 0; font-weight: 600; }
 /* The nameplate lets clicks through to the street; its clock takes them in multiplayer. */

@@ -252,19 +252,19 @@ function publish(engine) {
 /* ------------------------------------------------------------ DOM: invite, overlays, fireworks */
 
 const CSS = `
-.lonely-invite,.lonely-street,.lonely-fireworks{position:absolute;pointer-events:none;z-index:70}
+.lonely-invite,.lonely-street,.lonely-fireworks{position:absolute;pointer-events:none;z-index:var(--z-dialog)}
 .lonely-invite[hidden],.lonely-street[hidden],.lonely-fireworks[hidden]{display:none!important}
 .lonely-invite canvas{position:absolute;left:0;top:0}
 #game-root .lonely-invite canvas.lonely-portrait,#game-root canvas.lonely-fireworks.lonely-fireworks{width:var(--lw)!important;height:var(--lh)!important;display:block}
-.lonely-bubble{position:absolute;box-sizing:border-box;background:#fff;border-radius:13px;
+.lonely-bubble{position:absolute;box-sizing:border-box;background:var(--surface-bright);border-radius:var(--radius-xl);
   padding:calc(var(--k,1)*9px) calc(var(--k,1)*11px);transform:translateY(-100%);
-  filter:drop-shadow(1.4px 1.4px 1px rgba(0,0,0,.65))}
-.lonely-bubble::after{content:'';position:absolute;right:8%;bottom:calc(var(--k,1)*-10.4px);width:10.6%;height:calc(var(--k,1)*11.5px);background:#fff;
+  filter:drop-shadow(1.4px 1.4px 1px color-mix(in srgb, var(--c-black) 65%, transparent))}
+.lonely-bubble::after{content:'';position:absolute;right:8%;bottom:calc(var(--k,1)*-10.4px);width:10.6%;height:calc(var(--k,1)*11.5px);background:var(--surface-bright);
   clip-path:polygon(0 0,100% 0,100% 100%)}
-.lonely-bubble p{margin:0;font-family:Arial,'Helvetica Neue',sans-serif;color:#000;line-height:1.15;text-wrap:pretty}
-.lonely-street{left:0;top:0;text-align:center;color:#fff;font-weight:900;font-family:Nunito,'Trebuchet MS',sans-serif;
-  text-shadow:0 2px 0 #24303a,0 0 3px #24303a,0 0 10px rgba(0,0,0,.45);transition:opacity 300ms linear}
-.lonely-street p{margin:0;line-height:1.2}
+.lonely-bubble p{margin:0;font-family:var(--font-arial);color:var(--c-black);line-height:var(--lh-tight);text-wrap:pretty}
+.lonely-street{left:0;top:0;text-align:center;color:var(--text-inverse);font-weight:900;font-family:var(--font-round);
+  text-shadow:0 2px 0 var(--c-navy-30),0 0 3px var(--c-navy-30),0 0 10px color-mix(in srgb, var(--c-black) 45%, transparent);transition:opacity 300ms linear}
+.lonely-street p{margin:0;line-height:var(--lh-tight)}
 .lonely-street .big{font-size:1.5em}
 `;
 

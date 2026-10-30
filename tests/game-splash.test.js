@@ -20,7 +20,7 @@ import {
   splashRays,
   splashTextX,
   splashTextY,
-} from '../public/js/game-splash.js?v=g448-2';
+} from '../public/js/game-splash.js?v=g463-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -297,7 +297,7 @@ describe('G448: SVG frames on a dense screen', () => {
 
 describe('the game uses it', () => {
   it('races-feature: games_end_race / games_end_quoin_grab, and leaving mid-race just goes', () => {
-    assert.match(races, /import \{ QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor \} from '\.\.\/game-splash\.js\?v=g448-2';/);
+    assert.match(races, /import \{ QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor \} from '\.\.\/game-splash\.js\?v=g463-1';/);
     assert.match(races, /buttons: \[\{ label: splash\.leaveLabel, w: splash\.buttonW, value: 'leave', onClick: \(\) => leaveRace\(engine\) \}\],/);
     assert.match(races, /\} else setTimeout\(\(\) => leaveRace\(engine\), 0\);/);
     assert.match(races, /if \(splashShown\) engine\.hideGameSplash\?\.\(\);/);
@@ -306,7 +306,7 @@ describe('the game uses it', () => {
     assert.doesNotMatch(races, /raceResultCopy|moodMax/);
   });
   it('crowns-feature: games_end_it_game through engine.gameSplash, no card of its own', () => {
-    assert.match(crowns, /import \{ CROWNS_SPLASH, splashFor \} from '\.\.\/game-splash\.js\?v=g448-2';/);
+    assert.match(crowns, /import \{ CROWNS_SPLASH, splashFor \} from '\.\.\/game-splash\.js\?v=g463-1';/);
     assert.match(crowns, /engine\.gameSplash\?\.\(\{\s*key: CROWNS_SPLASH\.key,\s*\.\.\.splashFor\(res\.won, res\.winnerName\),\s*textDeltaY: CROWNS_SPLASH\.textDeltaY,/);
     assert.match(crowns, /value: 'again', onClick: \(\) => playAgain\(engine\)/);
     assert.match(crowns, /value: 'leave', onClick: \(\) => leave\(engine\)/);

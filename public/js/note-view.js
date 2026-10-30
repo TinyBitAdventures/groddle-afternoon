@@ -11,38 +11,38 @@
 
 const STYLE_ID = 'note-view-style';
 const CSS = `
-.note-view .note-card { background: #fffdf3; border: 1px solid #e3d9b8; border-radius: 6px; box-shadow: 0 16px 38px rgba(0,0,0,0.28), inset 0 0 0 6px #fffaf0; width: min(440px, 92vw); max-height: min(76vh, 620px); overflow: auto; padding: 1rem 1.1rem 0.9rem; position: relative; }
+.note-view .note-card { background: var(--surface-card); border: 1px solid var(--c-gold-87b); border-radius: var(--radius-sm); box-shadow: var(--shadow-4), inset 0 0 0 6px var(--c-cream-99); width: min(440px, 92vw); max-height: min(76vh, 620px); overflow: auto; padding: var(--sp-8) var(--sp-9) var(--sp-7); position: relative; }
 .note-view .note-frame { position: relative; transform: rotate(-0.6deg); }
-.note-view .note-frame::before { content: ''; position: absolute; z-index: 1; top: -9px; left: 50%; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ff8a8a, #c43b3b 70%); box-shadow: 0 2px 3px rgba(0,0,0,0.3); }
-.note-view .note-kicker { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: #9a8a5c; }
-.note-view h2 { margin: 0.15rem 0 0.5rem; font-size: 1.2rem; color: #3d3423; overflow-wrap: anywhere; }
-.note-view .note-body { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.98rem; line-height: 1.5; color: #3b3326; min-height: 3.2rem; background-image: repeating-linear-gradient(transparent, transparent 1.45rem, #efe6c9 1.45rem, #efe6c9 1.5rem); padding-bottom: 0.3rem; }
-.note-view .note-byline { margin-top: 0.55rem; font-size: 0.78rem; color: #8a7b58; font-style: italic; }
-.note-view .note-marker { display: inline-block; margin: 0.25rem 0 0.1rem; padding: 0.12rem 0.5rem; border: 1px dashed #b89b52; border-radius: 999px; background: #fff3c9; color: #6f5a22; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.02em; }
-.note-view .board-pin .note-marker { margin: 0; align-self: flex-start; font-size: 0.62rem; padding: 0.05rem 0.4rem; }
-.note-view .note-reason { margin-top: 0.4rem; font-size: 0.78rem; color: #a0503a; }
-.note-view .note-actions { display: flex; gap: 0.5rem; justify-content: flex-end; flex-wrap: wrap; margin-top: 0.8rem; }
-.note-view .note-actions button { font: inherit; font-size: 0.85rem; border: 1px solid #d8cba3; border-radius: 8px; padding: 0.38rem 0.85rem; background: #fff; color: #3d3423; cursor: pointer; }
-.note-view .note-actions button.is-primary { background: #e8f0dc; border-color: #9cc47a; font-weight: 700; }
+.note-view .note-frame::before { content: ''; position: absolute; z-index: var(--z-raised); top: -9px; left: 50%; width: 18px; height: 18px; margin-left: -9px; border-radius: var(--radius-round); background: radial-gradient(circle at 35% 35%, var(--c-red-76b), var(--c-red-56) 70%); box-shadow: 0 2px 3px color-mix(in srgb, var(--c-black) 30%, transparent); }
+.note-view .note-kicker { font-size: var(--fs-sm); letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-gold-63); }
+.note-view h2 { margin: var(--sp-1) 0 var(--sp-4); font-size: var(--fs-2xl); color: var(--c-sand-33); overflow-wrap: anywhere; }
+.note-view .note-body { white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--fs-lg); line-height: var(--lh-loose); color: var(--c-sand-33); min-height: 3.2rem; background-image: repeating-linear-gradient(transparent, transparent 1.45rem, var(--c-cream-91) 1.45rem, var(--c-cream-91) 1.5rem); padding-bottom: 0.3rem; }
+.note-view .note-byline { margin-top: 0.55rem; font-size: var(--fs-sm); color: var(--c-gold-59); font-style: italic; }
+.note-view .note-marker { display: inline-block; margin: var(--sp-2) 0 var(--sp-1); padding: var(--sp-1) var(--sp-4); border: 1px dashed var(--c-gold-70b); border-radius: var(--radius-pill); background: var(--c-yellow-98); color: var(--c-umber-48b); font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.02em; }
+.note-view .board-pin .note-marker { margin: 0; align-self: flex-start; font-size: var(--fs-2xs); padding: 0.05rem var(--sp-3); }
+.note-view .note-reason { margin-top: var(--sp-3); font-size: var(--fs-sm); color: var(--c-red-53c); }
+.note-view .note-actions { display: flex; gap: var(--sp-4); justify-content: flex-end; flex-wrap: wrap; margin-top: 0.8rem; }
+.note-view .note-actions button { font: inherit; font-size: var(--fs-base); border: 1px solid var(--c-gold-83); border-radius: var(--radius-md); padding: var(--sp-3) var(--sp-7); background: var(--surface-bright); color: var(--c-sand-33); cursor: pointer; }
+.note-view .note-actions button.is-primary { background: var(--surface-moss); border-color: var(--c-lime-77b); font-weight: 700; }
 .note-view .note-actions button:disabled { opacity: 0.5; cursor: default; }
-.note-view input, .note-view textarea { font: inherit; width: 100%; box-sizing: border-box; border: 1px solid #e0d4ad; border-radius: 6px; background: #fffef8; padding: 0.45rem 0.55rem; color: #3b3326; }
-.note-view textarea { min-height: 9rem; resize: vertical; line-height: 1.45; }
-.note-view label { display: block; font-size: 0.75rem; color: #8a7b58; margin: 0.45rem 0 0.2rem; }
-.note-view .note-count { font-size: 0.72rem; color: #a99a72; text-align: right; }
-.note-view .board-card { background: #c99e67 url('assets/sprites/street-furniture/notice-board-m0.png') center / cover; border: 10px solid #d9b77f; border-radius: 6px; box-shadow: 0 16px 38px rgba(0,0,0,0.3); width: min(600px, 94vw); max-height: min(78vh, 640px); overflow: auto; padding: 0.8rem; }
-.note-view .board-head { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; background: rgba(255,250,235,0.92); border-radius: 6px; padding: 0.45rem 0.7rem; margin-bottom: 0.65rem; }
-.note-view .board-head h2 { margin: 0; font-size: 1.05rem; }
-.note-view .board-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.65rem; }
-.note-view .board-pin { background: #fffdf3; border-radius: 3px; box-shadow: 0 4px 10px rgba(0,0,0,0.25); padding: 0.55rem 0.6rem 0.5rem; display: flex; flex-direction: column; gap: 0.3rem; min-height: 120px; }
+.note-view input, .note-view textarea { font: inherit; width: 100%; box-sizing: border-box; border: 1px solid var(--c-gold-87b); border-radius: var(--radius-sm); background: var(--surface-card); padding: 0.45rem 0.55rem; color: var(--c-sand-33); }
+.note-view textarea { min-height: 9rem; resize: vertical; line-height: var(--lh-loose); }
+.note-view label { display: block; font-size: var(--fs-sm); color: var(--c-gold-59); margin: 0.45rem 0 0.2rem; }
+.note-view .note-count { font-size: var(--fs-sm); color: var(--c-gold-69); text-align: right; }
+.note-view .board-card { background: var(--c-gold-73b) url('assets/sprites/street-furniture/notice-board-m0.png') center / cover; border: 10px solid var(--c-gold-80); border-radius: var(--radius-sm); box-shadow: var(--shadow-4); width: min(600px, 94vw); max-height: min(78vh, 640px); overflow: auto; padding: 0.8rem; }
+.note-view .board-head { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-4); background: color-mix(in srgb, var(--surface-card) 92%, transparent); border-radius: var(--radius-sm); padding: 0.45rem 0.7rem; margin-bottom: var(--sp-5); }
+.note-view .board-head h2 { margin: 0; font-size: var(--fs-lg); }
+.note-view .board-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--sp-5); }
+.note-view .board-pin { background: var(--surface-card); border-radius: var(--radius-xs); box-shadow: 0 4px 10px color-mix(in srgb, var(--c-black) 25%, transparent); padding: 0.55rem var(--sp-5) var(--sp-4); display: flex; flex-direction: column; gap: 0.3rem; min-height: 120px; }
 .note-view .board-pin:nth-child(odd) { transform: rotate(-1.4deg); }
 .note-view .board-pin:nth-child(even) { transform: rotate(1.1deg); }
-.note-view .board-pin strong { font-size: 0.86rem; color: #3d3423; overflow-wrap: anywhere; }
-.note-view .board-pin p { margin: 0; font-size: 0.76rem; color: #5b5038; flex: 1; overflow-wrap: anywhere; }
+.note-view .board-pin strong { font-size: var(--fs-base); color: var(--c-sand-33); overflow-wrap: anywhere; }
+.note-view .board-pin p { margin: 0; font-size: var(--fs-sm); color: var(--c-sand-44b); flex: 1; overflow-wrap: anywhere; }
 .note-view .board-pin .note-actions { margin-top: 0.2rem; justify-content: flex-start; gap: 0.3rem; }
-.note-view .board-pin .note-actions button { padding: 0.2rem 0.55rem; font-size: 0.74rem; }
-.note-view .board-empty { background: rgba(255,250,235,0.9); border-radius: 6px; padding: 0.8rem; font-size: 0.85rem; color: #5b5038; }
-.note-view .note-list { display: grid; gap: 0.4rem; margin-top: 0.4rem; }
-.note-view .note-list button { text-align: left; font: inherit; font-size: 0.86rem; border: 1px solid #e0d4ad; border-radius: 6px; background: #fff; padding: 0.45rem 0.6rem; cursor: pointer; overflow-wrap: anywhere; }
+.note-view .board-pin .note-actions button { padding: 0.2rem 0.55rem; font-size: var(--fs-sm); }
+.note-view .board-empty { background: color-mix(in srgb, var(--surface-card) 90%, transparent); border-radius: var(--radius-sm); padding: 0.8rem; font-size: var(--fs-base); color: var(--c-sand-44b); }
+.note-view .note-list { display: grid; gap: var(--sp-3); margin-top: var(--sp-3); }
+.note-view .note-list button { text-align: left; font: inherit; font-size: var(--fs-base); border: 1px solid var(--c-gold-87b); border-radius: var(--radius-sm); background: var(--surface-bright); padding: 0.45rem var(--sp-5); cursor: pointer; overflow-wrap: anywhere; }
 `;
 
 let wrap = null;

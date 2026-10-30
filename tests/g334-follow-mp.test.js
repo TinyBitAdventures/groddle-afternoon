@@ -29,7 +29,7 @@ import {
   teleportCounters,
   teleportKindOf,
 } from '../public/js/follow-mp.js?v=follow-1';
-import { followMpFeature } from '../public/js/features/follow-mp-feature.js?v=follow-1';
+import { followMpFeature } from '../public/js/features/follow-mp-feature.js?v=g463-1';
 import { COMPANION_FOLLOW_TRAIL_DISTANCE } from '../public/js/local-companions.js?v=street-players-4';
 import { loadContentCatalogsFromDir, getQuestCatalog, getAchievementCatalog } from '../public/js/content-catalogs.js?v=g403-1';
 import { createQuestState } from '../public/js/quests.js';
@@ -123,7 +123,7 @@ describe('G334 follow: solo is untouched', () => {
 
   it('is registered before street-objects', () => {
     const index = readFileSync(join(PUBLIC, 'js/features/index.js'), 'utf8');
-    const a = index.indexOf("from './follow-mp-feature.js?v=follow-1'");
+    const a = index.indexOf("from './follow-mp-feature.js?v=g463-1'");
     const b = index.indexOf("from './street-objects-feature.js");
     assert.ok(a > 0 && a < b, 'follow-mp before street-objects');
   });

@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 767,
+  "commits": 768,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "The bureaucrats' walks, the Factory Defect Chick and the Hog-tied Piggy draw sharp on Retina screens"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-29",
     "kind": "improve",
     "text": "The last 1x pack icons, Hell's grapes and Señor Funpickle are sharp on Retina"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "improve",
-    "text": "Sad piggies, eating piggies and sitting chickens draw sharp on Retina"
    }
   ]
  },
- "tests": 429,
+ "tests": 430,
  "generatedAt": "2026-10-30"
 }

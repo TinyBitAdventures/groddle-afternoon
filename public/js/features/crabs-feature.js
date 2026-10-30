@@ -234,20 +234,20 @@ function walk(engine, crab, dtMs) {
 // —— The call-out (onPlayerCollision / onConversation) ————————————————————
 
 const CSS = `
-#crab-talk { position: fixed; left: 50%; bottom: 22%; transform: translateX(-50%); z-index: 40; width: min(420px, calc(100vw - 32px)); background: #fffdf8; color: #3b2f22; border: 2px solid #e0b9a2; border-radius: 14px; box-shadow: 0 6px 22px rgba(60, 30, 10, 0.25); font: inherit; }
+#crab-talk { position: fixed; left: 50%; bottom: 22%; transform: translateX(-50%); z-index: calc(var(--z-panel) + 5); width: min(420px, calc(100vw - 32px)); background: var(--surface-card); color: var(--c-sand-33); border: 2px solid var(--c-orange-81); border-radius: var(--radius-2xl); box-shadow: 0 6px 22px color-mix(in srgb, var(--c-brown-27) 25%, transparent); font: inherit; }
 #crab-talk[hidden] { display: none; }
-#crab-talk .ct-head { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.85rem 0; font-weight: 700; color: #a2412b; }
-#crab-talk .ct-text { margin: 0.35rem 0.85rem 0.5rem; line-height: 1.4; }
-#crab-talk .ct-choices { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: flex-end; padding: 0 0.85rem 0.8rem; max-height: 40vh; overflow: auto; }
-#crab-talk .ct-btn { font: inherit; border: 1px solid #e0d3bb; border-radius: 9px; padding: 0.35rem 0.75rem; background: #fff; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; color: inherit; }
+#crab-talk .ct-head { display: flex; align-items: center; gap: var(--sp-4); padding: 0.55rem var(--sp-7) 0; font-weight: 700; color: var(--text-danger); }
+#crab-talk .ct-text { margin: var(--sp-3) var(--sp-7) var(--sp-4); line-height: var(--lh-normal); }
+#crab-talk .ct-choices { display: flex; flex-wrap: wrap; gap: var(--sp-3); justify-content: flex-end; padding: 0 var(--sp-7) 0.8rem; max-height: 40vh; overflow: auto; }
+#crab-talk .ct-btn { font: inherit; border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-3) var(--sp-6); background: var(--surface-bright); cursor: pointer; display: inline-flex; align-items: center; gap: var(--sp-3); color: inherit; }
 #crab-talk .ct-btn img { width: 22px; height: 22px; object-fit: contain; }
-#crab-talk .ct-btn:hover, #crab-talk .ct-btn:focus-visible { background: #f6efe1; }
-#crab-talk .ct-btn.primary { border-color: #e39a7f; background: #fbe9e1; font-weight: 700; }
+#crab-talk .ct-btn:hover, #crab-talk .ct-btn:focus-visible { background: var(--surface-parchment); }
+#crab-talk .ct-btn.primary { border-color: var(--c-red-75); background: var(--surface-parchment); font-weight: 700; }
 @media (prefers-color-scheme: dark) {
-  #crab-talk { background: #2b241d; color: #f2e6d6; border-color: #8a4b38; }
-  #crab-talk .ct-btn { background: #382f26; border-color: #5a4a3a; }
-  #crab-talk .ct-btn:hover, #crab-talk .ct-btn:focus-visible { background: #45392d; }
-  #crab-talk .ct-btn.primary { background: #5a3326; border-color: #a2584a; }
+  #crab-talk { background: var(--surface-dark); color: var(--c-cream-93); border-color: var(--c-brown-48); }
+  #crab-talk .ct-btn { background: var(--c-sand-33); border-color: var(--c-sand-42); }
+  #crab-talk .ct-btn:hover, #crab-talk .ct-btn:focus-visible { background: var(--c-sand-36b); }
+  #crab-talk .ct-btn.primary { background: var(--c-red-37); border-color: var(--c-red-54b); }
 }
 `;
 

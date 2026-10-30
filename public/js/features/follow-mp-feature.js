@@ -63,9 +63,9 @@ function isMp(engine) {
 }
 
 const PILL_CSS = `
-.mp-follow { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.55rem; border-radius: 999px; color: #3a2a52; background: rgba(240, 232, 250, 0.95); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22); }
+.mp-follow { display: inline-flex; align-items: center; gap: var(--sp-3); padding: 0.2rem 0.55rem; border-radius: var(--radius-pill); color: var(--c-violet-31); background: color-mix(in srgb, var(--surface-lilac) 95%, transparent); box-shadow: var(--shadow-1); }
 .mp-follow[hidden] { display: none; }
-.mp-bar .mp-follow button { padding: 0.05rem 0.5rem; background: #fff; box-shadow: inset 0 0 0 1px #c8b4dc; }
+.mp-bar .mp-follow button { padding: 0.05rem var(--sp-4); background: var(--surface-bright); box-shadow: inset 0 0 0 1px var(--c-violet-80); }
 `;
 
 function createSession(engine, client) {

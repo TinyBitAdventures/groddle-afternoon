@@ -24,7 +24,7 @@ const SOURCE = join(root, 'public/play/index.html');
 const TARGET = join(root, 'public/play/online/index.html');
 
 /** The cache key of js/online-boot.js (bump it when that file or js/minn-account.js changes). */
-export const ONLINE_BOOT_SRC = 'js/online-boot.js?v=g436-2';
+export const ONLINE_BOOT_SRC = 'js/online-boot.js?v=g463-1';
 
 const MODE_ENTRY = `  <!--
     Multiplayer entry (js/game-mode.js). This must stay the FIRST script on the page, ahead of
@@ -54,54 +54,54 @@ const MODE_ENTRY = `  <!--
 const ONLINE_STYLE = `  <style>
     /* The sign-in gate (js/online-boot.js) covers the shell until the save is loaded. */
     body.online-gated #wrap { display: none; }
-    .online-gate { min-height: 100vh; display: grid; place-items: center; padding: 1rem; background-attachment: fixed; }
+    .online-gate { min-height: 100vh; display: grid; place-items: center; padding: var(--sp-8); background-attachment: fixed; }
     .online-gate[hidden] { display: none; }
-    .online-gate .card { line-height: 1.4; text-align: left; max-width: 26rem; }
-    .online-gate .card img { display: block; width: 44px; height: 44px; margin: 0 auto 0.5rem; }
+    .online-gate .card { line-height: var(--lh-normal); text-align: left; max-width: 26rem; }
+    .online-gate .card img { display: block; width: 44px; height: 44px; margin: 0 auto var(--sp-4); }
     .online-gate .online-play {
-      display: block; width: 100%; margin-top: 0.85rem; text-align: center; text-decoration: none; border: 0; cursor: pointer;
-      border-radius: 10px; padding: 0.7rem 1rem; font: inherit; font-size: 1rem; font-weight: 700; color: white;
-      background: linear-gradient(180deg, #f09a55, var(--accent)); box-shadow: 0 3px 0 #b85a24;
+      display: block; width: 100%; margin-top: var(--sp-7); text-align: center; text-decoration: none; border: 0; cursor: pointer;
+      border-radius: var(--radius-lg); padding: 0.7rem var(--sp-8); font: inherit; font-size: var(--fs-lg); font-weight: 700; color: var(--text-inverse);
+      background: linear-gradient(180deg, var(--c-orange-76), var(--accent)); box-shadow: 0 3px 0 var(--c-orange-57);
     }
     .online-gate .online-play:hover { filter: brightness(1.05); }
-    .online-gate .online-play:active { transform: translateY(2px); box-shadow: 0 1px 0 #b85a24; }
+    .online-gate .online-play:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--c-orange-57); }
     .online-gate .online-alt {
-      display: block; margin-top: 0.6rem; text-align: center; text-decoration: none; border-radius: 10px; padding: 0.6rem 1rem;
-      font-weight: 700; color: #2e5a20; background: #eef6e4; box-shadow: inset 0 0 0 2px #b9d8a0;
+      display: block; margin-top: var(--sp-5); text-align: center; text-decoration: none; border-radius: var(--radius-lg); padding: var(--sp-5) var(--sp-8);
+      font-weight: 700; color: var(--text-moss); background: var(--surface-moss); box-shadow: inset 0 0 0 2px var(--c-lime-85);
     }
-    .online-gate .online-home { display: block; margin-top: 0.6rem; text-align: center; color: #2e5a20; font-weight: 700; }
+    .online-gate .online-home { display: block; margin-top: var(--sp-5); text-align: center; color: var(--text-moss); font-weight: 700; }
     .online-gate button.online-home { width: 100%; padding: 0; border: 0; background: none; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
     /* Play solo under the sign-in (Austin 2026-10-26: Play shows the sign-in or a button to play solo). */
-    .online-gate .online-solo { margin-top: 1.1rem; padding-top: 0.9rem; border-top: 1px solid rgba(46, 90, 32, 0.2); }
-    .online-gate .online-solo h3 { margin: 0 0 0.25rem; font-size: 1rem; }
+    .online-gate .online-solo { margin-top: var(--sp-9); padding-top: var(--sp-7); border-top: 1px solid color-mix(in srgb, var(--c-green-42) 20%, transparent); }
+    .online-gate .online-solo h3 { margin: 0 0 var(--sp-2); font-size: var(--fs-lg); }
     .online-gate .online-solo p { margin: 0; }
     /* The multiplayer save state (js/save-store.js groddle:save-state). */
     .save-pill {
-      position: fixed; left: 10px; bottom: 10px; z-index: 60; display: flex; gap: 0.45rem; align-items: center;
-      padding: 0.3rem 0.7rem; border-radius: 999px; font: 600 12px/1.3 system-ui, sans-serif; color: #24401b;
-      background: rgba(244, 251, 236, 0.92); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25); pointer-events: auto;
+      position: fixed; left: 10px; bottom: 10px; z-index: calc(var(--z-notice) + 10); display: flex; gap: 0.45rem; align-items: center;
+      padding: 0.3rem 0.7rem; border-radius: var(--radius-pill); font: 600 var(--fs-sm)/var(--lh-snug) var(--font-system); color: var(--c-green-34);
+      background: color-mix(in srgb, var(--surface-moss) 92%, transparent); box-shadow: var(--shadow-1); pointer-events: auto;
     }
     .save-pill .save-pill-who { opacity: 0.75; }
-    .save-pill .save-pill-state::before { content: ''; display: inline-block; width: 7px; height: 7px; margin-right: 0.35rem; border-radius: 50%; background: #5fa83a; vertical-align: 1px; }
-    .save-pill[data-state="pending"] .save-pill-state::before, .save-pill[data-state="saving"] .save-pill-state::before { background: #e8a33c; }
-    .save-pill[data-state="offline"] .save-pill-state::before, .save-pill[data-state="error"] .save-pill-state::before { background: #c8553d; }
-    .save-pill[data-state="conflict"], .save-pill[data-state="signed-out"] { background: #fff1d6; }
-    .save-pill[data-state="conflict"] .save-pill-state::before, .save-pill[data-state="signed-out"] .save-pill-state::before { background: #c8553d; }
-    .save-pill a { color: #8a3d12; }
+    .save-pill .save-pill-state::before { content: ''; display: inline-block; width: 7px; height: 7px; margin-right: var(--sp-3); border-radius: var(--radius-round); background: var(--c-lime-67); vertical-align: 1px; }
+    .save-pill[data-state="pending"] .save-pill-state::before, .save-pill[data-state="saving"] .save-pill-state::before { background: var(--c-gold-76); }
+    .save-pill[data-state="offline"] .save-pill-state::before, .save-pill[data-state="error"] .save-pill-state::before { background: var(--c-red-59); }
+    .save-pill[data-state="conflict"], .save-pill[data-state="signed-out"] { background: var(--status-warn-soft); }
+    .save-pill[data-state="conflict"] .save-pill-state::before, .save-pill[data-state="signed-out"] .save-pill-state::before { background: var(--c-red-59); }
+    .save-pill a { color: var(--c-brown-46b); }
     /* In the pack, under its hint (js/online-boot.js mountSavePill): part of the game, not over it. */
-    .pack-side { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 0.35rem; flex-shrink: 0; }
-    .save-pill.in-pack { position: static; z-index: auto; box-shadow: none; padding: 0.18rem 0.55rem; font-size: 11px; white-space: nowrap; }
+    .pack-side { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: var(--sp-3); flex-shrink: 0; }
+    .save-pill.in-pack { position: static; z-index: auto; box-shadow: none; padding: 0.18rem 0.55rem; font-size: var(--fs-xs); white-space: nowrap; }
     /* G320: the start card over the street, the chat dock and the pack, inside the game frame (it scrolls when the
        frame is shorter); the street's toasts, activity lines and Qurazy banner wait for it to close (game.js holds the
        toast's clock, qurazy-feature the banner). */
-    #overlay:not(.hidden) { z-index: 80; padding: 8px; box-sizing: border-box; }
+    #overlay:not(.hidden) { z-index: var(--z-screen); padding: var(--sp-4); box-sizing: border-box; }
     #overlay:not(.hidden) > .card { max-height: 100%; overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box; }
     #game-root:has(> #overlay:not(.hidden)) :is(.notify-notices, .qurazy-overlay) { visibility: hidden; }
-    body:has(#overlay:not(.hidden)) .save-pill { z-index: 81; }
+    body:has(#overlay:not(.hidden)) .save-pill { z-index: calc(var(--z-screen) + 1); }
     @media (max-width: 560px) {
-      #overlay:not(.hidden) > .card { width: 100%; padding: 0.85rem 0.95rem 0.75rem; font-size: 0.9rem; line-height: 1.35; }
-      #overlay:not(.hidden) > .card h2 { font-size: 1.1rem; margin-bottom: 0.35rem; }
-      #overlay:not(.hidden) > .card p { margin: 0.35rem 0; }
+      #overlay:not(.hidden) > .card { width: 100%; padding: var(--sp-7) 0.95rem var(--sp-6); font-size: var(--fs-base); line-height: var(--lh-normal); }
+      #overlay:not(.hidden) > .card h2 { font-size: var(--fs-xl); margin-bottom: var(--sp-3); }
+      #overlay:not(.hidden) > .card p { margin: var(--sp-3) 0; }
     }
   </style>`;
 

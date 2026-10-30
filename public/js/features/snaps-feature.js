@@ -39,49 +39,49 @@ export const SNAPS_FEATURE_ID = 'snaps';
 const VERB = 'take_picture';
 
 const STYLE = `
-.snap-travel { position: absolute; inset: 0; z-index: 82; background: rgba(0, 0, 0, 0.75); color: #fff; font: 15px/1.35 'Trebuchet MS', system-ui, sans-serif; opacity: 0; transition: opacity 0.3s linear; pointer-events: auto; }
+.snap-travel { position: absolute; inset: 0; z-index: calc(var(--z-screen) + 2); background: color-mix(in srgb, var(--c-black) 75%, transparent); color: var(--text-inverse); font: var(--fs-base)/var(--lh-normal) var(--font-ui); opacity: 0; transition: opacity 0.3s linear; pointer-events: auto; }
 .snap-travel.is-in { opacity: 1; }
 .snap-travel [hidden], .snap-shade [hidden] { display: none !important; }
-.snap-travel-text { position: absolute; left: 30px; right: 30px; top: 50%; transform: translateY(-50%); text-align: center; font-size: 20px; font-weight: 700; text-shadow: 0 2px 2px #000; }
-.snap-travel-place { position: absolute; left: 53px; right: 53px; top: 30px; text-align: center; font-size: 22px; font-weight: 700; text-shadow: 0 2px 3px #000, 0 0 3px rgba(0,0,0,0.3); }
-.snap-travel-place small { display: block; font-size: 14px; font-weight: 600; opacity: 0.9; }
-.snap-travel-frame { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: #fff; padding: 16px; max-width: calc(100% - 40px); box-sizing: border-box; }
-.snap-travel-frame img { display: block; max-width: 100%; max-height: 52vh; background: linear-gradient(135deg, #3a3a3a, #000); opacity: 0; transition: opacity 0.5s linear 0.2s; }
+.snap-travel-text { position: absolute; left: 30px; right: 30px; top: 50%; transform: translateY(-50%); text-align: center; font-size: var(--fs-2xl); font-weight: 700; text-shadow: 0 2px 2px var(--c-black); }
+.snap-travel-place { position: absolute; left: 53px; right: 53px; top: 30px; text-align: center; font-size: var(--fs-2xl); font-weight: 700; text-shadow: 0 2px 3px var(--c-black), 0 0 3px color-mix(in srgb, var(--c-black) 30%, transparent); }
+.snap-travel-place small { display: block; font-size: var(--fs-base); font-weight: 600; opacity: 0.9; }
+.snap-travel-frame { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: var(--surface-bright); padding: var(--sp-8); max-width: calc(100% - 40px); box-sizing: border-box; }
+.snap-travel-frame img { display: block; max-width: 100%; max-height: 52vh; background: linear-gradient(135deg, var(--c-grey-35), var(--c-black)); opacity: 0; transition: opacity 0.5s linear 0.2s; }
 .snap-travel-frame img.is-in { opacity: 1; }
-.snap-travel-buttons { position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 12px; }
-.snap-travel-go { width: 150px; border: 0; border-radius: 8px; padding: 0.55rem 0.8rem; font: 700 16px/1.1 'Trebuchet MS', system-ui, sans-serif; color: #fff; background: linear-gradient(#7ac943, #4f9a2a); box-shadow: 0 2px 0 #2f6d13; cursor: pointer; }
+.snap-travel-buttons { position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: var(--sp-6); }
+.snap-travel-go { width: 150px; border: 0; border-radius: var(--radius-md); padding: 0.55rem 0.8rem; font: 700 var(--fs-lg)/var(--lh-tight) var(--font-ui); color: var(--text-inverse); background: linear-gradient(var(--c-lime-76), var(--c-green-61)); box-shadow: 0 2px 0 var(--c-green-48b); cursor: pointer; }
 .snap-travel-go:disabled { filter: grayscale(0.8); cursor: default; }
-.snap-travel-forget { border: 0; border-radius: 10px; padding: 2px 8px; background: rgba(0,0,0,0.4); color: #fff; font: 600 13px/1.4 system-ui, sans-serif; text-shadow: 0 2px 2px #000; cursor: pointer; }
-.snap-travel-forget:hover { background: rgba(0,0,0,0.7); }
-.snap-travel-author { position: absolute; right: 0; bottom: 0; padding: 4px 6px; border-radius: 10px 0 0 0; background: rgba(0,0,0,0.4); font: 12px/1.3 system-ui, sans-serif; text-shadow: 0 1px 1px #000; }
-.snap-flash { position: absolute; inset: 0; z-index: 90; background: #fff; pointer-events: none; opacity: 0; transition: opacity 0.1s linear; }
+.snap-travel-forget { border: 0; border-radius: var(--radius-lg); padding: var(--sp-1) var(--sp-4); background: var(--overlay-dim); color: var(--text-inverse); font: 600 var(--fs-md)/var(--lh-normal) var(--font-system); text-shadow: 0 2px 2px var(--c-black); cursor: pointer; }
+.snap-travel-forget:hover { background: color-mix(in srgb, var(--c-black) 70%, transparent); }
+.snap-travel-author { position: absolute; right: 0; bottom: 0; padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-lg) 0 0 0; background: var(--overlay-dim); font: var(--fs-sm)/var(--lh-snug) var(--font-system); text-shadow: 0 1px 1px var(--c-black); }
+.snap-flash { position: absolute; inset: 0; z-index: calc(var(--z-screen) + 10); background: var(--surface-bright); pointer-events: none; opacity: 0; transition: opacity 0.1s linear; }
 .snap-flash.is-on { opacity: 1; }
 .snap-flash.is-off { opacity: 0; transition: opacity 0.6s linear 0.3s; }
-.snap-shade { position: absolute; inset: 0; z-index: 84; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center; padding: 16px; pointer-events: auto; }
-.snap-polaroid { background: #fffdf6; color: #302b34; border-radius: 4px; padding: 14px 14px 12px; width: min(560px, 100%); box-shadow: 0 10px 30px rgba(0,0,0,0.45); font: 13px/1.4 system-ui, sans-serif; text-align: center; }
-.snap-polaroid img { display: block; width: 100%; height: auto; background: #222; }
-.snap-polaroid input { box-sizing: border-box; width: 100%; margin: 10px 0 0; padding: 0.45rem 0.55rem; border: 0; border-radius: 6px; box-shadow: inset 0 0 0 1px #d6c8e2; font: italic 14px/1.3 'Trebuchet MS', system-ui, sans-serif; background: #fff; color: #302b34; }
-.snap-polaroid h2 { margin: 0 0 8px; font: 700 18px/1.2 'Trebuchet MS', system-ui, sans-serif; color: #4b2f63; }
-.snap-polaroid p { margin: 8px 0 0; white-space: pre-line; }
-.snap-row { display: flex; gap: 14px; align-items: center; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
-.snap-save { border: 0; border-radius: 8px; padding: 0.5rem 1rem; font: 700 14px/1.1 'Trebuchet MS', system-ui, sans-serif; color: #fff; background: linear-gradient(#7ac943, #4f9a2a); box-shadow: 0 2px 0 #2f6d13; cursor: pointer; }
+.snap-shade { position: absolute; inset: 0; z-index: calc(var(--z-screen) + 4); background: color-mix(in srgb, var(--c-black) 55%, transparent); display: flex; align-items: center; justify-content: center; padding: var(--sp-8); pointer-events: auto; }
+.snap-polaroid { background: var(--surface-card); color: var(--text); border-radius: var(--radius-xs); padding: var(--sp-7) var(--sp-7) var(--sp-6); width: min(560px, 100%); box-shadow: 0 10px 30px color-mix(in srgb, var(--c-black) 45%, transparent); font: var(--fs-md)/var(--lh-normal) var(--font-system); text-align: center; }
+.snap-polaroid img { display: block; width: 100%; height: auto; background: var(--surface-dark); }
+.snap-polaroid input { box-sizing: border-box; width: 100%; margin: var(--sp-5) 0 0; padding: 0.45rem 0.55rem; border: 0; border-radius: var(--radius-sm); box-shadow: inset 0 0 0 1px var(--c-mauve-85); font: italic var(--fs-base)/var(--lh-snug) var(--font-ui); background: var(--surface-bright); color: var(--text); }
+.snap-polaroid h2 { margin: 0 0 var(--sp-4); font: 700 var(--fs-xl)/var(--lh-tight) var(--font-ui); color: var(--c-violet-36); }
+.snap-polaroid p { margin: var(--sp-4) 0 0; white-space: pre-line; }
+.snap-row { display: flex; gap: var(--sp-7); align-items: center; justify-content: center; margin-top: var(--sp-6); flex-wrap: wrap; }
+.snap-save { border: 0; border-radius: var(--radius-md); padding: var(--sp-4) var(--sp-8); font: 700 var(--fs-base)/var(--lh-tight) var(--font-ui); color: var(--text-inverse); background: linear-gradient(var(--c-lime-76), var(--c-green-61)); box-shadow: 0 2px 0 var(--c-green-48b); cursor: pointer; }
 .snap-save:disabled { filter: grayscale(0.7); cursor: default; }
-.snap-link { border: 0; background: transparent; color: #74508e; font: 600 13px/1.2 system-ui, sans-serif; cursor: pointer; text-decoration: underline; padding: 0.2rem; }
-.snap-shade-win { position: fixed; inset: 0; z-index: 74; background: rgba(32, 24, 40, 0.28); display: flex; align-items: flex-start; justify-content: center; padding: 7vh 16px 16px; pointer-events: auto; }
+.snap-link { border: 0; background: transparent; color: var(--c-violet-50); font: 600 var(--fs-md)/var(--lh-tight) var(--font-system); cursor: pointer; text-decoration: underline; padding: 0.2rem; }
+.snap-shade-win { position: fixed; inset: 0; z-index: calc(var(--z-dialog) + 4); background: color-mix(in srgb, var(--c-mauve-23) 28%, transparent); display: flex; align-items: flex-start; justify-content: center; padding: 7vh var(--sp-8) var(--sp-8); pointer-events: auto; }
 .snap-shade-win[hidden] { display: none; }
-.snap-win { width: min(680px, 100%); max-height: 84vh; display: flex; flex-direction: column; border-radius: 12px; background: #fffdf6; color: #302b34; box-shadow: 0 10px 30px rgba(28, 25, 31, 0.35), 0 0 0 1px rgba(116, 80, 142, 0.18); font: 13px/1.4 system-ui, sans-serif; }
-.snap-win-head { display: flex; gap: 0.6rem; align-items: center; padding: 0.75rem 0.9rem 0.4rem; }
-.snap-win-head h2 { margin: 0; font: 700 17px/1.2 'Trebuchet MS', system-ui, sans-serif; color: #4b2f63; }
-.snap-win-head span { color: #8d8781; font-size: 12px; }
-.snap-win-x { margin-left: auto; border: 0; background: transparent; font: 700 18px/1 system-ui; color: #8d8781; cursor: pointer; padding: 0.15rem 0.35rem; border-radius: 6px; }
-.snap-win-body { overflow-y: auto; padding: 0.4rem 0.9rem 0.9rem; }
-.snap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.6rem; }
-.snap-card { background: #fff; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.18); padding: 6px 6px 8px; display: flex; flex-direction: column; gap: 4px; }
-.snap-card img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #ddd; border-radius: 2px; }
-.snap-card b { font-size: 12px; color: #4b2f63; }
-.snap-card i { font-size: 12px; color: #5f5960; overflow-wrap: anywhere; }
-.snap-card .snap-link { align-self: flex-start; font-size: 12px; }
-.snap-note { color: #8d8781; margin: 0.4rem 0; }
+.snap-win { width: min(680px, 100%); max-height: 84vh; display: flex; flex-direction: column; border-radius: var(--radius-xl); background: var(--surface-card); color: var(--text); box-shadow: var(--shadow-3), 0 0 0 1px color-mix(in srgb, var(--c-violet-50) 18%, transparent); font: var(--fs-md)/var(--lh-normal) var(--font-system); }
+.snap-win-head { display: flex; gap: var(--sp-5); align-items: center; padding: var(--sp-6) var(--sp-7) var(--sp-3); }
+.snap-win-head h2 { margin: 0; font: 700 var(--fs-lg)/var(--lh-tight) var(--font-ui); color: var(--c-violet-36); }
+.snap-win-head span { color: var(--text-subtle); font-size: var(--fs-sm); }
+.snap-win-x { margin-left: auto; border: 0; background: transparent; font: 700 var(--fs-xl)/var(--lh-none) var(--font-system); color: var(--text-subtle); cursor: pointer; padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-sm); }
+.snap-win-body { overflow-y: auto; padding: var(--sp-3) var(--sp-7) var(--sp-7); }
+.snap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--sp-5); }
+.snap-card { background: var(--surface-bright); border-radius: var(--radius-sm); box-shadow: var(--shadow-1); padding: var(--sp-3) var(--sp-3) var(--sp-4); display: flex; flex-direction: column; gap: var(--sp-2); }
+.snap-card img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--c-grey-90); border-radius: var(--radius-xs); }
+.snap-card b { font-size: var(--fs-sm); color: var(--c-violet-36); }
+.snap-card i { font-size: var(--fs-sm); color: var(--c-mauve-46); overflow-wrap: anywhere; }
+.snap-card .snap-link { align-self: flex-start; font-size: var(--fs-sm); }
+.snap-note { color: var(--text-subtle); margin: var(--sp-3) 0; }
 `;
 
 function el(tag, attrs = {}, text = '') {

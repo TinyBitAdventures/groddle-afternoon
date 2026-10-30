@@ -4,6 +4,7 @@
  */
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
+import { resolveTokens } from './css-tokens.js';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -141,7 +142,7 @@ describe('pack / inventory', () => {
 
   it('ships a contextual pack action card with use, recipe, tool, and vendor paths', () => {
     const html = readFileSync(join(__dirnameUi, '../public/play/index.html'), 'utf8');
-    const css = readFileSync(join(__dirnameUi, '../public/style.css'), 'utf8');
+    const css = resolveTokens(readFileSync(join(__dirnameUi, '../public/style.css'), 'utf8'));
     const game = readFileSync(join(__dirnameUi, '../public/game.js'), 'utf8');
     assert.match(html, /id="pack-popover"/);
     assert.match(html, /Shift-click to quick use/);
@@ -160,7 +161,7 @@ describe('pack / inventory', () => {
   });
 
   it('an open pack card keeps its buttons through HUD redraws, and its green button stays green on hover', () => {
-    const css = readFileSync(join(__dirnameUi, '../public/style.css'), 'utf8');
+    const css = resolveTokens(readFileSync(join(__dirnameUi, '../public/style.css'), 'utf8'));
     const game = readFileSync(join(__dirnameUi, '../public/game.js'), 'utf8');
     // updateHud redraws the open card on every HUD change; the same markup keeps the same buttons (no hover blink).
     assert.match(game, /if \(packSelected\) renderPackPopover\(packSelected\);/);
@@ -169,7 +170,7 @@ describe('pack / inventory', () => {
     assert.match(game, /packPopoverMarkup = '';/, 'closing forgets the markup');
     assert.match(game, /const sourceAnchor = \(anchor\?\.isConnected \? anchor : null\) \|\| findPackSlotElement\(classTsid\);/);
     // .pack-pop-actions button:hover (0,2,1) outranks .pack-pop-primary (0,2,0): the primary needs its own hover.
-    assert.match(css, /\.pack-pop-actions \.pack-pop-primary:hover:not\(:disabled\) \{ background: #5c9a2f;/);
+    assert.match(css, /\.pack-pop-actions \.pack-pop-primary:hover:not\(:disabled\) \{ background: #5a9e3e;/, 'a shade deeper than #6aaa3a (the design token --c-green-63)');
   });
 
   it('uses one shared inventory module instance so runtime-registered tools reach the HUD', () => {
@@ -316,7 +317,7 @@ describe('vendor buy/sell', () => {
 
   it('wires the pack drag payload, sell drop zone, receipt, and click fallback', () => {
     const html = readFileSync(join(__dirnameUi, '../public/play/index.html'), 'utf8');
-    const css = readFileSync(join(__dirnameUi, '../public/style.css'), 'utf8');
+    const css = resolveTokens(readFileSync(join(__dirnameUi, '../public/style.css'), 'utf8'));
     const game = readFileSync(join(__dirnameUi, '../public/game.js'), 'utf8');
     assert.match(html, /id="vendor-sell-drop"/);
     assert.match(html, /Drag an item from your pack/);

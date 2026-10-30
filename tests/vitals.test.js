@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { resolveTokens } from './css-tokens.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -74,7 +75,7 @@ test('game.js draws the states and wires the click to the pack Eat', () => {
 });
 
 test('style.css: amber, red with a pulse, no pulse under reduced motion', () => {
-  const css = fs.readFileSync(path.join(root, 'public/style.css'), 'utf8');
+  const css = resolveTokens(fs.readFileSync(path.join(root, 'public/style.css'), 'utf8'));
   const block = css.slice(css.indexOf('/* ===== VITALS (g458'));
   assert.ok(block.length > 100, 'the VITALS block');
   assert.match(block, /\.meta-pill\[data-vital="low"\] \{/);
@@ -91,5 +92,5 @@ test('style.css: amber, red with a pulse, no pulse under reduced motion', () => 
     assert.ok(ratio(fg, bg) >= 4.5, `${fg} on ${bg}: ${ratio(fg, bg).toFixed(2)}`);
   }
   const html = fs.readFileSync(path.join(root, 'public/play/index.html'), 'utf8');
-  assert.match(html, /&amp;vitals=g458-\d+&amp;backdrop=/);
+  assert.match(html, /&amp;vitals=g458-\d+&amp;(?:\w+=[\w-]+&amp;)*backdrop=/);
 });

@@ -109,34 +109,34 @@ function ensureStyle() {
   const s = document.createElement('style');
   s.id = STYLE_ID;
   s.textContent = `
-.subway-dialog { position: absolute; inset: 0; z-index: 60; display: grid; place-items: center; pointer-events: none; }
-.subway-dialog-card { pointer-events: auto; max-width: min(440px, calc(100% - 32px)); background: #fffdf5; color: #2b2a26; border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.35); padding: 1rem 1.15rem 1.05rem; font: 15px/1.4 "Trebuchet MS", system-ui, sans-serif; }
-.subway-dialog-card h3 { margin: 0 0 .15rem; font-size: 1.05rem; }
-.subway-dialog-card .subway-kicker { margin: 0 0 .35rem; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: #8a8270; }
+.subway-dialog { position: absolute; inset: 0; z-index: calc(var(--z-notice) + 10); display: grid; place-items: center; pointer-events: none; }
+.subway-dialog-card { pointer-events: auto; max-width: min(440px, calc(100% - 32px)); background: var(--surface-card); color: var(--c-grey-29); border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-3); padding: var(--sp-8) var(--sp-9) 1.05rem; font: var(--fs-base)/var(--lh-normal) var(--font-ui); }
+.subway-dialog-card h3 { margin: 0 0 var(--sp-1); font-size: var(--fs-lg); }
+.subway-dialog-card .subway-kicker { margin: 0 0 var(--sp-3); font-size: var(--fs-sm); letter-spacing: .08em; text-transform: uppercase; color: var(--c-sand-60); }
 .subway-dialog-card p { margin: .3rem 0; }
 .subway-dialog-card .subway-lines { margin: .45rem 0 .2rem; padding: 0; list-style: none; }
-.subway-dialog-card .subway-lines li { margin: .15rem 0; }
-.subway-dialog-card .subway-dot { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; margin-right: .4rem; vertical-align: -1px; }
+.subway-dialog-card .subway-lines li { margin: var(--sp-1) 0; }
+.subway-dialog-card .subway-dot { display: inline-block; width: .7rem; height: .7rem; border-radius: var(--radius-round); margin-right: var(--sp-3); vertical-align: -1px; }
 .subway-dialog-actions { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .7rem; }
-.subway-dialog-actions button { font: inherit; font-weight: 700; border: 0; border-radius: 999px; padding: .45rem .95rem; cursor: pointer; background: #e7e2d2; color: #2b2a26; }
-.subway-dialog-actions button.primary { background: #3d8b4a; color: #fff; }
-.subway-dialog-actions button:focus-visible { outline: 3px solid #f5c542; outline-offset: 2px; }
-.subway-announce { position: absolute; left: 50%; top: 15%; transform: translateX(-50%); width: min(560px, calc(100% - 32px)); z-index: 55;
-  text-align: center; pointer-events: none; color: #fff; font: 700 clamp(18px, 3.2vw, 30px)/1.2 "Trebuchet MS", system-ui, sans-serif;
-  text-shadow: 0 0 3px #3a3a32, 0 2px 4px rgba(0,0,0,.65), 1px 1px 0 #3a3a32, -1px -1px 0 #3a3a32, 1px -1px 0 #3a3a32, -1px 1px 0 #3a3a32; }
-.subway-announce b { color: #ffe14a; }
-.subway-map { position: absolute; inset: 0; z-index: 60; display: grid; place-items: center; background: rgba(20,20,16,.35); }
-.subway-map-card { width: 620px; max-width: calc(100% - 32px); background: #f3f1e6; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.4);
-  padding: .7rem .9rem .8rem; font: 14px/1.3 "Trebuchet MS", system-ui, sans-serif; color: #2b2a26; }
-.subway-map-head { display: flex; align-items: center; gap: .5rem; }
-.subway-map-head h3 { margin: 0; flex: 1; text-align: center; font-size: 1.25rem; }
+.subway-dialog-actions button { font: inherit; font-weight: 700; border: 0; border-radius: var(--radius-pill); padding: .45rem .95rem; cursor: pointer; background: var(--surface-sunken); color: var(--c-grey-29); }
+.subway-dialog-actions button.primary { background: var(--c-green-58); color: var(--text-inverse); }
+.subway-dialog-actions button:focus-visible { outline: 3px solid var(--c-gold-85); outline-offset: 2px; }
+.subway-announce { position: absolute; left: 50%; top: 15%; transform: translateX(-50%); width: min(560px, calc(100% - 32px)); z-index: calc(var(--z-notice) + 5);
+  text-align: center; pointer-events: none; color: var(--text-inverse); font: 700 clamp(var(--fs-xl), 3.2vw, var(--fs-4xl))/var(--lh-tight) var(--font-ui);
+  text-shadow: 0 0 3px var(--c-sand-35), 0 2px 4px color-mix(in srgb, var(--c-black) 65%, transparent), 1px 1px 0 var(--c-sand-35), -1px -1px 0 var(--c-sand-35), 1px -1px 0 var(--c-sand-35), -1px 1px 0 var(--c-sand-35); }
+.subway-announce b { color: var(--c-yellow-90); }
+.subway-map { position: absolute; inset: 0; z-index: calc(var(--z-notice) + 10); display: grid; place-items: center; background: color-mix(in srgb, var(--c-grey-20) 35%, transparent); }
+.subway-map-card { width: 620px; max-width: calc(100% - 32px); background: var(--surface-moss); border-radius: var(--radius-xl); box-shadow: var(--shadow-3);
+  padding: .7rem var(--sp-7) .8rem; font: var(--fs-base)/var(--lh-snug) var(--font-ui); color: var(--c-grey-29); }
+.subway-map-head { display: flex; align-items: center; gap: var(--sp-4); }
+.subway-map-head h3 { margin: 0; flex: 1; text-align: center; font-size: var(--fs-2xl); }
 .subway-map-head button { font: inherit; border: 0; background: none; cursor: pointer; }
-.subway-map-lines button { border-radius: 999px; padding: .15rem .6rem; font-size: .78rem; font-weight: 700; border: 2px solid transparent; background: #e2dfd0; }
-.subway-map-lines button[aria-pressed="true"] { border-color: currentColor; background: #fff; }
-.subway-map-close { font-size: 1.4rem; color: #c43; line-height: 1; padding: 0 .2rem; }
+.subway-map-lines button { border-radius: var(--radius-pill); padding: var(--sp-1) var(--sp-5); font-size: var(--fs-sm); font-weight: 700; border: 2px solid transparent; background: var(--surface-sunken); }
+.subway-map-lines button[aria-pressed="true"] { border-color: currentColor; background: var(--surface-bright); }
+.subway-map-close { font-size: var(--fs-3xl); color: var(--c-red-58b); line-height: var(--lh-none); padding: 0 .2rem; }
 .subway-map svg { display: block; width: 100%; height: auto; max-height: min(400px, calc(100vh - 260px)); margin-top: .3rem; }
-.subway-map-foot { text-align: center; margin: .3rem 0 0; color: #6d675a; font-size: .8rem; }
+.subway-map-foot { text-align: center; margin: .3rem 0 0; color: var(--text-muted); font-size: var(--fs-md); }
 `;
   document.head.appendChild(s);
 }

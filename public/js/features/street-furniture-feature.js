@@ -115,10 +115,10 @@ import {
   visitorLetter,
 } from '../neighbours.js?v=neighbours-4';
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=g458-1';
-import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=g462-1';
+import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=g463-1';
 import { textureFromUrl } from '../textures.js';
-import { butlerApi } from './butler-feature.js?v=g464-2';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=g464-2';
+import { butlerApi } from './butler-feature.js?v=g463-1';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=g463-1';
 import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';

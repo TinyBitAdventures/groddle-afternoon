@@ -71,15 +71,15 @@ const PACK_PLAY_FOR = 'pverb_play_for';
 const INFLUENCE_EVERY_MS = 1000;
 
 const STYLE = `
-.pverb-fx { position: fixed; left: 50%; top: 42%; z-index: 70; transform: translate(-50%, -50%); pointer-events: none; display: grid; justify-items: center; gap: 0.4rem; }
+.pverb-fx { position: fixed; left: 50%; top: 42%; z-index: var(--z-dialog); transform: translate(-50%, -50%); pointer-events: none; display: grid; justify-items: center; gap: var(--sp-3); }
 .pverb-fx[hidden] { display: none; }
-.pverb-fx img { width: min(46vw, 260px); height: auto; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35)); }
+.pverb-fx img { width: min(46vw, 260px); height: auto; filter: drop-shadow(0 6px 14px color-mix(in srgb, var(--c-black) 35%, transparent)); }
 .pverb-fx.is-splank img { width: min(60vw, 360px); animation: pverb-splank 0.5s ease-in-out 0s 6 alternate; transform-origin: 80% 90%; }
-.pverb-fx p { margin: 0; padding: 0.35rem 0.8rem; border-radius: 999px; background: rgba(32, 28, 20, 0.82); color: #fff; font: 600 15px/1.3 system-ui, sans-serif; }
+.pverb-fx p { margin: 0; padding: var(--sp-3) 0.8rem; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--surface-dark) 82%, transparent); color: var(--text-inverse); font: 600 var(--fs-base)/var(--lh-snug) var(--font-system); }
 @keyframes pverb-splank { from { transform: rotate(-28deg); } to { transform: rotate(12deg); } }
-.pverb-pick-list { display: grid; gap: 0.35rem; padding: 0.2rem 0.85rem 0.85rem; }
-.pverb-pick-list button { font: inherit; text-align: left; border: 1px solid #e4d9c4; border-radius: 8px; padding: 0.4rem 0.7rem; background: #fff; cursor: pointer; }
-.pverb-pick-list button:hover, .pverb-pick-list button:focus-visible { background: #f2ecdc; }
+.pverb-pick-list { display: grid; gap: var(--sp-3); padding: 0.2rem var(--sp-7) var(--sp-7); }
+.pverb-pick-list button { font: inherit; text-align: left; border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-3) 0.7rem; background: var(--surface-bright); cursor: pointer; }
+.pverb-pick-list button:hover, .pverb-pick-list button:focus-visible { background: var(--surface-parchment); }
 .pverb-pick-list .pverb-none { opacity: 0.75; font-style: italic; }
 `;
 

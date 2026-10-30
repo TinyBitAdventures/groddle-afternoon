@@ -106,26 +106,26 @@ export function normalizePrompt(opts = {}, uid = '') {
 }
 
 export const PROMPT_STACK_CSS = `
-.prompt-stack { position: absolute; z-index: 95; right: ${PROMPT_DOCK}px; bottom: calc(var(--pack-live-height, 112px) + ${PROMPT_DOCK}px);
+.prompt-stack { position: absolute; z-index: calc(var(--z-screen) + 15); right: ${PROMPT_DOCK}px; bottom: calc(var(--pack-live-height, 112px) + ${PROMPT_DOCK}px);
   width: min(${PROMPT_WIDTH}px, calc(100% - 32px)); display: flex; flex-direction: column; gap: ${PROMPT_PAD}px; pointer-events: none; }
 .prompt-stack:empty { display: none; }
 html[data-street-cards] .prompt-stack { visibility: hidden; }
-.prompt-stack .game-prompt { pointer-events: auto; box-sizing: border-box; width: 100%; padding: ${PROMPT_PAD}px; border-radius: 6px;
-  background: rgba(57,59,50,.9); color: #fff; display: flex; align-items: flex-end; gap: ${PROMPT_PAD * 2}px;
-  font: 700 14px/1.35 Nunito, 'Trebuchet MS', sans-serif; box-shadow: 0 2px 6px rgba(0,0,0,.25);
+.prompt-stack .game-prompt { pointer-events: auto; box-sizing: border-box; width: 100%; padding: ${PROMPT_PAD}px; border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--c-sand-35) 90%, transparent); color: var(--text-inverse); display: flex; align-items: flex-end; gap: ${PROMPT_PAD * 2}px;
+  font: 700 var(--fs-base)/var(--lh-normal) var(--font-round); box-shadow: var(--shadow-2);
   opacity: 1; transition: opacity ${PROMPT_FADE_MS}ms linear; }
 .prompt-stack .game-prompt.is-entering, .prompt-stack .game-prompt.is-leaving { opacity: .1; }
 .prompt-stack .game-prompt.is-leaving { opacity: 0; }
 .prompt-stack .game-prompt.is-below { flex-direction: column; align-items: stretch; gap: ${PROMPT_PAD}px; }
-.prompt-stack .game-prompt p { flex: 1 1 auto; min-width: 0; margin: 0; padding: 0 0 2px 2px; white-space: pre-line; overflow-wrap: anywhere;
-  text-shadow: -1px -1px 0 #333; }
+.prompt-stack .game-prompt p { flex: 1 1 auto; min-width: 0; margin: 0; padding: 0 0 var(--sp-1) var(--sp-1); white-space: pre-line; overflow-wrap: anywhere;
+  text-shadow: -1px -1px 0 var(--c-grey-35); }
 .prompt-stack .game-prompt-choices { flex: none; display: flex; align-self: flex-end; }
-.prompt-stack .game-prompt-choices button { min-width: 34px; height: 25px; padding: 0 12px; border: 1px solid rgba(255,255,255,.28); border-radius: 0;
-  font: 800 13px/1 Nunito, 'Trebuchet MS', sans-serif; color: #fff; cursor: pointer; background: linear-gradient(#7aa83f, #4f7d22); }
-.prompt-stack .game-prompt-choices button + button { border-left: 1px solid #838383; box-shadow: inset 1px 0 0 #fff; }
-.prompt-stack .game-prompt-choices button:first-child { border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
-.prompt-stack .game-prompt-choices button:last-child { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
-.prompt-stack .game-prompt-choices button:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+.prompt-stack .game-prompt-choices button { min-width: 34px; height: 25px; padding: 0 var(--sp-6); border: 1px solid color-mix(in srgb, var(--c-white) 28%, transparent); border-radius: 0;
+  font: 800 var(--fs-md)/var(--lh-none) var(--font-round); color: var(--text-inverse); cursor: pointer; background: linear-gradient(var(--c-lime-68), var(--c-lime-54)); }
+.prompt-stack .game-prompt-choices button + button { border-left: 1px solid var(--c-sand-63); box-shadow: inset 1px 0 0 var(--c-white); }
+.prompt-stack .game-prompt-choices button:first-child { border-top-left-radius: var(--radius-xs); border-bottom-left-radius: var(--radius-xs); }
+.prompt-stack .game-prompt-choices button:last-child { border-top-right-radius: var(--radius-xs); border-bottom-right-radius: var(--radius-xs); }
+.prompt-stack .game-prompt-choices button:focus-visible { outline: 2px solid var(--c-white); outline-offset: 1px; }
 .prompt-stack .game-prompt-choices.is-icons button { width: 24px; min-width: 24px; padding: 0; display: grid; place-items: center; }
 .prompt-stack .game-prompt-choices.is-icons img { display: block; image-rendering: auto; }
 @media (max-width: 620px) { .prompt-stack { right: 16px; } }

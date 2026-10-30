@@ -204,15 +204,15 @@ function clearRainbow() {
 /* ------------------------------------------------------------------ */
 
 const CSS = `
-#secret-spots-panel{position:fixed;z-index:62;display:flex;justify-content:center;align-items:flex-start;pointer-events:auto;background:rgba(10,20,30,.18)}
+#secret-spots-panel{position:fixed;z-index:calc(var(--z-notice) + 12);display:flex;justify-content:center;align-items:flex-start;pointer-events:auto;background:color-mix(in srgb, var(--surface-navy) 18%, transparent)}
 #secret-spots-panel[hidden]{display:none!important}
-#secret-spots-panel .ss-card{margin-top:var(--ss-top,15%);width:min(500px,92%);box-sizing:border-box;padding:18px 22px 14px;border-radius:14px;
-  background:rgba(24,38,52,.88);color:#fff;text-align:center;box-shadow:0 6px 22px rgba(0,0,0,.35);cursor:pointer;
-  font:700 17px/1.4 "Trebuchet MS","Segoe UI",sans-serif;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+#secret-spots-panel .ss-card{margin-top:var(--ss-top,15%);width:min(500px,92%);box-sizing:border-box;padding:var(--sp-9) 22px var(--sp-7);border-radius:var(--radius-2xl);
+  background:color-mix(in srgb, var(--c-navy-26) 88%, transparent);color:var(--text-inverse);text-align:center;box-shadow:0 6px 22px color-mix(in srgb, var(--c-black) 35%, transparent);cursor:pointer;
+  font:700 var(--fs-lg)/var(--lh-normal) var(--font-ui);text-shadow:0 1px 2px color-mix(in srgb, var(--c-black) 40%, transparent)}
 #secret-spots-panel .ss-text{white-space:pre-line}
-#secret-spots-panel .ss-row{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:12px}
-#secret-spots-panel .ss-hint{font-size:12px;opacity:.75}
-#secret-spots-panel button{font:800 14px "Trebuchet MS",sans-serif;border:0;border-radius:999px;padding:6px 16px;background:#bff3ff;color:#163447;cursor:pointer}
+#secret-spots-panel .ss-row{display:flex;justify-content:flex-end;align-items:center;gap:var(--sp-5);margin-top:var(--sp-6)}
+#secret-spots-panel .ss-hint{font-size:var(--fs-sm);opacity:.75}
+#secret-spots-panel button{font:800 var(--fs-base) var(--font-ui);border:0;border-radius:var(--radius-pill);padding:var(--sp-3) var(--sp-8);background:var(--c-sky-93);color:var(--c-sky-31);cursor:pointer}
 `;
 
 function ensureUi() {

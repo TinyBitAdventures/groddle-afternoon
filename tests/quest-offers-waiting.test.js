@@ -6,6 +6,7 @@
  */
 import { before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { resolveTokens } from './css-tokens.js';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -147,7 +148,7 @@ describe('G225 waiting quest offers', () => {
     assert.match(game, /closeQuestDialogue\(\{ cancel: questDialogueState\?\.inLog !== true, force: questDialogueState\?\.inLog === true \}\)/);
     assert.match(game, /if \(!inLog\) closeQuestPanel\(\);/);
     assert.match(game, /function questLogCardSpot\(modal\) \{/);
-    const css = read('style.css');
+    const css = resolveTokens(read('style.css'));
     assert.match(css, /\.quest-btn-count \{[^}]*background: #b21f00/);
     assert.match(css, /\.quest-dialogue\[data-look="familiar"\]\[data-in-log="true"\] \.quest-dialogue-card \{[^}]*left: var\(--fam-log-x, 10px\)/);
   });

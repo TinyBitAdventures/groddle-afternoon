@@ -5,6 +5,7 @@
  * note-view instance as every other note.
  */
 import assert from 'node:assert/strict';
+import { resolveTokens } from './css-tokens.js';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -34,7 +35,7 @@ describe('the holiday chip is clickable', () => {
 
   it('pins the note on a frame the scrolling card cannot clip', () => {
     // The card scrolls (overflow: auto), which cut the pin above its top edge in half (Austin 2026-10-29).
-    const src = read('public/js/note-view.js');
+    const src = resolveTokens(read('public/js/note-view.js'));
     assert.match(src, /\.note-view \.note-frame::before \{ content: ''; position: absolute; z-index: 1; top: -9px;/);
     assert.doesNotMatch(src, /\.note-card::before/);
     assert.match(src, /\.note-view \.note-card \{[^}]*overflow: auto;/);

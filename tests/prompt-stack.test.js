@@ -1,6 +1,7 @@
 // G294: the non-modal prompt stack (js/prompt-stack.js, PromptView.as) and engine.prompt's routing.
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { resolveTokens } from './css-tokens.js';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,7 +20,7 @@ import {
   promptChoices,
   promptStackHasRoom,
   usesIconButtons,
-} from '../public/js/prompt-stack.js?v=g434-1';
+} from '../public/js/prompt-stack.js?v=g463-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -177,9 +178,9 @@ describe('the source prompt (inc_prompts.js, PromptView.as)', () => {
   });
 
   it('docks bottom right, 300 px, stacked 7 px apart, hidden under the street card', () => {
-    assert.match(PROMPT_STACK_CSS, /\.prompt-stack \{ position: absolute; z-index: 95; right: 30px; bottom: calc\(var\(--pack-live-height, 112px\) \+ 30px\);/);
+    assert.match(resolveTokens(PROMPT_STACK_CSS), /\.prompt-stack \{ position: absolute; z-index: 95; right: 30px; bottom: calc\(var\(--pack-live-height, 112px\) \+ 30px\);/);
     assert.match(PROMPT_STACK_CSS, /width: min\(300px, calc\(100% - 32px\)\); display: flex; flex-direction: column; gap: 7px;/);
-    assert.match(PROMPT_STACK_CSS, /background: rgba\(57,59,50,\.9\)/);
+    assert.match(PROMPT_STACK_CSS, /background: color-mix\(in srgb, var\(--c-sand-35\) 90%, transparent\)/, 'the dark card (was rgba(57,59,50,.9))');
     assert.match(PROMPT_STACK_CSS, /html\[data-street-cards\] \.prompt-stack \{ visibility: hidden; \}/);
   });
 });
@@ -299,7 +300,7 @@ describe('engine.prompt and its callers', () => {
     const body = game.slice(game.indexOf('  prompt({ title = '), game.indexOf('  /** Enter the Museum of the Rook instance'));
     assert.match(body, /if \(modal !== true\) return promptStackUi\(\)\.add\(/);
     assert.match(body, /removePrompt: \(uid\) => promptStackUi\(\)\.remove\(uid\),/);
-    assert.match(game, /import \{ createPromptStack \} from '\.\/js\/prompt-stack\.js\?v=g434-1';/);
+    assert.match(game, /import \{ createPromptStack \} from '\.\/js\/prompt-stack\.js\?v=g463-1';/);
     assert.match(game, /viewHeight: \(\) => locationViewRect\(\)\?\.height \|\| 0,/);
   });
 

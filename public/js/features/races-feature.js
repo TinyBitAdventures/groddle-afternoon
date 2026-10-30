@@ -88,9 +88,9 @@ import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=ca
 import { runStreetTransition } from '../screen-fx.js?v=g434-1';
 import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-2';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
-import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=g448-2';
-import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=g458-1';
-import { startHogHaulMp } from './hog-haul-mp-feature.js?v=g458-1';
+import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=g463-1';
+import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=g463-1';
+import { startHogHaulMp } from './hog-haul-mp-feature.js?v=g463-1';
 import { textureFromUrl } from '../textures.js';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g424-1';
 import { gainMetabolic } from '../metabolics.js';
@@ -246,43 +246,43 @@ function raceDesc(raceId) {
 const STYLE = `
 .race-hud { top: 48px; }
 .race-hud .hog-haul-scoreboard strong { min-width: 2.6em; padding: 0 .3em; }
-.race-hud .race-track { position: relative; height: 10px; margin: 8px auto 0; width: min(420px, 90%);
-  border-radius: 999px; background: rgba(18,15,14,.62); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); }
+.race-hud .race-track { position: relative; height: 10px; margin: var(--sp-4) auto 0; width: min(420px, 90%);
+  border-radius: var(--radius-pill); background: color-mix(in srgb, var(--c-grey-17) 62%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-white) 20%, transparent); }
 .race-hud .race-track i { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px;
-  border-radius: 50%; border: 2px solid #fff; transition: left 120ms linear; }
-.race-hud .race-track i[data-race-you] { background: #ffd55b; z-index: 2; }
-.race-hud .race-track i[data-race-them] { background: #c9a6ff; }
-.race-hud .race-track b { position: absolute; right: -4px; top: -6px; font-size: 14px; }
-.race-hud .race-time { display: inline-block; margin-left: 8px; font-variant-numeric: tabular-nums; }
-.race-hud .race-forfeit { pointer-events: auto; position: absolute; right: -8px; top: 52px; padding: 3px 10px;
-  border: 1px solid rgba(255,255,255,.5); border-radius: 999px; color: #fff; font: 700 .7rem/1.4 inherit;
-  background: rgba(30,22,18,.65); cursor: pointer; }
-.race-ready-hint { margin: -10px 0 18px; color: #f2d36c; font-size: .78rem; font-weight: 900; letter-spacing: .08em; }
-.hog-haul-countdown.race-soon { font-size: clamp(1.4rem, 4.6vw, 2.6rem); letter-spacing: 0; text-align: center; padding: 0 16px; }
-.race-start-banner { position: absolute; z-index: 82; top: 15%; left: 50%; width: min(520px, calc(100% - 32px));
-  transform: translateX(-50%); color: #fff; text-align: center; font-size: clamp(1.2rem, 3.4vw, 1.9rem);
-  font-weight: 900; line-height: 1.15; text-shadow: 0 3px 0 #472b13, 0 6px 18px rgba(0,0,0,.7); pointer-events: none; }
+  border-radius: var(--radius-round); border: 2px solid var(--c-white); transition: left 120ms linear; }
+.race-hud .race-track i[data-race-you] { background: var(--c-gold-89); z-index: calc(var(--z-raised) + 1); }
+.race-hud .race-track i[data-race-them] { background: var(--c-violet-79b); }
+.race-hud .race-track b { position: absolute; right: -4px; top: -6px; font-size: var(--fs-base); }
+.race-hud .race-time { display: inline-block; margin-left: var(--sp-4); font-variant-numeric: tabular-nums; }
+.race-hud .race-forfeit { pointer-events: auto; position: absolute; right: -8px; top: 52px; padding: 3px var(--sp-5);
+  border: 1px solid color-mix(in srgb, var(--c-white) 50%, transparent); border-radius: var(--radius-pill); color: var(--text-inverse); font: 700 var(--fs-xs)/var(--lh-normal) inherit;
+  background: color-mix(in srgb, var(--c-sand-21) 65%, transparent); cursor: pointer; }
+.race-ready-hint { margin: -10px 0 var(--sp-9); color: var(--c-gold-87); font-size: var(--fs-sm); font-weight: 900; letter-spacing: .08em; }
+.hog-haul-countdown.race-soon { font-size: clamp(var(--fs-3xl), 4.6vw, var(--fs-display)); letter-spacing: 0; text-align: center; padding: 0 var(--sp-8); }
+.race-start-banner { position: absolute; z-index: calc(var(--z-screen) + 2); top: 15%; left: 50%; width: min(520px, calc(100% - 32px));
+  transform: translateX(-50%); color: var(--text-inverse); text-align: center; font-size: clamp(var(--fs-2xl), 3.4vw, var(--fs-4xl));
+  font-weight: 900; line-height: var(--lh-tight); text-shadow: 0 3px 0 var(--c-brown-32), 0 6px 18px color-mix(in srgb, var(--c-black) 70%, transparent); pointer-events: none; }
 .race-start-banner[hidden], .race-store[hidden] { display: none; }
-.race-store-card { position: relative; z-index: 1; width: min(560px, 94%); max-height: 86%; overflow: auto;
-  padding: 20px 20px 16px; border: 2px solid rgba(255,255,255,.74); border-radius: 18px; color: #fff;
-  background: radial-gradient(circle at 50% -30%, rgba(255,222,105,.32), transparent 55%), linear-gradient(180deg,#493a2e,#251f1c);
-  box-shadow: 0 18px 60px rgba(0,0,0,.5); }
-.race-store-card header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.race-store-card { position: relative; z-index: var(--z-raised); width: min(560px, 94%); max-height: 86%; overflow: auto;
+  padding: var(--sp-10) var(--sp-10) var(--sp-8); border: 2px solid color-mix(in srgb, var(--c-white) 74%, transparent); border-radius: var(--radius-3xl); color: var(--text-inverse);
+  background: radial-gradient(circle at 50% -30%, color-mix(in srgb, var(--c-gold-91) 32%, transparent), transparent 55%), linear-gradient(180deg,var(--c-sand-36),var(--surface-dark));
+  box-shadow: 0 18px 60px color-mix(in srgb, var(--c-black) 50%, transparent); }
+.race-store-card header { display: flex; align-items: center; gap: var(--sp-6); margin-bottom: var(--sp-5); }
 .race-store-card header img { width: 44px; height: auto; }
-.race-store-card h2 { margin: 0; font-size: 1.3rem; }
-.race-store-card header p { margin: 2px 0 0; color: #f2d36c; font-size: .78rem; font-weight: 800; }
-.race-store-card ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.race-store-card li { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 10px;
-  padding: 6px 8px; border-radius: 10px; background: rgba(255,255,255,.08); }
+.race-store-card h2 { margin: 0; font-size: var(--fs-2xl); }
+.race-store-card header p { margin: var(--sp-1) 0 0; color: var(--c-gold-87); font-size: var(--fs-sm); font-weight: 800; }
+.race-store-card ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-3); }
+.race-store-card li { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: var(--sp-5);
+  padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--surface-bright) 8%, transparent); }
 .race-store-card li.is-off { opacity: .55; }
 .race-store-card li img { width: 36px; height: 36px; object-fit: contain; }
-.race-store-card li small { display: block; color: #e8d9b8; font-size: .7rem; }
-.race-store-card li .race-store-actions { display: flex; gap: 6px; }
-.race-store-card button { padding: 5px 10px; border: 0; border-radius: 999px; font: 800 .74rem/1.2 inherit; cursor: pointer;
-  color: #3a240c; background: #ffd55b; }
-.race-store-card button[data-race-activate] { background: #b8f08a; }
+.race-store-card li small { display: block; color: var(--c-gold-87b); font-size: var(--fs-xs); }
+.race-store-card li .race-store-actions { display: flex; gap: var(--sp-3); }
+.race-store-card button { padding: 5px var(--sp-5); border: 0; border-radius: var(--radius-pill); font: 800 var(--fs-sm)/var(--lh-tight) inherit; cursor: pointer;
+  color: var(--c-brown-28); background: var(--c-gold-89); }
+.race-store-card button[data-race-activate] { background: var(--c-lime-89); }
 .race-store-card button:disabled { cursor: default; opacity: .5; }
-.race-store-card .race-store-close { position: absolute; right: 10px; top: 8px; background: transparent; color: #fff; font-size: 1.2rem; }
+.race-store-card .race-store-close { position: absolute; right: 10px; top: 8px; background: transparent; color: var(--text-inverse); font-size: var(--fs-2xl); }
 @media (max-width: 620px) {
   .race-store-card li { grid-template-columns: 32px 1fr; }
   .race-store-card li .race-store-actions { grid-column: 1 / -1; justify-content: flex-end; }

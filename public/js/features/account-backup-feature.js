@@ -30,11 +30,11 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
-import { mountAccountForms, mountAccountSettings } from '../account-forms.js?v=g436-1';
+import { mountAccountForms, mountAccountSettings } from '../account-forms.js?v=g463-1';
 import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=mp2-2';
 import { formatGameDayLabel } from '../game-day.js?v=dametime-4';
 import { multiplayerEntryUrl } from '../game-mode.js?v=mp2-1';
-import { quietSession } from '../online-boot.js?v=g436-2';
+import { quietSession } from '../online-boot.js?v=g463-1';
 
 /** Which slot a new backup goes to: the first empty one, else the oldest (which then needs a yes). */
 export function slotForNewBackup(backups, slots) {
@@ -71,25 +71,25 @@ function when(ms) {
 }
 
 const STYLE = `
-.account-shade { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 1rem; background: rgba(20, 34, 16, 0.45); }
+.account-shade { position: fixed; inset: 0; z-index: var(--z-screen); display: grid; place-items: center; padding: var(--sp-8); background: color-mix(in srgb, var(--c-sage-23) 45%, transparent); }
 .account-shade[hidden] { display: none; }
-.account-panel { width: min(30rem, 100%); max-height: calc(100vh - 2rem); overflow: auto; border-radius: 14px; padding: 1rem 1.1rem 1.1rem;
-  background: #fbf8ef; color: #2b2a22; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); font: 14px/1.45 system-ui, sans-serif; }
-.account-panel h2 { margin: 0 0 0.4rem; font-size: 1.15rem; }
-.account-panel p { margin: 0.35rem 0; }
-.account-panel .account-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.75rem 0 0.25rem; }
-.account-panel button, .account-panel a.account-link { font: inherit; font-weight: 700; border: 0; border-radius: 9px; padding: 0.5rem 0.85rem; cursor: pointer;
-  text-decoration: none; color: #fff; background: linear-gradient(180deg, #f09a55, #e07a35); box-shadow: 0 2px 0 #b85a24; }
-.account-panel button.alt, .account-panel a.account-link.alt { color: #2e5a20; background: #eef6e4; box-shadow: inset 0 0 0 2px #b9d8a0; }
+.account-panel { width: min(30rem, 100%); max-height: calc(100vh - 2rem); overflow: auto; border-radius: var(--radius-2xl); padding: var(--sp-8) var(--sp-9) var(--sp-9);
+  background: var(--surface-card); color: var(--c-sand-28); box-shadow: var(--shadow-3); font: var(--fs-base)/var(--lh-loose) var(--font-system); }
+.account-panel h2 { margin: 0 0 var(--sp-3); font-size: var(--fs-xl); }
+.account-panel p { margin: var(--sp-3) 0; }
+.account-panel .account-actions { display: flex; flex-wrap: wrap; gap: var(--sp-4); margin: var(--sp-6) 0 var(--sp-2); }
+.account-panel button, .account-panel a.account-link { font: inherit; font-weight: 700; border: 0; border-radius: var(--radius-md); padding: var(--sp-4) var(--sp-7); cursor: pointer;
+  text-decoration: none; color: var(--text-inverse); background: linear-gradient(180deg, var(--c-orange-76), var(--c-orange-68)); box-shadow: 0 2px 0 var(--c-orange-57); }
+.account-panel button.alt, .account-panel a.account-link.alt { color: var(--text-moss); background: var(--surface-moss); box-shadow: inset 0 0 0 2px var(--c-lime-85); }
 .account-panel button:disabled { opacity: 0.55; cursor: default; }
-.account-panel .account-slots { list-style: none; margin: 0.75rem 0 0; padding: 0; display: grid; gap: 0.45rem; }
-.account-panel .account-slots li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.6rem; padding: 0.5rem 0.6rem; border-radius: 9px; background: #f0ead8; }
+.account-panel .account-slots { list-style: none; margin: var(--sp-6) 0 0; padding: 0; display: grid; gap: 0.45rem; }
+.account-panel .account-slots li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3) var(--sp-5); padding: var(--sp-4) var(--sp-5); border-radius: var(--radius-md); background: var(--surface-parchment); }
 .account-panel .account-slots .slot-what { flex: 1 1 14rem; }
 .account-panel .account-slots .slot-what small { display: block; opacity: 0.75; }
-.account-panel .account-slots button { padding: 0.35rem 0.65rem; }
-.account-panel .account-note { min-height: 1.4em; margin-top: 0.6rem; font-weight: 600; color: #4c6b2e; }
-.account-panel .account-note[data-tone="bad"] { color: #a33b22; }
-.account-panel .account-close { float: right; padding: 0.2rem 0.55rem; color: #2b2a22; background: transparent; box-shadow: none; font-size: 1.2rem; line-height: 1; }
+.account-panel .account-slots button { padding: var(--sp-3) var(--sp-5); }
+.account-panel .account-note { min-height: 1.4em; margin-top: var(--sp-5); font-weight: 600; color: var(--c-lime-49); }
+.account-panel .account-note[data-tone="bad"] { color: var(--text-danger); }
+.account-panel .account-close { float: right; padding: 0.2rem 0.55rem; color: var(--c-sand-28); background: transparent; box-shadow: none; font-size: var(--fs-2xl); line-height: var(--lh-none); }
 `;
 
 function el(tag, attrs = {}, text = '') {

@@ -4,12 +4,13 @@
 // Customize look first or the tutorial choice, then go in order, and the card is the top window.
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { resolveTokens } from './css-tokens.js';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { START_CARD_SELECTOR, SCREEN_SELECTOR, WINDOW_SELECTOR, stackZ } from '../public/js/window-stack.js?v=g428-1';
-import { createPromptStack } from '../public/js/prompt-stack.js?v=g434-1';
+import { createPromptStack } from '../public/js/prompt-stack.js?v=g463-1';
 import {
   _resetFamiliarDialog,
   familiarDialogFeature,
@@ -197,7 +198,7 @@ describe('the window stack keeps the start card on top', () => {
   });
 
   it('the online card sits at z 80, over the side panels (the report: Skills opened behind it)', () => {
-    assert.match(read('play/online/index.html'), /#overlay:not\(\.hidden\) \{ z-index: 80;/);
+    assert.match(resolveTokens(read('play/online/index.html')), /#overlay:not\(\.hidden\) \{ z-index: 80;/);
     const ws = read('js/window-stack.js');
     assert.match(ws, /querySelectorAll\(`\$\{WINDOW_SELECTOR\}, \$\{SCREEN_SELECTOR\}, \$\{START_CARD_SELECTOR\}`\)/);
     assert.match(ws, /top: el\.matches\(START_CARD_SELECTOR\),/);

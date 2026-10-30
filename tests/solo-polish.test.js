@@ -16,11 +16,12 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { resolveTokens } from './css-tokens.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=g436-3';
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=g464-2';
-import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=g464-2';
+import { accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=g463-1';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=g463-1';
+import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=g463-1';
 import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js?v=g375-1';
 import { qurazyFeature, resetQurazyFeatureForTests } from '../public/js/features/qurazy-feature.js?v=g458-3';
 import { QURAZY_SPAWN_LINE } from '../public/js/qurazy.js';
@@ -141,8 +142,8 @@ describe('solo asks no rest-nonce (the console 400)', () => {
       assert.match(read(rel), /engine\?\.mode !== 'multiplayer'|engine\?\.mode === 'multiplayer'/, rel);
     }
     assert.match(read('public/js/features/account-backup-feature.js'), /const session = await quietSession\(account\);/);
-    assert.match(read('public/js/features/account-backup-feature.js'), /import \{ quietSession \} from '\.\.\/online-boot\.js\?v=g436-2';/);
-    assert.match(read('public/js/features/index.js'), /account-backup-feature\.js\?v=g436-3'/);
+    assert.match(read('public/js/features/account-backup-feature.js'), /import \{ quietSession \} from '\.\.\/online-boot\.js\?v=g463-1';/);
+    assert.match(read('public/js/features/index.js'), /account-backup-feature\.js\?v=g463-1'/);
   });
 });
 
@@ -237,7 +238,7 @@ describe('Qurazy banner and the solo start card', () => {
 });
 
 describe('style.css: word outline and solid dimmed upgrade cards', () => {
-  const css = read('public/style.css');
+  const css = resolveTokens(read('public/style.css'));
 
   it('the running word gets a soft CSS outline, not new pixels', () => {
     assert.match(css, /\.word-progress-word \{[^}]*filter: drop-shadow\(0 0 1px rgba\(0, 0, 0, 0\.55\)\) drop-shadow\(0 1px 1\.5px rgba\(0, 0, 0, 0\.3\)\);/);

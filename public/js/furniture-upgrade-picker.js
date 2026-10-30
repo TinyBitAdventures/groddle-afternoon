@@ -18,32 +18,32 @@
 import { listHasPaid, listUpgrades, purseText, saveButtonText, UPGRADE_TEXT } from './furniture-upgrades.js?v=g448-3';
 
 const CSS = `
-.furn-upgrade{position:absolute;left:50%;top:56px;transform:translateX(-50%);z-index:46;width:min(572px,calc(100% - 20px));max-height:calc(100% - 150px);display:flex;flex-direction:column;background:#fffdf7;border-radius:14px;box-shadow:0 12px 32px rgba(40,30,20,.28);border:1px solid rgba(90,70,40,.18);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;color:#2b2a33;overflow:hidden}
+.furn-upgrade{position:absolute;left:50%;top:56px;transform:translateX(-50%);z-index:calc(var(--z-panel) + 11);width:min(572px,calc(100% - 20px));max-height:calc(100% - 150px);display:flex;flex-direction:column;background:var(--surface-card);border-radius:var(--radius-2xl);box-shadow:0 12px 32px color-mix(in srgb, var(--c-sand-24) 28%, transparent);border:1px solid color-mix(in srgb, var(--c-umber-41) 18%, transparent);font-family:var(--font-ui);color:var(--text);overflow:hidden}
 .furn-upgrade[hidden]{display:none}
-.furn-upgrade header{display:flex;align-items:center;gap:8px;padding:9px 12px 7px;background:linear-gradient(180deg,#f7ecd6,#efe1c4);border-bottom:1px solid rgba(90,70,40,.15)}
-.furn-upgrade header h3{margin:0;font-size:15px;flex:1}
-.furn-upgrade .fu-close{border:none;background:transparent;font-size:18px;cursor:pointer;color:#6a5a45;line-height:1}
-.furn-upgrade .fu-main{flex:1;display:flex;gap:10px;min-height:0;padding:10px 12px}
-.furn-upgrade .fu-prev{flex:0 0 150px;display:flex;flex-direction:column;align-items:center;gap:6px}
-.furn-upgrade .fu-prev .fu-box{width:150px;height:150px;border-radius:10px;background:#efe6d4;display:flex;align-items:center;justify-content:center}
+.furn-upgrade header{display:flex;align-items:center;gap:var(--sp-4);padding:9px var(--sp-6) 7px;background:linear-gradient(180deg,var(--surface-parchment),var(--c-cream-91));border-bottom:1px solid color-mix(in srgb, var(--c-umber-41) 15%, transparent)}
+.furn-upgrade header h3{margin:0;font-size:var(--fs-base);flex:1}
+.furn-upgrade .fu-close{border:none;background:transparent;font-size:var(--fs-xl);cursor:pointer;color:var(--c-sand-48);line-height:var(--lh-none)}
+.furn-upgrade .fu-main{flex:1;display:flex;gap:var(--sp-5);min-height:0;padding:var(--sp-5) var(--sp-6)}
+.furn-upgrade .fu-prev{flex:0 0 150px;display:flex;flex-direction:column;align-items:center;gap:var(--sp-3)}
+.furn-upgrade .fu-prev .fu-box{width:150px;height:150px;border-radius:var(--radius-lg);background:var(--surface-parchment);display:flex;align-items:center;justify-content:center}
 .furn-upgrade .fu-prev img{max-width:138px;max-height:138px;object-fit:contain}
-.furn-upgrade .fu-prev strong{font-size:13px;text-align:center}
-.furn-upgrade .fu-grid{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px;align-content:start}
-.furn-upgrade .fu-tile{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;border:2px solid transparent;background:#f6efe2;border-radius:10px;padding:5px 4px;cursor:pointer;font:inherit;font-size:11px;line-height:1.15;color:#3b3328;text-align:center}
-.furn-upgrade .fu-tile:hover{border-color:#e0a84a}
-.furn-upgrade .fu-tile.on{border-color:#d08a2a;background:#fff3d8}
+.furn-upgrade .fu-prev strong{font-size:var(--fs-md);text-align:center}
+.furn-upgrade .fu-grid{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:var(--sp-3);align-content:start}
+.furn-upgrade .fu-tile{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;border:2px solid transparent;background:var(--surface-parchment);border-radius:var(--radius-lg);padding:5px var(--sp-2);cursor:pointer;font:inherit;font-size:var(--fs-xs);line-height:var(--lh-tight);color:var(--c-sand-33);text-align:center}
+.furn-upgrade .fu-tile:hover{border-color:var(--mood)}
+.furn-upgrade .fu-tile.on{border-color:var(--c-orange-69);background:var(--status-warn-soft)}
 .furn-upgrade .fu-tile img{width:64px;height:64px;object-fit:contain}
 .furn-upgrade .fu-tile .fu-label{font-weight:700}
-.furn-upgrade .fu-tile .fu-price{color:#6d6252}
-.furn-upgrade .fu-tile.paid .fu-price{color:#7a5a12;font-weight:700}
-.furn-upgrade .fu-tile .fu-new{position:absolute;left:4px;top:3px;font-size:9px;font-weight:700;background:#e07a3d;color:#fff;border-radius:6px;padding:0 4px}
-.furn-upgrade footer{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 12px 10px;border-top:1px solid rgba(90,70,40,.12)}
-.furn-upgrade footer button{border:1px solid rgba(90,70,40,.2);background:#fff;border-radius:8px;padding:6px 11px;font-size:12.5px;font-weight:700;color:#4a3a28;cursor:pointer}
-.furn-upgrade footer button.primary{background:#4a90c8;border-color:#4a90c8;color:#fff}
+.furn-upgrade .fu-tile .fu-price{color:var(--c-sand-51b)}
+.furn-upgrade .fu-tile.paid .fu-price{color:var(--c-umber-49);font-weight:700}
+.furn-upgrade .fu-tile .fu-new{position:absolute;left:4px;top:3px;font-size:var(--fs-2xs);font-weight:700;background:var(--accent);color:var(--text-inverse);border-radius:var(--radius-sm);padding:0 var(--sp-2)}
+.furn-upgrade footer{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-4);padding:var(--sp-4) var(--sp-6) var(--sp-5);border-top:1px solid color-mix(in srgb, var(--c-umber-41) 12%, transparent)}
+.furn-upgrade footer button{border:1px solid color-mix(in srgb, var(--c-umber-41) 20%, transparent);background:var(--surface-bright);border-radius:var(--radius-md);padding:var(--sp-3) 11px;font-size:var(--fs-sm);font-weight:700;color:var(--text-brown);cursor:pointer}
+.furn-upgrade footer button.primary{background:var(--c-blue-63);border-color:var(--c-blue-63);color:var(--text-inverse)}
 .furn-upgrade footer button:disabled{opacity:.45;cursor:not-allowed}
-.furn-upgrade .fu-note{flex-basis:100%;margin:0;font-size:12px;color:#a0522d}
-.furn-upgrade .fu-purse{margin-left:auto;font-size:12px;font-weight:700;color:#5c4a2e}
-.furn-upgrade .fu-purse.low{color:#b8322a}
+.furn-upgrade .fu-note{flex-basis:100%;margin:0;font-size:var(--fs-sm);color:var(--c-brown-53)}
+.furn-upgrade .fu-purse{margin-left:auto;font-size:var(--fs-sm);font-weight:700;color:var(--c-umber-41)}
+.furn-upgrade .fu-purse.low{color:var(--c-red-54)}
 @media (max-width:640px){.furn-upgrade{top:auto;bottom:106px;max-height:60%}.furn-upgrade .fu-prev{display:none}.furn-upgrade .fu-grid{grid-template-columns:repeat(auto-fill,minmax(84px,1fr))}}
 `;
 

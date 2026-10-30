@@ -22,7 +22,7 @@ import { createHash, generateKeyPairSync, sign } from 'node:crypto';
 import { join } from 'node:path';
 import { homedir, tmpdir } from 'node:os';
 
-import { FORM_COPY, GOOGLE_SCRIPT, createAccountRequests, googleButtonOptions, googleOutcome } from '../public/js/account-forms.js?v=g436-1';
+import { FORM_COPY, GOOGLE_SCRIPT, createAccountRequests, googleButtonOptions, googleOutcome } from '../public/js/account-forms.js?v=g463-1';
 import { HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

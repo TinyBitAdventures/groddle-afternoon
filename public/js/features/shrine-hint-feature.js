@@ -62,9 +62,9 @@ function shrineTarget(engine) {
 function ensureUi() {
   if (ui) return ui;
   const style = document.createElement('style');
-  style.textContent = `.shrine-vog{position:fixed;z-index:61;display:flex;align-items:center;justify-content:center;text-align:center;
-  background:rgba(0,0,0,.45);cursor:pointer;color:#fff;font:800 26px/1.25 Nunito,"Trebuchet MS",sans-serif;
-  text-shadow:0 2px 4px rgba(0,0,0,.5);padding:20px;box-sizing:border-box;opacity:0;transition:opacity .4s}
+  style.textContent = `.shrine-vog{position:fixed;z-index:calc(var(--z-notice) + 11);display:flex;align-items:center;justify-content:center;text-align:center;
+  background:color-mix(in srgb, var(--c-black) 45%, transparent);cursor:pointer;color:var(--text-inverse);font:800 var(--fs-3xl)/var(--lh-snug) var(--font-round);
+  text-shadow:0 2px 4px color-mix(in srgb, var(--c-black) 50%, transparent);padding:var(--sp-10);box-sizing:border-box;opacity:0;transition:opacity .4s}
 .shrine-vog.on{opacity:1}
 .shrine-vog[hidden]{display:none!important}`;
   document.head.appendChild(style);
@@ -134,25 +134,25 @@ function queueGiantScreen(engine, screen, giantId) {
 function ensureLoveUi() {
   if (love.ui) return love.ui;
   const style = document.createElement('style');
-  style.textContent = `.giant-screen{position:fixed;z-index:96;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  box-sizing:border-box;padding:20px;cursor:default;opacity:0;transition:opacity .8s linear;color:#fff;overflow:hidden}
+  style.textContent = `.giant-screen{position:fixed;z-index:calc(var(--z-screen) + 16);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-sizing:border-box;padding:var(--sp-10);cursor:default;opacity:0;transition:opacity .8s linear;color:var(--text-inverse);overflow:hidden}
 .giant-screen.on{opacity:1}
 .giant-screen.out{opacity:0;transition-duration:.4s}
 .giant-screen[hidden]{display:none!important}
 .giant-screen.ready{cursor:pointer}
 .gs-stage{display:flex;align-items:center;justify-content:center;gap:28px;max-width:100%}
-.gs-art{width:190px;height:auto;flex:none;transform:scale(.2);opacity:0;filter:drop-shadow(0 6px 14px rgba(0,0,0,.45))}
+.gs-art{width:190px;height:auto;flex:none;transform:scale(.2);opacity:0;filter:drop-shadow(0 6px 14px color-mix(in srgb, var(--c-black) 45%, transparent))}
 .giant-screen.on .gs-art{transform:scale(1);opacity:1;transition:transform 1.6s cubic-bezier(.34,1.56,.64,1) 1.2s,opacity 1.6s ease-in 1.2s}
 .gs-text{max-width:350px;clip-path:inset(0 0 100% 0)}
 .giant-screen.on .gs-text{clip-path:inset(0 0 0 0);transition:clip-path 1s linear 2.8s}
-.gs-name{margin:0;font:800 34px/1.1 Nunito,"Trebuchet MS",sans-serif;text-shadow:0 3px 3px rgba(0,0,0,.35)}
-.gs-tip{margin:.35em 0 0;font:700 22px/1.3 Nunito,"Trebuchet MS",sans-serif;opacity:.9;text-shadow:0 3px 3px rgba(0,0,0,.35)}
-.gs-ok{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;
-  padding:6px 16px 6px 12px;border-radius:15px;background:linear-gradient(#f4f4f4,#d6d6d6);color:#444;
-  font:700 14px/18px Nunito,"Trebuchet MS",sans-serif;box-shadow:0 2px 0 rgba(0,0,0,.25);opacity:0;transition:opacity .5s linear;pointer-events:none}
-.gs-ok::before{content:"";border-left:8px solid #777;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.gs-name{margin:0;font:800 var(--fs-5xl)/var(--lh-tight) var(--font-round);text-shadow:0 3px 3px color-mix(in srgb, var(--c-black) 35%, transparent)}
+.gs-tip{margin:.35em 0 0;font:700 var(--fs-2xl)/var(--lh-snug) var(--font-round);opacity:.9;text-shadow:0 3px 3px color-mix(in srgb, var(--c-black) 35%, transparent)}
+.gs-ok{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);display:flex;align-items:center;gap:var(--sp-4);
+  padding:var(--sp-3) var(--sp-8) var(--sp-3) var(--sp-6);border-radius:var(--radius-2xl);background:linear-gradient(var(--c-grey-94),var(--c-grey-87));color:var(--c-grey-39);
+  font:700 var(--fs-base)/18px var(--font-round);box-shadow:0 2px 0 color-mix(in srgb, var(--c-black) 25%, transparent);opacity:0;transition:opacity .5s linear;pointer-events:none}
+.gs-ok::before{content:"";border-left:8px solid var(--c-grey-57);border-top:5px solid transparent;border-bottom:5px solid transparent}
 .giant-screen.ready .gs-ok{opacity:1}
-@media (max-width:560px){.gs-stage{flex-direction:column;gap:14px;text-align:center}.gs-art{width:120px}.gs-name{font-size:26px}.gs-tip{font-size:18px}}`;
+@media (max-width:560px){.gs-stage{flex-direction:column;gap:var(--sp-7);text-align:center}.gs-art{width:120px}.gs-name{font-size:var(--fs-3xl)}.gs-tip{font-size:var(--fs-xl)}}`;
   document.head.appendChild(style);
   const el = document.createElement('div');
   // An id ending in -panel holds engine.busy() (quest offers, autoplay) while it is up.

@@ -2,6 +2,7 @@
 // that wait for the chooser or a verb menu, and the chooser over the chat dock.
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { resolveTokens } from './css-tokens.js';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,7 +13,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
 const read = (rel) => readFileSync(join(pub, rel), 'utf8');
 const game = read('game.js');
-const css = read('style.css');
+const css = resolveTokens(read('style.css'));
 const client = join(here, '../../glitch-client/com/tinyspeck/engine');
 
 const t = (classId, extra = {}) => ({ classId, label: classId, sprite: {}, ...extra });

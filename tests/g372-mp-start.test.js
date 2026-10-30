@@ -14,9 +14,10 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { resolveTokens } from './css-tokens.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { quietSession } from '../public/js/online-boot.js?v=g436-2';
+import { quietSession } from '../public/js/online-boot.js?v=g463-1';
 import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-10';
 import { buildOnlinePage, ONLINE_BOOT_SRC } from '../tools/play-online/build.mjs';
 
@@ -96,7 +97,7 @@ describe('G322: /play/online/ signed out asks no rest-nonce', () => {
     const body = boot.slice(boot.indexOf('async function boot()'), boot.indexOf('async function enter('));
     assert.match(body, /const session = await quietSession\(account\);/);
     assert.doesNotMatch(body, /account\.session\(\)/);
-    assert.equal(ONLINE_BOOT_SRC, 'js/online-boot.js?v=g436-2');
+    assert.equal(ONLINE_BOOT_SRC, 'js/online-boot.js?v=g463-1');
     assert.match(read('public/play/online/index.html'), /src="js\/online-boot\.js\?v=g\d+-\d+"/);
     assert.ok(read('public/play/online/index.html').includes(`src="${ONLINE_BOOT_SRC}"`));
   });
@@ -106,11 +107,11 @@ describe('G320: the multiplayer start card', () => {
   const page = buildOnlinePage(read('public/play/index.html'));
 
   it('the online page lifts the card over the chat dock and pack and lets it scroll inside the game frame', () => {
-    assert.match(page, /#overlay:not\(\.hidden\) \{ z-index: 80;/);
+    assert.match(resolveTokens(page), /#overlay:not\(\.hidden\) \{ z-index: 80;/);
     assert.match(page, /#overlay:not\(\.hidden\) > \.card \{ max-height: 100%; overflow-y: auto;/);
     assert.match(page, /@media \(max-width: 560px\) \{\n\s+#overlay:not\(\.hidden\) > \.card \{ width: 100%;/);
     // Above the chat dock (26) and the toast (50): style.css.
-    const css = read('public/style.css');
+    const css = resolveTokens(read('public/style.css'));
     assert.match(css, /\.local-chat-dock \{[^}]*z-index: 26;/);
     assert.match(css, /\.overlay \{[^}]*z-index: 5;/);
   });

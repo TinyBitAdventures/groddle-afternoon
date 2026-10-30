@@ -387,7 +387,7 @@ const noteOpen = () => Boolean(noteMod?.noteViewOpen?.());
 async function openHint(engineLike, h) {
   const clue = clueFor(h);
   if (!clue || typeof document === 'undefined') return;
-  noteMod ||= await import('../note-view.js?v=g462-1');
+  noteMod ||= await import('../note-view.js?v=g463-1');
   noteMod.openNoteView({ kicker: 'Secret Juju Hint', title: clue.title, body: clue.text, reason: TEXT.noteReason });
   engineLike.setData?.('jujuNote', clue.title);
 }

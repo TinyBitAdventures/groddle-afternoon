@@ -3,6 +3,7 @@
 // 401-460, 501-517; ProgressBar.as).
 import { before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { resolveTokens } from './css-tokens.js';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -99,7 +100,7 @@ describe('the study bar', () => {
       assert.match(src, /progress_bar\.setFrameColors\(0xcfd0d0, 0xb6b7b7\);/);
       assert.match(src, /progress_bar\.filters = StaticFilters\.copyFilterArrayFromObject\(\{blurX:8, blurY:8, strength:20, alpha:\.2\}, StaticFilters\.white4px40AlphaGlowA\);/);
     }
-    const css = read('style.css');
+    const css = resolveTokens(read('style.css'));
     // G241: the frame moved onto every study bar, unlearning included.
     const at = css.indexOf('.quest-log-body .q-bar.skill-study-bar {');
     assert.ok(at > 0);

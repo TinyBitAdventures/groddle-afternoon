@@ -120,23 +120,23 @@ export function remoteAvatarZ(order) {
 }
 
 const STYLE = `
-.mp-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; margin: 0 0 0.3rem; pointer-events: auto; font: 600 11.5px/1.3 system-ui, sans-serif; }
-.mp-state { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.55rem; border-radius: 999px; color: #24401b; background: rgba(244, 251, 236, 0.94); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22); }
-.mp-state::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #e8a33c; }
-.mp-state[data-state="online"]::before { background: #5fa83a; }
-.mp-state[data-state="offline"]::before, .mp-state[data-state="replaced"]::before, .mp-state[data-state="signed-out"]::before, .mp-state[data-state="stopped"]::before, .mp-state[data-state="booted"]::before, .mp-state[data-state="suspended"]::before { background: #c8553d; }
-.mp-state[data-state="off"]::before { background: #9a948a; }
-.mp-bar button { font: inherit; border: 0; border-radius: 999px; padding: 0.2rem 0.6rem; cursor: pointer; color: #3a3340; background: rgba(255, 253, 247, 0.92); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2); }
-.mp-bar button[aria-pressed="true"] { background: #efe4f6; }
+.mp-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; margin: 0 0 0.3rem; pointer-events: auto; font: 600 var(--fs-xs)/var(--lh-snug) var(--font-system); }
+.mp-state { display: inline-flex; align-items: center; gap: var(--sp-3); padding: 0.2rem 0.55rem; border-radius: var(--radius-pill); color: var(--c-green-34); background: color-mix(in srgb, var(--surface-moss) 94%, transparent); box-shadow: var(--shadow-1); }
+.mp-state::before { content: ''; width: 7px; height: 7px; border-radius: var(--radius-round); background: var(--c-gold-76); }
+.mp-state[data-state="online"]::before { background: var(--c-lime-67); }
+.mp-state[data-state="offline"]::before, .mp-state[data-state="replaced"]::before, .mp-state[data-state="signed-out"]::before, .mp-state[data-state="stopped"]::before, .mp-state[data-state="booted"]::before, .mp-state[data-state="suspended"]::before { background: var(--c-red-59); }
+.mp-state[data-state="off"]::before { background: var(--c-sand-67); }
+.mp-bar button { font: inherit; border: 0; border-radius: var(--radius-pill); padding: 0.2rem var(--sp-5); cursor: pointer; color: var(--text-heading); background: color-mix(in srgb, var(--surface-card) 92%, transparent); box-shadow: var(--shadow-1); }
+.mp-bar button[aria-pressed="true"] { background: var(--c-mauve-93); }
 .mp-bar button[hidden] { display: none; }
-.mp-log { list-style: none; margin: 0 0 0.3rem; padding: 0.35rem 0.5rem; max-height: 9.5rem; overflow-y: auto; pointer-events: auto; border-radius: 8px;
-  background: rgba(255, 253, 247, 0.95); box-shadow: 0 2px 7px rgba(28, 25, 31, 0.2); color: #302b34; font: 12px/1.35 system-ui, sans-serif; }
+.mp-log { list-style: none; margin: 0 0 0.3rem; padding: var(--sp-3) var(--sp-4); max-height: 9.5rem; overflow-y: auto; pointer-events: auto; border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-card) 95%, transparent); box-shadow: var(--shadow-2); color: var(--text); font: var(--fs-sm)/var(--lh-normal) var(--font-system); }
 .mp-log[hidden] { display: none; }
-.mp-log li { margin: 0.1rem 0; overflow-wrap: anywhere; }
-.mp-log li b { color: #74508e; }
-.mp-log li.is-note { color: #6b6460; font-style: italic; }
-.mp-log .mp-emotes { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: 0.35rem; }
-.mp-log .mp-emotes button { font: 600 11.5px/1.3 system-ui, sans-serif; border: 0; border-radius: 999px; padding: 0.2rem 0.6rem; cursor: pointer; color: #2e5a20; background: #eef6e4; box-shadow: inset 0 0 0 1px #b9d8a0; }
+.mp-log li { margin: var(--sp-1) 0; overflow-wrap: anywhere; }
+.mp-log li b { color: var(--c-violet-50); }
+.mp-log li.is-note { color: var(--text-muted); font-style: italic; }
+.mp-log .mp-emotes { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: var(--sp-3); }
+.mp-log .mp-emotes button { font: 600 var(--fs-xs)/var(--lh-snug) var(--font-system); border: 0; border-radius: var(--radius-pill); padding: 0.2rem var(--sp-5); cursor: pointer; color: var(--text-moss); background: var(--surface-moss); box-shadow: inset 0 0 0 1px var(--c-lime-85); }
 `;
 
 const EMOTE_LABELS = { happy: 'Happy', surprise: 'Surprised', angry: 'Angry' };

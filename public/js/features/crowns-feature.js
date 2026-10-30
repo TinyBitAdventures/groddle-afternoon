@@ -59,7 +59,7 @@ import { wallsScreen } from '../street-model.js?v=g442-6';
 import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
-import { CROWNS_SPLASH, splashFor } from '../game-splash.js?v=g448-2';
+import { CROWNS_SPLASH, splashFor } from '../game-splash.js?v=g463-1';
 import { saveStore } from '../save-store.js?v=mp2-2';
 import {
   CROWNS_MP_TEXT,
@@ -114,19 +114,19 @@ function el(tag, attrs = {}, html = '') {
 
 const STYLE = `
 .crowns-hud { top: 48px; }
-.crowns-board { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; font-size: .82rem; font-weight: 800; }
-.crowns-board span { padding: 3px 9px; border-radius: 999px; background: rgba(18,15,14,.68); }
-.crowns-board span.is-it { color: #3a240c; background: #ffd55b; }
+.crowns-board { display: flex; justify-content: center; gap: var(--sp-4); flex-wrap: wrap; font-size: var(--fs-md); font-weight: 800; }
+.crowns-board span { padding: 3px 9px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--c-grey-17) 68%, transparent); }
+.crowns-board span.is-it { color: var(--c-brown-28); background: var(--c-gold-89); }
 .crowns-board span.is-you b { text-decoration: underline; }
-.crowns-tip { margin: 8px auto 0; max-width: 520px; font-size: clamp(.9rem, 2.4vw, 1.2rem); font-weight: 900;
-  text-shadow: 0 2px 0 #472b13, 0 4px 12px rgba(0,0,0,.7); }
+.crowns-tip { margin: var(--sp-4) auto 0; max-width: 520px; font-size: clamp(var(--fs-base), 2.4vw, var(--fs-2xl)); font-weight: 900;
+  text-shadow: 0 2px 0 var(--c-brown-32), 0 4px 12px color-mix(in srgb, var(--c-black) 70%, transparent); }
 .crowns-tip:empty { display: none; }
-.crowns-clock { position: absolute; left: 50%; top: 76px; transform: translateX(-50%); display: flex; align-items: center; gap: 6px;
-  padding: 2px 12px 2px 4px; border-radius: 999px; color: #3a240c; font-weight: 900; background: rgba(255,247,211,.94); }
+.crowns-clock { position: absolute; left: 50%; top: 76px; transform: translateX(-50%); display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-1) var(--sp-6) var(--sp-1) var(--sp-2); border-radius: var(--radius-pill); color: var(--c-brown-28); font-weight: 900; background: color-mix(in srgb, var(--c-yellow-98) 94%, transparent); }
 .crowns-clock[hidden] { display: none; }
 .crowns-clock img { width: 34px; height: auto; }
-.crowns-rules { margin: 0 auto 16px; padding: 0; list-style: none; text-align: left; display: inline-block; font-weight: 700; font-size: .9rem; }
-.crowns-rules li::before { content: '• '; color: #f2d36c; }
+.crowns-rules { margin: 0 auto var(--sp-8); padding: 0; list-style: none; text-align: left; display: inline-block; font-weight: 700; font-size: var(--fs-base); }
+.crowns-rules li::before { content: '• '; color: var(--c-gold-87); }
 `;
 
 function buildChrome(engine) {
