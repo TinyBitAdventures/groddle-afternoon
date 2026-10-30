@@ -30,8 +30,8 @@
  *                                          ways (G216); canvas quoinShardLast / quoinShardYou
  */
 
-import { crowdScaleX } from '../avatar-anims.js';
-import { playCountdownArt } from '../overlays.js?v=g463-2';
+import { crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
+import { playCountdownArt } from '../overlays.js?v=6d2b7a11';
 import {
   RACES,
   RACE_ACHIEVEMENTS,
@@ -76,26 +76,26 @@ import {
   settleRace,
   startDelayMessage,
   tickRace,
-} from '../races.js?v=races-4';
-import { platformUnder, raceCourse, RACE_COURSE_IDS } from '../race-courses.js?v=races-5';
+} from '../races.js?v=df0576ad';
+import { platformUnder, raceCourse, RACE_COURSE_IDS } from '../race-courses.js?v=565822aa';
 import {
   drawCheckpointFlag,
   drawFinishGate,
   raceLoadingColors,
   renderRaceCourse,
-} from '../race-render.js?v=g463-2';
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { runStreetTransition } from '../screen-fx.js?v=g470-1';
-import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-2';
-import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
-import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=g463-2';
-import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=g478-1';
-import { startHogHaulMp } from './hog-haul-mp-feature.js?v=g463-2';
-import { textureFromUrl } from '../textures.js';
-import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g424-1';
-import { gainMetabolic } from '../metabolics.js';
-import { grantMoodXp } from '../mood-xp.js';
-import { quoinShardGrabberSound, quoinShardSoundKey } from '../quoin-shards.js?v=g216-1';
+} from '../race-render.js?v=5f946939';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
+import { runStreetTransition } from '../screen-fx.js?v=82ce3680';
+import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=98e21baf';
+import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
+import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=15233d46';
+import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=d75259a0';
+import { startHogHaulMp } from './hog-haul-mp-feature.js?v=087704cd';
+import { textureFromUrl } from '../textures.js?v=01a295a1';
+import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=d4f4772b';
+import { gainMetabolic } from '../metabolics.js?v=8504134e';
+import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { quoinShardGrabberSound, quoinShardSoundKey } from '../quoin-shards.js?v=9a2e4c37';
 import {
   MP_RACE_COURSES,
   MP_RACE_TEXT,
@@ -106,7 +106,7 @@ import {
   othersLabel,
   shardAmount,
   splitScores,
-} from '../races-mp.js?v=mp4-1';
+} from '../races-mp.js?v=c61cc7b5';
 
 const RACE_ICON_DIR = 'assets/sprites/races/';
 const GAME_LOGO_DIR = 'assets/sprites/overlays/';

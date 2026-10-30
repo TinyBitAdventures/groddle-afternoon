@@ -35,8 +35,8 @@ import {
   eestiStreetPoint,
   expireDeEmbiggenify,
   findSmallWorthless,
-} from '../public/js/de-embiggenify.js?v=g456-1';
-import { SOURCE_PHYSICS, triggerHit } from '../public/js/puzzle-triggers.js';
+} from '../public/js/de-embiggenify.js?v=58d2613c';
+import { SOURCE_PHYSICS, triggerHit } from '../public/js/puzzle-triggers.js?v=3ee2f2c8';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const LOCATIONS = path.join(root, '../streets/mnt/stos/location_data');
@@ -171,7 +171,7 @@ test('client integration uses clean recovered room and item art', () => {
   assert.match(content, /npc_dustbunny/);
   assert.match(content, /small_worthless/);
   assert.match(html, /id="de-embiggenify-hud"/);
-  assert.match(html, /eesti=page17-2/);
+  assert.match(html, /"game\.js\?v=[0-9a-f]{8}"/);
   assert.match(css, /\.de-embiggenify-hud/);
 });
 

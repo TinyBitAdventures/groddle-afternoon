@@ -15,13 +15,13 @@ import {
   rockClassFor,
   rockItems,
   soilKeyMap,
-} from '../public/js/features/homes-feature.js?v=g485-1';
-import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js';
-import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js';
-import { canPlantBean } from '../public/js/patches.js?v=g414-1';
-import { TOWER_PART_CHOICES, TOWER_STYLES, composeTower, towerBounds } from '../public/js/home-tower.js';
-import { MIN_GROUND_CLEARANCE, cameraTargetY, cameraWorldHeightForGround, yCamOffsetAnchor } from '../public/js/movement.js';
-import { INTERIOR } from '../public/js/home-decor.js?v=g448-3';
+} from '../public/js/features/homes-feature.js?v=8995a326';
+import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js?v=9f8473e6';
+import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js?v=29713fa8';
+import { canPlantBean } from '../public/js/patches.js?v=3996c344';
+import { TOWER_PART_CHOICES, TOWER_STYLES, composeTower, towerBounds } from '../public/js/home-tower.js?v=6ccb3a4f';
+import { MIN_GROUND_CLEARANCE, cameraTargetY, cameraWorldHeightForGround, yCamOffsetAnchor } from '../public/js/movement.js?v=a314f8a1';
+import { INTERIOR } from '../public/js/home-decor.js?v=95ba0a91';
 
 const root = join(import.meta.dirname, '..', 'public');
 

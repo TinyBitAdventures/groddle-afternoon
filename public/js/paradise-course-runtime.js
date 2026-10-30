@@ -16,9 +16,9 @@
  * vectors. Nothing here reads or copies recording pixels.
  */
 
-import { stepParadiseBody, usesParadiseBody } from './paradise-courses.js?v=g403-1';
-import { SKY_PLUNGE_FILES } from './sky-plunge-art.js';
-import { isLoaded, onLoaded, textureFromUrl } from './textures.js';
+import { stepParadiseBody, usesParadiseBody } from './paradise-courses.js?v=bb3d9051';
+import { SKY_PLUNGE_FILES } from './sky-plunge-art.js?v=47e01e53';
+import { isLoaded, onLoaded, textureFromUrl } from './textures.js?v=01a295a1';
 
 const DECO_ROOT = 'assets/decos/groddle';
 const decoUrl = (name) => `${DECO_ROOT}/${name}.png`;

@@ -18,8 +18,8 @@
  *     doorDrinkLast, doorDrinkPour, doorDrinkHere, doorDrinkAutoplay.
  */
 
-import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=catalog-unified-7';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
+import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=85d4faba';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=01a295a1';
 import {
   CLOSE_AFTER_MS,
   DOOR_DRINK,
@@ -39,7 +39,7 @@ import {
   portalsOn,
   prunePortals,
   useDoorDrink,
-} from '../door-drink.js';
+} from '../door-drink.js?v=15add3b8';
 
 export const DOOR_DRINK_FEATURE_ID = 'door-drink';
 const NARAKA_HUB_ID = '40';

@@ -20,10 +20,10 @@
  *     rubeLast, rubeAutoplay, rubeChance.
  */
 
-import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=catalog-unified-7';
-import { getGameDayKey } from '../game-day.js?v=dametime-4';
-import { hellFeature } from './hell-feature.js?v=hell-16';
-import { landingY, walkSurfaceY } from '../walk-surface.js?v=g478-1';
+import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=85d4faba';
+import { getGameDayKey } from '../game-day.js?v=3095e05b';
+import { hellFeature } from './hell-feature.js?v=bdaefff5';
+import { landingY, walkSurfaceY } from '../walk-surface.js?v=c4aff42f';
 import {
   RUBE_CLASS,
   RUBE_FADE_MS,
@@ -43,9 +43,9 @@ import {
   rubeSpawnChance,
   rubeTalk,
   streetCanHostRube,
-} from '../rube.js';
-import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js';
-import { itemZ } from '../item-bands.js?v=g429-1';
+} from '../rube.js?v=0b98cc11';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=01a295a1';
+import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const RUBE_FEATURE_ID = 'rube';
 const SONG = 'assets/audio/ambient/The_Rube_Song_1290596637.mp3';

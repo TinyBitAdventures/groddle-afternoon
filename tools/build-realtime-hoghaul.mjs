@@ -25,11 +25,11 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
-import { loadStreetDataFromFs } from '../public/js/street-loader.js';
-import { isStandable, platformYAt, platformsScreen, resolveGround, streetWidth, worldToScreen } from '../public/js/street-model.js';
-import { planStreetPlacements } from '../public/js/street-ecology.js';
-import { HOG_HAUL_GOAL, HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js';
-import { HOG_HAUL_TICKET } from '../public/js/races.js';
+import { loadStreetDataFromFs } from '../public/js/street-loader.js?v=20c7b021';
+import { isStandable, platformYAt, platformsScreen, resolveGround, streetWidth, worldToScreen } from '../public/js/street-model.js?v=606bae73';
+import { planStreetPlacements } from '../public/js/street-ecology.js?v=dbcefe18';
+import { HOG_HAUL_GOAL, HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js?v=50d2e072';
+import { HOG_HAUL_TICKET } from '../public/js/races.js?v=df0576ad';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

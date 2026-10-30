@@ -11,7 +11,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
-import { normalizePuzzleData, stepTriggers } from '../public/js/puzzle-triggers.js';
+import { normalizePuzzleData, stepTriggers } from '../public/js/puzzle-triggers.js?v=3ee2f2c8';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
@@ -72,8 +72,8 @@ describe('Light Beam in Shim Shiri (puzzles-feature)', () => {
     globalThis.PIXI = { Sprite, Container: Display, Graphics: Display, Texture, ImageSource, Rectangle: class {} };
     globalThis.Image = class { set src(v) { this._s = v; } decode() { return Promise.resolve(); } };
     globalThis.fetch = async () => ({ json: async () => raw });
-    ({ puzzlesFeature: feature } = await import('../public/js/features/puzzles-feature.js?v=g452-1'));
-    ({ locationEventsApi: api } = await import('../public/js/features/location-events-feature.js?v=g452-1'));
+    ({ puzzlesFeature: feature } = await import('../public/js/features/puzzles-feature.js?v=82f606a3'));
+    ({ locationEventsApi: api } = await import('../public/js/features/location-events-feature.js?v=518e223a'));
   });
 
   it('registers six Light Beam targets with Beam Up, and Beam Up fires the beam event', async () => {

@@ -41,15 +41,15 @@
  * radianceStatus, meditationTogether, meditatorsHere.
  */
 
-import { addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-7';
-import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from '../game-day.js?v=dametime-4';
+import { addItem, countItem, ensureItem } from '../inventory.js?v=85d4faba';
+import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from '../game-day.js?v=3095e05b';
 import {
   STATION_COUNTER,
   STATION_QUEST,
   normalizeStationState,
   recordStationSession,
   stationMessage,
-} from '../meditation-station.js?v=station-1';
+} from '../meditation-station.js?v=75b2cbf1';
 import {
   MEDITATION_TEXT,
   ORB_CLASS,
@@ -65,16 +65,16 @@ import {
   rollMeditationDay,
   startLevitation,
   startMeditation,
-} from '../meditation.js?v=g403-1';
-import { energyMax, metabolicGain, moodMax, loseEnergy, loseMood } from '../metabolics.js';
-import { levitationCards } from '../imagination-effects.js?v=g403-1';
-import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js?v=g403-1';
-import { sourceFromUrl } from '../textures.js';
-import { denseSprite } from '../sprite-dense.js?v=g430-1';
-import { rainbowSound, showRainbow } from '../overlays.js?v=g463-2';
-import { moodScaledXp } from '../mood-xp.js';
-import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
-import { getSkillPackageOverride } from '../skill-packages.js';
+} from '../meditation.js?v=892c78da';
+import { energyMax, metabolicGain, moodMax, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
+import { levitationCards } from '../imagination-effects.js?v=70169933';
+import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js?v=b45cd9c3';
+import { sourceFromUrl } from '../textures.js?v=01a295a1';
+import { denseSprite } from '../sprite-dense.js?v=8e0109eb';
+import { rainbowSound, showRainbow } from '../overlays.js?v=6d2b7a11';
+import { moodScaledXp } from '../mood-xp.js?v=958e7680';
+import { createMinnAccount } from '../minn-account.js?v=81339760';
+import { getSkillPackageOverride } from '../skill-packages.js?v=bfb87281';
 import {
   RADIANCE_TEXT,
   RADIATE_COOLDOWN_SECONDS,
@@ -91,7 +91,7 @@ import {
   radiationRank,
   radiatorEnd,
   radiatorLine,
-} from '../radiance-mp.js?v=radiance-5';
+} from '../radiance-mp.js?v=e3590470';
 
 export const MEDITATION_FEATURE_ID = 'meditation';
 /** metabolics_get_max_energy: the energy tank (100 plus Energy Tank cards). */

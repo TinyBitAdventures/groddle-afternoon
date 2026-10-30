@@ -56,7 +56,7 @@
  * grant(class, n) to gain something the way a reward does.
  */
 
-import { ITEM_CATALOG, addItem, isToolItem } from '../inventory.js?v=catalog-unified-7';
+import { ITEM_CATALOG, addItem, isToolItem } from '../inventory.js?v=85d4faba';
 import {
   BAG_DEFS,
   PACK_CAPACITY,
@@ -70,8 +70,8 @@ import {
   normalizePrefs,
   packIntoBags,
   roomFor,
-} from '../pack-slots.js?v=g152-2';
-import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
+} from '../pack-slots.js?v=c31995f9';
+import { createMinnAccount } from '../minn-account.js?v=81339760';
 
 export const BAGS_FEATURE_ID = 'bags';
 export const BAG_DEMO_KIT = Object.freeze([

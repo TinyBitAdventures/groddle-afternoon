@@ -12,7 +12,7 @@
  * Bands in the entity layer: background 10-19, normal 20-34, foreground 35-48, other players 49.x,
  * your avatar 50, foremost 60 (only the Crusher). Decos and door/signpost dressing stay under 10.
  */
-import { BACKGROUND_CLASSES, FOREGROUND_CLASSES, FOREMOST_CLASSES, NORMAL_CLASSES } from './item-bands-data.js?v=g429-1';
+import { BACKGROUND_CLASSES, FOREGROUND_CLASSES, FOREMOST_CLASSES, NORMAL_CLASSES } from './item-bands-data.js?v=0ac4551c';
 
 export const BAND_Z = Object.freeze({ background: 10, normal: 20, foreground: 35, foremost: 60 });
 /** Exclusive top of each band: an offset never reaches the next band. */

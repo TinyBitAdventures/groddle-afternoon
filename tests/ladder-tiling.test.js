@@ -12,8 +12,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { LADDER_TILE_Z, ladderTilePieces } from '../public/js/ladder-tiling.js?v=g415-1';
-import { extractLocationNavigation } from '../public/js/location-navigation.js?v=g478-1';
+import { LADDER_TILE_Z, ladderTilePieces } from '../public/js/ladder-tiling.js?v=4f9e07fa';
+import { extractLocationNavigation } from '../public/js/location-navigation.js?v=38c12adf';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (rel) => readFileSync(join(here, '..', rel), 'utf8');
@@ -112,7 +112,7 @@ function fakePixi() {
 }
 
 before(async () => {
-  ({ DECO_TWINS } = await import('../public/js/street-render.js?v=g478-1'));
+  ({ DECO_TWINS } = await import('../public/js/street-render.js?v=4df4a30c'));
 });
 
 describe('ladder tiling rule (SurfaceView.tile, vertical)', () => {
@@ -232,8 +232,8 @@ describe('buildStreetView draws the tiles', () => {
         setTimeout(() => this.onload?.(), 0);
       }
     };
-    const { buildStreetView } = await import('../public/js/street-render.js?v=g478-1');
-    const { worldToScreen } = await import('../public/js/street-model.js?v=g478-1');
+    const { buildStreetView } = await import('../public/js/street-render.js?v=4df4a30c');
+    const { worldToScreen } = await import('../public/js/street-model.js?v=606bae73');
     const s = { ...street('GM4109NI2R640'), gradient: null, signposts: [] };
     const root = buildStreetView(s, globalThis.PIXI, { available: new Set(['ladder_tile_center_01_spine']) });
     assert.equal(root.ladderTiles, 5);

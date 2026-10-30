@@ -27,13 +27,13 @@
  * snapsCount, snapsLast. window.groddleSnaps in multiplayer.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
-import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=catalog-unified-7';
-import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=g478-1';
+import { createMinnAccount } from '../minn-account.js?v=81339760';
+import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=85d4faba';
+import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=20c7b021';
 import {
   CAMERA_CLASS, CAPTION_MAX, FORGET_RECHARGE_SEC, RECHARGE_BUFF, SNAP_COPY as T, SNAP_MAX_BYTES, SNAP_QUALITY, SNAP_WIDTHS, TRAVEL,
   base64Bytes, canSnap, cleanCaption, isSnapUrl, jpegBase64, snapAuthor, snapPlace, snapStreet, takePictureState, withCamera,
-} from '../snaps.js?v=g332-snaps-1';
+} from '../snaps.js?v=7df81689';
 
 export const SNAPS_FEATURE_ID = 'snaps';
 const VERB = 'take_picture';

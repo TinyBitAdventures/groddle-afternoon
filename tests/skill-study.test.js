@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import {
   loadContentCatalogsFromDir,
   resetContentCatalogs,
-} from '../public/js/content-catalogs.js?v=g403-1';
+} from '../public/js/content-catalogs.js?v=10b118dd';
 import {
   SKILL_POINTS_PER_SECOND,
   accelerateActiveStudy,
@@ -19,8 +19,8 @@ import {
   rescaleStudiesForLearningModifier,
   startSkillStudy,
   tickSkillStudy,
-} from '../public/js/skills.js?v=study-6';
-import { brainCapacityRescale } from '../public/js/imagination-effects.js?v=g403-1';
+} from '../public/js/skills.js?v=4542bdf9';
+import { brainCapacityRescale } from '../public/js/imagination-effects.js?v=70169933';
 
 const root = join(import.meta.dirname, '..', 'public');
 

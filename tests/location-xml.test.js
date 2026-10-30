@@ -11,8 +11,8 @@ import {
   convertLocationXml,
   isConvertibleStreet,
   collectSprites,
-} from '../public/js/location-xml.js?v=g478-1';
-import { assertStreetGeometry } from '../public/js/street-model.js?v=g478-1';
+} from '../public/js/location-xml.js?v=e2351f22';
+import { assertStreetGeometry } from '../public/js/street-model.js?v=606bae73';
 import {
   loadStreetDataFromFs,
   loadStreetIndexObject,
@@ -20,7 +20,7 @@ import {
   clearStreetIndex,
   availableStreetTsids,
   STREET_INDEX,
-} from '../public/js/street-loader.js?v=g478-1';
+} from '../public/js/street-loader.js?v=20c7b021';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');

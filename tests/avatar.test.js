@@ -7,8 +7,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { facingScaleX, facingFromVelocity } from '../public/js/avatar.js';
-import { VECTOR_AVATAR } from '../public/js/avatar-vector-sheets.js';
+import { facingScaleX, facingFromVelocity } from '../public/js/avatar.js?v=c4da73ea';
+import { VECTOR_AVATAR } from '../public/js/avatar-vector-sheets.js?v=ad801376';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');

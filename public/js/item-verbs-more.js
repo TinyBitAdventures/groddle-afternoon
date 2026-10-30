@@ -17,8 +17,8 @@
  * left out here; a solo street has nobody else in it.
  */
 
-import { grantMoodXp } from './mood-xp.js';
-import { gainMetabolic, loseEnergy, loseMood } from './metabolics.js';
+import { grantMoodXp } from './mood-xp.js?v=958e7680';
+import { gainMetabolic, loseEnergy, loseMood } from './metabolics.js?v=8504134e';
 
 /* ------------------------------------------------------------------ */
 /* Names and the activity line                                          */

@@ -11,8 +11,8 @@ import {
   parseDroppedItemState,
   pickupDroppedStack,
   serializeDroppedItemState,
-} from '../public/js/world-items.js?v=world-items-4';
-import { createInventory } from '../public/js/inventory.js?v=catalog-unified-7';
+} from '../public/js/world-items.js?v=7df5cf4a';
+import { createInventory } from '../public/js/inventory.js?v=85d4faba';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
 
@@ -137,6 +137,6 @@ describe('dropped item client integration', () => {
     assert.match(content, /classId === 'dropped_item'/);
     assert.match(css, /pack-drop-quantity/);
     assert.match(game, /world-item-stack/);
-    assert.match(html, /game\.js\?v=official-ecology-1/);
+    assert.match(html, /game\.js\?v=[0-9a-f]{8}/);
   });
 });

@@ -5,8 +5,8 @@
  * Tools whose GSJS points_capacity is 0 remain intentionally wear-free.
  */
 
-import { repairGivesMood } from './imagination-effects.js?v=g403-1';
-import { loseEnergy, metabolicGain, moodMax } from './metabolics.js';
+import { repairGivesMood } from './imagination-effects.js?v=70169933';
+import { loseEnergy, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
 
 export const TOOL_CONDITION_CATALOG = Object.freeze({
   butterfly_lotion: {

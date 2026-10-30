@@ -20,12 +20,12 @@ import {
   quoinClassType,
   resetStreetQuoinsForNewDay,
   streetQuoinClass,
-} from '../public/js/quoins.js';
-import { setMetabolicGainGate } from '../public/js/metabolics.js';
-import { applyDropResult, createDropResult } from '../public/js/drop-tables.js';
-import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=g403-1';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
-import { applyVerbReward } from '../public/js/verb-rewards.js';
+} from '../public/js/quoins.js?v=d4f4772b';
+import { setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
+import { applyDropResult, createDropResult } from '../public/js/drop-tables.js?v=0f922478';
+import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=c7727c43';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
+import { applyVerbReward } from '../public/js/verb-rewards.js?v=d3ce41d5';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

@@ -32,13 +32,13 @@ import {
   SEASONAL_STOCK,
   SEASONS,
   SEASON_IDS,
-} from '../../public/js/seasons.js';
-import { SEASON_DATA } from '../../public/js/seasons-data.js';
-import { GAME_DAY_MS, GAME_EPOCH_MS, GAME_YEAR_MS, MONTH_LENGTHS, MONTH_NAMES } from '../../public/js/game-day.js';
-import { SEASONAL_SEEDS } from '../../public/js/garden.js';
-import { SEASONAL_RECIPES } from '../../public/js/making.js';
-import { SKILL_PACKAGES } from '../../public/js/skill-packages-data.js';
-import { TRANT_META } from '../../public/js/trants.js';
+} from '../../public/js/seasons.js?v=fcb12a83';
+import { SEASON_DATA } from '../../public/js/seasons-data.js?v=249cedba';
+import { GAME_DAY_MS, GAME_EPOCH_MS, GAME_YEAR_MS, MONTH_LENGTHS, MONTH_NAMES } from '../../public/js/game-day.js?v=3095e05b';
+import { SEASONAL_SEEDS } from '../../public/js/garden.js?v=9a8f8f72';
+import { SEASONAL_RECIPES } from '../../public/js/making.js?v=9e538296';
+import { SKILL_PACKAGES } from '../../public/js/skill-packages-data.js?v=cb4e9ab3';
+import { TRANT_META } from '../../public/js/trants.js?v=9c2e8c0f';
 import { playHref } from './play-links.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');

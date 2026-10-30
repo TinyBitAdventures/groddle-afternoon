@@ -54,9 +54,9 @@
  * engine.query('spiritLonelyHere').
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g464-2';
-import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=g478-1';
-import { STREET_SPIRIT_SPEECH_OFFSET } from '../speech-placement.js?v=g440-1';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=0e86cc0f';
+import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=c4aff42f';
+import { STREET_SPIRIT_SPEECH_OFFSET } from '../speech-placement.js?v=7e03b1b9';
 import {
   STREET_SPIRIT_ART,
   STREET_SPIRIT_VARIANTS,
@@ -68,7 +68,7 @@ import {
   spiritSheets,
   zuttoNear,
   zuttoNextClip,
-} from '../street-spirits.js';
+} from '../street-spirits.js?v=f9e88445';
 import {
   TALK_CLASSES,
   TALK_ORDER,
@@ -81,8 +81,8 @@ import {
   offerNext,
   offeredFor,
   talkBeats,
-} from '../street-spirit-talks.js?v=g202-1';
-import { CONVERSATIONS } from '../conversations-data.js?v=g202-1';
+} from '../street-spirit-talks.js?v=5321850f';
+import { CONVERSATIONS } from '../conversations-data.js?v=f11b7e02';
 import {
   adoptLegacyTalks,
   afterRecordRestore,
@@ -92,9 +92,9 @@ import {
   markHeard,
   resumeTarget,
   setCurrentState,
-} from '../conversations.js?v=g202-1';
-import { questStatus } from '../quest-offers.js?v=g403-1';
-import { questDoneAt } from '../quests.js?v=item-buffs-7';
+} from '../conversations.js?v=7cbdfea4';
+import { questStatus } from '../quest-offers.js?v=6b6cbf22';
+import { questDoneAt } from '../quests.js?v=282e1621';
 
 export const STREET_SPIRITS_FEATURE_ID = 'street-spirits';
 const TALK_MS = 5000; // the remake's talk bubble; the source talks until the conversation ends

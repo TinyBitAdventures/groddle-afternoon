@@ -9,8 +9,8 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=g403-1';
-import { createQuestState } from '../public/js/quests.js';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
+import { createQuestState } from '../public/js/quests.js?v=282e1621';
 import {
   acceptOffer,
   routeQuestEvent,
@@ -28,24 +28,24 @@ import {
   PURPLE_JOURNEY_STREETS,
   COLD_COMFORT,
   COLD_COMFORT_LEAVE_TEXT,
-} from '../public/js/quest-offers.js?v=g403-1';
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=g414-1';
-import { createPlot, performPlotVerb } from '../public/js/patches.js?v=g414-1';
-import { createToolConditionState } from '../public/js/tools.js?v=woodcutting-test-8';
-import { performEmotionalBearAction, createEmotionalBearState } from '../public/js/emotional-bear.js?v=g390-1';
+} from '../public/js/quest-offers.js?v=6b6cbf22';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=3d618d6a';
+import { createPlot, performPlotVerb } from '../public/js/patches.js?v=3996c344';
+import { createToolConditionState } from '../public/js/tools.js?v=9a2e7ef4';
+import { performEmotionalBearAction, createEmotionalBearState } from '../public/js/emotional-bear.js?v=1dd276f7';
 import {
   questVerbsFeature,
   slatherVerb,
   SLATHER_VERB,
   SLATHER_COPY,
-} from '../public/js/features/quest-verbs-feature.js?v=g390-1';
-import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=g425-1';
+} from '../public/js/features/quest-verbs-feature.js?v=b6b7c200';
+import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=243877f6';
 import {
   giveCubimalVerb,
   GIVE_CUBIMAL_VERB,
   CUBIMAL_GIFT_RESPONSES,
-} from '../public/js/features/quest-verbs-feature.js?v=g390-1';
-import { createFeatureHost } from '../public/js/feature-host.js?v=g390-1';
+} from '../public/js/features/quest-verbs-feature.js?v=b6b7c200';
+import { createFeatureHost } from '../public/js/feature-host.js?v=e4f648b1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUB = join(here, '../public');

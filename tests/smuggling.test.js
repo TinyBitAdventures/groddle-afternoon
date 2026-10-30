@@ -37,7 +37,7 @@ import {
   sourceKey,
   spawnOffset,
   sparedBySignpost,
-} from '../public/js/smuggling.js';
+} from '../public/js/smuggling.js?v=8eccf20d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');

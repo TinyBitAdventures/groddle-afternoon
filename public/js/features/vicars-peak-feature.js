@@ -15,7 +15,7 @@
  *   (through Thornfad Layers' locked door).
  */
 
-import { TIERS, VICARS_PEAK_BOUNDS, isVicarsPeakTsid, vicarsPeakEcology } from '../vicars-peak.js?v=g93-1';
+import { TIERS, VICARS_PEAK_BOUNDS, isVicarsPeakTsid, vicarsPeakEcology } from '../vicars-peak.js?v=465e7965';
 
 export const VICARS_PEAK_FEATURE_ID = 'vicars-peak';
 const DATA_MS = 250;

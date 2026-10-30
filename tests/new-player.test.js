@@ -13,15 +13,15 @@ import {
   isNewMultiplayerPlayer,
   newPlayerInventory,
   newPlayerStats,
-} from '../public/js/new-player.js?v=mp5-1';
-import { createBrowserSaveStore, createMultiplayerSaveStore, createSaveStore } from '../public/js/save-store.js?v=mp2-2';
-import { createInventory } from '../public/js/inventory.js?v=catalog-unified-7';
-import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=g424-1';
-import { createQuoinState } from '../public/js/quoins.js';
-import { createShrineState } from '../public/js/shrines.js?v=spinning-wheel-test-9';
-import { PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=g424-1';
-import { imaginationFeature, STARTER_UPGRADES } from '../public/js/features/imagination-feature.js?v=g472-5';
-import { RESOURCE_FEATURE_ID, resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=g478-1';
+} from '../public/js/new-player.js?v=553c5481';
+import { createBrowserSaveStore, createMultiplayerSaveStore, createSaveStore } from '../public/js/save-store.js?v=b74a8113';
+import { createInventory } from '../public/js/inventory.js?v=85d4faba';
+import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=b4449504';
+import { createQuoinState } from '../public/js/quoins.js?v=d4f4772b';
+import { createShrineState } from '../public/js/shrines.js?v=01b185bc';
+import { PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=deb5fb26';
+import { imaginationFeature, STARTER_UPGRADES } from '../public/js/features/imagination-feature.js?v=15c32e0c';
+import { RESOURCE_FEATURE_ID, resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=acce0123';
 
 const here = import.meta.dirname;
 const pub = join(here, '..', 'public');

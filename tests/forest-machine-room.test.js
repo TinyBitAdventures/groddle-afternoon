@@ -10,10 +10,10 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry } from '../public/js/street-model.js?v=g478-1';
-import { arrivalInTarget } from '../public/js/location-navigation.js?v=g478-1';
-import { populationForStreet } from '../public/js/street-ecology.js';
-import { MACHINE_ROOMS, availableHubStreets, countsTowardHub, isMachineRoom, streetVisitCounters } from '../public/js/exploration.js';
+import { assertStreetGeometry } from '../public/js/street-model.js?v=606bae73';
+import { arrivalInTarget } from '../public/js/location-navigation.js?v=38c12adf';
+import { populationForStreet } from '../public/js/street-ecology.js?v=dbcefe18';
+import { MACHINE_ROOMS, availableHubStreets, countsTowardHub, isMachineRoom, streetVisitCounters } from '../public/js/exploration.js?v=19c6758f';
 import {
   CLEARING_DOOR,
   CLEARING_SOURCE_TSID,
@@ -27,9 +27,9 @@ import {
   forestMachineRoomEcology,
   forestMachineRoomStreet,
   isForestMachineRoomTsid,
-} from '../public/js/forest-machine-room.js';
-import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=g478-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-369';
+} from '../public/js/forest-machine-room.js?v=5f7e4589';
+import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=0ceaadff';
+import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

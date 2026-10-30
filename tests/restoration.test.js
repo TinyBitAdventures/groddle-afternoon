@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { CHECKLIST, GROUPS, STATUS } from '../tools/restoration/checklist.mjs';
 import { SHOTS } from '../tools/restoration/shots.mjs';
 import { buildRestorationData, comparable, historyLog } from '../tools/build-restoration.mjs';
-import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=g482-2';
+import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
 import { ROOM_NOTES } from '../tools/restoration/rooms.mjs';
 import { DESIGNER_LEVELS, TEXT_LEVELS } from '../tools/restoration/designer-levels.mjs';
 

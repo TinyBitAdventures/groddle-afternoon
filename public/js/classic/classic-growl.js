@@ -7,7 +7,7 @@
  * this mirrors each card as it comes, in order, once. The line is its own live region, since the
  * hidden stack no longer speaks.
  */
-import { uiState, onUiModeChange } from './ui-mode.js?v=g476-1';
+import { uiState, onUiModeChange } from './ui-mode.js?v=587c014a';
 
 export const GROWL_IN_MS = 200;
 export const GROWL_HOLD_MS = 4000;

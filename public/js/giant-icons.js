@@ -39,9 +39,9 @@
  * hooks, so icons are placed on streets only.
  */
 
-import { GIANT_ICON_DATA } from './giant-icons-data.js';
+import { GIANT_ICON_DATA } from './giant-icons-data.js?v=5026b09c';
 // The Icon conversations' one copy, with every other teller's (G214); the key every importer uses.
-import { TELLERS } from './conversations-data.js?v=g202-1';
+import { TELLERS } from './conversations-data.js?v=f11b7e02';
 
 export { GIANT_ICON_DATA };
 

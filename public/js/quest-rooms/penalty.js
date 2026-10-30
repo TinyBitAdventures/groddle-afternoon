@@ -30,10 +30,10 @@
  * groddle1.swf decos; their placement is read off the Snap.
  */
 
-import { createPlot, performPlotVerb, plotArtPath, plotVerbs, soilResponse } from '../patches.js?v=g414-1';
-import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
-import { onLoaded, textureFromUrl } from '../textures.js';
-import { ensureItem } from '../inventory.js?v=catalog-unified-7';
+import { createPlot, performPlotVerb, plotArtPath, plotVerbs, soilResponse } from '../patches.js?v=3996c344';
+import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
+import { onLoaded, textureFromUrl } from '../textures.js?v=01a295a1';
+import { ensureItem } from '../inventory.js?v=85d4faba';
 
 export const PART_1 = 'smuggle_the_smuggler_part1';
 export const PART_2 = 'smuggle_the_smuggler_part2';

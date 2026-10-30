@@ -14,16 +14,16 @@
  * many are drawn), swoonerflyAt (x,y of the first).
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g464-2';
-import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=0e86cc0f';
+import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=670c3a7f';
 import {
   SWOONERFLY_CLASS,
   SWOONERFLY_PLACEMENT_KEY,
   SWOONERFLY_SHEET,
   swoonerflyPlacementGroups,
   swoonerfliesFor,
-} from '../swoonerflies.js?v=g369-1';
-import { itemZ } from '../item-bands.js?v=g429-1';
+} from '../swoonerflies.js?v=d23403b6';
+import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const SWOONERFLIES_FEATURE_ID = 'swoonerflies';
 

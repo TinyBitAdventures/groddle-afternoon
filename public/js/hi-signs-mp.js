@@ -20,7 +20,7 @@
  * engine.mode === 'multiplayer' and the realtime client first.
  */
 
-import { HI_VARIANTS, HI_VARIANT_NAMES, isHiVariant } from './hi-signs.js?v=hi-signs-4';
+import { HI_VARIANTS, HI_VARIANT_NAMES, isHiVariant } from './hi-signs.js?v=92c780ad';
 
 /** HiLeaderboard.as poll(): every 60 s while the panel is open. */
 export const BOARD_POLL_MS = 60_000;

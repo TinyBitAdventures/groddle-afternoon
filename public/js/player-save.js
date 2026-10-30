@@ -1,17 +1,17 @@
 /** Persistent player systems + per-street world snapshot. */
-import { normalizeShrineState } from './shrines.js?v=spinning-wheel-test-9';
-import { normalizeQuoinState } from './quoins.js?v=g424-1';
-import { normalizeToolConditionState } from './tools.js?v=woodcutting-test-8';
-import { normalizeSkillState } from './skills.js?v=study-6';
-import { normalizeFoodState } from './food.js?v=food-memory-8';
-import { createGhostQuestState } from './ghost-quest.js?v=phantom-4';
-import { normalizeParadiseState } from './paradise-flight.js?v=g424-1';
-import { normalizeFeatSnapshot } from './feats.js?v=incantations-2';
-import { normalizeEmotionalBearState } from './emotional-bear.js?v=g390-1';
-import { normalizeHomeState } from './homes.js?v=g380-1';
-import { normalizeMailboxState } from './mailbox.js?v=homes-mail-4';
-import { normalizeFeatureSlices } from './feature-host.js?v=g390-1';
-import { normalizeQuestOfferState } from './quest-offers.js?v=g403-1';
+import { normalizeShrineState } from './shrines.js?v=01b185bc';
+import { normalizeQuoinState } from './quoins.js?v=d4f4772b';
+import { normalizeToolConditionState } from './tools.js?v=9a2e7ef4';
+import { normalizeSkillState } from './skills.js?v=4542bdf9';
+import { normalizeFoodState } from './food.js?v=f6c6d15b';
+import { createGhostQuestState } from './ghost-quest.js?v=43feac5c';
+import { normalizeParadiseState } from './paradise-flight.js?v=deb5fb26';
+import { normalizeFeatSnapshot } from './feats.js?v=77f4e4ef';
+import { normalizeEmotionalBearState } from './emotional-bear.js?v=1dd276f7';
+import { normalizeHomeState } from './homes.js?v=385f9a1a';
+import { normalizeMailboxState } from './mailbox.js?v=05fb4eac';
+import { normalizeFeatureSlices } from './feature-host.js?v=e4f648b1';
+import { normalizeQuestOfferState } from './quest-offers.js?v=6b6cbf22';
 
 export const PLAYER_SAVE_VERSION = 7;
 

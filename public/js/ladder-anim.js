@@ -17,7 +17,7 @@
  * ladder frame, moving or not.
  */
 
-import { avatarAnimState } from './avatar-anims.js';
+import { avatarAnimState } from './avatar-anims.js?v=fb921bf4';
 
 /** 'climb' while moving on the ladder, 'climbPause' at rest. */
 export function ladderAnimState(vy) {

@@ -12,13 +12,13 @@ import { fileURLToPath } from 'node:url';
 import {
   ARTICLE_CONTAINERS, HAT_MASKED_HAIR, SKIN_NODES, SLOT_PARTS, applyCM, colorMatrixFor, drawListBounds, expandRig,
   frameDrawList, hardLightMatrix, isBoot, lookMatrices, mergeIdleArticle, mergeIdleRig, slotAssignments,
-} from '../public/js/avatar-rig.js';
+} from '../public/js/avatar-rig.js?v=b67f0da8';
 import {
   COLOR_FIELDS, articleColors, expandCatalog, lookKey, normalizeVectorFields, randomVectorFields, resolveLook, vectorFieldsFromColors,
-} from '../public/js/avatar-looks.js';
-import { CORE_FRAMES, IDLE_FRAMES, IDLE_SHEETS, SHEET_FRAMES } from '../public/js/avatar-anims.js';
-import { VECTOR_AVATAR, VECTOR_AVATAR_HIRES } from '../public/js/avatar-vector-sheets.js';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=g464-2';
+} from '../public/js/avatar-looks.js?v=64fab53e';
+import { CORE_FRAMES, IDLE_FRAMES, IDLE_SHEETS, SHEET_FRAMES } from '../public/js/avatar-anims.js?v=fb921bf4';
+import { VECTOR_AVATAR, VECTOR_AVATAR_HIRES } from '../public/js/avatar-vector-sheets.js?v=ad801376';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=bf62077e';
 import { compactD } from '../tools/avatar-compositor/shapes.mjs';
 import { customEase, easeAt, layerAt, readSymbol, tweenElement } from '../tools/avatar-compositor/xfl.mjs';
 

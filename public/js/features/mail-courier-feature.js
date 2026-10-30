@@ -58,11 +58,11 @@
  *   mailParcels, mailCourierLast, mailCourierDelivered, mailCourierAutoplay.
  */
 
-import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=catalog-unified-7';
-import { frameTexture, sourceFromUrl } from '../textures.js';
-import { questRoomConverse } from './quest-instances-feature.js?v=g482-2';
-import { hellFeature } from './hell-feature.js?v=hell-16';
-import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=mailnpc-1';
+import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=85d4faba';
+import { frameTexture, sourceFromUrl } from '../textures.js?v=01a295a1';
+import { questRoomConverse } from './quest-instances-feature.js?v=1af188a6';
+import { hellFeature } from './hell-feature.js?v=bdaefff5';
+import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=790f980a';
 import {
   COURIER,
   COURIER_TEXT,
@@ -78,8 +78,8 @@ import {
   pickPose,
   sendCarriedToMailbox,
   sendDueToMailbox,
-} from '../mail-courier.js?v=mailnpc-1';
-import { itemZ } from '../item-bands.js?v=g429-1';
+} from '../mail-courier.js?v=3e5664ee';
+import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const MAIL_COURIER_FEATURE_ID = 'mail-courier';
 const FROG_CLASS = 'npc_yoga_frog';

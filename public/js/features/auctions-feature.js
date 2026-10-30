@@ -36,10 +36,10 @@
  * window.groddleAuctions in multiplayer.
  */
 
-import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { TOOL_CONDITION_CATALOG, getToolCondition, setToolRemaining } from '../tools.js?v=woodcutting-test-8';
-import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
-import { saveStore } from '../save-store.js?v=mp2-2';
+import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=85d4faba';
+import { TOOL_CONDITION_CATALOG, getToolCondition, setToolRemaining } from '../tools.js?v=9a2e7ef4';
+import { createMinnAccount } from '../minn-account.js?v=81339760';
+import { saveStore } from '../save-store.js?v=b74a8113';
 import {
   AUCTION_TEXT as T,
   DEFAULT_RULES,
@@ -61,7 +61,7 @@ import {
   soldText,
   suggestedPrice,
   unitPrice,
-} from '../auctions.js?v=g333-1';
+} from '../auctions.js?v=bb302355';
 
 export const AUCTIONS_FEATURE_ID = 'auctions';
 const TABLE_URL = 'assets/content/trade-items.json';

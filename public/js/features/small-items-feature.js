@@ -23,11 +23,11 @@
  *     smallItemsBallX.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g464-2';
-import { nearestSurfaceY } from '../walk-surface.js?v=g478-1';
-import { openNoteView, openNotePicker } from '../note-view.js?v=g463-1';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=g485-1';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=0e86cc0f';
+import { nearestSurfaceY } from '../walk-surface.js?v=c4aff42f';
+import { openNoteView, openNotePicker } from '../note-view.js?v=21c55475';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=7cbe13d9';
 import {
   BALL,
   BALL_HIT,
@@ -49,8 +49,8 @@ import {
   overthinkPrompt,
   planBallHit,
   reconcileFortunes,
-} from '../small-items.js?v=g155-1';
-import { itemZ } from '../item-bands.js?v=g429-1';
+} from '../small-items.js?v=78d0056a';
+import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const SMALL_ITEMS_FEATURE_ID = 'small-items';
 const BALL_GROUP = 'smallItemsBall';

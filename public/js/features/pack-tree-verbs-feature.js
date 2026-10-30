@@ -21,8 +21,8 @@
  *     the Hatchet shows, `id:state`), packTreeLast.
  */
 
-import { countItem } from '../inventory.js?v=catalog-unified-7';
-import { getToolCondition } from '../tools.js?v=woodcutting-test-8';
+import { countItem } from '../inventory.js?v=85d4faba';
+import { getToolCondition } from '../tools.js?v=9a2e7ef4';
 import {
   PACK_TREE_REACH,
   deadTreeSide,
@@ -35,7 +35,7 @@ import {
   planPackTreeVerb,
   relabelWeeHarvest,
   woodTreeSide,
-} from '../pack-tree-verbs.js?v=g165-1';
+} from '../pack-tree-verbs.js?v=bfcb87be';
 
 export const PACK_TREE_VERBS_FEATURE_ID = 'pack-tree-verbs';
 

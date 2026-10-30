@@ -30,8 +30,8 @@
  * is gloomy and teal once it blooms (the Snaps show pots only under lit stalks).
  */
 
-import { OPERATION_GROW_FILES } from './operation-grow-art.js?v=g109-1';
-import { textureFromUrl } from './textures.js';
+import { OPERATION_GROW_FILES } from './operation-grow-art.js?v=3cbe7663';
+import { textureFromUrl } from './textures.js?v=01a295a1';
 
 export const GROW_ART_DIR = 'assets/sprites/quest-rooms/operation_grow/';
 

@@ -16,10 +16,10 @@ import {
   singReward,
   singLifeFor,
   wisdomPool,
-} from '../public/js/animal-flattery.js';
-import { setMetabolicGainGate } from '../public/js/metabolics.js';
-import { getVerbsFor, runVerb } from '../public/content.js?v=g478-1';
-import { getGameDayKey } from '../public/js/game-day.js';
+} from '../public/js/animal-flattery.js?v=63001f58';
+import { setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
+import { getVerbsFor, runVerb } from '../public/content.js?v=e2372a6b';
+import { getGameDayKey } from '../public/js/game-day.js?v=3095e05b';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const gs = (p) => readFileSync(join(here, '../../glitch-GameServerJS', p), 'utf8');

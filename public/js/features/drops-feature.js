@@ -34,8 +34,8 @@
  *     dropTable, dropLast, dropRolls, dropHits, dropAutoplay.
  */
 
-import { addItem, ensureItem, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-7';
-import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
+import { addItem, ensureItem, ITEM_CATALOG } from '../inventory.js?v=85d4faba';
+import { emblemCostFor } from '../shrines.js?v=01b185bc';
 import {
   DROP_ITEMS,
   DROP_TABLES,
@@ -46,7 +46,7 @@ import {
   rollDropTable,
   rollPackageDrop,
   tableItemOdds,
-} from '../drop-tables.js';
+} from '../drop-tables.js?v=0f922478';
 
 export const DROPS_FEATURE_ID = 'drops';
 const BATCH_GAP_MS = 4000;

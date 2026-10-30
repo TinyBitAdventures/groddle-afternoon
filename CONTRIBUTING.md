@@ -42,6 +42,7 @@ A test that needs a checkout you do not have skips and says what to clone.
 - **Rules cite their source**: the GameServerJS file and line a number or a line of dialogue came from, in a code comment.
 - **Words**: item and game text come from Tiny Speck's files; everything else is in our own words, plain, with no em-dashes.
 - **Generated files** say so in their header. Change the builder in `tools/` (or the root `build-*.mjs`) and run it, rather than editing the output.
+- **Cache keys come from content.** Every `?v=` on a module, script or style sheet URL (imports, `game.js`, `style.css`) is written by `node tools/module-keys/build.mjs`: run it after changing any of them (after `tools/data-versions/build.mjs`, before `tools/play-online/build.mjs`) and never edit a `?v=` by hand. `tests/module-keys.test.js` fails until the keys are current.
 
 ## Licences
 

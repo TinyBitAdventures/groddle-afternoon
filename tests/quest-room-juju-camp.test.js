@@ -8,8 +8,8 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=g458-1';
-import * as mod from '../public/js/quest-rooms/juju-camp.js?v=g463-1';
+import * as kit from '../public/js/quest-rooms/kit.js?v=fd1eb817';
+import * as mod from '../public/js/quest-rooms/juju-camp.js?v=3f537376';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(ROOT, 'assets', 'streets', `${tsid}.json`), 'utf8'));
@@ -200,7 +200,7 @@ describe('Juju Hideout room', () => {
 
 describe('Juju Hideout look (G70, players Snaps)', () => {
   it('is dusk, with two teepees, the papers, the campfire, the chair and a dirt mound', async () => {
-    const { JUJU_CAMP_FILES } = await import('../public/js/juju-camp-art.js');
+    const { JUJU_CAMP_FILES } = await import('../public/js/juju-camp-art.js?v=4aa81c05');
     const { createHash } = await import('node:crypto');
     const plan = JSON.parse(readFileSync(join(ROOT, '..', 'tools/room-art/juju_camp.json'), 'utf8'));
     // A mauve to pink-brown sky, no daytime blue anywhere in it.

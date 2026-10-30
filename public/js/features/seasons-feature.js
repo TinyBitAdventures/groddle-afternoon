@@ -31,20 +31,20 @@
  *     pack), seasonTrophy, seasonPlaced.
  */
 
-import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-7';
-import { dametimeParts, getGameDayKey } from '../game-day.js?v=dametime-4';
-import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=g403-1';
-import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=g403-1';
-import { setSeasonalRecipeCheck } from '../making.js?v=g403-1';
-import { getToolCondition } from '../tools.js?v=woodcutting-test-8';
-import { landingY, nearestSurfaceY } from '../walk-surface.js?v=g478-1';
-import { isBatterflyHabitat } from '../animal-husbandry.js?v=g478-1';
-import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
-import { rollDropTable } from '../drop-tables.js';
-import { openNoteView, noteViewOpen } from '../note-view.js?v=g463-1';
-import { payDrop } from './drops-feature.js?v=drops-8';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=g478-1';
-import { SEASON_DATA } from '../seasons-data.js';
+import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=85d4faba';
+import { dametimeParts, getGameDayKey } from '../game-day.js?v=3095e05b';
+import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=9a8f8f72';
+import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=9a8f8f72';
+import { setSeasonalRecipeCheck } from '../making.js?v=9e538296';
+import { getToolCondition } from '../tools.js?v=9a2e7ef4';
+import { landingY, nearestSurfaceY } from '../walk-surface.js?v=c4aff42f';
+import { isBatterflyHabitat } from '../animal-husbandry.js?v=16364589';
+import { emblemCostFor } from '../shrines.js?v=01b185bc';
+import { rollDropTable } from '../drop-tables.js?v=0f922478';
+import { openNoteView, noteViewOpen } from '../note-view.js?v=21c55475';
+import { payDrop } from './drops-feature.js?v=92989dc5';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=acce0123';
+import { SEASON_DATA } from '../seasons-data.js?v=249cedba';
 import {
   CANDY_CLASSES,
   CANDY_DAILY_MAX,
@@ -97,10 +97,10 @@ import {
   teachPhrase,
   yetiMailDue,
   yetiQuote,
-} from '../seasons.js?v=g433-1';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
-import { playOverlay } from '../overlays.js?v=g463-2';
-import { itemZ } from '../item-bands.js?v=g429-1';
+} from '../seasons.js?v=fcb12a83';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=01a295a1';
+import { playOverlay } from '../overlays.js?v=6d2b7a11';
+import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const SEASONS_FEATURE_ID = 'seasons';
 const LANTERN_GROUP = 'seasons:lantern';

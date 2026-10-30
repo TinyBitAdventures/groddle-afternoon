@@ -15,13 +15,13 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=nbhome-10';
-import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=g477-2';
-import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=g463-1';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=g477-2';
-import { FEATURES } from '../public/js/features/index.js?v=registry-369';
-import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=mp2-1';
-import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=mp2-2';
+import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=81339760';
+import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=8f6e0097';
+import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=b40dbb9f';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=a5712ed5';
+import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
+import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=1ecf2899';
+import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=b74a8113';
 import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

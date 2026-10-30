@@ -54,8 +54,8 @@
  * links Corridor Five's door.
  */
 
-import { towerRoomIndexEntry } from './tower-rooms.js?v=tower-rooms-1';
-import { anyTowerRoomStreet, barriersFor, collector, flat } from './tower-challenge-rooms.js?v=challenge-rooms-3';
+import { towerRoomIndexEntry } from './tower-rooms.js?v=7b2aa06a';
+import { anyTowerRoomStreet, barriersFor, collector, flat } from './tower-challenge-rooms.js?v=9e39f503';
 
 export const ROOM_23_TSID = 'GCR8MORFJI12IR4';
 export const ROOM_23_SOURCE_TSID = 'LCR8MORFJI12IR4';

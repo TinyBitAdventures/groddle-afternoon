@@ -11,10 +11,10 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry } from '../public/js/street-model.js?v=g478-1';
-import { OWNED_STREETS, streetOwner } from '../public/js/location-events.js?v=g403-1';
-import { JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js';
-import { WINTER_HAVEN_STREET_ID, WINTER_WALK_STREET_ID } from '../public/js/winter-walk.js?v=g482-2';
+import { assertStreetGeometry } from '../public/js/street-model.js?v=606bae73';
+import { OWNED_STREETS, streetOwner } from '../public/js/location-events.js?v=b45cd9c3';
+import { JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=8a4480a4';
+import { WINTER_HAVEN_STREET_ID, WINTER_WALK_STREET_ID } from '../public/js/winter-walk.js?v=9961c35f';
 import {
   WINTER_HAVEN_BOARDWALK_Y,
   WINTER_HAVEN_FIRE_X,
@@ -34,8 +34,8 @@ import {
   WINTER_WALK_TSID,
   isWinterStreetTsid,
   winterStreetEcology,
-} from '../public/js/winter-walk-streets.js';
-import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js';
+} from '../public/js/winter-walk-streets.js?v=615549da';
+import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=47822aae';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

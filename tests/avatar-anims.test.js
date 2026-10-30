@@ -10,8 +10,8 @@ import { fileURLToPath } from 'node:url';
 import {
   AFK_SEQUENCE, ANIMS, FALL_LOOP, IDLES_TO_RANDOM, IDLE_SHEETS, SHEET_FRAMES, animForState, avatarAnimState,
   createIdleClock, frameRef, idleSheetFor, standInState,
-} from '../public/js/avatar-anims.js';
-import { VECTOR_AVATAR } from '../public/js/avatar-vector-sheets.js';
+} from '../public/js/avatar-anims.js?v=fb921bf4';
+import { VECTOR_AVATAR } from '../public/js/avatar-vector-sheets.js?v=ad801376';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 

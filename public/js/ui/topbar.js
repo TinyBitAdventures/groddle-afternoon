@@ -16,8 +16,8 @@
  * game.js: it calls renderTopBar() from updateHud and installTopBar() once.
  * The pure helpers below are tested without a DOM (tests/topbar.test.js).
  */
-import { vitalLevel, vitalTitle } from '../vitals.js?v=g458-2';
-import { clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=g486-1';
+import { vitalLevel, vitalTitle } from '../vitals.js?v=ca7471dd';
+import { clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b5f4748a';
 
 /** The Menu's groups, in the mock's order; Social shows only when something is in it. */
 export const MENU_GROUPS = Object.freeze([

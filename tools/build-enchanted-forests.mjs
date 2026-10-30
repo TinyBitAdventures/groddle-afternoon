@@ -12,8 +12,8 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { arrivalInTarget } from '../public/js/location-navigation.js';
-import { ENCHANTED_FORESTS, buildEnchantedForestStreet, enchantedForestIndexEntry } from '../public/js/enchanted-forests.js';
+import { arrivalInTarget } from '../public/js/location-navigation.js?v=38c12adf';
+import { ENCHANTED_FORESTS, buildEnchantedForestStreet, enchantedForestIndexEntry } from '../public/js/enchanted-forests.js?v=dd04e11b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

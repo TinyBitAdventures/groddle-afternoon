@@ -21,8 +21,8 @@
  *   energyMax).
  */
 
-import { addItem } from './inventory.js?v=catalog-unified-7';
-import { energyMax, moodMax } from './metabolics.js';
+import { addItem } from './inventory.js?v=85d4faba';
+import { energyMax, moodMax } from './metabolics.js?v=8504134e';
 
 export const ADMIN_TEXT_MAX = 500;
 const GIVE_OP = /^admin-give-[0-9a-f]{16}$/;

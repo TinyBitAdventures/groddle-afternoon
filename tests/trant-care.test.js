@@ -10,20 +10,20 @@ import {
   resolveTrantCarePackage,
   quoteTrantCare,
   performTrantCare,
-} from '../public/js/trant-care.js?v=g414-1';
+} from '../public/js/trant-care.js?v=f4b16c76';
 import {
   createTrantState,
   livingTrantPlanForStreet,
   LIVING_TRANT_CLASS_IDS,
   setTrantTables,
   trantStatusLabel,
-} from '../public/js/trants.js?v=trant-care-2';
+} from '../public/js/trants.js?v=9c2e8c0f';
 import {
   createToolConditionState,
   getToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js?v=woodcutting-test-8';
-import { getVerbsFor, runVerb } from '../public/content.js?v=g478-1';
+} from '../public/js/tools.js?v=9a2e7ef4';
+import { getVerbsFor, runVerb } from '../public/content.js?v=e2372a6b';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(root, 'public');
@@ -228,6 +228,6 @@ test.describe('living-trant world and client integration', () => {
     assert.match(game, /livingTrantPlanForStreet\(currentStreetTsid/);
     assert.match(game, /getVerbsFor\(target, \{[\s\S]*?tools: toolState/);
     assert.match(game, /muted: loadMutedPreference\(\)/);
-    assert.match(html, /game\.js\?v=official-ecology-1/);
+    assert.match(html, /game\.js\?v=[0-9a-f]{8}/);
   });
 });

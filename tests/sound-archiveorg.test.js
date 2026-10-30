@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=g388-1';
+import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=2d82d399';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const pub = path.join(root, 'public');

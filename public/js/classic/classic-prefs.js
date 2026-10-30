@@ -18,10 +18,10 @@
  * focus goes back where it was. Its modern look is the <style> below; Classic
  * restyles it in public/css/classic.css.
  */
-import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=g476-1';
-import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=g476-1';
-import { installClassicChrome } from './classic-chrome.js?v=g486-1';
-import { clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=g486-1';
+import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=587c014a';
+import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=299eef68';
+import { installClassicChrome } from './classic-chrome.js?v=b0eb4498';
+import { clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b5f4748a';
 
 export const PREFS_TITLE = 'Preferences';
 

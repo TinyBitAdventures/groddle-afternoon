@@ -35,7 +35,7 @@ import {
   setJobTotal,
   setPaused,
   serializeCraftybotState,
-} from '../public/js/craftybot.js';
+} from '../public/js/craftybot.js?v=2cff4c78';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -387,7 +387,7 @@ describe('delivery and wiring', () => {
 
   it('registers the feature and ships its art and sounds', () => {
     const index = readFileSync(join(PUBLIC, 'js/features/index.js'), 'utf8');
-    assert.match(index, /craftybot-feature\.js\?v=g485-1'; FEATURES\.push\(craftybotFeature\)/);
+    assert.match(index, /craftybot-feature\.js\?v=[0-9a-f]{8}'; FEATURES\.push\(craftybotFeature\)/);
     for (const f of ['idle0', 'walk', 'collapse', 'craftStart', 'craftEnd', 'expand', 'sleepMode', 'peek']) {
       assert.ok(existsSync(join(PUBLIC, `assets/sprites/craftybot/craftybot_${f}.webp`)), f);
     }
@@ -402,10 +402,10 @@ describe('delivery and wiring', () => {
 
 describe('craftybot feature: the ingredient source and the job menu', async () => {
   // The feature imports these with their browser cache tags; load the same module instances.
-  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=g485-1');
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=g485-1');
-  const cbMod = await import('../public/js/craftybot.js?v=craftybot-1');
-  const making = await import('../public/js/making.js?v=g403-1');
+  const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=4907107e');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=8995a326');
+  const cbMod = await import('../public/js/craftybot.js?v=2cff4c78');
+  const making = await import('../public/js/making.js?v=9e538296');
 
   function fakeEngine(extra = {}) {
     return {

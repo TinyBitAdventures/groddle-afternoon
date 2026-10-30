@@ -51,15 +51,15 @@
  *   confirm, done, left), hallStep, hallHelper, hallBuff, hallRefusals, hallClerks.
  */
 
-import { LEGALIZE_CLERKS } from '../legalize-it.js?v=g450-1';
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { loseEnergy, loseMood } from '../metabolics.js';
-import { acceptOffer, ensureQuestOfferState, markOffered, questStatus } from '../quest-offers.js?v=g403-1';
-import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
-import { parseQuestConversation } from '../quests.js?v=item-buffs-7';
-import { CUP_CLASS, CUP_OF_WATER, WATER_COOLER, WATER_COOLER_CLASS, drinkCup, getWater, getWaterState } from '../water-cooler.js?v=g352-1';
-import { BUREAUCRAT_CLASS, HALL, HALL_LAYOUT, HALL_TEXT, PLEASE_WAIT_BUFF, TALK_VERB, createHallFlow } from '../bureaucratic-hall.js?v=g443-1';
-import { questRoomConverse } from './quest-instances-feature.js?v=g482-2';
+import { LEGALIZE_CLERKS } from '../legalize-it.js?v=d569fd0e';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
+import { loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
+import { acceptOffer, ensureQuestOfferState, markOffered, questStatus } from '../quest-offers.js?v=6b6cbf22';
+import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
+import { parseQuestConversation } from '../quests.js?v=282e1621';
+import { CUP_CLASS, CUP_OF_WATER, WATER_COOLER, WATER_COOLER_CLASS, drinkCup, getWater, getWaterState } from '../water-cooler.js?v=1cf1b040';
+import { BUREAUCRAT_CLASS, HALL, HALL_LAYOUT, HALL_TEXT, PLEASE_WAIT_BUFF, TALK_VERB, createHallFlow } from '../bureaucratic-hall.js?v=f5ab600e';
+import { questRoomConverse } from './quest-instances-feature.js?v=1af188a6';
 
 export const HALLS_FEATURE_ID = 'bureaucratic-halls';
 export const HALL_ENTER_VERB = 'hall_enter';

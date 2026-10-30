@@ -29,11 +29,11 @@ import {
   saveStore,
   savedAtOf,
   soloSaveSnapshot,
-} from '../public/js/save-store.js?v=mp2-1';
-import { AUDIO_MUTED_KEY } from '../public/js/audio-pref.js?v=g465-1';
-import { STORAGE_KEY as APPEARANCE_KEY, APPEARANCE_PRESETS, appearanceToJson, loadAppearance, saveAppearance } from '../public/js/character-builder.js';
-import { getGameDayKey, getLastNewDayKey, getLastNewDayTs, resetGameDayClock, setLastNewDayTs } from '../public/js/game-day.js?v=dametime-3';
-import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=g424-1';
+} from '../public/js/save-store.js?v=b74a8113';
+import { AUDIO_MUTED_KEY } from '../public/js/audio-pref.js?v=e56202ee';
+import { STORAGE_KEY as APPEARANCE_KEY, APPEARANCE_PRESETS, appearanceToJson, loadAppearance, saveAppearance } from '../public/js/character-builder.js?v=96976c4c';
+import { getGameDayKey, getLastNewDayKey, getLastNewDayTs, resetGameDayClock, setLastNewDayTs } from '../public/js/game-day.js?v=3095e05b';
+import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=b4449504';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (rel) => readFileSync(join(pub, rel), 'utf8');

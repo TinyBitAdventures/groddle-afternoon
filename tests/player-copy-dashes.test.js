@@ -142,7 +142,7 @@ describe('em-dashes in player-facing copy (G215)', () => {
 
 describe('the lines G215 reworded', () => {
   it('making uses the source result line and a colon before the recipe name', async () => {
-    const { formatCraftProgress, formatCraftResultLine } = await import('../public/js/making.js?v=g403-1');
+    const { formatCraftProgress, formatCraftResultLine } = await import('../public/js/making.js?v=9e538296');
     assert.equal(formatCraftProgress(2, 5, 'Flour'), 'Making 2 of 5: Flour');
     assert.equal(formatCraftProgress(1, 1), 'Making 1 of 1');
     // players/inc_making.js 896-909.
@@ -151,7 +151,7 @@ describe('the lines G215 reworded', () => {
   });
 
   it('the Hog Haul bait line is the source\'s', async (t) => {
-    const { hogHaulObjective } = await import('../public/js/hog-haul.js');
+    const { hogHaulObjective } = await import('../public/js/hog-haul.js?v=50d2e072');
     assert.equal(hogHaulObjective({ status: 'running', hasBait: true }), 'You have bait, now go get a piggy!');
     if (!existsSync(GS)) return t.skip('no GSJS');
     assert.ok(readFileSync(join(GS, 'players/inc_games.js'), 'utf8').includes('You have bait, now go get a piggy!'));

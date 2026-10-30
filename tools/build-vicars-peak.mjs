@@ -12,7 +12,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { arrivalInTarget } from '../public/js/location-navigation.js';
+import { arrivalInTarget } from '../public/js/location-navigation.js?v=38c12adf';
 import {
   MOSSYSTEP_ARRIVE,
   MOSSYSTEP_TSID,
@@ -22,7 +22,7 @@ import {
   VICARS_PEAK_TSID,
   vicarsPeakIndexEntry,
   vicarsPeakStreet,
-} from '../public/js/vicars-peak.js';
+} from '../public/js/vicars-peak.js?v=465e7965';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

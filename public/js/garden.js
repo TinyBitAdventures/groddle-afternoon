@@ -10,12 +10,12 @@
  * Produce counts are the GSJS seed classProps produces_count.
  */
 
-import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=catalog-unified-7';
-import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-8';
-import { skillPackageDetails } from './skill-packages.js';
-import { gardenGrowModifier } from './imagination-effects.js?v=g403-1';
-import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js';
-import { grantMoodXp } from './mood-xp.js';
+import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=85d4faba';
+import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=9a2e7ef4';
+import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
+import { gardenGrowModifier } from './imagination-effects.js?v=70169933';
+import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js?v=8504134e';
+import { grantMoodXp } from './mood-xp.js?v=958e7680';
 
 /** @typedef {'clean'|'seeds'|'shoots'|'crop'|'dirty'} PlotState */
 

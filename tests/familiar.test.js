@@ -29,15 +29,15 @@ import {
   skillLearnedModel,
   truncateLabel,
   vogLayout,
-} from '../public/js/familiar.js?v=g434-1';
-import { CARD_ART_LAYERS } from '../public/js/imagination-data.js';
+} from '../public/js/familiar.js?v=2089ac54';
+import { CARD_ART_LAYERS } from '../public/js/imagination-data.js?v=4a85e7fe';
 import {
   _resetFamiliarDialog,
   afterScreens,
   familiarDialogFeature,
   familiarDialogOpen,
   queueSkillLearned,
-} from '../public/js/features/familiar-dialog-feature.js?v=g434-1';
+} from '../public/js/features/familiar-dialog-feature.js?v=2fc8b1b5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');
@@ -241,7 +241,7 @@ describe('skill learned panel (G218)', () => {
     assert.match(game, /openSkillTree\(classTsid = ''\) \{/);
     const index = read('js/features/index.js');
     // Registered (G185 appends the loneliness feature after it; neither answers the other's first-answer hooks).
-    assert.match(index, /^import \{ familiarDialogFeature \} from '\.\/familiar-dialog-feature\.js\?v=g434-1'; FEATURES\.push\(familiarDialogFeature\);$/m);
+    assert.match(index, /^import \{ familiarDialogFeature \} from '\.\/familiar-dialog-feature\.js\?v=[0-9a-f]{8}'; FEATURES\.push\(familiarDialogFeature\);$/m);
   });
 });
 

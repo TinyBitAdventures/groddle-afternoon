@@ -20,7 +20,7 @@ import {
   isSolo,
   multiplayerEntryUrl,
   resolveGameMode,
-} from '../public/js/game-mode.js?v=mp2-1';
+} from '../public/js/game-mode.js?v=1ecf2899';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (rel) => readFileSync(join(pub, rel), 'utf8');
@@ -49,7 +49,7 @@ describe('mode flag', () => {
 
   it('is engine.mode and the canvas data-mode in game.js', () => {
     const game = read('game.js');
-    assert.match(game, /import \{ GAME_MODE(?:, isSolo)? \} from '\.\/js\/game-mode\.js\?v=mp2-1';/);
+    assert.match(game, /import \{ GAME_MODE(?:, isSolo)? \} from '\.\/js\/game-mode\.js\?v=[0-9a-f]{8}';/);
     assert.match(game, /const engine = \{\n\s*PIXI,\n(?:\s*\/\*\*[^\n]*\*\/\n)?\s*mode: GAME_MODE,/);
     assert.match(game, /app\.canvas\.dataset\.mode = GAME_MODE;/);
   });

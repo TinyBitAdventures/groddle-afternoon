@@ -10,11 +10,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { RUBE_YARD_FILES } from '../public/js/rube-yard-art.js';
+import { RUBE_YARD_FILES } from '../public/js/rube-yard-art.js?v=0a67d3e6';
 import {
   YARD_ART_DIR, YARD_FLOOR, YARD_FRONT, YARD_PIECES, YARD_W, TIER1, TIER2, LAWN_TOP,
-} from '../public/js/rube-yard-scene.js?v=g458-1';
-import * as room from '../public/js/quest-rooms/rube-yard.js?v=g458-1';
+} from '../public/js/rube-yard-scene.js?v=8fa5438f';
+import * as room from '../public/js/quest-rooms/rube-yard.js?v=5b33de4c';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, '..');

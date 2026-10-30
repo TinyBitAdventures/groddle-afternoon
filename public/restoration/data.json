@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 845,
+  "commits": 846,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "A sheet's title and close button stay put when its list scrolls"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "Classic's conversations, prompts and Quest complete! take 2012's dark box, and Eat how many? its quantity picker"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Classic's windows lay out their contents at the 2012 size: Quests, Skills, Buffs, Badges, the Map and Make"
    }
   ]
  },
- "tests": 473,
+ "tests": 474,
  "generatedAt": "2026-10-30"
 }

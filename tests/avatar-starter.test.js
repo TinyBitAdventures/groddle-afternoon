@@ -19,9 +19,9 @@ import {
   starterChoicesOf,
   starterFields,
   starterRowFields,
-} from '../public/js/avatar-starter.js';
-import { APPEARANCE_PRESETS, PRESET_GROUPS } from '../public/js/character-builder.js';
-import { expandCatalog, normalizeVectorFields, resolveLook } from '../public/js/avatar-looks.js';
+} from '../public/js/avatar-starter.js?v=2ba02b11';
+import { APPEARANCE_PRESETS, PRESET_GROUPS } from '../public/js/character-builder.js?v=96976c4c';
+import { expandCatalog, normalizeVectorFields, resolveLook } from '../public/js/avatar-looks.js?v=64fab53e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const catalog = expandCatalog(JSON.parse(readFileSync(join(root, 'public/assets/avatar/catalog.json'), 'utf8')));

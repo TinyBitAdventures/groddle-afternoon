@@ -41,8 +41,8 @@
  * puzzleRespawns, puzzleComplete, puzzleReward, puzzleDemo.
  */
 
-import { locationEventsApi } from './location-events-feature.js?v=g452-1';
-import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g424-1';
+import { locationEventsApi } from './location-events-feature.js?v=518e223a';
+import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=d4f4772b';
 import {
   PUZZLE_DATA_URL,
   SOURCE_PHYSICS,
@@ -54,9 +54,9 @@ import {
   respawnPoint,
   rewardBits,
   stepTriggers,
-} from '../puzzle-triggers.js';
-import { energyMax, metabolicGain, moodMax } from '../metabolics.js';
-import { isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
+} from '../puzzle-triggers.js?v=3ee2f2c8';
+import { energyMax, metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
+import { isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=01a295a1';
 
 export const PUZZLES_FEATURE_ID = 'puzzles';
 export const LIGHT_BEAM_CLASS = 'light_beam';

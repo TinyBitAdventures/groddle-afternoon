@@ -7,9 +7,9 @@
  * DOM-driven (not Pixi) so it covers HUD + canvas inside #game-root.
  */
 
-import { ACHIEVEMENT_DROP, ACHIEVEMENT_ROCK_WH, achievementBubbleText, easeOutBounce, mountPetRock } from './familiar.js?v=g434-1';
-import { formatLoadingTime, ordinal } from './exploration.js';
-import { isModernSkin, momentArt, momentArtShape, rewardChips } from './ui/moment-card.js?v=g470-1';
+import { ACHIEVEMENT_DROP, ACHIEVEMENT_ROCK_WH, achievementBubbleText, easeOutBounce, mountPetRock } from './familiar.js?v=2089ac54';
+import { formatLoadingTime, ordinal } from './exploration.js?v=19c6758f';
+import { isModernSkin, momentArt, momentArtShape, rewardChips } from './ui/moment-card.js?v=3c9c0aa6';
 
 /**
  * Street-load timings (seconds).

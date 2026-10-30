@@ -12,15 +12,15 @@ import {
   quoteWoodTreeHarvest,
   resetWoodTreeDay,
   woodTreeStatusLabel,
-} from '../public/js/woodcutting.js?v=g414-1';
+} from '../public/js/woodcutting.js?v=4e140315';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,
   getToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js?v=woodcutting-test-8';
-import { getVerbsFor, runVerb } from '../public/content.js?v=g478-1';
-import { actionDurationFor } from '../public/js/action-timing.js?v=woodcutting-test-1';
+} from '../public/js/tools.js?v=9a2e7ef4';
+import { getVerbsFor, runVerb } from '../public/content.js?v=e2372a6b';
+import { actionDurationFor } from '../public/js/action-timing.js?v=2513e592';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -158,7 +158,7 @@ test.describe('Wood Tree client integration', () => {
     assert.match(game, /resetWoodTreeDay\(tree\.state\)/);
     assert.match(game, /woodTreeChanged/);
     assert.match(game, /if \(inv\.hatchet === undefined\) inv\.hatchet = 1/);
-    assert.match(html, /game\.js\?v=official-ecology-1/);
+    assert.match(html, /game\.js\?v=[0-9a-f]{8}/);
     assert.match(game, /muted: loadMutedPreference\(\)/);
   });
 });

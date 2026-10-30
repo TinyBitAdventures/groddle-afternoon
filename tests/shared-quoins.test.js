@@ -23,18 +23,18 @@ import {
   normalizeSync,
   shardFor,
   statusOf,
-} from '../public/js/shared-quoins.js?v=g424-1';
-import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?v=g424-1';
+} from '../public/js/shared-quoins.js?v=98d9f115';
+import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?v=e1102af3';
 import {
   QUOIN_SHARD_FLOOR,
   QUOIN_SHARD_NEAR,
   QUOIN_SHARD_RADIUS,
   QUOIN_SHARD_TOP,
   QUOIN_SHARD_FALL,
-} from '../public/js/quoin-shards.js?v=g216-1';
+} from '../public/js/quoin-shards.js?v=9a2e4c37';
 import { placementRequests, streetQuoinLayout, classTable, mysteryTable } from '../tools/build-realtime-quoins.mjs';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js';
-import { QUOIN_CLASSES } from '../public/js/quoins.js';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=dbcefe18';
+import { QUOIN_CLASSES } from '../public/js/quoins.js?v=d4f4772b';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -309,7 +309,7 @@ describe('the feature', () => {
 describe('a mystery quoin in multiplayer', () => {
   it('lands as the kind the server rolled', async () => {
     // A fresh copy of the feature: the one above still holds its replaced client.
-    const { sharedQuoinsFeature } = await import('../public/js/features/shared-quoins-feature.js?v=mystery-test-1');
+    const { sharedQuoinsFeature } = await import('../public/js/features/shared-quoins-feature.js?fresh=mystery-test-1');
     const client = fakeClient();
     const engine = fakeEngine('multiplayer', client);
     sharedQuoinsFeature.onStreetEnter({}, engine);
@@ -344,7 +344,7 @@ describe('the server data', () => {
   });
 
   it('ships the current layout for Hechey Track and every class the spots use', { skip: skipWithoutServer }, async () => {
-    const { loadStreetDataFromFs, applyStreetIndex } = await import('../public/js/street-loader.js?v=g478-1');
+    const { loadStreetDataFromFs, applyStreetIndex } = await import('../public/js/street-loader.js?v=20c7b021');
     applyStreetIndex(index);
     for (const tsid of ['GLI2V0UN7RD1T2J', 'GLI3272LOTD1B1F']) {
       const data = await loadStreetDataFromFs(tsid, join(root, 'public/assets/streets'));
@@ -379,7 +379,7 @@ describe('the server and the wiring', () => {
 
   it('registers before realtime, and game.js hands the touch, the reward and respawns over', () => {
     const idx = read('public/js/features/index.js');
-    const mine = idx.indexOf("import { sharedQuoinsFeature } from './shared-quoins-feature.js?v=g424-1'");
+    const mine = idx.indexOf("import { sharedQuoinsFeature } from './shared-quoins-feature.js?v=");
     assert.ok(mine > 0 && mine < idx.indexOf('realtimeFeature'));
     const game = read('public/game.js');
     assert.match(game, /if \(features\.query\('quoinTouched', q, engine\)\) continue;\n\s+grabWorldQuoin\(q\);/);

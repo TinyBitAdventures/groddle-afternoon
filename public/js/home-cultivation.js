@@ -50,7 +50,7 @@
  *   drifts the way repeated float + 0.05 can.
  */
 
-import { CULTIVATION_CLASSES, HOME_LIMITS } from './homes-catalog.js?v=homes-catalog-2';
+import { CULTIVATION_CLASSES, HOME_LIMITS } from './homes-catalog.js?v=29713fa8';
 import {
   TOWER_CHASSIS,
   TOWER_IMG_COST,
@@ -58,7 +58,7 @@ import {
   TOWER_PLACEMENT_WARNING,
   TOWER_PROTO,
   TOWER_WIDTH,
-} from './home-tower.js?v=home-tower-3';
+} from './home-tower.js?v=6ccb3a4f';
 
 export const YARD_SEGMENT_W = 150;
 /** The house, porch, mailbox and World Gate stand on a fixed lot between the yards. */

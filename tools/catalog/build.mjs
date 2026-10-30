@@ -33,6 +33,7 @@ import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 import { siteNav } from '../changelog/build.mjs';
 import { committedMap, keyAssetUrls, mapTags } from '../data-versions/build.mjs';
+import { keyOf as moduleKeyOf } from '../module-keys/build.mjs';
 import { literalFrom, readItemTags } from '../inventory/gsjs-data.mjs';
 import { supplyConversions } from '../job-obtainable.mjs';
 
@@ -716,7 +717,7 @@ ${script ? mapTags(p) : ''}  <script src="${p}site/theme.js"></script>
   <link rel="icon" href="${p}favicon.svg?v=arch" type="image/svg+xml" />
   <link rel="icon" href="${p}favicon.ico?v=arch" sizes="32x32" />
   <link rel="apple-touch-icon" href="${p}apple-touch-icon.png?v=arch" />
-${script ? `  <script type="module" src="${script}"></script>\n` : ''}</head>
+${script ? `  <script type="module" src="${script}?v=${moduleKeyOf(`items/${script}`, root)}"></script>\n` : ''}</head>
 <body class="notes catalog">
 ${siteNav(p, 'items')}
 ${body}

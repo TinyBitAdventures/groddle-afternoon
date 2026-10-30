@@ -68,13 +68,13 @@
  * waiting, or kept when no teller was in range).
  */
 
-import { addItem, ensureItem } from '../inventory.js?v=catalog-unified-7';
-import { isPoisoned } from '../tree-poison.js';
-import { GREEDY_ACTS, GREEDY_STREET_SPIRIT_QUEST_ID, canOfferGreedyFirst } from '../greedy-street-spirit.js?v=greedy-story-2';
-import { questStatus } from '../quest-offers.js?v=g403-1';
-import { questDoneAt } from '../quests.js?v=item-buffs-7';
-import { grantMoodXp } from '../mood-xp.js';
-import { CONVERSATIONS, TELLERS } from '../conversations-data.js?v=g202-1';
+import { addItem, ensureItem } from '../inventory.js?v=85d4faba';
+import { isPoisoned } from '../tree-poison.js?v=f6e01177';
+import { GREEDY_ACTS, GREEDY_STREET_SPIRIT_QUEST_ID, canOfferGreedyFirst } from '../greedy-street-spirit.js?v=4d19b0e9';
+import { questStatus } from '../quest-offers.js?v=6b6cbf22';
+import { questDoneAt } from '../quests.js?v=282e1621';
+import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { CONVERSATIONS, TELLERS } from '../conversations-data.js?v=f11b7e02';
 import {
   CONVERSATION_RULES,
   clearCurrentState,
@@ -91,7 +91,7 @@ import {
   resumeTarget,
   setCurrentState,
   talkableFor,
-} from '../conversations.js?v=g202-1';
+} from '../conversations.js?v=7cbdfea4';
 
 export const CONVERSATIONS_FEATURE_ID = 'conversations';
 export const CONVO_TALK_VERB = 'convo_talk';

@@ -8,8 +8,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { climbBobY, ladderAnimState, ladderSwap } from '../public/js/ladder-anim.js?v=g421-1';
-import { animForState } from '../public/js/avatar-anims.js';
+import { climbBobY, ladderAnimState, ladderSwap } from '../public/js/ladder-anim.js?v=a8b327a0';
+import { animForState } from '../public/js/avatar-anims.js?v=fb921bf4';
 
 const root = join(import.meta.dirname, '..');
 
@@ -112,7 +112,7 @@ describe('ladder: climbing vs paused (js/ladder-anim.js)', () => {
 
   it('game.js reports climbPause, keeps the frame on the swap and drops the bob', () => {
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
-    assert.match(game, /import \{ climbBobY, ladderAnimState, ladderSwap \} from '\.\/js\/ladder-anim\.js\?v=g421-1';/);
+    assert.match(game, /import \{ climbBobY, ladderAnimState, ladderSwap \} from '\.\/js\/ladder-anim\.js\?v=[0-9a-f]{8}';/);
     assert.match(game, /if \(requested === 'climb'\) \{\s*idleClock\.reset\(\);[^}]*return ladderAnimState\(player\.vy\);/);
     assert.match(game, /ladderSwap\(player\.glitchState, st\)[\s\S]{0,300}player\.loop = true;/);
     assert.match(game, /if \(player\.textures\.length < 2 \|\| hold\) player\.gotoAndStop\(0\);/);

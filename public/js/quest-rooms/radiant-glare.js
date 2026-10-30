@@ -34,7 +34,7 @@
  * recovered sign_exit_starter_01a.
  */
 
-import { BODY_H, JUMP_GAP, JUMP_RISE, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=rg-1';
+import { BODY_H, JUMP_GAP, JUMP_RISE, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=8a4480a4';
 
 export const W = 1100;
 export const H = 3400;

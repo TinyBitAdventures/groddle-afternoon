@@ -85,8 +85,8 @@
  *   server message), mpFeatRewards (ids applied); window.groddleFeats (QA).
  */
 
-import { addItem } from '../inventory.js?v=catalog-unified-7';
-import { GAME_DAY_MS, getGameDayKey } from '../game-day.js?v=dametime-4';
+import { addItem } from '../inventory.js?v=85d4faba';
+import { GAME_DAY_MS, getGameDayKey } from '../game-day.js?v=3095e05b';
 import {
   CAP_OWNERS,
   COMPLETE_BUTTON,
@@ -114,11 +114,11 @@ import {
   resetPending,
   streakCheck,
   takePending,
-} from '../solo-feats.js?v=g370-1';
-import { saveStore } from '../save-store.js?v=mp2-2';
-import { gainMetabolic } from '../metabolics.js';
-import { grantMoodXp } from '../mood-xp.js';
-import { GIANTS } from '../shrines.js?v=spinning-wheel-test-9';
+} from '../solo-feats.js?v=e026b67b';
+import { saveStore } from '../save-store.js?v=b74a8113';
+import { gainMetabolic } from '../metabolics.js?v=8504134e';
+import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { GIANTS } from '../shrines.js?v=01b185bc';
 import {
   MP_TEXT,
   endedLine,
@@ -133,7 +133,7 @@ import {
   runFromServer,
   vogFor,
   youLine,
-} from '../feats-mp.js?v=g370-1';
+} from '../feats-mp.js?v=3aa606d6';
 
 const POLL_MS = 500;
 /** How often an open panel redraws its "Opens again in" lines. */

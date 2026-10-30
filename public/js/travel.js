@@ -112,7 +112,7 @@ export function listMapDestinations(currentTsid, streetIndex) {
 
 /**
  * Resolve travel when player uses a nearby signpost (screen X).
- * @param {import('./street-model.js?v=g478-1').StreetData} street
+ * @param {import('./street-model.js').StreetData} street
  * @param {number} playerScreenX
  * @param {Set<string>|string[]} availableTsids
  * @param {number} [radius=120]

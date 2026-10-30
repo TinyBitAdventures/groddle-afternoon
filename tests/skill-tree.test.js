@@ -8,8 +8,8 @@ import { before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
 
-import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=g403-1';
-import { createSkillState, grantSkill } from '../public/js/skills.js';
+import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
+import { createSkillState, grantSkill } from '../public/js/skills.js?v=4542bdf9';
 import {
   SKILL_REMAKE_NOTES,
   SKILL_CATEGORIES,
@@ -22,7 +22,7 @@ import {
   emblemUnlockFor,
   spendEmblemForSkill,
   skillTitle,
-} from '../public/js/skill-tree.js?v=g403-1';
+} from '../public/js/skill-tree.js?v=cf7bc81f';
 
 const root = join(import.meta.dirname, '..', 'public');
 

@@ -13,8 +13,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { racesFeature } from '../public/js/features/races-feature.js?v=g478-1';
-import { hogHaulMpFeature } from '../public/js/features/hog-haul-mp-feature.js?v=g463-2';
+import { racesFeature } from '../public/js/features/races-feature.js?v=b849c346';
+import { hogHaulMpFeature } from '../public/js/features/hog-haul-mp-feature.js?v=087704cd';
 import {
   HOG_MP_TEXT,
   atPen,
@@ -24,9 +24,9 @@ import {
   normalizeHogMatch,
   pigPose,
   touches,
-} from '../public/js/hog-haul-mp.js?v=g334-hog-1';
+} from '../public/js/hog-haul-mp.js?v=d8605396';
 import { hogHaulData } from '../tools/build-realtime-hoghaul.mjs';
-import { HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js';
+import { HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js?v=50d2e072';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

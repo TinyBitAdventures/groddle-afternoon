@@ -32,8 +32,8 @@ import {
   playLineScreenY,
   tagCrowns,
   tickCrowns,
-} from '../public/js/game-of-crowns.js';
-import { platformsScreen, wallsScreen } from '../public/js/street-model.js?v=g478-1';
+} from '../public/js/game-of-crowns.js?v=98e21baf';
+import { platformsScreen, wallsScreen } from '../public/js/street-model.js?v=606bae73';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const players = [
@@ -136,7 +136,7 @@ describe('Game of Crowns arena', () => {
   });
 
   it('finds paths from the waiting ledges down into the play area', async () => {
-    const { CROWNS_LADDERS: ladders } = await import('../public/js/game-of-crowns.js');
+    const { CROWNS_LADDERS: ladders } = await import('../public/js/game-of-crowns.js?v=98e21baf');
     assert.equal(ladders.length, 5);
     const withWalls = { ...street, walls: ladders.map((l) => ({ id: l.id, x: l.x, y: l.y - l.h, w: 50, h: l.h })) };
     const graph = buildNavGraph(platformsScreen(withWalls), wallsScreen(withWalls), { jumpScale: 1.15 });

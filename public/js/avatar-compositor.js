@@ -13,9 +13,9 @@
  *  - articles/<type>/<name>.json: one article's parts per frame and shapes
  *  - catalog.json: what the character builder offers, colours from GSJS
  */
-import { CORE_FRAMES, IDLE_FRAMES, SHEET_FRAMES } from './avatar-anims.js';
-import { applyCM, drawListBounds, expandRig, transformBounds, frameDrawList, lookMatrices, mergeIdleArticle, mergeIdleRig, slotAssignments } from './avatar-rig.js';
-import { expandCatalog } from './avatar-looks.js';
+import { CORE_FRAMES, IDLE_FRAMES, SHEET_FRAMES } from './avatar-anims.js?v=fb921bf4';
+import { applyCM, drawListBounds, expandRig, transformBounds, frameDrawList, lookMatrices, mergeIdleArticle, mergeIdleRig, slotAssignments } from './avatar-rig.js?v=b67f0da8';
+import { expandCatalog } from './avatar-looks.js?v=64fab53e';
 
 export const AVATAR_DATA_DIR = 'assets/avatar/';
 /** Widest sheet row at 3x (px); taller sheets wrap into rows. */

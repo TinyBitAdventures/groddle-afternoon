@@ -28,14 +28,14 @@ import {
   refusedText,
   teleportCounters,
   teleportKindOf,
-} from '../public/js/follow-mp.js?v=follow-1';
-import { followMpFeature } from '../public/js/features/follow-mp-feature.js?v=g463-1';
-import { COMPANION_FOLLOW_TRAIL_DISTANCE } from '../public/js/local-companions.js?v=street-players-4';
-import { loadContentCatalogsFromDir, getQuestCatalog, getAchievementCatalog } from '../public/js/content-catalogs.js?v=g403-1';
-import { createQuestState } from '../public/js/quests.js';
-import { pendingQuestOffers } from '../public/js/quest-offers.js?v=g403-1';
-import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=g358-1';
-import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=races3-test-7';
+} from '../public/js/follow-mp.js?v=7c5cda9a';
+import { followMpFeature } from '../public/js/features/follow-mp-feature.js?v=e5a26e1b';
+import { COMPANION_FOLLOW_TRAIL_DISTANCE } from '../public/js/local-companions.js?v=188f756c';
+import { loadContentCatalogsFromDir, getQuestCatalog, getAchievementCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
+import { createQuestState } from '../public/js/quests.js?v=282e1621';
+import { pendingQuestOffers } from '../public/js/quest-offers.js?v=6b6cbf22';
+import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=2beb658a';
+import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=15b36541';
 import { economyCredits } from '../tools/build-economy.mjs';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 
@@ -123,7 +123,7 @@ describe('G334 follow: solo is untouched', () => {
 
   it('is registered before street-objects', () => {
     const index = readFileSync(join(PUBLIC, 'js/features/index.js'), 'utf8');
-    const a = index.indexOf("from './follow-mp-feature.js?v=g463-1'");
+    const a = index.indexOf("from './follow-mp-feature.js?v=");
     const b = index.indexOf("from './street-objects-feature.js");
     assert.ok(a > 0 && a < b, 'follow-mp before street-objects');
   });

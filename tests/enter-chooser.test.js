@@ -16,7 +16,7 @@ import {
   itemSortValue,
   orderChoices,
   planEnter,
-} from '../public/js/enter-chooser.js?v=g217-1';
+} from '../public/js/enter-chooser.js?v=3990ddea';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const game = readFileSync(join(here, '../public/game.js'), 'utf8');
@@ -185,7 +185,7 @@ describe('client source', { skip: !existsSync(client) && 'glitch-client not besi
 
 describe('tile art crop', () => {
   it('finds the drawn box in an RGBA buffer', async () => {
-    const { alphaBox } = await import('../public/js/enter-chooser.js?v=g217-1');
+    const { alphaBox } = await import('../public/js/enter-chooser.js?v=3990ddea');
     const w = 4;
     const h = 3;
     const rgba = new Uint8ClampedArray(w * h * 4);

@@ -26,10 +26,10 @@
  * kittyHiddenVerbs, kittyDemo.
  */
 
-import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g464-2';
-import { landingY, nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=g478-1';
-import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js';
+import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=0e86cc0f';
+import { landingY, nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=c4aff42f';
+import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js?v=670c3a7f';
 import {
   KITTY_ID,
   KITTY_MOTION,
@@ -46,8 +46,8 @@ import {
   petKitty,
   rollScare,
   stepKitty,
-} from '../heli-kitties.js?v=g414-1';
-import { itemZ } from '../item-bands.js?v=g429-1';
+} from '../heli-kitties.js?v=ee89a5bf';
+import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const KITTY_FEATURE_ID = 'heli-kitties';
 export const KITTY_GROUP = 'kitty';

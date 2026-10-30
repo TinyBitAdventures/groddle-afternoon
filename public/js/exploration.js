@@ -18,7 +18,7 @@
  * the hub counter is topped up to the hub map's full street count.
  */
 
-import { HUB_MAP_STREETS } from './hub-maps-data.js';
+import { HUB_MAP_STREETS } from './hub-maps-data.js?v=ffe222f1';
 
 // js/hell.js noteNarakaVisit already counts Naraka's streets (its index rows
 // leave Hell One Clone's hub blank), so hub 40 is left to it.

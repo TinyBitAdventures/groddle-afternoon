@@ -15,14 +15,14 @@ import {
   crunchIce,
   itemVerbButton,
   runItemVerb,
-} from '../public/js/item-verbs.js?v=item-verbs-4';
+} from '../public/js/item-verbs.js?v=729ccd91';
 import {
   HAIRBALL_DASH_MIN,
   homeTrophyCount,
   isTrophyClass,
   itemVerbsFeature,
-} from '../public/js/features/item-verbs-feature.js?v=g485-1';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=g485-1';
+} from '../public/js/features/item-verbs-feature.js?v=bfa8a25e';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=8995a326';
 import {
   applyAchievementProgress,
   createAchievementState,
@@ -31,9 +31,9 @@ import {
   resetAchievementCounter,
   seedAchievementNearCompletion,
   worldVerbAchievementCounters,
-} from '../public/js/achievements.js?v=g403-1';
-import { applyBuff, buffPhysics, createBuffState, getBuffItemInfo, tickBuffs } from '../public/js/buffs.js?v=g403-1';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
+} from '../public/js/achievements.js?v=631d7daa';
+import { applyBuff, buffPhysics, createBuffState, getBuffItemInfo, tickBuffs } from '../public/js/buffs.js?v=c7727c43';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const publicRoot = join(dirname(fileURLToPath(import.meta.url)), '../public');
 
@@ -297,9 +297,9 @@ describe('game.js wiring for G134', () => {
     assert.match(game, /refreshTreeVisual\(target\) \{/);
     const registry = readFileSync(join(publicRoot, 'js/features/index.js'), 'utf8');
     // Later lanes (G137) bump these.
-    assert.match(registry, /powders-feature\.js\?v=g\d+-\d+'; FEATURES\.push\(powdersFeature\)/);
-    assert.match(registry, /item-verbs-feature\.js\?v=g\d+-\d+'; FEATURES\.push\(itemVerbsFeature\)/);
+    assert.match(registry, /powders-feature\.js\?v=[0-9a-f]{8}'; FEATURES\.push\(powdersFeature\)/);
+    assert.match(registry, /item-verbs-feature\.js\?v=[0-9a-f]{8}'; FEATURES\.push\(itemVerbsFeature\)/);
     // Lanes after this one bump the registry further.
-    assert.ok(Number(game.match(/features\/index\.js\?v=registry-(\d+)'/)?.[1]) >= 48, 'registry key at 48 or later');
+    assert.match(game, /features\/index\.js\?v=[0-9a-f]{8}'/, 'the registry carries its content key');
   });
 });

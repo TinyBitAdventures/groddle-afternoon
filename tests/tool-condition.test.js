@@ -13,20 +13,20 @@ import {
   quoteToolRepair,
   repairToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js?v=woodcutting-test-8';
-import { createInventory } from '../public/js/inventory.js';
+} from '../public/js/tools.js?v=9a2e7ef4';
+import { createInventory } from '../public/js/inventory.js?v=85d4faba';
 import {
   createGarden,
   plantPlot,
   waterPlot,
-} from '../public/js/garden.js?v=g403-1';
+} from '../public/js/garden.js?v=9a8f8f72';
 import {
   createMineRock,
   mineRock,
   MINING_COSTS,
-} from '../public/js/mining.js?v=g403-1';
-import { craftRecipe } from '../public/js/making.js?v=g403-1';
-import { createPlayerSave, normalizePlayerSave } from '../public/js/player-save.js?v=g424-1';
+} from '../public/js/mining.js?v=a7eb8740';
+import { craftRecipe } from '../public/js/making.js?v=9e538296';
+import { createPlayerSave, normalizePlayerSave } from '../public/js/player-save.js?v=b4449504';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');
@@ -197,6 +197,6 @@ describe('tool save and client wiring', () => {
     assert.match(game, /pack-slot-wear/);
     // G191: the repair card plays the Make panel's Tinkertool sheet (tests/make-tool-animations.test.js).
     assert.match(css, /\.tool-repair-sprite \{[\s\S]*?tinkertool-work@3x\.webp/);
-    assert.match(html, /game\.js\?v=official-ecology-1/);
+    assert.match(html, /game\.js\?v=[0-9a-f]{8}/);
   });
 });

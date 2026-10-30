@@ -18,20 +18,20 @@ import {
   openCubimalPackage,
   selectCubimal,
   setCubimalFree,
-} from '../public/js/cubimals.js';
+} from '../public/js/cubimals.js?v=378622fc';
 import {
   ITEM_CATALOG,
   addItem,
   countItem,
   createInventory,
   listPackItemSlots,
-} from '../public/js/inventory.js?v=catalog-unified-7';
+} from '../public/js/inventory.js?v=85d4faba';
 import {
   applyAchievementProgress,
   createAchievementState,
   getAchievementProgress,
-} from '../public/js/achievements.js?v=g403-1';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
+} from '../public/js/achievements.js?v=631d7daa';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
@@ -212,6 +212,6 @@ describe('Cubimal achievements and clean art', () => {
     assert.match(game, /dataset\.cubimalPrize/);
     assert.match(game, /cubimaldemo/);
     assert.match(game, /cubimalautoplay/);
-    assert.match(html, /cubimals=1/);
+    assert.match(html, /"game\.js\?v=[0-9a-f]{8}"/);
   });
 });

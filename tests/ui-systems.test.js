@@ -19,8 +19,8 @@ import {
   listPackRows,
   isToolItem,
   getItemUseInfo,
-} from '../public/js/inventory.js?v=catalog-unified-7';
-import { starterToolsInventory, ensureMakingItems } from '../public/js/making.js?v=g403-1';
+} from '../public/js/inventory.js?v=85d4faba';
+import { starterToolsInventory, ensureMakingItems } from '../public/js/making.js?v=9e538296';
 import {
   createQuestState,
   assignQuest,
@@ -28,8 +28,8 @@ import {
   getQuestProgress,
   listQuestTracker,
   QUEST_CATALOG,
-} from '../public/js/quests.js';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
+} from '../public/js/quests.js?v=282e1621';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const __dirnameUi = dirname(fileURLToPath(import.meta.url));
 before(async () => {
@@ -42,7 +42,7 @@ import {
   listBuyOffers,
   listSellOffers,
   createVendorSellQuote,
-} from '../public/js/vendor.js';
+} from '../public/js/vendor.js?v=563afb9b';
 import {
   buildMapGraph,
   buildHubMapView,
@@ -52,9 +52,9 @@ import {
   segmentMid,
   listHubsFromIndex,
   resolveHubId,
-} from '../public/js/map-graph.js?v=g478-1';
-import { STREET_INDEX } from '../public/js/street-loader.js?v=g478-1';
-import { listMapDestinations } from '../public/js/travel.js?v=g478-1';
+} from '../public/js/map-graph.js?v=53d64e50';
+import { STREET_INDEX } from '../public/js/street-loader.js?v=20c7b021';
+import { listMapDestinations } from '../public/js/travel.js?v=855c6c68';
 import { readFileSync } from 'node:fs';
 
 const HUB56 = JSON.parse(
@@ -186,7 +186,7 @@ describe('pack / inventory', () => {
       '../public/js/world-items.js',
     ].map((path) => readFileSync(join(__dirnameUi, path), 'utf8'));
     for (const source of files) {
-      assert.match(source, /inventory\.js\?v=catalog-unified-7/);
+      assert.match(source, /inventory\.js\?v=[0-9a-f]{8}/);
       assert.doesNotMatch(source, /inventory\.js\?v=(?:pack-actions-1|butterfly-care-1)/);
     }
     const game = files[0];

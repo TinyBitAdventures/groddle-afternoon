@@ -32,8 +32,8 @@
  * the cheese icon; the lab itself never survived, so it is drawn as vectors.
  */
 
-import { BODY_H, JUMP_GAP, JUMP_RISE, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=cu-1';
-import { textureFromUrl } from '../textures.js';
+import { BODY_H, JUMP_GAP, JUMP_RISE, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=8a4480a4';
+import { textureFromUrl } from '../textures.js?v=01a295a1';
 
 const ART = 'assets/sprites/quest-rooms/tile_puzzle/';
 

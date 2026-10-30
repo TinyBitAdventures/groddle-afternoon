@@ -15,10 +15,10 @@ import {
   quoteAnimalKinship,
   performAnimalKinship,
   resetAnimalKinshipDay,
-} from '../public/js/animal-kinship.js?v=g403-1';
-import { createAnimalState, animalStatusLabel } from '../public/js/animals.js?v=g478-1';
-import { getVerbsFor, runVerb } from '../public/content.js?v=g478-1';
-import { createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=woodcutting-test-8';
+} from '../public/js/animal-kinship.js?v=23f74bb3';
+import { createAnimalState, animalStatusLabel } from '../public/js/animals.js?v=e857d0af';
+import { getVerbsFor, runVerb } from '../public/content.js?v=e2372a6b';
+import { createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=9a2e7ef4';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');
@@ -354,6 +354,6 @@ describe('verb and live-client integration', () => {
     assert.match(game, /dataset\.butterflyCareAnimation/);
     assert.match(content, /quoteAnimalKinship/);
     assert.match(content, /performAnimalKinship/);
-    assert.match(html, /game\.js\?v=official-ecology-1/);
+    assert.match(html, /game\.js\?v=[0-9a-f]{8}/);
   });
 });

@@ -19,11 +19,11 @@ import {
   loadZoom,
   saveZoom,
   createWorldZoom,
-} from '../public/js/world-zoom.js?v=g486-1';
-import { stageFor, ORIGINAL_VIEW_W, ORIGINAL_VIEW_H, LOCATION_VIEW_W, VIEW_FLOOR_H, MIN_PACK_HEIGHT } from '../public/js/location-view.js?v=g476-1';
-import { classicLayout, classicScale, classicZoomScale, chromeWidth, railFor } from '../public/js/classic/classic-layout.js?v=g476-1';
-import { classicZoomVar } from '../public/js/classic/classic-zoom.js?v=g486-1';
-import { hotkeySections, clientKeyAction } from '../public/js/client-hotkeys.js?v=g486-1';
+} from '../public/js/world-zoom.js?v=b5f4748a';
+import { stageFor, ORIGINAL_VIEW_W, ORIGINAL_VIEW_H, LOCATION_VIEW_W, VIEW_FLOOR_H, MIN_PACK_HEIGHT } from '../public/js/location-view.js?v=5a0d5c0b';
+import { classicLayout, classicScale, classicZoomScale, chromeWidth, railFor } from '../public/js/classic/classic-layout.js?v=299eef68';
+import { classicZoomVar } from '../public/js/classic/classic-zoom.js?v=7a25123e';
+import { hotkeySections, clientKeyAction } from '../public/js/client-hotkeys.js?v=b45e776c';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => fs.readFileSync(path.join(root, 'public', rel), 'utf8');

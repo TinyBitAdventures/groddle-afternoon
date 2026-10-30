@@ -31,16 +31,16 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js';
-import { platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js';
-import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog } from '../public/js/street-ecology.js';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
-import { loadRecipeCatalogFromFile } from '../public/js/making.js';
-import { SHRINE_ITEM_BASE_COSTS, donationValueFor, giantForStreet } from '../public/js/shrines.js?v=spinning-wheel-test-4';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=20c7b021';
+import { platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js?v=606bae73';
+import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=dbcefe18';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=85d4faba';
+import { loadRecipeCatalogFromFile } from '../public/js/making.js?v=9e538296';
+import { SHRINE_ITEM_BASE_COSTS, donationValueFor, giantForStreet } from '../public/js/shrines.js?v=01b185bc';
 import { placementRequests } from './build-realtime-objects.mjs';
-import { streetIsRookable } from '../public/js/rook-attack.js';
-import { rebuiltRoomEcology } from '../public/js/rebuilt-rooms.js';
-import { winterStreetEcology } from '../public/js/winter-walk-streets.js';
+import { streetIsRookable } from '../public/js/rook-attack.js?v=c06c0537';
+import { rebuiltRoomEcology } from '../public/js/rebuilt-rooms.js?v=95ca6839';
+import { winterStreetEcology } from '../public/js/winter-walk-streets.js?v=615549da';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

@@ -16,8 +16,8 @@ import {
   pickConnection,
   streetWidth,
   streetHeight,
-} from '../public/js/street-model.js?v=g478-1';
-import { STREET_INDEX, availableStreetTsids } from '../public/js/street-loader.js?v=g478-1';
+} from '../public/js/street-model.js?v=606bae73';
+import { STREET_INDEX, availableStreetTsids } from '../public/js/street-loader.js?v=20c7b021';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const streetsDir = join(__dirname, '../public/assets/streets');

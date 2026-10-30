@@ -11,8 +11,8 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=g464-2';
-import { DENSE_SPRITES, denseFrame, densePath, denseSprite } from '../public/js/sprite-dense.js?v=g430-1';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=bf62077e';
+import { DENSE_SPRITES, denseFrame, densePath, denseSprite } from '../public/js/sprite-dense.js?v=8e0109eb';
 import {
   STREET_SPIRIT_ART,
   STREET_SPIRIT_LONELY_ART,
@@ -22,9 +22,9 @@ import {
   portraitSheet,
   spiritCrySheet,
   spiritSheet,
-} from '../public/js/street-spirits.js';
-import { STREET_SPIRIT_VARIANTS } from '../public/js/street-spirits.js';
-import { inviteBox } from '../public/js/spirit-loneliness.js';
+} from '../public/js/street-spirits.js?v=f9e88445';
+import { STREET_SPIRIT_VARIANTS } from '../public/js/street-spirits.js?v=f9e88445';
+import { inviteBox } from '../public/js/spirit-loneliness.js?v=9259917d';
 import { PORTRAIT_DENSITY, portraitManifest, streetManifest } from '../tools/vector-sprites/street-spirit-manifests.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -156,7 +156,7 @@ describe('sharp sprites drawn bigger than their frames', () => {
 
   it('the porthole draws the dense part when it is in, at up to 3 device px per CSS px', () => {
     const src = readFileSync(join(pub, 'js/features/spirit-loneliness-feature.js'), 'utf8');
-    assert.match(src, /from '\.\.\/sprite-dense\.js\?v=g\d+-\d+'/);
+    assert.match(src, /from '\.\.\/sprite-dense\.js\?v=[0-9a-f]{8}'/);
     assert.match(src, /const pxRatio = Math\.min\(3, globalThis\.devicePixelRatio \|\| 1\)/);
     assert.match(src, /denseSprite\(def\.path, pxPerTexel\)/);
     assert.match(src, /portraitFrame\(inv, clip, f\)/);

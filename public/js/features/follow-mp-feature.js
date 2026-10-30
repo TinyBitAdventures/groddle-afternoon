@@ -51,7 +51,7 @@ import {
   refusedText,
   teleportCounters,
   teleportKindOf,
-} from '../follow-mp.js?v=follow-1';
+} from '../follow-mp.js?v=7c5cda9a';
 
 export const FOLLOW_MP_FEATURE_ID = 'follow-mp';
 

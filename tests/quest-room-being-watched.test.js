@@ -11,8 +11,8 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=g458-1';
-import { JUMP_RISE, JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js';
+import * as kit from '../public/js/quest-rooms/kit.js?v=fd1eb817';
+import { JUMP_RISE, JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=8a4480a4';
 import {
   DAIS,
   DRINK_TEXT,
@@ -32,8 +32,8 @@ import {
   napPlatforms,
   room,
   watching,
-} from '../public/js/quest-rooms/being-watched.js?v=g457-3';
-import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=g482-2';
+} from '../public/js/quest-rooms/being-watched.js?v=b9f3d352';
+import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');

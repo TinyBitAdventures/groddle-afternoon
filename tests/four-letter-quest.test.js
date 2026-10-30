@@ -14,7 +14,7 @@ import {
   fourLetterWord,
   spinFourLetterBlock,
   startFourLetterPuzzle,
-} from '../public/js/four-letter-quest.js';
+} from '../public/js/four-letter-quest.js?v=a5574ac7';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');

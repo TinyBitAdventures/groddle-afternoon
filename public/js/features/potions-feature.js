@@ -62,19 +62,19 @@
  *   &potionlevel=<n> sets your level for the Draught of Wisdom.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { getGameDayKey } from '../game-day.js';
-import { metabolicGain, moodMax } from '../metabolics.js';
-import { quoinDailyLimitFor } from '../quoins.js?v=g424-1';
-import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
-import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=g414-1';
-import { isPoisoned } from '../tree-poison.js';
-import { furnitureSize } from '../home-decor.js?v=g448-3';
-import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js';
-import { POTION_ART } from '../potion-art.js?v=g448-3';
-import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=progression-1';
-import { overlayOrStandIn } from '../overlay-stand-in.js?v=g463-2';
-import { playPoofIn, playSheetOverlay } from '../overlay-art.js?v=g463-2';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
+import { getGameDayKey } from '../game-day.js?v=3095e05b';
+import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
+import { quoinDailyLimitFor } from '../quoins.js?v=d4f4772b';
+import { emblemCostFor } from '../shrines.js?v=01b185bc';
+import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js?v=3996c344';
+import { isPoisoned } from '../tree-poison.js?v=f6e01177';
+import { furnitureSize } from '../home-decor.js?v=95ba0a91';
+import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js?v=01a295a1';
+import { POTION_ART } from '../potion-art.js?v=27ccc756';
+import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
+import { overlayOrStandIn } from '../overlay-stand-in.js?v=d5f58efe';
+import { playPoofIn, playSheetOverlay } from '../overlay-art.js?v=628fa0b4';
 import {
   ANIMAL_BABIES,
   KEY_NAMES,
@@ -126,13 +126,13 @@ import {
   trantsformMessage,
   trantsformOutcome,
   usePotion,
-} from '../potions.js?v=g391-1';
-import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
-import { patchesFeature } from './patches-feature.js?v=g485-1';
-import { homesFeature } from './homes-feature.js?v=g485-1';
-import { streetTreeIndex } from './tree-death-feature.js?v=g485-1';
-import { questRoomConverse } from './quest-instances-feature.js?v=g482-2';
-import { itemZ } from '../item-bands.js?v=g429-1';
+} from '../potions.js?v=294258de';
+import { itemVerbAchievementCounters } from '../item-verbs.js?v=729ccd91';
+import { patchesFeature } from './patches-feature.js?v=22fe1430';
+import { homesFeature } from './homes-feature.js?v=8995a326';
+import { streetTreeIndex } from './tree-death-feature.js?v=e5c20791';
+import { questRoomConverse } from './quest-instances-feature.js?v=1af188a6';
+import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const POTIONS_FEATURE_ID = 'potions';
 const LOVE = 'feeling_called_love';

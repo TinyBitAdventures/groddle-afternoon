@@ -41,9 +41,9 @@
  * clue streets are the archived streets with their `juju_dig` boxes.
  */
 
-import { onLoaded, textureFromUrl } from '../textures.js';
-import { loseMood } from '../metabolics.js';
-import { JUJU_CAMP_FILES } from '../juju-camp-art.js';
+import { onLoaded, textureFromUrl } from '../textures.js?v=01a295a1';
+import { loseMood } from '../metabolics.js?v=8504134e';
+import { JUJU_CAMP_FILES } from '../juju-camp-art.js?v=4aa81c05';
 
 const Q1 = 'help_juju_bandits';
 const Q2 = 'help_juju_bandits_2';
@@ -387,7 +387,7 @@ const noteOpen = () => Boolean(noteMod?.noteViewOpen?.());
 async function openHint(engineLike, h) {
   const clue = clueFor(h);
   if (!clue || typeof document === 'undefined') return;
-  noteMod ||= await import('../note-view.js?v=g463-1');
+  noteMod ||= await import('../note-view.js?v=21c55475');
   noteMod.openNoteView({ kicker: 'Secret Juju Hint', title: clue.title, body: clue.text, reason: TEXT.noteReason });
   engineLike.setData?.('jujuNote', clue.title);
 }

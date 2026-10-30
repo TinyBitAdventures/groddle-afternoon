@@ -17,9 +17,9 @@ import {
   layerScreenDir,
   settleOnDevice,
   snapToDevice,
-} from '../public/js/camera-feel.js?v=g473-1';
-import { dampingAlpha } from '../public/js/movement.js?v=movement-6';
-import { parallaxLayerOffset } from '../public/js/street-render.js?v=g478-1';
+} from '../public/js/camera-feel.js?v=e668afc5';
+import { dampingAlpha } from '../public/js/movement.js?v=a314f8a1';
+import { parallaxLayerOffset } from '../public/js/street-render.js?v=4df4a30c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

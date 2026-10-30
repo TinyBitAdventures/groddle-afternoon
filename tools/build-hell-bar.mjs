@@ -12,7 +12,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { arrivalInTarget } from '../public/js/location-navigation.js';
+import { arrivalInTarget } from '../public/js/location-navigation.js?v=38c12adf';
 import {
   HELL_BAR_ARRIVE,
   HELL_BAR_TSID,
@@ -20,7 +20,7 @@ import {
   PANKA_TSID,
   hellBarIndexEntry,
   hellBarStreet,
-} from '../public/js/hell-bar.js';
+} from '../public/js/hell-bar.js?v=771e3c71';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

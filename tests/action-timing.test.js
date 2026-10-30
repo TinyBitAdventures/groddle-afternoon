@@ -10,7 +10,7 @@ import {
   createTimedAction,
   advanceTimedAction,
   cancelTimedAction,
-} from '../public/js/action-timing.js';
+} from '../public/js/action-timing.js?v=2513e592';
 
 const here = dirname(fileURLToPath(import.meta.url));
 

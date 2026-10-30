@@ -39,18 +39,18 @@ import {
   renderX,
   roomMachineVerbs,
   tankFuel,
-} from '../public/js/machine-rooms.js?v=g403-1';
-import { FOREST_MACHINE_ROOM_HELD, FOREST_MACHINE_ROOM_TSID } from '../public/js/forest-machine-room.js';
-import { FRESH_FUEL, MAX_FUEL, refuelMachine } from '../public/js/machines.js?v=g403-1';
-import { DROP_TABLES, applyDropResult, rollDropTable } from '../public/js/drop-tables.js';
-import { countItem, removeItem } from '../public/js/inventory.js?v=catalog-unified-7';
-import { canUseTool } from '../public/js/tools.js?v=woodcutting-test-8';
-import { MACHINE_EXTRA_WAIT_MS as MAKING_EXTRA_WAIT_MS, MAKING_TOOL_SKILLS, RECIPE_CATALOG, canCraft, craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=g403-1';
-import { fixedFurniturePoints, furniturePlacementGroups } from '../public/js/street-furniture.js?v=g478-1';
-import { worldToScreen } from '../public/js/street-model.js?v=g478-1';
-import { nearestSurfaceY } from '../public/js/walk-surface.js?v=g478-1';
-import { platformsScreen } from '../public/js/street-model.js?v=g478-1';
-import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=g478-1';
+} from '../public/js/machine-rooms.js?v=dd347926';
+import { FOREST_MACHINE_ROOM_HELD, FOREST_MACHINE_ROOM_TSID } from '../public/js/forest-machine-room.js?v=5f7e4589';
+import { FRESH_FUEL, MAX_FUEL, refuelMachine } from '../public/js/machines.js?v=aad0d603';
+import { DROP_TABLES, applyDropResult, rollDropTable } from '../public/js/drop-tables.js?v=0f922478';
+import { countItem, removeItem } from '../public/js/inventory.js?v=85d4faba';
+import { canUseTool } from '../public/js/tools.js?v=9a2e7ef4';
+import { MACHINE_EXTRA_WAIT_MS as MAKING_EXTRA_WAIT_MS, MAKING_TOOL_SKILLS, RECIPE_CATALOG, canCraft, craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=9e538296';
+import { fixedFurniturePoints, furniturePlacementGroups } from '../public/js/street-furniture.js?v=3955b1b6';
+import { worldToScreen } from '../public/js/street-model.js?v=606bae73';
+import { nearestSurfaceY } from '../public/js/walk-surface.js?v=c4aff42f';
+import { platformsScreen } from '../public/js/street-model.js?v=606bae73';
+import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=0ceaadff';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(spike, '../glitch-GameServerJS');

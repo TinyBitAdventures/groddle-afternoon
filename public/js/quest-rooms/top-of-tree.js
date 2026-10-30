@@ -21,7 +21,7 @@
  * flared root base, and the place's own name.
  */
 
-import { metabolicGain } from '../metabolics.js';
+import { metabolicGain } from '../metabolics.js?v=8504134e';
 
 export const TREE_W = 1400;
 export const TREE_H = 2320;

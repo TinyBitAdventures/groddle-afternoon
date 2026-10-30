@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { KIDS_ROOM_FILES } from '../public/js/kids-room-art.js';
+import { KIDS_ROOM_FILES } from '../public/js/kids-room-art.js?v=9f7a7a04';
 import {
   KIDS_ROOM_ART,
   KIDS_ROOM_ART_DIR,
@@ -19,8 +19,8 @@ import {
   KIDS_ROOM_TEMPLATE,
   KIDS_ROOM_W,
   kidsRoomArt,
-} from '../public/js/kids-room-scene.js';
-import { FOUR_LETTER_LAYOUT, FOUR_LETTER_ROOM_ID } from '../public/js/four-letter-quest.js';
+} from '../public/js/kids-room-scene.js?v=b1592bce';
+import { FOUR_LETTER_LAYOUT, FOUR_LETTER_ROOM_ID } from '../public/js/four-letter-quest.js?v=a5574ac7';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, '..');

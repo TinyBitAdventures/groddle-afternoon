@@ -15,7 +15,7 @@ import {
   themeLabel,
   allAmbientTrackUrls,
   SILENT_THEME,
-} from '../public/js/ambient-music.js';
+} from '../public/js/ambient-music.js?v=22d6d5e1';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const cfgPath = join(__dirname, '../public/assets/content/ambient-music.json');

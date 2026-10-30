@@ -29,18 +29,18 @@ import {
   rangerGreeting,
   splitConversation,
   stepFox,
-} from '../public/js/foxes.js?v=g414-1';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=woodcutting-test-8';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
-import { getAchievementCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
+} from '../public/js/foxes.js?v=9534264f';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=9a2e7ef4';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=85d4faba';
+import { getAchievementCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import {
   inReach,
   isPreserveRow,
   preserveEcologyEntry,
-} from '../public/js/features/foxes-feature.js?v=g478-1';
-import { wildlifeFor } from '../public/js/wildlife.js';
-import { createFeatureHost } from '../public/js/feature-host.js';
-import { foxesFeature } from '../public/js/features/foxes-feature.js?v=g478-1';
+} from '../public/js/features/foxes-feature.js?v=6561c7d4';
+import { wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
+import { createFeatureHost } from '../public/js/feature-host.js?v=e4f648b1';
+import { foxesFeature } from '../public/js/features/foxes-feature.js?v=6561c7d4';
 
 const ecology = JSON.parse(readFileSync(new URL('../public/assets/content/street-ecology.json', import.meta.url)));
 

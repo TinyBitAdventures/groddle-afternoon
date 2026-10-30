@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { wholeStatAmounts, wholeEffects } from '../public/js/stat-text.js';
+import { wholeStatAmounts, wholeEffects } from '../public/js/stat-text.js?v=f96d8fd3';
 
 describe('stat text', () => {
   it('rounds fractional stat amounts in messages', () => {

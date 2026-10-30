@@ -12,7 +12,7 @@ import {
   hogHaulObjective,
   pickupHogHaulBait,
   tickHogHaul,
-} from '../public/js/hog-haul.js';
+} from '../public/js/hog-haul.js?v=50d2e072';
 
 describe('The Great Hog Haul race rules', () => {
   it('runs the original READY, 3, 2, 1, GO countdown', () => {

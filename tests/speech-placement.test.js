@@ -31,7 +31,7 @@ import {
   speechBubbleOutline,
   speechTailPoints,
   SPEECH_SLIDE_LIMIT,
-} from '../public/js/speech-placement.js?v=g440-1';
+} from '../public/js/speech-placement.js?v=7e03b1b9';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '../glitch-GameServerJS');

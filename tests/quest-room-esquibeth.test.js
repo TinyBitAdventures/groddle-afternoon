@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import * as kit from '../public/js/quest-rooms/kit.js?v=g458-1';
+import * as kit from '../public/js/quest-rooms/kit.js?v=fd1eb817';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const mod = await import('../public/js/quest-rooms/esquibeth.js');
+const mod = await import('../public/js/quest-rooms/esquibeth.js?v=daa6d38e');
 
 // Avatar reach (game.js physics): jump 9.6 px/frame against 0.42 gravity peaks near 110 px
 // and carries about 200 px at run speed 4.4; keep margins.
@@ -199,7 +199,7 @@ describe('The Last Pilgrimage of Esquibeth (esquibeth)', () => {
   });
 
   it("plays the playback overlay's own melody take for the ghost", async () => {
-    const { SOUND_FILES, SOUND_CATEGORIES } = await import('../public/js/sound-keys.js?v=g388-1');
+    const { SOUND_FILES, SOUND_CATEGORIES } = await import('../public/js/sound-keys.js?v=2d82d399');
     const catalog = JSON.parse(readFileSync(join(root, 'public/assets/content/sound-keys.json'), 'utf8')).keys;
     // DOMSoundItem externalFileSize in glitch-overlays/npc_esquibeth_playback*.fla.
     const takes = {

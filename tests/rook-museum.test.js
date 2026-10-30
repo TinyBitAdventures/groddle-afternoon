@@ -30,7 +30,7 @@ import {
   rookMuseumPaintingAlphas,
   rookMuseumWorldPoint,
   visitRookMuseumExhibit,
-} from '../public/js/rook-museum.js?v=g455-1';
+} from '../public/js/rook-museum.js?v=aa41f263';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

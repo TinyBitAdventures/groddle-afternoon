@@ -1,7 +1,7 @@
 /** Official Glitch quoin types and their persistent daily economy. */
 
-import { energyMax, metabolicGain, moodMax } from './metabolics.js';
-import { grantMoodXp } from './mood-xp.js';
+import { energyMax, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
+import { grantMoodXp } from './mood-xp.js?v=958e7680';
 
 export const DEFAULT_DAILY_QUOIN_LIMIT = 100;
 export const QUOIN_SHEET = Object.freeze({

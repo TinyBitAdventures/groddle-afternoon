@@ -36,10 +36,10 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'yard-verbs.json');
 
 export async function yardVerbsJson() {
-  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js');
-  const { ANIMAL_KINSHIP_PACKAGES } = await import('../public/js/animal-kinship.js');
-  const { ARBOROLOGY_HARVEST, TRANT_META } = await import('../public/js/trants.js');
-  const { SOIL_SKILL_PACKAGES, SOIL_TIMERS } = await import('../public/js/patches.js');
+  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=40912008');
+  const { ANIMAL_KINSHIP_PACKAGES } = await import('../public/js/animal-kinship.js?v=23f74bb3');
+  const { ARBOROLOGY_HARVEST, TRANT_META } = await import('../public/js/trants.js?v=9c2e8c0f');
+  const { SOIL_SKILL_PACKAGES, SOIL_TIMERS } = await import('../public/js/patches.js?v=3996c344');
   const ak = Object.keys(ANIMAL_KINSHIP_PACKAGES).sort().map((key) => `${JSON.stringify(key)}:[${ANIMAL_KINSHIP_PACKAGES[key].map((r) => `{"l":${r.intervalLimit},"b":${r.bonusAmount}}`).join(',')}]`);
   const arbor = Object.values(ARBOROLOGY_HARVEST).map((r) => `{"skill":${JSON.stringify(r.skillId)},"l":${r.intervalLimit},"b":${r.bonusAmount}}`);
   const dig = Object.entries(SOIL_SKILL_PACKAGES.dig_patch).map(([id, r]) => `{"skill":${JSON.stringify(id === 'no_skill' ? null : id)},"b":${r.bonus_amount}}`);

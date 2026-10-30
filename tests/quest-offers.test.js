@@ -13,7 +13,7 @@ import {
   resetContentCatalogs,
   getQuestCatalog,
   getContentMeta,
-} from '../public/js/content-catalogs.js?v=g403-1';
+} from '../public/js/content-catalogs.js?v=10b118dd';
 import {
   createQuestState,
   assignQuest,
@@ -23,8 +23,8 @@ import {
   applyQuestRewards,
   questRewardSummary,
   listQuestLog,
-} from '../public/js/quests.js';
-import { builtInstanceQuests } from '../public/js/quest-rooms/catalog.js?v=g482-2';
+} from '../public/js/quests.js?v=282e1621';
+import { builtInstanceQuests } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
 import {
   OFFER_INTERVAL_MS,
   COUNTER_ROUTES,
@@ -53,8 +53,8 @@ import {
   tickQuestTimers,
   restartTimedQuest,
   questTimerStatus,
-} from '../public/js/quest-offers.js?v=g403-1';
-import { XP_FOR_LEVEL } from '../public/js/progression.js';
+} from '../public/js/quest-offers.js?v=6b6cbf22';
+import { XP_FOR_LEVEL } from '../public/js/progression.js?v=33462eaa';
 
 const CONTENT = join(dirname(fileURLToPath(import.meta.url)), '../public/assets/content');
 

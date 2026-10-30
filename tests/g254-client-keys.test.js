@@ -29,7 +29,7 @@ import {
   hotkeyText,
   isHotkeySheetRelease,
   isPlainKey,
-} from '../public/js/client-hotkeys.js?v=g486-1';
+} from '../public/js/client-hotkeys.js?v=b45e776c';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(here, '../public');
@@ -194,7 +194,7 @@ describe('G254: game.js wiring', () => {
   const keys = keyBlock(game);
 
   it('imports the module under one key, and nothing else imports it under another', () => {
-    assert.match(game, /from '\.\/js\/client-hotkeys\.js\?v=g\d+-\d+';/);
+    assert.match(game, /from '\.\/js\/client-hotkeys\.js\?v=[0-9a-f]{8}';/);
     const keysUsed = new Set([...game.matchAll(/client-hotkeys\.js\?v=([\w-]+)/g)].map((m) => m[1]));
     assert.equal(keysUsed.size, 1);
   });
@@ -262,8 +262,8 @@ describe('G254: game.js wiring', () => {
     assert.match(css.slice(at, css.indexOf('}', at)), /background: rgba\(0, 0, 0, 0\.4\);/);
     assert.match(css, /\.hotkeys-section b \{ color: #9ccc1c; \}/);
     const html = read('play/index.html');
-    assert.match(html, /style\.css\?v=[^"]*skills=g\d+-\d+/);
-    assert.match(html, /game\.js\?v=[^"]*round16=g\d+-\d+/);
+    assert.match(html, /href="style\.css\?v=[0-9a-f]{8}"/);
+    assert.match(html, /src="game\.js\?v=[0-9a-f]{8}"/);
     assert.match(html, /<kbd>M<\/kbd> or <kbd>G<\/kbd> map ·/);
     assert.match(html, /<kbd>Z<\/kbd> player menu ·/);
     assert.match(html, /hold <kbd>\?<\/kbd> for every key/);

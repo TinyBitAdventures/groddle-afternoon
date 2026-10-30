@@ -16,21 +16,21 @@ import {
   scaledToolWear,
   skillTimeFactor,
   toolWearMultiplier,
-} from '../public/js/imagination-effects.js?v=g403-1';
-import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=g403-1';
-import { REMAKE_STATUS_RULES, isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=g403-1';
-import { applyRewards } from '../public/js/quests.js';
-import { createInventory, countItem, ensureItem } from '../public/js/inventory.js?v=catalog-unified-7';
-import { createMineRock, miningProfile, mineRock, smeltMetalRocks } from '../public/js/mining.js?v=g403-1';
-import { craftRecipe, makingSkillAdjustments } from '../public/js/making.js?v=g403-1';
-import { createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=woodcutting-test-8';
-import { quoteWoodTreeHarvest } from '../public/js/woodcutting.js?v=g414-1';
-import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=g403-1';
-import { createGarden, getPlot, plantPlot, plotKey } from '../public/js/garden.js?v=g403-1';
-import { vendorBuy, vendorSell, vendorBuyUnitPrice } from '../public/js/vendor.js?v=vendor-profiles-12';
-import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=g424-1';
-import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=g403-1';
-import { createSkillState, getStudyStatus, pauseSkillStudy, startSkillStudy } from '../public/js/skills.js';
+} from '../public/js/imagination-effects.js?v=70169933';
+import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=b4f0eaf6';
+import { REMAKE_STATUS_RULES, isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=ca0a48d5';
+import { applyRewards } from '../public/js/quests.js?v=282e1621';
+import { createInventory, countItem, ensureItem } from '../public/js/inventory.js?v=85d4faba';
+import { createMineRock, miningProfile, mineRock, smeltMetalRocks } from '../public/js/mining.js?v=a7eb8740';
+import { craftRecipe, makingSkillAdjustments } from '../public/js/making.js?v=9e538296';
+import { createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=9a2e7ef4';
+import { quoteWoodTreeHarvest } from '../public/js/woodcutting.js?v=4e140315';
+import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=23f74bb3';
+import { createGarden, getPlot, plantPlot, plotKey } from '../public/js/garden.js?v=9a8f8f72';
+import { vendorBuy, vendorSell, vendorBuyUnitPrice } from '../public/js/vendor.js?v=563afb9b';
+import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=b4449504';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
+import { createSkillState, getStudyStatus, pauseSkillStudy, startSkillStudy } from '../public/js/skills.js?v=4542bdf9';
 
 const root = join(import.meta.dirname, '..', 'public');
 const ALL_AK = ['animalkinship_1', 'animalkinship_2', 'animalkinship_3', 'animalkinship_4', 'animalkinship_5', 'animalkinship_6', 'animalkinship_7'];

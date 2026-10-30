@@ -11,7 +11,7 @@
  * the GSJS instance props (bag_butler.js make_config), e.g. { accessory: '10',
  * bod: 'body10', skull: 'skull10', face: 'face10', closeArm: '10', ... }.
  */
-import { paintItems } from './avatar-compositor.js';
+import { paintItems } from './avatar-compositor.js?v=dcd906ae';
 
 export const BUTLER_RIG_URL = 'assets/butler-rig/butler.json';
 /** Backing pixels per world pixel for the in-game Butler. */

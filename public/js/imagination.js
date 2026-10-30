@@ -29,7 +29,7 @@
  * movement feel is the post-tutorial baseline.
  */
 
-import { IMAGINATION_UPGRADES, SHUFFLE_CARD_COST, CARD_ART_LAYERS } from './imagination-data.js';
+import { IMAGINATION_UPGRADES, SHUFFLE_CARD_COST, CARD_ART_LAYERS } from './imagination-data.js?v=4a85e7fe';
 
 export { IMAGINATION_UPGRADES, SHUFFLE_CARD_COST, CARD_ART_LAYERS };
 

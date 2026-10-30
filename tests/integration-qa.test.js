@@ -43,10 +43,10 @@ test.describe('integration playtest regressions', () => {
   });
 
   test('the Magic Rock waits out rook attacks, Naraka and meditation', async () => {
-    const { createFeatureHost } = await import('../public/js/feature-host.js');
-    const { rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=g479-2');
-    const { hellFeature } = await import('../public/js/features/hell-feature.js');
-    const { createRookAttack } = await import('../public/js/rook-attack.js?v=g479-2');
+    const { createFeatureHost } = await import('../public/js/feature-host.js?v=e4f648b1');
+    const { rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=827d24a8');
+    const { hellFeature } = await import('../public/js/features/hell-feature.js?v=bdaefff5');
+    const { createRookAttack } = await import('../public/js/rook-attack.js?v=c06c0537');
     const host = createFeatureHost([rookAttackFeature, hellFeature]);
     rookAttackFeature.restore({ active: createRookAttack({ tsid: 'L1', now: Date.now() }) });
     assert.equal(host.query('holdQuestOffers', { streetTsid: 'L1' }), true);
@@ -69,8 +69,8 @@ test.describe('integration playtest regressions', () => {
   });
 
   test('vendor receipts say "1 currant"', async () => {
-    const { vendorSell } = await import('../public/js/vendor.js');
-    const { createInventory } = await import('../public/js/inventory.js?v=catalog-unified-7');
+    const { vendorSell } = await import('../public/js/vendor.js?v=563afb9b');
+    const { createInventory } = await import('../public/js/inventory.js?v=85d4faba');
     const inv = createInventory();
     inv.grain = 1;
     const pc = { currants: 0 };
@@ -81,7 +81,7 @@ test.describe('integration playtest regressions', () => {
   });
 
   test('closed roads refuse signposts but not the Map', async () => {
-    const { createFeatureHost } = await import('../public/js/feature-host.js');
+    const { createFeatureHost } = await import('../public/js/feature-host.js?v=e4f648b1');
     const seen = [];
     const host = createFeatureHost([{ id: 'probe', travelGate: (tsid, engine, meta) => { seen.push(meta); return meta.via === 'signpost' ? { ok: false } : null; } }]);
     assert.equal(host.travelGate('L1', {}, { via: 'signpost' }).ok, false);

@@ -16,8 +16,8 @@ import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { inflateSync } from 'node:zlib';
-import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js';
-import { TOOL_STAND_INS, listMakingTools, loadRecipeCatalogFromFile } from '../public/js/making.js?v=g403-1';
+import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js?v=6f758e09';
+import { TOOL_STAND_INS, listMakingTools, loadRecipeCatalogFromFile } from '../public/js/making.js?v=9e538296';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -145,7 +145,7 @@ describe('G188 Make panel tool animations', () => {
   it('the Make panel plays the table, and only the table', () => {
     const game = readFileSync(join(pub, 'game.js'), 'utf8');
     const css = readFileSync(join(pub, 'style.css'), 'utf8');
-    assert.match(game, /import \{ MAKE_TOOL_SHEETS \} from '\.\/js\/make-tool-sheets\.js\?v=g\d+-\d+'/);
+    assert.match(game, /import \{ MAKE_TOOL_SHEETS \} from '\.\/js\/make-tool-sheets\.js\?v=[0-9a-f]{8}'/);
     assert.match(game, /const toolVisual = makeToolSheetVisual\(toolInUse\) \|\| makeToolSheetVisual\(recipe\.tool\)\n\s+\|\| machineArtHtml\(recipe\.tool, [^\n]+\n\s+\|\| `<img class="mp-tool"/);
     assert.match(game, /--mp-cols:\$\{sheet\.cols\}/);
     assert.match(game, /--mp-rows:\$\{rows\}/);

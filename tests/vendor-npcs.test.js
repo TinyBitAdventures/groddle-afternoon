@@ -27,10 +27,10 @@ import {
   vendorNpcStoreProfile,
   vendorNpcsFor,
   vendorSheet,
-} from '../public/js/vendor-npcs.js';
-import { VENDOR_PROFILES } from '../public/js/vendor.js';
-import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=g403-1';
-import { createQuestState } from '../public/js/quests.js';
+} from '../public/js/vendor-npcs.js?v=53b1f6c9';
+import { VENDOR_PROFILES } from '../public/js/vendor.js?v=563afb9b';
+import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
+import { createQuestState } from '../public/js/quests.js?v=282e1621';
 import {
   REMAKE_QUEST_NPCS,
   acceptOffer,
@@ -40,8 +40,8 @@ import {
   pendingQuestOffers,
   syncItemRequirements,
   turnInQuest,
-} from '../public/js/quest-offers.js?v=g403-1';
-import { XP_FOR_LEVEL } from '../public/js/progression.js';
+} from '../public/js/quest-offers.js?v=6b6cbf22';
+import { XP_FOR_LEVEL } from '../public/js/progression.js?v=33462eaa';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -182,7 +182,7 @@ describe('vendor NPC art', () => {
   });
 
   it('swaps every strip to a 3x render of its vector SWF on first draw, frame for frame', async () => {
-    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, SPLIT_SPRITES } = await import('../public/js/sprite-hires.js?v=g464-2');
+    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, SPLIT_SPRITES } = await import('../public/js/sprite-hires.js?v=bf62077e');
     const results = JSON.parse(readFileSync(join(PUBLIC, '../tools/vector-sprites/results.json'), 'utf8'));
     for (const cls of VENDOR_NPC_CLASSES) {
       for (const [state, art] of Object.entries(VENDOR_NPC_ART[cls].states)) {

@@ -9,10 +9,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { SLOPE_STICK, holdCloseToFloor, stickToSlope } from '../public/js/slope-walk.js?v=g411-1';
-import { platformsScreen, resolveGround } from '../public/js/street-model.js?v=g478-1';
-import { avatarAnimState } from '../public/js/avatar-anims.js';
-import { landingY } from '../public/js/walk-surface.js?v=g478-1';
+import { SLOPE_STICK, holdCloseToFloor, stickToSlope } from '../public/js/slope-walk.js?v=9af1e505';
+import { platformsScreen, resolveGround } from '../public/js/street-model.js?v=606bae73';
+import { avatarAnimState } from '../public/js/avatar-anims.js?v=fb921bf4';
+import { landingY } from '../public/js/walk-surface.js?v=c4aff42f';
 
 const root = join(import.meta.dirname, '..');
 const babySteppes = JSON.parse(readFileSync(join(root, 'public/assets/streets/GM416LNIKVLM1.json'), 'utf8'));
@@ -149,7 +149,7 @@ describe('holdCloseToFloor (AvatarAnimationState close_limit)', () => {
 
   it('game.js uses both in the physics loop and the animation pick', () => {
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
-    assert.match(game, /import \{ holdCloseToFloor, stickToSlope \} from '\.\/js\/slope-walk\.js\?v=g411-1';/);
+    assert.match(game, /import \{ holdCloseToFloor, stickToSlope \} from '\.\/js\/slope-walk\.js\?v=[0-9a-f]{8}';/);
     assert.match(game, /const wasGrounded = player\.onGround === true;[\s\S]{0,400}player\.vy \+= 0\.42 \* movementBuff\.gravity \* dt;/);
     assert.match(game, /stickToSlope\(\{ wasGrounded, vy: player\.vy, dx: player\.x - prevX, feetY: player\.y, groundY: ground \}\)/);
     assert.match(game, /holdCloseToFloor\(avatarAnimState\(/);

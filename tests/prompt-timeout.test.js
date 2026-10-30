@@ -12,12 +12,12 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PROMPT_ROLL_OUT_MS, armPromptTimeout, promptTimeoutMs, timeoutChoice } from '../public/js/prompt-timeout.js?v=g470-1';
-import { STREET_CARD_GONE, STREET_CARD_UP, cardHidesKey, cardPausedTimeout, installStreetCardKeyGuard, streetCardUp } from '../public/js/screen-fx.js?v=g470-1';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-16';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=g425-1';
-import { HELL_ENTRY_PROMPT_TIMEOUT_MS, HELL_TEXT } from '../public/js/hell.js';
-import { createQuestState } from '../public/js/quests.js';
+import { PROMPT_ROLL_OUT_MS, armPromptTimeout, promptTimeoutMs, timeoutChoice } from '../public/js/prompt-timeout.js?v=4a5f23f7';
+import { STREET_CARD_GONE, STREET_CARD_UP, cardHidesKey, cardPausedTimeout, installStreetCardKeyGuard, streetCardUp } from '../public/js/screen-fx.js?v=82ce3680';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=bdaefff5';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=243877f6';
+import { HELL_ENTRY_PROMPT_TIMEOUT_MS, HELL_TEXT } from '../public/js/hell.js?v=68b57749';
+import { createQuestState } from '../public/js/quests.js?v=282e1621';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(spike, 'public');

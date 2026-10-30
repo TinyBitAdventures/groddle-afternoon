@@ -24,8 +24,8 @@
  * waiting sign before the cave mouth on the right, and a pond, tables and the candy cane in front.
  */
 
-import { RUBE_YARD_FILES } from './rube-yard-art.js?v=g66-1';
-import { textureFromUrl } from './textures.js';
+import { RUBE_YARD_FILES } from './rube-yard-art.js?v=0a67d3e6';
+import { textureFromUrl } from './textures.js?v=01a295a1';
 
 export const YARD_W = 1900;
 export const YARD_H = 760;

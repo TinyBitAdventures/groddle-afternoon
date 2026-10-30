@@ -23,11 +23,11 @@ import {
   swfAddedWithSet,
   swfVerbs,
   wrangleMessage,
-} from '../public/js/swf.js?v=g190-1';
-import { swfFeature } from '../public/js/features/swf-feature.js?v=g463-2';
-import { FEATURES } from '../public/js/features/index.js?v=registry-369';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
-import { DROP_ITEMS, DROP_TABLES } from '../public/js/drop-tables-data.js';
+} from '../public/js/swf.js?v=6dd72036';
+import { swfFeature } from '../public/js/features/swf-feature.js?v=b2524e66';
+import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=85d4faba';
+import { DROP_ITEMS, DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -252,7 +252,7 @@ describe('Game (items/game_box.js)', () => {
 
 describe('G311: a move takes play_glitch down (cancelAllOverlaysWeCan 193-215)', () => {
   it('the pc_overlay goes with the street and is not sent again; the play still pays', async () => {
-    const { cancelAllOverlays, liveOverlayCount } = await import('../public/js/overlay-art.js?v=g463-2');
+    const { cancelAllOverlays, liveOverlayCount } = await import('../public/js/overlay-art.js?v=628fa0b4');
     cancelAllOverlays();
     swfFeature._reset();
     const engine = fakeEngine(); // no Pixi layer: the announcement is tracked all the same

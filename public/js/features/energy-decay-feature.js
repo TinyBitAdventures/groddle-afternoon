@@ -30,12 +30,12 @@
  * Canvas data: data-energy-loss-tick (period ms), -ticks, -last (energy lost
  * on the last tick), -skip, -energy.
  */
-import { createEnergyLossClock, ENERGY_LOSS_TICK_MS, energyLossSkip, periodicEnergyLoss } from '../energy-decay.js?v=g258-1';
-import { energyMax } from '../metabolics.js';
-import { isNewxpSceneTsid } from '../newxp.js?v=g481-2';
-import { homesFeature } from './homes-feature.js?v=g485-1';
-import { meditationFeature } from './meditation-feature.js?v=g463-2';
-import { newxpFeature } from './newxp-feature.js?v=g481-2';
+import { createEnergyLossClock, ENERGY_LOSS_TICK_MS, energyLossSkip, periodicEnergyLoss } from '../energy-decay.js?v=01009c8b';
+import { energyMax } from '../metabolics.js?v=8504134e';
+import { isNewxpSceneTsid } from '../newxp.js?v=d5978ec1';
+import { homesFeature } from './homes-feature.js?v=8995a326';
+import { meditationFeature } from './meditation-feature.js?v=b1d02c1c';
+import { newxpFeature } from './newxp-feature.js?v=7192302a';
 
 export const ENERGY_DECAY_FEATURE_ID = 'energy-decay';
 const BEAM_ME_DOWN_TSID = 'PUZZLESCENE_BEAM_ME_DOWN';

@@ -39,8 +39,8 @@
  * window.groddleGroups.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
-import { saveStore } from '../save-store.js?v=mp2-2';
+import { createMinnAccount } from '../minn-account.js?v=81339760';
+import { saveStore } from '../save-store.js?v=b74a8113';
 import {
   CHANNELS,
   CHANNEL_INTRO,
@@ -62,7 +62,7 @@ import {
   tabCommand,
   tabOrder,
   writeMemory,
-} from '../groups.js?v=g326-1';
+} from '../groups.js?v=65337c22';
 
 export const GROUPS_FEATURE_ID = 'groups';
 

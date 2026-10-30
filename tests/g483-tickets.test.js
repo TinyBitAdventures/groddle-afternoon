@@ -16,9 +16,9 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, createReportsApi, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=g483-1';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=g483-1';
-import { BUG_TEXT, badgeFor, bugReportFeature } from '../public/js/features/bug-report-feature.js?v=g483-1';
+import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, createReportsApi, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=f3d8584a';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=beb80ffb';
+import { BUG_TEXT, badgeFor, bugReportFeature } from '../public/js/features/bug-report-feature.js?v=5b069040';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

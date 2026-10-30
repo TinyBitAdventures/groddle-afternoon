@@ -16,11 +16,11 @@ import {
   canUseTool,
   setToolRemaining,
   useToolCondition,
-} from './tools.js?v=woodcutting-test-8';
-import { SKILL_PACKAGES, getSkillPackageOverride, skillPackageDetails } from './skill-packages.js';
-import { loseEnergy, metabolicGain, moodMax } from './metabolics.js';
-import { grantMoodXp } from './mood-xp.js';
-import { petPiggy, piggyNibbleRefusal } from './animal-mood.js';
+} from './tools.js?v=9a2e7ef4';
+import { SKILL_PACKAGES, getSkillPackageOverride, skillPackageDetails } from './skill-packages.js?v=bfb87281';
+import { loseEnergy, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
+import { grantMoodXp } from './mood-xp.js?v=958e7680';
+import { petPiggy, piggyNibbleRefusal } from './animal-mood.js?v=a49495fc';
 
 export const ANIMAL_KINSHIP_RANK_IDS = Object.freeze(
   Array.from({ length: 7 }, (_, index) => `animalkinship_${index + 1}`)

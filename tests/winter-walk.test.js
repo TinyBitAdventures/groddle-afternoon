@@ -20,7 +20,7 @@ import {
   winterWalkObjective,
   winterWalkProgress,
   winterWalkRemainingMs,
-} from '../public/js/winter-walk.js?v=g482-2';
+} from '../public/js/winter-walk.js?v=9961c35f';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');

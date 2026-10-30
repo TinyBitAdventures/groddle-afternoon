@@ -27,7 +27,7 @@ import {
   applyNewDayRefill,
   formatGameDayLabel,
   msUntilNewDay,
-} from '../public/js/game-day.js';
+} from '../public/js/game-day.js?v=3095e05b';
 
 const store = new Map();
 globalThis.localStorage = {

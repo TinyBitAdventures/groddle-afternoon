@@ -18,13 +18,14 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { committedMap, keyAssetUrls } from '../data-versions/build.mjs';
+import { moduleUrl } from '../module-keys/build.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SOURCE = join(root, 'public/play/index.html');
 const TARGET = join(root, 'public/play/online/index.html');
 
-/** The cache key of js/online-boot.js (bump it when that file or js/minn-account.js changes). */
-export const ONLINE_BOOT_SRC = 'js/online-boot.js?v=g477-2';
+/** js/online-boot.js with its content key (tools/module-keys/build.mjs: it changes with that file or js/minn-account.js). */
+export const ONLINE_BOOT_SRC = moduleUrl('js/online-boot.js', root);
 
 const MODE_ENTRY = `  <!--
     Multiplayer entry (js/game-mode.js). This must stay the FIRST script on the page, ahead of

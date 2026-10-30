@@ -9,23 +9,23 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { speechSlugList, slugsFromEffects } from '../public/js/speech-slugs.js?v=g412-1';
+import { speechSlugList, slugsFromEffects } from '../public/js/speech-slugs.js?v=130338f9';
 import {
   failureResponseKey,
   resourceNodeResponseKey,
   responsePool,
   shrineDonationResponseKey,
   verbResponse,
-} from '../public/js/verb-responses.js?v=g414-1';
-import { VERB_RESPONSE_POOLS } from '../public/js/verb-responses-data.js?v=g414-1';
-import { runVerb } from '../public/content.js?v=g478-1';
-import { setTrantTables, createTrantState } from '../public/js/trants.js?v=trant-harvest-2';
-import { setMetabolicLossGate } from '../public/js/metabolics.js';
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=g414-1';
-import { talkbackFor } from '../public/js/features/resource-nodes-feature.js?v=g478-1';
-import { plotVerbSlugs } from '../public/js/features/patches-feature.js?v=g485-1';
-import { createKitty, petKitty } from '../public/js/heli-kitties.js?v=g414-1';
-import { createToolConditionState } from '../public/js/tools.js?v=woodcutting-test-8';
+} from '../public/js/verb-responses.js?v=3ceb8a8c';
+import { VERB_RESPONSE_POOLS } from '../public/js/verb-responses-data.js?v=0b948684';
+import { runVerb } from '../public/content.js?v=e2372a6b';
+import { setTrantTables, createTrantState } from '../public/js/trants.js?v=9c2e8c0f';
+import { setMetabolicLossGate } from '../public/js/metabolics.js?v=8504134e';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=3d618d6a';
+import { talkbackFor } from '../public/js/features/resource-nodes-feature.js?v=acce0123';
+import { plotVerbSlugs } from '../public/js/features/patches-feature.js?v=22fe1430';
+import { createKitty, petKitty } from '../public/js/heli-kitties.js?v=ee89a5bf';
+import { createToolConditionState } from '../public/js/tools.js?v=9a2e7ef4';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');

@@ -18,7 +18,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { arrivalInTarget } from '../public/js/location-navigation.js';
+import { arrivalInTarget } from '../public/js/location-navigation.js?v=38c12adf';
 import {
   ABBASID_JAIL_DOOR,
   ABBASID_JAIL_TSID,
@@ -47,7 +47,7 @@ import {
   martlebyStreet,
   snowedInIndexEntry,
   snowedInStreet,
-} from '../public/js/rebuilt-rooms.js';
+} from '../public/js/rebuilt-rooms.js?v=95ca6839';
 import {
   WINTER_HAVEN_TSID,
   WINTER_WALK_TSID,
@@ -55,7 +55,7 @@ import {
   winterHavenStreet,
   winterWalkIndexEntry,
   winterWalkStreet,
-} from '../public/js/winter-walk-streets.js';
+} from '../public/js/winter-walk-streets.js?v=615549da';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

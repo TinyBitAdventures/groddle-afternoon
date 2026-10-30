@@ -15,7 +15,7 @@
  * applies the choice.
  */
 
-import { listHasPaid, listUpgrades, purseText, saveButtonText, UPGRADE_TEXT } from './furniture-upgrades.js?v=g448-3';
+import { listHasPaid, listUpgrades, purseText, saveButtonText, UPGRADE_TEXT } from './furniture-upgrades.js?v=c4ee77ed';
 
 const CSS = `
 .furn-upgrade{position:absolute;left:50%;top:56px;transform:translateX(-50%);z-index:calc(var(--z-panel) + 11);width:min(572px,calc(100% - 20px));max-height:calc(100% - 150px);display:flex;flex-direction:column;background:var(--surface-card);border-radius:var(--radius-2xl);box-shadow:0 12px 32px color-mix(in srgb, var(--c-sand-24) 28%, transparent);border:1px solid color-mix(in srgb, var(--c-umber-41) 18%, transparent);font-family:var(--font-ui);color:var(--text);overflow:hidden}

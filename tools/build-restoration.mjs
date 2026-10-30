@@ -18,17 +18,17 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
 import { CHECKLIST, GROUPS, STATUS } from './restoration/checklist.mjs';
-import { QUEST_ROOMS, BUILT_ROOMS } from '../public/js/quest-rooms/catalog.js';
-import { skillAuditTable } from '../public/js/skill-tree.js';
-import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js';
-import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js';
-import { remakeStatus } from '../public/js/imagination-remake.js';
+import { QUEST_ROOMS, BUILT_ROOMS } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
+import { skillAuditTable } from '../public/js/skill-tree.js?v=cf7bc81f';
+import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
+import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
+import { remakeStatus } from '../public/js/imagination-remake.js?v=ca0a48d5';
 import { SHOTS } from './restoration/shots.mjs';
 import { playFor, playHref } from './restoration/play-links.mjs';
 import { DESIGNERS, DESIGNER_LEVELS, TEXT_LEVELS } from './restoration/designer-levels.mjs';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 import { ROOM_NOTES } from './restoration/rooms.mjs';
-import { parseQuestConversation } from '../public/js/quests.js';
+import { parseQuestConversation } from '../public/js/quests.js?v=282e1621';
 import { seasonsData } from './restoration/seasons.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

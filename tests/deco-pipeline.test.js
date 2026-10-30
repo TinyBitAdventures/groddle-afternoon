@@ -9,10 +9,10 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HIRES_DECOS, HIRES_DECOS_BIG } from '../public/js/deco-hires-list.js?v=g457-3';
-import { decoUrl, installHiresDecos, wantsHiresDecos } from '../public/js/deco-hires.js?v=g457-3';
-import { resolutionOfUrl } from '../public/js/textures.js';
-import { recolourBudgetBytes } from '../public/js/street-render.js?v=g478-1';
+import { HIRES_DECOS, HIRES_DECOS_BIG } from '../public/js/deco-hires-list.js?v=ff3e7d6b';
+import { decoUrl, installHiresDecos, wantsHiresDecos } from '../public/js/deco-hires.js?v=a65f2d79';
+import { resolutionOfUrl } from '../public/js/textures.js?v=01a295a1';
+import { recolourBudgetBytes } from '../public/js/street-render.js?v=4df4a30c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const decoDir = join(root, 'public/assets/decos/groddle');

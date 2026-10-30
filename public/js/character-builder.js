@@ -12,10 +12,10 @@
  * (reference only). Saves that used them move to the nearest vector look
  * (migrateAppearance).
  */
-import { normalizeVectorFields, vectorFieldsFromColors } from './avatar-looks.js';
-import { installReimaginedTags } from './avatar-reimagined.js';
-import { starterRowFields } from './avatar-starter.js';
-import { saveStore } from './save-store.js?v=mp2-2';
+import { normalizeVectorFields, vectorFieldsFromColors } from './avatar-looks.js?v=64fab53e';
+import { installReimaginedTags } from './avatar-reimagined.js?v=9c22dac4';
+import { starterRowFields } from './avatar-starter.js?v=2ba02b11';
+import { saveStore } from './save-store.js?v=b74a8113';
 
 // The builder's wardrobe chips (game.js) get a "Reimagined" tag on the
 // greyscale masters the remake coloured (js/avatar-reimagined.js, row G52).

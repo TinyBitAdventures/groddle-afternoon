@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CAMERA_RANGE, EYEBALLERY_SKILL, cameraRange, stepLook } from '../public/js/features/camera-mode-feature.js?v=g484-1';
+import { CAMERA_RANGE, EYEBALLERY_SKILL, cameraRange, stepLook } from '../public/js/features/camera-mode-feature.js?v=0106af1c';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -37,7 +37,7 @@ describe('camera mode', () => {
   });
 
   it('the Eyeballery note no longer says the camera is missing', async () => {
-    const { SKILL_REMAKE_NOTES } = await import('../public/js/skill-tree.js?v=g403-1');
+    const { SKILL_REMAKE_NOTES } = await import('../public/js/skill-tree.js?v=cf7bc81f');
     assert.equal(SKILL_REMAKE_NOTES.Eyeballery.status, 'live');
   });
 });

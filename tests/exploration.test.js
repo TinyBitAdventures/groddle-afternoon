@@ -11,17 +11,17 @@ import {
   createAchievementState,
   applyAchievementProgress,
   groupLabelCount,
-} from '../public/js/achievements.js?v=g403-1';
-import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=g403-1';
-import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=g424-1';
+} from '../public/js/achievements.js?v=631d7daa';
+import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
+import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=b4449504';
 import {
   applyStreetVisit,
   availableHubStreets,
   countsTowardHub,
   hubMapStreetCount,
   streetVisitCounters,
-} from '../public/js/exploration.js';
-import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js';
+} from '../public/js/exploration.js?v=19c6758f';
+import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
@@ -165,7 +165,7 @@ import {
   recordStreetEntry,
   streetFeaturesFromTargets,
   streetLoadingVisit,
-} from '../public/js/exploration.js';
+} from '../public/js/exploration.js?v=19c6758f';
 
 describe('location loading card (LoadingLocationView.as, location.js getLoadingInfo)', () => {
   it('formats time and ordinals like StringUtil', () => {

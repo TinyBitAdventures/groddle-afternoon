@@ -13,14 +13,14 @@ import {
   planStreetPlacements,
   nearestPlacementGap,
   STREET_ECOLOGY_URL,
-} from '../public/js/street-ecology.js';
+} from '../public/js/street-ecology.js?v=dbcefe18';
 import {
   platformsScreen,
   platformYAt,
   streetWidth,
   worldToScreen,
-} from '../public/js/street-model.js?v=g478-1';
-import { giantForStreet } from '../public/js/shrines.js';
+} from '../public/js/street-model.js?v=606bae73';
+import { giantForStreet } from '../public/js/shrines.js?v=01b185bc';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(__dirname, '../public');
@@ -299,7 +299,7 @@ describe('runtime wiring', () => {
     assert.match(game, /dataset\.ecologyPopulation/);
     assert.match(game, /dataset\.ecologyPlayerClearance/);
     assert.match(game, /officialGiantId/);
-    assert.match(html, /game\.js\?v=official-ecology-1/);
+    assert.match(html, /game\.js\?v=[0-9a-f]{8}/);
     assert.match(generator, /locations-xml\.zip item references/);
   });
 });

@@ -27,7 +27,7 @@ import {
   teleportEnergyCost,
   teleportToPoint,
   useScript,
-} from '../public/js/teleportation.js?v=g356-1';
+} from '../public/js/teleportation.js?v=48e4e8de';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const T1 = ['meditativearts_1', 'teleportation_1'];

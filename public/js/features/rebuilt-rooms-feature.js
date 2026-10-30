@@ -19,8 +19,8 @@
  *   doordemo=GA9R4OR505F3PSL&doorautoplay=1 (Growing Stuff).
  */
 
-import { isRebuiltRoomTsid, rebuiltRoomEcology } from '../rebuilt-rooms.js?v=g365-1';
-import { WINTER_WALK_BOUNDS, WINTER_WALK_CAPTION, WINTER_WALK_TSID, winterStreetEcology } from '../winter-walk-streets.js?v=g382-1';
+import { isRebuiltRoomTsid, rebuiltRoomEcology } from '../rebuilt-rooms.js?v=95ca6839';
+import { WINTER_WALK_BOUNDS, WINTER_WALK_CAPTION, WINTER_WALK_TSID, winterStreetEcology } from '../winter-walk-streets.js?v=615549da';
 
 export const REBUILT_ROOMS_FEATURE_ID = 'rebuilt-rooms';
 

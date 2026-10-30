@@ -28,8 +28,8 @@
  *     data-supply-permits).
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-7';
-import { getToolCondition } from '../tools.js?v=woodcutting-test-8';
+import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=85d4faba';
+import { getToolCondition } from '../tools.js?v=9a2e7ef4';
 import {
   MACHINE_ASSEMBLIES,
   MACHINE_IDS,
@@ -51,8 +51,8 @@ import {
   refuelMachine,
   stillEtaSeconds,
   stillRoom,
-} from '../machines.js?v=g403-1';
-import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform } from '../item-transforms.js';
+} from '../machines.js?v=aad0d603';
+import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform } from '../item-transforms.js?v=f90aa798';
 import {
   BUREAUCRACY_ITEMS,
   HALL_STREETS,
@@ -61,10 +61,10 @@ import {
   clerkOffers,
   completePapers,
   completePapersCheck,
-} from '../bureaucracy.js';
-import { frameTexture, sourceFromUrl } from '../textures.js';
-import { setMetalMakingMusic } from '../sound-moments.js?v=g393-1';
-import { itemZ } from '../item-bands.js?v=g429-1';
+} from '../bureaucracy.js?v=cb52cc20';
+import { frameTexture, sourceFromUrl } from '../textures.js?v=01a295a1';
+import { setMetalMakingMusic } from '../sound-moments.js?v=2f8597cd';
+import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const SUPPLY_FEATURE_ID = 'supply';
 export const CLERK_CLASS = 'npc_bureaucrat';

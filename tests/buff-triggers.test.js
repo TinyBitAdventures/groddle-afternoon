@@ -22,14 +22,14 @@ import {
   questTimerBuffs,
   smallEnlightenmentSeconds,
   smeltItDealtItFreeSmelts,
-} from '../public/js/buff-triggers.js?v=g370-1';
-import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=g482-2';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=g463-2';
-import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=g463-1';
-import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=g479-2';
-import { rubeFeature } from '../public/js/features/rube-feature.js?v=g478-1';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=g482-2';
-import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=g478-1';
+} from '../public/js/buff-triggers.js?v=a3093922';
+import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js?v=c8063106';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=b1d02c1c';
+import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=a79a7cea';
+import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=827d24a8';
+import { rubeFeature } from '../public/js/features/rube-feature.js?v=5b27168e';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=a431e4be';
+import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=16364589';
 import {
   activateBuffItem,
   applyBuff,
@@ -38,14 +38,14 @@ import {
   hasBuff,
   removeBuff,
   tickBuffs,
-} from '../public/js/buffs.js?v=g403-1';
-import { getSkillPackageOverride, skillPackageDetails } from '../public/js/skill-packages.js';
-import { miningProfile } from '../public/js/mining.js?v=g403-1';
-import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=g403-1';
-import { makingSkillAdjustments } from '../public/js/making.js?v=g403-1';
-import { sessionPackage } from '../public/js/meditation.js?v=g403-1';
-import { accelerateActiveStudy, createSkillState, startSkillStudy } from '../public/js/skills.js';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
+} from '../public/js/buffs.js?v=c7727c43';
+import { getSkillPackageOverride, skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
+import { miningProfile } from '../public/js/mining.js?v=a7eb8740';
+import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=23f74bb3';
+import { makingSkillAdjustments } from '../public/js/making.js?v=9e538296';
+import { sessionPackage } from '../public/js/meditation.js?v=892c78da';
+import { accelerateActiveStudy, createSkillState, startSkillStudy } from '../public/js/skills.js?v=4542bdf9';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const T0 = 1_800_000_000_000;
@@ -486,7 +486,7 @@ describe('systems with their own timer show the source buff', () => {
     const quests = JSON.parse(readFileSync(join(root, 'assets/content/quests.json'), 'utf8'));
     const all = quests.quests || quests;
     // Player verbs: Blocks That Rock is offered in multiplayer (js/quests-mp.js), so its timer buff runs there.
-    const { MULTIPLAYER_QUESTS } = await import('../public/js/quests-mp.js');
+    const { MULTIPLAYER_QUESTS } = await import('../public/js/quests-mp.js?v=2beb658a');
     const solo = Object.entries(all).filter(([id, q]) => q.timer?.buff && (q.solo || MULTIPLAYER_QUESTS[id])).map(([id, q]) => `${id}>${q.timer.buff}`).sort();
     assert.deepEqual(QUEST_TIMER_BUFFS.map((r) => `${r.quest}>${r.buff}`).sort(), solo);
   });
@@ -509,7 +509,7 @@ describe('wiring', () => {
     for (const m of src.matchAll(/from '\.\/([a-z-]+-feature\.js\?v=[^']+)'/g)) {
       assert.ok(index.includes(`'./${m[1]}'`), m[1]);
     }
-    assert.match(index, /buff-triggers-feature\.js\?v=g482-2'; FEATURES\.push\(buffTriggersFeature\)/);
+    assert.match(index, /buff-triggers-feature\.js\?v=[0-9a-f]{8}'; FEATURES\.push\(buffTriggersFeature\)/);
   });
 
   it('game.js applies Stuffed at the daily limit and announces each making batch', () => {

@@ -17,8 +17,8 @@ import assert from 'node:assert/strict';
 import { resolveTokens } from './css-tokens.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { quietSession } from '../public/js/online-boot.js?v=g477-2';
-import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-10';
+import { quietSession } from '../public/js/online-boot.js?v=8f6e0097';
+import { createMinnAccount } from '../public/js/minn-account.js?v=81339760';
 import { buildOnlinePage, ONLINE_BOOT_SRC } from '../tools/play-online/build.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -97,8 +97,8 @@ describe('G322: /play/online/ signed out asks no rest-nonce', () => {
     const body = boot.slice(boot.indexOf('async function boot()'), boot.indexOf('async function enter('));
     assert.match(body, /const session = await quietSession\(account\);/);
     assert.doesNotMatch(body, /account\.session\(\)/);
-    assert.equal(ONLINE_BOOT_SRC, 'js/online-boot.js?v=g477-2');
-    assert.match(read('public/play/online/index.html'), /src="js\/online-boot\.js\?v=g\d+-\d+"/);
+    assert.match(ONLINE_BOOT_SRC, /^js\/online-boot\.js\?v=[0-9a-f]{8}$/);
+    assert.match(read('public/play/online/index.html'), /src="js\/online-boot\.js\?v=[0-9a-f]{8}"/);
     assert.ok(read('public/play/online/index.html').includes(`src="${ONLINE_BOOT_SRC}"`));
   });
 });
@@ -136,6 +136,6 @@ describe('G320: the multiplayer start card', () => {
     const src = read('public/js/features/qurazy-feature.js');
     assert.match(src, /function afterStartCard\(engine, run\) \{\n\s+if \(engine\.started !== false\) return Promise\.resolve\(true\);/);
     assert.match(src, /const run = \+\+bannerRun;\n\s+if \(!\(await afterStartCard\(engine, run\)\) \|\| run !== bannerRun\) return;/);
-    assert.match(read('public/js/features/index.js'), /qurazy-feature\.js\?v=g\d+-\d+'/);
+    assert.match(read('public/js/features/index.js'), /qurazy-feature\.js\?v=[0-9a-f]{8}'/);
   });
 });

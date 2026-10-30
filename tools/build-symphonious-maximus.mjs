@@ -12,7 +12,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { arrivalInTarget } from '../public/js/location-navigation.js';
+import { arrivalInTarget } from '../public/js/location-navigation.js?v=38c12adf';
 import {
   CEBARKUL_DOOR,
   CEBARKUL_TSID,
@@ -20,7 +20,7 @@ import {
   SYMPHONIOUS_TSID,
   symphoniousIndexEntry,
   symphoniousStreet,
-} from '../public/js/symphonious-maximus.js';
+} from '../public/js/symphonious-maximus.js?v=345ad437';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

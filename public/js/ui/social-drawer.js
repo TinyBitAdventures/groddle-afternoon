@@ -31,7 +31,7 @@
  * QA: canvas data socialOpen (open|rail), socialTab, socialTabs, socialUnread
  * (tab:n,...); window.groddleSocial.
  */
-import { colorizeAmounts } from '../notify-view.js?v=g469-2';
+import { colorizeAmounts } from '../notify-view.js?v=402d1954';
 
 export const SOCIAL_STORE_KEY = 'groddle-social-drawer';
 /** The drawer opens by default at this window width and up (the mock's 1440 rule). */

@@ -6,14 +6,14 @@ import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadLocation, getLocation, playerInBounds, DEFAULT_STREET } from '../public/js/locations.js?v=g403-1';
+import { loadLocation, getLocation, playerInBounds, DEFAULT_STREET } from '../public/js/locations.js?v=7e086f05';
 import {
   createWorld,
   teleportTo,
   enterHouse,
   leaveHouse,
   tryUsePortal,
-} from '../public/js/world.js';
+} from '../public/js/world.js?v=d0d8b7d7';
 import {
   createQuestState,
   assignQuest,
@@ -21,7 +21,7 @@ import {
   completeQuest,
   getQuestProgress,
   QUEST_CATALOG,
-} from '../public/js/quests.js';
+} from '../public/js/quests.js?v=282e1621';
 import {
   createInventory,
   addItem,
@@ -29,9 +29,9 @@ import {
   useItem,
   countItem,
   ITEM_CATALOG,
-} from '../public/js/inventory.js?v=catalog-unified-7';
-import { getVerbsFor, runVerb } from '../public/content.js?v=g478-1';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
+} from '../public/js/inventory.js?v=85d4faba';
+import { getVerbsFor, runVerb } from '../public/content.js?v=e2372a6b';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 before(async () => {

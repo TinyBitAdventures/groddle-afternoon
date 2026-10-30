@@ -25,14 +25,14 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js';
-import { platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=20c7b021';
+import { platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js?v=606bae73';
 import {
   ecologyForStreet,
   planStreetPlacements,
   populationForStreet,
   setStreetEcologyCatalog,
-} from '../public/js/street-ecology.js';
+} from '../public/js/street-ecology.js?v=dbcefe18';
 import {
   MYSTERY_QUOIN_KINDS,
   QUOIN_CLASSES,
@@ -41,8 +41,8 @@ import {
   mysteryClassFor,
   planStreetQuoins,
   streetQuoinClass,
-} from '../public/js/quoins.js';
-import { partyEcologyEntry, partySpaceForStreet } from '../public/js/party-spaces.js';
+} from '../public/js/quoins.js?v=d4f4772b';
+import { partyEcologyEntry, partySpaceForStreet } from '../public/js/party-spaces.js?v=459a8597';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

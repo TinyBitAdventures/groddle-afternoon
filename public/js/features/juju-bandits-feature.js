@@ -52,10 +52,10 @@
  *   nostalgiaPotion (1 once Ancestral Spirits is used this visit).
  */
 
-import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unified-7';
-import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=g403-1';
-import { groundBeneath, platformYAt, platformsScreen } from '../street-model.js?v=g478-1';
-import { sheetFrames } from '../quest-rooms/kit.js?v=g458-1';
+import { addItem, removeItem, countItem } from '../inventory.js?v=85d4faba';
+import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=6b6cbf22';
+import { groundBeneath, platformYAt, platformsScreen } from '../street-model.js?v=606bae73';
+import { sheetFrames } from '../quest-rooms/kit.js?v=fd1eb817';
 import {
   JUJU_BANDIT,
   JUJU_QUEST,
@@ -79,7 +79,7 @@ import {
   redeclareDelay,
   stealChanceForSeconds,
   withinReach,
-} from '../juju-bandits.js?v=g364-1';
+} from '../juju-bandits.js?v=6cf92f4f';
 import {
   NOSTALGIA_BUFF,
   NOSTALGIA_TEXT,
@@ -90,9 +90,9 @@ import {
   nostalgiaLimitSeconds,
   pickBootTarget,
   resetBaqalaTimes,
-} from '../ancestral-nostalgia.js?v=g39-nostalgia-1';
-import { NOSTALGIA_BOOT_STREETS } from '../ancestral-nostalgia-data.js?v=g39-nostalgia-1';
-import { itemZ } from '../item-bands.js?v=g429-1';
+} from '../ancestral-nostalgia.js?v=5adf3c9d';
+import { NOSTALGIA_BOOT_STREETS } from '../ancestral-nostalgia-data.js?v=0adb9184';
+import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const JUJU_FEATURE_ID = 'juju-bandits';
 /** npc_juju_bandit is a foreground item (item-bands.js). */

@@ -43,6 +43,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { moduleUrl } from '../module-keys/build.mjs';
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const MAP_PATH = 'public/js/data-versions.js';
@@ -131,8 +132,8 @@ export function mapKey(root = ROOT) {
   }
 }
 
-/** The js/data-urls.js key (bump it when that file changes). */
-export const HOOK_SRC = 'js/data-urls.js?v=g434-1';
+/** js/data-urls.js with its content key (tools/module-keys/build.mjs). */
+export const HOOK_SRC = moduleUrl('js/data-urls.js', ROOT);
 
 /* ------------------------------------------------------------------ */
 /* Keys written into HTML and CSS                                        */

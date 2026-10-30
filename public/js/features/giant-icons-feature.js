@@ -34,11 +34,11 @@
  *     iconOfferCollisions (walk-ins that offered instead of bestowing).
  */
 
-import { addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-7';
-import { getGameDayKey } from '../game-day.js?v=dametime-4';
-import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
-import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
-import { landingY } from '../walk-surface.js?v=g478-1';
+import { addItem, countItem, ensureItem } from '../inventory.js?v=85d4faba';
+import { getGameDayKey } from '../game-day.js?v=3095e05b';
+import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
+import { emblemCostFor } from '../shrines.js?v=01b185bc';
+import { landingY } from '../walk-surface.js?v=c4aff42f';
 import {
   EMBLEM_VERBS,
   GIANT_ICON_DATA,
@@ -65,13 +65,13 @@ import {
   titheCost,
   titheIcon,
   useEmblem,
-} from '../giant-icons.js';
-import { textureFromUrl } from '../textures.js';
-import { playSheetOverlay } from '../overlay-art.js?v=g463-2';
-import { grantMoodXp } from '../mood-xp.js';
-import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted, toldRecord } from '../conversations.js?v=g202-1';
-import { TELLERS } from '../conversations-data.js?v=g202-1';
-import { itemZ } from '../item-bands.js?v=g429-1';
+} from '../giant-icons.js?v=4639df55';
+import { textureFromUrl } from '../textures.js?v=01a295a1';
+import { playSheetOverlay } from '../overlay-art.js?v=628fa0b4';
+import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted, toldRecord } from '../conversations.js?v=7cbdfea4';
+import { TELLERS } from '../conversations-data.js?v=f11b7e02';
+import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const ICONS_FEATURE_ID = 'giant-icons';
 const WORLD_ART = (iconClass) => `assets/sprites/giant-icons/${iconClass}.png`;

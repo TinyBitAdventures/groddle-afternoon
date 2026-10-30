@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GAME_DAY_MS } from '../public/js/game-day.js';
+import { GAME_DAY_MS } from '../public/js/game-day.js?v=3095e05b';
 import {
   MUSICBLOCK_CATALOG,
   MUSICBLOCK_MONTH_MS,
@@ -27,17 +27,17 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from '../public/js/musicblocks.js?v=g403-1';
-import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=g388-1';
-import { DROP_TABLES } from '../public/js/drop-tables-data.js';
-import { SOIL_DROP_TABLES } from '../public/js/patches.js?v=g414-1';
-import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js';
+} from '../public/js/musicblocks.js?v=35e2b17a';
+import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=2d82d399';
+import { DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
+import { SOIL_DROP_TABLES } from '../public/js/patches.js?v=3996c344';
+import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js?v=be7fe558';
 import {
   ITEM_CATALOG,
   countItem,
   createInventory,
-} from '../public/js/inventory.js?v=catalog-unified-7';
-import { getVerbsFor, runVerb } from '../public/content.js?v=g478-1';
+} from '../public/js/inventory.js?v=85d4faba';
+import { getVerbsFor, runVerb } from '../public/content.js?v=e2372a6b';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
@@ -301,13 +301,13 @@ describe('Musicblock game integration', () => {
     assert.match(game, /fresh tune \+\$\{musicblockDef\.freshXp\} iMG/);
     // Completing a series is a collection trophy (inc_achievements.js:428).
     assert.match(game, /category === 'trophies' \? 'TROPHY_RECEIVED'/);
-    assert.match(html, /game\.js\?v=(?:official-ecology-1|trant-harvest-[12]|badge-events-1|butterfly-care-1|feed-picker-1|animal-kinship-[12]|trant-care-[1-3]|woodcutting-[1-4]|dialogue-[1-3]|movement-1|food-memory-1|dametime-1|musicblocks-collect-2|fruit-machine-[12]|vendor-profiles-1|world-items-[12]|world-persistence-1|shrines-[1-4]|quoins-[12]|item-buffs-[12]|tool-condition-1)/);
+    assert.match(html, /game\.js\?v=[0-9a-f]{8}/);
   });
 });
 
 describe('Musicblock collection badges from any source', () => {
   it('emits in_inventory the first time a block reaches the pack', async () => {
-    const { musicblocksFeature, newlyOwnedMusicblocks } = await import('../public/js/features/musicblocks-feature.js');
+    const { musicblocksFeature, newlyOwnedMusicblocks } = await import('../public/js/features/musicblocks-feature.js?v=cce74646');
     assert.deepEqual(newlyOwnedMusicblocks(new Set(['musicblock_d_blue_01']), {
       musicblock_d_blue_01: 2, musicblock_d_blue_02: 1, apple: 3, musicblock_trumpets: 1,
     }), ['musicblock_d_blue_02']);

@@ -10,9 +10,9 @@
  *   questRewardSummary(rewards, { multiplier }) award-screen lines without applying anything
  */
 
-import { getQuestCatalog } from './content-catalogs.js?v=g403-1';
-import { questRewardModifier } from './imagination-effects.js?v=g403-1';
-import { metabolicGain, moodMax } from './metabolics.js';
+import { getQuestCatalog } from './content-catalogs.js?v=10b118dd';
+import { questRewardModifier } from './imagination-effects.js?v=70169933';
+import { metabolicGain, moodMax } from './metabolics.js?v=8504134e';
 
 /**
  * @typedef {{

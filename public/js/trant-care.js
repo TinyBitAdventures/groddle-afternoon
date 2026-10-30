@@ -9,11 +9,11 @@
  * - items/wood_tree.js: Wood Tree tending gates
  */
 
-import { TOOL_CONDITION_CATALOG, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-8';
-import { fruitCapacityAt, fruitProductionAt } from './trants.js?v=trant-harvest-2';
-import { scaledToolWear, toolWearMultiplier } from './imagination-effects.js?v=g403-1';
-import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js';
-import { grantMoodXp } from './mood-xp.js';
+import { TOOL_CONDITION_CATALOG, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=9a2e7ef4';
+import { fruitCapacityAt, fruitProductionAt } from './trants.js?v=9c2e8c0f';
+import { scaledToolWear, toolWearMultiplier } from './imagination-effects.js?v=70169933';
+import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js?v=8504134e';
+import { grantMoodXp } from './mood-xp.js?v=958e7680';
 
 const freezeRanks = (ranks) => Object.freeze(
   Object.fromEntries(Object.entries(ranks).map(([id, row]) => [id, Object.freeze(row)]))

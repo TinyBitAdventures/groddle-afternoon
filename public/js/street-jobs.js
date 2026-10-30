@@ -51,7 +51,7 @@
  */
 
 export const SOLO_DIVISOR = 50;
-import { loseEnergy } from './metabolics.js';
+import { loseEnergy } from './metabolics.js?v=8504134e';
 /** items/include/jobs.js startJobWork unit_duration. */
 export const WORK_UNIT_MS = 1500;
 /** locations/inc_jobs.js jobs_get_available: 30 * 60 seconds. */

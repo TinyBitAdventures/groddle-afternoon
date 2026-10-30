@@ -29,11 +29,11 @@
  * enchantedSeedlings, enchantedLast, enchantedYield.
  */
 
-import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
-import { platformsScreen, platformYAt } from '../street-model.js?v=g478-1';
-import { frameTexture, textureFromUrl } from '../textures.js';
-import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=g414-1';
-import { noteWoodTreeCare } from '../patches.js?v=g414-1';
+import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
+import { platformsScreen, platformYAt } from '../street-model.js?v=606bae73';
+import { frameTexture, textureFromUrl } from '../textures.js?v=01a295a1';
+import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=4e140315';
+import { noteWoodTreeCare } from '../patches.js?v=3996c344';
 import {
   ENCHANTED_FORESTS,
   ENCHANTED_WOOD_TREE,
@@ -45,7 +45,7 @@ import {
   normalizeEnchantedTree,
   petEnchantedSeedling,
   seedlingStatusLabel,
-} from '../enchanted-forests.js?v=g414-1';
+} from '../enchanted-forests.js?v=dd04e11b';
 
 export const ENCHANTED_FEATURE_ID = 'enchanted-forest';
 const SEEDLING_URL = 'assets/sprites/soil/patch-seedling@3x.webp';

@@ -20,8 +20,8 @@
  * ledge is at most ~100 px above the one beside it; the slide and the stairs are walkable slopes.
  */
 
-import { textureFromUrl } from '../textures.js';
-import { RAINBOW_RUN_FILES } from './rainbow-run-art.js';
+import { textureFromUrl } from '../textures.js?v=01a295a1';
+import { RAINBOW_RUN_FILES } from './rainbow-run-art.js?v=bf073094';
 
 export const W = 3950;
 export const H = 1380;

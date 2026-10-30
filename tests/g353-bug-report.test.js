@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BUG_TEXT, MAX_MESSAGE, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=g483-1';
-import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-10';
+import { BUG_TEXT, MAX_MESSAGE, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=5b069040';
+import { createMinnAccount } from '../public/js/minn-account.js?v=81339760';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const siteDir = process.env.GRODDLE_SITE_DIR || join(root, '..', 'groddle-afternoon-site');
@@ -40,15 +40,15 @@ describe('Report a bug (G353)', () => {
   });
 
   it('names the build from the online page and the street and place from the engine', () => {
-    const doc = { getElementById: (id) => (id === 'online-boot' ? { dataset: { game: 'game.js?round16=g353-1&mp=1' } } : null) };
-    assert.equal(buildKey(doc), 'g353-1');
+    const doc = { getElementById: (id) => (id === 'online-boot' ? { dataset: { game: 'game.js?v=1a2b3c4d' } } : null) };
+    assert.equal(buildKey(doc), '1a2b3c4d');
     assert.equal(buildKey({ getElementById: () => null, querySelector: () => null }), '');
     const ctx = reportContext(
       { streetTsid: 'GA5101HF7F429V5', street: { label: 'Hechey Track' }, player: { x: 120.6, y: -30.2 } },
       ['TypeError: boom'],
       { document: doc, location: { pathname: '/play/online/' }, navigator: { userAgent: 'Test/1.0' }, innerWidth: 1280, innerHeight: 800 },
     );
-    assert.deepEqual(ctx, { street: 'GA5101HF7F429V5', streetName: 'Hechey Track', x: '121', y: '-30', build: 'g353-1', page: '/play/online/', agent: 'Test/1.0', screen: '1280x800', errors: ['TypeError: boom'] });
+    assert.deepEqual(ctx, { street: 'GA5101HF7F429V5', streetName: 'Hechey Track', x: '121', y: '-30', build: '1a2b3c4d', page: '/play/online/', agent: 'Test/1.0', screen: '1280x800', errors: ['TypeError: boom'] });
   });
 
   it('sends the report to groddle/v1/feedback with the session nonce', async () => {

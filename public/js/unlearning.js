@@ -21,8 +21,8 @@
  * Nothing is refunded: study time spent on the skill is simply gone.
  */
 
-import { getSkillCatalog } from './content-catalogs.js?v=g403-1';
-import { SKILL_POINTS_PER_SECOND, pauseSkillStudy, listStudyQueue } from './skills.js?v=study-6';
+import { getSkillCatalog } from './content-catalogs.js?v=10b118dd';
+import { SKILL_POINTS_PER_SECOND, pauseSkillStudy, listStudyQueue } from './skills.js?v=4542bdf9';
 
 export const UNLEARN_CARD = 'unlearning_ability';
 

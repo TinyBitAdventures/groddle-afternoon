@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js';
+import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js?v=6f758e09';
 import {
   RECIPE_CATALOG,
   TOOL_CATALOG,
@@ -23,25 +23,25 @@ import {
   loadRecipeCatalogFromFile,
   starterToolsInventory,
   STARTER_TOOL_IDS,
-} from '../public/js/making.js?v=g403-1';
+} from '../public/js/making.js?v=9e538296';
 import {
   ITEM_CATALOG,
   createInventory,
   countItem,
   getItemUseInfo,
   useItem,
-} from '../public/js/inventory.js?v=catalog-unified-7';
+} from '../public/js/inventory.js?v=85d4faba';
 import {
   FOOD_VARIETY_UPGRADE,
   createFoodState,
   isFoodBonusItem,
   quoteFoodVarietyBonus,
-} from '../public/js/food.js';
+} from '../public/js/food.js?v=f6c6d15b';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,
   getToolCondition,
-} from '../public/js/tools.js?v=woodcutting-test-8';
+} from '../public/js/tools.js?v=9a2e7ef4';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

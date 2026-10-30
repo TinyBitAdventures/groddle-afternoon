@@ -19,14 +19,14 @@ import assert from 'node:assert/strict';
 import { resolveTokens } from './css-tokens.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=g477-2';
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=g485-1';
-import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=g485-1';
-import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js?v=g375-1';
-import { qurazyFeature, resetQurazyFeatureForTests } from '../public/js/features/qurazy-feature.js?v=g481-2';
-import { QURAZY_SPAWN_LINE } from '../public/js/qurazy.js';
-import { QURAZY_PLACEMENT_GROUP } from '../public/js/features/qurazy-feature.js?v=g481-2';
-import { hubMapArtNote, hubMapSubtitle, questLogSummary } from '../public/js/panel-copy.js?v=g396-1';
+import { accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=a5712ed5';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=2caff429';
+import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=ba81e4fb';
+import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js?v=575920f2';
+import { qurazyFeature, resetQurazyFeatureForTests } from '../public/js/features/qurazy-feature.js?v=7c571cf4';
+import { QURAZY_SPAWN_LINE } from '../public/js/qurazy.js?v=62ae37a2';
+import { QURAZY_PLACEMENT_GROUP } from '../public/js/features/qurazy-feature.js?v=7c571cf4';
+import { hubMapArtNote, hubMapSubtitle, questLogSummary } from '../public/js/panel-copy.js?v=a6771c5e';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -142,8 +142,8 @@ describe('solo asks no rest-nonce (the console 400)', () => {
       assert.match(read(rel), /engine\?\.mode !== 'multiplayer'|engine\?\.mode === 'multiplayer'/, rel);
     }
     assert.match(read('public/js/features/account-backup-feature.js'), /const session = await quietSession\(account\);/);
-    assert.match(read('public/js/features/account-backup-feature.js'), /import \{ quietSession \} from '\.\.\/online-boot\.js\?v=g477-2';/);
-    assert.match(read('public/js/features/index.js'), /account-backup-feature\.js\?v=g477-2'/);
+    assert.match(read('public/js/features/account-backup-feature.js'), /import \{ quietSession \} from '\.\.\/online-boot\.js\?v=[0-9a-f]{8}';/);
+    assert.match(read('public/js/features/index.js'), /account-backup-feature\.js\?v=[0-9a-f]{8}'/);
   });
 });
 
@@ -164,7 +164,7 @@ describe('Map subtitle', () => {
     const game = read('public/game.js');
     assert.match(game, /sub\.textContent = hubMapSubtitle\(view\);\n\s+sub\.dataset\.mapArt = hubMapArtNote\(view\);/);
     assert.doesNotMatch(game, /'geometry only'/);
-    assert.match(game, /from '\.\/js\/panel-copy\.js\?v=g396-1';/);
+    assert.match(game, /from '\.\/js\/panel-copy\.js\?v=[0-9a-f]{8}';/);
   });
 });
 
@@ -264,6 +264,6 @@ describe('style.css: word outline and solid dimmed upgrade cards', () => {
   });
 
   it('the solo page links style.css with the polish key', () => {
-    assert.match(read('public/play/index.html'), /style\.css\?v=[^"]*&amp;polish=g396-1[&"]/);
+    assert.match(read('public/play/index.html'), /href="style\.css\?v=[0-9a-f]{8}"/);
   });
 });

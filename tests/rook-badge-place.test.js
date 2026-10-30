@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BADGE_PARTS, FEED_X, badgeExtent, feedZone, placeRookBadge, unionBox } from '../public/js/rook-badge-place.js?v=g479-1';
-import { ZOOM_EVENT } from '../public/js/world-zoom.js?v=g486-1';
+import { BADGE_PARTS, FEED_X, badgeExtent, feedZone, placeRookBadge, unionBox } from '../public/js/rook-badge-place.js?v=2bb00dfd';
+import { ZOOM_EVENT } from '../public/js/world-zoom.js?v=b5f4748a';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -132,7 +132,7 @@ describe('ROOKHUD: the Rook badge in the free play area', () => {
 
   it('the feature wires it: measured on a change, a notify zone released when the attack ends', () => {
     const f = read('js/features/rook-attack-feature.js');
-    assert.match(f, /from '\.\.\/rook-badge-place\.js\?v=g479-1'/);
+    assert.match(f, /from '\.\.\/rook-badge-place\.js\?v=[0-9a-f]{8}'/);
     assert.match(f, /export const ROOK_BADGE_ZONE = 'rook-badge';/);
     assert.match(f, /engine\.reserveZone\(ROOK_BADGE_ZONE, box\)/);
     assert.match(f, /reserveZone\?\.\(ROOK_BADGE_ZONE, null\)/);

@@ -8,8 +8,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-7';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=woodcutting-test-8';
+import { createInventory, countItem } from '../public/js/inventory.js?v=85d4faba';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=9a2e7ef4';
 import {
   MACHINE_ASSEMBLIES,
   MACHINE_PART_ITEMS,
@@ -22,14 +22,14 @@ import {
   distillInStill,
   advanceStill,
   collectHooch,
-} from '../public/js/machines.js?v=g403-1';
-import { runTransform, listTransformVerbs, transformEdges } from '../public/js/item-transforms.js';
-import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=g403-1';
-import { VENDOR_PROFILES } from '../public/js/vendor.js';
-import { SEED_CATALOG } from '../public/js/garden.js?v=g403-1';
+} from '../public/js/machines.js?v=aad0d603';
+import { runTransform, listTransformVerbs, transformEdges } from '../public/js/item-transforms.js?v=f90aa798';
+import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=9e538296';
+import { VENDOR_PROFILES } from '../public/js/vendor.js?v=563afb9b';
+import { SEED_CATALOG } from '../public/js/garden.js?v=9a8f8f72';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 import { supplyReport } from '../tools/supply-report.mjs';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=g443-1';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=890ec8c4';
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const ENGINEER = ['engineering_1'];

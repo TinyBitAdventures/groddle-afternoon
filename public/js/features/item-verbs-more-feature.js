@@ -38,19 +38,19 @@
  *   packVerbNet, packVerbDefect.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { getGameDayKey } from '../game-day.js';
-import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=progression-1';
-import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
-import { ELEMENT_STACKMAX, hasPouch, POUCH_CLASS } from '../elemental-pouch.js';
-import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=g481-2';
-import { SKILLQUEST_AK_TSID } from '../skillquest-ak.js?v=g298-1';
-import { setToolRemaining, TOOL_CONDITION_CATALOG } from '../tools.js?v=woodcutting-test-8';
-import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husbandry.js?v=g478-1';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g464-2';
-import { sourceFromUrl, frameTexture } from '../textures.js';
-import { landingY, walkSurfaceY } from '../walk-surface.js?v=g478-1';
-import { overlayOrStandIn } from '../overlay-stand-in.js?v=g463-2';
+import { addItem, countItem, removeItem } from '../inventory.js?v=85d4faba';
+import { getGameDayKey } from '../game-day.js?v=3095e05b';
+import { levelInfoForXp, XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
+import { itemVerbAchievementCounters } from '../item-verbs.js?v=729ccd91';
+import { ELEMENT_STACKMAX, hasPouch, POUCH_CLASS } from '../elemental-pouch.js?v=22f23943';
+import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=d5978ec1';
+import { SKILLQUEST_AK_TSID } from '../skillquest-ak.js?v=281b956d';
+import { setToolRemaining, TOOL_CONDITION_CATALOG } from '../tools.js?v=9a2e7ef4';
+import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husbandry.js?v=16364589';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=0e86cc0f';
+import { sourceFromUrl, frameTexture } from '../textures.js?v=01a295a1';
+import { landingY, walkSurfaceY } from '../walk-surface.js?v=c4aff42f';
+import { overlayOrStandIn } from '../overlay-stand-in.js?v=d5f58efe';
 import {
   BUNDLE_OF_JOY,
   BUTTERFLY_NET,
@@ -113,8 +113,8 @@ import {
   trophySmash,
   vvSniffButton,
   JUJU_POWDER,
-} from '../item-verbs-more.js?v=g391-1';
-import { itemZ } from '../item-bands.js?v=g429-1';
+} from '../item-verbs-more.js?v=ca6cc8aa';
+import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const ITEM_VERBS_MORE_FEATURE_ID = 'item-verbs-more';
 

@@ -23,7 +23,7 @@ import {
   slugSign,
   slugsFromEffects,
   speechSlugList,
-} from '../public/js/speech-slugs.js?v=g412-1';
+} from '../public/js/speech-slugs.js?v=130338f9';
 import {
   VERB_RESPONSE_MS,
   animalResponseKey,
@@ -31,15 +31,15 @@ import {
   rockResponseKey,
   trantCareResponseKey,
   verbResponse,
-} from '../public/js/verb-responses.js?v=g414-1';
-import { VERB_RESPONSE_POOLS } from '../public/js/verb-responses-data.js?v=g414-1';
+} from '../public/js/verb-responses.js?v=3ceb8a8c';
+import { VERB_RESPONSE_POOLS } from '../public/js/verb-responses-data.js?v=0b948684';
 import { buildVerbResponses, render } from '../tools/build-verb-responses.mjs';
-import { runVerb } from '../public/content.js?v=g478-1';
-import { createAnimalState } from '../public/js/animals.js?v=g478-1';
-import { createToolConditionState } from '../public/js/tools.js?v=woodcutting-test-8';
-import { setTrantTables, createTrantState } from '../public/js/trants.js?v=trant-harvest-2';
-import { createMineRock } from '../public/js/mining.js?v=g403-1';
-import { createInventory } from '../public/js/inventory.js?v=catalog-unified-7';
+import { runVerb } from '../public/content.js?v=e2372a6b';
+import { createAnimalState } from '../public/js/animals.js?v=e857d0af';
+import { createToolConditionState } from '../public/js/tools.js?v=9a2e7ef4';
+import { setTrantTables, createTrantState } from '../public/js/trants.js?v=9c2e8c0f';
+import { createMineRock } from '../public/js/mining.js?v=a7eb8740';
+import { createInventory } from '../public/js/inventory.js?v=85d4faba';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CLIENT = join(ROOT, '..', 'glitch-client');

@@ -25,10 +25,10 @@ import {
   buddyWhere,
   freshReverse,
   normalizeList,
-} from '../public/js/buddies.js?v=g325-1';
-import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-10';
-import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=g478-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-369';
+} from '../public/js/buddies.js?v=183da4ff';
+import { createMinnAccount } from '../public/js/minn-account.js?v=81339760';
+import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=71f50834';
+import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -290,7 +290,7 @@ describe('buddies feature (js/features/buddies-feature.js)', () => {
     assert.ok(ids.indexOf('buddies') < ids.indexOf('realtime'));
     assert.equal(ids.indexOf('street-objects') + 1, ids.indexOf('realtime'), 'street objects stays just before realtime');
     assert.ok(ids.indexOf('buddies') > ids.indexOf('trade'));
-    assert.match(read('public/js/features/index.js'), /buddies-feature\.js\?v=g\d+-\d+'/);
+    assert.match(read('public/js/features/index.js'), /buddies-feature\.js\?v=[0-9a-f]{8}'/);
   });
 
   it('loads the list, sends the signed list to the server, counts badges and tells new adds', async () => {

@@ -17,11 +17,11 @@ import {
   overlayLifeMs,
   overlayPlacement,
   sheetCell,
-} from '../public/js/overlay-art.js?v=g463-2';
-import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=g403-1';
-import { DRINK_TICKS, applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=g403-1';
-import { MOOD_XP_SOURCES } from '../public/js/mood-xp.js';
-import { LONELY_RULES } from '../public/js/spirit-loneliness.js?v=lonely-1';
+} from '../public/js/overlay-art.js?v=628fa0b4';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
+import { DRINK_TICKS, applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=c7727c43';
+import { MOOD_XP_SOURCES } from '../public/js/mood-xp.js?v=958e7680';
+import { LONELY_RULES } from '../public/js/spirit-loneliness.js?v=9259917d';
 import { frameCount, loadFla, parseEdges } from '../tools/overlay-art/xfl-svg.mjs';
 import { OVERLAYS, checkOverlays } from '../tools/overlay-art/build.mjs';
 

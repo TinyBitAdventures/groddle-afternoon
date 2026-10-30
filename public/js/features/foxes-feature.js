@@ -43,14 +43,14 @@
  * unchanged.
  */
 
-import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { getToolCondition } from '../tools.js?v=woodcutting-test-8';
-import { worldToScreen } from '../street-model.js?v=g478-1';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=g463-2';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g464-2';
-import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=g478-1';
-import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js';
+import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
+import { addItem, countItem, removeItem } from '../inventory.js?v=85d4faba';
+import { getToolCondition } from '../tools.js?v=9a2e7ef4';
+import { worldToScreen } from '../street-model.js?v=606bae73';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=6d2b7a11';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=0e86cc0f';
+import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=c4aff42f';
+import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js?v=670c3a7f';
 import {
   FIBER_ID,
   FLEET_FOXER_ACHIEVEMENT,
@@ -81,9 +81,9 @@ import {
   rangerGreeting,
   splitConversation,
   stepFox,
-} from '../foxes.js?v=g414-1';
-import { FOX_FLURRY_COUNTER, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=g414-1';
-import { itemZ } from '../item-bands.js?v=g429-1';
+} from '../foxes.js?v=9534264f';
+import { FOX_FLURRY_COUNTER, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=4f8bf0eb';
+import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const FOX_FEATURE_ID = 'foxes';
 const PLAYER_NAME = 'Glitch';

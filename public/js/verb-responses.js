@@ -6,7 +6,7 @@
  * 1060-1065 -> sendBubble(choice, 3500, pc, slugs)).
  */
 
-import { VERB_RESPONSE_POOLS } from './verb-responses-data.js?v=g414-1';
+import { VERB_RESPONSE_POOLS } from './verb-responses-data.js?v=0b948684';
 
 /** item.js sendResponse: the bubble stays 3,500 ms. */
 export const VERB_RESPONSE_MS = 3500;

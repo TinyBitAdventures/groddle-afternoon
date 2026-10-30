@@ -24,8 +24,8 @@
  * window.groddleBugReport.open('list'|'new'), .openTicket(id), .refresh() in multiplayer.
  */
 
-import { createReportsApi, REPORT_TEXT, UNREAD_POLL_MS, reportFromHash } from '../reports.js?v=g483-1';
-import { mountReportsSheet } from '../ui/reports-sheet.js?v=g483-1';
+import { createReportsApi, REPORT_TEXT, UNREAD_POLL_MS, reportFromHash } from '../reports.js?v=f3d8584a';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=beb80ffb';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 
@@ -55,11 +55,11 @@ export function rememberError(list, text) {
   return list;
 }
 
-/** The build the page runs: game.js's round16 key (the online page names it on #online-boot). */
+/** The build the page runs: game.js's content key (tools/module-keys; the online page names it on #online-boot). */
 export function buildKey(doc = globalThis.document) {
   const src = doc?.getElementById?.('online-boot')?.dataset?.game
     || doc?.querySelector?.('script[src*="game.js"]')?.getAttribute?.('src') || '';
-  const m = /[?&]round16=([^&"]+)/.exec(src);
+  const m = /[?&]v=([^&"]+)/.exec(src);
   return m ? m[1] : '';
 }
 

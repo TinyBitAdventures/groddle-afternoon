@@ -33,13 +33,13 @@ import {
   rollCubimalRace,
   sanitizeCubimalName,
   setCubimalFree,
-} from '../public/js/cubimals.js';
-import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=catalog-unified-7';
-import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=g403-1';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-369';
-import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=g478-1';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=g464-2';
+} from '../public/js/cubimals.js?v=378622fc';
+import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=85d4faba';
+import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=631d7daa';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
+import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
+import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=f83e5c0e';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=bf62077e';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

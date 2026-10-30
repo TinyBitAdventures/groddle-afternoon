@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from '../public/js/quoin-motion.js';
+import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from '../public/js/quoin-motion.js?v=ea0bd408';
 
 const root = join(import.meta.dirname, '..');
 

@@ -13,8 +13,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createNotifier } from '../public/js/notify.js?v=g459-1';
-import { bagsFeature } from '../public/js/features/bags-feature.js?v=g400-1';
+import { createNotifier } from '../public/js/notify.js?v=3383e8be';
+import { bagsFeature } from '../public/js/features/bags-feature.js?v=65fc537f';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 

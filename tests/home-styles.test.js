@@ -27,8 +27,8 @@ import {
   styleChoices,
   styleSwitchCost,
   switchStreetStyle,
-} from '../public/js/home-styles.js';
-import { HOME_STYLES } from '../public/js/homes.js';
+} from '../public/js/home-styles.js?v=f591561f';
+import { HOME_STYLES } from '../public/js/homes.js?v=385f9a1a';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(spike, '../glitch-GameServerJS');

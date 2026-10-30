@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HIRES_ICONS, hiresIconUrl } from '../public/js/icon-hires.js?v=g446-4';
+import { HIRES_ICONS, hiresIconUrl } from '../public/js/icon-hires.js?v=5357d4b4';
 
 const icons = join(dirname(fileURLToPath(import.meta.url)), '../public/assets/sprites/icons');
 const pngSize = (file) => {

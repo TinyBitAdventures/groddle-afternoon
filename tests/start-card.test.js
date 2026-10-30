@@ -9,13 +9,13 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { START_CARD_SELECTOR, SCREEN_SELECTOR, WINDOW_SELECTOR, stackZ } from '../public/js/window-stack.js?v=g428-1';
-import { createPromptStack } from '../public/js/prompt-stack.js?v=g470-1';
+import { START_CARD_SELECTOR, SCREEN_SELECTOR, WINDOW_SELECTOR, stackZ } from '../public/js/window-stack.js?v=be3b7274';
+import { createPromptStack } from '../public/js/prompt-stack.js?v=0c21efda';
 import {
   _resetFamiliarDialog,
   familiarDialogFeature,
   familiarDialogOpen,
-} from '../public/js/features/familiar-dialog-feature.js?v=g434-1';
+} from '../public/js/features/familiar-dialog-feature.js?v=2fc8b1b5';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

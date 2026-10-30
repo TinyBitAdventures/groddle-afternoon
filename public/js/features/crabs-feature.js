@@ -30,15 +30,15 @@
  * Canvas: crabs, crabLast, crabClip, crabOutcome, crabMemory, crabTalk.
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g464-2';
-import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js?v=g403-1';
-import { energyMax, loseMood, metabolicGain, moodMax, shiftMetabolic } from '../metabolics.js';
-import { grantMoodXp } from '../mood-xp.js';
-import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
-import { getGameDayKey } from '../game-day.js';
-import { cleanQuestMarkup } from '../quests.js?v=item-buffs-7';
-import { walkSurfaceY } from '../walk-surface.js?v=g478-1';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=0e86cc0f';
+import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=85d4faba';
+import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js?v=35e2b17a';
+import { energyMax, loseMood, metabolicGain, moodMax, shiftMetabolic } from '../metabolics.js?v=8504134e';
+import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
+import { getGameDayKey } from '../game-day.js?v=3095e05b';
+import { cleanQuestMarkup } from '../quests.js?v=282e1621';
+import { walkSurfaceY } from '../walk-surface.js?v=c4aff42f';
 import {
   CRAB_CLASS,
   CRAB_COPY,
@@ -69,7 +69,7 @@ import {
   musicblocksInPack,
   normalizeCrabMemory,
   playToday,
-} from '../crabs.js?v=g403-1';
+} from '../crabs.js?v=aef34108';
 
 const ART = 'assets/sprites/crabs/';
 /** OGA npc_crab sheets: 131x129 cells, 6 columns; populated counts measured. */

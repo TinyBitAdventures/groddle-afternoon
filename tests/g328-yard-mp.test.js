@@ -25,8 +25,8 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../public/js/yard-verbs-mp.js?v=g478-1';
-import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=g485-1';
+} from '../public/js/yard-verbs-mp.js?v=40912008';
+import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=ba81e4fb';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -155,7 +155,7 @@ describe('solo never runs it', () => {
     const at = index.indexOf(keys[0]);
     assert.ok(at > 0 && at < index.indexOf('street-objects-feature.js'));
     const feature = readFileSync(join(root, 'public/js/features/yard-verbs-mp-feature.js'), 'utf8');
-    assert.match(feature, /yard-verbs-mp\.js\?v=g478-1'/);
+    assert.match(feature, /yard-verbs-mp\.js\?v=[0-9a-f]{8}'/);
   });
 });
 

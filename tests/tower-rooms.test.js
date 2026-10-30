@@ -8,7 +8,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry, platformsScreen } from '../public/js/street-model.js?v=g478-1';
+import { assertStreetGeometry, platformsScreen } from '../public/js/street-model.js?v=606bae73';
 import {
   ROOM_15_TSID,
   STEPS_PROFILE,
@@ -20,9 +20,9 @@ import {
   towerRoomByTsid,
   towerRoomStreet,
   turned,
-} from '../public/js/tower-rooms.js';
-import { inTowerSpot, towerSpotsFor } from '../public/js/home-tower.js';
-import { restockGarden, towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js';
+} from '../public/js/tower-rooms.js?v=7b2aa06a';
+import { inTowerSpot, towerSpotsFor } from '../public/js/home-tower.js?v=6ccb3a4f';
+import { restockGarden, towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=b6ae268a';
 import {
   ALL_TOWER_ROOMS,
   CHALLENGE_ROOMS,
@@ -37,8 +37,8 @@ import {
   anyTowerRoomByTsid,
   anyTowerRoomStreet,
   flats,
-} from '../public/js/tower-challenge-rooms.js';
-import { ladderTopDeck } from '../public/js/street-model.js?v=g478-1';
+} from '../public/js/tower-challenge-rooms.js?v=9e39f503';
+import { ladderTopDeck } from '../public/js/street-model.js?v=606bae73';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

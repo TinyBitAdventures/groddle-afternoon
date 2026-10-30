@@ -45,8 +45,8 @@
  * the door glow sits, G200).
  */
 
-import { STREET_INDEX } from '../street-loader.js?v=g478-1';
-import { hellFeature } from './hell-feature.js?v=hell-16';
+import { STREET_INDEX } from '../street-loader.js?v=20c7b021';
+import { hellFeature } from './hell-feature.js?v=bdaefff5';
 import {
   ROUTE_COLOR,
   ROUTE_COLOR_CSS,
@@ -66,7 +66,7 @@ import {
   routeStep,
   sameStreet,
   tsidAliases,
-} from '../map-routes.js?v=lonely-1';
+} from '../map-routes.js?v=3e8f84ad';
 
 export const MAP_ROUTES_FEATURE_ID = 'map-routes';
 const GRAPH_URL = 'assets/content/signpost-graph.json?v=g198-1';

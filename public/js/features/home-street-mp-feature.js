@@ -40,21 +40,21 @@
  * here), hsPiles, hsRestores (shared restoration ids here), hsLast.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=g403-1';
-import { furnitureDef, furnitureScale, furnitureSize } from '../home-decor.js?v=g448-3';
-import { pieceLabel } from '../furniture-upgrades.js?v=g448-3';
-import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=home-cultivation-5';
-import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
-import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note-pole-art.js?v=homes3-1';
-import { textureFromUrl } from '../textures.js';
-import { signArmWidth } from '../street-render.js?v=g478-1';
-import { openNotePicker, openNoteView } from '../note-view.js?v=g463-1';
-import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=g328-4';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=g485-1';
-import { projectApi } from './street-jobs-feature.js?v=g485-1';
-import { saveStore } from '../save-store.js?v=mp2-2';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=g485-1';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
+import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=9e538296';
+import { furnitureDef, furnitureScale, furnitureSize } from '../home-decor.js?v=95ba0a91';
+import { pieceLabel } from '../furniture-upgrades.js?v=c4ee77ed';
+import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=9d3a8ec3';
+import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=68506420';
+import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note-pole-art.js?v=860d393a';
+import { textureFromUrl } from '../textures.js?v=01a295a1';
+import { signArmWidth } from '../street-render.js?v=4df4a30c';
+import { openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
+import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=31a75688';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=8995a326';
+import { projectApi } from './street-jobs-feature.js?v=fb0922a3';
+import { saveStore } from '../save-store.js?v=b74a8113';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=7cbe13d9';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,
@@ -85,7 +85,7 @@ import {
   saleVerbs,
   signpostArms,
   signpostCandidates,
-} from '../home-street-mp.js?v=homes3-1';
+} from '../home-street-mp.js?v=0fc12d80';
 
 export { HOME_STREET_MP_ID };
 

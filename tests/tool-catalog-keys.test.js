@@ -40,8 +40,8 @@ describe('tools load the content catalogs into the copy the game modules read', 
       const src = readFileSync(f, 'utf8');
       if (!/content-catalogs\.js/.test(src)) continue;
       for (const line of src.split('\n').filter((l) => /content-catalogs\.js/.test(l) && /import/.test(l))) {
-        // A literal specifier, or a URL built from the path with the key appended.
-        if (!line.includes(`content-catalogs.js?v=${key}`) && !line.includes(`?v=${key}`)) wrong.push(`${f.slice(root.length + 1)}: ${line.trim()}`);
+        // A literal specifier, or a URL built from the path with the key appended (from tools/module-keys).
+        if (!line.includes(`content-catalogs.js?v=${key}`) && !line.includes(`?v=${key}`) && !line.includes("moduleKeyOf('js/content-catalogs.js'")) wrong.push(`${f.slice(root.length + 1)}: ${line.trim()}`);
       }
     }
     assert.deepEqual(wrong, []);

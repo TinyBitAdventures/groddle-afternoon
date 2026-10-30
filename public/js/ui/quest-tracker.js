@@ -9,7 +9,7 @@
  * questPins ("id:count,id:count", "" when none), questPinsCollapsed.
  */
 
-import { escapeText } from './verb-menu.js?v=g477-1';
+import { escapeText } from './verb-menu.js?v=e9d100c3';
 
 /**
  * @param {{ el: HTMLElement|null, onOpen?: (classTsid: string) => void, onCollapse?: (on: boolean) => void,

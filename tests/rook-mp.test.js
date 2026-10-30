@@ -18,8 +18,8 @@ import {
   strikeDamage,
   syncKeys,
   syncObjs,
-} from '../public/js/rook-mp.js?v=g479-2';
-import { rookClockS, canStrike, canStun, rookPresent } from '../public/js/rook-attack.js?v=g479-2';
+} from '../public/js/rook-mp.js?v=20b4c9ce';
+import { rookClockS, canStrike, canStun, rookPresent } from '../public/js/rook-attack.js?v=c06c0537';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -169,7 +169,7 @@ describe('rook-mp: wiring', () => {
   it('every importer of rook-mp.js uses one key', () => {
     const keys = [...feature.matchAll(/rook-mp\.js\?v=([\w-]+)/g)].map((m) => m[1]);
     assert.equal(new Set(keys).size, 1);
-    assert.match(keys[0], /^(?:mp4|g\d+)-\d+$/);
+    assert.match(keys[0], /^[0-9a-f]{8}$/);
   });
 
   it('solo never binds the realtime client or skips its own schedule', () => {

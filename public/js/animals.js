@@ -7,7 +7,7 @@
 import {
   ensureAnimalKinshipState,
   resetAnimalKinshipDay,
-} from './animal-kinship.js?v=g403-1';
+} from './animal-kinship.js?v=23f74bb3';
 import {
   BABY_ANIMALS,
   babyFoodOptions,
@@ -16,8 +16,8 @@ import {
   isFoodItem,
   itemLabel,
   itemStackMax,
-} from './animal-husbandry.js?v=g478-1';
-import { ensurePiggyMood, piggyMoodLabel } from './animal-mood.js';
+} from './animal-husbandry.js?v=16364589';
+import { ensurePiggyMood, piggyMoodLabel } from './animal-mood.js?v=a49495fc';
 
 export const ANIMAL_CLASS_IDS = Object.freeze([
   'npc_piggy',

@@ -46,13 +46,13 @@
  *     data-help-mine-companion (the last companion swing: name:chunks).
  */
 
-import { ROCK_CATALOG, findWorkingPick, miningProfile } from '../mining.js?v=g403-1';
-import { addItem } from '../inventory.js?v=catalog-unified-7';
-import { MEGA_ROCK_CHUNKS, megaRockChance } from '../imagination-effects.js?v=g403-1';
-import { crowdScaleX } from '../avatar-anims.js';
-import { frameTexture, loadTexture } from '../textures.js';
-import { acceptOffer } from '../quest-offers.js?v=g403-1';
-import { HELP_DIG_COUNTER, HELP_DIG_LABEL, digHelpFrom, helpDigMessage, othersDigging } from '../help-dig.js?v=g329-dig-1';
+import { ROCK_CATALOG, findWorkingPick, miningProfile } from '../mining.js?v=a7eb8740';
+import { addItem } from '../inventory.js?v=85d4faba';
+import { MEGA_ROCK_CHUNKS, megaRockChance } from '../imagination-effects.js?v=70169933';
+import { crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
+import { frameTexture, loadTexture } from '../textures.js?v=01a295a1';
+import { acceptOffer } from '../quest-offers.js?v=6b6cbf22';
+import { HELP_DIG_COUNTER, HELP_DIG_LABEL, digHelpFrom, helpDigMessage, othersDigging } from '../help-dig.js?v=7b8a9733';
 import {
   COMPANION_MINE_RULES,
   HELP_MINE_COUNTER,
@@ -69,7 +69,7 @@ import {
   mineVerbLabel,
   pickCompanionRock,
   removeMiner,
-} from '../help-mine.js';
+} from '../help-mine.js?v=27f9d276';
 
 // game.js PICK_TOOL_SHEETS.pick / PICK_TOOL_DEF / PICK_SWING_FRAMES (the SWF's 30 fps swing).
 const PICK_SHEET = 'assets/sprites/tools/pick-tool@3x.webp';

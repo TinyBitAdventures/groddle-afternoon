@@ -16,9 +16,9 @@ import {
   itemstackOverlayPoint,
   overlayFrameAt,
   standPlacement,
-} from '../public/js/overlay-art.js?v=g463-2';
+} from '../public/js/overlay-art.js?v=628fa0b4';
 import { OVERLAYS, shareFrames } from '../tools/overlay-art/build.mjs';
-import { PIGGY_DEATH_PUFF } from '../public/js/animal-mood.js';
+import { PIGGY_DEATH_PUFF } from '../public/js/animal-mood.js?v=a49495fc';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

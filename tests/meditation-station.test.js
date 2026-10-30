@@ -11,7 +11,7 @@ import {
   normalizeStationState,
   recordStationSession,
   stationMessage,
-} from '../public/js/meditation-station.js';
+} from '../public/js/meditation-station.js?v=75b2cbf1';
 
 const root = join(import.meta.dirname, '..', 'public');
 

@@ -17,10 +17,10 @@ import {
   ladderTopSignpostLadder,
   ladderTopSignposts,
   walkUpSignpostStreet,
-} from '../public/js/ladder-top-signposts.js?v=g422-1';
-import { navigableSignposts, signpostNear, wallsScreen, worldToScreen } from '../public/js/street-model.js?v=g478-1';
-import { planSignpostTravel } from '../public/js/travel.js?v=g478-1';
-import { visibleDoors } from '../public/js/doors.js';
+} from '../public/js/ladder-top-signposts.js?v=d4123a4c';
+import { navigableSignposts, signpostNear, wallsScreen, worldToScreen } from '../public/js/street-model.js?v=606bae73';
+import { planSignpostTravel } from '../public/js/travel.js?v=855c6c68';
+import { visibleDoors } from '../public/js/doors.js?v=eb9510b1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');
@@ -147,7 +147,7 @@ describe('ladder-top signposts: the street data', () => {
 describe('ladder-top signposts: game.js', () => {
   const game = readFileSync(join(spike, 'public/game.js'), 'utf8');
   it('travels from the top like a door and keeps walk-up lookups off the post', () => {
-    assert.match(game, /from '\.\/js\/ladder-top-signposts\.js\?v=g\d+-\d+'/);
+    assert.match(game, /from '\.\/js\/ladder-top-signposts\.js\?v=[0-9a-f]{8}'/);
     assert.match(game, /updateBuriedSignposts\(\);\n\s*updateLadderTopSignposts\(\);/);
     assert.match(game, /if \(!climberAtLadderTop\(climb\.wall, player\.y\)\) return;/);
     assert.match(game, /const sign = ladderTopSignpostFor\(currentStreet, climb\.wall\.id\);[\s\S]{0,400}travelTo\(conn\.tsid, \{ label: conn\.label, arrive: conn\.arrive, via: 'door' \}\)/);

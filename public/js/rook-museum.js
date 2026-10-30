@@ -17,7 +17,7 @@
  * reference only, never shipped as pixels).
  */
 
-import { ROOK_ART } from './rook-art.js?v=g455-1';
+import { ROOK_ART } from './rook-art.js?v=3d9cd2ae';
 
 export const ROOK_HALL_START_QUEST_ID = 'rook_hall_start';
 export const ROOK_HALL_QUEST_ID = 'rook_hall';

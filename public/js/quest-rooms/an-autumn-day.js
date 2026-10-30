@@ -48,9 +48,9 @@
  * left end of the bench, so she sits there; where the leaves fall is ours.
  */
 
-import { AN_AUTUMN_DAY_FILES } from '../an-autumn-day-art.js';
-import { textureFromUrl } from '../textures.js';
-import { sceneAnim } from '../deco-anim.js?v=g457-3';
+import { AN_AUTUMN_DAY_FILES } from '../an-autumn-day-art.js?v=d6b2601b';
+import { textureFromUrl } from '../textures.js?v=01a295a1';
+import { sceneAnim } from '../deco-anim.js?v=b3fc64f2';
 
 export const ROOM_ID = 'an_autumn_day';
 export const QUEST_ID = 'an_autumn_day';

@@ -13,7 +13,7 @@ import {
   vitalMenuHeading,
   vitalSnacks,
   vitalTitle,
-} from '../public/js/vitals.js';
+} from '../public/js/vitals.js?v=ca7471dd';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -66,7 +66,7 @@ test('vitalSnacks: ordinary Eat and Drink that raise the stat, most first', () =
 
 test('game.js draws the states and wires the click to the pack Eat', () => {
   const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
-  assert.match(game, /from '\.\/js\/vitals\.js\?v=g458-\d+'/);
+  assert.match(game, /from '\.\/js\/vitals\.js\?v=[0-9a-f]{8}'/);
   // Phase 2: the top bar's rings carry the state (js/ui/topbar.js drawVital).
   const topbar = fs.readFileSync(path.join(root, 'public/js/ui/topbar.js'), 'utf8');
   assert.match(topbar, /pill\.dataset\.vital = r\.level;/);
@@ -102,5 +102,5 @@ test('style.css: amber, red with a pulse, no pulse under reduced motion', () => 
     assert.ok(ratio(fg, bg) >= 4.5, `${fg} on ${bg}: ${ratio(fg, bg).toFixed(2)}`);
   }
   const html = fs.readFileSync(path.join(root, 'public/play/index.html'), 'utf8');
-  assert.match(html, /&amp;vitals=g458-\d+&amp;(?:\w+=[\w-]+&amp;)*backdrop=/);
+  assert.match(html, /href="style\.css\?v=[0-9a-f]{8}"/);
 });

@@ -38,8 +38,8 @@
  *     does). A skill finished while away: &skilldemo=<class>&skillremaining=-60 (no autostart).
  */
 
-import { CARD_ART_LAYERS } from '../imagination-data.js';
-import { skillArtFor, skillLearnedModel } from '../familiar.js?v=g434-1';
+import { CARD_ART_LAYERS } from '../imagination-data.js?v=4a85e7fe';
+import { skillArtFor, skillLearnedModel } from '../familiar.js?v=2089ac54';
 
 /** FamiliarDialog grow / shrink: 0.3 s (start 340-343, end 253-268). */
 export const FAMILIAR_GROW_MS = 300;

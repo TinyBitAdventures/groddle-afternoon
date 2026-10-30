@@ -54,8 +54,8 @@ import {
   settleRace,
   startDelayMessage,
   tickRace,
-} from '../public/js/races.js';
-import { RACE_COURSE_IDS, platformUnder, raceCourse } from '../public/js/race-courses.js';
+} from '../public/js/races.js?v=df0576ad';
+import { RACE_COURSE_IDS, platformUnder, raceCourse } from '../public/js/race-courses.js?v=565822aa';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 

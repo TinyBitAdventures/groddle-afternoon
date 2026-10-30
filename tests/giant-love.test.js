@@ -18,9 +18,9 @@ import {
   giantLoveResponse,
   loveYouGiant,
   loveYouLine,
-} from '../public/js/giant-love.js';
-import { GIANTS } from '../public/js/shrines.js';
-import { sayLoveLine } from '../public/js/features/shrine-hint-feature.js?v=g481-2';
+} from '../public/js/giant-love.js?v=aa9ea315';
+import { GIANTS } from '../public/js/shrines.js?v=01b185bc';
+import { sayLoveLine } from '../public/js/features/shrine-hint-feature.js?v=45f7d542';
 
 const ROOT = join(import.meta.dirname, '..');
 const AUDIT = join(ROOT, '..');
@@ -140,7 +140,7 @@ describe('the shrine-hint feature hears the Local chat box', () => {
   it('reads the chat box in the capture phase, like the hi signs', () => {
     const src = readFileSync(join(ROOT, 'public', 'js', 'features', 'shrine-hint-feature.js'), 'utf8');
     assert.match(src, /document\.addEventListener\('submit', onChatSubmit, true\)/);
-    assert.match(src, /giant-love\.js\?v=g94-1/);
+    assert.match(src, /giant-love\.js\?v=[0-9a-f]{8}/);
     assert.match(src, /el\.id = 'giant-screen-panel'/);
   });
 });

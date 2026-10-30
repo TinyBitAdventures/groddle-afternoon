@@ -39,7 +39,7 @@ describe('G363: instances show no hub line', () => {
     assert.match(qi, /\/\/ G363: an instance has no hub line \(location\.js 3311\), whatever the room names\.\s*hubName: '',/);
     assert.match(qi, /street\.hubName = '';/);
     assert.doesNotMatch(qi, /room\.hubName \|\| 'Quest'/);
-    assert.match(qi, /\?v=rooms-g\d+/);
+    assert.match(qi, /\n  [a-z_]+: \(\) => import\('\.\.\/quest-rooms\/[a-z-]+\.js\?v=[0-9a-f]{8}'\),\n/);
   });
 
   it('game.js scenes that are instances carry no hub', () => {
@@ -57,7 +57,7 @@ describe('G363: instances show no hub line', () => {
   });
 
   it('feature instances answer labelFor with no hub', async () => {
-    const { gwendolynRoom23Feature } = await import('../public/js/features/gwendolyn-room-23-feature.js?v=g458-1');
+    const { gwendolynRoom23Feature } = await import('../public/js/features/gwendolyn-room-23-feature.js?v=890eec1d');
     assert.deepEqual(gwendolynRoom23Feature.labelFor('GCR8MORFJI12IR4'), { street: 'Room 23', hub: '', hubId: '79' });
     assert.equal(gwendolynRoom23Feature.labelFor('GTJ10M515812V0C'), null, 'Corridor Five keeps its hub');
     const street = { tsid: 'GCR8MORFJI12IR4', hubName: 'Tower Quest' };
@@ -74,7 +74,7 @@ describe('G352: the two snap captions (Austin 2026-10-28: one-off approval)', ()
     const src = read('js/quest-rooms/being-watched.js');
     assert.match(src, /Flickr 8270858639/);
     assert.match(src, /Austin 2026-10-28: one-off approval/);
-    const { CAPTION, FLOOR } = await import('../public/js/quest-rooms/being-watched.js?v=g457-3');
+    const { CAPTION, FLOOR } = await import('../public/js/quest-rooms/being-watched.js?v=b9f3d352');
     assert.equal(CAPTION.text, "Ever feel like you're being watched?");
     assert.ok(CAPTION.y < FLOOR && FLOOR - CAPTION.y <= 220);
     assert.match(src, /world\.addChild\(kit\.label\(PIXI, CAPTION\.text, CAPTION\.x, CAPTION\.y, \{ size: 17, fill: 0xffffff/);
@@ -85,13 +85,13 @@ describe('G352: the two snap captions (Austin 2026-10-28: one-off approval)', ()
     assert.match(src, /Flickr 8264519059/);
     assert.match(src, /Flickr 8273330942/);
     assert.match(src, /Austin 2026-10-28: one-off approval/);
-    const { WINTER_WALK_CAPTION, WINTER_WALK_CAMP, WINTER_WALK_FLOOR_Y, WINTER_WALK_BOUNDS } = await import('../public/js/winter-walk-streets.js');
+    const { WINTER_WALK_CAPTION, WINTER_WALK_CAMP, WINTER_WALK_FLOOR_Y, WINTER_WALK_BOUNDS } = await import('../public/js/winter-walk-streets.js?v=615549da');
     assert.equal(WINTER_WALK_CAPTION.lines.join(' '), 'Have you ever heard the ding-a-ling-ling sound icicles make when you tappity-tap them?');
     assert.ok(WINTER_WALK_CAPTION.x > WINTER_WALK_CAMP.tent && WINTER_WALK_CAPTION.x < WINTER_WALK_BOUNDS.r);
     assert.ok(WINTER_WALK_CAPTION.y < WINTER_WALK_FLOOR_Y);
     const feat = read('js/features/rebuilt-rooms-feature.js');
     assert.match(feat, /if \(street\?\.tsid === WINTER_WALK_TSID\) drawCaption\(engine\);/);
-    assert.match(feat, /winter-walk-streets\.js\?v=g382-1/);
+    assert.match(feat, /winter-walk-streets\.js\?v=[0-9a-f]{8}/);
   });
 
   it('the client drew deco sign text at the deco, in the street', { skip: !existsSync(client) && 'no client checkout' }, () => {
@@ -100,8 +100,8 @@ describe('G352: the two snap captions (Austin 2026-10-28: one-off approval)', ()
   });
 
   it('no em-dashes in the captions', async () => {
-    const { CAPTION } = await import('../public/js/quest-rooms/being-watched.js?v=g457-3');
-    const { WINTER_WALK_CAPTION } = await import('../public/js/winter-walk-streets.js');
+    const { CAPTION } = await import('../public/js/quest-rooms/being-watched.js?v=b9f3d352');
+    const { WINTER_WALK_CAPTION } = await import('../public/js/winter-walk-streets.js?v=615549da');
     assert.ok(!/[—–]/.test(CAPTION.text + WINTER_WALK_CAPTION.lines.join('')));
   });
 });

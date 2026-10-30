@@ -41,12 +41,12 @@ import {
   reopenDueFeats,
   reopenText,
   reopensAt,
-} from '../public/js/solo-feats.js?v=g370-1';
-import { DAY_NAMES, GAME_DAY_MS } from '../public/js/game-day.js?v=dametime-4';
-import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=g472-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-369';
-import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=g424-1';
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=g414-1';
+} from '../public/js/solo-feats.js?v=e026b67b';
+import { DAY_NAMES, GAME_DAY_MS } from '../public/js/game-day.js?v=3095e05b';
+import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=3a89f5a3';
+import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
+import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=b4449504';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=3d618d6a';
 
 const ROOT = join(import.meta.dirname, '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');
@@ -523,7 +523,7 @@ describe('G178 Feat follow-ups', () => {
   });
 
   it('hands the detail to every onEvent through the feature host', async () => {
-    const { createFeatureHost } = await import('../public/js/feature-host.js');
+    const { createFeatureHost } = await import('../public/js/feature-host.js?v=e4f648b1');
     const seen = [];
     const host = createFeatureHost([{ id: 't', onEvent: (...args) => seen.push(args) }]);
     host.event('npc_batterfly:feed', 1, 'E', { animal: 'x' });

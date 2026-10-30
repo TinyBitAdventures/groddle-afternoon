@@ -34,15 +34,15 @@
  * funpicklePowers, funpickleAward, funpickleSneezes, funpickleOverlay.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { ITEM_BASE_COSTS } from '../store-catalog.js';
-import { shiftMetabolic } from '../metabolics.js';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g464-2';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
-import { landingY, nearestSurfaceY } from '../walk-surface.js?v=g478-1';
-import { STREET_INDEX } from '../street-loader.js?v=g478-1';
-import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=g481-2';
-import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, standPlacement, trackOverlay } from '../overlay-art.js?v=g463-2';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
+import { ITEM_BASE_COSTS } from '../store-catalog.js?v=79d4de8a';
+import { shiftMetabolic } from '../metabolics.js?v=8504134e';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=0e86cc0f';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=01a295a1';
+import { landingY, nearestSurfaceY } from '../walk-surface.js?v=c4aff42f';
+import { STREET_INDEX } from '../street-loader.js?v=20c7b021';
+import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=d5978ec1';
+import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, standPlacement, trackOverlay } from '../overlay-art.js?v=628fa0b4';
 import {
   AWARD_ITEM,
   AWARD_LINE,
@@ -86,7 +86,7 @@ import {
   pickRandomTeleport,
   recordPower,
   shouldPlaceFind,
-} from '../funpickle.js';
+} from '../funpickle.js?v=1fb38c54';
 
 export const FUNPICKLE_FEATURE_ID = 'funpickle';
 

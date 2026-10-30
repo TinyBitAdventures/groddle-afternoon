@@ -25,7 +25,7 @@ import {
   room,
   solutionsFor,
   tallyStrokes,
-} from '../public/js/quest-rooms/picto-pattern.js';
+} from '../public/js/quest-rooms/picto-pattern.js?v=ae454875';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS/quests/picto_pattern.js');
@@ -149,8 +149,8 @@ describe('Picto Pattern felt look (G76, players Snaps)', () => {
     const { join, dirname } = await import('node:path');
     const { fileURLToPath } = await import('node:url');
     const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
-    const { PICTO_PATTERN_FILES } = await import('../public/js/picto-pattern-art.js');
-    const mod = await import('../public/js/quest-rooms/picto-pattern.js');
+    const { PICTO_PATTERN_FILES } = await import('../public/js/picto-pattern-art.js?v=72120af4');
+    const mod = await import('../public/js/quest-rooms/picto-pattern.js?v=ae454875');
     const plan = JSON.parse(readFileSync(join(spike, 'tools/room-art/picto_pattern.json'), 'utf8'));
     assert.match(plan.source, /glitch-locations meomi2\.swf, wardrobia\.swf \(CC0\)/);
     const names = [mod.FELT.question, mod.FELT.cloud, ...mod.FELT.ground];

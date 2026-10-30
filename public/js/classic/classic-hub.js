@@ -24,8 +24,8 @@
  * come with the game's init), so under Classic it takes X first. It never takes X while typing, while
  * the loading or start card is up, or while the upgrade cards are open (X closes those, as before).
  */
-import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=g476-1';
-import { classicArtUrl } from './classic-art.js?v=g468-9';
+import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=587c014a';
+import { classicArtUrl } from './classic-art.js?v=d985fc35';
 
 /** The clouds, in the client's two rows (ImgMenuView.as 343-415). */
 export const HUB_CLOUDS = Object.freeze([

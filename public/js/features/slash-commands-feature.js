@@ -28,15 +28,15 @@
  *     slashLine (the last line shown).
  */
 
-import { BUTLER_STRINGS } from '../butler.js?v=butler-9';
-import { butlerApi } from './butler-feature.js?v=g485-1';
-import { hellFeature } from './hell-feature.js?v=hell-16';
-import { towerApi } from './home-tower-feature.js?v=g463-1';
-import { slashPlan, unknownLine } from '../slash-commands.js?v=g249-1';
-import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=g406-1';
-import { minnUrls } from '../minn-account.js?v=nbhome-10';
-import { saveStore } from '../save-store.js?v=mp2-2';
-import { STREET_INDEX } from '../street-loader.js?v=g478-1';
+import { BUTLER_STRINGS } from '../butler.js?v=814ee05f';
+import { butlerApi } from './butler-feature.js?v=3446891e';
+import { hellFeature } from './hell-feature.js?v=bdaefff5';
+import { towerApi } from './home-tower-feature.js?v=b4e3d104';
+import { slashPlan, unknownLine } from '../slash-commands.js?v=23e13b20';
+import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';
+import { minnUrls } from '../minn-account.js?v=81339760';
+import { saveStore } from '../save-store.js?v=b74a8113';
+import { STREET_INDEX } from '../street-loader.js?v=20c7b021';
 
 export const SLASH_COMMANDS_FEATURE_ID = 'slash-commands';
 

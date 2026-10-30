@@ -12,8 +12,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ROOK_HIDDEN_HUBS, streetIsRookable } from '../public/js/rook-attack.js?v=g479-2';
-import { GENTLE_ISLAND_TSIDS } from '../public/js/newxp.js?v=g481-2';
+import { ROOK_HIDDEN_HUBS, streetIsRookable } from '../public/js/rook-attack.js?v=c06c0537';
+import { GENTLE_ISLAND_TSIDS } from '../public/js/newxp.js?v=d5978ec1';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));

@@ -13,7 +13,7 @@ import {
   extractLocationNavigation,
   buildStreetNavigation,
   arrivalInTarget,
-} from '../public/js/location-navigation.js?v=g478-1';
+} from '../public/js/location-navigation.js?v=38c12adf';
 import {
   DOOR_KEYS,
   DOOR_TEXT,
@@ -27,13 +27,13 @@ import {
   keyDropDue,
   normalizeDoorState,
   visibleDoors,
-} from '../public/js/doors.js';
+} from '../public/js/doors.js?v=eb9510b1';
 import {
   barriersScreen,
   blockBarrierCrossing,
   climbWallsWorld,
   navigableSignposts,
-} from '../public/js/street-model.js?v=g478-1';
+} from '../public/js/street-model.js?v=606bae73';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const street = (tsid) =>
@@ -335,7 +335,7 @@ describe('ladders, walls and signposts at runtime', () => {
 
 describe('barriersScreen follows walls opened at runtime', () => {
   it('drops a wall once its pc_perm becomes 0 and brings it back', async () => {
-    const { barriersScreen } = await import('../public/js/street-model.js?v=g478-1');
+    const { barriersScreen } = await import('../public/js/street-model.js?v=606bae73');
     const street = { bounds: { l: 0, t: 0, r: 1000, b: 500 }, barriers: [{ id: 'w', x: 100, y: 0, h: 200, pc_perm: null }] };
     assert.equal(barriersScreen(street).length, 1);
     street.barriers[0].pc_perm = 0;

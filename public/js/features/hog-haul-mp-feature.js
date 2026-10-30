@@ -31,11 +31,11 @@ import {
   normalizeHogMatch,
   pigPose,
   touches,
-} from '../hog-haul-mp.js?v=g334-hog-1';
-import { HOG_HAUL_SPLASH, splashFor } from '../game-splash.js?v=g463-2';
-import { grantMoodXp } from '../mood-xp.js';
-import { playCountdownArt } from '../overlays.js?v=g463-2';
-import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
+} from '../hog-haul-mp.js?v=d8605396';
+import { HOG_HAUL_SPLASH, splashFor } from '../game-splash.js?v=15233d46';
+import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { playCountdownArt } from '../overlays.js?v=6d2b7a11';
+import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 
 const HOLD = 'hog-haul-mp';
 const BAIT_ICON = 'assets/sprites/races/pig_bait__x1_iconic_png_1354830334.png';

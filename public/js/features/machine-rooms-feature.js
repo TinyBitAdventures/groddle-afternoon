@@ -59,7 +59,7 @@
  *   (id=state,... as drawn).
  */
 
-import { forestMachineRoomEcology, isForestMachineRoomTsid } from '../forest-machine-room.js';
+import { forestMachineRoomEcology, isForestMachineRoomTsid } from '../forest-machine-room.js?v=5f7e4589';
 import {
   CALL_PLAYER_LINES,
   MACHINE_HITBOX,
@@ -84,16 +84,16 @@ import {
   secondsToString,
   takeJobIngredients,
   tankFuel,
-} from '../machine-rooms.js?v=g403-1';
-import { refuelMachine, MAX_FUEL } from '../machines.js?v=g403-1';
-import { DROP_ITEMS, applyDropResult, isEmptyDrop, rollDropTable } from '../drop-tables.js';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { energyMax, moodMax } from '../metabolics.js';
-import { getSkillCatalog } from '../content-catalogs.js?v=g403-1';
-import { worldToScreen } from '../street-model.js?v=g478-1';
-import { nearestSurfaceY } from '../walk-surface.js?v=g478-1';
-import { textureFromUrl } from '../textures.js';
-import { createSheetLoader } from '../sprite-sheets.js?v=g464-2';
+} from '../machine-rooms.js?v=dd347926';
+import { refuelMachine, MAX_FUEL } from '../machines.js?v=aad0d603';
+import { DROP_ITEMS, applyDropResult, isEmptyDrop, rollDropTable } from '../drop-tables.js?v=0f922478';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
+import { energyMax, moodMax } from '../metabolics.js?v=8504134e';
+import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
+import { worldToScreen } from '../street-model.js?v=606bae73';
+import { nearestSurfaceY } from '../walk-surface.js?v=c4aff42f';
+import { textureFromUrl } from '../textures.js?v=01a295a1';
+import { createSheetLoader } from '../sprite-sheets.js?v=0e86cc0f';
 import {
   LOW_FUEL_BUBBLE_MS,
   LOW_FUEL_LINE,
@@ -103,7 +103,7 @@ import {
   machineFrame,
   machineSheetDef,
   roomMachineState,
-} from '../machine-art.js?v=g464-2';
+} from '../machine-art.js?v=2ce23a81';
 
 export const MACHINE_ROOMS_FEATURE_ID = 'machine-rooms';
 const MUSIC_CARD = 'metalmaking_music';

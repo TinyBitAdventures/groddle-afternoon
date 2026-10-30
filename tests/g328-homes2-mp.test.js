@@ -30,12 +30,12 @@ import {
   tendAct,
   tendCounters,
   tendedText,
-} from '../public/js/neighbours-mp.js?v=g328-4';
-import { createButlerState, nextHandover, normalizeButlerState, packagesAndMessagesForOwner } from '../public/js/butler.js?v=butler-9';
-import { createGarden, tickGarden } from '../public/js/garden.js?v=g403-1';
-import { butlerApi } from '../public/js/features/butler-feature.js?v=g485-1';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=g485-1';
-import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-10';
+} from '../public/js/neighbours-mp.js?v=31a75688';
+import { createButlerState, nextHandover, normalizeButlerState, packagesAndMessagesForOwner } from '../public/js/butler.js?v=814ee05f';
+import { createGarden, tickGarden } from '../public/js/garden.js?v=9a8f8f72';
+import { butlerApi } from '../public/js/features/butler-feature.js?v=3446891e';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=05723c71';
+import { createMinnAccount } from '../public/js/minn-account.js?v=81339760';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

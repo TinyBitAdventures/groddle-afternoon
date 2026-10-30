@@ -13,7 +13,7 @@ import {
   randomStarterChoices,
   starterChoicesOf,
   starterFields,
-} from './avatar-starter.js';
+} from './avatar-starter.js?v=2ba02b11';
 
 function el(tag, cls, text) {
   const node = document.createElement(tag);

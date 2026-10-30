@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { buriedSignpostRim, buriedSignpostUnder, isBuriedSignpost, signpostNear } from '../public/js/street-model.js?v=g478-1';
+import { buriedSignpostRim, buriedSignpostUnder, isBuriedSignpost, signpostNear } from '../public/js/street-model.js?v=606bae73';
 
 const root = join(import.meta.dirname, '..');
 const street = (tsid) => JSON.parse(readFileSync(join(root, 'public/assets/streets', `${tsid}.json`), 'utf8'));

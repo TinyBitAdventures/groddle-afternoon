@@ -21,8 +21,8 @@
  * (685) live in js/solo-feats.js and the sound (680) in js/sound-moments.js.
  */
 
-import { metabolicGain, moodMax, energyMax, loseEnergy } from './metabolics.js';
-import { grantMoodXp } from './mood-xp.js';
+import { metabolicGain, moodMax, energyMax, loseEnergy } from './metabolics.js?v=8504134e';
+import { grantMoodXp } from './mood-xp.js?v=958e7680';
 
 export const BUTTER_UP = Object.freeze({
   verb: 'butter_up',

@@ -26,10 +26,10 @@
  *     pouchDeltas, pouchName, pouchCards, pouchPickup, pouchAutoplay.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { getGameDayKey } from '../game-day.js?v=dametime-4';
-import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js?v=g403-1';
-import { VENDOR_PROFILES } from '../vendor.js?v=vendor-profiles-12';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
+import { getGameDayKey } from '../game-day.js?v=3095e05b';
+import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js?v=6b6cbf22';
+import { VENDOR_PROFILES } from '../vendor.js?v=563afb9b';
 import {
   ELEMENT_STACKMAX,
   POUCH_CLASS,
@@ -46,7 +46,7 @@ import {
   pouchPickupCheck,
   shakeCheck,
   shakePouch,
-} from '../elemental-pouch.js';
+} from '../elemental-pouch.js?v=22f23943';
 
 export const POUCH_FEATURE_ID = 'elemental-pouch';
 const POUCH_QUEST = 'elementhandling_buy_elemental_pouch';

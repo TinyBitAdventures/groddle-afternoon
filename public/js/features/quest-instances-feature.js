@@ -73,25 +73,25 @@ import {
   setRunFlag,
   solveQuestInstance,
   stepQuestInstance,
-} from '../quest-instance.js?v=qi-1';
-import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=g482-2';
-import * as kit from '../quest-rooms/kit.js?v=g458-1';
-import { locationEventsApi } from './location-events-feature.js?v=g452-1';
+} from '../quest-instance.js?v=71385640';
+import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=9ebeb502';
+import * as kit from '../quest-rooms/kit.js?v=fd1eb817';
+import { locationEventsApi } from './location-events-feature.js?v=518e223a';
 import {
   acceptOffer,
   ensureQuestOfferState,
   npcQuestOffers,
   questAwardPayload,
   turnInQuest,
-} from '../quest-offers.js?v=g403-1';
-import { parseQuestConversation } from '../quests.js?v=item-buffs-7';
-import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { runStreetTransition } from '../screen-fx.js?v=g470-1';
-import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=g470-1';
-import { applyFamiliarLook, familiarLook } from '../familiar.js?v=g434-1';
-import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g424-1';
-import { sourceFromUrl } from '../textures.js';
+} from '../quest-offers.js?v=6b6cbf22';
+import { parseQuestConversation } from '../quests.js?v=282e1621';
+import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
+import { runStreetTransition } from '../screen-fx.js?v=82ce3680';
+import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=4a5f23f7';
+import { applyFamiliarLook, familiarLook } from '../familiar.js?v=2089ac54';
+import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=d4f4772b';
+import { sourceFromUrl } from '../textures.js?v=01a295a1';
 
 let quoinFrames = null;
 function quoinTexture(PIXI, type) {
@@ -134,13 +134,43 @@ let rubeTraded = false;
 /* Room loading                                                         */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Each built room's module, written out so its URL carries a content key (tools/module-keys/build.mjs
+ * keys every literal import; a computed one cannot be). tests/module-keys.test.js checks this covers
+ * BUILT_ROOMS: a new room gets a line here.
+ */
+const ROOM_MODULES = {
+  rainbow_run: () => import('../quest-rooms/rainbow-run.js?v=13a512fc'),
+  top_of_tree: () => import('../quest-rooms/top-of-tree.js?v=58cdbd3b'),
+  color_unblocking: () => import('../quest-rooms/color-unblocking.js?v=942e0b8b'),
+  vision_quest: () => import('../quest-rooms/vision-quest.js?v=47aa37d7'),
+  kids_room: () => import('../quest-rooms/kids-room.js?v=7b1bb39e'),
+  rube_yard: () => import('../quest-rooms/rube-yard.js?v=5b33de4c'),
+  le_miserable: () => import('../quest-rooms/le-miserable.js?v=7d92daff'),
+  juju_camp: () => import('../quest-rooms/juju-camp.js?v=3f537376'),
+  picto_pattern: () => import('../quest-rooms/picto-pattern.js?v=ae454875'),
+  radiant_glare: () => import('../quest-rooms/radiant-glare.js?v=704e1269'),
+  an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=cf2cd52b'),
+  being_watched: () => import('../quest-rooms/being-watched.js?v=b9f3d352'),
+  back_alley: () => import('../quest-rooms/back-alley.js?v=7aefccae'),
+  clubhouse: () => import('../quest-rooms/clubhouse.js?v=13109d6b'),
+  light_perspective: () => import('../quest-rooms/light-perspective.js?v=33c19f0f'),
+  tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=53157a60'),
+  operation_grow: () => import('../quest-rooms/operation-grow.js?v=05cd2199'),
+  gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=98017a36'),
+  mental_block: () => import('../quest-rooms/mental-block.js?v=ed5ee574'),
+  penalty: () => import('../quest-rooms/penalty.js?v=fd4d240c'),
+  esquibeth: () => import('../quest-rooms/esquibeth.js?v=daa6d38e'),
+  firefly_whistle: () => import('../quest-rooms/firefly-whistle.js?v=3ca501b6'),
+};
+
 function loadRoom(roomId) {
   if (loaded.has(roomId)) return Promise.resolve(loaded.get(roomId));
   if (!loading.has(roomId)) {
-    const path = roomModulePath(roomId).replace(/^\.\//, '../quest-rooms/');
+    const load = ROOM_MODULES[roomId];
     loading.set(
       roomId,
-      import(`${path}?v=rooms-g450-1`)
+      (load ? load() : Promise.reject(new Error(`no module for ${roomModulePath(roomId)}`)))
         .then((mod) => {
           const def = mod.room || mod.default || null;
           loaded.set(roomId, def);

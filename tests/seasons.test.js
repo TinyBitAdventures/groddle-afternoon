@@ -8,8 +8,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=g464-2';
-import { HIRES_ICONS } from '../public/js/icon-hires.js?v=g446-4';
+import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=bf62077e';
+import { HIRES_ICONS } from '../public/js/icon-hires.js?v=5357d4b4';
 import {
   CANDY_DAILY_MAX,
   CARVED_CLASSES,
@@ -47,8 +47,8 @@ import {
   teachPhrase,
   yetiMailDue,
   yetiQuote,
-} from '../public/js/seasons.js?v=g433-1';
-import { SEASON_DATA } from '../public/js/seasons-data.js';
+} from '../public/js/seasons.js?v=fcb12a83';
+import { SEASON_DATA } from '../public/js/seasons-data.js?v=249cedba';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const at = (y, m, d, h = 12) => new Date(y, m - 1, d, h).getTime();
@@ -242,9 +242,9 @@ describe('Glitchmas', () => {
 
 describe('Egg Hunt and Pi Day', () => {
   it('is the source mechanic: Egg Plants pet with lgt_egg_plant_pet, five equally likely eggs, all year', async () => {
-    const { SKILL_PACKAGES } = await import('../public/js/skill-packages-data.js');
-    const { DROP_TABLES } = await import('../public/js/drop-tables-data.js');
-    const { packageForEvent } = await import('../public/js/features/drops-feature.js');
+    const { SKILL_PACKAGES } = await import('../public/js/skill-packages-data.js?v=cb4e9ab3');
+    const { DROP_TABLES } = await import('../public/js/drop-tables-data.js?v=c51a6400');
+    const { packageForEvent } = await import('../public/js/features/drops-feature.js?v=92989dc5');
     assert.equal(packageForEvent(`${EGG_HUNT.pet.trant}:pet`, {}), EGG_HUNT.pet.package);
     const pkg = SKILL_PACKAGES[EGG_HUNT.pet.package];
     assert.deepEqual(Object.values(pkg.skills).map((s) => [s.drop_class_id, s.drop_chance]), [[EGG_HUNT.pet.table, 10], [EGG_HUNT.pet.table, 15], [EGG_HUNT.pet.table, 20], [EGG_HUNT.pet.table, 30]]);
@@ -278,8 +278,8 @@ describe('Egg Hunt and Pi Day', () => {
   });
 
   it('counts each egg into the collection however it arrives, then gives the trophy for them (seasons-feature)', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=g478-1');
-    const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=catalog-unified-7');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=01dccb08');
+    const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=85d4faba');
     const unlocked = [];
     const counted = {};
     const inv = createInventory();
@@ -338,8 +338,8 @@ describe('supply paths', () => {
 
 describe('a ?season= preview leaves the save alone (G342)', () => {
   it('a carved pumpkin survives previewing another season, and the save still remembers Zilloween', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=g478-1');
-    const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=catalog-unified-7');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=01dccb08');
+    const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=85d4faba');
     const inv = createInventory();
     addItem(inv, 'pumpkin_carved_1', 2);
     let saved = 0;

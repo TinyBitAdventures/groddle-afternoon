@@ -28,7 +28,7 @@ import {
   purchaseQualification,
   requestLegalizeQualification,
   travelToGregarious,
-} from '../public/js/legalize-it.js?v=g450-1';
+} from '../public/js/legalize-it.js?v=d569fd0e';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -171,13 +171,13 @@ test('client integration ships recovered clean quest art and a playable route', 
   assert.match(game, /const LEGALIZE_STATION = surfaceStation\(LEGALIZE_GRANGE_TSID\);/);
   assert.match(game, /const LEGALIZE_HALL_DOOR = 'door_1300484753304';/);
   assert.match(game, /const LEGALIZE_STAIRS_DOOR = 'door_subway_stairs';/);
-  assert.match(game, /from '\.\/js\/quest-rooms\/back-alley-set\.js\?v=g\d+-\d+'/);
+  assert.match(game, /from '\.\/js\/quest-rooms\/back-alley-set\.js\?v=[0-9a-f]{8}'/);
   assert.match(game, /papersRefused: \(\) => legalizeGateRefused\(\)/);
   assert.match(content, /legalize_hall_entrance/);
   assert.match(content, /npc_back_alley_bureaucrat/);
   assert.match(content, /npc_bureaucrat/);
   assert.match(html, /id="legalize-hud"/);
   assert.match(html, /data-legalize-progress>1 \/ 5/);
-  assert.match(html, /legalize=6/);
+  assert.match(html, /"game\.js\?v=[0-9a-f]{8}"/);
   assert.match(css, /\.legalize-hud/);
 });

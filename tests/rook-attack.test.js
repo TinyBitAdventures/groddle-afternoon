@@ -39,7 +39,7 @@ import {
   stunFeedText,
   stunTableFor,
   useBalmPoint,
-} from '../public/js/rook-attack.js?v=g479-2';
+} from '../public/js/rook-attack.js?v=c06c0537';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public');
 
@@ -280,8 +280,8 @@ describe('rooked things and cures', () => {
 });
 
 describe('rook attack feature', async () => {
-  const { ROOK_SHEETS, rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=g479-2');
-  const { createFeatureHost } = await import('../public/js/feature-host.js');
+  const { ROOK_SHEETS, rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=827d24a8');
+  const { createFeatureHost } = await import('../public/js/feature-host.js?v=e4f648b1');
 
   /** Pixel size from a PNG IHDR or a WebP VP8/VP8L/VP8X header. */
   function imageSize(file) {

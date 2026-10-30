@@ -20,7 +20,7 @@ import {
   promptChoices,
   promptStackHasRoom,
   usesIconButtons,
-} from '../public/js/prompt-stack.js?v=g470-1';
+} from '../public/js/prompt-stack.js?v=0c21efda';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -300,7 +300,7 @@ describe('engine.prompt and its callers', () => {
     const body = game.slice(game.indexOf('  prompt({ title = '), game.indexOf('  /** Enter the Museum of the Rook instance'));
     assert.match(body, /if \(modal !== true\) return promptStackUi\(\)\.add\(/);
     assert.match(body, /removePrompt: \(uid\) => promptStackUi\(\)\.remove\(uid\),/);
-    assert.match(game, /import \{ createPromptStack \} from '\.\/js\/prompt-stack\.js\?v=g470-1';/);
+    assert.match(game, /import \{ createPromptStack \} from '\.\/js\/prompt-stack\.js\?v=[0-9a-f]{8}';/);
     assert.match(game, /viewHeight: \(\) => locationViewRect\(\)\?\.height \|\| 0,/);
   });
 

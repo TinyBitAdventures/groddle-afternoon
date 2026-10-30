@@ -33,12 +33,12 @@
  *    trants.js die() / wood_tree.js onDie for a tree grown in a plot.
  */
 
-import { createTrantState, fruitCapacityAt, resetTrantDay } from './trants.js?v=trant-harvest-2';
-import { ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=g414-1';
-import { canUseTool, useToolCondition } from './tools.js?v=woodcutting-test-8';
-import { musicblockItemMeta } from './musicblocks.js?v=g403-1';
-import { grantMoodXp } from './mood-xp.js';
-import { metabolicGain, loseEnergy } from './metabolics.js';
+import { createTrantState, fruitCapacityAt, resetTrantDay } from './trants.js?v=9c2e8c0f';
+import { ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=4e140315';
+import { canUseTool, useToolCondition } from './tools.js?v=9a2e7ef4';
+import { musicblockItemMeta } from './musicblocks.js?v=35e2b17a';
+import { grantMoodXp } from './mood-xp.js?v=958e7680';
+import { metabolicGain, loseEnergy } from './metabolics.js?v=8504134e';
 
 export const PATCH_SOURCE = 'tinyspeck/glitch-GameServerJS CC0';
 export const SOIL_SPRITE_ROOT = 'assets/sprites/soil';

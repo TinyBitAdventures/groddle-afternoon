@@ -13,13 +13,13 @@ import {
   moodXpMultiplier,
   moodXpMultiplierFor,
   setMoodXpEnv,
-} from '../public/js/mood-xp.js';
-import { collectQuoin, createQuoinState } from '../public/js/quoins.js';
-import { applyVerbReward, getVerbReward } from '../public/js/verb-rewards.js';
-import { applyDropResult } from '../public/js/drop-tables.js';
-import { quoteShrineDonation } from '../public/js/shrines.js';
-import { applyRewards } from '../public/js/quests.js';
-import { bemoanSnoCone, eatSnoCone } from '../public/js/sno-cones.js';
+} from '../public/js/mood-xp.js?v=958e7680';
+import { collectQuoin, createQuoinState } from '../public/js/quoins.js?v=d4f4772b';
+import { applyVerbReward, getVerbReward } from '../public/js/verb-rewards.js?v=d3ce41d5';
+import { applyDropResult } from '../public/js/drop-tables.js?v=0f922478';
+import { quoteShrineDonation } from '../public/js/shrines.js?v=01b185bc';
+import { applyRewards } from '../public/js/quests.js?v=282e1621';
+import { bemoanSnoCone, eatSnoCone } from '../public/js/sno-cones.js?v=2d23307e';
 
 const GSJS = join(import.meta.dirname, '../../glitch-GameServerJS');
 const gsjs = (rel) => readFileSync(join(GSJS, rel), 'utf8');
@@ -167,7 +167,7 @@ describe('every remake award path was routed through js/mood-xp.js', () => {
     for (const rel of flat) assert.doesNotMatch(read(rel), /mood-xp\.js/, rel);
     // One module instance: nobody imports mood-xp.js with a ?v= query.
     const game = read('game.js');
-    assert.match(game, /from '\.\/js\/mood-xp\.js';/);
+    assert.match(game, /from '\.\/js\/mood-xp\.js\?v=[0-9a-f]{8}';/);
     assert.match(game, /setMoodXpEnv\(\{/);
   });
 });

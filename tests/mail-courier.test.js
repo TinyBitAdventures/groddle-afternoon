@@ -26,15 +26,15 @@ import {
   pickPose,
   sendCarriedToMailbox,
   sendDueToMailbox,
-} from '../public/js/mail-courier.js?v=mailnpc-1';
+} from '../public/js/mail-courier.js?v=3e5664ee';
 import {
   createMailboxState,
   deliverMail,
   normalizeMailboxState,
   receiveMailAttachments,
   seedMailbox,
-} from '../public/js/mailbox.js?v=homes-mail-4';
-import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../public/js/mail-npc-art.js?v=mailnpc-1';
+} from '../public/js/mailbox.js?v=05fb4eac';
+import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../public/js/mail-npc-art.js?v=790f980a';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -216,7 +216,7 @@ describe('mail npc art (tools/mail-npc-art/build.mjs)', () => {
   });
 
   it('G448: the frog\'s 28 sheets have 3x renders from npc_yoga_frog.swf that swap in on first draw', async () => {
-    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=g464-2');
+    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=bf62077e');
     const results = JSON.parse(readFileSync(join(root, 'tools/vector-sprites/results.json'), 'utf8'));
     let n = 0;
     for (const label of Object.keys(FROG_ART.sheets)) {
@@ -238,13 +238,13 @@ describe('mail npc art (tools/mail-npc-art/build.mjs)', () => {
 describe('mail courier feature', () => {
   it('is registered once under its key', () => {
     const index = readFileSync(join(pub, 'js/features/index.js'), 'utf8');
-    assert.equal(index.match(/mail-courier-feature\.js\?v=g482-2/g)?.length, 1);
+    assert.equal(index.match(/mail-courier-feature\.js\?v=[0-9a-f]{8}/g)?.length, 1);
   });
 
   it('calls the frog with the source prompt once a letter is due, and waits in an instance', async () => {
     mock.timers.enable({ apis: ['Date'], now: 1_000_000 });
     try {
-      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?v=g482-2');
+      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?v=1d33b8b9');
       const st = createMailboxState();
       const prompts = [];
       let instance = false;

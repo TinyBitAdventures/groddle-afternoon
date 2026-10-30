@@ -16,7 +16,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { CAPPED_ROLLS } from '../tools/build-economy.mjs';
-import { currantRewardForLevel, XP_FOR_LEVEL } from '../public/js/progression.js';
+import { currantRewardForLevel, XP_FOR_LEVEL } from '../public/js/progression.js?v=33462eaa';
 
 const hasPhp = spawnSync('php', ['-v']).status === 0;
 const skip = skipWithoutSite || !hasPhp;

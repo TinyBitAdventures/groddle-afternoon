@@ -9,9 +9,9 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry } from '../public/js/street-model.js?v=g478-1';
-import { arrivalInTarget } from '../public/js/location-navigation.js?v=g478-1';
-import { inEventBox, runLocationEvent, createEventRuntime } from '../public/js/location-events.js?v=g403-1';
+import { assertStreetGeometry } from '../public/js/street-model.js?v=606bae73';
+import { arrivalInTarget } from '../public/js/location-navigation.js?v=38c12adf';
+import { inEventBox, runLocationEvent, createEventRuntime } from '../public/js/location-events.js?v=b45cd9c3';
 import {
   CEBARKUL_DOOR,
   CEBARKUL_TSID,
@@ -34,10 +34,10 @@ import {
   islandYAt,
   ladderGeometry,
   touchesStar,
-} from '../public/js/symphonious-maximus.js';
-import { symphoniousMaximusFeature, isSymphonious } from '../public/js/features/symphonious-maximus-feature.js';
-import { FEATURES } from '../public/js/features/index.js?v=registry-369';
-import { parallaxLayerOffset } from '../public/js/street-render.js?v=g478-1';
+} from '../public/js/symphonious-maximus.js?v=345ad437';
+import { symphoniousMaximusFeature, isSymphonious } from '../public/js/features/symphonious-maximus-feature.js?v=91d8eb1c';
+import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
+import { parallaxLayerOffset } from '../public/js/street-render.js?v=4df4a30c';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

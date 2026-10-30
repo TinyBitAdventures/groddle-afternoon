@@ -13,7 +13,7 @@
  * .q-put-off, .story-offer, data-quest-try ...). QA: canvas data questTab, questTabCounts.
  */
 
-import { escapeText } from './verb-menu.js?v=g477-1';
+import { escapeText } from './verb-menu.js?v=e9d100c3';
 
 export const QUEST_TABS = Object.freeze(['active', 'offered', 'done']);
 const TAB_LABELS = { active: 'Active', offered: 'Offered', done: 'Done' };

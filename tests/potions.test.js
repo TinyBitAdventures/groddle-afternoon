@@ -45,13 +45,13 @@ import {
   trantsformMessage,
   trantsformOutcome,
   usePotion,
-} from '../public/js/potions.js';
-import { potionsFeature, usePotionNow, munchRug, shakeFavor } from '../public/js/features/potions-feature.js?v=g485-1';
-import { BUFF_ICONS } from '../public/js/buff-triggers.js?v=g370-1';
-import { createPlot, growTree, tickPlot, trantsformPlotTree, normalizePlot } from '../public/js/patches.js?v=g414-1';
-import { POTION_ART } from '../public/js/potion-art.js?v=g448-3';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
-import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=g403-1';
+} from '../public/js/potions.js?v=294258de';
+import { potionsFeature, usePotionNow, munchRug, shakeFavor } from '../public/js/features/potions-feature.js?v=7eae9c3b';
+import { BUFF_ICONS } from '../public/js/buff-triggers.js?v=a3093922';
+import { createPlot, growTree, tickPlot, trantsformPlotTree, normalizePlot } from '../public/js/patches.js?v=3996c344';
+import { POTION_ART } from '../public/js/potion-art.js?v=27ccc756';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
+import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=631d7daa';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

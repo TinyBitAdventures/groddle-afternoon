@@ -46,23 +46,23 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js';
-import { platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=20c7b021';
+import { platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js?v=606bae73';
 import {
   ecologyForStreet,
   planStreetPlacements,
   populationForStreet,
   setStreetEcologyCatalog,
-} from '../public/js/street-ecology.js';
-import { ROCK_CATALOG } from '../public/js/mining.js';
-import { MEGA_ROCK_CHANCE, MEGA_ROCK_CHUNKS } from '../public/js/imagination-effects.js';
-import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js';
-import { ARBOROLOGY_HARVEST, TRANT_META } from '../public/js/trants.js';
-import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js';
-import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js';
-import { locationIsDepressing } from '../public/js/animal-mood.js';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=g429-1';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js';
+} from '../public/js/street-ecology.js?v=dbcefe18';
+import { ROCK_CATALOG } from '../public/js/mining.js?v=a7eb8740';
+import { MEGA_ROCK_CHANCE, MEGA_ROCK_CHUNKS } from '../public/js/imagination-effects.js?v=70169933';
+import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=3d618d6a';
+import { ARBOROLOGY_HARVEST, TRANT_META } from '../public/js/trants.js?v=9c2e8c0f';
+import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=f4b16c76';
+import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=23f74bb3';
+import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=acce0123';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=df470ff4';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

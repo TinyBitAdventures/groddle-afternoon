@@ -10,11 +10,11 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=g458-1';
-import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=g482-2';
-import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=g403-1';
-import { acceptOffer, ensureQuestOfferState, questStatus, turnInQuest } from '../public/js/quest-offers.js?v=g403-1';
-import { gwendolynOffers } from '../public/js/gwendolyn-room-23.js?v=g403-1';
+import * as kit from '../public/js/quest-rooms/kit.js?v=fd1eb817';
+import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
+import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
+import { acceptOffer, ensureQuestOfferState, questStatus, turnInQuest } from '../public/js/quest-offers.js?v=6b6cbf22';
+import { gwendolynOffers } from '../public/js/gwendolyn-room-23.js?v=d371497b';
 import {
   CACTUS,
   CACTUS_LINES,
@@ -48,7 +48,7 @@ import {
   room,
   stageForQuest,
   thirdPartFor,
-} from '../public/js/quest-rooms/gwendolyn.js?v=g463-2';
+} from '../public/js/quest-rooms/gwendolyn.js?v=98017a36';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = (p) => join(root, 'public', p);

@@ -3,8 +3,8 @@ import { describe, it } from 'node:test';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js';
-import { WALLPAPER_MAPS, WALLPAPER_PIECES } from '../public/js/home-wallpaper-art.js';
+import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js?v=29713fa8';
+import { WALLPAPER_MAPS, WALLPAPER_PIECES } from '../public/js/home-wallpaper-art.js?v=9f8473e6';
 import {
   GRODDLE_FRAME,
   PIECE_DIR,
@@ -18,7 +18,7 @@ import {
   swatchPiece,
   towerWallField,
   wallTargetAt,
-} from '../public/js/home-wallpaper.js';
+} from '../public/js/home-wallpaper.js?v=e676f00f';
 import {
   INTERIOR,
   TOWER_ROOM,
@@ -29,8 +29,8 @@ import {
   normalizeHomeDecorState,
   setHomeTexture,
   wallSlots,
-} from '../public/js/home-decor.js?v=g448-3';
-import { TOWER_GEO } from '../public/js/home-tower.js';
+} from '../public/js/home-decor.js?v=95ba0a91';
+import { TOWER_GEO } from '../public/js/home-tower.js?v=6ccb3a4f';
 
 const root = join(import.meta.dirname, '..');
 const pub = join(root, 'public');

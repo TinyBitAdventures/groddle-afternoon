@@ -17,7 +17,7 @@
  * Coordinates are world pixels, y down, platform y = walking surface.
  */
 
-import { RAINBOW_RUN_FILES } from './quest-rooms/rainbow-run-art.js';
+import { RAINBOW_RUN_FILES } from './quest-rooms/rainbow-run-art.js?v=bf073094';
 
 /** arbito1.swf pieces that are not street decos (tools/room-art rainbow_run set, CC0). */
 const ARBITO_ROOM_ART = 'assets/sprites/quest-rooms/rainbow_run/';

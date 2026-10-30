@@ -48,11 +48,11 @@
  *   towerWork, towerAutoplay, towerSecrets, towerRock, towerVisited, towerTopY (street).
  */
 
-import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=catalog-unified-7';
-import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-8';
-import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=g403-1';
-import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
-import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
+import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=85d4faba';
+import { canUseTool, useToolCondition } from '../tools.js?v=9a2e7ef4';
+import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=6b6cbf22';
+import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
+import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import {
   BUILD_A_TOWER,
   ELEVATOR_MARK,
@@ -108,11 +108,11 @@ import {
   towerSecretText,
   towerSpotsFor,
   workCheck,
-} from '../home-tower.js?v=home-tower-3';
-import { textureFromUrl } from '../textures.js';
-import { pieceUrl } from '../home-wallpaper.js?v=home-wallpaper-2';
-import { wantsHiresDecos } from '../deco-hires.js?v=g457-3';
-import { WOTD_TEXT } from '../wine-pour.js?v=g165-1';
+} from '../home-tower.js?v=6ccb3a4f';
+import { textureFromUrl } from '../textures.js?v=01a295a1';
+import { pieceUrl } from '../home-wallpaper.js?v=e676f00f';
+import { wantsHiresDecos } from '../deco-hires.js?v=a65f2d79';
+import { WOTD_TEXT } from '../wine-pour.js?v=6daa23a7';
 
 /** 3x tower pieces where the screen has more than 2.25 backing pixels per world pixel. */
 function hires(engine) {

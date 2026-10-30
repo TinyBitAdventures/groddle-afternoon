@@ -72,7 +72,7 @@ describe('self-hosted Nunito', () => {
       const html = readFileSync(join(pub, page), 'utf8');
       assert.match(html, /<html lang="en" data-ui="modern"/, page);
       assert.ok(html.includes(`<link rel="preload" href="${DIR}/nunito-roman-latin.woff2" as="font" type="font/woff2" crossorigin />`), `${page} preloads the main face`);
-      assert.match(html, /style\.css\?v=[^"]*&amp;nunito=g\d+-\d+&amp;(?:\w+=[\w-]+&amp;)*backdrop=/, `${page} keys style.css`);
+      assert.match(html, /href="style\.css\?v=[0-9a-f]{8}"/, `${page} keys style.css`);
     }
   });
 

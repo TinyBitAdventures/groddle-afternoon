@@ -15,7 +15,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { BAGS_NEEDED, CHEAP_BAG_PRICE, ISLAND_CURRANTS, questQueueLine, street4Check } from '../public/js/newxp.js?v=g481-2';
+import { BAGS_NEEDED, CHEAP_BAG_PRICE, ISLAND_CURRANTS, questQueueLine, street4Check } from '../public/js/newxp.js?v=d5978ec1';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

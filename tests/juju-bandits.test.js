@@ -30,12 +30,12 @@ import {
   redeclareDelay,
   stealChanceForSeconds,
   withinReach,
-} from '../public/js/juju-bandits.js';
-import { DROP_TABLES } from '../public/js/drop-tables.js';
-import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=g403-1';
-import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=g482-2';
-import { FEATURES } from '../public/js/features/index.js?v=registry-369';
-import { remakeStatus } from '../public/js/imagination-remake.js?v=g403-1';
+} from '../public/js/juju-bandits.js?v=6cf92f4f';
+import { DROP_TABLES } from '../public/js/drop-tables.js?v=0f922478';
+import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=6b6cbf22';
+import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
+import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
+import { remakeStatus } from '../public/js/imagination-remake.js?v=ca0a48d5';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(spike, '../glitch-GameServerJS');

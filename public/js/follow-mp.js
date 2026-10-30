@@ -15,7 +15,7 @@
  * COMPANION_FOLLOW_TRAIL_DISTANCE, companionFollowVelocity).
  */
 
-import { COMPANION_FOLLOW_TRAIL_DISTANCE, STALKER_ACHIEVEMENT_ID, companionFollowVelocity } from './local-companions.js?v=street-players-4';
+import { COMPANION_FOLLOW_TRAIL_DISTANCE, STALKER_ACHIEVEMENT_ID, companionFollowVelocity } from './local-companions.js?v=188f756c';
 
 export { STALKER_ACHIEVEMENT_ID };
 export const FOLLOW_VERB = 'mp_follow';

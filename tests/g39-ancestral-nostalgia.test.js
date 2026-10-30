@@ -17,16 +17,16 @@ import {
   nostalgiaLimitSeconds,
   pickBootTarget,
   resetBaqalaTimes,
-} from '../public/js/ancestral-nostalgia.js';
-import { NOSTALGIA_BOOT_STREETS } from '../public/js/ancestral-nostalgia-data.js';
+} from '../public/js/ancestral-nostalgia.js?v=5adf3c9d';
+import { NOSTALGIA_BOOT_STREETS } from '../public/js/ancestral-nostalgia-data.js?v=0adb9184';
 import { BOOT_SOURCE_TSIDS, buildRows, render } from '../tools/build-ancestral-nostalgia.mjs';
-import { ancestralClock, stealChanceForSeconds } from '../public/js/juju-bandits.js';
-import { applyBuff, createBuffState, hasBuff, removeBuff } from '../public/js/buffs.js?v=g403-1';
-import { getBuffCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
-import { IMAGINATION_UPGRADES, buildDeck, upgradeStatus } from '../public/js/imagination.js?v=g403-1';
-import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=g403-1';
-import { POTION_TEXT, ancestralCheck } from '../public/js/potions.js';
-import { FEATURES } from '../public/js/features/index.js?v=registry-369';
+import { ancestralClock, stealChanceForSeconds } from '../public/js/juju-bandits.js?v=6cf92f4f';
+import { applyBuff, createBuffState, hasBuff, removeBuff } from '../public/js/buffs.js?v=c7727c43';
+import { getBuffCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
+import { IMAGINATION_UPGRADES, buildDeck, upgradeStatus } from '../public/js/imagination.js?v=b4f0eaf6';
+import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=ca0a48d5';
+import { POTION_TEXT, ancestralCheck } from '../public/js/potions.js?v=294258de';
+import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(root, '../glitch-GameServerJS');

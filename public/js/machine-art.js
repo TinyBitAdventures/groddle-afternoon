@@ -36,8 +36,8 @@
  * and again every 30 s while the tank stays that low.
  */
 
-import { MACHINE_ART_LOOPERS, MACHINE_ART_SHEETS } from './machine-art-sheets.js';
-import { SPLIT_SPRITES } from './sprite-hires.js?v=g464-2';
+import { MACHINE_ART_LOOPERS, MACHINE_ART_SHEETS } from './machine-art-sheets.js?v=0fd6183b';
+import { SPLIT_SPRITES } from './sprite-hires.js?v=bf62077e';
 
 export { MACHINE_ART_SHEETS };
 

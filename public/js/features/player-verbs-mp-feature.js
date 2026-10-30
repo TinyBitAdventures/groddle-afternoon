@@ -35,14 +35,14 @@
  * window.groddlePlayerVerbs in multiplayer.
  */
 
-import { countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js';
-import { grantMoodXp } from '../mood-xp.js';
-import { ensureQuestOfferState } from '../quest-offers.js?v=g403-1';
-import { getMusicblock, isMusicblock } from '../musicblocks.js?v=g403-1';
-import { GAME_DAY_MS } from '../game-day.js';
-import { playSheetOverlay } from '../overlay-art.js?v=g463-2';
-import { showRainbow } from '../overlays.js?v=g463-2';
+import { countItem, removeItem } from '../inventory.js?v=85d4faba';
+import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
+import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { ensureQuestOfferState } from '../quest-offers.js?v=6b6cbf22';
+import { getMusicblock, isMusicblock } from '../musicblocks.js?v=35e2b17a';
+import { GAME_DAY_MS } from '../game-day.js?v=3095e05b';
+import { playSheetOverlay } from '../overlay-art.js?v=628fa0b4';
+import { showRainbow } from '../overlays.js?v=6d2b7a11';
 import {
   CHARADES_BUFF,
   CHARADES_POTION,
@@ -63,7 +63,7 @@ import {
   normalizeVerbsSlice,
   targetSide,
   underTheInfluence,
-} from '../player-verbs-mp.js?v=verbs-1';
+} from '../player-verbs-mp.js?v=21706489';
 
 export const PLAYER_VERBS_FEATURE_ID = 'player-verbs-mp';
 const PACK_SOAK = 'pverb_soak';

@@ -18,7 +18,7 @@ import {
   recordCompanionFollowStreet,
   startCompanionFollow,
   stopCompanionFollow,
-} from '../public/js/local-companions.js';
+} from '../public/js/local-companions.js?v=188f756c';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(__dirname, '../public');

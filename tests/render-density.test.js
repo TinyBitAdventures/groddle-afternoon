@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { MAX_RENDER_RESOLUTION, renderResolution } from '../public/js/render-density.js';
+import { MAX_RENDER_RESOLUTION, renderResolution } from '../public/js/render-density.js?v=ae0941e5';
 
 test('backing store matches the displayed canvas density', () => {
   // 1574 CSS px on Retina: the old fixed 2x store was upscaled 1.64x.

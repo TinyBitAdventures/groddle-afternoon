@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { STATUS_KEYS, FROM_RESTORATION, oursCell, oursNumbers } from '../public/compare/compare-data.js';
+import { STATUS_KEYS, FROM_RESTORATION, oursCell, oursNumbers } from '../public/compare/compare-data.js?v=c0ceb0f2';
 import { STATUS as RESTORATION_STATUS } from '../tools/restoration/checklist.mjs';
 import { servedByMinn } from './minn-served.js';
 

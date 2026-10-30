@@ -67,10 +67,10 @@
  *   'mp' triggers, mpReady[need] whether what a quest needs is live.
  */
 
-import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js';
-import { getQuestCatalog } from './content-catalogs.js?v=g403-1';
-import { levelInfoForXp } from './progression.js';
-import { offerableMultiplayerQuest } from './quests-mp.js?v=g358-1';
+import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js?v=53b1f6c9';
+import { getQuestCatalog } from './content-catalogs.js?v=10b118dd';
+import { levelInfoForXp } from './progression.js?v=33462eaa';
+import { offerableMultiplayerQuest } from './quests-mp.js?v=2beb658a';
 import {
   assignQuest,
   completeQuest,
@@ -78,7 +78,7 @@ import {
   parseQuestConversation,
   cleanQuestMarkup,
   eventToCounter,
-} from './quests.js?v=item-buffs-7';
+} from './quests.js?v=282e1621';
 
 /** Original: only one offer every 5 minutes (quests_offer delay = 60 * 5). */
 export const OFFER_INTERVAL_MS = 5 * 60 * 1000;

@@ -10,7 +10,7 @@
  * player|admin, body, at }. Who wrote is a role: an administrator is never named.
  */
 
-import { minnUrls } from './minn-account.js?v=nbhome-10';
+import { minnUrls } from './minn-account.js?v=81339760';
 
 /** The sheet's words (the new-report form keeps the original's, BootError.as 280-290). */
 export const REPORT_TEXT = Object.freeze({

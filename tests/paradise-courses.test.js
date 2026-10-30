@@ -19,7 +19,7 @@ import {
   resolveParadiseCourseAlias,
   stepParadiseBody,
   usesParadiseBody,
-} from '../public/js/paradise-courses.js?v=g403-1';
+} from '../public/js/paradise-courses.js?v=bb3d9051';
 import {
   PARADISE_COURSES,
   PARADISE_DAILY_LIMIT,
@@ -31,9 +31,9 @@ import {
   finishParadiseRun,
   paradiseTicketCost,
   resolveParadiseReward,
-} from '../public/js/paradise-flight.js';
-import { QURAZY_REWARDS } from '../public/js/quoins.js';
-import { remakeStatus } from '../public/js/imagination-remake.js?v=g403-1';
+} from '../public/js/paradise-flight.js?v=deb5fb26';
+import { QURAZY_REWARDS } from '../public/js/quoins.js?v=d4f4772b';
+import { remakeStatus } from '../public/js/imagination-remake.js?v=ca0a48d5';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');

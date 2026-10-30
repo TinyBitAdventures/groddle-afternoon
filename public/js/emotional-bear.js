@@ -10,7 +10,7 @@
  * named street companions already present in the Feat replay as local players.
  */
 
-import { loseEnergy } from './metabolics.js';
+import { loseEnergy } from './metabolics.js?v=8504134e';
 
 export const EMOTIONAL_BEAR_ITEM_ID = 'emotional_bear';
 export const EMOTIONAL_BEAR_LIPS_ID = 'lips';

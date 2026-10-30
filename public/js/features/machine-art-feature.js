@@ -18,10 +18,10 @@
  * Canvas data: machineArtState (the frozen state or ''), machineArtDemo.
  */
 
-import { addItem, countItem } from '../inventory.js?v=catalog-unified-7';
-import { ensureToolCondition } from '../tools.js?v=woodcutting-test-8';
-import { MACHINE_SKILLS } from '../machine-rooms.js?v=g403-1';
-import { freezeMachineState, isMachineArt } from '../machine-art.js?v=g464-2';
+import { addItem, countItem } from '../inventory.js?v=85d4faba';
+import { ensureToolCondition } from '../tools.js?v=9a2e7ef4';
+import { MACHINE_SKILLS } from '../machine-rooms.js?v=dd347926';
+import { freezeMachineState, isMachineArt } from '../machine-art.js?v=2ce23a81';
 
 export const MACHINE_ART_FEATURE_ID = 'machine-art';
 

@@ -21,12 +21,12 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { remoteAvatarZ } from '../public/js/features/realtime-feature.js?v=g478-1';
-import { FRONT_FURNITURE_SLOTS, furnitureDrawsInFront } from '../public/js/home-decor.js?v=g448-3';
-import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js';
-import { SCREEN_SELECTOR, WINDOW_SELECTOR, stackZ } from '../public/js/window-stack.js?v=g428-1';
-import { BAND_Z, bandClass, itemBand, itemZ, knownItemClass } from '../public/js/item-bands.js?v=g429-1';
-import { BACKGROUND_CLASSES, FOREGROUND_CLASSES, FOREMOST_CLASSES, NORMAL_CLASSES } from '../public/js/item-bands-data.js?v=g429-1';
+import { remoteAvatarZ } from '../public/js/features/realtime-feature.js?v=515337d4';
+import { FRONT_FURNITURE_SLOTS, furnitureDrawsInFront } from '../public/js/home-decor.js?v=95ba0a91';
+import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=29713fa8';
+import { SCREEN_SELECTOR, WINDOW_SELECTOR, stackZ } from '../public/js/window-stack.js?v=be3b7274';
+import { BAND_Z, bandClass, itemBand, itemZ, knownItemClass } from '../public/js/item-bands.js?v=e98b10bc';
+import { BACKGROUND_CLASSES, FOREGROUND_CLASSES, FOREMOST_CLASSES, NORMAL_CLASSES } from '../public/js/item-bands-data.js?v=0ac4551c';
 import { buildItemBands, render as renderItemBands } from '../tools/build-item-bands.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -344,7 +344,7 @@ describe('item bands from the source (ITEMBANDS)', () => {
     const files = ['public/game.js', ...['street-jobs', 'seasons', 'street-furniture', 'resource-nodes', 'foxes', 'heli-kitties', 'juju-bandits', 'butler', 'craftybot', 'rube', 'supply', 'giant-icons', 'mail-courier', 'rook-attack', 'animal-husbandry', 'yard-verbs-mp', 'neighbours-mp', 'small-items', 'item-verbs-more', 'vendor-npcs', 'potions', 'swoonerflies'].map((f) => `public/js/features/${f}-feature.js`)];
     for (const f of files) {
       const src = read(f);
-      assert.match(src, /import \{ itemZ \} from '\.\.?\/(js\/)?item-bands\.js\?v=g429-1';/, f);
+      assert.match(src, /import \{ itemZ \} from '\.\.?\/(js\/)?item-bands\.js\?v=[0-9a-f]{8}';/, f);
       for (const m of src.matchAll(/itemZ\('([a-z0-9_]+)'/g)) assert.ok(knownItemClass(m[1]), `${f}: ${m[1]}`);
     }
   });

@@ -20,8 +20,8 @@
  *     &crownrival=<seconds>                  pre-fill the first rival's clock; it starts as It (G304 loss splash)
  */
 
-import { crowdScaleX } from '../avatar-anims.js';
-import { OVERLAY_USES, playCountdownArt, playWindowOverlay } from '../overlays.js?v=g463-2';
+import { crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
+import { OVERLAY_USES, playCountdownArt, playWindowOverlay } from '../overlays.js?v=6d2b7a11';
 import {
   CROWNS_ID,
   CROWNS_LADDERS,
@@ -53,14 +53,14 @@ import {
   playLineScreenY,
   tagCrowns,
   tickCrowns,
-} from '../game-of-crowns.js?v=crowns-2';
-import { RACE_RIVALS } from '../races.js?v=races-4';
-import { wallsScreen } from '../street-model.js?v=g478-1';
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { textureFromUrl } from '../textures.js';
-import { grantMoodXp } from '../mood-xp.js';
-import { CROWNS_SPLASH, splashFor } from '../game-splash.js?v=g463-2';
-import { saveStore } from '../save-store.js?v=mp2-2';
+} from '../game-of-crowns.js?v=98e21baf';
+import { RACE_RIVALS } from '../races.js?v=df0576ad';
+import { wallsScreen } from '../street-model.js?v=606bae73';
+import { addItem, countItem, removeItem } from '../inventory.js?v=85d4faba';
+import { textureFromUrl } from '../textures.js?v=01a295a1';
+import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { CROWNS_SPLASH, splashFor } from '../game-splash.js?v=15233d46';
+import { saveStore } from '../save-store.js?v=b74a8113';
 import {
   CROWNS_MP_TEXT,
   crownHolderPos,
@@ -70,7 +70,7 @@ import {
   normalizeCrownsMatch,
   normalizeCrownsReward,
   normalizeCrownsState,
-} from '../crowns-mp.js?v=g334c-1';
+} from '../crowns-mp.js?v=0cb4bb3b';
 
 const ICON = 'assets/sprites/races/';
 const CROWN_DIR = 'assets/sprites/races/crowns/';

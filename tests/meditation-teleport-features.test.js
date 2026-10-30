@@ -6,11 +6,11 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { createFeatureHost } from '../public/js/feature-host.js';
-import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-7';
-import { createToolConditionState } from '../public/js/tools.js?v=woodcutting-test-8';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=g463-2';
-import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=g463-1';
+import { createFeatureHost } from '../public/js/feature-host.js?v=e4f648b1';
+import { createInventory, countItem } from '../public/js/inventory.js?v=85d4faba';
+import { createToolConditionState } from '../public/js/tools.js?v=9a2e7ef4';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=b1d02c1c';
+import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=a79a7cea';
 
 function fakeEngine(overrides = {}) {
   const toasts = [];

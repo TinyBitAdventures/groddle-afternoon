@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { resolveUiMode, createUiMode, UI_STORAGE_KEY, UI_SIZE_KEY, UI_MODE_EVENT } from '../public/js/classic/ui-mode.js?v=g476-1';
-import { interfaceMenuLabel, isPreferencesKey, PREFS_TITLE } from '../public/js/classic/classic-prefs.js?v=g486-1';
+import { resolveUiMode, createUiMode, UI_STORAGE_KEY, UI_SIZE_KEY, UI_MODE_EVENT } from '../public/js/classic/ui-mode.js?v=587c014a';
+import { interfaceMenuLabel, isPreferencesKey, PREFS_TITLE } from '../public/js/classic/classic-prefs.js?v=1e2ed651';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -164,9 +164,9 @@ describe('Classic switch: Menu item and Preferences', () => {
 
   it('game.js imports the switch (it applies as it loads, before main) and installs it after the Menu', () => {
     const src = read('public/game.js');
-    assert.match(src, /\nimport \{ installInterfaceSettings \} from '\.\/js\/classic\/classic-prefs\.js\?v=g\d+-\d+';/);
+    assert.match(src, /\nimport \{ installInterfaceSettings \} from '\.\/js\/classic\/classic-prefs\.js\?v=[0-9a-f]{8}';/);
     assert.ok(src.indexOf('classic-prefs.js') < src.indexOf('async function main('), 'a static import, evaluated before the body');
-    assert.match(read('public/js/classic/classic-prefs.js'), /from '\.\/ui-mode\.js\?v=g\d+-\d+'/);
+    assert.match(read('public/js/classic/classic-prefs.js'), /from '\.\/ui-mode\.js\?v=[0-9a-f]{8}'/);
     const more = src.indexOf('  installMoreMenu();');
     const mine = src.indexOf('  installInterfaceSettings(');
     const boot = src.indexOf('const endBoot = ');

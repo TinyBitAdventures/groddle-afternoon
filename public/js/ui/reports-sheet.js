@@ -22,7 +22,7 @@
  * [data-reports-close-ticket], [data-reports-new], [data-reports-back].
  */
 
-import { REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=g483-1';
+import { REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=f3d8584a';
 
 function el(doc, tag, attrs = {}, text = '') {
   const node = doc.createElement(tag);
@@ -35,7 +35,7 @@ function el(doc, tag, attrs = {}, text = '') {
 }
 
 /**
- * @param {{ doc?: Document, host: HTMLElement, api: ReturnType<import('../reports.js?v=g483-1').createReportsApi>,
+ * @param {{ doc?: Document, host: HTMLElement, api: ReturnType<import('../reports.js').createReportsApi>,
  *   context?: () => object, onState?: (s: { state: string, view: string, unread: number, ticket: number, last: string }) => void,
  *   toast?: (text: string, ms?: number) => void, opener?: () => HTMLElement|null, now?: () => number }} opts
  */

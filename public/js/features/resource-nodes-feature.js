@@ -52,13 +52,13 @@
  * last release: released:respawned|new:<key>, or failed:<reason>).
  */
 
-import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=catalog-unified-7';
-import { platformYAt } from '../street-model.js?v=g478-1';
-import { hiresSpriteUrl } from '../sprite-hires.js?v=g464-2';
-import { rollResourceNodeDrop } from './drops-feature.js?v=drops-8';
-import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
-import { resourceNodeResponseKey, verbResponse } from '../verb-responses.js?v=g414-1';
-import { rollSlothBonusSnails } from '../imagination-effects.js?v=g403-1';
+import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=85d4faba';
+import { platformYAt } from '../street-model.js?v=606bae73';
+import { hiresSpriteUrl } from '../sprite-hires.js?v=bf62077e';
+import { rollResourceNodeDrop } from './drops-feature.js?v=92989dc5';
+import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
+import { resourceNodeResponseKey, verbResponse } from '../verb-responses.js?v=3ceb8a8c';
+import { rollSlothBonusSnails } from '../imagination-effects.js?v=70169933';
 import {
   DUST_TRAP_DROP_ITEM_DEFS,
   ORGANELLE_OVERLAY,
@@ -84,11 +84,11 @@ import {
   starterResourceTools,
   swimmingSalmonCount,
   tickResourceNode,
-} from '../resource-nodes.js?v=g414-1';
-import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js';
-import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=g403-1';
-import { vpSequence } from '../quest-rooms/vp-overlay.js?v=g463-2';
-import { itemZ } from '../item-bands.js?v=g429-1';
+} from '../resource-nodes.js?v=3d618d6a';
+import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js?v=01a295a1';
+import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=6b6cbf22';
+import { vpSequence } from '../quest-rooms/vp-overlay.js?v=093270a6';
+import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';
 export const RESOURCE_GROUP_PREFIX = 'resource:';

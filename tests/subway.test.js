@@ -12,7 +12,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry } from '../public/js/street-model.js?v=g478-1';
+import { assertStreetGeometry } from '../public/js/street-model.js?v=606bae73';
 import { readMapLabels, readTransitInstances, GSJS } from '../tools/subway-source.mjs';
 import {
   CAR_FLOOR,
@@ -45,8 +45,8 @@ import {
   stationStreet,
   stepRide,
   ticketOffer,
-} from '../public/js/subway.js?v=g454-1';
-import { subwayFeature } from '../public/js/features/subway-feature.js?v=g478-1';
+} from '../public/js/subway.js?v=797a5e9c';
+import { subwayFeature } from '../public/js/features/subway-feature.js?v=8f2f0f0c';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

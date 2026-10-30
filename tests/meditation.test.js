@@ -33,7 +33,7 @@ import {
   startLevitation,
   startMeditation,
   tankMultiplier,
-} from '../public/js/meditation.js?v=g403-1';
+} from '../public/js/meditation.js?v=892c78da';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const MA1 = ['meditativearts_1'];

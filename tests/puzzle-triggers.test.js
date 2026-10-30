@@ -14,13 +14,13 @@ import {
   rewardBits,
   stepTriggers,
   triggerHit,
-} from '../public/js/puzzle-triggers.js';
+} from '../public/js/puzzle-triggers.js?v=3ee2f2c8';
 import {
   createEventRuntime,
   dueEventTimers,
   eventPlatformIds,
   runLocationEvent,
-} from '../public/js/location-events.js?v=g403-1';
+} from '../public/js/location-events.js?v=b45cd9c3';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const raw = JSON.parse(readFileSync(join(root, 'public/assets/content/puzzle-triggers.json'), 'utf8'));
@@ -193,7 +193,7 @@ describe('location-events trigger API', () => {
   });
 
   test('without a strict hook, a platform only lost boxes switch back stays walkable', async () => {
-    const { locationEventsFeature, locationEventsApi } = await import('../public/js/features/location-events-feature.js?v=g452-1');
+    const { locationEventsFeature, locationEventsApi } = await import('../public/js/features/location-events-feature.js?v=518e223a');
     const street = make();
     const engine = fakeEngine(street);
     locationEventsFeature.onStreetEnter(street, engine);
@@ -203,7 +203,7 @@ describe('location-events trigger API', () => {
   });
 
   test('a strict hook runs the scripts as written and restart re-applies them', async () => {
-    const { locationEventsFeature, locationEventsApi } = await import('../public/js/features/location-events-feature.js?v=g452-1');
+    const { locationEventsFeature, locationEventsApi } = await import('../public/js/features/location-events-feature.js?v=518e223a');
     let strict = false;
     locationEventsApi.register({ strict: (s) => strict && s.tsid === 'GTESTPUZZLE0001' });
     const street = make();
@@ -253,7 +253,7 @@ describe('gut tubes', () => {
 });
 
 describe('lost puzzle levels (scenes)', async () => {
-  const scenes = await import('../public/js/puzzle-scenes.js');
+  const scenes = await import('../public/js/puzzle-scenes.js?v=5a740c2e');
   const { CONSTELLATION, BEAM_ME_DOWN } = scenes;
 
   test('Constellation: stars connect only in order, and the first star closes the piggy', () => {

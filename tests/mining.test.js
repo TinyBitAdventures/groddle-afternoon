@@ -25,13 +25,13 @@ import {
   starterMiningTools,
   miningVendorOffers,
   STARTER_MINING_SKILLS,
-} from '../public/js/mining.js?v=g403-1';
+} from '../public/js/mining.js?v=a7eb8740';
 import {
   createInventory,
   countItem,
   listPackToolSlots,
   isToolItem,
-} from '../public/js/inventory.js?v=catalog-unified-7';
+} from '../public/js/inventory.js?v=85d4faba';
 import {
   loadRecipeCatalogFromFile,
   listRecipesForTool,
@@ -39,9 +39,9 @@ import {
   craftRecipe,
   ensureMakingItems,
   TOOL_CATALOG,
-} from '../public/js/making.js?v=g403-1';
-import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=woodcutting-test-8';
+} from '../public/js/making.js?v=9e538296';
+import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js?v=563afb9b';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=9a2e7ef4';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SPIKE = join(__dirname, '../public');
@@ -297,7 +297,7 @@ describe('game wiring', () => {
     assert.doesNotMatch(src, /rockTag/);
     assert.match(src, /starterMiningTools/);
     assert.match(src, /STARTER_MINING_SKILLS/);
-    assert.match(src, /from '\.\/js\/mining\.js\?v=g403-1'/);
+    assert.match(src, /from '\.\/js\/mining\.js\?v=[0-9a-f]{8}'/);
     const preloadedSheets = {
       mineRockMetal: [137, 100],
       mineRockDullite: [131, 114],

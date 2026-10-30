@@ -30,20 +30,20 @@ import {
   resourceSpritePaths,
   resourceItemIds,
   sheetFrameRect,
-} from '../public/js/resource-nodes.js?v=g414-1';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
+} from '../public/js/resource-nodes.js?v=3d618d6a';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=85d4faba';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,
   getToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js?v=woodcutting-test-8';
+} from '../public/js/tools.js?v=9a2e7ef4';
 import {
   setStreetEcologyCatalog,
   ecologyForStreet,
   populationForStreet,
   RESOURCE_NODE_CLASSES,
-} from '../public/js/street-ecology.js';
+} from '../public/js/street-ecology.js?v=dbcefe18';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(__dirname, '../public');

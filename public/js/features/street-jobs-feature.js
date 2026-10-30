@@ -43,14 +43,14 @@
  * 'restore', job type 5) and finishes the restore in its `onDone` hook.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-8';
-import { ecologyForStreet } from '../street-ecology.js?v=g485-1';
-import { worldToScreen } from '../street-model.js?v=g478-1';
-import { signArmWidth } from '../street-render.js?v=g478-1';
-import { getSkillCatalog } from '../content-catalogs.js?v=g403-1';
-import { GIANTS } from '../shrines.js?v=spinning-wheel-test-9';
-import { teleportationFeature } from './teleportation-feature.js?v=g463-1';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=85d4faba';
+import { canUseTool, useToolCondition } from '../tools.js?v=9a2e7ef4';
+import { ecologyForStreet } from '../street-ecology.js?v=dbcefe18';
+import { worldToScreen } from '../street-model.js?v=606bae73';
+import { signArmWidth } from '../street-render.js?v=4df4a30c';
+import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
+import { GIANTS } from '../shrines.js?v=01b185bc';
+import { teleportationFeature } from './teleportation-feature.js?v=a79a7cea';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
@@ -88,9 +88,9 @@ import {
   cancelJob,
   jobDivisor,
   upgradeOption,
-} from '../street-jobs.js?v=jobs-3';
-import { gainMetabolic, loseEnergy } from '../metabolics.js';
-import { saveStore } from '../save-store.js?v=mp2-2';
+} from '../street-jobs.js?v=3c8a3e97';
+import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
+import { saveStore } from '../save-store.js?v=b74a8113';
 import {
   HALL_TEXT,
   MP_TEXT,
@@ -109,12 +109,12 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../street-jobs-mp.js?v=g360-1';
-import { grantMoodXp } from '../mood-xp.js';
-import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
-import { normalizeGroups } from '../groups.js?v=g326-1';
-import { textureFromUrl } from '../textures.js';
-import { itemZ } from '../item-bands.js?v=g429-1';
+} from '../street-jobs-mp.js?v=74c659ea';
+import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { createMinnAccount } from '../minn-account.js?v=81339760';
+import { normalizeGroups } from '../groups.js?v=65337c22';
+import { textureFromUrl } from '../textures.js?v=01a295a1';
+import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
 const BOARD_CLASS = 'street_job_board';

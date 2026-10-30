@@ -118,7 +118,7 @@ describe('loading-card strips are our own renders (G316)', () => {
 
 describe('sprites, decos and garden art (G316)', () => {
   it('every 3x sprite file exists; the butterfly sheets render the CC0 glitch-items SWF', async () => {
-    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=g464-2');
+    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=bf62077e');
     for (const [lo, hi] of HIRES_SPRITES) {
       assert.ok(existsSync(join(pub, lo.split('?')[0])), lo);
       assert.ok(existsSync(join(pub, hi)), hi);
@@ -137,7 +137,7 @@ describe('sprites, decos and garden art (G316)', () => {
   it('every manifest deco has its file; renamed twins draw their CC0 SWF render', async () => {
     const names = JSON.parse(readFileSync(join(pub, 'assets/decos/manifest.json'), 'utf8'));
     for (const n of names) assert.ok(existsSync(join(pub, 'assets/decos/groddle', `${n}.webp`)), n);
-    const { DECO_TWINS } = await import('../public/js/street-render.js?v=g478-1');
+    const { DECO_TWINS } = await import('../public/js/street-render.js?v=4df4a30c');
     for (const [alias, twin] of Object.entries(DECO_TWINS)) {
       assert.ok(!names.includes(alias), alias);
       assert.ok(names.includes(twin), twin);

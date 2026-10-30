@@ -16,7 +16,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SLUG_STYLES, speechSlugList } from '../public/js/speech-slugs.js?v=g412-1';
+import { SLUG_STYLES, speechSlugList } from '../public/js/speech-slugs.js?v=130338f9';
 import {
   NEW_DAY_MESSAGES,
   SCREEN_CLOSED_RETRY_MS,
@@ -27,7 +27,7 @@ import {
   screenQueueHold,
   shuffleNewDayMessages,
   waitForScreenGates,
-} from '../public/js/screen-queue.js?v=g459-1';
+} from '../public/js/screen-queue.js?v=cf0132c0';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');
@@ -188,7 +188,7 @@ describe('game.js wires the gates', () => {
     assert.match(fn('maybeNewDay'), /await queueScreen\(async \(\) => \{\n\s*playSfx\('newDay', \{ volume: 0\.75 \}\);\n\s*await showNewDayScreen\(el\);\n\s*\}, \{ requiresFocus: false \}\);\n\s*showNewDayBubble\(refill\);/);
     assert.match(game, /queueScreen: \(show, opts\) => queueScreen\(show, opts\),/);
     // The screen modules load under one key each.
-    assert.match(game, /from '\.\/js\/screen-queue\.js\?v=g459-1';/);
+    assert.match(game, /from '\.\/js\/screen-queue\.js\?v=[0-9a-f]{8}';/);
   });
 
   it('no deadlock with quest offers: an open offer holds screens, queued screens hold the next offer only', { skip: !HAVE_CLIENT && 'glitch-client not present' }, () => {
@@ -264,8 +264,8 @@ describe('the Giant screen (GiantView.as)', () => {
     const src = read('js/features/shrine-hint-feature.js');
     assert.doesNotMatch(src, /\['Enter', 'Escape', ' '\]/);
     assert.match(src, /const input = screenInput\(el, \{ button: el \}\);/);
-    assert.match(src, /import \{ screenInput \} from '\.\.\/screen-fx\.js\?v=g470-1';/);
+    assert.match(src, /import \{ screenInput \} from '\.\.\/screen-fx\.js\?v=[0-9a-f]{8}';/);
     assert.match(src, /engine\.queueScreen\(run\)/);
-    assert.match(read('js/features/index.js'), /shrine-hint-feature\.js\?v=g481-2'/);
+    assert.match(read('js/features/index.js'), /shrine-hint-feature\.js\?v=[0-9a-f]{8}'/);
   });
 });

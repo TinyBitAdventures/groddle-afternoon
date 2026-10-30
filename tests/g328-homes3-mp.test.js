@@ -38,10 +38,10 @@ import {
   saleVerbs,
   signpostArms,
   signpostCandidates,
-} from '../public/js/home-street-mp.js?v=homes3-1';
-import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../public/js/note-pole-art.js?v=homes3-1';
-import { isSharedJob } from '../public/js/street-jobs-mp.js?v=g360-1';
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=g485-1';
+} from '../public/js/home-street-mp.js?v=0fc12d80';
+import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../public/js/note-pole-art.js?v=860d393a';
+import { isSharedJob } from '../public/js/street-jobs-mp.js?v=74c659ea';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=2caff429';
 import { projectTable } from '../tools/build-realtime-projects.mjs';
 import { HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 
@@ -261,7 +261,7 @@ describe('solo is untouched', () => {
   });
   it('sits before street-objects in features/index.js', () => {
     const src = read('public/js/features/index.js');
-    const at = src.search(/from '\.\/home-street-mp-feature\.js\?v=g\d+-\d+'/);
+    const at = src.search(/from '\.\/home-street-mp-feature\.js\?v=[0-9a-f]{8}'/);
     assert.ok(at > 0 && at < src.indexOf("from './street-objects-feature.js"));
   });
 });

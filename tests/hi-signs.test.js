@@ -45,10 +45,10 @@ import {
   setButlerHiVariant,
   setPlayerHiVariant,
   stepMissile,
-} from '../public/js/hi-signs.js';
-import { GAME_DAY_MS, GAME_EPOCH_MS } from '../public/js/game-day.js';
-import { hiSignsFeature } from '../public/js/features/hi-signs-feature.js?v=g485-1';
-import { getAchievementCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
+} from '../public/js/hi-signs.js?v=92c780ad';
+import { GAME_DAY_MS, GAME_EPOCH_MS } from '../public/js/game-day.js?v=3095e05b';
+import { hiSignsFeature } from '../public/js/features/hi-signs-feature.js?v=c6242e91';
+import { getAchievementCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -384,10 +384,10 @@ describe('hi-signs feature', () => {
 
   it('is registered with one import line and binds the 5 key', () => {
     const index = readFileSync(join(PUBLIC, 'js/features/index.js'), 'utf8');
-    assert.match(index, /import \{ hiSignsFeature \} from '\.\/hi-signs-feature\.js\?v=g485-1'; FEATURES\.push\(hiSignsFeature\);/);
+    assert.match(index, /import \{ hiSignsFeature \} from '\.\/hi-signs-feature\.js\?v=[0-9a-f]{8}'; FEATURES\.push\(hiSignsFeature\);/);
     const src = readFileSync(join(PUBLIC, 'js/features/hi-signs-feature.js'), 'utf8');
     assert.match(src, /e\.code === 'Digit5' \|\| e\.code === 'Numpad5'/);
-    assert.match(src, /butler-feature\.js\?v=g485-1/);
+    assert.match(src, /butler-feature\.js\?v=[0-9a-f]{8}/);
   });
 });
 
@@ -401,7 +401,7 @@ describe('a chat line that is just "hi" (RightSideManager.as 232-235, Emotes.as 
 
   it('keeps the hi sign and only drops the bubble over the speaker in game.js', () => {
     const game = readFileSync(join(PUBLIC, 'game.js'), 'utf8');
-    assert.match(game, /import \{ hidesChatBubble \} from '\.\/js\/hi-signs\.js\?v=hi-signs-4';/);
+    assert.match(game, /import \{ hidesChatBubble \} from '\.\/js\/hi-signs\.js\?v=[0-9a-f]{8}';/);
     const say = game.slice(game.indexOf('function sayLocalChat('), game.indexOf('function finishAssistedFeatChain('));
     assert.ok(say.indexOf('showLocalChatBubble(') < say.indexOf('hidesChatBubble(text)'), 'the Local chat dock (the pane) keeps the line');
     assert.match(say, /if \(hidesChatBubble\(text\)\) \{[^}]*\} else if \(participant === 'Ur'\) \{\s*showSpeechBubble/);

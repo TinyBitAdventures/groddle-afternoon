@@ -14,10 +14,10 @@ import {
   resolveLoadedTsid,
   pickConnection,
   tsidAliases,
-} from '../public/js/travel.js?v=g478-1';
-import { STREET_INDEX, availableStreetTsids } from '../public/js/street-loader.js?v=g478-1';
-import { pickConnection as modelPick, signpostNear, worldToScreen } from '../public/js/street-model.js?v=g478-1';
-import { setSignpostHover, signpostBoardAt } from '../public/js/street-render.js?v=g478-1';
+} from '../public/js/travel.js?v=855c6c68';
+import { STREET_INDEX, availableStreetTsids } from '../public/js/street-loader.js?v=20c7b021';
+import { pickConnection as modelPick, signpostNear, worldToScreen } from '../public/js/street-model.js?v=606bae73';
+import { setSignpostHover, signpostBoardAt } from '../public/js/street-render.js?v=4df4a30c';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const streetsDir = join(__dirname, '../public/assets/streets');

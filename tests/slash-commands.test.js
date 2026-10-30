@@ -17,15 +17,15 @@ import {
   slashPlan,
   slashWords,
   unknownLine,
-} from '../public/js/slash-commands.js?v=g249-1';
-import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=g485-1';
-import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=g485-1';
-import { towerApi } from '../public/js/features/home-tower-feature.js?v=g463-1';
-import { BUTLER_STRINGS } from '../public/js/butler.js?v=butler-9';
-import { butlerFeature } from '../public/js/features/butler-feature.js?v=g485-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-369';
-import { createFeatureHost } from '../public/js/feature-host.js';
-import { countItem } from '../public/js/inventory.js?v=catalog-unified-7';
+} from '../public/js/slash-commands.js?v=23e13b20';
+import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=3befa21c';
+import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=8e9db4df';
+import { towerApi } from '../public/js/features/home-tower-feature.js?v=b4e3d104';
+import { BUTLER_STRINGS } from '../public/js/butler.js?v=814ee05f';
+import { butlerFeature } from '../public/js/features/butler-feature.js?v=3446891e';
+import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
+import { createFeatureHost } from '../public/js/feature-host.js?v=e4f648b1';
+import { countItem } from '../public/js/inventory.js?v=85d4faba';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');

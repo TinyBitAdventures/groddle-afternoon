@@ -24,7 +24,7 @@ import {
   normalizeCrownsMatch,
   normalizeCrownsReward,
   normalizeCrownsState,
-} from '../public/js/crowns-mp.js?v=g334c-1';
+} from '../public/js/crowns-mp.js?v=0cb4bb3b';
 import { crownsData } from '../tools/build-realtime-crowns.mjs';
 import {
   CROWNS_LOCK_POINTS,
@@ -32,8 +32,8 @@ import {
   CROWNS_STREET,
   CROWNS_TEXT,
   CROWNS_TICKET,
-} from '../public/js/game-of-crowns.js?v=crowns-2';
-import { sharedStreet } from '../public/js/features/realtime-feature.js?v=g478-1';
+} from '../public/js/game-of-crowns.js?v=98e21baf';
+import { sharedStreet } from '../public/js/features/realtime-feature.js?v=515337d4';
 import { HAS_SERVER, HAS_SITE, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -229,7 +229,7 @@ describe('the multiplayer branch of crowns-feature', () => {
   const sharedEngine = fakeEngine(shared);
 
   it('challenges the street with a ticket, and needs someone else there', async () => {
-    const { crownsMpChallenge, crownsFeature } = await import('../public/js/features/crowns-feature.js?v=g478-1');
+    const { crownsMpChallenge, crownsFeature } = await import('../public/js/features/crowns-feature.js?v=d75259a0');
     // One realtime client for the whole module, as in the game (crowns-feature attaches once).
     shared.players = [];
     const e1 = sharedEngine;
@@ -248,7 +248,7 @@ describe('the multiplayer branch of crowns-feature', () => {
   });
 
   it('keeps a ticket spent on a challenge in flight through a street change (G349)', async () => {
-    const { crownsMpChallenge, crownsFeature } = await import('../public/js/features/crowns-feature.js?v=g478-1');
+    const { crownsMpChallenge, crownsFeature } = await import('../public/js/features/crowns-feature.js?v=d75259a0');
     const e1 = sharedEngine;
     shared.players = [{ id: 8 }];
     e1.inv[CROWNS_TICKET] = 1;
@@ -262,7 +262,7 @@ describe('the multiplayer branch of crowns-feature', () => {
   });
 
   it('applies a reward once: the iMG, the currants through ledgerReceipt, then acks', async () => {
-    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=g478-1');
+    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=d75259a0');
     const c = shared;
     c.players = [{ id: 8 }];
     const e = sharedEngine; // the handlers belong to the engine they were attached with, as in the game
@@ -281,7 +281,7 @@ describe('the multiplayer branch of crowns-feature', () => {
   });
 
   it('shares the arena on the match street only while a game is on', async () => {
-    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=g478-1');
+    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=d75259a0');
     assert.equal(crownsFeature.realtimeStreet({ streetTsid: CROWNS_STREET }), null, 'no match: the arena is private as before');
     // No hub line: getLoadingInfo sends instances no hub_name (locations/location.js 3311).
     assert.deepEqual(crownsFeature.labelFor('CROWNS_00000000000000A1'), { street: 'Game of Crowns', hub: '', hubId: 'it_game' });
@@ -302,7 +302,7 @@ describe('solo Game of Crowns stays solo', () => {
   });
 
   it('keeps the solo save as it was', async () => {
-    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=g478-1');
+    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=d75259a0');
     crownsFeature.restore({ wins: 2, losses: 1, applied: ['crowns-00000000000000a1-1-7'] }, { mode: 'solo' });
     assert.deepEqual(Object.keys(crownsFeature.save()).sort(), ['losses', 'pendingTicket', 'returnTo', 'wins']);
   });

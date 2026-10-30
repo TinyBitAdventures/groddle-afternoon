@@ -19,7 +19,7 @@ import {
   lostFloorStreet,
   missingFloorIndexEntry,
   missingFloorStreet,
-} from '../public/js/hidden-floors.js';
+} from '../public/js/hidden-floors.js?v=5ce87a04';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

@@ -31,9 +31,9 @@
  * teleportLast, teleportScripts, teleportEnergyCost.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { getGameDayKey } from '../game-day.js?v=dametime-4';
-import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-8';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
+import { getGameDayKey } from '../game-day.js?v=3095e05b';
+import { canUseTool, useToolCondition } from '../tools.js?v=9a2e7ef4';
 import {
   PAPER_CLASS,
   QUILL_CLASS,
@@ -57,8 +57,8 @@ import {
   teleportRank,
   teleportToPoint,
   useScript,
-} from '../teleportation.js?v=g356-1';
-import { loseEnergy } from '../metabolics.js';
+} from '../teleportation.js?v=48e4e8de';
+import { loseEnergy } from '../metabolics.js?v=8504134e';
 
 export const TELEPORT_FEATURE_ID = 'teleportation';
 const TANK = 100;

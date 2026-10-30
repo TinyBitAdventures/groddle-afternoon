@@ -34,7 +34,7 @@
  *     data-companion-quoins; data-last-sound for the sound check.
  */
 
-import { QUOIN_TYPES, creditQuoinStat, quoinClassAmount } from '../quoins.js?v=g424-1';
+import { QUOIN_TYPES, creditQuoinStat, quoinClassAmount } from '../quoins.js?v=d4f4772b';
 import {
   COMPANION_QUOIN_RULES,
   QUOIN_SHARD_FX,
@@ -45,7 +45,7 @@ import {
   quoinShardFxPlan,
   quoinShardGrabberSound,
   quoinTypeShards,
-} from '../quoin-shards.js?v=g216-1';
+} from '../quoin-shards.js?v=9a2e4c37';
 
 let fxRoot = null;
 const fxItems = [];

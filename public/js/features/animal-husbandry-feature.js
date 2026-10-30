@@ -50,13 +50,13 @@
  * yardStarved.
  */
 
-import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g464-2';
-import { nearestSurfaceY } from '../walk-surface.js?v=g478-1';
-import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g463-2';
-import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js';
-import { getGameDayKey } from '../game-day.js?v=dametime-4';
-import { createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=g478-1';
+import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=0e86cc0f';
+import { nearestSurfaceY } from '../walk-surface.js?v=c4aff42f';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=628fa0b4';
+import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js?v=3b194fca';
+import { getGameDayKey } from '../game-day.js?v=3095e05b';
+import { createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=e857d0af';
 import {
   BABY_ANIMALS,
   BATTERFLY,
@@ -101,13 +101,13 @@ import {
   resetIncubation,
   stepHogtie,
   stickPlaceState,
-} from '../animal-husbandry.js?v=g478-1';
-import { loseEnergy, shiftMetabolic } from '../metabolics.js';
-import { textureFromUrl } from '../textures.js';
-import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g479-2';
-import { grantMoodXp } from '../mood-xp.js';
-import { itemZ } from '../item-bands.js?v=g429-1';
+} from '../animal-husbandry.js?v=16364589';
+import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
+import { textureFromUrl } from '../textures.js?v=01a295a1';
+import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=d85768ae';
+import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
 export const BATTERFLY_GROUP = 'batterfly';

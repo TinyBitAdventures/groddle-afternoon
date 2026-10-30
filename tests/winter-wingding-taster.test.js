@@ -11,10 +11,10 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DROP_TABLES, DROP_ITEMS } from '../public/js/drop-tables-data.js';
-import { rollDropTable } from '../public/js/drop-tables.js';
-import { CRACKER } from '../public/js/seasons.js?v=g433-1';
-import { PARTY_PACKS, PARTY_SPACES, isPartyPack, partyPackDurationSeconds } from '../public/js/party-spaces.js?v=g403-1';
+import { DROP_TABLES, DROP_ITEMS } from '../public/js/drop-tables-data.js?v=c51a6400';
+import { rollDropTable } from '../public/js/drop-tables.js?v=0f922478';
+import { CRACKER } from '../public/js/seasons.js?v=fcb12a83';
+import { PARTY_PACKS, PARTY_SPACES, isPartyPack, partyPackDurationSeconds } from '../public/js/party-spaces.js?v=459a8597';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');

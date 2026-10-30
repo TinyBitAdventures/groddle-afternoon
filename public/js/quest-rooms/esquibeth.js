@@ -67,9 +67,9 @@
  *    lavender, with recovered Alakol cliff decos tinted for the far walls.
  */
 
-import { isLoaded, onLoaded, textureFromUrl } from '../textures.js';
-import { grantMoodXp } from '../mood-xp.js';
-import { loseEnergy, metabolicGain, moodMax } from '../metabolics.js';
+import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=01a295a1';
+import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { loseEnergy, metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 
 export const ROOM_ID = 'esquibeth';
 export const MAIN = 'last_pilgrimage_of_esquibeth';

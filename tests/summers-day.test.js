@@ -40,7 +40,7 @@ import {
   summersDayQurazyPoints,
   summersDayRemainingMs,
   summersDayStreetPoint,
-} from '../public/js/summers-day.js?v=g452-2';
+} from '../public/js/summers-day.js?v=a51eebd3';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -299,6 +299,6 @@ test('client integration runs the real street, its HUD and deterministic QA', ()
   assert.match(game, /dataset\.summerDayMainTsid/);
   assert.match(game, /dataset\.summerDayStreet = SUMMERS_DAY_STREET_TSID/);
   assert.match(html, /id="summers-day-hud"/);
-  assert.match(html, /summer=summers-day-7/);
+  assert.match(html, /"game\.js\?v=[0-9a-f]{8}"/);
   assert.match(css, /\.summers-day-hud/);
 });

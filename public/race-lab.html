@@ -6,7 +6,7 @@
   <title>Race course lab · Groddle</title>
   <!-- Content keys for data and art URLs (js/data-urls.js): before every other script. -->
   <script src="js/data-versions.js?v=3b0d983d"></script>
-  <script src="js/data-urls.js?v=g434-1"></script>
+  <script src="js/data-urls.js?v=523668ca"></script>
   <script src="vendor/pixi/pixi-8.22.0.min.js"></script>
   <style>
     body { margin: 0; padding: 16px; font-family: "Trebuchet MS", system-ui, sans-serif; background: #1a1a22; color: #f0ebe3; }
@@ -25,11 +25,11 @@
   <nav id="nav"></nav>
   <div id="stage"></div>
   <script type="module">
-    import { raceCourse, RACE_COURSE_IDS } from './js/race-courses.js';
-    import { renderRaceCourse, drawFinishGate, drawCheckpointFlag } from './js/race-render.js?v=g463-2';
-    import { RACES, routeDurationMs, formatRaceTime } from './js/races.js';
-    import * as textureUrls from './js/textures.js';
-    import { installHiresDecos } from './js/deco-hires.js?v=g457-3';
+    import { raceCourse, RACE_COURSE_IDS } from './js/race-courses.js?v=565822aa';
+    import { renderRaceCourse, drawFinishGate, drawCheckpointFlag } from './js/race-render.js?v=5f946939';
+    import { RACES, routeDurationMs, formatRaceTime } from './js/races.js?v=df0576ad';
+    import * as textureUrls from './js/textures.js?v=01a295a1';
+    import { installHiresDecos } from './js/deco-hires.js?v=a65f2d79';
 
     // Decos ship as WebP; route the .png deco URLs the renderer asks for, as the game does.
     installHiresDecos(textureUrls);

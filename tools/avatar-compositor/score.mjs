@@ -17,7 +17,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SHEET_FRAMES } from '../../public/js/avatar-anims.js';
+import { SHEET_FRAMES } from '../../public/js/avatar-anims.js?v=fb921bf4';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = resolve(HERE, '../../public');

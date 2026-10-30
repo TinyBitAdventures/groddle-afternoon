@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import {
   loadContentCatalogsFromDir,
   resetContentCatalogs,
-} from '../public/js/content-catalogs.js?v=g403-1';
+} from '../public/js/content-catalogs.js?v=10b118dd';
 import {
   BUFF_ITEM_CATALOG,
   createBuffState,
@@ -25,10 +25,10 @@ import {
   hasBuff,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from '../public/js/buffs.js?v=g403-1';
-import { accelerateActiveStudy, createSkillState, getStudyStatus, startSkillStudy } from '../public/js/skills.js';
-import { applyRewards } from '../public/js/quests.js?v=item-buffs-7';
-import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=g424-1';
+} from '../public/js/buffs.js?v=c7727c43';
+import { accelerateActiveStudy, createSkillState, getStudyStatus, startSkillStudy } from '../public/js/skills.js?v=4542bdf9';
+import { applyRewards } from '../public/js/quests.js?v=282e1621';
+import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=b4449504';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../public');
 
@@ -195,8 +195,8 @@ describe('buff save and client wiring', () => {
     assert.match(game, /bootParams\.get\('buffdemo'\)/);
     assert.doesNotMatch(game, /Catalog \(apply demo\)/);
     assert.match(html, /id="buff-strip"/);
-    assert.match(html, /game\.js\?v=official-ecology-1/);
-    assert.match(html, /style\.css\?v=feed-picker-1/);
+    assert.match(html, /game\.js\?v=[0-9a-f]{8}/);
+    assert.match(html, /style\.css\?v=[0-9a-f]{8}/);
     assert.match(css, /\.buff-chip/);
     assert.match(css, /body\.buff-purple-pulse::after/);
     assert.match(game, /!state\.muted && audio\.ctx\?\.state === 'suspended'/);

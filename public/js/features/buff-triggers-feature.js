@@ -27,7 +27,7 @@
  * buffTriggerOverrides, buffTriggerMirrors, buffColdTicks.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
+import { addItem, countItem, removeItem } from '../inventory.js?v=85d4faba';
 import {
   BUBBLE_MEDITATION_PACKAGES,
   BUFF_END_MESSAGES,
@@ -48,23 +48,23 @@ import {
   questTimerBuffs,
   smallEnlightenmentSeconds,
   smeltItDealtItFreeSmelts,
-} from '../buff-triggers.js?v=g370-1';
+} from '../buff-triggers.js?v=a3093922';
 import {
   addSkillPackageOverride,
   getSkillPackageOverride,
   removeSkillPackageOverride,
   skillPackageDetails,
-} from '../skill-packages.js';
-import { husbandryPack } from '../animal-husbandry.js?v=g478-1';
-import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
+} from '../skill-packages.js?v=bfb87281';
+import { husbandryPack } from '../animal-husbandry.js?v=16364589';
+import { itemVerbAchievementCounters } from '../item-verbs.js?v=729ccd91';
 // The same module instances js/features/index.js registers (tests/buff-triggers.test.js checks the tags).
-import { meditationFeature } from './meditation-feature.js?v=g463-2';
-import { teleportationFeature } from './teleportation-feature.js?v=g463-1';
-import { rookAttackFeature } from './rook-attack-feature.js?v=g479-2';
-import { rubeFeature } from './rube-feature.js?v=g478-1';
-import { smugglingFeature } from './smuggling-feature.js?v=g482-2';
-import { hellFeature } from './hell-feature.js?v=hell-16';
-import { isPooped } from '../hell.js';
+import { meditationFeature } from './meditation-feature.js?v=b1d02c1c';
+import { teleportationFeature } from './teleportation-feature.js?v=a79a7cea';
+import { rookAttackFeature } from './rook-attack-feature.js?v=827d24a8';
+import { rubeFeature } from './rube-feature.js?v=5b27168e';
+import { smugglingFeature } from './smuggling-feature.js?v=a431e4be';
+import { hellFeature } from './hell-feature.js?v=bdaefff5';
+import { isPooped } from '../hell.js?v=68b57749';
 
 export const BUFF_TRIGGERS_FEATURE_ID = 'buff-triggers';
 

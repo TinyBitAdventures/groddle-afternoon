@@ -13,7 +13,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=g458-1';
+import * as kit from '../public/js/quest-rooms/kit.js?v=fd1eb817';
 import {
   ALLEY,
   ALLEY_ART,
@@ -43,11 +43,11 @@ import {
   nearestStation,
   room,
   stationForDoor,
-} from '../public/js/quest-rooms/back-alley.js?v=g463-2';
-import * as alleySet from '../public/js/quest-rooms/back-alley-set.js?v=g458-1';
-import { STATION_FLOOR, STATIONS, stationArrival, stationByTsid, surfaceStation } from '../public/js/subway.js?v=g454-1';
-import { BACK_ALLEY_FILES } from '../public/js/quest-rooms/back-alley-art.js';
-import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=g482-2';
+} from '../public/js/quest-rooms/back-alley.js?v=7aefccae';
+import * as alleySet from '../public/js/quest-rooms/back-alley-set.js?v=72f92a77';
+import { STATION_FLOOR, STATIONS, stationArrival, stationByTsid, surfaceStation } from '../public/js/subway.js?v=797a5e9c';
+import { BACK_ALLEY_FILES } from '../public/js/quest-rooms/back-alley-art.js?v=08af5d4f';
+import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
@@ -230,7 +230,7 @@ describe('Back Alley and station geometry', () => {
     assert.ok(alleySet.inEnteredBox(ALLEY.triggerX) && !alleySet.inEnteredBox(ALLEY.spawnX));
     assert.equal(alleySet.SHADY.x, ALLEY.bureaucratX);
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
-    assert.match(game, /import \{ ALLEY, SHADY, drawAlley, inEnteredBox \} from '\.\/js\/quest-rooms\/back-alley-set\.js\?v=g458-1';/);
+    assert.match(game, /import \{ ALLEY, SHADY, drawAlley, inEnteredBox \} from '\.\/js\/quest-rooms\/back-alley-set\.js\?v=[0-9a-f]{8}';/);
     assert.match(game, /const layer = drawAlley\(PIXI\);/);
   });
 });

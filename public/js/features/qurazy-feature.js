@@ -24,9 +24,9 @@
  * (`x,y` or empty), qurazyFoundToday, qurazyCollected.
  */
 
-import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=g481-2';
-import { qurazyMarkersFor } from '../qurazy-markers.js?v=g260-1';
-import { OVERLAY_FADE, loadOverlayManifest, overlayPlacement, playVectorOverlay } from '../overlay-art.js?v=g463-2';
+import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=d5978ec1';
+import { qurazyMarkersFor } from '../qurazy-markers.js?v=f7a8124b';
+import { OVERLAY_FADE, loadOverlayManifest, overlayPlacement, playVectorOverlay } from '../overlay-art.js?v=628fa0b4';
 import {
   QURAZY_SPAWN_LINE,
   createQurazyState,
@@ -34,7 +34,7 @@ import {
   qurazyFoundToday,
   rollQurazy,
   rollQurazyDay,
-} from '../qurazy.js?v=g335-1';
+} from '../qurazy.js?v=62ae37a2';
 
 export const QURAZY_FEATURE_ID = 'qurazy';
 export const QURAZY_PLACEMENT_GROUP = 'qurazy';

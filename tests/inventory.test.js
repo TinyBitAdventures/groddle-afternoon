@@ -15,9 +15,9 @@ import { judgeAchievements, judgeBuffs, judgeLocations, judgeItems, judgeSkills,
 import { readTsidRefs, tsidRefsFromText } from '../tools/inventory/gsjs-data.mjs';
 import { REMAKE_EMITTERS, GSJS_EMITTERS, assemblySites, dropRollEmissions, emissionsByTag, itemGrantReach, locationBuilders, openDb, writeDb, lastDiff, summary, blockerRows } from '../tools/inventory/build.mjs';
 import { CHECKLIST } from '../tools/restoration/checklist.mjs';
-import { ARTIFACT_MAP, ARTIFACT_NECKLACES } from '../public/js/artifacts.js';
-import { DROP_TABLES } from '../public/js/drop-tables-data.js';
-import { SKILL_PACKAGES } from '../public/js/skill-packages-data.js';
+import { ARTIFACT_MAP, ARTIFACT_NECKLACES } from '../public/js/artifacts.js?v=fc419ecf';
+import { DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
+import { SKILL_PACKAGES } from '../public/js/skill-packages-data.js?v=cb4e9ab3';
 
 const SUBWAY_JS = `export const RIDE_COUNTER = 'transit:subways_entered';\nexport const OTHER = 'x';\n`;
 const FEATURE_JS = `import { RIDE_COUNTER } from '../subway.js?v=play-1';\nfunction board(engine) { engine.achievement(RIDE_COUNTER, 1); }\n`;

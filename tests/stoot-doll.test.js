@@ -13,29 +13,29 @@ import {
   createStootDollState,
   pullStootDollString,
   selectStootDollQuote,
-} from '../public/js/stoot-doll.js';
+} from '../public/js/stoot-doll.js?v=caf76200';
 import {
   ITEM_CATALOG,
   createInventory,
   ensureItem,
   listPackItemSlots,
-} from '../public/js/inventory.js?v=catalog-unified-7';
+} from '../public/js/inventory.js?v=85d4faba';
 import {
   createDroppedItemState,
   dropInventoryStack,
   listDroppedStacks,
   pickupDroppedStack,
-} from '../public/js/world-items.js?v=world-items-4';
+} from '../public/js/world-items.js?v=7df5cf4a';
 import {
   createShrineState,
   listShrineDonationOptions,
   quoteShrineDonation,
-} from '../public/js/shrines.js?v=spinning-wheel-test-9';
+} from '../public/js/shrines.js?v=01b185bc';
 import {
   createVendorSellQuote,
   listSellOffers,
   vendorSell,
-} from '../public/js/vendor.js?v=vendor-profiles-12';
+} from '../public/js/vendor.js?v=563afb9b';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -132,7 +132,7 @@ test.describe('pull-string interaction', () => {
     assert.match(content, /classId === 'stoot_barfield_pullstring_doll'/);
     assert.match(content, /add\('pull_string', 'pull string'/);
     assert.match(content, /s\.classTsid === 'stoot_barfield_pullstring_doll'/);
-    assert.match(html, /stootdoll=6/);
+    assert.match(html, /"game\.js\?v=[0-9a-f]{8}"/);
     assert.equal(
       fs.readdirSync(path.join(root, 'public'), { recursive: true })
         .some((file) => /\.mp4$/i.test(String(file))),

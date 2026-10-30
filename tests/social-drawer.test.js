@@ -25,8 +25,8 @@ import {
   splitChat,
   withTimeLines,
   writeChoice,
-} from '../public/js/ui/social-drawer.js?v=g468-13';
-import { createNotifier } from '../public/js/notify.js?v=g459-1';
+} from '../public/js/ui/social-drawer.js?v=629bfb34';
+import { createNotifier } from '../public/js/notify.js?v=3383e8be';
 import { resolveTokens } from './css-tokens.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -341,7 +341,7 @@ describe('the Social drawer: wiring', () => {
   const game = read('public/game.js');
 
   it('game.js mounts it on #local-chat-dock in the modern skin, with no old Activity panel or button', () => {
-    assert.match(game, /import \{ mountSocialDrawer \} from '\.\/js\/ui\/social-drawer\.js\?v=g468-13';/);
+    assert.match(game, /import \{ mountSocialDrawer \} from '\.\/js\/ui\/social-drawer\.js\?v=[0-9a-f]{8}';/);
     // Both skins mount it (Classic restyles it in place), so the interface can switch at runtime.
     assert.match(game, /const MODERN_UI = true;/);
     assert.match(game, /activityLog: !MODERN_UI,\n\s+sideInset: \(\) => socialDrawer\?\.inset\(\) \|\| null,/);

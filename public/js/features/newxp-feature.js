@@ -115,21 +115,21 @@ import {
   training2Layout,
   tutorialPhysics,
   vogPages,
-} from '../newxp.js?v=g481-2';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=g424-1';
-import { soundForQuoin } from '../sound-moments.js?v=g393-1';
-import { IMAGINATION_UPGRADES } from '../imagination.js?v=g403-1';
-import { assignQuest, completeQuest } from '../quests.js?v=item-buffs-7';
-import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=g403-1';
-import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
-import { locationEventsApi } from './location-events-feature.js?v=g452-1';
-import * as kit from '../quest-rooms/kit.js?v=g458-1';
-import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
-import { grantMoodXp } from '../mood-xp.js';
-import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g463-2';
-import { HOME_MACHINE } from '../home-ticket.js?v=g481-2';
-import { createAnimalState } from '../animals.js?v=g478-1';
+} from '../newxp.js?v=d5978ec1';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
+import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=d4f4772b';
+import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
+import { IMAGINATION_UPGRADES } from '../imagination.js?v=b4f0eaf6';
+import { assignQuest, completeQuest } from '../quests.js?v=282e1621';
+import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=6b6cbf22';
+import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
+import { locationEventsApi } from './location-events-feature.js?v=518e223a';
+import * as kit from '../quest-rooms/kit.js?v=fd1eb817';
+import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=01a295a1';
+import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=628fa0b4';
+import { HOME_MACHINE } from '../home-ticket.js?v=61ef0eb9';
+import { createAnimalState } from '../animals.js?v=e857d0af';
 import {
   AK_ANIMALS,
   AK_BUBBLE,
@@ -145,7 +145,7 @@ import {
   akSideTablePlacement,
   akVerbReaction,
   createAkState,
-} from '../skillquest-ak.js?v=g298-1';
+} from '../skillquest-ak.js?v=281b956d';
 
 export const NEWXP_FEATURE_ID = 'newxp';
 /** newxp_training1.js 705-706 slothRemove: deleteWithPoof, then hideTree 0.5 s later. */

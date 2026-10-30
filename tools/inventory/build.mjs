@@ -77,6 +77,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, statSync } from 'node
 import { homedir } from 'node:os';
 import { basename, dirname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { keyOf as moduleKeyOf } from '../module-keys/build.mjs';
 
 import { buildIndex, contextLiterals, inventoryWrites, listJsFiles, literalIndex, literalRoles, liveFiles, namesReached, qaAt, useRole, matchPattern, patternString, scanEmissions, spawnTemplates, templatePatterns } from './scan.mjs';
 import * as G from './gsjs-data.mjs';
@@ -373,7 +374,7 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
 
   // Remake catalogs.
   // The same key the game's modules import it with (skill-tree.js and friends), or the catalogs load into a second copy nothing reads.
-  const { loadContentCatalogsFromDir } = await import(`${pathToFileURL(join(pub, 'js/content-catalogs.js')).href}?v=g403-1`);
+  const { loadContentCatalogsFromDir } = await import(`${pathToFileURL(join(pub, 'js/content-catalogs.js')).href}?v=${moduleKeyOf('js/content-catalogs.js', spike)}`);
   await loadContentCatalogsFromDir(join(pub, 'assets/content'));
   const { obtainableItems, supplyConversions } = await import(join(spike, 'tools/job-obtainable.mjs'));
   const ob = await obtainableItems();

@@ -11,7 +11,7 @@ import {
   enterHomeInterior,
   leaveHomeInterior,
   imagineHome,
-} from '../public/js/homes.js';
+} from '../public/js/homes.js?v=385f9a1a';
 import {
   MAIL_BASE_COST,
   archiveMail,
@@ -24,7 +24,7 @@ import {
   seedMailbox,
   sendMail,
   unreadMailCount,
-} from '../public/js/mailbox.js';
+} from '../public/js/mailbox.js?v=05fb4eac';
 
 describe('source-backed home ownership', () => {
   it('imagines one of the three homestreet ticket styles once, free (inc_houses.js houses_go_to_new_house)', () => {

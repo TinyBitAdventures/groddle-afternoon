@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GAME_DAY_MS, GAME_EPOCH_MS } from '../public/js/game-day.js';
-import { QURAZY_MARKER_STREET_COUNT, qurazyMarkersFor } from '../public/js/qurazy-markers.js';
+import { GAME_DAY_MS, GAME_EPOCH_MS } from '../public/js/game-day.js?v=3095e05b';
+import { QURAZY_MARKER_STREET_COUNT, qurazyMarkersFor } from '../public/js/qurazy-markers.js?v=f7a8124b';
 import {
   QURAZY_DAILY_MAX,
   QURAZY_SPAWN_LINE,
@@ -21,8 +21,8 @@ import {
   qurazyHistoryChance,
   qurazyIsChance,
   rollQurazy,
-} from '../public/js/qurazy.js';
-import { planStreetQuoins } from '../public/js/quoins.js';
+} from '../public/js/qurazy.js?v=62ae37a2';
+import { planStreetQuoins } from '../public/js/quoins.js?v=d4f4772b';
 import {
   QURAZY_ZONE,
   QURAZY_OVERLAY,
@@ -35,9 +35,9 @@ import {
   qurazyFeatureState,
   qurazyStreetEligible,
   resetQurazyFeatureForTests,
-} from '../public/js/features/qurazy-feature.js?v=g481-2';
-import * as qurazyModule from '../public/js/features/qurazy-feature.js?v=g481-2';
-import { GENTLE_ISLAND } from '../public/js/newxp.js?v=g481-2';
+} from '../public/js/features/qurazy-feature.js?v=7c571cf4';
+import * as qurazyModule from '../public/js/features/qurazy-feature.js?v=7c571cf4';
+import { GENTLE_ISLAND } from '../public/js/newxp.js?v=d5978ec1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(here, '../public');
@@ -334,8 +334,8 @@ describe('wiring', () => {
     }
     // The feature and its modules agree on one key per module.
     const feature = readFileSync(join(PUBLIC, 'js/features/qurazy-feature.js'), 'utf8');
-    assert.match(feature, /qurazy\.js\?v=g\d+-\d+/);
-    assert.match(feature, /qurazy-markers\.js\?v=g\d+-\d+/);
+    assert.match(feature, /qurazy\.js\?v=[0-9a-f]{8}/);
+    assert.match(feature, /qurazy-markers\.js\?v=[0-9a-f]{8}/);
   });
 });
 

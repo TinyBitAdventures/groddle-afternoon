@@ -18,7 +18,7 @@
  * window.groddleHomePool { refresh(), collect(), state }.
  */
 
-import { HOME_POOL_REFRESH_MS, collectAmount, createPoolSite, normalizePool, poolView } from '../home-pool-mp.js?v=g375-1';
+import { HOME_POOL_REFRESH_MS, collectAmount, createPoolSite, normalizePool, poolView } from '../home-pool-mp.js?v=d04553e2';
 
 export const HOME_POOL_MP_FEATURE_ID = 'home-pool-mp';
 

@@ -14,15 +14,15 @@ import { before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=g403-1';
-import { createQuestState } from '../public/js/quests.js';
-import { pendingQuestOffers } from '../public/js/quest-offers.js?v=g403-1';
-import { MP_RACE_QUESTS, MULTIPLAYER_QUESTS, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=g358-1';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=g425-1';
-import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js';
-import { HELL_LOCATION } from '../public/js/hell.js';
-import { HOG_MP_COURSE } from '../public/js/hog-haul-mp.js?v=g334-hog-1';
-import { CROWNS_TICKET } from '../public/js/game-of-crowns.js?v=crowns-2';
+import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
+import { createQuestState } from '../public/js/quests.js?v=282e1621';
+import { pendingQuestOffers } from '../public/js/quest-offers.js?v=6b6cbf22';
+import { MP_RACE_QUESTS, MULTIPLAYER_QUESTS, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=2beb658a';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=243877f6';
+import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
+import { HELL_LOCATION } from '../public/js/hell.js?v=68b57749';
+import { HOG_MP_COURSE } from '../public/js/hog-haul-mp.js?v=d8605396';
+import { CROWNS_TICKET } from '../public/js/game-of-crowns.js?v=98e21baf';
 import { economyCredits } from '../tools/build-economy.mjs';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
@@ -78,7 +78,7 @@ describe('The Great Hog Haul quest in multiplayer (quests/hogtie_piggy.js)', () 
   });
 
   it('logs for the challenger, completes on the server\'s win and leaving, fails on a loss', async () => {
-    const { questsMpFeature: feature } = await import('../public/js/features/quests-mp-feature.js?v=races3-test-7');
+    const { questsMpFeature: feature } = await import('../public/js/features/quests-mp-feature.js?fresh=races3-test-7');
     const client = fakeClient(1);
     const calls = { activity: [], awards: [] };
     const engine = {
@@ -161,7 +161,7 @@ describe('the dead do not race', () => {
   });
 
   it('a race_match that reaches a dead page is left at once (races-feature)', async () => {
-    const { racesFeature } = await import('../public/js/features/races-feature.js?v=g478-1');
+    const { racesFeature } = await import('../public/js/features/races-feature.js?v=b849c346');
     const client = fakeClient(7);
     const toasts = [];
     const engine = {
@@ -244,7 +244,7 @@ describe('a Game of Crowns reload asks the server, and the dead stay out (crowns
 
   it('a page reloaded out of the arena is told once that it left (instance.js player_logout)', async () => {
     const { crownsFeature, client, engine, log } = await setup();
-    const { CROWNS_STREET } = await import('../public/js/game-of-crowns.js?v=crowns-2');
+    const { CROWNS_STREET } = await import('../public/js/game-of-crowns.js?v=98e21baf');
     crownsFeature.restore({ returnTo: { tsid: 'GA5', x: 1, y: 2 } }, engine);
     assert.deepEqual(crownsFeature.reloadLocation({ tsid: CROWNS_STREET }, engine), { tsid: 'GA5', x: 1, y: 2 });
     crownsFeature.onStreetEnter({ tsid: 'GA5' }, engine);
@@ -253,7 +253,7 @@ describe('a Game of Crowns reload asks the server, and the dead stay out (crowns
   });
 
   it('solo still gives a ticket back on a street change', async () => {
-    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=g478-1');
+    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=d75259a0');
     const engine = { mode: 'solo', inv: {}, query: () => null, toast() {}, updateHud() {}, param: () => null, instanceHold: null, setData() {} };
     crownsFeature.restore({ pendingTicket: CROWNS_TICKET }, engine);
     crownsFeature.onStreetEnter({ tsid: 'GA5' }, engine);

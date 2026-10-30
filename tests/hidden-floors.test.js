@@ -12,9 +12,9 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry } from '../public/js/street-model.js?v=g478-1';
-import { arrivalInTarget } from '../public/js/location-navigation.js?v=g478-1';
-import { SOURCE_PHYSICS } from '../public/js/puzzle-triggers.js';
+import { assertStreetGeometry } from '../public/js/street-model.js?v=606bae73';
+import { arrivalInTarget } from '../public/js/location-navigation.js?v=38c12adf';
+import { SOURCE_PHYSICS } from '../public/js/puzzle-triggers.js?v=3ee2f2c8';
 import {
   AVATAR_BODY_H,
   CANOPY_PHYSICS,
@@ -48,10 +48,10 @@ import {
   inTeleporter,
   jumpApex,
   teleportersOn,
-} from '../public/js/hidden-floors.js?v=g478-1';
-import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=g478-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-369';
-import { rawTripleJumpMultiplier, scaledTripleJumpMultiplier } from '../public/js/movement.js';
+} from '../public/js/hidden-floors.js?v=5ce87a04';
+import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=fff3374b';
+import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
+import { rawTripleJumpMultiplier, scaledTripleJumpMultiplier } from '../public/js/movement.js?v=a314f8a1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

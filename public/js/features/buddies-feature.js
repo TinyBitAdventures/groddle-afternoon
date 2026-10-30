@@ -37,8 +37,8 @@
  * buddiesIgnoring (ids), buddiesLast (the last notice); window.groddleBuddies.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
-import { STREET_INDEX } from '../street-loader.js?v=g478-1';
+import { createMinnAccount } from '../minn-account.js?v=81339760';
+import { STREET_INDEX } from '../street-loader.js?v=20c7b021';
 import {
   BUDDY_COUNTER,
   BUDDY_TEXT,
@@ -53,7 +53,7 @@ import {
   isBuddy,
   isIgnoring,
   normalizeList,
-} from '../buddies.js?v=g325-1';
+} from '../buddies.js?v=183da4ff';
 
 export const BUDDIES_FEATURE_ID = 'buddies';
 const VERB_IDS = new Set(Object.values(BUDDY_VERBS));

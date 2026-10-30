@@ -15,10 +15,10 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 
-import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../public/js/party-spaces-mp.js?v=g403-1';
-import { PARTY_PACKS, PARTY_SPACES, PARTY_TEXT, normalizePartyRecord } from '../public/js/party-spaces.js?v=g403-1';
-import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=g463-1';
-import { sharedStreet } from '../public/js/features/realtime-feature.js?v=g478-1';
+import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../public/js/party-spaces-mp.js?v=abfc67be';
+import { PARTY_PACKS, PARTY_SPACES, PARTY_TEXT, normalizePartyRecord } from '../public/js/party-spaces.js?v=459a8597';
+import { partySpacesFeature } from '../public/js/features/party-spaces-feature.js?v=3392a54d';
+import { sharedStreet } from '../public/js/features/realtime-feature.js?v=515337d4';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -309,9 +309,9 @@ describe('party spaces in solo', () => {
 
   it('is wired after the realtime client exists, with fresh keys', () => {
     const idx = read('public/js/features/index.js');
-    assert.ok(idx.includes("import { partySpacesFeature } from './party-spaces-feature.js?v=g463-1';"));
-    assert.ok(idx.includes("shared-quoins-feature.js?v=g424-1"));
-    assert.ok(idx.includes("trade-feature.js?v=g463-2"));
+    assert.ok(idx.includes("import { partySpacesFeature } from './party-spaces-feature.js?v="));
+    assert.ok(idx.includes("shared-quoins-feature.js?v="));
+    assert.ok(idx.includes("trade-feature.js?v="));
   });
 });
 

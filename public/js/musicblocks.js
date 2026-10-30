@@ -6,11 +6,11 @@
  * was last heard. The tunes are Tiny Speck's CC0 recordings (sound-key catalog).
  */
 
-import { addItem, countItem, ensureItem } from './inventory.js?v=catalog-unified-7';
-import { GAME_DAY_MS } from './game-day.js';
-import { metabolicGain, moodMax, loseEnergy } from './metabolics.js';
-import { grantMoodXp } from './mood-xp.js';
-import { SOUND_ALIASES, SOUND_FILES } from './sound-keys.js?v=g388-1';
+import { addItem, countItem, ensureItem } from './inventory.js?v=85d4faba';
+import { GAME_DAY_MS } from './game-day.js?v=3095e05b';
+import { metabolicGain, moodMax, loseEnergy } from './metabolics.js?v=8504134e';
+import { grantMoodXp } from './mood-xp.js?v=958e7680';
+import { SOUND_ALIASES, SOUND_FILES } from './sound-keys.js?v=2d82d399';
 
 export const MUSICBLOCK_MONTH_MS = Math.round(30.5 * 24 * 60 * 60 * 1000);
 export const MUSICBLOCK_REPLAY_MS = 4 * 60 * 60 * 1000;

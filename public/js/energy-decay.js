@@ -26,7 +26,7 @@
  * Property.dec stops at the bottom (eleven-server src/model/Property.js).
  */
 
-import { createMoodDecayClock } from './mood-decay.js?v=mood-decay-1';
+import { createMoodDecayClock } from './mood-decay.js?v=49175993';
 
 export const ENERGY_LOSS_TICK_MS = 90 * 1000;
 export const ENERGY_LOSS_RATE = 0.008;

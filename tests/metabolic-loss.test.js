@@ -17,19 +17,19 @@ import {
   setMetabolicGainGate,
   setMetabolicLossGate,
   shiftMetabolic,
-} from '../public/js/metabolics.js';
-import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=g403-1';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
-import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js';
-import { BUTTER_UP, butterUpChicken } from '../public/js/animal-flattery.js';
-import { SET_FREE, applySetFree } from '../public/js/animal-set-free.js';
-import { applyVerbReward, getVerbReward } from '../public/js/verb-rewards.js';
-import { createInventory, countItem } from '../public/js/inventory.js';
-import { startAssembly, startDisassembly } from '../public/js/machines.js?v=g403-1';
-import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=woodcutting-test-8';
-import { smeltMetalRocks } from '../public/js/mining.js?v=g403-1';
-import { craftRecipe } from '../public/js/making.js?v=g403-1';
-import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js';
+} from '../public/js/metabolics.js?v=8504134e';
+import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=c7727c43';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
+import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js?v=68b57749';
+import { BUTTER_UP, butterUpChicken } from '../public/js/animal-flattery.js?v=63001f58';
+import { SET_FREE, applySetFree } from '../public/js/animal-set-free.js?v=3b194fca';
+import { applyVerbReward, getVerbReward } from '../public/js/verb-rewards.js?v=d3ce41d5';
+import { createInventory, countItem } from '../public/js/inventory.js?v=85d4faba';
+import { startAssembly, startDisassembly } from '../public/js/machines.js?v=aad0d603';
+import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=9a2e7ef4';
+import { smeltMetalRocks } from '../public/js/mining.js?v=a7eb8740';
+import { craftRecipe } from '../public/js/making.js?v=9e538296';
+import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js?v=7fbf44a4';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -258,7 +258,7 @@ describe('verb costs spend through the door', () => {
     }
     const buffs = read('js/buffs.js');
     assert.doesNotMatch(buffs, /\bclamp\(|function gain\(/);
-    assert.match(buffs, /import \{[^}]*\bloseEnergy\b[^}]*\bloseMood\b[^}]*\bshiftMetabolic\b[^}]*\} from '\.\/metabolics\.js';/);
+    assert.match(buffs, /import \{[^}]*\bloseEnergy\b[^}]*\bloseMood\b[^}]*\bshiftMetabolic\b[^}]*\} from '\.\/metabolics\.js\?v=[0-9a-f]{8}';/);
   });
 
   it('rook attacks and street jobs pay and charge through the doors', () => {
@@ -332,7 +332,7 @@ describe('G296: the loss-door leftovers cost nothing while dead', () => {
   it('every routed module spends through loseEnergy', () => {
     for (const rel of ['js/animal-kinship.js', 'js/machines.js', 'js/making.js', 'js/tools.js', 'js/mining.js',
       'js/animal-husbandry.js', 'js/neighbours.js', 'js/quest-rooms/esquibeth.js']) {
-      assert.match(read(rel), /import \{[^}]*\bloseEnergy\b[^}]*\} from '\.\.?\/metabolics\.js';/, rel);
+      assert.match(read(rel), /import \{[^}]*\bloseEnergy\b[^}]*\} from '\.\.?\/metabolics\.js\?v=[0-9a-f]{8}';/, rel);
     }
     assert.match(read('js/making.js'), /const energyLost = loseEnergy\(pc, TRANSMOG_FAIL_ENERGY\);\s*const moodLost = pc\.mood != null \? loseMood\(pc, TRANSMOG_FAIL_MOOD\) : 0;/);
   });

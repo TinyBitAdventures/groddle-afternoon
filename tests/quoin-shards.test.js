@@ -17,9 +17,9 @@ import {
   quoinShardPercentage,
   quoinShardSoundKey,
   quoinTypeShards,
-} from '../public/js/quoin-shards.js';
-import { QUOIN_TYPES, collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js';
-import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=g388-1';
+} from '../public/js/quoin-shards.js?v=9a2e4c37';
+import { QUOIN_TYPES, collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js?v=d4f4772b';
+import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=2d82d399';
 
 const here = import.meta.dirname;
 const pub = join(here, '../public');

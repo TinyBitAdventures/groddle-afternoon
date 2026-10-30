@@ -10,8 +10,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { COLOR_UNBLOCKING_FILES } from '../public/js/color-unblocking-art.js';
-import * as mod from '../public/js/quest-rooms/color-unblocking.js';
+import { COLOR_UNBLOCKING_FILES } from '../public/js/color-unblocking-art.js?v=ea2b7e7f';
+import * as mod from '../public/js/quest-rooms/color-unblocking.js?v=942e0b8b';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const plan = JSON.parse(fs.readFileSync(path.join(root, 'tools/room-art/color_unblocking.json'), 'utf8'));

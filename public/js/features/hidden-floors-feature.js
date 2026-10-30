@@ -49,7 +49,7 @@ import {
   isLostFloorTsid,
   isMissingFloorTsid,
   teleportersOn,
-} from '../hidden-floors.js?v=g478-1';
+} from '../hidden-floors.js?v=5ce87a04';
 
 export const HIDDEN_FLOORS_FEATURE_ID = 'hidden-floors';
 const CHECK_MS = 60;

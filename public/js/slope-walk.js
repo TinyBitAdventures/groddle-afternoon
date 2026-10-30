@@ -20,7 +20,7 @@
  * rule (holdCloseToFloor) and also keeps a walking avatar on the slope.
  */
 
-import { CLOSE_LIMIT_PERC, LAND_LIMIT_PERC } from './avatar-anims.js';
+import { CLOSE_LIMIT_PERC, LAND_LIMIT_PERC } from './avatar-anims.js?v=fb921bf4';
 
 /** Steepest descent a walking avatar stays on: 1 px down per px across (45 degrees, 99.7% of street platforms). */
 export const SLOPE_STICK = 1;

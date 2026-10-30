@@ -22,11 +22,11 @@ import {
   sanitizeKittyName,
   scareChance,
   stepKitty,
-} from '../public/js/heli-kitties.js?v=g414-1';
-import { KITTY_SHEETS, heliKittiesFeature, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=g478-1';
-import { foxesFeature } from '../public/js/features/foxes-feature.js?v=g478-1';
-import { createFeatureHost } from '../public/js/feature-host.js';
-import { setWildlifeCatalog } from '../public/js/wildlife.js';
+} from '../public/js/heli-kitties.js?v=ee89a5bf';
+import { KITTY_SHEETS, heliKittiesFeature, kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=188dbb6e';
+import { foxesFeature } from '../public/js/features/foxes-feature.js?v=6561c7d4';
+import { createFeatureHost } from '../public/js/feature-host.js?v=e4f648b1';
+import { setWildlifeCatalog } from '../public/js/wildlife.js?v=670c3a7f';
 import { readFileSync } from 'node:fs';
 
 const flat = (y = 300) => ({ geo: { l: 0, r: 3000 }, groundY: y, surfaceY: () => y, landY: () => y });

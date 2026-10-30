@@ -38,15 +38,15 @@ import {
   takeObjs,
   treeReady,
   treeSkill,
-} from '../public/js/street-objects.js?v=g414-1';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=g478-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-369';
-import { createMineRock, mineRock } from '../public/js/mining.js?v=g403-1';
-import { createResourceNode } from '../public/js/resource-nodes.js?v=g414-1';
-import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=trant-harvest-2';
+} from '../public/js/street-objects.js?v=df470ff4';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=50e7a7d7';
+import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
+import { createMineRock, mineRock } from '../public/js/mining.js?v=a7eb8740';
+import { createResourceNode } from '../public/js/resource-nodes.js?v=3d618d6a';
+import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=9c2e8c0f';
 import { placementRequests, ruleTables, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=g478-1';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=20c7b021';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=dbcefe18';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -250,7 +250,7 @@ describe('street objects: the feature', () => {
   it('is registered just before the realtime feature', () => {
     const ids = FEATURES.map((f) => f.id);
     assert.equal(ids.indexOf('street-objects') + 1, ids.indexOf('realtime'));
-    assert.match(read('public/js/features/index.js'), /street-objects-feature\.js\?v=g478-1/);
+    assert.match(read('public/js/features/index.js'), /street-objects-feature\.js\?v=[0-9a-f]{8}/);
   });
 
   it('asks for the street on joining, and waits for it', () => {

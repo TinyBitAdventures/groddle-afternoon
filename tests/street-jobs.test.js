@@ -37,7 +37,7 @@ import {
   contributionBadgesReached,
   jobText,
   plainText,
-} from '../public/js/street-jobs.js';
+} from '../public/js/street-jobs.js?v=3c8a3e97';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');

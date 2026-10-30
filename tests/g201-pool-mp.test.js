@@ -15,12 +15,12 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { HOME_POOL_REFRESH_MS, collectAmount, normalizePool, poolView } from '../public/js/home-pool-mp.js?v=g375-1';
-import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js?v=g375-1';
-import { CULTIVATION_REWARDS_CAP, imgRewards, imgRewardLine } from '../public/js/magic-rock-home.js?v=g253-1';
-import { DROP_TEXT, eatenStack, normalizeGroundStack, pigAnimalKey } from '../public/js/drops-mp.js?v=g375-1';
-import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=g403-1';
-import { GAME_DAY_MS, GAME_EPOCH_MS, getGameDayKey } from '../public/js/game-day.js?v=dametime-4';
+import { HOME_POOL_REFRESH_MS, collectAmount, normalizePool, poolView } from '../public/js/home-pool-mp.js?v=d04553e2';
+import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js?v=575920f2';
+import { CULTIVATION_REWARDS_CAP, imgRewards, imgRewardLine } from '../public/js/magic-rock-home.js?v=39921139';
+import { DROP_TEXT, eatenStack, normalizeGroundStack, pigAnimalKey } from '../public/js/drops-mp.js?v=00490802';
+import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=be5487b4';
+import { GAME_DAY_MS, GAME_EPOCH_MS, getGameDayKey } from '../public/js/game-day.js?v=3095e05b';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
@@ -132,7 +132,7 @@ describe('the game shows the site\'s pool (home-pool-mp)', () => {
   });
 
   it('the rock hands over the site\'s amount in multiplayer, after the site marked the day', async () => {
-    const { homesFeature } = await import('../public/js/features/homes-feature.js?v=g485-1');
+    const { homesFeature } = await import('../public/js/features/homes-feature.js?v=8995a326');
     homesFeature.restore({ decor: {}, cult: {}, magicRock: { cultivate: 'cultivate_complete', changestyle: 'howto_shown', expand: 'howto_shown' } });
     const beats = [];
     const data = {};

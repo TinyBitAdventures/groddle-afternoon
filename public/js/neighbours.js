@@ -24,7 +24,7 @@
  * neighbours.
  */
 
-import { loseEnergy, metabolicGain } from './metabolics.js';
+import { loseEnergy, metabolicGain } from './metabolics.js?v=8504134e';
 
 export const NEIGHBOUR_SCENE_PREFIX = 'NB_';
 export const NEIGHBOUR_SCENE = Object.freeze({ width: 2200, height: 700, groundY: 620 });

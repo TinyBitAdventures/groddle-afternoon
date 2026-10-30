@@ -17,7 +17,7 @@ import {
   pickupIlmenskieJones,
   releaseIlmenskieJones,
   rememberIlmenskieSource,
-} from '../public/js/ilmenskie-quest.js';
+} from '../public/js/ilmenskie-quest.js?v=0e9809ac';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');

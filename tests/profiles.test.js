@@ -17,14 +17,14 @@ import { homedir } from 'node:os';
 import {
   AVATAR_STILL, AVATAR_TILE, FAILURE_BACKOFF_MS, HOME_MAX_BYTES, HOME_REFRESH_MS, PROFILE_ABOUT_MAX, PROFILE_COPY, RETRY_MS,
   aboutCounter, aboutLength, avatarKeyOf, base64Bytes, cleanAbout, homeKeyOf, pngBase64, profileSlug, shortHash, shouldUpload, stillTransform,
-} from '../public/js/profiles.js?v=play-1';
-import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-10';
-import { FEATURES } from '../public/js/features/index.js?v=registry-369';
+} from '../public/js/profiles.js?v=e5edbd6a';
+import { createMinnAccount } from '../public/js/minn-account.js?v=81339760';
+import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
-import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=g403-1';
-import { skillTitle } from '../public/js/skill-tree.js?v=g403-1';
-import { skillArtFor } from '../public/js/familiar.js?v=g434-1';
-import { CARD_ART_LAYERS } from '../public/js/imagination-data.js';
+import { loadContentCatalogsFromDir, getSkillCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
+import { skillTitle } from '../public/js/skill-tree.js?v=cf7bc81f';
+import { skillArtFor } from '../public/js/familiar.js?v=2089ac54';
+import { CARD_ART_LAYERS } from '../public/js/imagination-data.js?v=4a85e7fe';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -136,7 +136,7 @@ describe('the profiles feature', () => {
     const ids = FEATURES.map((f) => f.id);
     assert.ok(ids.includes('profiles'));
     assert.ok(ids.indexOf('profiles') < ids.indexOf('account-backup'));
-    assert.match(read('public/js/features/index.js'), /profiles-feature\.js\?v=g463-1/);
+    assert.match(read('public/js/features/index.js'), /profiles-feature\.js\?v=[0-9a-f]{8}/);
   });
 
   it('does nothing in solo: no state, no account section, no upload', () => {
@@ -155,7 +155,7 @@ describe('the profiles feature', () => {
   });
 
   it('draws with the game\'s own compositor and uploads through minn-account', () => {
-    assert.match(src, /from '\.\.\/avatar-compositor\.js'/, 'the same module instance game.js uses');
+    assert.match(src, /from '\.\.\/avatar-compositor\.js\?v=[0-9a-f]{8}'/, 'the same module instance game.js uses');
     assert.match(src, /s\.account\.uploadAvatar\(pictures\)/);
     assert.match(src, /s\.account\.uploadHome\(\{ key, home \}\)/);
     assert.match(src, /engine\.snapshotView\?\.\(/);

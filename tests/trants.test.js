@@ -22,8 +22,8 @@ import {
   ARBOROLOGY_HARVEST,
   TRANT_META,
   trantHarvestResponse,
-} from '../public/js/trants.js';
-import { getVerbsFor, runVerb } from '../public/content.js?v=g478-1';
+} from '../public/js/trants.js?v=9c2e8c0f';
+import { getVerbsFor, runVerb } from '../public/content.js?v=e2372a6b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../public');
 
@@ -319,7 +319,7 @@ describe('trant harvest (GSJS-extracted)', () => {
     assert.match(game, /harvestroll/);
     assert.match(game, /dataset\.trantHarvestYield/);
     assert.match(game, /TRANT_FRAME_VERSION = 'all-species-cell-2'/);
-    assert.match(html, /game\.js\?v=official-ecology-1/);
+    assert.match(html, /game\.js\?v=[0-9a-f]{8}/);
     assert.match(game, /muted: loadMutedPreference\(\)/);
   });
 });

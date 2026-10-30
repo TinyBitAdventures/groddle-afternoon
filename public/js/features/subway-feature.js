@@ -31,9 +31,9 @@
  *   subwayDemo, subwayWindows, subwayLinked.
  */
 
-import { countItem } from '../inventory.js?v=catalog-unified-7';
-import { doorsFeature } from './doors-feature.js?v=g478-1';
-import { textureFromUrl } from '../textures.js';
+import { countItem } from '../inventory.js?v=85d4faba';
+import { doorsFeature } from './doors-feature.js?v=91a56c1b';
+import { textureFromUrl } from '../textures.js?v=01a295a1';
 import {
   CAR_FLOOR,
   CAR_FLOOR_LIGHTS,
@@ -75,7 +75,7 @@ import {
   stationScreen,
   stepRide,
   ticketOffer,
-} from '../subway.js?v=g454-1';
+} from '../subway.js?v=797a5e9c';
 
 export const SUBWAY_FEATURE_ID = 'subway';
 const STYLE_ID = 'subway-feature-style';

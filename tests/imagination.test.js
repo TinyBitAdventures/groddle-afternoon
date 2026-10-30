@@ -26,7 +26,7 @@ import {
   reshuffleHand,
   resurrectionCardCost,
   upgradeStatus,
-} from '../public/js/imagination.js?v=g403-1';
+} from '../public/js/imagination.js?v=b4f0eaf6';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
 

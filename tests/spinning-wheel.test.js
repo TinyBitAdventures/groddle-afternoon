@@ -18,16 +18,16 @@ import {
   spinningWheelPhase,
   startSpinningWheel,
   wheelPrizeTier,
-} from '../public/js/spinning-wheel.js';
+} from '../public/js/spinning-wheel.js?v=be7fe558';
 import {
   ITEM_CATALOG,
   createInventory,
   listPackItemSlots,
-} from '../public/js/inventory.js?v=catalog-unified-7';
+} from '../public/js/inventory.js?v=85d4faba';
 import {
   createShrineState,
   donateToShrine,
-} from '../public/js/shrines.js?v=spinning-wheel-test-9';
+} from '../public/js/shrines.js?v=01b185bc';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -185,6 +185,6 @@ test.describe('shrine source and client integration', () => {
     assert.match(game, /data(?:set)?\.spinningWheelRewardApplied/);
     assert.match(game, /stootdemo/);
     assert.match(content, /classId === 'npc_spinning_wheel'/);
-    assert.match(html, /wheel=1/);
+    assert.match(html, /"game\.js\?v=[0-9a-f]{8}"/);
   });
 });

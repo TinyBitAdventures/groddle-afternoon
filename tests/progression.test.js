@@ -11,7 +11,7 @@ import {
   currantRewardForLevel,
   reconcilePlayerProgression,
   formatLevelProgress,
-} from '../public/js/progression.js';
+} from '../public/js/progression.js?v=33462eaa';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const game = readFileSync(join(here, '../public/game.js'), 'utf8');

@@ -16,7 +16,7 @@
  * nameplate and race tint each one already had), and rerolled until it is
  * distinct from the player's default look and the looks drawn before it.
  */
-import { catalogItem, cleanHex, randomVectorFields } from './avatar-looks.js';
+import { catalogItem, cleanHex, randomVectorFields } from './avatar-looks.js?v=64fab53e';
 
 /** Fixed seed for the whole set (mixed into each name's hash). */
 export const NPC_GLITCH_SEED = 0x47b1c4;

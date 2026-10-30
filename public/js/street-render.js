@@ -9,13 +9,13 @@ import {
   platformsScreen,
   signpostNear,
   pickConnection,
-} from './street-model.js?v=g478-1';
-import { availableStreetTsids } from './street-loader.js?v=g478-1';
-import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js';
-import { admitSharp, decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco } from './deco-hires.js?v=g457-3';
-import { LADDER_TILE_Z, ladderTilePieces } from './ladder-tiling.js?v=g415-1';
-import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } from './deco-anim.js?v=g457-3';
-import { drawnLayerOffset, layerScreenDir } from './camera-feel.js?v=g473-1';
+} from './street-model.js?v=606bae73';
+import { availableStreetTsids } from './street-loader.js?v=20c7b021';
+import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js?v=01a295a1';
+import { admitSharp, decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco } from './deco-hires.js?v=a65f2d79';
+import { LADDER_TILE_Z, ladderTilePieces } from './ladder-tiling.js?v=4f9e07fa';
+import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } from './deco-anim.js?v=b3fc64f2';
+import { drawnLayerOffset, layerScreenDir } from './camera-feel.js?v=e668afc5';
 
 const DECO_BASE = 'assets/decos/groddle/';
 /**
@@ -1348,7 +1348,7 @@ function cullLayer(lc, camX, camY, vpW, vpH, rebake, now) {
 }
 
 /**
- * @param {import('./street-model.js?v=g478-1').StreetData} street
+ * @param {import('./street-model.js').StreetData} street
  * @param {typeof PIXI} PIXI
  * @param {{
  *   decoBase?: string,

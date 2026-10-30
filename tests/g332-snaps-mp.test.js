@@ -18,9 +18,9 @@ import { join } from 'node:path';
 import {
   CAMERA_OFFER, FORGET_RECHARGE_SEC, RECHARGE_BUFF, SNAP_COPY, SNAPSHOTTERY, TRAVEL,
   canSnap, cleanCaption, isSnapStreet, isSnapUrl, snapAuthor, snapPlace, snapStreet, takePictureState, withCamera,
-} from '../public/js/snaps.js?v=g332-snaps-1';
-import { snapsFeature } from '../public/js/features/snaps-feature.js?v=g478-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-369';
+} from '../public/js/snaps.js?v=7df81689';
+import { snapsFeature } from '../public/js/features/snaps-feature.js?v=5e591bc6';
+import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
 import { HAS_SITE, SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

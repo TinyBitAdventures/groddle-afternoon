@@ -11,8 +11,8 @@
  * `<class>:<verb>` and `VERB:<verb>:<class>` (itemVerbAchievementCounters).
  */
 
-import { grantMoodXp } from './mood-xp.js';
-import { metabolicGain, loseEnergy, loseMood } from './metabolics.js';
+import { grantMoodXp } from './mood-xp.js?v=958e7680';
+import { metabolicGain, loseEnergy, loseMood } from './metabolics.js?v=8504134e';
 
 const ENERGY = "You don't have enough energy to do this.";
 const DEPRESSED = 'You are too depressed to do this.';

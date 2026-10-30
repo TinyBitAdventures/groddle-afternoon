@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { AUDIO_MUTED_KEY, loadMutedPreference, saveMutedPreference } from '../public/js/audio-pref.js?v=g465-1';
+import { AUDIO_MUTED_KEY, loadMutedPreference, saveMutedPreference } from '../public/js/audio-pref.js?v=e56202ee';
 
 function memoryStorage() {
   const data = new Map();
@@ -28,7 +28,7 @@ describe('remembered mute choice', () => {
 
 describe('remembered sound levels (the top bar\'s Sound popover)', () => {
   it('starts at the game\'s own mix and remembers each level, clamped to 0..100', async () => {
-    const { AUDIO_LEVEL_KEYS, loadAudioLevels, saveAudioLevel } = await import('../public/js/audio-pref.js?v=g465-1');
+    const { AUDIO_LEVEL_KEYS, loadAudioLevels, saveAudioLevel } = await import('../public/js/audio-pref.js?v=e56202ee');
     const storage = memoryStorage();
     assert.deepEqual(loadAudioLevels(storage), { effects: 100, music: 100 });
     saveAudioLevel('music', 35, storage);

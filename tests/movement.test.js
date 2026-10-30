@@ -25,9 +25,9 @@ import {
   yCamOffsetAnchor,
   cameraBottomSlack,
   cameraWorldHeightForGround,
-} from '../public/js/movement.js';
-import { streetHeight, platformsScreen } from '../public/js/street-model.js?v=g478-1';
-import { MIN_VP_H, MAX_VP_H, VIEW_CEIL_H, VIEW_FLOOR_H, locationViewHeightFor } from '../public/js/location-view.js?v=g476-1';
+} from '../public/js/movement.js?v=a314f8a1';
+import { streetHeight, platformsScreen } from '../public/js/street-model.js?v=606bae73';
+import { MIN_VP_H, MAX_VP_H, VIEW_CEIL_H, VIEW_FLOOR_H, locationViewHeightFor } from '../public/js/location-view.js?v=5a0d5c0b';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

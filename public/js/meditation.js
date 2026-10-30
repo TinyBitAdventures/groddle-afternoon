@@ -23,8 +23,8 @@
  * counts energyToday (stats) but never caps it (MEDITATION_DAILY_LIMIT).
  */
 
-import { MEDITATION_IMAGINATION_CHANCE, levitationCards, meditationCards } from './imagination-effects.js?v=g403-1';
-import { getSkillPackageOverride, skillPackageDetails } from './skill-packages.js';
+import { MEDITATION_IMAGINATION_CHANCE, levitationCards, meditationCards } from './imagination-effects.js?v=70169933';
+import { getSkillPackageOverride, skillPackageDetails } from './skill-packages.js?v=bfb87281';
 
 /** No daily cap on meditation energy (see above); dailyEnergyLimit is the pre-2012-10-31 top. */
 export const MEDITATION_DAILY_LIMIT = false;

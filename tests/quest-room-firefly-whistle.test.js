@@ -35,13 +35,13 @@ import {
   codeMatches,
   hintFor,
   room,
-} from '../public/js/quest-rooms/firefly-whistle.js?v=g463-2';
-import { DRESSING, ENTRY, FLOOR, FLOOR_Y, LAB, W, entryPath, labPlatforms, seamsToDraw, sx, sy } from '../public/js/quest-rooms/firefly-whistle-scene.js';
-import { FIREFLY_LAB_FILES } from '../public/js/quest-rooms/firefly-lab-art.js';
-import * as kit from '../public/js/quest-rooms/kit.js?v=g458-1';
-import { BUILT_ROOMS, OFFER_OVERRIDES, QUEST_ROOMS, questGiver } from '../public/js/quest-rooms/catalog.js?v=g482-2';
-import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=g403-1';
-import { FIREFLY_OFFER_LINES, FIREFLY_WHISTLE_QUEST, fireflyTouches } from '../public/js/features/resource-nodes-feature.js?v=g478-1';
+} from '../public/js/quest-rooms/firefly-whistle.js?v=3ca501b6';
+import { DRESSING, ENTRY, FLOOR, FLOOR_Y, LAB, W, entryPath, labPlatforms, seamsToDraw, sx, sy } from '../public/js/quest-rooms/firefly-whistle-scene.js?v=e95b2c49';
+import { FIREFLY_LAB_FILES } from '../public/js/quest-rooms/firefly-lab-art.js?v=481a55f9';
+import * as kit from '../public/js/quest-rooms/kit.js?v=fd1eb817';
+import { BUILT_ROOMS, OFFER_OVERRIDES, QUEST_ROOMS, questGiver } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
+import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=6b6cbf22';
+import { FIREFLY_OFFER_LINES, FIREFLY_WHISTLE_QUEST, fireflyTouches } from '../public/js/features/resource-nodes-feature.js?v=acce0123';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
@@ -186,7 +186,7 @@ describe('Fireflex 3000 Lab layout', () => {
 
 describe('Firefly Whistle offer and room wiring', () => {
   before(async () => {
-    const { loadContentCatalogsFromDir } = await import('../public/js/content-catalogs.js?v=g403-1');
+    const { loadContentCatalogsFromDir } = await import('../public/js/content-catalogs.js?v=10b118dd');
     loadContentCatalogsFromDir(join(root, 'public/assets/content'));
   });
 

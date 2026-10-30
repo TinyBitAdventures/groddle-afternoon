@@ -15,7 +15,7 @@
  * there (activityLog: false: no panel, no button) and covers the right edge:
  * sideInset() says how much, and the stack centres in the width that is left.
  */
-import { placeBelow, placeBeside, plainText } from './notify.js?v=g459-1';
+import { placeBelow, placeBeside, plainText } from './notify.js?v=3383e8be';
 
 const STACK_ID = 'notify-notices';
 const LOG_ID = 'activity-log';

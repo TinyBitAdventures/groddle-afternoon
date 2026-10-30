@@ -46,12 +46,12 @@
  *   rookNextAttack, rookArmor, rookBalmPoints, rookDemo, rookArt, rookStats.
  */
 
-import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
-import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-7';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g464-2';
-import { nearestSurfaceY } from '../walk-surface.js?v=g478-1';
-import { donationValueFor } from '../shrines.js?v=spinning-wheel-test-9';
-import { TRANT_META, trantStatusLabel } from '../trants.js?v=trant-harvest-2';
+import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
+import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=85d4faba';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=0e86cc0f';
+import { nearestSurfaceY } from '../walk-surface.js?v=c4aff42f';
+import { donationValueFor } from '../shrines.js?v=01b185bc';
+import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import {
   FOREHORSEMAN_LINES,
   ROOK_COLORS,
@@ -84,12 +84,12 @@ import {
   strikeBeamFor,
   strikeDamageFor,
   useBalmPoint,
-} from '../rook-attack.js?v=g479-2';
-import { shrinePrimeBonus } from '../imagination-effects.js?v=g403-1';
-import { grantMoodXp } from '../mood-xp.js';
-import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js';
-import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g463-2';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=g463-2';
+} from '../rook-attack.js?v=c06c0537';
+import { shrinePrimeBonus } from '../imagination-effects.js?v=70169933';
+import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
+import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=628fa0b4';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=6d2b7a11';
 import {
   MP_ROOK,
   MP_ROOK_TEXT,
@@ -103,9 +103,9 @@ import {
   strikeDamage as mpStrikeDamage,
   syncKeys,
   syncObjs,
-} from '../rook-mp.js?v=g479-2';
-import { itemZ } from '../item-bands.js?v=g429-1';
-import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=g479-1';
+} from '../rook-mp.js?v=20b4c9ce';
+import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=2bb00dfd';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
 /** The view the fight's screen art was laid out on; syncFront centres it in a wider one (g458). */

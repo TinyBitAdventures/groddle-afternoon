@@ -38,7 +38,7 @@ import {
   SPICE_CLASSES,
   STACKMAX,
   TOOL_CLASSES,
-} from './pack-slots-data.js?v=g152-1';
+} from './pack-slots-data.js?v=330c51e4';
 
 /** PC.as:48 pack_slots; items/bag.js:1. */
 export const PACK_CAPACITY = 16;

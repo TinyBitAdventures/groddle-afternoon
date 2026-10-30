@@ -27,7 +27,7 @@
  * js/audio-pref.js) and the /compare/ page theme (groddle-compare-theme).
  */
 
-import { GAME_MODE, MULTIPLAYER } from './game-mode.js?v=mp2-1';
+import { GAME_MODE, MULTIPLAYER } from './game-mode.js?v=1ecf2899';
 
 /** Save entry name -> localStorage key. These keys must never change. */
 export const SAVE_KEYS = Object.freeze({

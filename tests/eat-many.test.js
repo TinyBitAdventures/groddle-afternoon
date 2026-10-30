@@ -18,12 +18,12 @@ import {
   limitCountCap,
   useItemMany,
   recordFoodEatMany,
-} from '../public/js/eat-many.js?v=g433-1';
-import { CANDY_CLASSES, CANDY_DAILY_MAX, PIE_DAILY_MAX, SOURCE_LINES, dailyEatLimit, pieEatGate } from '../public/js/seasons.js?v=g433-1';
-import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=g478-1';
-import { getGameDayKey } from '../public/js/game-day.js?v=dametime-4';
-import { createInventory, getItemUseInfo, registerItemUse, useItem, countItem } from '../public/js/inventory.js?v=catalog-unified-7';
-import { FOOD_VARIETY_UPGRADE, createFoodState, recordFoodEat } from '../public/js/food.js?v=food-memory-8';
+} from '../public/js/eat-many.js?v=4faca8e6';
+import { CANDY_CLASSES, CANDY_DAILY_MAX, PIE_DAILY_MAX, SOURCE_LINES, dailyEatLimit, pieEatGate } from '../public/js/seasons.js?v=fcb12a83';
+import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=01dccb08';
+import { getGameDayKey } from '../public/js/game-day.js?v=3095e05b';
+import { createInventory, getItemUseInfo, registerItemUse, useItem, countItem } from '../public/js/inventory.js?v=85d4faba';
+import { FOOD_VARIETY_UPGRADE, createFoodState, recordFoodEat } from '../public/js/food.js?v=f6c6d15b';
 
 const root = join(import.meta.dirname, '..');
 const gsjs = join(root, '../glitch-GameServerJS');
@@ -194,7 +194,7 @@ describe('food memory for a batch (food.js 132-164)', () => {
 
 describe('the pack card chooser', () => {
   it('imports eat-many under one key', () => {
-    assert.match(game, /from '\.\/js\/eat-many\.js\?v=g\d+-\d+';/);
+    assert.match(game, /from '\.\/js\/eat-many\.js\?v=[0-9a-f]{8}';/);
   });
 
   it('adds "Eat more" (a second level of the stack menu) beside "Eat one" and an "Eat how many?" panel', () => {

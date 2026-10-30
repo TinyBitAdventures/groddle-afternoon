@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { BACKDROP_CAP_MS, pendingSources, revealStartCard, whenSceneDrawn } from '../public/js/start-backdrop.js?v=g432-1';
+import { BACKDROP_CAP_MS, pendingSources, revealStartCard, whenSceneDrawn } from '../public/js/start-backdrop.js?v=8510d51e';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -65,12 +65,12 @@ describe('the street draws under the start card', () => {
     assert.ok(game.indexOf("has('autostart')) beginGame();") < game.indexOf('const startCardWaits'));
   });
 
-  it('cache keys: the module, game.js round16, style.css and the online page', () => {
-    assert.match(game, /from '\.\/js\/start-backdrop\.js\?v=g432-1'/);
+  it('cache keys: the module, game.js, style.css and the online page', () => {
+    assert.match(game, /from '\.\/js\/start-backdrop\.js\?v=[0-9a-f]{8}'/);
     for (const page of ['play/index.html', 'play/online/index.html']) {
       const html = read(page);
-      assert.match(html, /round16=g\d+-\d+"/, page);
-      assert.match(html, /style\.css\?v=[^"]*&amp;backdrop=g432-1"/, page);
+      assert.match(html, /<script type="module" (?:id="online-boot" src="js\/online-boot\.js\?v=[0-9a-f]{8}" data-game|src)="game\.js\?v=[0-9a-f]{8}"/, page);
+      assert.match(html, /href="style\.css\?v=[0-9a-f]{8}"/, page);
     }
   });
 });

@@ -53,13 +53,13 @@
  *   &lonelyhold=invite      keep the porthole on screen (frozen at the loop) for screenshots
  */
 
-import { STREET_INDEX } from '../street-loader.js?v=g478-1';
-import { getStreetEcologyCatalog } from '../street-ecology.js?v=g485-1';
-import { graphKey, routeGraph, tsidAliases } from '../map-routes.js?v=lonely-1';
-import { STREET_SPIRIT_VARIANTS, portraitFit, portraitSheet, spiritForStreet } from '../street-spirits.js';
-import { grantMoodXp } from '../mood-xp.js';
-import { denseFrame, denseSprite } from '../sprite-dense.js?v=g430-1';
-import { loadVectorFrames, overlayAlpha, overlayFrameAt, overlayLifeMs, overlayPlacement, trackOverlay } from '../overlay-art.js?v=g463-2';
+import { STREET_INDEX } from '../street-loader.js?v=20c7b021';
+import { getStreetEcologyCatalog } from '../street-ecology.js?v=dbcefe18';
+import { graphKey, routeGraph, tsidAliases } from '../map-routes.js?v=3e8f84ad';
+import { STREET_SPIRIT_VARIANTS, portraitFit, portraitSheet, spiritForStreet } from '../street-spirits.js?v=f9e88445';
+import { grantMoodXp } from '../mood-xp.js?v=958e7680';
+import { denseFrame, denseSprite } from '../sprite-dense.js?v=8e0109eb';
+import { loadVectorFrames, overlayAlpha, overlayFrameAt, overlayLifeMs, overlayPlacement, trackOverlay } from '../overlay-art.js?v=628fa0b4';
 import {
   INVITE_ART,
   LONELY_RULES,
@@ -88,7 +88,7 @@ import {
   startEvent,
   streetKey,
   visitEvent,
-} from '../spirit-loneliness.js?v=lonely-1';
+} from '../spirit-loneliness.js?v=9259917d';
 
 export const SPIRIT_LONELINESS_FEATURE_ID = 'spirit-loneliness';
 const GRAPH_URL = 'assets/content/signpost-graph.json?v=g198-1';

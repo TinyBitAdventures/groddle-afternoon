@@ -31,7 +31,7 @@
  * apiSendAnnouncement to the acting player only; the location saw the
  * pc_overlay bubble (apiSendAnnouncementX). The remake keeps it local too.
  */
-import { WORD_PROGRESS_ART } from './word-progress-art.js?v=g387-1';
+import { WORD_PROGRESS_ART } from './word-progress-art.js?v=bd57f998';
 
 /** config_base.js 180-209, verbatim: map key -> word. */
 export const WORD_PROGRESS_MAP = Object.freeze({

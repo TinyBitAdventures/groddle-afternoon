@@ -36,16 +36,16 @@
  *     smugDeim, smugLast, smugCounts, smugAutoplay.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { canUseTool } from '../tools.js?v=woodcutting-test-8';
-import { acceptOffer, ensureQuestOfferState, turnInQuest } from '../quest-offers.js?v=g403-1';
-import { parseQuestConversation } from '../quests.js?v=item-buffs-7';
-import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
-import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=g478-1';
-import { worldToScreen } from '../street-model.js?v=g478-1';
-import { landingY, walkSurfaceY } from '../walk-surface.js?v=g478-1';
-import { hellFeature } from './hell-feature.js?v=hell-16';
-import { questRoomConverse } from './quest-instances-feature.js?v=g482-2';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
+import { canUseTool } from '../tools.js?v=9a2e7ef4';
+import { acceptOffer, ensureQuestOfferState, turnInQuest } from '../quest-offers.js?v=6b6cbf22';
+import { parseQuestConversation } from '../quests.js?v=282e1621';
+import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
+import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=20c7b021';
+import { worldToScreen } from '../street-model.js?v=606bae73';
+import { landingY, walkSurfaceY } from '../walk-surface.js?v=c4aff42f';
+import { hellFeature } from './hell-feature.js?v=bdaefff5';
+import { questRoomConverse } from './quest-instances-feature.js?v=1af188a6';
 import {
   CONTRABAND,
   CONTRABAND_ITEM,
@@ -80,9 +80,9 @@ import {
   sourceKey,
   spawnOffset,
   sparedBySignpost,
-} from '../smuggling.js';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
-import { grantMoodXp } from '../mood-xp.js';
+} from '../smuggling.js?v=8eccf20d';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=01a295a1';
+import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 
 export const SMUGGLING_FEATURE_ID = 'smuggling';
 const ART = 'assets/sprites/smuggling/';

@@ -27,8 +27,8 @@ import {
   ensureWinterWalkStory,
   failInterruptedWinterWalk,
   noteWinterWalkEnd,
-} from '../public/js/winter-walk.js?v=g482-2';
-import { OFFER_OVERRIDES, QUEST_ROOMS, isBuiltRoom } from '../public/js/quest-rooms/catalog.js?v=g482-2';
+} from '../public/js/winter-walk.js?v=9961c35f';
+import { OFFER_OVERRIDES, QUEST_ROOMS, isBuiltRoom } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
 
 const root = join(import.meta.dirname, '..');
 const gsjsQuests = join(root, '..', 'glitch-GameServerJS', 'quests');

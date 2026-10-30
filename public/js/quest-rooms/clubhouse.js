@@ -50,8 +50,8 @@
  * signpost are drawn here.
  */
 
-import { textureFromUrl } from '../textures.js';
-import { butlerApi } from '../features/butler-feature.js?v=g485-1';
+import { textureFromUrl } from '../textures.js?v=01a295a1';
+import { butlerApi } from '../features/butler-feature.js?v=3446891e';
 
 export const ROOM_MS = 5 * 60 * 1000; // source: questInstanceLocation(..., 5*60)
 export const PICTURE_REACH = 175; // source: club_house_picture jump_in conditions

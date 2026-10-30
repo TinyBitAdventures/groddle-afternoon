@@ -14,8 +14,8 @@ import {
   renderQuestText,
   questRequirementText,
   withQuestMarkup,
-} from '../public/js/quest-text.js?v=g425-1';
-import { cleanQuestMarkup, parseQuestConversation } from '../public/js/quests.js';
+} from '../public/js/quest-text.js?v=7f5d761c';
+import { cleanQuestMarkup, parseQuestConversation } from '../public/js/quests.js?v=282e1621';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -173,6 +173,6 @@ describe('quest requirement lines', () => {
     const keys = new Set();
     for (const text of [game, offers]) for (const m of text.matchAll(/quest-text\.js(\?v=[^'"]*)?['"]/g)) keys.add(m[1] || '');
     assert.equal(keys.size, 1, [...keys].join(', '));
-    assert.match([...keys][0], /^\?v=g\d+-\d+$/);
+    assert.match([...keys][0], /^\?v=[0-9a-f]{8}$/);
   });
 });

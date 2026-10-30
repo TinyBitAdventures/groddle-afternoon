@@ -19,8 +19,8 @@
  * level may eat one.
  */
 
-import { grantMoodXp } from './mood-xp.js';
-import { loseMood } from './metabolics.js';
+import { grantMoodXp } from './mood-xp.js?v=958e7680';
+import { loseMood } from './metabolics.js?v=8504134e';
 
 /** classProps eat_min_level / eat_xp and the bemoan verb's iMG and line, per cone. */
 export const SNO_CONES = Object.freeze({

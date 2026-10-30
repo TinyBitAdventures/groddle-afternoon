@@ -7,7 +7,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { IGNORE_ATTRS, quiet, quietAll, wantsAutofill } from '../public/js/no-autofill.js?v=g437-1';
+import { IGNORE_ATTRS, quiet, quietAll, wantsAutofill } from '../public/js/no-autofill.js?v=6a1a4382';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -52,7 +52,7 @@ describe('no-autofill', () => {
   it('loads before the game on both play pages, and the chat box carries the marks in the markup', () => {
     for (const page of ['public/play/index.html', 'public/play/online/index.html']) {
       const html = read(page);
-      assert.ok(html.indexOf('js/no-autofill.js?v=g437-1') > 0, page);
+      assert.ok(html.indexOf('js/no-autofill.js?v=') > 0, page);
       assert.match(html, /<input id="local-chat-input"[^>]* autocomplete="off" data-1p-ignore data-lpignore="true" data-bwignore data-form-type="other" \/>/, page);
     }
   });

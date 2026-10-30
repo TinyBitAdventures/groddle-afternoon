@@ -10,13 +10,13 @@ import {
   moodDecaySkip,
   moodWarningFor,
   periodicMoodLoss,
-} from '../public/js/mood-decay.js?v=mood-decay-1';
-import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=g403-1';
-import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=g403-1';
+} from '../public/js/mood-decay.js?v=49175993';
+import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=ca0a48d5';
+import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=b4f0eaf6';
 // The feature imports these with their browser cache tags; load the same module instances.
-import { moodDecayContext, moodDecayFeature, runMoodDecayMinute } from '../public/js/features/mood-decay-feature.js?v=g485-1';
-import { __newxpTest } from '../public/js/features/newxp-feature.js?v=g481-2';
-import { GENTLE_ISLAND_TSIDS } from '../public/js/newxp.js?v=g481-2';
+import { moodDecayContext, moodDecayFeature, runMoodDecayMinute } from '../public/js/features/mood-decay-feature.js?v=75ed28ca';
+import { __newxpTest } from '../public/js/features/newxp-feature.js?v=7192302a';
+import { GENTLE_ISLAND_TSIDS } from '../public/js/newxp.js?v=d5978ec1';
 
 const CARD = (n) => `periodic_mood_loss_reduced_${n}`;
 

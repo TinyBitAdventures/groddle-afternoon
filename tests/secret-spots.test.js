@@ -41,11 +41,11 @@ import {
   startSecretHunt,
   streetKeyFor,
   triggerSecretSpot,
-} from '../public/js/secret-spots.js';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
-import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=g403-1';
-import { SOUND_CATEGORIES } from '../public/js/sound-keys.js?v=g388-1';
-import { SYNTH_RECIPES, recipeForKey } from '../public/js/synth-sfx.js?v=g388-1';
+} from '../public/js/secret-spots.js?v=0127532b';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
+import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=631d7daa';
+import { SOUND_CATEGORIES } from '../public/js/sound-keys.js?v=2d82d399';
+import { SYNTH_RECIPES, recipeForKey } from '../public/js/synth-sfx.js?v=9853c8e7';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

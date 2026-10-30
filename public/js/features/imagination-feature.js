@@ -26,10 +26,10 @@
  * imgLast, imgShuffled, imgAutoplay, imgBrain, imgEnergyMax.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { getGameDayKey } from '../game-day.js?v=dametime-4';
-import { quoinDailyLimitFor } from '../quoins.js?v=g424-1';
-import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
+import { getGameDayKey } from '../game-day.js?v=3095e05b';
+import { quoinDailyLimitFor } from '../quoins.js?v=d4f4772b';
+import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import {
   CARD_ART_LAYERS,
   HAND_SIZE,
@@ -48,12 +48,12 @@ import {
   purchaseCard,
   remakeMovementMultipliers,
   reshuffleHand,
-} from '../imagination.js?v=g403-1';
-import { brainCapacityRescale, skillTimeFactor } from '../imagination-effects.js?v=g403-1';
-import { betterLearningDiscount } from '../better-learning.js?v=g403-1';
-import { rescaleStudiesForLearningModifier } from '../skills.js?v=study-6';
-import { isOfferedInRemake, remakeStatus } from '../imagination-remake.js?v=g403-1';
-import { hellFeature } from './hell-feature.js?v=hell-16';
+} from '../imagination.js?v=b4f0eaf6';
+import { brainCapacityRescale, skillTimeFactor } from '../imagination-effects.js?v=70169933';
+import { betterLearningDiscount } from '../better-learning.js?v=044ff9ff';
+import { rescaleStudiesForLearningModifier } from '../skills.js?v=4542bdf9';
+import { isOfferedInRemake, remakeStatus } from '../imagination-remake.js?v=ca0a48d5';
+import { hellFeature } from './hell-feature.js?v=bdaefff5';
 
 const ART = 'assets/imagination/cards/';
 const UI = 'assets/imagination/ui/';

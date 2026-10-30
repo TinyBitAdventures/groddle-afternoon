@@ -90,12 +90,12 @@
  *       (=restorehold stops on the proto, =restoreaward on the award)
  */
 
-import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=catalog-unified-7';
+import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=85d4faba';
 import {
   CULTIVATION_CLASSES,
   FURNITURE_CATALOG,
   FURNITURE_STORE,
-} from '../homes-catalog.js?v=homes-catalog-2';
+} from '../homes-catalog.js?v=29713fa8';
 import {
   INTERIOR,
   arrangeStarterRoom,
@@ -129,10 +129,10 @@ import {
   textureConfig,
   unexpandInterior,
   UNEXPAND_TEXT,
-} from '../home-decor.js?v=g448-3';
-import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=g448-3';
-import { chooseUpgrade, closeUpgradePicker, openUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=g463-1';
-import { RECIPE_CATALOG } from '../making.js?v=g403-1';
+} from '../home-decor.js?v=95ba0a91';
+import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=c4ee77ed';
+import { chooseUpgrade, closeUpgradePicker, openUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=42523674';
+import { RECIPE_CATALOG } from '../making.js?v=9e538296';
 import {
   createBackYardState,
   isBackYard,
@@ -162,22 +162,22 @@ import {
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=home-cultivation-5';
-import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
-import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=g463-2';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g464-2';
-import { fadeInNewNear } from '../poof-fade.js?v=g463-2';
-import { projectApi } from './street-jobs-feature.js?v=g485-1';
-import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-3';
-import { towerApi } from './home-tower-feature.js?v=g463-1';
-import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
-import { wantsHiresDecos } from '../deco-hires.js?v=g457-3';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=g478-1';
-import { patchesFeature } from './patches-feature.js?v=g485-1';
-import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=g414-1';
-import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=g165-1';
-import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=g369-1';
-import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
+} from '../home-cultivation.js?v=9d3a8ec3';
+import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=68506420';
+import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=628fa0b4';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=0e86cc0f';
+import { fadeInNewNear } from '../poof-fade.js?v=24c9b428';
+import { projectApi } from './street-jobs-feature.js?v=fb0922a3';
+import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=6ccb3a4f';
+import { towerApi } from './home-tower-feature.js?v=b4e3d104';
+import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=e676f00f';
+import { wantsHiresDecos } from '../deco-hires.js?v=a65f2d79';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=acce0123';
+import { patchesFeature } from './patches-feature.js?v=22fe1430';
+import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=3996c344';
+import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
+import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
+import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import {
   STREET_STYLE_BY_KEY,
   STYLE_TEXT,
@@ -193,9 +193,9 @@ import {
   yardLook,
   yardStyleChoices,
   yardStyleFor,
-} from '../home-styles.js?v=g373-1';
-import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
-import { ROCK_CATALOG } from '../mining.js?v=g403-1';
+} from '../home-styles.js?v=f591561f';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=01a295a1';
+import { ROCK_CATALOG } from '../mining.js?v=a7eb8740';
 import {
   HOUSE_SIGN,
   IMG_BUBBLE_MS,
@@ -211,11 +211,11 @@ import {
   readHowto,
   rockVerbs,
   ROCK_VERB_IDS,
-} from '../magic-rock-home.js?v=g253-1';
-import { getGameDayKey } from '../game-day.js?v=dametime-4';
-import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=g481-2';
-import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-6';
-import { takeFromHouse } from '../ledger-house.js?v=g482-1';
+} from '../magic-rock-home.js?v=39921139';
+import { getGameDayKey } from '../game-day.js?v=3095e05b';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=61ef0eb9';
+import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=a314f8a1';
+import { takeFromHouse } from '../ledger-house.js?v=258ef99e';
 import {
   DOOR_CLASS,
   DOOR_JOB_PHASES,
@@ -237,7 +237,7 @@ import {
   quoteHouseExpansion,
   quoteHouseUnexpand,
   unexpandHouseFloors,
-} from '../home-floors.js?v=g448-3';
+} from '../home-floors.js?v=824bd350';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';

@@ -17,7 +17,7 @@
  * Pure: no DOM, no engine (tests/help-dig-mp.test.js).
  */
 
-import { helpString } from './help-mine.js';
+import { helpString } from './help-mine.js?v=27f9d276';
 
 /** quests/soilappreciation_help_digging.js r277: the counter It Takes Two reads. */
 export const HELP_DIG_COUNTER = 'helped_dig';

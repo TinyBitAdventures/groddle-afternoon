@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { CULTIVATION_CLASSES, HOME_LIMITS } from '../public/js/homes-catalog.js';
+import { CULTIVATION_CLASSES, HOME_LIMITS } from '../public/js/homes-catalog.js?v=29713fa8';
 import {
   FIREFLY_HIVE,
   HOUSE_LOT_W,
@@ -22,7 +22,7 @@ import {
   placementCheck,
   quoteYardExpansion,
   removeCultivation,
-} from '../public/js/home-cultivation.js';
+} from '../public/js/home-cultivation.js?v=9d3a8ec3';
 
 const root = join(import.meta.dirname, '..', 'public');
 const rich = () => ({ level: 60, imagination: 1_000_000 });

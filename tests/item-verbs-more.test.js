@@ -50,8 +50,8 @@ import {
   trophySmash,
   verbMessage,
   vvSniffButton,
-} from '../public/js/item-verbs-more.js?v=g391-1';
-import { itemVerbsMoreFeature, runMoreVerb, eatLicoriceNow } from '../public/js/features/item-verbs-more-feature.js?v=g481-2';
+} from '../public/js/item-verbs-more.js?v=ca6cc8aa';
+import { itemVerbsMoreFeature, runMoreVerb, eatLicoriceNow } from '../public/js/features/item-verbs-more-feature.js?v=090d4c9b';
 import {
   LETTER_WEIGHTS,
   POTIONS,
@@ -70,12 +70,12 @@ import {
   sauceWord,
   wisdomCheck,
   wisdomMessage,
-} from '../public/js/potions.js?v=g391-1';
-import { potionsFeature, usePotionNow, pourSauce } from '../public/js/features/potions-feature.js?v=g485-1';
-import { husbandryPack } from '../public/js/animal-husbandry.js?v=g478-1';
-import { XP_FOR_LEVEL } from '../public/js/progression.js?v=progression-1';
-import { moodScaledXp } from '../public/js/mood-xp.js';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
+} from '../public/js/potions.js?v=294258de';
+import { potionsFeature, usePotionNow, pourSauce } from '../public/js/features/potions-feature.js?v=7eae9c3b';
+import { husbandryPack } from '../public/js/animal-husbandry.js?v=16364589';
+import { XP_FOR_LEVEL } from '../public/js/progression.js?v=33462eaa';
+import { moodScaledXp } from '../public/js/mood-xp.js?v=958e7680';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
@@ -577,9 +577,9 @@ describe('wiring', () => {
   });
   it('the feature is registered and the potions keys moved together', () => {
     const index = src('js/features/index.js');
-    assert.match(index, /import \{ itemVerbsMoreFeature \} from '\.\/item-verbs-more-feature\.js\?v=g481-2'; FEATURES\.push\(itemVerbsMoreFeature\);/);
-    assert.match(index, /potions-feature\.js\?v=g485-1/);
-    assert.match(src('js/features/potions-feature.js'), /from '\.\.\/potions\.js\?v=g391-1'/);
+    assert.match(index, /import \{ itemVerbsMoreFeature \} from '\.\/item-verbs-more-feature\.js\?v=[0-9a-f]{8}'; FEATURES\.push\(itemVerbsMoreFeature\);/);
+    assert.match(index, /potions-feature\.js\?v=[0-9a-f]{8}/);
+    assert.match(src('js/features/potions-feature.js'), /from '\.\.\/potions\.js\?v=[0-9a-f]{8}'/);
   });
   it('save and restore keep the jar, the net, the stick and the day', () => {
     const { engine } = fakeEngine({ inv: { dusty_stick: 1, butterfly_net: 1 }, interactables: [{ classId: 'npc_butterfly', sprite: { x: 520, y: 380, scale: { x: 1, y: 1 } } }] });

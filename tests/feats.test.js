@@ -14,7 +14,7 @@ import {
   normalizeFeatSnapshot,
   normalizeFeatState,
   submitIncantation,
-} from '../public/js/feats.js?v=incantations-1';
+} from '../public/js/feats.js?v=77f4e4ef';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
 

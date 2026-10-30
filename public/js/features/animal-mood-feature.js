@@ -85,16 +85,16 @@
  *   street), animalCrowdReturned, animalCrowdRespawn (armed|rolled).
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g464-2';
-import { nearestSurfaceY } from '../walk-surface.js?v=g478-1';
-import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g463-2';
-import { isInHell } from '../hell.js';
-import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
-import { TRANT_META, trantStatusLabel } from '../trants.js?v=trant-harvest-2';
-import { animalStatusLabel } from '../animals.js?v=g478-1';
-import { quoteAnimalKinship } from '../animal-kinship.js?v=g403-1';
-import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=g478-1';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=g479-2';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=0e86cc0f';
+import { nearestSurfaceY } from '../walk-surface.js?v=c4aff42f';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=628fa0b4';
+import { isInHell } from '../hell.js?v=68b57749';
+import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
+import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
+import { animalStatusLabel } from '../animals.js?v=e857d0af';
+import { quoteAnimalKinship } from '../animal-kinship.js?v=23f74bb3';
+import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=16364589';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=827d24a8';
 import {
   CHECK_ON_REMOVE,
   CROWD_CLASSES,
@@ -114,8 +114,8 @@ import {
   sadnessMax,
   sadnessStart,
   streetWidth,
-} from '../animal-crowding.js?v=g335-1';
-import { GAME_DAY_MS, setLastNewDayTs } from '../game-day.js?v=dametime-4';
+} from '../animal-crowding.js?v=81f4b6ea';
+import { GAME_DAY_MS, setLastNewDayTs } from '../game-day.js?v=3095e05b';
 import {
   CROAK_INTERVAL_MS,
   EAT_PAUSE_MS,
@@ -137,7 +137,7 @@ import {
   piggyWalkSpeed,
   sadPiggyClip,
   satePiggy,
-} from '../animal-mood.js';
+} from '../animal-mood.js?v=a49495fc';
 
 export const ANIMAL_MOOD_FEATURE_ID = 'animal-mood';
 const YARD_TSID = 'RH_HOME_EXT';

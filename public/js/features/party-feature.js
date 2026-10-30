@@ -28,7 +28,7 @@
  * window.groddleParty in multiplayer.
  */
 
-import { STREET_INDEX } from '../street-loader.js?v=g478-1';
+import { STREET_INDEX } from '../street-loader.js?v=20c7b021';
 import {
   PARTY_LOG_LINES,
   PARTY_TEXT,
@@ -38,7 +38,7 @@ import {
   normalizeParty,
   partiersLine,
   partyCommand,
-} from '../party.js?v=mp4-1';
+} from '../party.js?v=b86bf389';
 
 export const PARTY_FEATURE_ID = 'party';
 /** The hit box over another player's Glitch and name plate (realtime-feature PLATE_Y -150). */

@@ -20,8 +20,8 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { expandCatalog, resolveLook } from '../../public/js/avatar-looks.js';
-import { buildNpcLooks } from '../../public/js/npc-glitch-looks.js';
+import { expandCatalog, resolveLook } from '../../public/js/avatar-looks.js?v=64fab53e';
+import { buildNpcLooks } from '../../public/js/npc-glitch-looks.js?v=664e5f24';
 import { execFileSync } from 'node:child_process';
 import { withPage } from './build.mjs';
 

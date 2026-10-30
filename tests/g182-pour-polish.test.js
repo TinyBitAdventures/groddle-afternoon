@@ -15,8 +15,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { WOTD_TOOL, pourApproach, pourDropTip } from '../public/js/wine-pour-fx.js?v=g369-1';
-import { harvestWoodTree, woodMaturityLabel, woodTreeStatusLabel } from '../public/js/woodcutting.js?v=g414-1';
+import { WOTD_TOOL, pourApproach, pourDropTip } from '../public/js/wine-pour-fx.js?v=364e22d2';
+import { harvestWoodTree, woodMaturityLabel, woodTreeStatusLabel } from '../public/js/woodcutting.js?v=4e140315';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');

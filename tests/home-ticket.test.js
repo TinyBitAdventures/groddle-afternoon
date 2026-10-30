@@ -19,9 +19,9 @@ import {
   rockTicketBeats,
   ticketCount,
   useHomeTicket,
-} from '../public/js/home-ticket.js?v=g481-2';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
-import { createHomeState } from '../public/js/homes.js?v=g380-1';
+} from '../public/js/home-ticket.js?v=61ef0eb9';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=85d4faba';
+import { createHomeState } from '../public/js/homes.js?v=385f9a1a';
 
 const spike = join(import.meta.dirname, '..');
 const GS = join(spike, '../glitch-GameServerJS');
@@ -157,7 +157,7 @@ describe('game wiring (G208)', () => {
   });
 
   it('the Home panel without a home is the machine, and Home first asks the rock', () => {
-    assert.match(game, /from '\.\/js\/home-ticket\.js\?v=g\d+-\d+'/);
+    assert.match(game, /from '\.\/js\/home-ticket\.js\?v=[0-9a-f]{8}'/);
     assert.match(game, /if \(!homeState\.owned\) \{[\s\S]{0,200}renderTicketMachine\(body, homeTicketHost\(\)\);/);
     assert.match(game, /function openHomePanel\(\) \{[\s\S]{0,200}if \(!homeState\.owned && offerHomeTicket\(homeTicketHost\(\)\)\)/);
     assert.match(game, /grantHome\(style = 'meadow'\) \{[\s\S]{0,120}imagineHome\(homeState, style, Date\.now\(\)\)/);

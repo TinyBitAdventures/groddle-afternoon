@@ -49,7 +49,7 @@
  * the world view's top-left, or from its right or bottom edge where the
  * original pinned them there, so they follow a view of any size.
  */
-import { stageFor, MIN_PACK_HEIGHT, LOCATION_VIEW_W, VIEW_MAX_W, VIEW_CEIL_H, VIEW_FLOOR_H } from '../location-view.js?v=g476-1';
+import { stageFor, MIN_PACK_HEIGHT, LOCATION_VIEW_W, VIEW_MAX_W, VIEW_CEIL_H, VIEW_FLOOR_H } from '../location-view.js?v=5a0d5c0b';
 
 export const CLASSIC_MIN_W = 960;
 export const CLASSIC_MIN_H = 540;

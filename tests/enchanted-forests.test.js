@@ -9,7 +9,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry, platformsScreen } from '../public/js/street-model.js?v=g478-1';
+import { assertStreetGeometry, platformsScreen } from '../public/js/street-model.js?v=606bae73';
 import {
   ENCHANTED_FORESTS,
   ENCHANTED_MUSIC,
@@ -29,18 +29,18 @@ import {
   normalizeEnchantedTree,
   petEnchantedSeedling,
   seedlingRemainingMs,
-} from '../public/js/enchanted-forests.js?v=g414-1';
+} from '../public/js/enchanted-forests.js?v=dd04e11b';
 import {
   WOOD_TREE_HARVEST,
   harvestWoodTree,
   plankYieldForMaturity,
   quoteWoodTreeHarvest,
   woodTreeStatusLabel,
-} from '../public/js/woodcutting.js?v=g414-1';
-import { noteWoodTreeCare } from '../public/js/patches.js?v=g414-1';
-import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=g485-1';
-import { enchantedForestFeature, floorScreenY, hollowTrees, treeSpots } from '../public/js/features/enchanted-forest-feature.js?v=g478-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-369';
+} from '../public/js/woodcutting.js?v=4e140315';
+import { noteWoodTreeCare } from '../public/js/patches.js?v=3996c344';
+import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=e5c20791';
+import { enchantedForestFeature, floorScreenY, hollowTrees, treeSpots } from '../public/js/features/enchanted-forest-feature.js?v=f7e9d8f3';
+import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

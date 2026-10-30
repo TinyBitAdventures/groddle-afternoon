@@ -22,8 +22,8 @@ import {
   wordTimeline,
   isDismissible,
   heldActionDelta,
-} from '../public/js/word-progress.js?v=g387-1';
-import { WORD_PROGRESS_ART } from '../public/js/word-progress-art.js?v=g387-1';
+} from '../public/js/word-progress.js?v=bffa60ac';
+import { WORD_PROGRESS_ART } from '../public/js/word-progress-art.js?v=bd57f998';
 import { imageSize } from '../tools/word-progress/build.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -245,7 +245,7 @@ describe('in the game', () => {
     for (const html of pages) {
       assert.match(html, /<div id="action-progress" class="word-progress" role="status" aria-live="polite" hidden>/);
       assert.match(html, /<button type="button" class="word-progress-cancel" data-word-cancel aria-label="Cancel" title="Cancel" hidden><\/button>/);
-      assert.match(html, /style\.css\?v=[^"]*&amp;wordprog=g\d+-\d+(?:&amp;[^"]*)?"/);
+      assert.match(html, /href="style\.css\?v=[0-9a-f]{8}"/);
     }
   });
 
@@ -260,7 +260,7 @@ describe('in the game', () => {
     assert.match(game, /wordAnchor\(\{ classId: currentAction\.classId, verbId: currentAction\.verbId, itemX: spr\.x, itemY: spr\.y, itemTop: spr\.y - art, playerX: player\.x \}\)/);
     assert.match(game, /const scale = \(canvas\.clientWidth \|\| canvas\.width \|\| VIEW_W\) \/ VIEW_W;/);
     assert.match(game, /advanceTimedAction\(currentAction, heldActionDelta\(currentAction, deltaMs\)\)/);
-    assert.match(game, /from '\.\/js\/word-progress\.js\?v=g387-1'/);
+    assert.match(game, /from '\.\/js\/word-progress\.js\?v=[0-9a-f]{8}'/);
   });
 
   it('stays the acting player\'s own, as in the source (no realtime message)', () => {

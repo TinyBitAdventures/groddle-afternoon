@@ -50,8 +50,8 @@
  * Solo is untouched.
  */
 
-import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=catalog-unified-7';
-import { teleportEnergyCost } from '../teleportation.js?v=g356-1';
+import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=85d4faba';
+import { teleportEnergyCost } from '../teleportation.js?v=48e4e8de';
 import {
   PARTY_GUESTS,
   PARTY_PACKS,
@@ -80,10 +80,10 @@ import {
   stackAvailable,
   startParty,
   teleporterPhase,
-} from '../party-spaces.js?v=g403-1';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
-import { loseEnergy } from '../metabolics.js';
-import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../party-spaces-mp.js?v=g403-1';
+} from '../party-spaces.js?v=459a8597';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=01a295a1';
+import { loseEnergy } from '../metabolics.js?v=8504134e';
+import { MP_PARTY_TEXT, MP_SPACE_STREET_RE, kickVerb, mpActivationBlock, normalizeSpace, partyFromSpace } from '../party-spaces-mp.js?v=abfc67be';
 
 export const PARTY_FEATURE_ID = 'party-spaces';
 const HOLD = 'party';

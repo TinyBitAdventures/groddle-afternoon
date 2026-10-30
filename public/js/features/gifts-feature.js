@@ -33,11 +33,11 @@
  * giftDrag (none|dragging|over:<id>); window.groddleGifts.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { TOOL_CONDITION_CATALOG, getToolCondition, setToolRemaining } from '../tools.js?v=woodcutting-test-8';
-import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=85d4faba';
+import { TOOL_CONDITION_CATALOG, getToolCondition, setToolRemaining } from '../tools.js?v=9a2e7ef4';
+import { createMinnAccount } from '../minn-account.js?v=81339760';
 // The same key as features/index.js: one module instance holds the carried notes.
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=g485-1';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=7cbe13d9';
 import {
   BOX_SLOTS,
   GIFT_BOX,
@@ -57,7 +57,7 @@ import {
   unwrapGrowl,
   unwrapPack,
   wrapBox,
-} from '../gifts.js?v=g332-1';
+} from '../gifts.js?v=d0732a90';
 
 export const GIFTS_FEATURE_ID = 'gifts';
 export const GIFT_VERB = 'gift_give';

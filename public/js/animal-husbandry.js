@@ -34,17 +34,17 @@
  *   (rolled with the shared js/drop-tables.js runDropTable).
  */
 
-import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=catalog-unified-7';
-import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js';
-import { loseEnergy, loseMood, metabolicGain, moodMax } from './metabolics.js';
-import { grantMoodXp } from './mood-xp.js';
-import { musicblockItemMeta } from './musicblocks.js?v=g403-1';
-import { isEnchantedForest } from './enchanted-forests.js?v=g414-1';
-import { isSymphoniousTsid } from './symphonious-maximus.js?v=g90-1';
-import { isMissingFloorTsid } from './hidden-floors.js?v=g478-1';
-import { stationByTsid } from './subway.js?v=g454-1';
-import { ensurePiggyMood, piggyTwiceDailyTick, satePiggy } from './animal-mood.js';
-import { isCrowdSad } from './animal-crowding.js';
+import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=85d4faba';
+import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js?v=0f922478';
+import { loseEnergy, loseMood, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
+import { grantMoodXp } from './mood-xp.js?v=958e7680';
+import { musicblockItemMeta } from './musicblocks.js?v=35e2b17a';
+import { isEnchantedForest } from './enchanted-forests.js?v=dd04e11b';
+import { isSymphoniousTsid } from './symphonious-maximus.js?v=345ad437';
+import { isMissingFloorTsid } from './hidden-floors.js?v=5ce87a04';
+import { stationByTsid } from './subway.js?v=797a5e9c';
+import { ensurePiggyMood, piggyTwiceDailyTick, satePiggy } from './animal-mood.js?v=a49495fc';
+import { isCrowdSad } from './animal-crowding.js?v=81f4b6ea';
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;

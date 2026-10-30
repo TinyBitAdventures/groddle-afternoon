@@ -58,7 +58,7 @@
  * conversation (the source keeps only the one in progress).
  */
 
-import { CONVERSATIONS, TELLERS } from './conversations-data.js?v=g202-1';
+import { CONVERSATIONS, TELLERS } from './conversations-data.js?v=f11b7e02';
 
 export const CONVERSATION_RULES_SOURCE = 'tinyspeck/glitch-GameServerJS players/inc_conversations.js (CC0)';
 

@@ -14,7 +14,7 @@ import {
   qrazyRewardForLevel,
   quoinDailyLimitFor,
   resetQuoinDay,
-} from '../public/js/quoins.js';
+} from '../public/js/quoins.js?v=d4f4772b';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
 
@@ -154,6 +154,6 @@ describe('quoin client integration', () => {
     assert.match(game, /quoins: quoinState/);
     assert.match(game, /bootParams\.get\('quoincollect'\) === '1'/);
     assert.match(html, /id="quoin-stat"/);
-    assert.match(html, /game\.js\?v=official-ecology-1/);
+    assert.match(html, /game\.js\?v=[0-9a-f]{8}/);
   });
 });

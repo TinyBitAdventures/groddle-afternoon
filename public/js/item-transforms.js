@@ -20,9 +20,9 @@
  * Every verb works on one item or the whole stack, like the source's count.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=catalog-unified-7';
-import { skillPackageDetails } from './skill-packages.js';
-import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js';
+import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=85d4faba';
+import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
+import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js?v=8504134e';
 
 /**
  * Plain transforms: { verb, label, out, energy, mood, keep } per input class.

@@ -11,23 +11,23 @@
  * spend_points, emblem_base doSpend. See quoteFavorSpend / quoteEmblemSpend.
  */
 
-import { levelInfoForXp } from './progression.js?v=progression-1';
+import { levelInfoForXp } from './progression.js?v=33462eaa';
 import {
   ITEM_CATALOG,
   addItem,
   ensureItem,
   isToolItem,
   removeItem,
-} from './inventory.js?v=catalog-unified-7';
+} from './inventory.js?v=85d4faba';
 import {
   GAMESHOW_TICKET_ID,
   gameshowTicketChance,
-} from './spinning-wheel.js?v=spinning-wheel-9';
-import { metabolicGain, moodMax } from './metabolics.js';
-import { grantMoodXp } from './mood-xp.js';
-import { getSkillCatalog } from './content-catalogs.js?v=g403-1';
-import { accelerateActiveStudy, getActiveStudy, maxStudyAcceleration } from './skills.js?v=study-6';
-import { emblemUnlockSkillFor } from './skill-tree.js?v=g403-1';
+} from './spinning-wheel.js?v=be7fe558';
+import { metabolicGain, moodMax } from './metabolics.js?v=8504134e';
+import { grantMoodXp } from './mood-xp.js?v=958e7680';
+import { getSkillCatalog } from './content-catalogs.js?v=10b118dd';
+import { accelerateActiveStudy, getActiveStudy, maxStudyAcceleration } from './skills.js?v=4542bdf9';
+import { emblemUnlockSkillFor } from './skill-tree.js?v=cf7bc81f';
 
 export const EMBLEM_FAVOR_COST = 1000;
 export const EMBLEM_FAVOR_INCREMENT = 100;

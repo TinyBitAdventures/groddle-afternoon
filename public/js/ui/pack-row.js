@@ -21,7 +21,7 @@
  * packItemScrollLeft, packItemScrollMax (as the old items row had).
  */
 
-import { packPageTarget, packPagerState } from '../pack-pager.js?v=original-pager-1';
+import { packPageTarget, packPagerState } from '../pack-pager.js?v=ef8d9e49';
 
 /** The search field's words (the mock's; the client's label was "Search inventory for:"). */
 export const PACK_SEARCH_LABEL = 'Search pack and bags';

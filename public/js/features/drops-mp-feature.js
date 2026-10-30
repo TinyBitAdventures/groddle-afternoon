@@ -39,11 +39,11 @@
  * window.groddleDrops.
  */
 
-import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { TOOL_CONDITION_CATALOG, getToolCondition, setToolRemaining } from '../tools.js?v=woodcutting-test-8';
-import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
-import { saveStore } from '../save-store.js?v=mp2-2';
-import { DROP_OP, DROP_TEXT, dropEffect, eatenStack, groundFrom, isPublicStreet, normalizeGroundStack, normalizeMine, pigAnimalKey, shareReason } from '../drops-mp.js?v=g375-1';
+import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=85d4faba';
+import { TOOL_CONDITION_CATALOG, getToolCondition, setToolRemaining } from '../tools.js?v=9a2e7ef4';
+import { createMinnAccount } from '../minn-account.js?v=81339760';
+import { saveStore } from '../save-store.js?v=b74a8113';
+import { DROP_OP, DROP_TEXT, dropEffect, eatenStack, groundFrom, isPublicStreet, normalizeGroundStack, normalizeMine, pigAnimalKey, shareReason } from '../drops-mp.js?v=00490802';
 
 export const DROPS_MP_FEATURE_ID = 'drops-mp';
 const TABLE_URL = 'assets/content/trade-items.json';

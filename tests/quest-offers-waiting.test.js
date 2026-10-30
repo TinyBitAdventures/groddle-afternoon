@@ -11,10 +11,10 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=g403-1';
-import { createQuestState } from '../public/js/quests.js';
-import { questStatus, waitingOffers } from '../public/js/quest-offers.js?v=g403-1';
-import { questCountToast, questOffersFeature, showWaitingOffer } from '../public/js/features/quest-offers-feature.js?v=g425-1';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
+import { createQuestState } from '../public/js/quests.js?v=282e1621';
+import { questStatus, waitingOffers } from '../public/js/quest-offers.js?v=6b6cbf22';
+import { questCountToast, questOffersFeature, showWaitingOffer } from '../public/js/features/quest-offers-feature.js?v=243877f6';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');

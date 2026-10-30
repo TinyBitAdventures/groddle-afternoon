@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js';
+import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js?v=6f758e09';
 import {
   RECIPE_CATALOG,
   TOOL_CATALOG,
@@ -17,13 +17,13 @@ import {
   loadRecipeCatalogFromFile,
   starterCraftIngredients,
   starterToolsInventory,
-} from '../public/js/making.js?v=g403-1';
+} from '../public/js/making.js?v=9e538296';
 import {
   ITEM_CATALOG,
   countItem,
   createInventory,
   listPackToolSlots,
-} from '../public/js/inventory.js?v=catalog-unified-7';
+} from '../public/js/inventory.js?v=85d4faba';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
@@ -152,7 +152,7 @@ describe('Fruit Changing interface wiring', () => {
     assert.match(css, /@keyframes make-tool-sheet/);
     const making = readFileSync(join(publicRoot, 'js/making.js'), 'utf8');
     assert.match(making, /recipes\.json\?v=fruit-machine-2/);
-    assert.match(html, /game\.js\?v=(?:official-ecology-1|trant-harvest-[12]|badge-events-1|butterfly-care-1|feed-picker-1|animal-kinship-[12]|trant-care-[1-3]|woodcutting-[1-4]|dialogue-[1-3]|movement-1|food-memory-1|dametime-1|fruit-machine-2|vendor-profiles-1|world-items-[12]|world-persistence-1|shrines-[1-4]|quoins-[12]|item-buffs-[12]|tool-condition-1)/);
-    assert.match(html, /style\.css\?v=(?:feed-picker-1|trant-care-[1-3]|woodcutting-[1-4]|dialogue-[1-3]|movement-1|food-memory-1|dametime-1|fruit-machine-2|shrines-1|quoins-1|item-buffs-1|tool-condition-1)/);
+    assert.match(html, /game\.js\?v=[0-9a-f]{8}/);
+    assert.match(html, /style\.css\?v=[0-9a-f]{8}/);
   });
 });

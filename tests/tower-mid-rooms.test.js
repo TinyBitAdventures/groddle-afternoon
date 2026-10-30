@@ -10,8 +10,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FRAME_DT_CAP, assertStreetGeometry, platformYAt, resolveGround } from '../public/js/street-model.js?v=g478-1';
-import { insideBottomRect } from '../public/js/doors.js';
+import { FRAME_DT_CAP, assertStreetGeometry, platformYAt, resolveGround } from '../public/js/street-model.js?v=606bae73';
+import { insideBottomRect } from '../public/js/doors.js?v=eb9510b1';
 import {
   GREETERBOT,
   MEZZ,
@@ -28,10 +28,10 @@ import {
   boxToScreen,
   midTowerRoomByTsid,
   midTowerRoomStreet,
-} from '../public/js/tower-mid-rooms.js';
-import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=g464-2';
-import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js';
-import { populationForStreet } from '../public/js/street-ecology.js';
+} from '../public/js/tower-mid-rooms.js?v=15143f80';
+import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=00b35857';
+import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=b6ae268a';
+import { populationForStreet } from '../public/js/street-ecology.js?v=dbcefe18';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

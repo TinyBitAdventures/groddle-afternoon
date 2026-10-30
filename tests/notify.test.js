@@ -24,8 +24,8 @@ import {
   REPEAT_MS,
   GAIN_BATCH_MS,
   FLOAT_LINE_PX,
-} from '../public/js/notify.js?v=g459-1';
-import { REMAKE_SCREEN_GATES, SCREEN_GATES, screenQueueHold, waitForScreenGates } from '../public/js/screen-queue.js?v=g459-1';
+} from '../public/js/notify.js?v=3383e8be';
+import { REMAKE_SCREEN_GATES, SCREEN_GATES, screenQueueHold, waitForScreenGates } from '../public/js/screen-queue.js?v=cf0132c0';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -356,7 +356,7 @@ describe('one module: no direct notice DOM writes outside it', () => {
     const game = read('public/game.js');
     assert.match(game, /function toast\(msg, ms = 3000\) \{\n\s+notify\.notice\(wholeStatAmounts\(msg\), \{ ms \}\);\n\}/);
     assert.match(game, /function pushActivity\(msg\) \{[\s\S]{0,400}notify\.activity\(msg, \{ labelOf \}\);/);
-    assert.match(game, /import \{ createNotifier[^}]*\} from '\.\/js\/notify\.js\?v=g\d+-\d+';/);
+    assert.match(game, /import \{ createNotifier[^}]*\} from '\.\/js\/notify\.js\?v=[0-9a-f]{8}';/);
     // The engine's toast and pushActivity are those functions (features call engine.toast).
     assert.match(game, /\n  toast,\n  pushActivity,\n/);
   });

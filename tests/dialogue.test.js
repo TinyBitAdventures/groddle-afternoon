@@ -10,8 +10,8 @@ import {
   hasDialogue,
   nextDialogue,
   formatSpokenLine,
-} from '../public/js/dialogue.js';
-import { runVerb } from '../public/content.js?v=g478-1';
+} from '../public/js/dialogue.js?v=fcfed1af';
+import { runVerb } from '../public/content.js?v=e2372a6b';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

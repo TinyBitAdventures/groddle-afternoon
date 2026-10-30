@@ -7,7 +7,7 @@ import {
   packPagerState,
   packPageStep,
   packPageTarget,
-} from '../public/js/pack-pager.js';
+} from '../public/js/pack-pager.js?v=ef8d9e49';
 
 const here = dirname(fileURLToPath(import.meta.url));
 

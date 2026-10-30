@@ -17,7 +17,7 @@
  * floor platform at `floorY`.
  */
 
-import { WALLPAPER_MAPS, WALLPAPER_PIECES } from './home-wallpaper-art.js?v=home-wallpaper-art-2';
+import { WALLPAPER_MAPS, WALLPAPER_PIECES } from './home-wallpaper-art.js?v=9f8473e6';
 
 export const PIECE_DIR = 'assets/homes/wallpaper/';
 export const SEG = 150;

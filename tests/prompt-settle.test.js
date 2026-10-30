@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createPromptSettler, promptId } from '../public/js/prompt-settle.js';
+import { createPromptSettler, promptId } from '../public/js/prompt-settle.js?v=509ba9cc';
 
 const climb = { key: '↑', label: 'climb' };
 const climbing = { key: '↑↓', label: 'climb · Space jump' };

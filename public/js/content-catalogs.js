@@ -7,7 +7,7 @@
  * register G62): 2011 skills the late inc_data_skills.js no longer has.
  */
 
-import { withBetterLearning } from './better-learning.js?v=g403-1';
+import { withBetterLearning } from './better-learning.js?v=044ff9ff';
 
 const CACHE = {
   quests: null,

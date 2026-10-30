@@ -43,10 +43,10 @@
  * hallWallTint (hex, once the wall tiles are tinted).
  */
 
-import { insideBottomRect } from '../doors.js';
-import { assignQuest } from '../quests.js?v=item-buffs-7';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
-import { pixiSpeed } from '../sprite-sheets.js?v=g464-2';
+import { insideBottomRect } from '../doors.js?v=eb9510b1';
+import { assignQuest } from '../quests.js?v=282e1621';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=01a295a1';
+import { pixiSpeed } from '../sprite-sheets.js?v=0e86cc0f';
 import {
   GREETERBOT,
   MEZZANINE_TSID,
@@ -54,8 +54,8 @@ import {
   STOOT_RETURN,
   boxToScreen,
   midTowerRoomByTsid,
-} from '../tower-mid-rooms.js?v=mid-tower-4';
-import { CLICK_ANYWHERE, HALL, HALL_ART, HALL_ART_ROOT, HALL_BUTTON_CLASS, HALL_WIDGET, WALL_BUTTON } from '../hall-rejected-concepts.js';
+} from '../tower-mid-rooms.js?v=15143f80';
+import { CLICK_ANYWHERE, HALL, HALL_ART, HALL_ART_ROOT, HALL_BUTTON_CLASS, HALL_WIDGET, WALL_BUTTON } from '../hall-rejected-concepts.js?v=fc452e86';
 
 export const MID_TOWER_FEATURE_ID = 'mid-tower';
 export const ROOK_HALL_START = 'rook_hall_start';

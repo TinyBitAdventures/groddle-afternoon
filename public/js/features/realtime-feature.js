@@ -45,13 +45,13 @@
  * administrator sent you to, once there); window.groddleRealtime in multiplayer.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
-import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=g409-1';
-import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js';
-import { movedLine } from '../admin-teleport.js?v=g406-1';
-import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=g407-1';
-import { saveStore } from '../save-store.js?v=mp2-2';
-import { STREET_INDEX } from '../street-loader.js?v=g478-1';
+import { createMinnAccount } from '../minn-account.js?v=81339760';
+import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=8894c637';
+import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
+import { movedLine } from '../admin-teleport.js?v=fa56e8df';
+import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=430d51e0';
+import { saveStore } from '../save-store.js?v=b74a8113';
+import { STREET_INDEX } from '../street-loader.js?v=20c7b021';
 
 export const REALTIME_FEATURE_ID = 'realtime';
 /** Lines kept in the chat log. */

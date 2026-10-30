@@ -4,15 +4,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=g388-1';
+import { SOUND_ALIASES, SOUND_FILES, SOUND_KEY_COUNTS } from '../public/js/sound-keys.js?v=2d82d399';
 import {
   SYNTH_KEY_RECIPES,
   SYNTH_RECIPE_NAMES,
   SYNTH_RECIPES,
   playSynthRecipe,
   recipeForKey,
-} from '../public/js/synth-sfx.js?v=g388-1';
-import { createSoundBoard, resolveSound } from '../public/js/sound-board.js';
+} from '../public/js/synth-sfx.js?v=9853c8e7';
+import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=a1c4a308';
 import {
   LEGACY_SFX_KEYS,
   actionLoopFor,
@@ -23,7 +23,7 @@ import {
   soundForPanel,
   soundForQuoin,
   soundForVerb,
-} from '../public/js/sound-moments.js';
+} from '../public/js/sound-moments.js?v=2f8597cd';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const pub = path.join(root, 'public');

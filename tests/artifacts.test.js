@@ -29,13 +29,13 @@ import {
   pieceOdds,
   rollCrack,
   stackMaxFor,
-} from '../public/js/artifacts.js';
-import { artifactsFeature, finishCrack } from '../public/js/features/artifacts-feature.js?v=g463-2';
-import { FEATURES } from '../public/js/features/index.js?v=registry-369';
-import { DROP_ITEMS, DROP_TABLES, rollDropTable } from '../public/js/drop-tables.js';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=woodcutting-test-8';
-import { HIRES_ICONS } from '../public/js/icon-hires.js?v=g446-4';
+} from '../public/js/artifacts.js?v=fc419ecf';
+import { artifactsFeature, finishCrack } from '../public/js/features/artifacts-feature.js?v=39c17a5f';
+import { FEATURES } from '../public/js/features/index.js?v=d14194dd';
+import { DROP_ITEMS, DROP_TABLES, rollDropTable } from '../public/js/drop-tables.js?v=0f922478';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=85d4faba';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=9a2e7ef4';
+import { HIRES_ICONS } from '../public/js/icon-hires.js?v=5357d4b4';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '../glitch-GameServerJS');

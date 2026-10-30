@@ -30,14 +30,14 @@
  * profileAboutSaved (saved, failed).
  */
 
-import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
-import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-compositor.js';
-import { drawListBounds } from '../avatar-rig.js';
-import { lookKey, resolveLook } from '../avatar-looks.js';
+import { createMinnAccount } from '../minn-account.js?v=81339760';
+import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-compositor.js?v=dcd906ae';
+import { drawListBounds } from '../avatar-rig.js?v=b67f0da8';
+import { lookKey, resolveLook } from '../avatar-looks.js?v=64fab53e';
 import {
   AVATAR_FRAME, AVATAR_STILL, AVATAR_TILE, FAILURE_BACKOFF_MS, HOME_MAX_BYTES, HOME_SETTLE_MS, HOME_WIDTHS, PICTURE_RESOLUTION, PROFILE_COPY,
   aboutCounter, avatarKeyOf, base64Bytes, homeKeyOf, pngBase64, shouldUpload, stillTransform,
-} from '../profiles.js?v=play-1';
+} from '../profiles.js?v=e5edbd6a';
 
 export const PROFILES_FEATURE_ID = 'profiles';
 

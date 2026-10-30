@@ -38,11 +38,11 @@
  * `killTree` are the hooks; trees grown here die through `killPlotTree`.
  */
 
-import { ensureItem } from '../inventory.js?v=catalog-unified-7';
-import { platformYAt } from '../street-model.js?v=g478-1';
-import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=g485-1';
-import { trantStatusLabel } from '../trants.js?v=trant-harvest-2';
-import { woodTreeStatusLabel } from '../woodcutting.js?v=g414-1';
+import { ensureItem } from '../inventory.js?v=85d4faba';
+import { platformYAt } from '../street-model.js?v=606bae73';
+import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=dbcefe18';
+import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
+import { woodTreeStatusLabel } from '../woodcutting.js?v=4e140315';
 import {
   GROWN_TREE_LABELS,
   SEASONED_BEANS,
@@ -62,10 +62,10 @@ import {
   soilSpawnClasses,
   soilSpritePaths,
   tickPlot,
-} from '../patches.js?v=g414-1';
-import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js';
-import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=woodcutting-test-8';
-import { slugsFromEffects } from '../speech-slugs.js?v=g412-1';
+} from '../patches.js?v=3996c344';
+import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=01a295a1';
+import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=9a2e7ef4';
+import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 
 export const PATCHES_FEATURE_ID = 'patches';
 export const SOIL_GROUP_PREFIX = 'soil:';
