@@ -34,7 +34,7 @@ function fnBody(src, name) {
 
 describe('ORBERA: the orb just above the name labels', () => {
   it('stands its ball just clear of a name plate, the count on the orb', async () => {
-    const { ORB_ART } = await import('../public/js/features/rook-attack-feature.js?v=g458-1');
+    const { ORB_ART } = await import('../public/js/features/rook-attack-feature.js?v=g464-1');
     const plateY = Number(read('js/features/realtime-feature.js').match(/const PLATE_Y = (-\d+);/)[1]);
     // The plate's text bottom is PLATE_Y; 12 px text plus its 4 px pad puts the top about 20 px higher.
     const plateTop = -plateY + 20;

@@ -248,6 +248,30 @@
    {"path": "assets/sprites/quest-rooms/penalty/vendor_talk.webp", "label": "talk", "fw": 187, "fh": 91, "cols": 5, "frames": 72},
    {"path": "assets/sprites/quest-rooms/penalty/vendor_walk.webp", "label": "walk", "fw": 187, "fh": 91, "cols": 4, "frames": 16}
   ] },
+  {"name": "gardening-vendor", "swf": "inhabitants/gardening_vendor/npc_gardening_vendor.swf", "sprite": 53, "sheets": [
+   {"path": "assets/sprites/vendors/npc_gardening_vendor_idle.webp", "label": "idle_stand", "fw": 155, "fh": 183, "cols": 8, "frames": 110},
+   {"path": "assets/sprites/vendors/npc_gardening_vendor_talk.webp", "label": "talk", "fw": 155, "fh": 183, "cols": 8, "frames": 26}
+  ] },
+  {"name": "meal-vendor", "swf": "inhabitants/meal_vendor/npc_cooking_vendor.swf", "sprite": 116, "sheets": [
+   {"path": "assets/sprites/vendors/npc_cooking_vendor_idle.webp", "label": "idle_stand", "fw": 179, "fh": 212, "cols": 8, "frames": 193},
+   {"path": "assets/sprites/vendors/npc_cooking_vendor_talk.webp", "label": "talk", "fw": 179, "fh": 212, "cols": 8, "frames": 36}
+  ] },
+  {"name": "tool-vendor", "swf": "inhabitants/tool_vendor/npc_tool_vendor.swf", "sprite": 102, "sheets": [
+   {"path": "assets/sprites/vendors/npc_tool_vendor_idle.webp", "label": "idle_stand", "fw": 172, "fh": 228, "cols": 8, "frames": 36, "shift": 117},
+   {"path": "assets/sprites/vendors/npc_tool_vendor_talk.webp", "label": "talk", "fw": 172, "fh": 228, "cols": 8, "frames": 26}
+  ] },
+  {"name": "uncle-friendly", "swf": "inhabitants/uncle_friendly/npc_jabba1.swf", "sprite": 187, "sheets": [
+   {"path": "assets/sprites/vendors/npc_jabba1_idle.webp", "label": "idle_stand", "fw": 242, "fh": 191, "cols": 8, "frames": 48},
+   {"path": "assets/sprites/vendors/npc_jabba1_talk.webp", "label": "talk", "fw": 242, "fh": 191, "cols": 8, "frames": 53}
+  ] },
+  {"name": "sno-cone-vending-machine", "swf": "inhabitants/sno_cone_vending_machine/npc_sno_cone_vending_machine.swf", "sprite": 79, "sheets": [
+   {"path": "assets/sprites/vendors/npc_sno_cone_vending_machine_idle.webp", "label": "idle_stand", "fw": 167, "fh": 193, "cols": 8, "frames": 62},
+   {"path": "assets/sprites/vendors/npc_sno_cone_vending_machine_talk.webp", "label": "talk", "fw": 167, "fh": 193, "cols": 8, "frames": 20}
+  ] },
+  {"name": "helga", "swf": "inhabitants/helga/npc_jabba2.swf", "sprite": 251, "sheets": [
+   {"path": "assets/sprites/vendors/npc_jabba2_idle.webp", "label": "idle_stand", "fw": 195, "fh": 193, "cols": 8, "frames": 185},
+   {"path": "assets/sprites/vendors/npc_jabba2_talk.webp", "label": "talk", "fw": 195, "fh": 193, "cols": 8, "frames": 72}
+  ] },
   {"name": "fox-ranger", "swf": "inhabitants/fox_ranger/npc_fox_ranger.swf", "sprite": 28, "sheets": [
    {"path": "assets/sprites/foxes/ranger-idle0.png", "label": "idle0", "fw": 62, "fh": 105, "cols": 1, "frames": 1},
    {"path": "assets/sprites/foxes/ranger-idle1.png", "label": "idle1", "fw": 62, "fh": 105, "cols": 9, "frames": 9},

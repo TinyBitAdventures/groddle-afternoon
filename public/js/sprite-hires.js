@@ -589,6 +589,11 @@ export const HIRES_SPRITES = new Map([
   ["assets/sprites/trants/frames/trant_spice_m3.png", "assets/sprites/trants/frames/trant_spice_m3@3x.webp"],
   ["assets/sprites/trants/frames/trant_spice_m5.png", "assets/sprites/trants/frames/trant_spice_m5@3x.webp"],
   ["assets/sprites/trants/frames/trant_spice_m7.png", "assets/sprites/trants/frames/trant_spice_m7@3x.webp"],
+  ["assets/sprites/vendors/npc_cooking_vendor_talk.webp", "assets/sprites/vendors/npc_cooking_vendor_talk@3x.webp"],
+  ["assets/sprites/vendors/npc_gardening_vendor_talk.webp", "assets/sprites/vendors/npc_gardening_vendor_talk@3x.webp"],
+  ["assets/sprites/vendors/npc_sno_cone_vending_machine_talk.webp", "assets/sprites/vendors/npc_sno_cone_vending_machine_talk@3x.webp"],
+  ["assets/sprites/vendors/npc_tool_vendor_idle.webp", "assets/sprites/vendors/npc_tool_vendor_idle@3x.webp"],
+  ["assets/sprites/vendors/npc_tool_vendor_talk.webp", "assets/sprites/vendors/npc_tool_vendor_talk@3x.webp"],
   ["assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.png", "assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445@3x.webp"],
 ]);
 
@@ -639,6 +644,13 @@ export const SPLIT_SPRITES = new Map([
   ["assets/sprites/smuggling/smuggler_red_2_idleWithBox.webp", { fw: 251, fh: 186, cols: 16, parts: [["assets/sprites/smuggling/smuggler_red_2_idleWithBox.p1@3x.webp", 0, 37, 3], ["assets/sprites/smuggling/smuggler_red_2_idleWithBox.p2@3x.webp", 37, 37, 3], ["assets/sprites/smuggling/smuggler_red_2_idleWithBox.p3@3x.webp", 74, 35, 5]] }],
   ["assets/sprites/smuggling/smuggler_red_2_talkNoBox.webp", { fw: 251, fh: 186, cols: 15, parts: [["assets/sprites/smuggling/smuggler_red_2_talkNoBox.p1@3x.webp", 0, 36, 6], ["assets/sprites/smuggling/smuggler_red_2_talkNoBox.p2@3x.webp", 36, 36, 6]] }],
   ["assets/sprites/smuggling/smuggler_red_2_talkWithBox.webp", { fw: 251, fh: 186, cols: 15, parts: [["assets/sprites/smuggling/smuggler_red_2_talkWithBox.p1@3x.webp", 0, 36, 6], ["assets/sprites/smuggling/smuggler_red_2_talkWithBox.p2@3x.webp", 36, 36, 6]] }],
+  ["assets/sprites/vendors/npc_cooking_vendor_idle.webp", { fw: 179, fh: 212, cols: 8, parts: [["assets/sprites/vendors/npc_cooking_vendor_idle.p1@3x.webp", 0, 49, 7], ["assets/sprites/vendors/npc_cooking_vendor_idle.p2@3x.webp", 49, 49, 7], ["assets/sprites/vendors/npc_cooking_vendor_idle.p3@3x.webp", 98, 49, 7], ["assets/sprites/vendors/npc_cooking_vendor_idle.p4@3x.webp", 147, 46, 8]] }],
+  ["assets/sprites/vendors/npc_gardening_vendor_idle.webp", { fw: 155, fh: 183, cols: 8, parts: [["assets/sprites/vendors/npc_gardening_vendor_idle.p1@3x.webp", 0, 55, 11], ["assets/sprites/vendors/npc_gardening_vendor_idle.p2@3x.webp", 55, 55, 11]] }],
+  ["assets/sprites/vendors/npc_jabba1_idle.webp", { fw: 242, fh: 191, cols: 8, parts: [["assets/sprites/vendors/npc_jabba1_idle.p1@3x.webp", 0, 24, 4], ["assets/sprites/vendors/npc_jabba1_idle.p2@3x.webp", 24, 24, 4]] }],
+  ["assets/sprites/vendors/npc_jabba1_talk.webp", { fw: 242, fh: 191, cols: 8, parts: [["assets/sprites/vendors/npc_jabba1_talk.p1@3x.webp", 0, 27, 3], ["assets/sprites/vendors/npc_jabba1_talk.p2@3x.webp", 27, 26, 2]] }],
+  ["assets/sprites/vendors/npc_jabba2_idle.webp", { fw: 195, fh: 193, cols: 8, parts: [["assets/sprites/vendors/npc_jabba2_idle.p1@3x.webp", 0, 47, 6], ["assets/sprites/vendors/npc_jabba2_idle.p2@3x.webp", 47, 47, 6], ["assets/sprites/vendors/npc_jabba2_idle.p3@3x.webp", 94, 47, 6], ["assets/sprites/vendors/npc_jabba2_idle.p4@3x.webp", 141, 44, 4]] }],
+  ["assets/sprites/vendors/npc_jabba2_talk.webp", { fw: 195, fh: 193, cols: 8, parts: [["assets/sprites/vendors/npc_jabba2_talk.p1@3x.webp", 0, 36, 6], ["assets/sprites/vendors/npc_jabba2_talk.p2@3x.webp", 36, 36, 6]] }],
+  ["assets/sprites/vendors/npc_sno_cone_vending_machine_idle.webp", { fw: 167, fh: 193, cols: 8, parts: [["assets/sprites/vendors/npc_sno_cone_vending_machine_idle.p1@3x.webp", 0, 31, 8], ["assets/sprites/vendors/npc_sno_cone_vending_machine_idle.p2@3x.webp", 31, 31, 8]] }],
 ]);
 
 /**
@@ -1223,6 +1235,18 @@ export const FIRST_DRAW_SPRITES = new Set([
   "assets/sprites/trants/frames/trant_spice_m3.png",
   "assets/sprites/trants/frames/trant_spice_m5.png",
   "assets/sprites/trants/frames/trant_spice_m7.png",
+  "assets/sprites/vendors/npc_cooking_vendor_idle.webp",
+  "assets/sprites/vendors/npc_cooking_vendor_talk.webp",
+  "assets/sprites/vendors/npc_gardening_vendor_idle.webp",
+  "assets/sprites/vendors/npc_gardening_vendor_talk.webp",
+  "assets/sprites/vendors/npc_jabba1_idle.webp",
+  "assets/sprites/vendors/npc_jabba1_talk.webp",
+  "assets/sprites/vendors/npc_jabba2_idle.webp",
+  "assets/sprites/vendors/npc_jabba2_talk.webp",
+  "assets/sprites/vendors/npc_sno_cone_vending_machine_idle.webp",
+  "assets/sprites/vendors/npc_sno_cone_vending_machine_talk.webp",
+  "assets/sprites/vendors/npc_tool_vendor_idle.webp",
+  "assets/sprites/vendors/npc_tool_vendor_talk.webp",
   "assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.png",
 ]);
 

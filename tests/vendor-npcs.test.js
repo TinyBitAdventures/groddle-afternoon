@@ -180,6 +180,24 @@ describe('vendor NPC art', () => {
       assert.ok(a.x > 0 && a.x < 1 && a.y === 1, cls);
     }
   });
+
+  it('swaps every strip to a 3x render of its vector SWF on first draw, frame for frame', async () => {
+    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, SPLIT_SPRITES } = await import('../public/js/sprite-hires.js?v=g464-1');
+    const results = JSON.parse(readFileSync(join(PUBLIC, '../tools/vector-sprites/results.json'), 'utf8'));
+    for (const cls of VENDOR_NPC_CLASSES) {
+      for (const [state, art] of Object.entries(VENDOR_NPC_ART[cls].states)) {
+        const sheet = vendorSheet(cls, state);
+        const r = results[sheet.path];
+        assert.equal(r?.status, 'ok', `${sheet.path} ${r?.reason || ''}`);
+        assert.ok(FIRST_DRAW_SPRITES.has(sheet.path), sheet.path);
+        assert.ok(HIRES_SPRITES.has(sheet.path) || SPLIT_SPRITES.has(sheet.path), sheet.path);
+        // Same cells (the crop), same run of SWF frames: the strip's first kept frame, unmirrored.
+        assert.deepEqual([r.fw, r.fh, r.cells, r.mirror, r.shift], [art.crop.w, art.crop.h, art.frames, false, art.first || 0], sheet.path);
+        assert.equal(r.swfFrames[1] - r.swfFrames[0], art.frames - 1, sheet.path);
+        assert.ok(r.score >= 0.95 && r.minFrame >= 0.85, `${sheet.path} ${r.score} ${r.minFrame}`);
+      }
+    }
+  });
 });
 
 describe('Meet the Merchants', () => {

@@ -18,7 +18,7 @@ import {
   pointAtPart,
   sourceSheet,
   upgradeSource,
-} from '../public/js/sprite-hires.js?v=g448-4';
+} from '../public/js/sprite-hires.js?v=g464-1';
 import { packParts } from '../tools/vector-sprites/build.mjs';
 
 /** A js/textures.js stand-in: records the URL routes it is given. */
@@ -62,7 +62,10 @@ const SHARP = [
   'dustbunny', 'ilmenskie-jones', 'forehorseman', 'rook-head', 'rooked-piggy', 'rooked-chicken',
   // rooked-butterfly left (G316): its only SWF is a Wayback copy in no CC0 release, so it stays 1x.
   'sad-kitty', 'gwendolyn', 'cactus', 'crab', 'myopic-frog', 'maintenance-bot',
-  'fox-ranger', 'fox-bait', 'juju-red', 'juju-green', 'juju-yellow',
+  'fox-ranger', 'fox-bait',
+  // The street vendors (js/vendor-npcs.js VENDOR_NPC_ART: cropped 8-column strips, idle loop + talk).
+  'gardening-vendor', 'meal-vendor', 'tool-vendor', 'uncle-friendly', 'helga', 'sno-cone-vending-machine',
+  'juju-red', 'juju-green', 'juju-yellow',
   ...['red', 'green', 'yellow'].flatMap((v) => ['blue', 'black', 'red'].map((b) => `juju-bandit-${v}-${b}`)),
   ...['alph', 'cosma', 'friendly', 'grendaline', 'humbaba', 'lem', 'mab', 'pot', 'spriggan', 'ti', 'zille'].map((g) => `shrine-${g}`),
 ];

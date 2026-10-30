@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 765,
+  "commits": 766,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "A note's red pin shows whole instead of being cut off at the top"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-29",
     "kind": "improve",
     "text": "Loading-card street pictures are sharp on Retina screens"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "improve",
-    "text": "Every rainbow the game shows draws sharp on Retina screens"
    }
   ]
  },

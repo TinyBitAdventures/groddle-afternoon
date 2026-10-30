@@ -216,7 +216,7 @@ describe('mail npc art (tools/mail-npc-art/build.mjs)', () => {
   });
 
   it('G448: the frog\'s 28 sheets have 3x renders from npc_yoga_frog.swf that swap in on first draw', async () => {
-    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=g448-4');
+    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=g464-1');
     const results = JSON.parse(readFileSync(join(root, 'tools/vector-sprites/results.json'), 'utf8'));
     let n = 0;
     for (const label of Object.keys(FROG_ART.sheets)) {
