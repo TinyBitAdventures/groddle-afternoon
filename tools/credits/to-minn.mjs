@@ -30,6 +30,9 @@ export const SECTIONS = [
     'The sounds are Tiny Speck’s original recordings, shipped as the originals: from the Glitch audio sets on archive.org (most tagged CC0, one untagged) and from Glitch’s own servers through the Wayback Machine.',
     'Sounds that were never recovered play short tones the game makes itself.',
   ]],
+  ['Type', [
+    'The game’s type is <a href="https://github.com/googlefonts/nunito">Nunito</a> by The Nunito Project Authors, served from this site under the SIL Open Font License 1.1 (its licence sits beside the font files, in <code>assets/fonts/nunito/OFL.txt</code>).',
+  ]],
   ['The Glitch name', [
     'The Glitch name and logo belong to Tiny Speck and were never part of their release. Groddle Afternoon uses no Glitch logo, and it is not made by or affiliated with Tiny Speck or Slack.',
   ]],

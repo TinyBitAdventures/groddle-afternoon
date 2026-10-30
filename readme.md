@@ -107,5 +107,9 @@ Slack's sounds on archive.org. Tiny Speck's public-domain page names its art, no
 for the sounds this rests on those uploads. Sounds that were never recovered play short tones the
 game makes itself. Thank you, Tiny Speck, and everyone who played and recorded the game.
 
+The game's type is [Nunito](https://github.com/googlefonts/nunito) by The Nunito Project Authors,
+served from this site (`public/assets/fonts/nunito/`) under the
+[SIL Open Font License 1.1](public/assets/fonts/nunito/OFL.txt).
+
 Groddle Afternoon is a fan project. It is not affiliated with or endorsed by Tiny Speck or Slack,
 and it does not use the Glitch name or logo.

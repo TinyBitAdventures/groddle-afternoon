@@ -14,12 +14,17 @@
 :root {
   /* Fonts */
   --font-ui: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
-  --font-round: Nunito, "Trebuchet MS", sans-serif;
+  --font-round: Nunito, ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", sans-serif; /* self-hosted: @font-face below the block */
   --font-serif: Georgia, "Times New Roman", serif;
   --font-system: system-ui, sans-serif;
   --font-arial: Arial, "Helvetica Neue", sans-serif;
   --font-sans: sans-serif;
   --font-mono: ui-monospace, monospace;
+
+  /* Weights (the modern skin's text is Nunito 600; bold 700, heavy 800) */
+  --fw-regular: 600;
+  --fw-bold: 700;
+  --fw-heavy: 800;
 
   /* Type scale */
   --fs-2xs: 0.625rem;  /* 10px */
@@ -662,9 +667,50 @@
   --overlay-dim: rgba(0, 0, 0, 0.4);
   --shadow: rgba(40, 30, 20, 0.16);
 }
+/* Modern skin (<html data-ui="modern">, the default): Nunito is the UI font. A Classic skin keeps --font-ui. */
+:root[data-ui="modern"] {
+  --font-ui: var(--font-round);
+}
 /* == tokens:end == */
 
+/* Nunito (The Nunito Project Authors, SIL Open Font License 1.1: assets/fonts/nunito/OFL.txt), served from
+   this site: one variable file per style and subset (Google Fonts' woff2 cuts), never a request to Google.
+   The play pages preload the roman latin file. */
+@font-face {
+  font-family: Nunito;
+  font-style: normal;
+  font-weight: 200 1000;
+  font-display: swap;
+  src: url("assets/fonts/nunito/nunito-roman-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: Nunito;
+  font-style: normal;
+  font-weight: 200 1000;
+  font-display: swap;
+  src: url("assets/fonts/nunito/nunito-roman-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: Nunito;
+  font-style: italic;
+  font-weight: 200 1000;
+  font-display: swap;
+  src: url("assets/fonts/nunito/nunito-italic-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: Nunito;
+  font-style: italic;
+  font-weight: 200 1000;
+  font-display: swap;
+  src: url("assets/fonts/nunito/nunito-italic-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 :root { font-family: var(--font-ui); }
+:root[data-ui="modern"] { font-weight: var(--fw-regular); }
 
 * { box-sizing: border-box; }
 

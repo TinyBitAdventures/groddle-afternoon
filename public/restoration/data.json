@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 769,
+  "commits": 770,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "The Qurazy banner no longer draws over an open note or window"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-29",
     "kind": "improve",
     "text": "Legalize It and We're Off to See the Lizard run on the real subway stations and street"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "new",
-    "text": "The tutorial is Tiny Speck's own clouds, giant words and training rooms"
    }
   ]
  },
- "tests": 431,
+ "tests": 432,
  "generatedAt": "2026-10-30"
 }

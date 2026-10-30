@@ -124,7 +124,7 @@ function swap(html, find, replace, label) {
 /** The multiplayer page made from the solo shell's markup. */
 export function buildOnlinePage(play) {
   let html = play;
-  html = swap(html, '<!DOCTYPE html>\n<html lang="en">', '<!DOCTYPE html>\n<!-- Generated from play/index.html by tools/play-online/build.mjs: edit that page or the builder, never this file. -->\n<html lang="en" data-mode="multiplayer">', 'its <html> tag');
+  html = swap(html, '<!DOCTYPE html>\n<!-- data-ui: the interface skin. "modern" (the default) scopes the modern HUD\'s CSS and markup; a Classic skin can replace it. -->\n<html lang="en" data-ui="modern">', '<!DOCTYPE html>\n<!-- Generated from play/index.html by tools/play-online/build.mjs: edit that page or the builder, never this file. -->\n<!-- data-ui: the interface skin. "modern" (the default) scopes the modern HUD\'s CSS and markup; a Classic skin can replace it. -->\n<html lang="en" data-ui="modern" data-mode="multiplayer">', 'its <html> tag');
   html = swap(html, /  <!-- The game lives at \/play\/;[^\n]*-->\n  <base href="\.\.\/" \/>/, `  <!-- The multiplayer entry lives at /play/online/; every path stays relative to the site root. -->\n  <base href="../../" />\n${MODE_ENTRY}`, 'its <base>');
   html = swap(html, '<title>Groddle Afternoon</title>', '<meta name="robots" content="noindex" />\n  <title>Groddle Afternoon · Multiplayer</title>', 'its <title>');
   html = swap(html, /  <!-- \?practice=1:[^\n]*-->\n  <script src="js\/practice-mode\.js[^"]*"><\/script>\n/, '', 'the practice-mode script');

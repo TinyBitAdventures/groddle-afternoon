@@ -150,7 +150,7 @@ describe('/play/online/ entry page', () => {
     assert.equal(scripts[0], '<script id="mode-entry">');
     assert.ok(html.indexOf('<script id="mode-entry">') < html.indexOf('<link'), 'ahead of every stylesheet and asset');
     assert.doesNotMatch(markup, /practice-mode\.js/);
-    assert.match(html, /<html lang="en" data-mode="multiplayer">/);
+    assert.match(html, /<html lang="en" data-ui="modern" data-mode="multiplayer">/);
     assert.match(html, /<base href="\.\.\/\.\.\/" \/>/);
   });
 
