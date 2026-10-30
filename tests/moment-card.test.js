@@ -97,7 +97,7 @@ describe('the big moment card in the page', () => {
     for (const rule of hub.split('}').map((r) => r.trim()).filter((r) => r && !r.startsWith('@') && !r.startsWith('/*') && /\{/.test(r))) {
       const sel = rule.slice(0, rule.indexOf('{')).replace(/\/\*[\s\S]*?\*\//g, '').trim();
       if (!sel || /^(from|to|\d)/.test(sel) || sel.startsWith('@')) continue;
-      if (sel === '.award-more') continue;
+      if (sel === '.award-more' || sel === '.imagination-hub[hidden]') continue;
       for (const part of sel.split(',')) assert.match(part.trim(), /^\[data-ui="modern"\]/, part);
     }
     assert.match(hub, /@media \(prefers-reduced-motion: reduce\)[\s\S]*animation: none;/);

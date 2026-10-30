@@ -28,7 +28,7 @@ describe('G221 client hotkeys', () => {
     const img = read('js/features/imagination-feature.js');
     assert.match(img, /\(e\.key === 'u' \|\| e\.key === 'U'\) && !e\.shiftKey && !e\.metaKey && !e\.ctrlKey && !e\.altKey && !e\.repeat/);
     assert.match(img, /openPanel\(\{ view: 'hand' \}\)/);
-    assert.match(img, /title: 'Imagination upgrades \(U or X\)'/);
+    assert.match(img, /title: 'Imagination upgrades \(U\)'/);
   });
 
   it('game.js: Buffs on Y, Shift+S skills, Shift+T teleport points ahead of T and the movement keys', () => {

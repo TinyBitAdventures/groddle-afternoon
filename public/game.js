@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-2';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-341';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-342';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g463-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g470-1';
@@ -677,6 +677,9 @@ import {
   POL_OWNER_SIZE,
 } from './js/screen-fx.js?v=g470-1';
 import { momentMoreText } from './js/ui/moment-card.js?v=g470-1';
+// HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
+import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=g468-1';
+import { mountImaginationHub } from './js/ui/imagination-hub.js?v=g470-2';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=g459-1';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=g434-1';
 import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=g470-1';
@@ -848,7 +851,7 @@ import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from '.
 import { installHiresIcons } from './js/icon-hires.js?v=g446-4';
 import { installHiresDecos } from './js/deco-hires.js?v=g457-3';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=g465-1';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=g465-9';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=g470-2';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=g464-2';
 import { denseSprite } from './js/sprite-dense.js?v=g430-1';
@@ -857,7 +860,7 @@ import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from '.
 import { mountNotifyView } from './js/notify-view.js?v=g466-1';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g468-2';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g468-8';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g470-2';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=g432-1';
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=g463-2';
@@ -1325,7 +1328,7 @@ function openLookBuilderOn(slot) {
 }
 
 /** G254: the client's hold-? sheet (js/client-hotkeys.js); the keyring row only in multiplayer. */
-const hotkeysSheet = createHotkeysSheet(document, { keyring: () => Boolean(document.getElementById('keys-btn')) });
+const hotkeysSheet = createHotkeysSheet(document, { keyring: () => Boolean(document.getElementById('keys-btn')), hub: () => modernUi() });
 
 /** A visible element (not under a hidden ancestor or display: none). */
 function shownElement(node) {
@@ -9382,6 +9385,26 @@ function panelOnScreen() {
   return found.some((n) => typeof n.getClientRects !== 'function' || n.getClientRects().length > 0);
 }
 
+/** HUB: the modern skin's Imagination hub on X (js/ui/imagination-hub.js), mounted at boot. */
+let imaginationHub = null;
+/** HUB: true in the Modern skin (js/classic/ui-mode.js), where X is the hub. */
+function modernUi() {
+  return uiState().mode === MODERN;
+}
+
+/** HUB: the avatar's head and feet in #game-root px (where the hub's arc goes), or null. */
+function avatarOnRoot() {
+  const rootEl = document.getElementById('game-root');
+  if (!player || player.destroyed || !app?.canvas || !rootEl) return null;
+  const rr = rootEl.getBoundingClientRect();
+  const c = app.canvas.getBoundingClientRect();
+  const b = player.getBounds();
+  const sx = c.width / VIEW_W;
+  const sy = c.height / VIEW_H;
+  const x = c.left - rr.left + (b.x + b.width / 2) * sx;
+  return { head: { x, y: c.top - rr.top + b.y * sy }, feet: { x, y: c.top - rr.top + (b.y + b.height) * sy } };
+}
+
 const engine = {
   PIXI,
   /** 'solo' | 'multiplayer' (js/game-mode.js); solo everywhere until multiplayer opens. */
@@ -9668,9 +9691,16 @@ const engine = {
         engine.instanceHold ||
         (!ignoreHome && homeIsInstanced()) ||
         // Any open panel (Feat, quests, make, vendor, map, mailbox, ...).
-        panelOnScreen()
+        panelOnScreen() ||
+        Boolean(imaginationHub?.isOpen())
     );
   },
+  /**
+   * HUB: X in the modern skin opens the Imagination hub (imagination-feature.js onKeyDown asks
+   * here first); false in another skin, where X keeps its own answer.
+   */
+  imaginationHub: () => (modernUi() && imaginationHub ? imaginationHub.open() || true : false),
+  imaginationHubOpen: () => Boolean(imaginationHub?.isOpen()),
   /** A verb in progress or the verb menu open (both interrupt meditation). */
   acting: () => Boolean(currentAction || menuTarget),
   questDialogueOpen: () => isQuestDialogueOpen(),
@@ -26248,6 +26278,14 @@ async function main() {
           return false;
         }
       },
+      /** HUB QA: the Imagination hub (open, close, pick a tile by id, its state). */
+      hub: {
+        open: () => imaginationHub?.open() || false,
+        close: () => imaginationHub?.close() || false,
+        pick: (id) => imaginationHub?.pick(id) || false,
+        isOpen: () => Boolean(imaginationHub?.isOpen()),
+        layout: () => imaginationHub?.layout() || null,
+      },
       /** HUB QA: how many award, new-day and Giant screens are queued or showing. */
       screensPending: () => awardsPending,
     },
@@ -26346,10 +26384,34 @@ async function main() {
   installMoreMenu();
   installPlayerMenu();
   installVitalsMenu();
+  // HUB (js/ui/imagination-hub.js): the Imagination hub on X. Each tile opens what the game opens
+  // today; Upgrades is what X opened before (the imagination panel at its first view).
+  imaginationHub = mountImaginationHub(document, {
+    root: document.getElementById('game-root'),
+    actions: {
+      skills: () => openSkillsPanel(),
+      quests: () => openQuestPanel(),
+      upgrades: () => document.getElementById('img-btn')?.click(),
+      looks: () => openAvatarPanel(),
+      teleport: () => features.query('teleportPointsKey', engine),
+      home: () => document.getElementById('home-btn')?.click(),
+    },
+    canOpen: () => state.started && !engine.busy() && !isScreenViewOpen(),
+    anchor: () => avatarOnRoot(),
+    imagination: () => pc.imagination,
+    setData: (key, value) => {
+      if (app?.canvas) app.canvas.dataset[key] = value;
+    },
+    onOpenChange: (open) => document.getElementById('imagination-btn')?.setAttribute('aria-expanded', String(open)),
+  });
+  // Switching to Classic closes it (Classic's own hub answers X there).
+  onUiModeChange((now) => {
+    if (now.mode !== MODERN) imaginationHub?.close();
+  });
   // Phase 2 (js/ui/topbar.js): the modern bar's tooltips, Menu groups, Sound popover and pills.
   installTopBar(document, {
     audio: { levels: () => ({ ...audioLevels }), setLevel: setAudioLevel },
-    onImagination: () => document.getElementById('img-btn')?.click(),
+    onImagination: () => (modernUi() && imaginationHub ? imaginationHub.toggle() : document.getElementById('img-btn')?.click()),
     onMail: () => { if (state.started) openMailboxPanel(); },
     onPlayerCard: () => document.getElementById('player-menu-btn')?.click(),
   });

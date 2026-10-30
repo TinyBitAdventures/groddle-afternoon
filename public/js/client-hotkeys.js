@@ -75,13 +75,14 @@ export const HOTKEYS_FOOTER = "Open this list by holding the '?' Key.";
  * alternative is a key combination such as ['Shift', 'S'].
  * @param {{ keyring?: boolean }} opts keyring: the multiplayer keyring is there
  */
-export function hotkeySections({ keyring = false } = {}) {
+export function hotkeySections({ keyring = false, hub = false } = {}) {
   return [
     {
       title: 'Menus',
       rows: [
         ['Player Menu', [['Z']]],
-        ['Imagination Menu', [['X']]],
+        // HUB: in the modern skin X opens the Imagination hub, whose tiles answer their letters.
+        ['Imagination Menu', [['X']], ...(hub ? ['(then S, Q, U, L, T or H)'] : [])],
         ['Quest Log', [['Q']]],
         // Phase 2: the modern top bar's Make button (N was free; C opens it too).
         ['Make', [['N']]],
@@ -138,7 +139,7 @@ export function isHotkeySheetRelease(e) {
  * @param {Document} doc
  * @param {{ keyring?: () => boolean }} opts
  */
-export function createHotkeysSheet(doc, { keyring = () => false } = {}) {
+export function createHotkeysSheet(doc, { keyring = () => false, hub = () => false } = {}) {
   let shade = null;
   const build = () => {
     shade = doc.createElement('div');
@@ -163,7 +164,7 @@ export function createHotkeysSheet(doc, { keyring = () => false } = {}) {
     title.textContent = HOTKEYS_TITLE;
     const cols = doc.createElement('div');
     cols.className = 'hotkeys-cols';
-    for (const section of hotkeySections({ keyring: keyring() })) {
+    for (const section of hotkeySections({ keyring: keyring(), hub: hub() })) {
       const box = doc.createElement('div');
       box.className = 'hotkeys-section';
       const h = doc.createElement('h3');

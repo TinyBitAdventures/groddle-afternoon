@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 790,
+  "commits": 791,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "Badges, trophies, level-ups and finished quests show on a bigger moment card"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "Uncle Friendly, Helga and the other vendors draw sharp on Retina screens"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "A note's red pin shows whole instead of being cut off at the top"
    }
   ]
  },
- "tests": 446,
+ "tests": 447,
  "generatedAt": "2026-10-30"
 }

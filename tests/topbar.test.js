@@ -16,7 +16,7 @@ import {
   ringDash,
   vitalRing,
   volumeLevel,
-} from '../public/js/ui/topbar.js?v=g465-1';
+} from '../public/js/ui/topbar.js?v=g470-2';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (f) => readFileSync(join(pub, f), 'utf8');
@@ -77,9 +77,9 @@ describe('top bar helpers', () => {
     assert.equal(menuRowFor('signout-btn').group, 'settings');
     assert.equal(menuRowFor('something-new').group, 'world');
     assert.deepEqual([MENU_ROWS['keys-btn'].mod, MENU_ROWS['keys-btn'].key], ['Shift', 'K']);
-    // Upgrades (img-btn) opens the imagination panel at its first view, as X does: its cap is X, like the
-    // bar's Imagination button (imagination-feature.js onKeyDown: X openPanel(), U the upgrade cards).
-    assert.equal(MENU_ROWS['img-btn'].key, 'X');
+    // Upgrades (img-btn) opens the imagination panel at its first view; its cap is U (the upgrade cards).
+    // X is the Imagination hub (HUB, js/ui/imagination-hub.js), whose Upgrades tile is this row.
+    assert.equal(MENU_ROWS['img-btn'].key, 'U');
     assert.match(header, /id="imagination-btn"[^>]*data-key="X"[^>]*aria-label="Imagination \(X\)"/);
   });
 });
@@ -117,7 +117,7 @@ describe('top bar markup and wiring', () => {
   });
 
   it('wires Imagination, Mail and the Player card to what the game already opens', () => {
-    assert.match(game, /onImagination: \(\) => document\.getElementById\('img-btn'\)\?\.click\(\),/);
+    assert.match(game, /onImagination: \(\) => \(modernUi\(\) && imaginationHub \? imaginationHub\.toggle\(\) : document\.getElementById\('img-btn'\)\?\.click\(\)\),/);
     assert.match(game, /onMail: \(\) => \{ if \(state\.started\) openMailboxPanel\(\); \},/);
     assert.match(game, /onPlayerCard: \(\) => document\.getElementById\('player-menu-btn'\)\?\.click\(\),/);
     assert.match(game, /renderTopBar\(document, \{ unread \}\);/);

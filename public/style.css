@@ -9962,4 +9962,115 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] .award-screen .award-badge,
   [data-ui="modern"] .award-screen .award-badge::before { animation: none; }
 }
+/* —— HUB: Imagination hub —— */
+/* X (js/ui/imagination-hub.js): six round tiles in an arc over the avatar, the world dimmed
+   round it, and the iMG to spend in a pill under the feet. The HUD mock's sizes: tiles 92 px
+   with 66 px art, labels 13 px with a key cap, the pill 13 px. */
+.imagination-hub[hidden] { display: none; }
+[data-ui="modern"] .imagination-hub {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-dialog);
+  pointer-events: none;
+  font-family: var(--font-ui);
+  color: var(--text);
+}
+[data-ui="modern"] .imagination-hub .hub-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  background: radial-gradient(circle at var(--hub-x, 50%) var(--hub-y, 50%), var(--hub-dim-centre) 0, var(--hub-dim-mid) 260px, var(--hub-dim-edge) 100%);
+  animation: hubFade var(--motion-med) both;
+}
+@keyframes hubFade { from { opacity: 0; } }
+[data-ui="modern"] .imagination-hub .hub-tile {
+  position: absolute;
+  width: 92px;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  border: 0;
+  border-radius: var(--radius-l);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
+  animation: hubTileIn 260ms var(--ease-out) both;
+  animation-delay: calc(var(--hub-i, 0) * 30ms);
+}
+@keyframes hubTileIn { from { opacity: 0; transform: translate(calc(-50% + var(--hub-fx, 0px)), calc(-50% + var(--hub-fy, 0px))) scale(0.6); } }
+[data-ui="modern"] .imagination-hub .hub-art {
+  position: relative;
+  width: 66px;
+  height: 66px;
+  border-radius: var(--radius-round);
+  background: var(--surface-raised) center 46% / 128% auto no-repeat;
+  box-shadow: var(--shadow-2), 0 0 0 3px var(--surface-raised);
+  transition: transform var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast);
+}
+[data-ui="modern"] .imagination-hub .hub-tile:focus-visible { outline: none; }
+[data-ui="modern"] .imagination-hub .hub-tile:hover .hub-art,
+[data-ui="modern"] .imagination-hub .hub-tile:focus-visible .hub-art {
+  transform: scale(1.08);
+  box-shadow: var(--shadow-3), 0 0 0 3px var(--accent);
+}
+[data-ui="modern"] .imagination-hub .hub-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px 3px 4px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-1);
+  font-size: var(--fs-m);
+  font-weight: var(--fw-heavy);
+  line-height: var(--lh-tight);
+  white-space: nowrap;
+}
+[data-ui="modern"] .imagination-hub .hub-tile:focus-visible .hub-label { outline: 2px solid var(--focus); outline-offset: 1px; }
+[data-ui="modern"] .imagination-hub .kcap {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-heavy);
+  line-height: var(--lh-none);
+}
+[data-ui="modern"] .imagination-hub .hub-pill {
+  position: absolute;
+  transform: translate(-50%, 0);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 6px 6px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-2);
+  font-size: var(--fs-m);
+  font-weight: var(--fw-heavy);
+  white-space: nowrap;
+  pointer-events: auto;
+  animation: hubFade 300ms both;
+}
+[data-ui="modern"] .imagination-hub .hub-pill img { height: 18px; }
+[data-ui="modern"] .imagination-hub.is-still *,
+[data-ui="modern"] .imagination-hub.is-still { animation: none; transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  [data-ui="modern"] .imagination-hub .hub-scrim,
+  [data-ui="modern"] .imagination-hub .hub-tile,
+  [data-ui="modern"] .imagination-hub .hub-pill { animation: none; }
+  [data-ui="modern"] .imagination-hub .hub-art { transition: none; }
+  [data-ui="modern"] .imagination-hub .hub-tile:hover .hub-art,
+  [data-ui="modern"] .imagination-hub .hub-tile:focus-visible .hub-art { transform: none; }
+}
 /* —— end HUB —— */

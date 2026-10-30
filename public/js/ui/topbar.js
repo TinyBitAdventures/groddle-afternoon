@@ -35,8 +35,9 @@ export const MENU_GROUPS = Object.freeze([
 export const MENU_ROWS = Object.freeze({
   'player-card-btn': { group: 'me', rank: 0, key: 'Z' },
   'skills-btn': { group: 'me', rank: 1, key: 'K' },
-  // Upgrades opens the imagination panel at its first view, as X does (U opens the upgrade cards).
-  'img-btn': { group: 'me', rank: 2, key: 'X' },
+  // Upgrades opens the imagination panel at its first view (U opens the upgrade cards); X is the
+  // Imagination hub now (js/ui/imagination-hub.js), whose Upgrades tile is this row.
+  'img-btn': { group: 'me', rank: 2, key: 'U' },
   'achieve-btn': { group: 'me', rank: 3, key: 'B' },
   'buffs-btn': { group: 'me', rank: 4, key: 'Y' },
   'avatar-btn': { group: 'me', rank: 5, key: 'L' },

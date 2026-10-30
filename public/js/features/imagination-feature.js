@@ -512,9 +512,12 @@ function onPanelClick(e) {
 function onKeyDown(e) {
   const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || '');
   if (!panel || panel.hidden) {
+    // HUB: while the modern skin's Imagination hub is up it has the keys (js/ui/imagination-hub.js).
+    if (engineRef?.imaginationHubOpen?.()) return;
     if (!typing && (e.key === 'x' || e.key === 'X') && !e.metaKey && !e.ctrlKey && !e.altKey && engineRef && !engineRef.busy()) {
       e.preventDefault();
-      openPanel();
+      // X is the Imagination menu (ImgMenuView): the hub in the modern skin, else the panel.
+      if (!engineRef.imaginationHub?.()) openPanel();
     }
     // G221: U opens the upgrade cards (TSMainView.as 663, uKeyHandler 996-1010:
     // ImgMenuView with Cloud.TYPE_UPGRADES). KeyBeacon.as 288-295 sends Shift+U as
@@ -659,7 +662,7 @@ function installChrome() {
   if (document.getElementById('img-btn')) return;
   ensurePanel();
   const skills = document.getElementById('skills-btn');
-  const btn = el('button', { id: 'img-btn', type: 'button', class: 'chrome-btn img-chrome-btn', title: 'Imagination upgrades (U or X)' });
+  const btn = el('button', { id: 'img-btn', type: 'button', class: 'chrome-btn img-chrome-btn', title: 'Imagination upgrades (U)' });
   // Text only, like the rest of the menu (Austin 2026-10-29); the iMG mark stays on the panel itself.
   btn.append(document.createTextNode('Upgrades'));
   btn.addEventListener('click', () => (panel && !panel.hidden ? closePanel() : openPanel()));
