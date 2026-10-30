@@ -863,6 +863,7 @@ import { installHiresIcons } from './js/icon-hires.js?v=g446-4';
 import { installHiresDecos } from './js/deco-hires.js?v=g457-3';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=g465-1';
 import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=g486-1';
+import { installFocusReturn } from './js/ui/focus-return.js?v=g487-1';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=g464-2';
 import { denseSprite } from './js/sprite-dense.js?v=g430-1';
@@ -27291,6 +27292,8 @@ async function main() {
     if (isVendorOpen()) renderVendorList();
   });
   // Phase 2 (js/ui/topbar.js): the modern bar's tooltips, Menu groups, Sound popover and pills.
+  // Enter stays the world's: a mouse click on a HUD control hands focus back (js/ui/focus-return.js).
+  installFocusReturn(document);
   installTopBar(document, {
     audio: { levels: () => ({ ...audioLevels }), setLevel: setAudioLevel },
     zoom: { get: worldZoom, set: setWorldZoom, onChange: onZoomChange },

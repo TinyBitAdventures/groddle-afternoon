@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 838,
+  "commits": 839,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "Streets with no recovered ecology no longer grow invented trees, animals, gardens, vendors and shrines"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "The save state in the pack is a cloud icon, with \"Playing as … · Saved\" on hover"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "new",
-    "text": "How many asks in one compact chooser where you asked: by the piggy for Feed, by the stack for Eat more and Drop, by the tile for Buy and Sell"
    }
   ]
  },
- "tests": 468,
+ "tests": 469,
  "generatedAt": "2026-10-30"
 }
