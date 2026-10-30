@@ -454,7 +454,19 @@
   background: var(--c-classic-page);
   text-shadow: 0 1px 0 color-mix(in srgb, var(--c-classic-panel) 80%, transparent);
 }
-:root[data-ui="classic"] .top-bar #player-menu-btn .level-meter { position: static; display: block; }
+:root[data-ui="classic"] .top-bar #player-menu-btn .level-meter {
+  position: static;
+  display: block;
+  width: auto;
+  min-width: 0;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
 :root[data-ui="classic"] .top-bar #player-menu-btn #stat-level {
   position: static;
   color: var(--c-classic-title);
@@ -545,7 +557,7 @@
 :root[data-ui="classic"] .top-bar .meta-stat.currants strong::after { content: "\A Currants"; white-space: pre; font: var(--fs-classic-body)/var(--lh-tight) var(--font-classic-body); }
 
 /* The header. The 2012 cluster, centred over the chat column (GameHeaderUI.as 33-117): help, the
-   volume icon and the date (no bug icon: solo has no report path). The game's own buttons (Quests,
+   volume icon and the date, and online the bug icon (solo has no report path). The game's own buttons (Quests,
    Make, Map, Mail) and the Menu, which the 2012 header did not have, sit small and grey at the
    header's left after the iMG count (PROPOSED); the iMG button in the ear stands for Imagination. */
 :root[data-ui="classic"] {
@@ -590,6 +602,9 @@
 :root[data-ui="classic"] .top-bar #study-chip { left: calc(var(--cvx) + 337 * var(--cu)); width: auto; padding: 0 calc(6 * var(--cu)); color: var(--c-classic-link); font: 800 var(--fs-classic-body)/var(--lh-none) var(--font-classic-title); }
 :root[data-ui="classic"] .top-bar .classic-help-btn { right: calc(var(--cf-cluster-r) + 138 * var(--cu)); top: calc(10 * var(--cu)); width: calc(20 * var(--cu)); height: calc(21 * var(--cu)); }
 :root[data-ui="classic"] .top-bar .classic-help-btn img { display: block; width: 100%; height: 100%; }
+/* Online, the bug icon (bug-report-feature.js) sits 7 left of help, as in the 2012 header. */
+:root[data-ui="classic"] .top-bar .hud-actions > #bug-btn { right: calc(var(--cf-cluster-r) + 165 * var(--cu)); top: calc(10 * var(--cu)); width: calc(23 * var(--cu)); height: calc(20 * var(--cu)); }
+:root[data-ui="classic"] .top-bar .hud-actions > #bug-btn img { width: 100%; height: 100%; }
 /* The volume icon: one 34 px frame of the 4-state strip (AudioControl.as 214-229). */
 :root[data-ui="classic"] .top-bar .hud-actions #sound-btn {
   right: calc(var(--cf-cluster-r) + 98 * var(--cu));
@@ -641,7 +656,7 @@
   position: fixed;
   top: 0;
   left: auto;
-  right: max(var(--cvr), calc(var(--cf-cluster-r) + 168 * var(--cu)));
+  right: max(var(--cvr), calc(var(--cf-cluster-r) + 196 * var(--cu)));
   transform: none;
   display: block;
   height: var(--cf-header-h);
