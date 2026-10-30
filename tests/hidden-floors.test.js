@@ -12,8 +12,8 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry } from '../public/js/street-model.js?v=g442-6';
-import { arrivalInTarget } from '../public/js/location-navigation.js?v=g442-6';
+import { assertStreetGeometry } from '../public/js/street-model.js?v=g478-1';
+import { arrivalInTarget } from '../public/js/location-navigation.js?v=g478-1';
 import { SOURCE_PHYSICS } from '../public/js/puzzle-triggers.js';
 import {
   AVATAR_BODY_H,
@@ -48,9 +48,9 @@ import {
   inTeleporter,
   jumpApex,
   teleportersOn,
-} from '../public/js/hidden-floors.js';
-import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js';
-import { FEATURES } from '../public/js/features/index.js?v=registry-353';
+} from '../public/js/hidden-floors.js?v=g478-1';
+import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=g478-1';
+import { FEATURES } from '../public/js/features/index.js?v=registry-354';
 import { rawTripleJumpMultiplier, scaledTripleJumpMultiplier } from '../public/js/movement.js';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -379,7 +379,7 @@ describe('Ilmenskie\'s top-right corner (2011-12-15)', () => {
     // Coming down from above, or passing left of them, nothing stops.
     assert.equal(bumpCeiling(ceilings, 2700 - l, -900 - t, 2700 - l, -880 - t), null);
     assert.equal(bumpCeiling(ceilings, 2650 - l, -500 - t, 2650 - l, -850 - t), null);
-    assert.equal(AVATAR_BODY_H, 80);
+    assert.equal(AVATAR_BODY_H, 111, 'the client head circle top (street-model.js avatarHeadReach)');
   });
 
   it('the slope to the caps is a client jump over the ground: the right end moves as the client did', () => {

@@ -41,7 +41,7 @@ import { grantMoodXp } from './mood-xp.js';
 import { musicblockItemMeta } from './musicblocks.js?v=g403-1';
 import { isEnchantedForest } from './enchanted-forests.js?v=g414-1';
 import { isSymphoniousTsid } from './symphonious-maximus.js?v=g90-1';
-import { isMissingFloorTsid } from './hidden-floors.js?v=g105-1';
+import { isMissingFloorTsid } from './hidden-floors.js?v=g478-1';
 import { stationByTsid } from './subway.js?v=g454-1';
 import { ensurePiggyMood, piggyTwiceDailyTick, satePiggy } from './animal-mood.js';
 import { isCrowdSad } from './animal-crowding.js';

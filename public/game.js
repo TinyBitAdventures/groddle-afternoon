@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-2';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g478-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-353';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-354';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g463-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g470-1';
@@ -441,8 +441,8 @@ import {
 } from './js/inventory.js?v=catalog-unified-7';
 import { PACK_COPY } from './js/pack-slots.js?v=g152-2';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=g472-2';
-import { listAnimalFeedOptions } from './js/animals.js?v=g454-1';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g454-1';
+import { listAnimalFeedOptions } from './js/animals.js?v=g478-1';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g478-1';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -570,7 +570,7 @@ import {
   availableStreetTsids,
   ensureStreetIndex,
   resolveIndexTsid,
-} from './js/street-loader.js?v=g442-6';
+} from './js/street-loader.js?v=g478-1';
 import {
   ladderTopDeck,
   resolveGround as resolveStreetGround,
@@ -583,9 +583,10 @@ import {
   barriersScreen,
   blockBarrierCrossing,
   buriedSignpostUnder,
+  avatarHeadReach,
   headCeiling,
   isStandable,
-} from './js/street-model.js?v=g442-6';
+} from './js/street-model.js?v=g478-1';
 import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=g422-1';
 import {
   buildStreetView,
@@ -595,7 +596,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=g473-1';
+} from './js/street-render.js?v=g478-1';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -691,10 +692,10 @@ import {
   planTravel,
   listMapDestinations,
   planSignpostTravel,
-} from './js/travel.js?v=g442-6';
+} from './js/travel.js?v=g478-1';
 import { facingScaleX, facingFromVelocity } from './js/avatar.js';
 import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js';
-import { landingY } from './js/walk-surface.js?v=g442-6';
+import { landingY } from './js/walk-surface.js?v=g478-1';
 import { holdCloseToFloor, stickToSlope } from './js/slope-walk.js?v=g411-1';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=g421-1';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js';
@@ -748,7 +749,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=g454-1';
+} from './js/animals.js?v=g478-1';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -828,7 +829,7 @@ import {
   listHubsFromIndex,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
-} from './js/map-graph.js?v=g442-6';
+} from './js/map-graph.js?v=g478-1';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=g396-1';
 import {
   loadStreetEcologyCatalog,
@@ -1788,7 +1789,7 @@ let verbAnimationAlreadyStarted = false;
 /** @type {any|null} official tool sprite attached to the current timed verb. */
 let actionToolFx = null;
 
-/** @type {import('./js/street-model.js?v=g442-6').StreetData|null} */
+/** @type {import('./js/street-model.js?v=g478-1').StreetData|null} */
 let currentStreet = null;
 /** Camera Mode offset from the avatar, in world pixels (engine.setCameraLook). */
 const cameraLook = { x: 0, y: 0 };
@@ -11621,7 +11622,7 @@ function quoinResultCopy(result) {
   return `+${amount}`;
 }
 
-/** The avatar's collision height at scale 1 (street-model.js blockBarrierCrossing bodyH). */
+/** The avatar's height against walls at scale 1 (street-model.js blockBarrierCrossing bodyH); ceilings use avatarHeadReach. */
 const AVATAR_BODY_H = 80;
 
 function resolveGround(px, py) {
@@ -12303,11 +12304,14 @@ function physics(dt) {
     player.y += player.vy * dt;
     player.x = clamp(player.x, 24, WORLD_W - 24);
     // The avatar's collision height (80 px) shrinks with a street's pc_scale.
-    const bodyH = AVATAR_BODY_H * (features.query('avatarBodyScale', engine) ?? 1);
-    // A rising head stops under an underside or ceiling (platform pc_perm 1).
+    const bodyScale = features.query('avatarBodyScale', engine) ?? 1;
+    const bodyH = AVATAR_BODY_H * bodyScale;
+    // A rising head stops under an underside or ceiling (platform pc_perm 1 or null)
+    // at the client's head circle, 111 px over the feet at scale 1 (avatarHeadReach).
     // Puzzle streets with reversible gravity run their own (features/puzzles-feature.js).
+    const head = avatarHeadReach(bodyScale);
     const headY = streetPlatforms?.length && features.query('ownsCeilings', engine) !== true
-      ? headCeiling(streetPlatforms, prevX, prevY, player.x, player.y, bodyH)
+      ? headCeiling(streetPlatforms, prevX, prevY, player.x, player.y, head)
       : null;
     if (headY != null) {
       player.y = headY;

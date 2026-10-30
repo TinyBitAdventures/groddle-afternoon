@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 823,
+  "commits": 824,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "The save cloud sits in the pack row beside search, centred, instead of up in its corner"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "Classic's pack answers the arrows: along the row, up into a bag and back down"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Classic's verb menu sits on the thing you picked, with the 2012 tail pointing at it"
    }
   ]
  },

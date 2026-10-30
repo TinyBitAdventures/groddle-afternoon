@@ -28,11 +28,11 @@ import {
   routeStep,
   signpostToward,
 } from '../public/js/map-routes.js?v=lonely-1';
-import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=g463-1';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g473-1';
+import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=g478-1';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g478-1';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-16';
 import { createFeatureHost } from '../public/js/feature-host.js';
-import { applyStreetIndex } from '../public/js/street-loader.js?v=g442-6';
+import { applyStreetIndex } from '../public/js/street-loader.js?v=g478-1';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=g403-1';
 import { createQuestState } from '../public/js/quests.js';
 import { HELL_QUESTS, createHellState, croak } from '../public/js/hell.js';
@@ -40,7 +40,7 @@ import { SUBWAY_STREETS } from '../public/js/quest-rooms/back-alley.js?v=g463-2'
 import { doorRooms, doorToward, routeGraph } from '../public/js/map-routes.js?v=lonely-1';
 import { afterStreetCard, runStreetTransition, streetCardUp } from '../public/js/screen-fx.js?v=g470-1';
 import { EMITTED_EVENTS } from '../public/js/quest-offers.js?v=g403-1';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=g470-1';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=g478-1';
 import { addItem } from '../public/js/inventory.js?v=catalog-unified-7';
 import { resurrect } from '../public/js/hell.js';
 
@@ -337,7 +337,7 @@ describe('the feature', () => {
 
   it('is registered in features/index.js under its cache key', () => {
     const index = read(join(PUBLIC, 'js/features/index.js'));
-    assert.match(index, /map-routes-feature\.js\?v=g463-1'; FEATURES\.push\(mapRoutesFeature\);$/m);
+    assert.match(index, /map-routes-feature\.js\?v=g478-1'; FEATURES\.push\(mapRoutesFeature\);$/m);
   });
 
   it('Beelzebooze accepted: the ticket, the prompt and the route to Panka Surazu', () => {

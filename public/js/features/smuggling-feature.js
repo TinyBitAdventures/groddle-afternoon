@@ -41,9 +41,9 @@ import { canUseTool } from '../tools.js?v=woodcutting-test-8';
 import { acceptOffer, ensureQuestOfferState, turnInQuest } from '../quest-offers.js?v=g403-1';
 import { parseQuestConversation } from '../quests.js?v=item-buffs-7';
 import { getQuestCatalog } from '../content-catalogs.js?v=g403-1';
-import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=g442-6';
-import { worldToScreen } from '../street-model.js?v=g442-6';
-import { landingY, walkSurfaceY } from '../walk-surface.js?v=g442-6';
+import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=g478-1';
+import { worldToScreen } from '../street-model.js?v=g478-1';
+import { landingY, walkSurfaceY } from '../walk-surface.js?v=g478-1';
 import { hellFeature } from './hell-feature.js?v=hell-16';
 import { questRoomConverse } from './quest-instances-feature.js?v=g470-1';
 import {

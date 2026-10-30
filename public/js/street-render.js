@@ -9,8 +9,8 @@ import {
   platformsScreen,
   signpostNear,
   pickConnection,
-} from './street-model.js?v=g442-6';
-import { availableStreetTsids } from './street-loader.js?v=g442-6';
+} from './street-model.js?v=g478-1';
+import { availableStreetTsids } from './street-loader.js?v=g478-1';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js';
 import { admitSharp, decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco } from './deco-hires.js?v=g457-3';
 import { LADDER_TILE_Z, ladderTilePieces } from './ladder-tiling.js?v=g415-1';
@@ -1348,7 +1348,7 @@ function cullLayer(lc, camX, camY, vpW, vpH, rebake, now) {
 }
 
 /**
- * @param {import('./street-model.js?v=g442-6').StreetData} street
+ * @param {import('./street-model.js?v=g478-1').StreetData} street
  * @param {typeof PIXI} PIXI
  * @param {{
  *   decoBase?: string,

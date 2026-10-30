@@ -51,7 +51,7 @@ import {
   verbMessage,
   vvSniffButton,
 } from '../public/js/item-verbs-more.js?v=g391-1';
-import { itemVerbsMoreFeature, runMoreVerb, eatLicoriceNow } from '../public/js/features/item-verbs-more-feature.js?v=g463-2';
+import { itemVerbsMoreFeature, runMoreVerb, eatLicoriceNow } from '../public/js/features/item-verbs-more-feature.js?v=g478-1';
 import {
   LETTER_WEIGHTS,
   POTIONS,
@@ -71,8 +71,8 @@ import {
   wisdomCheck,
   wisdomMessage,
 } from '../public/js/potions.js?v=g391-1';
-import { potionsFeature, usePotionNow, pourSauce } from '../public/js/features/potions-feature.js?v=g473-1';
-import { husbandryPack } from '../public/js/animal-husbandry.js?v=g454-1';
+import { potionsFeature, usePotionNow, pourSauce } from '../public/js/features/potions-feature.js?v=g478-1';
+import { husbandryPack } from '../public/js/animal-husbandry.js?v=g478-1';
 import { XP_FOR_LEVEL } from '../public/js/progression.js?v=progression-1';
 import { moodScaledXp } from '../public/js/mood-xp.js';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
@@ -577,8 +577,8 @@ describe('wiring', () => {
   });
   it('the feature is registered and the potions keys moved together', () => {
     const index = src('js/features/index.js');
-    assert.match(index, /import \{ itemVerbsMoreFeature \} from '\.\/item-verbs-more-feature\.js\?v=g463-2'; FEATURES\.push\(itemVerbsMoreFeature\);/);
-    assert.match(index, /potions-feature\.js\?v=g473-1/);
+    assert.match(index, /import \{ itemVerbsMoreFeature \} from '\.\/item-verbs-more-feature\.js\?v=g478-1'; FEATURES\.push\(itemVerbsMoreFeature\);/);
+    assert.match(index, /potions-feature\.js\?v=g478-1/);
     assert.match(src('js/features/potions-feature.js'), /from '\.\.\/potions\.js\?v=g391-1'/);
   });
   it('save and restore keep the jar, the net, the stick and the day', () => {

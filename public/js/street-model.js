@@ -299,28 +299,72 @@ export function isSolidFromBelow(p) {
 }
 
 /**
- * The avatar's head moving up from (prevX, prevFeetY - bodyH) to
- * (x, feetY - bodyH) that crosses a line solid from below stops under it
- * (AvatarPhysicsHandler: the client tests the head against pc_solid_from_bottom
- * lines). Returns the clamped feet y (line + bodyH), or null when clear.
- * Lines whose ends are within `inset` px of x are skipped, so brushing an
- * underside's end does not catch the avatar beside it.
- * @param {{ x1:number,y1:number,x2:number,y2:number,pcPerm?:number|null }[]} platforms  screen-space
+ * The 2012 client's head collider at an avatar scale (the street's pc_scale).
+ * AvatarPhysicsHandler keeps two 15 px circles (ColliderAvatar): the foot circle
+ * sits on the feet (footCircle.y = pc.y - 15) and the head circle calcCircleGap
+ * above it, avatarViewBounds.height - 40 x pc_scale - 30, with the view bounds
+ * 150 x pc_scale tall (AbstractAvatarView.rescale): 80 px at scale 1. A head hits
+ * a platform line (radius 1) when its circle comes within 16 px of it, so the
+ * head reaches 110 x scale + 1 px over the feet (111 at scale 1), not the 80 px
+ * circle gap. `centre` is the head circle's height over the feet: the client
+ * tests a line against the head only while that centre is under it.
+ * @param {number} [scale=1]
+ * @returns {{ centre:number, reach:number }}
  */
-export function headCeiling(platforms, prevX, prevFeetY, x, feetY, bodyH = 80, inset = 2) {
-  if (!(feetY < prevFeetY)) return null;
-  const head = feetY - bodyH;
-  const prevHead = prevFeetY - bodyH;
-  let best = null;
-  for (const p of platforms || []) {
-    if (!isSolidFromBelow(p)) continue;
-    const y = platformYAt(p, x, -inset);
-    if (y == null) continue;
-    const before = platformYAt(p, prevX, 0) ?? y;
-    // Crossed it this frame: the head was at or under the line, now above it.
-    if (prevHead >= before - 1 && head < y && (best == null || y > best)) best = y;
+export function avatarHeadReach(scale = 1) {
+  const s = scale > 0 ? scale : 1;
+  const gap = Math.max(0, 150 * s - 40 * s - 30);
+  const centre = 15 + gap;
+  return { centre, reach: centre + 15 + 1 };
+}
+
+/** Another line solid from below that ends where this one does (a roof drawn as joined lines). */
+function joinedAt(platforms, p, ex, ey) {
+  for (const q of platforms) {
+    if (q === p || !isSolidFromBelow(q)) continue;
+    if ((Math.abs(q.x1 - ex) <= 1 && Math.abs(q.y1 - ey) <= 1) || (Math.abs(q.x2 - ex) <= 1 && Math.abs(q.y2 - ey) <= 1)) return true;
   }
-  return best == null ? null : best + bodyH;
+  return false;
+}
+
+/**
+ * The avatar's head moving up from prevFeetY to feetY that crosses a line solid
+ * from below stops under it (AvatarPhysicsHandler: the client tests the head
+ * circle against pc_solid_from_bottom lines). `head` is avatarHeadReach(scale)
+ * (a number is both reach and centre). Returns the clamped feet y (line +
+ * reach, never lower than prevFeetY), or null when clear.
+ * Lines whose ends are within `inset` px of x are skipped, so brushing an
+ * underside's end does not catch the avatar beside it; an end joined to another
+ * such line is no end (Flipside's pipe roof is two lines meeting at x 1401).
+ * @param {{ x1:number,y1:number,x2:number,y2:number,pcPerm?:number|null }[]} platforms  screen-space
+ * @param {number} prevX
+ * @param {number} prevFeetY
+ * @param {number} x
+ * @param {number} feetY
+ * @param {{ centre:number, reach:number }|number} [head]
+ * @param {number} [inset=2]
+ */
+export function headCeiling(platforms, prevX, prevFeetY, x, feetY, head = avatarHeadReach(1), inset = 2) {
+  if (!(feetY < prevFeetY)) return null;
+  const { reach, centre } = typeof head === 'number' ? { reach: head, centre: head } : head;
+  const top = feetY - reach;
+  const prevCentre = prevFeetY - centre;
+  const lines = platforms || [];
+  let best = null;
+  for (const p of lines) {
+    if (!isSolidFromBelow(p)) continue;
+    let y = platformYAt(p, x, -inset);
+    if (y == null) {
+      y = platformYAt(p, x, 0);
+      if (y == null) continue;
+      const [ex, ey] = Math.abs(x - p.x1) <= Math.abs(x - p.x2) ? [p.x1, p.y1] : [p.x2, p.y2];
+      if (!joinedAt(lines, p, ex, ey)) continue;
+    }
+    const before = platformYAt(p, prevX, 0) ?? y;
+    // Crossed it this frame: the head circle was under the line, now the head is over it.
+    if (prevCentre >= before - 1 && top < y && (best == null || y > best)) best = y;
+  }
+  return best == null ? null : Math.min(best + reach, prevFeetY);
 }
 
 /** game.js caps a frame's delta at 2.5 frames (slow or throttled frames). */

@@ -675,8 +675,12 @@ export const ILMENSKIE_RISE = 310;
  * not the remake's 105), the caps and the Entrance ledge.
  */
 export const ILMENSKIE_ZONE = Object.freeze({ x: 1900, y: 0 });
-/** The avatar's height for ceiling bumps (street-model.js blockBarrierCrossing bodyH). */
-export const AVATAR_BODY_H = 80;
+/**
+ * The avatar's head reach for ceiling bumps: the client's head circle top, 111 px over
+ * the feet at scale 1 (street-model.js avatarHeadReach), and the circle's centre, 95 px.
+ */
+export const AVATAR_BODY_H = 111;
+export const AVATAR_HEAD_CENTRE = 95;
 
 /** Ceilings as screen-space segments for a street whose platforms list them (the source's pc_perm 1 lines). */
 export function ceilingsScreen(street, ids = ILMENSKIE_CEILINGS) {
@@ -707,15 +711,15 @@ export function ceilingAt(ceilings, x) {
  * A head moving from (px, py - body) to (x, y - body) that crosses a ceiling
  * from below stops under it: returns the clamped feet y, or null when clear.
  */
-export function bumpCeiling(ceilings, px, py, x, y, body = AVATAR_BODY_H) {
+export function bumpCeiling(ceilings, px, py, x, y, body = AVATAR_BODY_H, centre = AVATAR_HEAD_CENTRE) {
+  if (!(y < py)) return null;
   const c = ceilingAt(ceilings, x);
   if (c === null) return null;
   const head = y - body;
   if (head >= c) return null;
   const before = ceilingAt(ceilings, px);
-  const prevHead = py - body;
-  if (prevHead < (before ?? c) - 1) return null; // already over it
-  return c + body;
+  if (py - centre < (before ?? c) - 1) return null; // already over it
+  return Math.min(c + body, py);
 }
 
 /* ------------------------------------------------------------------ */

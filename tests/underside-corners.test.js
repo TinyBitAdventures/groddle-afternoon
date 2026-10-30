@@ -28,16 +28,17 @@ import {
   resolveGround,
   groundBeneath,
   headCeiling,
+  avatarHeadReach,
   isStandable,
   platformYAt,
   worldToScreen,
-} from '../public/js/street-model.js?v=g442-6';
+} from '../public/js/street-model.js?v=g478-1';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const streetsDir = join(__dirname, '../public/assets/streets');
 const readStreet = (tsid) => JSON.parse(readFileSync(join(streetsDir, `${tsid}.json`), 'utf8'));
 
-const BODY_H = 80; // game.js AVATAR_BODY_H
+const BODY_H = 80; // game.js AVATAR_BODY_H (walls); ceilings use avatarHeadReach
 /** Feet under a ceiling while reversed gravity pins the head there (puzzles-feature avatarHeight: 0.85 x the ~137 px avatar). */
 const pinHeight = (scale) => 0.85 * 137 * scale;
 
@@ -47,7 +48,7 @@ const pinHeight = (scale) => 0.85 * 137 * scale;
  * (lowest standable line near x) stands in for game.js resolveGround's.
  */
 function step(geo, pl, { left = false, right = false, gravity = 1 } = {}) {
-  const { plats, bars, bodyH } = geo;
+  const { plats, bars, bodyH, head: headReach } = geo;
   if (left) pl.vx = -2.8;
   else if (right) pl.vx = 2.8;
   else pl.vx = 0;
@@ -56,7 +57,7 @@ function step(geo, pl, { left = false, right = false, gravity = 1 } = {}) {
   const prevY = pl.y;
   pl.x += pl.vx;
   pl.y += pl.vy;
-  const head = headCeiling(plats, prevX, prevY, pl.x, pl.y, bodyH);
+  const head = headCeiling(plats, prevX, prevY, pl.x, pl.y, headReach);
   if (head != null) {
     pl.y = head;
     if (pl.vy < 0) pl.vy = 0;
@@ -83,7 +84,7 @@ function step(geo, pl, { left = false, right = false, gravity = 1 } = {}) {
 
 const purplysa = readStreet('GHVP7QOKT403F5Q');
 const scale = purplysa.physics.setting.pc_scale;
-const geo = { plats: platformsScreen(purplysa), bars: barriersScreen(purplysa), bodyH: BODY_H * scale };
+const geo = { plats: platformsScreen(purplysa), bars: barriersScreen(purplysa), bodyH: BODY_H * scale, head: avatarHeadReach(scale) };
 const P = (wx, wy) => worldToScreen(purplysa, wx, wy);
 const byId = (id) => geo.plats.find((p) => p.id === id);
 const slab = byId('plat_1337125697373'); // underside x 708..961, y -341
@@ -132,7 +133,7 @@ describe('a rising head stops under an underside', () => {
       step(geo, pl);
       top = Math.min(top, pl.y);
     }
-    assert.ok(Math.abs(top - (smallSlab.y1 + geo.bodyH)) < 0.5, `head stopped at the underside (feet ${top})`);
+    assert.ok(Math.abs(top - (smallSlab.y1 + geo.head.reach)) < 0.5, `head stopped at the underside (feet ${top})`);
     assert.equal(pl.y, floor);
     assert.equal(pl.onGround, true);
   });
@@ -181,7 +182,7 @@ describe("Purplysa's slab corner (Austin's playtest)", () => {
     const pl = { x: wall.x + 40, y: floor, vx: 0, vy: 0, onGround: true };
     // Up to the underside, the head stops there.
     for (let i = 0; i < 200; i++) step(geo, pl, { gravity: -0.1 });
-    assert.ok(Math.abs(pl.y - (slab.y1 + geo.bodyH)) < 0.5, `pressed under the slab (feet ${pl.y})`);
+    assert.ok(Math.abs(pl.y - (slab.y1 + geo.head.reach)) < 0.5, `pressed under the slab (feet ${pl.y})`);
     for (let i = 0; i < 60; i++) step(geo, pl, { left: true, gravity: -0.1 });
     assert.ok(pl.x < wall.x - 20, `walked out past the corner (x ${pl.x})`);
     assert.ok(pl.y < slab.y1, 'and floats on up beside the slab');
@@ -253,8 +254,9 @@ describe('game.js runs these rules', () => {
   const src = readFileSync(join(__dirname, '../public/game.js'), 'utf8');
   it('scales the body, bumps heads on undersides and skips them as ground', () => {
     assert.match(src, /blockBarrierCrossing\(barriersScreen\(currentStreet\), prevX, player\.x, player\.y, bodyH\)/);
-    assert.match(src, /headCeiling\(streetPlatforms, prevX, prevY, player\.x, player\.y, bodyH\)/);
+    assert.match(src, /headCeiling\(streetPlatforms, prevX, prevY, player\.x, player\.y, head\)/);
     assert.match(src, /features\.query\('avatarBodyScale', engine\)/);
+    assert.match(src, /const head = avatarHeadReach\(bodyScale\)/);
     assert.match(src, /if \(!isStandable\(p\)\) continue;/);
   });
 });

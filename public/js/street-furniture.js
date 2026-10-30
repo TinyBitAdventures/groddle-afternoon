@@ -1,4 +1,4 @@
-import { platformYAt } from './street-model.js?v=g442-6';
+import { platformYAt } from './street-model.js?v=g478-1';
 
 /**
  * Street furniture rules: street Mailboxes, placed Notes, Notice Boards and

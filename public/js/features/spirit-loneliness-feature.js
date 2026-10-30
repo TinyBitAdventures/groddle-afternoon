@@ -53,7 +53,7 @@
  *   &lonelyhold=invite      keep the porthole on screen (frozen at the loop) for screenshots
  */
 
-import { STREET_INDEX } from '../street-loader.js?v=g442-6';
+import { STREET_INDEX } from '../street-loader.js?v=g478-1';
 import { getStreetEcologyCatalog } from '../street-ecology.js?v=official-ecology-7';
 import { graphKey, routeGraph, tsidAliases } from '../map-routes.js?v=lonely-1';
 import { STREET_SPIRIT_VARIANTS, portraitFit, portraitSheet, spiritForStreet } from '../street-spirits.js';

@@ -55,7 +55,7 @@
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g464-2';
-import { landingY, walkSurfaceY } from '../walk-surface.js?v=g442-6';
+import { landingY, walkSurfaceY } from '../walk-surface.js?v=g478-1';
 import { playPoofIn, poofInAlpha } from '../overlay-art.js?v=g463-2';
 import {
   CUBIMAL_FREE,

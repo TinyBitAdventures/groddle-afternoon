@@ -221,7 +221,7 @@ describe('street-render draws sharp copies on the sharp layers', () => {
       }
     };
     globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => ({ drawImage() {} }) }) };
-    const { buildStreetView } = await import('../public/js/street-render.js?v=g473-1');
+    const { buildStreetView } = await import('../public/js/street-render.js?v=g478-1');
     const handlers = {};
     const renderer = {
       resolution: 1,
@@ -267,7 +267,7 @@ describe('street-render draws sharp copies on the sharp layers', () => {
   });
 
   it('far layers: sharp copies within the street budget, the rest on their 2x files', async () => {
-    const { buildStreetView } = await import('../public/js/street-render.js?v=g473-1');
+    const { buildStreetView } = await import('../public/js/street-render.js?v=g478-1');
     const manifest = new Set(JSON.parse(readFileSync(join(root, 'public/assets/decos/manifest.json'), 'utf8')));
     const renderer = { resolution: 3.9, gl: { MAX_TEXTURE_SIZE: 1, getParameter: () => 8192 }, generateTexture: () => null, on() {}, off() {} };
     for (const tsid of ['GA95U14319524O9', 'GHFC3I4EKMI20JD', 'GA9117J18492SRS']) {

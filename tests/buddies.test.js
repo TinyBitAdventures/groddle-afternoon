@@ -27,8 +27,8 @@ import {
   normalizeList,
 } from '../public/js/buddies.js?v=g325-1';
 import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-10';
-import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=g466-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-353';
+import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=g478-1';
+import { FEATURES } from '../public/js/features/index.js?v=registry-354';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

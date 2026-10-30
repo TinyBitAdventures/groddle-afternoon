@@ -10,8 +10,8 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry } from '../public/js/street-model.js?v=g442-6';
-import { arrivalInTarget } from '../public/js/location-navigation.js?v=g442-6';
+import { assertStreetGeometry } from '../public/js/street-model.js?v=g478-1';
+import { arrivalInTarget } from '../public/js/location-navigation.js?v=g478-1';
 import { canTeleport, createHellState, enforceHellOnEnter, HELL_BAR, HELL_BARTENDER, isInHell, noteNarakaVisit } from '../public/js/hell.js';
 import { HELL_BAR_FILES } from '../public/js/hell-bar-art.js';
 import {
@@ -40,7 +40,7 @@ import {
 } from '../public/js/hell-bar.js';
 import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=g464-2';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-16';
-import { FEATURES } from '../public/js/features/index.js?v=registry-353';
+import { FEATURES } from '../public/js/features/index.js?v=registry-354';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

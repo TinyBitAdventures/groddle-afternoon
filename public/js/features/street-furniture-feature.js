@@ -35,7 +35,7 @@
  */
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g464-2';
-import { nearestSurfaceY } from '../walk-surface.js?v=g442-6';
+import { nearestSurfaceY } from '../walk-surface.js?v=g478-1';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-8';
@@ -94,7 +94,7 @@ import {
   streetNoteSeeds,
   takePinnedNote,
   writePaperNote,
-} from '../street-furniture.js?v=g442-6';
+} from '../street-furniture.js?v=g478-1';
 import {
   CHORES,
   NEIGHBOURS,
@@ -117,8 +117,8 @@ import {
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=g458-1';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=g463-1';
 import { textureFromUrl } from '../textures.js';
-import { butlerApi } from './butler-feature.js?v=g473-1';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=g473-1';
+import { butlerApi } from './butler-feature.js?v=g478-1';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=g478-1';
 import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';

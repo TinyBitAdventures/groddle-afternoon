@@ -52,9 +52,9 @@ import {
   segmentMid,
   listHubsFromIndex,
   resolveHubId,
-} from '../public/js/map-graph.js?v=g442-6';
-import { STREET_INDEX } from '../public/js/street-loader.js?v=g442-6';
-import { listMapDestinations } from '../public/js/travel.js?v=g442-6';
+} from '../public/js/map-graph.js?v=g478-1';
+import { STREET_INDEX } from '../public/js/street-loader.js?v=g478-1';
+import { listMapDestinations } from '../public/js/travel.js?v=g478-1';
 import { readFileSync } from 'node:fs';
 
 const HUB56 = JSON.parse(

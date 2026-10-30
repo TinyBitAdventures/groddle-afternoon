@@ -15,7 +15,7 @@ import { setMetabolicGainGate } from '../public/js/metabolics.js';
 import { createInventory, useItem } from '../public/js/inventory.js';
 import { ITEM_VERBS, crunchIce, runItemVerb } from '../public/js/item-verbs.js';
 import { performAnimalKinship } from '../public/js/animal-kinship.js?v=g403-1';
-import { createAnimalState } from '../public/js/animals.js?v=g454-1';
+import { createAnimalState } from '../public/js/animals.js?v=g478-1';
 import { performTrantCare } from '../public/js/trant-care.js?v=g414-1';
 import { createTrantState, setTrantTables } from '../public/js/trants.js';
 import { createToolConditionState } from '../public/js/tools.js?v=woodcutting-test-8';

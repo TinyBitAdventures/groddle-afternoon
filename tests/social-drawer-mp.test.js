@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { FakeEl, memoryStore, page } from './social-fake-dom.js';
 import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=g468-13';
 import { createNotifier } from '../public/js/notify.js?v=g459-1';
-import { partyFeature } from '../public/js/features/party-feature.js?v=g466-1';
+import { partyFeature } from '../public/js/features/party-feature.js?v=g478-1';
 import { groupsFeature } from '../public/js/features/groups-feature.js?v=g466-1';
 
 const ANSWER = {
