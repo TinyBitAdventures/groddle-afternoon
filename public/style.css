@@ -9322,6 +9322,8 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 }
 [data-ui="modern"] .top-bar .ring:hover,
 [data-ui="modern"] .top-bar .ring[aria-expanded="true"] { background: var(--surface-hover); box-shadow: none; }
+[data-ui="modern"] .top-bar .ring,
+[data-ui="modern"] .top-bar .ring .level-meter { grid-template: none / none; gap: 0; }
 [data-ui="modern"] .top-bar .ring .level-meter {
   position: absolute; inset: 0; display: grid; place-items: center;
   min-width: 0; padding: 0; margin: 0; border: 0; background: none; box-shadow: none; height: auto;
@@ -9339,6 +9341,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   font-variant-numeric: tabular-nums; line-height: var(--lh-none); text-align: center;
 }
 [data-ui="modern"] .top-bar .ring-num::before { content: none; }
+/* The hole inside the stroke is 26.5 px: three digits ("100") step down a size to keep 4 px clear each side. */
+[data-ui="modern"] .top-bar .ring-num[data-digits="3"],
+[data-ui="modern"] .top-bar .ring-num[data-digits="4"] { font-size: var(--fs-2xs); letter-spacing: -0.04em; }
 [data-ui="modern"] .top-bar .ring-glyph {
   position: absolute; right: -3px; bottom: -3px; width: 16px; height: 16px;
   display: grid; place-items: center; border-radius: var(--radius-round);

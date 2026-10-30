@@ -16,7 +16,7 @@ import {
   ringDash,
   vitalRing,
   volumeLevel,
-} from '../public/js/ui/topbar.js';
+} from '../public/js/ui/topbar.js?v=g465-1';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (f) => readFileSync(join(pub, f), 'utf8');
@@ -77,6 +77,10 @@ describe('top bar helpers', () => {
     assert.equal(menuRowFor('signout-btn').group, 'settings');
     assert.equal(menuRowFor('something-new').group, 'world');
     assert.deepEqual([MENU_ROWS['keys-btn'].mod, MENU_ROWS['keys-btn'].key], ['Shift', 'K']);
+    // Upgrades (img-btn) opens the imagination panel at its first view, as X does: its cap is X, like the
+    // bar's Imagination button (imagination-feature.js onKeyDown: X openPanel(), U the upgrade cards).
+    assert.equal(MENU_ROWS['img-btn'].key, 'X');
+    assert.match(header, /id="imagination-btn"[^>]*data-key="X"[^>]*aria-label="Imagination \(X\)"/);
   });
 });
 
@@ -118,6 +122,15 @@ describe('top bar markup and wiring', () => {
     assert.match(game, /onPlayerCard: \(\) => document\.getElementById\('player-menu-btn'\)\?\.click\(\),/);
     assert.match(game, /renderTopBar\(document, \{ unread \}\);/);
     assert.match(game, /icon: `assets\/sprites\/giant-icons\/icon_\$\{favorGiant\.id === 'ti' \? 'tii' : favorGiant\.id\}\.png`/);
+  });
+
+  it('every ring number sits centred in its ring; three digits take the smaller size', () => {
+    const css = read('style.css');
+    // The old bar's grid columns (.meta-pill, .level-meter) must not place the number off centre.
+    assert.match(css, /\[data-ui="modern"\] \.top-bar \.ring,\n\[data-ui="modern"\] \.top-bar \.ring \.level-meter \{ grid-template: none \/ none; gap: 0; \}/);
+    assert.match(css, /\.ring-num\[data-digits="3"\],\n\[data-ui="modern"\] \.top-bar \.ring-num\[data-digits="4"\] \{ font-size: var\(--fs-2xs\);/);
+    assert.match(topbar, /drawNum\(pill\.querySelector\('\.ring-num'\), r\.num\);/);
+    assert.match(topbar, /drawNum\(ring\.querySelector\('\.ring-num'\), r\.num\);/);
   });
 
   it('keeps a focused control\'s Enter and Space from the game, and no em dashes in what players read', () => {

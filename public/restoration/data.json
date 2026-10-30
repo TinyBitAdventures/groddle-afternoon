@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 775,
+  "commits": 777,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "A bag's tooltip no longer covers its open tray, and tips near the tray sit above it"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-29",
     "kind": "improve",
     "text": "The tutorial's look step opens Tiny Speck's new-player picker"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "improve",
-    "text": "Ice nubbins, the Dust Trap, the Firefly Jar and the mail frog draw sharp on Retina"
    }
   ]
  },

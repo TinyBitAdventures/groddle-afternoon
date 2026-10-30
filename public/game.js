@@ -847,7 +847,7 @@ import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from '.
 import { installHiresIcons } from './js/icon-hires.js?v=g446-4';
 import { installHiresDecos } from './js/deco-hires.js?v=g457-3';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=g465-1';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=g465-1';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=g465-9';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=g464-2';
 import { denseSprite } from './js/sprite-dense.js?v=g430-1';

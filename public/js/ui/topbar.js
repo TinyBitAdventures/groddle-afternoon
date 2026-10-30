@@ -35,7 +35,8 @@ export const MENU_GROUPS = Object.freeze([
 export const MENU_ROWS = Object.freeze({
   'player-card-btn': { group: 'me', rank: 0, key: 'Z' },
   'skills-btn': { group: 'me', rank: 1, key: 'K' },
-  'img-btn': { group: 'me', rank: 2, key: 'U' },
+  // Upgrades opens the imagination panel at its first view, as X does (U opens the upgrade cards).
+  'img-btn': { group: 'me', rank: 2, key: 'X' },
   'achieve-btn': { group: 'me', rank: 3, key: 'B' },
   'buffs-btn': { group: 'me', rank: 4, key: 'Y' },
   'avatar-btn': { group: 'me', rank: 5, key: 'L' },
@@ -157,13 +158,21 @@ const setText = (el, value) => {
   if (el && el.textContent !== value) el.textContent = value;
 };
 
+/** A ring's number, with its digit count so three digits ("100") take the smaller size (style.css). */
+function drawNum(el, text) {
+  if (!el) return;
+  setText(el, text);
+  const digits = String(Math.min(4, text.length));
+  if (el.dataset.digits !== digits) el.dataset.digits = digits;
+}
+
 function drawVital(doc, stat, now, max) {
   const pill = doc.querySelector(`.top-bar .meta-pill.${stat}`);
   if (!pill) return 'ok';
   const r = vitalRing(stat, now, max);
   pill.dataset.vital = r.level;
   setAttr(pill.querySelector('.ring-fill'), 'stroke-dasharray', r.dash);
-  setText(pill.querySelector('.ring-num'), r.num);
+  drawNum(pill.querySelector('.ring-num'), r.num);
   setAttr(pill, 'data-tip', r.tip);
   setAttr(pill, 'data-sub', r.sub);
   setAttr(pill, 'aria-label', r.label);
@@ -200,6 +209,7 @@ export function renderTopBar(doc, state = {}) {
     const r = levelRing(state.level);
     if (ring?.classList.contains('ring')) {
       setAttr(ring.querySelector('.ring-fill'), 'stroke-dasharray', r.dash);
+      drawNum(ring.querySelector('.ring-num'), r.num);
       setAttr(ring, 'data-tip', r.tip);
       setAttr(ring, 'data-sub', r.sub);
       setAttr(ring, 'aria-label', r.label);
