@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { HIRES_DECOS, HIRES_DECOS_BIG } from '../public/js/deco-hires-list.js?v=g457-3';
 import { decoUrl, installHiresDecos, wantsHiresDecos } from '../public/js/deco-hires.js?v=g457-3';
 import { resolutionOfUrl } from '../public/js/textures.js';
-import { recolourBudgetBytes } from '../public/js/street-render.js?v=g457-3';
+import { recolourBudgetBytes } from '../public/js/street-render.js?v=g473-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const decoDir = join(root, 'public/assets/decos/groddle');

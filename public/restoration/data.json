@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 806,
+  "commits": 807,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "The New Day screen's mountains are sharp at any window size"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "new",
     "text": "Classic's 2012 top bar: the mood face and energy arc in the ear, iMG, currants, location and the date"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "new",
-    "text": "Classic's 2012 frame: the world in its cell, the pack band below it and the chat column beside it"
    }
   ]
  },
- "tests": 453,
+ "tests": 454,
  "generatedAt": "2026-10-30"
 }

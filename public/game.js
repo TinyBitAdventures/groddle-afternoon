@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-2';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-340';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-345';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g463-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g470-1';
@@ -595,7 +595,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=g457-3';
+} from './js/street-render.js?v=g473-1';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -648,6 +648,7 @@ import {
   cameraBottomSlack,
   cameraWorldHeightForGround,
 } from './js/movement.js?v=movement-6';
+import { easeCameraAxis } from './js/camera-feel.js?v=g473-1';
 import { renderResolution, RESOLUTION_STEP } from './js/render-density.js';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
 import { vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=g458-2';
@@ -1221,6 +1222,14 @@ const SHEETS = {
 
 const keys = new Set();
 let app, world, bgLayer, entityLayer, fxLayer, player, prompt, promptLayer, camTarget, camY, portalSprites;
+// FEEL (js/camera-feel.js): per axis, whether the eased camera rests on its target this frame and
+// the way it last travelled.
+const cameraRest = { x: { rest: true, dir: 0 }, y: { rest: true, dir: 0 } };
+/** FEEL: the parallax layers snap to device pixels only on an axis whose camera rests. */
+function parallaxSnap() {
+  const res = app?.renderer?.resolution || 1;
+  return { x: cameraRest.x.rest ? res : 0, y: cameraRest.y.rest ? res : 0, dx: cameraRest.x.dir, dy: cameraRest.y.dir };
+}
 /** Holds the street's layers above the middleground (street-render frontView), over entityLayer. */
 let streetFrontLayer = null;
 /** The Dametime atmosphere (updateDametimeChrome): a multiply wash between the street and fxLayer. */
@@ -12385,15 +12394,20 @@ function physics(dt) {
   // Camera Mode (features/camera-mode-feature.js) looks away from the avatar;
   // the usual clamps keep the view inside the street.
   const target = cameraTargetForPlayer(player.x + cameraLook.x, cameraLook.x ? 0 : player.vx);
-  camTarget += (target - camTarget) * dampingAlpha(0.08, dt);
-  world.x = -Math.round(camTarget * 2) / 2;
+  // FEEL (js/camera-feel.js): one eased position per axis per frame that never turns back. The
+  // world and every parallax layer slide exactly while it moves and land on device pixels at rest.
+  const camRes = app?.renderer?.resolution || 1;
+  cameraRest.x = easeCameraAxis(camTarget, target, dampingAlpha(0.08, dt), camRes, cameraRest.x);
+  camTarget = cameraRest.x.value;
+  world.x = -camTarget;
   // Vertical follow for tall original streets
   const anchor = streetCameraAnchor();
   const streetH = activeCameraWorldHeight(anchor);
   const targetY = cameraTargetY(player.y + cameraLook.y, streetH, LOCATION_VIEW_H, anchor);
   if (camY === undefined || Number.isNaN(camY)) camY = targetY;
-  camY += (targetY - camY) * dampingAlpha(0.12, dt);
-  world.y = -Math.round(camY * 2) / 2;
+  cameraRest.y = easeCameraAxis(camY, targetY, dampingAlpha(0.12, dt), camRes, cameraRest.y);
+  camY = cameraRest.y.value;
+  world.y = -camY;
   if (app?.canvas) {
     app.canvas.dataset.cameraY = camY.toFixed(2);
     app.canvas.dataset.cameraWorldHeight = streetH.toFixed(2);
@@ -26691,6 +26705,27 @@ async function main() {
         images: textureUrls.textureStats(),
       };
     },
+    /**
+     * FEEL QA: this frame's camera as drawn. `camX` is the eased camera, `worldX` the world's drawn
+     * offset, and each parallax layer's `screenX` is where it lands on the stage (world.x + its x),
+     * in view px; `resolution` turns view px into device px; `rest` is true on an axis whose camera
+     * has arrived (its planes then sit on device pixels, js/camera-feel.js).
+     */
+    cameraFrame() {
+      return {
+        frame: app?.ticker?.lastTime ?? null,
+        camX: camTarget,
+        camY,
+        rest: { x: cameraRest.x.rest, y: cameraRest.y.rest, dx: cameraRest.x.dir, dy: cameraRest.y.dir },
+        worldX: world?.x ?? null,
+        worldY: world?.y ?? null,
+        playerX: player?.x ?? null,
+        vx: player?.vx ?? null,
+        resolution: app?.renderer?.resolution ?? null,
+        viewW: VIEW_W,
+        layers: (bgLayer?.parallaxLayers || []).map((lc) => ({ id: lc.label, x: lc.x, screenX: (world?.x || 0) + lc.x })),
+      };
+    },
     /** Street decos that play (js/deco-anim.js, G435): placed, strips in, playing, stopped off screen; `detail` adds each one's stage box. */
     animDecos(detail = false) {
       return bgLayer?.animStats?.(detail) || null;
@@ -26844,7 +26879,7 @@ async function main() {
     // A new street or room may hold the view to its own height (TSMainView smallest layer).
     if (bgLayer !== viewSceneLayer) syncLocationViewHeight();
     syncStreetFront();
-    bgLayer?.updateParallax?.(-world.x, -world.y, VIEW_W, LOCATION_VIEW_H, VIEW_H);
+    bgLayer?.updateParallax?.(-world.x, -world.y, VIEW_W, LOCATION_VIEW_H, VIEW_H, parallaxSnap());
     bgLayer?.cullDecos?.(-world.x, -world.y, VIEW_W, VIEW_H);
   };
   app.ticker.add((ticker) => {

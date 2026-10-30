@@ -15,6 +15,7 @@ import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './te
 import { admitSharp, decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco } from './deco-hires.js?v=g457-3';
 import { LADDER_TILE_Z, ladderTilePieces } from './ladder-tiling.js?v=g415-1';
 import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } from './deco-anim.js?v=g457-3';
+import { drawnLayerOffset, layerScreenDir } from './camera-feel.js?v=g473-1';
 
 const DECO_BASE = 'assets/decos/groddle/';
 /**
@@ -1093,6 +1094,11 @@ function gradientTexture(PIXI, top, bottom) {
  * (cameraWorldHeightForGround), so the slide continues on the same line: a
  * clamp froze same-size layers such as Hechey Track's `middleplus` dirt while
  * the ground kept moving, opening gaps of sky under the grass.
+ *
+ * The client floored each layer's slide to a whole pixel on its own. At the remake's Retina
+ * densities that is a 2-2.5 device px step on a different frame for every layer, so the layers
+ * wobbled against each other while the camera eased to a stop (FEEL, js/camera-feel.js). The
+ * offset is exact here; updateParallax snaps it to device pixels only when the camera rests.
  */
 export function parallaxLayerOffset(layer, camX, camY, vpW, vpH, streetW, streetH) {
   const maxX = streetW - vpW;
@@ -1100,8 +1106,8 @@ export function parallaxLayerOffset(layer, camX, camY, vpW, vpH, streetW, street
   const percX = maxX > 0 ? camX / maxX : 1;
   const percY = maxY > 0 ? camY / maxY : 1;
   return {
-    x: camX + Math.floor(percX * (vpW - layer.w)),
-    y: camY + Math.floor(percY * (vpH - layer.h)),
+    x: camX + percX * (vpW - layer.w),
+    y: camY + percY * (vpH - layer.h),
   };
 }
 
@@ -1687,13 +1693,26 @@ export function buildStreetView(street, PIXI, opts = {}) {
     for (const lc of layerContainers) culled += cullLayer(lc, camX, camY, vpW, vpH, rebake, now);
     root.culledDecos = culled;
   };
-  /** Call once per frame with the camera's top-left in screen space. */
-  root.updateParallax = (camX, camY, vpW, vpH, skyH = vpH) => {
+  /**
+   * Call once per frame with the camera's top-left in screen space. `snap` ({ x, y, dx, dy }: the
+   * renderer resolution on an axis whose camera rests, 0 while it moves, and the camera's
+   * direction of travel) settles each layer on a device pixel at rest without stepping back;
+   * moving layers keep their exact share (js/camera-feel.js).
+   */
+  root.updateParallax = (camX, camY, vpW, vpH, skyH = vpH, snap = null) => {
+    const slidesX = W - vpW > 0;
+    const slidesY = sourceH - vpH > 0;
     for (const lc of root.parallaxLayers) {
-      const at = parallaxLayerOffset(lc.parallaxLayer, camX, camY, vpW, vpH, W, sourceH);
-      if (lc.x !== at.x || lc.y !== at.y) lastCull = null;
-      lc.x = at.x;
-      lc.y = at.y;
+      const layer = lc.parallaxLayer;
+      const at = parallaxLayerOffset(layer, camX, camY, vpW, vpH, W, sourceH);
+      const x = drawnLayerOffset(at.x, camX, snap?.x || 0, slidesX ? layerScreenDir(snap?.dx, vpW, layer.w) : 0, lc.screenX);
+      const y = drawnLayerOffset(at.y, camY, snap?.y || 0, slidesY ? layerScreenDir(snap?.dy, vpH, layer.h) : 0, lc.screenY);
+      if (lc.x !== x || lc.y !== y) lastCull = null;
+      lc.x = x;
+      lc.y = y;
+      // Where it lands on screen this frame: the next frame's settle never steps back past it.
+      lc.screenX = x - camX;
+      lc.screenY = y - camY;
     }
     if (skyView) {
       skyView.x = camX;

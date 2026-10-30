@@ -167,7 +167,7 @@ import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=g463-2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=g464-2';
 import { fadeInNewNear } from '../poof-fade.js?v=g463-2';
-import { projectApi } from './street-jobs-feature.js?v=g463-1';
+import { projectApi } from './street-jobs-feature.js?v=g473-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-3';
 import { towerApi } from './home-tower-feature.js?v=g463-1';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
