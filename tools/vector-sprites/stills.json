@@ -1023,6 +1023,23 @@
      "frames": 1
     }
    ]
+  },
+  {
+   "name": "hogtied-piggy",
+   "swf": "misc/hogtied_piggy/hogtied_piggy.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/races/hogtied_piggy__x1_1_png_1354830331.png",
+     "fw": 45,
+     "fh": 40,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
   }
  ]
 }

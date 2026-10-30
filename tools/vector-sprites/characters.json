@@ -5,19 +5,27 @@
  "jobs": [
   {"name": "bureaucrat-0", "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf", "sprite": 121, "zoom": 3.428571, "parts": {"hair04": "hair01", "glasses01": null, "legFar04": "legFar01", "footClose04": "footClose01", "necklace02": null, "tie02": "tie01"}, "sheets": [
    {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995.png", "label": "idle1", "fw": 97, "fh": 89, "cols": 10, "frames": 57},
-   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_talk_png_1354832993.png", "label": "talk", "fw": 97, "fh": 89, "cols": 9, "frames": 26}
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_talk_png_1354832993.png", "label": "talk", "fw": 97, "fh": 89, "cols": 9, "frames": 26},
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_walk1_png_1354832991.png", "label": "walk1", "fw": 97, "fh": 89, "cols": 8, "frames": 24},
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_walk2_png_1354832992.png", "label": "walk2", "fw": 97, "fh": 89, "cols": 6, "frames": 12}
   ] },
   {"name": "bureaucrat-1", "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf", "sprite": 121, "zoom": 3.428571, "parts": {"armFar01": "armFar02", "armUpperClose01": "armUpperClose02", "armLowerClose01": "armLowerClose02", "hair04": "hair02", "glasses01": null, "legFar04": "legFar02", "legClose01": "legClose02", "footClose04": "footClose02", "necklace02": null, "body01": "body02"}, "sheets": [
    {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_idle1_png_1354833004.png", "label": "idle1", "fw": 97, "fh": 91, "cols": 10, "frames": 57},
-   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_talk_png_1354833002.png", "label": "talk", "fw": 97, "fh": 91, "cols": 9, "frames": 26}
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_talk_png_1354833002.png", "label": "talk", "fw": 97, "fh": 91, "cols": 9, "frames": 26},
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_walk1_png_1354832999.png", "label": "walk1", "fw": 97, "fh": 91, "cols": 8, "frames": 24},
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_walk2_png_1354833000.png", "label": "walk2", "fw": 97, "fh": 91, "cols": 6, "frames": 12}
   ] },
   {"name": "bureaucrat-2", "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf", "sprite": 121, "zoom": 3.428571, "parts": {"armFar01": "armFar03", "armUpperClose01": "armUpperClose03", "armLowerClose01": "armLowerClose03", "glasses01": null, "legFar04": "legFar03", "legClose01": "legClose03", "footClose04": "footClose03", "necklace02": "necklace01", "tie02": null, "body01": "body03"}, "sheets": [
    {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_idle1_png_1354833012.png", "label": "idle1", "fw": 97, "fh": 96, "cols": 10, "frames": 57},
-   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_talk_png_1354833010.png", "label": "talk", "fw": 97, "fh": 96, "cols": 9, "frames": 26}
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_talk_png_1354833010.png", "label": "talk", "fw": 97, "fh": 96, "cols": 9, "frames": 26},
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_walk1_png_1354833008.png", "label": "walk1", "fw": 97, "fh": 96, "cols": 8, "frames": 24},
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_walk2_png_1354833009.png", "label": "walk2", "fw": 97, "fh": 96, "cols": 6, "frames": 12}
   ] },
   {"name": "bureaucrat-3", "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf", "sprite": 121, "zoom": 3.428571, "parts": {"armFar01": "armFar04", "armUpperClose01": "armUpperClose04", "armLowerClose01": "armLowerClose04", "hair04": "hair05", "glasses01": null, "legClose01": "legClose04", "tie02": null, "body01": "body04"}, "sheets": [
    {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_idle1_png_1354833021.png", "label": "idle1", "fw": 97, "fh": 101, "cols": 10, "frames": 57},
-   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_talk_png_1354833019.png", "label": "talk", "fw": 97, "fh": 101, "cols": 9, "frames": 26}
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_talk_png_1354833019.png", "label": "talk", "fw": 97, "fh": 101, "cols": 9, "frames": 26},
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_walk1_png_1354833017.png", "label": "walk1", "fw": 97, "fh": 101, "cols": 8, "frames": 24},
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_walk2_png_1354833018.png", "label": "walk2", "fw": 97, "fh": 101, "cols": 6, "frames": 12}
   ] },
   {"name": "phantom", "swf": "quest_items/phantom_glitch/phantom_glitch.swf", "sprite": 65, "sheets": [
    {"path": "assets/sprites/quests/phantom-appear.png", "label": "appear", "fw": 147, "fh": 214, "cols": 6, "frames": 46},
@@ -271,6 +279,10 @@
   {"name": "helga", "swf": "inhabitants/helga/npc_jabba2.swf", "sprite": 251, "sheets": [
    {"path": "assets/sprites/vendors/npc_jabba2_idle.webp", "label": "idle_stand", "fw": 195, "fh": 193, "cols": 8, "frames": 185},
    {"path": "assets/sprites/vendors/npc_jabba2_talk.webp", "label": "talk", "fw": 195, "fh": 193, "cols": 8, "frames": 72}
+  ] },
+  {"name": "factory-defect-chick", "swf": "rare_items/npc_cubimal_factorydefect_chick/npc_cubimal_factorydefect_chick.swf", "sprite": 31, "sheets": [
+   {"path": "assets/sprites/cubimals/npc_cubimal_factorydefect_chick_race.webp", "label": "race", "fw": 52, "fh": 33, "cols": 15, "frames": 59},
+   {"path": "assets/sprites/cubimals/npc_cubimal_factorydefect_chick_1.webp", "label": "1", "fw": 52, "fh": 33, "cols": 1, "frames": 1}
   ] },
   {"name": "fox-ranger", "swf": "inhabitants/fox_ranger/npc_fox_ranger.swf", "sprite": 28, "sheets": [
    {"path": "assets/sprites/foxes/ranger-idle0.png", "label": "idle0", "fw": 62, "fh": 105, "cols": 1, "frames": 1},

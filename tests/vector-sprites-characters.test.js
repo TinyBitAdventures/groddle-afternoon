@@ -18,7 +18,7 @@ import {
   pointAtPart,
   sourceSheet,
   upgradeSource,
-} from '../public/js/sprite-hires.js?v=g464-1';
+} from '../public/js/sprite-hires.js?v=g464-2';
 import { packParts } from '../tools/vector-sprites/build.mjs';
 
 /** A js/textures.js stand-in: records the URL routes it is given. */
@@ -65,6 +65,7 @@ const SHARP = [
   'fox-ranger', 'fox-bait',
   // The street vendors (js/vendor-npcs.js VENDOR_NPC_ART: cropped 8-column strips, idle loop + talk).
   'gardening-vendor', 'meal-vendor', 'tool-vendor', 'uncle-friendly', 'helga', 'sno-cone-vending-machine',
+  'factory-defect-chick', // G407's chick, race and broken still
   'juju-red', 'juju-green', 'juju-yellow',
   ...['red', 'green', 'yellow'].flatMap((v) => ['blue', 'black', 'red'].map((b) => `juju-bandit-${v}-${b}`)),
   ...['alph', 'cosma', 'friendly', 'grendaline', 'humbaba', 'lem', 'mab', 'pot', 'spriggan', 'ti', 'zille'].map((g) => `shrine-${g}`),

@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 766,
+  "commits": 767,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "Uncle Friendly, Helga and the other vendors draw sharp on Retina screens"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-29",
     "kind": "improve",
     "text": "Sad piggies, eating piggies and sitting chickens draw sharp on Retina"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "improve",
-    "text": "Loading-card street pictures are sharp on Retina screens"
    }
   ]
  },

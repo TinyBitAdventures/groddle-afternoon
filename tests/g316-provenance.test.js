@@ -118,7 +118,7 @@ describe('loading-card strips are our own renders (G316)', () => {
 
 describe('sprites, decos and garden art (G316)', () => {
   it('every 3x sprite file exists; the butterfly sheets render the CC0 glitch-items SWF', async () => {
-    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=g464-1');
+    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=g464-2');
     for (const [lo, hi] of HIRES_SPRITES) {
       assert.ok(existsSync(join(pub, lo.split('?')[0])), lo);
       assert.ok(existsSync(join(pub, hi)), hi);
