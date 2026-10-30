@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 778,
+  "commits": 779,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "The Classic interface's screen frame, measured from the 2012 client"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "The Annex of A Summer's Day can be climbed to its ladder"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "new",
-    "text": "A Summer's Day is Tiny Speck's own memory street, with its flitterbugs, signs, stones, pool and orbs"
    }
   ]
  },
- "tests": 438,
+ "tests": 439,
  "generatedAt": "2026-10-30"
 }

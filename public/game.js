@@ -871,6 +871,8 @@ import { clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSp
 import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?v=g414-1';
 import { itemZ } from './js/item-bands.js?v=g429-1';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=g412-1';
+// The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=g468-1';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -26318,6 +26320,7 @@ async function main() {
     onPlayerCard: () => document.getElementById('player-menu-btn')?.click(),
   });
   packRow.install();
+  installInterfaceSettings();
   document.querySelector('.top-actions')?.addEventListener('click', () => {
     if (currentAction) cancelCurrentAction({ quiet: true });
     closePackPopover();
