@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-2';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-343';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-344';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g463-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g470-1';
@@ -860,7 +860,7 @@ import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from './js/notify.js?v=g459-1';
 import { mountNotifyView } from './js/notify-view.js?v=g469-2';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g468-13';
-import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=g472-4';
+import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=g472-5';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=g469-2';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=g469-3';
 import { bindVerbMenu, focusVerbRow, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=g469-1';
@@ -24842,6 +24842,8 @@ async function main() {
   await loadTrantTables();
   await loadAudio();
   features.init(engine);
+  // MPANELS: Upgrades (features/imagination-feature.js builds it) is the shell's centred size.
+  panelShell?.add({ id: 'imagination-panel', kind: 'center', close: () => document.querySelector('#imagination-panel [data-img-close]')?.click() });
 
   world = new PIXI.Container();
   // The camera moves `world` every frame; as a render group only its own

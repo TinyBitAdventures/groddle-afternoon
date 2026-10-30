@@ -446,18 +446,24 @@ function ensurePanel() {
     style.textContent = PANEL_CSS;
     document.head.appendChild(style);
   }
-  panel = el('div', { id: 'imagination-panel', class: 'glitch-modal imagination-panel', hidden: true });
-  panel.innerHTML = `<div class="img-card-shell" role="dialog" aria-modal="true" aria-labelledby="img-title">
-    <div class="img-head">
-      <div><p class="img-kicker">Imagination</p><h2 id="img-title">Upgrade</h2></div>
+  // MPANELS: the modern skin gives it the panel shell's centred frame (style.css .ui-sheet-*): the
+  // head (icon, title, balance, U key cap, close), the tabs, a body that scrolls and the footer
+  // with Re-deal. The parts marked mp-modern-only are the modern skin's alone.
+  panel = el('div', { id: 'imagination-panel', class: 'glitch-modal imagination-panel ui-sheet ui-sheet-center', hidden: true });
+  panel.innerHTML = `<div class="img-card-shell ui-sheet-card" role="dialog" aria-modal="true" aria-labelledby="img-title">
+    <div class="img-head ui-sheet-head">
+      <img class="ui-sheet-icon img-head-icon mp-modern-only" src="${UI}imagination_button.png" alt="" />
+      <div class="img-head-title"><p class="img-kicker">Imagination</p><h2 id="img-title" class="ui-sheet-title" tabindex="-1">Upgrade</h2></div>
       <div class="img-balance" title="Spendable imagination"><img src="${UI}imagination_button.png" alt="iMG" /><strong data-img-balance>0</strong></div>
-      <button type="button" class="img-x" data-img-close aria-label="Close">×</button>
+      <span class="kcap ui-sheet-key mp-modern-only" aria-hidden="true">U</span>
+      <button type="button" class="img-x ui-sheet-x" data-img-close aria-label="Close Upgrades (Esc)">×</button>
     </div>
-    <div class="img-tabs" role="tablist">
+    <div class="img-tabs ui-sheet-tabs" role="tablist" aria-label="Upgrades">
       <button type="button" role="tab" data-img-tab="hand" aria-selected="true">Your hand</button>
-      <button type="button" role="tab" data-img-tab="owned" aria-selected="false">Your upgrades</button>
+      <button type="button" role="tab" data-img-tab="owned" aria-selected="false" tabindex="-1">Your upgrades</button>
     </div>
-    <div data-img-body></div>
+    <div class="img-body ui-sheet-body" data-img-body></div>
+    <div class="img-foot-bar ui-sheet-foot" data-img-foot></div>
   </div>`;
   const host = document.getElementById('make-panel')?.parentElement || document.body;
   host.appendChild(panel);
@@ -539,6 +545,13 @@ function onKeyDown(e) {
       busyAnim = false;
       render(true);
     } else closePanel();
+  } else if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key) && e.target?.closest?.('[data-img-tab]')) {
+    // MPANELS: the tabs move with the arrow keys (the tab follows focus).
+    e.preventDefault();
+    view = e.key === 'Home' ? 'hand' : e.key === 'End' ? 'owned' : view === 'hand' ? 'owned' : 'hand';
+    flipped = -1;
+    render();
+    panel.querySelector(`[data-img-tab="${view}"]`)?.focus({ preventScroll: true });
   } else if (['1', '2', '3'].includes(e.key) && view === 'hand' && !busyAnim) {
     const slot = Number(e.key) - 1;
     flipped = flipped === slot ? -1 : slot;
@@ -578,12 +591,24 @@ function render(dealing = false) {
   const ownedList = ownedUpgradeList(state, owned(engine));
   for (const tab of panel.querySelectorAll('[data-img-tab]')) {
     tab.setAttribute('aria-selected', String(tab.dataset.imgTab === view));
+    tab.tabIndex = tab.dataset.imgTab === view ? 0 : -1;
     if (tab.dataset.imgTab === 'owned') tab.textContent = `Your upgrades (${ownedList.length})`;
   }
   const body = panel.querySelector('[data-img-body]');
   body.replaceChildren();
+  // The footer: Re-deal with the hand, the count of cards with Your upgrades; Esc in both.
+  const footBar = panel.querySelector('[data-img-foot]') || body;
+  if (footBar !== body) footBar.replaceChildren();
+  const escHint = () => {
+    if (footBar === body) return;
+    const esc = el('span', { class: 'ui-sheet-esc mp-modern-only' });
+    esc.append(el('span', { class: 'kcap' }, 'Esc'), document.createTextNode(' close'));
+    footBar.append(esc);
+  };
   if (view === 'owned') {
     renderOwned(body, ownedList);
+    if (footBar !== body) footBar.append(el('p', { class: 'panel-meta img-foot-note mp-modern-only' }, `${ownedList.length} ${ownedList.length === 1 ? 'upgrade' : 'upgrades'} so far`));
+    escHint();
     return;
   }
   const hand = el('div', { class: 'img-hand' });
@@ -607,7 +632,8 @@ function render(dealing = false) {
     foot.append(use);
   }
   foot.append(el('small', {}, free ? 'You can re-deal once a day' : "You've already re-dealt today"));
-  body.append(foot);
+  footBar.append(foot);
+  escHint();
 }
 
 function renderOwned(body, list) {

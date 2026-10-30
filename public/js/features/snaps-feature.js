@@ -75,6 +75,7 @@ const STYLE = `
 .snap-win-head span { color: var(--text-subtle); font-size: var(--fs-sm); }
 .snap-win-x { margin-left: auto; border: 0; background: transparent; font: 700 var(--fs-xl)/var(--lh-none) var(--font-system); color: var(--text-subtle); cursor: pointer; padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-sm); }
 .snap-win-body { overflow-y: auto; padding: var(--sp-3) var(--sp-7) var(--sp-7); }
+.snap-win-foot { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-5); padding: var(--sp-3) var(--sp-7) var(--sp-5); color: var(--text-subtle); font-size: var(--fs-sm); }
 .snap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--sp-5); }
 .snap-card { background: var(--surface-bright); border-radius: var(--radius-sm); box-shadow: var(--shadow-1); padding: var(--sp-3) var(--sp-3) var(--sp-4); display: flex; flex-direction: column; gap: var(--sp-2); }
 .snap-card img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--c-grey-90); border-radius: var(--radius-xs); }
@@ -333,14 +334,21 @@ function placeText(tsid) {
 
 function openAlbum(engine, s) {
   if (s.win) s.win.remove();
-  const shade = el('div', { class: 'snap-shade-win', 'data-snaps-window': '' });
-  const win = el('div', { class: 'snap-win', role: 'dialog', 'aria-label': T.title });
-  const head = el('div', { class: 'snap-win-head' });
-  const count = el('span', { 'data-snaps-count': '' });
-  const x = el('button', { type: 'button', class: 'snap-win-x', 'aria-label': T.close }, '×');
-  head.append(el('h2', {}, T.title), count, x);
-  const body = el('div', { class: 'snap-win-body' });
-  win.append(head, body);
+  // MPANELS: the panel shell's centred frame in the modern skin (style.css): the head (the Camera, the
+  // title, close), a body that scrolls, the count and Esc in the footer.
+  const shade = el('div', { class: 'snap-shade-win ui-sheet-center', 'data-snaps-window': '' });
+  const win = el('div', { class: 'snap-win ui-sheet-card', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'snaps-title' });
+  const head = el('div', { class: 'snap-win-head ui-sheet-head' });
+  const count = el('span', { class: 'panel-meta', 'data-snaps-count': '' });
+  const x = el('button', { type: 'button', class: 'snap-win-x ui-sheet-x', 'aria-label': `${T.close} (Esc)` }, '×');
+  const title = el('h2', { id: 'snaps-title', class: 'ui-sheet-title', tabindex: '-1' }, T.title);
+  head.append(el('img', { class: 'ui-sheet-icon mp-modern-only', src: itemIcon(CAMERA_CLASS), alt: '' }), title, x);
+  const body = el('div', { class: 'snap-win-body ui-sheet-body' });
+  const foot = el('div', { class: 'snap-win-foot ui-sheet-foot' });
+  const esc = el('span', { class: 'ui-sheet-esc mp-modern-only' });
+  esc.append(el('span', { class: 'kcap' }, 'Esc'), document.createTextNode(' close'));
+  foot.append(count, esc);
+  win.append(head, body, foot);
   shade.append(win);
   document.body.append(shade);
   s.win = shade;
@@ -388,7 +396,7 @@ function openAlbum(engine, s) {
   loadAlbum(s, true).then(() => { draw(); publish(engine, s); }).catch((err) => {
     body.replaceChildren(el('p', { class: 'snap-note' }, err?.message || 'That didn\'t work. Try again in a moment.'));
   });
-  x.focus();
+  title.focus({ preventScroll: true });
 }
 
 /* ------------------------------------------------------------------ */

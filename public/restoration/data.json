@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 811,
+  "commits": 812,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "Feat and the vendors open as side sheets on the left, with a header, a body that scrolls and a footer"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "new",
     "text": "Classic's imagination hub on X: the seven clouds for Skills, Quests, Upgrades, looks, Teleport and home"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "new",
-    "text": "Classic's verb menu: the 2012 white card with touching rows, no shade over the world"
    }
   ]
  },

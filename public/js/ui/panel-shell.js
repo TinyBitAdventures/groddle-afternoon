@@ -107,8 +107,8 @@ export function mountPanelShell({ root, sheets, setData = () => {}, onChange = (
     onChange(openSide);
   }
 
-  if (typeof MutationObserver === 'function') {
-    const mo = new MutationObserver(() => sync());
+  const mo = typeof MutationObserver === 'function' ? new MutationObserver(() => sync()) : null;
+  if (mo) {
     for (const s of list) {
       const e = el(s.id);
       if (e) mo.observe(e, { attributes: true, attributeFilter: ['hidden'] });
@@ -132,6 +132,18 @@ export function mountPanelShell({ root, sheets, setData = () => {}, onChange = (
       }
     },
     sync,
+    /** MPANELS: watch a panel a feature builds after the shell mounted (Upgrades). */
+    add(sheet) {
+      const e = el(sheet?.id);
+      if (!e || byId.has(sheet.id)) return false;
+      const s = { kind: 'side', ...sheet };
+      list.push(s);
+      byId.set(s.id, s);
+      was.set(s.id, shown(s.id));
+      mo?.observe(e, { attributes: true, attributeFilter: ['hidden'] });
+      sync();
+      return true;
+    },
   };
 }
 
