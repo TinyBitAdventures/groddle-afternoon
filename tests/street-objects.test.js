@@ -40,7 +40,7 @@ import {
   treeSkill,
 } from '../public/js/street-objects.js?v=g414-1';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=g478-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-364';
+import { FEATURES } from '../public/js/features/index.js?v=registry-369';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=g403-1';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=g414-1';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=trant-harvest-2';
@@ -468,7 +468,8 @@ describe('street objects: Wood Trees', () => {
   it('the server data carries the Wood Trees the game lays out', { skip: skipWithoutServer }, () => {
     const data = JSON.parse(readFileSync(serverPath('data', 'objects.json'), 'utf8'));
     const woods = Object.values(data.streets).flatMap((s) => (s.trees || []).filter((r) => r[1] === 'wood_tree'));
-    assert.ok(woods.length > 100, `${woods.length} wood trees`);
+    // 72 archived Wood Trees; the invented fallback set's ones went (2026-10-30).
+    assert.ok(woods.length >= 60, `${woods.length} wood trees`);
     assert.ok(woods.every((r) => r[4] === 6 && r[5] === 0), 'fresh at maturity 6');
     assert.match(read('public/js/features/street-objects-feature.js'), /t\.classId === 'wood_tree' && !t\.grownFromBean/);
   });

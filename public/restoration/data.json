@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 837,
+  "commits": 838,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "The world starts at the Original zoom, close like the 2012 game; players can zoom out to Wide"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "new",
     "text": "How many asks in one compact chooser where you asked: by the piggy for Feed, by the stack for Eat more and Drop, by the tile for Buy and Sell"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Home, Mail and Decorate take the panel shell's look: Home and Mail in its centred frame, Decorate and Cultivate a side sheet on the left"
    }
   ]
  },

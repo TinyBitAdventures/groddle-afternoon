@@ -116,6 +116,80 @@ describe('Tiny Speck street ecology catalog', () => {
   });
 });
 
+describe('streets without ecology get only what their own file holds (Austin 2026-10-30)', () => {
+  const index = JSON.parse(readFileSync(join(publicRoot, 'assets/streets/index.json'), 'utf8'));
+  const locationRoot = join(__dirname, '../../streets/mnt/stos/location_data');
+  const EXIT = 'GA93VBH3H3D38HF'; // Gentle Island Exit: LA93VBH3H3D38HF.xml holds 4 Coins and a Qurazy marker
+  const ANIMAL_OR_SCENERY = (p) => p.piggies + p.chickens + p.butterflies + p.flyingButterflies + p.treeClasses.length + p.rockClasses.length + p.gardens + Number(p.vendor) + Number(p.shrine);
+
+  it('no street ever gets the invented playable fallback', () => {
+    assert.doesNotMatch(readFileSync(join(publicRoot, 'js/street-ecology.js'), 'utf8'), /playable-fallback/);
+    for (const tsid of Object.keys(index.streets)) {
+      const pop = populationForStreet(tsid, ecologyForStreet(tsid), { starter: tsid === index.default });
+      assert.notEqual(pop.source, 'playable-fallback', tsid);
+    }
+  });
+
+  it('a street with no row and no file is empty', () => {
+    const pop = populationForStreet('GNOSUCHSTREET01', null);
+    assert.equal(pop.source, 'no-archived-row');
+    assert.equal(ANIMAL_OR_SCENERY(pop), 0);
+    assert.deepEqual([pop.apples, pop.musicblocks, pop.quoins], [0, 0, 0]);
+    // Penumbra (Puzzles) has no archived file and no feature row.
+    const penumbra = populationForStreet('GIFM2QAIQ1C31JV', ecologyForStreet('GIFM2QAIQ1C31JV'));
+    assert.equal(penumbra.source, 'no-archived-row');
+    assert.equal(ANIMAL_OR_SCENERY(penumbra), 0);
+  });
+
+  it('the starter keeps its onboarding set even without its row', () => {
+    const pop = populationForStreet(index.default, null, { starter: true });
+    assert.equal(pop.source, 'starter-onboarding');
+    assert.ok(pop.piggies >= 3 && pop.chickens >= 2 && pop.gardens >= 2 && pop.vendor && pop.shrine);
+    assert.deepEqual(pop.treeClasses, ['trant_fruit', 'trant_egg', 'trant_bean', 'wood_tree']);
+  });
+
+  it('Gentle Island Exit has its 4 quoins and no egg plant, animals, garden, vendor or shrine', () => {
+    const row = ecologyForStreet(EXIT);
+    assert.deepEqual(row, { label: 'Gentle Island Exit', sourceTsid: 'LA93VBH3H3D38HF', counts: {}, exact: true, quoins: 4 });
+    const pop = populationForStreet(EXIT, row);
+    assert.equal(pop.source, 'tinyspeck-locations-xml');
+    assert.equal(pop.exact, true);
+    assert.equal(pop.interior, undefined, 'outdoors: seasons still dress it');
+    assert.equal(pop.sourceEmpty, undefined);
+    assert.ok(!pop.treeClasses.includes('trant_egg'));
+    assert.equal(ANIMAL_OR_SCENERY(pop), 0);
+    assert.deepEqual([pop.apples, pop.musicblocks, pop.quoins], [0, 0, 4]);
+  });
+
+  it('patch-only streets keep their patches and nothing else (Groddle Forest Junction, Old Groddle Forest)', () => {
+    const row = ecologyForStreet('GLI1018LOKA18M6');
+    assert.equal(row.exact, true);
+    assert.deepEqual(catalog.soil.GLI1018LOKA18M6, { patch: 10 });
+    assert.equal(ANIMAL_OR_SCENERY(populationForStreet('GLI1018LOKA18M6', row)), 0);
+  });
+
+  it('the builder writes a row for every street with an archived file', { skip: existsSync(locationRoot) ? false : 'needs ../streets (glitch-locations locations-xml.zip unzipped)' }, () => {
+    const generator = readFileSync(join(__dirname, '../build-street-ecology.mjs'), 'utf8');
+    assert.doesNotMatch(generator, /!ecology\.spawners\) continue;/);
+    let withFile = 0;
+    for (const [tsid] of Object.entries(index.streets)) {
+      const file = ['L', 'G'].map((p) => join(locationRoot, `${p}${tsid.slice(1)}.xml`)).find((f) => existsSync(f));
+      if (!file) continue;
+      withFile += 1;
+      const row = ecologyForStreet(tsid);
+      assert.ok(row, `${tsid} has ${file} but no row`);
+      if (!row.exact) continue;
+      // An exact row is only for a file with nothing the ecology maps: its quoins are the file's own.
+      const xml = readFileSync(file, 'utf8');
+      const items = xml.match(/<objrefs id="items">([\s\S]*?)<\/objrefs>/)?.[1] || '';
+      assert.equal(row.quoins, (items.match(/label="(?:Coin|Quoin)"/g) || []).length, tsid);
+      assert.doesNotMatch(items, /label="(?:Piggy|Chicken|Butterfly|Fruit Tree|Egg Plant|Bean Tree|Bubble Tree|Spice Plant|Gas Plant|Wood Tree|Metal Rock|Dullite Rock|Beryl Rock|Sparkly Rock|Garden|Street Spirit|Spawner|spawner)"|Shrine (?:for|to) /, tsid);
+    }
+    assert.ok(withFile >= 1400, String(withFile));
+    assert.equal(Object.values(catalog.streets).filter((r) => r.exact).length, 139);
+  });
+});
+
 describe('one-pass platform placement', () => {
   const platforms = platformsScreen(hechey);
   const population = populationForStreet(

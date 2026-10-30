@@ -25,7 +25,7 @@ export function isInteriorHub(hubId) {
 /**
  * Interior streets in outdoor hubs (G43). build-street-ecology.mjs asks
  * interiorReason() for every street and writes `interior: true` plus the
- * reason (`interiorWhy`) on the row, so no fallback piggies, trees, vendor or
+ * reason (`interiorWhy`) on the row, so no outdoor piggies, trees, vendor or
  * shrine appear indoors. The tests, in order:
  *
  * - door art: the street's own doors use the art drawn for a door seen from
@@ -185,7 +185,7 @@ export async function loadStreetEcologyCatalog(fetchImpl = globalThis.fetch) {
     const response = await fetchImpl(STREET_ECOLOGY_URL);
     if (response.ok) setStreetEcologyCatalog(await response.json());
   } catch {
-    // Keep the playable fallback population when the optional catalog is absent.
+    // No catalog: streets load with no ecology (the starter keeps its onboarding set).
   }
   return catalog;
 }
@@ -206,47 +206,60 @@ function expandClasses(counts, classes, totalCap) {
   return out;
 }
 
+function emptyPopulation({ source, sourceTsid = null }) {
+  return {
+    source,
+    sourceTsid,
+    sourceEmpty: true,
+    giantId: null,
+    piggies: 0,
+    chickens: 0,
+    butterflies: 0,
+    flyingButterflies: 0,
+    treeClasses: [],
+    rockClasses: [],
+    gardens: 0,
+    vendor: false,
+    shrine: false,
+    apples: 0,
+    musicblocks: 0,
+    quoins: 0,
+    companions: false,
+    resourceCounts: {},
+    resourceNodeClasses: [],
+  };
+}
+
 /**
  * Convert an archived item-reference row into bounded playable counts.
  * Static items stay exact (within rendering caps). Archived spawners add no
  * animals: a spawner refills whenever a player enters, so its snapshot already
  * holds what it spawns, and 409 of the 449 archived streets with spawners show
  * no animal at all (register G44b).
+ *
+ * A street with no row gets nothing (Austin 2026-10-30): no invented piggies,
+ * trees, rocks, garden, vendor or shrine. build-street-ecology.mjs writes a row
+ * for every street that has an archived file, so only streets with no file at
+ * all (and no feature row) land here; the starter street keeps its onboarding
+ * set either way.
  */
 export function populationForStreet(tsid, entry, { starter = false } = {}) {
   if (entry?.empty === true) {
-    return {
-      source: 'tinyspeck-locations-xml',
-      sourceTsid: entry.sourceTsid || null,
-      sourceEmpty: true,
-      giantId: null,
-      piggies: 0,
-      chickens: 0,
-      butterflies: 0,
-      flyingButterflies: 0,
-      treeClasses: [],
-      rockClasses: [],
-      gardens: 0,
-      vendor: false,
-      shrine: false,
-      apples: 0,
-      musicblocks: 0,
-      quoins: 0,
-      companions: false,
-      resourceCounts: {},
-      resourceNodeClasses: [],
-    };
+    return emptyPopulation({ source: 'tinyspeck-locations-xml', sourceTsid: entry.sourceTsid || null });
   }
+  if (!entry && !starter) return emptyPopulation({ source: 'no-archived-row' });
   const counts = entry?.counts || {};
-  if (entry?.interior === true) {
-    // Indoors: exactly what the archived row lists, no spawner-inferred
-    // animals, no fallback scenery, no ambient apples or Musicblocks, and the
-    // archived quoin count instead of the outdoor eight.
+  if (entry?.interior === true || entry?.exact === true) {
+    // Indoors, or an outdoor street whose archived file holds no ecology at
+    // all (`exact`: quoins, Qurazy markers, event boxes, patches, notes):
+    // exactly what the archived row lists, no spawner-inferred animals, no
+    // invented scenery, no ambient apples or Musicblocks, and the archived
+    // quoin count instead of the outdoor eight.
     const butterflies = Math.min(whole(counts.npc_butterfly), 3);
     return {
       source: 'tinyspeck-locations-xml',
       sourceTsid: entry.sourceTsid || null,
-      interior: true,
+      ...(entry.interior === true ? { interior: true } : { exact: true }),
       giantId: entry.giantId || null,
       piggies: Math.min(whole(counts.npc_piggy), 6),
       chickens: Math.min(whole(counts.npc_chicken), 3),
@@ -265,7 +278,6 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
       resourceNodeClasses: expandResourceClasses(counts),
     };
   }
-  const seed = stableEcologyHash(tsid);
   // A feature-built row for a rebuilt street may lift the rendering caps to its
   // source's own count (Vicar's Peak's loading card: 11 Piggies, 7 Chickens);
   // archived rows never carry `caps`.
@@ -305,23 +317,10 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
     shrine = true;
   }
 
-  // If no official row exists at all, keep a small shippable fallback rather
-  // than turning an otherwise playable recovered street into an empty shell.
-  if (!entry) {
-    piggies = starter ? piggies : 1 + (seed % 2);
-    chickens = starter ? chickens : 1;
-    butterflies = starter ? butterflies : 1;
-    treeClasses = treeClasses.length
-      ? treeClasses
-      : ['trant_fruit', 'trant_egg', 'trant_bean', 'wood_tree'];
-    rockClasses = starter ? rockClasses : ['rock_metal_1', 'rock_dullite_1'];
-    gardens = starter ? gardens : 1;
-    vendor = true;
-    shrine = true;
-  }
-
   return {
-    source: entry ? 'tinyspeck-locations-xml' : 'playable-fallback',
+    // No row here means the starter street without its catalog row (the
+    // catalog failed to load): the onboarding set above, nothing else.
+    source: entry ? 'tinyspeck-locations-xml' : 'starter-onboarding',
     sourceTsid: entry?.sourceTsid || null,
     giantId: entry?.giantId || null,
     piggies,

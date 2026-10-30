@@ -82,8 +82,8 @@ const LABEL_TO_CLASS = Object.freeze({
 /**
  * Soil objects (js/patches.js): Patches, Dark Patches, the one archived
  * Seedling, and dead trants that clear back into a Patch. They are written to
- * a separate top-level `soil` map instead of `counts`, so a street whose only
- * archived objects are patches keeps its playable fallback population.
+ * a separate top-level `soil` map instead of `counts`; a street whose only
+ * archived objects are patches gets an exact row with no other ecology.
  */
 const SOIL_LABEL_TO_CLASS = Object.freeze({
   Patch: 'patch',
@@ -108,9 +108,8 @@ function soilFromLabels(labels) {
 
 /**
  * Fox Brushing Preserves and Heli Kitties (js/foxes.js, js/heli-kitties.js).
- * Written to a separate top-level `wildlife` map, like `soil`, so kitty-only
- * streets keep their playable fallback population. 51 Fox Rangers, 278 Fox
- * Stop Markers, and 93 Heli Kitties in the archived snapshot.
+ * Written to a separate top-level `wildlife` map, like `soil`. 51 Fox
+ * Rangers, 278 Fox Stop Markers, and 93 Heli Kitties in the archived snapshot.
  */
 const WILDLIFE_LABEL_TO_CLASS = Object.freeze({
   'Fox Ranger': 'npc_fox_ranger',
@@ -130,12 +129,11 @@ function wildlifeFromLabels(labels) {
 /**
  * Street furniture (js/street-furniture.js): street Mailboxes, Visiting
  * Stones, placed Notes and Notice Boards. Written to a separate top-level
- * `furniture` map, like `soil`, so furniture-only streets keep their playable
- * fallback population. 265 Mailboxes, 199 Visiting Stones, 135 Notes (63 on
- * the curated-empty Stoot memorial, which stays empty) and 7 Notice Boards in
- * the archived snapshot. Clickable Broadcasters are invisible event triggers
- * whose per-instance `event` props are absent from the dump, so they are not
- * mapped.
+ * `furniture` map, like `soil`. 265 Mailboxes, 199 Visiting Stones, 135
+ * Notes (63 on the curated-empty Stoot memorial, which stays empty) and 7
+ * Notice Boards in the archived snapshot. Clickable Broadcasters are
+ * invisible event triggers whose per-instance `event` props are absent from
+ * the dump, so they are not mapped.
  */
 const FURNITURE_LABEL_TO_CLASS = Object.freeze({
   Mailbox: 'npc_mailbox',
@@ -301,7 +299,23 @@ for (const [tsid, meta] of Object.entries(index.streets || {})) {
     };
     continue;
   }
-  if (!Object.keys(ecology.counts).length && !ecology.giantId && !ecology.spawners) continue;
+  if (!Object.keys(ecology.counts).length && !ecology.giantId && !ecology.spawners) {
+    // Nothing living, no rocks, garden, street spirit, shrine or spawner: the
+    // file is quoins, Qurazy markers, event boxes, patches, notes and the
+    // like (Gentle Island Exit: 4 Coins and a Qurazy marker). Austin
+    // 2026-10-30: such a street gets only what its file lists, so it gets an
+    // exact row (street-ecology.js populationForStreet) with its archived
+    // quoins; the soil, furniture, wildlife and vendor maps above still apply.
+    // These streets used to get no row, and so the invented fallback set.
+    streets[tsid] = {
+      label: meta.label || tsid,
+      sourceTsid,
+      counts: {},
+      exact: true,
+      quoins: labels.filter((label) => QUOIN_LABELS.has(label)).length,
+    };
+    continue;
+  }
   streets[tsid] = {
     label: meta.label || tsid,
     sourceTsid,

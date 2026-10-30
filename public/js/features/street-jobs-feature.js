@@ -45,7 +45,7 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-8';
-import { ecologyForStreet } from '../street-ecology.js?v=official-ecology-7';
+import { ecologyForStreet } from '../street-ecology.js?v=g485-1';
 import { worldToScreen } from '../street-model.js?v=g478-1';
 import { signArmWidth } from '../street-render.js?v=g478-1';
 import { getSkillCatalog } from '../content-catalogs.js?v=g403-1';
