@@ -11272,4 +11272,191 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #game-root .homes-bar h4 { color: var(--text-muted); font-size: var(--fs-xs); font-weight: var(--fw-heavy); letter-spacing: 0.06em; }
 [data-ui="modern"] #game-root .homes-styles .hs-sel { border-bottom: 1px solid var(--border); }
 [data-ui="modern"] #game-root .homes-styles .hs-name small { color: var(--text-muted); }
+/* The How many chooser (js/ui/count-chooser.js): − [number] + Max, OK with the count, Esc back.
+   The step row's own layout in every skin (it replaced the pack's .pack-drop-stepper). */
+.count-pop-step { display: flex; align-items: center; justify-content: center; gap: var(--sp-3); }
+.count-pop-step .count-pop-num { box-sizing: border-box; width: 3.6rem; height: 1.9rem; padding: 0 var(--sp-1); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-bright); color: var(--text); font: inherit; font-weight: 800; text-align: center; }
+.count-pop-of { display: block; margin-top: var(--sp-2); color: var(--text-muted); font-size: var(--fs-xs); text-align: center; }
+.count-pop-title { margin: 0 0 var(--sp-2); font-weight: 800; }
+/* Modern: the verb menu's paper, compact. */
+[data-ui="modern"] .count-pop { color: var(--text); font-family: var(--font-ui); }
+[data-ui="modern"] .count-pop .count-pop-title,
+[data-ui="modern"] #pack-popover .count-pop .pack-eat-title { margin: 0 0 var(--space-2); color: var(--text); font-size: var(--fs-m); font-weight: var(--fw-heavy); }
+[data-ui="modern"] .count-pop .count-pop-note { margin: 0 0 var(--space-2); color: var(--text-muted); font-size: var(--fs-s); line-height: var(--lh-body); }
+[data-ui="modern"] .count-pop :is(.count-pop-step, .feed-picker-qty-row, .qty-row) { display: flex; align-items: center; justify-content: flex-start; gap: 6px; margin: 0; flex-wrap: nowrap; }
+[data-ui="modern"] .count-pop :is(.count-pop-dec, .count-pop-inc, .feed-picker-qty-step, .qty-row [data-vq="-"], .qty-row [data-vq="+"]) {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-l);
+  font-weight: var(--fw-heavy);
+  line-height: var(--lh-none);
+  cursor: pointer;
+}
+[data-ui="modern"] .count-pop :is(.count-pop-num, .feed-picker-qty-input, [data-vq-val]) {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 64px;
+  height: 32px;
+  padding: 0 var(--space-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-m);
+  font-weight: var(--fw-heavy);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+[data-ui="modern"] .count-pop :is(.count-pop-max, .feed-picker-qty-max, .qty-row .btn-max) {
+  flex: none;
+  width: auto;
+  height: 32px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-s);
+  font-weight: var(--fw-heavy);
+  cursor: pointer;
+}
+[data-ui="modern"] .count-pop :is(.count-pop-max, .feed-picker-qty-max)[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+[data-ui="modern"] .count-pop button:hover:not(:disabled) { background: var(--surface-hover); }
+[data-ui="modern"] .count-pop button:disabled { opacity: 0.45; cursor: default; }
+[data-ui="modern"] .count-pop :is(button, input):focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+[data-ui="modern"] .count-pop :is(.count-pop-num, .feed-picker-qty-input, [data-vq-val]) { appearance: textfield; -moz-appearance: textfield; }
+[data-ui="modern"] .count-pop :is(.count-pop-num, .feed-picker-qty-input, [data-vq-val])::-webkit-inner-spin-button,
+[data-ui="modern"] .count-pop :is(.count-pop-num, .feed-picker-qty-input, [data-vq-val])::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+[data-ui="modern"] .count-pop .count-pop-of { margin: var(--space-1) 0 0; text-align: left; font-size: var(--fs-s); }
+[data-ui="modern"] .count-pop .count-pop-actions { display: flex; align-items: center; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-3); }
+[data-ui="modern"] .count-pop .count-pop-esc { display: inline-flex; align-items: center; gap: 4px; margin: 0 auto 0 0; color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] .count-pop .kcap {
+  display: inline-grid;
+  place-items: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-heavy);
+  line-height: var(--lh-none);
+  color: var(--text-muted);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+}
+[data-ui="modern"] .count-pop :is(.feed-picker-qty-go, .qty-row .btn-glitch-primary, [data-v-go]) {
+  flex: none;
+  width: auto;
+  height: 32px;
+  margin: 0;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--accent-text);
+  font: inherit;
+  font-size: var(--fs-m);
+  font-weight: var(--fw-heavy);
+  white-space: nowrap;
+  cursor: pointer;
+}
+[data-ui="modern"] .count-pop :is(.feed-picker-qty-go, [data-v-go]):hover:not(:disabled) { background: var(--accent-hover); }
+[data-ui="modern"] .count-pop .feed-picker-qty-back { height: 32px; padding: 0 var(--space-3); border: 1px solid var(--border-strong); border-radius: var(--radius-pill); background: var(--surface-raised); color: var(--text); font: inherit; font-size: var(--fs-s); font-weight: var(--fw-heavy); }
+/* The pack's Eat more and Drop: in the stack's own card, by its slot. */
+[data-ui="modern"] #pack-popover .count-pop .pack-eat-choices { gap: 4px; margin-bottom: var(--space-2); }
+[data-ui="modern"] #pack-popover .count-pop .pack-eat-choice { min-height: 28px; padding: 0 var(--space-2); border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); color: var(--text); font-size: var(--fs-s); font-weight: var(--fw-heavy); }
+[data-ui="modern"] #pack-popover .count-pop .pack-eat-choice.is-selected { border-color: var(--accent); background: var(--accent-soft); color: var(--text); }
+[data-ui="modern"] #pack-popover .count-pop .count-pop-actions { margin-top: var(--space-3); }
+/* Feed (Incubate, Deposit): the picker by the thing, as its verb menu was (placeMenuAtTarget). */
+[data-ui="modern"] #game-root #feed-picker {
+  --vm-w: 300px;
+  display: block;
+  background: none;
+  backdrop-filter: none;
+}
+[data-ui="modern"] #game-root #feed-picker[hidden] { display: none !important; }
+[data-ui="modern"] #feed-picker .feed-picker-card {
+  position: absolute;
+  left: var(--vm-left, calc(50% - 150px));
+  top: var(--vm-top, 30%);
+  bottom: var(--vm-bottom, auto);
+  box-sizing: border-box;
+  width: var(--vm-w);
+  max-height: calc(100% - var(--hud-h) - 16px);
+  overflow: auto;
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-3);
+  color: var(--text);
+  font-family: var(--font-ui);
+  animation: vm-in 140ms var(--ease-out);
+}
+[data-ui="modern"] #feed-picker .verb-menu-head { display: flex; align-items: center; gap: var(--space-2); margin: 0 0 var(--space-1); padding: 0; background: none; border: 0; }
+[data-ui="modern"] #feed-picker .verb-menu-title { flex: 1 1 auto; color: var(--text); font-size: var(--fs-m); font-weight: var(--fw-heavy); }
+[data-ui="modern"] #feed-picker .verb-menu-x { display: inline-grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: var(--radius-pill); background: none; color: var(--text-muted); font-size: var(--fs-xl); }
+[data-ui="modern"] #feed-picker .verb-menu-sub,
+[data-ui="modern"] #feed-picker .verb-menu-hint { margin: 0 0 var(--space-2); color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] #feed-picker .feed-picker-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+[data-ui="modern"] #feed-picker .feed-picker-choice { border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface); color: var(--text); font-family: var(--font-ui); }
+[data-ui="modern"] #feed-picker .feed-picker-choice:is(:hover, :focus-visible, .is-selected) { border-color: var(--accent); background: var(--accent-soft); box-shadow: none; }
+[data-ui="modern"] #feed-picker .feed-picker-qty { grid-template-columns: 44px minmax(0, 1fr); gap: var(--space-2) var(--space-3); padding: 0; }
+[data-ui="modern"] #feed-picker .feed-picker-qty-icon { width: 44px; height: 44px; padding: 4px; border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface); }
+[data-ui="modern"] #feed-picker .feed-picker-qty-label { margin: 0 0 var(--space-2); color: var(--text-muted); font-size: var(--fs-s); font-weight: var(--fw-bold); }
+[data-ui="modern"] #feed-picker .feed-picker-qty-actions { margin-top: var(--space-1); }
+[data-ui="modern"] #feed-picker:has(.feed-picker-qty:not([hidden])) :is(.verb-menu-sub, .verb-menu-hint) { display: none; }
+[data-ui="modern"] #feed-picker .vm-ptr { display: none; }
+/* Buy and Sell: a popover under its tile on the shelf, its tail pointing at the tile. */
+[data-ui="modern"] #vendor-panel .vendor-body { position: relative; }
+[data-ui="modern"] #vendor-panel .vendor-detail.count-pop {
+  position: absolute;
+  left: var(--space-4);
+  right: var(--space-4);
+  top: var(--pop-top, var(--space-2));
+  z-index: var(--z-raised);
+  display: grid !important;
+  grid-template-columns: 44px 1fr;
+  gap: var(--space-2) var(--space-3);
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-3);
+  animation: vm-in 140ms var(--ease-out);
+}
+[data-ui="modern"] #vendor-panel .vendor-detail.count-pop[hidden] { display: none !important; }
+[data-ui="modern"] #vendor-panel .vendor-detail.count-pop::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: var(--pop-tail, 50%);
+  width: 16px;
+  height: 9px;
+  background: var(--surface-raised);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+[data-ui="modern"] #vendor-panel .vendor-detail.count-pop .btn-glitch-back { display: none; }
+[data-ui="modern"] #vendor-panel .vendor-detail.count-pop .vendor-detail-icon { width: 44px; height: 44px; }
+[data-ui="modern"] #vendor-panel .vendor-detail.count-pop .vendor-detail-icon img { max-width: 34px; max-height: 34px; }
+[data-ui="modern"] #vendor-panel .vendor-detail.count-pop .vendor-detail-body h3 { font-size: var(--fs-m); }
+[data-ui="modern"] #vendor-panel .vendor-detail.count-pop .qty-row { flex-wrap: wrap; margin-top: var(--space-2); }
+[data-ui="modern"] #vendor-panel .vendor-detail.count-pop .qty-row .btn-glitch-primary { flex: 1 0 100%; margin-top: var(--space-1); }
+[data-ui="modern"] #vendor-panel .vendor-detail.count-pop .count-pop-esc { margin: var(--space-2) 0 0; }
+@media (prefers-reduced-motion: reduce) {
+  [data-ui="modern"] :is(#feed-picker .feed-picker-card, #vendor-panel .vendor-detail.count-pop) { animation: none; }
+}
 /* —— end MPANELS —— */

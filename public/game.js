@@ -863,6 +863,7 @@ import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g468-13';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=g472-5';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=g469-2';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=g469-3';
+import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=g472-7';
 import { bindVerbMenu, focusVerbRow, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=g469-1';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g470-2';
@@ -3668,14 +3669,13 @@ function renderPackPopover(classTsid, anchor = null) {
       : `Make with ${slot.label}`
     : `Show ${relatedRecipes.length === 1 ? 'recipe' : 'recipes'}`;
   const dropPrompt = packDropMode
-    ? `<div class="pack-drop-quantity" aria-label="Choose quantity to drop">
-        <p>${escapeHtml(features.query('sharedDropPrompt', classTsid, engine) || 'Drop this stack at your feet. Nearby matching stacks will merge.')}</p>
-        <div class="pack-drop-stepper">
-          <button type="button" data-pack-drop-dec aria-label="Drop one fewer">−</button>
-          <output aria-live="polite">${packDropQty} of ${slot.count}</output>
-          <button type="button" data-pack-drop-inc aria-label="Drop one more">+</button>
-        </div>
-        <div class="pack-drop-confirm-row">
+    ? `<div class="pack-drop-quantity count-pop" data-pack-drop-panel role="group" aria-label="Choose quantity to drop">
+        <p class="pack-drop-title count-pop-title">Drop how many?</p>
+        <p class="count-pop-note">${escapeHtml(features.query('sharedDropPrompt', classTsid, engine) || 'Drop this stack at your feet. Nearby matching stacks will merge.')}</p>
+        ${countStepMarkup({ value: packDropQty, max: slot.count, verb: 'Drop', attrs: { dec: 'data-pack-drop-dec', inc: 'data-pack-drop-inc', num: 'data-pack-drop-num', max: 'data-pack-drop-max' } })}
+        <output class="count-pop-of" aria-live="polite">${packDropQty} of ${slot.count}</output>
+        <div class="pack-drop-confirm-row count-pop-actions">
+          <span class="count-pop-esc mp-modern-only"><span class="kcap">Esc</span> back</span>
           <button type="button" class="pack-pop-primary" data-pack-drop-confirm>Drop ${packDropQty}</button>
         </div>
       </div>`
@@ -3706,17 +3706,15 @@ function renderPackPopover(classTsid, anchor = null) {
           ? Math.round(foodFullness({ foodToday: foodState.foodToday + (packEatPreview(eatMany, useInfo, qty).energy || 0) }, 100).percent)
           : null;
         const fullNote = useInfo.food && fullAfter !== fullNow ? `<span>${fullNow}% full today, then ${fullAfter}%</span>` : '';
-        return `<div class="pack-drop-quantity pack-eat-quantity" data-pack-eat-panel role="group" aria-labelledby="pack-eat-title">
-        <p id="pack-eat-title" class="pack-eat-title">${escapeHtml(eatMany.verb)} how many ${escapeHtml(eatMany.plural)}?</p>
+        return `<div class="pack-drop-quantity pack-eat-quantity count-pop" data-pack-eat-panel role="group" aria-labelledby="pack-eat-title">
+        <p id="pack-eat-title" class="pack-eat-title count-pop-title">${escapeHtml(eatMany.verb)} how many ${escapeHtml(eatMany.plural)}?</p>
         <div class="pack-eat-choices">${chips}</div>
-        <div class="pack-drop-stepper">
-          <button type="button" data-pack-eat-dec aria-label="${escapeHtml(eatMany.verb)} one fewer" ${qty <= 1 ? 'disabled' : ''}>−</button>
-          <output aria-live="polite" data-pack-eat-count>${qty} of ${slot.count}</output>
-          <button type="button" data-pack-eat-inc aria-label="${escapeHtml(eatMany.verb)} one more" ${qty >= eatMany.max ? 'disabled' : ''}>+</button>
-        </div>
+        ${countStepMarkup({ value: qty, max: eatMany.max, verb: eatMany.verb, attrs: { dec: 'data-pack-eat-dec', inc: 'data-pack-eat-inc', num: 'data-pack-eat-num', max: 'data-pack-eat-max' } })}
+        <output class="count-pop-of" aria-live="polite" data-pack-eat-count>${qty} of ${slot.count}</output>
         ${preview ? `<div class="pack-pop-effects pack-eat-preview" aria-live="polite">${preview}</div>` : ''}
         ${capNote || fullNote ? `<p class="pack-eat-note">${escapeHtml(capNote)}${capNote && fullNote ? ' ' : ''}${fullNote}</p>` : ''}
-        <div class="pack-drop-confirm-row">
+        <div class="pack-drop-confirm-row count-pop-actions">
+          <span class="count-pop-esc mp-modern-only"><span class="kcap">Esc</span> back</span>
           <button type="button" class="pack-pop-primary" data-pack-eat-confirm>${escapeHtml(eatMany.verb)} ${qty}</button>
         </div>
       </div>`;
@@ -3820,7 +3818,8 @@ function renderPackPopover(classTsid, anchor = null) {
   // A redraw while the eat chooser has focus (a count change, an energy tick) keeps it on the same control.
   const focusedEat = pop.contains(document.activeElement) ? document.activeElement : null;
   const keepFocus = focusedEat
-    ? ['data-pack-eat-choice', 'data-pack-eat-dec', 'data-pack-eat-inc', 'data-pack-eat-confirm', 'data-pack-eat-cancel', 'data-pack-eat-many']
+    ? ['data-pack-eat-choice', 'data-pack-eat-dec', 'data-pack-eat-inc', 'data-pack-eat-confirm', 'data-pack-eat-cancel', 'data-pack-eat-many', 'data-pack-eat-num', 'data-pack-eat-max',
+      'data-pack-drop-dec', 'data-pack-drop-inc', 'data-pack-drop-num', 'data-pack-drop-max', 'data-pack-drop-confirm']
         .filter((name) => focusedEat.hasAttribute(name))
         .map((name) => `[${name}${name === 'data-pack-eat-choice' ? `="${focusedEat.getAttribute(name)}"` : ''}]`)[0] || null
     : null;
@@ -3834,7 +3833,7 @@ function renderPackPopover(classTsid, anchor = null) {
     pop.innerHTML = markup;
     if (keepFocus) {
       const again = pop.querySelector(keepFocus);
-      const target = again && !again.disabled ? again : pop.querySelector('[data-pack-eat-confirm]');
+      const target = again && !again.disabled ? again : pop.querySelector('[data-pack-eat-confirm], [data-pack-drop-confirm]');
       target?.focus({ preventScroll: true });
     } else if (focusedRow >= 0) focusVerbRow(pop, focusedRow);
     syncVerbDetail(pop);
@@ -3932,6 +3931,33 @@ function renderPackPopover(classTsid, anchor = null) {
   pop.querySelector('[data-pack-drop-confirm]')?.addEventListener('click', () => {
     dropPackItem(classTsid, packDropQty);
   });
+  // MPANELS (js/ui/count-chooser.js): Max, the number field and the keys (arrows, Page Up / Down,
+  // Home / End step; Enter drops; Esc goes back to the stack's menu). The keys stay in the chooser.
+  const setDropQty = (value) => {
+    packDropQty = normalizeStackQuantity(value, slot.count);
+    renderPackPopover(classTsid, sourceAnchor);
+  };
+  pop.querySelector('[data-pack-drop-max]')?.addEventListener('click', () => setDropQty(slot.count));
+  bindCountField(pop.querySelector('[data-pack-drop-num]'), {
+    max: () => slot.count,
+    set: setDropQty,
+    confirm: (n) => dropPackItem(classTsid, normalizeStackQuantity(n, slot.count)),
+    cancel: () => pop.querySelector('[data-pack-drop-cancel]')?.click(),
+  });
+  pop.querySelector('[data-pack-drop-panel]')?.addEventListener('keydown', (e) => {
+    const next = countKeyValue(e.key, packDropQty, slot.count);
+    if (next != null) {
+      e.preventDefault();
+      e.stopPropagation();
+      setDropQty(next);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      pop.querySelector('[data-pack-drop-cancel]')?.click();
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.stopPropagation();
+    }
+  });
   if (eatMany) {
     const setEatQty = (value) => {
       packEatQty = clampConsumeCount(value, eatMany.max);
@@ -3949,6 +3975,17 @@ function renderPackPopover(classTsid, anchor = null) {
     });
     pop.querySelector('[data-pack-eat-dec]')?.addEventListener('click', () => setEatQty(packEatQty - 1));
     pop.querySelector('[data-pack-eat-inc]')?.addEventListener('click', () => setEatQty(packEatQty + 1));
+    // MPANELS (js/ui/count-chooser.js): Max and the number field (Enter eats what was typed).
+    pop.querySelector('[data-pack-eat-max]')?.addEventListener('click', () => setEatQty(eatMany.max));
+    bindCountField(pop.querySelector('[data-pack-eat-num]'), {
+      max: () => eatMany.max,
+      set: setEatQty,
+      confirm: (n) => {
+        packEatQty = clampConsumeCount(n, eatMany.max);
+        pop.querySelector('[data-pack-eat-confirm]')?.click();
+      },
+      cancel: () => pop.querySelector('[data-pack-eat-cancel]')?.click(),
+    });
     pop.querySelector('[data-pack-eat-cancel]')?.addEventListener('click', () => {
       packEatMode = false;
       packEatQty = 1;
@@ -3964,7 +4001,7 @@ function renderPackPopover(classTsid, anchor = null) {
     // Keyboard: arrows or -/+ change the count, Home/End go to one/all, Esc closes only the chooser.
     // The keys stop here so they never walk the avatar or reach the street's own Enter.
     pop.querySelector('[data-pack-eat-panel]')?.addEventListener('keydown', (e) => {
-      const step = { ArrowLeft: -1, ArrowDown: -1, '-': -1, ArrowRight: 1, ArrowUp: 1, '+': 1, '=': 1 }[e.key];
+      const step = { ArrowLeft: -1, ArrowDown: -1, '-': -1, ArrowRight: 1, ArrowUp: 1, '+': 1, '=': 1, PageDown: -10, PageUp: 10 }[e.key];
       if (step) {
         e.preventDefault();
         e.stopPropagation();
@@ -6676,7 +6713,15 @@ function openVerbPickLevel(target, verb, row) {
  * does not read them keeps its own place.
  */
 function placeWorldVerbMenu(target) {
-  const menu = document.getElementById('verb-menu');
+  placeMenuAtTarget(document.getElementById('verb-menu'), target, 'verbMenuPlace');
+}
+
+/**
+ * MPANELS: a menu or the How many chooser placed by its thing, the verb menu's way (placeVerbMenu):
+ * the custom properties above on `menu`, its card the first .verb-menu-card. `dataKey`: the canvas
+ * data that says where it went.
+ */
+function placeMenuAtTarget(menu, target, dataKey) {
   const root = document.getElementById('game-root');
   if (!menu || !root || menu.hidden) return;
   const card = menu.querySelector('.verb-menu-card') || menu;
@@ -6722,7 +6767,7 @@ function placeWorldVerbMenu(target) {
   menu.classList.toggle('below', placed.below);
   menu.classList.toggle('no-tail', placed.tail == null);
   if (placed.tail != null) set('--vm-tail', `${placed.tail}px`);
-  if (app?.canvas) app.canvas.dataset.verbMenuPlace = `${placed.x},${placed.y},${placed.below ? 'below' : 'above'},${placed.tail ?? 'none'}`;
+  if (app?.canvas) app.canvas.dataset[dataKey] = `${placed.x},${placed.y},${placed.below ? 'below' : 'above'},${placed.tail ?? 'none'}`;
 }
 
 /** A thing's sprite as a rect in #game-root's px (its bounds, clipped to the view), or null. */
@@ -6814,9 +6859,23 @@ function showFeedPickerQty(food) {
       ? 'Enter confirms · arrow keys change how many · Esc cancels'
       : 'Enter selects · arrow keys move · Esc cancels';
   }
-  if (!qty) return;
+  // MPANELS: the question says what it asks now ("Feed how many Cherries?"), and back again.
+  const title = document.getElementById('feed-picker-title');
+  if (title) {
+    const verbLabel = FEED_PICKER_VERB_LABELS[feedPickerVerb] || 'Feed';
+    title.textContent = food
+      ? `${verbLabel} how many ${ITEM_CATALOG[food.classTsid]?.namePlural || food.label}?`
+      : FEED_PICKER_TITLES[feedPickerVerb] || 'Feed what?';
+  }
+  if (!qty) {
+    placeFeedPicker();
+    return;
+  }
   qty.hidden = !food;
-  if (!food) return;
+  if (!food) {
+    placeFeedPicker();
+    return;
+  }
   const max = Math.max(1, pickerMaxCount(feedPickerTarget?.classId, food.classTsid, inv));
   const input = document.getElementById('feed-picker-qty-input');
   const icon = document.getElementById('feed-picker-qty-icon');
@@ -6828,7 +6887,25 @@ function showFeedPickerQty(food) {
     input.value = '1';
   }
   setFeedPickerQty(1);
+  // MPANELS (js/ui/count-chooser.js): Enter in the field feeds what was typed; Esc cancels.
+  bindCountField(input, {
+    max: () => Math.max(1, pickerMaxCount(feedPickerTarget?.classId, feedPickerQtyFood?.classTsid, inv)),
+    set: (n) => setFeedPickerQty(n),
+    confirm: (n) => {
+      setFeedPickerQty(n);
+      confirmFeedPickerQty();
+    },
+    cancel: () => closeFeedPicker(),
+  });
+  placeFeedPicker();
   requestAnimationFrame(() => document.getElementById('feed-picker-qty-go')?.focus({ preventScroll: true }));
+}
+
+/** MPANELS: the modern skin's Feed what? / How many sits by the thing, as its verb menu did. */
+function placeFeedPicker() {
+  const panel = document.getElementById('feed-picker');
+  if (!panel || panel.hidden || !feedPickerTarget) return;
+  placeMenuAtTarget(panel, feedPickerTarget, 'feedPickerPlace');
 }
 
 function setFeedPickerQty(value) {
@@ -6840,6 +6917,12 @@ function setFeedPickerQty(value) {
   const go = document.getElementById('feed-picker-qty-go');
   if (input) input.value = String(n);
   if (go) go.textContent = `${FEED_PICKER_VERB_LABELS[feedPickerVerb] || 'Feed'} ${n}`;
+  // MPANELS: the step row's ends say when there is no fewer or no more.
+  const minus = document.getElementById('feed-picker-qty-minus');
+  const plus = document.getElementById('feed-picker-qty-plus');
+  if (minus) minus.disabled = n <= 1;
+  if (plus) plus.disabled = n >= max;
+  document.getElementById('feed-picker-qty-max')?.setAttribute('aria-pressed', n >= max ? 'true' : 'false');
   if (app?.canvas) app.canvas.dataset.feedPickerCount = String(n);
   return n;
 }
@@ -6945,6 +7028,7 @@ function openFeedPicker(target, verb = null, pick = '') {
   }
 
   panel.hidden = false;
+  placeFeedPicker();
   if (app?.canvas) {
     app.canvas.dataset.feedPickerVerb = verbId;
     app.canvas.dataset.feedPickerCount = '';
@@ -23860,8 +23944,16 @@ function renderVendorList() {
   if (!list) return;
   renderVendorDropZone();
 
+  // MPANELS: in the modern skin the count is a popover over the shelf, by the tile it was asked from.
+  const vendorPop = document.documentElement.dataset.ui === 'modern';
   if (detail && vendorSelected) {
-    list.hidden = true;
+    // The control with focus before this redraw (a step, the field, OK) has it again after.
+    const hadFocus = detail.contains(document.activeElement)
+      ? ['data-vq', 'data-vq-val', 'data-v-go', 'data-v-back'].find((a) => document.activeElement.hasAttribute(a))
+      : null;
+    const hadFocusVal = hadFocus === 'data-vq' ? document.activeElement.getAttribute('data-vq') : null;
+    if (vendorPop) drawVendorTiles(list);
+    list.hidden = !vendorPop;
     detail.hidden = false;
     const isBuy = vendorTab === 'buy';
     const offer = activeVendor.offers.find((o) => o.classTsid === vendorSelected);
@@ -23884,6 +23976,9 @@ function renderVendorList() {
     vendorQty = Math.max(1, Math.min(vendorQty, maxQ));
     const total = unit * vendorQty;
     detail.style.display = 'block';
+    detail.classList.toggle('count-pop', vendorPop);
+    detail.setAttribute('role', 'group');
+    detail.setAttribute('aria-label', `${isBuy ? 'Buy' : 'Sell'} how many ${label}?`);
     detail.innerHTML = `
       <button type="button" class="btn-glitch-back" data-v-back>← Back</button>
       <div class="vendor-detail-icon"><img src="${itemIconUrl(vendorSelected)}" alt=""/></div>
@@ -23903,6 +23998,7 @@ function renderVendorList() {
             ${isBuy ? `Buy: ${vendorQty} for ${total}` : `Sell: ${vendorQty} for ${total}`}
           </button>
         </div>
+        <p class="count-pop-esc mp-modern-only"><span class="kcap">Esc</span> back · ${isBuy ? `◎ ${pc.currants || 0} to spend` : `${have} in your pack`}</p>
       </div>`;
     const applyQ = (n) => {
       vendorQty = Math.max(1, Math.min(maxQ, n));
@@ -23918,6 +24014,45 @@ function renderVendorList() {
     detail.querySelector('[data-vq-val]')?.addEventListener('change', (e) => {
       applyQ(Number(e.target.value) || 1);
     });
+    // MPANELS (js/ui/count-chooser.js): the keys. Enter in the field takes what was typed and buys or
+    // sells; the arrows, Page Up / Down, Home and End step; Esc goes back to the shelf.
+    const backToShelf = () => {
+      const was = vendorSelected;
+      vendorSelected = null;
+      renderVendorList();
+      list.querySelector(`[data-vendor-item="${CSS.escape(was || '')}"]`)?.focus({ preventScroll: true });
+    };
+    bindCountField(detail.querySelector('[data-vq-val]'), {
+      max: () => maxQ,
+      set: (n) => applyQ(n),
+      confirm: (n) => {
+        vendorQty = Math.max(1, Math.min(maxQ, n));
+        renderVendorList();
+        detail.querySelector('[data-v-go]')?.click();
+      },
+      cancel: backToShelf,
+    });
+    detail.onkeydown = (e) => {
+      if (e.target?.matches?.('[data-vq-val]')) return;
+      const next = countKeyValue(e.key, vendorQty, maxQ);
+      if (next != null) {
+        e.preventDefault();
+        e.stopPropagation();
+        applyQ(next);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        backToShelf();
+      } else if (e.key !== 'Tab') {
+        // The chooser is modal: its keys never walk the avatar.
+        e.stopPropagation();
+      }
+    };
+    if (hadFocus) {
+      const sel = hadFocus === 'data-vq' ? `[data-vq="${hadFocusVal}"]` : `[${hadFocus}]`;
+      detail.querySelector(sel)?.focus({ preventScroll: true });
+    } else if (vendorPop) detail.querySelector('[data-v-go]')?.focus({ preventScroll: true });
+    if (vendorPop) placeVendorPop(list, detail);
     detail.querySelector('[data-v-go]')?.addEventListener('click', () => {
       // G152 (inc_stores.js:168-196): buy only what fits; none fitting is refused, the rest isn't charged.
       const fit = isBuy ? features.query('packRoom', vendorSelected, vendorQty, engine) : null;
@@ -23956,6 +24091,31 @@ function renderVendorList() {
     detail.innerHTML = '';
     detail.style.display = '';
   }
+  drawVendorTiles(list);
+}
+
+/** MPANELS: the modern skin's count popover sits under (or over) its tile on the shelf, its tail on it. */
+function placeVendorPop(list, detail) {
+  const tile = list.querySelector(`[data-vendor-item="${CSS.escape(vendorSelected || '')}"]`);
+  list.querySelectorAll('.vendor-tile.is-asking').forEach((t) => t.classList.remove('is-asking'));
+  const body = detail.offsetParent;
+  if (!tile || !body) {
+    detail.style.removeProperty('--pop-top');
+    detail.style.removeProperty('--pop-tail');
+    return;
+  }
+  tile.classList.add('is-asking');
+  const br = body.getBoundingClientRect();
+  const tr = tile.getBoundingClientRect();
+  const top = tr.bottom - br.top + body.scrollTop + 8;
+  detail.style.setProperty('--pop-top', `${Math.round(top)}px`);
+  detail.style.setProperty('--pop-tail', `${Math.round(tr.left + tr.width / 2 - br.left - 12)}px`);
+  detail.scrollIntoView?.({ block: 'nearest' });
+  if (app?.canvas) app.canvas.dataset.vendorPop = `${vendorSelected}:${Math.round(top)}`;
+}
+
+/** The shelf: what this vendor sells (Buy) or buys from your pack (Sell). */
+function drawVendorTiles(list) {
   list.hidden = false;
   list.innerHTML = '';
 
@@ -26033,6 +26193,12 @@ async function main() {
         closePackPopover();
         return;
       }
+      // MPANELS: a vendor's How many goes first, back to the shelf.
+      if (isVendorOpen() && vendorSelected) {
+        vendorSelected = null;
+        renderVendorList();
+        return;
+      }
       if (currentAction) {
         cancelCurrentAction();
         return;
@@ -26084,10 +26250,12 @@ async function main() {
         else confirmFeedPickerQty();
         return;
       }
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+      // MPANELS (js/ui/count-chooser.js): the arrows, Page Up / Page Down, Home and End.
+      const was = Number(document.getElementById('feed-picker-qty-input')?.value) || 1;
+      const next = countKeyValue(e.key, was, Math.max(1, pickerMaxCount(feedPickerTarget?.classId, feedPickerQtyFood.classTsid, inv)));
+      if (next != null) {
         e.preventDefault();
-        const step = e.key === 'ArrowRight' || e.key === 'ArrowUp' ? 1 : -1;
-        setFeedPickerQty((Number(document.getElementById('feed-picker-qty-input')?.value) || 1) + step);
+        setFeedPickerQty(next);
       }
       return;
     }
@@ -26896,6 +27064,8 @@ async function main() {
   // Switching to Classic closes it (Classic's own hub answers X there).
   onUiModeChange((now) => {
     if (now.mode !== MODERN) imaginationHub?.close();
+    // MPANELS: a vendor's count is a popover over the shelf in Modern, the shelf's own detail in Classic.
+    if (isVendorOpen()) renderVendorList();
   });
   // Phase 2 (js/ui/topbar.js): the modern bar's tooltips, Menu groups, Sound popover and pills.
   installTopBar(document, {
