@@ -24,5 +24,12 @@ export function installClassicChrome({ doc = globalThis.document, win = globalTh
     pack: installClassicPack({ doc }),
     hub: installClassicHub({ doc, win, engine, avatarPortrait }),
   };
+  // QA: the quest-complete box, a Magic Rock conversation and a plain NPC prompt on demand,
+  // through the game's own award queue and scripted dialogue.
+  win.groddleClassicQA = {
+    conversation: () => engine?.scriptedDialogue?.({ title: 'Juice Medley Melee', kicker: 'Magic Rock', beats: [{ text: 'You know what this street needs? Juice. Lots of juice. Make me some?', response: 'Yeah!' }] }),
+    prompt: () => engine?.scriptedDialogue?.({ title: 'Mr. Block', kicker: 'Leaving so soon?', cancelable: true, beats: [{ text: 'Oh, are you not having fun here? You can come back and try the riddles again later.', response: 'Leave the playroom' }] }),
+    questComplete: () => engine?.award?.({ kind: 'quest', title: 'Juice Medley Melee', body: 'That juice looks mighty bracing, kid. But I forgot something.', subtitle: '+50 iMG · +20 currants', primaryLabel: 'OK' }),
+  };
   return installed;
 }

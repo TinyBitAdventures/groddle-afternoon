@@ -2671,9 +2671,24 @@
   ]
  },
  "git": {
-  "commits": 815,
+  "commits": 818,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "Classic's windows lay out their contents at the 2012 size: Quests, Skills, Buffs, Badges, the Map and Make"
+   },
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "A verb menu keeps one size while you move between its rows"
+   },
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "The save state in the pack is a cloud icon, with \"Playing as … · Saved\" on hover"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2778,21 +2793,6 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "Quests and Make open as one side sheet on the left, with tabs, a header and a footer; the Map is its centred size"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "The verb menu is a compact card over the thing: one line per verb with its number key and energy cost"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "With the Social drawer open, the top bar's Menu and Sound popover sit over it and every row takes clicks"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "new",
-    "text": "X opens the Imagination hub: six round tiles over your avatar for Skills, Quests, Upgrades, Looks, Teleport and Home"
    }
   ]
  },

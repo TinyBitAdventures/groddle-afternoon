@@ -1721,3 +1721,172 @@
 :root[data-ui="classic"] #game-root #make-panel #make-result .mr-actions { grid-column: 1 / -1; }
 :root[data-ui="classic"] #game-root #skills-panel .skill-family { margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
 :root[data-ui="classic"] #game-root #quest-panel .qc-head { padding: 0; border: 0; background: none; box-shadow: none; text-align: left; }
+
+/* == Dialogs and prompts (phase E; QuestConversationUI.as 54-55, 76; the dark box of
+   ref/video-2011-quest-complete.jpg). Quest offers and conversations, and the quest-complete screen,
+   take the client's 462 px box in #0a181d at .9: a header line with the quest book and its words over a
+   white .4 rule, the quest's name in the frame's yellow, the words in the frame's pale grey, dark
+   conversation buttons; no shade over the world. Restyled in place: #quest-dialogue-* and
+   [data-award-*] keep their ids and hooks. The familiar's and the voice-of-rock looks are left as
+   they are (they already are the client's). */
+:root[data-ui="classic"] .quest-dialogue:not([data-look="familiar"], [data-look="vog"]) .quest-dialogue-shade { background: none; backdrop-filter: none; }
+:root[data-ui="classic"] .quest-dialogue:not([data-look="familiar"], [data-look="vog"]) .quest-dialogue-card,
+:root[data-ui="classic"] #award-screen[data-kind="quest"] .award-card {
+  width: min(calc(462 * var(--cu)), calc(100% - 32px));
+  padding: 0 calc(20 * var(--cu)) calc(20 * var(--cu));
+  border: 0;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--c-classic-dark) 90%, transparent);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--c-classic-ink) 40%, transparent);
+  color: var(--c-classic-dialog-text);
+  font: calc(var(--fs-classic-row) * 1.07 * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-title);
+  text-align: left;
+}
+:root[data-ui="classic"] .quest-dialogue:not([data-look="familiar"], [data-look="vog"]) .fam-head,
+:root[data-ui="classic"] #award-screen[data-kind="quest"] .award-kicker {
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--cu));
+  margin: 0 calc(-20 * var(--cu));
+  padding: calc(7 * var(--cu)) calc(50 * var(--cu)) calc(7 * var(--cu)) calc(12 * var(--cu));
+  border-bottom: 1px solid color-mix(in srgb, var(--c-classic-panel) 40%, transparent);
+  color: var(--c-classic-panel);
+  font: 800 calc(var(--fs-classic-row-title) * 1.2 * var(--cu-n, 1))/var(--lh-snug) var(--font-classic-title);
+  text-transform: none;
+  letter-spacing: 0;
+}
+:root[data-ui="classic"] #award-screen[data-kind="quest"] .award-kicker::before { content: ""; flex: none; width: 32px; height: 22px; background: url("../assets/ui/familiar/quests_small.png?v=df15aba7") 0 0 / 100% 100% no-repeat; }
+:root[data-ui="classic"] .quest-dialogue:not([data-look="familiar"], [data-look="vog"]) .fam-head img { width: 32px; height: 22px; }
+:root[data-ui="classic"] .quest-dialogue:not([data-look="familiar"], [data-look="vog"]) .mr-kicker { display: none; }
+:root[data-ui="classic"] .quest-dialogue:not([data-look="familiar"], [data-look="vog"]) .quest-dialogue-card h2,
+:root[data-ui="classic"] #award-screen[data-kind="quest"] .award-title {
+  margin: calc(14 * var(--cu)) 0 calc(4 * var(--cu));
+  color: var(--c-classic-quest-title);
+  font: 800 calc(var(--fs-classic-row-title) * 1.5 * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title);
+  text-shadow: none;
+}
+:root[data-ui="classic"] .quest-dialogue:not([data-look="familiar"], [data-look="vog"]) .quest-dialogue-copy,
+:root[data-ui="classic"] #award-screen[data-kind="quest"] :is(.award-body, .award-sub) { min-height: 0; margin: 0; color: var(--c-classic-dialog-text); font: inherit; }
+:root[data-ui="classic"] .quest-dialogue[data-look="conversation"] #quest-dialogue-copy { margin-top: calc(12 * var(--cu)); } /* the title rides in the header */
+:root[data-ui="classic"] #award-screen[data-kind="quest"] .award-sub { margin-top: calc(6 * var(--cu)); color: var(--c-classic-slug-gain); font-weight: 700; }
+:root[data-ui="classic"] .quest-dialogue:not([data-look="familiar"], [data-look="vog"]) .quest-dialogue-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(8 * var(--cu)); margin-top: calc(14 * var(--cu)); }
+/* Dark conversation buttons (Button TYPE_DARK; PROPOSED colours from "Yeah!" in the same frame): 38 tall. */
+:root[data-ui="classic"] .quest-dialogue:not([data-look="familiar"], [data-look="vog"]) .quest-dialogue-actions button,
+:root[data-ui="classic"] #award-screen[data-kind="quest"] :is(.award-next, [data-award-next]) {
+  min-width: calc(97 * var(--cu));
+  min-height: calc(38 * var(--cu));
+  margin: calc(14 * var(--cu)) auto 0;
+  padding: 0 calc(16 * var(--cu));
+  border: 1px solid color-mix(in srgb, var(--c-classic-panel) 55%, transparent);
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--c-classic-btn-dark-top), var(--c-classic-btn-dark-bottom));
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--c-classic-ink) 50%, transparent);
+  color: var(--c-classic-btn-dark-label);
+  font: 800 calc(var(--fs-classic-row) * 1.07 * var(--cu-n, 1))/1 var(--font-classic-title);
+  text-decoration: none;
+  cursor: pointer;
+}
+:root[data-ui="classic"] .quest-dialogue:not([data-look="familiar"], [data-look="vog"]) .quest-dialogue-actions button { margin: 0; }
+:root[data-ui="classic"] #award-screen[data-kind="quest"] .award-next { display: block; }
+:root[data-ui="classic"] #award-screen[data-kind="quest"] .award-next[hidden] { display: none; }
+:root[data-ui="classic"] .quest-dialogue:not([data-look="familiar"], [data-look="vog"]) .quest-dialogue-actions button:is(:hover, :focus-visible),
+:root[data-ui="classic"] #award-screen[data-kind="quest"] .award-next:is(:hover, :focus-visible) { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] .quest-dialogue:not([data-look="familiar"], [data-look="vog"]) .quest-dialogue-cancel { background: none; border-color: transparent; box-shadow: none; color: var(--c-classic-dialog-text); font-weight: 700; text-decoration: underline; }
+/* The quest-complete screen is the box over the live game, not a full screen. */
+:root[data-ui="classic"] #award-screen[data-kind="quest"] { background: none; }
+:root[data-ui="classic"] #award-screen[data-kind="quest"] :is(.award-rays, .award-badge, .award-more) { display: none; }
+:root[data-ui="classic"] #award-screen[data-kind="quest"] .award-close { position: absolute; top: calc(7 * var(--cu)); right: calc(7 * var(--cu)); width: 20px; height: 20px; padding: 0; border: 0; background: url("../assets/ui/familiar/close_x_small_gray.png?v=df15aba7") center / 20px 20px no-repeat; color: transparent; font-size: 0; }
+
+/* The How many chooser and the Feed what? picker (#feed-picker; the client's count row and
+   QuantityPickerSpecial.as 344): a 2012 window, the stacks as pack slots, the number in Nunito 13
+   #495e5e in a 30 px field with the 2 px #e1c38d ring, the steps and the go as minor buttons. */
+:root[data-ui="classic"] #feed-picker:not([hidden]) { background: none; backdrop-filter: none; }
+:root[data-ui="classic"] #feed-picker .feed-picker-card {
+  padding: calc(10 * var(--cu)) calc(20 * var(--cu)) calc(16 * var(--cu));
+  border: 0;
+  border-radius: 4px;
+  background: var(--c-classic-panel);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--c-classic-ink) 37%, transparent),
+    0 0 1px 7px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+  color: var(--c-classic-text);
+  font: calc(var(--fs-classic-row) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-body);
+}
+:root[data-ui="classic"] #feed-picker .verb-menu-title { color: var(--c-classic-title); font: 800 calc(var(--fs-classic-window) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title); }
+:root[data-ui="classic"] #feed-picker .verb-menu-sub { color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
+:root[data-ui="classic"] #feed-picker .feed-picker-choice { border: 0; border-radius: 5px; background: var(--c-classic-panel); box-shadow: 0 0 0 1px var(--c-classic-slot-ring); color: var(--c-classic-title); }
+:root[data-ui="classic"] #feed-picker .feed-picker-choice:is(:hover, :focus-visible, .is-selected) { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #feed-picker .feed-picker-qty-label { color: var(--c-classic-title); font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-snug) var(--font-classic-title); }
+:root[data-ui="classic"] #feed-picker #feed-picker-qty-input {
+  height: calc(30 * var(--cu));
+  border: 1px solid var(--c-classic-input-border);
+  border-radius: 3.5px;
+  background: var(--c-classic-panel);
+  color: var(--c-classic-qty-text);
+  font: 800 calc(var(--fs-classic-button) * var(--cu-n, 1))/1 var(--font-classic-title);
+  text-align: center;
+}
+:root[data-ui="classic"] #feed-picker #feed-picker-qty-input:focus { outline: none; box-shadow: 0 0 0 2px var(--c-classic-qty-ring); }
+:root[data-ui="classic"] #feed-picker :is(.feed-picker-qty-step, .feed-picker-qty-max, .feed-picker-qty-back, .feed-picker-qty-go) {
+  min-height: calc(29 * var(--cu));
+  padding: 0 calc(12 * var(--cu));
+  border: 1px solid var(--c-classic-btn-minor-border);
+  border-radius: var(--radius-xs);
+  background: linear-gradient(180deg, var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom));
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+  color: var(--c-classic-btn-minor-label);
+  font: 800 calc(var(--fs-classic-button) * var(--cu-n, 1))/1 var(--font-classic-title);
+}
+:root[data-ui="classic"] #feed-picker .feed-picker-qty-go { min-height: calc(34 * var(--cu)); min-width: calc(84 * var(--cu)); }
+:root[data-ui="classic"] #feed-picker .verb-menu-x { color: var(--c-classic-close); }
+:root[data-ui="classic"] #feed-picker .verb-menu-hint { display: none; }
+/* Eat how many? in a pack stack's menu (js/eat-many.js, the [data-pack-eat-*] hooks): the same
+   QuantityPicker row, the count in the 30 px field with the 2 px ring, the choices and steps as
+   minor buttons, the go as a big minor button like Make's. */
+:root[data-ui="classic"] [data-pack-eat-panel] {
+  margin-top: calc(8 * var(--cu));
+  padding: calc(8 * var(--cu)) 0 0;
+  border: 0;
+  border-top: 1px solid var(--c-classic-row-rule);
+  border-radius: 0;
+  background: none;
+  color: var(--c-classic-text);
+  font: calc(var(--fs-classic-row) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-body);
+}
+:root[data-ui="classic"] [data-pack-eat-panel] .pack-eat-title { margin: 0 0 calc(6 * var(--cu)); color: var(--c-classic-title); font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-snug) var(--font-classic-title); }
+:root[data-ui="classic"] [data-pack-eat-panel] :is([data-pack-eat-choice], [data-pack-eat-dec], [data-pack-eat-inc]) {
+  min-height: calc(29 * var(--cu));
+  min-width: calc(29 * var(--cu));
+  padding: 0 calc(8 * var(--cu));
+  border: 1px solid var(--c-classic-btn-minor-border);
+  border-radius: var(--radius-xs);
+  background: linear-gradient(180deg, var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom));
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+  color: var(--c-classic-btn-minor-label);
+  font: 800 calc(var(--fs-classic-button) * var(--cu-n, 1))/1 var(--font-classic-title);
+}
+:root[data-ui="classic"] [data-pack-eat-panel] [data-pack-eat-choice].is-selected { border-color: var(--c-classic-qty-ring); box-shadow: 0 0 0 1px var(--c-classic-qty-ring); color: var(--c-classic-qty-text); }
+:root[data-ui="classic"] [data-pack-eat-panel] button:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] [data-pack-eat-panel] [data-pack-eat-count] {
+  display: inline-grid;
+  place-items: center;
+  min-width: calc(76 * var(--cu));
+  height: calc(30 * var(--cu));
+  border: 1px solid var(--c-classic-input-border);
+  border-radius: 3.5px;
+  background: var(--c-classic-panel);
+  box-shadow: 0 0 0 2px var(--c-classic-qty-ring);
+  color: var(--c-classic-qty-text);
+  font: 800 calc(var(--fs-classic-button) * var(--cu-n, 1))/1 var(--font-classic-title);
+}
+:root[data-ui="classic"] [data-pack-eat-panel] .pack-eat-note { color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
+:root[data-ui="classic"] [data-pack-eat-panel] [data-pack-eat-confirm] {
+  min-height: calc(34 * var(--cu));
+  min-width: calc(84 * var(--cu));
+  border: 1px solid var(--c-classic-btn-minor-border);
+  border-radius: var(--radius-xs);
+  background: linear-gradient(180deg, var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom));
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+  color: var(--c-classic-btn-minor-label);
+  font: 800 calc(var(--fs-classic-row) * var(--cu-n, 1))/1 var(--font-classic-title);
+}

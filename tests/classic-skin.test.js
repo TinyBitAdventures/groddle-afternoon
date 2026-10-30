@@ -172,4 +172,19 @@ describe('Classic skin: modules and copy', () => {
     assert.match(css, /#make-panel > \.make-card \{ width: min\(calc\(614 \* var\(--cu\)\), 100%\); \}/);
     assert.match(css, /#map-panel \.map-canvas \{[^}]*height: calc\(460 \* var\(--cu\)\);/);
   });
+
+  it('dialogs: conversations, prompts and quest complete in the 462 px dark box; How many as the quantity picker', () => {
+    const css = read(CSS);
+    assert.match(css, /#award-screen\[data-kind="quest"\] \.award-card \{[^}]*width: min\(calc\(462 \* var\(--cu\)\)/);
+    assert.match(css, /background: color-mix\(in srgb, var\(--c-classic-dark\) 90%, transparent\);/);
+    assert.match(css, /#award-screen\[data-kind="quest"\] \{ background: none; \}/, 'no full screen');
+    assert.match(css, /#feed-picker #feed-picker-qty-input:focus \{ outline: none; box-shadow: 0 0 0 2px var\(--c-classic-qty-ring\); \}/);
+    const style = read('public/style.css');
+    assert.match(style, /--c-classic-quest-title: #[0-9a-f]{6}; +\/\* FROM FRAME/);
+    // Eat how many? keys on its data hooks (MPANELS restyles the pack popover's markup).
+    assert.match(css, /\[data-pack-eat-panel\] \[data-pack-eat-count\] \{[^}]*height: calc\(30 \* var\(--cu\)\);[^}]*box-shadow: 0 0 0 2px var\(--c-classic-qty-ring\);/);
+    assert.match(css, /\[data-pack-eat-panel\] :is\(\[data-pack-eat-choice\], \[data-pack-eat-dec\], \[data-pack-eat-inc\]\)/);
+    // The familiar's and the voice of rock's looks stay theirs.
+    assert.match(css, /\.quest-dialogue:not\(\[data-look="familiar"\], \[data-look="vog"\]\)/);
+  });
 });

@@ -871,6 +871,10 @@
   --c-classic-online-text: #4a7500;       /* an online contact's name: #548500 (code default) darkened to 4.5:1 on the strip */
   --c-classic-row-rule: #e2e2e2;          /* the Quest Log's row dividers: QuestsDialog.as 52-392 */
   --c-classic-req-done: #dbdbdb;          /* a met requirement pill, at .6: QuestsDialog.as */
+  --c-classic-quest-title: #dbe36c;       /* FROM FRAME ref/video-2011-quest-complete.jpg: "Juice Medley Melee" (core of #bcc77d anti-aliased) */
+  --c-classic-dialog-text: #c4d1d1;       /* FROM FRAME, same frame: the box's body text */
+  --c-classic-qty-text: #495e5e;          /* the quantity picker's number (code default): QuantityPickerSpecial.as:344 */
+  --c-classic-qty-ring: #e1c38d;          /* its 2 px focus ring (code default): InteractionMenu.as 612-713 */
   /* classic:end */
   /* Classic type: the 2012 faces (VAG Rounded, Helvetica) are proprietary, so Nunito 800 stands in for
      titles, names, labels and big numbers, and the system Helvetica/Arial stack carries body text. The
