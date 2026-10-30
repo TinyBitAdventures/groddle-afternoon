@@ -207,6 +207,18 @@ describe('the console page (groddle-afternoon-site console/console.js)', { skip:
     assert.ok(mod.menuFor({ id: 2, admin: true }, { me: 1 }).find((i) => i.id === 'ban').reason);
   });
 
+  it('a plain click on a player opens the menu at the pointer; links, controls, double clicks and selecting text do not (Austin 2026-10-30)', () => {
+    assert.equal(mod.rowClickOpens({ button: 0, detail: 1 }), true);
+    assert.equal(mod.rowClickOpens({ button: 1, detail: 1 }), false, 'the middle button');
+    assert.equal(mod.rowClickOpens({ button: 0, detail: 2 }), false, 'a double click selects a word');
+    assert.equal(mod.rowClickOpens({ button: 0, detail: 1, inControl: true }), false, 'a link or the menu button');
+    assert.equal(mod.rowClickOpens({ button: 0, detail: 1, selected: 'Ada' }), false, 'the end of selecting text');
+    assert.equal(mod.rowClickOpens({ button: 0, detail: 1, selected: '  ' }), true);
+    const src = readFileSync(sitePath('console/console.js'), 'utf8');
+    assert.match(src, /tr\.addEventListener\('click', \(e\) => \{[\s\S]*?closest\?\.\('a, button, [\s\S]*?openMenu\(p, tr, \{ x: e\.clientX, y: e\.clientY \}\);/);
+    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /<p class="console-hint">Click or right-click a player, or use their menu button, Shift\+F10 or the Menu key\.<\/p>/);
+  });
+
   it('searches streets and items', () => {
     const streets = [{ tsid: 'GA1', label: 'Hechey Track', hub: 'Groddle Meadow' }, { tsid: 'GA2', label: 'Gregarious Grange', hub: 'Groddle Meadow' }, { tsid: 'GA3', label: "Scribe's Weald", hub: 'Ix' }];
     assert.deepEqual(mod.findStreets(streets, 'track').map((s) => s.tsid), ['GA1']);
@@ -332,7 +344,7 @@ describe('the site routes (groddle-afternoon-site AdminConsole, AdminConsolePage
   it('the theme serves the console\'s script and styles, keyed', () => {
     assert.ok(existsSync(sitePath('console/console.js')));
     assert.ok(existsSync(sitePath('console/console.css')));
-    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'g483-1'/);
+    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'g491-1'/);
     const css = readFileSync(sitePath('console/console.css'), 'utf8');
     for (const token of ['--surface', '--border', '--fg', '--muted', '--track', '--row-line']) assert.match(css, new RegExp(`var\\(${token}\\)`), token);
   });
