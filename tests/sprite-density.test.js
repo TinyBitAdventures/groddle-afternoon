@@ -162,7 +162,7 @@ describe('sharp sprites drawn bigger than their frames', () => {
     assert.match(src, /portraitFrame\(inv, clip, f\)/);
   });
 
-  it('the Focusing Orb draws its 4x cells where meditation holds it at 1.3 times their size', () => {
+  it('the Focusing Orb draws its 4x cells where meditation holds it at twice their size (the 80x80 overlay)', () => {
     const med = readFileSync(join(pub, 'js/features/meditation-feature.js'), 'utf8');
     assert.match(med, /denseSprite\(ORB_TOOL_SHEET\.url/);
     const r = dense['assets/sprites/meditation/focusing_orb-tool.png'];

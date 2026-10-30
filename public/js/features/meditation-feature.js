@@ -7,13 +7,12 @@
  * in players/player.js), the metabolic rewards, zen, cooldowns, the levitation
  * jetpack buff, and the badge/quest counters.
  *
- * Visuals: the recovered 31-frame Focusing Orb tool animation floats in front
- * of the avatar (52 px rather than the source 80x80 overlay, so the face stays
- * visible). The CC0 avatar sheets have no meditation pose, so the pose is a
- * clean Pixi replacement:
- * the avatar hovers on a slow four-second breath, inside a soft layered halo
- * with a ground ripple and rising motes, plus a thin ring around the orb that
- * fills to the end of the session. Max relax shows a small rainbow.
+ * Visuals, as in the source: the meditating player's only overlay is the
+ * recovered 31-frame Focusing Orb tool animation, 80x80, bottom-centred 8 px
+ * above the feet (focusing_orb.js pc_overlay delta_y -8; the client places it
+ * at pc_view.y + delta_y, InLocationAnnouncementOverlay.as 127-128). The avatar
+ * keeps its own pose: no glow, hover or progress ring. Max relax shows the
+ * rainbow (pc.show_rainbow('rainbow_maxrelax')).
  * Music: the published Wayback meditation tracks stand in for the unrecovered
  * MEDITATIVE_ARTS / FOCUSED_MEDITATION sound keys, over the ducked street BGM.
  *
@@ -97,8 +96,7 @@ export const MEDITATION_FEATURE_ID = 'meditation';
 /** metabolics_get_max_energy: the energy tank (100 plus Energy Tank cards). */
 const tankOf = (engine) => energyMax(engine?.pc);
 const WINTRY_PLACE = 'GM11E7ODKHO1QJE';
-const BREATH_MS = 4000;
-const ORB_HELD_SIZE = 52;
+const ORB_HELD_SIZE = ORB_TOOL_SHEET.displaySize;
 const JUMP_KEYS = new Set([' ', 'w', 'W']);
 
 let state = normalizeMeditationState();
@@ -175,7 +173,7 @@ function publish(engine, force = false) {
 function orbTextures(engine) {
   if (orbFrames) return orbFrames;
   const { PIXI } = engine;
-  // Held at ORB_HELD_SIZE (52) over 40 px cells: its 4x render (js/sprite-dense.js, one file in the
+  // Held at ORB_HELD_SIZE (80) over 40 px cells: its 4x render (js/sprite-dense.js, one file in the
   // same grid; js/textures.js reads resolution 4 from the name) when that is 1.5+ device px per texel.
   const pxPerTexel = (ORB_HELD_SIZE / ORB_TOOL_SHEET.frameW) * (engine.app?.renderer?.resolution || globalThis.devicePixelRatio || 1);
   const dense = denseSprite(ORB_TOOL_SHEET.url, pxPerTexel);
@@ -202,95 +200,22 @@ function buildMeditationFx(engine) {
   const { PIXI } = engine;
   const root = new PIXI.Container();
   root.zIndex = 40;
-  const halo = new PIXI.Graphics();
-  const ripple = new PIXI.Graphics();
-  const motes = new PIXI.Graphics();
-  const ring = new PIXI.Graphics();
-  const orbGlow = new PIXI.Graphics();
   const orb = new PIXI.AnimatedSprite(orbTextures(engine));
-  orb.anchor.set(0.5);
-  // The source overlay is 80x80; held in front of the avatar it reads best a
-  // little smaller, so the face stays visible.
+  // The client's overlay art is registered bottom-centre.
+  orb.anchor.set(0.5, 1);
   orb.width = ORB_HELD_SIZE;
   orb.height = ORB_HELD_SIZE;
   orb.animationSpeed = 0.42; // 31 frames ~ 1.2 s, a slow swirl
   orb.play();
-  root.addChild(ripple, halo, motes, orbGlow, ring, orb);
-  const seeds = Array.from({ length: 16 }, (_, i) => ({
-    phase: (i / 16) * Math.PI * 2,
-    speed: 0.6 + ((i * 37) % 10) / 14,
-    radius: 26 + ((i * 53) % 24),
-    offset: ((i * 71) % 100) / 100,
-  }));
+  root.addChild(orb);
   engine.fxLayer.addChild(root);
-  return { root, halo, ripple, motes, ring, orbGlow, orb, seeds };
+  return { root, orb };
 }
 
 function drawMeditationFx(engine, now) {
   if (!fx || !session) return;
   const player = engine.player;
-  const h = avatarHeight(engine);
-  const t = now - session.startedAt;
-  const breath = 0.5 - 0.5 * Math.cos((t / BREATH_MS) * Math.PI * 2); // 0..1..0
-  const cx = player.x;
-  const feet = player.y;
-  const chest = feet - h * 0.52;
-  const fadeIn = Math.min(1, t / 700);
-  fx.root.alpha = fadeIn;
-
-  // Hover on the breath; the physics loop eases pivot back each frame.
-  player.pivot.y = (4 + breath * 6) * fadeIn;
-
-  // Layered halo: soft lavender to sky, breathing in and out.
-  const halo = fx.halo;
-  halo.clear();
-  const layers = [
-    [0xd9c8ff, 0.07, 1.0],
-    [0xc3dcff, 0.08, 0.78],
-    [0xf2ecff, 0.1, 0.55],
-  ];
-  for (const [color, alpha, k] of layers) {
-    halo.ellipse(cx, chest + 4, (h * 0.62 + breath * 10) * k, (h * 0.72 + breath * 12) * k).fill({ color: color, alpha: alpha * (0.75 + breath * 0.5) });
-  }
-
-  // Ground ripple: one flattened ring every two seconds.
-  const ripple = fx.ripple;
-  ripple.clear();
-  for (const lag of [0, 0.5]) {
-    const p = ((t / 2000 + lag) % 1);
-    ripple.ellipse(cx, feet - 2, 18 + p * 70, 5 + p * 14).stroke({ width: 2, color: 0xe8f0ff, alpha: 0.42 * (1 - p) });
-  }
-  ripple.ellipse(cx, feet - 2, 30, 7).fill({ color: 0xbfd3ff, alpha: 0.16 + breath * 0.08 });
-
-  // Rising motes spiralling up around the avatar.
-  const motes = fx.motes;
-  motes.clear();
-  for (const seed of fx.seeds) {
-    const life = ((t / 1000) * 0.22 * seed.speed + seed.offset) % 1;
-    const angle = seed.phase + life * Math.PI * 1.4;
-    const x = cx + Math.cos(angle) * seed.radius * (0.7 + life * 0.5);
-    const y = feet - 8 - life * (h + 40);
-    const a = Math.sin(life * Math.PI) * 0.85;
-    motes.circle(x, y, 1.4 + (1 - life) * 1.8).fill({ color: life > 0.5 ? 0xfff6d8 : 0xe3eaff, alpha: a });
-  }
-
-  // The orb, floating just in front of the chest (source delta_y -8).
-  const orbY = feet - h * 0.34 + ORB_TOOL_SHEET.deltaY + Math.sin(t / 900) * 3;
-  const orbX = cx + (player.facing === 'left' ? -1 : 1) * h * 0.3;
-  fx.orb.position.set(orbX, orbY);
-  fx.orbGlow.clear();
-  fx.orbGlow.circle(orbX, orbY, ORB_HELD_SIZE * 0.45 + breath * 5).fill({ color: 0xeaf3ff, alpha: 0.18 + breath * 0.14 });
-
-  // Session ring: fills to the end of the rolled duration.
-  const progress = Math.min(1, t / session.durationMs);
-  const ring = fx.ring;
-  ring.clear();
-  const r = ORB_HELD_SIZE * 0.5 + 6;
-  ring.circle(orbX, orbY, r).stroke({ width: 3, color: 0xffffff, alpha: 0.18 });
-  const start = -Math.PI / 2;
-  ring.moveTo(orbX + Math.cos(start) * r, orbY + Math.sin(start) * r);
-  ring.arc(orbX, orbY, r, start, start + progress * Math.PI * 2);
-  ring.stroke({ width: 3, color: progress >= 1 ? 0xffd85a : 0xf4f8ff, alpha: 0.85 });
+  fx.orb.position.set(player.x, player.y + ORB_TOOL_SHEET.deltaY);
 }
 
 function destroyMeditationFx(engine) {
