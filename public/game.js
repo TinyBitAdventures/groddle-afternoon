@@ -227,10 +227,16 @@ import {
 import {
   DE_EMBIGGENIFY_PART2_QUEST_ID,
   DE_EMBIGGENIFY_QUEST_ID,
+  EESTI_AUTOPLAY_POINTS,
+  EESTI_DURATION_MS,
+  EESTI_FIND_BOX,
+  EESTI_HAIRBALL_SPOT,
+  EESTI_INSTANCE,
   EESTI_MUSIC_FILE,
   EESTI_PLAYER_SCALE,
   EESTI_PRODUCTION_TSID,
   EESTI_ROOM_ROUTE,
+  EESTI_SHINY_SPOT,
   EESTI_SOURCE_SPAWN,
   EESTI_STREET_ID,
   EMOTIONAL_BEAR_ID,
@@ -243,9 +249,10 @@ import {
   createDeEmbiggenifyState,
   deEmbiggenifyObjective,
   eestiRemainingMs,
+  eestiStreetPoint,
   expireDeEmbiggenify,
   findSmallWorthless,
-} from './js/de-embiggenify.js?v=de-embiggenify-2';
+} from './js/de-embiggenify.js?v=g456-1';
 import {
   EMOTIONAL_BEAR_ACTIONS,
   EMOTIONAL_BEAR_COMPANIONS,
@@ -1793,7 +1800,11 @@ let rookMuseumPageIndex = 0;
 let rookMuseumArtTimer = null;
 let rookMuseumArtStartedAt = 0;
 let rookMuseumAutoNextAt = 0;
-/** Transient source-authored miniature quest in Eesti Life Catalogue Page 17. */
+/**
+ * De-Embiggenify: the miniature room is Tiny Speck's own Eesti Life Catalog Page 17
+ * (the imported instance GHFBQQ4N68733LB, held as the private instance; its archived
+ * myles_is_great box runs through puzzles-feature).
+ */
 let deEmbiggenifyState = null;
 let deEmbiggenifySourceLocation = null;
 let deEmbiggenifyStartPromise = null;
@@ -9412,11 +9423,12 @@ const engine = {
   questFlag(flag) {
     questFlagsFeature.set(flag);
   },
-  /** The private instance holding an archived street ('summers-day'), else null. */
-  heldInstance: () => summersDayHeldInstance(),
+  /** The private instance holding an archived street ('summers-day', 'de-embiggenify'), else null. */
+  heldInstance: () => summersDayHeldInstance() || deEmbiggenifyHeldInstance(),
   /** A rebuilt box with a `moment` was entered (puzzles-feature). */
   instanceMoment(moment) {
     if (summersDayHeldInstance()) advanceSummersDayMoment(moment);
+    else if (deEmbiggenifyHeldInstance()) deEmbiggenifyMoment(moment);
   },
   /**
    * A source prompt (prompts_add). `timeout` (seconds, as GSJS prompts_add passes it) or
@@ -16583,105 +16595,23 @@ function updateRookMuseum() {
 }
 
 const EESTI_ASSET_ROOT = 'assets/sprites/quests/de-embiggenify';
-const EESTI_DECO_ROOT = 'assets/decos/groddle';
 
 function deEmbiggenifyIsInstanced() {
   return Boolean(deEmbiggenifyState && currentStreetTsid === EESTI_STREET_ID);
 }
 
-function addEestiDeco(root, file, x, y, width, height, zIndex = 0, anchorX = 0.5) {
-  const sprite = new PIXI.Sprite(textureFromUrl(`${EESTI_DECO_ROOT}/${file}`));
-  sprite.anchor.set(anchorX, 1);
-  sprite.position.set(x, y);
-  sprite.width = width;
-  sprite.height = height;
-  sprite.zIndex = zIndex;
-  sprite.eventMode = 'none';
-  root.addChild(sprite);
-  return sprite;
+/** The instance holding the imported street now (puzzles-feature runs its box inside it). */
+function deEmbiggenifyHeldInstance() {
+  return deEmbiggenifyIsInstanced() ? EESTI_INSTANCE : null;
 }
 
-function drawEestiCatalogueRoom() {
-  const root = new PIXI.Container();
-  root.sortableChildren = true;
-  root.worldW = 2800;
-  root.worldH = 910;
-  root.sourceWorldH = 910;
-
-  const base = new PIXI.Graphics();
-  base.zIndex = -1000;
-  base.rect(0, 0, root.worldW, 800).fill(0xe6d3a4);
-  base.rect(0, 800, root.worldW, 110).fill(0x9b642c);
-  root.addChild(base);
-
-  for (let x = 0; x < root.worldW; x += 600) {
-    addEestiDeco(root, 'k04_wallpaper_01_tan.png', x, 800, 600, 800, -900, 0);
-  }
-  const molding = addEestiDeco(
-    root,
-    'k04_molding_02_white.png',
-    0,
-    800,
-    root.worldW,
-    55,
-    -700,
-    0
-  );
-  molding.tint = 0xfff9e8;
-  for (let x = 0; x < root.worldW; x += 505) {
-    addEestiDeco(root, 'k04_floor_01_wood.png', x, 910, 505, 110, -650, 0);
-  }
-
-  // The recording pans left-to-right through this exact K04 landmark order:
-  // white sofa and sleepy cat, lamp/end table, ornate chair, long curled table,
-  // then the cake hiding the quest object. These are clean recovered assets,
-  // not pixels enlarged from the supplied video.
-  addEestiDeco(root, 'k04_plant_02_bamboo.png', 125, 800, 215, 602, -35);
-  addEestiDeco(root, 'k04_plant_03.png', 720, 800, 215, 534, -32);
-  addEestiDeco(root, 'k04_rug_03_red.png', 465, 870, 930, 119, -30);
-  addEestiDeco(root, 'k04_sofa_01.png', 445, 800, 720, 451, -12);
-  addEestiDeco(root, 'k04_sleepycat_01.png', 410, 800, 390, 157, 18);
-  addEestiDeco(root, 'k04_endtable_01.png', 855, 800, 185, 178, -4);
-  addEestiDeco(root, 'k04_lamp_04.png', 855, 636, 124, 219, 2);
-  addEestiDeco(root, 'k04_plant_07.png', 1035, 800, 175, 351, -28);
-  addEestiDeco(root, 'k04_chair_02.png', 1060, 800, 280, 461, 22);
-
-  for (const [x, file] of [
-    [1450, 'k04_pictureframe_01_kitty.png'],
-    [1760, 'k04_pictureframe_02_kitty.png'],
-    [2070, 'k04_pictureframe_03_kitty.png'],
-  ]) {
-    addEestiDeco(root, file, x, 205, 235, 233, -26);
-  }
-
-  const curvedTable = addEestiDeco(
-    root,
-    'k04_table_03.png',
-    1960,
-    800,
-    1580,
-    527,
-    28
-  );
-  curvedTable.eventMode = 'none';
-  addEestiDeco(root, 'k04_dessert_01.png', 1450, 294, 112, 71, 48);
-  addEestiDeco(root, 'k04_coffee_01.png', 1590, 294, 69, 71, 49);
-  addEestiDeco(root, 'k04_candle_01.png', 1790, 294, 42, 96, 50);
-  addEestiDeco(root, 'k04_candle_01.png', 1930, 294, 35, 80, 50);
-  addEestiDeco(root, 'k04_candlestick_01.png', 2190, 294, 96, 131, 50);
-  addEestiDeco(root, 'k04_wineglass_01.png', 2405, 294, 45, 104, 50);
-
-  root.platformsScreen = [
-    { id: 'eesti-floor', x1: 0, y1: 800, x2: root.worldW, y2: 800, pc_perm: 1 },
-    { id: 'eesti-sofa', x1: 175, y1: 585, x2: 750, y2: 585, pc_perm: 1 },
-    { id: 'eesti-chair-seat', x1: 955, y1: 580, x2: 1135, y2: 580, pc_perm: 1 },
-    { id: 'eesti-table-curl-low', x1: 1160, y1: 575, x2: 1305, y2: 575, pc_perm: 1 },
-    { id: 'eesti-table-curl-mid', x1: 1240, y1: 450, x2: 1390, y2: 450, pc_perm: 1 },
-    { id: 'eesti-table-curl-high', x1: 1325, y1: 340, x2: 1475, y2: 340, pc_perm: 1 },
-    { id: 'eesti-tabletop', x1: 1170, y1: 290, x2: 2740, y2: 290, pc_perm: 1 },
-  ];
-  root.signViews = [];
-  return root;
+/**
+ * The archived myles_is_great box was entered (puzzles-feature, engine.instanceMoment):
+ * location.js 1194-1210 creates the small shiny object while part two is open.
+ */
+function deEmbiggenifyMoment(moment) {
+  if (moment !== EESTI_FIND_BOX.id || deEmbiggenifyState?.status !== 'searching') return false;
+  return pickUpSmallWorthless();
 }
 
 function spawnMrHairball() {
@@ -16692,8 +16622,9 @@ function spawnMrHairball() {
   sprite.texturesIdle = idleFrames?.length ? idleFrames : [fallback];
   sprite.texturesTalk = talkFrames?.length ? talkFrames : sprite.texturesIdle;
   sprite.anchor.set(0.5, 1);
-  sprite.scale.set(0.82);
-  sprite.position.set(1140, 800);
+  // The x1 sheets at the street's own scale; our spot (EESTI_HAIRBALL_SPOT), on the item line.
+  const at = eestiStreetPoint(EESTI_HAIRBALL_SPOT);
+  sprite.position.set(at.x, at.y);
   // npc_dustbunny is in_foreground (FG_ITEM), still under the avatars (MiddleGroundRenderer 111-171).
   sprite.zIndex = 45;
   sprite.animationSpeed = 0.16;
@@ -16725,10 +16656,11 @@ function spawnSmallWorthless() {
     textureFromUrl(`${EESTI_ASSET_ROOT}/small_worthless__x1_1_x1_2_png_1354829517.png`)
   );
   sprite.anchor.set(0.5, 1);
-  sprite.scale.set(1.25);
-  sprite.position.set(2580, 288);
-  // The cake sits in front, as in the source. A restrained glint makes the
-  // target discoverable without turning the hidden-object beat into guesswork.
+  // Inside the archived box on the tabletop; the street's own cake (middleplus, in front of
+  // the avatars) hides its right half. A restrained glint makes the target discoverable
+  // without turning the hidden-object beat into guesswork.
+  const at = eestiStreetPoint(EESTI_SHINY_SPOT);
+  sprite.position.set(at.x, at.y);
   sprite.zIndex = 49;
   sprite.visible = false;
   entityLayer.addChild(sprite);
@@ -16739,7 +16671,7 @@ function spawnSmallWorthless() {
   glint.moveTo(0, -8);
   glint.lineTo(0, 8).stroke({ width: 2, color: 0xfff5af, alpha: 0.88 });
   glint.zIndex = 53;
-  glint.position.set(2580, 258);
+  glint.position.set(at.x, at.y - 24);
   glint.visible = false;
   entityLayer.addChild(glint);
 
@@ -16750,14 +16682,6 @@ function spawnSmallWorthless() {
     sprite,
     state: { deEmbiggenifyState, glint },
   });
-  const cake = new PIXI.Sprite(textureFromUrl(`${EESTI_DECO_ROOT}/k04_cake_01.png`));
-  cake.anchor.set(0.5, 1);
-  cake.position.set(2610, 292);
-  cake.width = 112;
-  cake.height = 98;
-  cake.zIndex = 52;
-  cake.eventMode = 'none';
-  entityLayer.addChild(cake);
   return smallWorthlessTarget;
 }
 
@@ -16813,9 +16737,13 @@ function renderDeEmbiggenifyHud(now = Date.now()) {
     app.canvas.dataset.deEmbiggenifyRemaining = String(remaining);
     app.canvas.dataset.deEmbiggenifyProductionTsid = EESTI_PRODUCTION_TSID;
     app.canvas.dataset.deEmbiggenifyPlayerScale = String(player?.baseScale || 0);
-    app.canvas.dataset.deEmbiggenifyArt = 'recovered-eesti-page-17';
+    // The room is Tiny Speck's own street; its landmarks and table are the street's decos.
+    app.canvas.dataset.deEmbiggenifyArt = 'tiny-speck-street';
+    app.canvas.dataset.deEmbiggenifyStreet = EESTI_STREET_ID;
     app.canvas.dataset.deEmbiggenifyLandmarks = EESTI_ROOM_ROUTE.join('>');
-    app.canvas.dataset.deEmbiggenifyTableArt = 'k04_table_03';
+    app.canvas.dataset.deEmbiggenifyTableArt = 'k04_table_03_back+k04_table_03_front';
+    app.canvas.dataset.deEmbiggenifyFindBox = EESTI_FIND_BOX.id;
+    app.canvas.dataset.deEmbiggenifyHairball = `${EESTI_HAIRBALL_SPOT.x},${EESTI_HAIRBALL_SPOT.y}`;
     app.canvas.dataset.deEmbiggenifyMusic = EESTI_MUSIC_FILE.split('/').pop();
     app.canvas.dataset.deEmbiggenifySourceSpawn =
       `${EESTI_SOURCE_SPAWN.x},${EESTI_SOURCE_SPAWN.y}`;
@@ -16864,11 +16792,15 @@ function pickUpSmallWorthless() {
   const result = findSmallWorthless(deEmbiggenifyState, Date.now());
   if (!result.ok) return false;
   addItem(inv, SMALL_WORTHLESS_ID, 1);
-  if (smallWorthlessTarget?.sprite) smallWorthlessTarget.sprite.visible = false;
-  if (smallWorthlessTarget?.state?.glint) smallWorthlessTarget.state.glint.visible = false;
   playSfx('pickup', { volume: 0.55, rate: 1.25 });
-  const pickupX = smallWorthlessTarget?.sprite?.x || 2580;
-  const pickupY = smallWorthlessTarget?.sprite?.y || 288;
+  const spot = eestiStreetPoint(EESTI_SHINY_SPOT);
+  const pickupX = smallWorthlessTarget?.sprite?.x || spot.x;
+  const pickupY = smallWorthlessTarget?.sprite?.y || spot.y;
+  // It is in the pack now: no target (and no Enter prompt) left on the table.
+  const glint = smallWorthlessTarget?.state?.glint;
+  if (glint && !glint.destroyed) glint.destroy();
+  if (smallWorthlessTarget) unregisterTarget(smallWorthlessTarget);
+  smallWorthlessTarget = null;
   burst(pickupX, pickupY - 23, 0xffef9a, 18);
   floatText(pickupX, pickupY - 56, 'SMALL! SHINY! WORTHLESS!', 0xffe899);
   pushActivity('You found the small shiny object with no intrinsic value.');
@@ -16946,54 +16878,46 @@ function handleDeEmbiggenifyTarget(target, verbId) {
   return false;
 }
 
-function setupDeEmbiggenifyInstance() {
-  clearWorldEntities();
-  if (bgLayer && world) {
-    world.removeChild(bgLayer);
-    bgLayer.destroy({ children: true });
+/**
+ * Enter Tiny Speck's own copy of the room (GHFBQQ4N68733LB) as the private instance, at
+ * onStarted's -1832, -76 (quests/de_embiggenify.js 43): its geometry, decos, front layer
+ * (the table front and the cake), DE_EMBIGGENIFY music and the myles_is_great box.
+ */
+async function setupDeEmbiggenifyInstance() {
+  const spawn = eestiStreetPoint(EESTI_SOURCE_SPAWN);
+  await enterStreet(EESTI_STREET_ID, {
+    spawnX: spawn.x,
+    spawnY: spawn.y,
+    quiet: true,
+    bypassFeatureGates: true,
+  });
+  if (!deEmbiggenifyState || currentStreetTsid !== EESTI_STREET_ID) return;
+  currentStreet.label = 'Eesti Life Catalogue Page 17';
+  currentStreet.productionTsid = EESTI_PRODUCTION_TSID;
+  currentStreet.hubName = ''; // G363: the eesti instance (de_embiggenify.js 43): no hub line (location.js 3311)
+  currentStreet.hubId = '49';
+  // An indoor catalogue page with its own light: no Dametime tint (the client had none).
+  currentStreet.ownLight = true;
+  // pc_perm 0 lines (pl1267165485151, the floor's back edge) are hard on top only for
+  // items (GodItemViewer.as 800, platform_item_perm -1): the avatar walks the floor in
+  // front of it, where Mr. Hairball's line stays for him alone.
+  for (let i = streetPlatforms.length - 1; i >= 0; i -= 1) {
+    if (streetPlatforms[i].pcPerm === 0) streetPlatforms.splice(i, 1);
   }
-  bgLayer = drawEestiCatalogueRoom();
-  world.addChildAt(bgLayer, 0);
-  currentStreet = {
-    tsid: EESTI_STREET_ID,
-    productionTsid: EESTI_PRODUCTION_TSID,
-    label: 'Eesti Life Catalogue Page 17',
-    hubName: '', // G363: the eesti instance (de_embiggenify.js 43): no hub line (location.js 3311); hub 49 keeps its music
-    hubId: '49',
-    bounds: { l: 0, r: bgLayer.worldW, t: 0, b: bgLayer.worldH },
-    platforms: bgLayer.platformsScreen,
-    signposts: [],
-  };
-  currentStreetTsid = EESTI_STREET_ID;
-  WORLD_W = bgLayer.worldW;
-  GROUND_Y = 800;
-  streetPlatforms = bgLayer.platformsScreen;
-  streetWalls = [];
-  climb = { active: false, wall: null };
-  Object.assign(jumpState, createJumpState(movementNow()));
   spawnMrHairball();
   spawnSmallWorthless();
   if (player) {
     player.baseScale = (deEmbiggenifyPlayerBaseScale || player.baseScale) * EESTI_PLAYER_SCALE;
-    player.position.set(220, GROUND_Y);
-    player.vx = 0;
-    player.vy = 0;
-    player.onGround = true;
     applyPlayerFacing();
-    noteGrounded(jumpState, true, movementNow());
   }
-  camTarget = cameraTargetForPlayer(player.x);
-  camY = cameraTargetY(player.y, activeCameraWorldHeight(), LOCATION_VIEW_H);
-  world.x = -Math.round(camTarget);
-  world.y = -Math.round(camY);
   const name = document.getElementById('street-name');
   if (name) {
     name.textContent = 'Eesti Life Catalogue Page 17';
     name.dataset.tsid = EESTI_PRODUCTION_TSID;
   }
-  if (state.started && audio.ctx) {
-    setAmbientForStreet(currentStreet, { force: true });
-  }
+  // A reload resumes at the street you came from, never inside the instance.
+  savePlayerLocation(deEmbiggenifySourceLocation);
+  updateDametimeChrome();
   renderDeEmbiggenifyHud();
 }
 
@@ -17022,10 +16946,17 @@ async function startDeEmbiggenify(opts = {}) {
     deEmbiggenifyState = createDeEmbiggenifyState({
       sourceLocation: deEmbiggenifySourceLocation,
     });
-    if (resumingPart2) beginDeEmbiggenifySearch(deEmbiggenifyState, Date.now());
     deEmbiggenifyTransitionBusy = true;
-    setupDeEmbiggenifyInstance();
-    deEmbiggenifyTransitionBusy = false;
+    try {
+      await setupDeEmbiggenifyInstance();
+    } finally {
+      deEmbiggenifyTransitionBusy = false;
+    }
+    if (!deEmbiggenifyIsInstanced()) return null;
+    // The two minutes start once the room is on screen, not while its street loads.
+    deEmbiggenifyState.enteredAt = Date.now();
+    deEmbiggenifyState.deadlineAt = deEmbiggenifyState.enteredAt + EESTI_DURATION_MS;
+    if (resumingPart2) beginDeEmbiggenifySearch(deEmbiggenifyState, Date.now());
     pushActivity('You shrink down inside Eesti Life Catalogue Page 17.');
     toast('Everything is enormous. Find Mr. Hairball.', 3400);
     updateHud();
@@ -17114,18 +17045,8 @@ function updateDeEmbiggenify() {
     setTimeout(() => returnFromDeEmbiggenify({ expired: true }), 450);
     return;
   }
-  if (
-    deEmbiggenifyState.status === 'searching' &&
-    smallWorthlessTarget?.sprite?.visible &&
-    player &&
-    Math.abs(player.x - smallWorthlessTarget.sprite.x) <= 46 &&
-    Math.abs(player.y - smallWorthlessTarget.sprite.y) <= 58
-  ) {
-    // The source location's collision box creates the item as soon as the
-    // tiny player reaches the hiding spot; the explicit Pickup verb remains
-    // available as an accessible fallback.
-    pickUpSmallWorthless();
-  }
+  // The archived myles_is_great box creates the object (deEmbiggenifyMoment); the Pickup
+  // verb on the glint stays as an accessible fallback.
   const autoplayMode = new URLSearchParams(location.search).get('eestiautoplay') || '';
   const autoplay = ['1', 'hairball', 'search', 'found'].includes(autoplayMode);
   if (autoplay && now >= deEmbiggenifyAutoNextAt) {
@@ -17133,25 +17054,32 @@ function updateDeEmbiggenify() {
     if (isQuestDialogueOpen()) {
       if (autoplayMode !== 'hairball') advanceQuestDialogue();
     } else if (deEmbiggenifyState.status === 'arrival') {
-      player.position.set(mrHairballTarget?.sprite?.x - 55 || 795, GROUND_Y);
+      placeDeEmbiggenifyAutoplay(EESTI_AUTOPLAY_POINTS.hairball);
       handleDeEmbiggenifyTarget(mrHairballTarget, 'talk_to');
     } else if (deEmbiggenifyState.status === 'searching') {
-      if (autoplayMode === 'search') {
-        player.position.set(2495, 290);
-        player.vx = 0;
-        player.vy = 0;
-        player.onGround = true;
-      } else {
-        player.position.set(2550, 290);
-      }
+      // Stand inside the archived box and let puzzles-feature fire it; `search` waits short of it.
+      placeDeEmbiggenifyAutoplay(
+        autoplayMode === 'search' ? EESTI_AUTOPLAY_POINTS.search : EESTI_AUTOPLAY_POINTS.find
+      );
     } else if (deEmbiggenifyState.status === 'found') {
       if (autoplayMode !== 'found') {
-        player.position.set(mrHairballTarget?.sprite?.x - 55 || 795, GROUND_Y);
+        placeDeEmbiggenifyAutoplay(EESTI_AUTOPLAY_POINTS.hairball);
         handleDeEmbiggenifyTarget(mrHairballTarget, 'talk_to');
       }
     }
   }
   renderDeEmbiggenifyHud(now);
+}
+
+/** QA autoplay: stand at a source point of the street (EESTI_AUTOPLAY_POINTS). */
+function placeDeEmbiggenifyAutoplay(point) {
+  if (!player) return;
+  const at = eestiStreetPoint(point);
+  if (Math.abs(player.x - at.x) < 2 && Math.abs(player.y - at.y) < 12) return;
+  player.position.set(at.x, at.y);
+  player.vx = 0;
+  player.vy = 0;
+  player.onGround = false;
 }
 
 /** Narrow game hooks for js/paradise-course-runtime.js (the nine reconstructed courses). */
@@ -25049,6 +24977,8 @@ async function main() {
       ? savePlayerLocation(rookMuseumSourceLocation)
     : summersDayRun && summersDaySourceLocation?.tsid
       ? savePlayerLocation(summersDaySourceLocation)
+    : deEmbiggenifyState && deEmbiggenifySourceLocation?.tsid
+      ? savePlayerLocation(deEmbiggenifySourceLocation)
     : greedyStreetState && greedyStreetSourceLocation?.tsid
       ? savePlayerLocation(greedyStreetSourceLocation)
     : paradiseRun && paradiseSourceLocation?.tsid

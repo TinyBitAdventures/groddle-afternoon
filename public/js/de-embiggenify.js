@@ -7,25 +7,87 @@
  * - items/npc_dustbunny.js
  * - items/small_worthless.js
  * - items/emotional_bear.js
+ * - locations/location.js 1194-1210 (the myles_is_great box)
+ *
+ * The room is Tiny Speck's own street. onStarted creates the 'eesti' instance of the
+ * production template LIF10RQLPLBYV7 at -1832, -76; the archive kept three such
+ * instances (L XML instance_of LIF10RQLPLBYV7, instance_id eesti), byte-identical
+ * apart from their headers, each carrying the template's geometry under its inner
+ * tsid GIF10RQLPLBYV7. The newest, GHFBQQ4N68733LB (2012-08-19), is the one game.js
+ * holds as the private instance: its 23 platforms, 5 walls, 80 k04 decos, the
+ * DE_EMBIGGENIFY music and the myles_is_great box. (GIFB19E1FUM1LH9 is a March 2011
+ * copy: one platform short, no music_file, no instance_of.) The street has no event
+ * scripts; the puzzles feature runs the box (assets/content/puzzle-triggers.json).
  */
 
 export const DE_EMBIGGENIFY_QUEST_ID = 'de_embiggenify';
 export const DE_EMBIGGENIFY_PART2_QUEST_ID = 'de_embiggenify_part2';
-export const EESTI_STREET_ID = 'INSTANCE_EESTI_PAGE_17';
+/** The imported instance of the template (LHFBQQ4N68733LB instance_of LIF10RQLPLBYV7). */
+export const EESTI_STREET_ID = 'GHFBQQ4N68733LB';
+/** The private instance's name (onStarted instance_id 'eesti'), for the puzzles feature. */
+export const EESTI_INSTANCE = 'de-embiggenify';
 export const EESTI_PRODUCTION_TSID = 'LIF10RQLPLBYV7';
+/** Its bounds (G XML l/t): source x, y to the street's screen space. */
+export const EESTI_STREET_BOUNDS = Object.freeze({ l: -2000, t: -1000 });
 export const EESTI_SOURCE_SPAWN = Object.freeze({ x: -1832, y: -76 });
 export const EESTI_DURATION_MS = 2 * 60 * 1000;
 export const SMALL_WORTHLESS_ID = 'small_worthless';
 export const EMOTIONAL_BEAR_ID = 'emotional_bear';
 export const EESTI_PLAYER_SCALE = 0.42;
 export const EESTI_MUSIC_FILE = 'assets/audio/ambient/eesti_life_catalogue_1344997859.mp3';
-export const EESTI_ROOM_ROUTE = Object.freeze([
-  'sofa-and-sleepy-cat',
-  'end-table-lamp',
-  'ornate-chair',
-  'curved-table',
-  'cake',
+/**
+ * The archived box (G XML GHFBQQ4N68733LB boxes/box_1, source bottom-centre x, y and
+ * w, h): it sits on the tabletop (_pl1257983927390, y -449) just left of the cake
+ * (k04_cake_01, middleplus, x 1790-1915). location.js creates the small shiny object
+ * when the avatar enters it during part two.
+ */
+export const EESTI_FIND_BOX = Object.freeze({ id: 'myles_is_great', x: 1750, y: -450, w: 150, h: 150 });
+/**
+ * Mr. Hairball (the instance's Dust Bunny, IHFBQS4N68733MP) lost his position with the
+ * items. Ours, source x, y: on the floor just right of the ornate chair's front leg and
+ * under the long table's left curl, where the runthrough (nloqeMjT-bQ, 0:24) shows him,
+ * feet on the street's item line pl1267165485151 (pc_perm 0, item_perm -1, y -65).
+ */
+export const EESTI_HAIRBALL_SPOT = Object.freeze({ x: 660, y: -65 });
+/**
+ * The small shiny object went straight into the pack (createItemFromGround); the remake
+ * shows it, with a glint, while you search. Ours: on the tabletop inside the archived box,
+ * its right half behind the cake's left edge.
+ */
+export const EESTI_SHINY_SPOT = Object.freeze({ x: 1810, y: -449 });
+/**
+ * Where the QA autoplay (&eestiautoplay) stands, source x, y (feet): beside Mr. Hairball on
+ * the floor in front of his item line (_pl1267160071287), on the tabletop short of the box
+ * (`search` waits there), and inside the archived box (tests/de-embiggenify.test.js).
+ */
+export const EESTI_AUTOPLAY_POINTS = Object.freeze({
+  hairball: Object.freeze({ x: 605, y: -40 }),
+  search: Object.freeze({ x: 1600, y: -449 }),
+  find: Object.freeze({ x: 1760, y: -449 }),
+});
+/**
+ * The room's landmarks left to right as you walk it (the runthrough's order), each the
+ * street's own deco: layer and sprite in GHFBQQ4N68733LB.json. Parallax layers are
+ * placed where their deco crosses the middle of the view.
+ */
+export const EESTI_LANDMARKS = Object.freeze([
+  Object.freeze({ id: 'sofa-and-sleepy-cat', decos: Object.freeze([['middleground', 'k04_sleepycat_01'], ['bg_2', 'k04_sofa_01']]) }),
+  Object.freeze({ id: 'end-table-lamp', decos: Object.freeze([['bg_2', 'k04_table_02'], ['bg_2', 'k04_lamp_04']]) }),
+  Object.freeze({ id: 'ornate-chair', decos: Object.freeze([['middleground', 'k04_chair_02']]) }),
+  Object.freeze({ id: 'kitty-frames', decos: Object.freeze([['sky', 'k04_pictureframe_01_kitty'], ['sky', 'k04_pictureframe_02_kitty'], ['sky', 'k04_pictureframe_03_kitty']]) }),
+  Object.freeze({ id: 'long-table', decos: Object.freeze([['middleground', 'k04_table_03_back'], ['middleplus', 'k04_table_03_front']]) }),
+  Object.freeze({ id: 'cake', decos: Object.freeze([['middleplus', 'k04_cake_01']]) }),
 ]);
+export const EESTI_ROOM_ROUTE = Object.freeze(EESTI_LANDMARKS.map((row) => row.id));
+
+/** Source x, y to the imported street's screen space. */
+export function eestiStreetPoint(point) {
+  return {
+    x: (Number(point?.x) || 0) - EESTI_STREET_BOUNDS.l,
+    y: (Number(point?.y) || 0) - EESTI_STREET_BOUNDS.t,
+  };
+}
+
 export const EESTI_REWARD = Object.freeze({
   xp: 200,
   currants: 200,

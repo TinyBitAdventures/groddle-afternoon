@@ -139,7 +139,7 @@
    "group": "world",
    "name": "Street scripts and puzzles",
    "status": "rebuilt",
-   "blurb": "Archived street event scripts run again; puzzle streets got their lost switches and triggers rebuilt. Shim Shiri’s Light Beams are clicked to Beam Up into the gut tubes. A Summer’s Day runs on its own archived street the same way: its 44 scripts, with the lost boxes behind its flitterbugs, pressure stones, pool, orbs and pulse dots rebuilt.",
+   "blurb": "Archived street event scripts run again; puzzle streets got their lost switches and triggers rebuilt. Shim Shiri’s Light Beams are clicked to Beam Up into the gut tubes. A Summer’s Day runs on its own archived street the same way: its 44 scripts, with the lost boxes behind its flitterbugs, pressure stones, pool, orbs and pulse dots rebuilt. De-Embiggenify’s catalogue page keeps its one archived box, the one behind the cake that finds Mr. Hairball’s shiny object.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
@@ -821,7 +821,7 @@
    "group": "quests",
    "name": "Hand-built story quests",
    "status": "rebuilt",
-   "blurb": "Phantom Glitch, Rooks’ Woods, Museum of the Rook, Winter Walk, A Summer’s Day, Ilmenskie Jones, Legalize It and more. A Summer’s Day is Tiny Speck’s own memory street, archived as a copy of its template: its flitterbugs, signs, pressure stones, pool, glowing orbs and ladder, with only its Annex drawn. Rooks’ Woods’ Crushers are Tiny Speck’s own crusher art, and the Rook Egg rests in their rook nest. The Museum of the Rook is laid out on the points its quest code kept (where you arrive, where Greeterbot waits and goes, where each painting hangs and where each speaker stands you): Tiny Speck’s framed paintings with their brass plaques, each lesson playing its three frames inside the real frame, the tower’s wood wall and pointed windows, the Mezzanine door and plaque, the Exhibits sign, the bench, spotlights over the orb and the shrine, the shrine’s speaker on its stand, and the wooden Greeterbot.",
+   "blurb": "Phantom Glitch, Rooks’ Woods, Museum of the Rook, Winter Walk, A Summer’s Day, Ilmenskie Jones, Legalize It and more. A Summer’s Day is Tiny Speck’s own memory street, archived as a copy of its template: its flitterbugs, signs, pressure stones, pool, glowing orbs and ladder, with only its Annex drawn. Rooks’ Woods’ Crushers are Tiny Speck’s own crusher art, and the Rook Egg rests in their rook nest. The Museum of the Rook is laid out on the points its quest code kept (where you arrive, where Greeterbot waits and goes, where each painting hangs and where each speaker stands you): Tiny Speck’s framed paintings with their brass plaques, each lesson playing its three frames inside the real frame, the tower’s wood wall and pointed windows, the Mezzanine door and plaque, the Exhibits sign, the bench, spotlights over the orb and the shrine, the shrine’s speaker on its stand, and the wooden Greeterbot. De-Embiggenify shrinks you onto Eesti Life Catalog Page 17 as Tiny Speck built it: the sleeping cat, sofa, ornate chair, kitty frames and long table, climbed by its own sneaker and chair up to the cake.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
@@ -832,7 +832,8 @@
     "public/assets/sprites/quests/rook-woods/crusher@3x.webp",
     "public/assets/sprites/quests/rook-museum/rook_hall_painting_01_frame@3x.webp",
     "public/js/winter-walk.js",
-    "public/js/summers-day.js"
+    "public/js/summers-day.js",
+    "public/js/de-embiggenify.js"
    ],
    "shot": "shots/story-quests.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=winter&practice=1"
@@ -2670,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 756,
+  "commits": 757,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "new",
+    "text": "Rooks' Woods and the Museum of the Rook in Tiny Speck's own art, the museum laid out on its quest code's own points"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2787,11 +2793,6 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "A speech bubble's tail fades with the bubble"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "Clicking the Zilloween chip opens its card"
    }
   ]
  },

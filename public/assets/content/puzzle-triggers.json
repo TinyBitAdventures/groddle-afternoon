@@ -5496,6 +5496,35 @@
     ]
    },
    "eventsWhy": "owl4_off as archived, plus a deco_hide for the rebuilt step’s shelf beside its plat off, so the shelf goes when the platform does"
+  },
+  "GHFBQQ4N68733LB": {
+   "name": "Eesti Life Catalog Page 17",
+   "blurb": "De-Embiggenify's miniature room: the private two-minute 'eesti' instance of LIF10RQLPLBYV7 (quests/de_embiggenify.js, de_embiggenify_part2.js).",
+   "instance": "de-embiggenify",
+   "physics": {
+    "jump": 1.06
+   },
+   "physicsWhy": "The way up to the tabletop is the street's own: the sneaker (plats to y -133), the chair seat (-276 at its high end, x 568), the chair back (_pl1285356305652, y -407, x 641-698), the table's curl and the tabletop (-449). The seat to the chair back is a 131 px rise. The client caught ledges with its 15 px collision circles (AvatarPhysicsHandler calcCircleGap), so its 134 px apex still landed there; the remake lands on the line itself and, measured by real input at source physics, peaks 2 px over the chair back and falls past it. x1.06 puts the apex at the client's reach (135 to 152 px); every other step on the way is lower",
+   "mapCard": false,
+   "emptyEcology": true,
+   "start": {
+    "x": 168,
+    "y": 924
+   },
+   "quoins": [],
+   "quoinsWhy": "The instance listed two Coin objrefs (L XML LHFBQQ4N68733LB: IHFBQR4N68733M7, IHFBQT4N68733NQ) whose positions and types were lost with the items; the remake's room never had them, so none are placed and the quest plays as before",
+   "triggers": [
+    {
+     "id": "myles_is_great",
+     "x": 3750,
+     "y": 550,
+     "w": 150,
+     "h": 150,
+     "onEnter": [],
+     "moment": "myles_is_great",
+     "why": "Not rebuilt: the archived G XML box myles_is_great (source 1750, -450, 150 x 150; screen 3750, 550) on the tabletop (_pl1257983927390, y -449) just left of the cake (k04_cake_01, middleplus, x 1790-1915). location.js 1194-1210 creates the small shiny object from the ground when the avatar enters it with de_embiggenify_part2 open and none in the pack; nloqeMjT-bQ (HburgerGlitch, Eesti Life Catalogue Page 17 runthrough) 0:51 finds it there, beside the cake"
+    }
+   ]
   }
  }
 }
