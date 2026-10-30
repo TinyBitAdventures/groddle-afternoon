@@ -56,9 +56,42 @@ export const ROOK_TOOL_PROFILES = Object.freeze({
 });
 
 /**
+ * The authored route (world px): the walking line the Crushers guard, from
+ * the start (spawn x 115) to the nest.
+ */
+export const ROOK_WOODS_PLATFORMS = Object.freeze([
+  Object.freeze({ id: 'rook-ground-west', x1: 0, y1: 780, x2: 560, y2: 780 }),
+  Object.freeze({ id: 'rook-rise-one', x1: 560, y1: 780, x2: 760, y2: 690 }),
+  Object.freeze({ id: 'rook-branch-one', x1: 760, y1: 690, x2: 1020, y2: 690 }),
+  Object.freeze({ id: 'rook-rise-two', x1: 1020, y1: 690, x2: 1210, y2: 560 }),
+  Object.freeze({ id: 'rook-branch-high', x1: 1210, y1: 560, x2: 1430, y2: 560 }),
+  Object.freeze({ id: 'rook-fall', x1: 1430, y1: 560, x2: 1610, y2: 780 }),
+  Object.freeze({ id: 'rook-ground-nest', x1: 1610, y1: 780, x2: 2300, y2: 780 }),
+]);
+
+/** The walking line's height at x (the route has no overhangs). */
+export function rookWoodsGroundY(x) {
+  const px = finite(x);
+  for (const p of ROOK_WOODS_PLATFORMS) {
+    if (px >= p.x1 && px <= p.x2) return p.y1 + ((p.y2 - p.y1) * (px - p.x1)) / (p.x2 - p.x1);
+  }
+  return px < 0 ? ROOK_WOODS_PLATFORMS[0].y1 : ROOK_WOODS_PLATFORMS.at(-1).y2;
+}
+
+/** The avatar's box the Crushers test against (feet at y, game.js updateRookWoods). */
+export const ROOK_AVATAR_HIT = Object.freeze({ halfWidth: 21, height: 86 });
+
+/**
  * Clean-room hazard layout derived from the route cadence in the supplied
  * footage. Motion values follow crusher.js: wait, one-second strike, wait,
  * then one second per ratchet step back to the start.
+ *
+ * The drops (axis y) are passed by timing: wait for the gap, then walk under.
+ * The sweeps (axis x) ride over the walking line, their box clear of a
+ * standing avatar's head along their whole reach, so you walk under them and
+ * only a jump into one hurts (2026-10-29: at y 593 and 718 they
+ * sat at head height across the path with no gap, so only autoplay, which
+ * skips collisions, could reach the Egg).
  */
 export const ROOK_CRUSHERS = Object.freeze([
   Object.freeze({
@@ -77,7 +110,7 @@ export const ROOK_CRUSHERS = Object.freeze([
     id: 'branch_sweep',
     axis: 'x',
     x: 790,
-    y: 593,
+    y: 520,
     travel: 190,
     topDelayMs: 1550,
     bottomDelayMs: 700,
@@ -101,7 +134,7 @@ export const ROOK_CRUSHERS = Object.freeze([
     id: 'nest_sweep',
     axis: 'x',
     x: 1635,
-    y: 718,
+    y: 568,
     travel: 205,
     topDelayMs: 1350,
     bottomDelayMs: 600,

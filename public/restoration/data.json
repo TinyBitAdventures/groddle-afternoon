@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 757,
+  "commits": 758,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "new",
+    "text": "De-Embiggenify shrinks you onto Tiny Speck's own Eesti Life Catalog Page 17"
+   },
    {
     "date": "2026-10-29",
     "kind": "new",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-29",
     "kind": "new",
     "text": "A share card and link previews for every page"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "A speech bubble's tail fades with the bubble"
    }
   ]
  },

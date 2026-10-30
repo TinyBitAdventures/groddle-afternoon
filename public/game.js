@@ -2,7 +2,7 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-2';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-305';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
@@ -176,6 +176,7 @@ import {
   summersDayStreetPoint,
 } from './js/summers-day.js?v=g452-2';
 import {
+  ROOK_AVATAR_HIT,
   ROOK_CRUSHERS,
   ROOK_CRUSHER_ART,
   ROOK_EGG_INITIAL_STATE,
@@ -186,6 +187,7 @@ import {
   ROOK_NEST,
   ROOK_QUEST_ID,
   ROOK_WOODS_DURATION_MS,
+  ROOK_WOODS_PLATFORMS,
   ROOK_WOODS_STREET_ID,
   beginRookWoods,
   completeRookEggSmash,
@@ -200,7 +202,7 @@ import {
   rookEggStateForProgress,
   rookWoodsObjective,
   rookWoodsRemainingMs,
-} from './js/rook-woods.js?v=g455-1';
+} from './js/rook-woods.js?v=g455-2';
 import {
   ROOK_HALL_QUEST_ID,
   ROOK_HALL_START_QUEST_ID,
@@ -15476,15 +15478,7 @@ function drawRookWoodsBackground() {
   }
   root.addChild(limbs);
 
-  const platforms = [
-    { id: 'rook-ground-west', x1: 0, y1: 780, x2: 560, y2: 780 },
-    { id: 'rook-rise-one', x1: 560, y1: 780, x2: 760, y2: 690 },
-    { id: 'rook-branch-one', x1: 760, y1: 690, x2: 1020, y2: 690 },
-    { id: 'rook-rise-two', x1: 1020, y1: 690, x2: 1210, y2: 560 },
-    { id: 'rook-branch-high', x1: 1210, y1: 560, x2: 1430, y2: 560 },
-    { id: 'rook-fall', x1: 1430, y1: 560, x2: 1610, y2: 780 },
-    { id: 'rook-ground-nest', x1: 1610, y1: 780, x2: 2300, y2: 780 },
-  ];
+  const platforms = ROOK_WOODS_PLATFORMS.map((platform) => ({ ...platform }));
 
   const path = new PIXI.Graphics();
   path.zIndex = -80;
@@ -15953,8 +15947,7 @@ function updateRookWoods(dt) {
         crusherHitsAvatar(entry.spec, entry.position, {
           x: player.x,
           y: player.y,
-          halfWidth: 21,
-          height: 86,
+          ...ROOK_AVATAR_HIT,
         })
       ) {
         beginRookCrusherHit(entry, now);

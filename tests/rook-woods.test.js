@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
+  ROOK_AVATAR_HIT,
   ROOK_CRUSHERS,
   ROOK_CRUSHER_ART,
   ROOK_EGG_INITIAL_STATE,
@@ -18,6 +19,7 @@ import {
   ROOK_REWARD,
   ROOK_TOOL_PROFILES,
   ROOK_WOODS_DURATION_MS,
+  ROOK_WOODS_PLATFORMS,
   ROOK_WOODS_STREET_ID,
   beginRookWoods,
   completeRookEggSmash,
@@ -31,8 +33,9 @@ import {
   findWorkingRookTool,
   recordCrusherHit,
   rookEggStateForProgress,
+  rookWoodsGroundY,
   rookWoodsRemainingMs,
-} from '../public/js/rook-woods.js?v=g455-1';
+} from '../public/js/rook-woods.js?v=g455-2';
 import {
   createToolConditionState,
   setToolRemaining,
@@ -218,4 +221,69 @@ test('the Crushers are crusher.swf and the Egg sits in the rook_nest deco', () =
   assert.doesNotMatch(bg, /const nest = new PIXI\.Graphics/);
   assert.match(game, /rookCrusherArt = ROOK_CRUSHER_ART\.swf/);
   assert.match(game, /rookNestArt = /);
+});
+
+test('every Crusher can be passed on foot: a sweep clears a standing head, a drop leaves a gap you can time', () => {
+  const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
+  // The avatar box, walk speed and jump come from the code that runs them.
+  assert.match(game, /crusherHitsAvatar\(entry\.spec, entry\.position, \{\s*x: player\.x,\s*y: player\.y,\s*\.\.\.ROOK_AVATAR_HIT,\s*\}\)/);
+  assert.match(game, /const platforms = ROOK_WOODS_PLATFORMS\.map/);
+  const walkPerFrame = Number(/const max = ([\d.]+) \* movementBuff\.speed;/.exec(game)[1]);
+  const jumpVelocity = Number(/const jumpVelocity = -([\d.]+) \* movementBuff\.jump;/.exec(game)[1]);
+  const gravity = Number(/player\.vy \+= ([\d.]+) \* movementBuff\.gravity \* dt;/.exec(game)[1]);
+  const walkPxPerMs = (walkPerFrame * 60) / 1000;
+  let vy = -jumpVelocity;
+  let rise = 0;
+  let lift = 0;
+  while (vy < 0) {
+    vy += gravity;
+    lift -= vy;
+    rise = Math.max(rise, lift);
+  }
+  assert.ok(rise > 90 && rise < 130, `jump rise ${rise}`);
+
+  const avatarAt = (x, up = 0) => ({ x, y: rookWoodsGroundY(x) - up, ...ROOK_AVATAR_HIT });
+  const hitAt = (spec, ms, avatar) => crusherHitsAvatar(spec, crusherPosition(spec, ms), avatar);
+  const routeEnd = ROOK_WOODS_PLATFORMS.at(-1).x2;
+  const eggStand = 2140 - 72; // spawnRookEgg x, where you stand to Smash (autoplay's spot too)
+  const STEP_MS = 10;
+  for (const spec of ROOK_CRUSHERS) {
+    const cycle = crusherCycleMs(spec);
+    // Where on the route a standing avatar is ever hit.
+    let lo = Infinity;
+    let hi = -Infinity;
+    for (let x = 0; x <= routeEnd; x += 2) {
+      for (let ms = 0; ms < cycle; ms += STEP_MS) {
+        if (hitAt(spec, ms, avatarAt(x))) {
+          lo = Math.min(lo, x);
+          hi = Math.max(hi, x);
+          break;
+        }
+      }
+    }
+    assert.ok(!(eggStand >= lo && eggStand <= hi), `${spec.id} guards the Egg itself`);
+    if (lo === Infinity) {
+      // A sweep over the walking line: you walk under it, but a jump into it still hurts.
+      assert.equal(spec.axis, 'x', `${spec.id} never threatens a standing avatar`);
+      const reach = [spec.x, spec.x + spec.travel];
+      let jumpHit = false;
+      for (let x = reach[0]; x <= reach[1] && !jumpHit; x += 4) {
+        for (let ms = 0; ms < cycle && !jumpHit; ms += STEP_MS) jumpHit = hitAt(spec, ms, avatarAt(x, rise));
+      }
+      assert.ok(jumpHit, `${spec.id} threatens a jump`);
+      continue;
+    }
+    // A Crusher a standing avatar can meet: some start time walks through clean, with room to time it.
+    let run = 0;
+    let best = 0;
+    for (let start = 0; start < cycle * 2; start += STEP_MS) {
+      let clean = true;
+      for (let x = lo - 2; x <= hi + 2 && clean; x += walkPxPerMs * STEP_MS) {
+        clean = !hitAt(spec, start + (x - (lo - 2)) / walkPxPerMs, avatarAt(x));
+      }
+      run = clean ? run + STEP_MS : 0;
+      best = Math.max(best, run);
+    }
+    assert.ok(best >= 300, `${spec.id}: the widest window to walk through is ${best} ms`);
+  }
 });
