@@ -128,7 +128,7 @@ export const ROOM_NOTES = Object.freeze({
     about: 'Being Watched began with a stale cup of water and a nap, and a dream in the dark where the screens follow you.',
     play: 'Walk under the ceiling TVs as they turn to keep you in view, hop onto the dais, peek behind the veil, and find out who has been watching.',
     source: 'The five-minute nap, the Peek Behind the Veil and Ride It Out flags, and the rewards.',
-    rebuilt: "The room is laid out from a player's Snap: all black, a TV hung from the ceiling at the upper right, the sleeper alone in a dim pool of light. The TV is Tiny Speck's own Bureaucratic Hall set; the veil and the Bureaucrat's three lines behind it are new writing.",
+    rebuilt: "The room is laid out from a player's Snap: all black, a TV hung from the ceiling at the upper right, the sleeper alone in a dim pool of light. The TV is Tiny Speck's own Bureaucratic Hall set with its screen lit and flickering, as in the Snap; the veil and the Bureaucrat's three lines behind it are new writing.",
     footage: [],
   },
   back_alley: {
@@ -176,7 +176,7 @@ export const ROOM_NOTES = Object.freeze({
     about: 'Smuggle the Smuggler followed the contraband runs: the Smuggler has been locked up, and you have to dig him out.',
     play: 'Talk to the imprisoned Smuggler, dig through the patch with a shovel, and crawl out to freedom together.',
     source: "The three quests' dialogue, flags, the shovel requirement and the rewards.",
-    rebuilt: "The cell's layout is lost; it is built from the recovered penalty-box decos.",
+    rebuilt: "The cell's layout is lost; it is built from the recovered penalty-box decos, and a player's Snap adds the grassy ledge under the mud floor and the bark trunk behind the bars.",
     footage: [{ id: 'Spfk2xfVyXA', label: 'Smuggler Quest' }],
   },
   firefly_whistle: {

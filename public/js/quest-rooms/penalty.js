@@ -22,6 +22,12 @@
  * because you are bad"), the vendor's OGA sheets and the patch_dark art the
  * patches feature already uses; digging runs through js/patches.js, so it
  * costs the dig_patch energy and tool wear and turns up earth.
+ *
+ * Little Poundcake's Snap of the cell (research/wayback/raw/snaps/penalty_box/,
+ * reference only) shows what lies round it: a grassy ledge under the mud
+ * floor's edge (penaltybox_base_grass) and a bark trunk behind the bars at the
+ * right, its roots under the "knock it off!" sign (penaltybox_trunk), both
+ * groddle1.swf decos; their placement is read off the Snap.
  */
 
 import { createPlot, performPlotVerb, plotArtPath, plotVerbs, soilResponse } from '../patches.js?v=g414-1';
@@ -53,6 +59,10 @@ export const PATCH_X = 250;
 export const PACE = Object.freeze({ x1: 520, x2: 920, speed: 40 });
 /** Bars close the cell on the right; the cave wall on the left. */
 export const BARS_X = 1290;
+/** The trunk's centre (the Snap: right of the "knock it off!" sign at 1210, behind the bars). */
+export const TRUNK_X = 1330;
+/** The grassy ledge's top under the floor line: its grass shows below the mud floor's edge. */
+export const GRASS_TOP = 62;
 const VENDOR = { cell: { w: 187, h: 91 }, anchor: { x: 153 / 187, y: 90 / 91 } };
 
 /**
@@ -307,16 +317,23 @@ export const room = {
     const world = root.layer(1, 3);
     // The cave cell behind, the rock roof above, the mud floor.
     world.addChild(kit.deco(PIXI, 'penaltybox_cell_background', W / 2, FLOOR + 30, { scale: 0.66 }));
+    // The Snap's trunk: behind the bars at the right, roots under the sign, its top under the roof.
+    world.addChild(kit.deco(PIXI, 'penaltybox_trunk', TRUNK_X, FLOOR + 8, { scale: 0.62 }));
     world.addChild(kit.deco(PIXI, 'penaltybox_roof', W / 2, FLOOR - 470, { ay: 0, scale: 0.62 }));
     world.addChild(kit.deco(PIXI, 'penaltybox_doorway', 60, FLOOR + 12, { scale: 0.62, tint: 0x8a8278 }));
     world.addChild(kit.deco(PIXI, 'penaltybox_sign_youarehere', 430, FLOOR + 4, { scale: 0.5 }));
     world.addChild(kit.deco(PIXI, 'penaltybox_sign_knockitoff', 1210, FLOOR + 4, { scale: 0.42 }));
     const g = new PIXI.Graphics();
-    g.rect(-200, FLOOR + 30, W + 400, H - FLOOR + 200).fill(0x4a3a2e);
-    // The mud floor's walking band (the strip's art thins out at its left end).
-    g.rect(-200, FLOOR - 6, W + 400, 40).fill(0x8a7a66);
-    g.rect(-200, FLOOR - 6, W + 400, 6).fill(0x9d8c76);
+    // The earth below the grassy ledge.
+    g.rect(-200, FLOOR + 180, W + 400, H - FLOOR + 50).fill(0x4a3a2e);
     world.addChild(g);
+    // The Snap's grassy ledge under the mud floor's edge, one copy each side for the camera's overscroll.
+    for (const dx of [-1440, 0, 1440]) world.addChild(kit.deco(PIXI, 'penaltybox_base_grass', W / 2 + dx, FLOOR + GRASS_TOP, { ay: 0, scale: 0.62 }));
+    const band = new PIXI.Graphics();
+    // The mud floor's walking band (the strip's art thins out at its left end).
+    band.rect(-200, FLOOR - 6, W + 400, 40).fill(0x8a7a66);
+    band.rect(-200, FLOOR - 6, W + 400, 6).fill(0x9d8c76);
+    world.addChild(band);
     world.addChild(kit.deco(PIXI, 'penaltybox_middleplus_side', W / 2, FLOOR - 10, { ay: 0, scale: 0.62 }));
     // The cell door: a row of recovered bars from floor to roof.
     for (let i = 0; i < 6; i++) {

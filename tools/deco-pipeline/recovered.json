@@ -4408,6 +4408,46 @@
    ],
    "png_sha": "8c1b98eb981b3051"
   },
+  "penaltybox_base_grass": {
+   "swf": "bundle:groddle1.swf#penaltybox_base_grass",
+   "swf_sha": "c52f7e8708cdea8a",
+   "stage": [
+    1189.95,
+    111.95
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the grassy ledge under the Penalty Box floor",
+   "png": [
+    2380,
+    224
+   ],
+   "png_sha": "78af55db978252db"
+  },
+  "penaltybox_trunk": {
+   "swf": "bundle:groddle1.swf#penaltybox_trunk",
+   "swf_sha": "538738c5c4338e3e",
+   "stage": [
+    260.55,
+    329.4
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the bark trunk at the right of the Penalty Box cell",
+   "png": [
+    522,
+    659
+   ],
+   "png_sha": "dbb43c3fe93846c3"
+  },
   "plat_tile_cap_0_sidewalk": {
    "swf": "bundle:meomi2.swf#plat_tile_cap_0_sidewalk",
    "swf_sha": "c73a12a4f8c4a40f",

@@ -13,6 +13,7 @@ export const ANIM_DECOS = new Map([
   ["WindFog", [41, 0, 0]],
   ["bubble_test", [270, 0, 0]],
   ["bureaucrat_farmgame", [195, 0, 0]],
+  ["bureaucratic_hall_tv_1_animated", [17, 0, 1]],
   ["cave_drip_03", [110, 0, 0]],
   ["dino_001_bum_tail", [20, 0, 0]],
   ["dino_002_bum_tail", [20, 0, 0]],

@@ -12,9 +12,9 @@ import {
 } from './street-model.js?v=g442-6';
 import { availableStreetTsids } from './street-loader.js?v=g442-6';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js';
-import { admitSharp, decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco } from './deco-hires.js?v=g457-2';
+import { admitSharp, decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco } from './deco-hires.js?v=g457-3';
 import { LADDER_TILE_Z, ladderTilePieces } from './ladder-tiling.js?v=g415-1';
-import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } from './deco-anim.js?v=g457-2';
+import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } from './deco-anim.js?v=g457-3';
 
 const DECO_BASE = 'assets/decos/groddle/';
 /**

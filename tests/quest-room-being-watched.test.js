@@ -32,7 +32,7 @@ import {
   napPlatforms,
   room,
   watching,
-} from '../public/js/quest-rooms/being-watched.js';
+} from '../public/js/quest-rooms/being-watched.js?v=g457-3';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -76,9 +76,14 @@ describe('Being Watched, dark as the snap shows it', () => {
   const src = readFileSync(join(root, 'public/js/quest-rooms/being-watched.js'), 'utf8');
 
   it('hangs the Bureaucratic Hall TV from the ceiling, as in the snap, at its own proportions', () => {
-    assert.equal(TV.sprite, 'bureaucratic_hall_tv_1');
-    const manifest = JSON.parse(readFileSync(join(root, 'public/assets/decos/manifest.json'), 'utf8'));
-    assert.ok(manifest.includes(TV.sprite));
+    // The snap's set has its pale screen lit: Tiny Speck's animated set, playing its own strip.
+    assert.equal(TV.sprite, 'bureaucratic_hall_tv_1_animated');
+    const strip = JSON.parse(readFileSync(join(root, 'public/assets/decos/animated', `${TV.sprite}.json`), 'utf8'));
+    assert.deepEqual(strip.size, [TV.w, TV.h]);
+    assert.equal(strip.frames, 17);
+    assert.doesNotMatch(src, /kit\.deco\(PIXI, 'light_spot', -6/, 'no stand-in glow: the set glows itself');
+    // The booth's monitors stay the hanging set (bureaucratic_hall_tv_1).
+    assert.match(src, /kit\.deco\(PIXI, 'bureaucratic_hall_tv_1', VEIL_X/);
     assert.ok(MONITORS.length >= 3);
     for (const m of MONITORS) {
       assert.ok(m.x > SPAWN.x && m.x < DAIS.x1, `set at ${m.x} hangs over the walk`);

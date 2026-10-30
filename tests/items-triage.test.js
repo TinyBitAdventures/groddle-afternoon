@@ -68,7 +68,7 @@ describe('Bushel of Grain (grain.js bundle, grain_bushel.js unbundle)', () => {
 
 describe('Extremely Rare Items Vendor (store 25) in the Penalty Box', () => {
   it('sells store 25 at the source prices, minus the sold-out trophy', async () => {
-    const { RARE_STORE, RARE_ITEMS, RARE_ICONS, rareStoreProfile, ensureRareItems, room } = await import('../public/js/quest-rooms/penalty.js?v=g414-1');
+    const { RARE_STORE, RARE_ITEMS, RARE_ICONS, rareStoreProfile, ensureRareItems, room } = await import('../public/js/quest-rooms/penalty.js?v=g457-3');
     const src = gsjs('items/catalog_stores.js');
     const block = src.slice(src.indexOf('Extremely Rare Items Vendor'), src.indexOf('// generated ok'));
     const rows = [...block.matchAll(/class_tsid: "([a-z0-9_]+)",\s*cost: (\d+),\s*total_quantity: (\d+)/g)].map((m) => ({ classTsid: m[1], cost: Number(m[2]), stock: Number(m[3]) }));

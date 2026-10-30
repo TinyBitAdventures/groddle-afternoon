@@ -36,8 +36,8 @@ it most, as recover.py picks):
   public/js/deco-anim-list.js (name -> frames, loop start, 3x).
 
 Rebuilt rooms play a few decos no archived street places (SCENE_ANIMATED: An Autumn Day's falling
-leaves and the girl on the bench): the same strips, made at the stage's full 3x, with no still and
-no placements; js/deco-anim.js sceneAnim draws them.
+leaves and the girl on the bench, Being Watched's lit TVs): the same strips, made at the stage's full
+3x, with no still and no placements; js/deco-anim.js sceneAnim draws them.
 
 Usage (python3.11 has numpy + Pillow; FFDec needs Java 21; cwebp 1.6):
   python3.11 -I tools/deco-pipeline/animate.py --list
@@ -95,6 +95,9 @@ SCENE_ANIMATED = {
     'falling_leaves_01b_anatumunsday': ('quest01.swf', 'a leaf falling down a 140 x 360 column, 254 frames'),
     'falling_leaves_01c_anatumunsday': ('quest01.swf', 'a leaf falling down a 140 x 360 column, frames 49 to 192 of 313'),
     'silhouette_girl_anautumsday': ('quest01.swf', 'the girl on the bench, her hair blowing (33 frames)'),
+    # Being Watched (js/quest-rooms/being-watched.js): the Bureaucratic Hall's TV with its screen lit
+    # and flickering (nested clips of 17, 9 and 8 frames: the 17-frame loop, as for any deco).
+    'bureaucratic_hall_tv_1_animated': ('bldg_int_bhall.swf', 'a ceiling TV, its pale screen glowing and flickering'),
 }
 
 CONTROL = {1, 4, 5, 12, 15, 18, 19, 26, 28, 43, 45, 70, 89}  # tags that belong to a timeline

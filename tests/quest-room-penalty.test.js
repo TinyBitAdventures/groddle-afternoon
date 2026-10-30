@@ -18,6 +18,7 @@ import {
   EXIT_PROMPT_MS,
   FLOOR,
   FREE_TEXT,
+  GRASS_TOP,
   NEED_TOOL,
   PACE,
   PART_1,
@@ -26,12 +27,13 @@ import {
   PATCH_X,
   SPAWN,
   TOOLS,
+  TRUNK_X,
   W,
   cellPlatforms,
   cellStep,
   hasWorkingTool,
   room,
-} from '../public/js/quest-rooms/penalty.js?v=g414-1';
+} from '../public/js/quest-rooms/penalty.js?v=g457-3';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
@@ -72,6 +74,15 @@ describe('Smuggle the Smuggler source', () => {
       assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${m[1]}.webp`)), m[1]);
     }
     for (const f of ['patch-dark-dirty.png', 'patch-dark-dug.png']) assert.ok(existsSync(join(root, 'public/assets/sprites/soil', f)));
+  });
+
+  it("draws the Snap's grassy ledge under the floor and the trunk behind the bars, not a drawn fill", () => {
+    const src = readFileSync(join(root, 'public/js/quest-rooms/penalty.js'), 'utf8');
+    assert.match(src, /kit\.deco\(PIXI, 'penaltybox_base_grass'/);
+    assert.match(src, /kit\.deco\(PIXI, 'penaltybox_trunk', TRUNK_X/);
+    assert.doesNotMatch(src, /g\.rect\(-200, FLOOR \+ 30,/, 'the earth under the floor starts below the ledge');
+    assert.ok(TRUNK_X > 1210 && TRUNK_X < W, 'right of the knock it off! sign, inside the cell');
+    assert.ok(GRASS_TOP > 30 && GRASS_TOP < 100, 'the grass shows under the mud floor edge');
   });
 });
 

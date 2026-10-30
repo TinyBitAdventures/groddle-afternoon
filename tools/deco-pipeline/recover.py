@@ -130,6 +130,14 @@ SCENE_DECOS.update({
     'groddle_finishline_bar_middle': 'the red and white bar across the finish',
     'groddle_finishline_bar_close': 'the near finish post (in front of the racers)',
 })
+# The Penalty Box (template LUVGFS2RQI63N49, lost): Little Poundcake's Snap of it (research/wayback/raw/
+# snaps/penalty_box/, reference only) shows a grassy ledge under the cell's mud floor and a bark trunk
+# behind the bars at the right, its roots under the "knock it off!" sign; both are groddle1.swf decos.
+# js/quest-rooms/penalty.js.
+SCENE_DECOS.update({
+    'penaltybox_base_grass': 'the grassy ledge under the Penalty Box floor',
+    'penaltybox_trunk': 'the bark trunk at the right of the Penalty Box cell',
+})
 
 
 def sha(path):

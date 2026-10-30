@@ -20,8 +20,8 @@
  *
  * Rebuilt rooms play a few decos with no placement at all through sceneAnim (below).
  */
-import { ANIM_DECOS } from './deco-anim-list.js?v=g457-1';
-import { wantsHiresDecos } from './deco-hires.js?v=g457-2';
+import { ANIM_DECOS } from './deco-anim-list.js?v=g457-3';
+import { wantsHiresDecos } from './deco-hires.js?v=g457-3';
 import { isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js';
 
 export const ANIM_BASE = 'assets/decos/animated/';
@@ -176,10 +176,11 @@ export function setDecoTexture(PIXI, spr, texture) {
 
 /**
  * A deco a rebuilt room plays though no archived street places it (tools/deco-pipeline/animate.py
- * SCENE_ANIMATED: An Autumn Day's falling leaves and girl): a PIXI.AnimatedSprite anchored at the
- * stage's bottom centre, sized like js/quest-rooms/kit.js deco (scale 1 is the still's 2x pixel
- * size, so 0.5 is the stage's own size), empty until its strip is in. `clock` sets where in the
- * loop it starts; `hold` (a timeline frame) stops it there instead of playing.
+ * SCENE_ANIMATED: An Autumn Day's falling leaves and girl, Being Watched's TVs): a
+ * PIXI.AnimatedSprite anchored at the stage's bottom centre, sized like js/quest-rooms/kit.js deco
+ * (scale 1 is the still's 2x pixel size, so 0.5 is the stage's own size), empty until its strip is
+ * in. `clock` sets where in the loop it starts; `hold` (a timeline frame) stops it there instead of
+ * playing.
  */
 export function sceneAnim(PIXI, name, x, y, { scale = 1, flip = false, clock = performance.now(), hold = null, resolution = globalThis.devicePixelRatio || 1, ax = 0.5, ay = 1 } = {}) {
   const spr = new PIXI.AnimatedSprite([PIXI.Texture.EMPTY]);

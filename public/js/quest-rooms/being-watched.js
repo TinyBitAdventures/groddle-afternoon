@@ -25,10 +25,11 @@
  * being-watched, reference only, nothing of it ships): an all-black room, a
  * television hung from the ceiling on a short stalk at the upper right, its
  * pale screen glowing, and the avatar alone in a dim pool of light, in its
- * own colours. The TV is Tiny Speck's bureaucratic_hall_tv_1 (the
- * Bureaucratic Hall's, where the cup of water comes from), so the room is
- * rebuilt dark: ceiling TVs along the room that turn to face you, a pool of
- * light that follows you, and the veil the source names ("Peek Behind the
+ * own colours. The TV is Tiny Speck's bureaucratic_hall_tv_1_animated
+ * (bldg_int_bhall.swf: the Bureaucratic Hall's set, where the cup of water
+ * comes from, its pale screen lit, glowing and flickering, as in the snap), so
+ * the room is rebuilt dark: ceiling TVs along the room that turn to face you,
+ * a pool of light that follows you, and the veil the source names ("Peek Behind the
  * Veil") on a dais at the far end. The picture's caption line is placed
  * text in the room (CAPTION below). Peeking behind the veil finds the Bureaucrats'
  * observation booth; their short exchange (marked below, no source text
@@ -37,6 +38,7 @@
  */
 
 import { onLoaded } from '../textures.js';
+import { sceneAnim } from '../deco-anim.js?v=g457-3';
 
 export const QUEST = 'stale_but_necessary';
 /** source: questInstanceLocation(..., 5*60). */
@@ -68,9 +70,10 @@ export const DAIS = Object.freeze({ x1: 1620, x2: 1980, y: FLOOR - 90 });
 export const VEIL_X = 1830;
 export const PEEK_RANGE = 200;
 /**
- * Ceiling TVs (bureaucratic_hall_tv_1, 266 x 282, its stalk at the top): x,
- * the bottom of the set (world), scale. The snap: the set hangs at the upper
- * right of the avatar, its foot about 180 px above the floor. The first is
+ * Ceiling TVs (bureaucratic_hall_tv_1_animated, 358 x 300 with its glow; the
+ * set's top edge 24 px down): x, the bottom of the set (world), scale. The
+ * snap: the set hangs at the upper right of the avatar, its foot about 180 px
+ * above the floor. The first is
  * far enough along to show right of the room card when you wake.
  */
 export const MONITORS = Object.freeze([
@@ -78,7 +81,7 @@ export const MONITORS = Object.freeze([
   { x: 1200, y: FLOOR - 190, s: 0.42 },
   { x: 1520, y: FLOOR - 172, s: 0.44 },
 ]);
-export const TV = Object.freeze({ sprite: 'bureaucratic_hall_tv_1', w: 266, h: 282 });
+export const TV = Object.freeze({ sprite: 'bureaucratic_hall_tv_1_animated', w: 358, h: 300, top: 24 });
 /**
  * G352: the room's caption, read off Arthur DentUre's snap (Flickr 8270858639, 2012-12-13;
  * research/flickr-2026-10-27/raw/being-watched, reference only). No GSJS text: placed in the
@@ -145,13 +148,12 @@ function drawDark(ctx) {
     const c = new PIXI.Container();
     c.x = m.x;
     c.y = m.y;
-    const h = TV.h * m.s;
+    const h = (TV.h - TV.top) * m.s;
     const rod = new PIXI.Graphics();
     rod.rect(-3, -h - 600, 6, 600 + 8).fill(0x1c1c20);
-    // The screen's soft glow (light_spot, a CC0 radial light).
-    const halo = kit.deco(PIXI, 'light_spot', -6, -h * 0.45, { ay: 0.5, scale: (TV.w * m.s * 2.2) / 848, alpha: 0.32, tint: 0xeef2f6 });
-    const tv = kit.deco(PIXI, TV.sprite, 0, 0, { scale: m.s });
-    c.addChild(halo, rod, tv);
+    // The set plays its own lit, flickering screen and glow, each on its own clock.
+    const tv = sceneAnim(PIXI, TV.sprite, 0, 0, { scale: m.s, clock: performance.now() - i * 190, resolution: ctx.engine?.app?.renderer?.resolution });
+    c.addChild(rod, tv);
     world.addChild(c);
     return { ...m, c, tv, dir: 1, turn: 1, phase: kit.hash01(`tv${i}`) * 6 };
   });
