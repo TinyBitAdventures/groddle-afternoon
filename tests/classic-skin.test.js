@@ -169,8 +169,16 @@ describe('Classic skin: modules and copy', () => {
     assert.match(css, /font-size: calc\(var\(--fs-classic-row\) \* var\(--cu-n, 1\)\);/);
     assert.match(css, /border-bottom: 1px solid var\(--c-classic-row-rule\);/);
     assert.match(css, /min-height: calc\(29 \* var\(--cu\)\);/, 'the 29 px footer buttons');
-    assert.match(css, /#make-panel > \.make-card \{ width: min\(calc\(614 \* var\(--cu\)\), 100%\); \}/);
+    assert.match(css, /#make-panel > \.make-card \{ width: min\(calc\(614 \* var\(--cu\)\), 100%\);/);
     assert.match(css, /#map-panel \.map-canvas \{[^}]*height: calc\(460 \* var\(--cu\)\);/);
+  });
+
+  it('montage fixes: quest steps read desc (got/need); Make\'s recipe and result drop the tool tabs and keep their buttons in the footer band', () => {
+    const css = read(CSS);
+    assert.match(css, /#quest-panel \.qc-head \.qc-step \+ \.qc-count::before,[^{]*\{ content: "\("; \}/);
+    assert.match(css, /:has\(#make-result:not\(\[hidden\]\), #make-detail:not\(\[hidden\]\)\) #make-tools,/);
+    assert.match(css, /#make-panel #make-result \.mr-actions \{\s*position: absolute;[^}]*min-height: calc\(64 \* var\(--cu\)\);/);
+    assert.match(css, /#make-panel > \.make-card \{[^}]*min-width: min\(calc\(614 \* var\(--cu\)\)/, 'the window keeps its 614 px without the tabs');
   });
 
   it('dialogs: conversations, prompts and quest complete in the 462 px dark box; How many as the quantity picker', () => {

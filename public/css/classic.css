@@ -1486,7 +1486,7 @@
 /* The title leads the head (the Quests sheet put it after its icon and pushed it right). */
 :root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) { justify-content: flex-start; }
 :root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) h2 { order: 0; flex: 0 1 auto; text-align: left; }
-:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) h2:focus:not(:focus-visible) { outline: none; }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) h2:is(:focus:not(:focus-visible), [tabindex="-1"]:focus) { outline: none; } /* a title takes focus to be read out, not to be used */
 /* The close: a white 30 x 30 square with the red cross (Dialog.as 221-243). */
 :root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel, #make-panel) :is(.side-head, .map-head, .ui-sheet-head) .verb-menu-x {
   position: absolute;
@@ -1588,7 +1588,7 @@
   font-size: calc(var(--fs-classic-row) * var(--cu-n, 1));
   line-height: var(--lh-normal);
 }
-:root[data-ui="classic"] #game-root #make-panel > .make-card { width: min(calc(614 * var(--cu)), 100%); }
+:root[data-ui="classic"] #game-root #make-panel > .make-card { width: min(calc(614 * var(--cu)), 100%); min-width: min(calc(614 * var(--cu)), calc(100vw - 32px)); } /* the tool tabs no longer hold it open */
 :root[data-ui="classic"] #game-root #make-panel .ui-sheet-head { min-height: calc(67 * var(--cu)); flex-wrap: wrap; }
 :root[data-ui="classic"] #game-root :is(#quest-panel, #make-panel, #map-panel) .ui-sheet-icon { width: auto; height: calc(28 * var(--cu)); }
 /* The sheet's body scrolls; its foot is the window's white footer (Making: head 67, body 320, foot 64). */
@@ -1721,6 +1721,33 @@
 :root[data-ui="classic"] #game-root #make-panel #make-result .mr-actions { grid-column: 1 / -1; }
 :root[data-ui="classic"] #game-root #skills-panel .skill-family { margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
 :root[data-ui="classic"] #game-root #quest-panel .qc-head { padding: 0; border: 0; background: none; box-shadow: none; text-align: left; }
+/* A row's step reads "desc (got/need)" under the quest's name (QuestTracker.as 212-214). */
+:root[data-ui="classic"] #game-root #quest-panel .qc-head { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: calc(5 * var(--cu)); width: 100%; }
+:root[data-ui="classic"] #game-root #quest-panel .qc-head .qc-title { flex: 1 0 100%; }
+:root[data-ui="classic"] #game-root #quest-panel .qc-head .qc-step { order: 1; color: var(--c-classic-text); font: calc(var(--fs-classic-row) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-body); }
+:root[data-ui="classic"] #game-root #quest-panel .qc-head .qc-count { order: 2; color: var(--c-classic-offline); font: 700 calc(var(--fs-classic-row) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-body); }
+:root[data-ui="classic"] #game-root #quest-panel .qc-head .qc-step + .qc-count::before,
+:root[data-ui="classic"] #game-root #quest-panel .qc-head .qc-count:has(+ .qc-step)::before { content: "("; }
+:root[data-ui="classic"] #game-root #quest-panel .qc-head .qc-step + .qc-count::after,
+:root[data-ui="classic"] #game-root #quest-panel .qc-head .qc-count:has(+ .qc-step)::after { content: ")"; }
+/* Make's recipe and result views (video-2011-make-result.jpg): no tool tabs, a 338 px body and the
+   buttons in the white 64 px footer band, where the tool's note sits on the recipe list. */
+:root[data-ui="classic"] #game-root #make-panel > .make-card:has(#make-result:not([hidden]), #make-detail:not([hidden])) { position: relative; }
+:root[data-ui="classic"] #game-root #make-panel > .make-card:has(#make-result:not([hidden]), #make-detail:not([hidden])) #make-tools,
+:root[data-ui="classic"] #game-root #make-panel > .make-card:has(#make-result:not([hidden])) > .ui-sheet-foot { display: none; }
+:root[data-ui="classic"] #game-root #make-panel > .make-card:has(#make-result:not([hidden])) > .ui-sheet-body { min-height: calc(338 * var(--cu)); padding-bottom: calc(76 * var(--cu)); }
+:root[data-ui="classic"] #game-root #make-panel #make-result .mr-actions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: calc(64 * var(--cu));
+  margin: 0;
+  padding: calc(10 * var(--cu)) calc(20 * var(--cu));
+  border-top: 1px solid var(--c-classic-rule);
+  border-radius: 0 0 4px 4px;
+  background: var(--c-classic-panel);
+}
 
 /* == Dialogs and prompts (phase E; QuestConversationUI.as 54-55, 76; the dark box of
    ref/video-2011-quest-complete.jpg). Quest offers and conversations, and the quest-complete screen,
