@@ -60,8 +60,9 @@ const ONLINE_STYLE = `  <style>
     .online-gate .card img { display: block; width: 44px; height: 44px; margin: 0 auto var(--sp-4); }
     .online-gate .online-play {
       display: block; width: 100%; margin-top: var(--sp-7); text-align: center; text-decoration: none; border: 0; cursor: pointer;
-      border-radius: var(--radius-lg); padding: 0.7rem var(--sp-8); font: inherit; font-size: var(--fs-lg); font-weight: 700; color: var(--text-inverse);
-      background: linear-gradient(180deg, var(--c-orange-76), var(--accent)); box-shadow: 0 3px 0 var(--c-orange-57);
+      border-radius: var(--radius-lg); padding: 0.7rem var(--sp-8); font: inherit; font-size: var(--fs-lg); font-weight: 700; color: var(--text);
+      /* One warm orange like the header's Play, dark text on it (6.7:1 to 5.0:1); white on orange fell under 3:1. */
+      background: linear-gradient(180deg, var(--c-orange-76), var(--c-orange-68)); box-shadow: 0 3px 0 var(--c-orange-57);
     }
     .online-gate .online-play:hover { filter: brightness(1.05); }
     .online-gate .online-play:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--c-orange-57); }
