@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-2';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-312';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-316';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g434-1';
@@ -568,14 +568,6 @@ import {
   findWorkingPick,
 } from './js/mining.js?v=g403-1';
 import {
-  createActivityLog,
-  appendActivity,
-  formatActivityLine,
-  formatActivityHtml,
-  buildActivitySegments,
-  activitySegmentsToHtml,
-} from './js/verb-rewards.js?v=g289-1';
-import {
   loadStreetData,
   STREET_INDEX,
   availableStreetTsids,
@@ -683,10 +675,9 @@ import {
   afterStreetCard,
   streetCardUp,
   STREET_CARD_UP,
-  cardPausedTimeout,
   POL_OWNER_SIZE,
 } from './js/screen-fx.js?v=g434-1';
-import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=g379-1';
+import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=g459-1';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=g434-1';
 import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=g434-1';
 import {
@@ -861,6 +852,8 @@ import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=g448-4';
 import { denseSprite } from './js/sprite-dense.js?v=g430-1';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
+import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from './js/notify.js?v=g459-1';
+import { mountNotifyView } from './js/notify-view.js?v=g459-1';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g367-1';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
@@ -1667,7 +1660,6 @@ const inv = createInventory(NEW_PLAYER ? newPlayerInventory(createInventory(), P
   paradise_ticket_starlit_night: 1,
   paradise_ticket_slip_n_slide: 1,
 });
-const activityLog = createActivityLog(50);
 /** @type {import('./js/character-builder.js').Appearance} */
 let playerAppearance = loadAppearance();
 /** @type {string} active builder tab */
@@ -1990,11 +1982,6 @@ let droppedItemState = createDroppedItemState();
 let state = {
   started: false,
   questDone: false,
-  toastTimer: 0,
-  /** Whether a panel was already open when the showing toast was raised. */
-  toastOverModal: false,
-  /** performance.now() when a loading card started holding the toast (G198). */
-  toastHeldAt: 0,
   /** G258: frames since the last HUD heartbeat (physics); energy no longer drifts here. */
   hudTick: 0,
   // Sound is on unless the player muted it last time (js/audio-pref.js).
@@ -2097,15 +2084,41 @@ function toastHeld() {
   return streetCardUp() || (GAME_MODE === 'multiplayer' && !state.started);
 }
 
+/**
+ * UI audit 2026-10-29 (NOTIFY): the one notifier. Every notice, gain, moment and log line goes
+ * through it (js/notify.js has the rules, js/notify-view.js the screen side); toast() and
+ * pushActivity() are its old names. Its clocks run on the wall clock (performance.now) and stop
+ * while toastHeld() (G198 loading card, G320 multiplayer start card: GrowlQueue.as 243-253).
+ */
+const notify = createNotifier({
+  held: () => toastHeld(),
+  onChange: (what) => {
+    notifyView?.update(what);
+    if (what === 'log' || what === 'notice') renderActivityHistory();
+  },
+});
+const notifyView = mountNotifyView(notify, {
+  root: document.getElementById('game-root'),
+  setData: (key, value) => {
+    if (app?.canvas && app.canvas.dataset[key] !== value) app.canvas.dataset[key] = value;
+  },
+  logButtonHost: document.getElementById('local-chat-form'),
+});
+/** When the open panel (.glitch-modal) opened: notices raised before it go early (they sat under it). */
+let notifyModalSince = -Infinity;
+
+/** An info notice, top centre (js/notify.js notice). */
 function toast(msg, ms = 3000) {
-  const el = document.getElementById('toast');
-  el.hidden = false;
-  el.textContent = wholeStatAmounts(msg);
-  // Wall-clock deadline: frame-counted timers linger on slow or throttled frames.
-  state.toastTimer = performance.now() + ms;
-  // Shown during a loading card (or the multiplayer start card, G320): its time starts once the card has gone (G198).
-  state.toastHeldAt = toastHeld() ? state.toastTimer - ms : 0;
-  state.toastOverModal = Boolean(openGlitchModal());
+  notify.notice(wholeStatAmounts(msg), { ms });
+}
+
+/** Once a frame: the notices' clocks, their zones and why they wait (a screen owns the screen). */
+function tickNotices() {
+  const modal = Boolean(openGlitchModal());
+  if (!modal) notifyModalSince = -Infinity;
+  else if (notifyModalSince === -Infinity) notifyModalSince = performance.now();
+  const hold = toastHeld() ? 'card' : isScreenViewOpen() ? 'screen' : '';
+  notifyView?.frame(performance.now(), { hold, dropBefore: notifyModalSince });
 }
 
 /** The open panel (.glitch-modal: shrine, vendor, Feat, ...), if any. */
@@ -2363,7 +2376,27 @@ function screenGateState() {
     // 3396: moveModel.moving: a street change (the loading card, a scene's own fade).
     moving: streetCardUp() || Boolean(document.getElementById('screen-transition')?.classList.contains('is-visible')) ||
       sceneTransitionBusy(),
+    // NOTIFY (js/screen-queue.js REMAKE_SCREEN_GATES): a panel, or a feature's conversation card.
+    panel: Boolean(openGlitchModal()),
+    dialog: conversationCardOpen(),
   };
+}
+
+/** Dialogs the screen queue has its own gate for, or that are screens themselves. */
+const GATED_DIALOG_IDS = new Set(['award-screen', 'new-day-screen', 'giant-screen-panel', 'quest-dialogue', 'verb-menu', 'pack-popover', 'familiar-dialog', 'imagination-panel', 'overlay']);
+
+/** NOTIFY: a visible [role="dialog"] in the game (a feature's conversation card, the Activity log). */
+function conversationCardOpen() {
+  const root = document.getElementById('game-root');
+  if (!root) return false;
+  for (const d of root.querySelectorAll('[role="dialog"]')) {
+    // Interaction menus (.verb-menu: the verb menu, Enter chooser, pickers) have their own gate (3384).
+    if (d.hidden || GATED_DIALOG_IDS.has(d.id) || d.classList.contains('glitch-modal') || d.classList.contains('verb-menu')) continue;
+    if (d.closest('[hidden]') || !d.getClientRects().length) continue;
+    if (getComputedStyle(d).visibility === 'hidden') continue;
+    return true;
+  }
+  return false;
 }
 
 /** A scene's own way in or out (its fade and street swap) is under way. */
@@ -2391,7 +2424,8 @@ function announceAchievementUpdates(updates = []) {
       app.canvas.dataset.achievementReward = rewardBits.join(' · ');
       app.canvas.dataset.achievementUnlockedCount = String(achieveState.unlocked.length);
     }
-    pushActivity(`Badge earned: ${update.def.name || update.def.title || 'Achievement'}.`);
+    // NOTIFY: a big moment: its award screen says it; the log keeps the line.
+    logMoment(`Badge earned: ${update.def.name || update.def.title || 'Achievement'}.`);
     enqueueAward({
       kind: 'achievement',
       classTsid: update.classTsid || update.def.classTsid,
@@ -2484,60 +2518,50 @@ function setBar(id, value) {
 }
 
 /**
- * Push an activity line. Accepts plain text or { base, effects } for signed gain/loss HTML.
+ * Push an activity line (js/notify.js activity): plain text is an info notice and its log line;
+ * { base, effects } is a gain: its amounts rise from the avatar and one line lands in the log.
  * @param {string|{ base?: string, text?: string, html?: string, effects?: object }} msg
  */
-const ACTIVITY_POPUPS = 2;
-const ACTIVITY_POPUP_MS = 4000;
-
 function pushActivity(msg) {
   if (!msg) return;
   if (typeof msg === 'string') msg = wholeStatAmounts(msg);
   else if (msg && typeof msg === 'object' && msg.effects) msg = { ...msg, effects: wholeEffects(msg.effects) };
-  let plain = '';
-  let html = '';
-  if (typeof msg === 'string') {
-    plain = msg;
-    // Color signed deltas already embedded in strings like "-4 energy, +2 mood"
-    html = colorizeActivityText(msg);
-  } else if (msg && typeof msg === 'object') {
-    if (msg.html) {
-      html = msg.html;
-      plain = msg.text || msg.base || stripHtml(msg.html);
-    } else if (msg.effects || msg.base) {
-      const base = msg.base || msg.text || 'You did a thing';
-      plain = formatActivityLine(base, msg.effects || {});
-      html = formatActivityHtml(base, msg.effects || {});
-    } else {
-      plain = msg.text || String(msg);
-      html = colorizeActivityText(plain);
-    }
-  } else {
-    plain = String(msg);
-    html = colorizeActivityText(plain);
-  }
-  appendActivity(activityLog, plain);
-  renderActivityHistory();
-  const feed = document.getElementById('activity-feed');
-  if (!feed) return;
-  const el = document.createElement('div');
-  el.className = 'act';
-  el.innerHTML = html || escapeHtml(plain);
-  feed.prepend(el);
-  // The newest one or two lines float briefly; Local activity keeps the rest.
-  while (feed.children.length > ACTIVITY_POPUPS) feed.removeChild(feed.lastChild);
-  // Its time stops under a street loading card (G198, GrowlQueue.as 243-253).
-  cardPausedTimeout(() => {
-    el.classList.add('is-leaving');
-    setTimeout(() => el.remove(), 400);
-  }, ACTIVITY_POPUP_MS);
+  const labelOf = (id) => ITEM_LABELS[id] || id;
+  notify.activity(msg, { labelOf });
+  if (msg && typeof msg === 'object' && msg.effects) floatGains(effectTokens(msg.effects, labelOf));
 }
 
+/** A gain line for the log only (its floats are the caller's): verb results, quoins. */
+function logGain(line) {
+  if (line) notify.gain(wholeStatAmounts(line));
+}
+
+/** A big moment's line: logged; its screen is the screen queue's (enqueueAward). */
+function logMoment(line) {
+  if (line) notify.moment(wholeStatAmounts(line));
+}
+
+const GAIN_FLOAT_COLORS = { energy: 0x7dcea0, mood: 0xffe066, img: 0xb388ff, currants: 0xf0c85a };
+
+/** A gain's amounts rising from the avatar, unless the caller already floated the same words. */
+function floatGains(tokens = []) {
+  if (!player || !state.started || !tokens.length) return;
+  for (const tk of tokens) {
+    const text = tokenText(tk);
+    if (recentFloatText(text, 900)) continue;
+    const unit = String(tk.unit).toLowerCase();
+    const color = tk.n < 0 ? 0xff8888 : GAIN_FLOAT_COLORS[unit] ?? 0x7dcea0;
+    const t = floatText(player.x, player.y - 90, text, color);
+    if (t) t._autoGain = true;
+  }
+}
+
+/** The local Activity history (the hidden tracker card's copy, read by tools/playtest.mjs): newest first. */
 function renderActivityHistory() {
   const box = document.getElementById('activity-history');
   if (!box) return;
   box.innerHTML = '';
-  const lines = activityLog.lines.slice(0, 7);
+  const lines = notify.entries.slice(-7).reverse();
   if (!lines.length) {
     const empty = document.createElement('div');
     empty.className = 'activity-history-empty';
@@ -2548,7 +2572,7 @@ function renderActivityHistory() {
   for (const line of lines) {
     const row = document.createElement('div');
     row.className = 'activity-history-line';
-    row.innerHTML = colorizeActivityText(line);
+    row.innerHTML = colorizeActivityText(line.text);
     box.appendChild(row);
   }
 }
@@ -2600,10 +2624,6 @@ function escapeHtml(s) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
-}
-
-function stripHtml(s) {
-  return String(s).replace(/<[^>]+>/g, '');
 }
 
 /** Wrap "-N energy" / "+N mood|iMG|xp" in gain/loss spans for plain craft lines. */
@@ -4055,7 +4075,7 @@ function updateHud() {
     if (levelUpdate.favor) rewardBits.push(`${levelUpdate.favor} favor with every Giant`);
     const rewardText = rewardBits.length ? ` You also received ${rewardBits.join(' and ')}.` : '';
     const activity = `Woo! You reached level ${levelUpdate.toLevel}. Energy and mood refilled.${rewardText}`;
-    pushActivity(activity);
+    logMoment(activity);
     enqueueAward({
       kind: 'level',
       title: `Level ${levelUpdate.toLevel}`,
@@ -5167,7 +5187,75 @@ function settlePrompt(want, now) {
   prompt.setPrompt(want.key, want.label);
   prompt.x = want.x;
   prompt.y = want.y;
+  prompt._baseY = want.y;
   prompt.visible = true;
+}
+
+/**
+ * NOTIFY zones: the Enter hint keeps off a banner (the Qurazy line) and the notices. It moves down
+ * just under them while that stays near its target (140 px at most), else it waits (unseen) until
+ * they have gone. Rects in Pixi global px (app.screen), from #game-root px.
+ */
+function promptKeepClear() {
+  if (!prompt?.visible) return;
+  if (Number.isFinite(prompt._baseY)) prompt.y = prompt._baseY;
+  const boxes = notifyZoneGlobalBoxes();
+  let alpha = 1;
+  if (boxes.length) {
+    const b = prompt.getBounds();
+    const chip = { left: b.x, right: b.x + b.width, top: b.y, bottom: b.y + b.height };
+    const hit = boxes.filter((o) => chip.left < o.right + 4 && chip.right > o.left - 4 && chip.top < o.bottom + 4 && chip.bottom > o.top - 4);
+    if (hit.length) {
+      const dy = Math.max(...hit.map((o) => o.bottom)) + 6 - chip.top;
+      const scale = Math.abs(promptLayer?.worldTransform?.d || 1) || 1;
+      const moved = { ...chip, top: chip.top + dy, bottom: chip.bottom + dy };
+      const stillHit = boxes.some((o) => moved.left < o.right && moved.right > o.left && moved.top < o.bottom && moved.bottom > o.top);
+      if (dy <= 140 && !stillHit) prompt.y += dy / scale;
+      else alpha = 0;
+    }
+  }
+  if (prompt.alpha !== alpha) prompt.alpha = alpha;
+  if (app?.canvas) app.canvas.dataset.promptZone = alpha ? (prompt.y !== prompt._baseY ? 'moved' : '') : 'waiting';
+}
+
+/** The notifier's zones (notices, banner) in Pixi global px, re-read every 100 ms. */
+let notifyZoneCache = { at: -Infinity, global: [], view: null };
+function refreshNotifyZones() {
+  const now = performance.now();
+  if (now - notifyZoneCache.at < 100) return notifyZoneCache;
+  notifyZoneCache = { at: now, global: [], view: null };
+  const rootEl = document.getElementById('game-root');
+  const canvas = app?.canvas;
+  const zones = notifyView?.zoneBoxes() || [];
+  if (!zones.length || !rootEl || !canvas) return notifyZoneCache;
+  const r = rootEl.getBoundingClientRect();
+  const c = canvas.getBoundingClientRect();
+  if (!c.width || !c.height) return notifyZoneCache;
+  const gx = (app.screen?.width || VIEW_W) / c.width;
+  const gy = (app.screen?.height || VIEW_H) / c.height;
+  const vx = VIEW_W / c.width;
+  const vy = VIEW_H / c.height;
+  let view = null;
+  for (const z of zones) {
+    const left = z.left + r.left - c.left;
+    const top = z.top + r.top - c.top;
+    const right = z.right + r.left - c.left;
+    const bottom = z.bottom + r.top - c.top;
+    notifyZoneCache.global.push({ left: left * gx, right: right * gx, top: top * gy, bottom: bottom * gy });
+    const v = { left: left * vx, right: right * vx, top: top * vy, bottom: bottom * vy };
+    view = view
+      ? { left: Math.min(view.left, v.left), right: Math.max(view.right, v.right), top: Math.min(view.top, v.top), bottom: Math.max(view.bottom, v.bottom) }
+      : v;
+  }
+  notifyZoneCache.view = view;
+  return notifyZoneCache;
+}
+function notifyZoneGlobalBoxes() {
+  return refreshNotifyZones().global;
+}
+/** One box round the notices and banner in view px (speech bubbles keep off it). */
+function notifyZoneViewBox() {
+  return refreshNotifyZones().view;
 }
 
 // —— Hover / pick targeting (crowded entities) ——
@@ -5445,15 +5533,14 @@ function nameplateViewBox() {
   return nameplateBox;
 }
 
-/** G269: the top-left HUD column (feed popups, buff strip) in view pixels, re-measured every 100 ms. */
+/** G269: the top-left HUD column (the buff strip; the feed popups are NOTIFY's notices now) in view pixels, re-measured every 100 ms. */
 let hudBoxCache = null;
 let hudBoxCacheAt = -Infinity;
 function hudColumnViewBox() {
   const now = performance.now();
   if (now - hudBoxCacheAt < 100) return hudBoxCache;
   hudBoxCacheAt = now;
-  const feed = document.getElementById('activity-feed');
-  hudBoxCache = hudColumnBox([...(feed?.children || []), document.getElementById('buff-strip')], app?.canvas, VIEW_W, VIEW_H);
+  hudBoxCache = hudColumnBox([document.getElementById('buff-strip')], app?.canvas, VIEW_W, VIEW_H);
   return hudBoxCache;
 }
 
@@ -5520,6 +5607,18 @@ function positionSpeechBubble(bubble) {
     place = { tip: clear.tip + cameraY, flip: clear.flip };
   }
   meta.overHud = clear?.how === 'over';
+  // NOTIFY zones: clear of the notices and a banner too; where it cannot be, the notices fade under it.
+  const zone = notifyZoneViewBox();
+  const clearZone = zone && clearSpeechOfBox({
+    left: bubble.x - cameraX - meta.width / 2, width: meta.width, height: meta.height,
+    tip: place.tip - cameraY, flip: place.flip, speakerX: spr.x + offset.x - cameraX, feet: spr.y - cameraY,
+    box: zone, viewWidth: horizontalLocationViewWidth(), viewBottom: LOCATION_VIEW_H - 18,
+  });
+  if (clearZone && clearZone.how !== 'over') {
+    bubble.x += clearZone.dx;
+    place = { tip: clearZone.tip + cameraY, flip: clearZone.flip };
+  }
+  meta.overNotices = clearZone?.how === 'over';
   // G357/G427: slid off a player's head as the client slid bubbles (at most 100 px, the
   // tail still on the speaker, ChatBubble.as 151-201), else hung under the speaker's feet
   // when that fits; eased so it doesn't jump. The tail never stretches (ChatBubble.as 374-379).
@@ -5826,14 +5925,42 @@ function updateSpeechBubbles(dt) {
   if (app?.canvas) app.canvas.dataset.speechBubbles = String(speechBubbles.length);
   // G269: where no spot clears the feed column (phone widths), the column fades under the bubble.
   const over = speechBubbles.some((b) => b._speechFx?.overHud);
-  for (const id of ['activity-feed', 'buff-strip']) {
+  notifyView?.setUnderSpeech(speechBubbles.some((b) => b._speechFx?.overNotices));
+  for (const id of ['buff-strip']) {
     const el = document.getElementById(id);
     if (el && el.hasAttribute('data-under-speech') !== over) el.toggleAttribute('data-under-speech', over);
   }
 }
 
-function floatText(x, y, text, color = 0xfff4d6) {
-  const t = new PIXI.Text({ text: wholeStatAmounts(text), style: {
+/** NOTIFY: floats raised lately ({ x, y, t, key, sprite }), for stacking and for not saying one amount twice. */
+const recentFloats = [];
+
+/** A float with these words was raised within `ms` (js/notify.js floatKey). */
+function recentFloatText(text, ms) {
+  const key = floatKey(wholeStatAmounts(text));
+  const now = performance.now();
+  return recentFloats.some((f) => f.key === key && now - f.t <= ms && f.sprite && !f.sprite.destroyed && f.sprite.parent);
+}
+
+/**
+ * A small gain or word rising from a spot (NOTIFY: the gains lane). Floats raised together near one
+ * spot stack a line apart instead of drawing on each other (js/notify.js stackFloat); a gain the
+ * avatar already floated for the same amount gives way to the caller's own float. With
+ * prefers-reduced-motion it fades where it is. `opts.life` (frames) keeps longer words up.
+ */
+function floatText(x, y, text, color = 0xfff4d6, opts = {}) {
+  const words = wholeStatAmounts(text);
+  const now = performance.now();
+  const key = floatKey(words);
+  while (recentFloats.length && now - recentFloats[0].t > 1500) recentFloats.shift();
+  // The caller's own float of an amount the avatar just floated replaces that one.
+  for (const f of recentFloats) {
+    if (f.key !== key || now - f.t > 300 || !f.sprite?._autoGain || f.sprite.destroyed) continue;
+    f.sprite.parent?.removeChild(f.sprite);
+    f.sprite.destroy();
+  }
+  const placed = stackFloat(recentFloats.filter((f) => f.sprite && !f.sprite.destroyed), x, y, now);
+  const t = new PIXI.Text({ text: words, style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 15,
     fill: color,
@@ -5841,8 +5968,10 @@ function floatText(x, y, text, color = 0xfff4d6) {
     dropShadow: { blur: 2, color: 0x000000, distance: 1 },
   } });
   t.anchor.set(0.5);
-  t.x = x; t.y = y; t._life = 0; t._vy = -0.7;
+  t.x = x; t.y = placed; t._life = 0; t._vy = notifyView?.reducedMotion() ? 0 : -0.7;
+  if (Number(opts.life) > 0) t._fade = Number(opts.life);
   fxLayer.addChild(t);
+  recentFloats.push({ x, y: placed, t: now, key, sprite: t });
   return t;
 }
 
@@ -6127,6 +6256,13 @@ function commitFeedPick(classTsid, count = 1) {
     label: `${verbId} ${counted && count > 1 ? `${count} ` : ''}${food.label}`,
     ...(target.featureId ? { durationMs: 0 } : {}),
   });
+}
+
+/** A verb result's effects moved a stat or an item (NOTIFY: a gain, not a notice). */
+function verbChangedSomething(effects) {
+  if (!effects || typeof effects !== 'object') return false;
+  if (['energy', 'mood', 'img', 'xp', 'currants'].some((k) => Number(effects[k]))) return true;
+  return Object.values(effects.items || {}).some((n) => Number(n));
 }
 
 function openFeedPicker(target, verb = null) {
@@ -6668,11 +6804,19 @@ function executeVerb(target, verbId) {
   // Single feed entry: prefer colorized activityLine; toast first msg once. A line already in a
   // speech bubble is not toasted too (Austin 10-28: the bubble, the toast and the feed said it
   // three times); the feed keeps it as history, as the client's conversation bubble stood alone.
+  // NOTIFY: a verb that gained or cost something is a gain: its first line rises from the item
+  // (as the rest of its lines do) and the activity line goes to the log, no notice.
   const feedLine = result.effects?.activityLine || result.msgs?.[0];
   if (feedLine) {
     const toastLine = result.msgs?.[0] || feedLine;
-    if (!spoke && toastLine !== reactionText) toast(toastLine, 3200);
-    pushActivity(feedLine);
+    const showLine = !spoke && toastLine !== reactionText;
+    if (result.ok && verbChangedSomething(result.effects) && target.sprite && !target.sprite.destroyed) {
+      if (showLine) floatText(target.sprite.x, target.sprite.y - 50, toastLine, 0xfff4d6, { life: 110 });
+      logGain(feedLine);
+    } else {
+      if (showLine) toast(toastLine, 3200);
+      pushActivity(feedLine);
+    }
   }
   (result.msgs || []).forEach((m, i) => {
     if (i === 0) return; // already toasted / fed above
@@ -9347,7 +9491,11 @@ const engine = {
     street.features[featureId] ||= {};
     return street.features[featureId];
   },
-  floatText: (x, y, text, color) => floatText(x, y, text, color),
+  floatText: (x, y, text, color, opts) => floatText(x, y, text, color, opts),
+  /** NOTIFY zones: a banner's box in #game-root px (null releases it); notices, the Enter hint and speech keep off it. */
+  reserveZone: (name, rect) => notifyView?.reserve(name, rect),
+  /** NOTIFY: the notifier itself (js/notify.js), for a feature that wants a lane by name. */
+  notify,
   /** updateHud re-renders both pack rows. */
   refreshPack: () => updateHud(),
   register,
@@ -10632,9 +10780,11 @@ function grabWorldQuoin(q, shared = null) {
     rate: result.typeId === 'qurazy' ? 1.2 : 1,
     jitter: result.typeId === 'qurazy' ? 0 : 0.03,
   });
-  toast(result.typeId === 'mystery' ? `Mystery quoin: ${copy}` : copy);
+  // NOTIFY: a quoin is a gain: its amount rises from it (below) and the line goes to the log.
+  // A mystery quoin still says what it turned out to be.
+  if (result.typeId === 'mystery') notify.notice(wholeStatAmounts(`Mystery quoin: ${copy}`), { log: false });
   const kind = q.typeId === 'xp' ? 'iMG' : q.typeId;
-  pushActivity(`You collected ${/^[aeiou]/i.test(kind) ? 'an' : 'a'} ${kind} quoin. ${copy}.`);
+  logGain(`You collected ${/^[aeiou]/i.test(kind) ? 'an' : 'a'} ${kind} quoin. ${copy}.`);
   if (result.acceleration?.completed?.length) {
     handleSkillCompletions(result.acceleration.completed);
   }
@@ -11554,9 +11704,11 @@ function physics(dt) {
       if (t._life > t._max) fxLayer.removeChild(t);
     } else if (t._life !== undefined) {
       t._life += dt;
-      t.y += (t._vy || -0.55) * dt;
-      t.alpha = Math.max(0, 1 - t._life / 55);
-      if (t._life > 55) fxLayer.removeChild(t);
+      t.y += (t._vy ?? -0.55) * dt;
+      // A longer float (floatText opts.life) holds, then fades over its last 40 frames.
+      const fade = t._fade || 55;
+      t.alpha = t._fade ? clamp((fade - t._life) / 40, 0, 1) : Math.max(0, 1 - t._life / 55);
+      if (t._life > fade) fxLayer.removeChild(t);
     }
   }
 
@@ -11596,24 +11748,10 @@ function physics(dt) {
       (LOCATION_VIEW_H - (player.y - camY)).toFixed(2);
   }
 
-  // GrowlQueue.as moveMoveStarted 243-247 / moveMoveEnded 249-253: a toast's clock
-  // stops while a street loading card is up (style.css hides it) and runs on after (G198).
-  if (state.toastTimer > 0) {
-    const t = performance.now();
-    if (toastHeld()) state.toastHeldAt ||= t;
-    else if (state.toastHeldAt) {
-      state.toastTimer += t - state.toastHeldAt;
-      state.toastHeldAt = 0;
-    }
-  }
-  // A panel opened after the toast was raised (the shrine again, right after a donation)
-  // would sit under it: the toast goes early, its line is still in the activity log.
-  const staleUnderPanel = state.toastTimer > 0 && !state.toastOverModal && openGlitchModal();
-  if (staleUnderPanel || (!state.toastHeldAt && state.toastTimer > 0 && performance.now() >= state.toastTimer)) {
-    state.toastTimer = 0;
-    state.toastHeldAt = 0;
-    document.getElementById('toast').hidden = true;
-  }
+  // GrowlQueue.as moveMoveStarted 243-247 / moveMoveEnded 249-253: a notice's clock stops while
+  // a street loading card is up (G198); a panel opened after a notice was raised (the shrine again,
+  // right after a donation) sends it early, its line still in the Activity log (tickNotices).
+  tickNotices();
 }
 
 function eatApple() {
@@ -11675,7 +11813,8 @@ function announceQuestCompletions(updates = []) {
           }
         : undefined,
     });
-    pushActivity(
+    // NOTIFY: the award screen says it; the log keeps the line.
+    logMoment(
       `Quest complete: ${update.def.title}.` +
       (rewardBits.length ? ` ${rewardBits.join(' · ')}.` : '')
     );
@@ -21131,7 +21270,8 @@ function sayLocalChat(message, participant = 'Ur', { quietActivity = false } = {
   if (result.ok || result.broken) {
     handleFeatResult(result, participant);
   } else if (!quietActivity && participant === 'Ur') {
-    pushActivity(`${shown}: ${text}`);
+    // NOTIFY: chat stays in chat (bubble and dock); solo keeps it in the Activity log for scrollback.
+    notify.chat(`${shown}: ${text}`, { online: GAME_MODE === 'multiplayer' });
   }
   return result;
 }
@@ -21543,7 +21683,7 @@ function handleSkillCompletions(completed, { offline = false } = {}) {
     // (features/familiar-dialog-feature.js) hears this event and replaces the
     // old toast and award screen (FamiliarDialog SKILL_LEARNED; inc_skills.js 1442-1444 activity).
     emitGameEvent(`skill_learned:${row.classTsid}`);
-    pushActivity(skillLearnedActivity(skillTitle(row.def) || name, row.def?.learned || '', { offline }));
+    logMoment(skillLearnedActivity(skillTitle(row.def) || name, row.def?.learned || '', { offline }));
   }
   // inc_skills.js:1513 (on learning) and player.js:217 (on login): eleven skills known.
   // Solo counts only the ones learned beyond the demo kit (G306); saves that hold it keep it.
@@ -22936,7 +23076,7 @@ function grantShrineEmblem(target) {
     durationMs: 5000,
     slugs: result.xp ? { xp: result.xp } : null,
   });
-  pushActivity(`The Shrine grants you an Emblem of ${result.giant.name}.${result.xp ? ` +${result.xp} iMG.` : ''}`);
+  logMoment(`The Shrine grants you an Emblem of ${result.giant.name}.${result.xp ? ` +${result.xp} iMG.` : ''}`);
   applyAchievementProgress(achieveState, `emblems_acquired:${giantId}`, 1, pc);
   enqueueAward({
     kind: 'badge',
@@ -25745,6 +25885,14 @@ async function main() {
     setInterval(play, 4000);
   }
   window.groddleQA = {
+    /** NOTIFY QA: raise a notice, read the notices and the Activity log, earn a badge (its screen and log line). */
+    notify: {
+      notice: (text, ms) => toast(String(text || ''), ms),
+      notices: () => notify.notices.map((n) => ({ text: n.text, count: n.count })),
+      entries: () => notify.entries.map((e) => ({ kind: e.kind, text: e.text, count: e.count })),
+      stats: () => ({ ...notify.stats, unread: notify.unread }),
+      grantBadge: (id) => engine.grantAchievement(id),
+    },
     /** Renderer QA: backend, Pixi version and GPU texture use (tools/perf, tools/playtest). */
     renderStats() {
       const r = app?.renderer;
@@ -26015,6 +26163,7 @@ async function main() {
       settlePrompt(want, performance.now());
       if (prompt.visible) {
         prompt.x = clampWorldOverlayX(prompt.x, prompt.width, 12);
+        promptKeepClear();
         app.canvas.dataset.promptScreenX = (prompt.x - camTarget).toFixed(2);
         app.canvas.dataset.promptSafeRight = horizontalLocationViewWidth().toFixed(2);
         app.canvas.dataset.promptWidth = prompt.width.toFixed(2);

@@ -27,7 +27,7 @@ import {
   screenQueueHold,
   shuffleNewDayMessages,
   waitForScreenGates,
-} from '../public/js/screen-queue.js?v=g379-1';
+} from '../public/js/screen-queue.js?v=g459-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');
@@ -188,7 +188,7 @@ describe('game.js wires the gates', () => {
     assert.match(fn('maybeNewDay'), /await queueScreen\(async \(\) => \{\n\s*playSfx\('newDay', \{ volume: 0\.75 \}\);\n\s*await showNewDayScreen\(el\);\n\s*\}, \{ requiresFocus: false \}\);\n\s*showNewDayBubble\(refill\);/);
     assert.match(game, /queueScreen: \(show, opts\) => queueScreen\(show, opts\),/);
     // The screen modules load under one key each.
-    assert.match(game, /from '\.\/js\/screen-queue\.js\?v=g379-1';/);
+    assert.match(game, /from '\.\/js\/screen-queue\.js\?v=g459-1';/);
   });
 
   it('no deadlock with quest offers: an open offer holds screens, queued screens hold the next offer only', { skip: !HAVE_CLIENT && 'glitch-client not present' }, () => {

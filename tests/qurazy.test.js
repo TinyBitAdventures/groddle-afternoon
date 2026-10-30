@@ -24,7 +24,7 @@ import {
 } from '../public/js/qurazy.js';
 import { planStreetQuoins } from '../public/js/quoins.js';
 import {
-  QURAZY_FEED_ATTR,
+  QURAZY_ZONE,
   QURAZY_OVERLAY,
   QURAZY_PILL_GAP,
   QURAZY_PLACEMENT_GROUP,
@@ -35,8 +35,8 @@ import {
   qurazyFeatureState,
   qurazyStreetEligible,
   resetQurazyFeatureForTests,
-} from '../public/js/features/qurazy-feature.js?v=g448-2';
-import * as qurazyModule from '../public/js/features/qurazy-feature.js?v=g448-2';
+} from '../public/js/features/qurazy-feature.js?v=g459-1';
+import * as qurazyModule from '../public/js/features/qurazy-feature.js?v=g459-1';
 import { GENTLE_ISLAND } from '../public/js/newxp.js?v=g449-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -370,8 +370,8 @@ describe('the banner on a street change (G303) and over the feed (G297)', () => 
     assert.equal('stopQurazyBanner' in qurazyModule, false);
     const src = readFileSync(join(PUBLIC, 'js/features/qurazy-feature.js'), 'utf8');
     assert.match(src, /playVectorOverlay\(root, QURAZY_OVERLAY\.key/);
-    // The feed fade ends with the canvas.
-    assert.match(src, /if \(!canvas\.isConnected\) \{\s*feed\.removeAttribute\(QURAZY_FEED_ATTR\)/);
+    // NOTIFY: its reserved zone ends with the canvas.
+    assert.match(src, /if \(!canvas\.isConnected\) \{\s*engine\.reserveZone\(QURAZY_ZONE, null\);/);
   });
 
   it('leaving the street clears it without a banner to stop', () => {
@@ -392,15 +392,18 @@ describe('the banner on a street change (G303) and over the feed (G297)', () => 
     assert.equal(qurazyBannerBox(null, rect), null);
   });
 
-  it('at 760 px wide and below the banner meets the feed column', () => {
-    // style.css: the feed at left 10, width min(300px, 72%) at 760 and below, min(320px, 42%) above.
-    const feedAt = (w) => ({ left: 10, right: 10 + Math.min(w <= 760 ? 300 : 320, (w <= 760 ? 0.72 : 0.42) * w), top: 40, bottom: 70 });
-    for (const [w, h, meets] of [[760, 430, true], [700, 400, true], [390, 300, true]]) {
+  it('the banner reserves its art box while it plays (NOTIFY zones: notices go under it, the Enter hint and speech keep off it)', () => {
+    // G297's case: at 760 px and below the banner met the old top-left feed; now nothing draws there.
+    const src = readFileSync(join(PUBLIC, 'js/features/qurazy-feature.js'), 'utf8');
+    assert.equal(QURAZY_ZONE, 'qurazy-banner');
+    assert.match(src, /if \(canvas\) reserveBannerZone\(engine, canvas, box\);/);
+    assert.match(src, /engine\.reserveZone\(QURAZY_ZONE, box\);/);
+    const game = readFileSync(join(PUBLIC, 'game.js'), 'utf8');
+    assert.match(game, /reserveZone: \(name, rect\) => notifyView\?\.reserve\(name, rect\),/);
+    for (const [w, h] of [[760, 430], [390, 300]]) {
       const box = qurazyBannerBox(meta, { left: 0, top: 0, width: w, height: h }, { topY: 0.05, scale: w / 960 });
-      assert.equal(boxesOverlap(box, feedAt(w)), meets, `${w} px`);
+      assert.ok(box.right > box.left && box.bottom > box.top, `${w} px`);
+      assert.equal(boxesOverlap(box, box), true);
     }
-    assert.equal(QURAZY_FEED_ATTR, 'data-under-banner');
-    const css = readFileSync(join(PUBLIC, 'style.css'), 'utf8');
-    assert.match(css, /\.activity-feed\[data-under-banner\] \{ opacity: 0\.18; \}/);
   });
 });

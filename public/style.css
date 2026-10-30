@@ -7992,3 +7992,144 @@ html[data-street-cards] .familiar-dialog,
   font-size: 0.82rem;
 }
 @media (prefers-reduced-motion: reduce) { .hotkeys-shade { animation: none; } }
+
+/* ========================================================================
+   NOTIFY: one notification system (js/notify.js rules, js/notify-view.js DOM).
+   Notices top centre under the street name (at most 2), the Activity log panel
+   above the Local chat dock and its button in the chat form. Plain cream look,
+   to be restyled with the HUD redesign. Supersedes .toast and .activity-feed.
+   ======================================================================== */
+.notify-notices {
+  position: absolute;
+  top: 52px;
+  left: 50%;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: min(440px, calc(100% - 24px));
+  transform: translateX(-50%);
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.notify-notices.is-waiting { visibility: hidden; }
+.notify-notices[data-under-speech] { opacity: 0.18; }
+.notify-card {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  max-width: 100%;
+  padding: 0.32rem 0.7rem;
+  border: 1px solid #ddd3c0;
+  border-radius: 10px;
+  background: rgba(255, 253, 247, 0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+  color: #3a3428;
+  font-size: 0.8rem;
+  line-height: 1.32;
+  text-align: center;
+  overflow-wrap: anywhere;
+  pointer-events: auto;
+  cursor: pointer;
+  animation: notifyIn 0.2s ease-out;
+}
+.notify-card .act-gain, .activity-log .act-gain { color: #2e7d32; font-weight: 700; }
+.notify-card .act-loss, .activity-log .act-loss { color: #c0392b; font-weight: 700; }
+.notify-card .act-base, .activity-log .act-base { font-weight: 600; }
+.notify-count {
+  flex: 0 0 auto;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: #efe6d2;
+  color: #6b5a3a;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.notify-count[hidden] { display: none; }
+@keyframes notifyIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+#local-chat-form .activity-log-btn, .activity-log-btn {
+  position: relative;
+  border: 1px solid #c5bdaa;
+  background: linear-gradient(#fffdf7, #efe6d2);
+  color: #4a3f2c;
+}
+#local-chat-form .activity-log-btn.is-open, .activity-log-btn.is-open { background: #e6dcc6; }
+.activity-log-unread {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #c0392b;
+  color: #fff;
+  font-size: 0.64rem;
+  line-height: 16px;
+  text-align: center;
+}
+.activity-log-unread[hidden] { display: none; }
+.activity-log {
+  position: absolute;
+  left: 12px;
+  bottom: calc(var(--pack-live-height, 112px) + 44px);
+  z-index: 27;
+  display: flex;
+  flex-direction: column;
+  width: min(380px, calc(100% - 24px));
+  max-height: min(56%, 380px);
+  border: 1px solid #c5bdaa;
+  border-radius: 12px;
+  background: rgba(255, 253, 247, 0.97);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  color: #3a3428;
+  animation: notifyIn 0.18s ease-out;
+}
+.activity-log[hidden] { display: none; }
+.activity-log-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.5rem 0.3rem 0.75rem;
+  border-bottom: 1px solid #e6dcc6;
+}
+.activity-log-head h2 { margin: 0; font-size: 0.9rem; color: #3d5a32; }
+.activity-log-close {
+  border: 0;
+  background: none;
+  color: #6b5a3a;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.activity-log-list {
+  overflow-y: auto;
+  padding: 0.3rem 0.6rem 0.5rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  overscroll-behavior: contain;
+}
+.activity-log-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  padding: 0.2rem 0;
+  border-bottom: 1px solid #f0e9da;
+}
+.activity-log-line:last-child { border-bottom: 0; }
+.activity-log-line time { flex: 0 0 auto; color: #9a8d72; font-size: 0.68rem; font-variant-numeric: tabular-nums; }
+.activity-log-text { flex: 1 1 auto; overflow-wrap: anywhere; }
+.activity-log-line.is-chat .activity-log-text { color: #5b4f6b; font-style: italic; }
+.activity-log-line.is-moment .activity-log-text { font-weight: 700; }
+.activity-log-empty { margin: 0.4rem 0; color: #8a7e66; font-size: 0.76rem; }
+html[data-street-cards] .notify-notices { visibility: hidden; }
+@media (max-width: 560px) {
+  .notify-notices { width: calc(100% - 16px); }
+  .notify-card { font-size: 0.74rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .notify-card, .activity-log { animation: none; }
+  .notify-notices { transition: none; }
+}
+/* ======================== end NOTIFY ======================== */

@@ -130,8 +130,10 @@ describe('collecting one', () => {
 
 describe('what the player sees', () => {
   const game = read('public/game.js');
-  it('the toast, float and sound use the rolled kind, iMG for xp', () => {
-    assert.match(game, /toast\(result\.typeId === 'mystery' \? `Mystery quoin: \$\{copy\}` : copy\);/);
+  it('the notice, float and sound use the rolled kind, iMG for xp', () => {
+    // NOTIFY: a plain quoin is a gain (its float and a log line); a mystery one still says what it was.
+    // Its notice is not logged: the gain line below is the log's ("You collected a mystery quoin. +3 energy.").
+    assert.match(game, /if \(result\.typeId === 'mystery'\) notify\.notice\(wholeStatAmounts\(`Mystery quoin: \$\{copy\}`\), \{ log: false \}\);/);
     assert.match(game, /if \(result\.resolvedTypeId === 'xp'\) return `\+\$\{amount\} iMG`;/);
     assert.match(game, /const rewardDef = QUOIN_TYPES\[result\.resolvedTypeId\] \|\| q\.def;/);
     assert.match(game, /floatText\(q\.x, q\.y - 20, copy, rewardDef\.color\);/);

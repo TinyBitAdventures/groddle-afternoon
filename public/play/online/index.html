@@ -32,7 +32,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex" />
   <title>Groddle Afternoon · Multiplayer</title>
-    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;tools=g183-1&amp;make=g191-1&amp;rock=g211-1&amp;route=g192-1&amp;prompt=g198-1&amp;machines=g193-1&amp;skills=g367-1&amp;chooser=g206-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=ticket-1&amp;card=g249-1&amp;offers=g229-1&amp;buffs=g256-1&amp;speech=g269-1&amp;banner=g297-1&amp;pop=g332-1&amp;bags=g394-1&amp;maptp=g356-1&amp;hud2=g361-1&amp;award=g385-1&amp;wordprog=g394-1&amp;overlays=g392-1&amp;polish=g396-1&amp;hud3=g402-1&amp;questtext=g425-1&amp;eat=g423-1&amp;assetkeys=g434-1&amp;menu=g438-1&amp;summerhud=g452-1&amp;rookmuseum=g455-1&amp;backdrop=g432-1" />
+    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;tools=g183-1&amp;make=g191-1&amp;rock=g211-1&amp;route=g192-1&amp;prompt=g198-1&amp;machines=g193-1&amp;skills=g367-1&amp;chooser=g206-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=ticket-1&amp;card=g249-1&amp;offers=g229-1&amp;buffs=g256-1&amp;speech=g269-1&amp;banner=g297-1&amp;pop=g332-1&amp;bags=g394-1&amp;maptp=g356-1&amp;hud2=g361-1&amp;award=g385-1&amp;wordprog=g394-1&amp;overlays=g392-1&amp;polish=g396-1&amp;hud3=g402-1&amp;questtext=g425-1&amp;eat=g423-1&amp;assetkeys=g434-1&amp;menu=g438-1&amp;summerhud=g452-1&amp;rookmuseum=g455-1&amp;notify=g459-1&amp;backdrop=g432-1" />
   <!-- Content keys for data and art URLs (js/data-urls.js): before every other script. -->
   <script src="js/data-versions.js?v=abdc2c96"></script>
   <script src="js/data-urls.js?v=g434-1"></script>
@@ -85,7 +85,7 @@
        toast's clock, qurazy-feature the banner). */
     #overlay:not(.hidden) { z-index: 80; padding: 8px; box-sizing: border-box; }
     #overlay:not(.hidden) > .card { max-height: 100%; overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box; }
-    #game-root:has(> #overlay:not(.hidden)) :is(.toast, .activity-feed, .qurazy-overlay) { visibility: hidden; }
+    #game-root:has(> #overlay:not(.hidden)) :is(.notify-notices, .qurazy-overlay) { visibility: hidden; }
     body:has(#overlay:not(.hidden)) .save-pill { z-index: 81; }
     @media (max-width: 560px) {
       #overlay:not(.hidden) > .card { width: 100%; padding: 0.85rem 0.95rem 0.75rem; font-size: 0.9rem; line-height: 1.35; }
@@ -459,8 +459,7 @@
       <div id="daylight-overlay" class="daylight-overlay" data-phase="day" aria-hidden="true"></div>
       <div id="buff-strip" class="buff-strip" aria-label="Current effects" hidden></div>
 
-      <!-- Activity / toast feed -->
-      <div id="activity-feed" class="activity-feed" aria-live="polite"></div>
+      <!-- Notices (top centre) and the Activity log are js/notify-view.js's: one notification system -->
 
       <!-- The running verb's word, filling over the item (the original's WordProgressBar; js/word-progress.js) -->
       <div id="action-progress" class="word-progress" role="status" aria-live="polite" hidden>
@@ -866,8 +865,6 @@
         <section id="pack-popover" class="pack-popover" role="dialog" aria-modal="false" aria-labelledby="pack-popover-title" hidden></section>
       </div>
 
-      <div id="toast" class="toast" hidden></div>
-
       <!-- Full-screen street load (LoadingLocationView-style crossfade) -->
       <div id="screen-transition" class="screen-transition" hidden aria-hidden="true" role="status">
         <div class="screen-transition-inner">
@@ -928,6 +925,6 @@
   <!-- Password managers skip the game's own boxes (chat, searches, names); the account forms keep autofill. -->
   <script type="module" src="js/no-autofill.js?v=g437-1"></script>
   <!-- game.js loads once the multiplayer save is in memory (js/online-boot.js). -->
-  <script type="module" id="online-boot" src="js/online-boot.js?v=g436-2" data-game="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=g378-1&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g457-3"></script>
+  <script type="module" id="online-boot" src="js/online-boot.js?v=g436-2" data-game="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=g378-1&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g459-1"></script>
 </body>
 </html>

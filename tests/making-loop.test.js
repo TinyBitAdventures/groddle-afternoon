@@ -400,7 +400,7 @@ describe('consume craft outputs', () => {
 });
 
 describe('UI wiring', () => {
-  it('index/game wire making panel, tool chips, and activity feed', () => {
+  it('index/game wire making panel, tool chips, and the notices (js/notify-view.js)', () => {
     const html = readFileSync(join(__dirname, '../public/play/index.html'), 'utf8');
     assert.ok(html.includes('id="make-panel"'));
     assert.ok(html.includes('id="make-btn"'));
@@ -408,7 +408,7 @@ describe('UI wiring', () => {
     assert.ok(html.includes('id="make-detail"') || html.includes('make-grid'));
     assert.ok(html.includes('id="make-progress"'));
     assert.ok(html.includes('id="make-result"'));
-    assert.ok(html.includes('id="activity-feed"'));
+    assert.ok(html.includes('js/notify-view.js') || readFileSync(join(__dirname, '../public/game.js'), 'utf8').includes("from './js/notify-view.js?v="));
     assert.ok(html.includes('id="pack-items"'));
     assert.ok(html.includes('id="pack-tools"'));
     assert.ok(html.includes('id="stat-currants"'));

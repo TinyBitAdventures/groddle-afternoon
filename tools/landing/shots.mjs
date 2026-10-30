@@ -59,7 +59,7 @@ export const SHOTS = Object.freeze({
 });
 
 // #crab-talk: a crab that wanders up asks for music in a dialog over the street.
-const HIDE = '#play-context, #local-chat-dock, #activity-feed, #toast, .qi-hint, #crab-talk { visibility: hidden !important; }';
+const HIDE = '#play-context, #local-chat-dock, #notify-notices, #activity-log, .qi-hint, #crab-talk { visibility: hidden !important; }';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const args = process.argv.slice(2);

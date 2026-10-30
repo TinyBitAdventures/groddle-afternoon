@@ -26,7 +26,7 @@ const outDir = join(root, 'public', 'restoration', 'shots');
 // CAPTURE_BASE serves another checkout (e.g. a clean worktree on a local port).
 const BASE = process.env.CAPTURE_BASE || 'https://groddle.localhost/';
 const HIDE = `
-  #play-context, #local-chat-dock, #activity-feed, #toast, .qi-hint { visibility: hidden !important; }
+  #play-context, #local-chat-dock, #notify-notices, #activity-log, .qi-hint { visibility: hidden !important; }
 `;
 
 const args = process.argv.slice(2);

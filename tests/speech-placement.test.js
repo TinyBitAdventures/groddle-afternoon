@@ -307,14 +307,19 @@ describe('bubbles keep clear of the activity feed column (G269)', () => {
     }
   });
 
-  it('game.js asks it with the feed and buff strip every placement', () => {
+  it('game.js asks it with the buff strip, then the notices and banner (NOTIFY zones), every placement', () => {
     const game = readFileSync(join(ROOT, 'public/game.js'), 'utf8');
-    assert.match(game, /hudColumnBox\(\[\.\.\.\(feed\?\.children \|\| \[\]\), document\.getElementById\('buff-strip'\)\]/);
+    assert.match(game, /hudColumnBox\(\[document\.getElementById\('buff-strip'\)\]/);
     assert.match(game, /const clear = clearSpeechOfBox\(\{/);
     assert.match(game, /meta\.overHud = clear\?\.how === 'over';/);
     assert.match(game, /el\.toggleAttribute\('data-under-speech', over\)/);
+    // The notices' stack and a banner (js/notify-view.js zoneBoxes): moved clear, or the notices fade under it.
+    assert.match(game, /const clearZone = zone && clearSpeechOfBox\(\{/);
+    assert.match(game, /meta\.overNotices = clearZone\?\.how === 'over';/);
+    assert.match(game, /notifyView\?\.setUnderSpeech\(speechBubbles\.some\(\(b\) => b\._speechFx\?\.overNotices\)\);/);
     const css = readFileSync(join(ROOT, 'public/style.css'), 'utf8');
-    assert.match(css, /\.activity-feed\[data-under-speech\], \.buff-strip\[data-under-speech\] \{ opacity: 0\.18; \}/);
+    assert.match(css, /\.buff-strip\[data-under-speech\] \{ opacity: 0\.18; \}/);
+    assert.match(css, /\.notify-notices\[data-under-speech\] \{ opacity: 0\.18; \}/);
   });
 });
 

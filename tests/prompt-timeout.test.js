@@ -251,19 +251,19 @@ describe('the game wires them', () => {
     assert.match(read(join(PUBLIC, 'js/features/subway-feature.js')), /timeoutMs: ride\.timing\.prompt,/);
   });
 
-  it('toasts and activity lines hide under the card and their clocks stop (GrowlQueue)', () => {
-    assert.match(css, /html\[data-street-cards\] \.toast,\nhtml\[data-street-cards\] \.activity-feed \{ visibility: hidden; \}/);
+  it('notices hide under the card and their clocks stop (GrowlQueue)', () => {
+    // NOTIFY: toasts and activity lines are one notice stack (js/notify-view.js); its clock is
+    // js/notify.js tick, held by toastHeld() (tests/notify.test.js runs the clock itself).
+    assert.match(css, /html\[data-street-cards\] \.notify-notices \{ visibility: hidden; \}/);
     // G320: through toastHeld(), which is the street card (and in multiplayer the start card too).
     assert.match(game, /function toastHeld\(\) \{\n\s+return streetCardUp\(\) \|\|/);
-    assert.match(game, /if \(toastHeld\(\)\) state\.toastHeldAt \|\|= t;/);
-    assert.match(game, /state\.toastHeldAt = toastHeld\(\) \? state\.toastTimer - ms : 0;/);
-    assert.match(game, /cardPausedTimeout\(\(\) => \{\n\s*el\.classList\.add\('is-leaving'\);/);
+    assert.match(game, /const notify = createNotifier\(\{\n\s+held: \(\) => toastHeld\(\),/);
   });
 
   it('a toast raised before a panel opens goes when the panel opens (shrine reopened after a donation)', () => {
-    assert.match(game, /state\.toastOverModal = Boolean\(openGlitchModal\(\)\);/);
-    assert.match(game, /const staleUnderPanel = state\.toastTimer > 0 && !state\.toastOverModal && openGlitchModal\(\);/);
-    assert.match(game, /if \(staleUnderPanel \|\| \(!state\.toastHeldAt && state\.toastTimer > 0 && performance\.now\(\) >= state\.toastTimer\)\)/);
+    // tickNotices: notices raised before the open panel's time go (js/notify.js tick dropBefore).
+    assert.match(game, /else if \(notifyModalSince === -Infinity\) notifyModalSince = performance\.now\(\);/);
+    assert.match(game, /notifyView\?\.frame\(performance\.now\(\), \{ hold, dropBefore: notifyModalSince \}\);/);
     // The shrine's answer carries the numbers now; the toast (no answer, or a Gameshow Ticket) still comes after the close.
     assert.match(game, /closeShrinePanel\(\);\n\s*playShrineDonation\(target\);\n\s*refreshShrineTarget\(target\);[\s\S]{0,1200}?if \(!answer \|\| result\.gameshowTicket\) toast\(line, 4200\);/, 'the donation toast is raised after the panel closes');
   });

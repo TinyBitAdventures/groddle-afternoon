@@ -59,12 +59,27 @@ export const SCREEN_GATES = Object.freeze([
 ]);
 
 /**
+ * The remake's own gates, after the client's (UI audit 2026-10-29, NOTIFY: a big
+ * moment never lands on a dialog). The client's panels were its ChoicesDialog and
+ * menus above; the remake's panels (.glitch-modal: vendor, shrine, make, ...) and
+ * the features' own conversation cards ([role="dialog"]: the Crab's talk, the
+ * Activity log, ...) hold the queue too. [state key, why].
+ */
+export const REMAKE_SCREEN_GATES = Object.freeze([
+  ['panel', 'panel open'],
+  ['dialog', 'dialog open'],
+]);
+
+/**
  * Why the next screen waits, or '' when it may show. The focus gate only
  * counts for screens that need it (requires_client_focus).
  */
 export function screenQueueHold(state = {}, { requiresFocus = true } = {}) {
   for (const [key, , why] of SCREEN_GATES) {
     if (key === 'unfocused' && !requiresFocus) continue;
+    if (state[key]) return why;
+  }
+  for (const [key, why] of REMAKE_SCREEN_GATES) {
     if (state[key]) return why;
   }
   return '';

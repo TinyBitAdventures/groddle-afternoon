@@ -96,7 +96,7 @@ const ONLINE_STYLE = `  <style>
        toast's clock, qurazy-feature the banner). */
     #overlay:not(.hidden) { z-index: 80; padding: 8px; box-sizing: border-box; }
     #overlay:not(.hidden) > .card { max-height: 100%; overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box; }
-    #game-root:has(> #overlay:not(.hidden)) :is(.toast, .activity-feed, .qurazy-overlay) { visibility: hidden; }
+    #game-root:has(> #overlay:not(.hidden)) :is(.notify-notices, .qurazy-overlay) { visibility: hidden; }
     body:has(#overlay:not(.hidden)) .save-pill { z-index: 81; }
     @media (max-width: 560px) {
       #overlay:not(.hidden) > .card { width: 100%; padding: 0.85rem 0.95rem 0.75rem; font-size: 0.9rem; line-height: 1.35; }

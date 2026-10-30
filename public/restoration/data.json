@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 761,
+  "commits": 762,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "improve",
+    "text": "The Penalty Box gets its grassy ledge and trunk, and Being Watched's TVs glow on their own"
+   },
    {
     "date": "2026-10-29",
     "kind": "improve",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "The Enter hint draws over a Rook attack's skulls and feathers"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "improve",
-    "text": "The Super Harvest rainbow draws sharp on Retina screens"
    }
   ]
  },
- "tests": 427,
- "generatedAt": "2026-10-29"
+ "tests": 428,
+ "generatedAt": "2026-10-30"
 }

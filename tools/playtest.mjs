@@ -152,7 +152,8 @@ class Session {
       for (const el of document.querySelectorAll('.side-panel, .glitch-modal, .home-panel, .mail-panel, .map-panel, .quest-dialogue, .verb-menu, #award-screen, .award-screen, #new-day, .new-day, [role="dialog"]')) {
         if (vis(el)) out[el.id || el.className.split(' ')[0]] = true;
       }
-      const toast = document.getElementById('toast');
+      // NOTIFY: the notices (js/notify-view.js) are the old toast; the newest is first.
+      const toast = document.querySelector('#notify-notices .notify-card');
       if (vis(toast)) out.toast = toast.textContent.trim();
       return out;
     });

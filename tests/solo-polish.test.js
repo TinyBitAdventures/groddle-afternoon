@@ -22,9 +22,9 @@ import { accountBackupFeature } from '../public/js/features/account-backup-featu
 import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=g457-3';
 import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=g457-3';
 import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js?v=g375-1';
-import { qurazyFeature, resetQurazyFeatureForTests } from '../public/js/features/qurazy-feature.js?v=g448-2';
+import { qurazyFeature, resetQurazyFeatureForTests } from '../public/js/features/qurazy-feature.js?v=g459-1';
 import { QURAZY_SPAWN_LINE } from '../public/js/qurazy.js';
-import { QURAZY_PLACEMENT_GROUP } from '../public/js/features/qurazy-feature.js?v=g448-2';
+import { QURAZY_PLACEMENT_GROUP } from '../public/js/features/qurazy-feature.js?v=g459-1';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from '../public/js/panel-copy.js?v=g396-1';
 
 const root = join(import.meta.dirname, '..');

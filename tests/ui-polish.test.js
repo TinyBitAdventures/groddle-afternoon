@@ -41,13 +41,12 @@ test.describe('responsive chrome polish', () => {
   test('floats only the newest activity briefly and enlarges large-screen chrome', () => {
     const css = fs.readFileSync(path.join(publicRoot, 'style.css'), 'utf8');
     const game = fs.readFileSync(path.join(publicRoot, 'game.js'), 'utf8');
-    assert.match(game, /feed\.children\.length > ACTIVITY_POPUPS/);
-    assert.match(game, /const ACTIVITY_POPUPS = 2;/);
-    assert.match(game, /classList\.add\('is-leaving'\)/);
-    assert.doesNotMatch(
-      css.match(/\.activity-feed\s*\{[\s\S]*?\}/)?.[0] || '',
-      /max-height/
-    );
+    // NOTIFY: at most two notices (js/notify.js NOTICE_LIMIT), each for its time; the log keeps the rest.
+    const notify = fs.readFileSync(path.join(publicRoot, 'js/notify.js'), 'utf8');
+    assert.match(notify, /export const NOTICE_LIMIT = 2;/);
+    assert.match(notify, /while \(notices\.length > limit\) \{/);
+    assert.match(game, /const notify = createNotifier\(/);
+    assert.doesNotMatch(css.match(/\.notify-notices\s*\{[\s\S]*?\}/)?.[0] || '', /max-height/);
     assert.match(css, /@media \(min-width: 1500px\)/);
     assert.match(css, /\.pack-slots \.inv-slot,[\s\S]*?width:\s*52px/);
   });

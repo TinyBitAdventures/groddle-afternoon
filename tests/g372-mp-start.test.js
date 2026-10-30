@@ -115,8 +115,9 @@ describe('G320: the multiplayer start card', () => {
     assert.match(css, /\.overlay \{[^}]*z-index: 5;/);
   });
 
-  it('the street\'s toasts, activity lines and Qurazy banner are hidden while the card is up (multiplayer page only)', () => {
-    assert.match(page, /#game-root:has\(> #overlay:not\(\.hidden\)\) :is\(\.toast, \.activity-feed, \.qurazy-overlay\) \{ visibility: hidden; \}/);
+  it('the street\'s notices and Qurazy banner are hidden while the card is up (multiplayer page only)', () => {
+    // NOTIFY: the toast and the activity feed are one notice stack now (js/notify-view.js).
+    assert.match(page, /#game-root:has\(> #overlay:not\(\.hidden\)\) :is\(\.notify-notices, \.qurazy-overlay\) \{ visibility: hidden; \}/);
     assert.doesNotMatch(read('public/play/index.html'), /#overlay:not\(\.hidden\)/, 'solo /play/ is unchanged');
     assert.equal(read('public/play/online/index.html'), page, 'the generated page is current');
   });
@@ -124,8 +125,8 @@ describe('G320: the multiplayer start card', () => {
   it('game.js holds a toast\'s clock behind the start card in multiplayer only (solo still holds only for a street card)', () => {
     const src = read('public/game.js');
     assert.match(src, /function toastHeld\(\) \{\n\s+return streetCardUp\(\) \|\| \(GAME_MODE === 'multiplayer' && !state\.started\);\n\}/);
-    assert.match(src, /state\.toastHeldAt = toastHeld\(\) \? state\.toastTimer - ms : 0;/);
-    assert.match(src, /if \(toastHeld\(\)\) state\.toastHeldAt \|\|= t;/);
+    // NOTIFY: the notifier's clock stops while toastHeld() (js/notify.js tick, tests/notify.test.js).
+    assert.match(src, /const notify = createNotifier\(\{\n\s+held: \(\) => toastHeld\(\),/);
     // The card closes in beginGame: overlay hidden, then state.started.
     assert.match(src, /document\.getElementById\('overlay'\)\.classList\.add\('hidden'\);\n\s+state\.started = true;/);
   });

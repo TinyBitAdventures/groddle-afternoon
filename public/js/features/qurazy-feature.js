@@ -149,35 +149,20 @@ export function boxesOverlap(a, b) {
 }
 
 /**
- * G297: at 760 px and below the banner lands on the activity feed's line
- * that repeats its message. The banner keeps the source's place (top_y -5%,
- * just under the street-name pill) and the feed fades under it while they
- * meet, the way it does under a speech bubble with no clear spot (G269,
- * style.css data-under-speech). Its own attribute, since game.js sets
- * data-under-speech every frame.
+ * G297 then NOTIFY (UI audit 2026-10-29): while the banner is up its art box is a reserved zone
+ * (engine.reserveZone, js/notify-view.js), in #game-root px: the notices move down under it and
+ * the Enter hint and speech bubbles keep off it. The zone goes with the canvas.
  */
-export const QURAZY_FEED_ATTR = 'data-under-banner';
+export const QURAZY_ZONE = 'qurazy-banner';
 
-function fadeFeedUnderBanner(root, canvas, box) {
-  const feed = document.getElementById('activity-feed');
-  if (!feed || !box) return;
+function reserveBannerZone(engine, canvas, box) {
+  if (!box || typeof engine?.reserveZone !== 'function') return;
+  engine.reserveZone(QURAZY_ZONE, box);
   const step = () => {
     if (!canvas.isConnected) {
-      feed.removeAttribute(QURAZY_FEED_ATTR);
+      engine.reserveZone(QURAZY_ZONE, null);
       return;
     }
-    const r = root.getBoundingClientRect();
-    let over = false;
-    if (Number(canvas.style.opacity || 0) > 0.05) {
-      for (const line of feed.querySelectorAll('.act:not(.is-leaving)')) {
-        const b = line.getBoundingClientRect();
-        if (b.width && b.height && boxesOverlap(box, { left: b.left - r.left, top: b.top - r.top, right: b.right - r.left, bottom: b.bottom - r.top })) {
-          over = true;
-          break;
-        }
-      }
-    }
-    if (feed.hasAttribute(QURAZY_FEED_ATTR) !== over) feed.toggleAttribute(QURAZY_FEED_ATTR, over);
     requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
@@ -231,7 +216,7 @@ async function showSpawnOverlay(engine) {
   const watch = () => {
     if (run !== bannerRun || Date.now() - t0 > 3000) return;
     const canvas = root.querySelector('canvas.qurazy-overlay');
-    if (canvas) fadeFeedUnderBanner(root, canvas, box);
+    if (canvas) reserveBannerZone(engine, canvas, box);
     else requestAnimationFrame(watch);
   };
   requestAnimationFrame(watch);
@@ -317,7 +302,9 @@ export const qurazyFeature = {
         const spot = roll.spawn ? markerSpot(engine, roll.markerIndex) : null;
         if (spot && placeQurazy(engine, spot)) {
           st.live = { tsid, day: today, x: spot.x, y: spot.y };
-          engine.pushActivity?.(QURAZY_SPAWN_LINE);
+          // NOTIFY: the banner says it; the line goes to the Activity log only (a notice too said it twice).
+          if (engine.notify) engine.notify.moment(QURAZY_SPAWN_LINE);
+          else engine.pushActivity?.(QURAZY_SPAWN_LINE);
           showSpawnOverlay(engine);
         }
       }
@@ -334,8 +321,8 @@ export const qurazyFeature = {
     if (!reconnecting) st.live = null;
     liveQuoin = null;
     // G303, G311: the banner goes with the street (cancelAllOverlaysWeCan 193-215). It is a
-    // playVectorOverlay, so game.js endStreetOverlays has already taken its canvas down, and the
-    // feed fade ends with the canvas (fadeFeedUnderBanner). One still waiting on the manifest
+    // playVectorOverlay, so game.js endStreetOverlays has already taken its canvas down, and its
+    // reserved zone goes with the canvas (reserveBannerZone). One still waiting on the manifest
     // has not started its player yet: the run bump keeps it off the next street.
     bannerRun += 1;
     const wasLive = bannerLive;
