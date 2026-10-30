@@ -850,6 +850,14 @@
   --c-classic-verb-hi: #f8f2e3;           /* the focused verb row, from int_menu_norm.png (PROPOSED, ref/flickr-verb-menu.jpg) */
   --c-classic-verb-edge: #e1c38f;         /* its tan edge (PROPOSED, same frame) */
   --c-classic-disabled: #989898;          /* disabled text (code default): FormElement.as */
+  --c-classic-chat-track: #ecf0f1;        /* a chat pane's 12 px scrollbar: ChatArea.as */
+  --c-classic-chat-track-border: #d2dadc;
+  --c-classic-chat-handle: #cfdcdd;
+  --c-classic-chat-handle-border: #b0bfc2;
+  --c-classic-activity-bar: #7aa2a4;      /* an activity line's bar, for no one (code default): ChatElement.as */
+  --c-classic-time-rule: #bebebe;         /* the rule under a time line: ChatElement.as */
+  --c-classic-system: #edd5cc;            /* a system line's box: ChatElement.as */
+  --c-classic-contact-divider: #cad6dc;   /* the contact strip's divider: ContactList.as:120-138 */
   /* classic:end */
   /* Classic type: the 2012 faces (VAG Rounded, Helvetica) are proprietary, so Nunito 800 stands in for
      titles, names, labels and big numbers, and the system Helvetica/Arial stack carries body text. The

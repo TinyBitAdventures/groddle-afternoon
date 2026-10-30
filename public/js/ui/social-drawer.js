@@ -206,6 +206,13 @@ export function mountSocialDrawer({
   let choice = readChoice(storage);
   let open = choice ?? defaultOpen(width());
   const listeners = new Set();
+  /** fn() after each redraw, so a second view of a log keeps up (the Classic skin's lower pane). */
+  const renderListeners = new Set();
+  const rendered = () => {
+    for (const fn of renderListeners) {
+      try { fn(); } catch (e) { console.warn('social', e); }
+    }
+  };
   /** Ids of buddies' "added you" already seen on the Buddies tab. */
   const seenAdds = new Set();
   let addsUnread = 0;
@@ -556,6 +563,7 @@ export function mountSocialDrawer({
 
   function render() {
     keepingFocus(renderNow);
+    rendered();
   }
 
   function renderNow() {
@@ -848,6 +856,7 @@ export function mountSocialDrawer({
           if (open) renderTabs();
           publish();
         });
+        rendered();
         return;
       }
       render();
@@ -864,6 +873,27 @@ export function mountSocialDrawer({
     onTab(fn) {
       listeners.add(fn);
       return () => listeners.delete(fn);
+    },
+    /**
+     * Some tabs' logs as one, oldest first, with the time lines, drawn as this drawer draws them (the
+     * Classic skin's "Local Chat / Activity" pane: Local's lines and the Activity log together).
+     */
+    logNodes(ids = []) {
+      const items = [];
+      for (const id of ids) {
+        const t = tabs.get(id);
+        if (!t) continue;
+        if (t.kind === 'activity') for (const e of notifier.entries) items.push({ at: Number(e.at) || 0, e, act: true });
+        else if (t.kind === 'chat') for (const l of t.lines) items.push({ at: l.at, e: l, act: false });
+      }
+      items.sort((a, b) => a.at - b.at);
+      return withTimeLines(items, (x) => x.at).map((x) => (x.sep ? lineNode(x) : x.act ? activityNode(x.e) : lineNode(x.e)));
+    },
+    /** A tab's label, or ''. */
+    label: (id) => tabs.get(id)?.label || '',
+    onRender(fn) {
+      renderListeners.add(fn);
+      return () => renderListeners.delete(fn);
     },
     /** How much of the root's edges the drawer covers (px), for the notices: { left, right }. */
     inset: () => insetNow(),

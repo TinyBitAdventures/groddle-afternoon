@@ -858,7 +858,7 @@ import { denseSprite } from './js/sprite-dense.js?v=g430-1';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from './js/notify.js?v=g459-1';
 import { mountNotifyView } from './js/notify-view.js?v=g469-2';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g469-2';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g468-13';
 import { bindTabs, mountPanelShell } from './js/ui/panel-shell.js?v=g469-2';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=g469-2';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=g469-3';
@@ -880,7 +880,7 @@ import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?
 import { itemZ } from './js/item-bands.js?v=g429-1';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=g412-1';
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=g468-10';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=g468-12';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;

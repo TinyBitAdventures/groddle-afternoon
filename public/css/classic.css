@@ -1118,3 +1118,160 @@
   font: 800 var(--fs-classic-body)/var(--lh-snug) var(--font-classic-title);
   white-space: nowrap;
 }
+
+/* == The chat column's panes (classic-spec spec §7a-§7f; RightSideView.as, ChatArea.as, ContactList.as;
+   js/classic/classic-panes.js). The column: white, radius 6, 12 in, the 1px 0 1px .2 shadow. "Local
+   Chat / Activity" is always the bottom pane; another chat online opens above it, the
+   chat_divider.png grip between them. Each pane's title row: the options chevron, the title, the
+   #b1b7ba unread pill and, above, the close. The 12 px scrollbar in the client's colours. */
+:root[data-ui="classic"] .local-chat-dock.social-drawer,
+:root[data-ui="classic"] .local-chat-dock.social-drawer.is-open {
+  display: grid;
+  grid-template-columns: calc(48 * var(--cu)) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+:root[data-ui="classic"] .social-drawer .social-rail { grid-column: 1; grid-row: 1 / -1; }
+:root[data-ui="classic"] .social-drawer .social-body,
+:root[data-ui="classic"] .social-drawer .classic-lower {
+  grid-column: 2;
+  min-height: 0;
+  padding: 0 calc(12 * var(--cu));
+  background: var(--c-classic-panel);
+  box-shadow: 1px 0 1px color-mix(in srgb, var(--c-classic-ink) 20%, transparent);
+}
+:root[data-ui="classic"] .social-drawer .social-body { grid-row: 1; border-radius: 6px; }
+:root[data-ui="classic"] .social-drawer[data-classic-upper="on"] { grid-template-rows: minmax(100px, 45%) minmax(100px, 1fr); }
+:root[data-ui="classic"] .social-drawer[data-classic-upper="on"] .social-body { border-radius: 6px 6px 0 0; }
+:root[data-ui="classic"] .social-drawer .classic-lower {
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0 0 6px 6px;
+}
+/* The divider: the 41 x 5 grip on a 13 px white strip (RightSideView.as 1195-1235). */
+:root[data-ui="classic"] .social-drawer .classic-lower::before {
+  content: "";
+  flex: none;
+  height: 13px;
+  margin: 0 calc(-12 * var(--cu));
+  background: url("../assets/classic/chat_divider.png?v=2dc713b4") center / 41px 5px no-repeat;
+}
+:root[data-ui="classic"] .social-drawer :is(.social-head, .classic-lower-head) {
+  display: flex;
+  align-items: center;
+  gap: calc(5 * var(--cu));
+  margin: 0;
+  padding: calc(10 * var(--cu)) 0 calc(3 * var(--cu));
+  border-bottom: 1px solid var(--c-classic-title-rule);
+}
+:root[data-ui="classic"] .social-drawer .classic-lower-head { padding-top: 0; }
+:root[data-ui="classic"] .social-drawer .classic-pane-chev { flex: none; width: 10px; height: 7px; transform: rotate(180deg); }
+:root[data-ui="classic"] .social-drawer .social-title[data-classic-title] { flex: 0 1 auto; min-width: 0; font-size: 0; }
+:root[data-ui="classic"] .social-drawer .social-title[data-classic-title]::before,
+:root[data-ui="classic"] .social-drawer .classic-lower-title { font: 800 var(--fs-classic-pane)/var(--lh-tight) var(--font-classic-title); color: var(--c-classic-title); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+:root[data-ui="classic"] .social-drawer .social-title[data-classic-title]::before { content: attr(data-classic-title); }
+:root[data-ui="classic"] .social-drawer .classic-lower-title { margin: 0; }
+:root[data-ui="classic"] .social-drawer .classic-pane-pill {
+  flex: none;
+  min-width: 21px;
+  height: 14px;
+  padding: 0 4px;
+  border-radius: 6px;
+  background: var(--c-classic-unread-pane);
+  color: var(--c-classic-panel);
+  font: 700 var(--fs-classic-count)/14px var(--font-classic-body);
+  text-align: center;
+}
+:root[data-ui="classic"] .social-drawer .classic-pane-close {
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+:root[data-ui="classic"] .social-drawer .classic-pane-close img { width: 10px; height: 10px; }
+/* The contact strip is the switcher, so the drawer's own tabs go; Local and Activity are the bottom pane. */
+:root[data-ui="classic"] .social-drawer .social-tabs { display: none !important; }
+@media (min-width: 1313px) {
+  :root[data-ui="classic"] .social-drawer :is([data-social-rail-tab="activity"], [data-social-rail-tab="local"]) { display: none !important; }
+}
+:root[data-ui="classic"] .social-drawer .classic-lower-log { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; }
+:root[data-ui="classic"] .social-drawer .classic-lower-form { flex: none; padding: calc(8 * var(--cu)) 0 calc(12 * var(--cu)); }
+:root[data-ui="classic"] .social-drawer :is(#local-chat-input, .classic-lower-input) {
+  width: 100%;
+  height: calc(25 * var(--cu));
+  padding: 0 calc(5 * var(--cu));
+  border: 1px solid var(--c-classic-input-border);
+  border-radius: 3.5px;
+  background: var(--c-classic-input);
+  box-shadow: inset 0 2px 2px color-mix(in srgb, var(--c-classic-ink) 20%, transparent);
+  color: var(--c-classic-text);
+  font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body);
+  transition: background 0.2s linear, border-color 0.2s linear;
+}
+:root[data-ui="classic"] .social-drawer :is(#local-chat-input, .classic-lower-input):is(:hover, :focus) { border-color: var(--c-classic-input-hi-border); background: var(--c-classic-input-hi); box-shadow: none; }
+:root[data-ui="classic"] .social-drawer .classic-lower-input:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+/* The scrollbar: 12 px, track #ecf0f1 edged #d2dadc, handle #cfdcdd edged #b0bfc2 (ChatArea.as). */
+:root[data-ui="classic"] .social-drawer :is(.social-log, .classic-lower-log) { scrollbar-width: auto; scrollbar-color: var(--c-classic-chat-handle) var(--c-classic-chat-track); }
+:root[data-ui="classic"] .social-drawer :is(.social-log, .classic-lower-log)::-webkit-scrollbar { width: 12px; }
+:root[data-ui="classic"] .social-drawer :is(.social-log, .classic-lower-log)::-webkit-scrollbar-track { background: var(--c-classic-chat-track); border: 1px solid var(--c-classic-chat-track-border); border-radius: 3px; }
+:root[data-ui="classic"] .social-drawer :is(.social-log, .classic-lower-log)::-webkit-scrollbar-thumb { background: var(--c-classic-chat-handle); border: 1px solid var(--c-classic-chat-handle-border); border-radius: 3px; }
+/* Lines (ChatElement.as 25-297): an activity line 9 in after a 3 px bar at .5; a moment the system
+   box (#edd5cc, radius 4); the time centred over a 1 px #bebebe rule. */
+:root[data-ui="classic"] .social-drawer .social-act {
+  margin-left: 3px;
+  padding-left: 6px;
+  border-left: 3px solid color-mix(in srgb, var(--c-classic-activity-bar) 50%, transparent);
+}
+:root[data-ui="classic"] .social-drawer .social-act[data-kind="gain"] { border-left-color: color-mix(in srgb, var(--c-classic-activity-bar) 50%, transparent); }
+:root[data-ui="classic"] .social-drawer .social-act[data-kind="moment"] {
+  padding: calc(3 * var(--cu)) calc(6 * var(--cu));
+  border: 0;
+  border-radius: 4px;
+  background: var(--c-classic-system);
+  box-shadow: 0 1px 1px color-mix(in srgb, var(--c-classic-ink) 60%, transparent);
+}
+:root[data-ui="classic"] .social-drawer .social-time {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: calc(6 * var(--cu));
+}
+:root[data-ui="classic"] .social-drawer .social-time::before,
+:root[data-ui="classic"] .social-drawer .social-time::after { content: ""; flex: 1 1 auto; height: 1px; background: var(--c-classic-time-rule); }
+/* The contact strip (ContactList.as 120-307): the open chats, each an icon and its name, cut by the
+   48 px strip as the client's closed strip did; Add Friends at the end. */
+:root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab] {
+  display: flex;
+  align-items: center;
+  gap: calc(4 * var(--cu));
+  overflow: hidden;
+  padding-left: calc(6 * var(--cu));
+  white-space: nowrap;
+  color: var(--c-classic-online);
+  font: 700 var(--fs-classic-body)/var(--lh-none) var(--font-classic-count);
+  background: url("../assets/classic/contact_group.png?v=a4c0be52") calc(6 * var(--cu)) center / 10px 10px no-repeat;
+}
+:root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab] svg { visibility: hidden; flex: none; width: 10px; }
+:root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab]::after { content: attr(title); }
+:root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab]:hover { color: var(--c-classic-contact-hover); }
+:root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab="party"] { background-image: url("../assets/classic/contact_party.png?v=2119ea21"); }
+:root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab*="global"] { background-image: url("../assets/classic/contact_global.png?v=0cb49cd0"); }
+:root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab*="help"] { background-image: url("../assets/classic/contact_help.png?v=b43ab532"); }
+:root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab*="trade"] { background-image: url("../assets/classic/contact_trade.png?v=483279da"); }
+:root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab="buddies"] {
+  height: calc(30 * var(--cu));
+  margin-top: auto;
+  color: var(--c-classic-link);
+  background: url("../assets/classic/contact_add_friend.png?v=212f7467") calc(6 * var(--cu)) center / 36px 23px no-repeat;
+}
+:root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab="buddies"]::after { content: none; }
+:root[data-ui="classic"] .social-drawer .social-rail { border-top: 0; }
+:root[data-ui="classic"] .social-drawer .social-sep { background: var(--c-classic-contact-divider); }
+@media (max-width: 1312.98px) {
+  :root[data-ui="classic"] .social-drawer .classic-lower { display: none !important; }
+}
