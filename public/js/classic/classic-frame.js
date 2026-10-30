@@ -17,7 +17,7 @@
  *   player's own Modern choice; leaving Classic hands it back (restore()).
  * - window.groddleClassic for QA: the mode, the measured view and the pure layout.
  */
-import { uiState, onUiModeChange } from './ui-mode.js?v=g468-1';
+import { uiState, onUiModeChange } from './ui-mode.js?v=g468-9';
 import { classicLayout, railFor } from './classic-layout.js?v=g468-1';
 
 const VARS = ['--cv-x', '--cv-y', '--cv-w', '--cv-h', '--cv-right', '--cband-h'];

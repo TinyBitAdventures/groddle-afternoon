@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { enqueue, GROWL_IN_MS, GROWL_HOLD_MS, GROWL_OUT_MS, GROWL_QUEUE_MAX } from '../public/js/classic/classic-growl.js';
+import { enqueue, GROWL_IN_MS, GROWL_HOLD_MS, GROWL_OUT_MS, GROWL_QUEUE_MAX } from '../public/js/classic/classic-growl.js?v=g468-9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 

@@ -1062,6 +1062,17 @@
 }
 :root[data-ui="classic"] #game-root .classic-hub-title { opacity: 0.9; font: 800 var(--fs-classic-window)/var(--lh-tight) var(--font-classic-title); text-shadow: 0 1px 2px color-mix(in srgb, var(--c-classic-ink) 60%, transparent); }
 :root[data-ui="classic"] #game-root .classic-hub-art { position: relative; display: grid; place-items: center; }
+/* The pictures: cut to the cloud's own shape (ImgMenuElement.as 119-127); the avatar stands on its cloud. */
+:root[data-ui="classic"] #game-root .classic-hub-art .classic-hub-pic { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.95; }
+:root[data-ui="classic"] #game-root .classic-hub-art .classic-hub-pic[hidden] { display: none; }
+:root[data-ui="classic"] #game-root .classic-hub-art .classic-hub-avatar { inset: auto auto 25% 50%; width: auto; height: 105%; transform: translateX(-50%); object-fit: contain; opacity: 1; }
+:root[data-ui="classic"] #game-root .classic-hub-cloud[data-hub-cloud="teleport"] .classic-hub-icon { height: 60%; }
+/* Each cloud fades in .2 s, .1 s after the one before (ImgMenuView.as 384-390); a disabled one at .35. */
+:root[data-ui="classic"] #game-root .classic-hub-cloud { animation: classic-fade 0.2s linear calc(var(--i, 0) * 0.1s) both; }
+:root[data-ui="classic"] #game-root .classic-hub-cloud:disabled { opacity: 0.35; cursor: default; }
+@media (prefers-reduced-motion: reduce) {
+  :root[data-ui="classic"] #game-root .classic-hub-cloud { animation: none; }
+}
 :root[data-ui="classic"] #game-root .classic-hub-art .classic-hub-icon { position: absolute; width: auto; height: 55%; opacity: 1; filter: none; }
 :root[data-ui="classic"] #game-root .classic-hub-cloud[data-hub-cloud="skills"] .classic-hub-icon { height: 30%; }
 :root[data-ui="classic"] #game-root .classic-hub-cloud > .classic-hub-art > img:first-child { display: block; height: calc(70 * var(--cu)); width: auto; opacity: 0.7; transition: opacity 0.2s linear, filter 0.2s linear; }

@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { resolveUiMode, createUiMode, UI_STORAGE_KEY, UI_SIZE_KEY, UI_MODE_EVENT } from '../public/js/classic/ui-mode.js';
-import { interfaceMenuLabel, isPreferencesKey, PREFS_TITLE } from '../public/js/classic/classic-prefs.js?v=g468-8';
+import { resolveUiMode, createUiMode, UI_STORAGE_KEY, UI_SIZE_KEY, UI_MODE_EVENT } from '../public/js/classic/ui-mode.js?v=g468-9';
+import { interfaceMenuLabel, isPreferencesKey, PREFS_TITLE } from '../public/js/classic/classic-prefs.js?v=g468-9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -168,7 +168,7 @@ describe('Classic switch: Menu item and Preferences', () => {
     assert.ok(src.indexOf('classic-prefs.js') < src.indexOf('async function main('), 'a static import, evaluated before the body');
     assert.match(read('public/js/classic/classic-prefs.js'), /from '\.\/ui-mode\.js\?v=g\d+-\d+'/);
     const more = src.indexOf('  installMoreMenu();');
-    const mine = src.indexOf('  installInterfaceSettings();');
+    const mine = src.indexOf('  installInterfaceSettings(');
     const boot = src.indexOf('const endBoot = ');
     assert.ok(more > 0 && mine > more && boot > mine, 'after the Menu, before the boot cover lifts');
   });
@@ -179,5 +179,13 @@ describe('Classic switch: Menu item and Preferences', () => {
       assert.doesNotMatch(src, /glitch/i, f);
       assert.doesNotMatch(src, /—/, f);
     }
+  });
+
+  it('every importer of ui-mode.js uses one cache key (two keys would be two switches)', async () => {
+    const { readdirSync } = await import('node:fs');
+    const files = ['public/game.js', ...readdirSync(join(root, 'public/js'), { recursive: true }).filter((f) => f.endsWith('.js')).map((f) => `public/js/${f}`)];
+    const keys = new Set();
+    for (const f of files) for (const m of read(f).matchAll(/ui-mode\.js\?v=([\w-]+)'/g)) keys.add(m[1]);
+    assert.equal(keys.size, 1, [...keys].join(', '));
   });
 });

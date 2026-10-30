@@ -678,7 +678,7 @@ import {
 } from './js/screen-fx.js?v=g470-1';
 import { momentMoreText } from './js/ui/moment-card.js?v=g470-1';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
-import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=g468-1';
+import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=g468-9';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=g470-2';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=g459-1';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=g434-1';
@@ -880,7 +880,7 @@ import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?
 import { itemZ } from './js/item-bands.js?v=g429-1';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=g412-1';
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=g468-8';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=g468-9';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -26795,7 +26795,7 @@ async function main() {
     onPlayerCard: () => document.getElementById('player-menu-btn')?.click(),
   });
   packRow.install();
-  installInterfaceSettings();
+  installInterfaceSettings({ engine, avatarPortrait: ownerPortraitUrl });
   document.querySelector('.top-actions')?.addEventListener('click', () => {
     if (currentAction) cancelCurrentAction({ quiet: true });
     closePackPopover();

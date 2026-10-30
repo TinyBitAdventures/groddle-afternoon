@@ -16,9 +16,9 @@
  * focus goes back where it was. Its modern look is the <style> below; Classic
  * restyles it in public/css/classic.css.
  */
-import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=g468-1';
+import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=g468-9';
 import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=g468-1';
-import { installClassicChrome } from './classic-chrome.js?v=g468-8';
+import { installClassicChrome } from './classic-chrome.js?v=g468-9';
 
 export const PREFS_TITLE = 'Preferences';
 
@@ -166,10 +166,10 @@ export function createPreferences(doc) {
 
 /**
  * The Menu item, the `,` key and the Classic chrome (game.js calls this once, after installMoreMenu).
- * @param {{ doc?: Document }} [o]
+ * @param {{ doc?: Document, engine?: object, avatarPortrait?: () => Promise<string|null> }} [o]
  * @returns {{ prefs: ReturnType<typeof createPreferences> }}
  */
-export function installInterfaceSettings({ doc = globalThis.document } = {}) {
+export function installInterfaceSettings({ doc = globalThis.document, engine = null, avatarPortrait = null } = {}) {
   const prefs = createPreferences(doc);
   const list = doc.getElementById('more-list');
   if (list && !doc.getElementById('interface-btn')) {
@@ -194,6 +194,6 @@ export function installInterfaceSettings({ doc = globalThis.document } = {}) {
     e.preventDefault();
     prefs.open();
   });
-  const chrome = installClassicChrome({ doc });
+  const chrome = installClassicChrome({ doc, engine, avatarPortrait });
   return { prefs, chrome };
 }

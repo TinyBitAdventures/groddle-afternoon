@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 795,
+  "commits": 796,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "Pin up to two quests from the Quests sheet: they show top left under the left pill and tick as you go"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "Panels, cards and menus take the warm paper look: cream surfaces, brown text, a purple accent and warm shadows"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "new",
-    "text": "The game's text is Nunito, served from the game itself with its open font licence"
    }
   ]
  },

@@ -52,6 +52,7 @@
       "assets/classic/empty_making_slot_white.png": "49383e7d",
       "assets/classic/empty_making_slot_wide.png": "346615ec",
       "assets/classic/energy_bolt.png": "5f43803a",
+      "assets/classic/familiar_dialog_teleport.png": "a37511b2",
       "assets/classic/filled_making_slot.png": "8a78571d",
       "assets/classic/furn_scroll.png": "095cbd7b",
       "assets/classic/furn_scroll_disabled.png": "c3f8c94d",

@@ -50,6 +50,7 @@ export const CLASSIC_ART = Object.freeze({
   empty_making_slot_wide: {"url":"assets/classic/empty_making_slot_wide.png","w":150,"h":67,"bytes":1835,"sha1":"bdb5faa800b0384c8fe07513446e4d52d2e50e4b","kind":"copy","src":"graphics/empty_making_slot_wide.png"},
   energy_bolt: {"url":"assets/classic/energy_bolt.png","w":9,"h":15,"bytes":1245,"sha1":"01117fb2c1abd2f5e67d4733fd8354cc0c2acfd7","kind":"copy","src":"graphics/energy_bolt.png"},
   familiar_dialog_quests_small: {"url":"assets/ui/familiar/quests_small.png","w":32,"h":22,"bytes":2720,"sha1":"011cf2d2ea3fa85d36aa488b507b670e3fadb355","kind":"reuse","src":"graphics/familiar_dialog_quests_small.png"},
+  familiar_dialog_teleport: {"url":"assets/classic/familiar_dialog_teleport.png","w":60,"h":40,"bytes":3977,"sha1":"e1db8a1b857ff755da346d671673da226c7b99c0","kind":"copy","src":"graphics/familiar_dialog_teleport.png"},
   filled_making_slot: {"url":"assets/classic/filled_making_slot.png","w":67,"h":67,"bytes":3080,"sha1":"00f9c2b1273c802eb58e8d33ad9bda0bc85fa285","kind":"copy","src":"graphics/filled_making_slot.png"},
   furn_scroll: {"url":"assets/classic/furn_scroll.png","w":9,"h":14,"bytes":1280,"sha1":"ee79c4053d9bdd9a6ae721cadd9ae51c5ae67289","kind":"copy","src":"graphics/furn_scroll.png"},
   furn_scroll_disabled: {"url":"assets/classic/furn_scroll_disabled.png","w":9,"h":14,"bytes":1263,"sha1":"570e485bed32e09c2748a134ee13b8fe3153d5c2","kind":"copy","src":"graphics/furn_scroll_disabled.png"},

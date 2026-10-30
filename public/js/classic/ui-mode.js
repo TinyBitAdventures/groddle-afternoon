@@ -172,6 +172,15 @@ export function createUiMode({ win = globalThis, doc = globalThis.document, stor
 
 const ui = createUiMode();
 
+/** Classic's own small pictures (the hub's home and world snapshots), kept on this device; try/catch throughout. */
+export const UI_CACHE_PREFIX = 'groddle.ui.cache.';
+export function readUiCache(key, storage = (() => { try { return globalThis.localStorage; } catch { return null; } })()) {
+  return readStore(storage, UI_CACHE_PREFIX + key);
+}
+export function writeUiCache(key, value, storage = (() => { try { return globalThis.localStorage; } catch { return null; } })()) {
+  return writeStore(storage, UI_CACHE_PREFIX + key, String(value));
+}
+
 /** The skin showing now. */
 export const uiMode = () => ui.mode();
 export const uiState = () => ui.state();

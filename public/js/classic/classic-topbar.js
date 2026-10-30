@@ -18,8 +18,8 @@
  * - the volume icon's frame (AudioControl.as 214-229) from the Sound sliders and mute;
  * - the day's quoins as a row in the player menu (open question 9).
  */
-import { uiState, onUiModeChange } from './ui-mode.js?v=g468-1';
-import { classicArtUrl } from './classic-art.js?v=g468-1';
+import { uiState, onUiModeChange } from './ui-mode.js?v=g468-9';
+import { classicArtUrl } from './classic-art.js?v=g468-9';
 
 /** PURE: a ring's share 0..1 from its stroke-dasharray ("63.5 100"). */
 export function shareFromDash(dash) {

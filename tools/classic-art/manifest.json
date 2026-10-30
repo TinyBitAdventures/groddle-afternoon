@@ -93,7 +93,8 @@
     { "name": "img_back", "src": "graphics/iMG_back.png", "use": "imagination hub: back" },
     { "name": "upgrade_icon", "src": "graphics/upgrade_icon.png", "use": "Upgrades cloud art" },
     { "name": "repeating_clouds", "src": "graphics/repeating_clouds.png", "use": "upgrade purchase backdrop, tiled" },
-    { "name": "lock_small", "src": "graphics/lock_small.png", "use": "locked skill tile" }
+    { "name": "lock_small", "src": "graphics/lock_small.png", "use": "locked skill tile" },
+    { "name": "familiar_dialog_teleport", "src": "graphics/familiar_dialog_teleport.png", "use": "the art inside the hub's Teleport cloud (ImgMenuTeleport.as 25-37)" }
   ],
   "reuse": [
     { "name": "imagination_button", "path": "assets/imagination/ui/imagination_button.png", "src": "graphics/imagination_button.png" },
