@@ -671,3 +671,92 @@
 :root[data-ui="classic"] #game-root .street-nameplate .street-time-divider,
 :root[data-ui="classic"] #game-root .street-nameplate .dametime-clock,
 :root[data-ui="classic"] #game-root .street-nameplate > :not(#street-name) { display: none; }
+
+/* == The right column (classic-spec spec §7): the Social drawer (js/ui/social-drawer.js) as the 2012
+   contact strip and chat column, restyled in place, so its tabs, log, input history, "/" and every
+   feature line work as in Modern. */
+/* The contact strip: the drawer's rail, on the page colour, a row per chat with its unread count
+   (ContactList.as 33-136; unread #c71700). The expand control only matters as the rail. */
+:root[data-ui="classic"] .social-drawer .social-rail {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: calc(4 * var(--cu)) 0 0;
+}
+:root[data-ui="classic"] .social-drawer .social-rail-btn {
+  width: 100%;
+  height: calc(26 * var(--cu));
+  justify-items: start;
+  padding-left: calc(8 * var(--cu));
+  border-radius: 0;
+  color: var(--c-classic-link);
+}
+:root[data-ui="classic"] .social-drawer .social-rail-btn svg { width: calc(14 * var(--cu)); height: calc(14 * var(--cu)); }
+:root[data-ui="classic"] .social-drawer .social-rail-btn:hover { background: color-mix(in srgb, var(--c-classic-panel) 60%, transparent); color: var(--c-classic-contact-hover); }
+:root[data-ui="classic"] .social-drawer .social-badge {
+  top: calc(4 * var(--cu));
+  right: calc(4 * var(--cu));
+  background: var(--c-classic-unread);
+  color: var(--c-classic-panel);
+  box-shadow: 0 0 0 1px var(--c-classic-panel);
+  font: 800 var(--fs-classic-count)/var(--lh-none) var(--font-classic-body);
+}
+:root[data-ui="classic"] .social-drawer .social-sep { width: auto; margin: calc(3 * var(--cu)) calc(8 * var(--cu)); background: var(--c-classic-title-rule); }
+@media (min-width: 1313px) {
+  :root[data-ui="classic"] .social-drawer [data-social-expand],
+  :root[data-ui="classic"] .social-drawer [data-social-expand] + .social-sep,
+  :root[data-ui="classic"] .social-drawer [data-social-collapse] { display: none !important; }
+}
+/* The pane (ChatArea.as): a 16 px title over a #c8d6dc rule, Helvetica 12 lines, 12 px in. */
+:root[data-ui="classic"] .social-drawer .social-body { color: var(--c-classic-text); font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body); }
+:root[data-ui="classic"] .social-drawer .social-head {
+  margin: 0 calc(12 * var(--cu));
+  padding: calc(12 * var(--cu)) 0 calc(4 * var(--cu));
+  border-bottom: 1px solid var(--c-classic-title-rule);
+}
+:root[data-ui="classic"] .social-drawer .social-title { color: var(--c-classic-title); font: 800 var(--fs-classic-pane)/var(--lh-tight) var(--font-classic-title); }
+/* Solo's pane is the client's "Local Chat / Activity" (its Activity log and its chat input). */
+:root[data-ui="classic"] .social-drawer[data-social-mode="solo"] .social-title { font-size: 0; }
+:root[data-ui="classic"] .social-drawer[data-social-mode="solo"] .social-title::before { content: "Local Chat / Activity"; font-size: var(--fs-classic-pane); }
+:root[data-ui="classic"] .social-drawer .social-tabs { margin: 0 calc(12 * var(--cu)); padding: 0; border-bottom: 1px solid var(--c-classic-title-rule); }
+:root[data-ui="classic"] .social-drawer .social-tab { color: var(--c-classic-tab-off); font: 800 var(--fs-classic-body)/var(--lh-normal) var(--font-classic-title); border-radius: 0; }
+:root[data-ui="classic"] .social-drawer .social-tab[aria-selected="true"] { color: var(--c-classic-title); box-shadow: inset 0 -2px 0 var(--c-classic-link); }
+:root[data-ui="classic"] .social-drawer .social-log {
+  padding: calc(6 * var(--cu)) calc(12 * var(--cu));
+  gap: calc(4 * var(--cu));
+  scrollbar-color: var(--c-classic-scroll-border) var(--c-classic-scroll-track);
+}
+:root[data-ui="classic"] .social-drawer .social-time { color: var(--c-classic-offline); font: var(--fs-classic-count)/var(--lh-normal) var(--font-classic-body); }
+/* An Activity line: the client's thin bar at its left, no card (ChatElement, spec §7d). */
+:root[data-ui="classic"] .social-drawer .social-act {
+  padding: 0 0 0 calc(6 * var(--cu));
+  border: 0;
+  border-left: 2px solid var(--c-classic-slug-loss);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+:root[data-ui="classic"] .social-drawer .social-act[data-kind="gain"] { border-left-color: var(--c-classic-slug-gain); }
+:root[data-ui="classic"] .social-drawer .social-act-when time { display: none; }
+:root[data-ui="classic"] .social-drawer .social-count { background: none; color: var(--c-classic-offline); }
+:root[data-ui="classic"] .social-drawer .social-msg b { color: var(--c-classic-link); }
+:root[data-ui="classic"] .social-drawer .social-msg.is-mine b { color: var(--c-classic-you); }
+:root[data-ui="classic"] .social-drawer .social-empty,
+:root[data-ui="classic"] .social-drawer .social-note { color: var(--c-classic-offline); }
+/* The input: 240 x 25, #e7ecee with a #b3c4cd border, #f5f5ce on hover and focus (InputField.as 106-134);
+   Enter sends, so the send button goes. */
+:root[data-ui="classic"] .social-drawer .social-compose { padding: calc(8 * var(--cu)) calc(12 * var(--cu)) calc(12 * var(--cu)); border: 0; }
+:root[data-ui="classic"] .social-drawer #local-chat-input {
+  width: 100%;
+  height: calc(25 * var(--cu));
+  padding: 0 calc(5 * var(--cu));
+  border: 1px solid var(--c-classic-input-border);
+  border-radius: 0;
+  background: var(--c-classic-input);
+  color: var(--c-classic-text);
+  font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body);
+}
+:root[data-ui="classic"] .social-drawer #local-chat-input:is(:hover, :focus) { border-color: var(--c-classic-input-hi-border); background: var(--c-classic-input-hi); }
+:root[data-ui="classic"] .social-drawer #local-chat-input:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] .social-drawer #local-chat-form .social-send { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); }
+:root[data-ui="classic"] .social-drawer :focus-visible { outline: 2px solid var(--c-classic-focus); }
