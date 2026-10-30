@@ -78,6 +78,8 @@ export function hotkeySections({ keyring = false } = {}) {
         ['Player Menu', [['Z']]],
         ['Imagination Menu', [['X']]],
         ['Quest Log', [['Q']]],
+        // Phase 2: the modern top bar's Make button (N was free; C opens it too).
+        ['Make', [['N']]],
         ['Skills', [['K'], ['Shift', 'S']]],
         ['Upgrades', [['U']]],
         ['Looks', [['L'], ['Shift', 'L']]],

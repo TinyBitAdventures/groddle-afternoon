@@ -8949,3 +8949,399 @@ html:not(.stage-pinned) #game-root > canvas[role="application"] {
 .vitals-snack b { color: var(--c-green-48); white-space: nowrap; }
 .vitals-menu[data-stat="mood"] .vitals-snack b { color: var(--c-umber-46); }
 .vitals-menu-empty { margin: 0.2rem var(--sp-1) 0.3rem; color: var(--text-hud); line-height: var(--lh-normal); }
+
+/* —— PAPER —— (phase 2, Warm paper: the modern top bar, js/ui/topbar.js; the HUD mock is the spec)
+   Three floating pills over the world, 44 px tall (--hud-h), 4 px from the top and --hud-inset from
+   the sides: the stats (rings, iMG, currants, favor, quoins), the street nameplate (#street-nameplate
+   in #game-root) and the actions (Quests, Make, Map, Imagination, Mail, Sound, Menu). The old
+   full-width bar is gone in this skin; every rule is under [data-ui="modern"] so a Classic skin can
+   bring its own. #game-root takes the whole window under the pills. */
+[data-ui="modern"] #wrap { position: relative; }
+[data-ui="modern"] .glitch-chrome { padding-top: 0; }
+[data-ui="modern"] header.top-bar,
+html:not(.stage-pinned)[data-ui="modern"] #wrap > .top-bar {
+  position: absolute;
+  z-index: var(--z-hud);
+  top: var(--space-1);
+  left: var(--hud-inset);
+  right: var(--hud-inset);
+  height: var(--hud-h);
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  pointer-events: none;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--fs-m);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-tight);
+}
+html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + var(--hud-inset)); right: calc(var(--sp-5) + var(--hud-inset)); }
+[data-ui="modern"] .top-bar [hidden] { display: none !important; }
+[data-ui="modern"] .top-bar .hud-pill {
+  pointer-events: auto;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  min-width: 0;
+  height: var(--hud-h);
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 2px;
+  padding: 0 var(--space-1);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-2);
+}
+[data-ui="modern"] .top-bar .hud-stats { padding-left: 3px; }
+[data-ui="modern"] .top-bar .hud-actions { padding-right: 3px; }
+/* The clusters stay for the tour's hide rules (newxp-feature.js) but draw no box. */
+[data-ui="modern"] .top-bar .hud-cluster,
+[data-ui="modern"] .top-bar .metabolics-cluster,
+[data-ui="modern"] .top-bar .meta-vitals { display: contents; }
+[data-ui="modern"] .top-bar .hud-div { flex: none; width: 1px; height: 22px; margin: 0 var(--space-1); background: var(--border-strong); }
+[data-ui="modern"] .top-bar button { font: inherit; color: inherit; }
+[data-ui="modern"] .top-bar :focus { outline: none; }
+[data-ui="modern"] .top-bar :focus-visible,
+[data-ui="modern"] .hud-pop :focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--c-white) 85%, transparent);
+}
+
+/* Rings: energy, mood, level. The number inside, the share round it, a glyph badge. */
+[data-ui="modern"] .top-bar .ring {
+  --c: var(--accent);
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--hit);
+  height: var(--hit);
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  animation: none;
+  transition: background var(--motion-fast) var(--ease-out);
+}
+[data-ui="modern"] .top-bar .ring:hover,
+[data-ui="modern"] .top-bar .ring[aria-expanded="true"] { background: var(--surface-hover); box-shadow: none; }
+[data-ui="modern"] .top-bar .ring .level-meter {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  min-width: 0; padding: 0; margin: 0; border: 0; background: none; box-shadow: none; height: auto;
+}
+[data-ui="modern"] .top-bar .ring-svg { position: absolute; inset: 2px; width: 32px; height: 32px; transform: rotate(-90deg); }
+[data-ui="modern"] .top-bar .ring-track { fill: none; stroke: var(--track); stroke-width: 3.5; }
+[data-ui="modern"] .top-bar .ring-fill {
+  fill: none; stroke: var(--c); stroke-width: 3.5; stroke-linecap: round;
+  width: auto; height: auto; background: none; border-radius: 0;
+  transition: stroke-dasharray 500ms var(--ease-out), stroke var(--motion-med);
+}
+[data-ui="modern"] .top-bar .ring-num {
+  position: relative; min-width: 0; color: var(--text);
+  font-size: var(--fs-s); font-weight: var(--fw-heavy); letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums; line-height: var(--lh-none); text-align: center;
+}
+[data-ui="modern"] .top-bar .ring-num::before { content: none; }
+[data-ui="modern"] .top-bar .ring-glyph {
+  position: absolute; right: -3px; bottom: -3px; width: 16px; height: 16px;
+  display: grid; place-items: center; border-radius: var(--radius-round);
+  background: var(--c); color: var(--c-white); box-shadow: 0 0 0 2px var(--surface-raised);
+}
+[data-ui="modern"] .top-bar .ring-glyph svg { width: 10px; height: 10px; }
+[data-ui="modern"] .top-bar .ring[data-stat="energy"] { --c: var(--energy); }
+[data-ui="modern"] .top-bar .ring[data-stat="mood"] { --c: var(--mood); }
+[data-ui="modern"] .top-bar .ring[data-stat="level"] { --c: var(--xp); }
+/* Low and very low (js/vitals.js): amber, then red with a slow pulse; the number keeps 4.5:1
+   (--warn 5.1:1, --danger 5.3:1 on --surface); the mood face and the energy pill say it in shape and words. */
+[data-ui="modern"] .top-bar .ring[data-vital="low"] { --c: var(--warn-fill); background: transparent; box-shadow: none; animation: none; }
+[data-ui="modern"] .top-bar .ring[data-vital="low"] .ring-num { color: var(--warn); }
+[data-ui="modern"] .top-bar .ring[data-vital="critical"] { --c: var(--danger-fill); background: transparent; box-shadow: none; animation: none; }
+[data-ui="modern"] .top-bar .ring[data-vital="critical"] .ring-num { color: var(--danger); }
+[data-ui="modern"] .top-bar .ring[data-vital="critical"]::before {
+  content: ""; position: absolute; inset: -1px; border-radius: var(--radius-round);
+  animation: hud-ring-pulse 1.6s ease-out infinite;
+}
+@keyframes hud-ring-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--danger-fill) 65%, transparent); }
+  70% { box-shadow: 0 0 0 9px color-mix(in srgb, var(--danger-fill) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--danger-fill) 0%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-ui="modern"] .top-bar .ring[data-vital="critical"]::before { animation: none; box-shadow: 0 0 0 2px var(--danger-fill); }
+  [data-ui="modern"] .top-bar .ring-fill { transition: none; }
+}
+[data-ui="modern"] .top-bar .hud-lowpill {
+  flex: none; display: inline-flex; align-items: center; gap: var(--space-1);
+  height: 26px; padding: 0 10px 0 var(--space-2); margin: 0 2px;
+  border: 0; border-radius: var(--radius-pill); cursor: pointer; white-space: nowrap;
+  font-size: var(--fs-s); font-weight: var(--fw-heavy);
+  background: var(--status-warn-soft); color: var(--c-brown-44c); /* 7.2:1 */
+}
+[data-ui="modern"] .top-bar .hud-lowpill svg { width: 12px; height: 12px; }
+[data-ui="modern"] .hud-stats[data-energy="critical"] .hud-lowpill { background: var(--danger); color: var(--c-white); /* 5.7:1 */ }
+
+/* iMG, currants, favor and quoins: an icon and the number. */
+[data-ui="modern"] .top-bar .hud-cur {
+  flex: none; display: inline-flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 5px;
+  box-sizing: border-box; height: 32px; padding: 0 var(--space-2) 0 6px; margin: 0;
+  border: 0; border-radius: var(--radius-pill); background: transparent; box-shadow: none;
+  color: var(--text); font-size: var(--fs-m); font-weight: var(--fw-heavy); line-height: var(--lh-none);
+  font-variant-numeric: tabular-nums; white-space: nowrap; cursor: default;
+}
+[data-ui="modern"] .top-bar button.hud-cur,
+[data-ui="modern"] .top-bar .hud-cur.img-stat-link { cursor: pointer; }
+[data-ui="modern"] .top-bar .hud-cur:hover { background: var(--surface-hover); filter: none; }
+[data-ui="modern"] .top-bar .hud-cur strong { color: var(--text); font-size: var(--fs-m); font-weight: var(--fw-heavy); }
+[data-ui="modern"] .top-bar .hud-cur img { width: auto; height: 20px; }
+[data-ui="modern"] .top-bar .hud-img img { height: 18px; }
+[data-ui="modern"] .top-bar .quoin-stat { display: inline-flex; column-gap: 0; }
+[data-ui="modern"] .top-bar .quoin-stat > span { color: var(--imagination); font-size: var(--fs-l); }
+[data-ui="modern"] .top-bar .quoin-stat small { margin-left: 3px; color: var(--text-muted); font-size: var(--fs-xs); }
+[data-ui="modern"] .top-bar .quoin-stat.at-limit { background: var(--accent-soft); color: var(--accent); }
+[data-ui="modern"] .top-bar .quoin-stat.at-limit > span,
+[data-ui="modern"] .top-bar .quoin-stat.at-limit small,
+[data-ui="modern"] .top-bar .quoin-stat.at-limit strong { color: var(--accent); }
+
+/* The actions: icon buttons with key caps, the Mail badge. */
+[data-ui="modern"] .top-bar .top-actions { gap: 2px; flex-wrap: nowrap; }
+[data-ui="modern"] .top-bar .hud-ibtn,
+[data-ui="modern"] .top-bar .top-actions .bug-btn {
+  position: relative; flex: none; display: inline-grid; place-items: center;
+  width: var(--hit); height: var(--hit); padding: 0; margin: 0;
+  border: 0; border-radius: var(--radius-m); background: transparent; box-shadow: none;
+  color: var(--text); cursor: pointer;
+  transition: background var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+}
+[data-ui="modern"] .top-bar .hud-ibtn:hover,
+[data-ui="modern"] .top-bar .top-actions .bug-btn:hover { background: var(--surface-hover); }
+[data-ui="modern"] .top-bar .hud-ibtn:active { transform: scale(0.94); }
+[data-ui="modern"] .top-bar .hud-ibtn[aria-pressed="true"],
+[data-ui="modern"] .top-bar .hud-ibtn[aria-expanded="true"] { background: var(--accent-soft); color: var(--accent); }
+[data-ui="modern"] .top-bar .hud-ibtn svg { width: 20px; height: 20px; }
+[data-ui="modern"] .top-bar .hud-ibtn img { width: 26px; height: auto; }
+[data-ui="modern"] .top-bar .top-actions .bug-btn img { width: 21px; height: auto; }
+[data-ui="modern"] .top-bar .kcap,
+[data-ui="modern"] .hud-tip .kcap {
+  display: inline-grid; place-items: center; box-sizing: border-box; min-width: 16px; height: 16px; padding: 0 3px;
+  font-size: var(--fs-xs); font-weight: var(--fw-heavy); line-height: var(--lh-none); letter-spacing: 0.02em;
+  color: var(--text-muted); background: var(--surface-sunken); border: 1px solid var(--border-strong); border-radius: var(--radius-xs);
+}
+[data-ui="modern"] .top-bar .hud-ibtn .kcap { position: absolute; right: -2px; bottom: -2px; transform: scale(0.92); pointer-events: none; }
+[data-ui="modern"] .top-bar .hud-badge,
+[data-ui="modern"] .top-bar .quest-btn-count {
+  position: absolute; top: -4px; right: -4px; display: inline-grid; place-items: center; box-sizing: border-box;
+  min-width: 18px; height: 18px; padding: 0 5px; margin: 0; border: 0; border-radius: var(--radius-pill);
+  font-size: var(--fs-xs); font-weight: var(--fw-heavy); line-height: var(--lh-none);
+  color: var(--c-white); background: var(--danger); box-shadow: 0 0 0 2px var(--surface-raised);
+}
+[data-ui="modern"] .top-bar .quest-added-notice {
+  right: 0; top: calc(100% + 10px); transform: none; padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill); background: var(--surface-raised); box-shadow: var(--shadow-2);
+  color: var(--danger); text-shadow: none; font-size: var(--fs-s);
+}
+[data-ui="modern"] .top-bar #sound-btn .sound-x,
+[data-ui="modern"] .top-bar #sound-btn[data-muted="true"] .sound-waves { display: none; }
+[data-ui="modern"] .top-bar #sound-btn[data-muted="true"] .sound-x { display: inline; }
+[data-ui="modern"] .top-bar #study-chip {
+  flex: none; height: 28px; padding: 0 var(--space-2); margin: 0 2px; border: 0; border-radius: var(--radius-pill);
+  background: var(--accent-soft); color: var(--accent); font-size: var(--fs-s); font-weight: var(--fw-heavy); white-space: nowrap; cursor: pointer;
+}
+[data-ui="modern"] .top-bar .more-menu { position: static; display: contents; }
+[data-ui="modern"] .top-bar .more-btn::after { content: none; }
+[data-ui="modern"] .top-bar .more-menu:has(.mail-unread-badge:not([hidden])) .more-btn::after { content: none; }
+
+/* Popovers: the Menu, Sound, the player card and "Something to eat", under the bar. */
+[data-ui="modern"] .top-bar .more-list,
+[data-ui="modern"] .hud-pop,
+[data-ui="modern"] .top-bar .player-menu,
+[data-ui="modern"] .top-bar .vitals-menu {
+  position: absolute; top: calc(100% + 8px); z-index: calc(var(--z-notice) + 10);
+  box-sizing: border-box; padding: var(--space-2);
+  background: var(--surface-raised); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--radius-l); box-shadow: var(--shadow-3);
+  font-size: var(--fs-m); pointer-events: auto;
+  transform-origin: top; animation: hud-pop-in var(--motion-med) var(--ease-out);
+}
+@keyframes hud-pop-in { from { opacity: 0; transform: translateY(-4px) scale(0.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  [data-ui="modern"] .top-bar .more-list,
+  [data-ui="modern"] .hud-pop,
+  [data-ui="modern"] .top-bar .player-menu,
+  [data-ui="modern"] .top-bar .vitals-menu { animation: none; }
+}
+[data-ui="modern"] .top-bar .more-list {
+  right: 0; left: auto; width: 420px; max-width: calc(100vw - 2 * var(--hud-inset));
+  display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--space-2); gap: 0 var(--space-2); min-width: 0;
+}
+[data-ui="modern"] .top-bar .more-list[hidden],
+[data-ui="modern"] .hud-pop[hidden],
+[data-ui="modern"] .top-bar .player-menu[hidden],
+[data-ui="modern"] .top-bar .vitals-menu[hidden] { display: none; }
+[data-ui="modern"] .more-list .menu-group { display: flex; flex-direction: column; padding: var(--space-1) 0; min-width: 0; }
+[data-ui="modern"] .more-list .menu-group[hidden] { display: none; }
+[data-ui="modern"] .more-list .menu-group-label,
+[data-ui="modern"] .vitals-menu-head span {
+  padding: var(--space-1) var(--space-2) 2px; color: var(--text-muted);
+  font-size: var(--fs-s); font-weight: var(--fw-heavy); text-transform: uppercase; letter-spacing: 0.06em;
+}
+[data-ui="modern"] .top-bar .more-list .chrome-btn {
+  display: flex; align-items: center; gap: var(--space-2); width: 100%; min-height: 32px; padding: 0 var(--space-2);
+  border: 0; border-radius: var(--radius-s); background: transparent; box-shadow: none;
+  color: var(--text); font-size: var(--fs-m); font-weight: var(--fw-bold); text-align: left; cursor: pointer;
+}
+[data-ui="modern"] .top-bar .more-list .chrome-btn:hover,
+[data-ui="modern"] .top-bar .more-list .chrome-btn:focus-visible { background: var(--surface-hover); border-color: transparent; }
+[data-ui="modern"] .top-bar .more-list .chrome-btn.is-studying { color: var(--accent); }
+[data-ui="modern"] .top-bar .more-list .feat-chrome-btn.is-active { color: var(--accent); background: transparent; }
+/* Key caps from data-key (js/ui/topbar.js MENU_ROWS), drawn so the rows' own text never changes. */
+[data-ui="modern"] .more-list [data-key]::after,
+[data-ui="modern"] .more-list [data-key-mod]::before {
+  display: inline-grid; place-items: center; box-sizing: border-box; min-width: 16px; height: 16px; padding: 0 3px;
+  font-size: var(--fs-xs); font-weight: var(--fw-heavy); line-height: var(--lh-none);
+  color: var(--text-muted); background: var(--surface-sunken); border: 1px solid var(--border-strong); border-radius: var(--radius-xs);
+}
+[data-ui="modern"] .more-list [data-key]::after { content: attr(data-key) / ""; order: 3; margin-left: auto; }
+[data-ui="modern"] .more-list [data-key-mod]::before { content: attr(data-key-mod) / ""; order: 2; margin-left: auto; }
+[data-ui="modern"] .more-list [data-key-mod]::after { margin-left: 0; }
+
+[data-ui="modern"] .top-bar .player-menu { left: 0; width: 260px; }
+[data-ui="modern"] .top-bar .player-menu .pm-level-label,
+[data-ui="modern"] .top-bar .player-menu .pm-stats dt { color: var(--text-muted); }
+[data-ui="modern"] .top-bar .player-menu .pm-level { color: var(--xp); }
+[data-ui="modern"] .top-bar .player-menu .pm-stats dd b { color: var(--text); }
+[data-ui="modern"] .top-bar .player-menu .pm-stats dd small { color: var(--text-muted); }
+[data-ui="modern"] .top-bar .player-menu .pm-buttons { border-top-color: var(--border); }
+[data-ui="modern"] .top-bar .player-menu .chrome-btn {
+  border: 0; border-radius: var(--radius-s); background: transparent; color: var(--text);
+  min-height: 32px; font-size: var(--fs-m); font-weight: var(--fw-bold);
+}
+[data-ui="modern"] .top-bar .player-menu .chrome-btn:hover { background: var(--surface-hover); }
+
+/* "Something to eat" (game.js installVitalsMenu), numbered 1 to 9 like the mock's popover. */
+[data-ui="modern"] .top-bar .vitals-menu { width: 280px; counter-reset: snack; }
+[data-ui="modern"] .vitals-menu-head { align-items: baseline; margin: var(--space-1) var(--space-2) var(--space-1); }
+[data-ui="modern"] .vitals-menu-head strong { font-size: var(--fs-m); font-weight: var(--fw-heavy); }
+[data-ui="modern"] .vitals-menu-head span { padding: 0; text-transform: none; letter-spacing: 0; }
+[data-ui="modern"] .top-bar .vitals-snack {
+  counter-increment: snack;
+  grid-template-columns: 16px 22px 1fr auto; gap: var(--space-2);
+  min-height: 32px; padding: 0 var(--space-2); margin: 0;
+  border: 0; border-radius: var(--radius-s); background: transparent;
+  font-size: var(--fs-m); font-weight: var(--fw-bold); color: var(--text);
+}
+[data-ui="modern"] .top-bar .vitals-snack::before {
+  content: counter(snack) / ""; display: inline-grid; place-items: center; box-sizing: border-box; width: 16px; height: 16px;
+  font-size: var(--fs-xs); font-weight: var(--fw-heavy); line-height: var(--lh-none);
+  color: var(--text-muted); background: var(--surface-sunken); border: 1px solid var(--border-strong); border-radius: var(--radius-xs);
+}
+[data-ui="modern"] .top-bar .vitals-snack:hover { background: var(--surface-hover); border-color: transparent; }
+[data-ui="modern"] .top-bar .vitals-snack:focus-visible { background: var(--surface-hover); }
+[data-ui="modern"] .top-bar .vitals-snack img { width: 22px; height: 22px; }
+[data-ui="modern"] .top-bar .vitals-snack small { color: var(--text-muted); font-size: inherit; font-weight: var(--fw-regular); }
+[data-ui="modern"] .top-bar .vitals-snack b,
+[data-ui="modern"] .top-bar .vitals-menu[data-stat="mood"] .vitals-snack b { color: var(--good); font-weight: var(--fw-heavy); }
+[data-ui="modern"] .top-bar .vitals-menu-empty { color: var(--text-muted); margin: var(--space-1) var(--space-2); }
+
+/* Sound: Effects, Music, Mute. */
+[data-ui="modern"] .sound-pop { width: 260px; }
+[data-ui="modern"] .hud-pop-title { margin: var(--space-1) var(--space-2) var(--space-2); font-size: var(--fs-m); font-weight: var(--fw-heavy); }
+[data-ui="modern"] .hud-slider {
+  display: grid; grid-template-columns: 64px 1fr 30px; align-items: center; gap: var(--space-2);
+  padding: var(--space-1) var(--space-2); font-size: var(--fs-m); font-weight: var(--fw-bold);
+}
+[data-ui="modern"] .hud-slider input { width: 100%; height: 24px; margin: 0; accent-color: var(--accent); }
+[data-ui="modern"] .hud-slider output { color: var(--text-muted); text-align: right; font-variant-numeric: tabular-nums; }
+[data-ui="modern"] .top-bar .hud-mute {
+  display: flex; align-items: center; justify-content: flex-start; gap: var(--space-2);
+  width: 100%; min-height: 32px; margin-top: var(--space-1); padding: 0 var(--space-2);
+  border: 0; border-top: 1px solid var(--border); border-radius: 0 0 var(--radius-s) var(--radius-s);
+  background: transparent; color: var(--text); font-size: var(--fs-m); font-weight: var(--fw-bold); cursor: pointer;
+}
+[data-ui="modern"] .top-bar .hud-mute:hover { background: var(--surface-hover); }
+[data-ui="modern"] .top-bar .hud-mute[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+
+/* The tooltip (js/ui/topbar.js): words, a second line, key caps. */
+[data-ui="modern"] .hud-tip {
+  position: fixed; z-index: calc(var(--z-notice) + 20); pointer-events: none;
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: 6px 10px; border-radius: var(--radius-m);
+  background: var(--surface-tip); color: var(--text-tip); box-shadow: var(--shadow-2);
+  font-family: var(--font-ui); font-size: var(--fs-s); font-weight: var(--fw-bold); line-height: var(--lh-tight); white-space: nowrap;
+  opacity: 0; transform: translateY(2px); transition: opacity var(--motion-fast), transform var(--motion-fast);
+}
+[data-ui="modern"] .hud-tip[hidden] { display: none; }
+[data-ui="modern"] .hud-tip.is-on { opacity: 1; transform: none; }
+[data-ui="modern"] .hud-tip .hud-tip-sub { color: var(--text-tip-muted); font-weight: var(--fw-regular); }
+[data-ui="modern"] .hud-tip .kcap { background: color-mix(in srgb, var(--c-white) 14%, transparent); color: var(--c-white); border-color: color-mix(in srgb, var(--c-white) 30%, transparent); }
+@media (prefers-reduced-motion: reduce) { [data-ui="modern"] .hud-tip { transition: none; transform: none; } }
+
+/* The centre pill: the street nameplate, between the two pills (their widths from topbar.js). */
+[data-ui="modern"] .street-nameplate {
+  top: var(--space-1);
+  box-sizing: border-box;
+  height: var(--hud-h);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: var(--plate-room, calc(100% - 2 * var(--hud-inset)));
+  padding: 0 var(--space-4);
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-2);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--fs-m);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-tight);
+  white-space: nowrap;
+}
+/* Placed by js/ui/topbar.js: centred on the window unless a pill is in the way. */
+[data-ui="modern"] .street-nameplate.is-placed { left: var(--plate-x); transform: none; }
+[data-ui="modern"] .street-nameplate #street-name { flex: 0 1 auto; min-width: 2em; overflow: hidden; text-overflow: ellipsis; }
+[data-ui="modern"] .street-nameplate .street-name-street { font-weight: var(--fw-heavy); }
+[data-ui="modern"] .street-nameplate .street-time-divider { margin: 0; color: var(--text-muted); }
+[data-ui="modern"] .street-nameplate .dametime-clock { color: var(--text); font-size: var(--fs-m); }
+[data-ui="modern"] .street-nameplate .season-chip { margin-left: 0; flex: none; }
+@media (max-width: 1100px) {
+  [data-ui="modern"] .street-nameplate .street-name-hub { display: none; }
+  [data-ui="modern"] .top-bar .hud-favor,
+  [data-ui="modern"] .top-bar .quoin-stat { display: none; }
+}
+/* Under the pills: the HUD that sat at the top of #game-root starts below the band
+   (the buff strip, and the side panels: Quests, Badges, Feat, Skills, Buffs, Vendor). */
+[data-ui="modern"] #buff-strip { top: calc(var(--hud-h) + var(--space-3)); left: var(--hud-inset); }
+[data-ui="modern"] #game-root .side-panel { top: calc(var(--hud-h) + var(--space-3)); }
+[data-ui="modern"] #game-root .hog-haul-hud,
+[data-ui="modern"] #game-root .play-context { top: calc(var(--hud-h) + var(--space-3)); }
+[data-ui="modern"] #game-root .route-gps { top: calc(var(--hud-h) + var(--space-3)); right: var(--hud-inset); }
+@media (max-width: 1100px) {
+  [data-ui="modern"] .street-nameplate .season-chip span { display: none; }
+  [data-ui="modern"] .street-nameplate .season-chip { padding-right: 0.2rem; }
+}
+/* A narrow window: the less-used chips go, and the nameplate drops under the pills. */
+@media (max-width: 760px) {
+  [data-ui="modern"] .top-bar .hud-cur.currants,
+  [data-ui="modern"] .top-bar #imagination-btn,
+  [data-ui="modern"] .top-bar #mail-btn,
+  [data-ui="modern"] .top-bar .hud-div { display: none; }
+  [data-ui="modern"] .street-nameplate,
+  [data-ui="modern"] .street-nameplate.is-placed { top: calc(var(--hud-h) + var(--space-2)); left: 50%; transform: translateX(-50%); max-width: calc(100% - 2 * var(--hud-inset)); }
+  [data-ui="modern"] #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4)); }
+}
+/* —— end PAPER —— */

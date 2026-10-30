@@ -67,7 +67,10 @@ test('vitalSnacks: ordinary Eat and Drink that raise the stat, most first', () =
 test('game.js draws the states and wires the click to the pack Eat', () => {
   const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
   assert.match(game, /from '\.\/js\/vitals\.js\?v=g458-\d+'/);
-  assert.match(game, /pill\.dataset\.vital = level;/);
+  // Phase 2: the top bar's rings carry the state (js/ui/topbar.js drawVital).
+  const topbar = fs.readFileSync(path.join(root, 'public/js/ui/topbar.js'), 'utf8');
+  assert.match(topbar, /pill\.dataset\.vital = r\.level;/);
+  assert.match(topbar, /label: vitalTitle\(stat, text, level\)/);
   assert.match(game, /function installVitalsMenu\(\)/);
   assert.match(game, /installVitalsMenu\(\);/);
   assert.match(game, /vitalSnacks\(\{ inv, stat, useInfoFor: getPackUseInfo \}\)/);
@@ -76,19 +79,26 @@ test('game.js draws the states and wires the click to the pack Eat', () => {
 
 test('style.css: amber, red with a pulse, no pulse under reduced motion', () => {
   const css = resolveTokens(fs.readFileSync(path.join(root, 'public/style.css'), 'utf8'));
+  // The old bar's states stay for a Classic skin; the modern rings (PAPER block) carry them now.
   const block = css.slice(css.indexOf('/* ===== VITALS (g458'));
   assert.ok(block.length > 100, 'the VITALS block');
   assert.match(block, /\.meta-pill\[data-vital="low"\] \{/);
   assert.match(block, /\.meta-pill\[data-vital="critical"\] \{[^}]*animation: vital-pulse/);
   assert.match(block, /@media \(prefers-reduced-motion: reduce\) \{ \.meta-pill\[data-vital="critical"\] \{ animation: none; \} \}/);
-  // Readable numbers: 4.5:1 or better on their backgrounds.
+  const paper = css.slice(css.indexOf('(phase 2, Warm paper: the modern top bar'));
+  assert.match(paper, /\.ring\[data-vital="low"\] \{ --c: #f2a31b;/);
+  assert.match(paper, /\.ring\[data-vital="critical"\]::before \{[^}]*animation: hud-ring-pulse/);
+  assert.match(paper, /@media \(prefers-reduced-motion: reduce\) \{\n  \[data-ui="modern"\] \.top-bar \.ring\[data-vital="critical"\]::before \{ animation: none;/);
+  // Readable numbers and pill words: 4.5:1 or better on their backgrounds.
   const lum = (hex) => {
     const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
     return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
   };
   const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
-  for (const [fg, bg] of [['#4b5b64', '#f6fbfd'], ['#7a4100', '#fff1d6'], ['#9b1c1f', '#ffe3e1']]) {
-    assert.ok(block.includes(fg), `${fg} in the block`);
+  const surface = '#fbf5ea';
+  assert.match(paper, /\.ring\[data-vital="low"\] \.ring-num \{ color: #9a5800; \}/);
+  assert.match(paper, /\.ring\[data-vital="critical"\] \.ring-num \{ color: #bf3127; \}/);
+  for (const [fg, bg] of [['#33241a', surface], ['#9a5800', surface], ['#bf3127', surface], ['#7a4300', '#fff1d6'], ['#ffffff', '#bf3127']]) {
     assert.ok(ratio(fg, bg) >= 4.5, `${fg} on ${bg}: ${ratio(fg, bg).toFixed(2)}`);
   }
   const html = fs.readFileSync(path.join(root, 'public/play/index.html'), 'utf8');

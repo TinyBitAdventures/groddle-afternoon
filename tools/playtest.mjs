@@ -451,12 +451,16 @@ async function exercisePanels(t, label = '') {
   }
   // Mute toggles its own (icon button) label.
   t.step = `mute${label}`;
+  // The modern bar keeps Mute in the Sound popover (js/ui/topbar.js): open it first.
+  const soundHidden = await t.page.evaluate(() => document.getElementById('sound-pop')?.hidden === true).catch(() => false);
+  if (soundHidden) { await t.page.click('#sound-btn').catch(() => {}); await t.wait(150); }
   const before = await t.page.getAttribute('#mute-btn', 'aria-label').catch(() => '');
   await t.page.click('#mute-btn', { timeout: 2000 }).catch((e) => t.issue('ui', `Mute click failed: ${e.message.split('\n')[0]}`));
   await t.wait(300);
   const after = await t.page.getAttribute('#mute-btn', 'aria-label').catch(() => '');
   if (before === after) t.issue('ui', `Mute label did not change (${before})`);
   await t.page.click('#mute-btn', { timeout: 2000 }).catch(() => {});
+  if (soundHidden) await t.page.keyboard.press('Escape').catch(() => {});
 }
 
 /** E-menu loop on the nearest matching target: returns what happened. */

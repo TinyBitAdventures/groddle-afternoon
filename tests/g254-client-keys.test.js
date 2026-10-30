@@ -27,7 +27,7 @@ import {
   hotkeyText,
   isHotkeySheetRelease,
   isPlainKey,
-} from '../public/js/client-hotkeys.js?v=g367-1';
+} from '../public/js/client-hotkeys.js?v=g465-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(here, '../public');
@@ -258,7 +258,8 @@ describe('G254: game.js wiring', () => {
     assert.match(html, /<kbd>M<\/kbd> or <kbd>G<\/kbd> map ·/);
     assert.match(html, /<kbd>Z<\/kbd> player menu ·/);
     assert.match(html, /hold <kbd>\?<\/kbd> for every key/);
-    assert.match(html, /title="Map \(M or G\)">Map</);
+    // The modern bar's Map button: its key cap and tooltip (js/ui/topbar.js).
+    assert.match(html, /id="map-btn"[^>]*data-sub="G opens it too" data-key="M" aria-label="Map \(M or G\)"/);
   });
 });
 

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-2';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-327';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-328';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g463-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g463-1';
@@ -653,7 +653,7 @@ import {
 } from './js/movement.js?v=movement-6';
 import { renderResolution, RESOLUTION_STEP } from './js/render-density.js';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
-import { vitalLevel, vitalMenuEmpty, vitalMenuHeading, vitalSnacks, vitalTitle } from './js/vitals.js?v=g458-2';
+import { vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=g458-2';
 import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap } from './js/location-view.js?v=g458-1';
 import {
   levelInfoForXp,
@@ -849,7 +849,8 @@ import {
 import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from './js/metabolics.js';
 import { installHiresIcons } from './js/icon-hires.js?v=g446-4';
 import { installHiresDecos } from './js/deco-hires.js?v=g457-3';
-import { loadMutedPreference, saveMutedPreference } from './js/audio-pref.js';
+import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=g465-1';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=g465-1';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=g464-2';
 import { denseSprite } from './js/sprite-dense.js?v=g430-1';
@@ -857,7 +858,7 @@ import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from './js/notify.js?v=g459-1';
 import { mountNotifyView } from './js/notify-view.js?v=g459-1';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g367-1';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g465-1';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=g432-1';
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=g463-2';
@@ -1483,9 +1484,16 @@ function installVitalsMenu() {
   menu.addEventListener('keydown', (e) => {
     // The menu's own keys stay out of the game (Space jumps, Enter runs verbs).
     if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
+    // 1 to 9 eat the row with that number (the HUD mock's popover keys), never Say Hi (5).
+    if (/^[1-9]$/.test(e.key) && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      const row = menu.querySelectorAll('[data-vital-use]')[Number(e.key) - 1];
+      e.stopPropagation();
+      e.preventDefault();
+      row?.click();
+    }
   });
   document.addEventListener('pointerdown', (e) => {
-    if (!menu.hidden && !e.target.closest('#vitals-menu, .meta-pill.energy, .meta-pill.mood')) close();
+    if (!menu.hidden && !e.target.closest('#vitals-menu, .meta-pill.energy, .meta-pill.mood, #low-energy-btn')) close();
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !menu.hidden) close(true);
@@ -1504,7 +1512,8 @@ function installPlayerMenu() {
   };
   const toggle = () => setOpen(menu.hidden);
   btn.addEventListener('click', toggle);
-  meter?.addEventListener('click', toggle);
+  // The modern bar's level ring is the button itself (its meter inside): one toggle.
+  if (meter && !btn.contains(meter)) meter.addEventListener('click', toggle);
   menu.addEventListener('click', (e) => {
     if (e.target.closest('button')) setOpen(false);
   });
@@ -4450,14 +4459,11 @@ function updateHud() {
   const levelMeter = document.getElementById('level-meter');
   if (levelEl) levelEl.textContent = String(levelInfo.level);
   if (xpEl) xpEl.textContent = formatLevelProgress(levelInfo);
-  if (levelBar) levelBar.style.width = `${Math.round(levelInfo.progress * 100)}%`;
+  if (levelBar && !levelBar.closest('svg')) levelBar.style.width = `${Math.round(levelInfo.progress * 100)}%`;
   if (levelMeter) {
     const label = `Level ${levelInfo.level}. ${formatLevelProgress(levelInfo)}`;
     levelMeter.setAttribute('aria-label', label);
     levelMeter.setAttribute('aria-valuenow', String(Math.round(levelInfo.progress * 100)));
-    levelMeter.title = levelInfo.atCap
-      ? label
-      : `${label}. ${levelInfo.remaining.toLocaleString()} XP to level ${levelInfo.level + 1}.`;
   }
   const cur = String(pc.currants || 0);
   const curEl = document.getElementById('stat-currants');
@@ -4474,26 +4480,24 @@ function updateHud() {
       'aria-label',
       `${quoinState.collectedToday} of ${quoinState.dailyLimit} quoins collected today. Multiplier ${multiplier}.`
     );
-    quoinEl.title = `${quoinState.totalCollected} quoins collected total`;
+    quoinEl.dataset.sub = `${quoinState.totalCollected} collected in all`;
     quoinEl.classList.toggle('at-limit', quoinState.collectedToday >= quoinState.dailyLimit);
   }
-  setBar('bar-energy', (pc.energy / energyCap()) * 100);
-  setBar('bar-mood', (pc.mood / moodMax(pc)) * 100);
-  // The numbers beside the mood and energy bars (and on hover) in the top bar's "you" card.
-  for (const [id, label, now, max] of [['stat-mood', 'Mood', pc.mood, moodMax(pc)], ['stat-energy', 'Energy', pc.energy, energyCap()]]) {
-    const num = document.getElementById(id);
-    if (!num) continue;
-    const text = `${Math.round(Number(now) || 0)}/${Math.round(Number(max) || 0)}`;
-    if (num.textContent === text) continue;
-    num.textContent = text;
-    // g458 (js/vitals.js): amber under 20%, red with a slow pulse under 10%, said in words too.
-    const stat = label === 'Mood' ? 'mood' : 'energy';
-    const level = vitalLevel(now, max);
-    const pill = num.parentElement;
-    pill.dataset.vital = level;
-    pill.title = vitalTitle(stat, text, level);
-    pill.setAttribute('aria-label', pill.title);
-  }
+  // The top bar's rings (js/ui/topbar.js): energy and mood with their states (g458, js/vitals.js:
+  // amber under 20%, red with a slow pulse under 10%, said in words too), the level, and favor
+  // with the street's Giant.
+  const favorGiant = currentStreet ? giantForStreet(currentStreet) : null;
+  renderTopBar(document, {
+    energy: [pc.energy, energyCap()],
+    mood: [pc.mood, moodMax(pc)],
+    level: levelInfo,
+    favor: favorGiant ? {
+      name: favorGiant.name,
+      points: shrineState.favor?.[favorGiant.id] || 0,
+      target: emblemCostFor(shrineState, favorGiant.id),
+      icon: `assets/sprites/giant-icons/icon_${favorGiant.id === 'ti' ? 'tii' : favorGiant.id}.png`,
+    } : null,
+  });
   refreshVitalsMenu();
 
   // Dual-row pack: items (top) + tools (bottom), currants already set above
@@ -4861,8 +4865,8 @@ async function loadAudio() {
   audio.ctx = new (window.AudioContext || window.webkitAudioContext)();
   audio.musicGain = audio.ctx.createGain();
   audio.sfxGain = audio.ctx.createGain();
-  audio.musicGain.gain.value = 0.26;
-  audio.sfxGain.gain.value = 1;
+  audio.musicGain.gain.value = 0.26 * musicLevel();
+  audio.sfxGain.gain.value = state.muted ? 0 : sfxLevel();
   audio.musicGain.connect(audio.ctx.destination);
   audio.sfxGain.connect(audio.ctx.destination);
   // Every SFX goes through the sound board: recovered file when one exists,
@@ -5102,7 +5106,7 @@ function setAmbientForStreet(street, opts = {}) {
   src.loop = true;
   src.connect(g);
   src.start(0);
-  const targetVol = state.muted ? 0 : 0.26;
+  const targetVol = state.muted ? 0 : 0.26 * musicLevel();
   g.gain.linearRampToValueAtTime(Math.max(0.001, targetVol), now + fade);
 
   audio.music = src;
@@ -5111,7 +5115,20 @@ function setAmbientForStreet(street, opts = {}) {
   applyMute();
 }
 
+/** The Sound popover's Effects and Music levels, 0 to 100 (js/audio-pref.js; 100 is the game's own mix). */
+const audioLevels = loadAudioLevels();
+const sfxLevel = () => audioLevels.effects / 100;
+const musicLevel = () => audioLevels.music / 100;
+/** A slider moved: remember it and apply it to the playing buses at once. */
+function setAudioLevel(kind, value) {
+  if (!(kind in audioLevels)) return;
+  audioLevels[kind] = Math.max(0, Math.min(100, Math.round(Number(value) || 0)));
+  saveAudioLevel(kind, audioLevels[kind]);
+  applyMute();
+}
+
 function syncMuteButton() {
+  document.getElementById('sound-btn')?.setAttribute('data-muted', String(state.muted));
   const btn = document.getElementById('mute-btn');
   if (!btn) return;
   const label = state.muted ? 'Unmute audio' : 'Mute audio';
@@ -5126,7 +5143,7 @@ function applyMute() {
   const blockPause = Boolean(audio.musicblock && audio.musicblockPausesStreet);
   const vol = state.muted || ambientThemeId === SILENT_THEME
     ? 0
-    : blockPause ? MUSICBLOCK_PLAYBACK.streetMusicLevel : audio.musicblock ? 0.055 : 0.26;
+    : (blockPause ? MUSICBLOCK_PLAYBACK.streetMusicLevel : audio.musicblock ? 0.055 : 0.26) * musicLevel();
   // The client fades the street music out (1 s) for a Musicblock and back in (1 s) after it.
   const fadeSec = blockPause === Boolean(audio.streetPausedForBlock)
     ? 0
@@ -5144,7 +5161,7 @@ function applyMute() {
   } catch {
     audio.musicGain.gain.value = vol;
   }
-  audio.sfxGain.gain.value = state.muted ? 0 : 1;
+  audio.sfxGain.gain.value = state.muted ? 0 : sfxLevel();
   if (state.muted) {
     audio.board?.stopAll();
     stopActionSoundLoop();
@@ -19132,6 +19149,7 @@ function updateHomeChrome() {
     badge.textContent = String(unread);
     badge.hidden = unread < 1;
   }
+  renderTopBar(document, { unread });
   if (homeMailboxTarget?.sprite && !homeMailboxTarget.sprite.destroyed) {
     homeMailboxTarget.state.unread = unread;
     homeMailboxTarget.subtitle = unread
@@ -25532,7 +25550,7 @@ async function main() {
       // shiftKKeyHandler 962-978, shiftLKeyHandler 980-994), so neither closes a panel.
       if (isPlainKey(e, 'k')) closeSkillsPanel();
       if (e.key === 'y' || e.key === 'Y') closeBuffsPanel();
-      if (e.key === 'c' || e.key === 'C') closeMakePanel();
+      if (e.key === 'c' || e.key === 'C' || isPlainKey(e, 'n')) closeMakePanel();
       if (isPlainKey(e, 'l')) closeAvatarPanel();
       return;
     }
@@ -25594,6 +25612,8 @@ async function main() {
     // G226: shift+C toggles cultivation mode at home (TSMainView.as shiftCKeyHandler).
     if (e.shiftKey && (e.key === 'c' || e.key === 'C') && features.query('cultivateKey', engine)) return;
     if (e.key === 'c' || e.key === 'C') openMakePanel();
+    // Phase 2: N is Make's key on the modern top bar (C still opens it; N was free).
+    if (isPlainKey(e, 'n')) openMakePanel();
     if (e.key === 'v' || e.key === 'V') openVendor();
     if (e.key === 'l' || e.key === 'L') openAvatarPanel();
   });
@@ -26164,6 +26184,13 @@ async function main() {
   installMoreMenu();
   installPlayerMenu();
   installVitalsMenu();
+  // Phase 2 (js/ui/topbar.js): the modern bar's tooltips, Menu groups, Sound popover and pills.
+  installTopBar(document, {
+    audio: { levels: () => ({ ...audioLevels }), setLevel: setAudioLevel },
+    onImagination: () => document.getElementById('img-btn')?.click(),
+    onMail: () => { if (state.started) openMailboxPanel(); },
+    onPlayerCard: () => document.getElementById('player-menu-btn')?.click(),
+  });
   document.querySelector('.top-actions')?.addEventListener('click', () => {
     if (currentAction) cancelCurrentAction({ quiet: true });
     closePackPopover();

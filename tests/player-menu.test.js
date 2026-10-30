@@ -9,9 +9,11 @@ const game = readFileSync(join(pub, 'game.js'), 'utf8');
 
 describe('player menu (PlayerInfoUI toggleMenu)', () => {
   it('opens from your name and from the level pill', () => {
-    assert.match(html, /<button id="player-menu-btn" type="button" class="brand" aria-haspopup="true" aria-expanded="false" aria-controls="player-menu"/);
+    // Phase 2: the modern bar's level ring is the button (Z), and the Menu's Player card row opens it.
+    assert.match(html, /<button id="player-menu-btn" type="button" class="ring level-ring" data-stat="level" aria-haspopup="true" aria-expanded="false" aria-controls="player-menu"/);
+    assert.match(html, /<button id="player-card-btn" type="button" class="chrome-btn">Player card<\/button>/);
     assert.match(html, /<div id="player-menu" class="player-menu" role="dialog" aria-label="Player menu" hidden><\/div>/);
-    assert.match(game, /btn\.addEventListener\('click', toggle\);\n\s*meter\?\.addEventListener\('click', toggle\);/);
+    assert.match(game, /btn\.addEventListener\('click', toggle\);\n[^\n]*\n\s*if \(meter && !btn\.contains\(meter\)\) meter\.addEventListener\('click', toggle\);/);
     assert.match(game, /installMoreMenu\(\);\n\s*installPlayerMenu\(\);/);
   });
 

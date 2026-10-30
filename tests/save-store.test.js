@@ -30,7 +30,7 @@ import {
   savedAtOf,
   soloSaveSnapshot,
 } from '../public/js/save-store.js?v=mp2-1';
-import { AUDIO_MUTED_KEY } from '../public/js/audio-pref.js';
+import { AUDIO_MUTED_KEY } from '../public/js/audio-pref.js?v=g465-1';
 import { STORAGE_KEY as APPEARANCE_KEY, APPEARANCE_PRESETS, appearanceToJson, loadAppearance, saveAppearance } from '../public/js/character-builder.js';
 import { getGameDayKey, getLastNewDayKey, getLastNewDayTs, resetGameDayClock, setLastNewDayTs } from '../public/js/game-day.js?v=dametime-3';
 import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=g424-1';

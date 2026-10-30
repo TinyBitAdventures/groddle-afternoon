@@ -293,7 +293,7 @@ body.nx-island-map #map-panel .map-feature-card:not(.nx-map-card),body.nx-island
 @keyframes nx-map-pulse{0%,100%{stroke:var(--c-gold-88b);stroke-width:9}50%{stroke:var(--c-yellow-98b);stroke-width:13}}
 #map-panel.nx-map-progress .map-street[data-tsid="GA94UK1BH3D3FJL"] .map-seg{animation:nx-map-pulse 1s ease-in-out infinite}
 .nx-map-card{margin:0 0 var(--sp-4);padding:var(--sp-4) var(--sp-6);border-radius:var(--radius-lg);background:var(--c-cream-97);color:var(--c-umber-40);font:800 var(--fs-md) var(--font-round);text-align:center}
-body.nx-hide-actions .top-actions>:not(#mute-btn),body.nx-hide-actions .quest-tracker{visibility:hidden}
+body.nx-hide-actions .top-actions>:not(#mute-btn):not(#sound-btn),body.nx-hide-actions .quest-tracker{visibility:hidden}
 body.nx-hide-chat #local-chat-dock{visibility:hidden}
 `;
 

@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 771,
+  "commits": 772,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "Panels, cards and menus take the warm paper look: cream surfaces, brown text, a purple accent and warm shadows"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "A rainbow lets its decoded SVG frames go once it ends"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "The tutorial's chain and its click-to-pull arrow are in view, and Local chat waits for the home street"
    }
   ]
  },
- "tests": 432,
+ "tests": 433,
  "generatedAt": "2026-10-30"
 }

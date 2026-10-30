@@ -143,7 +143,8 @@ function createSession(engine, errors) {
   const btn = el('button', { id: 'bug-btn', type: 'button', class: 'chrome-btn mute-btn bug-btn', title: BUG_TEXT.tip, 'aria-label': BUG_TEXT.tip, 'data-bug-report-open': '' });
   btn.append(el('img', { src: 'assets/ui/bug_icon.png', alt: '', width: '23', height: '20' }));
   btn.addEventListener('click', () => (state === 'closed' ? open() : close()));
-  const mute = document.getElementById?.('mute-btn');
+  // The modern bar keeps it in the right pill, before Sound (Mute lives in Sound's popover there).
+  const mute = document.getElementById?.('sound-btn') || document.getElementById?.('mute-btn');
   if (mute?.parentElement) mute.parentElement.insertBefore(btn, mute);
   else document.querySelector?.('.top-actions')?.append(btn);
 

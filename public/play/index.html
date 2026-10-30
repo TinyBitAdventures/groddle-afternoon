@@ -7,7 +7,7 @@
   <base href="../" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Groddle Afternoon</title>
-    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;tools=g183-1&amp;make=g191-1&amp;rock=g211-1&amp;route=g192-1&amp;prompt=g198-1&amp;machines=g193-1&amp;skills=g367-1&amp;chooser=g206-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=ticket-1&amp;card=g249-1&amp;offers=g229-1&amp;buffs=g256-1&amp;speech=g269-1&amp;banner=g297-1&amp;pop=g332-1&amp;bags=g394-1&amp;maptp=g356-1&amp;hud2=g361-1&amp;award=g385-1&amp;wordprog=g394-1&amp;overlays=g392-1&amp;polish=g396-1&amp;hud3=g402-1&amp;questtext=g425-1&amp;eat=g423-1&amp;assetkeys=g434-1&amp;menu=g438-1&amp;summerhud=g452-1&amp;rookmuseum=g455-1&amp;notify=g459-1&amp;stage=g458-1&amp;vitals=g458-2&amp;tokens=g463-1&amp;zoverlay=g463-2&amp;nunito=g465-1&amp;paper=g465-2&amp;backdrop=g432-1" />
+    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;tools=g183-1&amp;make=g191-1&amp;rock=g211-1&amp;route=g192-1&amp;prompt=g198-1&amp;machines=g193-1&amp;skills=g367-1&amp;chooser=g206-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=ticket-1&amp;card=g249-1&amp;offers=g229-1&amp;buffs=g256-1&amp;speech=g269-1&amp;banner=g297-1&amp;pop=g332-1&amp;bags=g394-1&amp;maptp=g356-1&amp;hud2=g361-1&amp;award=g385-1&amp;wordprog=g394-1&amp;overlays=g392-1&amp;polish=g396-1&amp;hud3=g402-1&amp;questtext=g425-1&amp;eat=g423-1&amp;assetkeys=g434-1&amp;menu=g438-1&amp;summerhud=g452-1&amp;rookmuseum=g455-1&amp;notify=g459-1&amp;stage=g458-1&amp;vitals=g458-2&amp;tokens=g463-1&amp;zoverlay=g463-2&amp;nunito=g465-1&amp;paper=g465-2&amp;topbar=g465-3&amp;backdrop=g432-1" />
   <!-- The UI font, self-hosted (style.css @font-face; OFL in assets/fonts/nunito/): the roman latin file, before first paint. -->
   <link rel="preload" href="assets/fonts/nunito/nunito-roman-latin.woff2" as="font" type="font/woff2" crossorigin />
   <!-- Content keys for data and art URLs (js/data-urls.js): before every other script. -->
@@ -31,69 +31,82 @@
         </div>
       </div>
     </div>
-    <!-- Top bar: you (name, mood and energy), progress (level, iMG), wallet (currants, quoins), then tools.
-         Mood and energy sit with the name as PlayerInfoUI.as kept them with the face. -->
-    <header class="top-bar">
-      <div class="hud-cluster hud-you" data-hud-cluster="you">
-        <button id="player-menu-btn" type="button" class="brand" aria-haspopup="true" aria-expanded="false" aria-controls="player-menu" title="Your stats, skills and look (Z)">
-          <span class="brand-mark">Ur</span>
-          <span class="brand-sub">Groddle Afternoon</span>
-        </button>
-        <div class="meta-vitals">
-          <div class="meta-pill mood" title="Mood">
-            <span class="meta-ico">☺</span>
-            <span class="meta-label">Mood</span>
-            <div class="meta-ring"><div id="bar-mood" class="meta-fill"></div></div>
-            <span id="stat-mood" class="meta-num"></span>
+    <!-- Top bar (modern skin, phase 2 Warm paper; js/ui/topbar.js): three floating pills over the world.
+         Left: energy, mood and level rings, then iMG, currants, favor and quoins. Centre: the street
+         nameplate (#street-nameplate, in #game-root). Right: Quests, Make, Map, Imagination, Mail, Sound
+         and the Menu (Me, World, Social, Settings). The ids are the game's and its tests'. -->
+    <header class="top-bar" aria-label="Status and actions">
+      <div id="hud-stats" class="hud-pill hud-stats" data-energy="ok">
+        <div class="meta-vitals hud-cluster" data-hud-cluster="you">
+          <button type="button" class="ring meta-pill energy" data-stat="energy" data-tip="Energy" aria-label="Energy">
+            <svg class="ring-svg" viewBox="0 0 36 36" aria-hidden="true"><circle class="ring-track" cx="18" cy="18" r="15" /><circle id="bar-energy" class="ring-fill meta-fill" cx="18" cy="18" r="15" pathLength="100" stroke-dasharray="0 100" /></svg>
+            <span id="stat-energy" class="ring-num meta-num"></span>
+            <span class="ring-glyph" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M7 .5 2 7h3.2L4.6 11.5 10 4.8H6.6z" fill="currentColor" /></svg></span>
+          </button>
+          <button type="button" class="ring meta-pill mood" data-stat="mood" data-tip="Mood" aria-label="Mood">
+            <svg class="ring-svg" viewBox="0 0 36 36" aria-hidden="true"><circle class="ring-track" cx="18" cy="18" r="15" /><circle id="bar-mood" class="ring-fill meta-fill" cx="18" cy="18" r="15" pathLength="100" stroke-dasharray="0 100" /></svg>
+            <span id="stat-mood" class="ring-num meta-num"></span>
+            <span class="ring-glyph" aria-hidden="true"><svg viewBox="0 0 12 12"></svg></span>
+          </button>
+        </div>
+        <div class="metabolics-cluster">
+          <div class="hud-cluster hud-progress" data-hud-cluster="progress">
+            <button id="player-menu-btn" type="button" class="ring level-ring" data-stat="level" aria-haspopup="true" aria-expanded="false" aria-controls="player-menu" data-tip="Level" data-key="Z" aria-label="Level. Your player card (Z)">
+              <span id="level-meter" class="level-meter" role="meter" aria-label="Level progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <svg class="ring-svg" viewBox="0 0 36 36" aria-hidden="true"><circle class="ring-track" cx="18" cy="18" r="15" /><circle id="bar-level" class="ring-fill" cx="18" cy="18" r="15" pathLength="100" stroke-dasharray="0 100" /></svg>
+                <strong id="stat-level" class="ring-num">5</strong>
+                <span id="stat-xp" class="level-xp visually-hidden">0 / 0 XP</span>
+              </span>
+              <span class="ring-glyph" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="m6 .8 1.6 3.3 3.6.5-2.6 2.5.6 3.6L6 9 2.8 10.7l.6-3.6L.8 4.6l3.6-.5z" fill="currentColor" /></svg></span>
+            </button>
+            <button type="button" id="low-energy-btn" class="hud-lowpill" aria-haspopup="dialog" aria-controls="vitals-menu" hidden><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M7 .5 2 7h3.2L4.6 11.5 10 4.8H6.6z" fill="currentColor" /></svg><span></span></button>
+            <span class="hud-div" aria-hidden="true"></span>
+            <button type="button" class="meta-stat hud-img hud-cur" data-tip="iMG" data-sub="Spend it in Upgrades (U)"><img src="assets/imagination/ui/imagination_button.png?v=df15aba7" alt="iMG" width="26" height="20" /><strong id="stat-img">0</strong></button>
           </div>
-          <div class="meta-pill energy" title="Energy">
-            <span class="meta-ico">⚡</span>
-            <span class="meta-label">Energy</span>
-            <div class="meta-ring"><div id="bar-energy" class="meta-fill"></div></div>
-            <span id="stat-energy" class="meta-num"></span>
+          <div class="hud-cluster hud-wallet" data-hud-cluster="wallet">
+            <span class="meta-stat currants hud-cur" tabindex="0" data-tip="Currants"><img src="assets/sprites/icons/pile_of_currants@3x.png?v=df15aba7" alt="Currants" width="17" height="20" /><strong id="stat-currants">0</strong></span>
+            <span id="favor-stat" class="meta-stat hud-favor hud-cur" tabindex="0" data-tip="Favor" hidden><img src="assets/sprites/giant-icons/icon_spriggan.png?v=df15aba7" alt="" width="15" height="20" /><strong id="stat-favor">0</strong></span>
+            <div id="quoin-stat" class="meta-stat quoin-stat hud-cur" role="status" tabindex="0" data-tip="Quoins today" aria-label="0 of 100 quoins collected today. Multiplier 1.">
+              <span aria-hidden="true">◉</span> <strong>0/100</strong><small>×1</small>
+            </div>
           </div>
         </div>
       </div>
       <div id="player-menu" class="player-menu" role="dialog" aria-label="Player menu" hidden></div>
-      <div class="metabolics-cluster">
-        <div class="hud-cluster hud-progress" data-hud-cluster="progress">
-          <div id="level-meter" class="level-meter" role="meter" title="Level progress: click for your stats" aria-label="Level progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-            <span class="level-label">Level <strong id="stat-level">5</strong></span>
-            <div class="level-track" aria-hidden="true"><i id="bar-level"></i></div>
-            <span id="stat-xp" class="level-xp">0 / 0 XP</span>
-          </div>
-          <div class="meta-stat hud-img">iMG <strong id="stat-img">0</strong></div>
-        </div>
-        <div class="hud-cluster hud-wallet" data-hud-cluster="wallet">
-          <div class="meta-stat currants">
-            <span class="currant-coin">◎</span>
-            <strong id="stat-currants">0</strong>
-          </div>
-          <div id="quoin-stat" class="meta-stat quoin-stat" role="status" aria-label="0 of 100 quoins collected today. Multiplier 1.">
-            <span aria-hidden="true">◉</span> <strong>0/100</strong><small>×1</small>
+      <div class="top-actions hud-pill hud-actions" data-hud-cluster="actions">
+        <button id="study-chip" type="button" class="chrome-btn is-studying" hidden>Study</button>
+        <button id="quest-btn" type="button" class="chrome-btn hud-ibtn" data-tip="Quests" data-key="Q" aria-label="Quests (Q)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3.5h9.5a2 2 0 0 1 2 2v11H6a2 2 0 0 1-2-2z" /><path d="M4 14.5a2 2 0 0 1 2-2h9.5M7.5 7h5M7.5 9.5h3.5" /></svg><span class="kcap" aria-hidden="true">Q</span></button>
+        <button id="make-btn" type="button" class="chrome-btn hud-ibtn" data-tip="Make" data-key="N" aria-label="Make (N)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.5 3.5 16.5 8.5 14 11 9 6z" /><path d="M10.2 7.2 3.5 13.9a1.5 1.5 0 0 0 2.1 2.1l6.7-6.7" /></svg><span class="kcap" aria-hidden="true">N</span></button>
+        <button id="map-btn" type="button" class="chrome-btn hud-ibtn" data-tip="Map" data-sub="G opens it too" data-key="M" aria-label="Map (M or G)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 5 7.5 3l5 2 5-2v12l-5 2-5-2-5 2z" /><path d="M7.5 3v12M12.5 5v12" /></svg><span class="kcap" aria-hidden="true">M</span></button>
+        <button id="imagination-btn" type="button" class="chrome-btn hud-ibtn" data-tip="Imagination" data-sub="Upgrades for your iMG" data-key="X" aria-label="Imagination (X)"><img src="assets/imagination/ui/imagination_button.png?v=df15aba7" alt="" width="26" height="20" /><span class="kcap" aria-hidden="true">X</span></button>
+        <span class="hud-div" aria-hidden="true"></span>
+        <button id="mail-btn" type="button" class="chrome-btn hud-ibtn" data-tip="Mail" aria-label="Mail"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="15" height="11" rx="2" /><path d="m3 5.5 7 5.5 7-5.5" /></svg><span id="mail-unread-badge" class="mail-unread-badge hud-badge" aria-hidden="true" hidden>0</span></button>
+        <button id="sound-btn" type="button" class="chrome-btn hud-ibtn" data-tip="Sound" aria-label="Sound" aria-haspopup="dialog" aria-expanded="false" aria-controls="sound-pop" data-muted="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8v4h3l4 3.5v-11L6 8z" /><path class="sound-waves" d="M13 7.5a3.5 3.5 0 0 1 0 5M15.2 5.3a6.5 6.5 0 0 1 0 9.4" /><path class="sound-x" d="M13.5 8l4 4M17.5 8l-4 4" /></svg></button>
+        <div class="more-menu">
+          <button id="more-btn" type="button" class="chrome-btn more-btn hud-ibtn" aria-haspopup="true" aria-expanded="false" aria-controls="more-list" aria-label="Menu" data-tip="Menu" data-sub="Badges, skills, home, buffs and more"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M4 6h12M4 10h12M4 14h12" /></svg></button>
+          <div id="more-list" class="more-list" hidden>
+            <div class="menu-group" data-menu-group="me" role="group" aria-label="Me"><div class="menu-group-label" aria-hidden="true">Me</div>
+              <button id="player-card-btn" type="button" class="chrome-btn">Player card</button>
+              <button id="skills-btn" type="button" class="chrome-btn" title="Skills (K or Shift+S)">Skills</button>
+              <button id="achieve-btn" type="button" class="chrome-btn" title="Achievements (B)">Badges</button>
+              <button id="buffs-btn" type="button" class="chrome-btn" title="Buffs (Y)">Buffs</button>
+              <button id="avatar-btn" type="button" class="chrome-btn" title="Look (L)">Look</button>
+            </div>
+            <div class="menu-group" data-menu-group="world" role="group" aria-label="World"><div class="menu-group-label" aria-hidden="true">World</div>
+              <button id="home-btn" type="button" class="chrome-btn home-chrome-btn" title="Home">Home</button>
+              <button id="feat-btn" type="button" class="chrome-btn feat-chrome-btn" title="Current Feat (H)">Feat</button>
+              <button id="vendor-btn" type="button" class="chrome-btn" title="Vendor (V)">Vendor</button>
+            </div>
+            <div class="menu-group" data-menu-group="social" role="group" aria-label="Social" hidden><div class="menu-group-label" aria-hidden="true">Social</div></div>
+            <div class="menu-group" data-menu-group="settings" role="group" aria-label="Settings" hidden><div class="menu-group-label" aria-hidden="true">Settings</div></div>
           </div>
         </div>
       </div>
-      <div class="top-actions">
-        <button id="quest-btn" type="button" class="chrome-btn" title="Quests (Q)">Quests</button>
-        <button id="make-btn" type="button" class="chrome-btn" title="Making">Make</button>
-        <button id="map-btn" type="button" class="chrome-btn" title="Map (M or G)">Map</button>
-        <button id="study-chip" type="button" class="chrome-btn is-studying" hidden>Study</button>
-        <div class="more-menu">
-          <button id="more-btn" type="button" class="chrome-btn more-btn" aria-haspopup="true" aria-expanded="false" aria-controls="more-list" title="Badges, skills, buffs, home and more">Menu <span class="more-chevron" aria-hidden="true"></span></button>
-          <div id="more-list" class="more-list" hidden>
-            <button id="achieve-btn" type="button" class="chrome-btn" title="Achievements (B)">Badges</button>
-            <button id="feat-btn" type="button" class="chrome-btn feat-chrome-btn" title="Current Feat (H)">Feat</button>
-            <button id="skills-btn" type="button" class="chrome-btn" title="Skills (K or Shift+S)">Skills</button>
-            <button id="buffs-btn" type="button" class="chrome-btn" title="Buffs (Y)">Buffs</button>
-            <button id="home-btn" type="button" class="chrome-btn home-chrome-btn" title="Home">
-              Home <span id="mail-unread-badge" class="mail-unread-badge" hidden>0</span>
-            </button>
-            <button id="vendor-btn" type="button" class="chrome-btn" title="Vendor (V)">Vendor</button>
-            <button id="avatar-btn" type="button" class="chrome-btn" title="Look (L)">Look</button>
-          </div>
-        </div>
-        <button id="mute-btn" type="button" class="chrome-btn mute-btn" title="Mute audio" aria-label="Mute audio" aria-pressed="false"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 7.5h3l4-3.5v12l-4-3.5H3z" fill="currentColor"/><path class="mute-x" d="M13 7.5l4 5M17 7.5l-4 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"/><path class="mute-waves" d="M13 7.2a4 4 0 0 1 0 5.6M15.2 5a7 7 0 0 1 0 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg></button>
+      <div id="sound-pop" class="hud-pop sound-pop" role="dialog" aria-label="Sound" hidden>
+        <h3 class="hud-pop-title">Sound</h3>
+        <label class="hud-slider"><span>Effects</span><input id="sfx-volume" type="range" min="0" max="100" step="5" value="100" /><output for="sfx-volume">100</output></label>
+        <label class="hud-slider"><span>Music</span><input id="music-volume" type="range" min="0" max="100" step="5" value="100" /><output for="music-volume">100</output></label>
+        <button id="mute-btn" type="button" class="chrome-btn mute-btn hud-mute" title="Mute audio" aria-label="Mute audio" aria-pressed="false"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 7.5h3l4-3.5v12l-4-3.5H3z" fill="currentColor"/><path class="mute-x" d="M13 7.5l4 5M17 7.5l-4 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"/><path class="mute-waves" d="M13 7.2a4 4 0 0 1 0 5.6M15.2 5a7 7 0 0 1 0 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg><span>Mute audio</span></button>
       </div>
     </header>
 
@@ -841,6 +854,6 @@
   </div>
   <!-- Password managers skip the game's own boxes (chat, searches, names); the account forms keep autofill. -->
   <script type="module" src="js/no-autofill.js?v=g437-1"></script>
-  <script type="module" src="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=g378-1&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g463-2"></script>
+  <script type="module" src="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=g378-1&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g465-1"></script>
 </body>
 </html>
