@@ -6,6 +6,7 @@ import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g4
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-358';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
+import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=g480-4';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=g481-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g463-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g470-1';
@@ -7870,6 +7871,8 @@ function openEnterChoice(choice) {
     doTeleport();
     return;
   }
+  // A garden in the chooser is tended, as Enter alone tends it (js/garden-tend.js).
+  if (choice.target?.classId === 'garden_new' && startGardenTend(choice.target)) return;
   const t = choice.open || choice.target;
   if (t?.sprite && !t.sprite.destroyed) openVerbMenu(t);
 }
@@ -8045,8 +8048,91 @@ function tryOpenNearestMenu({ nearestFirst = false } = {}) {
     }
   }
   const t = nearestInteractable(100);
+  // Bug report #5: Enter at a garden tends it (TSFrontController.as 3727-3733, js/garden-tend.js);
+  // scripted presses keep the nearest plot's menu.
+  if (t && !nearestFirst && /^garden_(new|plot)$/.test(t.classId) && startGardenTend(t.state?.gardenEntity || t)) return;
   if (t) openVerbMenu(t);
   else toast('Nothing nearby to interact with.');
+}
+
+/**
+ * Bug report #5 (js/garden-tend.js): tending a garden from the keyboard, as the client's
+ * GardenManager.startEditing. The plot in focus glows (and the Enter chip names it); the arrows
+ * or WASD move between plots, Enter or E opens that plot's menu, Esc or walking away stops.
+ * QA: canvas data gardenTend (the plot key in focus, empty when not tending).
+ */
+let gardenTend = null;
+/** The focused plot's glow (GardenPlotView highlightOnDragOver): plots are bare cells, so the hover rim has no art to trace. */
+let gardenTendMark = null;
+function gardenTendPlot() {
+  if (!gardenTend) return null;
+  return (gardenTend.entity.state?.plotTargets || []).find((p) => p.state?.plotKey === gardenTend.key) || null;
+}
+function startGardenTend(entity) {
+  const garden = entity?.state?.garden;
+  if (entity?.classId !== 'garden_new' || !garden?.cols || !garden?.rows) return false;
+  gardenTend = { entity, key: firstTendKey(garden.cols, garden.rows) };
+  showGardenTendFocus();
+  return Boolean(gardenTend);
+}
+function showGardenTendFocus() {
+  const plot = gardenTendPlot();
+  if (!plot?.sprite || plot.sprite.destroyed) {
+    stopGardenTend();
+    return;
+  }
+  setHoverTarget(plot);
+  if (!gardenTendMark || gardenTendMark.destroyed) {
+    gardenTendMark = new PIXI.Graphics();
+    gardenTendMark.eventMode = 'none';
+    gardenTendMark.label = 'garden-tend-focus';
+  }
+  gardenTendMark.clear();
+  gardenTendMark.roundRect(-GARDEN_CELL_W / 2 + 2, -GARDEN_CELL_H + 2, GARDEN_CELL_W - 4, GARDEN_CELL_H - 4, 6)
+    .fill({ color: 0xa8e4ff, alpha: 0.22 })
+    .stroke({ color: 0xa8e4ff, width: 3, alpha: 0.95 });
+  if (gardenTendMark.parent !== plot.sprite.parent) plot.sprite.parent?.addChild(gardenTendMark);
+  gardenTendMark.position.set(plot.sprite.x, plot.sprite.y);
+  gardenTendMark.zIndex = (Number(plot.sprite.zIndex) || 0) + 0.2;
+  if (app?.canvas) app.canvas.dataset.gardenTend = gardenTend.key;
+}
+function stopGardenTend() {
+  if (!gardenTend) return;
+  const plot = gardenTendPlot();
+  gardenTend = null;
+  if (plot && hoverTarget === plot) clearHoverGlow();
+  if (gardenTendMark && !gardenTendMark.destroyed) gardenTendMark.destroy();
+  gardenTendMark = null;
+  if (app?.canvas) app.canvas.dataset.gardenTend = '';
+}
+/** GardenView.as onKeyDown 588-672: a tending key; true when it was one. */
+function gardenTendKey(e) {
+  if (!gardenTend) return false;
+  const action = tendKeyAction(e);
+  if (!action) return false;
+  e.preventDefault();
+  keys.delete(e.key);
+  keys.delete(e.key.toLowerCase());
+  keys.delete(e.key.toUpperCase());
+  if (action === 'tend') {
+    const plot = gardenTendPlot();
+    if (plot && !currentAction) openVerbMenu(plot);
+    return true;
+  }
+  const garden = gardenTend.entity.state.garden;
+  gardenTend.key = stepTendKey(gardenTend.key, action, garden.cols, garden.rows);
+  showGardenTendFocus();
+  return true;
+}
+/** Each frame: walking away (or the garden going) stops tending; the focus glow comes back after a verb. */
+function updateGardenTend() {
+  if (!gardenTend) return;
+  const entity = gardenTend.entity;
+  if (!entity?.sprite || entity.sprite.destroyed || !gardens.includes(entity) || interactDistance(entity, player.x, player.y) > 200) {
+    stopGardenTend();
+    return;
+  }
+  if (!currentAction && !menuTarget && !hoverTarget) showGardenTendFocus();
 }
 
 /** Distance to an interactable; airborne (flying butterflies) get vertical slack. */
@@ -26284,6 +26370,11 @@ async function main() {
         closeVerbMenu();
         return;
       }
+      // GardenManager.as onKeyDown 176-181: Esc stops tending (js/garden-tend.js).
+      if (gardenTend) {
+        stopGardenTend();
+        return;
+      }
       closeVerbMenu();
       closeMap();
       closeVendor();
@@ -26306,6 +26397,8 @@ async function main() {
     }
     if (isQuestDialogueOpen()) return;
     if (isEmotionalBearPickerOpen()) return;
+    // Bug report #5: while tending a garden its plots take the arrows, WASD, Enter and E.
+    if (gardenTend && !menuTarget && !panelOnScreen() && gardenTendKey(e)) return;
     if (currentAction) {
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'w', 'W', 'a', 'A', 's', 'S', 'd', 'D'].includes(e.key)) {
         cancelCurrentAction();
@@ -26757,6 +26850,11 @@ async function main() {
 
     // Bounds-based pick (handles tall trees / stacked entities)
     const best = pickInteractableAt(sx, sy);
+    // GardenManager.as onStageClick 165-174: a click off the garden stops tending; a plot click moves the focus.
+    if (gardenTend) {
+      if (best?.state?.gardenEntity === gardenTend.entity && best.state.plotKey) gardenTend.key = best.state.plotKey;
+      else if (best !== gardenTend.entity) stopGardenTend();
+    }
     if (best) {
       setHoverTarget(best);
       // Behind a floor (js/reach.js): the client walked you over or said this line
@@ -27266,6 +27364,7 @@ async function main() {
       if (isMailboxOpen() && !mailboxComposeReplyTo) renderMailboxPanel();
     }
 
+    updateGardenTend();
     // Keep selection outline locked to animated sprite frames (pigs, chickens, …)
     if (hoverTarget?._hoverGlow?.syncOutlineTexture) {
       hoverTarget._hoverGlow.syncOutlineTexture();

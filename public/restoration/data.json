@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 831,
+  "commits": 832,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "Legalize It's progress card sits under the bug report form, menus and windows instead of hiding them"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "fix",
     "text": "The Rube faces the way he walks, and never blinks out as his animations change"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "Background layers glide smoothly when you slow down, instead of shifting left and right"
    }
   ]
  },
- "tests": 464,
+ "tests": 465,
  "generatedAt": "2026-10-30"
 }
