@@ -9,6 +9,7 @@ import { installClassicFrame } from './classic-frame.js?v=g468-9';
 import { installClassicTopbar } from './classic-topbar.js?v=g468-10';
 import { installClassicGrowl } from './classic-growl.js?v=g468-9';
 import { installClassicPanes } from './classic-panes.js?v=g468-12';
+import { installClassicPack } from './classic-pack.js?v=g468-15';
 import { installClassicHub } from './classic-hub.js?v=g468-9';
 
 let installed = null;
@@ -20,6 +21,7 @@ export function installClassicChrome({ doc = globalThis.document, win = globalTh
     topbar: installClassicTopbar({ doc, win, avatarPortrait }),
     growl: installClassicGrowl({ doc, win }),
     panes: installClassicPanes({ doc, win }),
+    pack: installClassicPack({ doc }),
     hub: installClassicHub({ doc, win, engine, avatarPortrait }),
   };
   return installed;

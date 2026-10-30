@@ -1303,3 +1303,8 @@
 @media (max-width: 1312.98px) {
   :root[data-ui="classic"] .social-drawer .classic-lower { display: none !important; }
 }
+
+/* == The pack's keyboard (classic-spec spec §8; PackDisplayManager.as 247-577; js/classic/classic-pack.js):
+   with a slot focused the others dim to .5 round its #53e5ff ring. The client's slide-down when a bag
+   opens is left out: PACK's open bag is a tray over the row, so sliding the row would part them. */
+:root[data-ui="classic"] #game-root .pack-bar.is-classic-focus .pack-slot:not(:focus):not(:focus-within) { opacity: 0.5; }

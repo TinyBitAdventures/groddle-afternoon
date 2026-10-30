@@ -18,7 +18,7 @@
  */
 import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=g468-9';
 import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=g468-1';
-import { installClassicChrome } from './classic-chrome.js?v=g468-12';
+import { installClassicChrome } from './classic-chrome.js?v=g468-15';
 
 export const PREFS_TITLE = 'Preferences';
 
