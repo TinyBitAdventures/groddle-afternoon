@@ -219,6 +219,26 @@ describe('the console page (groddle-afternoon-site console/console.js)', { skip:
     assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /<p class="console-hint">Click or right-click a player, or use their menu button, Shift\+F10 or the Menu key\.<\/p>/);
   });
 
+  it('Message everyone: how many will see it, a confirm step, the log line (Austin 2026-10-30)', () => {
+    assert.equal(mod.COPY.broadcastCount(0), 'Nobody is online to see it.');
+    assert.equal(mod.COPY.broadcastCount(1), '1 player online will see it.');
+    assert.equal(mod.COPY.broadcastCount(2), '2 players online will see it.');
+    assert.equal(mod.COPY.broadcastConfirm(2), 'Send to 2 players?');
+    assert.equal(mod.COPY.broadcastConfirm(1), 'Send to 1 player?');
+    const line = (detail) => mod.logWords({ kind: 'broadcast', detail, delivery: 'live', player: { id: 0 } });
+    assert.equal(line({ text: 'Restart in 5 minutes', count: 2, live: 2, failed: 0 }), 'messaged everyone online (2): “Restart in 5 minutes”');
+    assert.equal(line({ text: 'hi', count: 3, live: 2, failed: 1 }), 'messaged everyone online (3): “hi” (1 did not get it)');
+    const src = readFileSync(sitePath('console/console.js'), 'utf8');
+    const cast = src.slice(src.indexOf("cast.addEventListener('submit'"), src.indexOf('// == Bans and the log =='));
+    assert.ok(cast.indexOf('dialog(COPY.broadcastConfirm(n)') >= 0 && cast.indexOf('dialog(COPY.broadcastConfirm(n)') < cast.indexOf("api.call('admin/broadcast'"), 'the call only from the confirm');
+    assert.match(src, /castSend\.disabled = n === 0;/);
+    const page = readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8');
+    for (const hook of ['data-console-broadcast', 'data-console-broadcast-count', 'data-console-broadcast-send']) assert.ok(page.includes(hook), hook);
+    assert.match(page, /<h2 id="console-broadcast-title">Message everyone<\/h2>/);
+    assert.match(page, /id="console-broadcast-text" name="text" rows="3" maxlength="500"/);
+    for (const w of [mod.COPY.broadcastCount(0), mod.COPY.broadcastCount(2), mod.COPY.broadcastConfirm(2)]) assert.ok(!/[—–]/.test(w), w);
+  });
+
   it('searches streets and items', () => {
     const streets = [{ tsid: 'GA1', label: 'Hechey Track', hub: 'Groddle Meadow' }, { tsid: 'GA2', label: 'Gregarious Grange', hub: 'Groddle Meadow' }, { tsid: 'GA3', label: "Scribe's Weald", hub: 'Ix' }];
     assert.deepEqual(mod.findStreets(streets, 'track').map((s) => s.tsid), ['GA1']);
@@ -301,6 +321,23 @@ describe('the site routes (groddle-afternoon-site AdminConsole, AdminConsolePage
     assert.match(readFileSync(sitePath('src/Extension.php'), 'utf8'), /routes\(new AdminConsolePage\(\$minn\)\)/);
   });
 
+  it('a broadcast is admin/message to each player online now: one a minute, nobody queued, one log line', () => {
+    const src = readFileSync(sitePath('src/AdminConsole.php'), 'utf8');
+    assert.match(src, /#\[Route\(Method::Post, '\/groddle\/v1\/admin\/broadcast', policy: new Policy\(Access::Cap, self::ADMIN\)\)\]/);
+    const b = src.slice(src.indexOf('public function broadcast('), src.indexOf('public function boot('));
+    assert.match(src, /public const BROADCAST_GAP = 60;/);
+    assert.match(b, /WHERE kind = 'broadcast' ORDER BY id DESC LIMIT 1/);
+    assert.match(b, /throw new RestError\('groddle_admin_broadcast_slow', [^;]+, 429/);
+    assert.ok(b.indexOf('broadcast_slow') < b.indexOf("post('online'"), 'the limit before anything is sent');
+    assert.match(b, /\$call->post\('online', \[\]\)/);
+    assert.match(b, /\$call->post\('message', \['player' => \$player, 'id' => 'am-' \. bin2hex\(random_bytes\(8\)\), 'text' => \$text\]\)/);
+    assert.match(b, /=== 'sent'\) \{\s*\$live\+\+;/);
+    assert.match(b, /self::recordAction\(\$db, \$admin->id, 0, 'broadcast', \['text' => \$text, 'count' => \$sent, 'live' => \$live, 'failed' => \$failed\], \$delivery, \$now\);/);
+    assert.equal((b.match(/recordAction\(/g) || []).length, 1, 'one line, not one a player');
+    assert.match(b, /Response::json\(\['sent' => \$sent, 'live' => \$live, 'failed' => \$failed,/);
+    assert.match(b, /self::messageText\(/, 'the same limits as a message');
+  });
+
   it('never bans an administrator or yourself', () => {
     const src = readFileSync(sitePath('src/AdminConsole.php'), 'utf8');
     const ban = src.slice(src.indexOf('public function ban('), src.indexOf('public function unban('));
@@ -344,7 +381,7 @@ describe('the site routes (groddle-afternoon-site AdminConsole, AdminConsolePage
   it('the theme serves the console\'s script and styles, keyed', () => {
     assert.ok(existsSync(sitePath('console/console.js')));
     assert.ok(existsSync(sitePath('console/console.css')));
-    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'g491-3'/);
+    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'g491-4'/);
     const css = readFileSync(sitePath('console/console.css'), 'utf8');
     for (const token of ['--surface', '--border', '--fg', '--muted', '--track', '--row-line']) assert.match(css, new RegExp(`var\\(${token}\\)`), token);
   });
