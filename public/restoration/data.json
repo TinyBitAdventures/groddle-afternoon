@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 840,
+  "commits": 843,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "The online Play button is one warm orange with dark text, like the header's Play"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "Classic's windows lay out their contents at the 2012 size: Quests, Skills, Buffs, Badges, the Map and Make"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "A verb menu keeps one size while you move between its rows"
    }
   ]
  },
- "tests": 470,
+ "tests": 471,
  "generatedAt": "2026-10-30"
 }
