@@ -24,7 +24,7 @@ const SOURCE = join(root, 'public/play/index.html');
 const TARGET = join(root, 'public/play/online/index.html');
 
 /** The cache key of js/online-boot.js (bump it when that file or js/minn-account.js changes). */
-export const ONLINE_BOOT_SRC = 'js/online-boot.js?v=g463-1';
+export const ONLINE_BOOT_SRC = 'js/online-boot.js?v=g477-1';
 
 const MODE_ENTRY = `  <!--
     Multiplayer entry (js/game-mode.js). This must stay the FIRST script on the page, ahead of
@@ -91,6 +91,18 @@ const ONLINE_STYLE = `  <style>
     /* In the pack, under its hint (js/online-boot.js mountSavePill): part of the game, not over it. */
     .pack-side { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: var(--sp-3); flex-shrink: 0; }
     .save-pill.in-pack { position: static; z-index: auto; box-shadow: none; padding: 0.18rem 0.55rem; font-size: var(--fs-xs); white-space: nowrap; }
+    /* In the pack: one round cloud whose dot is the state, so the row never changes width; the words are its tooltip. */
+    .save-pill-icon { display: none; }
+    .save-pill.in-pack:not([data-state="conflict"]):not([data-state="signed-out"]) { position: relative; width: 32px; height: 32px; padding: 0; justify-content: center; border-radius: var(--radius-round); cursor: default; }
+    .save-pill.in-pack:not([data-state="conflict"]):not([data-state="signed-out"]) .save-pill-icon { display: block; position: relative; width: 20px; height: 20px; color: var(--c-green-34); }
+    .save-pill.in-pack .save-pill-icon svg { display: block; }
+    .save-pill.in-pack .save-pill-icon::after { content: ''; position: absolute; right: -3px; bottom: 0; width: 8px; height: 8px; border-radius: var(--radius-round); background: var(--c-lime-67); box-shadow: 0 0 0 2px var(--surface-moss); }
+    .save-pill.in-pack[data-state="pending"] .save-pill-icon::after, .save-pill.in-pack[data-state="saving"] .save-pill-icon::after { background: var(--c-gold-76); }
+    .save-pill.in-pack[data-state="offline"] .save-pill-icon::after, .save-pill.in-pack[data-state="error"] .save-pill-icon::after { background: var(--c-red-59); }
+    .save-pill.in-pack:not([data-state="conflict"]):not([data-state="signed-out"]) :is(.save-pill-who, .save-pill-state) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .save-pill.in-pack:not([data-state="conflict"]):not([data-state="signed-out"])::after { content: attr(data-tip); position: absolute; right: 0; bottom: calc(100% + var(--sp-4)); padding: var(--sp-2) var(--sp-4); border-radius: var(--radius-sm); background: var(--surface-dark); color: var(--text-on-dark); font-size: var(--fs-xs); white-space: nowrap; box-shadow: var(--shadow-2); opacity: 0; pointer-events: none; transition: opacity 120ms ease-out; }
+    .save-pill.in-pack:not([data-state="conflict"]):not([data-state="signed-out"]):is(:hover, :focus-visible)::after { opacity: 1; }
+    @media (prefers-reduced-motion: reduce) { .save-pill.in-pack::after { transition: none; } }
     /* G320: the start card over the street, the chat dock and the pack, inside the game frame (it scrolls when the
        frame is shorter); the street's toasts, activity lines and Qurazy banner wait for it to close (game.js holds the
        toast's clock, qurazy-feature the banner). */

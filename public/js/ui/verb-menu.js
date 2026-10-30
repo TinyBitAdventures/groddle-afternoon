@@ -124,7 +124,8 @@ function setDetail(el, row) {
   const shown = text || el.dataset.vmDefault || '';
   if (detail.textContent !== shown) detail.textContent = shown;
   detail.classList.toggle('bad', bad);
-  detail.hidden = !shown;
+  // A locked menu keeps its footer's room even when a row has nothing to say (lockVerbMenuSize).
+  detail.hidden = !shown && !el.dataset.vmLock;
   for (const r of menuRows(el)) r.classList.toggle('cur', r === row);
 }
 
@@ -191,6 +192,39 @@ export function syncVerbDetail(el) {
   const doc = el?.ownerDocument;
   const row = doc?.activeElement?.closest?.('.vm-row');
   setDetail(el, row && el.contains(row) ? row : null);
+}
+
+/**
+ * Give a menu's footer the height of its tallest line, once. The footer
+ * follows the row under the pointer, so a card sized to the current line changed size as the
+ * pointer moved; it hangs from its bottom edge, so the rows slid under the still pointer and
+ * picked another row, another line, back and forth (Austin 2026-10-30). Locked, it never
+ * changes height while it is open. Cheap to call again: it re-measures only when the rows change.
+ * The card's width is fixed by the skin; the footer wraps inside it.
+ * @param {HTMLElement} el the bound menu (bindVerbMenu): its rows, footer and default line
+ */
+export function lockVerbMenuSize(el) {
+  const detail = el?.querySelector?.('.vm-detail');
+  if (!detail) return;
+  const rows = menuRows(el);
+  const lines = [...new Set([el.dataset.vmDefault || '', ...rows.map((r) => rowDetail(r).text)])];
+  const key = `${rows.length}|${lines.join('\u0001')}`;
+  if (el.dataset.vmLock === key) return;
+  const was = { text: detail.textContent, hidden: detail.hidden };
+  detail.style.minHeight = '';
+  let h = 0;
+  for (const text of lines) {
+    detail.textContent = text;
+    detail.hidden = false;
+    h = Math.max(h, detail.offsetHeight);
+  }
+  // Not laid out yet (hidden, or a skin without the footer): measure again next time.
+  if (h > 0) {
+    detail.style.minHeight = `${Math.ceil(h)}px`;
+    el.dataset.vmLock = key;
+  }
+  detail.textContent = was.text;
+  detail.hidden = was.hidden && !lines.some(Boolean);
 }
 
 /**

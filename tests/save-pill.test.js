@@ -4,7 +4,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { pillStateFor, SAVING_SHOWN_AFTER_MS } from '../public/js/online-boot.js?v=g463-1';
+import { pillStateFor, SAVING_SHOWN_AFTER_MS } from '../public/js/online-boot.js?v=g477-1';
 
 const root = join(import.meta.dirname, '..');
 const boot = readFileSync(join(root, 'public/js/online-boot.js'), 'utf8');
@@ -24,5 +24,15 @@ describe('save pill', () => {
     assert.match(boot, /document\.querySelector\('\.pack-hint'\)/);
     assert.match(boot, /side\.append\(hint, pill\);\n\s+pill\.classList\.add\('in-pack'\);/);
     assert.match(build, /\.save-pill\.in-pack \{ position: static; z-index: auto;/);
+  });
+  it('in the pack, only the cloud shows and the words are its tooltip, so the row keeps its width', () => {
+    assert.match(boot, /class: 'save-pill-icon', 'aria-hidden': 'true'/);
+    assert.match(boot, /pill\.dataset\.tip = `\$\{who\} · \$\{text\}`/);
+    assert.match(boot, /tip\(text\);/, 'the tooltip follows every state');
+    assert.match(boot, /pill\.tabIndex = 0;/, 'the tooltip opens on keyboard focus too');
+    assert.match(build, /\.save-pill\.in-pack:not\(\[data-state="conflict"\]\):not\(\[data-state="signed-out"\]\) \{ position: relative; width: 32px; height: 32px;/);
+    assert.match(build, /:is\(\.save-pill-who, \.save-pill-state\) \{ position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset\(50%\);/, 'still read out, not shown');
+    // As specific as the rule that hides it, or the hidden rule wins.
+    assert.match(build, /\.save-pill\.in-pack:not\(\[data-state="conflict"\]\):not\(\[data-state="signed-out"\]\):is\(:hover, :focus-visible\)::after \{ opacity: 1; \}/);
   });
 });

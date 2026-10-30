@@ -241,8 +241,17 @@ export function pillStateFor(state, { slow = false } = {}) {
 }
 
 function mountSavePill(player) {
+  const who = player?.name ? `Playing as ${player.name}` : 'Multiplayer';
   const pill = el('div', { id: 'save-pill', class: 'save-pill', role: 'status', 'aria-live': 'polite', 'data-state': 'saved' });
-  pill.append(el('span', { class: 'save-pill-who' }, player?.name ? `Playing as ${player.name}` : 'Multiplayer'), el('span', { class: 'save-pill-state' }, PILL_TEXT.saved));
+  // In the pack only the cloud shows (its dot is the state) and the words are its tooltip: words
+  // that changed length ("Saved", "Saving…") made the whole pack row change width (Austin 2026-10-30).
+  const icon = el('span', { class: 'save-pill-icon', 'aria-hidden': 'true' });
+  icon.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 .6-7.96A6 6 0 0 0 6.2 9.1 4.5 4.5 0 0 0 7 18z"/></svg>';
+  pill.append(icon, el('span', { class: 'save-pill-who' }, who), el('span', { class: 'save-pill-state' }, PILL_TEXT.saved));
+  const tip = (text) => {
+    pill.dataset.tip = `${who} · ${text}`;
+  };
+  tip(PILL_TEXT.saved);
   // In the pack's own corner under its hint, so it never covers the slots and the award and
   // new-day screens cover it with the rest of the game; the window's corner when there is no pack.
   const hint = document.querySelector('.pack-hint');
@@ -251,6 +260,7 @@ function mountSavePill(player) {
     hint.parentNode.insertBefore(side, hint);
     side.append(hint, pill);
     pill.classList.add('in-pack');
+    pill.tabIndex = 0;
   } else {
     document.body.append(pill);
   }
@@ -264,6 +274,7 @@ function mountSavePill(player) {
     // Reloading /play/online/ shows the gate's sign-in when the session is gone.
     const href = s === 'conflict' || s === 'signed-out' ? location.pathname : '';
     const text = PILL_TEXT[s] || s;
+    tip(text);
     pill.lastChild.replaceWith(href ? el('a', { class: 'save-pill-state', href }, text) : el('span', { class: 'save-pill-state' }, text));
   };
   window.addEventListener('groddle:save-state', (e) => {
