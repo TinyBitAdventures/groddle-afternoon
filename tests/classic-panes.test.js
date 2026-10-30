@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { pillText, paneLayout, LOCAL_TABS, nameSlot, NAME_COLOURS, STRIP_OPEN_MIN_W } from '../public/js/classic/classic-panes.js?v=g468-16';
+import { pillText, paneLayout, LOCAL_TABS, nameSlot, NAME_COLOURS, STRIP_OPEN_MIN_W, dividerHeight, PANE_MIN_H } from '../public/js/classic/classic-panes.js?v=g468-17';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -67,5 +67,16 @@ describe('Classic panes', () => {
     const css = read('public/css/classic.css');
     assert.match(css, /:root\[data-ui="classic"\]\[data-classic-strip="open"\] \{ --cu-c: 470; \}/);
     assert.match(read('public/js/classic/classic-panes.js'), /'Playing with friends is much more fun\.'/);
+  });
+
+  it('the divider drags, each pane at least 100 px (RightSideView.as 1195-1235, ChatArea.as 64)', () => {
+    assert.equal(PANE_MIN_H, 100);
+    assert.equal(dividerHeight(300, 700), 300);
+    assert.equal(dividerHeight(20, 700), 100, 'the upper pane keeps 100');
+    assert.equal(dividerHeight(680, 700), 700 - 100 - 13, 'the lower pane keeps 100 under the grip');
+    const js = read('public/js/classic/classic-panes.js');
+    assert.match(js, /role: 'separator'/);
+    assert.match(js, /writeUiCache\('divider'/);
+    assert.match(read('public/css/classic.css'), /minmax\(100px, var\(--classic-upper-h, 45%\)\)/);
   });
 });

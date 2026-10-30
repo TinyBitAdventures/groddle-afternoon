@@ -2671,9 +2671,19 @@
   ]
  },
  "git": {
-  "commits": 802,
+  "commits": 804,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "In Classic, Skills, Buffs, Badges, Quests and the Map open as the 2012 windows"
+   },
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "Classic's chat reads at the 2012 size, each speaker's name in its own colour, and the contact strip opens"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2783,16 +2793,6 @@
     "date": "2026-10-30",
     "kind": "new",
     "text": "The Classic interface's own art: Tiny Speck's 2012 buttons, icons, clouds and spinner"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "new",
-    "text": "Choose the Modern or Classic interface from the Menu or Preferences (,)"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "new",
-    "text": "The Classic interface's screen frame, measured from the 2012 client"
    }
   ]
  },

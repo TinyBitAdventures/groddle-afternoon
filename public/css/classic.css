@@ -1168,7 +1168,8 @@
   box-shadow: 1px 0 1px color-mix(in srgb, var(--c-classic-ink) 20%, transparent);
 }
 :root[data-ui="classic"] .social-drawer .social-body { grid-row: 1; border-radius: 6px; }
-:root[data-ui="classic"] .social-drawer[data-classic-upper="on"] { grid-template-rows: minmax(100px, 45%) minmax(100px, 1fr); }
+:root[data-ui="classic"] .local-chat-dock.social-drawer[data-classic-upper="on"],
+:root[data-ui="classic"] .local-chat-dock.social-drawer.is-open[data-classic-upper="on"] { grid-template-rows: minmax(100px, var(--classic-upper-h, 45%)) minmax(100px, 1fr); }
 :root[data-ui="classic"] .social-drawer[data-classic-upper="on"] .social-body { border-radius: 6px 6px 0 0; }
 :root[data-ui="classic"] .social-drawer .classic-lower {
   grid-row: 2;
@@ -1176,14 +1177,17 @@
   flex-direction: column;
   border-radius: 0 0 6px 6px;
 }
-/* The divider: the 41 x 5 grip on a 13 px white strip (RightSideView.as 1195-1235). */
-:root[data-ui="classic"] .social-drawer .classic-lower::before {
-  content: "";
+/* The divider: the 41 x 5 grip on a 13 px white strip, dragged to share the column (RightSideView.as
+   1195-1235; js/classic/classic-panes.js). */
+:root[data-ui="classic"] .social-drawer .classic-divider {
   flex: none;
   height: 13px;
   margin: 0 calc(-12 * var(--cu));
   background: url("../assets/classic/chat_divider.png?v=2dc713b4") center / 41px 5px no-repeat;
+  cursor: ns-resize;
+  touch-action: none;
 }
+:root[data-ui="classic"] .social-drawer .classic-divider:focus-visible { outline: 2px solid var(--c-classic-focus); outline-offset: -2px; }
 :root[data-ui="classic"] .social-drawer :is(.social-head, .classic-lower-head) {
   display: flex;
   align-items: center;

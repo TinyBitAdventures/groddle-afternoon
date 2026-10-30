@@ -9,6 +9,8 @@
  * - Another chat picked online (a party, a group, Global Chat, Buddies) opens as the pane above it:
  *   the drawer's view, titled with that chat's name and a close that goes back to Local; the
  *   Local Chat / Activity pane stays under it with its own field, which says its words on Local.
+ * - The divider between them drags (RightSideView.as 1195-1235): each pane keeps at least 100 px,
+ *   Up and Down move it from the keyboard, and the place is kept on this device (contact_list_y).
  * - Each pane has the client's title row: the options chevron, the title, the unread pill (#b1b7ba,
  *   "∞" past 99) and, on the upper pane, the close.
  * - Names in chat lines take a colour each, in the order they first speak (RightSideManager.as
@@ -41,6 +43,15 @@ export function nameSlot(seen, name, n = NAME_COLOURS) {
   const k = String(name || '');
   if (!seen.has(k)) seen.set(k, seen.size % n);
   return seen.get(k);
+}
+
+/** The client's smallest pane (ChatArea.as 64; RightSideView.as 1195-1235). */
+export const PANE_MIN_H = 100;
+
+/** PURE: the upper pane's height for a divider at `y` in a column `h` tall (both px), each pane at least `min`. */
+export function dividerHeight(y, h, min = PANE_MIN_H, grip = 13) {
+  const hi = Math.max(min, h - min - grip);
+  return Math.round(Math.max(min, Math.min(hi, Number(y) || 0)));
 }
 
 /** PURE: which panes show: the upper one only online, for a tab that is not Local or Activity. */
@@ -111,7 +122,44 @@ export function installClassicPanes({ doc = globalThis.document, win = globalThi
     e.stopPropagation();
     if (e.key === 'Escape') lowerInput.blur();
   });
-  lower.append(lowerHead, lowerLog, lowerForm);
+  // The divider: chat_divider.png on its 13 px strip, dragged to share the column between the panes.
+  const divider = el(doc, 'div', { class: 'classic-divider', role: 'separator', tabindex: '0', 'aria-orientation': 'horizontal', 'aria-label': 'Resize the chat panes', 'aria-valuemin': String(PANE_MIN_H) });
+  const setUpper = (px, save = false) => {
+    const h = dock.clientHeight || 0;
+    if (!h) return;
+    const v = dividerHeight(px, h);
+    dock.style.setProperty('--classic-upper-h', `${v}px`);
+    divider.setAttribute('aria-valuenow', String(v));
+    divider.setAttribute('aria-valuemax', String(Math.max(PANE_MIN_H, h - PANE_MIN_H - 13)));
+    if (save) writeUiCache('divider', String(Math.round((v / h) * 1000) / 1000));
+  };
+  const restoreUpper = () => {
+    const f = Number(readUiCache('divider'));
+    if (f > 0 && f < 1) setUpper(f * (dock.clientHeight || 0));
+  };
+  divider.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    divider.setPointerCapture?.(e.pointerId);
+    const top = dock.getBoundingClientRect().top;
+    const move = (ev) => setUpper(ev.clientY - top - 6);
+    const up = (ev) => {
+      setUpper(ev.clientY - top - 6, true);
+      divider.removeEventListener('pointermove', move);
+      divider.removeEventListener('pointerup', up);
+      divider.removeEventListener('pointercancel', up);
+    };
+    divider.addEventListener('pointermove', move);
+    divider.addEventListener('pointerup', up);
+    divider.addEventListener('pointercancel', up);
+  });
+  divider.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+    e.preventDefault();
+    e.stopPropagation();
+    const now = Number(divider.getAttribute('aria-valuenow')) || (body.getBoundingClientRect().height || 0);
+    setUpper(now + (e.key === 'ArrowDown' ? 10 : -10), true);
+  });
+  lower.append(divider, lowerHead, lowerLog, lowerForm);
   dock.append(lower);
   added.push(lower);
 
@@ -198,7 +246,9 @@ export function installClassicPanes({ doc = globalThis.document, win = globalThi
       const up = layout.upper ? d.unread(tab) : d.unread('local') + d.unread('activity');
       pill.textContent = pillText(up);
       pill.style.display = pill.textContent ? '' : 'none';
+      const wasShown = lower.style.display !== 'none';
       lower.style.display = layout.lowerOwn ? '' : 'none';
+      if (layout.lowerOwn && !wasShown) restoreUpper();
       if (layout.lowerOwn) {
         const atEnd = lowerLog.scrollHeight - lowerLog.scrollTop - lowerLog.clientHeight < 24;
         lowerLog.replaceChildren(...d.logNodes(LOCAL_TABS));
