@@ -988,7 +988,10 @@
 :root[data-ui="classic"] #verb-menu .verb-menu-sub:empty { display: none; }
 :root[data-ui="classic"] #verb-menu .verb-menu-list { gap: 0; margin: 0; padding: 0; }
 :root[data-ui="classic"] #verb-menu .verb-choice {
-  display: block;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: calc(4 * var(--cu));
   width: 100%;
   min-height: calc(22 * var(--cu));
   margin: 0;
@@ -1001,12 +1004,24 @@
   font: 800 var(--fs-classic-body)/var(--lh-snug) var(--font-classic-title);
   text-align: left;
 }
-:root[data-ui="classic"] #verb-menu .verb-choice:is(:hover, :focus-visible) { outline: none; background: var(--c-classic-verb-hi); border-color: var(--c-classic-verb-edge); }
-:root[data-ui="classic"] #verb-menu .verb-choice:disabled { color: var(--c-classic-disabled); background: none; border-color: transparent; }
-:root[data-ui="classic"] #verb-menu .verb-choice .verb-choice-tip,
-:root[data-ui="classic"] #verb-menu .verb-choice .verb-choice-reason { display: none; font: var(--fs-classic-count)/var(--lh-snug) var(--font-classic-body); color: var(--c-classic-text); }
-:root[data-ui="classic"] #verb-menu .verb-choice:is(:hover, :focus-visible) :is(.verb-choice-tip, .verb-choice-reason) { display: block; }
+:root[data-ui="classic"] #verb-menu .verb-choice:is(:hover, :focus-visible, .cur) { outline: none; background: var(--c-classic-verb-hi); border-color: var(--c-classic-verb-edge); }
+:root[data-ui="classic"] #verb-menu .verb-choice:is(:disabled, [aria-disabled="true"]) { color: var(--c-classic-disabled); background: none; border-color: transparent; }
+/* VERBS' rows (js/ui/verb-menu.js): the verb and its energy cost or count; the 2012 menu had no number
+   keys or lock, so those stay hidden (the number keys still work). The row's explanation, or why it
+   can't be done, is the one desc line under the rows (.vm-detail), for the focused or hovered row. */
+:root[data-ui="classic"] #verb-menu .vm-label { flex: 1; min-width: 0; }
+:root[data-ui="classic"] #verb-menu :is(.vm-key, .vm-lock, .vm-ptr) { display: none; }
+:root[data-ui="classic"] #verb-menu .vm-icon { width: calc(20 * var(--cu)); height: calc(20 * var(--cu)); object-fit: contain; }
+:root[data-ui="classic"] #verb-menu .verb-menu-head { display: flex; align-items: center; gap: calc(4 * var(--cu)); }
+:root[data-ui="classic"] #verb-menu .vm-titles { flex: 1; min-width: 0; }
+:root[data-ui="classic"] #verb-menu .vm-cost { display: inline-flex; align-items: center; gap: 1px; color: var(--c-classic-offline); font: var(--fs-classic-count)/var(--lh-none) var(--font-classic-body); }
+:root[data-ui="classic"] #verb-menu .vm-detail { margin: calc(3 * var(--cu)) calc(5 * var(--cu)) 0; font: var(--fs-classic-count)/var(--lh-snug) var(--font-classic-body); color: var(--c-classic-text); }
+:root[data-ui="classic"] #verb-menu .vm-detail.bad { color: var(--c-classic-disabled); }
 :root[data-ui="classic"] #verb-menu .verb-menu-hint { display: none; }
+/* A pack stack's menu (#pack-popover) draws VERBS' rows too: the same, without key caps or the lock. */
+:root[data-ui="classic"] #pack-popover :is(.vm-key, .vm-lock) { display: none; }
+:root[data-ui="classic"] #pack-popover .vm-row { display: inline-flex; align-items: center; gap: 3px; }
+:root[data-ui="classic"] #pack-popover .vm-row[aria-disabled="true"] { cursor: default; opacity: 0.48; }
 
 /* == The imagination hub on X (classic-spec spec §9; ImgMenuView.as 52-415; js/classic/classic-hub.js).
    A full-viewport overlay, not a window: the radial vignette (black .1 to .7 round a 650 px box,

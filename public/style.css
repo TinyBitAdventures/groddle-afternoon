@@ -10086,3 +10086,255 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   z-index: var(--z-hud-pop);
 }
 /* —— end HUB top bar layer —— */
+
+/* —— VERBS —— (phase 2, Warm paper: the verb menu, js/ui/verb-menu.js; the HUD mock is the spec)
+   The world's verb menu (#verb-menu) and a stack's menu (#pack-popover) are one compact card: a
+   head (icon, name, what it is), one line per verb with its 1-9 key cap and energy cost, and a
+   footer line with the row's explanation or the reason it can't be done. The world menu has no
+   shade: it sits over the thing with a tail (game.js placeWorldVerbMenu). Everything is under
+   [data-ui="modern"] so a Classic skin can restyle the same elements. */
+[data-ui="modern"] { --vm-w: 240px; }
+[data-ui="modern"] #verb-menu {
+  inset: auto;
+  left: var(--vm-left, 0px);
+  top: var(--vm-top, 0px);
+  bottom: var(--vm-bottom, auto);
+  width: var(--vm-w);
+  display: block;
+  z-index: var(--z-notice);
+  background: none;
+  backdrop-filter: none;
+  pointer-events: none;
+}
+[data-ui="modern"] #verb-menu[hidden] { display: none !important; }
+[data-ui="modern"] #verb-menu .verb-menu-card,
+[data-ui="modern"] #pack-popover {
+  box-sizing: border-box;
+  width: var(--vm-w);
+  padding: var(--sp-3);
+  overflow: visible;
+  pointer-events: auto;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--fs-m);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-tight);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-3);
+  transform-origin: 50% 100%;
+  animation: vm-in 140ms var(--ease-out);
+}
+[data-ui="modern"] #verb-menu .verb-menu-card { position: relative; }
+[data-ui="modern"] #verb-menu.below .verb-menu-card { transform-origin: 50% 0; }
+@keyframes vm-in { from { opacity: 0; transform: scale(0.94); } }
+/* The head: icon, the name and (under it) what the thing is or what it asks. */
+[data-ui="modern"] #verb-menu .verb-menu-head,
+[data-ui="modern"] #pack-popover .pack-pop-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 2px var(--sp-3) var(--sp-3);
+  background: none;
+}
+[data-ui="modern"] #verb-menu .vm-icon,
+[data-ui="modern"] #pack-popover .pack-pop-icon img { width: 24px; height: 24px; object-fit: contain; flex: none; }
+[data-ui="modern"] #pack-popover .pack-pop-icon { width: auto; height: auto; flex: none; padding: 0; background: none; border: 0; border-radius: 0; box-shadow: none; }
+[data-ui="modern"] #verb-menu .vm-titles,
+[data-ui="modern"] #pack-popover .pack-pop-title { flex: 1; min-width: 0; }
+[data-ui="modern"] #verb-menu .verb-menu-title,
+[data-ui="modern"] #pack-popover .pack-pop-title h3 {
+  margin: 0;
+  font-size: var(--fs-m);
+  font-weight: var(--fw-heavy);
+  letter-spacing: 0;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-ui="modern"] #pack-popover .pack-pop-title h3 b { font-weight: var(--fw-bold); color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] #verb-menu .verb-menu-sub,
+[data-ui="modern"] #pack-popover .pack-pop-kind {
+  display: block;
+  margin: 1px 0 0;
+  padding: 0;
+  font-size: var(--fs-s);
+  font-weight: var(--fw-regular);
+  color: var(--text-muted);
+  opacity: 1;
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: var(--lh-tight);
+}
+/* The kind line's notes (wear, fullness) are words in both skins, not the old card's blocks. */
+#pack-popover .pack-pop-kind > span { display: inline; margin: 0; color: inherit; font: inherit; text-transform: none; letter-spacing: 0; padding: 0; background: none; border: 0; box-shadow: none; }
+[data-ui="modern"] #pack-popover .pack-tool-condition.broken { color: var(--danger); }
+[data-ui="modern"] #verb-menu .verb-menu-sub:empty { display: none; }
+/* No close button and no key hint: Esc, a press outside and the key caps say it. */
+[data-ui="modern"] #verb-menu .verb-menu-x,
+[data-ui="modern"] #verb-menu .verb-menu-hint,
+[data-ui="modern"] #pack-popover .pack-pop-close { display: none; }
+[data-ui="modern"] #verb-menu .verb-menu-list,
+[data-ui="modern"] #pack-popover .pack-pop-actions {
+  display: block;
+  margin: 0;
+  padding: 0;
+  max-height: none;
+  overflow: visible;
+  border: 0;
+  list-style: none;
+}
+[data-ui="modern"] #verb-menu .verb-menu-list li { margin: 0; }
+[data-ui="modern"] #verb-menu .vm-empty { padding: var(--sp-3) var(--sp-3) var(--sp-2); color: var(--text-muted); font-size: var(--fs-s); opacity: 1; }
+/* One line per verb. */
+[data-ui="modern"] #verb-menu .vm-row,
+[data-ui="modern"] #pack-popover .vm-row {
+  width: 100%;
+  height: 32px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 var(--sp-4) 0 var(--sp-3);
+  border: 0;
+  border-radius: var(--radius-s);
+  background: transparent;
+  box-shadow: none;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  font-size: var(--fs-m);
+  font-weight: var(--fw-bold);
+  opacity: 1;
+}
+[data-ui="modern"] #verb-menu .vm-row:hover,
+[data-ui="modern"] #verb-menu .vm-row.cur,
+[data-ui="modern"] #pack-popover .vm-row:hover,
+[data-ui="modern"] #pack-popover .vm-row.cur { background: var(--accent-soft); box-shadow: none; }
+[data-ui="modern"] #verb-menu .vm-row:focus,
+[data-ui="modern"] #pack-popover .vm-row:focus { outline: none; }
+[data-ui="modern"] #verb-menu .vm-row:focus-visible,
+[data-ui="modern"] #pack-popover .vm-row:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; box-shadow: none; }
+[data-ui="modern"] #verb-menu .vm-row[aria-disabled="true"],
+[data-ui="modern"] #pack-popover .vm-row[aria-disabled="true"] { color: var(--text-muted); cursor: not-allowed; opacity: 1; }
+[data-ui="modern"] .vm-row .vm-key {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-heavy);
+  line-height: var(--lh-none);
+  color: var(--text-muted);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+}
+[data-ui="modern"] .vm-row .vm-key-none { visibility: hidden; }
+[data-ui="modern"] .vm-row .vm-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: inherit;
+  font-weight: var(--fw-bold);
+  text-transform: none;
+}
+[data-ui="modern"] .vm-row .vm-label::first-letter { text-transform: uppercase; }
+[data-ui="modern"] .vm-row .vm-cost {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--fs-s);
+  font-weight: var(--fw-heavy);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+[data-ui="modern"] .vm-row .vm-gain { color: var(--good); }
+[data-ui="modern"] .vm-row .vm-bolt { color: var(--energy); }
+[data-ui="modern"] .vm-row .vm-chev,
+[data-ui="modern"] .vm-row .vm-lock,
+[data-ui="modern"] .vm-row .vm-backicon { flex: none; color: var(--text-muted); }
+[data-ui="modern"] .vm-row.vm-back .vm-label { color: var(--text-muted); }
+/* The footer line: the row's explanation, or (red) why it can't be done. */
+[data-ui="modern"] #verb-menu .vm-detail,
+[data-ui="modern"] #pack-popover .vm-detail {
+  margin: var(--sp-2) 2px 0;
+  padding: var(--sp-3) var(--sp-4);
+  min-height: 32px;
+  box-sizing: border-box;
+  border-radius: var(--radius-s);
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+  font-size: var(--fs-s);
+  font-weight: var(--fw-regular);
+  line-height: 1.35;
+  border: 0;
+}
+[data-ui="modern"] #verb-menu .vm-detail[hidden] { display: none; }
+[data-ui="modern"] #verb-menu .vm-detail.bad,
+[data-ui="modern"] #pack-popover .vm-detail.bad { color: var(--danger); }
+/* The tail at the thing: under the card, or over it when the menu flipped below. */
+[data-ui="modern"] #verb-menu .vm-ptr {
+  position: absolute;
+  left: var(--vm-tail, 50%);
+  bottom: -9px;
+  width: 16px;
+  height: 9px;
+  background: var(--surface-raised);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+[data-ui="modern"] #verb-menu.below .vm-ptr { bottom: auto; top: -9px; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+[data-ui="modern"] #verb-menu.no-tail .vm-ptr { display: none; }
+/* A stack's menu: over its slot in the pack, its tail on the slot (positionPackPopover). */
+[data-ui="modern"] #pack-popover::after {
+  left: var(--pack-arrow-left);
+  bottom: -9px;
+  width: 16px;
+  height: 9px;
+  transform: translateX(-50%);
+  background: var(--surface-raised);
+  border: 0;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+/* The second levels (Eat more, Drop some): the back row, then the count. */
+[data-ui="modern"] #pack-popover .pack-drop-quantity {
+  margin: var(--sp-2) 0 0;
+  padding: var(--sp-3) var(--sp-3) var(--sp-2);
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  background: none;
+  font-size: var(--fs-s);
+}
+[data-ui="modern"] #pack-popover .pack-drop-quantity p { margin: 0 0 var(--sp-3); color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] #pack-popover .pack-drop-quantity .pack-eat-title { color: var(--text); font-weight: var(--fw-heavy); font-size: var(--fs-m); }
+[data-ui="modern"] #pack-popover .pack-drop-confirm-row { display: flex; justify-content: flex-end; margin-top: var(--sp-3); }
+[data-ui="modern"] #pack-popover .pack-drop-confirm-row .pack-pop-primary {
+  height: 30px;
+  padding: 0 var(--sp-6);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--accent-text);
+  font: inherit;
+  font-size: var(--fs-m);
+  font-weight: var(--fw-heavy);
+  cursor: pointer;
+}
+[data-ui="modern"] #pack-popover .pack-drop-confirm-row .pack-pop-primary:hover { background: var(--accent-hover); }
+[data-ui="modern"] #pack-popover .pack-drop-confirm-row .pack-pop-primary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  [data-ui="modern"] #verb-menu .verb-menu-card,
+  [data-ui="modern"] #pack-popover { animation: none; }
+}
+/* —— end VERBS —— */

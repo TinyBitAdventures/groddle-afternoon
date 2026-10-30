@@ -859,6 +859,7 @@ import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from './js/notify.js?v=g459-1';
 import { mountNotifyView } from './js/notify-view.js?v=g466-1';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g468-2';
+import { bindVerbMenu, focusVerbRow, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=g469-1';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g470-2';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
@@ -1719,6 +1720,8 @@ let piggies = [], chickens = [], apples = [], worldMusicblocks = [], droppedItem
 let textures = {};
 let time = 0;
 let menuTarget = null;
+/** VERBS: the pointerdown that closed the modern verb menu (its timeStamp), so the canvas skips it. */
+let verbMenuClosedByPointerAt = -1;
 /** Target-item chooser state for the original Feed → "Feed what?" flow. */
 let feedPickerTarget = null;
 let feedPickerOptions = [];
@@ -3526,48 +3529,65 @@ function renderPackPopover(classTsid, anchor = null) {
   const bearUpgradeLabels = [];
   if (isEmotionalBear && emotionalBearHasUpgrade(emotionalBearState, 'kiss')) bearUpgradeLabels.push('Lips');
   if (isEmotionalBear && emotionalBearHasUpgrade(emotionalBearState, 'moon')) bearUpgradeLabels.push('Moon');
-  const bearStateMarkup = isEmotionalBear
-    ? `<div class="pack-bear-state" data-bear-state="${bearStateName}">
-        <img src="${emotionalBearIcon(emotionalBearState)}" alt="" />
-        <div>
-          <strong>${bearUpgradeLabels.length ? `Upgraded with ${bearUpgradeLabels.join(' + ')}` : 'Plain Emotional Bear'}</strong>
-          <span>${emotionalBearState.totalEmotes} social ${emotionalBearState.totalEmotes === 1 ? 'emote' : 'emotes'} · daily cheer ${emotionalBearState.anthropomorphizedDay === getGameDayKey(Date.now()) ? 'used' : 'ready'}</span>
-        </div>
-      </div>`
+  // VERBS: the stack's menu is the verb menu (js/ui/verb-menu.js): one line per thing to do, its key
+  // cap and its energy cost or what it gives; what a row does (or why it can't) is the footer line.
+  /** @type {{ attrs: string, cls?: string, label: string, cost?: number, gain?: string, next?: boolean, disabled?: boolean, tip?: string, reason?: string }[]} */
+  const rows = [];
+  const bearState = isEmotionalBear
+    ? `${bearUpgradeLabels.length ? `Upgraded with ${bearUpgradeLabels.join(' + ')}` : 'Plain Emotional Bear'} · ${emotionalBearState.totalEmotes} social ${emotionalBearState.totalEmotes === 1 ? 'emote' : 'emotes'} · daily cheer ${emotionalBearState.anthropomorphizedDay === getGameDayKey(Date.now()) ? 'used' : 'ready'}`
     : '';
-  const bearActionMarkup = isEmotionalBear
+  const bearActionRows = isEmotionalBear
     ? bearActions
         .filter((action) => action.available)
-        .map((action) => `<button type="button" class="pack-bear-action${action.id === 'anthropomorphize' ? ' pack-pop-primary' : ''}" data-bear-action="${action.id}" ${action.enabled ? '' : `disabled title="${escapeHtml(action.reason)}"`}>${escapeHtml(action.label)}${action.energy ? ` · ${action.energy} energy` : ' · +20 mood'}</button>`)
-        .join('')
-    : '';
-  const bearUpgradeMarkup = isEmotionalBear
+        .map((action) => ({
+          attrs: `data-bear-action="${action.id}"`,
+          cls: `pack-bear-action${action.id === 'anthropomorphize' ? ' pack-pop-primary' : ''}`,
+          label: action.label,
+          cost: action.energy || 0,
+          gain: action.energy ? '' : '+20 mood',
+          disabled: !action.enabled,
+          reason: action.reason,
+          tip: action.id === 'anthropomorphize' ? 'Cheer yourself up, once a game day' : 'Pick a companion on this street to emote with',
+        }))
+    : [];
+  const bearUpgradeRows = isEmotionalBear
     ? [
         ['kiss', 'Attach Lips'],
         ['moon', 'Attach Moon'],
-      ].map(([upgrade, label]) => {
-        if (emotionalBearHasUpgrade(emotionalBearState, upgrade)) return '';
+      ].flatMap(([upgrade, label]) => {
+        if (emotionalBearHasUpgrade(emotionalBearState, upgrade)) return [];
         const quote = emotionalBearUpgradeQuote(emotionalBearState, inv, upgrade);
-        return `<button type="button" class="pack-bear-upgrade" data-bear-upgrade="${upgrade}" ${quote.ok ? '' : 'disabled'} title="${quote.ok ? `Consume ${upgrade === 'kiss' ? 'Lips' : 'one Moon'} from your pack` : `Buy ${upgrade === 'kiss' ? 'Lips' : 'a Moon'} from a Toy Vendor`}">${label}</button>`;
-      }).join('')
-    : '';
+        return [{
+          attrs: `data-bear-upgrade="${upgrade}"`,
+          cls: 'pack-bear-upgrade',
+          label,
+          disabled: !quote.ok,
+          tip: `Consume ${upgrade === 'kiss' ? 'Lips' : 'one Moon'} from your pack`,
+          reason: `Buy ${upgrade === 'kiss' ? 'Lips' : 'a Moon'} from a Toy Vendor`,
+        }];
+      })
+    : [];
   const bearReminisceQuote = isEmotionalBear
     ? canOfferGreedyRepeat(questState, Date.now(), {
         bypassCooldown: String(new URLSearchParams(location.search).get('questdemo') || '').startsWith('greedy'),
       })
     : null;
-  const bearReminisceMarkup = isEmotionalBear
-    ? `<button type="button" class="pack-bear-action pack-bear-reminisce" data-bear-reminisce
-        ${bearReminisceQuote?.ok ? '' : `disabled title="${escapeHtml(
-          bearReminisceQuote?.reason === 'cooldown'
-            ? 'The Bear needs an hour before reminiscing again.'
-            : 'First hear the bedtime story from a Piggy.'
-        )}"`}>Reminisce · Greedy Street Spirit Story</button>`
-    : '';
+  const bearReminisceRow = isEmotionalBear
+    ? {
+        attrs: 'data-bear-reminisce',
+        cls: 'pack-bear-action pack-bear-reminisce',
+        label: 'Reminisce',
+        tip: 'Hear the Greedy Street Spirit Story again',
+        disabled: !bearReminisceQuote?.ok,
+        reason: bearReminisceQuote?.reason === 'cooldown'
+          ? 'The Bear needs an hour before reminiscing again.'
+          : 'First hear the bedtime story from a Piggy.',
+      }
+    : null;
   const isBearAccessory = classTsid === 'lips' || classTsid === 'moon';
-  const bearAccessoryMarkup = isBearAccessory && countItem(inv, EMOTIONAL_BEAR_ID) > 0
-    ? '<button type="button" class="pack-bear-upgrade" data-show-emotional-bear>Show Emotional Bear</button>'
-    : '';
+  const bearAccessoryRow = isBearAccessory && countItem(inv, EMOTIONAL_BEAR_ID) > 0
+    ? { attrs: 'data-show-emotional-bear', cls: 'pack-bear-upgrade', label: 'Show Emotional Bear', next: true, tip: 'Attach it from the Emotional Bear' }
+    : null;
   const musicblockDef = getMusicblock(classTsid);
   const relatedRecipes = listRecipes().filter((recipe) =>
     (recipe.inputs || []).some((input) => input.classTsid === classTsid)
@@ -3599,30 +3619,22 @@ function renderPackPopover(classTsid, anchor = null) {
     pc.energy >= repairQuote.energy &&
     !activeToolRepair
   );
-  const conditionMarkup = toolCondition?.tracked
-    ? `<div class="pack-tool-condition${toolCondition.broken ? ' broken' : ''}">
-        <div><span>${toolCondition.broken ? 'Broken' : 'Condition'}</span><strong>${toolCondition.remaining}/${toolCondition.capacity}</strong></div>
-        <div class="pack-tool-condition-track"><i style="width:${Math.round(toolCondition.percent * 100)}%"></i></div>
-      </div>`
+  // The kind line under the name: the tool's wear, the food's fullness today, the bear's state.
+  const conditionNote = toolCondition?.tracked
+    ? `<span class="pack-tool-condition${toolCondition.broken ? ' broken' : ''}">${toolCondition.broken ? 'Broken' : 'Condition'} ${toolCondition.remaining}/${toolCondition.capacity}</span>`
     : slot.isTool
-      ? '<p class="pack-tool-unlimited">This tool has no wear meter.</p>'
+      ? '<span class="pack-tool-unlimited">No wear meter</span>'
       : '';
-  const metabolicEffects = Object.entries(useInfo.effects || {})
-    .map(([stat, amount]) => `<span class="pack-pop-effect${amount < 0 ? ' loss' : ''}">${amount > 0 ? '+' : ''}${amount} ${escapeHtml(stat === 'xp' ? 'iMG' : stat)}</span>`)
-    .join('');
-  const buffEffect = useInfo.buff
-    ? `<span class="pack-pop-effect buff">${escapeHtml(useInfo.buff.def.name)}${useInfo.buff.durationSeconds ? ` · ${useInfo.buff.durationSeconds}s` : ''}</span>`
+  const effectWords = (effects) => Object.entries(effects || {})
+    .filter(([, amount]) => Number(amount))
+    .map(([stat, amount]) => `${amount > 0 ? '+' : ''}${amount} ${stat === 'xp' ? 'iMG' : stat}`);
+  const buffWords = useInfo.buff
+    ? `${useInfo.buff.def.name}${useInfo.buff.durationSeconds ? ` for ${useInfo.buff.durationSeconds}s` : ''}`
     : '';
-  const effects = musicblockDef
-    ? `<span class="pack-pop-effect loss">−2 energy</span><span class="pack-pop-effect">+2 mood</span><span class="pack-pop-effect music">fresh tune +${musicblockDef.freshXp} iMG</span>`
-    : metabolicEffects + buffEffect;
   const foodMemory = useInfo.food
-    ? `<div class="pack-food-memory${useInfo.food.quote.img > 0 ? ' has-bonus' : ''}">
-        <div><strong>${escapeHtml(useInfo.food.status)}</strong><span>${Math.round(useInfo.food.fullness.percent)}% full today</span></div>
-        <div class="pack-food-track" aria-hidden="true"><i style="width:${Math.round(useInfo.food.fullness.percent)}%"></i></div>
-        ${!useInfo.food.gate.ok ? `<p>${escapeHtml(useInfo.food.gate.reason)}</p>` : ''}
-      </div>`
+    ? `<span class="pack-food-memory${useInfo.food.quote.img > 0 ? ' has-bonus' : ''}">${Math.round(useInfo.food.fullness.percent)}% full today</span>`
     : '';
+  const kindNote = [conditionNote, foodMemory, bearState ? escapeHtml(bearState) : ''].filter(Boolean).join(' · ');
   const buffNote = useInfo.buff?.effectHint || '';
   const recipeNote = slot.isTool
     ? `${toolRecipes.length} ${toolRecipes.length === 1 ? 'recipe' : 'recipes'} with this tool`
@@ -3646,7 +3658,6 @@ function renderPackPopover(classTsid, anchor = null) {
           <button type="button" data-pack-drop-inc aria-label="Drop one more">+</button>
         </div>
         <div class="pack-drop-confirm-row">
-          <button type="button" data-pack-drop-cancel>Cancel</button>
           <button type="button" class="pack-pop-primary" data-pack-drop-confirm>Drop ${packDropQty}</button>
         </div>
       </div>`
@@ -3688,62 +3699,103 @@ function renderPackPopover(classTsid, anchor = null) {
         ${preview ? `<div class="pack-pop-effects pack-eat-preview" aria-live="polite">${preview}</div>` : ''}
         ${capNote || fullNote ? `<p class="pack-eat-note">${escapeHtml(capNote)}${capNote && fullNote ? ' ' : ''}${fullNote}</p>` : ''}
         <div class="pack-drop-confirm-row">
-          <button type="button" data-pack-eat-cancel>Cancel</button>
           <button type="button" class="pack-pop-primary" data-pack-eat-confirm>${escapeHtml(eatMany.verb)} ${qty}</button>
         </div>
       </div>`;
       })()
     : '';
-  const eatManyButton = eatMany && !packEatMode
-    ? `<button type="button" class="pack-eat-more" data-pack-eat-many title="Choose how many to ${escapeHtml(eatVerbLower)}">${escapeHtml(eatMany.verb)} more…</button>`
-    : '';
 
   // emblem_base `spend` (sort_on 54, before Caress): unlock its skill or speed up study.
   const emblemSpend = emblemSpendVerb(classTsid);
-  const emblemSpendMarkup = emblemSpend
-    ? `<button type="button" class="pack-bear-action" data-pack-emblem-spend ${emblemSpend.enabled ? '' : 'disabled'} title="${escapeHtml(emblemSpend.enabled ? emblemSpend.tooltip : emblemSpend.reason)}">Spend</button>`
-    : '';
+
+  // The rows, in the card's old order.
+  const useEffects = effectWords(useInfo.effects);
+  const useGain = useInfo.effects?.energy > 0 ? `+${useInfo.effects.energy}` : useEffects[0] || '';
+  const useTip = [
+    useEffects.join(', '),
+    buffWords,
+    useInfo.food ? `${useInfo.food.status}, ${Math.round(useInfo.food.fullness.percent)}% full today` : '',
+    buffNote,
+    useInfo.usable && !slot.isTool ? `Shift-click the stack to ${String(useInfo.verb).toLowerCase()} one straight away` : '',
+  ].filter(Boolean).join(' · ');
+  if (musicblockDef) {
+    rows.push({ attrs: 'data-pack-play data-musicblock-collection', cls: 'pack-pop-primary', label: 'Play tune', cost: 2, tip: [`+2 mood, fresh tune +${musicblockDef.freshXp} iMG`, collectionNote].filter(Boolean).join(' · ') });
+  }
+  if (useInfo.usable) {
+    const gateOk = !(useInfo.food && !useInfo.food.gate.ok);
+    rows.push({ attrs: 'data-pack-use', cls: 'pack-pop-primary', label: `${useInfo.verb}${useInfo.singleAction ? '' : ' one'}`, gain: useInfo.effects?.energy < 0 ? '' : useGain, cost: useInfo.effects?.energy < 0 ? -useInfo.effects.energy : 0, disabled: !gateOk, reason: useInfo.food?.gate?.reason || '', tip: useTip });
+  }
+  if ((useInfo.paradise || useInfo.buff) && !useInfo.usable) {
+    rows.push({ attrs: 'data-pack-use data-pack-use-block', cls: 'pack-pop-primary', label: useInfo.verb, disabled: true, reason: useInfo.reason, tip: buffWords });
+  }
+  if (useInfo.paradise) rows.push({ attrs: 'data-pack-eat-ticket', cls: 'pack-bear-action', label: 'Eat one', tip: PARADISE_TICKET_EAT.tooltip });
+  if (eatMany) rows.push({ attrs: 'data-pack-eat-many', cls: 'pack-eat-more', label: `${eatMany.verb} more`, next: true, tip: `Choose how many to ${eatVerbLower}` });
+  rows.push(...bearActionRows);
+  if (bearReminisceRow) rows.push(bearReminisceRow);
+  rows.push(...bearUpgradeRows);
+  if (bearAccessoryRow) rows.push(bearAccessoryRow);
+  if (toolCondition?.tracked && toolCondition.needsRepair && toolCondition.repairable) {
+    rows.push({
+      attrs: 'data-pack-repair',
+      cls: 'pack-pop-repair',
+      label: repairQuote?.ok ? 'Repair' : 'Repair (unavailable)',
+      cost: repairQuote?.ok ? repairQuote.energy : 0,
+      disabled: !canRepair,
+      tip: 'Repair with your Tinkertool',
+      reason: 'Needs Tinkering, energy, and a working Tinkertool',
+    });
+  }
+  if (emblemSpend) {
+    rows.push({ attrs: 'data-pack-emblem-spend', cls: 'pack-bear-action', label: 'Spend', disabled: !emblemSpend.enabled, tip: emblemSpend.tooltip, reason: emblemSpend.reason });
+  }
+  for (const verb of features.packVerbs(classTsid, engine)) {
+    rows.push({
+      attrs: `data-feature-pack-verb="${escapeHtml(verb.id)}" data-feature-id="${escapeHtml(verb.featureId)}"`,
+      cls: `pack-bear-action pack-feature-verb${verb.primary ? ' pack-pop-primary' : ''}`,
+      label: verb.label,
+      disabled: verb.enabled === false,
+      reason: verb.reason || '',
+      tip: verb.tooltip || '',
+    });
+  }
+  if (recipeTarget) rows.push({ attrs: 'data-pack-make', label: makeLabel, tip: recipeNote ? `${recipeNote} · opens Make` : 'Opens Make' });
+  const dropBlock = packDropBlockReason(classTsid);
+  rows.push({
+    attrs: 'data-pack-drop',
+    label: 'Drop',
+    next: slot.count > 1,
+    disabled: Boolean(dropBlock),
+    reason: dropBlock || '',
+    tip: slot.count > 1 ? `Choose how many to drop at your feet (${slot.count} here)` : 'Put it on the ground at your feet',
+  });
+  if (canSellHere) rows.push({ attrs: 'data-pack-sell', cls: 'pack-pop-sell', label: 'Sell', gain: `◎ ${sellPrice}`, tip: `Sell one to this vendor for ${sellPrice} currants` });
+
+  // Eat more and Drop (more than one) are second levels: a back row (0 or Backspace) and the count.
+  const level = eatPrompt ? 'eat' : dropPrompt ? 'drop' : '';
+  const keys = verbRowKeys(rows);
+  const rowMarkup = (row, key) => `<button type="button" class="vm-row${row.cls ? ` ${row.cls}` : ''}" ${row.attrs} ${verbRowAttrs(row)}>${verbRowInner({ ...row, key })}</button>`;
+  const rowsMarkup = level
+    ? `<button type="button" class="vm-row vm-back" ${level === 'eat' ? 'data-pack-eat-cancel' : 'data-pack-drop-cancel'} ${verbRowAttrs({ back: true, tip: 'Back to what you can do with it' })}>${verbRowInner({ key: '0', label: 'Back', back: true })}</button>`
+    : rows.map((row, i) => rowMarkup(row, keys[i])).join('');
 
   // A named Cubimal goes by its name, its figure type on the kind line (features/cubimal-race-feature.js).
   const named = features.query('itemDisplayName', classTsid);
   pop.hidden = false;
+  pop.dataset.vmDefault = plainWords(slot.desc || 'A thing from Ur.');
+  pop.dataset.vmLevel = level;
   const markup = `
-    <div class="pack-pop-head">
+    <div class="pack-pop-head vm-head"${isEmotionalBear ? ` data-bear-state="${bearStateName}"` : ''}>
       <div class="pack-pop-icon"><img src="${slot.icon}" alt="" /></div>
       <div class="pack-pop-title">
-        <span class="pack-pop-kind">${named ? escapeHtml(named.kind) : kind}</span>
         <h3 id="pack-popover-title">${escapeHtml(named?.label || slot.label)} <b>×${slot.count}</b></h3>
+        <span class="pack-pop-kind">${named ? escapeHtml(named.kind) : kind}${kindNote ? ` · ${kindNote}` : ''}</span>
       </div>
       <button type="button" class="pack-pop-close" data-pack-close aria-label="Close item actions">×</button>
     </div>
-    <p class="pack-pop-desc">${escapeHtml(slot.desc || 'A thing from Ur.')}</p>
-    ${bearStateMarkup}
-    ${conditionMarkup}
-    ${effects ? `<div class="pack-pop-effects">${effects}</div>` : ''}
-    ${foodMemory}
-    ${buffNote ? `<p class="pack-pop-recipes">${escapeHtml(buffNote)}</p>` : ''}
-    ${collectionNote ? `<p class="pack-pop-recipes" data-musicblock-collection>${escapeHtml(collectionNote)}</p>` : ''}
-    ${recipeNote ? `<p class="pack-pop-recipes">${escapeHtml(recipeNote)}</p>` : ''}
-    ${(useInfo.paradise || useInfo.buff) && useInfo.reason ? `<p class="pack-pop-recipes" data-pack-use-block>${escapeHtml(useInfo.reason)}</p>` : ''}
-    <div class="pack-pop-actions">
-      ${musicblockDef ? `<button type="button" class="pack-pop-primary" data-pack-play>Play tune</button>` : ''}
-      ${useInfo.usable ? `<button type="button" class="pack-pop-primary" data-pack-use ${useInfo.food && !useInfo.food.gate.ok ? 'disabled' : ''}>${escapeHtml(useInfo.verb)}${useInfo.singleAction ? '' : ' one'}</button>` : ''}
-      ${(useInfo.paradise || useInfo.buff) && !useInfo.usable ? `<button type="button" class="pack-pop-primary" data-pack-use disabled title="${escapeHtml(useInfo.reason)}">${escapeHtml(useInfo.verb)}</button>` : ''}
-      ${useInfo.paradise ? `<button type="button" class="pack-bear-action" data-pack-eat-ticket title="${escapeHtml(PARADISE_TICKET_EAT.tooltip)}">Eat one</button>` : ''}
-      ${eatManyButton}
-      ${bearActionMarkup}
-      ${bearReminisceMarkup}
-      ${bearUpgradeMarkup}
-      ${bearAccessoryMarkup}
-      ${toolCondition?.tracked && toolCondition.needsRepair && toolCondition.repairable ? `<button type="button" class="pack-pop-repair" data-pack-repair ${canRepair ? '' : 'disabled'} title="${canRepair ? 'Repair with your Tinkertool' : 'Needs Tinkering, energy, and a working Tinkertool'}">Repair · ${repairQuote?.ok ? `${repairQuote.energy} energy` : 'unavailable'}</button>` : ''}
-      ${emblemSpendMarkup}
-      ${features.packVerbs(classTsid, engine).map((verb) => `<button type="button" class="pack-bear-action pack-feature-verb${verb.primary ? ' pack-pop-primary' : ''}" data-feature-pack-verb="${escapeHtml(verb.id)}" data-feature-id="${escapeHtml(verb.featureId)}" ${verb.enabled === false ? 'disabled' : ''} title="${escapeHtml(verb.enabled === false ? verb.reason || '' : verb.tooltip || '')}">${escapeHtml(verb.label)}</button>`).join('')}
-      ${recipeTarget ? `<button type="button" data-pack-make>${escapeHtml(makeLabel)}</button>` : ''}
-      <button type="button" data-pack-drop ${packDropBlockReason(classTsid) ? `disabled title="${escapeHtml(packDropBlockReason(classTsid))}"` : ''}>Drop</button>
-      ${canSellHere ? `<button type="button" class="pack-pop-sell" data-pack-sell>Sell for ◎ ${sellPrice}</button>` : ''}
-    </div>
+    <div class="pack-pop-actions vm-rows" role="menu" aria-labelledby="pack-popover-title">${rowsMarkup}</div>
     ${eatPrompt}
-    ${dropPrompt}`;
+    ${dropPrompt}
+    <p class="vm-detail pack-pop-desc" aria-live="polite">${escapeHtml(plainWords(slot.desc || 'A thing from Ur.'))}</p>`;
   // updateHud redraws an open popover on every HUD change (buff timers, energy): rebuilding
   // the same markup swaps the buttons under the pointer and their hover blinks. Same content,
   // same buttons and listeners.
@@ -3755,13 +3807,19 @@ function renderPackPopover(classTsid, anchor = null) {
         .map((name) => `[${name}${name === 'data-pack-eat-choice' ? `="${focusedEat.getAttribute(name)}"` : ''}]`)[0] || null
     : null;
   const unchanged = pop.dataset.packFor === classTsid && pop.innerHTML !== '' && packPopoverMarkup === markup;
+  // VERBS: a row with focus keeps it across a redraw of the same stack (its place in the list).
+  const focusedRow = !keepFocus && focusedEat?.closest?.('.vm-row') && pop.dataset.packFor === classTsid
+    ? [...pop.querySelectorAll('.vm-row')].indexOf(focusedEat.closest('.vm-row'))
+    : -1;
+  bindVerbMenu(pop);
   if (!unchanged) {
     pop.innerHTML = markup;
     if (keepFocus) {
       const again = pop.querySelector(keepFocus);
       const target = again && !again.disabled ? again : pop.querySelector('[data-pack-eat-confirm]');
       target?.focus({ preventScroll: true });
-    }
+    } else if (focusedRow >= 0) focusVerbRow(pop, focusedRow);
+    syncVerbDetail(pop);
     pop.dataset.packFor = classTsid;
     packPopoverMarkup = markup;
   }
@@ -3837,6 +3895,7 @@ function renderPackPopover(classTsid, anchor = null) {
     packDropMode = true;
     packDropQty = normalizeStackQuantity(packDropQty, slot.count);
     renderPackPopover(classTsid, sourceAnchor);
+    pop.querySelector('[data-pack-drop-confirm]')?.focus({ preventScroll: true });
   });
   pop.querySelector('[data-pack-drop-dec]')?.addEventListener('click', () => {
     packDropQty = normalizeStackQuantity(packDropQty - 1, slot.count);
@@ -3850,6 +3909,7 @@ function renderPackPopover(classTsid, anchor = null) {
     packDropMode = false;
     packDropQty = 1;
     renderPackPopover(classTsid, sourceAnchor);
+    if (MODERN_UI) pop.querySelector('[data-pack-drop]')?.focus({ preventScroll: true });
   });
   pop.querySelector('[data-pack-drop-confirm]')?.addEventListener('click', () => {
     dropPackItem(classTsid, packDropQty);
@@ -4081,6 +4141,8 @@ function renderPackRow(box, slots, opts = {}) {
           packEatQty = 1;
         }
         renderPackPopover(s.classTsid, slot);
+        // VERBS: opened from the keyboard, the first row takes focus (a click leaves the footer on what it is).
+        if (MODERN_UI && event.detail === 0) focusVerbRow(document.getElementById('pack-popover'));
       }
     });
     if (canDragToVendor || inLayout) {
@@ -6388,53 +6450,211 @@ function openVerbMenu(target) {
     return;
   }
   const menu = document.getElementById('verb-menu');
-  const list = document.getElementById('verb-menu-list');
-  const title = document.getElementById('verb-menu-title');
-  const sub = document.getElementById('verb-menu-sub');
-
-  title.textContent = target.label || target.classId;
-  sub.textContent = target.subtitle || 'What do you want to do?';
-  list.innerHTML = '';
-
-  if (!verbs.length) {
-    list.innerHTML = '<li class="verb-choice-tip" style="padding:0.75rem 1rem">Nothing to do here.</li>';
-  }
-
-  /** @type {HTMLButtonElement|null} */
-  let firstEnabled = null;
-  verbs.forEach((v) => {
-    const li = document.createElement('li');
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'verb-choice';
-    btn.disabled = !v.enabled;
-    btn.innerHTML = `
-      <span class="verb-choice-label">${v.label}${v.energy ? ` · ${v.energy} energy` : ''}</span>
-      <span class="verb-choice-tip">${v.tooltip || ''}</span>
-      ${!v.enabled && v.reason ? `<span class="verb-choice-reason">${v.reason}</span>` : ''}
-    `;
-    if (v.enabled) {
-      if (!firstEnabled) firstEnabled = btn;
-      btn.addEventListener('click', () => {
-        closeVerbMenu();
-        if (v.id === 'feed' || v.picker) openFeedPicker(target, v);
-        else beginVerbAction(target, v);
-      });
-    }
-    li.appendChild(btn);
-    list.appendChild(li);
-  });
-
+  renderVerbMenu(target, verbs);
   menu.hidden = false;
+  placeWorldVerbMenu(target);
   // Defer focus so the Enter that opened the menu does not also activate this choice.
   requestAnimationFrame(() => {
-    const focusBtn = firstEnabled || list.querySelector('.verb-choice');
-    focusBtn?.focus({ preventScroll: true });
+    if (menuTarget === target && !menu.hidden) focusVerbRow(menu);
   });
 }
 
+/**
+ * VERBS (js/ui/verb-menu.js): the menu's rows, one line each with a 1-9 key cap and the energy
+ * cost; the tooltip or the reason a verb can't be done shows in the footer line. A verb that
+ * picks from the pack (Feed, Incubate, Deposit) opens a second level of the stacks it takes
+ * (the original's target-item list), with 0 or Backspace back to the verbs.
+ */
+function renderVerbMenu(target, verbs, level = null) {
+  const menu = document.getElementById('verb-menu');
+  const list = document.getElementById('verb-menu-list');
+  const title = document.getElementById('verb-menu-title');
+  const sub = document.getElementById('verb-menu-sub');
+  const icon = document.getElementById('verb-menu-icon');
+  bindVerbMenu(menu);
+  title.textContent = target.label || target.classId;
+  sub.textContent = level ? level.title : target.subtitle || 'What do you want to do?';
+  // A thing that is also an item (an apple on the ground, a dropped stack) shows its icon.
+  const iconUrl = ITEM_CATALOG[target.classId] ? itemIconUrl(target.classId) : '';
+  if (icon) {
+    icon.hidden = !iconUrl;
+    if (iconUrl && icon.getAttribute('src') !== iconUrl) icon.src = iconUrl;
+  }
+  menu.dataset.vmLevel = level ? level.verbId : '';
+  menu.dataset.vmDefault = '';
+  list.innerHTML = '';
+  const add = (row, onPick) => {
+    const li = document.createElement('li');
+    li.setAttribute('role', 'none');
+    const btn = makeVerbRow(document, row);
+    btn.classList.add('verb-choice');
+    if (row.verb) btn.dataset.verb = row.verb;
+    if (onPick) btn.addEventListener('click', onPick);
+    li.appendChild(btn);
+    list.appendChild(li);
+    return btn;
+  };
+  if (level) {
+    const keys = verbRowKeys([{ back: true }, ...level.options]);
+    add({ key: keys[0], label: 'Back', back: true, tip: `Back to what you can do with the ${target.label || 'thing'}` }, () => {
+      renderVerbMenu(target, menuVerbsFor(target));
+      placeWorldVerbMenu(target);
+      const at = [...list.querySelectorAll('.vm-row')].findIndex((r) => r.dataset.verb === level.verb?.id);
+      focusVerbRow(menu, at < 0 ? null : at);
+    });
+    level.options.forEach((food, i) => {
+      add({
+        key: keys[i + 1],
+        label: food.label,
+        count: `×${food.have}`,
+        tip: `${FEED_PICKER_VERB_LABELS[level.verbId] || 'Feed'} ${food.label} · ${food.have} in your pack`,
+        verb: `${level.verbId}:${food.classTsid}`,
+      }, () => {
+        closeVerbMenu();
+        openFeedPicker(target, level.verb, food.classTsid);
+      });
+    });
+    return;
+  }
+  if (!verbs.length) {
+    menu.dataset.vmDefault = 'Nothing to do here.';
+    const li = document.createElement('li');
+    li.className = 'verb-choice-tip vm-empty';
+    li.textContent = 'Nothing to do here.';
+    list.appendChild(li);
+    syncVerbDetail(menu);
+    return;
+  }
+  const keys = verbRowKeys(verbs);
+  verbs.forEach((v, i) => {
+    const picks = v.id === 'feed' || Boolean(v.picker);
+    add({
+      key: keys[i],
+      label: v.label,
+      cost: v.energy,
+      next: picks,
+      disabled: !v.enabled,
+      tip: v.tooltip || '',
+      reason: v.reason || '',
+      verb: v.id,
+    }, v.enabled ? (e) => {
+      if (picks) openVerbPickLevel(target, v, e.currentTarget);
+      else {
+        closeVerbMenu();
+        beginVerbAction(target, v);
+      }
+    } : null);
+  });
+}
+
+/** Feed (and the other pack pickers): the stacks it takes, or why there are none. */
+function openVerbPickLevel(target, verb, row) {
+  const menu = document.getElementById('verb-menu');
+  const verbId = verb?.picker || verb?.id || 'feed';
+  const options = feedPickerChoices(target, verbId);
+  if (!options.length) {
+    // The reason in the footer, where the menu's other reasons go (was a toast).
+    row.setAttribute('aria-disabled', 'true');
+    row.dataset.vmReason = verb?.emptyMsg || `You don't have anything this ${target.label || 'animal'} wants to eat.`;
+    refuseVerbRow(menu, row);
+    return;
+  }
+  renderVerbMenu(target, null, { verbId, verb, options, title: FEED_PICKER_TITLES[verbId] || 'Feed what?' });
+  placeWorldVerbMenu(target);
+  focusVerbRow(menu, 1);
+}
+
+/**
+ * The world menu's place: above the thing with its tail on it, below it when there is no room,
+ * clear of the avatar, the side insets, the top band and the pack (placeVerbMenu).
+ *
+ * Both skins get it as custom properties on #verb-menu (px in #game-root): the thing's rect,
+ * --vm-anchor-left/top/right/bottom and --vm-anchor-x (its centre), and the menu's place,
+ * --vm-left with --vm-top or --vm-bottom (the other is auto), --vm-tail (the tail's x in the card),
+ * the classes below and no-tail. The modern skin positions the card with them; a skin that
+ * does not read them keeps its own place.
+ */
+function placeWorldVerbMenu(target) {
+  const menu = document.getElementById('verb-menu');
+  const root = document.getElementById('game-root');
+  if (!menu || !root || menu.hidden) return;
+  const card = menu.querySelector('.verb-menu-card') || menu;
+  const rr = root.getBoundingClientRect();
+  const anchor = targetPageRect(target, rr);
+  if (!anchor) return;
+  const set = (name, v) => menu.style.setProperty(name, v);
+  set('--vm-anchor-left', `${Math.round(anchor.left)}px`);
+  set('--vm-anchor-top', `${Math.round(anchor.top)}px`);
+  set('--vm-anchor-right', `${Math.round(anchor.right)}px`);
+  set('--vm-anchor-bottom', `${Math.round(anchor.bottom)}px`);
+  set('--vm-anchor-x', `${Math.round((anchor.left + anchor.right) / 2)}px`);
+  menu.dataset.anchor = [anchor.left, anchor.top, anchor.right, anchor.bottom].map(Math.round).join(',');
+  const avatar = player && !player.destroyed ? targetPageRect({ sprite: player }, rr) : null;
+  const cs = getComputedStyle(root);
+  const px = (name, fallback) => {
+    const v = parseFloat(cs.getPropertyValue(name));
+    return Number.isFinite(v) ? v : fallback;
+  };
+  const pack = document.getElementById('pack-row')?.getBoundingClientRect();
+  const placed = placeVerbMenu({
+    anchor,
+    size: { w: card.offsetWidth, h: card.offsetHeight },
+    room: {
+      w: rr.width,
+      h: rr.height,
+      top: px('--hud-h', 44) + 8,
+      floor: pack && pack.height ? pack.top - rr.top : rr.height,
+      left: Math.max(8, px('--inset-l', 0)),
+      right: Math.max(8, px('--inset-r', 0)),
+    },
+    avoid: avatar && target?.sprite !== player ? avatar : null,
+  });
+  set('--vm-left', `${placed.x}px`);
+  // Above the thing it hangs from its bottom edge, so a longer footer line grows it upwards, off the thing.
+  if (placed.below) {
+    set('--vm-top', `${placed.y}px`);
+    set('--vm-bottom', 'auto');
+  } else {
+    set('--vm-top', 'auto');
+    set('--vm-bottom', `${Math.round(rr.height - placed.y - card.offsetHeight)}px`);
+  }
+  menu.classList.toggle('below', placed.below);
+  menu.classList.toggle('no-tail', placed.tail == null);
+  if (placed.tail != null) set('--vm-tail', `${placed.tail}px`);
+  if (app?.canvas) app.canvas.dataset.verbMenuPlace = `${placed.x},${placed.y},${placed.below ? 'below' : 'above'},${placed.tail ?? 'none'}`;
+}
+
+/** A thing's sprite as a rect in #game-root's px (its bounds, clipped to the view), or null. */
+function targetPageRect(target, rr) {
+  const spr = target?.sprite;
+  if (!spr || spr.destroyed || !app?.canvas || typeof spr.getBounds !== 'function') return null;
+  const c = app.canvas.getBoundingClientRect();
+  const sx = c.width / VIEW_W;
+  const sy = c.height / VIEW_H;
+  let b;
+  try {
+    b = spr.getBounds();
+  } catch {
+    return null;
+  }
+  const left = c.left - rr.left + b.x * sx;
+  const top = c.top - rr.top + b.y * sy;
+  const right = left + b.width * sx;
+  const bottom = top + b.height * sy;
+  if (!(right > left) || !(bottom > top)) return null;
+  // Clipped to what shows (a tree taller than the view, a thing half off the edge).
+  return {
+    left: Math.max(0, left),
+    top: Math.max(0, top),
+    right: Math.min(rr.width, Math.max(left + 1, right)),
+    bottom: Math.min(rr.height, Math.max(top + 1, bottom)),
+  };
+}
+
 function closeVerbMenu() {
-  document.getElementById('verb-menu').hidden = true;
+  const menu = document.getElementById('verb-menu');
+  menu.hidden = true;
+  delete menu.dataset.vmLevel;
   menuTarget = null;
 }
 
@@ -6563,7 +6783,8 @@ function verbChangedSomething(effects) {
   return Object.values(effects.items || {}).some((n) => Number(n));
 }
 
-function openFeedPicker(target, verb = null) {
+/** `pick`: a stack chosen in the verb menu's second level (VERBS): straight to the count, or fed. */
+function openFeedPicker(target, verb = null, pick = '') {
   if (!target || currentAction) return false;
   const panel = document.getElementById('feed-picker');
   const grid = document.getElementById('feed-picker-grid');
@@ -6623,6 +6844,7 @@ function openFeedPicker(target, verb = null) {
     app.canvas.dataset.feedPickerSelection = '';
     app.canvas.dataset.feedPickerResult = 'open';
   }
+  if (pick) return chooseFeedPickerItem(pick);
   requestAnimationFrame(() => {
     const first = grid.querySelector('.feed-picker-choice');
     markFeedPickerChoice(first);
@@ -25514,6 +25736,13 @@ async function main() {
   document.getElementById('verb-menu').addEventListener('click', (e) => {
     if (e.target.id === 'verb-menu') closeVerbMenu();
   });
+  // VERBS: the modern menu has no shade, so a press anywhere else closes it (and does only that).
+  document.addEventListener('pointerdown', (e) => {
+    const menu = document.getElementById('verb-menu');
+    if (!menuTarget || !menu || menu.hidden || menu.contains(e.target)) return;
+    closeVerbMenu();
+    verbMenuClosedByPointerAt = e.timeStamp;
+  }, true);
   document.getElementById('feed-picker-close').addEventListener('click', () => closeFeedPicker());
   document.getElementById('feed-picker-qty-minus')?.addEventListener('click', () => {
     setFeedPickerQty((Number(document.getElementById('feed-picker-qty-input')?.value) || 1) - 1);
@@ -25696,6 +25925,12 @@ async function main() {
       }
       return;
     }
+    // VERBS: a stack's menu (the pack's own verb menu) takes the menu keys while it is open.
+    if (isPackPopoverOpen() && verbMenuKey(document.getElementById('pack-popover'), e)) {
+      e.preventDefault();
+      keys.delete(e.key);
+      return;
+    }
     if (isMapOpen()) {
       // G254: M closes it too (TSMainView.as mKeyHandler 733-741, toggleHubMapDialog).
       if (e.key === 'g' || e.key === 'G' || isPlainKey(e, 'm')) closeMap();
@@ -25730,16 +25965,10 @@ async function main() {
     // Verb menu open: let Enter activate the focused choice (native button);
     // Esc already handled. Arrow keys can move between choices.
     if (menuTarget) {
-      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      // VERBS (js/ui/verb-menu.js): Up/Down or W/S move, 1-9 pick, 0 or Backspace go back.
+      if (verbMenuKey(document.getElementById('verb-menu'), e)) {
         e.preventDefault();
-        const choices = [...document.querySelectorAll('#verb-menu-list .verb-choice:not(:disabled)')];
-        if (!choices.length) return;
-        const i = choices.indexOf(document.activeElement);
-        const next =
-          e.key === 'ArrowDown'
-            ? choices[(i + 1 + choices.length) % choices.length]
-            : choices[(i - 1 + choices.length) % choices.length];
-        next?.focus({ preventScroll: true });
+        keys.delete(e.key);
       }
       return;
     }
@@ -26019,6 +26248,8 @@ async function main() {
 
   app.canvas.addEventListener('pointerdown', (e) => {
     if (!state.started || menuTarget || isMapOpen() || isScreenFxBlocking()) return;
+    // The press that closed a verb menu (VERBS) does nothing else, as the old shade's did.
+    if (e.timeStamp === verbMenuClosedByPointerAt) return;
     const bounds = app.canvas.getBoundingClientRect();
     const sx = (e.clientX - bounds.left) * (VIEW_W / bounds.width) + camTarget;
     const sy = (e.clientY - bounds.top) * (VIEW_H / bounds.height) + (camY || 0);

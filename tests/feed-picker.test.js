@@ -66,7 +66,8 @@ describe('original-style target-item feed picker', () => {
 
   it('wires mouse, keyboard, exact item ids, timing, and deterministic QA state', () => {
     const game = readFileSync(join(publicDir, 'game.js'), 'utf8');
-    assert.match(game, /function openFeedPicker\(target, verb = null\)/);
+    assert.match(game, /function openFeedPicker\(target, verb = null, pick = ''\)/);
+    assert.match(game, /if \(pick\) return chooseFeedPickerItem\(pick\);/);
     assert.match(game, /listAnimalFeedOptions\(target\.classId, inv\)/);
     assert.match(game, /id: counted \? `\$\{verbId\}:\$\{classTsid\}:\$\{count\}` : `\$\{verbId\}:\$\{classTsid\}`/);
     assert.match(game, /ArrowLeft'[\s\S]*ArrowRight'[\s\S]*ArrowUp'[\s\S]*ArrowDown'/);
@@ -74,6 +75,9 @@ describe('original-style target-item feed picker', () => {
     assert.match(game, /chooseFeedPickerItem\(selected\.dataset\.food\)/);
     assert.match(game, /dataset\.feedPickerOptions/);
     assert.match(game, /dataset\.feedPickerResult = result\.ok \? 'success' : 'failed'/);
-    assert.match(game, /if \(v\.id === 'feed' \|\| v\.picker\) openFeedPicker\(target, v\)/);
+    // VERBS: Feed (and every picker verb) is the verb menu's second level of the stacks it takes.
+    assert.match(game, /const picks = v\.id === 'feed' \|\| Boolean\(v\.picker\);/);
+    assert.match(game, /if \(picks\) openVerbPickLevel\(target, v, e\.currentTarget\);/);
+    assert.match(game, /openFeedPicker\(target, level\.verb, food\.classTsid\);/);
   });
 });

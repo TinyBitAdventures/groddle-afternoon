@@ -197,9 +197,8 @@ describe('the pack card chooser', () => {
     assert.match(game, /from '\.\/js\/eat-many\.js\?v=g\d+-\d+';/);
   });
 
-  it('adds "Eat more…" beside "Eat one" and an "Eat how many?" panel', () => {
-    assert.match(game, /data-pack-eat-many title="Choose how many to/);
-    assert.match(game, /\$\{escapeHtml\(eatMany\.verb\)\} more…<\/button>/);
+  it('adds "Eat more" (a second level of the stack menu) beside "Eat one" and an "Eat how many?" panel', () => {
+    assert.match(game, /attrs: 'data-pack-eat-many', cls: 'pack-eat-more', label: `\$\{eatMany\.verb\} more`, next: true, tip: `Choose how many to/);
     assert.match(game, /\$\{escapeHtml\(eatMany\.verb\)\} how many \$\{escapeHtml\(eatMany\.plural\)\}\?/);
     assert.match(game, /data-pack-eat-choice="\$\{n\}" aria-pressed=/);
     assert.match(game, /n === 1\s*\? 'Just one'/);

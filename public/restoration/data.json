@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 792,
+  "commits": 793,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "With the Social drawer open, the top bar's Menu and Sound popover sit over it and every row takes clicks"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "The game's colours, type, spacing, radii, shadows and layers come from one set of design tokens"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "The bureaucrats' walks, the Factory Defect Chick and the Hog-tied Piggy draw sharp on Retina screens"
    }
   ]
  },

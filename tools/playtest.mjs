@@ -312,7 +312,8 @@ class Session {
       return {
         title: document.getElementById('verb-menu-title')?.textContent || '',
         sub: document.getElementById('verb-menu-sub')?.textContent || '',
-        verbs: [...document.querySelectorAll('#verb-menu-list button')].map((b) => ({ text: b.textContent.trim().replace(/\s+/g, ' '), disabled: b.disabled })),
+        // A row's words are its label (and cost); a verb that can't be done now has aria-disabled (VERBS).
+        verbs: [...document.querySelectorAll('#verb-menu-list button')].map((b) => ({ text: (b.querySelector('.vm-label')?.textContent ?? b.textContent).trim().replace(/\s+/g, ' '), disabled: b.disabled || b.getAttribute('aria-disabled') === 'true' })),
       };
     });
   }
@@ -320,7 +321,7 @@ class Session {
   async chooseVerb(re) {
     const ok = await this.page.evaluate((src) => {
       const rx = new RegExp(src, 'i');
-      const b = [...document.querySelectorAll('#verb-menu-list button')].find((el) => rx.test(el.textContent.trim().replace(/\s+/g, ' ')) && !el.disabled);
+      const b = [...document.querySelectorAll('#verb-menu-list button')].find((el) => rx.test((el.querySelector('.vm-label')?.textContent ?? el.textContent).trim().replace(/\s+/g, ' ')) && !el.disabled && el.getAttribute('aria-disabled') !== 'true');
       if (!b) return false;
       b.click();
       return true;

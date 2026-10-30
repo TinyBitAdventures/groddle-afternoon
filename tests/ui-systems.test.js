@@ -166,7 +166,7 @@ describe('pack / inventory', () => {
     const game = readFileSync(join(__dirnameUi, '../public/game.js'), 'utf8');
     // updateHud redraws the open card on every HUD change; the same markup keeps the same buttons (no hover blink).
     assert.match(game, /if \(packSelected\) renderPackPopover\(packSelected\);/);
-    assert.match(game, /const unchanged = pop\.dataset\.packFor === classTsid && pop\.innerHTML !== '' && packPopoverMarkup === markup;\n\s*if \(!unchanged\) \{\n\s*pop\.innerHTML = markup;/);
+    assert.match(game, /const unchanged = pop\.dataset\.packFor === classTsid && pop\.innerHTML !== '' && packPopoverMarkup === markup;\n[\s\S]{0,500}?if \(!unchanged\) \{\n\s*pop\.innerHTML = markup;/);
     assert.match(game, /positionPackPopover\(pop, sourceAnchor\);\n\s*if \(unchanged\) return;/);
     assert.match(game, /packPopoverMarkup = '';/, 'closing forgets the markup');
     assert.match(game, /const sourceAnchor = \(anchor\?\.isConnected \? anchor : null\) \|\| findPackSlotElement\(classTsid\);/);
@@ -191,7 +191,8 @@ describe('pack / inventory', () => {
     }
     const game = files[0];
     assert.match(game, /classTsid === 'fruit_changing_machine'[\s\S]*?'Convert fruit'/);
-    assert.equal((game.match(/\$\{conditionMarkup\}/g) || []).length, 1);
+    // The tool's condition is said once, on the stack menu's kind line (VERBS).
+    assert.equal((game.match(/\[conditionNote, foodMemory, /g) || []).length, 1);
   });
 
   it('starts with sound on, remembers a mute, and offers the mute control', () => {
