@@ -22376,7 +22376,7 @@ function renderAchievePanel() {
   const meta = document.getElementById('achieve-meta');
   if (!box) return;
   box.innerHTML = '';
-  box.className = 'quest-log-body achieve-grid';
+  box.className = 'quest-log-body ui-sheet-body achieve-grid'; // ui-sheet-body: the sheet's one scroller (the header stays put)
   const catN = Object.keys(getAchievementCatalog()).length;
   const allRows = browseAchievementLog(achieveState, achievementBrowser);
   const visibleRows = allRows.slice(0, achievementBrowser.limit);
