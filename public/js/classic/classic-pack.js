@@ -8,7 +8,7 @@
  * (Austin 2026-10-30), so the pack is reached as any button is (Tab, or a click) and the arrows take
  * over from there. Keys used here stay here, so the avatar does not walk.
  */
-import { uiState } from './ui-mode.js?v=g468-9';
+import { uiState } from './ui-mode.js?v=g476-1';
 
 /** PURE: the next index along a row of n (wrapping), or -1 for an empty row. */
 export function stepIndex(i, n, dir) {

@@ -12,10 +12,11 @@
    C is the horizontal chrome in u: 20 + the 313 right column + 20, or 20 + the 48 rail + 20 under
    1313 px wide (open question 3). "Original window size" is u = 1 with the world capped at
    1000 x 600 (+ the 132 pack reserve) and the block centred (TSMainView.as 1219-1287).
-   The world cell is #game-root; the game sizes its view in it with stageFor, unchanged. */
+   The world cell is #game-root; the game sizes its view in it with stageFor, unchanged.
+   Zoomed past Wide (js/world-zoom.js), u comes from --cu-zoom on <html> (js/classic/classic-zoom.js). */
 :root[data-ui="classic"] {
   --cu-c: 353;
-  --cu: max(1px, min(100vw / (960 + var(--cu-c)), 100vh / 580, max(100vw / (1680 + var(--cu-c)), 100vh / 892)));
+  --cu: var(--cu-zoom, max(1px, min(100vw / (960 + var(--cu-c)), 100vh / 580, max(100vw / (1680 + var(--cu-c)), 100vh / 892))));
   --cf-right-w: calc((var(--cu-c) - 40) * var(--cu));
   --cf-gutter-r: calc(20 * var(--cu));
   --cf-header-h: calc(40 * var(--cu));
@@ -193,6 +194,16 @@
 :root[data-ui="classic"] .prefs-window .prefs-choice small,
 :root[data-ui="classic"] .prefs-window .prefs-note { color: var(--c-classic-text); font-size: var(--fs-classic-body); }
 :root[data-ui="classic"] .prefs-window input[type="radio"] { accent-color: var(--c-classic-link); }
+/* ZOOM (js/world-zoom.js): the world zoom slider, in the same well under the size choice. */
+:root[data-ui="classic"] .prefs-window .prefs-zoom {
+  margin: 0;
+  padding: var(--sp-5) var(--sp-10);
+  background: var(--c-classic-well);
+  border-bottom: 1px solid var(--c-classic-rule);
+}
+:root[data-ui="classic"] .prefs-window .prefs-zoom label { color: var(--c-classic-title); font: 800 var(--fs-classic-pane)/var(--lh-tight) var(--font-classic-title); }
+:root[data-ui="classic"] .prefs-window .prefs-zoom input { accent-color: var(--c-classic-link); }
+:root[data-ui="classic"] .prefs-window .prefs-zoom-ends { color: var(--c-classic-text); font-size: var(--fs-classic-body); }
 /* The client's own checkbox art (cb_unchecked.png, cb_checked.png, 18 x 18). */
 :root[data-ui="classic"] .prefs-window input[type="checkbox"] {
   appearance: none;

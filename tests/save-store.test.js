@@ -521,8 +521,9 @@ describe('every save read and write goes through the store', () => {
   // online-boot.js keeps one per-tab flag (Play as <name> picked) in sessionStorage, never a save;
   // groups-feature.js remembers which chat tabs a multiplayer player has open on this device, never a save;
   // ui/social-drawer.js remembers whether the player keeps the Social drawer open or as the rail, a device preference;
-  // js/classic/ui-mode.js keeps the interface (Modern or Classic) and its window size, a device preference.
-  const ALLOWED = new Set(['js/save-store.js', 'js/practice-mode.js', 'js/audio-pref.js', 'js/online-boot.js', 'js/features/groups-feature.js', 'js/ui/social-drawer.js', 'js/classic/ui-mode.js']);
+  // js/classic/ui-mode.js keeps the interface (Modern or Classic) and its window size, a device preference;
+  // js/world-zoom.js keeps the world zoom (Wide to Original), a device preference.
+  const ALLOWED = new Set(['js/save-store.js', 'js/practice-mode.js', 'js/audio-pref.js', 'js/online-boot.js', 'js/features/groups-feature.js', 'js/ui/social-drawer.js', 'js/classic/ui-mode.js', 'js/world-zoom.js']);
 
   it('game.js and js/ make no direct localStorage or sessionStorage calls', () => {
     const offenders = [];

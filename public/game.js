@@ -652,7 +652,7 @@ import { easeCameraAxis } from './js/camera-feel.js?v=g473-1';
 import { renderResolution, RESOLUTION_STEP } from './js/render-density.js';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
 import { vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=g458-2';
-import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap } from './js/location-view.js?v=g458-1';
+import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap } from './js/location-view.js?v=g476-1';
 import {
   levelInfoForXp,
   reconcilePlayerProgression,
@@ -679,7 +679,10 @@ import {
 } from './js/screen-fx.js?v=g470-1';
 import { momentMoreText } from './js/ui/moment-card.js?v=g470-1';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
-import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=g468-9';
+import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=g476-1';
+// ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
+import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction } from './js/world-zoom.js?v=g476-1';
+import './js/classic/classic-zoom.js?v=g476-1';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=g470-2';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=g459-1';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=g434-1';
@@ -852,7 +855,7 @@ import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from '.
 import { installHiresIcons } from './js/icon-hires.js?v=g446-4';
 import { installHiresDecos } from './js/deco-hires.js?v=g457-3';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=g465-1';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=g470-2';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=g476-1';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=g464-2';
 import { denseSprite } from './js/sprite-dense.js?v=g430-1';
@@ -866,7 +869,7 @@ import { createQuestTracker } from './js/ui/quest-tracker.js?v=g477-1';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=g472-7';
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=g477-1';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g470-2';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g476-1';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=g432-1';
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=g463-2';
@@ -882,7 +885,7 @@ import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?
 import { itemZ } from './js/item-bands.js?v=g429-1';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=g412-1';
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=g468-30';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=g476-2';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -1592,6 +1595,8 @@ function measureStage() {
     packReserve: PACK_VIEW_RESERVE,
     sceneWidth: sceneViewWidthCap(bgLayer, WORLD_W),
     sceneHeight,
+    // ZOOM (js/world-zoom.js): Wide (0) to Original (1), this device's choice.
+    zoom: worldZoom(),
   });
 }
 
@@ -1601,8 +1606,9 @@ function measureStage() {
  * a scene smaller than it magnifies to fill, and the canvas always fills
  * #game-root, so the page never scrolls (style.css STAGE block).
  */
-function syncLocationViewHeight() {
+function syncLocationViewHeight({ keepFraming = false } = {}) {
   viewSceneLayer = bgLayer;
+  const before = { viewW: VIEW_W, camX: camTarget };
   const stage = measureStage();
   const root = document.getElementById('game-root');
   if (root && !stage.pinned) {
@@ -1639,10 +1645,41 @@ function syncLocationViewHeight() {
     world.y = -Math.round(camY * 2) / 2;
   }
   if (world && player && Number.isFinite(WORLD_W)) {
-    camTarget = cameraTargetForPlayer(player.x, player.vx || 0);
-    world.x = -Math.round(camTarget * 2) / 2;
+    if (keepFraming && Number.isFinite(before.camX) && before.viewW > 0 && VIEW_W < WORLD_W) {
+      // ZOOM: the avatar keeps its place across the window, so the view grows or shrinks around
+      // it; the eased camera then glides to its new target (js/camera-feel.js), never a jump.
+      const share = (player.x - before.camX) / before.viewW;
+      camTarget = clamp(player.x - share * VIEW_W, 0, WORLD_W - VIEW_W);
+      cameraRest.x = { rest: false, dir: cameraRest.x.dir };
+      cameraRest.y = { rest: false, dir: cameraRest.y.dir };
+      world.x = -camTarget;
+    } else {
+      camTarget = cameraTargetForPlayer(player.x, player.vx || 0);
+      world.x = -Math.round(camTarget * 2) / 2;
+    }
   }
   return true;
+}
+
+/** ZOOM: a resize this file sends after a zoom change, so the camera keeps the framing it chose. */
+let zoomRelaying = false;
+
+/**
+ * ZOOM (js/world-zoom.js): the player moved the zoom. The stage resizes live (renderer density
+ * with it, so art redraws at the new scale), the camera keeps the avatar where it was on screen,
+ * and the usual resize listeners (pack pagers, overlays, Classic's frame) measure again.
+ */
+function applyWorldZoom() {
+  syncCameraSafeArea();
+  syncLocationViewHeight({ keepFraming: true });
+  syncRenderResolution();
+  if (app?.canvas) app.canvas.dataset.worldZoom = String(worldZoom());
+  try {
+    zoomRelaying = true;
+    window.dispatchEvent(new Event('resize'));
+  } finally {
+    zoomRelaying = false;
+  }
 }
 
 /**
@@ -24970,11 +25007,13 @@ async function main() {
     syncLocationViewHeight();
     syncRenderResolution();
     refreshPackPagers();
-    if (player && Number.isFinite(WORLD_W)) {
+    if (player && Number.isFinite(WORLD_W) && !zoomRelaying) {
       camTarget = cameraTargetForPlayer(player.x, player.vx || 0);
       if (world) world.x = -Math.round(camTarget * 2) / 2;
     }
   });
+  // ZOOM: the Menu, the Sound popover, Preferences and the = - 0 keys all land here.
+  onZoomChange(() => applyWorldZoom());
   // Pixi renders filters at resolution 1 by default. The street colour matrix
   // sits on the middleground and on entityLayer (1,169 of 1,422 streets), so
   // avatars, animals and decos were drawn at half density on Retina.
@@ -25015,6 +25054,7 @@ async function main() {
   app.canvas.dataset.viewWidth = String(VIEW_W);
   app.canvas.dataset.stageScale = STAGE_SCALE.toFixed(3);
   app.canvas.dataset.locationViewportHeight = String(LOCATION_VIEW_H);
+  app.canvas.dataset.worldZoom = String(worldZoom());
   syncLocationViewHeight();
   syncRenderResolution();
   // Panels and the HUD can resize the canvas without a window resize.
@@ -26372,6 +26412,14 @@ async function main() {
       return;
     }
     if (clientShortcutKey(e)) return;
+    // ZOOM: = (or +) closer, - wider, 0 back to Wide (js/world-zoom.js); typing in a field never gets here.
+    const zoomKey = zoomKeyAction(e);
+    if (zoomKey) {
+      e.preventDefault();
+      keys.delete(e.key);
+      stepWorldZoom(zoomKey);
+      return;
+    }
     if (e.key === 'f' || e.key === 'F') eatApple();
     if (e.key === 't' || e.key === 'T') doTeleport();
     if (e.key === 'g' || e.key === 'G' || isPlainKey(e, 'm')) {
@@ -27076,6 +27124,7 @@ async function main() {
   // Phase 2 (js/ui/topbar.js): the modern bar's tooltips, Menu groups, Sound popover and pills.
   installTopBar(document, {
     audio: { levels: () => ({ ...audioLevels }), setLevel: setAudioLevel },
+    zoom: { get: worldZoom, set: setWorldZoom, onChange: onZoomChange },
     onImagination: () => (modernUi() && imaginationHub ? imaginationHub.toggle() : document.getElementById('img-btn')?.click()),
     onMail: () => { if (state.started) openMailboxPanel(); },
     onPlayerCard: () => document.getElementById('player-menu-btn')?.click(),

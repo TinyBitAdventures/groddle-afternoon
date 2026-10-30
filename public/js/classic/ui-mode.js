@@ -29,7 +29,7 @@
  * event, and dispatches `resize` so the stage and the pack pagers measure again
  * (game.js syncLocationViewHeight, refreshPackPagers).
  */
-import { classicAllowed } from './classic-layout.js?v=g468-1';
+import { classicAllowed } from './classic-layout.js?v=g476-1';
 
 export const MODERN = 'modern';
 export const CLASSIC = 'classic';

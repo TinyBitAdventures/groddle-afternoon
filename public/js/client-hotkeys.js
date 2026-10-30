@@ -114,7 +114,8 @@ export function hotkeySections({ keyring = false, hub = false } = {}) {
       ],
     },
     { title: 'Emotions', rows: [['Say Hi!', [['5']]]] },
-    { title: 'View', rows: [['Camera Mode', [['C']]]] },
+    // ZOOM (js/world-zoom.js): the remake's world zoom, Wide to Original.
+    { title: 'View', rows: [['Camera Mode', [['C']]], ['Zoom In', [['=']]], ['Zoom Out', [['-']]], ['Zoom to Wide', [['0']]]] },
   ];
 }
 

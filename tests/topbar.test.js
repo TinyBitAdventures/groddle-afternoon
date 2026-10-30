@@ -16,7 +16,7 @@ import {
   ringDash,
   vitalRing,
   volumeLevel,
-} from '../public/js/ui/topbar.js?v=g470-2';
+} from '../public/js/ui/topbar.js?v=g476-1';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (f) => readFileSync(join(pub, f), 'utf8');

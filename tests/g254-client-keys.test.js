@@ -29,7 +29,7 @@ import {
   hotkeyText,
   isHotkeySheetRelease,
   isPlainKey,
-} from '../public/js/client-hotkeys.js?v=g470-2';
+} from '../public/js/client-hotkeys.js?v=g476-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(here, '../public');
@@ -159,7 +159,10 @@ describe('G254: the hotkey sheet lists only keys the remake answers', () => {
     const all = mp.join('\n');
     assert.ok(solo.includes('Inventory Search: Shift+F or `'), 'hotkeys.png: Inventory Search: Shift+F');
     assert.ok(solo.includes('Preferences: ,'), 'commaKeyHandler: Preferences (js/classic/classic-prefs.js)');
-    for (const gone of [/Info-getting/, /Zoom/, /Shift\+M/, /\bI\b$/m]) {
+    // ZOOM: the remake answers the client's zoom keys now (TSFrontController.as startListeningToZoomKeys
+    // 3181-3192: 0, minus, equal), with its own world zoom (js/world-zoom.js).
+    assert.ok(solo.includes('Zoom In: =') && solo.includes('Zoom Out: -') && solo.includes('Zoom to Wide: 0'));
+    for (const gone of [/Info-getting/, /Shift\+M/, /\bI\b$/m]) {
       assert.doesNotMatch(all, gone);
     }
     assert.doesNotMatch(all, /—/, 'no em-dashes in player copy');

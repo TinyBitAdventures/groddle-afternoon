@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 818,
+  "commits": 821,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "Classic's How many is the client's quantity picker wherever it asks: Feed, Eat more, Drop, Buy and Sell"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,24 +2793,9 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "Classic's mood face is your own avatar, with your name over it online"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Classic's hub clouds show their pictures: your avatar, the teleport art, your home street and the street you are on"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "new",
-    "text": "Pin up to two quests from the Quests sheet: they show top left under the left pill and tick as you go"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Quests and Make open as one side sheet on the left, with tabs, a header and a footer; the Map is its centred size"
    }
   ]
  },
- "tests": 457,
+ "tests": 458,
  "generatedAt": "2026-10-30"
 }

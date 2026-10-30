@@ -21,7 +21,7 @@
  *   (RightSideView.as 1166). The choice is kept on this device; it is closed by default.
  * Everything here shows only under Classic (inline display, so Modern is untouched).
  */
-import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=g468-9';
+import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=g476-1';
 import { classicArtUrl } from './classic-art.js?v=g468-9';
 
 /** The tabs that are the bottom pane, not a pane above it. */

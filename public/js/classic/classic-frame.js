@@ -18,8 +18,9 @@
  *   player's own Modern choice; leaving Classic hands it back (restore()).
  * - window.groddleClassic for QA: the mode, the measured view and the pure layout.
  */
-import { uiState, onUiModeChange } from './ui-mode.js?v=g468-9';
-import { classicLayout, railFor } from './classic-layout.js?v=g468-1';
+import { uiState, onUiModeChange } from './ui-mode.js?v=g476-1';
+import { classicLayout, railFor } from './classic-layout.js?v=g476-1';
+import { worldZoom } from '../world-zoom.js?v=g476-1';
 
 const VARS = ['--cv-x', '--cv-y', '--cv-w', '--cv-h', '--cv-right', '--cband-h', '--cu-n'];
 const PACK_RESERVE = 132;
@@ -47,7 +48,7 @@ export function installClassicFrame({ doc = globalThis.document, win = globalThi
   let classic = false;
   let rail = null;
 
-  const layoutNow = () => classicLayout({ width: win.innerWidth, height: win.innerHeight, size: uiState().size, contactsOpen: root.dataset.classicStrip === 'open' });
+  const layoutNow = () => classicLayout({ width: win.innerWidth, height: win.innerHeight, size: uiState().size, contactsOpen: root.dataset.classicStrip === 'open', zoom: worldZoom() });
   const canvas = () => doc.querySelector('#game-root > canvas[role="application"]') || doc.querySelector('#game-root > canvas');
   const drawer = () => win.groddleSocial || null;
 

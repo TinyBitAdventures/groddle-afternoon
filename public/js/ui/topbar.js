@@ -8,8 +8,8 @@
  *   favor with the street's Giant, and the day's quoins.
  * - Centre: the street nameplate (#street-nameplate in #game-root, restyled, not copied).
  * - Right: Quests (Q), Make (N), Map (M), Imagination (X), Mail with its unread
- *   badge, Sound (Effects and Music sliders, Mute) and the Menu, regrouped into Me,
- *   World, Social (multiplayer only) and Settings.
+ *   badge, Sound (Effects and Music sliders, Mute, and the world Zoom) and the Menu,
+ *   regrouped into Me, World, Social (multiplayer only) and Settings (with Zoom).
  *
  * Tooltips with key caps replace the bar's native titles. Everything here is
  * scoped to <html data-ui="modern"> in style.css, and the game state stays in
@@ -17,6 +17,7 @@
  * The pure helpers below are tested without a DOM (tests/topbar.test.js).
  */
 import { vitalLevel, vitalTitle } from '../vitals.js?v=g458-2';
+import { clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=g476-1';
 
 /** The Menu's groups, in the mock's order; Social shows only when something is in it. */
 export const MENU_GROUPS = Object.freeze([
@@ -306,7 +307,8 @@ function installMenu(doc) {
       const rows = [...box.querySelectorAll(':scope > button')];
       const sorted = [...rows].sort((x, y) => Number(x.dataset.menuRank) - Number(y.dataset.menuRank));
       if (sorted.some((btn, i) => btn !== rows[i])) for (const btn of sorted) box.append(btn);
-      const empty = rows.length === 0;
+      // A group can hold a control that is not a button (Settings' Zoom slider).
+      const empty = rows.length === 0 && !box.querySelector(':scope > [data-menu-control]');
       if (box.hidden !== empty) box.hidden = empty;
     }
   };
@@ -314,7 +316,7 @@ function installMenu(doc) {
   new MutationObserver(sync).observe(list, { childList: true, subtree: true });
   list.addEventListener('keydown', (e) => {
     if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) return;
-    const rows = [...list.querySelectorAll('button')].filter((b) => b.getClientRects().length && !b.disabled);
+    const rows = [...list.querySelectorAll('button, input[type="range"]')].filter((b) => b.getClientRects().length && !b.disabled);
     if (!rows.length) return;
     e.preventDefault();
     e.stopPropagation();
@@ -505,9 +507,72 @@ function installSound(doc, audio) {
 }
 
 /**
+ * ZOOM: one Zoom slider (Wide 0 to Original 100, js/world-zoom.js) with its live label.
+ * `where` names it for QA (data-zoom-control). Returns the row and a draw().
+ */
+export function zoomSlider(doc, zoom, { id, where, className = 'hud-slider hud-zoom' }) {
+  const row = doc.createElement('div');
+  row.className = className;
+  row.dataset.zoomControl = where;
+  const label = doc.createElement('label');
+  label.htmlFor = id;
+  label.textContent = 'Zoom';
+  const input = doc.createElement('input');
+  Object.assign(input, { id, type: 'range', min: '0', max: '100', step: '1' });
+  input.setAttribute('aria-describedby', `${id}-ends`);
+  const out = doc.createElement('output');
+  out.htmlFor = id;
+  const ends = doc.createElement('span');
+  ends.id = `${id}-ends`;
+  ends.className = 'hud-zoom-ends';
+  ends.innerHTML = '<span>Wide</span><span>Original</span>';
+  row.append(label, input, out, ends);
+  const draw = () => {
+    const z = clampZoom(zoom?.get?.());
+    if (doc.activeElement !== input) input.value = String(Math.round(z * 100));
+    setText(out, zoomLabel(z));
+    input.setAttribute('aria-valuetext', zoomValueText(z));
+  };
+  input.addEventListener('input', () => {
+    zoom?.set?.(clampZoom(Number(input.value) / 100));
+    draw();
+  });
+  // Arrow keys and Home/End move the slider, never the avatar or a menu row.
+  input.addEventListener('keydown', (e) => {
+    if (['ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageUp', 'PageDown'].includes(e.key)) e.stopPropagation();
+  });
+  zoom?.onChange?.(draw);
+  draw();
+  return { row, input, draw };
+}
+
+/** ZOOM: the slider in the Sound popover and in the Menu's Settings group. */
+function installZoom(doc, zoom) {
+  if (!zoom) return;
+  const pop = doc.getElementById('sound-pop');
+  if (pop && !doc.getElementById('sound-zoom')) {
+    const { row } = zoomSlider(doc, zoom, { id: 'sound-zoom', where: 'sound' });
+    pop.append(row);
+    const btn = doc.getElementById('sound-btn');
+    if (btn) {
+      btn.dataset.tip = 'Sound and zoom';
+      btn.dataset.sub = 'Effects, music, mute and how close the world is';
+    }
+  }
+  const settings = doc.querySelector('#more-list [data-menu-group="settings"]');
+  if (settings && !doc.getElementById('menu-zoom')) {
+    const { row } = zoomSlider(doc, zoom, { id: 'menu-zoom', where: 'menu', className: 'hud-slider hud-zoom menu-zoom' });
+    row.dataset.menuControl = 'zoom';
+    settings.querySelector('.menu-group-label')?.after(row);
+    settings.hidden = false;
+  }
+}
+
+/**
  * Wires the bar once (game.js main): tooltips, the Menu's groups, the Sound popover, the
  * low-energy pill, the nameplate's shape and the pills' widths. `opts`:
  *   audio: { levels(): { effects, music }, setLevel(kind, 0..100) }
+ *   zoom: { get(), set(0..1), onChange(fn) } (js/world-zoom.js)
  *   onImagination(), onMail(), onPlayerCard(): what those controls open.
  */
 export function installTopBar(doc, opts = {}) {
@@ -520,6 +585,7 @@ export function installTopBar(doc, opts = {}) {
   });
   installMenu(doc);
   installSound(doc, opts.audio);
+  installZoom(doc, opts.zoom);
   const tips = installTooltips(doc, [bar]);
   adoptTitles(bar);
   shapeStreetName(doc);

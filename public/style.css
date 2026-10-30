@@ -9709,6 +9709,19 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] .top-bar .hud-mute:hover { background: var(--surface-hover); }
 [data-ui="modern"] .top-bar .hud-mute[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
 
+/* —— ZOOM —— the world zoom (js/world-zoom.js) in the Sound popover and the Menu's Settings group. */
+[data-ui="modern"] .hud-zoom { grid-template-columns: 64px 1fr 58px; row-gap: 0; }
+[data-ui="modern"] .sound-pop .hud-zoom { margin-top: var(--space-1); padding-top: var(--space-2); border-top: 1px solid var(--border); }
+[data-ui="modern"] .hud-zoom output { color: var(--text); }
+[data-ui="modern"] .hud-zoom-ends {
+  grid-column: 2; display: flex; justify-content: space-between;
+  color: var(--text-muted); font-size: var(--fs-xs); font-weight: var(--fw-bold);
+}
+[data-ui="modern"] .more-list .menu-zoom { grid-template-columns: 1fr auto; padding: var(--space-1) var(--space-2) var(--space-2); }
+[data-ui="modern"] .more-list .menu-zoom input { grid-column: 1 / -1; }
+[data-ui="modern"] .more-list .menu-zoom .hud-zoom-ends { grid-column: 1 / -1; }
+[data-ui="modern"] .hud-zoom input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
 /* The tooltip (js/ui/topbar.js): words, a second line, key caps. */
 [data-ui="modern"] .hud-tip {
   position: fixed; z-index: calc(var(--z-notice) + 20); pointer-events: none;

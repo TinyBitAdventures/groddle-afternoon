@@ -20,7 +20,7 @@ import {
   sceneViewCap,
   sceneViewWidthCap,
   stageFor,
-} from '../public/js/location-view.js?v=g458-1';
+} from '../public/js/location-view.js?v=g476-1';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const client = path.resolve(root, '..', 'glitch-client', 'com', 'tinyspeck', 'engine');
@@ -104,7 +104,7 @@ test('game.js sizes the canvas from the rule, live', () => {
   assert.match(game, /from '\.\/js\/location-view\.js\?v=/);
   assert.match(game, /let LOCATION_VIEW_H = DEFAULT_VP_H;/);
   assert.match(game, /let VIEW_W = LOCATION_VIEW_W;/);
-  assert.match(game, /function syncLocationViewHeight\(\)/);
+  assert.match(game, /function syncLocationViewHeight\(\{ keepFraming = false \} = \{\}\)/);
   assert.match(game, /sceneWidth: sceneViewWidthCap\(bgLayer, WORLD_W\)/);
   assert.match(game, /sceneHeight = sceneViewCap\(bgLayer\)/);
   assert.match(game, /if \(bgLayer !== viewSceneLayer\) syncLocationViewHeight\(\);/);

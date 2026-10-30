@@ -6,8 +6,10 @@
  * Preferences in either.
  *
  * Preferences shows only what works (open question 5): Interface (Modern or
- * Classic) and, with Classic chosen, "Original window size" (open question 2:
- * the world at the 2012 client's 1000 x 600). The original's six checkboxes
+ * Classic), with Classic chosen "Original window size" (open question 2:
+ * the world at the 2012 client's 1000 x 600), and in both skins the world Zoom
+ * (js/world-zoom.js: Wide to Original; Original window size already is the
+ * 2012 picture, so the slider rests while it is on). The original's six checkboxes
  * have nothing behind them here and are left out. Changes apply at once, so the
  * window has Done where the original had Save.
  *
@@ -16,9 +18,10 @@
  * focus goes back where it was. Its modern look is the <style> below; Classic
  * restyles it in public/css/classic.css.
  */
-import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=g468-9';
-import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=g468-1';
-import { installClassicChrome } from './classic-chrome.js?v=g468-30';
+import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=g476-1';
+import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=g476-1';
+import { installClassicChrome } from './classic-chrome.js?v=g476-2';
+import { clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=g476-1';
 
 export const PREFS_TITLE = 'Preferences';
 
@@ -56,6 +59,11 @@ export const PREFS_STYLE = `
   color: var(--text-inverse); background: linear-gradient(180deg, var(--c-orange-76), var(--c-orange-68)); box-shadow: 0 2px 0 var(--c-orange-57); }
 .prefs-window .prefs-close { position: absolute; top: var(--sp-5); right: var(--sp-5); border: 0; padding: var(--sp-1) var(--sp-4); background: transparent; color: var(--text-muted);
   font-size: var(--fs-2xl); line-height: var(--lh-none); cursor: pointer; }
+.prefs-window .prefs-zoom { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: var(--sp-2) var(--sp-4); margin: var(--sp-4) 0 var(--sp-6); }
+.prefs-window .prefs-zoom label { font-weight: 700; }
+.prefs-window .prefs-zoom input { grid-column: 1 / -1; width: 100%; margin: 0; accent-color: var(--accent); }
+.prefs-window .prefs-zoom-ends { grid-column: 1 / -1; display: flex; justify-content: space-between; color: var(--text-muted); font-size: var(--fs-sm); }
+.prefs-window .prefs-zoom .prefs-note { grid-column: 1 / -1; }
 .prefs-window button:focus-visible, .prefs-window input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 `;
 
@@ -85,6 +93,14 @@ export function createPreferences(doc) {
     parts.size.checked = s.size === 'original';
     parts.sizeRow.hidden = s.pref !== CLASSIC;
     parts.small.hidden = !s.forced;
+    // ZOOM: "Original window size" is the 2012 picture at 1:1, so the zoom rests while Classic shows it.
+    const held = s.mode === CLASSIC && s.size === 'original';
+    const z = clampZoom(worldZoom());
+    parts.zoom.disabled = held;
+    if (doc.activeElement !== parts.zoom) parts.zoom.value = String(Math.round(z * 100));
+    parts.zoomOut.textContent = zoomLabel(z);
+    parts.zoom.setAttribute('aria-valuetext', zoomValueText(z));
+    parts.zoomHeld.hidden = !held;
   };
 
   const build = () => {
@@ -120,10 +136,23 @@ export function createPreferences(doc) {
     const sizeWords = el(doc, 'span', {}, 'Original window size');
     sizeWords.append(el(doc, 'small', {}, 'The world at 1000 by 600, as the 2012 client drew it, with the page around it.'));
     parts.sizeRow.append(parts.size, sizeWords);
+    // ZOOM: the world zoom, the same slider as the Menu's (js/world-zoom.js).
+    const zoomBox = el(doc, 'div', { class: 'prefs-zoom', 'data-zoom-control': 'prefs' });
+    const zoomLbl = el(doc, 'label', { for: 'prefs-zoom' }, 'Zoom');
+    parts.zoom = el(doc, 'input', { type: 'range', id: 'prefs-zoom', min: '0', max: '100', step: '1', 'aria-describedby': 'prefs-zoom-ends' });
+    parts.zoomOut = el(doc, 'output', { for: 'prefs-zoom' });
+    const zoomEnds = el(doc, 'span', { id: 'prefs-zoom-ends', class: 'prefs-zoom-ends' });
+    zoomEnds.append(el(doc, 'span', {}, 'Wide'), el(doc, 'span', {}, 'Original'));
+    parts.zoomHeld = el(doc, 'p', { class: 'prefs-note', 'data-prefs-note': 'zoom-held', hidden: true }, 'Original window size keeps the world at 1000 by 600, so zoom waits until it is off.');
+    zoomBox.append(zoomLbl, parts.zoom, parts.zoomOut, zoomEnds, parts.zoomHeld);
+    parts.zoom.addEventListener('input', () => {
+      setWorldZoom(clampZoom(Number(parts.zoom.value) / 100));
+      sync();
+    });
     const foot = el(doc, 'div', { class: 'prefs-foot' });
     const done = el(doc, 'button', { type: 'button', class: 'prefs-done' }, 'Done');
     foot.append(done);
-    win.append(close, title, group, parts.sizeRow, foot);
+    win.append(close, title, group, parts.sizeRow, zoomBox, foot);
     shade.append(win);
     doc.body.append(shade);
     close.addEventListener('click', () => api.close());
@@ -138,6 +167,7 @@ export function createPreferences(doc) {
       }
     });
     onUiModeChange(sync);
+    onZoomChange(sync);
   };
 
   const api = {

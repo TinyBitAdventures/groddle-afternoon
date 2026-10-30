@@ -51,6 +51,14 @@ export const VIEW_CEIL_H = 720;
  * 1000 px tall or more (all but 38 of 1,463 imported).
  */
 export const VIEW_HOLD_H = 1000;
+/**
+ * ZOOM (2026-10-30): the world zoom's close end, "Original": the 2012 client's
+ * largest view, LayoutModel.as 12-13 max_vp_w 1000 x max_vp_h 600, magnified to
+ * fill the window as the old remake's 960 px view did. The floors still hold
+ * (never under 960 x 408), so on a very wide window Original shows a little more.
+ */
+export const ORIGINAL_VIEW_W = 1000;
+export const ORIGINAL_VIEW_H = 600;
 /** The remake's smallest view: its old fixed 408 px, inside the source's 400-600. */
 export const VIEW_FLOOR_H = 408;
 /** Before the page can be measured (boot, tests): the smallest view. */
@@ -157,10 +165,16 @@ export function sceneViewWidthCap(layer, worldWidth) {
  *   held at VIEW_HOLD_H (a portrait phone, where the width floor wins) leaves
  *   a band above.
  *
+ * - ZOOM: `zoom` (0 to 1, js/world-zoom.js, a device preference) moves the scale
+ *   from that rule (0, "Wide", the default) to the same rule with the view
+ *   capped at ORIGINAL_VIEW_W x ORIGINAL_VIEW_H (1, "Original"), geometrically,
+ *   so each step magnifies by the same share at any window size. Both ends keep
+ *   the floors and the scene rule, so every value between does too.
+ *
  * width/height: the CSS room for the canvas (the game area under the top bar).
  * pinnedHeight: `viewh` (QA): the old layout, a LOCATION_VIEW_W view scaled to
  * the page width with that location height (the canvas may then outgrow the
- * window, as before).
+ * window, as before); zoom does not apply to it.
  */
 export function stageFor({
   width,
@@ -169,6 +183,7 @@ export function stageFor({
   sceneWidth,
   sceneHeight,
   pinnedHeight,
+  zoom = 0,
 } = {}) {
   const W = finite(width);
   const H = finite(height);
@@ -181,13 +196,18 @@ export function stageFor({
     return { scale, viewW, viewH, canvasH: viewH + pack, cssWidth: viewW * scale, cssHeight: (viewH + pack) * scale, pinned: pinned > 0 };
   }
   const floorH = VIEW_FLOOR_H + pack;
-  let scale = W < LOCATION_VIEW_W || H < floorH
-    ? Math.min(W / LOCATION_VIEW_W, H / floorH)
-    : Math.max(1, W / VIEW_MAX_W, H / (VIEW_CEIL_H + pack));
   const sw = finite(sceneWidth) > 0 ? Math.max(LOCATION_VIEW_W, finite(sceneWidth)) : Infinity;
   const sh = finite(sceneHeight) > 0 ? Math.max(VIEW_FLOOR_H, finite(sceneHeight)) : Infinity;
-  scale = Math.max(scale, W / sw, H / (sh + pack));
-  scale = Math.min(scale, W / LOCATION_VIEW_W, H / floorH);
+  const ruleScale = (capW, capH) => {
+    let s = W < LOCATION_VIEW_W || H < floorH
+      ? Math.min(W / LOCATION_VIEW_W, H / floorH)
+      : Math.max(1, W / capW, H / (capH + pack));
+    s = Math.max(s, W / sw, H / (sh + pack));
+    return Math.min(s, W / LOCATION_VIEW_W, H / floorH);
+  };
+  const z = Math.min(1, Math.max(0, finite(zoom, 0)));
+  let scale = ruleScale(VIEW_MAX_W, VIEW_CEIL_H);
+  if (z > 0) scale *= (ruleScale(ORIGINAL_VIEW_W, ORIGINAL_VIEW_H) / scale) ** z;
   const viewW = Math.round(W / scale);
   const room = Math.floor(H / scale + 1e-6) - pack;
   // A scene a few px shorter than the floors leave shows its ground skirt (the camera frames it);

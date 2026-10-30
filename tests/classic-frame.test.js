@@ -8,8 +8,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { viewFromCanvas } from '../public/js/classic/classic-frame.js?v=g468-16';
-import { railFor, chromeWidth } from '../public/js/classic/classic-layout.js';
+import { viewFromCanvas } from '../public/js/classic/classic-frame.js?v=g476-1';
+import { railFor, chromeWidth } from '../public/js/classic/classic-layout.js?v=g476-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -18,7 +18,8 @@ describe('Classic frame: CSS and JS agree', () => {
   const css = read('public/css/classic.css');
 
   it('the CSS scale is classic-layout.js classicScale', () => {
-    assert.match(css, /--cu: max\(1px, min\(100vw \/ \(960 \+ var\(--cu-c\)\), 100vh \/ 580, max\(100vw \/ \(1680 \+ var\(--cu-c\)\), 100vh \/ 892\)\)\);/);
+    // ZOOM: past Wide, u comes from --cu-zoom (js/classic/classic-zoom.js, classicZoomScale).
+    assert.match(css, /--cu: var\(--cu-zoom, max\(1px, min\(100vw \/ \(960 \+ var\(--cu-c\)\), 100vh \/ 580, max\(100vw \/ \(1680 \+ var\(--cu-c\)\), 100vh \/ 892\)\)\)\);/);
     assert.match(css, /--cu-c: 353;/);
     assert.equal(chromeWidth(), 353);
     assert.equal(chromeWidth({ rail: true }), 88);

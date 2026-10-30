@@ -19,7 +19,7 @@
  * - the day's quoins as a row in the player menu (open question 9);
  * - the face's avatar, and the player's name over it online.
  */
-import { uiState, onUiModeChange } from './ui-mode.js?v=g468-9';
+import { uiState, onUiModeChange } from './ui-mode.js?v=g476-1';
 import { classicArtUrl } from './classic-art.js?v=g468-9';
 
 /** PURE: a ring's share 0..1 from its stroke-dasharray ("63.5 100"). */

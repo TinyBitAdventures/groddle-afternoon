@@ -34,6 +34,13 @@
  * world cell is capped at 1000 x 732 (a 1000 x 600 view plus the pack reserve),
  * the whole block centred as the original's gutter = max(20, (W - block) / 2).
  *
+ * World zoom (js/world-zoom.js, ZOOM): past Wide the world magnifies and the chrome with
+ * it, still at one u. The stage's zoom has no closed form here, so classicZoomScale finds
+ * the u at which stageFor on the cell returns u itself (stageFor's scale only falls as u
+ * grows, so there is one). css/classic.css takes that u from --cu-zoom
+ * (js/classic/classic-zoom.js sets it); at Wide the CSS rule above stands alone.
+ * "Original window size" is the 2012 picture at 1:1 and ignores the zoom.
+ *
  * Classic is desktop only (open question 11): under 960 x 540 the page shows
  * Modern (classicAllowed).
  *
@@ -42,7 +49,7 @@
  * the world view's top-left, or from its right or bottom edge where the
  * original pinned them there, so they follow a view of any size.
  */
-import { stageFor, MIN_PACK_HEIGHT, LOCATION_VIEW_W, VIEW_MAX_W, VIEW_CEIL_H, VIEW_FLOOR_H } from '../location-view.js?v=g458-1';
+import { stageFor, MIN_PACK_HEIGHT, LOCATION_VIEW_W, VIEW_MAX_W, VIEW_CEIL_H, VIEW_FLOOR_H } from '../location-view.js?v=g476-1';
 
 export const CLASSIC_MIN_W = 960;
 export const CLASSIC_MIN_H = 540;
@@ -96,6 +103,26 @@ export function classicScale(width, height, { chrome = chromeWidth(), packReserv
 }
 
 /**
+ * The chrome scale with the world zoomed (0 Wide .. 1 Original): the u, at least 1, at which
+ * stageFor on the world cell (W - chrome u by H - 40u) returns u. At zoom 0 this is classicScale.
+ */
+export function classicZoomScale(width, height, { chrome = chromeWidth(), packReserve = MIN_PACK_HEIGHT, zoom = 0 } = {}) {
+  const W = num(width);
+  const H = num(height);
+  if (!(W > 0) || !(H > 0)) return 1;
+  const gap = (u) => stageFor({ width: W - chrome * u, height: H - FRAME.header * u, packReserve, zoom }).scale - u;
+  if (gap(1) <= 0) return 1;
+  let lo = 1;
+  let hi = Math.max(2, W / LOCATION_VIEW_W, H / VIEW_FLOOR_H);
+  for (let i = 0; i < 48; i++) {
+    const mid = (lo + hi) / 2;
+    if (gap(mid) > 0) lo = mid;
+    else hi = mid;
+  }
+  return lo;
+}
+
+/**
  * Frame-1 anchors in u. x from the view's left (or `r`: the right edge's distance in from the view's),
  * y from its top (or `b`: the bottom edge's distance above the view's foot; negative is below it).
  * Sources are layout.md §2's table rows.
@@ -129,7 +156,7 @@ function anchorRect(a, view, u) {
 /**
  * The Classic frame for a window, in CSS px.
  * @param {{ width: number, height: number, size?: 'fill'|'original', contactsOpen?: boolean,
- *   packReserve?: number, sceneWidth?: number, sceneHeight?: number }} o
+ *   packReserve?: number, sceneWidth?: number, sceneHeight?: number, zoom?: number }} o
  */
 export function classicLayout({
   width,
@@ -139,6 +166,7 @@ export function classicLayout({
   packReserve = MIN_PACK_HEIGHT,
   sceneWidth,
   sceneHeight,
+  zoom = 0,
 } = {}) {
   const W = num(width);
   const H = num(height);
@@ -146,7 +174,8 @@ export function classicLayout({
   const rail = railFor(W, { contactsOpen });
   const rightU = rightColumnWidth({ contactsOpen, rail });
   const chrome = 2 * FRAME.gutter + rightU;
-  const u = original ? 1 : classicScale(W, H, { chrome, packReserve });
+  const z = original ? 0 : Math.min(1, Math.max(0, num(zoom)));
+  const u = original ? 1 : z > 0 ? classicZoomScale(W, H, { chrome, packReserve, zoom: z }) : classicScale(W, H, { chrome, packReserve });
   const header = FRAME.header * u;
   const rightW = rightU * u;
   let cellW = Math.max(0, W - chrome * u);
@@ -159,7 +188,7 @@ export function classicLayout({
   }
   const gutterR = Math.max(0, W - gutterL - cellW - rightW);
   const cell = { x: gutterL, y: header, w: cellW, h: cellH };
-  const stage = stageFor({ width: cellW, height: cellH, packReserve, sceneWidth, sceneHeight });
+  const stage = stageFor({ width: cellW, height: cellH, packReserve, sceneWidth, sceneHeight, zoom: z });
   const view = { x: cell.x, y: cell.y, w: stage.viewW * stage.scale, h: stage.viewH * stage.scale };
   const band = { x: cell.x, y: view.y + view.h, w: cell.w, h: packReserve * stage.scale };
   const colX = cell.x + cell.w;
@@ -183,6 +212,7 @@ export function classicLayout({
   return {
     u,
     size: original ? 'original' : 'fill',
+    zoom: z,
     rail,
     contactsOpen: Boolean(contactsOpen),
     width: W,
