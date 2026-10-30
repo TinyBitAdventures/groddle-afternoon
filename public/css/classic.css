@@ -1403,3 +1403,161 @@
 :root[data-ui="classic"][data-classic-strip="open"] .social-drawer .social-rail[hidden] { flex-basis: calc(165 * var(--cu)); width: calc(165 * var(--cu)); align-self: start; }
 /* The strip's page colour runs the column's height under its rows. */
 :root[data-ui="classic"][data-classic-strip="open"] .social-drawer .classic-contacts { background: var(--c-classic-page); }
+
+/* == The 2012 windows (classic-spec spec §12a, §12b; Dialog.as 34-488, WindowBorder.as, BigDialog.as):
+   Skills, Buffs, Badges, Quests and the Map, restyled in place (every id, tab and close the game and
+   its tests use stays). Centred in the viewport with no shade over the world; a white panel, radius 4,
+   the 1 px black .37 outline and the 6 px black .15 halo, no drop shadow; the head at least 35 with
+   the 20 px title; the body a #ececec well between #d2d2d2 rules; the red 10 x 10 cross in a white
+   30 x 30 square, 16 in from the top right. Widths: Quests 615, Map 764 (spec §12b); Skills, Buffs
+   and Badges, which have no 2012 width, take the Quest Log's. */
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel):not([hidden]) {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: var(--cvh);
+  max-width: none;
+  display: grid;
+  place-items: center;
+  padding: calc(20 * var(--cu));
+  margin: 0;
+  border: 0;
+  background: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  pointer-events: none;
+  transform: none;
+}
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel) > .side-card,
+:root[data-ui="classic"] #game-root #map-panel > .map-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(calc(615 * var(--cu)), 100%);
+  height: auto;
+  max-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: auto;
+  border: 0;
+  border-radius: 4px;
+  background: var(--c-classic-panel);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--c-classic-ink) 37%, transparent),
+    0 0 1px 7px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+  color: var(--c-classic-text);
+  font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body);
+  transform: none;
+  animation: classic-fade 0.2s linear;
+}
+:root[data-ui="classic"] #game-root #map-panel > .map-card { width: min(calc(764 * var(--cu)), 100%); }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel) :is(.side-head, .map-head) {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--cu));
+  min-height: calc(35 * var(--cu));
+  margin: 0;
+  padding: calc(10 * var(--cu)) calc(56 * var(--cu)) calc(10 * var(--cu)) calc(20 * var(--cu));
+  border: 0;
+  background: var(--c-classic-panel);
+}
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel) :is(.side-head, .map-head) h2 {
+  margin: 0;
+  color: var(--c-classic-title);
+  font: 800 calc(var(--fs-classic-window) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title);
+}
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel) .kcap { display: none; }
+/* The title leads the head (the Quests sheet put it after its icon and pushed it right). */
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel) :is(.side-head, .map-head) { justify-content: flex-start; }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel) :is(.side-head, .map-head) h2 { order: 0; flex: 0 1 auto; text-align: left; }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel) :is(.side-head, .map-head) h2:focus:not(:focus-visible) { outline: none; }
+/* The close: a white 30 x 30 square with the red cross (Dialog.as 221-243). */
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel) :is(.side-head, .map-head) .verb-menu-x {
+  position: absolute;
+  top: calc(6 * var(--cu));
+  right: calc(16 * var(--cu));
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: var(--c-classic-panel);
+  box-shadow: none;
+  color: transparent;
+  font-size: 0;
+  cursor: pointer;
+}
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel) :is(.side-head, .map-head) .verb-menu-x::before,
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel) :is(.side-head, .map-head) .verb-menu-x::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 3px;
+  background: var(--c-classic-close);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel) :is(.side-head, .map-head) .verb-menu-x::after { transform: translate(-50%, -50%) rotate(-45deg); }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel) :is(.side-head, .map-head) .verb-menu-x:hover { box-shadow: inset 0 0 6px var(--c-classic-close-hover); }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel, #map-panel) :is(.side-head, .map-head) .verb-menu-x:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+/* The body: the grey well between two rules, scrolling inside the window (BigDialog.as 41-42). */
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel) > .side-card > :not(.side-head),
+:root[data-ui="classic"] #game-root #map-panel > .map-card > :not(.map-head) {
+  margin: 0;
+  padding-left: calc(20 * var(--cu));
+  padding-right: calc(20 * var(--cu));
+  background: var(--c-classic-well);
+}
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel) > .side-card > .side-head + *,
+:root[data-ui="classic"] #game-root #map-panel > .map-card > .map-head + * { border-top: 1px solid var(--c-classic-rule); padding-top: calc(10 * var(--cu)); }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel) > .side-card > :last-child,
+:root[data-ui="classic"] #game-root #map-panel > .map-card > :last-child { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding-bottom: calc(12 * var(--cu)); border-bottom: 1px solid var(--c-classic-rule); }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel) .quest-log-body { margin-top: 0; }
+:root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel) .panel-meta { color: var(--c-classic-offline); }
+/* The Quest Log's tabs and the Map's region picker on the head's line, as small minor buttons. */
+:root[data-ui="classic"] #game-root #quest-panel .ui-sheet-tabs button,
+:root[data-ui="classic"] #game-root :is(#achieve-panel) .badge-status-filters button {
+  border: 1px solid var(--c-classic-btn-minor-border);
+  border-radius: var(--radius-xs);
+  background: linear-gradient(180deg, var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom));
+  box-shadow: none;
+  color: var(--c-classic-btn-minor-label);
+  font: 800 var(--fs-classic-body)/var(--lh-normal) var(--font-classic-title);
+}
+:root[data-ui="classic"] #game-root #quest-panel .ui-sheet-tabs button[aria-selected="true"],
+:root[data-ui="classic"] #game-root #achieve-panel .badge-status-filters button.active { background: var(--c-classic-panel); color: var(--c-classic-title); border-color: var(--c-classic-rule); }
+
+/* Upgrades is the hub's sub-screen, not a window, in the client (ImgMenuView.as 330-335): solid black
+   .7 over the viewport, the white "Upgrade" title, the hub's close; the cards keep their own art. */
+:root[data-ui="classic"] #game-root #imagination-panel:not([hidden]) {
+  inset: 0 0 auto 0;
+  height: var(--cvh);
+  background: color-mix(in srgb, var(--c-classic-ink) 70%, transparent);
+  backdrop-filter: none;
+}
+:root[data-ui="classic"] #game-root #imagination-panel .img-card-shell {
+  width: min(calc(760 * var(--cu)), 96%);
+  max-height: calc(100% - 20 * var(--cu));
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+:root[data-ui="classic"] #game-root #imagination-panel .img-card-shell::before { display: none; }
+:root[data-ui="classic"] #game-root #imagination-panel .img-head h2 { color: var(--c-classic-panel); font: 800 calc(var(--fs-classic-window) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title); text-shadow: 0 2px 4px color-mix(in srgb, var(--c-classic-ink) 50%, transparent); }
+:root[data-ui="classic"] #game-root #imagination-panel .img-kicker { display: none; }
+:root[data-ui="classic"] #game-root #imagination-panel .img-x {
+  width: calc(43 * var(--cu));
+  height: calc(42 * var(--cu));
+  border-radius: 0;
+  background: url("../assets/classic/img_close.png?v=94915144") 0 0 / 100% 100% no-repeat;
+  color: transparent;
+  font-size: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-ui="classic"] #game-root :is(#skills-panel, #buffs-panel, #achieve-panel, #quest-panel) > .side-card,
+  :root[data-ui="classic"] #game-root #map-panel > .map-card { animation: none; }
+}

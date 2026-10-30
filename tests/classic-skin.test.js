@@ -149,4 +149,16 @@ describe('Classic skin: modules and copy', () => {
     assert.match(css, /#verb-menu\.below \.vm-ptr \{[^}]*scaleY\(-1\)/);
     assert.match(read('public/game.js'), /function placeWorldVerbMenu\(target\)/);
   });
+
+  it('Skills, Buffs, Badges, Quests and the Map in the 2012 window shell; Upgrades the hub\'s sub-screen', () => {
+    const css = read(CSS);
+    const shell = /#skills-panel, #buffs-panel, #achieve-panel, #quest-panel\) > \.side-card,\n:root\[data-ui="classic"\] #game-root #map-panel > \.map-card \{[^}]*border-radius: 4px;[^}]*0 0 0 1px color-mix\(in srgb, var\(--c-classic-ink\) 37%, transparent\),\n\s+0 0 1px 7px color-mix\(in srgb, var\(--c-classic-ink\) 15%, transparent\);/;
+    assert.match(css, shell);
+    assert.match(css, /#map-panel > \.map-card \{ width: min\(calc\(764 \* var\(--cu\)\), 100%\); \}/);
+    assert.match(css, /width: min\(calc\(615 \* var\(--cu\)\), 100%\);/);
+    assert.match(css, /\.verb-menu-x::before,[\s\S]{0,300}background: var\(--c-classic-close\);/);
+    assert.match(css, /#imagination-panel:not\(\[hidden\]\) \{[^}]*color-mix\(in srgb, var\(--c-classic-ink\) 70%, transparent\)/);
+    // No shade over the world for the windows.
+    assert.match(css, /#map-panel\):not\(\[hidden\]\) \{[^}]*background: none;[^}]*backdrop-filter: none;/);
+  });
 });
