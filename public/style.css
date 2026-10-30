@@ -79,6 +79,8 @@
   --z-raised: 1;    /* a part lifted inside its own component */
   --z-world: 5;     /* drawn over the world: tints, the verb menu */
   --z-hud: 12;      /* nameplate, tracker, feed, buffs, chat dock */
+  --z-overlay: 32;  /* world announcements (the Qurazy banner): over the HUD, under every panel */
+  --z-overlay: 32;  /* world announcements (the Qurazy banner): over the HUD, under every panel */
   --z-panel: 35;    /* side panels, Map, modals, the pack */
   --z-notice: 50;   /* toasts, popovers, player menu, tutorial pills */
   --z-dialog: 70;   /* windows and quest HUDs over panels */
@@ -930,6 +932,12 @@ header .sub {
   width: 100% !important;
   height: auto !important;
 }
+/* Window announcements drawn by js/overlay-art.js playVectorOverlay (the Qurazy banner): above the
+   world and the HUD, under side panels, modals, the pack and notices (a note card covers them). */
+#game-root > canvas.overlay-art { z-index: var(--z-overlay); }
+/* Window announcements drawn by js/overlay-art.js playVectorOverlay (the Qurazy banner): above the
+   world and the HUD, under side panels, modals, the pack and notices (a note card covers them). */
+#game-root > canvas.overlay-art { z-index: var(--z-overlay); }
 
 .overlay {
   position: absolute;

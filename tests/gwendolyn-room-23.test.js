@@ -20,7 +20,7 @@ import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js';
 import { GREETERBOT } from '../public/js/tower-mid-rooms.js';
 import { ROOM_23_FILES } from '../public/js/gwendolyn-room-23-art.js';
 import { GWENDOLYN_INNER_FILES } from '../public/js/quest-rooms/gwendolyn-inner-art.js';
-import { INNER_BASE, PART3 as G_PART3, PART3_REPEAT as G_PART3_REPEAT, innerLayout, thirdPartFor } from '../public/js/quest-rooms/gwendolyn.js?v=g448-2';
+import { INNER_BASE, PART3 as G_PART3, PART3_REPEAT as G_PART3_REPEAT, innerLayout, thirdPartFor } from '../public/js/quest-rooms/gwendolyn.js?v=g463-2';
 import {
   CONSOLATION,
   CORRIDOR_FIVE_TSID,

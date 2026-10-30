@@ -4,12 +4,12 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-2';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-326';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-327';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g463-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g463-1';
 import { createWindowStack } from './js/window-stack.js?v=g428-1';
-import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=g463-1';
+import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=g463-2';
 import {
   actionDurationFor,
   createTimedAction,
@@ -18,7 +18,7 @@ import {
 } from './js/action-timing.js?v=timed-actions-1';
 import { createWordProgressView, wordAnchor, heldActionDelta, MAX_PUSH_DOWN } from './js/word-progress.js?v=g387-1';
 // G374/G375/G378: Tiny Speck's quoin-limit and super-harvest rainbows and the musicblock notes.
-import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=g458-1';
+import { OVERLAY_USES, playCountdownArt, playOverlay, rainbowSound, showRainbow } from './js/overlays.js?v=g463-2';
 import {
   createQuestState,
   assignQuest,
@@ -860,7 +860,7 @@ import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g367-1';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=g432-1';
-import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=g448-2';
+import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=g463-2';
 import * as textureUrls from './js/textures.js';
 import { installPixiFixes } from './js/pixi-fixes.js';
 import { hidesChatBubble } from './js/hi-signs.js?v=hi-signs-4';

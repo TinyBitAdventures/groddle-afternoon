@@ -32,7 +32,7 @@
 import { applyRewards } from '../quests.js?v=item-buffs-7';
 import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=catalog-unified-7';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js';
-import { playPoofIn } from '../overlay-art.js?v=g448-2';
+import { playPoofIn } from '../overlay-art.js?v=g463-2';
 import { KIDS_ROOM_FLOOR, KIDS_ROOM_H, KIDS_ROOM_W, buildKidsRoomScene } from '../kids-room-scene.js';
 
 const W = KIDS_ROOM_W;

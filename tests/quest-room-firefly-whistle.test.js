@@ -35,13 +35,13 @@ import {
   codeMatches,
   hintFor,
   room,
-} from '../public/js/quest-rooms/firefly-whistle.js?v=g448-2';
+} from '../public/js/quest-rooms/firefly-whistle.js?v=g463-2';
 import { DRESSING, ENTRY, FLOOR, FLOOR_Y, LAB, W, entryPath, labPlatforms, seamsToDraw, sx, sy } from '../public/js/quest-rooms/firefly-whistle-scene.js';
 import { FIREFLY_LAB_FILES } from '../public/js/quest-rooms/firefly-lab-art.js';
 import * as kit from '../public/js/quest-rooms/kit.js?v=g458-1';
 import { BUILT_ROOMS, OFFER_OVERRIDES, QUEST_ROOMS, questGiver } from '../public/js/quest-rooms/catalog.js';
 import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=g403-1';
-import { FIREFLY_OFFER_LINES, FIREFLY_WHISTLE_QUEST, fireflyTouches } from '../public/js/features/resource-nodes-feature.js?v=g464-2';
+import { FIREFLY_OFFER_LINES, FIREFLY_WHISTLE_QUEST, fireflyTouches } from '../public/js/features/resource-nodes-feature.js?v=g463-2';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');

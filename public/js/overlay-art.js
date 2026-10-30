@@ -272,8 +272,9 @@ export async function playVectorOverlay(root, key, { rect, x = 0.5, y = 0.5, top
   canvas.width = Math.max(1, Math.round(rect.width * dpr));
   canvas.height = Math.max(1, Math.round(rect.height * dpr));
   Object.assign(canvas.style, {
-    position: 'absolute', left: `${rect.left}px`, top: `${rect.top}px`, pointerEvents: 'none', opacity: '0', zIndex: '70',
+    position: 'absolute', left: `${rect.left}px`, top: `${rect.top}px`, pointerEvents: 'none', opacity: '0',
   });
+  // Its layer is style.css's #game-root > canvas.overlay-art (--z-overlay: under the windows).
   // The game's stylesheet sizes canvases in #game-root; this one keeps the rect's size.
   canvas.style.setProperty('width', `${rect.width}px`, 'important');
   canvas.style.setProperty('height', `${rect.height}px`, 'important');

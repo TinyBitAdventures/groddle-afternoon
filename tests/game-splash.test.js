@@ -20,7 +20,7 @@ import {
   splashRays,
   splashTextX,
   splashTextY,
-} from '../public/js/game-splash.js?v=g463-1';
+} from '../public/js/game-splash.js?v=g463-2';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -254,7 +254,7 @@ describe('show and leave', () => {
 
 describe('G448: SVG frames on a dense screen', () => {
   it('a 2x screen draws the splash from its SVG frames into a canvas, held until it hides', async () => {
-    const { vectorArtStats } = await import('../public/js/overlay-art.js?v=g448-2');
+    const { vectorArtStats } = await import('../public/js/overlay-art.js?v=g463-2');
     const meta = manifest.race_winner;
     const vtext = read(`assets/sprites/overlays/${meta.vector.file}`);
     const savedFetch = globalThis.fetch;
@@ -297,7 +297,7 @@ describe('G448: SVG frames on a dense screen', () => {
 
 describe('the game uses it', () => {
   it('races-feature: games_end_race / games_end_quoin_grab, and leaving mid-race just goes', () => {
-    assert.match(races, /import \{ QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor \} from '\.\.\/game-splash\.js\?v=g463-1';/);
+    assert.match(races, /import \{ QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor \} from '\.\.\/game-splash\.js\?v=g463-2';/);
     assert.match(races, /buttons: \[\{ label: splash\.leaveLabel, w: splash\.buttonW, value: 'leave', onClick: \(\) => leaveRace\(engine\) \}\],/);
     assert.match(races, /\} else setTimeout\(\(\) => leaveRace\(engine\), 0\);/);
     assert.match(races, /if \(splashShown\) engine\.hideGameSplash\?\.\(\);/);
@@ -306,7 +306,7 @@ describe('the game uses it', () => {
     assert.doesNotMatch(races, /raceResultCopy|moodMax/);
   });
   it('crowns-feature: games_end_it_game through engine.gameSplash, no card of its own', () => {
-    assert.match(crowns, /import \{ CROWNS_SPLASH, splashFor \} from '\.\.\/game-splash\.js\?v=g463-1';/);
+    assert.match(crowns, /import \{ CROWNS_SPLASH, splashFor \} from '\.\.\/game-splash\.js\?v=g463-2';/);
     assert.match(crowns, /engine\.gameSplash\?\.\(\{\s*key: CROWNS_SPLASH\.key,\s*\.\.\.splashFor\(res\.won, res\.winnerName\),\s*textDeltaY: CROWNS_SPLASH\.textDeltaY,/);
     assert.match(crowns, /value: 'again', onClick: \(\) => playAgain\(engine\)/);
     assert.match(crowns, /value: 'leave', onClick: \(\) => leave\(engine\)/);
