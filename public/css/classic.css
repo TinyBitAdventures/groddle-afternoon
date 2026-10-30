@@ -1308,3 +1308,98 @@
    with a slot focused the others dim to .5 round its #53e5ff ring. The client's slide-down when a bag
    opens is left out: PACK's open bag is a tray over the row, so sliding the row would part them. */
 :root[data-ui="classic"] #game-root .pack-bar.is-classic-focus .pack-slot:not(:focus):not(:focus-within) { opacity: 0.5; }
+
+/* == Chat type and colour (phase D). The lost sheet held the sizes; these are measured off
+   ref/blog-2011-chat-sidebar.png at its 1:1 stage (the 264 px column measures 262): chat lines 13 px,
+   18 apart; pane titles 18 px; contact rows Arial bold 13 px, 18 apart. All Classic chat type grows
+   with u (--cu-n), as if the whole stage were zoomed. Names are bold, each speaker a colour from the
+   frame's palette in the order they first speak (RightSideManager.as 125-132, 805-838). */
+:root[data-ui="classic"] .social-drawer :is(.social-log, .classic-lower-log) {
+  font-size: calc(var(--fs-classic-chat) * var(--cu-n, 1));
+  line-height: calc(18 * var(--cu));
+  gap: calc(2 * var(--cu));
+}
+:root[data-ui="classic"] .social-drawer :is(.social-msg, .social-act-text) { font-size: calc(var(--fs-classic-chat) * var(--cu-n, 1)); line-height: calc(18 * var(--cu)); }
+:root[data-ui="classic"] .social-drawer .social-msg > b { font-weight: 700; color: var(--c-classic-name-0); margin-right: 0.35em; }
+:root[data-ui="classic"] .social-drawer .social-msg.is-mine > b { color: var(--c-classic-you); }
+:root[data-ui="classic"] .social-drawer .social-msg > b[data-classic-name="1"] { color: var(--c-classic-name-1); }
+:root[data-ui="classic"] .social-drawer .social-msg > b[data-classic-name="2"] { color: var(--c-classic-name-2); }
+:root[data-ui="classic"] .social-drawer .social-msg > b[data-classic-name="3"] { color: var(--c-classic-name-3); }
+:root[data-ui="classic"] .social-drawer .social-msg > b[data-classic-name="4"] { color: var(--c-classic-name-4); }
+:root[data-ui="classic"] .social-drawer .social-msg > b[data-classic-name="5"] { color: var(--c-classic-name-5); }
+:root[data-ui="classic"] .social-drawer :is(.social-title[data-classic-title]::before, .classic-lower-title) { font-size: calc(var(--fs-classic-pane) * var(--cu-n, 1)); }
+:root[data-ui="classic"] .social-drawer .social-time { font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); }
+:root[data-ui="classic"] .social-drawer :is(#local-chat-input, .classic-lower-input) { font-size: calc(var(--fs-classic-chat) * var(--cu-n, 1)); }
+:root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab] { font-size: calc(var(--fs-classic-contact) * var(--cu-n, 1)); height: calc(18 * var(--cu)); color: var(--c-classic-online-text); }
+
+/* The contact strip opens to 165u on its 12 x 60 tab (ContactList.as 33-44, 105-112, 281): the open
+   chats, then the buddies online in Arial bold with the 8 px #97be00 dot, "Offline contacts (N)",
+   and Add Friends; solo, "Playing with friends is much more fun." The column is then 430u and the
+   world gives up the room (RightSideView.as 1137, 1166). */
+:root[data-ui="classic"][data-classic-strip="open"] { --cu-c: 470; }
+:root[data-ui="classic"][data-classic-strip="open"] .local-chat-dock.social-drawer { grid-template-columns: calc(165 * var(--cu)) minmax(0, 1fr); }
+:root[data-ui="classic"] .social-drawer .classic-strip-tab {
+  position: absolute;
+  left: calc(-12 * var(--cu));
+  top: 50%;
+  width: calc(12 * var(--cu));
+  height: calc(60 * var(--cu));
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 6px 0 0 6px;
+  background: var(--c-classic-page);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+:root[data-ui="classic"] .social-drawer .classic-strip-tab img { width: calc(6 * var(--cu)); height: calc(11 * var(--cu)); }
+:root[data-ui="classic"] .social-drawer .classic-strip-tab[aria-expanded="true"] img { transform: rotate(180deg); }
+:root[data-ui="classic"] .social-drawer .classic-strip-tab:focus-visible { outline: 2px solid var(--c-classic-focus); }
+:root[data-ui="classic"] .social-drawer .classic-contacts {
+  position: absolute;
+  left: 0;
+  top: var(--classic-rail-h, 0px);
+  bottom: 0;
+  width: calc(165 * var(--cu));
+  overflow-y: auto;
+  padding: calc(4 * var(--cu)) calc(8 * var(--cu));
+  border-top: 1px solid var(--c-classic-contact-divider);
+  color: var(--c-classic-text);
+  font: 700 calc(var(--fs-classic-contact) * var(--cu-n, 1))/calc(18 * var(--cu)) var(--font-classic-count);
+}
+:root[data-ui="classic"] .social-drawer .classic-contacts-list { margin: 0; padding: 0; list-style: none; }
+:root[data-ui="classic"] .social-drawer .classic-contacts-list button {
+  display: flex;
+  align-items: center;
+  gap: calc(5 * var(--cu));
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-classic-online-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+:root[data-ui="classic"] .social-drawer .classic-contacts-list button::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: var(--radius-round); background: var(--c-classic-online-dot); }
+:root[data-ui="classic"] .social-drawer .classic-contacts-list button:hover { color: var(--c-classic-contact-hover); }
+:root[data-ui="classic"] .social-drawer .classic-contacts-offline { margin: calc(4 * var(--cu)) 0; color: var(--c-classic-offline); font-weight: 400; }
+:root[data-ui="classic"] .social-drawer .classic-contacts-empty { margin: calc(8 * var(--cu)) 0; color: var(--c-classic-text); font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body); }
+:root[data-ui="classic"] .social-drawer .classic-contacts-find { color: var(--c-classic-link); font-family: var(--font-classic-title); font-weight: 800; }
+:root[data-ui="classic"] .social-drawer .classic-contacts-add {
+  display: block;
+  margin-top: calc(10 * var(--cu));
+  padding: 0 0 0 calc(40 * var(--cu));
+  height: calc(23 * var(--cu));
+  border: 0;
+  background: url("../assets/classic/contact_add_friend.png?v=212f7467") 0 center / 36px 23px no-repeat;
+  color: var(--c-classic-link);
+  font: 700 calc(var(--fs-classic-contact) * var(--cu-n, 1))/calc(23 * var(--cu)) var(--font-classic-count);
+  cursor: pointer;
+}
+:root[data-ui="classic"] .social-drawer .classic-contacts-add:hover { color: var(--c-classic-contact-hover); }
+:root[data-ui="classic"][data-classic-strip="open"] .social-drawer .social-rail,
+:root[data-ui="classic"][data-classic-strip="open"] .social-drawer .social-rail[hidden] { flex-basis: calc(165 * var(--cu)); width: calc(165 * var(--cu)); align-self: start; }
+/* The strip's page colour runs the column's height under its rows. */
+:root[data-ui="classic"][data-classic-strip="open"] .social-drawer .classic-contacts { background: var(--c-classic-page); }

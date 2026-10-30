@@ -10,7 +10,8 @@
  * - The world view's rect and the pack band under it, from the real canvas (the canvas is the
  *   view plus the 132 px pack reserve, js/location-view.js stageFor), as CSS px on <html>:
  *   --cv-x, --cv-y, --cv-w, --cv-h (the view), --cv-right (window right to view right) and
- *   --cband-h (the band). The chrome the 2012 client drew inside the viewport (the ear, the
+ *   --cband-h (the band), and --cu-n, u as a plain number (Classic's type is scaled by it). The
+ *   chrome the 2012 client drew inside the viewport (the ear, the
  *   currants, the growl, the prompts, the pack row) hangs off these.
  * - The Social drawer (js/ui/social-drawer.js) is the chat column: under Classic it is held open
  *   beside the world, or as the 48u rail below 1313 px wide (open question 3), without touching the
@@ -20,7 +21,7 @@
 import { uiState, onUiModeChange } from './ui-mode.js?v=g468-9';
 import { classicLayout, railFor } from './classic-layout.js?v=g468-1';
 
-const VARS = ['--cv-x', '--cv-y', '--cv-w', '--cv-h', '--cv-right', '--cband-h'];
+const VARS = ['--cv-x', '--cv-y', '--cv-w', '--cv-h', '--cv-right', '--cband-h', '--cu-n'];
 const PACK_RESERVE = 132;
 
 /** PURE: the view and band from the canvas rect and its location viewport height (world px). */
@@ -46,6 +47,7 @@ export function installClassicFrame({ doc = globalThis.document, win = globalThi
   let classic = false;
   let rail = null;
 
+  const layoutNow = () => classicLayout({ width: win.innerWidth, height: win.innerHeight, size: uiState().size, contactsOpen: root.dataset.classicStrip === 'open' });
   const canvas = () => doc.querySelector('#game-root > canvas[role="application"]') || doc.querySelector('#game-root > canvas');
   const drawer = () => win.groddleSocial || null;
 
@@ -62,6 +64,9 @@ export function installClassicFrame({ doc = globalThis.document, win = globalThi
       const s = px(n);
       if (root.style.getPropertyValue(k) !== s) root.style.setProperty(k, s);
     }
+    // u as a plain number, so Classic's type grows with the chrome, as if the whole 2012 stage were zoomed.
+    const u = String(Math.round(layoutNow().u * 1000) / 1000);
+    if (root.style.getPropertyValue('--cu-n') !== u) root.style.setProperty('--cu-n', u);
   }
 
   function holdColumn() {
@@ -127,7 +132,7 @@ export function installClassicFrame({ doc = globalThis.document, win = globalThi
     /** The measured world view and pack band (CSS px), or null under Modern. */
     view: () => (last ? { ...last } : null),
     /** The pure frame for this window (classic-layout.js). */
-    layout: () => classicLayout({ width: win.innerWidth, height: win.innerHeight, size: uiState().size }),
+    layout: () => layoutNow(),
     measure,
   };
   return win.groddleClassic;

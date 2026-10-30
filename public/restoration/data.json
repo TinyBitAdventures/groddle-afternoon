@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 801,
+  "commits": 802,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "The verb menu on another player sits over their avatar instead of the top-left corner"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "new",
     "text": "The Classic interface's screen frame, measured from the 2012 client"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "The energy, mood and level numbers sit in the middle of their rings, and \"100\" fits with room to spare"
    }
   ]
  },

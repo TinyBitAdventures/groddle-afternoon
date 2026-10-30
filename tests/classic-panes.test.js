@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { pillText, paneLayout, LOCAL_TABS } from '../public/js/classic/classic-panes.js';
+import { pillText, paneLayout, LOCAL_TABS, nameSlot, NAME_COLOURS, STRIP_OPEN_MIN_W } from '../public/js/classic/classic-panes.js?v=g468-16';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -43,5 +43,29 @@ describe('Classic panes', () => {
     assert.match(css, /box-shadow: 1px 0 1px color-mix\(in srgb, var\(--c-classic-ink\) 20%, transparent\);/);
     const style = read('public/style.css');
     for (const [n, v] of [['chat-track', 'ecf0f1'], ['chat-handle', 'cfdcdd'], ['activity-bar', '7aa2a4'], ['time-rule', 'bebebe']]) assert.match(style, new RegExp(`--c-classic-${n}: #${v};`), n);
+  });
+
+  it('names take a colour each in the order they first speak, round robin (RightSideManager.as 125-132)', () => {
+    const seen = new Map();
+    assert.deepEqual(['Jade', 'Gabi', 'Jade', 'Mocha', 'A', 'B', 'C', 'D'].map((n) => nameSlot(seen, n)), [0, 1, 0, 2, 3, 4, 5, 0]);
+    assert.equal(NAME_COLOURS, 6);
+    const style = read('public/style.css');
+    for (let i = 0; i < NAME_COLOURS; i++) assert.match(style, new RegExp(`--c-classic-name-${i}: #[0-9a-f]{6}; +/\\* FROM FRAME`), `name ${i}`);
+  });
+
+  it('the chat type is measured off the frame and grows with u', () => {
+    const style = read('public/style.css');
+    assert.match(style, /--fs-classic-chat: var\(--fs-md\); +\/\* 13px, FROM FRAME ref\/blog-2011-chat-sidebar\.png/);
+    assert.match(style, /--fs-classic-pane: var\(--fs-xl\); +\/\* 18px, FROM FRAME/);
+    const css = read('public/css/classic.css');
+    assert.match(css, /font-size: calc\(var\(--fs-classic-chat\) \* var\(--cu-n, 1\)\);/);
+    assert.match(read('public/js/classic/classic-frame.js'), /setProperty\('--cu-n', u\)/);
+  });
+
+  it('the contact strip opens to 165u where the world keeps its 960 (430u column)', () => {
+    assert.equal(STRIP_OPEN_MIN_W, 1430);
+    const css = read('public/css/classic.css');
+    assert.match(css, /:root\[data-ui="classic"\]\[data-classic-strip="open"\] \{ --cu-c: 470; \}/);
+    assert.match(read('public/js/classic/classic-panes.js'), /'Playing with friends is much more fun\.'/);
   });
 });

@@ -11,9 +11,15 @@
  *   Local Chat / Activity pane stays under it with its own field, which says its words on Local.
  * - Each pane has the client's title row: the options chevron, the title, the unread pill (#b1b7ba,
  *   "∞" past 99) and, on the upper pane, the close.
+ * - Names in chat lines take a colour each, in the order they first speak (RightSideManager.as
+ *   125-132, 805-838: chat_element_others_N, round robin); yours is "You" in #aa322a.
+ * - The contact strip opens (its 12 x 60 tab, ContactList.as 105-112, 281, 385, 786-792) to 165u:
+ *   the open chats, a divider, the buddies online with their green dots, "Offline contacts (N)",
+ *   Add Friends; solo, the client's empty state. The world gives up the room, as the client's did
+ *   (RightSideView.as 1166). The choice is kept on this device; it is closed by default.
  * Everything here shows only under Classic (inline display, so Modern is untouched).
  */
-import { uiState, onUiModeChange } from './ui-mode.js?v=g468-9';
+import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=g468-9';
 import { classicArtUrl } from './classic-art.js?v=g468-9';
 
 /** The tabs that are the bottom pane, not a pane above it. */
@@ -24,6 +30,17 @@ export function pillText(n) {
   const v = Math.max(0, Math.floor(Number(n) || 0));
   if (!v) return '';
   return v > 99 ? '∞' : String(v);
+}
+
+export const NAME_COLOURS = 6;
+/** The strip opens only where the 430u column leaves the world its 960 (classic-layout.js railFor). */
+export const STRIP_OPEN_MIN_W = 1430;
+
+/** PURE: a name's colour slot, given the names seen so far (a Map name -> slot, added to). */
+export function nameSlot(seen, name, n = NAME_COLOURS) {
+  const k = String(name || '');
+  if (!seen.has(k)) seen.set(k, seen.size % n);
+  return seen.get(k);
 }
 
 /** PURE: which panes show: the upper one only online, for a tab that is not Local or Activity. */
@@ -98,6 +115,74 @@ export function installClassicPanes({ doc = globalThis.document, win = globalThi
   dock.append(lower);
   added.push(lower);
 
+  // Names, coloured in the order they first speak.
+  const seen = new Map();
+  function colourNames(scope) {
+    for (const b of scope.querySelectorAll('.social-msg:not(.is-mine) > b')) {
+      const slot = String(nameSlot(seen, b.textContent));
+      if (b.dataset.classicName !== slot) b.dataset.classicName = slot;
+    }
+  }
+
+  // The contact strip, opened: the open chats (the rail's own buttons), the buddies, Add Friends.
+  const root = doc.documentElement;
+  const rail = dock.querySelector('.social-rail');
+  const tab = el(doc, 'button', { type: 'button', class: 'classic-strip-tab', 'aria-label': 'Show your contacts', 'aria-expanded': 'false' });
+  tab.append(el(doc, 'img', { src: classicArtUrl('chat_toggle_arrow'), alt: '' }));
+  const list = el(doc, 'div', { class: 'classic-contacts', 'aria-label': 'Contacts' });
+  dock.append(tab);
+  rail?.after(list);
+  added.push(tab, list);
+  const wantsOpen = () => readUiCache('strip') === 'open';
+  function applyStrip() {
+    const open = classic() && wantsOpen() && (win.innerWidth || 0) >= STRIP_OPEN_MIN_W;
+    const was = root.dataset.classicStrip === 'open';
+    if (open) root.dataset.classicStrip = 'open';
+    else delete root.dataset.classicStrip;
+    tab.setAttribute('aria-expanded', String(open));
+    tab.setAttribute('aria-label', open ? 'Hide your contacts' : 'Show your contacts');
+    tab.style.display = classic() && (win.innerWidth || 0) >= STRIP_OPEN_MIN_W ? '' : 'none';
+    list.style.display = open ? '' : 'none';
+    if (open) renderContacts();
+    // The world gives up (or takes back) the room: the stage measures again.
+    if (open !== was && typeof win.Event === 'function') win.dispatchEvent(new win.Event('resize'));
+  }
+  tab.addEventListener('click', () => {
+    writeUiCache('strip', wantsOpen() ? 'closed' : 'open');
+    applyStrip();
+  });
+  win.addEventListener?.('resize', () => { if (classic()) applyStrip(); });
+  function renderContacts() {
+    const rows = [];
+    const data = (() => { try { return win.groddleBuddies?.drawerView?.() || null; } catch { return null; } })();
+    if (!online || !data) {
+      // Solo (ContactList.as 199-226): the client's empty state.
+      rows.push(el(doc, 'p', { class: 'classic-contacts-empty' }, 'Playing with friends is much more fun.'));
+      const find = el(doc, 'a', { class: 'classic-contacts-find', href: 'play/online/' }, 'Find your friends');
+      rows.push(find);
+    } else {
+      const on = data.rows.filter((r) => r.online);
+      const off = data.rows.filter((r) => !r.online);
+      const ul = el(doc, 'ul', { class: 'classic-contacts-list' });
+      for (const r of on) {
+        const li = el(doc, 'li', { class: 'is-online', title: r.where });
+        const b = el(doc, 'button', { type: 'button' }, r.name.length > 15 ? `${r.name.slice(0, 15)}...` : r.name);
+        b.addEventListener('click', () => d.select('buddies'));
+        li.append(b);
+        ul.append(li);
+      }
+      rows.push(ul);
+      if (off.length) rows.push(el(doc, 'p', { class: 'classic-contacts-offline' }, `Offline contacts (${off.length})`));
+    }
+    const add = el(doc, 'button', { type: 'button', class: 'classic-contacts-add' }, 'Add Friends');
+    add.addEventListener('click', () => { if (online) d.select('buddies'); else win.location.assign('play/online/'); });
+    rows.push(add);
+    list.replaceChildren(...rows);
+    // The list starts under the strip's own rows (the open chats).
+    const h = `${Math.round(rail?.offsetHeight || 0)}px`;
+    if (list.style.getPropertyValue('--classic-rail-h') !== h) list.style.setProperty('--classic-rail-h', h);
+  }
+
   let busy = false;
   function sync() {
     if (busy || !classic()) return;
@@ -129,6 +214,9 @@ export function installClassicPanes({ doc = globalThis.document, win = globalThi
         log.replaceChildren(...d.logNodes(LOCAL_TABS));
         if (atEnd) log.scrollTop = log.scrollHeight;
       }
+      colourNames(log);
+      if (layout.lowerOwn) colourNames(lowerLog);
+      if (root.dataset.classicStrip === 'open') renderContacts();
     } finally {
       busy = false;
     }
@@ -139,6 +227,7 @@ export function installClassicPanes({ doc = globalThis.document, win = globalThi
   const show = (state) => {
     const on = state.mode === 'classic';
     for (const n of added) n.style.display = on ? '' : 'none';
+    applyStrip();
     if (on) sync();
     else {
       delete dock.dataset.classicUpper;

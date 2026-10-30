@@ -858,6 +858,17 @@
   --c-classic-time-rule: #bebebe;         /* the rule under a time line: ChatElement.as */
   --c-classic-system: #edd5cc;            /* a system line's box: ChatElement.as */
   --c-classic-contact-divider: #cad6dc;   /* the contact strip's divider: ContactList.as:120-138 */
+  /* Chat names, per player, in order of first appearance (RightSideManager.as 125-132, 805-838:
+     chat_element_others_N, whose colours were in the lost sheet). FROM FRAME
+     ref/blog-2011-chat-sidebar.png (green, olive, blue, purple, teal, brown names), the green and
+     olive darkened to 4.5:1 on white. */
+  --c-classic-name-0: #5f7c28;            /* FROM FRAME, #7a9f34 darkened */
+  --c-classic-name-1: #344b9f;            /* FROM FRAME */
+  --c-classic-name-2: #85732b;            /* FROM FRAME, #9f8934 darkened */
+  --c-classic-name-3: #55349f;            /* FROM FRAME */
+  --c-classic-name-4: #34739f;            /* FROM FRAME */
+  --c-classic-name-5: #6c5745;            /* FROM FRAME */
+  --c-classic-online-text: #4a7500;       /* an online contact's name: #548500 (code default) darkened to 4.5:1 on the strip */
   /* classic:end */
   /* Classic type: the 2012 faces (VAG Rounded, Helvetica) are proprietary, so Nunito 800 stands in for
      titles, names, labels and big numbers, and the system Helvetica/Arial stack carries body text. The
@@ -867,8 +878,10 @@
   --font-classic-count: Arial, sans-serif;
   --fs-classic-count: var(--fs-2xs);      /* 10px */
   --fs-classic-energy: var(--fs-xs);      /* 11px, PROPOSED */
-  --fs-classic-body: var(--fs-sm);        /* 12px, PROPOSED: body text and chat */
-  --fs-classic-pane: var(--fs-lg);        /* 16px, PROPOSED: chat pane titles */
+  --fs-classic-body: var(--fs-sm);        /* 12px, PROPOSED: body text (chat lines: --fs-classic-chat) */
+  --fs-classic-pane: var(--fs-xl);        /* 18px, FROM FRAME ref/blog-2011-chat-sidebar.png: pane titles, cap height 13 px at 1:1 */
+  --fs-classic-chat: var(--fs-md);        /* 13px, FROM FRAME ref/blog-2011-chat-sidebar.png: chat lines, cap height 9 px, 18 px apart */
+  --fs-classic-contact: var(--fs-md);     /* 13px, FROM FRAME ref/blog-2011-chat-sidebar.png: contact rows, 18 px apart (Arial bold) */
   --fs-classic-window: var(--fs-2xl);     /* 20px, PROPOSED: window titles */
 
   /* Side insets: what the HUD covers at each edge, so what centres in the free width keeps clear.
