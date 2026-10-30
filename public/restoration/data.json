@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 824,
+  "commits": 825,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "A jump inside a tube or under a roof stops where the original's head did, so the hair no longer pops out over the top"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "fix",
     "text": "The verb menu on another player sits over their avatar instead of the top-left corner"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Classic's pack answers the arrows: along the row, up into a bag and back down"
    }
   ]
  },
- "tests": 458,
+ "tests": 459,
  "generatedAt": "2026-10-30"
 }

@@ -105,6 +105,7 @@ import {
   syncObjs,
 } from '../rook-mp.js?v=g334-1';
 import { itemZ } from '../item-bands.js?v=g429-1';
+import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=g479-1';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
 /** The view the fight's screen art was laid out on; syncFront centres it in a wider one (g458). */
@@ -122,8 +123,14 @@ const ARMOR_CLASS = 'essence_of_rookswort';
 /** music_map ROOK_FLOCK (archive.org 'rook flight'): inc_rook.js:40 loops it for the whole attack. */
 const ROOK_MUSIC = 'assets/audio/sfx/ROOK_FLOCK.mp3';
 const ROOK_HOME = Object.freeze({ x: 580, y: 170, scale: 0.82 });
-/** The HUD badge, docked in the viewport's top right; its feed hangs below, its right edge 10 px in (G283). */
-export const BADGE = Object.freeze({ x: VIEW_W - 70, y: 66, feedX: -90 });
+/**
+ * The HUD badge (ROOKHUD): in the free play area's top right, under the top bar's pills and left of
+ * the Social drawer (Modern), or at the 2012 header centre (Classic); js/rook-badge-place.js has the
+ * rule. Its box is a notify zone while it shows, so the notices keep off it.
+ */
+export const ROOK_BADGE_ZONE = 'rook-badge';
+/** A safety re-measure while the badge shows (the nameplate or the GPS can change under it). */
+const BADGE_REMEASURE_MS = 2000;
 
 const DIR = 'assets/sprites/rooks/';
 const sheet = (file, fw, fh, cols, frames) => Object.freeze({ path: `${DIR}${file}`, fw, fh, cols, frames });
@@ -199,6 +206,13 @@ let overlays = [];
 let shakeUntil = 0;
 let swoop = null;
 let departing = null;
+/** The badge's spot: measured on a change only (badgeKey, or badgeDirty from resize, zoom and skin events). */
+let badgePlace = null;
+let badgeKey = '';
+let badgeDirty = true;
+let badgeMeasuredAt = 0;
+let badgeZoneKey = '';
+let badgeCanvas = null;
 
 const now = () => Date.now();
 
@@ -516,10 +530,11 @@ function syncFront(engine) {
   if (!f || f.destroyed) return;
   const cam = engine.camera;
   // The screen art (Rook, banners, silhouettes) keeps its 960 px layout, centred in a wider
-  // view; the badge stays in the view's top right. The front layer stays on the world.
+  // view; the HUD layer is the view itself (view px from its top-left), where placeBadge puts
+  // the badge. The front layer stays on the world.
   const spare = Math.max(0, Math.round(((cam.w || VIEW_W) - VIEW_W) / 2));
   ui.root.x = spare;
-  if (ui.hud && !ui.hud.destroyed) ui.hud.x = spare;
+  if (ui.hud && !ui.hud.destroyed) ui.hud.x = -spare;
   f.x = -cam.x - spare;
   f.y = -cam.y;
 }
@@ -547,12 +562,14 @@ function buildHud(engine) {
   const hud = ui.hud;
   hud.removeChildren();
   // The client's rook head sits in its header, above the location viewport
-  // (RookIncidentHeaderView.as 640-651: x at the header centre, y 45). The
-  // remake's header is the page's own bar, and the viewport's top centre is
-  // where the stun orb rises (G283), so the badge docks in the top right.
+  // (RookIncidentHeaderView.as 640-651: x at the header centre, y 45). Classic
+  // keeps that spot; Modern's header is the floating top bar, and the viewport's
+  // top centre is where the stun orb rises (G283), so the badge docks in the free
+  // area's top right (placeBadge, js/rook-badge-place.js).
   const badge = new PIXI.Container();
-  badge.x = BADGE.x;
-  badge.y = BADGE.y;
+  const fallback = placeRookBadge({ view: { w: engine.camera?.w || VIEW_W, h: engine.camera?.h || VIEW_H }, scale: 1 });
+  badge.x = fallback.x;
+  badge.y = fallback.y;
   const disc = new PIXI.Graphics();
   const arc = new PIXI.Graphics();
   const stars = new PIXI.Graphics();
@@ -588,11 +605,12 @@ function buildHud(engine) {
     lineHeight: 16,
   } });
   feed.anchor.set(0.5, 0);
-  feed.x = BADGE.feedX;
+  feed.x = fallback.feedX;
   feed.y = 70;
   badge.addChild(disc, headMask, arc, stars, head, phase, clock, stamp, armor, feedBox, feed);
   hud.addChild(badge);
-  ui.badge = { root: badge, disc, arc, stars, head, clock, phase, stamp, armor, feedBox, feed, stampUntil: 0 };
+  ui.badge = { root: badge, disc, arc, stars, head, clock, phase, stamp, armor, feedBox, feed, stampUntil: 0, feedX: fallback.feedX };
+  badgeDirty = true;
   ui.head = head;
   badge.visible = false;
 }
@@ -626,8 +644,12 @@ function drawHud(engine, a) {
   if (!b) return;
   const show = Boolean(a && rookPresent(a));
   b.root.visible = show;
-  if (!show) return;
+  if (!show) {
+    releaseBadgeZone(engine);
+    return;
+  }
   const t = now();
+  placeBadge(engine, t);
   const r = 38;
   b.disc.clear();
   b.disc.circle(0, 3, r + 5).fill({ color: 0x2b1b33, alpha: 0.22 });
@@ -660,11 +682,115 @@ function drawHud(engine, a) {
   const showFeed = feedText && (t < feedUntil || holdFx) && !overlays.length;
   b.feed.text = showFeed ? feedText : '';
   b.feedBox.clear();
+  let feedH = 0;
   if (showFeed) {
     const h = Math.max(22, b.feed.height + 14);
-    b.feedBox.roundRect(BADGE.feedX - 150, 64, 300, h + 2, 8).fill({ color: 0x000000, alpha: 0.1 });
-    b.feedBox.roundRect(BADGE.feedX - 150, 62, 300, h, 8).fill({ color: 0xf2f2f0, alpha: 0.96 });
+    feedH = h;
+    b.feedBox.roundRect(b.feedX - 150, 64, 300, h + 2, 8).fill({ color: 0x000000, alpha: 0.1 });
+    b.feedBox.roundRect(b.feedX - 150, 62, 300, h, 8).fill({ color: 0xf2f2f0, alpha: 0.96 });
   }
+  reserveBadgeZone(engine, feedH);
+}
+
+/** The page's rect in #game-root CSS px, or null when it is not laid out. */
+function rootRect(el, rr) {
+  if (!el || typeof el.getBoundingClientRect !== 'function') return null;
+  if (el.hidden || (typeof el.checkVisibility === 'function' && !el.checkVisibility({ visibilityProperty: true }))) return null;
+  const r = el.getBoundingClientRect();
+  if (!(r.width > 0) || !(r.height > 0)) return null;
+  return { left: r.left - rr.left, top: r.top - rr.top, right: r.right - rr.left, bottom: r.bottom - rr.top };
+}
+
+function stageCanvas(root) {
+  if (badgeCanvas?.isConnected) return badgeCanvas;
+  badgeCanvas = root?.querySelector('canvas[data-view-width]') || root?.querySelector('canvas:not(.overlay-art):not(.lonely-fireworks):not(.lonely-portrait)') || null;
+  return badgeCanvas;
+}
+
+/** Cheap inputs (no layout read): a change in any of them re-measures the badge's spot. */
+function badgeInputs(engine, root, canvas) {
+  const cam = engine.camera || {};
+  const html = document.documentElement;
+  return [
+    cam.w, cam.h, canvas?.dataset?.stageScale || '', html?.dataset?.ui || '',
+    root.style.getPropertyValue('--inset-r'), root.style.getPropertyValue('--inset-l'),
+    globalThis.innerWidth, globalThis.innerHeight,
+  ].join('|');
+}
+
+/**
+ * Measure the page and place the badge (and its feed, stamp and armor line, which ride on it):
+ * only when something it depends on changed, plus a slow safety re-measure.
+ */
+function placeBadge(engine, t = now()) {
+  const b = ui?.badge;
+  if (!b || typeof document === 'undefined') return;
+  const root = document.getElementById('game-root');
+  const canvas = stageCanvas(root);
+  if (!root || !canvas) return;
+  const key = badgeInputs(engine, root, canvas);
+  if (!badgeDirty && key === badgeKey && badgePlace && t - badgeMeasuredAt < BADGE_REMEASURE_MS) return;
+  badgeDirty = false;
+  badgeKey = key;
+  badgeMeasuredAt = t;
+  const cam = engine.camera || {};
+  const rr = root.getBoundingClientRect();
+  const cr = canvas.getBoundingClientRect();
+  const viewW = cam.w || VIEW_W;
+  if (!(cr.width > 0) || !(rr.width > 0)) return;
+  const cs = getComputedStyle(root);
+  const px = (name, fallback) => {
+    const v = parseFloat(cs.getPropertyValue(name));
+    return Number.isFinite(v) ? v : fallback;
+  };
+  const classic = document.documentElement?.dataset?.ui === 'classic';
+  // The top bar's whole row (not only its pills: the badge never sits in a gap between them), the
+  // pills themselves, and the nameplate and the route GPS when they hang under the bar.
+  const blockers = [];
+  for (const el of [document.querySelector('.top-bar'), ...document.querySelectorAll('.top-bar .hud-pill'), document.getElementById('street-nameplate'), document.querySelector('.route-gps')]) {
+    const r = rootRect(el, rr);
+    if (r) blockers.push(r);
+  }
+  const pack = rootRect(document.getElementById('pack-row'), rr) || rootRect(document.getElementById('pack-bar'), rr);
+  const place = placeRookBadge({
+    mode: classic ? 'header' : 'dock',
+    view: { w: viewW, h: cam.h || VIEW_H },
+    scale: cr.width / viewW,
+    origin: { x: cr.left - rr.left, y: cr.top - rr.top },
+    root: { w: rr.width, h: rr.height },
+    insetL: px('--inset-l', 0),
+    insetR: px('--inset-r', 0),
+    gap: px('--hud-inset', 8),
+    blockers,
+    floor: pack ? pack.top : rr.height,
+  });
+  place.scale = cr.width / viewW;
+  place.origin = { x: cr.left - rr.left, y: cr.top - rr.top };
+  badgePlace = place;
+  b.root.x = place.x;
+  b.root.y = place.y;
+  b.feedX = place.feedX;
+  b.feed.x = place.feedX;
+  engine.setData?.('rookBadge', `${place.mode}:${place.x},${place.y}`);
+  engine.setData?.('rookBadgeBox', [place.box.left, place.box.top, place.box.right, place.box.bottom].join(','));
+}
+
+/** The badge (and its feed while it shows) as a notify zone (engine.reserveZone, js/notify-view.js), set on a change only. */
+function reserveBadgeZone(engine, feedH) {
+  if (!badgePlace || typeof engine?.reserveZone !== 'function') return;
+  const box = unionBox(badgePlace.box, feedH ? feedZone(badgePlace, badgePlace.scale, badgePlace.origin, feedH) : null);
+  const k = [box.left, box.top, box.right, box.bottom].join(',');
+  if (k === badgeZoneKey) return;
+  badgeZoneKey = k;
+  engine.reserveZone(ROOK_BADGE_ZONE, box);
+  engine.setData?.('rookBadgeZone', k);
+}
+
+function releaseBadgeZone(engine) {
+  if (!badgeZoneKey) return;
+  badgeZoneKey = '';
+  engine?.reserveZone?.(ROOK_BADGE_ZONE, null);
+  engine?.setData?.('rookBadgeZone', '');
 }
 
 function drawStar(g, x, y, r, fill, line) {
@@ -2492,6 +2618,9 @@ export const rookAttackFeature = {
     engineRef = engine;
     loader = createSheetLoader(engine.PIXI);
     loader.loadAll(Object.values(ROOK_SHEETS));
+    // The badge re-measures on a resize, a zoom (world-zoom.js ZOOM_EVENT) and a skin switch (ui-mode.js UI_MODE_EVENT).
+    const dirty = () => { badgeDirty = true; };
+    for (const ev of ['resize', 'groddle:zoom', 'groddle:ui-mode']) globalThis.addEventListener?.(ev, dirty);
   },
 
   onStreetEnter(street, engine) {
@@ -2535,6 +2664,8 @@ export const rookAttackFeature = {
     departing = null;
     removeRook();
     stopMusic();
+    releaseBadgeZone(engine);
+    badgeDirty = true;
     if (ui) {
       ui.textLayer.removeChildren();
       ui.tint.clear();

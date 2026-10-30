@@ -44,14 +44,16 @@ describe('G283: the stun orb and the beam in view', () => {
   // Desk ORBERA (G293): the orb moved down to just above the name labels, so
   // the camera no longer looks up for it (tests/desk-decisions.test.js).
   it('the orb (200 px over your feet) sits in the 408 px viewport without the camera looking up', async () => {
-    const { ORB_ART, BADGE } = await import('../public/js/features/rook-attack-feature.js?v=g478-1');
+    const { ORB_ART } = await import('../public/js/features/rook-attack-feature.js?v=g479-1');
+    const { placeRookBadge, badgeExtent } = await import('../public/js/rook-badge-place.js?v=g479-1');
     const viewH = 408;
     const feet = viewH * (0.5 + 150 / 600); // movement.js yCamOffsetAnchor(150)
     const orbY = feet - ORB_ART.orbAbove;
     assert.ok(orbY > 60 && orbY < 160, `orb at ${orbY}`);
-    // The badge leaves the top centre (where the orb rises) for the top right.
+    // The badge leaves the top centre (where the orb rises) for the top right (ROOKHUD: tests/rook-badge-place.test.js).
+    const BADGE = placeRookBadge({ view: { w: 960, h: 408 }, scale: 1 });
     assert.ok(BADGE.x > 960 - 100 && BADGE.y < 100);
-    assert.ok(BADGE.x + BADGE.feedX + 150 <= 960, 'the feed box stays on screen');
+    assert.ok(BADGE.x + badgeExtent().right <= 960, 'the feed box stays on screen');
   });
 
   it('the orb, its count, motes and the beams draw in front of the Rook; the camera stays put', () => {
