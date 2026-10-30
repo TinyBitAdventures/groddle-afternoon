@@ -140,4 +140,13 @@ describe('Classic skin: modules and copy', () => {
       assert.doesNotMatch(src, /—/, f);
     }
   });
+
+  it('the verb menu sits on its thing with the 2012 tail, from the place game.js works out for both skins', () => {
+    const css = read(CSS);
+    for (const v of ['--vm-left', '--vm-top', '--vm-bottom', '--vm-tail']) assert.match(css, new RegExp(`#verb-menu[^{]*\\{[^}]*var\\(${v}`), v);
+    assert.match(css, /#verb-menu \.vm-ptr \{[^}]*int_menu_norm\.png/);
+    assert.match(css, /int_menu_dis\.png/);
+    assert.match(css, /#verb-menu\.below \.vm-ptr \{[^}]*scaleY\(-1\)/);
+    assert.match(read('public/game.js'), /function placeWorldVerbMenu\(target\)/);
+  });
 });

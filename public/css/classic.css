@@ -964,6 +964,34 @@
   background: none;
   backdrop-filter: none;
 }
+/* Anchored on the thing (InteractionMenu.as 1064-1194): the place game.js placeWorldVerbMenu works
+   out for both skins (--vm-left, --vm-top or --vm-bottom, in #game-root px), measured on this card;
+   the 2012 tail, int_menu_norm.png (int_menu_dis.png when the first verb can't be done), hangs from
+   the card at --vm-tail onto the thing, flipped when the menu opens below it. */
+:root[data-ui="classic"] #verb-menu:not([hidden]) {
+  inset: auto;
+  left: var(--vm-left, 0px);
+  top: var(--vm-top, 0px);
+  bottom: var(--vm-bottom, auto);
+  display: block;
+  width: max-content;
+  pointer-events: none;
+}
+:root[data-ui="classic"] #verb-menu .verb-menu-card { position: relative; pointer-events: auto; }
+:root[data-ui="classic"] #verb-menu .vm-ptr {
+  display: block;
+  position: absolute;
+  left: calc(var(--vm-tail, 20px) - 6px);
+  bottom: calc(-42 * var(--cu));
+  width: calc(29 * var(--cu));
+  height: calc(49 * var(--cu));
+  background: url("../assets/classic/int_menu_norm.png?v=dd9d18bc") 0 0 / 100% 100% no-repeat;
+  clip-path: none;
+  pointer-events: none;
+}
+:root[data-ui="classic"] #verb-menu:has(#verb-menu-list > :first-child[aria-disabled="true"], #verb-menu-list > :first-child > .vm-row[aria-disabled="true"]) .vm-ptr { background-image: url("../assets/classic/int_menu_dis.png?v=fc3c35cc"); }
+:root[data-ui="classic"] #verb-menu.below .vm-ptr { top: calc(-42 * var(--cu)); bottom: auto; transform: scaleY(-1); }
+:root[data-ui="classic"] #verb-menu.no-tail .vm-ptr { display: none; }
 :root[data-ui="classic"] #verb-menu .verb-menu-card {
   min-width: calc(140 * var(--cu));
   width: auto;
@@ -1010,7 +1038,7 @@
    keys or lock, so those stay hidden (the number keys still work). The row's explanation, or why it
    can't be done, is the one desc line under the rows (.vm-detail), for the focused or hovered row. */
 :root[data-ui="classic"] #verb-menu .vm-label { flex: 1; min-width: 0; }
-:root[data-ui="classic"] #verb-menu :is(.vm-key, .vm-lock, .vm-ptr) { display: none; }
+:root[data-ui="classic"] #verb-menu :is(.vm-key, .vm-lock) { display: none; }
 :root[data-ui="classic"] #verb-menu .vm-icon { width: calc(20 * var(--cu)); height: calc(20 * var(--cu)); object-fit: contain; }
 :root[data-ui="classic"] #verb-menu .verb-menu-head { display: flex; align-items: center; gap: calc(4 * var(--cu)); }
 :root[data-ui="classic"] #verb-menu .vm-titles { flex: 1; min-width: 0; }
