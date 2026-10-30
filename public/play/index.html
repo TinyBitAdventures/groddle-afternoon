@@ -7,7 +7,7 @@
   <base href="../" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Groddle Afternoon</title>
-    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;tools=g183-1&amp;make=g191-1&amp;rock=g211-1&amp;route=g192-1&amp;prompt=g198-1&amp;machines=g193-1&amp;skills=g367-1&amp;chooser=g206-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=g467-1&amp;badgebrowser=full-catalog-2&amp;home=ticket-1&amp;card=g249-1&amp;offers=g229-1&amp;buffs=g256-1&amp;speech=g269-1&amp;banner=g297-1&amp;pop=g332-1&amp;bags=g394-1&amp;maptp=g356-1&amp;hud2=g361-1&amp;award=g385-1&amp;wordprog=g394-1&amp;overlays=g392-1&amp;polish=g396-1&amp;hud3=g402-1&amp;questtext=g425-1&amp;eat=g423-1&amp;assetkeys=g434-1&amp;menu=g438-1&amp;summerhud=g452-1&amp;rookmuseum=g455-1&amp;notify=g459-1&amp;stage=g458-1&amp;vitals=g458-2&amp;tokens=g463-1&amp;zoverlay=g463-2&amp;nunito=g465-1&amp;paper=g465-2&amp;topbar=g465-3&amp;social=g466-1&amp;ringfit=g465-10&amp;hub=g470-2&amp;barlayer=g470-3&amp;verbs=g469-3&amp;packclear=g472-2&amp;backdrop=g432-1" />
+    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;tools=g183-1&amp;make=g191-1&amp;rock=g211-1&amp;route=g192-1&amp;prompt=g198-1&amp;machines=g193-1&amp;skills=g367-1&amp;chooser=g206-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=g467-1&amp;badgebrowser=full-catalog-2&amp;home=ticket-1&amp;card=g249-1&amp;offers=g229-1&amp;buffs=g256-1&amp;speech=g269-1&amp;banner=g297-1&amp;pop=g332-1&amp;bags=g394-1&amp;maptp=g356-1&amp;hud2=g361-1&amp;award=g385-1&amp;wordprog=g394-1&amp;overlays=g392-1&amp;polish=g396-1&amp;hud3=g402-1&amp;questtext=g425-1&amp;eat=g423-1&amp;assetkeys=g434-1&amp;menu=g438-1&amp;summerhud=g452-1&amp;rookmuseum=g455-1&amp;notify=g459-1&amp;stage=g458-1&amp;vitals=g458-2&amp;tokens=g463-1&amp;zoverlay=g463-2&amp;nunito=g465-1&amp;paper=g465-2&amp;topbar=g465-3&amp;social=g466-1&amp;ringfit=g465-10&amp;hub=g470-2&amp;barlayer=g470-3&amp;verbs=g469-3&amp;packclear=g472-2&amp;mpanels=g472-1&amp;backdrop=g432-1" />
   <!-- The UI font, self-hosted (style.css @font-face; OFL in assets/fonts/nunito/): the roman latin file, before first paint. -->
   <link rel="preload" href="assets/fonts/nunito/nunito-roman-latin.woff2" as="font" type="font/woff2" crossorigin />
   <!-- The Classic interface (js/classic/ui-mode.js sets <html data-ui="classic">); every rule is scoped to it. -->
@@ -593,33 +593,37 @@
         </div>
       </div>
 
-      <!-- Collaborative Feats -->
-      <div id="feat-panel" class="side-panel feat-panel" hidden>
-        <div class="side-card feat-card">
-          <div class="side-head">
+      <!-- Collaborative Feats (modern: a side sheet of the panel shell, js/ui/panel-shell.js) -->
+      <div id="feat-panel" class="side-panel feat-panel ui-sheet" role="region" aria-labelledby="feat-panel-title" hidden>
+        <div class="side-card feat-card ui-sheet-card">
+          <div class="side-head ui-sheet-head">
             <div class="feat-title-lockup">
-              <img src="assets/sprites/feat_badge_small.png?v=df15aba7" alt="" />
-              <h2>Current Feat</h2>
+              <img src="assets/sprites/feat_badge_small.png?v=df15aba7" class="ui-sheet-icon" alt="" />
+              <h2 id="feat-panel-title" class="ui-sheet-title" tabindex="-1">Current Feat</h2>
             </div>
-            <button type="button" id="feat-close" class="verb-menu-x" aria-label="Close">×</button>
+            <span class="kcap ui-sheet-key" aria-hidden="true">H</span>
+            <button type="button" id="feat-close" class="verb-menu-x ui-sheet-x" aria-label="Close Feat (Esc)">×</button>
           </div>
-          <p class="feat-kicker">THE LAST FEAT REPLAY</p>
-          <h3 id="feat-title">The First Glimmer of the Giants’ Awakening</h3>
-          <p class="feat-copy">
-            Three different Glitches must say these incantations in order.
-            Another line during an active chain breaks it.
-          </p>
-          <div id="feat-chain" class="feat-chain" aria-label="Incantation chain"></div>
-          <div class="feat-stats">
-            <span><b id="feat-total">0</b> street points</span>
-            <span><b id="feat-personal">0</b> yours</span>
-            <span><b id="feat-complete">0</b> chains</span>
+          <div class="ui-sheet-body feat-body">
+            <p class="feat-kicker">THE LAST FEAT REPLAY</p>
+            <h3 id="feat-title">The First Glimmer of the Giants’ Awakening</h3>
+            <p class="feat-copy">
+              Three different Glitches must say these incantations in order.
+              Another line during an active chain breaks it.
+            </p>
+            <div id="feat-chain" class="feat-chain" aria-label="Incantation chain"></div>
+            <div class="feat-stats">
+              <span><b id="feat-total">0</b> street points</span>
+              <span><b id="feat-personal">0</b> yours</span>
+              <span><b id="feat-complete">0</b> chains</span>
+            </div>
+            <p id="feat-prompt" class="feat-prompt">Gather two companions to begin.</p>
+            <div class="feat-actions">
+              <button type="button" id="feat-gather" class="btn-glitch-primary">Gather a chain</button>
+              <button type="button" id="feat-say" class="content-action-btn" hidden>Say my line</button>
+            </div>
           </div>
-          <p id="feat-prompt" class="feat-prompt">Gather two companions to begin.</p>
-          <div class="feat-actions">
-            <button type="button" id="feat-gather" class="btn-glitch-primary">Gather a chain</button>
-            <button type="button" id="feat-say" class="content-action-btn" hidden>Say my line</button>
-          </div>
+          <div class="ui-sheet-foot mp-modern-only"><p class="panel-meta" id="feat-meta">Say the lines in local chat</p><span class="ui-sheet-esc"><span class="kcap">Esc</span> close</span></div>
         </div>
       </div>
 
@@ -718,26 +722,31 @@
         </div>
       </div>
 
-      <!-- Vendor panel (shelf grid like original street spirit) -->
-      <div id="vendor-panel" class="glitch-modal vendor-panel" hidden>
-        <div class="glitch-modal-card vendor-card">
-          <div class="glitch-modal-head">
-            <h2 id="vendor-title">Street Spirit</h2>
-            <div class="glitch-modal-tabs vendor-tabs">
-              <button type="button" class="vendor-tab active" data-tab="buy">Buy</button>
-              <button type="button" class="vendor-tab" data-tab="sell">Sell</button>
+      <!-- Vendor panel (shelf grid like original street spirit). Modern: a side sheet of the panel shell
+           (js/ui/panel-shell.js) with Buy and Sell tabs and the purse in its footer. -->
+      <div id="vendor-panel" class="glitch-modal vendor-panel ui-sheet" role="region" aria-labelledby="vendor-title" hidden>
+        <div class="glitch-modal-card vendor-card ui-sheet-card">
+          <div class="glitch-modal-head ui-sheet-head">
+            <img src="assets/sprites/icons/pile_of_currants@3x.png?v=df15aba7" class="ui-sheet-icon mp-modern-only" alt="" width="17" height="20" />
+            <h2 id="vendor-title" class="ui-sheet-title" tabindex="-1">Street Spirit</h2>
+            <span class="kcap ui-sheet-key mp-modern-only" aria-hidden="true">V</span>
+            <div class="glitch-modal-tabs vendor-tabs" role="tablist" aria-label="Buy or sell">
+              <button type="button" class="vendor-tab active" data-tab="buy" role="tab" aria-selected="true">Buy</button>
+              <button type="button" class="vendor-tab" data-tab="sell" role="tab" aria-selected="false" tabindex="-1">Sell</button>
             </div>
-            <button type="button" id="vendor-close" class="verb-menu-x" aria-label="Close">×</button>
+            <button type="button" id="vendor-close" class="verb-menu-x ui-sheet-x" aria-label="Close vendor (Esc)">×</button>
           </div>
-          <p id="vendor-desc" class="vendor-desc" hidden></p>
-          <div id="vendor-sell-drop" class="vendor-sell-drop" hidden aria-live="polite">
-            <span class="vendor-drop-arrow" aria-hidden="true">↥</span>
-            <strong>Drag an item from your pack</strong>
-            <span>or choose one below</span>
+          <div class="ui-sheet-body vendor-body">
+            <p id="vendor-desc" class="vendor-desc" hidden></p>
+            <div id="vendor-sell-drop" class="vendor-sell-drop" hidden aria-live="polite">
+              <span class="vendor-drop-arrow" aria-hidden="true">↥</span>
+              <strong>Drag an item from your pack</strong>
+              <span>or choose one below</span>
+            </div>
+            <div id="vendor-list" class="vendor-shelf" role="list"></div>
+            <div id="vendor-detail" class="vendor-detail" hidden></div>
           </div>
-          <div id="vendor-list" class="vendor-shelf" role="list"></div>
-          <div id="vendor-detail" class="vendor-detail" hidden></div>
-          <p class="vendor-foot">You have <span class="currant-coin">◎</span> <strong id="vendor-currants">0</strong> currants</p>
+          <p class="vendor-foot ui-sheet-foot"><span class="vendor-purse">You have <span class="currant-coin">◎</span> <strong id="vendor-currants">0</strong> currants</span><span class="ui-sheet-esc mp-modern-only"><span class="kcap">Esc</span> close</span></p>
         </div>
       </div>
 
@@ -896,6 +905,6 @@
   </div>
   <!-- Password managers skip the game's own boxes (chat, searches, names); the account forms keep autofill. -->
   <script type="module" src="js/no-autofill.js?v=g437-1"></script>
-  <script type="module" src="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=g467-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=g378-1&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g472-3"></script>
+  <script type="module" src="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=g467-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=g378-1&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g472-1"></script>
 </body>
 </html>

@@ -368,15 +368,18 @@ function ensurePanel() {
     box.innerHTML = `<div class="solo-feats-head"><h4>${MP_TEXT.heading}</h4><small data-world-feat-ends></small></div>`
       + `<p class="solo-feats-copy">${MP_TEXT.copy}</p>`
       + '<div class="solo-feats-list" data-world-feat></div>';
+    // MPANELS: the modern sheet's body scrolls under its head (index.html .ui-sheet-body).
+    const body = card.querySelector('.ui-sheet-body');
     const head = card.querySelector('.side-head');
-    if (head) head.after(box);
+    if (body) body.prepend(box);
+    else if (head) head.after(box);
     else card.prepend(box);
   } else {
     box.setAttribute('aria-label', 'Your Feats');
     box.innerHTML = '<div class="solo-feats-head"><h4>Your Feats</h4><small data-solo-feat-rocks></small></div>'
       + '<p class="solo-feats-copy">The old Feats, as goals of your own. Finish one for a Small Petrified Rock. A finished Feat opens again a game week later.</p>'
       + '<div class="solo-feats-list" data-solo-feat-list></div>';
-    card.appendChild(box);
+    (card.querySelector('.ui-sheet-body') || card).appendChild(box);
   }
   const panel = document.getElementById('feat-panel');
   if (panel && typeof MutationObserver === 'function' && !panelObserver) {

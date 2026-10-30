@@ -189,7 +189,7 @@ export function selectTab(tablist, id) {
  * world while one is open. The Map, Upgrades, the How many chooser, conversations, screens and the
  * prompts stay modal.
  */
-export const SIDE_SHEET_IDS = Object.freeze(['quest-panel', 'make-panel', 'achieve-panel', 'skills-panel', 'buffs-panel', 'feat-panel']);
+export const SIDE_SHEET_IDS = Object.freeze(['quest-panel', 'make-panel', 'achieve-panel', 'skills-panel', 'buffs-panel', 'feat-panel', 'vendor-panel']);
 
 /** True for an element that is one of the side sheets (or inside one). */
 export function inSideSheet(el) {

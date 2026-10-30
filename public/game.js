@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-2';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-348';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-343';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g463-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g470-1';
@@ -860,7 +860,7 @@ import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from './js/notify.js?v=g459-1';
 import { mountNotifyView } from './js/notify-view.js?v=g469-2';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g468-13';
-import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=g472-3';
+import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=g472-4';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=g469-2';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=g469-3';
 import { bindVerbMenu, focusVerbRow, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=g469-1';
@@ -4189,9 +4189,7 @@ function renderPackRow(box, slots, opts = {}) {
         vendorTab = 'sell';
         vendorSelected = null;
         vendorQty = 1;
-        document.querySelectorAll('.vendor-tab').forEach((tab) => {
-          tab.classList.toggle('active', tab.dataset.tab === vendorTab);
-        });
+        syncVendorTabs();
         if (event.dataTransfer) {
           event.dataTransfer.effectAllowed = 'move';
           event.dataTransfer.setData('application/x-groddle-item', s.classTsid);
@@ -11865,8 +11863,7 @@ function gameplayInputBlocked() {
     isScreenFxBlocking() ||
     isPackPopoverOpen() ||
     isMapOpen() ||
-    isVendorOpen() ||
-    // Quests, Make, Badges, Skills, Buffs and Feat are side sheets: the avatar still walks (SIDE_SHEET_IDS).
+    // Quests, Make, Badges, Skills, Buffs, Feat and the vendors are side sheets: the avatar still walks (SIDE_SHEET_IDS).
     isGardenOpen() ||
     isAvatarOpen() ||
     isShrineOpen()
@@ -22046,6 +22043,9 @@ function renderFeatPanel() {
     }
     if (say) say.hidden = true;
   }
+  // MPANELS: the sheet's footer line (the Feat button's own words for the chain).
+  const meta = document.getElementById('feat-meta');
+  if (meta) meta.textContent = status.nextStep === 1 ? `${status.totalPoints} street points so far` : `Chain waiting for line ${status.nextStep}`;
 }
 
 function updateFeatChrome() {
@@ -23287,9 +23287,7 @@ function openVendor() {
     clearTimeout(vendorReceiptTimer);
     vendorReceiptTimer = 0;
   }
-  document.querySelectorAll('.vendor-tab').forEach((t) => {
-    t.classList.toggle('active', t.dataset.tab === vendorTab);
-  });
+  syncVendorTabs();
   renderVendorList();
   panel.hidden = false;
 }
@@ -23301,6 +23299,16 @@ function closeVendor() {
   vendorSelected = null;
   vendorDragTsid = null;
   document.getElementById('vendor-sell-drop')?.classList.remove('is-dragover');
+}
+
+/** The Buy and Sell tabs show vendorTab (MPANELS: role=tab, so aria-selected and the roving tabindex too). */
+function syncVendorTabs() {
+  document.querySelectorAll('.vendor-tab').forEach((tab) => {
+    const on = tab.dataset.tab === vendorTab;
+    tab.classList.toggle('active', on);
+    tab.setAttribute('aria-selected', on ? 'true' : 'false');
+    tab.tabIndex = on ? 0 : -1;
+  });
 }
 
 function isVendorOpen() {
@@ -23801,9 +23809,7 @@ function stageVendorSell(classTsid) {
   vendorSelected = classTsid;
   vendorQty = quote.qty;
   vendorSellReceipt = null;
-  document.querySelectorAll('.vendor-tab').forEach((tab) => {
-    tab.classList.toggle('active', tab.dataset.tab === vendorTab);
-  });
+  syncVendorTabs();
   renderVendorList();
   return quote;
 }
@@ -23945,6 +23951,7 @@ function renderVendorList() {
       tile.className = 'vendor-tile';
       tile.setAttribute('role', 'listitem');
       tile.title = row.label;
+      tile.dataset.vendorItem = row.classTsid;
       tile.innerHTML = `
         <img src="${itemIconUrl(row.classTsid)}" alt="" />
         <span class="tile-price">◎ ${row.price}</span>
@@ -23969,6 +23976,7 @@ function renderVendorList() {
       tile.className = 'vendor-tile';
       tile.setAttribute('role', 'listitem');
       tile.title = `${row.label} ×${row.have}`;
+      tile.dataset.vendorItem = row.classTsid;
       tile.innerHTML = `
         <img src="${itemIconUrl(row.classTsid)}" alt="" />
         <span class="tile-price">◎ ${row.price}</span>
@@ -24748,6 +24756,9 @@ async function main() {
         { id: 'achieve-panel', close: () => closeAchievePanel() },
         { id: 'skills-panel', close: () => closeSkillsPanel() },
         { id: 'buffs-panel', close: () => closeBuffsPanel() },
+        // MPANELS: Feat is a side sheet too.
+        { id: 'feat-panel', close: () => closeFeatPanel() },
+        { id: 'vendor-panel', close: () => closeVendor() },
         { id: 'map-panel', kind: 'center', close: () => closeMap() },
       ],
       setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
@@ -26126,7 +26137,7 @@ async function main() {
       if (isPlainKey(e, 'l')) closeAvatarPanel();
       // A side sheet sits beside the world: walking, jumping, Enter and E (and the number keys, with
       // focus outside it) go on to the world; a modal panel keeps every key (js/ui/panel-shell.js).
-      const modal = isMailboxOpen() || isHomePanelOpen() || isVendorOpen() || isGardenOpen() || isAvatarOpen() || isShrineOpen();
+      const modal = isMailboxOpen() || isHomePanelOpen() || isGardenOpen() || isAvatarOpen() || isShrineOpen();
       const focused = document.activeElement;
       const focusInSheet = inSideSheet(focused);
       const focusOnControl = focusInSheet && Boolean(focused?.closest?.('button, [role="button"], [role="tab"], a[href], summary'));
@@ -26351,11 +26362,22 @@ async function main() {
         clearTimeout(vendorReceiptTimer);
         vendorReceiptTimer = 0;
       }
-      document.querySelectorAll('.vendor-tab').forEach((t) => {
-        t.classList.toggle('active', t.dataset.tab === vendorTab);
-      });
+      syncVendorTabs();
       renderVendorList();
     });
+  });
+  // MPANELS: the tabs move with the arrow keys, Home and End (the tab follows focus).
+  document.querySelector('.vendor-tabs')?.addEventListener('keydown', (event) => {
+    const tabs = [...document.querySelectorAll('.vendor-tab')];
+    const at = tabs.indexOf(event.target?.closest?.('.vendor-tab'));
+    if (at < 0) return;
+    const next = { ArrowRight: at + 1, ArrowDown: at + 1, ArrowLeft: at - 1, ArrowUp: at - 1, Home: 0, End: tabs.length - 1 }[event.key];
+    if (next == null) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const tab = tabs[(next + tabs.length) % tabs.length];
+    tab.focus({ preventScroll: true });
+    if (tab.dataset.tab !== vendorTab) tab.click();
   });
   const vendorDrop = document.getElementById('vendor-sell-drop');
   vendorDrop?.addEventListener('dragenter', (event) => {

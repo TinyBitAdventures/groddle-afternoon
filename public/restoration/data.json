@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 810,
+  "commits": 811,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "You can walk, jump and act on the world while Quests, Make or another side sheet is open"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "new",
     "text": "Classic's verb menu: the 2012 white card with touching rows, no shade over the world"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "new",
-    "text": "Classic's pack: 51 by 53 white slots on the band, Arial counts, wear bars and the bag strips"
    }
   ]
  },

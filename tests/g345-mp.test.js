@@ -38,7 +38,7 @@ import {
 } from '../public/js/feats-mp.js';
 import { FEAT_BY_ID, WIRED_FEATS, vogTextFor } from '../public/js/solo-feats.js?v=g370-1';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from '../public/js/game-day.js?v=dametime-4';
-import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=g463-1';
+import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=g472-1';
 
 const root = join(import.meta.dirname, '..');
 const feature = readFileSync(join(root, 'public/js/features/solo-feats-feature.js'), 'utf8');

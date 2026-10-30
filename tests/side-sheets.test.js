@@ -1,5 +1,5 @@
 /**
- * The side sheets (Quests, Make, Badges, Skills, Buffs, Feat) sit beside the world, not over it
+ * The side sheets (Quests, Make, Badges, Skills, Buffs, Feat, the vendors) sit beside the world, not over it
  * (Austin 2026-10-30): the avatar walks, jumps and acts while one is open; only a text field in the
  * sheet takes the keys, and the number keys and buttons in it only while focus is there.
  * Run: node --test tests/side-sheets.test.js
@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SIDE_SHEET_IDS, sheetKeyToWorld } from '../public/js/ui/panel-shell.js?v=g472-3';
+import { SIDE_SHEET_IDS, sheetKeyToWorld } from '../public/js/ui/panel-shell.js?v=g472-4';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');
@@ -40,9 +40,9 @@ describe('side sheets are not modal', () => {
   });
 
   it('game.js: no side sheet blocks movement or makes the game busy; a text field still takes the keys', () => {
-    assert.deepEqual([...SIDE_SHEET_IDS], ['quest-panel', 'make-panel', 'achieve-panel', 'skills-panel', 'buffs-panel', 'feat-panel']);
+    assert.deepEqual([...SIDE_SHEET_IDS], ['quest-panel', 'make-panel', 'achieve-panel', 'skills-panel', 'buffs-panel', 'feat-panel', 'vendor-panel']);
     const blocked = game.slice(game.indexOf('function gameplayInputBlocked() {'), game.indexOf('function publishJumpState('));
-    for (const open of ['isQuestOpen()', 'isMakeOpen()', 'isAchieveOpen()', 'isSkillsOpen()', 'isBuffsOpen()', 'isFeatOpen()']) {
+    for (const open of ['isQuestOpen()', 'isMakeOpen()', 'isAchieveOpen()', 'isSkillsOpen()', 'isBuffsOpen()', 'isFeatOpen()', 'isVendorOpen()']) {
       assert.ok(!blocked.includes(open), `${open} does not stop the avatar`);
     }
     for (const open of ['isMapOpen()', 'isQuestDialogueOpen()', 'isPackPopoverOpen()', 'isScreenFxBlocking()']) assert.ok(blocked.includes(open), `${open} still does`);
