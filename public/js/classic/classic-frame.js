@@ -20,7 +20,7 @@
  */
 import { uiState, onUiModeChange } from './ui-mode.js?v=g476-1';
 import { classicLayout, railFor } from './classic-layout.js?v=g476-1';
-import { worldZoom } from '../world-zoom.js?v=g476-1';
+import { worldZoom } from '../world-zoom.js?v=g486-1';
 
 const VARS = ['--cv-x', '--cv-y', '--cv-w', '--cv-h', '--cv-right', '--cband-h', '--cu-n'];
 const PACK_RESERVE = 132;

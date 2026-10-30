@@ -19,11 +19,11 @@ import {
   loadZoom,
   saveZoom,
   createWorldZoom,
-} from '../public/js/world-zoom.js?v=g476-1';
+} from '../public/js/world-zoom.js?v=g486-1';
 import { stageFor, ORIGINAL_VIEW_W, ORIGINAL_VIEW_H, LOCATION_VIEW_W, VIEW_FLOOR_H, MIN_PACK_HEIGHT } from '../public/js/location-view.js?v=g476-1';
 import { classicLayout, classicScale, classicZoomScale, chromeWidth, railFor } from '../public/js/classic/classic-layout.js?v=g476-1';
-import { classicZoomVar } from '../public/js/classic/classic-zoom.js?v=g476-1';
-import { hotkeySections, clientKeyAction } from '../public/js/client-hotkeys.js?v=g480-1';
+import { classicZoomVar } from '../public/js/classic/classic-zoom.js?v=g486-1';
+import { hotkeySections, clientKeyAction } from '../public/js/client-hotkeys.js?v=g486-1';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => fs.readFileSync(path.join(root, 'public', rel), 'utf8');
@@ -45,9 +45,9 @@ test('the Original end is the 2012 client largest view (LayoutModel.as max_vp_w,
 });
 
 test('levels, labels and keys', () => {
-  assert.equal(clampZoom(undefined), 0);
-  assert.equal(clampZoom('nope'), 0);
-  assert.equal(clampZoom(null), 0);
+  assert.equal(clampZoom(undefined), 1);
+  assert.equal(clampZoom('nope'), 1);
+  assert.equal(clampZoom(null), 1, 'unreadable reads as the default, Original');
   assert.equal(clampZoom(2), 1);
   assert.equal(clampZoom(-1), 0);
   assert.equal(clampZoom(0.333), 0.33);
@@ -69,7 +69,7 @@ test('levels, labels and keys', () => {
   assert.equal(nextZoom(0, 'in'), 0.1);
   assert.equal(nextZoom(0.95, 'in'), 1);
   assert.equal(nextZoom(0.05, 'out'), 0);
-  assert.equal(nextZoom(0.7, 'reset'), 0);
+  assert.equal(nextZoom(0.7, 'reset'), 1, '0 goes back to the default, Original');
   let z = 0;
   for (let i = 0; i < 10; i++) z = nextZoom(z, 'in');
   assert.equal(z, 1, 'ten presses from Wide to Original');
@@ -88,16 +88,17 @@ test('the zoom keys are free: no client key and no hotkey sheet row already take
   assert.ok(menuAt > 0 && zoomAt > menuAt, 'an open verb menu keeps 0 for Back');
 });
 
-test('stored per device: new players get Wide, storage that throws reads Wide', () => {
+test('stored per device: new players get Original, storage that throws reads Original', () => {
   const store = memory();
-  assert.equal(loadZoom(store), 0);
+  assert.equal(loadZoom(store), 1);
   saveZoom(0.6, store);
   assert.equal(store.map.get(ZOOM_STORAGE_KEY), '0.6');
   assert.equal(loadZoom(store), 0.6);
   saveZoom(0, store);
-  assert.equal(store.map.has(ZOOM_STORAGE_KEY), false, 'Wide leaves nothing behind');
+  assert.equal(store.map.get(ZOOM_STORAGE_KEY), '0', 'a Wide choice is kept, so it is not read back as the default');
+  assert.equal(loadZoom(store), 0);
   const broken = { getItem() { throw new Error('blocked'); }, setItem() { throw new Error('blocked'); }, removeItem() { throw new Error('blocked'); } };
-  assert.equal(loadZoom(broken), 0);
+  assert.equal(loadZoom(broken), 1);
   assert.doesNotThrow(() => saveZoom(1, broken));
   const zoom = createWorldZoom({ win: null, storage: store });
   const seen = [];

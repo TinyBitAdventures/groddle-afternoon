@@ -20,8 +20,8 @@
  */
 import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=g476-1';
 import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=g476-1';
-import { installClassicChrome } from './classic-chrome.js?v=g476-2';
-import { clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=g476-1';
+import { installClassicChrome } from './classic-chrome.js?v=g486-1';
+import { clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=g486-1';
 
 export const PREFS_TITLE = 'Preferences';
 

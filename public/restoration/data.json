@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 836,
+  "commits": 837,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "The bug button opens Reports: your bug reports with their replies, a reply box and Close, and a badge when an administrator answers"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "Home, Mail and Decorate take the panel shell's look: Home and Mail in its centred frame, Decorate and Cultivate a side sheet on the left"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Upgrades and Snaps open in the panel shell's centred frame, in the warm paper colours"
    }
   ]
  },

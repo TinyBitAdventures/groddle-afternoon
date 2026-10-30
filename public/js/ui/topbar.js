@@ -17,7 +17,7 @@
  * The pure helpers below are tested without a DOM (tests/topbar.test.js).
  */
 import { vitalLevel, vitalTitle } from '../vitals.js?v=g458-2';
-import { clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=g476-1';
+import { clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=g486-1';
 
 /** The Menu's groups, in the mock's order; Social shows only when something is in it. */
 export const MENU_GROUPS = Object.freeze([

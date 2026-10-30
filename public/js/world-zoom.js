@@ -2,8 +2,8 @@
  * ZOOM (Austin 2026-10-30): how close the world is drawn, a device preference.
  *
  * 0 is "Wide", the stage's own rule (js/location-view.js stageFor: about 1:1 up
- * to a 1680 x 720 view, magnified past that) and what new players get. 1 is
- * "Original": a view about 1000 px wide (the 2012 client's max_vp_w x max_vp_h,
+ * to a 1680 x 720 view, magnified past that). 1 is
+ * "Original", what new players get (Austin 2026-10-30): a view about 1000 px wide (the 2012 client's max_vp_w x max_vp_h,
  * 1000 x 600, LayoutModel.as 12-13) magnified to fill the window, as the old
  * remake magnified its 960 px view, so the world looks big and close. Values
  * between are continuous. stageFor never goes under its 960 x 408 floor, so
@@ -15,7 +15,7 @@
  *
  * Controls: the Menu's Settings group and the Sound popover (js/ui/topbar.js),
  * Preferences on `,` (js/classic/classic-prefs.js), and the keys `=` (or `+`)
- * closer, `-` wider and `0` back to Wide (zoomKeyAction), the 2012 client's own
+ * closer, `-` wider and `0` back to Original (zoomKeyAction), the 2012 client's own
  * zoom keys (TSFrontController.as startListeningToZoomKeys 3181-3192 and
  * zoomKeyHandler 3209-3227: 0 resets, minus and equal step, held keys repeat; its
  * zoom went the other way, out from 1:1, behind the Zoomability card). Ctrl or
@@ -26,13 +26,15 @@ export const ZOOM_STORAGE_KEY = 'groddle.zoom';
 export const ZOOM_EVENT = 'groddle:zoom';
 export const ZOOM_WIDE = 0;
 export const ZOOM_ORIGINAL = 1;
+/** Where a player who never chose starts, and where `0` goes back to. */
+export const ZOOM_DEFAULT = ZOOM_ORIGINAL;
 /** One `=` or `-` press: ten presses from Wide to Original. */
 export const ZOOM_KEY_STEP = 0.1;
 
-/** PURE: a zoom level 0..1 from anything (Wide when unreadable), on a 1/100 grid. */
+/** PURE: a zoom level 0..1 from anything (the default when unreadable), on a 1/100 grid. */
 export function clampZoom(v) {
   const n = Number(v);
-  if (v === null || v === '' || !Number.isFinite(n)) return ZOOM_WIDE;
+  if (v === null || v === '' || !Number.isFinite(n)) return ZOOM_DEFAULT;
   return Math.round(Math.min(1, Math.max(0, n)) * 100) / 100;
 }
 
@@ -70,7 +72,7 @@ export function nextZoom(z, action) {
   const v = clampZoom(z);
   if (action === 'in') return clampZoom(v + ZOOM_KEY_STEP);
   if (action === 'out') return clampZoom(v - ZOOM_KEY_STEP);
-  if (action === 'reset') return ZOOM_WIDE;
+  if (action === 'reset') return ZOOM_DEFAULT;
   return v;
 }
 
@@ -78,15 +80,15 @@ export function loadZoom(storage) {
   try {
     return clampZoom(storage?.getItem(ZOOM_STORAGE_KEY) ?? null);
   } catch {
-    return ZOOM_WIDE;
+    return ZOOM_DEFAULT;
   }
 }
 
 export function saveZoom(z, storage) {
   try {
     const v = clampZoom(z);
-    if (v === ZOOM_WIDE) storage?.removeItem(ZOOM_STORAGE_KEY);
-    else storage?.setItem(ZOOM_STORAGE_KEY, String(v));
+    // Every choice is kept, Wide too: an empty slot reads as the default (Original).
+    storage?.setItem(ZOOM_STORAGE_KEY, String(v));
   } catch {
     /* the level just won't be remembered */
   }
