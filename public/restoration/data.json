@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 800,
+  "commits": 801,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "Classic's pack answers the arrows: along the row, up into a bag and back down"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "fix",
     "text": "The energy, mood and level numbers sit in the middle of their rings, and \"100\" fits with room to spare"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "A bag's tooltip no longer covers its open tray, and tips near the tray sit above it"
    }
   ]
  },
- "tests": 451,
+ "tests": 452,
  "generatedAt": "2026-10-30"
 }

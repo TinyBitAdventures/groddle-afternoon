@@ -6731,6 +6731,14 @@ function targetPageRect(target, rr) {
   } catch {
     return null;
   }
+  // An empty Container (another player's hit box) has no bounds: use its explicit hit size.
+  if (!(b.width > 0) || !(b.height > 0)) {
+    const box = spriteWorldHitBox(spr, 0);
+    if (!box || typeof spr.parent?.toGlobal !== 'function') return null;
+    const tl = spr.parent.toGlobal({ x: box.left, y: box.top });
+    const br = spr.parent.toGlobal({ x: box.right, y: box.bottom });
+    b = { x: tl.x, y: tl.y, width: br.x - tl.x, height: br.y - tl.y };
+  }
   const left = c.left - rr.left + b.x * sx;
   const top = c.top - rr.top + b.y * sy;
   const right = left + b.width * sx;
