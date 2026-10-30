@@ -48,7 +48,10 @@
  *    reward buff (Gift of Gab 1.2, js/buffs.js) plus the owned Fit for a
  *    King / Overachiever tier (inc_quests.js:844, inc_achievements.js:331),
  *    then round_to_5 (common.js), x level/4 for a Completist badge past
- *    level 4.
+ *    level 4. homeKit: the house's starter furniture (players/inc_furniture.js
+ *    furniture_populate 73-113, js/homes-catalog.js FURNITURE_STARTER_KIT),
+ *    which the game hands over on the first visit inside
+ *    (js/home-decor.js grantStarterKit).
  *
  * Run from the game repo root:
  *   node tools/build-economy.mjs           writes the site repo's data/economy.json
@@ -69,6 +72,7 @@ import { XP_FOR_LEVEL, currantRewardForLevel } from '../public/js/progression.js
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js';
 import { SPINDLE_TOOLS } from '../public/js/making.js';
 import { creditedMultiplayerQuests } from '../public/js/quests-mp.js';
+import { FURNITURE_STARTER_KIT } from '../public/js/homes-catalog.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const OUT = sitePath('data', 'economy.json');
@@ -221,6 +225,10 @@ export function economyCredits(tradeable) {
     const c = String(give?.data?.class_id || '');
     if (c && tradeable.has(c)) cards[id] = { c, n: Math.max(1, Math.floor(Number(give.data.num) || 1)), ...(u.max_uses ? {} : { k: 1 }) };
   }
+  const homeKit = {};
+  for (const [c, n] of Object.entries(FURNITURE_STARTER_KIT).sort(([a], [b]) => a.localeCompare(b))) {
+    if (tradeable.has(c)) homeKit[c] = n;
+  }
   const tiers = (prefix) => Object.fromEntries(BONUS_TIERS.map((v, i) => [`${prefix}${i + 1}`, v]));
   return {
     buff: BEST_REWARD_BUFF,
@@ -231,6 +239,7 @@ export function economyCredits(tradeable) {
     quests,
     badges,
     cards,
+    homeKit,
   };
 }
 
@@ -244,6 +253,7 @@ export async function economyTable() {
   const { items: ordinary } = await obtainableItems();
   for (const q of Object.values(credits.quests)) for (const c of Object.keys(q.i || {})) ordinary.add(c);
   for (const card of Object.values(credits.cards)) ordinary.add(card.c);
+  for (const c of Object.keys(credits.homeKit)) ordinary.add(c);
   for (const t of transforms) for (const c of Object.keys(t.o)) ordinary.add(c);
   const drops = dropCounts();
   const items = {};
@@ -281,6 +291,7 @@ export async function economyJson() {
     `"quests":{\n${lines(c.quests)}}`,
     `"badges":{\n${lines(c.badges)}}`,
     `"cards":{\n${lines(c.cards)}}`,
+    `"homeKit":${JSON.stringify(c.homeKit)}`,
   ].join(',\n');
   return `{"_doc":${JSON.stringify(t._doc)},"fallback":${t.fallback},"items":${items},\n"transforms":[\n${transforms}],\n"credits":{\n${credits}}}\n`;
 }

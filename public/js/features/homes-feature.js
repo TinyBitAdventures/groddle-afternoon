@@ -215,6 +215,7 @@ import {
 import { getGameDayKey } from '../game-day.js?v=dametime-4';
 import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=g481-2';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-6';
+import { takeFromHouse } from '../ledger-house.js?v=g482-1';
 import {
   DOOR_CLASS,
   DOOR_JOB_PHASES,
@@ -5338,6 +5339,16 @@ export const homesFeature = {
       return true;
     }
     return false;
+  },
+
+  /**
+   * G335 (multiplayer): what a ledger correction could not take from the pack comes out of the
+   * house, as the site took it out of the stored save (js/ledger-house.js); answers what it took.
+   */
+  ledgerTakeBack(want, engine) {
+    const taken = takeFromHouse([houseDecor, ...(floors.upper || []), ...towerDecor], want);
+    if (Object.keys(taken).length && engine?.homeContext?.()?.inHome) engine.refreshHomeScene?.();
+    return taken;
   },
 
   /** QA / tests. */

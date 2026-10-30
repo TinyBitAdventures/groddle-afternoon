@@ -214,7 +214,7 @@ describe('the game side of a correction (save-store.js, features/ledger-feature.
   });
 
   it('takes a correction out of the pack and purse as changes, never below what is there', async () => {
-    const { applyCorrection } = await import('../public/js/features/ledger-feature.js?v=g335-1');
+    const { applyCorrection } = await import('../public/js/features/ledger-feature.js?v=g482-1');
     const inv = { apple: 5, cherry: 1 };
     const pc = { currants: 30 };
     const taken = applyCorrection(inv, pc, { items: { apple: 2, cherry: 4, pick: 1 }, currants: 50 });

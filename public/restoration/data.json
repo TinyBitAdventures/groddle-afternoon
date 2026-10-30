@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 832,
+  "commits": 833,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "Enter at a garden tends it: the arrows pick a plot, Enter opens that plot's menu, Esc stops"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "fix",
     "text": "The pack stays centred when a sheet or the Social drawer opens, and moves aside only when one reaches down to it"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "The Rube faces the way he walks, and never blinks out as his animations change"
    }
   ]
  },
- "tests": 465,
+ "tests": 466,
  "generatedAt": "2026-10-30"
 }
