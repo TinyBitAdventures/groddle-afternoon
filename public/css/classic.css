@@ -760,3 +760,40 @@
 :root[data-ui="classic"] .social-drawer #local-chat-input:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
 :root[data-ui="classic"] .social-drawer #local-chat-form .social-send { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); }
 :root[data-ui="classic"] .social-drawer :focus-visible { outline: 2px solid var(--c-classic-focus); }
+
+/* == Messages (classic-spec spec §11). The growl: one line at the viewport's bottom-left, 10 in and
+   its foot 15 above the view's (GrowlQueue.as 25-26, 122-127), a dark box with white text as in
+   ref/video-2011-growl.jpg (PROPOSED: the 2012 sheet is lost). js/classic/classic-growl.js fills it
+   from the same notices; the modern stack stays mounted and unseen. */
+:root[data-ui="classic"] #notify-notices { visibility: hidden; }
+:root[data-ui="classic"] #game-root .classic-growl {
+  position: absolute;
+  left: calc(10 * var(--cu));
+  top: calc(var(--cvh) - 15 * var(--cu));
+  z-index: var(--z-hud);
+  max-width: calc(var(--cv-w, 100%) - 20 * var(--cu));
+  padding: calc(2 * var(--cu)) calc(8 * var(--cu));
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--c-classic-dark) 90%, transparent);
+  color: var(--c-classic-panel);
+  font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body);
+  opacity: 0;
+  transform: translateY(-100%);
+  transition: opacity 0.6s linear;
+  pointer-events: none;
+}
+:root[data-ui="classic"] #game-root .classic-growl:empty { display: none; }
+:root[data-ui="classic"] #game-root .classic-growl.is-on { opacity: 1; transition-duration: 0.2s; }
+:root[data-ui="classic"] #game-root .classic-growl :is(.act-gain, .notify-gain) { color: var(--c-classic-slug-gain); }
+:root[data-ui="classic"] #game-root .classic-growl :is(.act-loss, .notify-loss) { color: var(--c-classic-slug-loss); }
+@media (prefers-reduced-motion: reduce) {
+  :root[data-ui="classic"] #game-root .classic-growl { transition: none; }
+}
+/* Prompts: the 300 px dark cards grow up from 30 above the view's foot, 30 in from its right
+   (PromptView.as 39, 367-368, 417-420). */
+:root[data-ui="classic"] #prompt-stack {
+  right: calc(30 * var(--cu));
+  bottom: calc(var(--cband-h, calc(132 * var(--cu))) + 30 * var(--cu));
+  width: min(calc(300 * var(--cu)), calc(100% - 32px));
+}
+:root[data-ui="classic"] #prompt-stack .game-prompt { background: color-mix(in srgb, var(--c-classic-prompt) 90%, transparent); font-family: var(--font-classic-body); }

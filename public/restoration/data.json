@@ -2671,9 +2671,19 @@
   ]
  },
  "git": {
-  "commits": 783,
+  "commits": 785,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "Classic's chat column: the contact strip and the \"Local Chat / Activity\" pane in the 2012 look"
+   },
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "Classic's 2012 top bar: the mood face and energy arc in the ear, iMG, currants, location and the date"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2783,19 +2793,9 @@
     "date": "2026-10-29",
     "kind": "improve",
     "text": "The races finish at Tiny Speck's own finish gate"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "improve",
-    "text": "An Autumn Day's bench, falling leaves and the girl on the bench are Tiny Speck's own"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "Rooks' Woods can be won by real input: you walk under the two sweeping Crushers"
    }
   ]
  },
- "tests": 443,
+ "tests": 444,
  "generatedAt": "2026-10-30"
 }
