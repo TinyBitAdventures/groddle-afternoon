@@ -45,8 +45,8 @@ import {
   stationStreet,
   stepRide,
   ticketOffer,
-} from '../public/js/subway.js';
-import { subwayFeature } from '../public/js/features/subway-feature.js?v=g450-1';
+} from '../public/js/subway.js?v=g454-1';
+import { subwayFeature } from '../public/js/features/subway-feature.js?v=g454-1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -231,6 +231,12 @@ describe('Ride badges (achievements subwayfarer, ground_hogger, commuter_mug, ch
 });
 
 describe('Stations, the train and the surface entrances', () => {
+  it('stands the column in front of the avatar: its foot is nearer than the walking line', () => {
+    const column = stationArt(STATIONS[0]).find((row) => row.piece === 'column_1');
+    const avatarZ = Number(/body\.zIndex = (\d+);/.exec(readFileSync(join(pub, 'game.js'), 'utf8'))?.[1]);
+    assert.ok(avatarZ > 0 && column.z > avatarZ, `drawn over the avatar (zIndex ${avatarZ})`);
+    assert.ok(column.y > STATION_FLOOR, 'foot below the floor line');
+  });
   it('writes every station and the train as an indexed street with art that exists', () => {
     for (const s of STATIONS) {
       const street = readJson(`assets/streets/${s.streetTsid}.json`);

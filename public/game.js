@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g450-1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g454-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-303';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-305';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g434-1';
@@ -119,7 +119,7 @@ import {
   travelToGregarious,
 } from './js/legalize-it.js?v=g450-1';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=g443-1';
-import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=play-1';
+import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=g454-1';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=g450-1';
 import {
   WINTER_HAVEN_STREET_ID,
@@ -426,8 +426,8 @@ import {
   packPagerState,
   packPageTarget,
 } from './js/pack-pager.js?v=original-pager-1';
-import { listAnimalFeedOptions } from './js/animals.js?v=g414-1';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g414-1';
+import { listAnimalFeedOptions } from './js/animals.js?v=g454-1';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g454-1';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -732,7 +732,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=g414-1';
+} from './js/animals.js?v=g454-1';
 import {
   ensureWoodTreeState,
   pickWoodTool,

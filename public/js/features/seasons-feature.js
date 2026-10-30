@@ -38,7 +38,7 @@ import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?
 import { setSeasonalRecipeCheck } from '../making.js?v=g403-1';
 import { getToolCondition } from '../tools.js?v=woodcutting-test-8';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=g442-6';
-import { isBatterflyHabitat } from '../animal-husbandry.js?v=g414-1';
+import { isBatterflyHabitat } from '../animal-husbandry.js?v=g454-1';
 import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
 import { rollDropTable } from '../drop-tables.js';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=note-g175';

@@ -354,7 +354,8 @@ export function stationArt(station) {
   // The train stands in the trench: nose at the left, body running off the right end.
   rows.push(art('train_1', X.train + SUBWAY_ART.train_1[1] / 2, F - 120, -56));
   rows.push(art('platform_crack_1', -40, F + 30, -48));
-  rows.push(art('column_1', X.column, F + 44, -30, { w: 70, h: 600 }));
+  // The column's foot stands 44 px nearer than the walking line, so it draws over the avatar (zIndex 50, game.js makePlayer; Austin, 2026-10-29).
+  rows.push(art('column_1', X.column, F + 44, 60, { w: 70, h: 600 }));
   rows.push(art('ticket_post_back', X.post, F + 10, -24));
   rows.push(art('subway_gate_static', X.gate, F + 14, -22));
   rows.push(art('door_asset_stairs', X.stairs, F + 12, -40));

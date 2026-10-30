@@ -53,7 +53,7 @@ import {
   activitySegmentsToHtml,
   formatSignedDelta,
 } from '../public/js/verb-rewards.js';
-import { runVerb } from '../public/content.js?v=g450-1';
+import { runVerb } from '../public/content.js?v=g454-1';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const recipesPath = join(__dirname, '../public/assets/content/recipes.json');

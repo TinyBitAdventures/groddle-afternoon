@@ -36,7 +36,7 @@ import { applyStreetIndex } from '../public/js/street-loader.js?v=g442-6';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=g403-1';
 import { createQuestState } from '../public/js/quests.js';
 import { HELL_QUESTS, createHellState, croak } from '../public/js/hell.js';
-import { SUBWAY_STREETS } from '../public/js/quest-rooms/back-alley.js?v=g448-2';
+import { SUBWAY_STREETS } from '../public/js/quest-rooms/back-alley.js?v=g454-1';
 import { doorRooms, doorToward, routeGraph } from '../public/js/map-routes.js?v=lonely-1';
 import { afterStreetCard, runStreetTransition, streetCardUp } from '../public/js/screen-fx.js?v=g434-1';
 import { EMITTED_EVENTS } from '../public/js/quest-offers.js?v=g403-1';

@@ -55,7 +55,7 @@ import {
   removeSkillPackageOverride,
   skillPackageDetails,
 } from '../skill-packages.js';
-import { husbandryPack } from '../animal-husbandry.js?v=g414-1';
+import { husbandryPack } from '../animal-husbandry.js?v=g454-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 // The same module instances js/features/index.js registers (tests/buff-triggers.test.js checks the tags).
 import { meditationFeature } from './meditation-feature.js?v=g448-2';

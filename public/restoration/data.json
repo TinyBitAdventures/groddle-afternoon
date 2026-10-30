@@ -2666,9 +2666,14 @@
   ]
  },
  "git": {
-  "commits": 752,
+  "commits": 754,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "fix",
+    "text": "The Annex of A Summer's Day can be climbed to its ladder"
+   },
    {
     "date": "2026-10-29",
     "kind": "new",
@@ -2783,11 +2788,6 @@
     "date": "2026-10-29",
     "kind": "new",
     "text": "Street decos play where the original played them: glints, steam, waves, grass, stars and 49 more"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "Password managers skip the street chat and the game's other boxes"
    }
   ]
  },
