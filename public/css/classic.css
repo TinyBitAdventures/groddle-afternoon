@@ -1824,9 +1824,8 @@
 :root[data-ui="classic"] #award-screen[data-kind="quest"] :is(.award-rays, .award-badge, .award-more) { display: none; }
 :root[data-ui="classic"] #award-screen[data-kind="quest"] .award-close { position: absolute; top: calc(7 * var(--cu)); right: calc(7 * var(--cu)); width: 20px; height: 20px; padding: 0; border: 0; background: url("../assets/ui/familiar/close_x_small_gray.png?v=df15aba7") center / 20px 20px no-repeat; color: transparent; font-size: 0; }
 
-/* The How many chooser and the Feed what? picker (#feed-picker; the client's count row and
-   QuantityPickerSpecial.as 344): a 2012 window, the stacks as pack slots, the number in Nunito 13
-   #495e5e in a 30 px field with the 2 px #e1c38d ring, the steps and the go as minor buttons. */
+/* The Feed what? picker (#feed-picker): a 2012 window, the stacks as pack slots; its How many row is
+   the shared chooser below. */
 :root[data-ui="classic"] #feed-picker:not([hidden]) { background: none; backdrop-filter: none; }
 :root[data-ui="classic"] #feed-picker .feed-picker-card {
   padding: calc(10 * var(--cu)) calc(20 * var(--cu)) calc(16 * var(--cu));
@@ -1843,45 +1842,27 @@
 :root[data-ui="classic"] #feed-picker .verb-menu-sub { color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
 :root[data-ui="classic"] #feed-picker .feed-picker-choice { border: 0; border-radius: 5px; background: var(--c-classic-panel); box-shadow: 0 0 0 1px var(--c-classic-slot-ring); color: var(--c-classic-title); }
 :root[data-ui="classic"] #feed-picker .feed-picker-choice:is(:hover, :focus-visible, .is-selected) { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
-:root[data-ui="classic"] #feed-picker .feed-picker-qty-label { color: var(--c-classic-title); font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-snug) var(--font-classic-title); }
-:root[data-ui="classic"] #feed-picker #feed-picker-qty-input {
-  height: calc(30 * var(--cu));
-  border: 1px solid var(--c-classic-input-border);
-  border-radius: 3.5px;
-  background: var(--c-classic-panel);
-  color: var(--c-classic-qty-text);
-  font: 800 calc(var(--fs-classic-button) * var(--cu-n, 1))/1 var(--font-classic-title);
-  text-align: center;
-}
-:root[data-ui="classic"] #feed-picker #feed-picker-qty-input:focus { outline: none; box-shadow: 0 0 0 2px var(--c-classic-qty-ring); }
-:root[data-ui="classic"] #feed-picker :is(.feed-picker-qty-step, .feed-picker-qty-max, .feed-picker-qty-back, .feed-picker-qty-go) {
-  min-height: calc(29 * var(--cu));
-  padding: 0 calc(12 * var(--cu));
-  border: 1px solid var(--c-classic-btn-minor-border);
-  border-radius: var(--radius-xs);
-  background: linear-gradient(180deg, var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom));
-  box-shadow: 0 1px 0 color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
-  color: var(--c-classic-btn-minor-label);
-  font: 800 calc(var(--fs-classic-button) * var(--cu-n, 1))/1 var(--font-classic-title);
-}
-:root[data-ui="classic"] #feed-picker .feed-picker-qty-go { min-height: calc(34 * var(--cu)); min-width: calc(84 * var(--cu)); }
 :root[data-ui="classic"] #feed-picker .verb-menu-x { color: var(--c-classic-close); }
 :root[data-ui="classic"] #feed-picker .verb-menu-hint { display: none; }
-/* Eat how many? in a pack stack's menu (js/eat-many.js, the [data-pack-eat-*] hooks): the same
-   QuantityPicker row, the count in the 30 px field with the 2 px ring, the choices and steps as
-   minor buttons, the go as a big minor button like Make's. */
-:root[data-ui="classic"] [data-pack-eat-panel] {
+/* How many (js/ui/count-chooser.js, .count-pop: Feed, Eat more, Drop, Buy and Sell): the client's
+   QuantityPickerSpecial row (InteractionMenu.as 612-713). The title keeps the client's own words,
+   "Feed how many Cherries?" (InteractionMenuController.as 989). The number in Nunito 13 #495e5e in a
+   30 px field that takes the 2 px #e1c38d ring, the steps, Max and the choices as minor buttons, OK as
+   a big minor button like Make's. Keyed on the chooser's own classes and the sites' data hooks. */
+:root[data-ui="classic"] [data-pack-eat-panel],
+:root[data-ui="classic"] [data-pack-drop-panel] {
   margin-top: calc(8 * var(--cu));
   padding: calc(8 * var(--cu)) 0 0;
   border: 0;
   border-top: 1px solid var(--c-classic-row-rule);
   border-radius: 0;
   background: none;
-  color: var(--c-classic-text);
-  font: calc(var(--fs-classic-row) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-body);
 }
-:root[data-ui="classic"] [data-pack-eat-panel] .pack-eat-title { margin: 0 0 calc(6 * var(--cu)); color: var(--c-classic-title); font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-snug) var(--font-classic-title); }
-:root[data-ui="classic"] [data-pack-eat-panel] :is([data-pack-eat-choice], [data-pack-eat-dec], [data-pack-eat-inc]) {
+:root[data-ui="classic"] .count-pop { color: var(--c-classic-text); font: calc(var(--fs-classic-row) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-body); }
+:root[data-ui="classic"] .count-pop :is(.count-pop-title, .pack-eat-title, .feed-picker-qty-label) { margin: 0 0 calc(6 * var(--cu)); color: var(--c-classic-title); font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-snug) var(--font-classic-title); }
+:root[data-ui="classic"] .count-pop :is(.count-pop-note, .count-pop-of, .pack-eat-note) { color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
+:root[data-ui="classic"] .count-pop :is(.count-pop-step, .feed-picker-qty-row, .qty-row) { display: flex; align-items: center; gap: calc(5 * var(--cu)); flex-wrap: nowrap; }
+:root[data-ui="classic"] .count-pop :is(.count-pop-dec, .count-pop-inc, .count-pop-max, [data-pack-eat-choice], .feed-picker-qty-step, .feed-picker-qty-max, .feed-picker-qty-back, [data-vq], [data-pack-drop-confirm], [data-pack-eat-confirm], .feed-picker-qty-go, [data-v-go]) {
   min-height: calc(29 * var(--cu));
   min-width: calc(29 * var(--cu));
   padding: 0 calc(8 * var(--cu));
@@ -1892,28 +1873,24 @@
   color: var(--c-classic-btn-minor-label);
   font: 800 calc(var(--fs-classic-button) * var(--cu-n, 1))/1 var(--font-classic-title);
 }
-:root[data-ui="classic"] [data-pack-eat-panel] [data-pack-eat-choice].is-selected { border-color: var(--c-classic-qty-ring); box-shadow: 0 0 0 1px var(--c-classic-qty-ring); color: var(--c-classic-qty-text); }
-:root[data-ui="classic"] [data-pack-eat-panel] button:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
-:root[data-ui="classic"] [data-pack-eat-panel] [data-pack-eat-count] {
-  display: inline-grid;
-  place-items: center;
-  min-width: calc(76 * var(--cu));
+:root[data-ui="classic"] .count-pop :is([data-pack-drop-confirm], [data-pack-eat-confirm], .feed-picker-qty-go, [data-v-go]) { min-height: calc(34 * var(--cu)); min-width: calc(84 * var(--cu)); font-size: calc(var(--fs-classic-row) * var(--cu-n, 1)); }
+:root[data-ui="classic"] .count-pop :is([data-pack-eat-choice].is-selected, .count-pop-max[aria-pressed="true"], .feed-picker-qty-max[aria-pressed="true"]) { border-color: var(--c-classic-qty-ring); box-shadow: 0 0 0 1px var(--c-classic-qty-ring); color: var(--c-classic-qty-text); }
+:root[data-ui="classic"] .count-pop button:disabled { opacity: 0.45; cursor: default; }
+:root[data-ui="classic"] .count-pop button:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] .count-pop :is(.count-pop-num, .feed-picker-qty-input, [data-vq-val]) {
+  box-sizing: border-box;
+  width: calc(52 * var(--cu));
   height: calc(30 * var(--cu));
+  padding: 0 calc(4 * var(--cu));
   border: 1px solid var(--c-classic-input-border);
   border-radius: 3.5px;
   background: var(--c-classic-panel);
-  box-shadow: 0 0 0 2px var(--c-classic-qty-ring);
   color: var(--c-classic-qty-text);
   font: 800 calc(var(--fs-classic-button) * var(--cu-n, 1))/1 var(--font-classic-title);
+  text-align: center;
+  appearance: textfield;
 }
-:root[data-ui="classic"] [data-pack-eat-panel] .pack-eat-note { color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
-:root[data-ui="classic"] [data-pack-eat-panel] [data-pack-eat-confirm] {
-  min-height: calc(34 * var(--cu));
-  min-width: calc(84 * var(--cu));
-  border: 1px solid var(--c-classic-btn-minor-border);
-  border-radius: var(--radius-xs);
-  background: linear-gradient(180deg, var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom));
-  box-shadow: 0 1px 0 color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
-  color: var(--c-classic-btn-minor-label);
-  font: 800 calc(var(--fs-classic-row) * var(--cu-n, 1))/1 var(--font-classic-title);
-}
+:root[data-ui="classic"] .count-pop :is(.count-pop-num, .feed-picker-qty-input, [data-vq-val])::-webkit-inner-spin-button,
+:root[data-ui="classic"] .count-pop :is(.count-pop-num, .feed-picker-qty-input, [data-vq-val])::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+:root[data-ui="classic"] .count-pop :is(.count-pop-num, .feed-picker-qty-input, [data-vq-val]):focus { outline: none; box-shadow: 0 0 0 2px var(--c-classic-qty-ring); }
+:root[data-ui="classic"] .count-pop .count-pop-actions { display: flex; align-items: center; justify-content: flex-end; gap: calc(8 * var(--cu)); margin-top: calc(10 * var(--cu)); }

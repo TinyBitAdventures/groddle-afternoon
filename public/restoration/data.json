@@ -2676,6 +2676,11 @@
   "recent": [
    {
     "date": "2026-10-30",
+    "kind": "fix",
+    "text": "Classic's Quests, Make and window titles match their reference frames side by side"
+   },
+   {
+    "date": "2026-10-30",
     "kind": "improve",
     "text": "Classic's conversations, prompts and Quest complete! take 2012's dark box, and Eat how many? its quantity picker"
    },

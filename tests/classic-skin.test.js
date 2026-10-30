@@ -181,17 +181,17 @@ describe('Classic skin: modules and copy', () => {
     assert.match(css, /#make-panel > \.make-card \{[^}]*min-width: min\(calc\(614 \* var\(--cu\)\)/, 'the window keeps its 614 px without the tabs');
   });
 
-  it('dialogs: conversations, prompts and quest complete in the 462 px dark box; How many as the quantity picker', () => {
+  it('dialogs: conversations, prompts and quest complete in the 462 px dark box; How many as the client\'s quantity picker', () => {
     const css = read(CSS);
     assert.match(css, /#award-screen\[data-kind="quest"\] \.award-card \{[^}]*width: min\(calc\(462 \* var\(--cu\)\)/);
     assert.match(css, /background: color-mix\(in srgb, var\(--c-classic-dark\) 90%, transparent\);/);
     assert.match(css, /#award-screen\[data-kind="quest"\] \{ background: none; \}/, 'no full screen');
-    assert.match(css, /#feed-picker #feed-picker-qty-input:focus \{ outline: none; box-shadow: 0 0 0 2px var\(--c-classic-qty-ring\); \}/);
+    assert.match(css, /\.count-pop :is\(\.count-pop-num, \.feed-picker-qty-input, \[data-vq-val\]\):focus \{ outline: none; box-shadow: 0 0 0 2px var\(--c-classic-qty-ring\); \}/);
     const style = read('public/style.css');
     assert.match(style, /--c-classic-quest-title: #[0-9a-f]{6}; +\/\* FROM FRAME/);
-    // Eat how many? keys on its data hooks (MPANELS restyles the pack popover's markup).
-    assert.match(css, /\[data-pack-eat-panel\] \[data-pack-eat-count\] \{[^}]*height: calc\(30 \* var\(--cu\)\);[^}]*box-shadow: 0 0 0 2px var\(--c-classic-qty-ring\);/);
-    assert.match(css, /\[data-pack-eat-panel\] :is\(\[data-pack-eat-choice\], \[data-pack-eat-dec\], \[data-pack-eat-inc\]\)/);
+    // How many is MPANELS' shared chooser (js/ui/count-chooser.js): one Classic rule set for Feed, Eat more, Drop, Buy and Sell.
+    assert.match(css, /\.count-pop :is\(\.count-pop-num, \.feed-picker-qty-input, \[data-vq-val\]\) \{[^}]*height: calc\(30 \* var\(--cu\)\);/);
+    assert.match(css, /\.count-pop :is\(\.count-pop-dec, \.count-pop-inc, \.count-pop-max, \[data-pack-eat-choice\]/);
     // The familiar's and the voice of rock's looks stay theirs.
     assert.match(css, /\.quest-dialogue:not\(\[data-look="familiar"\], \[data-look="vog"\]\)/);
   });
