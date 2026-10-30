@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 830,
+  "commits": 831,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "Start learning this skill works on the first click"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "fix",
     "text": "Background layers glide smoothly when you slow down, instead of shifting left and right"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "The New Day screen's mountains are sharp at any window size"
    }
   ]
  },
- "tests": 463,
+ "tests": 464,
  "generatedAt": "2026-10-30"
 }

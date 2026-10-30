@@ -120,6 +120,7 @@
   --z-hud-pop: calc(var(--z-hud) + 16); /* the top bar while its Menu, Sound or eat menu is open: over the Social drawer (z-hud + 14) */
   --z-overlay: 32;  /* world announcements (the Qurazy banner): over the HUD, under every panel */
   --z-overlay: 32;  /* world announcements (the Qurazy banner): over the HUD, under every panel */
+  --z-quest-hud: calc(var(--z-overlay) + 1); /* a quest's progress card (Legalize It): over the HUD, under every panel, menu, form and dialog */
   --z-panel: 35;    /* side panels, Map, modals, the pack */
   --z-notice: 50;   /* toasts, popovers, player menu, tutorial pills */
   --z-dialog: 70;   /* windows and quest HUDs over panels */
@@ -7153,7 +7154,7 @@ header.top-bar + .sub { display: none; }
 
 .legalize-hud {
   position: absolute;
-  z-index: calc(var(--z-dialog) + 9);
+  z-index: var(--z-quest-hud);
   top: 66px;
   left: 50%;
   width: min(640px, calc(100% - 32px));
