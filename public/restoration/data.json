@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 779,
+  "commits": 780,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "Choose the Modern or Classic interface from the Menu or Preferences (,)"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "You walk behind a subway station's column"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "The Annex of A Summer's Day can be climbed to its ladder"
    }
   ]
  },
- "tests": 439,
+ "tests": 440,
  "generatedAt": "2026-10-30"
 }
