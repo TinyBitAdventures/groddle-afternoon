@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 764,
+  "commits": 765,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "Low energy and mood turn amber and red, and a click offers something to eat"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-29",
     "kind": "improve",
     "text": "Every rainbow the game shows draws sharp on Retina screens"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "improve",
-    "text": "Butterflies draw sharp on Retina again, from Tiny Speck's CC0 SWF"
    }
   ]
  },

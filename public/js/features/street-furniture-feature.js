@@ -115,7 +115,7 @@ import {
   visitorLetter,
 } from '../neighbours.js?v=neighbours-4';
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=g458-1';
-import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=note-g175';
+import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=g462-1';
 import { textureFromUrl } from '../textures.js';
 import { butlerApi } from './butler-feature.js?v=g458-3';
 import { neighboursMpApi } from './neighbours-mp-feature.js?v=g458-3';

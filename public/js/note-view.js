@@ -11,8 +11,9 @@
 
 const STYLE_ID = 'note-view-style';
 const CSS = `
-.note-view .note-card { background: #fffdf3; border: 1px solid #e3d9b8; border-radius: 6px; box-shadow: 0 16px 38px rgba(0,0,0,0.28), inset 0 0 0 6px #fffaf0; width: min(440px, 92vw); max-height: min(76vh, 620px); overflow: auto; padding: 1rem 1.1rem 0.9rem; position: relative; transform: rotate(-0.6deg); }
-.note-view .note-card::before { content: ''; position: absolute; top: -9px; left: 50%; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ff8a8a, #c43b3b 70%); box-shadow: 0 2px 3px rgba(0,0,0,0.3); }
+.note-view .note-card { background: #fffdf3; border: 1px solid #e3d9b8; border-radius: 6px; box-shadow: 0 16px 38px rgba(0,0,0,0.28), inset 0 0 0 6px #fffaf0; width: min(440px, 92vw); max-height: min(76vh, 620px); overflow: auto; padding: 1rem 1.1rem 0.9rem; position: relative; }
+.note-view .note-frame { position: relative; transform: rotate(-0.6deg); }
+.note-view .note-frame::before { content: ''; position: absolute; z-index: 1; top: -9px; left: 50%; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ff8a8a, #c43b3b 70%); box-shadow: 0 2px 3px rgba(0,0,0,0.3); }
 .note-view .note-kicker { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: #9a8a5c; }
 .note-view h2 { margin: 0.15rem 0 0.5rem; font-size: 1.2rem; color: #3d3423; overflow-wrap: anywhere; }
 .note-view .note-body { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.98rem; line-height: 1.5; color: #3b3326; min-height: 3.2rem; background-image: repeating-linear-gradient(transparent, transparent 1.45rem, #efe6c9 1.45rem, #efe6c9 1.5rem); padding-bottom: 0.3rem; }
@@ -82,7 +83,14 @@ function mount(card, { label = 'Note', onClose } = {}) {
   closeNoteView({ silent: true });
   ensureStyle();
   wrap = el('div', { className: 'glitch-modal note-view', role: 'dialog', 'aria-modal': 'true', 'aria-label': label });
-  wrap.appendChild(card);
+  // The card scrolls, so its pin sits on a frame around it, where the card's overflow can't clip it.
+  if (card.classList?.contains('note-card')) {
+    const frame = el('div', { className: 'note-frame' });
+    frame.appendChild(card);
+    wrap.appendChild(frame);
+  } else {
+    wrap.appendChild(card);
+  }
   wrap.addEventListener('click', (event) => {
     if (event.target === wrap) closeNoteView();
   });

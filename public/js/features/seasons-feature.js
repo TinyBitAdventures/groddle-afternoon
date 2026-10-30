@@ -41,7 +41,7 @@ import { landingY, nearestSurfaceY } from '../walk-surface.js?v=g442-6';
 import { isBatterflyHabitat } from '../animal-husbandry.js?v=g454-1';
 import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-9';
 import { rollDropTable } from '../drop-tables.js';
-import { openNoteView, noteViewOpen } from '../note-view.js?v=note-g175';
+import { openNoteView, noteViewOpen } from '../note-view.js?v=g462-1';
 import { payDrop } from './drops-feature.js?v=drops-8';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=g448-4';
 import { SEASON_DATA } from '../seasons-data.js';

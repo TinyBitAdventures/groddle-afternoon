@@ -24,6 +24,20 @@ describe('the holiday chip is clickable', () => {
   });
 
   it('imports note-view under the key the other features use', () => {
-    assert.match(read('public/js/features/seasons-feature.js'), /from '\.\.\/note-view\.js\?v=note-g175';/);
+    const keyIn = (p) => read(p).match(/from '\.\.\/note-view\.js\?v=([^']+)';/)?.[1];
+    const seasons = keyIn('public/js/features/seasons-feature.js');
+    assert.ok(seasons);
+    for (const p of ['street-furniture-feature.js', 'small-items-feature.js', 'home-street-mp-feature.js']) {
+      assert.equal(keyIn(`public/js/features/${p}`), seasons, p);
+    }
+  });
+
+  it('pins the note on a frame the scrolling card cannot clip', () => {
+    // The card scrolls (overflow: auto), which cut the pin above its top edge in half (Austin 2026-10-29).
+    const src = read('public/js/note-view.js');
+    assert.match(src, /\.note-view \.note-frame::before \{ content: ''; position: absolute; z-index: 1; top: -9px;/);
+    assert.doesNotMatch(src, /\.note-card::before/);
+    assert.match(src, /\.note-view \.note-card \{[^}]*overflow: auto;/);
+    assert.match(src, /frame\.appendChild\(card\);/);
   });
 });
