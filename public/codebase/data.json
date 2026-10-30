@@ -6,43 +6,43 @@
    "id": "game",
    "name": "groddle-afternoon",
    "url": "https://github.com/TinyBitAdventures/groddle-afternoon",
-   "ref": "v0.4.5",
-   "commit": "cfd9e376",
+   "ref": "v0.5.0",
+   "commit": "09edcb38",
    "licence": "MIT",
    "history": {
-    "commits": 731,
+    "commits": 753,
     "first": "2026-10-19",
     "latest": "2026-10-29"
    },
    "code": {
-    "files": 1079,
-    "lines": 391952,
-    "bytes": 17542073
+    "files": 1085,
+    "lines": 394616,
+    "bytes": 17699022
    },
    "languages": [
     {
      "id": "javascript",
      "label": "JavaScript",
-     "files": 1027,
-     "lines": 373108
+     "files": 1033,
+     "lines": 375680
     },
     {
      "id": "css",
      "label": "CSS",
      "files": 5,
-     "lines": 9136
+     "lines": 9138
     },
     {
      "id": "python",
      "label": "Python",
      "files": 23,
-     "lines": 6669
+     "lines": 6744
     },
     {
      "id": "html",
      "label": "HTML",
      "files": 13,
-     "lines": 2253
+     "lines": 2268
     },
     {
      "id": "php",
@@ -62,53 +62,53 @@
      "id": "core",
      "label": "Game core",
      "path": "public/game.js, public/content.js, public/js/",
-     "files": 291,
-     "lines": 130608
+     "files": 292,
+     "lines": 131527
     },
     {
      "id": "tests",
      "label": "Tests",
      "path": "tests/",
-     "files": 435,
-     "lines": 99318
+     "files": 439,
+     "lines": 100433
     },
     {
      "id": "features",
      "label": "Feature modules",
      "path": "public/js/features/",
      "files": 115,
-     "lines": 88208
+     "lines": 88654
     },
     {
      "id": "tools",
      "label": "Build tools",
      "path": "tools/, build-*.mjs",
      "files": 189,
-     "lines": 42260
+     "lines": 42485
     },
     {
      "id": "rooms",
      "label": "Quest rooms",
      "path": "public/js/quest-rooms/",
-     "files": 30,
-     "lines": 19290
+     "files": 31,
+     "lines": 19247
     },
     {
      "id": "pages",
      "label": "Pages and styles",
      "path": "public/ (pages, stylesheets, page scripts)",
      "files": 19,
-     "lines": 12268
+     "lines": 12270
     }
    ],
    "largest": [
     {
      "path": "public/game.js",
-     "lines": 26505
+     "lines": 26096
     },
     {
      "path": "public/style.css",
-     "lines": 7973
+     "lines": 7975
     },
     {
      "path": "public/js/features/homes-feature.js",
@@ -116,32 +116,32 @@
     },
     {
      "path": "public/js/features/newxp-feature.js",
-     "lines": 3576
+     "lines": 3773
     },
     {
      "path": "public/js/features/rook-attack-feature.js",
-     "lines": 2715
+     "lines": 2719
     }
    ],
    "notCode": [
     {
      "id": "art",
      "label": "Art and sound",
-     "files": 17138,
-     "bytes": 1166438187
+     "files": 17496,
+     "bytes": 1205472451
     },
     {
      "id": "data",
      "label": "Data (JSON)",
-     "files": 3025,
-     "bytes": 178005450
+     "files": 3058,
+     "bytes": 196890249
     },
     {
      "id": "generated",
      "label": "Generated modules and built pages",
      "files": 1071,
-     "bytes": 7288610,
-     "lines": 147781
+     "bytes": 7382212,
+     "lines": 148898
     },
     {
      "id": "vendored",
@@ -163,10 +163,10 @@
      "bytes": 2298
     }
    ],
-   "totalFiles": 22336,
+   "totalFiles": 22733,
    "tests": {
-    "files": 422,
-    "cases": 5681,
+    "files": 426,
+    "cases": 5726,
     "runner": "node --test"
    }
   },
