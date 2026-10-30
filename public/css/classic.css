@@ -248,3 +248,426 @@
   outline: none;
   box-shadow: 0 0 0 2px var(--c-classic-focus);
 }
+
+/* == The top bar (classic-spec spec §2-§6; js/classic/classic-topbar.js). The modern bar's own
+   elements (js/ui/topbar.js) moved and painted: every id, slug target, click and key stays.
+   Header pieces are placed in page px off the measured world view (--cv-*, js/classic/classic-frame.js);
+   the fallbacks are the unmeasured frame. */
+:root[data-ui="classic"] {
+  --cvx: var(--cv-x, calc(20 * var(--cu)));
+  --cvy: var(--cv-y, var(--cf-header-h));
+  --cvh: var(--cv-h, calc(100vh - 172 * var(--cu)));
+  --cvr: var(--cv-right, calc(var(--cf-right-w) + var(--cf-gutter-r)));
+}
+:root[data-ui="classic"] .top-bar,
+:root[data-ui="classic"] .top-bar button { font-family: var(--font-classic-body); color: var(--c-classic-text); }
+:root[data-ui="classic"] .top-bar .hud-cluster,
+:root[data-ui="classic"] .top-bar .metabolics-cluster,
+:root[data-ui="classic"] .top-bar .meta-vitals { display: contents; }
+/* Not in the 2012 chrome: favor, the low-energy pill (the arc's ramp is the cue, open question 6),
+   the dividers; the quoins go into the player menu (open question 9). */
+:root[data-ui="classic"] .top-bar #favor-stat,
+:root[data-ui="classic"] .top-bar #low-energy-btn,
+:root[data-ui="classic"] .top-bar .hud-div,
+:root[data-ui="classic"] .top-bar #quoin-stat,
+:root[data-ui="classic"] .top-bar .ring-glyph { display: none !important; }
+
+/* The ear: a #e6ecee patch over the viewport's top-left corner, 122 x 125 from the page's corner
+   (PlayerInfoUI.as 114-133). Its pieces are placed in its own px, as the client did. */
+:root[data-ui="classic"] .top-bar #hud-stats {
+  position: absolute;
+  left: calc(var(--cvx) - 20 * var(--cu));
+  top: 0;
+  z-index: 0;
+  display: block;
+  width: calc(122 * var(--cu));
+  height: calc(125 * var(--cu));
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  pointer-events: none;
+}
+:root[data-ui="classic"] .top-bar #hud-stats::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--z-below) - 1);
+  background: var(--c-classic-page);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 122 125'%3E%3Cpath d='M0 0L0 125L20 125Q20 110 37 110Q96 112 109 55Q111 44 122 40L122 0Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 122 125'%3E%3Cpath d='M0 0L0 125L20 125Q20 110 37 110Q96 112 109 55Q111 44 122 40L122 0Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+}
+:root[data-ui="classic"] .top-bar #hud-stats > *,
+:root[data-ui="classic"] .top-bar #hud-stats .hud-cluster > *,
+:root[data-ui="classic"] .top-bar #hud-stats .meta-vitals > * { pointer-events: auto; }
+/* Ring buttons lose the modern ring look; the ring SVGs stay laid out (the slug targets) but unseen. */
+:root[data-ui="classic"] .top-bar .ring {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  animation: none;
+  cursor: pointer;
+}
+:root[data-ui="classic"] .top-bar .ring .ring-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+:root[data-ui="classic"] .top-bar .ring .meta-num::before { content: none; }
+
+/* The mood face: a 73 px circle at (13, 16), its gradient by state (PlayerFaceUI.as 32-152). */
+:root[data-ui="classic"] .top-bar .meta-pill.mood {
+  left: calc(13 * var(--cu));
+  top: calc(16 * var(--cu));
+  width: calc(73 * var(--cu));
+  height: calc(73 * var(--cu));
+  border-radius: var(--radius-round);
+  background: linear-gradient(180deg, var(--c-classic-mood-meh-top), var(--c-classic-mood-meh-bottom));
+  box-shadow:
+    inset 0 0 2px color-mix(in srgb, var(--c-classic-ink) 15%, transparent),
+    inset 0 2px 5px color-mix(in srgb, var(--c-classic-ink) 20%, transparent),
+    0 3px 0 color-mix(in srgb, var(--c-classic-panel) 55%, transparent);
+}
+:root[data-ui="classic"] .top-bar .meta-pill.mood[data-classic-mood="sun"] { background: linear-gradient(180deg, var(--c-classic-mood-sun-top), var(--c-classic-mood-sun-bottom)); }
+:root[data-ui="classic"] .top-bar .meta-pill.mood[data-classic-mood="glow"] { background: linear-gradient(180deg, var(--c-classic-mood-glow-top), var(--c-classic-mood-glow-bottom)); }
+:root[data-ui="classic"] .top-bar .meta-pill.mood[data-classic-mood="fair"] { background: linear-gradient(180deg, var(--c-classic-mood-fair-top), var(--c-classic-mood-fair-bottom)); }
+:root[data-ui="classic"] .top-bar .meta-pill.mood[data-classic-mood="low"] { background: linear-gradient(180deg, var(--c-classic-mood-low-top), var(--c-classic-mood-low-bottom)); }
+/* The face itself: the client's empty face (the remake has no avatar headshot yet). */
+:root[data-ui="classic"] .top-bar .meta-pill.mood::after {
+  content: "";
+  position: absolute;
+  inset: calc(1 * var(--cu));
+  border-radius: var(--radius-round);
+  background: url("../assets/classic/player_face_empty.png?v=7d5a819b") center / contain no-repeat;
+  transition: opacity 0.2s linear;
+}
+/* 80% and up: the rays behind the face (89 frames, 109 px cells, 9 a row, 24 fps). */
+:root[data-ui="classic"] .top-bar .meta-pill.mood[data-classic-mood="sun"]::before,
+:root[data-ui="classic"] .top-bar .meta-pill.mood[data-classic-mood="glow"]::before {
+  content: "";
+  position: absolute;
+  left: calc(-18 * var(--cu));
+  top: calc(-18 * var(--cu));
+  z-index: var(--z-below);
+  width: calc(109 * var(--cu));
+  height: calc(109 * var(--cu));
+  opacity: 0.8;
+  background: url("../assets/classic/player_face_rays.png?v=fb4fd49b") 0 0 / calc(981 * var(--cu)) calc(1090 * var(--cu)) no-repeat;
+  animation: classic-rays-x 0.375s steps(9) infinite, classic-rays-y 3.75s steps(10) infinite;
+}
+@keyframes classic-rays-x { to { background-position-x: calc(-981 * var(--cu)); } }
+@keyframes classic-rays-y { to { background-position-y: calc(-1090 * var(--cu)); } }
+/* Under 20%: rain over the face (avatar_rain.swf, 10 frames). */
+:root[data-ui="classic"] .top-bar .meta-pill.mood[data-classic-mood="low"]::before {
+  content: "";
+  position: absolute;
+  left: calc(-20 * var(--cu));
+  top: calc(-10 * var(--cu));
+  z-index: var(--z-raised);
+  width: calc(113.9 * var(--cu));
+  height: calc(96.65 * var(--cu));
+  background: url("../assets/classic/avatar_rain.svg?v=6d1e98b2") 0 0 / calc(1139 * var(--cu)) 100% no-repeat;
+  animation: classic-rain 0.42s steps(10) infinite;
+  pointer-events: none;
+}
+@keyframes classic-rain { to { background-position-x: calc(-1139 * var(--cu)); } }
+/* Hover: the face fades and the share shows (PlayerFaceUI.as 163-182). */
+:root[data-ui="classic"] .top-bar .meta-pill.mood .meta-num {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--c-classic-title);
+  font: 800 var(--fs-classic-pane)/var(--lh-none) var(--font-classic-title);
+  opacity: 0;
+  transition: opacity 0.2s linear;
+}
+:root[data-ui="classic"] .top-bar .meta-pill.mood:is(:hover, :focus-visible) .meta-num { opacity: 0.7; }
+:root[data-ui="classic"] .top-bar .meta-pill.mood:is(:hover, :focus-visible)::after { opacity: 0.1; }
+
+/* The energy arc: 77 x 64 at (27, 42), the 13 px band on a #bfced3 track, filled from the foot to the
+   top in the ramp's colour (EnergyBar.as 18-156); the bolt at (19, 90); the text at (116, 43). */
+:root[data-ui="classic"] .top-bar .meta-pill.energy {
+  left: calc(27 * var(--cu));
+  top: calc(42 * var(--cu));
+  width: calc(77 * var(--cu));
+  height: calc(64 * var(--cu));
+  --classic-ramp: var(--c-classic-ramp-10);
+}
+:root[data-ui="classic"] .top-bar .meta-pill.energy::after {
+  content: "";
+  position: absolute;
+  left: calc(-8 * var(--cu));
+  top: calc(48 * var(--cu));
+  width: calc(9 * var(--cu));
+  height: calc(15 * var(--cu));
+  background: url("../assets/classic/energy_bolt.png?v=5f43803a") 0 0 / 100% 100% no-repeat;
+}
+:root[data-ui="classic"] .top-bar .classic-arc { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+:root[data-ui="classic"] .top-bar .classic-arc-track { fill: var(--c-classic-energy-track); }
+:root[data-ui="classic"] .top-bar .classic-arc-fill { fill: none; stroke: var(--classic-ramp); stroke-width: 16; transition: stroke-dasharray 2s cubic-bezier(0.33, 1, 0.68, 1); }
+:root[data-ui="classic"] .top-bar .classic-arc-shine { fill: none; stroke: color-mix(in srgb, var(--c-classic-panel) 40%, transparent); stroke-width: 1; }
+:root[data-ui="classic"] .top-bar .meta-pill.energy[data-classic-ramp="0"] { --classic-ramp: var(--c-classic-ramp-0); }
+:root[data-ui="classic"] .top-bar .meta-pill.energy[data-classic-ramp="1"] { --classic-ramp: var(--c-classic-ramp-1); }
+:root[data-ui="classic"] .top-bar .meta-pill.energy[data-classic-ramp="2"] { --classic-ramp: var(--c-classic-ramp-2); }
+:root[data-ui="classic"] .top-bar .meta-pill.energy[data-classic-ramp="3"] { --classic-ramp: var(--c-classic-ramp-3); }
+:root[data-ui="classic"] .top-bar .meta-pill.energy[data-classic-ramp="4"] { --classic-ramp: var(--c-classic-ramp-4); }
+:root[data-ui="classic"] .top-bar .meta-pill.energy[data-classic-ramp="5"] { --classic-ramp: var(--c-classic-ramp-5); }
+:root[data-ui="classic"] .top-bar .meta-pill.energy[data-classic-ramp="6"] { --classic-ramp: var(--c-classic-ramp-6); }
+:root[data-ui="classic"] .top-bar .meta-pill.energy[data-classic-ramp="7"] { --classic-ramp: var(--c-classic-ramp-7); }
+:root[data-ui="classic"] .top-bar .meta-pill.energy[data-classic-ramp="8"] { --classic-ramp: var(--c-classic-ramp-8); }
+:root[data-ui="classic"] .top-bar .meta-pill.energy[data-classic-ramp="9"] { --classic-ramp: var(--c-classic-ramp-9); }
+/* The number inside the ring is replaced by the "{cur}/{max} Energy" line (PlayerInfoUI.as 177-179).
+   The client drew it at alpha .3; .7 here keeps it readable (4.5:1 on the page colour). */
+:root[data-ui="classic"] .top-bar .meta-pill.energy .meta-num { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+:root[data-ui="classic"] .top-bar .classic-energy-text {
+  position: absolute;
+  left: calc(89 * var(--cu));
+  top: calc(1 * var(--cu));
+  white-space: nowrap;
+  color: var(--c-classic-title);
+  font: 800 var(--fs-classic-energy)/var(--lh-tight) var(--font-classic-title);
+  text-align: left;
+  opacity: 0.7;
+  transition: opacity 0.1s linear;
+}
+:root[data-ui="classic"] .top-bar .classic-energy-text::after { content: "\A Energy"; white-space: pre; }
+:root[data-ui="classic"] .top-bar .meta-pill.energy:is(:hover, :focus-visible) .classic-energy-text { opacity: 1; }
+
+/* The level pill, centred over the face at y 3, where the client had the name (PlayerInfoUI.as
+   672-695): it opens the player menu (Z), as the name did. */
+:root[data-ui="classic"] .top-bar #player-menu-btn {
+  left: calc(49.5 * var(--cu));
+  top: calc(1 * var(--cu));
+  transform: translateX(-50%);
+  width: auto;
+  height: auto;
+  padding: 0 calc(5 * var(--cu));
+  border-radius: 3px;
+  background: var(--c-classic-page);
+  text-shadow: 0 1px 0 color-mix(in srgb, var(--c-classic-panel) 80%, transparent);
+}
+:root[data-ui="classic"] .top-bar #player-menu-btn .level-meter { position: static; display: block; }
+:root[data-ui="classic"] .top-bar #player-menu-btn #stat-level {
+  position: static;
+  color: var(--c-classic-title);
+  font: 800 var(--fs-classic-body)/var(--lh-snug) var(--font-classic-title);
+}
+:root[data-ui="classic"] .top-bar #player-menu-btn #stat-level::before { content: "Level "; }
+
+/* The iMG button: 52 x 41 at (113, 4), the cloud puff at (84, 26), the count right of it
+   (ImaginationButton.as 46-60, PlayerInfoUI.as 142-155). */
+:root[data-ui="classic"] .top-bar .hud-img {
+  position: absolute;
+  left: calc(113 * var(--cu));
+  top: calc(4 * var(--cu));
+  display: block;
+  width: calc(52 * var(--cu));
+  height: calc(41 * var(--cu));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+:root[data-ui="classic"] .top-bar .hud-img::before {
+  content: "";
+  position: absolute;
+  left: calc(-29 * var(--cu));
+  top: calc(22 * var(--cu));
+  width: calc(25 * var(--cu));
+  height: calc(21 * var(--cu));
+  background: url("../assets/classic/imagination_button_clouds.png?v=09f7ffe9") 0 0 / 100% 100% no-repeat;
+}
+:root[data-ui="classic"] .top-bar .hud-img img { display: block; width: 100%; height: 100%; }
+:root[data-ui="classic"] .top-bar .hud-img:is(:hover, :focus-visible) img { content: url("../assets/imagination/ui/imagination_button_hover.png?v=df15aba7"); }
+:root[data-ui="classic"] .top-bar .hud-img #stat-img {
+  position: absolute;
+  left: calc(100% + 3 * var(--cu));
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--c-classic-title);
+  font: 800 var(--fs-classic-pane)/var(--lh-none) var(--font-classic-title);
+  text-shadow: 0 1px 0 var(--c-classic-panel);
+  white-space: nowrap;
+}
+:root[data-ui="classic"] .top-bar .hud-img #stat-img::after { content: "i"; margin-left: 1px; font-size: var(--fs-classic-body); }
+
+/* The player menu: slides down from behind the ear to y 55, #e6ecee, bottom-right radius 7
+   (PlayerInfoUI.as 253-298, PlayerStatsUI.as). */
+:root[data-ui="classic"] .top-bar #player-menu {
+  position: absolute;
+  left: calc(var(--cvx) - 10 * var(--cu));
+  top: calc(55 * var(--cu));
+  width: calc(200 * var(--cu));
+  border: 0;
+  border-radius: 0 0 7px 0;
+  background: var(--c-classic-page);
+  box-shadow: 0 2px 4px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+  color: var(--c-classic-text);
+  font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body);
+}
+
+/* The currants: the 36 px icon at the viewport's bottom-left corner, half in the gutter, the number
+   and "Currants" right of it (YouDisplayManager.as 122-130, 464). Alpha .3 at rest in the client;
+   .7 here for 4.5:1. */
+:root[data-ui="classic"] .top-bar .meta-stat.currants {
+  position: absolute;
+  left: calc(var(--cvx) - 20 * var(--cu));
+  top: calc(var(--cvy) + var(--cvh) - 72 * var(--cu));
+  display: flex;
+  align-items: center;
+  gap: calc(5 * var(--cu));
+  height: calc(36 * var(--cu));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  opacity: 0.85;
+  transition: opacity 0.1s linear;
+}
+:root[data-ui="classic"] .top-bar .meta-stat.currants:is(:hover, :focus-visible) { opacity: 1; }
+:root[data-ui="classic"] .top-bar .meta-stat.currants img { content: url("../assets/classic/currants_icon.png?v=063d9b8e"); width: calc(36 * var(--cu)); height: calc(36 * var(--cu)); }
+:root[data-ui="classic"] .top-bar .meta-stat.currants strong {
+  color: var(--c-classic-panel);
+  font: 800 var(--fs-classic-pane)/var(--lh-tight) var(--font-classic-title);
+  text-shadow: 0 1px 1px color-mix(in srgb, var(--c-classic-ink) 80%, transparent);
+}
+:root[data-ui="classic"] .top-bar .meta-stat.currants strong::after { content: "\A Currants"; white-space: pre; font: var(--fs-classic-body)/var(--lh-tight) var(--font-classic-body); }
+
+/* The header. The 2012 cluster, centred over the chat column (GameHeaderUI.as 33-117): help, the
+   volume icon and the date (no bug icon: solo has no report path). The game's own buttons (Quests,
+   Make, Map, Mail) and the Menu, which the 2012 header did not have, sit small and grey at the
+   header's left after the iMG count (PROPOSED); the iMG button in the ear stands for Imagination. */
+:root[data-ui="classic"] {
+  --cf-cluster-r: calc(var(--cf-gutter-r) + 53 * var(--cu));
+}
+@media (max-width: 1312.98px) {
+  :root[data-ui="classic"] { --cf-cluster-r: var(--cf-gutter-r); }
+}
+:root[data-ui="classic"] .top-bar [hidden] { display: none !important; }
+:root[data-ui="classic"] .top-bar .hud-actions { display: contents; }
+:root[data-ui="classic"] .top-bar .hud-actions .kcap,
+:root[data-ui="classic"] .top-bar #imagination-btn { display: none !important; }
+:root[data-ui="classic"] .top-bar .hud-actions > .chrome-btn,
+:root[data-ui="classic"] .top-bar .hud-actions .more-menu,
+:root[data-ui="classic"] .top-bar .hud-actions .classic-date {
+  position: absolute;
+  top: calc(6 * var(--cu));
+  margin: 0;
+}
+:root[data-ui="classic"] .top-bar .hud-actions > .chrome-btn,
+:root[data-ui="classic"] .top-bar .more-menu > #more-btn {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  width: calc(24 * var(--cu));
+  height: calc(28 * var(--cu));
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: none;
+  box-shadow: none;
+  color: var(--c-classic-tab-off);
+}
+:root[data-ui="classic"] .top-bar .more-menu > #more-btn { position: static; }
+:root[data-ui="classic"] .top-bar :is(.hud-actions > .chrome-btn, .more-menu > #more-btn):is(:hover, :focus-visible) { color: var(--c-classic-link); background: color-mix(in srgb, var(--c-classic-panel) 60%, transparent); }
+:root[data-ui="classic"] .top-bar :is(.hud-actions > .chrome-btn, .more-menu > #more-btn) svg { width: calc(18 * var(--cu)); height: calc(18 * var(--cu)); }
+:root[data-ui="classic"] .top-bar #quest-btn { left: calc(var(--cvx) + 205 * var(--cu)); }
+:root[data-ui="classic"] .top-bar #make-btn { left: calc(var(--cvx) + 231 * var(--cu)); }
+:root[data-ui="classic"] .top-bar #map-btn { left: calc(var(--cvx) + 257 * var(--cu)); }
+:root[data-ui="classic"] .top-bar #mail-btn { left: calc(var(--cvx) + 283 * var(--cu)); }
+:root[data-ui="classic"] .top-bar .hud-actions .more-menu { left: calc(var(--cvx) + 309 * var(--cu)); }
+:root[data-ui="classic"] .top-bar #study-chip { left: calc(var(--cvx) + 337 * var(--cu)); width: auto; padding: 0 calc(6 * var(--cu)); color: var(--c-classic-link); font: 800 var(--fs-classic-body)/var(--lh-none) var(--font-classic-title); }
+:root[data-ui="classic"] .top-bar .classic-help-btn { right: calc(var(--cf-cluster-r) + 138 * var(--cu)); top: calc(10 * var(--cu)); width: calc(20 * var(--cu)); height: calc(21 * var(--cu)); }
+:root[data-ui="classic"] .top-bar .classic-help-btn img { display: block; width: 100%; height: 100%; }
+/* The volume icon: one 34 px frame of the 4-state strip (AudioControl.as 214-229). */
+:root[data-ui="classic"] .top-bar .hud-actions #sound-btn {
+  right: calc(var(--cf-cluster-r) + 98 * var(--cu));
+  top: calc(3 * var(--cu));
+  width: calc(34 * var(--cu));
+  height: calc(34 * var(--cu));
+  background: url("../assets/classic/audio_control_icon.png?v=15b441ab") 0 0 / 100% 400% no-repeat;
+}
+:root[data-ui="classic"] .top-bar #sound-btn > svg { opacity: 0; }
+:root[data-ui="classic"] .top-bar #sound-btn[data-classic-volume="1"] { background-position-y: 33.333%; }
+:root[data-ui="classic"] .top-bar #sound-btn[data-classic-volume="2"] { background-position-y: 66.667%; }
+:root[data-ui="classic"] .top-bar #sound-btn[data-classic-volume="3"] { background-position-y: 100%; }
+/* The date: "{Weekday}" / "{h:mm} {am|pm}" / "{Nth} of {Month}" (DateTimeUI.as 49-74). */
+:root[data-ui="classic"] .top-bar .hud-actions .classic-date {
+  right: var(--cf-cluster-r);
+  top: calc(3 * var(--cu));
+  display: grid;
+  justify-items: center;
+  width: calc(92 * var(--cu));
+  color: var(--c-classic-text);
+  font: var(--fs-classic-count)/var(--lh-tight) var(--font-classic-body);
+  white-space: nowrap;
+}
+:root[data-ui="classic"] .top-bar .classic-date-time { color: var(--c-classic-title); font: 800 var(--fs-classic-body)/var(--lh-tight) var(--font-classic-title); }
+/* The Sound popover: the 2012 volume panel's look under the icon (AudioControl.as 84-390). */
+:root[data-ui="classic"] .top-bar #sound-pop {
+  position: absolute;
+  top: var(--cf-header-h);
+  right: calc(var(--cf-cluster-r) + 60 * var(--cu));
+  border: 0;
+  border-radius: 5px;
+  background: var(--c-classic-page);
+  box-shadow: 0 2px 4px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+  color: var(--c-classic-text);
+  font-family: var(--font-classic-body);
+}
+:root[data-ui="classic"] .top-bar #more-list {
+  left: 0;
+  right: auto;
+  border-radius: 0 0 5px 5px;
+  background: var(--c-classic-page);
+  color: var(--c-classic-text);
+  font-family: var(--font-classic-body);
+}
+
+/* Current location: right-aligned to the viewport's right edge, in the header, the map icon then
+   "Current location:" over the street (CurrentLocationUI.as 21-142). A click opens the Map. */
+:root[data-ui="classic"] #game-root .street-nameplate {
+  position: fixed;
+  top: 0;
+  left: auto;
+  right: max(var(--cvr), calc(var(--cf-cluster-r) + 168 * var(--cu)));
+  transform: none;
+  display: block;
+  height: var(--cf-header-h);
+  max-width: calc(192 * var(--cu));
+  margin: 0;
+  padding: calc(6 * var(--cu)) 0 0 calc(32 * var(--cu));
+  border: 0;
+  border-radius: 0;
+  background: url("../assets/classic/map_icon.png?v=b6d8376f") 0 calc(4 * var(--cu)) / calc(27 * var(--cu)) calc(28 * var(--cu)) no-repeat;
+  box-shadow: none;
+  color: var(--c-classic-title);
+  font: 800 var(--fs-classic-body)/var(--lh-tight) var(--font-classic-title);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  z-index: var(--z-hud);
+}
+:root[data-ui="classic"] #game-root .street-nameplate:hover { background-image: url("../assets/classic/map_icon_hover.png?v=a5ada334"); }
+:root[data-ui="classic"] #game-root .street-nameplate::before {
+  content: "Current location:";
+  display: block;
+  color: var(--c-classic-text);
+  font: var(--fs-classic-count)/var(--lh-tight) var(--font-classic-body);
+}
+:root[data-ui="classic"] #game-root .street-nameplate #street-name { display: block; overflow: hidden; text-overflow: ellipsis; }
+:root[data-ui="classic"] #game-root .street-nameplate .street-name-hub,
+:root[data-ui="classic"] #game-root .street-nameplate .street-time-divider,
+:root[data-ui="classic"] #game-root .street-nameplate .dametime-clock,
+:root[data-ui="classic"] #game-root .street-nameplate > :not(#street-name) { display: none; }

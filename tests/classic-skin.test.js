@@ -31,17 +31,31 @@ function selectors(text) {
     if (c === '{') {
       // Structure from the masked text, words from the original (strings like "classic" kept, comments dropped).
       const prelude = text.slice(start, i).replace(/\/\*[\s\S]*?\*\//g, ' ').trim().replace(/\s+/g, ' ');
-      if (prelude.startsWith('@')) atStack.push(depth);
-      else out.push(prelude);
+      if (prelude.startsWith('@')) atStack.push({ depth, frames: /^@(-webkit-)?keyframes\b/.test(prelude) });
+      else if (!atStack.some((a) => a.frames)) out.push(prelude);
       depth++;
       start = i + 1;
     } else if (c === '}') {
       depth--;
-      if (atStack.length && atStack[atStack.length - 1] === depth) atStack.pop();
+      if (atStack.length && atStack[atStack.length - 1].depth === depth) atStack.pop();
       start = i + 1;
     } else if (c === ';') start = i + 1;
   }
   return out;
+}
+
+/** A selector list split on its own commas, not those inside :is(...) or :not(...). */
+function topLevelParts(sel) {
+  const parts = [];
+  let depth = 0;
+  let start = 0;
+  for (let i = 0; i < sel.length; i++) {
+    if (sel[i] === '(') depth++;
+    else if (sel[i] === ')') depth--;
+    else if (sel[i] === ',' && depth === 0) { parts.push(sel.slice(start, i)); start = i + 1; }
+  }
+  parts.push(sel.slice(start));
+  return parts;
 }
 
 describe('Classic skin: classic.css', () => {
@@ -51,12 +65,13 @@ describe('Classic skin: classic.css', () => {
     const list = selectors(text);
     assert.ok(list.length > 10, `${list.length} rules`);
     const bad = [];
-    for (const sel of list) for (const part of sel.split(',')) if (!part.trim().startsWith(SCOPE)) bad.push(part.trim());
+    for (const sel of list) for (const part of topLevelParts(sel)) if (!part.trim().startsWith(SCOPE)) bad.push(part.trim());
     assert.deepEqual(bad, []);
   });
 
   it('the selector reader sees nested and grouped rules', () => {
-    assert.deepEqual(selectors('a, b { x: 1 } @media (min-width: 1px) { c { y: 2 } } /* d { } */'), ['a, b', 'c']);
+    assert.deepEqual(selectors('a, b { x: 1 } @media (min-width: 1px) { c { y: 2 } } /* d { } */ @keyframes k { to { z: 1 } } e { f: 1 }'), ['a, b', 'c', 'e']);
+    assert.deepEqual(topLevelParts('a:is(b, c), d'), ['a:is(b, c)', ' d']);
   });
 
   it('its colours are the Classic palette only, and the palette is used nowhere else', () => {
@@ -94,7 +109,7 @@ describe('Classic skin: classic.css', () => {
     for (const d of allDeclarations(root).filter((x) => x.file === CSS)) {
       const hides = (d.prop === 'display' && /\bnone\b/.test(d.value)) || (d.prop === 'visibility' && /hidden/.test(d.value) && !/notify-notices/.test(d.selector));
       if (!hides) continue;
-      for (const part of d.selector.split(',')) {
+      for (const part of topLevelParts(d.selector)) {
         const last = part.trim().split(/\s+/).pop();
         if (KEEP.some((k) => last === k || last.startsWith(`${k}:`) || last.startsWith(`${k}[`) || last.startsWith(`${k}.`))) bad.push(part.trim());
       }

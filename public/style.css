@@ -804,6 +804,31 @@
   --c-classic-btn-dark-top: #3a4448;      /* PROPOSED, from frame ref/video-2011-quest-complete.jpg ("Yeah!") */
   --c-classic-btn-dark-bottom: #1f282b;   /* PROPOSED, same frame */
   --c-classic-btn-dark-label: #ffffff;    /* PROPOSED, same frame */
+  /* The energy ramp, empty to full: energy_mood_gradient.png's 11 stops (EnergyBar.as 114-126) */
+  --c-classic-ramp-0: #cb202e;
+  --c-classic-ramp-1: #e4491a;
+  --c-classic-ramp-2: #f36213;
+  --c-classic-ramp-3: #f98b06;
+  --c-classic-ramp-4: #f8b100;
+  --c-classic-ramp-5: #f6bf00;
+  --c-classic-ramp-6: #d1bc1a;
+  --c-classic-ramp-7: #a7b933;
+  --c-classic-ramp-8: #83b63d;
+  --c-classic-ramp-9: #73b43d;
+  --c-classic-ramp-10: #6bb745;
+  /* The mood face, top to bottom by state (PlayerFaceUI.as 37-45): 90%+, 80%+, 70%+, 20%+, under 20% */
+  --c-classic-mood-sun-top: #6bcddb;
+  --c-classic-mood-sun-bottom: #d6f7d2;
+  --c-classic-mood-glow-top: #64d2ad;
+  --c-classic-mood-glow-bottom: #daf5bc;
+  --c-classic-mood-fair-top: #cac97e;
+  --c-classic-mood-fair-bottom: #eae8ca;
+  --c-classic-mood-meh-top: #b0734b;
+  --c-classic-mood-meh-bottom: #d3a696;
+  --c-classic-mood-low-top: #644849;
+  --c-classic-mood-low-bottom: #6d5353;
+  --c-classic-debuff: #b73d40;            /* a debuff's ring (code default): BuffUI.as */
+  --c-classic-quest-badge: #b21f00;       /* the quest count on the iMG button (code default): ImaginationButton.as:38 */
   /* classic:end */
   /* Classic type: the 2012 faces (VAG Rounded, Helvetica) are proprietary, so Nunito 800 stands in for
      titles, names, labels and big numbers, and the system Helvetica/Arial stack carries body text. The

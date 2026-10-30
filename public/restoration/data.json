@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 782,
+  "commits": 783,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "Classic's 2012 frame: the world in its cell, the pack band below it and the chat column beside it"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "Rooks' Woods can be won by real input: you walk under the two sweeping Crushers"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "new",
-    "text": "De-Embiggenify shrinks you onto Tiny Speck's own Eesti Life Catalog Page 17"
    }
   ]
  },
- "tests": 442,
+ "tests": 443,
  "generatedAt": "2026-10-30"
 }

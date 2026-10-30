@@ -5,6 +5,7 @@
  * installs this.
  */
 import { installClassicFrame } from './classic-frame.js?v=g468-2';
+import { installClassicTopbar } from './classic-topbar.js?v=g468-3';
 
 let installed = null;
 
@@ -12,6 +13,7 @@ export function installClassicChrome({ doc = globalThis.document, win = globalTh
   if (installed) return installed;
   installed = {
     frame: installClassicFrame({ doc, win }),
+    topbar: installClassicTopbar({ doc, win }),
   };
   return installed;
 }
