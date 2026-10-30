@@ -833,6 +833,9 @@
   --c-classic-bag-dot: #6d777c;           /* the strip's dot */
   --c-classic-bag-panel: #c6d2d3;         /* an open bag's panel (code default): PackDisplayManager.as:1083-1201 */
   --c-classic-bag-border: #b2bfc0;
+  --c-classic-verb-hi: #f8f2e3;           /* the focused verb row, from int_menu_norm.png (PROPOSED, ref/flickr-verb-menu.jpg) */
+  --c-classic-verb-edge: #e1c38f;         /* its tan edge (PROPOSED, same frame) */
+  --c-classic-disabled: #989898;          /* disabled text (code default): FormElement.as */
   /* classic:end */
   /* Classic type: the 2012 faces (VAG Rounded, Helvetica) are proprietary, so Nunito 800 stands in for
      titles, names, labels and big numbers, and the system Helvetica/Arial stack carries body text. The

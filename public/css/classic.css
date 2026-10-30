@@ -938,3 +938,57 @@
   color: var(--c-classic-title);
   font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body);
 }
+
+/* == The verb menu (classic-spec spec §10; InteractionMenu.as): restyled in place, so
+   #verb-menu-title, #verb-menu-sub and the .verb-choice buttons keep their tests and keys. No shade
+   over the world: white at .95, radius 5, padding 5, at least 140 wide, rows touching, the
+   0 2px 1px .6 shadow; the focused row cream with a tan edge (int_menu_norm.png, PROPOSED). The
+   verb's explanation shows for the focused row only, as the client's one desc line did. */
+:root[data-ui="classic"] #verb-menu {
+  z-index: calc(var(--z-world) + 5);
+  background: none;
+  backdrop-filter: none;
+}
+:root[data-ui="classic"] #verb-menu .verb-menu-card {
+  min-width: calc(140 * var(--cu));
+  width: auto;
+  max-width: calc(300 * var(--cu));
+  padding: calc(5 * var(--cu)) calc(5 * var(--cu)) calc(7 * var(--cu));
+  border: 0;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--c-classic-panel) 95%, transparent);
+  box-shadow: 0 2px 1px color-mix(in srgb, var(--c-classic-ink) 60%, transparent);
+  color: var(--c-classic-text);
+  font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body);
+  animation: classic-fade 0.1s linear;
+}
+@keyframes classic-fade { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  :root[data-ui="classic"] #verb-menu .verb-menu-card { animation: none; }
+}
+:root[data-ui="classic"] #verb-menu .verb-menu-head { padding: 0 calc(5 * var(--cu)); margin: 0; border: 0; background: none; }
+:root[data-ui="classic"] #verb-menu .verb-menu-title { color: var(--c-classic-title); font: 800 var(--fs-classic-body)/var(--lh-snug) var(--font-classic-title); }
+:root[data-ui="classic"] #verb-menu .verb-menu-x { width: calc(16 * var(--cu)); height: calc(16 * var(--cu)); padding: 0; border: 0; background: none; color: var(--c-classic-close); font: 800 var(--fs-classic-body)/var(--lh-none) var(--font-classic-body); }
+:root[data-ui="classic"] #verb-menu .verb-menu-sub { margin: calc(3 * var(--cu)) calc(5 * var(--cu)) calc(4 * var(--cu)); color: var(--c-classic-offline); font-size: var(--fs-classic-count); }
+:root[data-ui="classic"] #verb-menu .verb-menu-sub:empty { display: none; }
+:root[data-ui="classic"] #verb-menu .verb-menu-list { gap: 0; margin: 0; padding: 0; }
+:root[data-ui="classic"] #verb-menu .verb-choice {
+  display: block;
+  width: 100%;
+  min-height: calc(22 * var(--cu));
+  margin: 0;
+  padding: calc(3 * var(--cu)) calc(10 * var(--cu));
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: none;
+  box-shadow: none;
+  color: var(--c-classic-title);
+  font: 800 var(--fs-classic-body)/var(--lh-snug) var(--font-classic-title);
+  text-align: left;
+}
+:root[data-ui="classic"] #verb-menu .verb-choice:is(:hover, :focus-visible) { outline: none; background: var(--c-classic-verb-hi); border-color: var(--c-classic-verb-edge); }
+:root[data-ui="classic"] #verb-menu .verb-choice:disabled { color: var(--c-classic-disabled); background: none; border-color: transparent; }
+:root[data-ui="classic"] #verb-menu .verb-choice .verb-choice-tip,
+:root[data-ui="classic"] #verb-menu .verb-choice .verb-choice-reason { display: none; font: var(--fs-classic-count)/var(--lh-snug) var(--font-classic-body); color: var(--c-classic-text); }
+:root[data-ui="classic"] #verb-menu .verb-choice:is(:hover, :focus-visible) :is(.verb-choice-tip, .verb-choice-reason) { display: block; }
+:root[data-ui="classic"] #verb-menu .verb-menu-hint { display: none; }
