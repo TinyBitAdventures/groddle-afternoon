@@ -32,8 +32,8 @@ import {
   writeMemory,
 } from '../public/js/groups.js?v=g326-1';
 import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-10';
-import { groupsFeature } from '../public/js/features/groups-feature.js?v=g463-1';
-import { FEATURES } from '../public/js/features/index.js?v=registry-328';
+import { groupsFeature } from '../public/js/features/groups-feature.js?v=g466-1';
+import { FEATURES } from '../public/js/features/index.js?v=registry-330';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -308,7 +308,7 @@ describe('groups feature (js/features/groups-feature.js)', () => {
     assert.ok(ids.indexOf('groups') > ids.indexOf('profiles'));
     assert.ok(ids.indexOf('groups') < ids.indexOf('realtime'));
     assert.equal(ids.indexOf('street-objects') + 1, ids.indexOf('realtime'), 'street objects stays just before realtime');
-    assert.match(read('public/js/features/index.js'), /groups-feature\.js\?v=g463-1'/);
+    assert.match(read('public/js/features/index.js'), /groups-feature\.js\?v=g466-1'/);
   });
 
   it('loads the list, sends the signed list, and opens the chats remembered', async () => {

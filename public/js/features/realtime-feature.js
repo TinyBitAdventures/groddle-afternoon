@@ -20,6 +20,10 @@
  *   "Playing somewhere else" (close 4001: never reconnects by itself; Play
  *   here reloads, for the newest save, and takes the character back), and
  *   the chat log toggle.
+ * - The modern skin's Social drawer (engine.social, js/ui/social-drawer.js)
+ *   is the chat log there: the state pill and Play here sit in its head, the
+ *   arrivals and notes go to its Local tab with the emote buttons over them,
+ *   and "/" is the drawer's.
  *
  * - An administrator's teleport (v0.2.2, js/admin-teleport.js): the server's
  *   {"t":"teleport","street","x"?,"y"?,"by":"admin"} (sent only on the site's
@@ -184,11 +188,16 @@ function createSession(engine) {
     b.addEventListener('click', () => emote(e));
     emoteRow.append(b);
   }
-  if (dock && form) {
+  const social = engine.social || null;
+  if (social) {
+    // The drawer's Local tab is the chat log: the pill and Play here go in its head, the emotes over Local.
+    social.statusSlot?.append(pill, hereBtn);
+    social.channel('local', { header: emoteRow });
+  } else if (dock && form) {
     dock.insertBefore(bar, form);
     dock.insertBefore(logList, dock.firstChild);
   }
-  if (input) input.placeholder = 'Chat with this street (press /)';
+  if (input && !social) input.placeholder = 'Chat with this street (press /)';
   logBtn.addEventListener('click', () => {
     const open = logList.hidden;
     logList.hidden = !open;
@@ -218,6 +227,8 @@ function createSession(engine) {
     log.push(line);
     while (log.length > LOG_LINES) log.shift();
     renderLog();
+    // The drawer's Local tab: notes come from here; spoken lines from engine.chatLine and game.js.
+    if (line.note) social?.push('local', { note: true, text: line.text });
   }
 
   function publish() {
@@ -225,6 +236,7 @@ function createSession(engine) {
     pill.dataset.state = s === 'connecting' && client.attempt > 0 ? 'offline' : s;
     pill.textContent = statusText(s, { here: client.here, attempt: client.attempt });
     hereBtn.hidden = s !== 'replaced';
+    social?.refresh();
     engine.setData?.('realtimeState', s);
     engine.setData?.('realtimeHere', String(client.here));
     engine.setData?.('realtimeStreet', client.street);
@@ -452,8 +464,8 @@ function createSession(engine) {
     if (applyAdminRefill(engine)) addLog({ note: true, text: ADMIN_TEXT.refilled });
   });
 
-  // "/" focuses the chat, unless something else has the keyboard.
-  window.addEventListener('keydown', (e) => {
+  // "/" focuses the chat, unless something else has the keyboard (the drawer's own "/" when there is one).
+  if (!social) window.addEventListener('keydown', (e) => {
     if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
     if (e.target?.matches?.('input, textarea, select, [contenteditable="true"]')) return;
     if (!engine.started || engine.busy?.() || engine.acting?.() || !input) return;

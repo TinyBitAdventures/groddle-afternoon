@@ -10,6 +10,10 @@
  * stopped). Speech bubbles and the Enter hint keep off the stack and the banner
  * (game.js asks zoneBoxes()). Award screens own the screen: notices wait under
  * them.
+ *
+ * The modern skin's Social drawer (js/ui/social-drawer.js) is the Activity log
+ * there (activityLog: false: no panel, no button) and covers the right edge:
+ * sideInset() says how much, and the stack centres in the width that is left.
  */
 import { placeBelow, placeBeside, plainText } from './notify.js?v=g459-1';
 
@@ -213,7 +217,7 @@ export function mountActivityLog(notifier, { container, buttonHost = null, onOpe
  * The notice stack and its zones. `root` is #game-root. game.js calls frame()
  * once a frame with why notices must wait ('' when they may show).
  */
-export function mountNotifyView(notifier, { root, setData = () => {}, logButtonHost = null } = {}) {
+export function mountNotifyView(notifier, { root, setData = () => {}, logButtonHost = null, activityLog = true, sideInset = () => null } = {}) {
   if (typeof document === 'undefined' || !root) return null;
   const stack = document.createElement('div');
   stack.id = STACK_ID;
@@ -221,14 +225,15 @@ export function mountNotifyView(notifier, { root, setData = () => {}, logButtonH
   stack.setAttribute('aria-live', 'polite');
   stack.setAttribute('aria-label', 'Notices');
   root.appendChild(stack);
-  const logView = mountActivityLog(notifier, { container: root, buttonHost: logButtonHost });
+  const logView = activityLog ? mountActivityLog(notifier, { container: root, buttonHost: logButtonHost }) : null;
 
   /** id → card element */
   const cards = new Map();
   /** name → rect (#game-root px) reserved by its owner (reserve()). */
   const reserved = new Map();
   let measuredAt = -Infinity;
-  let zones = { top: 12, banner: [], blockers: [], maxBottom: Infinity, rootW: 0 };
+  let zones = { top: 12, banner: [], blockers: [], maxBottom: Infinity, rootW: 0, insetL: 0, insetR: 0 };
+  let shiftKey = '';
   let place = { dy: 0, wait: false };
   let holdWhy = '';
   let shownBox = null;
@@ -304,11 +309,26 @@ export function mountNotifyView(notifier, { root, setData = () => {}, logButtonH
     }
     blockers.push(...dialogs);
     blockers.push(...keepMenusClear(root, dialogs, rr));
-    // The chat dock and the pack are the floor.
-    const dock = relRect(document.getElementById('local-chat-dock'), rr);
+    // The chat dock and the pack are the floor (the Social drawer is a side, not a floor: sideInset).
+    const dockEl = document.getElementById('local-chat-dock');
+    const dock = dockEl?.classList.contains('social-drawer') ? null : relRect(dockEl, rr);
+    let side = null;
+    try {
+      side = sideInset();
+    } catch {
+      side = null;
+    }
     const pack = relRect(document.getElementById('pack-bar'), rr);
     const floor = Math.min(dock ? dock.top : Infinity, pack ? pack.top : Infinity, rr.height);
-    zones = { top: plate ? plate.bottom + 6 : 10, banner, blockers, maxBottom: Math.min(floor - 8, rr.height * 0.62), rootW: rr.width };
+    zones = {
+      top: plate ? plate.bottom + 6 : 10,
+      banner,
+      blockers,
+      maxBottom: Math.min(floor - 8, rr.height * 0.62),
+      rootW: rr.width,
+      insetL: Math.max(0, Number(side?.left) || 0),
+      insetR: Math.max(0, Number(side?.right) || 0),
+    };
   }
 
   /**
@@ -344,6 +364,16 @@ export function mountNotifyView(notifier, { root, setData = () => {}, logButtonH
   }
 
   function layout() {
+    // Centre in the width a side drawer leaves (style.css reads the two numbers).
+    const shift = Math.round((zones.insetL - zones.insetR) / 2);
+    const room = Math.round(zones.insetL + zones.insetR);
+    const key = `${shift}:${room}`;
+    if (key !== shiftKey) {
+      shiftKey = key;
+      stack.style.setProperty('--notify-shift', `${shift}px`);
+      stack.style.setProperty('--notify-room', `${room}px`);
+      setData('notifyInset', room ? key : '');
+    }
     const h = stack.offsetHeight;
     const w = stack.offsetWidth;
     if (!h) {
@@ -351,7 +381,7 @@ export function mountNotifyView(notifier, { root, setData = () => {}, logButtonH
       shownBox = null;
       return;
     }
-    const left = (zones.rootW - w) / 2;
+    const left = (zones.rootW - w) / 2 + shift;
     const rect = { left, right: left + w, top: zones.top, bottom: zones.top + h };
     place = placeBelow(rect, zones.blockers, { margin: 6, maxBottom: zones.maxBottom });
     const top = Math.round(zones.top + place.dy);

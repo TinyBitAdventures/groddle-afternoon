@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g455-2';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-328';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-330';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g463-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g463-1';
@@ -856,7 +856,8 @@ import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js
 import { denseSprite } from './js/sprite-dense.js?v=g430-1';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from './js/notify.js?v=g459-1';
-import { mountNotifyView } from './js/notify-view.js?v=g459-1';
+import { mountNotifyView } from './js/notify-view.js?v=g466-1';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g466-1';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g465-1';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
@@ -2254,16 +2255,53 @@ const notify = createNotifier({
   held: () => toastHeld(),
   onChange: (what) => {
     notifyView?.update(what);
+    socialDrawer?.update(what);
     if (what === 'log' || what === 'notice') renderActivityHistory();
   },
 });
+/** Phase 2: the modern skin (<html data-ui="modern">, the default); a classic skin keeps the old chat dock. */
+const MODERN_UI = document.documentElement.dataset.ui !== 'classic';
+const setCanvasData = (key, value) => {
+  if (app?.canvas && app.canvas.dataset[key] !== value) app.canvas.dataset[key] = value;
+};
 const notifyView = mountNotifyView(notify, {
   root: document.getElementById('game-root'),
-  setData: (key, value) => {
-    if (app?.canvas && app.canvas.dataset[key] !== value) app.canvas.dataset[key] = value;
-  },
+  setData: setCanvasData,
   logButtonHost: document.getElementById('local-chat-form'),
+  // SOCIAL: the drawer is the Activity log in the modern skin, and the notices centre beside it.
+  activityLog: !MODERN_UI,
+  sideInset: () => socialDrawer?.inset() || null,
 });
+/**
+ * SOCIAL (phase 2, js/ui/social-drawer.js): the right-hand drawer is #local-chat-dock in the modern
+ * skin: Activity (this notifier's log), Local, Party, the chat channels and Buddies; solo has Activity
+ * only, with the chat input. Features reach it as engine.social.
+ */
+const socialDrawer = MODERN_UI
+  ? mountSocialDrawer({
+    root: document.getElementById('game-root'),
+    dock: document.getElementById('local-chat-dock'),
+    notifier: notify,
+    mode: GAME_MODE === 'multiplayer' ? 'online' : 'solo',
+    canChat: () => socialChatReady(),
+    // The street alone ("Hechey Track" of "Hechey Track · Groddle Forest").
+    streetName: () => (document.getElementById('street-name')?.textContent || '').split('·')[0].trim().replace(/^…$/, ''),
+    setData: setCanvasData,
+  })
+  : null;
+
+/** "/" may put the keyboard in the drawer's input: the game runs, nothing modal is up, not in the tutorial's clouds. */
+function socialChatReady() {
+  return Boolean(
+    state.started &&
+      !currentAction &&
+      !menuTarget &&
+      !isQuestDialogueOpen() &&
+      !isScreenFxBlocking() &&
+      !panelOnScreen() &&
+      !document.body.classList.contains('nx-hide-chat')
+  );
+}
 /** When the open panel (.glitch-modal) opened: notices raised before it go early (they sat under it). */
 let notifyModalSince = -Infinity;
 
@@ -2279,6 +2317,7 @@ function tickNotices() {
   else if (notifyModalSince === -Infinity) notifyModalSince = performance.now();
   const hold = toastHeld() ? 'card' : isScreenViewOpen() ? 'screen' : '';
   notifyView?.frame(performance.now(), { hold, dropBefore: notifyModalSince });
+  socialDrawer?.frame();
 }
 
 /** The open panel (.glitch-modal: shrine, vendor, Feat, ...), if any. */
@@ -9343,8 +9382,12 @@ const engine = {
   holdGlitchPacks(packs) {
     heldGlitchAnims = new Set((packs || []).map((p) => p?.anims).filter(Boolean));
   },
-  /** A line in the Local chat dock (it fades like the street's own). */
+  /** A line in the Local chat dock (it fades like the street's own; the modern skin's drawer keeps it in Local). */
   chatLine: (speaker, text) => showLocalChatBubble(String(speaker || ''), String(text || '')),
+  /** SOCIAL: the modern skin's drawer (js/ui/social-drawer.js), or null (a classic skin keeps the old dock). */
+  get social() {
+    return socialDrawer;
+  },
   get worldW() {
     return WORLD_W;
   },
@@ -21370,7 +21413,12 @@ function updateLocalChatDockPosition() {
   root.style.setProperty('--pack-live-height', `${Math.ceil(pack.offsetHeight) + 8}px`);
 }
 
-function showLocalChatBubble(participant, message, { feat = false } = {}) {
+function showLocalChatBubble(participant, message, { feat = false, mine = false } = {}) {
+  // SOCIAL: the drawer keeps the line (Local online, the Activity log solo) instead of a fading bubble.
+  if (socialDrawer) {
+    socialDrawer.localLine(participant, message, { feat, mine });
+    return;
+  }
   const stream = document.getElementById('local-chat-stream');
   if (!stream) return;
   const bubble = document.createElement('div');
@@ -21433,7 +21481,7 @@ function sayLocalChat(message, participant = 'Ur', { quietActivity = false } = {
   // Multiplayer: the player's line also goes to the street, under their own name (realtime-feature).
   const shown = participant === 'Ur' ? features.query('playerChatName', engine) || participant : participant;
   if (participant === 'Ur') features.query('localChatSaid', text, engine);
-  showLocalChatBubble(shown, text, { feat: result.matched || result.broken });
+  showLocalChatBubble(shown, text, { feat: result.matched || result.broken, mine: participant === 'Ur' });
   // The Local chat dock keeps the whole chain. In-world, keep only the current
   // speaker readable instead of stacking three large bubbles over the actors.
   if (result.matched) clearSpeechBubbles();
@@ -21452,8 +21500,9 @@ function sayLocalChat(message, participant = 'Ur', { quietActivity = false } = {
   }
   if (result.ok || result.broken) {
     handleFeatResult(result, participant);
-  } else if (!quietActivity && participant === 'Ur') {
-    // NOTIFY: chat stays in chat (bubble and dock); solo keeps it in the Activity log for scrollback.
+  } else if (!quietActivity && participant === 'Ur' && !socialDrawer) {
+    // NOTIFY: chat stays in chat (bubble and dock); solo keeps it in the Activity log for scrollback
+    // (the modern skin's drawer already logged it through showLocalChatBubble).
     notify.chat(`${shown}: ${text}`, { online: GAME_MODE === 'multiplayer' });
   }
   return result;
@@ -21494,6 +21543,8 @@ function gatherFeatChain() {
   }
   renderFeatPanel();
   const input = document.getElementById('local-chat-input');
+  // SOCIAL: the input is in the drawer; show it before filling it in.
+  socialDrawer?.revealInput();
   if (input) {
     input.value = INCANTATION_LINES[playerStep - 1].phrase;
     input.focus({ preventScroll: true });

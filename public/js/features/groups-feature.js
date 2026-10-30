@@ -25,6 +25,9 @@
  *   Invite, Members, Leave), invitations (Join / Decline), Find Groups
  *   (public ones by name) and Make a group (name, description, public or
  *   private). At most 20 groups (config_prod.js:39 max_groups).
+ * - The modern skin's Social drawer (engine.social): each open chat is a tab
+ *   there (after Local and Party), with Who is here and Close over its lines;
+ *   the drawer's Local and Party tabs stand for Street and Party.
  * - In a chat tab, /who names who is in it (main.js:5573-5582); other
  *   commands (emotes, /p, ...) go where they always did.
  * - Blocking: a blocked player's lines are dropped here, as the original's
@@ -173,12 +176,61 @@ function createSession(engine, client) {
   boxHead.append(boxTitle, whoBtn, closeBtn);
   const lines = el('ol', { class: 'grp-lines', 'data-groups-lines': '' });
   box.append(boxHead, lines);
+  const social = engine.social || null;
   if (dock && form) {
-    dock.insertBefore(box, form);
-    dock.insertBefore(tabs, form);
+    if (!social) {
+      dock.insertBefore(box, form);
+      dock.insertBefore(tabs, form);
+    }
     // Before the game's own submit handler (game.js local-chat-form): a line typed in a chat tab goes there.
     dock.addEventListener('submit', onSubmit, true);
   }
+  /** The drawer's tabs for the open chats: channel -> 'label|order' last handed over. */
+  const handed = new Map();
+  /** channel -> its head in the drawer (Who is here, Close). */
+  const heads = new Map();
+  const drawerLine = (line) => (line.note ? { note: true, text: line.text } : { name: line.name, text: line.text, mine: line.id === userId(), at: line.at });
+  function headFor(channel) {
+    let h = heads.get(channel);
+    if (!h) {
+      h = el('div', { class: 'social-chan-head', 'data-groups-box': channel });
+      const w = el('button', { type: 'button', 'data-groups-who': channel }, 'Who is here');
+      const c = el('button', { type: 'button', 'data-groups-close-chat': channel }, 'Close');
+      w.addEventListener('click', () => who(channel));
+      c.addEventListener('click', () => closeChat(channel));
+      h.append(w, c);
+      heads.set(channel, h);
+    }
+    return h;
+  }
+  /** The drawer shows the open chats as its own tabs (Local and Party are the drawer's). */
+  function handOver() {
+    const order = tabOrder([...chats.keys()], list, { inParty }).filter((t) => t !== 'street' && t !== 'party' && knownChat(t));
+    order.forEach((ch, i) => {
+      const label = chatLabel(ch, list);
+      const sig = `${label}|${i}`;
+      if (handed.get(ch) === sig && social.has(ch)) return;
+      handed.set(ch, sig);
+      social.channel(ch, { label, header: headFor(ch), placeholder: `Chat in ${label}`, inputLabel: label, order: 30 + i, empty: 'Nobody has said anything here yet.' });
+      social.setLines(ch, (chats.get(ch)?.lines || []).map(drawerLine));
+    });
+    for (const ch of [...handed.keys()]) {
+      if (order.includes(ch)) continue;
+      handed.delete(ch);
+      heads.delete(ch);
+      social.drop(ch);
+    }
+  }
+  // The drawer's tab in front is this feature's tab (what a typed line is for).
+  social?.onTab((t) => {
+    const want = t === 'local' ? 'street' : t === 'party' ? 'party' : chats.has(t) ? t : 'street';
+    if (want === tab) return;
+    tab = want;
+    const chat = chats.get(tab);
+    if (chat) chat.unread = 0;
+    remember();
+    publish();
+  });
   whoBtn.addEventListener('click', () => who(tab));
   closeBtn.addEventListener('click', () => closeChat(tab));
 
@@ -220,6 +272,11 @@ function createSession(engine, client) {
   function renderTabs() {
     const order = tabOrder([...chats.keys()], list, { inParty });
     if (!order.includes(tab)) tab = 'street';
+    if (social) {
+      handOver();
+      publish();
+      return;
+    }
     tabs.hidden = order.length < 2;
     tabs.replaceChildren(...order.map((t) => {
       const label = t === 'street' ? GROUP_TEXT.street : t === 'party' ? GROUP_TEXT.party : chatLabel(t, list);
@@ -235,6 +292,8 @@ function createSession(engine, client) {
   }
 
   function renderBox() {
+    // The drawer draws the lines and owns the input's hint.
+    if (social) return;
     const chat = chats.get(tab);
     const show = Boolean(chat) && knownChat(tab);
     box.hidden = !show;
@@ -254,7 +313,8 @@ function createSession(engine, client) {
     tab = t;
     const chat = chats.get(t);
     if (chat) chat.unread = 0;
-    if (t === 'party') {
+    if (social) social.select(t === 'street' ? 'local' : t);
+    else if (t === 'party') {
       // The Party pane is party-feature's: open it.
       const partyBox = document.getElementById?.('party-box');
       if (partyBox?.hidden) document.querySelector?.('[data-party-btn]')?.click?.();
@@ -277,6 +337,7 @@ function createSession(engine, client) {
     if (!chat) return;
     pushLine(chat.lines, { note: true, text });
     if (channel === tab) renderBox();
+    social?.push(channel, { note: true, text });
   }
 
   // —— Sending ——
@@ -348,6 +409,10 @@ function createSession(engine, client) {
     client.send('channel_join', { channel });
     remember();
     renderTabs();
+    if (focus && social) {
+      social.select(channel);
+      if (!social.isOpen()) social.open();
+    }
     if (focus) input?.focus?.({ preventScroll: true });
     return true;
   }
@@ -700,6 +765,7 @@ function createSession(engine, client) {
     }
     remember();
     renderTabs();
+    social?.setLines(ch, chat.lines.map(drawerLine));
   });
   client.on('msg:channel_left', (msg) => {
     const ch = String(msg.channel || '');
@@ -722,6 +788,7 @@ function createSession(engine, client) {
     if (ch !== tab && line.id !== userId()) chat.unread += 1;
     if (ch === tab) renderBox();
     renderTabs();
+    social?.push(ch, drawerLine(line));
   });
   client.on('msg:channel_note', (msg) => addNote(String(msg.channel || ''), String(msg.text || '')));
   client.on('msg:party', (msg) => {

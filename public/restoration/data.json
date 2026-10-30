@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 772,
+  "commits": 773,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "The top bar is three floating pills: your energy, mood and level rings, the street's name, and the game's buttons with key caps"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-29",
     "kind": "improve",
     "text": "Powders, splashes, the countdown, puffs, the Rook's overlays and the phantom draw sharp on Retina"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "A rainbow lets its decoded SVG frames go once it ends"
    }
   ]
  },
- "tests": 433,
+ "tests": 435,
  "generatedAt": "2026-10-30"
 }

@@ -28,6 +28,11 @@
  *   Pal count real buddies (player buddies_count, set to the list's size as
  *   addToBuddyGroup and removeBuddy's achievements_set do, inc_buddies.js:196 and 276).
  *
+ * - The modern skin's Social drawer (engine.social) has a Buddies tab: who is
+ *   online (here, or the street they are on) and offline, Visit where homes
+ *   can be visited, who added you, and Manage buddies for this panel. Its head
+ *   counts the buddies online (drawerView()).
+ *
  * QA: canvas data buddiesCount, buddiesOnline (name@street,...),
  * buddiesIgnoring (ids), buddiesLast (the last notice); window.groddleBuddies.
  */
@@ -209,6 +214,7 @@ function createSession(engine, client) {
   }
 
   function publish() {
+    engine.social?.refresh();
     engine.setData?.('buddiesCount', String(list?.buddies.length || 0));
     engine.setData?.('buddiesOnline', [...online.entries()].map(([id, p]) => `${p.name}@${p.street || 'secret'}`).join(','));
     engine.setData?.('buddiesIgnoring', (list?.ignoring || []).map((r) => r.id).join(','));
@@ -388,6 +394,33 @@ function createSession(engine, client) {
     open,
     close,
     isIgnoring: (id) => isIgnoring(list, Number(id)),
+    /**
+     * The drawer's Buddies tab (js/ui/social-drawer.js): your buddies, online first,
+     * each with where they are; who added you (newAdds: the ones the site marks new);
+     * null until the list is in.
+     */
+    drawerView() {
+      if (!list) return null;
+      const here = String(engine.streetTsid || '');
+      const canVisit = Boolean(engine.query?.('canVisitHomes', engine));
+      const rows = [...list.buddies]
+        .sort((a, b) => Number(online.has(b.id)) - Number(online.has(a.id)) || a.name.localeCompare(b.name))
+        .map((b) => {
+          const p = online.get(b.id);
+          const on = Boolean(p);
+          const where = !on ? BUDDY_TEXT.offlineWhere : p.street && p.street === here ? `Here on ${streetLabel(engine, here)}` : `Online: ${buddyWhere(p, (t) => streetLabel(engine, t))}`;
+          const actions = canVisit ? [{ label: 'Visit', run: () => engine.query?.('visitHome', b.id, b.name, engine) }] : [];
+          return { id: b.id, name: b.name, online: on, where, actions };
+        });
+      const back = addedYouOnly(list);
+      return {
+        rows,
+        empty: BUDDY_TEXT.empty,
+        addedYou: back.map((r) => r.name),
+        newAdds: back.filter((r) => r.isNew).map((r) => r.id),
+        manage: () => open(),
+      };
+    },
     verbs(target) {
       return buddyVerbs(list, { id: target.playerId, name: target.label || target.name });
     },

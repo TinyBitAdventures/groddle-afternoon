@@ -748,6 +748,11 @@
   --scrim-strong: rgba(36, 22, 10, 0.6);
   --overlay-dim: rgba(0, 0, 0, 0.4);
   --shadow: rgba(64, 40, 16, 0.16);
+
+  /* Side insets: what the HUD covers at each edge, so what centres in the free width keeps clear.
+     The Social drawer (js/ui/social-drawer.js) sets --inset-r on #game-root: 316px open, 60px as the rail. */
+  --inset-l: 0px;
+  --inset-r: 0px;
 }
 /* Modern skin (<html data-ui="modern">, the default): Nunito is the UI font. A Classic skin keeps --font-ui. */
 :root[data-ui="modern"] {
@@ -8864,6 +8869,270 @@ html[data-street-cards] .notify-notices { visibility: hidden; }
   .notify-notices { transition: none; }
 }
 /* ======================== end NOTIFY ======================== */
+
+/* —— SOCIAL —— (phase 2, modern skin: js/ui/social-drawer.js)
+   The right-hand drawer: Activity (the notifier's log), Local, Party, the open chat channels and
+   Buddies. #local-chat-dock is the drawer; open it is --drawer-w wide and at most 600 px tall, top
+   right under the top bar (--social-top, measured), collapsed a --rail-w rail with unread badges.
+   It sits over the world (the canvas keeps its size); the notices centre in what it leaves.
+   .social-drawer is the modern skin's (the drawer adds it; a classic skin never mounts it). */
+.local-chat-dock.social-drawer {
+  left: auto;
+  right: var(--hud-inset, 8px);
+  top: var(--social-top, 8px);
+  bottom: auto;
+  display: flex;
+  flex-direction: column;
+  width: var(--rail-w, 44px);
+  max-width: calc(100% - 16px);
+  overflow: hidden;
+  pointer-events: auto;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  line-height: var(--lh-tight);
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-2);
+  transition: width var(--motion-med, 180ms) var(--ease-out, ease-out);
+}
+.local-chat-dock.social-drawer.is-open {
+  width: var(--drawer-w, 300px);
+  height: min(600px, calc(100% - var(--social-top, 8px) - var(--pack-live-height, 112px)));
+  min-height: 220px;
+  background: var(--surface-bright);
+}
+.social-drawer .local-chat-stream { display: none; }
+.social-drawer [hidden] { display: none !important; }
+.social-drawer :focus { outline: none; }
+.social-drawer :focus-visible { outline: 2px solid var(--focus, var(--c-sky-57)); outline-offset: 2px; }
+.social-drawer button { font: inherit; color: inherit; }
+.social-drawer svg { display: block; }
+
+/* The rail */
+.social-rail { display: flex; flex-direction: column; align-items: center; gap: var(--sp-1); padding: var(--sp-2) 0; }
+.social-rail-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--hit, 36px);
+  height: var(--hit, 36px);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+.social-rail-btn svg { width: 20px; height: 20px; }
+.social-rail-btn:hover { background: var(--surface-parchment); }
+.social-rail-btn .social-badge { position: absolute; top: -2px; right: -4px; }
+.social-sep { width: 22px; height: 1px; margin: 3px 0; background: var(--border-strong); }
+.social-who { display: grid; place-items: center; gap: var(--sp-1); padding: var(--sp-2) 0 var(--sp-1); font-size: var(--fs-xs); font-weight: 800; color: var(--text-muted); }
+.social-dot { display: inline-block; width: 8px; height: 8px; border-radius: var(--radius-round); background: var(--status-good); box-shadow: 0 0 0 2px var(--surface-bright); }
+.social-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  line-height: var(--lh-none);
+  color: var(--text-inverse);
+  background: var(--status-danger);
+  box-shadow: 0 0 0 2px var(--surface-bright);
+}
+
+/* The open drawer */
+.social-body { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.social-head { display: flex; align-items: center; gap: var(--sp-4); padding: var(--sp-4) var(--sp-4) var(--sp-2) var(--sp-6); }
+.social-title { flex: 1 1 auto; margin: 0; font-size: var(--fs-base); font-weight: 800; color: var(--text); }
+.social-x { display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text-muted); cursor: pointer; }
+.social-x svg { width: 16px; height: 16px; }
+.social-x:hover { background: var(--surface-parchment); color: var(--text); }
+.social-status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); margin: 0 var(--sp-4) var(--sp-2); }
+.social-status-slot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
+.social-status-slot:empty { display: none; }
+.social-status .mp-state[data-state="online"] { display: none; }
+.social-presence {
+  display: flex;
+  flex: 1 1 100%;
+  align-items: center;
+  gap: var(--sp-4);
+  min-height: 32px;
+  padding: var(--sp-2) var(--sp-4);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.social-presence:hover { background: var(--surface-parchment); }
+.social-presence-label { flex: 1 1 auto; font-size: var(--fs-sm); font-weight: 700; }
+.social-chev svg { width: 12px; height: 12px; }
+.social-avs { display: flex; }
+.social-av {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-round);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  color: var(--text-inverse);
+  background: var(--c-violet-45);
+  box-shadow: 0 0 0 2px var(--surface-bright);
+}
+.social-avs .social-av + .social-av { margin-left: -6px; }
+.social-av[data-hue="1"] { background: var(--c-green-42); }
+.social-av[data-hue="2"] { background: var(--c-red-45); }
+.social-av[data-hue="3"] { background: var(--c-sky-41); }
+.social-av[data-hue="4"] { background: var(--c-plum-46); }
+.social-av[data-hue="5"] { background: var(--c-brown-44); }
+.social-av[data-hue="6"] { background: var(--c-blue-44); }
+.social-av[data-hue="7"] { background: var(--c-umber-45); }
+.social-av .social-dot { position: absolute; right: -2px; bottom: -2px; }
+.social-tabs { display: flex; flex: none; gap: var(--sp-1); padding: 0 var(--sp-4); overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--border); }
+.social-tab {
+  display: inline-flex;
+  flex: 1 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  height: 34px;
+  padding: 0 var(--sp-2);
+  border: 0;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.social-tab:hover { color: var(--text); background: var(--surface-parchment); }
+.social-tab[aria-selected="true"] { color: var(--text); box-shadow: inset 0 -2px 0 var(--accent); }
+.social-tab:focus-visible { outline-offset: -2px; }
+.social-tab .social-badge { min-width: 16px; height: 16px; padding: 0 var(--sp-2); box-shadow: none; }
+.social-view { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
+.social-view-head { flex: none; max-height: 45%; overflow-y: auto; padding: var(--sp-4) var(--sp-6) 0; font-size: var(--fs-sm); }
+.social-log {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--sp-3);
+  min-height: 0;
+  padding: var(--sp-4) var(--sp-6);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  font-size: var(--fs-md);
+  line-height: var(--lh-normal);
+}
+.social-log:focus-visible { outline-offset: -2px; }
+.social-time { align-self: center; padding: var(--sp-1) 0; font-size: var(--fs-sm); font-weight: 700; color: var(--text-muted); }
+.social-msg { margin: 0; overflow-wrap: anywhere; }
+.social-msg b { font-weight: 800; color: var(--text); }
+.social-msg.is-mine b { color: var(--accent); }
+.social-msg.is-note { color: var(--text-muted); font-style: italic; }
+.social-act {
+  display: grid;
+  gap: var(--sp-1);
+  padding: var(--sp-2) var(--sp-3) var(--sp-2) var(--sp-4);
+  border-left: 3px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-bright);
+  overflow-wrap: anywhere;
+}
+.social-act[data-kind="gain"] { border-left-color: var(--status-good); }
+.social-act[data-kind="moment"] { border-left-color: var(--imagination); }
+.social-act[data-kind="moment"] .social-act-text { font-weight: 800; }
+.social-act-when { display: flex; align-items: center; gap: var(--sp-3); font-size: var(--fs-sm); color: var(--text-muted); }
+.social-count { padding: 0 var(--sp-3); border-radius: var(--radius-pill); background: var(--surface-parchment); font-weight: 700; }
+.social-log .act-gain { color: var(--c-green-42); font-weight: 700; }
+.social-log .act-loss { color: var(--c-red-45); font-weight: 700; }
+.social-log .act-base { font-weight: 700; }
+.social-empty, .social-note { margin: var(--sp-3) 0; font-size: var(--fs-sm); color: var(--text-muted); }
+.social-chip {
+  min-height: 28px;
+  padding: 0 var(--sp-5);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-bright);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+.social-chip:hover { background: var(--surface-parchment); }
+.social-chip:disabled { opacity: 0.55; cursor: default; }
+.social-manage { align-self: flex-start; }
+.social-buddies { display: grid; gap: var(--sp-1); margin: 0; padding: 0; list-style: none; }
+.social-buddies li { display: flex; align-items: center; gap: var(--sp-4); min-height: 40px; padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); }
+.social-buddies li[data-online="false"] .social-av { opacity: 0.55; }
+.social-buddy-what { flex: 1 1 auto; min-width: 0; font-weight: 700; }
+.social-buddy-what small { display: block; font-size: var(--fs-sm); font-weight: 600; color: var(--text-muted); }
+/* What features hand the drawer for a tab's head: the party's roster, a channel's buttons, the emotes */
+.social-view-head .party-box { margin: 0; padding: 0; background: none; box-shadow: none; font: inherit; }
+.social-view-head .party-log, .social-view-head .party-hint { display: none; }
+.social-view-head .party-box button, .social-view-head .mp-emotes button, .social-chan-head button {
+  min-height: 28px;
+  padding: 0 var(--sp-5);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-bright);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  box-shadow: none;
+  cursor: pointer;
+}
+.social-view-head .mp-emotes, .social-chan-head { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--sp-2); margin: 0; }
+/* The input */
+.social-compose { flex: none; padding: var(--sp-4); border-top: 1px solid var(--border); }
+.social-drawer #local-chat-form { display: flex; align-items: center; gap: var(--sp-2); opacity: 1; }
+.social-drawer #local-chat-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 34px;
+  padding: 0 var(--sp-6);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-bright);
+  box-shadow: none;
+  color: var(--text);
+  font-size: var(--fs-md);
+}
+.social-drawer #local-chat-input::placeholder { color: var(--text-muted); opacity: 1; }
+.social-drawer #local-chat-input:focus-visible { border-color: var(--focus, var(--c-sky-57)); }
+.social-drawer #local-chat-form .social-send {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+.social-drawer #local-chat-form .social-send:hover { background: var(--surface-parchment); }
+.social-drawer #local-chat-form .social-send svg { width: 18px; height: 18px; }
+/* The notices centre in the width the drawer leaves (js/notify-view.js sets the two numbers). */
+.notify-notices {
+  left: calc(50% + var(--notify-shift, 0px));
+  width: min(440px, calc(100% - 24px - var(--notify-room, 0px)));
+}
+@media (prefers-reduced-motion: reduce) {
+  .local-chat-dock.social-drawer { transition: none; }
+}
+/* —— end SOCIAL —— */
 
 /* ===== STAGE (g458, UI audit 1): the game fills the window and the page never scrolls =====
    #wrap is the window's height: the top bar, then #game-root takes the rest. The canvas fills

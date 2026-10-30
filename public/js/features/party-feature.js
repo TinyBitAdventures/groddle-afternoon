@@ -19,6 +19,9 @@
  *   invites someone online by name; /leaveparty leaves. Party lines show in
  *   the panel and in the chat stream marked "Party".
  * - Party Spaces between the members (and their quoins) are party-spaces-feature.js (G334).
+ * - The modern skin's Social drawer (engine.social): while you are in a party it
+ *   has a Party tab, with the roster, invites and Leave over the party's lines,
+ *   and what you type there goes to the party (/p). No Party pill then.
  *
  * QA: canvas data partyState (none|in), partyMembers (name@where,...),
  * partyLeader, partyInvites (prompts waiting), partyLastSaid;
@@ -112,15 +115,25 @@ function createSession(engine, client) {
   const logList = el('ol', { class: 'party-log', 'aria-live': 'polite', 'data-party-log': '' });
   const hint = el('p', { class: 'party-hint' }, 'Type /p and a message to talk to your party.');
   box.append(head, roster, inviteRow, logList, hint);
-  if (bar) bar.append(pill);
-  if (dock && form) {
-    if (!bar) dock.insertBefore(pill, form);
-    dock.insertBefore(box, bar || form);
+  const social = engine.social || null;
+  if (social) {
+    // The drawer's Party tab holds the box (shown whenever the tab is): no pill.
+    box.hidden = false;
+  } else {
+    if (bar) bar.append(pill);
+    if (dock && form) {
+      if (!bar) dock.insertBefore(pill, form);
+      dock.insertBefore(box, bar || form);
+    }
   }
   pill.addEventListener('click', () => setOpen(box.hidden));
   leaveBtn.addEventListener('click', confirmLeave);
 
   function setOpen(open) {
+    if (social) {
+      render();
+      return;
+    }
     box.hidden = !open;
     pill.setAttribute('aria-pressed', String(open));
     if (open) render();
@@ -151,6 +164,11 @@ function createSession(engine, client) {
     });
     inviteRow.replaceChildren(...(buttons.length ? [el('span', {}, 'On this street:'), ...buttons] : [el('span', {}, 'Nobody else on this street to invite. /invite <name> finds someone online.')]));
     if (!box.hidden) renderLog();
+    if (social) {
+      if (party && !social.has('party')) {
+        social.channel('party', { label: 'Party', header: box, prefix: '/p ', placeholder: 'Message your party', inputLabel: 'Party chat' });
+      } else if (!party && social.has('party')) social.drop('party');
+    }
     publish();
   }
 
@@ -181,6 +199,11 @@ function createSession(engine, client) {
   /** inc_party.js party_activity: the party pane, or local chat when it is closed (RightSideManager.as 421-431). */
   function activity(text) {
     addLog({ note: true, text });
+    // The drawer: the Party tab while in a party, else Local (as the source's local chat when the pane is shut).
+    if (social) {
+      if (!(party && social.push('party', { note: true, text }))) engine.chatLine?.('Party', text);
+      return;
+    }
     if (box.hidden) engine.chatLine?.('Party', text);
   }
 
@@ -226,7 +249,7 @@ function createSession(engine, client) {
     const text = String(msg.text || '');
     lastSaid = `${name}:${text}`;
     addLog({ name, text });
-    engine.chatLine?.(`Party · ${name}`, text);
+    if (!social?.push('party', { name, text, mine: Number(msg.id) === me(), at: Number(msg.at) || Date.now() })) engine.chatLine?.(`Party · ${name}`, text);
     publish();
   });
   client.on('msg:party_invited', (msg) => {
