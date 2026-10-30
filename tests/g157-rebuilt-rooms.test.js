@@ -9,9 +9,9 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry, platformYAt } from '../public/js/street-model.js?v=606bae73';
+import { assertStreetGeometry, platformYAt } from '../public/js/street-model.js?v=77584eff';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=38c12adf';
-import { populationForStreet } from '../public/js/street-ecology.js?v=dbcefe18';
+import { populationForStreet } from '../public/js/street-ecology.js?v=face8516';
 import { checkDoorEntry, doorAt, doorDestination } from '../public/js/doors.js?v=eb9510b1';
 import { eventCounters, SEAM_STREETS } from '../public/js/quest-offers.js?v=6b6cbf22';
 import {
@@ -53,7 +53,7 @@ import {
   rebuiltRoomEcology,
 } from '../public/js/rebuilt-rooms.js?v=95ca6839';
 import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=47822aae';
-import { FEATURES } from '../public/js/features/index.js?v=92eec465';
+import { FEATURES } from '../public/js/features/index.js?v=23ffa6a0';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

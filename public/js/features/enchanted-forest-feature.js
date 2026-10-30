@@ -30,7 +30,7 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { platformsScreen, platformYAt } from '../street-model.js?v=606bae73';
+import { platformsScreen, platformYAt } from '../street-model.js?v=77584eff';
 import { frameTexture, textureFromUrl } from '../textures.js?v=01a295a1';
 import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=4e140315';
 import { noteWoodTreeCare } from '../patches.js?v=3996c344';

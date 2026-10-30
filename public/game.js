@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e2372a6b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=92eec465';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=23ffa6a0';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -576,7 +576,7 @@ import {
   availableStreetTsids,
   ensureStreetIndex,
   resolveIndexTsid,
-} from './js/street-loader.js?v=20c7b021';
+} from './js/street-loader.js?v=4b282477';
 import {
   ladderTopDeck,
   resolveGround as resolveStreetGround,
@@ -592,8 +592,8 @@ import {
   avatarHeadReach,
   headCeiling,
   isStandable,
-} from './js/street-model.js?v=606bae73';
-import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=d4123a4c';
+} from './js/street-model.js?v=77584eff';
+import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=881a57ff';
 import {
   buildStreetView,
   signpostNear,
@@ -602,7 +602,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=4df4a30c';
+} from './js/street-render.js?v=134a6e9a';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -702,7 +702,7 @@ import {
 } from './js/travel.js?v=855c6c68';
 import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
 import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
-import { landingY } from './js/walk-surface.js?v=c4aff42f';
+import { landingY } from './js/walk-surface.js?v=cf02de0e';
 import { holdCloseToFloor, stickToSlope } from './js/slope-walk.js?v=9af1e505';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
@@ -844,7 +844,7 @@ import {
   populationForStreet,
   planStreetPlacements,
   nearestPlacementGap,
-} from './js/street-ecology.js?v=dbcefe18';
+} from './js/street-ecology.js?v=face8516';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=a1c4a308';
 import {
   actionLoopFor,
@@ -9631,7 +9631,8 @@ function glitchAnimState(requested) {
   }
   // onGround flickers on slopes; a few frames off the floor make it a jump or fall.
   const airborne = !player.onGround && (player.airFrames || 0) > 3;
-  const floorY = airborne ? landingY(streetPlatforms, player.x, player.y) : null;
+  // The floor the avatar will land on: never a ceiling or a soft line it falls through.
+  const floorY = airborne ? landingY(streetPlatforms?.filter(isStandable), player.x, player.y) : null;
   const pack = player.pack;
   const idles = Boolean(pack?.idleLoader);
   const hit = player.hit && now < (player.hitUntil || 0) ? player.hit : null;
@@ -11813,12 +11814,15 @@ function samplePlatformPoints(n) {
     for (let i = 0; i < n; i++) pts.push({ x: 200 + i * 180, y: GROUND_Y });
     return pts;
   }
+  // Only floors the avatar stands on (no ceilings, no soft pc_perm 0 lines).
+  const floors = streetPlatforms.filter(isStandable);
+  const lines = floors.length ? floors : streetPlatforms;
   // Prefer platforms near the bottom third of the street
-  const maxY = Math.max(...streetPlatforms.map((p) => Math.max(p.y1, p.y2)));
-  const minY = Math.min(...streetPlatforms.map((p) => Math.min(p.y1, p.y2)));
+  const maxY = Math.max(...lines.map((p) => Math.max(p.y1, p.y2)));
+  const minY = Math.min(...lines.map((p) => Math.min(p.y1, p.y2)));
   const thresh = minY + (maxY - minY) * 0.55;
-  const low = streetPlatforms.filter((p) => (p.y1 + p.y2) / 2 >= thresh);
-  const pool = low.length ? low : streetPlatforms;
+  const low = lines.filter((p) => (p.y1 + p.y2) / 2 >= thresh);
+  const pool = low.length ? low : lines;
   for (let i = 0; i < n; i++) {
     const p = pool[i % pool.length];
     const t = 0.2 + (i / Math.max(n, 1)) * 0.6;
@@ -18007,8 +18011,10 @@ async function setupDeEmbiggenifyInstance() {
   // An indoor catalogue page with its own light: no Dametime tint (the client had none).
   currentStreet.ownLight = true;
   // pc_perm 0 lines (pl1267165485151, the floor's back edge) are hard on top only for
-  // items (GodItemViewer.as 800, platform_item_perm -1): the avatar walks the floor in
-  // front of it, where Mr. Hairball's line stays for him alone.
+  // items (GodItemViewer.as 800, platform_item_perm -1). The avatar never stands on one
+  // anywhere (street-model.js isStandable) and walks the floor in front of it; the
+  // instance also drops it from the list so no other item lands there: the line stays
+  // Mr. Hairball's alone.
   for (let i = streetPlatforms.length - 1; i >= 0; i -= 1) {
     if (streetPlatforms[i].pcPerm === 0) streetPlatforms.splice(i, 1);
   }

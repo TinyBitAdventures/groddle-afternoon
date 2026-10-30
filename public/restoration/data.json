@@ -2671,9 +2671,24 @@
   ]
  },
  "git": {
-  "commits": 854,
+  "commits": 858,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "Meditating shows the original's swirling orb alone, without the made-up glow around the player"
+   },
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "The report form welcomes any feedback, suggestions or bugs"
+   },
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "Bug reports can attach a picture of the game"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2778,24 +2793,9 @@
     "date": "2026-10-30",
     "kind": "fix",
     "text": "Things on another level, behind a floor, are no longer offered by Enter or a click"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "No Rook attacks on Gentle Island or the first skills' practice streets"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "The Rook attack's badge sits under the top bar and clear of the Social drawer, and in Classic it hangs from the header centre as in 2012"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "A jump inside a tube or under a roof stops where the original's head did, so the hair no longer pops out over the top"
    }
   ]
  },
- "tests": 476,
+ "tests": 477,
  "generatedAt": "2026-10-30"
 }

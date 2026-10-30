@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry } from '../public/js/street-model.js?v=606bae73';
+import { assertStreetGeometry } from '../public/js/street-model.js?v=77584eff';
 import {
   CLICK_ANYWHERE,
   HALL,

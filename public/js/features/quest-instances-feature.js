@@ -76,7 +76,7 @@ import {
 } from '../quest-instance.js?v=71385640';
 import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=9ebeb502';
 import * as kit from '../quest-rooms/kit.js?v=fd1eb817';
-import { locationEventsApi } from './location-events-feature.js?v=518e223a';
+import { locationEventsApi } from './location-events-feature.js?v=61fa7247';
 import {
   acceptOffer,
   ensureQuestOfferState,
@@ -153,7 +153,7 @@ const ROOM_MODULES = {
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=cf2cd52b'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=b9f3d352'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=7aefccae'),
-  clubhouse: () => import('../quest-rooms/clubhouse.js?v=ee1047a9'),
+  clubhouse: () => import('../quest-rooms/clubhouse.js?v=9da270a4'),
   light_perspective: () => import('../quest-rooms/light-perspective.js?v=33c19f0f'),
   tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=53157a60'),
   operation_grow: () => import('../quest-rooms/operation-grow.js?v=05cd2199'),

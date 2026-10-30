@@ -289,7 +289,7 @@ describe('street-render plays flagged decos and pauses them off screen', () => {
       return { ok: true, json: async () => anim(m[1]) };
     };
     try {
-      const { buildStreetView } = await import('../public/js/street-render.js?v=4df4a30c');
+      const { buildStreetView } = await import('../public/js/street-render.js?v=134a6e9a');
       const manifest = new Set(JSON.parse(read('public/assets/decos/manifest.json')));
       const s = { ...JSON.parse(read('public/assets/streets/GUVBP2STKQJ24PT.json')), gradient: null, signposts: [] };
       // The fake has no colour filters: drop the layers' filters so nothing bakes.

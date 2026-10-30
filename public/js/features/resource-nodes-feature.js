@@ -53,7 +53,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=85d4faba';
-import { platformYAt } from '../street-model.js?v=606bae73';
+import { platformYAt } from '../street-model.js?v=77584eff';
 import { hiresSpriteUrl } from '../sprite-hires.js?v=5919dfde';
 import { rollResourceNodeDrop } from './drops-feature.js?v=92989dc5';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';

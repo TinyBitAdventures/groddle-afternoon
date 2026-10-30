@@ -20,6 +20,8 @@
  * Pure data rules (world space, as in the street JSON); no DOM or Pixi.
  */
 
+import { isStandable } from './street-model.js?v=77584eff';
+
 /** How far beside the post a floor still counts as standing at it. */
 const DECK_REACH_X = 30;
 /** How far below the post's foot a floor still counts as its deck. */
@@ -28,7 +30,7 @@ const DECK_BELOW = 150;
 const cache = new WeakMap();
 
 function standable(p) {
-  return p && p.pc_perm !== 1 && p.pcPerm !== 1;
+  return Boolean(p) && isStandable(p);
 }
 
 /**

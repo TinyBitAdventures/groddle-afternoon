@@ -25,14 +25,14 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=20c7b021';
-import { platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js?v=606bae73';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=4b282477';
+import { platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js?v=77584eff';
 import {
   ecologyForStreet,
   planStreetPlacements,
   populationForStreet,
   setStreetEcologyCatalog,
-} from '../public/js/street-ecology.js?v=dbcefe18';
+} from '../public/js/street-ecology.js?v=face8516';
 import {
   MYSTERY_QUOIN_KINDS,
   QUOIN_CLASSES,

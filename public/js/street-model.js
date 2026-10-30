@@ -80,10 +80,11 @@ export function platformsScreen(street) {
   return street.platforms.map((p) => {
     const a = worldToScreen(street, p.x1, p.y1);
     const b = worldToScreen(street, p.x2, p.y2);
-    // The source line's permeability (platform_line pc_perm): 1 is an underside or
-    // ceiling, solid only from below, never ground to stand or place things on; null
-    // (the source's <null id="platform_pc_perm"/>) is hard both ways. A line with no
-    // pc_perm at all (built by hand) is a plain floor.
+    // The source line's permeability for the avatar (platform_pc_perm; isStandable,
+    // isSolidFromBelow): -1 a floor you can jump up through, 1 an underside or ceiling
+    // (solid only from below), 0 soft both ways (an item shelf the avatar walks and
+    // falls through), null (the source's <null id="platform_pc_perm"/>) hard both
+    // ways. A line with no pc_perm at all (built by hand) is a plain floor.
     const pcPerm = Number.isFinite(p.pc_perm) ? p.pc_perm : p.pc_perm === null ? null : undefined;
     // ensure left→right for queries
     if (a.x <= b.x) {
@@ -274,17 +275,23 @@ export function groundBeneath(platforms, x, feetY, maxRise = 6) {
 }
 
 /**
- * A line the avatar can stand on. The source's platform_pc_perm (PlatformLine.as,
- * GSJS geo_modify_plat_pc_perms): -1 solid from the top only (a floor you can
- * jump up through), 1 solid from the bottom only (an underside or ceiling: a
- * rising head stops under it, a falling avatar drops through it), 0 soft both
- * ways, null hard both ways. `pcPerm` comes from platformsScreen; lines built
- * by hand (scene floors) carry no pcPerm and stay standable. pc_perm 0 lines
- * are taken out of the list by the location events feature, so only 1 is
- * refused here.
+ * A line the avatar can stand on: the client's pc_solid_from_top (PlatformLine.as
+ * 341-343, `!(platform_pc_perm == 1 || platform_pc_perm == 0)`). The source's
+ * platform_pc_perm (GSJS geo_modify_plat_pc_perms): -1 solid from the top only (a
+ * floor you can jump up through), 1 solid from the bottom only (an underside or
+ * ceiling: a rising head stops under it, a falling avatar drops through it), 0 soft
+ * both ways, null hard both ways. A pc_perm 0 line is no collider for the avatar
+ * at all (AvatarPhysicsHandler.as 955-957, "not a collider for pcs at all, pass
+ * through"): mostly item shelves (platform_item_perm -1), where items rest and
+ * players walk through, such as Odena Odes' full-width cave line. Items use
+ * item_perm, which the street JSON does not carry. A location event that switches
+ * a line on sets its pcPerm (location-events-feature setPlatform), and then it
+ * stands. `pcPerm` comes from platformsScreen (raw street lines carry pc_perm);
+ * lines built by hand (scene floors) carry neither and stay standable.
  */
 export function isStandable(p) {
-  return p?.pcPerm !== 1;
+  const perm = p?.pcPerm !== undefined ? p.pcPerm : p?.pc_perm;
+  return perm !== 1 && perm !== 0;
 }
 
 /**

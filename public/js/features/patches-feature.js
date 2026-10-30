@@ -39,8 +39,8 @@
  */
 
 import { ensureItem } from '../inventory.js?v=85d4faba';
-import { platformYAt } from '../street-model.js?v=606bae73';
-import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=dbcefe18';
+import { platformYAt } from '../street-model.js?v=77584eff';
+import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=face8516';
 import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=4e140315';
 import {

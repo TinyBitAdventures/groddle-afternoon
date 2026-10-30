@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ladderTopDeck, platformsScreen, wallsScreen, platformYAt } from '../public/js/street-model.js?v=606bae73';
+import { ladderTopDeck, platformsScreen, wallsScreen, platformYAt } from '../public/js/street-model.js?v=77584eff';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const streets = join(here, '../public/assets/streets');

@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry } from '../public/js/street-model.js?v=606bae73';
+import { assertStreetGeometry } from '../public/js/street-model.js?v=77584eff';
 import { OWNED_STREETS, streetOwner } from '../public/js/location-events.js?v=b45cd9c3';
 import { JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=8a4480a4';
 import { WINTER_HAVEN_STREET_ID, WINTER_WALK_STREET_ID } from '../public/js/winter-walk.js?v=9961c35f';

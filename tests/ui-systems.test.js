@@ -53,7 +53,7 @@ import {
   listHubsFromIndex,
   resolveHubId,
 } from '../public/js/map-graph.js?v=53d64e50';
-import { STREET_INDEX } from '../public/js/street-loader.js?v=20c7b021';
+import { STREET_INDEX } from '../public/js/street-loader.js?v=4b282477';
 import { listMapDestinations } from '../public/js/travel.js?v=855c6c68';
 import { readFileSync } from 'node:fs';
 

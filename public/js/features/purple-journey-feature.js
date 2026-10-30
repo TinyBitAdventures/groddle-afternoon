@@ -38,7 +38,7 @@ import { shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=d4f4772b';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=01a295a1';
 import { playPoofIn } from '../overlay-art.js?v=628fa0b4';
-import { STREET_INDEX } from '../street-loader.js?v=20c7b021';
+import { STREET_INDEX } from '../street-loader.js?v=4b282477';
 import { getAchievementCatalog } from '../content-catalogs.js?v=10b118dd';
 import { POTION_ART } from '../potion-art.js?v=27ccc756';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=729ccd91';
@@ -61,7 +61,7 @@ import {
   scionWords,
 } from '../purple-journey.js?v=5e078ed8';
 import { VOYAGE_FLOOR, VOYAGE_H, VOYAGE_OFFSET, VOYAGE_W, buildVoyageScene } from '../purple-journey-scene.js?v=920ed251';
-import { homesFeature } from './homes-feature.js?v=9f2f4735';
+import { homesFeature } from './homes-feature.js?v=63e548fa';
 
 export const PURPLE_FEATURE_ID = 'purple-journey';
 /** The scene's own TSID (the template is LNVV4OTMAUG2PQV). */

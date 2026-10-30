@@ -509,9 +509,10 @@ export const locationEventsFeature = {
         instanced,
       };
       // Platforms the arrival chain switches on start in their source state
-      // (pc_perm 0, not solid); the remake's collision otherwise treats every
-      // line as solid. Ones only lost collision boxes enable stay solid, so
-      // those streets remain walkable.
+      // (pc_perm 0), taken out of the list until an event puts them back with
+      // its perm. A pc_perm 0 line is never a floor for the avatar
+      // (street-model.js isStandable, the client's pc_solid_from_top), switched
+      // or not; taking it out also keeps placement and sight lines off it.
       current.guard = recoverableToggles(current.events);
       // A street whose triggers another feature rebuilt runs its scripts as
       // written: every platform an event toggles starts in its source state.

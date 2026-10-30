@@ -1,4 +1,4 @@
-import { platformYAt } from './street-model.js?v=606bae73';
+import { isStandable, platformYAt } from './street-model.js?v=77584eff';
 
 /**
  * Street furniture rules: street Mailboxes, placed Notes, Notice Boards and
@@ -206,7 +206,7 @@ export function clearOfDoors(point, halfWidth, doors = [], platforms = [], world
   const floorAt = (x) => {
     let best = null;
     for (const p of platforms || []) {
-      if (p?.pcPerm === 1) continue;
+      if (!isStandable(p)) continue;
       const y = platformYAt(p, x, 0);
       if (y != null && Math.abs(y - point.y) <= 60 && (best == null || Math.abs(y - point.y) < Math.abs(best - point.y))) best = y;
     }

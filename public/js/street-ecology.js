@@ -3,6 +3,8 @@
  * placement on recovered locations-xml platforms.
  */
 
+import { isStandable } from './street-model.js?v=77584eff';
+
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
 
 /**
@@ -345,11 +347,13 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
 
 /** Build dense, stable candidates along the lower reachable platform bands. */
 export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '' } = {}) {
-  // An underside or ceiling line (pc_perm 1, street-model.js platformsScreen) is not
-  // ground: a tree placed there floats (the cave roof on Meadow's Edge).
+  // Only lines the avatar stands on (street-model.js isStandable): an underside or
+  // ceiling (pc_perm 1) floats a tree (the cave roof on Meadow's Edge), and a soft
+  // line (pc_perm 0) is one the player falls through, so a spot there (the arrival
+  // too) hangs mid-air (Odena Odes' cave line).
   const clean = (platforms || []).filter((platform) => {
     return [platform?.x1, platform?.y1, platform?.x2, platform?.y2].every(Number.isFinite)
-      && platform.pcPerm !== 1 && platform.pc_perm !== 1;
+      && isStandable(platform);
   });
   if (!clean.length) {
     return Array.from({ length: 32 }, (_, index) => ({
