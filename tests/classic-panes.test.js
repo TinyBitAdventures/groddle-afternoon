@@ -79,4 +79,11 @@ describe('Classic panes', () => {
     assert.match(js, /writeUiCache\('divider'/);
     assert.match(read('public/css/classic.css'), /minmax\(100px, var\(--classic-upper-h, 45%\)\)/);
   });
+
+  it('the closed strip: an icon and its count, the name in the tooltip, never under the count (online QA)', () => {
+    const css = read('public/css/classic.css');
+    assert.match(css, /\.social-rail-btn\[data-social-rail-tab\]::after \{ content: none; \}/);
+    assert.match(css, /\[data-classic-strip="open"\] \.social-drawer \.social-rail-btn\[data-social-rail-tab\]::after \{ content: attr\(title\); \}/);
+    assert.match(css, /\.social-rail-btn\[data-social-rail-tab\] \.social-badge \{ top: 50%; right: calc\(3 \* var\(--cu\)\);/);
+  });
 });

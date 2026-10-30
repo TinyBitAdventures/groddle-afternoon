@@ -1289,7 +1289,17 @@
   background: url("../assets/classic/contact_group.png?v=a4c0be52") calc(6 * var(--cu)) center / 10px 10px no-repeat;
 }
 :root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab] svg { visibility: hidden; flex: none; width: 10px; }
-:root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab]::after { content: attr(title); }
+/* Closed, the strip shows each chat as its icon and its unread count, the name in the tooltip (the
+   button's title): a name cut by 48 px, under the count, read as "A…" and "Loca" (online QA,
+   2026-10-30). Open (165u) it shows the names. Activity and Local keep their own icons. */
+:root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab] { justify-content: flex-start; padding-left: calc(9 * var(--cu)); background-position: calc(9 * var(--cu)) center; }
+:root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab]::after { content: none; }
+:root[data-ui="classic"] .social-drawer .social-rail-btn:is([data-social-rail-tab="activity"], [data-social-rail-tab="local"]) { background-image: none; }
+:root[data-ui="classic"] .social-drawer .social-rail-btn:is([data-social-rail-tab="activity"], [data-social-rail-tab="local"]) svg { visibility: visible; width: calc(16 * var(--cu)); height: calc(16 * var(--cu)); }
+:root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab] .social-badge { top: 50%; right: calc(3 * var(--cu)); min-width: 15px; height: 15px; padding: 0 3px; transform: translateY(-50%); line-height: 15px; }
+:root[data-ui="classic"][data-classic-strip="open"] .social-drawer .social-rail-btn[data-social-rail-tab] { justify-content: flex-start; padding-left: calc(22 * var(--cu)); background-position: calc(6 * var(--cu)) center; }
+:root[data-ui="classic"][data-classic-strip="open"] .social-drawer .social-rail-btn[data-social-rail-tab]::after { content: attr(title); }
+:root[data-ui="classic"][data-classic-strip="open"] .social-drawer .social-rail-btn:is([data-social-rail-tab="activity"], [data-social-rail-tab="local"]) { padding-left: calc(6 * var(--cu)); }
 :root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab]:hover { color: var(--c-classic-contact-hover); }
 :root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab="party"] { background-image: url("../assets/classic/contact_party.png?v=2119ea21"); }
 :root[data-ui="classic"] .social-drawer .social-rail-btn[data-social-rail-tab*="global"] { background-image: url("../assets/classic/contact_global.png?v=0cb49cd0"); }
