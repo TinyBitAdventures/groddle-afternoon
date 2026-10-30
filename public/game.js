@@ -6,6 +6,7 @@ import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g4
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-357';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
+import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=g481-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g463-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g470-1';
 import { createWindowStack } from './js/window-stack.js?v=g428-1';
@@ -8019,18 +8020,15 @@ function tryOpenNearestMenu({ nearestFirst = false } = {}) {
     recentInteractionTarget?.sprite &&
     !recentInteractionTarget.sprite.destroyed &&
     Date.now() < recentInteractionUntil &&
-    interactDistance(recentInteractionTarget, player.x, player.y) < 160
+    withinReach(recentInteractionTarget, 160)
   ) {
     openVerbMenu(recentInteractionTarget);
     return;
   }
   // Prefer hovered target when player is roughly near it
-  if (hoverTarget?.sprite && !hoverTarget.sprite.destroyed) {
-    const d = interactDistance(hoverTarget, player.x, player.y);
-    if (d < 160) {
-      openVerbMenu(hoverTarget);
-      return;
-    }
+  if (hoverTarget?.sprite && !hoverTarget.sprite.destroyed && withinReach(hoverTarget, 160)) {
+    openVerbMenu(hoverTarget);
+    return;
   }
   // G206: several things in reach open the chooser in the client's order; a
   // lone signpost goes where T goes. Scripted (untrusted) presses from in-page
@@ -8072,10 +8070,31 @@ function interactDistance(t, px, py) {
   return Math.hypot(dx, dy);
 }
 
+/**
+ * A floor between the avatar and the thing (js/reach.js): a plant in the cave
+ * under your feet, a piggy on the ledge over your head. The client offered
+ * only what the avatar's hit box touched (MiddleGroundRenderer.as 1158-1167).
+ */
+function behindFloorFromPlayer(t) {
+  if (!t?.sprite || t.sprite.destroyed || !streetPlatforms?.length) return false;
+  const bodyScale = features.query('avatarBodyScale', engine) ?? 1;
+  const body = { x: player.x, y: player.y - avatarHeadReach(bodyScale).reach / 2 };
+  const box = spriteWorldHitBox(t.sprite, 0);
+  return behindFloor(streetPlatforms, body, box, { x: t.sprite.x, y: t.sprite.y }, { airborne: Boolean(t.airborne), feetY: player.y });
+}
+
+/** In reach for Enter: near enough and not behind a floor. */
+function withinReach(t, maxD) {
+  if (!t?.sprite || t.sprite.destroyed) return false;
+  return interactDistance(t, player.x, player.y) < maxD && !behindFloorFromPlayer(t);
+}
+
 /** Weighted reach used by Enter (nearest pick and the G206 chooser alike). */
 function interactReach(t) {
   if (!t?.sprite || t.sprite.destroyed) return Infinity;
   let d = interactDistance(t, player.x, player.y);
+  // Only things already close need the floor test (the callers' cut-off is 100).
+  if (d < 160 && behindFloorFromPlayer(t)) return Infinity;
   // Prefer individual garden plots over the bed foot / large entities
   if (t.classId === 'dropped_item') {
     if (d > 130) return Infinity;
@@ -26738,6 +26757,13 @@ async function main() {
     const best = pickInteractableAt(sx, sy);
     if (best) {
       setHoverTarget(best);
+      // Behind a floor (js/reach.js): the client walked you over or said this line
+      // (TSFrontController.as 633); players open from anywhere (LocationInputHandler.as 887-895).
+      if (!/^pc_/.test(String(best.classId || '')) && behindFloorFromPlayer(best)) {
+        if (app?.canvas) app.canvas.dataset.reachBlocked = best.classId || '';
+        toast(OUT_OF_REACH_LINE);
+        return;
+      }
       // The original mailbox has one primary verb and opens the mail check
       // immediately. Avoid placing a transient verb modal under the same
       // pointer gesture that summoned it.
@@ -27266,7 +27292,7 @@ async function main() {
         recentInteractionTarget?.sprite &&
         !recentInteractionTarget.sprite.destroyed &&
         Date.now() < recentInteractionUntil &&
-        interactDistance(recentInteractionTarget, player.x, player.y) < 160
+        withinReach(recentInteractionTarget, 160)
           ? recentInteractionTarget
           : null;
       const nearHover =
@@ -27274,7 +27300,7 @@ async function main() {
           ? hoverTarget
           : null;
       const near =
-        recent || (nearHover && interactDistance(nearHover, player.x, player.y) < 160
+        recent || (nearHover && withinReach(nearHover, 160)
           ? nearHover
           : nearestInteractable(100));
       const nearSign = currentStreet ? signpostNear(walkUpSignpostStreet(currentStreet), player.x, 140) : null;

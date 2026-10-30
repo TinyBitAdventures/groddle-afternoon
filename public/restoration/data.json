@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 826,
+  "commits": 827,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "No Rook attacks on Gentle Island or the first skills' practice streets"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "In Classic, Skills, Buffs, Badges, Quests and the Map open as the 2012 windows"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Classic's chat reads at the 2012 size, each speaker's name in its own colour, and the contact strip opens"
    }
   ]
  },
- "tests": 460,
+ "tests": 461,
  "generatedAt": "2026-10-30"
 }
