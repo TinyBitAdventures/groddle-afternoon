@@ -139,6 +139,9 @@ import {
   winterWalkRemainingMs,
 } from './js/winter-walk.js?v=winter-walk-3';
 import {
+  SUMMERS_DAY_ANNEX_DOTS,
+  SUMMERS_DAY_ANNEX_EXIT,
+  SUMMERS_DAY_ANNEX_SHELVES,
   SUMMERS_DAY_BONUS_ID,
   SUMMERS_DAY_BONUS_DOT_COUNT,
   SUMMERS_DAY_BONUS_DOT_IMG,
@@ -171,7 +174,7 @@ import {
   summersDayQurazyPoints,
   summersDayRemainingMs,
   summersDayStreetPoint,
-} from './js/summers-day.js?v=g452-1';
+} from './js/summers-day.js?v=g452-2';
 import {
   ROOK_CRUSHERS,
   ROOK_EGG_INITIAL_STATE,
@@ -14858,18 +14861,8 @@ function drawSummersDayBonusBackground() {
   ]);
   walls.fill({ color: 0xf9fdff, alpha: 0.98 });
   root.addChild(walls);
-  const platforms = [
-    { x1: 110, y1: 1430, x2: 1170, y2: 1430 },
-    { x1: 180, y1: 1290, x2: 560, y2: 1290 },
-    { x1: 700, y1: 1150, x2: 1080, y2: 1150 },
-    { x1: 220, y1: 1010, x2: 650, y2: 1010 },
-    { x1: 720, y1: 870, x2: 1090, y2: 870 },
-    { x1: 170, y1: 730, x2: 550, y2: 730 },
-    { x1: 650, y1: 590, x2: 1080, y2: 590 },
-    { x1: 210, y1: 450, x2: 620, y2: 450 },
-    { x1: 650, y1: 310, x2: 1080, y2: 310 },
-    { x1: 360, y1: 185, x2: 880, y2: 185 },
-  ];
+  // Our own shelves (the Annex was not archived), spaced for the remake's jump (summers-day.js).
+  const platforms = SUMMERS_DAY_ANNEX_SHELVES.map((shelf) => ({ ...shelf }));
   root.platformsScreen = platforms;
   const floor = new PIXI.Graphics();
   floor.zIndex = -700;
@@ -14896,11 +14889,7 @@ function drawSummersDayBonusBackground() {
 }
 
 function spawnSummersDayBonusRoom() {
-  const spots = [
-    [380, 1345], [880, 1100], [410, 960], [890, 820],
-    [360, 680], [850, 540], [420, 400], [850, 260],
-  ];
-  summersDayBonusQuoins = spots.map(([x, y], index) => {
+  summersDayBonusQuoins = SUMMERS_DAY_ANNEX_DOTS.map(({ x, y }, index) => {
     const sprite = new PIXI.Sprite(
       textureFromUrl('assets/decos/groddle/pulseDot.png')
     );
@@ -14916,7 +14905,7 @@ function spawnSummersDayBonusRoom() {
     return { index, sprite, collected: false };
   });
   const exit = new PIXI.Container();
-  exit.position.set(620, 185);
+  exit.position.set(SUMMERS_DAY_ANNEX_EXIT.x, SUMMERS_DAY_ANNEX_EXIT.y);
   exit.zIndex = 40;
   const ladder = new PIXI.Sprite(
     textureFromUrl('assets/decos/groddle/firebog_ladder.png')

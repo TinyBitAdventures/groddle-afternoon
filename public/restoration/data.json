@@ -2666,9 +2666,14 @@
   ]
  },
  "git": {
-  "commits": 751,
+  "commits": 752,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "new",
+    "text": "A Summer's Day is Tiny Speck's own memory street, with its flitterbugs, signs, stones, pool and orbs"
+   },
    {
     "date": "2026-10-29",
     "kind": "improve",
@@ -2783,11 +2788,6 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "Password managers skip the street chat and the game's other boxes"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "Art in the page markup, style sheets and script-set backgrounds loads fresh after a release"
    }
   ]
  },

@@ -85,6 +85,38 @@ export const SUMMERS_DAY_ROUTE = Object.freeze([
   Object.freeze({ id: 'exit', x: -925, y: -910 }),
 ]);
 
+/**
+ * The Annex (LNVIL1E14M13K5I) was not archived; the recording shows a pale blue shaft of
+ * small white shelves, eight pale pulse dots and a ladder overhead. The shelves are ours,
+ * spaced for the remake's own jump in the Annex (normal physics: 105 px rise, 198 px running
+ * jump, measured): each rises SUMMERS_DAY_ANNEX_RISE (89 px, 16 px under the reach) and
+ * overlaps the one below across the middle, so a jump from that overlap lands on it. Left
+ * and right shelves alternate up the shaft from the floor to the top shelf under the ladder.
+ */
+export const SUMMERS_DAY_ANNEX_JUMP_REACH = 105;
+export const SUMMERS_DAY_ANNEX_RISE = 89;
+export const SUMMERS_DAY_ANNEX_FLOOR = Object.freeze({ x1: 110, y1: 1430, x2: 1170, y2: 1430 });
+export const SUMMERS_DAY_ANNEX_TOP = Object.freeze({ x1: 360, y1: 185, x2: 880, y2: 185 });
+export const SUMMERS_DAY_ANNEX_SHELVES = Object.freeze([
+  SUMMERS_DAY_ANNEX_FLOOR,
+  ...Array.from({ length: 13 }, (_, i) => {
+    const y = SUMMERS_DAY_ANNEX_FLOOR.y1 - SUMMERS_DAY_ANNEX_RISE * (i + 1);
+    return Object.freeze(i % 2 === 0
+      ? { x1: 240, y1: y, x2: 640, y2: y }
+      : { x1: 540, y1: y, x2: 1040, y2: y });
+  }),
+  SUMMERS_DAY_ANNEX_TOP,
+]);
+/** The eight dots, each 40 px over a shelf's outer end: walked into, a short detour each. */
+export const SUMMERS_DAY_ANNEX_DOTS = Object.freeze(
+  [1, 2, 4, 5, 7, 8, 10, 11].map((k) => {
+    const shelf = SUMMERS_DAY_ANNEX_SHELVES[k];
+    return Object.freeze({ x: shelf.x1 === 240 ? 290 : 990, y: shelf.y1 - 40 });
+  })
+);
+/** The ladder exit stands on the top shelf (anchored at its foot). */
+export const SUMMERS_DAY_ANNEX_EXIT = Object.freeze({ x: 620, y: SUMMERS_DAY_ANNEX_TOP.y1 });
+
 /** Source x, y to the imported street's screen space. */
 export function summersDayStreetPoint(point) {
   return {

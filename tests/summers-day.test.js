@@ -5,6 +5,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
+  SUMMERS_DAY_ANNEX_DOTS,
+  SUMMERS_DAY_ANNEX_EXIT,
+  SUMMERS_DAY_ANNEX_JUMP_REACH,
+  SUMMERS_DAY_ANNEX_RISE,
+  SUMMERS_DAY_ANNEX_SHELVES,
   SUMMERS_DAY_BONUS_DURATION_MS,
   SUMMERS_DAY_BONUS_DOT_COUNT,
   SUMMERS_DAY_BONUS_DOT_IMG,
@@ -35,7 +40,7 @@ import {
   summersDayQurazyPoints,
   summersDayRemainingMs,
   summersDayStreetPoint,
-} from '../public/js/summers-day.js?v=g452-1';
+} from '../public/js/summers-day.js?v=g452-2';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -147,6 +152,30 @@ test('the QA route stands inside each moment\'s box', () => {
     });
     assert.ok(hit, step.id);
   }
+});
+
+test('the Annex climbs on the remake jump: every rise 15 px under the reach, each shelf over the last', () => {
+  assert.ok(SUMMERS_DAY_ANNEX_JUMP_REACH - SUMMERS_DAY_ANNEX_RISE >= 15);
+  for (let i = 1; i < SUMMERS_DAY_ANNEX_SHELVES.length; i += 1) {
+    const below = SUMMERS_DAY_ANNEX_SHELVES[i - 1];
+    const shelf = SUMMERS_DAY_ANNEX_SHELVES[i];
+    const rise = below.y1 - shelf.y1;
+    assert.ok(rise > 0 && rise <= SUMMERS_DAY_ANNEX_JUMP_REACH - 15, `shelf ${i} rises ${rise}`);
+    // A straight-up jump from the overlap lands on it: at least 60 px of shared x.
+    const overlap = Math.min(below.x2, shelf.x2) - Math.max(below.x1, shelf.x1);
+    assert.ok(overlap >= 60, `shelf ${i} overlaps ${overlap}`);
+    // Inside the drawn walls (left edge at most 230, right at least 1048).
+    assert.ok(shelf.x1 >= 232);
+    assert.ok(shelf.x2 <= 1046);
+  }
+  assert.equal(SUMMERS_DAY_ANNEX_DOTS.length, SUMMERS_DAY_BONUS_DOT_COUNT);
+  for (const dot of SUMMERS_DAY_ANNEX_DOTS) {
+    // Walked into: 40 px over a shelf, within its ends (game.js collects within 46 px of mid-body).
+    assert.ok(SUMMERS_DAY_ANNEX_SHELVES.some((s) => s.y1 - dot.y === 40 && dot.x >= s.x1 + 20 && dot.x <= s.x2 - 20), `${dot.x},${dot.y}`);
+  }
+  const top = SUMMERS_DAY_ANNEX_SHELVES.at(-1);
+  assert.equal(SUMMERS_DAY_ANNEX_EXIT.y, top.y1);
+  assert.ok(SUMMERS_DAY_ANNEX_EXIT.x > top.x1 && SUMMERS_DAY_ANNEX_EXIT.x < top.x2);
 });
 
 test('the main memory opens the two-minute Annex and Annex quoins are unique', () => {
