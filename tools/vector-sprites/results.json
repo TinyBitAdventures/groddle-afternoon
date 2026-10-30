@@ -42174,5 +42174,775 @@
   "frameScores": [
    0.9822
   ]
+ },
+ "assets/sprites/animals/meat_collector.png": {
+  "animal": "meat-collector",
+  "swf": "misc/meat_collector/meat_collector.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   2,
+   2
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 69,
+  "fh": 54,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -306,
+   -270
+  ],
+  "score": 0.9902,
+  "minFrame": 0.9902,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/animals/meat_collector@3x.webp",
+  "bytes": 7800,
+  "firstDraw": true,
+  "frameScores": [
+   0.9902
+  ]
+ },
+ "assets/sprites/animals/butterfly_milker.png": {
+  "animal": "butterfly-milker",
+  "swf": "misc/butterfly_milker/butterfly_milker.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 48,
+  "fh": 69,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -198,
+   -363
+  ],
+  "score": 0.9818,
+  "minFrame": 0.9818,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/animals/butterfly_milker@3x.webp",
+  "bytes": 10546,
+  "firstDraw": true,
+  "frameScores": [
+   0.9818
+  ]
+ },
+ "assets/sprites/animals/piggy_feeder.png": {
+  "animal": "piggy-feeder",
+  "swf": "misc/piggy_feeder/piggy_feeder.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   2,
+   2
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 87,
+  "fh": 92,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -297,
+   -414
+  ],
+  "score": 0.9786,
+  "minFrame": 0.9786,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/animals/piggy_feeder@3x.webp",
+  "bytes": 25838,
+  "firstDraw": true,
+  "frameScores": [
+   0.9786
+  ]
+ },
+ "assets/sprites/animals/plop.png": {
+  "animal": "plop",
+  "swf": "misc/plop/plop.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 28,
+  "fh": 23,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -83,
+   -69
+  ],
+  "score": 0.9842,
+  "minFrame": 0.9842,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/animals/plop@3x.webp",
+  "bytes": 2960,
+  "firstDraw": true,
+  "frameScores": [
+   0.9842
+  ]
+ },
+ "assets/sprites/street-jobs/pile_of_currants.png": {
+  "animal": "pile-of-currants",
+  "swf": "misc/pile_of_currants/pile_of_currants.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 34,
+  "fh": 40,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -111,
+   -132
+  ],
+  "score": 0.9883,
+  "minFrame": 0.9883,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/street-jobs/pile_of_currants@3x.webp",
+  "bytes": 8106,
+  "firstDraw": true,
+  "frameScores": [
+   0.9883
+  ]
+ },
+ "assets/sprites/hell/wine_of_the_dead-world.png": {
+  "animal": "hell-wine-world",
+  "swf": "misc/wine_of_the_dead/wine_of_the_dead.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   92,
+   95
+  ],
+  "swfLabelFrames": 4,
+  "cells": 4,
+  "fw": 42,
+  "fh": 78,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -144,
+   -284
+  ],
+  "score": 0.9843,
+  "minFrame": 0.9837,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/hell/wine_of_the_dead-world@3x.webp",
+  "bytes": 42890,
+  "firstDraw": true,
+  "frameScores": [
+   0.9837,
+   0.9847,
+   0.9846,
+   0.9844
+  ]
+ },
+ "assets/sprites/hell/drink_ticket-world.png": {
+  "animal": "hell-drink-ticket-world",
+  "swf": "misc/drink_ticket/drink_ticket.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   2,
+   2
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 48,
+  "fh": 20,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -143,
+   -226
+  ],
+  "score": 0.9482,
+  "minFrame": 0.9482,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/hell/drink_ticket-world@3x.webp",
+  "bytes": 4898,
+  "firstDraw": true,
+  "frameScores": [
+   0.9482
+  ]
+ },
+ "assets/sprites/races/pig_bait__x1_1_x1_2_x1_3_x1_4_png_1354830335.png": {
+  "animal": "pig-bait-world",
+  "swf": "misc/pig_bait/pig_bait.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   2,
+   5
+  ],
+  "swfLabelFrames": 4,
+  "cells": 4,
+  "fw": 53,
+  "fh": 46,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -152,
+   -135
+  ],
+  "score": 0.9809,
+  "minFrame": 0.9774,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/races/pig_bait__x1_1_x1_2_x1_3_x1_4_png_1354830335@3x.webp",
+  "bytes": 59690,
+  "firstDraw": true,
+  "frameScores": [
+   0.9774,
+   0.9801,
+   0.9814,
+   0.9845
+  ]
+ },
+ "assets/sprites/cultivation/firefly_hive.png": {
+  "animal": "firefly-hive",
+  "swf": "misc/spawner/firefly_hive/firefly_hive.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 161,
+  "fh": 107,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -589,
+   -339
+  ],
+  "score": 0.9911,
+  "minFrame": 0.9911,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/cultivation/firefly_hive@3x.webp",
+  "bytes": 62954,
+  "firstDraw": true,
+  "frameScores": [
+   0.9911
+  ]
+ },
+ "assets/sprites/puzzles/light_beam.png": {
+  "animal": "light-beam",
+  "swf": "misc/light_beam/light_beam.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   1
+  ],
+  "swfLabelFrames": 1,
+  "cells": 1,
+  "fw": 161,
+  "fh": 382,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -552,
+   -1248
+  ],
+  "score": 0.9473,
+  "minFrame": 0.9473,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/puzzles/light_beam@3x.webp",
+  "bytes": 5386,
+  "firstDraw": true,
+  "frameScores": [
+   0.9473
+  ]
+ },
+ "assets/sprites/quests/rook-woods/rook-egg-states.png": {
+  "animal": "rook-egg",
+  "swf": "quest_items/rook_egg/rook_egg.swf",
+  "sprite": 0,
+  "label": null,
+  "swfFrames": [
+   1,
+   5
+  ],
+  "swfLabelFrames": 5,
+  "cells": 5,
+  "fw": 171,
+  "fh": 168,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -512,
+   -503
+  ],
+  "score": 0.989,
+  "minFrame": 0.9818,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/quests/rook-woods/rook-egg-states@3x.webp",
+  "bytes": 149168,
+  "firstDraw": true,
+  "frameScores": [
+   0.9939,
+   0.9915,
+   0.9889,
+   0.9888,
+   0.9818
+  ]
+ },
+ "assets/sprites/hell/graveside/graveside_marker_alph.png": {
+  "animal": "graveside-alph",
+  "swf": "misc/graveside_marker/graveside_marker.swf",
+  "sprite": 38,
+  "label": null,
+  "swfFrames": [
+   1,
+   3
+  ],
+  "swfLabelFrames": 3,
+  "cells": 3,
+  "fw": 90,
+  "fh": 88,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -2,
+   1
+  ],
+  "score": 0.9684,
+  "minFrame": 0.9675,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/hell/graveside/graveside_marker_alph@3x.webp",
+  "bytes": 74452,
+  "firstDraw": true,
+  "frameScores": [
+   0.9675,
+   0.9682,
+   0.9696
+  ]
+ },
+ "assets/sprites/hell/graveside/graveside_marker_cosma.png": {
+  "animal": "graveside-cosma",
+  "swf": "misc/graveside_marker/graveside_marker.swf",
+  "sprite": 35,
+  "label": null,
+  "swfFrames": [
+   1,
+   3
+  ],
+  "swfLabelFrames": 3,
+  "cells": 3,
+  "fw": 90,
+  "fh": 88,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -2,
+   1
+  ],
+  "score": 0.9686,
+  "minFrame": 0.9677,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/hell/graveside/graveside_marker_cosma@3x.webp",
+  "bytes": 74158,
+  "firstDraw": true,
+  "frameScores": [
+   0.9677,
+   0.9684,
+   0.9698
+  ]
+ },
+ "assets/sprites/hell/graveside/graveside_marker_friendly.png": {
+  "animal": "graveside-friendly",
+  "swf": "misc/graveside_marker/graveside_marker.swf",
+  "sprite": 32,
+  "label": null,
+  "swfFrames": [
+   1,
+   3
+  ],
+  "swfLabelFrames": 3,
+  "cells": 3,
+  "fw": 90,
+  "fh": 88,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -2,
+   1
+  ],
+  "score": 0.9684,
+  "minFrame": 0.9674,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/hell/graveside/graveside_marker_friendly@3x.webp",
+  "bytes": 74630,
+  "firstDraw": true,
+  "frameScores": [
+   0.9674,
+   0.9682,
+   0.9696
+  ]
+ },
+ "assets/sprites/hell/graveside/graveside_marker_generic.png": {
+  "animal": "graveside-generic",
+  "swf": "misc/graveside_marker/graveside_marker.swf",
+  "sprite": 41,
+  "label": null,
+  "swfFrames": [
+   1,
+   3
+  ],
+  "swfLabelFrames": 3,
+  "cells": 3,
+  "fw": 90,
+  "fh": 88,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -2,
+   1
+  ],
+  "score": 0.9684,
+  "minFrame": 0.9675,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/hell/graveside/graveside_marker_generic@3x.webp",
+  "bytes": 74552,
+  "firstDraw": true,
+  "frameScores": [
+   0.9675,
+   0.9682,
+   0.9696
+  ]
+ },
+ "assets/sprites/hell/graveside/graveside_marker_grendaline.png": {
+  "animal": "graveside-grendaline",
+  "swf": "misc/graveside_marker/graveside_marker.swf",
+  "sprite": 29,
+  "label": null,
+  "swfFrames": [
+   1,
+   3
+  ],
+  "swfLabelFrames": 3,
+  "cells": 3,
+  "fw": 90,
+  "fh": 88,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -2,
+   1
+  ],
+  "score": 0.9682,
+  "minFrame": 0.9673,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/hell/graveside/graveside_marker_grendaline@3x.webp",
+  "bytes": 74648,
+  "firstDraw": true,
+  "frameScores": [
+   0.9673,
+   0.968,
+   0.9694
+  ]
+ },
+ "assets/sprites/hell/graveside/graveside_marker_humbaba.png": {
+  "animal": "graveside-humbaba",
+  "swf": "misc/graveside_marker/graveside_marker.swf",
+  "sprite": 26,
+  "label": null,
+  "swfFrames": [
+   1,
+   3
+  ],
+  "swfLabelFrames": 3,
+  "cells": 3,
+  "fw": 90,
+  "fh": 88,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -2,
+   1
+  ],
+  "score": 0.9684,
+  "minFrame": 0.9675,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/hell/graveside/graveside_marker_humbaba@3x.webp",
+  "bytes": 74280,
+  "firstDraw": true,
+  "frameScores": [
+   0.9675,
+   0.9682,
+   0.9696
+  ]
+ },
+ "assets/sprites/hell/graveside/graveside_marker_lem.png": {
+  "animal": "graveside-lem",
+  "swf": "misc/graveside_marker/graveside_marker.swf",
+  "sprite": 23,
+  "label": null,
+  "swfFrames": [
+   1,
+   3
+  ],
+  "swfLabelFrames": 3,
+  "cells": 3,
+  "fw": 90,
+  "fh": 88,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -2,
+   1
+  ],
+  "score": 0.9684,
+  "minFrame": 0.9674,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/hell/graveside/graveside_marker_lem@3x.webp",
+  "bytes": 74640,
+  "firstDraw": true,
+  "frameScores": [
+   0.9674,
+   0.9682,
+   0.9696
+  ]
+ },
+ "assets/sprites/hell/graveside/graveside_marker_mab.png": {
+  "animal": "graveside-mab",
+  "swf": "misc/graveside_marker/graveside_marker.swf",
+  "sprite": 20,
+  "label": null,
+  "swfFrames": [
+   1,
+   3
+  ],
+  "swfLabelFrames": 3,
+  "cells": 3,
+  "fw": 90,
+  "fh": 88,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -2,
+   1
+  ],
+  "score": 0.9683,
+  "minFrame": 0.9674,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/hell/graveside/graveside_marker_mab@3x.webp",
+  "bytes": 74664,
+  "firstDraw": true,
+  "frameScores": [
+   0.9674,
+   0.9681,
+   0.9695
+  ]
+ },
+ "assets/sprites/hell/graveside/graveside_marker_pot.png": {
+  "animal": "graveside-pot",
+  "swf": "misc/graveside_marker/graveside_marker.swf",
+  "sprite": 17,
+  "label": null,
+  "swfFrames": [
+   1,
+   3
+  ],
+  "swfLabelFrames": 3,
+  "cells": 3,
+  "fw": 90,
+  "fh": 88,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -2,
+   1
+  ],
+  "score": 0.9684,
+  "minFrame": 0.9675,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/hell/graveside/graveside_marker_pot@3x.webp",
+  "bytes": 74076,
+  "firstDraw": true,
+  "frameScores": [
+   0.9675,
+   0.9682,
+   0.9696
+  ]
+ },
+ "assets/sprites/hell/graveside/graveside_marker_spriggan.png": {
+  "animal": "graveside-spriggan",
+  "swf": "misc/graveside_marker/graveside_marker.swf",
+  "sprite": 14,
+  "label": null,
+  "swfFrames": [
+   1,
+   3
+  ],
+  "swfLabelFrames": 3,
+  "cells": 3,
+  "fw": 90,
+  "fh": 88,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -2,
+   1
+  ],
+  "score": 0.9683,
+  "minFrame": 0.9674,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/hell/graveside/graveside_marker_spriggan@3x.webp",
+  "bytes": 74674,
+  "firstDraw": true,
+  "frameScores": [
+   0.9674,
+   0.9681,
+   0.9695
+  ]
+ },
+ "assets/sprites/hell/graveside/graveside_marker_tii.png": {
+  "animal": "graveside-tii",
+  "swf": "misc/graveside_marker/graveside_marker.swf",
+  "sprite": 11,
+  "label": null,
+  "swfFrames": [
+   1,
+   3
+  ],
+  "swfLabelFrames": 3,
+  "cells": 3,
+  "fw": 90,
+  "fh": 88,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -2,
+   1
+  ],
+  "score": 0.9683,
+  "minFrame": 0.9674,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/hell/graveside/graveside_marker_tii@3x.webp",
+  "bytes": 74192,
+  "firstDraw": true,
+  "frameScores": [
+   0.9674,
+   0.9681,
+   0.9695
+  ]
+ },
+ "assets/sprites/hell/graveside/graveside_marker_zille.png": {
+  "animal": "graveside-zille",
+  "swf": "misc/graveside_marker/graveside_marker.swf",
+  "sprite": 8,
+  "label": null,
+  "swfFrames": [
+   1,
+   3
+  ],
+  "swfLabelFrames": 3,
+  "cells": 3,
+  "fw": 90,
+  "fh": 88,
+  "mirror": false,
+  "shift": 0,
+  "offset3x": [
+   -2,
+   1
+  ],
+  "score": 0.9684,
+  "minFrame": 0.9675,
+  "faintFrames": 0,
+  "faintMin": 1,
+  "drift": [],
+  "status": "ok",
+  "hires": "assets/sprites/hell/graveside/graveside_marker_zille@3x.webp",
+  "bytes": 74522,
+  "firstDraw": true,
+  "frameScores": [
+   0.9675,
+   0.9682,
+   0.9696
+  ]
  }
 }

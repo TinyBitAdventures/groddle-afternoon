@@ -37,7 +37,7 @@
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
 import { ITEM_BASE_COSTS } from '../store-catalog.js?v=79d4de8a';
 import { shiftMetabolic } from '../metabolics.js?v=8504134e';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=695775ed';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=f0e432df';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=01a295a1';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=c4aff42f';
 import { STREET_INDEX } from '../street-loader.js?v=20c7b021';

@@ -34,7 +34,7 @@
  * neighbourChore, neighbourLetters, furnitureLast.
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=695775ed';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=f0e432df';
 import { nearestSurfaceY } from '../walk-surface.js?v=c4aff42f';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=670c3a7f';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
@@ -117,8 +117,8 @@ import {
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=7cf8f655';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
 import { textureFromUrl } from '../textures.js?v=01a295a1';
-import { butlerApi } from './butler-feature.js?v=17d0f55f';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=12d6cbe4';
+import { butlerApi } from './butler-feature.js?v=2f6fe811';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=c02f3ee5';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';

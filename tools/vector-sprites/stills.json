@@ -1,5 +1,5 @@
 {
- "about": "World still items the stills sweep (lane SPRITES, 2026-10-29) found drawn at 1.5+ need/available at 3 device px per world px, each from its own CC0 SWF in glitch-items: the Visiting Stone, notes, gift boxes, notice boards and the left mailbox (features/street-furniture-feature.js), the home furniture base pieces (furniture/furniture_base and bag_furniture_cabinet_base, js/home-decor.js), the street-job sign stake, the Party ATM, the Rook Hall speaker and the Butler's box (js/butler.js BUTLER_BOX_ART); G446: Hell's Bunch of Grapes on the floor (js/hell.js, four states) and Señor Funpickle's still (features/funpickle-feature.js). SHARP3 (2026-10-30, Original zoom draws the street at about 2.9 backing px per world px on a 1440 px Retina window): the Race Ticket Dispenser (features/races-feature.js). Root-timeline items render from a copy with a padded stage (padStage). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/stills.json",
+ "about": "World still items the stills sweep (lane SPRITES, 2026-10-29) found drawn at 1.5+ need/available at 3 device px per world px, each from its own CC0 SWF in glitch-items: the Visiting Stone, notes, gift boxes, notice boards and the left mailbox (features/street-furniture-feature.js), the home furniture base pieces (furniture/furniture_base and bag_furniture_cabinet_base, js/home-decor.js), the street-job sign stake, the Party ATM, the Rook Hall speaker and the Butler's box (js/butler.js BUTLER_BOX_ART); G446: Hell's Bunch of Grapes on the floor (js/hell.js, four states) and Señor Funpickle's still (features/funpickle-feature.js). SHARP3 (2026-10-30, Original zoom draws the street at about 2.9 backing px per world px on a 1440 px Retina window): the Race Ticket Dispenser (features/races-feature.js); the back yard's Meat Collector, Butterfly Milker and Piggy Feeder (their filled frame 2) and plops (features/animal-husbandry-feature.js); the home street's Pile of Currants (features/home-street-mp-feature.js) and Firefly Hive (features/homes-feature.js POD_ART); Wine of the Dead (labels 1-4, frames 92-95) and the Drink Ticket on the floor (js/hell.js); the Graveside Marker of each Giant (graveside_marker.swf, each Giant's own named sprite: DefineSprite 8 giantZille ... 41 giantGeneric; the emblem is too small for the score to tell Giants apart, the named sprite scores best for every one); Pig Bait (Hog Haul); Shim Shiri's light beams (puzzles-feature.js, drawn at 2.2); the Rook Egg (Rooks' Woods, labels 5-1). Root-timeline items render from a copy with a padded stage (padStage). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/stills.json",
  "firstDraw": true,
  "jobs": [
   {
@@ -1055,6 +1055,385 @@
      "frames": 1,
      "swfStart": 1,
      "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "butterfly-milker",
+   "swf": "misc/butterfly_milker/butterfly_milker.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/animals/butterfly_milker.png",
+     "fw": 48,
+     "fh": 69,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "plop",
+   "swf": "misc/plop/plop.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/animals/plop.png",
+     "fw": 28,
+     "fh": 23,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "pile-of-currants",
+   "swf": "misc/pile_of_currants/pile_of_currants.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/street-jobs/pile_of_currants.png",
+     "fw": 34,
+     "fh": 40,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "meat-collector",
+   "swf": "misc/meat_collector/meat_collector.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/animals/meat_collector.png",
+     "fw": 69,
+     "fh": 54,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 2,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "piggy-feeder",
+   "swf": "misc/piggy_feeder/piggy_feeder.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/animals/piggy_feeder.png",
+     "fw": 87,
+     "fh": 92,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 2,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "hell-wine-world",
+   "swf": "misc/wine_of_the_dead/wine_of_the_dead.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/hell/wine_of_the_dead-world.png",
+     "fw": 42,
+     "fh": 78,
+     "cols": 4,
+     "frames": 4,
+     "swfStart": 92,
+     "swfCount": 4
+    }
+   ]
+  },
+  {
+   "name": "hell-drink-ticket-world",
+   "swf": "misc/drink_ticket/drink_ticket.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/hell/drink_ticket-world.png",
+     "fw": 48,
+     "fh": 20,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 2,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "pig-bait-world",
+   "swf": "misc/pig_bait/pig_bait.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/races/pig_bait__x1_1_x1_2_x1_3_x1_4_png_1354830335.png",
+     "fw": 53,
+     "fh": 46,
+     "cols": 4,
+     "frames": 4,
+     "swfStart": 2,
+     "swfCount": 4
+    }
+   ]
+  },
+  {
+   "name": "firefly-hive",
+   "swf": "misc/spawner/firefly_hive/firefly_hive.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/cultivation/firefly_hive.png",
+     "fw": 161,
+     "fh": 107,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "light-beam",
+   "swf": "misc/light_beam/light_beam.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/puzzles/light_beam.png",
+     "fw": 161,
+     "fh": 382,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1
+    }
+   ]
+  },
+  {
+   "name": "rook-egg",
+   "swf": "quest_items/rook_egg/rook_egg.swf",
+   "sprite": 0,
+   "padStage": 1,
+   "sheets": [
+    {
+     "path": "assets/sprites/quests/rook-woods/rook-egg-states.png",
+     "fw": 171,
+     "fh": 168,
+     "cols": 5,
+     "frames": 5,
+     "swfStart": 1,
+     "swfCount": 5
+    }
+   ]
+  },
+  {
+   "name": "graveside-friendly",
+   "swf": "misc/graveside_marker/graveside_marker.swf",
+   "sprite": 32,
+   "sheets": [
+    {
+     "path": "assets/sprites/hell/graveside/graveside_marker_friendly.png",
+     "fw": 90,
+     "fh": 88,
+     "cols": 3,
+     "frames": 3,
+     "swfStart": 1,
+     "swfCount": 3
+    }
+   ]
+  },
+  {
+   "name": "graveside-generic",
+   "swf": "misc/graveside_marker/graveside_marker.swf",
+   "sprite": 41,
+   "sheets": [
+    {
+     "path": "assets/sprites/hell/graveside/graveside_marker_generic.png",
+     "fw": 90,
+     "fh": 88,
+     "cols": 3,
+     "frames": 3,
+     "swfStart": 1,
+     "swfCount": 3
+    }
+   ]
+  },
+  {
+   "name": "graveside-alph",
+   "swf": "misc/graveside_marker/graveside_marker.swf",
+   "sprite": 38,
+   "sheets": [
+    {
+     "path": "assets/sprites/hell/graveside/graveside_marker_alph.png",
+     "fw": 90,
+     "fh": 88,
+     "cols": 3,
+     "frames": 3,
+     "swfStart": 1,
+     "swfCount": 3
+    }
+   ]
+  },
+  {
+   "name": "graveside-cosma",
+   "swf": "misc/graveside_marker/graveside_marker.swf",
+   "sprite": 35,
+   "sheets": [
+    {
+     "path": "assets/sprites/hell/graveside/graveside_marker_cosma.png",
+     "fw": 90,
+     "fh": 88,
+     "cols": 3,
+     "frames": 3,
+     "swfStart": 1,
+     "swfCount": 3
+    }
+   ]
+  },
+  {
+   "name": "graveside-mab",
+   "swf": "misc/graveside_marker/graveside_marker.swf",
+   "sprite": 20,
+   "sheets": [
+    {
+     "path": "assets/sprites/hell/graveside/graveside_marker_mab.png",
+     "fw": 90,
+     "fh": 88,
+     "cols": 3,
+     "frames": 3,
+     "swfStart": 1,
+     "swfCount": 3
+    }
+   ]
+  },
+  {
+   "name": "graveside-humbaba",
+   "swf": "misc/graveside_marker/graveside_marker.swf",
+   "sprite": 26,
+   "sheets": [
+    {
+     "path": "assets/sprites/hell/graveside/graveside_marker_humbaba.png",
+     "fw": 90,
+     "fh": 88,
+     "cols": 3,
+     "frames": 3,
+     "swfStart": 1,
+     "swfCount": 3
+    }
+   ]
+  },
+  {
+   "name": "graveside-grendaline",
+   "swf": "misc/graveside_marker/graveside_marker.swf",
+   "sprite": 29,
+   "sheets": [
+    {
+     "path": "assets/sprites/hell/graveside/graveside_marker_grendaline.png",
+     "fw": 90,
+     "fh": 88,
+     "cols": 3,
+     "frames": 3,
+     "swfStart": 1,
+     "swfCount": 3
+    }
+   ]
+  },
+  {
+   "name": "graveside-lem",
+   "swf": "misc/graveside_marker/graveside_marker.swf",
+   "sprite": 23,
+   "sheets": [
+    {
+     "path": "assets/sprites/hell/graveside/graveside_marker_lem.png",
+     "fw": 90,
+     "fh": 88,
+     "cols": 3,
+     "frames": 3,
+     "swfStart": 1,
+     "swfCount": 3
+    }
+   ]
+  },
+  {
+   "name": "graveside-tii",
+   "swf": "misc/graveside_marker/graveside_marker.swf",
+   "sprite": 11,
+   "sheets": [
+    {
+     "path": "assets/sprites/hell/graveside/graveside_marker_tii.png",
+     "fw": 90,
+     "fh": 88,
+     "cols": 3,
+     "frames": 3,
+     "swfStart": 1,
+     "swfCount": 3
+    }
+   ]
+  },
+  {
+   "name": "graveside-pot",
+   "swf": "misc/graveside_marker/graveside_marker.swf",
+   "sprite": 17,
+   "sheets": [
+    {
+     "path": "assets/sprites/hell/graveside/graveside_marker_pot.png",
+     "fw": 90,
+     "fh": 88,
+     "cols": 3,
+     "frames": 3,
+     "swfStart": 1,
+     "swfCount": 3
+    }
+   ]
+  },
+  {
+   "name": "graveside-spriggan",
+   "swf": "misc/graveside_marker/graveside_marker.swf",
+   "sprite": 14,
+   "sheets": [
+    {
+     "path": "assets/sprites/hell/graveside/graveside_marker_spriggan.png",
+     "fw": 90,
+     "fh": 88,
+     "cols": 3,
+     "frames": 3,
+     "swfStart": 1,
+     "swfCount": 3
+    }
+   ]
+  },
+  {
+   "name": "graveside-zille",
+   "swf": "misc/graveside_marker/graveside_marker.swf",
+   "sprite": 8,
+   "sheets": [
+    {
+     "path": "assets/sprites/hell/graveside/graveside_marker_zille.png",
+     "fw": 90,
+     "fh": 88,
+     "cols": 3,
+     "frames": 3,
+     "swfStart": 1,
+     "swfCount": 3
     }
    ]
   }

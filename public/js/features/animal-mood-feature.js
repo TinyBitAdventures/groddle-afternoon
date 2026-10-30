@@ -85,7 +85,7 @@
  *   street), animalCrowdReturned, animalCrowdRespawn (armed|rolled).
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=695775ed';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=f0e432df';
 import { nearestSurfaceY } from '../walk-surface.js?v=c4aff42f';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=628fa0b4';
 import { isInHell } from '../hell.js?v=68b57749';
@@ -94,7 +94,7 @@ import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { animalStatusLabel } from '../animals.js?v=e857d0af';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=23f74bb3';
 import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=16364589';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=1931ea89';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=0e8c0afd';
 import {
   CHECK_ON_REMOVE,
   CROWD_CLASSES,

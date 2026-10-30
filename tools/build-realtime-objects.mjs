@@ -61,7 +61,7 @@ import { ARBOROLOGY_HARVEST, TRANT_META } from '../public/js/trants.js?v=9c2e8c0
 import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=f4b16c76';
 import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=23f74bb3';
 import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=36c1e9ed';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=cf3bfa90';
 import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=df470ff4';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

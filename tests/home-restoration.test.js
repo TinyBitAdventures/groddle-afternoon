@@ -48,7 +48,7 @@ import {
   rekeyRocks,
   rockItems,
   soilKeyMap,
-} from '../public/js/features/homes-feature.js?v=aa16dd07';
+} from '../public/js/features/homes-feature.js?v=9f2f4735';
 
 const root = join(import.meta.dirname, '..', 'public');
 const catalog = JSON.parse(readFileSync(join(root, 'assets/content/street-jobs.json'), 'utf8'));
