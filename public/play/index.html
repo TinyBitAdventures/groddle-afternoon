@@ -7,7 +7,7 @@
   <base href="../" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Groddle Afternoon</title>
-    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;tools=g183-1&amp;make=g191-1&amp;rock=g211-1&amp;route=g192-1&amp;prompt=g198-1&amp;machines=g193-1&amp;skills=g367-1&amp;chooser=g206-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=g467-1&amp;badgebrowser=full-catalog-2&amp;home=ticket-1&amp;card=g249-1&amp;offers=g229-1&amp;buffs=g256-1&amp;speech=g269-1&amp;banner=g297-1&amp;pop=g332-1&amp;bags=g394-1&amp;maptp=g356-1&amp;hud2=g361-1&amp;award=g385-1&amp;wordprog=g394-1&amp;overlays=g392-1&amp;polish=g396-1&amp;hud3=g402-1&amp;questtext=g425-1&amp;eat=g423-1&amp;assetkeys=g434-1&amp;menu=g438-1&amp;summerhud=g452-1&amp;rookmuseum=g455-1&amp;notify=g459-1&amp;stage=g458-1&amp;vitals=g458-2&amp;tokens=g463-1&amp;zoverlay=g463-2&amp;nunito=g465-1&amp;paper=g465-2&amp;topbar=g465-3&amp;social=g466-1&amp;ringfit=g465-10&amp;hub=g470-2&amp;barlayer=g470-3&amp;verbs=g469-1&amp;backdrop=g432-1" />
+    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;tools=g183-1&amp;make=g191-1&amp;rock=g211-1&amp;route=g192-1&amp;prompt=g198-1&amp;machines=g193-1&amp;skills=g367-1&amp;chooser=g206-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=g467-1&amp;badgebrowser=full-catalog-2&amp;home=ticket-1&amp;card=g249-1&amp;offers=g229-1&amp;buffs=g256-1&amp;speech=g269-1&amp;banner=g297-1&amp;pop=g332-1&amp;bags=g394-1&amp;maptp=g356-1&amp;hud2=g361-1&amp;award=g385-1&amp;wordprog=g394-1&amp;overlays=g392-1&amp;polish=g396-1&amp;hud3=g402-1&amp;questtext=g425-1&amp;eat=g423-1&amp;assetkeys=g434-1&amp;menu=g438-1&amp;summerhud=g452-1&amp;rookmuseum=g455-1&amp;notify=g459-1&amp;stage=g458-1&amp;vitals=g458-2&amp;tokens=g463-1&amp;zoverlay=g463-2&amp;nunito=g465-1&amp;paper=g465-2&amp;topbar=g465-3&amp;social=g466-1&amp;ringfit=g465-10&amp;hub=g470-2&amp;barlayer=g470-3&amp;verbs=g469-2&amp;backdrop=g432-1" />
   <!-- The UI font, self-hosted (style.css @font-face; OFL in assets/fonts/nunito/): the roman latin file, before first paint. -->
   <link rel="preload" href="assets/fonts/nunito/nunito-roman-latin.woff2" as="font" type="font/woff2" crossorigin />
   <!-- The Classic interface (js/classic/ui-mode.js sets <html data-ui="classic">); every rule is scoped to it. -->
@@ -486,15 +486,25 @@
         <strong id="emotional-bear-fx-copy"></strong>
       </div>
 
-      <!-- Quest log panel -->
-      <div id="quest-panel" class="side-panel quest-panel" hidden>
-        <div class="side-card">
-          <div class="side-head">
-            <h2>Quest Log</h2>
-            <button type="button" id="quest-close" class="verb-menu-x" aria-label="Close">×</button>
+      <!-- Quest log panel (modern: a side sheet of the panel shell, js/ui/panel-shell.js; tabs and
+           collapsible cards, js/ui/quest-sheet.js) -->
+      <div id="quest-panel" class="side-panel quest-panel ui-sheet" role="region" aria-labelledby="quest-panel-title" hidden>
+        <div class="side-card ui-sheet-card">
+          <div class="side-head ui-sheet-head">
+            <img class="ui-sheet-icon" src="assets/ui/familiar/quests_small.png?v=df15aba7" alt="" width="28" height="19" />
+            <h2 id="quest-panel-title" class="ui-sheet-title" tabindex="-1">Quests</h2>
+            <span class="kcap ui-sheet-key" aria-hidden="true">Q</span>
+            <button type="button" id="quest-close" class="verb-menu-x ui-sheet-x" aria-label="Close Quests (Esc)">×</button>
           </div>
-          <p class="panel-meta" id="quest-meta"></p>
-          <div id="quest" class="quest-log-body"></div>
+          <div id="quest-tabs" class="ui-sheet-tabs" role="tablist" aria-label="Quests">
+            <button type="button" role="tab" id="quest-tab-active" data-tab="active" aria-selected="true" aria-controls="quest">Active 0</button>
+            <button type="button" role="tab" id="quest-tab-offered" data-tab="offered" aria-selected="false" aria-controls="quest" tabindex="-1">Offered 0</button>
+            <button type="button" role="tab" id="quest-tab-done" data-tab="done" aria-selected="false" aria-controls="quest" tabindex="-1">Done 0</button>
+          </div>
+          <div class="ui-sheet-body">
+            <div id="quest" class="quest-log-body" role="tabpanel" aria-label="Quests"></div>
+          </div>
+          <div class="ui-sheet-foot"><p class="panel-meta" id="quest-meta"></p><span class="ui-sheet-esc"><span class="kcap">Esc</span> close</span></div>
         </div>
       </div>
 
@@ -628,22 +638,29 @@
         </div>
       </div>
 
-      <!-- Making / crafting (tool-driven, GSJS catalog_recipes) -->
-      <div id="make-panel" class="glitch-modal make-panel" hidden>
-        <div class="glitch-modal-card make-card">
-          <div class="glitch-modal-head">
-            <h2 id="make-title">Making</h2>
+      <!-- Making / crafting (tool-driven, GSJS catalog_recipes). Modern: a side sheet of the panel shell
+           with the tool strip, search and the "Can make now" filter. -->
+      <div id="make-panel" class="glitch-modal make-panel ui-sheet" role="region" aria-labelledby="make-panel-title" hidden>
+        <div class="glitch-modal-card make-card ui-sheet-card">
+          <div class="glitch-modal-head ui-sheet-head">
+            <img class="ui-sheet-icon" src="assets/sprites/icons/tinkertool.png?v=df15aba7" alt="" width="28" height="28" />
+            <h2 id="make-panel-title" class="ui-sheet-title" tabindex="-1">Make</h2>
+            <span class="kcap ui-sheet-key" aria-hidden="true">N</span>
             <div class="glitch-modal-tabs make-tool-tabs" id="make-tools" role="toolbar" aria-label="Tool"></div>
-            <button type="button" id="make-close" class="verb-menu-x" aria-label="Close">×</button>
+            <button type="button" id="make-close" class="verb-menu-x ui-sheet-x" aria-label="Close Make (Esc)">×</button>
           </div>
+          <p id="make-title" class="make-question">Making</p>
           <div class="make-search-row">
             <input type="search" id="make-search" class="make-search" placeholder="Find a recipe or ingredient" aria-label="Find a recipe or ingredient" autocomplete="off" />
+            <label class="make-canmake"><input type="checkbox" id="make-canmake" checked /> Can make now</label>
           </div>
-          <p class="panel-meta" id="make-meta">Pick a tool, then a recipe</p>
-          <div id="make-list" class="make-grid" role="list"></div>
-          <div id="make-detail" class="make-detail" hidden></div>
-          <div id="make-progress" class="make-progress" hidden></div>
-          <div id="make-result" class="make-result" hidden></div>
+          <div class="ui-sheet-body make-body">
+            <div id="make-list" class="make-grid" role="list"></div>
+            <div id="make-detail" class="make-detail" hidden></div>
+            <div id="make-progress" class="make-progress" hidden></div>
+            <div id="make-result" class="make-result" hidden></div>
+          </div>
+          <div class="ui-sheet-foot"><p class="panel-meta" id="make-meta">Pick a tool, then a recipe</p><span class="ui-sheet-esc"><span class="kcap">Esc</span> close</span></div>
         </div>
       </div>
 
@@ -753,14 +770,16 @@
         </div>
       </div>
 
-      <div id="map-panel" class="map-panel" hidden>
-        <div class="map-card map-hub">
-          <div class="map-head">
-            <h2 id="map-hub-title">Groddle Forest</h2>
+      <div id="map-panel" class="map-panel ui-sheet ui-sheet-center" hidden>
+        <div class="map-card map-hub ui-sheet-card">
+          <div class="map-head ui-sheet-head">
+            <img class="ui-sheet-icon" src="assets/sprites/icons/teleportation_script.png?v=df15aba7" alt="" width="28" height="28" />
+            <h2 id="map-hub-title" class="ui-sheet-title" tabindex="-1">Groddle Forest</h2>
             <div class="map-hub-picker">
               <select id="map-hub-select" title="Browse hub maps" aria-label="Region"></select>
             </div>
-            <button type="button" id="map-close" class="verb-menu-x" aria-label="Close map">×</button>
+            <span class="kcap ui-sheet-key" aria-hidden="true">M</span>
+            <button type="button" id="map-close" class="verb-menu-x ui-sheet-x" aria-label="Close map">×</button>
           </div>
           <p class="map-sub">Original street geometry · yellow = travel · red star = you</p>
           <div id="map-canvas" class="map-canvas"></div>
@@ -868,6 +887,6 @@
   </div>
   <!-- Password managers skip the game's own boxes (chat, searches, names); the account forms keep autofill. -->
   <script type="module" src="js/no-autofill.js?v=g437-1"></script>
-  <script type="module" src="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=g467-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=g378-1&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g469-1"></script>
+  <script type="module" src="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-6&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=g467-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=g378-1&amp;rook=forest-2&amp;decos=webp-1&amp;imgcards=g14-1&amp;treedeath=g36-1&amp;enchanted=g5-1&amp;craftybot=1&amp;round16=g469-2"></script>
 </body>
 </html>

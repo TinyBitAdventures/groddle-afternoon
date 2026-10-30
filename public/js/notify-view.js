@@ -217,7 +217,7 @@ export function mountActivityLog(notifier, { container, buttonHost = null, onOpe
  * The notice stack and its zones. `root` is #game-root. game.js calls frame()
  * once a frame with why notices must wait ('' when they may show).
  */
-export function mountNotifyView(notifier, { root, setData = () => {}, logButtonHost = null, activityLog = true, sideInset = () => null } = {}) {
+export function mountNotifyView(notifier, { root, setData = () => {}, logButtonHost = null, activityLog = true, sideInset = () => null, sideInsetLeft = () => 0 } = {}) {
   if (typeof document === 'undefined' || !root) return null;
   const stack = document.createElement('div');
   stack.id = STACK_ID;
@@ -326,7 +326,8 @@ export function mountNotifyView(notifier, { root, setData = () => {}, logButtonH
       blockers,
       maxBottom: Math.min(floor - 8, rr.height * 0.62),
       rootW: rr.width,
-      insetL: Math.max(0, Number(side?.left) || 0),
+      // A side sheet on the left (VERBS' panel shell) as well as a drawer's own left.
+      insetL: Math.max(0, Number(side?.left) || 0, Number((() => { try { return sideInsetLeft(); } catch { return 0; } })()) || 0),
       insetR: Math.max(0, Number(side?.right) || 0),
     };
   }

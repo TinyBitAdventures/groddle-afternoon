@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 793,
+  "commits": 794,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "The verb menu is a compact card over the thing: one line per verb with its number key and energy cost"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "fix",
     "text": "The Qurazy banner no longer draws over an open note or window"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "The game's colours, type, spacing, radii, shadows and layers come from one set of design tokens"
    }
   ]
  },

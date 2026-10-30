@@ -857,8 +857,10 @@ import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js
 import { denseSprite } from './js/sprite-dense.js?v=g430-1';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from './js/notify.js?v=g459-1';
-import { mountNotifyView } from './js/notify-view.js?v=g466-1';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g468-2';
+import { mountNotifyView } from './js/notify-view.js?v=g469-2';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g469-2';
+import { bindTabs, mountPanelShell } from './js/ui/panel-shell.js?v=g469-2';
+import { createQuestSheet } from './js/ui/quest-sheet.js?v=g469-2';
 import { bindVerbMenu, focusVerbRow, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=g469-1';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g470-2';
@@ -1869,6 +1871,8 @@ let vendorReceiptTimer = 0;
 /** @type {string} make panel tool filter (`all` or tool class_tsid) */
 let makeToolFilter = 'all';
 let makeSearchQuery = '';
+/** VERBS: Make's "Can make now" filter (on by default, as in the HUD mock): only the recipes you can make now. */
+let makeCanMakeOnly = true;
 /** A machine standing in the world the Make panel runs on instead of the pack (machine rooms, G169): { tool, toolState, onComplete } */
 let makeStation = null;
 /** @type {string|null} recipe key for make detail */
@@ -2281,6 +2285,8 @@ const notify = createNotifier({
  * (css/classic.css, js/classic/classic-frame.js). The old dock and Activity panel are no longer mounted.
  */
 const MODERN_UI = true;
+/** VERBS: the modern panel shell (js/ui/panel-shell.js), mounted with the HUD. */
+let panelShell = null;
 const setCanvasData = (key, value) => {
   if (app?.canvas && app.canvas.dataset[key] !== value) app.canvas.dataset[key] = value;
 };
@@ -2291,6 +2297,8 @@ const notifyView = mountNotifyView(notify, {
   // SOCIAL: the drawer is the Activity log in the modern skin, and the notices centre beside it.
   activityLog: !MODERN_UI,
   sideInset: () => socialDrawer?.inset() || null,
+  // VERBS: an open side sheet's width on the left (js/ui/panel-shell.js); the drawer's is on the right.
+  sideInsetLeft: () => panelShell?.insetLeft() || 0,
 });
 /**
  * SOCIAL (phase 2, js/ui/social-drawer.js): the right-hand drawer is #local-chat-dock in the modern
@@ -4424,6 +4432,18 @@ function renderPackBar() {
 
 /** G255: the quest log markup last drawn (updateHud redraws only when it changes). */
 let questLogDrawn = '';
+/** VERBS: the Quests sheet's tabs and collapsible cards (js/ui/quest-sheet.js). */
+const questSheet = createQuestSheet({
+  document,
+  questInfo: (classTsid) => {
+    const p = getQuestProgress(questState, classTsid);
+    return p ? { requirements: p.requirements, desc: p.def.desc, rewards: p.def.rewards } : null;
+  },
+  renderText: (el, markup) => renderQuestText(el, markup),
+  setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
+  // A card opened or closed in place is what the next draw makes: keep it (no redraw under the pointer).
+  onToggle: () => { questLogDrawn = document.getElementById('quest')?.innerHTML ?? questLogDrawn; },
+});
 
 function updateHud() {
   const spentRewardBuff = consumeRewardBuff(buffState, pc, Date.now());
@@ -4494,6 +4514,8 @@ function updateHud() {
     for (const p of log.slice(0, 40)) {
       const card = document.createElement('div');
       card.className = 'q-card' + (p.completed ? ' done' : '');
+      // VERBS: an active card names its quest, so the Quests sheet can show its step and rewards.
+      if (p.active) card.dataset.quest = p.def.classTsid;
       const title = document.createElement('div');
       title.className = 'q-title';
       title.textContent = p.def.title + (p.completed ? ' ✓' : '');
@@ -4637,6 +4659,8 @@ function updateHud() {
         catalog: Object.keys(getQuestCatalog()).length,
       });
     }
+    // VERBS (js/ui/quest-sheet.js): the Active, Offered and Done tabs, and cards that open and close.
+    questSheet.renderTabs(document.getElementById('quest-tabs'), questSheet.arrange(qBox));
     const drawn = qBox.innerHTML;
     if (drawn !== questLogDrawn) {
       qShown.replaceChildren(...qBox.childNodes);
@@ -22968,13 +22992,26 @@ function renderMakePanel() {
     if (ca !== cb) return ca - cb;
     return a.name.localeCompare(b.name);
   });
+  // VERBS: "Can make now" (on by default) leaves out what you can't make yet.
+  const canMakeEl = document.getElementById('make-canmake');
+  if (canMakeEl && canMakeEl.checked !== makeCanMakeOnly) canMakeEl.checked = makeCanMakeOnly;
+  const allRecipes = recipes.length;
+  if (makeCanMakeOnly) {
+    for (let i = recipes.length - 1; i >= 0; i--) {
+      const r = recipes[i];
+      if (!(canCraft(inv, r, opts).ok && pc.energy > recipeEnergyCost(r, opts.learned, pc.imaginationUpgrades))) recipes.splice(i, 1);
+    }
+  }
+  if (app?.canvas) app.canvas.dataset.makeShown = `${recipes.length}/${allRecipes}${makeCanMakeOnly ? ':canmake' : ''}`;
 
   if (meta) {
     meta.textContent = makeSelected
       ? `Uses ${recipeEnergyCost(RECIPE_CATALOG[makeSelected], skillState.learned, pc.imaginationUpgrades)} energy · energy now ${Math.floor(pc.energy)}`
       : makeToolFilter === 'fruit_changing_machine'
-        ? `${recipes.length} fruits · ${countItem(inv, 'cherry')} cherries ready · energy ${Math.floor(pc.energy)}`
-        : `${recipes.length} recipes · energy ${Math.floor(pc.energy)}`;
+        ? `${makeCanMakeOnly ? `${recipes.length} of ${allRecipes}` : recipes.length} fruits · ${countItem(inv, 'cherry')} cherries ready · energy ${Math.floor(pc.energy)}`
+        : makeCanMakeOnly
+          ? `${recipes.length} of ${allRecipes} recipes you can make now · energy ${Math.floor(pc.energy)}`
+          : `${recipes.length} recipes · energy ${Math.floor(pc.energy)}`;
   }
 
   // Detail view
@@ -23052,7 +23089,9 @@ function renderMakePanel() {
   list.hidden = false;
   list.innerHTML = '';
   if (!recipes.length) {
-    list.innerHTML = '<div class="make-empty">No recipes for this tool yet.</div>';
+    list.innerHTML = makeCanMakeOnly && allRecipes
+      ? '<div class="make-empty">Nothing you can make with this right now. Turn off Can make now to see every recipe.</div>'
+      : '<div class="make-empty">No recipes for this tool yet.</div>';
     return;
   }
 
@@ -24609,6 +24648,28 @@ async function main() {
     },
   });
   windowStack.install();
+  // VERBS: the panel shell: Quests, Make, Badges, Skills and Buffs are side sheets on the left (one at a
+  // time, --inset-l while open); the Map is its centred size.
+  if (MODERN_UI) {
+    panelShell = mountPanelShell({
+      root: document.getElementById('game-root'),
+      sheets: [
+        { id: 'quest-panel', close: () => closeQuestPanel() },
+        { id: 'make-panel', close: () => closeMakePanel() },
+        { id: 'achieve-panel', close: () => closeAchievePanel() },
+        { id: 'skills-panel', close: () => closeSkillsPanel() },
+        { id: 'buffs-panel', close: () => closeBuffsPanel() },
+        { id: 'map-panel', kind: 'center', close: () => closeMap() },
+      ],
+      setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
+    });
+  }
+  bindTabs(document.getElementById('quest-tabs'), {
+    onSelect: (tab) => {
+      questSheet.setTab(tab);
+      updateHud();
+    },
+  });
   syncCameraSafeArea();
   syncLocationViewHeight();
   window.addEventListener('resize', () => {
@@ -25854,6 +25915,11 @@ async function main() {
         packRow.closeSearch();
         return;
       }
+      // VERBS: Esc closes the topmost thing: a verb menu over a sheet goes first.
+      if (menuTarget) {
+        closeVerbMenu();
+        return;
+      }
       closeVerbMenu();
       closeMap();
       closeVendor();
@@ -26152,6 +26218,18 @@ async function main() {
     makeSearchQuery = event.target.value || '';
     makeSelected = null;
     renderMakePanel();
+  });
+  document.getElementById('make-canmake')?.addEventListener('change', (event) => {
+    makeCanMakeOnly = Boolean(event.target.checked);
+    makeSelected = null;
+    renderMakePanel();
+  });
+  // A checkbox is no text box: Esc on it closes Make, as Esc anywhere in the sheet does.
+  document.getElementById('make-canmake')?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    event.preventDefault();
+    event.stopPropagation();
+    closeMakePanel();
   });
   document.getElementById('vendor-btn')?.addEventListener('click', () => {
     if (!state.started) return;

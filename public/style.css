@@ -10337,4 +10337,357 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] #verb-menu .verb-menu-card,
   [data-ui="modern"] #pack-popover { animation: none; }
 }
+/* The panel shell (js/ui/panel-shell.js): side sheets on the left under the pills, 360 px (320 px
+   under 1100 px), a header with icon, title, key cap and close, tabs, a body that scrolls, a footer
+   line. Quests and Make are built as sheets; Badges, Skills and Buffs take the same frame. The Map
+   is the centred size of the shell. */
+@media (max-width: 1100px) { [data-ui="modern"] #game-root { --sheet-w: 320px; } }
+[data-ui="modern"] #game-root .ui-sheet:not(.ui-sheet-center),
+[data-ui="modern"] #game-root #achieve-panel,
+[data-ui="modern"] #game-root #skills-panel,
+[data-ui="modern"] #game-root #buffs-panel {
+  position: absolute;
+  inset: calc(var(--hud-h) + 6px) auto auto var(--hud-inset);
+  z-index: var(--z-panel);
+  width: var(--sheet-w);
+  max-width: calc(100% - 2 * var(--hud-inset));
+  max-height: calc(100% - var(--hud-h) - 6px - var(--pack-live-height, 72px) - 8px);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 0;
+  background: none;
+  backdrop-filter: none;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--fs-m);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-tight);
+  animation: ui-sheet-in var(--motion-med) var(--ease-out);
+}
+[data-ui="modern"] #game-root .ui-sheet[hidden],
+[data-ui="modern"] #game-root #achieve-panel[hidden],
+[data-ui="modern"] #game-root #skills-panel[hidden],
+[data-ui="modern"] #game-root #buffs-panel[hidden] { display: none !important; }
+@keyframes ui-sheet-in { from { opacity: 0; transform: translateX(-16px); } }
+[data-ui="modern"] #game-root .ui-sheet:not(.ui-sheet-center) > .ui-sheet-card,
+[data-ui="modern"] #game-root #achieve-panel > .side-card,
+[data-ui="modern"] #game-root #skills-panel > .side-card,
+[data-ui="modern"] #game-root #buffs-panel > .side-card {
+  flex: 0 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  max-height: none;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-3);
+}
+/* The panels that keep their own insides scroll as one. */
+[data-ui="modern"] #game-root #achieve-panel > .side-card,
+[data-ui="modern"] #game-root #skills-panel > .side-card,
+[data-ui="modern"] #game-root #buffs-panel > .side-card { display: block; overflow-y: auto; padding: 0 var(--space-4) var(--space-3); scrollbar-width: thin; }
+[data-ui="modern"] #game-root .ui-sheet-head,
+[data-ui="modern"] #game-root #achieve-panel .side-head,
+[data-ui="modern"] #game-root #skills-panel .side-head,
+[data-ui="modern"] #game-root #buffs-panel .side-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) var(--space-2) var(--space-2) var(--space-4);
+  background: none;
+  border: 0;
+}
+[data-ui="modern"] #game-root #achieve-panel .side-head,
+[data-ui="modern"] #game-root #skills-panel .side-head,
+[data-ui="modern"] #game-root #buffs-panel .side-head { margin: 0 calc(-1 * var(--space-2)) 0 calc(-1 * var(--space-4)); position: sticky; top: 0; z-index: var(--z-raised); background: var(--surface); }
+[data-ui="modern"] #game-root .ui-sheet-icon { width: 28px; height: auto; max-height: 28px; object-fit: contain; flex: none; }
+[data-ui="modern"] #game-root .ui-sheet-head h2,
+[data-ui="modern"] #game-root #achieve-panel .side-head h2,
+[data-ui="modern"] #game-root #skills-panel .side-head h2,
+[data-ui="modern"] #game-root #buffs-panel .side-head h2 {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-heavy);
+  line-height: var(--lh-tight);
+  color: var(--text);
+}
+[data-ui="modern"] #game-root .ui-sheet-head h2:focus,
+[data-ui="modern"] #game-root .ui-sheet-head h2:focus-visible,
+[data-ui="modern"] #game-root .side-head h2:focus,
+[data-ui="modern"] #game-root .side-head h2:focus-visible { outline: none; box-shadow: none; }
+[data-ui="modern"] #game-root .ui-sheet .kcap {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-heavy);
+  line-height: var(--lh-none);
+  color: var(--text-muted);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+}
+[data-ui="modern"] #game-root .ui-sheet-key { margin-right: 2px; flex: none; }
+[data-ui="modern"] #game-root .ui-sheet-x,
+[data-ui="modern"] #game-root #achieve-panel .side-head .verb-menu-x,
+[data-ui="modern"] #game-root #skills-panel .side-head .verb-menu-x,
+[data-ui="modern"] #game-root #buffs-panel .side-head .verb-menu-x {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--fs-2xl);
+  line-height: var(--lh-none);
+  cursor: pointer;
+}
+[data-ui="modern"] #game-root .ui-sheet-x:hover,
+[data-ui="modern"] #game-root .side-head .verb-menu-x:hover { background: var(--surface-hover); color: var(--text); }
+[data-ui="modern"] #game-root .ui-sheet-x:focus-visible,
+[data-ui="modern"] #game-root .side-head .verb-menu-x:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+/* Tabs: a segmented strip (the mock's). */
+[data-ui="modern"] #game-root .ui-sheet-tabs {
+  flex: none;
+  display: flex;
+  gap: 2px;
+  margin: 0 var(--space-4) var(--space-2);
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+}
+[data-ui="modern"] #game-root .ui-sheet-tabs [role="tab"] {
+  flex: 1;
+  height: 30px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: var(--fs-s);
+  font-weight: var(--fw-heavy);
+  cursor: pointer;
+}
+[data-ui="modern"] #game-root .ui-sheet-tabs [role="tab"]:hover { color: var(--text); }
+[data-ui="modern"] #game-root .ui-sheet-tabs [role="tab"][aria-selected="true"] { background: var(--surface-raised); color: var(--text); box-shadow: var(--shadow-1); }
+[data-ui="modern"] #game-root .ui-sheet-tabs [role="tab"]:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+[data-ui="modern"] #game-root .ui-sheet-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-1) var(--space-4) var(--space-3);
+  scrollbar-width: thin;
+}
+[data-ui="modern"] #game-root .ui-sheet-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: var(--fs-s);
+}
+[data-ui="modern"] #game-root .ui-sheet-foot .panel-meta { margin: 0; padding: 0; color: inherit; font-size: inherit; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+[data-ui="modern"] #game-root .ui-sheet-esc { flex: none; display: inline-flex; align-items: center; gap: 4px; }
+
+/* Quests: tabs and cards that open and close (js/ui/quest-sheet.js). */
+[data-ui="modern"] #quest.quest-log-body { margin: 0; font-size: var(--fs-m); display: flex; flex-direction: column; gap: var(--space-2); }
+[data-ui="modern"] #quest .q-card.qc,
+[data-ui="modern"] #quest .q-card.qc.done,
+[data-ui="modern"] #quest .q-card.qc.story-offer {
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--surface-raised);
+}
+[data-ui="modern"] #quest .q-card.qc[hidden] { display: none; }
+[data-ui="modern"] #quest .qc-head {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-m);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+[data-ui="modern"] #quest .qc-head:hover { background: var(--surface-hover); }
+[data-ui="modern"] #quest .qc-head:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+[data-ui="modern"] #quest .qc-head .q-title { margin: 0; font-size: var(--fs-l); font-weight: var(--fw-heavy); line-height: var(--lh-tight); color: var(--text); }
+[data-ui="modern"] #quest .qc-count { grid-row: 1 / span 2; grid-column: 2; align-self: center; font-weight: var(--fw-heavy); font-variant-numeric: tabular-nums; }
+[data-ui="modern"] #quest .qc-done { color: var(--good); font-size: var(--fs-s); }
+[data-ui="modern"] #quest .qc-step { grid-column: 1; font-size: var(--fs-s); color: var(--text-muted); }
+[data-ui="modern"] #quest .q-bar {
+  height: 6px;
+  margin: var(--space-1) 0 var(--space-2);
+  border: 0;
+  border-radius: 3px;
+  background: var(--track);
+  overflow: hidden;
+}
+[data-ui="modern"] #quest .q-bar > i { display: block; height: 100%; border-radius: inherit; background: var(--good); }
+[data-ui="modern"] #quest .qc-bar { margin: 0 var(--space-3) var(--space-3); }
+[data-ui="modern"] #quest .q-card.qc.is-open .qc-bar { margin-bottom: var(--space-2); }
+[data-ui="modern"] #quest .qc-body { display: none; padding: 0 var(--space-3) var(--space-3); line-height: var(--lh-body); }
+[data-ui="modern"] #quest .q-card.qc.is-open .qc-body { display: block; }
+[data-ui="modern"] #quest .qc-body .q-req { margin: 0 0 var(--space-1); color: var(--text); font-size: var(--fs-m); }
+[data-ui="modern"] #quest .qc-body .qc-desc { margin-bottom: var(--space-2); }
+[data-ui="modern"] #quest .qc-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: var(--space-2) 0; }
+[data-ui="modern"] #quest .qc-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 9px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  font-size: var(--fs-s);
+  font-weight: var(--fw-heavy);
+}
+[data-ui="modern"] #quest .qc-body .content-action-btn,
+[data-ui="modern"] #quest .q-card.qc.story-offer .content-action-btn {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  height: 32px;
+  margin: var(--space-1) var(--space-2) 0 0;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--accent-text);
+  font: inherit;
+  font-size: var(--fs-m);
+  font-weight: var(--fw-heavy);
+  cursor: pointer;
+}
+[data-ui="modern"] #quest .qc-body .content-action-btn:hover:not(:disabled) { background: var(--accent-hover); }
+[data-ui="modern"] #quest .qc-body .content-action-btn:disabled { background: var(--surface-sunken); border-color: var(--border); color: var(--text-muted); cursor: not-allowed; }
+[data-ui="modern"] #quest .qc-empty { margin: 0; padding: var(--space-6) var(--space-2); text-align: center; color: var(--text-muted); font-size: var(--fs-m); }
+
+/* Make: the tool strip (its fade in the sheet's colour), search and "Can make now", a 3-column grid. */
+[data-ui="modern"] #make-panel .make-tool-tabs { order: 3; flex: 1 1 100%; margin: var(--space-1) 0 0; padding-right: var(--space-2); }
+[data-ui="modern"] #make-panel .glitch-modal-tabs.make-tool-tabs::after { background: linear-gradient(to right, transparent, color-mix(in srgb, var(--surface) 85%, transparent)); }
+[data-ui="modern"] #make-panel .glitch-modal-tabs .make-tool-chip {
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  font-size: var(--fs-s);
+  font-weight: var(--fw-heavy);
+  padding: var(--space-1) var(--space-3);
+}
+[data-ui="modern"] #make-panel .glitch-modal-tabs .make-tool-chip.active { background: var(--accent-soft); color: var(--text); box-shadow: none; border-color: var(--border-strong); }
+[data-ui="modern"] #make-panel .glitch-modal-tabs .make-tool-chip.unowned { color: var(--text-subtle); }
+[data-ui="modern"] #make-panel .make-question { flex: none; margin: 0; padding: 0 var(--space-4) var(--space-2); color: var(--text-muted); font-size: var(--fs-s); font-weight: var(--fw-bold); }
+[data-ui="modern"] #make-panel .make-search-row { flex: none; display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 0 var(--space-4) var(--space-2); }
+[data-ui="modern"] #make-panel .make-search {
+  box-sizing: border-box;
+  width: 100%;
+  height: 34px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-m);
+}
+[data-ui="modern"] #make-panel .make-search::placeholder { color: var(--text-muted); opacity: 1; }
+[data-ui="modern"] #make-panel .make-search:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+[data-ui="modern"] #make-panel .make-canmake { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--fs-m); font-weight: var(--fw-bold); cursor: pointer; }
+[data-ui="modern"] #make-panel .make-canmake input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
+[data-ui="modern"] #make-panel .make-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  padding: 0;
+  min-height: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+[data-ui="modern"] #make-panel .make-tile {
+  min-height: 88px;
+  padding: var(--space-2) var(--space-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--surface-raised);
+  font: inherit;
+}
+[data-ui="modern"] #make-panel .make-tile:hover { border-color: var(--border-strong); box-shadow: none; background: var(--surface-hover); }
+[data-ui="modern"] #make-panel .make-tile:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+[data-ui="modern"] #make-panel .make-tile .tile-label { font-size: var(--fs-s); font-weight: var(--fw-heavy); color: var(--text); }
+[data-ui="modern"] #make-panel .make-tile .tile-req { font-size: var(--fs-xs); color: var(--text-muted); }
+[data-ui="modern"] #make-panel .make-empty { padding: var(--space-5) var(--space-2); text-align: center; color: var(--text-muted); font-size: var(--fs-m); }
+[data-ui="modern"] #make-panel .make-detail { margin-top: 0; }
+
+/* The Map: the shell's centred size (its own width, for the hub art), over a scrim. */
+[data-ui="modern"] #map-panel.ui-sheet-center { background: var(--scrim); backdrop-filter: none; }
+[data-ui="modern"] #map-panel .map-card.map-hub {
+  padding: 0 var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-3);
+  color: var(--text);
+  animation: ui-sheet-center-in var(--motion-med) var(--ease-out);
+}
+@keyframes ui-sheet-center-in { from { opacity: 0; transform: translateY(8px) scale(0.98); } }
+[data-ui="modern"] #map-panel .map-head { padding: var(--space-3) 0 var(--space-2); margin: 0 calc(-1 * var(--space-2)) 0 0; flex-wrap: nowrap; }
+[data-ui="modern"] #map-panel .map-head h2 { color: var(--text); }
+[data-ui="modern"] #map-panel .map-card.map-hub .map-sub { color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] #map-panel .map-card.map-hub .map-hint {
+  margin: var(--space-2) calc(-1 * var(--space-4)) 0;
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: var(--fs-s);
+  opacity: 1;
+}
+[data-ui="modern"] #map-panel .map-hint kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  font: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-heavy);
+  color: var(--text-muted);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-ui="modern"] #game-root .ui-sheet:not(.ui-sheet-center),
+  [data-ui="modern"] #game-root #achieve-panel,
+  [data-ui="modern"] #game-root #skills-panel,
+  [data-ui="modern"] #game-root #buffs-panel,
+  [data-ui="modern"] #map-panel .map-card.map-hub { animation: none; }
+}
 /* —— end VERBS —— */
