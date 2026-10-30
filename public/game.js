@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g478-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-362';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-363';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=g480-4';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=g481-1';
@@ -31,6 +31,7 @@ import {
   listQuestTracker,
   parseQuestConversation,
   cleanQuestMarkup,
+  questDoneAt,
 } from './js/quests.js?v=item-buffs-7';
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=g425-1';
@@ -130,16 +131,19 @@ import {
   WINTER_WALK_QUEST_ID,
   WINTER_WALK_REPEAT_QUEST_ID,
   WINTER_WALK_STREET_ID,
+  canOfferWinterWalk,
   collectWinterMote,
   createWinterWalkState,
   enterWinterHaven,
   expireWinterWalk,
+  failInterruptedWinterWalk,
   finishWinterWalk,
+  noteWinterWalkEnd,
   returnToWinterWalk,
   winterWalkObjective,
   winterWalkProgress,
   winterWalkRemainingMs,
-} from './js/winter-walk.js?v=winter-walk-3';
+} from './js/winter-walk.js?v=g482-2';
 import {
   SUMMERS_DAY_ANNEX_DOTS,
   SUMMERS_DAY_ANNEX_EXIT,
@@ -15671,6 +15675,14 @@ async function startWinterWalk(opts = {}) {
 
 function collectWinterWalkMote(entry) {
   if (!entry?.sprite || entry.collected || !winterWalkState) return false;
+  // The motes are iMG quoins in a place that keeps the daily quoin limit (items/quoin.js 159, 236-237).
+  if (quoinState.collectedToday >= quoinState.dailyLimit) {
+    if (!entry._limitNoticeAt || Date.now() - entry._limitNoticeAt > 5000) {
+      entry._limitNoticeAt = Date.now();
+      toast(`Wowza! You've reached today's ${quoinState.dailyLimit}-quoin limit.`);
+    }
+    return false;
+  }
   const result = collectWinterMote(
     winterWalkState,
     entry.stage,
@@ -15679,9 +15691,20 @@ function collectWinterWalkMote(entry) {
   );
   if (!result.ok) return false;
   entry.collected = true;
-  // The motes are iMG quoins (items/quoin.js 184): the mood bonus applies.
-  const amount = grantMoodXp(pc, result.amount);
+  // The motes are iMG quoins (items/quoin.js 184): the quoin multiplier and the mood bonus apply, and each counts today.
+  const quoin = collectQuoin(quoinState, 'xp', pc, { amount: result.amount });
+  const amount = quoin.ok ? quoin.actual : 0;
   winterWalkState.imgEarned += amount - result.amount;
+  if (quoin.hitLimit) {
+    // inc_stats.js stats_add_quoins_today 686-699, as a street quoin does (grabWorldQuoin).
+    playerRainbow(quoin.dailyLimit === 150 ? 'rainbow_150coinstoday' : 'rainbow_100coinstoday');
+    enqueueAward({
+      kind: 'achievement',
+      title: 'Quoin Limit Reached!',
+      body: `You gathered all ${quoin.dailyLimit} quoins available this game day.`,
+      subtitle: 'Numismatical!',
+    });
+  }
   const { x, y } = entry.sprite;
   if (entry.sprite.parent) entry.sprite.parent.removeChild(entry.sprite);
   if (!entry.sprite.destroyed) entry.sprite.destroy({ children: true });
@@ -15740,10 +15763,15 @@ async function returnFromWinterWalk({ abandon = false, expired = false } = {}) {
   const destination = winterWalkSourceLocation?.tsid
     ? { ...winterWalkSourceLocation }
     : { tsid: STREET_INDEX.default };
-  const questId = winterWalkState.repeat
+  const repeatWalk = Boolean(winterWalkState.repeat);
+  const questId = repeatWalk
     ? WINTER_WALK_REPEAT_QUEST_ID
     : WINTER_WALK_QUEST_ID;
-  if (abandon || expired) delete questState.active[questId];
+  if (abandon || expired) {
+    // winter_walk.js onExitLocation 96-107 / winter_walk_part2.js 88-100: leaving early fails the walk.
+    delete questState.active[questId];
+    noteWinterWalkEnd(questState, { repeat: winterWalkState.repeat, outcome: 'failed' });
+  }
   const status = expired ? 'expired' : abandon ? 'abandoned' : winterWalkState.status;
   closeQuestDialogue({ force: true });
   clearWinterAtmosphere();
@@ -15762,8 +15790,8 @@ async function returnFromWinterWalk({ abandon = false, expired = false } = {}) {
     savePlayerLocation(destination);
     savePlayerState();
     if (app?.canvas) app.canvas.dataset.winterWalkStatus = status;
-    if (expired) toast('The winter path faded. You can try the walk again.', 4000);
-    else if (abandon) toast('You leave the winter path for another time.', 3200);
+    if (expired) toast(repeatWalk ? 'The winter path faded. You can walk it again in an hour.' : 'The winter path faded. You can try the walk again.', 4000);
+    else if (abandon) toast(repeatWalk ? 'You leave the winter path. You can walk it again in an hour.' : 'You leave the winter path for another time.', 3200);
     updateHud();
     return true;
   } finally {
@@ -15779,6 +15807,7 @@ async function completeWinterWalk() {
     ? WINTER_WALK_REPEAT_QUEST_ID
     : WINTER_WALK_QUEST_ID;
   if (result.iceReward) addItem(inv, 'ice', result.iceReward);
+  noteWinterWalkEnd(questState, { repeat: winterWalkState.repeat, outcome: 'complete' });
   const active = questState.active?.[questId];
   if (active) active.progress.leave = 1;
   const completed = active ? completeQuest(questState, questId, pc) : null;
@@ -21586,11 +21615,15 @@ function canOfferStoryQuest(classTsid) {
       !rookMuseumIsInstanced()
     );
   }
-  if (classTsid === WINTER_WALK_REPEAT_QUEST_ID) {
-    return questState.completed.includes(WINTER_WALK_QUEST_ID) && !winterWalkIsInstanced();
-  }
-  if (classTsid === WINTER_WALK_QUEST_ID) {
-    return !questState.completed.includes(WINTER_WALK_QUEST_ID) && !winterWalkIsInstanced();
+  if (classTsid === WINTER_WALK_QUEST_ID || classTsid === WINTER_WALK_REPEAT_QUEST_ID) {
+    // Live report 2026-10-30 #7: the source's prerequisites and hour waits (js/winter-walk.js canOfferWinterWalk).
+    const demo = String(new URLSearchParams(location.search).get('questdemo') || '');
+    return canOfferWinterWalk(questState, {
+      repeat: classTsid === WINTER_WALK_REPEAT_QUEST_ID,
+      level: pc.level,
+      summersDayDoneAt: Math.max(ensureSummersDayStory(questState).firstCompletedAt, questDoneAt(questState, SUMMERS_DAY_QUEST_ID)),
+      bypassCooldown: demo.startsWith('winter'),
+    }).ok && !winterWalkIsInstanced();
   }
   if (questState.completed.includes(classTsid)) return false;
   if (classTsid === LEGALIZE_QUEST_ID) return !legalizeIsInstanced();
@@ -25301,6 +25334,8 @@ async function main() {
     restoreAnimalStateCache();
     rehydrateSavedBuffs();
     dropBootStarterQuests(questState);
+    // A Winter Walk still in the log was lost with the page: the source counts that as leaving it.
+    failInterruptedWinterWalk(questState, Date.now());
     const mainQuests = ['animalkinship_pet_piggies'];
     state.questDone = mainQuests.every((id) => questState.completed.includes(id));
     handleSkillCompletions(tickSkillStudy(skillState, Date.now()).completed, { offline: true });

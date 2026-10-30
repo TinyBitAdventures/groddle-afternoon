@@ -33,8 +33,8 @@ import {
 } from '../public/js/juju-bandits.js';
 import { DROP_TABLES } from '../public/js/drop-tables.js';
 import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=g403-1';
-import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js';
-import { FEATURES } from '../public/js/features/index.js?v=registry-362';
+import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=g482-2';
+import { FEATURES } from '../public/js/features/index.js?v=registry-363';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=g403-1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

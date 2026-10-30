@@ -74,7 +74,7 @@ import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.j
 import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=g482-1';
 import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js?v=g482-1';
 import { BUTLER_FEET, ButlerPainter, clipRange, drawList } from '../public/js/butler-rig.js';
-import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js';
+import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=g482-2';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=g403-1';
 import { npcQuestOffers, pendingQuestOffers } from '../public/js/quest-offers.js?v=g403-1';
 import { createQuestState } from '../public/js/quests.js';

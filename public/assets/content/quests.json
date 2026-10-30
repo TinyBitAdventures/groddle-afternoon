@@ -30942,6 +30942,11 @@
     "condition": "completed_quest",
     "value": "puzzle_level_color_blockage",
     "not": 0
+   },
+   {
+    "condition": "custom_code",
+    "value": "hour_after:puzzle_level_color_blockage",
+    "not": 0
    }
   ],
   "endNpcs": [],
@@ -30958,6 +30963,7 @@
    }
   ],
   "instanceRoom": "color_unblocking",
+  "offerNote": "canOffer: an hour after part 1 and after the last repeat or fail",
   "solo": true
  },
  "puzzle_level_light_perspective": {

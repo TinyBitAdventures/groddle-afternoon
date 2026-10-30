@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 833,
+  "commits": 834,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "Online, a new house's starter furniture no longer sets off a pack correction on every save"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "fix",
     "text": "You can walk, jump and act on the world while Quests, Make or another side sheet is open"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "The pack stays centred when a sheet or the Social drawer opens, and moves aside only when one reaches down to it"
    }
   ]
  },
- "tests": 466,
+ "tests": 467,
  "generatedAt": "2026-10-30"
 }

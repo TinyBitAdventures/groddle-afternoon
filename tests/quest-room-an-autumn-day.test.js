@@ -10,7 +10,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import * as kit from '../public/js/quest-rooms/kit.js?v=g458-1';
-import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js';
+import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=g482-2';
 import { questSceneTsid } from '../public/js/quest-instance.js';
 import {
   AUTUMN_MS,

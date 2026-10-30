@@ -15,7 +15,7 @@ import { CHECKLIST } from '../tools/restoration/checklist.mjs';
 import { NO_PLAY, PLAY_ROUTES, playFor, playRoute } from '../tools/restoration/play-links.mjs';
 import { DESIGNER_LEVELS, TEXT_LEVELS, DESIGNERS } from '../tools/restoration/designer-levels.mjs';
 import { SHOTS } from '../tools/restoration/shots.mjs';
-import { BUILT_ROOMS } from '../public/js/quest-rooms/catalog.js';
+import { BUILT_ROOMS } from '../public/js/quest-rooms/catalog.js?v=g482-2';
 import { PARADISE_COURSES } from '../public/js/paradise-flight.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

@@ -195,6 +195,11 @@ export const OFFER_OVERRIDES = Object.freeze({
     offerTriggers: [{ type: 'npc', npc: 'npc_smuggler' }],
     why: 'no offer trigger survives; the give Smuggler offers it after a delivery (smuggling-feature.js checks the shovel/ace_of_spades onStarted gate)',
   },
+  // Live report 2026-10-30 #7: the Play Cube offered it again at once (puzzle_level_color_blockage_rem.js canOffer 70-82).
+  puzzle_level_color_blockage_rem: {
+    prerequisites: [{ condition: 'custom_code', value: 'hour_after:puzzle_level_color_blockage', not: 0 }],
+    why: 'canOffer: an hour after part 1 and after the last repeat or fail',
+  },
   btc_room_3_reminisce: {
     prerequisites: [{ condition: 'custom_code', value: 'hour_after:btc_room_3', not: 0 }],
     why: 'canOffer: an hour after part 1 and after the last repeat or fail',

@@ -32,7 +32,7 @@ import {
   QUEST_ROOMS,
   builtInstanceQuests,
   roomModulePath,
-} from '../public/js/quest-rooms/catalog.js';
+} from '../public/js/quest-rooms/catalog.js?v=g482-2';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=g403-1';
 import * as kit from '../public/js/quest-rooms/kit.js?v=g458-1';
 
@@ -261,7 +261,7 @@ describe('The Wrizzards and The Rube (rube_yard)', () => {
   });
 
   it('registers the Play Cube for the pack catalog', async () => {
-    const { ROOM_ITEMS } = await import('../public/js/quest-rooms/catalog.js');
+    const { ROOM_ITEMS } = await import('../public/js/quest-rooms/catalog.js?v=g482-2');
     assert.equal(ROOM_ITEMS.play_cube.label, 'Play Cube');
     assert.equal(ROOM_ITEMS.play_cube.stackMax, 1);
     assert.equal(ROOM_ITEMS.play_cube.sellable, false);
@@ -337,7 +337,7 @@ describe('Le Misérable (le_miserable)', () => {
 
 describe('G99: the retry prompt names whoever offered the quest', () => {
   it('questGiver: NPC and pack-item givers, the Magic Rock for familiar offers', async () => {
-    const { questGiver, FAMILIAR_GATES, GIVER_LABELS } = await import('../public/js/quest-rooms/catalog.js');
+    const { questGiver, FAMILIAR_GATES, GIVER_LABELS } = await import('../public/js/quest-rooms/catalog.js?v=g482-2');
     const quests = JSON.parse(readFileSync(new URL('../public/assets/content/quests.json', import.meta.url), 'utf8'));
     const def = (id) => (Array.isArray(quests) ? quests : quests.quests || Object.values(quests)).find((q) => (q.classTsid || q.id) === id);
     assert.deepEqual(questGiver(def('join_club')), { npc: 'bag_butler', label: 'Butler' });
@@ -388,7 +388,7 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
   };
 
   it('a run lost to a reload marks a startable quest failed, not a retry prompt', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g470-1');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g482-2');
     const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=g403-1');
     assert.equal(getQuestCatalog().mental_block?.needsStart, true);
     assert.notEqual(getQuestCatalog().help_juju_bandits?.needsStart, true, 'no onStarted in GSJS');
@@ -452,7 +452,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('a reload removes a source-removed quest and its offers, and keeps the prompt for the three', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g470-1');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g482-2');
     const { questStatus } = await import('../public/js/quest-offers.js?v=g403-1');
     const t = Date.now() - 60_000;
     questInstancesFeature.restore({ memory: {}, retry: { tower_quest: t, le_miserable_part_2: t, smuggle_the_smuggler_part2: t } });
@@ -480,7 +480,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('has no map card', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g470-1');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=g482-2');
     assert.equal(questInstancesFeature.mapCards, undefined);
     const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
     assert.doesNotMatch(src, /Unfinished quest places/);

@@ -24,7 +24,7 @@ import {
   questRewardSummary,
   listQuestLog,
 } from '../public/js/quests.js';
-import { builtInstanceQuests } from '../public/js/quest-rooms/catalog.js';
+import { builtInstanceQuests } from '../public/js/quest-rooms/catalog.js?v=g482-2';
 import {
   OFFER_INTERVAL_MS,
   COUNTER_ROUTES,

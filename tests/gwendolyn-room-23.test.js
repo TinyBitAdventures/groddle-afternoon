@@ -16,7 +16,7 @@ import * as kit from '../public/js/quest-rooms/kit.js?v=g458-1';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=g403-1';
 import { acceptOffer, ensureQuestOfferState, npcQuestOffers, pendingQuestOffers, turnInQuest } from '../public/js/quest-offers.js?v=g403-1';
 import { XP_FOR_LEVEL } from '../public/js/progression.js';
-import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js';
+import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=g482-2';
 import { GREETERBOT } from '../public/js/tower-mid-rooms.js';
 import { ROOM_23_FILES } from '../public/js/gwendolyn-room-23-art.js';
 import { GWENDOLYN_INNER_FILES } from '../public/js/quest-rooms/gwendolyn-inner-art.js';
