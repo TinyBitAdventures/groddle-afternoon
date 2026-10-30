@@ -6,7 +6,7 @@
  * avatar still (game.js ownerPortraitUrl) for the pictures the 2012 chrome showed.
  */
 import { installClassicFrame } from './classic-frame.js?v=g468-9';
-import { installClassicTopbar } from './classic-topbar.js?v=g468-9';
+import { installClassicTopbar } from './classic-topbar.js?v=g468-10';
 import { installClassicGrowl } from './classic-growl.js?v=g468-9';
 import { installClassicHub } from './classic-hub.js?v=g468-9';
 
@@ -16,7 +16,7 @@ export function installClassicChrome({ doc = globalThis.document, win = globalTh
   if (installed) return installed;
   installed = {
     frame: installClassicFrame({ doc, win }),
-    topbar: installClassicTopbar({ doc, win }),
+    topbar: installClassicTopbar({ doc, win, avatarPortrait }),
     growl: installClassicGrowl({ doc, win }),
     hub: installClassicHub({ doc, win, engine, avatarPortrait }),
   };

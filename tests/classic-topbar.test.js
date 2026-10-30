@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { shareFromDash, rampStop, moodState, volumeFrame, dateLines, energyText } from '../public/js/classic/classic-topbar.js?v=g468-9';
+import { shareFromDash, rampStop, moodState, volumeFrame, dateLines, energyText, faceName } from '../public/js/classic/classic-topbar.js?v=g468-10';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -51,5 +51,20 @@ describe('Classic top bar', () => {
     assert.equal(energyText('Energy 80/100'), '80/100');
     assert.equal(energyText('Energy 1,200/1,500'), '1,200/1,500');
     assert.equal(energyText(''), '');
+  });
+
+  it('the name over the face: at most 11 characters, none solo (PlayerInfoUI.as 672-694)', () => {
+    assert.equal(faceName('Ada'), 'Ada');
+    assert.equal(faceName('Bartholomew Smythe'), 'Bartholome…');
+    assert.equal([...faceName('Bartholomew Smythe')].length, 11);
+    assert.equal(faceName(''), '');
+    assert.equal(faceName(undefined), '');
+  });
+
+  it('the face is your avatar: the game\'s own still, handed in by game.js', () => {
+    const src = readFileSync(join(root, 'public/js/classic/classic-topbar.js'), 'utf8');
+    assert.match(src, /avatarPortrait\(\)/);
+    assert.match(readFileSync(join(root, 'public/game.js'), 'utf8'), /installInterfaceSettings\(\{ engine, avatarPortrait: ownerPortraitUrl \}\);/);
+    assert.match(readFileSync(join(root, 'public/css/classic.css'), 'utf8'), /\[data-classic-face="avatar"\]::after \{[^}]*var\(--classic-face\)/);
   });
 });

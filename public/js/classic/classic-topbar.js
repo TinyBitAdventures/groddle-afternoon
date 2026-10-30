@@ -16,7 +16,8 @@
  * - the three-line date block (DateTimeUI.as 49-74) from #dametime-clock;
  * - the help button (GameHeaderUI.as 72-82: it shows the hotkey sheet);
  * - the volume icon's frame (AudioControl.as 214-229) from the Sound sliders and mute;
- * - the day's quoins as a row in the player menu (open question 9).
+ * - the day's quoins as a row in the player menu (open question 9);
+ * - the face's avatar, and the player's name over it online.
  */
 import { uiState, onUiModeChange } from './ui-mode.js?v=g468-9';
 import { classicArtUrl } from './classic-art.js?v=g468-9';
@@ -93,7 +94,14 @@ function el(doc, tag, attrs = {}, text = '') {
   return node;
 }
 
-export function installClassicTopbar({ doc = globalThis.document, win = globalThis } = {}) {
+/** PURE: the name over the face, at most 11 characters (PlayerInfoUI.as 672-694), or '' (solo has none). */
+export function faceName(name, max = 11) {
+  const n = String(name || '').trim();
+  if (!n) return '';
+  return [...n].length > max ? `${[...n].slice(0, max - 1).join('')}…` : n;
+}
+
+export function installClassicTopbar({ doc = globalThis.document, win = globalThis, avatarPortrait = null } = {}) {
   const energyBtn = doc.querySelector('.top-bar .meta-pill.energy');
   const moodBtn = doc.querySelector('.top-bar .meta-pill.mood');
   const actions = doc.querySelector('.top-bar .hud-actions');
@@ -209,11 +217,47 @@ export function installClassicTopbar({ doc = globalThis.document, win = globalTh
   }
   for (const id of ['sfx-volume', 'music-volume']) doc.getElementById(id)?.addEventListener('input', syncVolume);
 
+  // The face: your avatar (game.js ownerPortraitUrl, the still the home card draws), the head in the
+  // circle as PlayerFaceUI drew it (the avatar at .8, masked to the circle). Redrawn when the look
+  // changes (the Look builder closing) and now and then; the still is cached by look.
+  let faceUrl = '';
+  async function syncFace() {
+    if (!moodBtn || !classic() || typeof avatarPortrait !== 'function') return;
+    let url = '';
+    try { url = (await avatarPortrait()) || ''; } catch { url = ''; }
+    if (url === faceUrl) return;
+    faceUrl = url;
+    if (url) {
+      moodBtn.style.setProperty('--classic-face', `url("${url}")`);
+      moodBtn.dataset.classicFace = 'avatar';
+    } else {
+      moodBtn.style.removeProperty('--classic-face');
+      delete moodBtn.dataset.classicFace;
+    }
+  }
+  // The name over the face online; the level solo (no player name there).
+  function syncName() {
+    const btn = doc.getElementById('player-menu-btn');
+    if (!btn) return;
+    const name = classic() ? faceName(globalThis.GRODDLE_MP_BOOT?.player?.name) : '';
+    if (name) btn.dataset.classicName = name;
+    else delete btn.dataset.classicName;
+  }
+  const avatarPanel = doc.getElementById('avatar-panel');
+  if (avatarPanel && typeof win.MutationObserver === 'function') {
+    new win.MutationObserver(() => { if (avatarPanel.hidden) syncFace(); }).observe(avatarPanel, { attributes: true, attributeFilter: ['hidden'] });
+  }
+  win.setInterval?.(syncFace, 20000);
+
   const show = (state) => {
     const on = state.mode === 'classic';
     // Inline display, not [hidden]: an SVG has no hidden property, and Modern has no rule for these.
     for (const n of added) n.style.display = on ? '' : 'none';
-    if (on) sync();
+    syncName();
+    if (on) {
+      sync();
+      syncFace();
+    }
   };
   onUiModeChange(show);
   show(uiState());

@@ -1101,3 +1101,20 @@
 @media (prefers-reduced-motion: reduce) {
   :root[data-ui="classic"] #game-root .classic-hub { animation: none; }
 }
+
+/* == The face's avatar (PlayerFaceUI.as 117-118, 222-224: the avatar at .8, offset (10, 8), masked to
+   the circle): the player's own still (game.js ownerPortraitUrl), its head filling the face. Under
+   20% the client's low-mood colour matrix, here a desaturation. The level pill shows the player's
+   name online (js/classic/classic-topbar.js). */
+:root[data-ui="classic"] .top-bar .meta-pill.mood[data-classic-face="avatar"]::after {
+  inset: 0;
+  background: var(--classic-face) 50% 14% / 140% auto no-repeat;
+}
+:root[data-ui="classic"] .top-bar .meta-pill.mood[data-classic-face="avatar"][data-classic-mood="low"]::after { filter: saturate(0.45) brightness(0.85); }
+:root[data-ui="classic"] .top-bar #player-menu-btn[data-classic-name] .level-meter { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+:root[data-ui="classic"] .top-bar #player-menu-btn[data-classic-name]::after {
+  content: attr(data-classic-name);
+  color: var(--c-classic-title);
+  font: 800 var(--fs-classic-body)/var(--lh-snug) var(--font-classic-title);
+  white-space: nowrap;
+}

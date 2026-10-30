@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 796,
+  "commits": 797,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "Classic's hub clouds show their pictures: your avatar, the teleport art, your home street and the street you are on"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "new",
     "text": "The top bar is three floating pills: your energy, mood and level rings, the street's name, and the game's buttons with key caps"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Panels, cards and menus take the warm paper look: cream surfaces, brown text, a purple accent and warm shadows"
    }
   ]
  },
