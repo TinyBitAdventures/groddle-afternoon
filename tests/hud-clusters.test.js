@@ -63,6 +63,7 @@ describe('top bar clusters', () => {
 
   it('writes the mood and energy numbers beside the bars and on hover', () => {
     assert.match(game, /\['stat-mood', 'Mood', pc\.mood, moodMax\(pc\)\], \['stat-energy', 'Energy', pc\.energy, energyCap\(\)\]/);
-    assert.match(game, /num\.parentElement\.title = `\$\{label\} \$\{text\}`;/);
+    // g458: the title says the state in words and offers the click (js/vitals.js vitalTitle).
+    assert.match(game, /pill\.title = vitalTitle\(stat, text, level\);/);
   });
 });

@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 763,
+  "commits": 764,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "The game fills the window and shows more world on bigger screens"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-29",
     "kind": "improve",
     "text": "Butterflies draw sharp on Retina again, from Tiny Speck's CC0 SWF"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "new",
-    "text": "The Bureaucratic Halls greet you, make you wait, and serve you"
    }
   ]
  },
- "tests": 428,
+ "tests": 429,
  "generatedAt": "2026-10-30"
 }

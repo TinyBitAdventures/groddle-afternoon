@@ -652,6 +652,8 @@ import {
   cameraWorldHeightForGround,
 } from './js/movement.js?v=movement-6';
 import { renderResolution, RESOLUTION_STEP } from './js/render-density.js';
+// g458: low energy and mood turn amber and red, and a click offers something from the pack.
+import { vitalLevel, vitalMenuEmpty, vitalMenuHeading, vitalSnacks, vitalTitle } from './js/vitals.js?v=g458-2';
 import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap } from './js/location-view.js?v=g458-1';
 import {
   levelInfoForXp,
@@ -1382,6 +1384,112 @@ function clientShortcutKey(e) {
     return true;
   }
   return false;
+}
+
+/** The vitals menu (installVitalsMenu): which stat it is open for, and the meter that opened it. */
+let vitalsMenuFor = null;
+let vitalsMenuPill = null;
+
+/** Redraw the open vitals menu (after an eat, or when the pack changes); a no-op when closed. */
+function refreshVitalsMenu() {
+  const menu = document.getElementById('vitals-menu');
+  if (!menu || menu.hidden || !vitalsMenuFor) return;
+  const stat = vitalsMenuFor;
+  const snacks = vitalSnacks({ inv, stat, useInfoFor: getPackUseInfo });
+  const max = stat === 'mood' ? moodMax(pc) : energyCap();
+  const now = stat === 'mood' ? pc.mood : pc.energy;
+  const unit = stat === 'mood' ? 'mood' : 'energy';
+  const key = `${stat}|${Math.round(now)}|${snacks.map((s) => `${s.classTsid}:${s.count}`).join(',')}`;
+  if (menu.dataset.key === key) return;
+  menu.dataset.key = key;
+  menu.dataset.stat = stat;
+  const rows = snacks.map((s) => {
+    const label = ITEM_CATALOG[s.classTsid]?.label || s.classTsid;
+    return `<button type="button" class="vitals-snack" data-vital-use="${escapeHtml(s.classTsid)}" title="${escapeHtml(`${s.verb} a ${label}`)}">
+        <img src="${escapeHtml(itemIconUrl(s.classTsid))}" alt="" />
+        <span class="vitals-snack-name">${escapeHtml(label)} <small>×${s.count}</small></span>
+        <b>+${Math.round(s.gain)} ${unit}</b>
+      </button>`;
+  }).join('');
+  menu.innerHTML = `<div class="vitals-menu-head"><strong>${escapeHtml(vitalMenuHeading(stat))}</strong><span>${Math.round(now)}/${Math.round(max)}</span></div>
+    ${rows || `<p class="vitals-menu-empty">${escapeHtml(vitalMenuEmpty(stat))}</p>`}`;
+}
+
+/**
+ * g458 (Austin's UI audit 2): a click (or Enter) on the top bar's Energy or
+ * Mood offers what in the pack would raise it, best first; a pick eats or
+ * drinks one through the pack's own Eat / Drink (usePackItem).
+ */
+function installVitalsMenu() {
+  const bar = document.querySelector('header.top-bar');
+  if (!bar || document.getElementById('vitals-menu')) return;
+  const menu = document.createElement('div');
+  menu.id = 'vitals-menu';
+  menu.className = 'vitals-menu';
+  menu.hidden = true;
+  menu.setAttribute('role', 'dialog');
+  menu.setAttribute('aria-label', 'Something from your pack');
+  bar.appendChild(menu);
+  const close = (focusBack = false) => {
+    if (menu.hidden) return;
+    menu.hidden = true;
+    menu.dataset.key = '';
+    vitalsMenuPill?.setAttribute('aria-expanded', 'false');
+    if (focusBack) vitalsMenuPill?.focus();
+    vitalsMenuFor = null;
+  };
+  const open = (stat, pill) => {
+    if (!menu.hidden && vitalsMenuFor === stat) {
+      close();
+      return;
+    }
+    vitalsMenuPill?.setAttribute('aria-expanded', 'false');
+    vitalsMenuFor = stat;
+    vitalsMenuPill = pill;
+    menu.hidden = false;
+    menu.dataset.key = '';
+    const b = bar.getBoundingClientRect();
+    const r = pill.getBoundingClientRect();
+    menu.style.left = `${Math.max(6, Math.round(r.left - b.left - 8))}px`;
+    pill.setAttribute('aria-expanded', 'true');
+    refreshVitalsMenu();
+    menu.querySelector('button')?.focus();
+  };
+  for (const stat of ['energy', 'mood']) {
+    const pill = bar.querySelector(`.meta-pill.${stat}`);
+    if (!pill) continue;
+    pill.tabIndex = 0;
+    pill.setAttribute('role', 'button');
+    pill.setAttribute('aria-haspopup', 'dialog');
+    pill.setAttribute('aria-controls', 'vitals-menu');
+    pill.setAttribute('aria-expanded', 'false');
+    pill.addEventListener('click', () => open(stat, pill));
+    pill.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      // Not the game's Enter (verbs) or Space (jump).
+      e.preventDefault();
+      e.stopPropagation();
+      open(stat, pill);
+    });
+  }
+  menu.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-vital-use]');
+    if (!btn) return;
+    usePackItem(btn.dataset.vitalUse, 1);
+    menu.dataset.key = '';
+    refreshVitalsMenu();
+    (menu.querySelector(`[data-vital-use="${btn.dataset.vitalUse}"]`) || menu.querySelector('button'))?.focus();
+  });
+  menu.addEventListener('keydown', (e) => {
+    // The menu's own keys stay out of the game (Space jumps, Enter runs verbs).
+    if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
+  });
+  document.addEventListener('pointerdown', (e) => {
+    if (!menu.hidden && !e.target.closest('#vitals-menu, .meta-pill.energy, .meta-pill.mood')) close();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !menu.hidden) close(true);
+  });
 }
 
 function installPlayerMenu() {
@@ -4378,8 +4486,15 @@ function updateHud() {
     const text = `${Math.round(Number(now) || 0)}/${Math.round(Number(max) || 0)}`;
     if (num.textContent === text) continue;
     num.textContent = text;
-    num.parentElement.title = `${label} ${text}`;
+    // g458 (js/vitals.js): amber under 20%, red with a slow pulse under 10%, said in words too.
+    const stat = label === 'Mood' ? 'mood' : 'energy';
+    const level = vitalLevel(now, max);
+    const pill = num.parentElement;
+    pill.dataset.vital = level;
+    pill.title = vitalTitle(stat, text, level);
+    pill.setAttribute('aria-label', pill.title);
   }
+  refreshVitalsMenu();
 
   // Dual-row pack: items (top) + tools (bottom), currants already set above
   syncEmotionalBearCatalog();
@@ -24367,6 +24482,13 @@ async function main() {
     pc.xp = 6080;
     pc.level = 5;
   }
+  // g458 vitals QA: &vitalsdemo=<energy>,<mood> starts at those numbers (e.g. 6,15: energy red, mood amber).
+  if (bootParams.has('vitalsdemo')) {
+    const [energy, mood] = String(bootParams.get('vitalsdemo')).split(',').map(Number);
+    // A QA start value, not a loss: no metabolics door (tests/metabolic-loss.test.js ratchet).
+    if (Number.isFinite(energy)) pc.energy = Math.min(energyCap(), Math.max(0, energy));
+    if (Number.isFinite(mood)) pc.mood = Math.min(moodMax(pc), Math.max(0, mood));
+  }
   if (bootParams.has('quoinmult')) {
     quoinState.multiplier = clamp(Number(bootParams.get('quoinmult')) || 1, 1, 100);
   }
@@ -26041,6 +26163,7 @@ async function main() {
   }
   installMoreMenu();
   installPlayerMenu();
+  installVitalsMenu();
   document.querySelector('.top-actions')?.addEventListener('click', () => {
     if (currentAction) cancelCurrentAction({ quiet: true });
     closePackPopover();
