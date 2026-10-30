@@ -56,8 +56,14 @@ let look = { x: 0, y: 0 };
 let listeners = null;
 let overlay = null;
 
+/**
+ * The client refused Camera Mode only with no location or a location flagged no_camera_mode
+ * (TSFrontController.as maybeStartCameraManUserMode 2064-2078), so quest instances and the rebuilt
+ * rooms such as Winter Walk allow it (Austin 2026-10-30). Every archived street that sets the flag
+ * sets it false. An instance's arrival or exit still holds it, like any input.
+ */
 function blocked(engine) {
-  return engine.busy({ ignoreHome: true }) || engine.acting() || engine.inScene() || Boolean(engine.instanceHold) || engine.transientInstance?.();
+  return engine.busy({ ignoreHome: true, ignoreInstance: true }) || engine.acting() || Boolean(engine.instanceHold) || Boolean(engine.street?.noCameraMode);
 }
 
 /** G231: a house edit mode is open (homes-feature homeEditMode: cultivate or decorate). */
@@ -196,7 +202,7 @@ export const cameraModeFeature = {
   onTick(dtMs, now, engine) {
     if (!active) return;
     // Anything that takes over the screen ends Camera Mode.
-    if (engine.busy({ ignoreHome: true }) || engine.acting()) {
+    if (engine.busy({ ignoreHome: true, ignoreInstance: true }) || engine.acting()) {
       setActive(engine, false);
       return;
     }

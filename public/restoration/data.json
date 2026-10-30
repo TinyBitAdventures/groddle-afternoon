@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 834,
+  "commits": 835,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "Leaving Winter Walk early no longer lets its motes be gathered again and again"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "Feat and the vendors open as side sheets on the left, with a header, a body that scrolls and a footer"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "You can walk, jump and act on the world while Quests, Make or another side sheet is open"
    }
   ]
  },

@@ -187,7 +187,7 @@ describe('game.js wiring', () => {
   it('it locks the avatar and counts as busy', () => {
     const blocked = game.slice(game.indexOf('function gameplayInputBlocked()'), game.indexOf('function publishJumpState('));
     assert.match(blocked, /isVogOpen\(\) \|\|/);
-    const busy = game.slice(game.indexOf('  busy({ ignoreHome = false } = {}) {'), game.indexOf('  /** A verb in progress or the verb menu open'));
+    const busy = game.slice(game.indexOf('  busy({ ignoreHome = false, ignoreInstance = false } = {}) {'), game.indexOf('  /** A verb in progress or the verb menu open'));
     assert.match(busy, /isVogOpen\(\) \|\|/);
   });
 

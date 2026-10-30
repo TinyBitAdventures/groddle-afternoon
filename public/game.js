@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g478-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-363';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-368';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=g480-4';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=g481-1';
@@ -10248,15 +10248,15 @@ const engine = {
   /** Player verbs: the Emotional Bear's upgrades (kiss, moon), for the player menu's emotes. */
   emotionalBearUpgrades: () => [...(emotionalBearState.upgrades || [])],
   /** `{ ignoreHome: true }` lets a feature (Camera Mode) run at home while panels and verbs still block it. */
-  busy({ ignoreHome = false } = {}) {
+  busy({ ignoreHome = false, ignoreInstance = false } = {}) {
     return Boolean(
       currentAction ||
         menuTarget ||
         isQuestDialogueOpen() ||
         isScreenFxBlocking() ||
         isVogOpen() ||
-        anyTransientInstance() ||
-        engine.inScene() ||
+        // ignoreInstance: being in a quest instance or rebuilt room is not busy (Camera Mode works there).
+        (!ignoreInstance && (anyTransientInstance() || engine.inScene())) ||
         engine.instanceHold ||
         (!ignoreHome && homeIsInstanced()) ||
         // Any open panel (Feat, quests, make, vendor, map, mailbox, ...).

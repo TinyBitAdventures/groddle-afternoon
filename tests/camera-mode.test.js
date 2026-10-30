@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CAMERA_RANGE, EYEBALLERY_SKILL, cameraRange, stepLook } from '../public/js/features/camera-mode-feature.js';
+import { CAMERA_RANGE, EYEBALLERY_SKILL, cameraRange, stepLook } from '../public/js/features/camera-mode-feature.js?v=g484-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -39,5 +39,23 @@ describe('camera mode', () => {
   it('the Eyeballery note no longer says the camera is missing', async () => {
     const { SKILL_REMAKE_NOTES } = await import('../public/js/skill-tree.js?v=g403-1');
     assert.equal(SKILL_REMAKE_NOTES.Eyeballery.status, 'live');
+  });
+});
+
+describe('camera mode in quest instances', () => {
+  const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../public/js/features/camera-mode-feature.js'), 'utf8');
+  const body = src.slice(src.indexOf('function blocked('), src.indexOf('\n}', src.indexOf('function blocked(')) + 2);
+  it('starts in an instance, as the client allowed (only no_camera_mode refused it)', () => {
+    assert.doesNotMatch(body, /transientInstance/);
+    assert.match(body, /engine\.busy\(\{ ignoreHome: true, ignoreInstance: true \}\)/, 'busy() counts an instance as busy unless asked not to');
+    assert.match(body, /engine\.street\?\.noCameraMode/);
+  });
+  it('starts in a rebuilt room too, and still waits out an instance arrival or exit', () => {
+    assert.doesNotMatch(body, /inScene/);
+    assert.match(body, /engine\.instanceHold/);
+  });
+  it('does not end itself every tick inside an instance', () => {
+    const tick = src.slice(src.indexOf('onTick('), src.indexOf('onTick(') + 400);
+    assert.match(tick, /engine\.busy\(\{ ignoreHome: true, ignoreInstance: true \}\)/);
   });
 });

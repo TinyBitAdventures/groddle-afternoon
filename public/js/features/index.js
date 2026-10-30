@@ -34,7 +34,7 @@ import { animalHusbandryFeature } from './animal-husbandry-feature.js?v=g479-2';
 import { questInstancesFeature } from './quest-instances-feature.js?v=g482-2';
 import { partySpacesFeature } from './party-spaces-feature.js?v=g463-1';
 import { seasonsFeature } from './seasons-feature.js?v=g478-1';
-import { cameraModeFeature } from './camera-mode-feature.js?v=g359-1';
+import { cameraModeFeature } from './camera-mode-feature.js?v=g484-1';
 import { newxpFeature } from './newxp-feature.js?v=g481-2';
 
 export { questFlagsFeature };
