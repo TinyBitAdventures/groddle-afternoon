@@ -856,7 +856,7 @@ import { createNotifier, effectTokens, floatKey, stackFloat, tokenText } from '.
 import { mountNotifyView } from './js/notify-view.js?v=g466-1';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=g468-2';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g467-1';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=g468-8';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=g432-1';
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=g463-2';
@@ -872,7 +872,7 @@ import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?
 import { itemZ } from './js/item-bands.js?v=g429-1';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=g412-1';
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=g468-5';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=g468-8';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -1341,8 +1341,8 @@ function shownElement(node) {
  * Shift+F and backquote: Inventory Search (shiftFKeyHandler 846-855, 655), the
  * pack's search (js/ui/pack-row.js), not while Gentle Island hides the pack.
  *
- * Left out, with nothing behind them here: comma Preferences (commaKeyHandler
- * 806-814, PrefsDialog), I Info-getting Mode (iKeyHandler 870-891), Shift+M the chat
+ * Comma is Preferences (js/classic/classic-prefs.js, both skins). Left out, with
+ * nothing behind them here: I Info-getting Mode (iKeyHandler 870-891), Shift+M the chat
  * map's minimap tab (shiftMKeyHandler 925-940). F stays the remake's apple.
  */
 function clientShortcutKey(e) {

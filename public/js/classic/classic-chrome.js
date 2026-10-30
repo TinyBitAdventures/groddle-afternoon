@@ -7,6 +7,7 @@
 import { installClassicFrame } from './classic-frame.js?v=g468-2';
 import { installClassicTopbar } from './classic-topbar.js?v=g468-3';
 import { installClassicGrowl } from './classic-growl.js?v=g468-4';
+import { installClassicHub } from './classic-hub.js?v=g468-8';
 
 let installed = null;
 
@@ -16,6 +17,7 @@ export function installClassicChrome({ doc = globalThis.document, win = globalTh
     frame: installClassicFrame({ doc, win }),
     topbar: installClassicTopbar({ doc, win }),
     growl: installClassicGrowl({ doc, win }),
+    hub: installClassicHub({ doc, win }),
   };
   return installed;
 }

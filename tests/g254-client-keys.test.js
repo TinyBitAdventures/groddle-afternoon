@@ -8,7 +8,8 @@
  * (commaKeyHandler 806-814). The remake answers M (map, G kept), Z (player
  * menu), Shift+L (looks), Shift+K (multiplayer keyring), Shift+D (decorate where
  * you can), Shift+F and backquote (the pack's search, phase 2) and holding ? (the
- * hotkey sheet, view/ui/Hotkeys.as + hotkeys.png); comma, I and Shift+M have no
+ * hotkey sheet, view/ui/Hotkeys.as + hotkeys.png) and comma (Preferences,
+ * js/classic/classic-prefs.js); I and Shift+M have no
  * panel here and stay unbound.
  */
 import { describe, it } from 'node:test';
@@ -28,7 +29,7 @@ import {
   hotkeyText,
   isHotkeySheetRelease,
   isPlainKey,
-} from '../public/js/client-hotkeys.js?v=g467-1';
+} from '../public/js/client-hotkeys.js?v=g468-8';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(here, '../public');
@@ -108,7 +109,7 @@ describe('G254: clientKeyAction', () => {
       [key('D', { shiftKey: true }), 'decorate'],
       [key('?', { shiftKey: true, code: 'Slash' }), 'hotkeys'],
       [key('/', { shiftKey: true, code: 'Slash' }), 'hotkeys'],
-      [key(','), null], [key('i'), null],
+      [key(','), 'preferences'], [key('i'), null],
       [key('`'), 'pack-search'], [key('F', { shiftKey: true }), 'pack-search'],
       [key('f'), null], [key('~', { shiftKey: true, code: 'Backquote' }), null],
       [key('M', { shiftKey: true }), null],
@@ -157,7 +158,8 @@ describe('G254: the hotkey sheet lists only keys the remake answers', () => {
     assert.ok(mp.includes('Key Ring: Shift+K'));
     const all = mp.join('\n');
     assert.ok(solo.includes('Inventory Search: Shift+F or `'), 'hotkeys.png: Inventory Search: Shift+F');
-    for (const gone of [/Preferences/, /Info-getting/, /Zoom/, /: ,/, /Shift\+M/, /\bI\b$/m]) {
+    assert.ok(solo.includes('Preferences: ,'), 'commaKeyHandler: Preferences (js/classic/classic-prefs.js)');
+    for (const gone of [/Info-getting/, /Zoom/, /Shift\+M/, /\bI\b$/m]) {
       assert.doesNotMatch(all, gone);
     }
     assert.doesNotMatch(all, /—/, 'no em-dashes in player copy');

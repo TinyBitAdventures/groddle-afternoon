@@ -2671,9 +2671,24 @@
   ]
  },
  "git": {
-  "commits": 785,
+  "commits": 788,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "Classic's verb menu: the 2012 white card with touching rows, no shade over the world"
+   },
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "Classic's pack: 51 by 53 white slots on the band, Arial counts, wear bars and the bag strips"
+   },
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "Classic's growl line: notices one at a time at the world's bottom-left, and the 2012 prompt cards"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2778,24 +2793,9 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "The game fills the window and shows more world on bigger screens"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "new",
-    "text": "One notification system: notices top centre, gains rise and land in an Activity log, big moments wait their turn"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "improve",
-    "text": "The Penalty Box gets its grassy ledge and trunk, and Being Watched's TVs glow on their own"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "improve",
-    "text": "The races finish at Tiny Speck's own finish gate"
    }
   ]
  },
- "tests": 444,
+ "tests": 445,
  "generatedAt": "2026-10-30"
 }

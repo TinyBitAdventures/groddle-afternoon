@@ -32,14 +32,14 @@ export const CLIENT_KEY_TABLE = Object.freeze([
   { key: 'Shift+/', handler: 'shiftSlashKeyHandler', action: 'hotkeys' },
   { key: 'I', handler: 'iKeyHandler', action: null, why: 'no info mode' },
   { key: 'Z', handler: 'zKeyHandler', action: 'player-menu' },
-  { key: ',', handler: 'commaKeyHandler', action: null, why: 'no preferences dialog' },
+  { key: ',', handler: 'commaKeyHandler', action: 'preferences' },
 ]);
 
 /**
  * The remake's answer to a keydown, or null. Ctrl, Alt and Cmd combinations are
  * the browser's (Cmd+, Cmd+Z), never the game's.
  * @param {{ key: string, code?: string, shiftKey?: boolean, ctrlKey?: boolean, altKey?: boolean, metaKey?: boolean }} e
- * @returns {'map'|'player-menu'|'looks'|'keyring'|'decorate'|'hotkeys'|'pack-search'|null}
+ * @returns {'map'|'player-menu'|'looks'|'keyring'|'decorate'|'hotkeys'|'pack-search'|'preferences'|null}
  */
 export function clientKeyAction(e) {
   if (!e || e.metaKey || e.ctrlKey || e.altKey) return null;
@@ -47,6 +47,8 @@ export function clientKeyAction(e) {
   const k = String(e.key || '').toLowerCase();
   // shiftFKeyHandler 846-855 for both (655: "same as inventory search"): the pack's search.
   if (k === '`' || (e.code === 'Backquote' && !e.shiftKey)) return 'pack-search';
+  // commaKeyHandler 806-814: Preferences (js/classic/classic-prefs.js opens it, in both skins).
+  if (k === ',' && !e.shiftKey) return 'preferences';
   if (!e.shiftKey) {
     if (k === 'm') return 'map';
     if (k === 'z') return 'player-menu';
@@ -99,6 +101,7 @@ export function hotkeySections({ keyring = false } = {}) {
         ['Teleport', [['Shift', 'T']]],
         ...(keyring ? [['Key Ring', [['Shift', 'K']]]] : []),
         ['Inventory Search', [['Shift', 'F'], ['`']]],
+        ['Preferences', [[',']]],
         ['Verbs', [['Enter'], ['E']]],
       ],
     },
