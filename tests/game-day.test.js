@@ -196,7 +196,7 @@ describe('the Dametime atmosphere sits under speech and FX (G427, Austin 2026-10
     const game = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
     assert.match(game, /atmosphere\.blendMode = 'multiply';/);
     assert.match(game, /world\.addChild\(bgLayer, entityLayer, streetFrontLayer, atmosphere, fxLayer\);/);
-    assert.match(game, /setAtmosphere\(light\.color, currentStreet\?\.ownLight \? 0 : light\.opacity\);/);
+    assert.match(game, /setAtmosphere\(light\.color, worldTintOpacity\(light\.opacity, \{ on: nightTintOn\(\), ownLight: Boolean\(currentStreet\?\.ownLight\) \}\)\);/);
     assert.match(game, /const ATMOSPHERE_EASE_MS = 2000;/);
     const chrome = game.slice(game.indexOf('function updateDametimeChrome'), game.indexOf('function toastHeld'));
     assert.doesNotMatch(chrome, /overlay\.style\./, 'the CSS overlay paints nothing now');

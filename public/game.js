@@ -689,6 +689,7 @@ import { momentMoreText } from './js/ui/moment-card.js?v=3c9c0aa6';
 import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=587c014a';
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction } from './js/world-zoom.js?v=b5f4748a';
+import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=917a2caa';
 import './js/classic/classic-zoom.js?v=7a25123e';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=972868f3';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
@@ -862,7 +863,7 @@ import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from '.
 import { installHiresIcons } from './js/icon-hires.js?v=5357d4b4';
 import { installHiresDecos } from './js/deco-hires.js?v=a65f2d79';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=e56202ee';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=0fbf7744';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=19ec7dc0';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=5919dfde';
@@ -893,7 +894,7 @@ import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?
 import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=1e2ed651';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=3785ed7a';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -2269,15 +2270,17 @@ function updateDametimeChrome(now = dametimeDisplayNow()) {
   const overlay = document.getElementById('daylight-overlay');
   if (overlay) {
     // A place with its own authored light (street JSON or scene `ownLight: true`: Giants'
-    // memories, white voids) is never tinted. The original client had no world tint at all.
+    // memories, white voids) is never tinted. The original client had no world tint at all,
+    // so NIGHT TINT (js/night-tint.js, Settings and Preferences) turns it off for this device.
     const preserveAuthoredLight = Boolean(currentStreet?.ownLight);
     overlay.dataset.phase = light.phase;
+    overlay.dataset.nightTint = nightTintOn() ? 'on' : 'off';
     overlay.title = preserveAuthoredLight
       ? 'This place keeps its own light'
       : `${light.phase} in Ur`;
   }
   // Drawn in Pixi under the speech bubbles (tickAtmosphere), not by the overlay over the canvas.
-  setAtmosphere(light.color, currentStreet?.ownLight ? 0 : light.opacity);
+  setAtmosphere(light.color, worldTintOpacity(light.opacity, { on: nightTintOn(), ownLight: Boolean(currentStreet?.ownLight) }));
   return light;
 }
 
@@ -25196,6 +25199,8 @@ async function main() {
   });
   // ZOOM: the Menu, the Sound popover, Preferences and the = - 0 keys all land here.
   onZoomChange(() => applyWorldZoom());
+  // NIGHT TINT: the Menu's switch and Preferences land here; the tint eases to its new strength.
+  onNightTintChange(() => updateDametimeChrome());
   // Pixi renders filters at resolution 1 by default. The street colour matrix
   // sits on the middleground and on entityLayer (1,169 of 1,422 streets), so
   // avatars, animals and decos were drawn at half density on Retina.
@@ -27332,6 +27337,7 @@ async function main() {
   installTopBar(document, {
     audio: { levels: () => ({ ...audioLevels }), setLevel: setAudioLevel },
     zoom: { get: worldZoom, set: setWorldZoom, onChange: onZoomChange },
+    nightTint,
     onImagination: () => (modernUi() && imaginationHub ? imaginationHub.toggle() : document.getElementById('img-btn')?.click()),
     onMail: () => { if (state.started) openMailboxPanel(); },
     onPlayerCard: () => document.getElementById('player-menu-btn')?.click(),

@@ -9,7 +9,8 @@
  * Classic), with Classic chosen "Original window size" (open question 2:
  * the world at the 2012 client's 1000 x 600), and in both skins the world Zoom
  * (js/world-zoom.js: Wide to Original; Original window size already is the
- * 2012 picture, so the slider rests while it is on). The original's six checkboxes
+ * 2012 picture, so the slider rests while it is on) and Night tint (js/night-tint.js:
+ * the world darkens with the game clock; the 2012 client had none). The original's six checkboxes
  * have nothing behind them here and are left out. Changes apply at once, so the
  * window has Done where the original had Save.
  *
@@ -22,6 +23,7 @@ import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from '
 import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=299eef68';
 import { installClassicChrome } from './classic-chrome.js?v=b0eb4498';
 import { clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b5f4748a';
+import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL, nightTintOn, onNightTintChange, setNightTint } from '../night-tint.js?v=917a2caa';
 
 export const PREFS_TITLE = 'Preferences';
 
@@ -101,6 +103,7 @@ export function createPreferences(doc) {
     parts.zoomOut.textContent = zoomLabel(z);
     parts.zoom.setAttribute('aria-valuetext', zoomValueText(z));
     parts.zoomHeld.hidden = !held;
+    parts.tint.checked = nightTintOn();
   };
 
   const build = () => {
@@ -149,10 +152,17 @@ export function createPreferences(doc) {
       setWorldZoom(clampZoom(Number(parts.zoom.value) / 100));
       sync();
     });
+    // NIGHT TINT: the same switch as the Menu's (js/night-tint.js).
+    const tintRow = el(doc, 'label', { class: 'prefs-choice prefs-night-tint', 'data-night-tint-control': 'prefs' });
+    parts.tint = el(doc, 'input', { type: 'checkbox', id: 'prefs-night-tint' });
+    parts.tint.addEventListener('change', () => setNightTint(parts.tint.checked));
+    const tintWords = el(doc, 'span', {}, NIGHT_TINT_LABEL);
+    tintWords.append(el(doc, 'small', {}, NIGHT_TINT_HINT));
+    tintRow.append(parts.tint, tintWords);
     const foot = el(doc, 'div', { class: 'prefs-foot' });
     const done = el(doc, 'button', { type: 'button', class: 'prefs-done' }, 'Done');
     foot.append(done);
-    win.append(close, title, group, parts.sizeRow, zoomBox, foot);
+    win.append(close, title, group, parts.sizeRow, zoomBox, tintRow, foot);
     shade.append(win);
     doc.body.append(shade);
     close.addEventListener('click', () => api.close());
@@ -168,6 +178,7 @@ export function createPreferences(doc) {
     });
     onUiModeChange(sync);
     onZoomChange(sync);
+    onNightTintChange(sync);
   };
 
   const api = {

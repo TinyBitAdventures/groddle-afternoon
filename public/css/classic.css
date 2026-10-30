@@ -204,6 +204,13 @@
 :root[data-ui="classic"] .prefs-window .prefs-zoom label { color: var(--c-classic-title); font: 800 var(--fs-classic-pane)/var(--lh-tight) var(--font-classic-title); }
 :root[data-ui="classic"] .prefs-window .prefs-zoom input { accent-color: var(--c-classic-link); }
 :root[data-ui="classic"] .prefs-window .prefs-zoom-ends { color: var(--c-classic-text); font-size: var(--fs-classic-body); }
+/* NIGHT TINT (js/night-tint.js): its switch in a well of its own under the zoom. */
+:root[data-ui="classic"] .prefs-window .prefs-choice.prefs-night-tint {
+  margin: 0;
+  padding: var(--sp-5) var(--sp-10);
+  background: var(--c-classic-well);
+  border-bottom: 1px solid var(--c-classic-rule);
+}
 /* The client's own checkbox art (cb_unchecked.png, cb_checked.png, 18 x 18). */
 :root[data-ui="classic"] .prefs-window input[type="checkbox"] {
   appearance: none;

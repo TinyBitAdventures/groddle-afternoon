@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 850,
+  "commits": 851,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "The New Quest card on arrival sits under the Qurazy banner instead of covering it"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "fix",
     "text": "The save cloud sits in the pack row beside search, centred, instead of up in its corner"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "The Zoom slider's Wide and Original labels sit clear of its focus ring"
    }
   ]
  },
- "tests": 475,
+ "tests": 476,
  "generatedAt": "2026-10-30"
 }

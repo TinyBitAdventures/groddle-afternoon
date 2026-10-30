@@ -9,7 +9,7 @@
  * - Centre: the street nameplate (#street-nameplate in #game-root, restyled, not copied).
  * - Right: Quests (Q), Make (N), Map (M), Imagination (X), Mail with its unread
  *   badge, Sound (Effects and Music sliders, Mute, and the world Zoom) and the Menu,
- *   regrouped into Me, World, Social (multiplayer only) and Settings (with Zoom).
+ *   regrouped into Me, World, Social (multiplayer only) and Settings (with Zoom and Night tint).
  *
  * Tooltips with key caps replace the bar's native titles. Everything here is
  * scoped to <html data-ui="modern"> in style.css, and the game state stays in
@@ -18,6 +18,7 @@
  */
 import { vitalLevel, vitalTitle } from '../vitals.js?v=ca7471dd';
 import { clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b5f4748a';
+import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL } from '../night-tint.js?v=917a2caa';
 
 /** The Menu's groups, in the mock's order; Social shows only when something is in it. */
 export const MENU_GROUPS = Object.freeze([
@@ -316,7 +317,7 @@ function installMenu(doc) {
   new MutationObserver(sync).observe(list, { childList: true, subtree: true });
   list.addEventListener('keydown', (e) => {
     if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) return;
-    const rows = [...list.querySelectorAll('button, input[type="range"]')].filter((b) => b.getClientRects().length && !b.disabled);
+    const rows = [...list.querySelectorAll('button, input[type="range"], input[type="checkbox"]')].filter((b) => b.getClientRects().length && !b.disabled);
     if (!rows.length) return;
     e.preventDefault();
     e.stopPropagation();
@@ -569,10 +570,66 @@ function installZoom(doc, zoom) {
 }
 
 /**
+ * NIGHT TINT (js/night-tint.js): one switch, "Night tint", on while the world darkens with
+ * the game clock. `where` names it for QA (data-night-tint-control). Returns the row, the
+ * input and a draw().
+ */
+export function nightTintToggle(doc, setting, { id, where, className = 'hud-toggle' }) {
+  const row = doc.createElement('label');
+  row.className = className;
+  row.htmlFor = id;
+  row.dataset.nightTintControl = where;
+  const input = doc.createElement('input');
+  Object.assign(input, { id, type: 'checkbox' });
+  input.setAttribute('role', 'switch');
+  input.setAttribute('aria-describedby', `${id}-hint`);
+  const words = doc.createElement('span');
+  words.textContent = NIGHT_TINT_LABEL;
+  const hint = doc.createElement('small');
+  hint.id = `${id}-hint`;
+  hint.textContent = NIGHT_TINT_HINT;
+  row.append(input, words, hint);
+  const draw = () => {
+    const on = Boolean(setting?.get?.());
+    input.checked = on;
+    input.setAttribute('aria-checked', on ? 'true' : 'false');
+  };
+  input.addEventListener('change', () => {
+    setting?.set?.(input.checked);
+    draw();
+  });
+  // Enter or Space on the switch is its own (never a verb or a jump).
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      input.click();
+    }
+    if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
+  });
+  setting?.onChange?.(draw);
+  draw();
+  return { row, input, draw };
+}
+
+/** NIGHT TINT: the switch in the Menu's Settings group, under Zoom. */
+function installNightTint(doc, setting) {
+  if (!setting) return;
+  const settings = doc.querySelector('#more-list [data-menu-group="settings"]');
+  if (!settings || doc.getElementById('menu-night-tint')) return;
+  const { row } = nightTintToggle(doc, setting, { id: 'menu-night-tint', where: 'menu', className: 'hud-toggle menu-night-tint' });
+  row.dataset.menuControl = 'night-tint';
+  const zoom = settings.querySelector('[data-menu-control="zoom"]');
+  if (zoom) zoom.after(row);
+  else settings.querySelector('.menu-group-label')?.after(row);
+  settings.hidden = false;
+}
+
+/**
  * Wires the bar once (game.js main): tooltips, the Menu's groups, the Sound popover, the
  * low-energy pill, the nameplate's shape and the pills' widths. `opts`:
  *   audio: { levels(): { effects, music }, setLevel(kind, 0..100) }
  *   zoom: { get(), set(0..1), onChange(fn) } (js/world-zoom.js)
+ *   nightTint: { get(), set(bool), onChange(fn) } (js/night-tint.js)
  *   onImagination(), onMail(), onPlayerCard(): what those controls open.
  */
 export function installTopBar(doc, opts = {}) {
@@ -586,6 +643,7 @@ export function installTopBar(doc, opts = {}) {
   installMenu(doc);
   installSound(doc, opts.audio);
   installZoom(doc, opts.zoom);
+  installNightTint(doc, opts.nightTint);
   const tips = installTooltips(doc, [bar]);
   adoptTitles(bar);
   shapeStreetName(doc);

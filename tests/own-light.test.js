@@ -22,7 +22,7 @@ test('game.js reads the flag, not a hard-coded room', () => {
   assert.match(fn, /const preserveAuthoredLight = Boolean\(currentStreet\?\.ownLight\)/);
   assert.doesNotMatch(fn, /summersDayIsInstanced/);
   // G427: the tint is drawn in Pixi under the speech bubbles; the flag zeroes it there.
-  assert.match(fn, /setAtmosphere\(light\.color, currentStreet\?\.ownLight \? 0 : light\.opacity\);/);
+  assert.match(fn, /setAtmosphere\(light\.color, worldTintOpacity\(light\.opacity, \{ on: nightTintOn\(\), ownLight: Boolean\(currentStreet\?\.ownLight\) \}\)\);/);
   // enterScene carries it onto the street record the overlay reads.
   const enter = game.slice(game.indexOf('  enterScene(scene) {'), game.indexOf('  enterScene(scene) {') + 1600);
   assert.match(enter, /ownLight: Boolean\(scene\.ownLight\)/);

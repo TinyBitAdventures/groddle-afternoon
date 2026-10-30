@@ -9725,6 +9725,16 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] .more-list .menu-zoom .hud-zoom-ends { grid-column: 1 / -1; }
 [data-ui="modern"] .hud-zoom input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
+/* —— NIGHT TINT —— the switch under Zoom in the Menu's Settings group (js/night-tint.js, js/ui/topbar.js). */
+[data-ui="modern"] .more-list .menu-night-tint {
+  padding: var(--space-1) var(--space-2) var(--space-2); border-radius: var(--radius-s);
+  color: var(--text); font-size: var(--fs-m); font-weight: var(--fw-bold);
+}
+[data-ui="modern"] .more-list .menu-night-tint:hover { background: var(--surface-hover); }
+[data-ui="modern"] .more-list .menu-night-tint input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
+[data-ui="modern"] .more-list .menu-night-tint input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+[data-ui="modern"] .more-list .menu-night-tint small { color: var(--text-muted); font-size: var(--fs-xs); font-weight: var(--fw-regular); line-height: var(--lh-snug); }
+
 /* The tooltip (js/ui/topbar.js): words, a second line, key caps. */
 [data-ui="modern"] .hud-tip {
   position: fixed; z-index: calc(var(--z-notice) + 20); pointer-events: none;
@@ -9796,6 +9806,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4)); }
 }
 /* —— end PAPER —— */
+/* NIGHT TINT: the switch row in either skin (js/ui/topbar.js nightTintToggle; the modern look is in PAPER above). */
+.hud-toggle { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: var(--sp-4); cursor: pointer; }
+.hud-toggle small { grid-column: 2; }
 
 /* —— HUB —— */
 /* The big moment card (js/ui/moment-card.js; the award, badge, trophy, level-up and
