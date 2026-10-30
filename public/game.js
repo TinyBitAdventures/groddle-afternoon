@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g478-1';
 import { createFeatureHost } from './js/feature-host.js?v=g390-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-368';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-364';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=g480-4';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=g481-1';
@@ -10060,6 +10060,10 @@ const engine = {
   /** SOCIAL: the modern skin's drawer (js/ui/social-drawer.js), or null (a classic skin keeps the old dock). */
   get social() {
     return socialDrawer;
+  },
+  /** TICKETS: the modern panel shell (js/ui/panel-shell.js), so a window a feature builds joins it (add); null in a skin without it. */
+  get panelShell() {
+    return panelShell;
   },
   get worldW() {
     return WORLD_W;

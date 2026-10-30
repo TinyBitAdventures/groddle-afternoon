@@ -37,6 +37,8 @@ describe('Legalize It progress card layer', () => {
     for (const sel of ['\n.side-panel', '\n.glitch-modal', '\n.map-panel', '\n.quest-dialogue', '\n.notify-notices', '[data-ui="modern"] #verb-menu']) {
       assert.ok(card < z(sel), `card ${card} < ${sel.trim()} ${z(sel)}`);
     }
-    assert.ok(card < z('.bug-shade', bugCss), `card ${card} < the bug report form ${z('.bug-shade', bugCss)}`);
+    // TICKETS: the bug report form is the Reports sheet now (js/ui/reports-sheet.js, styled by the feature).
+    const reports = '[data-ui="modern"] #game-root #bug-report-panel';
+    assert.ok(card < z(reports, bugCss), `card ${card} < the Reports sheet ${z(reports, bugCss)}`);
   });
 });

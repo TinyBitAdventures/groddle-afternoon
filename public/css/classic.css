@@ -1905,3 +1905,214 @@
 :root[data-ui="classic"] .count-pop :is(.count-pop-num, .feed-picker-qty-input, [data-vq-val])::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 :root[data-ui="classic"] .count-pop :is(.count-pop-num, .feed-picker-qty-input, [data-vq-val]):focus { outline: none; box-shadow: 0 0 0 2px var(--c-classic-qty-ring); }
 :root[data-ui="classic"] .count-pop .count-pop-actions { display: flex; align-items: center; justify-content: flex-end; gap: calc(8 * var(--cu)); margin-top: calc(10 * var(--cu)); }
+
+/* == TICKETS == Reports (js/ui/reports-sheet.js, online only) as a 2012 window: the Quest Log's frame
+   (Dialog.as, WindowBorder.as, BigDialog.as) centred in the viewport, the white head with its 20 px
+   title and the red cross, the grey well between two rules, the white footer with the minor buttons;
+   ids and data hooks as in Modern. The client's own form (BootError.as) had no inbox to copy, so the
+   list rows take the Quest Log's rows. The bug icon's unread count is the contact list's red count. */
+:root[data-ui="classic"] .top-bar .hud-actions > #bug-btn .bug-unread {
+  position: absolute;
+  top: calc(-6 * var(--cu));
+  right: calc(-8 * var(--cu));
+  display: inline-grid;
+  place-items: center;
+  min-width: calc(14 * var(--cu));
+  height: calc(14 * var(--cu));
+  padding: 0 calc(3 * var(--cu));
+  border-radius: var(--radius-pill);
+  background: var(--c-classic-unread);
+  color: var(--c-classic-panel);
+  box-shadow: 0 0 0 1px var(--c-classic-panel);
+  font: 800 var(--fs-classic-count)/var(--lh-none) var(--font-classic-body);
+  pointer-events: none;
+}
+:root[data-ui="classic"] #game-root #bug-report-panel:not([hidden]) {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: calc(var(--z-dialog) + 5);
+  height: var(--cvh);
+  display: grid;
+  place-items: center;
+  padding: calc(20 * var(--cu));
+  background: none;
+  pointer-events: none;
+}
+:root[data-ui="classic"] #bug-report-panel .reports-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(calc(615 * var(--cu)), 100%);
+  height: min(calc(520 * var(--cu)), 100%);
+  overflow: hidden;
+  pointer-events: auto;
+  border-radius: 4px;
+  background: var(--c-classic-panel);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--c-classic-ink) 37%, transparent),
+    0 0 1px 7px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+  color: var(--c-classic-text);
+  font: calc(var(--fs-classic-row) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-body);
+  animation: classic-fade 0.2s linear;
+}
+:root[data-ui="classic"] #bug-report-panel .reports-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--cu));
+  min-height: calc(35 * var(--cu));
+  margin: 0;
+  padding: calc(10 * var(--cu)) calc(56 * var(--cu)) calc(10 * var(--cu)) calc(20 * var(--cu));
+  border-bottom: 1px solid var(--c-classic-rule);
+  background: var(--c-classic-panel);
+}
+:root[data-ui="classic"] #bug-report-panel .reports-head h2 {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--c-classic-title);
+  font: 800 calc(var(--fs-classic-window) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title);
+}
+:root[data-ui="classic"] #bug-report-panel .reports-head h2:focus { outline: none; }
+:root[data-ui="classic"] #bug-report-panel .ui-sheet-icon { width: calc(23 * var(--cu)); height: auto; flex: none; }
+:root[data-ui="classic"] #bug-report-panel .ui-sheet-x {
+  position: absolute;
+  top: calc(6 * var(--cu));
+  right: calc(16 * var(--cu));
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: var(--c-classic-panel);
+  color: transparent;
+  font-size: 0;
+  cursor: pointer;
+}
+:root[data-ui="classic"] #bug-report-panel .ui-sheet-x::before,
+:root[data-ui="classic"] #bug-report-panel .ui-sheet-x::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 3px;
+  background: var(--c-classic-close);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+:root[data-ui="classic"] #bug-report-panel .ui-sheet-x::after { transform: translate(-50%, -50%) rotate(-45deg); }
+:root[data-ui="classic"] #bug-report-panel .ui-sheet-x:hover { box-shadow: inset 0 0 6px var(--c-classic-close-hover); }
+:root[data-ui="classic"] #bug-report-panel :is(.reports-back, .reports-new, .reports-btn) {
+  flex: none;
+  min-height: calc(29 * var(--cu));
+  margin: 0;
+  padding: 0 calc(12 * var(--cu));
+  border: 1px solid var(--c-classic-btn-minor-border);
+  border-radius: var(--radius-xs);
+  background: linear-gradient(180deg, var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom));
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--c-classic-ink) 30%, transparent);
+  color: var(--c-classic-btn-minor-label);
+  font: 800 calc(var(--fs-classic-button) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-title);
+  cursor: pointer;
+}
+:root[data-ui="classic"] #bug-report-panel :is(.reports-back, .reports-new, .reports-btn):hover:not(:disabled) { background: linear-gradient(180deg, var(--c-classic-panel), var(--c-classic-btn-minor-top)); }
+:root[data-ui="classic"] #bug-report-panel .reports-back { padding: 0 calc(8 * var(--cu)); font-size: calc(var(--fs-classic-window) * var(--cu-n, 1)); line-height: 1; }
+:root[data-ui="classic"] #bug-report-panel .reports-btn:not(.is-quiet) {
+  border-color: color-mix(in srgb, var(--c-classic-panel) 55%, transparent);
+  background: linear-gradient(180deg, var(--c-classic-btn-dark-top), var(--c-classic-btn-dark-bottom));
+  color: var(--c-classic-btn-dark-label);
+}
+:root[data-ui="classic"] #bug-report-panel .reports-btn:not(.is-quiet):hover:not(:disabled) { filter: brightness(1.15); }
+:root[data-ui="classic"] #bug-report-panel button:disabled { opacity: 0.45; cursor: default; }
+:root[data-ui="classic"] #bug-report-panel :is(button, textarea):focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #bug-report-panel .reports-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: calc(10 * var(--cu)) calc(20 * var(--cu));
+  background: var(--c-classic-well);
+}
+:root[data-ui="classic"] #bug-report-panel .reports-view { display: flex; flex-direction: column; gap: calc(8 * var(--cu)); flex: 1 1 auto; min-height: 0; }
+:root[data-ui="classic"] #bug-report-panel .reports-list { list-style: none; margin: 0; padding: 0; }
+:root[data-ui="classic"] #bug-report-panel .reports-row { border-bottom: 1px solid var(--c-classic-row-rule); }
+:root[data-ui="classic"] #bug-report-panel .reports-row-btn {
+  display: grid;
+  gap: calc(2 * var(--cu));
+  width: 100%;
+  margin: 0;
+  padding: calc(8 * var(--cu)) calc(4 * var(--cu));
+  border: 0;
+  background: transparent;
+  color: var(--c-classic-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+:root[data-ui="classic"] #bug-report-panel .reports-row-btn:hover { background: color-mix(in srgb, var(--c-classic-panel) 70%, transparent); }
+:root[data-ui="classic"] #bug-report-panel .reports-row-top { display: flex; align-items: center; gap: calc(8 * var(--cu)); min-width: 0; }
+:root[data-ui="classic"] #bug-report-panel .reports-subject {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--c-classic-title);
+  font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title);
+}
+:root[data-ui="classic"] #bug-report-panel :is(.reports-line, .reports-when, .reports-closed-note, .reports-msg-who time, .reports-label) { color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
+:root[data-ui="classic"] #bug-report-panel .reports-dot { flex: none; width: calc(9 * var(--cu)); height: calc(9 * var(--cu)); border-radius: 50%; background: var(--c-classic-unread); }
+:root[data-ui="classic"] #bug-report-panel .reports-chip {
+  flex: none;
+  padding: 0 calc(6 * var(--cu));
+  border: 1px solid var(--c-classic-rule);
+  border-radius: var(--radius-xs);
+  background: var(--c-classic-panel);
+  color: var(--c-classic-text);
+  font: 800 calc(var(--fs-classic-body) * var(--cu-n, 1))/var(--lh-normal) var(--font-classic-title);
+}
+:root[data-ui="classic"] #bug-report-panel .reports-chip.is-answered { color: var(--c-classic-online-text); }
+:root[data-ui="classic"] #bug-report-panel .reports-chip.is-closed { color: var(--c-classic-offline); }
+:root[data-ui="classic"] #bug-report-panel .reports-empty { margin: calc(16 * var(--cu)) 0; color: var(--c-classic-offline); text-align: center; }
+:root[data-ui="classic"] #bug-report-panel .reports-thread-head { display: flex; align-items: center; gap: calc(8 * var(--cu)); }
+:root[data-ui="classic"] #bug-report-panel .reports-messages { list-style: none; margin: 0; padding: 0; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+:root[data-ui="classic"] #bug-report-panel .reports-msg { padding: calc(8 * var(--cu)) 0 calc(8 * var(--cu)) calc(9 * var(--cu)); border-bottom: 1px solid var(--c-classic-row-rule); box-shadow: inset 3px 0 0 color-mix(in srgb, var(--c-classic-activity-bar) 50%, transparent); }
+:root[data-ui="classic"] #bug-report-panel .reports-msg.is-admin { box-shadow: inset 3px 0 0 var(--c-classic-link); }
+:root[data-ui="classic"] #bug-report-panel .reports-msg-who { margin: 0 0 calc(2 * var(--cu)); color: var(--c-classic-title); font-family: var(--font-classic-title); }
+:root[data-ui="classic"] #bug-report-panel .reports-msg-body { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+:root[data-ui="classic"] #bug-report-panel .reports-new-title { margin: 0; color: var(--c-classic-title); font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/var(--lh-tight) var(--font-classic-title); }
+:root[data-ui="classic"] #bug-report-panel .reports-text {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: calc(6 * var(--cu)) calc(8 * var(--cu));
+  border: 1px solid var(--c-classic-input-border);
+  border-radius: 3.5px;
+  background: var(--c-classic-input);
+  color: var(--c-classic-text);
+  font: inherit;
+  resize: vertical;
+}
+:root[data-ui="classic"] #bug-report-panel .reports-text:is(:hover, :focus) { background: var(--c-classic-input-hi); border-color: var(--c-classic-input-hi-border); }
+:root[data-ui="classic"] #bug-report-panel .reports-new-view .reports-text { flex: 1 1 auto; min-height: calc(120 * var(--cu)); }
+:root[data-ui="classic"] #bug-report-panel .reports-actions { display: flex; justify-content: flex-end; gap: calc(8 * var(--cu)); }
+:root[data-ui="classic"] #bug-report-panel .reports-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--cu));
+  min-height: calc(44 * var(--cu));
+  padding: calc(6 * var(--cu)) calc(20 * var(--cu));
+  border-top: 1px solid var(--c-classic-rule);
+  background: var(--c-classic-panel);
+}
+:root[data-ui="classic"] #bug-report-panel .reports-status { flex: 1 1 auto; margin: 0; color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
+:root[data-ui="classic"] #bug-report-panel .reports-status.is-error { color: var(--c-classic-unread); }
+:root[data-ui="classic"] #bug-report-panel .ui-sheet-esc { display: none; }
+@media (prefers-reduced-motion: reduce) { :root[data-ui="classic"] #bug-report-panel .reports-card { animation: none; } }

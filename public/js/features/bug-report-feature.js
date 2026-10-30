@@ -8,30 +8,38 @@
  * messages and errors, 405-411); here that is the street, the player's place,
  * the build, the browser and the last errors the page saw.
  *
- * Reports go to the site (groddle-afternoon-site src/BugReports.php, POST
- * groddle/v1/feedback), signed in as the player, and land as private Bug
- * reports in Minn Admin. Solo has no account to send from: in solo this
- * feature draws nothing.
+ * TICKETS (2026-10-30): each report is a ticket the administrators answer
+ * (groddle-afternoon-site src/Tickets.php, groddle/v1/tickets; the console's
+ * Reports tab). The icon opens the Reports sheet (js/ui/reports-sheet.js):
+ * your reports with their status and a dot for a new reply, each thread with
+ * a reply box and Close report, and New report (the original's form, the
+ * same context). The icon carries a badge while a reply is unread: asked when
+ * the game starts, when the sheet opens, and every UNREAD_POLL_MS while the
+ * page is in view (the realtime server has no per-player channel to push it
+ * on). A reply email's link (/play/online/#report=<id>) opens that thread.
+ * Solo has no account to send from: in solo this feature draws nothing.
  *
  * QA: canvas data bugReport (closed|open|sending), bugReportLast (the last
- * line shown); window.groddleBugReport.open() in multiplayer.
+ * line shown), reportsView (list|thread|new), reportsUnread (n);
+ * window.groddleBugReport.open('list'|'new'), .openTicket(id), .refresh() in multiplayer.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
+import { createReportsApi, REPORT_TEXT, UNREAD_POLL_MS, reportFromHash } from '../reports.js?v=g483-1';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=g483-1';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 
-/** The words: the source's where it had them, short plain ones of ours where it did not. */
+/** The words: the source's where it had them, short plain ones of ours where it did not (js/reports.js has the sheet's). */
 export const BUG_TEXT = Object.freeze({
-  tip: 'Report a bug',
-  title: 'Thanks for reporting a bug!',
-  label: 'Please describe the problem you are having:',
-  send: 'Send',
-  close: 'Close',
-  sending: 'Sending…',
-  sent: 'Thanks! Your report was sent.',
-  empty: 'Please describe the problem you are having.',
-  failed: 'That didn\'t send. Try again in a moment.',
+  tip: REPORT_TEXT.tip,
+  title: REPORT_TEXT.title,
+  label: REPORT_TEXT.label,
+  send: REPORT_TEXT.send,
+  close: REPORT_TEXT.close,
+  sending: REPORT_TEXT.sending,
+  sent: REPORT_TEXT.sent,
+  empty: REPORT_TEXT.empty,
+  failed: REPORT_TEXT.failed,
 });
 
 /** As the site keeps them (BugReports.php MAX_MESSAGE, MAX_ERRORS). */
@@ -73,21 +81,54 @@ export function reportContext(engine, errors = [], env = globalThis) {
 }
 
 const STYLE = `
-.bug-btn { display: inline-flex; align-items: center; justify-content: center; padding: var(--sp-2) 0.45rem; }
+.bug-btn { display: inline-flex; align-items: center; justify-content: center; padding: var(--sp-2) 0.45rem; position: relative; }
 .bug-btn img { width: 23px; height: 20px; display: block; }
-.bug-shade { position: fixed; inset: 0; z-index: calc(var(--z-dialog) + 5); background: color-mix(in srgb, var(--c-mauve-23) 28%, transparent); display: flex; align-items: flex-start; justify-content: center; padding: 12vh var(--sp-8) var(--sp-8); }
-.bug-shade[hidden] { display: none; }
-.bug-win { width: min(440px, 100%); border-radius: var(--radius-xl); background: var(--surface-card); color: var(--text); box-shadow: var(--shadow-3), 0 0 0 1px color-mix(in srgb, var(--c-violet-50) 18%, transparent); font: var(--fs-md)/var(--lh-normal) var(--font-system); padding: 0.8rem 0.95rem var(--sp-7); }
-.bug-win h2 { margin: 0 0 0.45rem; font: 700 var(--fs-lg)/var(--lh-tight) var(--font-ui); color: var(--c-violet-36); display: flex; align-items: center; gap: 0.45rem; }
-.bug-win label { display: block; margin: 0 0 0.3rem; color: var(--c-mauve-40); }
-.bug-win textarea { box-sizing: border-box; width: 100%; min-height: 7.5rem; resize: vertical; font: var(--fs-md)/var(--lh-normal) var(--font-system); padding: 0.45rem 0.55rem; border-radius: var(--radius-md); border: 0; box-shadow: inset 0 0 0 1px var(--c-mauve-85); background: var(--surface-bright); color: var(--text); }
-.bug-win textarea:focus { outline: 2px solid var(--c-violet-50); outline-offset: 1px; }
-.bug-foot { display: flex; align-items: center; gap: var(--sp-4); margin-top: 0.55rem; }
-.bug-status { flex: 1; min-height: 1.2em; font-size: var(--fs-sm); color: var(--c-mauve-40); }
-.bug-status.is-error { color: var(--text-danger); }
-.bug-win button { font: 700 var(--fs-sm)/var(--lh-tight) var(--font-system); border: 0; border-radius: var(--radius-pill); padding: var(--sp-3) 0.95rem; cursor: pointer; color: var(--text-inverse); background: var(--c-violet-50); box-shadow: var(--shadow-1); }
-.bug-win button.is-quiet { color: var(--text-heading); background: var(--surface-parchment); box-shadow: none; }
-.bug-win button:disabled { opacity: 0.5; cursor: default; }
+.bug-btn .bug-unread[hidden], .reports-panel[hidden], .reports-view[hidden], .reports-panel [hidden] { display: none !important; }
+[data-ui="modern"] #game-root #bug-report-panel { position: absolute; inset: 0; z-index: calc(var(--z-dialog) + 5); display: grid; place-items: center; padding: calc(var(--hud-h) + 12px) var(--hud-inset) calc(var(--pack-live-height, 72px) + 8px); background: var(--scrim); }
+[data-ui="modern"] #bug-report-panel .reports-card { display: flex; flex-direction: column; width: min(560px, 100%); height: min(620px, 100%); max-height: 100%; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-l); background: var(--surface); box-shadow: var(--shadow-3); color: var(--text); font-family: var(--font-ui); font-size: var(--fs-m); animation: ui-sheet-center-in var(--motion-med) var(--ease-out); }
+[data-ui="modern"] #bug-report-panel .reports-head { flex: none; flex-wrap: nowrap; }
+[data-ui="modern"] #bug-report-panel .reports-head h2 { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+[data-ui="modern"] #bug-report-panel .ui-sheet-icon { width: 23px; }
+[data-ui="modern"] #bug-report-panel .reports-back { flex: none; display: inline-grid; place-items: center; width: 32px; height: 32px; margin: 0; padding: 0; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text); font: var(--fw-heavy) var(--fs-2xl)/var(--lh-none) var(--font-ui); cursor: pointer; }
+[data-ui="modern"] #bug-report-panel .reports-back:hover { background: var(--surface-hover); }
+[data-ui="modern"] #bug-report-panel :is(.reports-new, .reports-btn) { flex: none; display: inline-flex; align-items: center; justify-content: center; min-height: 32px; margin: 0; padding: 0 var(--space-4); border: 1px solid var(--accent); border-radius: var(--radius-pill); background: var(--accent); color: var(--text-inverse); font: var(--fw-heavy) var(--fs-s)/var(--lh-tight) var(--font-ui); cursor: pointer; }
+[data-ui="modern"] #bug-report-panel :is(.reports-new, .reports-btn):hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+[data-ui="modern"] #bug-report-panel .reports-btn.is-quiet { border-color: var(--border-strong); background: var(--surface-raised); color: var(--text); }
+[data-ui="modern"] #bug-report-panel .reports-btn.is-quiet:hover { background: var(--surface-hover); }
+[data-ui="modern"] #bug-report-panel :is(button, textarea):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+[data-ui="modern"] #bug-report-panel button:disabled { opacity: 0.55; cursor: default; }
+[data-ui="modern"] #bug-report-panel .reports-body { display: flex; flex-direction: column; padding-top: var(--space-2); }
+[data-ui="modern"] #bug-report-panel .reports-view { display: flex; flex-direction: column; gap: var(--space-2); min-height: 0; flex: 1 1 auto; }
+[data-ui="modern"] #bug-report-panel .reports-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-1); }
+[data-ui="modern"] #bug-report-panel .reports-row-btn { display: grid; gap: 2px; width: 100%; margin: 0; padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface-raised); color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+[data-ui="modern"] #bug-report-panel .reports-row-btn:hover { background: var(--surface-hover); }
+[data-ui="modern"] #bug-report-panel .reports-row[data-unread] .reports-row-btn { border-color: var(--accent); }
+[data-ui="modern"] #bug-report-panel .reports-row-top { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+[data-ui="modern"] #bug-report-panel .reports-subject { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: var(--fw-bold); }
+[data-ui="modern"] #bug-report-panel .reports-row[data-unread] .reports-subject { font-weight: var(--fw-heavy); }
+[data-ui="modern"] #bug-report-panel :is(.reports-line, .reports-when) { color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] #bug-report-panel .reports-dot { flex: none; width: 9px; height: 9px; border-radius: var(--radius-pill); background: var(--danger); }
+[data-ui="modern"] #bug-report-panel .reports-chip { flex: none; padding: 1px var(--space-2); border-radius: var(--radius-pill); background: var(--surface-sunken); color: var(--text-muted); font-size: var(--fs-xs); font-weight: var(--fw-heavy); line-height: var(--lh-tight); }
+[data-ui="modern"] #bug-report-panel .reports-chip.is-open { background: var(--accent-soft); color: var(--accent); }
+[data-ui="modern"] #bug-report-panel .reports-chip.is-answered { color: var(--status-good); }
+[data-ui="modern"] #bug-report-panel .reports-empty { margin: var(--space-4) 0; color: var(--text-muted); line-height: var(--lh-body); text-align: center; }
+[data-ui="modern"] #bug-report-panel .reports-thread-head { display: flex; align-items: center; gap: var(--space-2); }
+[data-ui="modern"] #bug-report-panel .reports-messages { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+[data-ui="modern"] #bug-report-panel .reports-msg { max-width: 88%; padding: var(--space-2) var(--space-3); border-radius: var(--radius-m); background: var(--surface-sunken); }
+[data-ui="modern"] #bug-report-panel .reports-msg.is-admin { align-self: flex-start; border: 1px solid var(--accent); background: var(--surface-raised); }
+[data-ui="modern"] #bug-report-panel .reports-msg.is-player { align-self: flex-end; }
+[data-ui="modern"] #bug-report-panel .reports-msg-who { margin: 0 0 2px; font-size: var(--fs-s); }
+[data-ui="modern"] #bug-report-panel .reports-msg-who time { color: var(--text-muted); }
+[data-ui="modern"] #bug-report-panel .reports-msg-body { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; line-height: var(--lh-body); }
+[data-ui="modern"] #bug-report-panel .reports-closed-note { margin: 0; color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] #bug-report-panel .reports-new-title { margin: 0; font-weight: var(--fw-heavy); font-size: var(--fs-l); }
+[data-ui="modern"] #bug-report-panel .reports-label { color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] #bug-report-panel .reports-text { box-sizing: border-box; width: 100%; resize: vertical; margin: 0; padding: var(--space-2) var(--space-3); border: 1px solid var(--border-strong); border-radius: var(--radius-m); background: var(--surface-raised); color: var(--text); font: var(--fs-m)/var(--lh-body) var(--font-ui); }
+[data-ui="modern"] #bug-report-panel .reports-new-view .reports-text { flex: 1 1 auto; min-height: 7.5rem; }
+[data-ui="modern"] #bug-report-panel .reports-actions { display: flex; justify-content: flex-end; gap: var(--space-2); }
+[data-ui="modern"] #bug-report-panel .reports-status.is-error { color: var(--text-danger); white-space: normal; }
+[data-ui="modern"] .top-bar .top-actions .bug-btn .bug-unread { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { [data-ui="modern"] #bug-report-panel .reports-card { animation: none; } }
 `;
 
 function el(tag, attrs = {}, text = '') {
@@ -100,111 +141,76 @@ function el(tag, attrs = {}, text = '') {
   return node;
 }
 
+/** The icon's tip and its badge for n unread replies. */
+export function badgeFor(n) {
+  const count = Math.max(0, Math.floor(Number(n) || 0));
+  return { hidden: count === 0, text: count > 9 ? '9+' : String(count), tip: count ? REPORT_TEXT.tipUnread(count) : REPORT_TEXT.tip };
+}
+
 function createSession(engine, errors) {
   const boot = globalThis.GRODDLE_MP_BOOT || {};
-  const account = createMinnAccount({ baseUri: document.baseURI, nonce: boot.nonce || '' });
-  let state = 'closed';
-  let lastLine = '';
+  const api = createReportsApi({ baseUri: document.baseURI, nonce: boot.nonce || '' });
 
   const style = el('style', { id: 'bug-report-css' });
   style.textContent = STYLE;
   document.head.append(style);
 
-  // The form: an id ending in -panel so engine.busy() counts it while it shows.
-  const shade = el('div', { id: 'bug-report-panel', class: 'bug-shade', hidden: true, 'data-bug-report': '' });
-  const win = el('section', { class: 'bug-win', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'bug-report-title' });
-  const title = el('h2', { id: 'bug-report-title' });
-  title.append(el('img', { src: 'assets/ui/bug_icon.png', alt: '', width: '23', height: '20' }), document.createTextNode(BUG_TEXT.title));
-  const label = el('label', { for: 'bug-report-text' }, BUG_TEXT.label);
-  const text = el('textarea', { id: 'bug-report-text', maxlength: String(MAX_MESSAGE), rows: '6', 'data-bug-report-text': '' });
-  const foot = el('div', { class: 'bug-foot' });
-  const status = el('p', { class: 'bug-status', 'aria-live': 'polite', 'data-bug-report-status': '' });
-  const closeBtn = el('button', { type: 'button', class: 'is-quiet', 'data-bug-report-close': '' }, BUG_TEXT.close);
-  const sendBtn = el('button', { type: 'button', 'data-bug-report-send': '' }, BUG_TEXT.send);
-  foot.append(status, closeBtn, sendBtn);
-  win.append(title, label, text, foot);
-  shade.append(win);
-  document.body.append(shade);
-
-  // Typing here is not walking: keys stay in the form (as the auctions window does).
-  for (const kind of ['keydown', 'keyup', 'keypress']) {
-    shade.addEventListener(kind, (e) => {
-      e.stopPropagation();
-      if (kind === 'keydown' && e.key === 'Escape') close();
-      if (kind === 'keydown' && e.key === 'Enter' && (e.metaKey || e.ctrlKey)) send();
-    });
-  }
-  shade.addEventListener('pointerdown', (e) => { if (e.target === shade) close(); });
-  text.addEventListener('input', () => { if (status.classList.contains('is-error')) say(''); });
-  closeBtn.addEventListener('click', () => close());
-  sendBtn.addEventListener('click', () => send());
-
   // The header icon, beside the mute button (GameHeaderUI.as: the bug icon sat with help in the header).
-  const btn = el('button', { id: 'bug-btn', type: 'button', class: 'chrome-btn mute-btn bug-btn', title: BUG_TEXT.tip, 'aria-label': BUG_TEXT.tip, 'data-bug-report-open': '' });
+  const btn = el('button', { id: 'bug-btn', type: 'button', class: 'chrome-btn mute-btn bug-btn', title: BUG_TEXT.tip, 'aria-label': BUG_TEXT.tip, 'aria-haspopup': 'dialog', 'data-bug-report-open': '' });
   btn.append(el('img', { src: 'assets/ui/bug_icon.png', alt: '', width: '23', height: '20' }));
-  btn.addEventListener('click', () => (state === 'closed' ? open() : close()));
+  const badge = el('span', { class: 'bug-unread hud-badge', 'aria-hidden': 'true', hidden: true, 'data-reports-badge': '' });
+  btn.append(badge);
   // The modern bar keeps it in the right pill, before Sound (Mute lives in Sound's popover there).
   const mute = document.getElementById?.('sound-btn') || document.getElementById?.('mute-btn');
   if (mute?.parentElement) mute.parentElement.insertBefore(btn, mute);
   else document.querySelector?.('.top-actions')?.append(btn);
 
-  function say(line, error = false) {
-    lastLine = line || '';
-    status.textContent = lastLine;
-    status.classList.toggle('is-error', error);
-    publish();
-  }
+  const host = document.getElementById('game-root') || document.body;
+  const sheet = mountReportsSheet({
+    host,
+    api,
+    context: () => reportContext(engine, errors),
+    toast: (t, ms) => engine.toast?.(t, ms),
+    opener: () => btn,
+    onState: ({ state, view, unread, last }) => {
+      engine.setData?.('bugReport', state);
+      engine.setData?.('bugReportLast', last);
+      engine.setData?.('reportsView', view);
+      engine.setData?.('reportsUnread', String(unread));
+      const b = badgeFor(unread);
+      badge.hidden = b.hidden;
+      badge.textContent = b.text;
+      // The modern bar shows data-tip (topbar.js adoptTitles moves a title there once); elsewhere the title.
+      if (btn.dataset.tip !== undefined) btn.dataset.tip = b.tip;
+      else btn.title = b.tip;
+      btn.setAttribute('aria-label', b.tip);
+      btn.dataset.unread = String(unread);
+      btn.setAttribute('aria-expanded', state === 'closed' ? 'false' : 'true');
+    },
+  });
+  // The shell's centred size, like Mail: it hands focus back to the icon when it closes.
+  engine.panelShell?.add?.({ id: 'bug-report-panel', kind: 'center', close: () => sheet.close() });
+  btn.addEventListener('click', () => (sheet.state === 'closed' ? sheet.open('list') : sheet.close()));
 
-  function publish() {
-    engine.setData?.('bugReport', state);
-    engine.setData?.('bugReportLast', lastLine);
-  }
-
-  function open() {
-    state = 'open';
-    shade.hidden = false;
-    say('');
-    sendBtn.disabled = false;
-    setTimeout(() => text.focus(), 0);
-    publish();
-  }
-
-  function close() {
-    if (state === 'sending') return;
-    state = 'closed';
-    shade.hidden = true;
-    publish();
-    btn.focus?.();
-  }
-
-  async function send() {
-    if (state !== 'open') return;
-    const message = text.value.trim();
-    if (!message) {
-      say(BUG_TEXT.empty, true);
-      text.focus();
-      return;
-    }
-    state = 'sending';
-    sendBtn.disabled = true;
-    say(BUG_TEXT.sending);
+  async function poll() {
+    if (sheet.state !== 'closed' || document.hidden || globalThis.navigator?.onLine === false) return;
     try {
-      await account.reportBug(message.slice(0, MAX_MESSAGE), reportContext(engine, errors));
-      text.value = '';
-      state = 'open';
-      close();
-      lastLine = BUG_TEXT.sent;
-      publish();
-      engine.toast?.(BUG_TEXT.sent, 3200);
-    } catch (err) {
-      state = 'open';
-      sendBtn.disabled = false;
-      say(typeof err?.message === 'string' && err.data?.message ? err.data.message : BUG_TEXT.failed, true);
-    }
+      const r = await api.unread();
+      sheet.setUnread(r?.unread);
+    } catch { /* the badge keeps what it had */ }
+  }
+  poll();
+  const timer = setInterval(poll, UNREAD_POLL_MS);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
+
+  // A reply email's link: /play/online/#report=<id> opens that thread once.
+  const linked = reportFromHash(globalThis.location?.hash);
+  if (linked) {
+    try { history.replaceState(history.state, '', location.pathname + location.search); } catch { /* the hash stays */ }
+    sheet.openTicket(linked);
   }
 
-  publish();
-  return { open, close, send, get state() { return state; } };
+  return { ...sheet, stop: () => clearInterval(timer), get state() { return sheet.state; }, get view() { return sheet.view; }, get unread() { return sheet.unread; } };
 }
 
 let session = null;

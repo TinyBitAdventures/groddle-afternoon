@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 835,
+  "commits": 836,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "Camera Mode works inside quest instances and rebuilt rooms, such as Winter Walk"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "Upgrades and Snaps open in the panel shell's centred frame, in the warm paper colours"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Feat and the vendors open as side sheets on the left, with a header, a body that scrolls and a footer"
    }
   ]
  },
- "tests": 467,
+ "tests": 468,
  "generatedAt": "2026-10-30"
 }
