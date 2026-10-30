@@ -8,7 +8,12 @@
  * - thread: the messages oldest first, a reply box (a reply to a closed report
  *   opens it again) and Close report;
  * - new: the original's form (BootError.as 280-290), sent with what the game
- *   knew (the feature's context()).
+ *   knew (the feature's context()) and, with Attach a picture of the game
+ *   ticked (the default), the picture the feature's capture() drew when the
+ *   form opened, shown small beside the box so you see what goes. A picture
+ *   the site refuses never costs the report: it goes again without it.
+ * A thread shows the report's picture under its first message; a click opens
+ * it full size in a new tab.
  * Esc closes, Ctrl or Cmd+Enter sends, Back returns to the list.
  *
  * Classic restyles it in place as a 2012 window (css/classic.css, the same
@@ -19,10 +24,12 @@
  * [data-bug-report-status]; new: [data-reports-view] on the panel,
  * [data-reports-list] rows [data-ticket=<id>] with [data-unread],
  * [data-reports-messages], #reports-reply-text, [data-reports-send-reply],
- * [data-reports-close-ticket], [data-reports-new], [data-reports-back].
+ * [data-reports-close-ticket], [data-reports-new], [data-reports-back],
+ * #reports-picture [data-reports-picture] (the checkbox),
+ * [data-reports-picture-preview], [data-reports-thread-picture].
  */
 
-import { REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=f3d8584a';
+import { REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=4112e3ff';
 
 function el(doc, tag, attrs = {}, text = '') {
   const node = doc.createElement(tag);
@@ -36,10 +43,10 @@ function el(doc, tag, attrs = {}, text = '') {
 
 /**
  * @param {{ doc?: Document, host: HTMLElement, api: ReturnType<import('../reports.js').createReportsApi>,
- *   context?: () => object, onState?: (s: { state: string, view: string, unread: number, ticket: number, last: string }) => void,
+ *   context?: () => object, capture?: () => ({ url: string, width: number, height: number }|null|Promise<object|null>), onState?: (s: { state: string, view: string, unread: number, ticket: number, last: string }) => void,
  *   toast?: (text: string, ms?: number) => void, opener?: () => HTMLElement|null, now?: () => number }} opts
  */
-export function mountReportsSheet({ doc = globalThis.document, host, api, context = () => ({}), onState = () => {}, toast = () => {}, opener = () => null, now = () => Date.now() } = {}) {
+export function mountReportsSheet({ doc = globalThis.document, host, api, context = () => ({}), capture = () => null, onState = () => {}, toast = () => {}, opener = () => null, now = () => Date.now() } = {}) {
   let state = 'closed';
   let view = 'list';
   let tickets = [];
@@ -48,6 +55,8 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   let messages = [];
   let last = '';
   let loading = false;
+  let shot = null;
+  let picture = null;
 
   const e = (tag, attrs, text) => el(doc, tag, attrs, text);
   const panel = e('div', { id: 'bug-report-panel', class: 'reports-panel ui-sheet ui-sheet-center', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'bug-report-title', hidden: true, 'data-bug-report': '', 'data-reports-view': 'list' });
@@ -86,10 +95,21 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   const newTitle = e('p', { class: 'reports-new-title' }, T.title);
   const label = e('label', { for: 'bug-report-text', class: 'reports-label' }, T.label);
   const text = e('textarea', { id: 'bug-report-text', class: 'reports-text', maxlength: String(REPORT_MAX), rows: '6', 'data-bug-report-text': '' });
+  // Attach a picture of the game: ticked by default, the picture small beside it.
+  const picRow = e('div', { class: 'reports-picture-row', 'data-reports-picture-row': '' });
+  const picText = e('div', { class: 'reports-picture-text' });
+  const picLabel = e('label', { class: 'reports-check', for: 'reports-picture' });
+  const picBox = e('input', { type: 'checkbox', id: 'reports-picture', class: 'reports-checkbox', checked: true, 'aria-describedby': 'reports-picture-hint', 'data-reports-picture': '' });
+  picBox.checked = true;
+  picLabel.append(picBox, doc.createTextNode(` ${T.picture}`));
+  const picHint = e('p', { id: 'reports-picture-hint', class: 'reports-hint' }, T.pictureHint);
+  picText.append(picLabel, picHint);
+  const picPreview = e('img', { class: 'reports-picture-thumb', alt: T.pictureAlt, hidden: true, 'data-reports-picture-preview': '' });
+  picRow.append(picText, picPreview);
   const newActs = e('div', { class: 'reports-actions' });
   const sendBtn = e('button', { type: 'button', class: 'reports-btn', 'data-bug-report-send': '' }, T.send);
   newActs.append(sendBtn);
-  newView.append(newTitle, label, text, newActs);
+  newView.append(newTitle, label, text, picRow, newActs);
   body.append(listView, threadView, newView);
 
   const foot = e('div', { class: 'reports-foot ui-sheet-foot' });
@@ -152,6 +172,14 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       li.append(who, e('p', { class: 'reports-msg-body' }, m.body));
       return li;
     }));
+    // The report's picture, under its first message (the report itself).
+    const src = pictureSrc(picture);
+    const first = msgs.children[0];
+    if (src && first) {
+      const a = e('a', { class: 'reports-picture', href: src, target: '_blank', rel: 'noopener', 'aria-label': T.pictureOpen, title: T.pictureOpen, 'data-reports-thread-picture': '' });
+      a.append(e('img', { src, alt: T.pictureAlt, width: String(Number(picture.width) || ''), height: String(Number(picture.height) || ''), loading: 'lazy' }));
+      first.append(a);
+    }
     closedNote.hidden = ticket.status !== 'closed';
     closeTicket.hidden = ticket.status === 'closed';
     globalThis.requestAnimationFrame?.(() => { msgs.lastElementChild?.scrollIntoView?.({ block: 'nearest' }); });
@@ -191,12 +219,14 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     show('thread');
     ticket = tickets.find((t) => t.id === id) || { id, status: 'open', subject: T.sheet };
     messages = [];
+    picture = null;
     drawThread();
     say(T.loading);
     try {
       const r = await api.thread(id);
       ticket = r.ticket;
       messages = r.messages || [];
+      picture = r.picture || null;
       // Read now: its dot goes, and the badge with it.
       const row = tickets.find((t) => t.id === id);
       if (row) Object.assign(row, ticket);
@@ -211,6 +241,30 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     }
   }
 
+  function drawPicture() {
+    const has = Boolean(shot?.url);
+    picBox.disabled = !has;
+    if (!has) picBox.checked = false;
+    picHint.textContent = has ? T.pictureHint : T.pictureNone;
+    picPreview.hidden = !(has && picBox.checked);
+    if (has) {
+      picPreview.setAttribute('src', shot.url);
+      picPreview.setAttribute('width', String(shot.width || ''));
+      picPreview.setAttribute('height', String(shot.height || ''));
+    }
+  }
+
+  /** The game as it is now, for a new report (the feature draws it; null when it cannot). */
+  async function takePicture() {
+    shot = null;
+    picBox.checked = true;
+    try {
+      const s = await capture();
+      shot = s && typeof s.url === 'string' && s.url.startsWith('data:image/jpeg;base64,') ? s : null;
+    } catch { shot = null; }
+    drawPicture();
+  }
+
   function open(which = 'list') {
     if (state === 'closed') {
       state = 'open';
@@ -220,6 +274,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     if (which === 'new') {
       show('new');
       sendBtn.disabled = false;
+      takePicture();
       setTimeout(() => text.focus(), 0);
     } else {
       show('list');
@@ -258,17 +313,30 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     state = 'sending';
     sendBtn.disabled = true;
     say(T.sending);
+    const words = message.slice(0, REPORT_MAX);
+    const pic = picBox.checked && shot?.url ? shot.url : null;
     try {
-      const r = await api.create(message.slice(0, REPORT_MAX), context());
+      let r;
+      let without = false;
+      try {
+        r = await api.create(words, context(), pic);
+      } catch (err) {
+        // The site refused the picture, not the report: send the words without it.
+        if (!pic || !pictureRefused(err)) throw err;
+        r = await api.create(words, context());
+        without = true;
+      }
+      const sentWords = without ? T.sentNoPicture : T.sent;
+      shot = null;
       text.value = '';
       state = 'open';
       sendBtn.disabled = false;
       if (r?.ticket) tickets.unshift(r.ticket);
       drawList();
       show('list');
-      say(T.sent);
-      toast(T.sent, 3200);
-      refresh().then(() => say(T.sent));
+      say(sentWords);
+      toast(sentWords, 3200);
+      refresh().then(() => say(sentWords));
       const row = r?.ticket ? list.querySelector(`[data-ticket="${r.ticket.id}"] button`) : null;
       (row || title).focus({ preventScroll: true });
     } catch (err) {
@@ -342,6 +410,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   panel.addEventListener('pointerdown', (ev) => { if (ev.target === panel) close(); });
   text.addEventListener('input', () => { if (status.classList.contains('is-error')) say(''); });
   reply.addEventListener('input', () => { if (status.classList.contains('is-error')) say(''); });
+  picBox.addEventListener('change', () => drawPicture());
   x.addEventListener('click', () => close());
   back.addEventListener('click', () => backToList());
   newBtn.addEventListener('click', () => open('new'));

@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 851,
+  "commits": 854,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "A Night tint setting turns off the world's darkening at dusk and night"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "fix",
     "text": "A jump inside a tube or under a roof stops where the original's head did, so the hair no longer pops out over the top"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "The save cloud sits in the pack row beside search, centred, instead of up in its corner"
    }
   ]
  },

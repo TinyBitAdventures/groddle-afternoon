@@ -19,7 +19,7 @@ import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=8133
 import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=8f6e0097';
 import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=b40dbb9f';
 import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=a5712ed5';
-import { FEATURES } from '../public/js/features/index.js?v=d61f8e53';
+import { FEATURES } from '../public/js/features/index.js?v=f6e72700';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=1ecf2899';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=b74a8113';
 import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
@@ -310,7 +310,7 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
   const src = (f) => readFileSync(join(ext, 'src', f), 'utf8');
 
   it('declares its tables under its own names, with the keys the routes rely on', () => {
-    assert.deepEqual(Object.keys(manifest.tables).sort(), ['groddle_admin_actions', 'groddle_admin_teleports', 'groddle_auctions', 'groddle_bans', 'groddle_buddies', 'groddle_butler_parcels', 'groddle_drops', 'groddle_furniture_sales', 'groddle_gifts', 'groddle_group_halls', 'groddle_group_invites', 'groddle_group_members', 'groddle_groups', 'groddle_home_pool', 'groddle_home_pool_marks', 'groddle_home_signposts', 'groddle_home_tending', 'groddle_home_visitors', 'groddle_home_yard', 'groddle_house_keys', 'groddle_ignores', 'groddle_ledger', 'groddle_ledger_credited', 'groddle_ledger_items', 'groddle_ledger_log', 'groddle_ledger_outcomes', 'groddle_mail_sends', 'groddle_mp_saves', 'groddle_players', 'groddle_profiles', 'groddle_signups', 'groddle_snaps', 'groddle_solo_backups', 'groddle_ticket_messages', 'groddle_tickets', 'groddle_trades']);
+    assert.deepEqual(Object.keys(manifest.tables).sort(), ['groddle_admin_actions', 'groddle_admin_teleports', 'groddle_auctions', 'groddle_bans', 'groddle_buddies', 'groddle_butler_parcels', 'groddle_drops', 'groddle_furniture_sales', 'groddle_gifts', 'groddle_group_halls', 'groddle_group_invites', 'groddle_group_members', 'groddle_groups', 'groddle_home_pool', 'groddle_home_pool_marks', 'groddle_home_signposts', 'groddle_home_tending', 'groddle_home_visitors', 'groddle_home_yard', 'groddle_house_keys', 'groddle_ignores', 'groddle_ledger', 'groddle_ledger_credited', 'groddle_ledger_items', 'groddle_ledger_log', 'groddle_ledger_outcomes', 'groddle_mail_sends', 'groddle_mp_saves', 'groddle_players', 'groddle_profiles', 'groddle_signups', 'groddle_snaps', 'groddle_solo_backups', 'groddle_ticket_messages', 'groddle_ticket_pictures', 'groddle_tickets', 'groddle_trades']);
     assert.ok(manifest.tables.groddle_players.includes('UNIQUE KEY name_key (name_key)'), 'no two characters share a name, whatever its letter case');
     assert.ok(manifest.tables.groddle_mp_saves.includes('PRIMARY KEY  (user_id)'), 'one multiplayer save per user');
     assert.ok(manifest.tables.groddle_solo_backups.includes('PRIMARY KEY  (user_id,slot)'), 'one backup per slot');

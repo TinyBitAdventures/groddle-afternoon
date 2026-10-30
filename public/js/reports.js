@@ -8,6 +8,14 @@
  * A ticket: { id, status: open|answered|closed, subject, createdAt, updatedAt,
  * lastMessageAt, lastAuthor: player|admin, unread }; a message: { id, author:
  * player|admin, body, at }. Who wrote is a role: an administrator is never named.
+ *
+ * A new report may carry a picture of the game (Austin 2026-10-30): Attach a
+ * picture of the game, ticked by default, sends the game's canvas as a JPEG
+ * (REPORT_PICTURE; the feature's capturePicture). The canvas is the street:
+ * you, other players' avatars, the name plates and speech bubbles drawn over
+ * them; never the HUD, the chat dock or a window, which are page elements.
+ * The site checks it again (src/ReportPicture.php) and shows it only to you
+ * and the administrators (src/TicketPictures.php).
  */
 
 import { minnUrls } from './minn-account.js?v=81339760';
@@ -41,7 +49,54 @@ export const REPORT_TEXT = Object.freeze({
   closedDone: 'Report closed.',
   unreadDot: 'New reply',
   meta: (n) => (n === 0 ? 'No reports yet' : n === 1 ? '1 report' : `${n} reports`),
+  picture: 'Attach a picture of the game',
+  pictureHint: 'It shows the street as you see it, with other players, their names and speech bubbles. Not your chat or these windows.',
+  pictureNone: 'The game view could not be drawn, so no picture goes with this one.',
+  pictureAlt: 'The game when you reported it',
+  pictureOpen: 'Open the picture full size',
+  sentNoPicture: 'Thanks! Your report was sent, without the picture.',
 });
+
+/**
+ * The picture of the game: the canvas downscaled to at most maxWidth, as a
+ * JPEG at quality (then lower, then narrower) until it fits maxBytes. The
+ * site's own limits are src/ReportPicture.php (1280x1280, 300 KiB, JPEG).
+ */
+export const REPORT_PICTURE = Object.freeze({
+  maxWidth: 1280,
+  maxHeight: 1280,
+  widths: Object.freeze([1280, 1024, 800]),
+  qualities: Object.freeze([0.8, 0.7, 0.6]),
+  maxBytes: 307200,
+  type: 'image/jpeg',
+});
+
+/** A w x h view drawn at most maxWidth wide and maxHeight tall, the shape kept: [w, h] in whole pixels. */
+export function pictureSize(w, h, maxWidth = REPORT_PICTURE.maxWidth, maxHeight = REPORT_PICTURE.maxHeight) {
+  const W = Math.max(0, Number(w) || 0);
+  const H = Math.max(0, Number(h) || 0);
+  if (!W || !H) return [0, 0];
+  const s = Math.min(1, maxWidth / W, maxHeight / H);
+  return [Math.max(1, Math.round(W * s)), Math.max(1, Math.round(H * s))];
+}
+
+/** The bytes a base64 string decodes to. */
+export function base64Size(b64) {
+  const s = String(b64 || '');
+  const pad = s.endsWith('==') ? 2 : s.endsWith('=') ? 1 : 0;
+  return Math.max(0, Math.floor((s.length * 3) / 4) - pad);
+}
+
+/** Whether a refusal was the picture's (the report itself would go without it). */
+export function pictureRefused(err) {
+  return typeof err?.code === 'string' && err.code.startsWith('groddle_report_picture');
+}
+
+/** A thread's picture address from the site (src/TicketPictures.php), or ''. */
+export function pictureSrc(picture) {
+  const url = typeof picture?.url === 'string' ? picture.url : '';
+  return /^\/report-pictures\/\d{1,12}$/.test(url) ? url : '';
+}
 
 /** The status chip's words. */
 export const STATUS_WORDS = Object.freeze({ open: 'Open', answered: 'Answered', closed: 'Closed' });
@@ -140,10 +195,10 @@ export function createReportsApi({ baseUri, fetch: fetchFn = globalThis.fetch?.b
     list: () => call('tickets'),
     /** { unread } */
     unread: () => call('tickets/unread'),
-    /** { ticket, messages }; marks it read. */
+    /** { ticket, messages, picture }; marks it read. */
     thread: (id) => call(`tickets/${Number(id)}`),
-    /** { status: sent, id, ticket } */
-    create: (message, context = {}) => call('tickets', { method: 'POST', body: { message, context } }),
+    /** { status: sent, id, ticket }; picture: a JPEG data URL, or nothing. */
+    create: (message, context = {}, picture = null) => call('tickets', { method: 'POST', body: picture ? { message, context, picture } : { message, context } }),
     /** { ticket, messages } */
     reply: (id, message) => call(`tickets/${Number(id)}/messages`, { method: 'POST', body: { message } }),
     /** { ticket, messages } */

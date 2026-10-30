@@ -19,13 +19,23 @@
  * on). A reply email's link (/play/online/#report=<id>) opens that thread.
  * Solo has no account to send from: in solo this feature draws nothing.
  *
+ * A picture of the game (Austin 2026-10-30): New report draws the game as it
+ * is (capturePicture: engine.snapshotView, the Pixi stage through the
+ * renderer's extract, the location view only) to a JPEG at most 1280 wide,
+ * quality 0.8 and lower or narrower until it is under 300 KiB, and the form
+ * sends it unless the player unticks Attach a picture of the game. What it
+ * holds is what the canvas draws: the street, the player, other players'
+ * avatars with their name plates, and speech bubbles (local chat said aloud).
+ * The HUD, the chat dock, Activity and every window are page elements and are
+ * never in it.
+ *
  * QA: canvas data bugReport (closed|open|sending), bugReportLast (the last
  * line shown), reportsView (list|thread|new), reportsUnread (n);
  * window.groddleBugReport.open('list'|'new'), .openTicket(id), .refresh() in multiplayer.
  */
 
-import { createReportsApi, REPORT_TEXT, UNREAD_POLL_MS, reportFromHash } from '../reports.js?v=f3d8584a';
-import { mountReportsSheet } from '../ui/reports-sheet.js?v=beb80ffb';
+import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=4112e3ff';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=b8e240dd';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 
@@ -80,6 +90,38 @@ export function reportContext(engine, errors = [], env = globalThis) {
   };
 }
 
+/**
+ * The game's canvas as a report's picture: { url, width, height, bytes } (a
+ * JPEG data URL), or null when the view cannot be drawn or never fits.
+ */
+export function capturePicture(engine, doc = globalThis.document, limits = REPORT_PICTURE) {
+  let view = null;
+  try { view = engine?.snapshotView?.({ resolution: 1 }); } catch { view = null; }
+  if (!view?.width || !view?.height || !doc?.createElement) return null;
+  for (const widest of limits.widths) {
+    const [w, h] = pictureSize(view.width, view.height, Math.min(widest, limits.maxWidth), limits.maxHeight);
+    if (!w || !h) return null;
+    const c = doc.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    const ctx = c.getContext?.('2d');
+    if (!ctx) return null;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, w, h);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(view, 0, 0, w, h);
+    for (const q of limits.qualities) {
+      let url = '';
+      try { url = c.toDataURL(limits.type, q); } catch { return null; }
+      if (!url.startsWith('data:image/jpeg;base64,')) return null;
+      const bytes = base64Size(url.slice(url.indexOf(',') + 1));
+      if (bytes <= limits.maxBytes) return { url, width: w, height: h, bytes };
+    }
+  }
+  return null;
+}
+
 const STYLE = `
 .bug-btn { display: inline-flex; align-items: center; justify-content: center; padding: var(--sp-2) 0.45rem; position: relative; }
 .bug-btn img { width: 23px; height: 20px; display: block; }
@@ -126,6 +168,17 @@ const STYLE = `
 [data-ui="modern"] #bug-report-panel .reports-text { box-sizing: border-box; width: 100%; resize: vertical; margin: 0; padding: var(--space-2) var(--space-3); border: 1px solid var(--border-strong); border-radius: var(--radius-m); background: var(--surface-raised); color: var(--text); font: var(--fs-m)/var(--lh-body) var(--font-ui); }
 [data-ui="modern"] #bug-report-panel .reports-new-view .reports-text { flex: 1 1 auto; min-height: 7.5rem; }
 [data-ui="modern"] #bug-report-panel .reports-actions { display: flex; justify-content: flex-end; gap: var(--space-2); }
+[data-ui="modern"] #bug-report-panel .reports-picture-row { display: flex; align-items: flex-start; gap: var(--space-3); }
+[data-ui="modern"] #bug-report-panel .reports-picture-text { flex: 1 1 auto; min-width: 0; display: grid; gap: 2px; }
+[data-ui="modern"] #bug-report-panel .reports-check { display: inline-flex; align-items: center; gap: var(--space-2); font-weight: var(--fw-bold); cursor: pointer; }
+[data-ui="modern"] #bug-report-panel .reports-checkbox { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+[data-ui="modern"] #bug-report-panel .reports-checkbox:disabled { cursor: default; }
+[data-ui="modern"] #bug-report-panel .reports-checkbox:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+[data-ui="modern"] #bug-report-panel .reports-hint { margin: 0; color: var(--text-muted); font-size: var(--fs-s); line-height: var(--lh-body); }
+[data-ui="modern"] #bug-report-panel .reports-picture-thumb { flex: none; width: 128px; height: auto; max-height: 96px; object-fit: cover; border: 1px solid var(--border); border-radius: var(--radius-s); }
+[data-ui="modern"] #bug-report-panel .reports-picture { display: block; margin-top: var(--space-2); width: fit-content; max-width: 100%; border: 1px solid var(--border); border-radius: var(--radius-s); overflow: hidden; line-height: 0; cursor: zoom-in; }
+[data-ui="modern"] #bug-report-panel .reports-picture:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+[data-ui="modern"] #bug-report-panel .reports-picture img { display: block; max-width: 100%; width: auto; height: auto; max-height: 180px; }
 [data-ui="modern"] #bug-report-panel .reports-status.is-error { color: var(--text-danger); white-space: normal; }
 [data-ui="modern"] .top-bar .top-actions .bug-btn .bug-unread { pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { [data-ui="modern"] #bug-report-panel .reports-card { animation: none; } }
@@ -170,6 +223,7 @@ function createSession(engine, errors) {
     host,
     api,
     context: () => reportContext(engine, errors),
+    capture: () => capturePicture(engine),
     toast: (t, ms) => engine.toast?.(t, ms),
     opener: () => btn,
     onState: ({ state, view, unread, last }) => {

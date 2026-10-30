@@ -2109,6 +2109,16 @@
 :root[data-ui="classic"] #bug-report-panel .reports-text:is(:hover, :focus) { background: var(--c-classic-input-hi); border-color: var(--c-classic-input-hi-border); }
 :root[data-ui="classic"] #bug-report-panel .reports-new-view .reports-text { flex: 1 1 auto; min-height: calc(120 * var(--cu)); }
 :root[data-ui="classic"] #bug-report-panel .reports-actions { display: flex; justify-content: flex-end; gap: calc(8 * var(--cu)); }
+:root[data-ui="classic"] #bug-report-panel .reports-picture-row { display: flex; align-items: flex-start; gap: calc(10 * var(--cu)); }
+:root[data-ui="classic"] #bug-report-panel .reports-picture-text { flex: 1 1 auto; min-width: 0; display: grid; gap: calc(2 * var(--cu)); }
+:root[data-ui="classic"] #bug-report-panel .reports-check { display: inline-flex; align-items: center; gap: calc(6 * var(--cu)); color: var(--c-classic-text); cursor: pointer; }
+:root[data-ui="classic"] #bug-report-panel .reports-checkbox { margin: 0; accent-color: var(--c-classic-link); }
+:root[data-ui="classic"] #bug-report-panel .reports-checkbox:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #bug-report-panel .reports-hint { margin: 0; color: var(--c-classic-offline); font-size: calc(var(--fs-classic-body) * var(--cu-n, 1)); }
+:root[data-ui="classic"] #bug-report-panel .reports-picture-thumb { flex: none; width: calc(128 * var(--cu)); height: auto; max-height: calc(96 * var(--cu)); object-fit: cover; border: 1px solid var(--c-classic-input-border); }
+:root[data-ui="classic"] #bug-report-panel .reports-picture { display: block; margin-top: calc(6 * var(--cu)); width: fit-content; max-width: 100%; border: 1px solid var(--c-classic-input-border); line-height: 0; cursor: zoom-in; }
+:root[data-ui="classic"] #bug-report-panel .reports-picture:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #bug-report-panel .reports-picture img { display: block; max-width: 100%; width: auto; height: auto; max-height: calc(180 * var(--cu)); }
 :root[data-ui="classic"] #bug-report-panel .reports-foot {
   flex: none;
   display: flex;

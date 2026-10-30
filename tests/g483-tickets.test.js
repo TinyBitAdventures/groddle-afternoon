@@ -16,9 +16,9 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, createReportsApi, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=f3d8584a';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=beb80ffb';
-import { BUG_TEXT, badgeFor, bugReportFeature } from '../public/js/features/bug-report-feature.js?v=5b069040';
+import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=4112e3ff';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=b8e240dd';
+import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=a16f71e6';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -297,6 +297,193 @@ describe('the Reports sheet (js/ui/reports-sheet.js)', () => {
   });
 });
 
+describe('a picture of the game with a report (Austin 2026-10-30)', () => {
+  const JPEG = (n) => `data:image/jpeg;base64,${'A'.repeat(n)}`;
+
+  it('the limits and helpers: at most 1280 wide, quality 0.8 first, under 300 KiB, JPEG', () => {
+    assert.equal(REPORT_PICTURE.maxWidth, 1280);
+    assert.equal(REPORT_PICTURE.qualities[0], 0.8);
+    assert.equal(REPORT_PICTURE.maxBytes, 307200);
+    assert.equal(REPORT_PICTURE.type, 'image/jpeg');
+    assert.deepEqual(pictureSize(1920, 1080), [1280, 720]);
+    assert.deepEqual(pictureSize(960, 540), [960, 540], 'never enlarged');
+    assert.deepEqual(pictureSize(1000, 2000), [640, 1280], 'a tall view keeps within 1280 tall');
+    assert.deepEqual(pictureSize(0, 10), [0, 0]);
+    assert.equal(base64Size('QUJD'), 3);
+    assert.equal(base64Size('QUI='), 2);
+    assert.equal(base64Size('QQ=='), 1);
+    assert.equal(pictureRefused({ code: 'groddle_report_picture_too_large' }), true);
+    assert.equal(pictureRefused({ code: 'groddle_feedback_slow' }), false);
+    assert.equal(pictureSrc({ url: '/report-pictures/12' }), '/report-pictures/12');
+    for (const url of ['https://evil.example/x.jpg', '/report-pictures/12?x', 'javascript:alert(1)', '']) assert.equal(pictureSrc({ url }), '', url);
+    for (const k of ['picture', 'pictureHint', 'pictureNone', 'pictureAlt', 'pictureOpen', 'sentNoPicture']) {
+      assert.ok(REPORT_TEXT[k], k);
+      assert.ok(!/[—–]/.test(REPORT_TEXT[k]), `no em dash: ${REPORT_TEXT[k]}`);
+    }
+    assert.equal(REPORT_TEXT.picture, 'Attach a picture of the game');
+    assert.match(REPORT_TEXT.pictureHint, /other players, their names and speech bubbles/, 'says what the canvas shows');
+  });
+
+  it('capturePicture draws the location view through snapshotView, downscaled, then lower quality, then narrower, until it fits', () => {
+    const made = [];
+    // Bytes a fake JPEG comes to: width x quality decides, so the steps show.
+    const doc = { createElement: () => {
+      const c = { width: 0, height: 0, drawn: [], getContext: () => ({ fillRect() {}, drawImage: (...a) => c.drawn.push(a) }), toDataURL: (type, q) => { made.push([c.width, q, type]); return JPEG(Math.round((c.width * q * 400) * 4 / 3)); } };
+      return c;
+    } };
+    const view = { width: 1920, height: 1080 };
+    const asked = [];
+    const engine = { snapshotView: (o) => { asked.push(o); return view; } };
+    // 1280 x 0.8 x 400 = 409,600 bytes: too big; 0.7 too; 0.6 = 307,200 fits.
+    const shot = capturePicture(engine, doc);
+    assert.deepEqual(asked, [{ resolution: 1 }]);
+    assert.deepEqual(made.map((m) => m.slice(0, 2)), [[1280, 0.8], [1280, 0.7], [1280, 0.6]]);
+    assert.equal(made[0][2], 'image/jpeg');
+    assert.equal(shot.width, 1280);
+    assert.equal(shot.height, 720);
+    assert.ok(shot.bytes <= 307200);
+    assert.ok(shot.url.startsWith('data:image/jpeg;base64,'));
+    // Tighter limits: narrower once every quality is too big at the widest.
+    made.length = 0;
+    const narrow = capturePicture(engine, doc, { ...REPORT_PICTURE, maxBytes: 250000 });
+    assert.deepEqual(made.map((m) => m.slice(0, 2)), [[1280, 0.8], [1280, 0.7], [1280, 0.6], [1024, 0.8], [1024, 0.7], [1024, 0.6]]);
+    assert.equal(narrow.width, 1024);
+    assert.equal(capturePicture(engine, doc, { ...REPORT_PICTURE, maxBytes: 10 }), null, 'never fits: no picture');
+    assert.equal(capturePicture({}, doc), null, 'no renderer yet');
+    assert.equal(capturePicture({ snapshotView: () => { throw new Error('lost context'); } }, doc), null);
+    // Only the canvas: the feature never reads the page's HUD or chat.
+    const f = read('public/js/features/bug-report-feature.js');
+    const fn = f.slice(f.indexOf('export function capturePicture('), f.indexOf('const STYLE'));
+    assert.match(fn, /engine\?\.snapshotView\?\.\(\{ resolution: 1 \}\)/);
+    assert.doesNotMatch(fn, /querySelector|getElementById|html2canvas|innerHTML/);
+    assert.match(f, /capture: \(\) => capturePicture\(engine\),/);
+    // snapshotView is the stage inside the location view (the pack strip below it left out).
+    assert.match(read('public/game.js'), /snapshotView\(\{ resolution = 1 \} = \{\}\) \{[\s\S]*?app\.renderer\.extract\.canvas\(\{ target: app\.stage, frame: new PIXI\.Rectangle\(0, 0, VIEW_W, LOCATION_VIEW_H\), resolution \}\)/);
+  });
+
+  function pictureApi({ refusePicture = false } = {}) {
+    const calls = [];
+    const tickets = [];
+    return {
+      calls,
+      list: async () => ({ tickets: tickets.map((t) => ({ ...t })), unread: 0 }),
+      unread: async () => ({ unread: 0 }),
+      thread: async (id) => ({ ticket: { id, status: 'open', subject: 'Pigs', lastAuthor: 'player', lastMessageAt: new Date(NOW).toISOString(), unread: false }, messages: [{ id: 1, author: 'player', body: 'Pigs float', at: new Date(NOW).toISOString() }], picture: id === 7 ? { url: '/report-pictures/7', width: 1280, height: 720 } : null }),
+      create: async (message, context, picture = null) => {
+        calls.push(['create', message, picture]);
+        if (picture && refusePicture) throw Object.assign(new Error('too big'), { status: 413, code: 'groddle_report_picture_too_large', data: { message: 'That picture is larger than a report keeps.' } });
+        const t = { id: 99, status: 'open', subject: message, lastAuthor: 'player', lastMessageAt: new Date(NOW).toISOString(), unread: false };
+        tickets.unshift(t);
+        return { status: 'sent', id: 99, ticket: t };
+      },
+      reply: async () => ({}),
+      close: async () => ({}),
+    };
+  }
+  const mount = (api, capture) => {
+    const doc = fakeDoc();
+    const host = new FakeNode('div', doc);
+    const toasts = [];
+    const sheet = mountReportsSheet({ doc, host, api, capture, toast: (t) => toasts.push(t), now: () => NOW });
+    return { doc, host, sheet, toasts };
+  };
+
+  it('New report ticks Attach a picture by default, shows it small, and sends it; unticked sends none', async () => {
+    const shot = { url: JPEG(400), width: 1280, height: 720, bytes: 300 };
+    let taken = 0;
+    const api = pictureApi();
+    const { host, sheet } = mount(api, () => { taken += 1; return shot; });
+    sheet.open('new');
+    await flush();
+    const box = byId(host, 'reports-picture');
+    assert.ok(box && 'reportsPicture' in box.dataset);
+    assert.equal(box.attrs.type, 'checkbox');
+    assert.equal(box.checked, true, 'on by default');
+    assert.equal(box.disabled, false);
+    assert.equal(taken, 1, 'drawn when the form opens');
+    const preview = byData(host, 'reportsPicturePreview');
+    assert.equal(preview.hidden, false);
+    assert.equal(preview.getAttribute('src'), shot.url);
+    assert.ok(host.find((n) => n.tagName === 'LABEL' && n.textContent.includes('Attach a picture of the game')));
+    byId(host, 'bug-report-text').value = 'Pigs float';
+    byData(host, 'bugReportSend').click();
+    await flush();
+    await flush();
+    assert.deepEqual(api.calls[0], ['create', 'Pigs float', shot.url]);
+    // A second report, unticked: no picture.
+    sheet.open('new');
+    await flush();
+    assert.equal(taken, 2, 'a fresh picture for each new report');
+    box.checked = false;
+    box.dispatch('change');
+    assert.equal(preview.hidden, true);
+    byId(host, 'bug-report-text').value = 'No picture please';
+    byData(host, 'bugReportSend').click();
+    await flush();
+    await flush();
+    assert.deepEqual(api.calls[1], ['create', 'No picture please', null]);
+  });
+
+  it('when the view cannot be drawn the box is off and says so; a refused picture never costs the report', async () => {
+    const off = mount(pictureApi(), () => null);
+    off.sheet.open('new');
+    await flush();
+    const box = byId(off.host, 'reports-picture');
+    assert.equal(box.checked, false);
+    assert.equal(box.disabled, true);
+    assert.equal(byId(off.host, 'reports-picture-hint').textContent, REPORT_TEXT.pictureNone);
+    const api = pictureApi({ refusePicture: true });
+    const { host, sheet, toasts } = mount(api, () => ({ url: JPEG(400), width: 800, height: 450 }));
+    sheet.open('new');
+    await flush();
+    byId(host, 'bug-report-text').value = 'Pigs float';
+    byData(host, 'bugReportSend').click();
+    for (let i = 0; i < 4; i++) await flush();
+    assert.equal(api.calls.length, 2);
+    assert.ok(api.calls[0][2], 'first with the picture');
+    assert.equal(api.calls[1][2], null, 'then without it');
+    assert.deepEqual(toasts, [REPORT_TEXT.sentNoPicture]);
+    // Something not a JPEG data URL from capture is never sent.
+    const odd = pictureApi();
+    const m = mount(odd, () => ({ url: 'https://evil.example/x.png' }));
+    m.sheet.open('new');
+    await flush();
+    byId(m.host, 'bug-report-text').value = 'x';
+    byData(m.host, 'bugReportSend').click();
+    await flush();
+    await flush();
+    assert.equal(odd.calls[0][2], null);
+  });
+
+  it('a thread shows the report\'s picture under its first message; a click opens it full size', async () => {
+    const { host, sheet } = mount(pictureApi(), () => null);
+    await sheet.openTicket(7);
+    await flush();
+    const a = byData(host, 'reportsThreadPicture');
+    assert.ok(a, 'the picture link');
+    assert.equal(a.tagName, 'A');
+    assert.equal(a.getAttribute('href'), '/report-pictures/7');
+    assert.equal(a.getAttribute('target'), '_blank');
+    assert.equal(a.getAttribute('rel'), 'noopener');
+    assert.equal(a.getAttribute('aria-label'), REPORT_TEXT.pictureOpen);
+    assert.equal(a.parentNode.dataset.author, 'player', 'under the report itself');
+    const img = a.children[0];
+    assert.equal(img.getAttribute('src'), '/report-pictures/7');
+    assert.equal(img.getAttribute('alt'), REPORT_TEXT.pictureAlt);
+    await sheet.openTicket(8);
+    await flush();
+    assert.equal(byData(host, 'reportsThreadPicture'), null, 'a report without one shows none');
+  });
+
+  it('the new controls are styled in both skins, Classic under its root', () => {
+    const f = read('public/js/features/bug-report-feature.js');
+    for (const sel of ['.reports-picture-row', '.reports-checkbox', '.reports-picture-thumb', '.reports-picture img']) assert.ok(f.includes(`[data-ui="modern"] #bug-report-panel ${sel}`), sel);
+    const css = read('public/css/classic.css');
+    for (const sel of ['.reports-picture-row', '.reports-checkbox', '.reports-picture-thumb', '.reports-picture img']) assert.ok(css.includes(`:root[data-ui="classic"] #bug-report-panel ${sel}`), sel);
+    assert.match(f, /prefers-reduced-motion/);
+  });
+});
+
 describe('the game wiring', () => {
   it('the feature mounts the sheet in the panel shell and polls the badge; game.js hands features the shell', () => {
     const f = read('public/js/features/bug-report-feature.js');
@@ -417,7 +604,7 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
   it('the console has a Reports tab: list, thread, reply, close and reopen, and the old reports\' button', async () => {
     const page = src('src/AdminConsolePage.php');
     for (const hook of ['data-console-tab="reports"', 'data-console-tickets', 'data-console-thread', 'data-console-reply', 'data-console-thread-close', 'data-console-thread-reopen', 'data-console-migrate', 'data-console-ticket-filter']) assert.ok(page.includes(hook), hook);
-    assert.match(page, /ASSET_KEY = 'g491-2'/);
+    assert.match(page, /ASSET_KEY = 'g491-3'/);
     const js = src('console/console.js');
     for (const route of ["admin/tickets?status=", "admin/tickets/${id}", "admin/tickets/${tickets.open}/reply", "admin/tickets/${tickets.open}/${kind}", "admin/tickets/migrate"]) assert.ok(js.includes(route), route);
     assert.match(js, /el\('p', \{ class: 'console-msg-body', text: m\.body \}\)/, 'messages set as text');
@@ -462,5 +649,79 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
     assert.match(mig, /\$store->open\(\(int\) \$row\['post_author'\], \$message, \$context, \$at, \$id\)/);
     assert.match(src('src/TicketStore.php'), /'INSERT ' \. \(\$legacyPost !== null \? 'IGNORE ' : ''\)/);
     assert.doesNotMatch(mig, /UPDATE [^']*posts|DELETE/i, 'the posts stay as they are');
+  });
+});
+
+describe('the site keeps a report\'s picture (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
+  const src = (f) => readFileSync(sitePath(f), 'utf8');
+
+  it('declares groddle_ticket_pictures additively and bumps the schema version', () => {
+    const m = JSON.parse(src('minn.json'));
+    const t = m.tables.groddle_ticket_pictures;
+    for (const col of ['ticket_id', 'player_user_id', 'picture', 'width', 'height', 'bytes', 'created_at']) assert.ok(t.some((l) => l.startsWith(`${col} `)), col);
+    assert.ok(t.includes('picture mediumblob NOT NULL'));
+    assert.ok(t.includes('PRIMARY KEY  (ticket_id)'), 'one picture a ticket');
+    assert.ok(t.includes('KEY player_user_id (player_user_id)'), 'cleanups find it by player');
+    const [a, b, c] = m.version.split('.').map(Number);
+    assert.ok(a > 0 || b > 5 || (b === 5 && c >= 23), `schema version past 0.5.22 (HomePicture's): ${m.version}`);
+    // Additive: the tickets' own tables keep every column.
+    for (const col of ['id', 'player_user_id', 'status', 'subject', 'context', 'legacy_post_id']) assert.ok(m.tables.groddle_tickets.some((l) => l.startsWith(`${col} `)), col);
+  });
+
+  it('checks the picture on the server: JPEG from its bytes, at most 1280x1280 and 300 KiB, written again by GD', () => {
+    const php = src('src/ReportPicture.php');
+    assert.match(php, /MAX_BYTES = 307_200;/);
+    assert.match(php, /MAX_W = 1280;/);
+    assert.match(php, /MAX_H = 1280;/);
+    assert.match(php, /str_starts_with\(\$bytes, "\\xFF\\xD8\\xFF"\)/);
+    assert.match(php, /SnapImage::readJpeg\(\$bytes\)/);
+    assert.match(php, /imagejpeg\(\$image, null, \$quality\)/);
+    assert.match(php, /public const CODE = 'groddle_report_picture';/);
+    // Only with a new report, after the report's own limits.
+    const t = src('src/Tickets.php');
+    const create = t.slice(t.indexOf('public function create('), t.indexOf('public function reply('));
+    assert.ok(create.indexOf('openedSince(') > 0 && create.indexOf('openedSince(') < create.indexOf('ReportPicture::accept('), 'the rate limit first');
+    assert.match(create, /\$store->open\(\$me->id, \$message, \$context, \$now, null, \$picture\)/);
+    assert.doesNotMatch(t.slice(t.indexOf('public function reply(')), /ReportPicture/, 'no picture with a reply');
+    assert.match(src('src/TicketStore.php'), /INSERT INTO ' \. \$this->db->table\(self::PICTURES\) \. ' \(ticket_id, player_user_id, picture, width, height, bytes, created_at\)/);
+    // Binary as base64 through FROM_BASE64, as Profiles writes its pictures: raw bytes bound as a string never stored (QA 2026-10-30).
+    assert.match(src('src/TicketStore.php'), /VALUES \(\?, \?, FROM_BASE64\(\?\), \?, \?, \?, \?\)', \[\$id, \$player, base64_encode\(\$picture\['bytes'\]\)/);
+  });
+
+  it('serves it only to the report\'s player and the administrators, never cached', () => {
+    const php = src('src/TicketPictures.php');
+    assert.match(php, /#\[Route\(Method::Get, '\/report-pictures\/\{id:\\d\+\}', policy: new Policy\(Access::Public\)\)\]/);
+    assert.match(php, /if \(\$user === null\) \{\s*throw new RouteMiss\(\);/);
+    assert.match(php, /\$mine = \(int\) \$row\['player_user_id'\] === \$user->id;/);
+    assert.match(php, /if \(!\$mine && !Capabilities::fromDb\(\$this->minn->db\)->can\(\$user->id, 'manage_options'\)\) \{\s*throw new RouteMiss\(\);/);
+    for (const h of ["'Content-Type' => 'image/jpeg'", "'Cache-Control' => 'private, no-store'", "'X-Content-Type-Options' => 'nosniff'", "default-src 'none'; sandbox"]) assert.ok(php.includes(h), h);
+    assert.match(src('src/Extension.php'), /\$minn->routes\(new TicketPictures\(\$minn\)\);/);
+    // Both threads carry where it is, never the bytes.
+    assert.match(src('src/Tickets.php'), /'picture' => \$store->pictureOut\(\$id\)/);
+    assert.match(src('src/AdminTickets.php'), /'picture' => \$store->pictureOut\(\$id\),/);
+    assert.match(src('src/TicketStore.php'), /SELECT width, height FROM ' \. \$this->db->table\(self::PICTURES\)/);
+  });
+
+  it('the console shows it in the thread, click to open full size', async () => {
+    const page = src('src/AdminConsolePage.php');
+    for (const hook of ['data-console-picture', 'data-console-picture-link', 'data-console-picture-img']) assert.ok(page.includes(hook), hook);
+    assert.match(page, /<a data-console-picture-link target="_blank" rel="noopener"/);
+    const mod = await import(pathToFileURL(sitePath('console/console.js')).href);
+    assert.equal(mod.pictureSrc({ url: '/report-pictures/3' }), '/report-pictures/3');
+    assert.equal(mod.pictureSrc({ url: '//evil.example/x' }), '');
+    assert.equal(mod.pictureSrc(null), '');
+  });
+
+  it('the picture rules (php)', { skip: (!hasPhp && 'no php') || noEngine }, () => {
+    const out = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/tickets.php'), engine, SITE_DIR], { encoding: 'utf8' })).picture;
+    assert.deepEqual(out.kept, { width: 640, height: 360, soi: true, fits: true, tagDropped: true });
+    assert.deepEqual(out.bytesDecide, { ok: true }, 'a data URL\'s own type is not trusted');
+    assert.deepEqual(out.pngNamedJpeg, { code: 'groddle_report_picture_type', status: 415 });
+    assert.deepEqual(out.tooWide, { code: 'groddle_report_picture_size', status: 400 });
+    assert.deepEqual(out.tooSmall, { code: 'groddle_report_picture_size', status: 400 });
+    assert.deepEqual(out.tooLarge, { code: 'groddle_report_picture_too_large', status: 413 });
+    assert.deepEqual(out.tooLong, { code: 'groddle_report_picture_too_large', status: 413 });
+    for (const k of ['garbage', 'cut', 'notString']) assert.deepEqual(out[k], { code: 'groddle_report_picture', status: 400 }, k);
+    assert.deepEqual(out.limits, { maxBytes: REPORT_PICTURE.maxBytes, maxW: REPORT_PICTURE.maxWidth, maxH: REPORT_PICTURE.maxHeight }, 'the game and the site agree');
   });
 });

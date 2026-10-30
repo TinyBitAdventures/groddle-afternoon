@@ -1,7 +1,7 @@
 <?php
 /**
  * Runs the site repo's ticket rules (groddle-afternoon-site src/TicketStore.php,
- * TicketMigration.php, BugReports.php, PlayerMail.php) against the engine's
+ * TicketMigration.php, BugReports.php, PlayerMail.php, ReportPicture.php) against the engine's
  * classes and prints them as JSON (tests/g483-tickets.test.js). Pure: no
  * database is opened.
  *
@@ -24,6 +24,7 @@ spl_autoload_register(static function (string $class) use ($extension): void {
 
 use Groddle\Minn\BugReports;
 use Groddle\Minn\PlayerMail;
+use Groddle\Minn\ReportPicture;
 use Groddle\Minn\TicketMigration;
 use Groddle\Minn\TicketStore;
 
@@ -42,7 +43,58 @@ $old = "<!-- wp:paragraph -->\n<p>The pig &amp; the &lt;b&gt;butterfly&lt;/b&gt;
 
 [$subject, $html, $headers] = PlayerMail::ticketReply('https://groddle.example/', '', 'Zz <b>Ada</b>', 'The <i>pig</i> froze', "Thanks!\n<script>alert(1)</script> & fixed.", 'https://groddle.example/play/online/#report=7');
 
+// A report's picture: JPEGs made here with GD, and what is refused (the code and status).
+$jpeg = static function (int $w, int $h, int $q = 80): string {
+    $im = imagecreatetruecolor($w, $h);
+    for ($x = 0; $x < $w; $x += 8) {
+        imagefilledrectangle($im, $x, 0, $x + 7, $h - 1, (int) imagecolorallocate($im, ($x * 7) % 256, ($x * 3) % 256, 120));
+    }
+    ob_start();
+    imagejpeg($im, null, $q);
+    return (string) ob_get_clean();
+};
+$refusal = static function (mixed $value): array {
+    try {
+        ReportPicture::accept($value);
+        return ['ok' => true];
+    } catch (Minn\RestError $e) {
+        return ['code' => $e->errorCode, 'status' => $e->status];
+    }
+};
+$good = $jpeg(640, 360);
+// An APP1 (EXIF-like) segment after SOI: GD's new JPEG keeps none of it.
+$tagged = "\xFF\xD8" . "\xFF\xE1" . pack('n', 2 + 16) . 'Exif' . "\0\0" . 'SECRETGPS!' . substr($good, 2);
+$kept = ReportPicture::accept('data:image/jpeg;base64,' . base64_encode($tagged));
+ob_start();
+imagepng(imagecreatetruecolor(320, 200));
+$png = (string) ob_get_clean();
+$noise = static function (int $w, int $h): string {
+    $im = imagecreatetruecolor($w, $h);
+    mt_srand(7);
+    for ($y = 0; $y < $h; $y++) {
+        for ($x = 0; $x < $w; $x++) {
+            imagesetpixel($im, $x, $y, mt_rand(0, 0xFFFFFF));
+        }
+    }
+    ob_start();
+    imagejpeg($im, null, 100);
+    return (string) ob_get_clean();
+};
+
 echo json_encode([
+    'picture' => [
+        'kept' => ['width' => $kept['width'], 'height' => $kept['height'], 'soi' => str_starts_with($kept['bytes'], "\xFF\xD8\xFF"), 'fits' => strlen($kept['bytes']) <= ReportPicture::MAX_BYTES, 'tagDropped' => !str_contains($kept['bytes'], 'SECRETGPS')],
+        'pngNamedJpeg' => $refusal('data:image/jpeg;base64,' . base64_encode($png)),
+        'bytesDecide' => $refusal('data:image/png;base64,' . base64_encode($good)),
+        'tooWide' => $refusal(base64_encode($jpeg(1400, 200))),
+        'tooSmall' => $refusal(base64_encode($jpeg(40, 40))),
+        'tooLarge' => $refusal(base64_encode($noise(1000, 700))),
+        'tooLong' => $refusal(str_repeat('A', 500000)),
+        'garbage' => $refusal('not base64 at all!'),
+        'cut' => $refusal(base64_encode(substr($good, 0, 400))),
+        'notString' => $refusal(['a']),
+        'limits' => ['maxBytes' => ReportPicture::MAX_BYTES, 'maxW' => ReportPicture::MAX_W, 'maxH' => ReportPicture::MAX_H],
+    ],
     'subject' => [
         'short' => TicketStore::subject("  Pigs float\nmore words"),
         'long' => TicketStore::subject(str_repeat('a', 80)),
