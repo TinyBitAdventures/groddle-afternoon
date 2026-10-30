@@ -286,8 +286,21 @@ export function scheduleNextAttack(save, now, rng = Math.random) {
   return save.nextAttackAt;
 }
 
-/** isRookable: not an instance/POL/home/game, and the street has a shrine. */
-export function streetIsRookable({ hasShrine = false, instance = false, home = false } = {}) {
+/**
+ * Hubs the 2012 server hid (locations/location.js is_hidden 2807: `this.hubid == 129 ||
+ * this.hubid == 132 || this.hubid == 81`), and a hidden street is never rookable
+ * (locations/inc_rook.js isRookable 20). 129 is Gentle Island, the new-player island
+ * (js/newxp.js GENTLE_ISLAND); 132 the practice streets the first skills send you to
+ * (Light Green Thumb, Animal Kinship, Soil Appreciation, EZ Cookin'); 81 the game and race clones.
+ */
+export const ROOK_HIDDEN_HUBS = Object.freeze(['129', '132', '81']);
+
+/**
+ * isRookable (locations/inc_rook.js 19-31): not a POL or home, not an instance, not a hidden
+ * street (a new-player or practice street: ROOK_HIDDEN_HUBS), not a game; and the street has a shrine.
+ */
+export function streetIsRookable({ hasShrine = false, instance = false, home = false, hubId = '' } = {}) {
+  if (ROOK_HIDDEN_HUBS.includes(String(hubId ?? ''))) return false;
   return Boolean(hasShrine) && !instance && !home;
 }
 

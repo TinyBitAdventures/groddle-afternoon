@@ -84,7 +84,7 @@ import {
   strikeBeamFor,
   strikeDamageFor,
   useBalmPoint,
-} from '../rook-attack.js';
+} from '../rook-attack.js?v=g479-2';
 import { shrinePrimeBonus } from '../imagination-effects.js?v=g403-1';
 import { grantMoodXp } from '../mood-xp.js';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js';
@@ -103,7 +103,7 @@ import {
   strikeDamage as mpStrikeDamage,
   syncKeys,
   syncObjs,
-} from '../rook-mp.js?v=g334-1';
+} from '../rook-mp.js?v=g479-2';
 import { itemZ } from '../item-bands.js?v=g429-1';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=g479-1';
 
@@ -2682,7 +2682,7 @@ export const rookAttackFeature = {
       // Schedule (about hourly) on rookable streets only.
       if (!save.nextAttackAt) scheduleNextAttack(save, t);
       if (!active() && t >= save.nextAttackAt && !demoMode && !qaRoute(engine)) {
-        const rookable = streetIsRookable({ hasShrine: hasShrine(engine), instance: engine.transientInstance(), home: engine.homeContext().inHome });
+        const rookable = streetIsRookable({ hasShrine: hasShrine(engine), instance: engine.transientInstance(), home: engine.homeContext().inHome, hubId: engine.street?.hubId });
         if (rookable && !engine.busy() && t - enteredAt > 8000) beginAttack(engine);
       }
       const a = active();

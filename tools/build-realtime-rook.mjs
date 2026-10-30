@@ -3,8 +3,9 @@
  * attacks (the realtime server's rook.go).
  *
  * - streets: every street the Rook can attack (locations/inc_rook.js
- *   isRookable 19-31: a street with a shrine; instances, homes and party
- *   spaces never reach the shared server), with its hub (groups/rook_attack.js
+ *   isRookable 19-31: a street with a shrine, not hidden: no new-player
+ *   island, practice street or game clone, js/rook-attack.js ROOK_HIDDEN_HUBS;
+ *   instances, homes and party spaces never reach the shared server), with its hub (groups/rook_attack.js
  *   is one attack group per hub, newLocation 30-66 picks a street of that
  *   hub), the shrine's place as game.js spawnShrine puts it (placement
  *   'shrine' from the same planner as tools/build-realtime-objects.mjs, then
@@ -37,6 +38,9 @@ import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
 import { loadRecipeCatalogFromFile } from '../public/js/making.js';
 import { SHRINE_ITEM_BASE_COSTS, donationValueFor, giantForStreet } from '../public/js/shrines.js?v=spinning-wheel-test-4';
 import { placementRequests } from './build-realtime-objects.mjs';
+import { streetIsRookable } from '../public/js/rook-attack.js';
+import { rebuiltRoomEcology } from '../public/js/rebuilt-rooms.js';
+import { winterStreetEcology } from '../public/js/winter-walk-streets.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');
@@ -103,7 +107,12 @@ async function main() {
       continue;
     }
     const meta = index.streets[tsid] || {};
-    const shrine = streetShrine({ ...data, hubId: data.hubId ?? meta.hubId, hubName: data.hubName ?? meta.hubName }, { starter: data.tsid === STREET_INDEX.default });
+    const hubId = String(data.hubId ?? meta.hubId ?? '');
+    // The new-player island, the practice streets and the game clones are hidden in the source: no Rook (ROOK_HIDDEN_HUBS).
+    if (!streetIsRookable({ hasShrine: true, hubId })) continue;
+    // The rebuilt rooms and Winter Walk spawn what the game spawns there (rebuilt-rooms-feature ecologyOverride): no shrine.
+    const override = rebuiltRoomEcology(tsid) || winterStreetEcology(tsid);
+    const shrine = streetShrine({ ...data, hubId: data.hubId ?? meta.hubId, hubName: data.hubName ?? meta.hubName }, { starter: data.tsid === STREET_INDEX.default, ...(override ? { ecology: override } : {}) });
     if (!shrine) continue;
     streets[tsid] = [String(data.hubId ?? meta.hubId ?? ''), shrine.x, shrine.y, shrine.giant];
   }

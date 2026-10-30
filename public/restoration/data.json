@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 825,
+  "commits": 826,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "The Rook attack's badge sits under the top bar and clear of the Social drawer, and in Classic it hangs from the header centre as in 2012"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "Classic's chat reads at the 2012 size, each speaker's name in its own colour, and the contact strip opens"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "The verb menu on another player sits over their avatar instead of the top-left corner"
    }
   ]
  },
- "tests": 459,
+ "tests": 460,
  "generatedAt": "2026-10-30"
 }
