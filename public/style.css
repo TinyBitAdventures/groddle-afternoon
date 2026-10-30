@@ -117,6 +117,7 @@
   --z-raised: 1;    /* a part lifted inside its own component */
   --z-world: 5;     /* drawn over the world: tints, the verb menu */
   --z-hud: 12;      /* nameplate, tracker, feed, buffs, chat dock */
+  --z-hud-pop: calc(var(--z-hud) + 16); /* the top bar while its Menu, Sound or eat menu is open: over the Social drawer (z-hud + 14) */
   --z-overlay: 32;  /* world announcements (the Qurazy banner): over the HUD, under every panel */
   --z-overlay: 32;  /* world announcements (the Qurazy banner): over the HUD, under every panel */
   --z-panel: 35;    /* side panels, Map, modals, the pack */
@@ -10074,3 +10075,14 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] .imagination-hub .hub-tile:focus-visible .hub-art { transform: none; }
 }
 /* —— end HUB —— */
+
+/* —— HUB: top bar popovers over the Social drawer (both skins) —— */
+/* The top bar is its own stacking layer (--z-hud), under the open Social drawer or Classic's chat
+   column (--z-hud + 14) where they meet: at 1440 px and up the Menu and the Sound popover drop from
+   the bar's right end onto the drawer (in Classic the Sound popover onto the chat column), and
+   their lower rows took no clicks. While one of the bar's popovers (the Menu, Sound, the eat menu)
+   is open, the bar lifts to --z-hud-pop; the rest of the time it stays under the drawer. */
+#wrap > header.top-bar:has(#more-list:not([hidden]), #sound-pop:not([hidden]), #vitals-menu:not([hidden])) {
+  z-index: var(--z-hud-pop);
+}
+/* —— end HUB top bar layer —— */
