@@ -937,24 +937,40 @@ export function renderRaceCourse(PIXI, course) {
   return root;
 }
 
-/** Striped finish posts with a red-and-white ribbon (race_end_position). */
-export function drawFinishPosts(PIXI, finish) {
-  const g = new PIXI.Graphics();
-  const h = 124;
-  for (const side of [-36, 36]) {
-    g.rect(side - 5, -h, 10, h).fill(0x202020);
-    for (let y = -h; y < 0; y += 16) g.rect(side - 5, y, 10, 8).fill(0xf5f5f5);
-    g.circle(side, -h - 2, 6).fill(0x202020);
-  }
-  const ry = -h * 0.55;
-  g.poly([-31, ry - 5, 31, ry - 9, 31, ry + 1, -31, ry + 5]).fill(0xffffff);
-  for (let i = 0; i < 6; i += 1) {
-    const x = -31 + i * 11;
-    g.poly([x, ry - 5 - i * 0.6, x + 6, ry - 5.5 - i * 0.6, x + 6, ry + 4.5 - i * 0.6, x, ry + 5 - i * 0.6]).fill(0xe2302d);
-  }
-  g.x = finish.x;
-  g.y = finish.y + 2;
-  return g;
+/**
+ * The finish gate (race_end_position) in Tiny Speck's own pieces: groddle1.swf
+ * groddle_finishline_bar_back, _middle and _close (arbito1.swf's arbito_finishline_bar_* and
+ * quest02.swf's copies are the same bytes), drawn at their stage size. Their names place them: the
+ * far post behind the racers, the near post in front, the red and white bar from one post top to the
+ * other. The race streets are lost, so the spacing is ours, read off the bar: its ends are 60 px apart
+ * and its right end 20 px lower, so the posts stand 60 px apart and the near one 18 px lower (nearer).
+ */
+export const FINISH_GATE = Object.freeze({
+  scale: 0.5, // the decos' files are twice their stage size
+  back: Object.freeze({ name: 'groddle_finishline_bar_back', dx: -26, dy: -9 }),
+  bar: Object.freeze({ name: 'groddle_finishline_bar_middle', dx: -31, dy: -157 }),
+  close: Object.freeze({ name: 'groddle_finishline_bar_close', dx: 33, dy: 9 }),
+});
+
+function gatePiece(PIXI, piece, finish, anchor) {
+  const sprite = new PIXI.Sprite(textureFromUrl(`${DECO_DIR}${piece.name}.png`));
+  sprite.anchor.set(...anchor);
+  sprite.scale.set(FINISH_GATE.scale);
+  sprite.x = finish.x + piece.dx;
+  sprite.y = finish.y + piece.dy;
+  return sprite;
+}
+
+/**
+ * The gate's two halves: `back` (far post and bar) to draw under the racers, `front` (near post) over
+ * them. Each is positioned in world space.
+ */
+export function drawFinishGate(PIXI, finish) {
+  const back = new PIXI.Container();
+  back.addChild(gatePiece(PIXI, FINISH_GATE.back, finish, [0.5, 1]));
+  back.addChild(gatePiece(PIXI, FINISH_GATE.bar, finish, [0, 0]));
+  const front = gatePiece(PIXI, FINISH_GATE.close, finish, [0.5, 1]);
+  return { back, front };
 }
 
 /** Small checkpoint pennant; setPassed(true) turns it green. */

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Race course lab · Groddle</title>
   <!-- Content keys for data and art URLs (js/data-urls.js): before every other script. -->
-  <script src="js/data-versions.js?v=39fe7f7e"></script>
+  <script src="js/data-versions.js?v=008d4fa3"></script>
   <script src="js/data-urls.js?v=g434-1"></script>
   <script src="vendor/pixi/pixi-8.22.0.min.js"></script>
   <style>
@@ -26,10 +26,10 @@
   <div id="stage"></div>
   <script type="module">
     import { raceCourse, RACE_COURSE_IDS } from './js/race-courses.js';
-    import { renderRaceCourse, drawFinishPosts, drawCheckpointFlag } from './js/race-render.js?v=g448-2';
+    import { renderRaceCourse, drawFinishGate, drawCheckpointFlag } from './js/race-render.js?v=g457-2';
     import { RACES, routeDurationMs, formatRaceTime } from './js/races.js';
     import * as textureUrls from './js/textures.js';
-    import { installHiresDecos } from './js/deco-hires.js?v=g457-1';
+    import { installHiresDecos } from './js/deco-hires.js?v=g457-2';
 
     // Decos ship as WebP; route the .png deco URLs the renderer asks for, as the game does.
     installHiresDecos(textureUrls);
@@ -58,7 +58,10 @@
     bg.updateParallax?.(camX, camY);
     world.addChild(bg);
     for (const cp of course.checkpoints) world.addChild(drawCheckpointFlag(PIXI, cp));
-    if (course.finish) world.addChild(drawFinishPosts(PIXI, course.finish));
+    if (course.finish) {
+      const gate = drawFinishGate(PIXI, course.finish);
+      world.addChild(gate.back, gate.front);
+    }
     const lines = new PIXI.Graphics();
     const route = (nodes, color) => {
       nodes.forEach((n, i) => (i ? lines.lineTo(n.x, n.y - 4) : lines.moveTo(n.x, n.y - 4)));

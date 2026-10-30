@@ -875,7 +875,7 @@
    "group": "quests",
    "name": "Races and Game of Crowns",
    "status": "solo",
-   "blurb": "Seven race courses rebuilt from footage, raced against recovered rival Glitches under the final ticket-race rules. In multiplayer, Grab ’Em Good, the seven finish-line races and the Game of Crowns are against the real players on your street.",
+   "blurb": "Seven race courses rebuilt from footage, raced against recovered rival Glitches under the final ticket-race rules, to Tiny Speck’s own finish gate: a striped post behind you, one in front and the red and white bar between (how far apart they stand is ours). In multiplayer, Grab ’Em Good, the seven finish-line races and the Game of Crowns are against the real players on your street.",
    "multiplayer": "Grab ’Em Good, the seven finish-line races, The Great Hog Haul and the Game of Crowns (four players, the crown, tags and locks decided by the server) are played against the real players on your street; a reload mid-race ends it for both, as a logout did. A reload during a Game of Crowns takes you out while the others play on, and nobody races from Naraka.",
    "spot": null,
    "evidence": [
@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 759,
+  "commits": 760,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-29",
+    "kind": "improve",
+    "text": "An Autumn Day's bench, falling leaves and the girl on the bench are Tiny Speck's own"
+   },
    {
     "date": "2026-10-29",
     "kind": "fix",
@@ -2788,14 +2793,9 @@
     "date": "2026-10-29",
     "kind": "fix",
     "text": "Notice Boards, Mailboxes and Visiting Stones never stand in front of a door"
-   },
-   {
-    "date": "2026-10-29",
-    "kind": "fix",
-    "text": "Tunnels and tubes have roofs: a source line with null pc_perm stops a rising head"
    }
   ]
  },
- "tests": 426,
+ "tests": 427,
  "generatedAt": "2026-10-29"
 }

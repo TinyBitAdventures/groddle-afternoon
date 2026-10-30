@@ -2053,6 +2053,66 @@
    ],
    "png_sha": "37b1c93e46a392d1"
   },
+  "groddle_finishline_bar_back": {
+   "swf": "bundle:groddle1.swf#groddle_finishline_bar_back",
+   "swf_sha": "44a08f6f52689bbf",
+   "stage": [
+    25.2,
+    148.85
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the far finish post (behind the racers)",
+   "png": [
+    51,
+    298
+   ],
+   "png_sha": "0dc6ee72288c58c8"
+  },
+  "groddle_finishline_bar_close": {
+   "swf": "bundle:groddle1.swf#groddle_finishline_bar_close",
+   "swf_sha": "ea503445239741bc",
+   "stage": [
+    26.3,
+    146.9
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the near finish post (in front of the racers)",
+   "png": [
+    53,
+    294
+   ],
+   "png_sha": "f1af706c063149ce"
+  },
+  "groddle_finishline_bar_middle": {
+   "swf": "bundle:groddle1.swf#groddle_finishline_bar_middle",
+   "swf_sha": "9b756690b3a926d9",
+   "stage": [
+    60.8,
+    25.85
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the red and white bar across the finish",
+   "png": [
+    122,
+    52
+   ],
+   "png_sha": "b2dc2b6babec444d"
+  },
   "groddle_grassSlice_h1": {
    "swf": "bundle:corey3.swf#groddle_grassSlice_h1",
    "swf_sha": "7ce6d75e65636b8e",

@@ -19,7 +19,7 @@
  * the largest placement; js/street-render.js asks sharpDeco() for them on the layers that are
  * drawn sharp (middleground and in front of it, unblurred).
  */
-import { HIRES_DECOS, HIRES_DECOS_BIG } from './deco-hires-list.js?v=g457-1';
+import { HIRES_DECOS, HIRES_DECOS_BIG } from './deco-hires-list.js?v=g457-2';
 import { SHARP_DECOS } from './deco-sharp-list.js?v=g435-1';
 
 const DECO_PNG = /^(.*?(?:^|\/)assets\/decos\/groddle\/)([^/?#]+)\.png([?#].*)?$/;

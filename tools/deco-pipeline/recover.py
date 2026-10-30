@@ -122,6 +122,14 @@ SCENE_DECOS.update({
 SCENE_DECOS.update({
     'bench_01_anautumnsday': 'the black park bench of every An Autumn Day room',
 })
+# The race streets are lost (none of config_prod.js shared_instances.race.locations is in the dump); the
+# finish gate's three pieces are in groddle1.swf (byte-identical copies in quest02.swf and, as
+# arbito_finishline_bar_*, in arbito1.swf). js/race-render.js stands them at every finish.
+SCENE_DECOS.update({
+    'groddle_finishline_bar_back': 'the far finish post (behind the racers)',
+    'groddle_finishline_bar_middle': 'the red and white bar across the finish',
+    'groddle_finishline_bar_close': 'the near finish post (in front of the racers)',
+})
 
 
 def sha(path):

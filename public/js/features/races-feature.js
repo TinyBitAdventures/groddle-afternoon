@@ -80,10 +80,10 @@ import {
 import { platformUnder, raceCourse, RACE_COURSE_IDS } from '../race-courses.js?v=races-5';
 import {
   drawCheckpointFlag,
-  drawFinishPosts,
+  drawFinishGate,
   raceLoadingColors,
   renderRaceCourse,
-} from '../race-render.js?v=g448-2';
+} from '../race-render.js?v=g457-2';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { runStreetTransition } from '../screen-fx.js?v=g434-1';
 import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-2';
@@ -121,6 +121,7 @@ let routeLens = null;
 let rivalSprite = null;
 let rivalLabel = null;
 let finishSprite = null;
+let finishFront = null;
 let checkpointSprites = [];
 let dispenserTarget = null;
 let hud = null;
@@ -672,9 +673,14 @@ function spawnRaceEntities(engine) {
     return flag;
   });
   if (course.finish) {
-    finishSprite = drawFinishPosts(PIXI, course.finish);
+    // Tiny Speck's finish gate: the far post and the bar behind the racers, the near post in front
+    // of them (the avatar's body is zIndex 50, game.js makePlayer).
+    const gate = drawFinishGate(PIXI, course.finish);
+    finishSprite = gate.back;
     finishSprite.zIndex = 9;
-    engine.entityLayer.addChild(finishSprite);
+    finishFront = gate.front;
+    finishFront.zIndex = 60;
+    engine.entityLayer.addChild(finishSprite, finishFront);
   }
   if (course.kind === 'quoins') spawnQuoins(engine);
   // The rival is a vector Glitch with its name's look (engine.npcGlitch).
@@ -1807,6 +1813,7 @@ export const racesFeature = {
     rivalSprite = null;
     rivalLabel = null;
     finishSprite = null;
+    finishFront = null;
     checkpointSprites = [];
     quoinSprites = [];
     dispenserTarget = null;
