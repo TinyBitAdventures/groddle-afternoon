@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 822,
+  "commits": 823,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "improve",
+    "text": "The Zoom slider's Wide and Original labels sit clear of its focus ring"
+   },
    {
     "date": "2026-10-30",
     "kind": "new",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "Classic's verb menu sits on the thing you picked, with the 2012 tail pointing at it"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Classic's chat column has the 2012 panes: Local Chat / Activity at the bottom, another chat above it, the contact strip beside them"
    }
   ]
  },

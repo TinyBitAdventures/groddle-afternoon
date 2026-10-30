@@ -17,7 +17,7 @@ import assert from 'node:assert/strict';
 import { resolveTokens } from './css-tokens.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { quietSession } from '../public/js/online-boot.js?v=g477-1';
+import { quietSession } from '../public/js/online-boot.js?v=g477-2';
 import { createMinnAccount } from '../public/js/minn-account.js?v=nbhome-10';
 import { buildOnlinePage, ONLINE_BOOT_SRC } from '../tools/play-online/build.mjs';
 
@@ -97,7 +97,7 @@ describe('G322: /play/online/ signed out asks no rest-nonce', () => {
     const body = boot.slice(boot.indexOf('async function boot()'), boot.indexOf('async function enter('));
     assert.match(body, /const session = await quietSession\(account\);/);
     assert.doesNotMatch(body, /account\.session\(\)/);
-    assert.equal(ONLINE_BOOT_SRC, 'js/online-boot.js?v=g477-1');
+    assert.equal(ONLINE_BOOT_SRC, 'js/online-boot.js?v=g477-2');
     assert.match(read('public/play/online/index.html'), /src="js\/online-boot\.js\?v=g\d+-\d+"/);
     assert.ok(read('public/play/online/index.html').includes(`src="${ONLINE_BOOT_SRC}"`));
   });

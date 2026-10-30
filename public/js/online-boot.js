@@ -255,7 +255,13 @@ function mountSavePill(player) {
   // In the pack's own corner under its hint, so it never covers the slots and the award and
   // new-day screens cover it with the rest of the game; the window's corner when there is no pack.
   const hint = document.querySelector('.pack-hint');
-  if (hint?.parentNode) {
+  const row = document.getElementById('pack-row');
+  if (row && hint?.parentNode === row) {
+    // The one-row pack: the cloud is the row's last button, beside search (Austin 2026-10-30).
+    row.insertBefore(pill, hint);
+    pill.classList.add('in-pack', 'in-row');
+    pill.tabIndex = 0;
+  } else if (hint?.parentNode) {
     const side = el('div', { class: 'pack-side' });
     hint.parentNode.insertBefore(side, hint);
     side.append(hint, pill);
