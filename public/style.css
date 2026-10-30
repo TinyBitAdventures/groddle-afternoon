@@ -9714,7 +9714,8 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] .sound-pop .hud-zoom { margin-top: var(--space-1); padding-top: var(--space-2); border-top: 1px solid var(--border); }
 [data-ui="modern"] .hud-zoom output { color: var(--text); }
 [data-ui="modern"] .hud-zoom-ends {
-  grid-column: 2; display: flex; justify-content: space-between;
+  /* Clear of the slider's focus ring (2px outline, 2px offset). */
+  grid-column: 2; display: flex; justify-content: space-between; margin-top: var(--sp-3);
   color: var(--text-muted); font-size: var(--fs-xs); font-weight: var(--fw-bold);
 }
 [data-ui="modern"] .more-list .menu-zoom { grid-template-columns: 1fr auto; padding: var(--space-1) var(--space-2) var(--space-2); }

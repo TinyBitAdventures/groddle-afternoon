@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 821,
+  "commits": 822,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "new",
+    "text": "A Zoom slider brings the world in close, from today's wide view to the original game's size"
+   },
    {
     "date": "2026-10-30",
     "kind": "improve",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "improve",
     "text": "Classic's chat column has the 2012 panes: Local Chat / Activity at the bottom, another chat above it, the contact strip beside them"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Classic's mood face is your own avatar, with your name over it online"
    }
   ]
  },
