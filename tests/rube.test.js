@@ -193,3 +193,27 @@ describe('rube cards', () => {
     assert.equal(remakeStatus('rube_chance_to_meet').status, 'live');
   });
 });
+
+describe('rube facing', () => {
+  it('faces the way he walks: his sheets face right, so only walking left mirrors him', () => {
+    const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../public/js/features/rube-feature.js'), 'utf8');
+    assert.match(src, /spr\.scale\.x = rube\.facing > 0 \? 1 : -1;/);
+    assert.doesNotMatch(src, /rube\.facing > 0 \? -1 : 1/, 'the old flip walked him backwards');
+  });
+});
+
+describe('rube clips never open on a blank frame', () => {
+  const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../public/js/features/rube-feature.js'), 'utf8');
+  it('appears once his spawn sheet is in, then starts every other sheet decoding', () => {
+    const spawn = src.slice(src.indexOf('function spawnRube('), src.indexOf('function endVisit('));
+    assert.match(spawn, /spr\.visible = false;\s*onLoaded\(spawnFrames\[0\], startSpawn\)/);
+    assert.match(spawn, /for \(const clip of Object\.keys\(CLIPS\)\) frames\(engine, clip\);/);
+    assert.ok(spawn.indexOf("setClip(engine, 'spawn_in'") < spawn.indexOf('Object.keys(CLIPS)'), 'the spawn sheet first');
+  });
+  it('keeps the current clip until the next sheet has loaded', () => {
+    const body = src.slice(src.indexOf('function setClip('), src.indexOf('function publish('));
+    assert.match(body, /if \(rube\.clip && isLoaded\(spr\.texture\) && !isLoaded\(list\[0\]\)\)/);
+    assert.match(body, /onLoaded\(list\[0\]/);
+    assert.ok(body.indexOf('isLoaded') < body.indexOf('spr.textures = list'), 'the check comes before the swap');
+  });
+});

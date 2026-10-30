@@ -61,7 +61,7 @@ import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { meditationFeature } from './meditation-feature.js?v=g463-2';
 import { teleportationFeature } from './teleportation-feature.js?v=g463-1';
 import { rookAttackFeature } from './rook-attack-feature.js?v=g463-2';
-import { rubeFeature } from './rube-feature.js?v=g442-6';
+import { rubeFeature } from './rube-feature.js?v=g475-1';
 import { smugglingFeature } from './smuggling-feature.js?v=g470-1';
 import { hellFeature } from './hell-feature.js?v=hell-16';
 import { isPooped } from '../hell.js';

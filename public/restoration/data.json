@@ -2671,9 +2671,14 @@
   ]
  },
  "git": {
-  "commits": 807,
+  "commits": 808,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-30",
+    "kind": "fix",
+    "text": "Background layers glide smoothly when you slow down, instead of shifting left and right"
+   },
    {
     "date": "2026-10-30",
     "kind": "fix",
@@ -2788,11 +2793,6 @@
     "date": "2026-10-30",
     "kind": "new",
     "text": "Classic's chat column: the contact strip and the \"Local Chat / Activity\" pane in the 2012 look"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "new",
-    "text": "Classic's 2012 top bar: the mood face and energy arc in the ear, iMG, currants, location and the date"
    }
   ]
  },

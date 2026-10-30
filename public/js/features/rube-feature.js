@@ -44,7 +44,7 @@ import {
   rubeTalk,
   streetCanHostRube,
 } from '../rube.js';
-import { frameTexture, sourceFromUrl } from '../textures.js';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js';
 import { itemZ } from '../item-bands.js?v=g429-1';
 
 export const RUBE_FEATURE_ID = 'rube';
@@ -123,7 +123,17 @@ function setClip(engine, clip, onComplete = null) {
   if (!rube?.sprite || rube.sprite.destroyed) return;
   const def = CLIPS[clip];
   const spr = rube.sprite;
-  spr.textures = frames(engine, clip);
+  const list = frames(engine, clip);
+  // A sheet still decoding draws a blank placeholder: keep the current clip until it arrives.
+  if (rube.clip && isLoaded(spr.texture) && !isLoaded(list[0])) {
+    rube.pendingClip = clip;
+    onLoaded(list[0], () => {
+      if (rube?.pendingClip === clip) setClip(engine, clip, onComplete);
+    });
+    return;
+  }
+  rube.pendingClip = null;
+  spr.textures = list;
   spr.loop = def.loop;
   spr.animationSpeed = def.fps / 60;
   spr.onComplete = onComplete;
@@ -170,7 +180,8 @@ function spawnRube(engine, { summoned = false, near = false } = {}) {
   x = Math.max(60, Math.min(worldW - 60, x));
   // spawn_npc: the closest platform below the player's height, else above.
   const ground = landingY(engine.platforms, x, p.y - 60) ?? walkSurfaceY(engine.platforms, x, p.y, { up: 400, down: 400 }) ?? p.y;
-  const spr = new PIXI.AnimatedSprite(frames(engine, 'spawn_in'));
+  const spawnFrames = frames(engine, 'spawn_in');
+  const spr = new PIXI.AnimatedSprite(spawnFrames);
   spr.anchor.set(0.5, 0.97);
   spr.x = x;
   spr.y = ground;
@@ -190,7 +201,8 @@ function spawnRube(engine, { summoned = false, near = false } = {}) {
     target,
     visit: createRubeVisit({ summoned }),
     phase: 'spawn_in',
-    clip: 'spawn_in',
+    clip: '',
+    pendingClip: null,
     spawnedAt: Date.now(),
     leaveAt: 0,
     removeAt: 0,
@@ -198,12 +210,25 @@ function spawnRube(engine, { summoned = false, near = false } = {}) {
     called: false,
     facing: 1,
   };
-  setClip(engine, 'spawn_in', () => {
-    if (rube?.phase === 'spawn_in') {
-      rube.phase = 'walk';
-      setClip(engine, 'walk');
-    }
-  });
+  const startSpawn = () => {
+    if (!rube || rube.sprite !== spr || spr.destroyed) return;
+    spr.visible = true;
+    rube.spawnedAt = Date.now();
+    if (rube.phase === 'spawn_in') setClip(engine, 'spawn_in', () => {
+      if (rube?.phase === 'spawn_in') {
+        rube.phase = 'walk';
+        setClip(engine, 'walk');
+      }
+    });
+    // Then every other clip's sheet, so none opens on a blank frame.
+    for (const clip of Object.keys(CLIPS)) frames(engine, clip);
+  };
+  // He appears once his spawn sheet has arrived (a blank placeholder until then), and his clock starts there.
+  if (isLoaded(spawnFrames[0])) startSpawn();
+  else {
+    spr.visible = false;
+    onLoaded(spawnFrames[0], startSpawn);
+  }
   state.visits += 1;
   last = RUBE_TEXT.arrived;
   engine.pushActivity?.(RUBE_TEXT.arrived);
@@ -487,6 +512,7 @@ export const rubeFeature = {
       rube.leaveAt = 0;
       die(engine);
     }
+    if (!spr.visible) return; // waiting for his spawn sheet
     if (rube.phase === 'spawn_in' && now - rube.spawnedAt >= START_MOVING_MS) {
       rube.phase = 'walk';
       setClip(engine, 'walk');
@@ -508,8 +534,8 @@ export const rubeFeature = {
         }
       }
     }
-    // The sheets face left; flip toward where he walks or looks.
-    spr.scale.x = rube.facing > 0 ? -1 : 1;
+    // The sheets face right (as Tiny Speck drew him); flip when he walks or looks left.
+    spr.scale.x = rube.facing > 0 ? 1 : -1;
   },
 
   verbsFor(target, engine) {
