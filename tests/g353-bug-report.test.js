@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BUG_TEXT, MAX_MESSAGE, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=a16f71e6';
+import { BUG_TEXT, MAX_MESSAGE, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=320c0ff6';
 import { createMinnAccount } from '../public/js/minn-account.js?v=81339760';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -18,10 +18,13 @@ const client = readFileSync(join(root, '../glitch-client/com/tinyspeck/engine/vi
 const bootError = readFileSync(join(root, '../glitch-client/com/tinyspeck/debug/BootError.as'), 'utf8');
 
 describe('Report a bug (G353)', () => {
-  it('uses the original client\'s words and icon', () => {
-    assert.match(client, new RegExp(`tip_txt = '${BUG_TEXT.tip}'`));
-    assert.ok(bootError.includes(`<h1>${BUG_TEXT.title}</h1>`));
-    assert.ok(bootError.includes(`<p>${BUG_TEXT.label}`));
+  it('welcomes feedback, suggestions and bugs, with the original client\'s icon', () => {
+    // The original asked only for bugs (tip_txt 'Report a bug', BootError.as "Thanks for reporting a bug!");
+    // Austin widened it to any feedback, suggestions or bugs (2026-10-30).
+    assert.match(client, /tip_txt = 'Report a bug'/);
+    assert.ok(bootError.includes('<h1>Thanks for reporting a bug!</h1>'));
+    assert.equal(BUG_TEXT.tip, 'Feedback, ideas and bugs');
+    assert.match(BUG_TEXT.label, /feedback.*suggestion.*bug/);
     assert.ok(bootError.includes(`<p>${BUG_TEXT.send}</p>`));
     const icon = readFileSync(join(root, 'public/assets/ui/bug_icon.png'));
     const original = readFileSync(join(root, '../glitch-client/TSEngineAssets/src/assets/graphics/bug_icon.png'));

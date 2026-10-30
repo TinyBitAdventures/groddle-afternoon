@@ -20,22 +20,22 @@
 
 import { minnUrls } from './minn-account.js?v=81339760';
 
-/** The sheet's words (the new-report form keeps the original's, BootError.as 280-290). */
+/** The sheet's words. The form welcomes feedback, suggestions and bugs alike (the original's BootError.as 280-290 asked only for bugs). */
 export const REPORT_TEXT = Object.freeze({
-  tip: 'Report a bug',
-  tipUnread: (n) => (n === 1 ? 'Report a bug (1 new reply)' : `Report a bug (${n} new replies)`),
+  tip: 'Feedback, ideas and bugs',
+  tipUnread: (n) => (n === 1 ? 'Feedback, ideas and bugs (1 new reply)' : `Feedback, ideas and bugs (${n} new replies)`),
   sheet: 'Reports',
-  newReport: 'New report',
+  newReport: 'Write to us',
   back: 'Back to your reports',
-  title: 'Thanks for reporting a bug!',
-  label: 'Please describe the problem you are having:',
+  title: 'We\'d love to hear from you!',
+  label: 'Tell us anything: feedback, a suggestion, or a bug you found.',
   send: 'Send',
   close: 'Close',
   sending: 'Sending…',
-  sent: 'Thanks! Your report was sent.',
-  empty: 'Please describe the problem you are having.',
+  sent: 'Thanks! Your message was sent.',
+  empty: 'Write your feedback, suggestion or bug first.',
   failed: 'That didn\'t send. Try again in a moment.',
-  none: 'You have not sent a report yet. Found a bug? Tell us with New report.',
+  none: 'You have not written to us yet. Feedback, ideas and bugs are all welcome: start with Write to us.',
   loading: 'Loading your reports…',
   loadFailed: 'Your reports did not load. Try again in a moment.',
   you: 'You',
@@ -54,7 +54,7 @@ export const REPORT_TEXT = Object.freeze({
   pictureNone: 'The game view could not be drawn, so no picture goes with this one.',
   pictureAlt: 'The game when you reported it',
   pictureOpen: 'Open the picture full size',
-  sentNoPicture: 'Thanks! Your report was sent, without the picture.',
+  sentNoPicture: 'Thanks! Your message was sent, without the picture.',
 });
 
 /**

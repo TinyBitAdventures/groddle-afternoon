@@ -29,7 +29,7 @@
  * [data-reports-picture-preview], [data-reports-thread-picture].
  */
 
-import { REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=4112e3ff';
+import { REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=0cc4230d';
 
 function el(doc, tag, attrs = {}, text = '') {
   const node = doc.createElement(tag);

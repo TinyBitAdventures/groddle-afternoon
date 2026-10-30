@@ -16,9 +16,9 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=4112e3ff';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=b8e240dd';
-import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=a16f71e6';
+import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=0cc4230d';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=4b181c55';
+import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=320c0ff6';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -131,8 +131,8 @@ describe('the rules (js/reports.js)', () => {
   });
 
   it('keeps the original form\'s words and the site\'s limits, with no em dashes', () => {
-    assert.equal(BUG_TEXT.title, 'Thanks for reporting a bug!');
-    assert.equal(BUG_TEXT.label, 'Please describe the problem you are having:');
+    assert.equal(BUG_TEXT.title, 'We\'d love to hear from you!');
+    assert.equal(BUG_TEXT.label, 'Tell us anything: feedback, a suggestion, or a bug you found.');
     assert.equal(REPORT_MAX, 2000);
     assert.equal(UNREAD_POLL_MS, 60000);
     const words = [...Object.values(REPORT_TEXT).map((v) => (typeof v === 'function' ? `${v(1)} ${v(3)}` : v)), ...Object.values(STATUS_WORDS)];
@@ -142,9 +142,9 @@ describe('the rules (js/reports.js)', () => {
   });
 
   it('the bug icon\'s badge: hidden at none, a count, 9+ past nine, and the tip says so', () => {
-    assert.deepEqual(badgeFor(0), { hidden: true, text: '0', tip: 'Report a bug' });
-    assert.deepEqual(badgeFor(1), { hidden: false, text: '1', tip: 'Report a bug (1 new reply)' });
-    assert.deepEqual(badgeFor(12), { hidden: false, text: '9+', tip: 'Report a bug (12 new replies)' });
+    assert.deepEqual(badgeFor(0), { hidden: true, text: '0', tip: 'Feedback, ideas and bugs' });
+    assert.deepEqual(badgeFor(1), { hidden: false, text: '1', tip: 'Feedback, ideas and bugs (1 new reply)' });
+    assert.deepEqual(badgeFor(12), { hidden: false, text: '9+', tip: 'Feedback, ideas and bugs (12 new replies)' });
   });
 });
 
@@ -263,7 +263,7 @@ describe('the Reports sheet (js/ui/reports-sheet.js)', () => {
     assert.equal(panel.dataset.reportsView, 'new');
     const text = byId(host, 'bug-report-text');
     assert.ok(text && 'bugReportText' in text.dataset);
-    assert.ok(host.find((n) => n.textContent === 'Thanks for reporting a bug!' && n.className === 'reports-new-title'));
+    assert.ok(host.find((n) => n.textContent === 'We\'d love to hear from you!' && n.className === 'reports-new-title'));
     text.value = 'The pig floated\nup and away';
     byData(host, 'bugReportSend').click();
     await flush();
@@ -630,7 +630,7 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
     assert.equal(out.migration.titleMessage, 'Title only', 'the title without its "<character>: "');
     // The email: escaped, by character name, the thread's link.
     const html = out.mail.html;
-    assert.equal(out.mail.subject, 'A reply to your Groddle Afternoon bug report');
+    assert.equal(out.mail.subject, 'A reply to your Groddle Afternoon message');
     assert.ok(html.includes('Hi <strong>Zz &lt;b&gt;Ada&lt;/b&gt;</strong>,'));
     assert.ok(html.includes('The &lt;i&gt;pig&lt;/i&gt; froze'));
     assert.ok(html.includes('Thanks!<br>\n&lt;script&gt;alert(1)&lt;/script&gt; &amp; fixed.'));
