@@ -2301,6 +2301,7 @@
       "assets/streets/GUVVSU5NCBA3KOS.json": "db33c7f6",
       "assets/streets/GUVVV3FU2FC38SK.json": "84042224",
       "assets/streets/missing-decos.json": "10f16d9d",
+      "assets/ui/newday/new_day_mountains.svg": "8a61bb11",
       "brand/share.jpg": "fb033ab8",
       "items/data.json": "5b6d525d",
     },
