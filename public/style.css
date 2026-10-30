@@ -829,6 +829,10 @@
   --c-classic-mood-low-bottom: #6d5353;
   --c-classic-debuff: #b73d40;            /* a debuff's ring (code default): BuffUI.as */
   --c-classic-quest-badge: #b21f00;       /* the quest count on the iMG button (code default): ImaginationButton.as:38 */
+  --c-classic-bag-strip: #f0f5f7;        /* a bag slot's used/total strip: PackSlot.as:119-170 */
+  --c-classic-bag-dot: #6d777c;           /* the strip's dot */
+  --c-classic-bag-panel: #c6d2d3;         /* an open bag's panel (code default): PackDisplayManager.as:1083-1201 */
+  --c-classic-bag-border: #b2bfc0;
   /* classic:end */
   /* Classic type: the 2012 faces (VAG Rounded, Helvetica) are proprietary, so Nunito 800 stands in for
      titles, names, labels and big numbers, and the system Helvetica/Arial stack carries body text. The

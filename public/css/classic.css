@@ -797,3 +797,144 @@
   width: min(calc(300 * var(--cu)), calc(100% - 32px));
 }
 :root[data-ui="classic"] #prompt-stack .game-prompt { background: color-mix(in srgb, var(--c-classic-prompt) 90%, transparent); font-family: var(--font-classic-body); }
+
+/* == The pack (classic-spec spec §8): js/ui/pack-row.js's one row, restyled in place on the band.
+   51 x 53 slots, radius 5, 4 apart (55 px pitch), no band background: the slots sit on the page
+   colour (PackSlot.as 28-141, PackContainerView.as 84, 209). Every id, data attribute, click, drag,
+   pager and the search stay. */
+:root[data-ui="classic"] #game-root .pack-bar { --pack-slot: calc(51 * var(--cu)); }
+:root[data-ui="classic"] #game-root .pack-row {
+  height: calc(53 * var(--cu));
+  gap: calc(4 * var(--cu));
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--c-classic-text);
+  font-family: var(--font-classic-body);
+}
+:root[data-ui="classic"] #game-root .pack-vsep { display: none; }
+:root[data-ui="classic"] #game-root .pack-slots { gap: calc(4 * var(--cu)); }
+:root[data-ui="classic"] #game-root .pack-slots .pack-slot {
+  width: calc(51 * var(--cu));
+  height: calc(53 * var(--cu));
+  margin: 0;
+  border: 0;
+  border-radius: 5px;
+  background: var(--c-classic-panel);
+  box-shadow: 0 0 0 1px var(--c-classic-slot-ring);
+  transition: none;
+}
+:root[data-ui="classic"] #game-root .pack-slots .pack-slot:hover { background: var(--c-classic-panel); transform: none; }
+:root[data-ui="classic"] #game-root .pack-slots .pack-slot:focus-visible,
+:root[data-ui="classic"] #game-root .pack-slots .pack-slot.active { outline: none; transform: none; background: var(--c-classic-panel); box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #game-root .pack-slots .pack-slot.is-drop-target { background: var(--c-classic-panel); box-shadow: 0 0 0 1px var(--c-classic-slot-ring), 0 0 7px 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #game-root .pack-slots .pack-slot.is-dragging { opacity: 0.5; transform: none; }
+:root[data-ui="classic"] #game-root .pack-slots .pack-slot img { width: calc(40 * var(--cu)); height: calc(40 * var(--cu)); }
+/* Counts: Arial bold 10 #676767 with a white halo, from 2 up (PackItemstackView.as 48-63). A fact,
+   not a proposal. */
+:root[data-ui="classic"] #game-root .pack-slots .pack-slot .count {
+  right: calc(4 * var(--cu));
+  bottom: calc(3 * var(--cu));
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--c-classic-count);
+  font: 700 var(--fs-classic-count)/var(--lh-none) var(--font-classic-count);
+  text-shadow: 0 0 2px var(--c-classic-panel), 0 0 2px var(--c-classic-panel), 0 0 2px var(--c-classic-panel), 0 0 2px var(--c-classic-panel);
+}
+/* Tool wear: a 40 x 3 bar under the icon, #277d8d on #bbdadf (ItemstackStatusBar.as 11-13). */
+:root[data-ui="classic"] #game-root .pack-slot-wear { left: calc(5.5 * var(--cu)); right: auto; width: calc(40 * var(--cu)); bottom: calc(3 * var(--cu)); height: 3px; border-radius: 2px; background: var(--c-classic-wear-track); }
+:root[data-ui="classic"] #game-root .pack-slot-wear i { background: var(--c-classic-wear); }
+:root[data-ui="classic"] #game-root .pack-slot.is-broken { filter: none; box-shadow: 0 0 0 1px var(--c-classic-slot-ring); }
+:root[data-ui="classic"] #game-root .pack-slot.is-broken .pack-slot-wear { visibility: hidden; }
+:root[data-ui="classic"] #game-root .pack-slot.is-broken::after {
+  content: "";
+  position: absolute;
+  right: calc(5 * var(--cu));
+  bottom: calc(5 * var(--cu));
+  width: calc(10 * var(--cu));
+  height: calc(10 * var(--cu));
+  background: url("../assets/classic/pack_tool_broken.png?v=e3669df4") 0 0 / 100% 100% no-repeat;
+}
+/* Empty slots: white at .4, no ring; the remake's "+N" ghost the same. */
+:root[data-ui="classic"] #game-root .pack-slots .pack-empty,
+:root[data-ui="classic"] #game-root .pack-slots .pack-slot.pack-ghost {
+  width: calc(51 * var(--cu));
+  height: calc(53 * var(--cu));
+  margin: 0;
+  border: 0;
+  background: color-mix(in srgb, var(--c-classic-panel) 40%, transparent);
+  box-shadow: none;
+  color: var(--c-classic-tab-off);
+  font: 800 var(--fs-classic-body)/var(--lh-none) var(--font-classic-title);
+}
+:root[data-ui="classic"] #game-root .pack-slots .pack-slot.pack-empty:hover { background: color-mix(in srgb, var(--c-classic-panel) 40%, transparent); }
+/* A bag slot: the 50 x 18 strip under the box with "used/total" and the dot (PackSlot.as 119-170);
+   open, it rises 6 px and the strip turns #78898a with a white dot. */
+:root[data-ui="classic"] #game-root .pack-slots .pack-slot.pack-bag { width: calc(51 * var(--cu)); place-items: start center; padding-top: calc(4 * var(--cu)); border-radius: 5px; }
+:root[data-ui="classic"] #game-root .pack-slots .pack-slot.pack-bag img { width: calc(36 * var(--cu)); height: calc(30 * var(--cu)); }
+:root[data-ui="classic"] #game-root .pack-bag-opener {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(18 * var(--cu));
+  display: flex;
+  align-items: center;
+  padding: 0 calc(3 * var(--cu));
+  border-radius: 0 0 5px 5px;
+  background: var(--c-classic-bag-strip);
+}
+:root[data-ui="classic"] #game-root .pack-bag-opener b { display: block; color: var(--c-classic-count); font: 700 var(--fs-classic-count)/var(--lh-none) var(--font-classic-count); }
+:root[data-ui="classic"] #game-root .pack-bag-opener i { display: block; width: 5px; height: 5px; margin-left: auto; border-radius: var(--radius-round); background: var(--c-classic-bag-dot); }
+:root[data-ui="classic"] #game-root .pack-slots .pack-slot.pack-bag.is-open { background: var(--c-classic-panel); transform: translateY(-6px); border-radius: 0 0 5px 5px; }
+:root[data-ui="classic"] #game-root .pack-slots .pack-slot.pack-bag.is-open .pack-bag-opener { background: var(--c-classic-tab-off); }
+:root[data-ui="classic"] #game-root .pack-slots .pack-slot.pack-bag.is-open .pack-bag-opener b { color: var(--c-classic-panel); text-shadow: none; }
+:root[data-ui="classic"] #game-root .pack-slots .pack-slot.pack-bag.is-open .pack-bag-opener i { background: var(--c-classic-panel); }
+/* The open bag's panel, over the row by its bag: padding 4, radius 5, #c6d2d3 with a #b2bfc0 edge. */
+:root[data-ui="classic"] #game-root .pack-bag-row {
+  border: 1px solid var(--c-classic-bag-border);
+  border-radius: 5px;
+  background: var(--c-classic-bag-panel);
+  box-shadow: none;
+  color: var(--c-classic-text);
+  font-family: var(--font-classic-body);
+}
+/* The count, the pager and search as small page-colour controls; the help line has no original. */
+:root[data-ui="classic"] #game-root .pack-count { color: var(--c-classic-tab-off); font: 800 var(--fs-classic-body)/var(--lh-none) var(--font-classic-title); }
+:root[data-ui="classic"] #game-root .pack-pager,
+:root[data-ui="classic"] #game-root .pack-search-btn {
+  width: calc(29 * var(--cu));
+  height: calc(29 * var(--cu));
+  border: 0;
+  border-radius: var(--radius-round);
+  background: var(--c-classic-page);
+  box-shadow: 0 0 0 1px var(--c-classic-slot-ring);
+  color: var(--c-classic-tab-off);
+}
+:root[data-ui="classic"] #game-root .pack-search-btn svg { opacity: 0; }
+:root[data-ui="classic"] #game-root .pack-search-btn { background: var(--c-classic-page) url("../assets/classic/mag_glass_inventory.png?v=ce4abf3b") center / calc(17 * var(--cu)) calc(16 * var(--cu)) no-repeat; }
+/* Search: the 282 x 37 panel, #f0f4d6 input with a #bbc08f edge (InventorySearch.as 27-98). */
+:root[data-ui="classic"] #game-root .pack-search {
+  border: 0;
+  border-radius: 4px;
+  background: var(--c-classic-well);
+  box-shadow: 0 0 0 1px var(--c-classic-slot-ring);
+}
+:root[data-ui="classic"] #game-root .pack-search input {
+  border: 1px solid var(--c-classic-input-hi-border);
+  border-radius: 0;
+  background: var(--c-classic-input-hi);
+  color: var(--c-classic-text);
+  font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body);
+}
+:root[data-ui="classic"] #game-root .pack-tip {
+  border: 0;
+  border-radius: 3px;
+  background: var(--c-classic-tip);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--c-classic-ink) 30%, transparent);
+  color: var(--c-classic-title);
+  font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body);
+}
