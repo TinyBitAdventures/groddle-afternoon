@@ -42,6 +42,20 @@ export function packBandRange(band, w = 0) {
   return { min, max: Math.max(min, width - padR - w) };
 }
 
+/**
+ * Where a pack tooltip goes (band px): centred over its control, inside the band's range, 8px above it.
+ * With a bag's tray open, the open bag's own tip is not shown (the tray's head says its name and fill),
+ * and a tip from inside the tray, or one that would cross it, goes above the tray instead of over its text.
+ * @returns {{ hide: true } | { left: number, floor: number }} floor: the top edge the tip sits 8px above
+ */
+export function packTipPlacement({ anchor, tipWidth = 0, min = 8, max = 8, tray = null, inTray = false, openBag = false }) {
+  if (openBag) return { hide: true };
+  const left = Math.max(min, Math.min(anchor.left + anchor.width / 2 - tipWidth / 2, max));
+  let floor = anchor.top;
+  if (tray && (inTray || (left < tray.right && left + tipWidth > tray.left))) floor = Math.min(floor, tray.top);
+  return { left, floor };
+}
+
 /** How many columns a bag's tray grid has for `count` cells: 4 to 8 (the mock). */
 export function trayColumns(count) {
   return Math.max(4, Math.min(8, Math.floor(Number(count) || 0)));
@@ -307,14 +321,29 @@ export function createPackRow({ document: doc = globalThis.document, setData = (
       sub.textContent = info.sub;
       tip.append(sub);
     }
+    const trayEl = $('pack-bag');
+    const trayOpen = Boolean(trayEl && !trayEl.hidden);
+    const openBag = trayOpen && el.classList?.contains('pack-bag') && el.dataset.packBag === trayEl.dataset.packBag;
+    if (openBag) {
+      tip.hidden = true;
+      return;
+    }
     tip.hidden = false;
     const b = band.getBoundingClientRect();
     const r = el.getBoundingClientRect();
     const w = tip.offsetWidth;
     const range = packBandRange(band, w);
-    const left = Math.max(range.min, Math.min(r.left - b.left + r.width / 2 - w / 2, range.max));
-    tip.style.left = `${Math.round(left)}px`;
-    tip.style.bottom = `${Math.round(b.bottom - r.top + 8)}px`;
+    const t = trayOpen ? trayEl.getBoundingClientRect() : null;
+    const at = packTipPlacement({
+      anchor: { left: r.left - b.left, width: r.width, top: r.top - b.top },
+      tipWidth: w,
+      min: range.min,
+      max: range.max,
+      tray: t ? { left: t.left - b.left, right: t.right - b.left, top: t.top - b.top } : null,
+      inTray: trayOpen && trayEl.contains(el),
+    });
+    tip.style.left = `${Math.round(at.left)}px`;
+    tip.style.bottom = `${Math.round(b.height - at.floor + 8)}px`;
   }
 
   function tipTarget(target) {

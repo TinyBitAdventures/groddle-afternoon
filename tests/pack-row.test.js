@@ -16,11 +16,12 @@ import {
   PACK_SEARCH_LABEL,
   packBandRange,
   packCountText,
+  packTipPlacement,
   packSearchEntries,
   packSearchMatch,
   packSlotTip,
   trayColumns,
-} from '../public/js/ui/pack-row.js?v=g467-1';
+} from '../public/js/ui/pack-row.js?v=g467-5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -51,6 +52,19 @@ describe('pack row: the pure parts', () => {
     const view = read('public/js/ui/pack-row.js');
     assert.match(view, /left = Math\.max\(range\.min, Math\.min\(left, range\.max\)\);/);
     assert.match(read('public/game.js'), /const range = packBandRange\(bar, popWidth\);\s+const left = clamp\(anchorCenter - popWidth \/ 2, range\.min, range\.max\);/);
+  });
+
+  it('with a tray open, the open bag shows no tip and tips near the tray go above it', () => {
+    const tray = { left: 100, right: 484, top: -112 };
+    assert.deepEqual(packTipPlacement({ anchor: { left: 120, width: 40, top: 6 }, tipWidth: 200, min: 8, max: 900, tray, openBag: true }), { hide: true });
+    // A tray stack: above the tray, not over its head.
+    assert.deepEqual(packTipPlacement({ anchor: { left: 140, width: 44, top: -70 }, tipWidth: 160, min: 8, max: 900, tray, inTray: true }), { left: 82, floor: -112 });
+    // A row stack under the tray: above the tray too.
+    assert.equal(packTipPlacement({ anchor: { left: 300, width: 44, top: 6 }, tipWidth: 160, min: 8, max: 900, tray }).floor, -112);
+    // A row stack clear of the tray: over its own slot.
+    assert.equal(packTipPlacement({ anchor: { left: 700, width: 44, top: 6 }, tipWidth: 160, min: 8, max: 900, tray }).floor, 6);
+    // No tray: over its own slot.
+    assert.deepEqual(packTipPlacement({ anchor: { left: 300, width: 44, top: 6 }, tipWidth: 160, min: 8, max: 900 }), { left: 242, floor: 6 });
   });
 
   it('the count says the pack slots and what the bags still hold', () => {

@@ -440,7 +440,7 @@ import {
   isToolItem,
 } from './js/inventory.js?v=catalog-unified-7';
 import { PACK_COPY } from './js/pack-slots.js?v=g152-2';
-import { createPackRow, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=g467-1';
+import { createPackRow, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=g467-5';
 import { listAnimalFeedOptions } from './js/animals.js?v=g454-1';
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g454-1';
 import {
