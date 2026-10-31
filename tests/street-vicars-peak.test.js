@@ -28,9 +28,9 @@ import {
   isVicarsPeakTsid,
   ladderGeometry,
   vicarsPeakEcology,
-} from '../public/js/vicars-peak.js?v=fa68613e';
-import { vicarsPeakFeature } from '../public/js/features/vicars-peak-feature.js?v=33193b4f';
-import { FEATURES } from '../public/js/features/index.js?v=44d27a11';
+} from '../public/js/vicars-peak.js?v=5efb4e71';
+import { vicarsPeakFeature } from '../public/js/features/vicars-peak-feature.js?v=cb444319';
+import { FEATURES } from '../public/js/features/index.js?v=1caaf2b6';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -188,16 +188,16 @@ describe("Vicar's Peak street", () => {
 });
 
 describe("Vicar's Peak ecology", () => {
-  it("the loading card's 11 Piggies, 7 Chickens and 1 Metal Rock, on this street only", () => {
+  it("6 Piggies, 4 Chickens and 1 Metal Rock (between the loading card's 11/7 and the live page's 1/1), on this street only", () => {
     // index.js imports it with a ?v= query: a separate module instance, same id.
     assert.ok(FEATURES.some((f) => f.id === vicarsPeakFeature.id));
-    assert.deepEqual(VICARS_PEAK_POPULATION, { npc_piggy: 11, npc_chicken: 7, rock_metal_1: 1 });
+    assert.deepEqual(VICARS_PEAK_POPULATION, { npc_piggy: 6, npc_chicken: 4, rock_metal_1: 1 });
     assert.equal(vicarsPeakFeature.ecologyOverride({ tsid: 'GCR12NU45AM12BB' }), null);
     for (const tsid of ['GCR1516SFHM122V', 'LCR1516SFHM122V']) assert.ok(isVicarsPeakTsid(tsid));
     const entry = vicarsPeakFeature.ecologyOverride(vp);
     assert.deepEqual(entry, vicarsPeakEcology());
     const pop = populationForStreet(VICARS_PEAK_TSID, entry);
-    assert.deepEqual([pop.piggies, pop.chickens, pop.rockClasses], [11, 7, ['rock_metal_1']]);
+    assert.deepEqual([pop.piggies, pop.chickens, pop.rockClasses], [6, 4, ['rock_metal_1']]);
     assert.deepEqual([pop.butterflies, pop.treeClasses.length, pop.gardens, pop.vendor, pop.shrine], [0, 0, 0, false, false]);
   });
 
@@ -216,7 +216,7 @@ describe("Vicar's Peak ecology", () => {
       { key: 'chickens', count: pop.chickens, clearance: 86 },
       { key: 'quoins', count: pop.quoins, clearance: 28 },
     ], { worldW: vp.bounds.r - L, seed: VICARS_PEAK_TSID });
-    assert.deepEqual([plan.groups.piggies.length, plan.groups.chickens.length, plan.groups.rocks.length], [11, 7, 1]);
+    assert.deepEqual([plan.groups.piggies.length, plan.groups.chickens.length, plan.groups.rocks.length], [6, 4, 1]);
     const tierYs = new Set(TIERS.map((t) => t.y - T));
     for (const p of [...plan.groups.piggies, ...plan.groups.chickens, ...plan.groups.rocks, ...plan.groups.player]) {
       assert.ok(tierYs.has(Math.round(p.y)), `spot ${p.x},${p.y} on a ledge`);

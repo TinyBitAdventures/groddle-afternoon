@@ -70,8 +70,12 @@ export const MOSSYSTEP_ARRIVE = Object.freeze({ x: -560, y: -250 });
 export const VICARS_PEAK_SOURCE =
   "reconstruction: Vicar's Peak (LCR1516SFHM122V, not in tinyspeck/glitch-locations); layout from video WZqTdcjhPII and two 2012 Snaps, art CC0 groddle1 Heights decos";
 
-/** The loading card's population (video WZqTdcjhPII t0520). */
-export const VICARS_PEAK_POPULATION = Object.freeze({ npc_piggy: 11, npc_chicken: 7, rock_metal_1: 1 });
+/**
+ * The street's animals. The 2011 beta loading card (video WZqTdcjhPII t0520) says 11 Piggies and
+ * 7 Chickens; its live street page (2011-10-09, tools/ecology/animal-census.json) lists 1 and 1. Austin
+ * (2026-10-31): something in the middle, the card reads like placed animals and 1/1 too few. 6 and 4.
+ */
+export const VICARS_PEAK_POPULATION = Object.freeze({ npc_piggy: 6, npc_chicken: 4, rock_metal_1: 1 });
 
 /** True for the street under either TSID prefix (G as imported, L as GSJS names it). */
 export const isVicarsPeakTsid = (tsid) => String(tsid || '').slice(1) === VICARS_PEAK_TSID.slice(1);
@@ -388,7 +392,7 @@ export function vicarsPeakStreet({ thornfadArrive = null, thornfadXY = null, mos
       pine: 'R5: the pine stands at the left of the row under the door ledge (the minimap\'s green tree at the top left).',
       topDoor: "Stone-arched wooden door on the top ledge (Snaps). Leads to Mossystep: Mossystep's geometry sources (2012-05-22) list Vicar's Peak, so it linked there; arrival x/y not archived.",
       bottomDoor: "Back to Thornfad Layers, in front of its door: a dark shape at the bottom right of the minimap where Thornfad's door lands. Remake choice: Thornfad's sources (2012-10-16) do not list Vicar's Peak.",
-      population: 'Loading card t0520: 11 Piggies, 7 Chickens, and 1 Metal Rock for mining.',
+      population: 'Loading card t0520: 11 Piggies, 7 Chickens, and 1 Metal Rock; live page 2011-10-09: 1 Piggy, 1 Chicken. Built with 6 Piggies, 4 Chickens and the Metal Rock (Austin 2026-10-31: in between).',
       notBuilt: 'The May 2012 Snap shows small unidentified items on the ledges (two stands, a lamp, a hanging sign).',
     },
   };
@@ -400,7 +404,7 @@ export function vicarsPeakEcology() {
     label: VICARS_PEAK_LABEL,
     sourceTsid: VICARS_PEAK_SOURCE_TSID,
     counts: { ...VICARS_PEAK_POPULATION },
-    // The source card's 11 Piggies and 7 Chickens, over the default rendering caps (6 / 3).
+    // 6 Piggies and 4 Chickens, over the street caps (3 / 2): between the beta card and the live page.
     caps: { piggies: VICARS_PEAK_POPULATION.npc_piggy, chickens: VICARS_PEAK_POPULATION.npc_chicken },
     reconstructed: true,
   };

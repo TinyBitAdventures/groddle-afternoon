@@ -2,7 +2,7 @@
  * Vicar's Peak (register row G93; street data in js/vicars-peak.js, built by
  * tools/build-vicars-peak.mjs).
  *
- * - Ecology: the beta loading card's "Home to: 11 Piggies, 7 Chickens, and
+ * - Ecology (6 Piggies, 4 Chickens, between the card and the live page): the beta loading card's "Home to: 11 Piggies, 7 Chickens, and
  *   1 Metal Rock for mining" (video WZqTdcjhPII t0520). The archive has no
  *   location file for the street, so the row comes from here, with the
  *   rendering caps lifted to the card's own counts.
@@ -15,7 +15,7 @@
  *   (through Thornfad Layers' locked door).
  */
 
-import { TIERS, VICARS_PEAK_BOUNDS, isVicarsPeakTsid, vicarsPeakEcology } from '../vicars-peak.js?v=fa68613e';
+import { TIERS, VICARS_PEAK_BOUNDS, isVicarsPeakTsid, vicarsPeakEcology } from '../vicars-peak.js?v=5efb4e71';
 
 export const VICARS_PEAK_FEATURE_ID = 'vicars-peak';
 const DATA_MS = 250;
