@@ -16,7 +16,10 @@ import { assertStreetGeometry } from '../public/js/street-model.js?v=23b926e5';
 import { readMapLabels, readTransitInstances, GSJS } from '../tools/subway-source.mjs';
 import {
   CAR_FLOOR,
+  CAR_FLOOR_BAND,
+  CAR_FLOOR_RUN,
   CAR_SEAT,
+  CAR_VIEW_BELOW,
   CAR_TILE_FLOOR,
   CAR_TILE_SEAT,
   CAR_TILE_TOP,
@@ -51,8 +54,8 @@ import {
   stationStreet,
   stepRide,
   ticketOffer,
-} from '../public/js/subway.js?v=3b9c09af';
-import { subwayFeature } from '../public/js/features/subway-feature.js?v=c03f5637';
+} from '../public/js/subway.js?v=646ae6af';
+import { subwayFeature } from '../public/js/features/subway-feature.js?v=4e579f11';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -248,7 +251,7 @@ describe('Stations, the train and the surface entrances', () => {
     // line ~604-608, dark floor strip ~612-672, then the bottom stripe and black.
     assert.equal(CAR_TILE_TOP, CAR_FLOOR - CAR_TILE_FLOOR);
     assert.ok(CAR_TILE_FLOOR > 612 && CAR_TILE_FLOOR < 672, 'the floor line sits in the dark floor strip, below the yellow line');
-    const wall = carArt().filter((row) => row.piece === 'subway_interior_1');
+    const wall = carArt().filter((row) => row.piece === 'subway_interior_1' && !row.frame);
     assert.equal(wall.length, 3);
     for (const row of wall) assert.equal(row.y - row.h, CAR_TILE_TOP, 'the wall tile hangs from CAR_TILE_TOP');
     // The seats are a ledge well above the floor (in the footage riders stand on the floor in
@@ -264,12 +267,43 @@ describe('Stations, the train and the surface entrances', () => {
     }
     // Boarding lands on the floor line itself.
     for (const r of [0, 0.3, 0.6, 0.9999]) assert.equal(boardingSpot(() => r).y, CAR_FLOOR - street.bounds.t);
-    // Poles reach just below the riders' feet; the street takes in the whole wall tile.
+    // Poles reach just below the riders' feet, in a front layer with no size of its own, so
+    // it moves with the street (a parallax layer is pinned to the bottom of a view taller
+    // than the car, street-render.js parallaxLayerOffset).
     for (const pole of carFrontDecos()) {
       const foot = pole.y + street.bounds.t;
       assert.ok(foot > CAR_FLOOR && foot - CAR_FLOOR <= 20, `${pole.id} foot ${foot - CAR_FLOOR} px below the floor`);
     }
-    assert.ok(street.bounds.t <= CAR_TILE_TOP && street.bounds.b >= CAR_TILE_TOP + 690);
+    const front = street.layers.find((l) => l.id === 'T_subway_car_front');
+    assert.ok(front.z > 0 && front.w === 0 && front.h === 0, 'in front, not a parallax canvas');
+  });
+
+  it('frames the car as the footage does: a thin strip of floor under the feet, no gap below', async () => {
+    const { cameraTargetY, cameraWorldHeightForGround, cameraBottomSlack } = await import('../public/js/movement.js?v=a314f8a1');
+    const street = carStreet();
+    const feet = CAR_FLOOR - street.bounds.t;
+    // street-render.js worldH: the street's height plus the camera's ground clearance.
+    const worldH = street.bounds.b - street.bounds.t + cameraBottomSlack(600);
+    for (const view of [408, 430, 493, 548, 588, 600]) {
+      const h = cameraWorldHeightForGround(worldH, feet, view);
+      const camY = cameraTargetY(feet, h, view);
+      assert.equal(camY + view - feet, CAR_VIEW_BELOW, `view ${view}: the view ends ${CAR_VIEW_BELOW} px under the feet`);
+      assert.ok(camY >= 0 && camY <= CAR_TILE_TOP + 300 - street.bounds.t, `view ${view}: the ads stay in view`);
+    }
+    // Under that edge the tile's floor strip carries on (behind the pack, and a view taller
+    // than the car), then its bottom edge rows: no empty band under the carriage.
+    const [b0, b1] = CAR_FLOOR_BAND;
+    const run = carArt().filter((row) => row.frame && row.frame[1] === b0);
+    const edge = carArt().filter((row) => row.frame && row.frame[1] === b1);
+    assert.equal(run.length, 3);
+    assert.equal(edge.length, 3);
+    for (const row of run) {
+      assert.equal(row.y - row.h, CAR_TILE_TOP + b1, 'starts where the tile\'s floor strip ends');
+      assert.equal(row.h, CAR_FLOOR_RUN);
+      assert.deepEqual(row.frame, [0, b0, 1200, b1 - b0]);
+    }
+    assert.ok(CAR_TILE_TOP + b1 + CAR_FLOOR_RUN - CAR_FLOOR >= CAR_VIEW_BELOW + 132 + 200, 'floor under the pack and a tall view');
+    assert.ok(b0 > CAR_TILE_FLOOR - 40 && b1 > CAR_TILE_FLOOR, 'the strip the riders stand on');
   });
   it('writes every station and the train as an indexed street with art that exists', () => {
     for (const s of STATIONS) {

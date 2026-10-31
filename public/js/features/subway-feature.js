@@ -33,10 +33,11 @@
 
 import { countItem } from '../inventory.js?v=85d4faba';
 import { doorsFeature } from './doors-feature.js?v=123332f2';
-import { textureFromUrl } from '../textures.js?v=db2ce452';
+import { frameTexture, textureFromUrl } from '../textures.js?v=db2ce452';
 import {
   CAR_FLOOR,
   CAR_FLOOR_LIGHTS,
+  CAR_FLOOR_RUN,
   CAR_TILE_TOP,
   CAR_TSID,
   CAR_UNDERFLOOR,
@@ -77,7 +78,7 @@ import {
   stationScreen,
   stepRide,
   ticketOffer,
-} from '../subway.js?v=3b9c09af';
+} from '../subway.js?v=646ae6af';
 
 export const SUBWAY_FEATURE_ID = 'subway';
 const STYLE_ID = 'subway-feature-style';
@@ -356,7 +357,8 @@ function clearViews(engine) {
 }
 
 function addSprite(engine, row, bounds) {
-  const s = new engine.PIXI.Sprite(textureFromUrl(artUrl(row.piece)));
+  const base = textureFromUrl(artUrl(row.piece));
+  const s = new engine.PIXI.Sprite(row.frame ? frameTexture(base, new engine.PIXI.Rectangle(...row.frame)) : base);
   s.anchor.set(0.5, 1);
   s.x = row.x - bounds.l;
   s.y = row.y - bounds.t;
@@ -403,8 +405,8 @@ function drawCar(engine, street) {
   const b = street.bounds;
   const { PIXI } = engine;
   for (const row of carArt()) addSprite(engine, row, b);
-  // Under the wall tile's last (black) rows: the camera keeps room below the riders' feet.
-  const under = new PIXI.Graphics().rect(0, CAR_TILE_TOP + 700 - b.t - 2, b.r - b.l, 600).fill(CAR_UNDERFLOOR);
+  // The black of the tile's last rows, under the carried-on floor (a view taller than the car).
+  const under = new PIXI.Graphics().rect(0, CAR_TILE_TOP + 700 + CAR_FLOOR_RUN - b.t - 2, b.r - b.l, 900).fill(CAR_UNDERFLOOR);
   under.zIndex = -71;
   under.eventMode = 'none';
   engine.entityLayer.addChild(under);

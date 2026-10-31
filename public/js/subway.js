@@ -45,6 +45,7 @@
 
 import { SUBWAY_LINE } from './subway-line.js?v=d74b3ee0';
 import { SUBWAY_ART } from './subway-art.js?v=789979e3';
+import { MIN_GROUND_CLEARANCE } from './movement.js?v=a314f8a1';
 
 export { SUBWAY_LINE, SUBWAY_ART };
 
@@ -331,7 +332,7 @@ export const STATION_X = Object.freeze({ stairs: -894, crack: -690, sign: -500, 
 
 const art = (piece, x, y, z, extra = {}) => {
   const [, w, h] = SUBWAY_ART[piece] || [null, 0, 0];
-  return Object.freeze({ piece, x, y, w: extra.w ?? w, h: extra.h ?? h, z, ...(extra.flip ? { flip: true } : {}), ...(extra.alpha ? { alpha: extra.alpha } : {}) });
+  return Object.freeze({ piece, x, y, w: extra.w ?? w, h: extra.h ?? h, z, ...(extra.flip ? { flip: true } : {}), ...(extra.alpha ? { alpha: extra.alpha } : {}), ...(extra.frame ? { frame: Object.freeze([...extra.frame]) } : {}) });
 };
 
 /** Art rows: x centre, y bottom (world), z under the avatar (negative) or over it. */
@@ -396,9 +397,23 @@ export const CAR_TILE_FLOOR = 644;
 export const CAR_TILE_SEAT = 548;
 export const CAR_TILE_TOP = CAR_FLOOR - CAR_TILE_FLOOR;
 export const CAR_SEAT = CAR_TILE_TOP + CAR_TILE_SEAT;
-/** The tile's bottom rows' black, carried on below it. */
+/**
+ * The view ends a thin strip below the riders' feet, as in the footage (t018, t030: the
+ * location view's bottom edge ~32 video px under the feet, about 42 world px). The camera
+ * never looks past the street's bottom bound plus its own ground clearance
+ * (movement.js MIN_GROUND_CLEARANCE, street-render.js worldH), so the bound sits that much
+ * higher.
+ */
+export const CAR_VIEW_BELOW = 42;
+export const CAR_BOUNDS = Object.freeze({ l: -800, r: 1000, t: CAR_TILE_TOP - 39, b: CAR_FLOOR + CAR_VIEW_BELOW - MIN_GROUND_CLEARANCE });
+/**
+ * Under that edge (behind the pack, and in a view taller than the car) the wall tile's own
+ * floor strip (rows 612-672) carries on down CAR_FLOOR_RUN px, then its bottom edge (rows
+ * 672-700) and the black of its last rows.
+ */
+export const CAR_FLOOR_BAND = Object.freeze([612, 672]);
+export const CAR_FLOOR_RUN = 420;
 export const CAR_UNDERFLOOR = 0x0d0c08;
-export const CAR_BOUNDS = Object.freeze({ l: -800, r: 1000, t: CAR_TILE_TOP - 39, b: CAR_TILE_TOP + 700 });
 export const CAR_TILE_X = Object.freeze([-1665, -465, 735]);
 export const CAR_WINDOWS = Object.freeze([-528, -52, 441].map((left) => left + 275 / 2 - 2.5));
 export const CAR_WINDOW_BOTTOM = CAR_TILE_TOP + 458;
@@ -409,7 +424,13 @@ const AD_CYCLE = [1, 2, 3, 4, 5];
 export function carArt() {
   const rows = [];
   const [, tw, th] = SUBWAY_ART.subway_interior_1;
-  for (const x of CAR_TILE_X) rows.push(art('subway_interior_1', x + tw / 2, CAR_TILE_TOP + th, -70));
+  const [b0, b1] = CAR_FLOOR_BAND;
+  for (const x of CAR_TILE_X) {
+    rows.push(art('subway_interior_1', x + tw / 2, CAR_TILE_TOP + th, -70));
+    // The floor carried on below the tile's floor strip, then the tile's own bottom edge.
+    rows.push(art('subway_interior_1', x + tw / 2, CAR_TILE_TOP + b1 + CAR_FLOOR_RUN, -69, { h: CAR_FLOOR_RUN, frame: [0, b0, tw, b1 - b0] }));
+    rows.push(art('subway_interior_1', x + tw / 2, CAR_TILE_TOP + th + CAR_FLOOR_RUN, -69, { h: th - b1, frame: [0, b1, tw, th - b1] }));
+  }
   // Ads: 290-wide panels with small gaps along the band (tile y 210-300).
   const adBottom = CAR_TILE_TOP + 296;
   let i = 0;
@@ -420,7 +441,12 @@ export function carArt() {
   return rows;
 }
 
-/** Poles at the wall seams, a street layer in front of the riders (screen space, like any T_ layer). */
+/**
+ * Poles at the wall seams, a street layer in front of the riders (screen space, like any
+ * T_ layer). The layer has no size of its own, so it moves with the street instead of
+ * as a parallax canvas (street-render.js): a parallax layer is pinned to the view's
+ * bottom when the view is taller than the car, and the poles would float off the floor.
+ */
 export function carFrontDecos() {
   const { l, t } = CAR_BOUNDS;
   return [CAR_TILE_X[1] + 310, CAR_TILE_X[2] + 310].map((x, i) => ({
@@ -522,7 +548,7 @@ export function carStreet() {
     platforms,
     layers: [
       { id: 'middleground', name: 'middleground', z: 0, w: r - l, h: b - t, decos: [] },
-      { id: 'T_subway_car_front', name: 'middleplus', z: 1, w: r - l, h: b - t, decos: carFrontDecos() },
+      { id: 'T_subway_car_front', name: 'middleplus', z: 1, w: 0, h: 0, decos: carFrontDecos() },
     ],
     signposts: [],
     doors: [],

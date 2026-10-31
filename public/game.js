@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=45f8baaa';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=a8fb3004';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=99394698';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=eeb9ca4c';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -122,7 +122,7 @@ import {
   travelToGregarious,
 } from './js/legalize-it.js?v=d569fd0e';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=f5ab600e';
-import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=3b9c09af';
+import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=646ae6af';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=f4c54caa';
 import {
   WINTER_HAVEN_STREET_ID,
@@ -447,8 +447,8 @@ import {
 } from './js/inventory.js?v=85d4faba';
 import { PACK_COPY } from './js/pack-slots.js?v=f01262b1';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=9b23e21a';
-import { listAnimalFeedOptions } from './js/animals.js?v=b22d4578';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=b22d4578';
+import { listAnimalFeedOptions } from './js/animals.js?v=2fc4d319';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=2fc4d319';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -759,7 +759,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=b22d4578';
+} from './js/animals.js?v=2fc4d319';
 import {
   ensureWoodTreeState,
   pickWoodTool,
