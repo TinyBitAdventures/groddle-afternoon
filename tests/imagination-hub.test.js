@@ -113,6 +113,14 @@ describe('the game wires the hub', () => {
     assert.match(game, /onImagination: \(\) => \(modernUi\(\) && imaginationHub \? imaginationHub\.toggle\(\) : document\.getElementById\('img-btn'\)\?\.click\(\)\),/);
   });
 
+  it('X and U work at home, but not over Decorate or Cultivate', () => {
+    const img = read('js/features/imagination-feature.js');
+    assert.match(img, /const blocked = \(\) => !engineRef \|\| engineRef\.busy\(\{ ignoreHome: true \}\) \|\| Boolean\(engineRef\.query\?\.\('homeEditMode', engineRef\)\);/);
+    assert.match(img, /\(e\.key === 'x' \|\| e\.key === 'X'\) && !e\.metaKey && !e\.ctrlKey && !e\.altKey && !blocked\(\)\)/);
+    assert.match(img, /engineRef\?\.started && !blocked\(\)\) \{/);
+    assert.match(read('game.js'), /canOpen: \(\) => state\.started && !engine\.busy\(\{ ignoreHome: true \}\) && !features\.query\('homeEditMode', engine\) && !isScreenViewOpen\(\),/);
+  });
+
   it('the hotkey sheet names the hub\'s letters in the modern skin', () => {
     const menus = (opts) => hotkeySections(opts)[0].rows.find((r) => r[0] === 'Imagination Menu');
     assert.equal(menus({}).length, 2);

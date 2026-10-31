@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e2372a6b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ffd108bc';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=03e719ca';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -27287,7 +27287,8 @@ async function main() {
       teleport: () => features.query('teleportPointsKey', engine),
       home: () => document.getElementById('home-btn')?.click(),
     },
-    canOpen: () => state.started && !engine.busy() && !isScreenViewOpen(),
+    // Your home is an instance, but X opens the hub there; not over Decorate or Cultivate.
+    canOpen: () => state.started && !engine.busy({ ignoreHome: true }) && !features.query('homeEditMode', engine) && !isScreenViewOpen(),
     anchor: () => avatarOnRoot(),
     imagination: () => pc.imagination,
     setData: (key, value) => {

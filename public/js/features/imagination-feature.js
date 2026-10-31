@@ -515,12 +515,15 @@ function onPanelClick(e) {
   }
 }
 
+/** Home is an instance but not busy for X and U; Decorate and Cultivate are (as Camera Mode). */
+const blocked = () => !engineRef || engineRef.busy({ ignoreHome: true }) || Boolean(engineRef.query?.('homeEditMode', engineRef));
+
 function onKeyDown(e) {
   const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || '');
   if (!panel || panel.hidden) {
     // HUB: while the modern skin's Imagination hub is up it has the keys (js/ui/imagination-hub.js).
     if (engineRef?.imaginationHubOpen?.()) return;
-    if (!typing && (e.key === 'x' || e.key === 'X') && !e.metaKey && !e.ctrlKey && !e.altKey && engineRef && !engineRef.busy()) {
+    if (!typing && (e.key === 'x' || e.key === 'X') && !e.metaKey && !e.ctrlKey && !e.altKey && !blocked()) {
       e.preventDefault();
       // X is the Imagination menu (ImgMenuView): the hub in the modern skin, else the panel.
       if (!engineRef.imaginationHub?.()) openPanel();
@@ -529,7 +532,7 @@ function onKeyDown(e) {
     // ImgMenuView with Cloud.TYPE_UPGRADES). KeyBeacon.as 288-295 sends Shift+U as
     // SHIFT_PLUS_ U, which nothing hears, and a held key does not fire again.
     if (!typing && (e.key === 'u' || e.key === 'U') && !e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey && !e.repeat &&
-        engineRef?.started && !engineRef.busy()) {
+        engineRef?.started && !blocked()) {
       e.preventDefault();
       e.stopImmediatePropagation();
       openPanel({ view: 'hand' });
