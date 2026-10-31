@@ -65,6 +65,11 @@ const FIXTURE_NAMES = Object.freeze({
   butler_box: 'Butler Box',
 });
 
+/** A fixture's name in a player-facing line ("Keep it clear of your World Gate."). */
+export function fixtureName(id) {
+  return FIXTURE_NAMES[id] || id;
+}
+
 /** The world x of the gate's and the signpost's posts on this street. */
 export function gateX(layout) {
   return layout.lotLeft + GATE.lotDx;

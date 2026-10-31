@@ -29,7 +29,7 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=814ee05f';
-import { butlerApi } from './butler-feature.js?v=8163d6d5';
+import { butlerApi } from './butler-feature.js?v=dbd1941d';
 import { hellFeature } from './hell-feature.js?v=2d9958f9';
 import { towerApi } from './home-tower-feature.js?v=a9047342';
 import { slashPlan, unknownLine } from '../slash-commands.js?v=23e13b20';

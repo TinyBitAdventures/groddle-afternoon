@@ -26,16 +26,42 @@
  */
 import { GARDEN_ART } from './garden-art.js?v=c947ccf4';
 
+/**
+ * The size gardens are drawn at: items/garden_new.js adjusted_scale 0.7, and
+ * glitch-client data/item/Item.as `scale` gives garden_new (and only it) its
+ * adjusted_scale. GardenView.as and GardenPlotView.as scale the bed, the plot
+ * pieces and every offset by it, so a bed stays inside its proto's
+ * placement width (crop medium: 457 x 0.7 = 320 of 356).
+ */
+export const GARDEN_SCALE = 0.7;
+
 /** GardenView.as constants at item scale 1. */
 export const BASE_PADD_RIGHT = 85;
 export const PLOT_PADD_LEFT = 7;
 export const PLOT_PADD_RIGHT = 5;
 export const PLOT_PADD_TOP = -3;
-/** GardenPlotView base_width / base_height: the `dry` base, kept as int (80.9 x 23). */
-export const PLOT_W = Math.trunc(GARDEN_ART.dry.w0);
-export const PLOT_H = Math.trunc(GARDEN_ART.dry.h0);
 
-/** A piece's frame: [url, x, y, w, h, ox, oy] (1x px; ox, oy its top-left from the origin). */
+/**
+ * GardenView.build at an item scale: each offset `int` (AS3 truncates), and the
+ * plot's base_width / base_height, the `dry` base scaled, kept as int.
+ */
+export function gardenMetrics(scale = GARDEN_SCALE) {
+  return {
+    scale,
+    baseRight: Math.trunc(BASE_PADD_RIGHT * scale),
+    plotLeft: Math.trunc(PLOT_PADD_LEFT * scale),
+    plotRight: Math.trunc(PLOT_PADD_RIGHT * scale),
+    plotTop: Math.trunc(PLOT_PADD_TOP * scale),
+    plotW: Math.trunc(GARDEN_ART.dry.w0 * scale),
+    plotH: Math.trunc(GARDEN_ART.dry.h0 * scale),
+  };
+}
+
+/** A plot's base as drawn (56 x 16 at 0.7). */
+export const PLOT_W = gardenMetrics().plotW;
+export const PLOT_H = gardenMetrics().plotH;
+
+/** A piece's frame: { url, x, y, w, h (its cell), ox, oy (top-left from the origin), x0, y0, w0, h0 }. */
 export function gardenFrame(name) {
   return GARDEN_ART[name] || null;
 }
@@ -48,8 +74,8 @@ export function gardenStyle({ gardenType = 'default', rows = 2, home = false, st
   return herb ? 'shimla_1' : 'strip_1';
 }
 
-/** GardenView.as build: the bed pieces for a style, at the garden's origin. */
-export function bedPieces(style, cols, rows) {
+/** GardenView.as build: the bed pieces for a style, at the garden's origin (x in scaled px). */
+export function bedPieces(style, cols, rows, scale = GARDEN_SCALE) {
   const chunks = String(style || 'none').split('_');
   const name = chunks[0];
   const styleCols = chunks.length > 1 ? Number(chunks[1]) || 1 : 1;
@@ -57,41 +83,52 @@ export function bedPieces(style, cols, rows) {
   if (GARDEN_ART[whole]) return [{ name: whole, x: 0, y: 0 }];
   const tile = `${name}_${rows}_${styleCols}`;
   if (!GARDEN_ART[tile]) return [];
+  const step = gardenMetrics(scale).baseRight * styleCols;
   const out = [];
-  for (let i = 0; i < cols / styleCols; i++) out.push({ name: tile, x: i * BASE_PADD_RIGHT * styleCols, y: 0 });
+  for (let i = 0; i < cols / styleCols; i++) out.push({ name: tile, x: i * step, y: 0 });
   return out;
 }
 
-/** Where plot "c-r" sits (its base's origin) in garden space. */
-export function plotOrigin(key, cols, rows) {
+/** Where plot "c-r" sits (its base's origin) in garden space, scaled px. */
+export function plotOrigin(key, cols, rows, scale = GARDEN_SCALE) {
+  const m = gardenMetrics(scale);
   const [c, r] = String(key).split('-').map(Number);
   const row = rows - r;
   const col = c - 1;
   return {
-    x: PLOT_PADD_LEFT + (PLOT_W / 2 + PLOT_PADD_RIGHT) * row + BASE_PADD_RIGHT * col,
-    y: (PLOT_H + PLOT_PADD_TOP) * (rows - 1 - row),
+    x: m.plotLeft + (m.plotW / 2 + m.plotRight) * row + m.baseRight * col,
+    y: (m.plotH + m.plotTop) * (rows - 1 - row),
   };
 }
 
 /**
  * The whole garden: bed pieces, each plot's origin, and the box the bed and the
- * plot bases cover (plants left out, so a garden does not move as it grows).
+ * plot bases cover (plants left out, so a garden does not move as it grows), all
+ * in scaled px; each piece is drawn at `scale` about its origin.
  */
-export function gardenLayout({ cols = 4, rows = 2, style = 'none' } = {}) {
-  const beds = bedPieces(style, cols, rows);
+export function gardenLayout({ cols = 4, rows = 2, style = 'none', scale = GARDEN_SCALE } = {}) {
+  const beds = bedPieces(style, cols, rows, scale);
   const plots = [];
   for (let r = 1; r <= rows; r++) {
-    for (let c = 1; c <= cols; c++) plots.push({ key: `${c}-${r}`, c, r, ...plotOrigin(`${c}-${r}`, cols, rows) });
+    for (let c = 1; c <= cols; c++) plots.push({ key: `${c}-${r}`, c, r, ...plotOrigin(`${c}-${r}`, cols, rows, scale) });
   }
   const base = GARDEN_ART.dry;
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-  const add = (a, b, c, d) => { x0 = Math.min(x0, a); y0 = Math.min(y0, b); x1 = Math.max(x1, c); y1 = Math.max(y1, d); };
-  for (const b of beds) {
-    const f = GARDEN_ART[b.name];
-    add(b.x + f.x0, b.y + f.y0, b.x + f.x0 + f.w0, b.y + f.y0 + f.h0);
-  }
-  for (const p of plots) add(p.x + base.x0, p.y + base.y0, p.x + base.x0 + base.w0, p.y + base.y0 + base.h0);
-  return { style, cols, rows, beds, plots, box: { x0, y0, x1, y1, w: x1 - x0, h: y1 - y0 } };
+  const add = (f, x, y) => {
+    x0 = Math.min(x0, x + f.x0 * scale); y0 = Math.min(y0, y + f.y0 * scale);
+    x1 = Math.max(x1, x + (f.x0 + f.w0) * scale); y1 = Math.max(y1, y + (f.y0 + f.h0) * scale);
+  };
+  for (const b of beds) add(GARDEN_ART[b.name], b.x, b.y);
+  for (const p of plots) add(base, p.x, p.y);
+  return { style, cols, rows, ...gardenMetrics(scale), beds, plots, box: { x0, y0, x1, y1, w: x1 - x0, h: y1 - y0 } };
+}
+
+/**
+ * Half the drawn width of a garden (bed and plot bases), rounded up: what a home
+ * cultivation keeps clear around its x (js/home-cultivation.js footprint).
+ */
+export function gardenHalfWidth({ gardenType = 'default', cols = 4, rows = 2, home = false, style = '', scale = GARDEN_SCALE } = {}) {
+  return Math.ceil(gardenLayout({ cols, rows, style: gardenStyle({ gardenType, rows, home, style }), scale }).box.w / 2);
 }
 
 /** GardenPlotView mature_level for a remake plot (include/garden.js getPlotStatus). */

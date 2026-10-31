@@ -15,7 +15,7 @@ import {
   footprint,
   homeStreetLayout,
   placementCheck,
-} from '../public/js/home-cultivation.js?v=3f6c0792';
+} from '../public/js/home-cultivation.js?v=15295514';
 import {
   DISPATCHER_HALF,
   GATE,
@@ -25,8 +25,8 @@ import {
   gateX,
   signpostX,
   streetFixtures,
-} from '../public/js/home-street-fixtures.js?v=57eaae87';
-import { HOUSE_STYLE_KEYS, houseFixtureX, homesFeature } from '../public/js/features/homes-feature.js?v=6aa45670';
+} from '../public/js/home-street-fixtures.js?v=088da201';
+import { HOUSE_STYLE_KEYS, houseFixtureX, homesFeature } from '../public/js/features/homes-feature.js?v=0676bd93';
 
 const root = join(import.meta.dirname, '..', 'public', 'js');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -97,7 +97,8 @@ describe('home street fixtures (HOMEMAIL)', () => {
     assert.equal(refused.ok, false);
     assert.equal(refused.reason, 'dispatcher');
     assert.equal(refused.msg, 'Keep it clear of your Mail Dispatcher.');
-    const clear = usual + DISPATCHER_HALF + footprint('proto_metal_rock') + 1;
+    // Beside it on the left (on its right is the signpost's post, which nothing stands on: GARDENART).
+    const clear = usual - DISPATCHER_HALF - footprint('proto_metal_rock') - 1;
     assert.equal(placementCheck(st, 'proto_metal_rock', clear).ok, true);
     // A save from before this rule with a rock on the spot: the dispatcher stands beside it.
     st.items.push({ id: 1, protoClass: 'proto_metal_rock', endClass: 'rock_metal_1', rx: usual, wear: 0, lifeSteps: 0 });

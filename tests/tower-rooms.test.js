@@ -567,8 +567,8 @@ describe('rebuilt tower rooms: Rooms 4, 8 and 16', () => {
     assert.equal(room4.wayOut.top, room4.doors[0].y);
     // Garden: 4 x 1 on the floor's middle flat, spinach.
     assert.deepEqual([room4.garden.cols * room4.garden.rows, room4.garden.seed], [4, 'seed_spinach']);
-    // js/garden-view.js: a street crop garden is strip_1, four strip_1_1 tiles 85 px apart (92.8 wide).
-    const bedHalf = (3 * 85 + 92.8) / 2;
+    // js/garden-view.js: a street crop garden is strip_1 at the 0.7 garden scale, four strip_1_1 tiles 59 px apart (92.8 x 0.7 wide).
+    const bedHalf = (3 * 59 + 92.8 * 0.7) / 2;
     const mid = room4.platforms.find((p) => p.id === 'plat_r4_floor_mid');
     assert.ok(mid.x1 <= room4.garden.x - bedHalf && room4.garden.x + bedHalf <= mid.x2 && mid.y1 === room4.garden.y);
     // Six different drinks, three on each shelf (G97: the Snaps' drinks stand on shelves).

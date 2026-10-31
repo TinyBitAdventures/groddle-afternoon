@@ -62,7 +62,8 @@ import {
   TOWER_PROTO,
   TOWER_WIDTH,
 } from './home-tower.js?v=6ccb3a4f';
-import { DISPATCHER_HALF, dispatcherSpot, savedDispatcherRx, streetFixtures } from './home-street-fixtures.js?v=57eaae87';
+import { DISPATCHER_HALF, dispatcherSpot, fixtureName, gateX, savedDispatcherRx, signpostX, streetFixtures } from './home-street-fixtures.js?v=088da201';
+import { gardenHalfWidth } from './garden-view.js?v=05651e76';
 
 export const YARD_SEGMENT_W = 150;
 /** The house, porch, mailbox and World Gate stand on a fixed lot between the yards. */
@@ -163,7 +164,7 @@ export function normalizeCultivationState(seed = {}) {
     ? HOME_LIMITS.MAX_BACKYARD_SEGMENTS - HOME_LIMITS.START_BACKYARD_SEGMENTS
     : HOME_LIMITS.MAX_FRONTYARD_LEFT_SEGMENTS - HOME_LIMITS.START_FRONTYARD_LEFT_SEGMENTS;
   const maxRight = back ? 0 : HOME_LIMITS.MAX_FRONTYARD_RIGHT_SEGMENTS - HOME_LIMITS.START_FRONTYARD_RIGHT_SEGMENTS;
-  return {
+  const state = {
     ...(back ? { yard: BACK_YARD } : {}),
     items,
     nextId: Math.max(items.reduce((m, r) => Math.max(m, r.id), 0) + 1, Math.floor(finite(seed?.nextId, 1))),
@@ -178,6 +179,33 @@ export function normalizeCultivationState(seed = {}) {
     // The Mail Dispatcher's spot on the street once you have moved it (home-street-fixtures).
     ...(!back && savedDispatcherRx(seed) != null ? { dispatcherRx: savedDispatcherRx(seed) } : {}),
   };
+  settleGardens(state);
+  return state;
+}
+
+/** The placementCheck reasons that are a fixture on the ground (groundFixtures). */
+const FIXTURE_REASONS = new Set(['gate', 'signpost', 'rock', 'butler_box']);
+
+/**
+ * Saves from before 2026-10-31 (GARDENART): gardens now draw Tiny Speck's beds
+ * (js/garden-view.js), a little wider than the footprint they were set down with, and
+ * nothing used to keep cultivations off the posts and fixtures on the ground. A saved
+ * garden that no longer fits where it is (on a post or fixture, past the yard's end, on
+ * the path to the door, or over another cultivation), or any other cultivation standing on
+ * a post or fixture, moves to the nearest spot that fits, the same on every client. The
+ * Mail Dispatcher steps aside on its own (dispatcherSpot).
+ */
+export function settleGardens(state) {
+  for (const item of state.items) {
+    const garden = cultivationDef(item.protoClass)?.kind === 'garden' && !item.depleted;
+    // The dispatcher is left out: it steps aside for a cultivation, not the other way round.
+    const check = placementCheck(state, item.protoClass, item.rx, item.id, { dispatcher: false });
+    if (check.ok || check.reason === 'unknown') continue;
+    if (!garden && !FIXTURE_REASONS.has(check.reason)) continue;
+    const rx = nearestFreeRx(state, item.protoClass, item.rx, item.id, { dispatcher: false });
+    if (rx != null) item.rx = rx;
+  }
+  return state;
 }
 
 export function createCultivationState(seed = {}) {
@@ -275,16 +303,41 @@ export function cultivationChoices(state, pc = {}) {
   });
 }
 
-/** Half-footprint used for spacing: the proto ghost width (source) at 80%. */
+/**
+ * Half-footprint used for spacing: the proto ghost width (source) at 80%, or for a
+ * garden half its drawn bed (js/garden-view.js: Tiny Speck's polcrop/polherb bed at
+ * the 0.7 garden scale, 104 / 160 / 206 for small / medium / large, inside the
+ * source's placement width), so nothing is set down under its edge.
+ */
 export function footprint(protoClass) {
-  return Math.round((cultivationDef(protoClass)?.width || 200) * 0.4);
+  const def = cultivationDef(protoClass);
+  if (def?.kind === 'garden') return gardenHalfWidth({ gardenType: def.gardenType, cols: def.cols, rows: def.rows, home: true });
+  return Math.round((def?.width || 200) * 0.4);
+}
+
+/** The signpost post's half width on the ground (home-street-mp-feature drawSignpost: signpost_post.png is 43 wide). */
+export const SIGNPOST_POST_HALF = 22;
+/** The World Gate's post (homes-feature makeGateSprite: 12 wide), with a little air. */
+export const GATE_POST_HALF = 10;
+
+/**
+ * What stands on the ground of the home street, which a cultivation keeps clear of: the
+ * World Gate's and the friends' signpost's posts (their board and arms are overhead, above
+ * the tallest grown crop), the Magic Rock and the Butler Box.
+ */
+export function groundFixtures(layout) {
+  return streetFixtures(layout).map((f) => {
+    if (f.id === 'signpost') return { id: f.id, x1: signpostX(layout) - SIGNPOST_POST_HALF, x2: signpostX(layout) + SIGNPOST_POST_HALF };
+    if (f.id === 'gate') return { id: f.id, x1: gateX(layout) - GATE_POST_HALF, x2: gateX(layout) + GATE_POST_HALF };
+    return f;
+  });
 }
 
 /**
  * Whether a cultivation fits at `rx`: inside the yard, clear of the doorway,
  * and not overlapping another cultivation's footprint.
  */
-export function placementCheck(state, protoClass, rx, excludeId = null) {
+export function placementCheck(state, protoClass, rx, excludeId = null, { dispatcher = true } = {}) {
   const def = cultivationDef(protoClass);
   if (!def) return { ok: false, reason: 'unknown' };
   const layout = homeStreetLayout(state);
@@ -297,7 +350,15 @@ export function placementCheck(state, protoClass, rx, excludeId = null) {
   if (Math.abs(x) < half + (back ? BACK_YARD_OPENING : DOOR_CLEARANCE) / 2) {
     return { ok: false, reason: 'door', msg: back ? 'Keep the way into your house clear.' : 'Keep the path to your front door clear.' };
   }
-  if (!back && Math.abs(dispatcherRx(state, { excludeId }) - x) < half + DISPATCHER_HALF) {
+  // Nothing stands on the gate's or the signpost's post, the Magic Rock or the Butler Box
+  // (ContiguousPlatformLineSet.calculateRanges kept placements off signposts).
+  if (!back) {
+    const wx = layout.houseX + x;
+    for (const f of groundFixtures(layout)) {
+      if (wx + half > f.x1 && wx - half < f.x2) return { ok: false, reason: f.id, msg: `Keep it clear of your ${fixtureName(f.id)}.` };
+    }
+  }
+  if (!back && dispatcher && Math.abs(dispatcherRx(state, { excludeId }) - x) < half + DISPATCHER_HALF) {
     return { ok: false, reason: 'dispatcher', msg: 'Keep it clear of your Mail Dispatcher.' };
   }
   for (const other of state.items) {
@@ -327,11 +388,11 @@ export function dispatcherRx(state, { excludeId = null, at = {} } = {}) {
 }
 
 /** The nearest free spot to `rx` (searching outward), or null. */
-export function nearestFreeRx(state, protoClass, rx, excludeId = null) {
+export function nearestFreeRx(state, protoClass, rx, excludeId = null, opts = {}) {
   const start = Math.round(finite(rx, 0));
   for (let d = 0; d < 7000; d += 10) {
     for (const x of d ? [start + d, start - d] : [start]) {
-      if (placementCheck(state, protoClass, x, excludeId).ok) return x;
+      if (placementCheck(state, protoClass, x, excludeId, opts).ok) return x;
     }
   }
   return null;

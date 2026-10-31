@@ -22,7 +22,7 @@ import {
   placementCheck,
   quoteYardExpansion,
   removeCultivation,
-} from '../public/js/home-cultivation.js?v=3f6c0792';
+} from '../public/js/home-cultivation.js?v=15295514';
 
 const root = join(import.meta.dirname, '..', 'public');
 const rich = () => ({ level: 60, imagination: 1_000_000 });
@@ -103,7 +103,8 @@ describe('cultivating the home street', () => {
   it('expands the yard at FRONTYARD_EXPAND_COSTS and keeps items beside the house', () => {
     const state = createCultivationState();
     const pc = { level: 1, imagination: 225 };
-    const item = cultivate(state, { level: 60, imagination: 400 }, 'proto_patch', -500).item;
+    // Right of the house: the left side of the starting street is the signpost's post and the dispatcher (GARDENART).
+    const item = cultivate(state, { level: 60, imagination: 400 }, 'proto_patch', 500).item;
     const before = homeStreetLayout(state).houseX + item.rx;
     assert.equal(quoteYardExpansion(state, pc, 'left').cost, 100);
     const left = expandYard(state, pc, 'left');

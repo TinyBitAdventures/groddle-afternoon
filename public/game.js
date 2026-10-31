@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e2372a6b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5cd0389e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b724c1b7';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -558,7 +558,7 @@ import {
   hasWateringCan,
   hasHoe,
 } from './js/garden.js?v=9a8f8f72';
-import { PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=bddf68c7';
+import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=05651e76';
 import {
   ROCK_CATALOG,
   createMineRock,
@@ -8182,7 +8182,7 @@ function showGardenTendFocus() {
     gardenTendMark.label = 'garden-tend-focus';
   }
   gardenTendMark.clear();
-  // The plot's base is a soil patch about 81 x 23: the glow follows its oval.
+  // The plot's base is a soil patch (56 x 16 at the garden scale): the glow follows its oval.
   gardenTendMark.ellipse(0, -GARDEN_PLOT_H / 2, GARDEN_PLOT_W / 2 + 2, GARDEN_PLOT_H / 2 + 3)
     .fill({ color: 0xa8e4ff, alpha: 0.22 })
     .stroke({ color: 0xa8e4ff, width: 3, alpha: 0.95 });
@@ -24549,7 +24549,7 @@ function WORLD_LABEL_STYLE(fontSize) {
  * patch or depleted soil on top, back row first. A plot's hit box is its base.
  */
 const gardenPieceTextures = new Map();
-function gardenPiece(name) {
+function gardenPiece(name, scale = GARDEN_SCALE) {
   const f = gardenFrame(name);
   if (!f) return null;
   let tex = gardenPieceTextures.get(name);
@@ -24558,12 +24558,14 @@ function gardenPiece(name) {
     gardenPieceTextures.set(name, tex);
   }
   const spr = new PIXI.Sprite(tex);
-  spr.position.set(f.ox, f.oy);
+  // Every piece is drawn at the garden's item scale about its origin (GardenPlotView base.width *= scale).
+  spr.scale.set(scale);
+  spr.position.set(f.ox * scale, f.oy * scale);
   spr.eventMode = 'none';
   return spr;
 }
 /** How far a back-row plot's hit box reaches up over its plant (the plant is part of the plot). */
-const GARDEN_BACK_ROW_REACH = 34;
+const GARDEN_BACK_ROW_REACH = 24;
 
 /**
  * Place a multi-plot crop/herb garden on the street with individually
@@ -24609,13 +24611,14 @@ function spawnGarden(opts = {}) {
   root.zIndex = itemZ('garden_new', 8);
   root.eventMode = 'none';
   for (const bed of layout.beds) {
-    const spr = gardenPiece(bed.name);
+    const spr = gardenPiece(bed.name, layout.scale);
     if (!spr) continue;
     spr.x += bed.x;
     spr.y += bed.y;
     root.addChild(spr);
   }
   root.gardenStyle = style;
+  root.gardenLayout = layout;
 
   const tag = new PIXI.Text(
     { text: opts.label || (gardenType === 'herb' ? 'Herbs' : 'Garden'), style: WORLD_LABEL_STYLE(11) }
@@ -24623,7 +24626,7 @@ function spawnGarden(opts = {}) {
   tag.anchor.set(0.5, 1);
   // Above the back row's grown plants (the tallest crop reaches 66 px over its plot).
   tag.x = Math.round((layout.box.x0 + layout.box.x1) / 2);
-  tag.y = Math.min(layout.box.y0, -66) - 4;
+  tag.y = Math.round(Math.min(layout.box.y0, -66 * layout.scale)) - 4;
   tag.eventMode = 'none';
   root.addChild(tag);
   root.gardenTag = tag;
@@ -24657,11 +24660,11 @@ function spawnGarden(opts = {}) {
     if (!getPlot(garden, key)) continue;
     const cell = new PIXI.Container();
     // The cell's point is the bottom centre of the plot's base; the pieces hang off it.
-    cell.x = left + plotPos.x + GARDEN_PLOT_W / 2;
-    cell.y = top + plotPos.y + GARDEN_PLOT_H;
+    cell.x = left + plotPos.x + layout.plotW / 2;
+    cell.y = top + plotPos.y + layout.plotH;
     cell.zIndex = itemZ('garden_plot', 9 + plotPos.r * 0.3);
-    cell._gardenHitW = GARDEN_PLOT_W;
-    cell._gardenHitH = GARDEN_PLOT_H + (plotPos.r === 1 ? GARDEN_BACK_ROW_REACH : 0);
+    cell._gardenHitW = layout.plotW;
+    cell._gardenHitH = layout.plotH + (plotPos.r === 1 ? GARDEN_BACK_ROW_REACH : 0);
     cell.hitArea = new PIXI.Rectangle(-cell._gardenHitW / 2, -cell._gardenHitH, cell._gardenHitW, cell._gardenHitH);
     entityLayer.addChild(cell);
     root.plotViews[key] = cell;
@@ -24766,12 +24769,13 @@ function drawGardenPlots(target) {
 
     const seed = plot?.seed ? SEED_CATALOG[plot.seed] : null;
     const pieces = plotPieces(plot, { gardenType: garden.gardenType, cropId: seed?.cropId, depleted: Boolean(garden.depleted) });
+    const m = root.gardenLayout;
     for (const name of [pieces.base, pieces.grow]) {
-      const spr = name && gardenPiece(name);
+      const spr = name && gardenPiece(name, m.scale);
       if (!spr) continue;
       // Pieces sit at the plot's origin, the base's top-left; the cell's point is its bottom centre.
-      spr.x -= GARDEN_PLOT_W / 2;
-      spr.y -= GARDEN_PLOT_H;
+      spr.x -= m.plotW / 2;
+      spr.y -= m.plotH;
       cell.addChild(spr);
     }
     cell.gardenPieces = pieces;
