@@ -23,6 +23,7 @@ import { forkStreet, forkOps, newTsid, streetKeyFrom, relayerPosition, isLayerLo
 import { nextDecoId, findDeco } from './ops.js?v=044258c8';
 import { decoBox, contains, handlePoints, resizeBy, rotationTo, meetsRect, corners } from './handles.js?v=e215d17d';
 import { layerRole } from './layer-role.js?v=e585f610';
+import { installNewArt, withNewArt, provenanceSection } from './new-art.js?v=b2411f6f';
 import * as textureUrls from '../textures.js?v=01a295a1';
 import { installPixiFixes } from '../pixi-fixes.js?v=173fb649';
 import { installHiresDecos } from '../deco-hires.js?v=a65f2d79';
@@ -205,6 +206,8 @@ async function boot() {
   const app = new PIXI.Application();
   // Street decos load as WebP, 3x on Retina (js/deco-hires.js), same logical sizes.
   installHiresDecos(textureUrls, { renderer: () => app?.renderer });
+  // New art (gz_ sprites) draws from the site's /builder-art/<sha256> (js/builder/new-art.js).
+  installNewArt(textureUrls, () => (S.mode === 'draft' ? S.session?.zone.assets : null));
   await app.init({
     resizeTo: canvasHost,
     background: 0x8ec8e8,
@@ -263,7 +266,7 @@ async function boot() {
     // The game draws what loadStreetData gives it: hidden connects dropped.
     const data = { ...s, signposts: navigableSignposts(s.signposts) };
     const t0 = performance.now();
-    S.view = buildStreetView(data, PIXI, { renderer: app.renderer, available });
+    S.view = buildStreetView(data, PIXI, { renderer: app.renderer, available: S.mode === 'draft' ? withNewArt(available, S.session?.zone.assets) : available });
     S.view.buildMs = Math.round(performance.now() - t0);
     world.addChild(S.view, S.view.frontView);
     for (const lc of S.view.layerContainers) lc.visible = !S.hidden.has(lc.label);
@@ -707,7 +710,8 @@ async function boot() {
       el('label', { class: 'builder-check' }, hidBox, ' Hidden in the game'),
       field('Layer', layerPick),
       el('p', { class: 'builder-sub', text: local ? `Layer-local x, y. With this camera it sits at ${worldAt.x}, ${worldAt.y} in the street.` : 'Street x, y (the middleground is the street\'s own space).' }),
-      file ? el('p', { class: 'builder-sub', text: `Art file ${file[0]} by ${file[1]} (drawn at half: ${Math.round(file[0] / 2)} by ${Math.round(file[1] / 2)}).` }) : null);
+      file ? el('p', { class: 'builder-sub', text: `Art file ${file[0]} by ${file[1]} (drawn at half: ${Math.round(file[0] / 2)} by ${Math.round(file[1] / 2)}).` }) : null,
+      provenanceSection(el, deco.sprite, S.mode === 'draft' ? S.session?.zone.assets?.[deco.sprite] : null, { library: S.catalog }));
   }
 
   // —— Pointer ——

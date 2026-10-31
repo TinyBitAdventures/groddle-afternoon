@@ -116,6 +116,7 @@
       "assets/content/puzzle-triggers.json": "09810451",
       "assets/content/quests.json": "46b779bd",
       "assets/content/street-ecology.json": "725a0bd1",
+      "assets/content/style-profiles.json": "be4b706a",
       "assets/content/trade-items.json": "ce3564fe",
       "assets/decos/animated/Glints_3.json": "1f110e8e",
       "assets/decos/animated/Glints_3.webp": "9942c793",

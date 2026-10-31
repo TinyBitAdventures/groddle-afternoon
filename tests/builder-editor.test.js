@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { afterEach, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { hashFor, layersFrontFirst, nudgeStep, parseHash, playTestUrl, searchStreets, zFor, zoomAfter, ZOOM_MAX, ZOOM_MIN } from '../public/js/builder/editor.js?v=c9a97b93';
+import { hashFor, layersFrontFirst, nudgeStep, parseHash, playTestUrl, searchStreets, zFor, zoomAfter, ZOOM_MAX, ZOOM_MIN } from '../public/js/builder/editor.js?v=53b8e3b3';
 import { contains, corners, decoBox, handlePoints, meetsRect, resizeBy, rotationTo, toLocal } from '../public/js/builder/handles.js?v=e215d17d';
 import { DraftSession, statusWords } from '../public/js/builder/session.js?v=e64474a6';
 import { createBuilderApi } from '../public/js/builder/api.js?v=3f83c00b';

@@ -1,0 +1,35 @@
+{
+  "format": "groddle-licence-policy/1",
+  "decided": "2026-10-30",
+  "policy": "Everything ships as CC0 1.0 (docs/level-builder/spec.md section 10). Tiny Speck's library decos are CC0 1.0. New art, Austin's own work or AI-generated, is dedicated CC0 1.0 with its provenance recorded: who or what made it, and from what inputs. Inputs must be CC0 (library decos) or Austin's own work. Third-party packs (CC-BY and other sites) are not used.",
+  "licences": {
+    "CC0-1.0": {
+      "origin": "tinyspeck-cc0",
+      "label": "CC0 1.0, Tiny Speck's library",
+      "requires": ["source"]
+    },
+    "own-work-CC0": {
+      "origin": "new",
+      "label": "Own work, dedicated CC0 1.0",
+      "requires": ["author", "sha256", "intake"],
+      "prefix": "gz_",
+      "notPrefix": "gz_ai_"
+    },
+    "ai-generated": {
+      "origin": "new",
+      "label": "AI-generated, dedicated CC0 1.0",
+      "requires": ["author", "tool", "prompt", "sha256", "intake"],
+      "prefix": "gz_ai_"
+    }
+  },
+  "newArtName": "^gz_[a-z0-9]+(_[a-z0-9]+)*$",
+  "newArtNameMax": 96,
+  "inputs": {
+    "max": 20,
+    "kinds": {
+      "deco": "a Tiny Speck library deco by name (deco:bush_3); it must be in the library",
+      "own": "Austin's own work, described (own:pencil sketch of a mossy stump)"
+    }
+  },
+  "notAllowed": ["CC-BY and other attribution licences", "third-party packs", "anything not dedicated CC0 1.0"]
+}
