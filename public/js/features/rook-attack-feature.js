@@ -29,7 +29,11 @@
  * 7. Aftermath: rooked critters and trees keep their state per street
  *    (engine.streetSlot) until revived: Revive (10 s, three doses) or Apply
  *    Balm (Rook Balm, 2.5 s, full revive). Rooked targets offer only those
- *    verbs (engine verbOverride hook).
+ *    verbs (engine verbOverride hook). In multiplayer the balm is the site's
+ *    ledger's to confirm (G335 slice 5): the realtime server uses one of its
+ *    five points through ledger/use before the full revive, the revive share
+ *    carries the ledger's word (the tube holds what it left), and without a
+ *    balm the server refuses and the thing stays rooked for everyone.
  *
  * Engine hooks used (game.js): interactables, camera, stage, nudgeCamera,
  * query('verbOverride') in the verb menu and query('runVerbOverride') before
@@ -2202,7 +2206,20 @@ function mpOnYou(engine, msg) {
     save.stats.strikes += 1;
   }
   if (why === 'revive' && msg.balm) {
-    const use = useBalmPoint(save, balmCount(engine));
+    // G335 slice 5: the server used this pour's point through the site's ledger first: the tube holds
+    // what the ledger left, and a tube it emptied leaves the pack once (ledgerReceipt holds its op).
+    const ledger = msg.use && typeof msg.use === 'object' ? msg.use : null;
+    let applied = false;
+    if (ledger) {
+      const left = Math.max(0, Math.floor(Number(ledger.left) || 0));
+      if (ledger.spent && engine.query?.('ledgerReceipt', String(ledger.op || ''), engine) === false) {
+        save.balmPoints = 0;
+        applied = true;
+      } else {
+        save.balmPoints = ledger.spent ? 1 : Math.min(ROOK_SOURCE.balmPoints - 1, left) + 1;
+      }
+    }
+    const use = applied ? { ok: false } : useBalmPoint(save, balmCount(engine));
     if (use.ok && use.consumeItem) removeItem(engine.inv, BALM_CLASS, 1);
     save.stats.balms += 1;
     engine.achievement(`potions_used:${BALM_CLASS}`, 1);

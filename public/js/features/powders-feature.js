@@ -51,6 +51,12 @@
  * each with the source's line; Sneeze-O-Rama at 5 others, Sparkle Buddy at 7
  * (the server's powders counters). The 150% window sparkle overlay is not
  * built (overlay_sparkle_powder.fla is not in the overlay sheets yet).
+ * The jar is the site's ledger's to confirm (G335 slice 5): once the street
+ * has room, the server uses one charge through ledger/use before anyone
+ * catches it, its go-ahead carries the ledger's word (the jar here holds what
+ * it says is left, an emptied jar applied once through ledgerReceipt, as for
+ * Fertilidust), and without the jar it answers "You don't have enough of
+ * that item." and nobody catches anything.
  * Canvas: powderMp.
  *
  * Fertilidust in multiplayer (G361, G335 slice 4): the street's shared trees
@@ -480,7 +486,8 @@ function onSpread(engine, m) {
   if (!SPREAD_POWDERS.has(cls) || asking !== cls) return;
   asking = '';
   if (!m.ok) {
-    const line = powderRefusedLine(cls, m.why);
+    // G335 slice 5: the ledger's refusal (no jar, or no answer) comes with its own words.
+    const line = m.message && (m.why === 'no_item' || m.why === 'no_answer') ? String(m.message) : powderRefusedLine(cls, m.why);
     say(engine, line, false);
     const sound = powderRefusedSound(cls, m.why);
     if (sound) engine.playSound?.(sound, { volume: 0.6 });
@@ -499,7 +506,13 @@ function onSpread(engine, m) {
     return;
   }
   if (countItem(engine.inv, cls) < 1) return;
-  last = `${cls}:${runnerFor(cls)(engine, cls)}:${Number(m.players) || 0}`;
+  // G335 slice 5: the server used this charge through the site's ledger first; the jar holds what it left.
+  granted = m.use && typeof m.use === 'object' ? { classTsid: cls, use: m.use } : null;
+  try {
+    last = `${cls}:${runnerFor(cls)(engine, cls)}:${Number(m.players) || 0}`;
+  } finally {
+    granted = null;
+  }
   for (const [counter, amount] of counterRows(m.counters)) engine.achievement(counter, amount);
   mpNote(engine, last);
   publish(engine);

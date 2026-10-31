@@ -62,7 +62,7 @@ import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=f4b16c76';
 import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=23f74bb3';
 import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
 import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=395dd6a2';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=df470ff4';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=fe7ee133';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

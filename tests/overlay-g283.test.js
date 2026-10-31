@@ -44,7 +44,7 @@ describe('G283: the stun orb and the beam in view', () => {
   // Desk ORBERA (G293): the orb moved down to just above the name labels, so
   // the camera no longer looks up for it (tests/desk-decisions.test.js).
   it('the orb (200 px over your feet) sits in the 408 px viewport without the camera looking up', async () => {
-    const { ORB_ART } = await import('../public/js/features/rook-attack-feature.js?v=3d0e7100');
+    const { ORB_ART } = await import('../public/js/features/rook-attack-feature.js?v=cb36367b');
     const { placeRookBadge, badgeExtent } = await import('../public/js/rook-badge-place.js?v=2bb00dfd');
     const viewH = 408;
     const feet = viewH * (0.5 + 150 / 600); // movement.js yCamOffsetAnchor(150)

@@ -432,11 +432,16 @@ export function reconcile(obj, copy, now = Date.now()) {
 }
 
 /** An obj_act message, validated the way the server will. */
-export function actMessage({ req, id, verb, perks = [], skill = '', on = '' }) {
+export function actMessage({ req, id, verb, perks = [], skill = '', on = '', c = '', n = 0 }) {
   const msg = { req: Math.max(1, Math.floor(Number(req) || 1)), id: String(id || ''), verb: String(verb || '') };
   const words = (perks || []).filter((p) => /^[a-z0-9_]{1,24}$/.test(p)).slice(0, 8);
   if (words.length) msg.perks = words;
   if (skill && /^[a-z0-9_]{1,32}$/.test(skill)) msg.skill = skill;
   if (on && /^tree:\d{1,2}$/.test(on)) msg.on = on;
+  // G335 slice 5: a feed names the food and how many, so the server can take them through the ledger.
+  if (c && /^[a-z0-9_]{1,64}$/.test(c)) {
+    msg.c = c;
+    msg.n = Math.max(1, Math.min(9999, Math.floor(Number(n) || 1)));
+  }
   return msg;
 }

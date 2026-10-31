@@ -50,8 +50,12 @@
  * the "Other animals make me happy!" bubble, the croak, and a walk to the
  * tree whose fruit it ate (the server took the fruit), and a walk to a
  * stack dropped for everyone it ate one of (drops-mp-feature, G332). A Piggy that eats
- * food only this player sees (their own dropped stack, or a tree they just
- * worked) tells the server (sharedPiggyAte), which sates it for everyone.
+ * a shared tree's fruit where only this player saw it walk tells the server
+ * (sharedPiggyAte), which takes the fruit and sates it for everyone. It
+ * leaves alone a stack only this player sees (G335 slice 5: a class the
+ * ledger does not carry, or one dropped while the server was out of reach):
+ * the server cannot see that food, so it no longer sates a Piggy everyone
+ * shares, and every other stack on a public street is dropped for everyone.
  * Released and raised Piggies (the husbandry feature's) stay each player's
  * own, on the local rules.
  *
@@ -94,7 +98,7 @@ import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { animalStatusLabel } from '../animals.js?v=e857d0af';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=23f74bb3';
 import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=16364589';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=3d0e7100';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=cb36367b';
 import {
   CHECK_ON_REMOVE,
   CROWD_CLASSES,
@@ -457,19 +461,11 @@ function arriveShared(engine, r) {
   } else if (Number(target.state.hunger) > 0) {
     const spr = target.sprite;
     const near = (x, y) => Math.hypot(x - spr.x, (Number.isFinite(y) ? y : spr.y) - spr.y) <= EAT_RADIUS;
-    const stack = foodStacks(engine).find((row) => near(row.x, row.y));
-    if (stack) {
-      const cls = stack.classTsid;
-      consumeStack(engine, stack);
-      engine.query?.('sharedPiggyAte', target, null, engine);
-      ate = { kind: 'stack', classTsid: cls };
-    } else {
-      const trant = fruitingTrants(engine).find((t) => near(t.sprite.x, t.sprite.y));
-      if (trant) {
-        // The tree is shared: the server takes the fruit for everyone.
-        engine.query?.('sharedPiggyAte', target, trant, engine);
-        ate = { kind: 'trant', classTsid: trant.classId };
-      }
+    // G335 slice 5: only a shared tree's fruit; a stack only this player sees stays where it is.
+    const trant = fruitingTrants(engine).find((t) => near(t.sprite.x, t.sprite.y));
+    if (trant && engine.query?.('sharedPiggyAte', target, trant, engine)) {
+      // The tree is shared: the server takes the fruit for everyone.
+      ate = { kind: 'trant', classTsid: trant.classId };
     }
     if (ate) satePiggy(target.state);
   }

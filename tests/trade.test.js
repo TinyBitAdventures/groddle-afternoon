@@ -30,7 +30,7 @@ import {
   untradeableReason,
 } from '../public/js/trade.js?v=58686f95';
 import { tradeFeature } from '../public/js/features/trade-feature.js?v=5f0fc746';
-import { FEATURES } from '../public/js/features/index.js?v=d08b4e35';
+import { FEATURES } from '../public/js/features/index.js?v=bad60457';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 import { GSJS } from '../tools/build-realtime-trade.mjs';
 
@@ -52,7 +52,7 @@ describe('trade table (tools/build-realtime-trade.mjs)', () => {
   it('keeps the source rules', () => {
     assert.equal(table.slots, 6);
     assert.equal(TRADE_SLOTS, 6); // TradeDialog.as:50
-    assert.deepEqual(table.items.apple, { max: 100, name: 'Apple', plural: 'Apples', food: true }); // items/apple.js stackmax; food: include/food.js (a Piggy eats it off the ground)
+    assert.deepEqual(table.items.apple, { max: 100, name: 'Apple', plural: 'Apples', food: true, sates: true }); // items/apple.js stackmax; food: include/food.js (a Piggy eats it off the ground); sates: base_cost 5 (npc_piggy.js feed 672)
     assert.equal(table.items.pick.max, 1);
     assert.equal(table.untradeable.play_cube, 'soulbound'); // items/play_cube.js:121-140
     assert.equal(table.untradeable.greeter_twig, 'soulbound');

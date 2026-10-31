@@ -14,7 +14,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
-import { powdersFeature } from '../public/js/features/powders-feature.js?v=fe984b47';
+import { powdersFeature } from '../public/js/features/powders-feature.js?v=9c281316';
 
 const hasPhp = spawnSync('php', ['-v']).status === 0;
 const skip = skipWithoutSite || !hasPhp;
@@ -131,6 +131,10 @@ describe('jars and bottles on shared trees are the ledger\'s (LedgerUse)', { ski
       fertilidust_lite: [5, 'powders', 'charges'],
       potion_tree_poison: [5, 'tree-death', 'uses'],
       potion_tree_poison_antidote: [5, 'tree-death', 'uses'],
+      // Slice 5 (tests/g335-slice5-mp.test.js).
+      sneezing_powder: [5, 'powders', 'charges'],
+      sparkle_powder: [5, 'powders', 'charges'],
+      potion_rook_balm: [5, 'rook-attack', 'balmPoints', true],
     });
     assert.equal(php('savedLeft', [save({}, { powders: { charges: { fertilidust: 3 } } }), 'fertilidust']), 3);
     assert.equal(php('savedLeft', [save({}, { 'tree-death': { uses: { potion_tree_poison: 2 } } }), 'potion_tree_poison']), 2);

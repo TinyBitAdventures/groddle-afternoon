@@ -34,9 +34,17 @@
  *   arrives later as well.
  * - Street Piggies (G334): pet, nibble and feed ask the server, whose mood,
  *   hunger and twice-daily clock win (animal-mood-feature leaves their ticks
- *   to it); a Piggy eating food only this player sees tells the server
- *   (sharedPiggyAte); the server's tick events (obj_ev) reach
- *   animal-mood-feature's sharedAnimalEvent.
+ *   to it); a Piggy eating a shared tree's fruit where only this player saw
+ *   it walk tells the server (sharedPiggyAte); the server's tick events
+ *   (obj_ev) reach animal-mood-feature's sharedAnimalEvent. Food that sates
+ *   a hungry Piggy is the ledger's (G335 slice 5): the feed names it ("c",
+ *   "n"), the server has the site take it first, a refusal shows "You don't
+ *   have enough of that item.", and the go-ahead's op is applied once
+ *   (ledgerReceipt) as the feed takes the food from the pack.
+ * - Tools (G335 slice 5): a swing, chop, scrape, dig or watering lands only
+ *   when the site's ledger holds the tool (the server asks once per street
+ *   visit); without one the server answers with the source's line ("You'll
+ *   need a pick first.").
  * - Help dig (G329): help-mine-feature tells the server when a dig at a Dirt
  *   Pile starts or stops (sharedDigSwing) and reads who digs (sharedDiggers).
  * - Fruit (G361): a shared tree regrows fruit only when its health rises (pet
@@ -87,11 +95,11 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=df470ff4';
+} from '../street-objects.js?v=fe7ee133';
 import { ROCK_CATALOG } from '../mining.js?v=a7eb8740';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=4e140315';
-import { animalStatusLabel } from '../animals.js?v=e857d0af';
+import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=e857d0af';
 import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=23f74bb3';
 import { PIGGY_FEED, itemBaseCost } from '../animal-husbandry.js?v=16364589';
 
@@ -308,12 +316,16 @@ function sharedVerbOn(engine, target, verbId) {
       };
     }
     if (base === 'feed' && cls) {
+      const count = String(verbId).split(':')[2];
       return {
         id: pigId(pig),
         wire: 'feed',
         ready: () => (Number(engine.inv?.[cls]) || 0) > 0,
         // npc_piggy.js feed 672-676 (js/animal-husbandry.js feedPiggyStack): base cost 5 or more sates.
         perks: itemBaseCost(cls) >= PIGGY_FEED.minBaseCost ? ['sate'] : [],
+        // G335 slice 5: the food and how many (content.js feedAnimal's count), for the ledger to take.
+        c: cls,
+        n: Math.max(1, Math.min(Math.floor(Number(count) || 1), pickerMaxCount('npc_piggy', cls, engine.inv))),
       };
     }
     return null;
@@ -392,6 +404,9 @@ function answered(engine, msg, ok) {
   // The local rules run on the state the server decided from, with its rolls.
   if (msg.before) applyKnown(obj, msg.before);
   grant = { target: p.target, verbId: p.verbId, roll: Number(msg.roll), chunks: Number.isInteger(msg.chunks) ? msg.chunks : undefined, help: msg.help && typeof msg.help === 'object' ? msg.help : null, use: msg.use && typeof msg.use === 'object' ? msg.use : null };
+  // G335 slice 5: food the ledger took for a Piggy leaves the pack with the feed below, once (the
+  // trade slice's applied list holds its op, so the site counts it as applied).
+  if (grant.use?.spent && grant.use.n && String(p.verbId).startsWith('feed:')) engine.query?.('ledgerReceipt', String(grant.use.op || ''), engine);
   try {
     engine.executeVerb?.(p.target, p.verbId, { animated: true });
   } finally {
@@ -432,7 +447,7 @@ function ask(engine, target, verbId) {
     }
   }
   reqSeq += 1;
-  if (!c.send('obj_act', actMessage({ req: reqSeq, id: verb.id, verb: verb.wire || verbId, perks: verb.perks, skill: verb.skill }))) {
+  if (!c.send('obj_act', actMessage({ req: reqSeq, id: verb.id, verb: verb.wire || verbId, perks: verb.perks, skill: verb.skill, c: verb.c, n: verb.n }))) {
     engine.toast?.(COPY.connecting, 2400);
     return true;
   }
@@ -512,11 +527,13 @@ export const streetObjectsFeature = {
     return i >= 0 && copy.objs.has(pigId(i)) ? true : null;
   },
 
-  /** A street Piggy ate food only this player sees (their own dropped stack), or a tree's fruit (onTarget). */
+  /** A street Piggy ate a shared tree's fruit (onTarget) where only this player saw it walk there. */
   sharedPiggyAte(target, onTarget, engine) {
     if (!streetObjectsFeature.sharedPiggy(target, engine)) return null;
+    // G335 slice 5: food only this player sees no longer sates a Piggy everyone shares.
+    if (!isStreetTree(onTarget) || !TRANT_META[onTarget.classId]) return null;
     const c = bind(engine);
-    const on = isStreetTree(onTarget) && TRANT_META[onTarget.classId] ? treeId(onTarget.treeIndex) : '';
+    const on = treeId(onTarget.treeIndex);
     reqSeq += 1;
     if (!c.send('obj_act', actMessage({ req: reqSeq, id: pigId(streetPigIndex(target, engine.streetTsid)), verb: 'eat', on }))) return null;
     pending.set(reqSeq, { id: pigId(streetPigIndex(target, engine.streetTsid)), target, verbId: 'eat', at: Date.now(), silent: true });

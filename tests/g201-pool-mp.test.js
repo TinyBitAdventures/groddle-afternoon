@@ -260,6 +260,6 @@ describe('the server', { skip: HAS_SERVER ? false : 'no server checkout' }, () =
     assert.match(pigs, /func \(o \*objects\) pigFood\(street, id string, x, y float64\)/);
     const drops = readFileSync(serverPath('drops.go'), 'utf8');
     assert.match(drops, /ledgerRouteDropEat\s+= "\/groddle\/v1\/ledger\/drop\/eat"/);
-    assert.match(readFileSync(serverPath('data/trade.json'), 'utf8'), /"apple":\{"max":100,"name":"Apple","plural":"Apples","food":true\}/);
+    assert.match(readFileSync(serverPath('data/trade.json'), 'utf8'), /"apple":\{"max":100,"name":"Apple","plural":"Apples","food":true,"sates":true\}/);
   });
 });

@@ -26,16 +26,16 @@ import {
   stateFor,
   streetPigIndex,
   takeObjs,
-} from '../public/js/street-objects.js?v=df470ff4';
+} from '../public/js/street-objects.js?v=fe7ee133';
 import { HELP_DIG_COUNTER, HELP_DIG_LABEL, digHelpFrom, helpDigMessage, othersDigging } from '../public/js/help-dig.js?v=7b8a9733';
 import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, creditedMultiplayerQuests, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=2beb658a';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=3d618d6a';
 import { isPoisoned, TREE_ANTIDOTE, TREE_POISON, BOTANY_SKILL } from '../public/js/tree-poison.js?v=f6e01177';
 import { treeDeathFeature } from '../public/js/features/tree-death-feature.js?v=e49a55a3';
 import { patchesFeature } from '../public/js/features/patches-feature.js?v=735652f6';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=50e7a7d7';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=d9623685';
 import { helpMineFeature } from '../public/js/features/help-mine-feature.js?v=cf3cf4c6';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=a0376629';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=805bee21';
 
 // ---------------------------------------------------------------------------
 // Pure helpers
@@ -375,7 +375,8 @@ describe('street objects feature: Piggies and pours (G334)', () => {
     assert.deepEqual(r.sent.at(-1), { t: 'obj_act', req: 1, id: 'pig:1', verb: 'pet', skill: 'no_skill' });
     r.client.emit('msg:obj_no', { t: 'obj_no', req: 1, id: 'pig:1', verb: 'pet', code: 'sad', message: 'x' });
     streetObjectsFeature.runVerbOverride(r.pigT, 'feed:potato:2', r.engine);
-    assert.deepEqual(r.sent.at(-1), { t: 'obj_act', req: 2, id: 'pig:1', verb: 'feed', perks: ['sate'] });
+    // G335 slice 5: the feed names the food and how many, for the ledger to take.
+    assert.deepEqual(r.sent.at(-1), { t: 'obj_act', req: 2, id: 'pig:1', verb: 'feed', perks: ['sate'], c: 'potato', n: 2 });
     r.client.emit('msg:obj_ok', { t: 'obj_ok', req: 2, id: 'pig:1', verb: 'feed', obj: { id: 'pig:1', mood: 2, hunger: 0, petted: true, daily: true, croak: false, in: 900 } });
     assert.equal(r.pigT.state.hunger, 0);
   });
