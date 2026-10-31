@@ -23,8 +23,6 @@ export const SUMMERS_DAY_BONUS_DEV_TSID = 'LPF1024Q2B135UG';
 
 export const SUMMERS_DAY_MAIN_DURATION_MS = 5 * 60 * 1000;
 export const SUMMERS_DAY_BONUS_DURATION_MS = 2 * 60 * 1000;
-export const SUMMERS_DAY_BONUS_DOT_COUNT = 8;
-export const SUMMERS_DAY_BONUS_DOT_IMG = 8;
 export const SUMMERS_DAY_FIRST_OFFER_COOLDOWN_MS = 4 * 60 * 60 * 1000;
 export const SUMMERS_DAY_REPEAT_COOLDOWN_MS = 60 * 60 * 1000;
 /** The imported copy of the main template (LNVV9IM8PL4301V instance_of LNVIH6NU3M13MJJ). */
@@ -86,36 +84,174 @@ export const SUMMERS_DAY_ROUTE = Object.freeze([
 ]);
 
 /**
- * The Annex (LNVIL1E14M13K5I) was not archived; the recording shows a pale blue shaft of
- * small white shelves, eight pale pulse dots and a ladder overhead. The shelves are ours,
- * spaced for the remake's own jump in the Annex (normal physics: 105 px rise, 198 px running
- * jump, measured): each rises SUMMERS_DAY_ANNEX_RISE (89 px, 16 px under the reach) and
- * overlaps the one below across the middle, so a jump from that overlap lands on it. Left
- * and right shelves alternate up the shaft from the floor to the top shelf under the ladder.
+ * The Annex (LNVIL1E14M13K5I) was not archived. Two recordings show the same room:
+ * 306_7Jvz8RQ (Cimm, 1:16-1:31) and cYKdfvrVsmM (Lily Linguistic, 3:08-3:25). A pale white
+ * surround holds a sky-blue cavity about two screens tall: a wide grassy bowl at the bottom
+ * (a short ladder stub stuck in the floor at left, a log railing at right that the player
+ * stands on: cYK 3:09), straight walls, and a pitched roof (306 1:28-1:31, cYK 3:25). Up the
+ * middle runs a three-column lattice of short white shelves, a left and right pair, then one
+ * centre shelf, three times over; the last centre shelf holds the exit ladder at top centre,
+ * rising into the roof (306 1:21-1:31). Arriving, only the bowl shows, with one bubble hanging
+ * over it on a short string; touching it reveals the climb (306 1:17-1:19, cYK 3:08-3:09), and it
+ * pays nothing. The Glitch Tribute Blog's post on the room (johnexploresur.tumblr.com, post
+ * 37303553830, "annex of a summer's dream. the reward room.") shows the same veiled bowl and
+ * says "you'd hit a switch to get the loot inside".
+ *
+ * Measured on 306_7Jvz8RQ (1278 x 720) and scaled by SUMMERS_DAY_ANNEX_SCALE so its rows,
+ * 114.6 px apart on average (1:21: 683, 570, 450, 338, 218, 110), rise 88 px: 17 px under
+ * the remake's measured 105 px jump (normal physics). One scale for x and y keeps the room's
+ * shape; the cavity then fills about two thirds of the 960-1000 px view, as it fills two
+ * thirds of the recorded window. Screen space, y down: the bowl's floor is at y 1000.
  */
 export const SUMMERS_DAY_ANNEX_JUMP_REACH = 105;
-export const SUMMERS_DAY_ANNEX_RISE = 89;
-export const SUMMERS_DAY_ANNEX_FLOOR = Object.freeze({ x1: 110, y1: 1430, x2: 1170, y2: 1430 });
-export const SUMMERS_DAY_ANNEX_TOP = Object.freeze({ x1: 360, y1: 185, x2: 880, y2: 185 });
+export const SUMMERS_DAY_ANNEX_RISE = 88;
+export const SUMMERS_DAY_ANNEX_SCALE = 0.768;
+export const SUMMERS_DAY_ANNEX_W = 1280;
+export const SUMMERS_DAY_ANNEX_H = 1150;
+/** The middle column (the centre shelves and the ladder). */
+export const SUMMERS_DAY_ANNEX_CX = 640;
+/** The cavity's straight walls (306 1:21: x 228 and 1085 about the centre shelf's 641). */
+export const SUMMERS_DAY_ANNEX_WALLS = Object.freeze({ left: 310, right: 970 });
+export const SUMMERS_DAY_ANNEX_FLOOR_Y = 1000;
+/** wall_shelf1 at the main memory's own 109 px (306: 132 px wide, 101 scaled). */
+export const SUMMERS_DAY_ANNEX_SHELF_W = 108;
+/**
+ * The rows, bottom up: P pairs, C centre shelves. The lowest pair stands 235 recorded px
+ * (180) over the bowl's floor (306 1:19: floor 625, pair 390). The pairs' centres sit 197 px
+ * either side of the centre (306 1:21-1:24), the lowest pair a little wider (213 and 227).
+ */
+const ROW_Y = (k) => SUMMERS_DAY_ANNEX_FLOOR_Y - 180 - SUMMERS_DAY_ANNEX_RISE * k;
+const shelf = (id, cx, y) => Object.freeze({
+  id,
+  x1: cx - SUMMERS_DAY_ANNEX_SHELF_W / 2,
+  y1: y,
+  x2: cx + SUMMERS_DAY_ANNEX_SHELF_W / 2,
+  y2: y,
+  // A shelf is jumped up through and stood on (platform_pc_perm -1).
+  pc_perm: -1,
+});
+const CX = SUMMERS_DAY_ANNEX_CX;
 export const SUMMERS_DAY_ANNEX_SHELVES = Object.freeze([
-  SUMMERS_DAY_ANNEX_FLOOR,
-  ...Array.from({ length: 13 }, (_, i) => {
-    const y = SUMMERS_DAY_ANNEX_FLOOR.y1 - SUMMERS_DAY_ANNEX_RISE * (i + 1);
-    return Object.freeze(i % 2 === 0
-      ? { x1: 240, y1: y, x2: 640, y2: y }
-      : { x1: 540, y1: y, x2: 1040, y2: y });
-  }),
-  SUMMERS_DAY_ANNEX_TOP,
+  shelf('pair1_left', CX - 170, ROW_Y(0)),
+  shelf('pair1_right', CX + 170, ROW_Y(0)),
+  shelf('centre1', CX, ROW_Y(1)),
+  shelf('pair2_left', CX - 152, ROW_Y(2)),
+  shelf('pair2_right', CX + 152, ROW_Y(2)),
+  shelf('centre2', CX, ROW_Y(3)),
+  shelf('pair3_left', CX - 152, ROW_Y(4)),
+  shelf('pair3_right', CX + 152, ROW_Y(4)),
+  shelf('centre_top', CX, ROW_Y(5)),
 ]);
-/** The eight dots, each 40 px over a shelf's outer end: walked into, a short detour each. */
-export const SUMMERS_DAY_ANNEX_DOTS = Object.freeze(
-  [1, 2, 4, 5, 7, 8, 10, 11].map((k) => {
-    const shelf = SUMMERS_DAY_ANNEX_SHELVES[k];
-    return Object.freeze({ x: shelf.x1 === 240 ? 290 : 990, y: shelf.y1 - 40 });
-  })
-);
-/** The ladder exit stands on the top shelf (anchored at its foot). */
-export const SUMMERS_DAY_ANNEX_EXIT = Object.freeze({ x: 620, y: SUMMERS_DAY_ANNEX_TOP.y1 });
+export const SUMMERS_DAY_ANNEX_TOP_SHELF = SUMMERS_DAY_ANNEX_SHELVES.at(-1);
+/**
+ * The bowl (306 1:19, about the lowest pair: the walls end 60 px under it, the floor runs
+ * flat from 221 px left of the centre shelf to 249 right, 230 px under it), walked from
+ * wall to wall. The railing's top bar (306 1:17: x 697-890, 37 px over the floor) is
+ * stood on (cYK 3:09).
+ */
+const F = SUMMERS_DAY_ANNEX_FLOOR_Y;
+export const SUMMERS_DAY_ANNEX_BOWL = Object.freeze([
+  [310, 866], [400, 930], [470, 978], [500, F], [820, F], [880, 975], [935, 935], [970, 890],
+].map(([x, y]) => Object.freeze({ x, y })));
+export const SUMMERS_DAY_ANNEX_RAILING = Object.freeze({ id: 'railing', x1: 683, y1: F - 28, x2: 831, y2: F - 28, pc_perm: -1 });
+/**
+ * The roof: the walls stop 117 px over the ladder's shelf (306 1:31: 492 to 375), the
+ * slopes reach the flat of the ridge 158 px either side of the ladder, 216 px over its shelf,
+ * and the ridge peaks over the ladder (cYK 3:25: shelf 268, corners 115, ridge 105, x 1.84).
+ */
+const TOP = ROW_Y(5);
+export const SUMMERS_DAY_ANNEX_ROOF = Object.freeze([
+  [310, TOP - 96], [482, TOP - 216], [CX, TOP - 232], [798, TOP - 216], [970, TOP - 96],
+].map(([x, y]) => Object.freeze({ x, y })));
+/**
+ * The exit: firebog_ladder (the main memory's own exit ladder) stands on the top centre
+ * shelf and climbs into the roof (306 1:28: 322 px, 78 px wide). Climbing it to the last
+ * SUMMERS_DAY_ANNEX_EXIT_CLIMB px of its top leaves the memory, as the player does at
+ * cYK 3:25 before Polenta Qado loads.
+ */
+export const SUMMERS_DAY_ANNEX_LADDER = Object.freeze({ id: 'annex_ladder', x: CX, y: TOP, h: 245, w: 60 });
+export const SUMMERS_DAY_ANNEX_EXIT_CLIMB = 70;
+export const SUMMERS_DAY_ANNEX_EXIT = Object.freeze({ x: CX, y: TOP });
+/** Where the memory sets you down: on the bowl's floor left of centre (306 1:17, cYK 3:08). */
+export const SUMMERS_DAY_ANNEX_SPAWN = Object.freeze({ x: 580, y: F });
+/**
+ * Until the reveal bubble is touched the room above the bowl's grassy rim is veiled
+ * (306 1:17-1:18: the rim 15-70 px under the lowest pair, pale above it).
+ */
+export const SUMMERS_DAY_ANNEX_VEIL_Y = ROW_Y(0) + 30;
+/** The switch: over the bowl's middle, 67 px under the lowest pair (306 1:17; the blog's panorama). */
+export const SUMMERS_DAY_ANNEX_REVEAL = Object.freeze({ x: 653, y: ROW_Y(0) + 51 });
+
+/**
+ * The pickups: one quoin over every pair shelf and the lowest centre shelf, none over the
+ * middle centre shelf (306 1:21-1:24), seven in all. Both recordings pay them in the same
+ * places: the lower left one currants, the middle right one mood, the rest iMG. Amounts are
+ * 306_7Jvz8RQ's (Cimm: iMG 9,882 to 9,912, currants 12,493 to 12,544, mood 510 to 515);
+ * Lily's higher-level run pays +120 iMG, +100 currants and +100 mood in the same places,
+ * with one +1098 iMG roll (cYK 3:12-3:25).
+ */
+export const SUMMERS_DAY_ANNEX_PICKUP_RISE = 42;
+const pickup = (shelfId, type, amount, source) => {
+  const s = SUMMERS_DAY_ANNEX_SHELVES.find((row) => row.id === shelfId);
+  return Object.freeze({ shelf: shelfId, type, amount, x: (s.x1 + s.x2) / 2, y: s.y1 - SUMMERS_DAY_ANNEX_PICKUP_RISE, source });
+};
+export const SUMMERS_DAY_ANNEX_PICKUPS = Object.freeze([
+  pickup('pair1_left', 'currants', 51, '306 1:22-1:24 +51 currants; cYK 3:14 +100 currants'),
+  pickup('pair1_right', 'xp', 6, '306 1:21 +6 iMG; cYK 3:12 +120 iMG'),
+  pickup('centre1', 'xp', 6, '306 1:22 +6 iMG; cYK 3:13-3:14 +120 iMG'),
+  pickup('pair2_left', 'xp', 6, '306 1:24-1:25 +6 iMG; cYK 3:17 +120 iMG'),
+  pickup('pair2_right', 'mood', 5, '306 1:26-1:27 +5 mood; cYK 3:18-3:19 +100 mood'),
+  pickup('pair3_left', 'xp', 6, '306 1:25-1:26 +6 iMG; cYK 3:22-3:23 +120 iMG'),
+  pickup('pair3_right', 'xp', 6, '306 1:27 +6 iMG; cYK 3:20-3:21 +1098 iMG'),
+]);
+export const SUMMERS_DAY_BONUS_DOT_COUNT = SUMMERS_DAY_ANNEX_PICKUPS.length;
+export const SUMMERS_DAY_BONUS_DOT_IMG = 6;
+/** Back-compat name for the pickups' spots. */
+export const SUMMERS_DAY_ANNEX_DOTS = SUMMERS_DAY_ANNEX_PICKUPS;
+
+/**
+ * The Annex as street data in screen space (bounds t 0, so world and screen agree): the
+ * game draws and walks it, and the level builder's reach graph (js/builder/reach-graph.js)
+ * checks it in tests/summers-day.test.js. The roof is a ceiling (pc_perm 1), the walls are
+ * solid both ways, the ladder is the exit.
+ */
+export function summersDayAnnexStreet() {
+  const bowl = SUMMERS_DAY_ANNEX_BOWL;
+  const roof = SUMMERS_DAY_ANNEX_ROOF;
+  const platforms = [
+    ...bowl.slice(1).map((b, i) => ({ id: `bowl_${i + 1}`, x1: bowl[i].x, y1: bowl[i].y, x2: b.x, y2: b.y, pc_perm: -1 })),
+    { ...SUMMERS_DAY_ANNEX_RAILING },
+    // Behind the walls, so the world's floor is no seam to walk round them (never reached).
+    { id: 'outside_left', x1: 0, y1: F, x2: SUMMERS_DAY_ANNEX_WALLS.left - 8, y2: F, pc_perm: -1 },
+    { id: 'outside_right', x1: SUMMERS_DAY_ANNEX_WALLS.right + 8, y1: F, x2: SUMMERS_DAY_ANNEX_W, y2: F, pc_perm: -1 },
+    ...SUMMERS_DAY_ANNEX_SHELVES.map((s) => ({ ...s })),
+    ...roof.slice(1).map((r, i) => ({ id: `roof_${i + 1}`, x1: roof[i].x, y1: roof[i].y, x2: r.x, y2: r.y, pc_perm: 1 })),
+  ];
+  const { left, right } = SUMMERS_DAY_ANNEX_WALLS;
+  return {
+    tsid: SUMMERS_DAY_BONUS_ID,
+    label: 'Annex of A Summer’s Day',
+    bounds: { l: 0, r: SUMMERS_DAY_ANNEX_W, t: 0, b: SUMMERS_DAY_ANNEX_H },
+    platforms,
+    barriers: [
+      { id: 'wall_left', x: left, y: 0, h: SUMMERS_DAY_ANNEX_H, pc_perm: null },
+      { id: 'wall_right', x: right, y: 0, h: SUMMERS_DAY_ANNEX_H, pc_perm: null },
+    ],
+    ladders: [{ ...SUMMERS_DAY_ANNEX_LADDER }],
+    walls: [],
+    signposts: [],
+    layers: [],
+  };
+}
+
+/** True when the avatar's feet are on the exit ladder's last stretch (leaving the memory). */
+export function summersDayAnnexAtExit(point) {
+  const l = SUMMERS_DAY_ANNEX_LADDER;
+  const x = Number(point?.x);
+  const y = Number(point?.y);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return false;
+  return Math.abs(x - l.x) <= 30 && y <= l.y - l.h + SUMMERS_DAY_ANNEX_EXIT_CLIMB && y >= l.y - l.h - 40;
+}
 
 /** Source x, y to the imported street's screen space. */
 export function summersDayStreetPoint(point) {
@@ -298,16 +434,21 @@ export function collectSummersDayBonusQuoin(
     return { ok: false, reason: 'expired', run };
   }
   const i = Math.floor(Number(index));
-  if (i < 0 || i >= total) return { ok: false, reason: 'invalid_quoin', run };
+  if (!(i >= 0 && i < total)) return { ok: false, reason: 'invalid_quoin', run };
   if (run.bonusCollected.includes(i)) return { ok: false, reason: 'already_collected', run };
   run.bonusCollected.push(i);
   run.bonusCollected.sort((a, b) => a - b);
-  run.bonusImgEarned = Math.max(0, Number(run.bonusImgEarned) || 0) + SUMMERS_DAY_BONUS_DOT_IMG;
+  // Each pickup pays its recorded kind (SUMMERS_DAY_ANNEX_PICKUPS); iMG adds to bonusImgEarned.
+  const pick = SUMMERS_DAY_ANNEX_PICKUPS[i] || { type: 'xp', amount: SUMMERS_DAY_BONUS_DOT_IMG };
+  if (pick.type === 'xp') {
+    run.bonusImgEarned = Math.max(0, Number(run.bonusImgEarned) || 0) + pick.amount;
+  }
   return {
     ok: true,
     reason: 'collected',
     index: i,
-    amount: SUMMERS_DAY_BONUS_DOT_IMG,
+    type: pick.type,
+    amount: pick.amount,
     run,
   };
 }

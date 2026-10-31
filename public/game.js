@@ -145,9 +145,19 @@ import {
   winterWalkRemainingMs,
 } from './js/winter-walk.js?v=9961c35f';
 import {
-  SUMMERS_DAY_ANNEX_DOTS,
-  SUMMERS_DAY_ANNEX_EXIT,
+  SUMMERS_DAY_ANNEX_BOWL,
+  SUMMERS_DAY_ANNEX_FLOOR_Y,
+  SUMMERS_DAY_ANNEX_H,
+  SUMMERS_DAY_ANNEX_LADDER,
+  SUMMERS_DAY_ANNEX_PICKUPS,
+  SUMMERS_DAY_ANNEX_RAILING,
+  SUMMERS_DAY_ANNEX_REVEAL,
+  SUMMERS_DAY_ANNEX_ROOF,
   SUMMERS_DAY_ANNEX_SHELVES,
+  SUMMERS_DAY_ANNEX_SPAWN,
+  SUMMERS_DAY_ANNEX_VEIL_Y,
+  SUMMERS_DAY_ANNEX_W,
+  SUMMERS_DAY_ANNEX_WALLS,
   SUMMERS_DAY_BONUS_ID,
   SUMMERS_DAY_BONUS_DOT_COUNT,
   SUMMERS_DAY_BONUS_DOT_IMG,
@@ -178,9 +188,11 @@ import {
   summersDayObjective,
   summersDayProgress,
   summersDayQurazyPoints,
+  summersDayAnnexAtExit,
+  summersDayAnnexStreet,
   summersDayRemainingMs,
   summersDayStreetPoint,
-} from './js/summers-day.js?v=a51eebd3';
+} from './js/summers-day.js?v=680eca6e';
 import {
   ROOK_AVATAR_HIT,
   ROOK_CRUSHERS,
@@ -588,6 +600,7 @@ import {
   wallsScreen,
   findClimbWallNear,
   barriersScreen,
+  platformsScreen,
   buriedSignpostUnder,
   avatarHeadReach,
   isItemFloor,
@@ -831,6 +844,7 @@ import {
   releaseQuoinRespawns,
   quoinClassType,
   resetStreetQuoinsForNewDay,
+  creditQuoinStat,
 } from './js/quoins.js?v=d4f4772b';
 import {
   buildHubMapView,
@@ -887,6 +901,7 @@ import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, placeVerbMen
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=e50c1649';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
+import { sceneAnim, syncAnim } from './js/deco-anim.js?v=2ceda14b';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d51e';
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=3753a0d2';
 import * as textureUrls from './js/textures.js?v=db2ce452';
@@ -2044,6 +2059,8 @@ let summersDayRun = null;
 let summersDaySourceLocation = null;
 let summersDayBonusQuoins = [];
 let summersDayExit = null;
+/** The Annex's reveal bubble and the veil's fade (0 veiled, 1 open). */
+let summersDayAnnexReveal = null;
 let summersDayStartPromise = null;
 let summersDayTransitionBusy = false;
 let summersDayAutoNextAt = 0;
@@ -16021,90 +16038,203 @@ function summersDayLocationLabel(tsid = currentStreetTsid) {
   return null;
 }
 
+/**
+ * The memory's own silhouette light: the main street's realmid and plus layers (contrast -100,
+ * brightness 100, saturation -100) for the Annex's decos, and its middleground (contrast -100,
+ * tintAmount 100, brightness 100) for the avatar and the quoins, white in both recordings.
+ */
+const SUMMERS_DAY_DECO_LIGHT = Object.freeze({ contrast: -100, brightness: 100, saturation: -100 });
+const SUMMERS_DAY_ENTITY_LIGHT = Object.freeze({ contrast: -100, tintAmount: 100, brightness: 100 });
+const SUMMERS_DAY_ANNEX_SURROUND = 0xe9eeee;
+
+function summersDayLightFilter(filters) {
+  const filter = new PIXI.ColorMatrixFilter();
+  filter.matrix = glitchLayerMatrix(filters);
+  return filter;
+}
+
+/** A Tiny Speck deco from assets/decos/groddle, anchored at its foot centre, sized w x h. */
+function summersDayAnnexDeco(name, x, y, w, h, { flip = false, z = 0 } = {}) {
+  const sprite = new PIXI.Sprite(textureFromUrl(`assets/decos/groddle/${name}.png`));
+  sprite.anchor.set(0.5, 1);
+  sprite.position.set(x, y);
+  sprite.zIndex = z;
+  sprite.label = name;
+  const fit = () => {
+    const tw = sprite.texture?.orig?.width || sprite.texture?.width || 1;
+    const th = sprite.texture?.orig?.height || sprite.texture?.height || 1;
+    sprite.scale.set((flip ? -1 : 1) * (w / tw), h / th);
+  };
+  fit();
+  sprite.texture?.once?.('update', fit);
+  sprite.texture?.source?.once?.('update', fit);
+  return sprite;
+}
+
+/**
+ * The Annex as the recordings show it (js/summers-day.js): the pale surround, the blue cavity
+ * from the grassy bowl up the straight walls to the pitched roof, its decos in the memory's
+ * white light, and the veil over the climb until the bubble over the bowl is touched.
+ */
 function drawSummersDayBonusBackground() {
   const root = new PIXI.Container();
   root.label = 'summers-day-annex-background';
   root.sortableChildren = true;
-  root.worldW = 1280;
-  root.worldH = 1520;
+  root.worldW = SUMMERS_DAY_ANNEX_W;
+  root.worldH = SUMMERS_DAY_ANNEX_H;
+  const { left, right } = SUMMERS_DAY_ANNEX_WALLS;
   const wash = new PIXI.Graphics();
-  wash.rect(0, 0, root.worldW, root.worldH).fill(0xfafdff);
-  wash.roundRect(150, 42, 980, 1438, 86).fill({ color: 0x9dd8e9, alpha: 0.82 });
+  // Past the room's edges too, so a tall or wide view never shows the default skirt.
+  wash.rect(-800, -800, root.worldW + 1600, root.worldH + 1600).fill(SUMMERS_DAY_ANNEX_SURROUND);
   wash.zIndex = -1000;
   root.addChild(wash);
-  const walls = new PIXI.Graphics();
-  walls.zIndex = -930;
-  walls.poly([
-    0, 0, 218, 0, 202, 180, 228, 355, 184, 520, 218, 705,
-    190, 900, 230, 1080, 196, 1260, 220, 1520, 0, 1520,
-  ]);
-  walls.poly([
-    1068, 0, 1280, 0, 1280, 1520, 1050, 1520, 1082, 1310, 1048, 1110,
-    1094, 905, 1058, 720, 1090, 540, 1050, 360, 1084, 170,
-  ]);
-  walls.fill({ color: 0xf9fdff, alpha: 0.98 });
-  root.addChild(walls);
-  // Our own shelves (the Annex was not archived), spaced for the remake's jump (summers-day.js).
-  const platforms = SUMMERS_DAY_ANNEX_SHELVES.map((shelf) => ({ ...shelf }));
-  root.platformsScreen = platforms;
-  const floor = new PIXI.Graphics();
-  floor.zIndex = -700;
-  floor.roundRect(80, 1418, 1120, 116, 46).fill({ color: 0xf9fdff, alpha: 0.99 }).stroke({ width: 3, color: 0xd8f2f9, alpha: 0.84 });
-  root.addChild(floor);
-  for (let index = 1; index < platforms.length; index += 1) {
-    const platform = platforms[index];
-    const shelf = new PIXI.Graphics();
-    shelf.zIndex = -650;
-    shelf.roundRect(
-      platform.x1,
-      platform.y1 - 11,
-      platform.x2 - platform.x1,
-      22,
-      11
-    );
-    shelf.fill({ color: 0xf9fdff, alpha: 0.99 });
-    shelf.moveTo(platform.x1 + 12, platform.y1 + 10);
-    shelf.lineTo(platform.x2 - 12, platform.y1 + 10).stroke({ width: 2, color: 0xd7f0f7, alpha: 0.72 });
-    root.addChild(shelf);
+  // The cavity: roof, the right wall (its brushed edge), the bowl, the left wall back up.
+  const roof = SUMMERS_DAY_ANNEX_ROOF;
+  const bowl = SUMMERS_DAY_ANNEX_BOWL;
+  const ragged = (x, y0, y1, side) => {
+    const out = [];
+    const step = 26;
+    const n = Math.max(1, Math.round(Math.abs(y1 - y0) / step));
+    for (let i = 1; i < n; i += 1) {
+      const y = y0 + ((y1 - y0) * i) / n;
+      out.push(x + side * (3 + 4 * Math.sin(i * 2.3 + x)), y);
+    }
+    return out;
+  };
+  const outline = [
+    ...roof.flatMap((p) => [p.x, p.y]),
+    ...ragged(right, roof.at(-1).y, bowl.at(-1).y, 1),
+    ...[...bowl].reverse().flatMap((p) => [p.x, p.y]),
+    ...ragged(left, bowl[0].y, roof[0].y, -1),
+  ];
+  const sky = new PIXI.FillGradient({ start: { x: 0, y: 0 }, end: { x: 0, y: 1 }, textureSpace: 'local' });
+  sky.addColorStop(0, 0xdbe8ed);
+  sky.addColorStop(0.42, 0xaed1e1);
+  sky.addColorStop(1, 0x67a7c8);
+  const cavity = new PIXI.Graphics();
+  cavity.poly(outline).fill(sky);
+  cavity.zIndex = -900;
+  root.addChild(cavity);
+
+  // Decos, Tiny Speck's own (the main memory's set), in its white light.
+  const decos = new PIXI.Container();
+  decos.label = 'summers-day-annex-decos';
+  decos.sortableChildren = true;
+  decos.zIndex = -600;
+  decos.filters = [summersDayLightFilter(SUMMERS_DAY_DECO_LIGHT)];
+  root.addChild(decos);
+  for (const shelf of SUMMERS_DAY_ANNEX_SHELVES) {
+    // wall_shelf1 (452 x 60), drawn with its top on the line.
+    decos.addChild(summersDayAnnexDeco('wall_shelf1', (shelf.x1 + shelf.x2) / 2, shelf.y1 + 12, shelf.x2 - shelf.x1 + 4, 14, { z: 10 }));
   }
-  root.summersDayAnnexArt = 'source-pulse-dots-and-ladder';
+  // The ladder exit on the top centre shelf, into the roof.
+  const ladder = SUMMERS_DAY_ANNEX_LADDER;
+  decos.addChild(summersDayAnnexDeco('firebog_ladder', ladder.x, ladder.y + 2, ladder.w, ladder.h + 2, { z: 8 }));
+  // The bowl: a log railing at right (stood on), a ladder stub at left, grass and a reed.
+  const rail = SUMMERS_DAY_ANNEX_RAILING;
+  decos.addChild(summersDayAnnexDeco('railing', (rail.x1 + rail.x2) / 2, SUMMERS_DAY_ANNEX_FLOOR_Y + 10, rail.x2 - rail.x1, 40, { z: 6 }));
+  decos.addChild(summersDayAnnexDeco('firebog_ladder', 508, SUMMERS_DAY_ANNEX_FLOOR_Y + 30, 62, 74, { z: 5 }));
+  decos.addChild(summersDayAnnexDeco('plant_fern_4', 404, 942, 26, 70, { z: 7 }));
+  const tufts = [[334, 884, 0.8], [372, 912, 1], [446, 966, 0.7], [560, 1004, 0.6], [612, 1004, 0.8], [668, 1004, 0.5], [760, 1004, 0.6], [902, 966, 0.9], [948, 924, 1], [962, 900, 0.7]];
+  tufts.forEach(([x, y, k], i) => {
+    decos.addChild(summersDayAnnexDeco('plant_grass_1', x, y + 4, 22 * k, 46 * k, { flip: i % 2 === 1, z: 9 }));
+  });
+  // The floor under the bowl: the surround again, over the decos' feet.
+  const ground = new PIXI.Graphics();
+  ground.poly([
+    left - 20, bowl[0].y + 6,
+    ...bowl.flatMap((p) => [p.x, p.y + 6]),
+    right + 20, bowl.at(-1).y + 6,
+    right + 20, root.worldH,
+    left - 20, root.worldH,
+  ]).fill(SUMMERS_DAY_ANNEX_SURROUND);
+  ground.zIndex = -500;
+  root.addChild(ground);
+
+  // The veil over the climb: pale down to the bowl's grassy rim (306 1:17).
+  const veil = new PIXI.Graphics();
+  const vy = SUMMERS_DAY_ANNEX_VEIL_Y;
+  // The rim, right to left: grass blades standing up out of the bowl into the pale.
+  const rim = [];
+  const wobble = (i, k) => Math.abs(Math.sin(i * k + 0.7) * Math.cos(i * 0.37));
+  for (let x = right + 10, i = 0; x >= left - 10; i += 1) {
+    // Uneven blades: a root on the rim, then a tip leaning a little, 6 to 50 px tall.
+    const blade = 6 + 30 * wobble(i, 1.9) + (wobble(i, 0.61) > 0.8 ? 14 : 0);
+    const lean = 3 * Math.sin(i * 2.9);
+    rim.push(x, vy - 2 * wobble(i, 3.1), x - 3 + lean, vy - blade);
+    x -= 5 + 7 * wobble(i, 1.3);
+  }
+  veil.poly([left - 24, 0, right + 24, 0, right + 24, vy - 40, ...rim, left - 24, vy - 40]).fill(SUMMERS_DAY_ANNEX_SURROUND);
+  veil.zIndex = -400;
+  veil.label = 'summers-day-annex-veil';
+  root.addChild(veil);
+  root.summersDayAnnexVeil = veil;
+  root.summersDayAnnexArt = 'memory-wall-shelves-quoins-and-ladder';
   return root;
 }
 
+/** The seven quoins over the shelves and the bubble over the bowl that reveals the climb. */
 function spawnSummersDayBonusRoom() {
-  summersDayBonusQuoins = SUMMERS_DAY_ANNEX_DOTS.map(({ x, y }, index) => {
-    const sprite = new PIXI.Sprite(
-      textureFromUrl('assets/decos/groddle/pulseDot.png')
-    );
-    sprite.anchor.set(0.5);
-    sprite.position.set(x, y);
-    sprite.baseScale = 0.86;
-    sprite.scale.set(sprite.baseScale);
-    sprite.tint = 0xf8feff;
-    sprite.alpha = 0.9;
-    sprite.zIndex = 32;
-    sprite._summerPhase = index * 1.17;
-    entityLayer.addChild(sprite);
-    return { index, sprite, collected: false };
+  summersDayBonusQuoins = SUMMERS_DAY_ANNEX_PICKUPS.map((pickup, index) => {
+    const sprite = spawnWorldQuoin(pickup, pickup.type, { useExactY: true, phaseIndex: index });
+    sprite.alpha = 0;
+    return { index, sprite, type: pickup.type, collected: false };
   });
-  const exit = new PIXI.Container();
-  exit.position.set(SUMMERS_DAY_ANNEX_EXIT.x, SUMMERS_DAY_ANNEX_EXIT.y);
-  exit.zIndex = 40;
-  const ladder = new PIXI.Sprite(
-    textureFromUrl('assets/decos/groddle/firebog_ladder.png')
-  );
-  ladder.anchor.set(0.5, 1);
-  ladder.scale.set(0.62);
-  ladder.tint = 0xf8fdff;
-  exit.addChild(ladder);
-  entityLayer.addChild(exit);
+  // The switch over the bowl: "you'd hit a switch to get the loot inside" (the Glitch Tribute
+  // Blog's Annex post). A white dot on a short string from the rim (306 1:17, cYK 3:08): the
+  // main memory's own pulseDot, playing its pulse. It pays nothing.
+  const reveal = new PIXI.Container();
+  reveal.position.set(SUMMERS_DAY_ANNEX_REVEAL.x, SUMMERS_DAY_ANNEX_REVEAL.y);
+  reveal.zIndex = 32;
+  const string = new PIXI.Graphics();
+  string.moveTo(0, SUMMERS_DAY_ANNEX_VEIL_Y - SUMMERS_DAY_ANNEX_REVEAL.y - 12).lineTo(0, -9).stroke({ width: 1.5, color: 0xf4f8f9 });
+  reveal.addChild(string);
+  const dot = sceneAnim(PIXI, 'pulseDot', 0, 0, { scale: 0.34, ay: 0.5 });
+  reveal.addChild(dot);
+  reveal.pulse = dot;
+  entityLayer.addChild(reveal);
+  summersDayAnnexReveal = { sprite: reveal, touched: false, fade: 0 };
+  const ladder = SUMMERS_DAY_ANNEX_LADDER;
   summersDayExit = {
     id: 'annex_exit',
-    sprite: exit,
-    x: exit.x,
-    y: exit.y,
+    sprite: null,
+    x: ladder.x,
+    y: ladder.y - ladder.h,
     art: 'recovered-firebog-ladder',
   };
+}
+
+/** Touching the bubble over the bowl (or climbing past the rim) lifts the veil. */
+function revealSummersDayAnnex() {
+  if (!summersDayAnnexReveal || summersDayAnnexReveal.touched) return false;
+  summersDayAnnexReveal.touched = true;
+  const { sprite } = summersDayAnnexReveal;
+  if (sprite?.parent) {
+    burst(sprite.x, sprite.y, 0xdff8ff, 9);
+    sprite.parent.removeChild(sprite);
+  }
+  playSfx('quoin', { volume: 0.32, rate: 1.24 });
+  return true;
+}
+
+function tickSummersDayAnnexReveal(dt) {
+  const reveal = summersDayAnnexReveal;
+  if (!reveal) return;
+  if (!reveal.touched) {
+    const { sprite } = reveal;
+    if (sprite.pulse) syncAnim(sprite.pulse);
+    if (
+      Math.hypot(sprite.x - player.x, sprite.y - (player.y - 28)) < 46 ||
+      player.y < SUMMERS_DAY_ANNEX_VEIL_Y - 24
+    ) revealSummersDayAnnex();
+  } else if (reveal.fade < 1) {
+    reveal.fade = Math.min(1, reveal.fade + 0.03 * dt);
+  }
+  const veil = bgLayer?.summersDayAnnexVeil;
+  if (veil) veil.alpha = 1 - reveal.fade;
+  for (const entry of summersDayBonusQuoins) {
+    if (!entry.collected && entry.sprite) entry.sprite.alpha = reveal.fade;
+  }
 }
 
 function renderSummersDayHud() {
@@ -16133,7 +16263,7 @@ function renderSummersDayHud() {
   if (bonus) {
     bonus.textContent =
       summersDayRun.stage === 'bonus'
-        ? `${progress.bonusCollected} / ${progress.bonusTotal} pale iMG dots`
+        ? `${progress.bonusCollected} / ${progress.bonusTotal} memory quoins`
         : 'Follow what the Giants remember';
   }
   if (app?.canvas) {
@@ -16157,6 +16287,8 @@ function renderSummersDayHud() {
       bgLayer?.summersDayAnnexArt || 'not-in-annex';
     app.canvas.dataset.summerDayAnnexDots = String(SUMMERS_DAY_BONUS_DOT_COUNT);
     app.canvas.dataset.summerDayAnnexDotReward = String(SUMMERS_DAY_BONUS_DOT_IMG);
+    app.canvas.dataset.summerDayAnnexPickups = SUMMERS_DAY_ANNEX_PICKUPS.map((p) => `${p.type}:${p.amount}`).join(',');
+    app.canvas.dataset.summerDayAnnexRevealed = summersDayAnnexReveal?.touched ? '1' : '0';
     app.canvas.dataset.summerDayAnnexExit =
       summersDayExit?.art || 'not-in-annex';
     app.canvas.dataset.summerDayGuide =
@@ -16164,7 +16296,7 @@ function renderSummersDayHud() {
   }
 }
 
-/** The Annex (LNVIL1E14M13K5I, not archived): the drawn shaft, its dots and ladder. */
+/** The Annex (LNVIL1E14M13K5I, not archived): the room the recordings show (js/summers-day.js). */
 function setupSummersDayAnnex() {
   clearWorldEntities();
   if (bgLayer && world) {
@@ -16175,26 +16307,29 @@ function setupSummersDayAnnex() {
   world.addChildAt(bgLayer, 0);
   currentStreetTsid = SUMMERS_DAY_BONUS_ID;
   const label = summersDayLocationLabel();
+  // Its walls, shelves, roof and ladder as street data: the same the reach tests walk.
+  const annex = summersDayAnnexStreet();
   currentStreet = {
+    ...annex,
     tsid: currentStreetTsid,
     label: label.street,
     hubName: label.hub,
-    bounds: { l: 0, r: bgLayer.worldW, t: 0, b: bgLayer.worldH },
-    platforms: [],
-    signposts: [],
     // The memory's blue-and-white light is its own: no Dametime tint.
     ownLight: true,
   };
   WORLD_W = bgLayer.worldW;
-  GROUND_Y = 1430;
-  streetPlatforms = bgLayer.platformsScreen || [];
-  streetWalls = [];
+  GROUND_Y = SUMMERS_DAY_ANNEX_FLOOR_Y;
+  streetPlatforms = platformsScreen(annex);
+  bgLayer.platformsScreen = streetPlatforms;
+  streetWalls = wallsScreen(annex);
   climb = { active: false, wall: null };
   Object.assign(jumpState, createJumpState(movementNow()));
+  // The avatar and the quoins in the memory's white light, as on the main street.
+  if (entityLayer) entityLayer.filters = [summersDayLightFilter(SUMMERS_DAY_ENTITY_LIGHT)];
   spawnSummersDayBonusRoom();
   if (player) {
-    player.x = 380;
-    player.y = 1430;
+    player.x = SUMMERS_DAY_ANNEX_SPAWN.x;
+    player.y = SUMMERS_DAY_ANNEX_SPAWN.y;
     player.vx = 0;
     player.vy = 0;
     player.onGround = true;
@@ -16358,6 +16493,7 @@ async function returnFromSummersDay({ expired = false, abandon = false, completi
   summersDaySourceLocation = null;
   summersDayBonusQuoins = [];
   summersDayExit = null;
+  summersDayAnnexReveal = null;
   const hud = document.getElementById('summers-day-hud');
   if (hud) hud.hidden = true;
   try {
@@ -16455,41 +16591,38 @@ function updateSummersDay(dt) {
     return;
   }
   if (summersDayRun.stage !== 'main') {
+    tickSummersDayAnnexReveal(dt);
     for (const entry of summersDayBonusQuoins) {
-      if (entry.collected || !entry.sprite?.parent) continue;
-      entry.sprite._summerPhase += 0.05 * dt;
-      const pulse = 1 + Math.sin(entry.sprite._summerPhase) * 0.13;
-      entry.sprite.scale.set(entry.sprite.baseScale * pulse);
-      entry.sprite.alpha = 0.78 + Math.sin(entry.sprite._summerPhase * 1.4) * 0.16;
-      if (
-        !menuTarget &&
-        Math.hypot(entry.sprite.x - player.x, entry.sprite.y - (player.y - 28)) < 46
-      ) {
-        const result = collectSummersDayBonusQuoin(
-          summersDayRun,
-          entry.index,
-          Date.now(),
-          SUMMERS_DAY_BONUS_DOT_COUNT
-        );
-        if (result.ok) {
-          entry.collected = true;
-          // An iMG quoin in the Annex (items/quoin.js 184): the mood bonus applies.
-          const amount = grantMoodXp(pc, result.amount);
-          summersDayRun.bonusImgEarned += amount - result.amount;
-          const { x, y } = entry.sprite;
-          entityLayer.removeChild(entry.sprite);
-          playSfx('quoin', { volume: 0.48, rate: 1.08 });
-          floatText(x, y - 18, `+${amount} iMG`, 0xeafcff);
-          burst(x, y, 0xdff8ff, 11);
-          pushActivity(`A pale memory dot becomes +${amount} iMG.`);
-          updateHud();
-        }
-      }
+      const q = entry.sprite;
+      if (entry.collected || !q?.parent) continue;
+      q.frameClock = advanceQuoinClock(q.frameClock, q.animationSpeed, dt, q.totalFrames);
+      q.gotoAndStop(Math.floor(q.frameClock) % q.totalFrames);
+      q.phase += 0.045 * dt;
+      q.y = q.baseY + Math.sin(q.phase) * 4;
+      if (!summersDayAnnexReveal?.touched) continue;
+      if (menuTarget || Math.hypot(q.x - player.x, q.y - (player.y - 28)) >= 46) continue;
+      const result = collectSummersDayBonusQuoin(
+        summersDayRun,
+        entry.index,
+        Date.now(),
+        SUMMERS_DAY_BONUS_DOT_COUNT
+      );
+      if (!result.ok) continue;
+      entry.collected = true;
+      // items/quoin.js 162-187: iMG takes the mood bonus, mood and currants add as they are.
+      const landed = creditQuoinStat(pc, result.type, result.amount);
+      if (result.type === 'xp') summersDayRun.bonusImgEarned += landed - result.amount;
+      const label = QUOIN_TYPES[result.type]?.label || 'iMG';
+      const { x, y } = q;
+      entityLayer.removeChild(q);
+      playSfx('quoin', { volume: 0.48, rate: 1.08 });
+      floatText(x, y - 18, `+${landed} ${label}`, 0xeafcff);
+      burst(x, y, 0xdff8ff, 11);
+      pushActivity(`A memory quoin: +${landed} ${label}.`);
+      updateHud();
     }
-    if (
-      summersDayExit?.sprite &&
-      Math.hypot(summersDayExit.sprite.x - player.x, summersDayExit.sprite.y - player.y) < 76
-    ) {
+    // The exit: climbing the ladder up into the roof leaves the memory (cYK 3:25).
+    if (summersDayAnnexAtExit(player)) {
       completeSummersDay();
       return;
     }
@@ -16507,13 +16640,16 @@ function updateSummersDay(dt) {
     if (summersDayRun.stage === 'main') {
       summersDayAutoplayStep(autoplay);
     } else {
-      const nextQuoin = summersDayBonusQuoins.find(
-        (entry) => !entry.collected && entry.sprite?.parent
-      );
-      const target = nextQuoin?.sprite || summersDayExit?.sprite;
+      // The bubble over the bowl, each quoin, then the ladder's top.
+      const nextQuoin = summersDayAnnexReveal?.touched
+        ? summersDayBonusQuoins.find((entry) => !entry.collected && entry.sprite?.parent)
+        : null;
+      const target = !summersDayAnnexReveal?.touched
+        ? summersDayAnnexReveal?.sprite
+        : nextQuoin?.sprite || summersDayExit;
       if (target) {
         player.x = target.x;
-        player.y = nextQuoin ? target.y + 28 : target.y;
+        player.y = target === summersDayExit ? target.y + 20 : target.y + 28;
         player.vx = 0;
         player.vy = 0;
         player.onGround = true;
@@ -20873,6 +21009,7 @@ function clearWorldEntities() {
   winterWalkPortal = null;
   summersDayBonusQuoins = [];
   summersDayExit = null;
+  summersDayAnnexReveal = null;
   rookCrushers = [];
   rookEggTarget = null;
   rookHitFx = null;

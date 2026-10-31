@@ -4,12 +4,25 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=0eb97168';
+
 import {
-  SUMMERS_DAY_ANNEX_DOTS,
+  SUMMERS_DAY_ANNEX_BOWL,
+  SUMMERS_DAY_ANNEX_CX,
   SUMMERS_DAY_ANNEX_EXIT,
+  SUMMERS_DAY_ANNEX_FLOOR_Y,
   SUMMERS_DAY_ANNEX_JUMP_REACH,
+  SUMMERS_DAY_ANNEX_LADDER,
+  SUMMERS_DAY_ANNEX_PICKUPS,
+  SUMMERS_DAY_ANNEX_PICKUP_RISE,
+  SUMMERS_DAY_ANNEX_REVEAL,
   SUMMERS_DAY_ANNEX_RISE,
+  SUMMERS_DAY_ANNEX_ROOF,
   SUMMERS_DAY_ANNEX_SHELVES,
+  SUMMERS_DAY_ANNEX_SPAWN,
+  SUMMERS_DAY_ANNEX_TOP_SHELF,
+  SUMMERS_DAY_ANNEX_VEIL_Y,
+  SUMMERS_DAY_ANNEX_WALLS,
   SUMMERS_DAY_BONUS_DURATION_MS,
   SUMMERS_DAY_BONUS_DOT_COUNT,
   SUMMERS_DAY_BONUS_DOT_IMG,
@@ -39,8 +52,10 @@ import {
   summersDayObjective,
   summersDayQurazyPoints,
   summersDayRemainingMs,
+  summersDayAnnexAtExit,
+  summersDayAnnexStreet,
   summersDayStreetPoint,
-} from '../public/js/summers-day.js?v=a51eebd3';
+} from '../public/js/summers-day.js?v=680eca6e';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -62,8 +77,9 @@ test('A Summer’s Day preserves the source quest ids, production templates, and
   assert.equal(SUMMERS_DAY_BONUS_PRODUCTION_TSID, 'LNVIL1E14M13K5I');
   assert.equal(SUMMERS_DAY_MAIN_DURATION_MS, 300000);
   assert.equal(SUMMERS_DAY_BONUS_DURATION_MS, 120000);
-  assert.equal(SUMMERS_DAY_BONUS_DOT_COUNT, 8);
-  assert.equal(SUMMERS_DAY_BONUS_DOT_IMG, 8);
+  // The Annex's seven quoins; its iMG ones pay +6 (306_7Jvz8RQ 1:21-1:28).
+  assert.equal(SUMMERS_DAY_BONUS_DOT_COUNT, 7);
+  assert.equal(SUMMERS_DAY_BONUS_DOT_IMG, 6);
   assert.deepEqual(SUMMERS_DAY_GUIDE_LINES, {
     bird_1: 'Hey, I’m up here!\nCan you reach me?',
     bird_2: 'Not bad.\nTry this next one.',
@@ -154,41 +170,137 @@ test('the QA route stands inside each moment\'s box', () => {
   }
 });
 
-test('the Annex climbs on the remake jump: every rise 15 px under the reach, each shelf over the last', () => {
-  assert.ok(SUMMERS_DAY_ANNEX_JUMP_REACH - SUMMERS_DAY_ANNEX_RISE >= 15);
-  for (let i = 1; i < SUMMERS_DAY_ANNEX_SHELVES.length; i += 1) {
-    const below = SUMMERS_DAY_ANNEX_SHELVES[i - 1];
-    const shelf = SUMMERS_DAY_ANNEX_SHELVES[i];
-    const rise = below.y1 - shelf.y1;
-    assert.ok(rise > 0 && rise <= SUMMERS_DAY_ANNEX_JUMP_REACH - 15, `shelf ${i} rises ${rise}`);
-    // A straight-up jump from the overlap lands on it: at least 60 px of shared x.
-    const overlap = Math.min(below.x2, shelf.x2) - Math.max(below.x1, shelf.x1);
-    assert.ok(overlap >= 60, `shelf ${i} overlaps ${overlap}`);
-    // Inside the drawn walls (left edge at most 230, right at least 1048).
-    assert.ok(shelf.x1 >= 232);
-    assert.ok(shelf.x2 <= 1046);
+test('the Annex is laid out as the recordings show: a three-column lattice over a bowl, under a pitched roof', () => {
+  const byId = Object.fromEntries(SUMMERS_DAY_ANNEX_SHELVES.map((s) => [s.id, s]));
+  const mid = (s) => (s.x1 + s.x2) / 2;
+  // Bottom up: a pair, a centre shelf, three times over (306_7Jvz8RQ 1:19-1:24).
+  assert.deepEqual(SUMMERS_DAY_ANNEX_SHELVES.map((s) => s.id), [
+    'pair1_left', 'pair1_right', 'centre1', 'pair2_left', 'pair2_right', 'centre2', 'pair3_left', 'pair3_right', 'centre_top',
+  ]);
+  const rows = [...new Set(SUMMERS_DAY_ANNEX_SHELVES.map((s) => s.y1))];
+  assert.equal(rows.length, 6);
+  for (let i = 1; i < rows.length; i += 1) assert.equal(rows[i - 1] - rows[i], SUMMERS_DAY_ANNEX_RISE);
+  // Three columns: left and right pairs mirror each other about the centre shelves.
+  for (const k of [1, 2, 3]) {
+    const l = byId[`pair${k}_left`];
+    const r = byId[`pair${k}_right`];
+    assert.equal(l.y1, r.y1);
+    assert.equal(SUMMERS_DAY_ANNEX_CX - mid(l), mid(r) - SUMMERS_DAY_ANNEX_CX);
+    assert.ok(mid(l) < SUMMERS_DAY_ANNEX_CX - 120 && mid(r) > SUMMERS_DAY_ANNEX_CX + 120);
   }
-  assert.equal(SUMMERS_DAY_ANNEX_DOTS.length, SUMMERS_DAY_BONUS_DOT_COUNT);
-  for (const dot of SUMMERS_DAY_ANNEX_DOTS) {
-    // Walked into: 40 px over a shelf, within its ends (game.js collects within 46 px of mid-body).
-    assert.ok(SUMMERS_DAY_ANNEX_SHELVES.some((s) => s.y1 - dot.y === 40 && dot.x >= s.x1 + 20 && dot.x <= s.x2 - 20), `${dot.x},${dot.y}`);
+  for (const id of ['centre1', 'centre2', 'centre_top']) assert.equal(mid(byId[id]), SUMMERS_DAY_ANNEX_CX);
+  // The ladder stands on the top centre shelf, in the middle, and climbs into the roof.
+  assert.equal(SUMMERS_DAY_ANNEX_TOP_SHELF.id, 'centre_top');
+  assert.equal(SUMMERS_DAY_ANNEX_LADDER.x, SUMMERS_DAY_ANNEX_CX);
+  assert.equal(SUMMERS_DAY_ANNEX_LADDER.y, SUMMERS_DAY_ANNEX_TOP_SHELF.y1);
+  assert.deepEqual({ ...SUMMERS_DAY_ANNEX_EXIT }, { x: SUMMERS_DAY_ANNEX_CX, y: SUMMERS_DAY_ANNEX_TOP_SHELF.y1 });
+  const { left, right } = SUMMERS_DAY_ANNEX_WALLS;
+  assert.equal(SUMMERS_DAY_ANNEX_CX - left, right - SUMMERS_DAY_ANNEX_CX);
+  // The roof: from the walls' tops up to a peak over the ladder, the ladder's top above it.
+  const roof = SUMMERS_DAY_ANNEX_ROOF;
+  assert.equal(roof[0].x, left);
+  assert.equal(roof.at(-1).x, right);
+  const peak = roof.reduce((a, b) => (b.y < a.y ? b : a));
+  assert.equal(peak.x, SUMMERS_DAY_ANNEX_CX);
+  for (let i = 1; i < roof.length; i += 1) {
+    assert.ok(roof[i].x > roof[i - 1].x);
+    assert.ok(roof[i].x <= peak.x ? roof[i].y < roof[i - 1].y : roof[i].y > roof[i - 1].y);
   }
-  const top = SUMMERS_DAY_ANNEX_SHELVES.at(-1);
-  assert.equal(SUMMERS_DAY_ANNEX_EXIT.y, top.y1);
-  assert.ok(SUMMERS_DAY_ANNEX_EXIT.x > top.x1 && SUMMERS_DAY_ANNEX_EXIT.x < top.x2);
+  assert.ok(roof[0].y < SUMMERS_DAY_ANNEX_TOP_SHELF.y1 - 80);
+  assert.ok(SUMMERS_DAY_ANNEX_LADDER.y - SUMMERS_DAY_ANNEX_LADDER.h < peak.y);
+  // The bowl: down from each wall to a flat floor in the middle, under the lowest pair.
+  const bowl = SUMMERS_DAY_ANNEX_BOWL;
+  assert.equal(bowl[0].x, left);
+  assert.equal(bowl.at(-1).x, right);
+  const floor = bowl.filter((p) => p.y === SUMMERS_DAY_ANNEX_FLOOR_Y);
+  assert.equal(floor.length, 2);
+  assert.ok(floor[0].x < SUMMERS_DAY_ANNEX_CX && floor[1].x > SUMMERS_DAY_ANNEX_CX);
+  for (let i = 1; i < bowl.length; i += 1) {
+    assert.ok(bowl[i].x > bowl[i - 1].x);
+    if (bowl[i].x <= floor[0].x) assert.ok(bowl[i].y > bowl[i - 1].y, 'left side goes down');
+    if (bowl[i - 1].x >= floor[1].x) assert.ok(bowl[i].y < bowl[i - 1].y, 'right side goes up');
+  }
+  assert.ok(bowl[0].y > byId.pair1_left.y1 && bowl.at(-1).y > byId.pair1_right.y1);
+  // The spawn is on the floor; the reveal bubble hangs over it (a jump reaches it), under the veil's rim.
+  assert.equal(SUMMERS_DAY_ANNEX_SPAWN.y, SUMMERS_DAY_ANNEX_FLOOR_Y);
+  assert.ok(SUMMERS_DAY_ANNEX_REVEAL.y > SUMMERS_DAY_ANNEX_VEIL_Y);
+  assert.ok(SUMMERS_DAY_ANNEX_FLOOR_Y - 28 - SUMMERS_DAY_ANNEX_JUMP_REACH - SUMMERS_DAY_ANNEX_REVEAL.y < 46 - 15);
+  assert.ok(SUMMERS_DAY_ANNEX_VEIL_Y > byId.pair1_left.y1);
 });
 
-test('the main memory opens the two-minute Annex and Annex quoins are unique', () => {
+test('the Annex pays its seven quoins in the recorded places: currants low left, mood middle right, iMG elsewhere', () => {
+  assert.equal(SUMMERS_DAY_ANNEX_PICKUPS.length, SUMMERS_DAY_BONUS_DOT_COUNT);
+  const by = Object.fromEntries(SUMMERS_DAY_ANNEX_PICKUPS.map((p) => [p.shelf, `${p.type}:${p.amount}`]));
+  assert.deepEqual(by, {
+    pair1_left: 'currants:51',
+    pair1_right: 'xp:6',
+    centre1: 'xp:6',
+    pair2_left: 'xp:6',
+    pair2_right: 'mood:5',
+    pair3_left: 'xp:6',
+    pair3_right: 'xp:6',
+  });
+  // None over the middle centre shelf or the ladder's shelf.
+  assert.equal(by.centre2, undefined);
+  assert.equal(by.centre_top, undefined);
+  for (const p of SUMMERS_DAY_ANNEX_PICKUPS) {
+    const s = SUMMERS_DAY_ANNEX_SHELVES.find((row) => row.id === p.shelf);
+    // Walked into: over the shelf's middle (game.js collects within 46 px of mid-body, 28 px up).
+    assert.equal(p.x, (s.x1 + s.x2) / 2);
+    assert.equal(s.y1 - p.y, SUMMERS_DAY_ANNEX_PICKUP_RISE);
+    assert.ok(Math.abs(SUMMERS_DAY_ANNEX_PICKUP_RISE - 28) < 46);
+    assert.match(p.source, /306 1:\d\d/);
+    assert.match(p.source, /cYK 3:\d\d/);
+  }
+});
+
+test('every shelf, quoin and the ladder are reached on the remake jump, and no fall strands the player', () => {
+  const street = summersDayAnnexStreet();
+  // Every rise between rows stays at least 15 px under the measured reach.
+  assert.ok(SUMMERS_DAY_ANNEX_JUMP_REACH - SUMMERS_DAY_ANNEX_RISE >= 15);
+  const ladder = SUMMERS_DAY_ANNEX_LADDER;
+  street.doors = [{ id: 'annex_exit', x: ladder.x, y: ladder.y, w: 40, h: 120 }];
+  const arrivals = [
+    { x: SUMMERS_DAY_ANNEX_SPAWN.x, y: SUMMERS_DAY_ANNEX_SPAWN.y - 4, from: 'spawn' },
+    // Coming back down from the top shelf.
+    { x: SUMMERS_DAY_ANNEX_CX - 30, y: SUMMERS_DAY_ANNEX_TOP_SHELF.y1 - 4, from: 'top' },
+  ];
+  const r = reachStreet(street, arrivals);
+  assert.ok(r.arrivals.every((a) => a.stands));
+  const exit = r.targets.find((t) => t.id === 'annex_exit');
+  assert.deepEqual(exit.reachedFrom, [true, true]);
+  // No jump on the way is tight for a keyboard player (PHY-006).
+  assert.ok(exit.margin >= 1, `margin ${exit.margin}`);
+  // Only the floor behind the walls is out of reach.
+  assert.deepEqual(r.unreached.map((u) => u.line).sort(), ['outside_left', 'outside_right']);
+  assert.deepEqual(r.traps, []);
+  for (const s of SUMMERS_DAY_ANNEX_SHELVES) {
+    const runs = r.surfaces.filter((x) => x.line === s.id);
+    assert.ok(runs.length && runs.every((x) => x.reached), s.id);
+  }
+  // The ladder rests on the top shelf; its top is the way out.
+  const deck = r.deckless.find((d) => d.id === ladder.id);
+  assert.equal(deck.foot, true);
+  assert.equal(summersDayAnnexAtExit({ x: ladder.x, y: ladder.y - ladder.h + 20 }), true);
+  assert.equal(summersDayAnnexAtExit({ x: ladder.x, y: ladder.y }), false);
+  // A jump from the top shelf never reaches the exit: it takes the ladder.
+  assert.equal(summersDayAnnexAtExit({ x: ladder.x, y: ladder.y - SUMMERS_DAY_ANNEX_JUMP_REACH }), false);
+});
+
+test('the Annex quoins pay their kinds once each, and only iMG counts as Annex iMG', () => {
   const run = createSummersDayRun({ now: 0 });
-  assert.equal(enterSummersDayBonus(run, 100).reason, 'main_incomplete');
   completeMain(run);
   assert.equal(enterSummersDayBonus(run, 2000).ok, true);
   assert.equal(run.expiresAt, 122000);
-  assert.equal(collectSummersDayBonusQuoin(run, 0, 2100).amount, 8);
+  const first = collectSummersDayBonusQuoin(run, 0, 2100);
+  assert.deepEqual([first.type, first.amount], ['currants', 51]);
   assert.equal(collectSummersDayBonusQuoin(run, 0, 2200).reason, 'already_collected');
-  assert.equal(collectSummersDayBonusQuoin(run, 8, 2200).reason, 'invalid_quoin');
-  assert.equal(collectSummersDayBonusQuoin(run, 1, 2300).amount, 8);
-  assert.equal(run.bonusImgEarned, 16);
+  assert.equal(collectSummersDayBonusQuoin(run, 7, 2200).reason, 'invalid_quoin');
+  const img = collectSummersDayBonusQuoin(run, 1, 2300);
+  assert.deepEqual([img.type, img.amount], ['xp', 6]);
+  const mood = collectSummersDayBonusQuoin(run, 4, 2400);
+  assert.deepEqual([mood.type, mood.amount], ['mood', 5]);
+  assert.equal(run.bonusImgEarned, 6);
   assert.match(summersDayObjective(run), /Annex/i);
 });
 
@@ -268,8 +380,8 @@ test('client integration runs the real street, its HUD and deterministic QA', ()
   const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
   const html = fs.readFileSync(path.join(root, 'public/play/index.html'), 'utf8');
   const css = fs.readFileSync(path.join(root, 'public/style.css'), 'utf8');
-  // The Annex is still drawn from its recovered decos.
-  for (const file of ['pulseDot.png', 'firebog_ladder.png']) {
+  // The Annex is drawn from the main memory's own decos.
+  for (const file of ['pulseDot.png', 'firebog_ladder.png', 'wall_shelf1.png', 'railing.png', 'plant_grass_1.png', 'plant_fern_4.png']) {
     assert.equal(
       fs.existsSync(path.join(root, 'public/assets/decos/groddle', file.replace(/\.png$/, '.webp'))),
       true,
@@ -281,7 +393,19 @@ test('client integration runs the real street, its HUD and deterministic QA', ()
   assert.match(game, /await enterStreet\(SUMMERS_DAY_STREET_TSID, \{/);
   assert.match(game, /heldInstance: \(\) => summersDayHeldInstance\(\)/);
   assert.match(game, /summerautoplay/);
-  assert.match(game, /source-pulse-dots-and-ladder/);
+  assert.match(game, /memory-wall-shelves-quoins-and-ladder/);
+  // The Annex walks the same street data the reach test checks, in the memory's white light.
+  assert.match(game, /const annex = summersDayAnnexStreet\(\);/);
+  assert.match(game, /streetPlatforms = platformsScreen\(annex\);/);
+  assert.match(game, /streetWalls = wallsScreen\(annex\);/);
+  assert.match(game, /entityLayer\.filters = \[summersDayLightFilter\(SUMMERS_DAY_ENTITY_LIGHT\)\]/);
+  assert.match(game, /if \(summersDayAnnexAtExit\(player\)\) \{\n\s*completeSummersDay\(\);/);
+  // A save made in the Annex holds where the memory was entered from, never the Annex.
+  assert.match(game, /savePlayerLocation\(summersDaySourceLocation\)/);
+  assert.doesNotMatch(game, /pale iMG dots/);
+  // The switch over the bowl is the main memory's own pulseDot, playing; it lifts the veil.
+  assert.match(game, /sceneAnim\(PIXI, 'pulseDot'/);
+  assert.match(game, /veil\.alpha = 1 - reveal\.fade/);
   assert.match(game, /tiny-speck-street/);
   assert.match(game, /source-flitterbug/);
   assert.match(game, /recovered-firebog-ladder/);
