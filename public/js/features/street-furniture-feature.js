@@ -40,7 +40,7 @@ import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=670c3a7f'
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
 import { canUseTool, useToolCondition } from '../tools.js?v=9a2e7ef4';
 import { getGameDayKey } from '../game-day.js?v=3095e05b';
-import { runStreetTransition } from '../screen-fx.js?v=82ce3680';
+import { runStreetTransition } from '../screen-fx.js?v=f4314526';
 import { STREET_VISITS_SLOT, loadingCardDetails, recordStreetEntry, streetLoadingVisit } from '../exploration.js?v=19c6758f';
 import {
   BOARD_ART,
@@ -118,7 +118,7 @@ import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } 
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { butlerApi } from './butler-feature.js?v=c4758d14';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=e9e751f5';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=02885401';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=e62cffa6';
 

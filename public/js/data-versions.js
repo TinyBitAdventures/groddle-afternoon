@@ -3738,6 +3738,7 @@
       "assets/streets/GUVVV3FU2FC38SK.json": "ceac1a7d",
       "assets/streets/missing-decos.json": "10f16d9d",
       "assets/ui/newday/new_day_mountains.svg": "8a61bb11",
+      "assets/ui/quest-book-solid.png": "cfa69c0f",
       "brand/share.jpg": "fb033ab8",
       "items/data.json": "5b6d525d",
     },

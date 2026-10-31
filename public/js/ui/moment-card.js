@@ -12,12 +12,20 @@
  */
 
 /**
+ * Tiny Speck's quest book (graphics/quest_book.png, 86x58) never goes above 80% opacity: the 2012
+ * client drew it over a white cloud. Over the card's ray burst the rays showed through its pages,
+ * so the card uses a copy with its alpha divided by 0.8 (magick quest-book.png -channel A
+ * -fx "min(1,u/0.8)"), the same pixels made solid.
+ */
+const QUEST_BOOK_SOLID = 'assets/ui/quest-book-solid.png';
+
+/**
  * Art for a moment that brings none: the quest book, and for a level the imagination card's
  * iMG mark (assets/imagination/ui/moment_icon_imagination.svg is cards/icon_imagination.svg
  * with its viewBox cropped to the mark, so it stays sharp at 166 px).
  */
 export const MOMENT_ART = Object.freeze({
-  quest: 'assets/ui/quest-book.png',
+  quest: QUEST_BOOK_SOLID,
   level: 'assets/imagination/ui/moment_icon_imagination.svg',
 });
 
@@ -30,13 +38,13 @@ export function isModernSkin(doc = globalThis.document) {
 
 /** The art the card shows: the payload's own, else the kind's, else null (the glyph). */
 export function momentArt(payload = {}) {
-  if (payload.iconUrl) return payload.iconUrl;
+  if (payload.iconUrl) return /(^|\/)quest-book\.png$/.test(payload.iconUrl) ? QUEST_BOOK_SOLID : payload.iconUrl;
   return MOMENT_ART[payload.kind] || null;
 }
 
 /** Which art it is, for its size: the quest book is wide (86x58), the rest square. */
 export function momentArtShape(url = '') {
-  return /quest-book\.png/.test(String(url)) ? 'book' : 'square';
+  return /quest-book(-solid)?\.png/.test(String(url)) ? 'book' : 'square';
 }
 
 /** A reward's icon: iMG, currants and a Giant's favor have one; the rest show words only. */

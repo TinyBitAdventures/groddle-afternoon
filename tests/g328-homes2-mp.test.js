@@ -34,7 +34,7 @@ import {
 import { createButlerState, nextHandover, normalizeButlerState, packagesAndMessagesForOwner } from '../public/js/butler.js?v=814ee05f';
 import { createGarden, tickGarden } from '../public/js/garden.js?v=9a8f8f72';
 import { butlerApi } from '../public/js/features/butler-feature.js?v=c4758d14';
-import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=e9e751f5';
+import { neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=02885401';
 import { createMinnAccount } from '../public/js/minn-account.js?v=81339760';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 

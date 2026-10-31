@@ -755,7 +755,7 @@
   --moment-w: clamp(460px, 41vw, 640px);
   --fs-moment-title: clamp(2.125rem, 3vw, 2.5rem); /* 34-40px: the mock's --fs-display for the card */
   --moment-art: 166px;        /* badge and level art, 1.6x the old 104 */
-  --moment-art-book: 140px;   /* the quest book (86x58 source) */
+  --moment-art-book: 129px;   /* the quest book (86x58 source, the only size there is): 1.5x */
   --moment-burst: 192px;      /* the ray burst behind the art */
   --moment-rays: rgba(255, 200, 60, 0.55);
   --moment-rays-clear: rgba(255, 200, 60, 0);

@@ -18,8 +18,8 @@ import {
   momentMoreText,
   rewardChips,
   rewardIcon,
-} from '../public/js/ui/moment-card.js?v=3c9c0aa6';
-import { awardRewardTokens } from '../public/js/screen-fx.js?v=82ce3680';
+} from '../public/js/ui/moment-card.js?v=077703c8';
+import { awardRewardTokens } from '../public/js/screen-fx.js?v=f4314526';
 import { readTokens } from '../tools/tokens/css-sources.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -37,10 +37,13 @@ describe('moment card helpers', () => {
 
   it('gives every moment art: its own, else the quest book or the iMG mark', () => {
     assert.equal(momentArt({ kind: 'achievement', iconUrl: 'assets/badges/confident_petter.png' }), 'assets/badges/confident_petter.png');
-    assert.equal(momentArt({ kind: 'quest' }), 'assets/ui/quest-book.png');
+    assert.equal(momentArt({ kind: 'quest' }), 'assets/ui/quest-book-solid.png');
+    // A paged quest's own book (game.js iconUrl) is the solid copy too: no rays through the pages.
+    assert.equal(momentArt({ kind: 'quest', iconUrl: 'assets/ui/quest-book.png' }), 'assets/ui/quest-book-solid.png');
     assert.equal(momentArt({ kind: 'level' }), MOMENT_ART.level);
     assert.equal(momentArt({ kind: 'generic' }), null);
     assert.equal(momentArtShape('assets/ui/quest-book.png'), 'book');
+    assert.equal(momentArtShape('assets/ui/quest-book-solid.png'), 'book');
     assert.equal(momentArtShape('assets/badges/x.png'), 'square');
     for (const url of Object.values(MOMENT_ART)) assert.ok(existsSync(join(PUBLIC, url)), url);
     // The cropped iMG mark is the card art's own paths with a tighter viewBox.
@@ -82,7 +85,7 @@ describe('the big moment card in the page', () => {
     assert.equal(tokens.get('--fs-lead'), '1.0625rem');
     assert.equal(tokens.get('--moment-art'), '166px');
     assert.equal(tokens.get('--moment-burst'), '192px');
-    assert.equal(tokens.get('--moment-art-book'), '140px');
+    assert.equal(tokens.get('--moment-art-book'), '129px'); // 1.5x the 86 px book, its only size
     assert.equal(tokens.get('--scrim-strong'), 'rgba(36, 22, 10, 0.6)');
     assert.match(hub, /width: var\(--moment-w\);/);
     assert.match(hub, /font-size: var\(--fs-moment-title\);/);
