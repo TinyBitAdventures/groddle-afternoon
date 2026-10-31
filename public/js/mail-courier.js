@@ -38,6 +38,8 @@
  * style), and a letter's sender stands in for getPlayer(sender).label.
  */
 
+import { mailSender } from './mailbox.js?v=e62cffa6';
+
 export const COURIER = Object.freeze({
   /** inc_mail.js 936-938. */
   minLeadMs: 30_000,
@@ -261,7 +263,7 @@ export function nextRamble(order) {
 
 /** nextPlayerMailItem 664-688: the frog's words for the n-th letter (0-based). */
 export function letterLine(index, { sender = '', text = '', stuff = false } = {}) {
-  const from = String(sender || '').trim() || 'Tiny Speck';
+  const from = mailSender(sender);
   let line;
   if (!index) line = `OK, so there's like… an express message for you from ${from}.`;
   else if (index === 1) line = `Oh, right. There's also a message from ${from}.`;

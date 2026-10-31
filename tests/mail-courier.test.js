@@ -26,14 +26,14 @@ import {
   pickPose,
   sendCarriedToMailbox,
   sendDueToMailbox,
-} from '../public/js/mail-courier.js?v=3e5664ee';
+} from '../public/js/mail-courier.js?v=cef544b7';
 import {
   createMailboxState,
   deliverMail,
   normalizeMailboxState,
   receiveMailAttachments,
   seedMailbox,
-} from '../public/js/mailbox.js?v=05fb4eac';
+} from '../public/js/mailbox.js?v=e62cffa6';
 import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../public/js/mail-npc-art.js?v=790f980a';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -180,7 +180,7 @@ describe('express mail rules (players/inc_mail.js)', () => {
     }
     assert.deepEqual(seen, [0, 1, 2, 3, 4, 5, 6, 0]);
     assert.equal(letterLine(0, { sender: 'Amp', text: 'Hi', stuff: true }), 'OK, so there\'s like… an express message for you from Amp. They said, "Hi" and they sent you all this stuff, too.');
-    assert.equal(letterLine(1, { sender: '', text: 'Hi' }), 'Oh, right. There\'s also a message from Tiny Speck. They said, "Hi"');
+    assert.equal(letterLine(1, { sender: '', text: 'Hi' }), 'Oh, right. There\'s also a message from Groddle Afternoon Post. They said, "Hi"');
     assert.equal(letterLine(2, { sender: 'Amp', stuff: true }), 'And you\'ve got something from Amp. They sent you all this stuff.');
     assert.equal(pickPose(0), 'tree');
     assert.equal(pickPose(0.5), 'dancer');
@@ -244,7 +244,7 @@ describe('mail courier feature', () => {
   it('calls the frog with the source prompt once a letter is due, and waits in an instance', async () => {
     mock.timers.enable({ apis: ['Date'], now: 1_000_000 });
     try {
-      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?v=c9e3783f');
+      const { mailCourierFeature } = await import('../public/js/features/mail-courier-feature.js?v=570f58a8');
       const st = createMailboxState();
       const prompts = [];
       let instance = false;

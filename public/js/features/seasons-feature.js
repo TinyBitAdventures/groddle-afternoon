@@ -102,6 +102,7 @@ import {
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { playOverlay } from '../overlays.js?v=106b9955';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { MAIL_POST_SENDER } from '../mailbox.js?v=e62cffa6';
 
 export const SEASONS_FEATURE_ID = 'seasons';
 const LANTERN_GROUP = 'seasons:lantern';
@@ -1376,7 +1377,7 @@ export const seasonsFeature = {
       const key = yetiMailDue(state, nowForCalendar(engine));
       if (key && SEASON_DATA.yetiMail) {
         state.yetiMail.push(key);
-        engine.deliverMail?.({ sender: 'Tiny Speck', text: SEASON_DATA.yetiMail, deliveryAt: Date.now(), attachment: { classTsid: 'glitchmas_cracker', count: 1 } });
+        engine.deliverMail?.({ sender: MAIL_POST_SENDER, text: SEASON_DATA.yetiMail, deliveryAt: Date.now(), attachment: { classTsid: 'glitchmas_cracker', count: 1 } });
         say(engine, 'You have mail: a box from the Glitchmas Yeti.');
         engine.save?.();
       }

@@ -38,7 +38,7 @@ import {
   unitPrice,
 } from '../public/js/auctions.js?v=bb302355';
 import { auctionsFeature } from '../public/js/features/auctions-feature.js?v=99383520';
-import { normalizeMailboxState } from '../public/js/mailbox.js?v=05fb4eac';
+import { normalizeMailboxState } from '../public/js/mailbox.js?v=e62cffa6';
 import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=2beb658a';
 import { auctionJson } from '../tools/build-auctions.mjs';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';

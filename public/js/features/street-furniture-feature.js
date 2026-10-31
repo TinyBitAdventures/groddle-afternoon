@@ -120,6 +120,7 @@ import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { butlerApi } from './butler-feature.js?v=71c981d0';
 import { neighboursMpApi } from './neighbours-mp-feature.js?v=f2803d6a';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { MAIL_POST_SENDER } from '../mailbox.js?v=e62cffa6';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';
 const PLAYER_ID = 'player';
@@ -131,7 +132,7 @@ const DEFAULT_RETURN_TSID = 'GLI2V0UN7RD1T2J';
 
 /** The first time a street mailbox opens, the post office explains itself. */
 export const STREET_MAIL_WELCOME = Object.freeze({
-  sender: 'Tiny Speck Post',
+  sender: MAIL_POST_SENDER,
   text: 'Every mailbox in Ur opens the same mail: yours. Write to a friend from any street, and collect your deliveries wherever you happen to be.',
 });
 

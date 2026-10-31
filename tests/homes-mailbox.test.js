@@ -24,7 +24,7 @@ import {
   seedMailbox,
   sendMail,
   unreadMailCount,
-} from '../public/js/mailbox.js?v=05fb4eac';
+} from '../public/js/mailbox.js?v=e62cffa6';
 
 describe('source-backed home ownership', () => {
   it('imagines one of the three homestreet ticket styles once, free (inc_houses.js houses_go_to_new_house)', () => {

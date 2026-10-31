@@ -48,7 +48,7 @@
  * offered (the remake has no mini_me_mini_you yet).
  *
  * QA (solo): ?autostart=1&fresh=1&resetgame=1&questoffer=off&maildemo=courier
- *   (a Tiny Speck special delivery, 5 Awesome Stew, the frog called 1.5 s
+ *   (a Groddle Afternoon Post special delivery, 5 Awesome Stew, the frog called 1.5 s
  *   later) &mailautoplay=1 (OK, talk, hand over, yoga, leave), =talk (stops
  *   at the first line), =hold (holds the yoga pose). Dispatcher:
  *   &homedemo=home&maildemo=dispatcher&mailautoplay=1 (Send mail, an Apple
@@ -66,6 +66,7 @@ import { questRoomConverse } from './quest-instances-feature.js?v=d19d2fd5';
 import { hellFeature } from './hell-feature.js?v=2d9958f9';
 import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=790f980a';
 import { DISPATCHER_GAP, DISPATCHER_HALF, GATE, SIGNPOST } from '../home-street-fixtures.js?v=57eaae87';
+import { MAIL_POST_SENDER } from '../mailbox.js?v=e62cffa6';
 import {
   COURIER,
   COURIER_TEXT,
@@ -81,7 +82,7 @@ import {
   pickPose,
   sendCarriedToMailbox,
   sendDueToMailbox,
-} from '../mail-courier.js?v=3e5664ee';
+} from '../mail-courier.js?v=cef544b7';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const MAIL_COURIER_FEATURE_ID = 'mail-courier';
@@ -818,7 +819,7 @@ function demoSetup(engine) {
   if (demo === 'courier') {
     // mail_send_special_item 1543-1585 with its default words; inc_imagination.js 1574 sends 5 Awesome Stew.
     const cls = ITEM_CATALOG.awesome_stew ? 'awesome_stew' : 'apple';
-    engine.deliverMail?.({ sender: 'Tiny Speck', text: "Here's a special delivery just for you!", deliveryAt: now(), attachment: { classTsid: cls, count: 5 } });
+    engine.deliverMail?.({ sender: MAIL_POST_SENDER, text: "Here's a special delivery just for you!", deliveryAt: now(), attachment: { classTsid: cls, count: 5 } });
     booted = true;
     last = 'demo:courier';
   }

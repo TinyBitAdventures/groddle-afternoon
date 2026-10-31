@@ -9,7 +9,7 @@ import { normalizeParadiseState } from './paradise-flight.js?v=deb5fb26';
 import { normalizeFeatSnapshot } from './feats.js?v=77f4e4ef';
 import { normalizeEmotionalBearState } from './emotional-bear.js?v=1dd276f7';
 import { normalizeHomeState } from './homes.js?v=385f9a1a';
-import { normalizeMailboxState } from './mailbox.js?v=05fb4eac';
+import { normalizeMailboxState } from './mailbox.js?v=e62cffa6';
 import { normalizeFeatureSlices } from './feature-host.js?v=e4f648b1';
 import { normalizeQuestOfferState } from './quest-offers.js?v=dbfa83c4';
 

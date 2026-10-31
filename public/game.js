@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e2372a6b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a1dfca27';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=69d27380';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -463,7 +463,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=188b57f5';
+} from './js/player-save.js?v=9ea632cc';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -489,7 +489,7 @@ import {
   seedMailbox,
   sendMail,
   unreadMailCount,
-} from './js/mailbox.js?v=05fb4eac';
+} from './js/mailbox.js?v=e62cffa6';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,

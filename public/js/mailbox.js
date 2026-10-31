@@ -21,6 +21,20 @@ export const MAIL_COMPANIONS = Object.freeze([
 
 const COMPANION_SET = new Set(MAIL_COMPANIONS);
 
+/**
+ * Who the game's own letters come from (lane HOMEMAIL). They said "Tiny Speck Post" or
+ * "Tiny Speck" before; letters already in a save (solo, or the site's stored save online) are
+ * read under the new name as they load. No other sender changes.
+ */
+export const MAIL_POST_SENDER = 'Groddle Afternoon Post';
+const OLD_POST_SENDERS = new Set(['Tiny Speck Post', 'Tiny Speck']);
+
+/** A letter's sender as the mailbox shows it: the old post office names read as the new one. */
+export function mailSender(value) {
+  const name = String(value || '').trim().slice(0, 80);
+  return OLD_POST_SENDERS.has(name) ? MAIL_POST_SENDER : name || MAIL_POST_SENDER;
+}
+
 function finiteInt(value, fallback = 0, max = 999_999) {
   const number = Math.floor(Number(value));
   return Number.isFinite(number) ? Math.max(0, Math.min(max, number)) : fallback;
@@ -41,7 +55,7 @@ function cleanText(value, max = MAIL_TEXT_LIMIT) {
   return String(value || '').trim().slice(0, max);
 }
 
-function cleanParty(value, fallback = 'Tiny Speck Post') {
+function cleanParty(value, fallback = MAIL_POST_SENDER) {
   return cleanText(value, 80) || fallback;
 }
 
@@ -59,7 +73,7 @@ function normalizeMessage(seed = {}, index = 0) {
   const currants = finiteInt(seed?.currants);
   return {
     id: cleanId(seed?.id || seed?.message_id) || `mail-${index + 1}`,
-    sender: cleanParty(seed?.sender?.label || seed?.sender),
+    sender: mailSender(seed?.sender?.label || seed?.sender),
     recipient: cleanParty(seed?.recipient, 'You'),
     text: cleanText(seed?.text),
     sentAt,
@@ -152,7 +166,7 @@ export function seedMailbox(state, now = Date.now()) {
   Object.assign(state, normalized);
   if (state.messages.length) return state;
   deliverMail(state, {
-    sender: 'Tiny Speck Post',
+    sender: MAIL_POST_SENDER,
     text: 'Your mailbox is ready. Messages may carry one item stack and a little bundle of currants. Open a message to collect either.',
     sentAt: now - 120_000,
     deliveryAt: now - 120_000,
