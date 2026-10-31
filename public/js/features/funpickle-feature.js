@@ -40,7 +40,7 @@ import { shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=f0e432df';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=01a295a1';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=764d5f5a';
-import { STREET_INDEX } from '../street-loader.js?v=d4113627';
+import { STREET_INDEX } from '../street-loader.js?v=d6cbbd5c';
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=d5978ec1';
 import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, standPlacement, trackOverlay } from '../overlay-art.js?v=628fa0b4';
 import {

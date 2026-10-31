@@ -14,6 +14,9 @@
  * why it stays a plain Storage swap rather than a save-store client. The two
  * read-through keys are save-store's 'appearance' key and audio-pref's mute key.
  *
+ * A level builder play-test (?draft=<id>, js/builder/draft-play.js, spec 6.8) is always a
+ * practice copy: `draft` implies practice=1, so a draft street never reaches the real save.
+ *
  * Classic script, loaded in play/index.html before the game modules so no
  * module sees the real localStorage first. If a shared multiplayer world is
  * ever added, practice links stay solo and nothing done in them counts there.
@@ -25,7 +28,7 @@
   } catch {
     return;
   }
-  if (params.get('practice') !== '1') return;
+  if (params.get('practice') !== '1' && !params.has('draft')) return;
   // Practice copies are solo only (js/game-mode.js): a multiplayer entry page never practises.
   if (window.GRODDLE_MODE === 'multiplayer') return;
 

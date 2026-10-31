@@ -112,6 +112,7 @@
       "assets/classic/teensy_signpost.png": "3d101127",
       "assets/classic/upgrade_icon.png": "3dbc4e03",
       "assets/classic/warning.png": "b3880bf6",
+      "assets/content/deco-catalog.json": "9c0598c3",
       "assets/content/puzzle-triggers.json": "09810451",
       "assets/content/quests.json": "46b779bd",
       "assets/content/street-ecology.json": "725a0bd1",

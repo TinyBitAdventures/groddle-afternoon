@@ -1,0 +1,62 @@
+{
+  "format": "groddle-zone/1",
+  "id": "mossy-hollow",
+  "title": "Mossy Hollow",
+  "rev": 7,
+  "hub": {
+    "id": "900", "name": "Mossy Hollow", "isNew": true,
+    "map": { "streets": [
+      { "tsid": "GZ0000000000001", "name": "Mossy Lane", "x1": 200, "y1": 260, "x2": 380, "y2": 240 },
+      { "tsid": "GZ0000000000002", "name": "Hollow End", "x1": 380, "y1": 240, "x2": 560, "y2": 270 }
+    ] }
+  },
+  "streets": [
+    {
+      "key": "lane",
+      "street": {
+        "source": "groddle-builder mossy-hollow", "tsid": "GZ0000000000001",
+        "label": "Mossy Lane", "hubId": "900", "hubName": "Mossy Hollow",
+        "bounds": { "l": -1500, "r": 1500, "t": -1000, "b": 0 },
+        "gradient": { "top": "87A8C9", "bottom": "FFE7A0" },
+        "platforms": [
+          { "id": "plat_1", "x1": -1480, "y1": -60, "x2": 1480, "y2": -60, "pc_perm": -1, "item_perm": -1 },
+          { "id": "plat_2", "x1": 1250, "y1": -150, "x2": 1450, "y2": -150, "pc_perm": -1 }
+        ],
+        "layers": [
+          { "id": "sky", "name": "sky", "z": -3, "w": 2250, "h": 1000, "filters": { "saturation": -46, "blur": 3 }, "decos": [
+            { "id": "d_1", "sprite": "bush_3", "x": 600, "y": 700, "w": 300, "h": 110, "z": 0, "r": 0 } ] },
+          { "id": "middleground", "name": "middleground", "z": 0, "decos": [
+            { "id": "d_9", "sprite": "patch_dirt_2a", "x": 0, "y": -40, "w": 600, "h": 90, "z": 1, "r": 0 },
+            { "id": "d_14", "sprite": "heights_topper_2", "x": 1350, "y": -150, "w": 220, "h": 60, "z": 2, "r": 0, "flip": true } ] }
+        ],
+        "signposts": [ { "id": "signpost_1", "x": 1350, "y": -150, "w": 100, "h": 200, "connects": [
+          { "tsid": "GZ0000000000002", "label": "Hollow End", "hub_id": "900", "arrive": { "x": 150, "y": 940 } } ] } ],
+        "stats": { "platformCount": 2, "layerCount": 2, "decoCount": 3, "signpostCount": 1 }
+      },
+      "population": { "counts": { "npc_piggy": 2, "trant_fruit": 1 }, "quoins": 6 },
+      "editor": { "camera": { "x": 1000, "y": 400, "zoom": 1 }, "lockedLayers": ["sky"] }
+    },
+    {
+      "key": "end",
+      "street": {
+        "source": "groddle-builder mossy-hollow", "tsid": "GZ0000000000002",
+        "label": "Hollow End", "hubId": "900", "hubName": "Mossy Hollow",
+        "bounds": { "l": -1000, "r": 1000, "t": -1000, "b": 0 },
+        "gradient": { "top": "87A8C9", "bottom": "FFE7A0" },
+        "platforms": [ { "id": "plat_1", "x1": -980, "y1": -60, "x2": 980, "y2": -60, "pc_perm": -1, "item_perm": -1 } ],
+        "layers": [ { "id": "middleground", "name": "middleground", "z": 0, "decos": [
+          { "id": "d_9", "sprite": "bush_3", "x": 300, "y": -60, "w": 160, "h": 90, "z": 1, "r": 0 } ] } ],
+        "signposts": [ { "id": "signpost_1", "x": -850, "y": -60, "w": 100, "h": 200, "connects": [
+          { "tsid": "GZ0000000000001", "label": "Mossy Lane", "hub_id": "900", "arrive": { "x": 2850, "y": 850 } } ] } ],
+        "stats": { "platformCount": 1, "layerCount": 1, "decoCount": 1, "signpostCount": 1 }
+      }
+    }
+  ],
+  "edits": [ { "tsid": "GLI2V0UN7RD1T2J", "op": "add-connect", "signpost": "signpost_1",
+    "connect": { "tsid": "GZ0000000000001", "label": "Mossy Lane", "hub_id": "900", "arrive": { "x": 150, "y": 940 } } } ],
+  "assets": {
+    "bush_3": { "origin": "tinyspeck-cc0", "licence": "CC0-1.0", "source": "groddle1.swf#bush_3" },
+    "patch_dirt_2a": { "origin": "tinyspeck-cc0", "licence": "CC0-1.0", "source": "groddle1.swf#patch_dirt_2a" },
+    "heights_topper_2": { "origin": "tinyspeck-cc0", "licence": "CC0-1.0", "source": "groddle1.swf#heights_topper_2" }
+  }
+}

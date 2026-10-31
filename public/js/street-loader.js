@@ -7,6 +7,14 @@ import { assertStreetGeometry, navigableSignposts } from './street-model.js?v=23
 
 const cache = new Map();
 
+/**
+ * LEVEL BUILDER play-test (spec 6.8, js/builder/draft-play.js): a draft's streets, which are not
+ * files. Their index rows are merged into STREET_INDEX (and again after any later index load), and
+ * their JSON is kept here so loadStreetData never fetches them. tsid -> { row, data }.
+ * @type {Map<string, { row: object, data: object }>}
+ */
+const draftStreets = new Map();
+
 /** @type {null | { default: string, streets: Record<string, { label: string, file: string, hubId?: string }> }} */
 let loadedIndex = null;
 
@@ -37,7 +45,40 @@ export function applyStreetIndex(idx) {
   loadedIndex = idx;
   if (idx.default) STREET_INDEX.default = idx.default;
   STREET_INDEX.streets = { ...idx.streets };
+  for (const [tsid, d] of draftStreets) STREET_INDEX.streets[tsid] = d.row;
   return STREET_INDEX;
+}
+
+/**
+ * LEVEL BUILDER (spec 6.8): register a draft's streets for a play-test. `rows` are index rows by
+ * tsid (label, hubId, hubName, ...; no file), `streetsByTsid` their street JSON. The rows join the
+ * index (a later index load keeps them) and the streets prime the cache, so loadStreetData returns
+ * them without a fetch. Each street is checked as a loaded file is (assertStreetGeometry) and copied,
+ * so the caller's object is never changed. Returns the registered tsids.
+ * @param {Record<string, object>} rows
+ * @param {Record<string, object>} streetsByTsid
+ */
+export function registerDraftStreets(rows, streetsByTsid) {
+  const out = [];
+  for (const [tsid, street] of Object.entries(streetsByTsid || {})) {
+    if (!street || typeof street !== 'object') continue;
+    const data = typeof structuredClone === 'function' ? structuredClone(street) : JSON.parse(JSON.stringify(street));
+    assertStreetGeometry(data);
+    const row = { label: data.label || tsid, ...(rows?.[tsid] || {}), draft: true };
+    delete row.file;
+    applyIndexHub(data, row);
+    data.signposts = navigableSignposts(data.signposts);
+    draftStreets.set(tsid, { row, data });
+    STREET_INDEX.streets[tsid] = row;
+    cache.set(tsid, data);
+    out.push(tsid);
+  }
+  return out;
+}
+
+/** Whether a tsid is a registered draft street (a play-test). */
+export function isDraftStreet(tsid) {
+  return draftStreets.has(tsid);
 }
 
 /**
@@ -113,6 +154,12 @@ export async function loadStreetData(tsid) {
   await ensureStreetIndex();
   const key = resolveIndexTsid(tsid) || STREET_INDEX.default;
   if (cache.has(key)) return cache.get(key);
+  // A draft street (a play-test) is never a file: it comes back from its registration.
+  if (draftStreets.has(key)) {
+    const data = draftStreets.get(key).data;
+    cache.set(key, data);
+    return data;
+  }
   const meta = STREET_INDEX.streets[key];
   if (!meta) throw new Error(`Unknown street tsid: ${tsid}`);
   const res = await fetch(meta.file);
@@ -162,6 +209,7 @@ export function clearStreetCache() {
 
 export function clearStreetIndex() {
   loadedIndex = null;
+  draftStreets.clear();
   STREET_INDEX.default = 'GLI2V0UN7RD1T2J';
   STREET_INDEX.streets = {
     GLI2V0UN7RD1T2J: {

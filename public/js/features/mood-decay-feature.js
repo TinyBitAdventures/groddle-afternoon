@@ -33,7 +33,7 @@ import {
 } from '../mood-decay.js?v=49175993';
 import { loseMood, moodMax } from '../metabolics.js?v=8504134e';
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=d5978ec1';
-import { homesFeature } from './homes-feature.js?v=d77d9eb8';
+import { homesFeature } from './homes-feature.js?v=8bff91b7';
 import { newxpFeature } from './newxp-feature.js?v=92133eb2';
 import { meditationFeature } from './meditation-feature.js?v=72f3a544';
 

@@ -678,6 +678,12 @@
           "description": "The anchor in the 2x file's pixels. The game draws decos bottom-centre, so intake requires x = w/2 and y = h (within 1 px) or re-pads the file.",
           "$ref": "#/$defs/point"
         },
+        "inputs": {
+          "description": "What new art was made from (decided 2026-10-30: CC0 1.0 only, inputs CC0 or Austin's own): library deco names (\"deco:bush_3\") or Austin's own work (\"own:<what>\").",
+          "type": "array",
+          "maxItems": 20,
+          "items": { "type": "string", "pattern": "^(deco:[A-Za-z0-9_.-]{1,96}|own:.{1,200})$" }
+        },
         "intake": {
           "description": "The intake report id this asset passed.",
           "type": "string"

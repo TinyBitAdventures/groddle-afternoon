@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e2372a6b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=bad60457';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=ffd108bc';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -576,7 +576,7 @@ import {
   availableStreetTsids,
   ensureStreetIndex,
   resolveIndexTsid,
-} from './js/street-loader.js?v=d4113627';
+} from './js/street-loader.js?v=d6cbbd5c';
 import {
   ladderTopDeck,
   resolveGround as resolveStreetGround,
@@ -603,7 +603,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=6defedeb';
+} from './js/street-render.js?v=3bcef6a7';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,

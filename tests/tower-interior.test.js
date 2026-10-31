@@ -18,7 +18,7 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
 } from '../public/js/street-ecology.js?v=7e30da8f';
-import { applyIndexHub, loadStreetDataFromFs } from '../public/js/street-loader.js?v=d4113627';
+import { applyIndexHub, loadStreetDataFromFs } from '../public/js/street-loader.js?v=d6cbbd5c';
 import { TOWER_ROOMS, VENT } from '../public/js/tower-rooms.js?v=7b2aa06a';
 import { ALL_TOWER_ROOMS } from '../public/js/tower-challenge-rooms.js?v=9e39f503';
 import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=b6ae268a';

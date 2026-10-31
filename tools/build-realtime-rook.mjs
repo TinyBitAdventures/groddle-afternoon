@@ -31,7 +31,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=d4113627';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=d6cbbd5c';
 import { platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js?v=23b926e5';
 import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=7e30da8f';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=85d4faba';

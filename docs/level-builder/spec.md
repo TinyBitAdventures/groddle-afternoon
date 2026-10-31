@@ -1,6 +1,6 @@
 # Level builder: design spec
 
-Status: draft for Austin's review, 2026-10-30. Nothing here is built yet.
+Status: approved 2026-10-30; phases P0 and P1 built (see 14.1 for what was built and where it deviates). Five of the open questions are decided (section 15).
 
 The level builder is a tool in the administrators' console (`/console/`) for editing streets and making new zones. It serves two users equally:
 
@@ -106,7 +106,7 @@ Every build script skips a street that has no Tiny Speck XML (`build-street-laye
 **Around the streets:**
 
 - **Hub maps:** `public/assets/maps/hubs/hub-<id>.json` (94 hubs, a 760 x 460 map, `streets[]` as lines, `hubs[]` as exits) and `assets/maps/index.json`. They came from GSJS `inc_data_maps_prod.js`, and no build script for them is in the repo.
-- **Hub membership:** `public/js/hub-maps-data.js` comes from `build-hub-maps.mjs`, and the Completist badge reads it. That script rebuilds it from GSJS alone (`build-hub-maps.mjs:20-42`), so zones need a merge step.
+- **Hub membership:** `public/js/hub-maps-data.js` comes from `build-hub-maps.mjs`, and the Completist badge reads it. That script rebuilds it from GSJS alone (`build-hub-maps.mjs:20-42`). Zones stay out of it (decided, section 15): they are neither on the world map nor counted for Completist badges.
 - **Routing:** `public/assets/content/signpost-graph.json` comes from `tools/build-signpost-graph.mjs`, and its `--check` mode is enforced by `tests/map-routes.test.js`.
 - **Populations:** `public/assets/content/street-ecology.json` comes from `build-street-ecology.mjs:345`. It holds one row per street (`counts` over 25 classes, `quoins`, `interior`, `exact`). The planner places them at run time: `planStreetPlacements` and `buildPlatformCandidates` (`public/js/street-ecology.js:349-466`).
 
@@ -149,7 +149,7 @@ All values are in px per frame at 60 fps. They come from `public/game.js` `handl
 | Air jump | one, only after walking off a ledge; the triple jump needs Imagination upgrades | `public/js/movement.js:125-185, 141` |
 | Ground snap | 12 px, more when falling fast (FRAME_DT_CAP 2.5) | `public/js/street-model.js:419-455` |
 
-The 2012 client jumped higher (about 134 px, `public/js/hidden-floors.js:54`). A few shipped spots are therefore out of reach in the remake, and the validator's calibration run (section 7.4) will list them.
+The 2012 client jumped higher (about 134 px, `public/js/hidden-floors.js:54`). A few shipped spots are therefore out of reach in the remake, and the validator's calibration run (section 7.4) will list them. The validator uses the remake's 105 px jump (decided, section 15): it must match what players can actually do.
 
 **Line rules:**
 
@@ -322,7 +322,7 @@ zone
 | origin | licence | Filled by | Checked by |
 |---|---|---|---|
 | `tinyspeck-cc0` | `CC0-1.0` | the store, from `plan.json` (`source`: bundle and symbol) | AST-003: the sprite must be in the library |
-| `new` | `own-work-CC0` or `ai-generated` | asset intake (9.1): sha256, size, registration, author, tool, prompt, intake report id | AST-002 and AST-004 |
+| `new` | `own-work-CC0` or `ai-generated` (both are CC0 1.0 dedications; the value says who made it) | asset intake (9.1): sha256, size, registration, author, tool, prompt, `inputs`, intake report id | AST-002 and AST-004 |
 
 **Ids.**
 
@@ -621,7 +621,7 @@ A **waiver** (schema `waivers[]`) accepts one finding at one place after a play-
 | AST-001 | fatal | Missing art | A sprite is neither in the library manifest nor in zone assets |
 | AST-002 | error | No provenance | A used sprite has no `assets` row |
 | AST-003 | error | Wrong provenance | A `tinyspeck-cc0` row for a sprite not in the library, or a `new` row whose sha256 does not match the stored file |
-| AST-004 | error | Licence not allowed | The asset's licence is not in the publish policy (section 10); not waivable |
+| AST-004 | error | Licence or provenance not allowed | The asset is not a CC0 1.0 dedication (`CC0-1.0`, `own-work-CC0`, `ai-generated`), or its provenance is incomplete: no author, no tool for ai-generated art, or `inputs` naming anything that is not CC0 or Austin's own (section 10); not waivable. AI-generated art is allowed |
 | AST-005 | warn | Drawn too large | Drawn size over the deco's logical size (`size2`) and no sharp copy: it will look soft |
 | AST-006 | warn | Not animated | `animated` set on a deco with no strip in `deco-anim-list.js` |
 | STY-001 | warn | Layer order | sky below the bg layers, and those below the middleground; foreground above |
@@ -676,7 +676,7 @@ Phase 2 also extracts the airborne step from `game.js physics()` into `public/js
 
 - It must finish in under 10 minutes on Austin's Mac.
 - Every PHY-003/004/005 finding goes into `tools/builder/calibration.json`.
-- 20 findings picked at random are play-tested. Under 10% may be false. The real ones are game bugs or the 105 vs 134 px gap, and they go to the register.
+- 20 findings picked at random are play-tested. Under 10% may be false. The real ones are game bugs or the 105 vs 134 px gap, and they go to the register. Under the decided 105 px standard, a spot only the 2012 jump reached is a game bug in the remake, not a validator error.
 
 ---
 
@@ -774,7 +774,7 @@ A batch is atomic: if one op fails, nothing is stored, and the answer is 422 wit
 
 **Humans** use the console session: cookie plus REST nonce, and `manage_options`, as the console does today.
 
-**Agents** use **builder keys**, made in the Builder tab. Each key has a label, scopes, an expiry (30 days by default) and can be revoked.
+**Agents** use **builder keys**, made in the Builder tab. Each key has a label, scopes, an expiry (30 days by default) and can be revoked. Keys are for local agents only for now (decided, section 15).
 
 - **Scopes:** `drafts:read`, `drafts:write`, `assets:write`, `validate`, `render`. No scope can publish, manage keys, or reach any other admin route. That is why keys are better than a Minn application password: an application password would carry `manage_options` for the whole site, bans and gives included.
 - **Header:** `X-Groddle-Builder: <key id>.<unix seconds>.<16 hex nonce>.<base64url HMAC-SHA256>`.
@@ -1015,17 +1015,13 @@ None of this is settled. Austin should check its status when he decides. Two con
 - a CC0 dedication of AI art is honest but may dedicate nothing;
 - the real risk is resemblance to someone else's work, not loss of our rights.
 
-**Recommendation:**
+**Decided (Austin, 2026-10-30): "anything as open license as we can".**
 
-1. **Now:** option A for anything that ships. Every phase until the last is useful with it.
-2. **Next:** add option B as the first category of new art.
-3. **AI art (option C):** allowed in **drafts and play-tests only**. AST-004 blocks publishing it while the publish policy (`tools/builder/licence-policy.json`, reviewed by Austin) lists only `CC0-1.0` and `own-work-CC0`. If Austin later says yes:
-   - add `ai-generated` to the policy;
-   - keep those files in their own prefix, with model and prompt in the provenance file;
-   - say so on the credits page.
-
-   One safer variant: models conditioned only on Tiny Speck's CC0 art (style references, image-to-image from library decos). That lowers, but does not remove, the resemblance risk, because the base model's training data is still unknown.
-4. **Option D:** not recommended.
+1. **Everything ships as CC0 1.0.** The Tiny Speck library (option A), and new art whether it is Austin's own work (option B) or AI-generated (option C), all carry a CC0 1.0 dedication, so the art set stays one licence.
+2. **Every asset's provenance is recorded:** who or what made it (author; for AI art the model and version, and the prompt) and from what inputs (`assets{}.inputs`: library deco names, Austin's own sketches or photos). Publishing writes it into `tools/provenance/new-art.json`, and the credits page lists new art by maker.
+3. **Inputs must be CC0 or Austin's own.** AI art made from style references or image-to-image takes only Tiny Speck's CC0 decos or Austin's own work as its inputs. That lowers, but does not remove, the resemblance risk above, because a base model's training data is still unknown.
+4. **The validator checks provenance and CC0** (AST-004, section 7.3). It no longer blocks AI art: the publish policy (`tools/builder/licence-policy.json`) lists `CC0-1.0`, `own-work-CC0` and `ai-generated`, and requires complete provenance. AI files keep their own prefix (`gz_ai_*`) so they stay easy to list.
+5. **Option D** (third-party packs) is not used.
 
 ---
 
@@ -1043,7 +1039,7 @@ It never commits, tags or pushes.
 1. **Gate.**
    - Pull the named rev.
    - It needs no fatal or error findings; every warn must be acknowledged or waived.
-   - Every asset licence must be in `licence-policy.json`.
+   - Every asset licence must be in `licence-policy.json` (CC0 1.0 dedications), with complete provenance.
    - Labels must be unique against the index.
    - The draft's `baseCommit` must be an ancestor of HEAD; otherwise re-validate first.
 2. **Write the zone's own files.**
@@ -1055,12 +1051,12 @@ It never commits, tags or pushes.
    | Generator | Adds |
    |---|---|
    | `build-street-names.mjs` | index rows (label, hub, counts) |
-   | `build-hub-maps.mjs` | `HUB_MAP_STREETS` (decides Completist counting, Q5) |
+   | `build-hub-maps.mjs` | nothing: zones stay off the world map and out of Completist counting (decided, section 15). Their streets carry `noMap` |
    | new `tools/builder/build-zone-maps.mjs` | `assets/maps/hubs/hub-<id>.json` and its `assets/maps/index.json` row |
    | `build-street-ecology.mjs` | the population rows |
    | `tools/builder/apply-zone-edits.mjs` | the `edits[]` connects on shipped streets, with `arrive` recomputed. It runs after `build-street-navigation.mjs`, which would drop an unmatched connect's `arrive` (`location-navigation.js:286-296`) |
    | `tools/build-signpost-graph.mjs`, `tools/data-versions/build.mjs` | as today |
-   | `build-realtime-*.mjs` | wherever they key by street (quoins, objects): checked per script in phase 6 (Q6) |
+   | `build-realtime-*.mjs` | not in the first release (zones are solo only, decided, section 15). Phase 6 keeps zone streets keyable the same way (one tsid, one population row), so a later release can run these builders over them |
 
 4. **Check.**
    - `npm test`, plus a new `tests/zones.test.js`:
@@ -1128,17 +1124,37 @@ Sizes: S is 1-2 lane-days, M is 3-4, L is 5-7.
 
 **Order and dependencies.** P0 comes first, then P1, then P2. P3 and P4 can run as two lanes after P2, split by file ownership: P3 owns `js/builder/editor*`, and P4 owns `tools/builder/*` and the site routes. P5 can start after P1. P6 is last.
 
+### 14.1 What was built, and where it differs from the plan
+
+**P0 (2026-10-30).**
+
+- **Schema checker, not Ajv.** `public/js/builder/schema-check.js` is a strict 2020-12 checker for the keywords `zone.schema.json` uses (an unknown keyword is a compile error, as in Ajv's strict mode). It is pure, so the editor and the P2 validator share it, and the repo gains no dependency. All 1,460 shipped streets pass `$defs/street` in about 2 s (`tests/zone-schema.test.js`).
+- **The schema stays at `docs/level-builder/zone.schema.json`.** Its only change is `assets{}.inputs` (decided Q1).
+- **Layer roles.** `public/js/builder/layer-role.js` names a layer's role from its name where it says one (sky, cloud, star, fore, fg) and from its depth against the middleground otherwise; the catalog, the picker's facets and the STY rules use it. Roles are the five facet roles (sky, bg, middleground, middleplus, foreground); bg_1/bg_2/bg_3 are one role.
+- **Deco catalog.** `tools/builder/deco-catalog.mjs` writes `public/assets/content/deco-catalog.json` (957 KB, one row a line). Two additions to the row in 6.4: `source` (the SWF bundle and symbol, which a fork writes into `assets{}`), and `hires` means a 3x file exists (2,333; the runtime list `deco-hires-list.js` holds 2,292 because the 41 big ones are picked elsewhere). `drawn` is the median over every role. Placements are counted under the art the renderer draws (`DECO_TWINS`), 555,702 in all; the 135 others name art that is missing.
+- **Seam.** `registerDraftStreets(rows, streetsByTsid)` in `street-loader.js` keeps draft streets in their own map: their rows survive a later index load, and `loadStreetData` returns them without a fetch even after the cache is cleared. Each street is copied and checked as a file is (`assertStreetGeometry`, hidden connects dropped).
+- **Practice.** `practice-mode.js` treats `?draft=` as `practice=1`, never on a multiplayer page.
+
 ---
 
 ## 15. Open questions for Austin
 
-1. **Licence for new art.** Section 10 recommends shipping CC0 library art only for now, adding own work (CC0) next, and keeping AI-generated art to drafts until you decide. Is that right, and who besides you may contribute "own work"?
-2. **Where the builder runs.** groddle.localhost only (recommended until P6), or also on groddleafternoon.com's console? Live drafts would sit in the production database, and render and validate would need a worker there.
-3. **Edits to shipped streets.** Forks only, plus new connects (recommended)? Or should fixes to Tiny Speck's own streets be published too? That needs a patch layer applied after the XML builders.
-4. **Ids.** GZ + 13 for new street tsids, and hub ids 900-999 for new hubs: fine?
-5. **The world map and badges.** Should new hubs join the world map and count toward Completist badges (`hub-maps-data.js`), or stay off the map until you say so (`noMap`)?
-6. **Multiplayer.** Do new zones go online in the same release? Shared quoins and objects come from `build-realtime-*.mjs` per street, and the server may need a data release too.
-7. **Agent keys.** Local agents only, or also remote agents (for example a Claude connector)? Default expiry 30 days?
-8. **The reach standard.** The remake's jump (105 px), as recommended, or the 2012 client's (about 134 px)? This decides whether calibration findings on shipped streets are game bugs.
+### Decided 2026-10-30
+
+Numbered as they were asked.
+
+- **Q1, licence for new art:** "anything as open license as we can". New art, whether Austin's own work or AI-generated, ships under CC0 1.0, with every asset's provenance recorded: who or what made it, and from what inputs. Inputs must be CC0 or Austin's own. Section 10 has the policy; the validator's licence rule (AST-004) checks provenance and CC0 and no longer blocks AI art.
+- **Q5, the world map and badges:** new zones are just new content. They stay off the world map (`noMap`) and do not count toward Completist badges (`hub-maps-data.js` is not merged). **Future work:** zones may get a map system of their own later, with links to the existing world.
+- **Q6, multiplayer:** "potentially". Not in the first release: zones are solo only, and `/play/online/` never sees them. The design keeps it possible later: each zone street has one tsid and one population row, so the per-street realtime builders (`build-realtime-*.mjs`) can run over zone streets in a later release (section 11).
+- **Q7, agent keys:** local agents only for now. Builder keys (8.4) are for agents on Austin's machine; a remote connector waits for a later decision. The 30-day default expiry stands.
+- **Q8, the reach standard:** the remake's 105 px jump, so the validator matches what players can actually do (2.3, 7.4).
+
+### Still open
+
+The lead's defaults for P0 and P1 are in brackets; they hold until Austin answers.
+
+2. **Where the builder runs.** groddle.localhost only (recommended until P6), or also on groddleafternoon.com's console? Live drafts would sit in the production database, and render and validate would need a worker there. [groddle.localhost only: the Builder tab, `/console/builder/` and every builder route are behind the site option `groddle_builder_enabled`, on locally and off when unset, so a release ships it dark.]
+3. **Edits to shipped streets.** Forks only, plus new connects (recommended)? Or should fixes to Tiny Speck's own streets be published too? That needs a patch layer applied after the XML builders. [Forks plus new connects: P1 forks a shipped street into a draft and never edits a shipped file.]
+4. **Ids.** GZ + 13 for new street tsids, and hub ids 900-999 for new hubs: fine? [Used as written.]
 9. **Events.** Should the builder ever author location events (the GSJS `admin_events_*` model), or should zones stay event-free?
 10. **Names.** Should builder street and hub names follow a naming guide (Tiny Speck's style of invented names), and should TXT-002 also refuse names close to a shipped one?
