@@ -36,7 +36,8 @@
  * &questofferdemo=waiting (&questoffercount=N, default 3) puts N ordinary
  * offers in the log at once; =show also opens the Quests dialog and presses
  * "Show me". Other QA routes (any *demo or *autoplay param) get no offers;
- * ?questoffer=off silences them anywhere (the demo still runs).
+ * ?questoffer=off silences them anywhere (the demo still runs); a level builder play-test
+ * (?draft=) is silent unless ?questoffer=now.
  * &questofferaward=1 queues an award screen when a check first falls under a
  * loading card (G213: the screen shows as the card goes and the check looks
  * again every second while it is up); canvas questOfferAfterCardMs is the wait
@@ -579,6 +580,11 @@ export const questOffersFeature = {
     return questLogActions(engine, classTsid);
   },
 
+  /** P7: a level builder play-test (?draft=) holds every quest offer (other features' too) unless ?questoffer=now. */
+  holdQuestOffers(engine) {
+    return Boolean(engine.param?.('draft')) && engine.param('questoffer') !== 'now';
+  },
+
   init(engine) {
     ensureQuestOfferState(engine.questState);
     // QA routes (any *demo / *autoplay / streetdemo param) stay uninterrupted
@@ -586,7 +592,9 @@ export const questOffersFeature = {
     const params = [...new URLSearchParams(globalThis.location?.search || '').keys()];
     const qaRoute = params.some((key) => /demo$|autoplay$/.test(key) && !key.startsWith('questoffer'));
     const mode = engine.param('questoffer');
-    quiet = mode === 'off' || (qaRoute && mode !== 'now');
+    // A level builder play-test (?draft=) never offers quests: they are no part of a zone (P7).
+    const draft = Boolean(engine.param('draft'));
+    quiet = mode === 'off' || ((qaRoute || draft) && mode !== 'now');
     nextOfferCheckAt = Date.now() + (engine.param('questoffer') === 'now' ? 1_500 : 12_000);
     heldByCard = false;
     cardGoneAt = 0;

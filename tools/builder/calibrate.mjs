@@ -10,8 +10,9 @@
  * is this street and that carries an `arrive`. Each street runs with its own per-street physics;
  * swim (jetpack) streets and streets whose location events change physics (bounces, gravity
  * flips, js/features/location-events-feature.js) are marked approximate: the model runs normal
- * (or the street's own) physics only, so their findings are kept apart from the sample. Every PHY-003, PHY-004 and PHY-005 finding goes
- * into calibration.json, with PHY-001 and PHY-008 counted. A street nothing arrives at is skipped
+ * (or the street's own) physics only, so their findings are kept apart from the sample. Every PHY-003, PHY-004, PHY-005 and
+ * (P7) PHY-006 finding goes into calibration.json, with PHY-001, PHY-002, PHY-007 and PHY-008 counted.
+ * `--sample 20 --rule PHY-006 --kind landing` samples one rule (and PHY-006's kind). A street nothing arrives at is skipped
  * and counted. Runs on all cores (worker threads).
  */
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -21,9 +22,9 @@ import { Worker, isMainThread, parentPort, workerData } from 'node:worker_thread
 import { fileURLToPath } from 'node:url';
 import { GAME_DIR } from '../repos.mjs';
 import { shippedStreetFiles } from './validator-context.mjs';
-import { validateShippedStreet } from '../../public/js/builder/validate.js?v=1705a409';
-import { streetBuff, REACH_LIMITS } from '../../public/js/builder/reach-graph.js?v=6f7512af';
-import { plainApex } from '../../public/js/builder/validate.js?v=1705a409';
+import { validateShippedStreet } from '../../public/js/builder/validate.js?v=faa3883f';
+import { streetBuff, REACH_LIMITS } from '../../public/js/builder/reach-graph.js?v=0eb97168';
+import { plainApex } from '../../public/js/builder/validate.js?v=faa3883f';
 
 /** The 2012 client's plain jump peaked about 134 px (hidden-floors.js); the remake's 105. */
 export const CLIENT_2012_APEX = 134;
@@ -39,8 +40,9 @@ export function jumpFor(apex) {
 }
 
 const OUT = join(GAME_DIR, 'tools/builder/calibration.json');
-const KEEP = new Set(['PHY-003', 'PHY-004', 'PHY-005']);
-const COUNT = new Set(['PHY-001', 'PHY-002', 'PHY-006', 'PHY-007', 'PHY-008']);
+// P7: PHY-006 is kept too (its landing kind is the keyboard-player model's), so it can be sampled.
+const KEEP = new Set(['PHY-003', 'PHY-004', 'PHY-005', 'PHY-006']);
+const COUNT = new Set(['PHY-001', 'PHY-002', 'PHY-007', 'PHY-008']);
 
 const json = (p) => JSON.parse(readFileSync(p, 'utf8'));
 let JUMP_2012 = 1;
@@ -142,7 +144,9 @@ if (!isMainThread) {
     const cal = json(OUT);
     let s = Number(arg('--seed', 7));
     const rnd = () => ((s = (s * 1103515245 + 12345) % 2147483648) / 2147483648);
-    const pool = cal.findings.filter((f) => !f.data.approximate);
+    const rule = arg('--rule');
+    const kind = arg('--kind');
+    const pool = cal.findings.filter((f) => !f.data.approximate && (!rule || f.rule === rule) && (!kind || f.data.kind === kind));
     const picked = [];
     while (picked.length < sample && pool.length) picked.push(pool.splice(Math.floor(rnd() * pool.length), 1)[0]);
     console.log(JSON.stringify(picked, null, 1));
@@ -182,6 +186,7 @@ if (!isMainThread) {
     approximate: Object.fromEntries(['jetpack', 'events'].map((k) => [k, results.filter((r) => r.approximate === k).map((r) => r.tsid)])),
     inModel: Object.fromEntries([...KEEP].map((k) => [k, findings.filter((f) => f.rule === k && !f.data.approximate).length])),
     inModelJump2012Reaches: findings.filter((f) => !f.data.approximate && f.data.jump2012 === 'reaches').length,
+    tightByKind: Object.fromEntries(['height', 'landing'].map((k) => [k, findings.filter((f) => f.rule === 'PHY-006' && f.data.kind === k && !f.data.approximate).length])),
     connectsWithoutArrive: missing,
     wallMs: wall,
     workers: n,

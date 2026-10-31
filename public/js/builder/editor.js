@@ -732,7 +732,7 @@ async function boot() {
   }
   function loadValidateMod() {
     if (S.validateModLoading) return;
-    S.validateModLoading = import('./validate.js?v=1705a409').then((m) => { S.validateMod = m; S.geoDrawn = ''; }).catch(() => { S.validateModLoading = null; });
+    S.validateModLoading = import('./validate.js?v=faa3883f').then((m) => { S.validateMod = m; S.geoDrawn = ''; }).catch(() => { S.validateModLoading = null; });
   }
 
   /** The reach to draw: the validator's for a draft street, else the one worked out here. */
@@ -2407,7 +2407,7 @@ async function boot() {
   async function loadReach() {
     if (S.reachMod) return S.reachMod;
     if (loadReach.p) return loadReach.p;
-    loadReach.p = import('./reach-graph.js?v=6f7512af').then((m) => { S.reachMod = m; S.geoDrawn = ''; return m; }).catch(() => {
+    loadReach.p = import('./reach-graph.js?v=0eb97168').then((m) => { S.reachMod = m; S.geoDrawn = ''; return m; }).catch(() => {
       say('The reach map could not load.', 'bad');
       return null;
     });
@@ -2477,7 +2477,7 @@ async function boot() {
     // `new URL(...)` written here would not be keyed by tools/module-keys).
     if (!V.workerUrl) {
       if (!V.loading) {
-        V.loading = import('./validate-worker.js?v=fa3797a4').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
+        V.loading = import('./validate-worker.js?v=e45b1e98').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
       }
       return null;
     }

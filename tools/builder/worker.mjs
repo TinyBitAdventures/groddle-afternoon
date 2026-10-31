@@ -7,6 +7,12 @@
  * deco catalog search, the style profiles and the guide.
  *
  *   node tools/builder/worker.mjs [--port 8794]
+ *   node tools/builder/worker.mjs --restart          stop the running worker (its pid file) and start again
+ *   node --watch tools/builder/worker.mjs           restarts by itself whenever a file it loaded changes
+ *
+ * It loads the validator once, so after a code change it is stale: GET /health says so
+ * ({stale: true, changed: [files]}), every answer carries X-Builder-Worker-Stale: 1, and it logs it.
+ * Restart it (--restart), or run it under `node --watch`.
  *
  * Every call is a POST signed by the site the ServiceCall way (X-Groddle-Worker, prefix
  * groddle-builder-worker/1, 60 s window, each nonce once), with a secret derived from the builder
@@ -23,10 +29,14 @@
  */
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { configDir } from './sign.mjs';
 import { pathToFileURL } from 'node:url';
 import { readMaster, masterFile, workerSecret, verifyWorker, WORKER_HEADER } from './sign.mjs';
 import { loadValidatorContext } from './validator-context.mjs';
-import { validateZone } from '../../public/js/builder/validate.js?v=1705a409';
+import { validateZone } from '../../public/js/builder/validate.js?v=faa3883f';
 import { createRenderer, renderInput } from './render.mjs';
 import { catalog, searchDecos, styleProfile } from './catalog.mjs';
 import { builderGuide } from './guide.mjs';
@@ -110,12 +120,44 @@ export function createHandlers({ renderer = null, ctx = null } = {}) {
   };
 }
 
-/** The HTTP server. */
-export function createWorker({ secret, handlers = createHandlers(), log = () => {} }) {
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
+/** The code the worker runs: the builder's tools and the game's modules (their mtimes). */
+export function codeStamp(root = ROOT) {
+  const out = new Map();
+  const walk = (dir) => {
+    if (!existsSync(dir)) return;
+    for (const d of readdirSync(dir, { withFileTypes: true })) {
+      const p = join(dir, d.name);
+      if (d.isDirectory()) walk(p);
+      else if (/\.m?js$/.test(d.name)) out.set(p.slice(root.length + 1), statSync(p).mtimeMs);
+    }
+  };
+  walk(join(root, 'tools/builder'));
+  walk(join(root, 'public/js'));
+  return out;
+}
+/** PURE: the files that changed (or came or went) between two stamps. */
+export function staleFiles(then, now) {
+  const out = [];
+  for (const [f, t] of now) if (then.get(f) !== t) out.push(f);
+  for (const f of then.keys()) if (!now.has(f)) out.push(f);
+  return out.sort();
+}
+/** Where a running worker keeps its pid (for --restart). */
+export const pidFile = (env = process.env) => join(configDir(env), 'builder-worker.pid');
+
+/** The HTTP server. `stale()` answers the files changed since it started ([] when none). */
+export function createWorker({ secret, handlers = createHandlers(), log = () => {}, stale = () => [] }) {
   const seen = new Map();
+  let warned = false;
   const send = (res, status, body, headers = {}) => {
     const buf = Buffer.isBuffer(body) ? body : Buffer.from(JSON.stringify(body));
-    res.writeHead(status, { 'Content-Type': Buffer.isBuffer(body) ? 'image/png' : 'application/json', 'Content-Length': buf.length, 'Cache-Control': 'no-store', ...headers });
+    const changed = stale();
+    if (changed.length && !warned) {
+      warned = true;
+      log(`stale: ${changed.length} file(s) changed since start (${changed.slice(0, 3).join(', ')}); restart with --restart, or run under node --watch`);
+    }
+    res.writeHead(status, { 'Content-Type': Buffer.isBuffer(body) ? 'image/png' : 'application/json', 'Content-Length': buf.length, 'Cache-Control': 'no-store', ...(changed.length ? { 'X-Builder-Worker-Stale': '1' } : {}), ...headers });
     res.end(buf);
   };
   const fail = (res, e) => {
@@ -124,7 +166,10 @@ export function createWorker({ secret, handlers = createHandlers(), log = () => 
   };
   return createServer(async (req, res) => {
     const route = new URL(req.url, 'http://worker').pathname;
-    if (req.method === 'GET' && route === '/health') return send(res, 200, { ok: true });
+    if (req.method === 'GET' && route === '/health') {
+      const changed = stale();
+      return send(res, 200, { ok: true, pid: process.pid, stale: changed.length > 0, changed: changed.slice(0, 20) });
+    }
     const chunks = [];
     let size = 0;
     try {
@@ -159,11 +204,35 @@ export function createWorker({ secret, handlers = createHandlers(), log = () => 
   });
 }
 
+/** --restart: stop the worker its pid file names, and wait for its port to come free. */
+async function stopRunning(port) {
+  const file = pidFile();
+  const pid = existsSync(file) ? Number(readFileSync(file, 'utf8').trim()) : 0;
+  if (pid > 0) {
+    try {
+      process.kill(pid, 'SIGTERM');
+      console.log(`stopped the worker (pid ${pid})`);
+    } catch {
+      console.log(`no worker with pid ${pid} (a stale pid file)`);
+    }
+  }
+  for (let i = 0; i < 50; i += 1) {
+    const up = await fetch(`http://${HOST}:${port}/health`).then(() => true, () => false);
+    if (!up) return true;
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  return false;
+}
+
 if (import.meta.url === pathToFileURL(process.argv[1] || '').href) {
   const at = process.argv.indexOf('--port');
   const port = at > 0 ? Number(process.argv[at + 1]) : PORT;
   if (port === 8793) {
     console.error('Port 8793 is the realtime server\'s.');
+    process.exit(2);
+  }
+  if (process.argv.includes('--restart') && !(await stopRunning(port))) {
+    console.error(`Something still answers on ${HOST}:${port} and its pid file does not name it; stop it by hand.`);
     process.exit(2);
   }
   const master = readMaster();
@@ -172,9 +241,28 @@ if (import.meta.url === pathToFileURL(process.argv[1] || '').href) {
     process.exit(2);
   }
   const handlers = createHandlers();
-  const server = createWorker({ secret: workerSecret(master), handlers, log: (m) => console.log(`${new Date().toISOString().slice(11, 19)} ${m}`) });
-  server.listen(port, HOST, () => console.log(`builder worker on http://${HOST}:${port} (master ${masterFile()})`));
+  const started = codeStamp();
+  let lastCheck = 0;
+  let changed = [];
+  const stale = () => {
+    if (Date.now() - lastCheck > 2000) {
+      lastCheck = Date.now();
+      changed = staleFiles(started, codeStamp());
+    }
+    return changed;
+  };
+  const server = createWorker({ secret: workerSecret(master), handlers, stale, log: (m) => console.log(`${new Date().toISOString().slice(11, 19)} ${m}`) });
+  server.listen(port, HOST, () => {
+    try {
+      mkdirSync(configDir(), { recursive: true });
+      writeFileSync(pidFile(), `${process.pid}\n`, { mode: 0o600 });
+    } catch { /* no pid file: --restart cannot find it */ }
+    console.log(`builder worker on http://${HOST}:${port} (master ${masterFile()}, pid ${process.pid})`);
+  });
   const stop = async () => {
+    try {
+      if (existsSync(pidFile()) && Number(readFileSync(pidFile(), 'utf8').trim()) === process.pid) rmSync(pidFile());
+    } catch { /* gone */ }
     server.close();
     await handlers.close();
     process.exit(0);

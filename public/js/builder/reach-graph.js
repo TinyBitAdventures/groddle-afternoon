@@ -39,6 +39,18 @@ export const POST_REACH_X = 120;
 export const POST_BELOW = 60;
 export const DOOR_REACH_X = 60;
 export const TIGHT_MARGIN = 8;
+/**
+ * P7: a keyboard player's timing. A jump onto another floor is tried again from eight takeoffs
+ * spread over 12 px either side (LANDING_TRIES: about 2.7 frames early or late at a full run of
+ * 4.4 px a frame), and an air jump after walking off a ledge with the press 1 to 3 frames early or
+ * late (AIR_JUMP_TRIES). A landing that fewer than LANDING_SHARE of the tries make is one a
+ * keyboard player often misses: a tight jump (PHY-006). Calibrated in the real game (spec 14.1 P7).
+ */
+export const LANDING_TRIES = Object.freeze([-12, -8.5, -5, -1.5, 1.5, 5, 8.5, 12]);
+export const AIR_JUMP_TRIES = Object.freeze([-3, -2, -1, 1, 2, 3]);
+export const LANDING_SHARE = 0.6;
+/** Room for a run-up that counts as unlimited (a full-speed run needs about 20 px). */
+const RUN_ROOM_FREE = 400;
 const COL = 64;
 const COL_PAD = 24;
 
@@ -46,7 +58,7 @@ export const REACH_LIMITS = Object.freeze([
   'Plain jump only: no triple jump, no coyote time, no jump buffer. Reachable means reachable by a new player.',
   'Sampled, not exhaustive: in the air the avatar only holds toward one side, so a path that needs a reversal in the air can be missed.',
   'Fixed 60 fps steps; a slow frame bends arcs a little (the 8 px tight-jump margin covers it).',
-  'A running jump starts at full speed from any spot, even one with no room for a run-up; a tight jump is judged by height only.',
+  'A running jump starts at the speed the floor behind it gives room for. A tight jump is judged by the height to spare and, for a jump onto another floor, by the share of a keyboard player\'s tries that land: takeoffs up to 12 px early or late, an air jump 1 to 3 frames early or late (a plain walk-off and a ladder hop by height only).',
   'Items, NPCs and other players are not colliders; lines events switch on or off are taken as the file has them.',
 ]);
 
@@ -156,9 +168,28 @@ export function runArc(world, body, { dir = 0, airJumpAt = -1, record = false, m
 }
 
 /** PURE: a jump from a standing spot (the jump frame steers on the floor, as handleInput does). */
-export function jumpArc(world, from, { dir = 0, run = false, record = false } = {}) {
+export function jumpArc(world, from, { dir = 0, run = false, speed = null, record = false } = {}) {
   const max = WALK_MAX * world.buff.speed;
-  return runArc(world, { x: from.x, y: from.y, vx: run ? dir * max : 0, vy: JUMP_SPEED * world.buff.jump, onGround: false }, { dir, record, launch: true });
+  // `speed`: a running jump's speed at takeoff, when the run-up was shorter than a full run (P7).
+  const vx = run ? dir * (speed == null ? max : Math.min(max, speed)) : 0;
+  return runArc(world, { x: from.x, y: from.y, vx, vy: JUMP_SPEED * world.buff.jump, onGround: false }, { dir, record, launch: true });
+}
+
+/**
+ * PURE (P7): the speed a run from a standstill reaches over `room` px of floor, stepped with the
+ * game's own steering (steerX on the floor, then the move).
+ */
+export function runUpSpeed(buff, room) {
+  let v = 0;
+  let x = 0;
+  for (let f = 0; f < 120; f += 1) {
+    const next = steerX(v, 1, true, buff);
+    if (x + next > room) break;
+    v = next;
+    x += v;
+    if (v >= WALK_MAX * buff.speed) break;
+  }
+  return v;
 }
 
 /**
@@ -195,6 +226,7 @@ class Graph {
     this.from = [];
     this.to = [];
     this.margin = [];
+    this.detail = [];
   }
   node(x, y, line, kind = 's') {
     this.x.push(x);
@@ -203,11 +235,12 @@ class Graph {
     this.kind.push(kind);
     return this.x.length - 1;
   }
-  edge(a, b, margin = Infinity) {
+  edge(a, b, margin = Infinity, detail = null) {
     if (a === b || a < 0 || b < 0) return;
     this.from.push(a);
     this.to.push(b);
     this.margin.push(margin);
+    this.detail.push(detail);
   }
   /** CSR adjacency, forward and reversed. */
   freeze() {
@@ -244,10 +277,12 @@ class Graph {
     }
     return seen;
   }
-  /** Widest path: the best bottleneck margin from the sources to every node. */
+  /** Widest path: the best bottleneck margin from the sources to every node (and that bottleneck's edge, in `.edge`). */
   widest(sources) {
     const n = this.x.length;
     const best = new Float64Array(n).fill(-1);
+    const neck = new Int32Array(n).fill(-1);
+    best.edge = neck;
     const heap = [];
     const push = (v, m) => {
       heap.push([m, v]);
@@ -285,8 +320,13 @@ class Graph {
       if (m < best[a]) continue;
       for (let k = g.start[a]; k < g.start[a + 1]; k += 1) {
         const b = g.adj[k];
-        const w = Math.min(m, this.margin[g.eid[k]]);
-        if (w > best[b]) { best[b] = w; push(b, w); }
+        const e = g.eid[k];
+        const w = Math.min(m, this.margin[e]);
+        if (w > best[b]) {
+          best[b] = w;
+          neck[b] = this.margin[e] <= m ? e : neck[a];
+          push(b, w);
+        }
       }
     }
     return best;
@@ -403,10 +443,112 @@ export function buildReachGraph(street, opts = {}) {
     return ly < sy - 1 ? ly - r.minY : Infinity;
   };
   world.onLand = landingNode;
-  const addLanding = (start, r) => {
+  // P7: room to run up behind each stand point, each way (to a wall, or to a free line end; a
+  // joined end runs on), and the speed a run that long reaches.
+  const joinedEnd = new Set();
+  lineNodes.forEach((ln) => {
+    if (!ln) return;
+    const free = new Set(dangling.filter(([e]) => e === ln.first || e === ln.first + ln.count - 1).map(([e, side]) => `${e}:${side}`));
+    if (!free.has(`${ln.first}:-1`)) joinedEnd.add(`${ln.first}:-1`);
+    if (!free.has(`${ln.first + ln.count - 1}:1`)) joinedEnd.add(`${ln.first + ln.count - 1}:1`);
+  });
+  const roomBack = new Float64Array(g.x.length); // room behind a node for a run to the right
+  const roomFwd = new Float64Array(g.x.length); // room behind a node for a run to the left
+  lineNodes.forEach((ln) => {
+    if (!ln) return;
+    for (let k = 0; k < ln.count; k += 1) {
+      const n = ln.first + k;
+      if (k === 0) roomBack[n] = joinedEnd.has(`${n}:-1`) ? RUN_ROOM_FREE : 0;
+      else roomBack[n] = blocked(barriers, g.x[n - 1], g.x[n], g.y[n - 1], world) ? 0 : Math.min(RUN_ROOM_FREE, roomBack[n - 1] + Math.abs(g.x[n] - g.x[n - 1]));
+    }
+    for (let k = ln.count - 1; k >= 0; k -= 1) {
+      const n = ln.first + k;
+      if (k === ln.count - 1) roomFwd[n] = joinedEnd.has(`${n}:1`) ? RUN_ROOM_FREE : 0;
+      else roomFwd[n] = blocked(barriers, g.x[n + 1], g.x[n], g.y[n + 1], world) ? 0 : Math.min(RUN_ROOM_FREE, roomFwd[n + 1] + Math.abs(g.x[n + 1] - g.x[n]));
+    }
+  });
+  const speedCache = new Map();
+  const runSpeed = (room) => {
+    const k = Math.round(room);
+    if (!speedCache.has(k)) speedCache.set(k, runUpSpeed(world.buff, k));
+    return speedCache.get(k);
+  };
+  /** A running jump's speed from screen x on line i, each way (the room behind it on that line). */
+  const roomAt = (s, dir, dx = 0) => Math.max(0, (dir > 0 ? roomBack[s] : roomFwd[s]) + dir * dx);
+  /** P7: whether a try landed where the jump it varies did: that floor, or one level with it near there (not the floor it left). */
+  const sameLanding = (t, want, startLine) => {
+    const n = t.landed ? (t.node ?? landingNode(t.landed.x, t.landed.y)) : -1;
+    if (n < 0) return false;
+    if (g.line[n] === g.line[want]) return true;
+    return g.line[n] !== startLine && Math.abs(g.y[n] - g.y[want]) <= 4 && Math.abs(g.x[n] - g.x[want]) <= 48;
+  };
+  /**
+   * P7: the share of LANDING_TRIES takeoffs around stand point `s` that land where `r` did (a
+   * takeoff past the end of the floor it starts on is taken at that end: a player can stand no
+   * further, and the game's 90 ms coyote time forgives a late press there). When both widest tries
+   * land, the rest are taken to; under LANDING_SHARE, takeoffs 4 and 8 px either side are tried
+   * as well and the best spot counts.
+   */
+  const landingShare = (s, spec, r) => {
+    const line = g.line[s];
+    const ln = lineNodes[line];
+    const p = lines[line];
+    const want = r.node;
+    const lands = (x0) => {
+      const x = Math.max(ln.x0, Math.min(ln.x1, x0));
+      const y = platformYAt(p, x, 4);
+      if (y == null) return false;
+      const speed = spec.run ? runSpeed(roomAt(s, spec.dir, x - g.x[s])) : null;
+      return sameLanding(jumpArc(world, { x, y }, { dir: spec.dir, run: spec.run, speed }), want, line);
+    };
+    const share = (x) => {
+      const ends = [LANDING_TRIES[0], LANDING_TRIES[LANDING_TRIES.length - 1]];
+      if (ends.every((o) => lands(x + o))) return 1;
+      return LANDING_TRIES.reduce((k, o) => k + (lands(x + o) ? 1 : 0), 0) / LANDING_TRIES.length;
+    };
+    let best = share(g.x[s]);
+    for (const shift of [-4, 4, -8, 8]) {
+      if (best >= LANDING_SHARE) break;
+      const x = g.x[s] + shift;
+      if (x < ln.x0 || x > ln.x1) continue;
+      best = Math.max(best, share(x));
+    }
+    return best;
+  };
+  /** P7: the share of AIR_JUMP_TRIES presses around frame `f` that land where `r` did, walking off `start`. */
+  const airJumpShare = (end, start, f, side, r) => {
+    let k = 0;
+    for (const d of AIR_JUMP_TRIES) {
+      const at = f + d;
+      if (at < 0) { k += 1; continue; }
+      if (sameLanding(runArc(world, start, { dir: side, airJumpAt: at }), r.node, g.line[end])) k += 1;
+    }
+    return k / AIR_JUMP_TRIES.length;
+  };
+  const addLanding = (start, r, spec = null) => {
     if (!r.landed) return;
     const n = r.node ?? landingNode(r.landed.x, r.landed.y);
-    if (n >= 0 && n !== start) g.edge(start, n, marginOf(start, r));
+    if (n < 0 || n === start) return;
+    r.node = n;
+    const mv = marginOf(start, r);
+    // A landing on another floor: the share of a keyboard player's tries that make it (P7).
+    // Same-floor hops need none; a plain walk-off is steered all the way down, so it needs none.
+    let share = null;
+    if (g.kind[start] === 's' && g.line[n] !== g.line[start]) {
+      if (spec?.kind === 'air') share = airJumpShare(start, spec.start, spec.airJumpAt, spec.dir, r);
+      else if (spec?.kind === 'jump') share = landingShare(start, spec, r);
+    }
+    const score = Math.min(mv / TIGHT_MARGIN, share == null ? Infinity : share / LANDING_SHARE);
+    // Each scored edge keeps how it was made (PHY-006's message); with keepSpecs every jump does,
+    // so a route can be played back in the game (tools/builder/playtest.mjs).
+    const keep = score !== Infinity || opts.keepSpecs;
+    g.edge(start, n, score, keep ? {
+      kind: spec?.kind || 'fall', from: start, x: g.x[start], y: g.y[start], to: n, lx: r.landed.x, ly: r.landed.y, rise: mv, share,
+      air: spec?.kind === 'air', run: Boolean(spec?.run), dir: spec?.dir ?? 0, line: lines[g.line[n]]?.id ?? null,
+      ...(spec?.kind === 'air' || spec?.kind === 'fall' ? { airJumpAt: spec.airJumpAt ?? null, vx: spec.start?.vx ?? null } : {}),
+      ...(spec?.run ? { vx: spec.dir * runSpeed(roomAt(start, spec.dir)) } : {}),
+      ...(spec?.kind === 'hop' ? { hopY: spec.y ?? null, jump: Boolean(spec.jump) } : {}),
+    } : null);
   };
   // 2. Jumps from every 16 px and from each end.
   lineNodes.forEach((ln) => {
@@ -416,10 +558,11 @@ export function buildReachGraph(street, opts = {}) {
       if (k % every !== 0 && k !== ln.count - 1) continue;
       const s = ln.first + k;
       const from = { x: g.x[s], y: g.y[s] };
-      addLanding(s, jumpArc(world, from, { dir: 0 }));
+      addLanding(s, jumpArc(world, from, { dir: 0 }), { kind: 'jump', dir: 0, run: false });
       for (const dir of [-1, 1]) {
-        addLanding(s, jumpArc(world, from, { dir }));
-        addLanding(s, jumpArc(world, from, { dir, run: true }));
+        addLanding(s, jumpArc(world, from, { dir }), { kind: 'jump', dir, run: false });
+        // A running jump at the speed the floor behind gives room for (P7; P2 started every one at full speed).
+        addLanding(s, jumpArc(world, from, { dir, run: true, speed: runSpeed(roomAt(s, dir)) }), { kind: 'jump', dir, run: true });
       }
     }
   });
@@ -429,10 +572,10 @@ export function buildReachGraph(street, opts = {}) {
     for (const speed of [max, 1]) {
       const start = { x: g.x[end], y: g.y[end], vx: side * speed, vy: 0, onGround: true };
       const fall = runArc(world, start, { dir: speed === max ? side : 0 });
-      addLanding(end, fall);
+      addLanding(end, fall, { kind: 'fall', start, dir: speed === max ? side : 0 });
       const airFrames = Math.min(fall.frames, 60);
       for (let f = 0; f < airFrames; f += 4) {
-        addLanding(end, runArc(world, start, { dir: side, airJumpAt: f }));
+        addLanding(end, runArc(world, start, { dir: side, airJumpAt: f }), { kind: 'air', start, airJumpAt: f, dir: side });
       }
     }
   }
@@ -448,15 +591,15 @@ export function buildReachGraph(street, opts = {}) {
       if (!ln) continue;
       for (let k = 0; k < ln.count; k += 1) {
         const n = ln.first + k;
-        if (Math.abs(g.x[n] - wall.x) < 28 && g.y[n] >= wall.yTop - 28 && g.y[n] <= wall.yBot + 64) g.edge(n, L);
+        if (Math.abs(g.x[n] - wall.x) < 28 && g.y[n] >= wall.yTop - 28 && g.y[n] <= wall.yBot + 64) g.edge(n, L, Infinity, opts.keepSpecs ? { kind: 'mount', ladder: wall.id, x: wall.x } : null);
       }
     }
     const deck = ladderTopDeck(world.col(wall.x), wall.x, wall.yTop + 4, wall.yBot);
     if (deck != null) {
       const n = landingNode(wall.x, deck);
-      if (n >= 0) g.edge(L, n);
+      if (n >= 0) g.edge(L, n, Infinity, opts.keepSpecs ? { kind: 'deck', ladder: wall.id, x: wall.x, ly: deck } : null);
     }
-    addLanding(L, runArc(world, { x: wall.x, y: wall.yBot, vx: 0, vy: 0, onGround: false }));
+    addLanding(L, runArc(world, { x: wall.x, y: wall.yBot, vx: 0, vy: 0, onGround: false }), { kind: 'hop', dir: 0 });
     const jumpV = JUMP_SPEED * world.buff.jump;
     const heights = [];
     for (let y = wall.yBot - 24; y > wall.yTop + 4; y -= 48) heights.push(y);
@@ -464,9 +607,9 @@ export function buildReachGraph(street, opts = {}) {
     heights.push(wall.yTop + 4);
     for (const y of heights) {
       for (const side of [-1, 1]) {
-        addLanding(L, runArc(world, { x: wall.x, y, vx: side * max * OFF_LADDER_RATIO, vy: jumpV / 10, onGround: false }, { dir: side }));
+        addLanding(L, runArc(world, { x: wall.x, y, vx: side * max * OFF_LADDER_RATIO, vy: jumpV / 10, onGround: false }, { dir: side }), { kind: 'hop', dir: side, y });
       }
-      for (const dir of [-1, 0, 1]) addLanding(L, runArc(world, { x: wall.x, y, vx: 0, vy: jumpV, onGround: false }, { dir }));
+      for (const dir of [-1, 0, 1]) addLanding(L, runArc(world, { x: wall.x, y, vx: 0, vy: jumpV, onGround: false }, { dir }), { kind: 'hop', dir, y, jump: true });
     }
   }
   g.freeze();
@@ -537,12 +680,20 @@ export function reachStreet(street, arrivals, opts = {}) {
   for (const t of targets) {
     t.reachedFrom = arr.map((a, i) => t.nodes.some((n) => per[i][n]));
     t.reached = t.reachedFrom.some(Boolean);
-    // The tightest of the arrivals' best routes to it (-1 when none reaches it).
+    // The tightest of the arrivals' best routes to it (-1 when none reaches it), as a share of
+    // the tight-jump limits (under 1 is tight: PHY-006), with that route's tightest jump.
     t.margin = -1;
+    t.tight = null;
     widest.forEach((w, i) => {
       if (!w || !t.reachedFrom[i]) return;
-      const m = t.nodes.reduce((x, n) => Math.max(x, w[n]), -1);
-      t.margin = t.margin < 0 ? m : Math.min(t.margin, m);
+      let m = -1;
+      let at = -1;
+      for (const n of t.nodes) if (w[n] > m) { m = w[n]; at = n; }
+      if (t.margin < 0 || m < t.margin) {
+        t.margin = m;
+        const e = at >= 0 ? w.edge[at] : -1;
+        t.tight = e >= 0 ? g.detail[e] : null;
+      }
     });
     // The stand point nearest the target that the first arrival missing it reaches (any arrival
     // when all reach it), for the message.
@@ -608,4 +759,83 @@ export function reachStreet(street, arrivals, opts = {}) {
     unreached,
     deckless,
   };
+}
+
+/**
+ * PURE (P7): a way a keyboard player can take from an arrival to each of a street's exits, as
+ * steps to play back in the game (tools/builder/playtest.mjs): `walk` to x; `jump` (dir -1, 0, 1;
+ * `run` with a run-up) from x; `fall` off a ledge's end; `air` (walk off, then jump `airJumpAt`
+ * frames into the fall); `mount` a ladder and climb to its `deck`; `hop` off a ladder. Routes
+ * prefer walking and comfortable jumps (a tight one, PHY-006, costs more). Returns
+ * { start: {x, y} | null, routes: [{ id, kind, x, y, steps | null }] }.
+ */
+export function reachRoutes(street, arrival, opts = {}) {
+  const built = buildReachGraph(street, { ...opts, keepSpecs: true });
+  const { world, graph: g, landingNode } = built;
+  const snapped = resolveGround(world.col(arrival.x), arrival.x, arrival.y, 0, 12);
+  const r = runArc(world, { x: arrival.x, y: arrival.y, vx: 0, vy: 0, onGround: false }, { maxFrames: 240 });
+  let start = r.landed ? landingNode(r.landed.x, r.landed.y) : -1;
+  if (start < 0 && snapped) start = landingNode(arrival.x, snapped.y);
+  const targets = streetTargets(street);
+  if (start < 0) return { start: null, routes: targets.map((t) => ({ id: t.id, kind: t.kind, x: t.x, y: t.y, steps: null })) };
+  // Dijkstra: walking costs its length (1 a 200 px), a jump to another floor 1, a tight one 6.
+  const n = g.x.length;
+  const cost = new Float64Array(n).fill(Infinity);
+  const via = new Int32Array(n).fill(-1);
+  const done = new Uint8Array(n);
+  cost[start] = 0;
+  const heap = [[0, start]];
+  const fwd = g.fwd;
+  while (heap.length) {
+    let bi = 0;
+    for (let i = 1; i < heap.length; i += 1) if (heap[i][0] < heap[bi][0]) bi = i;
+    const [c, a] = heap[bi];
+    heap[bi] = heap[heap.length - 1];
+    heap.pop();
+    if (done[a]) continue;
+    done[a] = 1;
+    for (let k = fwd.start[a]; k < fwd.start[a + 1]; k += 1) {
+      const b = fwd.adj[k];
+      const e = fwd.eid[k];
+      const d = g.detail[e];
+      // A hop along one floor is never needed where walking does: it costs more than any walk.
+      const w = d ? (g.margin[e] < 1 ? 6 : g.line[a] === g.line[b] && g.kind[a] === 's' ? 30 : 1) : Math.abs(g.x[b] - g.x[a]) / 200 + 0.01;
+      if (c + w < cost[b]) {
+        cost[b] = c + w;
+        via[b] = e;
+        heap.push([c + w, b]);
+      }
+    }
+  }
+  const ladderNode = new Map(built.ladders.map((l) => [l.id, l.node]));
+  const routes = targets.map((t) => {
+    const reachX = t.kind === 'door' ? t.w / 2 + DOOR_REACH_X : POST_REACH_X;
+    let best = -1;
+    for (let i = 0; i < n; i += 1) {
+      if (g.kind[i] !== 's' || !Number.isFinite(cost[i])) continue;
+      if (Math.abs(g.x[i] - t.x) <= (t.buried ? 110 : reachX) && (t.buried || (g.y[i] >= t.y - t.h && g.y[i] <= t.y + POST_BELOW))) {
+        if (best < 0 || cost[i] + Math.abs(g.x[i] - t.x) / 200 < cost[best] + Math.abs(g.x[best] - t.x) / 200) best = i;
+      }
+    }
+    if (best < 0 && t.ladder != null && Number.isFinite(cost[ladderNode.get(t.ladder)])) best = ladderNode.get(t.ladder);
+    if (best < 0) return { id: t.id, kind: t.kind, x: t.x, y: t.y, steps: null };
+    const edges = [];
+    for (let v = best; v !== start && via[v] >= 0; v = g.from[via[v]]) edges.push(via[v]);
+    edges.reverse();
+    const steps = [];
+    for (const e of edges) {
+      const d = g.detail[e];
+      const b = g.to[e];
+      if (!d) {
+        const last = steps[steps.length - 1];
+        if (last?.kind === 'walk') { last.x = g.x[b]; last.y = g.y[b]; } else steps.push({ kind: 'walk', x: g.x[b], y: g.y[b] });
+        continue;
+      }
+      steps.push({ ...d, from: undefined, to: undefined, x: d.x ?? g.x[g.from[e]], y: d.y ?? g.y[g.from[e]], toX: g.x[b], toY: g.y[b] });
+    }
+    // End beside the exit.
+    if (g.kind[best] === 's') steps.push({ kind: 'walk', x: Math.max(g.x[best] - 20, Math.min(g.x[best] + 20, t.x)), y: g.y[best] });
+    return { id: t.id, kind: t.kind, x: t.x, y: t.y, steps };
+  });
+  return { start: { x: g.x[start], y: g.y[start] }, routes };
 }

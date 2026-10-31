@@ -8,8 +8,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { GAME_DIR } from '../repos.mjs';
 import { GRAVITY, JUMP_SPEED, WALK_MAX, FLOOR_ACCEL, AIR_ACCEL_RATIO, STREET_PHYSICS_TERMINAL_VY, AVATAR_BODY_H, GROUND_SNAP, NORMAL_BUFF } from '../../public/js/avatar-step.js?v=c04c7c76';
-import { RULES, LIMITS, MIN_VIEW, PARALLAX_VIEW, LICENCES, plainApex } from '../../public/js/builder/validate.js?v=1705a409';
-import { REACH_LIMITS, POST_REACH_X, POST_BELOW, DOOR_REACH_X, TIGHT_MARGIN, streetWorld, jumpArc } from '../../public/js/builder/reach-graph.js?v=6f7512af';
+import { RULES, LIMITS, MIN_VIEW, PARALLAX_VIEW, LICENCES, plainApex } from '../../public/js/builder/validate.js?v=faa3883f';
+import { REACH_LIMITS, POST_REACH_X, POST_BELOW, DOOR_REACH_X, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetWorld, jumpArc } from '../../public/js/builder/reach-graph.js?v=0eb97168';
 import { OP_NAMES } from '../../public/js/builder/ops.js?v=acf30407';
 import { LAYER_ROLES } from '../../public/js/builder/layer-role.js?v=e585f610';
 import { POPULATION_CLASSES } from '../../public/js/builder/zone.js?v=6a3db28e';
@@ -62,7 +62,25 @@ export function builderGuide() {
       runningJump: runningJumpLength(),
       rule: 'Keep a ledge you must jump to at most 100 px over the floor you jump from (8 px of margin under the 105 px apex), or add a ladder.',
     },
-    reach: { signpostX: POST_REACH_X, signpostBelow: POST_BELOW, doorX: DOOR_REACH_X, tightMargin: TIGHT_MARGIN, limits: REACH_LIMITS },
+    reach: {
+      signpostX: POST_REACH_X, signpostBelow: POST_BELOW, doorX: DOOR_REACH_X, tightMargin: TIGHT_MARGIN, limits: REACH_LIMITS,
+      keyboard: { takeoffs: LANDING_TRIES, airJumpFrames: AIR_JUMP_TRIES, tightUnder: LANDING_SHARE, words: 'A jump onto another floor is tried again from takeoffs up to 12 px early or late (an air jump 1 to 3 frames early or late); fewer than 60% landing is a tight jump (PHY-006). Leave a landing 15 px or more from a ledge\'s ends.' },
+    },
+    posts: {
+      words: 'A signpost stands on the floor line under it (a fork\'s Tiny Speck posts may stand up to 48 px over theirs). Moving a line carries the posts on it (set --no-carry keeps them); PHY-009 names a post off its floor.',
+      cli: ['arrivals --posts', 'set <street>/<plat> y1=-150 y2=-150', 'connect a b --a-at 900 --a-floor lowest'],
+    },
+    playtest: {
+      words: 'Play a draft in the real game: /play/?practice=1&autostart=1&draft=<id>&street=<key> (an administrator\'s session; never a builder key). Quest offers never open in a draft play-test (add &questoffer=now to see them). The real save is never touched.',
+      script: 'node tools/builder/playtest.mjs --draft <id> [--street k] [--json] [--game <checkout>/public] [--shots <dir>]: walks to every signpost and door the way the validator says a keyboard player can, with real key presses, and reports which it reached (exit 1 on a miss).',
+      hooks: {
+        'groddleQA.snapshot()': 'street {tsid, label}, player {x, y, vx, vy, onGround, climbing}, busy, signposts [{x, y, to, tsid}], interactables',
+        'groddleQA.idleState()': 'the avatar\'s x, y, vx, vy, onGround and climbing, cheap enough to read every frame',
+        'groddleQA.placeAvatar(x, y)': 'set the avatar down at a screen-space spot (the street\'s top-left is 0, 0; world x - bounds.l, world y - bounds.t)',
+        'groddleQA.streetDeco(id)': 'a placed deco as drawn',
+      },
+      keys: 'window KeyboardEvents by e.key: ArrowLeft, ArrowRight, " " (jump), ArrowUp (jump, or climb at a ladder); press on one requestAnimationFrame, it acts on the next',
+    },
     layerRoles: roles,
     flipped: world.flipped,
     rotated: world.rotated,

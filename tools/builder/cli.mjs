@@ -308,6 +308,26 @@ export function kindOf(street, id) {
   return null;
 }
 
+/**
+ * PURE: the floor a new signpost stands on at world x (world y), or null: `floor` is `highest`
+ * (the default, as P4 placed posts), `lowest`, or a line id (its height at x; refused off its span).
+ */
+export function floorAt(street, wx, floor = 'highest') {
+  if (!floor || floor === 'highest') return highestFloorAt(street, wx);
+  const sx = wx - street.bounds.l;
+  const ys = [];
+  for (const p of platformsScreen(street)) {
+    if (!isStandable(p)) continue;
+    if (floor !== 'lowest' && p.id !== floor) continue;
+    const lo = Math.min(p.x1, p.x2);
+    const hi = Math.max(p.x1, p.x2);
+    if (sx < lo || sx > hi) continue;
+    ys.push(p.x2 === p.x1 ? Math.min(p.y1, p.y2) : p.y1 + ((sx - p.x1) / (p.x2 - p.x1)) * (p.y2 - p.y1));
+  }
+  if (!ys.length) return null;
+  return Math.round(Math.max(...ys) + street.bounds.t);
+}
+
 /** PURE: the highest standable floor at world x (world y), or null. */
 export function highestFloorAt(street, wx) {
   const sx = wx - street.bounds.l;
@@ -398,17 +418,32 @@ export function placeOps(zone, { street: key, layer = 'middleground', sprite, x,
 }
 
 /**
+ * PURE (P7): a note when the zone's own art goes on a layer with colour filters. Templates give
+ * back layers the filters Tiny Speck's art carries there (the Tall template's sky: brightness -14,
+ * contrast -18, saturation -43), made for Tiny Speck's painted colours; they wash out new art drawn
+ * to look right as it is. Null when there is nothing to say.
+ */
+export function newArtFilterNote(zone, key, layerId, sprite) {
+  if (typeof sprite !== 'string' || !sprite.startsWith('gz_')) return null;
+  const layer = (zone.streets || []).find((s) => s.key === key)?.street?.layers?.find((l) => l.id === layerId);
+  const f = layer?.filters || {};
+  const on = Object.entries(f).filter(([k, v]) => ['brightness', 'contrast', 'saturation'].includes(k) && Number(v) !== 0);
+  if (!on.length) return null;
+  return `layer ${layerId} carries ${on.map(([k, v]) => `${k} ${v}`).join(', ')}, made for Tiny Speck's art; it will dim and wash out ${sprite}. Render it to see, and soften or clear them: set ${key}/${layerId} filters='${JSON.stringify(Object.fromEntries(on.map(([k, v]) => [k, Math.round(Number(v) / 2)])))}' (or filters= to remove).`;
+}
+
+/**
  * PURE: two-way signposts between two of the zone's streets (spec 8.7 `connect`): a post at each
  * facing end (A's right end, B's left end) on the highest floor there, unless posts are named; the
  * arms carry the target's label and hub, and arrive where build-street-navigation.mjs would put them.
  */
-export function connectOps(zone, a, b, { aPost = null, bPost = null } = {}) {
+export function connectOps(zone, a, b, { aPost = null, bPost = null, aAt = null, bAt = null, aFloor = null, bFloor = null } = {}) {
   const A = streetOf(zone, a);
   const B = streetOf(zone, b);
   if (A === B) throw new CliError('Connect two different streets.');
   const work = clone(zone);
   const posts = [];
-  const place = (rowKey, other, end, named) => {
+  const place = (rowKey, other, end, named, at = null, floor = null) => {
     const row = streetOf(work, rowKey);
     const s = row.street;
     const target = streetOf(work, other).street;
@@ -419,15 +454,17 @@ export function connectOps(zone, a, b, { aPost = null, bPost = null } = {}) {
       posts.push({ street: rowKey, id: named, existing: true });
       return;
     }
-    const x = end === 'right' ? s.bounds.r - 150 : s.bounds.l + 150;
-    const y = highestFloorAt(s, x);
-    if (y === null) throw new CliError(`Street "${rowKey}" has no floor at x ${x} for a signpost.`, { code: 'builder_invalid' });
+    // P7: --a-at / --b-at put the post at an x, and --a-floor / --b-floor pick its floor there.
+    const x = at != null ? Math.round(at) : end === 'right' ? s.bounds.r - 150 : s.bounds.l + 150;
+    if (x < s.bounds.l || x > s.bounds.r) throw new CliError(`x ${x} is off street "${rowKey}" (${s.bounds.l} to ${s.bounds.r}).`);
+    const y = floorAt(s, x, floor || 'highest');
+    if (y === null) throw new CliError(floor && !['highest', 'lowest'].includes(floor) ? `Line ${floor} on street "${rowKey}" does not run under x ${x}.` : `Street "${rowKey}" has no floor at x ${x} for a signpost.`, { code: 'builder_invalid' });
     const id = nextGeometryId(s, 'signpost');
     applyOp(work, { op: 'signpost.add', street: rowKey, signpost: { id, x, y, w: POST_W, h: POST_H, connects: [arm] } });
     posts.push({ street: rowKey, id, existing: false });
   };
-  place(a, b, 'right', aPost);
-  place(b, a, 'left', bPost);
+  place(a, b, 'right', aPost, aAt, aFloor);
+  place(b, a, 'left', bPost, bAt, bFloor);
   // Now each post links back, the arrivals can be worked out on the target.
   const ops = [];
   for (const p of posts) {
@@ -652,7 +689,7 @@ export const HELP = `Groddle level builder (docs/level-builder/spec.md 8.2)
   rm <street>[/<id>[/<arm>]]
   platform --street k --from x,y --to x,y [--perm floor|roof|soft|hard]
   wall --street k --x --y --h [--perm]   ladder --street k --x --y --h [--w] [--tiling wood|stone|none]   signpost --street k --x --y [--w --h]
-  connect <streetA> <streetB> [--a-post id] [--b-post id]
+  connect <streetA> <streetB> [--a-post id] [--b-post id] [--a-at x] [--b-at x] [--a-floor highest|lowest|<line>] [--b-floor ...]
   arrivals [--street k] [--posts]             work every arm's arrival out again (after moving a post or its floor);
                                               --posts first stands floating or sunk signposts on their floor
   link-world <street> --from <shipped tsid> [--post id] [--back id]   (a post with room: the game shows four arms)
@@ -668,6 +705,7 @@ export const HELP = `Groddle level builder (docs/level-builder/spec.md 8.2)
   render --street k [--view full|camera] [--x --y --w --h] [--scale 0.25] [--overlay geometry,reach,findings,grid] [--layers a,b] --out f.png
   assets                                      the draft's new art: kept size, trim, intake warnings
   asset add <file> --name gz_x --licence own-work-CC0|ai-generated --author A [--tool --prompt --inputs a,b --role --file3 f]
+  asset add <file> <file> ... [--names a,b] --licence ... --author A   several at once (names from the files; x@1.5x.png is x's 3x)
   play [--street k]   history   restore <rev>
   publish [<id> --rev n | file:<zone.json>] --dry-run | --write [--art <folder>] [--ack fp|rule|all] [--no-build]
                                               into this checkout's files (spec 11); never commits. A draft's new
@@ -802,7 +840,9 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
     case 'place': {
       const t = target();
       let id;
+      let note = null;
       const r = await t.write((zone) => {
+        note = newArtFilterNote(zone, flags.street, typeof flags.layer === 'string' ? flags.layer : 'middleground', flags.sprite);
         const p = placeOps(zone, {
           street: flags.street, layer: typeof flags.layer === 'string' ? flags.layer : 'middleground', sprite: flags.sprite,
           x: num(flags.x, 'x'), y: num(flags.y, 'y'), w: num(flags.w, 'w', { optional: true }), h: num(flags.h, 'h', { optional: true }),
@@ -811,7 +851,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
         id = p.id;
         return p.ops;
       }, `place ${flags.sprite}`);
-      return wrote(r, { id: `${flags.street}/${id}` }, `${flags.street}/${id}`);
+      return wrote(r, { id: `${flags.street}/${id}`, ...(note ? { note } : {}) }, `${flags.street}/${id}${note ? `\n  note: ${note}` : ''}`);
     }
 
     case 'set': {
@@ -868,7 +908,11 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       if (args.length < 2) throw new CliError('connect <streetA> <streetB>');
       let posts;
       const r = await target().write((zone) => {
-        const c = connectOps(zone, args[0], args[1], { aPost: flags['a-post'] || null, bPost: flags['b-post'] || null });
+        const c = connectOps(zone, args[0], args[1], {
+          aPost: flags['a-post'] || null, bPost: flags['b-post'] || null,
+          aAt: num(flags['a-at'], 'a-at', { optional: true }) ?? null, bAt: num(flags['b-at'], 'b-at', { optional: true }) ?? null,
+          aFloor: typeof flags['a-floor'] === 'string' ? flags['a-floor'] : null, bFloor: typeof flags['b-floor'] === 'string' ? flags['b-floor'] : null,
+        });
         posts = c.posts;
         return c.ops;
       }, `connect ${args[0]} ${args[1]}`);
@@ -1014,7 +1058,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       let report;
       let rev;
       if (local()) {
-        const { validateZone } = await import('../../public/js/builder/validate.js?v=1705a409');
+        const { validateZone } = await import('../../public/js/builder/validate.js?v=faa3883f');
         const { loadValidatorContext } = await import('./validator-context.mjs');
         const zone = readJson(resolve(flags.file));
         rev = zone.rev;
@@ -1089,23 +1133,54 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
     }
 
     case 'asset': {
-      if (args[0] !== 'add' || !args[1] || !existsSync(args[1])) throw new CliError('asset add <file> --name gz_x --licence own-work-CC0|ai-generated --author A');
+      // P7: several files in one call. Each goes through intake (POST assets, one at a time), then
+      // their asset.set ops go into the draft as one batch. With more than one file, each name is
+      // gz_ (gz_ai_ for ai-generated) plus the file's base name, unless --names gives them; a
+      // <base>@1.5x.<ext> beside a file is sent as its 3x.
+      const files = args.slice(1);
+      if (args[0] !== 'add' || !files.length || files.some((f) => !existsSync(f))) throw new CliError('asset add <file> [<file> ...] --name gz_x (one file) | --names a,b (several) --licence own-work-CC0|ai-generated --author A');
       const id = draftId();
-      const body = {
-        draft: id,
-        name: flags.name,
-        file2: readFileSync(args[1]).toString('base64'),
-        licence: flags.licence,
-        author: flags.author,
-        ...(typeof flags.file3 === 'string' ? { file3: readFileSync(flags.file3).toString('base64') } : {}),
-        ...(typeof flags.tool === 'string' ? { tool: flags.tool } : {}),
-        ...(typeof flags.prompt === 'string' ? { prompt: flags.prompt } : {}),
-        ...(typeof flags.inputs === 'string' ? { inputs: flags.inputs.split(',').map((s) => s.trim()).filter(Boolean) } : {}),
-        ...(typeof flags.role === 'string' ? { role: flags.role } : {}),
+      const names = typeof flags.names === 'string' ? flags.names.split(',').map((x) => x.trim()) : null;
+      if (names && names.length !== files.length) throw new CliError(`--names gives ${names.length} names for ${files.length} files.`);
+      if (files.length === 1 && !names && typeof flags.name !== 'string') throw new CliError('Name the art: --name gz_x.');
+      const nameOf = (f, i) => {
+        if (names) return names[i];
+        if (files.length === 1) return flags.name;
+        const base = basename(f).replace(/@1\.5x/, '').replace(/\.[a-z0-9]+$/i, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+        const prefix = flags.licence === 'ai-generated' ? 'gz_ai_' : 'gz_';
+        return base.startsWith('gz_') ? base : `${prefix}${base.replace(/^ai_/, '')}`;
       };
-      const { data } = await client.call('POST', '/assets', { body });
-      const r = await draftTarget(client, id).write(() => [data.op], `asset ${flags.name}`);
-      return wrote(r, { asset: data.asset, report: data.report }, `${flags.name} kept (${data.asset.sha256.slice(0, 12)})`);
+      const kept = [];
+      for (const [i, f] of files.entries()) {
+        const name = nameOf(f, i);
+        const sibling = f.replace(/(\.[a-z0-9]+)$/i, '@1.5x$1');
+        const file3 = files.length === 1 && typeof flags.file3 === 'string' ? flags.file3 : sibling !== f && existsSync(sibling) ? sibling : null;
+        const body = {
+          draft: id,
+          name,
+          file2: readFileSync(f).toString('base64'),
+          licence: flags.licence,
+          author: flags.author,
+          ...(file3 ? { file3: readFileSync(file3).toString('base64') } : {}),
+          ...(typeof flags.tool === 'string' ? { tool: flags.tool } : {}),
+          ...(typeof flags.prompt === 'string' ? { prompt: flags.prompt } : {}),
+          ...(typeof flags.inputs === 'string' ? { inputs: flags.inputs.split(',').map((x) => x.trim()).filter(Boolean) } : {}),
+          ...(typeof flags.role === 'string' ? { role: flags.role } : {}),
+        };
+        try {
+          const { data } = await client.call('POST', '/assets', { body });
+          kept.push({ name, data });
+        } catch (e) {
+          if (!kept.length || files.length === 1) throw e;
+          // The ones taken so far still go in; say which one stopped it.
+          e.message = `${name} (${basename(f)}) was refused: ${e.message} The ${kept.length} before it go into the draft.`;
+          const r = await draftTarget(client, id).write(() => kept.map((k) => k.data.op), `assets ${kept.map((k) => k.name).join(', ')}`);
+          throw new CliError(e.message, { code: e.code, status: e.status, data: { ...(e.data || {}), rev: r.rev, kept: kept.map((k) => k.name) } });
+        }
+      }
+      const r = await draftTarget(client, id).write(() => kept.map((k) => k.data.op), files.length === 1 ? `asset ${kept[0].name}` : `assets ${kept.map((k) => k.name).join(', ')}`);
+      if (files.length === 1) return wrote(r, { asset: kept[0].data.asset, report: kept[0].data.report }, `${kept[0].name} kept (${kept[0].data.asset.sha256.slice(0, 12)})`);
+      return wrote(r, { assets: kept.map((k) => ({ name: k.name, sha256: k.data.asset.sha256, warnings: (k.data.report?.findings || []).filter((x) => x.severity === 'warn').map((x) => x.code || x.message) })) }, `${kept.length} pieces kept: ${kept.map((k) => k.name).join(', ')}`);
     }
 
     case 'play': {
@@ -1160,10 +1235,11 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       } finally {
         if (fetched) rmSync(art, { recursive: true, force: true });
       }
-      if (fetched) r.notes.unshift(`Fetched ${plural(fetched.length, 'piece')} of new art with the key (${fetched.filter((f) => f.three).length} with a 3x file).`);
+      const fetchedNote = fetched ? `Fetched ${plural(fetched.length, 'piece')} of new art with the key (${fetched.filter((f) => f.three).length} with a 3x file).` : null;
+      if (fetchedNote) r.notes.unshift(fetchedNote);
       const head = `${zone.title || zone.id} (${zone.id}, rev ${zone.rev ?? '?'}): ${plural(r.report?.counts?.fatal ?? 0, 'fatal')}, ${plural(r.report?.counts?.error ?? 0, 'error')}, ${plural(r.report?.counts?.warn ?? 0, 'warning')}, ${plural(r.report?.counts?.info ?? 0, 'note')}`;
       if (!r.ok) {
-        throw new CliError([`Not published. ${head}`, ...r.refused.map((x) => `  - ${x}`)].join('\n'), { code: 'builder_publish_refused', data: { refused: r.refused, counts: r.report?.counts || null }, exit: 1 });
+        throw new CliError([`Not published. ${head}`, ...r.refused.map((x) => `  - ${x}`), ...(fetchedNote ? [`  (${fetchedNote})`] : [])].join('\n'), { code: 'builder_publish_refused', data: { refused: r.refused, counts: r.report?.counts || null, ...(fetched ? { fetched: fetched.length } : {}) }, exit: 1 });
       }
       const ran = write && flags.build !== 'no' && flags['no-build'] !== true ? afterPublish(r.changed) : [];
       const verb = write ? 'Published' : 'Would publish';

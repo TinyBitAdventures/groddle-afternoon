@@ -28,7 +28,7 @@
  *   profiles     assets/content/style-profiles.json, for the STY rules (P5's js/builder/style-rules.js)
  */
 import { compileSchema } from './schema-check.js?v=cc9d1af4';
-import { reachStreet, REACH_LIMITS, TIGHT_MARGIN, streetBuff } from './reach-graph.js?v=6f7512af';
+import { reachStreet, REACH_LIMITS, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetBuff } from './reach-graph.js?v=0eb97168';
 import { platformsScreen, barriersScreen, isStandable, isSolidFromBelow, isItemFloor, assertStreetGeometry, avatarHeadReach, platformYAt, worldToScreen, streetWidth, streetHeight } from '../street-model.js?v=23b926e5';
 import { planStreetPlacements, populationForStreet } from '../street-ecology.js?v=7e30da8f';
 import { JUMP_SPEED } from '../avatar-step.js?v=c04c7c76';
@@ -323,8 +323,21 @@ export function reachFindings(key, street, arrivals, { want = () => true, reach 
       }, closest && closest.rise > 0
         ? `The nearest place you can stand is ${closest.rise} px under it. Lower its ledge to 100 px or less over a floor you can reach, or add a ladder.`
         : 'Add a floor, a ledge within a jump, or a ladder up to it.');
-    } else if (t.reached && t.margin >= 0 && t.margin < TIGHT_MARGIN) {
-      add('PHY-006', t.id, `${t.kind === 'door' ? 'Door' : 'Signpost'} ${t.id} needs a jump with only ${Math.round(t.margin)} px to spare.`, pt(t.x, t.y), { margin: Math.round(t.margin * 10) / 10 }, 'Lower the ledge or close the gap by at least 8 px.');
+    } else if (t.reached && t.margin >= 0 && t.margin < 1) {
+      // The route's tightest jump: too little height to spare, or (P7) a landing so near a ledge's
+      // end that a keyboard player's takeoff, a few px early or late, misses it.
+      const j = t.tight || {};
+      const what = t.kind === 'door' ? `Door ${t.id}` : `Signpost ${t.id}`;
+      const rise = Number.isFinite(j.rise) ? Math.round(j.rise * 10) / 10 : null;
+      const share = Number.isFinite(j.share) ? j.share : null;
+      const byHeight = rise != null && rise / TIGHT_MARGIN <= (share == null ? Infinity : share / LANDING_SHARE);
+      const from = Number.isFinite(j.x) ? ` (the ${j.air ? 'walk-off and air jump' : `${j.run ? 'running ' : ''}jump`} from ${round(j.x)}, ${round(j.y)} to ${round(j.lx)}, ${round(j.ly)})` : '';
+      const tries = j.air ? `of air jumps pressed up to 3 frames early or late, ${Math.round((share ?? 0) * AIR_JUMP_TRIES.length)} in ${AIR_JUMP_TRIES.length}` : `of takeoffs up to 12 px early or late, ${Math.round((share ?? 0) * LANDING_TRIES.length)} in ${LANDING_TRIES.length}`;
+      add('PHY-006', t.id, byHeight
+        ? `${what} needs a jump with only ${Math.round(rise)} px to spare${from}.`
+        : `${what} needs a landing a keyboard player often misses${from}: ${tries} land on ${j.line || 'that ledge'}.`,
+      pt(t.x, t.y), { margin: rise, landing: share == null ? null : Math.round(share * 100) / 100, kind: byHeight ? 'height' : 'landing', line: j.line ?? null, air: Boolean(j.air), from: Number.isFinite(j.x) ? { x: round(j.x), y: round(j.y) } : null, to: Number.isFinite(j.lx) ? { x: round(j.lx), y: round(j.ly) } : null, run: Boolean(j.run), dir: j.dir ?? 0 },
+      byHeight ? 'Lower the ledge or close the gap by at least 8 px.' : 'Widen the ledge it lands on, or move it so the jump lands 15 px or more from its ends.');
     }
   }
   // PHY-005: places you can get to and never leave.
