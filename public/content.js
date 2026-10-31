@@ -15,7 +15,7 @@ import {
 import {
   quoteTrantCare,
   performTrantCare,
-} from './js/trant-care.js?v=f4b16c76';
+} from './js/trant-care.js?v=1eff5718';
 import {
   listPlantableSeeds,
   waterAllPlots,
@@ -28,7 +28,7 @@ import {
   hasWateringCan,
   hasHoe,
   plotStatusLabel,
-} from './js/garden.js?v=9a8f8f72';
+} from './js/garden.js?v=175e782f';
 import {
   ROCK_CATALOG,
   MINING_COSTS,
@@ -38,18 +38,18 @@ import {
   findWorkingPick,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=a7eb8740';
+} from './js/mining.js?v=15c7bd6e';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=756d53d3';
+} from './js/animals.js?v=3fbbca52';
 import {
   quoteAnimalKinship,
   performAnimalKinship,
   highestAnimalKinshipRank,
-} from './js/animal-kinship.js?v=23f74bb3';
+} from './js/animal-kinship.js?v=91490913';
 import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,
@@ -61,8 +61,8 @@ import {
   quoteWoodTreeHarvest,
   harvestWoodTree,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=df8a49be';
-import { findWorkingRookTool } from './js/rook-woods.js?v=a77b5fe9';
+} from './js/woodcutting.js?v=58743072';
+import { findWorkingRookTool } from './js/rook-woods.js?v=3bc5c6ae';
 import {
   HERDKEEPING,
   INCUBATION,

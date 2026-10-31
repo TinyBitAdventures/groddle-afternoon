@@ -300,6 +300,14 @@ export function normalizeSlice(slice) {
       items,
       currants: n0(hold.currants),
     };
+    // Each held tool's own wear (js/tools.js copies), so it comes back as it went in.
+    const points = {};
+    for (const [c, list] of Object.entries(hold.points || {})) {
+      if (!items[c] || !Array.isArray(list)) continue;
+      const clean = list.slice(0, items[c]).map((r) => n0(r));
+      if (clean.length) points[c] = clean;
+    }
+    if (Object.keys(points).length) h.points = points;
   }
   const applied = (Array.isArray(slice?.applied) ? slice.applied : []).filter((t) => typeof t === 'string' && t.length <= 40).slice(-APPLIED_KEEP);
   return { hold: h, applied };

@@ -70,6 +70,7 @@
 import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js?v=616c0568';
 import { getQuestCatalog } from './content-catalogs.js?v=10b118dd';
 import { levelInfoForXp } from './progression.js?v=33462eaa';
+import { brokenToolCopies } from './tools.js?v=93286603';
 import { offerableMultiplayerQuest } from './quests-mp.js?v=2beb658a';
 import {
   assignQuest,
@@ -1287,11 +1288,14 @@ export function toolBreakEvents(previous, toolState) {
   const broken = {};
   const events = [];
   for (const [classTsid, row] of Object.entries(toolState?.condition || {})) {
-    const isBroken = row?.broken === true || Number(row?.remaining) <= 0;
-    broken[classTsid] = isBroken;
-    if (!previous || !isBroken || previous[classTsid] === true) continue;
-    events.push(`tool_broke:${classTsid}`);
-    if (classTsid === 'irrigator_9000') events.push('tool_broke:watering_can');
+    // Each tool held breaks on its own (js/tools.js copies): one event per tool that broke since.
+    const n = brokenToolCopies(row);
+    broken[classTsid] = n;
+    const before = previous ? Number(previous[classTsid] === true ? 1 : previous[classTsid]) || 0 : n;
+    for (let k = before; k < n; k += 1) {
+      events.push(`tool_broke:${classTsid}`);
+      if (classTsid === 'irrigator_9000') events.push('tool_broke:watering_can');
+    }
   }
   return { events, broken };
 }

@@ -19,8 +19,9 @@ import { HOME_POOL_REFRESH_MS, collectAmount, normalizePool, poolView } from '..
 import { homePoolMpFeature } from '../public/js/features/home-pool-mp-feature.js?v=575920f2';
 import { CULTIVATION_REWARDS_CAP, imgRewards, imgRewardLine } from '../public/js/magic-rock-home.js?v=39921139';
 import { DROP_TEXT, eatenStack, normalizeGroundStack, pigAnimalKey } from '../public/js/drops-mp.js?v=00490802';
-import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=be5487b4';
+import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=86fad7da';
 import { GAME_DAY_MS, GAME_EPOCH_MS, getGameDayKey } from '../public/js/game-day.js?v=3095e05b';
+import { normalizeToolConditionState } from '../public/js/tools.js?v=93286603';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
@@ -132,7 +133,7 @@ describe('the game shows the site\'s pool (home-pool-mp)', () => {
   });
 
   it('the rock hands over the site\'s amount in multiplayer, after the site marked the day', async () => {
-    const { homesFeature } = await import('../public/js/features/homes-feature.js?v=b8cbec16');
+    const { homesFeature } = await import('../public/js/features/homes-feature.js?v=61ee8fba');
     homesFeature.restore({ decor: {}, cult: {}, magicRock: { cultivate: 'cultivate_complete', changestyle: 'howto_shown', expand: 'howto_shown' } });
     const beats = [];
     const data = {};
@@ -213,15 +214,25 @@ describe('G332: street Piggies eat food dropped for everyone, and the drop promp
 describe('G332: a tool picked up while away keeps its wear (site LedgerDrop.php)', { skip: skipSite }, () => {
   const drop = (body) => php(['LedgerMath', 'LedgerDrop'], `use Groddle\\Minn\\LedgerDrop as D; ${body}`);
 
-  it('sets the stored save\'s tool condition as the game\'s pickup does', () => {
+  it('sets the stored save\'s tool condition as the game\'s pickup does: each tool its own wear', () => {
     const state = JSON.stringify({ inventory: { pick: 0 }, systems: { tools: { condition: { pick: { remaining: 90, broken: false, uses: 3, repairs: 0 } } } } });
     const entries = `['playerState' => ${JSON.stringify(state).replace(/\$/g, '\\$')}]`;
-    const first = drop(`echo json_encode(json_decode(D::withToolPoints(${entries}, 'pick', 40, false)['playerState'])->systems->tools->condition->pick);`);
-    assert.deepEqual(first, { remaining: 40, broken: false, uses: 3, repairs: 0 }, 'a first one takes the stack\'s wear');
-    const more = drop(`echo json_encode(json_decode(D::withToolPoints(${entries}, 'pick', 95, true)['playerState'])->systems->tools->condition->pick);`);
-    assert.equal(more.remaining, 90, 'one more keeps the more worn (drops-mp-feature apply)');
-    const fresh = drop(`echo json_encode(json_decode(D::withToolPoints(['playerState' => '{"inventory":{}}'], 'hoe', 0, false)['playerState'])->systems->tools->condition->hoe);`);
-    assert.deepEqual(fresh, { remaining: 0, broken: true, uses: 0, repairs: 0 });
+    const first = drop(`echo json_encode(json_decode(D::withToolPoints(${entries}, 'pick', 40, 0)['playerState'])->systems->tools->condition->pick);`);
+    assert.deepEqual(first, { remaining: 40, broken: false, uses: 3, repairs: 0, copies: [40] }, 'a first one takes the stack\'s wear');
+    // Ticket 12: one more keeps its own wear, and the one held keeps its own (an older save's value is the first's).
+    const more = drop(`echo json_encode(json_decode(D::withToolPoints(${entries}, 'pick', 95, 1)['playerState'])->systems->tools->condition->pick);`);
+    assert.deepEqual(more.copies, [90, 95]);
+    assert.equal(more.remaining, 90, 'the first one is in use (tool_base isWorking, findFirst)');
+    const copies = JSON.stringify({ inventory: { pick: 2 }, systems: { tools: { condition: { pick: { copies: [0, 70], remaining: 70, broken: false, uses: 9, repairs: 1 } } } } });
+    const two = drop(`echo json_encode(json_decode(D::withToolPoints(['playerState' => ${JSON.stringify(copies).replace(/\$/g, '\\$')}], 'pick', 12, 2, 2)['playerState'])->systems->tools->condition->pick);`);
+    assert.deepEqual(two, { copies: [0, 70, 12, 12], remaining: 70, broken: false, uses: 9, repairs: 1 }, 'a broken one stays broken, the picked-up two take the stack\'s points');
+    const held = drop(`echo json_encode(json_decode(D::withToolPoints(['playerState' => '{"inventory":{"hoe":2}}'], 'hoe', 5, 2)['playerState'])->systems->tools->condition->hoe);`);
+    assert.deepEqual(held.copies, [null, null, 5], 'tools held with no wear of their own are new (full)');
+    const fresh = drop(`echo json_encode(json_decode(D::withToolPoints(['playerState' => '{"inventory":{}}'], 'hoe', 0, 0)['playerState'])->systems->tools->condition->hoe);`);
+    assert.deepEqual(fresh, { uses: 0, repairs: 0, copies: [0], remaining: 0, broken: true });
+    // The game reads what the site wrote: null is a full tool.
+    const read = normalizeToolConditionState({ condition: { pick: { copies: [null, 7] } } });
+    assert.deepEqual(read.condition.pick.copies, [100, 7]);
     assert.deepEqual(drop(`echo json_encode([D::isTake('${OP}-t'), D::isTake('${OP}'), D::isTake('gift-00000000000000a1-t')]);`), [true, false, false]);
     const ledger = readFileSync(sitePath('src/Ledger.php'), 'utf8');
     assert.match(ledger, /LedgerDrop::isTake\(\$p\['trade'\]\) => LedgerDrop::catchUp\(\$this->db, \$entries, \$user, \$p\)/);

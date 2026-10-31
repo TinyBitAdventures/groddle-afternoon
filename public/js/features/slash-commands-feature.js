@@ -29,9 +29,9 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=814ee05f';
-import { butlerApi } from './butler-feature.js?v=f4c3a2d4';
+import { butlerApi } from './butler-feature.js?v=0f849c03';
 import { hellFeature } from './hell-feature.js?v=2d9958f9';
-import { towerApi } from './home-tower-feature.js?v=cac1af1a';
+import { towerApi } from './home-tower-feature.js?v=fd5a4171';
 import { slashPlan, unknownLine } from '../slash-commands.js?v=23e13b20';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';
 import { minnUrls } from '../minn-account.js?v=81339760';

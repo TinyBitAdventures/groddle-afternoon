@@ -456,6 +456,31 @@ export function layoutPack(inv, prefs = null, opts = {}) {
 }
 
 /**
+ * Where each unit of a class sits, in the order the source looks for one:
+ * bag.js findFirst 672-694 walks the pack's slots in order and a bag's
+ * contents where the bag sits (players/inc_items.js items_find_working_tool
+ * 729-732). One entry per unit ({ container, index }); what the magic rock
+ * holds comes after. js/tools.js keeps a tool's wear per unit in this order.
+ */
+export function unitPlaces(layout, cls) {
+  const out = [];
+  const add = (container, slot, index) => {
+    if (slot?.kind !== 'stack' || slot.cls !== cls) return;
+    for (let k = 0; k < Math.max(1, Math.floor(Number(slot.count) || 1)); k += 1) out.push({ container, index });
+  };
+  (layout?.pack?.slots || []).forEach((slot, i) => {
+    if (slot.kind === 'bag') (layout.bags?.[slot.key]?.slots || []).forEach((inner, j) => add(slot.key, inner, j));
+    else add('pack', slot, i);
+  });
+  return out;
+}
+
+/** The first unit's place in unitPlaces order of the stack at (container, index), or -1. */
+export function unitRankAt(layout, cls, container, index) {
+  return unitPlaces(layout, cls).findIndex((p) => p.container === container && p.index === index);
+}
+
+/**
  * Where a bag that arrives goes (Austin 2026-10-31): in place of the leftmost
  * pack slot that is not a bag, as the pack row shows it (bags, then items,
  * then tools, then the empty slots; game.js renderPack). Returns the index in

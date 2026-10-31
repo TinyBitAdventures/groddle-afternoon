@@ -37,7 +37,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=85d4faba';
-import { TOOL_CONDITION_CATALOG, getToolCondition, setToolRemaining } from '../tools.js?v=9a2e7ef4';
+import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy } from '../tools.js?v=93286603';
 import { createMinnAccount } from '../minn-account.js?v=81339760';
 import { saveStore } from '../save-store.js?v=b74a8113';
 import {
@@ -218,12 +218,9 @@ function createSession(engine) {
     const inv = engine.inv;
     for (const [c, d] of Object.entries(fx.pack)) {
       if (d > 0) {
-        const had = countItem(inv, c);
         addItem(inv, c, d);
-        if (r != null && TOOL_CONDITION_CATALOG[c] && engine.toolState) {
-          const mineR = getToolCondition(engine.toolState, c).remaining;
-          setToolRemaining(engine.toolState, c, had > 0 ? Math.min(mineR, r) : r);
-        }
+        // The tools that came keep the listing's wear; yours keep their own (js/tools.js copies).
+        if (r != null && TOOL_CONDITION_CATALOG[c] && engine.toolState) receiveToolCopy(engine.toolState, c, r, d);
       } else removeItem(inv, c, Math.min(countItem(inv, c), -d));
     }
     if (fx.currants) engine.pc.currants = Math.max(0, Math.floor(Number(engine.pc.currants) || 0) + fx.currants);
@@ -725,7 +722,7 @@ function createSession(engine) {
     render();
     await persist();
     const listing = { id: newListingId(), c, n, cost };
-    if (TOOL_CONDITION_CATALOG[c] && engine.toolState) listing.r = getToolCondition(engine.toolState, c).remaining;
+    if (TOOL_CONDITION_CATALOG[c] && engine.toolState) listing.r = leavingToolWear(engine.toolState, c, n);
     const r = await call(() => account.listAuction(listing));
     busy = false;
     if (!r.ok || r.data?.status !== 'listed') {

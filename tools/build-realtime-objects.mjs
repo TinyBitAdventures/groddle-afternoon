@@ -54,15 +54,15 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
 } from '../public/js/street-ecology.js?v=fd79899d';
-import { ROCK_CATALOG } from '../public/js/mining.js?v=a7eb8740';
+import { ROCK_CATALOG } from '../public/js/mining.js?v=15c7bd6e';
 import { MEGA_ROCK_CHANCE, MEGA_ROCK_CHUNKS } from '../public/js/imagination-effects.js?v=70169933';
-import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=3d618d6a';
+import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=51d64696';
 import { ARBOROLOGY_HARVEST, TRANT_META } from '../public/js/trants.js?v=9c2e8c0f';
-import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=f4b16c76';
-import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=23f74bb3';
+import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=1eff5718';
+import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=91490913';
 import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=4b0d8834';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=fe7ee133';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=786a2ac4';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=33fd3608';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

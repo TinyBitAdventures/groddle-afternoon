@@ -11,7 +11,7 @@
  */
 
 import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=85d4faba';
-import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=9a2e7ef4';
+import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=93286603';
 import { skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { gardenGrowModifier } from './imagination-effects.js?v=70169933';
 import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js?v=8504134e';

@@ -69,7 +69,7 @@ test.describe('integration playtest regressions', () => {
   });
 
   test('vendor receipts say "1 currant"', async () => {
-    const { vendorSell } = await import('../public/js/vendor.js?v=563afb9b');
+    const { vendorSell } = await import('../public/js/vendor.js?v=0f4afec9');
     const { createInventory } = await import('../public/js/inventory.js?v=85d4faba');
     const inv = createInventory();
     inv.grain = 1;

@@ -34,10 +34,10 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=85d4faba';
-import { TOOL_CONDITION_CATALOG, getToolCondition, setToolRemaining } from '../tools.js?v=9a2e7ef4';
+import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy } from '../tools.js?v=93286603';
 import { createMinnAccount } from '../minn-account.js?v=81339760';
 // The same key as features/index.js: one module instance holds the carried notes.
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=4065c6df';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=8e6ccce2';
 import {
   BOX_SLOTS,
   GIFT_BOX,
@@ -357,7 +357,8 @@ function createSession(engine, client) {
     } else {
       const item = { c: p.c, n: Math.min(p.n, countItem(engine.inv, p.c)) };
       if (item.n < 1) return say("You don't have enough of that item.", 'error');
-      if (TOOL_CONDITION_CATALOG[p.c] && engine.toolState) item.r = getToolCondition(engine.toolState, p.c).remaining;
+      // Each tool wears on its own (js/tools.js): the given ones carry their own wear (the most worn of them).
+      if (TOOL_CONDITION_CATALOG[p.c] && engine.toolState) item.r = leavingToolWear(engine.toolState, p.c, item.n);
       frame = { to: to.id, ref, item };
     }
     if (!client.send('gift_give', frame)) return say("You're offline.", 'error');
@@ -391,11 +392,9 @@ function createSession(engine, client) {
         if (!takeBlankNote()) removeItem(inv, c, Math.min(countItem(inv, c), -d));
       } else removeItem(inv, c, Math.min(countItem(inv, c), -d));
     }
-    if (fx.tool && TOOL_CONDITION_CATALOG[fx.tool.c] && engine.toolState) {
-      // As a trade does (trade-feature applyDone): a first one takes the giver's wear, one more keeps the more worn.
-      const had = countItem(inv, fx.tool.c) - (fx.pack[fx.tool.c] || 0);
-      const mine = getToolCondition(engine.toolState, fx.tool.c).remaining;
-      setToolRemaining(engine.toolState, fx.tool.c, had > 0 ? Math.min(mine, fx.tool.r) : fx.tool.r);
+    if (fx.tool && TOOL_CONDITION_CATALOG[fx.tool.c] && engine.toolState && (fx.pack[fx.tool.c] || 0) > 0) {
+      // As a trade does (trade-feature applyDone): the tools that came keep the giver's wear; yours keep their own.
+      receiveToolCopy(engine.toolState, fx.tool.c, fx.tool.r, fx.pack[fx.tool.c]);
     }
     if (fx.removeNote) {
       const n = writtenCarriedNotes(engine).find((x) => x.title === fx.removeNote.title && x.body === fx.removeNote.body);
@@ -536,7 +535,7 @@ function createSession(engine, client) {
     if (!wrap) return;
     const picks = wrap.picks.map((p) => {
       const it = { c: p.c, n: p.n };
-      if (TOOL_CONDITION_CATALOG[p.c] && engine.toolState) it.r = getToolCondition(engine.toolState, p.c).remaining;
+      if (TOOL_CONDITION_CATALOG[p.c] && engine.toolState) it.r = leavingToolWear(engine.toolState, p.c, p.n);
       return it;
     });
     const out = wrapBox(slice, picks, (c) => countItem(engine.inv, c), table, (c) => ITEM_CATALOG[c]?.tags || []);
@@ -564,10 +563,7 @@ function createSession(engine, client) {
       else removeItem(engine.inv, c, Math.min(countItem(engine.inv, c), -d));
     }
     for (const it of box.items) {
-      if (it.r != null && TOOL_CONDITION_CATALOG[it.c] && engine.toolState) {
-        const mine = getToolCondition(engine.toolState, it.c).remaining;
-        setToolRemaining(engine.toolState, it.c, countItem(engine.inv, it.c) > it.n ? Math.min(mine, it.r) : it.r);
-      }
+      if (it.r != null && TOOL_CONDITION_CATALOG[it.c] && engine.toolState) receiveToolCopy(engine.toolState, it.c, it.r, it.n);
     }
     const growl = unwrapGrowl(box.items, table, itemLabel);
     lastLine = growl;

@@ -22,7 +22,7 @@
  */
 
 import { addItem, countItem, removeItem } from './inventory.js?v=85d4faba';
-import { ensureToolCondition, getToolCondition } from './tools.js?v=9a2e7ef4';
+import { getToolCondition, receiveToolCopy, setToolRemaining, toolCopies } from './tools.js?v=93286603';
 import { distillingBonus, hasMasterAssembler, hasMasterExploder, machinePartInstallMs } from './imagination-effects.js?v=70169933';
 import { loseEnergy } from './metabolics.js?v=8504134e';
 
@@ -131,19 +131,16 @@ export function finishAssembly(inv, toolState, pending) {
   const def = MACHINE_ASSEMBLIES[machine];
   if (!def) return { ok: false, reason: 'unknown', msg: 'That is not a machine.' };
   const energy = Number(pending.energy) || 0;
-  const hadOne = countItem(inv, machine) > 0;
   addItem(inv, machine, 1);
-  const row = ensureToolCondition(toolState, machine);
-  if (row && !hadOne) {
-    row.remaining = FRESH_FUEL;
-    row.broken = false;
-  }
+  // Each machine has its own tank (machine_base fuel is the item's own): the new one starts at a quarter.
+  const fresh = toolState ? receiveToolCopy(toolState, machine, FRESH_FUEL) : null;
+  const fuel = fresh ? fresh.remaining : FRESH_FUEL;
   return {
     ok: true,
     machine,
     energy,
-    fuel: row ? row.remaining : FRESH_FUEL,
-    msg: `You assembled a ${def.label}!${energy ? ` (-${energy} energy)` : ''} It has ${row ? row.remaining : FRESH_FUEL}/${MAX_FUEL} fuel.`,
+    fuel,
+    msg: `You assembled a ${def.label}!${energy ? ` (-${energy} energy)` : ''} It has ${fuel}/${MAX_FUEL} fuel.`,
   };
 }
 
@@ -214,15 +211,21 @@ export function finishMachineWork(inv, toolState, pending) {
 }
 
 /** machine_base refuel: +50 per Fuel Cell, only while 50 or more units fit. */
+/** The machine a refuel fills: the first (pack order) with room for a cell, else the first. */
+function refuelCopy(toolState, machine) {
+  const at = toolCopies(toolState, machine).findIndex((c) => c.remaining <= MAX_FUEL - FUEL_PER_CELL);
+  return at >= 0 ? at : 0;
+}
+
 export function refuelCheck(inv, toolState, machine) {
   if (!isMachine(machine)) return { ok: false, reason: 'unknown', msg: 'That is not a machine.' };
-  const fuel = getToolCondition(toolState, machine);
+  const fuel = getToolCondition(toolState, machine, { copy: refuelCopy(toolState, machine) });
   if (fuel.remaining > MAX_FUEL - FUEL_PER_CELL) {
     return { ok: false, reason: 'full', msg: `There is not enough space for a fuel cell. Current level: ${fuel.remaining}/${MAX_FUEL}` };
   }
   if (countItem(inv, FUEL_CELL) < 1) return { ok: false, reason: 'cells', msg: "You don't have any fuel cells." };
   const cells = Math.min(countItem(inv, FUEL_CELL), Math.floor((MAX_FUEL - fuel.remaining) / FUEL_PER_CELL));
-  return { ok: true, cells, fuel: fuel.remaining };
+  return { ok: true, cells, fuel: fuel.remaining, copy: fuel.copy };
 }
 
 export function refuelMachine(inv, toolState, machine, { all = false } = {}) {
@@ -230,14 +233,12 @@ export function refuelMachine(inv, toolState, machine, { all = false } = {}) {
   if (!check.ok) return check;
   const cells = all ? check.cells : 1;
   removeItem(inv, FUEL_CELL, cells);
-  const row = ensureToolCondition(toolState, machine);
-  row.remaining = Math.min(MAX_FUEL, row.remaining + cells * FUEL_PER_CELL);
-  row.broken = row.remaining <= 0;
+  const after = setToolRemaining(toolState, machine, Math.min(MAX_FUEL, check.fuel + cells * FUEL_PER_CELL), { copy: check.copy });
   return {
     ok: true,
     cells,
-    fuel: row.remaining,
-    msg: `You added ${cells} Fuel Cell${cells === 1 ? '' : 's'}. Fuel: ${row.remaining}/${MAX_FUEL}.`,
+    fuel: after.remaining,
+    msg: `You added ${cells} Fuel Cell${cells === 1 ? '' : 's'}. Fuel: ${after.remaining}/${MAX_FUEL}.`,
   };
 }
 

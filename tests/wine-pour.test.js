@@ -19,8 +19,8 @@ import {
   pourConditions,
   pourConfirmText,
 } from '../public/js/wine-pour.js?v=6daa23a7';
-import { homeTowerFeature, towerApi } from '../public/js/features/home-tower-feature.js?v=cac1af1a';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=b8cbec16';
+import { homeTowerFeature, towerApi } from '../public/js/features/home-tower-feature.js?v=fd5a4171';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=61ee8fba';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');

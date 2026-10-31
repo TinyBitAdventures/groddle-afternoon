@@ -34,11 +34,11 @@ import {
 } from '../public/js/verb-responses.js?v=3ceb8a8c';
 import { VERB_RESPONSE_POOLS } from '../public/js/verb-responses-data.js?v=0b948684';
 import { buildVerbResponses, render } from '../tools/build-verb-responses.mjs';
-import { runVerb } from '../public/content.js?v=341f7fc2';
-import { createAnimalState } from '../public/js/animals.js?v=756d53d3';
-import { createToolConditionState } from '../public/js/tools.js?v=9a2e7ef4';
+import { runVerb } from '../public/content.js?v=20b826eb';
+import { createAnimalState } from '../public/js/animals.js?v=3fbbca52';
+import { createToolConditionState } from '../public/js/tools.js?v=93286603';
 import { setTrantTables, createTrantState } from '../public/js/trants.js?v=9c2e8c0f';
-import { createMineRock } from '../public/js/mining.js?v=a7eb8740';
+import { createMineRock } from '../public/js/mining.js?v=15c7bd6e';
 import { createInventory } from '../public/js/inventory.js?v=85d4faba';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

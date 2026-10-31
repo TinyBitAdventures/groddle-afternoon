@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=341f7fc2';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=20b826eb';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0724694f';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e822ebe6';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -36,7 +36,7 @@ import {
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=dbfa83c4';
+import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=ada47e25';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -220,7 +220,7 @@ import {
   rookEggStateForProgress,
   rookWoodsObjective,
   rookWoodsRemainingMs,
-} from './js/rook-woods.js?v=a77b5fe9';
+} from './js/rook-woods.js?v=3bc5c6ae';
 import {
   ROOK_HALL_QUEST_ID,
   ROOK_HALL_START_QUEST_ID,
@@ -457,10 +457,10 @@ import {
   removeItem,
   isToolItem,
 } from './js/inventory.js?v=85d4faba';
-import { PACK_COPY } from './js/pack-slots.js?v=d8325f2a';
+import { PACK_COPY, unitRankAt } from './js/pack-slots.js?v=00bca2cf';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=9b23e21a';
-import { listAnimalFeedOptions } from './js/animals.js?v=756d53d3';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=756d53d3';
+import { listAnimalFeedOptions } from './js/animals.js?v=3fbbca52';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=3fbbca52';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -469,13 +469,13 @@ import {
   normalizeStackQuantity,
   dropInventoryStack,
   pickupDroppedStack,
-} from './js/world-items.js?v=7df5cf4a';
+} from './js/world-items.js?v=a50e4a32';
 import {
   createPlayerSave,
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=9ea632cc';
+} from './js/player-save.js?v=b211632f';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -513,7 +513,9 @@ import {
   setToolRemaining,
   WATERING_CAN_TOOLS,
   firstWorkingTool,
-} from './js/tools.js?v=9a2e7ef4';
+  bindToolInventory,
+  TOOL_CONDITION_CATALOG as TOOL_WEAR,
+} from './js/tools.js?v=93286603';
 import {
   listRecipes,
   listRecipesForTool,
@@ -542,7 +544,7 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=9e538296';
+} from './js/making.js?v=fe73bfce';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=0fb7a5ca';
 import {
@@ -569,7 +571,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=9a8f8f72';
+} from './js/garden.js?v=175e782f';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=05651e76';
 import {
   ROCK_CATALOG,
@@ -582,7 +584,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=a7eb8740';
+} from './js/mining.js?v=15c7bd6e';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -769,19 +771,19 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=563afb9b';
+} from './js/vendor.js?v=0f4afec9';
 import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=756d53d3';
+} from './js/animals.js?v=3fbbca52';
 import {
   ensureWoodTreeState,
   pickWoodTool,
   resetWoodTreeDay,
   woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=df8a49be';
+} from './js/woodcutting.js?v=58743072';
 import {
   GIANTS,
   createShrineState,
@@ -804,7 +806,7 @@ import {
   emblemRelationNote,
   formatSpeedUpTime,
 } from './js/shrines.js?v=01b185bc';
-import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=5454a495';
+import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=bff50be4';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,
@@ -1908,7 +1910,7 @@ setMoodXpEnv({
   },
   hasBuff: (classTsid) => hasBuff(buffState, classTsid, Date.now()),
 });
-/** Persistent per-class condition for the remake's unstackable tool row. */
+/** Each tool's own condition (js/tools.js: one value per tool held, bound to the pack below). */
 const toolState = createToolConditionState();
 
 /**
@@ -1951,6 +1953,8 @@ const inv = createInventory(NEW_PLAYER ? newPlayerInventory(createInventory(), P
   paradise_ticket_starlit_night: 1,
   paradise_ticket_slip_n_slide: 1,
 });
+// Each tool held wears on its own: the copies follow the pack's counts (a new one is full).
+bindToolInventory(toolState, inv);
 /** @type {import('./js/character-builder.js').Appearance} */
 let playerAppearance = loadAppearance();
 /** @type {string} active builder tab */
@@ -3070,16 +3074,20 @@ function colorizeActivityText(text) {
     );
 }
 
-function findPackSlotElement(classTsid) {
-  return [...document.querySelectorAll('.pack-slot[data-tsid]')]
-    .find((el) => el.dataset.tsid === classTsid) || null;
+function findPackSlotElement(classTsid, copy = null) {
+  const all = [...document.querySelectorAll('.pack-slot[data-tsid]')].filter((el) => el.dataset.tsid === classTsid);
+  return (copy != null && all.find((el) => el.dataset.packCopy === String(copy))) || all[0] || null;
 }
+
+/** Which of a class's tools the open pack popover is about (its slot's place in pack order), or null. */
+let packSelectedCopy = null;
 
 /** The open pack popover's markup, so an unchanged redraw keeps its buttons (renderPackPopover). */
 let packPopoverMarkup = '';
 
 function closePackPopover() {
   packSelected = null;
+  packSelectedCopy = null;
   packDropMode = false;
   packDropQty = 1;
   packEatMode = false;
@@ -3634,12 +3642,14 @@ function hideToolRepairFx() {
   document.getElementById('tool-repair-fx')?.remove();
 }
 
-function beginToolRepair(classTsid) {
+/** A repair is a verb on one tool (pick.js repair 120-240): `copy` is which (its place in pack order), else the first that needs one. */
+function beginToolRepair(classTsid, copy = null) {
   if (activeToolRepair) {
     toast('Finish the current repair first.');
     return false;
   }
-  const quote = quoteToolRepair(toolState, classTsid, skillState.learned || []);
+  const which = Number.isInteger(copy) && copy >= 0 ? { copy } : {};
+  const quote = quoteToolRepair(toolState, classTsid, skillState.learned || [], which);
   if (!quote.ok) {
     const msg = quote.reason === 'skill'
       ? 'You need Tinkering I to repair tools.'
@@ -3674,6 +3684,7 @@ function beginToolRepair(classTsid) {
     activeToolRepair = null;
     hideToolRepairFx();
     const result = repairToolCondition(toolState, classTsid, pc, {
+      copy: quote.condition.copy,
       learned: skillState.learned || [],
       hasTinkertool: countItem(inv, 'tinkertool') >= 1,
       hasSpareTinkertool: countItem(inv, 'tinkertool') >= 2,
@@ -3715,10 +3726,13 @@ function renderPackPopover(classTsid, anchor = null) {
     packEatMode = false;
     packEatQty = 1;
   }
+  // A tool's own slot says which tool it is (its wear and its repair are that one's).
+  if (packSelected !== classTsid) packSelectedCopy = null;
+  if (anchor?.dataset?.packCopy != null && anchor.dataset.packCopy !== '') packSelectedCopy = Number(anchor.dataset.packCopy);
   packSelected = classTsid;
   packDropQty = normalizeStackQuantity(packDropQty, slot.count);
   // A pack redraw replaces the slot buttons: an anchor from before it falls back to the slot.
-  const sourceAnchor = (anchor?.isConnected ? anchor : null) || findPackSlotElement(classTsid);
+  const sourceAnchor = (anchor?.isConnected ? anchor : null) || findPackSlotElement(classTsid, packSelectedCopy);
   const useInfo = getPackUseInfo(classTsid);
   const isEmotionalBear = classTsid === EMOTIONAL_BEAR_ID;
   const bearActions = isEmotionalBear
@@ -3805,10 +3819,11 @@ function renderPackPopover(classTsid, anchor = null) {
         : relatedRecipes.length
           ? 'Ingredient'
           : 'Item';
-  const trackedCondition = getToolCondition(toolState, classTsid);
+  const toolCopy = TOOL_WEAR[classTsid] && packSelectedCopy != null ? { copy: packSelectedCopy } : {};
+  const trackedCondition = getToolCondition(toolState, classTsid, toolCopy);
   const toolCondition = trackedCondition.tracked ? trackedCondition : null;
   const repairQuote = toolCondition?.tracked && toolCondition.needsRepair && toolCondition.repairable
-    ? quoteToolRepair(toolState, classTsid, skillState.learned || [])
+    ? quoteToolRepair(toolState, classTsid, skillState.learned || [], { copy: toolCondition.copy })
     : null;
   const hasRepairTool = countItem(inv, 'tinkertool') >= (classTsid === 'tinkertool' ? 2 : 1);
   const repairTinkertoolReady = repairQuote?.ok
@@ -4072,7 +4087,7 @@ function renderPackPopover(classTsid, anchor = null) {
     playPackMusicblock(classTsid);
   });
   pop.querySelector('[data-pack-repair]')?.addEventListener('click', () => {
-    beginToolRepair(classTsid);
+    beginToolRepair(classTsid, getToolCondition(toolState, classTsid, packSelectedCopy != null ? { copy: packSelectedCopy } : {}).copy);
   });
   pop.querySelector('[data-pack-make]')?.addEventListener('click', () => {
     closePackPopover();
@@ -4260,7 +4275,8 @@ function renderPackRow(box, slots, opts = {}) {
     return;
   }
   for (const s of slots) {
-    const trackedCondition = getToolCondition(toolState, s.classTsid);
+    // A tool slot shows its own tool's wear (its place among the class's tools in pack order).
+    const trackedCondition = getToolCondition(toolState, s.classTsid, s.copy != null ? { copy: s.copy } : {});
     const toolCondition = trackedCondition.tracked
       ? trackedCondition
       : s.isTool || opts.toolRow
@@ -4282,6 +4298,7 @@ function renderPackRow(box, slots, opts = {}) {
     // The modern row's tooltip (js/ui/pack-row.js packSlotTip) says this; no browser title on top of it.
     slot.dataset.tsid = s.classTsid;
     slot.dataset.packCount = String(s.count);
+    if (toolCondition?.tracked && s.copy != null) slot.dataset.packCopy = String(s.copy);
     slot.dataset.packName = shownLabel;
     if (s.inBag) slot.dataset.packInBag = s.inBag.label;
     const canDragToVendor = !(s.isTool || opts.toolRow);
@@ -4446,7 +4463,7 @@ function packRowSignature(slots, opts) {
     // The selected stack is not part of it: renderPackPopover marks it (active, aria-expanded) on the same buttons.
     opts.emptyCount ?? 4, Boolean(opts.ghost), Boolean(opts.fillEmpty), Boolean(opts.toolRow), opts.container || '', opts.rock || null, opts.query || '',
     slots.map((s) => {
-      const c = getToolCondition(toolState, s.classTsid);
+      const c = getToolCondition(toolState, s.classTsid, s.copy != null ? { copy: s.copy } : {});
       return [s.classTsid, s.count, s.container ?? '', s.index ?? '', s.icon || '', s.bag ? [s.bag.used, s.bag.capacity, s.bag.open, s.bag.label] : 0,
         s.inBag?.label || '', packNamed(s.classTsid)?.label || '', c.tracked ? [c.remaining, c.broken] : 0];
     }),
@@ -4492,6 +4509,11 @@ function packLayoutEntry(slot, container, index, layout, openKey) {
     container,
     index,
   };
+  // Which of the class's tools this slot holds (js/tools.js keeps each one's wear in this order).
+  if (slot.kind === 'stack' && TOOL_WEAR[slot.cls]) {
+    const rank = unitRankAt(layout, slot.cls, container, index);
+    if (rank >= 0) entry.copy = rank;
+  }
   if (slot.kind === 'bag') {
     const box = layout.bags[slot.key];
     entry.isTool = false;
@@ -10752,7 +10774,7 @@ const engine = {
     if (blocked) return { ok: false, reason: 'blocked', msg: blocked };
     const n = normalizeStackQuantity(count, inv[classTsid] || 0);
     if (!n) return { ok: false, reason: 'missing', msg: 'That stack is no longer in your pack.' };
-    const result = dropInventoryStack(droppedItemState, inv, droppedStacksTsid(), classTsid, n, { x, y }, { now: Date.now(), mergeRadius: 12 });
+    const result = dropInventoryStack(droppedItemState, inv, droppedStacksTsid(), classTsid, n, { x, y }, { now: Date.now(), mergeRadius: 12, points: leavingToolPoints(classTsid, n) });
     if (!result.ok) return result;
     closePackPopover();
     saveDroppedItems();
@@ -11616,6 +11638,29 @@ function packDropBlockReason(classTsid) {
   return '';
 }
 
+/**
+ * The wear the tools leaving the pack take with them (the last `n`, js/tools.js takeToolCopy), so a
+ * tool set down and picked up again is the same worn tool (tool_base points_remaining is the stack's own).
+ */
+function leavingToolPoints(classTsid, n) {
+  if (!TOOL_WEAR[classTsid]) return undefined;
+  const held = countItem(inv, classTsid);
+  const copies = getToolCondition(toolState, classTsid).copies || 0;
+  const out = [];
+  for (let k = Math.max(0, Math.min(held, copies) - n); k < Math.min(held, copies); k += 1) out.push(getToolCondition(toolState, classTsid, { copy: k }).remaining);
+  return out;
+}
+
+/** Tools that just came into the pack with their own wear (null: a new, full one). */
+function arrivingToolPoints(classTsid, n, points) {
+  if (!TOOL_WEAR[classTsid] || !Array.isArray(points) || !points.length) return;
+  const copies = getToolCondition(toolState, classTsid).copies || 0;
+  for (let k = 0; k < Math.min(n, points.length); k += 1) {
+    if (points[k] == null) continue;
+    setToolRemaining(toolState, classTsid, points[k], { copy: copies - n + k });
+  }
+}
+
 function dropPackItem(classTsid, requested = 1) {
   if (!state.started || !player || !currentStreetTsid) return;
   const blocked = packDropBlockReason(classTsid);
@@ -11650,7 +11695,7 @@ function dropPackItem(classTsid, requested = 1) {
     classTsid,
     count,
     { x, y },
-    { now: Date.now() }
+    { now: Date.now(), points: leavingToolPoints(classTsid, count) }
   );
   closePackPopover();
   if (!result.ok) {
@@ -11692,6 +11737,7 @@ function pickupDroppedWorldItem(target) {
     refreshDroppedWorldItems();
     return false;
   }
+  arrivingToolPoints(result.classTsid, result.count, result.points);
   saveDroppedItems();
   const label = ITEM_CATALOG[result.classTsid]?.label || result.classTsid.replace(/_/g, ' ');
   const line = `You picked up ${result.count}× ${label}.`;
@@ -27592,7 +27638,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=ed1a0538').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=57a573e1').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // Loading card QA (js/loading-card-qa.js): ?loadcarddemo=<tsid>[,<tsid>].
   if (new URLSearchParams(location.search).has('loadcarddemo')) {

@@ -150,7 +150,7 @@ import {
   placeCostText,
   trayFilters,
 } from '../ui/home-builder.js?v=2e0c377b';
-import { RECIPE_CATALOG } from '../making.js?v=9e538296';
+import { RECIPE_CATALOG } from '../making.js?v=fe73bfce';
 import {
   createBackYardState,
   dispatcherRx,
@@ -187,14 +187,14 @@ import { DISPATCHER_HALF, DISPATCHER_TEXT, dispatcherFits, savedDispatcherRx, si
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
-import { projectApi } from './street-jobs-feature.js?v=1ac57383';
+import { projectApi } from './street-jobs-feature.js?v=c3539496';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=b05c58d8';
-import { towerApi } from './home-tower-feature.js?v=cac1af1a';
+import { towerApi } from './home-tower-feature.js?v=fd5a4171';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=e676f00f';
 import { wantsHiresDecos } from '../deco-hires.js?v=7678e434';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=4b0d8834';
-import { patchesFeature } from './patches-feature.js?v=5562a246';
-import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=cfa86c42';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=786a2ac4';
+import { patchesFeature } from './patches-feature.js?v=4afa4c2b';
+import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=ebfd3365';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
@@ -216,7 +216,7 @@ import {
 } from '../home-styles.js?v=f591561f';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { oneArmSignpost } from '../street-render.js?v=7c8bae68';
-import { ROCK_CATALOG } from '../mining.js?v=a7eb8740';
+import { ROCK_CATALOG } from '../mining.js?v=15c7bd6e';
 import {
   HOUSE_SIGN,
   IMG_BUBBLE_MS,

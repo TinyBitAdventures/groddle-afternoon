@@ -75,7 +75,9 @@ import {
   normalizePrefs,
   packIntoBags,
   roomFor,
-} from '../pack-slots.js?v=d8325f2a';
+  unitRankAt,
+} from '../pack-slots.js?v=00bca2cf';
+import { TOOL_CONDITION_CATALOG, moveToolCopy } from '../tools.js?v=93286603';
 import { createMinnAccount } from '../minn-account.js?v=81339760';
 
 export const BAGS_FEATURE_ID = 'bags';
@@ -339,9 +341,33 @@ function stackPlaces(layout, cls) {
   return out;
 }
 
+/**
+ * A tool's wear goes with it when it is dragged (js/tools.js keeps one value per tool in pack
+ * order, js/pack-slots.js unitPlaces): the moved tool's place in that order before and after.
+ */
+function movedToolRanks(engine, before, from, to, prefs) {
+  const src = from?.container === 'pack' ? before.pack : before.bags[from?.container];
+  const slot = src?.slots?.[Math.floor(Number(from?.index))];
+  if (slot?.kind !== 'stack' || !TOOL_CONDITION_CATALOG[slot.cls] || (Number(engine.inv?.[slot.cls]) || 0) < 2) return null;
+  const was = unitRankAt(before, slot.cls, from.container, Math.floor(Number(from.index)));
+  const after = layoutPack(engine.inv, prefs, opts());
+  const destKey = to?.bag ? to.bag : to?.container || 'pack';
+  const dest = destKey === 'pack' ? after.pack : after.bags[destKey];
+  if (!dest) return null;
+  // moveStack puts it at to.index in its container's list (after taking it out), else last.
+  const last = dest.slots.length - 1;
+  let at = Number.isFinite(Number(to?.index)) ? Math.max(0, Math.min(last, Math.floor(Number(to.index)))) : last;
+  if (dest.slots[at]?.cls !== slot.cls) at = dest.slots.findLastIndex((x) => x.cls === slot.cls);
+  const now = at >= 0 ? unitRankAt(after, slot.cls, destKey, at) : -1;
+  return was >= 0 && now >= 0 ? { cls: slot.cls, was, now } : null;
+}
+
 function doMove(engine, from, to) {
+  const before = layoutPack(engine.inv, slice.prefs, opts());
   const result = moveStack(engine.inv, slice.prefs, from, to, opts());
   if (result.ok) {
+    const ranks = engine.toolState ? movedToolRanks(engine, before, from, to, result.prefs) : null;
+    if (ranks && ranks.was !== ranks.now) moveToolCopy(engine.toolState, ranks.cls, ranks.was, ranks.now);
     slice.prefs = normalizePrefs(result.prefs);
     engine.setData?.('packLast', 'moved');
   } else if (result.reason) {

@@ -28,11 +28,31 @@ function cleanStreetTsid(value) {
   return String(value || '').trim().replace(/[^a-zA-Z0-9_:-]/g, '');
 }
 
+/**
+ * A dropped tool's own wear, one value per tool in the stack (js/tools.js
+ * copies; tool_base points_remaining is the stack's own instance prop, so a
+ * tool put down and picked up again is the same worn tool). Null when none.
+ */
+function cleanPoints(value, count) {
+  if (!Array.isArray(value)) return null;
+  // null: a tool that went down new (full).
+  const out = value.slice(0, count).map((r) => (r == null || !Number.isFinite(Number(r)) ? null : Math.max(0, Math.floor(Number(r)))));
+  return out.some((r) => r != null) ? out : null;
+}
+
+/** `points` padded to `count` tools (null for a full one), for stacking one stack's tools on another's. */
+function pointsFor(points, count) {
+  const out = (points || []).slice(0, count);
+  while (out.length < count) out.push(null);
+  return out;
+}
+
 function cleanRecord(row, streetTsid, fallbackId) {
   const classTsid = cleanClassTsid(row?.classTsid);
   const count = cleanCount(row?.count);
   if (!classTsid || count < 1) return null;
   const id = String(row?.id || fallbackId).trim() || fallbackId;
+  const points = cleanPoints(row?.points, count);
   return {
     id,
     streetTsid,
@@ -41,6 +61,7 @@ function cleanRecord(row, streetTsid, fallbackId) {
     x: finite(row?.x, 0),
     y: finite(row?.y, 0),
     droppedAt: Math.max(0, Math.floor(finite(row?.droppedAt, 0))),
+    ...(points ? { points } : {}),
   };
 }
 
@@ -130,8 +151,11 @@ export function dropInventoryStack(state, inv, streetTsid, classTsid, requested,
       .sort((a, b) => a.distance - b.distance)[0]?.row
     : null;
 
+  const points = cleanPoints(opts.points, count);
   if (!removeItem(inv, item, count)) return { ok: false, reason: 'missing' };
   if (merge) {
+    // Tools keep their own wear: a stack's points line up with its first tools, any without one are full.
+    if (points || merge.points) merge.points = [...pointsFor(merge.points, merge.count), ...pointsFor(points, count)];
     merge.count += count;
     merge.droppedAt = Math.max(0, Math.floor(finite(opts.now, Date.now())));
     return { ok: true, count, stack: { ...merge }, merged: true, remaining: inv[item] || 0 };
@@ -145,6 +169,7 @@ export function dropInventoryStack(state, inv, streetTsid, classTsid, requested,
     x,
     y,
     droppedAt: Math.max(0, Math.floor(finite(opts.now, Date.now()))),
+    ...(points ? { points } : {}),
   };
   rows.push(stack);
   return { ok: true, count, stack: { ...stack }, merged: false, remaining: inv[item] || 0 };
@@ -163,6 +188,8 @@ export function pickupDroppedStack(state, inv, streetTsid, stackId, requested = 
     : normalizeStackQuantity(requested, stack.count);
   if (count < 1) return { ok: false, reason: 'quantity' };
   addItem(inv, stack.classTsid, count);
+  const points = Array.isArray(stack.points) ? stack.points.splice(0, count) : [];
+  if (Array.isArray(stack.points) && !stack.points.length) delete stack.points;
   stack.count -= count;
   const removed = stack.count <= 0;
   if (removed) rows.splice(index, 1);
@@ -173,5 +200,6 @@ export function pickupDroppedStack(state, inv, streetTsid, stackId, requested = 
     classTsid: stack.classTsid,
     removed,
     remaining: Math.max(0, stack.count),
+    ...(points.some((r) => r != null) ? { points } : {}),
   };
 }

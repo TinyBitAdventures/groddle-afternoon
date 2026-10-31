@@ -119,19 +119,87 @@ export function createToolConditionState(seed = {}) {
   return normalizeToolConditionState(seed);
 }
 
+/*
+ * Each tool you hold wears on its own (ticket 12). In the source wear is an
+ * instance prop of each tool stack: tool_base points_remaining (pick.js 32,
+ * initInstanceProps; isWorking 405-430), use() lowers only the stack in use,
+ * a stack made or bought is new at its class's points_capacity, and a repair
+ * is a verb on one stack (pick.js repair 120-240, tinkertool.js startRepair).
+ * Which one a verb uses: the first working one in pack order
+ * (players/inc_items.js items_find_working_tool 729-732 and
+ * items/include/mining.js 203-204: pc.findFirst(is_tool && isWorking), and
+ * bag.js findFirst 672-694 walks the pack's slots in order, a bag's contents
+ * where the bag sits).
+ *
+ * The remake's pack is one count per class (js/inventory.js), so a class's
+ * row keeps one wear value per copy held, `copies`, in pack order (the
+ * Nth stack of the class as js/pack-slots.js lays the pack out, findFirst's
+ * order: toolCopyPlaces). Bound to the inventory (bindToolInventory), the
+ * copies follow its count: a copy that arrives is new and full (a purchase,
+ * a craft, a reward), and when one leaves it is the last one, unless the
+ * path that moves it says which (takeToolCopy, receiveToolCopy carry a
+ * given, dropped or traded tool's own wear). `remaining` and `broken` on
+ * the row repeat the copy in use, for readers of older saves.
+ *
+ * Saves from before (one shared value per class): that value stays with
+ * the first copy, the one that was in use, and any other copy held starts
+ * full (the shared value was only ever charged once per use, so it is one
+ * tool's wear; a pick bought on top of a worn one was charged that wear).
+ */
+
+/** The inventory a state's copies follow (not saved: a hidden property). */
+export function bindToolInventory(state, inv) {
+  if (!state || typeof state !== 'object') return state;
+  Object.defineProperty(state, 'inv', { value: inv || null, writable: true, configurable: true, enumerable: false });
+  return state;
+}
+
+/** A copy's points, clamped to the class's capacity; none given (null: the site's "new") is full. */
+function clampPoints(def, value) {
+  if (value == null || value === '') return def.capacity;
+  return Math.max(0, Math.min(def.capacity, finiteInt(value, def.capacity)));
+}
+
+function heldCount(state, classTsid) {
+  const inv = state?.inv;
+  if (!inv) return null;
+  const n = Number(inv[classTsid]);
+  return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+}
+
+/** The copy in use: the first that can take `wear` (findFirst isWorking), else the first. */
+function inUseIndex(copies, wear = 1) {
+  const cost = points(wear);
+  const at = copies.findIndex((r) => r >= cost);
+  return at >= 0 ? at : 0;
+}
+
+/** Repeat the copy in use on the row (older readers, and break events). */
+function settleRow(row, def) {
+  const copies = row.copies;
+  const r = copies.length ? copies[inUseIndex(copies)] : def.capacity;
+  row.remaining = r;
+  row.broken = r <= 0;
+  return row;
+}
+
 export function normalizeToolConditionState(seed = {}) {
   const source = seed?.condition && typeof seed.condition === 'object' ? seed.condition : {};
   const condition = {};
   for (const [classTsid, def] of Object.entries(TOOL_CONDITION_CATALOG)) {
     const row = source[classTsid];
     if (!row || typeof row !== 'object') continue;
-    const remaining = Math.max(0, Math.min(def.capacity, finiteInt(row.remaining, def.capacity)));
-    condition[classTsid] = {
-      remaining,
-      broken: row.broken === true || remaining <= 0,
+    // An older save's one value per class becomes the first copy's (see above).
+    const copies = Array.isArray(row.copies)
+      ? row.copies.map((r) => clampPoints(def, r))
+      : [row.broken === true ? 0 : clampPoints(def, row.remaining)];
+    condition[classTsid] = settleRow({
+      copies,
+      remaining: def.capacity,
+      broken: false,
       uses: Math.max(0, finiteInt(row.uses, 0)),
       repairs: Math.max(0, finiteInt(row.repairs, 0)),
-    };
+    }, def);
   }
   return {
     condition,
@@ -141,18 +209,49 @@ export function normalizeToolConditionState(seed = {}) {
   };
 }
 
-/** Return a stable mutable condition record, initially fully repaired. */
+/**
+ * Return a class's stable mutable row, its copies in step with the inventory
+ * (when bound): new copies full, the last ones gone. Unbound (a machine's own
+ * tank, tests), a row always has at least one copy.
+ */
 export function ensureToolCondition(state, classTsid) {
   const def = TOOL_CONDITION_CATALOG[classTsid];
   if (!def || !state) return null;
   if (!state.condition || typeof state.condition !== 'object') state.condition = {};
-  if (!state.condition[classTsid]) {
-    state.condition[classTsid] = { remaining: def.capacity, broken: false, uses: 0, repairs: 0 };
+  let row = state.condition[classTsid];
+  if (!row) {
+    row = { copies: [], remaining: def.capacity, broken: false, uses: 0, repairs: 0 };
+    state.condition[classTsid] = row;
   }
-  return state.condition[classTsid];
+  if (!Array.isArray(row.copies)) {
+    row.copies = [row.broken === true ? 0 : clampPoints(def, row.remaining)];
+  }
+  const held = heldCount(state, classTsid);
+  const want = held == null ? Math.max(1, row.copies.length) : held;
+  if (row.copies.length > want) row.copies.length = want;
+  while (row.copies.length < want) row.copies.push(def.capacity);
+  return settleRow(row, def);
 }
 
-export function getToolCondition(state, classTsid) {
+/** Every copy's wear, in pack order (what each tool slot shows). */
+export function toolCopies(state, classTsid) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def) return [];
+  const row = ensureToolCondition(state, classTsid);
+  return row.copies.map((r) => ({ remaining: r, capacity: def.capacity, percent: def.capacity ? r / def.capacity : 1, broken: r <= 0 }));
+}
+
+function copyIndexFor(row, opts, wear = 1) {
+  const n = Number(opts?.copy);
+  if (Number.isInteger(n) && n >= 0 && n < row.copies.length) return n;
+  return inUseIndex(row.copies, wear);
+}
+
+/**
+ * One tool's condition: the copy `opts.copy` (its place in pack order), else
+ * the one a verb would use now (the first that can take `opts.wear`, 1 by default).
+ */
+export function getToolCondition(state, classTsid, opts = {}) {
   const def = TOOL_CONDITION_CATALOG[classTsid];
   if (!def) {
     return {
@@ -168,15 +267,18 @@ export function getToolCondition(state, classTsid) {
     };
   }
   const row = ensureToolCondition(state, classTsid);
-  const remaining = Math.max(0, Math.min(def.capacity, Number(row?.remaining) || 0));
+  const copy = row?.copies.length ? copyIndexFor(row, opts, opts?.wear) : -1;
+  const remaining = copy >= 0 ? Math.max(0, Math.min(def.capacity, Number(row.copies[copy]) || 0)) : def.capacity;
   return {
     classTsid,
     label: def.label,
     tracked: true,
+    copy,
+    copies: row?.copies.length || 0,
     remaining,
     capacity: def.capacity,
     percent: def.capacity ? remaining / def.capacity : 1,
-    broken: row?.broken === true || remaining <= 0,
+    broken: remaining <= 0,
     needsRepair: remaining < def.capacity,
     repairable: def.repairable !== false,
     uses: row?.uses || 0,
@@ -184,8 +286,9 @@ export function getToolCondition(state, classTsid) {
   };
 }
 
-export function canUseTool(state, classTsid, wear = 1) {
-  const condition = getToolCondition(state, classTsid);
+/** Whether a copy can take `wear`: the first working one (findFirst isWorking), or `opts.copy`. */
+export function canUseTool(state, classTsid, wear = 1, opts = {}) {
+  const condition = getToolCondition(state, classTsid, { ...opts, wear });
   if (!condition.tracked) return { ok: true, condition, wear: 0 };
   const cost = points(wear);
   if (condition.broken || condition.remaining < cost) {
@@ -202,23 +305,31 @@ export function canUseTool(state, classTsid, wear = 1) {
   return { ok: true, condition, wear: cost };
 }
 
-/** Spend condition only after the associated gameplay mutation is known to succeed. */
-export function useToolCondition(state, classTsid, wear = 1) {
-  const check = canUseTool(state, classTsid, wear);
+/**
+ * Spend condition only after the associated gameplay mutation is known to succeed.
+ * Only the copy in use wears (tool_base use(): its own points_remaining).
+ */
+export function useToolCondition(state, classTsid, wear = 1, opts = {}) {
+  const check = canUseTool(state, classTsid, wear, opts);
   if (!check.ok || !check.condition.tracked) return check;
   const row = ensureToolCondition(state, classTsid);
-  const wasBroken = row.broken === true || row.remaining <= 0;
-  row.remaining = Math.max(0, row.remaining - check.wear);
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  const at = check.condition.copy;
+  const before = row.copies[at];
+  const wasBroken = before <= 0;
+  row.copies[at] = Math.max(0, before - check.wear);
   row.uses = (row.uses || 0) + check.wear;
   state.totalUses = (state.totalUses || 0) + check.wear;
-  row.broken = row.remaining <= 0;
-  const broke = !wasBroken && row.broken;
+  const nowBroken = row.copies[at] <= 0;
+  settleRow(row, def);
+  const broke = !wasBroken && nowBroken;
   if (broke) state.totalBreaks = (state.totalBreaks || 0) + 1;
   return {
     ok: true,
     classTsid,
+    copy: at,
     wear: check.wear,
-    remaining: row.remaining,
+    remaining: row.copies[at],
     capacity: check.condition.capacity,
     broke,
     msg: broke
@@ -227,6 +338,76 @@ export function useToolCondition(state, classTsid, wear = 1) {
         : `Ooops! You done broke your ${check.condition.label}.`
       : '',
   };
+}
+
+/**
+ * The wear a copy leaving the pack takes with it (a gift, a trade, a drop, an
+ * auction): the last copy, unless `copy` says which. Call it while the copy is
+ * still held; with `take`, that copy is the one that goes when the count drops.
+ */
+export function takeToolCopy(state, classTsid, { copy, take = true } = {}) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def) return null;
+  const row = ensureToolCondition(state, classTsid);
+  if (!row.copies.length) return def.capacity;
+  const n = Number(copy);
+  const at = Number.isInteger(n) && n >= 0 && n < row.copies.length ? n : row.copies.length - 1;
+  const r = row.copies[at];
+  if (take && at !== row.copies.length - 1) {
+    // The count drops next: move this copy last so it is the one that goes.
+    row.copies.splice(at, 1);
+    row.copies.push(r);
+    settleRow(row, def);
+  }
+  return r;
+}
+
+/**
+ * The wear a hand-over of `n` tools carries (a gift, a trade, an auction: one
+ * value per class on the wire): the most worn of the `n` that will leave (the
+ * last ones), so a tool passed between characters is never mended by it.
+ */
+export function leavingToolWear(state, classTsid, n = 1) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def) return null;
+  const row = ensureToolCondition(state, classTsid);
+  const k = Math.max(1, Math.floor(Number(n) || 1));
+  const leaving = row.copies.slice(Math.max(0, row.copies.length - k));
+  return leaving.length ? Math.min(...leaving) : def.capacity;
+}
+
+/**
+ * Copies that just arrived with their own wear (a dropped, given, traded or
+ * auctioned tool): the newest `n` (the last ones; the count already went up) take it.
+ */
+export function receiveToolCopy(state, classTsid, remaining, n = 1) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def) return null;
+  const row = ensureToolCondition(state, classTsid);
+  if (!row.copies.length) return null;
+  const k = Math.min(row.copies.length, Math.max(1, Math.floor(Number(n) || 1)));
+  for (let i = row.copies.length - k; i < row.copies.length; i += 1) row.copies[i] = clampPoints(def, remaining);
+  settleRow(row, def);
+  return getToolCondition(state, classTsid, { copy: row.copies.length - 1 });
+}
+
+/** A drag moved a class's copy from one place in pack order to another (bags-feature packMove). */
+export function moveToolCopy(state, classTsid, from, to) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def) return false;
+  const row = ensureToolCondition(state, classTsid);
+  const n = row.copies.length;
+  if (!(from >= 0 && from < n && to >= 0 && to < n) || from === to) return false;
+  const [r] = row.copies.splice(from, 1);
+  row.copies.splice(to, 0, r);
+  settleRow(row, def);
+  return true;
+}
+
+/** How many copies of a class are broken now (break events, js/quest-offers.js toolBreakEvents). */
+export function brokenToolCopies(row) {
+  if (Array.isArray(row?.copies)) return row.copies.filter((r) => Number(r) <= 0).length;
+  return row?.broken === true || Number(row?.remaining) <= 0 ? 1 : 0;
 }
 
 export function highestTinkeringRank(learned = []) {
@@ -238,9 +419,10 @@ export function highestTinkeringRank(learned = []) {
 }
 
 /** Official repair rate/energy math, with the visible wait demo-scaled for this single-player spike. */
-export function quoteToolRepair(state, classTsid, learned = []) {
+export function quoteToolRepair(state, classTsid, learned = [], opts = {}) {
   const def = TOOL_CONDITION_CATALOG[classTsid];
-  const condition = getToolCondition(state, classTsid);
+  // A repair is a verb on one tool (pick.js repair 120-240): `opts.copy`, else the first that needs one.
+  const condition = getToolCondition(state, classTsid, { copy: repairCopyIndex(state, classTsid, opts) });
   if (!def || !condition.tracked) return { ok: false, reason: 'not_repairable', condition };
   if (def.repairable === false) return { ok: false, reason: 'not_repairable', condition };
   if (!condition.needsRepair) return { ok: false, reason: 'full', condition };
@@ -272,7 +454,7 @@ export function quoteToolRepair(state, classTsid, learned = []) {
 
 /** Commit a quoted full repair atomically. Inventory presence is supplied by the caller. */
 export function repairToolCondition(state, classTsid, pc, opts = {}) {
-  const quote = quoteToolRepair(state, classTsid, opts.learned || []);
+  const quote = quoteToolRepair(state, classTsid, opts.learned || [], opts);
   if (!quote.ok) return quote;
   if (opts.hasTinkertool !== true && classTsid !== 'tinkertool') {
     return { ok: false, reason: 'tinkertool', quote, msg: 'You need a working Tinkertool to repair this.' };
@@ -280,7 +462,9 @@ export function repairToolCondition(state, classTsid, pc, opts = {}) {
   if (classTsid === 'tinkertool' && opts.hasSpareTinkertool !== true) {
     return { ok: false, reason: 'spare_tinkertool', quote, msg: 'A Tinkertool needs another working Tinkertool for this repair.' };
   }
-  const tinkerCheck = canUseTool(state, 'tinkertool', quote.tinkertoolWear);
+  // The Tinkertool doing the repair is another copy when the one repaired is a Tinkertool itself.
+  const tinkerOpts = classTsid === 'tinkertool' ? { copy: spareTinkertoolIndex(state, quote.condition.copy, quote.tinkertoolWear) } : {};
+  const tinkerCheck = canUseTool(state, 'tinkertool', quote.tinkertoolWear, tinkerOpts);
   if (!tinkerCheck.ok) {
     return { ok: false, reason: 'tinkertool_broken', quote, msg: tinkerCheck.msg };
   }
@@ -295,11 +479,11 @@ export function repairToolCondition(state, classTsid, pc, opts = {}) {
   const target = ensureToolCondition(state, classTsid);
   // tinkertool.js 435: each tick is metabolics_lose_energy; 368 reports what was used.
   const energyUsed = loseEnergy(pc, quote.energy);
-  target.remaining = quote.condition.capacity;
-  target.broken = false;
+  target.copies[quote.condition.copy] = quote.condition.capacity;
   target.repairs = (target.repairs || 0) + 1;
+  settleRow(target, TOOL_CONDITION_CATALOG[classTsid]);
   state.totalRepairs = (state.totalRepairs || 0) + 1;
-  const tinkertoolUse = useToolCondition(state, 'tinkertool', quote.tinkertoolWear);
+  const tinkertoolUse = useToolCondition(state, 'tinkertool', quote.tinkertoolWear, tinkerOpts);
   // Tink Happy Thoughts (tinkertool.js:419): each repair tick adds mood equal
   // to that tick's Tinkertool wear, so the whole repair adds the full wear.
   let moodGained = 0;
@@ -318,12 +502,38 @@ export function repairToolCondition(state, classTsid, pc, opts = {}) {
   };
 }
 
-/** QA helper: clamp one tool to an exact remaining-point value. */
-export function setToolRemaining(state, classTsid, remaining) {
+/** The copy a repair works on: `opts.copy`, else the first (pack order) that needs one. */
+function repairCopyIndex(state, classTsid, opts = {}) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  const row = ensureToolCondition(state, classTsid);
+  if (!def || !row?.copies.length) return undefined;
+  const n = Number(opts?.copy);
+  if (Number.isInteger(n) && n >= 0 && n < row.copies.length) return n;
+  const at = row.copies.findIndex((r) => r < def.capacity);
+  return at >= 0 ? at : 0;
+}
+
+/** A working Tinkertool other than copy `not` (repairing a Tinkertool takes a spare one). */
+function spareTinkertoolIndex(state, not, wear = 1) {
+  const row = ensureToolCondition(state, 'tinkertool');
+  const cost = points(wear);
+  const at = row.copies.findIndex((r, i) => i !== not && r >= cost);
+  if (at >= 0) return at;
+  const any = row.copies.findIndex((_, i) => i !== not);
+  return any >= 0 ? any : not;
+}
+
+/**
+ * Set one tool to an exact remaining-point value (QA, a machine's fuel): the
+ * copy `opts.copy`, else the one in use.
+ */
+export function setToolRemaining(state, classTsid, remaining, opts = {}) {
   const def = TOOL_CONDITION_CATALOG[classTsid];
   if (!def) return null;
   const row = ensureToolCondition(state, classTsid);
-  row.remaining = Math.max(0, Math.min(def.capacity, finiteInt(remaining, def.capacity)));
-  row.broken = row.remaining <= 0;
-  return getToolCondition(state, classTsid);
+  if (!row.copies.length) return getToolCondition(state, classTsid);
+  const at = copyIndexFor(row, opts);
+  row.copies[at] = clampPoints(def, remaining);
+  settleRow(row, def);
+  return getToolCondition(state, classTsid, { copy: at });
 }

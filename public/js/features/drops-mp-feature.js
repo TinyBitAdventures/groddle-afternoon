@@ -40,7 +40,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=85d4faba';
-import { TOOL_CONDITION_CATALOG, getToolCondition, setToolRemaining } from '../tools.js?v=9a2e7ef4';
+import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy } from '../tools.js?v=93286603';
 import { createMinnAccount } from '../minn-account.js?v=81339760';
 import { saveStore } from '../save-store.js?v=b74a8113';
 import { DROP_OP, DROP_TEXT, dropEffect, eatenStack, groundFrom, isPublicStreet, normalizeGroundStack, normalizeMine, pigAnimalKey, shareReason } from '../drops-mp.js?v=00490802';
@@ -136,11 +136,9 @@ function createSession(engine, client) {
       if (d > 0) addItem(inv, c, d);
       else removeItem(inv, c, Math.min(countItem(inv, c), -d));
     }
-    if (fx.tool && TOOL_CONDITION_CATALOG[fx.tool.c] && engine.toolState) {
-      // As a trade does (trade-feature applyDone): a first one takes the stack's wear, one more keeps the more worn.
-      const had = countItem(inv, fx.tool.c) - (fx.pack[fx.tool.c] || 0);
-      const mine = getToolCondition(engine.toolState, fx.tool.c).remaining;
-      setToolRemaining(engine.toolState, fx.tool.c, had > 0 ? Math.min(mine, fx.tool.r) : fx.tool.r);
+    if (fx.tool && TOOL_CONDITION_CATALOG[fx.tool.c] && engine.toolState && (fx.pack[fx.tool.c] || 0) > 0) {
+      // As a trade does (trade-feature applyDone): the tools picked up keep the stack's wear; yours keep their own.
+      receiveToolCopy(engine.toolState, fx.tool.c, fx.tool.r, fx.pack[fx.tool.c]);
     }
     if (at && Number.isFinite(at.x)) {
       const it = item.n === 1 ? itemLabel(item.c) : itemLabel(item.c, item.n);
@@ -288,7 +286,7 @@ function createSession(engine, client) {
     const n = Math.min(Math.max(1, Math.floor(Number(count) || 1)), countItem(engine.inv, c));
     if (n < 1) return null;
     const item = { c, n };
-    if (TOOL_CONDITION_CATALOG[c] && engine.toolState) item.r = getToolCondition(engine.toolState, c).remaining;
+    if (TOOL_CONDITION_CATALOG[c] && engine.toolState) item.r = leavingToolWear(engine.toolState, c, n);
     const ref = `d${Date.now().toString(36)}${(refN += 1)}`;
     dropping = { ref, c, n, r: item.r, x: Number(x) || 0, y: Number(y) || 0, at: Date.now() };
     publish();

@@ -84,9 +84,9 @@ import {
   starterResourceTools,
   swimmingSalmonCount,
   tickResourceNode,
-} from '../resource-nodes.js?v=3d618d6a';
+} from '../resource-nodes.js?v=51d64696';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js?v=db2ce452';
-import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=dbfa83c4';
+import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=ada47e25';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=ba11c5d4';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 

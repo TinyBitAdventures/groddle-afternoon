@@ -95,12 +95,12 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=fe7ee133';
-import { ROCK_CATALOG } from '../mining.js?v=a7eb8740';
+} from '../street-objects.js?v=33fd3608';
+import { ROCK_CATALOG } from '../mining.js?v=15c7bd6e';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
-import { quoteWoodTreeHarvest } from '../woodcutting.js?v=df8a49be';
-import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=756d53d3';
-import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=23f74bb3';
+import { quoteWoodTreeHarvest } from '../woodcutting.js?v=58743072';
+import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=3fbbca52';
+import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=91490913';
 import { PIGGY_FEED, itemBaseCost } from '../animal-husbandry.js?v=f273e2e7';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';

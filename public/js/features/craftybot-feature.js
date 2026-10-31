@@ -43,10 +43,10 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=85d4faba';
-import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=9a2e7ef4';
-import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=9e538296';
-import { listDroppedStacks } from '../world-items.js?v=7df5cf4a';
-import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=b8cbec16';
+import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=93286603';
+import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=fe73bfce';
+import { listDroppedStacks } from '../world-items.js?v=a50e4a32';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=61ee8fba';
 import {
   CRAFTYBOT,
   CRAFTYBOT_BOX,
@@ -305,11 +305,12 @@ function makeWorld(engine) {
       const c = getToolCondition(engine.toolState, cls);
       if (!c.tracked) return { broke: false };
       // wearTool: points_remaining > wear subtracts; otherwise the tool hits 0 and breaks.
+      // The one tool in use wears (js/tools.js copies), not every one of its class.
       if (c.remaining > n) {
-        setToolRemaining(engine.toolState, cls, c.remaining - n);
+        setToolRemaining(engine.toolState, cls, c.remaining - n, { copy: c.copy });
         return { broke: false };
       }
-      setToolRemaining(engine.toolState, cls, 0);
+      setToolRemaining(engine.toolState, cls, 0, { copy: c.copy });
       return { broke: true };
     },
     drop(cls, n, x) {

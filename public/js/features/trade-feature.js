@@ -41,7 +41,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=85d4faba';
-import { TOOL_CONDITION_CATALOG, getToolCondition, setToolRemaining } from '../tools.js?v=9a2e7ef4';
+import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy, setToolRemaining, toolCopies } from '../tools.js?v=93286603';
 import { saveStore } from '../save-store.js?v=b74a8113';
 import { playOverlay } from '../overlays.js?v=106b9955';
 import {
@@ -67,7 +67,7 @@ import {
   slotMax,
   tradeCommand,
   untradeableReason,
-} from '../trade.js?v=58686f95';
+} from '../trade.js?v=d85ea665';
 
 export const TRADE_FEATURE_ID = 'trade';
 export const TRADE_VERB = 'trade_start';
@@ -405,6 +405,20 @@ function createSession(engine, client) {
     return saved.hold ? { items: { ...saved.hold.items }, currants: saved.hold.currants } : { items: {}, currants: 0 };
   }
 
+  /** The wear of the last `n` tools of a class, about to leave the pack for the hold (js/tools.js copies). */
+  function toolPointsOut(c, n) {
+    if (!TOOL_CONDITION_CATALOG[c] || !engine.toolState) return [];
+    const all = toolCopies(engine.toolState, c).map((x) => x.remaining);
+    return all.slice(Math.max(0, all.length - n));
+  }
+
+  /** Tools just back in the pack (the newest copies) take the wear they had. */
+  function toolPointsIn(c, points) {
+    if (!TOOL_CONDITION_CATALOG[c] || !engine.toolState || !points?.length) return;
+    const n = toolCopies(engine.toolState, c).length;
+    points.forEach((r, k) => setToolRemaining(engine.toolState, c, r, { copy: n - points.length + k }));
+  }
+
   /** Move from the pack into the hold so it covers goods. False when the pack cannot. */
   function growHold(goods) {
     const want = holdFor([{ items: Object.entries(heldCounts().items).map(([c, n]) => ({ c, n })), currants: heldCounts().currants }, goods]);
@@ -419,8 +433,10 @@ function createSession(engine, client) {
     for (const [c, n] of Object.entries(want.items)) {
       const more = n - (have.items[c] || 0);
       if (more > 0) {
+        const out = toolPointsOut(c, more);
         removeItem(engine.inv, c, more);
         saved.hold.items[c] = n;
+        if (out.length) (saved.hold.points ||= {})[c] = [...(saved.hold.points?.[c] || []), ...out];
       }
     }
     const moreCur = want.currants - have.currants;
@@ -441,6 +457,8 @@ function createSession(engine, client) {
       const extra = n - (want.items[c] || 0);
       if (extra > 0) {
         addItem(engine.inv, c, extra);
+        const held = saved.hold.points?.[c];
+        if (held?.length) toolPointsIn(c, held.splice(held.length - Math.min(extra, held.length)));
         moved = true;
         if (want.items[c]) saved.hold.items[c] = want.items[c];
         else delete saved.hold.items[c];
@@ -463,7 +481,11 @@ function createSession(engine, client) {
     const hold = saved.hold;
     if (!hold || (tradeId && hold.trade !== tradeId)) return;
     saved.hold = null;
-    for (const [c, n] of Object.entries(hold.items)) if (n > 0) addItem(engine.inv, c, n);
+    for (const [c, n] of Object.entries(hold.items)) {
+      if (n <= 0) continue;
+      addItem(engine.inv, c, n);
+      toolPointsIn(c, (hold.points?.[c] || []).slice(0, n));
+    }
     if (hold.currants > 0) engine.pc.currants += hold.currants;
     engine.updateHud?.();
     engine.save?.();
@@ -517,7 +539,8 @@ function createSession(engine, client) {
       line(TRADE_TEXT.notEnough, 'error');
       return;
     }
-    const tracked = TOOL_CONDITION_CATALOG[c] ? getToolCondition(engine.toolState, c).remaining : null;
+    // Each tool wears on its own (js/tools.js): the offered ones carry their own wear (the most worn of them).
+    const tracked = TOOL_CONDITION_CATALOG[c] ? leavingToolWear(engine.toolState, c, Math.min(left, slotMax(c, table))) : null;
     const { goods, added, reason: why } = addToGoods(open.draft, c, Math.min(left, slotMax(c, table)), table, { tool: tracked });
     if (!added) {
       line(why, 'error');
@@ -866,19 +889,27 @@ function createSession(engine, client) {
     if (!hold && Object.keys(countsOf(normalizeGoods(msg.gave))).length) console.warn('[trade] done without its hold', id);
     const s = settleDone(hold, msg);
     const inv = engine.inv;
-    const had = {};
-    for (const t of s.tools) had[t.c] = countItem(inv, t.c);
     for (const [c, n] of Object.entries(s.pack)) {
       if (n > 0) addItem(inv, c, n);
       else removeItem(inv, c, Math.min(countItem(inv, c), -n));
     }
+    // Held tools the trade did not take come back with their own wear: the given ones were the most
+    // worn (the offer carried that wear: leavingToolWear), the rest return (the newest copies, before what came).
+    for (const [c, list] of Object.entries(hold?.points || {})) {
+      const gaveN = Math.min(list.length, (countsOf(normalizeGoods(msg.gave))[c] || 0));
+      const back = [...list].sort((a, b) => a - b).slice(gaveN);
+      const got = countsOf(normalizeGoods(msg.got))[c] || 0;
+      if (!back.length || !engine.toolState) continue;
+      const n = toolCopies(engine.toolState, c).length;
+      back.forEach((r, k) => setToolRemaining(engine.toolState, c, r, { copy: n - got - back.length + k }));
+    }
     engine.pc.currants = Math.max(0, n0(engine.pc.currants) + s.currants);
-    // A traded tool keeps its wear (the source carried tool_state): a first one takes the
-    // sender's points, one more of a class you have takes whichever is more worn.
+    // A traded tool keeps its wear (the source carried tool_state): the ones that came take the
+    // sender's points; the ones you had keep their own (js/tools.js copies).
+    const gotCounts = countsOf(normalizeGoods(msg.got));
     for (const t of s.tools) {
-      if (!TOOL_CONDITION_CATALOG[t.c] || !engine.toolState) continue;
-      const mine = getToolCondition(engine.toolState, t.c).remaining;
-      setToolRemaining(engine.toolState, t.c, had[t.c] > 0 ? Math.min(mine, t.r) : t.r);
+      if (!TOOL_CONDITION_CATALOG[t.c] || !engine.toolState || !(gotCounts[t.c] > 0)) continue;
+      receiveToolCopy(engine.toolState, t.c, t.r, gotCounts[t.c]);
     }
     if (hold) saved.hold = null;
     saved.applied = [...saved.applied, id].slice(-APPLIED_KEEP);

@@ -15,8 +15,9 @@
 import {
   canUseTool,
   setToolRemaining,
+  takeToolCopy,
   useToolCondition,
-} from './tools.js?v=9a2e7ef4';
+} from './tools.js?v=93286603';
 import { SKILL_PACKAGES, getSkillPackageOverride, skillPackageDetails } from './skill-packages.js?v=bfb87281';
 import { loseEnergy, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
@@ -356,10 +357,13 @@ export function performAnimalKinship(state, classId, verbId, ctx = {}) {
   if (classId === 'npc_butterfly' && verbId === 'massage' && selected.toolWear > 0 && ctx.tools) {
     toolUse = useToolCondition(ctx.tools, 'butterfly_lotion', selected.toolWear);
     if (toolUse.ok && toolUse.broke) {
+      // That tube is empty and leaves the pack; any other tube keeps its own uses (js/tools.js copies).
+      takeToolCopy(ctx.tools, 'butterfly_lotion', { copy: toolUse.copy });
       ctx.inv.butterfly_lotion = Math.max(0, (Number(ctx.inv.butterfly_lotion) || 0) - 1);
       effects.items.butterfly_lotion = -1;
       if (ctx.inv.butterfly_lotion > 0) {
-        setToolRemaining(ctx.tools, 'butterfly_lotion', toolUse.capacity);
+        // Not bound to this pack (a pure caller): the one row stands for the next tube, a full one.
+        if (ctx.tools.inv !== ctx.inv) setToolRemaining(ctx.tools, 'butterfly_lotion', toolUse.capacity);
         toolUse.replacementLoaded = true;
       }
     }
