@@ -199,10 +199,10 @@ describe('the console page (groddle-afternoon-site console/console.js)', { skip:
 
   it('offers each player the actions that fit: never banning yourself or an administrator, unban for the banned', () => {
     const ids = (m) => m.filter((i) => i.enabled).map((i) => i.id);
-    assert.deepEqual(ids(mod.menuFor({ id: 9 }, { me: 1, online: true })), ['message', 'teleport', 'give', 'refill', 'boot', 'ban']);
-    assert.deepEqual(ids(mod.menuFor({ id: 9 }, { me: 1, online: false })), ['message', 'teleport', 'give', 'ban']);
-    assert.deepEqual(ids(mod.menuFor({ id: 1, admin: true }, { me: 1, online: true })), ['message', 'give', 'refill']);
-    assert.deepEqual(ids(mod.menuFor({ id: 2, admin: true }, { me: 1, online: true })), ['message', 'teleport', 'give', 'refill', 'boot']);
+    assert.deepEqual(ids(mod.menuFor({ id: 9 }, { me: 1, online: true })), ['message', 'chatlog', 'teleport', 'give', 'refill', 'boot', 'ban']);
+    assert.deepEqual(ids(mod.menuFor({ id: 9 }, { me: 1, online: false })), ['message', 'chatlog', 'teleport', 'give', 'ban']);
+    assert.deepEqual(ids(mod.menuFor({ id: 1, admin: true }, { me: 1, online: true })), ['message', 'chatlog', 'give', 'refill']);
+    assert.deepEqual(ids(mod.menuFor({ id: 2, admin: true }, { me: 1, online: true })), ['message', 'chatlog', 'teleport', 'give', 'refill', 'boot']);
     assert.deepEqual(ids(mod.menuFor({ id: 9, banned: true }, { me: 1 })).slice(-1), ['unban']);
     assert.ok(mod.menuFor({ id: 2, admin: true }, { me: 1 }).find((i) => i.id === 'ban').reason);
   });
@@ -381,7 +381,7 @@ describe('the site routes (groddle-afternoon-site AdminConsole, AdminConsolePage
   it('the theme serves the console\'s script and styles, keyed', () => {
     assert.ok(existsSync(sitePath('console/console.js')));
     assert.ok(existsSync(sitePath('console/console.css')));
-    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'builder-keys-1'/);
+    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'chat-log-1'/);
     const css = readFileSync(sitePath('console/console.css'), 'utf8');
     for (const token of ['--surface', '--border', '--fg', '--muted', '--track', '--row-line']) assert.match(css, new RegExp(`var\\(${token}\\)`), token);
   });
@@ -394,5 +394,111 @@ describe('the realtime server (groddle-afternoon-server admin.go)', { skip: skip
     assert.doesNotMatch(src, /r\.Handle\(/, 'no socket kinds');
     assert.match(readFileSync(serverPath('main.go'), 'utf8'), /if s\.hub\.Banned\(claims\.Sub\) \{/);
     assert.match(readFileSync(serverPath('admin_test.go'), 'utf8'), /9MY3KNwUctqbzzlpAAxyoTdMJzr9DOkqYm5bW0LQN-Y/);
+  });
+});
+
+describe('the chat log (Austin 2026-10-31: chat written down for spam and abuse moderation)', { skip: skipWithoutSite || skipWithoutServer }, async () => {
+  const mod = HAS_SITE ? await import(pathToFileURL(sitePath('console/console.js')).href) : {};
+  const php = (code) => JSON.parse(String(execFileSync('php', ['-r', `foreach (['ServiceCall', 'AdminConsole'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\AdminConsole; echo json_encode(${code}, JSON_UNESCAPED_UNICODE);`])));
+
+  it('a player\'s menu has Chat history for anyone, yourself and the offline too, and it opens the tab filtered to them', () => {
+    for (const [p, opts] of [[{ id: 9 }, { me: 1, online: false }], [{ id: 1, admin: true }, { me: 1, online: true }], [{ id: 9, banned: true }, { me: 1 }]]) {
+      const item = mod.menuFor(p, opts).find((i) => i.id === 'chatlog');
+      assert.equal(item.label, 'Chat history');
+      assert.equal(item.enabled, true);
+    }
+    const src = readFileSync(sitePath('console/console.js'), 'utf8');
+    assert.match(src, /\} else if \(kind === 'chatlog'\) \{\s*openChat\(p\);/);
+    const open = src.slice(src.indexOf('function openChat('), src.indexOf("chatForm.addEventListener('submit'"));
+    assert.match(open, /chatForm\.player\.value = `#\$\{player\.id\}`;/, 'filtered by id, not a name piece');
+    assert.match(open, /showTab\('chat'\)/);
+    assert.match(src, /\/\^#chat=\\d\+\$\/\.test\(location\.hash\)\) openChat\(/, '#chat=<id> opens it filtered');
+  });
+
+  it('asks for the viewer\'s own days: From at its local midnight, To up to the next one', () => {
+    const p = new URLSearchParams(mod.chatlogParams({ player: ' #7 ', q: ' buy gold ', kind: 'party', from: '2026-10-30', to: '2026-10-31', refused: true, before: '2026-10-31:57' }));
+    assert.equal(p.get('player'), '#7');
+    assert.equal(p.get('q'), 'buy gold');
+    assert.equal(p.get('kind'), 'party');
+    assert.equal(Number(p.get('since')), new Date(2026, 9, 30).getTime());
+    assert.equal(Number(p.get('until')), new Date(2026, 10, 1).getTime());
+    assert.equal(p.get('refused'), '1');
+    assert.equal(p.get('before'), '2026-10-31:57');
+    assert.equal(mod.chatlogParams({ kind: 'whisper', from: 'yesterday', to: '' }), '', 'anything else is left out');
+    assert.equal(mod.chatlogParams({}), '');
+    assert.equal(mod.localDayStart('2026-12-31', 1), new Date(2027, 0, 1).getTime());
+  });
+
+  it('words refusals, the kinds, the status line, and local times', () => {
+    assert.equal(mod.chatWhy({ delivered: true }), '');
+    assert.equal(mod.chatWhy({ delivered: false, why: 'slow_down' }), 'Refused: too fast');
+    assert.equal(mod.chatWhy({ delivered: false, why: 'silenced', skipped: 4 }), 'Refused: silenced in this channel (4 more refused before it, not written)');
+    assert.deepEqual({ ...mod.CHAT_KIND }, { local: 'Street', channel: 'Channel', party: 'Party' });
+    assert.equal(mod.chatStatus({ shown: 2, more: true, days: 30 }), '2 lines, newest first, more with Older. Kept 30 days.');
+    assert.equal(mod.chatStatus({ shown: 1, dropped: 3, days: 30 }), '1 line, newest first. Kept 30 days. 3 lines were too many to write at once and are not in the log.');
+    assert.equal(mod.chatStatus({ shown: 0 }), 'No lines.');
+    assert.equal(mod.chatStatus({ server: 'off' }), 'The realtime server keeps no chat log right now.');
+    assert.equal(mod.chatStatus({ server: 'down' }), mod.COPY.serverDown);
+    const at = '2026-10-31T14:03:05.000Z';
+    assert.equal(mod.chatWhen(at), new Date(at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    assert.equal(mod.chatWhen('nope'), '');
+    for (const w of [mod.chatWhy({ why: 'silenced', skipped: 2 }), mod.chatStatus({ shown: 3, more: true, dropped: 2, days: 30 }), mod.chatStatus({ server: 'off' })]) assert.ok(!/[—–]|Glitch/.test(w), w);
+  });
+
+  it('the page: a Chat log tab with the search, the table and Older; what players said set as text', () => {
+    const page = readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8');
+    assert.match(page, /data-console-tab="chat">Chat log<\/button>/);
+    for (const hook of ['data-console-tabpanel="chat"', 'data-console-chat-form', 'data-console-chat-status', 'data-console-chat-empty', 'data-console-chat-more', 'data-console-chat-clear', 'data-console-chat hidden>']) assert.ok(page.includes(hook), hook);
+    for (const field of ['name="player"', 'name="q"', 'name="kind"', 'name="from" type="date"', 'name="to" type="date"', 'name="refused" type="checkbox"']) assert.ok(page.includes(field), field);
+    const panel = page.slice(page.indexOf('<div class="console-chat"'), page.indexOf('data-console-chat-more'));
+    assert.doesNotMatch(panel, /[—–]|Glitch/);
+    const src = readFileSync(sitePath('console/console.js'), 'utf8');
+    const row = src.slice(src.indexOf('function chatRow('), src.indexOf('async function loadChat('));
+    assert.match(row, /el\('span', \{ text: l\.text \}\)/, 'the line as text');
+    assert.match(row, /openMenu\(who, e\.currentTarget, null\)/, 'a name opens that player\'s menu');
+    assert.match(row, /chatWhen\(l\.at\)/);
+    assert.match(src, /api\.call\(`admin\/chatlog\$\{q \? `\?\$\{q\}` : ''\}`\)/);
+  });
+
+  it('the route: administrators only, the server\'s signed chatlog call, no table of its own', () => {
+    const src = readFileSync(sitePath('src/AdminConsole.php'), 'utf8');
+    assert.match(src, /#\[Route\(Method::Get, '\/groddle\/v1\/admin\/chatlog', policy: new Policy\(Access::Cap, self::ADMIN\)\)\]/);
+    const route = src.slice(src.indexOf('public function chatlog('), src.indexOf('public static function chatQuery('));
+    assert.match(route, /\(new RealtimeCall\(\$this->minn\)\)->post\('chatlog', self::chatQuery\(\$query\)\)/);
+    assert.match(route, /'server' => 'off'/);
+    assert.match(route, /'server' => 'down'/);
+    assert.doesNotMatch(route, /INSERT|UPDATE|DELETE/);
+    const manifest = JSON.parse(readFileSync(sitePath('minn.json'), 'utf8'));
+    assert.ok(!Object.keys(manifest.tables).some((t) => /chat/.test(t)), 'the log lives on the realtime server');
+  });
+
+  it('passes the filters as the server takes them, and leaves out what does not fit', { skip: !hasPhp && 'no php' }, () => {
+    assert.deepEqual(php(`AdminConsole::chatQuery(['player' => '#7', 'q' => "  buy \\t gold ", 'kind' => 'party', 'since' => '1761868800000', 'until' => '1761955200000', 'refused' => '1', 'before' => '2026-10-31:57'])`),
+      { limit: 100, player: 7, q: 'buy gold', kind: 'party', since: 1761868800000, until: 1761955200000, undelivered: true, before: '2026-10-31:57' });
+    assert.deepEqual(php(`AdminConsole::chatQuery(['player' => 'Ada'])`), { limit: 100, name: 'Ada' });
+    assert.deepEqual(php(`AdminConsole::chatQuery(['player' => '12'])`), { limit: 100, player: 12 });
+    assert.deepEqual(php(`AdminConsole::chatQuery(['kind' => 'whisper', 'since' => '-5', 'until' => 'soon', 'refused' => 'yes', 'before' => '../etc', 'q' => ['x']])`), { limit: 100 });
+    assert.equal(php(`mb_strlen(AdminConsole::chatQuery(['q' => str_repeat('é', 300)])['q'])`), 200);
+    assert.equal(php(`AdminConsole::chatWhere('local', 'GA5', ['GA5' => ['label' => 'Hechey Track']], [])`), 'Hechey Track');
+    assert.equal(php(`AdminConsole::chatWhere('local', 'GZZ', [], [])`), 'GZZ');
+    assert.equal(php(`AdminConsole::chatWhere('channel', 'newbie', [], [])`), 'Live Help (new players)');
+    assert.equal(php(`AdminConsole::chatWhere('channel', 'group:12', [], [12 => 'Gardeners'])`), 'Gardeners');
+    assert.equal(php(`AdminConsole::chatWhere('channel', 'group:13', [], [])`), 'Group 13');
+    assert.equal(php(`AdminConsole::chatWhere('party', 'party-7-x', [], [])`), 'Party');
+  });
+
+  it('the server logs every kind, refusals too, and answers only the site\'s signed call (groddle-afternoon-server chatlog.go)', () => {
+    const src = readFileSync(serverPath('chatlog.go'), 'utf8');
+    assert.match(src, /serviceHandlers\["chatlog"\] = adminChatlog/);
+    assert.doesNotMatch(src, /r\.Handle\(/, 'no socket kinds');
+    assert.match(src, /chatlogDaysFlag = flag\.Int\("chatlog-days", 30,/);
+    assert.match(src, /os\.O_APPEND\|os\.O_CREATE\|os\.O_WRONLY, 0o600/);
+    assert.match(readFileSync(serverPath('hub.go'), 'utf8'), /h\.logChatLocked\("local", cl\.street, cl, text, "slow_down", nil\)/);
+    const chans = readFileSync(serverPath('channels.go'), 'utf8');
+    assert.match(chans, /logChatLocked\("channel", room, cl, text, "silenced", nil\)/);
+    assert.match(chans, /logChatLocked\("channel", room, cl, text, "", nil\)/);
+    assert.match(readFileSync(serverPath('party.go'), 'utf8'), /logChatLocked\("party", p\.chatlogID\(cl\.ID\(\), m\.h\.Now\(\)\), cl, text, "", to\)/);
+    assert.match(readFileSync(serverPath('deploy/groddle-realtime.service'), 'utf8'), /-chatlog-dir \/var\/lib\/groddle-realtime\/chatlog/);
+    for (const t of ['TestChatlogCallIsOnlyTheSitesSignedPost', 'TestChatlogAFullQueueDropsLinesAndNeverHoldsUpChat', 'TestChatlogPrunesOldDaysAtStartAndOnANewDay']) assert.match(readFileSync(serverPath('chatlog_test.go'), 'utf8'), new RegExp(`func ${t}\\(`), t);
   });
 });
