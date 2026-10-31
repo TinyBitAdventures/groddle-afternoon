@@ -104,6 +104,7 @@ describe('a Piggy that reached its food', () => {
     Object.defineProperty(pig.sprite, 'playing', { get: () => playing });
     pig.sprite.gotoAndStop = () => { playing = false; };
     pig.sprite.play = () => { playing = true; };
+    pig.sprite.gotoAndPlay = () => { playing = true; };
     animalMoodFeature.onStreetClear();
     let t = 10_000;
     const tick = (ms = 500) => {
@@ -117,6 +118,10 @@ describe('a Piggy that reached its food', () => {
     animalMoodFeature.sharedAnimalEvent(pig, { ev: 'ate', on: tree }, engine);
     for (let i = 0; i < 4; i += 1) tick();
     assert.ok(Math.abs(pig.sprite.x - tree.sprite.x) < 7, 'it reached the tree');
+    // The chew clip plays first when its frames have loaded (they load in the background, so a
+    // loaded machine may not have them yet): end it as Pixi would, back to the walk frames.
+    pig.sprite.onComplete?.();
+    tick(16);
     assert.equal(playing, false, 'eating, it stands on a still frame (onFoodPathing 1485-1513: chew, then idle)');
     clock += 3100;
     tick();
