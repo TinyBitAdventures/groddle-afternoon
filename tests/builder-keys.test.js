@@ -29,6 +29,9 @@ const VECTORS = [
   { method: 'GET', route: '/groddle/v1/admin/builder/drafts/mossy-hollow/render.png', query: 'street=lane&scale=0.25&overlay=geometry,reach,findings,grid&view=full', body: '' },
   { method: 'get', route: '/groddle/v1/admin/builder/decos', query: { q: "bush (tall) it's!", limit: '3', layer: 'middleground', rest_route: '/x' }, body: '' },
   { method: 'DELETE', route: '/groddle/v1/admin/builder/drafts/a-b-c', query: 'b=2&a=1&a=0', body: '' },
+  // New art's bytes for publish (P7): the draft's art route, with and without the 3x.
+  { method: 'GET', route: `/groddle/v1/admin/builder/drafts/mount-test/art/${'5e'.repeat(32)}`, query: 'size=3', body: '' },
+  { method: 'GET', route: `/groddle/v1/admin/builder/drafts/mount-test/art/${'5e'.repeat(32)}`, query: '', body: '' },
 ];
 
 describe('builder keys: the CLI and the site sign the same bytes', () => {
@@ -129,6 +132,43 @@ describe('the site refuses a stale, replayed, forged or out-of-scope key (Builde
     assert.equal(r[60].code, 'builder_rate_limited');
     assert.equal(r.slice(61).filter((x) => x.ok).length, 70);
   });
+
+  it('new art\'s bytes count in their own bucket: the 301st fetch in a minute is 429', () => {
+    const calls = [];
+    for (let i = 0; i < RATES.art + 1; i += 1) calls.push(call(sign({ method: 'GET', nonce: (9000 + i).toString(16).padStart(16, '0') }), { method: 'GET', scope: 'drafts:read', kind: 'art' }));
+    const r = run(calls);
+    assert.equal(r.slice(0, RATES.art).filter((x) => x.ok).length, RATES.art);
+    assert.equal(r[RATES.art].status, 429);
+  });
+});
+
+describe('the draft art route hands out only art the draft names, or the caller sent (AdminBuilderAssets::artAllowed)', { skip: skipWithoutSite || (!hasPhp && 'no php') }, () => {
+  const SHA = '5e'.repeat(32);
+  const allowed = (zone, row, author) => {
+    const php = `require ${JSON.stringify(SITE_DIR)} . '/src/AdminBuilderAssets.php';
+      $in = json_decode(stream_get_contents(STDIN)); $row = json_decode(json_encode($in->row), true);
+      echo json_encode(Groddle\\Minn\\AdminBuilderAssets::artAllowed($in->zone, 'mount-test', $row, $in->author));`;
+    return JSON.parse(execFileSync('php', ['-r', php], { input: JSON.stringify({ zone, row, author }) }).toString());
+  };
+  const row = { name: 'gz_ai_ash_cone', sha256: SHA, draft: 'mount-test', createdBy: 'key:0f1e2d3c4b5a6978' };
+  const named = { assets: { gz_ai_ash_cone: { origin: 'new', sha256: SHA } } };
+
+  it('a row of the zone with that sha256, under the kept name, is allowed to any caller', () => {
+    assert.equal(allowed(named, row, '1'), true);
+    assert.equal(allowed(named, { ...row, draft: 'other', createdBy: '2' }, 'key:ffffffffffffffff'), true);
+  });
+  it('another draft\'s art, a renamed row, a library row or a changed sha256 is not', () => {
+    const other = { ...row, draft: 'other', createdBy: '2' };
+    assert.equal(allowed({ assets: {} }, other, '1'), false);
+    assert.equal(allowed({ assets: { gz_other: { origin: 'new', sha256: SHA } } }, other, '1'), false);
+    assert.equal(allowed({ assets: { gz_ai_ash_cone: { origin: 'tinyspeck-cc0', sha256: SHA } } }, other, '1'), false);
+    assert.equal(allowed({ assets: { gz_ai_ash_cone: { origin: 'new', sha256: 'ab'.repeat(32) } } }, other, '1'), false);
+  });
+  it('art this caller sent into this draft, before its asset.set op, is the caller\'s own', () => {
+    assert.equal(allowed({ assets: {} }, row, 'key:0f1e2d3c4b5a6978'), true);
+    assert.equal(allowed({ assets: {} }, row, 'key:ffffffffffffffff'), false);
+    assert.equal(allowed({ assets: {} }, { ...row, draft: 'other' }, 'key:0f1e2d3c4b5a6978'), false);
+  });
 });
 
 describe('the builder worker takes only the site\'s signed calls', () => {
@@ -206,7 +246,7 @@ describe('keys stay inside the builder (groddle-afternoon-site)', { skip: skipWi
   it('the scopes, rates and render limits match the tools', () => {
     const keys = src('src/BuilderKeys.php');
     assert.match(keys, new RegExp(`SCOPES = \\[${SCOPES.map((s) => `'${s}'`).join(', ')}\\]`));
-    assert.match(keys, new RegExp(`RATES = \\['write' => ${RATES.write}, 'render' => ${RATES.render}, 'validate' => ${RATES.validate}\\]`));
+    assert.match(keys, new RegExp(`RATES = \\['write' => ${RATES.write}, 'render' => ${RATES.render}, 'validate' => ${RATES.validate}, 'art' => ${RATES.art}\\]`));
     assert.match(keys, /WINDOW = 60;/);
     assert.match(keys, /NONCE_KEEP = 120;/);
     assert.match(keys, /DEFAULT_DAYS = 30;/);

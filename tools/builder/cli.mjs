@@ -19,7 +19,8 @@
  *
  * Exit status: 0 done; 1 validate (or publish) found an error or a fatal finding; 2 refused or wrong usage.
  */
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join, resolve, basename } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { GAME_DIR } from '../repos.mjs';
@@ -188,6 +189,41 @@ export function createClient({ url, key, fetchImpl = globalThis.fetch }) {
     return { data, res };
   }
   return { call };
+}
+
+/**
+ * New art's kept files for publish (spec 11), fetched with the key from the draft's art route
+ * (`GET drafts/<id>/art/<sha256>[?size=3]`, drafts:read; the site hands out only art the draft
+ * names): `<name>.webp` and, when intake kept one, `<name>@1.5x.webp`, into `dir`. A 429 waits its
+ * Retry-After and tries again. Answers the names fetched, with whether each had a 3x file.
+ */
+export async function fetchArt(client, id, entries, dir, { wait = (s) => new Promise((r) => setTimeout(r, s * 1000)) } = {}) {
+  const enc = encodeURIComponent(id);
+  const get = async (sha, three) => {
+    for (let attempt = 0; ; attempt += 1) {
+      try {
+        const res = await client.call('GET', `/drafts/${enc}/art/${sha}`, { query: three ? { size: '3' } : null, raw: true });
+        return Buffer.from(await res.arrayBuffer());
+      } catch (e) {
+        if (three && e.status === 404) return null;
+        if (e.code === 'builder_rate_limited' && attempt < 3) {
+          await wait(Number(e.data?.retryAfter) || 5);
+          continue;
+        }
+        throw e;
+      }
+    }
+  };
+  const got = [];
+  for (const [name, row] of entries) {
+    if (!/^[0-9a-f]{64}$/.test(String(row?.sha256 || ''))) continue;
+    const two = await get(row.sha256, false);
+    writeFileSync(join(dir, `${name}.webp`), two);
+    const three = await get(row.sha256, true);
+    if (three) writeFileSync(join(dir, `${name}@1.5x.webp`), three);
+    got.push({ name, three: Boolean(three) });
+  }
+  return got;
 }
 
 // —— Targets: a draft on the site, or a zone file ——
@@ -666,7 +702,8 @@ export const HELP = `Groddle level builder (docs/level-builder/spec.md 8.2)
   asset add <file> --name gz_x --licence own-work-CC0|ai-generated --author A [--tool --prompt --inputs a,b --role --file3 f]
   play [--street k]   history   restore <rev>
   publish [<id> --rev n | file:<zone.json>] --dry-run | --write [--art <folder>] [--ack fp|rule|all] [--no-build]
-                                              into this checkout's files (spec 11); never commits
+                                              into this checkout's files (spec 11); never commits. A draft's new
+                                              art is fetched with the key; --art <folder> works offline
   sign METHOD ROUTE [BODY] [--query a=1&b=2]  the X-Groddle-Builder value for a request`;
 
 // —— Commands ——
@@ -1096,16 +1133,34 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       const write = flags.write === true;
       if (write === (flags['dry-run'] === true)) throw new CliError('publish [<draft id> --rev n | file:<zone.json>] --dry-run | --write [--art <folder>] [--ack <fingerprint|rule|all>,...]');
       let zone;
+      let id = null;
       if (local()) {
         zone = readJson(resolve(flags.file));
       } else {
-        const id = args[0] || draftId();
+        id = args[0] || draftId();
         const rev = flags.rev !== undefined ? num(flags.rev, 'rev') : null;
         ({ data: zone } = await client.call('GET', `/drafts/${encodeURIComponent(id)}`, { query: rev ? { rev: String(rev) } : null }));
       }
-      const { publishZone, afterPublish } = await import('./publish.mjs');
+      const { publishZone, afterPublish, usedNewArt } = await import('./publish.mjs');
       const ack = typeof flags.ack === 'string' ? flags.ack.split(',').map((x) => x.trim()).filter(Boolean) : [];
-      const r = publishZone(zone, { art: typeof flags.art === 'string' ? resolve(flags.art) : null, ack, write, dirtyOk: flags.dirty === true });
+      // New art's bytes: --art <folder> (offline), else fetched with the key from the draft's art route.
+      let art = typeof flags.art === 'string' ? resolve(flags.art) : null;
+      let fetched = null;
+      const want = usedNewArt(zone);
+      if (!art && id && want.length) {
+        art = mkdtempSync(join(tmpdir(), 'builder-art-'));
+        fetched = await fetchArt(client, id, want, art).catch((e) => {
+          rmSync(art, { recursive: true, force: true });
+          throw new CliError(`Could not fetch the draft's new art: ${e.message} Give --art <folder> instead.`, { code: e.code || 'builder_art', status: e.status || 0, data: e.data || null });
+        });
+      }
+      let r;
+      try {
+        r = publishZone(zone, { art, ack, write, dirtyOk: flags.dirty === true });
+      } finally {
+        if (fetched) rmSync(art, { recursive: true, force: true });
+      }
+      if (fetched) r.notes.unshift(`Fetched ${plural(fetched.length, 'piece')} of new art with the key (${fetched.filter((f) => f.three).length} with a 3x file).`);
       const head = `${zone.title || zone.id} (${zone.id}, rev ${zone.rev ?? '?'}): ${plural(r.report?.counts?.fatal ?? 0, 'fatal')}, ${plural(r.report?.counts?.error ?? 0, 'error')}, ${plural(r.report?.counts?.warn ?? 0, 'warning')}, ${plural(r.report?.counts?.info ?? 0, 'note')}`;
       if (!r.ok) {
         throw new CliError([`Not published. ${head}`, ...r.refused.map((x) => `  - ${x}`)].join('\n'), { code: 'builder_publish_refused', data: { refused: r.refused, counts: r.report?.counts || null }, exit: 1 });

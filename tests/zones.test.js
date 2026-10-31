@@ -304,6 +304,41 @@ describe('the publish gate', () => {
     assert.equal(read('public/assets/streets/index.json'), was);
     await assert.rejects(run(['publish', `file:${join(ART, 'mossy-hollow-editor.zone.json')}`], { env: {} }), /--dry-run \| --write/);
   });
+
+  it('publish <draft> fetches new art with the key (the draft\'s art route, signed), with no --art; a 3x it lacks is fine', async () => {
+    const z = withArt();
+    const bytes = readFileSync(join(ART, 'gz_moss_mound.webp'));
+    const three = readFileSync(join(ART, 'gz_moss_mound@1.5x.webp'));
+    const sha = z.assets.gz_moss_mound.sha256;
+    const env = { GRODDLE_BUILDER_HOME: mkdtempSync(join(tmpdir(), 'zones-home-')), GRODDLE_BUILDER_URL: 'https://example.invalid', GRODDLE_BUILDER_KEY: `${'a'.repeat(16)}.${'b'.repeat(64)}` };
+    const calls = [];
+    const serve = (withThree, missing = false) => async (url, init) => {
+      const u = new URL(url);
+      calls.push({ method: init.method, path: u.pathname.replace('/wp-json/groddle/v1/admin/builder', ''), query: u.search.slice(1), header: init.headers['X-Groddle-Builder'] });
+      if (u.pathname.endsWith(`/drafts/${z.id}`)) return new Response(JSON.stringify(z), { status: 200, headers: { ETag: `"${z.rev}"` } });
+      const is3 = u.searchParams.get('size') === '3';
+      if (u.pathname.endsWith(`/art/${sha}`) && !missing && (!is3 || withThree)) return new Response(is3 ? three : bytes, { status: 200, headers: { 'Content-Type': 'image/webp' } });
+      return new Response(JSON.stringify({ code: 'builder_not_found', message: 'This draft names no new art with that sha256.', data: { status: 404 } }), { status: 404 });
+    };
+    const r = await run(['publish', z.id, '--dry-run', '--dirty', '--json'], { env, fetchImpl: serve(true) });
+    assert.equal(r.exit, 0);
+    assert.deepEqual(calls.map((c) => `${c.method} ${c.path}${c.query ? `?${c.query}` : ''}`), [`GET /drafts/${z.id}`, `GET /drafts/${z.id}/art/${sha}`, `GET /drafts/${z.id}/art/${sha}?size=3`]);
+    assert.ok(calls.every((c) => /^a{16}\.\d+\.[0-9a-f]{16}\.[A-Za-z0-9_-]{43}$/.test(c.header)), 'every fetch is signed');
+    assert.ok(r.out.changed.includes('public/assets/decos/groddle/gz_moss_mound.webp'));
+    assert.ok(r.out.changed.includes('public/assets/decos/groddle/gz_moss_mound@1.5x.webp'));
+    assert.match(r.out.notes[0], /Fetched 1 piece of new art with the key \(1 with a 3x file\)/);
+    calls.length = 0;
+    const no3 = await run(['publish', z.id, '--dry-run', '--dirty', '--json'], { env, fetchImpl: serve(false) });
+    assert.ok(no3.out.changed.includes('public/assets/decos/groddle/gz_moss_mound.webp'));
+    assert.ok(!no3.out.changed.includes('public/assets/decos/groddle/gz_moss_mound@1.5x.webp'));
+    // The site refusing the art is a refusal that says how to publish offline.
+    await assert.rejects(run(['publish', z.id, '--dry-run', '--dirty'], { env, fetchImpl: serve(false, true) }), /Could not fetch the draft's new art: .*--art <folder>/);
+    // --art is the offline path: no art route is called.
+    calls.length = 0;
+    const offline = await run(['publish', z.id, '--dry-run', '--dirty', '--art', ART, '--json'], { env, fetchImpl: serve(true) });
+    assert.equal(offline.exit, 0);
+    assert.deepEqual(calls.map((c) => c.path), [`/drafts/${z.id}`]);
+  });
 });
 
 describe('the game: zones are solo only (js/zone-streets.js, js/street-loader.js)', () => {

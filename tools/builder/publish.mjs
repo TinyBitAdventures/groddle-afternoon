@@ -33,7 +33,7 @@ export function unacknowledged(findings, ack = []) {
 }
 
 /** The new art a zone's streets use: [name, row]. */
-function usedNewArt(zone) {
+export function usedNewArt(zone) {
   const used = spritesUsed(zone);
   return Object.entries(zone.assets || {}).filter(([name, a]) => a?.origin === 'new' && used.has(name));
 }
