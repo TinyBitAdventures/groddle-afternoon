@@ -7,8 +7,9 @@
  * (assets/content/style-profiles.json, tools/builder/style-profile.mjs, spec 9.2):
  *
  *   Meadow  the Standard stack (sky, bg_1, middleground, middleplus), from Groddle Meadow (hub 58)
- *   Tall    Vertical Parallax: the same stack 2,400 high, its back layers shorter than the street
- *           in the same ratio as they are narrower, so they move up and down slower too
+ *   Tall    Vertical Parallax: the same stack 2,400 high, its back layers a little shorter than the
+ *           street as Tiny Speck's tall streets have them (tallLayerHeight), so they move up and down a
+ *           little slower and their bottoms stay behind the floor's ground at every camera position
  *   Forest  sky, bg_2, bg_1, middleground, middleplus and a foreground, from Groddle Forest (hub 56)
  *   Cave    a dark stack with a foreground, from Ilmenskie Caverns (hub 50)
  *   Blank   the middleground only, with the world's usual sky
@@ -26,7 +27,7 @@ import { newTsid, libraryAsset } from './zone.js?v=6a3db28e';
 
 export const TEMPLATES = Object.freeze([
   Object.freeze({ id: 'meadow', name: 'Meadow', words: 'Sky, one back layer, the middleground and a near layer (the Standard stack).', profile: 'hub-58', height: 1000, ground: 'evenground_platform_long', roles: Object.freeze(['sky', 'bg_1', 'middleground', 'middleplus']) }),
-  Object.freeze({ id: 'tall', name: 'Tall', words: 'The Standard stack, 2,400 high, its back layers moving up and down slower (Vertical Parallax).', profile: 'default', height: 2400, ground: 'evenground_platform_long', roles: Object.freeze(['sky', 'bg_1', 'middleground', 'middleplus']), vertical: true }),
+  Object.freeze({ id: 'tall', name: 'Tall', words: 'The Standard stack, 2,400 high, its back layers moving up and down a little slower (Vertical Parallax).', profile: 'default', height: 2400, ground: 'evenground_platform_long', roles: Object.freeze(['sky', 'bg_1', 'middleground', 'middleplus']), vertical: true }),
   Object.freeze({ id: 'forest', name: 'Forest', words: 'Two back layers and a foreground, with a forest\'s sky and colours.', profile: 'hub-56', height: 1000, ground: 'dirt_platform_long', roles: Object.freeze(['sky', 'bg_2', 'bg_1', 'middleground', 'middleplus', 'foreground']) }),
   Object.freeze({ id: 'cave', name: 'Cave', words: 'A dark sky and back layers, with a foreground, from the caverns.', profile: 'hub-50', height: 1000, ground: 'cave_gr_texture_2', roles: Object.freeze(['sky', 'bg_1', 'middleground', 'middleplus', 'foreground']) }),
   Object.freeze({ id: 'blank', name: 'Blank', words: 'The middleground only, with the world\'s usual sky.', profile: 'default', height: 1000, ground: 'evenground_platform_long', roles: Object.freeze(['middleground']) }),
@@ -46,6 +47,28 @@ export const MAP_H = 460;
 export const DEFAULT_MAP_COLOURS = Object.freeze({ color: '#1d3a80', top_color: '#989cb6', btm_color: '#6a6d7f' });
 
 const ROLE_OF = (id) => (/^bg_\d$/.test(id) ? 'bg' : id);
+
+/**
+ * Tiny Speck's tall streets (203 at 1,800 px or more; Janagi Elations GA911QQIDI32J6R, 2,700 high:
+ * its back layers 2,646, 2,592 and 2,511) make a back layer only a little shorter than the street,
+ * by its depth: the median height is 99% at z -1, 98% at -2 and 95-97% deeper, whatever its width
+ * (they are 66-90% as wide). So 1% a step of z, at most 4%, and at most TALL_SHRINK_MAX px.
+ */
+export const TALL_SHRINK = Object.freeze({ perZ: 0.01, max: 0.04 });
+/**
+ * A back layer's bottom slides from its own height (camera at the top) to the street's bottom
+ * (camera at the bottom): a render of the whole street (8.5 full: the camera at the street's
+ * middle) puts it half the shortfall over the street's bottom. Keeping the shortfall at most
+ * 2 x (the floor's 60 px over the bottom) keeps it under the floor line there, and in play the
+ * floor is only in view when the camera is near the bottom, where the layer's bottom is too.
+ */
+export const TALL_SHRINK_MAX_PX = 2 * -FLOOR_Y;
+
+/** PURE: a back layer's height on a Tall street, by its z (TALL_SHRINK). */
+export function tallLayerHeight(h, z) {
+  const share = Math.min(TALL_SHRINK.max, TALL_SHRINK.perZ * Math.abs(Math.min(0, Number(z) || 0)));
+  return Math.round(h - Math.min(h * share, TALL_SHRINK_MAX_PX));
+}
 const FILTER_NAMES = ['brightness', 'contrast', 'saturation', 'blur'];
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
@@ -104,8 +127,8 @@ export function templateLayers(template, profile, w, h) {
     z = Math.min(want, z - 1);
     // bg_2 behind bg_1: the second back layer is narrower, as Tiny Speck's are (spec 9.2).
     const ratio = clamp((Number(row?.w?.[1]) || 0.9) - (id === 'bg_2' ? 0.07 : 0), 0.5, 1.2);
-    const hr = template.vertical ? ratio : clamp(Number(row?.h?.[1]) || 1, 0.5, 1.2);
-    out.unshift({ id, name: id, z, w: Math.round(w * ratio), h: Math.round(h * hr), filters: filtersFor(row), decos: [] });
+    const lh = template.vertical ? tallLayerHeight(h, z) : Math.round(h * clamp(Number(row?.h?.[1]) || 1, 0.5, 1.2));
+    out.unshift({ id, name: id, z, w: Math.round(w * ratio), h: lh, filters: filtersFor(row), decos: [] });
   }
   out.push({ id: 'middleground', name: 'middleground', z: 0, w, h, decos: [] });
   let front = 0;

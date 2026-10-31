@@ -29,7 +29,7 @@ import { catalog, searchDecos, styleProfile, styleProfiles } from './catalog.mjs
 import { builderGuide } from './guide.mjs';
 import { applyOps, applyOp, nextDecoId, nextGeometryId, findGeometry, findDeco, GEOMETRY, OpError, OP_NAMES } from '../../public/js/builder/ops.js?v=acf30407';
 import { forkStreet, forkOps, newTsid, libraryAsset, linkEdit, editsOn } from '../../public/js/builder/zone.js?v=6a3db28e';
-import { newStreet, newStreetOps, newHub, nextHubId, mapWithStreet, mapWithoutStreet, TEMPLATES, DEFAULT_MAP_COLOURS } from '../../public/js/builder/templates.js?v=008481d2';
+import { newStreet, newStreetOps, newHub, nextHubId, mapWithStreet, mapWithoutStreet, TEMPLATES, DEFAULT_MAP_COLOURS } from '../../public/js/builder/templates.js?v=22093310';
 import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js/builder/geometry-handles.js?v=d39231a4';
 import { arrivalOps, settlePostOps, followPostOps } from '../../public/js/builder/posts.js?v=ebcf627c';
 import { platformsScreen, isStandable } from '../../public/js/street-model.js?v=23b926e5';

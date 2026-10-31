@@ -30,7 +30,7 @@ function hecheyZone() {
 }
 
 describe('the render page\'s frame (pure)', async () => {
-  const { renderFrame, gridLines } = await import('../public/builder-render/render.js?v=50a9c648');
+  const { renderFrame, gridLines } = await import('../public/builder-render/render.js?v=2d7fd7ed');
   const street = { bounds: { l: -1500, r: 1500, t: -1000, b: 0 } };
   it('full: the whole street at the scale, at most 4096 px a side', () => {
     const f = renderFrame(street, { view: 'full', scale: 0.25 });

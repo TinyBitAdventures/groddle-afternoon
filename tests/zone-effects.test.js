@@ -29,7 +29,7 @@ import { useDraftArt } from '../public/js/builder/draft-play.js?v=65af71eb';
 import { run, effectOps, rumbleOps, effectsReport, placeOps, ladderTiling, LADDER_TILINGS } from '../tools/builder/cli.mjs';
 import * as textures from '../public/js/textures.js?v=db2ce452';
 import { installNewArt } from '../public/js/builder/new-art.js?v=29f0b13e';
-import { newStreet } from '../public/js/builder/templates.js?v=008481d2';
+import { newStreet } from '../public/js/builder/templates.js?v=22093310';
 import { kindChange, costWords } from '../public/js/builder/editor-effects.js?v=85f32fd1';
 
 const json = (p) => JSON.parse(readFileSync(join(GAME_DIR, p), 'utf8'));

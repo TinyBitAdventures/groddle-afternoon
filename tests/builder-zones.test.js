@@ -10,8 +10,9 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tokensOf, searchDecos, facetCounts, passesFacets, sizeClass, drawnSize, hubPlacements, newArtRows, thumbUrl, decoFor, textScore, queryWords, NEW_ART_BUNDLE } from '../public/js/builder/deco-search.js?v=fda9b16b';
-import { TEMPLATES, newStreet, newStreetOps, groundStrip, templateLayers, gradientFrom, hslHex, filtersFor, nextHubId, newHub, nextMapLine, mapWithStreet, mapWithoutStreet, profileOf, FLOOR_Y, MAP_W, MAP_H } from '../public/js/builder/templates.js?v=008481d2';
-import { populationWith, plannedSpots, moveMapLine, mapForStreets, spotGroup } from '../public/js/builder/editor-zone.js?v=36e4d449';
+import { TEMPLATES, newStreet, newStreetOps, groundStrip, templateLayers, gradientFrom, hslHex, filtersFor, nextHubId, newHub, nextMapLine, mapWithStreet, mapWithoutStreet, profileOf, tallLayerHeight, FLOOR_Y, MAP_W, MAP_H } from '../public/js/builder/templates.js?v=22093310';
+import { parallaxLayerOffset } from '../public/js/street-render.js?v=3f8384af';
+import { populationWith, plannedSpots, moveMapLine, mapForStreets, spotGroup } from '../public/js/builder/editor-zone.js?v=aec513c7';
 import { intakeBody, base64Of } from '../public/js/builder/editor-picker.js?v=724352b6';
 import { streetWithEdits, editsOn, linkEdit, streetStats } from '../public/js/builder/zone.js?v=6a3db28e';
 import { applyZoneEdits } from '../public/js/builder/draft-play.js?v=65af71eb';
@@ -167,6 +168,21 @@ describe('templates, hubs and the hub map (js/builder/templates.js, spec 6.3)', 
     assert.ok(sky.z < layers.find((l) => l.id === 'bg_1').z);
     const tall = templateLayers(TEMPLATES[1], profileOf(profiles, 'default'), 3000, 2400);
     assert.ok(tall.find((l) => l.id === 'sky').h < 2400, 'Tall: back layers shorter than the street (vertical parallax)');
+    // P7: as Tiny Speck's tall streets (1% a step of z, at most 4%), not as short as they are narrow,
+    // so a back layer's bottom stays behind the floor's ground wherever the camera is (VOLCANO).
+    for (const l of tall.filter((x) => x.z < 0)) {
+      assert.equal(l.h, tallLayerHeight(2400, l.z));
+      assert.ok(l.h >= 2400 * 0.96 && l.h < 2400, `${l.id} ${l.h}`);
+      for (const [H, vpH] of [[2400, 540], [2400, 1080], [6000, 800]]) {
+        const lh = tallLayerHeight(H, l.z);
+        const floor = H + FLOOR_Y;
+        for (let camY = 0; camY <= H - vpH + 200; camY += 10) {
+          const bottom = parallaxLayerOffset({ w: 1000, h: lh }, 0, camY, 960, vpH, 3000, H).y + lh;
+          // Wherever the floor line is in view, and in a render of the whole street (the camera at its middle).
+          if (floor - camY <= vpH || Math.abs(camY - (H - vpH) / 2) < 5) assert.ok(bottom >= floor - 0.5, `${l.id} H ${H} view ${vpH} camera ${camY}: bottom ${bottom} over the floor ${floor}`);
+        }
+      }
+    }
     assert.deepEqual(groundStrip({ ground: 'cave_gr_texture_2' }, -500, 500).map((d) => d.x), [-343, -43, 257, 344]);
     assert.deepEqual(groundStrip({ ground: '' }, -500, 500), []);
     assert.deepEqual(filtersFor({ layers: 10, filters: { blur: { n: 6, band: [1, 3.4, 5] }, contrast: { n: 2, band: [0, -20, 0] } } }), { blur: 3 });

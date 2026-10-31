@@ -17,7 +17,7 @@ import { openBrowser } from '../qa/browser.mjs';
 import { validateZone, placementRequests } from '../../public/js/builder/validate.js?v=1705a409';
 import { planStreetPlacements, populationForStreet } from '../../public/js/street-ecology.js?v=7e30da8f';
 import { platformsScreen, streetWidth, worldToScreen } from '../../public/js/street-model.js?v=23b926e5';
-import { plannedSpots } from '../../public/js/builder/editor-zone.js?v=36e4d449';
+import { plannedSpots } from '../../public/js/builder/editor-zone.js?v=aec513c7';
 
 /** Fatal rules that still render (the street loads; see renderInput). */
 export const RENDERS_ANYWAY = new Set(['AST-001']);
