@@ -561,7 +561,8 @@ function createSession(engine, client) {
           spr.x = Math.min(right, Math.max(left, spr.x));
           a.vx *= -1;
         }
-        spr.scale.x = Math.abs(spr.baseScale) * (a.vx > 0 ? -1 : 1);
+        // The walk art faces right (animal-husbandry-feature.js stepExtra): unflipped going right.
+        spr.scale.x = Math.abs(spr.baseScale) * (a.vx >= 0 ? 1 : -1);
       }
     }
   }

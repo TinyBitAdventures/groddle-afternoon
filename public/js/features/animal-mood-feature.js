@@ -291,7 +291,8 @@ function release(engine, r) {
 
 function face(r, dir) {
   const spr = r.target.sprite;
-  if (isExtra(r.target)) spr.scale.x = Math.abs(spr.baseScale || spr.scale.x) * (dir > 0 ? -1 : 1);
+  // The walk sheets face right: unflipped going right, as the patrol (animal-husbandry-feature.js stepExtra).
+  if (isExtra(r.target)) spr.scale.x = Math.abs(spr.baseScale || spr.scale.x) * (dir > 0 ? 1 : -1);
   else spr.vx = dir * 1e-6;
 }
 

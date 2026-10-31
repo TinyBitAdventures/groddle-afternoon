@@ -105,7 +105,7 @@ import {
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=672464ee';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=f334f285';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
@@ -511,7 +511,8 @@ function stepExtra(engine, entity, dtMs) {
       entity.vx *= -1;
     }
     spr.y = surfaceAt(engine, spr.x, spr.y) + 2;
-    spr.scale.x = Math.abs(spr.baseScale) * (entity.vx > 0 ? -1 : 1);
+    // The walk art faces right, as game.js's street Piggies and chickens: unflipped going right.
+    spr.scale.x = Math.abs(spr.baseScale) * (entity.vx >= 0 ? 1 : -1);
   }
   entity.row.x = Math.round(spr.x);
 }

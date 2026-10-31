@@ -48,7 +48,7 @@ import {
 } from '../public/js/animal-husbandry.js?v=16364589';
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=e857d0af';
 import { getVerbsFor, runVerb } from '../public/content.js?v=e2372a6b';
-import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=f12d756f';
+import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=ed4d25b7';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');
@@ -399,5 +399,15 @@ describe('Batterfly flight after feeding', () => {
     const src = readFileSync(new URL('../public/js/features/animal-husbandry-feature.js', import.meta.url), 'utf8');
     const step = src.slice(src.indexOf('function stepBatterfly'), src.indexOf('function chewBatterfly'));
     assert.ok(step.indexOf('if (entity.chewUntil) return;') < step.indexOf('entity.phase += dtMs / 1000;'));
+  });
+
+  it('released and raised Piggies and chickens face the way they walk, as street ones do', () => {
+    const read = (f) => readFileSync(new URL(`../public/${f}`, import.meta.url), 'utf8');
+    // game.js: street Piggies and chickens are unflipped going right (the walk art faces right).
+    assert.match(read('game.js'), /p\.scale\.x = \(p\.vx >= 0 \? 1 : -1\) \* ps;/);
+    assert.match(read('js/features/animal-husbandry-feature.js'), /spr\.scale\.x = Math\.abs\(spr\.baseScale\) \* \(entity\.vx >= 0 \? 1 : -1\);/);
+    assert.match(read('js/features/yard-verbs-mp-feature.js'), /spr\.scale\.x = Math\.abs\(spr\.baseScale\) \* \(a\.vx >= 0 \? 1 : -1\);/);
+    // A hungry Piggy walking to food (the animal-mood feature) turns the same way.
+    assert.match(read('js/features/animal-mood-feature.js'), /spr\.scale\.x = Math\.abs\(spr\.baseScale \|\| spr\.scale\.x\) \* \(dir > 0 \? 1 : -1\);/);
   });
 });
