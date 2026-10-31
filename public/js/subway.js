@@ -381,14 +381,24 @@ export function stationDecos() {
  * The train car, world space, floor at the source's y -59. The car wall
  * (subway_interior_1, 1200 x 700) is placed so its windows fall where the
  * source's window overlays do (inc_transit.js transit_start_subway_windows:
- * left edges x -528, -52, 441, 275 x 161), feet 542 px below its top (the
- * benches and window sills against the avatar in VVyjuuRxDUw t0016-t0040).
- * Ads run along the light band over the windows, the SOLD poster sits on the
- * wall by the first window, poles stand at the wall seams.
+ * left edges x -528, -52, 441, 275 x 161). Riders stand on the dark floor
+ * strip in front of the yellow line, 644 px below the tile's top; the bench
+ * seats' front edge (548 px down) is a ledge 96 px above that floor
+ * (VVyjuuRxDUw t018 and t030: feet ~31 video px below the yellow line, about
+ * 41 world px; t018 and t040: a rider standing on a seat, feet on its front
+ * edge). Ads run along the light band over the windows, the SOLD poster sits
+ * on the wall by the first window, poles stand at the wall seams and reach
+ * just below the riders' feet.
  */
 export const CAR_FLOOR = SUBWAY_LINE.car.y;
-export const CAR_BOUNDS = Object.freeze({ l: -800, r: 1000, t: -640, b: -20 });
-export const CAR_TILE_TOP = CAR_FLOOR - 542;
+/** Where the floor and the seat edge fall in the wall tile, px below its top. */
+export const CAR_TILE_FLOOR = 644;
+export const CAR_TILE_SEAT = 548;
+export const CAR_TILE_TOP = CAR_FLOOR - CAR_TILE_FLOOR;
+export const CAR_SEAT = CAR_TILE_TOP + CAR_TILE_SEAT;
+/** The tile's bottom rows' black, carried on below it. */
+export const CAR_UNDERFLOOR = 0x0d0c08;
+export const CAR_BOUNDS = Object.freeze({ l: -800, r: 1000, t: CAR_TILE_TOP - 39, b: CAR_TILE_TOP + 700 });
 export const CAR_TILE_X = Object.freeze([-1665, -465, 735]);
 export const CAR_WINDOWS = Object.freeze([-528, -52, 441].map((left) => left + 275 / 2 - 2.5));
 export const CAR_WINDOW_BOTTOM = CAR_TILE_TOP + 458;
@@ -414,11 +424,11 @@ export function carArt() {
 export function carFrontDecos() {
   const { l, t } = CAR_BOUNDS;
   return [CAR_TILE_X[1] + 310, CAR_TILE_X[2] + 310].map((x, i) => ({
-    id: `subway_pole_${i}`, sprite: 'subway_interior_pole_1', x: x - l, y: CAR_FLOOR + 40 - t, w: 25, h: 550, z: i, r: 0,
+    id: `subway_pole_${i}`, sprite: 'subway_interior_pole_1', x: x - l, y: CAR_FLOOR + 12 - t, w: 25, h: 550, z: i, r: 0,
   }));
 }
 
-/** Bench seats as one-way ledges (an avatar can stand on the benches in VVyjuuRxDUw t0040). */
+/** Bench seats as one-way ledges at the seat's front edge (an avatar can stand on the benches in VVyjuuRxDUw t018, t040). */
 export function carBenches() {
   const spans = [[0, 265], [333, 738], [817, 1200]];
   const out = [];
@@ -426,7 +436,7 @@ export function carBenches() {
     for (const [a, b] of spans) {
       const x1 = Math.max(CAR_BOUNDS.l, x0 + a + 12);
       const x2 = Math.min(CAR_BOUNDS.r, x0 + b - 12);
-      if (x2 - x1 > 40) out.push({ id: `plat_bench_${x0 + a}`, x1, y1: CAR_FLOOR - 36, x2, y2: CAR_FLOOR - 36, pc_perm: -1 });
+      if (x2 - x1 > 40) out.push({ id: `plat_bench_${x0 + a}`, x1, y1: CAR_SEAT, x2, y2: CAR_SEAT, pc_perm: -1 });
     }
   }
   return out;

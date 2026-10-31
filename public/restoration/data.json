@@ -2671,131 +2671,131 @@
   ]
  },
  "git": {
-  "commits": 858,
+  "commits": 911,
   "since": "2026-10-19",
   "recent": [
    {
-    "date": "2026-10-30",
+    "date": "2026-10-31",
     "kind": "fix",
-    "text": "Meditating shows the original's swirling orb alone, without the made-up glow around the player"
+    "text": "A Piggy that has eaten stands still for its pause instead of walking in place"
    },
    {
-    "date": "2026-10-30",
+    "date": "2026-10-31",
+    "kind": "fix",
+    "text": "A rooked Piggy, Chicken or tree keeps saying it is rooked"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "fix",
+    "text": "A Piggy the Rook catches on its way to food stands still, and walks again once revived"
+   },
+   {
+    "date": "2026-10-31",
     "kind": "improve",
-    "text": "The report form welcomes any feedback, suggestions or bugs"
+    "text": "The start card's fan remake, Credits and Privacy links are moss green, not browser blue"
    },
    {
-    "date": "2026-10-30",
+    "date": "2026-10-31",
+    "kind": "fix",
+    "text": "Focus Pocus tells you why a focus fell short of 24, and its step says one focus"
+   },
+   {
+    "date": "2026-10-31",
     "kind": "new",
-    "text": "Bug reports can attach a picture of the game"
+    "text": "Tests for the chat log in the console and the realtime server"
    },
    {
-    "date": "2026-10-30",
+    "date": "2026-10-31",
     "kind": "new",
-    "text": "A Night tint setting turns off the world's darkening at dusk and night"
+    "text": "An open game says when a new version is out, with an Update ready button"
    },
    {
-    "date": "2026-10-30",
+    "date": "2026-10-31",
+    "kind": "improve",
+    "text": "The quest-complete book is solid and less stretched, so it reads clearly"
+   },
+   {
+    "date": "2026-10-31",
     "kind": "fix",
-    "text": "The New Quest card on arrival sits under the Qurazy banner instead of covering it"
+    "text": "The street map's name tips show over the travel card instead of under it"
    },
    {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Yard machines, graveside markers, Wine of the Dead and other world items draw sharp at Original zoom"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "The Race Ticket Dispenser draws sharp at Original zoom"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Home street pictures on profiles are sharp: drawn at 2x, up to 1920 wide, as WebP"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "Players always get the newest game code: every script and style sheet is keyed by its content"
-   },
-   {
-    "date": "2026-10-30",
+    "date": "2026-10-31",
     "kind": "fix",
-    "text": "A sheet's title and close button stay put when its list scrolls"
+    "text": "Trees, gardens, shrines, vendors and rocks stand on real ground, not on branch stubs"
    },
    {
-    "date": "2026-10-30",
-    "kind": "improve",
-    "text": "The online Play button is one warm orange with dark text, like the header's Play"
-   },
-   {
-    "date": "2026-10-30",
+    "date": "2026-10-31",
     "kind": "fix",
-    "text": "Enter reaches the world after a click: clicking Pin, a pinned quest or another HUD button no longer keeps the keys"
+    "text": "Buying a bag no longer tips the other bags' things out"
    },
    {
-    "date": "2026-10-30",
+    "date": "2026-10-31",
     "kind": "fix",
-    "text": "Streets with no recovered ecology no longer grow invented trees, animals, gardens, vendors and shrines"
+    "text": "Released and raised Piggies and chickens walk forwards, not backwards"
    },
    {
-    "date": "2026-10-30",
+    "date": "2026-10-31",
     "kind": "improve",
-    "text": "The world starts at the Original zoom, close like the 2012 game; players can zoom out to Wide"
+    "text": "The Glitchmas Yeti's letter is signed Groddle Afternoon and reads as a letter"
    },
    {
-    "date": "2026-10-30",
+    "date": "2026-10-31",
+    "kind": "fix",
+    "text": "The street map on your home street shows your street, you and your visitors instead of an empty box"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "fix",
+    "text": "Gardens draw at the original's size and keep clear of the gate, signpost, Mail Dispatcher and each other"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "improve",
+    "text": "Gardens draw Tiny Speck's own garden art: soil plots, seedlings, every crop and herb, and the beds"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "improve",
+    "text": "Letters from the game now come from Groddle Afternoon Post, not Tiny Speck Post"
+   },
+   {
+    "date": "2026-10-31",
     "kind": "new",
-    "text": "The bug button opens Reports: your bug reports with their replies, a reply box and Close, and a badge when an administrator answers"
+    "text": "Move your Mail Dispatcher: in Cultivate, click or drag it anywhere clear along your home street, or put it back in its usual spot"
    },
    {
-    "date": "2026-10-30",
+    "date": "2026-10-31",
+    "kind": "fix",
+    "text": "The Mail Dispatcher no longer stands on your friends' signpost: it waits just past the signpost, clear of the gate, Mailbox and door"
+   },
+   {
+    "date": "2026-10-31",
     "kind": "new",
-    "text": "Camera Mode works inside quest instances and rebuilt rooms, such as Winter Walk"
+    "text": "The map shows which streets have a vendor, a shrine or a subway station, with a tip on hover and keyboard focus"
    },
    {
-    "date": "2026-10-30",
+    "date": "2026-10-31",
+    "kind": "new",
+    "text": "The validator flags landings a keyboard player often misses, and agents can play-test a draft by script"
+   },
+   {
+    "date": "2026-10-31",
     "kind": "fix",
-    "text": "Leaving Winter Walk early no longer lets its motes be gathered again and again"
+    "text": "New Tall streets' back layers reach the floor wherever the camera is"
    },
    {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "Online, a new house's starter furniture no longer sets off a pack correction on every save"
-   },
-   {
-    "date": "2026-10-30",
+    "date": "2026-10-31",
     "kind": "improve",
-    "text": "Enter at a garden tends it: the arrows pick a plot, Enter opens that plot's menu, Esc stops"
+    "text": "A signpost stays on its floor when the floor moves, and findings name the post"
    },
    {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "Legalize It's progress card sits under the bug report form, menus and windows instead of hiding them"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "Start learning this skill works on the first click"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "C no longer opens Make where Camera Mode can't start, such as on the Winter Walk"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "Dropping off the end of Gentle Island Exit, under the down arrow, takes anyone off the island"
-   },
-   {
-    "date": "2026-10-30",
-    "kind": "fix",
-    "text": "Things on another level, behind a floor, are no longer offered by Enter or a click"
+    "date": "2026-10-31",
+    "kind": "new",
+    "text": "Publishing a draft fetches its new art with the builder key"
    }
   ]
  },
  "tests": 515,
- "generatedAt": "2026-10-30"
+ "generatedAt": "2026-10-31"
 }

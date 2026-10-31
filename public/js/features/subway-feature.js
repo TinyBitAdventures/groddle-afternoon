@@ -37,7 +37,9 @@ import { textureFromUrl } from '../textures.js?v=db2ce452';
 import {
   CAR_FLOOR,
   CAR_FLOOR_LIGHTS,
+  CAR_TILE_TOP,
   CAR_TSID,
+  CAR_UNDERFLOOR,
   CAR_WINDOWS,
   CAR_WINDOW_BOTTOM,
   CARD_BADGE,
@@ -75,7 +77,7 @@ import {
   stationScreen,
   stepRide,
   ticketOffer,
-} from '../subway.js?v=797a5e9c';
+} from '../subway.js?v=3b9c09af';
 
 export const SUBWAY_FEATURE_ID = 'subway';
 const STYLE_ID = 'subway-feature-style';
@@ -401,6 +403,12 @@ function drawCar(engine, street) {
   const b = street.bounds;
   const { PIXI } = engine;
   for (const row of carArt()) addSprite(engine, row, b);
+  // Under the wall tile's last (black) rows: the camera keeps room below the riders' feet.
+  const under = new PIXI.Graphics().rect(0, CAR_TILE_TOP + 700 - b.t - 2, b.r - b.l, 600).fill(CAR_UNDERFLOOR);
+  under.zIndex = -71;
+  under.eventMode = 'none';
+  engine.entityLayer.addChild(under);
+  views.push(under);
   const [, ww, wh] = SUBWAY_ART.subway_window_static;
   for (const cx of CAR_WINDOWS) {
     addSprite(engine, { piece: 'subway_window_static', x: cx, y: CAR_WINDOW_BOTTOM, w: ww, h: wh, z: -62 }, b);

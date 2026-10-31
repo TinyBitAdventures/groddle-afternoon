@@ -16,6 +16,10 @@ import { assertStreetGeometry } from '../public/js/street-model.js?v=23b926e5';
 import { readMapLabels, readTransitInstances, GSJS } from '../tools/subway-source.mjs';
 import {
   CAR_FLOOR,
+  CAR_SEAT,
+  CAR_TILE_FLOOR,
+  CAR_TILE_SEAT,
+  CAR_TILE_TOP,
   CAR_TSID,
   FARE,
   RIDE_COUNTER,
@@ -30,6 +34,8 @@ import {
   boardingSpot,
   canDisembark,
   carArt,
+  carBenches,
+  carFrontDecos,
   carStreet,
   createRide,
   disembarkSpot,
@@ -45,8 +51,8 @@ import {
   stationStreet,
   stepRide,
   ticketOffer,
-} from '../public/js/subway.js?v=797a5e9c';
-import { subwayFeature } from '../public/js/features/subway-feature.js?v=1eccbe36';
+} from '../public/js/subway.js?v=3b9c09af';
+import { subwayFeature } from '../public/js/features/subway-feature.js?v=b977abf1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -236,6 +242,34 @@ describe('Stations, the train and the surface entrances', () => {
     const avatarZ = Number(/body\.zIndex = (\d+);/.exec(readFileSync(join(pub, 'game.js'), 'utf8'))?.[1]);
     assert.ok(avatarZ > 0 && column.z > avatarZ, `drawn over the avatar (zIndex ${avatarZ})`);
     assert.ok(column.y > STATION_FLOOR, 'foot below the floor line');
+  });
+  it('stands riders on the car floor, not at seat height (VVyjuuRxDUw t018, t030)', () => {
+    // subway_interior_1 rows, world px below its top: seat front edge ~548, yellow
+    // line ~604-608, dark floor strip ~612-672, then the bottom stripe and black.
+    assert.equal(CAR_TILE_TOP, CAR_FLOOR - CAR_TILE_FLOOR);
+    assert.ok(CAR_TILE_FLOOR > 612 && CAR_TILE_FLOOR < 672, 'the floor line sits in the dark floor strip, below the yellow line');
+    const wall = carArt().filter((row) => row.piece === 'subway_interior_1');
+    assert.equal(wall.length, 3);
+    for (const row of wall) assert.equal(row.y - row.h, CAR_TILE_TOP, 'the wall tile hangs from CAR_TILE_TOP');
+    // The seats are a ledge well above the floor (in the footage riders stand on the floor in
+    // front of the benches, or hop up onto a seat).
+    assert.equal(CAR_SEAT, CAR_TILE_TOP + CAR_TILE_SEAT);
+    assert.ok(CAR_FLOOR - CAR_SEAT >= 80, `seats ${CAR_FLOOR - CAR_SEAT} px above the floor`);
+    const street = carStreet();
+    const floor = street.platforms.find((p) => p.id === 'plat_subway_car');
+    assert.equal(floor.y1, CAR_FLOOR);
+    for (const bench of carBenches()) {
+      assert.equal(bench.y1, CAR_SEAT, bench.id);
+      assert.equal(bench.pc_perm, -1, `${bench.id} is one-way`);
+    }
+    // Boarding lands on the floor line itself.
+    for (const r of [0, 0.3, 0.6, 0.9999]) assert.equal(boardingSpot(() => r).y, CAR_FLOOR - street.bounds.t);
+    // Poles reach just below the riders' feet; the street takes in the whole wall tile.
+    for (const pole of carFrontDecos()) {
+      const foot = pole.y + street.bounds.t;
+      assert.ok(foot > CAR_FLOOR && foot - CAR_FLOOR <= 20, `${pole.id} foot ${foot - CAR_FLOOR} px below the floor`);
+    }
+    assert.ok(street.bounds.t <= CAR_TILE_TOP && street.bounds.b >= CAR_TILE_TOP + 690);
   });
   it('writes every station and the train as an indexed street with art that exists', () => {
     for (const s of STATIONS) {
