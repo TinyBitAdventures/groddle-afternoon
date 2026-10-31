@@ -35,6 +35,7 @@ import { JUMP_SPEED } from '../avatar-step.js?v=c04c7c76';
 import { STY_RULES, styleFindings } from './style-rules.js?v=abf9bfae';
 import { EFFECT_LIMITS, effectsCost, normaliseEmitter, rumbleShare, emitterAnchor } from '../street-effects.js?v=e427650f';
 import { LICENCE_POLICY, provenanceProblems } from './new-art.js?v=29f0b13e';
+import { postOffFloor, offFloorWords } from './posts.js?v=ebcf627c';
 
 export const RULES = Object.freeze({
   'SCH-001': ['fatal', 'Zone does not fit the schema'],
@@ -53,6 +54,7 @@ export const RULES = Object.freeze({
   'PHY-006': ['warn', 'Tight jump'],
   'PHY-007': ['info', 'Unreachable area'],
   'PHY-008': ['warn', 'Ladder with no deck'],
+  'PHY-009': ['warn', 'Signpost off its floor'],
   'POP-001': ['warn', 'Population does not fit'],
   'POP-002': ['error', 'Nowhere to place things'],
   'NAV-001': ['fatal', 'Unknown destination'],
@@ -204,12 +206,19 @@ export function plainApex(buff = {}) {
  */
 export function zoneArrivals(zone) {
   const byTsid = new Map((zone.streets || []).map((s) => [s.street?.tsid, s.key]));
+  const rowOf = new Map((zone.streets || []).map((s) => [s.key, s.street]));
   const out = new Map((zone.streets || []).map((s) => [s.key, []]));
+  // The post on the target street where an arm lands: at the arrival's x, leading back (arriveFor).
+  const postAt = (key, x, fromTsid) => {
+    const t = rowOf.get(key);
+    if (!t?.bounds) return null;
+    return (t.signposts || []).find((p) => Math.abs(p.x - t.bounds.l - x) <= 2 && (p.connects || []).some((c) => c.tsid === fromTsid))?.id || null;
+  };
   for (const s of zone.streets || []) {
     for (const post of s.street?.signposts || []) {
       for (const c of post.connects || []) {
         const key = byTsid.get(c.tsid);
-        if (key && c.arrive && !c.hidden) out.get(key).push({ x: c.arrive.x, y: c.arrive.y, from: `${s.key}/${post.id}` });
+        if (key && c.arrive && !c.hidden) out.get(key).push({ x: c.arrive.x, y: c.arrive.y, from: `${s.key}/${post.id}`, post: postAt(key, c.arrive.x, s.street.tsid) });
       }
     }
     const sp = s.editor?.spawn;
@@ -218,7 +227,7 @@ export function zoneArrivals(zone) {
   for (const e of zone.edits || []) {
     const c = e.connect || e.newSignpost?.connects?.[0];
     const key = c && byTsid.get(c.tsid);
-    if (key && c.arrive) out.get(key).push({ x: c.arrive.x, y: c.arrive.y, from: `world:${e.tsid}` });
+    if (key && c.arrive) out.get(key).push({ x: c.arrive.x, y: c.arrive.y, from: `world:${e.tsid}`, post: postAt(key, c.arrive.x, e.tsid) });
   }
   return out;
 }
@@ -247,7 +256,7 @@ function fallbackArrivals(street) {
  * PURE: the PHY rules for one street from its arrivals. `key` names the street in `at`; `buff`
  * defaults to the street's own physics. Returns { findings, reach }.
  */
-export function reachFindings(key, street, arrivals, { want = () => true, reach = null, buff = null } = {}) {
+export function reachFindings(key, street, arrivals, { want = () => true, reach = null, buff = null, zoneStreet = false } = {}) {
   const findings = [];
   const sig = geometrySignature(street);
   const add = (rule, at, message, where, data, fix) => {
@@ -257,6 +266,7 @@ export function reachFindings(key, street, arrivals, { want = () => true, reach 
   const lines = platformsScreen(street);
   const barriers = barriersScreen(street);
   const head = avatarHeadReach(streetBuff(street).scale);
+  const named = new Set();
   // PHY-001, PHY-002: each arrival stands on a floor, clear of walls and low ceilings.
   arrivals.forEach((a, i) => {
     if (a.fallback) return;
@@ -267,7 +277,17 @@ export function reachFindings(key, street, arrivals, { want = () => true, reach 
       return y != null && y - a.y >= -2 && y - a.y <= 12;
     });
     if (!floorBelow) {
-      add('PHY-001', at, `The arrival at ${round(a.x)}, ${round(a.y)} (from ${a.from}) has no floor within 12 px under it.`, pt(a.x, a.y), { from: a.from }, 'Move the arrival onto a floor line, or draw a floor under it.');
+      // P7: the arm lands at a post here; when the post is the problem, the finding names it.
+      const post = a.post ? (street.signposts || []).find((p) => p.id === a.post) : null;
+      const off = post ? postOffFloor(street, post) : null;
+      if (post && off) {
+        named.add(post.id);
+        add('PHY-001', post.id, `${offFloorWords(post, off)} The arm from ${a.from} lands there, at ${round(a.x)}, ${round(a.y)}, with no floor within 12 px under it.`, pt(a.x, a.y), { from: a.from, post: post.id, gap: off.gap, floor: off.floor?.line ?? null }, 'Stand the post on its floor and work the arrivals out again: cli.mjs arrivals --posts, or "Stand it on the floor" in the inspector.');
+      } else if (post) {
+        add('PHY-001', at, `The arm from ${a.from} still lands at ${round(a.x)}, ${round(a.y)}, where signpost ${post.id} stood; there is no floor within 12 px under it now.`, pt(a.x, a.y), { from: a.from, post: post.id }, 'Work the arrivals out again: cli.mjs arrivals, or "Work it out" on the arm.');
+      } else {
+        add('PHY-001', at, `The arrival at ${round(a.x)}, ${round(a.y)} (from ${a.from}) has no floor within 12 px under it.`, pt(a.x, a.y), { from: a.from }, 'Move the arrival onto a floor line, or draw a floor under it.');
+      }
     }
     const wall = barriers.find((w) => Math.abs(w.x - a.x) <= 2 && Math.min(a.y, w.yBot) - Math.max(a.y - 80, w.yTop) > 0);
     const ceiling = lines.find((p) => {
@@ -318,6 +338,17 @@ export function reachFindings(key, street, arrivals, { want = () => true, reach 
   // PHY-008: ladders with no floor at the foot or no deck at the top.
   for (const d of r.deckless) {
     add('PHY-008', d.id, `Ladder ${d.id} has ${!d.foot ? 'no floor at its foot' : 'no deck to step onto at its top'}.`, pt(d.x, d.foot ? d.yTop : d.yBot), { foot: d.foot, deck: d.deck }, d.foot ? 'Put a floor line within 48 px of the ladder\'s top.' : 'Stand the ladder on a floor line.');
+  }
+  // PHY-009 (P7): a signpost floating over its floor or sunk into it, as after its floor moved.
+  // Zone streets only (shipped streets keep Tiny Speck's posts as they are).
+  if (zoneStreet) {
+    for (const post of street.signposts || []) {
+      if (named.has(post.id)) continue;
+      const off = postOffFloor(street, post);
+      if (!off) continue;
+      const foot = worldToScreen(street, post.x, post.y);
+      add('PHY-009', post.id, offFloorWords(post, off), pt(foot.x, foot.y), { gap: off.gap, floor: off.floor?.line ?? null, why: off.why }, off.why === 'none' ? 'Move the post over a floor, or draw a floor under it.' : 'Stand it on the floor: cli.mjs arrivals --posts, or "Stand it on the floor" in the inspector (the arms landing there follow).');
+    }
   }
   return { findings, reach: r };
 }
@@ -486,7 +517,7 @@ export function validateZone(zone, ctx = {}) {
     if (geometryOk && Object.keys(RULES).some((r) => r.startsWith('PHY-') && want(r))) {
       let arr = arrivals.get(key) || [];
       if (!arr.length) arr = fallbackArrivals(s);
-      const r = reachFindings(key, s, arr, { want });
+      const r = reachFindings(key, s, arr, { want, zoneStreet: true });
       reach[key] = r.reach;
       findings.push(...r.findings);
     }

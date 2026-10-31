@@ -617,6 +617,7 @@ A **waiver** (schema `waivers[]`) accepts one finding at one place after a play-
 | PHY-006 | warn | Tight jump | A required edge has under 8 px of margin (rise or gap) |
 | PHY-007 | info | Unreachable area | Standable surfaces no arrival reaches (fine for scenery; listed) |
 | PHY-008 | warn | Ladder with no deck | No `isStandable` line at the bottom, or `ladderTopDeck` finds none at the top (`street-model.js:463-475`) |
+| PHY-009 | warn | Signpost off its floor | Zone streets (P7): a post's foot more than 4 px over or under the nearest standable line within 80 px (a fork's Tiny Speck posts may stand up to 48 px over and 8 under), or no floor under it at all (`js/builder/posts.js`). When an arm lands at such a post, PHY-001 names the post instead |
 | POP-001 | warn | Population does not fit | `planStreetPlacements` places fewer than requested (`street-ecology.js:419-466`) |
 | POP-002 | error | Nowhere to place things | Population not empty but no `isItemFloor` line (`street-model.js:334`) |
 | NAV-001 | fatal | Unknown destination | Connect tsid not in the index or the zone (after L/G aliasing) |
@@ -718,10 +719,11 @@ Every command takes `--json`, which prints findings and results as JSON for agen
 | `street add --key k --label L [--template meadow] [--width 3000 --height 1000]` | New street from a template |
 | `street fork <shipped tsid> --key k --label L` | Copy a shipped street into the zone |
 | `place --street k --layer middleground --sprite bush_3 --x 300 --y -60 [--w --h --flip --z --r]` | Add a deco (w/h default to the median drawn size) |
-| `set <street>/<id> key=value …`, `rm <street>/<id>` | Edit or remove anything by id |
+| `set <street>/<id> key=value … [--no-carry]`, `rm <street>/<id>` | Edit or remove anything by id; a line that moves carries the signposts standing on it, and the arms landing there follow (P7) |
 | `platform --street k --from x,y --to x,y [--perm floor\|roof\|soft\|hard]` | Add a line |
 | `wall`, `ladder`, `signpost --street k --x --y` | Add geometry (`ladder --tiling wood\|stone\|none`: wood by default, since a bare ladder draws nothing) |
 | `connect <streetA> <streetB> [--a-post id] [--b-post id]` | Two-way connects, arrivals computed |
+| `arrivals [--street k] [--posts]` | Work every arm's arrival out again; `--posts` first stands floating or sunk signposts on their floor (P7) |
 | `link-world <street> --from <shipped tsid> [--post id]` | Add the `edits[]` connect from a shipped street |
 | `populate --street k npc_piggy=2 trant_fruit=1 [--quoins 6]` | Set the population |
 | `effect --street k --kind steam\|lava\|embers --x --y [--layer --rate --size --height --spread --period a,b --burst s \| --always --sprite s]` | Add a zone ambient effect (`set` and `rm` it by its `fx_` id) |
@@ -915,11 +917,11 @@ $ node tools/builder/cli.mjs render --draft mossy-hollow --street lane --scale 0
 lane.png 750x250  rev 6  findings 1 error, 0 warnings
 # The agent looks at lane.png: the post stands on the new ledge, 132 px over the floor, with no way up.
 
-$ node tools/builder/cli.mjs set lane/plat_2 y1=-150 y2=-150 --json      # a 90 px rise
+$ node tools/builder/cli.mjs set lane/plat_2 y1=-150 y2=-150 --json      # a 90 px rise; the post on it comes too
+{"rev":7,"changed":["lane/plat_2","lane/signpost_1","end/signpost_1"],"carried":["lane/signpost_1"],"arms":["end/signpost_1/0"]}
 $ node tools/builder/cli.mjs set lane/d_4 y=-150 --json                  # the ledge's topper with it
-$ node tools/builder/cli.mjs set lane/signpost_1 y=-150 --json           # and the post
-$ node tools/builder/cli.mjs arrivals --json                             # the arm into that post lands there again
-{"rev":10,"changed":["end/signpost_1"],"arms":["end/signpost_1/0"]}
+$ node tools/builder/cli.mjs arrivals --posts --json                     # every post on its floor, every arm landing there
+{"changed":[],"arms":[],"posts":[],"none":[]}
 $ node tools/builder/cli.mjs validate --draft mossy-hollow --json | jq .counts
 {"fatal":0,"error":0,"warn":0,"info":6}
 
@@ -928,14 +930,14 @@ https://groddle.localhost/play/?practice=1&autostart=1&draft=mossy-hollow&street
 $ curl -s -X POST "$GRODDLE_BUILDER_URL/wp-json/groddle/v1/admin/builder/drafts/mossy-hollow/publish-request" \
     -H "X-Groddle-Builder: $(node tools/builder/cli.mjs sign POST /groddle/v1/admin/builder/drafts/mossy-hollow/publish-request '{"note":"ready"}')" \
     -H 'Content-Type: application/json' -d '{"note":"ready"}'
-{"id":"mossy-hollow","state":"ready","rev":10}
+{"id":"mossy-hollow","state":"ready","rev":8}
 ```
 
-Austin then play-tests it, and runs `publish --write` in a clean worktree (section 11). The zone document at rev 10 looks like this (shortened; the full form passes the schema):
+Austin then play-tests it, and runs `publish --write` in a clean worktree (section 11). The zone document at rev 8 looks like this (shortened; the full form passes the schema):
 
 ```json
 {
-  "format": "groddle-zone/1", "id": "mossy-hollow", "title": "Mossy Hollow", "rev": 10,
+  "format": "groddle-zone/1", "id": "mossy-hollow", "title": "Mossy Hollow", "rev": 8,
   "hub": { "id": "900", "name": "Mossy Hollow", "isNew": true, "map": { "streets": [
     { "tsid": "GZ0000000000001", "name": "Mossy Lane", "x1": 200, "y1": 260, "x2": 380, "y2": 240 },
     { "tsid": "GZ0000000000002", "name": "Hollow End", "x1": 380, "y1": 240, "x2": 560, "y2": 270 } ] } },
@@ -1315,6 +1317,11 @@ Sizes: S is 1-2 lane-days, M is 3-4, L is 5-7.
 **P7 follow-ups (2026-10-31, lane BUILD7).** The open items the VOLCANO run found.
 
 - **A builder key fetches new art's bytes.** `GET admin/builder/drafts/{id}/art/{sha256}[?size=3]` (site `AdminBuilderAssets::file`) answers the kept WebP with `/builder-art/`'s headers. It takes `drafts:read`, is signed like every keyed call, counts in a new rate bucket `art` (300 a minute: a zone of 200 pieces with their 3x files fits in two minutes; `BuilderKeys::RATES`, `limits.mjs`), and logs a keyed run of fetches as one line per key, draft and 10 minutes. It hands out only art the draft's zone names (an `origin: new` row with that sha256 under the kept name) or that the caller sent into that draft (intake's `created_by`, before its `asset.set` op); anything else is 404 `builder_not_found`, so a key cannot read another draft's art by its hash. `cli.mjs publish <draft>` now fetches the art it needs this way into a temporary folder (a 404 on `?size=3` means no 3x file; a 429 waits its `Retry-After`), and `--art <folder>` stays the offline path (and the only one for `file:` zones).
+
+- **A signpost and its floor.** `public/js/builder/posts.js` (pure; the CLI, the editor and the validator share it) finds the floor a post stands on: the nearest standable line within 80 px of its foot (as `platformYNear` finds an arrival's ground), else the first under it. A post the builder makes stands on the line; Tiny Speck's posts stand 1 to 47 px over theirs (2,715 shipped posts: median 16, p99 47), so a forked street is allowed 48 px over and 8 under, a built one 4 either way, and buried posts are left alone.
+  - **The finding names the post.** A new rule, **PHY-009** (warn, zone streets only), names a post off its floor. When an arm lands at a post (the arrival is at the post's x and the post leads back) and there is no floor under the arrival, PHY-001 is now at the post (`lane/signpost_1`, "floats 40 px over its floor (plat_2). The arm from end/signpost_1 lands there ...") when the post is off its floor, and says "still lands where signpost_1 stood" when only the arm is stale. 8.2 listed no PHY-009; the rule table has it now.
+  - **Resettling.** `cli.mjs arrivals --posts` stands every off-floor post on its floor, then works out the arms on every street that land at them (`settlePostOps`, then `arrivalOps`, which moved from `cli.mjs` into `posts.js` and gained `into`). The editor's signpost inspector says when a post is off its floor and offers **Stand it on the floor** (one undo step with the arms landing there).
+  - **A line carries its posts.** When a platform moves (the editor's drag, handles, arrows and inspector; `cli.mjs set` on a line), the posts standing on it move with it, keeping their height over it, and the arms landing on that street are worked out again, in the same batch (`followPostOps`). `set --no-carry` keeps the old behaviour. So 8.7's fix is now one `set` on the ledge (the post comes along and the arm lands there again) and the topper's; `arrivals --posts` then has nothing to do, and `example-session.mjs` checks that (the revs in 8.7 moved down by two).
 
 ---
 

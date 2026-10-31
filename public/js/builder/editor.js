@@ -47,7 +47,8 @@ import { mountPicker, PICK_MIME } from './editor-picker.js?v=724352b6';
 import { newDraftDialog, newStreetDialog, hubMapDialog, populationSection, zoneSection, plannedSpots, SPOT_GROUPS, spotGroup } from './editor-zone.js?v=36e4d449';
 import { decoFor, NEW_ART_BUNDLE } from './deco-search.js?v=fda9b16b';
 import { populationForStreet, planStreetPlacements } from '../street-ecology.js?v=7e30da8f';
-import { nextDecoId, findDeco } from './ops.js?v=acf30407';
+import { nextDecoId, findDeco, applyOps } from './ops.js?v=acf30407';
+import { postOffFloor, offFloorWords, settlePostOps, arrivalOps, followPostOps } from './posts.js?v=ebcf627c';
 import { decoBox, contains, handlePoints, resizeBy, rotationTo, meetsRect, corners } from './handles.js?v=2f6896c4';
 import { layerRole } from './layer-role.js?v=e585f610';
 import { installNewArt, withNewArt, provenanceSection } from './new-art.js?v=29f0b13e';
@@ -731,7 +732,7 @@ async function boot() {
   }
   function loadValidateMod() {
     if (S.validateModLoading) return;
-    S.validateModLoading = import('./validate.js?v=89d70464').then((m) => { S.validateMod = m; S.geoDrawn = ''; }).catch(() => { S.validateModLoading = null; });
+    S.validateModLoading = import('./validate.js?v=1705a409').then((m) => { S.validateMod = m; S.geoDrawn = ''; }).catch(() => { S.validateModLoading = null; });
   }
 
   /** The reach to draw: the validator's for a draft street, else the one worked out here. */
@@ -993,7 +994,10 @@ async function boot() {
     if (!ops.length) return;
     if (!editable()) return readOnlyNote();
     try {
-      S.session.apply(ops, { label });
+      // A line that moves carries the signposts standing on it, and the arms landing there follow (P7).
+      const follow = ops.some((o) => o.op === 'platform.set') ? followPostOps(S.session.zone, ops) : null;
+      S.session.apply(follow ? follow.ops : ops, { label });
+      if (follow?.carried.length) say(`Moved ${follow.carried.map((c) => c.split('/').pop()).join(', ')} with the line${follow.arms.length ? `; ${follow.arms.length === 1 ? 'one arm lands' : `${follow.arms.length} arms land`} there again` : ''}.`);
     } catch (err) {
       failed(err);
     }
@@ -1567,6 +1571,12 @@ async function boot() {
       add(el('div', { class: 'builder-grid' },
         num('x', 'x (centre)', item.x, (n) => set({ x: Math.round(n) })), num('y', 'y (foot)', item.y, (n) => set({ y: Math.round(n) })),
         num('w', 'Width', item.w, (n) => set({ w: Math.max(1, Math.round(n)) }), { min: '1' }), num('h', 'Height', item.h, (n) => set({ h: Math.max(1, Math.round(n)) }), { min: '1' })));
+      const off = postOffFloor(s, item);
+      if (off && S.mode === 'draft') {
+        const settle = btn('Stand it on the floor', { class: 'builder-mini', name: 'post-settle', ...dis, disabled: ro || off.why === 'none' ? true : undefined, title: 'Move it onto the floor under it; the arms that land here follow' });
+        settle.addEventListener('click', () => settlePost(item));
+        add(el('p', { class: 'builder-sub builder-warn', 'data-builder-post-off': off.why, text: offFloorWords(item, off) }), el('div', { class: 'builder-row' }, settle));
+      }
       buildArms(s, item, add, dis);
       if (S.mode === 'view' && S.session) buildWaysIn(s, item, add);
     }
@@ -1616,6 +1626,18 @@ async function boot() {
     const meta = targetOf(target.tsid);
     commit([{ op: 'connect.add', street: key, signpost: post.id, connect: newConnect({ tsid: target.tsid, label: target.label || meta.label, hubId: target.hubId || meta.hubId, arrive }) }], 'arm');
     say(arrive ? `Linked to ${target.label}: players arrive at ${arrive.x}, ${arrive.y} there.` : `Linked to ${target.label}. No signpost there links back yet, so the arm has no arrival point; type one in, or work it out once one does.`);
+  }
+  /** Stand a post on its floor (PHY-009), and work out again the arms that land on this street. */
+  function settlePost(post) {
+    const zone = S.session?.zone;
+    if (!zone) return;
+    const { ops } = settlePostOps(zone, { street: S.streetKey, ids: [post.id] });
+    if (!ops.length) return say(`${post.id} already stands on its floor.`);
+    const work = JSON.parse(JSON.stringify(zone));
+    applyOps(work, ops);
+    const arrive = arrivalOps(work, { into: S.streetKey });
+    commit([...ops, ...arrive.ops], 'settle');
+    say(`${post.id} stands on the floor${arrive.arms.length ? `; ${arrive.arms.length === 1 ? 'one arm lands' : `${arrive.arms.length} arms land`} there again` : ''}.`);
   }
   async function workOutArrive(post, at) {
     const c = post.connects[at];
@@ -2455,7 +2477,7 @@ async function boot() {
     // `new URL(...)` written here would not be keyed by tools/module-keys).
     if (!V.workerUrl) {
       if (!V.loading) {
-        V.loading = import('./validate-worker.js?v=7707e54a').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
+        V.loading = import('./validate-worker.js?v=fa3797a4').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
       }
       return null;
     }

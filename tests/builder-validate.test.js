@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=89d70464';
+import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=1705a409';
 import { streetWorld, jumpArc, jumpArcs, reachStreet } from '../public/js/builder/reach-graph.js?v=6f7512af';
 import { stepAvatar, avatarGround, steerX, coastX, NORMAL_BUFF } from '../public/js/avatar-step.js?v=c04c7c76';
 import { platformsScreen } from '../public/js/street-model.js?v=23b926e5';
@@ -141,6 +141,8 @@ describe('the validator (js/builder/validate.js): one fixture per rule', () => {
     ['PHY-006', (z) => { const p = lane(z).platforms[1]; p.y1 = -160; p.y2 = -160; lane(z).signposts[0].y = -160; }],
     ['PHY-007', (z) => { lane(z).platforms.push({ id: 'plat_9', x1: -400, y1: -600, x2: -200, y2: -600, pc_perm: -1 }); }],
     ['PHY-008', (z) => { lane(z).ladders = [{ id: 'ladder_1', x: -1000, y: -60, w: 50, h: 400 }]; }],
+    // P7: the ledge under lane/signpost_1 moved 40 px down, its arm worked out again, the post left floating.
+    ['PHY-009', (z) => { Object.assign(lane(z).platforms[1], { y1: -110, y2: -110 }); end(z).signposts[0].connects[0].arrive = { x: 2850, y: 890 }; }],
     ['POP-001', (z) => { z.streets[1].population = { counts: { npc_piggy: 6, npc_chicken: 3, wood_tree: 8, rock_metal_1: 10 }, quoins: 40 }; }],
     ['POP-002', (z) => { for (const p of lane(z).platforms) p.item_perm = 1; }],
     ['NAV-001', (z) => { lane(z).signposts[0].connects[0].tsid = 'GZ0000000000099'; }],

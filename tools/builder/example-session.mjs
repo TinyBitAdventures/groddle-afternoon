@@ -194,19 +194,16 @@ async function main() {
     check('render: lane.png with the overlays', r.status === 0 && /^\d+x\d+$/.test(r.json?.size || '') && r.json.findings.error >= 1, r.err || JSON.stringify(r.json));
 
     r = cli('set', `${ledge}`, `y1=${floorY - 90}`, `y2=${floorY - 90}`, '--draft', DRAFT, '--json');
-    check('set: the ledge down to a 90 px rise', r.status === 0, r.err);
+    // P7: the post standing on the ledge comes down with it, and the arm into it lands there again.
+    check('set: the ledge down to a 90 px rise, carrying its post; the arm into it lands there again', r.status === 0 && (r.json?.carried || []).length === 1 && (r.json?.arms || []).length >= 1, r.err || JSON.stringify(r.json));
     // The deco on the ledge moves with it.
     const after = JSON.parse(readFileSync(cli('pull', DRAFT, '--out', join(OUT, 'p3.zone.json'), '--json').json.file, 'utf8'));
     const topper = after.streets.find((s) => s.key === 'lane').street.layers.find((l) => l.id === 'middleground').decos.find((d) => d.sprite === 'heights_topper_2' && d.y === ledgeY);
     if (topper) cli('set', `lane/${topper.id}`, `y=${floorY - 90}`, '--draft', DRAFT, '--json');
-    // The post on the ledge comes down with it, and the arm into it lands there again.
-    const lanePost = after.streets.find((s) => s.key === 'lane').street.signposts.find((p) => p.y === ledgeY);
-    if (lanePost) {
-      r = cli('set', `lane/${lanePost.id}`, `y=${floorY - 90}`, '--draft', DRAFT, '--json');
-      check('set: the post down with its ledge', r.status === 0, r.err);
-    }
-    r = cli('arrivals', '--draft', DRAFT, '--json');
-    check('arrivals: the arm into the moved post lands there again', r.status === 0 && (r.json?.arms || []).length >= 1, r.err || JSON.stringify(r.json));
+    const lanePost = after.streets.find((s) => s.key === 'lane').street.signposts.find((p) => p.id === r.json?.carried?.[0]?.split('/')[1]);
+    check('set: the post stands on the ledge where it came down to', lanePost?.y === floorY - 90, JSON.stringify(lanePost));
+    r = cli('arrivals', '--posts', '--draft', DRAFT, '--json');
+    check('arrivals --posts: every post on its floor, every arm landing where its post stands', r.status === 0 && (r.json?.posts || []).length === 0 && (r.json?.arms || []).length === 0, r.err || JSON.stringify(r.json));
     r = cli('validate', '--draft', DRAFT, '--rule', 'PHY-', '--json');
     const left = (r.json?.findings || []).filter((f) => f.street === 'lane' && f.rule === 'PHY-003');
     check('validate: the post is reached now (no PHY-003 on lane)', r.json && left.length === 0, left.map((f) => f.message).join(' | ') || JSON.stringify(r.json?.counts));

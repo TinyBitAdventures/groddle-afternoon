@@ -31,6 +31,7 @@ import { applyOps, applyOp, nextDecoId, nextGeometryId, findGeometry, findDeco, 
 import { forkStreet, forkOps, newTsid, libraryAsset, linkEdit, editsOn } from '../../public/js/builder/zone.js?v=6a3db28e';
 import { newStreet, newStreetOps, newHub, nextHubId, mapWithStreet, mapWithoutStreet, TEMPLATES, DEFAULT_MAP_COLOURS } from '../../public/js/builder/templates.js?v=008481d2';
 import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js/builder/geometry-handles.js?v=d39231a4';
+import { arrivalOps, settlePostOps, followPostOps } from '../../public/js/builder/posts.js?v=ebcf627c';
 import { platformsScreen, isStandable } from '../../public/js/street-model.js?v=23b926e5';
 import { DECO_TWINS } from '../../public/js/street-render.js?v=3f8384af';
 import { EFFECT_KINDS, EFFECT_DEFAULTS, EFFECT_LIMITS, RUMBLE_DEFAULTS, effectsCost, normaliseEmitter, rumbleShare } from '../../public/js/street-effects.js?v=e427650f';
@@ -57,7 +58,7 @@ export function ladderTiling(word = 'wood') {
 
 /** Ops spec 8.3 names that are not built yet: refused here rather than sent. */
 export const NOT_BUILT = Object.freeze(['layer.add', 'layer.remove', 'layer.move', 'waiver.add', 'waiver.remove']);
-const BOOLEAN_FLAGS = new Set(['json', 'dry-run', 'write', 'help', 'all', 'flip', 'reach', 'dirty', 'no-build', 'always', 'quiet', 'off']);
+const BOOLEAN_FLAGS = new Set(['json', 'dry-run', 'write', 'help', 'all', 'flip', 'reach', 'dirty', 'no-build', 'always', 'quiet', 'off', 'posts', 'no-carry']);
 const pub = (p) => join(GAME_DIR, 'public', p);
 const readJson = (f) => JSON.parse(readFileSync(f, 'utf8'));
 const clone = (v) => JSON.parse(JSON.stringify(v));
@@ -551,41 +552,6 @@ export function linkWorldOps(zone, key, shipped, { post = null, back = null } = 
   return { ops, post: `${key}/${backId}`, on: on.id };
 }
 
-/**
- * PURE: every arm that leads to one of the zone's streets (its own arms, and edits[] on shipped
- * streets) with its arrival worked out again where the target's signpost leading back now stands
- * (arriveFor, as build-street-navigation.mjs does). For after moving a post or the floor under it.
- * Returns { ops, arms: ["<street>/<post>/<n>" | "edit/<n>"] } for the arms that changed.
- */
-export function arrivalOps(zone, { street = null } = {}) {
-  const byTsid = new Map((zone.streets || []).map((r) => [r.street?.tsid, r.street]));
-  const same = (a, b) => (a?.x ?? null) === (b?.x ?? null) && (a?.y ?? null) === (b?.y ?? null);
-  const ops = [];
-  const arms = [];
-  for (const row of zone.streets || []) {
-    if (street && row.key !== street) continue;
-    for (const post of row.street.signposts || []) {
-      (post.connects || []).forEach((c, at) => {
-        const target = byTsid.get(c.tsid);
-        if (!target) return;
-        const arrive = arriveFor(target, row.street.tsid);
-        if (!arrive || same(arrive, c.arrive)) return;
-        ops.push({ op: 'connect.set', street: row.key, signpost: post.id, at, set: { arrive } });
-        arms.push(`${row.key}/${post.id}/${at}`);
-      });
-    }
-  }
-  (zone.edits || []).forEach((e, at) => {
-    if (street || e.op !== 'add-connect' || !e.connect) return;
-    const target = byTsid.get(e.connect.tsid);
-    const arrive = target && arriveFor(target, e.tsid);
-    if (!arrive || same(arrive, e.connect.arrive)) return;
-    ops.push({ op: 'edit.remove', at }, { op: 'edit.add', at, edit: { ...e, connect: { ...e.connect, arrive } } });
-    arms.push(`edit/${at}`);
-  });
-  return { ops, arms };
-}
-
 /** PURE: a hubmap.set op with this street's line on the zone's hub map. */
 export function hubMapOps(zone, key, line) {
   const s = streetOf(zone, key).street;
@@ -682,11 +648,13 @@ export const HELP = `Groddle level builder (docs/level-builder/spec.md 8.2)
   street add --key k --label L [--template meadow|tall|forest|cave|blank] [--width 3000 --height 1000]
   street fork <shipped tsid> --key k --label L
   place --street k --layer middleground --sprite bush_3 --x 300 --y -60 [--w --h --flip --z --r]
-  set <street>[/<id>[/<arm>]] key=value ...   (key= removes)    rm <street>[/<id>[/<arm>]]
+  set <street>[/<id>[/<arm>]] key=value ...   (key= removes; a moved line carries its signposts, --no-carry keeps them)
+  rm <street>[/<id>[/<arm>]]
   platform --street k --from x,y --to x,y [--perm floor|roof|soft|hard]
   wall --street k --x --y --h [--perm]   ladder --street k --x --y --h [--w] [--tiling wood|stone|none]   signpost --street k --x --y [--w --h]
   connect <streetA> <streetB> [--a-post id] [--b-post id]
-  arrivals [--street k]                       work every arm's arrival out again (after moving a post or its floor)
+  arrivals [--street k] [--posts]             work every arm's arrival out again (after moving a post or its floor);
+                                              --posts first stands floating or sunk signposts on their floor
   link-world <street> --from <shipped tsid> [--post id] [--back id]   (a post with room: the game shows four arms)
   populate --street k npc_piggy=2 trant_fruit=1 [--quoins 6]
   hub map --street k --line x1,y1,x2,y2
@@ -705,6 +673,8 @@ export const HELP = `Groddle level builder (docs/level-builder/spec.md 8.2)
                                               into this checkout's files (spec 11); never commits. A draft's new
                                               art is fetched with the key; --art <folder> works offline
   sign METHOD ROUTE [BODY] [--query a=1&b=2]  the X-Groddle-Builder value for a request`;
+
+export { arrivalOps, settlePostOps, followPostOps };
 
 // —— Commands ——
 
@@ -845,8 +815,17 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
     }
 
     case 'set': {
-      if (!args[0] || args.length < 2) throw new CliError('set <street>[/<id>] key=value ...');
-      return wrote(await target().write((zone) => setOps(zone, args[0], args.slice(1)), `set ${args[0]}`));
+      if (!args[0] || args.length < 2) throw new CliError('set <street>[/<id>] key=value ... [--no-carry]');
+      // A line that moves carries the signposts standing on it, and the arms landing there follow (P7).
+      let follow = { carried: [], arms: [] };
+      const r = await target().write((zone) => {
+        const ops = setOps(zone, args[0], args.slice(1));
+        if (flags['no-carry'] === true) return ops;
+        follow = followPostOps(zone, ops);
+        return follow.ops;
+      }, `set ${args[0]}`);
+      const words = follow.carried.length ? `carried ${follow.carried.join(', ')}${follow.arms.length ? `; ${plural(follow.arms.length, 'arrival')} worked out again` : ''}` : '';
+      return wrote(r, follow.carried.length ? { carried: follow.carried, arms: follow.arms } : {}, words);
     }
 
     case 'rm': {
@@ -911,18 +890,39 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
     }
 
     case 'arrivals': {
+      // --posts first stands every signpost that floats over its floor (or sinks into it) on that
+      // floor again (PHY-009), then the arms are worked out where the posts now stand.
       let arms = [];
+      let posts = [];
+      let none = [];
+      const only = typeof flags.street === 'string' ? flags.street : null;
       const r = await target().write((zone) => {
-        const a = arrivalOps(zone, { street: typeof flags.street === 'string' ? flags.street : null });
+        let ops = [];
+        let work = zone;
+        if (flags.posts === true) {
+          const settled = settlePostOps(zone, { street: only });
+          posts = settled.posts;
+          none = settled.none;
+          ops = settled.ops;
+          if (ops.length) {
+            work = clone(zone);
+            applyOps(work, ops);
+          }
+        }
+        // Settled posts move arrivals on every street that leads to them.
+        const a = arrivalOps(work, { street: posts.length ? null : only });
         arms = a.arms;
-        if (!a.ops.length) throw new CliError('Every arm already lands where its street\'s signpost leading back stands.', { code: 'builder_nothing', exit: 0 });
-        return a.ops;
-      }, 'arrivals').catch((e) => {
+        ops = [...ops, ...a.ops];
+        if (!ops.length) throw new CliError('Every arm already lands where its street\'s signpost leading back stands.', { code: 'builder_nothing', exit: 0 });
+        return ops;
+      }, flags.posts === true ? 'arrivals --posts' : 'arrivals').catch((e) => {
         if (e.code === 'builder_nothing') return null;
         throw e;
       });
-      if (!r) return { out: { changed: [], arms: [] }, text: 'Nothing to change.', exit: 0 };
-      return wrote(r, { arms }, `${arms.length} arrival${arms.length === 1 ? '' : 's'} worked out again`);
+      const left = none.length ? ` ${none.join(', ')} ha${none.length === 1 ? 's' : 've'} no floor under ${none.length === 1 ? 'it' : 'them'}: move ${none.length === 1 ? 'it' : 'them'} over one.` : '';
+      if (!r) return { out: { changed: [], arms: [], posts: [], none }, text: `Nothing to change.${left}`, exit: 0 };
+      const words = [posts.length ? `stood ${posts.join(', ')} on the floor` : '', `${arms.length} arrival${arms.length === 1 ? '' : 's'} worked out again`].filter(Boolean).join('; ');
+      return wrote(r, { arms, ...(flags.posts === true ? { posts, none } : {}) }, `${words}${left}`);
     }
 
     case 'populate': {
@@ -1014,7 +1014,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       let report;
       let rev;
       if (local()) {
-        const { validateZone } = await import('../../public/js/builder/validate.js?v=89d70464');
+        const { validateZone } = await import('../../public/js/builder/validate.js?v=1705a409');
         const { loadValidatorContext } = await import('./validator-context.mjs');
         const zone = readJson(resolve(flags.file));
         rev = zone.rev;

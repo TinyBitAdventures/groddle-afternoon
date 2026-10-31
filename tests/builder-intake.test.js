@@ -275,12 +275,18 @@ describe('new art on the site: table, routes, the art page and the store check',
   it('every asset route is an administrator\'s or a key\'s with its scope (BuilderAuth), gated by the option, and registered', () => {
     const s = src('src/AdminBuilderAssets.php');
     const routes = [...s.matchAll(/#\[Route\(Method::(\w+), self::BASE \. '([^']+)', policy: new Policy\(([^)]*)\)\)\]\s*public function (\w+)\(/g)];
-    assert.deepEqual(routes.map((r) => `${r[1]} ${r[2]}`).sort(), ['Get /assets', 'Get /assets/{key:[a-z0-9_]+}', 'Post /assets']);
+    assert.deepEqual(routes.map((r) => `${r[1]} ${r[2]}`).sort(), ['Get /assets', 'Get /assets/{key:[a-z0-9_]+}', 'Get /drafts/{id:[a-z0-9-]+}/art/{sha:[0-9a-f]{64}}', 'Post /assets']);
+    const gates = { intake: /\$this->gate\(\$request, 'assets:write', 'write'\)/, file: /\$this->gate\(\$request, 'drafts:read', 'art'\)/ };
     for (const [, , path, policy, fn] of routes) {
       assert.equal(policy, 'Access::Public', path);
       const body = s.slice(s.indexOf(`public function ${fn}(`));
-      assert.match(body.slice(0, body.indexOf('{') + 90), fn === 'intake' ? /\$this->gate\(\$request, 'assets:write', 'write'\)/ : /\$this->gate\(\$request, 'drafts:read'\)/, fn);
+      assert.match(body.slice(0, body.indexOf('{') + 110), gates[fn] || /\$this->gate\(\$request, 'drafts:read'\)/, fn);
     }
+    // P7: the keyed art route serves only a draft's own art, as /builder-art/ serves it.
+    const file = s.slice(s.indexOf('public function file('), s.indexOf('public static function artAllowed('));
+    assert.match(file, /artAllowed\(\$draft\['zone'\], \$id, \$row, \$who->author\)/);
+    assert.match(file, /BuilderArt::headers\(strlen\(\$bytes\)\)/);
+    assert.match(file, /'RIFF'/);
     assert.match(s, /new BuilderAuth\(\$this->minn\)\)->gate\(/);
     assert.match(src('src/BuilderAuth.php'), /AdminBuilder::enabled\(\$this->minn\)/);
     assert.match(s, /BuilderIntake::intake\(\$body/);
