@@ -15,6 +15,13 @@ Art preserved offline
   assets/maps/art/world/*.jpg      — continent world-map bitmaps from same FLA
   thumbLocal on ~57 hub JSON files when a matching thumb exists
 
+Region backgrounds from the thumbs (G471, round 5, 2026-10-31)
+  assets/maps/art/bg/<region>.webp (760×460) and <region>@2x.webp (1520×920): each public
+  region's thumb from world_map.fla, scaled to the frame and softened into a painting
+  (tools/map-backgrounds/build.mjs, provenance in art/bg/backgrounds.json). The thumbs line up
+  with the 2012 encyclopedia maps at scale 1 (reference only). js/map-graph.js draws one behind
+  the streets when no full painting (bgLocal) exists; test, tower and POL hubs keep the plain map.
+
 CDN hub paintings (full 760×460 bg/fg) — URLs preserved, files NOT on Wayback
   assets/maps/art-urls.txt         — 89 original c1/c2.glitch.bz URLs
   Each hub JSON keeps bg / fg CDN strings; bgLocal/fgLocal fill when recovered

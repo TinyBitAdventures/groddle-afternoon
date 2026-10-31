@@ -16,8 +16,8 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { hiddenReason, readHiddenSources, STRAYS, TOWERS } from '../tools/build-map-hidden.mjs';
-import { buildHubMapView, listHubsFromIndex, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=c0294a25';
-import { hubMapSubtitle } from '../public/js/panel-copy.js?v=27d7f31f';
+import { buildHubMapView, listHubsFromIndex, PUBLIC_HUBS, renderHubMapSvg } from '../public/js/map-graph.js?v=c89ca7f3';
+import { hubMapSubtitle } from '../public/js/panel-copy.js?v=9fc1b2da';
 import { doorRooms } from '../public/js/map-routes.js?v=5090dbb7';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

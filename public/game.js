@@ -857,8 +857,8 @@ import {
   pickMapSpot,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
-} from './js/map-graph.js?v=c0294a25';
-import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=27d7f31f';
+} from './js/map-graph.js?v=c89ca7f3';
+import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=9fc1b2da';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import {
   loadStreetEcologyCatalog,

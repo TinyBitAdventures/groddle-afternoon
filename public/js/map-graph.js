@@ -6,6 +6,7 @@
 
 import { listMapDestinations, planTravel, resolveLoadedTsid, tsidAliases } from './travel.js?v=a2c6427f';
 import { CLASSIC_ART } from './classic/classic-art.js?v=5745e669';
+import { HUB_MAP_BACKGROUNDS } from './hub-map-backgrounds.js?v=5889d7fa';
 
 /** Map catalog + per-hub files. */
 export const MAP_INDEX_URL = 'assets/maps/index.json';
@@ -170,6 +171,12 @@ export function buildHubMapView(hubData, currentTsid, streetIndex = {}) {
   const bgLocal = hubData.bgLocal || '';
   const fgLocal = hubData.fgLocal || '';
   const thumbLocal = hubData.thumbLocal || '';
+  // The region's painting, upscaled from its world-map thumbnail (G471,
+  // tools/map-backgrounds/build.mjs): x1 for the 760 x 460 frame, x2 for Retina. A recovered
+  // full painting (bgLocal) wins; a hub with neither keeps the drawn terrain.
+  const soft = bgLocal ? null : HUB_MAP_BACKGROUNDS[String(hubData.hubId || '')] || null;
+  const dpr = Number(globalThis.devicePixelRatio) || 1;
+  const bgSoft = soft ? (dpr > 1 ? soft.x2 : soft.x1) : '';
 
   return {
     hubId: String(hubData.hubId || ''),
@@ -181,6 +188,7 @@ export function buildHubMapView(hubData, currentTsid, streetIndex = {}) {
     bgLocal,
     fgLocal,
     thumbLocal,
+    bgSoft,
     color: hubData.color || '#5f721d',
     currentTsid: currentResolved,
     streets,
@@ -498,6 +506,9 @@ export function layoutStreetLabels(streets, mapW = 760, mapH = 460) {
   return out;
 }
 
+/** An art URL with its content key (js/data-urls.js groddleDataUrl); as it is in Node and on a page without the map. */
+const keyedArt = (url) => (typeof globalThis.groddleDataUrl === 'function' ? globalThis.groddleDataUrl(url) : url);
+
 /**
  * Build SVG markup for a hub map view (pure string).
  * Uses local bg/fg art when present.
@@ -532,6 +543,14 @@ export function renderHubMapSvg(view) {
   if (view.bgLocal) {
     parts.push(
       `<image class="map-bg" href="${escapeXml(view.bgLocal)}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="none"/>`
+    );
+  } else if (view.bgSoft) {
+    // Loaded with the map that shows it (an SVG <image> fetches when drawn), keyed like the
+    // game's other art (js/data-urls.js does not see an SVG href in an HTML string). The street
+    // lines, labels and GO buttons read on it as they are (no wash): every street of a painted
+    // region is playable, so none is drawn in the pale unvisited style.
+    parts.push(
+      `<image class="map-bg map-bg-soft" href="${escapeXml(keyedArt(view.bgSoft))}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="none"/>`
     );
   } else {
     parts.push(`<rect class="map-terrain" width="${w}" height="${h}" fill="url(#hubTerrain)"/>`);
