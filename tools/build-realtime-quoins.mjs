@@ -32,7 +32,7 @@ import {
   planStreetPlacements,
   populationForStreet,
   setStreetEcologyCatalog,
-} from '../public/js/street-ecology.js?v=9c1a5f07';
+} from '../public/js/street-ecology.js?v=6a313245';
 import {
   MYSTERY_QUOIN_KINDS,
   QUOIN_CLASSES,

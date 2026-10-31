@@ -17,7 +17,7 @@ import {
   ecologyForStreet,
   interiorReason,
   populationForStreet,
-} from '../public/js/street-ecology.js?v=9c1a5f07';
+} from '../public/js/street-ecology.js?v=6a313245';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => JSON.parse(readFileSync(join(spike, rel), 'utf8'));
@@ -147,13 +147,18 @@ describe('interior rows in the catalog', () => {
 
 describe('spawners', () => {
   it('a spawner on a street with no archived ecology guesses no animal', () => {
-    for (const tsid of ['GA9R4OR505F3PSL', 'GA9R3FG405F3B9P', 'GA9QNMSIV4F3143']) { // Abbasid Jail, Abbasid Walkway, Volcano Villa
+    for (const tsid of ['GA9R4OR505F3PSL', 'GA9QNMSIV4F3143']) { // Abbasid Jail, Volcano Villa
       const row = ecologyForStreet(tsid, catalog);
       assert.deepEqual([row.counts, row.spawners], [{}, 1], tsid);
       const pop = populationForStreet(tsid, row);
       assert.equal(pop.piggies + pop.chickens + pop.butterflies, 0, row.label);
       assert.equal(pop.treeClasses.length + Number(pop.vendor) + Number(pop.shrine), 0, row.label);
     }
+  });
+
+  it('Abbasid Walkway\'s two Butterflies come from its live street page, not its spawner', () => {
+    const row = ecologyForStreet('GA9R3FG405F3B9P', catalog);
+    assert.deepEqual([row.counts, row.spawners, catalog.butterflies.GA9R3FG405F3B9P.count], [{ npc_butterfly: 2 }, 1, 2]);
   });
 
   it('a spawner on a living street guesses no animal (G44b)', () => {

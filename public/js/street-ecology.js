@@ -208,6 +208,18 @@ function expandClasses(counts, classes, totalCap) {
   return out;
 }
 
+/**
+ * A street's Butterflies (build-street-ecology.mjs: the live street pages'
+ * count, at most 3) split between the path and the air so the street shows
+ * that many in all: one flies, two are one of each, three are one resting and
+ * two flying.
+ */
+export function butterflySplit(count) {
+  const total = Math.min(whole(count), 3);
+  const resting = Math.floor(total / 2);
+  return { butterflies: resting, flyingButterflies: total - resting };
+}
+
 function emptyPopulation({ source, sourceTsid = null }) {
   return {
     source,
@@ -237,7 +249,9 @@ function emptyPopulation({ source, sourceTsid = null }) {
  * Static items stay exact (within rendering caps). Archived spawners add no
  * animals: a spawner refills whenever a player enters, so its snapshot already
  * holds what it spawns, and 409 of the 449 archived streets with spawners show
- * no animal at all (register G44b).
+ * no animal at all (register G44b). Butterflies are the one exception the
+ * builder adds, from the live street pages' counts (counts.npc_butterfly,
+ * evidence in the catalog's `butterflies` map).
  *
  * A street with no row gets nothing (Austin 2026-10-30): no invented piggies,
  * trees, rocks, garden, vendor or shrine. build-street-ecology.mjs writes a row
@@ -257,7 +271,6 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
     // exactly what the archived row lists, no spawner-inferred animals, no
     // invented scenery, no ambient apples or Musicblocks, and the archived
     // quoin count instead of the outdoor eight.
-    const butterflies = Math.min(whole(counts.npc_butterfly), 3);
     return {
       source: 'tinyspeck-locations-xml',
       sourceTsid: entry.sourceTsid || null,
@@ -265,8 +278,7 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
       giantId: entry.giantId || null,
       piggies: Math.min(whole(counts.npc_piggy), 6),
       chickens: Math.min(whole(counts.npc_chicken), 3),
-      butterflies,
-      flyingButterflies: butterflies,
+      ...butterflySplit(counts.npc_butterfly),
       treeClasses: expandClasses(counts, TREE_CLASSES, 8),
       rockClasses: expandClasses(counts, ROCK_CLASSES, 10),
       gardens: Math.min(whole(counts.garden), 2),
@@ -286,7 +298,7 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
   const caps = entry?.caps || {};
   let piggies = Math.min(whole(counts.npc_piggy), whole(caps.piggies, 6, 12));
   let chickens = Math.min(whole(counts.npc_chicken), whole(caps.chickens, 3, 8));
-  let butterflies = Math.min(whole(counts.npc_butterfly), 3);
+  let { butterflies, flyingButterflies } = butterflySplit(counts.npc_butterfly);
 
   let treeClasses = expandClasses(counts, TREE_CLASSES, 8);
   let rockClasses = expandClasses(counts, ROCK_CLASSES, 10);
@@ -300,6 +312,7 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
     piggies = Math.max(3, piggies);
     chickens = Math.max(2, chickens);
     butterflies = Math.max(2, butterflies);
+    flyingButterflies = Math.max(2, flyingButterflies);
     if (!treeClasses.length) {
       treeClasses = ['trant_fruit', 'trant_egg', 'trant_bean', 'wood_tree'];
     } else if (!treeClasses.includes('wood_tree') && treeClasses.length < 8) {
@@ -328,7 +341,7 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
     piggies,
     chickens,
     butterflies,
-    flyingButterflies: Math.min(3, Math.max(starter ? 2 : 0, butterflies)),
+    flyingButterflies,
     treeClasses,
     rockClasses,
     gardens,

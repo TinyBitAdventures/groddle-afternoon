@@ -189,6 +189,32 @@ function swoonerfliesFromLabels(labels) {
   return n ? { [SWOONERFLY_CLASS]: n } : {};
 }
 
+/**
+ * Street Butterflies. The archived snapshot's `items` objrefs hold none: the
+ * late-2012 dump kept only seven, all under __MISSING_ITEMS__ (Fairgower Lane
+ * 4, Thicket 2, Hayden Seek Alley 1), and spawner instances there do not keep
+ * their spawn_class (items/spawner.js 23-32). The live game had them on most
+ * outdoor streets: the glitch.com encyclopedia page for each street printed the
+ * server's live count ("Plus 1 Piggy, 1 Butterfly, ..."; locations/location.js
+ * 3459-3460 and 3572), and tools/ecology/butterfly-census.json holds every
+ * archived street page's latest live capture from the Wayback Machine (plus an
+ * earlier sample). A street gets butterflies only when one
+ * of the two lists them, at most 3 (locations/inc_admin.js 866-869
+ * admin_clean_street keeps 3 per street); the evidence goes in the top-level
+ * `butterflies` map.
+ */
+const BUTTERFLY_CAP = 3;
+
+function missingButterflies(xml) {
+  const block = xml.match(/<object id="__MISSING_ITEMS__">([\s\S]*?)<\/object>/)?.[1] || '';
+  return [...block.matchAll(/<objref\b[^>]*\blabel="Butterfly"/g)].length;
+}
+
+async function butterflyCensus() {
+  const census = JSON.parse(await readFile(join(root, 'tools/ecology/butterfly-census.json'), 'utf8'));
+  return new Map(census.streets.filter((row) => row.butterflies > 0).map((row) => [row.tsid, row]));
+}
+
 function isInstanceLocation(xml) {
   return /<bool id="is_instance">true<\/bool>/.test(xml);
 }
@@ -266,6 +292,8 @@ const wildlife = {};
 const furniture = {};
 const vendors = {};
 const swoonerflies = {};
+const butterflies = {};
+const census = await butterflyCensus();
 for (const [tsid, meta] of Object.entries(index.streets || {})) {
   const candidates = locationAliases(tsid).map((alias) => join(locationRoot, `${alias}.xml`));
   const sourcePath = await firstReadable(candidates);
@@ -321,10 +349,22 @@ for (const [tsid, meta] of Object.entries(index.streets || {})) {
     };
     continue;
   }
+  const counts = { ...ecology.counts };
+  const live = census.get(tsid);
+  const missing = missingButterflies(xml);
+  if (live || missing) {
+    const count = Math.max(live?.butterflies || 0, missing);
+    counts.npc_butterfly = Math.min(count, BUTTERFLY_CAP);
+    butterflies[tsid] = {
+      count,
+      ...(live ? { wayback: live.captures.filter((c) => c.butterflies > 0).map((c) => c.wayback) } : {}),
+      ...(missing ? { missingItems: missing } : {}),
+    };
+  }
   streets[tsid] = {
     label: meta.label || tsid,
     sourceTsid,
-    counts: ecology.counts,
+    counts,
     ...(ecology.giantId ? { giantId: ecology.giantId } : {}),
     ...(ecology.spawners ? { spawners: ecology.spawners } : {}),
   };
@@ -345,6 +385,8 @@ const catalog = {
   vendors,
   swoonerflyStreetCount: Object.keys(swoonerflies).length,
   swoonerflies,
+  butterflyStreetCount: Object.keys(butterflies).length,
+  butterflies,
 };
 
 mergeZoneEcology(catalog, listZones(files(root)).map((z) => z.zone));

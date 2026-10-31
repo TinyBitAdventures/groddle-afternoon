@@ -53,7 +53,7 @@ import {
   planStreetPlacements,
   populationForStreet,
   setStreetEcologyCatalog,
-} from '../public/js/street-ecology.js?v=9c1a5f07';
+} from '../public/js/street-ecology.js?v=6a313245';
 import { ROCK_CATALOG } from '../public/js/mining.js?v=a7eb8740';
 import { MEGA_ROCK_CHANCE, MEGA_ROCK_CHUNKS } from '../public/js/imagination-effects.js?v=70169933';
 import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=3d618d6a';

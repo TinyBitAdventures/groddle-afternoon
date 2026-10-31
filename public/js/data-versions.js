@@ -120,7 +120,7 @@
       "assets/content/puzzle-triggers.json": "09810451",
       "assets/content/quests.json": "005211b8",
       "assets/content/signpost-graph.json": "1ea27669",
-      "assets/content/street-ecology.json": "725a0bd1",
+      "assets/content/street-ecology.json": "54e03178",
       "assets/content/style-profiles.json": "3776c99b",
       "assets/content/trade-items.json": "ce3564fe",
       "assets/content/zone.schema.json": "6c4a14c3",
