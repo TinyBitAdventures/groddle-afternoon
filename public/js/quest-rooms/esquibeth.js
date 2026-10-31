@@ -53,7 +53,7 @@
  *  - Each grotto hides 3, 4 and then 5 notes ("Found 1 of 3 Notes" ...). With
  *    all found ("You found all the notes. Now, play the song.") Esquibeth's
  *    ghost plays the song at a carved Giant glyph; you play it back on the
- *    notes set into the stone. The glyph glows, rocks crumble from a passage
+ *    notes set into the glyph. The glyph glows, rocks crumble from a passage
  *    and the narration moves you on. The song was recovered from the
  *    recordings' audio by matching the five bells: phrase A = E G D, the
  *    second grotto adds B = E C, the climb adds C = A D (the overlays are
@@ -65,11 +65,22 @@
  *    an iMG quoin (the reminisce, as recorded), then out through the light.
  *  - The grotto and climb terrain is clean vector basalt in the recordings'
  *    lavender, with recovered Alakol cliff decos tinted for the far walls.
+ *  - The Giant glyphs are Tiny Speck's own esquibeth1.swf decos (glitch-locations,
+ *    CC0; tools/esquibeth-art/build.py, js/quest-rooms/esquibeth-art.js):
+ *    Spriggan in the Eastern Grotto, Cosma in the Western Grotto and Pot on the
+ *    Climb, as players' Snaps show (round3-levels-2026-10-29 and wayback/raw/
+ *    snaps/last_pilgrimage_of_esquibeth, reference only). Each glyph carves 3, 4
+ *    and 5 note sockets, each marked with its note's sign, so a found note sits
+ *    in its own socket. The glyph's _glow art lights it when the song is played,
+ *    and its sheetmusiclines staff (01a, 01b, 01c) stands over it. The staff's
+ *    progress dots (glyph_dot_01a..e, one per note) are the remake's: they light
+ *    on its marks as the song is played.
  */
 
 import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=db2ce452';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { loseEnergy, metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
+import { ESQUIBETH_ART, ESQUIBETH_GLYPHS, ESQUIBETH_STAFFS } from './esquibeth-art.js?v=fe515887';
 
 export const ROOM_ID = 'esquibeth';
 export const MAIN = 'last_pilgrimage_of_esquibeth';
@@ -204,7 +215,7 @@ export function stageLayout(stage) {
       ledges: [],
       caves: [{ x1: 0, x2: 1420, ceiling: 680 }],
       notes: [{ n: 1, x: 930, y: 1000 }, { n: 3, x: 2620, y: 560 }, { n: 2, x: 630, y: 930 }],
-      glyph: { x: 330, y: 1000, symbol: 'grendaline' },
+      glyph: { x: 330, y: 1000, name: 'spriggan', staff: '01a', scale: 1.15 },
       button: { x: 470, y: 1000 },
       exit: { x: 110, y: 1000 },
       spawn: { x: 2980, y: 640 },
@@ -226,7 +237,7 @@ export function stageLayout(stage) {
       caves: [{ x1: 0, x2: 1000, ceiling: 680 }, { x1: 2380, x2: 3200, ceiling: 660 }],
       light: { x: 1660, w: 520 },
       notes: [{ n: 4, x: 3040, y: 1000 }, { n: 1, x: 2860, y: 820 }, { n: 3, x: 1700, y: 700 }, { n: 2, x: 990, y: 930 }],
-      glyph: { x: 430, y: 1000, symbol: 'eye' },
+      glyph: { x: 430, y: 1000, name: 'cosma', staff: '01b', scale: 1.1 },
       button: { x: 575, y: 1000 },
       exit: { x: 110, y: 1000 },
       spawn: { x: 3100, y: 1000 },
@@ -248,8 +259,8 @@ export function stageLayout(stage) {
       ledges: steps,
       caves: [],
       notes: [{ n: 2, ...mid(2) }, { n: 4, ...mid(7) }, { n: 5, ...mid(9) }, { n: 3, ...mid(13) }, { n: 1, ...mid(17) }],
-      glyph: { x: 1300, y: 700, symbol: 'bowl' },
-      button: { x: 1440, y: 700 },
+      glyph: { x: 1300, y: 700, name: 'pot', staff: '01c', scale: 0.8 },
+      button: { x: 1180, y: 700 },
       exit: { x: 1690, y: 700 },
       spawn: { x: 200, y: 2500 },
       quoins: [{ x: mid(8).x, y: mid(8).y - 70, type: 'xp' }, { x: mid(14).x, y: mid(14).y - 70, type: 'energy' }],
@@ -323,15 +334,51 @@ export function stageBarriers(stage) {
   return out;
 }
 
-/** Glyph socket offsets (note -> dx, dy from the glyph's centre). */
-export function socketOffsets(count) {
-  if (count === 3) return { 2: [-62, 6], 3: [0, -64], 1: [62, 6] };
-  if (count === 4) return { 2: [-62, -4], 3: [0, -64], 1: [62, -4], 4: [0, 56] };
-  return { 2: [-66, -10], 3: [-26, -64], 1: [66, -10], 4: [26, -64], 5: [0, 56] };
+/**
+ * The glyph's art sits this far above the floor (scaled). Players' Snaps of all three grottos
+ * show its bottom about two thirds of an avatar's height up, and the glyph a little shorter
+ * than an avatar (the Climb's Pot smaller still, so `scale` differs per grotto).
+ */
+export const GLYPH_LIFT = 78;
+/** The staff's bottom overlaps the glyph's top by this much (stage px), as in the Snaps. */
+export const STAFF_OVERLAP = 6;
+
+/**
+ * Where a grotto's glyph, its glow, sockets and staff go (world px). Positions come from the art's
+ * stage (js/quest-rooms/esquibeth-art.js): the glyph is centred on glyph.x with its bottom
+ * GLYPH_LIFT over the floor at glyph.y; the staff is centred over it.
+ */
+export function glyphPlacement(stage) {
+  const L = stageLayout(stage);
+  if (!L) return null;
+  const gl = L.glyph;
+  const s = gl.scale;
+  const art = ESQUIBETH_ART[`glyph_${gl.name}_01a`];
+  const glowArt = ESQUIBETH_ART[`glyph_${gl.name}_glow_01a`];
+  const staffArt = ESQUIBETH_ART[`glyph_sheetmusiclines_${gl.staff}`];
+  const info = ESQUIBETH_GLYPHS[gl.name];
+  const ox = gl.x - (art.trim[0] + art.w / 2) * s;
+  const oy = gl.y - GLYPH_LIFT - (art.trim[1] + art.h) * s;
+  const top = oy + art.trim[1] * s;
+  const sx = gl.x - (staffArt.trim[0] + staffArt.w / 2) * s;
+  const sy = top + STAFF_OVERLAP * s - (staffArt.trim[1] + staffArt.h) * s;
+  const at = (x0, y0, a) => ({ file: a.file, x: x0 + a.trim[0] * s, y: y0 + a.trim[1] * s, w: a.w * s, h: a.h * s, scale: s });
+  return {
+    name: gl.name,
+    scale: s,
+    glyph: at(ox, oy, art),
+    glow: at(ox + info.glow[0] * s, oy + info.glow[1] * s, glowArt),
+    staff: at(sx, sy, staffArt),
+    centre: { x: gl.x, y: top + (art.h * s) / 2 },
+    sockets: Object.fromEntries(Object.entries(info.sockets).map(([n, [x, y]]) => [n, { x: ox + x * s, y: oy + y * s }])),
+    marks: ESQUIBETH_STAFFS[gl.staff].map(([x, y]) => ({ x: sx + x * s, y: sy + y * s })),
+  };
 }
-/** The glyph's centre sits this far above the floor (sockets stay within the visible band). */
-export const GLYPH_CENTRE_UP = 88;
-export const STAFF_RADIUS = 96;
+
+/** The glyph_dot art for note n (01a for note 1 ... 01e for note 5). */
+export function noteDot(n) {
+  return ESQUIBETH_ART[`glyph_dot_01${'abcde'[n - 1]}`];
+}
 
 /* ------------------------------------------------------------------ */
 /* Drawing                                                              */
@@ -475,49 +522,14 @@ function radial(PIXI, inner, outer, w, h) {
   return s;
 }
 
-/** The Giant glyphs on the loading stones, as vectors (local, ~100 px tall). */
-export function drawGlyph(g, symbol, color, width = 5, alpha = 1) {
-  if (symbol === 'grendaline') {
-    g.moveTo(-34, -40);
-    g.quadraticCurveTo(-46, 6, -18, 34);
-    g.lineTo(0, 46);
-    g.lineTo(18, 34);
-    g.quadraticCurveTo(46, 6, 34, -40);
-    g.quadraticCurveTo(0, -24, -34, -40);
-    g.moveTo(0, -30);
-    g.lineTo(0, 30);
-    g.moveTo(0, -4);
-    g.lineTo(-20, -24);
-    g.moveTo(0, -4);
-    g.lineTo(20, -24);
-    g.moveTo(-16, 22);
-    g.lineTo(-8, 14);
-    g.lineTo(0, 22);
-    g.lineTo(8, 14);
-    g.lineTo(16, 22);
-  } else if (symbol === 'eye') {
-    g.moveTo(-46, 6);
-    g.quadraticCurveTo(0, -42, 46, 6);
-    g.quadraticCurveTo(0, 40, -46, 6);
-    g.circle(0, 6, 11);
-    for (const [x1, y1, x2, y2] of [[-30, -26, -40, -42], [0, -34, 0, -52], [30, -26, 40, -42], [-24, 34, -32, 48], [24, 34, 32, 48]]) {
-      g.moveTo(x1, y1);
-      g.lineTo(x2, y2);
-    }
-  } else {
-    g.moveTo(-42, 12);
-    g.quadraticCurveTo(0, 62, 42, 12);
-    g.moveTo(-42, 12);
-    g.lineTo(42, 12);
-    g.moveTo(-32, 0);
-    g.quadraticCurveTo(-30, -16, -12, -14);
-    g.quadraticCurveTo(0, -30, 14, -14);
-    g.quadraticCurveTo(32, -16, 32, 0);
-    g.moveTo(-20, -24);
-    g.quadraticCurveTo(0, -48, 20, -24);
-    g.circle(0, -48, 4);
-  }
-  g.stroke({ width, color, alpha, cap: 'round', join: 'round' });
+/** A sprite of one esquibeth-art piece at a glyphPlacement spot. */
+function artSprite(PIXI, spot) {
+  const spr = new PIXI.Sprite(textureFromUrl(spot.file));
+  spr.x = spot.x;
+  spr.y = spot.y;
+  // The @3x file's logical size is the art's stage size (js/textures.js).
+  spr.scale.set(spot.scale);
+  return spr;
 }
 
 /**
@@ -614,20 +626,10 @@ function buildGrotto(ctx, stage) {
     // The overhang above the summit ledge frames the bright cave mouth.
     drawCeiling(ceil, { x1: 980, x2: 1800, ceiling: 420 }, PAL.climb, kit, 0);
   }
-  // The glyph stone, carved into the wall.
-  const gl = L.glyph;
-  const stone = new PIXI.Graphics();
-  stone.moveTo(gl.x - 92, gl.y);
-  stone.lineTo(gl.x - 96, gl.y - 120);
-  stone.quadraticCurveTo(gl.x, gl.y - 215, gl.x + 96, gl.y - 120);
-  stone.lineTo(gl.x + 92, gl.y);
-  stone.closePath().fill({ color: 0x6a5a7c, alpha: 0.95 }).stroke({ width: 3, color: 0x2c2238, alpha: 0.8 });
-  world.addChild(stone);
-  const carve = new PIXI.Graphics();
-  carve.x = gl.x;
-  carve.y = gl.y - GLYPH_CENTRE_UP;
-  drawGlyph(carve, gl.symbol, 0x2a2133, 6, 0.9);
-  world.addChild(carve);
+  // The glyph, carved into the wall, and its staff over it.
+  const place = glyphPlacement(stage);
+  world.addChild(artSprite(PIXI, place.glyph));
+  world.addChild(artSprite(PIXI, place.staff));
   return {
     label: STAGE_LABELS[stage],
     hubName: 'The Last Pilgrimage of Esquibeth',
@@ -810,8 +812,13 @@ async function ghostVanish(ctx, spr) {
 /* Grotto play: notes, the stone, the song                              */
 /* ------------------------------------------------------------------ */
 
+/** The note art's disc is centred at (35, 35) in its 51 x 51 file, not the middle. */
+const NOTE_CENTRE = 35 / 51;
+/** A note in a socket: the 18 px disc at 85% of the glyph's scale fills the carved dent. */
+export const NOTE_IN_SOCKET = 0.85;
+
 function noteSprite(ctx, n, state = '1') {
-  return ctx.kit.roomArt(ctx.PIXI, ROOM_ID, `note${n}_${state}`, 0, 0, { ax: 0.5, ay: 0.5 });
+  return ctx.kit.roomArt(ctx.PIXI, ROOM_ID, `note${n}_${state}`, 0, 0, { ax: NOTE_CENTRE, ay: NOTE_CENTRE });
 }
 
 function setupGrotto(ctx, stage, scene) {
@@ -838,56 +845,50 @@ function setupGrotto(ctx, stage, scene) {
     ctx.add(c, 22);
     return { ...note, sprite: c, taken: false };
   });
-  // Sockets on the stone: empty dents until a note is found.
-  const gl = L.glyph;
-  const cx = gl.x;
-  const cy = gl.y - GLYPH_CENTRE_UP;
-  d.glyphLit = new PIXI.Graphics();
-  d.glyphLit.x = cx;
-  d.glyphLit.y = cy;
-  drawGlyph(d.glyphLit, gl.symbol, 0x5ff0dc, 16, 0.18);
-  drawGlyph(d.glyphLit, gl.symbol, 0x8ff6ea, 9, 0.35);
-  drawGlyph(d.glyphLit, gl.symbol, 0xd8fffa, 5, 1);
+  // The glyph's own sockets: each takes its note once found.
+  const place = glyphPlacement(stage);
+  d.place = place;
+  d.glyphLit = artSprite(PIXI, place.glow);
   d.glyphLit.alpha = 0;
   ctx.add(d.glyphLit, -6);
-  const offs = socketOffsets(L.notes.length);
   d.sockets = {};
-  for (const [nStr, [dx, dy]] of Object.entries(offs)) {
+  for (const [nStr, at] of Object.entries(place.sockets)) {
     const n = Number(nStr);
     const c = new PIXI.Container();
-    c.x = cx + dx;
-    c.y = cy + dy;
-    const dent = new PIXI.Graphics();
-    dent.circle(0, 0, 13).fill({ color: 0x241b2e, alpha: 0.85 });
-    c.addChild(dent);
+    c.x = at.x;
+    c.y = at.y;
     const plain = noteSprite(ctx, n, '1');
     const right = noteSprite(ctx, n, 'right');
     const wrong = noteSprite(ctx, n, 'wrong');
     for (const s of [plain, right, wrong]) {
-      s.scale.set(0.82);
+      s.scale.set(place.scale * NOTE_IN_SOCKET);
       s.visible = false;
       c.addChild(s);
     }
-    const key = kit.label(PIXI, String(n), 0, 30, { size: 11, fill: 0xf3ecff, weight: '900' });
+    const key = kit.label(PIXI, String(n), 0, 20, { size: 11, fill: 0xf3ecff, weight: '900' });
     key.alpha = 0;
     c.addChild(key);
-    c.hitArea = new PIXI.Circle(0, 0, 26);
+    c.hitArea = new PIXI.Circle(0, 0, 18);
     c.eventMode = 'none';
     c.cursor = 'pointer';
     c.on('pointertap', () => playNote(ctx, n));
     ctx.add(c, -5);
     d.sockets[n] = { c, plain, right, wrong, key, flashUntil: 0 };
   }
-  // The staff above the stone: one dot per note of the song.
+  // The staff's marks light, one per note of the song, as it is played.
   const song = SONGS[stage];
-  d.staff = song.map((_, i) => {
-    const t = song.length === 1 ? 0.5 : i / (song.length - 1);
-    const a = Math.PI * (1.15 + 0.7 * t);
-    const dot = new PIXI.Graphics();
-    dot.circle(0, 0, 4).fill(0xffffff);
-    dot.x = cx + Math.cos(a) * STAFF_RADIUS;
-    dot.y = cy + 24 + Math.sin(a) * STAFF_RADIUS;
-    dot.tint = 0x2a2133;
+  d.staff = song.map((n, i) => {
+    const mark = place.marks[i];
+    const dot = new PIXI.Container();
+    dot.addChild(kit.glow(PIXI, 0, 0, 0x8ff6ea, 6));
+    const art = noteDot(n);
+    const spr = new PIXI.Sprite(textureFromUrl(art.file));
+    spr.anchor.set(0.5);
+    spr.scale.set(place.scale);
+    dot.addChild(spr);
+    dot.x = mark.x;
+    dot.y = mark.y;
+    dot.alpha = 0;
     ctx.add(dot, -5);
     return dot;
   });
@@ -912,9 +913,10 @@ function setupGrotto(ctx, stage, scene) {
   else onLoaded(sheet.base, () => setTimeout(ready, 0));
   btn.addChild(press);
   ctx.add(btn, -4);
-  d.button = ctx.register({ classId: 'esquibeth_button', label: 'Playback Button', subtitle: 'Carved beside the stone', sprite: btn });
+  d.button = ctx.register({ classId: 'esquibeth_button', label: 'Playback Button', subtitle: 'Carved beside the glyph', sprite: btn });
   d.button.press = press;
-  // The stone itself: E opens a note menu (keys 1-5 work there too).
+  // The glyph itself: E opens a note menu (keys 1-5 work there too).
+  const gl = L.glyph;
   const stoneHit = new PIXI.Container();
   const hit = new PIXI.Graphics();
   hit.rect(-80, -200, 160, 200).fill({ color: 0xffffff, alpha: 0.001 });
@@ -922,7 +924,7 @@ function setupGrotto(ctx, stage, scene) {
   stoneHit.x = gl.x;
   stoneHit.y = gl.y;
   ctx.add(stoneHit, -7);
-  d.stone = ctx.register({ classId: 'esquibeth_stone', label: 'The Giant’s stone', subtitle: 'Notes are set into it', sprite: stoneHit });
+  d.stone = ctx.register({ classId: 'esquibeth_stone', label: 'The Giant’s glyph', subtitle: 'Notes are set into it', sprite: stoneHit });
   // Exit rocks: a heap of basalt over the passage.
   d.rocks = rockPile(ctx, L.exit.x, L.exit.y, stage);
   // Quoins.
@@ -978,7 +980,7 @@ function refreshSockets(ctx) {
   const song = SONGS[ctx.stage] || [];
   (d.staff || []).forEach((dot, i) => {
     const lit = d.phase === 'done' || i < (d.entered?.length || 0) || i < (d.ghostBeat ?? -1) + 1;
-    dot.tint = lit ? 0x8ff6ea : 0x2a2133;
+    dot.alpha = lit ? 1 : 0;
   });
   return song;
 }
@@ -1436,7 +1438,7 @@ export const room = {
         label: `Play the ${ORDINALS[n - 1]} note`,
         enabled: !d.ghostPlaying,
         reason: 'Esquibeth is playing',
-        tooltip: `Or press ${n} by the stone`,
+        tooltip: `Or press ${n} by the glyph`,
       }));
     }
     if (target === d.conchTarget) return [{ id: 'pickup', label: 'Pick up', enabled: true, tooltip: 'Pickup' }];
@@ -1529,7 +1531,7 @@ export const room = {
     const found = d.found?.length || 0;
     const song = SONGS[stage] || [];
     let text = 'Find the notes.';
-    if (d.phase === 'song') text = d.ghostPlaying ? 'Listen to Esquibeth’s song.' : 'Play the song on the stone (click the notes, or press 1-5 there).';
+    if (d.phase === 'song') text = d.ghostPlaying ? 'Listen to Esquibeth’s song.' : 'Play the song on the glyph (click the notes, or press 1-5 there).';
     else if (d.phase === 'done') text = d.exitOpen ? 'Follow her path on through the rocks.' : 'The glyph wakes …';
     return {
       text,
@@ -1574,7 +1576,8 @@ export const room = {
     ctx.setData('esqGiant', d.giant && !d.giant.destroyed ? `${d.giant.alpha.toFixed(2)}:${isLoaded(d.giant.texture) ? 'ok' : 'loading'}` : '');
     if (d.layout) {
       const gl = d.layout.glyph;
-      ctx.setData('esqGlyph', `${gl.x},${gl.y - GLYPH_CENTRE_UP}`);
+      const c = d.place?.centre || { x: gl.x, y: gl.y };
+      ctx.setData('esqGlyph', `${Math.round(c.x)},${Math.round(c.y)}`);
     }
   },
 

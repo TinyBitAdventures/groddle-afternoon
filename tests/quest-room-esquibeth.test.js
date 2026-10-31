@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import * as kit from '../public/js/quest-rooms/kit.js?v=c7ea6e0e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const mod = await import('../public/js/quest-rooms/esquibeth.js?v=18321905');
+const mod = await import('../public/js/quest-rooms/esquibeth.js?v=eb39b25c');
 
 // Avatar reach (game.js physics): jump 9.6 px/frame against 0.42 gravity peaks near 110 px
 // and carries about 200 px at run speed 4.4; keep margins.
@@ -99,7 +99,8 @@ describe('The Last Pilgrimage of Esquibeth (esquibeth)', () => {
       const found = new Set(mod.stageLayout(stage).notes.map((n) => n.n));
       assert.equal(found.size, mod.NOTE_COUNTS[stage]);
       for (const n of mod.SONGS[stage]) assert.ok(found.has(n), `${stage} note ${n}`);
-      assert.equal(Object.keys(mod.socketOffsets(found.size)).length, found.size);
+      // The glyph carves one socket per note found there, marked for that note.
+      assert.deepEqual(Object.keys(mod.glyphPlacement(stage).sockets).map(Number).sort(), [...found].sort());
     }
     for (const key of Object.values(mod.BELLS)) assert.ok(existsSync(join(root, 'public/assets/audio/sfx', `${key}.mp3`)), key);
   });
@@ -153,9 +154,15 @@ describe('The Last Pilgrimage of Esquibeth (esquibeth)', () => {
   it('keeps what you click within the visible band above the floor', () => {
     for (const stage of ['waterfall_01', 'waterfall_02', 'waterfall_03']) {
       const L = mod.stageLayout(stage);
-      const offs = mod.socketOffsets(L.notes.length);
-      for (const [, dy] of Object.values(offs)) assert.ok(mod.GLYPH_CENTRE_UP - dy <= 160, `${stage} socket ${dy}`);
-      assert.ok(mod.GLYPH_CENTRE_UP - 24 + mod.STAFF_RADIUS <= 162, 'staff');
+      // The camera keeps about 370 px above the floor in view (1280 x 800): sockets and the staff stay well inside.
+      const P = mod.glyphPlacement(stage);
+      for (const [n, at] of Object.entries(P.sockets)) {
+        const up = L.glyph.y - at.y;
+        assert.ok(up >= 60 && up <= 220, `${stage} socket ${n} ${up}`);
+      }
+      assert.ok(L.glyph.y - P.staff.y <= 260, `${stage} staff`);
+      // The song's marks are on the staff.
+      assert.ok(P.marks.length >= mod.SONGS[stage].length);
     }
   });
 

@@ -5,7 +5,11 @@
  *   the drawn bands, fitted to the arch you walk on.
  * - Le Voyage Violet: the washing is hanging_clothes_1..6 on hanging_clothes_line and the moon is
  *   `moon` (abbasid1.swf / quest02.swf decos), in place of drawn garments and a drawn crescent.
+ * - Esquibeth grottos: Tiny Speck's own glyphs (esquibeth1.swf: Spriggan, Cosma and Pot, their
+ *   glow, the sheetmusiclines staffs and the note dots) replace the three made-up vector glyphs;
+ *   each found note sits in the socket carved for it (tools/esquibeth-art/build.py).
  */
+import { createHash } from 'node:crypto';
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
@@ -14,6 +18,8 @@ import { fileURLToPath } from 'node:url';
 
 import { FLOORS, RAINBOW_ART, radiantLayout, rainbowY } from '../public/js/quest-rooms/radiant-glare.js?v=b878eda8';
 import { MOON, WASHING, WASHING_LINE } from '../public/js/purple-journey-scene.js?v=425b0b98';
+import * as esq from '../public/js/quest-rooms/esquibeth.js?v=eb39b25c';
+import { ESQUIBETH_ART, ESQUIBETH_GLYPHS, ESQUIBETH_STAFFS } from '../public/js/quest-rooms/esquibeth-art.js?v=fe515887';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -75,5 +81,62 @@ describe('Le Voyage Violet: the CC0 washing and moon', () => {
     assert.match(src, /deco\(PIXI, WASHING_LINE,/);
     assert.match(src, /deco\(PIXI, name,/);
     assert.match(src, /deco\(PIXI, MOON,/);
+  });
+});
+
+describe('Esquibeth grottos: the CC0 glyphs', () => {
+  const plan = JSON.parse(read('tools/esquibeth-art/plan.json'));
+
+  it('ships every piece rendered from esquibeth1.swf, as the plan records it', () => {
+    assert.equal(plan.bundle, 'esquibeth1.swf');
+    const names = plan.pieces.map((r) => r.name);
+    for (const g of ['spriggan', 'cosma', 'pot']) {
+      assert.ok(names.includes(`esquibeth_glyph_${g}_01a`), g);
+      assert.ok(names.includes(`esquibeth_glyph_${g}_glow_01a`), `${g} glow`);
+    }
+    for (const s of ['01a', '01b', '01c']) assert.ok(names.includes(`esquibeth_glyph_sheetmusiclines_${s}`));
+    for (const d of 'abcde') assert.ok(names.includes(`esquibeth_glyph_dot_01${d}`));
+    for (const r of plan.pieces) {
+      assert.equal(r.source, `bundle:esquibeth1.swf#${r.name}`);
+      const file = join(root, 'public', r.file);
+      assert.ok(existsSync(file), r.file);
+      assert.equal(createHash('sha256').update(readFileSync(file)).digest('hex').slice(0, 16), r.webp, r.file);
+      assert.match(r.file, /^assets\/sprites\/quest-rooms\/esquibeth\/glyph_[a-z0-9_]+@3x\.webp$/);
+      assert.deepEqual(ESQUIBETH_ART[r.name.replace('esquibeth_', '')], { file: r.file, w: r.w, h: r.h, stage: r.stage, trim: r.trim });
+    }
+  });
+
+  it('puts Spriggan, Cosma and Pot in the three grottos, one carved socket per note found there', () => {
+    const want = { waterfall_01: ['spriggan', '01a'], waterfall_02: ['cosma', '01b'], waterfall_03: ['pot', '01c'] };
+    for (const [stage, [name, staff]] of Object.entries(want)) {
+      const L = esq.stageLayout(stage);
+      assert.equal(L.glyph.name, name);
+      assert.equal(L.glyph.staff, staff);
+      const P = esq.glyphPlacement(stage);
+      const notes = L.notes.map((n) => n.n).sort();
+      assert.deepEqual(Object.keys(ESQUIBETH_GLYPHS[name].sockets).map(Number), notes);
+      assert.deepEqual(Object.keys(P.sockets).map(Number), notes);
+      // Every socket is on the glyph's art, and the glow covers the glyph.
+      for (const at of Object.values(P.sockets)) {
+        assert.ok(at.x > P.glyph.x && at.x < P.glyph.x + P.glyph.w && at.y > P.glyph.y && at.y < P.glyph.y + P.glyph.h);
+      }
+      assert.ok(Math.abs((P.glow.x + P.glow.w / 2) - (P.glyph.x + P.glyph.w / 2)) < 10);
+      // The staff stands over the glyph; the song's marks are on it.
+      assert.ok(P.staff.y < P.glyph.y && P.staff.y + P.staff.h > P.glyph.y - 2);
+      assert.ok(ESQUIBETH_STAFFS[staff].length >= esq.SONGS[stage].length);
+      for (const m of P.marks) assert.ok(m.x >= P.staff.x && m.x <= P.staff.x + P.staff.w);
+      for (const n of esq.SONGS[stage]) assert.ok(esq.noteDot(n), `dot ${n}`);
+    }
+    assert.deepEqual(plan.staffs['01a'].length, 4);
+    assert.deepEqual(plan.staffs['01c'].length, 11);
+  });
+
+  it('no longer draws made-up glyphs or a stone arch', () => {
+    const src = read('public/js/quest-rooms/esquibeth.js');
+    for (const gone of ['function drawGlyph(', "'grendaline'", "symbol: 'eye'", "symbol: 'bowl'", 'stone.quadraticCurveTo', 'socketOffsets(', 'STAFF_RADIUS']) {
+      assert.ok(!src.includes(gone), gone);
+    }
+    assert.match(src, /d\.glyphLit = artSprite\(PIXI, place\.glow\)/);
+    assert.match(src, /world\.addChild\(artSprite\(PIXI, place\.glyph\)\)/);
   });
 });

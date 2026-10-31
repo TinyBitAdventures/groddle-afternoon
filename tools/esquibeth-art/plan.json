@@ -1,0 +1,457 @@
+{
+ "zoom": 3,
+ "bundle": "esquibeth1.swf",
+ "bundleSha": "d458a6ecfeb702cc",
+ "glyphs": {
+  "spriggan": {
+   "sockets": {
+    "1": [
+     14.2,
+     37.1
+    ],
+    "2": [
+     39.5,
+     12.6
+    ],
+    "3": [
+     62.6,
+     52.9
+    ]
+   },
+   "glow": [
+    -6.3,
+    -5.7
+   ]
+  },
+  "cosma": {
+   "sockets": {
+    "1": [
+     23.3,
+     31.2
+    ],
+    "2": [
+     48.5,
+     7.0
+    ],
+    "3": [
+     71.5,
+     46.6
+    ],
+    "4": [
+     28.6,
+     66.5
+    ]
+   },
+   "glow": [
+    -6.0,
+    3.3
+   ]
+  },
+  "pot": {
+   "sockets": {
+    "1": [
+     17.3,
+     31.1
+    ],
+    "2": [
+     42.0,
+     7.1
+    ],
+    "3": [
+     65.2,
+     46.9
+    ],
+    "4": [
+     22.1,
+     66.5
+    ],
+    "5": [
+     55.7,
+     92.2
+    ]
+   },
+   "glow": [
+    -6.0,
+    0.3
+   ]
+  }
+ },
+ "staffs": {
+  "01a": [
+   [
+    7.8,
+    25.9
+   ],
+   [
+    17.0,
+    19.4
+   ],
+   [
+    25.9,
+    10.2
+   ],
+   [
+    36.1,
+    17.8
+   ]
+  ],
+  "01b": [
+   [
+    7.8,
+    28.6
+   ],
+   [
+    17.0,
+    22.1
+   ],
+   [
+    25.8,
+    12.9
+   ],
+   [
+    36.0,
+    20.4
+   ],
+   [
+    45.5,
+    17.9
+   ],
+   [
+    55.5,
+    12.6
+   ],
+   [
+    63.2,
+    22.3
+   ]
+  ],
+  "01c": [
+   [
+    7.8,
+    25.9
+   ],
+   [
+    17.0,
+    19.3
+   ],
+   [
+    25.9,
+    10.1
+   ],
+   [
+    36.1,
+    17.6
+   ],
+   [
+    45.4,
+    15.4
+   ],
+   [
+    55.4,
+    10.1
+   ],
+   [
+    63.1,
+    19.8
+   ],
+   [
+    72.4,
+    21.0
+   ],
+   [
+    80.5,
+    28.4
+   ],
+   [
+    91.8,
+    28.8
+   ],
+   [
+    101.1,
+    28.1
+   ]
+  ]
+ },
+ "pieces": [
+  {
+   "name": "esquibeth_glyph_spriggan_01a",
+   "source": "bundle:esquibeth1.swf#esquibeth_glyph_spriggan_01a",
+   "swf": "9d4025c1164f0f4b",
+   "file": "assets/sprites/quest-rooms/esquibeth/glyph_spriggan_01a@3x.webp",
+   "stage": [
+    82,
+    114
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 82,
+   "h": 105,
+   "bytes": 11470,
+   "lossless": false,
+   "error": 3.94,
+   "webp": "ff5f44ef119773f8"
+  },
+  {
+   "name": "esquibeth_glyph_cosma_01a",
+   "source": "bundle:esquibeth1.swf#esquibeth_glyph_cosma_01a",
+   "swf": "1e80ed306dcb58c6",
+   "file": "assets/sprites/quest-rooms/esquibeth/glyph_cosma_01a@3x.webp",
+   "stage": [
+    100,
+    108
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 100,
+   "h": 103,
+   "bytes": 10514,
+   "lossless": false,
+   "error": 3.69,
+   "webp": "bda34eb8c6808241"
+  },
+  {
+   "name": "esquibeth_glyph_pot_01a",
+   "source": "bundle:esquibeth1.swf#esquibeth_glyph_pot_01a",
+   "swf": "926e8e749c4bac8a",
+   "file": "assets/sprites/quest-rooms/esquibeth/glyph_pot_01a@3x.webp",
+   "stage": [
+    83,
+    108
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 83,
+   "h": 108,
+   "bytes": 9468,
+   "lossless": false,
+   "error": 3.61,
+   "webp": "529419e21acb65f4"
+  },
+  {
+   "name": "esquibeth_glyph_spriggan_glow_01a",
+   "source": "bundle:esquibeth1.swf#esquibeth_glyph_spriggan_glow_01a",
+   "swf": "47d28c407e9ed4f0",
+   "file": "assets/sprites/quest-rooms/esquibeth/glyph_spriggan_glow_01a@3x.webp",
+   "stage": [
+    98,
+    124
+   ],
+   "trim": [
+    2,
+    3
+   ],
+   "w": 91,
+   "h": 110,
+   "bytes": 29260,
+   "lossless": false,
+   "error": 2.12,
+   "webp": "56a8aed72af5fc3d"
+  },
+  {
+   "name": "esquibeth_glyph_cosma_glow_01a",
+   "source": "bundle:esquibeth1.swf#esquibeth_glyph_cosma_glow_01a",
+   "swf": "77cc2d774d5a4291",
+   "file": "assets/sprites/quest-rooms/esquibeth/glyph_cosma_glow_01a@3x.webp",
+   "stage": [
+    115,
+    101
+   ],
+   "trim": [
+    2,
+    2
+   ],
+   "w": 107,
+   "h": 94,
+   "bytes": 22344,
+   "lossless": false,
+   "error": 2.42,
+   "webp": "37c93ff44e045940"
+  },
+  {
+   "name": "esquibeth_glyph_pot_glow_01a",
+   "source": "bundle:esquibeth1.swf#esquibeth_glyph_pot_glow_01a",
+   "swf": "cecc5a8d63932936",
+   "file": "assets/sprites/quest-rooms/esquibeth/glyph_pot_glow_01a@3x.webp",
+   "stage": [
+    97,
+    110
+   ],
+   "trim": [
+    1,
+    1
+   ],
+   "w": 92,
+   "h": 104,
+   "bytes": 19488,
+   "lossless": false,
+   "error": 2.34,
+   "webp": "1c85f13839c017df"
+  },
+  {
+   "name": "esquibeth_glyph_sheetmusiclines_01a",
+   "source": "bundle:esquibeth1.swf#esquibeth_glyph_sheetmusiclines_01a",
+   "swf": "b22ce28b61c1696a",
+   "file": "assets/sprites/quest-rooms/esquibeth/glyph_sheetmusiclines_01a@3x.webp",
+   "stage": [
+    113,
+    54
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 113,
+   "h": 54,
+   "bytes": 25242,
+   "lossless": true,
+   "error": 4.67,
+   "webp": "45485e28384d2d8c"
+  },
+  {
+   "name": "esquibeth_glyph_sheetmusiclines_01b",
+   "source": "bundle:esquibeth1.swf#esquibeth_glyph_sheetmusiclines_01b",
+   "swf": "c49b66f25f905b3c",
+   "file": "assets/sprites/quest-rooms/esquibeth/glyph_sheetmusiclines_01b@3x.webp",
+   "stage": [
+    113,
+    57
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 113,
+   "h": 57,
+   "bytes": 30622,
+   "lossless": true,
+   "error": 5.47,
+   "webp": "528bbd487e3018ca"
+  },
+  {
+   "name": "esquibeth_glyph_sheetmusiclines_01c",
+   "source": "bundle:esquibeth1.swf#esquibeth_glyph_sheetmusiclines_01c",
+   "swf": "216bcc4d8a880cd6",
+   "file": "assets/sprites/quest-rooms/esquibeth/glyph_sheetmusiclines_01c@3x.webp",
+   "stage": [
+    113,
+    54
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 113,
+   "h": 54,
+   "bytes": 33830,
+   "lossless": true,
+   "error": 6.16,
+   "webp": "f31c92af951b92aa"
+  },
+  {
+   "name": "esquibeth_glyph_dot_01a",
+   "source": "bundle:esquibeth1.swf#esquibeth_glyph_dot_01a",
+   "swf": "e046d57a6adfe6a0",
+   "file": "assets/sprites/quest-rooms/esquibeth/glyph_dot_01a@3x.webp",
+   "stage": [
+    5,
+    5
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 5,
+   "h": 5,
+   "bytes": 216,
+   "lossless": false,
+   "error": 0.13,
+   "webp": "641e9fec4b81b132"
+  },
+  {
+   "name": "esquibeth_glyph_dot_01b",
+   "source": "bundle:esquibeth1.swf#esquibeth_glyph_dot_01b",
+   "swf": "5da64b517dc4a223",
+   "file": "assets/sprites/quest-rooms/esquibeth/glyph_dot_01b@3x.webp",
+   "stage": [
+    6,
+    5
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 6,
+   "h": 5,
+   "bytes": 252,
+   "lossless": false,
+   "error": 1.05,
+   "webp": "57837c7faadcc68c"
+  },
+  {
+   "name": "esquibeth_glyph_dot_01c",
+   "source": "bundle:esquibeth1.swf#esquibeth_glyph_dot_01c",
+   "swf": "b221a838ba09d368",
+   "file": "assets/sprites/quest-rooms/esquibeth/glyph_dot_01c@3x.webp",
+   "stage": [
+    6,
+    6
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 6,
+   "h": 6,
+   "bytes": 312,
+   "lossless": false,
+   "error": 0.94,
+   "webp": "c5d777c6e449f4fc"
+  },
+  {
+   "name": "esquibeth_glyph_dot_01d",
+   "source": "bundle:esquibeth1.swf#esquibeth_glyph_dot_01d",
+   "swf": "82efd66bd62179d0",
+   "file": "assets/sprites/quest-rooms/esquibeth/glyph_dot_01d@3x.webp",
+   "stage": [
+    7,
+    5
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 7,
+   "h": 5,
+   "bytes": 286,
+   "lossless": false,
+   "error": 1.53,
+   "webp": "bfb4c33ebacd8911"
+  },
+  {
+   "name": "esquibeth_glyph_dot_01e",
+   "source": "bundle:esquibeth1.swf#esquibeth_glyph_dot_01e",
+   "swf": "6aa3e0e7217ec078",
+   "file": "assets/sprites/quest-rooms/esquibeth/glyph_dot_01e@3x.webp",
+   "stage": [
+    6,
+    6
+   ],
+   "trim": [
+    0,
+    0
+   ],
+   "w": 6,
+   "h": 6,
+   "bytes": 308,
+   "lossless": false,
+   "error": 0.71,
+   "webp": "f3015a26c3bab946"
+  }
+ ]
+}
