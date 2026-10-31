@@ -206,6 +206,137 @@ def wrap(src, dst, period):
         f.write(b'FWS' + bytes([ver]) + struct.pack('<I', len(out) + 8) + out)
 
 
+# ---------- Erase ----------
+# Flash's Erase blend mode (PlaceObject3 blend 12) cuts the child's shape out of its parent's
+# layer. FFDec does not draw it at all, so the eraser's cut is lost and the layer renders whole.
+# portal_wintry is the one deco that erases: its pale oval is a white rectangle (alpha 189) with a
+# rectangle-with-an-oval-hole erased from it, then blurred; FFDec drew the whole rectangle, and
+# Northwest Passage showed a translucent white box where the wintry portal is (Austin 2026-10-31).
+# The fix renders such a deco twice: as FFDec draws it (the eraser skipped) and with the eraser
+# drawn as a normal child. Where the eraser covers a translucent layer, the second render is more
+# opaque by exactly the covered part: g = (a_drawn - a) / (1 - a), and the erased frame keeps
+# 1 - g of its alpha (unerase()).
+ERASE = 12  # BlendMode.ERASE
+DRAWN = '~eraser-drawn'  # the work copy's suffix
+
+
+class _Bits:
+    def __init__(self, b, p):
+        self.b, self.p, self.bit = b, p, 0
+
+    def u(self, n):
+        v = 0
+        for _ in range(n):
+            v = (v << 1) | ((self.b[self.p] >> (7 - self.bit)) & 1)
+            self.bit += 1
+            if self.bit == 8:
+                self.bit, self.p = 0, self.p + 1
+        return v
+
+    def end(self):
+        return self.p + (1 if self.bit else 0)
+
+
+def _skip_matrix(b, p):
+    r = _Bits(b, p)
+    for _ in range(2):  # scale, rotate
+        if r.u(1):
+            n = r.u(5)
+            r.u(2 * n)
+    n = r.u(5)
+    r.u(2 * n)
+    return r.end()
+
+
+def _skip_cxform(b, p):
+    r = _Bits(b, p)
+    add, mult, n = r.u(1), r.u(1), r.u(4)
+    r.u(n * 4 * (add + mult))
+    return r.end()
+
+
+# Fixed filter sizes after the type byte: DropShadow, Blur, Glow, Bevel, ColorMatrix.
+_FILTER_BYTES = {0: 23, 1: 9, 2: 15, 3: 27, 6: 80}
+
+
+def blend_at(b, q):
+    """Offset of a PlaceObject3's blend mode byte (data at q), or None when it has none."""
+    f1, f2 = b[q], b[q + 1]
+    if not f2 & 0x02:
+        return None
+    p = q + 4  # flags, depth
+    if f2 & 0x08 or (f2 & 0x10 and f1 & 0x02):
+        p = b.index(0, p) + 1  # class name
+    p += 2 if f1 & 0x02 else 0  # character
+    if f1 & 0x04:
+        p = _skip_matrix(b, p)
+    if f1 & 0x08:
+        p = _skip_cxform(b, p)
+    p += 2 if f1 & 0x10 else 0  # ratio
+    if f1 & 0x20:
+        p = b.index(0, p) + 1  # name
+    p += 2 if f1 & 0x40 else 0  # clip depth
+    if f2 & 0x01:
+        count = b[p]
+        p += 1
+        for _ in range(count):
+            t = b[p]
+            p += 1
+            if t in (4, 7):  # gradient glow / bevel
+                p += 1 + 5 * b[p] + 19
+            elif t == 5:  # convolution
+                p += 2 + 8 + 4 * b[p] * b[p + 1] + 5
+            else:
+                p += _FILTER_BYTES[t]
+    return p
+
+
+def erase_offsets(body):
+    """Offsets of every Erase blend byte in the SWF body, nested sprites included."""
+    out = []
+
+    def walk(s, e):
+        for code, h0, q, ln in tags(body, s, e):
+            if code == 70:
+                p = blend_at(body, q)
+                if p is not None and body[p] == ERASE:
+                    out.append(p)
+            elif code == 39:
+                walk(q + 4, q + ln)
+
+    walk(swfinfo.rect_len(body) + 4, len(body))
+    return out
+
+
+def erasers(path):
+    return len(erase_offsets(swfinfo.swf_body(path)[0]))
+
+
+def eraser_drawn(src, dst):
+    """A work copy with every Erase child drawn as a normal one (BlendMode.NORMAL)."""
+    body, ver = swfinfo.swf_body(src)
+    body = bytearray(body)
+    for p in erase_offsets(body):
+        body[p] = 1
+    with open(dst, 'wb') as f:
+        f.write(b'FWS' + bytes([ver]) + struct.pack('<I', len(body) + 8) + bytes(body))
+
+
+def unerase(img, drawn):
+    """The frame as Flash draws it: FFDec's render (eraser skipped) less what the eraser covers,
+    from the same frame rendered with the eraser drawn (`drawn`). Both straight-alpha RGBA."""
+    a = np.asarray(img, dtype=np.float32)
+    d = np.asarray(drawn, dtype=np.float32)
+    ao, an = a[..., 3] / 255, d[..., 3] / 255
+    seen = ao < 0.999
+    if np.any(~seen & (np.abs(an - ao) > 2 / 255)):
+        raise ValueError('an eraser over an opaque layer: its cut cannot be read from the alpha')
+    g = np.where(seen, np.clip((an - ao) / np.maximum(1e-6, 1 - ao), 0, 1), 0)
+    out = a.copy()
+    out[..., 3] = np.round(a[..., 3] * (1 - g))
+    return Image.fromarray(out.astype(np.uint8), 'RGBA')
+
+
 # ---------- placements ----------
 
 def animated_placements():
@@ -322,20 +453,28 @@ def pack(sizes, max_side=MAX_SIDE, pad=PAD):
         width = min(max_side, int(width * 1.15) + 1)
 
 
-def frame_images(render_dir, period, stage, zoom, size):
+def frame_images(render_dir, period, stage, zoom, size, drawn_dir=None):
+    """Each frame resampled to `size`; with `drawn_dir` (the eraser-drawn render) its erasers cut."""
+    blank = lambda: Image.new('RGBA', (max(1, round(stage[0] * zoom)), max(1, round(stage[1] * zoom))))
     for i in range(1, period + 1):
         p = os.path.join(render_dir, f'{i}.png')
-        ren = build.load(p) if os.path.exists(p) else Image.new('RGBA', (max(1, round(stage[0] * zoom)), max(1, round(stage[1] * zoom))))
+        ren = build.load(p) if os.path.exists(p) else blank()
+        if drawn_dir:
+            q = os.path.join(drawn_dir, f'{i}.png')
+            drawn = build.load(q) if os.path.exists(q) else blank()
+            if drawn.size != ren.size:
+                raise ValueError(f'{render_dir} frame {i}: the eraser-drawn render is {drawn.size}, not {ren.size}')
+            ren = unerase(ren, drawn)
         yield build.stage_resample(ren, stage, zoom, size)
 
 
-def make_strip(render_dir, period, stage, zoom, size, scale, seq_from=None):
+def make_strip(render_dir, period, stage, zoom, size, scale, seq_from=None, drawn_dir=None):
     """Unique trimmed frames of one strip at `scale` x `size` -> (frames, seq, px size). Identical
     frames are stored once; `seq_from` (the 2x strip's sequence) makes a 3x strip store the same
     frames, so both strips share one sequence."""
     px = (max(1, round(size[0] * scale)), max(1, round(size[1] * scale)))
     uniq, seq, frames = {}, [], []
-    for i, img in enumerate(frame_images(render_dir, period, stage, zoom, px)):
+    for i, img in enumerate(frame_images(render_dir, period, stage, zoom, px, drawn_dir)):
         if seq_from is not None and seq_from[i] < len(frames):
             seq.append(seq_from[i])
             continue
@@ -466,6 +605,8 @@ def survey(work):
         info = swfinfo.read(swf)
         r.update(swf=label, swf_sha=build.sha(swf)[:16], stage=info['stage'], root=tl['root'], nested=tl['nested'][:6])
         r['frames'] = loop_period(tl)
+        if erasers(swf):
+            r['erase'] = erasers(swf)
         lf = LOOP_FROM.get(n)
         r['loop_from'] = (tl['labels'][lf] - 1) if lf and lf in tl['labels'] else 0
         if r['frames'] <= 1:
@@ -537,10 +678,13 @@ def cmd_build(args):
                     wrap(swf, dst, r['frames'])
                 else:
                     os.symlink(swf, dst)
+                if r.get('erase'):
+                    eraser_drawn(dst, os.path.join(src, r['name'] + DRAWN + '.swf'))
             t0 = time.time()
             build.ffdec('-zoom', zoom, '-ignorebackground', '-format', 'frame:png', '-export', 'frame', out, src, heap='4g')
             for r, _ in items:
-                process(r, os.path.join(out, r['name'] + '.swf'), zoom, work)
+                drawn = os.path.join(out, r['name'] + DRAWN + '.swf') if r.get('erase') else None
+                process(r, os.path.join(out, r['name'] + '.swf'), zoom, work, drawn)
                 plan['decos'][r['name']] = r
                 print(f"  {r['name']}: {r['frames']} frames, {r['unique']} unique, "
                       + ', '.join(f"{s['density']}x {s['w']}x{s['h']} {s['bytes'] // 1024} KB (res {s['res']})" for s in r['strips']), flush=True)
@@ -553,7 +697,7 @@ def cmd_build(args):
     print('summary', json.dumps(plan['summary']))
 
 
-def process(r, render_dir, zoom, work):
+def process(r, render_dir, zoom, work, drawn_dir=None):
     n = r['name']
     stage = r['stage']
     size2 = r['size']
@@ -566,7 +710,7 @@ def process(r, render_dir, zoom, work):
         scale = min(r['need'], r.get('cap', 1)) if density == 1 else min(1.5, r['need'] * 1.5)
         frames = None
         while density == 1 or scale >= MIN_3X:
-            frames, seq, px = make_strip(render_dir, r['frames'], stage, zoom, size2, scale, None if density == 1 else seq2)
+            frames, seq, px = make_strip(render_dir, r['frames'], stage, zoom, size2, scale, None if density == 1 else seq2, drawn_dir)
             if strip_bytes(frames) > budget * 0.9 and scale > 0.25:
                 scale *= math.sqrt(budget * 0.85 / strip_bytes(frames))
                 frames = None
