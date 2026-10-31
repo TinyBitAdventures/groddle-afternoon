@@ -2623,7 +2623,11 @@ function publish(engine, force = false) {
     engine.setData('rookOrbsAt', [...mp.arts].map(([by, art]) => `${by}@${at(art.root)}`).join(' '));
     const near = nearestRooked(engine, 4000);
     engine.setData('rookRookedAt', near ? `${near.key}@${at(near.row.target.sprite, -20)}` : '');
-    engine.setData('rookRookedSpots', [...tracked].slice(0, 16).map(([key, row]) => `${key}@${at(row.target.sprite, -20)}`).join(' '));
+    // Nearest first, so the ones on screen are always listed (a street can have more than 16 rooked).
+    const px = engine.player?.x ?? 0;
+    const byDistance = [...tracked].filter(([, row]) => row.target.sprite && !row.target.sprite.destroyed)
+      .sort((a, b) => Math.abs(a[1].target.sprite.x - px) - Math.abs(b[1].target.sprite.x - px));
+    engine.setData('rookRookedSpots', byDistance.slice(0, 16).map(([key, row]) => `${key}@${at(row.target.sprite, -20)}`).join(' '));
   }
 }
 
