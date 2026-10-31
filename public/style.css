@@ -4695,13 +4695,15 @@ html[data-street-cards] .quest-dialogue { visibility: hidden; }
   border-color: var(--c-lime-68b);
   outline: 2px solid color-mix(in srgb, var(--c-lime-67) 20%, transparent);
 }
-.skill-tree-filters { grid-column: 1 / -1; display: flex; gap: var(--sp-2); }
+/* Five chips with counts do not fit the panel's ~330 px in one row: three, then two, each at
+   least as wide as its label and count (they used to shrink and spill past their borders). */
+.skill-tree-filters { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 .skill-tree-chip {
-  flex: 1;
-  min-width: 0;
+  flex: 1 0 28%;
+  min-width: max-content;
   border: 1px solid var(--border-grey);
   border-radius: var(--radius-pill);
-  padding: var(--sp-2) 0.2rem;
+  padding: var(--sp-2) var(--sp-3);
   background: var(--surface-parchment);
   color: var(--c-sand-47);
   font: 700 var(--fs-xs)/var(--lh-tight) var(--font-ui);
