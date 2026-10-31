@@ -114,7 +114,7 @@
       "assets/classic/warning.png": "b3880bf6",
       "assets/content/deco-catalog.json": "9c0598c3",
       "assets/content/puzzle-triggers.json": "09810451",
-      "assets/content/quests.json": "a6e1135f",
+      "assets/content/quests.json": "18e10236",
       "assets/content/street-ecology.json": "725a0bd1",
       "assets/content/style-profiles.json": "be4b706a",
       "assets/content/trade-items.json": "ce3564fe",

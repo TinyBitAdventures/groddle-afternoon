@@ -177,6 +177,20 @@ const REQUIREMENT_OVERRIDES = {
   ],
 };
 
+// Requirement lines whose GSJS `desc` is a raw key, not words: the quest log showed "black_pepper_made"
+// and "Gift_5_neighbors". Each row is [source desc, words]; the build fails when the source changes.
+// The words follow the other make and counter lines ("Make a Fertilidust Lite") and the quest's own desc.
+const REQUIREMENT_TEXT = {
+  umbra_black_white: {
+    r478: ['black_pepper_made', 'Make a mound of Black Pepper'],
+    r479: ['white_gas_made', 'Make a vial of White Gas'],
+    r480: ['licorice_made', 'Make a piece of Licorice'],
+  },
+  neighbor_gifts: {
+    r371: ['Gift_5_neighbors', 'Leave gifts with the butlers of 5 neighbors'],
+  },
+};
+
 // Quest text that sends the player somewhere the archive puts nothing. Each row is a list of exact
 // [from, to] swaps on desc, offer and completion, applied to the GSJS text; the build fails when a
 // `from` is no longer in the source. Deviation from GSJS, recorded here and in the commit.
@@ -365,6 +379,11 @@ function fnSource(ctx, name) {
 function extractQuest(classTsid, ctx, buffs) {
   const isJob = !!ctx.is_job || ctx.performance_rewards !== undefined;
   const reqs = Object.entries(ctx.requirements || {}).map(([id, r]) => normalizeRequirement(id, r));
+  for (const [id, [from, to]] of Object.entries(REQUIREMENT_TEXT[classTsid] || {})) {
+    const req = reqs.find((row) => row.id === id);
+    if (!req || req.desc !== from) throw new Error(`REQUIREMENT_TEXT ${classTsid} ${id}: "${from}" is not its desc any more`);
+    req.desc = to;
+  }
   const started = fnSource(ctx, 'onStarted');
   const timerBuff = started.match(/buffs_apply\('([a-z0-9_]+)'\)/)?.[1];
   const timer = timerBuff && buffs[timerBuff]?.isTimer

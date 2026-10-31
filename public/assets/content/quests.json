@@ -29938,7 +29938,7 @@
     "name": "give_bag_butler",
     "num": 5,
     "classId": "random_kindness",
-    "desc": "Gift_5_neighbors"
+    "desc": "Leave gifts with the butlers of 5 neighbors"
    }
   ],
   "rewards": {
@@ -35190,7 +35190,7 @@
     "type": "make",
     "name": "r478",
     "num": 1,
-    "desc": "black_pepper_made",
+    "desc": "Make a mound of Black Pepper",
     "recipeId": "121",
     "recipeName": "Black Pepper",
     "tool": "spice_mill",
@@ -35202,7 +35202,7 @@
     "type": "make",
     "name": "r479",
     "num": 1,
-    "desc": "white_gas_made",
+    "desc": "Make a vial of White Gas",
     "recipeId": "136",
     "recipeName": "White Gas",
     "tool": "gassifier",
@@ -35214,7 +35214,7 @@
     "type": "make",
     "name": "r480",
     "num": 1,
-    "desc": "licorice_made",
+    "desc": "Make a piece of Licorice",
     "recipeId": "125",
     "recipeName": "Licorice",
     "tool": "spice_mill",
