@@ -31,7 +31,11 @@
  *  4. The glare. A rainbow over the EXIT door, quoins along its arch.
  * Art is drawn as clean vectors in the footage's palette (no recovered deco
  * matches the lamps, disc platforms or panels); the EXIT sign is the
- * recovered sign_exit_starter_01a.
+ * recovered sign_exit_starter_01a. The rainbow is Tiny Speck's own `rainbow`
+ * deco (quest02.swf in tinyspeck/glitch-locations, CC0; the shipped
+ * decos/groddle/rainbow is the byte-identical copy in groddle1.swf), whose
+ * soft, faded bands match players' Snaps of this room (round3-levels-2026-10-29
+ * LIFFFRAHB4A3JHJ, reference only).
  */
 
 import { BODY_H, JUMP_GAP, JUMP_RISE, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=17e22046';
@@ -347,22 +351,24 @@ function drawSlab(g, y) {
   g.fill({ color: 0x2a2930, alpha: 0.8 });
 }
 
-function drawRainbow(PIXI) {
-  const g = new PIXI.Graphics();
-  const bands = [0xe8584a, 0xf09a3a, 0xe8d54a, 0x4fc45a, 0x4f6fe0, 0xb45ad6];
-  // A soft halo, then the bands under the walking line.
-  for (let pass = 0; pass < 2; pass++) {
-    bands.forEach((color, i) => {
-      g.setStrokeStyle({ width: pass ? 9 : 22, color: color, alpha: pass ? 0.72 : 0.12 });
-      for (let x = 200; x <= 900; x += 10) {
-        const y = rainbowY(x) + 6 + i * 9;
-        if (x === 200) g.moveTo(x, y);
-        else g.lineTo(x, y);
-      }
-      g.stroke();
-    });
-  }
-  return g;
+/**
+ * Where the CC0 rainbow deco sits: its top-left at x, `up` px above the top floor, at `scale` on the
+ * deco's file (kit.deco). The fit:
+ * the top of its outer band (alpha over 40) follows rainbowY from x 200 to 900 (mean
+ * error 7 px, worst 19 px), so you walk along the top of the bands.
+ */
+export const RAINBOW_ART = Object.freeze({ name: 'rainbow', x: 54, up: 250, scale: 1.22 });
+
+function drawRainbow(PIXI, kit) {
+  const a = RAINBOW_ART;
+  const c = new PIXI.Container();
+  c.addChild(kit.deco(PIXI, a.name, a.x, FLOORS.glare - a.up, { ax: 0, ay: 0, scale: a.scale }));
+  // Its faintest leg ends would show under the slab, in the floor below: cut at the floor.
+  const clip = new PIXI.Graphics();
+  clip.rect(0, 0, W, FLOORS.glare + 4).fill(0xffffff);
+  c.addChild(clip);
+  c.mask = clip;
+  return c;
 }
 
 function drawDoor(PIXI, x, y) {
@@ -538,6 +544,8 @@ export const room = {
       cones.addChild(spr);
       ctx.data.cones[lamp.id] = spr;
     }
+    // The rainbow's soft legs fade out behind the top floor's slab.
+    world.addChild(drawRainbow(PIXI, kit));
     const g = new PIXI.Graphics();
     for (const y of [FLOORS.mixer, FLOORS.totem, FLOORS.glare]) drawSlab(g, y);
     // The bottom floor.
@@ -555,7 +563,6 @@ export const room = {
     const lg = new PIXI.Graphics();
     for (const l of layout.ladders) kit.drawLadder(lg, kit.ladder(l.x, l.yTop - 6, l.yBot), { rail: 0xb9b6c2, rung: 0x9c99a6, half: 15 });
     world.addChild(lg);
-    world.addChild(drawRainbow(PIXI));
     world.addChild(drawDoor(PIXI, layout.door.x, layout.door.y));
     world.addChild(kit.deco(PIXI, 'sign_exit_starter_01a', layout.door.x, layout.door.y - 120, { scale: 0.62 }));
     world.addChild(drawConsole(PIXI, layout.console));
