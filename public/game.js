@@ -577,6 +577,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=d6cbbd5c';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=bc6e94f2';
 import {
   ladderTopDeck,
   resolveGround as resolveStreetGround,
@@ -25402,6 +25403,10 @@ async function main() {
   // Full locations-xml street catalog (index.json), then last saved street (or default)
   await Promise.all([ensureStreetIndex(), loadStreetEcologyCatalog()]);
   const bootParams = new URLSearchParams(location.search);
+  // LEVEL BUILDER play-test (js/builder/draft-play.js): ?draft=<id>&street=<key> registers the
+  // draft's streets and starts on one, as ?streetdemo= would (always a practice copy).
+  const draftStart = bootParams.has('draft') ? await startDraftPlay(bootParams, { mode: GAME_MODE }) : null;
+  if (draftStart) showDraftBanner(document, draftStart);
   if (bootParams.has('resetgame')) {
     try {
       saveStore.remove(PLAYER_STATE_STORAGE_KEY);
@@ -25630,9 +25635,11 @@ async function main() {
   const stootDemoTsid = bootParams.has('stootdemo')
     ? resolveIndexTsid(STOOT_MEMORIAL_STREET_ID)
     : null;
-  const streetDemoTsid = bootParams.has('streetdemo')
-    ? resolveIndexTsid(bootParams.get('streetdemo'))
-    : null;
+  const streetDemoTsid = draftStart?.tsid
+    ? draftStart.tsid
+    : bootParams.has('streetdemo')
+      ? resolveIndexTsid(bootParams.get('streetdemo'))
+      : null;
   const followDemoTsid = bootParams.has('followdemo')
     ? resolveIndexTsid(LAST_FEAT_STREET_IDS[0])
     : null;
@@ -27274,6 +27281,11 @@ async function main() {
       };
     },
     /** Street decos that play (js/deco-anim.js, G435): placed, strips in, playing, stopped off screen; `detail` adds each one's stage box. */
+    /** LEVEL BUILDER QA (js/builder/draft-play.js): a placed deco as drawn, by its id, or null. */
+    streetDeco(id) {
+      const spr = bgLayer?.decoViews?.get(String(id));
+      return spr ? { x: spr.x, y: spr.y, w: Math.round(Math.abs(spr.width)), h: Math.round(Math.abs(spr.height)), angle: spr.angle, flipped: spr.scale.x < 0, visible: spr.visible, street: currentStreetTsid } : null;
+    },
     animDecos(detail = false) {
       return bgLayer?.animStats?.(detail) || null;
     },

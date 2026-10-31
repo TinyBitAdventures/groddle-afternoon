@@ -604,7 +604,7 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
   it('the console has a Reports tab: list, thread, reply, close and reopen, and the old reports\' button', async () => {
     const page = src('src/AdminConsolePage.php');
     for (const hook of ['data-console-tab="reports"', 'data-console-tickets', 'data-console-thread', 'data-console-reply', 'data-console-thread-close', 'data-console-thread-reopen', 'data-console-migrate', 'data-console-ticket-filter']) assert.ok(page.includes(hook), hook);
-    assert.match(page, /ASSET_KEY = 'g491-4'/);
+    assert.match(page, /ASSET_KEY = 'builder-1'/);
     const js = src('console/console.js');
     for (const route of ["admin/tickets?status=", "admin/tickets/${id}", "admin/tickets/${tickets.open}/reply", "admin/tickets/${tickets.open}/${kind}", "admin/tickets/migrate"]) assert.ok(js.includes(route), route);
     assert.match(js, /el\('p', \{ class: 'console-msg-body', text: m\.body \}\)/, 'messages set as text');

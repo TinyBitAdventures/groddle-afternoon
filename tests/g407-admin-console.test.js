@@ -381,7 +381,7 @@ describe('the site routes (groddle-afternoon-site AdminConsole, AdminConsolePage
   it('the theme serves the console\'s script and styles, keyed', () => {
     assert.ok(existsSync(sitePath('console/console.js')));
     assert.ok(existsSync(sitePath('console/console.css')));
-    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'g491-4'/);
+    assert.match(readFileSync(sitePath('src/AdminConsolePage.php'), 'utf8'), /ASSET_KEY = 'builder-1'/);
     const css = readFileSync(sitePath('console/console.css'), 'utf8');
     for (const token of ['--surface', '--border', '--fg', '--muted', '--track', '--row-line']) assert.match(css, new RegExp(`var\\(${token}\\)`), token);
   });
