@@ -17,7 +17,7 @@ import {
   overlayLifeMs,
   overlayPlacement,
   sheetCell,
-} from '../public/js/overlay-art.js?v=628fa0b4';
+} from '../public/js/overlay-art.js?v=3753a0d2';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { DRINK_TICKS, applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=c7727c43';
 import { MOOD_XP_SOURCES } from '../public/js/mood-xp.js?v=958e7680';

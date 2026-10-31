@@ -46,7 +46,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } fr
 import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=9a2e7ef4';
 import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=9e538296';
 import { listDroppedStacks } from '../world-items.js?v=7df5cf4a';
-import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=a40e9f05';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=94147139';
 import {
   CRAFTYBOT,
   CRAFTYBOT_BOX,
@@ -82,9 +82,9 @@ import {
   setLocked,
   setPaused,
 } from '../craftybot.js?v=2cff4c78';
-import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=01a295a1';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=628fa0b4';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=3753a0d2';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const CRAFTYBOT_FEATURE_ID = 'craftybot';

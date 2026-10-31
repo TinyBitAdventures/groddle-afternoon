@@ -109,7 +109,7 @@ import {
   towerSpotsFor,
   workCheck,
 } from '../home-tower.js?v=6ccb3a4f';
-import { textureFromUrl } from '../textures.js?v=01a295a1';
+import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { pieceUrl } from '../home-wallpaper.js?v=e676f00f';
 import { wantsHiresDecos } from '../deco-hires.js?v=cc8506f6';
 import { WOTD_TEXT } from '../wine-pour.js?v=6daa23a7';

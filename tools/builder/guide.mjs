@@ -8,18 +8,20 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { GAME_DIR } from '../repos.mjs';
 import { GRAVITY, JUMP_SPEED, WALK_MAX, FLOOR_ACCEL, AIR_ACCEL_RATIO, STREET_PHYSICS_TERMINAL_VY, AVATAR_BODY_H, GROUND_SNAP, NORMAL_BUFF } from '../../public/js/avatar-step.js?v=c04c7c76';
-import { RULES, LIMITS, MIN_VIEW, PARALLAX_VIEW, LICENCES, plainApex } from '../../public/js/builder/validate.js?v=955b2e0f';
+import { RULES, LIMITS, MIN_VIEW, PARALLAX_VIEW, LICENCES, plainApex } from '../../public/js/builder/validate.js?v=89d70464';
 import { REACH_LIMITS, POST_REACH_X, POST_BELOW, DOOR_REACH_X, TIGHT_MARGIN, streetWorld, jumpArc } from '../../public/js/builder/reach-graph.js?v=6f7512af';
-import { OP_NAMES } from '../../public/js/builder/ops.js?v=2ca2cc56';
+import { OP_NAMES } from '../../public/js/builder/ops.js?v=acf30407';
 import { LAYER_ROLES } from '../../public/js/builder/layer-role.js?v=e585f610';
 import { POPULATION_CLASSES } from '../../public/js/builder/zone.js?v=6a3db28e';
 import { SCOPES, RATES, RENDER } from './limits.mjs';
+import { EFFECT_KINDS, EFFECT_WORDS, EFFECT_DEFAULTS, EFFECT_RANGES, EFFECT_LIMITS, RUMBLE_RANGES, RUMBLE_DEFAULTS, RUMBLE_SOUND } from '../../public/js/street-effects.js?v=e427650f';
 
 /** Spec 2.1: where each kind of thing is measured. */
 export const SPACES = Object.freeze([
   { what: 'platforms, barriers, ladders, signposts', space: 'world', anchor: 'y up is negative (bounds.b about 0, bounds.t about -1000); line ends; a barrier\'s top y and h down; a ladder\'s bottom-centre and h up; a signpost\'s bottom-centre' },
   { what: 'middleground decos', space: 'world', anchor: 'bottom-centre; w and h are the drawn size; r in degrees; flip mirrors about the anchor' },
   { what: 'decos on every other layer', space: 'layer-local, 0..w by 0..h', anchor: 'bottom-centre, as middleground decos' },
+  { what: 'effects (emitters)', space: 'as a deco on the same layer: world on the middleground, layer-local elsewhere', anchor: 'the vent\'s mouth: particles start there and rise (lava flies up and falls back)' },
   { what: 'doors, boxes, connect arrive, finding where (space "screen")', space: 'screen: x - bounds.l, y - bounds.t', anchor: 'bottom-centre' },
 ]);
 
@@ -65,6 +67,16 @@ export function builderGuide() {
     flipped: world.flipped,
     rotated: world.rotated,
     ops: OP_NAMES,
+    effects: {
+      what: 'Zone ambient effects (spec 15 Q12): emitters placed like decos, and a street-wide earthquake rumble. Zone streets only, solo only; prefers-reduced-motion turns the shake off and calms the emitters.',
+      kinds: Object.fromEntries(EFFECT_KINDS.map((k) => [k, { words: EFFECT_WORDS[k], defaults: EFFECT_DEFAULTS[k] }])),
+      fields: { rate: 'particles a second while it puffs', size: 'a particle\'s size in px', height: 'how high the plume rises or the squirt flies, px', spread: 'degrees either side of straight up', period: '[min, max] seconds from one burst\'s start to the next; leave it out to never stop', burst: 'seconds a burst lasts (at most the shortest period)', sprite: 'optional particle art (library or gz_); the built-in soft shape otherwise', layer: 'which layer it draws with (just above that layer\'s decos)' },
+      ranges: EFFECT_RANGES,
+      rumble: { ranges: RUMBLE_RANGES, defaults: RUMBLE_DEFAULTS, sound: RUMBLE_SOUND, fields: { every: '[min, max] seconds between rumbles', duration: 'seconds a rumble lasts', strength: 'the camera shake in px', sound: 'false for a silent rumble' } },
+      limits: EFFECT_LIMITS,
+      cli: ['effect --street k --kind steam --x 0 --y -60', 'set <street>/fx_1 rate=4 period=[5,9]', 'rm <street>/fx_1', 'rumble --street k --every 14,30 --duration 1.6 --strength 6', 'effects --street k'],
+      ops: 'emitter.add {street, emitter: {kind, layer, x, y, ...}}, emitter.set {street, id, set}, emitter.remove {street, id}; street.set {street, set: {rumble}}',
+    },
     population: POPULATION_CLASSES,
     rules: Object.entries(RULES).map(([id, [severity, title]]) => ({ id, severity, title })),
     severities: { fatal: 'blocks play-test, render and publish', error: 'blocks publish', warn: 'blocks publish until acknowledged or waived', info: 'blocks nothing' },

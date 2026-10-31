@@ -180,6 +180,39 @@
         }
       }
     },
+    "emitter": {
+      "description": "A zone ambient effect (public/js/street-effects.js; spec 4, 15 Q12): a steam vent, lava squirt or embers. x, y is the vent's mouth in its layer's space, as a deco's anchor is. rate is particles a second while it puffs, size a particle's size, height how high the plume rises or the squirt flies, spread degrees either side of straight up, period the seconds from one burst's start to the next (picked in the range each time) and burst the seconds a burst lasts; without a period it never stops. sprite is the particle's art (a library or gz_ name); without one a soft built-in shape is drawn. Builder streets only.",
+      "type": "object",
+      "required": ["id", "kind", "x", "y"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^fx_[0-9]{1,6}$" },
+        "kind": { "enum": ["steam", "lava", "embers"] },
+        "layer": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "sprite": { "$ref": "#/$defs/spriteName" },
+        "rate": { "type": "number", "minimum": 0.2, "maximum": 40 },
+        "size": { "type": "number", "minimum": 4, "maximum": 240 },
+        "height": { "type": "number", "minimum": 10, "maximum": 1200 },
+        "spread": { "type": "number", "minimum": 0, "maximum": 90 },
+        "period": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number", "minimum": 0.5, "maximum": 120 } },
+        "burst": { "type": "number", "minimum": 0.1, "maximum": 60 },
+        "hidden": { "type": "boolean" }
+      }
+    },
+    "rumble": {
+      "description": "A street-wide earthquake rumble (public/js/street-effects.js): every [min, max] seconds between rumbles, duration seconds, strength the camera shake in px; sound (default true) plays Tiny Speck's ROCKS_DISAPPEAR. Never shakes under prefers-reduced-motion. Builder streets only.",
+      "type": "object",
+      "required": ["every", "duration", "strength"],
+      "additionalProperties": false,
+      "properties": {
+        "every": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number", "minimum": 4, "maximum": 600 } },
+        "duration": { "type": "number", "minimum": 0.2, "maximum": 6 },
+        "strength": { "type": "number", "minimum": 1, "maximum": 24 },
+        "sound": { "type": "boolean" }
+      }
+    },
     "connect": {
       "description": "One signpost arm: where it leads. tsid may be the L or G form (street-loader.js resolveIndexTsid). arrive is the arrival point in the target's screen space, on a platform.",
       "type": "object",
@@ -487,7 +520,10 @@
         "enchantedForest": { "type": "string", "description": "Feature-owned (tools/build-enchanted-forests.mjs)." },
         "starJinglers": { "type": "object", "description": "Feature-owned." },
         "glowOrbs": { "type": "object", "description": "Feature-owned." },
-        "soilArt": { "type": "array", "description": "Feature-owned." }
+        "soilArt": { "type": "array", "description": "Feature-owned." },
+
+        "emitters": { "type": "array", "maxItems": 40, "items": { "$ref": "#/$defs/emitter" }, "description": "Zone ambient effects (builder streets; no shipped street has them)." },
+        "rumble": { "$ref": "#/$defs/rumble" }
       }
     },
     "draftStreet": {

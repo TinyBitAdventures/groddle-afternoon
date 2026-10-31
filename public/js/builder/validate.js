@@ -33,7 +33,8 @@ import { platformsScreen, barriersScreen, isStandable, isSolidFromBelow, isItemF
 import { planStreetPlacements, populationForStreet } from '../street-ecology.js?v=7e30da8f';
 import { JUMP_SPEED } from '../avatar-step.js?v=c04c7c76';
 import { STY_RULES, styleFindings } from './style-rules.js?v=abf9bfae';
-import { LICENCE_POLICY, provenanceProblems } from './new-art.js?v=b2411f6f';
+import { EFFECT_LIMITS, effectsCost, normaliseEmitter, rumbleShare, emitterAnchor } from '../street-effects.js?v=e427650f';
+import { LICENCE_POLICY, provenanceProblems } from './new-art.js?v=29f0b13e';
 
 export const RULES = Object.freeze({
   'SCH-001': ['fatal', 'Zone does not fit the schema'],
@@ -69,6 +70,11 @@ export const RULES = Object.freeze({
   'TXT-001': ['error', 'Words not allowed'],
   'TXT-002': ['error', 'Name taken'],
   'PRF-001': ['warn', 'Too heavy'],
+  // Zone ambient effects (js/street-effects.js, spec 15 Q12).
+  'FX-001': ['error', 'Effect on a missing layer'],
+  'FX-002': ['warn', 'Effect off its layer'],
+  'FX-003': ['warn', 'Rumble too often or too strong'],
+  'FX-004': ['info', 'Burst trimmed to its period'],
   // P5's style rules (js/builder/style-rules.js), run here with the rest.
   ...Object.fromEntries(STY_RULES.map((r) => [r.id, [r.severity, r.title]])),
 });
@@ -77,6 +83,7 @@ export const RULES = Object.freeze({
 export const LIMITS = Object.freeze({
   streets: 40, width: 8000, height: 6000, layers: 24, decos: 1500, platforms: 600,
   connects: 8, connectsWarn: 5, zoneBytes: 4 * 1024 * 1024, textureWarn: 150 * 1024 * 1024, textureError: 192 * 1024 * 1024,
+  emitters: EFFECT_LIMITS.emitters, particles: EFFECT_LIMITS.particles, overdraw: EFFECT_LIMITS.overdraw,
 });
 /** The 2012 view (world-zoom.js), the smallest a builder street may be. */
 export const MIN_VIEW = Object.freeze({ w: 1000, h: 600 });
@@ -379,6 +386,7 @@ export function validateZone(zone, ctx = {}) {
     dup('walls', s.barriers);
     dup('ladders', s.ladders);
     dup('signposts', s.signposts);
+    dup('effects', s.emitters);
     dup('doors', s.doors);
     dup('layers', s.layers);
     dup('decos', (s.layers || []).flatMap((l) => l.decos || []));
@@ -444,6 +452,34 @@ export function validateZone(zone, ctx = {}) {
       const n = (p.connects || []).length;
       if (n > LIMITS.connects) f('PRF-001', p.id, `Signpost ${p.id} has ${n} arms (at most ${LIMITS.connects}).`, null, { n });
       else if (n > LIMITS.connectsWarn) f('PRF-001', p.id, `Signpost ${p.id} has ${n} arms (more than ${LIMITS.connectsWarn} crowd the post).`, null, { n, warn: true });
+    }
+
+    // Zone ambient effects: FX-001..004, PRF-001 (emitters, live particles, overdraw).
+    if (Array.isArray(s.emitters) && s.emitters.length) {
+      const cost = effectsCost(s);
+      for (const [what, n, max, words] of [['emitters', cost.emitters, LIMITS.emitters, 'effects'], ['particles', cost.particles, LIMITS.particles, 'particles alive at once'], ['overdraw', cost.overdraw, LIMITS.overdraw, 'screens of particle overdraw']]) {
+        if (n > max) f('PRF-001', `effects/${what}`, `The street's effects make ${n} ${words} (at most ${max}).`, null, { n, max, cost }, 'Lower the rate or size of the busiest effects, or remove some.');
+        else if (n > max * 0.8) f('PRF-001', `effects/${what}`, `The street's effects make ${n} ${words}, near the limit of ${max}.`, null, { n, max, cost, warn: true }, 'Lower the rate or size of the busiest effects.');
+      }
+      for (const e of s.emitters) {
+        if (!e || typeof e !== 'object') continue;
+        const n = normaliseEmitter(e);
+        const layer = (s.layers || []).find((l) => l.id === n.layer);
+        if (!layer) {
+          f('FX-001', e.id, `Effect ${e.id} is on layer "${n.layer}", which this street does not have.`, null, { layer: n.layer }, `Put it on one of the street's layers: ${(s.layers || []).map((l) => l.id).join(', ')}.`);
+          continue;
+        }
+        const a = emitterAnchor(s, n);
+        const lw = n.layer === 'middleground' ? W : Number(layer.w) || W;
+        const lh = n.layer === 'middleground' ? H : Number(layer.h) || H;
+        if (a.x < 0 || a.x > lw || a.y < 0 || a.y > lh) f('FX-002', e.id, `Effect ${e.id} sits at ${n.x}, ${n.y}, outside its layer (${n.layer}, ${lw} by ${lh}), so nobody will see it.`, n.layer === 'middleground' ? pt(a.x, a.y) : null, { x: n.x, y: n.y }, 'Move it onto the layer.');
+        if (Array.isArray(e.period) && Number(e.burst) > Math.min(...e.period.map(Number))) f('FX-004', e.id, `Effect ${e.id} bursts for ${e.burst} s but restarts every ${e.period.join(' to ')} s; the burst is trimmed to ${n.burst} s.`, null, { burst: e.burst, period: e.period }, 'Shorten the burst, or leave out the period to keep it going.');
+      }
+    }
+    if (s.rumble && typeof s.rumble === 'object') {
+      const share = rumbleShare(s.rumble);
+      if (share > EFFECT_LIMITS.rumbleShare) f('FX-003', 'rumble', `The rumble shakes ${Math.round(share * 100)}% of the time (${s.rumble.duration} s every ${(s.rumble.every || []).join(' to ')} s); more than a third wears players out.`, null, { share }, 'Space the rumbles further apart, or make them shorter.');
+      if (Number(s.rumble.strength) > EFFECT_LIMITS.rumbleStrong) f('FX-003', 'rumble', `The rumble shakes ${s.rumble.strength} px; over ${EFFECT_LIMITS.rumbleStrong} px is hard on some players.`, null, { strength: s.rumble.strength }, `Keep it at ${EFFECT_LIMITS.rumbleStrong} px or less.`);
     }
 
     // PHY-*.
@@ -533,11 +569,19 @@ export function validateZone(zone, ctx = {}) {
       }
       if (d.animated && ctx.animated && !ctx.animated.has(art)) f('AST-006', d.id, `Deco ${d.id} is marked animated, but ${d.sprite} has no frames.`, null, { sprite: d.sprite }, 'Clear its animated box.');
     }
+    for (const e of s.emitters || []) {
+      if (typeof e?.sprite !== 'string' || !e.sprite || !ctx.library) continue;
+      const art = ctx.twins?.[e.sprite] || e.sprite;
+      if (!ctx.library.has(e.sprite) && !ctx.library.has(art) && !zone.assets?.[e.sprite]) {
+        f('AST-001', e.id, `Effect ${e.id} uses ${e.sprite}, which is neither in the library nor in this zone's art.`, null, { sprite: e.sprite }, 'Pick a library deco, add the art through intake, or leave the sprite out for the built-in shape.');
+      }
+    }
   }
 
-  // Assets: AST-002, AST-003, AST-004.
+  // Assets: AST-002, AST-003, AST-004 (decos' sprites and effects' particle sprites).
   const used = new Set();
   for (const row of streets) for (const l of row.street?.layers || []) for (const d of l.decos || []) used.add(d.sprite);
+  for (const row of streets) for (const e of row.street?.emitters || []) if (typeof e?.sprite === 'string' && e.sprite) used.add(e.sprite);
   for (const name of used) {
     const a = zone.assets?.[name];
     if (!a) {
@@ -549,7 +593,9 @@ export function validateZone(zone, ctx = {}) {
     }
     if (a.origin === 'new' && ctx.assetFiles) {
       const file = ctx.assetFiles.get(name);
-      if (!file || file.sha256 !== a.sha256) add('AST-003', null, `asset:${name}`, `${name}'s stored file does not match its provenance (sha256).`, null, { sprite: name });
+      // No file at hand is not a mismatch: say so (publish without --art gave every piece as "does not match").
+      if (!file) add('AST-003', null, `asset:${name}`, `${name}'s file is not at hand, so its bytes cannot be checked against its provenance.`, null, { sprite: name, missing: true }, 'Give publish --art <folder> with the files intake kept (/builder-art/<sha256>).');
+      else if (file.sha256 !== a.sha256) add('AST-003', null, `asset:${name}`, `${name}'s stored file does not match its provenance (sha256).`, null, { sprite: name });
     }
   }
   for (const [name, a] of Object.entries(zone.assets || {})) {

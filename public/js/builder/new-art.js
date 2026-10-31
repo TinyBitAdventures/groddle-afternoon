@@ -130,5 +130,6 @@ export function newArtUrl(url, assets) {
 
 /** Routes gz_ deco URLs to /builder-art/<sha> in js/textures.js; `assets()` gives the open zone's assets{}. */
 export function installNewArt(textures, assets) {
-  if (typeof textures?.addUrlRoute === 'function') textures.addUrlRoute('builder-new-art', (url) => newArtUrl(url, assets()));
+  // raw: back layers load their 2x files raw (street-render.js farUrl), and new art lives at /builder-art/ either way.
+  if (typeof textures?.addUrlRoute === 'function') textures.addUrlRoute('builder-new-art', (url) => newArtUrl(url, assets()), { raw: true });
 }

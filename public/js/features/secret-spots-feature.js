@@ -49,7 +49,7 @@ import {
   streetKeyFor,
   triggerSecretSpot,
 } from '../secret-spots.js?v=0127532b';
-import { playSheetOverlay } from '../overlay-art.js?v=628fa0b4';
+import { playSheetOverlay } from '../overlay-art.js?v=3753a0d2';
 
 export const SECRET_SPOTS_FEATURE_ID = 'secret-spots';
 const MARKER_Z = 4;

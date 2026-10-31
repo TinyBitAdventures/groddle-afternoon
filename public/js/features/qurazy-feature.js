@@ -26,7 +26,7 @@
 
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=d5978ec1';
 import { qurazyMarkersFor } from '../qurazy-markers.js?v=f7a8124b';
-import { OVERLAY_FADE, loadOverlayManifest, overlayPlacement, playVectorOverlay } from '../overlay-art.js?v=628fa0b4';
+import { OVERLAY_FADE, loadOverlayManifest, overlayPlacement, playVectorOverlay } from '../overlay-art.js?v=3753a0d2';
 import {
   QURAZY_SPAWN_LINE,
   createQurazyState,

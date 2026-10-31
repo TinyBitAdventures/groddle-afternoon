@@ -7,7 +7,12 @@
  *   barrier   x, top y, h down (a wall)              handles: top and bottom, vertical only
  *   ladder    bottom-centre x,y, w, h up             handles: bottom (moves it) and a height grip
  *   signpost  bottom-centre x,y, w, h                handles: the eight a deco has, no rotation
+ *   emitter   a zone effect's mouth x,y on its layer handles: the mouth (moves it); picked by a
+ *             small box over the mouth (js/street-effects.js)
  *
+ * An emitter on a parallax layer is in that layer's own space, as a deco is: its screen place
+ * needs the layer's current offset, which the editor hands in each frame (setLayerOffsets, the
+ * street view's layer containers). Nothing else here reads it.
  * LocoDeco's set (BR:2048-2069). Picking: geometry wins over decos, platforms over the rest.
  * Pure: no DOM, no Pixi.
  */
@@ -15,11 +20,32 @@ import { isStandable, platformsScreen } from '../street-model.js?v=23b926e5';
 import { decoBox, handlePoints, resizeBy } from './handles.js?v=2f6896c4';
 import { floorUnder } from './zone.js?v=6a3db28e';
 import { arrivalInTarget, streetAliases } from '../location-navigation.js?v=4be109b9';
+import { EFFECT_DEFAULTS } from '../street-effects.js?v=e427650f';
 
-export const GEO_KINDS = Object.freeze(['platform', 'barrier', 'ladder', 'signpost']);
-export const GEO_LIST = Object.freeze({ platform: 'platforms', barrier: 'barriers', ladder: 'ladders', signpost: 'signposts' });
+export const GEO_KINDS = Object.freeze(['platform', 'barrier', 'ladder', 'signpost', 'emitter']);
+export const GEO_LIST = Object.freeze({ platform: 'platforms', barrier: 'barriers', ladder: 'ladders', signpost: 'signposts', emitter: 'emitters' });
 /** Words for each kind (inspector, outliner, notes). */
-export const GEO_WORDS = Object.freeze({ platform: 'Platform', barrier: 'Wall', ladder: 'Ladder', signpost: 'Signpost' });
+export const GEO_WORDS = Object.freeze({ platform: 'Platform', barrier: 'Wall', ladder: 'Ladder', signpost: 'Signpost', emitter: 'Effect' });
+/** The box an effect is picked by, over its mouth. */
+export const EMITTER_BOX = Object.freeze({ w: 44, h: 44 });
+
+let layerViews = null;
+/** The street view's layer containers (labels and offsets) for effects on parallax layers; null for none. */
+export function setLayerOffsets(containers) {
+  layerViews = containers || null;
+}
+const layerOffset = (id) => {
+  if (!layerViews || !id || id === 'middleground') return { x: 0, y: 0 };
+  for (const lc of layerViews) if (lc.label === id) return { x: lc.x || 0, y: lc.y || 0 };
+  return { x: 0, y: 0 };
+};
+/** PURE (but for the layer offsets): an emitter's mouth in screen space. */
+export function emitterPoint(street, item) {
+  const layer = item.layer || 'middleground';
+  if (layer === 'middleground') return { x: item.x - street.bounds.l, y: item.y - street.bounds.t };
+  const o = layerOffset(layer);
+  return { x: item.x + o.x, y: item.y + o.y };
+}
 /** Sizes a new ladder and signpost take (Hechey Track's, the commonest in the files). */
 export const LADDER_W = 50;
 export const POST_W = 150;
@@ -75,6 +101,10 @@ export function geoShape(street, kind, item) {
     const bot = item.y - t;
     return { kind, x: item.x - l, y1: bot - (Number(item.h) || 0), y2: bot, w: item.w > 0 ? item.w : LADDER_W };
   }
+  if (kind === 'emitter') {
+    const p = emitterPoint(street, item);
+    return { kind, x: p.x, y1: p.y - EMITTER_BOX.h, y2: p.y, w: EMITTER_BOX.w };
+  }
   const box = postBox(street, item);
   return { kind, x: box.ax, y1: box.ay - box.h, y2: box.ay, w: box.w, box };
 }
@@ -105,7 +135,7 @@ export function shapeDistance(s, p) {
   return Math.hypot(dx, dy);
 }
 
-const RANK = Object.freeze({ platform: 0, barrier: 1, ladder: 2, signpost: 3 });
+const RANK = Object.freeze({ platform: 0, barrier: 1, ladder: 2, signpost: 3, emitter: 4 });
 
 /**
  * PURE: the geometry under a screen point within `tol` px, best first: platforms win over the
@@ -139,6 +169,7 @@ export function geoHandles(street, kind, item, zoom = 1) {
   if (kind === 'platform') return [{ id: 'p1', x: s.x1, y: s.y1 }, { id: 'p2', x: s.x2, y: s.y2 }];
   if (kind === 'barrier') return [{ id: 'top', x: s.x, y: s.y1 }, { id: 'bottom', x: s.x, y: s.y2 }];
   if (kind === 'ladder') return [{ id: 'bottom', x: s.x, y: s.y2 }, { id: 'height', x: s.x, y: s.y1 }];
+  if (kind === 'emitter') return [{ id: 'mouth', x: s.x, y: s.y2 }];
   return handlePoints(s.box, zoom).filter((h) => h.id !== 'rotate');
 }
 
@@ -174,6 +205,7 @@ export function dragHandle(street, kind, item, handle, from, to, { level = false
     if (handle === 'height') return { h: Math.max(MIN_H, r0(item.h - dy)) };
     return { x: r0(item.x + dx), y: r0(item.y + dy) };
   }
+  if (kind === 'emitter') return { x: r0(item.x + dx), y: r0(item.y + dy) };
   const box = postBox(street, item);
   const h = handlePoints(box).find((p) => p.id === handle);
   if (!h) return {};
@@ -228,7 +260,23 @@ export function defaultItem(street, kind, p) {
   if (kind === 'platform') return drawnItem(street, kind, { x: spot.x - 100, y: spot.y - 120 }, { x: spot.x + 100, y: spot.y - 120 });
   if (kind === 'barrier') return drawnItem(street, kind, { x: spot.x, y: spot.y - 200 }, { x: spot.x, y: spot.y });
   if (kind === 'ladder') return drawnItem(street, kind, { x: spot.x, y: spot.y - 300 }, { x: spot.x, y: spot.y });
+  if (kind === 'emitter') return newEmitter(street, 'steam', p);
   return postOnFloor(street, p);
+}
+
+/**
+ * PURE: a new effect of a kind on the middleground, its mouth on the floor under a screen point
+ * (EFFECT_DEFAULTS: a steam vent puffs 3.5 s every 6 to 10 s). No id: the op gives the next fx_<n>.
+ */
+export function newEmitter(street, kind, p) {
+  const spot = floorUnder(platformsScreen(street), p.x, p.y, isStandable) || { x: p.x, y: p.y };
+  const d = EFFECT_DEFAULTS[kind] || EFFECT_DEFAULTS.steam;
+  const item = { kind: EFFECT_DEFAULTS[kind] ? kind : 'steam', layer: 'middleground', x: r0(spot.x + street.bounds.l), y: r0(spot.y + street.bounds.t), rate: d.rate, size: d.size, height: d.height, spread: d.spread };
+  if (d.period) {
+    item.period = [...d.period];
+    item.burst = d.burst;
+  }
+  return item;
 }
 
 // —— Permeability (spec 3.3 PropertiesPanel; street-model.js isStandable, barriersScreen) ——

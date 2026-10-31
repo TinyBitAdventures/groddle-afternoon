@@ -32,8 +32,8 @@
  */
 
 import { countItem } from '../inventory.js?v=85d4faba';
-import { doorsFeature } from './doors-feature.js?v=55352015';
-import { textureFromUrl } from '../textures.js?v=01a295a1';
+import { doorsFeature } from './doors-feature.js?v=09621461';
+import { textureFromUrl } from '../textures.js?v=db2ce452';
 import {
   CAR_FLOOR,
   CAR_FLOOR_LIGHTS,

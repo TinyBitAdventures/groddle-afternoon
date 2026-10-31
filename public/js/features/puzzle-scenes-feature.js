@@ -39,7 +39,7 @@ import {
   sceneTsid,
 } from '../puzzle-scenes.js?v=5a740c2e';
 import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
-import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=01a295a1';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 
 export const PUZZLE_SCENES_FEATURE_ID = 'puzzle-scenes';

@@ -21,8 +21,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { GAME_DIR } from '../repos.mjs';
 import { loadValidatorContext } from './validator-context.mjs';
-import { validateZone } from '../../public/js/builder/validate.js?v=955b2e0f';
-import { buildZones, commitOverlay, files, overlay, publishedZone, sha256, zoneText, ZONES_DIR, DECO_DIR } from './zones.mjs';
+import { validateZone } from '../../public/js/builder/validate.js?v=89d70464';
+import { buildZones, commitOverlay, files, overlay, publishedZone, sha256, spritesUsed, zoneText, ZONES_DIR, DECO_DIR } from './zones.mjs';
 
 const ID = /^[a-z][a-z0-9-]{2,47}$/;
 
@@ -34,8 +34,7 @@ export function unacknowledged(findings, ack = []) {
 
 /** The new art a zone's streets use: [name, row]. */
 function usedNewArt(zone) {
-  const used = new Set();
-  for (const row of zone.streets || []) for (const l of row.street?.layers || []) for (const d of l.decos || []) used.add(d.sprite);
+  const used = spritesUsed(zone);
   return Object.entries(zone.assets || {}).filter(([name, a]) => a?.origin === 'new' && used.has(name));
 }
 

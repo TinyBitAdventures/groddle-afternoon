@@ -27,29 +27,38 @@
  * deco picker (js/builder/editor-picker.js, D): search, facets, thumbnails, drag or Enter to place,
  * and new art brought in through the site's intake.
  *
+ * Zone ambient effects (js/builder/editor-effects.js, js/street-effects.js; spec 15 Q12): the
+ * Effect button adds a steam vent at the view centre, its ring drags like a signpost, the
+ * inspector tunes its kind, layer, rate, size, height, spread and bursts, and the street's
+ * inspector sets the earthquake rumble with a Shake now preview. The effects play live in the view
+ * (the Effects overlay switch), drawn by the game's own code.
+ *
  * Addresses: #draft=<id>&street=<key> opens a draft's street, #view=<tsid> a shipped street.
- * QA: window.groddleBuilderQA (state, camera, matchView, select, anchorOf, selectGeo, geoHandles).
+ * QA: window.groddleBuilderQA (state, with the effects' stats; camera, matchView, select, anchorOf, selectGeo, geoHandles).
  */
-import { buildStreetView, loadDecoManifest, loadSignpostTextures, DECO_TWINS, flashBlurSize } from '../street-render.js?v=262c3652';
+import { buildStreetView, loadDecoManifest, loadSignpostTextures, DECO_TWINS, flashBlurSize } from '../street-render.js?v=ae048a15';
 import { worldToScreen, platformsScreen, isStandable, streetWidth, streetHeight, navigableSignposts } from '../street-model.js?v=23b926e5';
 import { ensureStreetIndex, STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=390e4702';
 import { loadStreetEcologyCatalog, ecologyForStreet } from '../street-ecology.js?v=7e30da8f';
 import { createBuilderApi } from './api.js?v=9560d68f';
-import { DraftSession, statusWords, SAVE_MS, POLL_MS } from './session.js?v=dc9f083b';
+import { DraftSession, statusWords, SAVE_MS, POLL_MS } from './session.js?v=caebc29e';
 import { forkStreet, forkOps, newTsid, streetKeyFrom, relayerPosition, isLayerLocal, withDecoIds, floorUnder, libraryAsset, screenToDeco, streetWithEdits, editsOn, linkEdit } from './zone.js?v=6a3db28e';
 import { mountPicker, PICK_MIME } from './editor-picker.js?v=724352b6';
-import { newDraftDialog, newStreetDialog, hubMapDialog, populationSection, zoneSection, plannedSpots, SPOT_GROUPS, spotGroup } from './editor-zone.js?v=3ca537c9';
+import { newDraftDialog, newStreetDialog, hubMapDialog, populationSection, zoneSection, plannedSpots, SPOT_GROUPS, spotGroup } from './editor-zone.js?v=36e4d449';
 import { decoFor, NEW_ART_BUNDLE } from './deco-search.js?v=fda9b16b';
 import { populationForStreet, planStreetPlacements } from '../street-ecology.js?v=7e30da8f';
-import { nextDecoId, findDeco } from './ops.js?v=2ca2cc56';
+import { nextDecoId, findDeco } from './ops.js?v=acf30407';
 import { decoBox, contains, handlePoints, resizeBy, rotationTo, meetsRect, corners } from './handles.js?v=2f6896c4';
 import { layerRole } from './layer-role.js?v=e585f610';
-import { installNewArt, withNewArt, provenanceSection } from './new-art.js?v=b2411f6f';
-import * as textureUrls from '../textures.js?v=01a295a1';
+import { installNewArt, withNewArt, provenanceSection } from './new-art.js?v=29f0b13e';
+import * as textureUrls from '../textures.js?v=db2ce452';
 import { installPixiFixes } from '../pixi-fixes.js?v=173fb649';
 import { installHiresDecos } from '../deco-hires.js?v=cc8506f6';
-import { OVERLAY_COLOURS, drawGeometryOverlay, drawReachOverlay, strokeSegs } from './overlays.js?v=a9d287ac';
-import { GEO_KINDS, GEO_LIST, GEO_WORDS, PERMS, geoKey, parseGeoKey, geoItem, geoKindOf, geoShape, geoHits, geoHandles, handleWorld, dragHandle, moveBy, changedFields, drawnItem, postOnFloor, defaultItem, permKey, permValue, permName, dashes, arriveFor, newConnect, shapeBounds } from './geometry-handles.js?v=a291ae18';
+import { OVERLAY_COLOURS, drawGeometryOverlay, drawReachOverlay, drawEffectMarkers, strokeSegs } from './overlays.js?v=7dd09d5a';
+import { createStreetEffects, createRumbleClock, prefersReducedMotion } from '../street-effects.js?v=e427650f';
+import { effectInspector, rumbleSection } from './editor-effects.js?v=85f32fd1';
+import { setLayerOffsets } from './geometry-handles.js?v=d39231a4';
+import { GEO_KINDS, GEO_LIST, GEO_WORDS, PERMS, geoKey, parseGeoKey, geoItem, geoKindOf, geoShape, geoHits, geoHandles, handleWorld, dragHandle, moveBy, changedFields, drawnItem, postOnFloor, defaultItem, permKey, permValue, permName, dashes, arriveFor, newConnect, shapeBounds } from './geometry-handles.js?v=d39231a4';
 import { SNAP_PX, GUIDE_PX, endPoints, joinedEnds, snapPlatform, snapDrawnPlatform, snapPoint, floorSnapY, rulerTicks, bestPull } from './snap.js?v=c1cb84a7';
 
 export const ZOOM_MIN = 0.05;
@@ -75,7 +84,7 @@ export const VIEW_FRAMES = Object.freeze([
   Object.freeze({ id: 'wide', label: 'Wide', w: 960, h: 408 }),
   Object.freeze({ id: 'original', label: 'Original', w: 1000, h: 600 }),
 ]);
-export const OVERLAY_DEFAULTS = Object.freeze({ geometry: true, reach: false, arc: false, frame: false, rulers: false, layout: false, edgePan: true, populations: false });
+export const OVERLAY_DEFAULTS = Object.freeze({ geometry: true, reach: false, arc: false, frame: false, rulers: false, layout: false, edgePan: true, populations: false, effects: true });
 export const SEVERITIES = Object.freeze([
   Object.freeze({ id: 'fatal', label: 'Fatal' }),
   Object.freeze({ id: 'error', label: 'Errors' }),
@@ -484,6 +493,9 @@ async function boot() {
       S.view.destroy({ children: true });
       S.view = null;
     }
+    S.fx?.destroy();
+    S.fx = null;
+    setLayerOffsets(null);
     world.removeChildren();
     S.geoDrawn = '';
     S.version += 1;
@@ -506,6 +518,13 @@ async function boot() {
     S.view.signById = new Map(data.signposts.map((p, i) => [p.id, S.view.signViews?.[i]]));
     world.addChild(S.view, S.view.frontView, geoGfx);
     for (const lc of S.view.layerContainers) lc.visible = !S.hidden.has(lc.label);
+    // Effects play live (the rumble only shakes on Shake now: an editor that shook by itself
+    // would be no place to work).
+    if (data.emitters?.length) {
+      S.fx = createStreetEffects({ ...data, rumble: null }, PIXI, S.view, { available: S.mode === 'draft' ? withNewArt(available, S.session?.zone.assets) : available, reduced: prefersReducedMotion() });
+      S.fx.setVisible(S.overlays.effects);
+    }
+    setLayerOffsets(S.view.layerContainers);
     canvas.dataset.street = s.tsid;
     canvas.dataset.decos = String(S.view.decoDrawn);
   }
@@ -651,6 +670,13 @@ async function boot() {
         v.updateParallax(S.cam.x, S.cam.y, fw, fh, Math.max(fh, h));
       }
       v.cullDecos(S.cam.x, S.cam.y, w, h);
+      S.fx?.update(app.ticker.deltaMS, { x: S.cam.x, y: S.cam.y, w, h });
+    }
+    if (S.shake) {
+      const o = S.shake.step(app.ticker.deltaMS / 1000);
+      world.position.x += o.dx * S.cam.zoom;
+      world.position.y += o.dy * S.cam.zoom;
+      if (!o.active && !o.started) S.shake = null;
     }
     updateArcs();
     drawGeometry();
@@ -663,7 +689,9 @@ async function boot() {
   function drawGeometry() {
     const s = street();
     const z = S.cam.zoom;
-    const key = `${S.version}|${z}|${S.overlays.geometry}|${S.overlays.reach}|${S.overlays.populations}|${S.validateMod ? 1 : 0}|${S.validate.report ? S.validate.id : 0}|${S.reachLocal?.key || ''}|${S.geoPreview.size ? Math.random() : ''}`;
+    // Effects on parallax layers move with the camera: their markers are drawn again as it moves.
+    const fxCam = (s?.emitters || []).some((e) => e.layer && e.layer !== 'middleground') ? `${Math.round(S.cam.x)},${Math.round(S.cam.y)}` : '';
+    const key = `${S.version}|${z}|${S.overlays.geometry}|${S.overlays.reach}|${S.overlays.populations}|${S.overlays.effects}|${fxCam}|${S.validateMod ? 1 : 0}|${S.validate.report ? S.validate.id : 0}|${S.reachLocal?.key || ''}|${S.geoPreview.size ? Math.random() : ''}`;
     if (key === S.geoDrawn) return;
     S.geoDrawn = key;
     geoGfx.clear();
@@ -671,6 +699,8 @@ async function boot() {
     const px = (n) => n / z;
     if (S.overlays.reach) drawReach(s, px);
     if (S.overlays.populations) drawSpots(s, px);
+    // Effects' rings show whenever the street has effects: they are how you pick one.
+    if (s.emitters?.length) drawEffectMarkers(geoGfx, s, { px, shown: geoShown });
     if (!S.overlays.geometry) return;
     drawGeometryOverlay(geoGfx, s, { px, shown: geoShown });
   }
@@ -701,7 +731,7 @@ async function boot() {
   }
   function loadValidateMod() {
     if (S.validateModLoading) return;
-    S.validateModLoading = import('./validate.js?v=955b2e0f').then((m) => { S.validateMod = m; S.geoDrawn = ''; }).catch(() => { S.validateModLoading = null; });
+    S.validateModLoading = import('./validate.js?v=89d70464').then((m) => { S.validateMod = m; S.geoDrawn = ''; }).catch(() => { S.validateModLoading = null; });
   }
 
   /** The reach to draw: the validator's for a draft street, else the one worked out here. */
@@ -928,7 +958,7 @@ async function boot() {
     if (kind) selectGeo([geoKey(kind, id)]);
   }
   /** What geometry can be picked: all of it while it is drawn or a draw tool is on, else signposts. */
-  const pickKinds = () => (S.overlays.geometry || S.tool !== 'select' ? GEO_KINDS : ['signpost']);
+  const pickKinds = () => (S.overlays.geometry || S.tool !== 'select' ? GEO_KINDS : ['signpost', 'emitter']);
   /** Geometry under a point, best first (platforms win), as keys. */
   function geoHitsAt(p) {
     const s = street();
@@ -1341,6 +1371,7 @@ async function boot() {
       const row = streetRowShown();
       if (row) {
         add(populationSection({ el, btn, field, row, editable: editable(), commit, spotsShown: S.overlays.populations, toggleSpots: (on) => setOverlay('populations', on), planned: S.spots?.spots?.length || 0 }));
+        add(rumbleSection({ el, btn, field, numberInput, street: s, streetKey: S.streetKey, editable: editable(), commit, reduced: prefersReducedMotion(), preview: previewRumble }));
         add(zoneSection({ el, btn, zone: S.session.zone, labelOf: (t) => targetOf(t).label, editable: Boolean(S.session), commit: commitZone, openHubMap: () => hubMap.open(), openShipped: (t) => openShipped(t) }));
       }
       if (layer) {
@@ -1408,6 +1439,14 @@ async function boot() {
       provenanceSection(el, deco.sprite, S.mode === 'draft' ? S.session?.zone.assets?.[deco.sprite] : null, { library: S.catalog }));
   }
 
+  /** Shake the view once with the street's rumble (none under reduced motion: the clock gives 0). */
+  function previewRumble() {
+    const r = street()?.rumble;
+    if (!r) return;
+    S.shake = createRumbleClock(r, 'preview', { reduced: prefersReducedMotion() });
+    S.shake.trigger();
+    say(prefersReducedMotion() ? 'Your device asks for less motion, so the view stays still.' : 'Shaking as players will feel it.');
+  }
   function addAtCentre(kind) {
     const s = street();
     const { w, h } = viewSize();
@@ -1513,6 +1552,12 @@ async function boot() {
         num('h', 'Height (down)', item.h, (n) => set({ h: Math.max(1, Math.round(n)) }), { min: '1' })),
         field('Blocks', permSelect('pc_perm', item.pc_perm, setPerm('pc_perm'), { wall: true, dis })),
         el('p', { class: 'builder-sub', text: 'From the left means a player walking right into it.' }));
+    } else if (kind === 'emitter') {
+      add(effectInspector({
+        el, btn, field, numberInput, item, id, street: s, dis, layers: layersFrontFirst(s.layers),
+        set: (patch, label = 'effect') => commit(geoSetOps([[kind, item, patch]]), label),
+        unset: (keys, label = 'effect') => commit([{ op: 'emitter.set', street: S.streetKey, id, set: {}, unset: keys }], label),
+      }));
     } else if (kind === 'ladder') {
       add(el('div', { class: 'builder-grid' },
         num('x', 'x (centre)', item.x, (n) => set({ x: Math.round(n) })), num('y', 'y (foot)', item.y, (n) => set({ y: Math.round(n) })),
@@ -2301,6 +2346,7 @@ async function boot() {
     el('ul', { class: 'builder-key' }, keyRow(legend(COLOURS.plain), 'Standing jump'), keyRow(legend(COLOURS.running), 'Running jump')),
     overlayCheck('populations', 'Populations: the planner\'s spots'),
     el('ul', { class: 'builder-key' }, ...SPOT_GROUPS.map((g) => keyRow(legend(g.colour, { box: true }), g.label))),
+    overlayCheck('effects', 'Effects: steam, lava and embers, playing'),
     overlayCheck('frame', 'View frame: Wide 960 by 408 (solid), Original 1000 by 600 (dashed)'),
     overlayCheck('rulers', 'Rulers and guides'),
     clearGuidesBtn,
@@ -2318,6 +2364,7 @@ async function boot() {
     if (name === 'arc' && !on) S.arcs = null;
     if (name === 'reach' && on) ensureLocalReach();
     if (name === 'populations') { if (on) loadValidateMod(); renderInspector(); }
+    if (name === 'effects') S.fx?.setVisible(on);
     S.geoDrawn = '';
     renderTools();
   }
@@ -2408,7 +2455,7 @@ async function boot() {
     // `new URL(...)` written here would not be keyed by tools/module-keys).
     if (!V.workerUrl) {
       if (!V.loading) {
-        V.loading = import('./validate-worker.js?v=b3a9b611').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
+        V.loading = import('./validate-worker.js?v=cdd49cfd').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
       }
       return null;
     }
@@ -2844,6 +2891,8 @@ async function boot() {
       validate: { state: S.validate.state, counts: findingCounts(S.validate.report), findings: S.validate.report?.findings?.length ?? null },
       reach: (() => { const r = reachData(); return r ? { surfaces: r.surfaces?.length || 0, reached: (r.surfaces || []).filter((u) => u.reached).length, targets: r.targets?.length || 0, arrivals: r.arrivals?.length || 0, local: r === S.reachLocal?.data, ms: S.reachLocal?.ms ?? null } : null; })(),
       arcs: (S.arcs || []).map((a) => ({ kind: a.kind, dir: a.dir, points: a.points?.length || 0, landed: a.landed })),
+      effects: S.fx ? S.fx.stats() : null,
+      shaking: Boolean(S.shake),
     }),
     camera(x, y, zoom = S.cam.zoom) { S.cam = { x, y, zoom }; zoomLabel.textContent = `${Math.round(zoom * 100)}%`; },
     /** Draw parallax for a view of w x h world px (match /play/'s frame), or null for the canvas's own. */

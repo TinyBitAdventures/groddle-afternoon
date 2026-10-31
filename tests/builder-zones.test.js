@@ -10,17 +10,17 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tokensOf, searchDecos, facetCounts, passesFacets, sizeClass, drawnSize, hubPlacements, newArtRows, thumbUrl, decoFor, textScore, queryWords, NEW_ART_BUNDLE } from '../public/js/builder/deco-search.js?v=fda9b16b';
-import { TEMPLATES, newStreet, newStreetOps, groundStrip, templateLayers, gradientFrom, hslHex, filtersFor, nextHubId, newHub, nextMapLine, mapWithStreet, mapWithoutStreet, profileOf, FLOOR_Y, MAP_W, MAP_H } from '../public/js/builder/templates.js?v=fa23314a';
-import { populationWith, plannedSpots, moveMapLine, mapForStreets, spotGroup } from '../public/js/builder/editor-zone.js?v=3ca537c9';
+import { TEMPLATES, newStreet, newStreetOps, groundStrip, templateLayers, gradientFrom, hslHex, filtersFor, nextHubId, newHub, nextMapLine, mapWithStreet, mapWithoutStreet, profileOf, FLOOR_Y, MAP_W, MAP_H } from '../public/js/builder/templates.js?v=008481d2';
+import { populationWith, plannedSpots, moveMapLine, mapForStreets, spotGroup } from '../public/js/builder/editor-zone.js?v=36e4d449';
 import { intakeBody, base64Of } from '../public/js/builder/editor-picker.js?v=724352b6';
 import { streetWithEdits, editsOn, linkEdit, streetStats } from '../public/js/builder/zone.js?v=6a3db28e';
-import { applyZoneEdits } from '../public/js/builder/draft-play.js?v=12944c21';
-import { applyOps } from '../public/js/builder/ops.js?v=2ca2cc56';
+import { applyZoneEdits } from '../public/js/builder/draft-play.js?v=d00d21ba';
+import { applyOps } from '../public/js/builder/ops.js?v=acf30407';
 import { compileSchema } from '../public/js/builder/schema-check.js?v=cc9d1af4';
-import { validateZone, placementRequests } from '../public/js/builder/validate.js?v=955b2e0f';
+import { validateZone, placementRequests } from '../public/js/builder/validate.js?v=89d70464';
 import { platformsScreen, worldToScreen, streetWidth } from '../public/js/street-model.js?v=23b926e5';
 import { populationForStreet, planStreetPlacements } from '../public/js/street-ecology.js?v=7e30da8f';
-import { arriveFor } from '../public/js/builder/geometry-handles.js?v=a291ae18';
+import { arriveFor } from '../public/js/builder/geometry-handles.js?v=d39231a4';
 import { applyStreetIndex, clearStreetIndex } from '../public/js/street-loader.js?v=390e4702';
 import { loadValidatorContext } from '../tools/builder/validator-context.mjs';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
@@ -145,7 +145,8 @@ describe('templates, hubs and the hub map (js/builder/templates.js, spec 6.3)', 
       assert.deepEqual(s.layers.map((l) => l.id), [...t.roles]);
       assert.deepEqual(s.stats, streetStats(s));
       assert.equal(s.stats.decoCount, ground.length);
-      assert.equal(s.noMap, true);
+      // Q11: a zone street shows its street map (the world map is kept apart by the zone markers).
+      assert.equal(s.noMap, undefined);
       assert.equal(s.bounds.r - s.bounds.l, 3000);
       assert.equal(s.bounds.b - s.bounds.t, t.height);
       // Back layers behind the middleground in order, front layers ahead of it.

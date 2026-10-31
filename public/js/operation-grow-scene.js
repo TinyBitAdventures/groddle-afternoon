@@ -31,7 +31,7 @@
  */
 
 import { OPERATION_GROW_FILES } from './operation-grow-art.js?v=3cbe7663';
-import { textureFromUrl } from './textures.js?v=01a295a1';
+import { textureFromUrl } from './textures.js?v=db2ce452';
 
 export const GROW_ART_DIR = 'assets/sprites/quest-rooms/operation_grow/';
 

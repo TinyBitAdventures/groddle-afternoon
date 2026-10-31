@@ -13,7 +13,7 @@ import { join } from 'node:path';
 import { band, weightedBand, hexHsl, showProfile } from '../tools/builder/style-profile.mjs';
 import { colourStats, hsl, hueOverlap } from '../public/js/builder/colour-stats.js?v=30f71984';
 import { STY_RULES, styleFindings, sty001, sty002, sty003, sty004, sty005, namedRole, bandOf, fingerprint } from '../public/js/builder/style-rules.js?v=abf9bfae';
-import { LICENCE_POLICY, isNewArtName, provenanceProblems, provenanceRows, provenanceSection, newArtUrl, withNewArt } from '../public/js/builder/new-art.js?v=b2411f6f';
+import { LICENCE_POLICY, isNewArtName, provenanceProblems, provenanceRows, provenanceSection, newArtUrl, withNewArt } from '../public/js/builder/new-art.js?v=29f0b13e';
 
 const root = join(import.meta.dirname, '..');
 const json = (p) => JSON.parse(readFileSync(join(root, p), 'utf8'));

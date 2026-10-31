@@ -173,8 +173,9 @@ export function newStreet({ zoneId, key, label, template = 'meadow', width, heig
     platforms: [{ id: 'plat_1', x1: l + FLOOR_INSET, y1: FLOOR_Y, x2: r - FLOOR_INSET, y2: FLOOR_Y, pc_perm: -1, item_perm: -1 }],
     layers: templateLayers(t, profile, w, h),
     signposts: [],
-    // Zones stay off the world map (spec 15, Q5).
-    noMap: true,
+    // No noMap: a zone street shows its own street map (spec 15 Q11). Zones stay off the world
+    // map, the region lists and Completist through the zone markers (index and hub map rows'
+    // `zone`, js/zone-streets.js), not through Tiny Speck's no_map flag, which hides the minimap.
   };
   const ground = groundStrip(t, l, r, catalog);
   street.layers.find((x) => x.id === 'middleground').decos = ground;

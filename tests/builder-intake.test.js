@@ -16,7 +16,7 @@ import { join } from 'node:path';
 import { crc32, deflateSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
 import { colourStats } from '../public/js/builder/colour-stats.js?v=30f71984';
-import { LICENCE_POLICY } from '../public/js/builder/new-art.js?v=b2411f6f';
+import { LICENCE_POLICY } from '../public/js/builder/new-art.js?v=29f0b13e';
 import { HAS_SITE, SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

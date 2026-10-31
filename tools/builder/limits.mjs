@@ -6,4 +6,4 @@
 export const SCOPES = Object.freeze(['drafts:read', 'drafts:write', 'assets:write', 'validate', 'render']);
 /** Calls a key may make a minute, by kind; reads are not limited. */
 export const RATES = Object.freeze({ write: 120, render: 20, validate: 60 });
-export const RENDER = Object.freeze({ scale: [0.05, 1], maxSide: 4096, overlays: Object.freeze(['geometry', 'reach', 'findings', 'arrivals', 'populations', 'grid']), views: Object.freeze(['full', 'camera']), seconds: 5 });
+export const RENDER = Object.freeze({ scale: [0.05, 1], maxSide: 4096, overlays: Object.freeze(['geometry', 'reach', 'findings', 'arrivals', 'populations', 'grid', 'effects']), views: Object.freeze(['full', 'camera']), seconds: 5 });

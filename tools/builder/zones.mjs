@@ -26,7 +26,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { streetStats, editsOn } from '../../public/js/builder/zone.js?v=6a3db28e';
-import { arriveFor } from '../../public/js/builder/geometry-handles.js?v=a291ae18';
+import { arriveFor } from '../../public/js/builder/geometry-handles.js?v=d39231a4';
 import { isZoneTsid, withoutZoneConnects } from '../../public/js/zone-streets.js?v=b40010d5';
 
 export const ZONES_DIR = 'public/assets/zones';
@@ -349,6 +349,16 @@ export function applyZoneEdits(fs, zones, out = []) {
 
 // —— New art ——
 
+/** The sprites a zone's streets use: their decos' and their effects' particle art. */
+export function spritesUsed(zone) {
+  const used = new Set();
+  for (const row of zone.streets || []) {
+    for (const l of row.street?.layers || []) for (const d of l.decos || []) used.add(d.sprite);
+    for (const e of row.street?.emitters || []) if (typeof e?.sprite === 'string' && e.sprite) used.add(e.sprite);
+  }
+  return used;
+}
+
 /**
  * The zones' new art (origin `new` rows that a street uses): name -> provenance row for
  * tools/provenance/new-art.json, with the file's place and bytes. A file that is missing or whose
@@ -357,8 +367,7 @@ export function applyZoneEdits(fs, zones, out = []) {
 export function newArt(fs, zones) {
   const art = {};
   for (const zone of zones) {
-    const used = new Set();
-    for (const row of zone.streets || []) for (const l of row.street?.layers || []) for (const d of l.decos || []) used.add(d.sprite);
+    const used = spritesUsed(zone);
     for (const [name, a] of Object.entries(zone.assets || {})) {
       if (a?.origin !== 'new' || !used.has(name)) continue;
       if (art[name] && art[name].sha256 !== a.sha256) throw new Error(`${name}: zones ${art[name].zones.join(', ')} and ${zone.id} hold different pictures under one name.`);

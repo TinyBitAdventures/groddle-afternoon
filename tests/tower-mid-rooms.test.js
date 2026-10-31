@@ -29,8 +29,8 @@ import {
   midTowerRoomByTsid,
   midTowerRoomStreet,
 } from '../public/js/tower-mid-rooms.js?v=15143f80';
-import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=e585470b';
-import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=b6ae268a';
+import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=4e5b1f84';
+import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=884946b3';
 import { populationForStreet } from '../public/js/street-ecology.js?v=7e30da8f';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

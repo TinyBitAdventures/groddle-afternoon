@@ -40,6 +40,11 @@
  *                                             a way in from a shipped street (zone.edits; the shipped file is never touched)
  *   edit.remove  { at, prune? }                prune: drop zone.edits when it empties (an add's inverse)
  *
+ * Zone ambient effects (spec 4, 15 Q12; js/street-effects.js) ride the same two shapes:
+ *   emitter.add / .remove / .set              a steam vent, lava squirt or embers (emitters[],
+ *                                             fx_<n>), as the geometry kinds above
+ *   street.set { set: { rumble: {every, duration, strength, sound?} } }   the street's rumble
+ *
  * A failing op throws an OpError with a code; a batch (applyOps) is all or nothing.
  *
  * Key order is kept: an inverse that puts back a field an op removed also carries `order`, the
@@ -58,12 +63,13 @@ export const OP_NAMES = Object.freeze([
   'layer.set', 'deco.add', 'deco.remove', 'deco.set', 'deco.move',
   'platform.add', 'platform.remove', 'platform.set', 'barrier.add', 'barrier.remove', 'barrier.set',
   'ladder.add', 'ladder.remove', 'ladder.set', 'signpost.add', 'signpost.remove', 'signpost.set',
+  'emitter.add', 'emitter.remove', 'emitter.set',
   'connect.add', 'connect.remove', 'connect.set',
   'population.set', 'hubmap.set', 'edit.add', 'edit.remove',
 ]);
 
 /** Top-level street fields street.set may change (geometry, layers and ids have their own ops). */
-export const STREET_FIELDS = Object.freeze(['label', 'internalLabel', 'hubId', 'hubName', 'gradient', 'musicFile', 'noMap', 'fogMap', 'bounds']);
+export const STREET_FIELDS = Object.freeze(['label', 'internalLabel', 'hubId', 'hubName', 'gradient', 'musicFile', 'noMap', 'fogMap', 'bounds', 'rumble']);
 export const LAYER_FIELDS = Object.freeze(['name', 'z', 'w', 'h', 'hidden', 'filters']);
 export const DECO_FIELDS = Object.freeze(['sprite', 'name', 'signText', 'x', 'y', 'w', 'h', 'z', 'r', 'flip', 'hidden', 'animated']);
 const ZONE_FIELDS = Object.freeze(['title', 'notes']);
@@ -74,6 +80,8 @@ export const GEOMETRY = Object.freeze({
   barrier: Object.freeze({ list: 'barriers', prefix: 'wall_', fields: Object.freeze(['x', 'y', 'h', 'pc_perm']) }),
   ladder: Object.freeze({ list: 'ladders', prefix: 'ladder_', fields: Object.freeze(['x', 'y', 'w', 'h', 'tiling']) }),
   signpost: Object.freeze({ list: 'signposts', prefix: 'signpost_', fields: Object.freeze(['x', 'y', 'w', 'h']) }),
+  // Zone ambient effects (js/street-effects.js): steam vents, lava squirts, embers.
+  emitter: Object.freeze({ list: 'emitters', prefix: 'fx_', fields: Object.freeze(['kind', 'layer', 'x', 'y', 'sprite', 'rate', 'size', 'height', 'spread', 'period', 'burst', 'hidden']) }),
 });
 export const CONNECT_FIELDS = Object.freeze(['tsid', 'label', 'hub_id', 'hidden', 'arrive']);
 /** A zone edit's fields (schema $defs/streetEdit) and its two kinds. */
@@ -393,7 +401,7 @@ export function applyOp(zone, op) {
   }
 }
 
-/** platform.*, barrier.*, ladder.* and signpost.* (see the header). */
+/** platform.*, barrier.*, ladder.*, signpost.* and emitter.* (see the header). */
 function applyGeometryOp(zone, op, kind, verb) {
   const g = GEOMETRY[kind];
   const street = streetRow(zone, op.street).street;

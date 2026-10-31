@@ -54,7 +54,7 @@
  * engine.query('spiritLonelyHere').
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=f0e432df';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=ec7b4119';
 import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=764d5f5a';
 import { STREET_SPIRIT_SPEECH_OFFSET } from '../speech-placement.js?v=7e03b1b9';
 import {

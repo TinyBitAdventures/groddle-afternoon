@@ -34,7 +34,7 @@ function fnBody(src, name) {
 
 describe('ORBERA: the orb just above the name labels', () => {
   it('stands its ball just clear of a name plate, the count on the orb', async () => {
-    const { ORB_ART } = await import('../public/js/features/rook-attack-feature.js?v=cb36367b');
+    const { ORB_ART } = await import('../public/js/features/rook-attack-feature.js?v=3e491f8d');
     const plateY = Number(read('js/features/realtime-feature.js').match(/const PLATE_Y = (-\d+);/)[1]);
     // The plate's text bottom is PLATE_Y; 12 px text plus its 4 px pad puts the top about 20 px higher.
     const plateTop = -plateY + 20;
@@ -107,7 +107,7 @@ describe('FOOTWORDS: footage words', () => {
   it("An Autumn Day says GSJS's own words", { skip: !haveGsjs && 'no GSJS' }, async () => {
     const lines = gsjs('inc_data_maps_prod.js').split('\n');
     assert.match(lines[17951], /"LUVCL0STDIB37HE"\s*: "This feeling of …",/);
-    const mod = await import('../public/js/quest-rooms/an-autumn-day.js?v=c1ce7e6e');
+    const mod = await import('../public/js/quest-rooms/an-autumn-day.js?v=a2a153b3');
     assert.equal(mod.CAPTION, 'This feeling of …');
     assert.equal(mod.feelingCaption('comfort'), 'This feeling of comfort.');
     assert.ok(mod.sentenceReady([...mod.SENTENCE, 'comfort.']));

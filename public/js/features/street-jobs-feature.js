@@ -47,7 +47,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } fr
 import { canUseTool, useToolCondition } from '../tools.js?v=9a2e7ef4';
 import { ecologyForStreet } from '../street-ecology.js?v=7e30da8f';
 import { worldToScreen } from '../street-model.js?v=23b926e5';
-import { signArmWidth } from '../street-render.js?v=262c3652';
+import { signArmWidth } from '../street-render.js?v=ae048a15';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { GIANTS } from '../shrines.js?v=01b185bc';
 import { teleportationFeature } from './teleportation-feature.js?v=a79a7cea';
@@ -113,7 +113,7 @@ import {
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=81339760';
 import { normalizeGroups } from '../groups.js?v=65337c22';
-import { textureFromUrl } from '../textures.js?v=01a295a1';
+import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';

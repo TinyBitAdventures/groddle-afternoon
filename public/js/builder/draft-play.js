@@ -9,7 +9,10 @@
  * 3. merges their population rows into the ecology catalog (street-ecology.js);
  * 4. puts the zone's edits on the shipped streets they name (a copy, registered the same way), so
  *    the new ways into the zone show on those streets too (phase P3);
- * 5. answers the start tsid, as ?streetdemo= would.
+ * 5. draws the zone's own new art (gz_ sprites, the bundle's `art`): their names join the
+ *    renderer's set and js/textures.js sends their URLs to /builder-art/<sha256> (new-art.js), as
+ *    the editor does;
+ * 6. answers the start tsid, as ?streetdemo= would.
  *
  * practice-mode.js makes every draft link a practice copy, so the real save never records a GZ
  * street. A multiplayer page never takes a draft (and /play/online/ strips every parameter). A
@@ -21,6 +24,9 @@ import { registerDraftStreets, loadStreetData, resolveIndexTsid, STREET_INDEX } 
 import { streetWithEdits, editsOn } from './zone.js?v=6a3db28e';
 import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../street-ecology.js?v=7e30da8f';
 import { createBuilderApi } from './api.js?v=9560d68f';
+import { installNewArt } from './new-art.js?v=29f0b13e';
+import { loadDecoManifest } from '../street-render.js?v=ae048a15';
+import * as textureUrls from '../textures.js?v=db2ce452';
 
 export const DRAFT_REFUSED = 'That draft is not available.';
 
@@ -62,11 +68,30 @@ export async function startDraftPlay(search, { mode = 'solo', api = createBuilde
   const tsids = registerDraftStreets(bundle?.index || {}, streets);
   if (!tsids.length) return { refused: DRAFT_REFUSED };
   await applyZoneEdits(bundle?.edits);
+  await useDraftArt(bundle?.art);
   const eco = getStreetEcologyCatalog();
   setStreetEcologyCatalog({ ...eco, streets: { ...(eco?.streets || {}), ...(bundle.ecology || {}) } });
   const key = want.street && keys[want.street] ? want.street : Object.keys(keys)[0];
   const tsid = keys[key] || tsids[0];
   return { id: want.draft, rev: bundle.draft?.rev ?? 0, tsid, key, label: streets[tsid]?.label || tsid, title: bundle.draft?.title || want.draft };
+}
+
+/**
+ * The zone's new art for this play-test: each gz_ name with a stored file joins the renderer's set
+ * (loadDecoManifest's Set, so buildStreetView draws it) and its URL goes to /builder-art/<sha256>.
+ * Resolves the names added.
+ */
+export async function useDraftArt(art, { textures = textureUrls, manifest = loadDecoManifest } = {}) {
+  const rows = {};
+  for (const [name, row] of Object.entries(art && typeof art === 'object' ? art : {})) {
+    if (/^gz_[a-z0-9_]+$/.test(name) && /^[0-9a-f]{64}$/.test(String(row?.sha256 || ''))) rows[name] = { origin: 'new', sha256: row.sha256 };
+  }
+  const names = Object.keys(rows);
+  if (!names.length) return [];
+  installNewArt(textures, () => rows);
+  const set = await manifest();
+  for (const name of names) set.add(name);
+  return names;
 }
 
 /**

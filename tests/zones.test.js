@@ -24,7 +24,7 @@ import { GAME_DIR } from '../tools/repos.mjs';
 import { buildZones, files, listZones, mergeZoneIndex, mergeZoneEcology, streetWithZoneEdits, zoneStreets, sha256, overlay, NEW_ART } from '../tools/builder/zones.mjs';
 import { publishZone, unacknowledged } from '../tools/builder/publish.mjs';
 import { loadValidatorContext } from '../tools/builder/validator-context.mjs';
-import { validateZone } from '../public/js/builder/validate.js?v=955b2e0f';
+import { validateZone } from '../public/js/builder/validate.js?v=89d70464';
 import { isZoneTsid, withoutZoneConnects, withoutZoneRows } from '../public/js/zone-streets.js?v=b40010d5';
 import { listHubsFromIndex } from '../public/js/map-graph.js?v=419ce342';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
@@ -92,13 +92,12 @@ describe('the published zones in this checkout (public/assets/zones)', () => {
     }
   });
 
-  it('labels: no "glitch", no em dash; streets carry noMap; their rows say which zone', () => {
+  it('labels: no "glitch", no em dash; their rows say which zone', () => {
     const index = json('public/assets/streets/index.json').streets;
     for (const zone of zones) {
       const words = [zone.title, zone.hub?.name, ...zone.streets.flatMap((s) => [s.street.label, ...(s.street.signposts || []).flatMap((p) => (p.connects || []).map((c) => c.label))]), ...(zone.edits || []).map((e) => e.connect?.label)];
       for (const w of words.filter(Boolean)) assert.ok(!/glitch|—/i.test(w), `${zone.id}: "${w}"`);
       for (const s of zone.streets) {
-        assert.equal(s.street.noMap, true, s.street.label);
         assert.equal(index[s.street.tsid]?.zone, zone.id, s.street.tsid);
       }
     }

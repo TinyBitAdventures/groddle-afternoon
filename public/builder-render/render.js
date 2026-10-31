@@ -15,16 +15,19 @@
  * reach: the validator's reach map for this street; findings: the street's findings (rule ids are
  * drawn at their `where`); populations: [{ key, x, y }] the planner's spots (screen space).
  * `full` draws every layer at the parallax offset of a Wide view at the street's centre, with the
- * sky over the whole street. The output is at most 4096 px a side (the scale shrinks to fit).
+ * sky over the whole street. A zone street's effects (js/street-effects.js) are drawn as a still
+ * with every emitter puffing (2.2 s in); the `effects` overlay marks each emitter (its id, kind and
+ * plume height) and names the rumble. The output is at most 4096 px a side (the scale shrinks to fit).
  */
-import { buildStreetView, loadDecoManifest, loadSignpostTextures } from '../js/street-render.js?v=262c3652';
+import { buildStreetView, loadDecoManifest, loadSignpostTextures } from '../js/street-render.js?v=ae048a15';
 import { navigableSignposts, streetWidth, streetHeight, worldToScreen } from '../js/street-model.js?v=23b926e5';
-import * as textureUrls from '../js/textures.js?v=01a295a1';
+import * as textureUrls from '../js/textures.js?v=db2ce452';
 import { installPixiFixes } from '../js/pixi-fixes.js?v=173fb649';
 import { installHiresDecos } from '../js/deco-hires.js?v=cc8506f6';
-import { installNewArt, withNewArt } from '../js/builder/new-art.js?v=b2411f6f';
-import { spotGroup } from '../js/builder/editor-zone.js?v=3ca537c9';
-import { drawGeometryOverlay, drawReachOverlay, drawArrivals, OVERLAY_COLOURS } from '../js/builder/overlays.js?v=a9d287ac';
+import { installNewArt, withNewArt } from '../js/builder/new-art.js?v=29f0b13e';
+import { spotGroup } from '../js/builder/editor-zone.js?v=36e4d449';
+import { drawGeometryOverlay, drawReachOverlay, drawArrivals, OVERLAY_COLOURS } from '../js/builder/overlays.js?v=7dd09d5a';
+import { createStreetEffects, normaliseEmitter, emitterAnchor, EFFECT_WORDS } from '../js/street-effects.js?v=e427650f';
 
 export const MAX_SIDE = 4096;
 export const WIDE = Object.freeze({ w: 960, h: 408 });
@@ -132,6 +135,8 @@ async function render({ street, assets = null, params = {}, reach = null, findin
   world.scale.set(frame.scale);
   world.position.set(-frame.cam.x * frame.scale, -frame.cam.y * frame.scale);
   const view = buildStreetView(data, PIXI, { renderer: app.renderer, available: withNewArt(available, assets) });
+  // `layers` shows those layers only: the middleground too (the renderer always builds it).
+  if (only.size) for (const lc of view.layerContainers || []) if (!only.has(lc.label)) lc.visible = false;
   view.updateParallax(frame.parallax.x, frame.parallax.y, frame.parallax.w, frame.parallax.h, frame.parallax.h);
   if (view.skyView) {
     view.skyView.x = frame.cam.x;
@@ -141,6 +146,8 @@ async function render({ street, assets = null, params = {}, reach = null, findin
   }
   world.addChild(view);
   if (view.frontView) world.addChild(view.frontView);
+  const fx = data.emitters?.length ? createStreetEffects(data, PIXI, view, { available: withNewArt(available, assets), reduced: false, always: true }) : null;
+  fx?.simulate(2.2);
   const g = new PIXI.Graphics();
   const px = (n) => n / frame.scale;
   world.addChild(g);
@@ -174,6 +181,24 @@ async function render({ street, assets = null, params = {}, reach = null, findin
       if (frame.scale >= 0.2) labels.addChild(label(PIXI, p.key, o.x + 8, o.y - 26, { size: 10, colour: group.colour }));
     }
   }
+  if (overlay.has('effects')) {
+    // Each emitter: a ring at its mouth, a line up to its plume's height, and its id and kind.
+    const colour = { steam: 0xe5e7eb, lava: 0xff7a1a, embers: 0xffd34d };
+    for (const e of street.emitters || []) {
+      const n = normaliseEmitter(e);
+      const lc = (view.layerContainers || []).find((c) => c.label === n.layer);
+      const a = emitterAnchor(street, n);
+      const p = { x: a.x + (lc?.x || 0), y: a.y + (lc?.y || 0) };
+      g.circle(p.x, p.y, px(9)).stroke({ width: px(3), color: colour[n.kind] || 0xffffff }).circle(p.x, p.y, px(9)).stroke({ width: px(1), color: 0x000000 });
+      g.moveTo(p.x, p.y - px(9)).lineTo(p.x, p.y - n.height).stroke({ width: px(2), color: colour[n.kind] || 0xffffff, alpha: 0.8 });
+      const o = toOut(p);
+      labels.addChild(label(PIXI, `${e.id} ${EFFECT_WORDS[n.kind].toLowerCase()}${n.layer === 'middleground' ? '' : ` (${n.layer})`}${e.hidden ? ', hidden' : ''}`, o.x + 11, o.y - 8, { size: 11, bg: 0x3b1d0e }));
+    }
+    if (street.rumble) {
+      const r = street.rumble;
+      labels.addChild(label(PIXI, `Rumble: ${r.duration} s every ${(r.every || []).join(' to ')} s, ${r.strength} px${r.sound === false ? ', silent' : ''}`, 6, frame.height - 22, { size: 12, bg: 0x7c2d12 }));
+    }
+  }
   if (overlay.has('findings')) {
     const SEV = { fatal: 0xb91c1c, error: OVERLAY_COLOURS.unreached, warn: OVERLAY_COLOURS.Roof, info: OVERLAY_COLOURS.arrival };
     const seen = new Map();
@@ -189,8 +214,11 @@ async function render({ street, assets = null, params = {}, reach = null, findin
   }
   view.cullDecos?.(frame.cam.x, frame.cam.y, frame.vw, frame.vh, true);
   const missing = await settle(view);
+  for (let i = 0; fx && fx.pending() && i < 40; i += 1) await new Promise((r) => setTimeout(r, 80));
+  if (fx) app.renderer.render(app.stage);
   const rect = new PIXI.Rectangle(0, 0, frame.width, frame.height);
   const dataUrl = await app.renderer.extract.base64({ target: app.stage, frame: rect, resolution: 1, format: 'png' });
+  fx?.destroy();
   view.destroy({ children: true });
   return { png: String(dataUrl).replace(/^data:image\/png;base64,/, ''), width: frame.width, height: frame.height, scale: frame.scale, view: frame.view, missing };
 }

@@ -16,7 +16,9 @@
  *   unchanged), like Pixi's own resolver; addUrlRoute() registers the 3x
  *   routes for pack icons and sprite sheets (js/icon-hires.js,
  *   js/sprite-hires.js).
- * - `{ raw: true }` skips the routes (a sheet a loader upgrades itself).
+ * - `{ raw: true }` skips the routes (a sheet a loader upgrades itself), except routes added with
+ *   `{ raw: true }`: those move where a file lives rather than pick its resolution (a level builder
+ *   draft's new art, served from /builder-art/), so they apply to every URL.
  * - SVG files and data URLs are rasterised to a canvas, at { width, height }
  *   or { scale } when given (Pixi 7's SVGResource options).
  * - Image sources are garbage collected on the GPU by Pixi when unused for a
@@ -29,6 +31,8 @@ const sources = new Map();
 const textures = new Map();
 /** @type {Map<string, (url: string) => string|null>} */
 const routes = new Map();
+/** The routes that apply to raw URLs too (addUrlRoute's `raw`). */
+const rawRoutes = new Set();
 
 const LOAD = Symbol('groddleLoad');
 
@@ -36,15 +40,23 @@ function pixi() {
   return globalThis.PIXI;
 }
 
-/** Register a URL rewrite (e.g. a 3x route); later routes see earlier results. */
-export function addUrlRoute(name, fn) {
+/**
+ * Register a URL rewrite (e.g. a 3x route); later routes see earlier results. `raw: true` makes
+ * it apply to `{ raw: true }` loads as well (a file that lives somewhere else, not a resolution).
+ */
+export function addUrlRoute(name, fn, { raw = false } = {}) {
   routes.set(name, fn);
+  if (raw) rawRoutes.add(name);
+  else rawRoutes.delete(name);
 }
 
-/** The URL actually loaded for `url` after routes. */
-export function routeUrl(url) {
+
+
+/** The URL actually loaded for `url` after routes (a raw load: only the routes added with `raw`). */
+export function routeUrl(url, { raw = false } = {}) {
   let out = String(url);
-  for (const fn of routes.values()) {
+  for (const [name, fn] of routes) {
+    if (raw && !rawRoutes.has(name)) continue;
     const next = fn(out);
     if (next) out = next;
   }
@@ -137,7 +149,7 @@ function createSource(url, opts) {
 
 /** The TextureSource for an image URL (shared, filled in when loaded). */
 export function sourceFromUrl(url, opts = {}) {
-  const key = opts.raw ? String(url) : routeUrl(url);
+  const key = routeUrl(url, { raw: Boolean(opts.raw) });
   let source = sources.get(key);
   if (!source || source.destroyed) {
     source = createSource(key, opts);
@@ -148,7 +160,7 @@ export function sourceFromUrl(url, opts = {}) {
 
 /** The whole-image Texture for a URL (shared, sized when loaded). */
 export function textureFromUrl(url, opts = {}) {
-  const key = opts.raw ? String(url) : routeUrl(url);
+  const key = routeUrl(url, { raw: Boolean(opts.raw) });
   let texture = textures.get(key);
   if (!texture || texture.destroyed) {
     // dynamic: sprites re-read the size and UVs when the image arrives.

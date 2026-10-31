@@ -182,16 +182,16 @@ import {
   towerItem,
 } from '../home-cultivation.js?v=9d3a8ec3';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=68506420';
-import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=628fa0b4';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=f0e432df';
-import { fadeInNewNear } from '../poof-fade.js?v=24c9b428';
-import { projectApi } from './street-jobs-feature.js?v=624b862d';
+import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=ec7b4119';
+import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
+import { projectApi } from './street-jobs-feature.js?v=1f017907';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=6ccb3a4f';
-import { towerApi } from './home-tower-feature.js?v=883b8476';
+import { towerApi } from './home-tower-feature.js?v=3914a7d5';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=e676f00f';
 import { wantsHiresDecos } from '../deco-hires.js?v=cc8506f6';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=395dd6a2';
-import { patchesFeature } from './patches-feature.js?v=735652f6';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=20b030f4';
+import { patchesFeature } from './patches-feature.js?v=9cf66cf0';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=3996c344';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
@@ -212,7 +212,7 @@ import {
   yardStyleChoices,
   yardStyleFor,
 } from '../home-styles.js?v=f591561f';
-import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=01a295a1';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { ROCK_CATALOG } from '../mining.js?v=a7eb8740';
 import {
   HOUSE_SIGN,

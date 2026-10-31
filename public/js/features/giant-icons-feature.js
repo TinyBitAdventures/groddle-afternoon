@@ -66,8 +66,8 @@ import {
   titheIcon,
   useEmblem,
 } from '../giant-icons.js?v=4639df55';
-import { textureFromUrl } from '../textures.js?v=01a295a1';
-import { playSheetOverlay } from '../overlay-art.js?v=628fa0b4';
+import { textureFromUrl } from '../textures.js?v=db2ce452';
+import { playSheetOverlay } from '../overlay-art.js?v=3753a0d2';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted, toldRecord } from '../conversations.js?v=7cbdfea4';
 import { TELLERS } from '../conversations-data.js?v=f11b7e02';

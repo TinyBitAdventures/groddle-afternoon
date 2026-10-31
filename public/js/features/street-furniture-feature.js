@@ -34,7 +34,7 @@
  * neighbourChore, neighbourLetters, furnitureLast.
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=f0e432df';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=ec7b4119';
 import { nearestSurfaceY } from '../walk-surface.js?v=764d5f5a';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=670c3a7f';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
@@ -114,11 +114,11 @@ import {
   recordVisit,
   visitorLetter,
 } from '../neighbours.js?v=7fbf44a4';
-import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=7cf8f655';
+import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=302e64ad';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
-import { textureFromUrl } from '../textures.js?v=01a295a1';
-import { butlerApi } from './butler-feature.js?v=05543207';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=0b2dc56f';
+import { textureFromUrl } from '../textures.js?v=db2ce452';
+import { butlerApi } from './butler-feature.js?v=4743f6d7';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=1e33badc';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';

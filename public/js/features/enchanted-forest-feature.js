@@ -31,7 +31,7 @@
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { isItemFloor, platformsScreen, platformYAt } from '../street-model.js?v=23b926e5';
-import { frameTexture, textureFromUrl } from '../textures.js?v=01a295a1';
+import { frameTexture, textureFromUrl } from '../textures.js?v=db2ce452';
 import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=4e140315';
 import { noteWoodTreeCare } from '../patches.js?v=3996c344';
 import {

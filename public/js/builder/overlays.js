@@ -6,15 +6,37 @@
  *
  *   drawGeometryOverlay(g, street, { px, shown })   lines by permeability, walls, ladders, signposts
  *   drawReachOverlay(g, reach, { px })               the validator's reach map (surfaces, targets, traps, arrivals)
+ *   drawEffectMarkers(g, street, { px, shown })      each zone effect's mouth and plume height (the editor's)
  *
  * No DOM; Pixi only through the Graphics handed in.
  */
-import { geoShape, permName, dashes, wallSides, shapeBounds } from './geometry-handles.js?v=a291ae18';
+import { geoShape, permName, dashes, wallSides, shapeBounds } from './geometry-handles.js?v=d39231a4';
+import { normaliseEmitter } from '../street-effects.js?v=e427650f';
 
 export const OVERLAY_COLOURS = Object.freeze({
   Floor: 0x3ddc84, Roof: 0xffb020, Soft: 0x7cc4ff, Hard: 0xff5a5a, wall: 0xe879f9, ladder: 0x22d3ee, post: 0xfde047,
   reached: 0x22c55e, unreached: 0xef4444, arrival: 0x60a5fa, trap: 0xf97316, plain: 0xfff176, running: 0xff8ad8, select: 0x1fa6ff,
+  steam: 0xe5e7eb, lava: 0xff7a1a, embers: 0xffd34d,
 });
+
+/**
+ * Zone effects (js/street-effects.js): a ring at each mouth in the kind's colour, a faint line up to
+ * the plume's height and the box it is picked by; a hidden one dashed.
+ */
+export function drawEffectMarkers(g, s, { px = (n) => n, shown = (kind, item) => item } = {}) {
+  const C = OVERLAY_COLOURS;
+  for (const e of s.emitters || []) {
+    const item = shown('emitter', e);
+    const n = normaliseEmitter(item);
+    const sh = geoShape(s, 'emitter', item);
+    const colour = C[n.kind] || 0xffffff;
+    const r = px(8);
+    if (n.hidden) strokeSegs(g, dashes(sh.x - r, sh.y2, sh.x + r, sh.y2, px(4), px(3)), { width: px(2), color: colour });
+    else g.circle(sh.x, sh.y2, r).stroke({ width: px(4), color: 0x000000, alpha: 0.5 }).circle(sh.x, sh.y2, r).stroke({ width: px(2.5), color: colour });
+    g.moveTo(sh.x, sh.y2 - r).lineTo(sh.x, sh.y2 - n.height).stroke({ width: px(1.5), color: colour, alpha: 0.45 });
+    g.poly([sh.x, sh.y2 - r - px(10), sh.x - px(5), sh.y2 - r - px(2), sh.x + px(5), sh.y2 - r - px(2)]).fill({ color: colour });
+  }
+}
 
 /** A path of segments stroked once. */
 export function strokeSegs(g, segs, style) {

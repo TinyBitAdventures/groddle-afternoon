@@ -14,7 +14,8 @@
  *
  * Commands (spec 8.2): drafts; new; pull; push; street add | fork; place; set; rm; platform; wall;
  * ladder; signpost; connect; link-world; populate; hub map; ops; decos; style; guide; validate;
- * render; asset add; play; history; restore; publish; sign. `cli.mjs help` lists them.
+ * render; asset add; play; history; restore; publish; sign. Zone ambient effects (spec 15 Q12):
+ * effect, rumble, effects. `cli.mjs help` lists them.
  *
  * Exit status: 0 done; 1 validate (or publish) found an error or a fatal finding; 2 refused or wrong usage.
  */
@@ -25,19 +26,37 @@ import { GAME_DIR } from '../repos.mjs';
 import { signKey, parseKey, parseEnv, configDir, canonicalQuery } from './sign.mjs';
 import { catalog, searchDecos, styleProfile, styleProfiles } from './catalog.mjs';
 import { builderGuide } from './guide.mjs';
-import { applyOps, applyOp, nextDecoId, nextGeometryId, findGeometry, findDeco, GEOMETRY, OpError, OP_NAMES } from '../../public/js/builder/ops.js?v=2ca2cc56';
+import { applyOps, applyOp, nextDecoId, nextGeometryId, findGeometry, findDeco, GEOMETRY, OpError, OP_NAMES } from '../../public/js/builder/ops.js?v=acf30407';
 import { forkStreet, forkOps, newTsid, libraryAsset, linkEdit, editsOn } from '../../public/js/builder/zone.js?v=6a3db28e';
-import { newStreet, newStreetOps, newHub, nextHubId, mapWithStreet, mapWithoutStreet, TEMPLATES, DEFAULT_MAP_COLOURS } from '../../public/js/builder/templates.js?v=fa23314a';
-import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js/builder/geometry-handles.js?v=a291ae18';
+import { newStreet, newStreetOps, newHub, nextHubId, mapWithStreet, mapWithoutStreet, TEMPLATES, DEFAULT_MAP_COLOURS } from '../../public/js/builder/templates.js?v=008481d2';
+import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js/builder/geometry-handles.js?v=d39231a4';
 import { platformsScreen, isStandable } from '../../public/js/street-model.js?v=23b926e5';
-import { DECO_TWINS } from '../../public/js/street-render.js?v=262c3652';
+import { DECO_TWINS } from '../../public/js/street-render.js?v=ae048a15';
+import { EFFECT_KINDS, EFFECT_DEFAULTS, EFFECT_LIMITS, RUMBLE_DEFAULTS, effectsCost, normaliseEmitter, rumbleShare } from '../../public/js/street-effects.js?v=e427650f';
 
 export const PERM_WORDS = Object.freeze({ floor: -1, roof: 1, soft: 0, hard: null });
 /** The game draws a signpost's first four arms (street-render.js); a fifth would never show. */
 export const ARMS_SHOWN = 4;
+/**
+ * Ladder art (js/ladder-tiling.js): a ladder is only a climb zone, and draws nothing without
+ * `tiling`. Most of Tiny Speck's ladders have none and a ladder deco drawn over them instead; for
+ * an agent the CLI tiles one by default (Tiny Speck's basic wood), or stone, or none.
+ */
+export const LADDER_TILINGS = Object.freeze({
+  wood: Object.freeze({ cap_0: { sprite: 'ladder_tile_center_00_basicWood', w: 60, h: 50 }, cap_1: { sprite: 'ladder_tile_cap_1_basicWood', w: 60, h: 50 }, centers: [{ sprite: 'ladder_tile_center_00_basicWood', w: 60, h: 50 }] }),
+  stone: Object.freeze({ cap_0: { sprite: 'ladder_tile_cap_0_stone', w: 75, h: 50 }, cap_1: { sprite: 'ladder_tile_cap_1_stone', w: 75, h: 50 }, centers: [{ sprite: 'ladder_tile_center_04_stone', w: 70, h: 50 }] }),
+});
+
+/** PURE: the tiling a --tiling word names (wood by default; none for a bare climb zone). */
+export function ladderTiling(word = 'wood') {
+  if (word === 'none') return null;
+  if (!Object.prototype.hasOwnProperty.call(LADDER_TILINGS, String(word))) throw new CliError(`--tiling is ${Object.keys(LADDER_TILINGS).join(', ')} or none.`);
+  return clone(LADDER_TILINGS[word]);
+}
+
 /** Ops spec 8.3 names that are not built yet: refused here rather than sent. */
 export const NOT_BUILT = Object.freeze(['layer.add', 'layer.remove', 'layer.move', 'waiver.add', 'waiver.remove']);
-const BOOLEAN_FLAGS = new Set(['json', 'dry-run', 'write', 'help', 'all', 'flip', 'reach', 'dirty', 'no-build']);
+const BOOLEAN_FLAGS = new Set(['json', 'dry-run', 'write', 'help', 'all', 'flip', 'reach', 'dirty', 'no-build', 'always', 'quiet', 'off']);
 const pub = (p) => join(GAME_DIR, 'public', p);
 const readJson = (f) => JSON.parse(readFileSync(f, 'utf8'));
 const clone = (v) => JSON.parse(JSON.stringify(v));
@@ -284,6 +303,14 @@ export function prepareOps(zone, ops, rows = catalog()) {
   for (const op of ops) if (op?.op === 'asset.set' && op.name) rowed.add(op.name);
   const out = [];
   for (const op of ops) {
+    if (op?.op === 'emitter.add' && typeof op.emitter?.sprite === 'string') {
+      // An effect's particle sprite needs its provenance row too.
+      const art = byName.get(op.emitter.sprite) || byName.get(DECO_TWINS[op.emitter.sprite]);
+      if (!rowed.has(op.emitter.sprite) && art) {
+        out.push({ op: 'asset.set', name: op.emitter.sprite, asset: libraryAsset(art) });
+        rowed.add(op.emitter.sprite);
+      }
+    }
     if (op?.op !== 'deco.add' || !op.deco) {
       out.push(op);
       continue;
@@ -318,8 +345,11 @@ export function placeOps(zone, { street: key, layer = 'middleground', sprite, x,
   const byName = new Map(rows.map((d) => [d.name, d]));
   const art = byName.get(sprite) || byName.get(DECO_TWINS[sprite]);
   if (!art && !zone.assets?.[sprite]) throw new CliError(`No deco "${sprite}" in the library or this zone's art. Try: cli.mjs decos ${sprite.split('_')[0]}`, { code: 'builder_not_found' });
-  const decoW = w ?? art?.drawn?.w_med ?? Math.round((art?.size2?.[0] || 200) / 2);
-  const decoH = h ?? art?.drawn?.h_med ?? Math.round((art?.size2?.[1] || 200) / 2);
+  // The zone's own art has no catalog row: its intake row has the kept 2x size, drawn at half.
+  const own = zone.assets?.[sprite];
+  const half = (n) => (Number(n) > 0 ? Math.round(Number(n) / 2) : null);
+  const decoW = w ?? art?.drawn?.w_med ?? half(own?.w) ?? Math.round((art?.size2?.[0] || 200) / 2);
+  const decoH = h ?? art?.drawn?.h_med ?? half(own?.h) ?? Math.round((art?.size2?.[1] || 200) / 2);
   const zs = (lay.decos || []).map((d) => Number(d.z) || 0);
   const id = nextDecoId(row.street);
   const deco = { id, sprite, x: Math.round(x), y: Math.round(y), w: Math.round(decoW), h: Math.round(decoH), z: z ?? (zs.length ? Math.max(...zs) + 1 : 0), r };
@@ -532,6 +562,73 @@ export function hubMapOps(zone, key, line) {
   return [{ op: 'hubmap.set', map }];
 }
 
+/** PURE: "a,b" into a sorted pair of numbers (--period, --every). */
+export function pair(text, name) {
+  const m = /^\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*$/.exec(String(text ?? ''));
+  if (!m) throw new CliError(`--${name} is min,max in seconds (6,10).`);
+  return [Number(m[1]), Number(m[2])].sort((a, b) => a - b);
+}
+
+/**
+ * PURE: the ops that place a zone ambient effect (spec 15 Q12; js/street-effects.js): an
+ * emitter.add with the kind's defaults for whatever is not given, and the provenance row of a
+ * library particle sprite the zone has no row for. `always` drops the period (it never stops).
+ */
+export function effectOps(zone, { street: key, kind, layer = 'middleground', x, y, sprite = null, rate, size, height, spread, period, burst, always = false }, rows = catalog()) {
+  const row = streetOf(zone, key);
+  if (!EFFECT_KINDS.includes(kind)) throw new CliError(`--kind is one of ${EFFECT_KINDS.join(', ')}.`);
+  if (!(row.street.layers || []).some((l) => l.id === layer)) throw new CliError(`Street "${key}" has no layer "${layer}". Its layers: ${(row.street.layers || []).map((l) => l.id).join(', ')}.`, { code: 'builder_not_found' });
+  const d = EFFECT_DEFAULTS[kind];
+  const id = nextGeometryId(row.street, 'emitter');
+  const emitter = { id, kind, layer, x: Math.round(x), y: Math.round(y) };
+  if (sprite) emitter.sprite = sprite;
+  emitter.rate = rate ?? d.rate;
+  emitter.size = size ?? d.size;
+  emitter.height = height ?? d.height;
+  emitter.spread = spread ?? d.spread;
+  const per = always ? null : period ?? (d.period ? [...d.period] : null);
+  if (per) {
+    emitter.period = per;
+    emitter.burst = burst ?? d.burst ?? Math.min(2, per[0]);
+  }
+  const ops = [];
+  if (sprite) {
+    const byName = new Map(rows.map((r) => [r.name, r]));
+    const art = byName.get(sprite) || byName.get(DECO_TWINS[sprite]);
+    if (!art && !zone.assets?.[sprite]) throw new CliError(`No sprite "${sprite}" in the library or this zone's art.`, { code: 'builder_not_found' });
+    if (!zone.assets?.[sprite] && art) ops.push({ op: 'asset.set', name: sprite, asset: libraryAsset(art) });
+  }
+  ops.push({ op: 'emitter.add', street: key, emitter });
+  return { ops, id };
+}
+
+/** PURE: the street.set op for a rumble (or its removal with `off`). */
+export function rumbleOps(zone, key, { every, duration, strength, quiet = false, off = false } = {}) {
+  streetOf(zone, key);
+  if (off) return [{ op: 'street.set', street: key, set: {}, unset: ['rumble'] }];
+  const rumble = { every: every ?? [...RUMBLE_DEFAULTS.every], duration: duration ?? RUMBLE_DEFAULTS.duration, strength: strength ?? RUMBLE_DEFAULTS.strength };
+  if (quiet) rumble.sound = false;
+  return [{ op: 'street.set', street: key, set: { rumble } }];
+}
+
+/** PURE: a street's effects in words and numbers (`effects`): each emitter, the rumble, the cost against the limits. */
+export function effectsReport(zone, key = null) {
+  return (zone.streets || []).filter((r) => !key || r.key === key).map((r) => {
+    const s = r.street;
+    const cost = effectsCost(s);
+    return {
+      street: r.key,
+      emitters: (s.emitters || []).map((e) => {
+        const n = normaliseEmitter(e);
+        return { id: e.id, kind: n.kind, layer: n.layer, x: n.x, y: n.y, rate: n.rate, size: n.size, height: n.height, period: n.period, burst: n.burst, ...(n.sprite ? { sprite: n.sprite } : {}), ...(n.hidden ? { hidden: true } : {}) };
+      }),
+      rumble: s.rumble ? { ...s.rumble, share: rumbleShare(s.rumble) } : null,
+      cost,
+      limits: { emitters: EFFECT_LIMITS.emitters, particles: EFFECT_LIMITS.particles, overdraw: EFFECT_LIMITS.overdraw },
+    };
+  });
+}
+
 // —— Words ——
 
 function findingLine(f) {
@@ -551,16 +648,21 @@ export const HELP = `Groddle level builder (docs/level-builder/spec.md 8.2)
   place --street k --layer middleground --sprite bush_3 --x 300 --y -60 [--w --h --flip --z --r]
   set <street>[/<id>[/<arm>]] key=value ...   (key= removes)    rm <street>[/<id>[/<arm>]]
   platform --street k --from x,y --to x,y [--perm floor|roof|soft|hard]
-  wall --street k --x --y --h [--perm]   ladder --street k --x --y --h [--w]   signpost --street k --x --y [--w --h]
+  wall --street k --x --y --h [--perm]   ladder --street k --x --y --h [--w] [--tiling wood|stone|none]   signpost --street k --x --y [--w --h]
   connect <streetA> <streetB> [--a-post id] [--b-post id]
   arrivals [--street k]                       work every arm's arrival out again (after moving a post or its floor)
   link-world <street> --from <shipped tsid> [--post id] [--back id]   (a post with room: the game shows four arms)
   populate --street k npc_piggy=2 trant_fruit=1 [--quoins 6]
   hub map --street k --line x1,y1,x2,y2
+  effect --street k --kind steam|lava|embers --x --y [--layer middleground] [--rate --size --height --spread]
+         [--period 6,10 --burst 3 | --always] [--sprite gz_x]   a zone ambient effect (set/rm it by its fx_ id)
+  rumble --street k [--every 14,30 --duration 1.6 --strength 6 --quiet] | --off   the street's earthquake rumble
+  effects [--street k]                        each street's effects, rumble and cost against the limits
   ops <file.json>                             apply a batch atomically
   decos <query> [--layer sky] [--hub 58] [--limit 20]    style [hub-58|default]    guide
   validate [--rule PHY-*]                     exit 1 on an error or fatal finding
   render --street k [--view full|camera] [--x --y --w --h] [--scale 0.25] [--overlay geometry,reach,findings,grid] [--layers a,b] --out f.png
+  assets                                      the draft's new art: kept size, trim, intake warnings
   asset add <file> --name gz_x --licence own-work-CC0|ai-generated --author A [--tool --prompt --inputs a,b --role --file3 f]
   play [--street k]   history   restore <rev>
   publish [<id> --rev n | file:<zone.json>] --dry-run | --write [--art <folder>] [--ack fp|rule|all] [--no-build]
@@ -739,7 +841,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
         const x = num(flags.x, 'x');
         const y = num(flags.y, 'y');
         const item = kind === 'barrier' ? { id, x, y, h: num(flags.h, 'h'), pc_perm: permOf(flags.perm, null) }
-          : kind === 'ladder' ? { id, x, y, w: num(flags.w, 'w', { optional: true }) ?? LADDER_W, h: num(flags.h, 'h') }
+          : kind === 'ladder' ? { id, x, y, w: num(flags.w, 'w', { optional: true }) ?? LADDER_W, h: num(flags.h, 'h'), ...(ladderTiling(typeof flags.tiling === 'string' ? flags.tiling : 'wood') ? { tiling: ladderTiling(typeof flags.tiling === 'string' ? flags.tiling : 'wood') } : {}) }
             : { id, x, y, w: num(flags.w, 'w', { optional: true }) ?? POST_W, h: num(flags.h, 'h', { optional: true }) ?? POST_H, connects: [] };
         return [{ op: `${kind}.add`, street: flags.street, [kind]: item }];
       }, cmd);
@@ -791,6 +893,51 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       return wrote(await target().write((zone) => populateOps(zone, flags.street, args, q), 'populate'));
     }
 
+    case 'effect': {
+      if (typeof flags.street !== 'string') throw new CliError('effect --street k --kind steam|lava|embers --x --y');
+      let id;
+      const r = await target().write((zone) => {
+        const e = effectOps(zone, {
+          street: flags.street, kind: flags.kind, layer: typeof flags.layer === 'string' ? flags.layer : 'middleground',
+          x: num(flags.x, 'x'), y: num(flags.y, 'y'), sprite: typeof flags.sprite === 'string' ? flags.sprite : null,
+          rate: num(flags.rate, 'rate', { optional: true }), size: num(flags.size, 'size', { optional: true }),
+          height: num(flags.height, 'height', { optional: true }), spread: num(flags.spread, 'spread', { optional: true }),
+          period: flags.period !== undefined ? pair(flags.period, 'period') : undefined, burst: num(flags.burst, 'burst', { optional: true }),
+          always: flags.always === true,
+        });
+        id = e.id;
+        return e.ops;
+      }, `effect ${flags.kind}`);
+      return wrote(r, { id: `${flags.street}/${id}` }, `${flags.street}/${id}`);
+    }
+
+    case 'rumble': {
+      if (typeof flags.street !== 'string') throw new CliError('rumble --street k [--every 14,30 --duration 1.6 --strength 6 --quiet] | --off');
+      const r = await target().write((zone) => rumbleOps(zone, flags.street, {
+        every: flags.every !== undefined ? pair(flags.every, 'every') : undefined,
+        duration: num(flags.duration, 'duration', { optional: true }), strength: num(flags.strength, 'strength', { optional: true }),
+        quiet: flags.quiet === true, off: flags.off === true,
+      }), flags.off ? 'rumble off' : 'rumble');
+      return wrote(r, {}, flags.off ? 'no rumble' : 'rumble set');
+    }
+
+    case 'assets': {
+      // The draft's new art as intake kept it: name, kept size (2x px; placements draw about half),
+      // what intake trimmed, and its warnings (spec 9.1).
+      const id = draftId();
+      const { data } = await client.call('GET', '/assets', { query: { draft: id } });
+      const out = (data.assets || []).map((a) => ({ name: a.name, w: a.w, h: a.h, drawn: [Math.round(a.w / 2), Math.round(a.h / 2)], trim: a.report?.trim || null, role: a.report?.role || null, sha256: a.sha256, warnings: (a.report?.findings || []).filter((f) => f.severity === 'warn').map((f) => f.code || f.message) }));
+      return { out, text: out.map((a) => `${a.name.padEnd(30)} ${a.w}x${a.h} (draws ${a.drawn.join('x')})${a.trim && (a.trim.t || a.trim.l) ? `  trimmed top ${a.trim.t}, sides ${a.trim.l}` : ''}${a.warnings.length ? `  warn: ${a.warnings.join(', ')}` : ''}`).join('\n') || 'No new art in this draft.', exit: 0 };
+    }
+
+    case 'effects': {
+      const { zone } = await target().zone();
+      const out = effectsReport(zone, typeof flags.street === 'string' ? flags.street : null);
+      const text = out.map((x) => [`${x.street}: ${x.emitters.length} effects, ${x.cost.particles} particles alive at most (limit ${x.limits.particles}), overdraw ${x.cost.overdraw} screens (limit ${x.limits.overdraw})${x.rumble ? `, rumble ${x.rumble.duration} s every ${x.rumble.every.join(' to ')} s at ${x.rumble.strength} px` : ', no rumble'}`,
+        ...x.emitters.map((e) => `  ${e.id.padEnd(7)} ${e.kind.padEnd(6)} ${e.layer} ${e.x},${e.y}  rate ${e.rate} size ${e.size} height ${e.height}${e.period ? `  ${e.burst} s every ${e.period.join(' to ')} s` : '  always'}${e.sprite ? `  ${e.sprite}` : ''}`)].join('\n')).join('\n');
+      return { out, text: text || 'No streets.', exit: 0 };
+    }
+
     case 'hub': {
       if (args[0] !== 'map') throw new CliError('hub map --street k --line x1,y1,x2,y2');
       return wrote(await target().write((zone) => hubMapOps(zone, flags.street, flags.line), 'hub map'));
@@ -830,7 +977,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       let report;
       let rev;
       if (local()) {
-        const { validateZone } = await import('../../public/js/builder/validate.js?v=955b2e0f');
+        const { validateZone } = await import('../../public/js/builder/validate.js?v=89d70464');
         const { loadValidatorContext } = await import('./validator-context.mjs');
         const zone = readJson(resolve(flags.file));
         rev = zone.rev;

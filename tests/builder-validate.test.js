@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=955b2e0f';
+import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=89d70464';
 import { streetWorld, jumpArc, jumpArcs, reachStreet } from '../public/js/builder/reach-graph.js?v=6f7512af';
 import { stepAvatar, avatarGround, steerX, coastX, NORMAL_BUFF } from '../public/js/avatar-step.js?v=c04c7c76';
 import { platformsScreen } from '../public/js/street-model.js?v=23b926e5';
@@ -158,7 +158,24 @@ describe('the validator (js/builder/validate.js): one fixture per rule', () => {
     ['TXT-001', (z) => { lane(z).label = 'Glitch Lane'; }],
     ['TXT-002', (z) => { lane(z).label = 'Hechey Track'; }],
     ['PRF-001', (z) => { for (const p of lane(z).signposts) for (let i = 0; i < 6; i += 1) p.connects.push({ ...p.connects[0] }); }],
+    // Zone ambient effects (js/street-effects.js, spec 15 Q12).
+    ['FX-001', (z) => { lane(z).emitters = [{ id: 'fx_1', kind: 'steam', layer: 'no_such_layer', x: 0, y: -60 }]; }],
+    ['FX-002', (z) => { lane(z).emitters = [{ id: 'fx_1', kind: 'lava', x: lane(z).bounds.r + 400, y: -60 }]; }],
+    ['FX-003', (z) => { lane(z).rumble = { every: [4, 5], duration: 3, strength: 20 }; }],
+    ['FX-004', (z) => { lane(z).emitters = [{ id: 'fx_1', kind: 'steam', x: 0, y: -60, period: [2, 4], burst: 6 }]; }],
   ];
+
+  it('effects: a busy street is too heavy (PRF-001), and an effect\'s particle art needs provenance (AST-002)', () => {
+    const busy = fire('PRF-001', (z) => { lane(z).emitters = Array.from({ length: 30 }, (_, i) => ({ id: `fx_${i + 1}`, kind: 'steam', x: i * 40 - 600, y: -60, rate: 20, size: 200 })); });
+    assert.ok(busy.some((f) => f.at === 'lane/effects/particles' && f.severity === 'warn' && !f.data.warn), JSON.stringify(busy.map((f) => f.at)));
+    assert.ok(busy.some((f) => f.at === 'lane/effects/overdraw'));
+    const art = fire('AST-002', (z) => { lane(z).emitters = [{ id: 'fx_1', kind: 'steam', x: 0, y: -60, sprite: 'bush_3' }]; delete z.assets.bush_3; });
+    assert.equal(art.length, 1);
+    const zone = structuredClone(base);
+    lane(zone).emitters = [{ id: 'fx_1', kind: 'steam', x: 0, y: -60, period: [6, 10], burst: 3 }];
+    lane(zone).rumble = { every: [14, 30], duration: 1.6, strength: 6 };
+    assert.deepEqual(validateZone(zone, ctx).findings.filter((f) => /^(FX-|PRF-|SCH-)/.test(f.rule)), []);
+  });
   it('covers every rule but the STY rules (P5 tests those, tests/builder-style.test.js)', () => {
     assert.deepEqual(cases.map(([r]) => r).sort(), Object.keys(RULES).filter((r) => !r.startsWith('STY-')).sort());
   });

@@ -19,7 +19,7 @@ import {
   KIDS_ROOM_TEMPLATE,
   KIDS_ROOM_W,
   kidsRoomArt,
-} from '../public/js/kids-room-scene.js?v=b1592bce';
+} from '../public/js/kids-room-scene.js?v=cfe30938';
 import { FOUR_LETTER_LAYOUT, FOUR_LETTER_ROOM_ID } from '../public/js/four-letter-quest.js?v=a5574ac7';
 
 const here = path.dirname(fileURLToPath(import.meta.url));

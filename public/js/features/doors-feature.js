@@ -27,7 +27,7 @@
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
 import { getGameDayKey } from '../game-day.js?v=3095e05b';
-import { loadDecoManifest } from '../street-render.js?v=262c3652';
+import { loadDecoManifest } from '../street-render.js?v=ae048a15';
 import {
   DOOR_KEYS,
   DOOR_KEY_BASE_COST,
@@ -44,7 +44,7 @@ import {
   normalizeDoorState,
   visibleDoors,
 } from '../doors.js?v=eb9510b1';
-import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=01a295a1';
+import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=db2ce452';
 
 export const DOORS_FEATURE_ID = 'doors';
 const DECO_BASE = 'assets/decos/groddle/';

@@ -10,10 +10,10 @@ import { describe, it } from 'node:test';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { GEOMETRY, OP_NAMES, OpError, applyOp, applyOps, nextDecoId, nextGeometryId, opsSummary } from '../public/js/builder/ops.js?v=2ca2cc56';
+import { GEOMETRY, OP_NAMES, OpError, applyOp, applyOps, nextDecoId, nextGeometryId, opsSummary } from '../public/js/builder/ops.js?v=acf30407';
 import { DEFAULT_GRADIENT, forkOps, forkStreet, newTsid, relayerPosition, streetKeyFrom } from '../public/js/builder/zone.js?v=6a3db28e';
 import { compileSchema } from '../public/js/builder/schema-check.js?v=cc9d1af4';
-import { DECO_TWINS } from '../public/js/street-render.js?v=262c3652';
+import { DECO_TWINS } from '../public/js/street-render.js?v=ae048a15';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -40,6 +40,7 @@ function geometryItem(kind, rnd, pick, i) {
   if (kind === 'platform') return { x1: r(900), y1: -r(400), x2: 900 + r(400), y2: -r(400), pc_perm: pick([-1, 0, 1, null]), item_perm: pick([-1, null]) };
   if (kind === 'barrier') return { x: r(900), y: -r(400), h: 40 + r(200), pc_perm: pick([0, null]) };
   if (kind === 'ladder') return { x: r(900), y: -r(400), w: 50, h: 100 + r(400), ...(rnd() > 0.5 ? { tiling: { cap_0: { sprite: 'ladder_tile_center_00_basicWood', w: 60, h: 50 } } } : {}) };
+  if (kind === 'emitter') return { kind: pick(['steam', 'lava', 'embers']), x: r(900), y: -r(200), ...(rnd() > 0.5 ? { layer: 'middleground' } : {}), rate: 1 + r(10), size: 10 + r(90), ...(rnd() > 0.5 ? { period: [3, 3 + r(6)], burst: 1 } : {}) };
   return { x: r(900), y: -r(200), w: 150, h: 200, connects: rnd() > 0.7 ? [] : [{ tsid: 'GZ0000000000002', label: `Arm ${i}`, hub_id: '56', arrive: { x: r(900), y: -r(200) } }] };
 }
 
@@ -67,6 +68,25 @@ function randomOps(zone, n, seed = 7) {
       keep({ op: 'population.set', street: 'lane', population: { counts: { npc_piggy: 2 }, quoins: 3 } });
       keep({ op: 'hubmap.set', map: null });
       keep({ op: 'hubmap.set', map: { color: '#1d3a80', streets: [{ tsid: zone.streets[0].street.tsid, name: 'Lane', x1: 10, y1: 20, x2: 200, y2: 30 }] } });
+      continue;
+    }
+    if (i === 7 || i === Math.floor(n * 0.4)) {
+      // Zone ambient effects: an effect on a street without any (its inverse prunes), a period
+      // set as a list then dropped, one with an id, the ladder's own set and remove, and the
+      // street's rumble set and unset (spec 15 Q12).
+      const fx = nextGeometryId(street, 'emitter');
+      keep({ op: 'emitter.add', street: 'lane', emitter: { kind: 'steam', x: 10, y: -60, rate: 6 } });
+      keep({ op: 'emitter.set', street: 'lane', id: fx, set: { period: [4, 8], burst: 2, layer: 'middleground' } });
+      keep({ op: 'emitter.set', street: 'lane', id: fx, set: { rate: 3 }, unset: ['period', 'burst'] });
+      keep({ op: 'emitter.add', street: 'lane', emitter: { id: 'fx_77', kind: 'lava', x: 40, y: -60, sprite: 'bush_3' }, at: 0 });
+      const ladder = (street.ladders || [])[0];
+      if (ladder) keep({ op: 'ladder.set', street: 'lane', id: ladder.id, set: { h: 140 } });
+      const rung = nextGeometryId(street, 'ladder');
+      keep({ op: 'ladder.add', street: 'lane', ladder: { x: 5, y: -60, w: 50, h: 100 } });
+      keep({ op: 'ladder.remove', street: 'lane', id: rung });
+      keep({ op: 'street.set', street: 'lane', set: { rumble: { every: [10, 20], duration: 1.5, strength: 6 } } });
+      if (i === 7) keep({ op: 'street.set', street: 'lane', set: {}, unset: ['rumble'] });
+      if (i !== 7) for (const e of [...(street.emitters || [])]) keep({ op: 'emitter.remove', street: 'lane', id: e.id, prune: true });
       continue;
     }
     if (i === 5 || i === Math.floor(n * 0.6)) {

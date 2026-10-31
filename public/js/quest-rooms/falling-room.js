@@ -28,7 +28,7 @@
  * fallX, fallNumber (the last number passed), fallLabel, fallMaxVy.
  */
 
-import { ARRIVAL, FLOOR, FLOOR_Y, H, TELEPORTER, VY_MAX, W, buildFall, fallPlatforms, numberAt, sx, sy } from './falling-room-scene.js?v=49a0d75b';
+import { ARRIVAL, FLOOR, FLOOR_Y, H, TELEPORTER, VY_MAX, W, buildFall, fallPlatforms, numberAt, sx, sy } from './falling-room-scene.js?v=d2f1e023';
 
 export const STAGE = 'falling';
 export const TEMPLATE = Object.freeze({ prod: 'LLI12DVTLA01HT5', dev: 'LHH12F9DO801RUL' });

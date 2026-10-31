@@ -1,6 +1,6 @@
 # Level builder: design spec
 
-Status: approved 2026-10-30; every phase, P0 to P6, built (see 14.1 for what was built and where it deviates). Five of the open questions are decided (section 15).
+Status: approved 2026-10-30; every phase, P0 to P6, built (see 14.1 for what was built and where it deviates), and zone ambient effects added on 2026-10-31 (14.1). Five of the open questions are decided by Austin, and two by the lead until he says otherwise (section 15).
 
 The level builder is a tool in the administrators' console (`/console/`) for editing streets and making new zones. It serves two users equally:
 
@@ -316,6 +316,13 @@ zone
 | required | `hubId`, `hubName`, `gradient`, `stats` |
 | forbidden | `events`, `eventBoxes`, `physics` and the feature-owned fields |
 | limits | bounds within 8000 x 6000; at most 600 platforms and 24 layers |
+| may carry | `emitters[]` and `rumble`: zone ambient effects (below); no shipped street has them |
+
+**Zone ambient effects** (decided by the lead, 15 Q12). A builder street may carry steam vents, lava squirts and embers, placed like decos, and a street-wide earthquake rumble. They are zone content, not location events: they need no event scripting and no GSJS (Q9 stays open).
+
+- `emitters[]` (`$defs/emitter`, ids `fx_<n>`): `kind` (`steam`, `lava`, `embers`), `layer` (default the middleground), `x, y` (the vent's mouth, in its layer's space as a deco's anchor is), `rate` (particles a second while it puffs), `size`, `height` (how high the plume rises or the squirt flies), `spread` (degrees either side of straight up), `period` ([min, max] seconds from one burst's start to the next; left out, it never stops) and `burst` (seconds), `sprite` (the particle's art: a library deco or the zone's gz_ art; left out, a soft built-in shape) and `hidden`.
+- `rumble` (`$defs/rumble`): `every` ([min, max] seconds between rumbles), `duration` (seconds), `strength` (the camera shake in px) and `sound` (default true: Tiny Speck's `ROCKS_DISAPPEAR`, a low rocky rumble).
+- `public/js/street-effects.js` holds both halves: the pure one (defaults, ranges, the cost the validator caps, the rumble's seeded clock) and a pooled Pixi view the game, the editor and the render page share.
 
 **Provenance on every asset.** `assets{}` has one row per sprite the zone uses:
 
@@ -631,7 +638,11 @@ A **waiver** (schema `waivers[]`) accepts one finding at one place after a play-
 | STY-005 | info | Unusual layer for this deco | Deco placed on a layer role where the catalog shows it is never placed |
 | TXT-001 | error | Words not allowed | Street, hub, signpost arm or sign text contains "glitch" (any case) or an em dash |
 | TXT-002 | error | Name taken | A street label equal to a shipped street's label (case-insensitive), which would make `/tp` and the map ambiguous |
-| PRF-001 | warn / error | Too heavy | Over the limits in section 12 (warn at 80%, error over) |
+| PRF-001 | warn / error | Too heavy | Over the limits in section 12 (warn at 80%, error over); for effects, a street's emitters, the most particles alive at once, and their overdraw |
+| FX-001 | error | Effect on a missing layer | An emitter's `layer` is not one of the street's layers |
+| FX-002 | warn | Effect off its layer | An emitter's mouth is outside its layer (the street for the middleground), so nobody sees it |
+| FX-003 | warn | Rumble too often or too strong | The rumble shakes more than a third of the time (duration over the shortest gap), or over 16 px |
+| FX-004 | info | Burst trimmed to its period | A `burst` longer than the shortest `period` (the game trims it) |
 
 ### 7.4 Reachability: how it works and its limits
 
@@ -709,16 +720,20 @@ Every command takes `--json`, which prints findings and results as JSON for agen
 | `place --street k --layer middleground --sprite bush_3 --x 300 --y -60 [--w --h --flip --z --r]` | Add a deco (w/h default to the median drawn size) |
 | `set <street>/<id> key=value …`, `rm <street>/<id>` | Edit or remove anything by id |
 | `platform --street k --from x,y --to x,y [--perm floor\|roof\|soft\|hard]` | Add a line |
-| `wall`, `ladder`, `signpost --street k --x --y` | Add geometry |
+| `wall`, `ladder`, `signpost --street k --x --y` | Add geometry (`ladder --tiling wood\|stone\|none`: wood by default, since a bare ladder draws nothing) |
 | `connect <streetA> <streetB> [--a-post id] [--b-post id]` | Two-way connects, arrivals computed |
 | `link-world <street> --from <shipped tsid> [--post id]` | Add the `edits[]` connect from a shipped street |
 | `populate --street k npc_piggy=2 trant_fruit=1 [--quoins 6]` | Set the population |
+| `effect --street k --kind steam\|lava\|embers --x --y [--layer --rate --size --height --spread --period a,b --burst s \| --always --sprite s]` | Add a zone ambient effect (`set` and `rm` it by its `fx_` id) |
+| `rumble --street k [--every a,b --duration s --strength px --quiet] \| --off` | Set or remove the street's rumble |
+| `effects [--street k]` | Each street's effects and rumble, and their cost against the limits |
 | `hub map --street k --line x1,y1,x2,y2` | Draw the hub map |
 | `ops <file.json>` | Apply a batch of ops atomically |
 | `decos <query> [--layer sky] [--hub 58] [--limit 20]` | Search the deco catalog |
 | `style [hub-58\|default]` | Print a style profile |
 | `validate [--rule PHY-*]` | Findings; exit 1 on error or fatal |
-| `render --street k [--view full\|camera] [--x --y] [--scale 0.25] [--overlay geometry,reach,findings] --out f.png` | PNG |
+| `render --street k [--view full\|camera] [--x --y] [--scale 0.25] [--overlay geometry,reach,findings,effects] --out f.png` | PNG |
+| `assets` | The draft's new art as intake kept it: size, what was trimmed, warnings |
 | `asset add <file> --name gz_x --licence own-work-CC0\|ai-generated [--author --tool --prompt]` | Intake (9.1) |
 | `play [--street k]` | Print the play-test URL |
 | `history`, `restore <rev>` | Revisions |
@@ -772,6 +787,7 @@ Every route is under `/wp-json/groddle/v1/admin/builder/`.
 | `deco.add`, `deco.remove`, `deco.set`, `deco.move` | `{street, layer, deco, at?}`, `{street, id}`, `{street, id, set, unset?, order?}`, `{street, id, layer, at?, set?: {x, y}}` |
 | `platform.*`, `barrier.*`, `ladder.*`, `signpost.*` | `.add {street, <kind>: {id?, ...}, at?, order?}`, `.remove {street, id, prune?}`, `.set {street, id, set, unset?, order?}` |
 | `connect.add`, `connect.remove`, `connect.set` | `{street, signpost, connect, at?}`, `{street, signpost, at}`, `{street, signpost, at, set, unset?, order?}` |
+| `emitter.add`, `emitter.remove`, `emitter.set` | zone ambient effects, the geometry ops' shapes: `{street, emitter: {id?, kind, layer?, x, y, ...}, at?}`, `{street, id, prune?}`, `{street, id, set, unset?, order?}`; the rumble is `street.set {set: {rumble}}` |
 | `edit.add` | `{edit: {tsid, op: "add-connect", signpost, connect} \| {tsid, op: "add-signpost", newSignpost}, at?, order?}` |
 | `edit.remove` | `{at, prune?}` (prune drops `edits` when it empties, the inverse of an add that made it) |
 
@@ -824,7 +840,7 @@ The render endpoint shows an agent its work.
 |---|---|
 | `view` | `full`: the whole street, every layer at the parallax offset for the street's centre; or `camera`: what the player sees at camera `x,y` |
 | `scale` | 0.05 to 1; the output is at most 4096 px a side |
-| `overlay` | any of `geometry`, `reach`, `findings` (rule ids drawn at their `where`), `arrivals`, `populations`, `grid` (100 px world grid with labels, so an agent can read coordinates off the picture) |
+| `overlay` | any of `geometry`, `reach`, `findings` (rule ids drawn at their `where`), `arrivals`, `populations`, `grid` (100 px world grid with labels, so an agent can read coordinates off the picture), `effects` (each emitter's mouth, plume height, id and kind; the rumble named) |
 | `layers` | a comma list, to show some layers only |
 
 **Headers:** `X-Builder-Rev` and `X-Builder-Findings: <error>,<warn>`.
@@ -1080,7 +1096,7 @@ It never commits, tags or pushes.
    | Generator | Adds |
    |---|---|
    | `build-street-names.mjs` | index rows (label, hub, counts) |
-   | `build-hub-maps.mjs` | nothing: zones stay off the world map and out of Completist counting (decided, section 15). Their streets carry `noMap` |
+   | `build-hub-maps.mjs` | nothing: zones stay off the world map and out of Completist counting (decided, section 15). The zone markers keep them apart (index and hub map rows' `zone`); their streets show their own street map (15 Q11) |
    | new `tools/builder/build-zone-maps.mjs` | `assets/maps/hubs/hub-<id>.json` and its `assets/maps/index.json` row |
    | `build-street-ecology.mjs` | the population rows |
    | `tools/builder/apply-zone-edits.mjs` | the `edits[]` connects on shipped streets, with `arrive` recomputed. It runs after `build-street-navigation.mjs`, which would drop an unmatched connect's `arrive` (`location-navigation.js:286-296`) |
@@ -1116,6 +1132,8 @@ It never commits, tags or pushes.
 | Render | 5 s, at most 4096 px a side and 4 MB, cached by rev and params | Phase 4 |
 | API rate per key | 120 writes/min, 20 renders/min, 60 validates/min | 429 |
 | Asset intake | 8 MB upload, 4096 px a side, 200 new assets per zone | 9.1 |
+| Zone effects per street | 40 emitters; 400 particles alive at once; overdraw 4 Wide views (each particle's largest area, summed); warn at 80% | `js/street-effects.js` `EFFECT_LIMITS`: the pools are made once, so this is also the memory |
+| Rumble | shakes at most a third of the time and 16 px (warn); schema caps 24 px and 6 s | Motion comfort; none at all under `prefers-reduced-motion` |
 
 ---
 
@@ -1273,9 +1291,25 @@ Sizes: S is 1-2 lane-days, M is 3-4, L is 5-7.
 - **Validator.** TXT-002 no longer counts the zone's own index rows (after publishing, its labels are in the index), so a zone published again validates as it did the first time.
 - **Release status** lists each published zone under the game's notes: its streets and hub, then its files (zone file, street files, hub map, new art, the shipped streets its ways in are on), each marked new or changed since the tag, unchanged, or not committed.
 - **The online smoke check** gained `--game=<dir>` (local only): the game's own paths are answered from a folder, a worktree's `public/` with a zone published in it say, through Playwright routes, while sign-up, saves and the realtime server stay the site's. When that folder has a zone, check 8 runs: the served index lists zone streets, the online page's street index has none, and the shipped streets carrying ways in show no arm into one.
-- **`noMap`.** Zone streets carry `noMap` as P3's templates set it (11 says so). In the game that flag is Tiny Speck's own `no_map`: it hides the street's minimap (`js/ui/street-minimap.js` `minimapVisibility`), and the game says "No map: You're on your own" there. Kept as built; asked in 15.
+- **`noMap`.** Zone streets carry `noMap` as P3's templates set it (11 says so). In the game that flag is Tiny Speck's own `no_map`: it hides the street's minimap (`js/ui/street-minimap.js` `minimapVisibility`), and the game says "No map: You're on your own" there. Kept as built; asked in 15. (Superseded on 2026-10-31: the lead decided Q11, and templates no longer set it.)
 - **Acceptance, measured 2026-10-31 in a throwaway worktree** (Mossy Hollow is test content, so it is not committed): `publish file:tests/fixtures/builder/mossy-hollow-editor.zone.json --write` (rev 13: no fatal finding, error or warning, 7 notes) wrote 8 files (the zone, its two streets, index and ecology rows, hub 904's map and row, the arm on Hechey Track's `signpost_3`) and ran the signpost graph and data-versions; then the builders in order and every `--check` (data-versions, module-keys, play-online, codebase, build-zones, apply-zone-edits, build-zone-maps, deco-catalog, style-profile, deco-palette, signpost graph, build-street-names, the feature room builders, every realtime builder against the server repo: its data unchanged). `npm test` there: 6,694 pass, 0 fail (6,695 tests, the same as the branch). Re-running all 18 street build scripts (layers, navigation, events, names, ecology, jobs, hub maps and the 11 feature tools) changed only the 27 shipped street files they change on main too, none of the zone's; the zone checks stayed current. `release/status.mjs` lists the zone and its five files as not committed. `tests/map-routes.test.js` passes there. The two-player smoke check (`online-smoke.mjs --local --game=<worktree>/public`) passed all 8 checks with a clean cleanup: the served index lists the two zone streets, the online page's index has none and Hechey Track shows no arm into the zone. Solo `/play/` from the worktree, 13 of 13: in from Hechey Track by the new arm on `signpost_3`, arriving at Mossy Lane's post back; the zone's own map on Mossy Lane; Mossy Lane to Hollow End and back; the length of Mossy Lane and out, arriving at `signpost_3`; Groddle Forest's region list without Mossy Hollow; no page errors.
 - **Left for later:** the site does not learn that a draft was published (`state: published`, `published_commit`), since that happens when Austin commits; a keyed route for new art's bytes; `new --from-zone`.
+
+**Zone ambient effects and the first agent-built zone (2026-10-31, lane VOLCANO).** Where it lives: game `public/js/street-effects.js` (both halves), `public/js/features/zone-effects-feature.js` (the game), `public/js/builder/editor-effects.js` (the editor's inspector and rumble section), the `emitter` kind in `ops.js` and `geometry-handles.js`, the FX rules in `validate.js`, `effect`, `rumble` and `effects` in `cli.mjs`, the `effects` section of the guide, the render page's still and `effects` overlay; site `src/BuilderOps.php` (the ops and the structural check), `src/AdminBuilder.php` (the play bundle's `art`), `src/AdminBuilderAgent.php` (the `effects` overlay, effects' new art sent to renders). The test is `tests/zone-effects.test.js`; `tests/builder-ops.test.js` and `tests/builder-validate.test.js` cover the new op and rules.
+
+- **Effects are data on the street, drawn by the game's own code.** Ops: `emitter.add/remove/set` are the geometry ops' shapes (`emitters[]`, ids `fx_<n>`), and the rumble is a street field (`street.set {rumble}`), so the PHP port needed only its tables and the property test only new cases. Each emitter's sprites are made once (rate times the longest life) and reused; nothing is allocated per frame; an emitter off screen stops. An emitter draws in a container beside its layer's, just above that layer's decos, following the layer's parallax each render; it is not inside the layer, so a layer's colour bake or blur does not reach it (lava and embers draw additive, steam plain). The rumble shakes the camera through `nudgeCamera` (the Rook's shake) with a seeded clock, plays Tiny Speck's `ROCKS_DISAPPEAR` (a 3 s low rocky rumble, the only bass-heavy CC0 sound in the set) as each starts, and makes the effects puff harder while it lasts. Under `prefers-reduced-motion` the camera never moves (the sound still plays) and emitters run at half the rate and 60% of the height.
+- **Where they show:** `/play/` and `/play/?draft=` (the feature runs on GZ streets in solo only), the editor (live; an Effects overlay switch; the rumble only on Shake now, since an editor that shook by itself would be no place to work), renders (a still with every emitter puffing 2.2 s in; overlay `effects` marks each emitter and names the rumble), the CLI and the guide. Publishing carries them in the zone and street files; new art an effect uses counts as used (`zones.mjs spritesUsed`).
+- **The editor** places an effect like geometry: the Effect button puts a steam vent on the floor at the view centre, its ring drags (an effect on a parallax layer is in that layer's space, so the editor hands `geometry-handles.js` the layers' offsets each frame), Delete, copy and paste work, and the inspector tunes kind, layer, place, rate, size, height, spread, bursts or always on, particle art and hidden. The street's inspector (nothing selected) has the rumble and what the effects cost.
+- **Validator:** FX-001 (an effect on a missing layer, error), FX-002 (off its layer, warn), FX-003 (a rumble more than a third of the time or over 16 px, warn), FX-004 (a burst trimmed to its period, info), and PRF-001 over 40 emitters, 400 live particles or 4 Wide views of overdraw (warn at 80%). An effect's particle sprite is checked like a deco's (AST-001, AST-002).
+- **Fixes found by building Mount Ashomel through the CLI** (the friction log is in the lane's report):
+  - a draft's new art never drew on the layers behind the middleground (editor, renders, play-test): those layers load their 2x files `{ raw: true }`, which skipped every URL route, including new art's to `/builder-art/`. `textures.js` routes may now apply to raw loads (`addUrlRoute(name, fn, { raw: true })`), and new art's does;
+  - the play-test did not draw a draft's new art at all: the play bundle now carries `art` (name and sha256 of each `origin: new` row) and `draft-play.js useDraftArt` adds the names to the renderer's set and installs the `/builder-art/` route;
+  - `cli.mjs ladder` made ladders that draw nothing (a ladder is only a climb zone without `tiling`, and most of Tiny Speck's have a ladder deco instead): it now tiles Tiny Speck's basic wood by default (`--tiling wood|stone|none`);
+  - `cli.mjs place` sized the zone's own art at 100 by 100 (it has no catalog row): it now takes half the kept 2x size from the art's intake row;
+  - a render's `layers` list could not hide the middleground (the renderer always builds it): the render page now hides every container not named;
+  - `publish` without `--art` called every piece's file a mismatch (AST-003 "does not match its provenance"); a missing file now says it is not at hand and how to give it;
+  - there was no way to list a draft's art with the sizes intake kept (it trims transparent tops and sides, which moves a topper's surface): `cli.mjs assets`.
+- **Mount Ashomel** (draft `mount-ashomel` on groddle.localhost, not published): a new hub (900) of four Tall streets climbing a volcano (Cindra Foothold, Hoffo Zigzag, Grumblo Ledges, Ashomel Rim), linked from Tahli's Paaviri Vent, built with a builder key and the CLI only, with 27 pieces of original art drawn in code (`tools/builder/art/volcano/`, SVG rendered with `rsvg-convert`, CC0 1.0, provenance `ai-generated` naming Claude and the scripts) brought in through intake. It validates with no fatal finding, error or warning, and `publish --dry-run` writes 39 files. It was played by keyboard bottom to top and back in `/play/?draft=`.
 
 ---
 
@@ -1291,6 +1325,11 @@ Numbered as they were asked.
 - **Q7, agent keys:** local agents only for now. Builder keys (8.4) are for agents on Austin's machine; a remote connector waits for a later decision. The 30-day default expiry stands.
 - **Q8, the reach standard:** the remake's 105 px jump, so the validator matches what players can actually do (2.3, 7.4).
 
+### Decided by the lead, 2026-10-31 (Austin can overrule)
+
+- **Q11, a zone street's minimap:** zone streets show their street minimap. Austin's Q5 "off the world map" means the world map, the region lists and Completist, not the minimap on each street; a vertical climb needs its minimap. Templates no longer set `noMap` (`js/builder/templates.js`), and the zone markers P6 added (the `zone` field on index and hub map rows, `js/zone-streets.js`, `listHubsFromIndex`) keep zones off the world map and the region list. `noMap` stays a field an author may set on purpose, as Tiny Speck did on caves; drafts and fixtures made before this keep theirs.
+- **Q12, zone ambient effects:** builder streets may carry steam vents, lava squirts and embers (`emitters[]`) and an earthquake `rumble` (section 4). These are zone content, placed and tuned like decos; they are **not** location events. They need no GSJS action list and no event scripting, so Q9 (events) stays open and untouched. The game plays them on zone streets only, in solo only; no shipped street has them, and `/play/online/` never sees a zone.
+
 ### Still open
 
 The lead's defaults for P0 and P1 are in brackets; they hold until Austin answers.
@@ -1298,6 +1337,6 @@ The lead's defaults for P0 and P1 are in brackets; they hold until Austin answer
 2. **Where the builder runs.** groddle.localhost only (recommended until P6), or also on groddleafternoon.com's console? Live drafts would sit in the production database, and render and validate would need a worker there. [groddle.localhost only: the Builder tab, `/console/builder/` and every builder route are behind the site option `groddle_builder_enabled`, on locally and off when unset, so a release ships it dark.]
 3. **Edits to shipped streets.** Forks only, plus new connects (recommended)? Or should fixes to Tiny Speck's own streets be published too? That needs a patch layer applied after the XML builders. [Forks plus new connects: P1 forks a shipped street into a draft and never edits a shipped file.]
 4. **Ids.** GZ + 13 for new street tsids, and hub ids 900-999 for new hubs: fine? [Used as written.]
-9. **Events.** Should the builder ever author location events (the GSJS `admin_events_*` model), or should zones stay event-free?
+9. **Events.** Should the builder ever author location events (the GSJS `admin_events_*` model), or should zones stay event-free? (Zone ambient effects, Q12, are not events and do not answer this.)
 10. **Names.** Should builder street and hub names follow a naming guide (Tiny Speck's style of invented names), and should TXT-002 also refuse names close to a shipped one?
-11. **A zone street's minimap** (asked 2026-10-31, P6). Zone streets carry `noMap` to keep them off the world map (P3, section 11), but in the game `noMap` is Tiny Speck's `no_map` flag, which hides the street's minimap card. Should a zone street show its minimap, with the world map kept apart by the zone markers P6 added instead (the `zone` field on index and hub map rows)? [Kept as built: `noMap` on, so no minimap on zone streets.]
+11. *(Decided by the lead on 2026-10-31, above: zone streets show their minimap.)*

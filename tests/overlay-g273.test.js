@@ -26,7 +26,7 @@ import {
   tweenInst,
 } from '../tools/overlay-art/xfl-svg.mjs';
 import { OVERLAYS, checkOverlays, framePlan, scrub } from '../tools/overlay-art/build.mjs';
-import { POOF_IN, poofInAlpha, stateFrameAt } from '../public/js/overlay-art.js?v=628fa0b4';
+import { POOF_IN, poofInAlpha, stateFrameAt } from '../public/js/overlay-art.js?v=3753a0d2';
 import { orbLookFor } from '../public/js/rook-attack.js?v=c06c0537';
 
 const here = dirname(fileURLToPath(import.meta.url));
