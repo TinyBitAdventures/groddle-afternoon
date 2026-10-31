@@ -452,6 +452,34 @@ export function surfaceUnder(state, x, excludeId = null) {
 }
 
 /**
+ * Where an ordinary item set down in the room comes to rest (HandOfDecorator
+ * calculateTargetPlatformLineForRegStackFromPt: the closest item platform under
+ * the point). Any placed piece with a surface (a shelf, table, desk, counter,
+ * bookcase, cabinet or mantel) whose top is under the point (`give` px above it
+ * still counts) and whose width covers x, the nearest first; else the floor.
+ * x stays inside the room's placement span. Positions are room x and world y.
+ * @returns {{ x: number, y: number, on: number|null }}
+ */
+export function stackSurfaceAt(state, x, y, { give = 24 } = {}) {
+  const room = placementRoom(state);
+  const px = Math.round(Math.max(room.start + 12, Math.min(room.end - 12, finite(x, room.start))));
+  const py = finite(y, INTERIOR.floorY);
+  let best = null;
+  for (const row of state.placed) {
+    if (row.slot === 'ceiling' || row.slot === 'rug') continue;
+    const h = surfaceHeight(row.classTsid, row.upgradeId);
+    if (!h) continue;
+    const half = furnitureSize(row.classTsid, row.upgradeId).w / 2 - 6;
+    if (Math.abs(px - row.x) > half) continue;
+    const top = Math.round(row.y - h);
+    if (top < py - give) continue;
+    if (!best || top < best.y || (top === best.y && row.z > best.z)) best = { x: px, y: top, on: row.id, z: row.z };
+  }
+  if (best) return { x: best.x, y: best.y, on: best.on };
+  return { x: px, y: INTERIOR.floorY, on: null };
+}
+
+/**
  * Snap a requested point to the slot rules. Positions are the foot point
  * (bottom-center) for floor, rug, tabletop and wall pieces, and the hanging
  * point (top-center) for ceiling pieces.

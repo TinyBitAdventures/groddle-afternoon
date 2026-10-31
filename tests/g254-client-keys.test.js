@@ -242,8 +242,10 @@ describe('G254: game.js wiring', () => {
     // The ids it clicks are homes-feature's own.
     const homes = read('js/features/homes-feature.js');
     assert.match(homes, /id: 'homes-decorate-btn'/);
-    assert.match(homes, /id: 'homes-bar'/);
-    assert.match(homes, /class: 'hb-close'/);
+    // BUILDER: the bar and its close button are drawn by js/ui/home-builder.js.
+    const builder = read('js/ui/home-builder.js');
+    assert.match(builder, /id: 'homes-bar'/);
+    assert.match(builder, /class: 'hb-close'/);
     assert.match(homes, /homeEditMode\(\) \{/);
     const mp = read('js/features/neighbours-mp-feature.js');
     assert.match(mp, /id: 'keys-shade'/);

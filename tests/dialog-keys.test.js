@@ -21,6 +21,6 @@ test('focusedDialogButton only answers for buttons inside an open dialog or the 
   assert.match(fn, /closest\?\.\('button, \[role="button"\]'\)/);
   assert.match(fn, /button\.disabled/);
   // The pack row's buttons too (phase 2): Enter on a focused bag opens its tray, not the nearest menu.
-  assert.match(fn, /closest\('dialog, \[role="dialog"\], \[aria-modal="true"\], \.glitch-modal, #pack-bar'\)/);
+  assert.match(fn, /closest\('dialog, \[role="dialog"\], \[aria-modal="true"\], \.glitch-modal, #pack-bar, #homes-bar, #homes-pop, #homes-place'\)/);
   assert.match(fn, /!dialog\.hidden/);
 });

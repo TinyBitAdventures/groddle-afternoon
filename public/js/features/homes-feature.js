@@ -126,12 +126,30 @@ import {
   restackFurniture,
   setHomeTexture,
   snapPlacement,
+  stackSurfaceAt,
+  surfaceHeight,
   textureConfig,
   unexpandInterior,
   UNEXPAND_TEXT,
-} from '../home-decor.js?v=95ba0a91';
+} from '../home-decor.js?v=cbf17565';
 import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=c4ee77ed';
 import { chooseUpgrade, closeUpgradePicker, openUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=42523674';
+import {
+  BUILDER_TEXT,
+  DRAG_DIST,
+  EDGE_DELAY_MS,
+  PAN_SPEED,
+  clampRoomX,
+  createHomeBuilder,
+  cultChooseText,
+  decorLook,
+  edgePan,
+  filterTiles,
+  panDirection,
+  panKey,
+  placeCostText,
+  trayFilters,
+} from '../ui/home-builder.js?v=c2f2ccc7';
 import { RECIPE_CATALOG } from '../making.js?v=9e538296';
 import {
   createBackYardState,
@@ -237,7 +255,7 @@ import {
   quoteHouseExpansion,
   quoteHouseUnexpand,
   unexpandHouseFloors,
-} from '../home-floors.js?v=824bd350';
+} from '../home-floors.js?v=e640ed56';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -611,6 +629,9 @@ function publish(engine) {
   engine.setData('homeYardStyle', currentYardStyle(engine));
   engine.setData('homeYardShown', yardPreview || '');
   engine.setData('homeSelected', selected ? `${selected.kind}:${selected.id}` : '');
+  // BUILDER: the tray tab and filter, and what moves the thing you carry.
+  engine.setData('homeTray', mode === 'decorate' ? `${tab}:${trayFilter}` : mode || '');
+  engine.setData('homeCarry', placing ? carryBy : '');
   // G358: placed pieces' upgrades (class:id), the open picker and the last upgrade.
   engine.setData('furnupPlaced', decor.placed.filter((p) => p.upgradeId).map((p) => `${p.classTsid}:${p.upgradeId}`).join(','));
   engine.setData('furnupStored', Object.entries(decor.styles || {}).map(([c, rows]) => rows.map((r) => `${c}:${r.upgradeId || 0}`).join(',')).filter(Boolean).join(','));
@@ -767,7 +788,8 @@ function pieceSprite(engine, row, hires) {
 function drawRoomShell(engine, container, opts = {}) {
   const { PIXI } = engine;
   container.removeChildren().forEach((child) => child.destroy({ children: true }));
-  const room = roomPieces(decor, { floorY: INTERIOR.floorY, construction: Boolean(opts.construction), leftOpen: Boolean(opts.yard) });
+  // BUILDER: a swatch preview draws the room as it would look (HandOfDecorator startPreviewingSwatch).
+  const room = roomPieces(opts.preview || decor, { floorY: INTERIOR.floorY, construction: Boolean(opts.construction), leftOpen: Boolean(opts.yard) });
   const width = room.width;
   const top = room.top - 200;
   const bottom = room.bottom + 200;
@@ -875,8 +897,8 @@ function interiorBackground(engine, opts = {}) {
       { id: 'home-floor', x1: x0 + room.floorStart, y1: GROUND_Y, x2: width, y2: GROUND_Y, pc_perm: 1 },
     ]
     : [{ id: 'home-floor', x1: 0, y1: GROUND_Y, x2: width, y2: GROUND_Y, pc_perm: 1 }];
-  root.redraw = () => {
-    root.room = drawRoomShell(engine, shell, opts);
+  root.redraw = (preview = null) => {
+    root.room = drawRoomShell(engine, shell, preview ? { ...opts, preview } : opts);
     drawStampMarks(engine);
   };
   return root;
@@ -1738,6 +1760,7 @@ function furnitureView(PIXI, item) {
   spr.anchor.set(0.5, item.slot === 'ceiling' ? 0 : 1);
   spr.scale.set((item.facingRight ? 1 : -1) * s, s);
   box.addChild(spr);
+  box.art = spr;
   if (item.slot === 'ceiling') {
     const cord = new PIXI.Graphics();
     cord.rect(-1, -8, 2, 10).fill(0x5a4a3a);
@@ -1817,14 +1840,21 @@ function renderFurniture(engine) {
     layer?.removeChildren().forEach((child) => child.destroy({ children: true }));
   }
   const here = houseFloorHere();
+  const views = new Map();
   renderOrder(decor).forEach((item, i) => {
     // A Door between floors (or building one) is drawn by its own target (spawnDoorTargets).
     if (here != null && item.classTsid === DOOR_CLASS && doorRole(floors, here, item.id)) return;
     const view = furnitureView(PIXI, item);
     view.zIndex = i;
+    // BUILDER: the piece being carried stays faint where it was (HandOfDecorator lis_to_hide).
+    if (placing?.moveId === item.id) view.alpha = 0.3;
+    views.set(item.id, view);
     furnitureHolder(layers, item).addChild(view);
   });
-  if (selected?.kind === 'furniture') {
+  scene.furnitureViews = views;
+  scene.hoverGlow = null;
+  if (hoverId != null) drawHover(engine);
+  if (selected?.kind === 'furniture' && placing?.moveId !== selected.id) {
     const item = placedItem(decor, selected.id);
     if (item) furnitureHolder(layers, item).addChild(selectionOutline(PIXI, furnitureBounds(item)));
     else selected = null;
@@ -2519,6 +2549,8 @@ function wirePourDrag(engine) {
 
 /** game.js pack slot dragstart: the bottle may go onto a cultivated item or running proto here. */
 function startPourDrag(classTsid, event, engine) {
+  // BUILDER: while decorating, a pack stack goes onto a shelf, a table or the floor instead.
+  if (mode === 'decorate') return startPackDrag(classTsid, event, engine);
   if (classTsid !== WOTD || countItem(engine.inv, WOTD) < 1 || !pourTargets(engine).length || !wirePourDrag(engine)) return false;
   pourDrag = { over: null };
   engine.setData('homePourDrag', 'dragging');
@@ -2596,35 +2628,6 @@ function protoVerbs(item, engine) {
 // ---------------------------------------------------------------------------
 
 const CSS = `
-.homes-bar{position:absolute;right:10px;top:48px;bottom:112px;z-index:calc(var(--z-panel) + 5);width:min(270px,31%);display:flex;flex-direction:column;background:var(--surface-card);border-radius:var(--radius-2xl);box-shadow:0 10px 28px color-mix(in srgb, var(--c-sand-24) 24%, transparent);border:1px solid color-mix(in srgb, var(--c-umber-41) 18%, transparent);font-family:var(--font-ui);color:var(--text);overflow:hidden}
-.homes-bar[hidden]{display:none}
-.homes-bar header{display:flex;align-items:center;gap:var(--sp-4);padding:9px var(--sp-6) 7px;background:linear-gradient(180deg,var(--surface-parchment),var(--c-cream-91));border-bottom:1px solid color-mix(in srgb, var(--c-umber-41) 15%, transparent)}
-.homes-bar header h3{margin:0;font-size:var(--fs-base);flex:1}
-.homes-bar header small{color:var(--c-sand-53);font-weight:600}
-.homes-bar .hb-close{border:none;background:transparent;font-size:var(--fs-xl);cursor:pointer;color:var(--c-sand-48);line-height:var(--lh-none)}
-.homes-bar nav{display:flex;flex-wrap:wrap;gap:3px;padding:7px var(--sp-4) 0}
-.homes-bar nav button{border:1px solid color-mix(in srgb, var(--c-umber-41) 18%, transparent);background:var(--surface-parchment);border-radius:var(--radius-md) var(--radius-md) 0 0;padding:var(--sp-2) 7px;font-size:var(--fs-xs);font-weight:700;color:var(--c-sand-42);cursor:pointer}
-.homes-bar nav button.on{background:var(--surface-bright);color:var(--text);border-bottom-color:var(--c-white)}
-.homes-bar .hb-body{flex:1;padding:9px 9px var(--sp-5);overflow:auto;border-top:1px solid color-mix(in srgb, var(--c-umber-41) 15%, transparent);margin-top:-1px}
-.homes-bar .hb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:var(--sp-3)}
-.homes-bar .hb-tile{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;border:1px solid color-mix(in srgb, var(--c-umber-41) 16%, transparent);background:var(--surface-bright);border-radius:var(--radius-lg);padding:var(--sp-3) var(--sp-2) 5px;cursor:pointer;font-size:var(--fs-xs);line-height:var(--lh-tight);text-align:center;color:var(--c-sand-33)}
-.homes-bar .hb-tile:hover{border-color:var(--mood);box-shadow:0 2px 8px color-mix(in srgb, var(--mood) 25%, transparent)}
-.homes-bar .hb-tile.on{border-color:var(--c-orange-69);background:var(--c-cream-99b)}
-.homes-bar .hb-tile[disabled]{opacity:.5;cursor:not-allowed}
-.homes-bar .hb-tile img{width:44px;height:44px;object-fit:contain}
-.homes-bar .hb-tile .hb-count{position:absolute;right:5px;top:4px;font-size:var(--fs-2xs);font-weight:700;background:var(--moss);color:var(--text-inverse);border-radius:var(--radius-md);padding:0 5px}
-.homes-bar .hb-swatch{width:50px;height:50px;border-radius:var(--radius-sm);border:1px solid color-mix(in srgb, var(--c-black) 15%, transparent);background-color:var(--surface-sunken);background-size:cover}
-.homes-bar .hb-cost{font-weight:700;color:var(--c-violet-52b)}
-.homes-bar .hb-row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-3);margin:0 0 var(--sp-4)}
-.homes-bar .hb-row button,.homes-bar .hb-actions button{border:1px solid color-mix(in srgb, var(--c-umber-41) 20%, transparent);background:var(--surface-bright);border-radius:var(--radius-md);padding:5px 9px;font-size:var(--fs-sm);font-weight:700;color:var(--text-brown);cursor:pointer}
-.homes-bar .hb-row button.primary,.homes-bar .hb-actions button.primary{background:var(--c-blue-63);border-color:var(--c-blue-63);color:var(--text-inverse)}
-.homes-bar .hb-row button:disabled,.homes-bar .hb-actions button:disabled{opacity:.45;cursor:not-allowed}
-.homes-bar .hb-note{font-size:var(--fs-sm);color:var(--c-sand-51b);margin:0 0 var(--sp-4)}
-.homes-bar .hb-sel{border:1px solid var(--c-gold-88);background:var(--c-cream-99b);border-radius:var(--radius-lg);padding:7px 9px;margin:0 0 9px}
-.homes-bar .hb-sel strong{display:block;font-size:var(--fs-md)}
-.homes-bar .hb-sel p{margin:var(--sp-1) 0 var(--sp-3);font-size:var(--fs-xs);color:var(--c-sand-51b)}
-.homes-bar .hb-actions{display:flex;flex-wrap:wrap;gap:5px}
-.homes-bar h4{margin:var(--sp-4) 0 5px;font-size:var(--fs-sm);color:var(--c-sand-53);text-transform:uppercase;letter-spacing:.04em}
 .homes-modes{position:absolute;left:50%;top:92px;transform:translateX(-50%);z-index:calc(var(--z-hud) + 18);display:flex;gap:var(--sp-3)}
 .homes-modes[hidden]{display:none}
 .homes-modes button{border:none;border-radius:var(--radius-pill);padding:var(--sp-3) var(--sp-7);font-weight:700;font-size:var(--fs-sm);cursor:pointer;background:color-mix(in srgb, var(--surface-card) 94%, transparent);color:var(--text-brown);box-shadow:var(--shadow-2)}
@@ -2690,10 +2693,11 @@ function ensureUi(engine) {
   if (!document.getElementById('homes-feature-css')) {
     document.head.append(el('style', { id: 'homes-feature-css', text: CSS }));
   }
-  const bar = el('section', { class: 'homes-bar', id: 'homes-bar', hidden: true, 'aria-label': 'Home building' });
+  // BUILDER: the banner, tray, floating actions and Place button (js/ui/home-builder.js).
+  const builder = createHomeBuilder({ root, doc: document });
   const modes = el('div', { class: 'homes-modes', id: 'homes-modes', hidden: true });
-  root.append(bar, modes);
-  ui = { root, bar, modes };
+  root.append(modes);
+  ui = { root, bar: builder.bar, modes, builder };
   return ui;
 }
 
@@ -2719,9 +2723,11 @@ function beginStamping(engine, kind, key) {
 
 function stopStamping(engine) {
   if (!stamping && !stampHover) return;
+  const previewing = Boolean(stamping && stampHover);
   stamping = null;
   stampHover = null;
   drawStampMarks(engine);
+  if (previewing) redrawPreview(engine);
 }
 
 /** What a stamp would hit at a world point: one wall segment (its centre), a room's walls, the floor or the ceiling. */
@@ -3028,76 +3034,208 @@ function renderModes(engine) {
   );
 }
 
+/**
+ * BUILDER (js/ui/home-builder.js): Decorate and Cultivate as the 2012 client drew them, over a
+ * room that fills the stage: the banner (DecorateToolbarUI / CultToolbarUI), the tray in the pack's
+ * place (the furniture bag and the swatch tabs, or the cultivation picker), the actions by the
+ * selected piece and the Place button under what you carry. This builds the model; the module draws.
+ */
 function renderBar(engine) {
   if (!ensureUi(engine)) return;
-  const bar = ui.bar;
-  bar.hidden = !mode;
   renderModes(engine);
-  if (!mode) return;
-  const title = mode === 'decorate' ? (inTower() ? `Decorate ${towerApi.floorTitle()}` : 'Decorate your house') : 'Cultivate your yard';
-  const sub = mode === 'decorate'
-    ? `${decor.placed.length} placed`
-    : `◉ ${Math.floor(engine.pc.imagination || 0).toLocaleString()} iMG`;
-  const header = el('header', {}, [
-    el('h3', { text: title }),
-    el('small', { text: sub }),
-    el('button', { class: 'hb-close', type: 'button', 'aria-label': 'Close', text: '×', onclick: () => setMode(engine, null) }),
-  ]);
-  const body = el('div', { class: 'hb-body' });
-  if (mode === 'decorate') {
-    const tabs = [['furniture', 'Furniture'], ['wall', 'Walls'], ['floor', 'Floors'], ['ceiling', 'Ceilings'], ['house', inTower() ? 'Tower' : 'House']];
-    const nav = el('nav', {}, tabs.map(([id, label]) => el('button', {
-      type: 'button',
-      class: tab === id ? 'on' : '',
-      'data-home-tab': id,
-      text: label,
-      onclick: () => {
-        tab = id;
-        stopStamping(engine);
-        renderBar(engine);
-      },
-    })));
-    bar.replaceChildren(header, nav, body);
-    renderDecorateBody(engine, body);
-  } else {
-    bar.replaceChildren(header, body);
-    renderCultivateBody(engine, body);
+  if (!mode) {
+    ui.builder.render(null);
+    reserveBannerZone(engine, true);
+    return;
   }
+  ui.builder.render(mode === 'decorate' ? decorateModel(engine) : cultivateModel(engine));
+  syncFloating(engine, true);
 }
 
-function renderSelectionCard(engine, body) {
-  if (selected?.kind !== 'furniture') return;
+/** The tray tabs while decorating (PackTabberUI: Inventory, Furniture, Walls, Floors, Ceilings). */
+const DECOR_TABS = Object.freeze([['pack', 'Pack'], ['furniture', 'Furniture'], ['wall', 'Walls'], ['floor', 'Floors'], ['ceiling', 'Ceilings']]);
+
+/** The banner's buttons while decorating: DecorateToolbarUI Expand / Un-expand, the Tower's floors, the store. */
+function decorateBannerActions(engine) {
+  if (inTower()) {
+    const state = towerApi.state();
+    const costs = towerApi.expandCosts();
+    const items = Object.entries(costs.items || {}).map(([cls, n]) => `${n} ${ITEM_CATALOG[cls]?.label || cls.replace(/_/g, ' ')}`);
+    const workRows = Object.entries(costs.work || {}).map(([cls, n]) => `${n} units with a ${ITEM_CATALOG[cls]?.label || cls.replace(/_/g, ' ')}`);
+    return [{
+      label: costs.locked ? 'A floor is under construction' : costs.count ? 'Build a New Floor' : 'As tall as it gets',
+      primary: true,
+      disabled: !costs.count || costs.locked,
+      title: `${towerApi.label()} has ${state.floors} of ${TOWER_CONFIG.MAX_FLOORS} floors. Each new floor is a project at the Workbench on the floor under construction.${costs.count && !costs.locked ? ` The next floor will cost ${[...items, ...workRows].join(', ')}.` : ''}`,
+      attrs: { 'data-tower-expand': '1' },
+      onClick: () => {
+        const res = towerApi.beginExpansion(engine);
+        renderBar(engine);
+        // tower_move_players: the feature takes the owner up to the floor under construction.
+        if (res.ok) engine.toast('Up to the new floor: the Workbench is there.', 2600);
+      },
+    }];
+  }
+  const quote = quoteHouseExpansion(floors, houseDecor, engine.inv);
+  const many = floorCount(floors) > 1;
+  const segments = engine.inv.wall_segment || 0;
+  const about = many
+    ? `Your house is ${decor.wallSegments} wall segments wide (the most is 20) and ${floorCount(floors)} floors high. The next segment goes on every floor and takes ${itemsText(quote.items)}.`
+    : `Your house is ${decor.wallSegments} wall segments wide (the most is 20). Each extra segment takes one Wall Segment, made with a Construction Tool.`;
+  return [
+    {
+      label: 'Expand',
+      icon: '↔',
+      disabled: !quote.ok,
+      title: `${about}${!quote.ok && quote.msg ? ` ${quote.msg}` : many ? '' : ` You have ${segments} Wall Segment${segments === 1 ? '' : 's'}.`}`,
+      attrs: { 'data-home-expand': 'house' },
+      onClick: () => expandHouse(engine),
+    },
+    { label: UNEXPAND_TEXT.button, attrs: { 'data-home-unexpand': 'house' }, onClick: () => confirmUnexpand(engine) },
+  ];
+}
+
+function decorateModel(engine) {
+  const tabId = DECOR_TABS.some(([id]) => id === tab) ? tab : 'furniture';
+  const model = {
+    mode: 'decorate',
+    title: BUILDER_TEXT.decorateTitle,
+    hint: inTower() ? `${towerApi.floorTitle()} · ${BUILDER_TEXT.decorateHint}` : BUILDER_TEXT.decorateHint,
+    closeLabel: 'Leave Decoration Mode',
+    onClose: () => setMode(engine, null),
+    bannerActions: decorateBannerActions(engine),
+    tabs: DECOR_TABS.map(([id, label]) => ({ id, label })),
+    tab: tabId,
+    tabsLabel: 'Decorate with',
+    onTab: (id) => {
+      tab = id;
+      stopStamping(engine);
+      // PackDisplayManager: leaving a swatch tab leaves its preview.
+      redrawPreview(engine);
+      renderBar(engine);
+    },
+    trayLabel: 'Decoration tray',
+    // The Furniture Store, by the furniture it sells (the original reached it from the house's menu).
+    footActions: [{ label: 'Furniture Store', attrs: { 'data-home-store': '1' }, onClick: () => openStore(engine) }],
+  };
+  if (tabId === 'pack') {
+    // The pack itself shows below the tabs (the Inventory tab): drag things onto shelves and tables.
+    return { ...model, panelHidden: true, note: BUILDER_TEXT.packNote };
+  }
+  if (tabId === 'furniture') return { ...model, ...furnitureTray(engine) };
+  return { ...model, ...swatchTray(engine, tabId) };
+}
+
+/** The furniture bag: every piece you can place (storage, then the pack), its filter row and counts. */
+function furnitureTray(engine) {
+  const list = listPlaceable(decor, engine.inv);
+  const filters = trayFilters(list);
+  if (!filters.some((f) => f.id === trayFilter)) trayFilter = 'all';
+  const rows = filterTiles(list, trayFilter);
+  return {
+    stripLabel: 'Furniture',
+    stripKey: `furniture:${trayFilter}`,
+    filters: list.length ? filters : [],
+    filter: trayFilter,
+    onFilter: (id) => {
+      trayFilter = id;
+      renderBar(engine);
+    },
+    empty: list.length ? '' : BUILDER_TEXT.emptyFurniture,
+    note: placing?.kind === 'furniture'
+      ? (placing.moveId ? 'Click where it goes, or drop it on the tray to put it away. Esc cancels.' : 'Click in the room to place it. Esc cancels.')
+      : '',
+    tiles: rows.map((row) => {
+      const on = placing?.kind === 'furniture' && !placing.moveId && placing.classTsid === row.classTsid && (placing.style ?? null) === (row.style ?? null);
+      const where = `${row.stored ? `${row.stored} in storage` : ''}${row.stored && row.packed ? ', ' : ''}${row.packed ? `${row.packed} in pack` : ''}`;
+      return {
+        // G358: an upgraded piece in storage shows its own art.
+        img: row.upgradeId ? pieceArt(row.classTsid, row.upgradeId).path : `assets/sprites/icons/${row.classTsid}.png`,
+        label: row.label,
+        count: row.total,
+        on,
+        title: `${row.label} (${where}). Drag it into the room, or click it and then click the room.`,
+        ariaLabel: `${row.label}, ${row.total}`,
+        describedBy: 'homes-keys-help',
+        attrs: { 'data-furniture': row.classTsid, 'data-furniture-style': row.style ?? false },
+        onActivate: ({ keyboard }) => {
+          if (on) return cancelCarry(engine);
+          beginPlacing(engine, row.classTsid, null, row.style);
+          if (keyboard) carryWithKeys(engine);
+        },
+        onDragStart: (e) => startTrayDrag(engine, e, () => beginPlacing(engine, row.classTsid, null, row.style)),
+        onDragMove: (e) => moveDrag(engine, e),
+        onDragEnd: (e, how) => endDrag(engine, e, how),
+      };
+    }),
+  };
+}
+
+/** The Walls / Floors / Ceilings tabs (SwatchBagUI): pick one, then click the room. */
+function swatchTray(engine, kind) {
+  const current = decor[kind];
+  const mixed = kind === 'wall' && decor.walls?.some((row) => row !== decor.wall);
+  const now = mixed ? 'a mix of wallpapers' : textureConfig(kind, current)?.name || current;
+  const how = kind === 'wall'
+    ? 'Pick a swatch, then click a wall: the middle of a segment papers just that segment, anywhere else papers the whole room.'
+    : `Pick a swatch, then click the ${kind}.`;
+  const groups = [];
+  for (const row of listTextures(kind)) {
+    if (!groups.length || groups[groups.length - 1].heading !== row.category) groups.push({ heading: row.category, tiles: [] });
+    const armed = stamping?.kind === kind && stamping.key === row.key;
+    const name = row.name;
+    groups[groups.length - 1].tiles.push({
+      kind: 'swatch',
+      swatch: swatchUrl(kind, row.key),
+      label: name,
+      on: armed || (!stamping && row.key === current && !mixed),
+      title: row.costCredits ? `${name} (${row.costCredits} credits in the original)` : name,
+      attrs: { 'data-swatch': `${kind}:${row.key}` },
+      onActivate: () => (armed ? (stopStamping(engine), renderBar(engine)) : beginStamping(engine, kind, row.key)),
+    });
+  }
+  return {
+    stripLabel: `${kind[0].toUpperCase()}${kind.slice(1)} swatches`,
+    stripKey: `swatch:${kind}`,
+    groups,
+    note: stamping ? `Click the room to apply ${textureConfig(stamping.kind, stamping.key)?.name}. Esc cancels.` : `Now: ${now}. ${how} Swatches are free to apply.`,
+  };
+}
+
+/** The selected piece's actions, floating by it (the old panel's selection card). */
+function furniturePop(engine) {
+  if (selected?.kind !== 'furniture' || placing) return null;
   const item = placedItem(decor, selected.id);
-  if (!item) return;
+  if (!item) return null;
   const def = furnitureDef(item.classTsid);
   const actions = [
-    el('button', { type: 'button', 'data-home-action': 'move', text: 'Move', onclick: () => beginMove(engine, item.id) }),
+    { label: 'Move', attrs: { 'data-home-action': 'move' }, onClick: () => { beginMove(engine, item.id); carryWithKeys(engine, item); } },
     ...upgradeButtons(engine, item),
-    el('button', { type: 'button', 'data-home-action': 'flip', text: 'Flip', disabled: !def.canFlip, onclick: () => runFurnitureAction(engine, 'flip') }),
-    el('button', { type: 'button', 'data-home-action': 'forward', text: 'Forward', onclick: () => runFurnitureAction(engine, 'forward') }),
-    el('button', { type: 'button', 'data-home-action': 'back', text: 'Back', onclick: () => runFurnitureAction(engine, 'back') }),
-    el('button', { type: 'button', 'data-home-action': 'pickup', text: 'Pick up', onclick: () => runFurnitureAction(engine, 'pickup') }),
+    { label: 'Flip', disabled: !def.canFlip, attrs: { 'data-home-action': 'flip' }, onClick: () => runFurnitureAction(engine, 'flip') },
+    { label: 'Forward', title: 'Bring it in front', attrs: { 'data-home-action': 'forward' }, onClick: () => runFurnitureAction(engine, 'forward') },
+    { label: 'Back', title: 'Send it behind', attrs: { 'data-home-action': 'back' }, onClick: () => runFurnitureAction(engine, 'back') },
+    { label: 'Pick up', attrs: { 'data-home-action': 'pickup' }, onClick: () => runFurnitureAction(engine, 'pickup') },
   ];
+  const extra = [];
+  let key = `f:${item.id}:${item.upgradeId || ''}:${item.facingRight}`;
   if (item.classTsid === 'bag_furniture_sdb') {
     if (item.display) {
-      actions.push(el('button', { type: 'button', text: `Take out ${item.display.count}`, onclick: () => runFurnitureAction(engine, 'withdraw') }));
+      actions.push({ label: `Take out ${item.display.count}`, attrs: { 'data-home-action': 'withdraw' }, onClick: () => runFurnitureAction(engine, 'withdraw') });
     }
     const choices = displayableItems(engine);
     if (choices.length) {
-      const select = el('select', { 'aria-label': 'Item to display' }, choices.map((row) => el('option', { value: row.classTsid, text: `${row.label} (${row.count})` })));
-      actions.push(select, el('button', {
+      const select = el('select', { 'aria-label': 'Item to display', 'data-home-display': '1' }, choices.map((row) => el('option', { value: row.classTsid, text: `${row.label} (${row.count})` })));
+      extra.push(select, el('button', {
         type: 'button',
-        class: 'primary',
+        class: 'hb-bt primary',
+        'data-home-action': 'deposit',
         text: 'Display',
         onclick: () => runFurnitureAction(engine, 'deposit', select.value),
       }));
     }
+    key += `:${item.display?.classTsid || ''}:${item.display?.count || 0}:${choices.map((r) => `${r.classTsid}${r.count}`).join()}`;
   }
-  body.append(el('div', { class: 'hb-sel' }, [
-    el('strong', { text: pieceLabel(item, def.label) }),
-    el('p', { text: def.desc || '' }),
-    el('div', { class: 'hb-actions' }, actions),
-  ]));
+  return { key, title: pieceLabel(item, def.label), sub: def.desc || '', actions, extra };
 }
 
 // ---------------------------------------------------------------------------
@@ -3112,6 +3250,7 @@ function upgradeButtons(engine, item) {
   const locked = typeof sale === 'string' && sale;
   return [el('button', {
     type: 'button',
+    class: 'hb-bt',
     'data-home-action': verb.id,
     text: verb.label,
     title: locked ? UPGRADE_TEXT.forSale : verb.tooltip,
@@ -3316,214 +3455,140 @@ function displayableItems(engine) {
     .slice(0, 80);
 }
 
-function renderDecorateBody(engine, body) {
-  renderSelectionCard(engine, body);
-  if (tab === 'furniture') {
-    const list = listPlaceable(decor, engine.inv);
-    if (!list.length) {
-      body.append(el('p', { class: 'hb-note', text: 'Everything is placed. Pick something up, buy furniture at the Furniture Store, or build some with a Construction Tool.' }));
-    } else {
-      body.append(el('p', { class: 'hb-note', text: placing ? 'Click in the room to place it. Esc cancels.' : 'Choose a piece, then click in the room to place it. Click placed furniture to move, flip or pick it up.' }));
-      body.append(el('div', { class: 'hb-grid' }, list.map((row) => el('button', {
-        type: 'button',
-        class: `hb-tile${placing?.classTsid === row.classTsid && (placing?.style ?? null) === (row.style ?? null) ? ' on' : ''}`,
-        'data-furniture': row.classTsid,
-        'data-furniture-style': row.style ?? false,
-        title: `${row.label} · ${row.slot}${row.stored ? ` · ${row.stored} in storage` : ''}${row.packed ? ` · ${row.packed} in pack` : ''}`,
-        onclick: () => beginPlacing(engine, row.classTsid, null, row.style),
-      }, [
-        // G358: an upgraded piece in storage shows its own art.
-        el('img', { src: row.upgradeId ? pieceArt(row.classTsid, row.upgradeId).path : `assets/sprites/icons/${row.classTsid}.png`, alt: '' }),
-        el('span', { text: row.label }),
-        el('span', { class: 'hb-count', text: String(row.total) }),
-      ]))));
-    }
-    body.append(el('div', { class: 'hb-row', style: 'margin-top:9px' }, [
-      el('button', { type: 'button', 'data-home-store': '1', text: 'Furniture Store', onclick: () => openStore(engine) }),
-    ]));
-    return;
-  }
-  if (tab === 'house' && inTower()) {
-    renderTowerTab(engine, body);
-    return;
-  }
-  if (tab === 'house') {
-    const quote = quoteHouseExpansion(floors, houseDecor, engine.inv);
-    const many = floorCount(floors) > 1;
-    body.append(el('p', { class: 'hb-note', text: many
-      ? `Your house is ${decor.wallSegments} wall segments wide (the most is 20) and ${floorCount(floors)} floors high. The next segment goes on every floor and takes ${itemsText(quote.items)}.`
-      : `Your house is ${decor.wallSegments} wall segments wide (the most is 20). Each extra segment takes one Wall Segment, made with a Construction Tool.` }));
-    body.append(el('div', { class: 'hb-row' }, [
-      el('button', {
-        type: 'button',
-        class: 'primary',
-        'data-home-expand': 'house',
-        disabled: !quote.ok,
-        text: many ? 'Expand house' : `Expand house (${engine.inv.wall_segment || 0} Wall Segment${(engine.inv.wall_segment || 0) === 1 ? '' : 's'})`,
-        onclick: () => expandHouse(engine),
-      }),
-      el('button', {
-        type: 'button',
-        'data-home-unexpand': 'house',
-        text: UNEXPAND_TEXT.button,
-        onclick: () => confirmUnexpand(engine),
-      }),
-    ]));
-    if (!quote.ok && quote.msg) body.append(el('p', { class: 'hb-note', text: quote.msg }));
-    return;
-  }
-  const kind = tab;
-  const current = decor[kind];
-  const mixed = kind === 'wall' && decor.walls?.some((row) => row !== decor.wall);
-  const now = mixed ? 'a mix of wallpapers' : textureConfig(kind, current)?.name || current;
-  const how = kind === 'wall'
-    ? 'Pick a swatch, then click a wall: the middle of a segment papers just that segment, anywhere else papers the whole room.'
-    : `Pick a swatch, then click the ${kind}.`;
-  body.append(el('p', { class: 'hb-note', text: stamping ? `Click the room to apply ${textureConfig(stamping.kind, stamping.key)?.name}. Esc cancels.` : `Now: ${now}. ${how} Swatches are free to apply.` }));
-  let lastCat = '';
-  const grid = [];
-  const flush = () => {
-    if (grid.length) body.append(el('div', { class: 'hb-grid' }, grid.splice(0)));
-  };
-  for (const row of listTextures(kind)) {
-    if (row.category !== lastCat) {
-      flush();
-      body.append(el('h4', { text: row.category }));
-      lastCat = row.category;
-    }
-    const armed = stamping?.kind === kind && stamping.key === row.key;
-    grid.push(el('button', {
-      type: 'button',
-      class: `hb-tile${armed || (!stamping && row.key === current && !mixed) ? ' on' : ''}`,
-      'data-swatch': `${kind}:${row.key}`,
-      title: row.costCredits ? `${row.name} (${row.costCredits} credits in the original)` : row.name,
-      onclick: () => (armed ? (stopStamping(engine), renderBar(engine)) : beginStamping(engine, kind, row.key)),
-    }, [el('span', { class: 'hb-swatch', style: `background-image:url(${swatchUrl(kind, row.key)})` }), el('span', { text: row.name })]));
-  }
-  flush();
-}
-
-/** The Decorate bar's Tower tab: floors and Build a New Floor (tower_get_expand_costs / tower_start_expand). */
-function renderTowerTab(engine, body) {
-  const state = towerApi.state();
-  const costs = towerApi.expandCosts();
-  body.append(el('p', { class: 'hb-note', text: `${towerApi.label()} has ${state.floors} of ${TOWER_CONFIG.MAX_FLOORS} floors. Each new floor is a project at the Workbench on the floor under construction.` }));
-  if (costs.count && !costs.locked) {
-    const items = Object.entries(costs.items).map(([cls, n]) => `${n} ${ITEM_CATALOG[cls]?.label || cls.replace(/_/g, ' ')}`);
-    const workRows = Object.entries(costs.work).map(([cls, n]) => `${n} units with a ${ITEM_CATALOG[cls]?.label || cls.replace(/_/g, ' ')}`);
-    body.append(el('h4', { text: 'The next floor will cost' }));
-    body.append(el('p', { class: 'hb-note', text: [...items, ...workRows].join(' · ') }));
-  }
-  body.append(el('div', { class: 'hb-row' }, [
-    el('button', {
-      type: 'button',
-      class: 'primary',
-      'data-tower-expand': '1',
-      disabled: !costs.count || costs.locked,
-      text: costs.locked ? 'A floor is under construction' : costs.count ? 'Build a New Floor' : 'As tall as it gets',
-      onclick: () => {
-        const res = towerApi.beginExpansion(engine);
-        renderBar(engine);
-        // tower_move_players: the feature takes the owner up to the floor under construction.
-        if (res.ok) engine.toast('Up to the new floor: the Workbench is there.', 2600);
-      },
-    }),
-  ]));
-}
-
-function renderCultivateBody(engine, body) {
+/**
+ * Cultivation Mode's tray (CultPickerUI): the hint and your iMG on the left, each choice with its
+ * name, art and cost, and the yard's expansions (HouseExpandYardDialog) on the right.
+ */
+function cultivateModel(engine) {
   const st = activeCult();
   const back = isBackYard(st);
-  if (selected?.kind === 'cultivation') {
-    const item = st.items.find((row) => row.id === selected.id);
-    if (item) {
-      const def = cultivationDef(item.protoClass);
-      const nudge = engine.learnedSkills.includes('nudgery_1');
-      const isTower = def.kind === 'tower';
-      const wine = countItem(engine.inv, WOTD) > 0;
-      const running = item.depleted && projectApi.inProgress(restoreJobId(item, st));
-      const life = Math.round(lifespanMultiplier(item) * 100);
-      const actions = [
-        el('button', { type: 'button', 'data-home-action': 'nudge', disabled: !nudge, title: nudge ? 'Move it along the yard' : 'Needs the Nudgery skill', text: 'Nudge', onclick: () => beginNudge(engine, item.id) }),
-        el('button', {
-          type: 'button',
-          'data-home-action': 'remove',
-          text: 'Remove',
-          disabled: item.endClass === TOWER_CHASSIS || running,
-          title: item.endClass === TOWER_CHASSIS ? 'A finished Tower stays.' : running ? 'Pour some Wine of the Dead to cancel the project first.' : '',
-          onclick: () => removeSelected(engine),
-        }),
-      ];
-      if (item.depleted) {
-        actions.unshift(el('button', { type: 'button', class: 'primary', 'data-home-action': 'restore', text: 'Restore', onclick: () => projectApi.open(engine, restoreJobId(item, st)) }));
-      }
-      if (!isTower && (running || !item.depleted)) {
-        actions.push(el('button', {
-          type: 'button',
-          'data-home-action': 'wotd',
-          text: 'Pour Wine of the Dead',
-          disabled: !wine,
-          title: wine ? (item.depleted ? 'Cancel the restore project' : 'Wear it out now (its restore will not lengthen its life)') : 'You need a Wine of the Dead.',
-          onclick: () => pourWine(engine, item.id),
-        }));
-      }
-      body.append(el('div', { class: 'hb-sel' }, [
-        el('strong', { text: isTower ? towerApi.label() : item.depleted ? `${def.label} (worn out)` : def.label }),
-        el('p', { text: isTower
-          ? (item.endClass === TOWER_CHASSIS ? 'Built. Step inside to decorate its floors.' : 'A Tower project. Click it in the yard to see what it needs.')
-          : item.depleted
-            ? `Worn out. A Restore project brings it back${item.wotd ? '' : ` with ${Math.round(Math.min(2, lifespanMultiplier(item) + 0.05) * 100)}% of its lifespan`}.`
-            : `Lifespan ${Math.round(lifespanLeft(item, qaWear(engine)) * 100)}% (${usesLeft(item, qaWear(engine))} uses left; ${life}% of the original).` }),
-        el('div', { class: 'hb-actions' }, actions),
-      ]));
-    }
-  }
-  // magic_rock.js howto_cultivate: "anything you cultivate on your home street will be usable by visitors; anything in your yard is private."
-  body.append(el('p', { class: 'hb-note', text: placing
-    ? 'Click your yard to place it. Esc cancels.'
-    : back
-      ? 'Spend imagination to grow gardens, rocks and patches in your yard. Anything in your yard is private. Each one costs a little more than the last.'
-      : 'Spend imagination to grow gardens, rocks and patches on your street. Each one costs a little more than the last.' }));
   const choices = cultivationChoices(st, engine.pc);
-  body.append(el('div', { class: 'hb-grid' }, choices.map((row) => el('button', {
-    type: 'button',
-    class: `hb-tile${placing?.protoClass === row.protoClass ? ' on' : ''}`,
-    'data-cultivate': row.protoClass,
-    disabled: !row.canPlace,
-    title: row.reason || `${row.label}: ${row.cost} iMG`,
-    onclick: () => beginCultivate(engine, row.protoClass),
-  }, [
-    el('img', { src: cultivationIcon(row.protoClass), alt: '' }),
-    el('span', { text: row.label }),
-    el('span', { class: 'hb-cost', text: row.canPlace || row.reason.startsWith('Needs') ? `◉ ${row.cost.toLocaleString()}` : `Lv ${row.minLevel}` }),
-  ]))));
+  const model = {
+    mode: 'cultivate',
+    title: BUILDER_TEXT.cultivateTitle,
+    hint: BUILDER_TEXT.cultivateHint,
+    closeLabel: 'Leave Cultivation Mode',
+    onClose: () => setMode(engine, null),
+    bannerActions: [],
+    trayLabel: 'Cultivation tray',
+    stripLabel: back ? 'Things to grow in your yard' : 'Things to grow on your street',
+    stripKey: `cult:${back ? 'yard' : 'street'}`,
+    // magic_rock.js howto_cultivate: "anything you cultivate on your home street will be usable by visitors; anything in your yard is private."
+    aside: {
+      text: placing?.kind === 'cultivation' ? 'Walk or point to where it goes, then Place it. Esc cancels.' : cultChooseText(back),
+      balance: `You have ◉ ${Math.floor(engine.pc.imagination || 0).toLocaleString('en-US')} iMG`,
+    },
+    note: back
+      ? 'Anything in your yard is private. Each one costs a little more than the last.'
+      : 'Anything on your street can be used by visitors. Each one costs a little more than the last.',
+    tiles: choices.map((row) => {
+      const on = placing?.kind === 'cultivation' && !placing.moveId && placing.protoClass === row.protoClass;
+      const cost = row.canPlace || row.reason.startsWith('Needs') ? `◉ ${row.cost.toLocaleString('en-US')}` : `Lv ${row.minLevel}`;
+      return {
+        kind: 'cult',
+        img: cultivationIcon(row.protoClass),
+        label: row.label,
+        labelTop: true,
+        cost,
+        on,
+        disabled: !row.canPlace,
+        title: row.reason || `${row.label}: ${row.cost} iMG. Drag it onto your yard, or click it to carry it.`,
+        ariaLabel: `${row.label}, ${row.canPlace ? `${row.cost} iMG` : row.reason}`,
+        attrs: { 'data-cultivate': row.protoClass },
+        onActivate: ({ keyboard }) => {
+          if (on) return cancelCarry(engine);
+          beginCultivate(engine, row.protoClass);
+          // CultManager: what you carry rides at your feet; walk to move it, then Place.
+          if (keyboard) {
+            carryBy = 'avatar';
+            pointer.inside = false;
+            updateGhost(engine);
+            syncFloating(engine, true);
+            ui?.builder?.place?.focus?.({ preventScroll: true });
+          }
+        },
+        onDragStart: (e) => startTrayDrag(engine, e, () => beginCultivate(engine, row.protoClass)),
+        onDragMove: (e) => moveDrag(engine, e),
+        onDragEnd: (e, how) => endDrag(engine, e, how),
+      };
+    }),
+  };
   if (back) {
     // HouseExpandYardDialog inside the house: "Expand your yard", one way (left), "Expand for Ni".
     const quote = quoteYardExpansion(st, engine.pc);
-    body.append(el('h4', { text: 'Expand your yard' }));
-    body.append(el('div', { class: 'hb-row' }, [
-      el('button', {
-        type: 'button',
-        'data-home-expand': 'yard',
+    return {
+      ...model,
+      trayActionsLabel: 'Expand your yard',
+      trayActions: [{
+        label: quote.count ? `← Expand for ${quote.cost.toLocaleString('en-US')}i` : 'Expand',
         disabled: !quote.ok,
-        text: quote.count ? `← Expand for ${quote.cost.toLocaleString()}i` : 'Expand',
         title: quote.msg || '',
-        onclick: () => growYard(engine, 'left'),
-      }),
-    ]));
-    body.append(el('p', { class: 'hb-note', text: quote.count
-      ? `This yard can be expanded ${quote.count} more ${quote.count === 1 ? 'time' : 'times'}.`
-      : "This yard can't be expanded anymore." }));
-    return;
+        attrs: { 'data-home-expand': 'yard' },
+        onClick: () => growYard(engine, 'left'),
+      }],
+      trayActionsNote: quote.count
+        ? `This yard can be expanded ${quote.count} more ${quote.count === 1 ? 'time' : 'times'}.`
+        : "This yard can't be expanded anymore.",
+    };
   }
   const left = quoteYardExpansion(cult, engine.pc, 'left');
   const right = quoteYardExpansion(cult, engine.pc, 'right');
-  body.append(el('h4', { text: 'Expand your street' }));
-  body.append(el('div', { class: 'hb-row' }, [
-    el('button', { type: 'button', 'data-home-expand': 'left', disabled: !left.ok, text: `← Left (◉ ${left.cost})`, title: left.msg || '', onclick: () => growYard(engine, 'left') }),
-    el('button', { type: 'button', 'data-home-expand': 'right', disabled: !right.ok, text: `Right → (◉ ${right.cost})`, title: right.msg || '', onclick: () => growYard(engine, 'right') }),
-  ]));
-  body.append(el('p', { class: 'hb-note', text: `${left.countLeft} left and ${right.countRight} right expansions remain.` }));
+  return {
+    ...model,
+    trayActionsLabel: 'Expand your street',
+    trayActions: [
+      { label: `← Left ◉ ${left.cost.toLocaleString('en-US')}`, disabled: !left.ok, title: left.msg || '', ariaLabel: `Expand left for ${left.cost} iMG`, attrs: { 'data-home-expand': 'left' }, onClick: () => growYard(engine, 'left') },
+      { label: `Right ◉ ${right.cost.toLocaleString('en-US')} →`, disabled: !right.ok, title: right.msg || '', ariaLabel: `Expand right for ${right.cost} iMG`, attrs: { 'data-home-expand': 'right' }, onClick: () => growYard(engine, 'right') },
+    ],
+    trayActionsNote: `${left.countLeft} left and ${right.countRight} right expansions remain.`,
+  };
+}
+
+/** A selected cultivation's actions, floating by it: Restore, Nudge, Remove, Pour Wine of the Dead. */
+function cultivationPop(engine) {
+  if (selected?.kind !== 'cultivation' || placing) return null;
+  const st = activeCult();
+  const item = st.items.find((row) => row.id === selected.id);
+  if (!item) return null;
+  const def = cultivationDef(item.protoClass);
+  const nudge = engine.learnedSkills.includes('nudgery_1');
+  const isTower = def.kind === 'tower';
+  const wine = countItem(engine.inv, WOTD) > 0;
+  const running = item.depleted && projectApi.inProgress(restoreJobId(item, st));
+  const life = Math.round(lifespanMultiplier(item) * 100);
+  const actions = [
+    { label: 'Nudge', disabled: !nudge, title: nudge ? 'Move it along the yard' : 'Needs the Nudgery skill', attrs: { 'data-home-action': 'nudge' }, onClick: () => { beginNudge(engine, item.id); carryBy = 'avatar'; pointer.inside = false; syncFloating(engine, true); ui?.builder?.place?.focus?.({ preventScroll: true }); } },
+    {
+      label: 'Remove',
+      disabled: item.endClass === TOWER_CHASSIS || running,
+      title: item.endClass === TOWER_CHASSIS ? 'A finished Tower stays.' : running ? 'Pour some Wine of the Dead to cancel the project first.' : '',
+      attrs: { 'data-home-action': 'remove' },
+      onClick: () => removeSelected(engine),
+    },
+  ];
+  if (item.depleted) {
+    actions.unshift({ label: 'Restore', primary: true, attrs: { 'data-home-action': 'restore' }, onClick: () => projectApi.open(engine, restoreJobId(item, st)) });
+  }
+  if (!isTower && (running || !item.depleted)) {
+    actions.push({
+      label: 'Pour Wine of the Dead',
+      disabled: !wine,
+      title: wine ? (item.depleted ? 'Cancel the restore project' : 'Wear it out now (its restore will not lengthen its life)') : 'You need a Wine of the Dead.',
+      attrs: { 'data-home-action': 'wotd' },
+      onClick: () => pourWine(engine, item.id),
+    });
+  }
+  const sub = isTower
+    ? (item.endClass === TOWER_CHASSIS ? 'Built. Step inside to decorate its floors.' : 'A Tower project. Click it in the yard to see what it needs.')
+    : item.depleted
+      ? `Worn out. A Restore project brings it back${item.wotd ? '' : ` with ${Math.round(Math.min(2, lifespanMultiplier(item) + 0.05) * 100)}% of its lifespan`}.`
+      : `Lifespan ${Math.round(lifespanLeft(item, qaWear(engine)) * 100)}% (${usesLeft(item, qaWear(engine))} uses left; ${life}% of the original).`;
+  return {
+    key: `c:${item.id}:${item.depleted ? 1 : 0}:${running ? 1 : 0}:${wine ? 1 : 0}:${nudge ? 1 : 0}:${sub}`,
+    title: isTower ? towerApi.label() : item.depleted ? `${def.label} (worn out)` : def.label,
+    sub,
+    actions,
+  };
 }
 
 function cultivationIcon(protoClass) {
@@ -3548,8 +3613,14 @@ function setMode(engine, next) {
   mode = next;
   placing = null;
   selected = null;
+  drag = null;
+  packDrag = null;
+  carryBy = 'pointer';
+  heldPan.clear();
+  setHover(engine, null);
   stopStamping(engine);
-  tab = tab || 'furniture';
+  // PackDisplayManager: entering Decoration Mode opens the Furniture tab.
+  if (next === 'decorate' && (!tab || tab === 'house' || tab === 'pack')) tab = 'furniture';
   destroyGhost();
   if (mode === 'cultivate') drawCultivationMarkers(engine);
   else if (scene) {
@@ -3602,6 +3673,8 @@ function toggleCultivateKey(engine) {
 
 function beginPlacing(engine, classTsid, from = null, style = null) {
   placing = { kind: 'furniture', classTsid, from };
+  carryBy = 'pointer';
+  stopStamping(engine);
   // G358: an upgraded piece from storage (its index in decor.styles[class]).
   if (Number.isInteger(style)) {
     placing.style = style;
@@ -3624,7 +3697,10 @@ function beginMove(engine, id) {
     }
   }
   placing = { kind: 'furniture', classTsid: item.classTsid, moveId: id, upgradeId: item.upgradeId || '' };
+  carryBy = 'pointer';
+  setHover(engine, null);
   makeGhost(engine);
+  renderFurniture(engine);
   renderBar(engine);
 }
 
@@ -3647,6 +3723,7 @@ function beginCultivate(engine, protoClass, opts = {}) {
     return;
   }
   placing = { kind: 'cultivation', protoClass };
+  carryBy = 'pointer';
   selected = null;
   makeGhost(engine);
   drawCultivationMarkers(engine);
@@ -3657,6 +3734,7 @@ function beginNudge(engine, id) {
   const item = activeCult().items.find((row) => row.id === id);
   if (!item) return;
   placing = { kind: 'cultivation', protoClass: item.protoClass, moveId: id };
+  carryBy = 'pointer';
   makeGhost(engine);
   renderBar(engine);
 }
@@ -3885,6 +3963,7 @@ function placeAtPointer(engine, at) {
 function destroyGhost() {
   if (scene?.ghost && !scene.ghost.destroyed) scene.ghost.destroy({ children: true });
   if (scene) scene.ghost = null;
+  keyCarry = null;
 }
 
 function makeGhost(engine) {
@@ -3906,52 +3985,89 @@ function makeGhost(engine) {
     g.addChild(pad);
     g.pad = pad;
     g.half = half;
-    const label = new PIXI.Text({ text: cultivationDef(placing.protoClass).label, style: {
-      fontFamily: 'Trebuchet MS, sans-serif',
-      fontSize: 13,
-      fontWeight: '700',
-      fill: 0xffffff,
-      stroke: { color: 0x3b2a1f, width: 4 },
-    } });
-    label.anchor.set(0.5, 1);
-    label.y = -18;
-    g.addChild(label);
+    // CultCarryUI: the item's own art over its placement line.
+    const art = new PIXI.Sprite(textureFromUrl(cultivationIcon(placing.protoClass)));
+    art.anchor.set(0.5, 1);
+    art.alpha = 0.85;
+    const fit = () => {
+      const w = art.texture?.width || 1;
+      const h = art.texture?.height || 1;
+      art.scale.set(Math.min(1.4, 96 / Math.max(w, h)));
+    };
+    fit();
+    if (!isLoaded(art.texture?.source)) onLoaded(art.texture?.source, () => !art.destroyed && fit());
+    art.y = -6;
+    g.addChild(art);
+    g.art = art;
   }
   engine.entityLayer.addChild(g);
   scene.ghost = g;
   updateGhost(engine);
 }
 
+/** Where what you carry is now (world x, y): the keys' point, the pointer, or at your feet. */
+function carryAt(engine) {
+  if (carryBy === 'keys' && keyCarry) return keyCarry;
+  if (carryBy !== 'avatar' && pointer.inside) return pointer;
+  return { x: engine.player?.x ?? 400, y: GROUND_Y - 120 };
+}
+
 function updateGhost(engine) {
   const g = scene?.ghost;
   if (!g || !placing) return;
-  const at = pointer.inside ? pointer : { x: engine.player?.x ?? 400, y: GROUND_Y - 120 };
+  const at = carryAt(engine);
+  g.alpha = drag?.over === 'tray' ? 0.3 : 1;
   if (placing.kind === 'furniture') {
     // Furniture lives in room x; the room starts at the back yard's edge.
     const snap = snapPlacement(decor, placing.classTsid, toRoom(at), placing.moveId || null, placing.upgradeId || '');
     g.x = snap.x + roomX0();
     g.y = snap.y;
+    g.ok = true;
     return;
   }
   const st = activeCult();
   const rx = Math.round(at.x - homeStreetLayout(st).houseX);
   const ok = placementCheck(st, placing.protoClass, rx, placing.moveId || null).ok;
+  g.ok = ok;
   g.x = at.x;
   g.y = yardGroundY(st);
   g.pad.clear();
   g.pad.roundRect(-g.half, -10, g.half * 2, 20, 10).fill({ color: ok ? 0x7cc35a : 0xe0574a, alpha: 0.35 });
   g.pad.roundRect(-g.half, -10, g.half * 2, 20, 10).stroke({ width: 2, color: ok ? 0x7cc35a : 0xe0574a, alpha: 0.95 });
+  if (g.art) g.art.alpha = ok ? 0.9 : 0.45;
+}
+
+/** The game canvas's rect and its css px per view px. */
+function canvasFrame(engine) {
+  const canvas = gameCanvas();
+  const rect = canvas?.getBoundingClientRect?.();
+  if (!rect?.width) return null;
+  return { rect, k: (engine.camera?.w || 960) / rect.width };
 }
 
 function worldPoint(engine, event) {
-  const canvas = event.target;
-  const rect = canvas.getBoundingClientRect();
+  const f = canvasFrame(engine);
+  if (!f) return { x: pointer.x, y: pointer.y };
   // CSS px per view px: the view follows the window (g458).
-  const k = (engine.camera?.w || 960) / rect.width;
-  const sx = (event.clientX - rect.left) * k;
-  const sy = (event.clientY - rect.top) * k;
+  const sx = (event.clientX - f.rect.left) * f.k;
+  const sy = (event.clientY - f.rect.top) * f.k;
   const p = engine.entityLayer.toLocal(new engine.PIXI.Point(sx, sy));
   return { x: p.x, y: p.y };
+}
+
+/** A world point (entity layer) as a client point. */
+function clientPoint(engine, x, y) {
+  const f = canvasFrame(engine);
+  if (!f) return null;
+  const g = engine.entityLayer.toGlobal(new engine.PIXI.Point(x, y));
+  return { x: f.rect.left + g.x / f.k, y: f.rect.top + g.y / f.k };
+}
+
+function overCanvas(e) {
+  const canvas = gameCanvas();
+  if (!canvas) return false;
+  const r = canvas.getBoundingClientRect();
+  return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
 }
 
 function furnitureAt(point) {
@@ -3965,31 +4081,469 @@ function furnitureAt(point) {
   return null;
 }
 
+// ---------------------------------------------------------------------------
+// BUILDER: carrying, dragging, the keys (client HandOfDecorator, CultManager)
+// ---------------------------------------------------------------------------
+
+let drag = null; // { source: 'tray'|'room', id?, over: 'room'|'tray'|null }
+let carryBy = 'pointer'; // what moves the thing you carry: 'pointer' | 'keys' | 'avatar'
+let keyCarry = null; // the keys' point while carrying with them (world)
+let trayFilter = 'all';
+let hoverId = null;
+let popModel = null;
+let packDrag = null; // { classTsid, count, furniture }
+let packDragWired = false;
+let lastClient = null; // the pointer's last client point while dragging
+let edgeSince = 0;
+const heldPan = new Set();
+let heldFast = false;
+
+/** Stop carrying anything (Esc, or a drop that went nowhere). */
+function cancelCarry(engine) {
+  const wasMove = placing?.moveId;
+  placing = null;
+  drag = null;
+  carryBy = 'pointer';
+  destroyGhost();
+  ui?.builder?.tray?.classList.remove('is-drop-target');
+  if (mode === 'decorate' && wasMove) renderFurniture(engine);
+  renderBar(engine);
+  publish(engine);
+}
+
+/** Carry with the keys: the ghost starts on `item` (a Move) or mid-view, and the Place button takes focus. */
+function carryWithKeys(engine, item = null) {
+  if (!placing || placing.kind !== 'furniture') return;
+  carryBy = 'keys';
+  const view = engine.camera;
+  keyCarry = item
+    ? { x: item.x + roomX0(), y: item.slot === 'ceiling' ? item.y : item.y - 40 }
+    : { x: Math.round((view?.x || 0) + (view?.w || 960) / 2), y: furnitureDef(placing.classTsid)?.slot === 'wall' ? INTERIOR.wallTop + 160 : INTERIOR.floorY - 40 };
+  updateGhost(engine);
+  syncFloating(engine, true);
+  ui?.builder?.place?.focus?.({ preventScroll: true });
+}
+
+/** A tray tile dragged out: start carrying it with the pointer. */
+function startTrayDrag(engine, e, begin) {
+  begin();
+  if (!placing) return;
+  drag = { source: 'tray', over: null };
+  carryBy = 'pointer';
+  moveDrag(engine, e);
+}
+
+function moveDrag(engine, e) {
+  if (!drag || !e) return;
+  lastClient = { x: e.clientX, y: e.clientY };
+  const overTray = Boolean(ui?.builder?.trayHit(e.clientX, e.clientY));
+  drag.over = overTray ? 'tray' : overCanvas(e) ? 'room' : null;
+  // DecoratorBagUI: a placed piece dragged back over the bag is put away there.
+  const dropping = drag.source === 'room' && overTray;
+  const tray = ui?.builder?.tray;
+  if (tray && tray.classList.contains('is-drop-target') !== dropping) {
+    tray.classList.toggle('is-drop-target', dropping);
+    const note = tray.querySelector('.hb-tray-note');
+    if (note) {
+      if (dropping) note.dataset.was = note.textContent;
+      note.textContent = dropping ? BUILDER_TEXT.dropToPickUp : note.dataset.was || '';
+    }
+  }
+  if (drag.over === 'room') pointer = { ...worldPoint(engine, e), inside: true };
+  updateGhost(engine);
+  syncFloating(engine);
+  engine.setData('homeDrag', `${drag.source}:${placing?.classTsid || placing?.protoClass || ''}:${drag.over || ''}`);
+}
+
+function endDrag(engine, e, { cancelled = false, overTray = false } = {}) {
+  if (!drag) return;
+  const was = drag;
+  if (e) moveDrag(engine, e);
+  drag = null;
+  lastClient = null;
+  edgeSince = 0;
+  ui?.builder?.tray?.classList.remove('is-drop-target');
+  engine.setData('homeDrag', '');
+  if (cancelled || !placing) return cancelCarry(engine);
+  if (overTray || was.over === 'tray') {
+    if (was.source === 'room' && placing.kind === 'furniture' && placing.moveId) {
+      // dropFurnitureFromLocationInFurnitureBag: back into storage, by furniture_pickup's rules.
+      const id = placing.moveId;
+      placing = null;
+      destroyGhost();
+      selected = { kind: 'furniture', id };
+      const res = runFurnitureAction(engine, 'pickup');
+      engine.setData('homeDropLast', res?.ok ? `stored:${id}` : `refused:${res?.reason || ''}`);
+      return res;
+    }
+    return cancelCarry(engine);
+  }
+  if (was.over !== 'room') return cancelCarry(engine);
+  const res = placeAtPointer(engine, placing.kind === 'furniture' ? toRoom(pointer) : pointer);
+  engine.setData('homeDropLast', res?.ok ? 'placed' : `refused:${res?.reason || ''}`);
+  return res;
+}
+
+/** The world x span of the room on show (the house's frame, or a Tower floor). */
+function roomSpan() {
+  const room = scene?.background?.room;
+  const x0 = roomX0();
+  return { left: x0, right: x0 + (room?.width || interiorWidth(decor)) };
+}
+
+/** [ and ]: the placed piece left or right of the selected one (by x), with the camera on it. */
+function selectAdjacent(engine, dir) {
+  const rows = [...decor.placed].sort((a, b) => a.x - b.x || a.z - b.z);
+  if (!rows.length) return null;
+  const at = selected?.kind === 'furniture' ? rows.findIndex((row) => row.id === selected.id) : -1;
+  let i;
+  if (at < 0) {
+    // From the middle of the view.
+    const mid = (decorCamX ?? engine.player?.x ?? 0) - roomX0();
+    i = dir > 0 ? rows.findIndex((row) => row.x >= mid) : rows.findLastIndex((row) => row.x <= mid);
+    if (i < 0) i = dir > 0 ? 0 : rows.length - 1;
+  } else i = (at + dir + rows.length) % rows.length;
+  const item = rows[i];
+  selected = { kind: 'furniture', id: item.id };
+  decorCamX = item.x + roomX0();
+  decorPan = null;
+  renderFurniture(engine);
+  renderBar(engine);
+  publish(engine);
+  return item;
+}
+
+/** Arrows while carrying with the keys: move the ghost (Shift: further), the camera keeps it in view. */
+function moveKeyCarry(engine, [dx, dy], fast) {
+  if (!keyCarry) return;
+  const step = fast ? 60 : 15;
+  keyCarry = { x: keyCarry.x + dx * step, y: keyCarry.y + dy * step };
+  const span = roomSpan();
+  keyCarry.x = Math.max(span.left, Math.min(span.right, keyCarry.x));
+  keyCarry.y = Math.max(INTERIOR.ceilingTop, Math.min(INTERIOR.floorY, keyCarry.y));
+  const w = engine.camera?.w || 960;
+  const cx = decorCamX ?? engine.player?.x ?? 0;
+  if (keyCarry.x < cx - w / 2 + 140) decorCamX = keyCarry.x + w / 2 - 140;
+  else if (keyCarry.x > cx + w / 2 - 140) decorCamX = keyCarry.x - w / 2 + 140;
+  updateGhost(engine);
+  syncFloating(engine);
+}
+
+// --- the hover glow (HandOfDecorator updateHighlightedLISView: glow on the piece under the cursor)
+
+function setHover(engine, id) {
+  if (id === hoverId) return;
+  hoverId = id;
+  drawHover(engine);
+  engine.setData('homeHover', hoverId ?? '');
+}
+
+let glowFilter = null;
+function drawHover(engine) {
+  if (scene?.hoverGlow && !scene.hoverGlow.destroyed) scene.hoverGlow.destroy({ children: true });
+  if (scene) scene.hoverGlow = null;
+  const view = hoverId != null && !placing && !stamping && !(selected?.kind === 'furniture' && selected.id === hoverId)
+    ? scene?.furnitureViews?.get(hoverId) : null;
+  if (!view || view.destroyed || !view.art || !view.parent) return;
+  const { PIXI } = engine;
+  const glow = new PIXI.Container();
+  const art = view.art;
+  // A warm outline: the piece's own art eight times, two px out each way, made one light colour.
+  for (const [ox, oy] of [[-2, 0], [2, 0], [0, -2], [0, 2], [-2, -2], [2, -2], [-2, 2], [2, 2]]) {
+    const s = new PIXI.Sprite(art.texture);
+    s.anchor.copyFrom(art.anchor);
+    s.scale.copyFrom(art.scale);
+    s.x = art.x + ox;
+    s.y = art.y + oy;
+    glow.addChild(s);
+  }
+  if (PIXI.ColorMatrixFilter) {
+    if (!glowFilter) {
+      glowFilter = new PIXI.ColorMatrixFilter();
+      glowFilter.matrix = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0.92, 0, 0, 0, 0, 0.62, 0, 0, 0, 1, 0];
+    }
+    glow.filters = [glowFilter];
+  } else {
+    for (const s of glow.children) s.tint = 0xfff1b0;
+  }
+  glow.alpha = 0.95;
+  glow.x = view.x;
+  glow.y = view.y;
+  glow.zIndex = view.zIndex - 0.5;
+  glow.eventMode = 'none';
+  view.parent.addChild(glow);
+  scene.hoverGlow = glow;
+}
+
+// --- swatch preview (HandOfDecorator startPreviewingSwatch: the swatch shows on its target first)
+
+function redrawPreview(engine) {
+  const bg = scene?.background;
+  if (!bg?.redraw) return;
+  if (stamping && stampHover) {
+    const preview = { ...decor, walls: [...(decor.walls || [])] };
+    const res = setHomeTexture(preview, stamping.kind, stamping.key, stampHover.kind === 'wall' && stampHover.center ? { segment: stampHover.segment } : {});
+    bg.redraw(res.ok ? preview : null);
+    engine.setData('homeSwatchPreview', res.ok ? `${stamping.kind}:${stamping.key}${res.segment != null ? `@${res.segment}` : ''}` : '');
+    return;
+  }
+  bg.redraw(null);
+  engine.setData('homeSwatchPreview', '');
+}
+
+// --- pack items onto shelves and tables (HandOfDecorator startWithItemFromPack, dropItemFromPackOnTargetPlatform)
+
+function packDropTarget(engine, e) {
+  const p = toRoom(worldPoint(engine, e));
+  return stackSurfaceAt(decor, p.x, p.y);
+}
+
+function drawPackMarker(engine, target) {
+  if (scene?.packMarker && !scene.packMarker.destroyed) scene.packMarker.destroy({ children: true });
+  if (scene) scene.packMarker = null;
+  if (!target || !packDrag || !scene) return;
+  const { PIXI } = engine;
+  const g = new PIXI.Container();
+  g.zIndex = 95;
+  const icon = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[packDrag.classTsid]?.icon || `assets/sprites/icons/${packDrag.classTsid}.png`));
+  icon.anchor.set(0.5, 1);
+  icon.width = 40;
+  icon.height = 40;
+  icon.alpha = 0.85;
+  const line = new PIXI.Graphics();
+  line.roundRect(-26, -2, 52, 5, 2.5).fill({ color: 0xfff1b0, alpha: 0.95 });
+  g.addChild(line, icon);
+  g.x = target.x + roomX0();
+  g.y = target.y;
+  engine.entityLayer.addChild(g);
+  scene.packMarker = g;
+}
+
+function endPackDrag(engine) {
+  packDrag = null;
+  lastClient = null;
+  edgeSince = 0;
+  drawPackMarker(engine, null);
+  if (placing?.from === 'pack' && !drag) cancelCarry(engine);
+  engine.setData('homeDrag', '');
+}
+
+function wirePackDrag(engine) {
+  const canvas = gameCanvas();
+  if (packDragWired || !canvas) return Boolean(canvas);
+  packDragWired = true;
+  canvas.addEventListener('dragover', (e) => {
+    if (!packDrag || mode !== 'decorate') return;
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    lastClient = { x: e.clientX, y: e.clientY };
+    if (packDrag.furniture) {
+      pointer = { ...worldPoint(engine, e), inside: true };
+      updateGhost(engine);
+      return;
+    }
+    drawPackMarker(engine, packDropTarget(engine, e));
+    engine.setData('homeDrag', `pack:${packDrag.classTsid}:room`);
+  });
+  canvas.addEventListener('dragleave', () => drawPackMarker(engine, null));
+  canvas.addEventListener('drop', (e) => {
+    if (!packDrag || mode !== 'decorate') return;
+    e.preventDefault();
+    const was = packDrag;
+    if (was.furniture) {
+      pointer = { ...worldPoint(engine, e), inside: true };
+      packDrag = null;
+      const res = placeAtPointer(engine, toRoom(pointer));
+      engine.setData('homeDropLast', res?.ok ? 'placed' : `refused:${res?.reason || ''}`);
+      endPackDrag(engine);
+      return;
+    }
+    const target = packDropTarget(engine, e);
+    endPackDrag(engine);
+    const res = engine.dropPackStackAt?.(was.classTsid, was.count, target.x + roomX0(), target.y);
+    if (!res?.ok) {
+      if (res?.msg) engine.toast(res.msg);
+      engine.playSound?.('CLICK_FAILURE', { volume: 0.4 });
+    }
+    engine.setData('homeDropLast', res?.ok ? `stack:${was.classTsid}:${target.on ?? 'floor'}` : `refused:${res?.reason || ''}`);
+  });
+  document.addEventListener('dragend', () => { if (packDrag) endPackDrag(engine); });
+  return true;
+}
+
+/** game.js pack dragstart while decorating: a pack stack goes onto a shelf, a table or the floor. */
+function startPackDrag(classTsid, event, engine) {
+  if (mode !== 'decorate' || scene?.room !== 'interior' || scene.construction || !wirePackDrag(engine)) return false;
+  const count = Math.max(1, Math.floor(Number(event?.target?.closest?.('[data-pack-count]')?.dataset?.packCount) || 1));
+  packDrag = { classTsid, count, furniture: Boolean(FURNITURE_CATALOG[classTsid]) };
+  if (packDrag.furniture) {
+    beginPlacing(engine, classTsid, 'pack');
+    carryBy = 'pointer';
+  }
+  if (event?.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('application/x-groddle-item', classTsid);
+    event.dataTransfer.setData('text/plain', classTsid);
+  }
+  engine.setData('homeDrag', `pack:${classTsid}:`);
+  return true;
+}
+
+// --- the floating actions and the Place button
+
+/** The selected piece's top centre and bottom on screen. */
+function popAnchor(engine) {
+  if (selected?.kind === 'furniture') {
+    const item = placedItem(decor, selected.id);
+    if (!item) return null;
+    const b = furnitureBounds(item);
+    const top = clientPoint(engine, b.x + b.w / 2 + roomX0(), b.y);
+    const bottom = clientPoint(engine, b.x + b.w / 2 + roomX0(), b.y + b.h);
+    return top && bottom ? { x: top.x, y: top.y, bottom: bottom.y } : null;
+  }
+  if (selected?.kind === 'cultivation') {
+    const st = activeCult();
+    const item = st.items.find((row) => row.id === selected.id);
+    if (!item) return null;
+    const x = cultivationWorldX(item, st);
+    const top = clientPoint(engine, x, yardGroundY(st) - 150);
+    const bottom = clientPoint(engine, x, yardGroundY(st) + 24);
+    return top && bottom ? { x: top.x, y: top.y, bottom: bottom.y } : null;
+  }
+  return null;
+}
+
+/** Under the ghost's foot (the bottom of its drawn bounds). */
+function ghostAnchor(engine, g) {
+  const f = canvasFrame(engine);
+  const b = g.getBounds?.();
+  if (!f || !b) return null;
+  const bx = b.x ?? b.minX;
+  const by = b.y ?? b.minY;
+  return { x: f.rect.left + (bx + b.width / 2) / f.k, y: f.rect.top + (by + b.height) / f.k };
+}
+
+/**
+ * The floating actions by the selected piece and the Place button under the ghost. `force`
+ * rebuilds the actions (after a change); each frame only moves them with the camera.
+ */
+let bannerZoneAt = 0;
+let bannerZoneKey = '';
+/** The banner as a notify zone (engine.reserveZone, js/notify-view.js): notices show under it. */
+function reserveBannerZone(engine, force = false) {
+  const now = Date.now();
+  if (!force && now - bannerZoneAt < 500) return;
+  bannerZoneAt = now;
+  const banner = mode && ui?.builder && !ui.builder.bar.hidden ? ui.builder.banner : null;
+  const r = banner?.getBoundingClientRect?.();
+  const host = ui?.root?.getBoundingClientRect?.();
+  const rect = r?.height && host ? { left: r.left - host.left, top: r.top - host.top, right: r.right - host.left, bottom: r.bottom - host.top } : null;
+  const key = rect ? `${Math.round(rect.left)},${Math.round(rect.top)},${Math.round(rect.right)},${Math.round(rect.bottom)}` : '';
+  if (key === bannerZoneKey) return;
+  bannerZoneKey = key;
+  engine.reserveZone?.('home-builder-banner', rect);
+}
+
+function syncFloating(engine, force = false) {
+  const b = ui?.builder;
+  if (!b) return;
+  reserveBannerZone(engine, force);
+  if (!mode || !scene) {
+    popModel = null;
+    b.setPop(null);
+    b.setPlace(null);
+    return;
+  }
+  if (force) popModel = mode === 'decorate' ? furniturePop(engine) : cultivationPop(engine);
+  if (popModel && !drag && !placing) b.setPop(popModel, popAnchor(engine));
+  else b.setPop(null);
+  const g = scene.ghost;
+  if (!placing || !g || g.destroyed || (packDrag && !packDrag.furniture) || drag?.over === 'tray') {
+    b.setPlace(null);
+    return;
+  }
+  let label = placing.moveId ? BUILDER_TEXT.moveHere : BUILDER_TEXT.place;
+  if (placing.kind === 'cultivation' && !placing.moveId) {
+    if (placing.cost == null) placing.cost = cultivationChoices(activeCult(), engine.pc).find((row) => row.protoClass === placing.protoClass)?.cost ?? 0;
+    label = placeCostText(placing.cost);
+  }
+  b.setPlace({
+    label,
+    disabled: g.ok === false,
+    badTitle: "It doesn't fit here. Move it somewhere else.",
+    onRefused: () => engine.playSound?.('CLICK_FAILURE', { volume: 0.4 }),
+    follow: Boolean(drag || packDrag) || (carryBy === 'pointer' && pointer.inside),
+    onClick: () => {
+      if (!placing) return;
+      const at = carryAt(engine);
+      const res = placeAtPointer(engine, placing.kind === 'furniture' ? toRoom(at) : at);
+      engine.setData('homeDropLast', res?.ok ? 'placed' : `refused:${res?.reason || ''}`);
+    },
+  }, ghostAnchor(engine, g));
+}
+
 function bindPointer(engine) {
   if (typeof document === 'undefined' || bindPointer.bound) return;
   const root = document.getElementById('game-root');
   if (!root) return;
   bindPointer.bound = true;
   const isCanvas = (e) => e.target?.tagName === 'CANVAS';
+  let press = null; // a placed piece pressed, before it is a drag
   root.addEventListener('pointermove', (e) => {
-    if (!mode || !scene || !isCanvas(e)) return;
+    if (!mode || !scene || !isCanvas(e) || drag || press?.dragging) return;
     const p = worldPoint(engine, e);
     pointer = { ...p, inside: true };
+    if (placing && carryBy !== 'pointer' && e.pointerType === 'mouse' && (e.movementX || e.movementY)) carryBy = 'pointer';
     if (stamping) {
       const hit = stampTargetAt(toRoom(p));
       if (JSON.stringify(hit) !== JSON.stringify(stampHover)) {
         stampHover = hit;
         drawStampMarks(engine);
+        redrawPreview(engine);
       }
       return;
     }
-    updateGhost(engine);
+    if (placing) {
+      updateGhost(engine);
+      return;
+    }
+    if (mode === 'decorate') setHover(engine, furnitureAt(toRoom(p))?.id ?? null);
+  }, true);
+  root.addEventListener('pointerleave', () => {
+    if (mode === 'decorate') setHover(engine, null);
   }, true);
   root.addEventListener('wheel', (e) => {
-    if (!isCanvas(e) || !panDecorCamera(engine, e.deltaY)) return;
+    if (!isCanvas(e) || !panDecorCamera(engine, e.deltaX, e.deltaY, e.shiftKey)) return;
     e.preventDefault();
     e.stopPropagation();
   }, { capture: true, passive: false });
+  const onPressMove = (e) => {
+    if (!press || e.pointerId !== press.pointerId) return;
+    if (!press.dragging) {
+      if (Math.hypot(e.clientX - press.x, e.clientY - press.y) < DRAG_DIST) return;
+      // HandOfDecorator locDragStart: a placed piece pressed and moved is carried.
+      press.dragging = true;
+      beginMove(engine, press.id);
+      if (!placing) {
+        press = null;
+        return;
+      }
+      drag = { source: 'room', id: press.id, over: 'room' };
+      carryBy = 'pointer';
+      setHover(engine, null);
+    }
+    moveDrag(engine, e);
+  };
+  const onPressUp = (e) => {
+    if (!press || e.pointerId !== press.pointerId) return;
+    window.removeEventListener('pointermove', onPressMove, true);
+    window.removeEventListener('pointerup', onPressUp, true);
+    window.removeEventListener('pointercancel', onPressUp, true);
+    const was = press;
+    press = null;
+    if (!was.dragging || !drag) return;
+    endDrag(engine, e, { cancelled: e.type === 'pointercancel', overTray: Boolean(ui?.builder?.trayHit(e.clientX, e.clientY)) });
+  };
   root.addEventListener('pointerdown', (e) => {
     if (!mode || !scene || !isCanvas(e)) return;
     e.stopPropagation();
@@ -3998,7 +4552,10 @@ function bindPointer(engine) {
     pointer = { ...p, inside: true };
     if (placing) {
       // Furniture takes room x; cultivations take world x.
-      placeAtPointer(engine, placing.kind === 'furniture' ? toRoom(p) : p);
+      carryBy = 'pointer';
+      updateGhost(engine);
+      const res = placeAtPointer(engine, placing.kind === 'furniture' ? toRoom(p) : p);
+      engine.setData('homeDropLast', res?.ok ? 'placed' : `refused:${res?.reason || ''}`);
       return;
     }
     if (stamping) {
@@ -4008,8 +4565,15 @@ function bindPointer(engine) {
     if (mode === 'decorate') {
       const item = furnitureAt(toRoom(p));
       selected = item ? { kind: 'furniture', id: item.id } : null;
+      setHover(engine, null);
       renderFurniture(engine);
       renderBar(engine);
+      if (item && e.button === 0) {
+        press = { id: item.id, x: e.clientX, y: e.clientY, pointerId: e.pointerId, dragging: false };
+        window.addEventListener('pointermove', onPressMove, true);
+        window.addEventListener('pointerup', onPressUp, true);
+        window.addEventListener('pointercancel', onPressUp, true);
+      }
     } else {
       const item = cultivationAt(p.x);
       selected = item ? { kind: 'cultivation', id: item.id } : null;
@@ -4018,30 +4582,80 @@ function bindPointer(engine) {
     }
     publish(engine);
   }, true);
+  const typing = (t) => t?.matches?.('input, textarea, select, [contenteditable="true"]');
   window.addEventListener('keydown', (e) => {
-    if (!mode || e.key !== 'Escape') return;
-    if (e.target?.matches?.('input, textarea, select')) return;
-    // G277: an open confirm takes Escape first, as its no (ConfirmationDialog.as closeFromUserInput
-    // 102-111 submits escape_value; HouseExpandDialog.as 202-209 sets it false). The bar stays open.
-    if (engine.questDialogueOpen?.()) return;
-    e.stopImmediatePropagation();
-    if (stamping) {
-      stopStamping(engine);
-      renderBar(engine);
-    } else if (placing) {
-      placing = null;
-      destroyGhost();
-      renderBar(engine);
-    } else if (selected) {
-      selected = null;
-      if (mode === 'decorate') renderFurniture(engine);
-      else drawCultivationMarkers(engine);
-      renderBar(engine);
-    } else {
-      setMode(engine, null);
+    if (!mode) return;
+    if (e.key === 'Escape') {
+      if (typing(e.target) && e.target.tagName !== 'SELECT') return;
+      // G277: an open confirm takes Escape first, as its no (ConfirmationDialog.as closeFromUserInput
+      // 102-111 submits escape_value; HouseExpandDialog.as 202-209 sets it false). The bar stays open.
+      if (engine.questDialogueOpen?.()) return;
+      e.stopImmediatePropagation();
+      if (drag || ui?.builder?.dragging) {
+        ui?.builder?.cancelDrag();
+        cancelCarry(engine);
+      } else if (stamping) {
+        stopStamping(engine);
+        redrawPreview(engine);
+        renderBar(engine);
+      } else if (placing) {
+        cancelCarry(engine);
+      } else if (selected) {
+        selected = null;
+        if (mode === 'decorate') renderFurniture(engine);
+        else drawCultivationMarkers(engine);
+        renderBar(engine);
+      } else {
+        setMode(engine, null);
+      }
+      publish(engine);
+      return;
     }
-    publish(engine);
+    if (typing(e.target) || e.ctrlKey || e.metaKey || e.altKey || engine.questDialogueOpen?.()) return;
+    const dir = panKey(e.key);
+    if (mode === 'cultivate') {
+      // CultManager: what you carry rides at your feet while you walk.
+      if (dir && placing) {
+        carryBy = 'avatar';
+        pointer.inside = false;
+      }
+      return;
+    }
+    // Shift+D stays the decorate key (game.js): it leaves Decoration Mode.
+    if (dir && !(e.shiftKey && (e.key === 'D' || e.key === 'd'))) {
+      // The tray's tabs take Left and Right themselves.
+      if (e.target?.closest?.('[role="tab"]') && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if (placing?.kind === 'furniture' && carryBy === 'keys') moveKeyCarry(engine, dir, e.shiftKey);
+      else {
+        heldPan.add(e.key.length === 1 ? e.key.toLowerCase() : e.key);
+        heldFast = e.shiftKey;
+      }
+      return;
+    }
+    if (e.key === '[' || e.key === ']') {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if (!placing && !stamping) selectAdjacent(engine, e.key === ']' ? 1 : -1);
+      return;
+    }
+    if (e.key === 'Enter' && !e.target?.closest?.('button, a, [role="tab"]')) {
+      if (placing && carryBy === 'keys') {
+        e.preventDefault();
+        ui?.builder?.place?.click();
+      } else if (selected && !placing) {
+        // Enter reaches the selected piece's actions.
+        e.preventDefault();
+        ui?.builder?.pop?.querySelector('button:not([disabled])')?.focus();
+      }
+    }
   }, true);
+  window.addEventListener('keyup', (e) => {
+    heldPan.delete(e.key.length === 1 ? e.key.toLowerCase() : e.key);
+    if (e.key === 'Shift') heldFast = false;
+  }, true);
+  window.addEventListener('blur', () => heldPan.clear());
 }
 
 /**
@@ -4055,20 +4669,26 @@ function bindPointer(engine) {
  * whole wall shows. (A fixed -62 px was right for a house but put Tower feet
  * 8 px behind the pack; Decorate's fixed -105 px gave -3 / -51.)
  *
- * Decorate: the client's HandOfDecorator hides the avatars (start(): hidePCs)
- * and drives the camera itself (CameraMan decorator_mode: camera_control_pt,
- * panned by the mouse wheel and keys, bounded to the location). Here the avatar
- * hides too, the camera starts on the walk framing, looks up to the ceiling
- * band while a ceiling piece or ceiling swatch is in hand or selected, and the
- * mouse wheel pans between the two. Camera Mode's own look always wins.
+ * Decorate: the client's HandOfDecorator hides the avatars (start(): hidePCs),
+ * holds them (stops_avatar_on_focus; game.js gameplayInputBlocked) and drives
+ * the camera itself (CameraMan decorator_mode: camera_control_pt, bounded to
+ * the location): the arrow keys and WASD scroll it across the whole room and
+ * between the ceiling band and the floor (maybeScrollVPByKeys, Shift faster),
+ * as do the mouse wheel (onMouseWheel, both axes) and a drag held at the
+ * stage's edge (maybeScrollVPByDragging, after 500 ms). The camera starts
+ * where the avatar stands, framing the floor's front edge just over the tray,
+ * looks up to the ceiling band while a ceiling piece or ceiling swatch is in
+ * hand or selected, and never leaves the house. Camera Mode's own look wins.
  */
 const LOOK_VIEW_H = 408;
 /** Ceiling band top (INTERIOR.ceilingTop) shows with this much room above it. */
 const CEILING_MARGIN = 14;
-let lastLookY = 0;
-let decorPan = null; // wheel-set look while decorating (null = automatic)
+let lastLook = { x: 0, y: 0 };
+let decorPan = null; // key- or wheel-set look y while decorating (null = automatic)
+let decorCamX = null; // the decorate camera's centre x (world), null = where the avatar stands
 let hidAvatar = false;
 let lastLookTag = '';
+let insets = { top: 0, bottom: 0, at: 0 };
 
 /**
  * The interior look offsets for an avatar at `playerY` with a camera anchor:
@@ -4108,38 +4728,115 @@ function setAvatarHidden(engine, hide) {
   }
 }
 
-function interiorCameraLook(engine) {
+/** How much of the view the banner and the tray cover, in world px (measured four times a second). */
+function decorInsets(engine, now = Date.now()) {
+  if (now - insets.at < 250) return insets;
+  const f = canvasFrame(engine);
+  const r = ui?.builder?.roomRect?.();
+  insets = f && r
+    ? { top: Math.max(0, (r.top - f.rect.top) * f.k), bottom: Math.max(0, (f.rect.bottom - r.bottom) * f.k), at: now }
+    : { top: 0, bottom: 0, at: now };
+  return insets;
+}
+
+/** The held keys and a drag at the stage's edge move the decorate camera (dt in ms). */
+function tickDecorPan(engine, range, dtMs) {
+  const frames = Math.min(4, Math.max(0.25, (Number(dtMs) || 16.7) / 16.7));
+  const speed = (heldFast ? PAN_SPEED.fast : PAN_SPEED.normal) * frames;
+  let { dx, dy } = panDirection(heldPan);
+  dx *= speed;
+  dy *= speed;
+  const dragging = Boolean(lastClient && (drag || packDrag));
+  if (dragging) {
+    const edge = edgePan(lastClient.x, lastClient.y, ui?.builder?.roomRect?.());
+    const now = Date.now();
+    if (edge.dx || edge.dy) {
+      if (!edgeSince) edgeSince = now;
+      if (now - edgeSince > EDGE_DELAY_MS) {
+        dx += edge.dx * PAN_SPEED.normal * frames;
+        dy += edge.dy * PAN_SPEED.normal * frames;
+      }
+    } else edgeSince = 0;
+  }
+  if (!dx && !dy) return false;
+  const span = roomSpan();
+  const before = { x: decorCamX, y: decorPan };
+  decorCamX = clampRoomX((decorCamX ?? engine.player?.x ?? 0) + dx, { left: span.left, right: span.right, view: engine.camera?.w || 960 });
+  if (dy) decorPan = Math.max(range.lo, Math.min(range.hi, Math.round((decorPan ?? (ceilingInHand() ? range.ceiling : range.floor)) + dy)));
+  if (dragging && drag && (before.x !== decorCamX || before.y !== decorPan)) {
+    // The room slid under a still pointer: what you carry stays under it.
+    const f = canvasFrame(engine);
+    if (f && drag.over === 'room') {
+      pointer = { ...worldPoint(engine, { clientX: lastClient.x, clientY: lastClient.y }), inside: true };
+      updateGhost(engine);
+    }
+  }
+  return true;
+}
+
+function interiorCameraLook(engine, dtMs) {
   if (typeof engine?.setCameraLook !== 'function') return;
   const decorating = mode === 'decorate';
   setAvatarHidden(engine, decorating);
-  if (!decorating) decorPan = null;
-  const look = interiorLook({ playerY: engine.player?.y ?? INTERIOR.floorY, anchor: roomAnchor(engine), view: engine.camera?.h || LOOK_VIEW_H });
-  const auto = decorating && ceilingInHand() ? look.ceiling : look.walk;
-  const want = decorating && decorPan != null ? Math.max(look.ceiling, Math.min(look.walk, decorPan)) : auto;
-  const tag = `${!decorating ? 'walk' : decorPan != null ? 'pan' : want === look.walk ? 'walk' : 'ceiling'}:${want}${hidAvatar ? ':hidden' : ''}`;
+  const playerY = engine.player?.y ?? INTERIOR.floorY;
+  const anchor = roomAnchor(engine);
+  const view = engine.camera?.h || LOOK_VIEW_H;
+  const look = interiorLook({ playerY, anchor, view });
+  let wantX = 0;
+  let wantY = look.walk;
+  let kind = 'walk';
+  if (!decorating) {
+    decorPan = null;
+    decorCamX = null;
+    heldPan.clear();
+  } else {
+    const ins = decorInsets(engine);
+    const range = decorLook({ playerY, anchor, view, top: ins.top, bottom: ins.bottom, ceilingTop: INTERIOR.ceilingTop, floorFront: INTERIOR.floorFront });
+    tickDecorPan(engine, range, dtMs);
+    const auto = ceilingInHand() ? range.ceiling : range.floor;
+    wantY = decorPan != null ? Math.max(range.lo, Math.min(range.hi, decorPan)) : auto;
+    kind = decorPan != null ? 'pan' : wantY === range.floor ? 'walk' : 'ceiling';
+    const span = roomSpan();
+    decorCamX = clampRoomX(decorCamX ?? engine.player?.x ?? span.left, { left: span.left, right: span.right, view: engine.camera?.w || 960 });
+    wantX = Math.round(decorCamX - (engine.player?.x ?? 0));
+  }
+  const tag = `${kind}:${wantY}${hidAvatar ? ':hidden' : ''}`;
   if (tag !== lastLookTag) engine.setData('homeCameraLook', (lastLookTag = tag));
+  engine.setData('homeCameraX', decorating ? String(decorCamX) : '');
   const now = engine.cameraLook || { x: 0, y: 0 };
-  const ours = now.x === 0 && (now.y === 0 || now.y === lastLookY);
-  if (!ours || now.y === want) return;
-  engine.setCameraLook(0, want);
-  lastLookY = want;
+  const ours = (now.x === 0 && now.y === 0) || (now.x === lastLook.x && now.y === lastLook.y);
+  if (!ours || (now.x === wantX && now.y === wantY)) return;
+  engine.setCameraLook(wantX, wantY);
+  lastLook = { x: wantX, y: wantY };
 }
 
-/** HandOfDecorator onMouseWheel: pan the decorate camera up and down (10 px a notch). */
-function panDecorCamera(engine, deltaY) {
+/** HandOfDecorator onMouseWheel: pan the decorate camera both ways (Shift turns a vertical wheel sideways). */
+function panDecorCamera(engine, deltaX, deltaY, sideways = false) {
   if (mode !== 'decorate' || scene?.room !== 'interior') return false;
-  const look = interiorLook({ playerY: engine.player?.y ?? INTERIOR.floorY, anchor: roomAnchor(engine), view: engine.camera?.h || LOOK_VIEW_H });
-  const from = decorPan ?? (ceilingInHand() ? look.ceiling : look.walk);
-  decorPan = Math.max(look.ceiling, Math.min(look.walk, Math.round(from + Math.sign(deltaY) * Math.min(60, Math.max(10, Math.abs(deltaY))))));
+  const dx = sideways && !deltaX ? deltaY : deltaX;
+  const dy = sideways && !deltaX ? 0 : deltaY;
+  if (dx) {
+    const span = roomSpan();
+    decorCamX = clampRoomX((decorCamX ?? engine.player?.x ?? 0) + Math.sign(dx) * Math.min(80, Math.max(10, Math.abs(dx))), { left: span.left, right: span.right, view: engine.camera?.w || 960 });
+  }
+  if (dy) {
+    const playerY = engine.player?.y ?? INTERIOR.floorY;
+    const ins = decorInsets(engine);
+    const range = decorLook({ playerY, anchor: roomAnchor(engine), view: engine.camera?.h || LOOK_VIEW_H, top: ins.top, bottom: ins.bottom, ceilingTop: INTERIOR.ceilingTop, floorFront: INTERIOR.floorFront });
+    const from = decorPan ?? (ceilingInHand() ? range.ceiling : range.floor);
+    decorPan = Math.max(range.lo, Math.min(range.hi, Math.round(from + Math.sign(dy) * Math.min(60, Math.max(10, Math.abs(dy))))));
+  }
   return true;
 }
 
 function releaseCameraLook(engine) {
   setAvatarHidden(engine, false);
   decorPan = null;
+  decorCamX = null;
+  heldPan.clear();
   const now = engine?.cameraLook;
-  if (lastLookY && now && now.x === 0 && now.y === lastLookY) engine.setCameraLook(0, 0);
-  lastLookY = 0;
+  if ((lastLook.x || lastLook.y) && now && now.x === lastLook.x && now.y === lastLook.y) engine.setCameraLook(0, 0);
+  lastLook = { x: 0, y: 0 };
 }
 
 /**
@@ -4350,6 +5047,15 @@ function demoSetup(engine) {
       setHomeTexture(decor, 'ceiling', 'whitewood_ceiling');
     }
     decor.storage.furniture_armchair = (decor.storage.furniture_armchair || 0) + 1;
+    // QA (BUILDER): &homesegments=N grows the demo house to N wall segments (up to 20) through the expand rules.
+    const wantSegs = Math.min(20, Math.floor(Number(engine.param('homesegments')) || 0));
+    let grew = false;
+    while (!inTower() && decor.wallSegments < wantSegs) {
+      engine.inv.wall_segment = (engine.inv.wall_segment || 0) + floorCount(floors);
+      if (!expandHouseFloors(floors, houseDecor, engine.inv).ok) break;
+      grew = true;
+    }
+    if (grew) setTimeout(() => engine.refreshHomeScene?.(), 0);
     engine.inv.musicblock_d_blue_05 = Math.max(3, engine.inv.musicblock_d_blue_05 || 0);
     engine.inv.wall_segment = Math.max(1, engine.inv.wall_segment || 0);
     scene.background?.redraw?.();
@@ -5152,6 +5858,17 @@ export const homesFeature = {
         publish(engine);
         return true;
       };
+      // QA (BUILDER): window.groddleHomePiece(id | classTsid) is a placed piece's client rect
+      // ({ id, left, top, right, bottom }), or of the shelf-or-table surface a pack item would rest on.
+      window.groddleHomePiece = (key) => {
+        const item = decor.placed.find((row) => row.id === Number(key)) || decor.placed.find((row) => row.classTsid === key);
+        if (!item || !scene) return null;
+        const b = furnitureBounds(item);
+        const a = clientPoint(engine, b.x + roomX0(), b.y);
+        const z = clientPoint(engine, b.x + b.w + roomX0(), b.y + b.h);
+        const top = surfaceHeight(item.classTsid, item.upgradeId) ? clientPoint(engine, item.x + roomX0(), item.y - surfaceHeight(item.classTsid, item.upgradeId)) : null;
+        return a && z ? { id: item.id, left: a.x, top: a.y, right: z.x, bottom: z.y, surfaceY: top?.y ?? null } : null;
+      };
       // QA: window.groddleHomeRock() lists the rock's verbs; (verbId) runs one; ('house_sign') opens HouseSignDialog.
       window.groddleHomeRock = (verbId) => {
         if (!rockTarget || rockTarget.sprite?.destroyed) return null;
@@ -5232,8 +5949,11 @@ export const homesFeature = {
     rockTarget = null;
     rockBubbled = false;
     rockBubble = null;
+    drag = null;
+    packDrag = null;
+    hoverId = null;
     if (ui) {
-      ui.bar.hidden = true;
+      ui.builder.render(null);
       ui.modes.hidden = true;
       if (ui.sign) ui.sign.hidden = true;
     }
@@ -5306,7 +6026,12 @@ export const homesFeature = {
     } else {
       if (inHouse()) wearFromNodes(engine, now);
       keepInsideWalls(engine);
-      interiorCameraLook(engine);
+      interiorCameraLook(engine, dtMs);
+    }
+    if (mode) {
+      // CultManager: what you carry by walking rides at your feet.
+      if (placing && carryBy === 'avatar') updateGhost(engine);
+      syncFloating(engine);
     }
   },
 

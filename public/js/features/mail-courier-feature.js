@@ -60,7 +60,7 @@
 
 import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=85d4faba';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=01a295a1';
-import { questRoomConverse } from './quest-instances-feature.js?v=dd932a98';
+import { questRoomConverse } from './quest-instances-feature.js?v=d7d6c224';
 import { hellFeature } from './hell-feature.js?v=6825f033';
 import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=790f980a';
 import {

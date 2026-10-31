@@ -2133,3 +2133,196 @@
 :root[data-ui="classic"] #bug-report-panel .reports-status.is-error { color: var(--c-classic-unread); }
 :root[data-ui="classic"] #bug-report-panel .ui-sheet-esc { display: none; }
 @media (prefers-reduced-motion: reduce) { :root[data-ui="classic"] #bug-report-panel .reports-card { animation: none; } }
+
+/* BUILDER: Decoration and Cultivation Mode (js/ui/home-builder.js) in the 2012 client's look.
+   The banner sits in the header over the world, as DecorateToolbarUI / CultToolbarUI did: the mode's
+   title, "Use arrow keys to scroll • Press esc to exit" under it, the Expand and Un-expand buttons
+   and the red close X. The tray is the pack band: PackTabberUI's tabs on the viewport's bottom edge,
+   the furniture bag's paging well with 70 x 70 white tiles and their counts (FurnitureBagUI,
+   TSScrollPager), the filter row under it (BagFilterUI); in Cultivation Mode the picker (CultPickerUI). */
+:root[data-ui="classic"] #game-root .hb-builder { font-family: var(--font-classic-body); color: var(--c-classic-text); }
+:root[data-ui="classic"] #game-root .hb-banner {
+  position: fixed;
+  top: 0;
+  /* The world's centre, a little right: the header's left cluster (face, iMG, the menu icons) is wider than its right. */
+  left: calc(var(--hb-cx, 50%) + 24 * var(--cu));
+  height: var(--cf-header-h);
+  gap: calc(10 * var(--cu));
+  padding: 0;
+  background: var(--c-classic-page);
+}
+:root[data-ui="classic"] #game-root .hb-banner-text { text-align: center; flex: 0 0 auto; }
+:root[data-ui="classic"] #game-root .hb-banner .hb-title { color: var(--c-classic-title); font: 800 calc(var(--fs-classic-row-title) * var(--cu-n, 1))/1.1 var(--font-classic-title); }
+:root[data-ui="classic"] #game-root .hb-banner .hb-hint { color: var(--c-classic-text); font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); line-height: 1.2; }
+:root[data-ui="classic"] #game-root .hb-banner-actions { gap: calc(4 * var(--cu)); }
+:root[data-ui="classic"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  min-width: calc(60 * var(--cu));
+  min-height: calc(26 * var(--cu));
+  padding: calc(2 * var(--cu)) calc(8 * var(--cu));
+  border: 1px solid var(--c-classic-btn-minor-border);
+  border-radius: calc(4 * var(--cu));
+  background: linear-gradient(var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom));
+  color: var(--c-classic-btn-minor-label);
+  font: 800 calc(var(--fs-classic-count) * var(--cu-n, 1))/1.1 var(--font-classic-title);
+  white-space: nowrap;
+  cursor: pointer;
+}
+:root[data-ui="classic"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt:hover:not(:disabled) { background: var(--c-classic-panel); }
+:root[data-ui="classic"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt.primary { border-color: var(--c-classic-btn-dark-bottom); background: linear-gradient(var(--c-classic-btn-dark-top), var(--c-classic-btn-dark-bottom)); color: var(--c-classic-btn-dark-label); }
+:root[data-ui="classic"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt:disabled { color: var(--c-classic-disabled); cursor: default; }
+:root[data-ui="classic"] #game-root .hb-banner .hb-btn-ic { font-size: calc(var(--fs-classic-row) * var(--cu-n, 1)); line-height: 1; opacity: 0.7; }
+:root[data-ui="classic"] #game-root .hb-banner .hb-close {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: calc(28 * var(--cu));
+  height: calc(27 * var(--cu));
+  padding: 0;
+  border: 1px solid var(--c-classic-btn-minor-border);
+  border-radius: calc(4 * var(--cu));
+  background: linear-gradient(var(--c-classic-btn-minor-top), var(--c-classic-btn-minor-bottom));
+  color: var(--c-classic-close);
+  font: 800 calc(var(--fs-classic-pane) * var(--cu-n, 1))/1 var(--font-classic-body);
+  cursor: pointer;
+}
+:root[data-ui="classic"] #game-root .hb-tray {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--cband-h, calc(132 * var(--cu)));
+  grid-template-rows: 0 calc(81 * var(--cu)) auto;
+  column-gap: calc(8 * var(--cu));
+  padding: calc(13 * var(--cu)) calc(5 * var(--cu)) 0;
+  background: var(--c-classic-page);
+  overflow: visible;
+}
+/* PackTabberUI: flared tabs, 17 tall, their feet on the viewport's bottom edge. */
+:root[data-ui="classic"] #game-root .hb-tray .hb-tabs { position: absolute; left: calc(4 * var(--cu)); top: calc(-17 * var(--cu)); gap: calc(2 * var(--cu)); }
+:root[data-ui="classic"] #game-root .hb-tray .hb-tabs button {
+  height: calc(17 * var(--cu));
+  padding: 0 calc(14 * var(--cu));
+  border: 0;
+  border-radius: calc(8 * var(--cu)) calc(8 * var(--cu)) 0 0;
+  background: var(--c-classic-tab-off);
+  color: var(--c-classic-panel);
+  font: 800 calc(var(--fs-classic-count) * var(--cu-n, 1))/1 var(--font-classic-body);
+  box-shadow: inset 0 -2px 4px color-mix(in srgb, var(--c-classic-ink) 20%, transparent);
+  cursor: pointer;
+}
+:root[data-ui="classic"] #game-root .hb-tray .hb-tabs button.on { background: var(--c-classic-page); color: var(--c-classic-title); box-shadow: 3px 0 3px -2px color-mix(in srgb, var(--c-classic-ink) 20%, transparent), -3px 0 3px -2px color-mix(in srgb, var(--c-classic-ink) 20%, transparent); }
+/* The Inventory tab: the pack itself under the tabs. */
+:root[data-ui="classic"] #game-root .hb-tray[data-tab="pack"] { height: 0; padding: 0; bottom: auto; top: calc(100% - var(--cband-h, calc(132 * var(--cu)))); background: transparent; }
+:root[data-ui="classic"] #game-root .hb-tray[data-tab="pack"] .hb-foot { display: none; }
+:root[data-ui="classic"] #game-root .hb-tray .hb-panel {
+  position: relative;
+  gap: 0;
+  border-radius: calc(5 * var(--cu));
+  background: var(--c-classic-furn-well);
+  box-shadow: inset 0 1px 3px color-mix(in srgb, var(--c-classic-ink) 20%, transparent);
+}
+:root[data-ui="classic"] #game-root .hb-strip { gap: calc(5 * var(--cu)); padding: calc(5 * var(--cu)); align-items: center; }
+:root[data-ui="classic"] #game-root .hb-strip .hb-group { color: var(--c-classic-tab-off); font: 800 calc(var(--fs-classic-count) * var(--cu-n, 1))/1 var(--font-classic-body); text-transform: uppercase; }
+:root[data-ui="classic"] #game-root .hb-tile {
+  width: calc(70 * var(--cu));
+  height: calc(70 * var(--cu));
+  padding: calc(4 * var(--cu));
+  border: 0;
+  border-radius: calc(4 * var(--cu));
+  background: var(--c-classic-panel);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+  color: var(--c-classic-text);
+}
+:root[data-ui="classic"] #game-root .hb-tile:hover:not([disabled]) { box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #game-root .hb-tile.on { box-shadow: 0 0 7px 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #game-root .hb-tile[disabled] { opacity: 0.5; }
+:root[data-ui="classic"] #game-root .hb-tile img { width: calc(58 * var(--cu)); height: calc(54 * var(--cu)); }
+:root[data-ui="classic"] #game-root .hb-tile:not(.hb-tile-cult) .hb-tile-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+:root[data-ui="classic"] #game-root .hb-tile .hb-count { position: absolute; right: calc(3 * var(--cu)); bottom: calc(1 * var(--cu)); color: var(--c-classic-count); font: 700 calc(var(--fs-classic-count) * var(--cu-n, 1))/1 var(--font-classic-count); text-shadow: 0 0 2px var(--c-classic-panel), 0 0 2px var(--c-classic-panel); }
+:root[data-ui="classic"] #game-root .hb-tile-swatch .hb-swatch { width: calc(60 * var(--cu)); height: calc(60 * var(--cu)); border-radius: calc(3 * var(--cu)); }
+/* CultPickerUI: name over the art, the iMG cost under it, in a white strip with rules between. */
+:root[data-ui="classic"] #game-root .hb-tile-cult { width: calc(92 * var(--cu)); height: calc(78 * var(--cu)); justify-content: space-between; border-radius: 0; box-shadow: none; border-right: 1px solid var(--c-classic-rule); }
+:root[data-ui="classic"] #game-root .hb-tile-cult.on { background: var(--c-classic-well); box-shadow: none; }
+:root[data-ui="classic"] #game-root .hb-tile-cult .hb-tile-name { color: var(--c-classic-title); font: 700 calc(var(--fs-classic-count) * var(--cu-n, 1))/1.1 var(--font-classic-body); }
+:root[data-ui="classic"] #game-root .hb-tile-cult img { width: calc(56 * var(--cu)); height: calc(40 * var(--cu)); }
+:root[data-ui="classic"] #game-root .hb-tile .hb-cost { color: var(--c-classic-text); font: 700 calc(var(--fs-classic-count) * var(--cu-n, 1))/1 var(--font-classic-body); }
+:root[data-ui="classic"] #game-root .hb-tray[data-tab=""] .hb-panel { background: var(--c-classic-panel); }
+:root[data-ui="classic"] #game-root .hb-tray[data-tab=""] .hb-strip { gap: 0; padding: 0; }
+:root[data-ui="classic"] #game-root .hb-page {
+  width: calc(22 * var(--cu));
+  border: 0;
+  background: url(../assets/classic/furn_scroll.png?v=095cbd7b) center / calc(9 * var(--cu)) calc(14 * var(--cu)) no-repeat;
+  color: transparent;
+  font-size: 0;
+  cursor: pointer;
+}
+:root[data-ui="classic"] #game-root .hb-page-next { transform: scaleX(-1); }
+:root[data-ui="classic"] #game-root .hb-page:disabled { background-image: url(../assets/classic/furn_scroll_disabled.png?v=c3f8c94d); cursor: default; }
+:root[data-ui="classic"] #game-root .hb-aside { width: calc(160 * var(--cu)); gap: calc(4 * var(--cu)); padding: calc(6 * var(--cu)) calc(10 * var(--cu)); border-radius: calc(5 * var(--cu)) 0 0 calc(5 * var(--cu)); background: var(--c-classic-panel); border-right: 1px solid var(--c-classic-rule); }
+:root[data-ui="classic"] #game-root .hb-aside .hb-note { margin: 0; color: var(--c-classic-title); font: 700 calc(var(--fs-classic-body) * var(--cu-n, 1))/1.2 var(--font-classic-body); text-align: center; }
+:root[data-ui="classic"] #game-root .hb-aside .hb-balance { margin: 0; color: var(--c-classic-text); font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); text-align: center; }
+:root[data-ui="classic"] #game-root .hb-tray-actions { gap: calc(3 * var(--cu)); padding: 0 calc(8 * var(--cu)); }
+:root[data-ui="classic"] #game-root .hb-tray-actions-title { color: var(--c-classic-title); font: 800 calc(var(--fs-classic-count) * var(--cu-n, 1))/1 var(--font-classic-title); }
+:root[data-ui="classic"] #game-root .hb-tray-actions-row { gap: calc(4 * var(--cu)); }
+:root[data-ui="classic"] #game-root .hb-tray-actions .hb-note { color: var(--c-classic-text); font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); }
+/* BagFilterUI: micro buttons 19 tall, the active one pressed in. */
+:root[data-ui="classic"] #game-root .hb-tray .hb-filters { gap: calc(2 * var(--cu)); padding-top: calc(4 * var(--cu)); }
+:root[data-ui="classic"] #game-root .hb-tray .hb-filters button {
+  height: calc(19 * var(--cu));
+  padding: 0 calc(7 * var(--cu));
+  border: 0;
+  border-radius: calc(9 * var(--cu));
+  background: transparent;
+  color: var(--c-classic-tab-off);
+  font: 700 calc(var(--fs-classic-count) * var(--cu-n, 1))/1 var(--font-classic-body);
+  cursor: pointer;
+}
+:root[data-ui="classic"] #game-root .hb-tray .hb-filters button:hover { text-decoration: underline; }
+:root[data-ui="classic"] #game-root .hb-tray .hb-filters button.on { background: var(--c-classic-panel); color: var(--c-classic-title); box-shadow: inset 0 1px 3px color-mix(in srgb, var(--c-classic-ink) 20%, transparent); }
+:root[data-ui="classic"] #game-root .hb-tray .hb-filters button[data-home-filter="all"]::after { content: ":"; }
+:root[data-ui="classic"] #game-root .hb-tray .hb-foot { gap: calc(8 * var(--cu)); padding-top: calc(3 * var(--cu)); }
+:root[data-ui="classic"] #game-root .hb-tray .hb-foot .hb-bt { min-height: calc(19 * var(--cu)); flex-direction: row; }
+:root[data-ui="classic"] #game-root .hb-tray .hb-tray-note { padding-top: calc(4 * var(--cu)); color: var(--c-classic-text); font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); }
+:root[data-ui="classic"] #game-root .hb-tray.is-drop-target .hb-panel { box-shadow: 0 0 7px 2px var(--c-classic-focus); }
+/* The actions by a selected piece: a small white window (Dialog.as outline and halo). */
+:root[data-ui="classic"] #game-root .hb-pop {
+  max-width: calc(420 * var(--cu));
+  padding: calc(8 * var(--cu)) calc(10 * var(--cu));
+  border: 1px solid color-mix(in srgb, var(--c-classic-ink) 37%, transparent);
+  border-radius: calc(6 * var(--cu));
+  background: var(--c-classic-panel);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+}
+:root[data-ui="classic"] #game-root .hb-pop .hb-pop-head { margin-bottom: calc(6 * var(--cu)); }
+:root[data-ui="classic"] #game-root .hb-pop .hb-pop-head strong { color: var(--c-classic-title); font: 800 calc(var(--fs-classic-row) * var(--cu-n, 1))/1.2 var(--font-classic-title); }
+:root[data-ui="classic"] #game-root .hb-pop .hb-pop-sub { color: var(--c-classic-text); font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); line-height: 1.3; }
+:root[data-ui="classic"] #game-root .hb-pop .hb-actions { gap: calc(4 * var(--cu)); }
+:root[data-ui="classic"] #game-root .hb-pop .hb-bt { min-width: 0; }
+:root[data-ui="classic"] #game-root .hb-pop select { height: calc(24 * var(--cu)); border: 1px solid var(--c-classic-input-border); background: var(--c-classic-input); color: var(--c-classic-text); font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); }
+/* CultCarryUI's invoke button: "Place (N iMG)" on white. */
+:root[data-ui="classic"] #game-root .hb-place {
+  min-height: calc(26 * var(--cu));
+  padding: 0 calc(16 * var(--cu));
+  border: 1px solid var(--c-classic-btn-minor-border);
+  border-radius: calc(4 * var(--cu));
+  background: var(--c-classic-panel);
+  color: var(--c-classic-btn-minor-label);
+  font: 800 calc(var(--fs-classic-button) * var(--cu-n, 1))/1 var(--font-classic-title);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--c-classic-ink) 25%, transparent);
+}
+:root[data-ui="classic"] #game-root .hb-place[aria-disabled="true"] { color: var(--c-classic-disabled); cursor: not-allowed; }
+:root[data-ui="classic"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) :is(button, select):focus-visible,
+:root[data-ui="classic"] #game-root .hb-place:focus-visible { outline: 2px solid var(--c-classic-focus); outline-offset: 1px; }
+:root[data-ui="classic"][data-home-builder] #game-root .pack-bar { visibility: hidden; }
+:root[data-ui="classic"][data-home-builder="decorate"][data-home-tray="pack"] #game-root .pack-bar { visibility: visible; }
+@media (max-width: 1100px) {
+  :root[data-ui="classic"] #game-root .hb-banner .hb-hint { display: none; }
+  /* The header has no room for the toolbar's buttons here: they sit in the tray's footer. */
+  :root[data-ui="classic"] #game-root .hb-banner .hb-banner-actions { display: none; }
+  :root[data-ui="classic"] #game-root .hb-tray .hb-foot .hb-foot-mirror { display: inline-flex !important; flex-direction: row; }
+}
+/* end BUILDER */

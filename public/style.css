@@ -846,6 +846,7 @@
   --c-classic-quest-badge: #b21f00;       /* the quest count on the iMG button (code default): ImaginationButton.as:38 */
   --c-classic-bag-strip: #f0f5f7;        /* a bag slot's used/total strip: PackSlot.as:119-170 */
   --c-classic-bag-dot: #6d777c;           /* the strip's dot */
+  --c-classic-furn-well: #d8e0e2;        /* the furniture bag's paging well: TSScrollPager.as:125-139 */
   --c-classic-bag-panel: #c6d2d3;         /* an open bag's panel (code default): PackDisplayManager.as:1083-1201 */
   --c-classic-bag-border: #b2bfc0;
   --c-classic-verb-hi: #f8f2e3;           /* the focused verb row, from int_menu_norm.png (PROPOSED, ref/flickr-verb-menu.jpg) */
@@ -11281,39 +11282,19 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #mail-panel .mail-compose-cost strong { color: var(--text); }
 @media (max-width: 760px) { [data-ui="modern"] #mail-panel .mail-layout { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { [data-ui="modern"] :is(#home-panel, #mail-panel) :is(.home-card, .mail-card) { animation: none; } }
-/* At home: Decorate and Cultivate (features/homes-feature.js .homes-bar) are a side sheet on the left,
-   under the pills, as the other sheets; Change Style (.homes-styles) the shell's centred frame. */
-[data-ui="modern"] #game-root .homes-bar {
-  left: var(--hud-inset);
-  right: auto;
-  top: calc(var(--hud-h) + 6px);
-  bottom: calc(var(--pack-live-height, 72px) + 8px);
-  width: min(var(--sheet-w), calc(100% - 2 * var(--hud-inset)));
-  border: 1px solid var(--border);
-  border-radius: var(--radius-l);
-  background: var(--surface);
-  box-shadow: var(--shadow-3);
-  font-size: var(--fs-m);
-}
-[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) {
+/* Change Style (.homes-styles, features/homes-feature.js): the shell's centred frame. */
+[data-ui="modern"] #game-root .homes-styles {
   border: 1px solid var(--border);
   border-radius: var(--radius-l);
   background: var(--surface);
   box-shadow: var(--shadow-3);
 }
-[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) header { gap: var(--space-2); padding: var(--space-3) var(--space-2) var(--space-2) var(--space-4); border-bottom: 0; background: none; }
-[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) header h3 { color: var(--text); font-size: var(--fs-xl); font-weight: var(--fw-heavy); line-height: var(--lh-tight); }
-[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) header small { color: var(--text-muted); font-size: var(--fs-s); }
-[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) .hb-close { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: var(--radius-pill); color: var(--text-muted); font-size: var(--fs-2xl); }
-[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) .hb-close:hover { background: var(--surface-hover); color: var(--text); }
-[data-ui="modern"] #game-root .homes-bar nav { gap: 2px; margin: 0 var(--space-4) var(--space-2); padding: 3px; border-radius: var(--radius-pill); background: var(--surface-sunken); }
-[data-ui="modern"] #game-root .homes-bar nav button { flex: 1; height: 30px; padding: 0 var(--space-1); border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text-muted); font: inherit; font-size: var(--fs-s); font-weight: var(--fw-heavy); }
-[data-ui="modern"] #game-root .homes-bar nav button.on { background: var(--surface-raised); color: var(--text); box-shadow: var(--shadow-1); }
-[data-ui="modern"] #game-root .homes-bar .hb-body { margin-top: 0; padding: var(--space-1) var(--space-4) var(--space-3); border-top: 0; scrollbar-width: thin; }
-[data-ui="modern"] #game-root .homes-bar .hb-tile { border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface-raised); color: var(--text); font-size: var(--fs-xs); font-weight: var(--fw-bold); }
-[data-ui="modern"] #game-root .homes-bar .hb-tile:hover { border-color: var(--border-strong); background: var(--surface-hover); box-shadow: none; }
-[data-ui="modern"] #game-root .homes-bar .hb-tile.on { border-color: var(--accent); background: var(--accent-soft); }
-[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) :is(.hb-row, .hb-actions, .hs-actions) button {
+[data-ui="modern"] #game-root .homes-styles header { gap: var(--space-2); padding: var(--space-3) var(--space-2) var(--space-2) var(--space-4); border-bottom: 0; background: none; }
+[data-ui="modern"] #game-root .homes-styles header h3 { color: var(--text); font-size: var(--fs-xl); font-weight: var(--fw-heavy); line-height: var(--lh-tight); }
+[data-ui="modern"] #game-root .homes-styles header small { color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] #game-root .homes-styles .hb-close { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: var(--radius-pill); color: var(--text-muted); font-size: var(--fs-2xl); }
+[data-ui="modern"] #game-root .homes-styles .hb-close:hover { background: var(--surface-hover); color: var(--text); }
+[data-ui="modern"] #game-root .homes-styles .hs-actions button {
   min-height: 30px;
   padding: 0 var(--space-3);
   border: 1px solid var(--border-strong);
@@ -11324,12 +11305,197 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   font-size: var(--fs-s);
   font-weight: var(--fw-heavy);
 }
-[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) :is(.hb-row, .hb-actions, .hs-actions) button.primary { border-color: var(--accent); background: var(--accent); color: var(--accent-text); }
-[data-ui="modern"] #game-root :is(.homes-bar, .homes-styles) button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
-[data-ui="modern"] #game-root .homes-bar .hb-note { color: var(--text-muted); font-size: var(--fs-s); }
-[data-ui="modern"] #game-root .homes-bar .hb-sel { border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface-raised); }
-[data-ui="modern"] #game-root .homes-bar .hb-sel p { color: var(--text-muted); font-size: var(--fs-s); }
-[data-ui="modern"] #game-root .homes-bar h4 { color: var(--text-muted); font-size: var(--fs-xs); font-weight: var(--fw-heavy); letter-spacing: 0.06em; }
+[data-ui="modern"] #game-root .homes-styles .hs-actions button.primary { border-color: var(--accent); background: var(--accent); color: var(--accent-text); }
+[data-ui="modern"] #game-root .homes-styles button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+
+/* —— BUILDER —— Decorate and Cultivate (js/ui/home-builder.js): the room fills the stage; a slim
+   banner across the top (DecorateToolbarUI), the tray in the pack's place (the furniture bag, the
+   swatch tabs, the cultivation picker), actions floating by the selected piece and a Place button
+   under what you carry. Layout for both skins here; the Modern look under [data-ui="modern"];
+   the Classic look in css/classic.css. */
+#game-root .homes-bar.hb-builder { position: absolute; inset: 0; z-index: var(--z-panel); display: block; pointer-events: none; }
+#game-root .homes-bar.hb-builder[hidden] { display: none; }
+#game-root .hb-builder > :not(.hb-sr) { pointer-events: auto; }
+.hb-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+#game-root .hb-banner { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; max-width: calc(100% - 16px); box-sizing: border-box; }
+#game-root .hb-banner-text { min-width: 0; }
+#game-root .hb-banner .hb-title, #game-root .hb-banner .hb-hint { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#game-root .hb-banner-actions { display: flex; align-items: center; flex-wrap: nowrap; }
+#game-root .hb-tray { position: absolute; box-sizing: border-box; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "tabs tabs" "panel panel" "filters foot"; }
+#game-root .hb-tray .hb-foot .hb-foot-mirror { display: none !important; }
+#game-root .hb-tray .hb-foot { grid-area: foot; display: flex; align-items: center; justify-content: flex-end; min-width: 0; }
+#game-root .hb-tray .hb-foot:first-child, #game-root .hb-tray .hb-panel + .hb-foot { grid-column: 1 / -1; }
+#game-root .hb-tray .hb-tabs { grid-area: tabs; display: flex; align-items: flex-end; }
+#game-root .hb-tray .hb-panel { grid-area: panel; display: flex; align-items: stretch; min-width: 0; }
+#game-root .hb-tray .hb-panel[hidden] { display: none; }
+#game-root .hb-tray .hb-filters { grid-area: filters; display: flex; flex-wrap: wrap; align-items: center; }
+#game-root .hb-tray .hb-tray-note { flex: 1 1 auto; margin: 0; min-width: 0; text-align: right; }
+#game-root .hb-tray .hb-panel + .hb-foot .hb-tray-note { text-align: left; }
+#game-root .hb-strip { flex: 1 1 auto; display: flex; align-items: stretch; min-width: 0; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; scrollbar-width: none; overscroll-behavior-x: contain; }
+#game-root .hb-strip::-webkit-scrollbar { display: none; }
+#game-root .hb-strip .hb-group { flex: 0 0 auto; align-self: center; writing-mode: vertical-rl; transform: rotate(180deg); }
+#game-root .hb-strip .hb-empty { align-self: center; margin: 0 auto; }
+#game-root .hb-tile { position: relative; flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; scroll-snap-align: start; touch-action: pan-x; cursor: grab; font: inherit; }
+#game-root .hb-tile[disabled] { cursor: not-allowed; }
+#game-root .hb-tile.is-dragging { cursor: grabbing; opacity: 0.5; }
+#game-root .hb-tile img { object-fit: contain; pointer-events: none; -webkit-user-drag: none; user-select: none; }
+#game-root .hb-tile .hb-tile-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#game-root .hb-tile .hb-swatch { display: block; background-size: cover; background-position: center; }
+#game-root .hb-page { flex: 0 0 auto; }
+#game-root .hb-aside, #game-root .hb-tray-actions { flex: 0 0 auto; display: flex; flex-direction: column; justify-content: center; }
+#game-root .hb-tray-actions-row { display: flex; }
+#game-root .hb-pop { position: absolute; left: 0; top: 0; z-index: var(--z-panel); box-sizing: border-box; }
+#game-root .hb-pop[hidden], #game-root .hb-place[hidden] { display: none; }
+#game-root .hb-pop .hb-actions { display: flex; flex-wrap: wrap; align-items: center; }
+#game-root .hb-pop .hb-pop-head strong { display: block; }
+#game-root .hb-pop .hb-pop-sub { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+#game-root .hb-place { position: absolute; left: 0; top: 0; z-index: var(--z-panel); white-space: nowrap; cursor: pointer; font: inherit; }
+#game-root .hb-place.is-following { pointer-events: none; }
+/* The pack hides while the tray holds its place; the Pack tab shows it again, under the tabs. */
+:root[data-home-builder] #game-root .pack-bar { visibility: hidden; }
+:root[data-home-builder="decorate"][data-home-tray="pack"] #game-root .pack-bar { visibility: visible; }
+
+/* Modern: Warm paper, compact. */
+[data-ui="modern"] #game-root .hb-builder { font-family: var(--font-ui); color: var(--text); }
+[data-ui="modern"] #game-root .hb-banner {
+  top: calc(var(--hud-h) + var(--hud-inset) + var(--space-2));
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  box-shadow: var(--shadow-2);
+}
+[data-ui="modern"] #game-root .hb-banner .hb-title { color: var(--text); font-size: var(--fs-m); font-weight: var(--fw-heavy); line-height: var(--lh-tight); }
+[data-ui="modern"] #game-root .hb-banner .hb-hint { color: var(--text-muted); font-size: var(--fs-xs); line-height: var(--lh-tight); }
+[data-ui="modern"] #game-root .hb-banner-actions { gap: var(--space-1); padding-left: var(--space-3); border-left: 1px solid var(--border); }
+[data-ui="modern"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 32px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-s);
+  font-weight: var(--fw-heavy);
+  white-space: nowrap;
+  cursor: pointer;
+}
+[data-ui="modern"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt:hover:not(:disabled) { background: var(--surface-hover); }
+[data-ui="modern"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt.primary { border-color: var(--accent); background: var(--accent); color: var(--accent-text); }
+[data-ui="modern"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt.primary:hover:not(:disabled) { background: var(--accent-hover); }
+[data-ui="modern"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) .hb-bt:disabled { border-color: var(--border); background: var(--surface-sunken); color: var(--text-muted); cursor: not-allowed; }
+[data-ui="modern"] #game-root .hb-banner .hb-btn-ic { font-size: var(--fs-m); line-height: var(--lh-none); }
+[data-ui="modern"] #game-root .hb-banner .hb-close { display: inline-grid; place-items: center; flex: 0 0 auto; width: 32px; height: 32px; padding: 0; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text-muted); font: inherit; font-size: var(--fs-2xl); line-height: var(--lh-none); cursor: pointer; }
+[data-ui="modern"] #game-root .hb-banner .hb-close:hover { background: var(--surface-hover); color: var(--text); }
+[data-ui="modern"] #game-root .hb-tray {
+  left: calc(var(--inset-l, 0px) + var(--hud-inset));
+  right: calc(var(--inset-r, 0px) + var(--hud-inset));
+  bottom: var(--hud-inset);
+  max-width: 1180px;
+  margin: 0 auto;
+  gap: var(--sp-3) var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  box-shadow: var(--shadow-3);
+}
+/* The Pack tab: only the tabs, over the pack itself. */
+[data-ui="modern"] #game-root .hb-tray[data-tab="pack"] { right: auto; max-width: min(340px, calc(50% - 180px)); margin: 0; padding-bottom: var(--space-2); }
+[data-ui="modern"] #game-root .hb-tray .hb-tabs { gap: 2px; justify-self: start; padding: 3px; border-radius: var(--radius-pill); background: var(--surface-sunken); }
+[data-ui="modern"] #game-root .hb-tray .hb-tabs button { min-height: 28px; padding: 0 var(--space-3); border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text-muted); font: inherit; font-size: var(--fs-s); font-weight: var(--fw-heavy); cursor: pointer; }
+[data-ui="modern"] #game-root .hb-tray .hb-tabs button:hover { color: var(--text); }
+[data-ui="modern"] #game-root .hb-tray .hb-tabs button.on { background: var(--surface-raised); color: var(--text); box-shadow: var(--shadow-1); }
+[data-ui="modern"] #game-root .hb-tray .hb-panel { gap: var(--sp-2); }
+[data-ui="modern"] #game-root .hb-strip { gap: var(--sp-3); padding: 2px; }
+[data-ui="modern"] #game-root .hb-strip .hb-group { padding: 0 var(--sp-1); color: var(--text-muted); font-size: var(--fs-2xs); font-weight: var(--fw-heavy); letter-spacing: 0.06em; text-transform: uppercase; }
+[data-ui="modern"] #game-root .hb-tile {
+  width: 76px;
+  height: 80px;
+  gap: 2px;
+  padding: var(--sp-2) var(--sp-1) var(--sp-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--surface-raised);
+  color: var(--text);
+}
+[data-ui="modern"] #game-root .hb-tile:hover:not([disabled]) { border-color: var(--border-strong); background: var(--surface-hover); }
+[data-ui="modern"] #game-root .hb-tile.on { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+[data-ui="modern"] #game-root .hb-tile[disabled] { opacity: 0.55; }
+[data-ui="modern"] #game-root .hb-tile img { width: 48px; height: 46px; }
+[data-ui="modern"] #game-root .hb-tile .hb-tile-name { font-size: var(--fs-2xs); font-weight: var(--fw-bold); line-height: var(--lh-tight); }
+[data-ui="modern"] #game-root .hb-tile .hb-count { position: absolute; top: 3px; right: 3px; min-width: 18px; padding: 0 5px; border-radius: var(--radius-pill); background: var(--moss); color: var(--text-inverse); font-size: var(--fs-2xs); font-weight: var(--fw-heavy); line-height: 1.5; text-align: center; }
+[data-ui="modern"] #game-root .hb-tile-swatch { width: 64px; }
+[data-ui="modern"] #game-root .hb-tile-swatch .hb-swatch { width: 52px; height: 50px; border: 1px solid var(--border); border-radius: var(--radius-sm); background-color: var(--surface-sunken); }
+[data-ui="modern"] #game-root .hb-tile-cult { width: 92px; height: 92px; justify-content: space-between; }
+[data-ui="modern"] #game-root .hb-tile-cult img { width: 60px; height: 44px; }
+[data-ui="modern"] #game-root .hb-tile .hb-cost { color: var(--imagination); font-size: var(--fs-xs); font-weight: var(--fw-heavy); }
+[data-ui="modern"] #game-root .hb-page { width: 26px; padding: 0; border: 0; border-radius: var(--radius-m); background: var(--surface-sunken); color: var(--text-muted); font: inherit; font-size: var(--fs-xl); cursor: pointer; }
+[data-ui="modern"] #game-root .hb-page:hover:not(:disabled) { background: var(--surface-hover); color: var(--text); }
+[data-ui="modern"] #game-root .hb-page:disabled { opacity: 0.35; cursor: default; }
+[data-ui="modern"] #game-root .hb-aside { width: 168px; gap: var(--sp-2); padding: 0 var(--sp-3); }
+[data-ui="modern"] #game-root .hb-aside .hb-note { margin: 0; color: var(--text); font-size: var(--fs-s); font-weight: var(--fw-bold); line-height: var(--lh-snug); }
+[data-ui="modern"] #game-root .hb-aside .hb-balance { margin: 0; color: var(--imagination); font-size: var(--fs-s); font-weight: var(--fw-heavy); }
+[data-ui="modern"] #game-root .hb-tray-actions { gap: var(--sp-2); padding: 0 var(--sp-2) 0 var(--space-3); border-left: 1px solid var(--border); }
+[data-ui="modern"] #game-root .hb-tray-actions-title { color: var(--text-muted); font-size: var(--fs-2xs); font-weight: var(--fw-heavy); letter-spacing: 0.06em; text-transform: uppercase; }
+[data-ui="modern"] #game-root .hb-tray-actions-row { gap: var(--sp-2); }
+[data-ui="modern"] #game-root .hb-tray-actions .hb-note { color: var(--text-muted); font-size: var(--fs-2xs); }
+[data-ui="modern"] #game-root .hb-tray .hb-filters { gap: var(--sp-2); }
+[data-ui="modern"] #game-root .hb-tray .hb-filters button { min-height: 24px; padding: 0 var(--sp-5); border: 1px solid var(--border); border-radius: var(--radius-pill); background: transparent; color: var(--text-muted); font: inherit; font-size: var(--fs-xs); font-weight: var(--fw-bold); cursor: pointer; }
+[data-ui="modern"] #game-root .hb-tray .hb-filters button:hover { color: var(--text); border-color: var(--border-strong); }
+[data-ui="modern"] #game-root .hb-tray .hb-filters button.on { border-color: var(--accent); background: var(--accent-soft); color: var(--text); }
+[data-ui="modern"] #game-root .hb-tray .hb-foot { gap: var(--space-3); }
+[data-ui="modern"] #game-root .hb-tray .hb-foot .hb-bt { min-height: 26px; font-size: var(--fs-xs); }
+[data-ui="modern"] #game-root .hb-tray .hb-tray-note { align-self: center; color: var(--text-muted); font-size: var(--fs-xs); line-height: var(--lh-snug); }
+[data-ui="modern"] #game-root .hb-tray .hb-empty { color: var(--text-muted); font-size: var(--fs-s); }
+[data-ui="modern"] #game-root .hb-tray.is-drop-target { border-color: var(--accent); box-shadow: var(--shadow-3), inset 0 0 0 2px var(--accent); }
+[data-ui="modern"] #game-root .hb-builder.is-dragging .hb-tray { cursor: grabbing; }
+[data-ui="modern"] #game-root .hb-pop {
+  max-width: min(440px, calc(100% - 16px));
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  box-shadow: var(--shadow-2);
+}
+[data-ui="modern"] #game-root .hb-pop .hb-pop-head { margin-bottom: var(--sp-3); }
+[data-ui="modern"] #game-root .hb-pop .hb-pop-head strong { color: var(--text); font-size: var(--fs-s); font-weight: var(--fw-heavy); }
+[data-ui="modern"] #game-root .hb-pop .hb-pop-sub { color: var(--text-muted); font-size: var(--fs-xs); line-height: var(--lh-snug); }
+[data-ui="modern"] #game-root .hb-pop .hb-actions { gap: var(--sp-2); }
+[data-ui="modern"] #game-root .hb-pop .hb-bt { min-height: 30px; padding: 0 var(--sp-5); font-size: var(--fs-xs); }
+[data-ui="modern"] #game-root .hb-pop select { min-height: 30px; max-width: 180px; padding: 0 var(--sp-3); border: 1px solid var(--border-strong); border-radius: var(--radius-pill); background: var(--surface-raised); color: var(--text); font: inherit; font-size: var(--fs-xs); }
+[data-ui="modern"] #game-root .hb-place {
+  min-height: 30px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: var(--fs-s);
+  font-weight: var(--fw-heavy);
+  box-shadow: var(--shadow-2);
+}
+[data-ui="modern"] #game-root .hb-place[aria-disabled="true"] { border-color: var(--border-strong); background: var(--surface); color: var(--text-muted); cursor: not-allowed; }
+[data-ui="modern"] #game-root .hb-place.is-following { box-shadow: var(--shadow-1); }
+[data-ui="modern"] #game-root :is(.hb-banner, .hb-tray, .hb-pop) :is(button, select):focus-visible,
+[data-ui="modern"] #game-root .hb-place:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+@media (max-width: 1100px) {
+  [data-ui="modern"] #game-root .hb-banner .hb-hint { display: none; }
+  [data-ui="modern"] #game-root .hb-banner .hb-btn-ic { display: none; }
+  [data-ui="modern"] #game-root .hb-aside { width: 132px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-ui="modern"] #game-root :is(.hb-tile, .hb-bt, .hb-tabs button, .hb-filters button) { transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out); }
+}
+[data-ui="modern"] #game-root .hb-tray[data-tab="pack"] .hb-foot { grid-column: 1 / -1; flex-wrap: wrap; justify-content: flex-start; }
+[data-ui="modern"] #game-root .hb-tray[data-tab="pack"] .hb-tray-note { text-align: left; flex-basis: 100%; }
+[data-ui="modern"] #game-root .hb-tray[data-tab="pack"] .hb-tabs { flex-wrap: wrap; }
+/* —— /BUILDER —— */
 [data-ui="modern"] #game-root .homes-styles .hs-sel { border-bottom: 1px solid var(--border); }
 [data-ui="modern"] #game-root .homes-styles .hs-name small { color: var(--text-muted); }
 /* The How many chooser (js/ui/count-chooser.js): − [number] + Max, OK with the count, Esc back.

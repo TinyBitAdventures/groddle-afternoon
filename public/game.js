@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e2372a6b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=05df51b6';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c822ab1d';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -10621,6 +10621,27 @@ const engine = {
     }
     return result;
   },
+  /**
+   * BUILDER: set `count` of a pack class down at world (x, y) here, as Drop does (the same drop
+   * rules, the same dropped-stack record): Decoration Mode's drag from the pack onto a shelf.
+   */
+  dropPackStackAt(classTsid, count, x, y) {
+    if (!state.started || !currentStreetTsid) return { ok: false, reason: 'not_started' };
+    const blocked = packDropBlockReason(classTsid);
+    if (blocked) return { ok: false, reason: 'blocked', msg: blocked };
+    const n = normalizeStackQuantity(count, inv[classTsid] || 0);
+    if (!n) return { ok: false, reason: 'missing', msg: 'That stack is no longer in your pack.' };
+    const result = dropInventoryStack(droppedItemState, inv, droppedStacksTsid(), classTsid, n, { x, y }, { now: Date.now(), mergeRadius: 12 });
+    if (!result.ok) return result;
+    closePackPopover();
+    saveDroppedItems();
+    refreshDroppedWorldItems();
+    const label = ITEM_CATALOG[classTsid]?.label || classTsid.replace(/_/g, ' ');
+    pushActivity(`You set down ${result.count}× ${label}.`);
+    playSound('ITEM_DROP', { volume: 0.6 });
+    updateHud();
+    return result;
+  },
   /** Every street's dropped stacks (js/world-items.js state), for features that fetch from the ground. */
   get droppedItems() {
     return droppedItemState;
@@ -12157,7 +12178,9 @@ function gameplayInputBlocked() {
     // Quests, Make, Badges, Skills, Buffs, Feat and the vendors are side sheets: the avatar still walks (SIDE_SHEET_IDS).
     isGardenOpen() ||
     isAvatarOpen() ||
-    isShrineOpen()
+    isShrineOpen() ||
+    // BUILDER: Decoration Mode holds the avatar (HandOfDecorator stops_avatar_on_focus); the keys scroll the room.
+    features.query('homeEditMode', engine) === 'decorate'
   );
 }
 
@@ -21999,8 +22022,9 @@ function focusedDialogButton() {
   const button = document.activeElement?.closest?.('button, [role="button"]');
   if (!button || button.disabled) return null;
   // The pack row's buttons too: Enter or Space on a focused bag or stack presses it (opens the tray or
-  // the stack's actions), never the nearest thing's menu or a jump.
-  const dialog = button.closest('dialog, [role="dialog"], [aria-modal="true"], .glitch-modal, #pack-bar');
+  // the stack's actions), never the nearest thing's menu or a jump. BUILDER: the decorate and cultivate
+  // tray, banner, floating actions and Place button (js/ui/home-builder.js) likewise.
+  const dialog = button.closest('dialog, [role="dialog"], [aria-modal="true"], .glitch-modal, #pack-bar, #homes-bar, #homes-pop, #homes-place');
   return dialog && !dialog.hidden ? button : null;
 }
 
