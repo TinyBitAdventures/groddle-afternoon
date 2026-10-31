@@ -93,7 +93,12 @@ describe('a rooked Piggy (Pasha\'s Place walk in place)', () => {
 });
 
 describe('a Piggy that reached its food', () => {
-  it('stands still while it eats (no walk in place), then walks on', async () => {
+  it('stands still while it eats (no walk in place), then walks on', () => {
+    // The feature times the pause by Date.now: a held clock keeps this test off the machine's load.
+    const realNow = Date.now;
+    let clock = realNow();
+    Date.now = () => clock;
+    try {
     const { engine, pig, tree } = setup();
     let playing = true;
     Object.defineProperty(pig.sprite, 'playing', { get: () => playing });
@@ -103,6 +108,7 @@ describe('a Piggy that reached its food', () => {
     let t = 10_000;
     const tick = (ms = 500) => {
       t += ms;
+      clock += ms;
       animalMoodFeature.onTick(ms, t, engine);
       pig.sprite.x += pig.sprite.vx * (ms / 16);
     };
@@ -112,10 +118,13 @@ describe('a Piggy that reached its food', () => {
     for (let i = 0; i < 4; i += 1) tick();
     assert.ok(Math.abs(pig.sprite.x - tree.sprite.x) < 7, 'it reached the tree');
     assert.equal(playing, false, 'eating, it stands on a still frame (onFoodPathing 1485-1513: chew, then idle)');
-    await new Promise((r) => setTimeout(r, 3100));
+    clock += 3100;
     tick();
     assert.equal(playing, true, 'it walks on after the pause');
     assert.ok(Math.abs(pig.sprite.vx) >= 0.4);
     animalMoodFeature.onStreetClear();
+    } finally {
+      Date.now = realNow;
+    }
   });
 });
