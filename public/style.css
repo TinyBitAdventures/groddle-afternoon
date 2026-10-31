@@ -9751,6 +9751,8 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] .more-list .menu-zoom { grid-template-columns: 1fr auto; padding: var(--space-1) var(--space-2) var(--space-2); }
 [data-ui="modern"] .more-list .menu-zoom input { grid-column: 1 / -1; }
 [data-ui="modern"] .more-list .menu-zoom .hud-zoom-ends { grid-column: 1 / -1; }
+/* The zoom keys under the slider (world-zoom.js ZOOM_KEYS_HINT). */
+[data-ui="modern"] .hud-zoom-keys { grid-column: 1 / -1; margin: var(--sp-2) 0 0; color: var(--text-muted); font-size: var(--fs-xs); }
 [data-ui="modern"] .hud-zoom input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
 /* —— NIGHT TINT —— the switch under Zoom in the Menu's Settings group (js/night-tint.js, js/ui/topbar.js). */

@@ -17,7 +17,7 @@
  * The pure helpers below are tested without a DOM (tests/topbar.test.js).
  */
 import { vitalLevel, vitalTitle } from '../vitals.js?v=ca7471dd';
-import { clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b5f4748a';
+import { ZOOM_KEYS_HINT, clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b262a6c7';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL } from '../night-tint.js?v=917a2caa';
 import { STREET_MAP_HINT, STREET_MAP_LABEL } from './street-minimap.js?v=ee455eee';
 
@@ -509,7 +509,8 @@ function installSound(doc, audio) {
 }
 
 /**
- * ZOOM: one Zoom slider (Wide 0 to Original 100, js/world-zoom.js) with its live label.
+ * ZOOM: one Zoom slider (Wide 0 to Original 100, js/world-zoom.js) with its live label
+ * and the keys under it (ZOOM_KEYS_HINT).
  * `where` names it for QA (data-zoom-control). Returns the row and a draw().
  */
 export function zoomSlider(doc, zoom, { id, where, className = 'hud-slider hud-zoom' }) {
@@ -521,14 +522,19 @@ export function zoomSlider(doc, zoom, { id, where, className = 'hud-slider hud-z
   label.textContent = 'Zoom';
   const input = doc.createElement('input');
   Object.assign(input, { id, type: 'range', min: '0', max: '100', step: '1' });
-  input.setAttribute('aria-describedby', `${id}-ends`);
+  input.setAttribute('aria-describedby', `${id}-ends ${id}-keys`);
   const out = doc.createElement('output');
   out.htmlFor = id;
   const ends = doc.createElement('span');
   ends.id = `${id}-ends`;
   ends.className = 'hud-zoom-ends';
   ends.innerHTML = '<span>Wide</span><span>Original</span>';
-  row.append(label, input, out, ends);
+  // The keys that do the same from anywhere in the game (world-zoom.js zoomKeyAction).
+  const keys = doc.createElement('p');
+  keys.id = `${id}-keys`;
+  keys.className = 'hud-zoom-keys';
+  keys.textContent = ZOOM_KEYS_HINT;
+  row.append(label, input, out, ends, keys);
   const draw = () => {
     const z = clampZoom(zoom?.get?.());
     if (doc.activeElement !== input) input.value = String(Math.round(z * 100));

@@ -29,7 +29,7 @@ import {
   hotkeyText,
   isHotkeySheetRelease,
   isPlainKey,
-} from '../public/js/client-hotkeys.js?v=e50c1649';
+} from '../public/js/client-hotkeys.js?v=34ae15ae';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(here, '../public');
@@ -162,7 +162,8 @@ describe('G254: the hotkey sheet lists only keys the remake answers', () => {
     assert.ok(solo.includes('Preferences: ,'), 'commaKeyHandler: Preferences (js/classic/classic-prefs.js)');
     // ZOOM: the remake answers the client's zoom keys now (TSFrontController.as startListeningToZoomKeys
     // 3181-3192: 0, minus, equal), with its own world zoom (js/world-zoom.js).
-    assert.ok(solo.includes('Zoom In: =') && solo.includes('Zoom Out: -') && solo.includes('Zoom to Original: 0'));
+    // + too (player report on v0.7.0: where + needs Shift, both keys zoom in, world-zoom.js zoomKeyAction).
+    assert.ok(solo.includes('Zoom In: = or +') && solo.includes('Zoom Out: -') && solo.includes('Zoom to Original: 0'));
     assert.ok(solo.includes('Street Map: Shift+M'), 'G370: the street map on Shift+M');
     for (const gone of [/Info-getting/, /\bI\b$/m]) {
       assert.doesNotMatch(all, gone);

@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { viewFromCanvas } from '../public/js/classic/classic-frame.js?v=1c54a74a';
+import { viewFromCanvas } from '../public/js/classic/classic-frame.js?v=9c837724';
 import { railFor, chromeWidth } from '../public/js/classic/classic-layout.js?v=299eef68';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

@@ -67,6 +67,21 @@ export function zoomKeyAction(e) {
   return null;
 }
 
+/**
+ * The keys, in plain words, under every Zoom slider (the Menu, the Sound popover and
+ * Preferences), so a player who never saw the Zoomability card learns them (player
+ * report on v0.7.0: 0 went back to Original and there seemed no key back out).
+ */
+export const ZOOM_KEYS_HINT = 'Keys: - out, = in, 0 Original';
+
+/**
+ * PURE: the brief notice a zoom key shows, or '' for none. Only `0` says anything:
+ * it jumps all the way, so it says where it went and the way back out.
+ */
+export function zoomKeyToast(action) {
+  return action === 'reset' ? 'Zoom: Original (press - to zoom out)' : '';
+}
+
 /** PURE: the level after a zoom key. */
 export function nextZoom(z, action) {
   const v = clampZoom(z);

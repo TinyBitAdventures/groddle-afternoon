@@ -22,8 +22,8 @@
  */
 import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=587c014a';
 import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=299eef68';
-import { installClassicChrome } from './classic-chrome.js?v=82c8e0ea';
-import { clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b5f4748a';
+import { installClassicChrome } from './classic-chrome.js?v=3432e381';
+import { ZOOM_KEYS_HINT, clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b262a6c7';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL, nightTintOn, onNightTintChange, setNightTint } from '../night-tint.js?v=917a2caa';
 import { STREET_MAP_HINT, STREET_MAP_LABEL, onStreetMapChange, setStreetMap, streetMapOn } from '../ui/street-minimap.js?v=ee455eee';
 
@@ -145,12 +145,14 @@ export function createPreferences(doc) {
     // ZOOM: the world zoom, the same slider as the Menu's (js/world-zoom.js).
     const zoomBox = el(doc, 'div', { class: 'prefs-zoom', 'data-zoom-control': 'prefs' });
     const zoomLbl = el(doc, 'label', { for: 'prefs-zoom' }, 'Zoom');
-    parts.zoom = el(doc, 'input', { type: 'range', id: 'prefs-zoom', min: '0', max: '100', step: '1', 'aria-describedby': 'prefs-zoom-ends' });
+    parts.zoom = el(doc, 'input', { type: 'range', id: 'prefs-zoom', min: '0', max: '100', step: '1', 'aria-describedby': 'prefs-zoom-ends prefs-zoom-keys' });
     parts.zoomOut = el(doc, 'output', { for: 'prefs-zoom' });
     const zoomEnds = el(doc, 'span', { id: 'prefs-zoom-ends', class: 'prefs-zoom-ends' });
     zoomEnds.append(el(doc, 'span', {}, 'Wide'), el(doc, 'span', {}, 'Original'));
     parts.zoomHeld = el(doc, 'p', { class: 'prefs-note', 'data-prefs-note': 'zoom-held', hidden: true }, 'Original window size keeps the world at 1000 by 600, so zoom waits until it is off.');
-    zoomBox.append(zoomLbl, parts.zoom, parts.zoomOut, zoomEnds, parts.zoomHeld);
+    // The keys that do the same from anywhere in the game (world-zoom.js zoomKeyAction).
+    const zoomKeys = el(doc, 'p', { id: 'prefs-zoom-keys', class: 'prefs-note prefs-zoom-keys' }, ZOOM_KEYS_HINT);
+    zoomBox.append(zoomLbl, parts.zoom, parts.zoomOut, zoomEnds, zoomKeys, parts.zoomHeld);
     parts.zoom.addEventListener('input', () => {
       setWorldZoom(clampZoom(Number(parts.zoom.value) / 100));
       sync();

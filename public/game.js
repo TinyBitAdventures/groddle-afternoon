@@ -702,10 +702,10 @@ import { momentMoreText } from './js/ui/moment-card.js?v=077703c8';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
 import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=587c014a';
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
-import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction } from './js/world-zoom.js?v=b5f4748a';
+import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast } from './js/world-zoom.js?v=b262a6c7';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=917a2caa';
 import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=ee455eee';
-import './js/classic/classic-zoom.js?v=7a25123e';
+import './js/classic/classic-zoom.js?v=1ef4b9a5';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=fff73f8c';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=2089ac54';
@@ -885,7 +885,7 @@ import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from '.
 import { installHiresIcons } from './js/icon-hires.js?v=5357d4b4';
 import { installHiresDecos } from './js/deco-hires.js?v=7678e434';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=e56202ee';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=7f816593';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=bfdd12a1';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=f7ea0bd5';
@@ -900,7 +900,7 @@ import { createQuestTracker } from './js/ui/quest-tracker.js?v=e2899b11';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=e9d100c3';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=e50c1649';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=34ae15ae';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=8bf3b1bb';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d51e';
@@ -917,7 +917,7 @@ import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?
 import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=7e1b24b7';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=0b92cb49';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -26879,12 +26879,15 @@ async function main() {
       return;
     }
     if (clientShortcutKey(e)) return;
-    // ZOOM: = (or +) closer, - wider, 0 back to Wide (js/world-zoom.js); typing in a field never gets here.
+    // ZOOM: = (or +) closer, - wider, 0 back to Original (js/world-zoom.js); typing in a field never gets here.
+    // 0 says where it went and the way back out (zoomKeyToast; player report on v0.7.0).
     const zoomKey = zoomKeyAction(e);
     if (zoomKey) {
       e.preventDefault();
       keys.delete(e.key);
       stepWorldZoom(zoomKey);
+      const said = e.repeat ? '' : zoomKeyToast(zoomKey);
+      if (said) toast(said, 3000);
       return;
     }
     if (e.key === 'f' || e.key === 'F') eatApple();
