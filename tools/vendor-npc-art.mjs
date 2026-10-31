@@ -17,7 +17,7 @@ import { mkdirSync, readdirSync, rmSync, mkdtempSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
-import { VENDOR_NPC_ART } from '../public/js/vendor-npcs.js?v=53b1f6c9';
+import { VENDOR_NPC_ART } from '../public/js/vendor-npcs.js?v=616c0568';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OGA = join(os.homedir(), 'Documents/glitch-audit/opengameart/extracted_vendors/glitch-assets');

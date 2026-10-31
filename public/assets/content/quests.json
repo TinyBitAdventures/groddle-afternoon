@@ -35264,8 +35264,8 @@
  "vendor_ping_pong_part1": {
   "classTsid": "vendor_ping_pong_part1",
   "title": "Meet the Merchants",
-  "desc": "Visit the <b>Gardening Vendor</b> in <b>Northwest Passage</b>. He has some work for you.",
-  "offer": "Hi!<split butt_txt=\"Um, hi.\" /> I'm your pet rock. I'll be your guide to this brand new world.<split butt_txt=\"Great!\" /> If you're ready to get started, let's go.<split butt_txt=\"I'm ready\" /> OK, great. Here's the first thing you should do: head over to the <b>Gardening Vendor</b> in <b>Northwest Passage</b>. He has some work for you. Click on your map over there in the top right corner to locate him.",
+  "desc": "Visit the <b>Gardening Vendor</b> in <b>Middle Arbor</b>, here in Groddle Forest. He has some work for you.",
+  "offer": "Hi!<split butt_txt=\"Um, hi.\" /> I'm your pet rock. I'll be your guide to this brand new world.<split butt_txt=\"Great!\" /> If you're ready to get started, let's go.<split butt_txt=\"I'm ready\" /> OK, great. Here's the first thing you should do: head over to the <b>Gardening Vendor</b> in <b>Middle Arbor</b>, here in Groddle Forest. He has some work for you. Click on your map over there in the top right corner to locate him.",
   "completion": "Oh, hello! I've been expecting you. Maybe you can help me out...",
   "requirements": [],
   "rewards": {
@@ -35305,8 +35305,8 @@
  "vendor_ping_pong_part2": {
   "classTsid": "vendor_ping_pong_part2",
   "title": "Meet the Merchants",
-  "desc": "Deliver 1 pack of tomato seeds, 1 pack of onion seeds, a hoe, and a watering can to the <b>Tool Vendor</b> on <b>Ti Street</b> in Groddle.<br><br>Don't forget to <b>buy these items from the Gardening Vendor</b> before you head off.",
-  "offer": "I have a friend who sells tools over in <b>Groddle</b>, on <b>Ti Street</b>. He's been thinking of growing a garden, but he needs some seeds.<split butt_txt=\"Yeah? Tell me more.\" /> He has a terrible green thumb, so he needs my help. Can you take him 1 pack of <b>tomato seeds</b>, 1 pack of <b>onion seeds</b>, a <b>hoe</b>, and a <b>watering can</b>?<split butt_txt=\"Sure, I'll help.\" />  You'll have to <b>buy these items from me</b> first. The tool vendor will pay you back. You can count on him. He may have a black thumb, but he's chock full of scruples.",
+  "desc": "Deliver 1 pack of tomato seeds, 1 pack of onion seeds, a hoe, and a watering can to the <b>Tool Vendor</b> in <b>Cebarkul</b>, in Uralia.<br><br>Don't forget to <b>buy these items from the Gardening Vendor</b> before you head off.",
+  "offer": "I have a friend who sells tools over in <b>Uralia</b>, in <b>Cebarkul</b>. He's been thinking of growing a garden, but he needs some seeds.<split butt_txt=\"Yeah? Tell me more.\" /> He has a terrible green thumb, so he needs my help. Can you take him 1 pack of <b>tomato seeds</b>, 1 pack of <b>onion seeds</b>, a <b>hoe</b>, and a <b>watering can</b>?<split butt_txt=\"Sure, I'll help.\" />  You'll have to <b>buy these items from me</b> first. The tool vendor will pay you back. You can count on him. He may have a black thumb, but he's chock full of scruples.",
   "completion": "Thank you so much! I can't wait to get started on my garden.<split butt_txt=\"Oh. Uh. Good luck?\" />  Don't believe anything the Gardening Vendor tells you. He's just jealous that my pumpkin took first prize in the Groddle Forest Harvest Fair.<split butt_txt=\"Wow. Congratulations.\" />  Here's your money, plus a little something extra for your trouble.",
   "requirements": [
    {
@@ -35400,8 +35400,8 @@
  "vendor_ping_pong_part3": {
   "classTsid": "vendor_ping_pong_part3",
   "title": "Meet the Merchants",
-  "desc": "Deliver 3 tubes of butterfly lotion to the <b>Cooking Vendor</b> who works in the <b>Thicket</b> in Groddle Forest.<br><br>Don't forget to <b>buy the lotion</b> before you set off.",
-  "offer": "You've been such a great help so far. Are you up for another errand?<split butt_txt=\"Like what?\" /> There's a fellow who sells hard-to-come-by cooking ingredients. He lives in the <b>Thicket</b> here in Groddle Forest. He has a thing for <b>butterfly lotion</b>. I don't know if he eats it or uses it on himself or what.<split butt_txt=\"That's... odd. So?\" /> It's not my place to judge, so can you <b>bring him 3 tubes of butterfly lotion</b>?<split butt_txt=\"That's very open-minded of you.\" /> I try. You can <b>buy the lotion from me</b>. The <b>Cooking Vendor</b> in the <b>Thicket</b> will pay you back. He's good for it. Despite his bizarre penchants, he's quite trustworthy.",
+  "desc": "Deliver 3 tubes of butterfly lotion to the <b>Cooking Vendor</b> who works in <b>Level 2 East</b>, in the Ilmenskie Caverns.<br><br>Don't forget to <b>buy the lotion</b> before you set off.",
+  "offer": "You've been such a great help so far. Are you up for another errand?<split butt_txt=\"Like what?\" /> There's a fellow who sells hard-to-come-by cooking ingredients. He works down in <b>Level 2 East</b>, in the Ilmenskie Caverns. He has a thing for <b>butterfly lotion</b>. I don't know if he eats it or uses it on himself or what.<split butt_txt=\"That's... odd. So?\" /> It's not my place to judge, so can you <b>bring him 3 tubes of butterfly lotion</b>?<split butt_txt=\"That's very open-minded of you.\" /> I try. You can <b>buy the lotion from me</b>. The <b>Cooking Vendor</b> in <b>Level 2 East</b> will pay you back. He's good for it. Despite his bizarre penchants, he's quite trustworthy.",
   "completion": "My lotion! Excellent. My precious butterfly will be so happy. He's been complaining about my calluses.<split butt_txt=\"Er...\" /> What has the Tool Vendor been telling you? Oh, never mind. Besides, you wouldn't believe what that guy's into.",
   "requirements": [
    {

@@ -57,7 +57,7 @@ describe('G363: instances show no hub line', () => {
   });
 
   it('feature instances answer labelFor with no hub', async () => {
-    const { gwendolynRoom23Feature } = await import('../public/js/features/gwendolyn-room-23-feature.js?v=3544c7f6');
+    const { gwendolynRoom23Feature } = await import('../public/js/features/gwendolyn-room-23-feature.js?v=83aa69ca');
     assert.deepEqual(gwendolynRoom23Feature.labelFor('GCR8MORFJI12IR4'), { street: 'Room 23', hub: '', hubId: '79' });
     assert.equal(gwendolynRoom23Feature.labelFor('GTJ10M515812V0C'), null, 'Corridor Five keeps its hub');
     const street = { tsid: 'GCR8MORFJI12IR4', hubName: 'Tower Quest' };

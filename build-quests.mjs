@@ -177,6 +177,33 @@ const REQUIREMENT_OVERRIDES = {
   ],
 };
 
+// Quest text that sends the player somewhere the archive puts nothing. Each row is a list of exact
+// [from, to] swaps on desc, offer and completion, applied to the GSJS text; the build fails when a
+// `from` is no longer in the source. Deviation from GSJS, recorded here and in the commit.
+//
+// Meet the Merchants (vendor_ping_pong_part1-4): the chain's street names date from 2010 (in 2012 it
+// was granted only by the admin /testquest, main.js 2358-2371). The archived location objects stand
+// its vendors elsewhere (street-ecology.json `vendors`, js/vendor-npcs.js), and the remake follows the
+// archive: Northwest Passage's own vendor is the Kitchen Tools street spirit (inc_data_mapextras_prod.js
+// 1563), "Ti Street" is on no map, and the Thicket has no vendor. Each part now names the nearest
+// archived stand of its vendor from Groddle Forest (Austin 2026-10-31). Part 4's Uncle Friendly stands
+// in his Emporium, whose door is on Guillermo Gamera Way, as its text says.
+const TEXT_OVERRIDES = {
+  vendor_ping_pong_part1: [
+    ['Visit the <b>Gardening Vendor</b> in <b>Northwest Passage</b>.', 'Visit the <b>Gardening Vendor</b> in <b>Middle Arbor</b>, here in Groddle Forest.'],
+    ['head over to the <b>Gardening Vendor</b> in <b>Northwest Passage</b>.', 'head over to the <b>Gardening Vendor</b> in <b>Middle Arbor</b>, here in Groddle Forest.'],
+  ],
+  vendor_ping_pong_part2: [
+    ['to the <b>Tool Vendor</b> on <b>Ti Street</b> in Groddle.', 'to the <b>Tool Vendor</b> in <b>Cebarkul</b>, in Uralia.'],
+    ['I have a friend who sells tools over in <b>Groddle</b>, on <b>Ti Street</b>.', 'I have a friend who sells tools over in <b>Uralia</b>, in <b>Cebarkul</b>.'],
+  ],
+  vendor_ping_pong_part3: [
+    ['to the <b>Cooking Vendor</b> who works in the <b>Thicket</b> in Groddle Forest.', 'to the <b>Cooking Vendor</b> who works in <b>Level 2 East</b>, in the Ilmenskie Caverns.'],
+    ['He lives in the <b>Thicket</b> here in Groddle Forest.', 'He works down in <b>Level 2 East</b>, in the Ilmenskie Caverns.'],
+    ['The <b>Cooking Vendor</b> in the <b>Thicket</b> will pay you back.', 'The <b>Cooking Vendor</b> in <b>Level 2 East</b> will pay you back.'],
+  ],
+};
+
 const INFERRED_GATES = {
   meditativearts_meditation_station: { quests: ['meditativearts_get_max_relax'], why: 'Meditative Arts series; no giver survives (familiar turn-in)' },
   master_milker: { quests: ['animalkinship_milk_butterflies'], why: 'milking quest after the Animal Kinship milking quest' },
@@ -408,6 +435,12 @@ for (const file of files) {
   }
   catalog[classTsid] = extractQuest(classTsid, ctx, buffs);
   if (REQUIREMENT_OVERRIDES[classTsid]) catalog[classTsid].requirements = REQUIREMENT_OVERRIDES[classTsid].map((r) => ({ ...r }));
+  for (const [from, to] of TEXT_OVERRIDES[classTsid] || []) {
+    const def = catalog[classTsid];
+    const key = ['desc', 'offer', 'completion'].find((k) => String(def[k] || '').includes(from));
+    if (!key) throw new Error(`TEXT_OVERRIDES ${classTsid}: "${from}" is not in its text any more`);
+    def[key] = def[key].split(from).join(to);
+  }
 }
 
 // chain triggers from completion code

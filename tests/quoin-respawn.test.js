@@ -16,7 +16,7 @@ import {
   releaseQuoinRespawns,
   streetQuoinClass,
 } from '../public/js/quoins.js?v=d4f4772b';
-import { normalizeWorldSnapshot } from '../public/js/player-save.js?v=b4449504';
+import { normalizeWorldSnapshot } from '../public/js/player-save.js?v=188b57f5';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

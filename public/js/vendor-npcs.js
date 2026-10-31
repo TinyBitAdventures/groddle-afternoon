@@ -191,6 +191,20 @@ export function vendorNpcsFor(catalog, tsid) {
   return null;
 }
 
+/**
+ * The streets where any of these NPC classes stands (street-ecology.json `vendors`), in the
+ * catalog's order: where a quest held for a talk turn-in (quest-offers.js heldForNpcTurnIn) can
+ * be handed in, and the destinations its map route goes to (the nearest one wins).
+ * @param {{ vendors?: Record<string, Record<string, number>> }} catalog
+ * @param {string[]} classes
+ */
+export function vendorStreetsFor(catalog, classes) {
+  const want = new Set(classes || []);
+  return Object.entries(catalog?.vendors || {})
+    .filter(([, row]) => Object.keys(row || {}).some((c) => want.has(c) && Number(row[c]) > 0))
+    .map(([tsid]) => tsid);
+}
+
 /** The classes on a row, in a stable order, one entry per archived object. */
 export function vendorNpcList(row) {
   const out = [];

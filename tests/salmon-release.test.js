@@ -21,7 +21,7 @@ import {
   tickResourceNode,
 } from '../public/js/resource-nodes.js?v=3d618d6a';
 import { MOOD_XP_SOURCES } from '../public/js/mood-xp.js?v=958e7680';
-import { resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=20b030f4';
+import { resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=d7088df4';
 import { eventIncrements } from '../public/js/solo-feats.js?v=e026b67b';
 
 const ROOT = join(import.meta.dirname, '..');

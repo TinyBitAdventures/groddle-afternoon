@@ -40,8 +40,8 @@ import { DRESSING, ENTRY, FLOOR, FLOOR_Y, LAB, W, entryPath, labPlatforms, seams
 import { FIREFLY_LAB_FILES } from '../public/js/quest-rooms/firefly-lab-art.js?v=481a55f9';
 import * as kit from '../public/js/quest-rooms/kit.js?v=c7ea6e0e';
 import { BUILT_ROOMS, OFFER_OVERRIDES, QUEST_ROOMS, questGiver } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
-import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=6b6cbf22';
-import { FIREFLY_OFFER_LINES, FIREFLY_WHISTLE_QUEST, fireflyTouches } from '../public/js/features/resource-nodes-feature.js?v=20b030f4';
+import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=dbfa83c4';
+import { FIREFLY_OFFER_LINES, FIREFLY_WHISTLE_QUEST, fireflyTouches } from '../public/js/features/resource-nodes-feature.js?v=d7088df4';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');

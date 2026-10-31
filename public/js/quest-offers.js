@@ -67,7 +67,7 @@
  *   'mp' triggers, mpReady[need] whether what a quest needs is live.
  */
 
-import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js?v=53b1f6c9';
+import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js?v=616c0568';
 import { getQuestCatalog } from './content-catalogs.js?v=10b118dd';
 import { levelInfoForXp } from './progression.js?v=33462eaa';
 import { offerableMultiplayerQuest } from './quests-mp.js?v=2beb658a';

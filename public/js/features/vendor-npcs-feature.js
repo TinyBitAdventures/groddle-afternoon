@@ -32,13 +32,15 @@ import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=670c3a7f'
 import { VENDOR_PROFILES } from '../vendor.js?v=563afb9b';
 import { addItem, countItem, removeItem } from '../inventory.js?v=85d4faba';
 import { parseQuestConversation } from '../quests.js?v=282e1621';
+import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import {
   acceptOffer,
   declineOffer,
+  heldForNpcTurnIn,
   npcQuestOffers,
   questAwardPayload,
   turnInQuest,
-} from '../quest-offers.js?v=6b6cbf22';
+} from '../quest-offers.js?v=dbfa83c4';
 import {
   GOT_QUEST_TEXT,
   VENDOR_NPCS,
@@ -50,7 +52,8 @@ import {
   vendorNpcStoreProfile,
   vendorNpcsFor,
   vendorSheet,
-} from '../vendor-npcs.js?v=53b1f6c9';
+  vendorStreetsFor,
+} from '../vendor-npcs.js?v=616c0568';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const VENDOR_NPCS_FEATURE_ID = 'vendor-npcs';
@@ -66,6 +69,9 @@ let shopOpened = false;
 let talking = null;
 let last = '';
 let demoUsed = false;
+/** Quests this session has already routed (one route per quest a session, so a cleared route stays cleared). */
+const routed = new Set();
+let lastRouteCheck = 0;
 
 function questCtx(engine) {
   const street = engine.street || {};
@@ -200,6 +206,7 @@ function offer(engine, npc, card) {
       if (result.ok) {
         engine.pushActivity(`New quest: ${card.def.title}`);
         engine.refreshPack();
+        routeHeldQuests(engine, wildlifeCatalog());
       }
       engine.save();
     },
@@ -303,6 +310,31 @@ function setupDemo(engine) {
   }, Math.max(0, Number(engine.param('vendornpcwait')) || 2500));
 }
 
+/** map-routes.js ROUTE_SOURCES id of a vendor quest's route. */
+export const MERCHANT_ROUTE_SOURCE = 'vendor_quest';
+
+/**
+ * A quest held for a vendor's talk turn-in (Meet the Merchants) gets a map route to the nearest
+ * street where that vendor stands, once a session, when no other route is set. Part 1's offer says
+ * "Click on your map over there in the top right corner to locate him"; the remake's vendors stand
+ * where the archive puts them, not where the 2010 text said (build-quests.mjs TEXT_OVERRIDES), so
+ * the route takes the player there. A player who already holds a part (from v0.6.0) gets it too.
+ */
+export function routeHeldQuests(engine, catalog) {
+  if (!catalog?.vendors || !engine.query) return;
+  const active = Object.keys(engine.questState?.active || {});
+  for (const id of active) {
+    if (routed.has(id)) continue;
+    const def = getQuestCatalog()[id];
+    if (!heldForNpcTurnIn(def)) continue;
+    routed.add(id);
+    if (engine.query('mapRoute', 'get', null, engine)) continue;
+    const to = vendorStreetsFor(catalog, def.endNpcs);
+    if (to.length) engine.query('mapRoute', 'set', { to, source: MERCHANT_ROUTE_SOURCE, quest: id }, engine);
+    last = `route:${id}`;
+  }
+}
+
 function publish(engine) {
   engine.setData('vendorNpcs', npcs.map((n) => n.classTsid).join(','));
   engine.setData('vendorNpcLast', last);
@@ -328,6 +360,7 @@ export const vendorNpcsFeature = {
     const mine = generation;
     loadWildlifeCatalog().then((catalog) => {
       if (mine !== generation) return null;
+      routeHeldQuests(engine, catalog);
       const list = vendorNpcList(vendorNpcsFor(catalog, engine.streetTsid));
       const demo = engine.param('vendornpcdemo');
       const classes = new Set([...list, ...(VENDOR_NPCS[demo] ? [demo] : [])]);
@@ -364,6 +397,11 @@ export const vendorNpcsFeature = {
       talking = null;
     }
     if (npcs.length) tickAttract(engine, now);
+    // A quest the familiar gave (part 1) gets its route within a second, not at the next street.
+    if (now - lastRouteCheck > 1000) {
+      lastRouteCheck = now;
+      routeHeldQuests(engine, wildlifeCatalog());
+    }
     publish(engine);
   },
 
