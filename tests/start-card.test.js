@@ -266,3 +266,11 @@ describe('prompts raised while the card is up', () => {
     assert.equal(armed.length, 1, 'the timed one arms now');
   });
 });
+
+describe('the start card fine print', () => {
+  it('colours its links moss, visited or not, instead of the browser blue and purple', () => {
+    const css = readFileSync(new URL('../public/style.css', import.meta.url), 'utf8');
+    assert.match(css, /\.fine a,\n\.fine a:visited \{ color: var\(--text-moss\);/);
+    assert.match(css, /\.fine a:hover,\n\.fine a:focus-visible \{ color: var\(--c-green-34\);/);
+  });
+});
