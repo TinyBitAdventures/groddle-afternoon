@@ -1,7 +1,8 @@
 /**
  * Enchanted Wood Trees and the rebuilt Enchanted Forest hollows
  * (js/enchanted-forests.js, js/woodcutting.js, tools/build-enchanted-forests.mjs,
- * features/enchanted-forest-feature.js).
+ * features/enchanted-forest-feature.js). The hollows are laid out from the
+ * Glitch Tribute Blog panoramas (posts 54865968635, 48940157335, 52343141868).
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -9,7 +10,8 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry, platformsScreen } from '../public/js/street-model.js?v=23b926e5';
+import { assertStreetGeometry, platformsScreen, platformYAt, worldToScreen } from '../public/js/street-model.js?v=23b926e5';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=0eb97168';
 import {
   ENCHANTED_FORESTS,
   ENCHANTED_MUSIC,
@@ -17,30 +19,31 @@ import {
   ENCHANTED_WOOD_TREE,
   SEEDLING_PET_NO_MORE,
   SEEDLING_PET_NO_MORE_LINES,
+  HOLLOW_LAYOUTS,
+  HOLLOW_SCALE,
   advanceEnchantedTree,
-  clipPlatform,
   createEnchantedTree,
   enchantedForestByTsid,
   enchantedPlankYield,
   enchantedTreeFrame,
   enchantedVariantFor,
-  flattestWindow,
-  hollowWidth,
+  hollowTreeSpots,
   normalizeEnchantedTree,
   petEnchantedSeedling,
+  polylineY,
   seedlingRemainingMs,
-} from '../public/js/enchanted-forests.js?v=dd04e11b';
+} from '../public/js/enchanted-forests.js?v=d986bff5';
 import {
   WOOD_TREE_HARVEST,
   harvestWoodTree,
   plankYieldForMaturity,
   quoteWoodTreeHarvest,
   woodTreeStatusLabel,
-} from '../public/js/woodcutting.js?v=4e140315';
-import { noteWoodTreeCare } from '../public/js/patches.js?v=3996c344';
-import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=3941d349';
-import { enchantedForestFeature, floorScreenY, hollowTrees, treeSpots } from '../public/js/features/enchanted-forest-feature.js?v=f685ef38';
-import { FEATURES } from '../public/js/features/index.js?v=8e4dd82a';
+} from '../public/js/woodcutting.js?v=df8a49be';
+import { noteWoodTreeCare } from '../public/js/patches.js?v=cfa86c42';
+import { isTreeTarget } from '../public/js/features/tree-death-feature.js?v=72f805a2';
+import { enchantedForestFeature, hollowTrees, treeScreenSpots } from '../public/js/features/enchanted-forest-feature.js?v=a67def9f';
+import { FEATURES } from '../public/js/features/index.js?v=72e14270';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');
@@ -164,6 +167,8 @@ describe('enchanted wood tree rules (wood_tree_enchanted.js)', () => {
 });
 
 describe('enchanted forest hollows', () => {
+  const manifest = new Set(JSON.parse(readFileSync(join(spike, 'public/assets/decos/manifest.json'), 'utf8')));
+
   it('are written, indexed and current (tools/build-enchanted-forests.mjs --check)', () => {
     const out = execFileSync(process.execPath, [join(spike, 'tools/build-enchanted-forests.mjs'), '--check'], { encoding: 'utf8' });
     assert.match(out, /stale: nothing/);
@@ -177,7 +182,31 @@ describe('enchanted forest hollows', () => {
       assertStreetGeometry(s);
       assert.match(s.source, /^reconstruction/);
       assert.equal(s.musicFile, ENCHANTED_MUSIC);
-      assert.equal(s.bounds.r - s.bounds.l, hollowWidth(f));
+      const layout = HOLLOW_LAYOUTS[f.id];
+      // The panorama's size at 1.25 world px per px, the floor at the door's connect y.
+      assert.equal(HOLLOW_SCALE, 1.25);
+      assert.equal(s.bounds.r - s.bounds.l, layout.w * HOLLOW_SCALE);
+      assert.equal(s.bounds.b - s.bounds.t, layout.h * HOLLOW_SCALE);
+      assert.equal(s.platforms.find((p) => /_floor$/.test(p.id)).y1, f.arrive.y);
+      assert.match(s.why.layout, new RegExp(`post ${layout.post}`));
+    }
+  });
+
+  it('are drawn in Tiny Speck\'s own Enchanted Forest art, every piece shipped', () => {
+    for (const f of ENCHANTED_FORESTS) {
+      const s = street(f.tsid);
+      const sprites = new Set(s.layers.flatMap((l) => l.decos.map((d) => d.sprite)));
+      for (const name of sprites) {
+        assert.ok(manifest.has(name), `${f.label}: ${name} not shipped`);
+        // enchant_tree.swf (the et1 set) and groddle1.swf's plank pegs.
+        assert.ok(/_et1$/.test(name) || name === 'trunk_ladder_1', `${f.label}: ${name}`);
+      }
+      for (const name of ['tree_background_tile_01a_et1', 'tree_floor_01a_et1', 'trunk_ladder_1', 'fungus_oyster_01a_et1']) assert.ok(sprites.has(name), `${f.label} lacks ${name}`);
+      assert.equal(s.doors[0].sprite, 'door_asset_woodtreedoor_01a_et1');
+      assert.ok(manifest.has(s.doors[0].sprite));
+      // Pale shelves over dark bark, nothing purple.
+      assert.deepEqual(s.layers.map((l) => l.id), ['T_ench_bark', 'T_ench_pegs', 'T_ench_shelves', 'middleground']);
+      assert.ok(s.layers.every((l) => !l.filters?.tintAmount));
     }
   });
 
@@ -187,7 +216,27 @@ describe('enchanted forest hollows', () => {
     assert.equal(enchantedForestByTsid('LDODG1KQLOS2GNO').id, 'grimssea');
   });
 
-  it('link the parent mini doors in and the way out back', () => {
+  it('stand the Wood Trees on the shelves where the panoramas show them', () => {
+    const perShelf = (id) => HOLLOW_LAYOUTS[id].shelves.filter((s) => s.walk !== false).map((s) => s.trees.length);
+    // Top of the trunk to the bottom.
+    assert.deepEqual(perShelf('grimssea'), [4, 2, 1, 1, 2, 1, 1, 3, 2]);
+    assert.deepEqual(perShelf('afar'), [3, 0, 1, 0, 3, 2]);
+    assert.deepEqual(perShelf('magha'), [3, 2, 0, 1, 3, 3, 0, 2, 3, 1, 1, 1, 1]);
+    for (const f of ENCHANTED_FORESTS) {
+      const s = street(f.tsid);
+      const spots = treeScreenSpots(s, f);
+      assert.equal(spots.length, f.woodTrees);
+      assert.equal(hollowTreeSpots(f).length, f.woodTrees);
+      const plats = platformsScreen(s);
+      for (const p of spots) {
+        // On a shelf line (not the floor), within a pixel.
+        const on = plats.filter((l) => !/_floor$/.test(l.id) && Math.abs((platformYAt(l, p.x, 0) ?? Infinity) - p.y) <= 1);
+        assert.ok(on.length, `${f.label}: no shelf under the tree at ${p.x},${p.y}`);
+      }
+    }
+  });
+
+  it('link the parent mini doors in and the arched door out back', () => {
     for (const f of ENCHANTED_FORESTS) {
       const parent = street(f.parent);
       const door = parent.doors.find((d) => d.id === f.door);
@@ -197,32 +246,46 @@ describe('enchanted forest hollows', () => {
       const hollow = street(f.tsid);
       const out = hollow.doors[0];
       assert.equal(out.connect.street, f.parent);
-      // The way out stands where the door delivers you.
-      assert.equal(out.x, door.connect.arrive.x);
+      // The door stands where its panorama has it, on the floor, and the mini door
+      // delivers you onto the floor a few steps from it, as in the panorama.
+      const layout = HOLLOW_LAYOUTS[f.id];
+      assert.equal(out.x, Math.round((layout.door - layout.w / 2) * HOLLOW_SCALE) - hollow.bounds.l);
+      assert.equal(out.y, f.arrive.y - hollow.bounds.t);
       assert.ok(Math.abs(out.y - door.connect.arrive.y) <= 1);
+      assert.ok(Math.abs(out.x - door.connect.arrive.x) < 200, `${f.label}: arrive ${door.connect.arrive.x}, door ${out.x}`);
       // ...and comes back out at the mini door.
       assert.equal(out.connect.arrive.x, door.x);
     }
+    // Afar Cleft's door is left of the trunk's middle, the other two right of it.
+    assert.deepEqual(ENCHANTED_FORESTS.map((f) => Math.sign(HOLLOW_LAYOUTS[f.id].door - 450)), [1, -1, 1]);
   });
 
-  it('give every tree spot a floor', () => {
+  it('reach every tree, shelf and ladder from the mini door on the remake jump, and lead back to the door', () => {
     for (const f of ENCHANTED_FORESTS) {
       const s = street(f.tsid);
-      const plats = platformsScreen(s);
-      const xs = treeSpots(f.woodTrees, s.bounds.r - s.bounds.l);
-      assert.equal(xs.length, f.woodTrees);
-      for (const x of xs) assert.notEqual(floorScreenY(plats, x), null, `${f.label} x ${x}`);
+      const door = street(f.parent).doors.find((d) => d.id === f.door);
+      const spots = treeScreenSpots(s, f);
+      // Each tree is a target, as a door is: reached, and by no tight jump.
+      const probe = { ...s, doors: [...s.doors, ...spots.map((p, i) => ({ id: `tree_${i}`, x: p.x, y: p.y, w: 40, h: 120 }))] };
+      const r = reachStreet(probe, [{ x: door.connect.arrive.x, y: door.connect.arrive.y - 4, from: 'mini door' }]);
+      assert.ok(r.arrivals.every((a) => a.stands), f.label);
+      for (const t of r.targets) {
+        assert.equal(t.reached, true, `${f.label}: ${t.id}`);
+        assert.ok(t.margin >= 1, `${f.label}: ${t.id} margin ${t.margin}`);
+      }
+      assert.deepEqual(r.unreached, [], f.label);
+      assert.deepEqual(r.traps, [], f.label);
+      assert.deepEqual(r.deckless, [], `${f.label}: every ladder has a floor at its foot and a shelf at its top`);
+      assert.equal(s.ladders.length, HOLLOW_LAYOUTS[f.id].ladders.length);
     }
   });
 
-  it('slice helpers: flattest window and clipping', () => {
-    const s = { bounds: { l: 0, r: 1000 }, platforms: [{ x1: 0, y1: -100, x2: 500, y2: 0 }, { x1: 500, y1: -20, x2: 1000, y2: -20 }] };
-    const w = flattestWindow(s, 400);
-    assert.equal(w.x0, 550);
-    assert.equal(w.range, 0);
-    const c = clipPlatform({ x1: 0, y1: 0, x2: 100, y2: -100 }, 50, 200);
-    assert.deepEqual([c.x1, c.y1, c.x2, c.y2], [50, -50, 100, -100]);
-    assert.equal(clipPlatform({ x1: 0, y1: 0, x2: 10, y2: 0 }, 20, 30), null);
+  it('layout helpers: a shelf polyline', () => {
+    const pts = [[0, 10], [100, 30], [200, 30]];
+    assert.equal(polylineY(pts, -5), 10);
+    assert.equal(polylineY(pts, 50), 20);
+    assert.equal(polylineY(pts, 150), 30);
+    assert.equal(polylineY(pts, 999), 30);
   });
 
   it('feature: registered, empty ecology, saved trees per hollow', () => {

@@ -26,8 +26,8 @@ import {
   setStreetEcologyCatalog,
 } from '../public/js/street-ecology.js?v=9c1a5f07';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
-import { adoptedPlan } from '../public/js/features/patches-feature.js?v=09eb58f2';
-import { createPlot } from '../public/js/patches.js?v=3996c344';
+import { adoptedPlan } from '../public/js/features/patches-feature.js?v=451f5cd1';
+import { createPlot } from '../public/js/patches.js?v=cfa86c42';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

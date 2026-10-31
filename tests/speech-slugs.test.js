@@ -34,8 +34,8 @@ import {
 } from '../public/js/verb-responses.js?v=3ceb8a8c';
 import { VERB_RESPONSE_POOLS } from '../public/js/verb-responses-data.js?v=0b948684';
 import { buildVerbResponses, render } from '../tools/build-verb-responses.mjs';
-import { runVerb } from '../public/content.js?v=e70532b9';
-import { createAnimalState } from '../public/js/animals.js?v=2fc4d319';
+import { runVerb } from '../public/content.js?v=1d972879';
+import { createAnimalState } from '../public/js/animals.js?v=43b2acc8';
 import { createToolConditionState } from '../public/js/tools.js?v=9a2e7ef4';
 import { setTrantTables, createTrantState } from '../public/js/trants.js?v=9c2e8c0f';
 import { createMineRock } from '../public/js/mining.js?v=a7eb8740';

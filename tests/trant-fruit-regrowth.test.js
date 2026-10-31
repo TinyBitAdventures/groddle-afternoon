@@ -25,7 +25,7 @@ import {
   setTrantTables,
 } from '../public/js/trants.js?v=9c2e8c0f';
 import { fertilizeTree } from '../public/js/powders.js?v=5454a495';
-import { createPlot, growTree, resetPlotDay, reviveDeadTree } from '../public/js/patches.js?v=3996c344';
+import { createPlot, growTree, resetPlotDay, reviveDeadTree } from '../public/js/patches.js?v=cfa86c42';
 import { createToolConditionState } from '../public/js/tools.js?v=9a2e7ef4';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

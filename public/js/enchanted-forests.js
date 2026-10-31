@@ -30,17 +30,28 @@
  * never archived (locations.js lists them as "Enchanted forests"). Tree counts
  * come from the Glitch wiki "Enchanted Forest" table.
  *
- * Reconstruction (each hollow carries a `why`): the geometry and art are a
- * slice of the parent street's own CC0 location (its platforms, middleground
- * and parallax layers, cut to the hollow's width with the parent's parallax
- * ratio kept), shaded purple ("the lovely purple shadows", forum) and
- * scored with ENCHANTED_WOOD, the track uploaded the day they opened. The
- * door's own connect x/y is the arrival point, and the way out stands there.
+ * Reconstruction (each hollow carries a `why`): the Glitch Tribute Blog
+ * (johnexploresur.tumblr.com, reference only) posted a full-height panorama
+ * of each hollow with every Wood Tree in view: Grimssea Hollow post
+ * 54865968635, Afar Cleft 48940157335, Magha Pleat 52343141868. Each one is
+ * the inside of a giant trunk: bracket-fungus shelves up the bark walls, the
+ * Wood Trees on the shelves, peg ladders knocked into the wood, and an arched
+ * door out at the foot. HOLLOW_LAYOUTS below is each panorama measured in its
+ * own pixels (900 wide); the builder scales it by HOLLOW_SCALE (the door and
+ * the avatar both measure 1.25 world px per panorama px) about the trunk's
+ * centre, with the floor at the archived door's connect y. The art is Tiny
+ * Speck's own Enchanted Forest set, enchant_tree.swf (the et1 decos, CC0),
+ * and the music ENCHANTED_WOOD, the track uploaded the day they opened.
+ * Where a step of the original is out of the remake's 105 px jump, a ladder
+ * runs on to the shelf above, and where pegs end beside a shelf its lip
+ * reaches under the top peg, so every ladder has a deck (each ladder's `why`
+ * says what moved). The panorama px are image px; the jump figures are world px.
  */
 
 export const ENCHANTED_SOURCE = 'tinyspeck/glitch-GameServerJS CC0 items/wood_tree_enchanted.js';
 import { loseEnergy } from './metabolics.js?v=8504134e';
-export const ENCHANTED_FOREST_SOURCE = 'reconstruction: Enchanted Forest hollows (not in tinyspeck/glitch-locations); a purple-shaded slice of the parent street\'s CC0 location';
+export const ENCHANTED_FOREST_SOURCE = 'reconstruction: Enchanted Forest hollows (not in tinyspeck/glitch-locations), laid out from the Glitch Tribute Blog panoramas in Tiny Speck\'s enchant_tree.swf art (CC0)';
+
 
 /** wood_tree_enchanted.js onLoad and patch_seedling.js timers. */
 export const ENCHANTED_WOOD_TREE = Object.freeze({
@@ -82,14 +93,10 @@ export const ENCHANTED_TREE_SHEETS = Object.freeze([
   Object.freeze({ variant: 4, url: 'assets/sprites/wood_tree_enchanted/wood_tree_enchanted_v4@3x.webp', fw: 87, fh: 121 }),
 ]);
 
+
 export const ENCHANTED_MUSIC = 'ENCHANTED_WOOD';
-/** A purple wash over every layer (tint filter, as the source layers use). */
-export const ENCHANTED_TINT = Object.freeze({ tintColor: 0x6b3fa0, tintAmount: 45 });
-/** The client viewport width the parallax formula uses (js/street-render.js). */
-export const VIEW_W = 960;
-/** Horizontal room per tree in a hollow, plus the margin at each end. */
-export const TREE_SPACING = 170;
-export const HOLLOW_MARGIN = 350;
+/** World px per panorama px: the door (69 x 168 art) and the avatar measure the same. */
+export const HOLLOW_SCALE = 1.25;
 
 /**
  * The three hollows. `door` is the archived mini door on the parent street;
@@ -136,6 +143,137 @@ export const ENCHANTED_FORESTS = Object.freeze([
     why: 'Wiki "Enchanted Forest" and "Magha Pleat": through a hollow tree on Magha Shank in Rasana, 21 Wood Trees. Door door_1334186505811 (archived) arrives at 126,-66.',
   }),
 ]);
+
+/*
+ * Each hollow measured on its panorama, in that image's pixels (x 0..900 left
+ * to right, y 0..h top to bottom). A shelf is its walkable top edge (a
+ * polyline) and the x of every Wood Tree standing on it; `art: false` marks a
+ * little fungus drawn on the bark that nothing stands on. A ladder runs from
+ * `bottom` up to `top`. Wall decos are placed by their own art: a crack light
+ * by its slit, the rest by their box (x centre, top, bottom).
+ */
+export const HOLLOW_LAYOUTS = Object.freeze({
+  grimssea: {
+    post: '54865968635',
+    w: 900,
+    h: 1800,
+    door: 663,
+    shelves: [
+      { id: 'top_left', pts: [[62, 280], [230, 272], [400, 276], [585, 292]], trees: [128, 272, 393, 495] },
+      { id: 'top_right', pts: [[525, 192], [600, 176], [835, 172]], trees: [645, 765] },
+      { id: 'upper_right', pts: [[595, 414], [830, 410]], trees: [725] },
+      { id: 'upper_middle', pts: [[135, 614], [430, 606], [470, 580], [650, 574]], trees: [345] },
+      { id: 'middle_right', pts: [[490, 770], [840, 765]], trees: [630, 760] },
+      { id: 'middle_left', pts: [[60, 824], [250, 830], [480, 838]], trees: [355] },
+      { id: 'grave_right', pts: [[575, 1060], [840, 1055]], trees: [760] },
+      { id: 'lower_left', pts: [[55, 1076], [230, 1080], [475, 1104]], trees: [125, 255, 370] },
+      { id: 'bottom', pts: [[288, 1501], [845, 1492]], trees: [638, 755] },
+      { id: 'grave_cap_1', pts: [[690, 972], [742, 970]], trees: [], walk: false },
+      { id: 'grave_cap_2', pts: [[790, 1003], [832, 1001]], trees: [], walk: false },
+    ],
+    ladders: [
+      { id: 'floor_left', x: 300, bottom: 'floor', top: 1462, why: 'pegs from the floor to beside the bottom shelf (54865968635); the shelf\'s lip reaches 47 px further left, under the top peg, to step off onto' },
+      { id: 'centre', x: 515, bottom: 1497, top: 588, why: 'the long middle climb from the bottom shelf to the upper middle shelf (54865968635: a player stands on it)' },
+      { id: 'top', x: 545, bottom: 576, top: 186, why: 'pegs from the upper middle shelf up under the top shelves; they run on to the top right shelf, 98 px over the top of the pegs and out of a 105 px jump' },
+      { id: 'left', x: 145, bottom: 826, top: 592, why: 'pegs up the left wall from the middle left shelf to the upper middle shelf, whose lip reaches 60 px further left, under the top peg' },
+    ],
+    stumps: [{ x: 505, on: 'bottom', w: 82 }],
+    wall: [
+      { sprite: 'tree_cracklight_01a_et1', slit: [182, 105, 150] },
+      { sprite: 'tree_cracklight_01b_et1', slit: [818, 485, 625], flip: true },
+      { sprite: 'tree_cracklight_01c_et1', slit: [145, 1135, 1310] },
+      { sprite: 'tree_cracklight_01a_et1', slit: [793, 1262, 1312] },
+      { sprite: 'tree_knot_01c_et1', box: [152, 450, 600] },
+      { sprite: 'tree_knot_01a_et1', box: [420, 950, 1055] },
+      { sprite: 'tree_knot_01b_et1', box: [668, 1220, 1345] },
+      { sprite: 'tree_knot_01a_et1', box: [662, 1325, 1440] },
+      { sprite: 'treemoss_dark_01a_et1', box: [150, 1170, 1600] },
+      { sprite: 'treemoss_dark_01b_et1', box: [785, 1110, 1370] },
+      { sprite: 'treemoss_dark_01a_et1', box: [120, 560, 810] },
+      { sprite: 'treemoss_dark_01d_et1', box: [380, 1560, 1745] },
+      { sprite: 'treemoss_dark_01c_et1', box: [745, 880, 1010] },
+      { sprite: 'treemoss_dark_01b_et1', box: [320, 330, 470] },
+      { sprite: 'treemoss_01c_et1', box: [440, 520, 600] },
+      { sprite: 'treemoss_01d_et1', box: [710, 1420, 1500] },
+    ],
+  },
+  afar: {
+    post: '48940157335',
+    w: 900,
+    h: 900,
+    door: 272,
+    shelves: [
+      { id: 'top_left', pts: [[65, 238], [230, 232], [400, 246], [560, 258]], trees: [185, 335, 455] },
+      { id: 'top_middle', pts: [[480, 126], [670, 124]], trees: [] },
+      { id: 'top_right', pts: [[650, 222], [845, 218]], trees: [755] },
+      { id: 'middle', pts: [[443, 422], [700, 420]], trees: [] },
+      { id: 'left', pts: [[60, 520], [230, 515], [415, 500]], trees: [112, 228, 335] },
+      { id: 'right', pts: [[515, 614], [700, 612], [835, 630]], trees: [640, 765] },
+      { id: 'right_cap', pts: [[745, 292], [838, 290]], trees: [], walk: false },
+    ],
+    ladders: [
+      { id: 'floor', x: 455, bottom: 'floor', top: 385, why: 'pegs from the floor up past the left shelf to the middle shelf (48940157335), whose lip reaches 52 px further left, under the top peg' },
+      { id: 'top', x: 615, bottom: 421, top: 125, why: 'pegs from the middle shelf to the top right shelf; they run on to the top middle shelf, 90 px over the top of the pegs and out of a 105 px jump' },
+    ],
+    stumps: [{ x: 470, on: 'floor', w: 100 }],
+    wall: [
+      { sprite: 'tree_cracklight_01a_et1', slit: [155, 345, 470] },
+      { sprite: 'tree_cracklight_01b_et1', slit: [730, 330, 520], flip: true },
+      { sprite: 'tree_crack_01b_et1', box: [385, 40, 160] },
+      { sprite: 'tree_knot_01b_et1', box: [487, 115, 185] },
+      { sprite: 'tree_knot_01c_et1', box: [215, 585, 665] },
+      { sprite: 'treemoss_dark_01a_et1', box: [470, 560, 840] },
+      { sprite: 'treemoss_dark_01c_et1', box: [190, 740, 840] },
+      { sprite: 'treemoss_dark_01d_et1', box: [720, 660, 840] },
+      { sprite: 'treemoss_dark_01b_et1', box: [420, 290, 400] },
+      { sprite: 'treemoss_dark_01c_et1', box: [250, 40, 160] },
+    ],
+  },
+  magha: {
+    post: '52343141868',
+    w: 900,
+    h: 1800,
+    door: 665,
+    shelves: [
+      { id: 'top_left', pts: [[55, 262], [250, 255], [445, 258]], trees: [135, 262, 368] },
+      { id: 'top_right', pts: [[500, 198], [560, 180], [845, 172]], trees: [620, 760] },
+      { id: 'top_small', pts: [[455, 326], [640, 322]], trees: [] },
+      { id: 'upper_right', pts: [[620, 414], [840, 410]], trees: [745] },
+      { id: 'upper_left', pts: [[50, 540], [250, 520], [400, 478], [540, 470]], trees: [150, 280, 405] },
+      { id: 'middle', pts: [[90, 800], [300, 788], [450, 776], [747, 767]], trees: [215, 335, 450] },
+      { id: 'middle_right', pts: [[575, 954], [845, 950]], trees: [] },
+      { id: 'lower_middle', pts: [[128, 1042], [300, 1022], [450, 1036], [560, 1050]], trees: [310, 450] },
+      { id: 'lower_right', pts: [[475, 1240], [560, 1226], [840, 1212]], trees: [545, 662, 765] },
+      { id: 'lower_left', pts: [[55, 1344], [442, 1340]], trees: [285] },
+      { id: 'low_small', pts: [[230, 1528], [405, 1524]], trees: [320] },
+      { id: 'low_right_1', pts: [[480, 1462], [655, 1460]], trees: [580] },
+      { id: 'low_right_2', pts: [[670, 1474], [845, 1470]], trees: [765] },
+      { id: 'low_right_under', pts: [[585, 1512], [750, 1510]], trees: [], walk: false },
+    ],
+    ladders: [
+      { id: 'floor', x: 430, bottom: 'floor', top: 1300, why: 'pegs from the floor up between the low shelves (52343141868); the lower left shelf reaches 47 px further right, under the top peg' },
+      { id: 'left', x: 140, bottom: 1342, top: 990, why: 'pegs up the left wall from the lower left shelf to the lower middle shelf, whose lip reaches 57 px further left, under the top peg' },
+      { id: 'right', x: 735, bottom: 1213, top: 740, why: 'pegs from the middle right shelf to the middle shelf\'s end; they start on the lower right shelf, since the middle right shelf is 98 px over the lower middle one and out of a 105 px jump; the middle shelf reaches 37 px further right, under the top peg' },
+      { id: 'upper', x: 570, bottom: 771, top: 324, why: 'pegs from the middle shelf up past the upper left shelf; they run on to the small top shelf, 80 px over the top of the pegs' },
+    ],
+    stumps: [{ x: 500, on: 'floor', w: 120 }],
+    wall: [
+      { sprite: 'tree_cracklight_01c_et1', slit: [80, 30, 160] },
+      { sprite: 'tree_knot_01a_et1', box: [690, 265, 355] },
+      { sprite: 'tree_knot_01c_et1', box: [265, 600, 705] },
+      { sprite: 'tree_knot_01b_et1', box: [372, 1145, 1270] },
+      { sprite: 'tree_crack_01a_et1', box: [315, 1590, 1650] },
+      { sprite: 'tree_knot_01c_et1', box: [592, 1520, 1610] },
+      { sprite: 'treemoss_dark_01a_et1', box: [130, 590, 960] },
+      { sprite: 'treemoss_dark_01a_et1', box: [785, 470, 1010] },
+      { sprite: 'treemoss_dark_01b_et1', box: [650, 1520, 1720] },
+      { sprite: 'treemoss_dark_01d_et1', box: [370, 1640, 1750] },
+      { sprite: 'treemoss_dark_01c_et1', box: [300, 290, 400] },
+      { sprite: 'treemoss_01d_et1', box: [550, 1260, 1330] },
+      { sprite: 'treemoss_01c_et1', box: [290, 1355, 1420] },
+    ],
+  },
+});
 
 export const enchantedForestByTsid = (tsid) =>
   ENCHANTED_FORESTS.find((f) => f.tsid === tsid || f.sourceTsid === tsid) || null;
@@ -277,133 +415,227 @@ export function seedlingStatusLabel(tree, now = Date.now()) {
 /** wood_tree.js poison / trantsform conditions: null for an enchanted tree. */
 export const isEnchantedTreeState = (state) => Boolean(state && state.enchanted === true);
 
+
 /* ------------------------------------------------------------------ */
 /* Hollow street builder                                                */
 /* ------------------------------------------------------------------ */
 
-/** Walkable floor (lowest platform) at world x, or null. */
-export function floorAt(platforms, x) {
-  let best = null;
-  for (const p of platforms || []) {
-    const a = Math.min(p.x1, p.x2);
-    const b = Math.max(p.x1, p.x2);
-    if (x < a || x > b || b === a) continue;
-    const y = p.y1 + ((x - p.x1) / (p.x2 - p.x1)) * (p.y2 - p.y1);
-    if (best === null || y > best) best = y;
-  }
-  return best;
-}
-
+/** The decos a hollow uses, at their own size (world px: the 2x files halved). */
+export const ET1_SIZES = Object.freeze({
+  fungus_oyster_01a_et1: [169, 77],
+  fungus_oyster_01b_et1: [173, 72],
+  fungus_oyster_01c_et1: [182, 75],
+  fungus_oyster_01d_et1: [130, 72],
+  door_asset_woodtreedoor_01a_et1: [69, 167.5],
+  tree_floor_stump_01a_et1: [85.5, 83.5],
+  tree_floor_01a_et1: [843, 262],
+  tree_background_tile_01a_et1: [900, 400],
+  top_gradient_et1: [900, 400],
+  tree_cracklight_01a_et1: [130, 131],
+  tree_cracklight_01b_et1: [245, 234],
+  tree_cracklight_01c_et1: [569, 452],
+  tree_crack_01a_et1: [15, 190],
+  tree_crack_01b_et1: [13, 127],
+  tree_knot_01a_et1: [40, 159],
+  tree_knot_01b_et1: [25, 116],
+  tree_knot_01c_et1: [58, 286],
+  treemoss_dark_01a_et1: [97, 368],
+  treemoss_dark_01b_et1: [65, 201],
+  treemoss_dark_01c_et1: [88, 107],
+  treemoss_dark_01d_et1: [113, 122],
+  treemoss_01c_et1: [88, 107],
+  treemoss_01d_et1: [109, 118],
+});
+/** Where the slit sits in each crack light's art (x, top, bottom as shares of its box). */
+const SLIT = Object.freeze({ x: 0.06, top: 0.06, bottom: 0.35 });
+/** The shelves' fungus, in turn. */
+const FUNGUS = Object.freeze(['fungus_oyster_01c_et1', 'fungus_oyster_01a_et1', 'fungus_oyster_01b_et1', 'fungus_oyster_01d_et1']);
+/** A fungus piece's walkable top lies this share of its height above its foot. */
+const FUNGUS_TOP = 0.66;
+/** No fungus piece deeper than this (a short shelf is one wide piece, as flat as the long ones). */
+const FUNGUS_MAX_H = 112;
+/** The floor art's floor lies this share of its height above its foot (tree_floor_01a_et1). */
+const FLOOR_TOP = 0.27;
 /**
- * The flattest stretch of `width` on the parent street (floor range, sampled
- * every 50 px, every sample on a platform). Ties keep the leftmost.
+ * Peg ladders: the panoramas' flat plank pegs are groddle1.swf's trunk_ladder_1 (three staggered
+ * planks a piece), as Tiny Speck's own enchant_tree rooms in Balzare use them (Nemo Sana). One
+ * piece at most this tall, stacked up the ladder.
  */
-export function flattestWindow(street, width, step = 50) {
-  const { l, r } = street.bounds;
-  const xs = [];
-  for (let x = l; x <= r; x += step) xs.push(x);
-  const floors = xs.map((x) => floorAt(street.platforms, x));
-  const span = Math.round(width / step);
-  let best = null;
-  for (let i = 0; i + span < xs.length; i += 1) {
-    const seg = floors.slice(i, i + span + 1);
-    if (seg.some((v) => v === null)) continue;
-    const range = Math.max(...seg) - Math.min(...seg);
-    if (!best || range < best.range - 1e-9) best = { x0: xs[i], x1: xs[i] + width, range, low: Math.max(...seg), high: Math.min(...seg) };
-  }
-  return best;
-}
-
-/** Clip a platform to [a, b] (world x), interpolating y at the cut. */
-export function clipPlatform(p, a, b) {
-  const lo = Math.min(p.x1, p.x2);
-  const hi = Math.max(p.x1, p.x2);
-  if (hi <= a || lo >= b) return null;
-  const yAt = (x) => (p.x2 === p.x1 ? p.y1 : p.y1 + ((x - p.x1) / (p.x2 - p.x1)) * (p.y2 - p.y1));
-  const x1 = Math.max(lo, a);
-  const x2 = Math.min(hi, b);
-  if (x2 - x1 < 1) return null;
-  const left = p.x1 <= p.x2;
-  return {
-    ...p,
-    x1: left ? x1 : x2,
-    y1: yAt(left ? x1 : x2),
-    x2: left ? x2 : x1,
-    y2: yAt(left ? x2 : x1),
-  };
-}
-
-/** Hollow width: the wiki's tree count at TREE_SPACING plus a margin each side. */
-export const hollowWidth = (forest) => forest.woodTrees * TREE_SPACING + 2 * HOLLOW_MARGIN;
+const PEG_PIECE_H = 108;
+const PEG_PIECE_W = 90;
+/** Bark, peg and shelf layer colours, matched by eye to the panoramas (pale shelves, dark bark). */
+export const HOLLOW_FILTERS = Object.freeze({
+  wall: Object.freeze({ brightness: -28, saturation: -18 }),
+  pegs: Object.freeze({ brightness: -12, saturation: -20 }),
+  shelves: Object.freeze({ brightness: -2, saturation: -52 }),
+});
+export const HOLLOW_GRADIENT = Object.freeze({ top: '120A05', bottom: '3B3128' });
 
 const round = (v) => Math.round(v * 100) / 100;
 
+/** Height of a polyline at x (clamped to its ends). */
+export function polylineY(pts, x) {
+  if (x <= pts[0][0]) return pts[0][1];
+  for (let i = 1; i < pts.length; i += 1) {
+    const [x0, y0] = pts[i - 1];
+    const [x1, y1] = pts[i];
+    if (x <= x1) return y0 + ((x - x0) / (x1 - x0)) * (y1 - y0);
+  }
+  return pts[pts.length - 1][1];
+}
+
 /**
- * Build a hollow's street JSON from its parent street JSON.
+ * A hollow's measured layout in world space: bounds, floor y, each walkable
+ * shelf (world polyline), ladders, tree spots, door x. `layout` defaults to
+ * HOLLOW_LAYOUTS[forest.id].
+ */
+export function hollowGeometry(forest, layout = HOLLOW_LAYOUTS[forest.id]) {
+  const S = HOLLOW_SCALE;
+  const X = (px) => Math.round((px - layout.w / 2) * S);
+  const Y = (py) => Math.round((py - layout.h) * S);
+  const W = Math.round(layout.w * S);
+  const H = Math.round(layout.h * S);
+  const bounds = { l: -Math.round(W / 2), r: W - Math.round(W / 2), t: -H, b: 0 };
+  const floorY = forest.arrive.y;
+  const shelves = layout.shelves.map((s) => ({
+    id: s.id,
+    walk: s.walk !== false,
+    pts: s.pts.map(([x, y]) => [X(x), Y(y)]),
+    trees: s.trees.map((tx) => ({ x: X(tx), y: round(Y(polylineY(s.pts, tx))) })),
+  }));
+  const ladders = layout.ladders.map((l) => {
+    const bottom = l.bottom === 'floor' ? floorY : Y(l.bottom);
+    const top = Y(l.top);
+    return { id: l.id, x: X(l.x), bottom, top, why: l.why };
+  });
+  const trees = shelves.flatMap((s) => s.trees.map((t) => ({ ...t, shelf: s.id })));
+  return { S, X, Y, W, H, bounds, floorY, shelves, ladders, trees, doorX: X(layout.door), wallL: X(48), wallR: X(layout.w - 48) };
+}
+
+/** World x,y of every Wood Tree in a hollow, in the panorama's shelf order (top to bottom). */
+export const hollowTreeSpots = (forest) => hollowGeometry(forest).trees;
+
+/**
+ * Build a hollow's street JSON. The parent street gives the way out its
+ * destination (the mini door) and the swf list.
  * @param {object} forest an ENCHANTED_FORESTS row
  * @param {object} parent the parent street JSON (assets/streets/<parent>.json)
  */
 export function buildEnchantedForestStreet(forest, parent) {
-  const W = hollowWidth(forest);
-  const win = flattestWindow(parent, W);
-  if (!win) throw new Error(`${forest.label}: no ${W} px floor on ${parent.label}`);
-  const a = win.x0;
-  const b = win.x1;
-  // Hollow world = parent world shifted so the door's arrival sits HOLLOW_MARGIN
-  // in from the left edge, on the slice's floor.
-  const l = forest.arrive.x - HOLLOW_MARGIN;
-  const dx = l - a;
-  const floorThere = floorAt(parent.platforms, a + HOLLOW_MARGIN);
-  const dy = Math.round(forest.arrive.y - floorThere);
-  const bounds = { l, r: l + W, t: parent.bounds.t + dy, b: parent.bounds.b + dy };
-  const H = bounds.b - bounds.t;
+  const layout = HOLLOW_LAYOUTS[forest.id];
+  if (!layout) throw new Error(`${forest.label}: no layout`);
+  const g = hollowGeometry(forest, layout);
+  const { S, X, Y, W, H, bounds, floorY } = g;
+  const local = (x, y) => ({ x: round(x - bounds.l), y: round(y - bounds.t) });
+  const size = (sprite) => ET1_SIZES[sprite];
 
-  const platforms = (parent.platforms || [])
-    .map((p) => clipPlatform(p, a, b))
-    .filter(Boolean)
-    .map((p, i) => ({ ...p, id: `plat_ench_${forest.id}_${i}`, x1: round(p.x1 + dx), y1: round(p.y1 + dy), x2: round(p.x2 + dx), y2: round(p.y2 + dy) }));
-  const inX = (x) => x >= a && x <= b;
-  const barriers = (parent.barriers || []).filter((w) => inX(w.x)).map((w) => ({ ...w, x: w.x + dx, y: w.y + dy }));
-  const ladders = (parent.ladders || []).filter((d) => inX(d.x)).map((d) => ({ ...d, x: d.x + dx, y: d.y + dy }));
+  // Walkable lines: the floor wall to wall, and every shelf (solid from the top only).
+  const plat = (id, x1, y1, x2, y2, solid = false) => ({ id: `plat_ench_${forest.id}_${id}`, x1, y1, x2, y2, pc_perm: solid ? null : -1, item_perm: -1 });
+  const platforms = [plat('floor', g.wallL, floorY, g.wallR, floorY, true)];
+  for (const s of g.shelves) {
+    if (!s.walk) continue;
+    s.pts.slice(1).forEach(([x2, y2], i) => {
+      const [x1, y1] = s.pts[i];
+      platforms.push(plat(`${s.id}${s.pts.length > 2 ? `_${i}` : ''}`, x1, y1, x2, y2));
+    });
+  }
+  const barriers = [
+    { id: `wall_ench_${forest.id}_left`, x: g.wallL, y: bounds.t, h: H, pc_perm: null },
+    { id: `wall_ench_${forest.id}_right`, x: g.wallR, y: bounds.t, h: H, pc_perm: null },
+  ];
+  const ladders = g.ladders.map((l) => ({ id: `ladder_ench_${forest.id}_${l.id}`, x: l.x, y: l.bottom, w: 50, h: l.bottom - l.top }));
 
-  const parentW = parent.bounds.r - parent.bounds.l;
-  const f0 = (a - parent.bounds.l) / (parentW - VIEW_W);
-  const f1 = (b - VIEW_W - parent.bounds.l) / (parentW - VIEW_W);
-  const tint = (filters) => (filters?.tintAmount ? { ...filters } : { ...(filters || {}), ...ENCHANTED_TINT });
-  const layers = (parent.layers || []).map((layer) => {
-    const out = { ...layer, filters: tint(layer.filters) };
-    if (layer.id === 'middleground') {
-      const margin = 400;
-      out.decos = (layer.decos || [])
-        .filter((d) => d.x >= a - margin && d.x <= b + margin)
-        .map((d) => ({ ...d, x: d.x + dx, y: d.y + dy }));
-      out.w = W;
-      out.h = H;
-      return out;
+  // Bark: the trunk tile up the whole height, the dark top, cracks, knots and moss.
+  const wall = [];
+  const [tw, th] = size('tree_background_tile_01a_et1');
+  const tileH = Math.round((th * W) / tw);
+  for (let i = 0, y = bounds.b; y > bounds.t; i += 1, y -= tileH) {
+    wall.push({ sprite: 'tree_background_tile_01a_et1', ...local(0, y), w: W, h: tileH, z: i, r: 0 });
+  }
+  const [gw, gh] = size('top_gradient_et1');
+  wall.push({ sprite: 'top_gradient_et1', ...local(0, bounds.t + Math.round((gh * W) / gw)), w: W, h: Math.round((gh * W) / gw), z: 90, r: 0 });
+  layout.wall.forEach((d, i) => {
+    const [nw, nh] = size(d.sprite);
+    let x;
+    let y;
+    let h;
+    if (d.slit) {
+      const [sx, st, sb] = d.slit;
+      h = ((sb - st) * S) / (SLIT.bottom - SLIT.top);
+      const w = (h * nw) / nh;
+      x = X(sx) + (0.5 - SLIT.x) * w * (d.flip ? -1 : 1);
+      y = Y(st) - SLIT.top * h + h;
+    } else {
+      const [bx, bt, bb] = d.box;
+      h = (bb - bt) * S;
+      x = X(bx);
+      y = Y(bb);
     }
-    // Parallax layer: keep the parent's slide ratio over the narrower street.
-    const L = layer.w || parentW;
-    const o = Math.max(0, f0 * (L - VIEW_W));
-    const Lh = Math.round(Math.max(VIEW_W, (f1 - f0) * (L - VIEW_W) + VIEW_W));
-    const margin = 600;
-    out.decos = (layer.decos || [])
-      .filter((d) => d.x >= o - margin && d.x <= o + Lh + margin)
-      .map((d) => ({ ...d, x: Math.round(d.x - o) }));
-    out.w = Lh;
-    return out;
+    const w = (h * nw) / nh;
+    wall.push({ sprite: d.sprite, ...local(x, y), w: Math.round(w), h: Math.round(h), z: 20 + i, r: 0, ...(d.flip ? { flip: true } : {}) });
   });
 
-  // The way out: the parent's mini door at the arrival point, back to the parent door.
+  // Shelves: overlapping fungus along each shelf's top, the pegs behind them.
+  const shelfArt = [];
+  const pegs = [];
+  g.shelves.forEach((s, si) => {
+    const x1 = s.pts[0][0];
+    const x2 = s.pts[s.pts.length - 1][0];
+    const span = x2 - x1;
+    const n = Math.max(1, Math.round(span / 250));
+    const step = span / n;
+    for (let i = 0; i < n; i += 1) {
+      const sprite = FUNGUS[(si + i) % FUNGUS.length];
+      const [nw, nh] = size(sprite);
+      const pw = step * 1.3;
+      const ph = Math.min(FUNGUS_MAX_H, (pw * nh) / nw);
+      const cx = x1 + (i + 0.5) * step;
+      const top = polylineY(s.pts, cx);
+      shelfArt.push({ sprite, ...local(cx, top + FUNGUS_TOP * ph), w: Math.round(pw), h: Math.round(ph), z: 100 + si * 10 + (i % 2 ? 0 : 5), r: 0, ...((si + i) % 2 ? { flip: true } : {}) });
+    }
+  });
+  g.ladders.forEach((l, li) => {
+    const len = l.bottom - l.top;
+    const n = Math.max(1, Math.ceil(len / PEG_PIECE_H));
+    const ph = len / n;
+    for (let i = 0; i < n; i += 1) {
+      pegs.push({ sprite: 'trunk_ladder_1', ...local(l.x, l.bottom - i * ph), w: PEG_PIECE_W, h: Math.round(ph), z: 10 + li, r: 0, ...(i % 2 ? { flip: true } : {}) });
+    }
+  });
+
+  // Middleground: the rooty floor and the stumps.
+  const [fw, fh] = size('tree_floor_01a_et1');
+  const floorH = Math.round((fh * W) / fw);
+  const middle = [{ sprite: 'tree_floor_01a_et1', ...{ x: 0, y: round(floorY + FLOOR_TOP * floorH) }, w: W, h: floorH, z: 1, r: 0 }];
+  for (const st of layout.stumps || []) {
+    const [sw, sh] = size('tree_floor_stump_01a_et1');
+    const w = st.w * S;
+    const h = (w * sh) / sw;
+    const shelf = layout.shelves.find((s) => s.id === st.on);
+    const foot = shelf ? Y(polylineY(shelf.pts, st.x)) + 0.1 * h : floorY + 0.12 * h;
+    const deco = { sprite: 'tree_floor_stump_01a_et1', x: X(st.x), y: round(foot), w: Math.round(w), h: Math.round(h), z: 5, r: 0 };
+    middle.push(deco);
+  }
+
+  const layers = [
+    { id: 'T_ench_bark', name: 'bark', z: -3, w: W, h: H, filters: { ...HOLLOW_FILTERS.wall }, decos: wall },
+    { id: 'T_ench_pegs', name: 'pegs', z: -2, w: W, h: H, filters: { ...HOLLOW_FILTERS.pegs }, decos: pegs },
+    { id: 'T_ench_shelves', name: 'shelves', z: -1, w: W, h: H, filters: { ...HOLLOW_FILTERS.shelves }, decos: shelfArt },
+    { id: 'middleground', name: 'middleground', z: 0, w: W, h: H, decos: middle },
+  ];
+
+  // The way out: the arched door at the foot of the trunk, back to the parent's mini door.
   const parentDoor = (parent.doors || []).find((d) => d.id === forest.door);
   if (!parentDoor) throw new Error(`${parent.label} has no ${forest.door}`);
   const back = { x: parentDoor.x + parent.bounds.l, y: parentDoor.y + parent.bounds.t };
+  const [dw, dh] = size('door_asset_woodtreedoor_01a_et1');
   const doors = [{
     id: `door_${forest.id}_wayout`,
-    x: forest.arrive.x - l,
-    y: Math.round((floorAt(platforms, forest.arrive.x) ?? forest.arrive.y) - bounds.t),
-    w: parentDoor.w,
-    h: parentDoor.h,
-    sprite: parentDoor.sprite,
+    x: g.doorX - bounds.l,
+    y: floorY - bounds.t,
+    w: dw,
+    h: Math.round(dh),
+    sprite: 'door_asset_woodtreedoor_01a_et1',
     key_id: 0,
     requires_level: 0,
     is_locked: false,
@@ -417,7 +649,7 @@ export function buildEnchantedForestStreet(forest, parent) {
       hub_id: forest.hubId,
     },
   }];
-  const decoCount = layers.reduce((n, layer) => n + (layer.decos?.length || 0), 0);
+  const decoCount = layers.reduce((n, layer) => n + layer.decos.length, 0);
   return {
     source: ENCHANTED_FOREST_SOURCE,
     reconstructed: true,
@@ -427,7 +659,7 @@ export function buildEnchantedForestStreet(forest, parent) {
     hubId: forest.hubId,
     hubName: forest.hubName,
     musicFile: ENCHANTED_MUSIC,
-    swf_file: parent.swf_file,
+    swf_file: 'enchant_tree.swf',
     bounds,
     platforms,
     layers,
@@ -441,14 +673,15 @@ export function buildEnchantedForestStreet(forest, parent) {
       ladderCount: ladders.length,
       barrierCount: barriers.length,
     },
-    gradient: parent.gradient ? { ...parent.gradient } : { top: '3B2A5C', bottom: '9C7FC4' },
+    gradient: { ...HOLLOW_GRADIENT },
     doors,
     barriers,
     ladders,
     why: {
       hollow: forest.why,
-      slice: `Parent ${parent.label} x ${a}..${b} (floor range ${Math.round(win.range)} px), shifted by ${dx},${dy}.`,
-      look: 'Purple tint over every layer: "the lovely purple shadows" (forum, a player\'s house in the Enchanted Forest); the enchant_tree.swf decos were never recovered.',
+      layout: `Laid out from the Glitch Tribute Blog panorama, johnexploresur.tumblr.com post ${layout.post} (reference only): ${layout.w} x ${layout.h} px at ${S} world px per px, about the trunk's centre, the floor at the door's connect y. ${g.trees.length} Wood Trees where the panorama shows them.`,
+      ladders: g.ladders.map((l) => `ladder_ench_${forest.id}_${l.id}: ${l.why}`).join('; '),
+      look: 'Tiny Speck\'s enchant_tree.swf set (CC0): bark tile, fungus shelves, knots, crack lights, moss, the rooty floor and stump, the arched door; the pegs are groddle1.swf trunk_ladder_1, as in Tiny Speck\'s own enchant_tree rooms. The shelves are pale and the bark dark, as in the panoramas.',
       music: 'ENCHANTED_WOOD (inc_data_sounds.js, uploaded 2012-04-11, the day the hollow doors were placed).',
     },
   };

@@ -4,8 +4,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { getVerbsFor, runVerb } from '../public/content.js?v=e70532b9';
-import { createAnimalState, listAnimalFeedOptions } from '../public/js/animals.js?v=2fc4d319';
+import { getVerbsFor, runVerb } from '../public/content.js?v=1d972879';
+import { createAnimalState, listAnimalFeedOptions } from '../public/js/animals.js?v=43b2acc8';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');

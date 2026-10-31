@@ -6,8 +6,9 @@
  * mini doors, way out, platforms and parallax need nothing here. This file
  * adds what a street JSON cannot carry:
  * - an empty ecology (the hollows held Wood Trees and nothing else);
- * - the wiki's tree count of Enchanted Wood Trees (17 / 9 / 21), spread along
- *   the floor, each a plain `wood_tree` target whose state is flagged
+ * - the wiki's tree count of Enchanted Wood Trees (17 / 9 / 21), standing on
+ *   the shelves where the Tribute Blog panoramas show them
+ *   (js/enchanted-forests.js hollowTreeSpots), each a plain `wood_tree` target whose state is flagged
  *   `enchanted`, so the shared harvest / pet / water verbs, the Hatchet
  *   animation, badges and quests all run unchanged while woodcutting.js uses
  *   the 10-60 plank map. Art: wood_tree_enchanted.swf (4 variants x 6
@@ -30,22 +31,22 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { isItemFloor, platformsScreen, platformYAt } from '../street-model.js?v=23b926e5';
+import { worldToScreen } from '../street-model.js?v=23b926e5';
 import { frameTexture, textureFromUrl } from '../textures.js?v=db2ce452';
-import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=4e140315';
-import { noteWoodTreeCare } from '../patches.js?v=3996c344';
+import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=df8a49be';
+import { noteWoodTreeCare } from '../patches.js?v=cfa86c42';
 import {
   ENCHANTED_FORESTS,
   ENCHANTED_WOOD_TREE,
-  HOLLOW_MARGIN,
   advanceEnchantedTree,
   createEnchantedTree,
   enchantedForestByTsid,
   enchantedTreeFrame,
+  hollowTreeSpots,
   normalizeEnchantedTree,
   petEnchantedSeedling,
   seedlingStatusLabel,
-} from '../enchanted-forests.js?v=dd04e11b';
+} from '../enchanted-forests.js?v=d986bff5';
 
 export const ENCHANTED_FEATURE_ID = 'enchanted-forest';
 const SEEDLING_URL = 'assets/sprites/soil/patch-seedling@3x.webp';
@@ -64,27 +65,9 @@ let last = '';
 /* Pure helpers (tests/enchanted-forests.test.js)                       */
 /* ------------------------------------------------------------------ */
 
-/**
- * Screen x for each tree: evenly from just right of the way out to the far
- * end of the hollow (the door stands HOLLOW_MARGIN in from the left).
- */
-export function treeSpots(count, width) {
-  const start = HOLLOW_MARGIN + 140;
-  const end = width - 160;
-  if (count <= 1) return [Math.round((start + end) / 2)];
-  const step = (end - start) / (count - 1);
-  return Array.from({ length: count }, (_, i) => Math.round(start + i * step));
-}
-
-/** The lowest floor (largest screen y) at x a tree stands on (isItemFloor), or null. */
-export function floorScreenY(platforms, x) {
-  let best = null;
-  for (const p of platforms || []) {
-    if (!isItemFloor(p)) continue;
-    const y = platformYAt(p, x, 0);
-    if (y != null && (best == null || y > best)) best = y;
-  }
-  return best;
+/** Screen x,y (the foot) of each of a hollow's trees, from its measured layout. */
+export function treeScreenSpots(street, f) {
+  return hollowTreeSpots(f).map((t) => worldToScreen(street, t.x, t.y));
 }
 
 /** The hollow's saved trees, created on first visit, repaired on every load. */
@@ -252,15 +235,13 @@ export const enchantedForestFeature = {
       }
       slot.qaApplied = true;
     }
-    const platforms = platformsScreen(street);
-    const width = street.bounds.r - street.bounds.l;
-    const xs = treeSpots(trees.length, width);
+    const spots = treeScreenSpots(street, f);
     const now = Date.now();
     entities = trees.map((tree, index) => ({
       index,
       tree,
-      x: xs[index],
-      y: floorScreenY(platforms, xs[index]) ?? (street.bounds.b - street.bounds.t),
+      x: spots[index].x,
+      y: spots[index].y,
       target: null,
       sprite: null,
     }));

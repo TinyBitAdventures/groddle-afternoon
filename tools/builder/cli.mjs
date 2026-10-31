@@ -33,7 +33,7 @@ import { newStreet, newStreetOps, newHub, nextHubId, mapWithStreet, mapWithoutSt
 import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js/builder/geometry-handles.js?v=d39231a4';
 import { arrivalOps, settlePostOps, followPostOps } from '../../public/js/builder/posts.js?v=ebcf627c';
 import { platformsScreen, isStandable } from '../../public/js/street-model.js?v=23b926e5';
-import { DECO_TWINS } from '../../public/js/street-render.js?v=c7f5186f';
+import { DECO_TWINS } from '../../public/js/street-render.js?v=b7b83ce1';
 import { EFFECT_KINDS, EFFECT_DEFAULTS, EFFECT_LIMITS, RUMBLE_DEFAULTS, effectsCost, normaliseEmitter, rumbleShare } from '../../public/js/street-effects.js?v=e427650f';
 
 export const PERM_WORDS = Object.freeze({ floor: -1, roof: 1, soft: 0, hard: null });

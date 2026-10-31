@@ -23,7 +23,7 @@ import {
   purchaseAchievementUpdates,
 } from '../public/js/achievements.js?v=631d7daa';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=3d618d6a';
-import { createPlot, growTree, tickPlot } from '../public/js/patches.js?v=3996c344';
+import { createPlot, growTree, tickPlot } from '../public/js/patches.js?v=cfa86c42';
 import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=4b0d8834';
 import { supplyFeature } from '../public/js/features/supply-feature.js?v=8a147dd9';
 import { createToolConditionState } from '../public/js/tools.js?v=9a2e7ef4';

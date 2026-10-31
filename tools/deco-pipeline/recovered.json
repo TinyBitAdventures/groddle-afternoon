@@ -1456,6 +1456,26 @@
    ],
    "png_sha": "49231a347ba97c2d"
   },
+  "door_asset_woodtreedoor_01a_et1": {
+   "swf": "bundle:enchant_tree.swf#door_asset_woodtreedoor_01a_et1",
+   "swf_sha": "58a4d560e0534d89",
+   "stage": [
+    68.7,
+    167.15
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 0,
+   "streets": 0,
+   "scene": "the arched wooden door out of an Enchanted Forest",
+   "png": [
+    138,
+    335
+   ],
+   "png_sha": "bcc87dfafe6ec2b8"
+  },
   "door_asset_yellow": {
    "swf": "bundle:meomi2.swf#door_asset_yellow",
    "swf_sha": "a189ebfd2b12be46",
@@ -4868,6 +4888,26 @@
    ],
    "png_sha": "bfd3b884ffbb66dc"
   },
+  "tree_cracklight_01b_et1": {
+   "swf": "bundle:enchant_tree.swf#tree_cracklight_01b_et1",
+   "swf_sha": "c56100f2e4058f59",
+   "stage": [
+    244.65,
+    233.65
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 2,
+   "streets": 2,
+   "scene": "a lit crack in the trunk wall with a short beam",
+   "png": [
+    490,
+    468
+   ],
+   "png_sha": "a7e8262ffdacec2b"
+  },
   "tree_darkPointy": {
    "swf": "bundle:newxp.swf#tree_darkPointy",
    "swf_sha": "78ed11706882fbd0",
@@ -4886,6 +4926,26 @@
     222
    ],
    "png_sha": "b47178fcd90b8e50"
+  },
+  "tree_floor_stump_01a_et1": {
+   "swf": "bundle:enchant_tree.swf#tree_floor_stump_01a_et1",
+   "swf_sha": "e68f7a7ac7474d55",
+   "stage": [
+    85.3,
+    83.35
+   ],
+   "root_frames": 1,
+   "sprite_frames": 1,
+   "frame": 1,
+   "variants_differ": [],
+   "placed": 3,
+   "streets": 3,
+   "scene": "the root stump on the floor or a shelf of an Enchanted Forest",
+   "png": [
+    171,
+    167
+   ],
+   "png_sha": "e71193d1c502f5a9"
   },
   "tree_furryFlat1": {
    "swf": "bundle:newxp.swf#tree_furryFlat1",

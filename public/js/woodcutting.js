@@ -12,7 +12,7 @@
 
 import { canUseTool, useToolCondition } from './tools.js?v=9a2e7ef4';
 import { woodHarvestOverrides } from './imagination-effects.js?v=70169933';
-import { ENCHANTED_WOOD_TREE } from './enchanted-forests.js?v=dd04e11b';
+import { ENCHANTED_WOOD_TREE } from './enchanted-forests.js?v=d986bff5';
 import { loseEnergy } from './metabolics.js?v=8504134e';
 
 export const WOOD_TREE_SOURCE = 'tinyspeck/glitch-GameServerJS CC0';

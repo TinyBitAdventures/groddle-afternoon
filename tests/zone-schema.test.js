@@ -125,12 +125,12 @@ describe('the deco catalog (tools/builder/deco-catalog.mjs, assets/content/deco-
 
   it('has one row per library deco, with layer usage, sizes and flags', () => {
     const manifest = json('public/assets/decos/manifest.json');
-    assert.equal(cat.count, 2990);
+    assert.equal(cat.count, 2993);
     assert.equal(cat.decos.length, manifest.length);
     assert.equal(cat.streetsScanned, 1475);
     assert.deepEqual(cat.decos.map((d) => d.name), [...manifest].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)));
     const placed = cat.decos.filter((d) => !d.neverPlaced);
-    assert.equal(cat.decos.length - placed.length, 137, 'spec 2.4: 137 library decos never placed');
+    assert.equal(cat.decos.length - placed.length, 138, 'spec 2.4: 138 library decos never placed (the Enchanted Forest door is a door sprite)');
     assert.ok(placed.every((d) => Object.keys(d.layers).length > 0 && d.drawn && d.streets > 0));
     assert.ok(cat.decos.every((d) => Object.keys(d.layers).every((r) => LAYER_ROLES.includes(r))));
     assert.ok(cat.decos.every((d) => Array.isArray(d.size2) && d.size2.length === 2));
@@ -140,7 +140,7 @@ describe('the deco catalog (tools/builder/deco-catalog.mjs, assets/content/deco-
     assert.equal(bush.family, 'bush');
     assert.equal(bush.source, 'groddle1.swf#bush_3');
     assert.ok(bush.placements > 10000 && bush.layers.middleground > 1000 && bush.hubs.length === 5);
-    assert.equal(cat.decos.filter((d) => d.hires).length, 2333);
+    assert.equal(cat.decos.filter((d) => d.hires).length, 2336);
     assert.equal(cat.decos.filter((d) => d.animated).length > 0, true);
   });
 

@@ -138,6 +138,15 @@ SCENE_DECOS.update({
     'penaltybox_base_grass': 'the grassy ledge under the Penalty Box floor',
     'penaltybox_trunk': 'the bark trunk at the right of the Penalty Box cell',
 })
+# The three Enchanted Forests (Grimssea Hollow LDODG1KQLOS2GNO, Afar Cleft LDOLMQFMNOS24AJ, Magha Pleat
+# LUVNMB7AOOS28EK) are lost; their own deco set is enchant_tree.swf (the et1 decos), and the Glitch
+# Tribute Blog panoramas (johnexploresur.tumblr.com posts 54865968635, 48940157335, 52343141868;
+# reference only) show these three pieces no archived street places. js/enchanted-forests.js lays them.
+SCENE_DECOS.update({
+    'door_asset_woodtreedoor_01a_et1': 'the arched wooden door out of an Enchanted Forest',
+    'tree_floor_stump_01a_et1': 'the root stump on the floor or a shelf of an Enchanted Forest',
+    'tree_cracklight_01b_et1': 'a lit crack in the trunk wall with a short beam',
+})
 
 
 def sha(path):

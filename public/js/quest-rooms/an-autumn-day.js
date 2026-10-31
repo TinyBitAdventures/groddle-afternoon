@@ -50,7 +50,7 @@
 
 import { AN_AUTUMN_DAY_FILES } from '../an-autumn-day-art.js?v=d6b2601b';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
-import { sceneAnim } from '../deco-anim.js?v=1b9682e9';
+import { sceneAnim } from '../deco-anim.js?v=a97374b0';
 
 export const ROOM_ID = 'an_autumn_day';
 export const QUEST_ID = 'an_autumn_day';

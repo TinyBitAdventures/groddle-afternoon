@@ -98,10 +98,10 @@ import {
 } from '../street-objects.js?v=fe7ee133';
 import { ROCK_CATALOG } from '../mining.js?v=a7eb8740';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
-import { quoteWoodTreeHarvest } from '../woodcutting.js?v=4e140315';
-import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=2fc4d319';
+import { quoteWoodTreeHarvest } from '../woodcutting.js?v=df8a49be';
+import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=43b2acc8';
 import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=23f74bb3';
-import { PIGGY_FEED, itemBaseCost } from '../animal-husbandry.js?v=81131445';
+import { PIGGY_FEED, itemBaseCost } from '../animal-husbandry.js?v=5b53d454';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
