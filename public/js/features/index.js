@@ -36,7 +36,7 @@ import { partySpacesFeature } from './party-spaces-feature.js?v=bb533f7e';
 import { seasonsFeature } from './seasons-feature.js?v=890241c2';
 import { cameraModeFeature } from './camera-mode-feature.js?v=ad1ae5ea';
 import { newxpFeature } from './newxp-feature.js?v=8563f9a7';
-import { streetMinimapFeature } from './street-minimap-feature.js?v=258b7419';
+import { streetMinimapFeature } from './street-minimap-feature.js?v=1250e91c';
 
 export { questFlagsFeature };
 
@@ -147,7 +147,7 @@ import { dropsMpFeature } from './drops-mp-feature.js?v=be5487b4'; FEATURES.push
 import { bugReportFeature } from './bug-report-feature.js?v=320c0ff6'; FEATURES.push(bugReportFeature);
 import { playerVerbsMpFeature } from './player-verbs-mp-feature.js?v=0f055109'; FEATURES.push(playerVerbsMpFeature);
 import { snapsFeature } from './snaps-feature.js?v=dd057d33'; FEATURES.push(snapsFeature);
-import { homeStreetMpFeature } from './home-street-mp-feature.js?v=81a802e4'; FEATURES.push(homeStreetMpFeature);
+import { homeStreetMpFeature } from './home-street-mp-feature.js?v=f946b8aa'; FEATURES.push(homeStreetMpFeature);
 import { swoonerfliesFeature } from './swoonerflies-feature.js?v=00c4b491'; FEATURES.push(swoonerfliesFeature);
 import { homePoolMpFeature } from './home-pool-mp-feature.js?v=575920f2'; FEATURES.push(homePoolMpFeature);
 import { yardVerbsMpFeature } from './yard-verbs-mp-feature.js?v=d6cfb690'; FEATURES.push(yardVerbsMpFeature);

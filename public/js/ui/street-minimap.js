@@ -30,10 +30,16 @@
  *   (getTip 923-970).
  * - no_map: the street hides the map (Location.show_map, changeMiniMapVisibility). fog_map: a
  *   70% black wash over the picture and "No map: You're on your own" (addGraphic 330-337).
- * - The picture: the 2012 server sent a snapshot of the street (resnapMiniMap). Here the
- *   street's own layers are drawn small through Pixi (snapshotStreetView, every layer stretched
- *   to the street as a flat picture), over the sky gradient and the platform lines, which are
- *   all that shows if the snapshot fails.
+ * - The picture: the client snapped the street itself (TSFrontController.resnapMiniMap:
+ *   getSnapshot at 160 wide, every layer stretched to the middleground, players and most
+ *   itemstacks hidden; batched to once a second, again after a deco or a home change, and when
+ *   another client at the home sent RESNAP_MINIMAP). Here the street's own layers are drawn
+ *   small through Pixi (snapshotStreetView, every layer stretched to the street as a flat
+ *   picture), over the sky gradient and the platform lines, which show only until the first
+ *   snapshot lands (or if it fails). A scene a feature builds (a home street, the house, a
+ *   Tower floor, a visit, an instance or a race) has no street image: it is snapped live with
+ *   its cultivations, fixtures and furniture, and re-snapped as it changes (lane HOMEMAP,
+ *   features/street-minimap-feature.js).
  * - Hidden, as changeMiniMapVisibility hid it: while you move between streets, the Imagination
  *   menu or a full-screen moment is up, in decorate mode; and in this remake also in Camera
  *   Mode, during the tutorial and an arrival or exit scene.
@@ -284,6 +290,64 @@ export const onStreetMapChange = (fn) => pref.onChange(fn);
 /** The shared setting object ({ get, set, onChange }) the Menu's switch takes. */
 export const streetMapSetting = pref;
 
+/**
+ * PURE (lane HOMEMAP): how far a scene's parallax layer (`parallaxF`, js/features/homes-feature.js
+ * drawLandscape, js/features/neighbour-scene.js) stretches across a `W` wide street for the
+ * snapshot. At camera x the layer sits at camX * (1 - f), so a `viewW` wide window shows its
+ * own x from 0 to f * (W - viewW) + viewW; that span is laid over the whole street, as
+ * getSnapshot made every layer the middleground's size (LocationRenderer.as 700-712).
+ */
+export function parallaxStretch(f, W, viewW) {
+  const w = Number(W) || 0;
+  const v = Math.min(w, Math.max(1, Number(viewW) || w));
+  const k = Number(f);
+  if (!(w > 0) || !Number.isFinite(k)) return 1;
+  const span = Math.max(0, Math.min(1, k)) * (w - v) + v;
+  return span > 0 ? w / span : 1;
+}
+
+/**
+ * The classes that never go in a scene's snapshot (getSnapshot hidePCsTemporarily and
+ * hideItemstacksTemporarily): players and the walking characters (NPCs, the Butler, the visiting
+ * Butler, the Craftybot). The home street's Mailbox and Mail Dispatcher stand still as the
+ * street's fixtures, so they stay.
+ */
+export const SNAP_FIXTURE_NPCS = Object.freeze(['npc_mailbox', 'npc_mail_dispatcher']);
+export const SNAP_SKIP_CLASSES = Object.freeze(['bag_butler', 'mp_butler']);
+
+/** PURE: whether a registered thing of this class is drawn in a live scene's snapshot. */
+export function snapsWithScene(classId) {
+  const id = String(classId || '');
+  if (!id) return false;
+  if (SNAP_FIXTURE_NPCS.includes(id)) return true;
+  if (/^(npc_|pc_)/.test(id)) return false;
+  return !SNAP_SKIP_CLASSES.includes(id);
+}
+
+/**
+ * A scene's posts that the map shows as signposts (maybeAddSignpost: on a home street every post
+ * shows): the World Gate (your own street's, and a visit's) and the friends' signpost.
+ */
+export const SCENE_SIGN_CLASSES = Object.freeze(['home_return_marker', 'mp_home_gate', 'mp_home_signpost']);
+
+/**
+ * PURE: sign marks from a scene's registered targets ([{ classId, label, state, sprite: { x, y } }],
+ * world px as the game's): the friends' signpost lists its friends one per line (state.arms), a
+ * World Gate shows its label.
+ */
+export function sceneSignMarks(targets = []) {
+  const out = [];
+  for (const t of targets || []) {
+    if (!t || !SCENE_SIGN_CLASSES.includes(t.classId)) continue;
+    const s = t.sprite;
+    if (!s || s.destroyed || !Number.isFinite(s.x) || !Number.isFinite(s.y)) continue;
+    const arms = Array.isArray(t.state?.arms) ? t.state.arms.map((a) => String(a || '').trim()).filter(Boolean) : [];
+    const tip = t.classId === 'mp_home_signpost' ? arms.join('\n') : String(t.label || '').trim();
+    out.push({ kind: 'sign', id: `scene:${t.classId}:${out.length}`, x: Math.round(s.x), y: Math.round(s.y), tip: tip || null });
+  }
+  return out;
+}
+
 /* ------------------------------------------------------------------ picture */
 
 const hex = (v) => `#${String(v || '').replace(/^#/, '').slice(0, 6).padStart(6, '0')}`;
@@ -322,37 +386,62 @@ export function drawLinesPicture(canvas, street, platforms = []) {
 }
 
 /**
- * The street's own picture, small: every layer of the street view (js/street-render.js
- * buildStreetView) stretched over the street as one flat picture, its sky left out (the
- * gradient is drawn under it), its culled decos drawn too. Returns a canvas of width x height
- * device px, or null when the view can't be drawn. The view is put back as it was.
+ * The street's own picture, small (TSFrontController.resnapMiniMap, getSnapshot
+ * SNAPSHOT_TYPE_NORMAL): returns a canvas of width x height device px, or null when the view
+ * can't be drawn. Everything moved for it is put back as it was.
+ * - A street (js/street-render.js buildStreetView): every layer stretched over the street as one
+ *   flat picture, its sky left out (the gradient is drawn under it), its culled decos drawn too.
+ * - A scene a feature builds (the home street, the house, Tower floors, a visit, the instances
+ *   and races; lane HOMEMAP): `W` x `H` (the street's bounds) when the view names no size; its
+ *   updateParallax runs as a camera as wide as the street, so its sky covers it, and every
+ *   `parallaxF` layer stretches over it (parallaxStretch, `viewW` the window's width); then
+ *   `entities` ({ layer, keep(child) }) draws over it with only the children `keep` passes
+ *   showing: the cultivations, fixtures and furniture, never a player (hidePCsTemporarily).
  */
-export function snapshotStreetView(PIXI, renderer, view, { width, height } = {}) {
+export function snapshotStreetView(PIXI, renderer, view, { width, height } = {}, { W: streetW = 0, H: streetH = 0, viewW = 0, entities = null } = {}) {
   if (!PIXI || !renderer || !view || view.destroyed || !(width > 0) || !(height > 0)) return null;
-  const W = view.worldW || 0;
-  const H = view.sourceWorldH || view.worldH || 0;
+  const W = view.worldW || streetW || 0;
+  const H = view.sourceWorldH || view.worldH || streetH || 0;
   if (!(W > 0) || !(H > 0)) return null;
   const restore = [];
   const set = (obj, key, value) => {
     restore.push([obj, key, obj[key]]);
     obj[key] = value;
   };
+  const keepTransform = (c) => restore.push([c.position, 'x', c.position.x], [c.position, 'y', c.position.y], [c.scale, 'x', c.scale.x], [c.scale, 'y', c.scale.y]);
   let rt = null;
   try {
-    for (const lc of view.parallaxLayers || []) {
-      const layer = lc.parallaxLayer || {};
-      restore.push([lc.position, 'x', lc.position.x], [lc.position, 'y', lc.position.y], [lc.scale, 'x', lc.scale.x], [lc.scale, 'y', lc.scale.y]);
-      lc.position.set(0, 0);
-      lc.scale.set(layer.w > 0 ? W / layer.w : 1, layer.h > 0 ? H / layer.h : 1);
+    if (view.parallaxLayers) {
+      for (const lc of view.parallaxLayers) {
+        const layer = lc.parallaxLayer || {};
+        keepTransform(lc);
+        lc.position.set(0, 0);
+        lc.scale.set(layer.w > 0 ? W / layer.w : 1, layer.h > 0 ? H / layer.h : 1);
+      }
+      for (const lc of view.layerContainers || []) {
+        for (const child of lc.children || []) if (child.culled) set(child, 'culled', false);
+      }
+      if (view.skyView) set(view.skyView, 'visible', false);
+    } else if (typeof view.updateParallax === 'function') {
+      for (const c of view.children || []) keepTransform(c);
+      view.updateParallax(0, 0, W, H, H);
+      for (const c of view.children || []) {
+        if (!Number.isFinite(c.parallaxF)) continue;
+        c.position.x = 0;
+        c.scale.x *= parallaxStretch(c.parallaxF, W, viewW || W);
+      }
     }
-    for (const lc of view.layerContainers || []) {
-      for (const child of lc.children || []) if (child.culled) set(child, 'culled', false);
+    const layer = entities?.layer && !entities.layer.destroyed ? entities.layer : null;
+    if (layer) {
+      for (const child of layer.children || []) {
+        if (child.visible && !entities.keep(child)) set(child, 'visible', false);
+      }
     }
-    if (view.skyView) set(view.skyView, 'visible', false);
     const front = view.frontView && !view.frontView.destroyed ? view.frontView : null;
     rt = PIXI.RenderTexture.create({ width, height, resolution: 1 });
     const m = new PIXI.Matrix().scale(width / W, height / H);
     renderer.render({ container: view, target: rt, clear: true, transform: m });
+    if (layer) renderer.render({ container: layer, target: rt, clear: false, transform: m });
     if (front) renderer.render({ container: front, target: rt, clear: false, transform: m });
     return renderer.extract.canvas(rt);
   } catch (err) {
@@ -459,6 +548,11 @@ export function createStreetMinimap(doc, host, opts = {}) {
   let shown = false;
   let state = 'hidden';
   let tipFor_ = null;
+  // The last snapshot laid over the lines (and its street's tsid): a rebuilt street keeps it.
+  let snapPic = null;
+  let snapTsid = '';
+  // The scene's own posts (setSceneSigns), kept while the same street is built again.
+  let sceneMarks = [];
   const signs = new Map();
   const dots = new Map();
   let lastLayout = -1;
@@ -672,6 +766,13 @@ export function createStreetMinimap(doc, host, opts = {}) {
     if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
   });
 
+  function addSign(mark) {
+    const el = markButton('sign', mark.id);
+    el.setAttribute('aria-label', mark.tip ? `Signpost to ${mark.tip.split('\n').join(', ')}` : 'Signpost');
+    signsEl.append(el);
+    signs.set(mark.id, { mark, el });
+  }
+
   function markButton(kind, id) {
     const el = doc.createElement('button');
     el.type = 'button';
@@ -688,8 +789,16 @@ export function createStreetMinimap(doc, host, opts = {}) {
     get expanded() { return expanded; },
     get geometry() { return geom; },
     get state() { return state; },
-    /** A new street: its geometry, signposts and the fallback picture until a snapshot lands. */
-    setStreet(next, { platforms = [] } = {}) {
+    /**
+     * A new street: its geometry, signposts and the fallback picture until a snapshot lands.
+     * `keepPicture`: the same street built again (a home street after a cultivation, an
+     * expansion or a new style) keeps its last snapshot until the next one, so the map never
+     * goes blank between them.
+     */
+    setStreet(next, { platforms = [], keepPicture = false } = {}) {
+      const kept = keepPicture && snapPic && next && String(next.tsid || '') === snapTsid ? snapPic : null;
+      const sameStreet = Boolean(next && street && String(next.tsid || '') === String(street.tsid || ''));
+      if (!sameStreet) sceneMarks = [];
       street = next || null;
       api._platforms = Array.isArray(platforms) ? platforms : [];
       hideTip();
@@ -714,20 +823,35 @@ export function createStreetMinimap(doc, host, opts = {}) {
       pic.width = Math.max(1, Math.round(geom.w * 2));
       pic.height = Math.max(1, Math.round(geom.mapH * 2));
       drawLinesPicture(pic, street, platforms);
+      if (kept) pic.getContext?.('2d')?.drawImage(kept, 0, 0, pic.width, pic.height);
+      else snapPic = null;
       showPic();
-      root.dataset.picture = 'lines';
+      root.dataset.picture = kept ? 'snapshot' : 'lines';
       const fogged = Boolean(street.fogMap);
       fog.hidden = !fogged;
       wash.hidden = !fogged;
       root.dataset.fog = fogged ? 'true' : 'false';
-      for (const mark of signpostMarks(street)) {
-        const el = markButton('sign', mark.id);
-        if (mark.tip) el.setAttribute('aria-label', `Signpost to ${mark.tip.split('\n').join(', ')}`);
-        signsEl.append(el);
-        signs.set(mark.id, { mark, el });
-      }
+      for (const mark of signpostMarks(street)) addSign(mark);
+      for (const mark of sceneMarks) addSign(mark);
       root.dataset.signs = String(signs.size);
       layout();
+    },
+    /**
+     * The posts a scene draws itself (sceneSignMarks: a home street's World Gate and friends'
+     * signpost), in place of the last ones it gave; the street's own posts stay.
+     */
+    setSceneSigns(marks = []) {
+      if (!geom) return;
+      for (const [id, s] of signs) {
+        if (!id.startsWith('scene:')) continue;
+        if (tipFor_ === s.el) hideTip();
+        s.el.remove();
+        signs.delete(id);
+      }
+      sceneMarks = (marks || []).filter((mark) => mark && String(mark.id || '').startsWith('scene:'));
+      for (const mark of sceneMarks) addSign(mark);
+      root.dataset.signs = String(signs.size);
+      placeAll();
     },
     /** The size of the picture canvas in device px (the snapshot's target). */
     pictureSize() {
@@ -740,6 +864,8 @@ export function createStreetMinimap(doc, host, opts = {}) {
       if (!ctx) return false;
       drawLinesPicture(pic, street, api._platforms || []);
       ctx.drawImage(canvas, 0, 0, pic.width, pic.height);
+      snapPic = canvas;
+      snapTsid = String(street.tsid || '');
       showPic();
       root.dataset.picture = 'snapshot';
       return true;
@@ -805,7 +931,7 @@ export function createStreetMinimap(doc, host, opts = {}) {
         if (Math.abs(w - geom.w) > 0.5) {
           const plats = api._platforms || [];
           const pics = root.dataset.picture;
-          api.setStreet(street, { platforms: plats });
+          api.setStreet(street, { platforms: plats, keepPicture: true });
           if (pics === 'snapshot') opts.onResnap?.();
         }
         layout();
@@ -826,7 +952,7 @@ export function createStreetMinimap(doc, host, opts = {}) {
       if (!shown || !street) return;
       const w = widthPx();
       if (geom && Math.abs(w - geom.w) > 0.5) {
-        api.setStreet(street, { platforms: api._platforms || [] });
+        api.setStreet(street, { platforms: api._platforms || [], keepPicture: true });
         opts.onResnap?.();
       }
       layout();

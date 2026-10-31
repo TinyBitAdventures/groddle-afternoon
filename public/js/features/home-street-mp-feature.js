@@ -346,7 +346,8 @@ function createSession(engine, client) {
     engine.entityLayer.addChild(box);
     const label = owner ? T.signpost : T.signpost;
     const subtitle = arms.length ? arms.map((n) => n.name).join(', ') : T.noArms;
-    drawn.signpost = { target: addTarget({ classId: CLASS_SIGNPOST, label, subtitle, sprite: box, state: { owner } }), neighbors: arms, owner };
+    // arms: the street map's tip lists them (street-minimap sceneSignMarks).
+    drawn.signpost = { target: addTarget({ classId: CLASS_SIGNPOST, label, subtitle, sprite: box, state: { owner, arms: arms.map((n) => n.name) } }), neighbors: arms, owner };
   }
 
   /** note_pole.as: the pole, the sign and (posted) the note, from the pole's base. */
