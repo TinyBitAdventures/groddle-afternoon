@@ -11,11 +11,13 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry } from '../public/js/street-model.js?v=23b926e5';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=4be109b9';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=0eb97168';
 import { planStreetPlacements, populationForStreet } from '../public/js/street-ecology.js?v=fd79899d';
 import {
   BOTTOM_DOOR,
   LADDER_SPOTS,
   MOSSYSTEP_TSID,
+  PINE,
   THORNFAD_DOOR,
   THORNFAD_TSID,
   TIERS,
@@ -26,9 +28,9 @@ import {
   isVicarsPeakTsid,
   ladderGeometry,
   vicarsPeakEcology,
-} from '../public/js/vicars-peak.js?v=465e7965';
-import { vicarsPeakFeature } from '../public/js/features/vicars-peak-feature.js?v=b830235a';
-import { FEATURES } from '../public/js/features/index.js?v=75574d83';
+} from '../public/js/vicars-peak.js?v=fa68613e';
+import { vicarsPeakFeature } from '../public/js/features/vicars-peak-feature.js?v=33193b4f';
+import { FEATURES } from '../public/js/features/index.js?v=44d27a11';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -62,13 +64,27 @@ describe("Vicar's Peak street", () => {
     assert.match(loc, /this\.tsid == 'LCR1516SFHM122V'\)\s*\/\/ Vicar's Peak/);
   });
 
-  it('keeps to the 1500 x 2000 Heights climb with seven ledge tiers', () => {
-    assert.deepEqual(vp.bounds, { l: -750, r: 750, t: -2000, b: 0 });
+  it('R5 (post 55353935847): 1500 wide, rows ~235 apart, the top door on a short ledge of its own at the top of the street', () => {
+    assert.deepEqual(vp.bounds, { l: -750, r: 750, t: -1640, b: 0 });
     assert.equal(TIERS.length, 7);
-    for (let i = 1; i < TIERS.length; i += 1) {
+    for (let i = 1; i < TIERS.length - 1; i += 1) {
       const gap = TIERS[i - 1].y - TIERS[i].y;
-      assert.ok(gap >= 260 && gap <= 300, `tier ${i} gap ${gap}`);
+      assert.ok(gap >= 225 && gap <= 245, `tier ${i} gap ${gap}`);
     }
+    // The door's ledge: short, right of centre, closer over the row under it.
+    const top = TIERS[TIERS.length - 1];
+    const gap = TIERS[TIERS.length - 2].y - top.y;
+    assert.ok(gap >= 150 && gap < 235, `door ledge gap ${gap}`);
+    assert.equal(top.segs.length, 1);
+    const [a, b] = top.segs[0];
+    assert.ok(b - a <= 450 && a < TOP_DOOR.x && b > TOP_DOOR.x && TOP_DOOR.x > 0, 'a short ledge right of centre under the door');
+    const door = vp.doors.find((d) => d.id === TOP_DOOR.id);
+    assert.ok(door.y - door.h >= 0 && door.y - door.h <= 40, 'the arch at the top of the street');
+    // The pine stands one row lower, at the left (R5).
+    const mg = vp.layers.find((l) => l.name === 'middleground');
+    const pine = mg.decos.find((d) => d.sprite === PINE.sprite);
+    assert.equal(PINE.tier, TIERS.length - 2);
+    assert.ok(pine.x < 0 && Math.abs(pine.y - 6 - TIERS[PINE.tier].y) < 1, 'pine on the row under the door ledge');
     for (const tier of TIERS) {
       for (const [a, b] of tier.segs) {
         assert.ok(a >= L && b <= vp.bounds.r && b - a >= 150, `${tier.id} ${a}..${b}`);
@@ -82,7 +98,7 @@ describe("Vicar's Peak street", () => {
   it('every ladder stands on one ledge and tops out over the next', () => {
     const lads = ladderGeometry();
     assert.equal(vp.ladders.length, LADDER_SPOTS.length);
-    assert.ok(vp.ladders.length >= 14, 'many ladders, as in the Snaps');
+    assert.equal(vp.ladders.length, 13, 'the thirteen R5 draws between the rows');
     for (const lad of vp.ladders) {
       const g = lads.find((x) => x.id === lad.id);
       const lower = TIERS.find((t) => t.id === g.from);
@@ -115,6 +131,18 @@ describe("Vicar's Peak street", () => {
       }
     }
     for (const door of vp.doors) assert.ok(existsSync(join(pub, 'assets/decos/groddle', `${door.sprite}.webp`)), door.sprite);
+  });
+
+  it("the level builder's reach graph: from Thornfad's door and from the top door, both doors and every ledge, no traps", () => {
+    const door = thornfad.doors.find((d) => d.id === THORNFAD_DOOR);
+    const top = vp.doors.find((d) => d.id === TOP_DOOR.id);
+    const r = reachStreet(vp, [{ x: door.connect.arrive.x, y: door.connect.arrive.y, from: 'thornfad' }, { x: top.x, y: top.y, from: 'top' }]);
+    assert.ok(r.arrivals.every((a) => a.stands));
+    for (const t of r.targets) assert.deepEqual(t.reachedFrom, [true, true], t.id);
+    assert.deepEqual(r.unreached, []);
+    assert.deepEqual(r.traps, []);
+    assert.deepEqual(r.deckless, []);
+    assert.ok(r.surfaces.every((x) => x.reached));
   });
 
   it("opens from Thornfad Layers' locked door (Door Key 1) and lands on the ground at its connect point", () => {

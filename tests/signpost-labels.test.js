@@ -11,7 +11,7 @@ import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
-import { SIGN_TEXT_FILL, SIGN_TEXT_FILL_UNBUILT, signLabel } from '../public/js/street-render.js?v=0a63147a';
+import { SIGN_TEXT_FILL, SIGN_TEXT_FILL_UNBUILT, signLabel } from '../public/js/street-render.js?v=b5ae0c3d';
 
 const root = join(import.meta.dirname, '..');
 const python = '/opt/homebrew/bin/python3.11';

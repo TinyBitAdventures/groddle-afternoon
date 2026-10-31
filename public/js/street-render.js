@@ -12,9 +12,9 @@ import {
 } from './street-model.js?v=23b926e5';
 import { availableStreetTsids } from './street-loader.js?v=390e4702';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js?v=db2ce452';
-import { admitSharp, decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco, NEW_DECOS } from './deco-hires.js?v=2459d904';
+import { admitSharp, decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco, NEW_DECOS } from './deco-hires.js?v=cb905e17';
 import { LADDER_TILE_Z, ladderTilePieces } from './ladder-tiling.js?v=4f9e07fa';
-import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } from './deco-anim.js?v=51e6411b';
+import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } from './deco-anim.js?v=6f548fd1';
 import { drawnLayerOffset, layerScreenDir } from './camera-feel.js?v=e668afc5';
 
 const DECO_BASE = 'assets/decos/groddle/';

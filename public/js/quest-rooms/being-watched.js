@@ -38,7 +38,7 @@
  */
 
 import { onLoaded } from '../textures.js?v=db2ce452';
-import { sceneAnim } from '../deco-anim.js?v=51e6411b';
+import { sceneAnim } from '../deco-anim.js?v=6f548fd1';
 
 export const QUEST = 'stale_but_necessary';
 /** source: questInstanceLocation(..., 5*60). */

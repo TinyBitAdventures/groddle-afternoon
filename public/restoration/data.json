@@ -312,7 +312,7 @@
     "tools/build-vicars-peak.mjs"
    ],
    "shot": "shots/vicars-peak.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&streetdemo=GCR1516SFHM122V&streetx=1000&streety=215&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&streetdemo=GCR1516SFHM122V&streetx=1000&streety=185&practice=1"
   },
   {
    "id": "picture-rooms",

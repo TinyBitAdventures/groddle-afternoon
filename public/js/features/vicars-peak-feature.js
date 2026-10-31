@@ -10,12 +10,12 @@
  *   stand on, t0 ground .. t6 the door ledge, '' while climbing or in the
  *   air) and vicarsPeakTop (the highest tier reached this visit).
  *
- * QA: ?autostart=1&questoffer=off&streetdemo=GCR1516SFHM122V&streetx=1300&streety=1895
+ * QA: ?autostart=1&questoffer=off&streetdemo=GCR1516SFHM122V&streetx=1300&streety=1535
  *   (the ground by the bottom door), or doordemo=GCR12NU45AM12BB&doorkey=1&doorautoplay=1
  *   (through Thornfad Layers' locked door).
  */
 
-import { TIERS, VICARS_PEAK_BOUNDS, isVicarsPeakTsid, vicarsPeakEcology } from '../vicars-peak.js?v=465e7965';
+import { TIERS, VICARS_PEAK_BOUNDS, isVicarsPeakTsid, vicarsPeakEcology } from '../vicars-peak.js?v=fa68613e';
 
 export const VICARS_PEAK_FEATURE_ID = 'vicars-peak';
 const DATA_MS = 250;

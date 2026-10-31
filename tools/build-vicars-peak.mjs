@@ -22,7 +22,7 @@ import {
   VICARS_PEAK_TSID,
   vicarsPeakIndexEntry,
   vicarsPeakStreet,
-} from '../public/js/vicars-peak.js?v=465e7965';
+} from '../public/js/vicars-peak.js?v=fa68613e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

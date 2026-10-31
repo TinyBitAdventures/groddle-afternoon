@@ -33,6 +33,13 @@
  *   door on the top ledge. Tiers sit ~2 avatar heights apart (~280 px for
  *   the remake's 130 px avatar). The May Snap also shows a few small items on
  *   the ledges (two stands, a lamp, a hanging sign): not identified, not built.
+ * - R5: Tribute Blog post 55353935847 (2013, reference only), the whole street
+ *   in one picture (its doors and pine sit where the beta minimap has them):
+ *   six pebbly rows ~235 px apart, the top door on a short ledge of its own
+ *   right of centre, the pine one row lower at the left, 13 vined ladders
+ *   between the rows. The rows, ledge ends, ladders, pine and moss follow it.
+ *   Two more ladders climb from the pine row past the top of the picture, left
+ *   of the door ledge; nothing shows where they lead, so they are left out.
  *
  * Art (all CC0, the groddle1 bundle already in assets/decos/groddle):
  * heights_face_1 and heights_hole_wall_piece for the rock face; the ledges are
@@ -71,7 +78,8 @@ export const isVicarsPeakTsid = (tsid) => String(tsid || '').slice(1) === VICARS
 
 const L = -750;
 const R = 750;
-const T = -2000;
+// R5 (post 55353935847): the door's arch touches the top of the street.
+const T = -1640;
 const B = 0;
 export const VICARS_PEAK_BOUNDS = Object.freeze({ l: L, r: R, t: T, b: B });
 const W = R - L;
@@ -81,29 +89,36 @@ const H = B - T;
 /* Tiers and ladders                                                   */
 /* ------------------------------------------------------------------ */
 
+/** Rows apart (R5, post 55353935847: ~235 px; the Snaps' ~2 avatar heights read 280). */
+export const ROW_GAP = 235;
+/** The door's short ledge sits closer over the pine row (R5: ~0.7 of a row). */
+export const TOP_LEDGE_GAP = 175;
+
 /**
  * Ledge tiers, bottom to top: walk-line y and the ledge segments [x0, x1]
- * (world). Seven tiers ~280 px apart, as the minimap's player rows; the
- * gaps leave the rock face showing between ledges, as in the Snaps.
+ * (world), read off R5 (post 55353935847; picture x * 1500/1280 - 750): each
+ * row runs off one side of the street and stops short of the other, in
+ * turn, and the top door's ledge is a short one of its own. The gaps leave
+ * the rock face showing between ledges, as in the Snaps.
  */
 export const TIERS = Object.freeze([
   { id: 't0', y: -105, segs: [[L, R]], why: "the ground: Thornfad's door lands at 708,-105" },
-  { id: 't1', y: -385, segs: [[L, -120], [60, R]] },
-  { id: 't2', y: -665, segs: [[L, 250], [420, R]] },
-  { id: 't3', y: -945, segs: [[-600, R]] },
-  { id: 't4', y: -1225, segs: [[L, -250], [-80, R]] },
-  { id: 't5', y: -1505, segs: [[L, 150], [330, R]] },
-  { id: 't6', y: -1785, segs: [[L, 520]], why: 'the top ledge with the arched door (Snaps) and a pine at its left end (minimap)' },
+  { id: 't1', y: -105 - ROW_GAP, segs: [[L, 539]] },
+  { id: 't2', y: -105 - 2 * ROW_GAP, segs: [[-621, R]] },
+  { id: 't3', y: -105 - 3 * ROW_GAP, segs: [[L, 656]] },
+  { id: 't4', y: -105 - 4 * ROW_GAP, segs: [[-609, R]] },
+  { id: 't5', y: -105 - 5 * ROW_GAP, segs: [[L, 656]], why: 'the long row under the door ledge, the pine at its left end (R5)' },
+  { id: 't6', y: -105 - 5 * ROW_GAP - TOP_LEDGE_GAP, segs: [[-82, 328]], why: 'the short ledge with the arched door (Snaps; R5: right of centre, on its own)' },
 ].map((t) => Object.freeze({ ...t, segs: Object.freeze(t.segs.map((s) => Object.freeze(s))) })));
 
-/** Ladders: world x and the tier each stands on (it climbs to the next one up). Many, as in the Snaps. */
+/** Ladders: world x and the tier each stands on (it climbs to the next one up). R5's thirteen, where it draws them. */
 export const LADDER_SPOTS = Object.freeze([
-  [-560, 0], [300, 0], [480, 0],
-  [-650, 1], [-300, 1], [520, 1],
-  [-420, 2], [120, 2], [600, 2],
-  [-520, 3], [250, 3], [680, 3],
-  [-640, 4], [60, 4], [560, 4],
-  [-380, 5], [-540, 5], [420, 5],
+  [-193, 0], [410, 0],
+  [-463, 1], [143, 1],
+  [-299, 2], [223, 2], [545, 2],
+  [-443, 3], [-190, 3], [413, 3],
+  [-6, 4], [551, 4],
+  [281, 5],
 ].map(([x, from]) => Object.freeze({ x, from })));
 
 /** Climb zone width (source Heights ladders are 50; a little wider for the remake's avatar). */
@@ -129,7 +144,7 @@ export function ladderGeometry() {
 /* Doors                                                               */
 /* ------------------------------------------------------------------ */
 
-/** The top door (Snaps: stone-arched wooden door on the top ledge; minimap: a little right of centre). */
+/** The top door (Snaps: stone-arched wooden door on the top ledge; minimap and R5: a little right of centre, on its short ledge). */
 export const TOP_DOOR = Object.freeze({ id: 'door_vp_top', x: 135, tier: 6, w: 150, h: 161, sprite: 'heights_door_static' });
 /** The bottom door by Thornfad's landing (minimap: a dark shape at the bottom right). */
 export const BOTTOM_DOOR = Object.freeze({ id: 'door_vp_bottom', x: 640, tier: 0, w: 140, h: 150, sprite: 'heights_door_static' });
@@ -179,8 +194,8 @@ function wallDecos() {
     const y = T + 150 + rnd(i + 71) * (H - 200);
     out.push(deco('heights_hole_wall_piece', x, y, 282 * 0.8, 296 * 0.8, 6, i % 2 ? { flip: true } : {}));
   }
-  // Grey rock patches on the face (Snap Sep 2012: a grey stone cluster on the right).
-  for (const [x, y] of [[560, -1300], [-420, -520], [300, -1880], [-640, -1060]]) {
+  // Grey rock patches on the face (Snap Sep 2012: a grey stone cluster on the right; R5 places three more).
+  for (const [x, y] of [[575, -1300], [-10, -590], [105, -905], [-640, -1060]]) {
     out.push(deco('heights_face_rock_2', x, y, 288 * 0.6, 120 * 0.6, 8));
   }
   // Grey pebbles set in the face.
@@ -242,8 +257,8 @@ function pebbleDecos() {
   return out;
 }
 
-/** Olive moss on a few ledges (beta loading card t0520 and t0120). */
-const MOSS = Object.freeze([[-470, 1], [380, 2], [-200, 4], [610, 5], [-300, 0]]);
+/** Olive moss on a few ledges (beta loading card t0520 and t0120; R5 places it). */
+const MOSS = Object.freeze([[-310, 0], [160, 1], [-290, 2], [450, 2], [400, 3], [-150, 4], [230, 4], [-540, 5]]);
 function mossDecos() {
   return MOSS.map(([x, ti], i) => deco('heights_moss_2', x, TIERS[ti].y + 10, 398 * 0.45, 88 * 0.45, 58, i % 2 ? { flip: true } : {}));
 }
@@ -272,11 +287,11 @@ function ladderDecos() {
   return out;
 }
 
-/** A pine on the top ledge's left end (minimap t2240: a green tree at the top left; video t0040). */
-const PINE = Object.freeze({ sprite: 'heights_coniferous_3', x: -680, w: 530 * 0.3, h: 1290 * 0.3 });
+/** A pine at the top left (minimap t2240; video t0040), on the row under the door ledge (R5). */
+export const PINE = Object.freeze({ sprite: 'heights_coniferous_3', x: -463, tier: 5, w: 530 * 0.3, h: 1290 * 0.3 });
 
 function middlegroundDecos() {
-  const pine = deco(PINE.sprite, PINE.x, TIERS[6].y + 6, PINE.w, PINE.h, 12);
+  const pine = deco(PINE.sprite, PINE.x, TIERS[PINE.tier].y + 6, PINE.w, PINE.h, 12);
   return [
     ...wallDecos(),
     pine,
@@ -367,9 +382,10 @@ export function vicarsPeakStreet({ thornfadArrive = null, thornfadXY = null, mos
     ladders: ladders.map(({ id, x, y, w, h }) => ({ id, x, y, w, h })),
     why: {
       street: "inc_data_maps_prod.js 16370 (hub 64); location.js 2786-2790 counts it as on the map; no location XML.",
-      bounds: 'Minimap (video WZqTdcjhPII t1960, t2240) ~0.75 wide for tall, like the 1500 x 2000 Heights climbs; Thornfad door lands at 708,-105.',
-      tiers: 'Seven ledge tiers ~280 px apart: minimap player rows, ~2 avatar heights in the Snaps.',
-      ladders: 'Wooden ladders twined with leafy vines between every tier (Snaps May 30 and Sep 13 2012).',
+      bounds: 'Width 1500 as the other Heights climbs; Thornfad door lands at 708,-105. R5 (Tribute Blog post 55353935847, the whole street, reference only): the top door\'s arch at the top of the street, so 1640 tall with the rows 235 apart (was 2000).',
+      tiers: 'R5: six rows ~235 px apart (was 280, from the Snaps\' ~2 avatar heights), each running off one side, and the top door on a short ledge of its own ~175 px over the long row.',
+      ladders: 'Wooden ladders twined with leafy vines between every tier (Snaps May 30 and Sep 13 2012); R5 places thirteen. R5 and the Sep Snap show two more climbing from the pine row past the top of the picture, left of the door ledge, to nothing shown: left out.',
+      pine: 'R5: the pine stands at the left of the row under the door ledge (the minimap\'s green tree at the top left).',
       topDoor: "Stone-arched wooden door on the top ledge (Snaps). Leads to Mossystep: Mossystep's geometry sources (2012-05-22) list Vicar's Peak, so it linked there; arrival x/y not archived.",
       bottomDoor: "Back to Thornfad Layers, in front of its door: a dark shape at the bottom right of the minimap where Thornfad's door lands. Remake choice: Thornfad's sources (2012-10-16) do not list Vicar's Peak.",
       population: 'Loading card t0520: 11 Piggies, 7 Chickens, and 1 Metal Rock for mining.',

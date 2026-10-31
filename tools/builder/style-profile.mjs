@@ -30,7 +30,7 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DECO_TWINS } from '../../public/js/street-render.js?v=0a63147a';
+import { DECO_TWINS } from '../../public/js/street-render.js?v=b5ae0c3d';
 import { isZoneTsid } from '../../public/js/zone-streets.js?v=b40010d5';
 import { layerRole, LAYER_ROLES } from '../../public/js/builder/layer-role.js?v=e585f610';
 import { HUE_BINS } from '../../public/js/builder/colour-stats.js?v=30f71984';
