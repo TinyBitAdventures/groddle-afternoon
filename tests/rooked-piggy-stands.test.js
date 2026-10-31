@@ -4,7 +4,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createAnimalState } from '../public/js/animals.js?v=e857d0af';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=4fa4ab60';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=e06d1bf9';
 import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=0cd81ddd';
 
 const TSID = 'GLI2HVHUM4F16B0'; // Pasha's Place, Groddle Forest: where Austin met it
@@ -12,7 +12,7 @@ const TSID = 'GLI2HVHUM4F16B0'; // Pasha's Place, Groddle Forest: where Austin m
 function setup() {
   const slots = {};
   const walk = [{ walk: true }];
-  const sprite = { x: 4400, y: 876, vx: 0.45, baseX: 4400, range: 90, scale: { x: 1 }, visible: true, destroyed: false, textures: walk, loop: true, animationSpeed: 0.14, playing: true, gotoAndPlay() {} };
+  const sprite = { x: 4400, y: 876, vx: 0.45, baseX: 4400, range: 90, scale: { x: 1 }, visible: true, destroyed: false, textures: walk, loop: true, animationSpeed: 0.14, gotoAndPlay() {} };
   const pig = { classId: 'npc_piggy', animalKey: `${TSID}:npc_piggy:0`, state: createAnimalState('npc_piggy', { hunger: 5, mood: 1, hungerAt: Date.now() + 3_600_000 }), sprite };
   const tree = { classId: 'trant_bubble', state: { fruitCount: 3 }, sprite: { x: 3900, y: 876, visible: true, destroyed: false, scale: { x: 1 } } };
   const engine = {
@@ -89,5 +89,33 @@ describe('a rooked Piggy (Pasha\'s Place walk in place)', () => {
     assert.ok(Math.abs(pig.sprite.x - before) > 5, 'it moves');
     animalMoodFeature.onStreetClear();
     rookAttackFeature.onStreetClear(engine);
+  });
+});
+
+describe('a Piggy that reached its food', () => {
+  it('stands still while it eats (no walk in place), then walks on', async () => {
+    const { engine, pig, tree } = setup();
+    let playing = true;
+    Object.defineProperty(pig.sprite, 'playing', { get: () => playing });
+    pig.sprite.gotoAndStop = () => { playing = false; };
+    pig.sprite.play = () => { playing = true; };
+    animalMoodFeature.onStreetClear();
+    let t = 10_000;
+    const tick = (ms = 500) => {
+      t += ms;
+      animalMoodFeature.onTick(ms, t, engine);
+      pig.sprite.x += pig.sprite.vx * (ms / 16);
+    };
+    tick();
+    pig.sprite.x = tree.sprite.x + 40; // close by, so it gets there at once
+    animalMoodFeature.sharedAnimalEvent(pig, { ev: 'ate', on: tree }, engine);
+    for (let i = 0; i < 4; i += 1) tick();
+    assert.ok(Math.abs(pig.sprite.x - tree.sprite.x) < 7, 'it reached the tree');
+    assert.equal(playing, false, 'eating, it stands on a still frame (onFoodPathing 1485-1513: chew, then idle)');
+    await new Promise((r) => setTimeout(r, 3100));
+    tick();
+    assert.equal(playing, true, 'it walks on after the pause');
+    assert.ok(Math.abs(pig.sprite.vx) >= 0.4);
+    animalMoodFeature.onStreetClear();
   });
 });

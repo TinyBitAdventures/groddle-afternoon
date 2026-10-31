@@ -273,11 +273,22 @@ function hold(engine, r) {
   }
 }
 
+/** A held Piggy whose walk frames still play stands on its first walk frame instead. */
+function standStill(engine, r) {
+  const spr = r.target.sprite;
+  const walk = walkFrames(engine, r.target);
+  if (!spr || spr.destroyed || !spr.playing || !walk.length || spr.textures?.[0] !== walk[0] || typeof spr.gotoAndStop !== 'function') return;
+  spr.gotoAndStop(0);
+}
+
 function release(engine, r) {
   const spr = r.target.sprite;
   r.mode = 'idle';
   r.food = null;
   if (!spr || spr.destroyed) return;
+  // Walking again: the walk frames play again (standStill stopped them).
+  const walk = walkFrames(engine, r.target);
+  if (!spr.playing && walk.length && spr.textures?.[0] === walk[0] && typeof spr.play === 'function') spr.play();
   if (isExtra(r.target)) {
     spr._moodHold = false;
     spr._moodRebase = spr.x;
@@ -1235,6 +1246,9 @@ export const animalMoodFeature = {
         if (!acting) stepSeek(engine, r, dtMs);
       } else if (r.mode === 'eat' && time >= r.holdUntil) {
         release(engine, r);
+      } else if (r.mode === 'eat') {
+        // onFoodPathing 1485-1513: chew, then stand idle until startMoving 3 s on; never a walk in place.
+        standStill(engine, r);
       }
       if (target.state.croaking && Number(target.state.hunger) >= PIGGY_HUNGER.max) {
         if (r.nextCroakAt && time >= r.nextCroakAt) {
