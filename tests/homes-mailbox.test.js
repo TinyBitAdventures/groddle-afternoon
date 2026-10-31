@@ -159,4 +159,12 @@ describe('playable home and mailbox integration', () => {
       assert.ok(readFileSync(join(root, file)).length > 1_000);
     }
   });
+
+  it('is called Mailbox, its original name, not the description joke Mailbox (1)', () => {
+    for (const f of ['../public/game.js', '../public/js/features/homes-feature.js']) {
+      const src = readFileSync(new URL(f, import.meta.url), 'utf8');
+      assert.doesNotMatch(src, /label: 'Mailbox \(1\)'/, f);
+      assert.match(src, /classId: 'npc_mailbox',\n\s*\/\/[^\n]*\n\s*label: 'Mailbox',/, f);
+    }
+  });
 });

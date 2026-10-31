@@ -1898,7 +1898,8 @@ function spawnStreetTargets(engine) {
   engine.entityLayer.addChild(mailbox);
   const mailTarget = engine.register({
     classId: 'npc_mailbox',
-    label: 'Mailbox (1)',
+    // npc_mailbox.js name_single; "Mailbox (1)" is only a joke in its description.
+    label: 'Mailbox',
     subtitle: unread ? `${unread} unread message${unread === 1 ? '' : 's'}` : 'Your very own mail',
     sprite: mailbox,
     state: { unread },

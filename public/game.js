@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e70532b9';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9a8f16c0';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d7153b1c';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -20493,7 +20493,8 @@ function spawnHomeSceneTargets(room) {
     entityLayer.addChild(mailbox);
     homeMailboxTarget = register({
       classId: 'npc_mailbox',
-      label: 'Mailbox (1)',
+      // npc_mailbox.js name_single; "Mailbox (1)" is only a joke in its description.
+      label: 'Mailbox',
       subtitle: unread ? `${unread} unread message${unread === 1 ? '' : 's'}` : 'Your very own mail',
       sprite: mailbox,
       state: { unread },
