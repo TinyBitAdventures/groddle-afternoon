@@ -54,8 +54,8 @@ import {
   STOOT_RETURN,
   boxToScreen,
   midTowerRoomByTsid,
-} from '../tower-mid-rooms.js?v=1e4d8bbd';
-import { CLICK_ANYWHERE, HALL, HALL_ART, HALL_ART_ROOT, HALL_BUTTON_CLASS, HALL_WIDGET, WALL_BUTTON } from '../hall-rejected-concepts.js?v=2a184c74';
+} from '../tower-mid-rooms.js?v=057c7e72';
+import { CLICK_ANYWHERE, HALL, HALL_ART, HALL_ART_ROOT, HALL_BUTTON_CLASS, HALL_WIDGET, WALL_BUTTON } from '../hall-rejected-concepts.js?v=4c553550';
 
 export const MID_TOWER_FEATURE_ID = 'mid-tower';
 export const ROOK_HALL_START = 'rook_hall_start';

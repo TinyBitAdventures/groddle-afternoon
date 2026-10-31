@@ -41,10 +41,10 @@ import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=df8a49be';
 import { animalStatusLabel } from '../animals.js?v=43b2acc8';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
-import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=3d0b08f0';
+import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=bb8b2151';
 import { readVisitScene } from '../neighbours-mp.js?v=31a75688';
 import { saveStore } from '../save-store.js?v=b74a8113';
-import { STREET_GROUND_Y } from './homes-feature.js?v=e2dbaa5a';
+import { STREET_GROUND_Y } from './homes-feature.js?v=5c5c4449';
 import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=d7bf7501';
 import {
   YARD_STREET,

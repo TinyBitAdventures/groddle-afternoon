@@ -22,7 +22,7 @@ import {
   placementCheck,
   quoteYardExpansion,
   removeCultivation,
-} from '../public/js/home-cultivation.js?v=3d0b08f0';
+} from '../public/js/home-cultivation.js?v=bb8b2151';
 
 const root = join(import.meta.dirname, '..', 'public');
 const rich = () => ({ level: 60, imagination: 1_000_000 });

@@ -19,9 +19,9 @@ import {
   setStreetEcologyCatalog,
 } from '../public/js/street-ecology.js?v=6a313245';
 import { applyIndexHub, loadStreetDataFromFs } from '../public/js/street-loader.js?v=390e4702';
-import { TOWER_ROOMS, VENT } from '../public/js/tower-rooms.js?v=fc6dc1e7';
-import { ALL_TOWER_ROOMS } from '../public/js/tower-challenge-rooms.js?v=ab42bf71';
-import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=2a52b273';
+import { TOWER_ROOMS, VENT } from '../public/js/tower-rooms.js?v=eeebce6f';
+import { ALL_TOWER_ROOMS } from '../public/js/tower-challenge-rooms.js?v=8877b6a7';
+import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=ba8fe469';
 import { seasonsFeature } from '../public/js/features/seasons-feature.js?v=a9f4022e';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -147,7 +147,7 @@ describe('Room 15 and the Ventilation Room run on below their floors', () => {
     for (const room of ALL_TOWER_ROOMS) {
       assert.ok(room.bounds.b - lowestFloor(room) >= 300, `${room.label}: ${room.bounds.b - lowestFloor(room)}`);
     }
-    assert.equal(VENT.bounds.b, 3000);
+    assert.equal(VENT.bounds.b, 3220); // R5 (post 57374191151): the exit floor at ~2800, 420 px of world under it
   });
 
   it('the shell art reaches the new bottom and the end walls run the full height', () => {

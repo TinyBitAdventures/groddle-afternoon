@@ -108,10 +108,10 @@ import {
   towerSecretText,
   towerSpotsFor,
   workCheck,
-} from '../home-tower.js?v=b6e0d43c';
+} from '../home-tower.js?v=b05c58d8';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { pieceUrl } from '../home-wallpaper.js?v=e676f00f';
-import { wantsHiresDecos } from '../deco-hires.js?v=f3b0ac4e';
+import { wantsHiresDecos } from '../deco-hires.js?v=7678e434';
 import { WOTD_TEXT } from '../wine-pour.js?v=6daa23a7';
 
 /** 3x tower pieces where the screen has more than 2.25 backing pixels per world pixel. */

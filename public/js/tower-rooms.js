@@ -320,152 +320,194 @@ function buildRoom15() {
 /* Ventilation Room (LIF102JCHL027DO)                                   */
 /* ------------------------------------------------------------------ */
 
-/** The vertical span: C6's door near the top, C4's at mid height, Tower St South at the bottom. */
+/**
+ * The vertical span: C6's door near the top, C4's at mid height, Tower St
+ * South at the bottom. R5: Tribute Blog post 57374191151 (reference only) is
+ * the whole room, 320 x 1920: its two "Way Out" doors stand 894 picture px
+ * apart, the archived arrivals 2780 world px apart, so ~3.11 world px a
+ * picture px and the room ~1000 wide, ~5970 tall, the street exit's floor at
+ * ~2800 (picture y 1877), its door at the left.
+ */
 export const VENT = Object.freeze({
-  bounds: Object.freeze({ l: -750, r: 750, t: -2900, b: 3000 }),
-  inner: 620,
+  bounds: Object.freeze({ l: -500, r: 500, t: -3030, b: 3220 }),
+  inner: 470,
   c6Floor: -2540,
   c4Floor: 240,
-  floor: 2600,
-  ceiling: -2860,
+  floor: 2800,
+  ceiling: -2990,
 });
+
+/** R5 picture px (x 0-320, y 0-1920) to world. */
+const ventPx = (x, y) => ({ x: Math.round((x - 160) * 3.11), y: Math.round(-2540 + (y - 158) * 3.11) });
 
 function buildVent() {
   const platforms = [];
   const decos = [];
+  const { bounds, inner, c6Floor, c4Floor, floor, ceiling } = VENT;
+  const mg = (sprite, x, y, w, h, z, extra = {}) => ({ sprite, x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h), z, r: 0, ...extra, layer: 'mg' });
   const add = (piece) => {
     platforms.push(...piece.platforms);
     decos.push(...piece.decos);
     return piece;
   };
-  const { bounds, inner, c6Floor, c4Floor, floor, ceiling } = VENT;
+  const run = (d, line, id, why, clip) => {
+    decos.push(d);
+    const r = walkLine(d, line, id, why, clip);
+    platforms.push(...r.platforms);
+    return r;
+  };
+  // A plank panel (platform_bottletree_single, or the two-panel _flat when wide) whose walk line is at y.
+  const panel = (id, cx, y, w, why) => {
+    const wide = w > 180;
+    const h = Math.round(w * (wide ? 82 / 206 : 78 / 136));
+    return run(mg(wide ? 'platform_bottletree_flat' : 'platform_bottletree_single', cx, y + 0.7 * h, w, h, 9, cx > 0 ? { flip: true } : {}), PANEL_LINE, id, why);
+  };
+  // A plank bridge on ropes whose walk line runs from about y (left) a little up or down.
+  const ropeBridge = (id, cx, y, w, why, { flip = false } = {}) => {
+    const h = Math.round(w * 0.2);
+    const d = mg('bridge', cx, 0, w, h, 8, flip ? { flip: true } : {});
+    d.y = Math.round(y - (lineY(walkLine({ ...d }, BRIDGE_LINE, 'probe', '').platforms, cx) ?? 0));
+    const r = run(d, BRIDGE_LINE, id, why);
+    // Two thorny ropes from each end up out of sight, as in the picture.
+    for (const fx of [0.06, 0.94]) {
+      const [x, ry] = decoPoint(d, fx, 0.5);
+      decos.push(mg('vine_rope', x, ry, 26, 420, 7, { r: fx < 0.5 ? 14 : -14 }));
+    }
+    return r;
+  };
+  // A curved plank deck (walkway_1) whose deepest walk point is at y.
+  const deck = (id, cx, y, w, why, flip = false) => {
+    const h = Math.round(w * 0.14);
+    const d = mg('walkway_1', cx, 0, w, h, 8, flip ? { flip: true } : {});
+    const probe = walkLine({ ...d }, WALKWAY_LINE, 'probe', '');
+    d.y = Math.round(y - probe.low);
+    return run(d, WALKWAY_LINE, id, why, { minX: -inner, maxX: inner });
+  };
+  // A sliced-tree ring stump (the corridors' steps art) whose high block is at y.
+  const ring = (id, cx, y, w, why, flip = false) => add(stepsPiece(id, cx, y, w, Math.round(w * 0.2), { flip, why, z: 7 }));
 
-  // Shaft shell: a corridor turned on end. The frame cap's curve closes the
-  // top and bottom; frame walls run down both sides; the wood backdrops are
-  // turned 90 degrees so the grain runs up the shaft.
-  // The bottom cap sits under the view (bounds.b, 420 px below the floor), so
-  // the backdrop runs on under the floor like Rooms 4, 8 and 16.
-  const sink = bounds.b - 2700;
+  // Backdrop: dark wood planks with the grain across the room (the picture's walls), dimmed in BG.
+  for (let y = bounds.t + 600, n = 0; y <= bounds.b + 600; y += 560, n += 1) {
+    decos.push({ sprite: 'jethimadh_int_bg_center', x: (n % 2 ? 60 : -60), y, w: 1300, h: 640, z: 1 + (n % 2), r: 0, layer: 'bg', ...(n % 2 ? { flip: true } : {}) });
+  }
+
+  // Doors (archived arrivals) and their ledges.
+  const c6Why = 'Arrival 400,-2540 from Corridor Six door_1304678594671 (archived). W: "Exits to C6W (labeled \'Way Out\')"; F 8885 "nothing in the dark space above the uppermost exit door". R5 (post 57374191151): the door at the top right on sliced-tree stumps over a long log, a lantern over it, the "Way Out" plank on ropes to its left, glowing bushes.';
+  const c4Why = 'Arrival 360,240 from Corridor Four door_1304677515850 (archived). F 9061 Timski: "the mid-height Way Out"; W "the middle door". R5 (post 57374191151): a door in a big trunk on the right, a "Way Out" plaque beside it, at the top of a long plank branch rising from the left.';
+  const ssWhy = 'G: "a high vertical shaft leading down to exits to corridors as well as Tower Street South at the bottom"; W "Exits to ... Tower St South". R5 (post 57374191151): the bottom door on the floor at the left, an "EXIT" plaque beside it. Arrives beside Tower St South\'s tower door.';
+  const climbWhy = 'F 8885/9061: platforms all the way up the shaft ("you hardly need spinach"). R5 (post 57374191151): plank panels, rope bridges, curved decks and ring stumps among tangled trunks; remake spacing 80 px up and under ~60 px across (plain jumps), the picture\'s big pieces at their heights.';
+
+  // The C4 branch: tiled planks rising to the right to the door (R5 picture y 1040-1080), flat under the door.
+  const branchWhy = `${c4Why} Remake: the branch's walk line, flat from x 200 to the wall.`;
+  platforms.push({ id: 'plat_vent_c4_branch_1', x1: -200, y1: 300, x2: 200, y2: c4Floor, pc_perm: -1, why: branchWhy });
+  platforms.push(flat('vent_c4_branch_2', 200, inner, c4Floor, branchWhy));
   decos.push(
-    turned('jethimadh_frame_cap', 0, -2540, 720, 1300, 90, { z: 8, layer: 'fg' }),
-    turned('jethimadh_frame_cap', 0, 2310 + sink, 720, 1300, -90, { z: 8, layer: 'fg' }),
+    mg('platform_bottletree_4_panel', -40, 330, 460, 150, 9, { r: -9 }),
+    mg('platform_bottletree_3_panel', 330, 285, 330, 140, 9, { r: -2 }),
   );
-  for (let y = -1900; y <= 1900 + sink; y += 760) {
-    decos.push(turned('jethimadh_frame_wall', -630, y, 1000, 42, 90, { z: 8, layer: 'fg' }));
-    decos.push(turned('jethimadh_frame_wall', 630, y, 1000, 42, 90, { z: 8, layer: 'fg' }));
-  }
-  decos.push(turned('jethimadh_int_bg_left', 0, -2380, 1000, 1250, 90, { z: 1, layer: 'bg' }));
-  let n = 0;
-  // The backdrop's ends are slanted, so the tiles overlap by a third.
-  for (let y = -1760; y <= 1800; y += 560) {
-    decos.push(turned('jethimadh_int_bg_center', 0, y, 900, 1300, n % 2 ? -90 : 90, { z: 2 + (n % 2), layer: 'bg' }));
-    n += 1;
-  }
-  decos.push(turned('jethimadh_int_bg_right', 0, 2200 + sink, 1000 + sink, 1250, 90, { z: 1, layer: 'bg' }));
-  decos.push(turned('jethimadh_int_bg_shadow_50percent', 0, sink / 2, 5500 + sink, 1240, 90, { z: 5, layer: 'bg' }));
+  const c4Ledge = { left: -200, right: inner, top: c4Floor, low: 300 };
 
-  // Doors: two "Way Out" doors on right-hand ledges and Tower St South at the bottom.
-  const c6Why = 'Arrival 400,-2540 from Corridor Six door_1304678594671 (archived). W: "Exits to C6W (labeled \'Way Out\')"; F 8885 "nothing in the dark space above the uppermost exit door".';
-  const c4Why = 'Arrival 360,240 from Corridor Four door_1304677515850 (archived). F 9061 Timski: "the mid-height Way Out"; W "the middle door".';
-  const ssWhy = 'G: "a high vertical shaft leading down to exits to corridors as well as Tower Street South at the bottom"; W "Exits to ... Tower St South". Arrives beside Tower St South\'s tower door.';
-  // Flipped pieces put their high block (x0 + 0.666..0.933 of the width) under each door.
-  const c6Ledge = add(stepsPiece('vent_c6_ledge', 245, c6Floor, 520, 80, { flip: true, why: c6Why, z: 7 }));
+  // The climb, bottom to top: each entry [y, x centre, width] or a named big piece.
+  const route = [c4Ledge];
+  const steps = [
+    [190, 100, 170], [115, -100, 170], [40, -300, 170], [-35, -100, 170], [-110, 100, 170], [-185, 300, 170], [-260, 100, 170], [-335, -100, 170], [-410, -300, 170], [-485, -100, 170], [-560, -270, 170],
+    'deckL',
+    [-720, 230, 170], [-800, 30, 170], [-880, -170, 170], [-960, -370, 170],
+    'planksL',
+    [-1120, -200, 170], [-1200, 0, 170], [-1280, 200, 170],
+    'bridgeR',
+    [-1440, 380, 170], [-1520, 180, 170], [-1600, -20, 170], [-1680, -220, 170],
+    'bridgeL',
+    [-1840, 20, 170], [-1920, 220, 170], [-2000, 20, 170],
+    'stumpL',
+    [-2160, -250, 170], [-2240, -50, 170], [-2320, 150, 170],
+    'beam',
+  ];
+  let n = 0;
+  for (const s of steps) {
+    const id = `vent_climb_${String(n).padStart(2, '0')}`;
+    n += 1;
+    if (Array.isArray(s)) { route.push(panel(id, s[1], s[0], s[2], climbWhy)); continue; }
+    if (s === 'deckL') route.push(deck(id, -185, -640, 640, `${climbWhy} R5: a curved plank deck on the left, roots under it (picture y 785-810).`, true));
+    if (s === 'planksL') route.push(panel(id, -400, -1040, 200, `${climbWhy} R5: plank panels at the left wall (picture y 655-670).`));
+    if (s === 'bridgeR') route.push(ropeBridge(id, 75, -1360, 450, `${climbWhy} R5: a rope bridge on the right with a round deck at its end (picture y 525-555).`, { flip: true }));
+    if (s === 'bridgeL') route.push(ropeBridge(id, -270, -1760, 420, `${climbWhy} R5: a rope bridge from the left wall (picture y 405-440).`));
+    if (s === 'stumpL') route.push(ring(id, -62, -2080, 330, `${climbWhy} R5: a sliced-tree stump left of centre with red mushrooms (picture y 305-345).`));
+    if (s === 'beam') {
+      const why = `${c6Why} The long log under the stumps runs wall to wall (picture y 195).`;
+      platforms.push(flat(id, -inner, inner, -2400, why));
+      decos.push(mg('legs_moss_noBase', 0, -2400 + 140, 330, 1020, 8, { r: 90 }));
+      route.push({ left: -inner, right: inner, top: -2400, low: -2400 });
+    }
+  }
+  // The round deck at the right-hand rope bridge's end (picture x 255-325).
+  run(mg('walkway_2', 560, -1310 + 60, 640, 90, 8), WALKWAY_LINE, 'vent_round_deck', climbWhy, { minX: 300, maxX: inner });
+  // The stumps under the C6 door: two rings stepping up to the right.
+  const top = ring('vent_c6_step', 110, -2470, 220, `${climbWhy} R5: the lower stump under the top door.`);
+  route.push(top);
+  const c6Ledge = ring('vent_c6_ledge', 325, c6Floor, 340, c6Why, true);
   platforms.push(flat('vent_c6_lip', c6Ledge.right, inner, c6Floor, c6Why));
-  const c4Ledge = add(stepsPiece('vent_c4_ledge', 205, c4Floor, 520, 80, { flip: true, why: c4Why, z: 7 }));
-  platforms.push(flat('vent_c4_lip', c4Ledge.right, inner, c4Floor, c4Why));
-  add(stepsPiece('vent_floor_l', -310, floor - 60, 640, 90, { why: ssWhy }));
-  add(stepsPiece('vent_floor_r', 310, floor - 60, 640, 90, { flip: true, why: ssWhy }));
-  platforms.push(flat('vent_floor_mid', -60, 60, floor - 60 + Math.round(0.422 * 90), ssWhy));
+  route.push(c6Ledge);
   platforms.push(flat('vent_ceiling', -inner, inner, ceiling, 'Shaft roof (solid from below).', 1));
 
-  // The climb: alternating sliced-tree ledges 80 px apart from just above the
-  // spot-11 ledge to just under the C6 ledge, so the doors work both ways with
-  // a plain jump. F 8885: "all i did in the ventilation room was to jump on
-  // every platform, you hardly need spinach".
-  const climbWhy = 'F 8885/9061: platforms all the way down the shaft; remake spacing 80 px up, 90-140 px across (plain jumps).';
-  const route = [];
-  const step = (y, side, i) => {
-    const cx = (side ? 100 : -150) + (((i * 37) % 3) - 1) * 14;
-    route.push(add(stepsPiece(`vent_climb_${String(i).padStart(2, '0')}`, cx, y, side ? 220 : 200, 44, { flip: Boolean(side), why: climbWhy })));
-  };
-  // Below the C4 ledge: up from the spot-11 ledge to the ledge's low end.
-  step(420, 0, 0);
-  step(340, 1, 1);
-  route.push(c4Ledge);
-  // Above it: 34 steps to the top ledge under the C6 door (the last on the right).
-  for (let y = c4Floor - 60, i = 2; y > c6Floor + 40; y -= 80, i += 1) step(y, i % 2, i);
-  const top = route[route.length - 1];
-  route.push(c6Ledge);
-
-  // Under the mid door the shaft only goes down: a few wide ledges break the
-  // fall to the bottom exit (Tower St South had no door back in).
-  const dropWhy = 'G: the shaft "leading down" to Tower St South; ledges that break the fall (one-way, like the street exit).';
-  const drops = [[820, 160, 300], [1220, -220, 300], [1620, 180, 300], [2020, -200, 300]];
-  drops.forEach(([y, cx, w], i) => add(stepsPiece(`vent_drop_${i}`, cx, y, w, 50, { flip: i % 2 === 1, why: dropWhy })));
+  // Under the mid door the shaft only goes down: the picture's lower pieces break the fall to the
+  // bottom exit (Tower St South had no door back in).
+  const dropWhy = 'G: the shaft "leading down" to Tower St South. R5 (post 57374191151): a bead-hung bridge, small planks, a curved deck, a slanted plank run and a two-ring stump on the way down (one-way, like the street exit).';
+  ropeBridge('vent_drop_bridge', ventPx(70, 0).x - 40, ventPx(0, 1290).y, 470, dropWhy);
+  for (const fx of [0.2, 0.45, 0.7]) {
+    const [x, y] = decoPoint(decos.find((d) => d.sprite === 'bridge' && d.y > 800), fx, 0.9);
+    decos.push(mg('hanging_eggs_decor', x, y + 130, 100, 130, 7));
+  }
+  panel('vent_drop_planks', ventPx(35, 0).x, ventPx(0, 1385).y, 160, dropWhy);
+  deck('vent_drop_deck', ventPx(150, 0).x, ventPx(0, 1445).y, 520, dropWhy);
+  run(mg('platform_bottletree_steep_3_panel', ventPx(262, 0).x, ventPx(0, 1545).y + 70, 360, 150, 9), [[0.05, 0.12], [0.95, 0.62]], 'vent_drop_slant', dropWhy);
+  ring('vent_drop_stump', -260, ventPx(0, 1645).y, 420, dropWhy);
+  // The floor: a dark root bed wall to wall, the exit door at its left.
+  platforms.push(flat('vent_floor', -inner, inner, floor, ssWhy));
+  decos.push(mg('crosssection_underground_fill_1', 0, floor + 380, 1200, 420, 6));
 
   // Secret spots 9-11.
-  const s9 = 'F 9061 Timski: "Very close to the door from corridor 6 (marked Way Out)... actually the top point"; Serilyn: "the one just below the top exit that looks like a sliced up tree"; W [9] "The area just below the C6W platform": the top climb ledge under the C6 ledge.';
-  const s10 = 'F 9061 Timski: "On the left, only slightly down in height from the top"; W [10] "A platform to the left - 3/4 of the way up"; G "2/3rds up ... on a platform to the left. You may need to spinach-jump to the ledge".';
-  const s11 = 'F 9061 Timski: "On the left, but much further down. Slightly lower level than the mid-height Way Out"; W [11] "A platform to the left, just under the middle door"; F 8885 "It is much further down than the guides claim".';
-  // Box bottom 170 px under the top ledge: the ledge itself stays outside it
-  // (y < box.y - 200), stepping off it or standing on the ledge below is inside.
+  const s9 = 'F 9061 Timski: "Very close to the door from corridor 6 (marked Way Out)... actually the top point"; Serilyn: "the one just below the top exit that looks like a sliced up tree"; W [9] "The area just below the C6W platform": the stump under the C6 ledge (R5: sliced-tree stumps under the top door).';
+  const s10 = 'F 9061 Timski: "On the left, only slightly down in height from the top"; W [10] "A platform to the left - 3/4 of the way up"; G "2/3rds up ... on a platform to the left. You may need to spinach-jump to the ledge": a stump at the left wall beside the right-hand rope bridge.';
+  const s11 = 'F 9061 Timski: "On the left, but much further down. Slightly lower level than the mid-height Way Out"; W [11] "A platform to the left, just under the middle door"; F 8885 "It is much further down than the guides claim": a stump at the left wall below the C4 branch\'s low end.';
+  // Box bottom 170 px under the stump top: the C6 ledge stays outside it.
   const spot9 = { id: 'TowerSpot_09', x: Math.round((top.left + top.right) / 2), y: top.top + 170, why: s9 };
-  const spot10Y = -1780;
+  const spot10Y = -1400;
   const spot11Y = c4Floor + 90;
-  add(stepsPiece('vent_secret_10', -400, spot10Y, 220, 46, { why: s10, z: 7 }));
-  add(stepsPiece('vent_secret_11', -400, spot11Y, 220, 46, { why: s11, z: 7 }));
+  const ledge10 = ring('vent_secret_10', -360, spot10Y, 220, s10);
+  const ledge11 = ring('vent_secret_11', -360, spot11Y, 220, s11);
 
   const barriers = [
     { id: 'wall_vent_left', x: -inner, y: bounds.t, h: bounds.b - bounds.t, pc_perm: null, why: 'Shaft side.' },
     { id: 'wall_vent_right', x: inner, y: bounds.t, h: bounds.b - bounds.t, pc_perm: null, why: 'Shaft side.' },
   ];
 
-  // Lanterns down the shaft.
-  for (const [x, y] of [[-420, -2300], [430, -1900], [-420, -1150], [430, -500], [-420, 120], [430, 900], [-420, 1700]]) {
-    decos.push({ sprite: 'jethimadh_int_lantern_1', x, y, w: 300, h: 450, z: 3, r: 0, layer: 'fg' });
+  // Tangled ringed trunks behind the platforms, read off the picture (positions in picture px).
+  const trunks = [
+    ['legs_moss_noBase', 25, 150, 260, 900, -35], ['legs_moss_3', 60, 470, 260, 820, 25], ['legs_moss_1', 270, 520, 330, 900, -20],
+    ['legs_moss_4', 120, 760, 360, 1000, 40], ['legs_moss_2', 250, 840, 380, 960, -30], ['legs_moss_3', 40, 1010, 260, 900, -15],
+    ['legs_moss_noBase', 210, 1180, 300, 1000, 30], ['legs_moss_1', 60, 1340, 320, 900, -40], ['legs_moss_4', 270, 1450, 360, 1000, 20],
+    ['legs_moss_2', 120, 1560, 340, 960, 35], ['legs_moss_3', 280, 1760, 260, 900, -10], ['legs_moss_1', 30, 1880, 300, 760, 10],
+  ];
+  trunks.forEach(([sprite, px, py, w, h, r], i) => {
+    const p = ventPx(px, py);
+    // In the dimmed BG with the walls: the picture's trunks are as dark as the wood behind them.
+    decos.push({ ...mg(sprite, p.x, p.y + h * 0.8, w * 1.6, h * 1.6, 5 + (i % 3), { r, ...(i % 2 ? { flip: true } : {}) }), layer: 'bg' });
+  });
+  // The big trunk round the mid door (R5: the door sits in a fat bottletree trunk on the right).
+  decos.push(mg('bottletree_body2', 470, c4Floor + 330, 520, 1100, 4));
+  // Roots under the big pieces, glowing bushes by the doors, lanterns.
+  for (const [x, y, s] of [[-185, -640, 1], [75, -1360, 2], [-270, -1760, 1], [-62, -2080, 2], [-260, ventPx(0, 1645).y, 1], [-185, ventPx(0, 1445).y, 2], [-360, spot10Y, 2], [-360, spot11Y, 2]]) {
+    decos.push(mg(s === 1 ? 'hanging_braches1' : 'hanging_braches2', x, y + 40 + 230, s === 1 ? 300 : 230, 230, 5));
   }
-
-  // G110: the Ventilation Room Snap (research/wayback/raw/snaps/jtower_ventilation_room/,
-  // PUVFMPJUESM2R57, 2012-12-09 "Way out~", reference only) at the mid door: dark horizontal plank
-  // walls (the BG layer's tint), a lantern hanging over the door, the "Way Out" plank on two thorny
-  // ropes to its left, glowing yellow bushes on the ring steps, root tendrils with beads under them,
-  // a thorny vine across the wall. Every piece is a firebog.swf street deco.
-  const ledgeOf = { [c6Floor]: c6Ledge, [c4Floor]: c4Ledge };
-  const groundAt = (x, near) => {
-    let best = null;
-    for (const p of platforms) {
-      if (p.pc_perm !== -1 || x < Math.min(p.x1, p.x2) || x > Math.max(p.x1, p.x2)) continue;
-      const y = p.x2 === p.x1 ? p.y1 : p.y1 + ((x - p.x1) / (p.x2 - p.x1)) * (p.y2 - p.y1);
-      if (y >= near - 30 && (best == null || y < best)) best = y;
-    }
-    return Math.round(best ?? near);
-  };
-  const doorDressing = (doorX, doorY, text) => {
-    // Snap scale ~1.2 world px a Snap px (the avatar ~120 px there): the lantern ~220 over the door,
-    // the plank ~180 left of the door and clear over your head, the big bush ~330 left on the lower step.
-    decos.push({ sprite: 'jethimadh_int_lantern_1', x: doorX, y: doorY + 61, w: 300, h: 450, z: 4, r: 0, layer: 'fg' });
-    decos.push(...hangingSign(doorX - 178, doorY - 150, text, { rope: 460 }));
-    const big = doorX - 330;
-    decos.push({ sprite: 'underground_bogwillow', x: big, y: groundAt(big, doorY) + 6, w: 170, h: 171, z: 9, r: 0, layer: 'mg' });
-    const small = doorX - 115;
-    decos.push({ sprite: 'underground_bogwillow_1', x: small, y: groundAt(small, doorY) + 4, w: 58, h: 100, z: 9, r: 0, layer: 'mg' });
-    decos.push({ sprite: 'vine_rope', x: doorX - 620, y: doorY - 230, w: 36, h: 360, z: 2, r: 52, layer: 'mg' });
-    const ledge = ledgeOf[doorY];
-    if (ledge) {
-      // Roots hang from under the ledge art (its top + 80); behind the steps (z 6-7).
-      const cx = (ledge.left + ledge.right) / 2;
-      decos.push({ sprite: 'hanging_braches1', x: Math.round(cx - 70), y: doorY + 60 + 254, w: 300, h: 254, z: 5, r: 0, layer: 'mg' });
-      decos.push({ sprite: 'hanging_braches2', x: Math.round(cx + 120), y: doorY + 60 + 230, w: 226, h: 230, z: 5, r: 0, layer: 'mg' });
-    }
-  };
-  doorDressing(400, c6Floor, 'Way Out');
-  doorDressing(360, c4Floor, 'Way Out');
-  // The street exit's sign hangs the same way (remake: no Snap of the bottom door).
-  doorDressing(500, floor - 58, 'Tower St South');
-  // Bushes and roots on the secret-spot ledges.
-  for (const y of [spot10Y, spot11Y]) {
-    decos.push({ sprite: 'underground_bogwillow_1', x: -470, y: groundAt(-470, y) + 4, w: 58, h: 100, z: 9, r: 0, layer: 'mg' });
-    decos.push({ sprite: 'hanging_braches2', x: -400, y: y + 40 + 200, w: 196, h: 200, z: 5, r: 0, layer: 'mg' });
+  decos.push(...hangingSign(170, c6Floor - 150, 'Way Out', { rope: 520 }));
+  decos.push({ sprite: 'jethimadh_int_lantern_1', x: 380, y: c6Floor + 61, w: 300, h: 450, z: 4, r: 0, layer: 'fg' });
+  decos.push(mg('underground_bogwillow', -60, -2400 + 6, 200, 200, 9), mg('underground_bogwillow_1', 240, c6Floor - 60 + 4, 58, 100, 9));
+  decos.push(mg('jethimadh_int_door_sign', 210, c4Floor - 70, 188, 110, 30), mg('firebog_sign_blank', 210, c4Floor - 87, 138, 80, 31, { signText: 'Way Out' }));
+  const exitX = ventPx(72, 0).x;
+  decos.push(mg('jethimadh_int_door_sign', exitX + 190, floor - 70, 188, 110, 30), mg('firebog_sign_blank', exitX + 190, floor - 87, 138, 80, 31, { signText: 'EXIT' }));
+  for (const [x, y] of [[-420, -2200], [420, -1700], [-420, -1000], [420, -300], [-420, 700], [420, 1600], [-420, 2300]]) {
+    decos.push({ sprite: 'jethimadh_int_lantern_1', x, y, w: 240, h: 360, z: 3, r: 0, layer: 'fg' });
   }
 
   return {
@@ -477,23 +519,25 @@ function buildVent() {
     barriers,
     decos,
     doors: [
-      { id: 'door_vent_c6', x: 400, y: c6Floor, ...DOOR, connect: { tsid: 'LTJ110817812KO4', label: 'Corridor Six', x: -867, y: -649, hub_id: '77' }, why: c6Why },
-      { id: 'door_vent_c4', x: 360, y: c4Floor, ...DOOR, connect: { tsid: 'LTJ10K7P3812R8F', label: 'Corridor Four', x: -202, y: -551, hub_id: '77' }, why: c4Why },
-      { id: 'door_vent_street', x: 500, y: floor - 58, ...DOOR, connect: { tsid: 'LIF15OTSM102353', label: 'Tower St South', x: -600, y: -379, hub_id: '71' }, why: ssWhy },
+      { id: 'door_vent_c6', x: 380, y: c6Floor, ...DOOR, w: 170, h: 186, connect: { tsid: 'LTJ110817812KO4', label: 'Corridor Six', x: -867, y: -649, hub_id: '77' }, why: c6Why },
+      { id: 'door_vent_c4', x: 380, y: c4Floor, ...DOOR, w: 170, h: 186, connect: { tsid: 'LTJ10K7P3812R8F', label: 'Corridor Four', x: -202, y: -551, hub_id: '77' }, why: c4Why },
+      { id: 'door_vent_street', x: exitX, y: floor, ...DOOR, w: 170, h: 186, connect: { tsid: 'LIF15OTSM102353', label: 'Tower St South', x: -600, y: -379, hub_id: '71' }, why: ssWhy },
     ],
     spots: [
       spot9,
-      // Boxes end over the ledge's right end, so the locking overlay (it stops
+      // Boxes end over the stump's right end, so the locking overlay (it stops
       // the avatar's run) never fires mid-jump with nothing underneath.
-      { id: 'TowerSpot_10', x: -415, y: spot10Y + 30, why: s10 },
-      { id: 'TowerSpot_11', x: -415, y: spot11Y + 30, why: s11 },
+      { id: 'TowerSpot_10', x: -375, y: spot10Y + 30, why: s10 },
+      { id: 'TowerSpot_11', x: -375, y: spot11Y + 30, why: s11 },
     ],
     route: route.map((p) => ({ left: p.left, right: p.right, top: p.top, low: p.low })),
-    // The walls' wood darkened to the Snap's (~#26190c against the backdrop art's ~#69431c).
+    secretLedges: [ledge10, ledge11].map((p) => ({ left: p.left, right: p.right, top: p.top, low: p.low })),
+    // The walls' wood darkened to the pictures' (~#26190c against the backdrop art's ~#69431c).
     bgFilters: { tintColor: 0, tintAmount: 62 },
     why: {
       room: 'W: three hidden locations ([9]-[11]), "Exits to C6W (labeled \'Way Out\'), C4 (also labeled \'Way Out\'), and Tower St South. BRING SPINACH." G: "a high vertical shaft".',
-      size: 'The archived arrivals put C6\'s door at y -2540 and C4\'s at +240 (2780 px apart); F calls C4 "the mid-height Way Out", so the shaft runs as far again below it to the street exit (t -2900, floor 2600; the world runs to b 3000 so the view never shows past the bottom). 1500 wide like the archived vertical streets (l -750, r 750).',
+      size: 'The archived arrivals put C6\'s door at y -2540 and C4\'s at +240 (2780 px apart). R5 (Tribute Blog post 57374191151, the whole room, reference only): those doors 894 picture px apart, so ~3.11 world px a picture px: ~1000 wide (inner +-470), the top at ~-3030 and the exit floor at ~2800 (b 3220 keeps 400+ px of world under it).',
+      decor: 'R5 (post 57374191151): a firebog cave of tangled ringed trunks (legs_moss_*), plank panels (platform_bottletree_*), rope bridges (bridge, vine_rope, hanging_eggs_decor), curved decks (walkway_1/2), sliced-tree stumps (jethimadh_int_steps_1), roots (hanging_braches*), glowing bushes (underground_bogwillow*), the mid door in a bottletree trunk (bottletree_body2); "Way Out" plank and lantern at the top door, plaques at the mid ("Way Out") and bottom ("EXIT") doors. The picture\'s red mushrooms and lit bulb have no firebog art in the game and are left out. G110: the Snap at the mid door (dark plank walls) keeps the BG tint.',
     },
   };
 }

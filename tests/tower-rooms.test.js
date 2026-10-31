@@ -20,9 +20,9 @@ import {
   towerRoomByTsid,
   towerRoomStreet,
   turned,
-} from '../public/js/tower-rooms.js?v=fc6dc1e7';
-import { inTowerSpot, towerSpotsFor } from '../public/js/home-tower.js?v=b6e0d43c';
-import { restockGarden, towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=2a52b273';
+} from '../public/js/tower-rooms.js?v=eeebce6f';
+import { inTowerSpot, towerSpotsFor } from '../public/js/home-tower.js?v=b05c58d8';
+import { restockGarden, towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=ba8fe469';
 import {
   ALL_TOWER_ROOMS,
   CHALLENGE_ROOMS,
@@ -37,7 +37,7 @@ import {
   anyTowerRoomByTsid,
   anyTowerRoomStreet,
   flats,
-} from '../public/js/tower-challenge-rooms.js?v=ab42bf71';
+} from '../public/js/tower-challenge-rooms.js?v=8877b6a7';
 import { ladderTopDeck } from '../public/js/street-model.js?v=23b926e5';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -106,13 +106,15 @@ describe('rebuilt tower rooms: street data', () => {
     const corridorArt = new Set(['jethimadh_int_bg_left', 'jethimadh_int_bg_center', 'jethimadh_int_bg_right', 'jethimadh_int_bg_shadow_50percent', 'jethimadh_int_steps_1', 'jethimadh_int_lantern_1', 'jethimadh_int_pillar_1', 'jethimadh_int_pillar_1_mod', 'jethimadh_int_door_sign', 'firebog_sign_blank', 'jethimadh_frame_cap', 'jethimadh_frame_wall']);
     // G110: the Ventilation Room Snap's hanging plank, thorny ropes, glowing bushes and beaded roots.
     const ventSnapArt = new Set(['firebog_sign_blank_plank', 'vine_rope', 'underground_bogwillow', 'underground_bogwillow_1', 'hanging_braches1', 'hanging_braches2']);
+    // R5 (post 57374191151): the Ventilation Room's trunks, panels, bridges, decks and floor (all firebog.swf).
+    const ventPictureArt = new Set(['legs_moss_noBase', 'legs_moss_1', 'legs_moss_2', 'legs_moss_3', 'legs_moss_4', 'platform_bottletree_single', 'platform_bottletree_flat', 'platform_bottletree_3_panel', 'platform_bottletree_4_panel', 'platform_bottletree_steep_3_panel', 'bridge', 'walkway_1', 'walkway_2', 'hanging_eggs_decor', 'bottletree_body2', 'crosssection_underground_fill_1']);
     // R5 (post 57203525070): Room 15's deck, bridges, root stalks, panels, trunk, plants, garland and vine (all firebog.swf).
     const room15Art = new Set([...ventSnapArt, 'walkway_1', 'bridge', 'platform_bottletree_flat', 'platform_bottletree_single', 'legs_moss_noBase', 'legs_moss_1', 'legs_moss_2', 'legs_moss_3', 'legs_moss_4', 'bottletree_body2', 'hanging_eggs_decor', 'firebog_ladder_tile_center_01_vine', 'firebog_ladder_tile_cap_1_vine']);
     for (const room of TOWER_ROOMS) {
       const s = street(room.tsid);
       for (const layer of s.layers) {
         for (const d of layer.decos) {
-          assert.ok(corridorArt.has(d.sprite) || (room.tsid === VENT_ROOM_TSID && ventSnapArt.has(d.sprite)) || (room.tsid === ROOM_15_TSID && room15Art.has(d.sprite)), `${room.label}: ${d.sprite}`);
+          assert.ok(corridorArt.has(d.sprite) || (room.tsid === VENT_ROOM_TSID && (ventSnapArt.has(d.sprite) || ventPictureArt.has(d.sprite))) || (room.tsid === ROOM_15_TSID && room15Art.has(d.sprite)), `${room.label}: ${d.sprite}`);
           assert.ok(manifest.has(d.sprite), d.sprite);
         }
       }
@@ -120,28 +122,32 @@ describe('rebuilt tower rooms: street data', () => {
     }
   });
 
-  it('dresses the Ventilation Room like its Snap: dark plank walls, a lantern over each door, the rope-hung Way Out planks, bushes and roots (G110)', () => {
+  it('dresses the Ventilation Room like its whole-room picture: dark walls and trunks, the top door\'s rope-hung Way Out plank and lantern, plaques at the other two (R5, G110)', () => {
     const s = street(VENT_ROOM_TSID);
     const bg = s.layers.find((l) => l.name === 'BG');
     assert.equal(bg.z, -1);
     assert.deepEqual(bg.filters, { tintColor: 0, tintAmount: 62 });
-    assert.ok(bg.decos.every((d) => /^jethimadh_int_bg_/.test(d.sprite)), 'only the wood backdrops are dimmed');
+    assert.ok(bg.decos.every((d) => /^jethimadh_int_bg_|^legs_moss_/.test(d.sprite)), 'only the wood walls and the trunks are dimmed');
     const mg = s.layers.find((l) => l.id === 'middleground').decos;
     const fg = s.layers.find((l) => l.name === 'FG').decos;
-    // The plaques are gone: each door has a plank on two ropes, its text, to its left and over your head.
-    assert.ok(!mg.some((d) => d.sprite === 'jethimadh_int_door_sign'));
+    // R5 (post 57374191151): the top door has the plank on two ropes to its left, over your head, and a lantern over it.
+    const [c6, c4, street_] = vent.doors;
     const planks = mg.filter((d) => d.sprite === 'firebog_sign_blank_plank');
-    assert.deepEqual(planks.map((d) => d.signText), ['Way Out', 'Way Out', 'Tower St South']);
-    for (const [i, door] of vent.doors.entries()) {
-      const p = planks[i];
-      assert.ok(p.x < door.x && door.x - p.x < 250, `${door.id} plank to the left`);
-      assert.ok(door.y - p.y >= 140, `${door.id} plank clear over the head`);
-      assert.equal(mg.filter((d) => d.sprite === 'vine_rope' && Math.abs(d.x - p.x) < p.w / 2 && p.y - d.y > 0 && p.y - d.y < p.h && d.r === 0).length, 2, `${door.id} plank ropes`);
-      // A lantern (screen space in FG) right over the door.
-      assert.ok(fg.some((d) => d.sprite === 'jethimadh_int_lantern_1' && Math.abs(d.x + s.bounds.l - door.x) < 2 && Math.abs(d.y + s.bounds.t - door.y) < 80), `${door.id} lantern`);
+    assert.deepEqual(planks.map((d) => d.signText), ['Way Out']);
+    const [p] = planks;
+    assert.ok(p.x < c6.x && c6.x - p.x < 250, 'plank to the left');
+    assert.ok(c6.y - p.y >= 140, 'plank clear over the head');
+    assert.equal(mg.filter((d) => d.sprite === 'vine_rope' && Math.abs(d.x - p.x) < p.w / 2 && p.y - d.y > 0 && p.y - d.y < p.h && d.r === 0).length, 2, 'plank ropes');
+    assert.ok(fg.some((d) => d.sprite === 'jethimadh_int_lantern_1' && Math.abs(d.x + s.bounds.l - c6.x) < 2 && Math.abs(d.y + s.bounds.t - c6.y) < 80), 'lantern over the top door');
+    // The mid door's "Way Out" plaque and the street exit's "EXIT" plaque beside them.
+    const signs = mg.filter((d) => d.sprite === 'firebog_sign_blank');
+    for (const [door, text] of [[c4, 'Way Out'], [street_, 'EXIT']]) {
+      assert.ok(signs.some((d) => d.signText === text && Math.abs(d.x - door.x) < 260 && Math.abs(d.y - (door.y - 87)) < 2), `${door.id} plaque`);
     }
-    assert.ok(mg.filter((d) => d.sprite === 'underground_bogwillow').length >= 3);
+    assert.ok(mg.some((d) => d.sprite === 'underground_bogwillow'));
     assert.ok(mg.filter((d) => /^hanging_braches/.test(d.sprite)).length >= 6);
+    // The middle door stands in a bottletree trunk.
+    assert.ok(mg.some((d) => d.sprite === 'bottletree_body2' && Math.abs(d.x - c4.x) < 200));
   });
 
   it('turns decos about their bottom-centre anchor so they stay centred', () => {
@@ -305,16 +311,24 @@ describe('rebuilt tower rooms: the secret spots', () => {
     }
   });
 
-  it('the shaft climbs with plain jumps from the spot-11 ledge to the C6 ledge, and both left ledges are a plain jump off it', () => {
+  it('the shaft climbs with plain jumps from the C4 branch to the C6 ledge, and both left ledges are a plain jump off it', () => {
     const route = vent.route;
-    for (let i = 1; i < route.length; i += 1) {
-      const a = route[i - 1];
-      const b = route[i];
-      const rise = a.low - b.low; // low ends face each other: the pieces alternate flips
-      const gap = Math.max(0, Math.max(a.left, b.left) - Math.min(a.right, b.right));
-      assert.ok(rise <= 85, `step ${i} rise ${rise}`);
-      assert.ok(gap < reach(rise + 20) * 0.9, `step ${i} gap ${gap} at rise ${rise}`);
-    }
+    /** Surface points (world) of the floors within a piece's extent at about its height. */
+    const surface = (p) => {
+      const pts = [];
+      for (let x = Math.max(p.left, -VENT.inner); x <= Math.min(p.right, VENT.inner); x += 10) {
+        const y = floorAt(vent.platforms, x, (p.top + p.low) / 2);
+        if (y != null && y >= p.top - 2 && y <= p.low + 2) pts.push([x, y]);
+      }
+      return pts;
+    };
+    // R5 (post 57374191151): the pieces wander across the room, so each step is checked where it is
+    // easiest: some point of the lower piece reaches some point of the upper one with a plain jump.
+    const jumpable = (a, b) => surface(a).some(([ax, ay]) => surface(b).some(([bx, by]) => {
+      const rise = ay - by;
+      return rise <= 85 && Math.abs(bx - ax) < reach(rise + 20) * 0.9;
+    }));
+    for (let i = 1; i < route.length; i += 1) assert.ok(jumpable(route[i - 1], route[i]), `step ${i}: ${JSON.stringify(route[i - 1])} -> ${JSON.stringify(route[i])}`);
     // The chain runs through both Way Out ledges.
     assert.ok(route.some((p) => Math.abs(p.top - VENT.c4Floor) < 1));
     assert.equal(route[route.length - 1].top, VENT.c6Floor);

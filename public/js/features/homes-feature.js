@@ -181,17 +181,17 @@ import {
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=3d0b08f0';
+} from '../home-cultivation.js?v=bb8b2151';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=68506420';
 import { DISPATCHER_HALF, DISPATCHER_TEXT, dispatcherFits, savedDispatcherRx, signpostX, streetFixtures } from '../home-street-fixtures.js?v=26bb21a8';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
-import { projectApi } from './street-jobs-feature.js?v=425a497b';
-import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=b6e0d43c';
-import { towerApi } from './home-tower-feature.js?v=f095bea7';
+import { projectApi } from './street-jobs-feature.js?v=16ad13e5';
+import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=b05c58d8';
+import { towerApi } from './home-tower-feature.js?v=cac1af1a';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=e676f00f';
-import { wantsHiresDecos } from '../deco-hires.js?v=f3b0ac4e';
+import { wantsHiresDecos } from '../deco-hires.js?v=7678e434';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=4b0d8834';
 import { patchesFeature } from './patches-feature.js?v=d7bf7501';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=cfa86c42';
@@ -215,7 +215,7 @@ import {
   yardStyleFor,
 } from '../home-styles.js?v=f591561f';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
-import { oneArmSignpost } from '../street-render.js?v=e17d8881';
+import { oneArmSignpost } from '../street-render.js?v=7c8bae68';
 import { ROCK_CATALOG } from '../mining.js?v=a7eb8740';
 import {
   HOUSE_SIGN,
