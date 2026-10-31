@@ -1,6 +1,8 @@
 // Home page: fill the numbers and the recent changes from the restoration
 // report's data (restoration/data.json, rebuilt with every commit). The HTML
 // carries reasonable numbers so the page reads fine if this fetch fails.
+// Every photo opens full size in the viewer (landing/viewer.js).
+import { mountViewer } from './viewer.js?v=9a919381';
 
 const fmt = (n) => Number(n || 0).toLocaleString('en-US');
 const of = (a, b) => `${fmt(a)} of ${fmt(b)}`;
@@ -59,4 +61,5 @@ async function main() {
   }
 }
 
+mountViewer();
 main();
