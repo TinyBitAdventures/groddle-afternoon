@@ -40,24 +40,28 @@ describe('the level builder on the site (groddle-afternoon-site)', { skip: skipW
     assert.ok(maj > 0 || min > 5 || (min === 5 && patch >= 24), `version ${manifest.version}`);
   });
 
-  it('every builder route is manage_options, under admin/builder, and off unless the option is on', () => {
+  it('every builder route is an administrator\'s or a key\'s with its scope (BuilderAuth), under admin/builder, and off unless the option is on', () => {
     const s = src('src/AdminBuilder.php');
     const routes = [...s.matchAll(/#\[Route\(Method::(\w+), self::BASE \. '([^']+)', policy: new Policy\(([^)]*)\)\)\]\s*public function (\w+)\(/g)];
     assert.equal(routes.length, 9);
     assert.match(s, /private const BASE = '\/groddle\/v1\/admin\/builder';/);
+    const scopes = { drafts: "'drafts:read'", draft: "'drafts:read'", revisions: "'drafts:read'", play: 'null', create: "'drafts:write', 'write'", replace: "'drafts:write', 'write'", ops: "'drafts:write', 'write'", restore: "'drafts:write', 'write'", archive: "'drafts:write', 'write'" };
     for (const [, , path, policy, fn] of routes) {
-      assert.equal(policy, 'Access::Cap, self::ADMIN', path);
+      // Public to the router: a key is no Minn sign-in. The gate is the handler's first line (P4).
+      assert.equal(policy, 'Access::Public', path);
       const body = s.slice(s.indexOf(`public function ${fn}(`));
-      assert.match(body.slice(0, body.indexOf('{') + 80), /\$this->gate\(\)/, `${fn} checks the option first`);
+      assert.ok(body.slice(0, body.indexOf('{') + 90).includes(`$this->gate($request, ${scopes[fn]})`), `${fn} gates first with its scope`);
     }
     assert.deepEqual(routes.map((r) => `${r[1]} ${r[2]}`).sort(), [
       'Delete /drafts/{id:[a-z0-9-]+}', 'Get /drafts', 'Get /drafts/{id:[a-z0-9-]+}', 'Get /drafts/{id:[a-z0-9-]+}/play', 'Get /drafts/{id:[a-z0-9-]+}/revisions',
       'Post /drafts', 'Post /drafts/{id:[a-z0-9-]+}/ops', 'Post /drafts/{id:[a-z0-9-]+}/restore', 'Put /drafts/{id:[a-z0-9-]+}',
     ]);
-    assert.match(s, /private const ADMIN = 'manage_options';/);
+    assert.match(s, /return \(new BuilderAuth\(\$this->minn\)\)->gate\(\$request, \$scope, \$kind\);/);
+    const auth = src('src/BuilderAuth.php');
+    assert.match(auth, /can\(\$user->id, 'manage_options'\)/);
     assert.match(s, /public const OPTION = 'groddle_builder_enabled';/);
     assert.match(s, /site->option\(self::OPTION\)/);
-    assert.match(s, /throw new RestError\('builder_disabled', [^;]+, 404\)/);
+    assert.match(auth, /throw new RestError\('builder_disabled', [^;]+, 404\)/);
     assert.match(src('src/Extension.php'), /new AdminBuilder\(\$minn\)/);
     assert.match(src('src/Extension.php'), /routes\(new AdminBuilderPage\(\$minn\)\)/);
   });

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- The level builder's render page (docs/level-builder/spec.md 8.5): the builder worker
+       (tools/builder/worker.mjs) and the CLI open it in Chrome and call window.groddleRender. Asset
+       paths stay relative to the site root, as /play/'s do. -->
+  <base href="../" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Street render</title>
+  <style>html, body { margin: 0; background: #000; }</style>
+  <script src="js/data-versions.js?v=ba26d309"></script>
+  <script src="js/data-urls.js?v=523668ca"></script>
+  <script src="vendor/pixi/pixi-8.22.0.min.js"></script>
+  <script type="module" src="builder-render/render.js?v=bc7721e7"></script>
+</head>
+<body data-builder-render></body>
+</html>

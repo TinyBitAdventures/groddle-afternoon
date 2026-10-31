@@ -272,17 +272,17 @@ describe('new art on the site: table, routes, the art page and the store check',
     assert.ok(maj > 0 || min > 5 || (min === 5 && patch >= 25), manifest.version);
   });
 
-  it('every asset route is manage_options, gated by the option, and registered', () => {
+  it('every asset route is an administrator\'s or a key\'s with its scope (BuilderAuth), gated by the option, and registered', () => {
     const s = src('src/AdminBuilderAssets.php');
     const routes = [...s.matchAll(/#\[Route\(Method::(\w+), self::BASE \. '([^']+)', policy: new Policy\(([^)]*)\)\)\]\s*public function (\w+)\(/g)];
     assert.deepEqual(routes.map((r) => `${r[1]} ${r[2]}`).sort(), ['Get /assets', 'Get /assets/{key:[a-z0-9_]+}', 'Post /assets']);
     for (const [, , path, policy, fn] of routes) {
-      assert.equal(policy, 'Access::Cap, self::ADMIN', path);
+      assert.equal(policy, 'Access::Public', path);
       const body = s.slice(s.indexOf(`public function ${fn}(`));
-      assert.match(body.slice(0, body.indexOf('{') + 60), /\$this->gate\(\)/, fn);
+      assert.match(body.slice(0, body.indexOf('{') + 90), fn === 'intake' ? /\$this->gate\(\$request, 'assets:write', 'write'\)/ : /\$this->gate\(\$request, 'drafts:read'\)/, fn);
     }
-    assert.match(s, /private const ADMIN = 'manage_options';/);
-    assert.match(s, /AdminBuilder::enabled\(\$this->minn\)/);
+    assert.match(s, /new BuilderAuth\(\$this->minn\)\)->gate\(/);
+    assert.match(src('src/BuilderAuth.php'), /AdminBuilder::enabled\(\$this->minn\)/);
     assert.match(s, /BuilderIntake::intake\(\$body/);
     assert.match(s, /builder_asset_refused/);
     const ext = src('src/Extension.php');
