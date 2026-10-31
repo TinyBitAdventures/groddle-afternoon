@@ -44,18 +44,18 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inv
 import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=9e538296';
 import { furnitureDef, furnitureScale, furnitureSize } from '../home-decor.js?v=cbf17565';
 import { pieceLabel } from '../furniture-upgrades.js?v=c4ee77ed';
-import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=7a47ef54';
+import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=3d0b08f0';
 import { signpostX as fixtureSignpostX } from '../home-street-fixtures.js?v=26bb21a8';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=68506420';
 import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note-pole-art.js?v=860d393a';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
-import { signArmWidth, signLabel } from '../street-render.js?v=b7b83ce1';
+import { signArmWidth, signLabel } from '../street-render.js?v=e17d8881';
 import { openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
 import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=31a75688';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=8d5bb9c4';
-import { projectApi } from './street-jobs-feature.js?v=a7682eb9';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=e2dbaa5a';
+import { projectApi } from './street-jobs-feature.js?v=425a497b';
 import { saveStore } from '../save-store.js?v=b74a8113';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=cc0d7e70';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=0794e422';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,

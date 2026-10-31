@@ -129,82 +129,155 @@ export function hangingSign(x, y, text, { w = 190, rope = 520, z = 16 } = {}) {
  */
 const BELOW_FLOOR = 300;
 
+/**
+ * Walking lines of firebog.swf deck art, as fractions of the unflipped art
+ * ([x from its left, y from its top]): the platforms follow them.
+ * bridge.webp: ~45% down each plank's face (G110, Room 8).
+ */
+export const BRIDGE_LINE = Object.freeze([[0.03, 0.58], [0.25, 0.67], [0.42, 0.65], [0.52, 0.61], [0.62, 0.54], [0.75, 0.41], [0.87, 0.31], [0.97, 0.25]]);
+/** walkway_1: ~40% down its plank face, left tip to past the middle. */
+export const WALKWAY_LINE = Object.freeze([[0.01, 0.28], [0.05, 0.23], [0.1, 0.25], [0.15, 0.26], [0.2, 0.35], [0.25, 0.42], [0.3, 0.48], [0.35, 0.52], [0.4, 0.55], [0.5, 0.56], [0.7, 0.53]]);
+/** platform_bottletree_flat / _single: the middle of the panels' top faces (measured from the art's alpha). */
+export const PANEL_LINE = Object.freeze([[0.08, 0.3], [0.92, 0.3]]);
+
+/**
+ * Platforms along a deco's walking line (world), clipped to [minX, maxX].
+ * Returns them with the run's ends and heights, as Room 8's route pieces.
+ */
+export function walkLine(d, line, id, why, { minX = -Infinity, maxX = Infinity } = {}) {
+  const pts = line.map(([fx, fy]) => decoPoint(d, fx, fy).map(Math.round)).sort((p, q) => p[0] - q[0]);
+  const clip = (a, b, x) => [x, Math.round(a[1] + ((x - a[0]) / (b[0] - a[0])) * (b[1] - a[1]))];
+  while (pts.length > 2 && pts[1][0] <= minX) pts.shift();
+  if (pts[0][0] < minX) pts[0] = clip(pts[0], pts[1], minX);
+  while (pts.length > 2 && pts[pts.length - 2][0] >= maxX) pts.pop();
+  if (pts[pts.length - 1][0] > maxX) pts[pts.length - 1] = clip(pts[pts.length - 2], pts[pts.length - 1], maxX);
+  const platforms = [];
+  for (let i = 1; i < pts.length; i += 1) {
+    const [[x1, y1], [x2, y2]] = [pts[i - 1], pts[i]];
+    platforms.push({ id: `plat_${id}_${i}`, x1, y1, x2, y2, pc_perm: -1, why });
+  }
+  return { platforms, left: pts[0][0], right: pts[pts.length - 1][0], top: Math.min(...pts.map((p) => p[1])), low: Math.max(...pts.map((p) => p[1])) };
+}
+
+/** The walking line's height under x (world), or null. */
+function lineY(platforms, x) {
+  for (const p of platforms) {
+    if (x < p.x1 || x > p.x2) continue;
+    return p.x2 === p.x1 ? p.y1 : p.y1 + ((x - p.x1) / (p.x2 - p.x1)) * (p.y2 - p.y1);
+  }
+  return null;
+}
+
 /* ------------------------------------------------------------------ */
 /* Room 15 (LIF1G7Q75312T8B)                                            */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Room 15 (R5): Tribute Blog post 57203525070 (reference only) shows the
+ * room as a firebog cave like Rooms 8 and 16, not a corridor chamber: you
+ * stand on a round plank deck on the left among yellow glowing plants; two
+ * short plank bridges on root stalks, hung with roots, cross a dark void; two
+ * lanterns hang between them under a vine garland; on the right three plank
+ * panels hold the key under a rope-hung "Way Out" plank, beside a wooden
+ * door in a bottletree trunk. About 0.53 picture px a world px (its avatar
+ * ~75 px tall). Every piece is a firebog.swf street deco already in the game;
+ * the gaps are closed to plain jumps, as in Room 8.
+ */
+export const ROOM_15 = Object.freeze({
+  bounds: Object.freeze({ l: -1050, r: 1400, t: -1150, b: 450 }),
+  arrival: Object.freeze({ x: -790, y: -423 }),
+  pit: 150,
+  doorX: 1250,
+  keyX: 700,
+  spotX: 1130,
+});
+
 function buildRoom15() {
   const platforms = [];
   const decos = [];
-  const add = (piece) => {
-    platforms.push(...piece.platforms);
-    decos.push(...piece.decos);
-    return piece;
+  const { bounds, arrival, pit, doorX, keyX, spotX } = ROOM_15;
+  const mg = (sprite, x, y, w, h, z, extra = {}) => ({ sprite, x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h), z, r: 0, ...extra, layer: 'mg' });
+  const piece = (d, line, id, why, clip) => {
+    decos.push(d);
+    const run = walkLine(d, line, id, why, clip);
+    platforms.push(...run.platforms);
+    return run;
   };
-  const bounds = { l: -1000, r: 1000, t: -1000, b: BELOW_FLOOR };
 
-  // Chamber shell: a corridor section stood taller (frame caps and walls, the
-  // three wood backdrops and their shadow), like a numbered room off C4E. The
-  // roof stays put; everything that ended at y 0 runs on to the new bottom.
-  const down = BELOW_FLOOR;
+  // The void: the chamber shell behind everything, dimmed (BG), as Room 8.
+  const down = bounds.b;
   decos.push(
-    { sprite: 'jethimadh_int_bg_left', x: -560, y: -30 + down, w: 900, h: 930 + down, z: 1, r: 0, layer: 'mg' },
-    { sprite: 'jethimadh_int_bg_center', x: 0, y: -24 + down, w: 640, h: 940 + down, z: 2, r: 0, layer: 'mg' },
-    { sprite: 'jethimadh_int_bg_right', x: 560, y: -30 + down, w: 900, h: 930 + down, z: 0, r: 0, layer: 'mg' },
-    { sprite: 'jethimadh_int_bg_shadow_50percent', x: 0, y: -40 + down, w: 1960, h: 900 + down, z: 3, r: 0, layer: 'mg' },
-    { sprite: 'jethimadh_frame_cap', x: -760, y: -10 + down, w: 480, h: 980 + down, z: 8, r: 0, layer: 'fg' },
-    { sprite: 'jethimadh_frame_cap', x: 760, y: -10 + down, w: 480, h: 980 + down, z: 8, r: 0, flip: true, layer: 'fg' },
-    { sprite: 'jethimadh_frame_wall', x: 0, y: -958, w: 1060, h: 42, z: 8, r: 0, layer: 'fg' },
-    { sprite: 'jethimadh_frame_wall', x: 0, y: -10 + down, w: 1060, h: 42, z: 8, r: 0, layer: 'fg' },
+    { sprite: 'jethimadh_int_bg_left', x: -620, y: down, w: 1000, h: 1600, z: 1, r: 0, layer: 'bg' },
+    { sprite: 'jethimadh_int_bg_center', x: 170, y: down, w: 800, h: 1600, z: 2, r: 0, layer: 'bg' },
+    { sprite: 'jethimadh_int_bg_right', x: 950, y: down, w: 1000, h: 1600, z: 0, r: 0, layer: 'bg' },
+    { sprite: 'jethimadh_int_bg_shadow_50percent', x: 175, y: down, w: 2450, h: 1600, z: 3, r: 0, layer: 'bg' },
   );
 
-  // Floor: two steps pieces meeting in a dip (the corridors' floor art), joined in the middle.
-  const why = 'Corridor floor art (jethimadh_int_steps_1) mirrored into a dip; platforms follow its top edge.';
-  const left = add(stepsPiece('r15_floor_l', -460, -160, 900, 140, { why }));
-  const right = add(stepsPiece('r15_floor_r', 460, -160, 900, 140, { flip: true, why }));
-  platforms.push(flat('r15_floor_mid', left.right, right.left, -101, why));
+  // Arrival deck: walkway_1 mirrored, its tip pointing right, set so the
+  // archived arrival (-790,-423) stands on its planks.
+  const arriveWhy = 'Arrival -790,-423 from Corridor Four door_1304677515854 (archived, key 4). R5 (post 57203525070): you start on a round plank deck on the left, among yellow glowing plants.';
+  const deckD = mg('walkway_1', -979, 0, 1100, 150, 8, { flip: true });
+  deckD.y = Math.round(arrival.y - (lineY(walkLine({ ...deckD, y: 0 }, WALKWAY_LINE, 'probe', '').platforms, arrival.x) ?? 0));
+  const deck = piece(deckD, WALKWAY_LINE, 'r15_deck', arriveWhy, { minX: bounds.l + 20 });
 
-  // Way out: the door back to C4 on a high ledge at the source arrival point.
-  const doorWhy = 'Arrival -790,-423 from Corridor Four door_1304677515854 (archived); the way out stands where you arrive.';
-  // The piece's high block (0.067-0.334 of its width) sits under the door.
-  add(stepsPiece('r15_wayout', -658, -423, 440, 70, { why: doorWhy, z: 7 }));
-  platforms.push(flat('r15_wayout_lip', -980, -855, -423, doorWhy));
+  // Two plank bridges over the void, the first rising a little to the right, the second falling.
+  const bridgeWhy = 'R5 (post 57203525070): two short plank bridges on root stalks cross the void between the deck and the key. Remake: gaps closed to plain running jumps either way (~100-125 px).';
+  const b1 = piece(mg('bridge', -150, -409, 400, 85, 8), BRIDGE_LINE, 'r15_bridge1', bridgeWhy);
+  const b2 = piece(mg('bridge', 330, -370, 360, 80, 8, { flip: true }), BRIDGE_LINE, 'r15_bridge2', bridgeWhy);
 
-  // Climb back up to the way out (rises of 75 px: a plain jump).
-  const climb = 'Remake route: ledges from the floor back up to the way out, 75 px apart (one plain jump each).';
-  add(stepsPiece('r15_climb_a', -470, -235, 200, 44, { why: climb }));
-  add(stepsPiece('r15_climb_b', -290, -310, 180, 42, { flip: true, why: climb }));
+  // The key's panels, then the deck round the trunk with the door.
+  const keyWhy = 'W rooms table: Room 15 contains a Purple-Orange Circle Key (door_key_6, opens Room 16 in C6W). R5 (post 57203525070): the key lies on three plank panels under the "Way Out" plank, beside the trunk door.';
+  const shelf = piece(mg('platform_bottletree_flat', 690, -393, 300, 110, 9), PANEL_LINE, 'r15_key_shelf', keyWhy);
+  const doorWhy = 'R5 (post 57203525070): the way out is a wooden door in a bottletree trunk on the right, past the key, "Way Out" hung beside it. It leads back through C4E\'s Room 15 door (world 1484,-701), the way you came in.';
+  const trunkDeck = piece(mg('walkway_1', 1300, -417, 1000, 140, 9), WALKWAY_LINE, 'r15_trunk_deck', doorWhy, { maxX: bounds.r - 20 });
+  const doorY = Math.round(lineY(trunkDeck.platforms, doorX));
 
-  // The key course: the room "Contains a Purple-Orange Circle Key" (W rooms table).
-  const keyWhy = 'W rooms table: Room 15 contains a Purple-Orange Circle Key (door_key_6, opens Room 16 in C6W); remake shelf at the top of a short climb.';
-  add(stepsPiece('r15_key_d', 500, -235, 200, 44, { flip: true, why: keyWhy }));
-  add(stepsPiece('r15_key_e', 730, -310, 180, 42, { why: keyWhy }));
-  add(stepsPiece('r15_key_f', 490, -385, 180, 42, { flip: true, why: keyWhy }));
-  add(stepsPiece('r15_key_g', 710, -460, 180, 42, { why: keyWhy }));
-  add(stepsPiece('r15_key_shelf', 830, -535, 260, 50, { flip: true, why: keyWhy }));
+  // Secret spot 5: "a quoin at the top of the screen, near the way out ... Bring Spinach" (W, G).
+  const spotWhy = 'W [5] "a quoin at the top of the screen, near the way out"; G "spinach-jumping to the quoin at the top of the room": a plank panel ~250 px over the trunk deck, above the door (spinach apex 296 px, plain jump 110).';
+  const spotShelf = piece(mg('platform_bottletree_single', spotX, -650, 200, 115, 9), PANEL_LINE, 'r15_secret', spotWhy);
 
-  // Secret spot 5: "A quoin at the top of the screen, near the way out" (W),
-  // "spinach-jumping to the quoin at the top of the room" (G).
-  const spotWhy = 'W [5] "a quoin at the top of the screen, near the way out"; G "spinach-jumping to the quoin at the top of the room": a high shelf 257 px over the way-out ledge (spinach apex 296 px, plain jump 110).';
-  add(stepsPiece('r15_secret', -590, -680, 220, 46, { why: spotWhy, z: 7 }));
+  // A fall lands on the void's floor; a vine climbs back to the deck by the left wall.
+  const pitWhy = 'Remake (as Room 8): the picture shows only dark under the bridges; a fall lands on a floor out of view, and a vine (firebog_ladder_tile_*_vine) climbs back to the arrival deck by the left wall.';
+  platforms.push(flat('r15_pit', bounds.l + 20, bounds.r - 20, pit, pitWhy));
+  const vineX = bounds.l + 60;
+  const vineTop = Math.round(lineY(deck.platforms, vineX));
+  const ladders = [{ id: 'ladder_r15_vine', x: vineX, y: pit, w: 50, h: pit - vineTop, why: pitWhy }];
+  const tiles = Math.floor((pit - vineTop - 100) / 120);
+  for (let i = 0; i < tiles; i += 1) decos.push(mg('firebog_ladder_tile_center_01_vine', vineX, pit - i * 120, 44, 122, 4));
+  decos.push(mg('firebog_ladder_tile_cap_1_vine', vineX, vineTop + 122, 44, 122, 4));
+  platforms.push(flat('r15_ceiling', bounds.l + 40, bounds.r - 40, bounds.t + 35, 'Chamber roof (solid from below).', 1));
 
-  // Ceiling and end walls.
-  platforms.push(flat('r15_ceiling', -960, 960, -965, 'Chamber roof (solid from below).', 1));
-  const barriers = [
-    { id: 'wall_r15_left', x: -968, y: bounds.t, h: bounds.b - bounds.t, pc_perm: null, why: 'Chamber end.' },
-    { id: 'wall_r15_right', x: 968, y: bounds.t, h: bounds.b - bounds.t, pc_perm: null, why: 'Chamber end.' },
-  ];
-
-  // Lanterns, two columns and the door plaque (the corridors' furniture).
+  // Dressing, back to front (R5, post 57203525070).
   decos.push(
-    { sprite: 'jethimadh_int_lantern_1', x: -300, y: -330, w: 353, h: 533, z: 3, r: 0, layer: 'fg' },
-    { sprite: 'jethimadh_int_lantern_1', x: 300, y: -330, w: 353, h: 533, z: 3, r: 0, layer: 'fg' },
-    { sprite: 'jethimadh_int_lantern_1', x: -720, y: -500, w: 300, h: 450, z: 3, r: 0, layer: 'fg' },
-    { sprite: 'jethimadh_int_pillar_1_mod', x: -150, y: -96, w: 230, h: 860, z: 5, r: 0, flip: true, layer: 'fg' },
-    { sprite: 'jethimadh_int_pillar_1', x: 150, y: -96, w: 230, h: 860, z: 6, r: 0, layer: 'fg' },
-    { sprite: 'jethimadh_int_door_sign', x: -600, y: -455, w: 188, h: 110, z: 11, r: 0, layer: 'mg' },
-    { sprite: 'firebog_sign_blank', x: -600, y: -472, w: 138, h: 80, z: 16, r: 0, layer: 'mg', signText: 'Way Out' },
+    // Ringed trunks behind: one under the deck, pale stalks under each bridge, one rising to the trunk.
+    mg('legs_moss_noBase', -800, 120, 380, 700, 2, { flip: true }),
+    mg('legs_moss_3', -150, 160, 300, 640, 3),
+    mg('legs_moss_1', 330, 200, 360, 600, 3, { flip: true }),
+    mg('legs_moss_4', -560, -500, 520, 740, 1, { r: -60 }),
+    mg('legs_moss_2', 620, -640, 540, 640, 1, { r: 80, flip: true }),
+    // The bottletree trunk on the right, its door on the deck.
+    mg('bottletree_body2', 1430, 260, 620, 1400, 3),
+    // Roots hanging under the deck and both bridges.
+    mg('hanging_braches1', -700, -400 + 300, 360, 300, 6),
+    mg('hanging_braches2', -480, -430 + 220, 220, 220, 6),
+    mg('hanging_braches1', -150, -440 + 260, 300, 260, 6),
+    mg('hanging_braches2', 330, -390 + 240, 240, 240, 6),
+    mg('hanging_braches2', 1000, -460 + 220, 220, 220, 6, { flip: true }),
+    // Yellow glowing plants on the deck.
+    mg('underground_bogwillow_1', -1000, deck.top + 60, 110, 190, 9),
+    mg('underground_bogwillow_1', -880, arrival.y + 8, 100, 175, 9, { flip: true }),
+    mg('underground_bogwillow_1', -640, arrival.y + 6, 95, 165, 9),
+    mg('underground_bogwillow_1', -520, arrival.y - 4, 90, 150, 9, { flip: true }),
   );
+  // The vine garland across the top, bead strings hanging from it.
+  decos.push(
+    mg('vine_rope', -380, -870, 30, 760, 5, { r: 98 }),
+    mg('vine_rope', 360, -880, 30, 760, 5, { r: 84 }),
+  );
+  for (const [x, y] of [[-560, -900], [-220, -880], [180, -880], [520, -900]]) decos.push(mg('hanging_eggs_decor', x, y + 150, 116, 150, 6));
+  // Two lanterns between the bridges, the "Way Out" plank on ropes beside the door.
+  decos.push(...[[20, -560], [380, -520]].map(([x, y]) => ({ sprite: 'jethimadh_int_lantern_1', x, y, w: 300, h: 450, z: 3, r: 0, layer: 'fg' })));
+  decos.push(...hangingSign(930, Math.round(lineY(shelf.platforms, 900) ?? -470) - 70, 'Way Out', { w: 200, rope: 640 }));
 
   return {
     tsid: ROOM_15_TSID,
@@ -212,28 +285,37 @@ function buildRoom15() {
     label: 'Room 15',
     bounds,
     platforms,
-    barriers,
+    barriers: [
+      { id: 'wall_r15_left', x: bounds.l + 20, y: bounds.t, h: bounds.b - bounds.t, pc_perm: null, why: 'Chamber end.' },
+      { id: 'wall_r15_right', x: bounds.r - 20, y: bounds.t, h: bounds.b - bounds.t, pc_perm: null, why: 'Chamber end.' },
+    ],
     decos,
+    bgFilters: { tintColor: 0, tintAmount: 82 },
+    ladders,
     doors: [
       {
         id: 'door_r15_wayout',
-        x: -790,
-        y: -423,
+        x: doorX,
+        y: doorY,
         ...DOOR,
+        w: 160,
+        h: 176,
         connect: { tsid: 'LTJ10K7P3812R8F', label: 'Corridor Four', x: 1484, y: -701, hub_id: '77' },
-        why: 'Back through C4E\'s Room 15 door (world 1484,-701), the way you came in.',
+        why: doorWhy,
       },
     ],
-    // Box bottom 30 px under the shelf top: standing anywhere on it counts, the way-out ledge does not.
-    spots: [{ id: 'TowerSpot_05', x: -590, y: -650, why: spotWhy }],
-    keyDrop: { id: 'r15_key', key: 6, x: 905, y: -505, w: 120, h: 120, why: keyWhy },
+    // Box bottom 30 px under the panel top: standing on it counts, the trunk deck under it does not.
+    spots: [{ id: 'TowerSpot_05', x: spotX, y: spotShelf.top + 30, why: spotWhy }],
+    keyDrop: { id: 'r15_key', key: 6, x: keyX, y: Math.round(lineY(shelf.platforms, keyX)) + 30, w: 120, h: 120, why: keyWhy },
+    route: [deck, b1, b2, shelf, trunkDeck].map((p) => ({ left: p.left, right: p.right, top: p.top, low: p.low })),
+    spotShelf: { left: spotShelf.left, right: spotShelf.right, top: spotShelf.top, low: spotShelf.low },
     why: {
       room: 'W: "Room 15 || Teal-Red Hexagon Key || Located in C4E. Contains a Purple-Orange Circle Key." and "[5] A quoin at the top of the screen, near the way out. Bring Spinach." G: "the secret spot is accesible by spinach-jumping to the quoin at the top of the room."',
-      size: 'Remake: a 2000 x 1000 chamber (no source bounds survive); the arrival x -790 sits inside a -1000..1000 room.',
+      size: 'R5 (post 57203525070, reference only): the picture spans ~2400 world px at ~0.53 picture px a world px, from the deck at the left wall to the trunk on the right; the archived arrival x -790 stands on the deck.',
+      decor: 'R5 (post 57203525070): a firebog cave (like Rooms 8 and 16): round plank deck with yellow glowing plants (walkway_1, underground_bogwillow_1), two plank bridges on root stalks hung with roots (bridge, legs_moss_*, hanging_braches*), two lanterns under a vine garland (jethimadh_int_lantern_1, vine_rope with hanging_eggs_decor: the picture\'s garland carries red pods, no CC0 art for them), three plank panels with the key (platform_bottletree_flat), a rope-hung "Way Out" plank and a wooden door in a bottletree trunk (bottletree_body2). No pixels from the picture.',
     },
   };
 }
-
 /* ------------------------------------------------------------------ */
 /* Ventilation Room (LIF102JCHL027DO)                                   */
 /* ------------------------------------------------------------------ */

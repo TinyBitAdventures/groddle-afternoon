@@ -61,7 +61,7 @@ import {
   TOWER_PLACEMENT_WARNING,
   TOWER_PROTO,
   TOWER_WIDTH,
-} from './home-tower.js?v=6ccb3a4f';
+} from './home-tower.js?v=b6e0d43c';
 import { DISPATCHER_HALF, dispatcherSpot, fixtureName, savedDispatcherRx, signpostX, streetFixtures } from './home-street-fixtures.js?v=26bb21a8';
 import { gardenHalfWidth } from './garden-view.js?v=05651e76';
 

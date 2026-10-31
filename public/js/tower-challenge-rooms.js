@@ -43,7 +43,7 @@
  * ladder, plaque, lantern and wall helpers are exported for js/tower-mid-rooms.js.
  */
 
-import { decoPoint, hangingSign, stepsPiece, TOWER_ROOMS, towerRoomIndexEntry, towerRoomStreet } from './tower-rooms.js?v=7b2aa06a';
+import { BRIDGE_LINE, WALKWAY_LINE, decoPoint, hangingSign, stepsPiece, TOWER_ROOMS, towerRoomIndexEntry, towerRoomStreet } from './tower-rooms.js?v=fc6dc1e7';
 import { TOWER_ROOM_4_FILES } from './tower-room-4-art.js?v=6a934af6';
 import { TOWER_ROOM_16_FILES } from './tower-room-16-art.js?v=eaafb5f7';
 
@@ -379,13 +379,6 @@ function buildRoom4() {
  * (the Snap's ~250 px hop to the deck is past the remake's ~150 px running jump); the bridge does
  * not sway (its instability is not recorded beyond the caption).
  */
-const ROOM_8_BRIDGE = Object.freeze({
-  // bridge.webp's walking line (fractions of the unflipped art): ~45% down each plank's face.
-  line: Object.freeze([[0.03, 0.58], [0.25, 0.67], [0.42, 0.65], [0.52, 0.61], [0.62, 0.54], [0.75, 0.41], [0.87, 0.31], [0.97, 0.25]]),
-});
-/** walkway_1's walking line (fractions): ~40% down its plank face, left tip to past the middle. */
-const WALKWAY_LINE = Object.freeze([[0.01, 0.28], [0.05, 0.23], [0.1, 0.25], [0.15, 0.26], [0.2, 0.35], [0.25, 0.42], [0.3, 0.48], [0.35, 0.52], [0.4, 0.55], [0.5, 0.56], [0.7, 0.53]]);
-
 function buildRoom8() {
   const c = collector();
   const bounds = { l: -1000, r: 1000, t: -1150, b: 500 };
@@ -420,7 +413,7 @@ function buildRoom8() {
   const bridgeWhy = 'Snap PUVTECCNR7S22RU: a rope-and-plank bridge drops left to right across the void, ~16 degrees, hung from thorny vines. Remake: its high end a short step under the ledge\'s low end; platforms follow the planks (bridge.webp, ~45% down each plank face).';
   const bridgeDeco = mg('bridge', -54, -411, 640, 136, 8, { flip: true, r: 10 });
   c.decos.push(bridgeDeco);
-  const bridge = lineOn(bridgeDeco, ROOM_8_BRIDGE.line, 'r8_bridge', bridgeWhy);
+  const bridge = lineOn(bridgeDeco, BRIDGE_LINE, 'r8_bridge', bridgeWhy);
 
   // The deck round the trunk: walkway_1's left half (its right half runs on behind the end wall).
   const deckWhy = 'Snap PUVTECCNR7S22RU: a curved plank deck round a tree trunk on the right, a little over the bridge\'s low end. Remake: its tip a plain running jump (~95 px, ~50 px up) from the bridge\'s end.';

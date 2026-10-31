@@ -20,9 +20,9 @@ import {
   towerRoomByTsid,
   towerRoomStreet,
   turned,
-} from '../public/js/tower-rooms.js?v=7b2aa06a';
-import { inTowerSpot, towerSpotsFor } from '../public/js/home-tower.js?v=6ccb3a4f';
-import { restockGarden, towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=7b8b86f3';
+} from '../public/js/tower-rooms.js?v=fc6dc1e7';
+import { inTowerSpot, towerSpotsFor } from '../public/js/home-tower.js?v=b6e0d43c';
+import { restockGarden, towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=2a52b273';
 import {
   ALL_TOWER_ROOMS,
   CHALLENGE_ROOMS,
@@ -37,7 +37,7 @@ import {
   anyTowerRoomByTsid,
   anyTowerRoomStreet,
   flats,
-} from '../public/js/tower-challenge-rooms.js?v=9e39f503';
+} from '../public/js/tower-challenge-rooms.js?v=ab42bf71';
 import { ladderTopDeck } from '../public/js/street-model.js?v=23b926e5';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -101,16 +101,18 @@ describe('rebuilt tower rooms: street data', () => {
     assert.equal(vent.sourceTsid, 'LIF102JCHL027DO');
   });
 
-  it('use only the corridors\' own art (and, in the Ventilation Room, the firebog.swf pieces of its Snap), all of it on disk', () => {
+  it('use only the corridors\' own art (and, in the Ventilation Room and Room 15, the firebog.swf pieces of their pictures), all of it on disk', () => {
     const manifest = new Set(JSON.parse(readFileSync(join(spike, 'public/assets/decos/manifest.json'), 'utf8')));
     const corridorArt = new Set(['jethimadh_int_bg_left', 'jethimadh_int_bg_center', 'jethimadh_int_bg_right', 'jethimadh_int_bg_shadow_50percent', 'jethimadh_int_steps_1', 'jethimadh_int_lantern_1', 'jethimadh_int_pillar_1', 'jethimadh_int_pillar_1_mod', 'jethimadh_int_door_sign', 'firebog_sign_blank', 'jethimadh_frame_cap', 'jethimadh_frame_wall']);
     // G110: the Ventilation Room Snap's hanging plank, thorny ropes, glowing bushes and beaded roots.
     const ventSnapArt = new Set(['firebog_sign_blank_plank', 'vine_rope', 'underground_bogwillow', 'underground_bogwillow_1', 'hanging_braches1', 'hanging_braches2']);
+    // R5 (post 57203525070): Room 15's deck, bridges, root stalks, panels, trunk, plants, garland and vine (all firebog.swf).
+    const room15Art = new Set([...ventSnapArt, 'walkway_1', 'bridge', 'platform_bottletree_flat', 'platform_bottletree_single', 'legs_moss_noBase', 'legs_moss_1', 'legs_moss_2', 'legs_moss_3', 'legs_moss_4', 'bottletree_body2', 'hanging_eggs_decor', 'firebog_ladder_tile_center_01_vine', 'firebog_ladder_tile_cap_1_vine']);
     for (const room of TOWER_ROOMS) {
       const s = street(room.tsid);
       for (const layer of s.layers) {
         for (const d of layer.decos) {
-          assert.ok(corridorArt.has(d.sprite) || (room.tsid === VENT_ROOM_TSID && ventSnapArt.has(d.sprite)), `${room.label}: ${d.sprite}`);
+          assert.ok(corridorArt.has(d.sprite) || (room.tsid === VENT_ROOM_TSID && ventSnapArt.has(d.sprite)) || (room.tsid === ROOM_15_TSID && room15Art.has(d.sprite)), `${room.label}: ${d.sprite}`);
           assert.ok(manifest.has(d.sprite), d.sprite);
         }
       }
@@ -225,22 +227,46 @@ describe('rebuilt tower rooms: the secret spots', () => {
     for (const spot of TOWER_ROOM_SPOTS) assert.deepEqual([spot.w, spot.h], [200, 200]);
   });
 
-  it('spot 5: the top of Room 15 near the way out, a spinach jump from the way-out ledge', () => {
+  it('spot 5: the top of Room 15 near the way out, a spinach jump from the trunk deck under it', () => {
     const { s, box } = spotIn(room15, 'TowerSpot_05');
-    const ledgeY = floorAt(room15.platforms, room15.doors[0].x, -423);
-    const shelfY = floorAt(room15.platforms, -590, -680);
-    assert.ok(Math.abs(ledgeY + 423) < 3);
+    const door = room15.doors[0];
+    const deckY = floorAt(room15.platforms, door.x, door.y);
+    const shelf = room15.spotShelf;
+    const shelfY = floorAt(room15.platforms, (shelf.left + shelf.right) / 2, shelf.top);
+    assert.ok(Math.abs(deckY - door.y) < 3);
     // Near the way out: within 250 px of the door, above it, in the top third of the room.
-    assert.ok(Math.abs(box.x + s.bounds.l - room15.doors[0].x) <= 250);
-    assert.ok(shelfY < room15.doors[0].y - room15.doors[0].h);
+    assert.ok(Math.abs(box.x + s.bounds.l - door.x) <= 250);
+    assert.ok(shelfY < door.y - door.h);
     assert.ok(shelfY - s.bounds.t < (s.bounds.b - s.bounds.t) / 3);
-    // Standing on the shelf counts; standing at the door does not.
-    assert.equal(standing(room15, s, box, -590, shelfY), true);
-    assert.equal(standing(room15, s, box, -650, ledgeY), false);
-    // A plain jump from the ledge falls short of the box; spinach (High Jumper) reaches it.
-    const rise = ledgeY - (box.y + s.bounds.t + 100); // feet must rise until the avatar's 100 px box meets the spot
+    // Standing on the shelf counts; standing on the deck under it does not.
+    assert.equal(standing(room15, s, box, (shelf.left + shelf.right) / 2, shelfY), true);
+    assert.equal(standing(room15, s, box, box.x + s.bounds.l, floorAt(room15.platforms, box.x + s.bounds.l, door.y)), false);
+    // A plain jump from the deck falls short of the box; spinach (High Jumper) reaches it and the shelf.
+    const rise = deckY - (box.y + s.bounds.t + 100); // feet must rise until the avatar's 100 px box meets the spot
     assert.ok(apex() < rise, `plain apex ${apex()} vs ${rise}`);
-    assert.ok(apex(SPINACH.jump, SPINACH.gravity) > rise, `spinach apex vs ${rise}`);
+    assert.ok(apex(SPINACH.jump, SPINACH.gravity) > deckY - shelfY + 10, `spinach apex vs ${deckY - shelfY}`);
+    // The shelf hangs over the deck, so the spinach jump goes straight up.
+    assert.ok(floorAt(room15.platforms, shelf.left + 10, door.y) != null && floorAt(room15.platforms, shelf.right - 10, door.y) != null);
+  });
+
+  it('R5 (post 57203525070): Room 15 crosses the void left to right with plain running jumps, and a fall has a vine back up', () => {
+    const route = room15.route;
+    for (let i = 1; i < route.length; i += 1) {
+      const a = route[i - 1];
+      const b = route[i];
+      const gap = Math.max(0, b.left - a.right);
+      // The harder way: up from the lower end. Ends: a's right end and b's left end.
+      const aEnd = floorAt(room15.platforms, a.right - 1, a.top);
+      const bEnd = floorAt(room15.platforms, b.left + 1, b.top);
+      const rise = Math.abs(aEnd - bEnd);
+      assert.ok(rise < apex() - 10, `step ${i} rise ${rise}`);
+      assert.ok(gap < reach(rise) - 20, `step ${i} gap ${gap} at rise ${rise}`);
+    }
+    assert.ok(Math.abs(floorAt(room15.platforms, -790, -423) + 423) < 3, 'the archived arrival stands on the deck');
+    const [vine] = room15.ladders;
+    assert.equal(floorAt(room15.platforms, vine.x, vine.y), vine.y);
+    assert.ok(Math.abs(floorAt(room15.platforms, vine.x, vine.y - vine.h) - (vine.y - vine.h)) < 2, 'the vine tops out on the deck');
+    assert.ok(room15.bounds.b - vine.y >= 300);
   });
 
   it('spot 9: just below the C6 Way Out ledge, not on it', () => {
@@ -301,23 +327,15 @@ describe('rebuilt tower rooms: the secret spots', () => {
     }
   });
 
-  it('room 15 has its Purple-Orange Circle Key on a shelf you can climb to', () => {
+  it('room 15 has its Purple-Orange Circle Key on the plank panels before the door', () => {
     const s = street(ROOM_15_TSID);
     const key = s.boxes.find((b) => b.key);
     assert.equal(key.key, 6);
     const kx = key.x + s.bounds.l;
     const shelf = floorAt(room15.platforms, kx, key.y + s.bounds.t - 30);
     assert.ok(shelf != null && key.y + s.bounds.t - shelf >= 0 && key.y + s.bounds.t - shelf <= key.h);
-    // The way up: each key-course step a plain jump.
-    const tops = {};
-    for (const p of room15.platforms.filter((q) => /r15_key_/.test(q.id))) {
-      const piece = p.id.replace(/_\d+$/, '');
-      tops[piece] = Math.min(tops[piece] ?? Infinity, p.y1, p.y2);
-    }
-    const levels = Object.values(tops).map((y) => Math.round((y + 1) / 5) * 5).sort((a, b) => b - a);
-    const steps = [-160, ...levels.filter((y) => y < -160)];
-    assert.deepEqual(steps, [-160, -235, -310, -385, -460, -535]);
-    for (let i = 1; i < steps.length; i += 1) assert.ok(steps[i - 1] - steps[i] <= 85);
+    assert.ok(room15.platforms.some((p) => /r15_key_shelf/.test(p.id) && kx >= p.x1 && kx <= p.x2));
+    assert.ok(kx < room15.doors[0].x);
   });
 });
 

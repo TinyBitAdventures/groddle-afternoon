@@ -16,10 +16,10 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { arrivalInTarget, streetAliases } from '../public/js/location-navigation.js?v=4be109b9';
-import { TOWER_ROOM_DOOR_LINKS } from '../public/js/tower-rooms.js?v=7b2aa06a';
-import { ALL_TOWER_ROOMS, CHALLENGE_ROOM_DOOR_LINKS, anyTowerRoomIndexEntry, anyTowerRoomStreet } from '../public/js/tower-challenge-rooms.js?v=9e39f503';
-import { MID_TOWER_DOOR_LINKS, MID_TOWER_ROOMS, midTowerIndexEntry, midTowerRoomStreet } from '../public/js/tower-mid-rooms.js?v=5d998562';
-import { GWENDOLYN_DOOR_LINKS, GWENDOLYN_ROOMS, room23IndexEntry, room23Street } from '../public/js/gwendolyn-room-23.js?v=d371497b';
+import { TOWER_ROOM_DOOR_LINKS } from '../public/js/tower-rooms.js?v=fc6dc1e7';
+import { ALL_TOWER_ROOMS, CHALLENGE_ROOM_DOOR_LINKS, anyTowerRoomIndexEntry, anyTowerRoomStreet } from '../public/js/tower-challenge-rooms.js?v=ab42bf71';
+import { MID_TOWER_DOOR_LINKS, MID_TOWER_ROOMS, midTowerIndexEntry, midTowerRoomStreet } from '../public/js/tower-mid-rooms.js?v=1e4d8bbd';
+import { GWENDOLYN_DOOR_LINKS, GWENDOLYN_ROOMS, room23IndexEntry, room23Street } from '../public/js/gwendolyn-room-23.js?v=91ba4e4d';
 
 const ROOMS = [...ALL_TOWER_ROOMS, ...MID_TOWER_ROOMS, ...GWENDOLYN_ROOMS];
 const LINKS = [...TOWER_ROOM_DOOR_LINKS, ...CHALLENGE_ROOM_DOOR_LINKS, ...MID_TOWER_DOOR_LINKS, ...GWENDOLYN_DOOR_LINKS];
