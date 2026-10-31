@@ -618,6 +618,17 @@
 :root[data-ui="classic"] .top-bar #mail-btn { left: calc(var(--cvx) + 283 * var(--cu)); }
 :root[data-ui="classic"] .top-bar .hud-actions .more-menu { left: calc(var(--cvx) + 309 * var(--cu)); }
 :root[data-ui="classic"] .top-bar #study-chip { left: calc(var(--cvx) + 337 * var(--cu)); width: auto; padding: 0 calc(6 * var(--cu)); color: var(--c-classic-link); font: 800 var(--fs-classic-body)/var(--lh-none) var(--font-classic-title); }
+/* Update ready (js/features/update-ready-feature.js): where the study chip sits, after the Menu; a running study moves along. */
+:root[data-ui="classic"] .top-bar .hud-actions > .update-ready-btn {
+  position: absolute; top: calc(9 * var(--cu)); left: calc(var(--cvx) + 337 * var(--cu));
+  display: inline-flex; align-items: center; gap: calc(4 * var(--cu)); width: auto; height: calc(21 * var(--cu));
+  margin: 0; padding: 0 calc(7 * var(--cu)); border: 1px solid var(--c-classic-link); border-radius: calc(11 * var(--cu));
+  background: color-mix(in srgb, var(--c-classic-panel) 85%, transparent); box-shadow: none;
+  color: var(--c-classic-link); font: 800 var(--fs-classic-body)/var(--lh-none) var(--font-classic-title); white-space: nowrap; cursor: pointer;
+}
+:root[data-ui="classic"] .top-bar .hud-actions > .update-ready-btn:is(:hover, :focus-visible) { background: var(--c-classic-panel); }
+:root[data-ui="classic"] .top-bar .hud-actions:has(> .update-ready-btn:not([hidden])) > #study-chip { left: calc(var(--cvx) + 458 * var(--cu)); }
+:root[data-ui="classic"] .update-ready-btn svg { width: calc(12 * var(--cu)); height: calc(12 * var(--cu)); }
 :root[data-ui="classic"] .top-bar .classic-help-btn { right: calc(var(--cf-cluster-r) + 138 * var(--cu)); top: calc(10 * var(--cu)); width: calc(20 * var(--cu)); height: calc(21 * var(--cu)); }
 :root[data-ui="classic"] .top-bar .classic-help-btn img { display: block; width: 100%; height: 100%; }
 /* Online, the bug icon (bug-report-feature.js) sits 7 left of help, as in the 2012 header. */

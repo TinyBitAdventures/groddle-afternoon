@@ -79,6 +79,9 @@ GAME="$work/game/public"
 node "$work/game/tools/deploy/fathom.mjs" "$GAME" || { echo "fathom was not added to the built pages" >&2; exit 1; }
 # Link previews (Open Graph and Twitter cards) on the static game pages; the theme adds them to Minn's pages (tools/deploy/social.mjs).
 node "$work/game/tools/deploy/social.mjs" "$GAME" || { echo "social tags were not added to the built pages" >&2; exit 1; }
+# The build id (tools/deploy/build-id.mjs), last of the page edits: each play page's own stamp and play/build.json,
+# which open games fetch (uncached, ?t= buster) to offer Update ready. A new id whenever any content key changed.
+node "$work/game/tools/deploy/build-id.mjs" "$GAME" --version="$GAME_REF" || { echo "the build id was not written" >&2; exit 1; }
 
 echo "2/6 Minn Engine, Minn Admin, theme"
 rsync -rlc --delete --exclude admin --exclude .install.json -e "${SSH[*]}" "$work/engine/public/minn/" "$HOST:public/minn/"
@@ -132,6 +135,6 @@ echo "5/6 cache"
 "${SSH[@]}" "$HOST" 'cd ~/public && wp cache flush' | tail -1
 
 echo "6/6 check"
-for p in / /play/ /play/online/ /restoration/ /changelog/ /musicblocks/ /items/ /wp-json/groddle/v1/me; do
+for p in / /play/ /play/online/ /play/build.json /restoration/ /changelog/ /musicblocks/ /items/ /wp-json/groddle/v1/me; do
 	printf '%s %s\n' "$(curl -s -o /dev/null -w '%{http_code}' "https://groddleafternoon.com$p?deploy=$RANDOM")" "$p"
 done

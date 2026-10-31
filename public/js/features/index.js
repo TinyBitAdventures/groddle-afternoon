@@ -155,6 +155,7 @@ import { questVerbsFeature } from './quest-verbs-feature.js?v=b6b7c200'; FEATURE
 import { itemVerbsMoreFeature } from './item-verbs-more-feature.js?v=84e6bdd8'; FEATURES.push(itemVerbsMoreFeature);
 import { questPinsFeature } from './quest-pins-feature.js?v=e59012f1'; FEATURES.push(questPinsFeature);
 import { zoneEffectsFeature } from './zone-effects-feature.js?v=6b079a9c'; FEATURES.push(zoneEffectsFeature);
+import { updateReadyFeature } from './update-ready-feature.js?v=107825cd'; FEATURES.push(updateReadyFeature);
 import { streetObjectsFeature } from './street-objects-feature.js?v=d9623685'; FEATURES.push(streetObjectsFeature);
 import { realtimeFeature } from './realtime-feature.js?v=72bd6e0f'; FEATURES.push(realtimeFeature);
 import { accountBackupFeature } from './account-backup-feature.js?v=a5712ed5'; FEATURES.push(accountBackupFeature);
