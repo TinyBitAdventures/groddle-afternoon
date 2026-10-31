@@ -46,10 +46,10 @@ import {
   streetNoteSeeds,
   takePinnedNote,
   writePaperNote,
-} from '../public/js/street-furniture.js?v=1519b13a';
-import { REMAKE_NOTE_BYLINE, REMAKE_NOTE_MARKER, isRemakeNote, normalizeNote as normalizeNoteRow } from '../public/js/street-furniture.js?v=1519b13a';
-import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=c2680019';
-import { FEATURES } from '../public/js/features/index.js?v=8d19d3f3';
+} from '../public/js/street-furniture.js?v=37094759';
+import { REMAKE_NOTE_BYLINE, REMAKE_NOTE_MARKER, isRemakeNote, normalizeNote as normalizeNoteRow } from '../public/js/street-furniture.js?v=37094759';
+import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=40676512';
+import { FEATURES } from '../public/js/features/index.js?v=5aa7fb46';
 import { createFeatureHost } from '../public/js/feature-host.js?v=e4f648b1';
 import { setWildlifeCatalog } from '../public/js/wildlife.js?v=670c3a7f';
 
@@ -244,7 +244,7 @@ describe('notice boards (bag_notice_board.js)', () => {
     assert.equal(added.carried.length, 0);
     const taken = takePinnedNote(added.pins, [], pins[0].id);
     assert.equal(taken.pins.length, 3);
-    assert.equal(noteContent(taken.carried[0]).title, 'Tower Social');
+    assert.equal(noteContent(taken.carried[0]).title, 'Welcome');
   });
 });
 

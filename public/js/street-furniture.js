@@ -1,4 +1,4 @@
-import { isItemFloor, platformYAt } from './street-model.js?v=23b926e5';
+import { isItemFloor, platformYAt, worldToScreen } from './street-model.js?v=23b926e5';
 
 /**
  * Street furniture rules: street Mailboxes, placed Notes, Notice Boards and
@@ -32,8 +32,10 @@ import { isItemFloor, platformYAt } from './street-model.js?v=23b926e5';
  * that players wrote them: "Notice Boards (first debuted inside Machine
  * Rooms ...) which allow players to post notes for others to read ... Jokes,
  * propaganda and instructions abound" (glitch blog 2011-06-01, research/
- * wayback/raw/blog/2011-06-01-life-in-beta-new-features-so-far.txt:78); no
- * capture of a note's text survives.
+ * wayback/raw/blog/2011-06-01-life-in-beta-new-features-so-far.txt:78). The
+ * only notices that survive are players' own, transcribed on the Glitch
+ * Tribute Blog: they set how many pins five boards carry (see BOARD_PINS),
+ * and their words never ship.
  */
 
 export const MAILBOX_CLASS = 'npc_mailbox';
@@ -576,40 +578,105 @@ export const STREET_NOTES = Object.freeze({
   ],
 });
 
-/** Notices already pinned to each archived Notice Board. */
-export const BOARD_PINS = Object.freeze({
-  GA5134UPLRU29OH: [
-    note('Tower Social', 'Potluck on the roof this Saturday. Bring a dish. Bring a chair. Do not bring the Rook.'),
-    note('Quiet hours', 'Please keep Musicblocks below a gentle jangle after dark.'),
-    note('Swap shelf', 'Leave something, take something. Last week somebody left a whole Cubimal. We are still talking about it.'),
-  ],
-  GA9H1V6OGRU2FSB: [
-    note('Wanted', 'Brave visitors for a tour of the upper rooms. Lanterns provided. Courage not included.'),
-    note('Lost and found', 'One monocle, one glove, one very small hat. If they are yours, you are probably a very small butler.'),
-  ],
-  GA9MU59GB792T80: [
-    note('Sign-up sheet', 'Blockmaker: Mon, Wed, Fri. Woodworker: whenever it is in the mood.'),
-    note('Notice', 'The Metal Machine has been tuned. It now goes clunk instead of clonk.'),
-  ],
-  GCR101Q98A12EHH: [
-    note('Fuel cells', 'We are low on fuel cells again. Please make two if you use one.'),
-    note('Thank you', 'To the kind Glitch who oiled the Woodworker: it hums now.'),
-    note('Lost: one Tinkertool', 'It has a little chip in the handle and a lot of sentimental value.'),
-  ],
-  GHVUFJ6HGRU2V0E: [
-    note('Welcome Committee', 'New in the Towers? Knock on any door. Somebody will have tea, or at least hot water and good intentions.'),
-    note('Stairs', 'Please stop polishing the stairs. They are already very slippery and very proud.'),
-  ],
-  GHVUR3UKGRU2SD2: [
-    note('Basement gardens', 'Spare seeds in the jar by the door. Take a handful, grow a mouthful.'),
-    note('Tower dues', 'Tower dues are one smile per week, payable to the nearest neighbour.'),
-  ],
-  GIFI4FP9GRU2CC8: [
-    note('Auditions', 'The Towers\' players seek a Piggy to play a Piggy. Method actors welcome.'),
-    note('Costume swap', 'Hats in the lobby box. Please return the tall one, it has a career.'),
-    note('Tonight', 'Opening night! Applause is free. Encores are also free, but please pace yourselves.'),
-  ],
+/**
+ * Neutral notices for the boards, plainly ours (G175). The words players
+ * pinned are theirs and do not ship, but the Glitch Tribute Blog
+ * (johnexploresur.tumblr.com, late 2012, reference only) transcribed every
+ * notice on five boards, so those boards carry as many pins as it shows, and
+ * the board art's own "m" + count state then draws Tiny Speck's pin layout for
+ * that number: Hakusan Heaps Towers 5 (posts 43184658883-43259368088), Besara
+ * Community Machine Room 5 (41388998992-41461262547), Egret Taun Towers 7
+ * (41208895411-41298594230), Sabudana Drama Towers 6 (40388154117-
+ * 40483430501), Hauki Seeks Manor 6 (48382666370-48468991839; the lobby shot
+ * 48374460546 shows those six pins). Nothing survives for Gregarious Towers or
+ * the Meadow Community Machine Room, so they keep three each. List in
+ * research/coverage/round4-people-2026-10-31/boards/notice-posts.tsv.
+ */
+const PIN = Object.freeze({
+  welcome: (place) => note('Welcome', `Welcome to ${place}. This board is for everyone who passes through.`),
+  howTo: note('How to post', 'Write on a Note with a Quill, then choose Add a note to pin it here.'),
+  room: note('Room for ten', 'This board holds ten notes. Take one down to make room for yours.'),
+  take: note('Take one', 'A note you take goes into your pack. You can pin it back any time.'),
+  lost: note('Lost and found', 'Found something? Pin a note saying where you left it.'),
+  spare: note('Spare things', 'Have something to spare? Say what it is and where to find it.'),
+  machines: note('The machines', 'The machines here are for everyone. Please leave them ready for the next visitor.'),
+  kind: note('Be kind', 'Please keep notices friendly.'),
 });
+
+/** Notices already pinned to each archived Notice Board (counts above). */
+export const BOARD_PINS = Object.freeze({
+  // Gregarious Towers (no source: three, as before)
+  GA5134UPLRU29OH: [PIN.welcome('Gregarious Towers'), PIN.howTo, PIN.kind],
+  // Hauki Seeks Manor: 6
+  GA9H1V6OGRU2FSB: [PIN.welcome('Hauki Seeks Manor'), PIN.howTo, PIN.room, PIN.take, PIN.lost, PIN.kind],
+  // Besara Community Machine Room: 5
+  GA9MU59GB792T80: [PIN.welcome('the Besara Community Machine Room'), PIN.machines, PIN.howTo, PIN.spare, PIN.kind],
+  // Meadow Community Machine Room (no source: three, as before)
+  GCR101Q98A12EHH: [PIN.welcome('the Meadow Community Machine Room'), PIN.machines, PIN.howTo],
+  // Hakusan Heaps Towers: 5
+  GHVUFJ6HGRU2V0E: [PIN.welcome('Hakusan Heaps Towers'), PIN.howTo, PIN.room, PIN.lost, PIN.kind],
+  // Egret Taun Towers: 7
+  GHVUR3UKGRU2SD2: [PIN.welcome('Egret Taun Towers'), PIN.howTo, PIN.room, PIN.take, PIN.lost, PIN.spare, PIN.kind],
+  // Sabudana Drama Towers: 6
+  GIFI4FP9GRU2CC8: [PIN.welcome('Sabudana Drama Towers'), PIN.howTo, PIN.room, PIN.take, PIN.spare, PIN.kind],
+});
+
+/** How many notices the Tribute Blog shows on each board it covers (see BOARD_PINS). */
+export const BOARD_PIN_SOURCE_COUNTS = Object.freeze({
+  GA9H1V6OGRU2FSB: 6,
+  GA9MU59GB792T80: 5,
+  GHVUFJ6HGRU2V0E: 5,
+  GHVUR3UKGRU2SD2: 7,
+  GIFI4FP9GRU2CC8: 6,
+});
+
+/**
+ * The invented notices the boards carried before 2026-10-31. A save may still
+ * hold them: they stay labelled as remake text, and a board still holding
+ * only those (nobody pinned, took or wrote anything) is seeded afresh.
+ */
+export const RETIRED_BOARD_PIN_TEXTS = Object.freeze([
+  'Potluck on the roof this Saturday. Bring a dish. Bring a chair. Do not bring the Rook.',
+  'Please keep Musicblocks below a gentle jangle after dark.',
+  'Leave something, take something. Last week somebody left a whole Cubimal. We are still talking about it.',
+  'Brave visitors for a tour of the upper rooms. Lanterns provided. Courage not included.',
+  'One monocle, one glove, one very small hat. If they are yours, you are probably a very small butler.',
+  'Blockmaker: Mon, Wed, Fri. Woodworker: whenever it is in the mood.',
+  'The Metal Machine has been tuned. It now goes clunk instead of clonk.',
+  'We are low on fuel cells again. Please make two if you use one.',
+  'To the kind Glitch who oiled the Woodworker: it hums now.',
+  'It has a little chip in the handle and a lot of sentimental value.',
+  'New in the Towers? Knock on any door. Somebody will have tea, or at least hot water and good intentions.',
+  'Please stop polishing the stairs. They are already very slippery and very proud.',
+  'Spare seeds in the jar by the door. Take a handful, grow a mouthful.',
+  'Tower dues are one smile per week, payable to the nearest neighbour.',
+  'The Towers\' players seek a Piggy to play a Piggy. Method actors welcome.',
+  'Hats in the lobby box. Please return the tall one, it has a career.',
+  'Opening night! Applause is free. Encores are also free, but please pace yourselves.',
+]);
+
+/**
+ * Where a board hung, when a picture shows it (street world px, the board's
+ * bottom-centre as drawn: art anchor 0.99, 2 px down). Hauki Seeks Manor: the
+ * Tribute Blog's lobby shot (post 48374460546, the whole 1500 px lobby at
+ * 1280 px) has it on the wall right of the lift, its frame 884-1061 x
+ * 254-367 in the shot, so centre x 390, frame foot at screen y 430 (the art's
+ * frame ends 10 px above its anchor). Other boards keep the planner's spot.
+ */
+export const BOARD_SPOTS = Object.freeze({
+  GA9H1V6OGRU2FSB: Object.freeze([Object.freeze({ x: 390, y: -202 })]),
+});
+
+/**
+ * A street's furniture row with its board pinned to BOARD_SPOTS (screen
+ * space), when the row has a board and no fixed spot of its own.
+ */
+export function boardSpotRow(row, street) {
+  const spots = BOARD_SPOTS[String(street?.tsid || '')];
+  if (!row || !spots || !street?.bounds || !whole(row[BOARD_CLASS]) || row.at?.[BOARD_CLASS]) return row;
+  const at = spots.map((p) => ({ ...worldToScreen(street, p.x, p.y), wall: true }));
+  return { ...row, at: { ...(row.at || {}), [BOARD_CLASS]: at } };
+}
 
 /** Initial notes for a street's `count` placed notes (blank beyond the authored list). */
 export function streetNoteSeeds(tsid, count) {
@@ -629,7 +696,24 @@ export function boardPinSeeds(tsid) {
   );
 }
 
-const REMAKE_TEXTS = new Set([...Object.values(STREET_NOTES), ...Object.values(BOARD_PINS)].flat().map((row) => row.text));
+const REMAKE_TEXTS = new Set([
+  ...[...Object.values(STREET_NOTES), ...Object.values(BOARD_PINS)].flat().map((row) => row.text),
+  ...RETIRED_BOARD_PIN_TEXTS,
+]);
+const RETIRED_PINS = new Set(RETIRED_BOARD_PIN_TEXTS);
+
+/**
+ * A saved board's pins, or fresh seeds when it still holds only the retired
+ * invented notices, untouched (see RETIRED_BOARD_PIN_TEXTS).
+ */
+export function refreshBoardPins(pins, tsid) {
+  if (!Array.isArray(pins) || !pins.length) return pins;
+  const stale = pins.every((p) => {
+    const n = normalizeNote(p);
+    return !n.lastEditor && !n.history.length && RETIRED_PINS.has(n.initialText);
+  });
+  return stale ? boardPinSeeds(tsid) : pins;
+}
 
 /**
  * True while a note still shows text written for the remake: seeded from

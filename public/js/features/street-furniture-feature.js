@@ -65,6 +65,7 @@ import {
   boardAddVerb,
   boardArtState,
   boardPinSeeds,
+  boardSpotRow,
   canOptIn,
   closeMailboxView,
   createMailboxView,
@@ -89,12 +90,13 @@ import {
   REMAKE_NOTE_MARKER,
   isRemakeNote,
   reconcileCarried,
+  refreshBoardPins,
   stoneVerbs,
   stoneVog,
   streetNoteSeeds,
   takePinnedNote,
   writePaperNote,
-} from '../street-furniture.js?v=1519b13a';
+} from '../street-furniture.js?v=37094759';
 import {
   CHORES,
   NEIGHBOURS,
@@ -543,6 +545,7 @@ function runNoteVerb(engine, entity, verbId) {
 function boardPins(engine, index) {
   const s = slot(engine);
   if (!Array.isArray(s.boards[index])) s.boards[index] = index === 0 ? boardPinSeeds(engine.streetTsid) : [];
+  else if (index === 0) s.boards[index] = refreshBoardPins(s.boards[index], engine.streetTsid);
   return s.boards[index];
 }
 
@@ -1174,11 +1177,12 @@ function demoPoint(engine, dx) {
 /**
  * The street's furniture row: the archived catalog row, unless a feature's
  * furnitureRow(street, base, engine) hook answers (rebuilt rooms without
- * location XML, fixed wall spots; see fixedFurniturePoints).
+ * location XML, fixed wall spots; see fixedFurniturePoints), with a board
+ * hung where a picture shows it (BOARD_SPOTS).
  */
 function rowFor(engine, catalog, street) {
   const base = furnitureFor(catalog, street?.tsid);
-  return (street && engine?.query?.('furnitureRow', street, base, engine)) || base;
+  return boardSpotRow((street && engine?.query?.('furnitureRow', street, base, engine)) || base, street);
 }
 
 function spawnStreet(engine, row) {
