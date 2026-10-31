@@ -121,8 +121,6 @@ const ONLINE_STYLE = `  <style>
     body:has(#overlay:not(.hidden)) .save-pill { z-index: calc(var(--z-screen) + 1); }
     @media (max-width: 560px) {
       #overlay:not(.hidden) > .card { width: 100%; padding: var(--sp-7) 0.95rem var(--sp-6); font-size: var(--fs-base); line-height: var(--lh-normal); }
-      #overlay:not(.hidden) > .card h2 { font-size: var(--fs-xl); margin-bottom: var(--sp-3); }
-      #overlay:not(.hidden) > .card p { margin: var(--sp-3) 0; }
     }
   </style>`;
 

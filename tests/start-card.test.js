@@ -182,7 +182,7 @@ describe('the window stack keeps the start card on top', () => {
     assert.equal(START_CARD_SELECTOR, '#overlay');
     assert.doesNotMatch(WINDOW_SELECTOR, /#overlay/);
     assert.doesNotMatch(SCREEN_SELECTOR, /#overlay/);
-    assert.match(read('play/index.html'), /<div id="overlay" class="overlay">\s*<div class="card">\s*<h2>Welcome to a scrap of Ur<\/h2>/);
+    assert.match(read('play/index.html'), /<div id="overlay" class="overlay" role="dialog" aria-labelledby="start-card-title">\s*<div class="card start-card">\s*<div class="start-main">\s*<h2 id="start-card-title">Welcome to a scrap of Ur<\/h2>/);
   });
 
   it('puts the card over windows and screens opened after it, and keeps its own z alone', () => {
@@ -272,5 +272,122 @@ describe('the start card fine print', () => {
     const css = readFileSync(new URL('../public/style.css', import.meta.url), 'utf8');
     assert.match(css, /\.fine a,\n\.fine a:visited \{ color: var\(--text-moss\);/);
     assert.match(css, /\.fine a:hover,\n\.fine a:focus-visible \{ color: var\(--c-green-34\);/);
+  });
+});
+
+// STARTCARD (Austin 2026-10-31: "the start exploring dialog could use a UI revamp. The shortcut keys feel lost
+// in the mix of content"): the title, one line, the actions, the goals, the keys in three headed groups and
+// the fine print; the first action has focus; the card scrolls inside itself; online keeps the same markup.
+describe('the start card layout', () => {
+  const html = read('play/index.html');
+  const card = html.slice(html.indexOf('<div id="overlay"'), html.indexOf('<!-- The Great Hog Haul'));
+  const at = (needle) => {
+    const i = card.indexOf(needle);
+    assert.ok(i >= 0, `the card has ${needle}`);
+    return i;
+  };
+  const text = (src) => src.replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+
+  it('reads title, one line, the actions, the goals, the keys, then the fine print', () => {
+    const order = [
+      '<h2 id="start-card-title">Welcome to a scrap of Ur</h2>',
+      '<p class="start-lede">',
+      '<div class="start-actions">',
+      '<button id="start-btn" type="button">Start exploring</button>',
+      '<button id="start-customize-btn" type="button" class="btn-secondary">Customize look first</button>',
+      '<section class="start-goal" aria-labelledby="start-goal-title">',
+      '<h3 id="start-goal-title">Today’s goals</h3>',
+      '<section class="start-keys" aria-labelledby="start-keys-title">',
+      '<h3 id="start-keys-title">Keys</h3>',
+      '<p class="start-keys-foot">Hold <kbd>?</kbd> for every key</p>',
+      '<p class="fine">',
+    ].map(at);
+    assert.deepEqual(order, [...order].sort((a, b) => a - b));
+    assert.equal(card.match(/<p class="start-lede">/g).length, 1, 'one welcome line');
+    assert.match(card, /<p class="start-lede">[^<]{20,80}<\/p>/, 'a short one');
+    // The goals keep Hechey Track, the gathering, the cooking and the Triple Jump.
+    const goal = text(card.slice(at('<section class="start-goal"'), at('<section class="start-keys"')));
+    assert.match(goal, /grain or meat.*flour and sammiches.*Triple Jump.*Hechey Track/);
+  });
+
+  it('groups every key in Move, Do and Open: lists of a keycap and a label', () => {
+    const groups = [...card.matchAll(/<div class="start-key-group start-key-(\w+)">\s*<h4>(\w+)<\/h4>\s*<ul>([\s\S]*?)<\/ul>/g)];
+    assert.deepEqual(groups.map((g) => g[2]), ['Move', 'Do', 'Open']);
+    const rows = Object.fromEntries(groups.map((g) => [g[2], [...g[3].matchAll(/<li><span class="start-caps">([\s\S]*?)<\/span><span>([^<]+)<\/span><\/li>/g)]
+      .map((m) => `${[...m[1].matchAll(/<kbd[^>]*>([^<]+)<\/kbd>|<i>(or|\+)<\/i>/g)].map((k) => k[1] || (k[2] === '+' ? '+' : ' or ')).join('')}: ${m[2]}`)]));
+    for (const g of groups) assert.equal(rows[g[2]].length, (g[3].match(/<li>/g) || []).length, `${g[2]}: every row is caps + label`);
+    assert.deepEqual(rows, {
+      Move: ['AD: Walk', 'W or Space: Tap to jump', '↑: Climb ladders', 'C: Camera'],
+      Do: ['Enter: Verbs', 'Z: Player menu', 'V: Vendor', 'Shift+T: Teleport points'],
+      Open: ['M or G: Map', 'Q: Quests', 'B: Badges', 'H: Feat', 'K or Shift+S: Skills', 'U: Upgrades', 'Y: Buffs'],
+    });
+    // Every key the old one-line list named is still on the card.
+    const caps = [...card.matchAll(/<kbd[^>]*>([^<]+)<\/kbd>/g)].map((m) => m[1]);
+    for (const key of ['A', 'D', 'W', 'Space', '↑', 'Enter', 'M', 'G', 'Z', 'Q', 'B', 'H', 'K', 'Shift', 'S', 'U', 'Y', 'C', 'T', 'V', '?']) {
+      assert.ok(caps.includes(key), `${key} is on the card`);
+    }
+    assert.match(card, /<kbd title="Up arrow">↑<\/kbd>/);
+  });
+
+  it('keeps the fine print, plain copy and no other Glitch', () => {
+    assert.match(card, /<p class="fine">A <a href="https:\/\/tinybitadventures\.com">fan remake<\/a> of Tiny Speck’s Glitch · <a href="credits\/">Credits<\/a> · <a href="privacy-policy\/">Privacy<\/a><\/p>\s*<\/div>\s*<\/div>/, 'last in the card');
+    const copy = text(card.replace(/<!--[\s\S]*?-->/g, ''));
+    assert.doesNotMatch(copy, /—/);
+    assert.equal(copy.match(/Glitch/g).length, 1, 'only the fine print names it');
+    const newxp = read('js/features/newxp-feature.js');
+    const choice = between(newxp, 'const tutorialChoice = () => {', "engine.setData('newxpStartCard', 'shown');");
+    assert.doesNotMatch(choice.replace(/\/\/[^\n]*/g, ''), /Glitch|—/);
+  });
+
+  it('puts the tutorial choice first among the actions, its note after its buttons', () => {
+    const newxp = read('js/features/newxp-feature.js');
+    const show = between(newxp, 'function showStartCard(engine) {', 'function resumeOnReload(');
+    assert.match(show, /startBtn\.parentNode\.insertBefore\(box, startBtn\);/, 'in .start-actions, before Start exploring');
+    for (const button of ['<button type="button" data-nx-start>Start</button>', '<button type="button" data-nx-start>Start with the tutorial</button>']) {
+      const i = show.indexOf(button);
+      assert.ok(i > 0 && i < show.indexOf('<p><strong>', i), `${button} comes before its note`);
+    }
+    const css = read('style.css');
+    assert.match(css, /\.start-actions :is\(\.nx-start, \.nx-start-row\) \{ display: contents; \}/);
+    assert.match(css, /\.start-actions \[data-nx-start\] \{ grid-column: 1 \/ -1; grid-row: 1; \}/);
+    assert.match(css, /#start-btn,\n\.start-actions \[data-nx-start\] \{/, 'the tutorial start wears the primary button');
+    assert.match(css, /#start-customize-btn,\n\.start-actions \[data-nx-skipstart\] \{/, 'Skip to Ur wears the secondary one');
+  });
+
+  it('focuses the first action as the card appears; Enter and Space press it', () => {
+    const show = between(game, 'revealStartCard({', 'clear: () => {');
+    assert.match(show, /startOverlay\.classList\.remove\('is-waiting'\);\s*focusStartCard\(\);/);
+    assert.match(game, /function focusStartCard\(\) \{\s*document\.querySelector\('#overlay:not\(\.hidden\) :is\(\[data-nx-start\], #start-btn:not\(\[hidden\]\)\)'\)\?\.focus\(\{ preventScroll: true \}\);/);
+    // The card is a dialog, so a focused button there takes Enter and Space (no jump queued), and the
+    // notice and conversation gates that skip #overlay keep skipping it.
+    assert.match(html, /<div id="overlay" class="overlay" role="dialog" aria-labelledby="start-card-title">/);
+    assert.match(between(game, 'function focusedDialogButton()', '/** The newest-on-top window stack'), /closest\('dialog, \[role="dialog"\]/);
+    assert.match(game, /const GATED_DIALOG_IDS = new Set\(\[[^\]]*'overlay'\]\);/);
+    assert.doesNotMatch(html, /id="overlay"[^>]*aria-modal/, 'not a window: the stack keeps it apart');
+    // A tutorial box that comes in after the card has focus takes it over from Start exploring.
+    const newxp = read('js/features/newxp-feature.js');
+    assert.match(newxp, /const hadFocus = document\.activeElement === startBtn;\s*startBtn\.hidden = true;/);
+    assert.match(newxp, /if \(hadFocus\) box\.querySelector\('\[data-nx-start\]'\)\?\.focus\(\{ preventScroll: true \}\);/);
+  });
+
+  it('fits the frame: two columns on desktop, one on a phone, scrolling inside itself', () => {
+    const raw = read('style.css');
+    assert.match(raw, /\.start-card \{\n  display: grid;\n  grid-template-columns: minmax\(0, 0\.92fr\) minmax\(0, 1\.2fr\);[\s\S]*?max-height: 100%;\n  overflow-y: auto;/);
+    assert.match(raw, /\[data-ui="modern"\] #overlay \{\n  padding: calc\(var\(--hud-h\) \+ var\(--sp-8\)\) calc\(var\(--sp-8\) \+ var\(--inset-r, 0px\)\) 72px/);
+    assert.match(raw, /\[data-ui="classic"\] #overlay \{ padding-bottom: calc\(var\(--cband-h, calc\(132 \* var\(--cu\)\)\) \+ var\(--sp-6\)\); \}/);
+    assert.match(raw, /\.start-key-open \{ grid-column: 2; grid-row: 1 \/ span 2; \}/);
+    // The Social drawer's inset is measured again once the loading card lifts (it read 0 under it), so the
+    // card centres clear of a drawer open at 1440 px.
+    const drawer = read('js/ui/social-drawer.js');
+    assert.match(drawer, /if \(body\.classList\.contains\('is-booting'\)\) return;\s*uncovered\.disconnect\(\);\s*syncInset\(\);/);
+    const phone = raw.slice(raw.indexOf('@media (max-width: 720px) {\n  #overlay'));
+    assert.match(phone, /\.start-card \{ grid-template-columns: minmax\(0, 1fr\);/);
+    assert.match(phone, /\.start-key-groups \{ grid-template-columns: minmax\(0, 1fr\); \}/);
+  });
+
+  it('online shows the same card', () => {
+    const online = read('play/online/index.html');
+    const oc = online.slice(online.indexOf('<div id="overlay"'), online.indexOf('<!-- The Great Hog Haul'));
+    assert.equal(oc, card);
   });
 });

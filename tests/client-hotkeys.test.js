@@ -75,11 +75,12 @@ describe('G221 client hotkeys', () => {
     const html = read('play/index.html');
     assert.match(html, /title="Buffs \(Y\)">Buffs</);
     assert.match(html, /title="Skills \(K or Shift\+S\)">Skills</);
-    assert.match(html, /<kbd>U<\/kbd> upgrades ·/);
-    assert.match(html, /<kbd>Y<\/kbd> buffs ·/);
-    assert.match(html, /<kbd>C<\/kbd> camera ·/);
-    assert.match(html, /<kbd>Shift<\/kbd>\+<kbd>T<\/kbd> teleport points ·/);
-    assert.doesNotMatch(html, /<kbd>U<\/kbd> buffs|<kbd>C<\/kbd> make|Buffs \(U\)|Making \(C\)/);
+    // STARTCARD (2026-10-31): the welcome card's keys are caps + label rows (tests/start-card.test.js).
+    assert.match(html, /<kbd>U<\/kbd><\/span><span>Upgrades<\/span>/);
+    assert.match(html, /<kbd>Y<\/kbd><\/span><span>Buffs<\/span>/);
+    assert.match(html, /<kbd>C<\/kbd><\/span><span>Camera<\/span>/);
+    assert.match(html, /<kbd>Shift<\/kbd><i>\+<\/i><kbd>T<\/kbd><\/span><span>Teleport points<\/span>/);
+    assert.doesNotMatch(html, /<kbd>U<\/kbd><\/span><span>Buffs|<kbd>C<\/kbd><\/span><span>Make|Buffs \(U\)|Making \(C\)/);
   });
 });
 

@@ -767,6 +767,18 @@ export function mountSocialDrawer({
   }
   layout(true);
   globalThis.addEventListener?.('resize', () => layout(true));
+  // STARTCARD: the loading card hides the drawer (body.is-booting, visibility), so the inset measured
+  // under it is 0; measure again once the game is uncovered, so the start card and the pack centre
+  // clear of a drawer that opens with the window.
+  const body = document.body;
+  if (body?.classList?.contains('is-booting') && typeof MutationObserver === 'function') {
+    const uncovered = new MutationObserver(() => {
+      if (body.classList.contains('is-booting')) return;
+      uncovered.disconnect();
+      syncInset();
+    });
+    uncovered.observe(body, { attributes: true, attributeFilter: ['class'] });
+  }
 
   // The street's name in the input's hint follows the street.
   const streetEl = document.getElementById('street-name');

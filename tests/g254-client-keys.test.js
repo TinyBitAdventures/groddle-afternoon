@@ -269,9 +269,10 @@ describe('G254: game.js wiring', () => {
     const html = read('play/index.html');
     assert.match(html, /href="style\.css\?v=[0-9a-f]{8}"/);
     assert.match(html, /src="game\.js\?v=[0-9a-f]{8}"/);
-    assert.match(html, /<kbd>M<\/kbd> or <kbd>G<\/kbd> map ·/);
-    assert.match(html, /<kbd>Z<\/kbd> player menu ·/);
-    assert.match(html, /hold <kbd>\?<\/kbd> for every key/);
+    // STARTCARD (2026-10-31): the welcome card's keys are caps + label rows (tests/start-card.test.js).
+    assert.match(html, /<kbd>M<\/kbd><i>or<\/i><kbd>G<\/kbd><\/span><span>Map<\/span>/);
+    assert.match(html, /<kbd>Z<\/kbd><\/span><span>Player menu<\/span>/);
+    assert.match(html, /Hold <kbd>\?<\/kbd> for every key/);
     // The modern bar's Map button: its key cap and tooltip (js/ui/topbar.js).
     assert.match(html, /id="map-btn"[^>]*data-sub="G opens it too" data-key="M" aria-label="Map \(M or G\)"/);
   });

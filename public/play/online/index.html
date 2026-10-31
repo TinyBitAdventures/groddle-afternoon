@@ -33,7 +33,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex" />
   <title>Groddle Afternoon · Multiplayer</title>
-    <link rel="stylesheet" href="style.css?v=3e526735" />
+    <link rel="stylesheet" href="style.css?v=6bd8dcc6" />
   <!-- The UI font, self-hosted (style.css @font-face; OFL in assets/fonts/nunito/): the roman latin file, before first paint. -->
   <link rel="preload" href="assets/fonts/nunito/nunito-roman-latin.woff2" as="font" type="font/woff2" crossorigin />
   <!-- The Classic interface (js/classic/ui-mode.js sets <html data-ui="classic">); every rule is scoped to it. -->
@@ -114,8 +114,6 @@
     body:has(#overlay:not(.hidden)) .save-pill { z-index: calc(var(--z-screen) + 1); }
     @media (max-width: 560px) {
       #overlay:not(.hidden) > .card { width: 100%; padding: var(--sp-7) 0.95rem var(--sp-6); font-size: var(--fs-base); line-height: var(--lh-normal); }
-      #overlay:not(.hidden) > .card h2 { font-size: var(--fs-xl); margin-bottom: var(--sp-3); }
-      #overlay:not(.hidden) > .card p { margin: var(--sp-3) 0; }
     }
   </style>
 </head>
@@ -219,33 +217,59 @@
     </header>
 
     <div id="game-root">
-      <div id="overlay" class="overlay">
-        <div class="card">
-          <h2>Welcome to a scrap of Ur</h2>
-          <p>
-            <kbd>A</kbd>/<kbd>D</kbd> move ·
-            tap <kbd>W</kbd>/<kbd>Space</kbd> to jump ·
-            <kbd>↑</kbd> climb ladders ·
-            <kbd>Enter</kbd> verbs ·
-            <kbd>M</kbd> or <kbd>G</kbd> map ·
-            <kbd>Z</kbd> player menu ·
-            <kbd>Q</kbd> quests ·
-            <kbd>B</kbd> badges ·
-            <kbd>H</kbd> feat ·
-            <kbd>K</kbd> or <kbd>Shift</kbd>+<kbd>S</kbd> skills ·
-            <kbd>U</kbd> upgrades ·
-            <kbd>Y</kbd> buffs ·
-            <kbd>C</kbd> camera ·
-            <kbd>Shift</kbd>+<kbd>T</kbd> teleport points ·
-            <kbd>V</kbd> vendor ·
-            hold <kbd>?</kbd> for every key
-          </p>
-          <p class="quest-preview">
-            Gather grain/meat · Make flour &amp; sammiches · land and jump 3× quickly for a Triple Jump.
-            Start on <strong>Hechey Track</strong>.
-          </p>
-          <button id="start-btn" type="button">Start exploring</button>
-          <button id="start-customize-btn" type="button" class="btn-secondary">Customize look first</button>
+      <!-- STARTCARD (Austin 2026-10-31, "the shortcut keys feel lost in the mix"): the title, one line,
+           the actions (newxp puts the tutorial choice in .start-actions for a new save), the goals, then
+           the keys in three short groups, and the fine print. game.js focuses the first action. -->
+      <div id="overlay" class="overlay" role="dialog" aria-labelledby="start-card-title">
+        <div class="card start-card">
+          <div class="start-main">
+            <h2 id="start-card-title">Welcome to a scrap of Ur</h2>
+            <p class="start-lede">Explore the streets, gather what grows and cook up something good.</p>
+            <div class="start-actions">
+              <button id="start-btn" type="button">Start exploring</button>
+              <button id="start-customize-btn" type="button" class="btn-secondary">Customize look first</button>
+            </div>
+            <section class="start-goal" aria-labelledby="start-goal-title">
+              <h3 id="start-goal-title">Today’s goals</h3>
+              <p>Gather grain or meat, make flour and sammiches, and jump again as you land, 3 times, for a Triple Jump. You start on <strong>Hechey Track</strong>.</p>
+            </section>
+          </div>
+          <section class="start-keys" aria-labelledby="start-keys-title">
+            <h3 id="start-keys-title">Keys</h3>
+            <div class="start-key-groups">
+              <div class="start-key-group start-key-move">
+                <h4>Move</h4>
+                <ul>
+                  <li><span class="start-caps"><kbd>A</kbd><kbd>D</kbd></span><span>Walk</span></li>
+                  <li><span class="start-caps"><kbd>W</kbd><i>or</i><kbd>Space</kbd></span><span>Tap to jump</span></li>
+                  <li><span class="start-caps"><kbd title="Up arrow">↑</kbd></span><span>Climb ladders</span></li>
+                  <li><span class="start-caps"><kbd>C</kbd></span><span>Camera</span></li>
+                </ul>
+              </div>
+              <div class="start-key-group start-key-do">
+                <h4>Do</h4>
+                <ul>
+                  <li><span class="start-caps"><kbd>Enter</kbd></span><span>Verbs</span></li>
+                  <li><span class="start-caps"><kbd>Z</kbd></span><span>Player menu</span></li>
+                  <li><span class="start-caps"><kbd>V</kbd></span><span>Vendor</span></li>
+                  <li><span class="start-caps"><kbd>Shift</kbd><i>+</i><kbd>T</kbd></span><span>Teleport points</span></li>
+                </ul>
+              </div>
+              <div class="start-key-group start-key-open">
+                <h4>Open</h4>
+                <ul>
+                  <li><span class="start-caps"><kbd>M</kbd><i>or</i><kbd>G</kbd></span><span>Map</span></li>
+                  <li><span class="start-caps"><kbd>Q</kbd></span><span>Quests</span></li>
+                  <li><span class="start-caps"><kbd>B</kbd></span><span>Badges</span></li>
+                  <li><span class="start-caps"><kbd>H</kbd></span><span>Feat</span></li>
+                  <li><span class="start-caps"><kbd>K</kbd><i>or</i><kbd>Shift</kbd><i>+</i><kbd>S</kbd></span><span>Skills</span></li>
+                  <li><span class="start-caps"><kbd>U</kbd></span><span>Upgrades</span></li>
+                  <li><span class="start-caps"><kbd>Y</kbd></span><span>Buffs</span></li>
+                </ul>
+              </div>
+            </div>
+            <p class="start-keys-foot">Hold <kbd>?</kbd> for every key</p>
+          </section>
           <p class="fine">A <a href="https://tinybitadventures.com">fan remake</a> of Tiny Speck’s Glitch · <a href="credits/">Credits</a> · <a href="privacy-policy/">Privacy</a></p>
         </div>
       </div>
@@ -1018,6 +1042,6 @@
   <!-- Password managers skip the game's own boxes (chat, searches, names); the account forms keep autofill. -->
   <script type="module" src="js/no-autofill.js?v=6a1a4382"></script>
   <!-- game.js loads once the multiplayer save is in memory (js/online-boot.js). -->
-  <script type="module" id="online-boot" src="js/online-boot.js?v=8f6e0097" data-game="game.js?v=8d8fc608"></script>
+  <script type="module" id="online-boot" src="js/online-boot.js?v=8f6e0097" data-game="game.js?v=442ce3ba"></script>
 </body>
 </html>

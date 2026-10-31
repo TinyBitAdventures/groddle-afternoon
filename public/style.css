@@ -1282,13 +1282,6 @@ header .sub {
 .card h2 { margin: 0 0 var(--sp-4); font-size: var(--fs-2xl); }
 .card p { margin: var(--sp-4) 0; }
 
-.quest-preview {
-  background: var(--surface-moss);
-  border-left: 4px solid var(--moss);
-  padding: 0.55rem var(--sp-6);
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-}
-
 kbd {
   display: inline-block;
   padding: 0.05rem var(--sp-3);
@@ -1297,23 +1290,6 @@ kbd {
   background: var(--c-cream-96);
   font-size: 0.85em;
 }
-
-#start-btn {
-  margin-top: var(--sp-6);
-  width: 100%;
-  border: 0;
-  border-radius: var(--radius-lg);
-  padding: 0.7rem var(--sp-8);
-  font-size: var(--fs-lg);
-  font-weight: 700;
-  color: var(--text-inverse);
-  background: linear-gradient(180deg, var(--c-orange-76), var(--c-orange-68));
-  cursor: pointer;
-  box-shadow: 0 3px 0 var(--c-orange-57);
-}
-
-#start-btn:hover { filter: brightness(1.05); }
-#start-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--c-orange-57); }
 
 .fine {
   margin-top: var(--sp-7) !important;
@@ -1326,6 +1302,136 @@ kbd {
 .fine a:visited { color: var(--text-moss); text-decoration-color: var(--border-moss); text-underline-offset: 0.15em; }
 .fine a:hover,
 .fine a:focus-visible { color: var(--c-green-34); text-decoration-color: currentColor; }
+
+/* STARTCARD (Austin 2026-10-31: "the shortcut keys feel lost in the mix"): the start card is the title, one
+   line, the actions, the goals, the keys in three headed groups beside them, and the fine print. It sits
+   inside the game frame with a gutter and scrolls inside itself when the frame is short. */
+#overlay { padding: var(--sp-8); box-sizing: border-box; }
+/* Modern: clear of the top bar and the pack, which float over the frame (solo; online the card is over them),
+   and centred in the width an open Social drawer leaves (--inset-r, as the quest HUDs). */
+[data-ui="modern"] #overlay {
+  padding: calc(var(--hud-h) + var(--sp-8)) calc(var(--sp-8) + var(--inset-r, 0px)) 72px calc(var(--sp-8) + var(--inset-l, 0px));
+}
+/* Classic: clear of the pack band at the world's foot (classic.css #game-root::after), which is over the world. */
+[data-ui="classic"] #overlay { padding-bottom: calc(var(--cband-h, calc(132 * var(--cu))) + var(--sp-6)); }
+.start-card {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.2fr);
+  column-gap: var(--sp-12);
+  align-items: start;
+  width: min(900px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
+  padding: var(--sp-12);
+  color: var(--text);
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+}
+.start-card h2 { margin: 0; font-size: var(--fs-4xl); font-weight: var(--fw-heavy); line-height: var(--lh-tight); }
+.start-card .start-lede { margin: var(--sp-3) 0 var(--sp-10); color: var(--text-muted); font-size: var(--fs-lg); }
+.start-card h3 { margin: 0 0 var(--sp-4); color: var(--text-muted); font-size: var(--fs-sm); font-weight: var(--fw-heavy); letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* The actions: Start exploring, or newxp's tutorial choice (Start with the tutorial, Skip to Ur and its note)
+   with Customize look first beside Skip to Ur. */
+.start-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); }
+.start-actions > *,
+.start-actions .nx-start p { grid-column: 1 / -1; }
+.start-actions :is(.nx-start, .nx-start-row) { display: contents; }
+.start-actions [data-nx-start] { grid-column: 1 / -1; grid-row: 1; }
+.start-actions [data-nx-skipstart] { grid-column: 1; grid-row: 2; }
+.start-actions:has([data-nx-skipstart]) #start-customize-btn { grid-column: 2; grid-row: 2; }
+.start-actions .nx-start p { grid-row: 3; margin: var(--sp-1) 0 0; color: var(--text-muted); font-size: var(--fs-md); line-height: var(--lh-snug); }
+.start-actions .nx-start p strong { color: var(--text); }
+#start-btn,
+.start-actions [data-nx-start] {
+  margin: 0;
+  width: 100%;
+  border: 0;
+  border-radius: var(--radius-lg);
+  padding: 0.7rem var(--sp-8);
+  font: var(--fw-bold) var(--fs-lg)/var(--lh-snug) var(--font-ui);
+  color: var(--text-inverse);
+  background: linear-gradient(180deg, var(--c-orange-76), var(--c-orange-68));
+  cursor: pointer;
+  box-shadow: 0 3px 0 var(--c-orange-57);
+}
+#start-btn:hover,
+.start-actions [data-nx-start]:hover { filter: brightness(1.05); }
+#start-btn:active,
+.start-actions [data-nx-start]:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--c-orange-57); }
+#start-customize-btn,
+.start-actions [data-nx-skipstart] {
+  margin: 0;
+  width: 100%;
+  padding: var(--sp-4) var(--sp-6);
+  border: 1px solid var(--border-moss);
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--text-moss);
+  font: var(--fw-bold) var(--fs-base)/var(--lh-snug) var(--font-ui);
+  box-shadow: none;
+  cursor: pointer;
+}
+#start-customize-btn:hover,
+.start-actions [data-nx-skipstart]:hover { background: var(--surface-moss); }
+.start-card :is(button, a):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* The goals: one labelled box, quieter than the keys. */
+.start-goal { margin-top: var(--sp-10); padding: var(--sp-5) var(--sp-6); border-radius: var(--radius-lg); background: var(--surface-moss); }
+.start-goal h3 { margin-bottom: var(--sp-2); color: var(--text-moss); }
+.start-goal p { margin: 0; font-size: var(--fs-md); line-height: var(--lh-snug); }
+
+/* The keys: keycap + label rows in three headed groups (Move and Do in one column, Open in the other). */
+.start-keys { padding: var(--sp-9) var(--sp-10) var(--sp-8); border-radius: var(--radius-xl); background: var(--surface-parchment); }
+.start-key-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--sp-10); row-gap: var(--sp-8); }
+.start-key-move { grid-column: 1; grid-row: 1; }
+.start-key-do { grid-column: 1; grid-row: 2; }
+.start-key-open { grid-column: 2; grid-row: 1 / span 2; }
+.start-key-group h4 { margin: 0 0 var(--sp-3); color: var(--text-moss); font-size: var(--fs-md); font-weight: var(--fw-heavy); }
+.start-key-group ul { display: grid; grid-template-columns: minmax(5.5rem, max-content) minmax(0, 1fr); column-gap: var(--sp-5); row-gap: var(--sp-3); margin: 0; padding: 0; list-style: none; }
+.start-key-group li { display: grid; grid-column: 1 / -1; grid-template-columns: subgrid; align-items: center; font-size: var(--fs-md); line-height: var(--lh-snug); }
+/* The caps right-aligned in their column, so every label starts on one line beside its keys. */
+.start-caps { display: inline-flex; align-items: center; justify-self: end; gap: var(--sp-1); white-space: nowrap; }
+.start-caps i { color: var(--text-muted); font-size: var(--fs-xs); font-style: normal; font-weight: var(--fw-bold); }
+/* Keycaps: the modern skin's .kcap (sunken paper, strong border), a size up for a card that teaches them. */
+.start-card kbd {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-bright);
+  color: var(--text);
+  font: var(--fw-heavy) var(--fs-sm)/var(--lh-none) var(--font-ui);
+}
+.start-card .start-keys-foot { margin: var(--sp-8) 0 0; padding-top: var(--sp-6); border-top: 1px solid var(--border); color: var(--text-muted); font-size: var(--fs-md); }
+.start-card .fine { grid-column: 1 / -1; margin: var(--sp-10) 0 0 !important; text-align: center; }
+
+/* Phone and narrow frames: one column, every action full width, the groups one under another. */
+@media (max-width: 720px) {
+  #overlay { padding: var(--sp-4); }
+  /* The nameplate drops under the top bar on a narrow frame. */
+  [data-ui="modern"] #overlay { padding: calc(var(--hud-h) * 2 + var(--sp-6)) var(--sp-4) 72px; }
+  .start-card { grid-template-columns: minmax(0, 1fr); padding: var(--sp-10) var(--sp-8); }
+  .start-card h2 { font-size: var(--fs-3xl); }
+  .start-card .start-lede { margin-bottom: var(--sp-8); font-size: var(--fs-base); }
+  .start-goal { margin: var(--sp-8) 0; }
+  .start-keys { padding: var(--sp-8); }
+  .start-key-groups { grid-template-columns: minmax(0, 1fr); }
+  :is(.start-key-move, .start-key-do, .start-key-open) { grid-column: 1; grid-row: auto; }
+}
+@media (max-width: 420px) {
+  .start-actions { grid-template-columns: minmax(0, 1fr); }
+  .start-actions [data-nx-skipstart],
+  .start-actions:has([data-nx-skipstart]) #start-customize-btn { grid-column: 1; grid-row: auto; }
+  .start-actions .nx-start p { grid-row: auto; order: 1; }
+}
 
 #hud {
   display: grid;

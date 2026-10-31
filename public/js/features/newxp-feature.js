@@ -247,7 +247,7 @@ const CSS = `
 .nx-bubble::after{content:"";position:absolute;left:50%;bottom:-8px;margin-left:-8px;border:8px solid transparent;border-bottom:0;border-top-color:var(--c-white)}
 .nx-bubble .nx-who{display:block;font-size:var(--fs-xs);color:var(--c-sand-60);margin-bottom:var(--sp-1);text-transform:uppercase;letter-spacing:.06em}
 .nx-bubble .nx-btns{display:flex;gap:var(--sp-3);justify-content:center;margin-top:7px;flex-wrap:wrap}
-.nx-bubble button,.nx-card button,.nx-pill button,.nx-start button{font:800 var(--fs-sm) var(--font-round);border:0;border-radius:var(--radius-sm);padding:5px var(--sp-6);cursor:pointer;
+.nx-bubble button,.nx-card button,.nx-pill button{font:800 var(--fs-sm) var(--font-round);border:0;border-radius:var(--radius-sm);padding:5px var(--sp-6);cursor:pointer;
   background:linear-gradient(var(--c-gold-90),var(--c-gold-81e));color:var(--c-umber-38);box-shadow:0 2px 0 var(--c-gold-70)}
 .nx-bubble button.alt{background:var(--c-grey-94);color:var(--c-grey-45);box-shadow:0 2px 0 var(--c-grey-84)}
 .nx-bubble input{font:inherit;width:100%;box-sizing:border-box;margin-top:var(--sp-3);padding:5px 7px;border:1px solid var(--border-strong);border-radius:var(--radius-sm)}
@@ -281,10 +281,8 @@ body:has(.nx-card:not([hidden])) .nx-instr{visibility:hidden}
   font:800 var(--fs-sm) var(--font-round);color:var(--c-mauve-40);box-shadow:var(--shadow-2)}
 .nx-pill button{background:var(--surface-lilac);color:var(--c-mauve-40);box-shadow:none;padding:3px var(--sp-5);border-radius:var(--radius-pill)}
 .nx-fade{position:fixed;z-index:calc(var(--z-notice) + 13);background:var(--c-black);opacity:0;pointer-events:none;transition:opacity .35s}
-.nx-start{margin:var(--sp-5) 0 var(--sp-3);padding:var(--sp-5) var(--sp-6);border-radius:var(--radius-xl);background:var(--surface-moss);border:1px solid var(--c-lime-88);text-align:center}
-.nx-start p{margin:0 0 var(--sp-4);font-size:var(--fs-md)}
-.nx-start .nx-start-row{display:flex;gap:var(--sp-4);justify-content:center;flex-wrap:wrap}
-.nx-start button.alt{background:var(--surface-bright);color:var(--c-lime-44);box-shadow:0 2px 0 var(--c-lime-88)}
+/* STARTCARD: the tutorial choice (.nx-start) is the start card's actions: its buttons, row and note are laid
+   out and drawn with Start exploring and Customize look first in style.css (.start-actions). */
 body.nx-hide-meta .metabolics-cluster>:not(.meta-pill),body.nx-hide-energy .meta-pill.energy,body.nx-hide-mood .meta-pill.mood{visibility:hidden}
 body.nx-hide-pack #pack-bar{visibility:hidden}
 body.nx-hide-map #map-btn,body.nx-hide-map #street-nameplate,body.nx-hide-currants .meta-stat.currants{visibility:hidden}
@@ -3379,33 +3377,40 @@ function showStartCard(engine) {
   ensureUi();
   startCardShown = true;
   const box = el('div', { class: 'nx-start', id: 'newxp-start' }, '');
+  // STARTCARD: the card focuses its first action as it appears (game.js focusStartCard); a box that
+  // comes in after that takes the focus over from Start exploring.
+  const hadFocus = document.activeElement === startBtn;
   startBtn.hidden = true;
   startBtn.parentNode.insertBefore(box, startBtn);
   const tutorialChoice = () => {
     box.dataset.step = 'tutorial';
     // Multiplayer: every new player went through the tutorial (players/player.js onCreate
     // 1238-1239 goToNewNewStartingLevel; skipping was only a testing flag), so there is no Skip to Ur.
+    const focusStart = () => {
+      if (hadFocus) box.querySelector('[data-nx-start]')?.focus({ preventScroll: true });
+    };
     if (engine.mode === 'multiplayer') {
       box.innerHTML = `
-    <p><strong>Welcome to Ur.</strong> Every new Glitch starts in the clouds: meet the Welcoming Flamingo,
-      the Dustbunny and your Magic Rock, then find your way off Gentle Island.</p>
     <div class="nx-start-row">
       <button type="button" data-nx-start>Start</button>
-    </div>`;
+    </div>
+    <p><strong>Welcome to Ur.</strong> Every new player starts in the clouds: meet the Welcoming Flamingo,
+      the Dustbunny and your Magic Rock, then find your way off Gentle Island.</p>`;
       box.querySelector('[data-nx-start]').addEventListener('click', () => {
         pendingStage = 'clouds';
         startBtn.click();
       });
       engine.setData('newxpStartCard', 'tutorial-only');
+      focusStart();
       return;
     }
     box.innerHTML = `
-    <p><strong>New to Ur?</strong> Fall out of the clouds and meet the Welcoming Flamingo,
-      the Dustbunny and your Magic Rock, then find your way off Gentle Island.</p>
     <div class="nx-start-row">
       <button type="button" data-nx-start>Start with the tutorial</button>
       <button type="button" class="alt" data-nx-skipstart>Skip to Ur</button>
-    </div>`;
+    </div>
+    <p><strong>New to Ur?</strong> Fall out of the clouds and meet the Welcoming Flamingo,
+      the Dustbunny and your Magic Rock, then find your way off Gentle Island.</p>`;
     box.querySelector('[data-nx-start]').addEventListener('click', () => {
       // Austin 2026-10-28: a brand-new solo game that takes the tutorial starts as a new
       // multiplayer character does, from zero (game.js startAsNewPlayer, js/new-player.js;
@@ -3429,6 +3434,7 @@ function showStartCard(engine) {
       pendingStage = 'clouds';
     }, { capture: true, once: true });
     engine.setData('newxpStartCard', 'shown');
+    focusStart();
   };
   // Solo or multiplayer is chosen before the game, on the Play page (/play/online/: sign in, or
   // Play solo; Austin 2026-10-26), so a new solo game goes straight to the tutorial choice.

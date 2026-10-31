@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=20b826eb';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e102fee3';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1d54432d';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -895,7 +895,7 @@ import { denseSprite } from './js/sprite-dense.js?v=8e0109eb';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=d85330ff';
 import { mountNotifyView } from './js/notify-view.js?v=81d06119';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=5802b41c';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=bee1328e';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=3309a3d9';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=2a704f05';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=e2899b11';
@@ -2763,6 +2763,15 @@ function releaseStartLookHold() {
   if (app?.canvas) app.canvas.dataset.startLookHold = 'released';
   releaseStartWaiters();
   promptStack?.flush();
+}
+
+/**
+ * STARTCARD: the card's first action has focus as it appears, so Enter or Space presses it: newxp's
+ * Start with the tutorial (or Start, online) on a new save, else Start exploring. #overlay is a
+ * [role="dialog"], so focusedDialogButton() leaves those keys to the button (no jump queued).
+ */
+function focusStartCard() {
+  document.querySelector('#overlay:not(.hidden) :is([data-nx-start], #start-btn:not([hidden]))')?.focus({ preventScroll: true });
 }
 
 /** A visible element by id (not [hidden]). */
@@ -27906,7 +27915,10 @@ async function main() {
       show: (mode) => {
         startOverlay.classList.toggle('is-calm', mode === 'calm');
         endBoot({ fade: true });
-        requestAnimationFrame(() => startOverlay.classList.remove('is-waiting'));
+        requestAnimationFrame(() => {
+          startOverlay.classList.remove('is-waiting');
+          focusStartCard();
+        });
         noteBackdrop(mode);
       },
       clear: () => {
