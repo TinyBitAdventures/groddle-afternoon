@@ -9790,7 +9790,12 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #game-root .side-panel { top: calc(var(--hud-h) + var(--space-3)); }
 [data-ui="modern"] #game-root .hog-haul-hud,
 [data-ui="modern"] #game-root .play-context { top: calc(var(--hud-h) + var(--space-3)); }
-[data-ui="modern"] #game-root .route-gps { top: calc(var(--hud-h) + var(--space-3)); right: var(--hud-inset); }
+/* The route card sits left of the Social drawer (its rail, or the open drawer): --inset-r. */
+[data-ui="modern"] #game-root .route-gps {
+  top: calc(var(--hud-h) + var(--space-3));
+  right: max(var(--hud-inset), var(--inset-r));
+  max-width: calc(100% - var(--inset-r) - var(--hud-inset) * 2);
+}
 @media (max-width: 1100px) {
   [data-ui="modern"] .street-nameplate .season-chip span { display: none; }
   [data-ui="modern"] .street-nameplate .season-chip { padding-right: 0.2rem; }
