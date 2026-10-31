@@ -11791,6 +11791,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   width: max-content; max-width: 16rem; margin: 0; white-space: pre-line; pointer-events: none;
   font-size: var(--fs-sm); line-height: var(--lh-tight);
 }
+/* The tip hangs below the card, where the route card and other HUD cards sit at the same z: lift
+   the whole map a step while a tip shows (the tip's own z only counts inside the map). */
+.street-minimap:has(.smm-tip:not([hidden])) { z-index: calc(var(--z-hud) + 1); }
 @media (prefers-reduced-motion: reduce) {
   .street-minimap .smm-tab img { transition: none; }
 }

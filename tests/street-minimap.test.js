@@ -385,4 +385,8 @@ describe('street map: placement', () => {
   it('registered as a feature', () => {
     assert.match(read('public/js/features/index.js'), /streetMinimapFeature,\n\];/);
   });
+
+  it('a showing tip lifts the map over the route card and other HUD cards below it', () => {
+    assert.match(read('public/style.css'), /\.street-minimap:has\(\.smm-tip:not\(\[hidden\]\)\) \{ z-index: calc\(var\(--z-hud\) \+ 1\); \}/);
+  });
 });
