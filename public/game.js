@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e2372a6b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=bd70c606';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d08b4e35';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -603,7 +603,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=1949ea5c';
+} from './js/street-render.js?v=6defedeb';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -691,6 +691,7 @@ import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=587c0
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction } from './js/world-zoom.js?v=b5f4748a';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=917a2caa';
+import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=22d73edf';
 import './js/classic/classic-zoom.js?v=7a25123e';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=972868f3';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
@@ -864,7 +865,7 @@ import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from '.
 import { installHiresIcons } from './js/icon-hires.js?v=5357d4b4';
 import { installHiresDecos } from './js/deco-hires.js?v=a65f2d79';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=e56202ee';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=19ec7dc0';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=1fa36eba';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=5919dfde';
@@ -879,7 +880,7 @@ import { createQuestTracker } from './js/ui/quest-tracker.js?v=e2899b11';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=e9d100c3';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=b45e776c';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=0eeb8604';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=01a295a1';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d51e';
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=628fa0b4';
@@ -895,7 +896,7 @@ import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?
 import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=3785ed7a';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=1c6068d6';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -1373,11 +1374,17 @@ function shownElement(node) {
  * pack's search (js/ui/pack-row.js), not while Gentle Island hides the pack.
  *
  * Comma is Preferences (js/classic/classic-prefs.js, both skins). Left out, with
- * nothing behind them here: I Info-getting Mode (iKeyHandler 870-891), Shift+M the chat
- * map's minimap tab (shiftMKeyHandler 925-940). F stays the remake's apple.
+ * nothing behind them here: I Info-getting Mode (iKeyHandler 870-891). Shift+M shows or
+ * hides the street map (G370). F stays the remake's apple.
  */
 function clientShortcutKey(e) {
   const action = clientKeyAction(e);
+  // Shift+M: the street map (G370, js/ui/street-minimap.js), on or off. The client's Shift+M
+  // showed the chat column's map tab (shiftMKeyHandler 925-940), whose map this is.
+  if (action === 'street-map') {
+    if (!e.repeat) toggleStreetMap();
+    return true;
+  }
   if (action === 'pack-search') {
     if (document.body.classList.contains('nx-hide-pack') || !shownElement(document.getElementById('pack-bar'))) return false;
     // The key must not type itself into the field it focuses.
@@ -10390,6 +10397,10 @@ const engine = {
   /** The Pixi stage, for screen-space layers above the world. */
   get stage() {
     return app?.stage || null;
+  },
+  /** The Pixi renderer (MINIMAP: the street map's snapshot of the street, js/ui/street-minimap.js). */
+  get renderer() {
+    return app?.renderer || null;
   },
   /**
    * The view as the player sees it (the stage inside the location's view),
@@ -27375,6 +27386,7 @@ async function main() {
     audio: { levels: () => ({ ...audioLevels }), setLevel: setAudioLevel },
     zoom: { get: worldZoom, set: setWorldZoom, onChange: onZoomChange },
     nightTint,
+    streetMap: streetMapSetting,
     onImagination: () => (modernUi() && imaginationHub ? imaginationHub.toggle() : document.getElementById('img-btn')?.click()),
     onMail: () => { if (state.started) openMailboxPanel(); },
     onPlayerCard: () => document.getElementById('player-menu-btn')?.click(),

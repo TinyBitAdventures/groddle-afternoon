@@ -572,6 +572,14 @@ export const realtimeFeature = {
     return session ? session.speechTargets() : null;
   },
 
+  /** MINIMAP (G370): the other players drawn on this street, for the street map's dots. */
+  minimapPlayers() {
+    if (!session) return null;
+    return [...session.remotes.values()]
+      .filter((r) => r.root && !r.root.destroyed && r.root.visible !== false)
+      .map((r) => ({ id: r.id, label: r.name, x: r.root.x, y: r.root.y }));
+  },
+
   /** /who: the other players on this street. */
   remotePlayerNames() {
     return session ? session.client.players.map((p) => p.name) : null;

@@ -4,7 +4,8 @@
  * (brightness, contrast, saturation, tintColor, tintAmount, blur), and the
  * location's sky `gradient` (top, bottom), its `music_file` override, plus each
  * deco's `h_flip`, `hidden` and `animated` flags, each layer's `is_hidden` (as `hidden`), and
- * each platform line's `platform_item_perm` (as `item_perm`).
+ * each platform line's `platform_item_perm` (as `item_perm`), and the location's
+ * `no_map` / `fog_map` flags (as `noMap` / `fogMap`).
  * Source: tinyspeck/glitch-locations (CC0). Edits assets/streets/*.json in place; safe to re-run.
  *
  * `animated`: the client plays a placed deco's timeline only when the placement says so
@@ -18,6 +19,12 @@
  * line carries one (an `<int>` or `<null>`); a line without one would be solid both ways in
  * the client (an unset `*` field compares unequal to 0 and 1), so it is left off here too.
  * js/street-model.js isItemSolid reads it.
+ *
+ * `noMap` / `fogMap` (G370, js/ui/street-minimap.js): Location.as 61-63 `no_map` hides the street
+ * map entirely (show_map is false, TSFrontController.changeMiniMapVisibility); `fog_map` keeps it
+ * but covers the picture with a 70% black wash and "No map: You're on your own" (MiniMapView.as
+ * addGraphic 330-337). 65 archived streets set no_map (towers, basements, tutorial scenes), 2
+ * set fog_map (The Drop, The Other Drop). Only `true` is written.
  *
  * Run from spike root:
  *   node build-street-layers.mjs           (write)
@@ -143,6 +150,8 @@ const itemPermCounts = new Map();
 const stale = [];
 let filtered = 0;
 let gradients = 0;
+let noMaps = 0;
+let fogMaps = 0;
 for (const file of files) {
   const path = join(streetsDir, file);
   const street = JSON.parse(await readFile(path, 'utf8'));
@@ -163,6 +172,15 @@ for (const file of files) {
   const music = xml.match(/<str id="music_file">([^<]+)<\/str>/)?.[1]?.trim();
   if (music) street.musicFile = music;
   else delete street.musicFile;
+
+  // G370: the street map's own flags (only the location's top-level bools).
+  const topBool = (id) => new RegExp(`\\n\\t{2}<bool id="${id}">true</bool>`).test(xml);
+  if (topBool('no_map')) street.noMap = true;
+  else delete street.noMap;
+  if (topBool('fog_map')) street.fogMap = true;
+  else delete street.fogMap;
+  if (street.noMap) noMaps += 1;
+  if (street.fogMap) fogMaps += 1;
 
   const gradientAt = xml.indexOf('<object id="gradient">');
   if (gradientAt >= 0) {
@@ -256,7 +274,8 @@ for (const file of files) {
 console.log(
   `${CHECK ? 'Checked' : 'Updated'} ${updated} streets: ${gradients} gradients, ${filtered} filtered layers, ` +
     `${flipped} flipped decos, ${hiddenDecos} hidden decos, ${animatedDecos} animated decos, ${hiddenLayers} hidden layers, ` +
-    `${itemPerms} line item perms (${['-1', '0', '1', 'null'].map((k) => `${k}: ${itemPermCounts.get(k) || 0}`).join(', ')}).`
+    `${itemPerms} line item perms (${['-1', '0', '1', 'null'].map((k) => `${k}: ${itemPermCounts.get(k) || 0}`).join(', ')}), ` +
+    `${noMaps} no_map, ${fogMaps} fog_map.`
 );
 if (CHECK && stale.length) {
   console.log(`${stale.length} street files are stale (run node build-street-layers.mjs): ${stale.slice(0, 8).join(', ')}`);

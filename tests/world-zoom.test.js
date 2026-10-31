@@ -23,7 +23,7 @@ import {
 import { stageFor, ORIGINAL_VIEW_W, ORIGINAL_VIEW_H, LOCATION_VIEW_W, VIEW_FLOOR_H, MIN_PACK_HEIGHT } from '../public/js/location-view.js?v=5a0d5c0b';
 import { classicLayout, classicScale, classicZoomScale, chromeWidth, railFor } from '../public/js/classic/classic-layout.js?v=299eef68';
 import { classicZoomVar } from '../public/js/classic/classic-zoom.js?v=7a25123e';
-import { hotkeySections, clientKeyAction } from '../public/js/client-hotkeys.js?v=b45e776c';
+import { hotkeySections, clientKeyAction } from '../public/js/client-hotkeys.js?v=0eeb8604';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => fs.readFileSync(path.join(root, 'public', rel), 'utf8');

@@ -28,7 +28,8 @@ export const CLIENT_KEY_TABLE = Object.freeze([
   { key: 'Shift+F', handler: 'shiftFKeyHandler', action: 'pack-search' },
   { key: '`', handler: 'shiftFKeyHandler', action: 'pack-search' },
   { key: 'Shift+K', handler: 'shiftKKeyHandler', action: 'keyring' },
-  { key: 'Shift+M', handler: 'shiftMKeyHandler', action: null, why: 'no chat map (the right-hand minimap tab)' },
+  // G370: the client's Shift+M showed the chat column's map tab; here it shows or hides the street map.
+  { key: 'Shift+M', handler: 'shiftMKeyHandler', action: 'street-map' },
   { key: 'Shift+/', handler: 'shiftSlashKeyHandler', action: 'hotkeys' },
   { key: 'I', handler: 'iKeyHandler', action: null, why: 'no info mode' },
   { key: 'Z', handler: 'zKeyHandler', action: 'player-menu' },
@@ -39,7 +40,7 @@ export const CLIENT_KEY_TABLE = Object.freeze([
  * The remake's answer to a keydown, or null. Ctrl, Alt and Cmd combinations are
  * the browser's (Cmd+, Cmd+Z), never the game's.
  * @param {{ key: string, code?: string, shiftKey?: boolean, ctrlKey?: boolean, altKey?: boolean, metaKey?: boolean }} e
- * @returns {'map'|'player-menu'|'looks'|'keyring'|'decorate'|'hotkeys'|'pack-search'|'preferences'|null}
+ * @returns {'map'|'player-menu'|'looks'|'keyring'|'decorate'|'hotkeys'|'pack-search'|'preferences'|'street-map'|null}
  */
 export function clientKeyAction(e) {
   if (!e || e.metaKey || e.ctrlKey || e.altKey) return null;
@@ -55,6 +56,7 @@ export function clientKeyAction(e) {
     return null;
   }
   if (k === 'l') return 'looks';
+  if (k === 'm') return 'street-map';
   if (k === 'k') return 'keyring';
   if (k === 'd') return 'decorate';
   if (k === 'f') return 'pack-search';
@@ -99,6 +101,7 @@ export function hotkeySections({ keyring = false, hub = false } = {}) {
       title: 'Interface',
       rows: [
         ['Show Map', [['M'], ['G']]],
+        ['Street Map', [['Shift', 'M']]],
         ['Teleport', [['Shift', 'T']]],
         ...(keyring ? [['Key Ring', [['Shift', 'K']]]] : []),
         ['Inventory Search', [['Shift', 'F'], ['`']]],

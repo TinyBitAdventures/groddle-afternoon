@@ -1,5 +1,5 @@
 {
-  "about": "The Classic interface's chrome art: Tiny Speck's CC0 glitch-client (TSEngineAssets/src/assets), rendered by tools/classic-art/build.mjs into public/assets/classic/. copy: PNGs shipped byte for byte (1x, the browser scales them). reuse: art the remake already ships, verified against the same source and not copied again. svg: vector symbols exported with FFDec (sprite: one DefineSprite by id; frame: one stage frame; strip: every stage frame side by side). Left out on purpose: the logo (logo_glitch.png, glitch_logo.swf), the 2011 slot and mood art, hotkeys.png (the sheet is redrawn as text), the minimap, the daily-limits calendar, staff badges, the hub map buttons and the speech bubbles (they stay in Pixi).",
+  "about": "The Classic interface's chrome art: Tiny Speck's CC0 glitch-client (TSEngineAssets/src/assets), rendered by tools/classic-art/build.mjs into public/assets/classic/. copy: PNGs shipped byte for byte (1x, the browser scales them). reuse: art the remake already ships, verified against the same source and not copied again. svg: vector symbols exported with FFDec (sprite: one DefineSprite by id; frame: one stage frame; strip: every stage frame side by side). Left out on purpose: the logo (logo_glitch.png, glitch_logo.swf), the 2011 slot and mood art, hotkeys.png (the sheet is redrawn as text), the daily-limits calendar, staff badges, the hub map buttons and the speech bubbles (they stay in Pixi).",
   "copy": [
     { "name": "imagination_button_down", "src": "graphics/imagination_button_down.png", "use": "iMG button while its menu is open (ImaginationButton.as)" },
     { "name": "imagination_button_clouds", "src": "graphics/imagination_button_clouds.png", "use": "cloud puff left of the iMG button" },
@@ -19,6 +19,8 @@
     { "name": "cb_checked", "src": "graphics/cb_checked.png", "use": "checkboxes, checked" },
     { "name": "map_icon", "src": "graphics/map_icon.png", "use": "Current location map button" },
     { "name": "map_icon_hover", "src": "graphics/map_icon_hover.png", "use": "Current location map button, hover" },
+    { "name": "map_expand_arrow", "src": "graphics/map_expand_arrow.png", "use": "Street map expand tab (MiniMapView.as 285-296)" },
+    { "name": "teensy_signpost", "src": "graphics/teensy_signpost.png", "use": "Street map signposts (MiniMapView.as maybeAddSignpost 410)" },
     { "name": "currants_icon", "src": "graphics/currants_icon.png", "use": "currants counter" },
     { "name": "buff_bang_white", "src": "graphics/buff_bang_white.png", "use": "debuff mark in a buff ring" },
     { "name": "chat_divider", "src": "graphics/chat_divider.png", "use": "pane divider grip" },

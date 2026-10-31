@@ -199,6 +199,11 @@ export const cameraModeFeature = {
     return active ? { speed: 0, jump: 0 } : null;
   },
 
+  /** MINIMAP (G370): the street map stays out of Camera Mode's picture. */
+  cameraModeActive() {
+    return active ? true : null;
+  },
+
   onTick(dtMs, now, engine) {
     if (!active) return;
     // Anything that takes over the screen ends Camera Mode.

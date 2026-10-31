@@ -9,8 +9,8 @@
  * menu), Shift+L (looks), Shift+K (multiplayer keyring), Shift+D (decorate where
  * you can), Shift+F and backquote (the pack's search, phase 2) and holding ? (the
  * hotkey sheet, view/ui/Hotkeys.as + hotkeys.png) and comma (Preferences,
- * js/classic/classic-prefs.js); I and Shift+M have no
- * panel here and stay unbound.
+ * js/classic/classic-prefs.js) and Shift+M (the street map, G370). I has no
+ * panel here and stays unbound.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -29,7 +29,7 @@ import {
   hotkeyText,
   isHotkeySheetRelease,
   isPlainKey,
-} from '../public/js/client-hotkeys.js?v=b45e776c';
+} from '../public/js/client-hotkeys.js?v=0eeb8604';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(here, '../public');
@@ -112,7 +112,8 @@ describe('G254: clientKeyAction', () => {
       [key(','), 'preferences'], [key('i'), null],
       [key('`'), 'pack-search'], [key('F', { shiftKey: true }), 'pack-search'],
       [key('f'), null], [key('~', { shiftKey: true, code: 'Backquote' }), null],
-      [key('M', { shiftKey: true }), null],
+      // G370: Shift+M shows or hides the street map (the client's chat-column map tab).
+      [key('M', { shiftKey: true }), 'street-map'],
       [key('Z', { shiftKey: true }), null],
       [key('l'), null], [key('k'), null], [key('d'), null],
     ];
@@ -162,7 +163,8 @@ describe('G254: the hotkey sheet lists only keys the remake answers', () => {
     // ZOOM: the remake answers the client's zoom keys now (TSFrontController.as startListeningToZoomKeys
     // 3181-3192: 0, minus, equal), with its own world zoom (js/world-zoom.js).
     assert.ok(solo.includes('Zoom In: =') && solo.includes('Zoom Out: -') && solo.includes('Zoom to Original: 0'));
-    for (const gone of [/Info-getting/, /Shift\+M/, /\bI\b$/m]) {
+    assert.ok(solo.includes('Street Map: Shift+M'), 'G370: the street map on Shift+M');
+    for (const gone of [/Info-getting/, /\bI\b$/m]) {
       assert.doesNotMatch(all, gone);
     }
     assert.doesNotMatch(all, /—/, 'no em-dashes in player copy');

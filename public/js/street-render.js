@@ -1661,6 +1661,9 @@ export function buildStreetView(street, PIXI, opts = {}) {
   root.frontLayers = layerContainers.filter((lc) => lc.inFront).map((lc) => lc.label);
   root.decoViews = decoViews;
   root.parallaxLayers = layerContainers.filter((lc) => lc.parallaxLayer);
+  // MINIMAP (G370, js/ui/street-minimap.js snapshotStreetView): every layer, and the sky it leaves out.
+  root.layerContainers = layerContainers;
+  root.skyView = skyView;
   // The client filters the whole middleground plane, so avatars and items on
   // it share the decos' treatment (Hell One's greyscale Glitches).
   const middleground = (street.layers || []).find((layer) => layer.id === 'middleground');

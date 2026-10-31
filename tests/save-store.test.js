@@ -523,8 +523,9 @@ describe('every save read and write goes through the store', () => {
   // ui/social-drawer.js remembers whether the player keeps the Social drawer open or as the rail, a device preference;
   // js/classic/ui-mode.js keeps the interface (Modern or Classic) and its window size, a device preference;
   // js/world-zoom.js keeps the world zoom (Wide to Original), a device preference;
-  // js/night-tint.js keeps whether the world darkens with the game clock, a device preference.
-  const ALLOWED = new Set(['js/save-store.js', 'js/practice-mode.js', 'js/audio-pref.js', 'js/online-boot.js', 'js/features/groups-feature.js', 'js/ui/social-drawer.js', 'js/classic/ui-mode.js', 'js/world-zoom.js', 'js/night-tint.js']);
+  // js/night-tint.js keeps whether the world darkens with the game clock, a device preference;
+  // js/ui/street-minimap.js keeps whether the street map shows (G370), a device preference.
+  const ALLOWED = new Set(['js/save-store.js', 'js/practice-mode.js', 'js/audio-pref.js', 'js/online-boot.js', 'js/features/groups-feature.js', 'js/ui/social-drawer.js', 'js/classic/ui-mode.js', 'js/world-zoom.js', 'js/night-tint.js', 'js/ui/street-minimap.js']);
 
   it('game.js and js/ make no direct localStorage or sessionStorage calls', () => {
     const offenders = [];

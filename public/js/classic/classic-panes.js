@@ -22,7 +22,7 @@
  * Everything here shows only under Classic (inline display, so Modern is untouched).
  */
 import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=587c014a';
-import { classicArtUrl } from './classic-art.js?v=d985fc35';
+import { classicArtUrl } from './classic-art.js?v=8da477d9';
 
 /** The tabs that are the bottom pane, not a pane above it. */
 export const LOCAL_TABS = Object.freeze(['local', 'activity']);

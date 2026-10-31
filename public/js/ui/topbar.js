@@ -19,6 +19,7 @@
 import { vitalLevel, vitalTitle } from '../vitals.js?v=ca7471dd';
 import { clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b5f4748a';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL } from '../night-tint.js?v=917a2caa';
+import { STREET_MAP_HINT, STREET_MAP_LABEL } from './street-minimap.js?v=22d73edf';
 
 /** The Menu's groups, in the mock's order; Social shows only when something is in it. */
 export const MENU_GROUPS = Object.freeze([
@@ -625,11 +626,60 @@ function installNightTint(doc, setting) {
 }
 
 /**
+ * MINIMAP (G370, js/ui/street-minimap.js): the "Street map" switch in the Menu's Settings group,
+ * under Night tint. `setting` is { get, set, onChange }.
+ */
+function installStreetMap(doc, setting) {
+  if (!setting) return;
+  const settings = doc.querySelector('#more-list [data-menu-group="settings"]');
+  if (!settings || doc.getElementById('menu-street-map')) return;
+  const id = 'menu-street-map';
+  const row = doc.createElement('label');
+  row.className = 'hud-toggle menu-street-map';
+  row.htmlFor = id;
+  row.dataset.menuControl = 'street-map';
+  row.dataset.streetMapControl = 'menu';
+  const input = doc.createElement('input');
+  Object.assign(input, { id, type: 'checkbox' });
+  input.setAttribute('role', 'switch');
+  input.setAttribute('aria-describedby', `${id}-hint`);
+  const words = doc.createElement('span');
+  words.textContent = STREET_MAP_LABEL;
+  const hint = doc.createElement('small');
+  hint.id = `${id}-hint`;
+  hint.textContent = STREET_MAP_HINT;
+  row.append(input, words, hint);
+  const draw = () => {
+    const on = Boolean(setting.get?.());
+    input.checked = on;
+    input.setAttribute('aria-checked', on ? 'true' : 'false');
+  };
+  input.addEventListener('change', () => {
+    setting.set?.(input.checked);
+    draw();
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      input.click();
+    }
+    if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
+  });
+  setting.onChange?.(draw);
+  draw();
+  const after = settings.querySelector('[data-menu-control="night-tint"]') || settings.querySelector('[data-menu-control="zoom"]');
+  if (after) after.after(row);
+  else settings.querySelector('.menu-group-label')?.after(row);
+  settings.hidden = false;
+}
+
+/**
  * Wires the bar once (game.js main): tooltips, the Menu's groups, the Sound popover, the
  * low-energy pill, the nameplate's shape and the pills' widths. `opts`:
  *   audio: { levels(): { effects, music }, setLevel(kind, 0..100) }
  *   zoom: { get(), set(0..1), onChange(fn) } (js/world-zoom.js)
  *   nightTint: { get(), set(bool), onChange(fn) } (js/night-tint.js)
+ *   streetMap: { get(), set(bool), onChange(fn) } (js/ui/street-minimap.js)
  *   onImagination(), onMail(), onPlayerCard(): what those controls open.
  */
 export function installTopBar(doc, opts = {}) {
@@ -644,6 +694,7 @@ export function installTopBar(doc, opts = {}) {
   installSound(doc, opts.audio);
   installZoom(doc, opts.zoom);
   installNightTint(doc, opts.nightTint);
+  installStreetMap(doc, opts.streetMap);
   const tips = installTooltips(doc, [bar]);
   adoptTitles(bar);
   shapeStreetName(doc);

@@ -3671,6 +3671,12 @@ export const newxpFeature = {
     return isNewxpSceneTsid(engine?.streetTsid) ? true : null;
   },
 
+  /** MINIMAP (G370): the tutorial is about to start or running (the street map waits for it). */
+  tutorialRunning(engine) {
+    if (pendingStage || active()) return true;
+    return isNewxpSceneTsid(engine?.streetTsid) ? true : null;
+  },
+
   /**
    * G339: the street under the tutorial's scenes says nothing on arrival (no
    * "loaded" toast or new-afternoon line, no Qurazy roll) while the tutorial is

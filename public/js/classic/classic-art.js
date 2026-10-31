@@ -83,6 +83,7 @@ export const CLASSIC_ART = Object.freeze({
   making_drag_arrow: {"url":"assets/classic/making_drag_arrow.png","w":42,"h":45,"bytes":929,"sha1":"7a0d6f5247eaa78d102bb1f3d938c008c750b7df","kind":"copy","src":"graphics/making_drag_arrow.png"},
   making_info: {"url":"assets/classic/making_info.png","w":15,"h":15,"bytes":1309,"sha1":"cfde4f336a033a3949aebfa6462b7e9a42a8d25c","kind":"copy","src":"graphics/making_info.png"},
   making_info_small: {"url":"assets/classic/making_info_small.png","w":10,"h":10,"bytes":1166,"sha1":"cf67b173ba6ad9a3da5d7ba80106a7431507b2c0","kind":"copy","src":"graphics/making_info_small.png"},
+  map_expand_arrow: {"url":"assets/classic/map_expand_arrow.png","w":11,"h":6,"bytes":1008,"sha1":"659c9dad3481bc7fc6a2fa2b414fcc60fbfb679b","kind":"copy","src":"graphics/map_expand_arrow.png"},
   map_icon: {"url":"assets/classic/map_icon.png","w":27,"h":28,"bytes":1164,"sha1":"0592dabda636d3ec940f74f637bf36955c951040","kind":"copy","src":"graphics/map_icon.png"},
   map_icon_hover: {"url":"assets/classic/map_icon_hover.png","w":27,"h":28,"bytes":1131,"sha1":"d0d65da010a753a20ce30d45fe815d700984e133","kind":"copy","src":"graphics/map_icon_hover.png"},
   no_sign: {"url":"assets/classic/no_sign.png","w":79,"h":79,"bytes":2164,"sha1":"eb38d9562c8f0a7d09b43855c1509998afd8bbec","kind":"copy","src":"graphics/no_sign.png"},
@@ -111,6 +112,7 @@ export const CLASSIC_ART = Object.freeze({
   slug_xp_pos: {"url":"assets/classic/slug_xp_pos.png","w":17,"h":17,"bytes":1556,"sha1":"4f1b40c25d5433c9bcaf62498c4a7c0012eb980f","kind":"copy","src":"graphics/slug_xp_pos.png"},
   spinner: {"url":"assets/classic/spinner.svg","w":40,"h":40,"bytes":5694,"sha1":"5ef1e838df1b45afaa90705e0c4bab50180d46c1","kind":"svg","src":"swfs/spinner.swf","loop":{"steps":12,"ms":1500},"frame":37},
   super_search_no_results: {"url":"assets/classic/super_search_no_results.png","w":30,"h":32,"bytes":1341,"sha1":"973538e443942041c0794b9888953acf9f97be40","kind":"copy","src":"graphics/super_search_no_results.png"},
+  teensy_signpost: {"url":"assets/classic/teensy_signpost.png","w":10,"h":15,"bytes":358,"sha1":"03f3ab218bdfa98acec49cd1b51495c35d2b70fc","kind":"copy","src":"graphics/teensy_signpost.png"},
   upgrade_icon: {"url":"assets/classic/upgrade_icon.png","w":122,"h":70,"bytes":15925,"sha1":"812865681d66ef076b201a987708c662f9e7d8b1","kind":"copy","src":"graphics/upgrade_icon.png"},
   warning: {"url":"assets/classic/warning.png","w":18,"h":18,"bytes":506,"sha1":"bb1c5e2bdd329a48f48eec8ad305477e375a8d60","kind":"copy","src":"graphics/warning.png"},
 });

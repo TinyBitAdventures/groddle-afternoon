@@ -91,7 +91,7 @@ describe('the wiring', () => {
     assert.match(topbar, /installNightTint\(doc, opts\.nightTint\);/);
     assert.match(topbar, /input\[type="checkbox"\]'\)\]\.filter/, 'arrow keys reach the switch in the Menu');
     const prefs = read('public/js/classic/classic-prefs.js');
-    assert.match(prefs, /win\.append\(close, title, group, parts\.sizeRow, zoomBox, tintRow, foot\);/);
+    assert.match(prefs, /win\.append\(close, title, group, parts\.sizeRow, zoomBox, tintRow, (mapRow, )?foot\);/);
     assert.match(prefs, /parts\.tint\.addEventListener\('change', \(\) => setNightTint\(parts\.tint\.checked\)\);/);
   });
 });

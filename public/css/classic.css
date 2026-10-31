@@ -2328,3 +2328,91 @@
   :root[data-ui="classic"] #game-root .hb-tray .hb-foot .hb-foot-mirror { display: inline-flex !important; flex-direction: row; }
 }
 /* end BUILDER */
+
+/* == MINIMAP == */
+/* The street map as the 2012 client drew it (MiniMapView.as, js/ui/street-minimap.js): 160 x 70 (+ the
+   10 tab) at the world's top right, x 860 y 40 on the 1020 stage (classic-spec layout.md). Its panel is
+   the page colour (LayoutModel bg_color), 3 px past the map on the left and below, a 10 px curve at the
+   bottom left and fillets where it meets the header and the viewport edge (_draw 975-1000). The map
+   itself is masked to a rounded rect (map_mask, ellipse 16). */
+:root[data-ui="classic"] #game-root .street-minimap {
+  --mm-w: calc(160 * var(--cu));
+  top: 0;
+  right: 0;
+  font-family: var(--font-classic-body);
+}
+:root[data-ui="classic"] #game-root .street-minimap .smm-card { border-radius: calc(8 * var(--cu)); }
+:root[data-ui="classic"] #game-root .street-minimap .smm-card::before {
+  content: "";
+  position: absolute;
+  z-index: var(--z-below);
+  left: calc(-3 * var(--cu));
+  top: 0;
+  right: 0;
+  bottom: calc(-3 * var(--cu));
+  border-radius: 0 0 0 calc(10 * var(--cu));
+  background: var(--c-classic-page);
+}
+:root[data-ui="classic"] #game-root .street-minimap .smm-card::after {
+  content: "";
+  position: absolute;
+  z-index: var(--z-below);
+  left: calc(-17 * var(--cu));
+  top: calc(-1 * var(--cu));
+  width: calc(14 * var(--cu));
+  height: calc(11 * var(--cu));
+  background: radial-gradient(ellipse calc(14 * var(--cu)) calc(11 * var(--cu)) at 0 100%, transparent 98%, var(--c-classic-page) 100%);
+}
+:root[data-ui="classic"] #game-root .street-minimap::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: calc(var(--mm-h, 80px) + 2 * var(--cu));
+  width: calc(14 * var(--cu));
+  height: calc(10 * var(--cu));
+  pointer-events: none;
+  background: radial-gradient(ellipse calc(14 * var(--cu)) calc(10 * var(--cu)) at 0 100%, transparent 98%, var(--c-classic-page) 100%);
+}
+/* The tab: the page colour, rounded below (4), a soft 1 px shadow (StaticFilters black2px90Degrees, alpha .2). */
+:root[data-ui="classic"] #game-root .street-minimap .smm-tab {
+  margin-top: calc(3 * var(--cu));
+  border-radius: 0 0 calc(4 * var(--cu)) calc(4 * var(--cu));
+  background: var(--c-classic-page);
+  box-shadow: 0 var(--cu) calc(2 * var(--cu)) color-mix(in srgb, var(--c-classic-ink) 20%, transparent);
+}
+:root[data-ui="classic"] #game-root .street-minimap .smm-tab:focus-visible,
+:root[data-ui="classic"] #game-root .street-minimap .smm-dot:focus-visible,
+:root[data-ui="classic"] #game-root .smm-show:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #game-root .street-minimap .smm-fog { font: var(--fs-classic-count)/var(--lh-tight) var(--font-classic-body); }
+/* The tooltip (TipDisplayManager: the pale yellow tip, pointer at its top centre, 15 below). */
+:root[data-ui="classic"] #game-root .street-minimap .smm-tip {
+  top: calc(var(--tip-y, 0px) + 6 * var(--cu));
+  padding: calc(3 * var(--cu)) calc(6 * var(--cu));
+  border: 1px solid color-mix(in srgb, var(--c-classic-ink) 37%, transparent);
+  border-radius: calc(4 * var(--cu));
+  background: var(--c-classic-tip);
+  color: var(--c-classic-text);
+  font: var(--fs-classic-body)/var(--lh-tight) var(--font-classic-body);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--c-classic-ink) 15%, transparent);
+}
+/* With the map off (Preferences or Shift+M), a small page-coloured map button keeps its corner. */
+:root[data-ui="classic"] #game-root .smm-show {
+  top: 0;
+  right: 0;
+  width: calc(30 * var(--cu));
+  height: calc(22 * var(--cu));
+  border-radius: 0 0 0 calc(8 * var(--cu));
+  background: var(--c-classic-page);
+  color: var(--c-classic-title);
+  box-shadow: none;
+}
+/* The route card (GpsUI, a child of the map in the client) stacks under the map. */
+:root[data-ui="classic"] #game-root .route-gps { top: calc(var(--minimap-h, 0px) + 10 * var(--cu)); }
+/* Preferences: the Street map switch in its own well under Night tint. */
+:root[data-ui="classic"] .prefs-window .prefs-choice.prefs-street-map {
+  margin: 0;
+  padding: var(--sp-5) var(--sp-10);
+  background: var(--c-classic-well);
+  border-bottom: 1px solid var(--c-classic-rule);
+}
+/* == end MINIMAP == */

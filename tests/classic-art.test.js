@@ -9,7 +9,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { check, readManifest, trademarkProblems, cleanSvg, stripSvg, artSize, sha1, LOGO_SHA1, ASSETS, OUT_DIR } from '../tools/classic-art/build.mjs';
-import { CLASSIC_ART, classicArtUrl } from '../public/js/classic/classic-art.js?v=d985fc35';
+import { CLASSIC_ART, classicArtUrl } from '../public/js/classic/classic-art.js?v=8da477d9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const files = readdirSync(OUT_DIR);

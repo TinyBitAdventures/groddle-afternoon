@@ -10,7 +10,8 @@
  * the world at the 2012 client's 1000 x 600), and in both skins the world Zoom
  * (js/world-zoom.js: Wide to Original; Original window size already is the
  * 2012 picture, so the slider rests while it is on) and Night tint (js/night-tint.js:
- * the world darkens with the game clock; the 2012 client had none). The original's six checkboxes
+ * the world darkens with the game clock; the 2012 client had none) and Street map (G370,
+ * js/ui/street-minimap.js: the map the 2012 client always showed). The original's six checkboxes
  * have nothing behind them here and are left out. Changes apply at once, so the
  * window has Done where the original had Save.
  *
@@ -21,9 +22,10 @@
  */
 import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=587c014a';
 import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=299eef68';
-import { installClassicChrome } from './classic-chrome.js?v=b0eb4498';
+import { installClassicChrome } from './classic-chrome.js?v=abce2e1f';
 import { clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b5f4748a';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL, nightTintOn, onNightTintChange, setNightTint } from '../night-tint.js?v=917a2caa';
+import { STREET_MAP_HINT, STREET_MAP_LABEL, onStreetMapChange, setStreetMap, streetMapOn } from '../ui/street-minimap.js?v=22d73edf';
 
 export const PREFS_TITLE = 'Preferences';
 
@@ -104,6 +106,7 @@ export function createPreferences(doc) {
     parts.zoom.setAttribute('aria-valuetext', zoomValueText(z));
     parts.zoomHeld.hidden = !held;
     parts.tint.checked = nightTintOn();
+    parts.streetMap.checked = streetMapOn();
   };
 
   const build = () => {
@@ -159,10 +162,17 @@ export function createPreferences(doc) {
     const tintWords = el(doc, 'span', {}, NIGHT_TINT_LABEL);
     tintWords.append(el(doc, 'small', {}, NIGHT_TINT_HINT));
     tintRow.append(parts.tint, tintWords);
+    // MINIMAP (G370): the street map, the same switch as the Menu's and Shift+M.
+    const mapRow = el(doc, 'label', { class: 'prefs-choice prefs-street-map', 'data-street-map-control': 'prefs' });
+    parts.streetMap = el(doc, 'input', { type: 'checkbox', id: 'prefs-street-map' });
+    parts.streetMap.addEventListener('change', () => setStreetMap(parts.streetMap.checked));
+    const mapWords = el(doc, 'span', {}, STREET_MAP_LABEL);
+    mapWords.append(el(doc, 'small', {}, STREET_MAP_HINT));
+    mapRow.append(parts.streetMap, mapWords);
     const foot = el(doc, 'div', { class: 'prefs-foot' });
     const done = el(doc, 'button', { type: 'button', class: 'prefs-done' }, 'Done');
     foot.append(done);
-    win.append(close, title, group, parts.sizeRow, zoomBox, tintRow, foot);
+    win.append(close, title, group, parts.sizeRow, zoomBox, tintRow, mapRow, foot);
     shade.append(win);
     doc.body.append(shade);
     close.addEventListener('click', () => api.close());
@@ -179,6 +189,7 @@ export function createPreferences(doc) {
     onUiModeChange(sync);
     onZoomChange(sync);
     onNightTintChange(sync);
+    onStreetMapChange(sync);
   };
 
   const api = {

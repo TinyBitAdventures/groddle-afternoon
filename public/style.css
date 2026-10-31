@@ -895,6 +895,22 @@
   --fs-classic-row-title: var(--fs-lg);   /* 16px, FROM FRAME ref/video-2011-make-result.jpg: "You made 5 Oranges!" */
   --fs-classic-button: var(--fs-md);      /* 13px, FROM FRAME ref/video-2011-quest-complete.jpg: "Back to recipes", cap 8.8 px */
 
+  /* MINIMAP (G370, js/ui/street-minimap.js): the street map's marks, the 2012 client's colours
+     (MiniMapView.as: addYou 610-623, OTHER_DOT_*, ITEM_DOT_COLOR, the fog wash; StaticFilters.as
+     youDisplayManager_Glow / blue2px_Glow for the signposts' white halo and blue hover). */
+  --minimap-you: #000000;
+  --minimap-ring: #ffffff;
+  --minimap-glow: rgba(255, 214, 22, 0.55);
+  --minimap-other: #ffffff;
+  --minimap-other-ring: #000000;
+  --minimap-item: #f8992a;
+  --minimap-dot-text: #ffffff;
+  --minimap-fog-wash: rgba(0, 0, 0, 0.7);
+  --minimap-fog-text: #ffffff;
+  --minimap-sign-halo: #ffffff;
+  --minimap-sign-hover: #53e5ff;
+  --minimap-lines-bg: #c9dce4;
+
   /* Side insets: what the HUD covers at each edge, so what centres in the free width keeps clear.
      The Social drawer (js/ui/social-drawer.js) sets --inset-r on #game-root: 316px open, 60px as the rail. */
   --inset-l: 0px;
@@ -11689,3 +11705,122 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] :is(#feed-picker .feed-picker-card, #vendor-panel .vendor-detail.count-pop) { animation: none; }
 }
 /* —— end MPANELS —— */
+
+/* —— MINIMAP —— */
+/* The street map (G370, js/ui/street-minimap.js; MiniMapView.as). One DOM for both skins: these
+   rules are its frame and the modern card; css/classic.css has the 2012 look. Sizes in map units
+   scale by --mm-u (the card's width / 160), which the module sets. */
+.street-minimap[hidden], .smm-show[hidden], .street-minimap .smm-tab[hidden],
+.street-minimap .smm-fog[hidden], .street-minimap .smm-fogwash[hidden], .street-minimap .smm-tip[hidden],
+.street-minimap .smm-sign[hidden], .street-minimap .smm-dot[hidden] { display: none; }
+.street-minimap {
+  --mm-w: 192px;
+  --mm-u: 1.2;
+  position: absolute;
+  z-index: var(--z-hud);
+  top: calc(var(--hud-h) + var(--space-3));
+  right: max(var(--hud-inset), var(--inset-r));
+  width: var(--mm-w);
+  font-family: var(--font-ui);
+}
+.street-minimap .smm-card { position: relative; width: var(--mm-w); height: var(--mm-h, calc(80px * var(--mm-u))); }
+.street-minimap .smm-window { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
+.street-minimap .smm-pic { position: absolute; left: 0; top: var(--mm-scroll, 0px); display: block; width: 100%; height: var(--mm-map-h, 100%); }
+.street-minimap .smm-fogwash { position: absolute; inset: 0; background: var(--minimap-fog-wash); }
+.street-minimap .smm-fog {
+  position: absolute; left: 0; right: 0; top: calc(1px * var(--mm-u)); margin: 0;
+  color: var(--minimap-fog-text); font-size: var(--fs-2xs); font-weight: var(--fw-bold); line-height: var(--lh-tight);
+  text-align: center; pointer-events: none;
+}
+/* Marks may stand 20 map px past the left, right and top edges (MAP_CONTAINER_BLEED), never below. */
+.street-minimap .smm-marks {
+  position: absolute; pointer-events: none; overflow: hidden;
+  left: calc(-1 * var(--mm-bleed, 24px)); top: calc(-1 * var(--mm-bleed, 24px));
+  width: calc(100% + 2 * var(--mm-bleed, 24px)); height: calc(var(--mm-h, 96px) + var(--mm-bleed, 24px));
+}
+.street-minimap .smm-marks-in { position: absolute; left: var(--mm-bleed, 24px); top: calc(var(--mm-bleed, 24px) + var(--mm-scroll, 0px)); width: 0; height: 0; }
+.street-minimap .smm-sign,
+.street-minimap .smm-dot { position: absolute; left: 0; top: 0; margin: 0; padding: 0; pointer-events: auto; cursor: pointer; }
+.street-minimap .smm-sign {
+  width: calc(10px * var(--mm-u)); height: calc(15px * var(--mm-u)); border: 0; background: none;
+  filter: drop-shadow(0 0 1px var(--minimap-sign-halo)) drop-shadow(0 0 1px var(--minimap-sign-halo));
+}
+.street-minimap .smm-sign img { display: block; width: 100%; height: 100%; }
+.street-minimap .smm-sign:hover,
+.street-minimap .smm-sign:focus-visible { outline: none; filter: drop-shadow(0 0 1px var(--minimap-sign-hover)) drop-shadow(0 0 1px var(--minimap-sign-hover)) drop-shadow(0 0 1px var(--minimap-sign-hover)); }
+/* A dot: the circle and its 2 px ring (Flash strokes straddle the edge: the fill shows r - 1). */
+.street-minimap .smm-dot {
+  box-sizing: border-box;
+  width: calc(var(--dot-d, 12) * 1px * var(--mm-u)); height: calc(var(--dot-d, 12) * 1px * var(--mm-u));
+  border: calc(2px * var(--mm-u)) solid var(--dot-ring, var(--minimap-other-ring)); border-radius: var(--radius-round);
+  background: var(--dot, var(--minimap-other));
+  color: var(--minimap-dot-text); font-size: var(--fs-2xs); font-weight: var(--fw-bold); line-height: 1;
+  display: grid; place-items: center; overflow: visible; white-space: nowrap;
+}
+.street-minimap .smm-dot.has-text { text-shadow: 0 0 2px var(--minimap-other-ring); }
+.street-minimap .smm-you {
+  --dot-d: 10; z-index: var(--z-raised); pointer-events: none; cursor: default;
+  background: var(--minimap-you); border-color: var(--minimap-ring);
+  box-shadow: 0 0 calc(3.5px * var(--mm-u)) calc(1.5px * var(--mm-u)) var(--minimap-glow);
+}
+.street-minimap .smm-item { background: var(--minimap-item); }
+.street-minimap .smm-dot:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* The 30 x 10 tab under the map (map_expand_arrow, turned over when the map is out). */
+.street-minimap .smm-tab {
+  display: grid; place-items: center; margin: calc(3px * var(--mm-u)) auto 0; padding: 0; border: 0;
+  width: calc(30px * var(--mm-u)); height: calc(10px * var(--mm-u)); cursor: pointer;
+}
+.street-minimap .smm-tab img { display: block; width: calc(11px * var(--mm-u)); height: calc(6px * var(--mm-u)); transition: transform var(--motion-fast) var(--ease-out); }
+.street-minimap[data-expanded="true"] .smm-tab img { transform: rotate(180deg); }
+.street-minimap .smm-tab:focus-visible,
+.street-minimap .smm-hide:focus-visible,
+.smm-show:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.street-minimap .smm-tip {
+  position: absolute; left: var(--tip-x, 0px); top: calc(var(--tip-y, 0px) + var(--sp-3)); z-index: var(--z-raised);
+  width: max-content; max-width: 16rem; margin: 0; white-space: pre-line; pointer-events: none;
+  font-size: var(--fs-sm); line-height: var(--lh-tight);
+}
+@media (prefers-reduced-motion: reduce) {
+  .street-minimap .smm-tab img { transition: none; }
+}
+/* Modern: a paper card left of the Social drawer (--inset-r), the map inside a cream frame. */
+[data-ui="modern"] .street-minimap .smm-card {
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  box-shadow: 0 0 0 var(--sp-2) var(--surface-card), 0 0 0 calc(var(--sp-2) + 1px) var(--border), var(--shadow-2);
+}
+[data-ui="modern"] .street-minimap .smm-tab {
+  margin-top: var(--sp-2); border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  background: var(--surface-card); box-shadow: 0 0 0 1px var(--border), var(--shadow-1);
+}
+[data-ui="modern"] .street-minimap .smm-tip {
+  padding: var(--sp-2) var(--sp-4); border-radius: var(--radius-md);
+  background: var(--surface-card); color: var(--text); box-shadow: 0 0 0 1px var(--border), var(--shadow-2);
+  font-weight: var(--fw-bold);
+}
+/* The card's own hide button, and the show button that stands in its place when it is off. */
+.street-minimap .smm-hide { display: none; }
+[data-ui="modern"] .street-minimap .smm-hide {
+  position: absolute; top: calc(-1 * var(--sp-4)); right: calc(-1 * var(--sp-4)); z-index: var(--z-raised);
+  display: grid; place-items: center; width: 22px; height: 22px; padding: 0; border: 0; border-radius: var(--radius-round);
+  background: var(--surface-card); color: var(--text-muted); box-shadow: 0 0 0 1px var(--border), var(--shadow-1);
+  cursor: pointer; opacity: 0; transition: opacity var(--motion-fast) var(--ease-out);
+}
+[data-ui="modern"] .street-minimap .smm-hide svg { width: 12px; height: 12px; }
+[data-ui="modern"] .street-minimap:hover .smm-hide,
+[data-ui="modern"] .street-minimap:focus-within .smm-hide { opacity: 1; }
+[data-ui="modern"] .street-minimap .smm-hide:hover { color: var(--text); }
+.smm-show {
+  position: absolute; z-index: var(--z-hud);
+  top: calc(var(--hud-h) + var(--space-3)); right: max(var(--hud-inset), var(--inset-r));
+  display: grid; place-items: center; width: 32px; height: 32px; padding: 0; cursor: pointer;
+  border: 0; border-radius: var(--radius-round);
+  background: var(--surface-card); color: var(--text); box-shadow: 0 0 0 1px var(--border), var(--shadow-2);
+}
+.smm-show svg { width: 18px; height: 18px; }
+@media (prefers-reduced-motion: reduce) {
+  [data-ui="modern"] .street-minimap .smm-hide { transition: none; }
+}
+/* The route card (To: / Next:) stacks under the map: --minimap-h is what the map takes (0 when hidden). */
+[data-ui="modern"] #game-root .route-gps { top: calc(var(--hud-h) + var(--space-3) + var(--minimap-h, 0px)); }
+/* —— end MINIMAP —— */

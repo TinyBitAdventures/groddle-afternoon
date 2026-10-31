@@ -20,7 +20,7 @@
  * - the face's avatar, and the player's name over it online.
  */
 import { uiState, onUiModeChange } from './ui-mode.js?v=587c014a';
-import { classicArtUrl } from './classic-art.js?v=d985fc35';
+import { classicArtUrl } from './classic-art.js?v=8da477d9';
 
 /** PURE: a ring's share 0..1 from its stroke-dasharray ("63.5 100"). */
 export function shareFromDash(dash) {

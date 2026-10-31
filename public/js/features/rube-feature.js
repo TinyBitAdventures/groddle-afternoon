@@ -456,6 +456,13 @@ function autoplay(engine, now) {
 export const rubeFeature = {
   id: RUBE_FEATURE_ID,
 
+  /** MINIMAP (G370): the street map tracks npc_rube (MiniMapView.as ITEMS_TO_TRACK) as an orange dot. */
+  minimapItems() {
+    const spr = rube?.sprite;
+    if (!spr || spr.destroyed || spr.visible === false) return null;
+    return [{ id: RUBE_CLASS, classTsid: RUBE_CLASS, label: rube.target?.label || 'The Rube', x: spr.x, y: spr.y }];
+  },
+
   init(engine) {
     rollRubeDay(state, dayKey());
     ensureItem(RUBE_CLASS, { label: 'Rube', sellable: false, donatable: false });
