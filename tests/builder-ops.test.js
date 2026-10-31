@@ -13,7 +13,7 @@ import { join } from 'node:path';
 import { GEOMETRY, OP_NAMES, OpError, applyOp, applyOps, nextDecoId, nextGeometryId, opsSummary } from '../public/js/builder/ops.js?v=acf30407';
 import { DEFAULT_GRADIENT, forkOps, forkStreet, newTsid, relayerPosition, streetKeyFrom } from '../public/js/builder/zone.js?v=6a3db28e';
 import { compileSchema } from '../public/js/builder/schema-check.js?v=cc9d1af4';
-import { DECO_TWINS } from '../public/js/street-render.js?v=ae048a15';
+import { DECO_TWINS } from '../public/js/street-render.js?v=3f8384af';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

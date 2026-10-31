@@ -47,16 +47,40 @@ const SIGN_FONT_SIZE = 14;
 const SIGN_TEXT_RESOLUTION = 3;
 const SIGN_ARM_PAD_X = 8;
 const SIGN_GLOW_COLOUR = 0x53e5ff;
+/**
+ * The label's colour. The client's `signpost` CSS class is lost, but every snap of a 2012
+ * signpost (research/flickr-2026-10-27 Louise Pasture: "Estevan Meadows", "Ritzrock Rise")
+ * shows warm white bold words on the dark arm. The remake drew them dark brown (0x2a1a08) on
+ * that dark brown arm, under a white halo: hard to read, and on the home street's friends'
+ * signpost, with no halo, nearly invisible (Austin 2026-10-31). Warm white on the arm is about
+ * 12:1. A destination the remake has not built yet stays a dimmer parchment (about 8:1).
+ */
+export const SIGN_TEXT_FILL = 0xfdf8ee;
+export const SIGN_TEXT_FILL_UNBUILT = 0xd9ccb6;
 const SIGN_LABEL_STYLE = Object.freeze({
   fontFamily: 'Trebuchet MS, Georgia, serif',
   fontSize: SIGN_FONT_SIZE,
   fontWeight: '700',
-  // The glow's strength 3 is approximated by a soft stroke under a blur.
-  stroke: { color: 'rgba(255,255,255,0.45)', width: 3 },
+  fill: SIGN_TEXT_FILL,
   lineJoin: 'round',
-  dropShadow: { alpha: 0.6, blur: 2, color: 0xffffff, distance: 0 },
+  // StaticFilters.white1pxSignpost_GlowA: white, alpha .4, blur 2, strength 3.
+  dropShadow: { alpha: 0.4, blur: 2, color: 0xffffff, distance: 0 },
   padding: 3,
 });
+
+/**
+ * One arm's words as SignpostView draws them (createSignTextField): every signpost board, the
+ * street's and the home street's friends' signpost alike, uses this.
+ * @param {typeof PIXI} PIXI
+ * @param {string} text
+ * @param {number} [fill]
+ */
+export function signLabel(PIXI, text, fill = SIGN_TEXT_FILL) {
+  const label = new PIXI.Text({ text: String(text), style: { ...SIGN_LABEL_STYLE, fill } });
+  label.resolution = SIGN_TEXT_RESOLUTION;
+  label.anchor.set(0.5, 0.5);
+  return label;
+}
 
 /** makeSign: an arm fits its label plus 8px either side (holder units). */
 export function signArmWidth(PIXI, labelText) {
@@ -174,11 +198,9 @@ function buildSignpostSprite(PIXI, signpost, pos) {
     })();
 
     // SignpostView.createSignTextField: 14px text drawn at 2.8x then scaled
-    // down, with a soft white glow (StaticFilters.white1pxSignpost_GlowA).
-    const baseFill = isLoaded ? 0x2a1a08 : 0x4a3a28;
-    const label = new PIXI.Text({ text: labelText, style: { ...SIGN_LABEL_STYLE, fill: baseFill } });
-    label.resolution = SIGN_TEXT_RESOLUTION;
-    label.anchor.set(0.5, 0.5);
+    // down, warm white with a soft white glow (signLabel).
+    const baseFill = isLoaded ? SIGN_TEXT_FILL : SIGN_TEXT_FILL_UNBUILT;
+    const label = signLabel(PIXI, labelText, baseFill);
     const fitW = signArmWidth(PIXI, labelText);
 
     let armW = fitW;

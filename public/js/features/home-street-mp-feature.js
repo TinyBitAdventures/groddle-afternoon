@@ -48,13 +48,13 @@ import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=9d3a8
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=68506420';
 import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note-pole-art.js?v=860d393a';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
-import { signArmWidth } from '../street-render.js?v=ae048a15';
+import { signArmWidth, signLabel } from '../street-render.js?v=3f8384af';
 import { openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
 import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=31a75688';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=94147139';
-import { projectApi } from './street-jobs-feature.js?v=1f017907';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=fd5fe91c';
+import { projectApi } from './street-jobs-feature.js?v=398a7110';
 import { saveStore } from '../save-store.js?v=b74a8113';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=de26a03e';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=bd9029a1';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,
@@ -332,9 +332,8 @@ function createSession(engine, client) {
       board.width = w;
       board.height = 30;
       if (left) board.scale.x *= -1;
-      const label = new PIXI.Text({ text: n.name, style: { fontFamily: 'Trebuchet MS, Georgia, serif', fontSize: 14, fontWeight: '700', fill: 0x2a1a08, padding: 3 } });
-      label.resolution = 3;
-      label.anchor.set(0.5);
+      // The street signposts' words (street-render signLabel): warm white on the dark arm.
+      const label = signLabel(PIXI, n.name);
       label.x = left ? -w / 2 : w / 2;
       label.y = -1;
       arm.addChild(board, label);

@@ -31,7 +31,7 @@ import { forkStreet, forkOps, newTsid, libraryAsset, linkEdit, editsOn } from '.
 import { newStreet, newStreetOps, newHub, nextHubId, mapWithStreet, mapWithoutStreet, TEMPLATES, DEFAULT_MAP_COLOURS } from '../../public/js/builder/templates.js?v=008481d2';
 import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js/builder/geometry-handles.js?v=d39231a4';
 import { platformsScreen, isStandable } from '../../public/js/street-model.js?v=23b926e5';
-import { DECO_TWINS } from '../../public/js/street-render.js?v=ae048a15';
+import { DECO_TWINS } from '../../public/js/street-render.js?v=3f8384af';
 import { EFFECT_KINDS, EFFECT_DEFAULTS, EFFECT_LIMITS, RUMBLE_DEFAULTS, effectsCost, normaliseEmitter, rumbleShare } from '../../public/js/street-effects.js?v=e427650f';
 
 export const PERM_WORDS = Object.freeze({ floor: -1, roof: 1, soft: 0, hard: null });

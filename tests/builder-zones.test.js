@@ -14,7 +14,7 @@ import { TEMPLATES, newStreet, newStreetOps, groundStrip, templateLayers, gradie
 import { populationWith, plannedSpots, moveMapLine, mapForStreets, spotGroup } from '../public/js/builder/editor-zone.js?v=36e4d449';
 import { intakeBody, base64Of } from '../public/js/builder/editor-picker.js?v=724352b6';
 import { streetWithEdits, editsOn, linkEdit, streetStats } from '../public/js/builder/zone.js?v=6a3db28e';
-import { applyZoneEdits } from '../public/js/builder/draft-play.js?v=d00d21ba';
+import { applyZoneEdits } from '../public/js/builder/draft-play.js?v=65af71eb';
 import { applyOps } from '../public/js/builder/ops.js?v=acf30407';
 import { compileSchema } from '../public/js/builder/schema-check.js?v=cc9d1af4';
 import { validateZone, placementRequests } from '../public/js/builder/validate.js?v=89d70464';
