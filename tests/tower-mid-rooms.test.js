@@ -28,9 +28,9 @@ import {
   boxToScreen,
   midTowerRoomByTsid,
   midTowerRoomStreet,
-} from '../public/js/tower-mid-rooms.js?v=fa06bcdb';
-import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=27a8bf5a';
-import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=4bf1db8c';
+} from '../public/js/tower-mid-rooms.js?v=5d998562';
+import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=e67f7d07';
+import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=7b8b86f3';
 import { populationForStreet } from '../public/js/street-ecology.js?v=6a313245';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -204,32 +204,26 @@ describe('Jethimadh Tower: Mid rooms: the climb', () => {
     }
   }
 
-  it('flight 1 climbs from the arrival to the landing with walks and plain jumps', () => {
-    const segs = floors(stairs).filter((p) => /st_f1|st_bottom|st_landing/.test(p.id));
-    assertChain(segs, 'flight 1');
-    assert.ok(stairs.flights.f1.high.y < STAIRS.arrival.y);
+  it('R5 (post 57559495026): one straight tube climbs from the arrival to the Mezzanine door with walks and plain jumps', () => {
+    assertChain(floors(stairs).filter((p) => p.y1 > stairs.bounds.t + 100), 'the tube');
+    assert.deepEqual(stairs.ladders, []);
+    const { low, high } = stairs.flight;
+    const out = stairs.doors.find((d) => d.connect.label === 'Tower St West');
+    const up = stairs.doors.find((d) => d.connect.label === 'Mezzanine');
+    assert.ok(out.x < low.x + 200 && up.x > high.x, 'EXIT at the low left end, the Mezzanine door at the high right end');
+    assert.equal(floorAt(stairs.platforms, up.x, up.y), up.y);
+    const deg = (Math.atan2(low.y - high.y, high.x - low.x) * 180) / Math.PI;
+    assert.ok(deg > 7 && deg < 9, `climbs ${deg.toFixed(1)} degrees`);
   });
 
-  it('the landing ladder climbs to flight 2, which climbs to the Mezzanine door', () => {
-    const [ladder] = stairs.ladders;
-    const { f1, f2 } = stairs.flights;
-    assert.equal(ladder.y, f1.high.y);
-    assert.equal(ladder.y - ladder.h, f2.low.y);
-    assert.ok(floorAt(stairs.platforms, ladder.x, f1.high.y) === f1.high.y, 'ladder foot on the landing');
-    assert.ok(floorAt(stairs.platforms, ladder.x, f2.low.y) === f2.low.y, 'deck over the ladder top');
-    const segs = floors(stairs).filter((p) => /st_f2|st_upper|st_top/.test(p.id));
-    assertChain(segs, 'flight 2');
-    const door = stairs.doors.find((d) => d.connect.label === 'Mezzanine');
-    assert.equal(floorAt(stairs.platforms, door.x, door.y), door.y);
-  });
-
-  it('the flights never overlap: 400+ px between them wherever both run', () => {
-    for (let x = stairs.flights.f2.high.x; x <= stairs.flights.f1.high.x; x += 50) {
-      const lower = floorAt(floors(stairs).filter((p) => /st_f1/.test(p.id)), x, 0);
-      const upper = floorAt(floors(stairs).filter((p) => /st_f2/.test(p.id)), x, -2000);
-      if (lower == null || upper == null) continue;
-      assert.ok(lower - upper >= 400, `x ${x}: ${lower} vs ${upper}`);
-    }
+  it('R5: one frame round the whole tube, past both doors', () => {
+    const frames = stairs.decos.filter((d) => d.sprite === 'jethimadh_int_frame_50percent');
+    assert.equal(frames.length, 1);
+    const [f] = frames;
+    const half = (f.w / 2) * Math.cos((f.r * Math.PI) / 180);
+    for (const d of stairs.doors) assert.ok(Math.abs(d.x - f.x) < half - 50, `${d.id} inside the frame`);
+    assert.ok(stairs.decos.filter((d) => /pillar/.test(d.sprite)).length >= 8);
+    assert.ok(stairs.decos.filter((d) => d.sprite === 'jethimadh_int_lantern_1').length >= 8);
   });
 
   it('the Mezzanine: floorboards solid from below, a ladder down in the corner to the crawlspace', () => {
@@ -366,35 +360,30 @@ describe('mid-tower feature: the Greeterbot', () => {
   });
 });
 
-describe('G97: hopping along the Stairs\' flight 2 on slow frames', () => {
+describe('G97: hopping along the Stairs\' tube on slow frames', () => {
   const st = street(STAIRS_TSID);
   const L = st.bounds.l;
   const T = st.bounds.t;
   const plats = st.platforms.map((p) => ({ ...p, x1: p.x1 - L, y1: p.y1 - T, x2: p.x2 - L, y2: p.y2 - T }));
-  const f2 = plats.filter((p) => /^plat_st_f2_/.test(p.id) && p.pc_perm === -1);
-  const f2FloorAt = (x) => {
-    for (const p of f2) {
+  const tube = plats.filter((p) => /^plat_st_f[12]_/.test(p.id) && p.pc_perm === -1);
+  const tubeFloorAt = (x) => {
+    let best = null;
+    for (const p of tube) {
       const y = platformYAt(p, x);
-      if (y != null) return y;
+      if (y != null && (best == null || y > best)) best = y;
     }
-    return null;
+    return best;
   };
 
-  it('the frame that dropped the avatar (QA log, ~9 fps): 20.7 px past the step still lands on it', () => {
-    // x 1738.7 feet 634.1 (0.5 px above the floor), then dt 2.5, vy 8.25: feet 654.8 at x 1727.7.
-    const hit = resolveGround(plats, 1727.7, 654.8, 8.25, 16);
-    assert.ok(hit, 'caught');
-    assert.ok(/^plat_st_f2_/.test(hit.platform.id), `on flight 2, not ${hit.platform.id}`);
-    assert.ok(Math.abs(hit.y - f2FloorAt(1727.7)) < 0.01);
-  });
-
-  it('every hop from screen x 1380 to 2560, either way, lands back on flight 2 at the dt cap', () => {
+  it('every hop along the tube, either way, lands back on its floor at the dt cap', () => {
     const misses = [];
-    for (let x0 = 1380; x0 <= 2560; x0 += 7) {
+    const from = stairs.flight.low.x - L + 60;
+    const to = stairs.flight.high.x - L - 60;
+    for (let x0 = from; x0 <= to; x0 += 7) {
       for (const vx of [-4.4, 4.4]) {
         // game.js physics(): vy += 0.42 * dt; x += vx * dt; y += vy * dt; land when y >= ground.
         let x = x0;
-        let y = f2FloorAt(x0);
+        let y = tubeFloorAt(x0);
         if (y == null) continue;
         let vy = -8.3; // a hop
         let landed = null;
@@ -405,7 +394,7 @@ describe('G97: hopping along the Stairs\' flight 2 on slow frames', () => {
           const hit = resolveGround(plats, x, y, vy, 16);
           if (hit && y >= hit.y && vy >= 0) landed = hit;
         }
-        if (!landed || !/^plat_st_f2_/.test(landed.platform.id)) misses.push(`${x0}${vx > 0 ? '>' : '<'}${landed?.platform.id || 'none'}`);
+        if (!landed || !/^plat_st_(f[12]_|bottom_lip|top_lip)/.test(landed.platform.id)) misses.push(`${x0}${vx > 0 ? '>' : '<'}${landed?.platform.id || 'none'}`);
       }
     }
     assert.deepEqual(misses, []);

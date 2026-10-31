@@ -127,88 +127,161 @@ const C4_LOW = Object.freeze({ x: -1675, y: -411 });
 const C4_HIGH = Object.freeze({ x: 1599, y: -684 });
 
 /**
- * One flight: Corridor Four moved by (dx, dy), mirrored (it climbs to the
- * left) when `mirror`. Mirroring negates x, swaps each segment's ends, flips
- * every deco and negates its rotation.
+ * One length of tube: Corridor Four moved by (dx, dy). Its platforms and its
+ * steps, pillars and lanterns go in as they are; its wood backdrops too, but
+ * not its frame or frame shadow (`skip`): the Stairs draw one frame round the
+ * whole tube (see buildStairs).
  */
-function flight(c, id, { dx, dy, mirror = false, why, zBase = 0 }) {
-  const mx = (x) => (mirror ? -x : x) + dx;
+function flight(c, id, { dx, dy, why, skip = new Set() }) {
   C4_PLATFORMS.forEach(([x1, y1, x2, y2, pc], i) => {
-    const a = { x: mx(x1), y: y1 + dy };
-    const b = { x: mx(x2), y: y2 + dy };
-    const [p, q] = a.x <= b.x ? [a, b] : [b, a];
-    c.platforms.push({ id: `plat_${id}_${String(i).padStart(2, '0')}`, x1: p.x, y1: p.y, x2: q.x, y2: q.y, pc_perm: pc, why });
+    c.platforms.push({ id: `plat_${id}_${String(i).padStart(2, '0')}`, x1: x1 + dx, y1: y1 + dy, x2: x2 + dx, y2: y2 + dy, pc_perm: pc, why });
   });
   // C4 splits into halves with a wall slab between x 26 and 183 (walls
   // 1304666165704/5); the Stairs have no halves, so a step bridges the slot.
-  {
-    const a = { x: mx(26), y: -542 + dy };
-    const b = { x: mx(183), y: -561 + dy };
-    const [p, q] = a.x <= b.x ? [a, b] : [b, a];
-    c.platforms.push({ id: `plat_${id}_bridge`, x1: p.x, y1: p.y, x2: q.x, y2: q.y, pc_perm: -1, why: `${why} Corridor Four's east/west wall slot (x 26-183) is bridged.` });
-  }
+  c.platforms.push({ id: `plat_${id}_bridge`, x1: 26 + dx, y1: -542 + dy, x2: 183 + dx, y2: -561 + dy, pc_perm: -1, why: `${why} Corridor Four's east/west wall slot (x 26-183) is bridged.` });
   for (const [layer, sprite, x, y, w, h, z, r, flip] of C4_DECOS) {
-    const deco = { sprite, x: mx(x), y: y + dy, w, h, z: z + zBase, r: mirror && r ? -r : r, layer };
-    if (flip !== mirror) deco.flip = true;
+    if (skip.has(sprite)) continue;
+    const deco = { sprite, x: x + dx, y: y + dy, w, h, z, r, layer };
+    if (flip) deco.flip = true;
     c.decos.push(deco);
   }
-  return { low: { x: mx(C4_LOW.x), y: C4_LOW.y + dy }, high: { x: mx(C4_HIGH.x), y: C4_HIGH.y + dy } };
+  return { low: { x: C4_LOW.x + dx, y: C4_LOW.y + dy }, high: { x: C4_HIGH.x + dx, y: C4_HIGH.y + dy } };
 }
 
-/** Stairs layout: the archived arrival, two flights, the landing ladder, the top landing. */
+/**
+ * Turn a room's platforms and decos about a pivot by `deg` (negative: the
+ * right-hand end rises). Decos are anchored bottom-centre and turn about that
+ * anchor, so the anchor moves and the turn adds to each deco's own r.
+ */
+function tilt(c, pivot, deg) {
+  const t = (deg * Math.PI) / 180;
+  const cos = Math.cos(t);
+  const sin = Math.sin(t);
+  const turn = (x, y) => {
+    const dx = x - pivot.x;
+    const dy = y - pivot.y;
+    return [Math.round(pivot.x + dx * cos - dy * sin), Math.round(pivot.y + dx * sin + dy * cos)];
+  };
+  for (const p of c.platforms) {
+    [p.x1, p.y1] = turn(p.x1, p.y1);
+    [p.x2, p.y2] = turn(p.x2, p.y2);
+  }
+  for (const d of c.decos) {
+    [d.x, d.y] = turn(d.x, d.y);
+    d.r = Math.round(((d.r || 0) + deg) * 10) / 10;
+  }
+  return (pt) => {
+    const [x, y] = turn(pt.x, pt.y);
+    return { x, y };
+  };
+}
+
+/** The steepest riser the Stairs keep (degrees): see easeRisers. */
+export const STAIRS_MAX_RISER = 25;
+
+/**
+ * Lay each steep riser back to STAIRS_MAX_RISER by starting it further
+ * left, along the step below (its end moves with it). Corridor Four's risers
+ * climb ~36-41 degrees (more once turned); a hop up the tube on a slow frame
+ * (FRAME_DT_CAP) moves 11 px a frame and can fall through so steep a riser
+ * past resolveGround's catch, out of the tube. `segs` run left to right, each
+ * starting where the one before ends.
+ */
+function easeRisers(segs) {
+  const tan = Math.tan((STAIRS_MAX_RISER * Math.PI) / 180);
+  for (let i = 1; i < segs.length; i += 1) {
+    const p = segs[i];
+    const prev = segs[i - 1];
+    const rise = p.y1 - p.y2;
+    if (rise <= 0 || rise / (p.x2 - p.x1) <= tan || prev.x2 !== p.x1) continue;
+    const x1 = Math.round(p.x2 - rise / tan);
+    if (x1 <= prev.x1 + 20) continue;
+    prev.y2 = Math.round(prev.y1 + ((x1 - prev.x1) / (prev.x2 - prev.x1)) * (prev.y2 - prev.y1));
+    prev.x2 = x1;
+    p.x1 = x1;
+    p.y1 = prev.y2;
+  }
+}
+
+/**
+ * Stairs layout (R5, Tribute Blog post 57559495026, reference only): one
+ * long straight tube climbing to the right, the EXIT door at its low left
+ * end and the Mezzanine door at its high right end, with about eight
+ * pillars and eight lanterns along it. Two Corridor Four lengths end to
+ * end, the whole turned 3 degrees steeper about the archived arrival (the
+ * picture's tube climbs about 8 degrees; the corridor's own 5).
+ */
 export const STAIRS = Object.freeze({
-  bounds: Object.freeze({ l: -2750, r: 1400, t: -1700, b: 210 }),
+  bounds: Object.freeze({ l: -3100, r: 4800, t: -2000, b: 210 }),
   arrival: Object.freeze({ x: -2463, y: -191 }),
   flight1: Object.freeze({ dx: -885, dy: 220 }),
-  flight2: Object.freeze({ dx: -525, dy: -473 }),
-  ladderX: 1250,
-  mezzDoorX: -2450,
+  flight2: Object.freeze({ dx: -885 + (C4_HIGH.x - C4_LOW.x), dy: 220 + (C4_HIGH.y - C4_LOW.y) }),
+  tiltDeg: -3,
+  mezzDoorX: 4180,
 });
+
+/** Frame and shadow are drawn once round the whole tube. */
+const STAIRS_SKIP = new Set(['jethimadh_int_frame_50percent', 'jethimadh_int_bg_shadow_50percent']);
+/** Extra pillars where the two lengths leave a long bare run (world x before the tilt). */
+const STAIRS_PILLARS = Object.freeze([[-700, -278], [2550, -546]]);
 
 function buildStairs() {
   const c = collector();
-  const { bounds, arrival, ladderX, mezzDoorX } = STAIRS;
+  const { bounds, arrival, mezzDoorX } = STAIRS;
 
-  // Flight 1: Corridor Four placed so its first floor platform (-1675,-411)
-  // carries the archived arrival from Tower St West (-2463,-191).
-  const f1Why = 'Corridor Four\'s floor and roof (the archived corridor that climbs, firebog.swf steps art), moved so its first flat carries the archived arrival -2463,-191; B/N "climb the Stairs", "ascend the stairway".';
-  const f1 = flight(c, 'st_f1', { ...STAIRS.flight1, why: f1Why });
-  // Flight 2: the same corridor mirrored, climbing back to the left 420 px over the landing.
-  const f2Why = 'Corridor Four mirrored: the second flight climbs back to the left above the first (a switchback stairwell, remake layout), its roof the stairwell top.';
-  const f2 = flight(c, 'st_f2', { ...STAIRS.flight2, mirror: true, why: f2Why, zBase: 20 });
+  const f1Why = 'Corridor Four\'s floor and roof (the archived corridor that climbs, firebog.swf steps art), moved so its first flat carries the archived arrival -2463,-191; B/N "climb the Stairs", "ascend the stairway". R5 (post 57559495026): one straight tube.';
+  const f1 = flight(c, 'st_f1', { ...STAIRS.flight1, why: f1Why, skip: STAIRS_SKIP });
+  const f2Why = 'Corridor Four again, its low end on the first length\'s high end, so the tube runs on up in one straight climb (R5, post 57559495026).';
+  const f2 = flight(c, 'st_f2', { ...STAIRS.flight2, why: f2Why, skip: STAIRS_SKIP });
 
-  // Bottom lip from the end wall to the first flight, where you arrive.
-  const doorWhy = 'Archived: Tower St West door_1313235999202 (the tower\'s back door at world -37,-197) arrives at -2463,-191; the way back out stands there.';
-  c.platforms.push(flat('st_bottom_lip', bounds.l + 32, f1.low.x, arrival.y, doorWhy));
-
-  // Landing at the top of flight 1, a corridor ladder up to flight 2's lip.
-  const landWhy = 'Remake route: a landing at the top of the first flight and a corridor ladder (C1/C2 art) 420 px up to the second flight.';
-  c.platforms.push(flat('st_landing', f1.high.x, bounds.r - 32, f1.high.y, landWhy));
-  c.platforms.push(flat('st_upper_lip', f2.low.x, bounds.r - 32, f2.low.y, landWhy));
-  const ladders = [ladder(c, 'st', ladderX, f1.high.y, f2.low.y, landWhy)];
-
-  // Top landing: from flight 2's high end to the end wall, the Mezzanine door on it.
-  const topWhy = 'B "climb the Stairs to reach the Mezzanine": the top landing holds the door up to the Mezzanine (remake placement).';
-  c.platforms.push(flat('st_top_lip', bounds.l + 32, f2.high.x, f2.high.y, topWhy));
-
-  // Backdrop behind the landing shaft and both end walls (the corridors' wood and frame).
+  // One frame and one shadow round both lengths and on past both doors (R5:
+  // each door stands inside the tube's rounded end): Corridor Four's own,
+  // stretched, their anchors kept on the tube's line (its slope is the
+  // corridor's: 273 up in 3274).
+  const slope = (C4_HIGH.y - C4_LOW.y) / (C4_HIGH.x - C4_LOW.x);
+  const midX = (bounds.l + bounds.r) / 2;
+  const stretch = (sprite, layer, extra = 0) => {
+    const [, , x, y, w, h, z, r] = C4_DECOS.find((d) => d[1] === sprite);
+    // Corridor Four's own anchor in flight 1, slid along the line to the room's middle.
+    const x1 = x + STAIRS.flight1.dx;
+    const y1 = y + STAIRS.flight1.dy + (midX - x1) * slope;
+    return { sprite, x: Math.round(midX), y: Math.round(y1), w: Math.round(bounds.r - bounds.l - 260 + extra), h, z, r, layer };
+  };
+  c.decos.push(stretch('jethimadh_int_bg_shadow_50percent', 'mg', -60), stretch('jethimadh_int_frame_50percent', 'fg'));
+  // Wood behind the tube's ends past the corridor's own backdrops, and over the join between the two lengths.
+  const along = (sprite, x, dyFromC4, w, h, z) => ({ sprite, x: Math.round(x), y: Math.round(dyFromC4 + (x - C4_DECOS.find((d) => d[1] === sprite)[2] - STAIRS.flight1.dx) * slope), w, h, z, r: -5, layer: 'mg' });
   c.decos.push(
-    { sprite: 'jethimadh_int_bg_center', x: 1050, y: f1.high.y + 90, w: 700, h: 1100, z: 0, r: 0, layer: 'mg' },
-    { sprite: 'jethimadh_int_bg_shadow_50percent', x: 1050, y: f1.high.y + 60, w: 760, h: 1000, z: 1, r: 0, layer: 'mg' },
-    { sprite: 'jethimadh_int_bg_left', x: -2520, y: arrival.y + 120, w: 600, h: 1500, z: 0, r: 0, layer: 'mg' },
-    { sprite: 'jethimadh_frame_cap', x: -2700, y: bounds.b, w: 300, h: bounds.b - bounds.t, z: 9, r: 0, layer: 'fg' },
-    { sprite: 'jethimadh_frame_cap', x: 1350, y: bounds.b, w: 300, h: bounds.b - bounds.t, z: 9, r: 0, flip: true, layer: 'fg' },
-    lantern(1050, f1.high.y - 120),
-    lantern(-2300, f2.high.y - 120),
+    along('jethimadh_int_bg_left', -1026 + STAIRS.flight1.dx - 560, -333 + STAIRS.flight1.dy - 40, 1100, 520, 1),
+    along('jethimadh_int_bg_right', 1043 + STAIRS.flight1.dx + (C4_HIGH.x - C4_LOW.x) + 630, -518 + STAIRS.flight1.dy + 10, 1100, 540, 0),
+    along('jethimadh_int_bg_center', C4_HIGH.x + STAIRS.flight1.dx, -425 + STAIRS.flight1.dy, 1300, 629, 2),
   );
-  // Plaques beside the doors at mid height, as the corridors hang theirs. G72:
-  // a player Snap of the Stairs (jtower_stairs/, reference only) shows the
-  // arched door at the low end with an "EXIT" plaque beside it; both plaques
-  // sit in front of the second flight's backdrop (z 40+), which hid them. The
-  // EXIT plaque hangs just past flight 1's first pillar (x -2278, FG), which
-  // stands where the corridors' plaque spot would be.
+  for (const [x, y] of STAIRS_PILLARS) {
+    c.decos.push({ sprite: 'jethimadh_int_pillar_1', x, y, w: 185, h: 530, z: 9, r: 0, layer: 'fg' });
+  }
+
+  // The whole tube 3 degrees steeper, about the arrival (which keeps its floor).
+  const turn = tilt(c, arrival, STAIRS.tiltDeg);
+  const low = turn(f1.low);
+  const high = turn(f2.high);
+  easeRisers(c.platforms.filter((p) => /^plat_st_f[12]_\d+$/.test(p.id) && p.pc_perm === -1));
+
+  // Bottom lip from the end wall to the tube, where you arrive.
+  const doorWhy = 'Archived: Tower St West door_1313235999202 (the tower\'s back door at world -37,-197) arrives at -2463,-191; the way back out stands there (R5: the EXIT door at the tube\'s low left end).';
+  c.platforms.push(flat('st_bottom_lip', bounds.l + 32, low.x, low.y, doorWhy));
+  // Top landing: from the tube's high end to the end wall, the Mezzanine door on it.
+  const topWhy = 'B "climb the Stairs to reach the Mezzanine"; R5 (post 57559495026): the Mezzanine door at the high right end of the tube, its plaque to the left.';
+  c.platforms.push(flat('st_top_lip', high.x, bounds.r - 32, high.y, topWhy));
+
+  // End walls: the corridors' frame caps (the room's ends are black past the tube, R5).
+  c.decos.push(
+    { sprite: 'jethimadh_frame_cap', x: bounds.l + 50, y: bounds.b, w: 300, h: bounds.b - bounds.t, z: 9, r: 0, layer: 'fg' },
+    { sprite: 'jethimadh_frame_cap', x: bounds.r - 50, y: bounds.b, w: 300, h: bounds.b - bounds.t, z: 9, r: 0, flip: true, layer: 'fg' },
+  );
+  // Plaques beside the doors at mid height, as the corridors hang theirs: EXIT
+  // right of the low door (G72 Snap; R5), "Mezzanine" left of the top one (R5).
+  // Both stand in front of the tube's backdrops (z 30+).
   plaque(c, arrival.x + 380, arrival.y - 70, 'EXIT');
-  plaque(c, mezzDoorX + 190, f2.high.y - 70, 'Mezzanine');
+  plaque(c, mezzDoorX - 240, high.y - 70, 'Mezzanine');
   for (const d of c.decos) if (d.sprite === 'jethimadh_int_door_sign' || d.sprite === 'firebog_sign_blank') d.z += 30;
   c.platforms.push(flat('st_ceiling', bounds.l + 40, bounds.r - 40, bounds.t + 35, 'Stairwell roof (solid from below).', 1));
 
@@ -221,7 +294,7 @@ function buildStairs() {
     platforms: c.platforms,
     barriers: barriersFor(bounds, 'st'),
     decos: c.decos,
-    ladders,
+    ladders: [],
     doors: [
       {
         id: 'door_st_tower_st_west',
@@ -234,18 +307,18 @@ function buildStairs() {
       {
         id: 'door_st_mezzanine',
         x: mezzDoorX,
-        y: f2.high.y,
+        y: high.y,
         ...DOOR,
         connect: { tsid: 'LIFGJ2246R72LJL', label: 'Mezzanine', x: MEZZ.stairsDoorX, y: MEZZ.floor, hub_id: '96' },
         why: topWhy,
       },
     ],
     spots: [],
-    flights: { f1, f2 },
+    flight: { low, high },
     why: {
       room: 'Maps: LIFFUV4ATQ72I6D "Stairs" in hub 96 "Jethimadh Tower: Mid". B: "visit Tower St. West, climb the Stairs to reach the Mezzanine". N: "Enter the Tower via the giant door on Tower St. West ... and ascend the stairway to the Mezzanine."',
-      size: 'Remake: the arrival x -2463 puts the door near the left end, so the street starts at -2750; two Corridor Four flights (each 3274 wide, 273 up) stacked as a switchback reach 1157 px over the arrival. 300+ px of world under the lowest floor (b 210) like the base rooms.',
-      decor: 'G72: Tower St West\'s archived door into the Stairs carries swf_file_versioned .../locations/firebog/1316548751.swf (streets GIF5UU8FO3029OK.xml), the corridors\' bundle, and a player Snap (2012-12-09, jtower_stairs/, reference only) shows the corridor set itself: a tilted curved wooden tube (jethimadh_int_bg_*), stepped sliced-tree "pews" (jethimadh_int_steps_1), a spotted pillar (jethimadh_int_pillar_1), a hanging lantern (jethimadh_int_lantern_1), the arched door (door_asset_jethimadh_int) with an EXIT plaque. So the Corridor Four flights stay; the low door\'s plaque reads EXIT and both plaques are lifted in front of the second flight. A second Snap (2012-06, Ancient filter) is too blurred to read.',
+      size: 'R5 (Tribute Blog post 57559495026, a whole-room picture, reference only): one straight tube about 8 degrees up to the right, ~6 corridor lanterns apart end to end. Remake: two Corridor Four lengths (each 3274 wide) end to end from the archived arrival x -2463, turned 3 degrees steeper about it; 300+ px of world under the lowest floor (b 210) like the base rooms.',
+      decor: 'G72: Tower St West\'s archived door into the Stairs carries swf_file_versioned .../locations/firebog/1316548751.swf (streets GIF5UU8FO3029OK.xml), the corridors\' bundle, and a player Snap (2012-12-09, jtower_stairs/, reference only) shows the corridor set itself: a tilted curved wooden tube (jethimadh_int_bg_*), stepped sliced-tree "pews" (jethimadh_int_steps_1), a spotted pillar (jethimadh_int_pillar_1), a hanging lantern (jethimadh_int_lantern_1), the arched door (door_asset_jethimadh_int) with an EXIT plaque. R5 (post 57559495026) shows the whole room: one tube, eight pillars and eight lanterns, EXIT plaque right of the low door, "Mezzanine" plaque left of the high one. Corridor Four\'s frame and shadow are stretched over both lengths so the tube reads as one; two pillars are added in its long bare runs.',
     },
   };
 }
@@ -421,8 +494,13 @@ function buildMezzanine() {
   };
 }
 
-/** The Stairs' top landing height (flight 2's high end), for the Mezzanine's door back down. */
-const STAIRS_TOP_Y = C4_HIGH.y + STAIRS.flight2.dy;
+/** The Stairs' top landing height (the tube's high end, after the tilt), for the Mezzanine's door back down. */
+const STAIRS_TOP_Y = (() => {
+  const t = (STAIRS.tiltDeg * Math.PI) / 180;
+  const dx = C4_HIGH.x + STAIRS.flight2.dx - STAIRS.arrival.x;
+  const dy = C4_HIGH.y + STAIRS.flight2.dy - STAIRS.arrival.y;
+  return Math.round(STAIRS.arrival.y + dx * Math.sin(t) + dy * Math.cos(t));
+})();
 
 /**
  * unnnn's way back up (remake): walking into its left end returns you to the
