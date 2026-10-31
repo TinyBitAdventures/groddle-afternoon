@@ -44,7 +44,7 @@ import {
 } from '../public/js/solo-feats.js?v=e026b67b';
 import { DAY_NAMES, GAME_DAY_MS } from '../public/js/game-day.js?v=3095e05b';
 import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=3a89f5a3';
-import { FEATURES } from '../public/js/features/index.js?v=5af934bd';
+import { FEATURES } from '../public/js/features/index.js?v=e116bafc';
 import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=9ea632cc';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=3d618d6a';
 

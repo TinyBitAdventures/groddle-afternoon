@@ -14,7 +14,7 @@
  *   (Hauki Seeks Manor, floor 3, at the lift); a lobby's lift arms lead to each floor.
  */
 
-import { TOWER_FLOOR_BOUNDS, TOWER_LIFT, TOWER_LIFT_PLATE, towerFloorEcology, towerFloorFor, towerFloorLayout } from '../tower-floors.js?v=da5c6d5a';
+import { TOWER_FLOOR_BOUNDS, TOWER_LIFT, TOWER_LIFT_PLATE, towerFloorEcology, towerFloorFor, towerFloorLayout } from '../tower-floors.js?v=45fe0f93';
 
 export const TOWER_FLOORS_FEATURE_ID = 'tower-floors';
 

@@ -135,7 +135,7 @@ describe('the deco catalog (tools/builder/deco-catalog.mjs, assets/content/deco-
     assert.ok(cat.decos.every((d) => Object.keys(d.layers).every((r) => LAYER_ROLES.includes(r))));
     assert.ok(cat.decos.every((d) => Array.isArray(d.size2) && d.size2.length === 2));
     const total = cat.decos.reduce((n, d) => n + d.placements, 0);
-    assert.ok(total > 550000 && total <= 556904, `placements ${total}`); // + 1,067 on the 15 tower floors (G144)
+    assert.ok(total > 550000 && total <= 557208, `placements ${total}`); // + 1,371 on the 15 tower floors (G144)
     const bush = cat.decos.find((d) => d.name === 'bush_3');
     assert.equal(bush.family, 'bush');
     assert.equal(bush.source, 'groddle1.swf#bush_3');

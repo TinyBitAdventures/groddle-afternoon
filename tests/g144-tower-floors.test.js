@@ -33,9 +33,9 @@ import {
   towerFloorFor,
   towerFloorLayout,
   towerForLobby,
-} from '../public/js/tower-floors.js?v=da5c6d5a';
-import { towerFloorsFeature } from '../public/js/features/tower-floors-feature.js?v=dbdc2b41';
-import { FEATURES } from '../public/js/features/index.js?v=5af934bd';
+} from '../public/js/tower-floors.js?v=45fe0f93';
+import { towerFloorsFeature } from '../public/js/features/tower-floors-feature.js?v=7f87d087';
+import { FEATURES } from '../public/js/features/index.js?v=e116bafc';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -81,33 +81,56 @@ describe('tower floors: street JSON', () => {
     }
   });
 
-  it('Hauki Seeks Manor\'s three floors are laid out from their panoramas; the other 12 are marked default, awaiting one', () => {
-    const pictures = { LDOBRJIEU2V2Q2G: ['48476742859', 6], LDOBRKREU2V2F9B: ['48484112182', 8], LHF9DOUO7K03OUA: ['48540615574', 3] };
+  it('every floor is laid out from its Tribute Blog panorama (post id and lift plate cited); no default marker is left', () => {
+    // [post id, hall doors as the picture shows them]
+    const pictures = {
+      LDOBRJIEU2V2Q2G: ['48476742859', 6], LDOBRKREU2V2F9B: ['48484112182', 8], LHF9DOUO7K03OUA: ['48540615574', 3],
+      LUVMHFM3U2V2T72: ['41722396690', 8], LUVMHGV3U2V2J7M: ['41805000800', 2], LUVMHH74U2V245O: ['41813899873', 6],
+      LNV6EBBIS2V2JB8: ['40948529639', 4], LNV6ECKIS2V26JU: ['40956964858', 4], LNV6EDVIS2V2SFD: ['40965287278', 3], LNV6EEAJS2V26B2: ['40973309005', 7],
+      LA9TBQS1V2V2G34: ['43506277838', 7], LA9TBR62V2V23E2: ['43514874358', 5],
+      LDOBRLULU2V24DS: ['53465948360', 8], LDOBRNDMU2V2Q34: ['53473055375', 8], LDOBROOMU2V2GCK: ['53480119891', 8],
+    };
     for (const f of BUILT) {
       const s = street(f.tsid);
       const doors = Number(s.why.hallDoors.split(' ')[0]);
-      if (pictures[f.source]) {
-        assert.match(s.why.layout, /^panorama: /);
-        assert.match(s.why.layout, new RegExp(pictures[f.source][0]));
-        assert.match(s.why.layout, new RegExp(`plate ${f.n}|tagged Hauki Seeks Manor`));
-        assert.equal(doors, pictures[f.source][1], f.label);
-      } else {
-        assert.ok(s.why.layout.startsWith(`${TOWER_DEFAULT_NOTE}:`), f.label);
-        assert.match(s.source, new RegExp(TOWER_DEFAULT_NOTE));
-        assert.equal(TOWER_DEFAULT_NOTE, 'default layout, awaiting a panorama');
-        assert.equal(doors, TOWER_DEFAULT_DOORS, 'apartment_8units: eight doors');
-      }
+      assert.match(s.why.layout, /^panorama: /, f.label);
+      assert.match(s.why.layout, new RegExp(pictures[f.source][0]));
+      assert.match(s.why.layout, new RegExp(`plate ${f.n}\\)|post 48540615574`), f.label);
+      assert.equal(doors, pictures[f.source][1], f.label);
       assert.equal(doors, towerFloorLayout(f).bays.filter(([, , k]) => k === 'door').length);
+      assert.ok(!s.source.includes(TOWER_DEFAULT_NOTE) && !JSON.stringify(s.why).includes(TOWER_DEFAULT_NOTE), f.label);
       assert.equal(s.internalLabel, `Abandoned ${f.label}`);
     }
     assert.deepEqual(Object.keys(PANORAMA_LAYOUTS).sort(), Object.keys(pictures).sort());
-    assert.equal(TOWER_FLOORS.filter((f) => !PANORAMA_LAYOUTS[f.source]).length, 12);
+    assert.equal(TOWER_FLOORS.filter((f) => !PANORAMA_LAYOUTS[f.source]).length, 0);
   });
 
-  it('the three Hauki floors share one plan of bays, the default floors too', () => {
+  it('round 5\'s floors keep what their pictures show: open windows and torn walls, posts, columns, bricks, the room seen through a wall', () => {
+    const L = (src) => towerFloorLayout(towerFloorFor(src));
+    const kinds = (src) => L(src).bays.map(([, , k, o]) => `${k}${o.open ? ':open' : ''}${o.room ? ':room' : ''}`);
+    const sprites = (src) => L(src).props.map(([sp]) => sp);
+    // Egret Taun: lit, windows open to the sky; floor 2's garden rooms with columns and planter beds.
+    assert.ok(L('LUVMHFM3U2V2T72').light && kinds('LUVMHFM3U2V2T72').filter((k) => k === 'window:open').length === 4);
+    assert.equal(sprites('LUVMHGV3U2V2J7M').filter((sp) => sp === 'column_1').length, 8);
+    assert.equal(sprites('LUVMHGV3U2V2J7M').filter((sp) => sp === 'firebog_planter_box_3x4').length, 4);
+    // Sabudana Drama: braced posts on floors 1 and 4, the torn walls on floors 2 and 3, the room behind floor 1's last bay.
+    assert.equal(sprites('LNV6EBBIS2V2JB8').filter((sp) => sp === 'wood_cover_middleplus').length, 6);
+    assert.equal(kinds('LNV6EBBIS2V2JB8')[11], 'torn:room');
+    assert.deepEqual([kinds('LNV6ECKIS2V26JU').filter((k) => k === 'torn').length, kinds('LNV6EDVIS2V2SFD').filter((k) => k === 'torn').length], [6, 6]);
+    // Hakusan Heaps floor 2: the room seen through the torn left end.
+    assert.deepEqual(kinds('LA9TBR62V2V23E2').slice(0, 2), ['torn:room', 'torn:room']);
+    // Gregarious: bricks under the plaster on every floor, filing cabinets on floor 3.
+    for (const src of ['LDOBRLULU2V24DS', 'LDOBRNDMU2V2Q34', 'LDOBROOMU2V2GCK']) assert.equal(L(src).bricks, true);
+    assert.equal(sprites('LDOBROOMU2V2GCK').filter((sp) => sp === 'cubicle_cabinet_stack').length, 4);
+    // Every lit floor has the sky through its windows; Hauki Seeks Manor's stay dark, as in their pictures.
+    for (const f of BUILT) assert.deepEqual(street(f.tsid).gradient.top, f.tower.id === 'hauki' ? '0A0705' : '8FB9E6', f.label);
+  });
+
+  it('every floor shares Hauki Seeks Manor\'s plan of bays, the fallback default too', () => {
     const plan = (layout) => layout.bays.map(([a, b]) => `${a}..${b}`);
     assert.deepEqual(plan(HAUKI_FLOOR_1), plan(HAUKI_FLOOR_2));
     assert.deepEqual(plan(defaultTowerLayout(TOWER_FLOORS[3])), plan(HAUKI_FLOOR_1));
+    for (const f of TOWER_FLOORS.filter((x) => x.tower.id !== 'hauki')) assert.deepEqual(plan(towerFloorLayout(f)), plan(HAUKI_FLOOR_1), f.label);
     assert.equal(HAUKI_PILASTERS.length, 14);
     // Floor 3's right side is the same bays (its left end is the barred room).
     HAUKI_FLOOR_3.bays.slice(-6).forEach(([a, b], i) => {
@@ -149,8 +172,8 @@ describe('tower floors: street JSON', () => {
     assert.ok(!walk(join(pub, 'assets')).some((n) => /tumblr|me4gckP3Ug1rlttf2o1/i.test(n)));
   });
 
-  it('every default floor is its own (doors boarded, leftovers placed per floor), deterministic', () => {
-    const shapes = new Set(TOWER_FLOORS.filter((f) => !PANORAMA_LAYOUTS[f.source]).map((f) => JSON.stringify(defaultTowerLayout(f))));
+  it('the fallback default layout (for a floor with no picture) varies per floor and is deterministic', () => {
+    const shapes = new Set(TOWER_FLOORS.map((f) => JSON.stringify(defaultTowerLayout(f))));
     assert.ok(shapes.size >= 12);
     const f = TOWER_FLOORS[0];
     assert.deepEqual(defaultTowerLayout(f), defaultTowerLayout(f));

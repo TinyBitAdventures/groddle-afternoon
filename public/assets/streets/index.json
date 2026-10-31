@@ -13224,7 +13224,7 @@
       "hubId": "98",
       "hubName": "Besara",
       "platforms": 2,
-      "decos": 80,
+      "decos": 103,
       "reconstructed": true,
       "internalLabel": "Abandoned Egret Taun Towers, floor 1"
     },
@@ -13234,7 +13234,7 @@
       "hubId": "98",
       "hubName": "Besara",
       "platforms": 2,
-      "decos": 77,
+      "decos": 84,
       "reconstructed": true,
       "internalLabel": "Abandoned Egret Taun Towers, floor 2"
     },
@@ -13244,7 +13244,7 @@
       "hubId": "98",
       "hubName": "Besara",
       "platforms": 2,
-      "decos": 76,
+      "decos": 102,
       "reconstructed": true,
       "internalLabel": "Abandoned Egret Taun Towers, floor 3"
     },
@@ -13254,7 +13254,7 @@
       "hubId": "101",
       "hubName": "Aranna",
       "platforms": 2,
-      "decos": 71,
+      "decos": 96,
       "reconstructed": true,
       "internalLabel": "Abandoned Sabudana Drama Towers, floor 1"
     },
@@ -13264,7 +13264,7 @@
       "hubId": "101",
       "hubName": "Aranna",
       "platforms": 2,
-      "decos": 66,
+      "decos": 94,
       "reconstructed": true,
       "internalLabel": "Abandoned Sabudana Drama Towers, floor 2"
     },
@@ -13274,7 +13274,7 @@
       "hubId": "101",
       "hubName": "Aranna",
       "platforms": 2,
-      "decos": 65,
+      "decos": 92,
       "reconstructed": true,
       "internalLabel": "Abandoned Sabudana Drama Towers, floor 3"
     },
@@ -13284,7 +13284,7 @@
       "hubId": "101",
       "hubName": "Aranna",
       "platforms": 2,
-      "decos": 67,
+      "decos": 92,
       "reconstructed": true,
       "internalLabel": "Abandoned Sabudana Drama Towers, floor 4"
     },
@@ -13294,7 +13294,7 @@
       "hubId": "97",
       "hubName": "Muufo",
       "platforms": 2,
-      "decos": 76,
+      "decos": 90,
       "reconstructed": true,
       "internalLabel": "Abandoned Hakusan Heaps Towers, floor 1"
     },
@@ -13304,7 +13304,7 @@
       "hubId": "97",
       "hubName": "Muufo",
       "platforms": 2,
-      "decos": 73,
+      "decos": 111,
       "reconstructed": true,
       "internalLabel": "Abandoned Hakusan Heaps Towers, floor 2"
     },
@@ -13314,7 +13314,7 @@
       "hubId": "58",
       "hubName": "Groddle Meadow",
       "platforms": 2,
-      "decos": 71,
+      "decos": 106,
       "reconstructed": true,
       "internalLabel": "Abandoned Gregarious Towers, floor 1"
     },
@@ -13324,7 +13324,7 @@
       "hubId": "58",
       "hubName": "Groddle Meadow",
       "platforms": 2,
-      "decos": 74,
+      "decos": 100,
       "reconstructed": true,
       "internalLabel": "Abandoned Gregarious Towers, floor 2"
     },
@@ -13334,7 +13334,7 @@
       "hubId": "58",
       "hubName": "Groddle Meadow",
       "platforms": 2,
-      "decos": 77,
+      "decos": 107,
       "reconstructed": true,
       "internalLabel": "Abandoned Gregarious Towers, floor 3"
     }

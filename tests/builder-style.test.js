@@ -63,7 +63,7 @@ describe('the style profile (tools/builder/style-profile.mjs, assets/content/sty
     assert.deepEqual(Object.keys(world.roles), ['sky', 'bg', 'middleground', 'middleplus', 'foreground']);
     assert.deepEqual(world.size.w, [2500, 6000, 6000, 8000]);
     assert.deepEqual(world.size.h.slice(0, 3), [1000, 1000, 2400]);
-    assert.deepEqual(world.roles.middleground.density, [0.4, 27.7, 86.7]);
+    assert.deepEqual(world.roles.middleground.density, [0.4, 28.2, 86.7]);
     assert.deepEqual(world.roles.middleground.decoW, [86, 249, 703]);
     assert.ok(world.roles.sky.filters.saturation.band[1] < world.roles.middleground.filters.saturation.band[1], 'further back is greyer');
     for (const role of Object.values(world.roles)) {
