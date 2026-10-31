@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e70532b9';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=74796cb1';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f2ecd288';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -713,8 +713,9 @@ import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=8691
 import {
   planTravel,
   listMapDestinations,
+  pickAwayConnection,
   planSignpostTravel,
-} from './js/travel.js?v=855c6c68';
+} from './js/travel.js?v=a2c6427f';
 import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
 import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
 import { landingY } from './js/walk-surface.js?v=764d5f5a';
@@ -856,7 +857,7 @@ import {
   pickMapSpot,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
-} from './js/map-graph.js?v=ca1acd30';
+} from './js/map-graph.js?v=41426330';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=a6771c5e';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import {
@@ -27808,7 +27809,7 @@ async function main() {
           y: (box ? box.top : near.sprite.y - 74) - 12,
         };
       } else if (nearSign) {
-        const conn = pickConnection(nearSign.signpost, availableStreetTsids());
+        const conn = pickAwayConnection(nearSign.signpost, currentStreetTsid, availableStreetTsids());
         // Above the post, clear of the arms (SignpostView post 246px at 0.8).
         want = conn
           ? { key: 'T', label: conn.label, x: nearSign.screen.x, y: nearSign.screen.y - 246 * 0.8 - 10 }

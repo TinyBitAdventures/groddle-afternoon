@@ -13187,6 +13187,36 @@
       "platforms": 24,
       "decos": 208,
       "reconstructed": true
+    },
+    "GDOBRJIEU2V2Q2G": {
+      "label": "Hauki Seeks Manor, floor 1",
+      "file": "assets/streets/GDOBRJIEU2V2Q2G.json",
+      "hubId": "75",
+      "hubName": "Bortola",
+      "platforms": 2,
+      "decos": 107,
+      "reconstructed": true,
+      "internalLabel": "Abandoned Hauki Seeks Manor, floor 1"
+    },
+    "GDOBRKREU2V2F9B": {
+      "label": "Hauki Seeks Manor, floor 2",
+      "file": "assets/streets/GDOBRKREU2V2F9B.json",
+      "hubId": "75",
+      "hubName": "Bortola",
+      "platforms": 2,
+      "decos": 114,
+      "reconstructed": true,
+      "internalLabel": "Abandoned Hauki Seeks Manor, floor 2"
+    },
+    "GHF9DOUO7K03OUA": {
+      "label": "Hauki Seeks Manor, floor 3",
+      "file": "assets/streets/GHF9DOUO7K03OUA.json",
+      "hubId": "75",
+      "hubName": "Bortola",
+      "platforms": 2,
+      "decos": 108,
+      "reconstructed": true,
+      "internalLabel": "Abandoned Hauki Seeks Manor, floor 3"
     }
   }
 }

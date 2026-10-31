@@ -63,7 +63,7 @@ describe('the style profile (tools/builder/style-profile.mjs, assets/content/sty
     assert.deepEqual(Object.keys(world.roles), ['sky', 'bg', 'middleground', 'middleplus', 'foreground']);
     assert.deepEqual(world.size.w, [2500, 6000, 6000, 8000]);
     assert.deepEqual(world.size.h.slice(0, 3), [1000, 1000, 2400]);
-    assert.deepEqual(world.roles.middleground.density, [0.4, 27.7, 86.8]);
+    assert.deepEqual(world.roles.middleground.density, [0.4, 27.8, 86.8]);
     assert.deepEqual(world.roles.middleground.decoW, [87, 250, 702]);
     assert.ok(world.roles.sky.filters.saturation.band[1] < world.roles.middleground.filters.saturation.band[1], 'further back is greyer');
     for (const role of Object.values(world.roles)) {
@@ -183,7 +183,7 @@ describe('the style rules (js/builder/style-rules.js)', () => {
     assert.equal(sty001(a)[0].fingerprint, sty001(structuredClone(a))[0].fingerprint);
   });
 
-  it('calibration: over the 1,460 shipped streets STY-001 is rare and STY-005 never fires', () => {
+  it('calibration: over the 1,463 shipped streets STY-001 is rare and STY-005 never fires', () => {
     const counts = {};
     for (const f of readdirSync(join(root, 'public/assets/streets')).filter((n) => /^[GL][A-Z0-9]+\.json$/.test(n) && !/^[GL]Z[A-Z0-9]{13}\.json$/.test(n))) {
       const street = json(`public/assets/streets/${f}`);

@@ -69,8 +69,12 @@ test('every street on the map lists has its own location hub, which the map data
 
 test('rebuilt rooms (no location XML) keep a hub the map data lists them under', () => {
   const rebuilt = rows.filter((r) => !r.own);
-  assert.equal(rebuilt.length, 38); // + Snowed In, Ethereal Endeavour, Martleby Hare, Growing Stuff (G157-G159), Winter Walk, Winter Haven
-  for (const r of rebuilt) assert.deepEqual(r.maps, [r.meta.hubId], `${r.tsid} ${r.meta.label}`);
+  assert.equal(rebuilt.length, 41); // + Snowed In, Ethereal Endeavour, Martleby Hare, Growing Stuff (G157-G159), Winter Walk, Winter Haven, the three Hauki Seeks Manor floors (G144)
+  // The abandoned towers' floors were quarter streets, never on a map list: they keep their lobby's hub.
+  const floors = rebuilt.filter((r) => r.meta.internalLabel === `Abandoned ${r.meta.label}` && /, floor \d$/.test(r.meta.label));
+  assert.equal(floors.length, 3);
+  for (const r of floors) assert.deepEqual(r.maps, [], `${r.tsid} ${r.meta.label}`);
+  for (const r of rebuilt.filter((x) => !floors.includes(x))) assert.deepEqual(r.maps, [r.meta.hubId], `${r.tsid} ${r.meta.label}`);
 });
 
 test('instance copies off the map lists carry their own hub or none (follow-up row)', () => {

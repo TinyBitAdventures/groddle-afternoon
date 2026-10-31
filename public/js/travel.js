@@ -58,6 +58,24 @@ export function pickConnection(signpost, availableTsids) {
 }
 
 /**
+ * The connection a signpost's T key (and its prompt) takes from `fromTsid`: the
+ * first loaded one that leads somewhere else, else pickConnection's. A tower's
+ * lift lists every floor, its own too (the archived lobby lifts; GSJS
+ * locations/tower.js gives every floor one connects list), so its first row
+ * can be the street you stand on.
+ * @param {object} signpost
+ * @param {string} fromTsid
+ * @param {Set<string>|string[]} availableTsids
+ */
+export function pickAwayConnection(signpost, fromTsid, availableTsids) {
+  const here = new Set(tsidAliases(fromTsid));
+  const connects = signpost?.connects || [];
+  const away = connects.filter((c) => !tsidAliases(c?.tsid).some((a) => here.has(a)));
+  const conn = away.length && away.length < connects.length ? pickConnection({ ...signpost, connects: away }, availableTsids) : null;
+  return conn || pickConnection(signpost, availableTsids);
+}
+
+/**
  * Attempt travel from current street to a destination tsid.
  * Pure: does not load assets — returns a plan the client executes.
  * @param {string} fromTsid
@@ -137,7 +155,7 @@ export function planSignpostTravel(street, playerScreenX, availableTsids, radius
   if (!nearest) {
     return { ok: false, reason: 'no_signpost', radius };
   }
-  const conn = pickConnection(nearest, availableTsids);
+  const conn = pickAwayConnection(nearest, street.tsid, availableTsids);
   if (!conn) {
     return {
       ok: false,

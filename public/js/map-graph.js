@@ -4,7 +4,7 @@
  * Pure logic — no DOM/Pixi. Click destination → travel plan via planTravel.
  */
 
-import { listMapDestinations, planTravel, resolveLoadedTsid, tsidAliases } from './travel.js?v=855c6c68';
+import { listMapDestinations, planTravel, resolveLoadedTsid, tsidAliases } from './travel.js?v=a2c6427f';
 import { CLASSIC_ART } from './classic/classic-art.js?v=5745e669';
 
 /** Map catalog + per-hub files. */

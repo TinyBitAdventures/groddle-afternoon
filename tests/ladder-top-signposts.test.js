@@ -19,7 +19,7 @@ import {
   walkUpSignpostStreet,
 } from '../public/js/ladder-top-signposts.js?v=f609fb2f';
 import { navigableSignposts, signpostNear, wallsScreen, worldToScreen } from '../public/js/street-model.js?v=23b926e5';
-import { planSignpostTravel } from '../public/js/travel.js?v=855c6c68';
+import { planSignpostTravel } from '../public/js/travel.js?v=a2c6427f';
 import { visibleDoors } from '../public/js/doors.js?v=eb9510b1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
