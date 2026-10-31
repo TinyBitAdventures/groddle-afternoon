@@ -107,9 +107,9 @@ describe('street data (build-street-layers.mjs item_perm)', () => {
     });
   });
 
-  it('the rebuilt streets: the ones copied from an archived street carry it, the 37 drawn by hand have none', () => {
+  it('the rebuilt streets: the ones copied from an archived street carry it, the 49 drawn by hand have none', () => {
     const rebuilt = allStreets().filter((s) => /^reconstruction/.test(s.source || ''));
-    assert.equal(rebuilt.length, 41); // + the three Hauki Seeks Manor floors (G144)
+    assert.equal(rebuilt.length, 53); // + the 15 abandoned-tower floors (G144)
     // tools/build-enchanted-forests.mjs slices the parent street; tools/build-forest-machine-room.mjs
     // copies the Meadow room's template.
     const copied = rebuilt.filter((s) => /Enchanted Forest hollows|Forest Community Machine Room/.test(s.source));
@@ -237,7 +237,7 @@ describe('the other lines the rule changes', () => {
     assert.ok(checked > 1900, `${checked}`);
   });
 
-  it("2,240 lines on 272 streets hold no items; the two rules disagree on 70 lines on 32 streets", () => {
+  it("2,252 lines on 284 streets hold no items; the two rules disagree on 70 lines on 32 streets", () => {
     let soft = 0;
     let softStreets = 0;
     let disagree = 0;
@@ -254,8 +254,8 @@ describe('the other lines the rule changes', () => {
       soft += n;
       if (n) softStreets += 1;
     }
-    assert.equal(soft, 2240);
-    assert.equal(softStreets, 272);
+    assert.equal(soft, 2252);
+    assert.equal(softStreets, 284);
     assert.equal(disagree, 70);
     assert.equal(disagreeStreets.size, 32);
   });

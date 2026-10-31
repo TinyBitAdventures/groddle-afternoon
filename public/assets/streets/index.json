@@ -13217,6 +13217,126 @@
       "decos": 108,
       "reconstructed": true,
       "internalLabel": "Abandoned Hauki Seeks Manor, floor 3"
+    },
+    "GUVMHFM3U2V2T72": {
+      "label": "Egret Taun Towers, floor 1",
+      "file": "assets/streets/GUVMHFM3U2V2T72.json",
+      "hubId": "98",
+      "hubName": "Besara",
+      "platforms": 2,
+      "decos": 80,
+      "reconstructed": true,
+      "internalLabel": "Abandoned Egret Taun Towers, floor 1"
+    },
+    "GUVMHGV3U2V2J7M": {
+      "label": "Egret Taun Towers, floor 2",
+      "file": "assets/streets/GUVMHGV3U2V2J7M.json",
+      "hubId": "98",
+      "hubName": "Besara",
+      "platforms": 2,
+      "decos": 77,
+      "reconstructed": true,
+      "internalLabel": "Abandoned Egret Taun Towers, floor 2"
+    },
+    "GUVMHH74U2V245O": {
+      "label": "Egret Taun Towers, floor 3",
+      "file": "assets/streets/GUVMHH74U2V245O.json",
+      "hubId": "98",
+      "hubName": "Besara",
+      "platforms": 2,
+      "decos": 76,
+      "reconstructed": true,
+      "internalLabel": "Abandoned Egret Taun Towers, floor 3"
+    },
+    "GNV6EBBIS2V2JB8": {
+      "label": "Sabudana Drama Towers, floor 1",
+      "file": "assets/streets/GNV6EBBIS2V2JB8.json",
+      "hubId": "101",
+      "hubName": "Aranna",
+      "platforms": 2,
+      "decos": 71,
+      "reconstructed": true,
+      "internalLabel": "Abandoned Sabudana Drama Towers, floor 1"
+    },
+    "GNV6ECKIS2V26JU": {
+      "label": "Sabudana Drama Towers, floor 2",
+      "file": "assets/streets/GNV6ECKIS2V26JU.json",
+      "hubId": "101",
+      "hubName": "Aranna",
+      "platforms": 2,
+      "decos": 66,
+      "reconstructed": true,
+      "internalLabel": "Abandoned Sabudana Drama Towers, floor 2"
+    },
+    "GNV6EDVIS2V2SFD": {
+      "label": "Sabudana Drama Towers, floor 3",
+      "file": "assets/streets/GNV6EDVIS2V2SFD.json",
+      "hubId": "101",
+      "hubName": "Aranna",
+      "platforms": 2,
+      "decos": 65,
+      "reconstructed": true,
+      "internalLabel": "Abandoned Sabudana Drama Towers, floor 3"
+    },
+    "GNV6EEAJS2V26B2": {
+      "label": "Sabudana Drama Towers, floor 4",
+      "file": "assets/streets/GNV6EEAJS2V26B2.json",
+      "hubId": "101",
+      "hubName": "Aranna",
+      "platforms": 2,
+      "decos": 67,
+      "reconstructed": true,
+      "internalLabel": "Abandoned Sabudana Drama Towers, floor 4"
+    },
+    "GA9TBQS1V2V2G34": {
+      "label": "Hakusan Heaps Towers, floor 1",
+      "file": "assets/streets/GA9TBQS1V2V2G34.json",
+      "hubId": "97",
+      "hubName": "Muufo",
+      "platforms": 2,
+      "decos": 76,
+      "reconstructed": true,
+      "internalLabel": "Abandoned Hakusan Heaps Towers, floor 1"
+    },
+    "GA9TBR62V2V23E2": {
+      "label": "Hakusan Heaps Towers, floor 2",
+      "file": "assets/streets/GA9TBR62V2V23E2.json",
+      "hubId": "97",
+      "hubName": "Muufo",
+      "platforms": 2,
+      "decos": 73,
+      "reconstructed": true,
+      "internalLabel": "Abandoned Hakusan Heaps Towers, floor 2"
+    },
+    "GDOBRLULU2V24DS": {
+      "label": "Gregarious Towers, floor 1",
+      "file": "assets/streets/GDOBRLULU2V24DS.json",
+      "hubId": "58",
+      "hubName": "Groddle Meadow",
+      "platforms": 2,
+      "decos": 71,
+      "reconstructed": true,
+      "internalLabel": "Abandoned Gregarious Towers, floor 1"
+    },
+    "GDOBRNDMU2V2Q34": {
+      "label": "Gregarious Towers, floor 2",
+      "file": "assets/streets/GDOBRNDMU2V2Q34.json",
+      "hubId": "58",
+      "hubName": "Groddle Meadow",
+      "platforms": 2,
+      "decos": 74,
+      "reconstructed": true,
+      "internalLabel": "Abandoned Gregarious Towers, floor 2"
+    },
+    "GDOBROOMU2V2GCK": {
+      "label": "Gregarious Towers, floor 3",
+      "file": "assets/streets/GDOBROOMU2V2GCK.json",
+      "hubId": "58",
+      "hubName": "Groddle Meadow",
+      "platforms": 2,
+      "decos": 77,
+      "reconstructed": true,
+      "internalLabel": "Abandoned Gregarious Towers, floor 3"
     }
   }
 }

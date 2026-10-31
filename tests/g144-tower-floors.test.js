@@ -27,14 +27,15 @@ import {
   TOWER_FLOOR_SIGNPOST,
   TOWER_LIFT,
   TOWERS,
+  defaultTowerLayout,
   isTowerFloorTsid,
   towerFloorEcology,
   towerFloorFor,
   towerFloorLayout,
   towerForLobby,
-} from '../public/js/tower-floors.js?v=dd614b98';
-import { towerFloorsFeature } from '../public/js/features/tower-floors-feature.js?v=c630d6a3';
-import { FEATURES } from '../public/js/features/index.js?v=f2ecd288';
+} from '../public/js/tower-floors.js?v=da5c6d5a';
+import { towerFloorsFeature } from '../public/js/features/tower-floors-feature.js?v=dbdc2b41';
+import { FEATURES } from '../public/js/features/index.js?v=5af934bd';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -57,10 +58,10 @@ const landsOnFloor = (target, arrive) => target.platforms.some((p) => {
 });
 
 describe('tower floors: street JSON', () => {
-  it('fifteen floors over five towers; Hauki Seeks Manor\'s three written, indexed and current (tools/build-tower-floors.mjs --check)', () => {
+  it('fifteen floors over five towers, written, indexed and current (tools/build-tower-floors.mjs --check)', () => {
     execFileSync(process.execPath, [join(spike, 'tools/build-tower-floors.mjs'), '--check'], { stdio: 'pipe' });
     assert.equal(TOWER_FLOORS.length, 15);
-    assert.deepEqual([BUILT.length, BUILT_TOWERS.length], [3, 1]);
+    assert.deepEqual([BUILT.length, BUILT_TOWERS.length], [15, 5]);
     assert.deepEqual(TOWERS.map((t) => [t.label, t.floors.length]), [
       ['Hauki Seeks Manor', 3], ['Egret Taun Towers', 3], ['Sabudana Drama Towers', 4], ['Hakusan Heaps Towers', 2], ['Gregarious Towers', 3],
     ]);
@@ -80,7 +81,7 @@ describe('tower floors: street JSON', () => {
     }
   });
 
-  it('Hauki Seeks Manor\'s three floors are laid out from their panoramas; the other 12 are not built yet', () => {
+  it('Hauki Seeks Manor\'s three floors are laid out from their panoramas; the other 12 are marked default, awaiting one', () => {
     const pictures = { LDOBRJIEU2V2Q2G: ['48476742859', 6], LDOBRKREU2V2F9B: ['48484112182', 8], LHF9DOUO7K03OUA: ['48540615574', 3] };
     for (const f of BUILT) {
       const s = street(f.tsid);
@@ -100,13 +101,13 @@ describe('tower floors: street JSON', () => {
       assert.equal(s.internalLabel, `Abandoned ${f.label}`);
     }
     assert.deepEqual(Object.keys(PANORAMA_LAYOUTS).sort(), Object.keys(pictures).sort());
-    assert.equal(TOWER_FLOORS.filter((f) => !towerFloorLayout(f)).length, 12);
-    for (const f of TOWER_FLOORS.filter((x) => !towerFloorLayout(x))) assert.ok(!existsSync(join(streets, `${f.tsid}.json`)), f.label);
+    assert.equal(TOWER_FLOORS.filter((f) => !PANORAMA_LAYOUTS[f.source]).length, 12);
   });
 
-  it('the three Hauki floors share one plan of bays', () => {
+  it('the three Hauki floors share one plan of bays, the default floors too', () => {
     const plan = (layout) => layout.bays.map(([a, b]) => `${a}..${b}`);
     assert.deepEqual(plan(HAUKI_FLOOR_1), plan(HAUKI_FLOOR_2));
+    assert.deepEqual(plan(defaultTowerLayout(TOWER_FLOORS[3])), plan(HAUKI_FLOOR_1));
     assert.equal(HAUKI_PILASTERS.length, 14);
     // Floor 3's right side is the same bays (its left end is the barred room).
     HAUKI_FLOOR_3.bays.slice(-6).forEach(([a, b], i) => {
@@ -146,6 +147,13 @@ describe('tower floors: street JSON', () => {
     }
     const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(join(dir, e.name)) : [e.name]));
     assert.ok(!walk(join(pub, 'assets')).some((n) => /tumblr|me4gckP3Ug1rlttf2o1/i.test(n)));
+  });
+
+  it('every default floor is its own (doors boarded, leftovers placed per floor), deterministic', () => {
+    const shapes = new Set(TOWER_FLOORS.filter((f) => !PANORAMA_LAYOUTS[f.source]).map((f) => JSON.stringify(defaultTowerLayout(f))));
+    assert.ok(shapes.size >= 12);
+    const f = TOWER_FLOORS[0];
+    assert.deepEqual(defaultTowerLayout(f), defaultTowerLayout(f));
   });
 });
 

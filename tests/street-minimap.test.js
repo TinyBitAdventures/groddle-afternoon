@@ -241,10 +241,10 @@ describe('street map: no_map and fog_map', () => {
   const streets = readdirSync(join(root, 'public/assets/streets')).filter((n) => n.endsWith('.json') && !/^[GL]Z/.test(n));
   const flagged = (key) => streets.filter((f) => read(`public/assets/streets/${f}`).includes(`"${key}":true`));
 
-  it('the archive\'s flags are carried (build-street-layers.mjs): 65 no_map, 2 fog_map; the tower floors (G144) add no_map like their lobbies', () => {
+  it('the archive\'s flags are carried (build-street-layers.mjs): 65 no_map, 2 fog_map; the 15 tower floors (G144) add no_map like their lobbies', () => {
     const noMap = flagged('noMap');
     const fog = flagged('fogMap');
-    assert.equal(noMap.length, 65 + 3);
+    assert.equal(noMap.length, 65 + 15);
     assert.equal(noMap.filter((f) => !/"internalLabel":"Abandoned [^"]+, floor \d"/.test(read(`public/assets/streets/${f}`))).length, 65);
     assert.deepEqual(fog.sort(), ['GHH12E1QP611OPA.json', 'GLI1D5DO1671QPA.json'], 'The Drop and The Other Drop');
     assert.ok(noMap.includes('GA9H1V6OGRU2FSB.json'), 'Abandoned Hauki Seeks Manor');

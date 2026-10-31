@@ -318,8 +318,52 @@ export const HAUKI_FLOOR_3 = Object.freeze({
 /** Floors laid out from a picture, by GSJS tsid. */
 export const PANORAMA_LAYOUTS = Object.freeze({ LDOBRJIEU2V2Q2G: HAUKI_FLOOR_1, LDOBRKREU2V2F9B: HAUKI_FLOOR_2, LHF9DOUO7K03OUA: HAUKI_FLOOR_3 });
 
-/** The layout a floor is built from (its picture's), or null: a floor without one is not built yet. */
-export const towerFloorLayout = (floor) => PANORAMA_LAYOUTS[floor.source] || null;
+/**
+ * The default hall: Hauki Seeks Manor's twelve bays, six each side of the
+ * lift, with eight doors (apartment_8units) and the windows where Hauki
+ * Seeks Manor's floors have theirs (Snowed In's hall too).
+ */
+const DEFAULT_KINDS = ['door', 'door', 'window', 'door', 'door', 'window', 'window', 'door', 'door', 'window', 'door', 'door'];
+const DEFAULT_BAYS = Object.freeze(DEFAULT_KINDS.map((kind, i) => [P[i < 6 ? i : i + 1], P[i < 6 ? i + 1 : i + 2], kind]));
+const BOARDS = ['cross', 'three', 'two', 'one', 'none'];
+
+/** A floor's default layout: the hall above, its doors boarded and its leftovers placed per floor. */
+export function defaultTowerLayout(floor) {
+  const seed = seedOf(floor.source);
+  let k = 0;
+  const r = () => rnd(seed + 17 * (k += 1));
+  const bays = DEFAULT_BAYS.map(([a, b, kind]) => (kind === 'door' ? [a, b, kind, { boards: BOARDS[Math.floor(r() * BOARDS.length)] }] : [a, b, kind]));
+  // One window per side gives way to a hole in the wall on about half the floors.
+  for (const side of [[2, 5], [6, 9]]) {
+    if (r() < 0.5) {
+      const i = side[Math.floor(r() * 2)];
+      bays[i] = [bays[i][0], bays[i][1], 'hole'];
+    }
+  }
+  const props = [];
+  // A crate (and on some floors a chair on it) at one end, papers and rubble along the walls.
+  const end = r() < 0.5 ? -1 : 1;
+  const crateX = end * Math.round(1250 + r() * 60);
+  props.push(['crate_1', crateX, floor.arrive.y + 4, 160, 136, {}]);
+  if (r() < 0.6) props.push(['deco_chair_wooden_ghtest', crateX + end * 10, floor.arrive.y + 4 - 132, 66, 88, {}]);
+  for (let i = 0; i < 4; i += 1) {
+    const x = -1400 + (i + 0.3 + r() * 0.4) * 700;
+    if (Math.abs(x) < 260) continue;
+    props.push([i % 2 ? 'juju_grandma_papers_01c_al1' : 'abandoned_apt_rubble_06', x, floor.arrive.y + 46, i % 2 ? 44 : 170, i % 2 ? 16 : 24, { flip: r() < 0.5 }]);
+  }
+  const rug = r() < 0.6 ? [Math.round((r() < 0.5 ? -1 : 1) * (600 + r() * 200)), 1000] : null;
+  return Object.freeze({
+    status: 'default',
+    source: TOWER_DEFAULT_NOTE,
+    bays,
+    props,
+    rug,
+    closed: null,
+  });
+}
+
+/** The layout a floor is built from: its picture's, or the default. */
+export const towerFloorLayout = (floor) => PANORAMA_LAYOUTS[floor.source] || defaultTowerLayout(floor);
 
 /* ------------------------------------------------------------------ */
 /* Decos                                                               */
