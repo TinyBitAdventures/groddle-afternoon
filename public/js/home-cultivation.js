@@ -48,6 +48,9 @@
  *   the Restore project (features/street-jobs-feature.js projectApi). The
  *   multiplier is kept as whole 0.05 steps (`lifeSteps`, 0..20) so it never
  *   drifts the way repeated float + 0.05 can.
+ * - The Mail Dispatcher stands on the street (js/home-street-fixtures.js):
+ *   its spot is kept with the street (`dispatcherRx`, null for the usual
+ *   one) and cultivations keep clear of it, as it keeps clear of them.
  */
 
 import { CULTIVATION_CLASSES, HOME_LIMITS } from './homes-catalog.js?v=29713fa8';
@@ -59,6 +62,7 @@ import {
   TOWER_PROTO,
   TOWER_WIDTH,
 } from './home-tower.js?v=6ccb3a4f';
+import { DISPATCHER_HALF, dispatcherSpot, savedDispatcherRx, streetFixtures } from './home-street-fixtures.js?v=57eaae87';
 
 export const YARD_SEGMENT_W = 150;
 /** The house, porch, mailbox and World Gate stand on a fixed lot between the yards. */
@@ -291,6 +295,9 @@ export function placementCheck(state, protoClass, rx, excludeId = null) {
   if (Math.abs(x) < half + (back ? BACK_YARD_OPENING : DOOR_CLEARANCE) / 2) {
     return { ok: false, reason: 'door', msg: back ? 'Keep the way into your house clear.' : 'Keep the path to your front door clear.' };
   }
+  if (!back && Math.abs(dispatcherRx(state, { excludeId }) - x) < half + DISPATCHER_HALF) {
+    return { ok: false, reason: 'dispatcher', msg: 'Keep it clear of your Mail Dispatcher.' };
+  }
   for (const other of state.items) {
     if (other.id === excludeId) continue;
     if (Math.abs(other.rx - x) < half + footprint(other.protoClass)) {
@@ -298,6 +305,23 @@ export function placementCheck(state, protoClass, rx, excludeId = null) {
     }
   }
   return { ok: true };
+}
+
+/**
+ * Where the Mail Dispatcher stands on the home street, x from the house's centre: its saved
+ * spot (or the usual one), or the nearest that is clear of the fixtures and of the
+ * cultivations (but `excludeId`). `at` adds the drawn Mailbox and door x (home-street-fixtures
+ * streetFixtures). Null in a back yard.
+ */
+export function dispatcherRx(state, { excludeId = null, at = {} } = {}) {
+  if (isBackYard(state)) return null;
+  const layout = homeStreetLayout(state);
+  const items = (state?.items || []).filter((row) => row.id !== excludeId).map((row) => ({
+    x: layout.houseX + row.rx,
+    half: footprint(row.protoClass),
+    label: cultivationDef(row.protoClass)?.label,
+  }));
+  return dispatcherSpot(layout, savedDispatcherRx(state), { fixtures: streetFixtures(layout, at), items }) - layout.houseX;
 }
 
 /** The nearest free spot to `rx` (searching outward), or null. */

@@ -18,8 +18,8 @@ import {
   slashWords,
   unknownLine,
 } from '../public/js/slash-commands.js?v=23e13b20';
-import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=3179b887';
-import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=f3fc42ce';
+import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=5c94e62b';
+import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=d58f844a';
 import { towerApi } from '../public/js/features/home-tower-feature.js?v=a9047342';
 import { BUTLER_STRINGS } from '../public/js/butler.js?v=814ee05f';
 import { butlerFeature } from '../public/js/features/butler-feature.js?v=6e0ef3d0';

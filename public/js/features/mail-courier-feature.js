@@ -27,8 +27,10 @@
  *   rebuilt npc_mailbox and npc_mail_dispatcher from the street template
  *   whenever a player-owned lot or quarter street changed, so they stood
  *   together on the old housing streets. Here it stands on your home
- *   street just outside the World Gate, near the Mailbox (reimagined
- *   placement). Send mail opens the mail window
+ *   street just outside the World Gate, past the friends' signpost's left
+ *   arms, clear of every fixture there (reimagined placement; homes-feature
+ *   homeDispatcherX, the rules in js/home-street-fixtures.js). Send mail
+ *   opens the mail window
  *   on a new letter (mail_dispatch_start); it plays interact while the window
  *   is open and cancel when it closes (mailStop, CANCEL_DISPATCHER). A letter
  *   that went with an item is a parcel: prepare_package (600 ms),
@@ -60,9 +62,10 @@
 
 import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=85d4faba';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=db2ce452';
-import { questRoomConverse } from './quest-instances-feature.js?v=b63657cc';
+import { questRoomConverse } from './quest-instances-feature.js?v=8857cd4e';
 import { hellFeature } from './hell-feature.js?v=2d9958f9';
 import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=790f980a';
+import { DISPATCHER_GAP, DISPATCHER_HALF, GATE, SIGNPOST } from '../home-street-fixtures.js?v=57eaae87';
 import {
   COURIER,
   COURIER_TEXT,
@@ -89,9 +92,8 @@ const HOME_STREET_TSID = 'RH_HOME_EXT';
 const FPS = 30;
 const FROG_LOOPERS = new Set(['idle', 'move', 'talk', 'treePose', 'dancerPose', 'warriorPose']);
 const DISPATCHER_LOOPERS = new Set(['idle', 'waiting_for_frog']);
-/** Just outside the World Gate (the lot's left edge), clear of its sign; else left of the Mailbox. */
-const DISPATCHER_GATE_DX = -150;
-const DISPATCHER_DX = -125;
+/** Without the homes feature's answer: the usual spot, from the World Gate (home-street-fixtures). */
+const DISPATCHER_GATE_DX = SIGNPOST.lotDx - GATE.lotDx - SIGNPOST.left - DISPATCHER_GAP - DISPATCHER_HALF;
 /**
  * in_foreground (the frog) and in_background (the station): both under the avatar's 50, since the
  * client's item holders sit below the avatar holders (MiddleGroundRenderer.setupEndShapes 111-171).
@@ -629,8 +631,10 @@ function homeMailbox(engine) {
 }
 
 function stationX(engine, mailbox) {
+  const at = engine.query?.('homeDispatcherX', engine);
+  if (Number.isFinite(at)) return Math.round(at);
   const gate = (engine.interactables || []).find((t) => t.classId === 'home_return_marker' && t.sprite && !t.sprite.destroyed);
-  return Math.round(gate ? gate.sprite.x + DISPATCHER_GATE_DX : mailbox.sprite.x + DISPATCHER_DX);
+  return Math.round(gate ? gate.sprite.x + DISPATCHER_GATE_DX : mailbox.sprite.x + DISPATCHER_GATE_DX);
 }
 
 function spawnStation(engine, mailbox) {

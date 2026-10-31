@@ -153,6 +153,7 @@ import {
 import { RECIPE_CATALOG } from '../making.js?v=9e538296';
 import {
   createBackYardState,
+  dispatcherRx,
   isBackYard,
   nearestFreeRx,
   FIREFLY_HIVE,
@@ -180,8 +181,9 @@ import {
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=9d3a8ec3';
+} from '../home-cultivation.js?v=9056c819';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=68506420';
+import { gateX } from '../home-street-fixtures.js?v=57eaae87';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=ec7b4119';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
@@ -1455,6 +1457,15 @@ const HOUSES = {
   firebog: { path: 'door_asset_house_medium_03', w: 764, h: 586, scale: 0.58, doorX: 0.55, signX: 0.06 },
   uralia: { path: 'door_asset_house_large_05', w: 830, h: 668, scale: 0.48, doorX: 0.52, signX: 0.06 },
 };
+export const HOUSE_STYLE_KEYS = Object.freeze(Object.keys(HOUSES));
+
+/** The house's left end, its front door and its sign corner (where the Mailbox stands), in world x. */
+export function houseFixtureX(layout, houseStyle = 'meadow') {
+  const h = HOUSES[houseStyle] || HOUSES.meadow;
+  const w = h.w * h.scale;
+  const left = layout.houseX - w / 2;
+  return { left, doorX: layout.houseX + (h.doorX - 0.5) * w, signX: left + w * (h.signX + 0.02) };
+}
 
 /**
  * The street style shown: the one you chose, else the purchase look's
@@ -1656,7 +1667,7 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
   // A planted border in front of the house hides the deco's For Sale sign.
   const trim = new PIXI.Container();
   trim.zIndex = -19;
-  const left = layout.houseX - (h.w * h.scale) / 2;
+  const { left, doorX, signX } = houseFixtureX(layout, houseStyle);
   style.trim.forEach((meta, i) => {
     const row = style.nearTint != null && meta.tint == null ? { ...meta, tint: style.nearTint } : meta;
     trim.addChild(decoSprite(PIXI, row, left + h.w * h.scale * (h.signX + 0.05 + i * 0.07), STREET_GROUND_Y + 20, i % 2 === 1));
@@ -1666,10 +1677,23 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
   root.worldH = STREET_WORLD_H;
   root.platformsScreen = [{ id: 'home-ground', x1: 0, y1: STREET_GROUND_Y, x2: width, y2: STREET_GROUND_Y, pc_perm: 1 }];
   root.updateParallax = (camX, camY, vpW, vpH, skyH = vpH) => land.update(camX, camY, vpW, skyH);
-  root.houseDoorX = layout.houseX + (h.doorX - 0.5) * h.w * h.scale;
-  root.houseSignX = left + h.w * h.scale * (h.signX + 0.02);
+  root.houseDoorX = doorX;
+  root.houseSignX = signX;
   root.streetStyle = styleKey;
   return root;
+}
+
+/** The drawn Mailbox and door x on this street (they follow the house style). */
+function streetFixtureAt() {
+  const bg = scene?.background;
+  const layout = homeStreetLayout(cult);
+  return { mailboxX: Math.round(bg?.houseSignX ?? layout.houseX - 260), doorX: bg?.houseDoorX ?? layout.houseX };
+}
+
+/** The Mail Dispatcher's world x on your own home street (mail-courier-feature draws it), or null. */
+function dispatcherWorldX(excludeId = null) {
+  if (scene?.room !== 'street') return null;
+  return homeStreetLayout(cult).houseX + dispatcherRx(cult, { excludeId, at: streetFixtureAt() });
 }
 
 function makeGateSprite(engine) {
@@ -1731,7 +1755,7 @@ function spawnStreetTargets(engine) {
     state: { room: 'street' },
   });
   const gate = makeGateSprite(engine);
-  gate.x = layout.lotLeft + 40;
+  gate.x = gateX(layout);
   gate.y = STREET_GROUND_Y + 2;
   gate.zIndex = 20;
   engine.entityLayer.addChild(gate);
@@ -5446,7 +5470,7 @@ export function visitorHomeScene(engine, view = {}, room = 'street') {
         door.zIndex = 9;
         eng.entityLayer.addChild(door);
         const gate = makeGateSprite(eng);
-        gate.x = layout.lotLeft + 40;
+        gate.x = gateX(layout);
         gate.y = STREET_GROUND_Y + 2;
         gate.zIndex = 20;
         eng.entityLayer.addChild(gate);
@@ -6075,6 +6099,14 @@ export const homesFeature = {
     const taken = takeFromHouse([houseDecor, ...(floors.upper || []), ...towerDecor], want);
     if (Object.keys(taken).length && engine?.homeContext?.()?.inHome) engine.refreshHomeScene?.();
     return taken;
+  },
+
+  /**
+   * Where the Mail Dispatcher stands on your home street (world x), clear of the gate, the
+   * signpost, the Mailbox, the door and the cultivations (home-street-fixtures); null elsewhere.
+   */
+  homeDispatcherX() {
+    return dispatcherWorldX();
   },
 
   /** QA / tests. */
