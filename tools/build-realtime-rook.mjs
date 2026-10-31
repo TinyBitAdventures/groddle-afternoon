@@ -39,7 +39,7 @@ import { loadRecipeCatalogFromFile } from '../public/js/making.js?v=9e538296';
 import { SHRINE_ITEM_BASE_COSTS, donationValueFor, giantForStreet } from '../public/js/shrines.js?v=01b185bc';
 import { placementRequests } from './build-realtime-objects.mjs';
 import { streetIsRookable } from '../public/js/rook-attack.js?v=c06c0537';
-import { rebuiltRoomEcology } from '../public/js/rebuilt-rooms.js?v=95ca6839';
+import { rebuiltRoomEcology } from '../public/js/rebuilt-rooms.js?v=9eb97c49';
 import { winterStreetEcology } from '../public/js/winter-walk-streets.js?v=8607edd3';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 

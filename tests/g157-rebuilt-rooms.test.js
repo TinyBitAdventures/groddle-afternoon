@@ -51,9 +51,9 @@ import {
   SNOWED_IN_TSID,
   isRebuiltRoomTsid,
   rebuiltRoomEcology,
-} from '../public/js/rebuilt-rooms.js?v=95ca6839';
-import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=7e5e5ea9';
-import { FEATURES } from '../public/js/features/index.js?v=331017d2';
+} from '../public/js/rebuilt-rooms.js?v=9eb97c49';
+import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=b5232fd6';
+import { FEATURES } from '../public/js/features/index.js?v=53bef1f4';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -234,23 +234,29 @@ describe('rebuilt rooms: layouts after the pictures', () => {
     assert.deepEqual([Math.min(...xs), Math.max(...xs)], [ee.bounds.l, ee.bounds.r]);
   });
 
-  it('Martleby Hare: each ledge ends over the next, down to the stone-arched door, with no ladders', () => {
+  it('Martleby Hare (R5, post 53558008127): every ledge end drops onto a ledge below, down to the stone-arched door, with no ladders', () => {
     assert.deepEqual(mh.bounds, { l: -750, r: 750, t: -2000, b: 0 });
     assert.equal(mh.ladders.length, 0);
+    assert.equal(MARTLEBY_TIERS.length, 7, 'seven rows of ledges');
     const first = MARTLEBY_TIERS[0];
     assert.ok(first.segs.some(([a, b]) => MARTLEBY_ARRIVE.x > a && MARTLEBY_ARRIVE.x < b) && first.y === MARTLEBY_ARRIVE.y);
-    for (let i = 0; i + 1 < MARTLEBY_TIERS.length; i += 1) {
-      const [a, b] = MARTLEBY_TIERS[i].segs[0];
-      const next = MARTLEBY_TIERS[i + 1];
-      // The open end (not at the street edge) drops onto the next ledge.
-      const ends = [a > mh.bounds.l ? a - 20 : null, b < mh.bounds.r ? b + 20 : null].filter((x) => x != null);
-      assert.ok(ends.length, `${MARTLEBY_TIERS[i].id} has an open end`);
-      assert.ok(ends.every((x) => floorAt(mh, x, next.y)), `${MARTLEBY_TIERS[i].id} drops onto ${next.id}`);
+    assert.ok(MARTLEBY_TIERS.some((t) => t.segs.length >= 3), 'a row in three pieces');
+    const below = (x, y) => MARTLEBY_TIERS.filter((t) => t.y > y && t.segs.some(([a, b]) => x >= a && x <= b)).sort((p, q) => p.y - q.y)[0];
+    for (const tier of MARTLEBY_TIERS.slice(0, -1)) {
+      for (const [a, b] of tier.segs) {
+        // Each open end (not at the street edge) drops onto a ledge below.
+        const ends = [a > mh.bounds.l ? a - 20 : null, b < mh.bounds.r ? b + 20 : null].filter((x) => x != null);
+        assert.ok(ends.length, `${tier.id} ${a}..${b} has an open end`);
+        for (const x of ends) {
+          const next = below(x, tier.y);
+          assert.ok(next && floorAt(mh, x, next.y), `${tier.id} drops at ${x}`);
+        }
+      }
     }
     const out = door(mh, MARTLEBY_EXIT_DOOR);
     assert.equal(out.sprite, 'heights_door_static');
     assert.equal(out.y + mh.bounds.t, MARTLEBY_TIERS[MARTLEBY_DOOR.tier].y);
-    assert.ok(out.x + mh.bounds.l > 0, 'right of centre, as in the snap');
+    assert.ok(Math.abs(out.x + mh.bounds.l) < 60, 'in the middle, as in the R5 panorama');
     // Footlands Heath's balcony: the door lands in front of its stone-arched door deco.
     const foot = street(FOOTLANDS_TSID);
     const balconyDoor = foot.layers.find((l) => l.id === 'middleground').decos.find((d) => d.sprite === 'heights_door_static');

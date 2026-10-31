@@ -538,21 +538,25 @@ export const MARTLEBY_SOURCE_LINE =
 
 /**
  * Ledge tiers, top to bottom: walk line y and ledge segments [x0, x1]
- * (world). The top ledge takes Rookthills Lay's door (-613,-1833); each
- * ledge ends where the next one starts, so a walk off its open end drops to
- * the next (no ladders: "not as Donkey Kong-ish as Vicars Peak").
+ * (world). R5: Tribute Blog post 53558008127 (reference only) is the whole
+ * street, 1280 x 1600, so world = (-750 + px x 1.17, -2000 + px y x 1.25).
+ * It shows seven rows of ledges staggered left and right, some rows in two
+ * or three pieces, and the door at floor level in the middle. The top ledge
+ * takes Rookthills Lay's door (-613,-1833); every open end drops onto a
+ * ledge below (no ladders: "not as Donkey Kong-ish as Vicars Peak").
  */
 export const MARTLEBY_TIERS = Object.freeze([
-  { id: 'm0', y: -1833, segs: [[-750, -250]], why: "Rookthills Lay's door lands at -613,-1833" },
-  { id: 'm1', y: -1515, segs: [[-450, 750]] },
-  { id: 'm2', y: -1200, segs: [[-750, 300]] },
-  { id: 'm3', y: -885, segs: [[-300, 750]] },
-  { id: 'm4', y: -570, segs: [[-750, 350]], why: 'the mossy ledge with the grey slate under its right end (snap)' },
-  { id: 'm5', y: -255, segs: [[-750, 750]], why: 'the door ledge: a stone-arched door right of centre (snap)' },
+  { id: 'm0', y: -1833, segs: [[-750, 220]], why: "Rookthills Lay's door lands at -613,-1833; R5: the top ledge runs from the door two thirds across" },
+  { id: 'm1', y: -1588, segs: [[220, 750]], why: 'R5: a ledge on the right under the top one\'s end' },
+  { id: 'm2', y: -1444, segs: [[-620, 110]], why: 'R5: the mossy ledge left of centre' },
+  { id: 'm3', y: -1290, segs: [[-750, -585], [10, 750]], why: 'R5: a short ledge at the left wall and a long one on the right' },
+  { id: 'm4', y: -1050, segs: [[-750, 635]], why: 'R5: the long mossy ledge from the left wall' },
+  { id: 'm5', y: -706, segs: [[-750, -290], [-145, 315], [460, 750]], why: 'R5: the lowest row in three pieces, grey slate under the middle one' },
+  { id: 'm6', y: -156, segs: [[-750, 750]], why: 'R5: the floor, the stone-arched door in its middle' },
 ].map((t) => Object.freeze({ ...t, segs: Object.freeze(t.segs.map((s) => Object.freeze(s))) })));
 
-/** The stone-arched door (snap: floor level, right of centre; Footlands' balcony door is the same art). */
-export const MARTLEBY_DOOR = Object.freeze({ x: 230, tier: 5, w: 164, h: 176, sprite: 'heights_door_static' });
+/** The stone-arched door (R5: floor level, in the middle; Footlands' balcony door is the same art). */
+export const MARTLEBY_DOOR = Object.freeze({ x: 0, tier: 6, w: 164, h: 176, sprite: 'heights_door_static' });
 
 const ML = MARTLEBY_BOUNDS.l;
 const MR = MARTLEBY_BOUNDS.r;
@@ -617,18 +621,23 @@ function martlebyLedgeDecos() {
 function martlebyDetailDecos() {
   const out = [];
   let z = 60;
-  // Moss on the ledges (snap: olive patches on the ledges and the floor in front of the door).
-  for (const [x, ti, w] of [[-560, 4, 300], [-120, 4, 220], [-520, 5, 330], [560, 5, 300], [120, 2, 200], [500, 1, 240], [-640, 0, 180], [420, 3, 220]]) {
-    out.push(deco('heights_moss_2', x, MARTLEBY_TIERS[ti].y + 12, w, w * 0.22, z++, ti % 2 ? { flip: true } : {}));
+  const T = (id) => MARTLEBY_TIERS.find((t) => t.id === id).y;
+  // Olive moss where R5 (post 53558008127) shows it: on the top ledge, the left-centre and long ledges, the low row and the floor.
+  for (const [x, id, w] of [[-260, 'm0', 320], [530, 'm1', 260], [-300, 'm2', 390], [150, 'm3', 180], [-100, 'm4', 390], [-570, 'm5', 330], [150, 'm5', 160], [-460, 'm6', 390], [150, 'm6', 360]]) {
+    out.push(deco('heights_moss_2', x, T(id) + 12, w, w * 0.22, z++, z % 2 ? { flip: true } : {}));
   }
-  out.push(deco('heights_moss_1', -380, MARTLEBY_TIERS[4].y + 70, 160, 87, z++));
-  out.push(deco('heights_moss_1', 600, MARTLEBY_TIERS[1].y + 70, 160, 87, z++, { flip: true }));
-  // The grey slate overhang under the mossy ledge's right end (snap, top right).
-  out.push(deco('heights_face_rock_3', 250, MARTLEBY_TIERS[4].y + 150, 375, 139, z++));
-  out.push(deco('heights_face_rock_3', -420, MARTLEBY_TIERS[2].y + 140, 300, 111, z++, { flip: true }));
-  // Mounds at the foot of the face on the door ledge.
-  out.push(deco('heights_mound_3', -380, MARTLEBY_TIERS[5].y + 8, 420, 160, 14));
-  out.push(deco('heights_mound_3', 600, MARTLEBY_TIERS[5].y + 8, 380, 144, 14, { flip: true }));
+  out.push(deco('heights_moss_1', -380, T('m2') + 70, 180, 98, z++));
+  out.push(deco('heights_moss_1', -640, T('m4') + 70, 200, 109, z++, { flip: true }));
+  out.push(deco('heights_moss_1', 600, T('m1') + 70, 160, 87, z++, { flip: true }));
+  // Grey slate under the ledges (R5): the top ledge's left half, the right ledges, the long ledge's ends, the low row's middle piece.
+  for (const [x, id, w, flip] of [[-480, 'm0', 420, false], [500, 'm1', 360, true], [40, 'm2', 260, false], [360, 'm4', 380, true], [-660, 'm4', 220, false], [95, 'm5', 360, false]]) {
+    out.push(deco('heights_face_rock_3', x, T(id) + 150, w, w * 0.37, z++, flip ? { flip: true } : {}));
+  }
+  // A grey rock on the face above the floor, right of the door (R5).
+  out.push(deco('heights_face_rock_3', 480, T('m6') - 20, 260, 96, 15, { flip: true }));
+  // Mounds at the foot of the face on the floor.
+  out.push(deco('heights_mound_3', -420, T('m6') + 8, 420, 160, 14));
+  out.push(deco('heights_mound_3', 620, T('m6') + 8, 380, 144, 14, { flip: true }));
   return out;
 }
 
@@ -668,8 +677,8 @@ export function martlebyStreet({ footlandsArrive = null } = {}) {
     why: {
       street: 'inc_data_maps_prod.js:16369 (hub 64); location.js:540 explore_the_seams, :2789 on the map; no location XML.',
       bounds: "Rookthills Lay's door lands at -613,-1833, so the street is a tall climb: the 1500 x 2000 of the Heights climbs (Vicar's Peak, Jacob's Climb).",
-      tiers: 'Six ledges ~315 px apart, each ending over the next: you arrive at the top left and drop down to the door.',
-      door: 'Snap 8411933944: a stone-arched wooden door at floor level right of centre, ledges with moss above, a grey slate overhang (heights_door_static, as on Footlands Heath\'s balcony).',
+      tiers: 'R5 (Tribute Blog post 53558008127, the whole street, reference only): seven rows of staggered ledges, some in two or three pieces; you arrive at the top left and drop from ledge to ledge down to the door.',
+      door: 'R5 (post 53558008127): a stone-arched wooden door at floor level in the middle (heights_door_static, as on Footlands Heath\'s balcony); Snap 8411933944 showed it right of centre in a cropped view.',
       wayOut: "Footlands Heath's sources list Martleby Hare; the door lands on Footlands' walled balcony in front of the same door art (its pen opens only to the left, so it is an arrival spot). Rookthills Lay's sources do not list it, so there is no way back that way.",
       population: "Zog's Glitchy Tools (2012) lists nothing on it.",
       notBuilt: 'No ladders (the snap\'s title: not as Donkey Kong-ish as Vicar\'s Peak).',
