@@ -10,11 +10,11 @@ import {
   signpostNear,
   pickConnection,
 } from './street-model.js?v=23b926e5';
-import { availableStreetTsids } from './street-loader.js?v=d6cbbd5c';
+import { availableStreetTsids } from './street-loader.js?v=390e4702';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js?v=01a295a1';
-import { admitSharp, decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco } from './deco-hires.js?v=a65f2d79';
+import { admitSharp, decoUrl, isSharpDeco, maxTextureSizeOf, sharpDeco, NEW_DECOS } from './deco-hires.js?v=cc8506f6';
 import { LADDER_TILE_Z, ladderTilePieces } from './ladder-tiling.js?v=4f9e07fa';
-import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } from './deco-anim.js?v=b3fc64f2';
+import { attachAnim, isAnimatedDeco, setAnimSource, setDecoTexture, syncAnim } from './deco-anim.js?v=bcbe0e95';
 import { drawnLayerOffset, layerScreenDir } from './camera-feel.js?v=e668afc5';
 
 const DECO_BASE = 'assets/decos/groddle/';
@@ -329,11 +329,12 @@ export async function loadDecoManifest() {
     const res = await fetch('assets/decos/manifest.json?v=puzzles-1');
     if (res.ok) {
       const list = await res.json();
-      decoManifest = new Set(list);
+      // A published zone's new art (gz_, js/deco-new-list.js) is drawn like the library's.
+      decoManifest = new Set([...list, ...NEW_DECOS]);
       return decoManifest;
     }
   } catch { /* */ }
-  decoManifest = new Set();
+  decoManifest = new Set(NEW_DECOS);
   return decoManifest;
 }
 

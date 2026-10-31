@@ -100,7 +100,8 @@ describe('Batterflies and Guano (npc_batterfly.js)', () => {
     assert.equal(isBatterflyHabitat({ label: 'Churni Sanctum', hubName: 'Ilmenskie Deeps' }), true);
     assert.equal(isBatterflyHabitat({ label: 'Hechey Track', hubName: 'Groddle Forest' }), false);
     const index = JSON.parse(readFileSync(join(publicDir, 'assets/streets/index.json'), 'utf8')).streets;
-    const counts = Object.entries(index).map(([tsid, row]) => batterflyCountForStreet({ tsid, ...row }));
+    // Tiny Speck's streets (a published zone's, GZ, are new content).
+    const counts = Object.entries(index).filter(([tsid]) => !/^[GL]Z/.test(tsid)).map(([tsid, row]) => batterflyCountForStreet({ tsid, ...row }));
     const habitat = counts.filter(Boolean);
     // 52 since G184 put Oktyabrya in Uralia, its own location hub (was Groddle Forest).
     assert.equal(habitat.length, 52);

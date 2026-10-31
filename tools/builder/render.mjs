@@ -14,10 +14,10 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, normalize } from 'node:path';
 import { GAME_DIR } from '../repos.mjs';
 import { openBrowser } from '../qa/browser.mjs';
-import { validateZone, placementRequests } from '../../public/js/builder/validate.js?v=ef755481';
+import { validateZone, placementRequests } from '../../public/js/builder/validate.js?v=955b2e0f';
 import { planStreetPlacements, populationForStreet } from '../../public/js/street-ecology.js?v=7e30da8f';
 import { platformsScreen, streetWidth, worldToScreen } from '../../public/js/street-model.js?v=23b926e5';
-import { plannedSpots } from '../../public/js/builder/editor-zone.js?v=fb167700';
+import { plannedSpots } from '../../public/js/builder/editor-zone.js?v=3ca537c9';
 
 /** Fatal rules that still render (the street loads; see renderInput). */
 export const RENDERS_ANYWAY = new Set(['AST-001']);

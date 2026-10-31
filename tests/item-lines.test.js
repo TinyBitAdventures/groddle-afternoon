@@ -83,7 +83,7 @@ describe('street data (build-street-layers.mjs item_perm)', () => {
     const cross = new Map();
     let streets = 0;
     for (const s of allStreets()) {
-      if (/^reconstruction/.test(s.source || '')) continue;
+      if (/^(reconstruction|groddle-builder )/.test(s.source || '')) continue;
       streets += 1;
       for (const p of s.platforms) {
         assert.ok('item_perm' in p, `${s.tsid} ${p.id}`);

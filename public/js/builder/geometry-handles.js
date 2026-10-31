@@ -12,8 +12,8 @@
  * Pure: no DOM, no Pixi.
  */
 import { isStandable, platformsScreen } from '../street-model.js?v=23b926e5';
-import { decoBox, handlePoints, resizeBy } from './handles.js?v=f6ab68c4';
-import { floorUnder } from './zone.js?v=bdc23538';
+import { decoBox, handlePoints, resizeBy } from './handles.js?v=2f6896c4';
+import { floorUnder } from './zone.js?v=6a3db28e';
 import { arrivalInTarget, streetAliases } from '../location-navigation.js?v=4be109b9';
 
 export const GEO_KINDS = Object.freeze(['platform', 'barrier', 'ladder', 'signpost']);

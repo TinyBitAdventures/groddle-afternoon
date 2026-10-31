@@ -237,7 +237,8 @@ describe('street map: dots (addYou, colorPC, ITEMS_TO_TRACK)', () => {
 });
 
 describe('street map: no_map and fog_map', () => {
-  const streets = readdirSync(join(root, 'public/assets/streets')).filter((n) => n.endsWith('.json'));
+  // Tiny Speck's streets: a published zone's (GZ) carry noMap of their own (spec 11).
+  const streets = readdirSync(join(root, 'public/assets/streets')).filter((n) => n.endsWith('.json') && !/^[GL]Z/.test(n));
   const flagged = (key) => streets.filter((f) => read(`public/assets/streets/${f}`).includes(`"${key}":true`));
 
   it('the archive\'s flags are carried (build-street-layers.mjs): 65 no_map, 2 fog_map', () => {

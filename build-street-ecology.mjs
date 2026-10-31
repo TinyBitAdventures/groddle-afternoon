@@ -3,6 +3,10 @@
  * locations-xml item references. The G-prefixed files contain geometry while
  * their L-prefixed aliases retain the late-game item population snapshot.
  *
+ * Published zones (level builder, docs/level-builder/spec.md 11) have no location XML: their
+ * population rows come from public/assets/zones/*.json (tools/builder/zones.mjs mergeZoneEcology),
+ * added after Tiny Speck's, so a run keeps them.
+ *
  * Run from spike root:
  *   node build-street-ecology.mjs
  */
@@ -13,6 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { interiorReason } from './public/js/street-ecology.js';
 import { VENDOR_NPC_LABELS } from './public/js/vendor-npcs.js';
 import { SWOONERFLY_LABEL, SWOONERFLY_CLASS } from './public/js/swoonerflies.js';
+import { files, listZones, mergeZoneEcology } from './tools/builder/zones.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const streetIndexPath = join(root, 'public/assets/streets/index.json');
@@ -342,5 +347,6 @@ const catalog = {
   swoonerflies,
 };
 
+mergeZoneEcology(catalog, listZones(files(root)).map((z) => z.zone));
 await writeFile(outputPath, `${JSON.stringify(catalog, null, 2)}\n`);
-console.log(`Wrote ${catalog.streetCount} official street ecologies to ${outputPath}`);
+console.log(`Wrote ${catalog.streetCount} official street ecologies${catalog.zoneStreetCount ? ` and ${catalog.zoneStreetCount} from published zones` : ''} to ${outputPath}`);

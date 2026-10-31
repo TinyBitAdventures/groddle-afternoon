@@ -31,7 +31,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=d6cbbd5c';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=390e4702';
 import { platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js?v=23b926e5';
 import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=7e30da8f';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=85d4faba';
@@ -41,6 +41,7 @@ import { placementRequests } from './build-realtime-objects.mjs';
 import { streetIsRookable } from '../public/js/rook-attack.js?v=c06c0537';
 import { rebuiltRoomEcology } from '../public/js/rebuilt-rooms.js?v=95ca6839';
 import { winterStreetEcology } from '../public/js/winter-walk-streets.js?v=615549da';
+import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');
@@ -93,12 +94,15 @@ export function offerValues() {
 
 async function main() {
   requireServer();
+  // As a multiplayer page loads streets: no published zone, no arm into one (js/street-loader.js).
+  setZoneStreetsShown(false);
   const index = JSON.parse(await readFile(join(streetsDir, 'index.json'), 'utf8'));
   applyStreetIndex(index);
   setStreetEcologyCatalog(JSON.parse(await readFile(join(root, 'public/assets/content/street-ecology.json'), 'utf8')));
   await loadRecipeCatalogFromFile(join(root, 'public/assets/content/recipes.json'));
   const streets = {};
-  for (const tsid of Object.keys(index.streets).sort()) {
+  // A published zone's streets (GZ) are solo only (docs/level-builder/spec.md 15, Q6): never shared.
+  for (const tsid of Object.keys(index.streets).filter((t) => !isZoneTsid(t)).sort()) {
     let data;
     try {
       data = await loadStreetDataFromFs(tsid, streetsDir);

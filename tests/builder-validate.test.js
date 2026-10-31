@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=ef755481';
+import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=955b2e0f';
 import { streetWorld, jumpArc, jumpArcs, reachStreet } from '../public/js/builder/reach-graph.js?v=6f7512af';
 import { stepAvatar, avatarGround, steerX, coastX, NORMAL_BUFF } from '../public/js/avatar-step.js?v=c04c7c76';
 import { platformsScreen } from '../public/js/street-model.js?v=23b926e5';
@@ -17,7 +17,8 @@ import { loadValidatorContext } from '../tools/builder/validator-context.mjs';
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
 const base = JSON.parse(read('tests/fixtures/builder/mossy-hollow.zone.json'));
-const ctx = loadValidatorContext({ publish: true });
+// Tiny Speck's world alone, so the fixtures validate the same whatever zones are published.
+const ctx = loadValidatorContext({ publish: true, zones: false });
 const lane = (z) => z.streets[0].street;
 const end = (z) => z.streets[1].street;
 

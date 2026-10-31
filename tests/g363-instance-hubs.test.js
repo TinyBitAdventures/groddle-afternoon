@@ -74,7 +74,7 @@ describe('G352: the two snap captions (Austin 2026-10-28: one-off approval)', ()
     const src = read('js/quest-rooms/being-watched.js');
     assert.match(src, /Flickr 8270858639/);
     assert.match(src, /Austin 2026-10-28: one-off approval/);
-    const { CAPTION, FLOOR } = await import('../public/js/quest-rooms/being-watched.js?v=b9f3d352');
+    const { CAPTION, FLOOR } = await import('../public/js/quest-rooms/being-watched.js?v=0de8cfb8');
     assert.equal(CAPTION.text, "Ever feel like you're being watched?");
     assert.ok(CAPTION.y < FLOOR && FLOOR - CAPTION.y <= 220);
     assert.match(src, /world\.addChild\(kit\.label\(PIXI, CAPTION\.text, CAPTION\.x, CAPTION\.y, \{ size: 17, fill: 0xffffff/);
@@ -100,7 +100,7 @@ describe('G352: the two snap captions (Austin 2026-10-28: one-off approval)', ()
   });
 
   it('no em-dashes in the captions', async () => {
-    const { CAPTION } = await import('../public/js/quest-rooms/being-watched.js?v=b9f3d352');
+    const { CAPTION } = await import('../public/js/quest-rooms/being-watched.js?v=0de8cfb8');
     const { WINTER_WALK_CAPTION } = await import('../public/js/winter-walk-streets.js?v=615549da');
     assert.ok(!/[—–]/.test(CAPTION.text + WINTER_WALK_CAPTION.lines.join('')));
   });

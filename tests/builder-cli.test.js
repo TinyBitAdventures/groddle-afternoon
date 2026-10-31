@@ -18,7 +18,11 @@ const env = { GRODDLE_BUILDER_HOME: join(dir, 'home'), GRODDLE_BUILDER_URL: 'htt
 const cli = (...argv) => run(argv, { env });
 const file = join(dir, 'zone.json');
 const zone = () => JSON.parse(readFileSync(file, 'utf8'));
-const shipped = (tsid) => JSON.parse(readFileSync(join(GAME_DIR, 'public/assets/streets', `${tsid}.json`), 'utf8'));
+// Tiny Speck's street, without any published zone's arms (spec 11), so the post picked stays the same.
+const shipped = (tsid) => {
+  const s = JSON.parse(readFileSync(join(GAME_DIR, 'public/assets/streets', `${tsid}.json`), 'utf8'));
+  return { ...s, signposts: s.signposts.map((p) => ({ ...p, connects: p.connects.filter((c) => !/^[GL]Z/.test(c.tsid)) })).filter((p) => p.connects.length) };
+};
 const HECHEY = 'GLI2V0UN7RD1T2J';
 
 describe('arguments', () => {
@@ -246,8 +250,21 @@ describe('a draft on the site (signed REST, faked here)', () => {
     }
   });
 
-  it('publish waits for P6; an unknown command is refused', async () => {
-    await assert.rejects(() => cli('publish', '--dry-run'), (e) => e.code === 'builder_not_yet');
+  it('publish (P6) pulls the named rev, signed, and runs the gate here; an unknown command is refused', async () => {
+    const z = JSON.parse(readFileSync(join(GAME_DIR, 'tests/fixtures/builder/mossy-hollow-editor.zone.json'), 'utf8'));
+    const calls = [];
+    const fetchImpl = async (url, init) => {
+      const u = new URL(url);
+      calls.push({ method: init.method, path: u.pathname, query: u.search.slice(1) });
+      return new Response(JSON.stringify(z), { status: 200, headers: { 'Content-Type': 'application/json', ETag: `"${z.rev}"` } });
+    };
+    const r = await run(['publish', z.id, '--rev', '13', '--dry-run', '--dirty'], { env, fetchImpl });
+    assert.equal(r.exit, 0);
+    assert.deepEqual(calls, [{ method: 'GET', path: `/wp-json/groddle/v1/admin/builder/drafts/${z.id}`, query: 'rev=13' }]);
+    // Listed, or (in a checkout where it is published already) nothing left to change.
+    assert.ok(r.out.changed.includes(`public/assets/zones/${z.id}.json`) || r.out.notes.some((n) => /already published/.test(n)));
+    assert.equal(r.out.write, false);
+    await assert.rejects(() => cli('publish', '--draft', 'x'), /--dry-run \| --write/);
     await assert.rejects(() => cli('nope'), /No command "nope"/);
   });
 

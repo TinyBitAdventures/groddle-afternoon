@@ -46,7 +46,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=d6cbbd5c';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=390e4702';
 import { platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js?v=23b926e5';
 import {
   ecologyForStreet,
@@ -63,6 +63,7 @@ import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=23f74b
 import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
 import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=395dd6a2';
 import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=fe7ee133';
+import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');
@@ -212,13 +213,16 @@ export function ruleTables(trantTables) {
 
 async function main() {
   requireServer();
+  // As a multiplayer page loads streets: no published zone, no arm into one (js/street-loader.js).
+  setZoneStreetsShown(false);
   const index = JSON.parse(await readFile(join(streetsDir, 'index.json'), 'utf8'));
   applyStreetIndex(index);
   setStreetEcologyCatalog(JSON.parse(await readFile(join(root, 'public/assets/content/street-ecology.json'), 'utf8')));
   const trantTables = JSON.parse(await readFile(join(root, 'public/assets/content/trants.json'), 'utf8'));
   const streets = {};
   const totals = { rocks: 0, trees: 0, nodes: 0, pigs: 0 };
-  for (const tsid of Object.keys(index.streets).sort()) {
+  // A published zone's streets (GZ) are solo only (docs/level-builder/spec.md 15, Q6): never shared.
+  for (const tsid of Object.keys(index.streets).filter((t) => !isZoneTsid(t)).sort()) {
     let data;
     try {
       data = await loadStreetDataFromFs(tsid, streetsDir);

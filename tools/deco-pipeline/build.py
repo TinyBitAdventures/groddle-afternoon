@@ -633,7 +633,8 @@ def cmd_check(args):
             continue  # sized copies made by sharp.py (its --check covers them)
         if f.endswith('.png'):
             problems.append(f'{f}: PNG in the shipped deco folder (sources live in assets-src/decos)')
-        elif f.endswith('.webp') and stem not in known:
+        elif f.endswith('.webp') and stem not in known and not stem.startswith('gz_'):
+            # gz_ files are a published zone's new art (tools/provenance/new-art.json), not the library.
             problems.append(f'{f}: not in manifest.json')
     for n in plan['decos']:
         if n not in known:

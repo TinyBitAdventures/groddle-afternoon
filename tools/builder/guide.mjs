@@ -8,11 +8,11 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { GAME_DIR } from '../repos.mjs';
 import { GRAVITY, JUMP_SPEED, WALK_MAX, FLOOR_ACCEL, AIR_ACCEL_RATIO, STREET_PHYSICS_TERMINAL_VY, AVATAR_BODY_H, GROUND_SNAP, NORMAL_BUFF } from '../../public/js/avatar-step.js?v=c04c7c76';
-import { RULES, LIMITS, MIN_VIEW, PARALLAX_VIEW, LICENCES, plainApex } from '../../public/js/builder/validate.js?v=ef755481';
+import { RULES, LIMITS, MIN_VIEW, PARALLAX_VIEW, LICENCES, plainApex } from '../../public/js/builder/validate.js?v=955b2e0f';
 import { REACH_LIMITS, POST_REACH_X, POST_BELOW, DOOR_REACH_X, TIGHT_MARGIN, streetWorld, jumpArc } from '../../public/js/builder/reach-graph.js?v=6f7512af';
 import { OP_NAMES } from '../../public/js/builder/ops.js?v=2ca2cc56';
 import { LAYER_ROLES } from '../../public/js/builder/layer-role.js?v=e585f610';
-import { POPULATION_CLASSES } from '../../public/js/builder/zone.js?v=bdc23538';
+import { POPULATION_CLASSES } from '../../public/js/builder/zone.js?v=6a3db28e';
 import { SCOPES, RATES, RENDER } from './limits.mjs';
 
 /** Spec 2.1: where each kind of thing is measured. */

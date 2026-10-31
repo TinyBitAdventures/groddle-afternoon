@@ -347,7 +347,8 @@ export function validateZone(zone, ctx = {}) {
   const zoneTsids = new Map(streets.map((s) => [s.street?.tsid, s]));
   const arrivals = zoneArrivals(zone);
   const labelOf = (tsid) => zoneTsids.get(tsid)?.street?.label ?? ctx.index?.[resolveTsid(ctx.index, tsid)]?.label ?? null;
-  const shippedLabels = ctx.shippedLabels || (ctx.index ? new Set(Object.values(ctx.index).map((r) => lc(r.label))) : null);
+  // A published zone's own index rows (spec 11) are not "shipped" names it could clash with.
+  const shippedLabels = ctx.shippedLabels || (ctx.index ? new Set(Object.entries(ctx.index).filter(([t, r]) => !zoneTsids.has(t) && !(zone?.id && r?.zone === zone.id)).map(([, r]) => lc(r.label))) : null);
   /** Whether a shipped street leads back to a zone street: its own arms, or a zone edit on it. */
   const leadsBack = (shipped, zoneTsid) => {
     const own = aliases(shipped);

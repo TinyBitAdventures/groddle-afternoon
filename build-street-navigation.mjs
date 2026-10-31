@@ -22,6 +22,11 @@
  * A full run also rewrites streets later builders touched (e.g. the subway
  * station doors js/features/subway-feature.js retargets at load); use --only
  * after an importer change that only affects some streets.
+ *
+ * Published zones (level builder, docs/level-builder/spec.md 11): an arm a
+ * zone adds to a shipped street has no source in the XML, so the rebuild above
+ * keeps it without its `arrive`. Every run ends by putting the zones' edits
+ * back as publishing left them (tools/builder/apply-zone-edits.mjs).
  */
 
 import { readFile, writeFile, readdir, access } from 'node:fs/promises';
@@ -32,6 +37,7 @@ import {
   buildStreetNavigation,
   streetAliases,
 } from './public/js/location-navigation.js';
+import { applyZoneEdits, files as checkoutFiles, listZones } from './tools/builder/zones.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const streetsDir = join(root, 'public/assets/streets');
@@ -145,5 +151,8 @@ for (const [tsid, { file, street }] of streets) {
   await writeFile(join(streetsDir, file), `${JSON.stringify(street)}\n`);
 }
 
+const zoneFiles = checkoutFiles(root);
+const zoneEdits = applyZoneEdits(zoneFiles, listZones(zoneFiles).map((z) => z.zone));
 console.log(JSON.stringify(totals));
+if (zoneEdits.length) console.log(`published zones' ways in put back on ${zoneEdits.length} street${zoneEdits.length === 1 ? '' : 's'}`);
 console.log(`door sprites: ${sprites.size}; distinct missing door targets: ${missingTargets.size}`);

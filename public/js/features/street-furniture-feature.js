@@ -117,8 +117,8 @@ import {
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=7cf8f655';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
 import { textureFromUrl } from '../textures.js?v=01a295a1';
-import { butlerApi } from './butler-feature.js?v=696d9c67';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=bc2f04a6';
+import { butlerApi } from './butler-feature.js?v=05543207';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=0b2dc56f';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';

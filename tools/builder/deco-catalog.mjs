@@ -20,10 +20,11 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DECO_TWINS } from '../../public/js/street-render.js?v=3bcef6a7';
+import { DECO_TWINS } from '../../public/js/street-render.js?v=262c3652';
 import { HIRES_DECOS } from '../../public/js/deco-hires-list.js?v=ff3e7d6b';
 import { SHARP_DECOS } from '../../public/js/deco-sharp-list.js?v=14808a90';
 import { ANIM_DECOS } from '../../public/js/deco-anim-list.js?v=ecfee655';
+import { isZoneTsid } from '../../public/js/zone-streets.js?v=b40010d5';
 import { layerRole } from '../../public/js/builder/layer-role.js?v=e585f610';
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -55,7 +56,8 @@ export function buildCatalog(root = ROOT) {
   const plan = new Map(JSON.parse(readFileSync(join(root, 'tools/deco-pipeline/plan.json'), 'utf8')).decos.map((d) => [d.name, d]));
   const use = new Map();
   const dir = join(root, 'public/assets/streets');
-  const files = readdirSync(dir).filter((f) => /^[GL][A-Z0-9]+\.json$/.test(f)).sort();
+  // Tiny Speck's streets only: a published zone's (GZ) are new content, not the style measured.
+  const files = readdirSync(dir).filter((f) => /^[GL][A-Z0-9]+\.json$/.test(f) && !isZoneTsid(f.slice(0, -5))).sort();
   for (const f of files) {
     const street = JSON.parse(readFileSync(join(dir, f), 'utf8'));
     const hub = street.hubId != null && street.hubId !== '' ? String(street.hubId) : '';

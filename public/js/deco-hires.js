@@ -20,6 +20,10 @@
  * drawn sharp (middleground and in front of it, unblurred).
  */
 import { HIRES_DECOS, HIRES_DECOS_BIG } from './deco-hires-list.js?v=ff3e7d6b';
+import { NEW_DECOS, NEW_DECOS_HIRES } from './deco-new-list.js?v=eadb6e8c';
+
+/** A published zone's new art (gz_ decos, js/deco-new-list.js): drawn like library decos. */
+export { NEW_DECOS };
 import { SHARP_DECOS } from './deco-sharp-list.js?v=14808a90';
 
 const DECO_PNG = /^(.*?(?:^|\/)assets\/decos\/groddle\/)([^/?#]+)\.png([?#].*)?$/;
@@ -38,7 +42,7 @@ export function decoUrl(url, { hires = false, bigTextures = true } = {}) {
   const m = DECO_PNG.exec(String(url || ''));
   if (!m) return null;
   const [, dir, name, query = ''] = m;
-  const three = hires && (HIRES_DECOS.has(name) || (bigTextures && HIRES_DECOS_BIG.has(name)));
+  const three = hires && (HIRES_DECOS.has(name) || NEW_DECOS_HIRES.has(name) || (bigTextures && HIRES_DECOS_BIG.has(name)));
   return `${dir}${name}${three ? '@1.5x' : ''}.webp${query}`;
 }
 

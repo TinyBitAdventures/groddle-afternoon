@@ -56,7 +56,7 @@ describe('the style profile (tools/builder/style-profile.mjs, assets/content/sty
   });
 
   it('measures the whole world and every hub with streets; the figures spec 9.2 quotes', () => {
-    const streets = readdirSync(join(root, 'public/assets/streets')).filter((f) => /^[GL][A-Z0-9]+\.json$/.test(f)).length;
+    const streets = readdirSync(join(root, 'public/assets/streets')).filter((f) => /^[GL][A-Z0-9]+\.json$/.test(f) && !/^[GL]Z[A-Z0-9]{13}\.json$/.test(f)).length;
     assert.equal(profiles.streetsScanned, streets);
     const world = profiles.profiles.default;
     assert.equal(world.streets, streets);
@@ -185,7 +185,7 @@ describe('the style rules (js/builder/style-rules.js)', () => {
 
   it('calibration: over the 1,460 shipped streets STY-001 is rare and STY-005 never fires', () => {
     const counts = {};
-    for (const f of readdirSync(join(root, 'public/assets/streets')).filter((n) => /^[GL][A-Z0-9]+\.json$/.test(n))) {
+    for (const f of readdirSync(join(root, 'public/assets/streets')).filter((n) => /^[GL][A-Z0-9]+\.json$/.test(n) && !/^[GL]Z[A-Z0-9]{13}\.json$/.test(n))) {
       const street = json(`public/assets/streets/${f}`);
       for (const x of styleFindings({ key: street.tsid, street }, ctx)) counts[x.rule] = (counts[x.rule] || 0) + 1;
     }

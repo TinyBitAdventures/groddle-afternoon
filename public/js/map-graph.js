@@ -396,11 +396,15 @@ export function renderHubMapSvg(view) {
 /**
  * List hubs from map index for UI (name + street counts).
  * @param {object} mapIndex
+ * @param {{ keep?: string|null }} [opts] a zone hub to list anyway (the one on show)
  * @returns {{ hubId: string, hubName: string, streetCount: number, hasArt: boolean, file: string }[]}
  */
-export function listHubsFromIndex(mapIndex) {
+export function listHubsFromIndex(mapIndex, { keep = null } = {}) {
   const hubs = mapIndex?.hubs || {};
   return Object.values(hubs)
+    // A published zone's hub (spec 11; its row carries `zone`) stays off the world's list of
+    // regions (spec 15, Q5): its map opens from its own streets only, as `keep`.
+    .filter((h) => !h.zone || (keep != null && String(h.hubId) === String(keep)))
     .map((h) => ({
       hubId: String(h.hubId),
       hubName: h.hubName || `Hub ${h.hubId}`,

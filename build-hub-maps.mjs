@@ -6,6 +6,10 @@
  * (config.data_maps.maps[hubid].objs) before a street counts toward a hub's
  * Completist badge.
  *
+ * Published zones (level builder, docs/level-builder/spec.md 11, 15 Q5) are
+ * never added: they stay off the world map and out of Completist badges. Their
+ * own hub maps come from tools/builder/build-zone-maps.mjs.
+ *
  *   node build-hub-maps.mjs
  */
 import { readFile, writeFile } from 'node:fs/promises';

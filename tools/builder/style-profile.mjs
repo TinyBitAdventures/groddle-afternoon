@@ -30,7 +30,8 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DECO_TWINS } from '../../public/js/street-render.js?v=3bcef6a7';
+import { DECO_TWINS } from '../../public/js/street-render.js?v=262c3652';
+import { isZoneTsid } from '../../public/js/zone-streets.js?v=b40010d5';
 import { layerRole, LAYER_ROLES } from '../../public/js/builder/layer-role.js?v=e585f610';
 import { HUE_BINS } from '../../public/js/builder/colour-stats.js?v=30f71984';
 
@@ -97,7 +98,8 @@ export function buildProfiles(root = ROOT) {
   const library = new Set(JSON.parse(readFileSync(join(root, 'public/assets/decos/manifest.json'), 'utf8')));
   const palette = new Map(JSON.parse(readFileSync(join(root, 'tools/builder/deco-palette.json'), 'utf8')).decos.map((r) => [r.name, r]));
   const dir = join(root, 'public/assets/streets');
-  const files = readdirSync(dir).filter((f) => /^[GL][A-Z0-9]+\.json$/.test(f)).sort();
+  // Tiny Speck's streets only: a published zone's (GZ) are new content, not the style measured.
+  const files = readdirSync(dir).filter((f) => /^[GL][A-Z0-9]+\.json$/.test(f) && !isZoneTsid(f.slice(0, -5))).sort();
   const world = newBucket();
   const hubs = new Map();
   for (const f of files) {

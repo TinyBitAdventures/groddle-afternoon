@@ -19,6 +19,10 @@
  * hub; an instance copy that is not on the map lists keeps what it has, and a
  * rebuilt room (no L*.xml) keeps the hub its build tool gave it.
  *
+ * Published zones (level builder, docs/level-builder/spec.md 11): their streets' rows come from
+ * public/assets/zones/*.json (tools/builder/zones.mjs mergeZoneIndex), so a run keeps them, sets
+ * them as the zone files say and drops those of a zone no longer published.
+ *
  * Run from spike root:
  *   node build-street-names.mjs
  *   node build-street-names.mjs --check   exit 1 if index.json or a street is stale
@@ -28,6 +32,7 @@ import { readFile, writeFile, open } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
+import { files, listZones, mergeZoneIndex } from './tools/builder/zones.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const gsjs = process.env.GSJS_ROOT || decodeURIComponent(new URL('../glitch-GameServerJS', import.meta.url).pathname);
@@ -154,6 +159,7 @@ for (const [tsid, meta] of Object.entries(index.streets || {})) {
   }
 }
 
+mergeZoneIndex(index, listZones(files(root)).map((z) => z.zone));
 const indexNext = `${JSON.stringify(index, null, 2)}\n`;
 if (indexNext !== indexText) {
   stale.push('assets/streets/index.json');

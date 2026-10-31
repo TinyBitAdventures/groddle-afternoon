@@ -5,6 +5,7 @@
  * parallax). No DOM, no Pixi.
  */
 import { worldToScreen, screenToWorld } from '../street-model.js?v=23b926e5';
+import { withoutZoneConnects } from '../zone-streets.js?v=b40010d5';
 
 /** Fields a builder street never carries (schema $defs/draftStreet; feature-owned or events). */
 export const FORK_DROPS = Object.freeze([
@@ -97,6 +98,8 @@ export function forkStreet(shipped, { zoneId, key, label, tsid, indexRow = {}, c
   street.hubId = String(shipped.hubId ?? indexRow.hubId ?? '');
   street.hubName = String(shipped.hubName ?? indexRow.hubName ?? '');
   if (!street.gradient) street.gradient = { ...DEFAULT_GRADIENT };
+  // A published zone's arms on the shipped street (spec 11) are that zone's, not Tiny Speck's: a fork leaves them.
+  if (Array.isArray(street.signposts)) street.signposts = withoutZoneConnects(street.signposts);
   let n = 0;
   const assets = {};
   for (const layer of street.layers || []) {

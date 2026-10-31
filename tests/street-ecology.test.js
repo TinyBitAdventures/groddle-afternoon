@@ -36,7 +36,8 @@ describe('Tiny Speck street ecology catalog', () => {
     assert.match(catalog.source, /tinyspeck\/glitch-locations/i);
     assert.match(catalog.sourceSnapshot, /2012-12/i);
     assert.ok(catalog.streetCount >= 1000, String(catalog.streetCount));
-    assert.equal(catalog.streetCount, Object.keys(catalog.streets).length);
+    // Published zones' rows (spec 11) are counted apart, in zoneStreetCount.
+    assert.equal(catalog.streetCount + (catalog.zoneStreetCount || 0), Object.keys(catalog.streets).length);
     assert.equal(STREET_ECOLOGY_URL, 'assets/content/street-ecology.json?v=official-ecology-6');
   });
 

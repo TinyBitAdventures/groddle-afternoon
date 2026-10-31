@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e2372a6b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4c890076';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0e4159cb';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -576,8 +576,8 @@ import {
   availableStreetTsids,
   ensureStreetIndex,
   resolveIndexTsid,
-} from './js/street-loader.js?v=d6cbbd5c';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=4343fa28';
+} from './js/street-loader.js?v=390e4702';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=12944c21';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -601,7 +601,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=3bcef6a7';
+} from './js/street-render.js?v=262c3652';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -838,7 +838,7 @@ import {
   listHubsFromIndex,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
-} from './js/map-graph.js?v=53d64e50';
+} from './js/map-graph.js?v=419ce342';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=a6771c5e';
 import {
   loadStreetEcologyCatalog,
@@ -863,7 +863,7 @@ import {
 } from './js/sound-moments.js?v=2f8597cd';
 import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from './js/metabolics.js?v=8504134e';
 import { installHiresIcons } from './js/icon-hires.js?v=5357d4b4';
-import { installHiresDecos } from './js/deco-hires.js?v=a65f2d79';
+import { installHiresDecos } from './js/deco-hires.js?v=cc8506f6';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=e56202ee';
 import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=b916a6e4';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
@@ -21352,7 +21352,7 @@ async function openMap(hubId) {
 
   // Populate hub dropdown (once per open with fresh index)
   if (hubSelect && mapIndex) {
-    const hubs = listHubsFromIndex(mapIndex);
+    const hubs = listHubsFromIndex(mapIndex, { keep: targetHub });
     const prev = hubSelect.value;
     hubSelect.innerHTML = '';
     for (const h of hubs) {

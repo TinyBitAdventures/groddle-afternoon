@@ -11,6 +11,10 @@
  *     --timeout=<s>     stop the checks after this long and clean up (default 900)
  *     --load=<s>        how long each player may take to reach the street (default 180)
  *     --headed          show the browser
+ *     --game=<dir>      (local) serve the game's files from this folder (a checkout's public/, say
+ *                       with a published zone in it) instead of the synced build: every request for
+ *                       a path whose first part is in <dir> is answered from <dir>; the site's own
+ *                       paths (wp-*, minn, /console/) still go to the site
  *
  * Checks: 1 both players get in (signed in, online, both on the street); 2 Local chat both
  * ways; 3 a party invite from the player menu, the Party tab on both, /p goes to the party,
@@ -18,7 +22,9 @@
  * 5 a Reports round trip (local only): the player files a report, a throwaway administrator
  * replies from /console/, the reply mail is recorded, the player sees the badge and the reply
  * and closes the report; 6 a fresh player starts at the Original zoom (- steps to 90%, 0
- * resets); 7 no page errors.
+ * resets); 7 no page errors; 8 (with --game and a published zone in it) published zones stay
+ * out of multiplayer: the served index lists zone streets, the game's street index on the online
+ * page has none, and no arm on a shipped street leads into one (docs/level-builder/spec.md 15, Q6).
  *
  * Players: local signs up through POST groddle/v1/players (the site's instant sign-up option
  * covers zz-*@groddle.localhost). Live has no instant sign-up and no mail to read, so it holds
@@ -36,9 +42,9 @@
  */
 import { execFileSync } from 'node:child_process';
 import { createHash, randomBytes } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { extname, join, resolve } from 'node:path';
 import { openBrowser } from './browser.mjs';
 import { emailHash, runCleanup, throwawayPattern } from './smoke-cleanup.mjs';
 
@@ -60,7 +66,13 @@ const PAT = throwawayPattern(MODE, STAMP);
 const SETTLE_MS = Number(value('settle', 20)) * 1000;
 const TIMEOUT_MS = Number(value('timeout', 900)) * 1000;
 const LOAD_MS = Number(value('load', 180)) * 1000;
-const CHECK_IDS = ['1-both-in', '2-local-chat', '3-party', '4-save-cloud', '5-reports', '6-zoom-original', '7-no-page-errors'];
+const GAME = value('game', '') ? resolve(value('game', '')) : null;
+if (GAME && (LIVE || !existsSync(join(GAME, 'play', 'online', 'index.html')))) {
+  console.error(LIVE ? '--game is for --local only' : `--game=${GAME}: no play/online/index.html there (name a game checkout's public/ folder)`);
+  process.exit(2);
+}
+const ZONES = GAME && existsSync(join(GAME, 'assets', 'zones')) ? readdirSync(join(GAME, 'assets', 'zones')).filter((f) => f.endsWith('.json')) : [];
+const CHECK_IDS = ['1-both-in', '2-local-chat', '3-party', '4-save-cloud', '5-reports', '6-zoom-original', '7-no-page-errors', ...(ZONES.length ? ['8-zones-solo-only'] : [])];
 const OUT = resolve(value('out', join(tmpdir(), 'groddle-online-smoke', `${MODE}-${STAMP}`)));
 const W = 1440;
 const H = 900;
@@ -156,9 +168,26 @@ function watch(pl) {
   pl.p.on('console', (m) => { if (m.type() === 'error') pl.consoleErrors.push(m.text().slice(0, 300)); });
 }
 
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg', '.wav': 'audio/wav', '.m4a': 'audio/mp4', '.woff2': 'font/woff2', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8', '.atlas': 'text/plain; charset=utf-8', '.xml': 'application/xml' };
+const SITE_OWNS = /^(wp-|minn$|index\.php$|console$|wp-json$)/;
+
+/** --game: answer the game's paths from a local folder, the rest from the site. */
+async function routeGame(ctx) {
+  const top = new Set(readdirSync(GAME).filter((n) => !SITE_OWNS.test(n)));
+  await ctx.route((url) => url.origin === SITE && top.has(decodeURIComponent(url.pathname.split('/')[1] || '')), async (route) => {
+    const path = decodeURIComponent(new URL(route.request().url()).pathname);
+    let file = resolve(join(GAME, path));
+    if (!file.startsWith(GAME)) return route.fulfill({ status: 403, body: '' });
+    if (existsSync(file) && statSync(file).isDirectory()) file = join(file, 'index.html');
+    if (!existsSync(file)) return route.fulfill({ status: 404, body: 'not found' });
+    return route.fulfill({ status: 200, body: readFileSync(file), headers: { 'content-type': TYPES[extname(file).toLowerCase()] || 'application/octet-stream', 'cache-control': 'no-store' } });
+  });
+}
+
 async function newContext() {
   const ctx = await session.browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, ignoreHTTPSErrors: !LIVE });
   try { await ctx.grantPermissions(['local-network-access'], { origin: SITE }); } catch {}
+  if (GAME) await routeGame(ctx);
   return ctx;
 }
 
@@ -357,6 +386,34 @@ async function checks() {
   check('1-both-in', cA.realtimeState === 'online' && cB.realtimeState === 'online' && Number(here[0]) >= 2 && Number(here[1]) >= 2 && pills[0] === `Playing as ${A.name}` && pills[1] === `Playing as ${B.name}`, { ids: [A.id, B.id], realtime: [cA.realtimeState, cB.realtimeState], here, pills, shots: inShots });
   const alone = here[0] === '2' && here[1] === '2';
   if (!alone) note('someone else is on the street', here);
+
+  // 8. Published zones stay out of multiplayer (only with --game and a zone in the served copy).
+  if (ZONES.length) {
+    const z = await A.p.evaluate(async (zoneFiles) => {
+      const served = await (await fetch('/assets/streets/index.json', { cache: 'no-store' })).json();
+      const zoneRows = Object.entries(served.streets).filter(([, r]) => r.zone).map(([t]) => t);
+      // The page's own street-loader module (the URL it loaded, so the same instance).
+      const url = performance.getEntriesByType('resource').map((e) => e.name).find((n) => /\/js\/street-loader\.js(\?|$)/.test(n));
+      if (!url) return { zoneRows, error: 'street-loader.js not loaded' };
+      const loader = await import(url);
+      await loader.ensureStreetIndex();
+      const gameRows = Object.keys(loader.STREET_INDEX.streets).filter((t) => /^[GL]Z/.test(t));
+      // The shipped streets the zones' ways in are on, as the online page loads them.
+      const shipped = new Set();
+      for (const f of zoneFiles) for (const e of (await (await fetch(`/assets/zones/${f}`, { cache: 'no-store' })).json()).edits || []) shipped.add(e.tsid);
+      const inFile = [];
+      const armsShown = [];
+      for (const tsid of shipped) {
+        const key = served.streets[tsid] ? tsid : `${tsid[0] === 'L' ? 'G' : 'L'}${tsid.slice(1)}`;
+        const raw = await (await fetch(`/${served.streets[key].file}`, { cache: 'no-store' })).text();
+        if (/"tsid":"[GL]Z[A-Z0-9]{13}"/.test(raw)) inFile.push(key);
+        const data = await loader.loadStreetData(key);
+        for (const p of data.signposts || []) for (const c of p.connects || []) if (/^[GL]Z/.test(c.tsid)) armsShown.push(`${key}/${p.id}>${c.tsid}`);
+      }
+      return { zoneRows, gameRows, waysInInFiles: inFile, armsShown, mode: window.GRODDLE_MODE || null };
+    }, ZONES);
+    check('8-zones-solo-only', z.zoneRows?.length > 0 && z.gameRows?.length === 0 && z.waysInInFiles?.length > 0 && z.armsShown?.length === 0 && z.mode === 'multiplayer', z);
+  }
 
   // 6. A fresh player starts at the Original zoom (checked first, before any key press).
   const zoomInfo = (pl) => pl.p.evaluate(() => {

@@ -10,18 +10,18 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tokensOf, searchDecos, facetCounts, passesFacets, sizeClass, drawnSize, hubPlacements, newArtRows, thumbUrl, decoFor, textScore, queryWords, NEW_ART_BUNDLE } from '../public/js/builder/deco-search.js?v=fda9b16b';
-import { TEMPLATES, newStreet, newStreetOps, groundStrip, templateLayers, gradientFrom, hslHex, filtersFor, nextHubId, newHub, nextMapLine, mapWithStreet, mapWithoutStreet, profileOf, FLOOR_Y, MAP_W, MAP_H } from '../public/js/builder/templates.js?v=0ee8c60d';
-import { populationWith, plannedSpots, moveMapLine, mapForStreets, spotGroup } from '../public/js/builder/editor-zone.js?v=fb167700';
+import { TEMPLATES, newStreet, newStreetOps, groundStrip, templateLayers, gradientFrom, hslHex, filtersFor, nextHubId, newHub, nextMapLine, mapWithStreet, mapWithoutStreet, profileOf, FLOOR_Y, MAP_W, MAP_H } from '../public/js/builder/templates.js?v=fa23314a';
+import { populationWith, plannedSpots, moveMapLine, mapForStreets, spotGroup } from '../public/js/builder/editor-zone.js?v=3ca537c9';
 import { intakeBody, base64Of } from '../public/js/builder/editor-picker.js?v=724352b6';
-import { streetWithEdits, editsOn, linkEdit, streetStats } from '../public/js/builder/zone.js?v=bdc23538';
-import { applyZoneEdits } from '../public/js/builder/draft-play.js?v=4343fa28';
+import { streetWithEdits, editsOn, linkEdit, streetStats } from '../public/js/builder/zone.js?v=6a3db28e';
+import { applyZoneEdits } from '../public/js/builder/draft-play.js?v=12944c21';
 import { applyOps } from '../public/js/builder/ops.js?v=2ca2cc56';
 import { compileSchema } from '../public/js/builder/schema-check.js?v=cc9d1af4';
-import { validateZone, placementRequests } from '../public/js/builder/validate.js?v=ef755481';
+import { validateZone, placementRequests } from '../public/js/builder/validate.js?v=955b2e0f';
 import { platformsScreen, worldToScreen, streetWidth } from '../public/js/street-model.js?v=23b926e5';
 import { populationForStreet, planStreetPlacements } from '../public/js/street-ecology.js?v=7e30da8f';
-import { arriveFor } from '../public/js/builder/geometry-handles.js?v=3befd62c';
-import { applyStreetIndex, clearStreetIndex } from '../public/js/street-loader.js?v=d6cbbd5c';
+import { arriveFor } from '../public/js/builder/geometry-handles.js?v=a291ae18';
+import { applyStreetIndex, clearStreetIndex } from '../public/js/street-loader.js?v=390e4702';
 import { loadValidatorContext } from '../tools/builder/validator-context.mjs';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
@@ -34,7 +34,8 @@ const profiles = json('public/assets/content/style-profiles.json');
 const schema = json('docs/level-builder/zone.schema.json');
 const check = compileSchema(schema);
 const base = json('tests/fixtures/builder/mossy-hollow.zone.json');
-const ctx = loadValidatorContext({ publish: true });
+// Tiny Speck's world alone, so the fixtures validate the same whatever zones are published.
+const ctx = loadValidatorContext({ publish: true, zones: false });
 const names = (found) => found.map((r) => r.row.name);
 
 describe('the deco picker\'s search (js/builder/deco-search.js, spec 6.4)', () => {

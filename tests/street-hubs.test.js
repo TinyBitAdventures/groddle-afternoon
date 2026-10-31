@@ -49,7 +49,8 @@ function ownHub(key) {
   return buf.subarray(0, n).toString('utf8').match(/<game_object\b[^>]*\bhubid="(\d+)"/)?.[1] ?? null;
 }
 
-const rows = Object.entries(index).map(([tsid, meta]) => {
+// Tiny Speck's streets: a published zone's (GZ, spec 11) have no location XML and no map-data hub.
+const rows = Object.entries(index).filter(([tsid]) => !/^[GL]Z/.test(tsid)).map(([tsid, meta]) => {
   const key = tsid.slice(1);
   return { tsid, meta, own: ownHub(key), maps: mapHubs.get(key) || [] };
 });

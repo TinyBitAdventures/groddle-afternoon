@@ -22,7 +22,7 @@
  * width), h: same for height, filters: { name: { n, band: [p10, median, p90] } } }. A filter is
  * part of a template when at least half that role's layers carry it; its value is the median.
  */
-import { newTsid, libraryAsset } from './zone.js?v=bdc23538';
+import { newTsid, libraryAsset } from './zone.js?v=6a3db28e';
 
 export const TEMPLATES = Object.freeze([
   Object.freeze({ id: 'meadow', name: 'Meadow', words: 'Sky, one back layer, the middleground and a near layer (the Standard stack).', profile: 'hub-58', height: 1000, ground: 'evenground_platform_long', roles: Object.freeze(['sky', 'bg_1', 'middleground', 'middleplus']) }),

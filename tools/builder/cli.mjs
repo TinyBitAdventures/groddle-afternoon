@@ -14,9 +14,9 @@
  *
  * Commands (spec 8.2): drafts; new; pull; push; street add | fork; place; set; rm; platform; wall;
  * ladder; signpost; connect; link-world; populate; hub map; ops; decos; style; guide; validate;
- * render; asset add; play; history; restore; publish (P6); sign. `cli.mjs help` lists them.
+ * render; asset add; play; history; restore; publish; sign. `cli.mjs help` lists them.
  *
- * Exit status: 0 done; 1 validate found an error or a fatal finding; 2 refused or wrong usage.
+ * Exit status: 0 done; 1 validate (or publish) found an error or a fatal finding; 2 refused or wrong usage.
  */
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join, resolve, basename } from 'node:path';
@@ -26,18 +26,18 @@ import { signKey, parseKey, parseEnv, configDir, canonicalQuery } from './sign.m
 import { catalog, searchDecos, styleProfile, styleProfiles } from './catalog.mjs';
 import { builderGuide } from './guide.mjs';
 import { applyOps, applyOp, nextDecoId, nextGeometryId, findGeometry, findDeco, GEOMETRY, OpError, OP_NAMES } from '../../public/js/builder/ops.js?v=2ca2cc56';
-import { forkStreet, forkOps, newTsid, libraryAsset, linkEdit, editsOn } from '../../public/js/builder/zone.js?v=bdc23538';
-import { newStreet, newStreetOps, newHub, nextHubId, mapWithStreet, mapWithoutStreet, TEMPLATES, DEFAULT_MAP_COLOURS } from '../../public/js/builder/templates.js?v=0ee8c60d';
-import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js/builder/geometry-handles.js?v=3befd62c';
+import { forkStreet, forkOps, newTsid, libraryAsset, linkEdit, editsOn } from '../../public/js/builder/zone.js?v=6a3db28e';
+import { newStreet, newStreetOps, newHub, nextHubId, mapWithStreet, mapWithoutStreet, TEMPLATES, DEFAULT_MAP_COLOURS } from '../../public/js/builder/templates.js?v=fa23314a';
+import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js/builder/geometry-handles.js?v=a291ae18';
 import { platformsScreen, isStandable } from '../../public/js/street-model.js?v=23b926e5';
-import { DECO_TWINS } from '../../public/js/street-render.js?v=3bcef6a7';
+import { DECO_TWINS } from '../../public/js/street-render.js?v=262c3652';
 
 export const PERM_WORDS = Object.freeze({ floor: -1, roof: 1, soft: 0, hard: null });
 /** The game draws a signpost's first four arms (street-render.js); a fifth would never show. */
 export const ARMS_SHOWN = 4;
 /** Ops spec 8.3 names that are not built yet: refused here rather than sent. */
 export const NOT_BUILT = Object.freeze(['layer.add', 'layer.remove', 'layer.move', 'waiver.add', 'waiver.remove']);
-const BOOLEAN_FLAGS = new Set(['json', 'dry-run', 'write', 'help', 'all', 'flip', 'reach']);
+const BOOLEAN_FLAGS = new Set(['json', 'dry-run', 'write', 'help', 'all', 'flip', 'reach', 'dirty', 'no-build']);
 const pub = (p) => join(GAME_DIR, 'public', p);
 const readJson = (f) => JSON.parse(readFileSync(f, 'utf8'));
 const clone = (v) => JSON.parse(JSON.stringify(v));
@@ -562,7 +562,9 @@ export const HELP = `Groddle level builder (docs/level-builder/spec.md 8.2)
   validate [--rule PHY-*]                     exit 1 on an error or fatal finding
   render --street k [--view full|camera] [--x --y --w --h] [--scale 0.25] [--overlay geometry,reach,findings,grid] [--layers a,b] --out f.png
   asset add <file> --name gz_x --licence own-work-CC0|ai-generated --author A [--tool --prompt --inputs a,b --role --file3 f]
-  play [--street k]   history   restore <rev>   publish (local, phase P6)
+  play [--street k]   history   restore <rev>
+  publish [<id> --rev n | file:<zone.json>] --dry-run | --write [--art <folder>] [--ack fp|rule|all] [--no-build]
+                                              into this checkout's files (spec 11); never commits
   sign METHOD ROUTE [BODY] [--query a=1&b=2]  the X-Groddle-Builder value for a request`;
 
 // —— Commands ——
@@ -605,7 +607,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       if (flags.hub !== undefined) {
         const hubId = String(flags.hub).replace(/^hub-/, '');
         const index = readJson(pub('assets/streets/index.json')).streets;
-        const row = Object.values(index).find((r) => String(r.hubId) === hubId);
+        const row = Object.values(index).find((r) => String(r.hubId) === hubId && !r.zone);
         if (!row) throw new CliError(`No shipped street is in hub ${hubId}.`, { code: 'builder_not_found' });
         hub = { id: hubId, name: row.hubName };
       } else if (typeof flags['new-hub'] === 'string') {
@@ -658,7 +660,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       if (verb === 'fork') {
         const tsid = args[1];
         const file = pub(`assets/streets/${tsid}.json`);
-        if (!/^[GL][A-Z0-9]+$/.test(tsid || '') || !existsSync(file)) throw new CliError(`street fork <shipped tsid>: no street ${tsid}.`, { code: 'builder_not_found' });
+        if (!/^[GL][A-Z0-9]+$/.test(tsid || '') || /^[GL]Z/.test(tsid) || !existsSync(file)) throw new CliError(`street fork <shipped tsid>: no shipped street ${tsid}.`, { code: 'builder_not_found' });
         const shipped = readJson(file);
         const rows = new Map(catalog().map((d) => [d.name, d]));
         const ecology = readJson(pub('assets/content/street-ecology.json')).streets;
@@ -828,7 +830,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       let report;
       let rev;
       if (local()) {
-        const { validateZone } = await import('../../public/js/builder/validate.js?v=ef755481');
+        const { validateZone } = await import('../../public/js/builder/validate.js?v=955b2e0f');
         const { loadValidatorContext } = await import('./validator-context.mjs');
         const zone = readJson(resolve(flags.file));
         rev = zone.rev;
@@ -943,8 +945,31 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       return { out: data, text: `rev ${data.rev} (rev ${rev} copied forward)`, exit: 0 };
     }
 
-    case 'publish':
-      throw new CliError('Publishing comes with phase P6 (spec 11): publish --dry-run | --write in a clean worktree.', { code: 'builder_not_yet' });
+    case 'publish': {
+      const write = flags.write === true;
+      if (write === (flags['dry-run'] === true)) throw new CliError('publish [<draft id> --rev n | file:<zone.json>] --dry-run | --write [--art <folder>] [--ack <fingerprint|rule|all>,...]');
+      let zone;
+      if (local()) {
+        zone = readJson(resolve(flags.file));
+      } else {
+        const id = args[0] || draftId();
+        const rev = flags.rev !== undefined ? num(flags.rev, 'rev') : null;
+        ({ data: zone } = await client.call('GET', `/drafts/${encodeURIComponent(id)}`, { query: rev ? { rev: String(rev) } : null }));
+      }
+      const { publishZone, afterPublish } = await import('./publish.mjs');
+      const ack = typeof flags.ack === 'string' ? flags.ack.split(',').map((x) => x.trim()).filter(Boolean) : [];
+      const r = publishZone(zone, { art: typeof flags.art === 'string' ? resolve(flags.art) : null, ack, write, dirtyOk: flags.dirty === true });
+      const head = `${zone.title || zone.id} (${zone.id}, rev ${zone.rev ?? '?'}): ${plural(r.report?.counts?.fatal ?? 0, 'fatal')}, ${plural(r.report?.counts?.error ?? 0, 'error')}, ${plural(r.report?.counts?.warn ?? 0, 'warning')}, ${plural(r.report?.counts?.info ?? 0, 'note')}`;
+      if (!r.ok) {
+        throw new CliError([`Not published. ${head}`, ...r.refused.map((x) => `  - ${x}`)].join('\n'), { code: 'builder_publish_refused', data: { refused: r.refused, counts: r.report?.counts || null }, exit: 1 });
+      }
+      const ran = write && flags.build !== 'no' && flags['no-build'] !== true ? afterPublish(r.changed) : [];
+      const verb = write ? 'Published' : 'Would publish';
+      const text = [`${verb} ${head}`, ...r.notes.map((n) => `  ${n}`), `${write ? 'Wrote' : 'Would write'} ${plural(r.changed.length, 'file')}:`, ...r.changed.map((f) => `  ${f}`),
+        ...(ran.length ? ['Then ran:', ...ran.map((c) => `  ${c}`)] : []),
+        ...(write ? ['Nothing is committed. Next: the builders in order (build-restoration, data-versions, module-keys, play-online, then each --check), npm test, then commit.'] : [])].join('\n');
+      return { out: { ok: true, write, id: zone.id, rev: zone.rev ?? null, counts: r.report.counts, changed: r.changed, notes: r.notes, ran }, text, exit: 0 };
+    }
 
     case 'sign': {
       const [method, route, body = ''] = args;

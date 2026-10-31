@@ -80,7 +80,8 @@ describe('the zone schema (docs/level-builder/zone.schema.json)', () => {
   it('every shipped street fits $defs/street', () => {
     const street = compileSchema(schema, '#/$defs/street');
     const dir = join(root, 'public/assets/streets');
-    const files = readdirSync(dir).filter((f) => /^[GL][A-Z0-9]+\.json$/.test(f));
+    // Tiny Speck's 1,460; a published zone's streets (GZ, spec 11) are checked by tests/zones.test.js.
+    const files = readdirSync(dir).filter((f) => /^[GL][A-Z0-9]+\.json$/.test(f) && !/^[GL]Z[A-Z0-9]{13}\.json$/.test(f));
     assert.equal(files.length, 1460);
     const bad = [];
     for (const f of files) {

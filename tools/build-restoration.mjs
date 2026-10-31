@@ -152,7 +152,8 @@ function skillStats() {
 function streetStats() {
   const index = json('assets/streets/index.json').streets;
   // Rebuilt rooms (js/tower-rooms.js) sit in the index but are not archive imports.
-  const imported = Object.keys(index).filter((t) => !index[t].reconstructed);
+  // Tiny Speck's streets: a published zone's (level builder, index rows with `zone`) are new content.
+  const imported = Object.keys(index).filter((t) => !index[t].reconstructed && !index[t].zone);
   const mapped = new Set(Object.values(HUB_MAP_STREETS).flat());
   return {
     imported: imported.length,

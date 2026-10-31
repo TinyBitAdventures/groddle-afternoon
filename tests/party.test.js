@@ -23,8 +23,8 @@ import {
   partiersLine,
   partyCommand,
 } from '../public/js/party.js?v=b86bf389';
-import { partyFeature } from '../public/js/features/party-feature.js?v=a2f5182e';
-import { FEATURES } from '../public/js/features/index.js?v=4c890076';
+import { partyFeature } from '../public/js/features/party-feature.js?v=e0756bfb';
+import { FEATURES } from '../public/js/features/index.js?v=0e4159cb';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

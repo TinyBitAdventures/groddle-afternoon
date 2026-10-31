@@ -4,6 +4,8 @@
  */
 
 import { assertStreetGeometry, navigableSignposts } from './street-model.js?v=23b926e5';
+import { isSolo, resolveGameMode } from './game-mode.js?v=1ecf2899';
+import { withoutZoneRows, withoutZoneConnects } from './zone-streets.js?v=b40010d5';
 
 const cache = new Map();
 
@@ -17,6 +19,18 @@ const draftStreets = new Map();
 
 /** @type {null | { default: string, streets: Record<string, { label: string, file: string, hubId?: string }> }} */
 let loadedIndex = null;
+
+/**
+ * LEVEL BUILDER published zones (spec 11, 15 Q6; js/zone-streets.js): solo only. On a multiplayer
+ * page the zones' index rows are dropped and so is every arm that leads into a zone, so no way in
+ * shows and nothing can travel there. Read once, from the page's mode.
+ */
+let zonesShown = isSolo(resolveGameMode());
+
+/** Tests: show or hide the published zones' streets (the page's mode decides otherwise). */
+export function setZoneStreetsShown(shown) {
+  zonesShown = Boolean(shown);
+}
 
 /**
  * Fallback bootstrap index (used before async index load / offline tests).
@@ -44,7 +58,7 @@ export function applyStreetIndex(idx) {
   if (!idx?.streets) return STREET_INDEX;
   loadedIndex = idx;
   if (idx.default) STREET_INDEX.default = idx.default;
-  STREET_INDEX.streets = { ...idx.streets };
+  STREET_INDEX.streets = zonesShown ? { ...idx.streets } : withoutZoneRows(idx.streets);
   for (const [tsid, d] of draftStreets) STREET_INDEX.streets[tsid] = d.row;
   return STREET_INDEX;
 }
@@ -168,7 +182,7 @@ export async function loadStreetData(tsid) {
   assertStreetGeometry(data);
   applyIndexHub(data, meta);
   // Hidden signpost connects stay in the JSON (source data) but never show.
-  data.signposts = navigableSignposts(data.signposts);
+  data.signposts = navigableSignposts(zonesShown ? data.signposts : withoutZoneConnects(data.signposts));
   cache.set(key, data);
   return data;
 }
@@ -198,7 +212,7 @@ export async function loadStreetDataFromFs(tsid, baseDir) {
   const data = JSON.parse(await readFile(path, 'utf8'));
   assertStreetGeometry(data);
   applyIndexHub(data, meta);
-  data.signposts = navigableSignposts(data.signposts);
+  data.signposts = navigableSignposts(zonesShown ? data.signposts : withoutZoneConnects(data.signposts));
   cache.set(key, data);
   return data;
 }

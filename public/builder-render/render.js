@@ -17,14 +17,14 @@
  * `full` draws every layer at the parallax offset of a Wide view at the street's centre, with the
  * sky over the whole street. The output is at most 4096 px a side (the scale shrinks to fit).
  */
-import { buildStreetView, loadDecoManifest, loadSignpostTextures } from '../js/street-render.js?v=3bcef6a7';
+import { buildStreetView, loadDecoManifest, loadSignpostTextures } from '../js/street-render.js?v=262c3652';
 import { navigableSignposts, streetWidth, streetHeight, worldToScreen } from '../js/street-model.js?v=23b926e5';
 import * as textureUrls from '../js/textures.js?v=01a295a1';
 import { installPixiFixes } from '../js/pixi-fixes.js?v=173fb649';
-import { installHiresDecos } from '../js/deco-hires.js?v=a65f2d79';
+import { installHiresDecos } from '../js/deco-hires.js?v=cc8506f6';
 import { installNewArt, withNewArt } from '../js/builder/new-art.js?v=b2411f6f';
-import { spotGroup } from '../js/builder/editor-zone.js?v=fb167700';
-import { drawGeometryOverlay, drawReachOverlay, drawArrivals, OVERLAY_COLOURS } from '../js/builder/overlays.js?v=33839acd';
+import { spotGroup } from '../js/builder/editor-zone.js?v=3ca537c9';
+import { drawGeometryOverlay, drawReachOverlay, drawArrivals, OVERLAY_COLOURS } from '../js/builder/overlays.js?v=a9d287ac';
 
 export const MAX_SIDE = 4096;
 export const WIDE = Object.freeze({ w: 960, h: 408 });

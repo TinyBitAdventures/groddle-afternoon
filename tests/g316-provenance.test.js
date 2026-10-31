@@ -13,6 +13,11 @@
  * listed by path and git blob under `restored`, and each may appear only at its
  * own path with its own bytes (research/coverage/g312-provenance.md "Original
  * sounds, 2026-10-28").
+ *
+ * 2026-10-31 (level builder P6, docs/level-builder/spec.md 10, 11): new art may ship, own work or
+ * AI-generated, dedicated CC0 1.0, when a published zone uses it and its provenance is recorded:
+ * every gz_ deco file is listed in tools/provenance/new-art.json with the sha256 of its bytes and a
+ * licence the publish policy allows, and nothing else new comes in.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -92,6 +97,32 @@ describe('non-CC0 files stay out (G316/G317)', () => {
   });
 });
 
+describe('new art from published zones (level builder P6)', () => {
+  it('every gz_ file is listed in tools/provenance/new-art.json with its bytes, maker and a CC0 1.0 dedication', () => {
+    const file = join(root, 'tools/provenance/new-art.json');
+    const art = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')).art : {};
+    const policy = JSON.parse(readFileSync(join(root, 'tools/builder/licence-policy.json'), 'utf8'));
+    const sha = (buf) => createHash('sha256').update(buf).digest('hex');
+    const decos = join(pub, 'assets/decos/groddle');
+    for (const f of readdirSync(decos).filter((n) => n.startsWith('gz_'))) {
+      const name = f.replace(/(@1\.5x)?\.webp$/, '');
+      const row = art[name];
+      assert.ok(row, `${f}: no provenance row`);
+      assert.equal(sha(readFileSync(join(decos, f))), f.includes('@1.5x') ? row.sha256_3 : row.sha256, `${f}: not the bytes its provenance names`);
+    }
+    for (const [name, row] of Object.entries(art)) {
+      assert.equal(policy.licences[row.licence]?.origin, 'new', `${name}: ${row.licence}`);
+      assert.ok(row.author && (row.licence !== 'ai-generated' || (row.tool && row.prompt)), `${name}: maker`);
+      assert.ok(row.inputs.every((i) => /^(deco:|own:)/.test(i)), `${name}: inputs`);
+      assert.ok(existsSync(join(root, row.file)), row.file);
+      assert.ok(row.zones.length > 0, `${name}: no zone uses it`);
+    }
+    // Only gz_ names are new art, and the library manifest stays Tiny Speck's.
+    assert.ok(Object.keys(art).every((n) => /^gz_[a-z0-9_]+$/.test(n)));
+    assert.ok(!JSON.parse(readFileSync(join(pub, 'assets/decos/manifest.json'), 'utf8')).some((n) => n.startsWith('gz_')));
+  });
+});
+
 describe('loading-card strips are our own renders (G316)', () => {
   it('every card key points at a strip drawn from the street\'s CC0 layers', async () => {
     const map = JSON.parse(readFileSync(join(pub, 'assets/content/loading-images.json'), 'utf8'));
@@ -137,7 +168,7 @@ describe('sprites, decos and garden art (G316)', () => {
   it('every manifest deco has its file; renamed twins draw their CC0 SWF render', async () => {
     const names = JSON.parse(readFileSync(join(pub, 'assets/decos/manifest.json'), 'utf8'));
     for (const n of names) assert.ok(existsSync(join(pub, 'assets/decos/groddle', `${n}.webp`)), n);
-    const { DECO_TWINS } = await import('../public/js/street-render.js?v=3bcef6a7');
+    const { DECO_TWINS } = await import('../public/js/street-render.js?v=262c3652');
     for (const [alias, twin] of Object.entries(DECO_TWINS)) {
       assert.ok(!names.includes(alias), alias);
       assert.ok(names.includes(twin), twin);
