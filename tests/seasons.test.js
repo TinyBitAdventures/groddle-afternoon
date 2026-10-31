@@ -47,8 +47,8 @@ import {
   teachPhrase,
   yetiMailDue,
   yetiQuote,
-} from '../public/js/seasons.js?v=fcb12a83';
-import { SEASON_DATA } from '../public/js/seasons-data.js?v=249cedba';
+} from '../public/js/seasons.js?v=886b0b84';
+import { SEASON_DATA } from '../public/js/seasons-data.js?v=b5174bc9';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const at = (y, m, d, h = 12) => new Date(y, m - 1, d, h).getTime();
@@ -238,6 +238,18 @@ describe('Glitchmas', () => {
     assert.match(SEASON_DATA.yetiMail, /^Good news! The Glitchmas Yeti awoke/);
     assert.match(SEASON_DATA.holidayQuest.offer, /type "yay"/);
   });
+
+  it('the Yeti\'s letter is signed Groddle Afternoon, with no em dash and no conversation markup (build-seasons YETI_MAIL_OVERRIDES)', () => {
+    const mail = SEASON_DATA.yetiMail;
+    assert.match(mail, /Happy Glitchmas!\n\nGroddle Afternoon$/);
+    assert.doesNotMatch(mail, /—|Tiny Speck|<split/);
+    assert.match(mail, /We’re not sure what they are, though from the description/);
+    assert.equal(mail.split('\n\n').length, 4);
+    const builder = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'build-seasons.mjs'), 'utf8');
+    assert.match(builder, /const YETI_MAIL_OVERRIDES = \[/);
+    assert.match(builder, /is not in its GSJS text any more/);
+    assert.match(builder, /overrideText\('yetiMail', /);
+  });
 });
 
 describe('Egg Hunt and Pi Day', () => {
@@ -278,7 +290,7 @@ describe('Egg Hunt and Pi Day', () => {
   });
 
   it('counts each egg into the collection however it arrives, then gives the trophy for them (seasons-feature)', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=890241c2');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=aa4e066a');
     const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=85d4faba');
     const unlocked = [];
     const counted = {};
@@ -338,7 +350,7 @@ describe('supply paths', () => {
 
 describe('a ?season= preview leaves the save alone (G342)', () => {
   it('a carved pumpkin survives previewing another season, and the save still remembers Zilloween', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=890241c2');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=aa4e066a');
     const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=85d4faba');
     const inv = createInventory();
     addItem(inv, 'pumpkin_carved_1', 2);

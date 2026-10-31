@@ -29,7 +29,7 @@
  * `?seasondate=YYYY-MM-DD` to preview a calendar date.
  */
 
-import { SEASON_DATA } from './seasons-data.js?v=249cedba';
+import { SEASON_DATA } from './seasons-data.js?v=b5174bc9';
 
 const DAY_MS = 86_400_000;
 

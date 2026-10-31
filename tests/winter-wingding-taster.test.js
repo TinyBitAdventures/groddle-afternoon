@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DROP_TABLES, DROP_ITEMS } from '../public/js/drop-tables-data.js?v=c51a6400';
 import { rollDropTable } from '../public/js/drop-tables.js?v=0f922478';
-import { CRACKER } from '../public/js/seasons.js?v=fcb12a83';
+import { CRACKER } from '../public/js/seasons.js?v=886b0b84';
 import { PARTY_PACKS, PARTY_SPACES, isPartyPack, partyPackDurationSeconds } from '../public/js/party-spaces.js?v=6fea0ad5';
 
 const here = dirname(fileURLToPath(import.meta.url));

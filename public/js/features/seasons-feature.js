@@ -45,7 +45,7 @@ import { rollDropTable } from '../drop-tables.js?v=0f922478';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=21c55475';
 import { payDrop } from './drops-feature.js?v=92989dc5';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=4b0d8834';
-import { SEASON_DATA } from '../seasons-data.js?v=249cedba';
+import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import {
   CANDY_CLASSES,
   CANDY_DAILY_MAX,
@@ -98,7 +98,7 @@ import {
   teachPhrase,
   yetiMailDue,
   yetiQuote,
-} from '../seasons.js?v=fcb12a83';
+} from '../seasons.js?v=886b0b84';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { playOverlay } from '../overlays.js?v=106b9955';
 import { itemZ } from '../item-bands.js?v=e98b10bc';

@@ -54,7 +54,6 @@ const SOURCE_VERBATIM = [
   ['js/quest-rooms/back-alley.js', 'routine subway maintenance—refilling', 'glitch-GameServerJS/items/npc_maintenance_bot.js'],
   ['js/quest-rooms/kids-room.js', 'six different letters—A, B, E, M, S and T—you', 'glitch-GameServerJS/items/npc_letterblock.js'],
   ['js/rube.js', 'Something smells weird—like', 'glitch-GameServerJS/items/essence_of_rubeweed.js'],
-  ['js/seasons-data.js', 'not sure what they are — though from the description', 'glitch-GameServerJS/players/player.js'],
   ['js/street-furniture.js', 'Ah — I know just the street to send you to.', 'glitch-GameServerJS/items/visiting_stone.js'],
   ['js/exploration.js', ' &#8212; ', 'glitch-client/com/tinyspeck/engine/view/gameoverlay/LoadingLocationView.as'],
   // G249: the home card's last-here box (LoadingLocationPOLView.as 299).
