@@ -910,6 +910,9 @@
   --minimap-sign-halo: #ffffff;
   --minimap-sign-hover: #53e5ff;
   --minimap-lines-bg: #c9dce4;
+  /* MAPWALK: the walk's goal ring (the remake's; the client drew none), the you glow's yellow on black. */
+  --minimap-dest: #ffd616;
+  --minimap-dest-edge: #000000;
 
   /* Side insets: what the HUD covers at each edge, so what centres in the free width keeps clear.
      The Social drawer (js/ui/social-drawer.js) sets --inset-r on #game-root: 316px open, 60px as the rail. */
@@ -11712,7 +11715,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
    scale by --mm-u (the card's width / 160), which the module sets. */
 .street-minimap[hidden], .smm-show[hidden], .street-minimap .smm-tab[hidden],
 .street-minimap .smm-fog[hidden], .street-minimap .smm-fogwash[hidden], .street-minimap .smm-tip[hidden],
-.street-minimap .smm-sign[hidden], .street-minimap .smm-dot[hidden] { display: none; }
+.street-minimap .smm-sign[hidden], .street-minimap .smm-dot[hidden], .street-minimap .smm-dest[hidden] { display: none; }
 .street-minimap {
   --mm-w: 192px;
   --mm-u: 1.2;
@@ -11724,7 +11727,8 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   font-family: var(--font-ui);
 }
 .street-minimap .smm-card { position: relative; width: var(--mm-w); height: var(--mm-h, calc(80px * var(--mm-u))); }
-.street-minimap .smm-window { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
+/* The whole map takes a click to walk there (map_sp.useHandCursor). */
+.street-minimap .smm-window { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; cursor: pointer; }
 .street-minimap .smm-pic { position: absolute; left: 0; top: var(--mm-scroll, 0px); display: block; width: 100%; height: var(--mm-map-h, 100%); }
 .street-minimap .smm-fogwash { position: absolute; inset: 0; background: var(--minimap-fog-wash); }
 .street-minimap .smm-fog {
@@ -11764,6 +11768,13 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   box-shadow: 0 0 calc(3.5px * var(--mm-u)) calc(1.5px * var(--mm-u)) var(--minimap-glow);
 }
 .street-minimap .smm-item { background: var(--minimap-item); }
+/* MAPWALK: where the walk you started is heading, a hollow ring that never takes a click. */
+.street-minimap .smm-dest {
+  position: absolute; left: 0; top: 0; box-sizing: border-box; pointer-events: none;
+  width: calc(8px * var(--mm-u)); height: calc(8px * var(--mm-u)); border-radius: var(--radius-round);
+  border: calc(2px * var(--mm-u)) solid var(--minimap-dest);
+  box-shadow: 0 0 0 1px var(--minimap-dest-edge), inset 0 0 0 1px var(--minimap-dest-edge);
+}
 .street-minimap .smm-dot:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 /* The 30 x 10 tab under the map (map_expand_arrow, turned over when the map is out). */
 .street-minimap .smm-tab {

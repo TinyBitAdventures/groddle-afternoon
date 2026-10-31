@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e2372a6b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=03e719ca';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=4c890076';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -689,7 +689,7 @@ import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=587c0
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction } from './js/world-zoom.js?v=b5f4748a';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=917a2caa';
-import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=22d73edf';
+import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=23e34f93';
 import './js/classic/classic-zoom.js?v=7a25123e';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=972868f3';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
@@ -705,6 +705,7 @@ import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FA
 import { landingY } from './js/walk-surface.js?v=764d5f5a';
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, streetPhysicsExtras } from './js/avatar-step.js?v=c04c7c76';
+import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=81ea4347';
@@ -864,7 +865,7 @@ import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from '.
 import { installHiresIcons } from './js/icon-hires.js?v=5357d4b4';
 import { installHiresDecos } from './js/deco-hires.js?v=a65f2d79';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=e56202ee';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=1fa36eba';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=b916a6e4';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=5919dfde';
@@ -895,7 +896,7 @@ import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?
 import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=1c6068d6';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=0694e27a';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -2107,6 +2108,8 @@ const AVATAR_WALK_ARRIVE_PX = 6;
 
 function startAvatarWalk(x, face = '') {
   if (!player || !Number.isFinite(Number(x))) return false;
+  // The game's walk wins over one you started (MAPWALK).
+  endUserWalk('game');
   avatarWalk = {
     x: Math.max(0, Math.min(WORLD_W, Number(x))),
     face: face === 'left' || face === 'right' ? face : '',
@@ -2116,10 +2119,49 @@ function startAvatarWalk(x, face = '') {
   return true;
 }
 
+/**
+ * MAPWALK (js/user-path.js): a walk you start from the street map (MiniMapView.as
+ * mouseUpHandler, TSFrontController.startUserInitiatedPath, AvatarController.beginPath).
+ * Refused while a walk the game started is running (avatar_gs_path_pt), while a menu or a
+ * scene holds the avatar (the client's "main view isn't in focus"), and in a Paradise course.
+ * It takes you off a ladder. `goal` is { kind: 'sign'|'player'|'item'|'point', id, x, y }.
+ * QA: canvas data avatarWalk (kind:x while it runs) and avatarWalkEnd (why it ended).
+ */
+function startUserWalk(goal) {
+  if (!state.started || !player || !goal) return false;
+  if (avatarWalk && !avatarWalk.user) return false;
+  if (gameplayInputBlocked() || paradiseIsInstanced()) return false;
+  const path = createUserPath(goal, { fromX: player.x, tsid: currentStreetTsid, worldW: WORLD_W });
+  if (!path) return false;
+  if (climb.active) stopClimb();
+  avatarWalk = path;
+  setCanvasData('avatarWalk', `${path.kind}:${Math.round(path.x)}`);
+  setCanvasData('avatarWalkEnd', '');
+  return true;
+}
+
+function endUserWalk(reason) {
+  const w = avatarWalk;
+  if (!w?.user) return;
+  avatarWalk = null;
+  setCanvasData('avatarWalk', '');
+  setCanvasData('avatarWalkEnd', reason);
+  // AvatarController.endPath 156-165: beside the player you walked to, their menu opens.
+  if (reason === 'arrived' && w.kind === 'player' && w.id && !menuTarget) {
+    const them = interactables.find((t) => t?.classId === 'pc_remote' && String(t.playerId) === w.id);
+    if (them && withinReach(them, 100)) openVerbMenu(them);
+  }
+}
+
 /** handleInput: -1 / 1 while the walk steers left / right, 0 once it is over (it faces then). */
 function avatarWalkSteer(userMoving) {
   const w = avatarWalk;
   if (!w || !player) return 0;
+  if (w.user) {
+    const step = stepUserPath(w, { x: player.x, moving: userMoving, jump: hasQueuedJump(jumpState, movementNow()), tsid: currentStreetTsid });
+    if (step.end) endUserWalk(step.end);
+    return step.dir;
+  }
   const dx = w.x - player.x;
   const done = Math.abs(dx) <= AVATAR_WALK_ARRIVE_PX || Date.now() > w.until;
   if (userMoving || w.tsid !== currentStreetTsid || done) {
@@ -10589,6 +10631,13 @@ const engine = {
   get avatarWalking() {
     return Boolean(avatarWalk);
   },
+  /** MAPWALK: walk to a street map click ({ kind: 'sign'|'player'|'item'|'point', id, x, y }); false when refused. */
+  walkTo: (goal) => startUserWalk(goal),
+  /** MAPWALK: where a walk you started is heading ({ kind, id, x, y }), or null. */
+  get userWalkGoal() {
+    const w = avatarWalk;
+    return w?.user ? { kind: w.kind, id: w.id, x: w.x, y: w.y } : null;
+  },
   transientInstance: () => anyTransientInstance() || engine.inScene() || Boolean(engine.instanceHold),
   homeContext() {
     return {
@@ -12244,6 +12293,8 @@ function combinedPhysics() {
 
 function handleInput() {
   if (gameplayInputBlocked()) {
+    // MAPWALK: a menu or a scene that holds the avatar ends a walk you started.
+    endUserWalk('held');
     player.vx = 0;
     clearJumpQueue(jumpState);
     return;
@@ -12259,6 +12310,7 @@ function handleInput() {
     return;
   }
   if (pc.energy <= 0 && features.query('allowZeroEnergyMovement', engine) !== true) {
+    endUserWalk('held');
     player.vx *= 0.85;
     if (climb.active) stopClimb();
     clearJumpQueue(jumpState);

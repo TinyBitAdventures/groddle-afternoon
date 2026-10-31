@@ -37,10 +37,18 @@
  * - Hidden, as changeMiniMapVisibility hid it: while you move between streets, the Imagination
  *   menu or a full-screen moment is up, in decorate mode; and in this remake also in Camera
  *   Mode, during the tutorial and an arrival or exit scene.
- * - Left out: clicking the map to walk there (mouseUpHandler: startUserInitiatedPath), the GPS
- *   it carried (the route card is js/features/map-routes-feature.js), drawRangesFromCPLS (the
- *   white lines of an item's placement ranges while placing furniture, a placement aid), the
- *   editor's view rectangle and checkboxes.
+ * - Click to walk (mouseUpHandler 430-460, startUserInitiatedPath): a click on the map walks you
+ *   to that point, a signpost to the signpost, another player's dot to them and the Rube's to
+ *   him (the whole map shows the hand cursor, map_sp.useHandCursor). The walk is js/user-path.js
+ *   through engine.walkTo: left or right only, no jumps or ladders, so a spot up on a ledge
+ *   walks you to the x under it; it ends on arrival, any movement key or Space, a wall or a new
+ *   street. The marks are buttons, so Tab to one and Enter (or Space) walks there too; a point
+ *   has no keyboard way, as the client had none. A pointer click never leaves the focus on a
+ *   mark (Space stays your jump). The client drew no destination marker; here a small ring
+ *   stands on the goal while the walk runs (setDestination).
+ * - Left out: the GPS it carried (the route card is js/features/map-routes-feature.js),
+ *   drawRangesFromCPLS (the white lines of an item's placement ranges while placing furniture,
+ *   a placement aid), the editor's view rectangle and checkboxes.
  *
  * One DOM and one behaviour for both skins: style.css's MINIMAP block is the modern card,
  * css/classic.css the 2012 look. The width comes from CSS (--mm-w); everything scales by
@@ -52,7 +60,7 @@
  *
  * QA (features/street-minimap-feature.js): canvas data streetMap (shown|off|hidden|no-map),
  * streetMapFog, streetMapExpanded, streetMapDots, streetMapSigns, streetMapPicture
- * (snapshot|lines), streetMapSnapMs.
+ * (snapshot|lines), streetMapSnapMs, streetMapWalk (the last click's kind:x, or "refused").
  */
 
 export const MAP_WIDTH = 160;
@@ -72,6 +80,8 @@ export const YOU_DOT = Object.freeze({ r: 4, ring: 2, fill: '#000000', stroke: '
 export const OTHER_DOT = Object.freeze({ r: 5, ring: 2, fill: '#ffffff', stroke: '#000000' });
 export const ITEM_DOT = Object.freeze({ r: 5, ring: 2, fill: '#f8992a', stroke: '#000000' });
 export const SIGNPOST_MARK = Object.freeze({ w: 10, h: 15 });
+/** The walk's goal ring (the remake's; the client drew none): its size in map units. */
+export const DEST_MARK = Object.freeze({ d: 8 });
 
 export const STREET_MAP_STORAGE_KEY = 'groddle.streetMap';
 export const STREET_MAP_EVENT = 'groddle:street-map';
@@ -112,6 +122,16 @@ export function mapGeometry(street, { width = MAP_WIDTH } = {}) {
     bleed: MAP_BLEED * u,
     tab: { w: EXPAND_TAB.w * u, h: EXPAND_TAB.h * u },
   };
+}
+
+/**
+ * PURE: the world point under a map point (mouseUpHandler 431-432): `mx`, `my` in CSS px from
+ * the window's top left, `scrollY` the map y at that top edge. Kept inside the street.
+ */
+export function mapToWorld(geom, mx, my, scrollY = 0) {
+  const x = (Number(mx) / geom.w) * geom.W;
+  const y = ((Number(my) + Number(scrollY || 0)) / geom.mapH) * geom.H;
+  return { x: Math.max(0, Math.min(geom.W, x)), y: Math.max(0, Math.min(geom.H, y)) };
 }
 
 /** PURE: a world point on the map, rounded as translateX/translateY (509-515). */
@@ -363,6 +383,8 @@ const MAP_SVG = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stro
  *   onHide()           the card's hide button (the setting goes off)
  *   onShow()           the show button (the setting goes on)
  *   onLayout(px)       the height the card takes now (0 hidden), for what stacks under it
+ *   onWalk(goal, how)  a click (or Enter) on the map: { kind: 'sign'|'player'|'item'|'point',
+ *                      id, x, y } in world px; how.keyboard true from a key
  *   now()              ms clock (tests)
  */
 export function createStreetMinimap(doc, host, opts = {}) {
@@ -382,6 +404,7 @@ export function createStreetMinimap(doc, host, opts = {}) {
       <div class="smm-window"><img class="smm-pic" alt="" /><div class="smm-fogwash" hidden></div></div>
       <div class="smm-marks"><div class="smm-marks-in">
         <div class="smm-dots"></div><div class="smm-signs"></div>
+        <span class="smm-dest" aria-hidden="true" hidden></span>
         <span class="smm-dot smm-you" data-kind="you" aria-hidden="true"></span>
       </div></div>
       <p class="smm-fog" hidden>${esc(NO_MAP_TEXT)}</p>
@@ -418,6 +441,7 @@ export function createStreetMinimap(doc, host, opts = {}) {
   const signsEl = q('.smm-signs');
   const dotsEl = q('.smm-dots');
   const youEl = q('.smm-you');
+  const destEl = q('.smm-dest');
   const fog = q('.smm-fog');
   const tab = q('.smm-tab');
   const tip = q('.smm-tip');
@@ -430,6 +454,7 @@ export function createStreetMinimap(doc, host, opts = {}) {
   let containerH = 0;
   let scrollY = 0;
   let you = null;
+  let dest = null;
   let rollTimer = null;
   let shown = false;
   let state = 'hidden';
@@ -496,6 +521,11 @@ export function createStreetMinimap(doc, host, opts = {}) {
       const p = placeEl(youEl, you.x, you.y, size, size);
       youEl.hidden = !p.visible;
     }
+    if (dest) {
+      const size = DEST_MARK.d * geom.u;
+      // The ring is centred on the goal (a point, or the foot of the mark you clicked).
+      placeEl(destEl, dest.x, dest.y + (DEST_MARK.d / 2) * (geom.H / geom.mapH) * geom.u, size, size);
+    } else destEl.hidden = true;
   }
 
   function setTarget(h, { animate = true } = {}) {
@@ -615,6 +645,27 @@ export function createStreetMinimap(doc, host, opts = {}) {
       tab.focus?.();
     }
   });
+  // —— Click to walk (mouseUpHandler) ——
+  // A pointer press never focuses a mark (Space stays the jump); Tab still reaches them.
+  card.addEventListener('mousedown', (e) => {
+    if (e.target?.closest?.('[data-mark]')) e.preventDefault();
+  });
+  card.addEventListener('click', (e) => {
+    if (!geom || !street || state !== 'shown' || e.target?.closest?.('.smm-hide')) return;
+    const keyboard = e.detail === 0;
+    const el = e.target?.closest?.('[data-mark]');
+    let goal = null;
+    if (el) {
+      const row = signs.get(el.dataset.mark) || dots.get(el.dataset.mark);
+      if (!row) return;
+      goal = { kind: row.mark.kind, id: row.mark.id, x: row.mark.x, y: row.mark.y };
+    } else {
+      const rect = win.getBoundingClientRect?.();
+      if (!rect || !(rect.width > 0)) return;
+      goal = { kind: 'point', id: '', ...mapToWorld(geom, e.clientX - rect.left, e.clientY - rect.top, scrollY) };
+    }
+    opts.onWalk?.(goal, { keyboard });
+  });
   hideBtn.addEventListener('click', () => opts.onHide?.());
   showBtn.addEventListener('click', () => opts.onShow?.());
   showBtn.addEventListener('keydown', (e) => {
@@ -649,6 +700,8 @@ export function createStreetMinimap(doc, host, opts = {}) {
       signsEl.replaceChildren();
       dotsEl.replaceChildren();
       you = null;
+      dest = null;
+      destEl.hidden = true;
       if (!street) {
         geom = null;
         return;
@@ -761,6 +814,14 @@ export function createStreetMinimap(doc, host, opts = {}) {
       reportLayout();
     },
     expand: (on = true) => setExpanded(Boolean(on)),
+    /** The goal of the walk you started ({ x, y } world px), or null: a small ring on the map. */
+    setDestination(at) {
+      const next = at && Number.isFinite(at.x) ? { x: at.x, y: Number.isFinite(at.y) ? at.y : you?.y ?? 0 } : null;
+      if (!next && !dest) return;
+      dest = next;
+      root.dataset.dest = dest ? `${Math.round(dest.x)}` : '';
+      placeAll();
+    },
     relayout() {
       if (!shown || !street) return;
       const w = widthPx();

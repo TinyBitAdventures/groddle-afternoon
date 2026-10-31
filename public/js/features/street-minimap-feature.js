@@ -11,13 +11,18 @@
  * - Hidden by minimapVisibility: the setting, no_map, moving between streets, a full-screen
  *   moment, the Imagination menu, decorate mode, Camera Mode, the tutorial and arrival scenes.
  * - The height it takes goes on #game-root as --minimap-h, so the route card stacks under it.
+ * - Click to walk (MAPWALK, MiniMapView.as mouseUpHandler): the view's click (or Enter on a
+ *   mark) goes to engine.walkTo (game.js startUserWalk, js/user-path.js); a pointer click takes
+ *   the keys back from a text field first, so the arrows and Space reach the avatar. While the
+ *   walk runs its goal shows as a ring on the map (engine.userWalkGoal).
  *
  * Canvas data: streetMap (shown|off|no-map|hidden), streetMapFog, streetMapExpanded,
  * streetMapDots, streetMapDotIds, streetMapSigns, streetMapPicture (lines|snapshot),
- * streetMapSnapMs (the last snapshot's cost). QA: &streetmapexpand=1 expands it on each street.
+ * streetMapSnapMs (the last snapshot's cost), streetMapWalk (the last click: kind:x, or
+ * refused). QA: &streetmapexpand=1 expands it on each street.
  */
 
-import { createStreetMinimap, minimapVisibility, onStreetMapChange, setStreetMap, snapshotStreetView, streetMapOn } from '../ui/street-minimap.js?v=22d73edf';
+import { createStreetMinimap, minimapVisibility, onStreetMapChange, setStreetMap, snapshotStreetView, streetMapOn } from '../ui/street-minimap.js?v=23e34f93';
 import { classicArtUrl } from '../classic/classic-art.js?v=8da477d9';
 import { onUiModeChange } from '../classic/ui-mode.js?v=587c014a';
 
@@ -131,6 +136,19 @@ function sync(engine, force = false) {
     engine.setData?.('streetMapDotIds', ids);
   }
   engine.setData?.('streetMapExpanded', view.expanded ? '1' : '0');
+  view.setDestination(engine.userWalkGoal || null);
+}
+
+/** MAPWALK: a click on the map (or Enter on a mark) walks you there. */
+export function walkFromMap(engine, goal, { keyboard = false, doc = globalThis.document } = {}) {
+  if (!keyboard) {
+    const active = doc?.activeElement;
+    if (active?.matches?.('input, textarea, select, [contenteditable="true"]')) active.blur?.();
+  }
+  const ok = Boolean(engine.walkTo?.(goal));
+  engine.setData?.('streetMapWalk', ok ? `${goal.kind}:${Math.round(goal.x)}` : 'refused');
+  if (ok) view?.setDestination(engine.userWalkGoal || null);
+  return ok;
 }
 
 export const streetMinimapFeature = {
@@ -153,6 +171,7 @@ export const streetMinimapFeature = {
       onLayout: (h) => host.style.setProperty('--minimap-h', `${h > 0 ? h + 12 : 0}px`),
       maxHeight: () => Math.max(120, (host.clientHeight || 600) * 0.55),
       onResnap: () => scheduleSnaps(engine, [60]),
+      onWalk: (goal, how) => walkFromMap(engine, goal, how),
     });
     onStreetMapChange((on) => {
       sync(engine, true);
