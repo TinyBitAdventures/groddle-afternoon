@@ -51,7 +51,7 @@
 
 import { towerRoomIndexEntry } from './tower-rooms.js?v=7b2aa06a';
 import { DOOR, anyTowerRoomStreet, barriersFor, collector, flat, ladder, lantern, plaque, shell } from './tower-challenge-rooms.js?v=9e39f503';
-import { HALL, HALL_TSID, buildHall } from './hall-rejected-concepts.js?v=fc452e86';
+import { HALL, HALL_TSID, buildHall } from './hall-rejected-concepts.js?v=72b3925f';
 
 export const STAIRS_TSID = 'GIFFUV4ATQ72I6D';
 export const MEZZANINE_TSID = 'GIFGJ2246R72LJL';

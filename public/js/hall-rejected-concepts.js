@@ -23,7 +23,8 @@
  *   tinyspeck/glitch-locations source/quests/museum_*.swf (CC0): every
  *     exhibit, and museum_stand_1 the plinth (js/hall-concepts-art.js).
  *     museum_abbasidss_1, museum_flyingkitties_1 and museum_woodtree_1 are in
- *     the same set but in no Snap or recording, so they are left out.
+ *     the same set but in no Snap, no recording and not on the Tribute Blog's
+ *     list of the displays (B), so they stay out.
  * Reference only (player content, never shipped as pixels, audio or text):
  *   S  ten player Snaps, research/wayback/raw/snaps/jtower_hall_rejected_concepts/
  *      (2012-11-19 .. 2012-12-09): the warm wooden hall, pointed windows, low
@@ -36,8 +37,16 @@
  *      panorama (spotlight per exhibit, window spacing).
  *   F  forum general/29729 (2012-11-21, Kukubee): opened "next to the Rook
  *      Museum in Jethimadh tower"; replies: "accessible from Tower St West".
+ *   B  the Glitch Tribute Blog's "Hall of Rejected Concept Displays"
+ *      (johnexploresur.tumblr.com/post/58190004351, a player's transcript,
+ *      late 2012): the same 14 captions in the same order as V, word for word
+ *      but one: "DeImaginators", as the caption also reads in V (-03T3bLY7a0
+ *      at 98 s). Its 11 "Note found in Hall of Rejected Concepts" posts are
+ *      players' notes from the floor, not exhibit text. Research copy:
+ *      research/coverage/round4-people-2026-10-31/hall/.
  * The captions the buttons raised are Tiny Speck's text, surviving only in V
- * (transcribed in research/wayback/README.md section 6, G73); Austin approved
+ * and B (GSJS, glitch-items and glitch-client hold none of it; transcribed in
+ * research/wayback/README.md section 6, G73); Austin approved
  * shipping them 2026-10-23. Each exhibit keeps its name as `label`.
  *
  * Layout (world px, floor y 0): exhibit order from V; spacing from V and S
@@ -136,7 +145,7 @@ export const HALL_EXHIBITS = Object.freeze([
   { id: 'fox', label: 'The Fox', caption: 'The Fox, before being injected with a dose of Quagmirian creepyness', x: 1310, pieces: [['museum_fox_1', 0]], plinth: 110 },
   { id: 'craftybot', label: 'The Craftybot', caption: 'The original Craftybot had a slightly more modern look. The style was later used for the Play Cube item', x: 1560, pieces: [['museum_craftybot_1', 0]], plinth: 130 },
   { id: 'butler', label: 'The Butler', caption: 'The original idea for the Butler was to be a re-animated corpse of a dead Glitch', x: 1815, pieces: [['museum_butler_1', 0]], plinth: 100 },
-  { id: 'deimaginators', label: 'The Deimaginators', caption: 'Various concepts for the Deimaginators', x: 2085, pieces: [['museum_deimaginator_1', 0]], plinth: 230 },
+  { id: 'deimaginators', label: 'The Deimaginators', caption: 'Various concepts for the DeImaginators', x: 2085, pieces: [['museum_deimaginator_1', 0]], plinth: 230 },
   {
     id: 'street_spirits',
     label: 'The Street Spirits',

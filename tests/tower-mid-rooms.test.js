@@ -28,9 +28,9 @@ import {
   boxToScreen,
   midTowerRoomByTsid,
   midTowerRoomStreet,
-} from '../public/js/tower-mid-rooms.js?v=15143f80';
-import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=96f5bffc';
-import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=884946b3';
+} from '../public/js/tower-mid-rooms.js?v=fa06bcdb';
+import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=27a8bf5a';
+import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=4bf1db8c';
 import { populationForStreet } from '../public/js/street-ecology.js?v=9c1a5f07';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

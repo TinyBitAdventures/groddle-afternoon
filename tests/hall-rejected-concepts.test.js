@@ -24,8 +24,8 @@ import {
   STAND,
   WALL_BUTTON,
   hallLayout,
-} from '../public/js/hall-rejected-concepts.js?v=fc452e86';
-import { MEZZ, MEZZANINE_TSID, midTowerRoomByTsid } from '../public/js/tower-mid-rooms.js?v=15143f80';
+} from '../public/js/hall-rejected-concepts.js?v=72b3925f';
+import { MEZZ, MEZZANINE_TSID, midTowerRoomByTsid } from '../public/js/tower-mid-rooms.js?v=fa06bcdb';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(spike, '../glitch-GameServerJS');
@@ -139,8 +139,39 @@ describe('Hall of Rejected Concepts: the exhibits', () => {
     }
     const byId = Object.fromEntries(HALL_EXHIBITS.map((ex) => [ex.id, ex.caption]));
     assert.equal(byId.bunny, 'A bunny. Why? Because bunny.');
+    // V and the Tribute Blog's displays post both spell it with a capital I.
+    assert.equal(byId.deimaginators, 'Various concepts for the DeImaginators');
     assert.match(byId.stactus, /^The Stactus was a jenga-like building game/);
     assert.equal(new Set(Object.values(byId)).size, HALL_EXHIBITS.length);
+  });
+});
+
+describe('Hall of Rejected Concepts: the Tribute Blog displays post (johnexploresur.tumblr.com/post/58190004351)', () => {
+  // The blog's transcript of every display, in walking order (reference only; checked against V).
+  const BLOG = [
+    'The original idea for the Rube called for a Spongebobbian country rube character.',
+    'The Fox, before being injected with a dose of Quagmirian creepyness',
+    'The original Craftybot had a slightly more modern look. The style was later used for the Play Cube item',
+    'The original idea for the Butler was to be a re-animated corpse of a dead Glitch',
+    'Various concepts for the DeImaginators',
+    'Early concepts for the Groddle Street Spirits',
+    'A bunny. Why? Because bunny.',
+    'An idea for evolving pet Dragons',
+    'Original concepts for the Food and Gardening Vendors.',
+    'Bluto\'s Wish Dolly idea. The doll was to grant the owner a wish a day.',
+    'The Playerator was a precursor to the Play Cube',
+    'A multitude of additional premium tools were designed but yet to be implemented.',
+    'The Stactus was a jenga-like building game where multiple players collect and stack balls to make structures.',
+    'Early concepts for the Avatar',
+  ];
+
+  it('shows every display the blog lists, in its order, with its words', () => {
+    assert.deepEqual(HALL_EXHIBITS.map((ex) => ex.caption), BLOG);
+  });
+
+  it('leaves out the three museum renders no display shows (Abbasid, flying kitties, wood tree)', () => {
+    const used = HALL_EXHIBITS.flatMap((ex) => ex.pieces.map(([art]) => art));
+    for (const art of ['museum_abbasidss_1', 'museum_flyingkitties_1', 'museum_woodtree_1']) assert.ok(!used.includes(art), art);
   });
 });
 
@@ -237,7 +268,7 @@ describe('Hall of Rejected Concepts: the Wall Buttons', () => {
       globalThis.PIXI = { Sprite: Obj, Container: Obj, AnimatedSprite: Anim, Rectangle, ImageSource: Source, Texture: class { constructor(o) { Object.assign(this, o); } } };
       globalThis.Image = class { set src(_u) {} decode() { return new Promise(() => {}); } };
       globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => ({ drawImage() {} }) }) };
-      ({ midTowerFeature: feature } = await import('../public/js/features/mid-tower-feature.js?v=96f5bffc'));
+      ({ midTowerFeature: feature } = await import('../public/js/features/mid-tower-feature.js?v=27a8bf5a'));
     });
     after(() => {
       for (const [k, v] of Object.entries(saved)) globalThis[k] = v;
