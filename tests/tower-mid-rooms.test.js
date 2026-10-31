@@ -14,6 +14,7 @@ import { FRAME_DT_CAP, assertStreetGeometry, platformYAt, resolveGround } from '
 import { insideBottomRect } from '../public/js/doors.js?v=eb9510b1';
 import {
   GREETERBOT,
+  HALL_TSID,
   MEZZ,
   MEZZANINE_TSID,
   MID_TOWER_DOOR_LINKS,
@@ -28,10 +29,11 @@ import {
   boxToScreen,
   midTowerRoomByTsid,
   midTowerRoomStreet,
-} from '../public/js/tower-mid-rooms.js?v=057c7e72';
-import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=f98638ea';
-import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=ba8fe469';
+} from '../public/js/tower-mid-rooms.js?v=b38e8578';
+import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=efeefcdd';
+import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=c80ca9da';
 import { populationForStreet } from '../public/js/street-ecology.js?v=fd79899d';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=0eb97168';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');
@@ -111,9 +113,9 @@ describe('Jethimadh Tower: Mid rooms: street data', () => {
     for (const room of MID_TOWER_ROOMS) assert.ok(room.bounds.b - lowestFloor(room) >= 300, room.label);
   });
 
-  it('the Mezzanine keeps unnnn\'s clone data: bounds, floor height, the street-sized Rook Hall spotlights', () => {
+  it('the Mezzanine keeps unnnn\'s clone data: top, floor height, the street-sized Rook Hall spotlights at their world positions', () => {
     const unnnn = street(STOOT_SHRINE_TSID);
-    assert.deepEqual({ l: mezz.bounds.l, r: mezz.bounds.r, t: mezz.bounds.t }, { l: unnnn.bounds.l, r: unnnn.bounds.r, t: unnnn.bounds.t });
+    assert.equal(mezz.bounds.t, unnnn.bounds.t);
     assert.equal(unnnn.platforms[0].y1, MEZZ.floor);
     const layer = unnnn.layers.find((l) => l.id === 'T_1311832165202');
     assert.equal(layer.w, unnnn.bounds.r - unnnn.bounds.l); // street-sized: no parallax
@@ -121,6 +123,27 @@ describe('Jethimadh Tower: Mid rooms: street data', () => {
     const rebuilt = mezz.decos.filter((d) => d.sprite === 'rookhall_spotlight').map((d) => `${d.x},${d.y},${d.w},${d.h},${d.r}`).sort();
     assert.equal(archived.length, 11);
     assert.deepEqual(rebuilt, archived);
+  });
+
+  it('R5 (post 57550578382): the lobby is the picture\'s width, ~1,560 px at the Greeterbot\'s and the door\'s own scale (unnnn\'s clone was 1,000)', () => {
+    // The picture: 1,280 px from the lobby's left end to the far pillar; the Greeterbot (72 x 84 art) is ~64 x 69 px in it, the arched door (196 x 214) ~164 x 185.
+    const scale = [72 / 64, 84 / 69, 196 / 164, 214 / 185];
+    const k = scale.reduce((a, b) => a + b) / scale.length;
+    const width = mezz.bounds.r - mezz.bounds.l;
+    assert.ok(Math.abs(width - 1290 * k) < 60, `width ${width} vs ${Math.round(1290 * k)}`);
+    assert.ok(width > street(STOOT_SHRINE_TSID).bounds.r - street(STOOT_SHRINE_TSID).bounds.l);
+    // Pillars: one between the EXIT arrow and the Rook Museum plaque, two past the Hall door (the nearer in front).
+    const pillars = mezz.decos.filter((d) => d.sprite === 'jethimadh_int_pillar_1').sort((a, b) => a.x - b.x);
+    assert.equal(pillars.length, 3);
+    const sign = (text) => mezz.decos.find((d) => d.signText === text);
+    assert.ok(pillars[0].x > sign('EXIT').x && pillars[0].x < sign('Rook\nMuseum').x);
+    const hallDoor = mezz.doors.find((d) => d.id === 'door_mz_hall');
+    assert.ok(pillars[1].x > hallDoor.x + hallDoor.w / 2 && pillars[2].layer === 'fg');
+    // The floor: the firebog room floor slab over warm floorboards; no lanterns.
+    assert.ok(mezz.decos.some((d) => d.sprite === 'room_background3a_floor'));
+    assert.equal(mezz.decos.filter((d) => d.sprite === 'jethimadh_int_lantern_1').length, 0);
+    const manifest = new Set(JSON.parse(readFileSync(join(spike, 'public/assets/decos/manifest.json'), 'utf8')));
+    for (const d of mezz.decos) assert.ok(manifest.has(d.sprite), `${d.sprite} is shipped CC0 deco art`);
   });
 
   it('G88: the footage order, left to right: Stairs door, EXIT arrow pointing left, Rook Museum plaque, museum door with the Greeterbot, Hall plaque and door', () => {
@@ -133,12 +156,15 @@ describe('Jethimadh Tower: Mid rooms: street data', () => {
     const door = (label) => mezz.doors.find((d) => d.connect.label === label);
     const stairsDoor = door('Stairs');
     const museumDoor = door('Museum of the Rook');
-    const xs = [stairsDoor.x, exit.x, museumSign.x, museumDoor.x, door('Hall of Rejected Concepts').x];
+    const hallSign = signs.find((d) => d.signText === 'Hall of Rejected\nConcepts');
+    const hallDoor = door('Hall of Rejected Concepts');
+    const xs = [stairsDoor.x, exit.x, museumSign.x, museumDoor.x, hallSign.x, hallDoor.x];
     assert.deepEqual(xs, [...xs].sort((a, b) => a - b));
-    // Beside the doors, not over them: clear of both door frames, and hung within the doors' height.
+    // Beside the doors, not over them (R5: the Hall plaque left of its door too): clear of the door frames, and hung within the doors' height.
     const clear = (sign, d) => Math.abs(sign.x - d.x) >= (sign.w + d.w) / 2;
-    assert.ok(clear(exit, stairsDoor) && clear(museumSign, museumDoor) && exit.x + exit.w / 2 <= museumSign.x - museumSign.w / 2);
-    for (const s of [exit, museumSign]) assert.ok(s.y > MEZZ.floor - DOOR_H && s.y - s.h < MEZZ.floor - 60, s.signText);
+    assert.ok(clear(exit, stairsDoor) && clear(museumSign, museumDoor) && clear(hallSign, hallDoor) && clear(hallSign, museumDoor));
+    assert.ok(exit.x + exit.w / 2 <= museumSign.x - museumSign.w / 2);
+    for (const s of [exit, museumSign, hallSign]) assert.ok(s.y > MEZZ.floor - DOOR_H && s.y - s.h < MEZZ.floor - 60, s.signText);
     // The Greeterbot stands in front of the museum door, a little left of its middle.
     assert.ok(mezz.greeterbot.x < museumDoor.x && museumDoor.x - mezz.greeterbot.x < museumDoor.w / 4);
     assert.match(readFileSync(join(spike, 'public/js/tower-mid-rooms.js'), 'utf8'), /i11hPtqFN8E/);
@@ -226,15 +252,62 @@ describe('Jethimadh Tower: Mid rooms: the climb', () => {
     assert.ok(stairs.decos.filter((d) => d.sprite === 'jethimadh_int_lantern_1').length >= 8);
   });
 
-  it('the Mezzanine: floorboards solid from below, a ladder down in the corner to the crawlspace', () => {
+  it('the Mezzanine: floorboards solid from below, a drop past the far pillar and a ladder back up', () => {
     const under = mezz.platforms.find((p) => p.id === 'plat_mz_floor_underside');
     assert.equal(under.pc_perm, 1);
     const [ladder] = mezz.ladders;
-    assert.ok(ladder.x > under.x2, 'the ladder shaft is open');
+    assert.ok(ladder.x - ladder.w / 2 > under.x2, 'the ladder shaft is open');
     assert.equal(ladder.y, MEZZ.crawl);
     assert.equal(ladder.y - ladder.h, MEZZ.floor);
     assert.equal(floorAt(mezz.platforms, ladder.x, MEZZ.floor), MEZZ.floor, 'deck over the ladder top');
     assert.ok(MEZZ.crawl - MEZZ.floor > APEX * 2, 'no jumping up through the floorboards');
+    // d4IOWnzw0Y0 t0003-t0005: walking on past the far pillar drops you under the floor.
+    const wall = mezz.barriers.find((b) => b.id === 'wall_mz_right');
+    const lobby = mezz.platforms.find((p) => p.id === 'plat_mz_floor');
+    assert.ok(wall.x - lobby.x2 >= 40, 'a drop between the floor\'s end and the wall');
+    assert.equal(floorAt(mezz.platforms, (wall.x + lobby.x2) / 2, MEZZ.floor), MEZZ.crawl);
+    const front = mezz.decos.find((d) => d.sprite === 'jethimadh_int_pillar_1' && d.layer === 'fg');
+    assert.ok(Math.abs(front.x - ladder.x) < front.w / 2, 'the near pillar stands in front of the way down');
+  });
+
+  it('R5 (post 57550578382): six currant quoins in a row under the floorboards, each a grab from the crawlspace floor', () => {
+    assert.equal(mezz.quoins.length, 6);
+    const xs = mezz.quoins.map((q) => q.x);
+    assert.deepEqual(xs, [...xs].sort((a, b) => a - b));
+    // game.js grabs a quoin within 44 px of (feet x, feet - 28); a plain jump lifts the feet APEX px.
+    for (const q of mezz.quoins) {
+      assert.equal(q.type, 'currants');
+      assert.equal(q.quoinClass, 'slow medium-large currants');
+      assert.ok(q.y > MEZZ.underside && q.y < MEZZ.crawl, 'under the floorboards, over the crawlspace floor');
+      assert.equal(floorAt(mezz.platforms, q.x, MEZZ.crawl), MEZZ.crawl);
+      assert.ok(MEZZ.crawl - q.y - 28 - 44 < APEX, `quoin at ${q.x} within a jump`);
+      assert.ok(q.x > mezz.teleports[0].x + mezz.teleports[0].w / 2, 'clear of the teleporter');
+    }
+    // The feature hands them to game.js in screen space; elsewhere it stays out of the way.
+    const spots = midTowerFeature.quoinSpots(street(MEZZANINE_TSID));
+    assert.deepEqual(spots.map((q) => [q.x, q.y]), mezz.quoins.map((q) => [q.x - mezz.bounds.l, q.y - mezz.bounds.t]));
+    assert.ok(spots.every((q) => q.exactY && q.type === 'currants'));
+    assert.equal(midTowerFeature.quoinSpots(street(STAIRS_TSID)), null);
+    assert.equal(midTowerFeature.quoinSpots({ tsid: 'GIF15OTSM102353' }), null);
+    const game = readFileSync(join(spike, 'public/game.js'), 'utf8');
+    assert.match(game, /features\.query\('quoinSpots', data, engine\)/);
+    assert.match(game, /useExactY: spot\.exactY === true/);
+  });
+
+  it('the level builder\'s reach graph: every door from every way in, the crawlspace and its way back up, no traps', () => {
+    const json = street(MEZZANINE_TSID);
+    const arrivals = [
+      ...[street(STAIRS_TSID).doors.find((d) => d.connect.street === MEZZANINE_TSID), street(HALL_TSID).doors.find((d) => d.connect.street === MEZZANINE_TSID)]
+        .map((d) => ({ x: d.connect.arrive.x, y: d.connect.arrive.y, from: d.id })),
+      { x: STOOT_RETURN.to.x - mezz.bounds.l, y: STOOT_RETURN.to.y - mezz.bounds.t, from: 'unnnn' },
+    ];
+    const r = reachStreet(json, arrivals);
+    assert.ok(r.arrivals.every((a) => a.stands));
+    for (const t of r.targets) assert.deepEqual(t.reachedFrom, [true, true, true], t.id);
+    assert.deepEqual(r.unreached, []);
+    assert.deepEqual(r.traps, []);
+    assert.deepEqual(r.deckless, []);
+    assert.ok(r.surfaces.filter((x) => x.line === 'plat_mz_crawl').every((x) => x.reached));
   });
 });
 

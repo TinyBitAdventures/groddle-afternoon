@@ -36,7 +36,7 @@
  * Addresses: #draft=<id>&street=<key> opens a draft's street, #view=<tsid> a shipped street.
  * QA: window.groddleBuilderQA (state, with the effects' stats; camera, matchView, select, anchorOf, selectGeo, geoHandles).
  */
-import { buildStreetView, loadDecoManifest, loadSignpostTextures, DECO_TWINS, flashBlurSize } from '../street-render.js?v=7c8bae68';
+import { buildStreetView, loadDecoManifest, loadSignpostTextures, DECO_TWINS, flashBlurSize } from '../street-render.js?v=0a63147a';
 import { worldToScreen, platformsScreen, isStandable, streetWidth, streetHeight, navigableSignposts } from '../street-model.js?v=23b926e5';
 import { ensureStreetIndex, STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=390e4702';
 import { loadStreetEcologyCatalog, ecologyForStreet } from '../street-ecology.js?v=fd79899d';
@@ -54,7 +54,7 @@ import { layerRole } from './layer-role.js?v=e585f610';
 import { installNewArt, withNewArt, provenanceSection } from './new-art.js?v=29f0b13e';
 import * as textureUrls from '../textures.js?v=db2ce452';
 import { installPixiFixes } from '../pixi-fixes.js?v=173fb649';
-import { installHiresDecos } from '../deco-hires.js?v=7678e434';
+import { installHiresDecos } from '../deco-hires.js?v=2459d904';
 import { OVERLAY_COLOURS, drawGeometryOverlay, drawReachOverlay, drawEffectMarkers, strokeSegs } from './overlays.js?v=7dd09d5a';
 import { createStreetEffects, createRumbleClock, prefersReducedMotion } from '../street-effects.js?v=e427650f';
 import { effectInspector, rumbleSection } from './editor-effects.js?v=85f32fd1';
@@ -2477,7 +2477,7 @@ async function boot() {
     // `new URL(...)` written here would not be keyed by tools/module-keys).
     if (!V.workerUrl) {
       if (!V.loading) {
-        V.loading = import('./validate-worker.js?v=b3dd77fd').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
+        V.loading = import('./validate-worker.js?v=fe580f66').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
       }
       return null;
     }

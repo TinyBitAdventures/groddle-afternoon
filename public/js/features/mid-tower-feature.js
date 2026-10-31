@@ -15,6 +15,7 @@
  *   - otherwise its no_quest_text ("One must be called to do so.").
  * - The museum door ("enter the door to the Rook museum", beta recap
  *   2011-08-19) goes the Greeterbot's way: its Enter runs the same check.
+ * - The six quoins under the floorboards (quoinSpots, R5 post 57550578382).
  * - The teleporter under the floorboards (Mezzanine box mezz_stoot_teleporter:
  *   jump at the crawlspace's left end) to unnnn, the Stoot Shrine, and unnnn's
  *   way back (STOOT_RETURN: walk into its left end).
@@ -54,7 +55,7 @@ import {
   STOOT_RETURN,
   boxToScreen,
   midTowerRoomByTsid,
-} from '../tower-mid-rooms.js?v=057c7e72';
+} from '../tower-mid-rooms.js?v=b38e8578';
 import { CLICK_ANYWHERE, HALL, HALL_ART, HALL_ART_ROOT, HALL_BUTTON_CLASS, HALL_WIDGET, WALL_BUTTON } from '../hall-rejected-concepts.js?v=4c553550';
 
 export const MID_TOWER_FEATURE_ID = 'mid-tower';
@@ -389,8 +390,25 @@ async function teleport(engine, row) {
   }
 }
 
+/**
+ * A rebuilt room's quoins where its picture shows them (the Mezzanine's six
+ * under the floorboards, R5 post 57550578382): screen-space quoin centres,
+ * each with its type and class. game.js enterStreet spawns them as the
+ * street's natural quoins (collected, saved and respawned like any other).
+ */
+export function roomQuoinSpots(street) {
+  const room = midTowerRoomByTsid(street?.tsid);
+  if (!room?.quoins?.length) return null;
+  return room.quoins.map((q) => ({ x: q.x - room.bounds.l, y: q.y - room.bounds.t, type: q.type, quoinClass: q.quoinClass, exactY: true }));
+}
+
 export const midTowerFeature = {
   id: MID_TOWER_FEATURE_ID,
+
+  /** game.js enterStreet: this room's quoins in place of the planner's (null elsewhere). */
+  quoinSpots(street) {
+    return roomQuoinSpots(street);
+  },
 
   onStreetEnter(street, engine) {
     clear(engine);

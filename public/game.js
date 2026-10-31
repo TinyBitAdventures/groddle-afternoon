@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=20b826eb';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1d54432d';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=75574d83';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -592,7 +592,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=390e4702';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=63ffbf9a';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=f53aa4ff';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -618,7 +618,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=7c8bae68';
+} from './js/street-render.js?v=0a63147a';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -885,7 +885,7 @@ import {
 } from './js/sound-moments.js?v=2f8597cd';
 import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from './js/metabolics.js?v=8504134e';
 import { installHiresIcons } from './js/icon-hires.js?v=5357d4b4';
-import { installHiresDecos } from './js/deco-hires.js?v=7678e434';
+import { installHiresDecos } from './js/deco-hires.js?v=2459d904';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=e56202ee';
 import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=bfdd12a1';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
@@ -904,7 +904,7 @@ import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, placeVerbMen
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=34ae15ae';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
-import { sceneAnim, syncAnim } from './js/deco-anim.js?v=8bf3b1bb';
+import { sceneAnim, syncAnim } from './js/deco-anim.js?v=51e6411b';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d51e';
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=3753a0d2';
 import * as textureUrls from './js/textures.js?v=db2ce452';
@@ -11806,8 +11806,12 @@ function spawnWorldQuoin(spot, typeId = 'xp', opts = {}) {
  */
 let naturalQuoins = { tsid: '', points: [], plan: [] };
 
-function naturalQuoinPlan(count) {
+function naturalQuoinPlan(count, points = []) {
   const plan = planStreetQuoins(currentStreetTsid, count);
+  // A room that sets its own quoins (a feature's quoinSpots) names each one's type.
+  points.forEach((spot, i) => {
+    if (QUOIN_TYPES[spot?.type]) plan[i] = spot.type;
+  });
   const params = new URLSearchParams(location.search);
   const demoType = params.get('quoindemo');
   if (demoType !== null) plan[0] = QUOIN_TYPES[demoType] ? demoType : 'currants';
@@ -11821,6 +11825,8 @@ function naturalQuoinPlan(count) {
 function naturalQuoinClass(index, typeId) {
   const forced = new URLSearchParams(location.search).get('quoinclass');
   if (index === 0 && forced) return forced;
+  const own = naturalQuoins.points[index]?.quoinClass;
+  if (own && quoinClassType(own) === typeId) return own;
   return streetQuoinClass(currentStreetTsid, index, typeId);
 }
 
@@ -11828,14 +11834,14 @@ function spawnNaturalQuoin(i) {
   const spot = naturalQuoins.points[i];
   if (!spot) return null;
   const typeId = naturalQuoins.plan[i] || 'xp';
-  const q = spawnWorldQuoin(spot, typeId, { naturalQuoinIndex: i, phaseIndex: i });
+  const q = spawnWorldQuoin(spot, typeId, { naturalQuoinIndex: i, phaseIndex: i, useExactY: spot.exactY === true });
   q.quoinClass = naturalQuoinClass(i, typeId);
   return q;
 }
 
 function spawnQuoins(points = samplePlatformPoints(8)) {
   const list = [];
-  naturalQuoins = { tsid: currentStreetTsid, points, plan: naturalQuoinPlan(points.length) };
+  naturalQuoins = { tsid: currentStreetTsid, points, plan: naturalQuoinPlan(points.length, points) };
   const world = streetWorldState();
   // Respawn timers that ran out while you were away.
   releaseQuoinRespawns(world, Date.now());
@@ -21278,7 +21284,9 @@ async function enterStreet(tsid, opts = {}) {
   }));
   trees = spawnTrees(treeSpots);
   // Animated official eight-scene quoins placed along reachable platforms.
-  quoins = spawnQuoins(placement('quoins'));
+  // A rebuilt room whose picture shows where its quoins sit hands them in (features' quoinSpots: screen-space centres).
+  const roomQuoins = features.query('quoinSpots', data, engine);
+  quoins = spawnQuoins(Array.isArray(roomQuoins) ? roomQuoins : placement('quoins'));
 
   // Signposts are manually hit-tested by individual destination board.
   portalSprites = bgLayer.signViews || [];

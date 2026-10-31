@@ -50,7 +50,7 @@
  */
 
 import { towerRoomIndexEntry } from './tower-rooms.js?v=eeebce6f';
-import { DOOR, anyTowerRoomStreet, barriersFor, collector, flat, ladder, lantern, plaque, shell } from './tower-challenge-rooms.js?v=8877b6a7';
+import { DOOR, anyTowerRoomStreet, barriersFor, collector, flat, ladder, plaque, shell } from './tower-challenge-rooms.js?v=8877b6a7';
 import { HALL, HALL_TSID, buildHall } from './hall-rejected-concepts.js?v=4c553550';
 
 export const STAIRS_TSID = 'GIFFUV4ATQ72I6D';
@@ -327,33 +327,65 @@ function buildStairs() {
 /* Mezzanine (LIFGJ2246R72LJL)                                          */
 /* ------------------------------------------------------------------ */
 
-/** Mezzanine layout (world). Bounds l/r/t and the lobby floor are unnnn's clone data. */
+/**
+ * Mezzanine layout (world). R5 (Tribute Blog post 57550578382, a whole-lobby
+ * picture, reference only) sets the width and the order of things; its scale
+ * comes from two sizes the archive keeps: the Greeterbot's own art (72 x 84,
+ * npc_widget.swf) and the corridors' arched door (196 x 214) both read about
+ * 1.2 world px to a picture px, so the lobby is ~1,560 wide (the picture's
+ * 1,280 px from the left end to the far pillar). Top t, the lobby floor y -12
+ * and the Rook Hall spotlights are still unnnn's clone data (its sources list
+ * this street); only its 1,000-px width gave way to the picture.
+ */
 export const MEZZ = Object.freeze({
-  bounds: Object.freeze({ l: -500, r: 500, t: -700, b: 700 }),
+  bounds: Object.freeze({ l: -780, r: 780, t: -700, b: 800 }),
   floor: -12,
-  underside: 0,
-  crawl: 290,
-  ceiling: -665,
-  shaftL: 400,
-  stairsDoorX: -380,
-  // G88 footage: the Greeterbot stands in front of the museum door, a little left of its middle.
-  greeterX: 70,
-  museumDoorX: 90,
-  hallDoorX: 300,
-  ladderX: 434,
+  // The floorboards' bottom edge (solid from below), the crawlspace floor, the lobby roof.
+  underside: 170,
+  crawl: 440,
+  ceiling: -470,
+  lobbyTop: -520,
+  // The lobby floor ends here; past it, behind the near pillar, is the drop to the crawlspace.
+  floorEnd: 700,
+  stairsDoorX: -720,
+  // The Greeterbot stands in front of the museum door, a little left of its middle (G88, R5).
+  greeterX: -78,
+  museumDoorX: -60,
+  hallDoorX: 390,
+  ladderX: 676,
 });
 
-/**
- * The Mezzanine's sign words (G88, footage i11hPtqFN8E t0000-t0004): the EXIT
- * arrow right of the Stairs door, pointing back to it, and the "Rook Museum"
- * plaque left of the museum door. x world; lift = sign bottom over the floor.
- */
-export const MEZZ_SIGNS = Object.freeze([
-  Object.freeze({ id: 'exit', text: 'EXIT', arrow: true, x: -220, lift: 128 }),
-  Object.freeze({ id: 'rook_museum', text: 'Rook\nMuseum', arrow: false, x: -85, lift: 86 }),
+/** R5: one pillar between the EXIT arrow and the Rook Museum plaque, two at the far right (the nearer one in front). */
+export const MEZZ_PILLARS = Object.freeze([
+  Object.freeze({ x: -406, front: false }),
+  Object.freeze({ x: 606, front: false }),
+  Object.freeze({ x: 682, front: true }),
 ]);
 
-/** unnnn's two archived layers (layer-local, street-sized: world = local + (l, t) = local - (500, 700)). */
+/**
+ * The Mezzanine's sign words (G88, footage i11hPtqFN8E t0000-t0004; R5 post
+ * 57550578382 for their places): the EXIT arrow right of the Stairs door,
+ * pointing back to it, the "Rook Museum" plaque left of the museum door and
+ * the "Hall of Rejected Concepts" plaque left of the Hall door. x world;
+ * lift = sign bottom over the floor.
+ */
+export const MEZZ_SIGNS = Object.freeze([
+  Object.freeze({ id: 'exit', text: 'EXIT', arrow: true, x: -556, lift: 148 }),
+  Object.freeze({ id: 'rook_museum', text: 'Rook\nMuseum', arrow: false, x: -242, lift: 108 }),
+  Object.freeze({ id: 'hall', text: 'Hall of Rejected\nConcepts', arrow: false, x: 208, lift: 104 }),
+]);
+
+/**
+ * R5 (post 57550578382): six currant quoins in a row in the dark under the
+ * floorboards; F 13777 and the 2012 recording d4IOWnzw0Y0 (t0005-t0009: two
+ * of them grabbed, "+100 currants" each, at a 4x quoin bonus) make them the
+ * 25-currant class. x and the quoin's centre y (world), read off the picture.
+ */
+export const MEZZ_QUOINS = Object.freeze([
+  [-386, 340], [-250, 356], [-104, 340], [74, 362], [241, 348], [430, 368],
+].map(([x, y]) => Object.freeze({ x, y, type: 'currants', quoinClass: 'slow medium-large currants' })));
+
+/** unnnn's two archived layers (layer-local, street-sized in the 1,000-px clone: world = local - (500, 700)). */
 const UNNNN_SPOTLIGHTS = Object.freeze([
   [195, 294, 405, 337, 90, 8, false], [1088, -44, 176, 630, -117, 6, false], [-55, 295, 176, 630, -271, 1, false],
   [495, -335, 176, 630, -181, 3, false], [1015, 540, 176, 630, -61, 5, false], [49, 618, 176, 630, -308, 4, false],
@@ -363,79 +395,110 @@ const UNNNN_SPOTLIGHTS = Object.freeze([
 const UNNNN_SHADOWS = Object.freeze([
   [84, 703, 331, 1114, 0, 2, false], [924, 703, 331, 1114, 0, 1, true],
 ]);
+const UNNNN_W = 1000;
+
+/**
+ * A deco whose opaque band (art rows top..bottom of rows) lands on world
+ * y0..y1: the art is drawn whole, bottom-centre anchored.
+ */
+function band(sprite, x, w, y0, y1, [top, bottom, rows], z, layer = 'mg', extra = {}) {
+  const h = Math.round(((y1 - y0) * rows) / (bottom - top));
+  return { sprite, x, y: Math.round(y1 + ((rows - bottom) / rows) * h), w, h, z, r: 0, layer, ...extra };
+}
+/** room_background3a_floor.webp (firebog.swf): its slab fills rows 363..877 of 1,240. */
+const FLOOR_ART = [363, 877, 1240];
 
 function buildMezzanine() {
   const c = collector();
-  const { bounds, floor, underside, crawl, ceiling, shaftL, stairsDoorX, museumDoorX, hallDoorX, ladderX } = MEZZ;
-  const lobby = { l: bounds.l, r: bounds.r, t: bounds.t, b: underside };
-  const below = { l: bounds.l, r: bounds.r, t: underside, b: bounds.b };
+  const { bounds, floor, underside, crawl, ceiling, lobbyTop, floorEnd, stairsDoorX, museumDoorX, hallDoorX, ladderX } = MEZZ;
+  const W = bounds.r - bounds.l;
+  const lobby = { l: bounds.l, r: bounds.r, t: lobbyTop, b: 0 };
+  const r5 = 'R5 (Tribute Blog post 57550578382, reference only)';
 
-  // Lobby: the corridors' chamber shell over the clone's 1000 x 700, and the
-  // clone's own Rook Hall spotlights and shadows at their archived positions
-  // (unnnn layers T_1311832165202 / T_1311832941302: why.decor).
-  c.decos.push(...shell(lobby));
+  // Lobby: the corridors' wooden tube (the shell's wood backdrops, shadow and
+  // frame walls) over the picture's width, without the shell's end caps (R5:
+  // the Stairs door stands at the very left end, the far pillar at the right).
+  // Plain wood behind both ends first, so the tube's curved backdrops never
+  // leave the lobby's ends bare; the floor is drawn below, so the shell's
+  // frame walls go too.
+  const wall = shell(lobby).find((d) => d.sprite === 'jethimadh_int_bg_center');
+  for (const x of [bounds.l + 200, bounds.r - 200]) c.decos.push({ ...wall, x, w: 640, z: 0 });
+  c.decos.push(...shell(lobby).filter((d) => d.sprite !== 'jethimadh_frame_cap' && d.sprite !== 'jethimadh_frame_wall'));
+  c.decos.push({ sprite: 'jethimadh_frame_wall', x: 0, y: ceiling + 20, w: W + 40, h: 44, z: 9, r: 0, layer: 'mg' });
+  // unnnn's archived Rook Hall spotlights at their positions (why.decor); its
+  // two upright shadows darken the lobby's two ends (R5: the ends are darker
+  // wood), set back so their black half lies past the walls and the Stairs
+  // door stays lit.
   for (const [x, y, w, h, r, z, flip] of UNNNN_SPOTLIGHTS) {
-    const deco = { sprite: 'rookhall_spotlight', x: x + bounds.l, y: y + bounds.t, w, h, z: 4 + z, r, layer: 'mg' };
+    const deco = { sprite: 'rookhall_spotlight', x: x - UNNNN_W / 2, y: y + bounds.t, w, h, z: 4 + z, r, layer: 'mg' };
     if (flip) deco.flip = true;
     c.decos.push(deco);
   }
   for (const [x, y, w, h, r, z, flip] of UNNNN_SHADOWS) {
-    const deco = { sprite: 'firebog_linear_gradient_shadow', x: x + bounds.l, y: y + bounds.t, w, h, z: 20 + z, r, layer: 'fg' };
+    const wx = x < UNNNN_W / 2 ? bounds.l - 60 : bounds.r + 60;
+    const deco = { sprite: 'firebog_linear_gradient_shadow', x: wx, y: y + bounds.t, w, h, z: 20 + z, r, layer: 'fg' };
     if (flip) deco.flip = true;
     c.decos.push(deco);
   }
-  c.decos.push(lantern(-260, -330), lantern(200, -330));
-  // V: the Hall door's plaque (the recordings show it beside the door; here over it, the lobby being narrower).
-  plaque(c, hallDoorX, floor - DOOR.h + 4, 'Hall of Rejected\nConcepts');
+
+  // The floor (R5): a dark slab, its walk surface ~40 px deep behind the
+  // feet and its face ~100 px down (the firebog set's room floor), then the
+  // warm floorboards under it fading into the dark.
+  c.decos.push(band('room_background3a_floor', 0, Math.round((W + 60) * (3464 / 3366)), floor - 40, floor + 104, FLOOR_ART, 16));
+  c.decos.push(
+    { sprite: 'jethimadh_frame_wall', x: 0, y: floor + 112, w: W + 40, h: 30, z: 15, r: 0, layer: 'mg' },
+    // Wider than the lobby: the panel's curved ends fall past the walls.
+    { sprite: 'jethimadh_int_bg_center', x: 0, y: underside + 6, w: W + 420, h: 96, z: 14, r: 0, layer: 'mg' },
+  );
+
+  // Pillars (R5): between the EXIT arrow and the Rook Museum plaque, and two
+  // at the far right, the nearer one in front of the floor's edge (the
+  // corridors' spotted pillar, jethimadh_int_pillar_1).
+  for (const p of MEZZ_PILLARS) {
+    if (p.front) c.decos.push({ sprite: 'jethimadh_int_pillar_1', x: p.x, y: floor + 74, w: 180, h: 560, z: 6, r: 0, layer: 'fg' });
+    else c.decos.push({ sprite: 'jethimadh_int_pillar_1', x: p.x, y: floor - 10, w: 150, h: 460, z: 18, r: 0, layer: 'mg' });
+  }
+
   // G88 (Austin approved shipping this sign text, 2026-10-23): read off player
   // footage, Lily Linguistic's "Rook Museum" (YouTube i11hPtqFN8E, t0000-t0004)
   // and "Hall of Rejected Concepts" (-03T3bLY7a0, t0000); notes in
-  // research/video/README.md section 3c. Left to right the lobby shows the
-  // Stairs door, a carved arrow sign pointing left reading "EXIT", a wooden
-  // pillar, a "Rook Museum" plaque, the museum door with the Greeterbot in
-  // front, then the Hall plaque and door. Remake text on the set's CC0 art
-  // (sign_arrow_1 mirrored, the corridors' plaque), both at the footage's
-  // height beside the doors. The footage lobby is wider (about 1,700 px against
-  // unnnn's 1,000-px clone), so here they sit closer and the plaque is
-  // three-quarter size; the pillar is left out (no room between the signs).
+  // research/video/README.md section 3c. R5 places them: left to right the
+  // Stairs door, a carved arrow sign pointing left reading "EXIT", a pillar,
+  // a "Rook Museum" plaque, the museum door with the Greeterbot in front, a
+  // "Hall of Rejected Concepts" plaque, the Hall door, two more pillars.
+  // Remake text on the set's CC0 art (sign_arrow_1 mirrored, the corridors'
+  // plaque at the picture's size).
   for (const sign of MEZZ_SIGNS) {
     if (sign.arrow) {
-      c.decos.push({ sprite: 'sign_arrow_1', x: sign.x, y: floor - sign.lift, w: 116, h: 77, z: 30, r: 0, flip: true, layer: 'mg', signText: sign.text });
+      c.decos.push({ sprite: 'sign_arrow_1', x: sign.x, y: floor - sign.lift, w: 120, h: 80, z: 30, r: 0, flip: true, layer: 'mg', signText: sign.text });
     } else {
-      c.decos.push({ sprite: 'jethimadh_int_door_sign', x: sign.x, y: floor - sign.lift, w: 140, h: 82, z: 11, r: 0, layer: 'mg' });
-      c.decos.push({ sprite: 'firebog_sign_blank', x: sign.x, y: floor - sign.lift - 13, w: 103, h: 60, z: 16, r: 0, layer: 'mg', signText: sign.text });
+      c.decos.push({ sprite: 'jethimadh_int_door_sign', x: sign.x, y: floor - sign.lift, w: 156, h: 88, z: 31, r: 0, layer: 'mg' });
+      c.decos.push({ sprite: 'firebog_sign_blank', x: sign.x, y: floor - sign.lift - 14, w: 116, h: 64, z: 36, r: 0, layer: 'mg', signText: sign.text });
     }
   }
 
-  // Floors: the lobby floor (the clone's platform height) and the
-  // floorboards under it, solid from below except over the ladder shaft in
-  // the right-hand corner (Down at the ladder top climbs below).
-  const floorWhy = 'unnnn\'s only platform is y -12 across its width (the clone\'s floor); the lobby keeps it.';
-  c.platforms.push(flat('mz_floor', bounds.l + 32, bounds.r - 32, floor, floorWhy));
-  c.platforms.push(flat('mz_floor_underside', bounds.l + 32, shaftL, underside, 'The floorboards, solid from below: the crawlspace is left by its ladder (or the teleporter).', 1));
+  // Floors: the lobby floor (the clone's platform height) to the drop at its
+  // right end, the floorboards' underside (solid from below) clear of the
+  // ladder, and the roof.
+  const floorWhy = `unnnn's only platform is y -12 (the clone's floor); the lobby keeps it. ${r5} and recording d4IOWnzw0Y0 t0003-t0005: past the far pillar the floor ends and you drop under it.`;
+  c.platforms.push(flat('mz_floor', bounds.l + 32, floorEnd, floor, floorWhy));
+  c.platforms.push(flat('mz_floor_underside', bounds.l + 32, ladderX - 36, underside, 'The floorboards, solid from below: the crawlspace is left by its ladder (or the teleporter).', 1));
   c.platforms.push(flat('mz_ceiling', bounds.l + 40, bounds.r - 40, ceiling, 'Lobby roof (solid from below).', 1));
 
-  // Below the floorboards: a crawlspace the width of the lobby.
-  const crawlWhy = 'F 13777: "the hidden space under the floor in Jethimadh mezzanine"; H: "below the floorboards". Remake: a crawlspace 290 px deep under the whole lobby, reached by a corridor ladder in the right-hand corner past the Hall door ("with a little investigation").';
+  // Below the floorboards: a dark crawlspace the width of the lobby (R5: black under the floorboards).
+  const crawlWhy = `F 13777: "the hidden space under the floor in Jethimadh mezzanine"; H: "below the floorboards". ${r5}: black under the floorboards, six quoins in a row ~360 px under the lobby floor; d4IOWnzw0Y0 t0003-t0009: a drop at the far right end, then a walk along under the floor. Remake: the crawlspace floor ~70 px under the quoins, a ladder back up in the drop by the far pillar.`;
   c.decos.push(
-    { sprite: 'jethimadh_int_bg_left', x: -260, y: crawl + 80, w: 600, h: 420, z: 0, r: 0, layer: 'mg' },
-    { sprite: 'jethimadh_int_bg_right', x: 260, y: crawl + 80, w: 600, h: 420, z: 0, r: 0, layer: 'mg' },
-    { sprite: 'jethimadh_int_bg_shadow_50percent', x: 0, y: crawl + 60, w: 1100, h: 420, z: 1, r: 0, layer: 'mg' },
-    { sprite: 'jethimadh_int_bg_shadow_50percent', x: 0, y: crawl + 40, w: 1100, h: 380, z: 2, r: 0, layer: 'mg' },
-    { sprite: 'jethimadh_frame_wall', x: 0, y: underside + 30, w: 1060, h: 48, z: 12, r: 0, layer: 'fg' },
-    { sprite: 'jethimadh_frame_wall', x: 0, y: crawl + 40, w: 1060, h: 48, z: 12, r: 0, layer: 'fg' },
-    { sprite: 'jethimadh_frame_cap', x: -470, y: bounds.b, w: 120, h: bounds.b - underside, z: 11, r: 0, layer: 'fg' },
-    { sprite: 'jethimadh_frame_cap', x: 470, y: bounds.b, w: 120, h: bounds.b - underside, z: 11, r: 0, flip: true, layer: 'fg' },
-    { sprite: 'jethimadh_int_steps_1c', x: -420, y: crawl + 30, w: 260, h: 60, z: 3, r: 0, layer: 'mg' },
+    { sprite: 'jethimadh_frame_wall', x: 0, y: crawl + 30, w: W - 40, h: 40, z: 12, r: 0, layer: 'mg' },
+    { sprite: 'jethimadh_int_steps_1c', x: bounds.l + 160, y: crawl + 30, w: 260, h: 60, z: 3, r: 0, layer: 'mg' },
   );
   c.platforms.push(flat('mz_crawl', bounds.l + 32, bounds.r - 32, crawl, crawlWhy));
   const ladders = [ladder(c, 'mz', ladderX, crawl, floor, crawlWhy)];
 
-
-  const greeterWhy = 'Maps / quests: rook_hall_start sends you to "the Mezzanine in Jethimadh Tower" to "speak to Greeterbot Sentry G-42" (end_npcs npc_quest_giver_widget). V (G88, i11hPtqFN8E t0000-t0004, -03T3bLY7a0 t0000): it stands in front of the museum door, a little left of its middle.';
+  const greeterWhy = 'Maps / quests: rook_hall_start sends you to "the Mezzanine in Jethimadh Tower" to "speak to Greeterbot Sentry G-42" (end_npcs npc_quest_giver_widget). V (G88, i11hPtqFN8E t0000-t0004, -03T3bLY7a0 t0000) and R5: it stands in front of the museum door, a little left of its middle.';
   const museumWhy = 'B "enter the door to the Rook museum"; N "If you have been chosen, you will be invited to enter the Rook Museum". The door goes the Greeterbot\'s way: npc_quest_giver_widget.enterHall (LA91BDTNHS82D36, arrive -2270,-136), the remake\'s transient museum.';
-  const hallWhy = 'B "the locked door to the Hall of Records (next door)" (2011); forum 29729: the Hall of Rejected Concepts (LA9L33D5CNE3I0J) opened behind it "next to the Rook Museum" in 2012-11. V: the door wears a "Hall of Rejected Concepts" plaque and leads to the Hall\'s left end (js/hall-rejected-concepts.js).';
-  const stootWhy = 'unnnn\'s objrefs include two Collision-triggered Teleporters (positions lost); H "Left + Up + Space", F 13777 "Head left (when you\'re in the floor space)", "just keep jumping, pressing left". A jump at the crawlspace\'s left end (box 60 px over its floor: a plain jump, spinach not needed) takes you to the Stoot Shrine.';
+  const hallWhy = 'B "the locked door to the Hall of Records (next door)" (2011); forum 29729: the Hall of Rejected Concepts (LA9L33D5CNE3I0J) opened behind it "next to the Rook Museum" in 2012-11. V and R5: the door has a "Hall of Rejected Concepts" plaque to its left and leads to the Hall\'s left end (js/hall-rejected-concepts.js).';
+  const stootWhy = 'unnnn\'s objrefs include two Collision-triggered Teleporters (positions lost); H "Left + Up + Space", F 13777 "Head left (when you\'re in the floor space)", "just keep jumping, pressing left"; d4IOWnzw0Y0 t0012-t0031: under the floor, a Spinach jump at the left, then "Entering unnnn". A jump at the crawlspace\'s left end (box 60 px over its floor: a plain jump, spinach not needed) takes you to the Stoot Shrine.';
+  const quoinWhy = `${r5}: six currant quoins in a row under the floorboards; d4IOWnzw0Y0 t0005-t0009: grabbed for "+100 currants" each (a 25-currant quoin at a 4x bonus).`;
 
   return {
     tsid: MEZZANINE_TSID,
@@ -454,7 +517,7 @@ function buildMezzanine() {
         y: floor,
         ...DOOR,
         connect: { tsid: 'LIFFUV4ATQ72I6D', label: 'Stairs', x: STAIRS.mezzDoorX, y: STAIRS_TOP_Y, hub_id: '96' },
-        why: 'Back down the Stairs (remake: the door the top landing leads to).',
+        why: `Back down the Stairs (remake: the door the top landing leads to). ${r5}: the arched door at the lobby's left end.`,
       },
       {
         id: MUSEUM_DOOR_ID,
@@ -485,11 +548,12 @@ function buildMezzanine() {
         why: stootWhy,
       },
     ],
+    quoins: MEZZ_QUOINS.map((q) => ({ ...q, why: quoinWhy })),
     greeterbot: { x: MEZZ.greeterX, y: floor, why: greeterWhy },
     why: {
       room: 'Maps: LIFGJ2246R72LJL "Mezzanine" in hub 96. B/N: the lobby of the Rook Museum, reached up the Stairs, with the museum door, the Greeterbot and the locked Hall of Records next door; H/F: a hidden space under its floorboards that leads on to unnnn.',
-      size: 'unnnn was cloned from the Mezzanine (sources LIFGJ2246R72LJL): its bounds -500..500 x -700..0, floor y -12 and street-sized deco layers are kept. The crawlspace runs below (to y 290) with 400 px of world under it (b 700), so the view never shows past the bottom.',
-      decor: 'Source-exact positions: unnnn layers T_1311832165202 (11 rookhall_spotlight) and T_1311832941302 (the two upright firebog_linear_gradient_shadow; a third lies along the floor and a fourth duplicates the first, left out so the lobby floor stays lit), deco ids of 2011-07-28, street-sized so world = local - (500, 700). Left out: rook_hall_placeholder_painting (no art recovered) and unnnn\'s middleground flash_crasher_demon / water_ripple (the shrine room\'s scene, replaced in 2012). The shell, lanterns, crawlspace and ladder are the corridors\' art (remake). G88: the EXIT arrow and Rook Museum plaque are footage text on the set\'s CC0 sign art (MEZZ_SIGNS).',
+      size: `${r5} shows the whole lobby, its left end at the picture's left edge and the far pillar at its right; the Greeterbot's art (72 x 84) and the arched door (196 x 214) put it at ~1.2 world px a picture px, so 1,560 wide (unnnn's clone was 1,000). unnnn's t -700 and floor y -12 are kept. The crawlspace runs below (to y ${crawl}) with ${bounds.b - crawl} px of world under it, so the view never shows past the bottom.`,
+      decor: 'Source-exact positions: unnnn layer T_1311832165202 (11 rookhall_spotlight), deco ids of 2011-07-28, at the world positions they had in the clone (street-sized, world = local - (500, 700)); its layer T_1311832941302\'s two upright firebog_linear_gradient_shadow darken the two ends, set back so their black half lies past the walls (R5: the ends are darker wood, the Stairs door still shows) (a third lies along the floor and a fourth duplicates the first, left out so the lobby floor stays lit). Left out: rook_hall_placeholder_painting (no art recovered) and unnnn\'s middleground flash_crasher_demon / water_ripple (the shrine room\'s scene, replaced in 2012). R5: the floor is the firebog set\'s room floor slab (room_background3a_floor) over warm floorboards (jethimadh_int_bg_center) fading to black, three spotted pillars (jethimadh_int_pillar_1), no lanterns. The shell, crawlspace and ladder are the corridors\' art (remake). G88: the EXIT arrow and the two plaques are footage text on the set\'s CC0 sign art (MEZZ_SIGNS).',
     },
   };
 }
@@ -510,7 +574,7 @@ export const STOOT_RETURN = Object.freeze({
   tsid: STOOT_SHRINE_TSID,
   bounds: Object.freeze({ l: -500, r: 500, t: -700, b: 0 }),
   box: Object.freeze({ x: -470, y: 0, w: 60, h: 300 }),
-  to: Object.freeze({ tsid: MEZZANINE_TSID, x: -300, y: 290 }),
+  to: Object.freeze({ tsid: MEZZANINE_TSID, x: MEZZ.bounds.l + 220, y: MEZZ.crawl }),
   why: 'unnnn\'s second Collision-triggered Teleporter (position lost): the remake puts it at the room\'s left end, the side you came in from, and lands you in the crawlspace beside the teleporter that brought you.',
 });
 
