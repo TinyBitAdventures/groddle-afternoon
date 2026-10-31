@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e70532b9';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=7e23ff5f';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8d19d3f3';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -596,6 +596,7 @@ import {
 import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=f609fb2f';
 import {
   buildStreetView,
+  glitchLayerMatrix,
   signpostNear,
   pickConnection,
   loadDecoManifest,
@@ -10152,6 +10153,10 @@ const engine = {
   get streetTsid() {
     return currentStreetTsid;
   },
+  /** The location's avatar filter (a ColorMatrixFilter) or null: setAvatarTone. */
+  get avatarTone() {
+    return avatarTone;
+  },
   get groundY() {
     return GROUND_Y;
   },
@@ -10876,11 +10881,13 @@ const engine = {
    * collision lines and climb walls, with no street load. `returnTo` is
    * written as the resumable location; leave with engine.enter(tsid, …).
    * scene = { tsid, label, hubName, width, height, background, platforms,
-   *           walls, spawn: { x, y }, returnTo: { tsid, x, y }, ownLight }
-   * (ownLight: true keeps the Dametime tint off, as on a street JSON.)
+   *           walls, spawn: { x, y }, returnTo: { tsid, x, y }, ownLight, avatarFilters }
+   * (ownLight: true keeps the Dametime tint off, as on a street JSON; avatarFilters: the
+   * location's avatar filter, setAvatarTone.)
    */
   enterScene(scene) {
     clearWorldEntities();
+    if (scene.avatarFilters) setAvatarTone(scene.avatarFilters);
     if (bgLayer && world) {
       world.removeChild(bgLayer);
       bgLayer.destroy({ children: true });
@@ -20779,6 +20786,28 @@ function handleHomeTarget(target, verbId) {
   return false;
 }
 
+/**
+ * The location's avatar filter. The client gives the middleground layer's filters to your avatar
+ * and every other player's (AddAvatarViewCmd, MiddleGroundRenderer.createPcView: Layer.filtersA,
+ * ColorMatrix.getFilter), so a room whose middleground is desaturated shows everyone in grey. A
+ * scene names it as `avatarFilters` (Layer filter values: saturation, brightness, ...); null clears.
+ * Remote players take it from engine.avatarTone (features/realtime-feature.js).
+ */
+let avatarTone = null;
+function setAvatarTone(filters) {
+  const matrix = filters ? glitchLayerMatrix(filters) : null;
+  if (player && avatarTone) {
+    const left = (player.filters || []).filter((f) => f !== avatarTone);
+    player.filters = left.length ? left : null;
+  }
+  avatarTone = null;
+  if (!matrix || !globalThis.PIXI?.ColorMatrixFilter) return;
+  avatarTone = new PIXI.ColorMatrixFilter();
+  avatarTone.matrix = matrix;
+  avatarTone.glitchFilters = filters;
+  if (player) player.filters = [...(player.filters || []), avatarTone];
+}
+
 function clearWorldEntities() {
   cancelCurrentAction({ quiet: true });
   endStreetOverlays();
@@ -20793,6 +20822,7 @@ function clearWorldEntities() {
   }
   features.streetClear(engine);
   if (entityLayer) entityLayer.filters = null;
+  setAvatarTone(null);
   interactables = [];
   piggies = [];
   chickens = [];

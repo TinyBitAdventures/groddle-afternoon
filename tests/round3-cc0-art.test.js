@@ -8,15 +8,19 @@
  * - Esquibeth grottos: Tiny Speck's own glyphs (esquibeth1.swf: Spriggan, Cosma and Pot, their
  *   glow, the sheetmusiclines staffs and the note dots) replace the three made-up vector glyphs;
  *   each found note sits in the socket carved for it (tools/esquibeth-art/build.py).
+ * - Walk Toward the Light and Radiant Glare: every avatar draws in grey (the designer's videos
+ *   Et0RkY43A5Q and ZQQydNM9THI and the Snaps), as the client's middleground saturation filter did.
  */
 import { createHash } from 'node:crypto';
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { FLOORS, RAINBOW_ART, radiantLayout, rainbowY } from '../public/js/quest-rooms/radiant-glare.js?v=b878eda8';
+import { FLOORS, RAINBOW_ART, radiantLayout, rainbowY, room as glareRoom } from '../public/js/quest-rooms/radiant-glare.js?v=2a265adb';
+import { room as lightRoom } from '../public/js/quest-rooms/light-perspective.js?v=f6fb0621';
+import { glitchLayerMatrix } from '../public/js/street-render.js?v=90a690df';
 import { MOON, WASHING, WASHING_LINE } from '../public/js/purple-journey-scene.js?v=425b0b98';
 import * as esq from '../public/js/quest-rooms/esquibeth.js?v=eb39b25c';
 import { ESQUIBETH_ART, ESQUIBETH_GLYPHS, ESQUIBETH_STAFFS } from '../public/js/quest-rooms/esquibeth-art.js?v=fe515887';
@@ -138,5 +142,40 @@ describe('Esquibeth grottos: the CC0 glyphs', () => {
     }
     assert.match(src, /d\.glyphLit = artSprite\(PIXI, place\.glow\)/);
     assert.match(src, /world\.addChild\(artSprite\(PIXI, place\.glyph\)\)/);
+  });
+});
+
+describe('Walk Toward the Light and Radiant Glare: grey avatars', () => {
+  it('both rooms carry the client middleground saturation filter, and no other room does', () => {
+    for (const r of [lightRoom, glareRoom]) assert.deepEqual(r.avatarFilters, { saturation: -100 });
+    const dir = join(root, 'public/js/quest-rooms');
+    const withFilter = readdirSync(dir).filter((f) => f.endsWith('.js') && /avatarFilters:/.test(read(`public/js/quest-rooms/${f}`))).sort();
+    assert.deepEqual(withFilter, ['light-perspective.js', 'radiant-glare.js']);
+  });
+
+  it('saturation -100 is pure grey: every colour channel reads the same luminance', () => {
+    const m = glitchLayerMatrix({ saturation: -100 });
+    const rows = [m.slice(0, 5), m.slice(5, 10), m.slice(10, 15)];
+    for (const row of rows) {
+      assert.deepEqual(row.map((v) => v.toFixed(4)), rows[0].map((v) => v.toFixed(4)));
+      assert.ok(Math.abs(row[0] + row[1] + row[2] - 1) < 1e-6);
+      assert.equal(row[4], 0);
+    }
+    assert.deepEqual(m.slice(15), [0, 0, 0, 1, 0]);
+  });
+
+  it('applies the filter to you and to other players only while in such a room', () => {
+    const game = read('public/game.js');
+    // Cleared on every location change, set again by a scene that names it.
+    assert.match(game, /function clearWorldEntities\(\) \{[^]*?if \(entityLayer\) entityLayer\.filters = null;\n  setAvatarTone\(null\);/);
+    assert.match(game, /enterScene\(scene\) \{\n    clearWorldEntities\(\);\n    if \(scene\.avatarFilters\) setAvatarTone\(scene\.avatarFilters\);/);
+    assert.match(game, /get avatarTone\(\) \{\n    return avatarTone;/);
+    // Your Glitch keeps its other filters (An Autumn Day's silhouette) beside it.
+    assert.match(game, /player\.filters = \[\.\.\.\(player\.filters \|\| \[\]\), avatarTone\]/);
+    const qi = read('public/js/features/quest-instances-feature.js');
+    assert.match(qi, /avatarFilters: scene\.avatarFilters \?\? room\.avatarFilters \?\? null,/);
+    // Other players: their Glitch, not their name plate.
+    const rt = read('public/js/features/realtime-feature.js');
+    assert.match(rt, /const tone = engine\.avatarTone \|\| null;\n\s+if \(\(r\.body\.filters\?\.\[0\] \|\| null\) !== tone\) r\.body\.filters = tone \? \[tone\] : null;/);
   });
 });

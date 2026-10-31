@@ -501,6 +501,13 @@ export const room = {
   theme: 'lab',
   // G315: hub 135 'Puzzles' (inc_data_maps_prod.js 1197), the template's hub.
   hubName: 'Puzzles',
+  /**
+   * Avatars draw in grey here: the designer's run-through (ZQQydNM9THI) and every player's Snap
+   * (round3-levels-2026-10-29 LIFFFRAHB4A3JHJ, reference only) show each Glitch in grey while the HUD
+   * portrait keeps its colours, as the client did when a location's middleground carried
+   * saturation -100 (its filters go to every avatar: game.js setAvatarTone).
+   */
+  avatarFilters: Object.freeze({ saturation: -100 }),
   durationMs: EXIT_DELAY_MS,
   leaveText: 'Leave before you reach the glare? You will have to start over.',
   travelText: 'Find the EXIT, or use Leave.',

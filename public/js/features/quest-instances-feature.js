@@ -149,12 +149,12 @@ const ROOM_MODULES = {
   le_miserable: () => import('../quest-rooms/le-miserable.js?v=3d0bf608'),
   juju_camp: () => import('../quest-rooms/juju-camp.js?v=5bdc545c'),
   picto_pattern: () => import('../quest-rooms/picto-pattern.js?v=4f01a1d1'),
-  radiant_glare: () => import('../quest-rooms/radiant-glare.js?v=b878eda8'),
+  radiant_glare: () => import('../quest-rooms/radiant-glare.js?v=2a265adb'),
   an_autumn_day: () => import('../quest-rooms/an-autumn-day.js?v=a2a153b3'),
   being_watched: () => import('../quest-rooms/being-watched.js?v=55341016'),
   back_alley: () => import('../quest-rooms/back-alley.js?v=e1542416'),
   clubhouse: () => import('../quest-rooms/clubhouse.js?v=b93c1484'),
-  light_perspective: () => import('../quest-rooms/light-perspective.js?v=b62f3a4c'),
+  light_perspective: () => import('../quest-rooms/light-perspective.js?v=f6fb0621'),
   tile_puzzle: () => import('../quest-rooms/tile-puzzle.js?v=9ba8f9cc'),
   operation_grow: () => import('../quest-rooms/operation-grow.js?v=232a0736'),
   gwendolyn: () => import('../quest-rooms/gwendolyn.js?v=81341c1b'),
@@ -914,6 +914,8 @@ async function buildStage(engine, stage) {
     returnTo: run.returnTo,
     // A room (or one stage) with its own authored light: the Dametime tint stays off.
     ownLight: Boolean(scene.ownLight ?? room.ownLight),
+    // A room whose avatars draw in grey (or another location filter): game.js setAvatarTone.
+    avatarFilters: scene.avatarFilters ?? room.avatarFilters ?? null,
   });
   if (engine.street) engine.street.barriers = scene.barriers || [];
   room.enter?.(ctx, stage);

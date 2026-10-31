@@ -340,6 +340,9 @@ function createSession(engine) {
       }
       // A street rebuild empties the entity layer; put them back.
       if (layer && r.root.parent !== layer) layer.addChild(r.root);
+      // The location's avatar filter (game.js setAvatarTone) on their Glitch, not their name.
+      const tone = engine.avatarTone || null;
+      if ((r.body.filters?.[0] || null) !== tone) r.body.filters = tone ? [tone] : null;
       if (r.pack.pending && t >= r.packCheckAt) {
         r.packCheckAt = t + 400;
         const next = engine.glitchPack(r.look);
