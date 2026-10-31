@@ -63,7 +63,7 @@ for (const [key, meta] of Object.entries(index.streets)) {
   }
 }
 
-// Streets no hub map draws (G198): the Map's "Set a destination" can only pick
+// Streets no hub map draws (G198, and the hidden ones, round 5 maps): the Map's "Set a destination" can only pick
 // a drawn street (InteractionMenuController.startLocationMenu 133-160 is the
 // hub map's street menu), so js/map-routes.js doorRooms() lists the rooms
 // behind doors from these. Hub maps: assets/maps/index.json -> hubs/*.json streets.
@@ -75,6 +75,9 @@ if (existsSync(mapIndexFile)) {
     if (!hub?.file || !existsSync(join(pub, hub.file))) continue;
     const data = JSON.parse(readFileSync(join(pub, hub.file), 'utf8'));
     for (const s of data.streets || []) {
+      // A street the client left off the map (tools/build-map-hidden.mjs) is not drawn: a tower,
+      // basement or machine room is then a room behind its door, as the Hell Bar is.
+      if (s?.invisible_to_outsiders) continue;
       const k = resolve(s?.tsid);
       if (k) drawn.add(k);
     }

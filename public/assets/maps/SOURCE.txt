@@ -23,3 +23,10 @@ CDN hub paintings (full 760×460 bg/fg) — URLs preserved, files NOT on Wayback
 In-game
   Map (G) opens player hub; dropdown browses all hubs with geometry
   GO buttons switch hub map view (explore); yellow paths = playable streets only
+
+Streets left off the map (round 5, 2026-10-31)
+  invisible_to_outsiders on a hub street: the Start streets, apartment towers and basements,
+  machine rooms and Muufo's forgotten floor, which the client drew only for a player standing
+  on them (MapHub.as drawStreet). Written by tools/build-map-hidden.mjs from GSJS
+  (greeting_locations, machine_rooms, the Apt basements rule) and the Tribute Blog's Nov 2012
+  region maps (reference only). The region list offers GSJS public_hubs only (js/map-graph.js).

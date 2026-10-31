@@ -24,7 +24,7 @@ import {
   renderHubMapSvg,
   SUBWAY_ICON_NUDGE,
   youBox,
-} from '../public/js/map-graph.js?v=41426330';
+} from '../public/js/map-graph.js?v=c0294a25';
 import { mapIconStep, mapIconTipPlace } from '../public/js/ui/map-icon-tips.js?v=6b3eb3f9';
 import { selectVendorProfile } from '../public/js/vendor.js?v=563afb9b';
 import { CLASSIC_ART } from '../public/js/classic/classic-art.js?v=5745e669';
@@ -166,7 +166,8 @@ describe('map icon placement and render (js/map-graph.js)', () => {
     for (const [id, at] of [[56, 'GLI2V0UN7RD1T2J'], [93, 'GIFI9G70SV72H3C']]) {
       const view = buildHubMapView(hub(id), at, STREETS);
       const labels = layoutStreetLabels(view.streets, 760, 460);
-      assert.equal(labels.length, view.streets.length, 'every street keeps its label');
+      // Every street the map draws (not Salatu's Start streets, tools/build-map-hidden.mjs).
+      assert.equal(labels.length, view.streets.filter((s) => !s.hidden).length, 'every street keeps its label');
       const svg = renderHubMapSvg(view);
       for (const l of labels) assert.ok(svg.includes(`x="${l.x.toFixed(1)}" y="${l.y.toFixed(1)}"`), l.name);
     }

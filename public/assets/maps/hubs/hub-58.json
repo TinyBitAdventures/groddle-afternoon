@@ -195,7 +195,8 @@
       "x1": 40,
       "y1": 160,
       "x2": 240,
-      "y2": 160
+      "y2": 160,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LDONEDVHC4030KF",
@@ -203,7 +204,8 @@
       "x1": 40,
       "y1": 200,
       "x2": 240,
-      "y2": 200
+      "y2": 200,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LCR202JSVIN1STL",
@@ -270,7 +272,8 @@
       "x1": 40,
       "y1": 120,
       "x2": 240,
-      "y2": 120
+      "y2": 120,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LLID3PL336E1RN1",

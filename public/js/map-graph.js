@@ -131,6 +131,9 @@ export function buildHubMapView(hubData, currentTsid, streetIndex = {}) {
       store: s.store || '',
       shrine: s.shrine || '',
       hasSubway: !!s.has_subway,
+      // Left off the map unless you stand on it (MapHub.as drawStreet 638-640): the Start
+      // streets, apartment towers and basements, machine rooms (tools/build-map-hidden.mjs).
+      hidden: !!s.invisible_to_outsiders && !isCurrent,
     };
   });
 
@@ -146,7 +149,7 @@ export function buildHubMapView(hubData, currentTsid, streetIndex = {}) {
   }));
 
   const nodes = streets
-    .filter((s) => s.loaded)
+    .filter((s) => s.loaded && !s.hidden)
     .map((s) => ({
       tsid: s.loadedTsid,
       label: s.label,
@@ -355,6 +358,7 @@ export function layoutStreetIcons(streets, { labels = [], hubs = [] } = {}) {
 
   // The subway stations first (the fewest, and the most use when looking for one), then the rest.
   for (const pass of ['subway', 'rest']) for (const s of streets || []) {
+    if (s.hidden) continue;
     const rot = (Math.atan2(s.y2 - s.y1, s.x2 - s.x1) * 180) / Math.PI;
     const half = Math.hypot(s.x2 - s.x1, s.y2 - s.y1) / 2;
     const add = (kind, value, lx0, rows, along, reach = 6) => {
@@ -430,6 +434,7 @@ export function layoutStreetLabels(streets, mapW = 760, mapH = 460) {
   const out = [];
 
   for (const s of ordered) {
+    if (s.hidden) continue;
     const angle = (Math.atan2(s.y2 - s.y1, s.x2 - s.x1) * 180) / Math.PI;
     let rot = angle;
     if (rot > 90) rot -= 180;
@@ -548,14 +553,14 @@ export function renderHubMapSvg(view) {
   }
 
   for (const s of view.streets || []) {
-    if (s.loaded) continue;
+    if (s.loaded || s.hidden) continue;
     parts.push(
       `<line class="map-seg dim" x1="${s.x1}" y1="${s.y1}" x2="${s.x2}" y2="${s.y2}" ` +
         `data-tsid="${escapeXml(s.tsid)}" data-name="${escapeXml(s.name)}"/>`
     );
   }
   for (const s of view.streets || []) {
-    if (!s.loaded) continue;
+    if (!s.loaded || s.hidden) continue;
     const cls = s.current ? 'map-seg current' : 'map-seg travelable';
     const travelTsid = s.loadedTsid || s.tsid;
     parts.push(
@@ -639,17 +644,33 @@ export function renderHubMapSvg(view) {
 }
 
 /**
+ * The regions of Ur the world map offered: GSJS config_prod.js public_hubs, the only hubs
+ * get_map put in its `all` listing (locations/location.js 2869-2874). The rest of the map data
+ * is test and template hubs (Abbasid, Old Groddle Forest, the POL hubs, Gentle Island) and
+ * the two Jethimadh Tower hubs, which open from their GO button or when you are inside them.
+ * The Tribute Blog's world maps of Nov 2012 (posts 38005474341, 45119695823, 49865657967,
+ * 49872342514; reference only) draw no Abbasid and no old forest.
+ */
+export const PUBLIC_HUBS = Object.freeze(new Set([
+  27, 40, 50, 51, 56, 58, 63, 64, 66, 71, 72, 75, 76, 78, 85, 86, 88, 89, 90, 91, 92, 93, 95, 97, 98, 99,
+  100, 101, 102, 105, 106, 107, 108, 109, 110, 112, 113, 114, 116, 119, 120, 121, 123, 125, 126, 128,
+  131, 133, 136, 137, 140, 141, 142, 143,
+].map(String)));
+
+/**
  * List hubs from map index for UI (name + street counts).
  * @param {object} mapIndex
- * @param {{ keep?: string|null }} [opts] a zone hub to list anyway (the one on show)
+ * @param {{ keep?: string|null }} [opts] a hub to list anyway (the one on show: a zone's, or
+ *   a tower's opened from its GO button)
  * @returns {{ hubId: string, hubName: string, streetCount: number, hasArt: boolean, file: string }[]}
  */
 export function listHubsFromIndex(mapIndex, { keep = null } = {}) {
   const hubs = mapIndex?.hubs || {};
   return Object.values(hubs)
     // A published zone's hub (spec 11; its row carries `zone`) stays off the world's list of
-    // regions (spec 15, Q5): its map opens from its own streets only, as `keep`.
-    .filter((h) => !h.zone || (keep != null && String(h.hubId) === String(keep)))
+    // regions (spec 15, Q5): its map opens from its own streets only, as `keep`. So does a hub
+    // the world map never offered (PUBLIC_HUBS).
+    .filter((h) => (keep != null && String(h.hubId) === String(keep)) || (!h.zone && PUBLIC_HUBS.has(String(h.hubId))))
     .map((h) => ({
       hubId: String(h.hubId),
       hubName: h.hubName || `Hub ${h.hubId}`,

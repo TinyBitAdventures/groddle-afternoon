@@ -887,7 +887,8 @@ describe('G198 rooms behind doors as destinations', () => {
     const maps = JSON.parse(read(join(PUBLIC, 'assets/maps/index.json')));
     const drawn = new Set();
     for (const hub of Object.values(maps.hubs)) {
-      for (const st of JSON.parse(read(join(PUBLIC, hub.file))).streets || []) for (const a of [st.tsid, `G${st.tsid.slice(1)}`, `L${st.tsid.slice(1)}`]) drawn.add(a);
+      // A street the client left off the map (invisible_to_outsiders, tools/build-map-hidden.mjs) is not drawn.
+      for (const st of JSON.parse(read(join(PUBLIC, hub.file))).streets || []) if (!st.invisible_to_outsiders) for (const a of [st.tsid, `G${st.tsid.slice(1)}`, `L${st.tsid.slice(1)}`]) drawn.add(a);
     }
     for (const key of Object.keys(INDEX.streets)) assert.equal(off.has(key), !drawn.has(key), key);
   });

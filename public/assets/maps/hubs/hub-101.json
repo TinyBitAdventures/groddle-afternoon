@@ -236,7 +236,8 @@
       "x1": 40,
       "y1": 40,
       "x2": 240,
-      "y2": 40
+      "y2": 40,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LIF84CCRN203N7P",
@@ -244,7 +245,8 @@
       "x1": 40,
       "y1": 80,
       "x2": 240,
-      "y2": 80
+      "y2": 80,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LHV1HKHRSKA2CR9",

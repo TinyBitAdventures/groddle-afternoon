@@ -54,7 +54,8 @@
       "x1": 40,
       "y1": 40,
       "x2": 240,
-      "y2": 40
+      "y2": 40,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LA9G6MA4P6923PH",
@@ -110,7 +111,8 @@
       "x1": 40,
       "y1": 200,
       "x2": 240,
-      "y2": 200
+      "y2": 200,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LHVEI9NVJ203LRO",
@@ -118,7 +120,8 @@
       "x1": 40,
       "y1": 240,
       "x2": 240,
-      "y2": 240
+      "y2": 240,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LA9111H84492V1K",

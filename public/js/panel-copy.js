@@ -11,7 +11,8 @@
 
 /** The Map subtitle: streets, playable streets and how to use the map. */
 export function hubMapSubtitle(view) {
-  const streets = Array.isArray(view?.streets) ? view.streets : [];
+  // The streets the map draws (map-graph.js buildHubMapView `hidden`: not the Start streets or towers).
+  const streets = (Array.isArray(view?.streets) ? view.streets : []).filter((s) => !s.hidden);
   const playable = streets.filter((s) => s.loaded).length;
   return `${streets.length} streets · ${playable} playable here · click a street to set a destination or teleport · red star = you`;
 }

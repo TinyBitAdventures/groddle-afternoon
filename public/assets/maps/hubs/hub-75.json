@@ -36,7 +36,8 @@
       "x1": 171,
       "y1": 240,
       "x2": 265,
-      "y2": 212
+      "y2": 212,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LA9TEC6GB0D2B2M",
@@ -44,7 +45,8 @@
       "x1": 117,
       "y1": 327,
       "x2": 200,
-      "y2": 298
+      "y2": 298,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LA9U0VLRB0D2JES",
@@ -52,7 +54,8 @@
       "x1": 328,
       "y1": 449,
       "x2": 398,
-      "y2": 394
+      "y2": 394,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LA9U90TVB0D2EAH",
@@ -60,7 +63,8 @@
       "x1": 508,
       "y1": 315,
       "x2": 543,
-      "y2": 236
+      "y2": 236,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LHV1H1EHOF32UJM",
@@ -96,7 +100,8 @@
       "x1": 40,
       "y1": 80,
       "x2": 240,
-      "y2": 80
+      "y2": 80,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LA9EBPF8M2031HB",
@@ -104,7 +109,8 @@
       "x1": 40,
       "y1": 120,
       "x2": 240,
-      "y2": 120
+      "y2": 120,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LHVB9CAE6032G6S",

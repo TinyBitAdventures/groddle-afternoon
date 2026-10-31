@@ -16,7 +16,8 @@
       "x1": 83,
       "y1": 137,
       "x2": 198,
-      "y2": 167
+      "y2": 167,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LNVRJVDNB0D2GJ9",
@@ -24,7 +25,8 @@
       "x1": 275,
       "y1": 198,
       "x2": 349,
-      "y2": 269
+      "y2": 269,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LNV57FNCD0D2059",
@@ -32,7 +34,8 @@
       "x1": 367,
       "y1": 265,
       "x2": 451,
-      "y2": 253
+      "y2": 253,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LNV6FEDKD0D2J3O",
@@ -40,7 +43,8 @@
       "x1": 164,
       "y1": 252,
       "x2": 234,
-      "y2": 194
+      "y2": 194,
+      "invisible_to_outsiders": true
     },
     {
       "tsid": "LLI17VIKLJ02BSV",
