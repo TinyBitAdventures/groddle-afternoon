@@ -98,7 +98,7 @@ import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { animalStatusLabel } from '../animals.js?v=e857d0af';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=23f74bb3';
 import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=16364589';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=602a6e9f';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=645600e9';
 import {
   CHECK_ON_REMOVE,
   CROWD_CLASSES,
@@ -1224,7 +1224,11 @@ export const animalMoodFeature = {
     for (const r of records.values()) {
       const target = r.target;
       if (!target.sprite || target.sprite.destroyed) continue;
-      if (r.mode === 'sad') {
+      if ((r.mode === 'seek' || r.mode === 'eat') && isRooked(target, engine)) {
+        // Rooked on the way to food: it stops there (include/rook.js fullStop 53-63) and the Rook
+        // feature holds it; a rooked animal goes after no food (npc_animal onContainerItemAdded 1394, 1419).
+        release(engine, r);
+      } else if (r.mode === 'sad') {
         if (time >= r.nextSadAt) sadInterval(engine, r);
         else hold(engine, r);
       } else if (r.mode === 'seek') {
@@ -1285,7 +1289,9 @@ export const animalMoodFeature = {
     const r = recordFor(target);
     if (ev === 'happy') say(engine, target, PIGGY_LINES.happy, 3000);
     else if (ev === 'croak') r.nextCroakAt = Math.min(r.nextCroakAt || Infinity, now() + 1500);
-    else if (ev === 'ate' && on?.sprite && r.mode !== 'sad') {
+    else if (ev === 'ate' && isRooked(target, engine)) {
+      // A rooked Piggy stays put (include/rook.js fullStop), whatever the server's tick decided.
+    } else if (ev === 'ate' && on?.sprite && r.mode !== 'sad') {
       if (!startSeek(engine, r, { kind: 'trant', target: on, x: on.sprite.x, y: on.sprite.y, shared: true })) {
         playClip(engine, r, PIGGY_MOOD_SHEETS.chew);
       }

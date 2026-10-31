@@ -404,7 +404,9 @@ function removeRookedVisual(engine, key) {
   }
   const cls = target.classId;
   if (cls === 'npc_piggy' || cls === 'npc_chicken') {
-    spr.vx = saved.vx || (Math.random() < 0.5 ? -0.45 : 0.45);
+    // onRevived startMoving (npc_piggy.js 1090-1095): walk again, never at the creep of a hold that
+    // was on when it was rooked (animal-mood-feature hold), which reads as walking in place.
+    spr.vx = Math.abs(saved.vx) > 0.01 ? saved.vx : (Math.random() < 0.5 ? -0.45 : 0.45);
   } else if (cls === 'npc_butterfly') {
     spr.vx = saved.vx || 0;
     spr._ambient = saved.ambient;
@@ -449,6 +451,8 @@ function updateRookedVisuals(engine) {
     } else if (row.clip && t >= row.clipAt) {
       setRookedClip(row, row.clip === 'a' ? 'b' : 'a');
     }
+    // fullStop (include/rook.js 53-63): a rooked Piggy or Chicken stays put until it is revived.
+    if (row.target.classId === 'npc_piggy' || row.target.classId === 'npc_chicken') spr.vx = 0;
     if (row.halo && !row.halo.destroyed) {
       const b = spr.getBounds();
       const cam = engine.camera;
