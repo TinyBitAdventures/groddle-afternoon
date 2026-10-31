@@ -53,7 +53,7 @@ import {
   startMeditation,
 } from '../public/js/meditation.js?v=380b2f3f';
 import { skillPackageDetails } from '../public/js/skill-packages.js?v=bfb87281';
-import { strikeDamageFor } from '../public/js/rook-attack.js?v=c06c0537';
+import { strikeDamageFor } from '../public/js/rook-attack.js?v=55853232';
 import { createMineRock, mineRock, tickMineRock } from '../public/js/mining.js?v=a7eb8740';
 import { runTransform, shuckDetails } from '../public/js/item-transforms.js?v=f90aa798';
 import { brushFox, createFox, foxFiberRange } from '../public/js/foxes.js?v=9534264f';

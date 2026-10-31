@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=341f7fc2';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=fc354f1d';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0724694f';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -11139,6 +11139,8 @@ function spawnPiggies(xs) {
       sprite: spr,
       state: animalState,
       animalKey: `${currentStreetTsid}:npc_piggy:${i}`,
+      // The street's Nth Piggy: its own Rook key (js/rook-attack.js rookKeyFor).
+      classIndex: i,
     });
   });
   return list;
@@ -11184,6 +11186,7 @@ function spawnChickens(xs) {
       subtitle: animalStatusLabel('npc_chicken', animalState),
       sprite: spr,
       state: animalState,
+      classIndex: i,
     });
   });
   return list;
@@ -11214,6 +11217,7 @@ function spawnButterflies(xs, flyingSpots) {
       airborne: false,
       state: animalState,
       animalKey: `${currentStreetTsid}:npc_butterfly:${i}`,
+      classIndex: i,
     });
   });
   // Flying butterflies — also interactable (Enter when near, or click). Same scale as rest.
@@ -11252,6 +11256,8 @@ function spawnButterflies(xs, flyingSpots) {
       airborne: true,
       state: animalState,
       animalKey: `${currentStreetTsid}:npc_butterfly:${flyIndex}`,
+      // Flying ones follow the resting ones (the same index as their saved state), never sharing one.
+      classIndex: flyIndex,
     });
   }
   return list;
@@ -11360,6 +11366,8 @@ function spawnTrees(spots) {
       state: targetState,
       // Multiplayer street objects: tree:<index> (js/street-objects.js).
       treeIndex: i,
+      // The street's Nth tree of this class: its own Rook key (js/rook-attack.js rookKeyFor).
+      classIndex: plan.slice(0, i).filter((p) => p.classId === classId).length,
     });
     streetState.trees[i] = { classId, state: targetState };
   });

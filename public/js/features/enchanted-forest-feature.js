@@ -153,6 +153,8 @@ function buildView(engine, entity) {
     sprite,
     state,
     enchantedIndex: entity.index,
+    // The hollow's Nth tree (it holds no other trees): its own Rook key, kept through a seedling's regrowth.
+    classIndex: entity.index,
     // game.js refreshWoodTreeVisual: this tree's own art.
     woodTexture: (s) => treeTexture(engine, tree.variant, s.maturity),
   });

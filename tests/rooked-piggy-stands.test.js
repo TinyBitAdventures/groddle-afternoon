@@ -4,8 +4,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createAnimalState } from '../public/js/animals.js?v=756d53d3';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=7c62b64b';
-import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=0cd81ddd';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=8ec1c687';
+import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=c57dc3cc';
 
 const TSID = 'GLI2HVHUM4F16B0'; // Pasha's Place, Groddle Forest: where Austin met it
 
@@ -13,7 +13,7 @@ function setup() {
   const slots = {};
   const walk = [{ walk: true }];
   const sprite = { x: 4400, y: 876, vx: 0.45, baseX: 4400, range: 90, scale: { x: 1 }, visible: true, destroyed: false, textures: walk, loop: true, animationSpeed: 0.14, gotoAndPlay() {} };
-  const pig = { classId: 'npc_piggy', animalKey: `${TSID}:npc_piggy:0`, state: createAnimalState('npc_piggy', { hunger: 5, mood: 1, hungerAt: Date.now() + 3_600_000 }), sprite };
+  const pig = { classId: 'npc_piggy', animalKey: `${TSID}:npc_piggy:0`, classIndex: 0, state: createAnimalState('npc_piggy', { hunger: 5, mood: 1, hungerAt: Date.now() + 3_600_000 }), sprite };
   const tree = { classId: 'trant_bubble', state: { fruitCount: 3 }, sprite: { x: 3900, y: 876, visible: true, destroyed: false, scale: { x: 1 } } };
   const engine = {
     started: true,

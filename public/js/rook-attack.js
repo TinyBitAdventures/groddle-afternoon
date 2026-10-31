@@ -207,6 +207,38 @@ export function isRookableClass(classId) {
   return ROOKABLE.has(String(classId || ''));
 }
 
+/** Keys from 100 up: a rookable thing the street did not spawn with an index (rookKeyFor). */
+export const ROOK_LOOSE_KEY_BASE = 100;
+
+/**
+ * A rookable thing's own key on its street: its class and the index the street
+ * spawned it with (`classIndex`: the Nth Piggy, Butterfly or Bean Tree of the
+ * street's ecology, the same index its animal state is saved under), so the
+ * key names one animal or tree on every visit and for every player, whatever
+ * order the things were found in. In the source each rooked thing keeps its
+ * own healers (items/include/rook.js rookAttack 69-70 `this.rook_healers = {}`,
+ * startRevive 118, playerIsHealer 268-274); the remake's street keys were the
+ * order a scan first met them in, so an animal that left a crowded street and
+ * came back, or one of your own animals among the street's, moved every later
+ * key along and a dose showed on another animal (ticket 12).
+ * Your own animals (released, hatched: animal-husbandry-feature) are keyed by
+ * their own id (`npc_butterfly:h<id>`): only your copy of the street has them,
+ * so the realtime server never hears of them (rook-mp syncKeys takes digits only).
+ * '' when the target carries neither (the feature then keys it from ROOK_LOOSE_KEY_BASE).
+ */
+export function rookKeyFor(target) {
+  const cls = String(target?.classId || '');
+  if (!isRookableClass(cls)) return '';
+  const own = target.husbandryAnimal;
+  if (own != null && own !== '') {
+    const id = String(own).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 48);
+    return id ? `${cls}:h${id}` : '';
+  }
+  const n = Number(target.classIndex);
+  if (Number.isInteger(n) && n >= 0 && n < ROOK_LOOSE_KEY_BASE) return `${cls}:${n}`;
+  return '';
+}
+
 export function isTreeClass(classId) {
   const id = String(classId || '');
   return id.startsWith('trant_') || id === 'wood_tree' || id === 'paper_tree';

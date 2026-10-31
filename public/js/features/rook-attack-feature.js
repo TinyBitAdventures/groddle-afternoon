@@ -69,7 +69,9 @@ import {
   createRookAttack,
   defeatXpFor,
   forceRook,
+  ROOK_LOOSE_KEY_BASE,
   isRookableClass,
+  rookKeyFor,
   isTreeClass,
   normalizeRookSave,
   normalizeRookedSlot,
@@ -88,7 +90,7 @@ import {
   strikeBeamFor,
   strikeDamageFor,
   useBalmPoint,
-} from '../rook-attack.js?v=c06c0537';
+} from '../rook-attack.js?v=55853232';
 import { shrinePrimeBonus } from '../imagination-effects.js?v=70169933';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
@@ -107,7 +109,7 @@ import {
   strikeDamage as mpStrikeDamage,
   syncKeys,
   syncObjs,
-} from '../rook-mp.js?v=20b4c9ce';
+} from '../rook-mp.js?v=6012319e';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=2bb00dfd';
 
@@ -286,9 +288,13 @@ function rookableTargets(engine) {
     if (!target.sprite || target.sprite.destroyed) continue;
     let key = keyOf.get(target);
     if (!key) {
-      const n = classCounters[target.classId] || 0;
-      classCounters[target.classId] = n + 1;
-      key = `${target.classId}:${n}`;
+      // The thing's own key (js/rook-attack.js rookKeyFor), never the order this scan met it in.
+      key = rookKeyFor(target);
+      if (!key) {
+        const n = classCounters[target.classId] || 0;
+        classCounters[target.classId] = n + 1;
+        key = `${target.classId}:${ROOK_LOOSE_KEY_BASE + n}`;
+      }
       keyOf.set(target, key);
     }
     out.push({ key, classId: target.classId, target, x: target.sprite.x, y: target.sprite.y });
