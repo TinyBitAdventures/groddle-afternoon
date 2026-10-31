@@ -40,7 +40,7 @@
 
 import { ensureItem } from '../inventory.js?v=85d4faba';
 import { isItemFloor, platformYAt } from '../street-model.js?v=23b926e5';
-import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=7e30da8f';
+import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=9c1a5f07';
 import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=4e140315';
 import {
@@ -129,13 +129,27 @@ export function soilSpawnPlan(counts, placement) {
   return plan;
 }
 
-/** Plots a dead street tree left behind (slot.adopted: key -> { x, y }). */
-export function adoptedPlan(slot) {
+/**
+ * Plots a dead street tree left behind (slot.adopted: key -> { x, y }).
+ * `treeSpot(i)`, when given, is street tree i's planned spot this visit
+ * (engine.placement('trees')[i]): a `tree:<i>` plot stands where its tree
+ * stands, so it moves with the street's layout (lane PERCH moved trees off
+ * branch stubs; a save from before keeps its plot but not the old perch), and
+ * the saved spot is brought up to date. Spots are saved as the tree death
+ * saves them: the tree's x, its feet (spot y + 2) less 4.
+ */
+export function adoptedPlan(slot, treeSpot = null) {
   const plan = [];
   for (const [key, spot] of Object.entries(slot?.adopted || {})) {
     const plot = normalizePlot(slot.plots?.[key]);
     if (!plot || !Number.isFinite(spot?.x) || !Number.isFinite(spot?.y)) continue;
-    plan.push({ key, classTsid: plot.classTsid, x: spot.x, y: spot.y, adopted: true });
+    const m = /^tree:(\d+)$/.exec(key);
+    const tree = m && typeof treeSpot === 'function' ? treeSpot(Number(m[1])) : null;
+    if (Number.isFinite(tree?.x) && Number.isFinite(tree?.y)) {
+      slot.adopted[key] = { x: Math.round(tree.x), y: Math.round(tree.y - 2) };
+    }
+    const at = slot.adopted[key];
+    plan.push({ key, classTsid: plot.classTsid, x: at.x, y: at.y, adopted: true });
   }
   return plan;
 }
@@ -787,7 +801,10 @@ export const patchesFeature = {
     // Home streets pass their cultivated Patches (js/features/homes-feature.js).
     const counts = street?.soilCounts || soilCountsForStreet(street?.tsid || engine.streetTsid);
     const now = Date.now();
-    let planned = [...soilSpawnPlan(counts, (key) => engine.placement(key)), ...adoptedPlan(slot)];
+    let planned = [
+      ...soilSpawnPlan(counts, (key) => engine.placement(key)),
+      ...adoptedPlan(slot, (index) => engine.placement('trees')?.[index]),
+    ];
     planned = setupDemo(engine, slot, planned);
     const items = prepareStreetPlots(slot, planned, { tsid: engine.streetTsid, hubId: hubIdOf(engine), now });
     plannedItems = items;

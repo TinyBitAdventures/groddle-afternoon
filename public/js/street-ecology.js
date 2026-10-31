@@ -345,6 +345,122 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
   };
 }
 
+/**
+ * Big scenery needs a floor under it (lane PERCH, 2026-10-31): a bean tree
+ * planned onto a 24 px branch stub halfway up Groddle Forest Junction's great
+ * trunk stood as a tree in a tree. Each group below needs a continuous run of
+ * floor about its own width, half of it on each side of its spot.
+ *
+ * The widths are the art as game.js draws it:
+ * - trees: the trants' full-grown frames (assets/sprites/trants/frames/*_m10.png,
+ *   m7 is the same size) at spawnTrees' trantDisplayScale (210 px tall, never
+ *   above 1:1): trant_bean 198x270 -> 154 px, trant_bubble 167x277 -> 127,
+ *   trant_egg 296x278 -> 224, trant_fruit 271x249 -> 229, trant_gas 276x258 -> 225,
+ *   trant_spice 318x250 -> 267, and the Wood Tree's 88 px frame (treeWoodGrowth,
+ *   1:1). The planner sees the group, not the class, so it asks for TREE_FOOTPRINT
+ *   px: every trant's foot on the floor (the frames' bottom 15%, drawn: trant_egg's
+ *   roots 171 px, trant_spice 136, trant_bean 130, the rest under 60), while a
+ *   wider canopy may reach past an edge as a real tree's does.
+ * - gardens: garden-view.js gardenLayout's bed box, 280 px for the four-plot
+ *   strip (the first garden) and 227 px for the three-plot herb bed.
+ * - vendor: the Street Spirit art (decos/groddle/vendor.webp, 422 px) at 0.25.
+ * - shrine: one shrine cell (151 px) at spawnShrine's 0.78.
+ * - rocks: the mining sheets' opaque art (assets/sprites/mining, cells 131-137 px)
+ *   at spawnMineRock's 0.85: metal 134 -> 114 px, beryl and sparkly 114 -> 97,
+ *   dullite 108 -> 92.
+ * Animals, quoins, apples and the rest keep the plain rule: any line wide enough
+ * to sample.
+ */
+export const TREE_FOOTPRINT = 180;
+export const PLACEMENT_FOOTPRINTS = Object.freeze({
+  trees: TREE_FOOTPRINT,
+  gardens: 280,
+  vendor: 106,
+  shrine: 118,
+  rocks: 100,
+});
+
+/**
+ * Glitch floors are often many short lines joined end to end (or one line's
+ * end resting on another), so a floor's width is its run: lines that hold
+ * items (isStandable and isItemSolid) whose ends meet within FLOOR_JOIN_PX.
+ */
+export const FLOOR_JOIN_PX = 6;
+
+/**
+ * A spot is a perch when a floor run at least the footprint wide lies more than
+ * PERCH_DROP_PX under it (a branch or ledge over the street's floor; 150 px is
+ * well past the avatar's 105 px jump). Big scenery stands on a perch only when
+ * the floors below have no free, uncrowded spot left; a cliff top or an upper
+ * floor with nothing under it is a floor like any other.
+ */
+export const PERCH_DROP_PX = 150;
+
+function pointToSegment(px, py, p) {
+  const dx = p.x2 - p.x1;
+  const dy = p.y2 - p.y1;
+  const len2 = dx * dx + dy * dy;
+  const t = len2 ? Math.max(0, Math.min(1, ((px - p.x1) * dx + (py - p.y1) * dy) / len2)) : 0;
+  return Math.hypot(px - (p.x1 + dx * t), py - (p.y1 + dy * t));
+}
+
+/**
+ * For each line that holds items, the x spans of the floor run it belongs to
+ * (merged where they meet within FLOOR_JOIN_PX). Returns a Map line -> spans.
+ */
+export function floorRunSpans(lines) {
+  const n = lines.length;
+  const parent = Array.from({ length: n }, (_, i) => i);
+  const find = (i) => {
+    while (parent[i] !== i) {
+      parent[i] = parent[parent[i]];
+      i = parent[i];
+    }
+    return i;
+  };
+  const touches = (a, b) => [[a.x1, a.y1], [a.x2, a.y2]].some(([x, y]) => pointToSegment(x, y, b) <= FLOOR_JOIN_PX);
+  for (let i = 0; i < n; i += 1) {
+    for (let j = i + 1; j < n; j += 1) {
+      const a = lines[i];
+      const b = lines[j];
+      if (Math.min(a.x1, a.x2) > Math.max(b.x1, b.x2) + FLOOR_JOIN_PX) continue;
+      if (Math.min(b.x1, b.x2) > Math.max(a.x1, a.x2) + FLOOR_JOIN_PX) continue;
+      if (touches(a, b) || touches(b, a)) parent[find(i)] = find(j);
+    }
+  }
+  const byRun = new Map();
+  lines.forEach((line, i) => {
+    const r = find(i);
+    if (!byRun.has(r)) byRun.set(r, []);
+    byRun.get(r).push([Math.min(line.x1, line.x2), Math.max(line.x1, line.x2)]);
+  });
+  const merged = new Map();
+  for (const [r, spans] of byRun) {
+    spans.sort((a, b) => a[0] - b[0]);
+    const runSpans = [];
+    for (const [lo, hi] of spans) {
+      const last = runSpans[runSpans.length - 1];
+      if (last && lo <= last[1] + FLOOR_JOIN_PX) last[1] = Math.max(last[1], hi);
+      else runSpans.push([lo, hi]);
+    }
+    merged.set(r, runSpans);
+  }
+  const out = new Map();
+  lines.forEach((line, i) => out.set(line, merged.get(find(i))));
+  return out;
+}
+
+/**
+ * The widest footprint a spot at x on `line` can hold: twice the floor its
+ * run gives on the narrower side.
+ */
+function roomAt(spans, x) {
+  for (const [lo, hi] of spans || []) {
+    if (x >= lo - 0.01 && x <= hi + 0.01) return 2 * Math.max(0, Math.min(x - lo, hi - x));
+  }
+  return 0;
+}
+
 /** Build dense, stable candidates along the lower reachable platform bands. */
 export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '' } = {}) {
   // Only lines the avatar stands on (street-model.js isStandable): an underside or
@@ -371,6 +487,20 @@ export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '' } 
   let pool = clean.filter((p) => (p.y1 + p.y2) / 2 >= lowerThreshold);
   if (pool.length < 4) pool = clean;
 
+  // Each item spot's room (the footprint its floor run holds, PLACEMENT_FOOTPRINTS)
+  // and `under`: the widest floor run more than PERCH_DROP_PX below it (0: none).
+  const itemLines = clean.filter((p) => isItemSolid(p));
+  const spans = floorRunSpans(itemLines);
+  const under = (x, y) => {
+    let widest = 0;
+    for (const line of itemLines) {
+      if (x < Math.min(line.x1, line.x2) || x > Math.max(line.x1, line.x2)) continue;
+      const t = line.x2 === line.x1 ? 0 : (x - line.x1) / (line.x2 - line.x1);
+      if (line.y1 + (line.y2 - line.y1) * t <= y + PERCH_DROP_PX) continue;
+      for (const [lo, hi] of spans.get(line)) if (x >= lo && x <= hi) widest = Math.max(widest, hi - lo);
+    }
+    return widest;
+  };
   const candidates = [];
   const seen = new Set();
   for (let pIndex = 0; pIndex < pool.length; pIndex += 1) {
@@ -386,7 +516,15 @@ export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '' } 
       const key = `${Math.round(x / 22)}:${Math.round(y / 14)}`;
       if (seen.has(key)) continue;
       seen.add(key);
-      candidates.push({ id: `${platform.id || pIndex}:${i}`, x, y, item: isItemSolid(platform) });
+      const item = isItemSolid(platform);
+      candidates.push({
+        id: `${platform.id || pIndex}:${i}`,
+        x,
+        y,
+        item,
+        room: item ? roomAt(spans.get(platform), x) : 0,
+        under: item ? under(x, y) : 0,
+      });
     }
   }
   candidates.sort((a, b) => {
@@ -413,8 +551,16 @@ function scaledDistance(a, b, verticalScale = 1.75) {
  * obey_physics false), where the player reaches them, so they keep the avatar's
  * floor too; a shelf only items rest on (pc_perm 0, item_perm -1) holds none.
  *
+ * Big scenery (PLACEMENT_FOOTPRINTS, or a request's own `footprint`) also needs
+ * room: a spot whose floor run holds its width, half on each side. Among those it
+ * takes, in order: a floor spot clear of everything placed (nearest >= 1), a
+ * perch (PERCH_DROP_PX) that is clear, a crowded floor spot, a crowded perch;
+ * the plan lists perches under `perches` ({ key, index }). When no free spot has
+ * the room the thing still goes down, on the roomiest spots left, and the plan
+ * lists it under `fallbacks` ({ key, index, room, footprint }).
+ *
  * @param {any[]} platforms
- * @param {{key:string,count:number,clearance:number}[]} requests
+ * @param {{key:string,count:number,clearance:number,footprint?:number}[]} requests
  */
 export function planStreetPlacements(
   platforms,
@@ -426,18 +572,34 @@ export function planStreetPlacements(
     .map((point, index) => ({ ...point, key: point.key || `reserved:${index}`, clearance: whole(point.clearance, 120, 600) }));
   const used = new Set();
   const groups = {};
+  const fallbacks = [];
+  const perches = [];
 
   for (const request of requests || []) {
     const count = whole(request?.count, 0, 40);
     const clearance = whole(request?.clearance, 40, 600);
     groups[request.key] = [];
     const avatar = request.key === 'player' || request.avatar === true;
+    const footprint = avatar ? 0 : Number.isFinite(request?.footprint)
+      ? Math.max(0, request.footprint)
+      : PLACEMENT_FOOTPRINTS[request.key] || 0;
     for (let index = 0; index < count; index += 1) {
+      // The room this one asks for: its footprint, or the most any free spot has.
+      let need = 0;
+      if (footprint > 0) {
+        for (const candidate of candidates) {
+          if (used.has(candidate.id) || candidate.item === false) continue;
+          need = Math.max(need, Math.min(footprint, candidate.room || 0));
+        }
+        if (need < footprint) fallbacks.push({ key: request.key, index, room: Math.round(need), footprint });
+      }
       let best = null;
       let bestScore = -Infinity;
+      let bestTier = Infinity;
       for (const candidate of candidates) {
         if (used.has(candidate.id)) continue;
         if (!avatar && candidate.item === false) continue;
+        if (need > 0 && (candidate.room || 0) < need) continue;
         const nearest = occupied.length
           ? Math.min(...occupied.map((other) => {
               const needed = Math.max(1, clearance + other.clearance);
@@ -450,12 +612,17 @@ export function planStreetPlacements(
         const edgeBias = Math.min(candidate.x, worldW - candidate.x) / Math.max(1, worldW) * 0.08;
         const jitter = (stableEcologyHash(`${seed}:${request.key}:${index}:${candidate.id}`) % 1000) / 100000;
         const score = nearest + centerBias + edgeBias + jitter;
-        if (score > bestScore) {
+        const tier = footprint > 0
+          ? ((candidate.under || 0) >= footprint ? 1 : 0) + (nearest < 1 ? 2 : 0)
+          : 0;
+        if (tier < bestTier || (tier === bestTier && score > bestScore)) {
+          bestTier = tier;
           bestScore = score;
           best = candidate;
         }
       }
       if (!best) break;
+      if (footprint > 0 && (best.under || 0) >= footprint) perches.push({ key: request.key, index });
       used.add(best.id);
       const point = { x: best.x, y: best.y, id: best.id, key: request.key, clearance };
       groups[request.key].push(point);
@@ -463,7 +630,7 @@ export function planStreetPlacements(
     }
   }
 
-  return { seed: String(seed), groups, occupied, candidateCount: candidates.length };
+  return { seed: String(seed), groups, occupied, candidateCount: candidates.length, fallbacks, perches };
 }
 
 export function nearestPlacementGap(plan, fromKey, toKeys = null) {

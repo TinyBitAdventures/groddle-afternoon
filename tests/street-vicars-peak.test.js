@@ -11,7 +11,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry } from '../public/js/street-model.js?v=23b926e5';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=4be109b9';
-import { planStreetPlacements, populationForStreet } from '../public/js/street-ecology.js?v=7e30da8f';
+import { planStreetPlacements, populationForStreet } from '../public/js/street-ecology.js?v=9c1a5f07';
 import {
   BOTTOM_DOOR,
   LADDER_SPOTS,
@@ -28,7 +28,7 @@ import {
   vicarsPeakEcology,
 } from '../public/js/vicars-peak.js?v=465e7965';
 import { vicarsPeakFeature } from '../public/js/features/vicars-peak-feature.js?v=b830235a';
-import { FEATURES } from '../public/js/features/index.js?v=e098c6f0';
+import { FEATURES } from '../public/js/features/index.js?v=6600dd60';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

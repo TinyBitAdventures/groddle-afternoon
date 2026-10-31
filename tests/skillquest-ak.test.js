@@ -31,7 +31,7 @@ import {
   createAkState,
 } from '../public/js/skillquest-ak.js?v=281b956d';
 import { listAnimalFeedOptions } from '../public/js/animals.js?v=e857d0af';
-import { populationForStreet } from '../public/js/street-ecology.js?v=7e30da8f';
+import { populationForStreet } from '../public/js/street-ecology.js?v=9c1a5f07';
 import { newxpFeature } from '../public/js/features/newxp-feature.js?v=8563f9a7';
 
 const here = dirname(fileURLToPath(import.meta.url));

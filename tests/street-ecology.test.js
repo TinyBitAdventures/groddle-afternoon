@@ -13,7 +13,7 @@ import {
   planStreetPlacements,
   nearestPlacementGap,
   STREET_ECOLOGY_URL,
-} from '../public/js/street-ecology.js?v=7e30da8f';
+} from '../public/js/street-ecology.js?v=9c1a5f07';
 import {
   platformsScreen,
   platformYAt,
@@ -282,10 +282,13 @@ describe('one-pass platform placement', () => {
       'shrine',
       'rocks',
       'piggies',
-      'chickens',
-      'butterflies',
     ]);
     assert.ok(majorGap >= 180, `major arrival gap ${majorGap}`);
+    // Lane PERCH (2026-10-31): big scenery stays off branch stubs now, so this
+    // busy starter floor is fuller and a Chicken or resting Butterfly lands a
+    // little nearer (147 px; 213 before). Every other street keeps 180+.
+    const smallGap = nearestPlacementGap(first, 'player', ['chickens', 'butterflies']);
+    assert.ok(smallGap >= 140, `small arrival gap ${smallGap}`);
   });
 });
 
