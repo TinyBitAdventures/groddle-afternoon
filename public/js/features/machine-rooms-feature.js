@@ -93,7 +93,7 @@ import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { worldToScreen } from '../street-model.js?v=23b926e5';
 import { nearestSurfaceY } from '../walk-surface.js?v=764d5f5a';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
-import { createSheetLoader } from '../sprite-sheets.js?v=ec7b4119';
+import { createSheetLoader } from '../sprite-sheets.js?v=1b2de668';
 import {
   LOW_FUEL_BUBBLE_MS,
   LOW_FUEL_LINE,
@@ -103,7 +103,7 @@ import {
   machineFrame,
   machineSheetDef,
   roomMachineState,
-} from '../machine-art.js?v=fc8d675e';
+} from '../machine-art.js?v=0fb7a5ca';
 
 export const MACHINE_ROOMS_FEATURE_ID = 'machine-rooms';
 const MUSIC_CARD = 'metalmaking_music';

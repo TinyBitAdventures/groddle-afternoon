@@ -18008,38 +18008,6 @@
    0.9859
   ]
  },
- "assets/sprites/garden/plot_seedling.png": {
-  "animal": "garden-seedling",
-  "swf": "harvestable_resources/garden/garden_new.swf",
-  "sprite": 0,
-  "label": null,
-  "swfFrames": [
-   1,
-   1
-  ],
-  "swfLabelFrames": 1,
-  "cells": 1,
-  "fw": 81,
-  "fh": 43,
-  "mirror": false,
-  "shift": 0,
-  "offset3x": [
-   -30,
-   -12
-  ],
-  "score": 0.9706,
-  "minFrame": 0.9706,
-  "faintFrames": 0,
-  "faintMin": 1,
-  "drift": [],
-  "status": "ok",
-  "hires": "assets/sprites/garden/plot_seedling@3x.webp",
-  "bytes": 13242,
-  "firstDraw": true,
-  "frameScores": [
-   0.9706
-  ]
- },
  "assets/sprites/cultivation/barnacle_pod.png": {
   "animal": "barnacle-pod",
   "swf": "harvestable_resources/barnacle_pod/barnacle_pod.swf",
@@ -36366,25 +36334,6 @@
    0.9784
   ]
  },
- "assets/sprites/garden/bed_frame_wood.png": {
-  "animal": "garden-bed",
-  "character": "garden-bed",
-  "source": "tools/garden-art",
-  "status": "ok",
-  "hires": "assets/sprites/garden/bed_frame_wood@3x.png",
-  "bytes": 5595,
-  "cells": 1,
-  "fw": 280,
-  "fh": 110,
-  "scoreKind": "our own art redrawn at 3x by tools/garden-art (no SWF)",
-  "score": 1,
-  "minFrame": 1,
-  "drift": [],
-  "firstDraw": true,
-  "frameScores": [
-   1
-  ]
- },
  "assets/sprites/butler/butler_box.png": {
   "animal": "butler-box",
   "swf": "misc/butler_box/butler_box.swf",
@@ -42943,6 +42892,401 @@
    0.9675,
    0.9682,
    0.9696
+  ]
+ },
+ "assets/sprites/garden/garden_bed_apartment_2_2.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_bed_apartment_2_2@3x.webp",
+  "bytes": 20358,
+  "cells": 1,
+  "fw": 231,
+  "fh": 59,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9826,
+  "minFrame": 0.9826,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9826
+  ]
+ },
+ "assets/sprites/garden/garden_bed_polcrop_2_2.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_bed_polcrop_2_2@3x.webp",
+  "bytes": 45204,
+  "cells": 1,
+  "fw": 296,
+  "fh": 75,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9681,
+  "minFrame": 0.9681,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9681
+  ]
+ },
+ "assets/sprites/garden/garden_bed_polcrop_2_4.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_bed_polcrop_2_4@3x.webp",
+  "bytes": 68146,
+  "cells": 1,
+  "fw": 458,
+  "fh": 74,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9721,
+  "minFrame": 0.9721,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9721
+  ]
+ },
+ "assets/sprites/garden/garden_bed_polcrop_3_5.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_bed_polcrop_3_5@3x.webp",
+  "bytes": 100358,
+  "cells": 1,
+  "fw": 587,
+  "fh": 93,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9732,
+  "minFrame": 0.9732,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9732
+  ]
+ },
+ "assets/sprites/garden/garden_bed_polgroddle_1_3.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_bed_polgroddle_1_3@3x.webp",
+  "bytes": 38642,
+  "cells": 1,
+  "fw": 319,
+  "fh": 56,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9563,
+  "minFrame": 0.9563,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9563
+  ]
+ },
+ "assets/sprites/garden/garden_bed_polgroddle_2_2.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_bed_polgroddle_2_2@3x.webp",
+  "bytes": 39974,
+  "cells": 1,
+  "fw": 271,
+  "fh": 70,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9654,
+  "minFrame": 0.9654,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9654
+  ]
+ },
+ "assets/sprites/garden/garden_bed_polherb_2_2.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_bed_polherb_2_2@3x.webp",
+  "bytes": 78864,
+  "cells": 1,
+  "fw": 296,
+  "fh": 80,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9505,
+  "minFrame": 0.9505,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9505
+  ]
+ },
+ "assets/sprites/garden/garden_bed_polherb_2_4.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_bed_polherb_2_4@3x.webp",
+  "bytes": 104668,
+  "cells": 1,
+  "fw": 464,
+  "fh": 82,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9527,
+  "minFrame": 0.9527,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9527
+  ]
+ },
+ "assets/sprites/garden/garden_bed_polherb_3_5.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_bed_polherb_3_5@3x.webp",
+  "bytes": 153670,
+  "cells": 1,
+  "fw": 583,
+  "fh": 99,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9553,
+  "minFrame": 0.9553,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9553
+  ]
+ },
+ "assets/sprites/garden/garden_bed_shimla_1_1.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_bed_shimla_1_1@3x.webp",
+  "bytes": 18196,
+  "cells": 1,
+  "fw": 103,
+  "fh": 44,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9698,
+  "minFrame": 0.9698,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9698
+  ]
+ },
+ "assets/sprites/garden/garden_bed_shimla_2_1.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_bed_shimla_2_1@3x.webp",
+  "bytes": 24502,
+  "cells": 1,
+  "fw": 156,
+  "fh": 63,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9734,
+  "minFrame": 0.9734,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9734
+  ]
+ },
+ "assets/sprites/garden/garden_bed_shimla_3_1.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_bed_shimla_3_1@3x.webp",
+  "bytes": 28640,
+  "cells": 1,
+  "fw": 192,
+  "fh": 81,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9751,
+  "minFrame": 0.9751,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9751
+  ]
+ },
+ "assets/sprites/garden/garden_bed_strip_1_1.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_bed_strip_1_1@3x.webp",
+  "bytes": 5998,
+  "cells": 1,
+  "fw": 94,
+  "fh": 31,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9824,
+  "minFrame": 0.9824,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9824
+  ]
+ },
+ "assets/sprites/garden/garden_bed_strip_2_1.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_bed_strip_2_1@3x.webp",
+  "bytes": 10236,
+  "cells": 1,
+  "fw": 147,
+  "fh": 50,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9832,
+  "minFrame": 0.9832,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9832
+  ]
+ },
+ "assets/sprites/garden/garden_bed_strip_3_1.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_bed_strip_3_1@3x.webp",
+  "bytes": 13324,
+  "cells": 1,
+  "fw": 183,
+  "fh": 68,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9841,
+  "minFrame": 0.9841,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9841
+  ]
+ },
+ "assets/sprites/garden/garden_bed_strip_4_1.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_bed_strip_4_1@3x.webp",
+  "bytes": 17234,
+  "cells": 1,
+  "fw": 230,
+  "fh": 88,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9834,
+  "minFrame": 0.9834,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9834
+  ]
+ },
+ "assets/sprites/garden/garden_crops.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_crops@3x.webp",
+  "bytes": 498162,
+  "cells": 25,
+  "fw": 499,
+  "fh": 271,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.9401,
+  "minFrame": 0.8921,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.954,
+   0.9658,
+   0.9658,
+   0.9531,
+   0.9515,
+   0.8921,
+   0.9523,
+   0.9679,
+   0.916,
+   0.9221,
+   0.9549,
+   0.9377,
+   0.953,
+   0.909,
+   0.9301,
+   0.9435,
+   0.9489,
+   0.9,
+   0.9012,
+   0.9473,
+   0.9454,
+   0.9572,
+   0.9591,
+   0.915,
+   0.9605
+  ]
+ },
+ "assets/sprites/garden/garden_plots.png": {
+  "animal": "garden-art",
+  "character": "garden-art",
+  "source": "tools/garden-art",
+  "swf": "harvestable_resources/garden/garden_new.swf",
+  "status": "ok",
+  "hires": "assets/sprites/garden/garden_plots@3x.webp",
+  "bytes": 90460,
+  "cells": 12,
+  "fw": 480,
+  "fh": 71,
+  "scoreKind": "each symbol: the zoom-3 render box-downscaled 3:1 vs FFDec zoom 1",
+  "score": 0.928,
+  "minFrame": 0.8633,
+  "drift": [],
+  "firstDraw": true,
+  "frameScores": [
+   0.9435,
+   0.94,
+   0.969,
+   0.872,
+   0.9179,
+   0.9323,
+   0.8907,
+   0.9373,
+   0.951,
+   0.9671,
+   0.8633,
+   0.9523
   ]
  }
 }

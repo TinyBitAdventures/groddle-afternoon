@@ -182,7 +182,7 @@ describe('vendor NPC art', () => {
   });
 
   it('swaps every strip to a 3x render of its vector SWF on first draw, frame for frame', async () => {
-    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, SPLIT_SPRITES } = await import('../public/js/sprite-hires.js?v=5919dfde');
+    const { FIRST_DRAW_SPRITES, HIRES_SPRITES, SPLIT_SPRITES } = await import('../public/js/sprite-hires.js?v=f7ea0bd5');
     const results = JSON.parse(readFileSync(join(PUBLIC, '../tools/vector-sprites/results.json'), 'utf8'));
     for (const cls of VENDOR_NPC_CLASSES) {
       for (const [state, art] of Object.entries(VENDOR_NPC_ART[cls].states)) {

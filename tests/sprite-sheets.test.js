@@ -47,7 +47,7 @@ before(async () => {
   globalThis.PIXI = { ImageSource, Texture, Rectangle };
   globalThis.Image = FakeImage;
   globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => ({ drawImage() {} }) }) };
-  S = await import('../public/js/sprite-sheets.js?v=ec7b4119');
+  S = await import('../public/js/sprite-sheets.js?v=1b2de668');
 });
 after(() => {
   for (const [k, v] of Object.entries(saved)) globalThis[k] = v;

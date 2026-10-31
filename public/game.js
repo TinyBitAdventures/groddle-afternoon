@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e2372a6b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=69d27380';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5cd0389e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -532,7 +532,7 @@ import {
   recipeToolInUse,
 } from './js/making.js?v=9e538296';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
-import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=fc8d675e';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=0fb7a5ca';
 import {
   createGarden,
   tickGarden,
@@ -558,6 +558,7 @@ import {
   hasWateringCan,
   hasHoe,
 } from './js/garden.js?v=9a8f8f72';
+import { PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=bddf68c7';
 import {
   ROCK_CATALOG,
   createMineRock,
@@ -869,7 +870,7 @@ import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreferen
 import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=b916a6e4';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
-import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=5919dfde';
+import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=f7ea0bd5';
 import { denseSprite } from './js/sprite-dense.js?v=8e0109eb';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=d85330ff';
@@ -8181,7 +8182,8 @@ function showGardenTendFocus() {
     gardenTendMark.label = 'garden-tend-focus';
   }
   gardenTendMark.clear();
-  gardenTendMark.roundRect(-GARDEN_CELL_W / 2 + 2, -GARDEN_CELL_H + 2, GARDEN_CELL_W - 4, GARDEN_CELL_H - 4, 6)
+  // The plot's base is a soil patch about 81 x 23: the glow follows its oval.
+  gardenTendMark.ellipse(0, -GARDEN_PLOT_H / 2, GARDEN_PLOT_W / 2 + 2, GARDEN_PLOT_H / 2 + 3)
     .fill({ color: 0xa8e4ff, alpha: 0.22 })
     .stroke({ color: 0xa8e4ff, width: 3, alpha: 0.95 });
   if (gardenTendMark.parent !== plot.sprite.parent) plot.sprite.parent?.addChild(gardenTendMark);
@@ -24540,23 +24542,37 @@ function WORLD_LABEL_STYLE(fontSize) {
   };
 }
 
-/** Plot spacing — tall enough for raised 3D soil mounds (128×96 art). */
-const GARDEN_CELL_W = 52;
-const GARDEN_CELL_H = 36;
-const GARDEN_PAD_X = 10;
-const GARDEN_PAD_Y = 8;
-/** Visual size of raised dirt sprite (preserves mound aspect, not flat square). */
-const GARDEN_DIRT_W = 50;
-const GARDEN_DIRT_H = 38;
+/**
+ * Gardens are Tiny Speck's garden_new.swf pieces (js/garden-art.js), put together as
+ * GardenView.as and GardenPlotView.as did (js/garden-view.js): the bed for the garden's
+ * style, then each plot's wet or dry base with its seeds, seedling, crop, harvested
+ * patch or depleted soil on top, back row first. A plot's hit box is its base.
+ */
+const gardenPieceTextures = new Map();
+function gardenPiece(name) {
+  const f = gardenFrame(name);
+  if (!f) return null;
+  let tex = gardenPieceTextures.get(name);
+  if (!tex || tex.destroyed) {
+    tex = frameTexture(textureFromUrl(f.url), new PIXI.Rectangle(f.x, f.y, f.w, f.h));
+    gardenPieceTextures.set(name, tex);
+  }
+  const spr = new PIXI.Sprite(tex);
+  spr.position.set(f.ox, f.oy);
+  spr.eventMode = 'none';
+  return spr;
+}
+/** How far a back-row plot's hit box reaches up over its plant (the plant is part of the plot). */
+const GARDEN_BACK_ROW_REACH = 34;
 
 /**
  * Place a multi-plot crop/herb garden on the street with individually
- * clickable plots in **world coordinates** (original GardenPlotView feel).
+ * clickable plots in **world coordinates** (GardenPlotView, one per plot).
  *
  * Plots are NOT nested local UI children — each has world x/y so hover/E
  * hit-testing works. No dialog: click/E on a plot opens the verb menu.
  *
- * @param {{ x?: number, y?: number, cols?: number, rows?: number, gardenType?: 'default'|'herb', label?: string }} [opts]
+ * @param {{ x?: number, y?: number, cols?: number, rows?: number, gardenType?: 'default'|'herb', label?: string, style?: string }} [opts]
  */
 function spawnGarden(opts = {}) {
   if (!entityLayer) return null;
@@ -24579,32 +24595,35 @@ function spawnGarden(opts = {}) {
   const originX = opts.x ?? p.x + (gardenType === 'herb' ? -40 : 180);
   const originY = opts.y ?? p.y + 2;
 
-  const bedW = cols * GARDEN_CELL_W + GARDEN_PAD_X * 2;
-  // Extra room for raised dirt front-faces
-  const bedH = rows * GARDEN_CELL_H + GARDEN_PAD_Y * 2 + 12;
+  // Home gardens wear polcrop/polherb beds (garden_new.js onCultivated); street ones strip/shimla.
+  const style = gardenStyle({ gardenType, rows: garden.rows || rows, home: Boolean(opts.detached), style: opts.style });
+  const layout = gardenLayout({ cols: garden.cols || cols, rows: garden.rows || rows, style });
+  // GardenView.place: centred on its x, standing on its y (plants left out of the box).
+  const left = Math.round(originX - (layout.box.x0 + layout.box.x1) / 2);
+  const top = Math.round(originY - layout.box.y1);
+  const bedW = Math.round(layout.box.w);
 
-  // Bed frame in world space (beveled wood — not flat dialog chrome)
   const root = new PIXI.Container();
-  root.x = originX;
-  root.y = originY;
+  root.x = left;
+  root.y = top;
   root.zIndex = itemZ('garden_new', 8);
   root.eventMode = 'none';
-
-  const wood = new PIXI.Sprite(textureFromUrl('assets/sprites/garden/bed_frame_wood.png'));
-  wood.anchor.set(0.5, 1);
-  wood.width = bedW + 8;
-  wood.height = bedH + 10;
-  wood.y = 2;
-  wood.eventMode = 'none';
-  if (gardenType === 'herb') wood.tint = 0xd0e8b8;
-  root.addChild(wood);
-  root.bedFrame = wood;
+  for (const bed of layout.beds) {
+    const spr = gardenPiece(bed.name);
+    if (!spr) continue;
+    spr.x += bed.x;
+    spr.y += bed.y;
+    root.addChild(spr);
+  }
+  root.gardenStyle = style;
 
   const tag = new PIXI.Text(
     { text: opts.label || (gardenType === 'herb' ? 'Herbs' : 'Garden'), style: WORLD_LABEL_STYLE(11) }
   );
   tag.anchor.set(0.5, 1);
-  tag.y = -bedH - 4;
+  // Above the back row's grown plants (the tallest crop reaches 66 px over its plot).
+  tag.x = Math.round((layout.box.x0 + layout.box.x1) / 2);
+  tag.y = Math.min(layout.box.y0, -66) - 4;
   tag.eventMode = 'none';
   root.addChild(tag);
   root.gardenTag = tag;
@@ -24633,22 +24652,17 @@ function spawnGarden(opts = {}) {
   gardens.push(gardenEntity);
 
   // Individual plots in **world** space so spriteWorldHitBox works
-  for (const key of listPlotKeys(garden)) {
-    const [c, r] = key.split('-').map(Number);
+  for (const plotPos of layout.plots) {
+    const key = plotPos.key;
+    if (!getPlot(garden, key)) continue;
     const cell = new PIXI.Container();
-    // Anchor bottom-center of each dirt square
-    cell.x =
-      originX - bedW / 2 + GARDEN_PAD_X + (c - 1) * GARDEN_CELL_W + GARDEN_CELL_W / 2;
-    cell.y =
-      originY - bedH + GARDEN_PAD_Y + r * GARDEN_CELL_H;
-    cell.zIndex = itemZ('garden_plot', 9 + r * 0.3);
-    // Explicit hit size (Containers report 0 size until children drawn)
-    cell.hitArea = new PIXI.Rectangle(
-      -GARDEN_CELL_W / 2,
-      -GARDEN_CELL_H,
-      GARDEN_CELL_W,
-      GARDEN_CELL_H
-    );
+    // The cell's point is the bottom centre of the plot's base; the pieces hang off it.
+    cell.x = left + plotPos.x + GARDEN_PLOT_W / 2;
+    cell.y = top + plotPos.y + GARDEN_PLOT_H;
+    cell.zIndex = itemZ('garden_plot', 9 + plotPos.r * 0.3);
+    cell._gardenHitW = GARDEN_PLOT_W;
+    cell._gardenHitH = GARDEN_PLOT_H + (plotPos.r === 1 ? GARDEN_BACK_ROW_REACH : 0);
+    cell.hitArea = new PIXI.Rectangle(-cell._gardenHitW / 2, -cell._gardenHitH, cell._gardenHitW, cell._gardenHitH);
     entityLayer.addChild(cell);
     root.plotViews[key] = cell;
 
@@ -24668,18 +24682,67 @@ function spawnGarden(opts = {}) {
     gardenEntity.state.plotTargets.push(plotTarget);
   }
 
+  applyGardenStatesQa(garden);
   drawGardenPlots(gardenEntity);
   return gardenEntity;
 }
 
-function plotDirtTexture(plot) {
-  if (!plot || plot.state === 'dirty') return 'assets/sprites/garden/plot_dirty.png';
-  if (plot.wet) return 'assets/sprites/garden/plot_wet.png';
-  return 'assets/sprites/garden/plot_dry.png';
+/**
+ * QA `?gardenstates=1`: the plots of every garden drawn take a spread of states, so one look
+ * shows them all: crop gardens empty, seeds, seedling dry, fertilized, grown tomato and corn,
+ * harvested dry and wet; herb gardens empty wet, herb seedling dry and wet, grown rubeweed,
+ * purple flower and gandlevery (a small herb garden: seedling, grown, harvested, empty).
+ * `&gardendepleted=1` marks the gardens worn out (their empty plots show the depleted soil).
+ * Canvas `gardenArt` lists each garden's type, style, world spot (its foot: centre x, ground y)
+ * and plot pieces.
+ */
+const GARDEN_STATES_QA = (() => {
+  try {
+    const q = new URLSearchParams(location.search);
+    return q.get('gardenstates') ? { depleted: q.get('gardendepleted') === '1' } : null;
+  } catch {
+    return null;
+  }
+})();
+function applyGardenStatesQa(garden) {
+  if (!GARDEN_STATES_QA || !garden?.plots || garden._qaStates) return;
+  garden._qaStates = true;
+  const herb = garden.gardenType === 'herb';
+  const keys = listPlotKeys(garden);
+  const states = herb
+    ? (keys.length <= 4
+      ? [{ state: 'shoots', seed: 'herb_seed_rubeweed', wet: true }, { state: 'crop', seed: 'herb_seed_rubeweed' }, { state: 'dirty', wet: true }, { state: 'clean' }]
+      : [{ state: 'clean', wet: true }, { state: 'shoots', seed: 'herb_seed_rubeweed' }, { state: 'shoots', seed: 'herb_seed_rubeweed', wet: true },
+        { state: 'crop', seed: 'herb_seed_rubeweed', wet: true }, { state: 'crop', seed: 'herb_seed_purple_flower' }, { state: 'crop', seed: 'herb_seed_gandlevery' }])
+    : [{ state: 'clean' }, { state: 'seeds', seed: 'seed_tomato' }, { state: 'shoots', seed: 'seed_tomato' }, { state: 'shoots', seed: 'seed_corn', wet: true, fertilized: true },
+      { state: 'crop', seed: 'seed_tomato', wet: true }, { state: 'crop', seed: 'seed_corn' }, { state: 'dirty' }, { state: 'dirty', wet: true },
+      { state: 'clean', wet: true }, { state: 'shoots', seed: 'seed_pumpkin', wet: true }, { state: 'crop', seed: 'seed_pumpkin' }];
+  const now = Date.now();
+  keys.forEach((key, i) => {
+    const s = states[i % states.length];
+    // Growing plots hold their stage for the look (their stage starts a month from now).
+    const held = s.state === 'seeds' || s.state === 'shoots' ? now + 30 * 86_400_000 : now;
+    Object.assign(garden.plots[key], { state: s.state, seed: s.seed || null, wet: Boolean(s.wet), wetAt: s.wet ? now : null, fertilized: Boolean(s.fertilized), stageStartedAt: held, growthMs: 0 });
+  });
+  if (GARDEN_STATES_QA.depleted) garden.depleted = true;
+}
+function noteGardenArt() {
+  if (!app?.canvas) return;
+  app.canvas.dataset.gardenArt = gardens.map((g) => {
+    const root = g._gardenRoot;
+    const garden = g.state?.garden;
+    if (!root || !garden) return '';
+    const plots = listPlotKeys(garden).map((k) => {
+      const p = root.plotViews[k]?.gardenPieces;
+      return p ? `${k}=${p.base}${p.grow ? `+${p.grow}` : ''}` : `${k}=?`;
+    });
+    const foot = g.sprite;
+    return `${garden.gardenType}:${root.gardenStyle}@${Math.round(foot?.x || 0)},${Math.round(foot?.y || 0)}:${plots.join(',')}`;
+  }).join(';');
 }
 
 /**
- * Rebuild per-plot visuals on world-space cells.
+ * Rebuild per-plot visuals on world-space cells (GardenPlotView.buildPlot).
  */
 function drawGardenPlots(target) {
   const garden = target?.state?.garden;
@@ -24698,76 +24761,20 @@ function drawGardenPlots(target) {
     if (!cell) continue;
     // Keep plotTarget ref
     const plotTarget = cell.plotTarget;
-    cell.removeChildren();
+    cell.removeChildren().forEach((c) => c.destroy());
     cell.plotTarget = plotTarget;
 
-    // Raised 3D soil mound (front face + shaded top) — not a flat UI square
-    const dirt = new PIXI.Sprite(textureFromUrl(plotDirtTexture(plot)));
-    dirt.anchor.set(0.5, 1);
-    dirt.width = GARDEN_DIRT_W;
-    dirt.height = GARDEN_DIRT_H;
-    dirt.eventMode = 'none';
-    cell.addChild(dirt);
-
-    // Plants sit on top surface of the mound (~60% up the dirt sprite)
-    const plantY = -Math.round(GARDEN_DIRT_H * 0.42);
-
     const seed = plot?.seed ? SEED_CATALOG[plot.seed] : null;
-    if (plot?.state === 'seeds') {
-      const dots = new PIXI.Graphics();
-      dots.circle(-5, plantY - 2, 2.2);
-      dots.circle(5, plantY - 1, 2);
-      dots.circle(0, plantY - 5, 1.8);
-      dots.fill({ color: 0xf5e6a8, alpha: 0.95 });
-      dots.eventMode = 'none';
-      cell.addChild(dots);
-    } else if (plot?.state === 'shoots') {
-      const sprout = new PIXI.Sprite(
-        textureFromUrl('assets/sprites/garden/plot_seedling.png')
-      );
-      sprout.anchor.set(0.5, 1);
-      sprout.scale.set(0.95);
-      sprout.y = plantY;
-      sprout.eventMode = 'none';
-      cell.addChild(sprout);
-    } else if (plot?.state === 'crop' && seed) {
-      const stalk = new PIXI.Sprite(
-        textureFromUrl('assets/sprites/garden/plot_seedling.png')
-      );
-      stalk.anchor.set(0.5, 1);
-      stalk.scale.set(1.25);
-      stalk.y = plantY;
-      stalk.eventMode = 'none';
-      cell.addChild(stalk);
-      const produce = new PIXI.Sprite(textureFromUrl(cropIcon(seed.cropId)));
-      produce.anchor.set(0.5, 1);
-      produce.scale.set(0.52);
-      produce.y = plantY - 26;
-      produce.eventMode = 'none';
-      cell.addChild(produce);
-    } else if (plot?.state === 'dirty') {
-      // Weeds already partly baked into dirty tile; add a few taller blades
-      const weeds = new PIXI.Graphics();
-      weeds.moveTo(-7, plantY + 4);
-      weeds.lineTo(-3, plantY - 10);
-      weeds.lineTo(1, plantY + 4);
-      weeds.lineTo(4, plantY - 8);
-      weeds.lineTo(8, plantY + 4);
-      weeds.fill({ color: 0x4a5a30, alpha: 0.9 });
-      weeds.eventMode = 'none';
-      cell.addChild(weeds);
+    const pieces = plotPieces(plot, { gardenType: garden.gardenType, cropId: seed?.cropId, depleted: Boolean(garden.depleted) });
+    for (const name of [pieces.base, pieces.grow]) {
+      const spr = name && gardenPiece(name);
+      if (!spr) continue;
+      // Pieces sit at the plot's origin, the base's top-left; the cell's point is its bottom centre.
+      spr.x -= GARDEN_PLOT_W / 2;
+      spr.y -= GARDEN_PLOT_H;
+      cell.addChild(spr);
     }
-
-    // Ensure hit area stays after redraw
-    cell.hitArea = new PIXI.Rectangle(
-      -GARDEN_CELL_W / 2,
-      -GARDEN_CELL_H,
-      GARDEN_CELL_W,
-      GARDEN_CELL_H
-    );
-    // Fake dimensions for spriteWorldHitBox (uses spr.width/height)
-    cell._gardenHitW = GARDEN_CELL_W;
-    cell._gardenHitH = GARDEN_CELL_H;
+    cell.gardenPieces = pieces;
 
     if (plotTarget) {
       plotTarget.state.plot = plot;
@@ -24795,6 +24802,7 @@ function drawGardenPlots(target) {
   if (entity) {
     entity.subtitle = 'Click a plot · water all on bed edge';
   }
+  noteGardenArt();
 }
 
 function refreshGardenVisual(target) {

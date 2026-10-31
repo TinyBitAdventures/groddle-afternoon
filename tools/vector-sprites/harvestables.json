@@ -1071,23 +1071,6 @@
    ]
   },
   {
-   "name": "garden-seedling",
-   "swf": "harvestable_resources/garden/garden_new.swf",
-   "sprite": 0,
-   "sheets": [
-    {
-     "path": "assets/sprites/garden/plot_seedling.png",
-     "fw": 81,
-     "fh": 43,
-     "cols": 1,
-     "frames": 1,
-     "swfStart": 1,
-     "swfCount": 1,
-     "mirror": false
-    }
-   ]
-  },
-  {
    "name": "barnacle-pod",
    "swf": "harvestable_resources/barnacle_pod/barnacle_pod.swf",
    "sprite": 0,

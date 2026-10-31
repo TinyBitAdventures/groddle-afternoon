@@ -149,7 +149,7 @@ describe('loading-card strips are our own renders (G316)', () => {
 
 describe('sprites, decos and garden art (G316)', () => {
   it('every 3x sprite file exists; the butterfly sheets render the CC0 glitch-items SWF', async () => {
-    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=5919dfde');
+    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=f7ea0bd5');
     for (const [lo, hi] of HIRES_SPRITES) {
       assert.ok(existsSync(join(pub, lo.split('?')[0])), lo);
       assert.ok(existsSync(join(pub, hi)), hi);
@@ -176,13 +176,29 @@ describe('sprites, decos and garden art (G316)', () => {
     for (const n of ['patch_grass_2', 'patch_grass_4', 'patch_grass_6']) assert.ok(!names.includes(n), n);
   });
 
-  it('the fruit tree and garden art come from CC0 cells or our own drawing', () => {
+  it('the fruit tree and garden art come from CC0 cells or SWFs', () => {
     const game = readFileSync(join(pub, 'game.js'), 'utf8');
     assert.match(game, /treeFruit: \{ url: 'assets\/sprites\/trants\/frames\/trant_fruit_m7\.png', whole: true \}/);
     assert.ok(existsSync(join(pub, 'assets/sprites/trants/frames/trant_fruit_m7.png')));
-    for (const f of ['plot_dry.png', 'plot_wet.png', 'plot_dirty.png', 'bed_frame_wood.png']) {
-      assert.ok(existsSync(join(pub, 'assets/sprites/garden', f)), f);
+    // 2026-10-31: the gardens are Tiny Speck's garden_new.swf (CC0 glitch-items), rendered by
+    // tools/garden-art/build.mjs; the drawn G316 stand-ins (plot_dry/wet/dirty, bed_frame_wood) retired.
+    const art = JSON.parse(readFileSync(join(root, 'tools/garden-art/garden.json'), 'utf8'));
+    assert.equal(art.source.repo, 'tinyspeck/glitch-items');
+    assert.equal(art.source.path, 'harvestable_resources/garden/garden_new.swf');
+    assert.equal(art.source.licence, 'CC0 1.0');
+    assert.match(art.source.blob, /^[0-9a-f]{40}$/);
+    const sha = (f) => createHash('sha256').update(readFileSync(join(pub, f))).digest('hex');
+    for (const [file, row] of Object.entries(art.files)) {
+      assert.equal(sha(file), row.sha256, file);
+      assert.equal(sha(row.hires), row.sha256_3, row.hires);
     }
-    assert.match(readFileSync(join(root, 'tools/garden-art/build.py'), 'utf8'), /plot_\{s\}\.png/);
+    const others = new Set(['bean_garden__x1_1_x1_2_x1_3_x1_4_png_1354836553.png', 'bean_garden__x1_iconic_png_1354836553.png', 'garden_new__x1_1_png_1354833270.png']);
+    const listed = new Set(Object.entries(art.files).flatMap(([f, r]) => [f, r.hires].map((p) => p.split('/').pop())));
+    for (const f of readdirSync(join(pub, 'assets/sprites/garden'))) assert.ok(listed.has(f) || others.has(f), f);
+    for (const f of ['plot_dry.png', 'plot_wet.png', 'plot_dirty.png', 'bed_frame_wood.png']) {
+      assert.ok(!existsSync(join(pub, 'assets/sprites/garden', f)), f);
+      assert.ok(!game.includes(`assets/sprites/garden/${f}`), f);
+    }
+    assert.ok(!existsSync(join(root, 'tools/garden-art/build.py')));
   });
 });

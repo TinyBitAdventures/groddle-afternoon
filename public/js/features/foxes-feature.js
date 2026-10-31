@@ -48,7 +48,7 @@ import { addItem, countItem, removeItem } from '../inventory.js?v=85d4faba';
 import { getToolCondition } from '../tools.js?v=9a2e7ef4';
 import { worldToScreen } from '../street-model.js?v=23b926e5';
 import { OVERLAY_USES, playOverlay } from '../overlays.js?v=106b9955';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=ec7b4119';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=764d5f5a';
 import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js?v=670c3a7f';
 import {

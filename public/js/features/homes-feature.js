@@ -185,14 +185,14 @@ import {
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=68506420';
 import { DISPATCHER_HALF, DISPATCHER_TEXT, dispatcherFits, gateX, savedDispatcherRx, streetFixtures } from '../home-street-fixtures.js?v=57eaae87';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=ec7b4119';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
 import { projectApi } from './street-jobs-feature.js?v=398a7110';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=6ccb3a4f';
 import { towerApi } from './home-tower-feature.js?v=a9047342';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=e676f00f';
 import { wantsHiresDecos } from '../deco-hires.js?v=cc8506f6';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=d7088df4';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=4b0d8834';
 import { patchesFeature } from './patches-feature.js?v=9cf66cf0';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=3996c344';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
@@ -5126,6 +5126,18 @@ function wearFromEvent(engine, counter) {
 function wearItem(engine, id, n = 1, st = activeCult()) {
   const result = addWear(st, id, n, qaWear(engine));
   if (result.depleted) {
+    // include/garden.js onDepleted + harvest (580-584), countEmptyPlots: a worn-out garden
+    // with plots still growing stays until they are picked; its empty plots show the
+    // depleted soil (GardenPlotView mature_level 5).
+    const garden = st.gardens?.[id];
+    if (garden?.plots && Object.values(garden.plots).some((p) => p && p.state !== 'clean' && p.state !== 'dirty')) {
+      if (!garden.depleted) {
+        garden.depleted = true;
+        engine.save();
+        engine.refreshHomeScene?.();
+      }
+      return result;
+    }
     depleteItem(engine, id, {}, st);
     engine.refreshHomeScene?.();
   }

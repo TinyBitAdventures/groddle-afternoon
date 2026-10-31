@@ -330,7 +330,8 @@ describe('UI wiring for garden', () => {
     const game = readFileSync(join(__dirname, '../public/game.js'), 'utf8');
     assert.ok(game.includes('spawnGarden') || game.includes('garden_new'));
     assert.ok(game.includes('garden_plot'));
-    assert.ok(game.includes('plot_seedling') || game.includes('plot_dry'));
+    // Tiny Speck's garden_new.swf pieces (js/garden-view.js), not drawn stand-ins.
+    assert.ok(game.includes('plotPieces(plot') && game.includes('gardenLayout('));
     assert.ok(
       game.includes("gardenType: 'herb'") ||
       game.includes('gardenType: "herb"') ||
@@ -344,12 +345,12 @@ describe('UI wiring for garden', () => {
     // No tend→dialog path (original is on-map plots only)
     assert.ok(!content.includes('openGarden: true'));
     assert.ok(game.includes('_gardenHitW') || game.includes('garden_plot'));
-    // World plot dirt + seedling assets
+    // World plot, plant and bed art (tools/garden-art from garden_new.swf)
     for (const f of [
-      'plot_dry.png',
-      'plot_wet.png',
-      'plot_dirty.png',
-      'plot_seedling.png',
+      'garden_plots.png',
+      'garden_crops.png',
+      'garden_bed_strip_2_1.png',
+      'garden_bed_shimla_2_1.png',
       'garden_new__x1_1_png_1354833270.png',
     ]) {
       const p = join(__dirname, '../public/assets/sprites/garden', f);

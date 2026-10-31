@@ -41,7 +41,7 @@ import {
 } from '../public/js/home-street-mp.js?v=0fc12d80';
 import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../public/js/note-pole-art.js?v=860d393a';
 import { isSharedJob } from '../public/js/street-jobs-mp.js?v=74c659ea';
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=e1b5bfb9';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=f7217fac';
 import { projectTable } from '../tools/build-realtime-projects.mjs';
 import { HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 
