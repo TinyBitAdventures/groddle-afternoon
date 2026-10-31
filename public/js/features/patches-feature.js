@@ -39,8 +39,8 @@
  */
 
 import { ensureItem } from '../inventory.js?v=85d4faba';
-import { platformYAt } from '../street-model.js?v=77584eff';
-import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=face8516';
+import { isItemFloor, platformYAt } from '../street-model.js?v=23b926e5';
+import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=7e30da8f';
 import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=4e140315';
 import {
@@ -182,6 +182,7 @@ export function demoPlotClass(variant) {
 function surfaceNear(platforms, x, refY) {
   let best = null;
   for (const platform of Array.isArray(platforms) ? platforms : []) {
+    if (!isItemFloor(platform)) continue;
     const y = platformYAt(platform, x, 0);
     if (y == null || y < refY - 90 || y > refY + 260) continue;
     if (best == null || Math.abs(y - refY) < Math.abs(best - refY)) best = y;

@@ -20,7 +20,7 @@ import {
   reachableEvents,
   runLocationEvent,
   streetOwner,
-} from '../public/js/location-events.js?v=b45cd9c3';
+} from '../public/js/location-events.js?v=61e0c5d3';
 import { createFeatureHost } from '../public/js/feature-host.js?v=e4f648b1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -197,7 +197,7 @@ describe('location events', () => {
 
 describe('walkable fallback', () => {
   test('only platforms the arrival chain re-enables may be switched off', async () => {
-    const { recoverableToggles } = await import('../public/js/location-events.js?v=b45cd9c3');
+    const { recoverableToggles } = await import('../public/js/location-events.js?v=61e0c5d3');
     const events = {
       player_enter: [{ type: 'plat', plat: 'p1', pc_perm: 0 }, { type: 'event', event: 'cycle', delay: 2000 }],
       cycle: [{ type: 'plat', plat: 'p1', pc_perm: -1 }, { type: 'wall', wall: 'w1', pc_perm: 0 }],

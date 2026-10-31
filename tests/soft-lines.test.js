@@ -20,10 +20,10 @@ import {
   platformsScreen,
   resolveGround,
   streetWidth,
-} from '../public/js/street-model.js?v=77584eff';
-import { buildPlatformCandidates, planStreetPlacements } from '../public/js/street-ecology.js?v=face8516';
-import { landingY } from '../public/js/walk-surface.js?v=cf02de0e';
-import { OWNED_STREETS } from '../public/js/location-events.js?v=b45cd9c3';
+} from '../public/js/street-model.js?v=23b926e5';
+import { buildPlatformCandidates, planStreetPlacements } from '../public/js/street-ecology.js?v=7e30da8f';
+import { landingY } from '../public/js/walk-surface.js?v=764d5f5a';
+import { OWNED_STREETS } from '../public/js/location-events.js?v=61e0c5d3';
 
 const spike = join(import.meta.dirname, '..');
 const streetsDir = join(spike, 'public/assets/streets');

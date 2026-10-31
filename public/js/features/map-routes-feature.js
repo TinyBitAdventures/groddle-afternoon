@@ -45,8 +45,8 @@
  * the door glow sits, G200).
  */
 
-import { STREET_INDEX } from '../street-loader.js?v=4b282477';
-import { hellFeature } from './hell-feature.js?v=bdaefff5';
+import { STREET_INDEX } from '../street-loader.js?v=d4113627';
+import { hellFeature } from './hell-feature.js?v=6825f033';
 import {
   ROUTE_COLOR,
   ROUTE_COLOR_CSS,

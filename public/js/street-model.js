@@ -86,11 +86,14 @@ export function platformsScreen(street) {
     // falls through), null (the source's <null id="platform_pc_perm"/>) hard both
     // ways. A line with no pc_perm at all (built by hand) is a plain floor.
     const pcPerm = Number.isFinite(p.pc_perm) ? p.pc_perm : p.pc_perm === null ? null : undefined;
+    // The same for items (platform_item_perm; isItemSolid): -1 items rest on it, 1 an
+    // underside items fall through, 0 soft both ways, null hard both ways.
+    const itemPerm = Number.isFinite(p.item_perm) ? p.item_perm : p.item_perm === null ? null : undefined;
     // ensure left→right for queries
     if (a.x <= b.x) {
-      return { id: p.id, x1: a.x, y1: a.y, x2: b.x, y2: b.y, pcPerm };
+      return { id: p.id, x1: a.x, y1: a.y, x2: b.x, y2: b.y, pcPerm, itemPerm };
     }
-    return { id: p.id, x1: b.x, y1: b.y, x2: a.x, y2: a.y, pcPerm };
+    return { id: p.id, x1: b.x, y1: b.y, x2: a.x, y2: a.y, pcPerm, itemPerm };
   });
 }
 
@@ -259,13 +262,15 @@ export function platformYAt(p, x, margin = 4) {
  * @param {number} x
  * @param {number} feetY
  * @param {number} [maxRise=6]
+ * @param {(p:object) => boolean} [solid=isStandable] the line rule: isStandable for
+ *   the avatar and its stand-ins, isItemSolid for a creature that is an item
  * @returns {{ y:number, platform:object }|null}
  */
-export function groundBeneath(platforms, x, feetY, maxRise = 6) {
+export function groundBeneath(platforms, x, feetY, maxRise = 6, solid = isStandable) {
   let below = null;
   let lowest = null;
   for (const p of platforms || []) {
-    if (!isStandable(p)) continue;
+    if (!solid(p)) continue;
     const y = platformYAt(p, x, 0);
     if (y == null) continue;
     if (y >= feetY - maxRise && (!below || y < below.y)) below = { y, platform: p };
@@ -283,8 +288,8 @@ export function groundBeneath(platforms, x, feetY, maxRise = 6) {
  * both ways, null hard both ways. A pc_perm 0 line is no collider for the avatar
  * at all (AvatarPhysicsHandler.as 955-957, "not a collider for pcs at all, pass
  * through"): mostly item shelves (platform_item_perm -1), where items rest and
- * players walk through, such as Odena Odes' full-width cave line. Items use
- * item_perm, which the street JSON does not carry. A location event that switches
+ * players walk through. Items go by item_perm instead (isItemSolid). A location
+ * event that switches
  * a line on sets its pcPerm (location-events-feature setPlatform), and then it
  * stands. `pcPerm` comes from platformsScreen (raw street lines carry pc_perm);
  * lines built by hand (scene floors) carry neither and stay standable.
@@ -292,6 +297,42 @@ export function groundBeneath(platforms, x, feetY, maxRise = 6) {
 export function isStandable(p) {
   const perm = p?.pcPerm !== undefined ? p.pcPerm : p?.pc_perm;
   return perm !== 1 && perm !== 0;
+}
+
+/**
+ * A line an item rests on: the client's item_solid_from_top (PlatformLine.as
+ * 349-351, `!(platform_item_perm == 1 || platform_item_perm == 0)`), the filter of
+ * getPlatsSolidFromTopForItems (PlatformLine.as 127), which the client uses for
+ * where items sit. In the original every creature, rock, tree, quoin and dropped
+ * thing on a street is an item. The source's platform_item_perm: -1 solid from the
+ * top only (items rest on it), 1 solid from the bottom only (an underside or
+ * ceiling, 2,047 lines, nearly all pc_perm 1 too), 0 soft both ways, null hard both
+ * ways. Most lines agree with pc_perm; where they differ, a shelf (pc_perm 0,
+ * item_perm -1) holds items the avatar walks through, and Odena Odes' cave line
+ * (pc_perm 0, item_perm 1) holds neither. A location event can set it
+ * (location-events-feature setPlatform, GSJS inc_events.js). `itemPerm` comes from
+ * platformsScreen (raw street lines carry item_perm). Every archived line has one.
+ * A line the remake drew by hand with a pc_perm but no item_perm (the rebuilt
+ * streets, 38 of them) takes its pc_perm, as Tiny Speck's editor drew new lines
+ * (LocoDecoSWFBridge.as 2732-2739: item perm set with the pc perm, -1 for a floor,
+ * 1 for a roof); a line with neither (a scene floor) is solid, as an unset perm is
+ * in the client.
+ */
+export function isItemSolid(p) {
+  let perm = p?.itemPerm !== undefined ? p.itemPerm : p?.item_perm;
+  if (perm === undefined) perm = p?.pcPerm !== undefined ? p.pcPerm : p?.pc_perm;
+  return perm !== 1 && perm !== 0;
+}
+
+/**
+ * A line for something placed where the avatar goes to use it (a tree, rock,
+ * quoin, garden, shrine, vendor, street furniture): the original's editors set
+ * those by hand (GSJS obey_physics false), on floors the player stands on, so the
+ * remake's stand-in placements need a line that both holds items (isItemSolid)
+ * and is a floor for the avatar (isStandable).
+ */
+export function isItemFloor(p) {
+  return isStandable(p) && isItemSolid(p);
 }
 
 /**

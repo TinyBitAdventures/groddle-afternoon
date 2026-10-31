@@ -48,7 +48,7 @@
  * Surazu's door target; features/hell-bar-feature.js draws and runs it.
  */
 
-import { HELL_BAR, HELL_BARTENDER } from './hell.js?v=68b57749';
+import { HELL_BAR, HELL_BARTENDER } from './hell.js?v=454c9f42';
 import { HELL_BAR_FILES } from './hell-bar-art.js?v=fc723c41';
 
 export const HELL_BAR_TSID = 'GA5FPUNAI7P2NVF';

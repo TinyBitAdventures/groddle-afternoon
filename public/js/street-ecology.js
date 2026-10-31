@@ -3,7 +3,7 @@
  * placement on recovered locations-xml platforms.
  */
 
-import { isStandable } from './street-model.js?v=77584eff';
+import { isItemSolid, isStandable } from './street-model.js?v=23b926e5';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
 
@@ -351,6 +351,9 @@ export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '' } 
   // ceiling (pc_perm 1) floats a tree (the cave roof on Meadow's Edge), and a soft
   // line (pc_perm 0) is one the player falls through, so a spot there (the arrival
   // too) hangs mid-air (Odena Odes' cave line).
+  // Each spot also says whether the line holds items (`item`, isItemSolid): every
+  // planned thing is an item in the original and needs one (planStreetPlacements);
+  // only the arrival goes by the avatar's rule alone.
   const clean = (platforms || []).filter((platform) => {
     return [platform?.x1, platform?.y1, platform?.x2, platform?.y2].every(Number.isFinite)
       && isStandable(platform);
@@ -383,7 +386,7 @@ export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '' } 
       const key = `${Math.round(x / 22)}:${Math.round(y / 14)}`;
       if (seen.has(key)) continue;
       seen.add(key);
-      candidates.push({ id: `${platform.id || pIndex}:${i}`, x, y });
+      candidates.push({ id: `${platform.id || pIndex}:${i}`, x, y, item: isItemSolid(platform) });
     }
   }
   candidates.sort((a, b) => {
@@ -399,6 +402,16 @@ function scaledDistance(a, b, verticalScale = 1.75) {
 /**
  * Allocate every category in one pass. Large scenery goes first, then roaming
  * NPCs and collectibles fill the remaining platform anchors.
+ *
+ * Every spot is on a floor the avatar stands on (buildPlatformCandidates). The
+ * player's arrival (`key: 'player'`, or `avatar: true`) needs nothing more; every
+ * other request places a thing that is an item in the original (a tree, rock, quoin,
+ * animal, apple, garden, vendor...), so its spot must also be on a line items rest
+ * on (the client's item_solid_from_top, street-model.js isItemSolid): Umbra's
+ * walkway that items fall through (pc_perm -1, item_perm 0) holds none of them.
+ * The trees, rocks, quoins and animals are set by hand in the original (GSJS
+ * obey_physics false), where the player reaches them, so they keep the avatar's
+ * floor too; a shelf only items rest on (pc_perm 0, item_perm -1) holds none.
  *
  * @param {any[]} platforms
  * @param {{key:string,count:number,clearance:number}[]} requests
@@ -418,11 +431,13 @@ export function planStreetPlacements(
     const count = whole(request?.count, 0, 40);
     const clearance = whole(request?.clearance, 40, 600);
     groups[request.key] = [];
+    const avatar = request.key === 'player' || request.avatar === true;
     for (let index = 0; index < count; index += 1) {
       let best = null;
       let bestScore = -Infinity;
       for (const candidate of candidates) {
         if (used.has(candidate.id)) continue;
+        if (!avatar && candidate.item === false) continue;
         const nearest = occupied.length
           ? Math.min(...occupied.map((other) => {
               const needed = Math.max(1, clearance + other.clearance);

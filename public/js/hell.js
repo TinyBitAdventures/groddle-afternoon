@@ -174,11 +174,11 @@ export const HOME_TSIDS = Object.freeze({ street: 'RH_HOME_EXT', interior: 'RH_H
 
 /** Hell One floor geometry embedded from assets/streets/GA5PPFP86NF2FOS.json. */
 export const HELL_ONE_PLATFORMS = Object.freeze([
-  Object.freeze({ id: 'plat_1319486971932', x1: 1244, y1: -195, x2: 1499, y2: -187, pc_perm: -1 }),
-  Object.freeze({ id: 'pl1263890361047', x1: -945, y1: -344, x2: -682, y2: -344, pc_perm: -1 }),
-  Object.freeze({ id: 'plat_1319489256886', x1: -1283, y1: -191, x2: -1069, y2: -199, pc_perm: -1 }),
-  Object.freeze({ id: 'plat_1319489256887', x1: -1499, y1: -203, x2: -1283, y2: -191, pc_perm: -1 }),
-  Object.freeze({ id: 'pl1263887138338', x1: -1069, y1: -199, x2: 1097, y2: -191, pc_perm: -1 }),
+  Object.freeze({ id: 'plat_1319486971932', x1: 1244, y1: -195, x2: 1499, y2: -187, pc_perm: -1, item_perm: -1 }),
+  Object.freeze({ id: 'pl1263890361047', x1: -945, y1: -344, x2: -682, y2: -344, pc_perm: -1, item_perm: -1 }),
+  Object.freeze({ id: 'plat_1319489256886', x1: -1283, y1: -191, x2: -1069, y2: -199, pc_perm: -1, item_perm: -1 }),
+  Object.freeze({ id: 'plat_1319489256887', x1: -1499, y1: -203, x2: -1283, y2: -191, pc_perm: -1, item_perm: -1 }),
+  Object.freeze({ id: 'pl1263887138338', x1: -1069, y1: -199, x2: 1097, y2: -191, pc_perm: -1, item_perm: -1 }),
 ]);
 
 const HELL_ONE_BOUNDS = Object.freeze({ l: -1500, r: 1500, t: -1000, b: 0 });

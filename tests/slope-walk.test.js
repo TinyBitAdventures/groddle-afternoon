@@ -10,9 +10,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { SLOPE_STICK, holdCloseToFloor, stickToSlope } from '../public/js/slope-walk.js?v=9af1e505';
-import { platformsScreen, resolveGround } from '../public/js/street-model.js?v=77584eff';
+import { platformsScreen, resolveGround } from '../public/js/street-model.js?v=23b926e5';
 import { avatarAnimState } from '../public/js/avatar-anims.js?v=fb921bf4';
-import { landingY } from '../public/js/walk-surface.js?v=cf02de0e';
+import { landingY } from '../public/js/walk-surface.js?v=764d5f5a';
 
 const root = join(import.meta.dirname, '..');
 const babySteppes = JSON.parse(readFileSync(join(root, 'public/assets/streets/GM416LNIKVLM1.json'), 'utf8'));

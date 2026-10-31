@@ -54,7 +54,7 @@
 
 import { addItem, removeItem, countItem } from '../inventory.js?v=85d4faba';
 import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=6b6cbf22';
-import { groundBeneath, platformYAt, platformsScreen } from '../street-model.js?v=77584eff';
+import { groundBeneath, isItemSolid, platformYAt, platformsScreen } from '../street-model.js?v=23b926e5';
 import { sheetFrames } from '../quest-rooms/kit.js?v=fd1eb817';
 import {
   JUJU_BANDIT,
@@ -462,8 +462,9 @@ function spawn(engine, { mode, itemClass, now = Date.now() }) {
   // point), and only where it can walk to you: jujuSpawnPoint skips ledges.
   const feet = { x: p.x, y: groundBeneath(platforms, p.x, p.y, 6)?.y ?? p.y };
   const spot = jujuSpawnPoint(feet, width, {
-    spawnFloor: (sx) => (floorNear(platforms, sx, feet.y) || groundBeneath(platforms, sx, feet.y - JUJU_BANDIT.spawnSearchUp, 0))?.y ?? null,
-    groundAhead: (gx, gy) => groundBeneath(platforms, gx, gy, STEP_UP)?.y ?? null,
+    // The bandit is an item: it stands and walks by the item rule (isItemSolid).
+    spawnFloor: (sx) => (floorNear(platforms, sx, feet.y) || groundBeneath(platforms, sx, feet.y - JUJU_BANDIT.spawnSearchUp, 0, isItemSolid))?.y ?? null,
+    groundAhead: (gx, gy) => groundBeneath(platforms, gx, gy, STEP_UP, isItemSolid)?.y ?? null,
     stepUp: STEP_UP,
   });
   if (!spot) {
@@ -518,10 +519,11 @@ function spawn(engine, { mode, itemClass, now = Date.now() }) {
   return true;
 }
 
-/** The platform at x whose top is nearest feet height y (within 160 px), or null. */
+/** The line at x an item stands on whose top is nearest feet height y (within 160 px), or null. */
 function floorNear(list, x, y) {
   let best = null;
   for (const p of list) {
+    if (!isItemSolid(p)) continue;
     const py = platformYAt(p, x, 0);
     if (py == null || Math.abs(py - y) > 160) continue;
     if (!best || Math.abs(py - y) < Math.abs(best.y - y)) best = { y: py, platform: p };
@@ -681,7 +683,7 @@ function walk(engine, dtMs) {
   const step = Math.min(Math.abs(dx), (JUJU_BANDIT.walkSpeed * dtMs) / 1000) * dir;
   const nx = bandit.x + step;
   // npc_can_climb / can_fall, no jumping: follow the ground, stop at a wall of a step.
-  const ground = groundBeneath(platforms, nx, bandit.y, STEP_UP);
+  const ground = groundBeneath(platforms, nx, bandit.y, STEP_UP, isItemSolid);
   if (!ground || ground.y < bandit.y - STEP_UP) {
     stopMoving(engine);
     return;

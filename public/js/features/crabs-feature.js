@@ -38,7 +38,8 @@ import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { getGameDayKey } from '../game-day.js?v=3095e05b';
 import { cleanQuestMarkup } from '../quests.js?v=282e1621';
-import { walkSurfaceY } from '../walk-surface.js?v=cf02de0e';
+import { walkSurfaceY } from '../walk-surface.js?v=764d5f5a';
+import { isStandable } from '../street-model.js?v=23b926e5';
 import {
   CRAB_CLASS,
   CRAB_COPY,
@@ -566,11 +567,12 @@ function setupDemo(engine) {
       later(() => {
         crab.mode = 'idle';
         crab.waitUntil = Infinity;
-        // Stand on the crab's own floor, beside it where the floor goes on.
+        // Stand on the crab's own floor, beside it where the floor goes on (a floor
+        // for the avatar: the pc rule, not the item rule the crab walks by).
         const feet = crab.sprite.y - FEET_PAD * CRAB_SCALE;
-        const dx = [140, -140, 70, -70, 0].find((d) => walkSurfaceY(engine.platforms, crab.sprite.x + d, feet, { up: 24, down: 24 }) != null) ?? 0;
+        const dx = [140, -140, 70, -70, 0].find((d) => walkSurfaceY(engine.platforms, crab.sprite.x + d, feet, { up: 24, down: 24 }, isStandable) != null) ?? 0;
         engine.player.x = crab.sprite.x + dx;
-        engine.player.y = (walkSurfaceY(engine.platforms, crab.sprite.x + dx, feet, { up: 24, down: 24 }) ?? feet) - 4;
+        engine.player.y = (walkSurfaceY(engine.platforms, crab.sprite.x + dx, feet, { up: 24, down: 24 }, isStandable) ?? feet) - 4;
         engine.player.vx = 0;
         engine.player.vy = 0;
       }, 1500);

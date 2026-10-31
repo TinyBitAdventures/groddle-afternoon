@@ -32,7 +32,7 @@ import {
   isStandable,
   platformYAt,
   worldToScreen,
-} from '../public/js/street-model.js?v=77584eff';
+} from '../public/js/street-model.js?v=23b926e5';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const streetsDir = join(__dirname, '../public/assets/streets');

@@ -20,7 +20,7 @@ import {
   dueEventTimers,
   eventPlatformIds,
   runLocationEvent,
-} from '../public/js/location-events.js?v=b45cd9c3';
+} from '../public/js/location-events.js?v=61e0c5d3';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const raw = JSON.parse(readFileSync(join(root, 'public/assets/content/puzzle-triggers.json'), 'utf8'));
@@ -193,7 +193,7 @@ describe('location-events trigger API', () => {
   });
 
   test('without a strict hook, a platform only lost boxes switch back stays walkable', async () => {
-    const { locationEventsFeature, locationEventsApi } = await import('../public/js/features/location-events-feature.js?v=61fa7247');
+    const { locationEventsFeature, locationEventsApi } = await import('../public/js/features/location-events-feature.js?v=58727a27');
     const street = make();
     const engine = fakeEngine(street);
     locationEventsFeature.onStreetEnter(street, engine);
@@ -203,7 +203,7 @@ describe('location-events trigger API', () => {
   });
 
   test('a strict hook runs the scripts as written and restart re-applies them', async () => {
-    const { locationEventsFeature, locationEventsApi } = await import('../public/js/features/location-events-feature.js?v=61fa7247');
+    const { locationEventsFeature, locationEventsApi } = await import('../public/js/features/location-events-feature.js?v=58727a27');
     let strict = false;
     locationEventsApi.register({ strict: (s) => strict && s.tsid === 'GTESTPUZZLE0001' });
     const street = make();

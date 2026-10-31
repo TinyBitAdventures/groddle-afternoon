@@ -8,7 +8,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
-import { avatarHeadReach, headCeiling, isSolidFromBelow, isStandable, platformYAt, platformsScreen } from '../public/js/street-model.js?v=77584eff';
+import { avatarHeadReach, headCeiling, isSolidFromBelow, isStandable, platformYAt, platformsScreen } from '../public/js/street-model.js?v=23b926e5';
 
 const street = (path) => JSON.parse(readFileSync(new URL(`../public/assets/streets/${path}`, import.meta.url), 'utf8'));
 

@@ -173,6 +173,9 @@ export function convertGameObjectToStreet(gameObject, hubNames = {}, opts = {}) 
         const start = findChild(pl, 'object', 'start');
         const end = findChild(pl, 'object', 'end');
         if (!start || !end) continue;
+        // platform_item_perm: what the line is for items (street-model.js isItemSolid);
+        // an <int> or <null>, left off when the line has none (solid, as in the client).
+        const itemPerm = childValue(pl, 'platform_item_perm', undefined);
         platforms.push({
           id: pl.id || pl.attrs?.id || '',
           x1: Number(childValue(start, 'x', 0)),
@@ -180,6 +183,7 @@ export function convertGameObjectToStreet(gameObject, hubNames = {}, opts = {}) 
           x2: Number(childValue(end, 'x', 0)),
           y2: Number(childValue(end, 'y', 0)),
           pc_perm: childValue(pl, 'platform_pc_perm', -1),
+          ...(itemPerm === undefined ? {} : { item_perm: itemPerm }),
         });
       }
     }

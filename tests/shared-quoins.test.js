@@ -33,7 +33,7 @@ import {
   QUOIN_SHARD_FALL,
 } from '../public/js/quoin-shards.js?v=9a2e4c37';
 import { placementRequests, streetQuoinLayout, classTable, mysteryTable } from '../tools/build-realtime-quoins.mjs';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=face8516';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=7e30da8f';
 import { QUOIN_CLASSES } from '../public/js/quoins.js?v=d4f4772b';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
@@ -344,7 +344,7 @@ describe('the server data', () => {
   });
 
   it('ships the current layout for Hechey Track and every class the spots use', { skip: skipWithoutServer }, async () => {
-    const { loadStreetDataFromFs, applyStreetIndex } = await import('../public/js/street-loader.js?v=4b282477');
+    const { loadStreetDataFromFs, applyStreetIndex } = await import('../public/js/street-loader.js?v=d4113627');
     applyStreetIndex(index);
     for (const tsid of ['GLI2V0UN7RD1T2J', 'GLI3272LOTD1B1F']) {
       const data = await loadStreetDataFromFs(tsid, join(root, 'public/assets/streets'));

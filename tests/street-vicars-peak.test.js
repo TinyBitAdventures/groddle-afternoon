@@ -9,9 +9,9 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry } from '../public/js/street-model.js?v=77584eff';
-import { arrivalInTarget } from '../public/js/location-navigation.js?v=38c12adf';
-import { planStreetPlacements, populationForStreet } from '../public/js/street-ecology.js?v=face8516';
+import { assertStreetGeometry } from '../public/js/street-model.js?v=23b926e5';
+import { arrivalInTarget } from '../public/js/location-navigation.js?v=4be109b9';
+import { planStreetPlacements, populationForStreet } from '../public/js/street-ecology.js?v=7e30da8f';
 import {
   BOTTOM_DOOR,
   LADDER_SPOTS,
@@ -28,7 +28,7 @@ import {
   vicarsPeakEcology,
 } from '../public/js/vicars-peak.js?v=465e7965';
 import { vicarsPeakFeature } from '../public/js/features/vicars-peak-feature.js?v=b830235a';
-import { FEATURES } from '../public/js/features/index.js?v=23ffa6a0';
+import { FEATURES } from '../public/js/features/index.js?v=05df51b6';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

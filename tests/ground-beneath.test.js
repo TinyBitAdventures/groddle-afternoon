@@ -4,7 +4,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { groundBeneath } from '../public/js/street-model.js?v=77584eff';
+import { groundBeneath } from '../public/js/street-model.js?v=23b926e5';
 
 const floor = { x1: 0, y1: 800, x2: 1000, y2: 800 };
 const ledge = { x1: 300, y1: 500, x2: 600, y2: 500 };

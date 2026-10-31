@@ -21,7 +21,7 @@
  * (build-street-navigation.mjs) converts doors and boxes to screen space.
  */
 
-import { parseLocationXmlTree, findChild, childValue } from './location-xml.js?v=e2351f22';
+import { parseLocationXmlTree, findChild, childValue } from './location-xml.js?v=a4db2433';
 
 const objects = (node) => (node?.children || []).filter((c) => c.tag === 'object');
 const num = (v, fallback = 0) => (Number.isFinite(Number(v)) && v !== null && v !== '' ? Number(v) : fallback);

@@ -50,7 +50,7 @@ import {
   recoverableToggles,
   runLocationEvent,
   streetOwner,
-} from '../location-events.js?v=b45cd9c3';
+} from '../location-events.js?v=61e0c5d3';
 
 export const LOCATION_EVENTS_FEATURE_ID = 'location-events';
 const DATA_MS = 250;
@@ -109,12 +109,25 @@ function setDeco(engine, id, visible, fadeMs, now) {
   return true;
 }
 
-function setPlatform(engine, id, pcPerm) {
+/**
+ * An event's `plat` action (GSJS inc_events.js 238-262). `itemPerm` is set only when
+ * the action names one (undefined leaves the line's own), as GSJS does; it is what
+ * the line is for items (street-model.js isItemSolid). A pc_perm 0 line still leaves
+ * the list whole, as before, so the avatar's lines are exactly what they were.
+ */
+function setPlatform(engine, id, pcPerm, itemPerm) {
   const plats = engine.platforms;
   if (!Array.isArray(plats)) return false;
+  const setItem = (line) => {
+    if (itemPerm !== undefined && line && 'itemPerm' in line) line.itemPerm = itemPerm == null ? null : Number(itemPerm);
+  };
   if (Number(pcPerm) === 0) {
     const at = plats.findIndex((p) => p.id === id);
-    if (at < 0) return stash.has(id);
+    if (at < 0) {
+      setItem(stash.get(id));
+      return stash.has(id);
+    }
+    setItem(plats[at]);
     stash.set(id, plats[at]);
     plats.splice(at, 1);
     return true;
@@ -123,6 +136,7 @@ function setPlatform(engine, id, pcPerm) {
   // A line switched to 1 (solid from below) or null/-1 changes what it is for the avatar.
   const live = back || plats.find((p) => p.id === id);
   if (live && 'pcPerm' in live) live.pcPerm = pcPerm == null ? null : Number(pcPerm);
+  setItem(live);
   if (!back) return plats.some((p) => p.id === id);
   stash.delete(id);
   plats.push(back);
@@ -182,7 +196,7 @@ function applyEffects(engine, effects, now) {
           effectCounts.kept_walkable = (effectCounts.kept_walkable || 0) + 1;
           break;
         }
-        setPlatform(engine, fx.id, fx.pc_perm);
+        setPlatform(engine, fx.id, fx.pc_perm, fx.item_perm);
         break;
       case 'wall':
         if (!(fx.pc_perm != null && Number(fx.pc_perm) === 0) && !current?.strict && !current?.guard?.wallOpen.has(fx.id) && demo.stage !== 'run') {

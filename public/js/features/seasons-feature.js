@@ -37,13 +37,14 @@ import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=9a8f
 import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=9a8f8f72';
 import { setSeasonalRecipeCheck } from '../making.js?v=9e538296';
 import { getToolCondition } from '../tools.js?v=9a2e7ef4';
-import { landingY, nearestSurfaceY } from '../walk-surface.js?v=cf02de0e';
+import { landingY, nearestSurfaceY } from '../walk-surface.js?v=764d5f5a';
+import { isStandable } from '../street-model.js?v=23b926e5';
 import { isBatterflyHabitat } from '../animal-husbandry.js?v=16364589';
 import { emblemCostFor } from '../shrines.js?v=01b185bc';
 import { rollDropTable } from '../drop-tables.js?v=0f922478';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=21c55475';
 import { payDrop } from './drops-feature.js?v=92989dc5';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=9e15fe12';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=395dd6a2';
 import { SEASON_DATA } from '../seasons-data.js?v=249cedba';
 import {
   CANDY_CLASSES,
@@ -436,9 +437,10 @@ function clearSnow() {
   snow = null;
 }
 
-function groundAt(engine, x, refY) {
-  return landingY(engine.platforms, x, (refY ?? engine.groundY) - 60)
-    ?? nearestSurfaceY(engine.platforms, x, refY ?? engine.groundY)
+/** Where a lantern, pumpkin or candy cane rests (walk-surface's item rule); `solid` isStandable for the avatar. */
+function groundAt(engine, x, refY, solid = undefined) {
+  return landingY(engine.platforms, x, (refY ?? engine.groundY) - 60, solid)
+    ?? nearestSurfaceY(engine.platforms, x, refY ?? engine.groundY, solid)
     ?? engine.groundY;
 }
 
@@ -599,7 +601,7 @@ function previewAt(engine) {
   if (!d?.sprite) return;
   previewDone = true;
   engine.player.x = d.sprite.x - 90;
-  engine.player.y = groundAt(engine, engine.player.x, d.sprite.y) - 2;
+  engine.player.y = groundAt(engine, engine.player.x, d.sprite.y, isStandable) - 2;
   engine.player.vx = 0;
   engine.player.vy = 0;
   engine.snapCamera?.();

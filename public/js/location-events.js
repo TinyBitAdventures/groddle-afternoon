@@ -335,10 +335,12 @@ export function normalizeEventAction(raw) {
       return { type, name: String(raw.name || ''), loops: Math.max(1, num(raw.loops, 1)), all };
     case 'stop_sound':
       return { type, name: String(raw.name || ''), all };
+    // item_perm only when the action names it: GSJS (locations/inc_events.js 243-255)
+    // changes a line's or wall's item perm only `if (utils.has_key('item_perm', act))`.
     case 'plat':
-      return { type, plat: String(raw.plat_id || ''), pc_perm: raw.pc_perm ?? null };
+      return { type, plat: String(raw.plat_id || ''), pc_perm: raw.pc_perm ?? null, ...itemPermOf(raw) };
     case 'wall':
-      return { type, wall: String(raw.wall_id || ''), pc_perm: raw.pc_perm ?? null };
+      return { type, wall: String(raw.wall_id || ''), pc_perm: raw.pc_perm ?? null, ...itemPermOf(raw) };
     case 'pc_vog':
       return {
         type,
@@ -361,6 +363,10 @@ export function normalizeEventAction(raw) {
  * L*.xml `events` → { [eventName]: action[] } in run order.
  * @returns {Record<string, object[]>}
  */
+function itemPermOf(raw) {
+  return 'item_perm' in raw ? { item_perm: Number.isFinite(raw.item_perm) ? raw.item_perm : null } : {};
+}
+
 export function parseLocationEvents(xml) {
   const body = objectBodyById(String(xml || ''), 'events');
   if (body == null) return {};
@@ -487,7 +493,7 @@ export function createEventRuntime() {
 /**
  * Run one event (events_broadcast). Mutates the runtime (flags, physics,
  * timers) and returns the world effects for the caller to apply:
- * { type: 'deco', id, visible, fade } | { type: 'plat'|'wall', id, pc_perm }
+ * { type: 'deco', id, visible, fade } | { type: 'plat'|'wall', id, pc_perm, item_perm? }
  * | { type: 'sound', name, loops, stop } | { type: 'vog', lines }
  * | { type: 'activity', text } | { type: 'teleport', tsid, x, y }
  * | { type: 'quest_flag', flag } | { type: 'unsupported', action }
@@ -514,10 +520,10 @@ export function runLocationEvent(runtime, events, name, ctx = {}) {
         if (act.deco) effects.push({ type: 'deco', id: act.deco, visible: act.type === 'deco_show', fade: act.fade });
         break;
       case 'plat':
-        if (act.plat) effects.push({ type: 'plat', id: act.plat, pc_perm: act.pc_perm });
+        if (act.plat) effects.push({ type: 'plat', id: act.plat, pc_perm: act.pc_perm, ...('item_perm' in act ? { item_perm: act.item_perm } : {}) });
         break;
       case 'wall':
-        if (act.wall) effects.push({ type: 'wall', id: act.wall, pc_perm: act.pc_perm });
+        if (act.wall) effects.push({ type: 'wall', id: act.wall, pc_perm: act.pc_perm, ...('item_perm' in act ? { item_perm: act.item_perm } : {}) });
         break;
       case 'event':
         if (!act.event) break;

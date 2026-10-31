@@ -13,7 +13,7 @@
  * player out of your Party Space", with a confirmation) and 3963-3976.
  */
 
-import { PARTY_SPACES, isPartyPack } from './party-spaces.js?v=459a8597';
+import { PARTY_SPACES, isPartyPack } from './party-spaces.js?v=6fea0ad5';
 
 /** The hub street a space's members share (party_spaces.go partySpaceStreet + 16 hex, upper case). */
 export const MP_SPACE_STREET_RE = /^PARTY_[0-9A-F]{16}$/;

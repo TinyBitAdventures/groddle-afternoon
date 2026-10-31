@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e2372a6b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=23ffa6a0';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=05df51b6';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -576,7 +576,7 @@ import {
   availableStreetTsids,
   ensureStreetIndex,
   resolveIndexTsid,
-} from './js/street-loader.js?v=4b282477';
+} from './js/street-loader.js?v=d4113627';
 import {
   ladderTopDeck,
   resolveGround as resolveStreetGround,
@@ -591,9 +591,10 @@ import {
   buriedSignpostUnder,
   avatarHeadReach,
   headCeiling,
+  isItemFloor,
   isStandable,
-} from './js/street-model.js?v=77584eff';
-import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=881a57ff';
+} from './js/street-model.js?v=23b926e5';
+import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=f609fb2f';
 import {
   buildStreetView,
   signpostNear,
@@ -602,7 +603,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=134a6e9a';
+} from './js/street-render.js?v=1949ea5c';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -702,7 +703,7 @@ import {
 } from './js/travel.js?v=855c6c68';
 import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
 import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
-import { landingY } from './js/walk-surface.js?v=cf02de0e';
+import { landingY } from './js/walk-surface.js?v=764d5f5a';
 import { holdCloseToFloor, stickToSlope } from './js/slope-walk.js?v=9af1e505';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
@@ -844,7 +845,7 @@ import {
   populationForStreet,
   planStreetPlacements,
   nearestPlacementGap,
-} from './js/street-ecology.js?v=face8516';
+} from './js/street-ecology.js?v=7e30da8f';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=a1c4a308';
 import {
   actionLoopFor,
@@ -9631,8 +9632,9 @@ function glitchAnimState(requested) {
   }
   // onGround flickers on slopes; a few frames off the floor make it a jump or fall.
   const airborne = !player.onGround && (player.airFrames || 0) > 3;
-  // The floor the avatar will land on: never a ceiling or a soft line it falls through.
-  const floorY = airborne ? landingY(streetPlatforms?.filter(isStandable), player.x, player.y) : null;
+  // The floor the avatar will land on: never a ceiling or a soft line it falls through
+  // (the pc rule, not walk-surface's item rule).
+  const floorY = airborne ? landingY(streetPlatforms, player.x, player.y, isStandable) : null;
   const pack = player.pack;
   const idles = Boolean(pack?.idleLoader);
   const hit = player.hit && now < (player.hitUntil || 0) ? player.hit : null;
@@ -11477,10 +11479,13 @@ function dropPackItem(classTsid, requested = 1) {
   }
   const facing = player.facing === 'left' ? -1 : 1;
   const x = clamp(player.x + facing * 72, 24, Math.max(24, WORLD_W - 24));
-  // Tiny Speck's takeable_drop lifts the stack above pc.y. Our two-row pack
-  // overlaps more of the world, so use a larger readable lift while keeping the
-  // pile within pickup range and visually tethered to the avatar's platform.
-  const y = player.y - 74;
+  // Tiny Speck's takeable_drop (items/include/takeable.js 157-206) puts the stack in
+  // at pc.y - 20, and a stack obeys physics (obey_physics, true for takeables): it
+  // lands on the first line under it that holds items (walk-surface landingY, the
+  // client's item_solid_from_top). A shelf the avatar walks through catches it, and
+  // a line soft to items (Odena Odes' cave line) lets it fall to the floor below.
+  // With no line under it (off the street's edge) it stays by the avatar's feet.
+  const y = landingY(streetPlatforms, x, player.y - 20) ?? player.y;
   // G332: in multiplayer a public street's drop is everyone's, through the server (features/drops-mp-feature.js).
   if (features.query('sharedDrop', { classTsid, count, x, y }, engine)) {
     closePackPopover();
@@ -11814,8 +11819,10 @@ function samplePlatformPoints(n) {
     for (let i = 0; i < n; i++) pts.push({ x: 200 + i * 180, y: GROUND_Y });
     return pts;
   }
-  // Only floors the avatar stands on (no ceilings, no soft pc_perm 0 lines).
-  const floors = streetPlatforms.filter(isStandable);
+  // Only floors the avatar stands on (no ceilings, no soft pc_perm 0 lines) that hold
+  // items (street-model.js isItemFloor): the shrine, vendor, gardens, rocks and quoins
+  // placed here are items in the original.
+  const floors = streetPlatforms.filter(isItemFloor);
   const lines = floors.length ? floors : streetPlatforms;
   // Prefer platforms near the bottom third of the street
   const maxY = Math.max(...lines.map((p) => Math.max(p.y1, p.y2)));

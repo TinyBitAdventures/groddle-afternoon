@@ -30,7 +30,7 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
-import { platformsScreen, platformYAt } from '../street-model.js?v=77584eff';
+import { isItemFloor, platformsScreen, platformYAt } from '../street-model.js?v=23b926e5';
 import { frameTexture, textureFromUrl } from '../textures.js?v=01a295a1';
 import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=4e140315';
 import { noteWoodTreeCare } from '../patches.js?v=3996c344';
@@ -76,10 +76,11 @@ export function treeSpots(count, width) {
   return Array.from({ length: count }, (_, i) => Math.round(start + i * step));
 }
 
-/** The lowest floor (largest screen y) at x, or null. */
+/** The lowest floor (largest screen y) at x a tree stands on (isItemFloor), or null. */
 export function floorScreenY(platforms, x) {
   let best = null;
   for (const p of platforms || []) {
+    if (!isItemFloor(p)) continue;
     const y = platformYAt(p, x, 0);
     if (y != null && (best == null || y > best)) best = y;
   }

@@ -3,13 +3,21 @@
  * each layer's canvas size (w, h), its `filtersNEW` colour treatment
  * (brightness, contrast, saturation, tintColor, tintAmount, blur), and the
  * location's sky `gradient` (top, bottom), its `music_file` override, plus each
- * deco's `h_flip`, `hidden` and `animated` flags, and each layer's `is_hidden` (as `hidden`).
+ * deco's `h_flip`, `hidden` and `animated` flags, each layer's `is_hidden` (as `hidden`), and
+ * each platform line's `platform_item_perm` (as `item_perm`).
  * Source: tinyspeck/glitch-locations (CC0). Edits assets/streets/*.json in place; safe to re-run.
  *
  * `animated`: the client plays a placed deco's timeline only when the placement says so
  * (DecoRenderer.as 301-305: MCUtil.recursivePlay, else recursiveGotoAndStop on frame 1), at the
  * stage's 30 fps (TSEngineConstants.TARGET_FRAMERATE). js/street-render.js plays those decos from
  * the strips in assets/decos/animated/ (tools/deco-pipeline/animate.py).
+ *
+ * `item_perm`: what a line is for items, the twin of `pc_perm` (PlatformLine.as 349-355,
+ * item_solid_from_top / item_solid_from_bottom): -1 items rest on it and pass up through it,
+ * 1 an underside items fall through, 0 soft both ways, null hard both ways. Every archived
+ * line carries one (an `<int>` or `<null>`); a line without one would be solid both ways in
+ * the client (an unset `*` field compares unequal to 0 and 1), so it is left off here too.
+ * js/street-model.js isItemSolid reads it.
  *
  * Run from spike root:
  *   node build-street-layers.mjs           (write)
@@ -130,6 +138,8 @@ let flipped = 0;
 let hiddenDecos = 0;
 let hiddenLayers = 0;
 let animatedDecos = 0;
+let itemPerms = 0;
+const itemPermCounts = new Map();
 const stale = [];
 let filtered = 0;
 let gradients = 0;
@@ -189,6 +199,26 @@ for (const file of files) {
       } else {
         delete layer.filters;
       }
+      if (layer.id === 'middleground') {
+        const lines = childObjects(body).find((c) => c.id === 'platform_lines');
+        const perms = new Map();
+        for (const line of lines ? childObjects(lines.body) : []) {
+          const own = line.body.replace(/<object id="(start|end)">[\s\S]*?<\/object>/g, '');
+          const int = own.match(/<int id="platform_item_perm">(-?\d+)<\/int>/);
+          if (int) perms.set(line.id, Number(int[1]));
+          else if (/<null id="platform_item_perm"\/>/.test(own)) perms.set(line.id, null);
+        }
+        for (const platform of street.platforms || []) {
+          if (perms.has(platform.id)) {
+            platform.item_perm = perms.get(platform.id);
+            itemPerms += 1;
+            const key = String(platform.item_perm);
+            itemPermCounts.set(key, (itemPermCounts.get(key) || 0) + 1);
+          } else {
+            delete platform.item_perm;
+          }
+        }
+      }
       const flags = layer.id === 'middleground'
         ? decoFlags(body.replace(/<object id="(platform_lines|walls|ladders|signposts|boxes|targets|doors)">[\s\S]*?\n\t{4}<\/object>/g, ''))
         : decoFlags(body);
@@ -225,7 +255,8 @@ for (const file of files) {
 }
 console.log(
   `${CHECK ? 'Checked' : 'Updated'} ${updated} streets: ${gradients} gradients, ${filtered} filtered layers, ` +
-    `${flipped} flipped decos, ${hiddenDecos} hidden decos, ${animatedDecos} animated decos, ${hiddenLayers} hidden layers.`
+    `${flipped} flipped decos, ${hiddenDecos} hidden decos, ${animatedDecos} animated decos, ${hiddenLayers} hidden layers, ` +
+    `${itemPerms} line item perms (${['-1', '0', '1', 'null'].map((k) => `${k}: ${itemPermCounts.get(k) || 0}`).join(', ')}).`
 );
 if (CHECK && stale.length) {
   console.log(`${stale.length} street files are stale (run node build-street-layers.mjs): ${stale.slice(0, 8).join(', ')}`);

@@ -51,7 +51,7 @@ import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims
 import { movedLine } from '../admin-teleport.js?v=fa56e8df';
 import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=430d51e0';
 import { saveStore } from '../save-store.js?v=b74a8113';
-import { STREET_INDEX } from '../street-loader.js?v=4b282477';
+import { STREET_INDEX } from '../street-loader.js?v=d4113627';
 
 export const REALTIME_FEATURE_ID = 'realtime';
 /** Lines kept in the chat log. */

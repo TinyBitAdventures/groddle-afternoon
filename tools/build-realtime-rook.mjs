@@ -31,9 +31,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=4b282477';
-import { platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js?v=77584eff';
-import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=face8516';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=d4113627';
+import { platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js?v=23b926e5';
+import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=7e30da8f';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=85d4faba';
 import { loadRecipeCatalogFromFile } from '../public/js/making.js?v=9e538296';
 import { SHRINE_ITEM_BASE_COSTS, donationValueFor, giantForStreet } from '../public/js/shrines.js?v=01b185bc';

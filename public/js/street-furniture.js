@@ -1,4 +1,4 @@
-import { isStandable, platformYAt } from './street-model.js?v=77584eff';
+import { isItemFloor, platformYAt } from './street-model.js?v=23b926e5';
 
 /**
  * Street furniture rules: street Mailboxes, placed Notes, Notice Boards and
@@ -198,6 +198,7 @@ export const DOOR_CLEARANCE = 24;
  * street's own (screen space, bottom-centre, build-street-navigation.mjs); the
  * spot slides to the nearer side that clears the frame by DOOR_CLEARANCE and
  * has floor within 60 px of its own (a step down off a doorstep counts), else it stays.
+ * Floor is a line furniture rests on that the avatar stands on (street-model.js isItemFloor).
  * @param {{x:number,y:number}} point
  * @param {number} halfWidth  half the furniture's art width
  */
@@ -206,7 +207,7 @@ export function clearOfDoors(point, halfWidth, doors = [], platforms = [], world
   const floorAt = (x) => {
     let best = null;
     for (const p of platforms || []) {
-      if (!isStandable(p)) continue;
+      if (!isItemFloor(p)) continue;
       const y = platformYAt(p, x, 0);
       if (y != null && Math.abs(y - point.y) <= 60 && (best == null || Math.abs(y - point.y) < Math.abs(best - point.y))) best = y;
     }

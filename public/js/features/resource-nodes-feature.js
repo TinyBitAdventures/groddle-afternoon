@@ -53,7 +53,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=85d4faba';
-import { platformYAt } from '../street-model.js?v=77584eff';
+import { isItemFloor, platformYAt } from '../street-model.js?v=23b926e5';
 import { hiresSpriteUrl } from '../sprite-hires.js?v=5919dfde';
 import { rollResourceNodeDrop } from './drops-feature.js?v=92989dc5';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
@@ -252,6 +252,7 @@ export function resourceDemoKit(classTsid) {
 export function surfaceNear(platforms, x, refY) {
   let best = null;
   for (const platform of Array.isArray(platforms) ? platforms : []) {
+    if (!isItemFloor(platform)) continue;
     const y = platformYAt(platform, x, 0);
     if (y == null || y < refY - 90 || y > refY + 260) continue;
     if (best == null || Math.abs(y - refY) < Math.abs(best - refY)) best = y;

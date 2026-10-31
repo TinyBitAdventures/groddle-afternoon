@@ -41,11 +41,11 @@ import { canUseTool } from '../tools.js?v=9a2e7ef4';
 import { acceptOffer, ensureQuestOfferState, turnInQuest } from '../quest-offers.js?v=6b6cbf22';
 import { parseQuestConversation } from '../quests.js?v=282e1621';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
-import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=4b282477';
-import { worldToScreen } from '../street-model.js?v=77584eff';
-import { landingY, walkSurfaceY } from '../walk-surface.js?v=cf02de0e';
-import { hellFeature } from './hell-feature.js?v=bdaefff5';
-import { questRoomConverse } from './quest-instances-feature.js?v=412d45db';
+import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=d4113627';
+import { isStandable, worldToScreen } from '../street-model.js?v=23b926e5';
+import { landingY, walkSurfaceY } from '../walk-surface.js?v=764d5f5a';
+import { hellFeature } from './hell-feature.js?v=6825f033';
+import { questRoomConverse } from './quest-instances-feature.js?v=dd932a98';
 import {
   CONTRABAND,
   CONTRABAND_ITEM,
@@ -285,7 +285,8 @@ function stepBeside(engine, npc) {
   if (!p || !npc) return;
   const left = p.x < npc.x;
   const x = npc.x + (left ? -SMUGGLER.talkOffset : SMUGGLER.talkOffset);
-  const y = walkSurfaceY(engine.platforms, x, npc.y, { up: 40, down: 60 });
+  // The avatar's own floor (the pc rule), not the item rule NPCs walk by.
+  const y = walkSurfaceY(engine.platforms, x, npc.y, { up: 40, down: 60 }, isStandable);
   if (y != null) {
     p.x = x;
     p.y = y;
@@ -300,9 +301,13 @@ function playerName() {
   return 'friend';
 }
 
-/** A spot on the platform under (x, y - 75), else above, else the avatar's line. */
-function standY(engine, x, y, lift = 75) {
-  return landingY(engine.platforms, x, y - lift) ?? walkSurfaceY(engine.platforms, x, y, { up: 600, down: 600 });
+/**
+ * A spot on the platform under (x, y - 75), else above, else the avatar's line. An NPC
+ * is an item (walk-surface's item rule); `solid` is isStandable for one the avatar
+ * has to walk up to.
+ */
+function standY(engine, x, y, lift = 75, solid = undefined) {
+  return landingY(engine.platforms, x, y - lift, solid) ?? walkSurfaceY(engine.platforms, x, y, { up: 600, down: 600 }, solid);
 }
 
 /* ------------------------------------------------------------ quest */
@@ -658,7 +663,7 @@ function placeReceiver(engine, { near = false } = {}) {
     ? Math.min(w - 60, p.x + 180)
     : Math.max(40, Math.min(w - 40, spawnOffset(p.x, { l: 0, r: w, min: RECEIVER.spawnMin, max: RECEIVER.spawnMax, rng })));
   // The contact is unseen until you bump into him: keep him on a line you can walk.
-  const y = standY(engine, x, p.y, 10) ?? p.y;
+  const y = standY(engine, x, p.y, 10, isStandable) ?? p.y;
   const head = 1 + Math.floor(rng() * 2);
   receiver = makeNpc(engine, 'receiver', `smuggler_green_${head}_`, x, y, SMUGGLER_ANCHOR);
   receiver.state = 'hidden';
