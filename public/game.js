@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=72cc82cd';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e70532b9';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d1decac5';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9a8f16c0';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -690,7 +690,7 @@ import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=587c0
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction } from './js/world-zoom.js?v=b5f4748a';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=917a2caa';
-import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=8bc8920a';
+import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=ee455eee';
 import './js/classic/classic-zoom.js?v=7a25123e';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=fff73f8c';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
@@ -869,7 +869,7 @@ import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from '.
 import { installHiresIcons } from './js/icon-hires.js?v=5357d4b4';
 import { installHiresDecos } from './js/deco-hires.js?v=cc8506f6';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=e56202ee';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=f1b60367';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=7f816593';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=f7ea0bd5';
@@ -900,7 +900,7 @@ import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?
 import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=ac12c722';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=7e1b24b7';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -10683,7 +10683,7 @@ const engine = {
       returnLabel: homeState.returnLocation?.label || '',
       // G328: where the home's way back leads (a visit to someone's home from yours returns there).
       returnLocation: homeState.returnLocation ? { ...homeState.returnLocation } : null,
-      // GATESIGN: the way-out signpost's street (the remembered one, else your arrival street).
+      // GATESIGN: where the signpost's Back to Ur leads (the remembered street, else your arrival street).
       wayOut: (({ tsid, label, hubName }) => ({ tsid, label, hubName }))(homeReturnDestination()),
       unread: unreadMailCount(mailboxState, Date.now()),
     };
@@ -20715,7 +20715,7 @@ async function switchHomeRoom(room) {
 
 /**
  * GATESIGN: where your home's way out leads: the street you came from (homeState.returnLocation),
- * else your arrival street (STREET_INDEX.default), with its label and hub name for the way-out
+ * else your arrival street (STREET_INDEX.default), with its label and hub name for the Back to Ur
  * signpost's arm and the Imagination hub's Back to world tip (ImgMenuHome.as: label + ", " + hub).
  */
 function homeReturnDestination(back = homeState.returnLocation) {

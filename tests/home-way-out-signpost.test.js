@@ -1,23 +1,25 @@
 /**
- * GATESIGN (Austin 2026-10-31): the home street's way out is Tiny Speck's own street signpost,
- * not a code-drawn "World Gate", and the Imagination menu has Back to world as the original did.
+ * GATESIGN, GATESIGN2 (Austin 2026-10-31): the home street's way out is Tiny Speck's own street
+ * signpost, not a code-drawn "World Gate"; and one post, not two ("the 2 different poles look
+ * silly. Let's combine and just put the top one as, Back to Ur"). The friends' signpost's post
+ * carries the way out as its top arm, Back to Ur, pointing left; the friends' arms hang below.
+ * The Imagination menu keeps Back to world, as the original had.
  *
  * The original had no gate: you left home through the Imagination menu (glitch-client
  * ImgMenuHome.as at home: "Back to world", tip "<street>, <hub>", /leave; ImgMenuBackToWorld.as
  * in another player's home), and the home street's only post was the friends' signpost
- * (locations/inc_homes.js geo_lock_signpost). The signpost stands where the gate stood, its one
- * arm pointing left with the street you will return to on it; Enter on it takes you there.
+ * (locations/inc_homes.js geo_lock_signpost).
  * Run: node --test tests/home-way-out-signpost.test.js
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { getVerbsFor } from '../public/content.js?v=72cc82cd';
+import { getVerbsFor } from '../public/content.js?v=e70532b9';
 import { SIGN_FIRST_ARM_Y, SIGN_POST_W, SIGN_SCALE } from '../public/js/street-render.js?v=90a690df';
-import { WAY_OUT_FALLBACK, WAY_OUT_HIT, wayOutTarget } from '../public/js/features/homes-feature.js?v=1b54505a';
+import { WAY_OUT_ARM, WAY_OUT_HIT, wayOutTarget } from '../public/js/features/homes-feature.js?v=5949c0f6';
+import { FRIENDS_HIT_H } from '../public/js/features/home-street-mp-feature.js?v=929126d8';
 import {
-  GATE_POST_HALF,
   SIGNPOST_POST_HALF,
   createCultivationState,
   dispatcherRx,
@@ -26,8 +28,9 @@ import {
   homeStreetLayout,
   normalizeCultivationState,
   placementCheck,
-} from '../public/js/home-cultivation.js?v=7097c51d';
-import { DISPATCHER_TEXT, GATE, dispatcherDefaultRx, dispatcherFits, fixtureName, gateX, signpostX, streetFixtures } from '../public/js/home-street-fixtures.js?v=a9d81324';
+} from '../public/js/home-cultivation.js?v=7a47ef54';
+import { DISPATCHER_TEXT, SIGNPOST, dispatcherDefaultRx, dispatcherFits, signpostX, streetFixtures } from '../public/js/home-street-fixtures.js?v=26bb21a8';
+import { sceneSignMarks } from '../public/js/ui/street-minimap.js?v=ee455eee';
 import { HUB_TILES, hubTileBackground, hubTileForKey, hubTileState } from '../public/js/ui/imagination-hub.js?v=fff73f8c';
 import { HUB_CLOUDS, placeClouds } from '../public/js/classic/classic-hub.js?v=264ab19f';
 
@@ -36,23 +39,34 @@ const pub = join(root, 'public');
 const read = (p) => readFileSync(join(pub, p), 'utf8');
 const CLIENT = join(root, '..', 'glitch-client', 'com', 'tinyspeck', 'engine', 'view', 'ui', 'imagination');
 
-describe('the way-out signpost replaces the World Gate', () => {
+describe('one signpost at home: its top arm says Back to Ur', () => {
   const homes = read('js/features/homes-feature.js');
+  const mp = read('js/features/home-street-mp-feature.js');
 
-  it('is a street signpost from Tiny Speck\'s PNGs, not a drawn gate', () => {
-    assert.doesNotMatch(homes, /makeGateSprite/);
-    assert.match(homes, /function makeWayOutSignpost\(engine, label\) \{\n\s+const post = oneArmSignpost\(engine\.PIXI, label \|\| WAY_OUT_FALLBACK, \{ left: true \}\);/);
-    // Your own street and a visitor's view of someone's both draw it.
-    assert.equal((homes.match(/makeWayOutSignpost\(/g) || []).length, 3);
-    assert.match(homes, /const gate = makeWayOutSignpost\(eng, opts\.returnLabel\);/);
+  it('homes-feature draws the one post, from Tiny Speck\'s PNGs, where the friends\' signpost stands', () => {
+    assert.doesNotMatch(homes, /makeGateSprite|makeWayOutSignpost|gateX/);
+    assert.match(homes, /function makeHomeSignpost\(engine\) \{\n\s+const post = oneArmSignpost\(engine\.PIXI, WAY_OUT_ARM, \{ left: true \}\);/);
+    // Your own street and a visitor's view of someone's both draw it, at the friends' signpost's x.
+    assert.equal((homes.match(/makeHomeSignpost\(/g) || []).length, 3);
+    assert.equal((homes.match(/gate\.x = signpostX\(layout\);/g) || []).length, 2);
+    assert.match(mp, /return fixtureSignpostX\(layout\);/);
     const render = read('js/street-render.js');
     const helper = render.slice(render.indexOf('export function oneArmSignpost('), render.indexOf('/** @type {Set<string>|null} */\nlet decoManifest'));
-    for (const art of ['SIGNPOST.shadow', 'SIGNPOST.post', 'SIGNPOST.arm']) assert.match(helper, new RegExp(`textureFromUrl\\(${art.replace('.', '\\.')}\\)`), art);
+    for (const art of ['shadow', 'post', 'arm']) assert.match(helper, new RegExp(`textureFromUrl\\(SIGNPOST\\.${art}\\)`), art);
     assert.doesNotMatch(helper, /Graphics/, 'no drawn art');
-    // The words as every signpost's (signLabel), the arm mirrored on the left (makeSign left_side).
-    assert.match(helper, /const label = signLabel\(PIXI, text, fill\);/);
     assert.match(helper, /if \(left\) board\.scale\.x \*= -1;/);
-    for (const f of ['signpost_post.png', 'signpost_arm.png', 'signpost_shadow.png']) assert.ok(existsSync(join(pub, 'assets/ui/signpost', f)), f);
+  });
+
+  it('the top arm reads exactly Back to Ur; the friends\' signpost draws only its arms, no second post', () => {
+    assert.equal(WAY_OUT_ARM, 'Back to Ur');
+    const draw = mp.slice(mp.indexOf('  function drawSignpost('), mp.indexOf('  /** note_pole.as'));
+    assert.ok(draw.length > 500);
+    assert.doesNotMatch(draw, /SIGN_ART\.post|SIGN_ART\.shadow/);
+    assert.match(draw, /const board = new PIXI\.Sprite\(textureFromUrl\(SIGN_ART\.arm\)\);/);
+    // Its arms keep their slots, under the post's top arm, drawn over the post.
+    assert.match(draw, /const postH = 200;/);
+    assert.match(draw, /arm\.y = -postH \+ i \* 28 \+ 32;/);
+    assert.match(draw, /box\.zIndex = 21;/);
   });
 
   it('no player-facing "World Gate" is left in the game', () => {
@@ -65,26 +79,24 @@ describe('the way-out signpost replaces the World Gate', () => {
       }
     };
     walk(join(pub, 'js'));
-    files.push(join(pub, 'game.js'), join(pub, 'content.js'));
+    files.push(join(pub, 'game.js'), join(pub, 'content.js'), join(root, 'tools', 'restoration', 'checklist.mjs'));
     for (const f of files) {
       // Comments may remember it; strings may not.
       const code = readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '').replace(/\s\/\/ .*$/gm, '');
       assert.doesNotMatch(code, /['"`][^'"`\n]*World Gate/, f);
     }
+    assert.doesNotMatch(read('restoration/data.json'), /World Gate/);
   });
 
-  it('its arm names the street you will return to, its target says where', () => {
-    assert.deepEqual(wayOutTarget({ label: 'Hechey Track', hubName: 'Groddle Forest' }), { label: 'Hechey Track', subtitle: 'Back to Hechey Track, Groddle Forest' });
-    assert.deepEqual(wayOutTarget({ label: 'Groddle', hubName: 'Groddle' }), { label: 'Groddle', subtitle: 'Back to Groddle' });
-    assert.deepEqual(wayOutTarget({}), { label: WAY_OUT_FALLBACK, subtitle: 'Back out into the world' });
-    assert.doesNotMatch(JSON.stringify(wayOutTarget({ label: 'X', hubName: 'Y' })), /—|Glitch/);
-    assert.match(homes, /const way = ctx\.wayOut \|\| \{ label: ctx\.returnLabel \|\| '', hubName: '' \};/);
+  it('the top arm\'s target is Back to Ur, its tip the street you will return to and its hub', () => {
+    assert.deepEqual(wayOutTarget({ label: 'Hechey Track', hubName: 'Groddle Forest' }), { label: 'Back to Ur', subtitle: 'Hechey Track, Groddle Forest' });
+    assert.deepEqual(wayOutTarget({ label: 'Groddle', hubName: 'Groddle' }), { label: 'Back to Ur', subtitle: 'Groddle' });
+    assert.deepEqual(wayOutTarget({}), { label: 'Back to Ur', subtitle: 'Back out into the world' });
     assert.match(homes, /classId: 'home_return_marker',\n\s+label: words\.label,\n\s+subtitle: words\.subtitle,/);
     // The remembered street, else your arrival street, as returnFromHome goes (game.js).
     const game = read('game.js');
     assert.match(game, /function homeReturnDestination\(back = homeState\.returnLocation\) \{\n\s+const tsid = back\?\.tsid \|\| STREET_INDEX\.default;/);
     assert.match(game, /const destination = homeReturnDestination\(result\.returnLocation\);/);
-    assert.match(game, /wayOut: \(\(\{ tsid, label, hubName \}\) => \(\{ tsid, label, hubName \}\)\)\(homeReturnDestination\(\)\),/);
   });
 
   it('Enter on it offers the way back to that street, which returns you (handleHomeTarget)', () => {
@@ -92,57 +104,56 @@ describe('the way-out signpost replaces the World Gate', () => {
     const back = verbs.find((v) => v.id === 'return_to_world');
     assert.equal(back.label, 'back to Hechey Track');
     assert.equal(back.tooltip, 'Teleport back to Hechey Track, Groddle Forest');
-    const none = getVerbsFor({ classId: 'home_return_marker', state: {} }, { pc: {}, inv: {} }).find((v) => v.id === 'return_to_world');
-    assert.equal(none.label, 'back to the world');
     assert.match(read('game.js'), /if \(target\?\.classId === 'home_return_marker' && verbId === 'return_to_world'\) \{\n\s+returnFromHome\(\);/);
   });
 
-  it('its arm sits at a street signpost\'s first slot, above the friends\' signpost\'s arms, so they never cross', () => {
-    const mp = read('js/features/home-street-mp-feature.js');
-    assert.match(mp, /const postH = 200;/);
-    assert.match(mp, /arm\.y = -postH \+ i \* 28 \+ 32;/);
-    const friendsTop = -200 + 32; // the friends' highest arm (slot 0, a right arm), holder units
-    const tilt = Math.tan((5.5 * Math.PI) / 180);
-    const half = (30 * SIGN_SCALE) / 2; // both arms are 30 tall
-    const gap = gateX({ lotLeft: 0 }) - signpostX({ lotLeft: 0 });
-    assert.equal(gap, 110);
-    // Each arm's tip rises 5.5 degrees; check every x between the posts, whatever the names' lengths.
-    for (let d = 0; d <= gap; d += 1) {
-      const wayBottom = SIGN_FIRST_ARM_Y * SIGN_SCALE - tilt * d + half;
-      const friendsArmTop = friendsTop * SIGN_SCALE - tilt * (gap - d) - half;
-      assert.ok(wayBottom < friendsArmTop, `at ${d} px left of the way-out post`);
+  it('the top arm sits above the friends\' arms on the same post, and a click there is the way out', () => {
+    const half = (30 * SIGN_SCALE) / 2;
+    const wayY = SIGN_FIRST_ARM_Y * SIGN_SCALE;
+    // The friends' highest arm (slot 0, a right arm, tilting the other way) and their left arms
+    // (slots 1 and 3, tilting as the top arm does) all stay below it.
+    for (let i = 0; i < 5; i++) {
+      const y = (-200 + i * 28 + 32) * SIGN_SCALE;
+      assert.ok(wayY + half < y - half - 6, `slot ${i}`);
     }
-  });
-
-  it('stands on the old gate\'s spot with its hit box; the ground keeps clear of its post', () => {
-    assert.deepEqual({ ...GATE }, { lotDx: 40, half: 70 });
+    const tilt = Math.tan((5.5 * Math.PI) / 180);
+    const slot0 = (-200 + 32) * SIGN_SCALE;
+    for (let d = 0; d <= SIGNPOST.right; d += 2) assert.ok(wayY + half < slot0 - tilt * d - half || d > 0, `right arm at ${d}`);
+    // Hit boxes: the post's (the way out) is taller than the friends' arms', which stop under the top arm.
     assert.deepEqual({ ...WAY_OUT_HIT }, { w: 140, h: 210 });
-    assert.equal(GATE_POST_HALF, SIGNPOST_POST_HALF);
-    assert.ok(SIGN_POST_W / 2 <= GATE_POST_HALF, 'the post is inside its ground span');
-    const layout = homeStreetLayout(createCultivationState({}));
-    const g = groundFixtures(layout).find((f) => f.id === 'gate');
-    assert.deepEqual([g.x1, g.x2], [gateX(layout) - GATE_POST_HALF, gateX(layout) + GATE_POST_HALF]);
-    assert.equal(fixtureName('gate'), 'signpost');
-    assert.doesNotMatch(JSON.stringify(DISPATCHER_TEXT), /World Gate|gate/);
+    assert.ok(FRIENDS_HIT_H < -wayY + half, 'the friends\' box stops under Back to Ur');
+    assert.ok(FRIENDS_HIT_H >= -slot0 + half, 'and covers their top arm');
   });
 
-  it('old saves stay good: the dispatcher\'s usual spot and fits are unchanged, a cultivation on the wider post steps aside', () => {
+  it('one post: its ground is the signpost\'s alone, the old second post\'s ground is free; saves stay good', () => {
     const st = createCultivationState({});
     const layout = homeStreetLayout(st);
+    assert.deepEqual(streetFixtures(layout).map((f) => f.id), ['signpost', 'rock', 'butler_box']);
+    assert.ok(SIGN_POST_W / 2 <= SIGNPOST_POST_HALF, 'the post is inside its ground span');
+    const g = groundFixtures(layout).find((f) => f.id === 'signpost');
+    assert.deepEqual([g.x1, g.x2], [signpostX(layout) - SIGNPOST_POST_HALF, signpostX(layout) + SIGNPOST_POST_HALF]);
+    // The Mail Dispatcher's usual spot is unchanged (past the signpost's left arms).
     assert.equal(dispatcherDefaultRx(layout), -674);
     assert.equal(dispatcherRx(st), -674);
-    // Every spot that fit beside the gate's 140 px board still fits (the span is the same).
-    const span = streetFixtures(layout).find((f) => f.id === 'gate');
-    assert.deepEqual([span.x1, span.x2], [gateX(layout) - 70, gateX(layout) + 70]);
-    assert.equal(dispatcherFits(layout, gateX(layout) - 200).ok, false, 'still under the friends\' signpost');
-    // A Patch saved 6 px clear of the old 12 px pole (half 10) now stands on the wider post: it
-    // moves to the nearest spot that fits, the same on every client.
-    const rx = Math.round(gateX(layout) + footprint('proto_patch') + 10 + 6 - layout.houseX);
-    assert.equal(placementCheck(st, 'proto_patch', rx).reason, 'gate');
-    assert.ok(Math.abs(layout.houseX + rx - gateX(layout)) - footprint('proto_patch') >= 10, 'clear of the old pole');
-    const old = normalizeCultivationState({ items: [{ id: 1, protoClass: 'proto_patch', endClass: 'patch', rx }] });
-    assert.notEqual(old.items[0].rx, rx);
-    assert.equal(placementCheck(old, 'proto_patch', old.items[0].rx, 1, { dispatcher: false }).ok, true);
+    // Where the second post stood (lot + 40) is no fixture now: the dispatcher may stand there.
+    const old = layout.lotLeft + 40;
+    for (const f of [...groundFixtures(layout), ...streetFixtures(layout)]) assert.ok(old < f.x1 || old > f.x2, f.id);
+    assert.equal(dispatcherFits(layout, old + 60).ok, true);
+    // A Patch reaching over the old post's ground fits now, and a save with one loads as it was.
+    const rx = -250;
+    assert.ok(layout.houseX + rx - footprint('proto_patch') < old, 'over the old post');
+    assert.equal(placementCheck(st, 'proto_patch', rx).ok, true);
+    const saved = normalizeCultivationState({ items: [{ id: 1, protoClass: 'proto_patch', endClass: 'patch', rx }] });
+    assert.equal(saved.items[0].rx, rx);
+    assert.doesNotMatch(JSON.stringify(DISPATCHER_TEXT), /World Gate|gate|signposts/);
+  });
+
+  it('the street map shows one signpost there: Back to Ur over the friends', () => {
+    const marks = sceneSignMarks([
+      { classId: 'home_return_marker', label: 'Back to Ur', sprite: { x: 290, y: 872 } },
+      { classId: 'mp_home_signpost', label: 'Signpost', state: { arms: ['Pal40'] }, sprite: { x: 290, y: 872 } },
+    ]);
+    assert.deepEqual(marks, [{ kind: 'sign', id: 'scene:home_return_marker:0', x: 290, y: 872, tip: 'Back to Ur\nPal40' }]);
   });
 });
 
@@ -204,9 +215,9 @@ describe('Back to world in the Imagination menu', () => {
 describe('online: a visitor\'s way out and the owner\'s', () => {
   const mp = read('js/features/neighbours-mp-feature.js');
 
-  it('the visited street\'s signpost names the street the visitor came from and takes them back', () => {
+  it('a visitor sees the same one post: its top arm Back to Ur takes them back where they came from', () => {
     assert.match(mp, /const built = visitorHomeScene\(engine, visit\.view, room, \{ returnLabel: wayOutOf\(visit\.returnTo\)\.label \}\);/);
-    assert.match(mp, /t\.gate = engine\.register\(\{ classId: CLASS_GATE, featureId: NEIGHBOURS_MP_FEATURE_ID, label: way\.label,/);
+    assert.match(mp, /t\.gate = engine\.register\(\{ classId: CLASS_GATE, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'Back to Ur', subtitle: `\$\{way\.label\}/);
     assert.match(mp, /if \(target\.classId === CLASS_GATE\) return \[\{ id: 'go_back'/);
     assert.match(mp, /else if \(verbId === 'go_back'\) goBack\(\);/);
   });
@@ -216,9 +227,10 @@ describe('online: a visitor\'s way out and the owner\'s', () => {
     assert.match(mp, /homeVisitWayOut\(engine\) \{\n\s+if \(!session \|\| engine\?\.mode !== 'multiplayer'\) return null;\n\s+return session\.wayOut\(\) \|\| null;/);
   });
 
-  it('the owner\'s street online keeps the same signpost (homes-feature) beside the friends\' signpost', () => {
+  it('the owner\'s street online: the same post, the friends\' arms hung on it', () => {
     const own = read('js/features/home-street-mp-feature.js');
-    assert.match(own, /return fixtureSignpostX\(layout\);/);
+    assert.match(own, /if \(own\.neighbors\) drawSignpost\(signpostX\(layout\), STREET_GROUND_Y, own\.neighbors, \{ owner: true \}\);/);
+    assert.match(own, /drawSignpost\(signpostX\(layout\), STREET_GROUND_Y, signpostArms\(visit\.data\.signpost\)\.filter\(Boolean\), \{ owner: false \}\);/);
     assert.match(read('js/features/homes-feature.js'), /classId: 'home_return_marker',/);
   });
 });

@@ -326,24 +326,36 @@ export function snapsWithScene(classId) {
 
 /**
  * A scene's posts that the map shows as signposts (maybeAddSignpost: on a home street every post
- * shows): the way-out signpost (your own street's, and a visit's) and the friends' signpost.
+ * shows): the home street's signpost, whose top arm (Back to Ur, on your own street and on a
+ * visit) and friends' arms are separate targets on one post.
  */
 export const SCENE_SIGN_CLASSES = Object.freeze(['home_return_marker', 'mp_home_gate', 'mp_home_signpost']);
 
 /**
  * PURE: sign marks from a scene's registered targets ([{ classId, label, state, sprite: { x, y } }],
- * world px as the game's): the friends' signpost lists its friends one per line (state.arms), a
- * way-out signpost shows its label (the street it leads to).
+ * world px as the game's): the friends' arms list their friends one per line (state.arms), the
+ * way out shows its label (Back to Ur). Targets on one post (within 8 px) are one mark, their
+ * tips one under the other.
  */
 export function sceneSignMarks(targets = []) {
   const out = [];
+  const tips = [];
   for (const t of targets || []) {
     if (!t || !SCENE_SIGN_CLASSES.includes(t.classId)) continue;
     const s = t.sprite;
     if (!s || s.destroyed || !Number.isFinite(s.x) || !Number.isFinite(s.y)) continue;
     const arms = Array.isArray(t.state?.arms) ? t.state.arms.map((a) => String(a || '').trim()).filter(Boolean) : [];
     const tip = t.classId === 'mp_home_signpost' ? arms.join('\n') : String(t.label || '').trim();
-    out.push({ kind: 'sign', id: `scene:${t.classId}:${out.length}`, x: Math.round(s.x), y: Math.round(s.y), tip: tip || null });
+    const x = Math.round(s.x);
+    const y = Math.round(s.y);
+    const same = out.findIndex((m) => Math.abs(m.x - x) <= 8 && Math.abs(m.y - y) <= 8);
+    if (same >= 0) {
+      if (tip) tips[same].push(tip);
+      out[same].tip = tips[same].join('\n') || null;
+      continue;
+    }
+    tips.push(tip ? [tip] : []);
+    out.push({ kind: 'sign', id: `scene:${t.classId}:${out.length}`, x, y, tip: tip || null });
   }
   return out;
 }
@@ -837,7 +849,7 @@ export function createStreetMinimap(doc, host, opts = {}) {
       layout();
     },
     /**
-     * The posts a scene draws itself (sceneSignMarks: a home street's way-out signpost and friends'
+     * The posts a scene draws itself (sceneSignMarks: a home street's signpost, Back to Ur and friends'
      * signpost), in place of the last ones it gave; the street's own posts stay.
      */
     setSceneSigns(marks = []) {

@@ -15,18 +15,18 @@ import {
   homeStreetLayout,
   normalizeCultivationState,
   placementCheck,
-} from '../public/js/home-cultivation.js?v=7097c51d';
+} from '../public/js/home-cultivation.js?v=7a47ef54';
 import {
   DISPATCHER_HALF,
   DISPATCHER_TEXT,
   STREET_EDGE,
   dispatcherDefaultRx,
   dispatcherFits,
-  gateX,
   savedDispatcherRx,
+  signpostX,
   streetFixtures,
-} from '../public/js/home-street-fixtures.js?v=a9d81324';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=1b54505a';
+} from '../public/js/home-street-fixtures.js?v=26bb21a8';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=5949c0f6';
 
 const root = join(import.meta.dirname, '..', 'public', 'js');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -66,15 +66,15 @@ describe('moving the Mail Dispatcher (HOMEMAIL)', () => {
     const st = createCultivationState({});
     const layout = homeStreetLayout(st);
     const fixtures = streetFixtures(layout);
-    for (const want of [gateX(layout) - layout.houseX, -layout.houseX - 500, layout.width, 221, 300]) {
+    for (const want of [signpostX(layout) - layout.houseX, -layout.houseX - 500, layout.width, 221, 300]) {
       st.dispatcherRx = want;
       const x = layout.houseX + dispatcherRx(st);
       assert.ok(x - DISPATCHER_HALF >= STREET_EDGE && x + DISPATCHER_HALF <= layout.width - STREET_EDGE, `on the street for ${want}`);
       assert.equal(dispatcherFits(layout, x, { fixtures }).ok, true, `clear for ${want}`);
     }
-    const on = dispatcherFits(layout, gateX(layout), { fixtures });
-    assert.deepEqual([on.ok, on.reason, on.msg], [false, 'gate', 'Keep it clear of your signpost.']);
-    const sign = dispatcherFits(layout, gateX(layout) - 200, { fixtures });
+    // GATESIGN2: one post; where the way-out post stood (lot + 40) is free ground now.
+    assert.equal(dispatcherFits(layout, layout.lotLeft + 40 + 60, { fixtures }).ok, true);
+    const sign = dispatcherFits(layout, signpostX(layout) - 90, { fixtures });
     assert.deepEqual([sign.ok, sign.reason, sign.msg], [false, 'signpost', 'Keep it clear of your signpost.']);
     const edge = dispatcherFits(layout, 20, { fixtures });
     assert.deepEqual([edge.ok, edge.msg], [false, 'Not enough street there.']);

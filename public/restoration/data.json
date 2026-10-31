@@ -1008,7 +1008,7 @@
    "group": "home",
    "name": "Mail",
    "status": "source",
-   "blurb": "Mailboxes, postage, parcels and replies. A letter with an item comes by AFLC Frog, and the Mail Dispatcher outside your World Gate sends parcels.",
+   "blurb": "Mailboxes, postage, parcels and replies. A letter with an item comes by AFLC Frog, and the Mail Dispatcher by the signpost on your home street sends parcels.",
    "multiplayer": null,
    "spot": null,
    "evidence": [

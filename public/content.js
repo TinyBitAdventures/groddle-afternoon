@@ -221,7 +221,7 @@ export function getVerbsFor(target, ctx) {
   }
 
   if (classId === 'home_return_marker') {
-    // GATESIGN: the way-out signpost's one arm (homes-feature makeWayOutSignpost).
+    // GATESIGN2: the home signpost's top arm, Back to Ur (homes-feature makeHomeSignpost).
     const where = s.returnLabel ? `${s.returnLabel}${s.returnHub && s.returnHub !== s.returnLabel ? `, ${s.returnHub}` : ''}` : '';
     add('return_to_world', s.returnLabel ? `back to ${s.returnLabel}` : 'back to the world', {
       sort: 10,

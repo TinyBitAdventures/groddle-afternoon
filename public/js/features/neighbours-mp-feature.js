@@ -77,12 +77,12 @@ import { createMinnAccount } from '../minn-account.js?v=81339760';
 import { runStreetTransition } from '../screen-fx.js?v=f4314526';
 import { STREET_INDEX } from '../street-loader.js?v=390e4702';
 import { ITEM_CATALOG, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=85d4faba';
-import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=7097c51d';
+import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=7a47ef54';
 import { tickGarden } from '../garden.js?v=9a8f8f72';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=e81817d9';
 import { normalizeButlerParts } from '../butler.js?v=814ee05f';
-import { butlerApi } from './butler-feature.js?v=cf0aa8cc';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=1b54505a';
+import { butlerApi } from './butler-feature.js?v=346d3963';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=5949c0f6';
 import {
   BUTLER_MESSAGE_MAX,
   KEY_VERB,
@@ -351,9 +351,9 @@ function createSession(engine, client) {
     const t = {};
     if (room === 'street') {
       t.door = engine.register({ classId: CLASS_DOOR, featureId: NEIGHBOURS_MP_FEATURE_ID, label: houseName(visit.name), subtitle: `The indoor half of ${visit.name}'s home`, sprite: spots.door, state: { owner: visit.owner } });
-      // GATESIGN: the way-out signpost, named for the street its arm points to.
+      // GATESIGN2: the signpost's top arm, Back to Ur; its tip the street the visitor came from.
       const way = wayOutOf(visit.returnTo);
-      t.gate = engine.register({ classId: CLASS_GATE, featureId: NEIGHBOURS_MP_FEATURE_ID, label: way.label, subtitle: `Back to ${way.label}${way.hubName && way.hubName !== way.label ? `, ${way.hubName}` : ''}`, sprite: spots.gate, state: { owner: visit.owner } });
+      t.gate = engine.register({ classId: CLASS_GATE, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'Back to Ur', subtitle: `${way.label}${way.hubName && way.hubName !== way.label ? `, ${way.hubName}` : ''}`, sprite: spots.gate, state: { owner: visit.owner } });
     } else {
       t.front = engine.register({ classId: CLASS_FRONT, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'Front Door', subtitle: `Back to ${homeStreetName(visit.name)}`, sprite: spots.door, state: { owner: visit.owner } });
     }
@@ -758,7 +758,7 @@ function createSession(engine, client) {
 
   /**
    * GATESIGN: where the visit's way out leads (goBack: the spot you came from, else the arrival
-   * street), with its name and hub, for the way-out signpost's arm and the Imagination menu's
+   * street), with its name and hub, for the Back to Ur arm's tip and the Imagination menu's
    * Back to world (ImgMenuBackToWorld.as: label + ", " + hub).
    */
   function wayOutOf(spot) {

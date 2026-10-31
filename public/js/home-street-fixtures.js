@@ -4,17 +4,14 @@
  * home-cultivation.js homeStreetLayout (lotLeft, houseX, width).
  *
  * The fixtures and their drawn half widths:
- * - the way-out signpost (homes-feature makeWayOutSignpost; GATESIGN replaced the
- *   code-drawn World Gate with Tiny Speck's street signpost): its post at the
- *   lot's left edge + 40, its one arm pointing left (toward the world) at a
- *   street signpost's first slot. Its span is still the old gate's 140 (the
- *   id stays `gate`, so saved spots and reasons keep their meaning);
- * - the friends' signpost (multiplayer, home-street-mp-feature drawSignpost):
- *   its post 70 left of the lot, where locations/home.js 212-218 put the
- *   source's post (x -328). Its right arms reach under the way-out arm on
- *   purpose (that arm sits higher, so they never cross); its left arms (the
- *   2nd and 4th friend) reach up to SIGNPOST.left, room for a 19-letter name
- *   (the site's name rule);
+ * - the signpost (GATESIGN2, Austin 2026-10-31: one post, not two): its post 70
+ *   left of the lot, where locations/home.js 212-218 put the source's post
+ *   (x -328). homes-feature makeHomeSignpost draws the post with its top arm,
+ *   "Back to Ur", pointing left (toward the world: the way out, which replaced
+ *   the code-drawn World Gate); online, home-street-mp-feature drawSignpost hangs
+ *   the friends' arms below it. The right arms reach up to SIGNPOST.right; the
+ *   left arms (the 2nd and 4th friend) up to SIGNPOST.left, room for a 19-letter
+ *   name (the site's name rule);
  * - the Mailbox at the house's sign corner, the front door's hit area, the
  *   Magic Rock right of the door (homes-feature STREET_ROCK) and the Butler
  *   Box beyond it (butler-feature BOX_RX).
@@ -22,8 +19,7 @@
  * The Mail Dispatcher (items/npc_mail_dispatcher.js). The source rebuilt it
  * with the mailbox from the street template whenever a player street changed
  * (locations/inc_upgrades.js upgrades_recreate_classes), so no player ever
- * moved it. Reimagined: it stands just outside the way-out signpost, past the
- * friends' signpost's left arms (the same spot solo and online, whether or not the
+ * moved it. Reimagined: it stands just outside the signpost, past its left arms (the same spot solo and online, whether or not the
  * signpost has friends on it), and in Cultivate you can move it anywhere
  * along the street that is clear of these fixtures and of your cultivations,
  * or put it back. The spot is saved with the street (cultivation state
@@ -38,7 +34,6 @@ export const DISPATCHER_GAP = 12;
 /** How close to either end of the street it may stand (homeStreetLayout minRx / maxRx). */
 export const STREET_EDGE = 60;
 
-export const GATE = Object.freeze({ lotDx: 40, half: 70 });
 export const SIGNPOST = Object.freeze({ lotDx: -70, left: 180, right: 70 });
 export const MAILBOX_HALF = 36;
 export const DOOR_HALF = 46;
@@ -47,11 +42,11 @@ export const BUTLER_BOX = Object.freeze({ houseDx: 300, half: 32 });
 
 export const DISPATCHER_TEXT = Object.freeze({
   label: 'Mail Dispatcher',
-  sub: 'Move it anywhere along your street that is clear of your signposts, Mailbox and door.',
+  sub: 'Move it anywhere along your street that is clear of your signpost, Mailbox and door.',
   move: 'Move',
   moveTitle: 'Carry it to a new spot on your street',
   reset: 'Back to its usual spot',
-  resetTitle: 'Put it back just past your signposts',
+  resetTitle: 'Put it back just past your signpost',
   atUsual: 'It is in its usual spot.',
   banner: 'Move Mail Dispatcher',
   bannerTitle: 'Pick up your Mail Dispatcher and set it down somewhere else on your street',
@@ -62,7 +57,6 @@ export const DISPATCHER_TEXT = Object.freeze({
 });
 
 const FIXTURE_NAMES = Object.freeze({
-  gate: 'signpost',
   signpost: 'signpost',
   mailbox: 'Mailbox',
   rock: 'Magic Rock',
@@ -74,11 +68,7 @@ export function fixtureName(id) {
   return FIXTURE_NAMES[id] || id;
 }
 
-/** The world x of the way-out signpost's (`gate`) and the friends' signpost's posts on this street. */
-export function gateX(layout) {
-  return layout.lotLeft + GATE.lotDx;
-}
-
+/** The world x of the signpost's post on this street (its way out and, online, its friends). */
 export function signpostX(layout) {
   return layout.lotLeft + SIGNPOST.lotDx;
 }
@@ -89,7 +79,6 @@ export function signpostX(layout) {
  */
 export function streetFixtures(layout, at = {}) {
   const rows = [
-    { id: 'gate', x1: gateX(layout) - GATE.half, x2: gateX(layout) + GATE.half },
     { id: 'signpost', x1: signpostX(layout) - SIGNPOST.left, x2: signpostX(layout) + SIGNPOST.right },
     { id: 'rock', x1: layout.houseX + STREET_ROCK.houseDx - STREET_ROCK.half, x2: layout.houseX + STREET_ROCK.houseDx + STREET_ROCK.half },
     { id: 'butler_box', x1: layout.houseX + BUTLER_BOX.houseDx - BUTLER_BOX.half, x2: layout.houseX + BUTLER_BOX.houseDx + BUTLER_BOX.half },

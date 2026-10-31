@@ -44,18 +44,18 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inv
 import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=9e538296';
 import { furnitureDef, furnitureScale, furnitureSize } from '../home-decor.js?v=cbf17565';
 import { pieceLabel } from '../furniture-upgrades.js?v=c4ee77ed';
-import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=7097c51d';
-import { signpostX as fixtureSignpostX } from '../home-street-fixtures.js?v=a9d81324';
+import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=7a47ef54';
+import { signpostX as fixtureSignpostX } from '../home-street-fixtures.js?v=26bb21a8';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=68506420';
 import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note-pole-art.js?v=860d393a';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { signArmWidth, signLabel } from '../street-render.js?v=90a690df';
 import { openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
 import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=31a75688';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=1b54505a';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=5949c0f6';
 import { projectApi } from './street-jobs-feature.js?v=195eda11';
 import { saveStore } from '../save-store.js?v=b74a8113';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=27212fc8';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=c2680019';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,
@@ -96,7 +96,9 @@ const CLASS_SALE = 'mp_furn_sale';
 const CLASS_PILE = 'mp_currant_pile';
 const CLASS_PROTO = 'mp_restore_proto';
 const FLOOR_Y = 620;
-const SIGN_ART = { post: 'assets/ui/signpost/signpost_post.png', arm: 'assets/ui/signpost/signpost_arm.png', shadow: 'assets/ui/signpost/signpost_shadow.png' };
+const SIGN_ART = { arm: 'assets/ui/signpost/signpost_arm.png' };
+/** The friends' arms' hit box height (world px): under the post's top arm, Back to Ur (its centre 171 px up). */
+export const FRIENDS_HIT_H = 152;
 const PILE_ART = 'assets/sprites/street-jobs/pile_of_currants.png';
 const POLE_ART_DIR = 'assets/sprites/note-pole/';
 const TOKENS_FRESH_MS = 10 * 60 * 1000;
@@ -298,7 +300,11 @@ function createSession(engine, client) {
     if (entry.tag && !entry.tag.destroyed) entry.tag.destroy({ children: true });
   }
 
-  /** SignpostView-style post (street-render's art): arms with the neighbours' names, alternating. */
+  /**
+   * SignpostView-style arms (street-render's art) with the neighbours' names, alternating, on the
+   * home street's one signpost. GATESIGN2: homes-feature makeHomeSignpost draws the post (and its
+   * top arm, Back to Ur) at this same x on your street and on a visit; these arms hang below it.
+   */
   function drawSignpost(x, groundY, neighbors, { owner }) {
     const { PIXI } = engine;
     if (!PIXI || !engine.entityLayer) return;
@@ -307,19 +313,11 @@ function createSession(engine, client) {
     const box = new PIXI.Container();
     box.x = Math.round(x);
     box.y = groundY + 2;
-    // Over the way-out signpost's post beside it (its one arm sits higher), so every name reads.
+    // Over the post homes-feature draws (zIndex 20), so every name reads.
     box.zIndex = 21;
     const holder = new PIXI.Container();
     holder.scale.set(0.8);
     box.addChild(holder);
-    const shadow = new PIXI.Sprite(textureFromUrl(SIGN_ART.shadow));
-    shadow.anchor.set(0.5, 1);
-    shadow.y = 6;
-    shadow.alpha = 0.75;
-    holder.addChild(shadow);
-    const post = new PIXI.Sprite(textureFromUrl(SIGN_ART.post));
-    post.anchor.set(0.5, 1);
-    holder.addChild(post);
     const postH = 200;
     arms.forEach((n, i) => {
       const left = Boolean(i % 2);
@@ -340,9 +338,10 @@ function createSession(engine, client) {
       arm.addChild(board, label);
       holder.addChild(arm);
     });
-    box.addChild(hitBox(PIXI, -70, -170, 140, 172));
+    // The friends' arms only: it stops under the top arm (Back to Ur, homes-feature's target).
+    box.addChild(hitBox(PIXI, -70, -FRIENDS_HIT_H + 2, 140, FRIENDS_HIT_H));
     box._worldHitW = 140;
-    box._worldHitH = 172;
+    box._worldHitH = FRIENDS_HIT_H;
     engine.entityLayer.addChild(box);
     const label = owner ? T.signpost : T.signpost;
     const subtitle = arms.length ? arms.map((n) => n.name).join(', ') : T.noArms;
@@ -499,8 +498,8 @@ function createSession(engine, client) {
   }
 
   function signpostX(layout) {
-    // locations/home.js:212-218 puts the post at x -328, where the remake's way-out signpost stands: ours is just left of
-    // the way-out post, and the Mail Dispatcher stands past its left arms (home-street-fixtures).
+    // locations/home.js:212-218 puts the post at x -328: the home street's one signpost (homes-feature draws the
+    // post and its Back to Ur arm), and the Mail Dispatcher stands past its left arms (home-street-fixtures).
     return fixtureSignpostX(layout);
   }
 

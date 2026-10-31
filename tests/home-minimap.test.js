@@ -76,20 +76,19 @@ describe('home map: what the snapshot draws (hidePCsTemporarily, hideItemstacksT
     }
   });
 
-  it('the scene\'s posts are signposts on the map: the way-out signpost by the street it leads to, the friends\' signpost by its friends', () => {
+  it('the scene\'s post is one signpost on the map: Back to Ur over its friends', () => {
     assert.deepEqual([...SCENE_SIGN_CLASSES], ['home_return_marker', 'mp_home_gate', 'mp_home_signpost']);
     const marks = sceneSignMarks([
-      { classId: 'home_return_marker', label: 'Hechey Track', sprite: { x: 490.4, y: 870 } },
+      { classId: 'home_return_marker', label: 'Back to Ur', sprite: { x: 620.4, y: 872 } },
       { classId: 'mp_home_signpost', label: 'Signpost', state: { owner: true, arms: ['Zz Mer Maid', ' ', 'Pal40'] }, sprite: { x: 620, y: 872 } },
       { classId: 'mp_home_signpost', label: 'Signpost', state: { arms: [] }, sprite: { x: 700, y: 872 } },
       { classId: 'garden_new', label: 'Garden', sprite: { x: 1300, y: 870 } },
-      { classId: 'mp_home_gate', label: 'Hechey Track', sprite: { x: 1, y: 2, destroyed: true } },
+      { classId: 'mp_home_gate', label: 'Back to Ur', sprite: { x: 1, y: 2, destroyed: true } },
       null,
     ]);
     assert.deepEqual(marks, [
-      { kind: 'sign', id: 'scene:home_return_marker:0', x: 490, y: 870, tip: 'Hechey Track' },
-      { kind: 'sign', id: 'scene:mp_home_signpost:1', x: 620, y: 872, tip: 'Zz Mer Maid\nPal40' },
-      { kind: 'sign', id: 'scene:mp_home_signpost:2', x: 700, y: 872, tip: null },
+      { kind: 'sign', id: 'scene:home_return_marker:0', x: 620, y: 872, tip: 'Back to Ur\nZz Mer Maid\nPal40' },
+      { kind: 'sign', id: 'scene:mp_home_signpost:1', x: 700, y: 872, tip: null },
     ]);
   });
 

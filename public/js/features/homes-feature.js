@@ -11,7 +11,7 @@
  * game.js asks this feature for the home scene through the `homeScene` query
  * (renderHomeScene): the scene supplies the background (parallax street or the
  * room shell), the world width, where the avatar arrives, the mailbox / door /
- * way-out signpost targets, and `enter()` spawns furniture or cultivations.
+ * signpost (its Back to Ur arm) targets, and `enter()` spawns furniture or cultivations.
  *
  * Cultivations reuse the public-street systems through the engine:
  * gardens via engine.spawnGarden, rocks via engine.spawnMineRock (their state in
@@ -181,9 +181,9 @@ import {
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=7097c51d';
+} from '../home-cultivation.js?v=7a47ef54';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=68506420';
-import { DISPATCHER_HALF, DISPATCHER_TEXT, dispatcherFits, gateX, savedDispatcherRx, streetFixtures } from '../home-street-fixtures.js?v=a9d81324';
+import { DISPATCHER_HALF, DISPATCHER_TEXT, dispatcherFits, savedDispatcherRx, signpostX, streetFixtures } from '../home-street-fixtures.js?v=26bb21a8';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
@@ -1846,36 +1846,40 @@ function dispatcherPop(engine) {
 }
 
 /**
- * GATESIGN: the home street's way out, a Tiny Speck street signpost (street-render
- * oneArmSignpost) whose one arm points left, toward the world, with the street you will
- * return to on it. It stands where the remake's code-drawn World Gate stood (the
- * fixtures' `gate` spot). The original had no gate: you left through the Imagination
- * menu (ImgMenuHome.as, ImgMenuBackToWorld.as) and the home street's only post was the
- * friends' signpost (locations/inc_homes.js geo_lock_signpost). Its arm sits at a street
- * signpost's first slot (246 px post), above the friends' signpost's arms (200 px), so
- * the two never cross.
+ * GATESIGN2 (Austin 2026-10-31: "the 2 different poles look silly. Let's combine and just put
+ * the top one as, Back to Ur"): the home street's one signpost, Tiny Speck's street signpost
+ * (street-render oneArmSignpost) where the friends' signpost stands (locations/home.js
+ * 212-218, home-street-fixtures signpostX). Its top arm, at a street signpost's first slot
+ * (246 px post), says Back to Ur and points left, toward the world: Enter on it takes you back
+ * to the street you came from, as the code-drawn World Gate did. Online the friends' arms hang
+ * below it (home-street-mp-feature drawSignpost, its 200 px slots), so they never cross. The
+ * original had no gate: you left through the Imagination menu (ImgMenuHome.as,
+ * ImgMenuBackToWorld.as), whose Back to world the hub keeps.
  */
-function makeWayOutSignpost(engine, label) {
-  const post = oneArmSignpost(engine.PIXI, label || WAY_OUT_FALLBACK, { left: true });
+function makeHomeSignpost(engine) {
+  const post = oneArmSignpost(engine.PIXI, WAY_OUT_ARM, { left: true });
   post._worldHitW = WAY_OUT_HIT.w;
   post._worldHitH = WAY_OUT_HIT.h;
-  post.label = 'home-way-out';
+  post.label = 'home-signpost';
   return post;
 }
 
-/** The way-out signpost's hit box: the old gate board's 140 wide, the post's height. */
+/** The top arm's words. */
+export const WAY_OUT_ARM = 'Back to Ur';
+
+/**
+ * The way out's hit box: the post and its top arm. The friends' arms' own box (home-street-mp-feature)
+ * is smaller and stops under the top arm, so a click there picks a friend and the top arm the way out.
+ */
 export const WAY_OUT_HIT = Object.freeze({ w: 140, h: 210 });
 
-/** The arm's words when no street is known (homeContext gives one: the street you came from, else your arrival street). */
-export const WAY_OUT_FALLBACK = 'Back to the world';
-
-/** PURE: the way-out signpost's target words for the street it leads to ({ label, hubName }). */
+/** PURE: the way out's target words: Back to Ur, its tip the street it leads to and its hub ({ label, hubName }). */
 export function wayOutTarget(way = {}) {
   const label = String(way?.label || '').trim();
   const hub = String(way?.hubName || '').trim();
   return {
-    label: label || WAY_OUT_FALLBACK,
-    subtitle: label ? `Back to ${label}${hub && hub !== label ? `, ${hub}` : ''}` : 'Back out into the world',
+    label: WAY_OUT_ARM,
+    subtitle: label ? `${label}${hub && hub !== label ? `, ${hub}` : ''}` : 'Back out into the world',
   };
 }
 
@@ -1918,8 +1922,8 @@ function spawnStreetTargets(engine) {
   // GATESIGN: the street you came from (else your arrival street), as returnFromHome goes.
   const way = ctx.wayOut || { label: ctx.returnLabel || '', hubName: '' };
   const words = wayOutTarget(way);
-  const gate = makeWayOutSignpost(engine, way.label);
-  gate.x = gateX(layout);
+  const gate = makeHomeSignpost(engine);
+  gate.x = signpostX(layout);
   gate.y = STREET_GROUND_Y + 2;
   gate.zIndex = 20;
   engine.entityLayer.addChild(gate);
@@ -5628,7 +5632,7 @@ function drawVisitorYard(engine, st, groundY, houseX) {
  * walk line, width and house as the owner's own scene, so both stand in the
  * same places) and `populate(engine)`, which draws what stands there and
  * returns { door, gate } spots for the caller's own targets (`gate` is the
- * way-out signpost, its arm reading `opts.returnLabel`). The visitor's
+ * signpost, its top arm Back to Ur; `opts.returnLabel` names where it leads). The visitor's
  * own home state is put back before this returns.
  */
 export function visitorHomeScene(engine, view = {}, room = 'street', opts = {}) {
@@ -5706,9 +5710,9 @@ export function visitorHomeScene(engine, view = {}, room = 'street', opts = {}) 
         door.y = STREET_GROUND_Y;
         door.zIndex = 9;
         eng.entityLayer.addChild(door);
-        // The visitor's way out: the street they came from (neighbours-mp-feature visit.returnTo).
-        const gate = makeWayOutSignpost(eng, opts.returnLabel);
-        gate.x = gateX(layout);
+        // The same one signpost; its Back to Ur takes the visitor back where they came from (neighbours-mp-feature).
+        const gate = makeHomeSignpost(eng);
+        gate.x = signpostX(layout);
         gate.y = STREET_GROUND_Y + 2;
         gate.zIndex = 20;
         eng.entityLayer.addChild(gate);

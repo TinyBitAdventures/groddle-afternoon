@@ -15,18 +15,16 @@ import {
   footprint,
   homeStreetLayout,
   placementCheck,
-} from '../public/js/home-cultivation.js?v=7097c51d';
+} from '../public/js/home-cultivation.js?v=7a47ef54';
 import {
   DISPATCHER_HALF,
-  GATE,
   SIGNPOST,
   dispatcherDefaultRx,
   dispatcherFits,
-  gateX,
   signpostX,
   streetFixtures,
-} from '../public/js/home-street-fixtures.js?v=a9d81324';
-import { HOUSE_STYLE_KEYS, houseFixtureX, homesFeature } from '../public/js/features/homes-feature.js?v=1b54505a';
+} from '../public/js/home-street-fixtures.js?v=26bb21a8';
+import { HOUSE_STYLE_KEYS, houseFixtureX, homesFeature } from '../public/js/features/homes-feature.js?v=5949c0f6';
 
 const root = join(import.meta.dirname, '..', 'public', 'js');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -47,7 +45,7 @@ function streets() {
 const apart = (a, b) => a.x2 <= b.x1 || b.x2 <= a.x1;
 
 describe('home street fixtures (HOMEMAIL)', () => {
-  it('keeps the dispatcher off the signpost, gate, Mailbox, door, rock and Butler Box on every street', () => {
+  it('keeps the dispatcher off the signpost, Mailbox, door, rock and Butler Box on every street', () => {
     for (const { style, state } of streets()) {
       const layout = homeStreetLayout(state);
       const house = houseFixtureX(layout, style);
@@ -57,7 +55,7 @@ describe('home street fixtures (HOMEMAIL)', () => {
       const where = `${style} left ${state.yardLeft} right ${state.yardRight}`;
       assert.ok(span.x1 >= 60 && span.x2 <= layout.width - 60, `on the street: ${where}`);
       const fixtures = streetFixtures(layout, at);
-      assert.deepEqual(fixtures.map((f) => f.id).sort(), ['butler_box', 'door', 'gate', 'mailbox', 'rock', 'signpost']);
+      assert.deepEqual(fixtures.map((f) => f.id).sort(), ['butler_box', 'door', 'mailbox', 'rock', 'signpost']);
       for (const f of fixtures) assert.ok(apart(span, f), `clear of the ${f.id}: ${where}`);
       // With no cultivations it is always the usual spot, left of the signpost's left arms.
       assert.equal(x - layout.houseX, dispatcherDefaultRx(layout));
@@ -65,26 +63,23 @@ describe('home street fixtures (HOMEMAIL)', () => {
     }
   });
 
-  it('keeps the other fixtures apart too (the signpost reaches over the gate board on purpose)', () => {
+  it('keeps the other fixtures apart too', () => {
     for (const { style, state } of streets()) {
       const layout = homeStreetLayout(state);
       const house = houseFixtureX(layout, style);
       const rows = Object.fromEntries(streetFixtures(layout, { mailboxX: Math.round(house.signX), doorX: house.doorX }).map((f) => [f.id, f]));
-      for (const [a, b] of [['gate', 'mailbox'], ['mailbox', 'door'], ['door', 'rock'], ['rock', 'butler_box'], ['signpost', 'mailbox']]) {
+      for (const [a, b] of [['mailbox', 'door'], ['door', 'rock'], ['rock', 'butler_box'], ['signpost', 'mailbox']]) {
         assert.ok(apart(rows[a], rows[b]), `${a} and ${b}: ${style} left ${state.yardLeft}`);
       }
-      // The signpost's post stands left of the gate's post, under its own arms.
-      assert.ok(signpostX(layout) + 6 < gateX(layout) - 6);
     }
   });
 
-  it('places the signpost, the gate and the dispatcher from the one table', () => {
+  it('places the signpost (its post, top arm and friends\' arms) and the dispatcher from the one table', () => {
     assert.match(read('features/home-street-mp-feature.js'), /return fixtureSignpostX\(layout\);/);
-    assert.equal((read('features/homes-feature.js').match(/gate\.x = gateX\(layout\);/g) || []).length, 2);
+    assert.equal((read('features/homes-feature.js').match(/gate\.x = signpostX\(layout\);/g) || []).length, 2);
     const courier = read('features/mail-courier-feature.js');
     assert.match(courier, /engine\.query\?\.\('homeDispatcherX', engine\)/);
     assert.doesNotMatch(courier, /DISPATCHER_GATE_DX = -150/);
-    assert.equal(GATE.lotDx, 40);
     assert.equal(SIGNPOST.lotDx, -70);
   });
 

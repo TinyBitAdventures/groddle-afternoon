@@ -255,7 +255,7 @@ export const CHECKLIST = Object.freeze([
     multiplayer: 'Visitors on your home street fill your Magic Rock’s daily iMG, and you collect it there the next game day.',
     evidence: ['public/js/homes.js', 'public/js/home-ticket.js', 'public/js/home-decor.js', 'public/js/home-wallpaper.js', 'public/js/home-cultivation.js', 'public/js/home-styles.js', 'public/js/hi-signs.js', 'public/js/home-pool-mp.js'] },
   { id: 'mail', group: 'home', name: 'Mail', status: 'source',
-    blurb: 'Mailboxes, postage, parcels and replies. A letter with an item comes by AFLC Frog, and the Mail Dispatcher outside your World Gate sends parcels.',
+    blurb: 'Mailboxes, postage, parcels and replies. A letter with an item comes by AFLC Frog, and the Mail Dispatcher by the signpost on your home street sends parcels.',
     evidence: ['public/js/mailbox.js', 'public/js/mail-courier.js', 'public/js/features/mail-courier-feature.js'] },
   { id: 'neighbours', group: 'home', name: 'Neighbours', status: 'reimagined',
     blurb: 'Visiting Stones lead to six authored neighbours, standing in for other players’ homes.',

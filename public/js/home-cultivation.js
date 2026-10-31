@@ -62,11 +62,11 @@ import {
   TOWER_PROTO,
   TOWER_WIDTH,
 } from './home-tower.js?v=6ccb3a4f';
-import { DISPATCHER_HALF, dispatcherSpot, fixtureName, gateX, savedDispatcherRx, signpostX, streetFixtures } from './home-street-fixtures.js?v=a9d81324';
+import { DISPATCHER_HALF, dispatcherSpot, fixtureName, savedDispatcherRx, signpostX, streetFixtures } from './home-street-fixtures.js?v=26bb21a8';
 import { gardenHalfWidth } from './garden-view.js?v=05651e76';
 
 export const YARD_SEGMENT_W = 150;
-/** The house, porch, mailbox and way-out signpost stand on a fixed lot between the yards. */
+/** The house, porch and mailbox stand on a fixed lot between the yards. */
 export const HOUSE_LOT_W = 720;
 /** Cultivations keep this much clear ground in front of the door. */
 export const DOOR_CLEARANCE = 150;
@@ -184,7 +184,7 @@ export function normalizeCultivationState(seed = {}) {
 }
 
 /** The placementCheck reasons that are a fixture on the ground (groundFixtures). */
-const FIXTURE_REASONS = new Set(['gate', 'signpost', 'rock', 'butler_box']);
+const FIXTURE_REASONS = new Set(['signpost', 'rock', 'butler_box']);
 
 /**
  * Saves from before 2026-10-31 (GARDENART): gardens now draw Tiny Speck's beds
@@ -315,25 +315,21 @@ export function footprint(protoClass) {
   return Math.round((def?.width || 200) * 0.4);
 }
 
-/** The signpost post's half width on the ground (home-street-mp-feature drawSignpost: signpost_post.png is 43 wide). */
-export const SIGNPOST_POST_HALF = 22;
 /**
- * The way-out signpost's post (homes-feature makeWayOutSignpost, GATESIGN): the same
- * signpost_post.png as the friends' signpost, so the same half width. It replaced the
- * World Gate's 12 px pole (half 10); a saved cultivation now on the wider post steps
- * aside on load (settleGardens).
+ * The signpost post's half width on the ground (homes-feature makeHomeSignpost: signpost_post.png
+ * is 43 wide). GATESIGN2: it is the street's one post now; the way-out post that stood 110 px right
+ * of it (and the World Gate's pole before that) is gone, and its ground is free again.
  */
-export const GATE_POST_HALF = SIGNPOST_POST_HALF;
+export const SIGNPOST_POST_HALF = 22;
 
 /**
  * What stands on the ground of the home street, which a cultivation keeps clear of: the
- * way-out signpost's and the friends' signpost's posts (their arms are overhead, above
+ * signpost's post (its arms are overhead, above
  * the tallest grown crop), the Magic Rock and the Butler Box.
  */
 export function groundFixtures(layout) {
   return streetFixtures(layout).map((f) => {
     if (f.id === 'signpost') return { id: f.id, x1: signpostX(layout) - SIGNPOST_POST_HALF, x2: signpostX(layout) + SIGNPOST_POST_HALF };
-    if (f.id === 'gate') return { id: f.id, x1: gateX(layout) - GATE_POST_HALF, x2: gateX(layout) + GATE_POST_HALF };
     return f;
   });
 }
