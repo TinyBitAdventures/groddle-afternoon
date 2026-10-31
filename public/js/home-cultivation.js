@@ -175,6 +175,8 @@ export function normalizeCultivationState(seed = {}) {
       : {},
     // achievements cultivation:times_restored is a set-to-max counter; the remake increments by the gain.
     timesRestored: Math.max(0, Math.floor(finite(seed?.timesRestored, 0))),
+    // The Mail Dispatcher's spot on the street once you have moved it (home-street-fixtures).
+    ...(!back && savedDispatcherRx(seed) != null ? { dispatcherRx: savedDispatcherRx(seed) } : {}),
   };
 }
 

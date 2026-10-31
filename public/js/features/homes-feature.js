@@ -181,9 +181,9 @@ import {
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=9056c819';
+} from '../home-cultivation.js?v=3f6c0792';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=68506420';
-import { gateX } from '../home-street-fixtures.js?v=57eaae87';
+import { DISPATCHER_HALF, DISPATCHER_TEXT, dispatcherFits, gateX, savedDispatcherRx, streetFixtures } from '../home-street-fixtures.js?v=57eaae87';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=ec7b4119';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
@@ -529,8 +529,9 @@ let backCult = createBackYardState();
 let savedHouseX = null;
 let mode = null; // 'decorate' | 'cultivate' | null
 let tab = 'furniture';
-let placing = null; // { kind: 'furniture'|'cultivation', classTsid|protoClass, moveId? }
+let placing = null; // { kind: 'furniture'|'cultivation'|'dispatcher', classTsid|protoClass, moveId? }
 let selected = null; // { kind, id }
+let dispatcherLast = ''; // QA: the last move of the Mail Dispatcher (moved:<rx> | usual | refused:<why>)
 let stamping = null; // { kind: 'wall'|'floor'|'ceiling', key } while a swatch is on the cursor
 let stampHover = null; // { kind, segment?, center? } under the cursor
 let scene = null; // live scene context while a home room is shown
@@ -634,6 +635,10 @@ function publish(engine) {
   // BUILDER: the tray tab and filter, and what moves the thing you carry.
   engine.setData('homeTray', mode === 'decorate' ? `${tab}:${trayFilter}` : mode || '');
   engine.setData('homeCarry', placing ? carryBy : '');
+  // HOMEMAIL: where the Mail Dispatcher stands (world x) and its saved spot (or usual), the last move.
+  const dx = dispatcherWorldX();
+  engine.setData('homeDispatcher', dx == null ? '' : `${Math.round(dx)}:${savedDispatcherRx(cult) ?? 'usual'}`);
+  engine.setData('homeDispatcherLast', dispatcherLast);
   // G358: placed pieces' upgrades (class:id), the open picker and the last upgrade.
   engine.setData('furnupPlaced', decor.placed.filter((p) => p.upgradeId).map((p) => `${p.classTsid}:${p.upgradeId}`).join(','));
   engine.setData('furnupStored', Object.entries(decor.styles || {}).map(([c, rows]) => rows.map((r) => `${c}:${r.upgradeId || 0}`).join(',')).filter(Boolean).join(','));
@@ -1696,6 +1701,149 @@ function dispatcherWorldX(excludeId = null) {
   return homeStreetLayout(cult).houseX + dispatcherRx(cult, { excludeId, at: streetFixtureAt() });
 }
 
+/*
+ * Moving the Mail Dispatcher (lane HOMEMAIL: "can I move my mail dispatcher?"). Reimagined: the
+ * source rebuilt it with the mailbox from the street template whenever a player street changed
+ * (locations/inc_upgrades.js upgrades_recreate_classes), so no player ever moved it. Here
+ * Cultivate carries it too, on your home street: click it (or the banner's Move Mail Dispatcher)
+ * for Move and Back to its usual spot, or press and drag it. It sets down only where it is clear
+ * of the street's ends, the fixtures and your cultivations (home-street-fixtures dispatcherFits);
+ * the spot is saved with the street (cult.dispatcherRx, x from the house's centre), solo and online.
+ */
+const DISPATCHER_CLASS = 'npc_mail_dispatcher';
+let dimmedDispatcher = null;
+
+function dispatcherTarget(engine) {
+  return (engine?.interactables || []).find((t) => t.classId === DISPATCHER_CLASS && t.sprite && !t.sprite.destroyed) || null;
+}
+
+function canMoveDispatcher(engine) {
+  return mode === 'cultivate' && scene?.room === 'street' && Boolean(dispatcherTarget(engine));
+}
+
+/** A world point on the dispatcher's drawn art (144 px tall, 104 wide). */
+function dispatcherAt(engine, p) {
+  if (scene?.room !== 'street') return false;
+  const s = dispatcherTarget(engine)?.sprite;
+  return Boolean(s) && Math.abs(p.x - s.x) <= DISPATCHER_HALF && p.y <= s.y + 10 && p.y >= s.y - 150;
+}
+
+/** Whether it may stand at world x now: on the street, clear of the fixtures and the cultivations. */
+function dispatcherCheck(x) {
+  const layout = homeStreetLayout(cult);
+  const items = cult.items.map((row) => ({ x: layout.houseX + row.rx, half: footprint(row.protoClass), label: cultivationDef(row.protoClass)?.label }));
+  return dispatcherFits(layout, Math.round(x), { fixtures: streetFixtures(layout, streetFixtureAt()), items });
+}
+
+/** While you carry it, the one standing there fades back. */
+function dimDispatcher(engine, on) {
+  if (dimmedDispatcher && !dimmedDispatcher.destroyed) dimmedDispatcher.alpha = 1;
+  dimmedDispatcher = null;
+  const s = on ? dispatcherTarget(engine)?.sprite : null;
+  if (!s) return;
+  s.alpha = 0.35;
+  dimmedDispatcher = s;
+}
+
+function selectDispatcher(engine) {
+  if (!canMoveDispatcher(engine)) return false;
+  if (placing) cancelCarry(engine);
+  selected = { kind: 'dispatcher', id: 'dispatcher' };
+  drawCultivationMarkers(engine);
+  renderBar(engine);
+  publish(engine);
+  return true;
+}
+
+/** Carry it with the pointer, or at your feet ('avatar': walk it over, then Place). */
+function beginDispatcherMove(engine, by = 'pointer') {
+  if (!canMoveDispatcher(engine)) return false;
+  placing = { kind: 'dispatcher', classTsid: DISPATCHER_CLASS, moveId: 'dispatcher' };
+  selected = { kind: 'dispatcher', id: 'dispatcher' };
+  carryBy = by;
+  if (by === 'avatar') pointer.inside = false;
+  makeGhost(engine);
+  dimDispatcher(engine, true);
+  renderBar(engine);
+  if (by === 'avatar') {
+    syncFloating(engine, true);
+    ui?.builder?.place?.focus?.({ preventScroll: true });
+  }
+  publish(engine);
+  return true;
+}
+
+/** Stand it where it now belongs (mail-courier-feature checks it every 400 ms as well). */
+function settleDispatcher(engine) {
+  const t = dispatcherTarget(engine);
+  const x = dispatcherWorldX();
+  if (t && x != null) t.sprite.x = Math.round(x);
+}
+
+function placeDispatcher(engine, x) {
+  const fit = dispatcherCheck(x);
+  if (!fit.ok) {
+    engine.toast(fit.msg);
+    engine.playSound?.('CLICK_FAILURE', { volume: 0.4 });
+    dispatcherLast = `refused:${fit.reason}`;
+    publish(engine);
+    return fit;
+  }
+  cult.dispatcherRx = Math.round(x) - homeStreetLayout(cult).houseX;
+  placing = null;
+  selected = { kind: 'dispatcher', id: 'dispatcher' };
+  destroyGhost();
+  settleDispatcher(engine);
+  engine.playSound?.('ITEM_DROP', { volume: 0.45 });
+  engine.pushActivity(DISPATCHER_TEXT.moved);
+  dispatcherLast = `moved:${cult.dispatcherRx}`;
+  engine.save();
+  drawCultivationMarkers(engine);
+  renderBar(engine);
+  publish(engine);
+  return { ok: true, x: Math.round(x), rx: cult.dispatcherRx };
+}
+
+/** Back to its usual spot, just past the friends' signpost. */
+function resetDispatcher(engine) {
+  if (savedDispatcherRx(cult) == null) return { ok: false, reason: 'usual' };
+  delete cult.dispatcherRx;
+  if (placing?.kind === 'dispatcher') {
+    placing = null;
+    destroyGhost();
+  }
+  settleDispatcher(engine);
+  engine.playSound?.('ITEM_DROP', { volume: 0.45 });
+  engine.pushActivity(DISPATCHER_TEXT.resetDone);
+  dispatcherLast = 'usual';
+  engine.save();
+  drawCultivationMarkers(engine);
+  renderBar(engine);
+  publish(engine);
+  return { ok: true };
+}
+
+/** The selected dispatcher's actions, floating by it: Move, Back to its usual spot. */
+function dispatcherPop(engine) {
+  if (selected?.kind !== 'dispatcher' || placing || !canMoveDispatcher(engine)) return null;
+  const moved = savedDispatcherRx(cult) != null;
+  return {
+    key: `d:${moved ? 1 : 0}`,
+    title: DISPATCHER_TEXT.label,
+    sub: DISPATCHER_TEXT.sub,
+    actions: [
+      { label: DISPATCHER_TEXT.move, primary: true, title: DISPATCHER_TEXT.moveTitle, attrs: { 'data-home-action': 'dispatcher-move' }, onClick: () => beginDispatcherMove(engine, 'avatar') },
+      {
+        label: DISPATCHER_TEXT.reset,
+        disabled: !moved,
+        title: moved ? DISPATCHER_TEXT.resetTitle : DISPATCHER_TEXT.atUsual,
+        attrs: { 'data-home-action': 'dispatcher-reset' },
+        onClick: () => resetDispatcher(engine),
+      },
+    ],
+  };
+}
+
 function makeGateSprite(engine) {
   const { PIXI } = engine;
   const marker = new PIXI.Container();
@@ -2082,6 +2230,15 @@ function drawCultivationMarkers(engine) {
     const left = lifespanLeft(item, qaWear(engine));
     pad.roundRect(x - 30, Y + 16, 60, 6, 3).fill({ color: 0x2b2a33, alpha: 0.55 });
     pad.roundRect(x - 30, Y + 16, 60 * left, 6, 3).fill(left > 0.3 ? 0x7cc35a : 0xe0a84a);
+    g.addChild(pad);
+  }
+  // HOMEMAIL: the Mail Dispatcher can be picked up here too.
+  const disp = scene.room === 'street' ? dispatcherTarget(engine)?.sprite : null;
+  if (disp) {
+    const sel = selected?.kind === 'dispatcher';
+    const pad = new PIXI.Graphics();
+    pad.roundRect(disp.x - DISPATCHER_HALF, Y - 4, DISPATCHER_HALF * 2, 14, 7).fill({ color: sel ? 0xffd76a : 0xffffff, alpha: sel ? 0.28 : 0.14 });
+    pad.roundRect(disp.x - DISPATCHER_HALF, Y - 4, DISPATCHER_HALF * 2, 14, 7).stroke({ width: 2, color: sel ? 0xffd76a : 0xffffff, alpha: sel ? 0.95 : 0.4 });
     g.addChild(pad);
   }
   engine.entityLayer.addChild(g);
@@ -3494,7 +3651,15 @@ function cultivateModel(engine) {
     hint: BUILDER_TEXT.cultivateHint,
     closeLabel: 'Leave Cultivation Mode',
     onClose: () => setMode(engine, null),
-    bannerActions: [],
+    // HOMEMAIL: the Mail Dispatcher moves in Cultivate too (reimagined); this reaches it from the keys.
+    bannerActions: back || scene?.room !== 'street' ? [] : [{
+      label: DISPATCHER_TEXT.banner,
+      title: DISPATCHER_TEXT.bannerTitle,
+      attrs: { 'data-home-dispatcher': 'select' },
+      onClick: () => {
+        if (selectDispatcher(engine)) ui?.builder?.pop?.querySelector('button:not([disabled])')?.focus({ preventScroll: true });
+      },
+    }],
     trayLabel: 'Cultivation tray',
     stripLabel: back ? 'Things to grow in your yard' : 'Things to grow on your street',
     stripKey: `cult:${back ? 'yard' : 'street'}`,
@@ -3920,6 +4085,7 @@ function removeSelected(engine) {
 
 function placeAtPointer(engine, at) {
   if (!placing) return null;
+  if (placing.kind === 'dispatcher') return placeDispatcher(engine, at.x);
   if (placing.kind === 'furniture') {
     let result;
     const isDoor = placing.classTsid === DOOR_CLASS;
@@ -3989,6 +4155,7 @@ function destroyGhost() {
   if (scene?.ghost && !scene.ghost.destroyed) scene.ghost.destroy({ children: true });
   if (scene) scene.ghost = null;
   keyCarry = null;
+  dimDispatcher(null, false);
 }
 
 function makeGhost(engine) {
@@ -4004,6 +4171,20 @@ function makeGhost(engine) {
     spr.scale.set(pieceScale(def.classTsid, placing.upgradeId));
     spr.alpha = 0.72;
     g.addChild(spr);
+  } else if (placing.kind === 'dispatcher') {
+    // The dispatcher's own frame over its footprint.
+    const pad = new PIXI.Graphics();
+    g.addChild(pad);
+    g.pad = pad;
+    g.half = DISPATCHER_HALF;
+    const live = dispatcherTarget(engine)?.sprite;
+    if (live) {
+      const art = new PIXI.Sprite(live.texture);
+      art.anchor.copyFrom(live.anchor);
+      art.alpha = 0.85;
+      g.addChild(art);
+      g.art = art;
+    }
   } else {
     const half = footprint(placing.protoClass);
     const pad = new PIXI.Graphics();
@@ -4048,6 +4229,18 @@ function updateGhost(engine) {
     g.x = snap.x + roomX0();
     g.y = snap.y;
     g.ok = true;
+    return;
+  }
+  if (placing.kind === 'dispatcher') {
+    const x = Math.round(at.x);
+    const ok = dispatcherCheck(x).ok;
+    g.ok = ok;
+    g.x = x;
+    g.y = STREET_GROUND_Y + 4;
+    g.pad.clear();
+    g.pad.roundRect(-g.half, -14, g.half * 2, 20, 10).fill({ color: ok ? 0x7cc35a : 0xe0574a, alpha: 0.35 });
+    g.pad.roundRect(-g.half, -14, g.half * 2, 20, 10).stroke({ width: 2, color: ok ? 0x7cc35a : 0xe0574a, alpha: 0.95 });
+    if (g.art) g.art.alpha = ok ? 0.9 : 0.45;
     return;
   }
   const st = activeCult();
@@ -4426,6 +4619,13 @@ function popAnchor(engine) {
     const bottom = clientPoint(engine, b.x + b.w / 2 + roomX0(), b.y + b.h);
     return top && bottom ? { x: top.x, y: top.y, bottom: bottom.y } : null;
   }
+  if (selected?.kind === 'dispatcher') {
+    const s = dispatcherTarget(engine)?.sprite;
+    if (!s) return null;
+    const top = clientPoint(engine, s.x, s.y - 150);
+    const bottom = clientPoint(engine, s.x, s.y + 24);
+    return top && bottom ? { x: top.x, y: top.y, bottom: bottom.y } : null;
+  }
   if (selected?.kind === 'cultivation') {
     const st = activeCult();
     const item = st.items.find((row) => row.id === selected.id);
@@ -4479,7 +4679,7 @@ function syncFloating(engine, force = false) {
     b.setPlace(null);
     return;
   }
-  if (force) popModel = mode === 'decorate' ? furniturePop(engine) : cultivationPop(engine);
+  if (force) popModel = mode === 'decorate' ? furniturePop(engine) : selected?.kind === 'dispatcher' ? dispatcherPop(engine) : cultivationPop(engine);
   if (popModel && !drag && !placing) b.setPop(popModel, popAnchor(engine));
   else b.setPop(null);
   const g = scene.ghost;
@@ -4548,7 +4748,8 @@ function bindPointer(engine) {
       if (Math.hypot(e.clientX - press.x, e.clientY - press.y) < DRAG_DIST) return;
       // HandOfDecorator locDragStart: a placed piece pressed and moved is carried.
       press.dragging = true;
-      beginMove(engine, press.id);
+      if (press.kind === 'dispatcher') beginDispatcherMove(engine);
+      else beginMove(engine, press.id);
       if (!placing) {
         press = null;
         return;
@@ -4595,6 +4796,14 @@ function bindPointer(engine) {
       renderBar(engine);
       if (item && e.button === 0) {
         press = { id: item.id, x: e.clientX, y: e.clientY, pointerId: e.pointerId, dragging: false };
+        window.addEventListener('pointermove', onPressMove, true);
+        window.addEventListener('pointerup', onPressUp, true);
+        window.addEventListener('pointercancel', onPressUp, true);
+      }
+    } else if (dispatcherAt(engine, p) && selectDispatcher(engine)) {
+      // HOMEMAIL: press and drag the Mail Dispatcher, or click it for its actions.
+      if (e.button === 0) {
+        press = { kind: 'dispatcher', id: 'dispatcher', x: e.clientX, y: e.clientY, pointerId: e.pointerId, dragging: false };
         window.addEventListener('pointermove', onPressMove, true);
         window.addEventListener('pointerup', onPressUp, true);
         window.addEventListener('pointercancel', onPressUp, true);
