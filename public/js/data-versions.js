@@ -115,6 +115,7 @@
       "assets/classic/teensy_signpost.png": "3d101127",
       "assets/classic/upgrade_icon.png": "3dbc4e03",
       "assets/classic/warning.png": "b3880bf6",
+      "assets/content/buffs.json": "70ea503c",
       "assets/content/deco-catalog.json": "9c0598c3",
       "assets/content/puzzle-triggers.json": "09810451",
       "assets/content/quests.json": "005211b8",

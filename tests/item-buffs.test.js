@@ -271,3 +271,17 @@ describe('Yellow Crumb items speed up the study in progress', () => {
     assert.match(game, /accelerateActiveStudy\(skillState, r\.info\.studyAccelerationSeconds, Date\.now\(\)\)/);
   });
 });
+
+describe('buff text reads as words', () => {
+  it('no buff name or description carries markup (<b>, <\\/b>, <br>) or the word Glitch', () => {
+    const buffs = JSON.parse(readFileSync(new URL('../public/assets/content/buffs.json', import.meta.url), 'utf8'));
+    for (const [id, b] of Object.entries(buffs)) {
+      for (const field of ['name', 'desc']) {
+        const text = String(b[field] || '');
+        assert.doesNotMatch(text, /<[a-zA-Z/\\]|\\\//, `${id}.${field}: ${text}`);
+        assert.doesNotMatch(text, /\bGlitch\b/, `${id}.${field}: ${text}`);
+      }
+    }
+    assert.equal(buffs.glitch_train.name, 'On the Groddle Train');
+  });
+});
