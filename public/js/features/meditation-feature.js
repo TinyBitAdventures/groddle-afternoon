@@ -50,12 +50,17 @@ import {
   stationMessage,
 } from '../meditation-station.js?v=75b2cbf1';
 import {
+  FOCUS_POCUS_FLAG,
+  FOCUS_POCUS_NEED,
+  FOCUS_POCUS_QUEST,
   MEDITATION_TEXT,
   ORB_CLASS,
   ORB_ITEM,
   ORB_TOOL_SHEET,
+  bestFocusGain,
   endLevitation,
   finishMeditation,
+  focusPocusHint,
   hasZen,
   isLevitating,
   listOrbVerbs,
@@ -64,7 +69,7 @@ import {
   rollMeditationDay,
   startLevitation,
   startMeditation,
-} from '../meditation.js?v=892c78da';
+} from '../meditation.js?v=380b2f3f';
 import { energyMax, metabolicGain, moodMax, loseEnergy, loseMood } from '../metabolics.js?v=8504134e';
 import { levitationCards } from '../imagination-effects.js?v=70169933';
 import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js?v=61e0c5d3';
@@ -90,7 +95,7 @@ import {
   radiationRank,
   radiatorEnd,
   radiatorLine,
-} from '../radiance-mp.js?v=e3590470';
+} from '../radiance-mp.js?v=21492b23';
 
 export const MEDITATION_FEATURE_ID = 'meditation';
 /** metabolics_get_max_energy: the energy tank (100 plus Energy Tank cards). */
@@ -310,6 +315,7 @@ function end(engine, reason = 'timer', at = Date.now()) {
   destroyMeditationFx(engine);
   mpMeditating(engine, '', done);
   const pc = engine.pc;
+  const before = { energy: pc.energy || 0, mood: pc.mood || 0, energyMax: tankOf(engine), moodMax: moodMax(pc) };
   const out = finishMeditation(state, done, {
     now: at,
     learned: learned(engine),
@@ -351,12 +357,33 @@ function end(engine, reason = 'timer', at = Date.now()) {
   if (player && parts.length) engine.floatText(player.x, player.y - avatarHeight(engine) - 20, parts.join('  '), out.full ? 0xd6f5ff : 0xf0e6d0);
   if (out.maxRelax && player) showMaxRelax(engine);
   if (out.reachedZen) engine.toast(MEDITATION_TEXT.zenReached, 3600);
-  for (const event of out.events) engine.achievement(event.counter, event.amount);
+  // focusing_orb.js 822-837 tests what metabolics_add_* returned, so a gain the
+  // dead / Super Pooped gate refused sets neither flag.
+  const counted = Math.max(energy, mood);
+  for (const event of out.events) {
+    if (event.counter === 'meditation_gain_24' && counted < FOCUS_POCUS_NEED) continue;
+    if (event.counter === 'meditation_mood_50' && mood < 50) continue;
+    engine.achievement(event.counter, event.amount);
+  }
+  if (done.kind === 'focused') focusPocusNote(engine, done.focus, done.focus === 'energy' ? energy : mood, before);
   stationAfterSession(engine, out.seconds);
   engine.setData('meditationLast', `${reason}:${out.seconds}s:e${energy}:m${mood}:i${out.img}:${out.full ? 'full' : 'part'}${out.imgBonus ? `:bonus${out.imgBonus}` : ''}${out.maxRelax ? ':maxrelax' : ''}`);
   engine.updateHud();
   engine.save();
   publish(engine, true);
+}
+
+/**
+ * Focus Pocus: a focus that fell short says why (the tank was nearly full, this
+ * rank and tank cannot reach 24 in one focus yet, or the roll was short).
+ */
+function focusPocusNote(engine, focus, gained, before) {
+  const quest = engine.questState?.active?.[FOCUS_POCUS_QUEST];
+  if (!quest || gained >= FOCUS_POCUS_NEED || quest.progress?.[FOCUS_POCUS_FLAG] >= 1) return;
+  const room = focus === 'energy' ? before.energyMax - before.energy : before.moodMax - before.mood;
+  const best = bestFocusGain({ learned: learned(engine), upgrades: upgrades(engine), tank: before.energyMax });
+  const line = focusPocusHint({ focus, gained, room, best, learned: learned(engine) });
+  if (line) engine.pushActivity(line);
 }
 
 /** Meditation Station: one counted game day per 60 s on the same street (quest active only). */

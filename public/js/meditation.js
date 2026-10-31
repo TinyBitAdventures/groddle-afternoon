@@ -550,6 +550,58 @@ export function finishMeditation(state, session, ctx = {}) {
 }
 
 /**
+ * Focus Pocus (quests/focusedmeditation_get_mood_or_energy.js r160): one
+ * focus that actually gains 24. focusing_orb.js endFocusedMeditation 822-836
+ * keeps what metabolics_add_energy / _mood returned (the change after the tank
+ * clamp, inc_metabolics.js 55-76) and sets the flag only when that one
+ * session's change is 24 or more: gains never add up across sessions, and a
+ * focus at a full tank counts nothing.
+ */
+export const FOCUS_POCUS_QUEST = 'focusedmeditation_get_mood_or_energy';
+export const FOCUS_POCUS_FLAG = 'meditation_24_mood_energy';
+export const FOCUS_POCUS_NEED = 24;
+
+/**
+ * The most one focus can pay at this tank, rank and cards, before the tank's
+ * room: the longest roll runSkillPackage can give (inc_skill_packages.js 189-194),
+ * the full-effect bonus, and Double Max Relax when that roll is duration_max.
+ * At Meditative Arts I this stays under 24 below a tank of about 158 (tank 150: 23),
+ * in the source as here.
+ */
+export function bestFocusGain({ learned = [], upgrades = [], tank = DEFAULT_TANK } = {}) {
+  const pkg = sessionPackage('focused', learned, upgrades);
+  if (!pkg) return 0;
+  const lo = pkg.duration / 1000;
+  const hi = pkg.durationMax / 1000;
+  const seconds = Math.ceil(lo + Math.floor(hi - lo));
+  let gain = perSecondGain('focused', learned, tank) * seconds;
+  gain += (pkg.bonusAmount / 100) * gain;
+  if (seconds * 1000 === pkg.durationMax && meditationCards(upgrades).maxRelaxDouble) gain *= 2;
+  return Math.round(gain);
+}
+
+/**
+ * The line a player on Focus Pocus reads after a focus that fell short, saying
+ * what held it back. The quest log only shows 0/1, and the source said nothing.
+ * @param {{ focus: 'energy'|'mood', gained: number, room: number, best: number, learned?: string[] }} o
+ * @returns {string|null} null once the focus reached 24
+ */
+export function focusPocusHint({ focus, gained = 0, room = Infinity, best = 0, learned = [] } = {}) {
+  const need = FOCUS_POCUS_NEED;
+  if (gained >= need) return null;
+  const what = focus === 'energy' ? 'energy' : 'mood';
+  if (best < need) {
+    const rank = meditativeArtsRank(learned);
+    const longer = rank < 3 ? `Learning Meditative Arts ${rank >= 2 ? 'III' : 'II'} makes a focus last longer, and a` : 'A';
+    return `Focus Pocus needs ${need} ${what} from a single focus, and right now the most one focus can give you is ${best}. ${longer} bigger Energy Tank makes every second worth more.`;
+  }
+  if (room < need) {
+    return `Focus Pocus counts only the ${what} you actually gain, and you had room for just ${Math.max(0, Math.floor(room))} more. Focus again when your ${what} is at least ${need} below full.`;
+  }
+  return `Focus Pocus needs ${need} ${what} from a single focus, and that one gave ${gained}. A focus lasts a random time and the longest give up to ${best}, so hold still and try again.`;
+}
+
+/**
  * imagine levitation: spend energy, start the 5 s jetpack buff.
  * @returns {{ ok: boolean, error?: string, state?: object, energyCost?: number, until?: number, message?: string }}
  */

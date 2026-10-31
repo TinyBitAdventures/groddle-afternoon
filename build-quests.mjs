@@ -189,6 +189,11 @@ const REQUIREMENT_TEXT = {
   neighbor_gifts: {
     r371: ['Gift_5_neighbors', 'Leave gifts with the butlers of 5 neighbors'],
   },
+  // Focus Pocus: the flag needs 24 gained in one focus (focusing_orb.js 822-836), as the quest's desc
+  // says ("in one try"); the source step left that out and reads as if focuses add up.
+  focusedmeditation_get_mood_or_energy: {
+    r160: ['Focus your meditation to gain 24 mood or energy', 'Focus your meditation to gain 24 mood or energy in a single focus'],
+  },
 };
 
 // Quest text that sends the player somewhere the archive puts nothing. Each row is a list of exact
