@@ -19,7 +19,7 @@ import { arrivalInTarget, streetAliases } from '../public/js/location-navigation
 import { TOWER_ROOM_DOOR_LINKS } from '../public/js/tower-rooms.js?v=eeebce6f';
 import { ALL_TOWER_ROOMS, CHALLENGE_ROOM_DOOR_LINKS, anyTowerRoomIndexEntry, anyTowerRoomStreet } from '../public/js/tower-challenge-rooms.js?v=8877b6a7';
 import { MID_TOWER_DOOR_LINKS, MID_TOWER_ROOMS, midTowerIndexEntry, midTowerRoomStreet } from '../public/js/tower-mid-rooms.js?v=057c7e72';
-import { GWENDOLYN_DOOR_LINKS, GWENDOLYN_ROOMS, room23IndexEntry, room23Street } from '../public/js/gwendolyn-room-23.js?v=e4eef2b1';
+import { GWENDOLYN_DOOR_LINKS, GWENDOLYN_ROOMS, room23IndexEntry, room23Street } from '../public/js/gwendolyn-room-23.js?v=2b1f5cc4';
 
 const ROOMS = [...ALL_TOWER_ROOMS, ...MID_TOWER_ROOMS, ...GWENDOLYN_ROOMS];
 const LINKS = [...TOWER_ROOM_DOOR_LINKS, ...CHALLENGE_ROOM_DOOR_LINKS, ...MID_TOWER_DOOR_LINKS, ...GWENDOLYN_DOOR_LINKS];

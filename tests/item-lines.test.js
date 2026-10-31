@@ -237,7 +237,7 @@ describe('the other lines the rule changes', () => {
     assert.ok(checked > 1900, `${checked}`);
   });
 
-  it("2,252 lines on 284 streets hold no items; the two rules disagree on 70 lines on 32 streets", () => {
+  it("2,253 lines on 285 streets hold no items; the two rules disagree on 70 lines on 32 streets", () => {
     let soft = 0;
     let softStreets = 0;
     let disagree = 0;
@@ -254,8 +254,8 @@ describe('the other lines the rule changes', () => {
       soft += n;
       if (n) softStreets += 1;
     }
-    assert.equal(soft, 2252);
-    assert.equal(softStreets, 284);
+    assert.equal(soft, 2253); // R5: Room 23 gets a roof over its new upper floor
+    assert.equal(softStreets, 285);
     assert.equal(disagree, 70);
     assert.equal(disagreeStreets.size, 32);
   });

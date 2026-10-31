@@ -49,8 +49,8 @@ import {
   gwendolynOffers,
   leadPath,
   room23Street,
-} from '../public/js/gwendolyn-room-23.js?v=e4eef2b1';
-import { gwendolynRoom23Feature } from '../public/js/features/gwendolyn-room-23-feature.js?v=a151583f';
+} from '../public/js/gwendolyn-room-23.js?v=2b1f5cc4';
+import { gwendolynRoom23Feature } from '../public/js/features/gwendolyn-room-23-feature.js?v=5bd464e1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = (p) => join(spike, 'public', p);
@@ -216,7 +216,7 @@ describe('Room 23: the room', () => {
     assert.deepEqual(out.connect.arrive, { x: door.x, y: out.connect.arrive.y });
   });
 
-  it('climbs from the arrival to Gwendolyn by plain jumps, every face a wall', () => {
+  it('climbs from the arrival to the step under the up arrow by plain jumps, every face a wall', () => {
     const floorP = ROOM_23_ROOM.platforms.find((p) => p.id === 'plat_r23_floor');
     assert.ok(ROOM_23_DOOR.arrive.x >= floorP.x1 && ROOM_23_DOOR.arrive.x <= floorP.x2);
     assert.equal(floorP.y1, ROOM_23_DOOR.arrive.y);
@@ -233,15 +233,29 @@ describe('Room 23: the room', () => {
     }
   });
 
-  it('puts the Greeterbot by the arrival, leads to x 1250 on the walk, and Gwendolyn just up to the right', () => {
+  it('R5 (post 57356435191): a vine ladder under the up arrow climbs from the step to the upper floor', () => {
+    const upper = R.tiers.find((t) => t.id === 'upper');
+    const [ladder] = ROOM_23_ROOM.ladders;
+    assert.equal(ladder.x, R.ladder.x);
+    assert.ok(ladder.x >= mound.x1 && ladder.x <= mound.x2 && ladder.x >= upper.x1 && ladder.x <= upper.x2);
+    assert.equal(ladder.y, mound.y);
+    assert.equal(ladder.y - ladder.h, upper.y);
+    assert.ok(Math.abs(R.arrow.x - ladder.x) < 40 && R.arrow.y < mound.y && R.arrow.y > upper.y, 'the arrow over the ladder foot');
+    assert.ok(upper.y - R.bounds.t >= 500, 'room over the upper floor');
+    assert.ok(mound.y - upper.y > 600, 'two storeys');
+  });
+
+  it('puts the Greeterbot by the arrival, leads to x 1250 on the walk, the way up just to the right, Gwendolyn and the gourd on the upper floor', () => {
+    const upper = R.tiers.find((t) => t.id === 'upper');
     assert.ok(Math.abs(R.greeter.x - ROOM_23_DOOR.arrive.x) <= HIT_HALF, 'it greets you as you arrive');
     const path = leadPath();
     assert.deepEqual(path.at(-1), { x: LEAD_X, y: walk.y });
     assert.ok(LEAD_X >= walk.x1 && LEAD_X <= walk.x2);
-    assert.ok(R.gwen.x > LEAD_X && R.gwen.x >= mound.x1 && R.gwen.x <= mound.x2);
-    assert.ok(R.gwen.x - mound.x1 <= HIT_HALF + 100, 'she notices you soon after the step');
-    assert.ok(R.gwen.x - LEAD_X > HIT_HALF, 'but not while you stand by the Greeterbot');
-    assert.ok(R.gourd.x > R.gwen.x && R.gourd.x < R.bounds.r);
+    // "That's it. Just up to your right.": the ladder up is right of x 1250.
+    assert.ok(R.ladder.x > LEAD_X && R.ladder.x - LEAD_X < 600);
+    assert.ok(R.gwen.x >= upper.x1 && R.gwen.x <= upper.x2);
+    assert.ok(R.gwen.x - upper.x1 <= HIT_HALF + 300, 'she stands on the left of the upper floor');
+    assert.ok(R.gourd.x > R.gwen.x && R.gourd.x < upper.x2);
   });
 
   it('dresses itself from firebog.swf street decos on disk, plus the rendered up arrow', () => {

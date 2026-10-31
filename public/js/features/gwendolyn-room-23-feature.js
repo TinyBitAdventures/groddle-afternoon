@@ -63,7 +63,7 @@ import {
   isRoom23,
   leadPath,
   toScreen,
-} from '../gwendolyn-room-23.js?v=e4eef2b1';
+} from '../gwendolyn-room-23.js?v=2b1f5cc4';
 
 export const GWENDOLYN_ROOM_23_FEATURE_ID = 'gwendolyn-room-23';
 const CHECK_MS = 120;
@@ -169,9 +169,10 @@ function drawGreeter(engine) {
 
 function drawGwendolyn(engine) {
   const { PIXI } = engine;
-  const mound = ROOM_23.tiers.find((t) => t.id === 'mound');
+  // R5 (post 57356435191): she waits on the upper floor, up the vine ladder.
+  const upper = ROOM_23.tiers.find((t) => t.id === 'upper');
   const x = ROOM_23.gwen.x;
-  const y = mound.y;
+  const y = upper.y;
   const p = toScreen(x, y);
   const glow = new PIXI.Graphics();
   for (let i = 6; i >= 1; i--) glow.circle(0, -90, 40 + i * 22).fill({ color: 0xa9f0ff, alpha: 0.035 * (7 - i) });

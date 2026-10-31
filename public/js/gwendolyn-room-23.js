@@ -210,21 +210,28 @@ export function gwendolynOffers(questState, { repeatPaid = false } = {}) {
 
 const BELOW_FLOOR = 300;
 export const ROOM_23 = Object.freeze({
-  bounds: Object.freeze({ l: -2150, r: 2050, t: -1300, b: BELOW_FLOOR }),
+  bounds: Object.freeze({ l: -2150, r: 2050, t: -1900, b: BELOW_FLOOR }),
   floor: -135,
-  /** Three ledges up from the floor (85 px each: one plain jump), then the walk and the mound. */
+  /**
+   * Three ledges up from the floor (85 px each: one plain jump), the walk and
+   * the step at its right end; then (R5, Tribute Blog post 57356435191) a
+   * vine ladder under the up arrow climbs to the upper floor where Gwendolyn
+   * waits.
+   */
   tiers: Object.freeze([
     Object.freeze({ id: 't1', x1: -1600, x2: -1300, y: -220 }),
     Object.freeze({ id: 't2', x1: -1300, x2: -1000, y: -305 }),
     Object.freeze({ id: 'walk', x1: -1000, x2: 1300, y: -390 }),
     Object.freeze({ id: 'mound', x1: 1300, x2: 2010, y: -470 }),
+    Object.freeze({ id: 'upper', x1: -1150, x2: 2010, y: -1250 }),
   ]),
   floorRight: -1600,
   greeter: Object.freeze({ x: -1730, hover: 40 }),
-  gwen: Object.freeze({ x: 1580 }),
-  gourd: Object.freeze({ x: 1860 }),
-  posts: Object.freeze({ x1: -1330, x2: -1110, top: -1300, bottom: -520 }),
-  arrow: Object.freeze({ x: -1070, y: -500 }),
+  gwen: Object.freeze({ x: -760 }),
+  gourd: Object.freeze({ x: -120 }),
+  ladder: Object.freeze({ x: 1700 }),
+  posts: Object.freeze({ x1: 1674, x2: 1726, top: -1250, bottom: -560 }),
+  arrow: Object.freeze({ x: 1700, y: -490 }),
 });
 
 /** The Greeterbot's way to x 1250: up the ledges to the walk (it hovers; npc_can_climb is false, so it glides). */
@@ -279,13 +286,17 @@ function buildRoom23() {
     floor: 'Arrival -1919,-135 (Corridor Five door_1304678396366 connect x/y): the floor you land on.',
     ledges: 'S1: stacked rock ledges step up to the right of the trunk; the Greeterbot says "Proceed upstairs". Remake: three rises of 85 px (one plain jump each).',
     walk: 'npc_widget leadToGwen: apiFindPath(1250, this.y): the Greeterbot leads you along one level to x 1250. Remake: the walk on top of the ledges.',
-    mound: 'npc_widget: "That’s it. Just up to your right." S2: a dark mound in a black void, roots overhead, the ghost and the gourd. Remake: one more 80 px step right of x 1300.',
+    mound: 'npc_widget: "That’s it. Just up to your right." Remake: one more 80 px step right of x 1300, under the up arrow (R5, post 57356435191).',
+    upper: 'R5 (Tribute Blog post 57356435191, the whole room, reference only): the room has two storeys; the up arrow and the hanging vine posts at the lower level\'s right end lead up to an upper floor of dark dirt under hanging roots, the ghost of Gwendolyn on its left and the ribbed gourd in its middle (S2: the ghost left, the gourd right). Remake: a vine ladder up the posts.',
+    ladder: 'R5 (post 57356435191): the vine posts hang from the upper floor to the lower level\'s right end over the up arrow, "just up to your right" of x 1250. Remake: they are the ladder.',
   };
   c.platforms.push(flat('r23_floor', bounds.l + 40, R.floorRight + 20, floor, why.floor));
   c.platforms.push(flat('r23_t1', t.t1.x1, t.t1.x2 + 20, t.t1.y, why.ledges));
   c.platforms.push(flat('r23_t2', t.t2.x1, t.t2.x2 + 20, t.t2.y, why.ledges));
   c.platforms.push(flat('r23_walk', t.walk.x1, t.walk.x2 + 20, t.walk.y, why.walk));
   c.platforms.push(flat('r23_mound', t.mound.x1, t.mound.x2, t.mound.y, why.mound));
+  c.platforms.push(flat('r23_upper', t.upper.x1, t.upper.x2, t.upper.y, why.upper));
+  c.platforms.push(flat('r23_ceiling', bounds.l + 40, bounds.r - 40, bounds.t + 35, 'Roof of the void (solid from below).', 1));
   const faces = [
     ['r23_face_t1', t.t1.x1, t.t1.y, floor],
     ['r23_face_t2', t.t2.x1, t.t2.y, t.t1.y],
@@ -321,17 +332,31 @@ function buildRoom23() {
     for (let y = bottom; y > posts.top - tile.h; y -= tile.h) decos.push(mg('firebog_ladder_tile_center_01_vine', x, y, tile.w, tile.h, 20));
     decos.push(mg(p % 2 ? 'charm_2' : 'charm_1', x, bottom + 78, 30, 96, 21));
   }
-  // S2: roots with seed pods hanging over the mound, the gourd at the far end.
-  decos.push(mg('hanging_braches1', 1080, -640, 520, 440, 3, { flip: true }));
-  decos.push(mg('hanging_braches1', 1440, -660, 600, 500, 3));
-  decos.push(mg('hanging_braches2', 1800, -650, 440, 450, 3));
-  decos.push(mg('hanging_braches2', 640, -620, 380, 390, 3));
-  decos.push(mg('hanging_braches1', 160, -640, 480, 410, 3));
-  decos.push(mg('hanging_braches2', -420, -630, 360, 370, 3, { flip: true }));
-  decos.push(mg('bottletree_body2', R.gourd.x, t.mound.y + 18, 300, 352, 16));
-  decos.push(mg('bottletree_face1', R.gourd.x + 70, t.mound.y - 120, 120, 30, 17, { r: -70 }));
-  decos.push(mg('bottletree_face1', R.gourd.x + 105, t.mound.y - 175, 90, 24, 17, { r: -78 }));
-  decos.push(mg('bottletree_face2', R.gourd.x + 20, t.mound.y - 70, 110, 26, 17, { r: -64 }));
+  // R5 (post 57356435191): the upper floor, a dark dirt slab in the void, roots with seed pods
+  // hanging over it from the dark, the ghost on its left and the ribbed gourd in its middle (S2).
+  ledgeDecos(decos, t.upper, t.upper.y + 200, 15);
+  for (let x = t.upper.x1 + 120, i = 0; x < t.upper.x2; x += 240, i += 1) {
+    decos.push(mg(i % 2 ? 'ground_generic_2' : 'ground_generic_1', x, t.upper.y + 34, 300, 70, 18));
+  }
+  const up = t.upper.y;
+  decos.push(mg('hanging_braches1', -1500, up - 420, 520, 440, 3, { flip: true }));
+  decos.push(mg('hanging_braches2', -1060, up - 430, 440, 450, 3));
+  decos.push(mg('hanging_braches1', -520, up - 400, 600, 500, 3));
+  decos.push(mg('hanging_braches2', 120, up - 420, 380, 390, 3, { flip: true }));
+  decos.push(mg('hanging_braches1', 640, up - 410, 480, 410, 3));
+  decos.push(mg('hanging_braches2', 1160, up - 430, 360, 370, 3));
+  // A ringed trunk arching over the upper floor's right end (R5, top right).
+  decos.push(mg('legs_moss_2', 1820, up + 30, 520, 620, 2, { flip: true }));
+  decos.push(mg('bottletree_body2', R.gourd.x, up + 18, 300, 352, 16));
+  decos.push(mg('bottletree_face1', R.gourd.x + 70, up - 120, 120, 30, 17, { r: -70 }));
+  decos.push(mg('bottletree_face1', R.gourd.x + 105, up - 175, 90, 24, 17, { r: -78 }));
+  decos.push(mg('bottletree_face2', R.gourd.x + 20, up - 70, 110, 26, 17, { r: -64 }));
+  // The lower level: a ringed log arching over the walk's middle with roots under it (R5), and
+  // roots over the ledges.
+  decos.push(mg('legs_moss_3', -40, t.walk.y + 40, 330, 760, 2, { r: 62 }));
+  decos.push(mg('legs_moss_4', 520, t.walk.y + 40, 360, 720, 2, { r: -58, flip: true }));
+  decos.push(mg('hanging_braches2', 230, t.walk.y - 260, 300, 300, 3));
+  decos.push(mg('hanging_braches1', -1250, t.walk.y - 330, 420, 360, 3, { flip: true }));
 
   return {
     tsid: ROOM_23_TSID,
@@ -343,7 +368,7 @@ function buildRoom23() {
     platforms: c.platforms,
     barriers,
     decos,
-    ladders: [],
+    ladders: [{ id: 'ladder_r23_vine', x: R.ladder.x, y: t.mound.y, w: 50, h: t.mound.y - t.upper.y, why: why.ladder }],
     doors: [
       {
         id: 'door_r23_wayout',

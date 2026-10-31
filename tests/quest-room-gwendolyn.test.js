@@ -14,7 +14,7 @@ import * as kit from '../public/js/quest-rooms/kit.js?v=c7ea6e0e';
 import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=10b118dd';
 import { acceptOffer, ensureQuestOfferState, questStatus, turnInQuest } from '../public/js/quest-offers.js?v=dbfa83c4';
-import { gwendolynOffers } from '../public/js/gwendolyn-room-23.js?v=e4eef2b1';
+import { gwendolynOffers } from '../public/js/gwendolyn-room-23.js?v=2b1f5cc4';
 import {
   CACTUS,
   CACTUS_LINES,
