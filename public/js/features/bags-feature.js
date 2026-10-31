@@ -43,7 +43,12 @@
  * Departures (see js/pack-slots.js): every overflow is held by the magic rock
  * (the source put things made from a source on the ground); rock-held stacks
  * are out of the pack but recipes and quests still count them; elements may
- * use pack slots; a bag that leaves the pack leaves its contents behind.
+ * use pack slots; a bag that leaves the pack leaves its contents behind; a
+ * bag that arrives (bought, a reward, a gift, mail, picked up, made) goes in
+ * place of the leftmost pack slot that is not a bag and takes the stack there
+ * in with it, so a full pack still takes one (Austin 2026-10-31; the source
+ * put it in the first free slot and refused a full pack, bag.js:89-238,
+ * inc_stores.js:170-173). Bags held and what they hold never move.
  *
  * QA: `?autostart=1&fresh=1&resetgame=1&questoffer=off&bagdemo=1` empties the
  * pack to a Generic Bag and 15 stacks (16/16, the bag empty) and drops 5 Plums
@@ -70,7 +75,7 @@ import {
   normalizePrefs,
   packIntoBags,
   roomFor,
-} from '../pack-slots.js?v=c31995f9';
+} from '../pack-slots.js?v=f01262b1';
 import { createMinnAccount } from '../minn-account.js?v=81339760';
 
 export const BAGS_FEATURE_ID = 'bags';
@@ -248,10 +253,12 @@ export function applyStarter(engine, answer) {
   // Did the pack overflow before these bags? (A load may already have added them: take them out to look.)
   const without = { ...inv };
   if (receipt === false) for (const c of mint) without[c] = Math.max(0, (Number(without[c]) || 0) - 1);
-  const overflowed = layoutPack(without, slice.prefs, opts()).rockStacks > 0;
+  const before = layoutPack(without, slice.prefs, opts());
+  const overflowed = before.rockStacks > 0;
   if (receipt === true) for (const c of mint) addItem(inv, c, 1);
-  // The solo migration's arrangement for the new bags; what was there before is placed as usual.
-  slice.prefs = normalizePrefs(arrangeIntoBags(inv, mint, opts()));
+  // The solo migration's arrangement for the new bags; bags held before keep what is in them,
+  // the rest is placed as usual.
+  slice.prefs = normalizePrefs(arrangeIntoBags(inv, mint, opts(), before.prefs));
   slice.open = '';
   const layout = layoutPack(inv, slice.prefs, opts());
   slice.prefs = layout.prefs;

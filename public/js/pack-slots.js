@@ -20,7 +20,8 @@
  * the record of everything held, because hundreds of call sites and several
  * side tables read it. The layout is computed from those counts and a saved
  * arrangement (prefs): saved positions are honoured first, so stacks stay where
- * the player put them and new arrivals are what doesn't fit. What doesn't fit
+ * the player put them and new arrivals are what doesn't fit (a new bag goes in
+ * place of the leftmost slot that is not a bag: arrivalSlot). What doesn't fit
  * is held by the magic rock (the source's familiar overflow) and comes back by
  * itself when room frees. A class's count is split into full stacks first and
  * one remainder stack last.
@@ -201,7 +202,12 @@ export function layoutPack(inv, prefs = null, opts = {}) {
   const capacity = Math.max(1, Math.floor(opts.capacity ?? PACK_CAPACITY));
   const saved = normalizePrefs(prefs);
   // Bag instances: the saved ones of each class first (in saved order), then new keys.
-  const used = new Set();
+  // Every saved key is taken before any new one is made, so a bag that just
+  // arrived never takes the key (and so the contents) of a bag held already,
+  // whatever order its class comes in (the catalog lists the vendors' bags in
+  // store order: a Generic Bag before a Red Toolbox). In the source nothing
+  // held moves when a bag arrives (bag.js:89-238 addItemStack only adds it).
+  const used = new Set(saved.bags.map((row) => row.key));
   const instances = [];
   const savedByCls = new Map();
   for (const row of saved.bags) {
@@ -213,10 +219,7 @@ export function layoutPack(inv, prefs = null, opts = {}) {
     if (!isBagClass(cls)) continue;
     const n = Math.max(0, Math.floor(Number(inv[cls]) || 0));
     const rows = (savedByCls.get(cls) || []).slice(0, n);
-    for (const row of rows) {
-      used.add(row.key);
-      instances.push({ key: row.key, cls, placed: false });
-    }
+    for (const row of rows) instances.push({ key: row.key, cls, placed: false });
     for (let i = rows.length; i < n; i += 1) {
       const key = nextBagKey(used);
       used.add(key);
@@ -273,9 +276,22 @@ export function layoutPack(inv, prefs = null, opts = {}) {
       if (has(cls) && boxTakes(box, cls)) putStack(box, cls);
     }
   }
-  // Phase 2a: bags that have no saved place take free pack slots first.
+  // Phase 2a: a bag with no saved place (one that just arrived, or one the magic rock gives
+  // back) goes in place of the leftmost pack slot that is not a bag, and the stack in that
+  // slot goes into it, so nothing leaves the pack (Austin 2026-10-31; the source put it in
+  // the first free slot instead: bag.js:89-238). See arrivalSlot.
   for (const inst of instances) {
-    if (!inst.placed && pack.slots.length < capacity) putBag(inst);
+    if (inst.placed) continue;
+    const box = { cls: inst.cls, capacity: BAG_DEFS[inst.cls].capacity, onePerClass: Boolean(BAG_DEFS[inst.cls].onePerClass), slots: [] };
+    const at = arrivalSlot(pack.slots, capacity, (cls) => boxTakes(box, cls), opts);
+    if (at === null) continue;
+    const swallowed = at >= 0 ? pack.slots.splice(at, 1)[0] : null;
+    putBag(inst);
+    // Bags sit together at the front of the row, in arrival order after the bags held.
+    const slot = pack.slots.pop();
+    const lastBag = pack.slots.reduce((last, s, i) => (s.kind === 'bag' ? i : last), -1);
+    pack.slots.splice(lastBag + 1, 0, slot);
+    if (swallowed) boxes.get(inst.key).slots.push(swallowed);
   }
   // Phase 2b: every other stack, the source's order: limited bags, then the pack, then the other bags.
   const bagSlots = () => pack.slots.filter((s) => s.kind === 'bag').map((s) => boxes.get(s.key));
@@ -332,6 +348,26 @@ export function layoutPack(inv, prefs = null, opts = {}) {
     free: capacity - pack.slots.length,
     prefs: nextPrefs,
   };
+}
+
+/**
+ * Where a bag that arrives goes (Austin 2026-10-31): in place of the leftmost
+ * pack slot that is not a bag, as the pack row shows it (bags, then items,
+ * then tools, then the empty slots; game.js renderPack). Returns the index in
+ * slots of the stack it takes in (that stack moves into the bag), -1 for an
+ * empty slot, or null when there is none (the magic rock holds the bag, and a
+ * vendor refuses the sale: inc_stores.js:170-173).
+ * A bag that can't hold the leftmost stack (a Spice Rack and an apple) takes
+ * the leftmost one it can hold, else the first empty slot; a stack is never
+ * put in a bag that would refuse it.
+ */
+export function arrivalSlot(slots, capacity, takes, opts = {}) {
+  const rowTool = (cls) => Boolean(opts.isTool?.(cls));
+  const order = [];
+  slots.forEach((s, i) => { if (s.kind === 'stack' && !rowTool(s.cls)) order.push(i); });
+  slots.forEach((s, i) => { if (s.kind === 'stack' && rowTool(s.cls)) order.push(i); });
+  for (const i of order) if (takes(slots[i].cls)) return i;
+  return slots.length < capacity ? -1 : null;
 }
 
 /** Units of overflow (stacks the rock holds), the measure room is judged by. */
@@ -477,15 +513,41 @@ export function starterKit(inv, opts = {}) {
  * The arrangement packIntoBags makes, for bags that just arrived (the solo
  * migration's, or a multiplayer character's starter bags from the site's
  * ledger): the new bags first in the pack, a toolbox filled with tool stacks,
- * then each other bag with the stacks left, in auto-place order. Bags the
- * pack held before and anything left over are placed by layoutPack as usual
- * (free pack slots, then the magic rock). Returns prefs (normalizePrefs shape).
+ * then each other bag with the stacks left, in auto-place order. Anything left
+ * over is placed by layoutPack as usual (free pack slots, then the magic rock).
+ * keep: the arrangement of the bags held before these arrived (prefs shape):
+ * they keep their keys, their pack places (ahead of the new bags) and
+ * everything in them; only the stacks outside them are laid into the new bags
+ * (the source never moves a held stack when a bag arrives, bag.js:89-238).
+ * Returns prefs (normalizePrefs shape).
  */
-export function arrangeIntoBags(inv, mint, opts = {}) {
+export function arrangeIntoBags(inv, mint, opts = {}, keep = null) {
   const { toolStacks, otherStacks } = stacksByKind(inv, opts);
   const list = (Array.isArray(mint) ? mint : []).filter((cls) => isBagClass(cls));
   const prefs = { bags: [], place: { pack: [] } };
-  const keyOf = list.map((cls, i) => ({ cls, key: `b${i + 1}` }));
+  const kept = normalizePrefs(keep);
+  const used = new Set();
+  for (const entry of kept.place.pack || []) {
+    const key = entry.startsWith('@') ? entry.slice(1) : '';
+    const row = key && kept.bags.find((b) => b.key === key);
+    if (!row || used.has(key)) continue;
+    used.add(key);
+    prefs.bags.push(row);
+    prefs.place.pack.push(entry);
+    prefs.place[key] = [...(kept.place[key] || [])];
+    // What this bag holds stays in it: those stacks are not laid out again.
+    for (const cls of prefs.place[key]) {
+      for (const stacks of [toolStacks, otherStacks]) {
+        const at = stacks.indexOf(cls);
+        if (at >= 0) { stacks.splice(at, 1); break; }
+      }
+    }
+  }
+  const keyOf = list.map((cls) => {
+    const key = nextBagKey(used);
+    used.add(key);
+    return { cls, key };
+  });
   for (const { cls, key } of keyOf) {
     prefs.bags.push({ key, cls });
     prefs.place.pack.push(`@${key}`);
