@@ -149,7 +149,7 @@ import {
   panKey,
   placeCostText,
   trayFilters,
-} from '../ui/home-builder.js?v=c2f2ccc7';
+} from '../ui/home-builder.js?v=2e0c377b';
 import { RECIPE_CATALOG } from '../making.js?v=9e538296';
 import {
   createBackYardState,
@@ -3104,7 +3104,8 @@ function decorateModel(engine) {
     closeLabel: 'Leave Decoration Mode',
     onClose: () => setMode(engine, null),
     bannerActions: decorateBannerActions(engine),
-    tabs: DECOR_TABS.map(([id, label]) => ({ id, label })),
+    // The Pack tab's tooltip says what it is for (its hint line has no room beside the pack).
+    tabs: DECOR_TABS.map(([id, label]) => ({ id, label, title: id === 'pack' ? BUILDER_TEXT.packNote : '' })),
     tab: tabId,
     tabsLabel: 'Decorate with',
     onTab: (id) => {

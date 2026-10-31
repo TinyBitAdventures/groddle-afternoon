@@ -26,7 +26,7 @@ import {
   panKey,
   placeCostText,
   trayFilters,
-} from '../public/js/ui/home-builder.js?v=c2f2ccc7';
+} from '../public/js/ui/home-builder.js?v=2e0c377b';
 import {
   INTERIOR,
   createHomeDecorState,
@@ -492,6 +492,17 @@ describe('two skins, one DOM', () => {
     assert.doesNotMatch(style, /#game-root \.homes-bar \{\s*left: var\(--hud-inset\)/);
     // Classic uses the 2012 bag's own art for its paging arrows.
     assert.match(classic, /assets\/classic\/furn_scroll\.png/);
+  });
+
+  it('keeps the tray tabs on one row, and the Pack tab clear of the pack and an open bag', () => {
+    const style = read('public/style.css');
+    const classic = read('public/css/classic.css');
+    assert.match(style, /#game-root \.hb-tray \.hb-tabs \{[^}]*flex-wrap: nowrap;[^}]*min-width: max-content;/);
+    assert.match(style, /#game-root \.hb-tray \.hb-tabs button \{ white-space: nowrap; \}/);
+    assert.match(style, /\.hb-tray\[data-tab="pack"\] \{ right: auto; width: max-content;/);
+    assert.doesNotMatch(style, /\.hb-tray\[data-tab="pack"\] \.hb-tabs \{ flex-wrap: wrap; \}/);
+    // Classic: the bag rises over the tabs that hang 17 above the pack band.
+    assert.match(classic, /:root\[data-ui="classic"\]\[data-home-tray="pack"\] #game-root \.pack-bag-row \{ bottom: calc\(100% \+ 8px \+ 21 \* var\(--cu\)\); \}/);
   });
 
   it('respects reduced motion', () => {

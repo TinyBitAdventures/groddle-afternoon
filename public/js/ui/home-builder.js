@@ -361,6 +361,7 @@ export function createHomeBuilder({ root, doc = root?.ownerDocument }) {
           class: t.id === m.tab ? 'on' : false,
           'aria-selected': String(t.id === m.tab),
           'data-home-tab': t.id,
+          title: t.title || false,
           id: `homes-tab-${t.id}`,
           text: t.label,
         });

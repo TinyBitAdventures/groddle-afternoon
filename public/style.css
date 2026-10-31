@@ -11325,7 +11325,8 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 #game-root .hb-tray .hb-foot .hb-foot-mirror { display: none !important; }
 #game-root .hb-tray .hb-foot { grid-area: foot; display: flex; align-items: center; justify-content: flex-end; min-width: 0; }
 #game-root .hb-tray .hb-foot:first-child, #game-root .hb-tray .hb-panel + .hb-foot { grid-column: 1 / -1; }
-#game-root .hb-tray .hb-tabs { grid-area: tabs; display: flex; align-items: flex-end; }
+#game-root .hb-tray .hb-tabs { grid-area: tabs; display: flex; flex-wrap: nowrap; align-items: flex-end; min-width: max-content; }
+#game-root .hb-tray .hb-tabs button { white-space: nowrap; }
 #game-root .hb-tray .hb-panel { grid-area: panel; display: flex; align-items: stretch; min-width: 0; }
 #game-root .hb-tray .hb-panel[hidden] { display: none; }
 #game-root .hb-tray .hb-filters { grid-area: filters; display: flex; flex-wrap: wrap; align-items: center; }
@@ -11406,7 +11407,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   box-shadow: var(--shadow-3);
 }
 /* The Pack tab: only the tabs, over the pack itself. */
-[data-ui="modern"] #game-root .hb-tray[data-tab="pack"] { right: auto; max-width: min(340px, calc(50% - 180px)); margin: 0; padding-bottom: var(--space-2); }
+/* The Pack tab: one row of tabs beside the pack row, its hint in the Pack tab's tooltip; the bag opens over the pack, clear of it. */
+[data-ui="modern"] #game-root .hb-tray[data-tab="pack"] { right: auto; width: max-content; max-width: none; margin: 0; padding: var(--sp-2); }
+[data-ui="modern"] #game-root .hb-tray[data-tab="pack"] .hb-foot { display: none; }
 [data-ui="modern"] #game-root .hb-tray .hb-tabs { gap: 2px; justify-self: start; padding: 3px; border-radius: var(--radius-pill); background: var(--surface-sunken); }
 [data-ui="modern"] #game-root .hb-tray .hb-tabs button { min-height: 28px; padding: 0 var(--space-3); border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text-muted); font: inherit; font-size: var(--fs-s); font-weight: var(--fw-heavy); cursor: pointer; }
 [data-ui="modern"] #game-root .hb-tray .hb-tabs button:hover { color: var(--text); }
@@ -11492,9 +11495,9 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 @media (prefers-reduced-motion: no-preference) {
   [data-ui="modern"] #game-root :is(.hb-tile, .hb-bt, .hb-tabs button, .hb-filters button) { transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out); }
 }
-[data-ui="modern"] #game-root .hb-tray[data-tab="pack"] .hb-foot { grid-column: 1 / -1; flex-wrap: wrap; justify-content: flex-start; }
-[data-ui="modern"] #game-root .hb-tray[data-tab="pack"] .hb-tray-note { text-align: left; flex-basis: 100%; }
-[data-ui="modern"] #game-root .hb-tray[data-tab="pack"] .hb-tabs { flex-wrap: wrap; }
+@media (max-width: 1100px) {
+  [data-ui="modern"] #game-root .hb-tray[data-tab="pack"] .hb-tabs button { padding: 0 var(--sp-5); }
+}
 /* —— /BUILDER —— */
 [data-ui="modern"] #game-root .homes-styles .hs-sel { border-bottom: 1px solid var(--border); }
 [data-ui="modern"] #game-root .homes-styles .hs-name small { color: var(--text-muted); }

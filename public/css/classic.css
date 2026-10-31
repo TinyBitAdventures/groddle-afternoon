@@ -2218,6 +2218,8 @@
 /* The Inventory tab: the pack itself under the tabs. */
 :root[data-ui="classic"] #game-root .hb-tray[data-tab="pack"] { height: 0; padding: 0; bottom: auto; top: calc(100% - var(--cband-h, calc(132 * var(--cu)))); background: transparent; }
 :root[data-ui="classic"] #game-root .hb-tray[data-tab="pack"] .hb-foot { display: none; }
+/* An open bag rises clear of the tabs while they hang over the pack (PackTabberUI 17 tall). */
+:root[data-ui="classic"][data-home-tray="pack"] #game-root .pack-bag-row { bottom: calc(100% + 8px + 21 * var(--cu)); }
 :root[data-ui="classic"] #game-root .hb-tray .hb-panel {
   position: relative;
   gap: 0;
