@@ -13,7 +13,7 @@ import {
   planStreetPlacements,
   nearestPlacementGap,
   STREET_ECOLOGY_URL,
-} from '../public/js/street-ecology.js?v=6a313245';
+} from '../public/js/street-ecology.js?v=fd79899d';
 import {
   platformsScreen,
   platformYAt,
@@ -44,6 +44,7 @@ describe('Tiny Speck street ecology catalog', () => {
   it('recovers Hechey Track exact static animals, trants, vendor, shrine, and spawner', () => {
     const row = ecologyForStreet('GLI2V0UN7RD1T2J');
     assert.equal(row.sourceTsid, 'LLI2V0UN7RD1T2J');
+    // The starter keeps its 6 Piggies (snapshot and August 2012 page) above the street cap of 3.
     assert.equal(row.counts.npc_piggy, 6);
     assert.equal(row.counts.trant_fruit, 5);
     assert.equal(row.counts.trant_bubble, 2);
@@ -72,7 +73,9 @@ describe('Tiny Speck street ecology catalog', () => {
     assert.equal(row.counts.trant_gas, 1);
     assert.equal(row.counts.trant_fruit, 1);
     assert.equal(row.giantId, 'friendly');
-    assert.equal(row.counts.npc_piggy || 0, 0);
+    // Its snapshot holds no animal; its September 2012 page lists 2 Piggies (build-street-ecology.mjs).
+    assert.equal(row.counts.npc_piggy, 2);
+    assert.deepEqual(catalog.piggies.GLI3272LOTD1B1F.wayback, ['20120913010151']);
   });
 
   it('keeps the source-empty Stoot memorial private and uncluttered', () => {

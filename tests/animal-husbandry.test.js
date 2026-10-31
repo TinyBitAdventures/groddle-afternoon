@@ -45,10 +45,11 @@ import {
   stepHogtie,
   stickPlaceState,
   takePlop,
-} from '../public/js/animal-husbandry.js?v=5b53d454';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=43b2acc8';
-import { getVerbsFor, runVerb } from '../public/content.js?v=1d972879';
-import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=43a5166b';
+} from '../public/js/animal-husbandry.js?v=f273e2e7';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=756d53d3';
+import { getVerbsFor, runVerb } from '../public/content.js?v=341f7fc2';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=fd79899d';
+import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=e62b5ff4';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');
@@ -94,19 +95,22 @@ describe('Batterflies and Guano (npc_batterfly.js)', () => {
     assert.equal(passiveGuano(state, t0 + 20 * BATTERFLY.passiveIntervalMs, 8), 2);
   });
 
-  it('lives on cave and cavern streets only, one or two per street', () => {
+  it('lives where the live street pages listed Batterflies, as many as they did', () => {
+    // isBatterflyHabitat is the cave-street test the seasons keep out of.
     assert.equal(isBatterflyHabitat({ label: 'Lapulapu Caverns', hubName: 'Old Groddle Forest' }), true);
     assert.equal(isBatterflyHabitat({ label: 'Dokk Rokk', internalLabel: 'nottis_cavern_07', hubName: 'Nottis' }), true);
-    assert.equal(isBatterflyHabitat({ label: 'Churni Sanctum', hubName: 'Ilmenskie Deeps' }), true);
     assert.equal(isBatterflyHabitat({ label: 'Hechey Track', hubName: 'Groddle Forest' }), false);
+    const catalog = JSON.parse(readFileSync(join(publicDir, 'assets/content/street-ecology.json'), 'utf8'));
+    setStreetEcologyCatalog(catalog);
     const index = JSON.parse(readFileSync(join(publicDir, 'assets/streets/index.json'), 'utf8')).streets;
-    // Tiny Speck's streets (a published zone's, GZ, are new content).
-    const counts = Object.entries(index).filter(([tsid]) => !/^[GL]Z/.test(tsid)).map(([tsid, row]) => batterflyCountForStreet({ tsid, ...row }));
-    const habitat = counts.filter(Boolean);
-    // 52 since G184 put Oktyabrya in Uralia, its own location hub (was Groddle Forest).
-    assert.equal(habitat.length, 52);
-    assert.ok(habitat.every((n) => n === 1 || n === 2));
-    assert.deepEqual(batterflyPlacementGroups({ tsid: 'GA9114MS8B32FB2', label: 'Churni Sanctum', hubName: 'Ilmenskie Deeps' })[0].key, 'batterfly');
+    const counts = Object.fromEntries(Object.keys(index).map((tsid) => [tsid, batterflyCountForStreet({ tsid, ...index[tsid] })]).filter(([, n]) => n));
+    assert.equal(Object.keys(counts).length, 60);
+    for (const [tsid, n] of Object.entries(counts)) assert.equal(n, catalog.batterflies[tsid].count, tsid);
+    // Churni Sanctum (Ilmenskie Deeps): 4 on its August 2012 page; Hechey Track: none.
+    assert.equal(counts.GA9114MS8B32FB2, 4);
+    assert.equal(batterflyCountForStreet({ tsid: 'GLI2V0UN7RD1T2J' }), 0);
+    assert.deepEqual(batterflyPlacementGroups({ tsid: 'GA9114MS8B32FB2' }), [{ key: 'batterfly', count: 4, clearance: 120 }]);
+    assert.deepEqual(batterflyPlacementGroups({ tsid: 'GLI2V0UN7RD1T2J' }), []);
   });
 });
 

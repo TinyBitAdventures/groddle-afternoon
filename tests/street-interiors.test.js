@@ -17,7 +17,7 @@ import {
   ecologyForStreet,
   interiorReason,
   populationForStreet,
-} from '../public/js/street-ecology.js?v=6a313245';
+} from '../public/js/street-ecology.js?v=fd79899d';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => JSON.parse(readFileSync(join(spike, rel), 'utf8'));
@@ -147,7 +147,7 @@ describe('interior rows in the catalog', () => {
 
 describe('spawners', () => {
   it('a spawner on a street with no archived ecology guesses no animal', () => {
-    for (const tsid of ['GA9R4OR505F3PSL', 'GA9QNMSIV4F3143']) { // Abbasid Jail, Volcano Villa
+    for (const tsid of ['GA53N05IG9S2BLR', 'GA9QNMSIV4F3143']) { // Gyerean Park, Volcano Villa
       const row = ecologyForStreet(tsid, catalog);
       assert.deepEqual([row.counts, row.spawners], [{}, 1], tsid);
       const pop = populationForStreet(tsid, row);
@@ -156,9 +156,12 @@ describe('spawners', () => {
     }
   });
 
-  it('Abbasid Walkway\'s two Butterflies come from its live street page, not its spawner', () => {
-    const row = ecologyForStreet('GA9R3FG405F3B9P', catalog);
-    assert.deepEqual([row.counts, row.spawners, catalog.butterflies.GA9R3FG405F3B9P.count], [{ npc_butterfly: 2 }, 1, 2]);
+  it('Abbasid Walkway and Abbasid Jail get their animals from their live street pages, not their spawners', () => {
+    const walkway = ecologyForStreet('GA9R3FG405F3B9P', catalog);
+    assert.deepEqual([walkway.counts, walkway.spawners], [{ npc_chicken: 2, npc_butterfly: 2 }, 1]);
+    const jail = ecologyForStreet('GA9R4OR505F3PSL', catalog);
+    // 1 Piggy and 4 Chickens on its page: Chickens at the street cap of 2.
+    assert.deepEqual([jail.counts, catalog.chickens.GA9R4OR505F3PSL.count], [{ npc_piggy: 1, npc_chicken: 2 }, 4]);
   });
 
   it('a spawner on a living street guesses no animal (G44b)', () => {

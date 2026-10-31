@@ -24,9 +24,9 @@ import {
   planStreetPlacements,
   populationForStreet,
   setStreetEcologyCatalog,
-} from '../public/js/street-ecology.js?v=6a313245';
+} from '../public/js/street-ecology.js?v=fd79899d';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
-import { adoptedPlan } from '../public/js/features/patches-feature.js?v=d7bf7501';
+import { adoptedPlan } from '../public/js/features/patches-feature.js?v=5562a246';
 import { createPlot } from '../public/js/patches.js?v=cfa86c42';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
@@ -50,9 +50,9 @@ function layoutOf(data, { footprints = true } = {}) {
 describe('the footprints', () => {
   it('come from the drawn art', () => {
     // Trants 127-267 px wide at 210 px tall, their feet up to 171 px (trant_egg); gardens 280 / 227;
-    // the vendor 422 px x 0.25; a shrine cell 151 px x 0.78; rocks 92-114 px at 0.85.
+    // the vendor 422 px x 0.25; a shrine cell 151 px x 0.78; rocks 92-114 px at 0.85; a Piggy's feet and body.
     assert.equal(TREE_FOOTPRINT, 180);
-    assert.deepEqual({ ...PLACEMENT_FOOTPRINTS }, { trees: 180, gardens: 280, vendor: 106, shrine: 118, rocks: 100 });
+    assert.deepEqual({ ...PLACEMENT_FOOTPRINTS }, { trees: 180, gardens: 280, vendor: 106, shrine: 118, rocks: 100, piggies: 60 });
     assert.equal(PERCH_DROP_PX, 150);
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
     assert.match(game, /trantDisplayScale\(tex, \{ targetH: 210, maxScale: 1 \}\)/);
@@ -174,6 +174,7 @@ describe('the archived streets', () => {
   it('places every big thing on its own footprint of floor, and drops none', () => {
     let placed = 0;
     let perched = 0;
+    const perchedBy = {};
     for (const tsid of streets) {
       let data;
       try { data = street(tsid); } catch { continue; }
@@ -183,10 +184,13 @@ describe('the archived streets', () => {
       assert.deepEqual(plan.fallbacks, [], tsid);
       placed += BIG.reduce((n, key) => n + (plan.groups[key]?.length || 0), 0);
       perched += plan.perches.length;
+      for (const p of plan.perches) perchedBy[p.key] = (perchedBy[p.key] || 0) + 1;
     }
     assert.ok(placed > 5000, String(placed));
     // Perches only where a street's floors are full: 6 trees, 17 shrines, 167 rocks on 2026-10-31.
-    assert.ok(perched <= 200, String(perched));
+    assert.ok(perched <= 200 + (perchedBy.piggies || 0), JSON.stringify(perchedBy));
+    // The census's Piggies (2026-10-31) perch on ledges a player can still reach (tests/reach.test.js).
+    assert.ok((perchedBy.piggies || 0) <= 40, JSON.stringify(perchedBy));
   });
 
   it('plans streets whose archived file holds no ecology exactly as before', () => {

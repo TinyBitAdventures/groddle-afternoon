@@ -45,6 +45,7 @@ import { isMissingFloorTsid } from './hidden-floors.js?v=5ce87a04';
 import { stationByTsid } from './subway.js?v=646ae6af';
 import { ensurePiggyMood, piggyTwiceDailyTick, satePiggy } from './animal-mood.js?v=a49495fc';
 import { isCrowdSad } from './animal-crowding.js?v=81f4b6ea';
+import { ecologyForStreet } from './street-ecology.js?v=fd79899d';
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
@@ -246,12 +247,11 @@ export function passiveGuano(state, now, guanoOnStreet = 0) {
 }
 
 /**
- * Where Batterflies live. No archived street places one and nothing in GSJS
- * spawns one, but the item says "Found in caverns" and the Batterfly Bounty
- * quest sends you to "a batterfly roaming the caves". The remake puts one or
- * two (stable per street) on cave and cavern streets: the Ilmenskie Caverns,
- * Ilmenskie Deeps and Uralia hubs, plus any street whose public or template
- * name says cave, cavern, grotto, tunnel or hollow.
+ * Cave streets: the Ilmenskie Caverns, Ilmenskie Deeps and Uralia hubs, plus
+ * any street whose public or template name says cave, cavern, grotto, tunnel
+ * or hollow (the item says "Found in caverns"). Seasonal outdoor things keep
+ * out of them (seasons-feature.js). Batterflies used to be placed by this
+ * guess; they now come from the live street pages (batterflyCountForStreet).
  */
 export const BATTERFLY_CAVE_HUBS = Object.freeze(['Ilmenskie Caverns', 'Ilmenskie Deeps', 'Uralia']);
 const CAVE_WORDS = /(cave|cavern|grotto|tunnel|hollow)/i;
@@ -270,18 +270,15 @@ export function isBatterflyHabitat(street = {}) {
   return CAVE_WORDS.test(String(street.label || '')) || CAVE_WORDS.test(String(street.internalLabel || ''));
 }
 
-function hashString(text) {
-  let h = 2166136261;
-  for (const ch of String(text || '')) {
-    h ^= ch.charCodeAt(0);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
-
+/**
+ * A street's Batterflies: the count its live glitch.com street page listed
+ * (build-street-ecology.mjs, counts.npc_batterfly; 60 streets, evidence in
+ * the catalog's `batterflies` map). A street with no evidence has none.
+ */
 export function batterflyCountForStreet(street = {}) {
-  if (!isBatterflyHabitat(street)) return 0;
-  return 1 + (hashString(street.tsid || street.label) % 2);
+  const row = street?.tsid ? ecologyForStreet(street.tsid) : null;
+  const n = Math.floor(Number(row?.counts?.npc_batterfly) || 0);
+  return n > 0 ? n : 0;
 }
 
 // ---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 /**
  * Street Butterflies come back only where the original had them: the live
- * glitch.com street pages' counts (tools/ecology/butterfly-census.json, every
+ * glitch.com street pages' counts (tools/ecology/animal-census.json, every
  * archived street page's latest live capture plus an earlier sample) and the seven the late-2012 snapshot kept under
  * __MISSING_ITEMS__. build-street-ecology.mjs writes counts.npc_butterfly and
  * the evidence map `butterflies`; populationForStreet shows that many in all.
@@ -11,11 +11,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { butterflySplit, populationForStreet } from '../public/js/street-ecology.js?v=6a313245';
+import { butterflySplit, populationForStreet } from '../public/js/street-ecology.js?v=fd79899d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const catalog = JSON.parse(readFileSync(join(root, 'public/assets/content/street-ecology.json'), 'utf8'));
-const census = JSON.parse(readFileSync(join(root, 'tools/ecology/butterfly-census.json'), 'utf8'));
+const census = JSON.parse(readFileSync(join(root, 'tools/ecology/animal-census.json'), 'utf8'));
 const index = JSON.parse(readFileSync(join(root, 'public/assets/streets/index.json'), 'utf8'));
 
 /**

@@ -1,5 +1,5 @@
 {
-  "about": "Live-era glitch.com street encyclopedia pages (Wayback Machine). Each page's features line was the server's live count of the street's items (GSJS locations/location.js 3459-3460, 3572). The census takes the latest capture of every archived street page before the 2012-12-09 shutdown, and keeps the earlier sample's captures (October 2011, about 3 per hub). A street's butterflies and batterflies are its largest count in any capture; piggies and chickens are its latest capture's, kept as a cross-check only. Pages that answered Page not found are left out. Raw pages and the parser: glitch-audit research/wayback/raw/glitchcom-locations-live and research/wayback/tools/build-butterfly-census.py.",
+  "about": "Live-era glitch.com street encyclopedia pages (Wayback Machine). Each page's features line was the server's live count of the street's items (GSJS locations/location.js 3459-3460, 3572). The census takes the latest capture of every archived street page before the 2012-12-09 shutdown, and keeps the earlier sample's captures (October 2011, about 3 per hub). A street's count of each animal is its largest in any capture. Pages that answered Page not found are left out. Raw pages and the parser: glitch-audit research/wayback/raw/glitchcom-locations-live and research/wayback/tools/build-butterfly-census.py.",
   "streets": [
     {
       "tsid": "GLI17VIKLJ02BSV",
@@ -508,7 +508,7 @@
       "latest": "20121018053319",
       "butterflies": 2,
       "piggies": 2,
-      "chickens": 3,
+      "chickens": 4,
       "batterflies": 0
     },
     {
@@ -978,7 +978,7 @@
       ],
       "latest": "20121029032958",
       "butterflies": 2,
-      "piggies": 0,
+      "piggies": 2,
       "chickens": 5,
       "batterflies": 0
     },
@@ -5389,7 +5389,7 @@
       "latest": "20121029061422",
       "butterflies": 2,
       "piggies": 0,
-      "chickens": 0,
+      "chickens": 3,
       "batterflies": 0
     },
     {
@@ -5629,7 +5629,7 @@
       "latest": "20121029061417",
       "butterflies": 3,
       "piggies": 0,
-      "chickens": 0,
+      "chickens": 2,
       "batterflies": 0
     },
     {
@@ -5764,7 +5764,7 @@
       "latest": "20121029062152",
       "butterflies": 1,
       "piggies": 0,
-      "chickens": 0,
+      "chickens": 1,
       "batterflies": 0
     },
     {
@@ -6307,7 +6307,7 @@
       "latest": "20120611101145",
       "butterflies": 8,
       "piggies": 11,
-      "chickens": 7,
+      "chickens": 8,
       "batterflies": 0
     },
     {
@@ -12247,7 +12247,7 @@
       "latest": "20121112031609",
       "butterflies": 5,
       "piggies": 0,
-      "chickens": 2,
+      "chickens": 8,
       "batterflies": 0
     },
     {
@@ -12820,7 +12820,7 @@
       "latest": "20120611105311",
       "butterflies": 4,
       "piggies": 7,
-      "chickens": 5,
+      "chickens": 8,
       "batterflies": 0
     },
     {
@@ -12997,7 +12997,7 @@
       "latest": "20121029063527",
       "butterflies": 2,
       "piggies": 0,
-      "chickens": 2,
+      "chickens": 3,
       "batterflies": 0
     },
     {
@@ -18100,7 +18100,7 @@
       "latest": "20121024044735",
       "butterflies": 1,
       "piggies": 0,
-      "chickens": 0,
+      "chickens": 5,
       "batterflies": 2
     },
     {
@@ -20779,7 +20779,7 @@
       "latest": "20120611102224",
       "butterflies": 7,
       "piggies": 10,
-      "chickens": 7,
+      "chickens": 8,
       "batterflies": 0
     },
     {
@@ -23665,7 +23665,7 @@
       "latest": "20120812235914",
       "butterflies": 1,
       "piggies": 0,
-      "chickens": 0,
+      "chickens": 1,
       "batterflies": 0
     },
     {

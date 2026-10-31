@@ -209,6 +209,23 @@ function expandClasses(counts, classes, totalCap) {
 }
 
 /**
+ * The original's street caps (locations/inc_admin.js 862-870
+ * admin_clean_street): 3 Piggies, 2 Chickens and 3 Butterflies a street.
+ * build-street-ecology.mjs writes counts at these caps already; a
+ * feature-built row may lift Piggies and Chickens with its own `caps`.
+ */
+export const STREET_ANIMAL_CAPS = Object.freeze({ piggies: 3, chickens: 2, butterflies: 3 });
+
+/**
+ * The remake's rendering caps, for what the original's street cleanup never
+ * touched: the starter street keeps its onboarding set or its own page's and
+ * snapshot's counts when higher (Hechey Track: 6 Piggies, 7 Chickens), and an
+ * instanced location (admin_clean_street returns early for instances: The
+ * Great Hog Haul's 6 Piggies) carries these as its row's `caps`.
+ */
+export const RENDER_ANIMAL_CAPS = Object.freeze({ npc_piggy: 6, npc_chicken: 3 });
+
+/**
  * A street's Butterflies (build-street-ecology.mjs: the live street pages'
  * count, at most 3) split between the path and the air so the street shows
  * that many in all: one flies, two are one of each, three are one resting and
@@ -276,8 +293,8 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
       sourceTsid: entry.sourceTsid || null,
       ...(entry.interior === true ? { interior: true } : { exact: true }),
       giantId: entry.giantId || null,
-      piggies: Math.min(whole(counts.npc_piggy), 6),
-      chickens: Math.min(whole(counts.npc_chicken), 3),
+      piggies: Math.min(whole(counts.npc_piggy), STREET_ANIMAL_CAPS.piggies),
+      chickens: Math.min(whole(counts.npc_chicken), STREET_ANIMAL_CAPS.chickens),
       ...butterflySplit(counts.npc_butterfly),
       treeClasses: expandClasses(counts, TREE_CLASSES, 8),
       rockClasses: expandClasses(counts, ROCK_CLASSES, 10),
@@ -294,10 +311,12 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
   }
   // A feature-built row for a rebuilt street may lift the rendering caps to its
   // source's own count (Vicar's Peak's loading card: 11 Piggies, 7 Chickens);
-  // archived rows never carry `caps`.
+  // an archived instanced location carries RENDER_ANIMAL_CAPS.
   const caps = entry?.caps || {};
-  let piggies = Math.min(whole(counts.npc_piggy), whole(caps.piggies, 6, 12));
-  let chickens = Math.min(whole(counts.npc_chicken), whole(caps.chickens, 3, 8));
+  const pigCap = starter ? RENDER_ANIMAL_CAPS.npc_piggy : STREET_ANIMAL_CAPS.piggies;
+  const chickenCap = starter ? RENDER_ANIMAL_CAPS.npc_chicken : STREET_ANIMAL_CAPS.chickens;
+  let piggies = Math.min(whole(counts.npc_piggy), whole(caps.piggies, pigCap, 12));
+  let chickens = Math.min(whole(counts.npc_chicken), whole(caps.chickens, chickenCap, 8));
   let { butterflies, flyingButterflies } = butterflySplit(counts.npc_butterfly);
 
   let treeClasses = expandClasses(counts, TREE_CLASSES, 8);
@@ -381,8 +400,12 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
  * - rocks: the mining sheets' opaque art (assets/sprites/mining, cells 131-137 px)
  *   at spawnMineRock's 0.85: metal 134 -> 114 px, beryl and sparkly 114 -> 97,
  *   dullite 108 -> 92.
- * Animals, quoins, apples and the rest keep the plain rule: any line wide enough
- * to sample.
+ * - piggies: the feet and body of the Piggy walk art (about 86 px at
+ *   ENTITY_SCALE.piggy; snout and tail may overhang, as a canopy does), 60 px:
+ *   a Piggy is a shared server object online, laid out from this plan, and must
+ *   stand where a player beside it can reach it (tests/reach.test.js).
+ * Chickens, Butterflies, quoins, apples and the rest keep the plain rule: any
+ * line wide enough to sample.
  */
 export const TREE_FOOTPRINT = 180;
 export const PLACEMENT_FOOTPRINTS = Object.freeze({
@@ -391,6 +414,7 @@ export const PLACEMENT_FOOTPRINTS = Object.freeze({
   vendor: 106,
   shrine: 118,
   rocks: 100,
+  piggies: 60,
 });
 
 /**

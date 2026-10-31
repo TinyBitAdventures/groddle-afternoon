@@ -11,7 +11,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry } from '../public/js/street-model.js?v=23b926e5';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=4be109b9';
-import { planStreetPlacements, populationForStreet } from '../public/js/street-ecology.js?v=6a313245';
+import { planStreetPlacements, populationForStreet } from '../public/js/street-ecology.js?v=fd79899d';
 import {
   BOTTOM_DOOR,
   LADDER_SPOTS,
@@ -28,7 +28,7 @@ import {
   vicarsPeakEcology,
 } from '../public/js/vicars-peak.js?v=465e7965';
 import { vicarsPeakFeature } from '../public/js/features/vicars-peak-feature.js?v=b830235a';
-import { FEATURES } from '../public/js/features/index.js?v=d7ea1ba2';
+import { FEATURES } from '../public/js/features/index.js?v=ca3bc3a4';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -173,9 +173,9 @@ describe("Vicar's Peak ecology", () => {
     assert.deepEqual([pop.butterflies, pop.treeClasses.length, pop.gardens, pop.vendor, pop.shrine], [0, 0, 0, false, false]);
   });
 
-  it('archived rows keep the 6 / 3 caps', () => {
+  it('archived rows keep the original\'s street caps, 3 / 2 (inc_admin.js admin_clean_street)', () => {
     const pop = populationForStreet('GXX', { counts: { npc_piggy: 11, npc_chicken: 7 } });
-    assert.deepEqual([pop.piggies, pop.chickens], [6, 3]);
+    assert.deepEqual([pop.piggies, pop.chickens], [3, 2]);
   });
 
   it('every animal, the rock and the player get a ledge spot', () => {

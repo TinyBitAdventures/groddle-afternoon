@@ -14,7 +14,7 @@
 import { readFile, writeFile, access } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { interiorReason } from './public/js/street-ecology.js';
+import { interiorReason, RENDER_ANIMAL_CAPS } from './public/js/street-ecology.js';
 import { VENDOR_NPC_LABELS } from './public/js/vendor-npcs.js';
 import { SWOONERFLY_LABEL, SWOONERFLY_CLASS } from './public/js/swoonerflies.js';
 import { files, listZones, mergeZoneEcology } from './tools/builder/zones.mjs';
@@ -190,29 +190,57 @@ function swoonerfliesFromLabels(labels) {
 }
 
 /**
- * Street Butterflies. The archived snapshot's `items` objrefs hold none: the
- * late-2012 dump kept only seven, all under __MISSING_ITEMS__ (Fairgower Lane
- * 4, Thicket 2, Hayden Seek Alley 1), and spawner instances there do not keep
- * their spawn_class (items/spawner.js 23-32). The live game had them on most
- * outdoor streets: the glitch.com encyclopedia page for each street printed the
- * server's live count ("Plus 1 Piggy, 1 Butterfly, ..."; locations/location.js
- * 3459-3460 and 3572), and tools/ecology/butterfly-census.json holds every
- * archived street page's latest live capture from the Wayback Machine (plus an
- * earlier sample). A street gets butterflies only when one
- * of the two lists them, at most 3 (locations/inc_admin.js 866-869
- * admin_clean_street keeps 3 per street); the evidence goes in the top-level
- * `butterflies` map.
+ * Street animals from the live street pages. The archived snapshot under-counts
+ * them: its `items` objrefs hold no Butterfly, 68 Piggies and no Chicken on the
+ * outdoor streets (the dump kept seven Butterflies under __MISSING_ITEMS__:
+ * Fairgower Lane 4, Thicket 2, Hayden Seek Alley 1), and spawner instances there
+ * do not keep their spawn_class (items/spawner.js 23-32). The glitch.com
+ * encyclopedia page of each street printed the server's live count ("Plus 1
+ * Piggy, 1 Butterfly, 2 Chickens, ..."; locations/location.js 3456-3467 and
+ * 3570-3574), and tools/ecology/animal-census.json holds every archived street
+ * page's latest live capture from the Wayback Machine (plus an earlier sample).
+ * A street gets an animal only when the census, the snapshot's items or (for
+ * Butterflies) its __MISSING_ITEMS__ list it, the largest of those, at the
+ * original's street caps: locations/inc_admin.js 862-870 admin_clean_street
+ * keeps 3 Piggies, 3 Butterflies and 2 Chickens a street. Batterflies have no
+ * cleanup cap (its animal_classes leave them out), so they keep the census
+ * count. Each class's evidence goes in its top-level map (`piggies`,
+ * `chickens`, `butterflies`, `batterflies`).
  */
-const BUTTERFLY_CAP = 3;
+export const ANIMAL_CAPS = Object.freeze({ npc_piggy: 3, npc_chicken: 2, npc_butterfly: 3, npc_batterfly: Infinity });
+const CENSUS_FIELD = Object.freeze({ npc_piggy: 'piggies', npc_chicken: 'chickens', npc_butterfly: 'butterflies', npc_batterfly: 'batterflies' });
 
 function missingButterflies(xml) {
   const block = xml.match(/<object id="__MISSING_ITEMS__">([\s\S]*?)<\/object>/)?.[1] || '';
   return [...block.matchAll(/<objref\b[^>]*\blabel="Butterfly"/g)].length;
 }
 
-async function butterflyCensus() {
-  const census = JSON.parse(await readFile(join(root, 'tools/ecology/butterfly-census.json'), 'utf8'));
-  return new Map(census.streets.filter((row) => row.butterflies > 0).map((row) => [row.tsid, row]));
+async function animalCensus() {
+  const census = JSON.parse(await readFile(join(root, 'tools/ecology/animal-census.json'), 'utf8'));
+  return new Map(census.streets.map((row) => [row.tsid, row]));
+}
+
+/**
+ * Sets a row's animal counts from the evidence and records it in `evidence`
+ * (class -> tsid -> { count, wayback?, snapshot?, missingItems? }).
+ */
+function applyAnimalEvidence(tsid, counts, xml, census, evidence, { uncleaned = false } = {}) {
+  const live = census.get(tsid);
+  const missing = missingButterflies(xml);
+  for (const [classTsid, field] of Object.entries(CENSUS_FIELD)) {
+    const page = live?.[field] || 0;
+    const snapshot = counts[classTsid] || 0;
+    const missingItems = classTsid === 'npc_butterfly' ? missing : 0;
+    const count = Math.max(page, snapshot, missingItems);
+    if (!count) continue;
+    counts[classTsid] = Math.min(count, (uncleaned && RENDER_ANIMAL_CAPS[classTsid]) || ANIMAL_CAPS[classTsid]);
+    evidence[field][tsid] = {
+      count,
+      ...(page ? { wayback: live.captures.filter((c) => c[field] > 0).map((c) => c.wayback) } : {}),
+      ...(snapshot ? { snapshot } : {}),
+      ...(missingItems ? { missingItems } : {}),
+    };
+  }
 }
 
 function isInstanceLocation(xml) {
@@ -292,8 +320,8 @@ const wildlife = {};
 const furniture = {};
 const vendors = {};
 const swoonerflies = {};
-const butterflies = {};
-const census = await butterflyCensus();
+const animalEvidence = { piggies: {}, chickens: {}, butterflies: {}, batterflies: {} };
+const census = await animalCensus();
 for (const [tsid, meta] of Object.entries(index.streets || {})) {
   const candidates = locationAliases(tsid).map((alias) => join(locationRoot, `${alias}.xml`));
   const sourcePath = await firstReadable(candidates);
@@ -340,33 +368,28 @@ for (const [tsid, meta] of Object.entries(index.streets || {})) {
     // exact row (street-ecology.js populationForStreet) with its archived
     // quoins; the soil, furniture, wildlife and vendor maps above still apply.
     // These streets used to get no row, and so the invented fallback set.
+    const exactCounts = {};
+    applyAnimalEvidence(tsid, exactCounts, xml, census, animalEvidence);
     streets[tsid] = {
       label: meta.label || tsid,
       sourceTsid,
-      counts: {},
+      counts: exactCounts,
       exact: true,
       quoins: labels.filter((label) => QUOIN_LABELS.has(label)).length,
     };
     continue;
   }
   const counts = { ...ecology.counts };
-  const live = census.get(tsid);
-  const missing = missingButterflies(xml);
-  if (live || missing) {
-    const count = Math.max(live?.butterflies || 0, missing);
-    counts.npc_butterfly = Math.min(count, BUTTERFLY_CAP);
-    butterflies[tsid] = {
-      count,
-      ...(live ? { wayback: live.captures.filter((c) => c.butterflies > 0).map((c) => c.wayback) } : {}),
-      ...(missing ? { missingItems: missing } : {}),
-    };
-  }
+  // The starter and instanced locations were never cleaned (RENDER_ANIMAL_CAPS).
+  const instance = isInstanceLocation(xml);
+  applyAnimalEvidence(tsid, counts, xml, census, animalEvidence, { uncleaned: instance || tsid === index.default });
   streets[tsid] = {
     label: meta.label || tsid,
     sourceTsid,
     counts,
     ...(ecology.giantId ? { giantId: ecology.giantId } : {}),
     ...(ecology.spawners ? { spawners: ecology.spawners } : {}),
+    ...(instance && (counts.npc_piggy || counts.npc_chicken) ? { caps: { piggies: RENDER_ANIMAL_CAPS.npc_piggy, chickens: RENDER_ANIMAL_CAPS.npc_chicken } } : {}),
   };
 }
 
@@ -385,8 +408,14 @@ const catalog = {
   vendors,
   swoonerflyStreetCount: Object.keys(swoonerflies).length,
   swoonerflies,
-  butterflyStreetCount: Object.keys(butterflies).length,
-  butterflies,
+  piggyStreetCount: Object.keys(animalEvidence.piggies).length,
+  piggies: animalEvidence.piggies,
+  chickenStreetCount: Object.keys(animalEvidence.chickens).length,
+  chickens: animalEvidence.chickens,
+  butterflyStreetCount: Object.keys(animalEvidence.butterflies).length,
+  butterflies: animalEvidence.butterflies,
+  batterflyStreetCount: Object.keys(animalEvidence.batterflies).length,
+  batterflies: animalEvidence.batterflies,
 };
 
 mergeZoneEcology(catalog, listZones(files(root)).map((z) => z.zone));
