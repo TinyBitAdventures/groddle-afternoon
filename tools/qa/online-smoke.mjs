@@ -491,7 +491,9 @@ async function checks() {
     await A.p.waitForSelector('#bug-report-text', { state: 'visible' });
     await A.p.fill('#bug-report-text', `Smoke check ${STAMP}: the signpost label overlaps the pack row when I zoom out.`);
     await A.p.click('[data-bug-report-send]');
-    await A.p.waitForFunction(() => document.querySelector('#game-root canvas')?.dataset.bugReportLast === 'Thanks! Your report was sent.', null, { timeout: 15000 });
+    // The sent line is REPORT_TEXT.sent in js/reports.js ("Thanks! Your message was sent." since the
+    // form welcomed feedback too); match its start so a reworded thanks does not fail the check.
+    await A.p.waitForFunction(() => /^Thanks!/.test(document.querySelector('#game-root canvas')?.dataset.bugReportLast || ''), null, { timeout: 15000 });
     const reportShots = [await shot(A.p, 'a-5-report-sent')];
     const ticketId = Number(q(`SELECT COALESCE(MAX(id), 0) FROM wp_groddle_tickets WHERE player_user_id = ${A.id}`));
     await A.p.keyboard.press('Escape');
