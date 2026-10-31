@@ -8,12 +8,14 @@ import assert from 'node:assert/strict';
 import { afterEach, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { hashFor, layersFrontFirst, nudgeStep, parseHash, playTestUrl, searchStreets, zFor, zoomAfter, ZOOM_MAX, ZOOM_MIN } from '../public/js/builder/editor.js?v=53b8e3b3';
+import { hashFor, layersFrontFirst, nudgeStep, parseHash, playTestUrl, searchStreets, zFor, zoomAfter, ZOOM_MAX, ZOOM_MIN, readOverlays, OVERLAY_DEFAULTS, layoutCamera, edgePan, findingCounts, validateWords, groupFindings, parseAt, findingPoint, filtersWith, colourInput, colourHex, tintInput, tintNumber, VIEW_FRAMES } from '../public/js/builder/editor.js?v=fd5ba1e7';
+import { geoKey, parseGeoKey, geoShape, geoHits, geoInRect, geoHandles, handleWorld, dragHandle, moveBy, changedFields, drawnItem, postOnFloor, defaultItem, permKey, permValue, permName, wallSides, dashes, arriveFor, newConnect, distToSegment, geoKindOf, PERMS } from '../public/js/builder/geometry-handles.js?v=54aaffb7';
+import { gridSnap, endPoints, nearestEnd, joinedEnds, snapPlatform, snapDrawnPlatform, bestPull, guideSnap, snapPoint, floorSnapY, rulerTicks } from '../public/js/builder/snap.js?v=c1cb84a7';
 import { contains, corners, decoBox, handlePoints, meetsRect, resizeBy, rotationTo, toLocal } from '../public/js/builder/handles.js?v=e215d17d';
-import { DraftSession, statusWords } from '../public/js/builder/session.js?v=e64474a6';
+import { DraftSession, statusWords } from '../public/js/builder/session.js?v=28b56d66';
 import { createBuilderApi } from '../public/js/builder/api.js?v=3f83c00b';
 import { DRAFT_REFUSED, bannerWords, builderUrl, draftParams, startDraftPlay } from '../public/js/builder/draft-play.js?v=bc6e94f2';
-import { applyOps } from '../public/js/builder/ops.js?v=044258c8';
+import { applyOps } from '../public/js/builder/ops.js?v=28c0d569';
 import { floorUnder, withDecoIds } from '../public/js/builder/zone.js?v=9608addf';
 import { clearStreetCache, clearStreetIndex, isDraftStreet, loadStreetData } from '../public/js/street-loader.js?v=d6cbbd5c';
 import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=7e30da8f';
@@ -304,5 +306,264 @@ describe('the play-test (js/builder/draft-play.js, game.js)', () => {
     const pick = game.indexOf('const streetDemoTsid = draftStart?.tsid');
     assert.ok(ask > 0 && pick > ask);
     assert.ok(ask > game.indexOf('await Promise.all([ensureStreetIndex(), loadStreetEcologyCatalog()]);'), 'after the index and ecology load');
+  });
+});
+
+describe('geometry: picking, handles, drags and drawing (js/builder/geometry-handles.js)', () => {
+  // World: bounds l -1000, t -1000, so screen = world + 1000.
+  const street = () => ({
+    bounds: { l: -1000, r: 1000, t: -1000, b: 0 },
+    platforms: [
+      { id: 'plat_1', x1: -980, y1: -60, x2: 980, y2: -60, pc_perm: -1, item_perm: -1 },
+      { id: 'plat_2', x1: 0, y1: -300, x2: 200, y2: -300, pc_perm: 1 },
+      { id: 'plat_3', x1: 200, y1: -300, x2: 400, y2: -250, pc_perm: 0 },
+    ],
+    barriers: [{ id: 'wall_1', x: 400, y: -400, h: 340, pc_perm: null }],
+    ladders: [{ id: 'ladder_1', x: -500, y: -60, w: 50, h: 300 }],
+    signposts: [{ id: 'signpost_1', x: 800, y: -60, w: 150, h: 200, connects: [] }],
+  });
+
+  it('keys name a kind and an id', () => {
+    assert.equal(geoKey('platform', 'plat_1'), 'platform:plat_1');
+    assert.deepEqual(parseGeoKey('barrier:wall_1'), { kind: 'barrier', id: 'wall_1' });
+    assert.deepEqual(parseGeoKey('ladder:_pl:odd'), { kind: 'ladder', id: '_pl:odd' });
+    assert.equal(parseGeoKey('d_12'), null);
+    assert.equal(parseGeoKey('deco:d_1'), null);
+    assert.equal(geoKindOf(street(), 'ladder_1'), 'ladder');
+    assert.equal(geoKindOf(street(), 'd_1'), null);
+  });
+
+  it('shapes are in screen space with each kind\'s anchor (spec 2.1)', () => {
+    const s = street();
+    assert.deepEqual(geoShape(s, 'platform', s.platforms[0]), { kind: 'platform', x1: 20, y1: 940, x2: 1980, y2: 940 });
+    assert.deepEqual(geoShape(s, 'barrier', s.barriers[0]), { kind: 'barrier', x: 1400, y1: 600, y2: 940 });
+    assert.deepEqual(geoShape(s, 'ladder', s.ladders[0]), { kind: 'ladder', x: 500, y1: 640, y2: 940, w: 50 });
+    const post = geoShape(s, 'signpost', s.signposts[0]);
+    assert.deepEqual([post.x, post.y1, post.y2, post.w], [1800, 740, 940, 150]);
+  });
+
+  it('picks geometry: platforms first, then the nearest; a box counts inside', () => {
+    const s = street();
+    assert.equal(distToSegment({ x: 5, y: 3 }, { x: 0, y: 0 }, { x: 10, y: 0 }), 3);
+    // The ladder's foot sits on the floor: the floor wins there, the ladder above it.
+    assert.deepEqual(geoHits(s, { x: 500, y: 942 }, 6).map((h) => h.id), ['plat_1', 'ladder_1']);
+    assert.deepEqual(geoHits(s, { x: 500, y: 800 }, 6).map((h) => h.id), ['ladder_1']);
+    assert.deepEqual(geoHits(s, { x: 1402, y: 700 }, 6).map((h) => h.id), ['wall_1']);
+    assert.deepEqual(geoHits(s, { x: 1400, y: 700 }, 6, ['signpost']), []);
+    assert.deepEqual(geoHits(s, { x: 1800, y: 800 }, 6).map((h) => h.id), ['signpost_1']);
+    assert.deepEqual(geoHits(s, { x: 1100, y: 500 }, 6), []);
+    assert.deepEqual(geoInRect(s, { x1: 950, y1: 650, x2: 1250, y2: 720 }).sort(), ['platform:plat_2', 'platform:plat_3']);
+  });
+
+  it('has LocoDeco\'s handles: two line ends, wall top and bottom, ladder foot and height, a post\'s eight', () => {
+    const s = street();
+    assert.deepEqual(geoHandles(s, 'platform', s.platforms[1]).map((h) => [h.id, h.x, h.y]), [['p1', 1000, 700], ['p2', 1200, 700]]);
+    assert.deepEqual(geoHandles(s, 'barrier', s.barriers[0]).map((h) => [h.id, h.x, h.y]), [['top', 1400, 600], ['bottom', 1400, 940]]);
+    assert.deepEqual(geoHandles(s, 'ladder', s.ladders[0]).map((h) => [h.id, h.x, h.y]), [['bottom', 500, 940], ['height', 500, 640]]);
+    const post = geoHandles(s, 'signpost', s.signposts[0]);
+    assert.equal(post.length, 8, 'eight handles, no rotation knob');
+    assert.ok(!post.some((h) => h.id === 'rotate'));
+    assert.deepEqual(handleWorld('barrier', s.barriers[0], 'bottom'), { x: 400, y: -60 });
+    assert.deepEqual(handleWorld('ladder', s.ladders[0], 'height'), { x: -500, y: -360 });
+  });
+
+  it('drags a handle: a line end (Shift levels it), a wall end vertically, a ladder, a post from its foot', () => {
+    const s = street();
+    const p2 = s.platforms[1];
+    assert.deepEqual(dragHandle(s, 'platform', p2, 'p2', { x: 1200, y: 700 }, { x: 1250, y: 680 }), { x2: 250, y2: -320 });
+    assert.deepEqual(dragHandle(s, 'platform', p2, 'p2', { x: 1200, y: 700 }, { x: 1250, y: 680 }, { level: true }), { x2: 250, y2: -300 });
+    assert.deepEqual(dragHandle(s, 'platform', p2, 'p1', { x: 1000, y: 700 }, { x: 990, y: 705 }), { x1: -10, y1: -295 });
+    const w = s.barriers[0];
+    assert.deepEqual(dragHandle(s, 'barrier', w, 'top', { x: 1400, y: 600 }, { x: 1450, y: 550 }), { y: -450, h: 390 }, 'the bottom stays; x never moves');
+    assert.deepEqual(dragHandle(s, 'barrier', w, 'bottom', { x: 1400, y: 940 }, { x: 1400, y: 960 }), { h: 360 });
+    assert.deepEqual(dragHandle(s, 'barrier', w, 'top', { x: 1400, y: 600 }, { x: 1400, y: 2000 }), { y: -68, h: 8 }, 'never shorter than 8');
+    const l = s.ladders[0];
+    assert.deepEqual(dragHandle(s, 'ladder', l, 'bottom', { x: 500, y: 940 }, { x: 520, y: 930 }), { x: -480, y: -70 });
+    assert.deepEqual(dragHandle(s, 'ladder', l, 'height', { x: 500, y: 640 }, { x: 500, y: 600 }), { h: 340 });
+    const post = s.signposts[0];
+    assert.deepEqual(dragHandle(s, 'signpost', post, 'e', { x: 1875, y: 840 }, { x: 1895, y: 840 }), { x: 810, y: -60, w: 170, h: 200 });
+    assert.deepEqual(dragHandle(s, 'signpost', post, 'n', { x: 1800, y: 740 }, { x: 1800, y: 720 }), { x: 800, y: -60, w: 150, h: 220 });
+  });
+
+  it('moves, and keeps only what changed', () => {
+    const s = street();
+    assert.deepEqual(moveBy('platform', s.platforms[1], 5, -5), { x1: 5, y1: -305, x2: 205, y2: -305 });
+    assert.deepEqual(moveBy('signpost', s.signposts[0], -20, 0), { x: 780, y: -60 });
+    assert.deepEqual(changedFields(s.platforms[1], { x1: 0, y1: -305, pc_perm: null }), { y1: -305, pc_perm: null });
+  });
+
+  it('draws new geometry from a drag: floors left to right, hard walls, ladders from the foot; too short is nothing', () => {
+    const s = street();
+    assert.deepEqual(drawnItem(s, 'platform', { x: 1300, y: 500 }, { x: 1100, y: 520 }), { x1: 100, y1: -480, x2: 300, y2: -500, pc_perm: -1, item_perm: -1 });
+    assert.deepEqual(drawnItem(s, 'platform', { x: 1100, y: 500 }, { x: 1300, y: 520 }, { level: true }), { x1: 100, y1: -500, x2: 300, y2: -500, pc_perm: -1, item_perm: -1 });
+    assert.equal(drawnItem(s, 'platform', { x: 1100, y: 500 }, { x: 1104, y: 503 }), null);
+    assert.deepEqual(drawnItem(s, 'barrier', { x: 1100, y: 900 }, { x: 1130, y: 700 }), { x: 100, y: -300, h: 200, pc_perm: null });
+    assert.deepEqual(drawnItem(s, 'ladder', { x: 1100, y: 940 }, { x: 1100, y: 640 }), { x: 100, y: -60, w: 50, h: 300 });
+    assert.deepEqual(drawnItem(s, 'signpost', { x: 1100, y: 940 }, { x: 1200, y: 800 }), { x: 150, y: -60, w: 100, h: 140, connects: [] });
+    assert.equal(drawnItem(s, 'signpost', { x: 1100, y: 940 }, { x: 1102, y: 941 }), null);
+    // A click stands a post on the floor under it (Hechey Track's size).
+    assert.deepEqual(postOnFloor(s, { x: 1100, y: 400 }), { x: 100, y: -60, w: 150, h: 200, connects: [] }, 'through the roof over it, onto the floor');
+    assert.deepEqual(postOnFloor(s, { x: 1100, y: 800 }), { x: 100, y: -60, w: 150, h: 200, connects: [] });
+    assert.deepEqual(defaultItem(s, 'platform', { x: 300, y: 800 }), { x1: -800, y1: -180, x2: -600, y2: -180, pc_perm: -1, item_perm: -1 });
+    assert.deepEqual(defaultItem(s, 'ladder', { x: 300, y: 800 }), { x: -700, y: -60, w: 50, h: 300 });
+  });
+
+  it('names perms as LocoDeco did, for lines and for walls', () => {
+    assert.deepEqual(PERMS.map((p) => p.label), ['Floor', 'Roof', 'Soft', 'Hard']);
+    for (const v of [-1, 1, 0, null]) assert.equal(permValue(permKey(v)), v);
+    assert.equal(permKey(undefined), '');
+    assert.equal(permValue(''), undefined);
+    assert.equal(permName(undefined), 'Floor', 'a line without a perm stands');
+    assert.equal(permName(null), 'Hard');
+    assert.deepEqual(wallSides(null), { left: true, right: true });
+    assert.deepEqual(wallSides(-1), { left: true, right: false });
+    assert.deepEqual(wallSides(1), { left: false, right: true });
+    assert.deepEqual(wallSides(0), { left: false, right: false });
+  });
+
+  it('dashes a line for the Soft overlay', () => {
+    assert.deepEqual(dashes(0, 0, 30, 0, 8, 6), [[0, 0, 8, 0], [14, 0, 22, 0], [28, 0, 30, 0]]);
+    assert.deepEqual(dashes(0, 0, 0, 0), []);
+  });
+
+  it('works out an arm\'s arrival as build-street-navigation.mjs does: the post that links back, on its floor', () => {
+    const z = fixture();
+    const [lane, end] = z.streets.map((r) => r.street);
+    // The fixture's own arrive values are what the navigation build writes.
+    assert.deepEqual(arriveFor(end, lane.tsid), lane.signposts[0].connects[0].arrive);
+    assert.deepEqual(arriveFor(lane, end.tsid), end.signposts[0].connects[0].arrive);
+    assert.equal(arriveFor(end, 'GZ9999999999999'), null, 'no post links back: no arrival');
+    // An L form names the same street as its G form.
+    const shipped = { bounds: { l: 0, r: 1000, t: -1000, b: 0 }, platforms: [{ x1: 0, y1: -40, x2: 1000, y2: -40 }], signposts: [{ x: 500, y: -100, connects: [{ tsid: 'LABCDEF123456', label: 'Back' }] }] };
+    assert.deepEqual(arriveFor(shipped, 'GABCDEF123456'), { x: 500, y: 960 });
+    // No floor within 80 px of the post: left out.
+    shipped.platforms[0].y1 = shipped.platforms[0].y2 = -300;
+    assert.equal(arriveFor(shipped, 'GABCDEF123456'), null);
+    assert.deepEqual(newConnect({ tsid: 'GZ0000000000002', label: 'Hollow End', hubId: '900', arrive: { x: 150.4, y: 940 } }), { tsid: 'GZ0000000000002', label: 'Hollow End', hub_id: '900', arrive: { x: 150, y: 940 } });
+    assert.deepEqual(newConnect({ tsid: 'GA1', label: 'x'.repeat(60), hubId: undefined }), { tsid: 'GA1', label: 'x'.repeat(48) });
+  });
+});
+
+describe('snapping (js/builder/snap.js)', () => {
+  const street = () => ({
+    bounds: { l: -1000, r: 1000, t: -1000, b: 0 },
+    platforms: [
+      { id: 'a', x1: -500, y1: -100, x2: 0, y2: -100 },
+      { id: 'b', x1: 0, y1: -100, x2: 300, y2: -200, pc_perm: -1 },
+      { id: 'roof', x1: -500, y1: -400, x2: 500, y2: -400, pc_perm: 1 },
+    ],
+    barriers: [{ id: 'w', x: 300, y: -500, h: 300, pc_perm: null }],
+  });
+
+  it('a grid of 10 px', () => {
+    assert.equal(gridSnap(14), 10);
+    assert.equal(gridSnap(-16), -20);
+    assert.deepEqual(snapPoint({ x: 14, y: 26 }, { grid: true }), { x: 10, y: 30 });
+  });
+
+  it('ends: platform ends and wall tops and bottoms, the dragged ones left out', () => {
+    const ends = endPoints(street(), new Set(['platform:b']));
+    assert.deepEqual(ends.map((e) => `${e.id}.${e.end}`), ['a.p1', 'a.p2', 'roof.p1', 'roof.p2', 'w.top', 'w.bottom']);
+    assert.deepEqual(nearestEnd({ x: 290, y: -190 }, endPoints(street()), 30), { kind: 'platform', id: 'b', end: 'p2', x: 300, y: -200 });
+    assert.equal(nearestEnd({ x: 400, y: -100 }, endPoints(street()), 30), null);
+    assert.deepEqual(joinedEnds(street(), { x: 0, y: -100 }).map((e) => `${e.id}.${e.end}`), ['a.p2', 'b.p1']);
+    assert.deepEqual(joinedEnds(street(), { x: 0, y: -100 }, new Set(['platform:a'])).map((e) => `${e.id}.${e.end}`), ['b.p1']);
+  });
+
+  it('on release a line end snaps within 30 px; a moved line shifts by its nearest end', () => {
+    const s = street();
+    const ends = endPoints(s, new Set(['platform:b']));
+    // b's far end dragged near the wall's bottom (300, -200).
+    assert.deepEqual(snapPlatform({ ...s.platforms[1], x2: 320, y2: -210 }, ends, ['p2']), { x2: 300, y2: -200 });
+    assert.deepEqual(snapPlatform({ ...s.platforms[1], x2: 360, y2: -210 }, ends, ['p2']), {}, 'too far');
+    // A whole line moved: the nearer of its two pulls wins.
+    assert.deepEqual(snapPlatform({ x1: 10, y1: -95, x2: 310, y2: -195 }, ends), { x1: 0, y1: -100, x2: 300, y2: -200 });
+    assert.deepEqual(bestPull([{ x: 5, y: 0 }], [{ x: 0, y: 0 }, { x: 9, y: 0 }]), { dx: 4, dy: 0 });
+    assert.deepEqual(snapDrawnPlatform({ x1: -520, y1: -110, x2: -300, y2: -300 }, endPoints(s)), { x1: -500, y1: -100, x2: -300, y2: -300 });
+  });
+
+  it('guides pull a value within their radius, on their axis only', () => {
+    const guides = [{ axis: 'x', at: 100 }, { axis: 'y', at: -50 }];
+    assert.equal(guideSnap(104, guides, 'x', 8), 100);
+    assert.equal(guideSnap(110, guides, 'x', 8), 110);
+    assert.equal(guideSnap(104, guides, 'y', 8), 104);
+    assert.deepEqual(snapPoint({ x: 97, y: -55 }, { guides, radius: 8 }), { x: 100, y: -50 });
+  });
+
+  it('a middleground deco sits on the floor under it, never on a roof', () => {
+    const s = street();
+    assert.equal(floorSnapY(s, -200, -90), -100);
+    assert.equal(floorSnapY(s, 150, -140), -150, 'a sloped line at x');
+    assert.equal(floorSnapY(s, -200, -390), null, 'the roof is no floor');
+    assert.equal(floorSnapY(s, -200, -200), null, 'too far');
+  });
+
+  it('ruler ticks: round steps at least 64 canvas px apart', () => {
+    assert.deepEqual(rulerTicks(-1000, 400, 1), { step: 100, ticks: [-1000, -900, -800, -700, -600] });
+    assert.equal(rulerTicks(0, 5000, 0.1).step, 1000);
+    assert.equal(rulerTicks(0, 100, 4).step, 20);
+  });
+});
+
+describe('the editor\'s P2 helpers (js/builder/editor.js)', () => {
+  it('overlay switches: stored values over the defaults, nothing odd', () => {
+    assert.deepEqual(readOverlays(null), { ...OVERLAY_DEFAULTS });
+    assert.deepEqual(readOverlays({ reach: true, geometry: 'yes', extra: true }), { ...OVERLAY_DEFAULTS, reach: true });
+    assert.deepEqual(VIEW_FRAMES.map((f) => [f.w, f.h]), [[960, 408], [1000, 600]]);
+  });
+
+  it('the layout preview\'s camera: a Wide view at the centre, kept inside the street', () => {
+    const wide = VIEW_FRAMES[0];
+    assert.deepEqual(layoutCamera({ x: 3000, y: 500 }, wide, 6000, 1000), { x: 2520, y: 296 });
+    assert.deepEqual(layoutCamera({ x: 100, y: 990 }, wide, 6000, 1000), { x: 0, y: 592 });
+    assert.deepEqual(layoutCamera({ x: 500, y: 500 }, wide, 800, 300), { x: 0, y: 0 });
+  });
+
+  it('pans at the view edge while dragging, faster nearer it', () => {
+    assert.deepEqual(edgePan(500, 400, 1000, 800), { dx: 0, dy: 0 });
+    assert.deepEqual(edgePan(0, 400, 1000, 800), { dx: -14, dy: 0 });
+    assert.deepEqual(edgePan(984, 800, 1000, 800), { dx: 7, dy: 14 });
+  });
+
+  it('the Validate button and the findings panel', () => {
+    const report = { ok: false, counts: { fatal: 1, error: 1, warn: 2, info: 3 }, findings: [
+      { rule: 'NAV-001', severity: 'warn', at: 'lane/signpost_1', message: 'a' },
+      { rule: 'PHY-001', severity: 'error', at: 'lane', message: 'b' },
+      { rule: 'X', severity: 'fatal', message: 'c' },
+    ] };
+    assert.deepEqual(findingCounts(report), { errors: 2, warnings: 2, notes: 3 });
+    assert.equal(validateWords('done', report), 'Validate: 2 errors, 2 warnings');
+    assert.equal(validateWords('done', { counts: { warn: 1 } }), 'Validate: 0 errors, 1 warning');
+    assert.equal(validateWords('idle', null), 'Validate');
+    assert.equal(validateWords('off', null), 'Validate: not available');
+    assert.equal(validateWords('running', report), 'Validate: checking');
+    assert.deepEqual(groupFindings(report.findings).map((g) => [g.id, g.items.length]), [['fatal', 1], ['error', 1], ['warn', 1]]);
+    assert.deepEqual(parseAt('lane/signpost_1'), { street: 'lane', id: 'signpost_1' });
+    assert.deepEqual(parseAt('lane'), { street: 'lane', id: '' });
+    const s = { bounds: { l: -1500, t: -1000 } };
+    assert.deepEqual(findingPoint({ where: { x: 0, y: -60, space: 'world' } }, s), { x: 1500, y: 940 });
+    assert.deepEqual(findingPoint({ where: { x: 10, y: 20, space: 'screen' } }, s), { x: 10, y: 20 });
+    assert.equal(findingPoint({}, s), null);
+  });
+
+  it('layer filters: a zero drops the key, an empty set is no filters, the file\'s order kept', () => {
+    assert.deepEqual(filtersWith({ brightness: -20, saturation: -19, contrast: -23 }, 'saturation', 0), { brightness: -20, contrast: -23 });
+    assert.deepEqual(filtersWith({ contrast: 5 }, 'brightness', 10), { contrast: 5, brightness: 10 });
+    assert.equal(filtersWith({ brightness: -10 }, 'brightness', 0), null);
+    assert.equal(filtersWith(null, 'blur', 0), null);
+    assert.deepEqual(filtersWith({ tintAmount: 40 }, 'tintColor', 0), { tintAmount: 40, tintColor: 0 }, 'black is a tint colour');
+    assert.equal(colourInput('D1F4FF'), '#d1f4ff');
+    assert.equal(colourHex('#d1f4ff'), 'D1F4FF');
+    assert.equal(tintInput(0x9f3dd4), '#9f3dd4');
+    assert.equal(tintNumber('#33cccc'), 0x33cccc);
+  });
+
+  it('the editor loads the reach module and the validator worker only when asked (spec 6.7, 7.1)', () => {
+    const src = read('public/js/builder/editor.js');
+    assert.match(src, /import\('\.\/reach-graph\.js\?v=[0-9a-f]{8}'\)/);
+    // The worker's URL comes from the keyed module itself (validate-worker.js WORKER_URL).
+    assert.match(src, /import\('\.\/validate-worker\.js\?v=[0-9a-f]{8}'\)\.then\(\(m\) => \{ V\.workerUrl = m\.WORKER_URL;/);
+    assert.match(src, /new Worker\(V\.workerUrl, \{ type: 'module' \}\)/);
+    assert.doesNotMatch(src, /^import [^;]*reach-graph/m, 'never a static import: the editor works without it');
   });
 });

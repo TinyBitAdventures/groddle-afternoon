@@ -10,29 +10,67 @@
  * panel (eye and lock are this editor's only) and the outliner; undo and redo; autosave every 2 s
  * (js/builder/session.js); and play-testing a draft in /play/ (js/builder/draft-play.js).
  *
+ * P2: geometry (js/builder/geometry-handles.js): select, move, nudge, delete, copy and paste
+ * platforms, walls, ladders and signposts with LocoDeco's handles; the draw tools (V select, Q
+ * platform, W wall, E ladder, S signpost); snapping (js/builder/snap.js: `;` ends, floors and
+ * guides, `G` the 10 px grid); the inspector for geometry (perms, signpost size, arms and where they
+ * arrive), the sky gradient and layer filters (previewed live); overlays (geometry, view frame,
+ * rulers and guides, the "layout" parallax preview, panning at the view edge while dragging, the
+ * reach map and jump arc from js/builder/reach-graph.js); and the validator in a worker
+ * (js/builder/validate-worker.js) with its findings panel. Until the worker exists the editor works
+ * without it, and the reach map is worked out here from the view centre.
+ *
  * Addresses: #draft=<id>&street=<key> opens a draft's street, #view=<tsid> a shipped street.
- * QA: window.groddleBuilderQA (state, camera, matchView, select, anchorOf).
+ * QA: window.groddleBuilderQA (state, camera, matchView, select, anchorOf, selectGeo, geoHandles).
  */
 import { buildStreetView, loadDecoManifest, loadSignpostTextures, DECO_TWINS, flashBlurSize } from '../street-render.js?v=3bcef6a7';
 import { worldToScreen, platformsScreen, isStandable, streetWidth, streetHeight, navigableSignposts } from '../street-model.js?v=23b926e5';
 import { ensureStreetIndex, STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=d6cbbd5c';
 import { loadStreetEcologyCatalog, ecologyForStreet } from '../street-ecology.js?v=7e30da8f';
 import { createBuilderApi } from './api.js?v=3f83c00b';
-import { DraftSession, statusWords, SAVE_MS, POLL_MS } from './session.js?v=e64474a6';
+import { DraftSession, statusWords, SAVE_MS, POLL_MS } from './session.js?v=28b56d66';
 import { forkStreet, forkOps, newTsid, streetKeyFrom, relayerPosition, isLayerLocal, withDecoIds, floorUnder, libraryAsset } from './zone.js?v=9608addf';
-import { nextDecoId, findDeco } from './ops.js?v=044258c8';
+import { nextDecoId, findDeco } from './ops.js?v=28c0d569';
 import { decoBox, contains, handlePoints, resizeBy, rotationTo, meetsRect, corners } from './handles.js?v=e215d17d';
 import { layerRole } from './layer-role.js?v=e585f610';
 import { installNewArt, withNewArt, provenanceSection } from './new-art.js?v=b2411f6f';
 import * as textureUrls from '../textures.js?v=01a295a1';
 import { installPixiFixes } from '../pixi-fixes.js?v=173fb649';
 import { installHiresDecos } from '../deco-hires.js?v=a65f2d79';
+import { GEO_KINDS, GEO_LIST, GEO_WORDS, PERMS, geoKey, parseGeoKey, geoItem, geoKindOf, geoShape, geoHits, geoHandles, handleWorld, dragHandle, moveBy, changedFields, drawnItem, postOnFloor, defaultItem, permKey, permValue, permName, wallSides, dashes, arriveFor, newConnect, shapeBounds } from './geometry-handles.js?v=54aaffb7';
+import { SNAP_PX, GUIDE_PX, endPoints, joinedEnds, snapPlatform, snapDrawnPlatform, snapPoint, floorSnapY, rulerTicks, bestPull } from './snap.js?v=c1cb84a7';
 
 export const ZOOM_MIN = 0.05;
 export const ZOOM_MAX = 4;
 export const CLIPBOARD_KEY = 'groddle.builder.clipboard';
 export const PANELS_KEY = 'groddle.builder.panels';
+export const OVERLAYS_KEY = 'groddle.builder.overlays';
+export const SNAP_KEY = 'groddle.builder.snap';
 const HANDLE_PX = 7;
+/** Rulers' thickness in canvas px. */
+const RULER_PX = 20;
+/** Geometry is picked this many canvas px from a line. */
+const PICK_PX = 6;
+/** Canvas colours (the street's art is the same in light and dark). */
+const COLOURS = Object.freeze({
+  Floor: 0x3ddc84, Roof: 0xffb020, Soft: 0x7cc4ff, Hard: 0xff5a5a, wall: 0xe879f9, ladder: 0x22d3ee, post: 0xfde047,
+  reached: 0x22c55e, unreached: 0xef4444, arrival: 0x60a5fa, trap: 0xf97316, plain: 0xfff176, running: 0xff8ad8, select: 0x1fa6ff,
+});
+const hexCss = (n) => `#${n.toString(16).padStart(6, '0')}`;
+
+/** The view frames the overlay draws (spec 6.7): the game's Wide view and the original client's. */
+export const VIEW_FRAMES = Object.freeze([
+  Object.freeze({ id: 'wide', label: 'Wide', w: 960, h: 408 }),
+  Object.freeze({ id: 'original', label: 'Original', w: 1000, h: 600 }),
+]);
+export const OVERLAY_DEFAULTS = Object.freeze({ geometry: true, reach: false, arc: false, frame: false, rulers: false, layout: false, edgePan: true });
+export const SEVERITIES = Object.freeze([
+  Object.freeze({ id: 'fatal', label: 'Fatal' }),
+  Object.freeze({ id: 'error', label: 'Errors' }),
+  Object.freeze({ id: 'warn', label: 'Warnings' }),
+  Object.freeze({ id: 'info', label: 'Notes' }),
+]);
+const FILTER_KEYS = Object.freeze(['brightness', 'contrast', 'saturation', 'tintColor', 'tintAmount', 'blur']);
 
 // —— Pure helpers (tests/builder-editor.test.js) ——
 
@@ -95,6 +133,90 @@ export function layersFrontFirst(layers) {
   return (layers || []).map((l, i) => ({ l, i })).sort((a, b) => (Number(b.l.z) || 0) - (Number(a.l.z) || 0) || b.i - a.i).map(({ l }) => l);
 }
 
+/** PURE: the overlay switches as stored (anything missing or odd takes its default). */
+export function readOverlays(stored) {
+  const out = { ...OVERLAY_DEFAULTS };
+  for (const k of Object.keys(OVERLAY_DEFAULTS)) if (typeof stored?.[k] === 'boolean') out[k] = stored[k];
+  return out;
+}
+
+/**
+ * PURE: the camera the "layout" parallax preview draws every layer for: a game-sized `frame`
+ * centred on the view centre, kept inside the street (the game's own camera clamp).
+ */
+export function layoutCamera(centre, frame, W, H) {
+  return {
+    x: Math.max(0, Math.min(Math.max(0, W - frame.w), centre.x - frame.w / 2)),
+    y: Math.max(0, Math.min(Math.max(0, H - frame.h), centre.y - frame.h / 2)),
+  };
+}
+
+/** PURE: how far to pan this frame while a drag sits within `margin` px of the view's edge (canvas px). */
+export function edgePan(cx, cy, w, h, margin = 32, speed = 14) {
+  const pull = (v, size) => {
+    if (v < margin) return -speed * Math.min(1, (margin - v) / margin);
+    if (v > size - margin) return speed * Math.min(1, (v - (size - margin)) / margin);
+    return 0;
+  };
+  return { dx: pull(cx, w), dy: pull(cy, h) };
+}
+
+/** PURE: a report's counts in the bar's terms: errors (fatal and error), warnings, notes. */
+export function findingCounts(report) {
+  const c = report?.counts || {};
+  return { errors: (c.fatal || 0) + (c.error || 0), warnings: c.warn || 0, notes: c.info || 0 };
+}
+
+const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
+/** PURE: the Validate button's words for the validator's state. */
+export function validateWords(state, report) {
+  if (state === 'off') return 'Validate: not available';
+  if (state === 'running') return 'Validate: checking';
+  if (state === 'failed') return 'Validate: did not finish';
+  if (!report) return 'Validate';
+  const c = findingCounts(report);
+  return `Validate: ${plural(c.errors, 'error')}, ${plural(c.warnings, 'warning')}`;
+}
+
+/** PURE: findings grouped by severity, worst first: [{ id, label, items }] (empty groups left out). */
+export function groupFindings(findings) {
+  return SEVERITIES.map((s) => ({ ...s, items: (findings || []).filter((f) => f.severity === s.id) })).filter((g) => g.items.length);
+}
+
+/** PURE: a finding's `at` ("<streetKey>/<elementId>"): { street, id }. */
+export function parseAt(at) {
+  const s = String(at || '');
+  const i = s.indexOf('/');
+  return i < 0 ? { street: s, id: '' } : { street: s.slice(0, i), id: s.slice(i + 1) };
+}
+
+/** PURE: where a finding points, in screen space (its `where` is screen or world), or null. */
+export function findingPoint(finding, street) {
+  const w = finding?.where;
+  if (!w || !Number.isFinite(w.x) || !Number.isFinite(w.y) || !street?.bounds) return null;
+  return w.space === 'world' ? { x: w.x - street.bounds.l, y: w.y - street.bounds.t } : { x: w.x, y: w.y };
+}
+
+/** PURE: a layer's filters with one value changed: zero drops the key, an empty set is null. */
+export function filtersWith(filters, key, value) {
+  const out = { ...(filters || {}) };
+  if (value === null || value === undefined || value === '' || (key !== 'tintColor' && Number(value) === 0)) delete out[key];
+  else out[key] = Number(value);
+  // Keys keep the order the file has; a new one goes after them (FILTER_KEYS order).
+  const kept = {};
+  for (const k of Object.keys(filters || {})) if (k in out) kept[k] = out[k];
+  for (const k of FILTER_KEYS) if (k in out && !(k in kept)) kept[k] = out[k];
+  return Object.keys(kept).length ? kept : null;
+}
+
+/** PURE: a street gradient colour ("87A8C9") for a colour input ("#87a8c9"), and back. */
+export const colourInput = (hex) => `#${String(hex || '000000').replace(/^#/, '').padStart(6, '0').slice(0, 6).toLowerCase()}`;
+export const colourHex = (value) => String(value || '').replace(/^#/, '').toUpperCase();
+/** PURE: a tint colour number for a colour input, and back. */
+export const tintInput = (n) => `#${(Number(n) || 0).toString(16).padStart(6, '0').slice(-6)}`;
+export const tintNumber = (value) => parseInt(String(value || '').replace(/^#/, ''), 16) || 0;
+
 // —— The page ——
 
 function el(tag, attrs = {}, ...kids) {
@@ -144,6 +266,28 @@ async function boot() {
     rKey: false,
     space: false,
     rebuildTimer: 0,
+    // —— P2 ——
+    tool: 'select', // 'select' | a geometry kind (the draw tools)
+    geoSel: [], // geometry keys "<kind>:<id>" (never mixed with decos)
+    geoRevert: null, // { key: item copy } when the selection was made (Esc)
+    geoPreview: new Map(), // geometry key -> fields being dragged
+    snap: { on: true, grid: false, ...store.get(SNAP_KEY, {}) },
+    overlays: readOverlays(store.get(OVERLAYS_KEY, null)),
+    guides: [], // [{ axis: 'x' | 'y', at }] in world px, this street's (localStorage)
+    streetPatch: null, // { gradient?, filters?: { layerId: filters | null } }: the sky and filters previewed live
+    version: 0, // bumped on every change to the street drawn (reach and arcs go stale)
+    geoDrawn: '', // what the geometry layer was last drawn for
+    pointer: null, // the last pointer on the canvas: { cx, cy, shift, ctrl }
+    arcs: null,
+    arcAt: null,
+    arcT: 0,
+    arcWorld: null, // { version, world } for jumpArcs
+    reachMod: null, // js/builder/reach-graph.js, loaded on first use
+    reachLocal: null, // { key, data, from } reach worked out here (a shipped street, or no validator)
+    reachFrom: null, // the screen point reach is worked out from here
+    reachPinned: false, // "Reach from the view centre" was asked for: show it over the validator's
+    validate: { state: 'idle', report: null, id: 0, timer: 0, worker: null },
+    shippedStreets: new Map(), // tsid -> street JSON (signpost arm targets)
   };
   const panels = store.get(PANELS_KEY, { left: true, right: true });
 
@@ -163,22 +307,41 @@ async function boot() {
   const fitBtn = btn('Fit', { 'aria-keyshortcuts': '0', title: 'Fit the street (0); 100% is 1' });
   const playBtn = btn('Play', { class: 'builder-btn builder-primary', 'data-builder-play': '', 'aria-keyshortcuts': 'P', disabled: true });
   const keysBtn = btn('Keys', { 'aria-haspopup': 'dialog', 'aria-keyshortcuts': 'Shift+?' });
+  const validateBtn = btn('Validate', { class: 'builder-btn builder-validate', 'data-builder-validate': '', 'aria-controls': 'builder-findings', hidden: true, title: 'Check the draft: reach, links, geometry' });
   const bar = el('header', { class: 'builder-bar' },
     el('div', { class: 'builder-bar-group' }, el('a', { href: '/console/#builder', class: 'builder-back' }, 'Console'), draftSel, streetSel, openBtn, forkBtn),
-    el('div', { class: 'builder-bar-group' }, undoBtn, redoBtn, zoomOut, zoomLabel, zoomIn, fitBtn, keysBtn, playBtn),
+    el('div', { class: 'builder-bar-group' }, undoBtn, redoBtn, zoomOut, zoomLabel, zoomIn, fitBtn, keysBtn, validateBtn, playBtn),
     status);
   const layersList = el('ul', { class: 'builder-layers', 'aria-label': 'Layers', 'data-builder-layers': '' });
   const outline = el('ul', { class: 'builder-outline', 'aria-label': 'Decos on the active layer', 'data-builder-outline': '' });
   const outlineHead = el('h2', { class: 'builder-h' }, 'Decos');
-  const left = el('aside', { class: 'builder-left', 'aria-label': 'Layers and decos', hidden: !panels.left },
-    el('h2', { class: 'builder-h' }, 'Layers'), layersList, outlineHead, outline);
+  const geoOutline = el('div', { class: 'builder-geo-outline', 'data-builder-geometry': '' });
+  const left = el('aside', { class: 'builder-left', 'aria-label': 'Layers, decos and geometry', hidden: !panels.left },
+    el('h2', { class: 'builder-h' }, 'Layers'), layersList, outlineHead, outline, el('h2', { class: 'builder-h' }, 'Geometry'), geoOutline);
   const inspector = el('div', { class: 'builder-inspector', 'data-builder-inspector': '' });
-  const right = el('aside', { class: 'builder-right', 'aria-label': 'Inspector', hidden: !panels.right }, el('h2', { class: 'builder-h' }, 'Inspector'), inspector);
+  const findingsBody = el('div', { class: 'builder-findings-body', 'data-builder-findings': '' });
+  const findings = el('section', { class: 'builder-findings', id: 'builder-findings', 'aria-labelledby': 'builder-findings-title', tabindex: '-1', hidden: true },
+    el('h2', { class: 'builder-h', id: 'builder-findings-title' }, 'Findings'), findingsBody);
+  const right = el('aside', { class: 'builder-right', 'aria-label': 'Inspector and findings', hidden: !panels.right }, el('h2', { class: 'builder-h' }, 'Inspector'), inspector, findings);
   const canvasHost = el('div', { class: 'builder-canvas', 'data-builder-canvas': '' });
   const note = el('p', { class: 'builder-note', role: 'status', 'aria-live': 'polite', hidden: true });
   const toggleLeft = btn('Layers', { class: 'builder-btn builder-toggle', 'aria-pressed': String(panels.left), 'aria-label': 'Show the layers panel' });
   const toggleRight = btn('Inspector', { class: 'builder-btn builder-toggle', 'aria-pressed': String(panels.right), 'aria-label': 'Show the inspector' });
-  const stage = el('div', { class: 'builder-stage' }, canvasHost, note, el('div', { class: 'builder-toggles' }, toggleLeft, toggleRight));
+
+  // Tools, snapping and the overlay menu, over the canvas's top left.
+  const TOOLS = [['select', 'Select', 'V'], ['platform', 'Platform', 'Q'], ['barrier', 'Wall', 'W'], ['ladder', 'Ladder', 'E'], ['signpost', 'Signpost', 'S']];
+  const toolBtns = TOOLS.map(([id, label, key]) => btn(label, { class: 'builder-tool', 'data-tool': id, 'aria-pressed': String(id === 'select'), 'aria-keyshortcuts': key, title: `${label} (${key})` }));
+  const snapBtn = btn('Snap', { class: 'builder-tool', 'data-builder-snap': '', 'aria-keyshortcuts': ';', title: 'Snap line ends, decos to the floor and guides (;)' });
+  const gridBtn = btn('Grid', { class: 'builder-tool', 'data-builder-grid': '', 'aria-keyshortcuts': 'G', title: 'Snap to a 10 px grid (G)' });
+  const overlaysBtn = btn('Overlays', { class: 'builder-tool', 'aria-expanded': 'false', 'aria-controls': 'builder-overlays', 'data-builder-overlays': '' });
+  const overlayMenu = el('div', { class: 'builder-menu', id: 'builder-overlays', role: 'group', 'aria-label': 'Overlays', hidden: true });
+  const toolbar = el('div', { class: 'builder-toolbar' },
+    el('div', { class: 'builder-toolgroup', role: 'group', 'aria-label': 'Tools' }, ...toolBtns),
+    el('div', { class: 'builder-toolgroup', role: 'group', 'aria-label': 'Snapping and overlays' }, snapBtn, gridBtn, overlaysBtn),
+    overlayMenu);
+  const rulerTop = el('canvas', { class: 'builder-ruler builder-ruler-top', 'aria-hidden': 'true', hidden: true });
+  const rulerLeft = el('canvas', { class: 'builder-ruler builder-ruler-left', 'aria-hidden': 'true', hidden: true });
+  const stage = el('div', { class: 'builder-stage' }, canvasHost, toolbar, note, el('div', { class: 'builder-toggles' }, toggleLeft, toggleRight));
   const body = el('div', { class: 'builder-body' }, left, stage, right);
   root.append(bar, body);
 
@@ -221,9 +384,13 @@ async function boot() {
   canvas.tabIndex = 0;
   canvas.setAttribute('aria-label', 'Street. Click a deco to select it; arrow keys move the selection. Press Shift and ? for the keys.');
   canvas.dataset.builderView = '';
-  canvasHost.append(canvas);
+  canvasHost.append(canvas, rulerTop, rulerLeft);
   const world = new PIXI.Container();
   world.label = 'builder-world';
+  // Geometry and the reach map, in the street's own px over the street view (drawn again only
+  // when they change or the zoom does); the selection, arcs, frames and guides in canvas px.
+  const geoGfx = new PIXI.Graphics();
+  geoGfx.label = 'builder-geometry';
   const overlay = new PIXI.Graphics();
   overlay.label = 'builder-overlay';
   app.stage.addChild(world, overlay);
@@ -241,6 +408,18 @@ async function boot() {
     const [layer, i] = findDeco(s, id);
     return layer ? [layer, layer.decos[i]] : [null, null];
   };
+  /** A geometry item by kind and id on the street drawn, and with any drag preview on top. */
+  const geoOf = (kind, id) => geoItem(street(), kind, id);
+  const geoShown = (kind, item) => {
+    const p = S.geoPreview.get(geoKey(kind, item.id));
+    return p ? { ...item, ...p } : item;
+  };
+  /** The selected geometry as [{ key, kind, id, item }] (items still on the street only). */
+  const geoSelected = () => S.geoSel.map((key) => {
+    const g = parseGeoKey(key);
+    const item = g && geoOf(g.kind, g.id);
+    return item ? { key, ...g, item } : null;
+  }).filter(Boolean);
   const containerOf = (layerId) => (S.view?.layerContainers || []).find((lc) => lc.label === layerId) || null;
   const offsetOf = (layerId) => {
     const lc = containerOf(layerId);
@@ -262,16 +441,41 @@ async function boot() {
       S.view = null;
     }
     world.removeChildren();
+    S.geoDrawn = '';
+    S.version += 1;
     if (!s) return;
-    // The game draws what loadStreetData gives it: hidden connects dropped.
+    // The game draws what loadStreetData gives it: hidden connects dropped. The sky and layer
+    // filters being previewed (the inspector's sliders) draw over the draft's own.
     const data = { ...s, signposts: navigableSignposts(s.signposts) };
+    const patch = S.streetPatch;
+    if (patch?.gradient) data.gradient = patch.gradient;
+    if (patch?.filters) {
+      data.layers = s.layers.map((l) => {
+        if (!(l.id in patch.filters)) return l;
+        const { filters, ...rest } = l;
+        return patch.filters[l.id] ? { ...rest, filters: patch.filters[l.id] } : rest;
+      });
+    }
     const t0 = performance.now();
     S.view = buildStreetView(data, PIXI, { renderer: app.renderer, available: S.mode === 'draft' ? withNewArt(available, S.session?.zone.assets) : available });
     S.view.buildMs = Math.round(performance.now() - t0);
-    world.addChild(S.view, S.view.frontView);
+    S.view.signById = new Map(data.signposts.map((p, i) => [p.id, S.view.signViews?.[i]]));
+    world.addChild(S.view, S.view.frontView, geoGfx);
     for (const lc of S.view.layerContainers) lc.visible = !S.hidden.has(lc.label);
     canvas.dataset.street = s.tsid;
     canvas.dataset.decos = String(S.view.decoDrawn);
+  }
+  /** Draw the street again soon (the sky and filter preview, at most every 90 ms). */
+  let previewTimer = 0;
+  function remountSoon(ms = 90) {
+    if (ms === 0) {
+      clearTimeout(previewTimer);
+      previewTimer = 0;
+      mount();
+      return;
+    }
+    if (previewTimer) return;
+    previewTimer = setTimeout(() => { previewTimer = 0; mount(); }, ms);
   }
   /** After an edit: move sprites in place where that is enough, else draw the street again. */
   function refresh(changed = []) {
@@ -279,10 +483,18 @@ async function boot() {
     if (!s || !S.view) return mount();
     const key = S.streetKey;
     let rebuild = false;
+    S.version += 1;
+    S.geoDrawn = '';
     for (const c of changed) {
       const [k, id] = c.split('/');
       if (k !== key) continue;
-      if (!/^d_\d+$/.test(id || '')) { rebuild = true; break; }
+      if (!/^d_\d+$/.test(id || '')) {
+        // Lines and walls are only the overlay's; ladders (their tiles) and signposts are drawn.
+        const kind = geoKindOf(s, id);
+        if (kind === 'platform' || kind === 'barrier') continue;
+        rebuild = true;
+        break;
+      }
       const [layer, deco] = decoOf(id);
       const spr = S.view.decoViews.get(id);
       if (!layer || !spr || spr.destroyed || flashBlurSize(layer.filters?.blur) > 0 || spr.parent?.label !== layer.id || spr.decoSprite !== undefined && spr.decoSprite !== deco.sprite) { rebuild = true; break; }
@@ -358,25 +570,236 @@ async function boot() {
   const toCanvas = (p) => ({ x: (p.x - S.cam.x) * S.cam.zoom, y: (p.y - S.cam.y) * S.cam.zoom });
 
   // —— Every frame ——
+  const DRAG_PANS = new Set(['move', 'resize', 'geo-move', 'geo-handle', 'draw', 'marquee', 'guide']);
   app.ticker.add(() => {
     const v = S.view;
+    // Panning at the view edge while dragging (an overlay switch).
+    if (S.drag && S.pointer && S.overlays.edgePan && DRAG_PANS.has(S.drag.kind)) {
+      const { dx, dy } = edgePan(S.pointer.cx, S.pointer.cy, canvasHost.clientWidth, canvasHost.clientHeight);
+      if (dx || dy) {
+        S.cam.x += dx / S.cam.zoom;
+        S.cam.y += dy / S.cam.zoom;
+        dragMove(S.pointer.cx, S.pointer.cy, S.pointer);
+        saveCamera();
+      }
+    }
     world.scale.set(S.cam.zoom);
     world.position.set(-S.cam.x * S.cam.zoom, -S.cam.y * S.cam.zoom);
     if (v) {
       const { w, h } = viewSize();
-      const fw = S.frame?.w || w;
-      const fh = S.frame?.h || h;
-      v.updateParallax(S.cam.x, S.cam.y, fw, fh, Math.max(fh, h));
+      const s = street();
+      if (S.overlays.layout && s) {
+        // "Layout": every layer at the offset the game gives it with a Wide view centred here.
+        const f = VIEW_FRAMES[0];
+        const c = layoutCamera({ x: S.cam.x + w / 2, y: S.cam.y + h / 2 }, f, streetWidth(s), streetHeight(s));
+        v.updateParallax(c.x, c.y, f.w, f.h, f.h);
+        if (v.skyView) {
+          v.skyView.x = S.cam.x;
+          v.skyView.y = S.cam.y;
+          v.skyView.width = w;
+          v.skyView.height = h;
+        }
+      } else {
+        const fw = S.frame?.w || w;
+        const fh = S.frame?.h || h;
+        v.updateParallax(S.cam.x, S.cam.y, fw, fh, Math.max(fh, h));
+      }
       v.cullDecos(S.cam.x, S.cam.y, w, h);
     }
+    updateArcs();
+    drawGeometry();
     drawOverlay();
+    drawRulers();
   });
+
+  // —— Geometry and reach (in the street's px, under the selection) ——
+  /** A path of segments stroked once: an outline under, then the colour. */
+  function strokeSegs(g, segs, style) {
+    if (!segs.length) return;
+    for (const [x1, y1, x2, y2] of segs) g.moveTo(x1, y1).lineTo(x2, y2);
+    g.stroke(style);
+  }
+  function drawGeometry() {
+    const s = street();
+    const z = S.cam.zoom;
+    const key = `${S.version}|${z}|${S.overlays.geometry}|${S.overlays.reach}|${S.validate.report ? S.validate.id : 0}|${S.reachLocal?.key || ''}|${S.geoPreview.size ? Math.random() : ''}`;
+    if (key === S.geoDrawn) return;
+    S.geoDrawn = key;
+    geoGfx.clear();
+    if (!s) return;
+    const px = (n) => n / z;
+    if (S.overlays.reach) drawReach(s, px);
+    if (!S.overlays.geometry) return;
+    const shape = (kind, item) => geoShape(s, kind, geoShown(kind, item));
+    // Platforms by permeability: Floor solid, Roof with ticks under it, Soft dashed, Hard thick.
+    const groups = { Floor: [], Roof: [], Soft: [], Hard: [] };
+    const outline = [];
+    const ticks = { Roof: [], wall: [] };
+    for (const p of s.platforms || []) {
+      const sh = shape('platform', p);
+      const name = permName(geoShown('platform', p).pc_perm);
+      const seg = [sh.x1, sh.y1, sh.x2, sh.y2];
+      outline.push(seg);
+      if (name === 'Soft') groups.Soft.push(...dashes(...seg, px(8), px(6)));
+      else groups[name].push(seg);
+      if (name === 'Roof') {
+        const len = Math.hypot(sh.x2 - sh.x1, sh.y2 - sh.y1);
+        for (let d = px(6); d < len; d += px(14)) {
+          const t = d / len;
+          const x = sh.x1 + t * (sh.x2 - sh.x1);
+          const y = sh.y1 + t * (sh.y2 - sh.y1);
+          ticks.Roof.push([x, y, x, y + px(5)]);
+        }
+      }
+    }
+    // Walls: a line, with ticks on each side it blocks (an open wall dashed).
+    const walls = [];
+    for (const b of s.barriers || []) {
+      const item = geoShown('barrier', b);
+      const sh = geoShape(s, 'barrier', item);
+      const sides = wallSides(item.pc_perm);
+      outline.push([sh.x, sh.y1, sh.x, sh.y2]);
+      if (!sides.left && !sides.right) walls.push(...dashes(sh.x, sh.y1, sh.x, sh.y2, px(8), px(6)));
+      else walls.push([sh.x, sh.y1, sh.x, sh.y2]);
+      for (let y = sh.y1 + px(6); y < sh.y2; y += px(14)) {
+        if (sides.left) ticks.wall.push([sh.x - px(5), y, sh.x, y]);
+        if (sides.right) ticks.wall.push([sh.x, y, sh.x + px(5), y]);
+      }
+    }
+    strokeSegs(geoGfx, outline, { width: px(5), color: 0x000000, alpha: 0.45 });
+    strokeSegs(geoGfx, groups.Floor, { width: px(2), color: COLOURS.Floor });
+    strokeSegs(geoGfx, groups.Roof, { width: px(2), color: COLOURS.Roof });
+    strokeSegs(geoGfx, ticks.Roof, { width: px(1.5), color: COLOURS.Roof });
+    strokeSegs(geoGfx, groups.Soft, { width: px(2), color: COLOURS.Soft });
+    strokeSegs(geoGfx, groups.Hard, { width: px(3.5), color: COLOURS.Hard });
+    strokeSegs(geoGfx, walls, { width: px(2.5), color: COLOURS.wall });
+    strokeSegs(geoGfx, ticks.wall, { width: px(1.5), color: COLOURS.wall });
+    // Line ends: where lines join up.
+    for (const seg of outline.slice(0, (s.platforms || []).length)) {
+      geoGfx.circle(seg[0], seg[1], px(2.5)).circle(seg[2], seg[3], px(2.5));
+    }
+    geoGfx.fill({ color: 0xffffff, alpha: 0.85 });
+    // Ladders: the climb zone with rungs.
+    const rungs = [];
+    for (const l of s.ladders || []) {
+      const sh = shape('ladder', l);
+      geoGfx.rect(sh.x - sh.w / 2, sh.y1, sh.w, sh.y2 - sh.y1);
+      for (let y = sh.y2 - 20; y > sh.y1; y -= 20) rungs.push([sh.x - sh.w / 2, y, sh.x + sh.w / 2, y]);
+    }
+    geoGfx.stroke({ width: px(2), color: COLOURS.ladder });
+    strokeSegs(geoGfx, rungs, { width: px(1), color: COLOURS.ladder, alpha: 0.7 });
+    // Signposts: their box; a post with no arm the game shows is dashed (it is not drawn).
+    const dashed = [];
+    for (const p of s.signposts || []) {
+      const sh = shape('signpost', p);
+      const b = shapeBounds(sh);
+      if ((p.connects || []).some((c) => !c.hidden)) geoGfx.rect(b.x1, b.y1, b.x2 - b.x1, b.y2 - b.y1);
+      else for (const [x1, y1, x2, y2] of [[b.x1, b.y1, b.x2, b.y1], [b.x2, b.y1, b.x2, b.y2], [b.x2, b.y2, b.x1, b.y2], [b.x1, b.y2, b.x1, b.y1]]) dashed.push(...dashes(x1, y1, x2, y2, px(8), px(6)));
+    }
+    geoGfx.stroke({ width: px(2), color: COLOURS.post });
+    strokeSegs(geoGfx, dashed, { width: px(2), color: COLOURS.post });
+  }
+
+  /** The reach to draw: the validator's for a draft street, else the one worked out here. */
+  function reachData() {
+    if (S.reachPinned && S.reachLocal?.key === reachKey()) return S.reachLocal.data;
+    if (S.mode === 'draft' && S.validate.report?.reach?.[S.streetKey]) return S.validate.report.reach[S.streetKey];
+    return S.reachLocal?.key === reachKey() ? S.reachLocal.data : null;
+  }
+  function drawReach(s, px) {
+    const r = reachData();
+    if (!r) {
+      ensureLocalReach();
+      return;
+    }
+    const good = [];
+    const bad = [];
+    for (const u of r.surfaces || []) (u.reached ? good : bad).push([u.x1, u.y1, u.x2 === u.x1 ? u.x2 + 4 : u.x2, u.y2]);
+    strokeSegs(geoGfx, good, { width: px(8), color: COLOURS.reached, alpha: 0.5 });
+    strokeSegs(geoGfx, bad, { width: px(8), color: COLOURS.unreached, alpha: 0.5 });
+    for (const t of r.targets || []) {
+      geoGfx.rect(t.x - (t.w || 100) / 2, t.y - (t.h || 200), t.w || 100, t.h || 200);
+      geoGfx.stroke({ width: px(t.reached ? 2 : 4), color: t.reached ? COLOURS.reached : COLOURS.unreached });
+    }
+    for (const t of r.traps || []) geoGfx.poly([t.x, t.y - px(14), t.x - px(8), t.y, t.x + px(8), t.y]).fill({ color: COLOURS.trap });
+    for (const a of r.arrivals || []) {
+      geoGfx.circle(a.x, a.y, px(8));
+      if (a.stands) geoGfx.fill({ color: COLOURS.arrival });
+      else geoGfx.stroke({ width: px(3), color: COLOURS.arrival });
+    }
+  }
 
   function drawOverlay() {
     overlay.clear();
     const s = street();
     if (!s) return;
     const line = { width: 1.5, color: 0x1fa6ff, alpha: 1 };
+    const cw = canvasHost.clientWidth;
+    const ch = canvasHost.clientHeight;
+    // View frames, centred on the view.
+    if (S.overlays.frame) {
+      for (const f of VIEW_FRAMES) {
+        const w = f.w * S.cam.zoom;
+        const h = f.h * S.cam.zoom;
+        const x = (cw - w) / 2;
+        const y = (ch - h) / 2;
+        overlay.rect(x, y, w, h).stroke({ width: 3, color: 0x000000, alpha: 0.5 });
+        if (f.id === 'wide') overlay.rect(x, y, w, h).stroke({ width: 1.5, color: 0xffffff });
+        else for (const seg of [[x, y, x + w, y], [x + w, y, x + w, y + h], [x + w, y + h, x, y + h], [x, y + h, x, y]]) strokeSegs(overlay, dashes(...seg, 10, 6), { width: 1.5, color: 0xffffff });
+      }
+    }
+    // Guides.
+    if (S.overlays.rulers) {
+      for (const g of S.guides) {
+        const p = toCanvas({ x: g.at - s.bounds.l, y: g.at - s.bounds.t });
+        if (g.axis === 'x') overlay.moveTo(p.x, 0).lineTo(p.x, ch);
+        else overlay.moveTo(0, p.y).lineTo(cw, p.y);
+      }
+      overlay.stroke({ width: 1, color: 0x00e5ff, alpha: 0.9 });
+    }
+    // The jump arcs from the pointer.
+    if (S.overlays.arc && S.arcs) {
+      for (const a of S.arcs) {
+        const pts = (a.points || []).map(toCanvas);
+        if (pts.length < 2) continue;
+        const colour = a.kind === 'running' ? COLOURS.running : COLOURS.plain;
+        overlay.poly(pts.flatMap((p) => [p.x, p.y]), false).stroke({ width: 4, color: 0x000000, alpha: 0.4 });
+        overlay.poly(pts.flatMap((p) => [p.x, p.y]), false).stroke({ width: 2, color: colour });
+        if (a.landed) {
+          const l = toCanvas(a.landed);
+          overlay.circle(l.x, l.y, 4).fill({ color: colour }).stroke({ width: 1, color: 0x000000 });
+        }
+      }
+      const f = S.arcs[0]?.from && toCanvas(S.arcs[0].from);
+      if (f) overlay.circle(f.x, f.y, 4).fill({ color: 0xffffff }).stroke({ width: 1.5, color: 0x000000 });
+    }
+    // A shape being drawn.
+    if (S.drag?.kind === 'draw') drawDrawing(s, S.drag);
+    // Selected geometry: highlighted, with its handles.
+    const geo = geoSelected();
+    for (const { kind, item } of geo) {
+      const sh = geoShape(s, kind, geoShown(kind, item));
+      if (kind === 'platform') {
+        const a = toCanvas({ x: sh.x1, y: sh.y1 });
+        const b = toCanvas({ x: sh.x2, y: sh.y2 });
+        overlay.moveTo(a.x, a.y).lineTo(b.x, b.y).stroke({ width: 6, color: 0xffffff, alpha: 0.6 }).moveTo(a.x, a.y).lineTo(b.x, b.y).stroke({ width: 2.5, color: COLOURS.select });
+      } else {
+        const b = shapeBounds(sh);
+        const a = toCanvas({ x: b.x1, y: b.y1 });
+        const c = toCanvas({ x: b.x2, y: b.y2 });
+        const pad = kind === 'barrier' ? 4 : 0;
+        overlay.rect(a.x - pad, a.y, c.x - a.x + pad * 2, c.y - a.y).stroke({ width: 3, color: 0xffffff, alpha: 0.7 });
+        overlay.rect(a.x - pad, a.y, c.x - a.x + pad * 2, c.y - a.y).stroke(line);
+      }
+    }
+    if (geo.length === 1 && editable()) {
+      const { kind, item } = geo[0];
+      for (const h of geoHandles(s, kind, geoShown(kind, item), S.cam.zoom)) {
+        const c = toCanvas(h);
+        if (kind === 'barrier' || (kind === 'ladder' && h.id === 'height')) overlay.circle(c.x, c.y, HANDLE_PX - 1).fill({ color: 0xffffff }).stroke(line);
+        else overlay.rect(c.x - HANDLE_PX / 2 - 0.5, c.y - HANDLE_PX / 2 - 0.5, HANDLE_PX + 1, HANDLE_PX + 1).fill({ color: 0xffffff }).stroke(line);
+      }
+    }
     for (const id of S.selected) {
       const [layer, deco] = decoOf(id);
       if (!layer) continue;
@@ -404,15 +827,123 @@ async function boot() {
       overlay.rect(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.abs(b.x - a.x), Math.abs(b.y - a.y)).fill({ color: 0x1fa6ff, alpha: 0.12 }).stroke(line);
     }
   }
+  /** The shape a draw tool is making, as it will be added. */
+  function drawDrawing(s, d) {
+    const item = drawnItem(s, d.tool, d.from, d.to, { level: Boolean(S.pointer?.shift) });
+    if (!item) return;
+    const sh = geoShape(s, d.tool, item);
+    const style = { width: 2.5, color: COLOURS.select };
+    if (d.tool === 'platform') {
+      const a = toCanvas({ x: sh.x1, y: sh.y1 });
+      const b = toCanvas({ x: sh.x2, y: sh.y2 });
+      overlay.moveTo(a.x, a.y).lineTo(b.x, b.y).stroke({ width: 6, color: 0xffffff, alpha: 0.6 }).moveTo(a.x, a.y).lineTo(b.x, b.y).stroke(style);
+      return;
+    }
+    const b = shapeBounds(sh);
+    const a = toCanvas({ x: b.x1, y: b.y1 });
+    const c = toCanvas({ x: b.x2, y: b.y2 });
+    if (d.tool === 'barrier') overlay.moveTo(a.x, a.y).lineTo(a.x, c.y).stroke({ width: 6, color: 0xffffff, alpha: 0.6 }).moveTo(a.x, a.y).lineTo(a.x, c.y).stroke(style);
+    else overlay.rect(a.x, a.y, c.x - a.x, c.y - a.y).fill({ color: COLOURS.select, alpha: 0.12 }).stroke(style);
+  }
+
+  // —— Rulers (canvas px, in the street's world numbers) ——
+  let rulersDrawn = '';
+  function drawRulers() {
+    const on = S.overlays.rulers && Boolean(street());
+    rulerTop.hidden = !on;
+    rulerLeft.hidden = !on;
+    stage.classList.toggle('has-rulers', on);
+    if (!on) { rulersDrawn = ''; return; }
+    const s = street();
+    const cw = canvasHost.clientWidth;
+    const ch = canvasHost.clientHeight;
+    const dpr = Math.min(3, globalThis.devicePixelRatio || 1);
+    const dark = matchMedia?.('(prefers-color-scheme: dark)').matches;
+    const key = `${S.cam.x}|${S.cam.y}|${S.cam.zoom}|${cw}|${ch}|${dpr}|${dark}|${document.documentElement.dataset.theme || ''}`;
+    if (key === rulersDrawn) return;
+    rulersDrawn = key;
+    const css = getComputedStyle(root);
+    const col = (name, fallback) => css.getPropertyValue(name).trim() || fallback;
+    const bg = col('--surface', 'white');
+    const fg = col('--fg', 'black');
+    const muted = col('--muted', 'gray');
+    for (const [cv, axis] of [[rulerTop, 'x'], [rulerLeft, 'y']]) {
+      const w = axis === 'x' ? cw : RULER_PX;
+      const h = axis === 'x' ? RULER_PX : ch;
+      if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) {
+        cv.width = Math.round(w * dpr);
+        cv.height = Math.round(h * dpr);
+        cv.style.width = `${w}px`;
+        cv.style.height = `${h}px`;
+      }
+      const ctx = cv.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = muted;
+      ctx.fillStyle = fg;
+      ctx.font = '10px system-ui, sans-serif';
+      ctx.lineWidth = 1;
+      const origin = axis === 'x' ? s.bounds.l + S.cam.x : s.bounds.t + S.cam.y;
+      const span = (axis === 'x' ? cw : ch) / S.cam.zoom;
+      const { step, ticks } = rulerTicks(origin, span, S.cam.zoom);
+      ctx.beginPath();
+      for (let v = Math.ceil(origin / (step / 5)) * (step / 5); v <= origin + span; v += step / 5) {
+        const at = Math.round((v - origin) * S.cam.zoom) + 0.5;
+        if (axis === 'x') { ctx.moveTo(at, RULER_PX); ctx.lineTo(at, RULER_PX - 4); } else { ctx.moveTo(RULER_PX, at); ctx.lineTo(RULER_PX - 4, at); }
+      }
+      for (const v of ticks) {
+        const at = Math.round((v - origin) * S.cam.zoom) + 0.5;
+        if (axis === 'x') {
+          ctx.moveTo(at, RULER_PX); ctx.lineTo(at, 4);
+          ctx.fillText(String(v), at + 3, 11);
+        } else {
+          ctx.moveTo(RULER_PX, at); ctx.lineTo(4, at);
+          ctx.save();
+          ctx.translate(11, at - 3);
+          ctx.rotate(-Math.PI / 2);
+          ctx.fillText(String(v), 0, 0);
+          ctx.restore();
+        }
+      }
+      ctx.stroke();
+    }
+  }
 
   // —— Selection ——
   function select(ids, { add = false } = {}) {
+    S.geoSel = [];
+    S.geoRevert = null;
     const next = add ? [...new Set([...S.selected, ...ids])] : [...new Set(ids)];
     S.selected = next.filter((id) => decoOf(id)[0]);
     S.revertTo = Object.fromEntries(S.selected.map((id) => [id, JSON.parse(JSON.stringify(decoOf(id)[1]))]));
     const first = S.selected[0] && decoOf(S.selected[0])[0];
     if (first && first.id !== S.activeLayer && S.selected.every((id) => decoOf(id)[0]?.id === first.id)) S.activeLayer = first.id;
     renderPanels();
+  }
+  /** Select geometry (keys "<kind>:<id>"); decos and geometry are never selected together. */
+  function selectGeo(keys, { add = false } = {}) {
+    const s = street();
+    const next = add ? [...new Set([...S.geoSel, ...keys])] : [...new Set(keys)];
+    S.geoSel = next.filter((k) => { const g = parseGeoKey(k); return g && geoItem(s, g.kind, g.id); });
+    S.selected = [];
+    S.revertTo = null;
+    S.geoRevert = Object.fromEntries(geoSelected().map(({ key, item }) => [key, JSON.parse(JSON.stringify(item))]));
+    renderPanels();
+  }
+  /** Select a deco or a piece of geometry by its id (a finding's `at`). */
+  function selectById(id) {
+    if (decoOf(id)[0]) return select([id]);
+    const kind = geoKindOf(street(), id);
+    if (kind) selectGeo([geoKey(kind, id)]);
+  }
+  /** What geometry can be picked: all of it while it is drawn or a draw tool is on, else signposts. */
+  const pickKinds = () => (S.overlays.geometry || S.tool !== 'select' ? GEO_KINDS : ['signpost']);
+  /** Geometry under a point, best first (platforms win), as keys. */
+  function geoHitsAt(p) {
+    const s = street();
+    if (!s) return [];
+    return geoHits(s, p, PICK_PX / S.cam.zoom, pickKinds()).map((h) => geoKey(h.kind, h.id));
   }
   /** Everything under a point, topmost first: the active layer first unless `all`. */
   function hitsAt(p, { all = false } = {}) {
@@ -459,7 +990,26 @@ async function boot() {
     }
     commit(setOps(changes), label);
   }
-  function nudge(dx, dy) { editSelected((d) => ({ x: Math.round(d.x + dx), y: Math.round(d.y + dy) }), 'nudge'); }
+  function nudge(dx, dy) {
+    if (S.geoSel.length) return commit(geoSetOps(geoSelected().map(({ kind, item }) => [kind, item, moveBy(kind, item, dx, dy)])), 'nudge');
+    editSelected((d) => ({ x: Math.round(d.x + dx), y: Math.round(d.y + dy) }), 'nudge');
+  }
+  /** <kind>.set ops for [kind, item, fields] (unchanged fields left out, empty sets dropped). */
+  function geoSetOps(changes) {
+    return changes.map(([kind, item, set]) => [kind, item.id, changedFields(item, set)]).filter(([, , set]) => Object.keys(set).length).map(([kind, id, set]) => ({ op: `${kind}.set`, street: S.streetKey, id, set }));
+  }
+  /** Add geometry items ([kind, item] without ids: the ops give them) and select what was added. */
+  function addGeometry(items, label) {
+    const s = street();
+    if (!s || !items.length) return;
+    if (!editable()) return readOnlyNote();
+    const before = Object.fromEntries(GEO_KINDS.map((k) => [k, (s[GEO_LIST[k]] || []).length]));
+    commit(items.map(([kind, item]) => ({ op: `${kind}.add`, street: S.streetKey, [kind]: item })), label);
+    const now = street();
+    const added = GEO_KINDS.flatMap((k) => (now?.[GEO_LIST[k]] || []).slice(before[k]).map((g) => geoKey(k, g.id)));
+    if (added.length) selectGeo(added);
+    return added;
+  }
   function rotate(by) { editSelected((d) => { let r = (Number(d.r) || 0) + by; while (r > 180) r -= 360; while (r <= -180) r += 360; return { r }; }, 'rotate'); }
   function flip() { editSelected((d) => ({ flip: !d.flip }), 'flip'); }
   function zOrder(dir, top) { editSelected((d, layer) => ({ z: zFor(layer, d, dir, top) }), 'z'); }
@@ -485,6 +1035,14 @@ async function boot() {
     }
   }
   function remove() {
+    if (S.geoSel.length) {
+      const ops = geoSelected().map(({ kind, id }) => ({ op: `${kind}.remove`, street: S.streetKey, id }));
+      if (!ops.length) return;
+      commit(ops, 'delete');
+      S.geoSel = [];
+      renderPanels();
+      return;
+    }
     const ops = S.selected.filter((id) => !S.locked.has(decoOf(id)[0]?.id)).map((id) => ({ op: 'deco.remove', street: S.streetKey, id }));
     if (!ops.length) return;
     commit(ops, 'delete');
@@ -492,15 +1050,43 @@ async function boot() {
     renderPanels();
   }
   function copy(cut = false) {
+    if (S.geoSel.length) {
+      const geometry = geoSelected().map(({ kind, item }) => {
+        const { id, ...rest } = item;
+        return { kind, item: rest };
+      });
+      store.set(CLIPBOARD_KEY, { decos: [], geometry, at: Date.now() });
+      say(`Copied ${geometry.length === 1 ? `1 ${GEO_WORDS[geometry[0].kind].toLowerCase()}` : `${geometry.length} pieces of geometry`}.`);
+      if (cut) remove();
+      return;
+    }
     const decos = S.selected.map((id) => decoOf(id)).filter(([l]) => l).map(([layer, deco]) => ({ layer: layer.id, role: layerRole(layer, street()), deco }));
     if (!decos.length) return;
     store.set(CLIPBOARD_KEY, { decos, at: Date.now() });
     say(`Copied ${decos.length === 1 ? '1 deco' : `${decos.length} decos`}.`);
     if (cut) remove();
   }
+  /** Paste copied geometry: at the view centre (the group's bottom centre there), or where it was. */
+  function pasteGeometry(geometry, inPlace) {
+    const s = street();
+    let dx = 0;
+    let dy = 0;
+    if (!inPlace) {
+      const pts = geometry.flatMap(({ kind, item }) => (kind === 'platform' ? [{ x: item.x1, y: item.y1 }, { x: item.x2, y: item.y2 }] : [{ x: item.x, y: item.y }]));
+      const { w, h } = viewSize();
+      const xs = pts.map((p) => p.x);
+      dx = Math.round(S.cam.x + w / 2 + s.bounds.l - (Math.min(...xs) + Math.max(...xs)) / 2);
+      dy = Math.round(S.cam.y + h / 2 + s.bounds.t - Math.max(...pts.map((p) => p.y)));
+    }
+    addGeometry(geometry.filter((g) => GEO_KINDS.includes(g.kind)).map(({ kind, item }) => [kind, { ...item, ...moveBy(kind, item, dx, dy) }]), 'paste');
+  }
   async function paste(inPlace) {
     const clip = store.get(CLIPBOARD_KEY, null);
-    if (!clip?.decos?.length) return say('Nothing to paste yet. Copy a deco first.');
+    if (clip?.geometry?.length) {
+      if (!editable()) return readOnlyNote();
+      return pasteGeometry(clip.geometry, inPlace);
+    }
+    if (!clip?.decos?.length) return say('Nothing to paste yet. Copy a deco or some geometry first.');
     if (!editable()) return readOnlyNote();
     const s = street();
     const target = layerOf(S.activeLayer) || layerOf('middleground');
@@ -535,6 +1121,22 @@ async function boot() {
     setTimeout(() => select(ids), 80);
   }
   function revertSelection() {
+    if (S.geoRevert && editable()) {
+      const ops = [];
+      for (const [key, was] of Object.entries(S.geoRevert)) {
+        const g = parseGeoKey(key);
+        const now = g && geoOf(g.kind, g.id);
+        if (!now) continue;
+        const set = {};
+        const unset = [];
+        for (const k of Object.keys(was)) if (k !== 'id' && k !== 'connects' && JSON.stringify(now[k]) !== JSON.stringify(was[k])) set[k] = was[k];
+        for (const k of Object.keys(now)) if (k !== 'id' && k !== 'connects' && !(k in was)) unset.push(k);
+        if (Object.keys(set).length || unset.length) ops.push({ op: `${g.kind}.set`, street: S.streetKey, id: g.id, set, ...(unset.length ? { unset } : {}) });
+      }
+      if (!ops.length) return false;
+      commit(ops, 'revert');
+      return true;
+    }
     if (!S.revertTo || !editable()) return false;
     const changes = [];
     for (const [id, was] of Object.entries(S.revertTo)) {
@@ -558,14 +1160,19 @@ async function boot() {
     } else if (['apply', 'undo', 'redo'].includes(e.kind)) {
       refresh(e.changed);
       S.selected = S.selected.filter((id) => decoOf(id)[0]);
+      S.geoSel = geoSelected().map((g) => g.key);
+      if (e.changed?.includes(S.streetKey)) fillStreets();
       renderPanels();
+      scheduleValidate();
     } else {
       // remote, rebased, conflict: the whole draft may differ.
       fillStreets();
       if (!street()) return openDraftStreet('');
       mount();
       S.selected = S.selected.filter((id) => decoOf(id)[0]);
+      S.geoSel = geoSelected().map((g) => g.key);
       renderPanels();
+      scheduleValidate();
       if (e.kind === 'remote') say('This draft changed somewhere else; showing the new version.');
     }
     undoBtn.disabled = !S.session.canUndo;
@@ -576,12 +1183,72 @@ async function boot() {
   function renderPanels() {
     renderLayers();
     renderOutline();
+    renderGeoOutline();
     renderInspector();
+    renderTools();
+    renderValidate();
+    renderFindings();
     undoBtn.disabled = !S.session?.canUndo;
     redoBtn.disabled = !S.session?.canRedo;
     playBtn.disabled = S.mode !== 'draft' || !street();
     forkBtn.hidden = S.mode !== 'view';
-    canvas.dataset.selected = S.selected.join(',');
+    canvas.dataset.selected = [...S.selected, ...S.geoSel].join(',');
+  }
+  function renderTools() {
+    for (const b of toolBtns) b.setAttribute('aria-pressed', String(b.dataset.tool === S.tool));
+    snapBtn.setAttribute('aria-pressed', String(S.snap.on));
+    gridBtn.setAttribute('aria-pressed', String(S.snap.grid));
+    canvas.dataset.tool = S.tool;
+    canvas.dataset.overlays = Object.entries(S.overlays).filter(([, v]) => v).map(([k]) => k).join(',');
+  }
+  function setTool(tool) {
+    if (tool !== 'select' && !editable()) {
+      if (street()) readOnlyNote();
+      tool = 'select';
+    }
+    S.tool = tool;
+    if (S.drag?.kind === 'draw') S.drag = null;
+    renderTools();
+    const words = { select: 'Select: click to pick, drag to move.', platform: 'Platform: drag to draw a line. Shift keeps it level.', barrier: 'Wall: drag up or down to draw one.', ladder: 'Ladder: drag from its foot up.', signpost: 'Signpost: click to stand one on the floor, or drag its size.' };
+    if (tool !== 'select') say(`${words[tool]} Esc goes back to Select.`);
+  }
+  /** The left panel's geometry lists, one per kind (a keyboard way to pick geometry). */
+  function renderGeoOutline() {
+    const s = street();
+    if (!s) return geoOutline.replaceChildren();
+    const sel = new Set(S.geoSel);
+    const open = geoOutline.querySelectorAll('details[open]');
+    const wasOpen = new Set([...open].map((d) => d.dataset.kind));
+    geoOutline.replaceChildren(...GEO_KINDS.map((kind) => {
+      const items = s[GEO_LIST[kind]] || [];
+      const details = el('details', { 'data-kind': kind, open: wasOpen.has(kind) || items.some((g) => sel.has(geoKey(kind, g.id))) ? true : null },
+        el('summary', { text: `${GEO_WORDS[kind]}s (${items.length})` }),
+        el('ul', { class: 'builder-outline' }, ...items.map((g) => {
+          const key = geoKey(kind, g.id);
+          const sub = kind === 'platform' ? permName(g.pc_perm) : kind === 'barrier' ? (PERMS.find((p) => p.value === g.pc_perm)?.wall || PERMS[3].wall) : kind === 'signpost' ? `${(g.connects || []).length} arms` : `${Math.round(g.h)} tall`;
+          return el('li', {}, el('button', {
+            type: 'button',
+            class: 'builder-deco',
+            'aria-pressed': String(sel.has(key)),
+            'data-geo': key,
+            onclick: (e) => {
+              selectGeo([key], { add: e.shiftKey });
+              if (!e.shiftKey) centreOnGeo(kind, g);
+            },
+          }, el('span', { text: g.id }), el('span', { class: 'builder-sub', text: ` ${sub}` })));
+        })));
+      return details;
+    }));
+  }
+  function centreAt(p) {
+    const { w, h } = viewSize();
+    S.cam.x = p.x - w / 2;
+    S.cam.y = p.y - h / 2;
+    saveCamera();
+  }
+  function centreOnGeo(kind, item) {
+    const b = shapeBounds(geoShape(street(), kind, item));
+    centreAt({ x: (b.x1 + b.x2) / 2, y: (b.y1 + b.y2) / 2 });
   }
   function renderLayers() {
     const s = street();
@@ -638,25 +1305,41 @@ async function boot() {
     input.addEventListener('change', () => { const n = Number(input.value); if (Number.isFinite(n)) onCommit(n); });
     return input;
   }
+  /** Draw the inspector again, keeping the keyboard focus on the field it was on. */
   function renderInspector() {
+    const a = document.activeElement;
+    const focusKey = a && inspector.contains(a) ? a.dataset.focus || a.name || '' : '';
+    buildInspector();
+    if (focusKey) {
+      const esc = globalThis.CSS?.escape ? CSS.escape(focusKey) : focusKey;
+      inspector.querySelector(`[data-focus="${esc}"], [name="${esc}"]`)?.focus();
+    }
+  }
+  function buildInspector() {
     const s = street();
     inspector.replaceChildren();
     // append() writes a null as the text "null": leave the absent parts out.
     const add = (...kids) => inspector.append(...kids.filter((k) => k != null));
     if (!s) return add(el('p', { class: 'builder-sub', text: 'Open a street to begin.' }));
+    if (S.geoSel.length) return buildGeoInspector(s, add);
     if (!S.selected.length) {
       const layer = layerOf(S.activeLayer);
       add(
         el('p', {}, el('b', { text: s.label }), el('span', { class: 'builder-sub', text: ` ${s.tsid}` })),
         el('p', { class: 'builder-sub', text: S.mode === 'view' ? 'A shipped street, open to look at. Fork it into a draft to change it.' : `${s.hubName || ''} · ${streetWidth(s)} by ${streetHeight(s)}` }),
-        el('p', { class: 'builder-sub', text: 'Click a deco on the active layer to select it. Alt+click picks from every layer.' }));
+        el('p', { class: 'builder-sub', text: 'Click a deco on the active layer to select it, or a line, wall, ladder or signpost. Alt+click cycles through everything under the pointer.' }));
+      if (editable()) {
+        add(el('h3', { class: 'builder-h3', text: 'Add at the view centre' }),
+          el('div', { class: 'builder-row builder-wrap' }, ...GEO_KINDS.map((kind) => btn(GEO_WORDS[kind], { class: 'builder-mini', 'data-add': kind, onclick: () => addAtCentre(kind) }))));
+      }
       if (layer) {
-        const hid = el('input', { type: 'checkbox', checked: layer.hidden ? true : null, disabled: !editable() || null });
+        const hid = el('input', { type: 'checkbox', name: 'layer-hidden', checked: layer.hidden ? true : null, disabled: !editable() || null });
         hid.addEventListener('change', () => commit([{ op: 'layer.set', street: S.streetKey, layer: layer.id, ...(hid.checked ? { set: { hidden: true } } : { unset: ['hidden'] }) }], 'layer'));
         add(el('h3', { class: 'builder-h3', text: `Layer ${layer.name || layer.id}` }),
           el('p', { class: 'builder-sub', text: `${layerRole(layer, s)}, z ${layer.z ?? 0}${layer.w ? `, ${layer.w} by ${layer.h}` : ''}` }),
           el('label', { class: 'builder-check' }, hid, ' Hidden in the game'));
       }
+      buildSkyAndFilters(s, layer, add);
       return;
     }
     if (S.selected.length > 1) {
@@ -714,6 +1397,221 @@ async function boot() {
       provenanceSection(el, deco.sprite, S.mode === 'draft' ? S.session?.zone.assets?.[deco.sprite] : null, { library: S.catalog }));
   }
 
+  function addAtCentre(kind) {
+    const s = street();
+    const { w, h } = viewSize();
+    const item = defaultItem(s, kind, { x: S.cam.x + w / 2, y: S.cam.y + h / 2 });
+    if (item) addGeometry([[kind, item]], 'add');
+  }
+  function permSelect(name, value, onPick, { wall = false, dis = {} } = {}) {
+    const sel = el('select', { name, ...dis },
+      ...(value === undefined ? [el('option', { value: '', selected: true }, 'Not set (a floor)')] : []),
+      ...PERMS.map((p) => el('option', { value: p.key, selected: permKey(value) === p.key ? true : null }, `${p.label} (${p.key === 'null' ? 'null' : p.value}): ${wall ? p.wall : p.line}`)));
+    sel.addEventListener('change', () => onPick(permValue(sel.value)));
+    return sel;
+  }
+  /** The inspector for geometry: coordinates, perms, a signpost's size and its arms. */
+  function buildGeoInspector(s, add) {
+    const geo = geoSelected();
+    if (geo.length > 1) {
+      add(el('p', {}, el('b', { text: `${geo.length} pieces of geometry` })),
+        el('p', { class: 'builder-sub', text: 'Arrows move them all, Delete removes them, Ctrl/Cmd+C and V copy them.' }));
+      return;
+    }
+    if (!geo.length) return;
+    const { kind, id, item } = geo[0];
+    const ro = !editable();
+    const dis = ro ? { disabled: true } : {};
+    const set = (patch, label = 'inspector') => commit(geoSetOps([[kind, item, patch]]), label);
+    const setPerm = (field) => (v) => commit([{ op: `${kind}.set`, street: S.streetKey, id, ...(v === undefined ? { set: {}, unset: [field] } : { set: { [field]: v } }) }], 'perm');
+    const num = (name, label, value, fn, attrs = {}) => field(label, numberInput(name, value, fn, { ...dis, ...attrs }));
+    add(el('p', {}, el('b', { text: GEO_WORDS[kind] }), el('span', { class: 'builder-sub', text: ` ${id}` })),
+      ro ? el('p', { class: 'builder-sub', text: 'Read-only: fork this street to change it.' }) : null);
+    if (kind === 'platform') {
+      const len = Math.round(Math.hypot(item.x2 - item.x1, item.y2 - item.y1));
+      const level = btn('Level it', { class: 'builder-mini', ...dis, title: 'Put the right end at the left end\'s height' });
+      level.addEventListener('click', () => set(item.x1 <= item.x2 ? { y2: item.y1 } : { y1: item.y2 }, 'level'));
+      add(el('div', { class: 'builder-grid' },
+        num('x1', 'x1', item.x1, (n) => set({ x1: Math.round(n) })), num('y1', 'y1', item.y1, (n) => set({ y1: Math.round(n) })),
+        num('x2', 'x2', item.x2, (n) => set({ x2: Math.round(n) })), num('y2', 'y2', item.y2, (n) => set({ y2: Math.round(n) }))),
+        el('div', { class: 'builder-row' }, el('span', { class: 'builder-sub', text: `${len} px long` }), level),
+        field('Players', permSelect('pc_perm', item.pc_perm, setPerm('pc_perm'), { dis })),
+        field('Items', permSelect('item_perm', item.item_perm, setPerm('item_perm'), { dis })),
+        el('p', { class: 'builder-sub', text: 'Street x, y: y goes up as it gets more negative. A new line is a Floor for both.' }));
+    } else if (kind === 'barrier') {
+      add(el('div', { class: 'builder-grid' },
+        num('x', 'x', item.x, (n) => set({ x: Math.round(n) })), num('y', 'Top y', item.y, (n) => set({ y: Math.round(n) })),
+        num('h', 'Height (down)', item.h, (n) => set({ h: Math.max(1, Math.round(n)) }), { min: '1' })),
+        field('Blocks', permSelect('pc_perm', item.pc_perm, setPerm('pc_perm'), { wall: true, dis })),
+        el('p', { class: 'builder-sub', text: 'From the left means a player walking right into it.' }));
+    } else if (kind === 'ladder') {
+      add(el('div', { class: 'builder-grid' },
+        num('x', 'x (centre)', item.x, (n) => set({ x: Math.round(n) })), num('y', 'y (foot)', item.y, (n) => set({ y: Math.round(n) })),
+        num('w', 'Width', item.w, (n) => set({ w: Math.max(1, Math.round(n)) }), { min: '1' }), num('h', 'Height (up)', item.h, (n) => set({ h: Math.max(1, Math.round(n)) }), { min: '1' })),
+        el('p', { class: 'builder-sub', text: 'Drag the square to move it, the circle to change its height.' }));
+    } else {
+      add(el('div', { class: 'builder-grid' },
+        num('x', 'x (centre)', item.x, (n) => set({ x: Math.round(n) })), num('y', 'y (foot)', item.y, (n) => set({ y: Math.round(n) })),
+        num('w', 'Width', item.w, (n) => set({ w: Math.max(1, Math.round(n)) }), { min: '1' }), num('h', 'Height', item.h, (n) => set({ h: Math.max(1, Math.round(n)) }), { min: '1' })));
+      buildArms(s, item, add, dis);
+    }
+    const del = btn(`Delete this ${GEO_WORDS[kind].toLowerCase()}`, { class: 'builder-mini', ...dis });
+    del.addEventListener('click', () => remove());
+    add(el('div', { class: 'builder-row' }, del));
+  }
+
+  // —— Signpost arms (connects) ——
+  /** Streets an arm can lead to: this draft's other streets, then the shipped ones. */
+  async function armTargets(query) {
+    if (!S.shippedList) {
+      try { S.shippedList = await api.streets(); } catch (err) { failed(err); S.shippedList = []; }
+    }
+    const own = S.mode === 'draft' ? S.session.zone.streets.filter((r) => r.key !== S.streetKey).map((r) => ({ tsid: r.street.tsid, label: r.street.label, hub: 'this draft', key: r.key, hubId: r.street.hubId })) : [];
+    return searchStreets([...own, ...S.shippedList], query, 8);
+  }
+  /** A target street's JSON: a draft street from the zone, a shipped one fetched once. */
+  async function targetStreet(target) {
+    if (target.key) return S.session?.zone.streets.find((r) => r.key === target.key)?.street || null;
+    const key = resolveIndexTsid(target.tsid);
+    if (S.shippedStreets.has(key)) return S.shippedStreets.get(key);
+    const file = key && STREET_INDEX.streets[key]?.file;
+    if (!file) return null;
+    const data = await (await fetch(file)).json();
+    S.shippedStreets.set(key, data);
+    return data;
+  }
+  /** The draft street (or shipped row) a connect's tsid names, for its words. */
+  function targetOf(tsid) {
+    const own = S.session?.zone.streets.find((r) => r.street.tsid === tsid);
+    if (own) return { tsid, key: own.key, label: own.street.label, hubId: own.street.hubId, hub: 'this draft' };
+    const key = resolveIndexTsid(tsid);
+    const row = key && STREET_INDEX.streets[key];
+    return row ? { tsid, label: row.label, hubId: row.hubId, hub: row.hubName || '' } : { tsid, label: tsid, hub: 'not a known street' };
+  }
+  async function addArm(post, target) {
+    const s = street();
+    const key = S.streetKey;
+    let arrive = null;
+    try { arrive = arriveFor(await targetStreet(target), s.tsid); } catch { arrive = null; }
+    const meta = targetOf(target.tsid);
+    commit([{ op: 'connect.add', street: key, signpost: post.id, connect: newConnect({ tsid: target.tsid, label: target.label || meta.label, hubId: target.hubId || meta.hubId, arrive }) }], 'arm');
+    say(arrive ? `Linked to ${target.label}: players arrive at ${arrive.x}, ${arrive.y} there.` : `Linked to ${target.label}. No signpost there links back yet, so the arm has no arrival point; type one in, or work it out once one does.`);
+  }
+  async function workOutArrive(post, at) {
+    const c = post.connects[at];
+    let arrive = null;
+    try { arrive = arriveFor(await targetStreet(targetOf(c.tsid)), street().tsid); } catch { arrive = null; }
+    if (!arrive) return say('No signpost on that street links back here with a floor near it, so there is no arrival point to work out.', 'bad');
+    commit([{ op: 'connect.set', street: S.streetKey, signpost: post.id, at, set: { arrive } }], 'arrive');
+    say(`Arrival set to ${arrive.x}, ${arrive.y} on the other street.`);
+  }
+  function buildArms(s, post, add, dis) {
+    const arms = post.connects || [];
+    add(el('h3', { class: 'builder-h3', text: `Arms (${arms.length})` }));
+    if (!arms.length) add(el('p', { class: 'builder-sub', text: 'A signpost with no arm is not drawn in the game. Add one below.' }));
+    arms.forEach((c, at) => {
+      const meta = targetOf(c.tsid);
+      const setArm = (patch, unset = []) => commit([{ op: 'connect.set', street: S.streetKey, signpost: post.id, at, set: patch, ...(unset.length ? { unset } : {}) }], 'arm');
+      const label = el('input', { type: 'text', name: `arm-label-${at}`, value: c.label, maxlength: '48', ...dis });
+      label.addEventListener('change', () => { const v = label.value.trim(); if (v && v !== c.label) setArm({ label: v }); });
+      const hid = el('input', { type: 'checkbox', name: `arm-hidden-${at}`, checked: c.hidden ? true : null, ...dis });
+      hid.addEventListener('change', () => (hid.checked ? setArm({ hidden: true }) : setArm({}, ['hidden'])));
+      const ax = el('input', { type: 'number', name: `arm-ax-${at}`, value: c.arrive ? String(c.arrive.x) : '', step: '1', placeholder: 'none', ...dis });
+      const ay = el('input', { type: 'number', name: `arm-ay-${at}`, value: c.arrive ? String(c.arrive.y) : '', step: '1', placeholder: 'none', ...dis });
+      const setArrive = () => {
+        if (ax.value === '' && ay.value === '') { if (c.arrive) setArm({}, ['arrive']); return; }
+        const x = Number(ax.value);
+        const y = Number(ay.value);
+        if (ax.value !== '' && ay.value !== '' && Number.isFinite(x) && Number.isFinite(y)) setArm({ arrive: { x: Math.round(x), y: Math.round(y) } });
+      };
+      ax.addEventListener('change', setArrive);
+      ay.addEventListener('change', setArrive);
+      const work = btn('Work it out', { class: 'builder-mini', name: `arm-work-${at}`, ...dis, title: 'Where the signpost on that street that links back here stands' });
+      work.addEventListener('click', () => workOutArrive(post, at));
+      const drop = btn('Remove arm', { class: 'builder-mini', name: `arm-remove-${at}`, ...dis });
+      drop.addEventListener('click', () => commit([{ op: 'connect.remove', street: S.streetKey, signpost: post.id, at }], 'arm'));
+      add(el('fieldset', { class: 'builder-fieldset builder-arm', 'data-arm': String(at) },
+        el('legend', { text: `To ${meta.label}` }),
+        el('p', { class: 'builder-sub', text: `${c.tsid}${meta.hub ? ` · ${meta.hub}` : ''}${c.hub_id ? ` · hub ${c.hub_id}` : ''}` }),
+        field('Label on the arm', label),
+        el('label', { class: 'builder-check' }, hid, ' Hidden (the game leaves it off the post)'),
+        el('div', { class: 'builder-grid' }, field('Arrive x', ax), field('Arrive y', ay)),
+        el('p', { class: 'builder-sub', text: 'Where players land on that street, in its screen px.' }),
+        el('div', { class: 'builder-row' }, work, drop)));
+    });
+    if (dis.disabled) return;
+    if (arms.length >= 8) return add(el('p', { class: 'builder-sub', text: 'Eight arms is the most a signpost holds.' }));
+    const search = el('input', { type: 'search', name: 'arm-search', 'aria-label': 'Street to link to', placeholder: 'Street to link to', autocomplete: 'off', spellcheck: 'false' });
+    const results = el('ul', { class: 'builder-results builder-arm-results', 'aria-label': 'Streets to link to' });
+    const fill = async () => {
+      const found = await armTargets(search.value);
+      results.replaceChildren(...found.map((t) => el('li', {}, el('button', {
+        type: 'button',
+        class: 'builder-result',
+        onclick: () => addArm(post, t),
+      }, el('b', { text: t.label }), el('span', { class: 'builder-sub', text: ` ${t.hub || ''} · ${t.tsid}` })))));
+    };
+    search.addEventListener('input', fill);
+    add(el('h3', { class: 'builder-h3', text: 'Add an arm' }), search, results);
+  }
+
+  // —— Sky and layer filters (street.set gradient, layer.set filters), previewed live ——
+  function buildSkyAndFilters(s, layer, add) {
+    const ro = !editable();
+    const dis = ro ? { disabled: true } : {};
+    const grad = s.gradient || null;
+    const top = el('input', { type: 'color', name: 'sky-top', value: colourInput(grad?.top || '87A8C9'), ...dis });
+    const bottom = el('input', { type: 'color', name: 'sky-bottom', value: colourInput(grad?.bottom || 'FFE7A0'), ...dis });
+    const preview = () => {
+      S.streetPatch = { ...(S.streetPatch || {}), gradient: { top: colourHex(top.value), bottom: colourHex(bottom.value) } };
+      remountSoon();
+    };
+    const commitSky = () => {
+      const g = { top: colourHex(top.value), bottom: colourHex(bottom.value) };
+      S.streetPatch = null;
+      if (grad && grad.top === g.top && grad.bottom === g.bottom) return remountSoon(0);
+      commit([{ op: 'street.set', street: S.streetKey, set: { gradient: g } }], 'sky');
+    };
+    for (const i of [top, bottom]) {
+      i.addEventListener('input', preview);
+      i.addEventListener('change', commitSky);
+    }
+    add(el('h3', { class: 'builder-h3', text: 'Sky and layer filters' }),
+      el('div', { class: 'builder-grid' }, field('Sky top', top), field('Sky bottom', bottom)),
+      grad ? null : el('p', { class: 'builder-sub', text: 'No sky gradient yet: picking a colour adds one.' }));
+    if (!layer) return;
+    const f = layer.filters || {};
+    const sliders = [['brightness', 'Brightness', -100, 100], ['contrast', 'Contrast', -100, 100], ['saturation', 'Saturation', -100, 100], ['tintAmount', 'Tint amount', 0, 100], ['blur', 'Blur', 0, 100]];
+    const values = { ...f };
+    const previewFilters = () => {
+      let next = layer.filters || null;
+      for (const k of FILTER_KEYS) next = filtersWith(next, k, values[k]);
+      S.streetPatch = { ...(S.streetPatch || {}), filters: { ...(S.streetPatch?.filters || {}), [layer.id]: next } };
+      remountSoon();
+      return next;
+    };
+    const commitFilters = () => {
+      const next = previewFilters();
+      S.streetPatch = null;
+      if (JSON.stringify(next) === JSON.stringify(layer.filters || null)) return remountSoon(0);
+      commit([{ op: 'layer.set', street: S.streetKey, layer: layer.id, ...(next ? { set: { filters: next } } : { unset: ['filters'] }) }], 'filters');
+    };
+    const rows = sliders.map(([k, label, min, max]) => {
+      const out = el('output', { class: 'builder-out', text: String(f[k] ?? 0) });
+      const input = el('input', { type: 'range', name: `filter-${k}`, min: String(min), max: String(max), step: '1', value: String(f[k] ?? 0), ...dis });
+      input.addEventListener('input', () => { values[k] = Number(input.value); out.textContent = input.value; previewFilters(); });
+      input.addEventListener('change', commitFilters);
+      return el('label', { class: 'builder-range' }, el('span', { text: label }), input, out);
+    });
+    const tint = el('input', { type: 'color', name: 'filter-tintColor', value: tintInput(f.tintColor), ...dis });
+    tint.addEventListener('input', () => { values.tintColor = tintNumber(tint.value); previewFilters(); });
+    tint.addEventListener('change', commitFilters);
+    const reset = btn('No filters', { class: 'builder-mini', ...dis, title: 'Clear this layer\'s filters' });
+    reset.addEventListener('click', () => { if (layer.filters) commit([{ op: 'layer.set', street: S.streetKey, layer: layer.id, unset: ['filters'] }], 'filters'); });
+    add(el('p', { class: 'builder-sub', text: `Filters on ${layer.name || layer.id} (pick a layer on the left).` }),
+      ...rows, field('Tint colour', tint), el('div', { class: 'builder-row' }, reset));
+  }
+
   // —— Pointer ——
   const pointer = (e) => {
     const r = canvas.getBoundingClientRect();
@@ -730,76 +1628,252 @@ async function boot() {
     }
     return null;
   }
+  /** The handle of the one selected piece of geometry under a canvas point. */
+  function geoHandleAt(cx, cy) {
+    if (S.geoSel.length !== 1 || !editable()) return null;
+    const [g] = geoSelected();
+    if (!g) return null;
+    for (const h of geoHandles(street(), g.kind, geoShown(g.kind, g.item), S.cam.zoom)) {
+      const c = toCanvas(h);
+      if (Math.abs(c.x - cx) <= HANDLE_PX && Math.abs(c.y - cy) <= HANDLE_PX) return { ...g, handle: h.id };
+    }
+    return null;
+  }
+  /** A guide near a canvas point (while rulers and guides are shown). */
+  function guideAt(cx, cy) {
+    const s = street();
+    if (!S.overlays.rulers || !s) return null;
+    return S.guides.find((g) => {
+      const c = toCanvas({ x: g.at - s.bounds.l, y: g.at - s.bounds.t });
+      return g.axis === 'x' ? Math.abs(c.x - cx) <= 4 : Math.abs(c.y - cy) <= 4;
+    }) || null;
+  }
+  /** A screen point on the grid and pulled to guides (snapping), in screen space. */
+  function snapScreen(p) {
+    const s = street();
+    if (!s) return p;
+    const w = snapPoint({ x: p.x + s.bounds.l, y: p.y + s.bounds.t }, { grid: S.snap.grid, guides: S.overlays.rulers ? S.guides : [], radius: S.snap.on ? GUIDE_PX / S.cam.zoom : 0 });
+    return { x: w.x - s.bounds.l, y: w.y - s.bounds.t };
+  }
+  const mods = (e) => ({ shift: e.shiftKey, ctrl: e.ctrlKey || e.metaKey, alt: e.altKey });
+
   canvas.addEventListener('pointerdown', (e) => {
     canvas.focus();
     const { cx, cy } = pointer(e);
     const p = toWorld(cx, cy);
+    S.pointer = { cx, cy, ...mods(e) };
     canvas.setPointerCapture(e.pointerId);
     if (S.space || e.button === 1) {
       S.drag = { kind: 'pan', cx, cy, cam: { ...S.cam } };
       return;
     }
     if (e.button !== 0) return;
+    // A draw tool: drag out the new thing (S: a click stands a post on the floor).
+    if (S.tool !== 'select') {
+      if (!editable()) { setTool('select'); return; }
+      const at = snapScreen(p);
+      S.drag = { kind: 'draw', tool: S.tool, from: at, to: at };
+      return;
+    }
+    const gh = geoHandleAt(cx, cy);
+    if (gh) {
+      const at = handleWorld(gh.kind, gh.item, gh.handle);
+      const skip = new Set([gh.key]);
+      // The ends joined to this one (Ctrl/Cmd brings them along).
+      const joined = gh.kind === 'platform' || gh.kind === 'barrier' ? joinedEnds(street(), at, skip) : [];
+      S.drag = { kind: 'geo-handle', from: p, g: gh, joined, moved: false };
+      return;
+    }
     const h = handleAt(cx, cy);
     if (h) {
       S.drag = { kind: h.handle.id === 'rotate' ? 'rotate' : 'resize', from: p, ...h };
       return;
     }
-    let hits = hitsAt(p, { all: e.altKey });
-    if (e.altKey && hits.length) {
-      // Alt+click cycles through everything under the pointer.
-      const at = hits.indexOf(S.selected[0]);
-      hits = [hits[(at + 1) % hits.length]];
+    const guide = guideAt(cx, cy);
+    if (guide) {
+      S.drag = { kind: 'guide', guide };
+      return;
     }
-    const id = hits[0];
-    if (id) {
+    // Geometry wins over decos, platforms over the rest (LocoDeco); Alt+click cycles through all.
+    const geo = geoHitsAt(p);
+    const decos = hitsAt(p, { all: e.altKey });
+    let pick = e.altKey ? null : geo[0] || decos[0] || null;
+    if (e.altKey) {
+      const all = [...geo, ...decos];
+      const current = S.geoSel.length === 1 ? S.geoSel[0] : S.selected.length === 1 ? S.selected[0] : null;
+      pick = all.length ? all[(all.indexOf(current) + 1) % all.length] : null;
+    }
+    if (pick && parseGeoKey(pick)) {
       if (e.shiftKey) {
-        select(S.selected.includes(id) ? S.selected.filter((x) => x !== id) : [...S.selected, id]);
+        selectGeo(S.geoSel.includes(pick) ? S.geoSel.filter((k) => k !== pick) : [...S.geoSel, pick]);
         return;
       }
-      if (!S.selected.includes(id)) select([id]);
+      if (!S.geoSel.includes(pick)) selectGeo([pick]);
+      if (editable()) S.drag = { kind: 'geo-move', from: p, keys: [...S.geoSel], moved: false };
+      return;
+    }
+    if (pick) {
+      if (e.shiftKey) {
+        select(S.selected.includes(pick) ? S.selected.filter((x) => x !== pick) : [...S.selected, pick]);
+        return;
+      }
+      if (!S.selected.includes(pick)) select([pick]);
       if (editable()) S.drag = { kind: 'move', from: p, ids: S.selected.filter((x) => !S.locked.has(decoOf(x)[0]?.id)), moved: false };
       return;
     }
     S.drag = { kind: 'marquee', from: p, to: p, add: e.shiftKey };
   });
-  canvas.addEventListener('pointermove', (e) => {
-    const d = S.drag;
-    const { cx, cy } = pointer(e);
-    if (!d) {
-      canvas.style.cursor = handleAt(cx, cy) ? (handleAt(cx, cy).handle.id === 'rotate' ? 'grab' : 'nwse-resize') : S.space ? 'grab' : 'default';
-      return;
+
+  /** Move a signpost's sprite and a ladder's tiles with a drag (the street is drawn again on release). */
+  function previewSprites(kind, item, shown) {
+    const s = street();
+    if (kind === 'signpost') {
+      const g = S.view?.signById?.get(item.id);
+      if (g && !g.destroyed) {
+        g.x = shown.x - s.bounds.l;
+        g.y = shown.y - s.bounds.t;
+      }
+    } else if (kind === 'ladder') {
+      const mg = containerOf('middleground');
+      for (const spr of mg?.children || []) {
+        if (spr.glitchLadderId !== item.id || spr.destroyed) continue;
+        spr.ladderX ??= spr.x;
+        spr.ladderY ??= spr.y;
+        spr.x = spr.ladderX + (shown.x - item.x);
+        spr.y = spr.ladderY + (shown.y - item.y);
+      }
     }
+  }
+
+  /** Follow the pointer in a drag (also each frame while the view pans at its edge). */
+  function dragMove(cx, cy, m) {
+    const d = S.drag;
+    if (!d) return;
+    const s = street();
     const p = toWorld(cx, cy);
     if (d.kind === 'pan') {
       S.cam.x = d.cam.x - (cx - d.cx) / S.cam.zoom;
       S.cam.y = d.cam.y - (cy - d.cy) / S.cam.zoom;
       saveCamera();
     } else if (d.kind === 'move') {
-      const dx = Math.round(p.x - d.from.x);
-      const dy = Math.round(p.y - d.from.y);
+      let dx = Math.round(p.x - d.from.x);
+      let dy = Math.round(p.y - d.from.y);
       d.moved = d.moved || Math.abs(dx) + Math.abs(dy) > 1;
       if (!d.moved) return;
+      // The grid and guides pull the first deco's anchor (middleground: the street's own px).
+      const [l0, d0] = decoOf(d.ids[0]);
+      if (l0 && !isLayerLocal(l0) && (S.snap.grid || (S.snap.on && S.guides.length))) {
+        const at = snapScreen(worldToScreen(s, d0.x + dx, d0.y + dy));
+        dx = Math.round(at.x + s.bounds.l - d0.x);
+        dy = Math.round(at.y + s.bounds.t - d0.y);
+      }
       for (const id of d.ids) {
         const [layer, deco] = decoOf(id);
         S.preview.set(id, { x: deco.x + dx, y: deco.y + dy });
         syncSprite(layer, deco);
       }
     } else if (d.kind === 'resize') {
-      const next = resizeBy(street(), d.layer, d.deco, d.box, d.handle, d.from, p, { keepAspect: e.shiftKey, offset: offsetOf(d.layer.id) });
+      const next = resizeBy(s, d.layer, d.deco, d.box, d.handle, d.from, p, { keepAspect: m.shift, offset: offsetOf(d.layer.id) });
       S.preview.set(d.deco.id, next);
       syncSprite(d.layer, d.deco);
     } else if (d.kind === 'rotate') {
-      S.preview.set(d.deco.id, { r: rotationTo(d.box, p, e.shiftKey ? 15 : 1) });
+      S.preview.set(d.deco.id, { r: rotationTo(d.box, p, m.shift ? 15 : 1) });
       syncSprite(d.layer, d.deco);
     } else if (d.kind === 'marquee') {
       d.to = p;
+    } else if (d.kind === 'draw') {
+      d.to = snapScreen(p);
+    } else if (d.kind === 'guide') {
+      d.guide.at = Math.round(d.guide.axis === 'x' ? p.x + s.bounds.l : p.y + s.bounds.t);
+      d.off = d.guide.axis === 'x' ? cx < RULER_PX : cy < RULER_PX;
+    } else if (d.kind === 'geo-move') {
+      let dx = Math.round(p.x - d.from.x);
+      let dy = Math.round(p.y - d.from.y);
+      d.moved = d.moved || Math.abs(dx) + Math.abs(dy) > 1;
+      if (!d.moved) return;
+      const first = parseGeoKey(d.keys[0]);
+      const item0 = first && geoOf(first.kind, first.id);
+      if (item0 && (S.snap.grid || (S.snap.on && S.guides.length))) {
+        const ref = handleWorld(first.kind, item0, first.kind === 'platform' ? 'p1' : first.kind === 'barrier' ? 'top' : 'bottom');
+        const at = snapScreen({ x: ref.x + dx - s.bounds.l, y: ref.y + dy - s.bounds.t });
+        dx = Math.round(at.x + s.bounds.l - ref.x);
+        dy = Math.round(at.y + s.bounds.t - ref.y);
+      }
+      d.dx = dx;
+      d.dy = dy;
+      for (const key of d.keys) {
+        const g = parseGeoKey(key);
+        const item = g && geoOf(g.kind, g.id);
+        if (!item) continue;
+        const next = moveBy(g.kind, item, dx, dy);
+        S.geoPreview.set(key, next);
+        previewSprites(g.kind, item, { ...item, ...next });
+      }
+    } else if (d.kind === 'geo-handle') {
+      handleDrag(d, p, m, false);
     }
+  }
+
+  /**
+   * A handle drag: the dragged item's new fields, then (on release, with snapping on) a platform
+   * end pulled onto an end within 30 px, then the joined ends brought along when Ctrl/Cmd is held.
+   */
+  function handleDrag(d, p, m, release) {
+    const s = street();
+    const { kind, item, handle, key } = d.g;
+    // The end goes where the pointer took it, then the grid and guides pull the end itself.
+    const start = handleWorld(kind, item, handle);
+    const startScreen = { x: start.x - s.bounds.l, y: start.y - s.bounds.t };
+    const aim = snapScreen({ x: startScreen.x + (p.x - d.from.x), y: startScreen.y + (p.y - d.from.y) });
+    d.moved = d.moved || Math.abs(p.x - d.from.x) + Math.abs(p.y - d.from.y) > 1;
+    if (!d.moved) return;
+    const next = kind === 'signpost'
+      ? dragHandle(s, kind, item, handle, d.from, p, { level: m.shift })
+      : dragHandle(s, kind, item, handle, startScreen, aim, { level: m.shift });
+    if (release && S.snap.on && kind === 'platform') {
+      const skip = new Set([key, ...(m.ctrl ? d.joined.map((j) => geoKey(j.kind, j.id)) : [])]);
+      Object.assign(next, snapPlatform({ ...item, ...next }, endPoints(s, skip), [handle]));
+    }
+    S.geoPreview.set(key, next);
+    previewSprites(kind, item, { ...item, ...next });
+    // Joined ends follow the dragged end by the same amount (Ctrl/Cmd held).
+    const moved = handleWorld(kind, { ...item, ...next }, handle);
+    const ddx = moved.x - start.x;
+    const ddy = moved.y - start.y;
+    for (const j of d.joined) {
+      const jkey = geoKey(j.kind, j.id);
+      if (!m.ctrl) { S.geoPreview.delete(jkey); continue; }
+      const other = geoOf(j.kind, j.id);
+      if (!other) continue;
+      const prev = S.geoPreview.get(jkey) || {};
+      let set;
+      if (j.kind === 'platform') set = j.end === 'p1' ? { x1: other.x1 + ddx, y1: other.y1 + ddy } : { x2: other.x2 + ddx, y2: other.y2 + ddy };
+      else if (j.end === 'top') set = { x: other.x + ddx, y: other.y + ddy, h: other.h - ddy };
+      else set = { x: other.x + ddx, h: other.h + ddy };
+      S.geoPreview.set(jkey, { ...prev, ...set });
+    }
+  }
+
+  canvas.addEventListener('pointermove', (e) => {
+    const { cx, cy } = pointer(e);
+    S.pointer = { cx, cy, ...mods(e) };
+    if (!S.drag) {
+      const gh = geoHandleAt(cx, cy);
+      const dh = !gh && handleAt(cx, cy);
+      canvas.style.cursor = gh ? (gh.kind === 'barrier' || gh.handle === 'height' ? 'ns-resize' : gh.kind === 'signpost' ? 'nwse-resize' : 'move')
+        : dh ? (dh.handle.id === 'rotate' ? 'grab' : 'nwse-resize')
+          : S.space ? 'grab' : S.tool !== 'select' ? 'crosshair' : guideAt(cx, cy) ? (guideAt(cx, cy).axis === 'x' ? 'ew-resize' : 'ns-resize') : 'default';
+      return;
+    }
+    dragMove(cx, cy, S.pointer);
   });
+  canvas.addEventListener('pointerleave', () => { if (!S.drag) { S.pointer = null; S.arcs = null; } });
+
   function endDrag() {
     const d = S.drag;
     S.drag = null;
     if (!d) return;
+    const s = street();
     if (d.kind === 'marquee') {
       const rect = { x1: d.from.x, y1: d.from.y, x2: d.to.x, y2: d.to.y };
       if (Math.abs(rect.x2 - rect.x1) + Math.abs(rect.y2 - rect.y1) < 3) {
@@ -813,6 +1887,59 @@ async function boot() {
       return;
     }
     if (d.kind === 'pan') return;
+    if (d.kind === 'guide') {
+      if (d.off) S.guides = S.guides.filter((g) => g !== d.guide);
+      saveGuides();
+      return;
+    }
+    if (d.kind === 'draw') {
+      let item = drawnItem(s, d.tool, d.from, d.to, { level: Boolean(S.pointer?.shift) });
+      if (!item && d.tool === 'signpost') item = postOnFloor(s, d.from);
+      if (!item) return say(`Drag to draw a ${GEO_WORDS[d.tool].toLowerCase()}.`);
+      if (d.tool === 'platform' && S.snap.on) item = snapDrawnPlatform(item, endPoints(s));
+      addGeometry([[d.tool, item]], 'draw');
+      return;
+    }
+    if (d.kind === 'geo-move' || d.kind === 'geo-handle') {
+      if (d.kind === 'geo-handle' && d.moved && S.pointer) handleDrag(d, toWorld(S.pointer.cx, S.pointer.cy), S.pointer, true);
+      if (d.kind === 'geo-move' && d.moved && S.snap.on) {
+        // A moved line joins up: the shortest pull onto an end within 30 px, for the whole group.
+        const skip = new Set(d.keys);
+        const ends = endPoints(s, skip);
+        const pts = d.keys.map(parseGeoKey).filter((g) => g?.kind === 'platform').flatMap((g) => {
+          const v = S.geoPreview.get(geoKey(g.kind, g.id));
+          return v ? [{ x: v.x1, y: v.y1 }, { x: v.x2, y: v.y2 }] : [];
+        });
+        const pull = pts.length ? bestPull(pts, ends) : null;
+        if (pull) {
+          for (const key of d.keys) {
+            const g = parseGeoKey(key);
+            const item = geoOf(g.kind, g.id);
+            if (item) S.geoPreview.set(key, moveBy(g.kind, item, (d.dx || 0) + pull.dx, (d.dy || 0) + pull.dy));
+          }
+        }
+      }
+      const changes = [...S.geoPreview].map(([key, v]) => {
+        const g = parseGeoKey(key);
+        const item = g && geoOf(g.kind, g.id);
+        return item ? [g.kind, item, v] : null;
+      }).filter(Boolean);
+      S.geoPreview.clear();
+      const ops = geoSetOps(changes);
+      if (ops.length) commit(ops, d.kind === 'geo-move' ? 'move' : 'resize');
+      else if (d.moved) remountSoon(0);
+      S.version += 1;
+      return;
+    }
+    // Decos: middleground decos dropped near a floor sit on it (snapping).
+    if (d.kind === 'move' && d.moved && S.snap.on) {
+      for (const [id, v] of S.preview) {
+        const [layer] = decoOf(id);
+        if (layer?.id !== 'middleground') continue;
+        const y = floorSnapY(s, v.x, v.y, SNAP_PX);
+        if (y != null) v.y = y;
+      }
+    }
     const changes = [...S.preview].map(([id, v]) => [id, Object.fromEntries(Object.entries(v).filter(([k, val]) => decoOf(id)[1]?.[k] !== val))]);
     S.preview.clear();
     if (changes.length) commit(setOps(changes), d.kind);
@@ -825,8 +1952,41 @@ async function boot() {
       S.preview.delete(id);
       if (layer) syncSprite(layer, deco);
     }
+    if (S.geoPreview.size) {
+      S.geoPreview.clear();
+      remountSoon(0);
+    }
     S.drag = null;
   });
+
+  // Rulers: drag from one to add a guide; drag a guide back onto its ruler to remove it.
+  for (const [r, axis] of [[rulerTop, 'y'], [rulerLeft, 'x']]) {
+    r.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0 || !street()) return;
+      const { cx, cy } = pointer(e);
+      const s = street();
+      const p = toWorld(cx, cy);
+      const guide = { axis, at: Math.round(axis === 'x' ? p.x + s.bounds.l : p.y + s.bounds.t) };
+      S.guides.push(guide);
+      S.drag = { kind: 'guide', guide, off: true };
+      S.pointer = { cx, cy, ...mods(e) };
+      r.setPointerCapture(e.pointerId);
+    });
+    r.addEventListener('pointermove', (e) => {
+      const { cx, cy } = pointer(e);
+      S.pointer = { cx, cy, ...mods(e) };
+      dragMove(cx, cy, S.pointer);
+    });
+    r.addEventListener('pointerup', endDrag);
+  }
+  const guidesKey = () => `groddle.builder.guides:${S.mode === 'draft' ? `${S.session?.id}/${S.streetKey}` : S.viewTsid}`;
+  function saveGuides() {
+    store.set(guidesKey(), S.guides.map(({ axis, at }) => ({ axis, at })));
+  }
+  function loadGuides() {
+    const g = store.get(guidesKey(), []);
+    S.guides = Array.isArray(g) ? g.filter((x) => (x?.axis === 'x' || x?.axis === 'y') && Number.isFinite(x.at)).slice(0, 50) : [];
+  }
   canvas.addEventListener('wheel', (e) => {
     e.preventDefault();
     const { cx, cy } = pointer(e);
@@ -843,8 +2003,14 @@ async function boot() {
   const keySheet = el('dialog', { class: 'builder-dialog', 'aria-labelledby': 'builder-keys-title' },
     el('h2', { id: 'builder-keys-title', text: 'Keys' }),
     el('dl', { class: 'builder-keys' }, ...[
-      ['Click, Shift+click, Alt+click', 'Select, add or remove, cycle through what is under the pointer'],
+      ['Click, Shift+click, Alt+click', 'Select (lines, walls, ladders and signposts before decos), add or remove, cycle through everything under the pointer'],
       ['Drag on empty space', 'Select with a box on the active layer'],
+      ['V, Q, W, E, S', 'Select; draw a platform, a wall, a ladder; a signpost (click to stand one on the floor, or drag its size)'],
+      ['Shift while drawing or dragging a line end', 'Keep the line level'],
+      ['Ctrl/Cmd while dragging an end', 'Bring the ends joined to it along'],
+      ['; (semicolon)', 'Snapping on or off: line ends within 30 px, middleground decos onto the floor, guides'],
+      ['G', 'The 10 px grid on or off'],
+      ['Drag from a ruler', 'Add a guide (Overlays, Rulers and guides); drag it back onto the ruler to remove it'],
       ['Ctrl/Cmd+A, with Shift', 'Select the active layer, every layer'],
       ['Arrows', 'Move 5 px; Shift 20; Alt 1'],
       ['R with Left or Right', 'Rotate 1°; Shift 15°'],
@@ -854,7 +2020,7 @@ async function boot() {
       ['Ctrl/Cmd+Z, Shift+Ctrl/Cmd+Z', 'Undo, redo'],
       ['Ctrl/Cmd+C, X, V, Shift+V', 'Copy, cut, paste at the view centre, paste in place'],
       ['Delete', 'Delete'],
-      ['Esc', 'Put the selection back as it was; again to deselect'],
+      ['Esc', 'Leave a draw tool; put the selection back as it was; again to deselect'],
       ['Space+drag, wheel, Ctrl/Cmd+wheel', 'Pan, pan, zoom'],
       ['0, 1', 'Fit the street, 100%'],
       ['L', 'Lock the active layer'],
@@ -890,15 +2056,25 @@ async function boot() {
     if (mod && (k === '[' || k === 'ArrowDown')) { e.preventDefault(); zOrder(-1, e.shiftKey); return; }
     if (mod) return;
     if (e.altKey && (k === 'ArrowUp' || k === 'ArrowDown')) { e.preventDefault(); moveLayer(k === 'ArrowUp' ? 1 : -1); return; }
-    if (k.startsWith('Arrow') && S.selected.length) {
+    if (k.startsWith('Arrow') && (S.selected.length || S.geoSel.length)) {
       e.preventDefault();
-      if (S.rKey && (k === 'ArrowLeft' || k === 'ArrowRight')) { rotate((k === 'ArrowRight' ? 1 : -1) * (e.shiftKey ? 15 : 1)); return; }
+      if (S.rKey && S.selected.length && (k === 'ArrowLeft' || k === 'ArrowRight')) { rotate((k === 'ArrowRight' ? 1 : -1) * (e.shiftKey ? 15 : 1)); return; }
       const n = nudgeStep(e);
       nudge(k === 'ArrowLeft' ? -n : k === 'ArrowRight' ? n : 0, k === 'ArrowUp' ? -n : k === 'ArrowDown' ? n : 0);
       return;
     }
     if (k === 'Delete' || k === 'Backspace') { e.preventDefault(); remove(); return; }
-    if (k === 'Escape') { if (!revertSelection()) select([]); else S.revertTo = null; return; }
+    if (k === 'Escape') {
+      if (S.drag?.kind === 'draw') { S.drag = null; return; }
+      if (S.tool !== 'select') { setTool('select'); return; }
+      if (!revertSelection()) select([]);
+      else { S.revertTo = null; S.geoRevert = null; }
+      return;
+    }
+    const tools = { v: 'select', q: 'platform', w: 'barrier', e: 'ladder', s: 'signpost' };
+    if (!e.altKey && tools[k.toLowerCase()]) { setTool(tools[k.toLowerCase()]); return; }
+    if (k === ';') { toggleSnap(); return; }
+    if (k === 'g' || k === 'G') { toggleGrid(); return; }
     if (k === 'h' || k === 'H') { flip(); return; }
     if (k === '0') { fit(); return; }
     if (k === '1') { setZoom(1); return; }
@@ -918,6 +2094,304 @@ async function boot() {
   zoomIn.addEventListener('click', () => setZoom(S.cam.zoom * 1.25));
   zoomOut.addEventListener('click', () => setZoom(S.cam.zoom / 1.25));
   fitBtn.addEventListener('click', fit);
+
+  // —— Tools, snapping and overlays ——
+  for (const b of toolBtns) b.addEventListener('click', () => setTool(b.dataset.tool));
+  function toggleSnap() {
+    S.snap.on = !S.snap.on;
+    store.set(SNAP_KEY, S.snap);
+    renderTools();
+    say(S.snap.on ? 'Snapping on: line ends join within 30 px, middleground decos sit on the floor, guides pull.' : 'Snapping off.');
+  }
+  function toggleGrid() {
+    S.snap.grid = !S.snap.grid;
+    store.set(SNAP_KEY, S.snap);
+    renderTools();
+    say(S.snap.grid ? 'Grid on: drags land on 10 px steps.' : 'Grid off.');
+  }
+  snapBtn.addEventListener('click', toggleSnap);
+  gridBtn.addEventListener('click', toggleGrid);
+
+  /** A small picture of how the overlay draws a thing (colour and pattern, so not by colour alone). */
+  function legend(colour, { dash = false, thick = false, ticks = false, box = false } = {}) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 28 12');
+    svg.setAttribute('width', '28');
+    svg.setAttribute('height', '12');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.classList.add('builder-legend');
+    // A dark ground, as the overlay draws its lines over a dark outline on the street.
+    const ground = document.createElementNS(NS, 'rect');
+    for (const [k, v] of Object.entries({ width: 28, height: 12, rx: 3, fill: '#1d2430' })) ground.setAttribute(k, String(v));
+    svg.append(ground);
+    const shape = document.createElementNS(NS, box ? 'rect' : 'line');
+    if (box) for (const [k, v] of Object.entries({ x: 2, y: 1, width: 24, height: 10, fill: 'none' })) shape.setAttribute(k, String(v));
+    else for (const [k, v] of Object.entries({ x1: 1, y1: 5, x2: 27, y2: 5 })) shape.setAttribute(k, String(v));
+    shape.setAttribute('stroke', hexCss(colour));
+    shape.setAttribute('stroke-width', thick ? '4' : '2.5');
+    if (dash) shape.setAttribute('stroke-dasharray', '5 3');
+    svg.append(shape);
+    if (ticks) {
+      const t = document.createElementNS(NS, 'path');
+      t.setAttribute('d', 'M5 5v4M11 5v4M17 5v4M23 5v4');
+      t.setAttribute('stroke', hexCss(colour));
+      t.setAttribute('stroke-width', '1.5');
+      svg.append(t);
+    }
+    return svg;
+  }
+  const keyRow = (svg, text) => el('li', {}, svg, el('span', { text }));
+  function overlayCheck(name, label) {
+    const input = el('input', { type: 'checkbox', name: `overlay-${name}`, checked: S.overlays[name] ? true : null });
+    input.addEventListener('change', () => setOverlay(name, input.checked));
+    return el('label', { class: 'builder-check' }, input, ` ${label}`);
+  }
+  const reachFromBtn = btn('Reach from the view centre', { class: 'builder-mini', title: 'Work the reach map out again from the floor under the view centre' });
+  reachFromBtn.addEventListener('click', () => {
+    const { w, h } = viewSize();
+    S.reachFrom = { x: S.cam.x + w / 2, y: S.cam.y + h / 2 };
+    S.reachLocal = null;
+    S.reachPinned = true;
+    if (!S.overlays.reach) setOverlay('reach', true);
+    S.geoDrawn = '';
+    ensureLocalReach(true);
+  });
+  const clearGuidesBtn = btn('Clear guides', { class: 'builder-mini' });
+  clearGuidesBtn.addEventListener('click', () => { S.guides = []; saveGuides(); say('Guides cleared.'); });
+  const asPlayed = el('input', { type: 'radio', name: 'overlay-parallax', value: 'played', checked: S.overlays.layout ? null : true });
+  const asLayout = el('input', { type: 'radio', name: 'overlay-parallax', value: 'layout', checked: S.overlays.layout ? true : null });
+  for (const r of [asPlayed, asLayout]) r.addEventListener('change', () => setOverlay('layout', asLayout.checked));
+  overlayMenu.append(
+    overlayCheck('geometry', 'Geometry'),
+    el('ul', { class: 'builder-key' },
+      keyRow(legend(COLOURS.Floor), 'Floor'), keyRow(legend(COLOURS.Roof, { ticks: true }), 'Roof (solid from below)'),
+      keyRow(legend(COLOURS.Soft, { dash: true }), 'Soft (no collider)'), keyRow(legend(COLOURS.Hard, { thick: true }), 'Hard (both ways)'),
+      keyRow(legend(COLOURS.wall, { ticks: true }), 'Wall, ticks on the side it blocks'), keyRow(legend(COLOURS.ladder, { box: true }), 'Ladder'),
+      keyRow(legend(COLOURS.post, { box: true }), 'Signpost (dashed: no arm shown)')),
+    overlayCheck('reach', 'Reach map'),
+    el('ul', { class: 'builder-key' },
+      keyRow(legend(COLOURS.reached, { thick: true }), 'Reached from an arrival'), keyRow(legend(COLOURS.unreached, { thick: true }), 'Not reached; a red box is an exit not reached'),
+      keyRow(legend(COLOURS.arrival, { box: true }), 'Arrival (hollow: no floor under it)'), keyRow(legend(COLOURS.trap, { thick: true }), 'Trap: reached, with no way to an exit')),
+    reachFromBtn,
+    overlayCheck('arc', 'Jump arc from the pointer'),
+    el('ul', { class: 'builder-key' }, keyRow(legend(COLOURS.plain), 'Standing jump'), keyRow(legend(COLOURS.running), 'Running jump')),
+    overlayCheck('frame', 'View frame: Wide 960 by 408 (solid), Original 1000 by 600 (dashed)'),
+    overlayCheck('rulers', 'Rulers and guides'),
+    clearGuidesBtn,
+    el('fieldset', { class: 'builder-fieldset' }, el('legend', { text: 'Parallax' }),
+      el('label', { class: 'builder-check' }, asPlayed, ' As played (for this view)'),
+      el('label', { class: 'builder-check' }, asLayout, ' Layout (every layer placed for a Wide view at the centre)')),
+    overlayCheck('edgePan', 'Pan at the view edge while dragging'));
+  function setOverlay(name, on) {
+    S.overlays[name] = on;
+    store.set(OVERLAYS_KEY, S.overlays);
+    const box = overlayMenu.querySelector(`[name="overlay-${name}"]`);
+    if (box) box.checked = on;
+    if (name === 'layout') { asLayout.checked = on; asPlayed.checked = !on; }
+    if (name === 'arc' && on) loadReach();
+    if (name === 'arc' && !on) S.arcs = null;
+    if (name === 'reach' && on) ensureLocalReach();
+    S.geoDrawn = '';
+    renderTools();
+  }
+  function showMenu(open) {
+    overlayMenu.hidden = !open;
+    overlaysBtn.setAttribute('aria-expanded', String(open));
+    if (open) overlayMenu.querySelector('input')?.focus();
+  }
+  overlaysBtn.addEventListener('click', () => showMenu(overlayMenu.hidden));
+  overlayMenu.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { e.stopPropagation(); showMenu(false); overlaysBtn.focus(); }
+  });
+  document.addEventListener('pointerdown', (e) => {
+    if (!overlayMenu.hidden && !overlayMenu.contains(e.target) && e.target !== overlaysBtn) showMenu(false);
+  });
+
+  // —— Reach and the jump arc (js/builder/reach-graph.js, loaded on first use) ——
+  async function loadReach() {
+    if (S.reachMod) return S.reachMod;
+    if (loadReach.p) return loadReach.p;
+    loadReach.p = import('./reach-graph.js?v=6f7512af').then((m) => { S.reachMod = m; S.geoDrawn = ''; return m; }).catch(() => {
+      say('The reach map could not load.', 'bad');
+      return null;
+    });
+    return loadReach.p;
+  }
+  const reachKey = () => `${S.mode}:${S.mode === 'draft' ? S.streetKey : S.viewTsid}:${S.version}:${S.reachFrom ? `${Math.round(S.reachFrom.x)},${Math.round(S.reachFrom.y)}` : ''}`;
+  /** Arrivals for reach worked out here: the draft row's editor.spawn if any, else the floor under the view centre. */
+  function localArrivals(s) {
+    const spawn = S.mode === 'draft' ? S.session?.zone.streets.find((r) => r.key === S.streetKey)?.editor?.spawn : null;
+    if (spawn && Number.isFinite(spawn.x) && Number.isFinite(spawn.y)) return [{ x: spawn.x, y: spawn.y, from: 'spawn' }];
+    const { w, h } = viewSize();
+    const at = S.reachFrom || { x: S.cam.x + w / 2, y: S.cam.y + h / 2 };
+    S.reachFrom = at;
+    const spot = floorUnder(platformsScreen(s), at.x, at.y, isStandable);
+    return spot ? [{ x: spot.x, y: spot.y - 1, from: 'view centre' }] : [];
+  }
+  let reachBusy = false;
+  /** Reach worked out here: for a shipped street, or a draft while the validator has none. */
+  async function ensureLocalReach(now = false) {
+    const s = street();
+    if (!s || !S.overlays.reach || reachBusy) return;
+    const v = S.validate;
+    const fromValidator = v.state === 'idle' || v.state === 'running' || (v.state === 'done' && v.report?.reach?.[S.streetKey]);
+    if (S.mode === 'draft' && fromValidator && !now) return;
+    if (S.reachLocal?.key === reachKey()) return;
+    reachBusy = true;
+    try {
+      const m = await loadReach();
+      const cur = street();
+      if (!m || cur !== s) return;
+      const arrivals = localArrivals(s);
+      const key = reachKey();
+      await new Promise((r) => setTimeout(r, 0));
+      const t0 = performance.now();
+      const data = m.reachStreet(s, arrivals);
+      S.reachLocal = { key, data, ms: Math.round(performance.now() - t0) };
+      S.geoDrawn = '';
+    } catch (err) {
+      say(`The reach map did not work out: ${err?.message || err}`, 'bad');
+    } finally {
+      reachBusy = false;
+    }
+  }
+  function updateArcs() {
+    if (!S.overlays.arc || !S.pointer || S.drag || !street()) return;
+    if (!S.reachMod) { loadReach(); return; }
+    const now = performance.now();
+    if (now - S.arcT < 50) return;
+    const p = toWorld(S.pointer.cx, S.pointer.cy);
+    if (S.arcAt && Math.abs(S.arcAt.x - p.x) + Math.abs(S.arcAt.y - p.y) < 2 && S.arcWorld?.version === S.version) return;
+    S.arcT = now;
+    S.arcAt = p;
+    try {
+      if (S.arcWorld?.version !== S.version || S.arcWorld.street !== street()) S.arcWorld = { version: S.version, street: street(), world: S.reachMod.streetWorld(street()) };
+      S.arcs = S.reachMod.jumpArcs(street(), p, S.arcWorld.world);
+    } catch {
+      S.arcs = null;
+    }
+  }
+
+  // —— The validator (js/builder/validate-worker.js), 400 ms after the last edit ——
+  const V = S.validate;
+  function validator() {
+    if (V.worker) return V.worker;
+    if (V.state === 'off' || typeof Worker !== 'function') { V.state = 'off'; return null; }
+    // The worker's module URL comes from the module itself, so it carries its content key (a
+    // `new URL(...)` written here would not be keyed by tools/module-keys).
+    if (!V.workerUrl) {
+      if (!V.loading) {
+        V.loading = import('./validate-worker.js?v=8ab513f9').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
+      }
+      return null;
+    }
+    try {
+      V.worker = new Worker(V.workerUrl, { type: 'module' });
+    } catch {
+      V.state = 'off';
+      return null;
+    }
+    V.worker.addEventListener('message', (e) => {
+      const { id, report, error } = e.data || {};
+      if (id !== V.id) return;
+      if (error) { V.state = 'failed'; V.error = String(error); } else { V.state = 'done'; V.report = report; }
+      S.geoDrawn = '';
+      renderValidate();
+      renderFindings();
+      if (V.state === 'failed') ensureLocalReach();
+    });
+    V.worker.addEventListener('error', (e) => {
+      e.preventDefault?.();
+      V.worker?.terminate();
+      V.worker = null;
+      V.state = 'off';
+      V.report = null;
+      S.geoDrawn = '';
+      renderValidate();
+      renderFindings();
+      ensureLocalReach();
+    });
+    return V.worker;
+  }
+  function scheduleValidate(ms = 400) {
+    clearTimeout(V.timer);
+    if (S.mode !== 'draft' || !S.session) return;
+    V.timer = setTimeout(runValidate, ms);
+  }
+  function runValidate() {
+    if (S.mode !== 'draft' || !S.session) return;
+    const w = validator();
+    if (!w) { if (!V.loading || V.workerUrl) { renderValidate(); renderFindings(); } return; }
+    V.id += 1;
+    V.state = 'running';
+    renderValidate();
+    try {
+      // The worker fetches the validator's data at the keys the page uses (js/data-urls.js).
+      const keyed = globalThis.groddleDataUrl || ((p) => p);
+      const urls = Object.fromEntries((V.dataPaths || []).map((p) => [p, new URL(keyed(p), document.baseURI).href]));
+      w.postMessage({ id: V.id, zone: S.session.zone, urls });
+    } catch (err) {
+      V.state = 'failed';
+      V.error = err?.message || String(err);
+      renderValidate();
+    }
+  }
+  function renderValidate() {
+    const on = S.mode === 'draft' && Boolean(S.session);
+    validateBtn.hidden = !on;
+    findings.hidden = !on;
+    validateBtn.textContent = validateWords(V.state, V.report);
+    validateBtn.dataset.state = V.state;
+    const c = findingCounts(V.report);
+    validateBtn.dataset.errors = String(c.errors);
+    validateBtn.title = V.state === 'off' ? 'The validator is not in this build yet. The reach map is worked out from the view centre instead.' : 'Check the draft: reach, links, geometry';
+  }
+  validateBtn.addEventListener('click', () => {
+    if (V.state === 'off') V.state = 'idle';
+    runValidate();
+    if (!panels.right) toggleRight.click();
+    findings.focus();
+  });
+  function renderFindings() {
+    if (S.mode !== 'draft') return findingsBody.replaceChildren();
+    if (V.state === 'off') return findingsBody.replaceChildren(el('p', { class: 'builder-sub', text: 'The validator is not in this build yet.' }));
+    if (V.state === 'failed') return findingsBody.replaceChildren(el('p', { class: 'builder-sub', text: `The check did not finish: ${V.error || 'no reason given'}.` }));
+    const r = V.report;
+    if (!r) return findingsBody.replaceChildren(el('p', { class: 'builder-sub', text: V.state === 'running' ? 'Checking the draft.' : 'Not checked yet.' }));
+    const groups = groupFindings(r.findings);
+    if (!groups.length) return findingsBody.replaceChildren(el('p', { class: 'builder-sub', text: 'No findings: everything checked is fine.' }));
+    findingsBody.replaceChildren(...groups.map((g) => el('div', { class: 'builder-findgroup', 'data-severity': g.id },
+      el('h3', { class: 'builder-h3', text: `${g.label} (${g.items.length})` }),
+      el('ul', { class: 'builder-outline' }, ...g.items.map((f) => {
+        const at = parseAt(f.at);
+        const other = at.street && at.street !== S.streetKey;
+        return el('li', {}, el('button', {
+          type: 'button',
+          class: 'builder-finding',
+          'data-rule': f.rule || '',
+          'data-waived': f.waived ? '' : null,
+          onclick: () => goToFinding(f),
+        }, el('span', { text: f.message || f.rule }), el('span', { class: 'builder-sub', text: ` ${f.rule || ''}${f.at ? ` · ${f.at}` : ''}${other ? ' (another street)' : ''}${f.waived ? ' · waived' : ''}` })));
+      })))));
+  }
+  /** Centre on a finding and select what it names (another street of the draft opens first). */
+  function goToFinding(f) {
+    const at = parseAt(f.at);
+    const key = at.street || f.street;
+    if (S.mode === 'draft' && key && key !== S.streetKey && S.session.zone.streets.some((r) => r.key === key)) openDraftStreet(key);
+    const s = street();
+    if (!s) return;
+    if (at.id) selectById(at.id);
+    const pt = findingPoint(f, s);
+    if (pt) centreAt(pt);
+    else if (at.id) {
+      const kind = geoKindOf(s, at.id);
+      if (kind) centreOnGeo(kind, geoItem(s, kind, at.id));
+      else if (decoOf(at.id)[0]) centreOn(at.id);
+    }
+    canvas.focus();
+  }
 
   // —— Play-test (spec 6.8) ——
   async function playTest() {
@@ -952,17 +2426,34 @@ async function boot() {
     if (S.session) await S.session.flush();
     S.session = new DraftSession(r.zone, { api, onChange: onSession });
     S.mode = 'draft';
+    if (S.validate.state !== 'off') S.validate.state = 'idle';
+    S.validate.report = null;
     status.textContent = statusWords(S.session);
     fillDrafts();
     openDraftStreet(streetKey);
   }
+  /** What belongs to the street on screen, cleared when another opens. */
+  function resetStreetState() {
+    S.selected = [];
+    S.preview.clear();
+    S.geoSel = [];
+    S.geoRevert = null;
+    S.geoPreview.clear();
+    S.streetPatch = null;
+    S.reachLocal = null;
+    S.reachFrom = null;
+    S.reachPinned = false;
+    S.arcs = null;
+    S.arcWorld = null;
+    S.activeLayer = 'middleground';
+  }
   function openDraftStreet(key) {
     const streets = S.session.zone.streets;
     S.streetKey = streets.some((s) => s.key === key) ? key : streets[0]?.key || '';
-    S.selected = [];
-    S.preview.clear();
-    S.activeLayer = 'middleground';
+    resetStreetState();
     fillStreets();
+    loadGuides();
+    scheduleValidate(0);
     if (!S.streetKey) {
       mount();
       renderPanels();
@@ -989,9 +2480,11 @@ async function boot() {
     S.viewTsid = key;
     S.viewStreet = withDecoIds(data);
     if (!S.viewStreet.hubName && meta.hubName) S.viewStreet.hubName = meta.hubName;
-    S.selected = [];
-    S.activeLayer = 'middleground';
+    resetStreetState();
+    if (S.tool !== 'select') S.tool = 'select';
+    clearTimeout(S.validate.timer);
     fillStreets();
+    loadGuides();
     restoreCamera();
     mount();
     renderPanels();
@@ -1003,6 +2496,7 @@ async function boot() {
       const s = street();
       S.session = null;
       S.mode = 'none';
+      resetStreetState();
       if (s) say('No draft chosen. Open a street to look at it.');
       mount();
       fillStreets();
@@ -1141,6 +2635,14 @@ async function boot() {
       fps: Math.round(app.ticker.FPS),
       canUndo: Boolean(S.session?.canUndo),
       canRedo: Boolean(S.session?.canRedo),
+      tool: S.tool,
+      geoSel: [...S.geoSel],
+      snap: { ...S.snap },
+      overlays: { ...S.overlays },
+      guides: S.guides.map((g) => ({ ...g })),
+      validate: { state: S.validate.state, counts: findingCounts(S.validate.report), findings: S.validate.report?.findings?.length ?? null },
+      reach: (() => { const r = reachData(); return r ? { surfaces: r.surfaces?.length || 0, reached: (r.surfaces || []).filter((u) => u.reached).length, targets: r.targets?.length || 0, arrivals: r.arrivals?.length || 0, local: r === S.reachLocal?.data, ms: S.reachLocal?.ms ?? null } : null; })(),
+      arcs: (S.arcs || []).map((a) => ({ kind: a.kind, dir: a.dir, points: a.points?.length || 0, landed: a.landed })),
     }),
     camera(x, y, zoom = S.cam.zoom) { S.cam = { x, y, zoom }; zoomLabel.textContent = `${Math.round(zoom * 100)}%`; },
     /** Draw parallax for a view of w x h world px (match /play/'s frame), or null for the canvas's own. */
@@ -1157,6 +2659,21 @@ async function boot() {
     },
     flush: () => S.session?.flush(),
     viewOffsets: () => offsets(),
+    selectGeo: (keys) => selectGeo(keys),
+    geo: (kind, id) => JSON.parse(JSON.stringify(geoOf(kind, id) || null)),
+    geoList: (kind) => JSON.parse(JSON.stringify(street()?.[GEO_LIST[kind]] || [])),
+    /** A geometry item's handles in canvas px (for pointer drags). */
+    geoHandles(kind, id) {
+      const item = geoOf(kind, id);
+      return item ? geoHandles(street(), kind, item, S.cam.zoom).map((h) => ({ id: h.id, ...toCanvas(h) })) : null;
+    },
+    /** A street (world) point in canvas px. */
+    canvasAt(x, y) { const s = street(); return s ? toCanvas({ x: x - s.bounds.l, y: y - s.bounds.t }) : null; },
+    setOverlay: (name, on) => setOverlay(name, on),
+    setTool: (t) => setTool(t),
+    report: () => JSON.parse(JSON.stringify(S.validate.report || null)),
+    validateNow: () => runValidate(),
+    goToFinding: (f) => goToFinding(f),
   };
 
   try { S.drafts = await api.drafts(); } catch (err) { failed(err); }

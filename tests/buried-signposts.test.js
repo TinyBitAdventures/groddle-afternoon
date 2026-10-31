@@ -28,7 +28,10 @@ describe('buried signposts (Collision-triggered Teleporters)', () => {
 
   it('game.js falls into the hole, never pulls you back up, and travels like a door', () => {
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
-    assert.match(game, /if \(best != null && py >= best - 80 && !\(hole && py > best \+ 24\)\) return best;/);
+    // The floor resolve lives in js/avatar-step.js (avatarGround), shared with the level builder.
+    const step = readFileSync(join(root, 'public/js/avatar-step.js'), 'utf8');
+    assert.match(step, /if \(best != null && py >= best - 80 && !\(hole && py > best \+ 24\)\) return best;/);
+    assert.ok(game.includes('return avatarGround(streetPlatforms, px, py, player?.vy ?? 0, { street: currentStreet, fallback: GROUND_Y });'));
     assert.match(game, /travelTo\(conn\.tsid, \{ label: conn\.label, arrive: conn\.arrive, via: 'door' \}\);/);
     assert.match(game, /updateShrineWalkBy\(\);\n\s*updateBuriedSignposts\(\);/);
   });

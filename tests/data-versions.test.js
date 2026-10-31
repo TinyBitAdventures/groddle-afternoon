@@ -278,7 +278,12 @@ describe('every page that runs scripts loads the map and the hook first', () => 
   it('nothing in the game loads data where the hook cannot see it', () => {
     const files = git(root, 'ls-files', 'public').split('\n').filter((f) => /\.(m?js|html)$/.test(f) && !f.startsWith('public/vendor/') && !/^public\/(items|changelog)\/[^/]+\//.test(f));
     const BYPASS = /\bXMLHttpRequest\b|\bnew\s+(?:Shared)?Worker\s*\(|\bimportScripts\s*\(|navigator\.serviceWorker|\bnew\s+EventSource\s*\(/;
-    const hits = files.filter((f) => BYPASS.test(read(f))).map((f) => `${f}: ${BYPASS.exec(read(f))[0]}`);
+    // The level builder's validator worker (spec 7.1) fetches only URLs the page keyed with
+    // groddleDataUrl and sent to it (editor.js posts them; validate-worker.js fetches urls[path]).
+    const KEYED_BY_PAGE = new Set(['public/js/builder/editor.js', 'public/js/builder/validate-worker.js']);
+    assert.match(read('public/js/builder/editor.js'), /const keyed = globalThis\.groddleDataUrl/);
+    assert.match(read('public/js/builder/validate-worker.js'), /fetch\(urls\[path\] \|\|/);
+    const hits = files.filter((f) => !KEYED_BY_PAGE.has(f) && BYPASS.test(read(f))).map((f) => `${f}: ${BYPASS.exec(read(f))[0]}`);
     assert.deepEqual(hits, [], 'a worker, XHR or service worker fetches around js/data-urls.js: key its URLs with groddleDataUrl()');
   });
 });

@@ -1,0 +1,694 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://groddleafternoon.com/schemas/groddle-zone-1.json",
+  "title": "Groddle Afternoon level builder draft zone",
+  "description": "A draft zone: one or more streets (each a superset of the game's street JSON, public/assets/streets/<tsid>.json), the hub they belong to, their populations, and the provenance of every asset they use. Draft, not yet game data. The street part ($defs/street) also describes every shipped street; $defs/draftStreet adds the rules for streets the builder makes. Spec: docs/level-builder/spec.md.",
+  "type": "object",
+  "required": ["format", "id", "title", "rev", "hub", "streets", "assets"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "format": { "const": "groddle-zone/1" },
+    "id": {
+      "description": "Draft id, lowercase words and digits joined by hyphens. Stable for the life of the draft; the published zone file is public/assets/zones/<id>.json.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{2,47}$"
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "rev": {
+      "description": "Revision number the store assigned. A write must name the rev it was based on (If-Match); a stale write is refused with 409.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "baseCommit": {
+      "description": "The game repo commit the draft was last checked against (asset library, street index). Set by the store.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{7,40}$"
+    },
+    "notes": { "type": "string", "maxLength": 4000 },
+    "hub": { "$ref": "#/$defs/hub" },
+    "streets": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 40,
+      "items": { "$ref": "#/$defs/draftStreet" }
+    },
+    "edits": {
+      "description": "Changes to shipped streets the zone needs, kept apart from new streets so a publish shows them as a diff: today only new signpost connects on an existing street that lead into the zone.",
+      "type": "array",
+      "maxItems": 20,
+      "items": { "$ref": "#/$defs/streetEdit" }
+    },
+    "assets": {
+      "description": "Provenance of every sprite the zone's streets use, keyed by sprite name. The store fills rows for Tiny Speck library decos itself; new art arrives only through asset intake.",
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/spriteName" },
+      "additionalProperties": { "$ref": "#/$defs/asset" }
+    },
+    "waivers": {
+      "description": "Validator findings a person checked by play-test and accepted (spec: Validator, waivers). A waiver names one rule at one place and stops matching when that place changes.",
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": ["rule", "at", "reason", "by", "fingerprint"],
+        "additionalProperties": false,
+        "properties": {
+          "rule": { "type": "string", "pattern": "^[A-Z]{3}-[0-9]{3}$" },
+          "at": { "type": "string", "description": "<street key>/<element id>, as the finding's `at`." },
+          "reason": { "type": "string", "minLength": 3, "maxLength": 300 },
+          "by": { "type": "string", "maxLength": 80 },
+          "fingerprint": { "type": "string", "pattern": "^[0-9a-f]{16}$", "description": "Hash of the geometry the finding was computed from." }
+        }
+      }
+    },
+    "style": {
+      "description": "The style profile the validator's style rules measure against (spec: Style guide). Defaults to the profile of the hub the zone borrows its look from.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "profile": { "type": "string", "pattern": "^(hub-[0-9]+|default)$" }
+      }
+    }
+  },
+  "$defs": {
+    "num": { "type": "number" },
+    "tsid": {
+      "description": "A street id. Shipped streets: G or L then 12 or 14 capitals and digits (Tiny Speck's own). Builder streets: GZ then 13 (draftStreet.tsid).",
+      "type": "string",
+      "pattern": "^[GL][A-Z0-9]{12,14}$"
+    },
+    "hubId": { "type": "string", "pattern": "^[0-9]{1,4}$" },
+    "spriteName": { "type": "string", "pattern": "^[A-Za-z0-9_.-]{1,96}$" },
+    "hexColour": { "type": "string", "pattern": "^[0-9A-Fa-f]{6}$" },
+    "perm": {
+      "description": "Permeability as the source stores it: -1 solid from the top (a floor you can jump up through), 1 solid from below (an underside), 0 soft both ways, null hard both ways (street-model.js isStandable, isItemSolid).",
+      "type": ["integer", "null"],
+      "enum": [-1, 0, 1, null]
+    },
+    "point": {
+      "type": "object",
+      "required": ["x", "y"],
+      "additionalProperties": false,
+      "properties": { "x": { "type": "number" }, "y": { "type": "number" } }
+    },
+    "bounds": {
+      "description": "World bounds. y grows downward; b is usually 0 and t negative (street-model.js worldToScreen).",
+      "type": "object",
+      "required": ["l", "r", "t", "b"],
+      "additionalProperties": false,
+      "properties": {
+        "l": { "type": "number" },
+        "r": { "type": "number" },
+        "t": { "type": "number" },
+        "b": { "type": "number" }
+      }
+    },
+    "platform": {
+      "description": "A platform line in world space (x1,y1)-(x2,y2).",
+      "type": "object",
+      "required": ["id", "x1", "y1", "x2", "y2"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "x1": { "type": "number" },
+        "y1": { "type": "number" },
+        "x2": { "type": "number" },
+        "y2": { "type": "number" },
+        "pc_perm": { "$ref": "#/$defs/perm" },
+        "item_perm": { "$ref": "#/$defs/perm" }
+      }
+    },
+    "barrier": {
+      "description": "A wall (the XML <walls>): vertical collider in world space, top y, h down. pc_perm null or -1 blocks from the left, null or 1 from the right, 0 is open (street-model.js barriersScreen).",
+      "type": "object",
+      "required": ["id", "x", "y", "h", "pc_perm"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "h": { "type": "number" },
+        "pc_perm": { "$ref": "#/$defs/perm" }
+      }
+    },
+    "legacyWall": {
+      "description": "Legacy climb zone (street.walls) on two hand-built streets. Not edited by the builder.",
+      "type": "object",
+      "required": ["x", "y", "h"],
+      "properties": {
+        "id": { "type": "string" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "h": { "type": "number" },
+        "w": { "type": "number" },
+        "pc_perm": { "$ref": "#/$defs/perm" },
+        "item_perm": { "$ref": "#/$defs/perm" },
+        "source": { "type": "string" }
+      }
+    },
+    "ladderTile": {
+      "type": "object",
+      "required": ["sprite", "w", "h"],
+      "additionalProperties": false,
+      "properties": {
+        "sprite": { "$ref": "#/$defs/spriteName" },
+        "w": { "type": "number" },
+        "h": { "type": "number" }
+      }
+    },
+    "ladder": {
+      "description": "A climb zone in world space: x centre, y bottom, h up.",
+      "type": "object",
+      "required": ["id", "x", "y", "w", "h"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "w": { "type": "number" },
+        "h": { "type": "number", "exclusiveMinimum": 0 },
+        "tiling": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cap_0": { "$ref": "#/$defs/ladderTile" },
+            "cap_1": { "$ref": "#/$defs/ladderTile" },
+            "centers": { "type": "array", "items": { "$ref": "#/$defs/ladderTile" } },
+            "pattern": { "type": "array", "items": { "type": "integer", "minimum": 0 } }
+          }
+        }
+      }
+    },
+    "connect": {
+      "description": "One signpost arm: where it leads. tsid may be the L or G form (street-loader.js resolveIndexTsid). arrive is the arrival point in the target's screen space, on a platform.",
+      "type": "object",
+      "required": ["tsid", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "tsid": { "$ref": "#/$defs/tsid" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 48 },
+        "hub_id": { "$ref": "#/$defs/hubId" },
+        "hidden": { "type": "boolean" },
+        "arrive": { "$ref": "#/$defs/point" }
+      }
+    },
+    "signpost": {
+      "description": "A signpost in world space, bottom-centre at (x, y).",
+      "type": "object",
+      "required": ["id", "x", "y", "w", "h", "connects"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "w": { "type": "number" },
+        "h": { "type": "number" },
+        "connects": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/connect" } }
+      }
+    },
+    "doorConnect": {
+      "type": "object",
+      "required": ["tsid", "label", "hub_id", "street"],
+      "additionalProperties": false,
+      "properties": {
+        "tsid": { "$ref": "#/$defs/tsid" },
+        "label": { "type": "string" },
+        "hub_id": { "$ref": "#/$defs/hubId" },
+        "street": {
+          "description": "The street index key the door leads to, or null when the target was never archived.",
+          "anyOf": [{ "$ref": "#/$defs/tsid" }, { "type": "null" }]
+        },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "arrive": { "$ref": "#/$defs/point" }
+      }
+    },
+    "door": {
+      "description": "A door in screen space (x - bounds.l, y - bounds.t), bottom-centre rect.",
+      "type": "object",
+      "required": ["id", "x", "y", "w", "h", "sprite", "hidden", "is_locked", "key_id", "requires_level", "connect"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "w": { "type": "number" },
+        "h": { "type": "number" },
+        "sprite": { "$ref": "#/$defs/spriteName" },
+        "src": { "type": "string" },
+        "flip": { "type": "boolean" },
+        "hidden": { "type": "boolean" },
+        "is_locked": { "type": "boolean" },
+        "key_id": { "type": "integer", "minimum": 0 },
+        "requires_level": { "type": "integer", "minimum": 0 },
+        "house_number": { "type": "string" },
+        "for_sale": { "type": "boolean" },
+        "owned": { "type": "boolean" },
+        "owner_label": { "type": "string" },
+        "instance_exit": { "type": "boolean" },
+        "connect": { "$ref": "#/$defs/doorConnect" },
+        "destinations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["tsid", "street"],
+            "additionalProperties": false,
+            "properties": { "tsid": { "$ref": "#/$defs/tsid" }, "street": { "$ref": "#/$defs/tsid" } }
+          }
+        }
+      }
+    },
+    "box": {
+      "description": "A named hitbox in screen space, bottom-centre.",
+      "type": "object",
+      "required": ["id", "x", "y", "w", "h"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "key": { "type": ["string", "number"] },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "w": { "type": "number" },
+        "h": { "type": "number" },
+        "reconstructed": { "type": "boolean" },
+        "teleport": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "tsid": { "$ref": "#/$defs/tsid" },
+            "street": { "$ref": "#/$defs/tsid" },
+            "label": { "type": "string" },
+            "x": { "type": "number" },
+            "y": { "type": "number" },
+            "arrive": { "$ref": "#/$defs/point" }
+          }
+        }
+      }
+    },
+    "deco": {
+      "description": "One placed deco. Anchor is bottom-centre (street-render.js spr.anchor.set(0.5, 1)); w and h are the drawn size; r is degrees; flip mirrors about the anchor. Coordinates are world space on the middleground and layer-local on every other layer (street-render.js buildStreetView).",
+      "type": "object",
+      "required": ["sprite", "x", "y", "w", "h", "z", "r"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "signText": { "type": "string", "maxLength": 200 },
+        "sprite": { "$ref": "#/$defs/spriteName" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "w": { "type": "number", "minimum": 0 },
+        "h": { "type": "number", "minimum": 0 },
+        "z": { "type": "number" },
+        "r": { "type": "number", "minimum": -360, "maximum": 360 },
+        "flip": { "type": "boolean" },
+        "hidden": { "type": "boolean" },
+        "animated": { "type": "boolean" }
+      }
+    },
+    "filters": {
+      "description": "A layer's colour treatment (filtersNEW): build-street-layers.mjs, street-render.js glitchLayerMatrix.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "brightness": { "type": "number", "minimum": -100, "maximum": 100 },
+        "contrast": { "type": "number", "minimum": -100, "maximum": 100 },
+        "saturation": { "type": "number", "minimum": -100, "maximum": 100 },
+        "tintColor": { "type": "integer", "minimum": 0, "maximum": 16777215 },
+        "tintAmount": { "type": "number", "minimum": 0, "maximum": 100 },
+        "blur": { "type": "number", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "required": ["id", "name", "z", "decos"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "z": { "type": "number", "minimum": -20, "maximum": 20, "description": "Draw order among layers; the middleground is 0. One shipped layer uses -2.5." },
+        "w": { "type": "number", "minimum": 0 },
+        "h": { "type": "number", "minimum": 0 },
+        "hidden": { "type": "boolean" },
+        "filters": { "$ref": "#/$defs/filters" },
+        "decos": { "type": "array", "items": { "$ref": "#/$defs/deco" } }
+      }
+    },
+    "eventAction": {
+      "description": "One location event action (build-street-events.mjs, location-events.js). Shipped data only; the builder does not author events in phase 1 to 3.",
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": ["deco_hide", "deco_show", "event", "play_sound", "code_location", "code_player", "flag_set", "flag_clear", "flag_has_exit", "flag_not_exit", "pc_vog", "wall", "plat", "physics", "physics_reset", "stop_timers"]
+        },
+        "all": { "type": "boolean" },
+        "deco": { "type": "string" },
+        "fade": { "type": "number" },
+        "delay": { "type": "number" },
+        "duration": { "type": "number" },
+        "event": { "type": "string" },
+        "flag": { "type": "string" },
+        "plat": { "type": "string" },
+        "wall": { "type": "string" },
+        "pc_perm": { "$ref": "#/$defs/perm" },
+        "item_perm": { "$ref": "#/$defs/perm" },
+        "param": { "type": "string" },
+        "value": { "type": "number" },
+        "name": { "type": "string" },
+        "loops": { "type": "number" },
+        "url": { "type": "string" },
+        "lines": { "type": "array", "items": { "type": "string" } },
+        "next": { "type": "string" },
+        "code": {
+          "type": "object",
+          "required": ["type"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "enum": ["code", "activity", "noop", "teleport", "stop_sound", "quest_flag"] },
+            "reason": { "type": "string" },
+            "supported": { "type": "boolean" },
+            "tsid": { "$ref": "#/$defs/tsid" },
+            "street": { "$ref": "#/$defs/tsid" },
+            "x": { "type": "number" },
+            "y": { "type": "number" },
+            "arrive": { "$ref": "#/$defs/point" },
+            "flag": { "type": "string" },
+            "name": { "type": "string" },
+            "text": { "type": "string" }
+          }
+        }
+      }
+    },
+    "eventBox": {
+      "type": "object",
+      "required": ["id", "x", "y", "w", "h", "onEnter", "onExit"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "w": { "type": "number" },
+        "h": { "type": "number" },
+        "onEnter": { "type": "array", "items": { "type": "string" } },
+        "onExit": { "type": "array", "items": { "type": "string" } },
+        "source": { "type": "string" }
+      }
+    },
+    "physicsSetting": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "can_3_jump": { "type": "number" },
+        "can_wall_jump": { "type": "number" },
+        "friction_air": { "type": "number" },
+        "friction_floor": { "type": "number" },
+        "friction_thresh": { "type": "number" },
+        "gravity": { "type": "number" },
+        "item_scale": { "type": "number" },
+        "jetpack": { "type": "number" },
+        "multiplier_3_jump": { "type": "number" },
+        "pc_scale": { "type": "number" },
+        "vx_accel_add_in_air": { "type": "number" },
+        "vx_accel_add_in_floor": { "type": "number" },
+        "vx_max": { "type": "number" },
+        "vx_off_ladder": { "type": "number" },
+        "vy_jump": { "type": "number" },
+        "vy_max": { "type": "number" },
+        "y_cam_offset": { "type": "number" }
+      }
+    },
+    "stats": {
+      "description": "Counts written by the importer and build-street-navigation.mjs; the builder recomputes them on save.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "platformCount": { "type": "integer", "minimum": 0 },
+        "wallCount": { "type": "integer", "minimum": 0 },
+        "layerCount": { "type": "integer", "minimum": 0 },
+        "decoCount": { "type": "integer", "minimum": 0 },
+        "signpostCount": { "type": "integer", "minimum": 0 },
+        "doorCount": { "type": "integer", "minimum": 0 },
+        "ladderCount": { "type": "integer", "minimum": 0 },
+        "barrierCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "street": {
+      "description": "The street JSON the game loads (public/assets/streets/<tsid>.json). Every shipped street fits it. The last group of properties is owned by features or hand-built rooms: kept as data, never edited by the builder.",
+      "type": "object",
+      "required": ["source", "tsid", "label", "bounds", "platforms", "layers", "signposts"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "type": "string" },
+        "tsid": { "$ref": "#/$defs/tsid" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 48 },
+        "internalLabel": { "type": "string" },
+        "hubId": { "$ref": "#/$defs/hubId" },
+        "hubName": { "type": "string" },
+        "swf_file": { "type": "string" },
+        "bounds": { "$ref": "#/$defs/bounds" },
+        "gradient": {
+          "type": "object",
+          "required": ["top", "bottom"],
+          "additionalProperties": false,
+          "properties": { "top": { "$ref": "#/$defs/hexColour" }, "bottom": { "$ref": "#/$defs/hexColour" } }
+        },
+        "musicFile": { "type": "string", "pattern": "^[A-Z0-9_]+$" },
+        "noMap": { "type": "boolean" },
+        "fogMap": { "type": "boolean" },
+        "platforms": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/platform" } },
+        "barriers": { "type": "array", "items": { "$ref": "#/$defs/barrier" } },
+        "ladders": { "type": "array", "items": { "$ref": "#/$defs/ladder" } },
+        "walls": { "type": "array", "items": { "$ref": "#/$defs/legacyWall" } },
+        "layers": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/layer" } },
+        "signposts": { "type": "array", "items": { "$ref": "#/$defs/signpost" } },
+        "doors": { "type": "array", "items": { "$ref": "#/$defs/door" } },
+        "boxes": { "type": "array", "items": { "$ref": "#/$defs/box" } },
+        "stats": { "$ref": "#/$defs/stats" },
+        "physics": {
+          "type": "object",
+          "required": ["setting", "delta"],
+          "additionalProperties": false,
+          "properties": { "setting": { "$ref": "#/$defs/physicsSetting" }, "delta": { "$ref": "#/$defs/physicsSetting" } }
+        },
+        "events": {
+          "type": "object",
+          "additionalProperties": { "type": "array", "items": { "$ref": "#/$defs/eventAction" } }
+        },
+        "eventBoxes": { "type": "array", "items": { "$ref": "#/$defs/eventBox" } },
+
+        "reconstructed": { "type": "boolean", "description": "Feature-owned: a street the remake rebuilt by hand." },
+        "why": { "type": "object", "additionalProperties": { "type": "string" }, "description": "Feature-owned: sources for a rebuilt street." },
+        "template": { "type": "string", "description": "Feature-owned." },
+        "ownLight": { "type": "boolean", "description": "Feature-owned." },
+        "subway": { "type": "object", "description": "Feature-owned (tools/build-subway.mjs)." },
+        "enchantedForest": { "type": "string", "description": "Feature-owned (tools/build-enchanted-forests.mjs)." },
+        "starJinglers": { "type": "object", "description": "Feature-owned." },
+        "glowOrbs": { "type": "object", "description": "Feature-owned." },
+        "soilArt": { "type": "array", "description": "Feature-owned." }
+      }
+    },
+    "draftStreet": {
+      "description": "A street the builder makes, with its population and editor state.",
+      "type": "object",
+      "required": ["key", "street"],
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "description": "Short handle for the street inside the zone (CLI and API use it).",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{0,31}$"
+        },
+        "street": {
+          "allOf": [
+            { "$ref": "#/$defs/street" },
+            {
+              "type": "object",
+              "required": ["hubId", "hubName", "gradient", "stats"],
+              "properties": {
+                "source": { "type": "string", "pattern": "^groddle-builder " },
+                "tsid": { "type": "string", "pattern": "^GZ[0-9A-Z]{13}$" },
+                "events": false,
+                "eventBoxes": false,
+                "physics": false,
+                "reconstructed": false,
+                "why": false,
+                "template": false,
+                "ownLight": false,
+                "subway": false,
+                "enchantedForest": false,
+                "starJinglers": false,
+                "glowOrbs": false,
+                "soilArt": false,
+                "walls": false,
+                "bounds": {
+                  "type": "object",
+                  "properties": {
+                    "l": { "type": "number", "minimum": -8000, "maximum": 0 },
+                    "r": { "type": "number", "minimum": 0, "maximum": 8000 },
+                    "t": { "type": "number", "minimum": -6000, "maximum": 0 },
+                    "b": { "type": "number", "minimum": -200, "maximum": 2000 }
+                  }
+                },
+                "platforms": { "type": "array", "maxItems": 600 },
+                "layers": { "type": "array", "maxItems": 24 }
+              }
+            }
+          ]
+        },
+        "population": { "$ref": "#/$defs/population" },
+        "editor": {
+          "description": "Editor state saved with the draft (not published): the camera, locked and hidden-in-editor layers, guides.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "camera": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "zoom": { "type": "number", "minimum": 0.05, "maximum": 4 } }
+            },
+            "lockedLayers": { "type": "array", "items": { "type": "string" } },
+            "hiddenLayers": { "type": "array", "items": { "type": "string" } },
+            "guides": {
+              "type": "array",
+              "maxItems": 50,
+              "items": {
+                "type": "object",
+                "required": ["axis", "at"],
+                "additionalProperties": false,
+                "properties": { "axis": { "enum": ["x", "y"] }, "at": { "type": "number" } }
+              }
+            },
+            "spawn": { "$ref": "#/$defs/point" }
+          }
+        }
+      }
+    },
+    "population": {
+      "description": "The street's row for the ecology planner (assets/content/street-ecology.json shape, street-ecology.js populationForStreet).",
+      "type": "object",
+      "required": ["counts"],
+      "additionalProperties": false,
+      "properties": {
+        "counts": {
+          "type": "object",
+          "propertyNames": {
+            "enum": ["street_spirit", "trant_fruit", "trant_bean", "trant_bubble", "trant_egg", "trant_gas", "trant_spice", "wood_tree", "paper_tree", "rock_metal_1", "rock_beryl_1", "rock_dullite_1", "rock_sparkly_1", "dirt_pile", "dust_trap", "peat_1", "mortar_barnacle", "jellisac", "ice_knob", "npc_piggy", "npc_chicken", "npc_butterfly", "npc_salmon", "npc_firefly", "npc_sloth", "garden"]
+          },
+          "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 12 }
+        },
+        "quoins": { "type": "integer", "minimum": 0, "maximum": 40 },
+        "interior": { "type": "boolean" },
+        "exact": { "type": "boolean" },
+        "giantId": { "type": "string" }
+      }
+    },
+    "hub": {
+      "description": "The hub the zone's streets belong to: a new hub (id in the builder range, a map) or an existing one (id only, its map gains the new streets).",
+      "type": "object",
+      "required": ["id", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Existing hub ids are Tiny Speck's (1-143 today). New hubs take 900-999.",
+          "$ref": "#/$defs/hubId"
+        },
+        "name": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "isNew": { "type": "boolean" },
+        "map": {
+          "description": "The hub map (assets/maps/hubs/hub-<id>.json shape): 760 x 460, each street a line.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "color": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+            "top_color": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+            "btm_color": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+            "streets": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["tsid", "name", "x1", "y1", "x2", "y2"],
+                "additionalProperties": false,
+                "properties": {
+                  "tsid": { "$ref": "#/$defs/tsid" },
+                  "name": { "type": "string" },
+                  "x1": { "type": "number", "minimum": 0, "maximum": 760 },
+                  "y1": { "type": "number", "minimum": 0, "maximum": 460 },
+                  "x2": { "type": "number", "minimum": 0, "maximum": 760 },
+                  "y2": { "type": "number", "minimum": 0, "maximum": 460 }
+                }
+              }
+            },
+            "hubs": {
+              "description": "Exits to other hubs drawn on the map edge.",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["tsid", "hub_id", "label", "x", "y"],
+                "additionalProperties": false,
+                "properties": {
+                  "tsid": { "$ref": "#/$defs/tsid" },
+                  "hub_id": { "$ref": "#/$defs/hubId" },
+                  "hubName": { "type": "string" },
+                  "label": { "type": "string" },
+                  "x": { "type": "number" },
+                  "y": { "type": "number" },
+                  "arrow": { "type": "number" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "streetEdit": {
+      "description": "A connect added to a shipped street's signpost (or a new signpost on it), so the zone can be reached.",
+      "type": "object",
+      "required": ["tsid", "op"],
+      "additionalProperties": false,
+      "properties": {
+        "tsid": { "$ref": "#/$defs/tsid" },
+        "op": { "enum": ["add-connect", "add-signpost"] },
+        "signpost": { "type": "string", "description": "The existing signpost's id (add-connect)." },
+        "connect": { "$ref": "#/$defs/connect" },
+        "newSignpost": { "$ref": "#/$defs/signpost" }
+      }
+    },
+    "asset": {
+      "description": "Where one sprite comes from. Every sprite used in the zone has a row.",
+      "type": "object",
+      "required": ["origin", "licence"],
+      "additionalProperties": false,
+      "properties": {
+        "origin": {
+          "description": "tinyspeck-cc0: the shipped deco library (public/assets/decos/groddle, tools/deco-pipeline/plan.json names its SWF). new: arrived through asset intake.",
+          "enum": ["tinyspeck-cc0", "new"]
+        },
+        "licence": { "enum": ["CC0-1.0", "own-work-CC0", "ai-generated"] },
+        "source": { "type": "string", "maxLength": 300, "description": "SWF bundle and symbol for library decos; for new art the maker and tool." },
+        "author": { "type": "string", "maxLength": 120 },
+        "tool": { "type": "string", "maxLength": 120, "description": "Generator or editor used for new art (model name and version for ai-generated)." },
+        "prompt": { "type": "string", "maxLength": 4000, "description": "For ai-generated art: the prompt, kept for the record." },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "w": { "type": "integer", "minimum": 1 },
+        "h": { "type": "integer", "minimum": 1 },
+        "registration": {
+          "description": "The anchor in the 2x file's pixels. The game draws decos bottom-centre, so intake requires x = w/2 and y = h (within 1 px) or re-pads the file.",
+          "$ref": "#/$defs/point"
+        },
+        "inputs": {
+          "description": "What new art was made from (decided 2026-10-30: CC0 1.0 only, inputs CC0 or Austin's own): library deco names (\"deco:bush_3\") or Austin's own work (\"own:<what>\").",
+          "type": "array",
+          "maxItems": 20,
+          "items": { "type": "string", "pattern": "^(deco:[A-Za-z0-9_.-]{1,96}|own:.{1,200})$" }
+        },
+        "intake": {
+          "description": "The intake report id this asset passed.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

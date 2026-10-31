@@ -20,6 +20,17 @@
  *   deco.set     { street, id, set: {...}, unset?: [..] }
  *   deco.move    { street, id, layer, at?, set? }                          re-layer (set: new x, y)
  *
+ * P2 ops (geometry, spec 6.5; ids follow Tiny Speck's patterns: plat_<n>, wall_<n>, ladder_<n>,
+ * signpost_<n>). <kind> is platform, barrier, ladder or signpost; the thing rides under its kind's
+ * name ({ platform: {...} }), and an add without an id takes the next free one:
+ *   <kind>.add   { street, <kind>: {id?, ...}, at? }
+ *   <kind>.remove{ street, id, prune? }       prune: drop the list when it empties (an add's inverse
+ *                                             on a street that had no list, so undo gives the same bytes)
+ *   <kind>.set   { street, id, set, unset?, order? }   pc_perm and item_perm may be set to null (hard)
+ *   connect.add  { street, signpost, connect: {tsid, label, hub_id?, hidden?, arrive?}, at? }
+ *   connect.remove { street, signpost, at }
+ *   connect.set  { street, signpost, at, set, unset?, order? }
+ *
  * A failing op throws an OpError with a code; a batch (applyOps) is all or nothing.
  *
  * Key order is kept: an inverse that puts back a field an op removed also carries `order`, the
@@ -36,6 +47,9 @@ export class OpError extends Error {
 export const OP_NAMES = Object.freeze([
   'zone.set', 'hub.set', 'asset.set', 'street.add', 'street.remove', 'street.set', 'editor.set',
   'layer.set', 'deco.add', 'deco.remove', 'deco.set', 'deco.move',
+  'platform.add', 'platform.remove', 'platform.set', 'barrier.add', 'barrier.remove', 'barrier.set',
+  'ladder.add', 'ladder.remove', 'ladder.set', 'signpost.add', 'signpost.remove', 'signpost.set',
+  'connect.add', 'connect.remove', 'connect.set',
 ]);
 
 /** Top-level street fields street.set may change (geometry, layers and ids have their own ops). */
@@ -43,6 +57,17 @@ export const STREET_FIELDS = Object.freeze(['label', 'internalLabel', 'hubId', '
 export const LAYER_FIELDS = Object.freeze(['name', 'z', 'w', 'h', 'hidden', 'filters']);
 export const DECO_FIELDS = Object.freeze(['sprite', 'name', 'signText', 'x', 'y', 'w', 'h', 'z', 'r', 'flip', 'hidden', 'animated']);
 const ZONE_FIELDS = Object.freeze(['title', 'notes']);
+
+/** Geometry kinds: the street list each lives in, its id prefix and the fields an op may set. */
+export const GEOMETRY = Object.freeze({
+  platform: Object.freeze({ list: 'platforms', prefix: 'plat_', fields: Object.freeze(['x1', 'y1', 'x2', 'y2', 'pc_perm', 'item_perm']) }),
+  barrier: Object.freeze({ list: 'barriers', prefix: 'wall_', fields: Object.freeze(['x', 'y', 'h', 'pc_perm']) }),
+  ladder: Object.freeze({ list: 'ladders', prefix: 'ladder_', fields: Object.freeze(['x', 'y', 'w', 'h', 'tiling']) }),
+  signpost: Object.freeze({ list: 'signposts', prefix: 'signpost_', fields: Object.freeze(['x', 'y', 'w', 'h']) }),
+});
+export const CONNECT_FIELDS = Object.freeze(['tsid', 'label', 'hub_id', 'hidden', 'arrive']);
+/** Fields whose null is a value (a perm of null is hard both ways), not a missing value. */
+const NULLABLE = Object.freeze(['pc_perm', 'item_perm']);
 
 const own = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 const clone = (v) => (v === undefined ? undefined : JSON.parse(JSON.stringify(v)));
@@ -90,6 +115,25 @@ export function nextDecoId(street, taken = new Set()) {
   return `d_${n + 1}`;
 }
 
+/** PURE: the next free id of a geometry kind on a street (plat_<n>, wall_<n>, ladder_<n>, signpost_<n>). */
+export function nextGeometryId(street, kind) {
+  need(own(GEOMETRY, kind), 'builder_bad_op', `No geometry kind "${kind}".`);
+  const g = GEOMETRY[kind];
+  let n = 0;
+  for (const item of street[g.list] || []) {
+    const m = /^(\d+)$/.exec(String(item?.id || '').slice(g.prefix.length));
+    if (String(item?.id || '').startsWith(g.prefix) && m) n = Math.max(n, Number(m[1]));
+  }
+  return `${g.prefix}${n + 1}`;
+}
+
+/** [list, index] of a geometry item by id (list is null when the street has none). */
+export function findGeometry(street, kind, id) {
+  const list = street[GEOMETRY[kind].list];
+  if (!Array.isArray(list)) return [null, -1];
+  return [list, list.findIndex((g) => g.id === id)];
+}
+
 /** Put an object's keys in `order` (the keys it names first, the rest after, as they are). */
 function reorder(target, order) {
   if (!Array.isArray(order)) return;
@@ -103,13 +147,13 @@ function reorder(target, order) {
  * Set and unset fields of `target` limited to `allowed`; returns the inverse {set, unset, order?}.
  * A set keeps an existing key in place; a removed key goes back where it was through `order`.
  */
-function patch(target, set, unset, allowed, what, order) {
+function patch(target, set, unset, allowed, what, order, nullable = []) {
   need(isObj(set || {}), 'builder_bad_op', `${what}: set must be an object.`);
   need(Array.isArray(unset || []), 'builder_bad_op', `${what}: unset must be a list.`);
   const inv = { set: {}, unset: [] };
   for (const k of Object.keys(set || {})) {
     need(allowed.includes(k), 'builder_bad_op', `${what}: "${k}" cannot be set here.`);
-    need(set[k] !== null && set[k] !== undefined, 'builder_bad_op', `${what}: "${k}" needs a value (unset removes a field).`);
+    need(set[k] !== undefined && (set[k] !== null || nullable.includes(k)), 'builder_bad_op', `${what}: "${k}" needs a value (unset removes a field).`);
   }
   for (const k of unset || []) need(allowed.includes(k), 'builder_bad_op', `${what}: "${k}" cannot be unset here.`);
   for (const k of Object.keys(set || {})) {
@@ -244,9 +288,89 @@ export function applyOp(zone, op) {
       if (Object.keys(inv.set).length) back.set = inv.set;
       return { inverse: back, changed: [`${op.street}/${op.id}`] };
     }
-    default:
+    case 'connect.add': {
+      const street = streetRow(zone, op.street).street;
+      const [list, i] = findGeometry(street, 'signpost', op.signpost);
+      need(i >= 0, 'builder_no_signpost', `No signpost ${op.signpost} on this street.`);
+      const post = list[i];
+      const c = op.connect;
+      need(isObj(c) && typeof c.tsid === 'string' && typeof c.label === 'string', 'builder_bad_op', 'connect.add needs a connect with a tsid and a label.');
+      for (const k of Object.keys(c)) need(CONNECT_FIELDS.includes(k), 'builder_bad_op', `connect.add: "${k}" is not a connect field.`);
+      if (!Array.isArray(post.connects)) post.connects = [];
+      const at = Number.isInteger(op.at) ? Math.max(0, Math.min(op.at, post.connects.length)) : post.connects.length;
+      post.connects.splice(at, 0, clone(c));
+      return { inverse: { op: 'connect.remove', street: op.street, signpost: op.signpost, at }, changed: [`${op.street}/${op.signpost}`] };
+    }
+    case 'connect.remove': {
+      const street = streetRow(zone, op.street).street;
+      const [list, i] = findGeometry(street, 'signpost', op.signpost);
+      need(i >= 0, 'builder_no_signpost', `No signpost ${op.signpost} on this street.`);
+      const post = list[i];
+      need(Number.isInteger(op.at) && op.at >= 0 && op.at < (post.connects || []).length, 'builder_no_connect', `Signpost ${op.signpost} has no arm ${op.at}.`);
+      const [c] = post.connects.splice(op.at, 1);
+      return { inverse: { op: 'connect.add', street: op.street, signpost: op.signpost, connect: c, at: op.at }, changed: [`${op.street}/${op.signpost}`] };
+    }
+    case 'connect.set': {
+      const street = streetRow(zone, op.street).street;
+      const [list, i] = findGeometry(street, 'signpost', op.signpost);
+      need(i >= 0, 'builder_no_signpost', `No signpost ${op.signpost} on this street.`);
+      const post = list[i];
+      need(Number.isInteger(op.at) && op.at >= 0 && op.at < (post.connects || []).length, 'builder_no_connect', `Signpost ${op.signpost} has no arm ${op.at}.`);
+      const inv = patch(post.connects[op.at], op.set, op.unset, CONNECT_FIELDS, 'connect.set', op.order);
+      return { inverse: { op: 'connect.set', street: op.street, signpost: op.signpost, at: op.at, ...inv }, changed: [`${op.street}/${op.signpost}`] };
+    }
+    default: {
+      const [kind, verb] = String(op.op).split('.');
+      if (own(GEOMETRY, kind) && ['add', 'remove', 'set'].includes(verb)) return applyGeometryOp(zone, op, kind, verb);
       throw new OpError('builder_bad_op', `Unknown op "${op.op}".`);
+    }
   }
+}
+
+/** platform.*, barrier.*, ladder.* and signpost.* (see the header). */
+function applyGeometryOp(zone, op, kind, verb) {
+  const g = GEOMETRY[kind];
+  const street = streetRow(zone, op.street).street;
+  if (verb === 'add') {
+    const item = op[kind];
+    need(isObj(item), 'builder_bad_op', `${op.op} needs a ${kind}.`);
+    const allowed = kind === 'signpost' ? [...g.fields, 'connects'] : g.fields;
+    for (const k of Object.keys(item)) need(k === 'id' || allowed.includes(k), 'builder_bad_op', `${op.op}: "${k}" is not a ${kind} field.`);
+    need(item.id === undefined || (typeof item.id === 'string' && item.id !== ''), 'builder_bad_op', `${op.op}: an id is a string.`);
+    if (kind === 'signpost' && item.connects !== undefined) {
+      need(Array.isArray(item.connects), 'builder_bad_op', 'signpost.add: connects is a list.');
+      for (const c of item.connects) {
+        need(isObj(c) && typeof c.tsid === 'string' && typeof c.label === 'string', 'builder_bad_op', 'signpost.add: each connect has a tsid and a label.');
+        for (const k of Object.keys(c)) need(CONNECT_FIELDS.includes(k), 'builder_bad_op', `signpost.add: "${k}" is not a connect field.`);
+      }
+    }
+    const id = item.id === undefined ? nextGeometryId(street, kind) : item.id;
+    need(findGeometry(street, kind, id)[1] < 0, 'builder_exists', `A ${kind} ${id} is already on this street.`);
+    const copy = item.id === undefined ? { id, ...clone(item) } : clone(item);
+    const fresh = !Array.isArray(street[g.list]);
+    if (fresh) street[g.list] = [];
+    const list = street[g.list];
+    const at = Number.isInteger(op.at) ? Math.max(0, Math.min(op.at, list.length)) : list.length;
+    list.splice(at, 0, copy);
+    reorder(street, op.order);
+    const inverse = { op: `${kind}.remove`, street: op.street, id };
+    if (fresh) inverse.prune = true;
+    return { inverse, changed: [`${op.street}/${id}`] };
+  }
+  const [list, i] = findGeometry(street, kind, op.id);
+  need(i >= 0, `builder_no_${kind}`, `No ${kind} ${op.id} on this street.`);
+  if (verb === 'remove') {
+    const keys = Object.keys(street);
+    const [item] = list.splice(i, 1);
+    const inverse = { op: `${kind}.add`, street: op.street, [kind]: item, at: i };
+    if (op.prune === true && list.length === 0) {
+      delete street[g.list];
+      inverse.order = keys;
+    }
+    return { inverse, changed: [`${op.street}/${op.id}`] };
+  }
+  const inv = patch(list[i], op.set, op.unset, g.fields, op.op, op.order, NULLABLE);
+  return { inverse: { op: op.op, street: op.street, id: op.id, ...inv }, changed: [`${op.street}/${op.id}`] };
 }
 
 /**

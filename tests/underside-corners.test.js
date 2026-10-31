@@ -252,11 +252,15 @@ describe('every street: undersides and their corners', () => {
 
 describe('game.js runs these rules', () => {
   const src = readFileSync(join(__dirname, '../public/game.js'), 'utf8');
+  // The frame itself lives in js/avatar-step.js (shared with the level builder's validator).
+  const step = readFileSync(join(__dirname, '../public/js/avatar-step.js'), 'utf8');
   it('scales the body, bumps heads on undersides and skips them as ground', () => {
-    assert.match(src, /blockBarrierCrossing\(barriersScreen\(currentStreet\), prevX, player\.x, player\.y, bodyH\)/);
-    assert.match(src, /headCeiling\(streetPlatforms, prevX, prevY, player\.x, player\.y, head\)/);
-    assert.match(src, /features\.query\('avatarBodyScale', engine\)/);
-    assert.match(src, /const head = avatarHeadReach\(bodyScale\)/);
-    assert.match(src, /if \(!isStandable\(p\)\) continue;/);
+    assert.match(src, /barriers: barriersScreen\(currentStreet\)/);
+    assert.match(src, /platforms: streetPlatforms/);
+    assert.match(step, /blockBarrierCrossing\(barriers, prevX, body\.x, body\.y, bodyH\)/);
+    assert.match(step, /headCeiling\(platforms, prevX, prevY, body\.x, body\.y, head\)/);
+    assert.match(src, /bodyScale: features\.query\('avatarBodyScale', engine\)/);
+    assert.match(step, /const head = avatarHeadReach\(bodyScale\)/);
+    assert.match(step, /if \(!isStandable\(p\)\) continue;/);
   });
 });

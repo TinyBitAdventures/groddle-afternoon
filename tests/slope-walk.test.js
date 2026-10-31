@@ -147,11 +147,14 @@ describe('holdCloseToFloor (AvatarAnimationState close_limit)', () => {
     assert.equal(holdCloseToFloor('fall', 'walk2x', { airborne: true, vy: 150, distFromFloor: null }), 'fall');
   });
 
-  it('game.js uses both in the physics loop and the animation pick', () => {
+  it('game.js uses both in the physics loop (js/avatar-step.js stepAvatar) and the animation pick', () => {
     const game = readFileSync(join(root, 'public/game.js'), 'utf8');
-    assert.match(game, /import \{ holdCloseToFloor, stickToSlope \} from '\.\/js\/slope-walk\.js\?v=[0-9a-f]{8}';/);
-    assert.match(game, /const wasGrounded = player\.onGround === true;[\s\S]{0,400}player\.vy \+= 0\.42 \* movementBuff\.gravity \* dt;/);
-    assert.match(game, /stickToSlope\(\{ wasGrounded, vy: player\.vy, dx: player\.x - prevX, feetY: player\.y, groundY: ground \}\)/);
+    const step = readFileSync(join(root, 'public/js/avatar-step.js'), 'utf8');
+    assert.match(game, /import \{ holdCloseToFloor \} from '\.\/js\/slope-walk\.js\?v=[0-9a-f]{8}';/);
+    assert.match(step, /import \{ stickToSlope \} from '\.\/slope-walk\.js\?v=[0-9a-f]{8}';/);
+    assert.match(game, /stepAvatar\(player, \{/);
+    assert.match(step, /const wasGrounded = body\.onGround === true;[\s\S]{0,400}body\.vy \+= GRAVITY \* \(buff\.gravity \?\? 1\) \* dt;/);
+    assert.match(step, /stickToSlope\(\{ wasGrounded, vy: body\.vy, dx: body\.x - prevX, feetY: body\.y, groundY: floor \}\)/);
     assert.match(game, /holdCloseToFloor\(avatarAnimState\(/);
   });
 });

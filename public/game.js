@@ -580,7 +580,6 @@ import {
 import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=bc6e94f2';
 import {
   ladderTopDeck,
-  resolveGround as resolveStreetGround,
   groundBeneath,
   streetWidth,
   assertStreetGeometry,
@@ -588,10 +587,8 @@ import {
   wallsScreen,
   findClimbWallNear,
   barriersScreen,
-  blockBarrierCrossing,
   buriedSignpostUnder,
   avatarHeadReach,
-  headCeiling,
   isItemFloor,
   isStandable,
 } from './js/street-model.js?v=23b926e5';
@@ -706,7 +703,8 @@ import {
 import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
 import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
 import { landingY } from './js/walk-surface.js?v=764d5f5a';
-import { holdCloseToFloor, stickToSlope } from './js/slope-walk.js?v=9af1e505';
+import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
+import { WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, streetPhysicsExtras } from './js/avatar-step.js?v=c04c7c76';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=81ea4347';
@@ -11813,36 +11811,9 @@ function quoinResultCopy(result) {
   return `+${amount}`;
 }
 
-/** The avatar's height against walls at scale 1 (street-model.js blockBarrierCrossing bodyH); ceilings use avatarHeadReach. */
-const AVATAR_BODY_H = 80;
-
+/** The floor under the feet (js/avatar-step.js avatarGround, shared with the level builder's validator). */
 function resolveGround(px, py) {
-  if (streetPlatforms?.length) {
-    const hit = resolveStreetGround(streetPlatforms, px, py, player?.vy ?? 0, 16);
-    if (hit) return hit.y;
-    // fall through to lowest platform near x, else street bottom
-    let best = null;
-    let bestY = -Infinity;
-    for (const p of streetPlatforms) {
-      if (!isStandable(p)) continue; // an underside is never the floor (pc_perm 1)
-      const y = (p.y1 + p.y2) / 2;
-      const minX = Math.min(p.x1, p.x2) - 8;
-      const maxX = Math.max(p.x1, p.x2) + 8;
-      if (px >= minX && px <= maxX && y > bestY) {
-        bestY = y;
-        best = y;
-      }
-    }
-    // A gap over a buried signpost is a hole to jump into (the Great Hole to
-    // Ix): fall, and never get pulled back up onto the rim from below, until
-    // updateBuriedSignposts takes its link. Other gaps keep the old bridge,
-    // since imported streets have seams.
-    const hole = currentStreet ? buriedSignpostUnder(currentStreet, px, Infinity) : null;
-    if (best != null && py >= best - 80 && !(hole && py > best + 24)) return best;
-    if (hole) return worldToScreen(currentStreet, px, currentStreet.bounds?.b ?? 0).y;
-    return streetPlatforms.reduce((m, p) => Math.max(m, p.y1, p.y2), 0);
-  }
-  return GROUND_Y;
+  return avatarGround(streetPlatforms, px, py, player?.vy ?? 0, { street: currentStreet, fallback: GROUND_Y });
 }
 
 /** Pick spawn points along lower platforms. */
@@ -12244,28 +12215,6 @@ function performPlayerJump(result, baseVelocity, now) {
  * friction_air drag; jetpack pushes on every airborne jump press, half force
  * while rising; multiplier_3_jump scales the triple-jump boost).
  */
-/** normal vy_max (670 px/s) in the remake's px/frame, against its -9.6 = 570 px/s jump. */
-const STREET_PHYSICS_TERMINAL_VY = (9.6 * 670) / 570;
-
-function streetPhysicsExtras(extra) {
-  return {
-    vyMax: Number.isFinite(extra.vyMax) && extra.vyMax > 0 ? extra.vyMax : null,
-    accel: extra.accel ?? 1,
-    airAccel: extra.airAccel ?? 1,
-    friction: extra.friction ?? 1,
-    airDrag: extra.airDrag > 0 ? extra.airDrag : 0,
-    jetpack: extra.jetpack === true,
-    tripleJump: extra.tripleJump ?? 1,
-  };
-}
-
-/** Coasting decay per frame: ground friction scales the 0.78 rule; drag rules the air. */
-function streetPhysicsCoastDecay(buff) {
-  if (!player?.onGround && buff.airDrag > 0) return Math.max(0, 1 - buff.airDrag / 60);
-  if (player?.onGround && buff.friction !== 1) return 0.78 ** Math.max(0.05, buff.friction);
-  return 0.78;
-}
-
 /** An airborne jump press on a jetpack street (swimming): a stroke, half force while rising. */
 function streetPhysicsJetpackStroke(buff, jumpVelocity, now) {
   if (!buff.jetpack || player.onGround || !hasQueuedJump(jumpState, now)) return false;
@@ -12278,21 +12227,6 @@ function streetPhysicsJetpackStroke(buff, jumpVelocity, now) {
 function streetPhysicsTripleJump(buff, result) {
   if (result?.triple && buff.tripleJump !== 1) result.multiplier = 1 + (result.multiplier - 1) * buff.tripleJump;
   return result;
-}
-
-/** Air drag and the vy_max cap, only on streets/events that set them. */
-function streetPhysicsFreeFall(buff, dt) {
-  if (buff.airDrag > 0 && !player.onGround) player.vy *= Math.max(0, 1 - (buff.airDrag * dt) / 60);
-  // A swim (jetpack) bounds vx to vx_max every frame, as boundAvatarVelocities does: a
-  // run-up into A Summer's Day's pool no longer carries you across it at walking speed.
-  if (buff.jetpack) {
-    const vxCap = 4.4 * buff.speed;
-    player.vx = clamp(player.vx, -vxCap, vxCap);
-  }
-  if (buff.vyMax) {
-    const cap = STREET_PHYSICS_TERMINAL_VY * buff.vyMax;
-    player.vy = clamp(player.vy, -(buff.gravity < 0 ? cap : cap * 2), cap);
-  }
 }
 
 /** Buff physics with feature multipliers (e.g. Pooped) folded in. */
@@ -12414,9 +12348,9 @@ function handleInput() {
     return;
   }
 
-  // vx_accel_add_in_air 0.22 against _floor 0.3.
-  const accel = 0.58 * (player.onGround ? movementBuff.accel : movementBuff.airAccel * (0.22 / 0.3));
-  const max = 4.4 * movementBuff.speed;
+  // vx_accel_add_in_air 0.22 against _floor 0.3 (js/avatar-step.js).
+  const accel = steerAccel(player.onGround, movementBuff);
+  const max = WALK_MAX * movementBuff.speed;
   player.vxMax = max;
   const jumpVelocity = -9.6 * movementBuff.jump;
   if (left) {
@@ -12431,10 +12365,9 @@ function handleInput() {
   } else if (!player.onGround && !(movementBuff.airDrag > 0)) {
     // Airborne with no key: floor friction does not apply, so the jump keeps
     // its momentum until it drops under friction_thresh (80 of vx_max 335).
-    if (Math.abs(player.vx) < max * (80 / 335)) player.vx = 0;
+    player.vx = coastX(player.vx, false, movementBuff);
   } else {
-    player.vx *= streetPhysicsCoastDecay(movementBuff);
-    if (Math.abs(player.vx) < 0.05) player.vx = 0;
+    player.vx = coastX(player.vx, player.onGround, movementBuff);
   }
   applyPlayerFacing();
   if (jumpRequested && player.onGround && climbHit && up && !climb.regrabLock) {
@@ -12491,52 +12424,19 @@ function physics(dt) {
     if (player.vy !== 0) player.walkPhase += dt * 0.35;
     player.pivot.y = climbBobY({ sheets: Boolean(player.anims), vy: player.vy, phase: player.walkPhase });
   } else {
-    const movementBuff = combinedPhysics();
-    // On the floor before this frame's move (a jump in handleInput already left it).
-    const wasGrounded = player.onGround === true;
-    player.vy += 0.42 * movementBuff.gravity * dt;
-    streetPhysicsFreeFall(movementBuff, dt);
-    const prevX = player.x;
-    const prevY = player.y;
-    player.x += player.vx * dt;
-    player.y += player.vy * dt;
-    player.x = clamp(player.x, 24, WORLD_W - 24);
-    // The avatar's collision height (80 px) shrinks with a street's pc_scale.
-    const bodyScale = features.query('avatarBodyScale', engine) ?? 1;
-    const bodyH = AVATAR_BODY_H * bodyScale;
-    // A rising head stops under an underside or ceiling (platform pc_perm 1 or null)
-    // at the client's head circle, 111 px over the feet at scale 1 (avatarHeadReach).
-    // Puzzle streets with reversible gravity run their own (features/puzzles-feature.js).
-    const head = avatarHeadReach(bodyScale);
-    const headY = streetPlatforms?.length && features.query('ownsCeilings', engine) !== true
-      ? headCeiling(streetPlatforms, prevX, prevY, player.x, player.y, head)
-      : null;
-    if (headY != null) {
-      player.y = headY;
-      if (player.vy < 0) player.vy = 0;
-    }
-    // Source <walls>: vertical colliders with directional pc_perm.
-    const walledX = blockBarrierCrossing(barriersScreen(currentStreet), prevX, player.x, player.y, bodyH);
-    if (walledX !== player.x) {
-      player.x = walledX;
-      player.vx = 0;
-    }
-    {
-      const ground = resolveGround(player.x, player.y);
-      if (player.y >= ground && player.vy >= 0) {
-        player.y = ground;
-        player.vy = 0;
-        player.onGround = true;
-      } else if (stickToSlope({ wasGrounded, vy: player.vy, dx: player.x - prevX, feetY: player.y, groundY: ground })) {
-        // Walking down a slope (js/slope-walk.js): the floor fell away faster than
-        // gravity moved the feet; stay on it instead of hopping down in falls.
-        player.y = ground;
-        player.vy = 0;
-        player.onGround = true;
-      } else if (player.y < ground - 2) {
-        player.onGround = false;
-      }
-    }
+    // js/avatar-step.js: the same frame the level builder's validator steps (spec 7.4).
+    stepAvatar(player, {
+      dt,
+      buff: combinedPhysics(),
+      platforms: streetPlatforms,
+      barriers: barriersScreen(currentStreet),
+      worldW: WORLD_W,
+      // The avatar's collision height (80 px) shrinks with a street's pc_scale.
+      bodyScale: features.query('avatarBodyScale', engine) ?? 1,
+      // Puzzle streets with reversible gravity run their own ceilings (features/puzzles-feature.js).
+      ceilings: features.query('ownsCeilings', engine) !== true,
+      ground: resolveGround,
+    });
     // Foot-plant bob only if not using full walk sheet animation
     if (player.anims) {
       player.pivot.y = 0;
@@ -27282,6 +27182,16 @@ async function main() {
     },
     /** Street decos that play (js/deco-anim.js, G435): placed, strips in, playing, stopped off screen; `detail` adds each one's stage box. */
     /** LEVEL BUILDER QA (js/builder/draft-play.js): a placed deco as drawn, by its id, or null. */
+    /** Level builder play-tests (spec 7.4 calibration): set the avatar down at a screen-space spot. */
+    placeAvatar(x, y) {
+      if (!player || !Number.isFinite(x) || !Number.isFinite(y)) return false;
+      player.x = x;
+      player.y = y;
+      player.vx = 0;
+      player.vy = 0;
+      player.onGround = false;
+      return true;
+    },
     streetDeco(id) {
       const spr = bgLayer?.decoViews?.get(String(id));
       return spr ? { x: spr.x, y: spr.y, w: Math.round(Math.abs(spr.width)), h: Math.round(Math.abs(spr.height)), angle: spr.angle, flipped: spr.scale.x < 0, visible: spr.visible, street: currentStreetTsid } : null;

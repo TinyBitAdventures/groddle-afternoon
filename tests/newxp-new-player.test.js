@@ -222,7 +222,7 @@ describe('4. the Cloud Level ends in a soft cloud, and the edge drops cleanly', 
     const read = (f) => readFileSync(join(root, f), 'utf8');
     // The slack it clears: platformYAt's 4 px margin and resolveGround's 8 px seam bridge.
     assert.match(read('public/js/street-model.js'), /export function platformYAt\(p, x, margin = 4\)/);
-    assert.match(game, /const maxX = Math\.max\(p\.x1, p\.x2\) \+ 8;/);
+    assert.match(read('public/js/avatar-step.js'), /const maxX = Math\.max\(p\.x1, p\.x2\) \+ 8;/);
     assert.ok(CLOUD_EDGE_CLEAR > 8);
     assert.equal(cloudStepOff(edge, { x: edge + 4, onGround: true }), edge + CLOUD_EDGE_CLEAR, 'the QA stick: x 3354 standing on air');
     assert.equal(cloudStepOff(edge, { x: edge + 1, onGround: true }), edge + CLOUD_EDGE_CLEAR);

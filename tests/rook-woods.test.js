@@ -228,9 +228,13 @@ test('every Crusher can be passed on foot: a sweep clears a standing head, a dro
   // The avatar box, walk speed and jump come from the code that runs them.
   assert.match(game, /crusherHitsAvatar\(entry\.spec, entry\.position, \{\s*x: player\.x,\s*y: player\.y,\s*\.\.\.ROOK_AVATAR_HIT,\s*\}\)/);
   assert.match(game, /const platforms = ROOK_WOODS_PLATFORMS\.map/);
-  const walkPerFrame = Number(/const max = ([\d.]+) \* movementBuff\.speed;/.exec(game)[1]);
+  // The frame lives in js/avatar-step.js (shared with the level builder); game.js uses its WALK_MAX.
+  const step = fs.readFileSync(path.join(root, 'public/js/avatar-step.js'), 'utf8');
+  assert.match(game, /const max = WALK_MAX \* movementBuff\.speed;/);
+  const walkPerFrame = Number(/export const WALK_MAX = ([\d.]+);/.exec(step)[1]);
   const jumpVelocity = Number(/const jumpVelocity = -([\d.]+) \* movementBuff\.jump;/.exec(game)[1]);
-  const gravity = Number(/player\.vy \+= ([\d.]+) \* movementBuff\.gravity \* dt;/.exec(game)[1]);
+  assert.match(step, /body\.vy \+= GRAVITY \* \(buff\.gravity \?\? 1\) \* dt;/);
+  const gravity = Number(/export const GRAVITY = ([\d.]+);/.exec(step)[1]);
   const walkPxPerMs = (walkPerFrame * 60) / 1000;
   let vy = -jumpVelocity;
   let rise = 0;

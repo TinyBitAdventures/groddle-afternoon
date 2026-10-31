@@ -9,7 +9,7 @@ import { describe, it } from 'node:test';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { OpError, applyOp, applyOps, nextDecoId, opsSummary } from '../public/js/builder/ops.js?v=044258c8';
+import { GEOMETRY, OP_NAMES, OpError, applyOp, applyOps, nextDecoId, nextGeometryId, opsSummary } from '../public/js/builder/ops.js?v=28c0d569';
 import { DEFAULT_GRADIENT, forkOps, forkStreet, newTsid, relayerPosition, streetKeyFrom } from '../public/js/builder/zone.js?v=9608addf';
 import { compileSchema } from '../public/js/builder/schema-check.js?v=cc9d1af4';
 import { DECO_TWINS } from '../public/js/street-render.js?v=3bcef6a7';
@@ -33,6 +33,15 @@ function forkedZone(tsid = 'GLI2V0UN7RD1T2J', key = 'lane') {
   return zone;
 }
 
+/** A random geometry item of a kind (no id), for <kind>.add. */
+function geometryItem(kind, rnd, pick, i) {
+  const r = (n) => Math.round(rnd() * n);
+  if (kind === 'platform') return { x1: r(900), y1: -r(400), x2: 900 + r(400), y2: -r(400), pc_perm: pick([-1, 0, 1, null]), item_perm: pick([-1, null]) };
+  if (kind === 'barrier') return { x: r(900), y: -r(400), h: 40 + r(200), pc_perm: pick([0, null]) };
+  if (kind === 'ladder') return { x: r(900), y: -r(400), w: 50, h: 100 + r(400), ...(rnd() > 0.5 ? { tiling: { cap_0: { sprite: 'ladder_tile_center_00_basicWood', w: 60, h: 50 } } } : {}) };
+  return { x: r(900), y: -r(200), w: 150, h: 200, connects: rnd() > 0.7 ? [] : [{ tsid: 'GZ0000000000002', label: `Arm ${i}`, hub_id: '56', arrive: { x: r(900), y: -r(200) } }] };
+}
+
 /** A seeded run of ops over a zone's street (the editor's vocabulary). */
 function randomOps(zone, n, seed = 7) {
   let s = seed;
@@ -40,11 +49,34 @@ function randomOps(zone, n, seed = 7) {
   const pick = (a) => a[Math.floor(rnd() * a.length)];
   const street = zone.streets[0].street;
   const layers = street.layers;
+  const kinds = Object.keys(GEOMETRY);
   const ops = [];
+  const keep = (op) => {
+    // Apply as it goes so later ops name real things.
+    ops.push(op);
+    try { applyOp(structuredClone(zone), op); applyOp(zone, op); } catch { ops.pop(); }
+  };
   for (let i = 0; i < n; i += 1) {
+    if (i === 5 || i === Math.floor(n * 0.6)) {
+      // A sure tour of the perm and prune paths: a barrier on a street without any, made hard,
+      // softened (a null goes back), its perm unset, then removed with prune (the list empties).
+      const id = nextGeometryId(street, 'barrier');
+      keep({ op: 'barrier.add', street: 'lane', barrier: { x: 40, y: -90, h: 120, pc_perm: 0 } });
+      keep({ op: 'barrier.set', street: 'lane', id, set: { pc_perm: null } });
+      keep({ op: 'barrier.set', street: 'lane', id, set: { pc_perm: 1 } });
+      keep({ op: 'barrier.set', street: 'lane', id, set: { h: 80 }, unset: ['pc_perm'] });
+      for (const b of [...(street.barriers || [])]) keep({ op: 'barrier.remove', street: 'lane', id: b.id, prune: true });
+      continue;
+    }
     const layer = pick(layers.filter((l) => l.decos.length));
     const deco = pick(layer.decos);
-    const kind = pick(['set', 'set', 'unset', 'add', 'remove', 'move', 'layer', 'street', 'zone', 'asset', 'editor']);
+    const kind = pick(['set', 'set', 'unset', 'add', 'remove', 'move', 'layer', 'street', 'zone', 'asset', 'editor',
+      'geo.add', 'geo.add', 'geo.set', 'geo.perm', 'geo.remove', 'geo.remove', 'connect.add', 'connect.set', 'connect.remove']);
+    // Geometry: a kind, one of its items (if any) and a signpost arm.
+    const g = pick(kinds);
+    const item = pick(street[GEOMETRY[g].list] || [{ id: `${GEOMETRY[g].prefix}none` }]);
+    const post = pick((street.signposts || []).filter((p) => Array.isArray(p.connects)).concat([{ id: 'signpost_none', connects: [] }]));
+    const arm = Math.floor(rnd() * Math.max(1, post.connects.length));
     if (kind === 'set') ops.push({ op: 'deco.set', street: 'lane', id: deco.id, set: { x: Math.round(rnd() * 900), flip: rnd() > 0.5, r: Math.round(rnd() * 40 - 20) } });
     else if (kind === 'unset') ops.push({ op: 'deco.set', street: 'lane', id: deco.id, set: { hidden: true }, unset: ['flip'] });
     else if (kind === 'add') ops.push({ op: 'deco.add', street: 'lane', layer: layer.id, deco: { id: nextDecoId(street, new Set([`d_${9000 + i}`])), sprite: 'bush_3', x: 10, y: -20, w: 160, h: 90, z: 3, r: 0 }, at: 1 });
@@ -54,18 +86,81 @@ function randomOps(zone, n, seed = 7) {
     else if (kind === 'street') ops.push({ op: 'street.set', street: 'lane', set: { label: `Lane ${i}`, gradient: { top: '102030', bottom: 'FFEEDD' } }, unset: ['musicFile'] });
     else if (kind === 'zone') ops.push({ op: 'zone.set', set: { notes: `n${i}` } });
     else if (kind === 'asset') ops.push({ op: 'asset.set', name: 'bush_3', asset: rnd() > 0.5 ? null : { origin: 'tinyspeck-cc0', licence: 'CC0-1.0', source: 'groddle1.swf#bush_3' } });
-    else ops.push({ op: 'editor.set', street: 'lane', editor: { camera: { x: i, y: 2, zoom: 1 }, lockedLayers: ['sky'] } });
-    // Apply as it goes so later ops name real things.
-    try { applyOp(structuredClone(zone), ops.at(-1)); applyOp(zone, ops.at(-1)); } catch { ops.pop(); }
+    else if (kind === 'editor') ops.push({ op: 'editor.set', street: 'lane', editor: { camera: { x: i, y: 2, zoom: 1 }, lockedLayers: ['sky'] } });
+    else if (kind === 'geo.add') {
+      // Without an id (the next free one), or with one, first or last; sometimes at a place.
+      const fresh = geometryItem(g, rnd, pick, i);
+      const id = `${GEOMETRY[g].prefix}${9000 + i}`;
+      const thing = pick([fresh, { id, ...fresh }, { ...fresh, id }]);
+      ops.push({ op: `${g}.add`, street: 'lane', [g]: thing, ...(rnd() > 0.5 ? { at: Math.floor(rnd() * 3) } : {}) });
+    } else if (kind === 'geo.set') {
+      const f = GEOMETRY[g].fields.filter((k) => k !== 'pc_perm' && k !== 'item_perm' && k !== 'tiling');
+      const set = { [pick(f)]: Math.round(rnd() * 500), [pick(f)]: -Math.round(rnd() * 500) };
+      ops.push({ op: `${g}.set`, street: 'lane', id: item.id, set, ...(g === 'ladder' && rnd() > 0.5 ? { unset: ['tiling'] } : {}) });
+    } else if (kind === 'geo.perm') {
+      // pc_perm and item_perm: null (hard), a number, or gone.
+      // Mostly a hard one (so a null goes back in an inverse), else the first or last few.
+      const p = pick(['platform', 'barrier']);
+      const all = street[GEOMETRY[p].list] || [];
+      const hard = all.filter((x) => x.pc_perm === null);
+      const it = pick(hard.length && rnd() > 0.4 ? hard : [...all.slice(0, 3), ...all.slice(-3), { id: `${GEOMETRY[p].prefix}none` }]);
+      const how = pick(['null', 'null', 'unset', 'number', 'item']);
+      if (how === 'null') ops.push({ op: `${p}.set`, street: 'lane', id: it.id, set: { pc_perm: null } });
+      else if (how === 'unset') ops.push({ op: `${p}.set`, street: 'lane', id: it.id, set: {}, unset: ['pc_perm'] });
+      else if (how === 'number') ops.push({ op: `${p}.set`, street: 'lane', id: it.id, set: { pc_perm: pick([-1, 0, 1]) } });
+      else ops.push({ op: 'platform.set', street: 'lane', id: (street.platforms[0] || {}).id, set: { item_perm: null, y1: -7 }, unset: ['pc_perm'] });
+    } else if (kind === 'geo.remove') {
+      // Half the time a barrier: the fork has none, so removes there empty the list.
+      const r = (street.barriers || []).length && rnd() > 0.5 ? pick(street.barriers) : item;
+      ops.push({ op: `${r === item ? g : 'barrier'}.remove`, street: 'lane', id: r.id, ...(rnd() > 0.4 ? { prune: true } : {}) });
+    }
+    else if (kind === 'connect.add') {
+      const connect = { tsid: 'GZ0000000000003', label: `Way ${i}`, ...(rnd() > 0.5 ? { hub_id: '56' } : {}), ...(rnd() > 0.7 ? { hidden: true } : {}), ...(rnd() > 0.5 ? { arrive: { x: 1, y: -2 } } : {}) };
+      ops.push({ op: 'connect.add', street: 'lane', signpost: post.id, connect, ...(rnd() > 0.5 ? { at: 0 } : {}) });
+    } else if (kind === 'connect.set') {
+      ops.push({ op: 'connect.set', street: 'lane', signpost: post.id, at: arm, set: { label: `Sign ${i}`, hidden: rnd() > 0.5 }, ...(rnd() > 0.5 ? { unset: [pick(['hub_id', 'arrive'])] } : {}) });
+    } else ops.push({ op: 'connect.remove', street: 'lane', signpost: post.id, at: arm });
+    keep(ops.pop());
   }
   return ops;
 }
+
+/** What a script exercises of the P2 ops, replayed on a copy of the zone. */
+function p2Coverage(zone, script) {
+  const z = structuredClone(zone);
+  const seen = new Set();
+  for (const op of script) {
+    const [kind, verb] = op.op.split('.');
+    const list = GEOMETRY[kind] ? z.streets[0].street[GEOMETRY[kind].list] : null;
+    const { inverse } = applyOp(z, op);
+    seen.add(op.op);
+    if (verb === 'add' && GEOMETRY[kind]) seen.add(op[kind].id === undefined ? 'add without an id' : 'add with an id');
+    if (inverse.prune) seen.add('add on a street without the list');
+    if (verb === 'remove' && op.prune && inverse.order) seen.add(`prune empties ${GEOMETRY[kind].list}`);
+    if (verb === 'remove' && op.prune && !inverse.order && list) seen.add('prune on a list that stays');
+    if (verb === 'set' && op.set && op.set.pc_perm === null) seen.add('pc_perm set to null');
+    if (verb === 'set' && (op.unset || []).includes('pc_perm')) seen.add('pc_perm unset');
+    if (verb === 'set' && inverse.set && inverse.set.pc_perm === null) seen.add('pc_perm null put back');
+  }
+  return seen;
+}
+
+const P2_MUST = [
+  ...OP_NAMES.filter((n) => GEOMETRY[n.split('.')[0]] || n.startsWith('connect.')),
+  'add without an id', 'add with an id', 'add on a street without the list', 'prune empties barriers', 'prune on a list that stays',
+  'pc_perm set to null', 'pc_perm unset', 'pc_perm null put back',
+];
+const assertP2 = (zone, script) => {
+  const seen = p2Coverage(zone, script);
+  assert.deepEqual(P2_MUST.filter((k) => !seen.has(k)), [], 'the script exercises every P2 op');
+};
 
 describe('ops (js/builder/ops.js)', () => {
   it('every op then its inverse gives a byte-equal zone (300 seeded ops on a fork of Hechey Track)', () => {
     const zone = forkedZone();
     const script = randomOps(structuredClone(zone), 300);
     assert.ok(script.length > 250, `ops ${script.length}`);
+    assertP2(zone, script);
     for (const op of script) {
       const before = bytes(zone);
       const { inverse } = applyOp(zone, op);
@@ -102,11 +197,38 @@ describe('ops (js/builder/ops.js)', () => {
     assert.equal(code({ op: 'layer.set', street: 'lane', layer: 'nope', set: { z: 1 } }), 'builder_no_layer');
     assert.equal(code({ op: 'street.add', street: 'lane', draftStreet: zone.streets[0] }), 'builder_exists');
     assert.equal(code({ op: 'nope' }), 'builder_bad_op');
+    // P2: geometry and signpost arms.
+    const ladder = zone.streets[0].street.ladders[0].id;
+    const post = zone.streets[0].street.signposts[0].id;
+    assert.equal(code({ op: 'platform.set', street: 'lane', id: 'plat_nope', set: { x1: 1 } }), 'builder_no_platform');
+    assert.equal(code({ op: 'barrier.remove', street: 'lane', id: 'wall_1', prune: true }), 'builder_no_barrier');
+    assert.equal(code({ op: 'signpost.remove', street: 'lane', id: 'nope' }), 'builder_no_signpost');
+    assert.equal(code({ op: 'ladder.set', street: 'lane', id: ladder, set: { tiling: null } }), 'builder_bad_op');
+    assert.equal(code({ op: 'ladder.set', street: 'lane', id: ladder, set: { pc_perm: 1 } }), 'builder_bad_op');
+    assert.equal(code({ op: 'ladder.set', street: 'lane', id: ladder, unset: ['id'] }), 'builder_bad_op');
+    assert.equal(code({ op: 'platform.add', street: 'lane', platform: { id: '', x1: 0 } }), 'builder_bad_op');
+    assert.equal(code({ op: 'platform.add', street: 'lane', platform: { id: 7, x1: 0 } }), 'builder_bad_op');
+    assert.equal(code({ op: 'platform.add', street: 'lane', platform: { x1: 0, connects: [] } }), 'builder_bad_op');
+    assert.equal(code({ op: 'platform.add', street: 'lane' }), 'builder_bad_op');
+    assert.equal(code({ op: 'signpost.add', street: 'lane', signpost: { id: post, x: 0, y: 0 } }), 'builder_exists');
+    assert.equal(code({ op: 'signpost.add', street: 'lane', signpost: { x: 0, connects: {} } }), 'builder_bad_op');
+    assert.equal(code({ op: 'signpost.add', street: 'lane', signpost: { x: 0, connects: [{ tsid: 'GZ0000000000002' }] } }), 'builder_bad_op');
+    assert.equal(code({ op: 'connect.add', street: 'lane', signpost: 'nope', connect: { tsid: 'x', label: 'y' } }), 'builder_no_signpost');
+    assert.equal(code({ op: 'connect.add', street: 'lane', signpost: post, connect: { tsid: 'x', label: 'y', events: 1 } }), 'builder_bad_op');
+    assert.equal(code({ op: 'connect.remove', street: 'lane', signpost: post, at: 99 }), 'builder_no_connect');
+    assert.equal(code({ op: 'connect.set', street: 'lane', signpost: post, at: '0', set: { label: 'x' } }), 'builder_no_connect');
+    assert.equal(code({ op: 'connect.set', street: 'lane', signpost: post, at: 0, set: { hub_id: null } }), 'builder_bad_op');
+    assert.equal(code({ op: 'platform.frob', street: 'lane' }), 'builder_bad_op');
+    assert.equal(code({ op: 'platform.add', street: 'nope', platform: {} }), 'builder_no_street');
+    assert.equal(code({ op: 'platform.set', street: 'lane', id: zone.streets[0].street.platforms[0].id, set: { pc_perm: null, item_perm: null } }), 'ok');
   });
 
   it('names the next deco id and sums a batch in words', () => {
     assert.equal(nextDecoId({ layers: [{ decos: [{ id: 'd_4' }, { id: 'x' }] }, { decos: [{ id: 'd_12' }] }] }), 'd_13');
     assert.equal(nextDecoId({ layers: [] }, new Set(['d_2'])), 'd_3');
+    assert.equal(nextGeometryId({ platforms: [{ id: '_pl1285104321235' }, { id: 'plat_4' }, { id: 'plat_x9' }] }, 'platform'), 'plat_5');
+    assert.equal(nextGeometryId({}, 'barrier'), 'wall_1');
+    assert.equal(nextGeometryId({ ladders: [{ id: 'ladder_1284683116151' }] }, 'ladder'), 'ladder_1284683116152');
     assert.equal(opsSummary([{ op: 'deco.set' }, { op: 'deco.set' }, { op: 'deco.add' }]), '2 deco.set, 1 deco.add');
   });
 });
@@ -171,7 +293,35 @@ describe('the site applies the same ops (groddle-afternoon-site src/BuilderOps.p
   it('the same script gives the same zone and the same inverses, byte for byte', () => {
     const zone = forkedZone();
     const script = randomOps(structuredClone(zone), 200, 23);
-    script.push({ op: 'deco.set', street: 'lane', id: 'd_999999', set: { x: 1 } }, { op: 'hub.set', hub: null }, { op: 'street.remove', street: 'lane' });
+    assertP2(zone, script);
+    const post = zone.streets[0].street.signposts[0].id;
+    const ladder = zone.streets[0].street.ladders[0].id;
+    script.push(
+      { op: 'deco.set', street: 'lane', id: 'd_999999', set: { x: 1 } },
+      // P2 failures, so the error codes match too.
+      { op: 'platform.set', street: 'lane', id: 'plat_nope', set: { x1: 1 } },
+      { op: 'barrier.remove', street: 'lane', id: 'wall_nope', prune: true },
+      { op: 'ladder.set', street: 'lane', id: 'ladder_nope', set: { x: 1 } },
+      { op: 'signpost.set', street: 'lane', id: 'signpost_nope', set: { x: 1 } },
+      { op: 'ladder.set', street: 'lane', id: ladder, set: { tiling: null } },
+      { op: 'ladder.set', street: 'lane', id: ladder, set: { pc_perm: 1 } },
+      { op: 'platform.add', street: 'lane', platform: { id: null, x1: 0 } },
+      { op: 'platform.add', street: 'lane', platform: { x1: 0, events: [] } },
+      { op: 'signpost.add', street: 'lane', signpost: { x: 0, connects: [{ tsid: 'GZ0000000000002', label: 'x', events: 1 }] } },
+      { op: 'connect.add', street: 'lane', signpost: 'signpost_nope', connect: { tsid: 'x', label: 'y' } },
+      { op: 'connect.add', street: 'lane', signpost: post, connect: { tsid: 'x' } },
+      { op: 'connect.remove', street: 'lane', signpost: post, at: -1 },
+      { op: 'connect.set', street: 'lane', signpost: post, at: 99, set: { label: 'x' } },
+      { op: 'platform.frob', street: 'lane' },
+      // And some that land: clamped places, an id last, a reorder, a signpost without arms gaining one.
+      { op: 'barrier.add', street: 'lane', barrier: { x: 1, y: -2, h: 3, pc_perm: null, id: 'wall_77' }, at: 99 },
+      { op: 'barrier.add', street: 'lane', barrier: { x: 4, y: -5, h: 6 }, at: -3 },
+      { op: 'barrier.set', street: 'lane', id: 'wall_77', set: { pc_perm: 1 }, unset: ['h'], order: ['pc_perm', 'id'] },
+      { op: 'signpost.add', street: 'lane', signpost: { x: 9, y: -9, w: 150, h: 200 } },
+      { op: 'connect.add', street: 'lane', signpost: post, connect: { label: 'Back', tsid: 'GZ0000000000004', hidden: false }, at: 1 },
+      { op: 'hub.set', hub: null },
+      { op: 'street.remove', street: 'lane' },
+    );
     const fromPhp = php(structuredClone(zone), script);
     const inverses = [];
     for (const op of script) {
