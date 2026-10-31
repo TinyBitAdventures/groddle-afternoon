@@ -111,7 +111,7 @@ import {
 } from '../home-tower.js?v=6ccb3a4f';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { pieceUrl } from '../home-wallpaper.js?v=e676f00f';
-import { wantsHiresDecos } from '../deco-hires.js?v=cc8506f6';
+import { wantsHiresDecos } from '../deco-hires.js?v=eaac1067';
 import { WOTD_TEXT } from '../wine-pour.js?v=6daa23a7';
 
 /** 3x tower pieces where the screen has more than 2.25 backing pixels per world pixel. */

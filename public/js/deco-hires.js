@@ -24,7 +24,7 @@ import { NEW_DECOS, NEW_DECOS_HIRES } from './deco-new-list.js?v=eadb6e8c';
 
 /** A published zone's new art (gz_ decos, js/deco-new-list.js): drawn like library decos. */
 export { NEW_DECOS };
-import { SHARP_DECOS } from './deco-sharp-list.js?v=14808a90';
+import { SHARP_DECOS } from './deco-sharp-list.js?v=ce2104a8';
 
 const DECO_PNG = /^(.*?(?:^|\/)assets\/decos\/groddle\/)([^/?#]+)\.png([?#].*)?$/;
 

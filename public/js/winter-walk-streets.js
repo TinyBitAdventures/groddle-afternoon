@@ -46,9 +46,23 @@
  * snow_pinecluster_01a_al1, the dead trees heights_tree_bare_* and
  * tree_bare_*, the drums ground_rootpipe2 darkened, the boardwalk
  * wood_platform on wood_cover_middleplus posts, the ladder
- * ladder_interior_4steps. Left out (no CC0 art in the shipped set): the big
- * hollow two-trunk tree and the pale green curling plants of the walk (bare
- * trees and dry grass stand there), and the snow on the haven's branches.
+ * ladder_interior_4steps. The snow on the haven's branches is left out (no
+ * CC0 piece).
+ * - Round 5 (2026-10-31), the walk after the Glitch Tribute Blog's posts
+ *   (johnexploresur.tumblr.com 37358133852, 37366254046, and the four icicle
+ *   posts 37374550569, 37415159206, 37421343721, 37429063895, filed as Winter
+ *   Haven but taken on the walk: the same pale cliffs, pillars and sky as the
+ *   Snaps on the walk's own Snaps pages, one of them, 80964, captioned
+ *   "Floating entrance to Winter Haven") and the 147 Winter Walk Snaps
+ *   (research/coverage/snaps-round3-2026-10-31/winter_walk), reference only:
+ *   white streaks on the overhang, big icicles under it, a cliff block with
+ *   icy ledges behind the far end, and the blizzard bank with three more
+ *   pillars. Known from those pictures but not built: the big hollow two-trunk
+ *   tree arching round the caption (82043, 81189; blog 37366254046) and the
+ *   pale green curling plants in the snow (82043, 81185, 83816; blog
+ *   37366254046, 37415159206). No CC0 piece is either (checked against the 62
+ *   location bundles and the per-deco sources of tinyspeck/glitch-locations),
+ *   and stand-ins were not wanted (Austin 2026-10-31).
  * The walk's caption line (WINTER_WALK_CAPTION) is placed in the walk as the
  * pictures show it (G352, Austin 2026-10-28: one-off approval); Being Watched
  * places its own (js/quest-rooms/being-watched.js CAPTION).
@@ -148,14 +162,39 @@ export const WINTER_WALK_FLOOR_Y = WINTER_WALK_START.y;
  */
 export const WINTER_WALK_FLOOR_BREAKS = Object.freeze([-3000, -2750, -2400, -2050, -1700, -1350, -1000, -650, -300, 50, 400, 750, 1100, 1450, 1800, 2150, 2500, 2750, 3000]);
 /**
- * Snow pillars standing in the snow near the cliffs (Flickr 8417912992):
- * centre x, top y, cap width. Left of the last six platforms, so the return
+ * Snow pillars standing in the snow near the cliffs (Flickr 8417912992) and
+ * in the blizzard bank at the far end: centre x, top y, cap width. The return
  * leg (js/winter-walk.js: the rightmost 22%, at least six) starts on the floor.
  */
 export const WINTER_WALK_PILLARS = Object.freeze([
   Object.freeze({ x: 1250, top: -176, w: 150 }),
   Object.freeze({ x: 1470, top: -271, w: 170 }),
   Object.freeze({ x: 1690, top: -176, w: 150 }),
+  // Round 5: the far end is a white blizzard bank with three pillars rising out of it, short,
+  // middle and tall (Snaps 81710, 83620, 82325, 82003 in snaps-round3-2026-10-31/winter_walk,
+  // reference only); 82003 shows the last iMG paid on the tallest. Each is one hop up from the
+  // one before. Their midpoints sit between the last floor runs, so the homeward leg (the
+  // rightmost six platforms) still starts on the floor, takes its three motes on these
+  // pillars, and the passage stays on the last floor run.
+  Object.freeze({ x: 2400, top: -176, w: 150 }),
+  Object.freeze({ x: 2560, top: -271, w: 170 }),
+  Object.freeze({ x: 2720, top: -366, w: 160 }),
+]);
+/** The overhang's pieces (centre x), hung from the top at the cliffs' end. */
+export const WINTER_WALK_OVERHANG = Object.freeze([1300, 1760, 2160]);
+/**
+ * Round 5: the big icicles under the overhang (the Tribute Blog's posts 37374550569 "you hit
+ * icicles to make these large ones fall", 37415159206, 37421343721, and the Snaps 81185,
+ * 83816, 82354, 81936; reference only). Their caps tuck under the rock (-450); the points stop
+ * well over a standing avatar's head and clear of the pillars' tops. Tapping them down is not built: they hang still.
+ */
+export const WINTER_WALK_ICICLES = Object.freeze([
+  Object.freeze({ x: 1130, top: -470, h: 190 }),
+  Object.freeze({ x: 1356, top: -470, h: 170 }),
+  Object.freeze({ x: 1590, top: -470, h: 150 }),
+  Object.freeze({ x: 1840, top: -470, h: 240 }),
+  Object.freeze({ x: 2050, top: -470, h: 200 }),
+  Object.freeze({ x: 2260, top: -470, h: 160 }),
 ]);
 /** The camp at the left end (Flickr 8417912672: you start beside the fire, the teepee just past it). */
 export const WINTER_WALK_CAMP = Object.freeze({ fire: -2760, tent: -2540 });
@@ -307,12 +346,21 @@ function walkMiddleDecos() {
   // Snowy rocks here and there.
   for (const [i, x] of [-640, 560, 1380, 2560].entries()) out.push(deco('rock_snowy_1a_al1', x, WF - 4, 386 * 0.32, 282 * 0.32, z++, i % 2 ? { flip: true } : {}));
   // The grey basalt overhang along the top at the cliffs' end (8417912992), hung from the street top.
-  for (const [i, x] of [1300, 1760, 2240, 2720].entries()) {
+  // Round 5: it ends short of the blizzard bank (Snaps 81936, 82325: open sky over the far
+  // pillars), and its rock carries Alakol's own white streaks, as the Snaps' pale cliffs do
+  // (81185, 83816, 82354; the blog's 37415159206).
+  for (const [i, x] of WINTER_WALK_OVERHANG.entries()) {
     const sprite = i % 2 ? 'cliffside_1c_al1' : 'cliffside_1a_al1';
     const [sw, sh] = sprite === 'cliffside_1a_al1' ? [1336, 878] : [620, 846];
     const s = 0.55;
     // Rotated half a turn about its foot: it hangs down from y to y + h, its foot at -450.
     out.push(deco(sprite, x, -450 - sh * s, sw * s, sh * s, z++, { r: 180, ...(i % 2 ? { flip: true } : {}) }));
+    out.push(deco('snow_cliffface_mask_01a_al1', x, -450 - 836 * s * 0.9, sw * s * 0.9, 836 * s * 0.9, z++, { r: 180, ...(i % 2 ? {} : { flip: true }) }));
+  }
+  // The big icicles hanging from the overhang, the ones you tap (the blog's 37374550569,
+  // 37415159206, 37421343721; Snaps 81185, 83816, 82354, 81936): long, slender, point down.
+  for (const [i, ic] of WINTER_WALK_ICICLES.entries()) {
+    out.push(deco('icicle_1a_al1', ic.x, ic.top + ic.h, Math.round(ic.h * 318 / 842), ic.h, z++, { id: `walk_icicle_${i + 1}`, ...(i % 2 ? { flip: true } : {}) }));
   }
   // Snow pillars: snow cap up, taper down into the snow.
   for (const [i, p] of WINTER_WALK_PILLARS.entries()) {
@@ -353,6 +401,54 @@ function walkFrontDecos() {
   return out;
 }
 
+/**
+ * Round 5, the far end. Parallax layers narrower than the street slide under the camera; this
+ * puts a world x of the walk at the same spot on screen in a layer `lw` wide (a 1280 px view).
+ */
+const PARALLAX_VIEW = 1280;
+const layerX = (wx, lw) => Math.round((wx - WB.l - PARALLAX_VIEW / 2) * (lw - PARALLAX_VIEW) / (WB.r - WB.l - PARALLAX_VIEW) + PARALLAX_VIEW / 2);
+
+/**
+ * The cliff block behind the far end with its snowy ledges (Snaps 80964 "Floating entrance to
+ * Winter Haven", 82161, 82051, 81219; the blog's 37429063895), in the near layer: Alakol's
+ * cliffside rock under its own white streaks, icy toppers on its shoulders. Scenery only (no
+ * platforms): the passage to Winter Haven stays on the walk.
+ */
+function walkCliffBlockDecos(w, h, z0) {
+  let z = z0;
+  const out = [];
+  for (const [i, [wx, s]] of [[1950, 0.62], [2330, 0.5]].entries()) {
+    const x = layerX(wx, w);
+    out.push(deco('cliffside_1a_al1', x, h - 112, 1336 * s, 878 * s, z++, i % 2 ? { flip: true } : {}));
+    out.push(deco('snow_cliffface_mask_01a_al1', x, h - 130, 694 * s * 1.6, 836 * s * 0.95, z++, i % 2 ? {} : { flip: true }));
+    out.push(deco('topper_icy_1a_al1', x - 1336 * s * 0.18, h - 112 - 878 * s * 0.55, 474 * s * 0.9, 200 * s * 0.9, z++));
+  }
+  return out;
+}
+
+/** The blizzard bank behind the far pillars (Snaps 81710, 81936, 82325, 82003), in street-local coordinates. */
+function walkFogBackDecos() {
+  const out = [];
+  let z = 0;
+  const ox = -WB.l;
+  const oy = -WB.t;
+  for (const [i, [x, y, fw, fh]] of [
+    [2300, WF + 10, 900, 420], [2560, WF - 90, 1100, 560], [2820, WF - 40, 1200, 640],
+    [2980, WF - 260, 1000, 560], [2700, WF - 380, 900, 420], [2450, WF - 300, 700, 320],
+  ].entries()) out.push(deco('freeze_single_v1_al1', x + ox, y + oy, fw, fh, z++, i % 2 ? { flip: true } : {}));
+  return out;
+}
+
+/** The bank's near edge, in front at the very end (82325, 82003: the white sweeps over the right of the view). */
+function walkFogFrontDecos() {
+  const ox = -WB.l;
+  const oy = -WB.t;
+  return [
+    deco('freeze_single_v1_al1', 3060 + ox, WF + 120 + oy, 760, 420, 0),
+    deco('freeze_single_v1_al1', 3010 + ox, WF - 170 + oy, 620, 360, 1, { flip: true }),
+  ];
+}
+
 export function winterWalkStreet() {
   const W = WB.r - WB.l;
   const H = WB.b - WB.t;
@@ -361,14 +457,16 @@ export function winterWalkStreet() {
   for (let i = 0; i + 1 < breaks.length; i += 1) platforms.push(plat(`plat_ww_floor_${i + 1}`, breaks[i], breaks[i + 1], WF));
   WINTER_WALK_PILLARS.forEach((p, i) => platforms.push(plat(`plat_ww_pillar_${i + 1}`, p.x - Math.round(p.w * 0.42), p.x + Math.round(p.w * 0.42), p.top)));
   const layers = [
-    { id: 'T_ww_sky', name: 'sky', z: -6, w: 4400, h: H, decos: walkSkyDecos(4400), filters: { brightness: 18 } },
-    { id: 'T_ww_far', name: 'mountains', z: -5, w: 4800, h: H, decos: walkFarDecos(4800, H), filters: { tintColor: 0xc9c6ec, tintAmount: 28, brightness: 14, saturation: -20 } },
-    { id: 'T_ww_firs', name: 'firs', z: -4, w: 5300, h: H, decos: walkFirDecos(5300, H), filters: { tintColor: 0xc6c8f0, tintAmount: 18, brightness: 6 } },
-    { id: 'T_ww_near', name: 'bg_1', z: -3, w: 5700, h: H, decos: walkNearDecos(5700, H), filters: { saturation: -35, brightness: 22, tintColor: 0xd2d4f2, tintAmount: 20 } },
-    { id: 'T_ww_ground', name: 'ground', z: -1, w: W, h: H, decos: walkGroundDecos(), filters: { brightness: 72, saturation: -45, tintColor: 0xead9b6, tintAmount: 45 } },
+    { id: 'T_ww_sky', name: 'sky', z: -9, w: 4400, h: H, decos: walkSkyDecos(4400), filters: { brightness: 18 } },
+    { id: 'T_ww_far', name: 'mountains', z: -8, w: 4800, h: H, decos: walkFarDecos(4800, H), filters: { tintColor: 0xc9c6ec, tintAmount: 28, brightness: 14, saturation: -20 } },
+    { id: 'T_ww_firs', name: 'firs', z: -7, w: 5300, h: H, decos: walkFirDecos(5300, H), filters: { tintColor: 0xc6c8f0, tintAmount: 18, brightness: 6 } },
+    { id: 'T_ww_near', name: 'bg_1', z: -6, w: 5700, h: H, decos: [...walkNearDecos(5700, H), ...walkCliffBlockDecos(5700, H, 900)], filters: { saturation: -35, brightness: 22, tintColor: 0xd2d4f2, tintAmount: 20 } },
+    { id: 'T_ww_fog', name: 'blizzard', z: -5, w: W, h: H, decos: walkFogBackDecos() },
+    { id: 'T_ww_ground', name: 'ground', z: -4, w: W, h: H, decos: walkGroundDecos(), filters: { brightness: 72, saturation: -45, tintColor: 0xead9b6, tintAmount: 45 } },
     { id: 'middleground', name: 'middleground', z: 0, w: W, h: H, decos: walkMiddleDecos() },
     { id: 'T_ww_front_ground', name: 'ground front', z: 1, w: W, h: H, decos: walkFrontGroundDecos(), filters: { brightness: 72, saturation: -45, tintColor: 0xead9b6, tintAmount: 45 } },
     { id: 'T_ww_front', name: 'middleplus', z: 2, w: W, h: H, decos: walkFrontDecos(), filters: { tintColor: 0x9eabd0, tintAmount: 30, brightness: -6 } },
+    { id: 'T_ww_fog_front', name: 'blizzard front', z: 3, w: W, h: H, decos: walkFogFrontDecos() },
   ];
   return shell({
     source: WINTER_WALK_SOURCE_LINE,
@@ -381,10 +479,11 @@ export function winterWalkStreet() {
     gradient: { top: '8CC2EA', bottom: 'DCE2F6' },
     why: {
       street: 'winter_walk.js:24-33 (LIFH2AKJ5I735SV) and inc_data_maps_prod.js:17936 (hub 61); no location XML.',
+      round5: 'The Glitch Tribute Blog (posts 37358133852, 37366254046, 37374550569, 37415159206, 37421343721, 37429063895) and the 147 Winter Walk Snaps (snaps-round3-2026-10-31): the streaked overhang and its big icicles, the cliff block behind the far end, and the blizzard bank with three pillars. Reference only.',
       bounds: 'onStarted drops you at -2875,-81 (winter_walk.js:105), so the walk is the standard -3000..3000 with its floor at -81.',
-      layout: 'Left to right: the camp (campfire, teepee) where you start, a wood of bare dead trees and snowy scrub, an open snowfield, then the cliffs\' end with a basalt overhang, a big bare tree and three snow pillars; firs, white hills and snowy basalt mountains behind.',
+      layout: 'Left to right: the camp (campfire, teepee) where you start, a wood of bare dead trees and snowy scrub, the caption, an open snowfield, then the cliffs\' end with a streaked basalt overhang hung with big icicles, three snow pillars and a cliff block with icy ledges, and at the far end a white blizzard bank with three more pillars, short, middle and tall, before the passage; firs, white hills and snowy basalt mountains behind.',
       route: 'js/winter-walk.js runs the timed route: motes spread over the platforms, the passage to Winter Haven at the right end, and the way home at the same end on the return.',
-      notBuilt: 'The hollow two-trunk tree and the curling green plants have no CC0 art in the shipped set.',
+      notBuilt: 'The big hollow two-trunk tree arching round the caption and the pale green curling plants are known from the blog and the Snaps but not built: no CC0 piece is either. Tapping the icicles down (the blog: "you hit icicles to make these large ones fall") is not built.',
       caption: 'The pictures\' caption line is drawn at the same spot by features/rebuilt-rooms-feature.js (WINTER_WALK_CAPTION; Austin 2026-10-28: one-off approval).',
     },
   });

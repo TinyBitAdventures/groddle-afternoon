@@ -40,7 +40,7 @@ import { SHRINE_ITEM_BASE_COSTS, donationValueFor, giantForStreet } from '../pub
 import { placementRequests } from './build-realtime-objects.mjs';
 import { streetIsRookable } from '../public/js/rook-attack.js?v=c06c0537';
 import { rebuiltRoomEcology } from '../public/js/rebuilt-rooms.js?v=95ca6839';
-import { winterStreetEcology } from '../public/js/winter-walk-streets.js?v=615549da';
+import { winterStreetEcology } from '../public/js/winter-walk-streets.js?v=8607edd3';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

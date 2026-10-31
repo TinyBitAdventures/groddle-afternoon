@@ -187,11 +187,11 @@ import { DISPATCHER_HALF, DISPATCHER_TEXT, dispatcherFits, savedDispatcherRx, si
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
-import { projectApi } from './street-jobs-feature.js?v=195eda11';
+import { projectApi } from './street-jobs-feature.js?v=8e782fd0';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=6ccb3a4f';
-import { towerApi } from './home-tower-feature.js?v=a9047342';
+import { towerApi } from './home-tower-feature.js?v=b1f0239d';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=e676f00f';
-import { wantsHiresDecos } from '../deco-hires.js?v=cc8506f6';
+import { wantsHiresDecos } from '../deco-hires.js?v=eaac1067';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=4b0d8834';
 import { patchesFeature } from './patches-feature.js?v=09eb58f2';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=3996c344';
@@ -215,7 +215,7 @@ import {
   yardStyleFor,
 } from '../home-styles.js?v=f591561f';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
-import { oneArmSignpost } from '../street-render.js?v=90a690df';
+import { oneArmSignpost } from '../street-render.js?v=c7f5186f';
 import { ROCK_CATALOG } from '../mining.js?v=a7eb8740';
 import {
   HOUSE_SIGN,

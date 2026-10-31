@@ -1279,7 +1279,7 @@ export const SHARP_DECOS = new Map([
 ["snow_cap_01d_al1",["svg",0,232,96,0,1.1638,0]],
 ["snow_cliffface_01a_al1",["webp",0,974,838,2.25,0.6786,0]],
 ["snow_cliffface_01b_al1",["webp",0.9869,992,838,3.0,0.7697,0]],
-["snow_cliffface_mask_01a_al1",["webp",0.6089,694,836,2.0,0.6352,0]],
+["snow_cliffface_mask_01a_al1",["webp",0.9524,694,836,3.0,0.9914,0]],
 ["snow_drift_01a_al1",["webp",0.6958,618,168,2.25,0.7321,0]],
 ["snow_drift_01b_al1",["webp",1.065,846,190,3.25,0.6312,1.2009]],
 ["snow_patch_3",["webp",1.3262,564,74,4.0,0.9379,0.8457]],

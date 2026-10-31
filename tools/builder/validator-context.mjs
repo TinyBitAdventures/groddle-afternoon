@@ -6,9 +6,9 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { GAME_DIR } from '../repos.mjs';
-import { DECO_TWINS } from '../../public/js/street-render.js?v=90a690df';
+import { DECO_TWINS } from '../../public/js/street-render.js?v=c7f5186f';
 import { ANIM_DECOS } from '../../public/js/deco-anim-list.js?v=ecfee655';
-import { SHARP_DECOS } from '../../public/js/deco-sharp-list.js?v=14808a90';
+import { SHARP_DECOS } from '../../public/js/deco-sharp-list.js?v=ce2104a8';
 import { compileSchema } from '../../public/js/builder/schema-check.js?v=cc9d1af4';
 import { isZoneTsid, withoutZoneConnects, withoutZoneRows } from '../../public/js/zone-streets.js?v=b40010d5';
 import { setStreetEcologyCatalog } from '../../public/js/street-ecology.js?v=9c1a5f07';

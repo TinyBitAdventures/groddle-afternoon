@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e70532b9';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e116bafc';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8e4dd82a';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -590,7 +590,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=390e4702';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=19db20b0';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=77cb1b6a';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -616,7 +616,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=90a690df';
+} from './js/street-render.js?v=c7f5186f';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -883,7 +883,7 @@ import {
 } from './js/sound-moments.js?v=2f8597cd';
 import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from './js/metabolics.js?v=8504134e';
 import { installHiresIcons } from './js/icon-hires.js?v=5357d4b4';
-import { installHiresDecos } from './js/deco-hires.js?v=cc8506f6';
+import { installHiresDecos } from './js/deco-hires.js?v=eaac1067';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=e56202ee';
 import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=7f816593';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
@@ -902,7 +902,7 @@ import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, placeVerbMen
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=e50c1649';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
-import { sceneAnim, syncAnim } from './js/deco-anim.js?v=2ceda14b';
+import { sceneAnim, syncAnim } from './js/deco-anim.js?v=1b9682e9';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d51e';
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=3753a0d2';
 import * as textureUrls from './js/textures.js?v=db2ce452';

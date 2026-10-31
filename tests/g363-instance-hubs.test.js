@@ -74,7 +74,7 @@ describe('G352: the two snap captions (Austin 2026-10-28: one-off approval)', ()
     const src = read('js/quest-rooms/being-watched.js');
     assert.match(src, /Flickr 8270858639/);
     assert.match(src, /Austin 2026-10-28: one-off approval/);
-    const { CAPTION, FLOOR } = await import('../public/js/quest-rooms/being-watched.js?v=55341016');
+    const { CAPTION, FLOOR } = await import('../public/js/quest-rooms/being-watched.js?v=03a4dac6');
     assert.equal(CAPTION.text, "Ever feel like you're being watched?");
     assert.ok(CAPTION.y < FLOOR && FLOOR - CAPTION.y <= 220);
     assert.match(src, /world\.addChild\(kit\.label\(PIXI, CAPTION\.text, CAPTION\.x, CAPTION\.y, \{ size: 17, fill: 0xffffff/);
@@ -85,7 +85,7 @@ describe('G352: the two snap captions (Austin 2026-10-28: one-off approval)', ()
     assert.match(src, /Flickr 8264519059/);
     assert.match(src, /Flickr 8273330942/);
     assert.match(src, /Austin 2026-10-28: one-off approval/);
-    const { WINTER_WALK_CAPTION, WINTER_WALK_CAMP, WINTER_WALK_FLOOR_Y, WINTER_WALK_BOUNDS } = await import('../public/js/winter-walk-streets.js?v=615549da');
+    const { WINTER_WALK_CAPTION, WINTER_WALK_CAMP, WINTER_WALK_FLOOR_Y, WINTER_WALK_BOUNDS } = await import('../public/js/winter-walk-streets.js?v=8607edd3');
     assert.equal(WINTER_WALK_CAPTION.lines.join(' '), 'Have you ever heard the ding-a-ling-ling sound icicles make when you tappity-tap them?');
     assert.ok(WINTER_WALK_CAPTION.x > WINTER_WALK_CAMP.tent && WINTER_WALK_CAPTION.x < WINTER_WALK_BOUNDS.r);
     assert.ok(WINTER_WALK_CAPTION.y < WINTER_WALK_FLOOR_Y);
@@ -100,8 +100,8 @@ describe('G352: the two snap captions (Austin 2026-10-28: one-off approval)', ()
   });
 
   it('no em-dashes in the captions', async () => {
-    const { CAPTION } = await import('../public/js/quest-rooms/being-watched.js?v=55341016');
-    const { WINTER_WALK_CAPTION } = await import('../public/js/winter-walk-streets.js?v=615549da');
+    const { CAPTION } = await import('../public/js/quest-rooms/being-watched.js?v=03a4dac6');
+    const { WINTER_WALK_CAPTION } = await import('../public/js/winter-walk-streets.js?v=8607edd3');
     assert.ok(!/[—–]/.test(CAPTION.text + WINTER_WALK_CAPTION.lines.join('')));
   });
 });

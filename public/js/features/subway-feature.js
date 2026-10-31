@@ -32,7 +32,7 @@
  */
 
 import { countItem } from '../inventory.js?v=85d4faba';
-import { doorsFeature } from './doors-feature.js?v=b256bac0';
+import { doorsFeature } from './doors-feature.js?v=398097bb';
 import { frameTexture, textureFromUrl } from '../textures.js?v=db2ce452';
 import {
   CAR_FLOOR,

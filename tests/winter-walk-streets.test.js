@@ -28,14 +28,17 @@ import {
   WINTER_HUB,
   WINTER_REPEAT_SOURCE_TSIDS,
   WINTER_WALK_CAMP,
+  WINTER_WALK_ICICLES,
+  WINTER_WALK_OVERHANG,
   WINTER_WALK_PILLARS,
   WINTER_WALK_SOURCE_TSID,
   WINTER_WALK_START,
   WINTER_WALK_TSID,
   isWinterStreetTsid,
   winterStreetEcology,
-} from '../public/js/winter-walk-streets.js?v=615549da';
-import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=47822aae';
+} from '../public/js/winter-walk-streets.js?v=8607edd3';
+import { rebuiltRoomsFeature } from '../public/js/features/rebuilt-rooms-feature.js?v=7e5e5ea9';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=0eb97168';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -160,6 +163,62 @@ describe('Winter Walk after the snaps', () => {
     assert.equal(ret[0].y + walk.bounds.t, WINTER_WALK_START.y, `the homeward leg starts on the floor, not on ${ret[0].id}`);
     // The passage out and the way home are at the right end.
     assert.equal(routeCandidates(walk, 'surface').at(-1).x + walk.bounds.l, 2875);
+  });
+});
+
+describe('Winter Walk, round 5 (the Tribute Blog and the 147 Snaps)', () => {
+  const layer = (id) => walk.layers.find((l) => l.id === id);
+  const mid = layer('middleground').decos;
+
+  it('the arched hollow tree and the curling plants are not built as stand-ins (Austin 2026-10-31)', () => {
+    assert.ok(!walk.layers.some((l) => /arch|curl/i.test(l.id)));
+    const sprites = new Set(walk.layers.flatMap((l) => l.decos.map((d) => d.sprite)));
+    for (const name of ['corey3_tree_redBare_n2', 'ground_cutaway_hollow3', 'plant_fern_1', 'plant_fern_4', 'plant_giant_fern_1']) assert.ok(!sprites.has(name), name);
+    assert.match(walk.why.notBuilt, /not built: no CC0 piece/);
+  });
+
+  it('big icicles hang from the streaked overhang, over head height and clear of the pillar tops', () => {
+    const icicles = mid.filter((d) => d.sprite === 'icicle_1a_al1');
+    assert.equal(icicles.length, WINTER_WALK_ICICLES.length);
+    assert.equal(mid.filter((d) => d.sprite === 'snow_cliffface_mask_01a_al1').length, WINTER_WALK_OVERHANG.length);
+    for (const d of icicles) {
+      const top = d.y - d.h;
+      assert.ok(top < -450 + 30, 'the cap tucks under the overhang');
+      assert.ok(WINTER_WALK_START.y - d.y >= 100, `the point at ${d.y} stays over a standing head`);
+      for (const p of walk.platforms.filter((q) => q.id.startsWith('plat_ww_pillar'))) {
+        assert.ok(d.x + d.w / 2 < p.x1 || d.x - d.w / 2 > p.x2, `${d.id} clear of ${p.id}`);
+      }
+    }
+  });
+
+  it('the far end is a blizzard bank: soft white behind and in front, three pillars short, middle, tall', () => {
+    for (const id of ['T_ww_fog', 'T_ww_fog_front']) assert.ok(layer(id).decos.length && layer(id).decos.every((d) => d.sprite === 'freeze_single_v1_al1'), id);
+    assert.ok(layer('T_ww_fog_front').z > 0, 'the near edge draws in front');
+    const far = WINTER_WALK_PILLARS.filter((p) => p.x > 2000);
+    assert.equal(far.length, 3);
+    assert.ok(far[0].top > far[1].top && far[1].top > far[2].top);
+    // The homeward leg starts on the floor and its three motes (1,098, 600, 720) land on them (82003).
+    const ret = routeCandidates(walk, 'return');
+    const picks = [0, 1, 2].map((i) => ret[Math.round((0.12 + 0.72 * (i / 2)) * (ret.length - 1))]);
+    assert.deepEqual(picks.map((r) => r.id), ['plat_ww_pillar_4', 'plat_ww_pillar_5', 'plat_ww_pillar_6']);
+  });
+
+  it('every pillar is reached on the remake jump from the floor, and nothing strands you (reach graph)', () => {
+    for (const [l, r] of [[1000, 1900], [2050, 3000]]) {
+      const sub = {
+        ...walk,
+        bounds: { ...walk.bounds, l, r },
+        layers: [],
+        platforms: walk.platforms.filter((p) => p.x2 > l && p.x1 < r).map((p) => ({ ...p, x1: Math.max(l, p.x1), x2: Math.min(r, p.x2) })),
+      };
+      const res = reachStreet(sub, [{ x: l + 60, y: WINTER_WALK_START.y - 4, from: 'left' }, { x: r - 60, y: WINTER_WALK_START.y - 4, from: 'right' }]);
+      assert.ok(res.arrivals.every((a) => a.stands));
+      assert.deepEqual(res.unreached, [], `${l}..${r}`);
+      assert.deepEqual(res.traps, []);
+      for (const p of sub.platforms.filter((q) => q.id.startsWith('plat_ww_pillar'))) {
+        assert.ok(res.surfaces.filter((x) => x.line === p.id).every((x) => x.reached), p.id);
+      }
+    }
   });
 });
 
