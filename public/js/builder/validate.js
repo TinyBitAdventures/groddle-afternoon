@@ -348,6 +348,15 @@ export function validateZone(zone, ctx = {}) {
   const arrivals = zoneArrivals(zone);
   const labelOf = (tsid) => zoneTsids.get(tsid)?.street?.label ?? ctx.index?.[resolveTsid(ctx.index, tsid)]?.label ?? null;
   const shippedLabels = ctx.shippedLabels || (ctx.index ? new Set(Object.values(ctx.index).map((r) => lc(r.label))) : null);
+  /** Whether a shipped street leads back to a zone street: its own arms, or a zone edit on it. */
+  const leadsBack = (shipped, zoneTsid) => {
+    const own = aliases(shipped);
+    if ((zone.edits || []).some((e) => own.includes(e.tsid) && [e.connect, ...(e.newSignpost?.connects || [])].some((c) => c && c.tsid === zoneTsid && !c.hidden))) return true;
+    const target = ctx.streetFor ? ctx.streetFor(shipped) : null;
+    // Without the shipped street to look at, give it the benefit of the doubt.
+    if (!ctx.streetFor) return true;
+    return (target?.signposts || []).some((p) => (p.connects || []).some((c) => c.tsid === zoneTsid && !c.hidden));
+  };
 
   for (const row of streets) {
     const key = row.key;
@@ -485,6 +494,11 @@ export function validateZone(zone, ctx = {}) {
         if (inZone && !(inZone.street.signposts || []).some((p) => (p.connects || []).some((x) => x.tsid === s.tsid && !x.hidden))) {
           f('NAV-003', at, `${s.label} leads to ${inZone.street.label}, but no signpost there leads back.`, null, { to: inZone.key }, 'Add an arm back on the other street.');
         }
+        // P3: a road out to a shipped street needs a way back in: the shipped street's own arm
+        // (a fork's) or an edits[] connect from it (spec 4, 11).
+        if (!inZone && shipped && !leadsBack(shipped, s.tsid)) {
+          f('NAV-003', at, `${s.label} leads to ${labelOf(c.tsid) || c.tsid}, but nothing there leads back.`, null, { to: shipped }, `Open ${labelOf(c.tsid) || 'that street'}, pick a signpost and add a way into this draft.`);
+        }
         const target = labelOf(c.tsid);
         if (target != null && c.label !== target) f('NAV-005', at, `The arm reads "${c.label}"; the street is called "${target}".`, null, { label: c.label, street: target }, '');
         const bad = badWords(c.label);
@@ -550,6 +564,47 @@ export function validateZone(zone, ctx = {}) {
     const linked = (zone.edits || []).some((e) => tsids.has(e.connect?.tsid) || (e.newSignpost?.connects || []).some((c) => tsids.has(c.tsid)));
     if (!linked) add('NAV-004', null, 'zone', 'Nothing in the shipped world leads into this zone.', null, {}, 'Link a shipped street to one of the zone\'s streets (edits).');
   }
+  // P3: the zone's edits (spec 4, 11), the ways in from shipped streets: each names a shipped
+  // street (and an existing signpost on it), leads to one of this zone's streets, and lands on a
+  // floor there. NAV-001, NAV-002, NAV-003, NAV-005 and TXT-001, as for the zone's own arms.
+  (Array.isArray(zone.edits) ? zone.edits : []).forEach((e, i) => {
+    const at = `edit/${i}`;
+    const shipped = ctx.index ? resolveTsid(ctx.index, e?.tsid) : e?.tsid;
+    const from = labelOf(e?.tsid) || e?.tsid;
+    if (ctx.index && !shipped) {
+      add('NAV-001', null, at, `Edit ${i} adds a way in from ${e?.tsid}, which is not a shipped street.`, null, { tsid: e?.tsid }, 'Pick the street from the list.');
+      return;
+    }
+    const target = shipped && ctx.streetFor ? ctx.streetFor(shipped) : null;
+    if (e?.op === 'add-connect' && target && !(target.signposts || []).some((p) => p.id === e.signpost)) {
+      add('NAV-001', null, at, `Edit ${i} adds an arm to signpost ${e.signpost} on ${from}, which has no such signpost.`, null, { tsid: e.tsid, signpost: e.signpost }, 'Pick one of that street\'s signposts.');
+    }
+    const conns = e?.op === 'add-connect' ? [e.connect] : (e?.newSignpost?.connects || []);
+    for (const c of conns) {
+      if (!c) continue;
+      const into = zoneTsids.get(c.tsid);
+      if (!into) {
+        add('NAV-001', null, at, `Edit ${i} on ${from} leads to ${c.tsid}, which is not one of this zone's streets.`, null, { tsid: c.tsid }, 'Lead it to one of the zone\'s streets.');
+        continue;
+      }
+      if (c.hidden) continue;
+      if (!c.arrive) {
+        add('NAV-002', null, at, `The way in from ${from} to ${into.street.label} has no arrival point.`, null, { tsid: c.tsid }, 'Work out the arrival: a signpost on the zone street that leads back, standing on a floor.');
+      } else if (into.street.bounds && !platformsScreen(into.street).some((q) => {
+        if (!isStandable(q)) return false;
+        const y = platformYAt(q, c.arrive.x, 4);
+        return y != null && y - c.arrive.y >= -2 && y - c.arrive.y <= 12;
+      })) {
+        add('NAV-002', null, at, `The way in from ${from} lands at ${c.arrive.x}, ${c.arrive.y} on ${into.street.label}, off its floor.`, null, { tsid: c.tsid, arrive: c.arrive }, 'Move the arrival onto a floor.');
+      }
+      if (shipped && !(into.street.signposts || []).some((p) => (p.connects || []).some((x) => aliases(shipped).includes(x.tsid) && !x.hidden))) {
+        add('NAV-003', null, at, `${from} leads to ${into.street.label}, but no signpost there leads back.`, null, { to: into.key, from: shipped }, `Add an arm to ${from} on ${into.street.label}.`);
+      }
+      if (c.label !== into.street.label) add('NAV-005', null, at, `The arm on ${from} reads "${c.label}"; the street is called "${into.street.label}".`, null, { label: c.label, street: into.street.label }, '');
+      const bad = badWords(c.label);
+      if (bad.length) add('TXT-001', null, at, `The arm "${c.label}" on ${from} uses ${bad.join(' and ')}.`, null, { words: bad }, 'Reword it.');
+    }
+  });
   if (zone.hub?.isNew && zone.hub.map) {
     const mapped = new Set((zone.hub.map.streets || []).map((x) => x.tsid));
     const have = new Set(streets.map((s) => s.street?.tsid));

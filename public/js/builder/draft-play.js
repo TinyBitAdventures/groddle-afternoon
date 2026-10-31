@@ -7,7 +7,9 @@
  * 2. registers the draft's streets (street-loader.js registerDraftStreets), so loadStreetData never
  *    fetches them and signposts between them work;
  * 3. merges their population rows into the ecology catalog (street-ecology.js);
- * 4. answers the start tsid, as ?streetdemo= would.
+ * 4. puts the zone's edits on the shipped streets they name (a copy, registered the same way), so
+ *    the new ways into the zone show on those streets too (phase P3);
+ * 5. answers the start tsid, as ?streetdemo= would.
  *
  * practice-mode.js makes every draft link a practice copy, so the real save never records a GZ
  * street. A multiplayer page never takes a draft (and /play/online/ strips every parameter). A
@@ -15,9 +17,10 @@
  * not available." and the game starts on its usual street. A small banner names the draft and its
  * rev, with a link back to the builder.
  */
-import { registerDraftStreets } from '../street-loader.js?v=d6cbbd5c';
+import { registerDraftStreets, loadStreetData, resolveIndexTsid, STREET_INDEX } from '../street-loader.js?v=d6cbbd5c';
+import { streetWithEdits, editsOn } from './zone.js?v=bdc23538';
 import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../street-ecology.js?v=7e30da8f';
-import { createBuilderApi } from './api.js?v=3f83c00b';
+import { createBuilderApi } from './api.js?v=9560d68f';
 
 export const DRAFT_REFUSED = 'That draft is not available.';
 
@@ -58,11 +61,31 @@ export async function startDraftPlay(search, { mode = 'solo', api = createBuilde
   const streets = bundle?.streets || {};
   const tsids = registerDraftStreets(bundle?.index || {}, streets);
   if (!tsids.length) return { refused: DRAFT_REFUSED };
+  await applyZoneEdits(bundle?.edits);
   const eco = getStreetEcologyCatalog();
   setStreetEcologyCatalog({ ...eco, streets: { ...(eco?.streets || {}), ...(bundle.ecology || {}) } });
   const key = want.street && keys[want.street] ? want.street : Object.keys(keys)[0];
   const tsid = keys[key] || tsids[0];
   return { id: want.draft, rev: bundle.draft?.rev ?? 0, tsid, key, label: streets[tsid]?.label || tsid, title: bundle.draft?.title || want.draft };
+}
+
+/**
+ * The zone's edits on shipped streets (a way in from Hechey Track, say): each street they name is
+ * loaded as the game loads it, the edits put on a copy, and the copy registered for this play-test
+ * only. A street that will not load keeps its shipped self. Resolves the tsids it changed.
+ */
+export async function applyZoneEdits(edits, { load = loadStreetData, register = registerDraftStreets } = {}) {
+  const done = [];
+  const tsids = [...new Set((Array.isArray(edits) ? edits : []).map((e) => resolveIndexTsid(e?.tsid)).filter(Boolean))];
+  for (const tsid of tsids) {
+    try {
+      const shipped = await load(tsid);
+      if (!editsOn(edits, tsid).length) continue;
+      const row = { ...(STREET_INDEX.streets[tsid] || {}) };
+      done.push(...register({ [tsid]: row }, { [tsid]: streetWithEdits({ ...shipped, tsid }, edits) }));
+    } catch { /* that street stays as shipped */ }
+  }
+  return done;
 }
 
 /** The banner (or the refusal), a small status line over the game. */

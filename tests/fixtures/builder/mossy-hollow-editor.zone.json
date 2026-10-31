@@ -1,0 +1,423 @@
+{
+ "format": "groddle-zone/1",
+ "id": "mossy-hollow-p3d",
+ "title": "Mossy Hollow",
+ "rev": 13,
+ "hub": {
+  "id": "904",
+  "name": "Mossy Hollow",
+  "isNew": true,
+  "map": {
+   "color": "#1d3a80",
+   "top_color": "#989cb6",
+   "btm_color": "#6a6d7f",
+   "streets": [
+    {
+     "tsid": "GZQH92G9U3EUZB1",
+     "name": "Mossy Lane",
+     "x1": 200,
+     "y1": 230,
+     "x2": 360,
+     "y2": 230
+    },
+    {
+     "tsid": "GZN0W36E4ZZLUMV",
+     "name": "Hollow End",
+     "x1": 360,
+     "y1": 230,
+     "x2": 567,
+     "y2": 289
+    }
+   ],
+   "hubs": [
+    {
+     "tsid": "GLI2V0UN7RD1T2J",
+     "hub_id": "56",
+     "hubName": "Groddle Forest",
+     "label": "To: Groddle Forest",
+     "x": 680,
+     "y": 60,
+     "arrow": 90
+    }
+   ]
+  }
+ },
+ "streets": [
+  {
+   "key": "lane",
+   "street": {
+    "source": "groddle-builder mossy-hollow-p3d",
+    "tsid": "GZQH92G9U3EUZB1",
+    "label": "Mossy Lane",
+    "hubId": "904",
+    "hubName": "Mossy Hollow",
+    "bounds": {
+     "l": -1500,
+     "r": 1500,
+     "t": -1000,
+     "b": 0
+    },
+    "gradient": {
+     "top": "B3FFFF",
+     "bottom": "FDFF8A"
+    },
+    "platforms": [
+     {
+      "id": "plat_1",
+      "x1": -1480,
+      "y1": -60,
+      "x2": 1480,
+      "y2": -60,
+      "pc_perm": -1,
+      "item_perm": -1
+     }
+    ],
+    "layers": [
+     {
+      "id": "sky",
+      "name": "sky",
+      "z": -3,
+      "w": 2010,
+      "h": 1000,
+      "decos": []
+     },
+     {
+      "id": "bg_1",
+      "name": "bg_1",
+      "z": -2,
+      "w": 2640,
+      "h": 1000,
+      "decos": []
+     },
+     {
+      "id": "middleground",
+      "name": "middleground",
+      "z": 0,
+      "w": 3000,
+      "h": 1000,
+      "decos": [
+       {
+        "id": "d_1",
+        "sprite": "evenground_platform_long",
+        "x": -902,
+        "y": -10,
+        "w": 1215,
+        "h": 67,
+        "z": 0,
+        "r": 0
+       },
+       {
+        "id": "d_2",
+        "sprite": "evenground_platform_long",
+        "x": 192,
+        "y": -10,
+        "w": 1215,
+        "h": 67,
+        "z": 1,
+        "r": 0
+       },
+       {
+        "id": "d_3",
+        "sprite": "evenground_platform_long",
+        "x": 903,
+        "y": -10,
+        "w": 1215,
+        "h": 67,
+        "z": 0,
+        "r": 0
+       },
+       {
+        "id": "d_4",
+        "sprite": "bush_3",
+        "x": -1100,
+        "y": -60,
+        "w": 261,
+        "h": 93,
+        "z": 2,
+        "r": 0
+       },
+       {
+        "id": "d_5",
+        "sprite": "flower_bush_5",
+        "x": -1240,
+        "y": -60,
+        "w": 251,
+        "h": 107,
+        "z": 3,
+        "r": 0
+       }
+      ]
+     },
+     {
+      "id": "middleplus",
+      "name": "middleplus",
+      "z": 1,
+      "w": 3000,
+      "h": 1000,
+      "decos": []
+     }
+    ],
+    "signposts": [
+     {
+      "id": "signpost_1",
+      "x": 1350,
+      "y": -60,
+      "w": 150,
+      "h": 200,
+      "connects": [
+       {
+        "tsid": "GZN0W36E4ZZLUMV",
+        "label": "Hollow End",
+        "hub_id": "904",
+        "arrive": {
+         "x": 150,
+         "y": 940
+        }
+       }
+      ]
+     },
+     {
+      "id": "signpost_2",
+      "x": -1350,
+      "y": -60,
+      "w": 150,
+      "h": 200,
+      "connects": [
+       {
+        "tsid": "GLI2V0UN7RD1T2J",
+        "label": "Hechey Track",
+        "hub_id": "56",
+        "arrive": {
+         "x": 2026,
+         "y": 894
+        }
+       }
+      ]
+     }
+    ],
+    "noMap": true,
+    "stats": {
+     "platformCount": 1,
+     "layerCount": 4,
+     "decoCount": 3,
+     "signpostCount": 0
+    }
+   },
+   "population": {
+    "counts": {
+     "trant_fruit": 1,
+     "npc_piggy": 2
+    },
+    "quoins": 6
+   }
+  },
+  {
+   "key": "end",
+   "street": {
+    "source": "groddle-builder mossy-hollow-p3d",
+    "tsid": "GZN0W36E4ZZLUMV",
+    "label": "Hollow End",
+    "hubId": "904",
+    "hubName": "Mossy Hollow",
+    "bounds": {
+     "l": -1000,
+     "r": 1000,
+     "t": -1000,
+     "b": 0
+    },
+    "gradient": {
+     "top": "B3FEFF",
+     "bottom": "9EFFFA"
+    },
+    "platforms": [
+     {
+      "id": "plat_1",
+      "x1": -980,
+      "y1": -60,
+      "x2": 980,
+      "y2": -60,
+      "pc_perm": -1,
+      "item_perm": -1
+     }
+    ],
+    "layers": [
+     {
+      "id": "sky",
+      "name": "sky",
+      "z": -3,
+      "w": 1560,
+      "h": 1000,
+      "decos": []
+     },
+     {
+      "id": "bg_2",
+      "name": "bg_2",
+      "z": -2,
+      "w": 1660,
+      "h": 1000,
+      "filters": {
+       "brightness": -19
+      },
+      "decos": []
+     },
+     {
+      "id": "bg_1",
+      "name": "bg_1",
+      "z": -1,
+      "w": 1800,
+      "h": 1000,
+      "filters": {
+       "brightness": -19
+      },
+      "decos": []
+     },
+     {
+      "id": "middleground",
+      "name": "middleground",
+      "z": 0,
+      "w": 2000,
+      "h": 1000,
+      "decos": [
+       {
+        "id": "d_1",
+        "sprite": "dirt_platform_long",
+        "x": -397,
+        "y": -10,
+        "w": 1226,
+        "h": 67,
+        "z": 0,
+        "r": 0
+       },
+       {
+        "id": "d_2",
+        "sprite": "dirt_platform_long",
+        "x": 397,
+        "y": -10,
+        "w": 1226,
+        "h": 67,
+        "z": 1,
+        "r": 0
+       },
+       {
+        "id": "d_3",
+        "sprite": "tree_coniferous_fg_1",
+        "x": -850,
+        "y": -60,
+        "w": 615,
+        "h": 1356,
+        "z": 2,
+        "r": 0
+       },
+       {
+        "id": "d_4",
+        "sprite": "patch_mossy_1",
+        "x": -850,
+        "y": -60,
+        "w": 144,
+        "h": 34,
+        "z": 3,
+        "r": 0
+       }
+      ]
+     },
+     {
+      "id": "middleplus",
+      "name": "middleplus",
+      "z": 1,
+      "w": 2000,
+      "h": 1000,
+      "decos": []
+     },
+     {
+      "id": "foreground",
+      "name": "foreground",
+      "z": 2,
+      "w": 2160,
+      "h": 1020,
+      "decos": []
+     }
+    ],
+    "signposts": [
+     {
+      "id": "signpost_1",
+      "x": -850,
+      "y": -60,
+      "w": 150,
+      "h": 200,
+      "connects": [
+       {
+        "tsid": "GZQH92G9U3EUZB1",
+        "label": "Mossy Lane",
+        "hub_id": "904",
+        "arrive": {
+         "x": 2850,
+         "y": 940
+        }
+       }
+      ]
+     }
+    ],
+    "noMap": true,
+    "stats": {
+     "platformCount": 1,
+     "layerCount": 6,
+     "decoCount": 2,
+     "signpostCount": 0
+    }
+   },
+   "population": {
+    "counts": {
+     "npc_chicken": 1
+    }
+   }
+  }
+ ],
+ "edits": [
+  {
+   "tsid": "GLI2V0UN7RD1T2J",
+   "op": "add-connect",
+   "signpost": "signpost_3",
+   "connect": {
+    "tsid": "GZQH92G9U3EUZB1",
+    "label": "Mossy Lane",
+    "hub_id": "904",
+    "arrive": {
+     "x": 150,
+     "y": 940
+    }
+   }
+  }
+ ],
+ "assets": {
+  "evenground_platform_long": {
+   "origin": "tinyspeck-cc0",
+   "licence": "CC0-1.0",
+   "source": "groddle1.swf#evenground_platform_long"
+  },
+  "dirt_platform_long": {
+   "origin": "tinyspeck-cc0",
+   "licence": "CC0-1.0",
+   "source": "groddle1.swf#dirt_platform_long"
+  },
+  "tree_coniferous_fg_1": {
+   "origin": "tinyspeck-cc0",
+   "licence": "CC0-1.0",
+   "source": "groddle1.swf#tree_coniferous_fg_1"
+  },
+  "patch_mossy_1": {
+   "origin": "tinyspeck-cc0",
+   "licence": "CC0-1.0",
+   "source": "groddle1.swf#patch_mossy_1"
+  },
+  "bush_3": {
+   "origin": "tinyspeck-cc0",
+   "licence": "CC0-1.0",
+   "source": "groddle1.swf#bush_3"
+  },
+  "flower_bush_5": {
+   "origin": "tinyspeck-cc0",
+   "licence": "CC0-1.0",
+   "source": "groddle1.swf#flower_bush_5"
+  }
+ }
+}

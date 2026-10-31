@@ -30,8 +30,10 @@
             { "id": "d_14", "sprite": "heights_topper_2", "x": 1350, "y": -150, "w": 220, "h": 60, "z": 2, "r": 0, "flip": true } ] }
         ],
         "signposts": [ { "id": "signpost_1", "x": 1350, "y": -150, "w": 100, "h": 200, "connects": [
-          { "tsid": "GZ0000000000002", "label": "Hollow End", "hub_id": "900", "arrive": { "x": 150, "y": 940 } } ] } ],
-        "stats": { "platformCount": 2, "layerCount": 2, "decoCount": 3, "signpostCount": 1 }
+          { "tsid": "GZ0000000000002", "label": "Hollow End", "hub_id": "900", "arrive": { "x": 150, "y": 940 } } ] },
+          { "id": "signpost_2", "x": -1350, "y": -60, "w": 100, "h": 200, "connects": [
+          { "tsid": "GLI2V0UN7RD1T2J", "label": "Hechey Track", "hub_id": "56", "arrive": { "x": 2026, "y": 894 } } ] } ],
+        "stats": { "platformCount": 2, "layerCount": 2, "decoCount": 3, "signpostCount": 2 }
       },
       "population": { "counts": { "npc_piggy": 2, "trant_fruit": 1 }, "quoins": 6 },
       "editor": { "camera": { "x": 1000, "y": 400, "zoom": 1 }, "lockedLayers": ["sky"] }
@@ -52,7 +54,7 @@
       }
     }
   ],
-  "edits": [ { "tsid": "GLI2V0UN7RD1T2J", "op": "add-connect", "signpost": "signpost_1",
+  "edits": [ { "tsid": "GLI2V0UN7RD1T2J", "op": "add-connect", "signpost": "signpost_3",
     "connect": { "tsid": "GZ0000000000001", "label": "Mossy Lane", "hub_id": "900", "arrive": { "x": 150, "y": 940 } } } ],
   "assets": {
     "bush_3": { "origin": "tinyspeck-cc0", "licence": "CC0-1.0", "source": "groddle1.swf#bush_3" },

@@ -20,6 +20,13 @@
  * (js/builder/validate-worker.js) with its findings panel. Until the worker exists the editor works
  * without it, and the reach map is worked out here from the view centre.
  *
+ * P3: new zones (js/builder/editor-zone.js): a new draft with a new hub (ids from 900) or an
+ * existing one; new streets from templates (js/builder/templates.js); the hub map editor; each
+ * street's population with the planner's spots (an overlay); and the zone's ways in from shipped
+ * streets (edits[]): open a shipped street with a draft chosen, pick a signpost, add a way in. The
+ * deco picker (js/builder/editor-picker.js, D): search, facets, thumbnails, drag or Enter to place,
+ * and new art brought in through the site's intake.
+ *
  * Addresses: #draft=<id>&street=<key> opens a draft's street, #view=<tsid> a shipped street.
  * QA: window.groddleBuilderQA (state, camera, matchView, select, anchorOf, selectGeo, geoHandles).
  */
@@ -27,17 +34,21 @@ import { buildStreetView, loadDecoManifest, loadSignpostTextures, DECO_TWINS, fl
 import { worldToScreen, platformsScreen, isStandable, streetWidth, streetHeight, navigableSignposts } from '../street-model.js?v=23b926e5';
 import { ensureStreetIndex, STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=d6cbbd5c';
 import { loadStreetEcologyCatalog, ecologyForStreet } from '../street-ecology.js?v=7e30da8f';
-import { createBuilderApi } from './api.js?v=3f83c00b';
-import { DraftSession, statusWords, SAVE_MS, POLL_MS } from './session.js?v=28b56d66';
-import { forkStreet, forkOps, newTsid, streetKeyFrom, relayerPosition, isLayerLocal, withDecoIds, floorUnder, libraryAsset } from './zone.js?v=9608addf';
-import { nextDecoId, findDeco } from './ops.js?v=28c0d569';
-import { decoBox, contains, handlePoints, resizeBy, rotationTo, meetsRect, corners } from './handles.js?v=e215d17d';
+import { createBuilderApi } from './api.js?v=9560d68f';
+import { DraftSession, statusWords, SAVE_MS, POLL_MS } from './session.js?v=dc9f083b';
+import { forkStreet, forkOps, newTsid, streetKeyFrom, relayerPosition, isLayerLocal, withDecoIds, floorUnder, libraryAsset, screenToDeco, streetWithEdits, editsOn, linkEdit } from './zone.js?v=bdc23538';
+import { mountPicker, PICK_MIME } from './editor-picker.js?v=724352b6';
+import { newDraftDialog, newStreetDialog, hubMapDialog, populationSection, zoneSection, plannedSpots, SPOT_GROUPS, spotGroup } from './editor-zone.js?v=fb167700';
+import { decoFor, NEW_ART_BUNDLE } from './deco-search.js?v=fda9b16b';
+import { populationForStreet, planStreetPlacements } from '../street-ecology.js?v=7e30da8f';
+import { nextDecoId, findDeco } from './ops.js?v=2ca2cc56';
+import { decoBox, contains, handlePoints, resizeBy, rotationTo, meetsRect, corners } from './handles.js?v=f6ab68c4';
 import { layerRole } from './layer-role.js?v=e585f610';
 import { installNewArt, withNewArt, provenanceSection } from './new-art.js?v=b2411f6f';
 import * as textureUrls from '../textures.js?v=01a295a1';
 import { installPixiFixes } from '../pixi-fixes.js?v=173fb649';
 import { installHiresDecos } from '../deco-hires.js?v=a65f2d79';
-import { GEO_KINDS, GEO_LIST, GEO_WORDS, PERMS, geoKey, parseGeoKey, geoItem, geoKindOf, geoShape, geoHits, geoHandles, handleWorld, dragHandle, moveBy, changedFields, drawnItem, postOnFloor, defaultItem, permKey, permValue, permName, wallSides, dashes, arriveFor, newConnect, shapeBounds } from './geometry-handles.js?v=54aaffb7';
+import { GEO_KINDS, GEO_LIST, GEO_WORDS, PERMS, geoKey, parseGeoKey, geoItem, geoKindOf, geoShape, geoHits, geoHandles, handleWorld, dragHandle, moveBy, changedFields, drawnItem, postOnFloor, defaultItem, permKey, permValue, permName, wallSides, dashes, arriveFor, newConnect, shapeBounds } from './geometry-handles.js?v=3befd62c';
 import { SNAP_PX, GUIDE_PX, endPoints, joinedEnds, snapPlatform, snapDrawnPlatform, snapPoint, floorSnapY, rulerTicks, bestPull } from './snap.js?v=c1cb84a7';
 
 export const ZOOM_MIN = 0.05;
@@ -47,6 +58,8 @@ export const PANELS_KEY = 'groddle.builder.panels';
 export const OVERLAYS_KEY = 'groddle.builder.overlays';
 export const SNAP_KEY = 'groddle.builder.snap';
 const HANDLE_PX = 7;
+/** How many arms the game draws on a signpost (street-render.js, connects.slice(0, 4)). */
+const SIGN_ARMS_SHOWN = 4;
 /** Rulers' thickness in canvas px. */
 const RULER_PX = 20;
 /** Geometry is picked this many canvas px from a line. */
@@ -63,7 +76,7 @@ export const VIEW_FRAMES = Object.freeze([
   Object.freeze({ id: 'wide', label: 'Wide', w: 960, h: 408 }),
   Object.freeze({ id: 'original', label: 'Original', w: 1000, h: 600 }),
 ]);
-export const OVERLAY_DEFAULTS = Object.freeze({ geometry: true, reach: false, arc: false, frame: false, rulers: false, layout: false, edgePan: true });
+export const OVERLAY_DEFAULTS = Object.freeze({ geometry: true, reach: false, arc: false, frame: false, rulers: false, layout: false, edgePan: true, populations: false });
 export const SEVERITIES = Object.freeze([
   Object.freeze({ id: 'fatal', label: 'Fatal' }),
   Object.freeze({ id: 'error', label: 'Errors' }),
@@ -85,6 +98,15 @@ export function parseHash(hash) {
 export function hashFor({ draft = '', street = '', view = '' }) {
   if (draft) return `#draft=${encodeURIComponent(draft)}${street ? `&street=${encodeURIComponent(street)}` : ''}`;
   return view ? `#view=${encodeURIComponent(view)}` : '';
+}
+
+/**
+ * PURE: the page's own address with a new hash. The page has <base href="/">, so a bare "#..."
+ * given to history.replaceState would point the address bar at the site's home page (and a
+ * reload would leave the builder).
+ */
+export function addressFor(loc, hash) {
+  return `${loc.pathname}${loc.search || ''}${hash}`;
 }
 
 /** PURE: the play-test address (spec 6.8): a practice copy that starts on the draft street. */
@@ -288,6 +310,12 @@ async function boot() {
     reachPinned: false, // "Reach from the view centre" was asked for: show it over the validator's
     validate: { state: 'idle', report: null, id: 0, timer: 0, worker: null },
     shippedStreets: new Map(), // tsid -> street JSON (signpost arm targets)
+    // —— P3 ——
+    viewShown: null, // { key, street }: the shipped street on screen with the draft's edits on it
+    spots: null, // { key, spots } the planner's spots for the street on screen (the populations overlay)
+    profiles: null, // assets/content/style-profiles.json (templates)
+    hubs: null, // [{ id, name }] Tiny Speck's hubs (assets/maps/index.json)
+    validateMod: null, // js/builder/validate.js (placementRequests), loaded with the populations overlay
   };
   const panels = store.get(PANELS_KEY, { left: true, right: true });
 
@@ -299,6 +327,8 @@ async function boot() {
   const btn = (text, attrs = {}) => el('button', { type: 'button', class: 'builder-btn', ...attrs }, text);
   const openBtn = btn('Open street', { 'data-builder-open': '', 'aria-haspopup': 'dialog' });
   const forkBtn = btn('Fork into draft', { 'data-builder-fork': '', 'aria-haspopup': 'dialog', hidden: true });
+  const newDraftBtn = btn('New draft', { 'data-builder-new-draft-open': '', 'aria-haspopup': 'dialog', title: 'A new zone: its own streets and a hub' });
+  const newStreetBtn = btn('New street', { 'data-builder-new-street-open': '', 'aria-haspopup': 'dialog', hidden: true, title: 'A new street in this draft, from a template' });
   const undoBtn = btn('Undo', { 'data-builder-undo': '', 'aria-keyshortcuts': 'Control+Z Meta+Z', disabled: true });
   const redoBtn = btn('Redo', { 'data-builder-redo': '', 'aria-keyshortcuts': 'Control+Shift+Z Meta+Shift+Z', disabled: true });
   const zoomOut = btn('−', { 'aria-label': 'Zoom out' });
@@ -309,7 +339,7 @@ async function boot() {
   const keysBtn = btn('Keys', { 'aria-haspopup': 'dialog', 'aria-keyshortcuts': 'Shift+?' });
   const validateBtn = btn('Validate', { class: 'builder-btn builder-validate', 'data-builder-validate': '', 'aria-controls': 'builder-findings', hidden: true, title: 'Check the draft: reach, links, geometry' });
   const bar = el('header', { class: 'builder-bar' },
-    el('div', { class: 'builder-bar-group' }, el('a', { href: '/console/#builder', class: 'builder-back' }, 'Console'), draftSel, streetSel, openBtn, forkBtn),
+    el('div', { class: 'builder-bar-group' }, el('a', { href: '/console/#builder', class: 'builder-back' }, 'Console'), newDraftBtn, draftSel, streetSel, newStreetBtn, openBtn, forkBtn),
     el('div', { class: 'builder-bar-group' }, undoBtn, redoBtn, zoomOut, zoomLabel, zoomIn, fitBtn, keysBtn, validateBtn, playBtn),
     status);
   const layersList = el('ul', { class: 'builder-layers', 'aria-label': 'Layers', 'data-builder-layers': '' });
@@ -399,7 +429,22 @@ async function boot() {
   const [available] = await Promise.all([loadDecoManifest(), loadSignpostTextures(PIXI), ensureStreetIndex(), loadStreetEcologyCatalog()]);
 
   // —— The street being drawn ——
-  const street = () => (S.mode === 'draft' ? S.session?.zone.streets.find((s) => s.key === S.streetKey)?.street : S.viewStreet) || null;
+  const street = () => (S.mode === 'draft' ? S.session?.zone.streets.find((s) => s.key === S.streetKey)?.street : viewWithEdits()) || null;
+  /**
+   * The shipped street on screen, with the open draft's ways in on it (edits[]): the arms show on
+   * its signposts as they will once published. The shipped file is never changed.
+   */
+  function viewWithEdits() {
+    const v = S.viewStreet;
+    if (!v) return null;
+    const edits = S.session ? editsOn(S.session.zone.edits, v.tsid) : [];
+    if (!edits.length) return v;
+    const key = `${v.tsid}|${JSON.stringify(edits)}`;
+    if (S.viewShown?.key !== key) S.viewShown = { key, street: streetWithEdits(v, edits) };
+    return S.viewShown.street;
+  }
+  /** The zone's street row on screen (draft mode), or null. */
+  const streetRowShown = () => (S.mode === 'draft' ? S.session?.zone.streets.find((s) => s.key === S.streetKey) || null : null);
   const editable = () => S.mode === 'draft' && Boolean(street());
   const layerOf = (id) => (street()?.layers || []).find((l) => l.id === id) || null;
   const decoOf = (id) => {
@@ -488,6 +533,8 @@ async function boot() {
     for (const c of changed) {
       const [k, id] = c.split('/');
       if (k !== key) continue;
+      // The population and editor state draw nothing (the spots overlay follows S.version).
+      if (id === 'population' || id === 'editor') continue;
       if (!/^d_\d+$/.test(id || '')) {
         // Lines and walls are only the overlay's; ladders (their tiles) and signposts are drawn.
         const kind = geoKindOf(s, id);
@@ -622,13 +669,14 @@ async function boot() {
   function drawGeometry() {
     const s = street();
     const z = S.cam.zoom;
-    const key = `${S.version}|${z}|${S.overlays.geometry}|${S.overlays.reach}|${S.validate.report ? S.validate.id : 0}|${S.reachLocal?.key || ''}|${S.geoPreview.size ? Math.random() : ''}`;
+    const key = `${S.version}|${z}|${S.overlays.geometry}|${S.overlays.reach}|${S.overlays.populations}|${S.validateMod ? 1 : 0}|${S.validate.report ? S.validate.id : 0}|${S.reachLocal?.key || ''}|${S.geoPreview.size ? Math.random() : ''}`;
     if (key === S.geoDrawn) return;
     S.geoDrawn = key;
     geoGfx.clear();
     if (!s) return;
     const px = (n) => n / z;
     if (S.overlays.reach) drawReach(s, px);
+    if (S.overlays.populations) drawSpots(s, px);
     if (!S.overlays.geometry) return;
     const shape = (kind, item) => geoShape(s, kind, geoShown(kind, item));
     // Platforms by permeability: Floor solid, Roof with ticks under it, Soft dashed, Hard thick.
@@ -698,6 +746,35 @@ async function boot() {
     }
     geoGfx.stroke({ width: px(2), color: COLOURS.post });
     strokeSegs(geoGfx, dashed, { width: px(2), color: COLOURS.post });
+  }
+
+  /**
+   * The populations overlay (spec 6.7): where the ecology planner puts this street's population
+   * (js/street-ecology.js planStreetPlacements, seeded by the street's tsid, as the game plans it),
+   * a dot per thing coloured by kind.
+   */
+  function drawSpots(s, px) {
+    const row = streetRowShown();
+    if (!row?.population || !S.validateMod) {
+      if (!S.validateMod) loadValidateMod();
+      S.spots = null;
+      return;
+    }
+    const key = `${S.streetKey}|${S.version}`;
+    if (S.spots?.key !== key) {
+      S.spots = { key, spots: plannedSpots({ street: s, population: row.population, platformsScreen, worldToScreen, populationForStreet, planStreetPlacements, placementRequests: S.validateMod.placementRequests, worldW: streetWidth(s) }) };
+      if (!S.selected.length && !S.geoSel.length) queueMicrotask(renderInspector);
+    }
+    for (const g of SPOT_GROUPS) {
+      const mine = S.spots.spots.filter((p) => spotGroup(p.key) === g);
+      if (!mine.length) continue;
+      for (const p of mine) geoGfx.circle(p.x, p.y - px(9), px(g.id === 'player' ? 9 : 7));
+      geoGfx.fill({ color: g.colour, alpha: 0.9 }).stroke({ width: px(2), color: 0x000000, alpha: 0.6 });
+    }
+  }
+  function loadValidateMod() {
+    if (S.validateModLoading) return;
+    S.validateModLoading = import('./validate.js?v=ef755481').then((m) => { S.validateMod = m; S.geoDrawn = ''; }).catch(() => { S.validateModLoading = null; });
   }
 
   /** The reach to draw: the validator's for a draft street, else the one worked out here. */
@@ -978,6 +1055,16 @@ async function boot() {
       failed(err);
     }
   }
+  /** Ops on the draft as a whole (the hub map, ways in, new streets): a draft is enough, even with a shipped street on screen. */
+  function commitZone(ops, label) {
+    if (!ops.length) return;
+    if (!S.session) return say('Choose a draft first (the Draft menu), or make a new one.', 'bad');
+    try {
+      S.session.apply(ops, { label });
+    } catch (err) {
+      failed(err);
+    }
+  }
   const setOps = (changes) => changes.filter(([, set]) => Object.keys(set).length).map(([id, set]) => ({ op: 'deco.set', street: S.streetKey, id, set }));
   function editSelected(fn, label) {
     const changes = [];
@@ -1158,7 +1245,11 @@ async function boot() {
       status.textContent = statusWords(S.session);
       status.dataset.state = S.session.status;
     } else if (['apply', 'undo', 'redo'].includes(e.kind)) {
-      refresh(e.changed);
+      // A way in changed with a shipped street on screen: draw it again with its new arms.
+      if (S.mode === 'view' && e.changed?.includes('edits')) mount();
+      else refresh(e.changed);
+      if (e.changed?.some((c) => c === 'hub' || c === 'edits' || !c.includes('/'))) hubMap.refresh();
+      if (e.changed?.some((c) => c.startsWith('asset:'))) picker.refresh();
       S.selected = S.selected.filter((id) => decoOf(id)[0]);
       S.geoSel = geoSelected().map((g) => g.key);
       if (e.changed?.includes(S.streetKey)) fillStreets();
@@ -1166,6 +1257,7 @@ async function boot() {
       scheduleValidate();
     } else {
       // remote, rebased, conflict: the whole draft may differ.
+      hubMap.refresh();
       fillStreets();
       if (!street()) return openDraftStreet('');
       mount();
@@ -1192,6 +1284,7 @@ async function boot() {
     redoBtn.disabled = !S.session?.canRedo;
     playBtn.disabled = S.mode !== 'draft' || !street();
     forkBtn.hidden = S.mode !== 'view';
+    newStreetBtn.hidden = !S.session;
     canvas.dataset.selected = [...S.selected, ...S.geoSel].join(',');
   }
   function renderTools() {
@@ -1332,6 +1425,11 @@ async function boot() {
         add(el('h3', { class: 'builder-h3', text: 'Add at the view centre' }),
           el('div', { class: 'builder-row builder-wrap' }, ...GEO_KINDS.map((kind) => btn(GEO_WORDS[kind], { class: 'builder-mini', 'data-add': kind, onclick: () => addAtCentre(kind) }))));
       }
+      const row = streetRowShown();
+      if (row) {
+        add(populationSection({ el, btn, field, row, editable: editable(), commit, spotsShown: S.overlays.populations, toggleSpots: (on) => setOverlay('populations', on), planned: S.spots?.spots?.length || 0 }));
+        add(zoneSection({ el, btn, zone: S.session.zone, labelOf: (t) => targetOf(t).label, editable: Boolean(S.session), commit: commitZone, openHubMap: () => hubMap.open(), openShipped: (t) => openShipped(t) }));
+      }
       if (layer) {
         const hid = el('input', { type: 'checkbox', name: 'layer-hidden', checked: layer.hidden ? true : null, disabled: !editable() || null });
         hid.addEventListener('change', () => commit([{ op: 'layer.set', street: S.streetKey, layer: layer.id, ...(hid.checked ? { set: { hidden: true } } : { unset: ['hidden'] }) }], 'layer'));
@@ -1403,6 +1501,64 @@ async function boot() {
     const item = defaultItem(s, kind, { x: S.cam.x + w / 2, y: S.cam.y + h / 2 });
     if (item) addGeometry([[kind, item]], 'add');
   }
+  // —— The deco picker's placing (spec 6.4) ——
+  /**
+   * Place a picker row on the active layer: at the view centre, or where it was dropped (`at`: a
+   * pointer event's client x, y). A middleground deco stands on the floor under it while snapping
+   * is on. A library deco brings its provenance row; new art has its own already.
+   */
+  function placeDeco(row, at = null) {
+    if (!editable()) return S.mode === 'view' ? readOnlyNote() : say('Open a draft street first (New street, or Fork into draft).', 'bad');
+    const s = street();
+    const layer = layerOf(S.activeLayer);
+    if (!layer) return say('Pick a layer first.', 'bad');
+    if (S.locked.has(layer.id)) return say(`${layer.name || layer.id} is locked. Unlock it (L) to place on it.`, 'bad');
+    let p;
+    if (at) {
+      const r = canvas.getBoundingClientRect();
+      p = toWorld(at.clientX - r.left, at.clientY - r.top);
+    } else {
+      const { w, h } = viewSize();
+      p = { x: S.cam.x + w / 2, y: S.cam.y + h / 2 };
+    }
+    if (layer.id === 'middleground' && S.snap.on) {
+      const floor = floorUnder(platformsScreen(s), p.x, p.y, isStandable);
+      if (floor && floor.y >= p.y - 2 && floor.y - p.y < 400 && Math.abs(floor.x - p.x) < 2) p = { x: p.x, y: floor.y };
+    }
+    const pos = screenToDeco(s, layer, p, offsetOf(layer.id));
+    const id = nextDecoId(s);
+    const z = (layer.decos || []).reduce((m, d) => Math.max(m, Number(d.z) || 0), 0) + 1;
+    const deco = decoFor(row, { id, x: pos.x, y: pos.y, z });
+    const ops = [];
+    if (row.bundle !== NEW_ART_BUNDLE && !S.session.zone.assets?.[row.name] && row.source) ops.push({ op: 'asset.set', name: row.name, asset: libraryAsset(row) });
+    ops.push({ op: 'deco.add', street: S.streetKey, layer: layer.id, deco });
+    commit(ops, 'place');
+    if (decoOf(id)[0]) {
+      select([id]);
+      say(`Placed ${row.name} on ${layer.name || layer.id} at ${deco.x}, ${deco.y}, ${deco.w} by ${deco.h}.`);
+    }
+  }
+  canvasHost.addEventListener('dragover', (e) => {
+    if (![...(e.dataTransfer?.types || [])].includes(PICK_MIME)) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  });
+  canvasHost.addEventListener('drop', async (e) => {
+    const name = e.dataTransfer?.getData(PICK_MIME);
+    if (!name) return;
+    e.preventDefault();
+    const row = picker.find(name) || (await loadCatalog()).get(name);
+    if (row) placeDeco(row, { clientX: e.clientX, clientY: e.clientY });
+  });
+  /** New art through the site's intake (P5's POST admin/builder/assets), then its asset.set op. */
+  async function uploadArt(body) {
+    if (!S.session) throw new Error('Open a draft first.');
+    await S.session.flush();
+    const r = await api.intake(body);
+    if (r?.op) commitZone([r.op], 'new art');
+    return r;
+  }
+
   function permSelect(name, value, onPick, { wall = false, dis = {} } = {}) {
     const sel = el('select', { name, ...dis },
       ...(value === undefined ? [el('option', { value: '', selected: true }, 'Not set (a floor)')] : []),
@@ -1454,6 +1610,7 @@ async function boot() {
         num('x', 'x (centre)', item.x, (n) => set({ x: Math.round(n) })), num('y', 'y (foot)', item.y, (n) => set({ y: Math.round(n) })),
         num('w', 'Width', item.w, (n) => set({ w: Math.max(1, Math.round(n)) }), { min: '1' }), num('h', 'Height', item.h, (n) => set({ h: Math.max(1, Math.round(n)) }), { min: '1' })));
       buildArms(s, item, add, dis);
+      if (S.mode === 'view' && S.session) buildWaysIn(s, item, add);
     }
     const del = btn(`Delete this ${GEO_WORDS[kind].toLowerCase()}`, { class: 'builder-mini', ...dis });
     del.addEventListener('click', () => remove());
@@ -1473,12 +1630,17 @@ async function boot() {
   async function targetStreet(target) {
     if (target.key) return S.session?.zone.streets.find((r) => r.key === target.key)?.street || null;
     const key = resolveIndexTsid(target.tsid);
-    if (S.shippedStreets.has(key)) return S.shippedStreets.get(key);
+    if (S.shippedStreets.has(key)) return withDraftEdits(S.shippedStreets.get(key));
     const file = key && STREET_INDEX.streets[key]?.file;
     if (!file) return null;
     const data = await (await fetch(file)).json();
     S.shippedStreets.set(key, data);
-    return data;
+    return withDraftEdits(data);
+  }
+  /** A shipped street with the open draft's edits on it (as the play-test and publishing put them). */
+  function withDraftEdits(data) {
+    const edits = S.session ? editsOn(S.session.zone.edits, data.tsid) : [];
+    return edits.length ? streetWithEdits(data, edits) : data;
   }
   /** The draft street (or shipped row) a connect's tsid names, for its words. */
   function targetOf(tsid) {
@@ -1530,6 +1692,15 @@ async function boot() {
       work.addEventListener('click', () => workOutArrive(post, at));
       const drop = btn('Remove arm', { class: 'builder-mini', name: `arm-remove-${at}`, ...dis });
       drop.addEventListener('click', () => commit([{ op: 'connect.remove', street: S.streetKey, signpost: post.id, at }], 'arm'));
+      // A road out to a shipped street: offer the way back in (an edit on that street).
+      const shippedKey = S.mode === 'draft' && !meta.key ? resolveIndexTsid(c.tsid) : null;
+      const back = shippedKey && !(S.session.zone.edits || []).some((e) => editsOn([e], shippedKey).length && [e.connect, ...(e.newSignpost?.connects || [])].some((x) => x?.tsid === s.tsid))
+        ? btn(`Add the way back on ${meta.label}`, { class: 'builder-mini', name: `arm-back-${at}`, title: 'Opens that street: pick a signpost there and add a way into this draft' })
+        : null;
+      back?.addEventListener('click', async () => {
+        await openShipped(shippedKey);
+        say(`Pick a signpost on ${meta.label} (geometry or the Signposts list), then "Add a way in" in the inspector. Your draft stays chosen.`);
+      });
       add(el('fieldset', { class: 'builder-fieldset builder-arm', 'data-arm': String(at) },
         el('legend', { text: `To ${meta.label}` }),
         el('p', { class: 'builder-sub', text: `${c.tsid}${meta.hub ? ` · ${meta.hub}` : ''}${c.hub_id ? ` · hub ${c.hub_id}` : ''}` }),
@@ -1537,10 +1708,11 @@ async function boot() {
         el('label', { class: 'builder-check' }, hid, ' Hidden (the game leaves it off the post)'),
         el('div', { class: 'builder-grid' }, field('Arrive x', ax), field('Arrive y', ay)),
         el('p', { class: 'builder-sub', text: 'Where players land on that street, in its screen px.' }),
-        el('div', { class: 'builder-row' }, work, drop)));
+        el('div', { class: 'builder-row builder-wrap' }, work, drop, back)));
     });
     if (dis.disabled) return;
     if (arms.length >= 8) return add(el('p', { class: 'builder-sub', text: 'Eight arms is the most a signpost holds.' }));
+    if (arms.filter((c) => !c.hidden).length >= SIGN_ARMS_SHOWN) add(el('p', { class: 'builder-sub builder-warn', text: `The game draws a signpost's first ${SIGN_ARMS_SHOWN} arms; another one will not show. Use a second signpost.` }));
     const search = el('input', { type: 'search', name: 'arm-search', 'aria-label': 'Street to link to', placeholder: 'Street to link to', autocomplete: 'off', spellcheck: 'false' });
     const results = el('ul', { class: 'builder-results builder-arm-results', 'aria-label': 'Streets to link to' });
     const fill = async () => {
@@ -1553,6 +1725,42 @@ async function boot() {
     };
     search.addEventListener('input', fill);
     add(el('h3', { class: 'builder-h3', text: 'Add an arm' }), search, results);
+  }
+
+  // —— Ways into a draft from a shipped street (edits[], spec 4 and 11) ——
+  /**
+   * On a shipped street's signpost, with a draft chosen: the arms the draft adds to it (removable)
+   * and a way to add one into each of the draft's streets. The arrival is where that street's
+   * signpost leading back here stands; without one the arm has none yet (NAV-002 says so).
+   */
+  function buildWaysIn(s, post, add) {
+    const zone = S.session.zone;
+    const mine = (zone.edits || []).map((e, at) => ({ e, at })).filter(({ e }) => editsOn([e], s.tsid).length && e.op === 'add-connect' && e.signpost === post.id);
+    add(el('h3', { class: 'builder-h3', text: `Ways into ${zone.title} (${mine.length})` }),
+      el('p', { class: 'builder-sub', text: 'Arms this draft adds to this shipped signpost. The shipped file is never changed; publishing adds them.' }));
+    for (const { e, at } of mine) {
+      const drop = btn('Remove', { class: 'builder-mini', 'data-builder-edit-remove': String(at) });
+      drop.addEventListener('click', () => commitZone([{ op: 'edit.remove', at }], 'way in'));
+      add(el('div', { class: 'builder-row builder-arm-in', 'data-builder-way-in': String(at) },
+        el('span', { text: `To ${e.connect.label}${e.connect.arrive ? `, arriving at ${e.connect.arrive.x}, ${e.connect.arrive.y}` : ', no arrival yet'}` }), drop));
+    }
+    const targets = zone.streets.filter((r) => !mine.some(({ e }) => e.connect.tsid === r.street.tsid));
+    if (!targets.length) return;
+    // The game draws a signpost's first four arms (street-render.js): a fifth would not show.
+    if ((post.connects || []).filter((c) => !c.hidden).length >= SIGN_ARMS_SHOWN) {
+      add(el('p', { class: 'builder-sub builder-warn', 'data-builder-post-full': '', text: `This signpost already shows ${SIGN_ARMS_SHOWN} arms, the most the game draws. Pick another signpost on ${s.label}.` }));
+      return;
+    }
+    const pick = el('select', { name: 'way-in-street', 'aria-label': 'Draft street the arm leads to' }, ...targets.map((r) => el('option', { value: r.key }, r.street.label)));
+    const go = btn('Add a way in', { class: 'builder-mini builder-primary', 'data-builder-way-in-add': '' });
+    go.addEventListener('click', () => {
+      const r = zone.streets.find((x) => x.key === pick.value);
+      if (!r) return;
+      const arrive = arriveFor(r.street, s.tsid);
+      commitZone([{ op: 'edit.add', edit: linkEdit({ shippedTsid: S.viewTsid, signpost: post.id, target: { tsid: r.street.tsid, label: r.street.label, hubId: r.street.hubId }, arrive }) }], 'way in');
+      say(arrive ? `${s.label} now leads to ${r.street.label}, arriving at ${arrive.x}, ${arrive.y}.` : `${s.label} now leads to ${r.street.label}. Give ${r.street.label} a signpost with an arm back to ${s.label}, then add this again to set where players arrive.`);
+    });
+    add(el('div', { class: 'builder-row builder-wrap' }, pick, go));
   }
 
   // —— Sky and layer filters (street.set gradient, layer.set filters), previewed live ——
@@ -2024,6 +2232,7 @@ async function boot() {
       ['Space+drag, wheel, Ctrl/Cmd+wheel', 'Pan, pan, zoom'],
       ['0, 1', 'Fit the street, 100%'],
       ['L', 'Lock the active layer'],
+      ['D', 'The deco picker: type to search, Down into the results, Enter places at the view centre; or drag one onto the street'],
       ['P', 'Play-test from the view centre'],
       ['Ctrl/Cmd+S', 'Save now'],
       ['?', 'This sheet'],
@@ -2082,6 +2291,7 @@ async function boot() {
     if (k === '-') { setZoom(S.cam.zoom / 1.25); return; }
     if (k === 'l' || k === 'L') { toggleLock(S.activeLayer); return; }
     if (k === 'p' || k === 'P') { playTest(); return; }
+    if (k === 'd' || k === 'D') { e.preventDefault(); if (!panels.left) toggleLeft.click(); picker.open(); return; }
     if (k === '?') { keySheet.showModal(); }
   });
   document.addEventListener('keyup', (e) => {
@@ -2176,6 +2386,8 @@ async function boot() {
     reachFromBtn,
     overlayCheck('arc', 'Jump arc from the pointer'),
     el('ul', { class: 'builder-key' }, keyRow(legend(COLOURS.plain), 'Standing jump'), keyRow(legend(COLOURS.running), 'Running jump')),
+    overlayCheck('populations', 'Populations: the planner\'s spots'),
+    el('ul', { class: 'builder-key' }, ...SPOT_GROUPS.map((g) => keyRow(legend(g.colour, { box: true }), g.label))),
     overlayCheck('frame', 'View frame: Wide 960 by 408 (solid), Original 1000 by 600 (dashed)'),
     overlayCheck('rulers', 'Rulers and guides'),
     clearGuidesBtn,
@@ -2192,6 +2404,7 @@ async function boot() {
     if (name === 'arc' && on) loadReach();
     if (name === 'arc' && !on) S.arcs = null;
     if (name === 'reach' && on) ensureLocalReach();
+    if (name === 'populations') { if (on) loadValidateMod(); renderInspector(); }
     S.geoDrawn = '';
     renderTools();
   }
@@ -2282,7 +2495,7 @@ async function boot() {
     // `new URL(...)` written here would not be keyed by tools/module-keys).
     if (!V.workerUrl) {
       if (!V.loading) {
-        V.loading = import('./validate-worker.js?v=8ab513f9').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
+        V.loading = import('./validate-worker.js?v=a2758bdd').then((m) => { V.workerUrl = m.WORKER_URL; V.dataPaths = m.VALIDATOR_DATA; runValidate(); }).catch(() => { V.state = 'off'; ensureLocalReach(); });
       }
       return null;
     }
@@ -2319,8 +2532,29 @@ async function boot() {
     if (S.mode !== 'draft' || !S.session) return;
     V.timer = setTimeout(runValidate, ms);
   }
+  /** The shipped streets the zone's arms and edits name (the validator's NAV rules look at them). */
+  function shippedNamed(zone) {
+    const own = new Set(zone.streets.map((r) => r.street.tsid));
+    const out = new Set();
+    for (const r of zone.streets) for (const p of r.street.signposts || []) for (const c of p.connects || []) {
+      const k = !own.has(c.tsid) && resolveIndexTsid(c.tsid);
+      if (k && STREET_INDEX.streets[k]?.file) out.add(k);
+    }
+    for (const e of zone.edits || []) {
+      const k = resolveIndexTsid(e.tsid);
+      if (k && STREET_INDEX.streets[k]?.file) out.add(k);
+    }
+    return [...out];
+  }
   function runValidate() {
     if (S.mode !== 'draft' || !S.session) return;
+    const named = shippedNamed(S.session.zone);
+    const missing = named.filter((k) => !S.shippedStreets.has(k));
+    if (missing.length) {
+      // Fetch them first (once each), then check.
+      Promise.all(missing.map((k) => targetStreet({ tsid: k }).catch(() => null))).then(() => { if (missing.every((k) => S.shippedStreets.has(k))) scheduleValidate(0); });
+      return;
+    }
     const w = validator();
     if (!w) { if (!V.loading || V.workerUrl) { renderValidate(); renderFindings(); } return; }
     V.id += 1;
@@ -2330,7 +2564,8 @@ async function boot() {
       // The worker fetches the validator's data at the keys the page uses (js/data-urls.js).
       const keyed = globalThis.groddleDataUrl || ((p) => p);
       const urls = Object.fromEntries((V.dataPaths || []).map((p) => [p, new URL(keyed(p), document.baseURI).href]));
-      w.postMessage({ id: V.id, zone: S.session.zone, urls });
+      const shipped = Object.fromEntries(named.map((k) => [k, S.shippedStreets.get(k)]));
+      w.postMessage({ id: V.id, zone: S.session.zone, urls, shipped });
     } catch (err) {
       V.state = 'failed';
       V.error = err?.message || String(err);
@@ -2405,6 +2640,50 @@ async function boot() {
   }
   playBtn.addEventListener('click', playTest);
 
+  // —— P3: the deco picker and the new-zone dialogs ——
+  const picker = mountPicker({
+    el, btn, field, say,
+    catalog: loadCatalog,
+    assets: () => (S.session ? S.session.zone.assets : null),
+    hub: () => String(street()?.hubId || ''),
+    role: () => { const l = layerOf(S.activeLayer); return l ? layerRole(l, street()) : ''; },
+    editable,
+    draft: () => S.session?.id || '',
+    place: placeDeco,
+    upload: uploadArt,
+  });
+  layersList.after(picker.section);
+  root.append(picker.dialog);
+  async function loadProfiles() {
+    if (S.profiles) return S.profiles;
+    const r = await fetch('assets/content/style-profiles.json');
+    S.profiles = await r.json();
+    return S.profiles;
+  }
+  async function hubList() {
+    if (S.hubs) return S.hubs;
+    const r = await fetch('assets/maps/index.json');
+    const idx = await r.json();
+    S.hubs = Object.values(idx.hubs || {}).map((h) => ({ id: String(h.hubId), name: String(h.hubName) })).sort((a, b) => a.name.localeCompare(b.name));
+    return S.hubs;
+  }
+  const hubStreets = (hubId) => Object.entries(STREET_INDEX.streets).filter(([, r]) => String(r.hubId) === String(hubId) && r.file).map(([tsid, r]) => ({ tsid, label: r.label })).sort((a, b) => a.label.localeCompare(b.label));
+  const newDraft = newDraftDialog({
+    el, btn, field, root, api,
+    drafts: () => S.drafts,
+    hubList,
+    async onCreated(id) {
+      S.drafts = await api.drafts();
+      await openDraft(id);
+      say('Draft made. Add its first street.');
+      newStreet.open();
+    },
+  });
+  const newStreet = newStreetDialog({ el, btn, field, root, say, session: () => S.session, profiles: loadProfiles, catalog: loadCatalog, commit: commitZone, openStreet: (key) => { S.mode = 'draft'; openDraftStreet(key); } });
+  const hubMap = hubMapDialog({ el, btn, field, root, say, session: () => S.session, commit: commitZone, hubList, hubStreets });
+  newDraftBtn.addEventListener('click', () => newDraft.open());
+  newStreetBtn.addEventListener('click', () => newStreet.open());
+
   // —— Opening drafts and streets ——
   function fillDrafts() {
     draftSel.replaceChildren(el('option', { value: '' }, 'No draft (looking only)'), ...S.drafts.map((d) => el('option', { value: d.id, selected: S.session?.id === d.id ? true : null }, `${d.title} (${d.id})`)));
@@ -2421,9 +2700,18 @@ async function boot() {
     return S.catalog;
   }
   async function openDraft(id, streetKey = '') {
+    // Send what is pending first, so the draft fetched below has it.
+    if (S.session) await S.session.flush();
+    // The draft already open (back from a shipped street): keep its session and its undo history.
+    if (S.session?.id === id && !S.session.pending.length) {
+      S.mode = 'draft';
+      if (S.validate.state !== 'off') S.validate.state = 'idle';
+      fillDrafts();
+      openDraftStreet(streetKey || S.streetKey);
+      return;
+    }
     let r;
     try { r = await api.draft(id); } catch (err) { failed(err); return; }
-    if (S.session) await S.session.flush();
     S.session = new DraftSession(r.zone, { api, onChange: onSession });
     S.mode = 'draft';
     if (S.validate.state !== 'off') S.validate.state = 'idle';
@@ -2457,14 +2745,14 @@ async function boot() {
     if (!S.streetKey) {
       mount();
       renderPanels();
-      say('This draft has no streets yet. Open a shipped street and fork it into the draft.');
-      history.replaceState(null, '', hashFor({ draft: S.session.id }));
+      say('This draft has no streets yet. Add one (New street), or open a shipped street and fork it into the draft.');
+      history.replaceState(null, '', addressFor(location, hashFor({ draft: S.session.id })));
       return;
     }
     restoreCamera();
     mount();
     renderPanels();
-    history.replaceState(null, '', hashFor({ draft: S.session.id, street: S.streetKey }));
+    history.replaceState(null, '', addressFor(location, hashFor({ draft: S.session.id, street: S.streetKey })));
   }
   async function openShipped(tsid) {
     const key = resolveIndexTsid(tsid);
@@ -2488,7 +2776,7 @@ async function boot() {
     restoreCamera();
     mount();
     renderPanels();
-    history.replaceState(null, '', hashFor({ view: key }));
+    history.replaceState(null, '', addressFor(location, hashFor({ view: key })));
   }
   draftSel.addEventListener('change', () => {
     if (draftSel.value) openDraft(draftSel.value);
@@ -2674,6 +2962,11 @@ async function boot() {
     report: () => JSON.parse(JSON.stringify(S.validate.report || null)),
     validateNow: () => runValidate(),
     goToFinding: (f) => goToFinding(f),
+    // —— P3 ——
+    zone: () => JSON.parse(JSON.stringify(S.session?.zone || null)),
+    pickerResults: () => picker.results(),
+    hubMap: () => hubMap.map(),
+    spots: () => (S.spots?.spots || []).map((p) => ({ ...p })),
   };
 
   try { S.drafts = await api.drafts(); } catch (err) { failed(err); }

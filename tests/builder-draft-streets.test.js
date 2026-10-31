@@ -70,9 +70,9 @@ describe('registerDraftStreets (js/street-loader.js)', () => {
 
   it('drops hidden connects as a loaded file does', () => {
     const street = structuredClone(lane);
-    street.signposts.push({ id: 'signpost_2', x: 0, y: -60, w: 100, h: 200, connects: [{ tsid: 'GLI2V0UN7RD1T2J', label: 'Hechey Track', hidden: true }] });
+    street.signposts.push({ id: 'signpost_9', x: 0, y: -60, w: 100, h: 200, connects: [{ tsid: 'GLI2V0UN7RD1T2J', label: 'Hechey Track', hidden: true }] });
     registerDraftStreets({}, { [street.tsid]: street });
-    return loadStreetData(street.tsid).then((d) => assert.equal(d.signposts.length, 1));
+    return loadStreetData(street.tsid).then((d) => assert.equal(d.signposts.length, lane.signposts.length));
   });
 });
 

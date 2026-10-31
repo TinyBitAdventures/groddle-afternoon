@@ -31,6 +31,15 @@
  *   connect.remove { street, signpost, at }
  *   connect.set  { street, signpost, at, set, unset?, order? }
  *
+ * P3 ops (new zones, spec 6.3, 6.4, 11):
+ *   population.set { street, population: {counts, quoins?, interior?, ...} | null, order? }
+ *                                             the street's row for the ecology planner
+ *   hubmap.set   { map: {color?, top_color?, btm_color?, streets: [...], hubs?: [...]} | null, order? }
+ *                                             the hub map of the zone's hub (the zone needs a hub)
+ *   edit.add     { edit: {tsid, op: 'add-connect', signpost, connect} | {tsid, op: 'add-signpost', newSignpost}, at?, order? }
+ *                                             a way in from a shipped street (zone.edits; the shipped file is never touched)
+ *   edit.remove  { at, prune? }                prune: drop zone.edits when it empties (an add's inverse)
+ *
  * A failing op throws an OpError with a code; a batch (applyOps) is all or nothing.
  *
  * Key order is kept: an inverse that puts back a field an op removed also carries `order`, the
@@ -50,6 +59,7 @@ export const OP_NAMES = Object.freeze([
   'platform.add', 'platform.remove', 'platform.set', 'barrier.add', 'barrier.remove', 'barrier.set',
   'ladder.add', 'ladder.remove', 'ladder.set', 'signpost.add', 'signpost.remove', 'signpost.set',
   'connect.add', 'connect.remove', 'connect.set',
+  'population.set', 'hubmap.set', 'edit.add', 'edit.remove',
 ]);
 
 /** Top-level street fields street.set may change (geometry, layers and ids have their own ops). */
@@ -66,6 +76,9 @@ export const GEOMETRY = Object.freeze({
   signpost: Object.freeze({ list: 'signposts', prefix: 'signpost_', fields: Object.freeze(['x', 'y', 'w', 'h']) }),
 });
 export const CONNECT_FIELDS = Object.freeze(['tsid', 'label', 'hub_id', 'hidden', 'arrive']);
+/** A zone edit's fields (schema $defs/streetEdit) and its two kinds. */
+export const EDIT_FIELDS = Object.freeze(['tsid', 'op', 'signpost', 'connect', 'newSignpost']);
+export const EDIT_KINDS = Object.freeze(['add-connect', 'add-signpost']);
 /** Fields whose null is a value (a perm of null is hard both ways), not a missing value. */
 const NULLABLE = Object.freeze(['pc_perm', 'item_perm']);
 
@@ -318,6 +331,59 @@ export function applyOp(zone, op) {
       need(Number.isInteger(op.at) && op.at >= 0 && op.at < (post.connects || []).length, 'builder_no_connect', `Signpost ${op.signpost} has no arm ${op.at}.`);
       const inv = patch(post.connects[op.at], op.set, op.unset, CONNECT_FIELDS, 'connect.set', op.order);
       return { inverse: { op: 'connect.set', street: op.street, signpost: op.signpost, at: op.at, ...inv }, changed: [`${op.street}/${op.signpost}`] };
+    }
+    case 'population.set': {
+      const row = streetRow(zone, op.street);
+      need(op.population === null || (isObj(op.population) && isObj(op.population.counts)), 'builder_bad_op', 'population.set needs a population with counts, or null.');
+      const before = own(row, 'population') ? clone(row.population) : null;
+      const keys = Object.keys(row);
+      if (op.population === null) delete row.population;
+      else row.population = clone(op.population);
+      reorder(row, op.order);
+      const inverse = { op: 'population.set', street: op.street, population: before };
+      if (op.population === null && before !== null) inverse.order = keys;
+      return { inverse, changed: [`${op.street}/population`] };
+    }
+    case 'hubmap.set': {
+      need(isObj(zone.hub), 'builder_no_hub', 'This draft has no hub yet.');
+      need(op.map === null || (isObj(op.map) && Array.isArray(op.map.streets)), 'builder_bad_op', 'hubmap.set needs a map with a streets list, or null.');
+      const before = own(zone.hub, 'map') ? clone(zone.hub.map) : null;
+      const keys = Object.keys(zone.hub);
+      if (op.map === null) delete zone.hub.map;
+      else zone.hub.map = clone(op.map);
+      reorder(zone.hub, op.order);
+      const inverse = { op: 'hubmap.set', map: before };
+      if (op.map === null && before !== null) inverse.order = keys;
+      return { inverse, changed: ['hub'] };
+    }
+    case 'edit.add': {
+      const e = op.edit;
+      need(isObj(e) && typeof e.tsid === 'string' && EDIT_KINDS.includes(e.op), 'builder_bad_op', 'edit.add needs an edit with a tsid and an op (add-connect or add-signpost).');
+      for (const k of Object.keys(e)) need(EDIT_FIELDS.includes(k), 'builder_bad_op', `edit.add: "${k}" is not an edit field.`);
+      const c = e.op === 'add-connect' ? e.connect : null;
+      if (e.op === 'add-connect') need(typeof e.signpost === 'string' && e.signpost !== '' && isObj(c) && typeof c.tsid === 'string' && typeof c.label === 'string', 'builder_bad_op', 'An add-connect edit names a signpost and a connect with a tsid and a label.');
+      else need(isObj(e.newSignpost), 'builder_bad_op', 'An add-signpost edit carries the new signpost.');
+      if (c) for (const k of Object.keys(c)) need(CONNECT_FIELDS.includes(k), 'builder_bad_op', `edit.add: "${k}" is not a connect field.`);
+      const fresh = !Array.isArray(zone.edits);
+      if (fresh) zone.edits = [];
+      const at = Number.isInteger(op.at) ? Math.max(0, Math.min(op.at, zone.edits.length)) : zone.edits.length;
+      zone.edits.splice(at, 0, clone(e));
+      reorder(zone, op.order);
+      const inverse = { op: 'edit.remove', at };
+      if (fresh) inverse.prune = true;
+      return { inverse, changed: ['edits'] };
+    }
+    case 'edit.remove': {
+      const list = Array.isArray(zone.edits) ? zone.edits : [];
+      need(Number.isInteger(op.at) && op.at >= 0 && op.at < list.length, 'builder_no_edit', `This draft has no edit ${op.at}.`);
+      const keys = Object.keys(zone);
+      const [e] = list.splice(op.at, 1);
+      const inverse = { op: 'edit.add', edit: e, at: op.at };
+      if (op.prune === true && list.length === 0) {
+        delete zone.edits;
+        inverse.order = keys;
+      }
+      return { inverse, changed: ['edits'] };
     }
     default: {
       const [kind, verb] = String(op.op).split('.');

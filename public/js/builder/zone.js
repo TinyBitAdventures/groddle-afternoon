@@ -197,3 +197,44 @@ export function floorUnder(platforms, x, y, standable = () => true) {
   }
   return best;
 }
+
+// —— Zone edits (spec 4, 11): new ways in from shipped streets, never written into their files ——
+
+/** PURE: the zone's edits on one shipped street (L and G forms of its tsid alike). */
+export function editsOn(edits, tsid) {
+  const a = String(tsid || '').slice(1);
+  return (edits || []).filter((e) => e && typeof e.tsid === 'string' && e.tsid.slice(1) === a && /^[GL]/.test(e.tsid));
+}
+
+/**
+ * PURE: a copy of a shipped street with the zone's edits on it, as publishing will apply them
+ * (tools/builder/apply-zone-edits.mjs, phase P6): an add-connect edit appends its arm to the named
+ * signpost, an add-signpost edit appends the new signpost. Edits on other streets, or naming a
+ * signpost the street lacks, are left out. The input is untouched.
+ */
+export function streetWithEdits(street, edits) {
+  const copy = JSON.parse(JSON.stringify(street));
+  for (const e of editsOn(edits, copy.tsid)) {
+    if (e.op === 'add-connect' && e.connect) {
+      const post = (copy.signposts || []).find((p) => p.id === e.signpost);
+      if (!post) continue;
+      if (!Array.isArray(post.connects)) post.connects = [];
+      post.connects.push(JSON.parse(JSON.stringify(e.connect)));
+    } else if (e.op === 'add-signpost' && e.newSignpost) {
+      if (!Array.isArray(copy.signposts)) copy.signposts = [];
+      copy.signposts.push(JSON.parse(JSON.stringify(e.newSignpost)));
+    }
+  }
+  return copy;
+}
+
+/**
+ * PURE: the edit that adds an arm into a zone street on a shipped street's signpost (spec 8.2
+ * link-world). `arrive` is where players land on the zone street (its screen px), or null.
+ */
+export function linkEdit({ shippedTsid, signpost, target, arrive = null }) {
+  const connect = { tsid: target.tsid, label: String(target.label || target.tsid).slice(0, 48) };
+  if (/^[0-9]{1,4}$/.test(String(target.hubId || ''))) connect.hub_id = String(target.hubId);
+  if (arrive && Number.isFinite(arrive.x) && Number.isFinite(arrive.y)) connect.arrive = { x: Math.round(arrive.x), y: Math.round(arrive.y) };
+  return { tsid: shippedTsid, op: 'add-connect', signpost, connect };
+}

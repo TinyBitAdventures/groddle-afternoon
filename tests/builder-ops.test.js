@@ -3,14 +3,15 @@
  * inverse gives back a byte-equal zone; a batch is all or nothing; and the site's port
  * (groddle-afternoon-site src/BuilderOps.php) turns the same script into the same bytes.
  * Also the fork (js/builder/zone.js): a forked shipped street fits the draft schema.
+ * P3 adds population.set, hubmap.set, edit.add and edit.remove to the same scripts.
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { GEOMETRY, OP_NAMES, OpError, applyOp, applyOps, nextDecoId, nextGeometryId, opsSummary } from '../public/js/builder/ops.js?v=28c0d569';
-import { DEFAULT_GRADIENT, forkOps, forkStreet, newTsid, relayerPosition, streetKeyFrom } from '../public/js/builder/zone.js?v=9608addf';
+import { GEOMETRY, OP_NAMES, OpError, applyOp, applyOps, nextDecoId, nextGeometryId, opsSummary } from '../public/js/builder/ops.js?v=2ca2cc56';
+import { DEFAULT_GRADIENT, forkOps, forkStreet, newTsid, relayerPosition, streetKeyFrom } from '../public/js/builder/zone.js?v=bdc23538';
 import { compileSchema } from '../public/js/builder/schema-check.js?v=cc9d1af4';
 import { DECO_TWINS } from '../public/js/street-render.js?v=3bcef6a7';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
@@ -57,6 +58,17 @@ function randomOps(zone, n, seed = 7) {
     try { applyOp(structuredClone(zone), op); applyOp(zone, op); } catch { ops.pop(); }
   };
   for (let i = 0; i < n; i += 1) {
+    if (i === 9 || i === Math.floor(n * 0.7)) {
+      // P3: empty the zone's edits with prune (the list goes), add one back (fresh: its inverse
+      // prunes), and drop and put back a population and the hub map.
+      for (let k = (zone.edits || []).length - 1; k >= 0; k -= 1) keep({ op: 'edit.remove', at: k, prune: true });
+      keep({ op: 'edit.add', edit: { tsid: 'GLI2V0UN7RD1T2J', op: 'add-connect', signpost: 'signpost_1', connect: { tsid: 'GZ0000000000001', label: `Lane ${i}`, hub_id: '900', arrive: { x: 150, y: 940 } } } });
+      keep({ op: 'population.set', street: 'lane', population: null });
+      keep({ op: 'population.set', street: 'lane', population: { counts: { npc_piggy: 2 }, quoins: 3 } });
+      keep({ op: 'hubmap.set', map: null });
+      keep({ op: 'hubmap.set', map: { color: '#1d3a80', streets: [{ tsid: zone.streets[0].street.tsid, name: 'Lane', x1: 10, y1: 20, x2: 200, y2: 30 }] } });
+      continue;
+    }
     if (i === 5 || i === Math.floor(n * 0.6)) {
       // A sure tour of the perm and prune paths: a barrier on a street without any, made hard,
       // softened (a null goes back), its perm unset, then removed with prune (the list empties).
@@ -71,10 +83,11 @@ function randomOps(zone, n, seed = 7) {
     const layer = pick(layers.filter((l) => l.decos.length));
     const deco = pick(layer.decos);
     const kind = pick(['set', 'set', 'unset', 'add', 'remove', 'move', 'layer', 'street', 'zone', 'asset', 'editor',
-      'geo.add', 'geo.add', 'geo.set', 'geo.perm', 'geo.remove', 'geo.remove', 'connect.add', 'connect.set', 'connect.remove']);
+      'geo.add', 'geo.add', 'geo.set', 'geo.perm', 'geo.remove', 'geo.remove', 'connect.add', 'connect.set', 'connect.remove',
+      'pop', 'hubmap', 'hub', 'edit.add', 'edit.add', 'edit.remove']);
     // Geometry: a kind, one of its items (if any) and a signpost arm.
     const g = pick(kinds);
-    const item = pick(street[GEOMETRY[g].list] || [{ id: `${GEOMETRY[g].prefix}none` }]);
+    const item = pick(street[GEOMETRY[g].list]?.length ? street[GEOMETRY[g].list] : [{ id: `${GEOMETRY[g].prefix}none` }]);
     const post = pick((street.signposts || []).filter((p) => Array.isArray(p.connects)).concat([{ id: 'signpost_none', connects: [] }]));
     const arm = Math.floor(rnd() * Math.max(1, post.connects.length));
     if (kind === 'set') ops.push({ op: 'deco.set', street: 'lane', id: deco.id, set: { x: Math.round(rnd() * 900), flip: rnd() > 0.5, r: Math.round(rnd() * 40 - 20) } });
@@ -119,6 +132,21 @@ function randomOps(zone, n, seed = 7) {
       ops.push({ op: 'connect.add', street: 'lane', signpost: post.id, connect, ...(rnd() > 0.5 ? { at: 0 } : {}) });
     } else if (kind === 'connect.set') {
       ops.push({ op: 'connect.set', street: 'lane', signpost: post.id, at: arm, set: { label: `Sign ${i}`, hidden: rnd() > 0.5 }, ...(rnd() > 0.5 ? { unset: [pick(['hub_id', 'arrive'])] } : {}) });
+    } else if (kind === 'pop') {
+      const counts = Object.fromEntries([['npc_piggy', Math.floor(rnd() * 4)], [pick(['trant_fruit', 'rock_beryl_1', 'npc_chicken']), 1 + Math.floor(rnd() * 3)]].filter(([, v]) => v > 0));
+      ops.push({ op: 'population.set', street: 'lane', population: rnd() > 0.85 ? null : { counts, ...(rnd() > 0.5 ? { quoins: Math.floor(rnd() * 9) } : {}), ...(rnd() > 0.8 ? { interior: false } : {}) } });
+    } else if (kind === 'hubmap') {
+      const line = () => ({ tsid: pick(['GZ0000000000001', 'GZ0000000000002']), name: `Line ${i}`, x1: Math.round(rnd() * 760), y1: Math.round(rnd() * 460), x2: Math.round(rnd() * 760), y2: Math.round(rnd() * 460) });
+      ops.push({ op: 'hubmap.set', map: rnd() > 0.9 ? null : { ...(rnd() > 0.5 ? { color: '#2a5d34', top_color: '#88aa66' } : {}), streets: [line(), ...(rnd() > 0.5 ? [line()] : [])], ...(rnd() > 0.6 ? { hubs: [{ tsid: 'LLIE7307LTG11T2', hub_id: '56', hubName: 'Groddle Forest', label: 'To: Groddle Forest', x: 700, y: Math.round(rnd() * 400), arrow: 90 }] } : {}) } });
+    } else if (kind === 'hub') {
+      ops.push({ op: 'hub.set', hub: { id: String(900 + Math.floor(rnd() * 3)), name: `Hub ${i}`, isNew: true, ...(rnd() > 0.5 ? { map: { streets: [] } } : {}) } });
+    } else if (kind === 'edit.add') {
+      const edit = rnd() > 0.3
+        ? { tsid: 'GLI2V0UN7RD1T2J', op: 'add-connect', signpost: pick(['signpost_1', 'signpost_2']), connect: { tsid: 'GZ0000000000001', label: `In ${i}`, ...(rnd() > 0.5 ? { hub_id: '900' } : {}), ...(rnd() > 0.4 ? { arrive: { x: Math.round(rnd() * 900), y: 940 } } : {}) } }
+        : { tsid: 'GA5101HF7F429V5', op: 'add-signpost', newSignpost: { id: `signpost_${i}`, x: 10, y: -60, w: 100, h: 200, connects: [{ tsid: 'GZ0000000000001', label: 'Lane' }] } };
+      ops.push({ op: 'edit.add', edit, ...(rnd() > 0.5 ? { at: Math.floor(rnd() * 3) } : {}) });
+    } else if (kind === 'edit.remove') {
+      ops.push({ op: 'edit.remove', at: Math.floor(rnd() * Math.max(1, (zone.edits || []).length + 1)), ...(rnd() > 0.5 ? { prune: true } : {}) });
     } else ops.push({ op: 'connect.remove', street: 'lane', signpost: post.id, at: arm });
     keep(ops.pop());
   }
@@ -136,7 +164,7 @@ function p2Coverage(zone, script) {
     seen.add(op.op);
     if (verb === 'add' && GEOMETRY[kind]) seen.add(op[kind].id === undefined ? 'add without an id' : 'add with an id');
     if (inverse.prune) seen.add('add on a street without the list');
-    if (verb === 'remove' && op.prune && inverse.order) seen.add(`prune empties ${GEOMETRY[kind].list}`);
+    if (verb === 'remove' && op.prune && inverse.order && GEOMETRY[kind]) seen.add(`prune empties ${GEOMETRY[kind].list}`);
     if (verb === 'remove' && op.prune && !inverse.order && list) seen.add('prune on a list that stays');
     if (verb === 'set' && op.set && op.set.pc_perm === null) seen.add('pc_perm set to null');
     if (verb === 'set' && (op.unset || []).includes('pc_perm')) seen.add('pc_perm unset');
@@ -155,12 +183,34 @@ const assertP2 = (zone, script) => {
   assert.deepEqual(P2_MUST.filter((k) => !seen.has(k)), [], 'the script exercises every P2 op');
 };
 
+/** What a script exercises of the P3 ops (the removes that empty, the adds that make the list). */
+function p3Coverage(zone, script) {
+  const z = structuredClone(zone);
+  const seen = new Set();
+  for (const op of script) {
+    const { inverse } = applyOp(z, op);
+    seen.add(op.op);
+    if (op.op === 'edit.add' && inverse.prune) seen.add('edit.add makes the list');
+    if (op.op === 'edit.remove' && inverse.order) seen.add('edit.remove empties the list');
+    if (op.op === 'population.set' && op.population === null && inverse.order) seen.add('population removed');
+    if (op.op === 'hubmap.set' && op.map === null && inverse.order) seen.add('hub map removed');
+    if (op.op === 'edit.add' && op.edit.op === 'add-signpost') seen.add('add-signpost');
+  }
+  return seen;
+}
+const P3_MUST = ['population.set', 'hubmap.set', 'hub.set', 'edit.add', 'edit.remove', 'edit.add makes the list', 'edit.remove empties the list', 'population removed', 'hub map removed', 'add-signpost'];
+const assertP3 = (zone, script) => {
+  const seen = p3Coverage(zone, script);
+  assert.deepEqual(P3_MUST.filter((k) => !seen.has(k)), [], 'the script exercises every P3 op');
+};
+
 describe('ops (js/builder/ops.js)', () => {
   it('every op then its inverse gives a byte-equal zone (300 seeded ops on a fork of Hechey Track)', () => {
     const zone = forkedZone();
     const script = randomOps(structuredClone(zone), 300);
     assert.ok(script.length > 250, `ops ${script.length}`);
     assertP2(zone, script);
+    assertP3(zone, script);
     for (const op of script) {
       const before = bytes(zone);
       const { inverse } = applyOp(zone, op);
@@ -175,7 +225,7 @@ describe('ops (js/builder/ops.js)', () => {
   it('a batch undoes in one step, and a failing batch leaves nothing behind', () => {
     const zone = forkedZone();
     const start = bytes(zone);
-    const script = randomOps(structuredClone(zone), 40, 11);
+    const script = randomOps(structuredClone(zone), 220, 31);
     const { inverses, changed } = applyOps(zone, script);
     assert.ok(changed.length > 0);
     applyOps(zone, inverses);
@@ -221,6 +271,17 @@ describe('ops (js/builder/ops.js)', () => {
     assert.equal(code({ op: 'platform.frob', street: 'lane' }), 'builder_bad_op');
     assert.equal(code({ op: 'platform.add', street: 'nope', platform: {} }), 'builder_no_street');
     assert.equal(code({ op: 'platform.set', street: 'lane', id: zone.streets[0].street.platforms[0].id, set: { pc_perm: null, item_perm: null } }), 'ok');
+    // P3: populations, the hub map and zone edits.
+    assert.equal(code({ op: 'population.set', street: 'lane', population: { quoins: 1 } }), 'builder_bad_op');
+    assert.equal(code({ op: 'population.set', street: 'lane', population: [] }), 'builder_bad_op');
+    assert.equal(code({ op: 'hubmap.set', map: { hubs: [] } }), 'builder_bad_op');
+    assert.equal(code({ op: 'edit.add', edit: { tsid: 'GLI2V0UN7RD1T2J', op: 'add-connect', connect: { tsid: 'GZ0000000000001', label: 'x' } } }), 'builder_bad_op');
+    assert.equal(code({ op: 'edit.add', edit: { tsid: 'GLI2V0UN7RD1T2J', op: 'add-connect', signpost: 'signpost_1', connect: { tsid: 'GZ0000000000001', label: 'x', at: 1 } } }), 'builder_bad_op');
+    assert.equal(code({ op: 'edit.add', edit: { tsid: 'GLI2V0UN7RD1T2J', op: 'remove-connect', signpost: 'signpost_1' } }), 'builder_bad_op');
+    assert.equal(code({ op: 'edit.remove', at: 0 }), 'builder_no_edit');
+    assert.equal(code({ op: 'edit.add', edit: { tsid: 'GLI2V0UN7RD1T2J', op: 'add-connect', signpost: 'signpost_1', connect: { tsid: 'GZ0000000000001', label: 'x' } } }), 'ok');
+    assert.equal(code({ op: 'hub.set', hub: null }), 'ok');
+    assert.equal(code({ op: 'hubmap.set', map: { streets: [] } }), 'builder_no_hub');
   });
 
   it('names the next deco id and sums a batch in words', () => {
@@ -292,8 +353,9 @@ describe('the site applies the same ops (groddle-afternoon-site src/BuilderOps.p
 
   it('the same script gives the same zone and the same inverses, byte for byte', () => {
     const zone = forkedZone();
-    const script = randomOps(structuredClone(zone), 200, 23);
+    const script = randomOps(structuredClone(zone), 220, 31);
     assertP2(zone, script);
+    assertP3(zone, script);
     const post = zone.streets[0].street.signposts[0].id;
     const ladder = zone.streets[0].street.ladders[0].id;
     script.push(
@@ -313,6 +375,25 @@ describe('the site applies the same ops (groddle-afternoon-site src/BuilderOps.p
       { op: 'connect.remove', street: 'lane', signpost: post, at: -1 },
       { op: 'connect.set', street: 'lane', signpost: post, at: 99, set: { label: 'x' } },
       { op: 'platform.frob', street: 'lane' },
+      // P3 failures.
+      { op: 'population.set', street: 'lane', population: { quoins: 2 } },
+      { op: 'population.set', street: 'nope', population: null },
+      { op: 'hubmap.set', map: { streets: {} } },
+      { op: 'edit.add', edit: { tsid: 'GLI2V0UN7RD1T2J', op: 'add-door' } },
+      { op: 'edit.add', edit: { tsid: 'GLI2V0UN7RD1T2J', op: 'add-connect', signpost: 'signpost_1', connect: { tsid: 'GZ0000000000001' } } },
+      { op: 'edit.add', edit: { tsid: 'GLI2V0UN7RD1T2J', op: 'add-connect', signpost: '', connect: { tsid: 'GZ0000000000001', label: 'x' } } },
+      { op: 'edit.add', edit: { tsid: 'GLI2V0UN7RD1T2J', op: 'add-connect', signpost: 'signpost_1', connect: { tsid: 'GZ0000000000001', label: 'x', events: 1 } } },
+      { op: 'edit.add', edit: { tsid: 'GLI2V0UN7RD1T2J', op: 'add-signpost' } },
+      { op: 'edit.add', edit: { tsid: 'GLI2V0UN7RD1T2J', op: 'add-signpost', newSignpost: {}, extra: 1 } },
+      { op: 'edit.remove', at: 99 },
+      { op: 'edit.remove', at: '0' },
+      // And some that land: an edit placed first, the population and map reordered.
+      { op: 'edit.add', edit: { op: 'add-connect', tsid: 'GLI2V0UN7RD1T2J', connect: { label: 'Back in', tsid: 'GZ0000000000001' }, signpost: 'signpost_3' }, at: -4 },
+      { op: 'population.set', street: 'lane', population: { quoins: 1, counts: {} }, order: ['population', 'key'] },
+      { op: 'hubmap.set', map: { streets: [], hubs: [] }, order: ['map', 'id'] },
+      { op: 'hubmap.set', map: null },
+      { op: 'hub.set', hub: null },
+      { op: 'hubmap.set', map: { streets: [] } },
       // And some that land: clamped places, an id last, a reorder, a signpost without arms gaining one.
       { op: 'barrier.add', street: 'lane', barrier: { x: 1, y: -2, h: 3, pc_perm: null, id: 'wall_77' }, at: 99 },
       { op: 'barrier.add', street: 'lane', barrier: { x: 4, y: -5, h: 6 }, at: -3 },

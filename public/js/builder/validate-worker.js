@@ -3,8 +3,10 @@
  *
  *   const { WORKER_URL } = await import('./validate-worker.js');   // keyed, so the URL is too
  *   const w = new Worker(WORKER_URL, { type: 'module' });
- *   w.postMessage({ id, zone, rules?, urls? });   // -> { id, report } or { id, error }
- *   (urls: VALIDATOR_DATA paths -> their content-keyed URLs, from the page's groddleDataUrl)
+ *   w.postMessage({ id, zone, rules?, urls?, shipped? });   // -> { id, report } or { id, error }
+ *   (urls: VALIDATOR_DATA paths -> their content-keyed URLs, from the page's groddleDataUrl;
+ *   shipped: { tsid: street JSON } for every shipped street the zone's arms and edits name, so the
+ *   NAV rules can look at them: the page has them already)
  *
  * Imported on the page it only gives its URL; it listens for messages only inside a worker.
  *
@@ -13,7 +15,7 @@
  * ecology rows, the style profiles and the zone schema (assets/content/zone.schema.json, a copy of
  * docs/level-builder/zone.schema.json that tests/builder-validate.test.js keeps equal).
  */
-import { validateZone } from './validate.js?v=f15a39d0';
+import { validateZone } from './validate.js?v=ef755481';
 import { compileSchema } from './schema-check.js?v=cc9d1af4';
 import { DECO_TWINS } from '../street-render.js?v=3bcef6a7';
 import { ANIM_DECOS } from '../deco-anim-list.js?v=ecfee655';
@@ -65,11 +67,11 @@ export const WORKER_URL = import.meta.url;
 
 const inWorker = typeof WorkerGlobalScope !== 'undefined' && globalThis instanceof WorkerGlobalScope;
 if (inWorker) self.addEventListener('message', async (e) => {
-  const { id, zone, rules = null } = e.data || {};
+  const { id, zone, rules = null, shipped = null } = e.data || {};
   if (e.data?.urls && !ctx) urls = e.data.urls;
   try {
     const c = await context();
-    const report = validateZone(zone, { ...c, rules });
+    const report = validateZone(zone, shipped ? { ...c, rules, streetFor: (tsid) => shipped[tsid] || null } : { ...c, rules });
     self.postMessage({ id, report });
   } catch (err) {
     self.postMessage({ id, error: String(err?.message || err) });

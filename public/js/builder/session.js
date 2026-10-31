@@ -12,7 +12,7 @@
  *
  * The api is injected ({ ops(id, rev, ops, note), draft(id, { etag }) }), so tests drive it.
  */
-import { applyOps } from './ops.js?v=28c0d569';
+import { applyOps } from './ops.js?v=2ca2cc56';
 
 export const SAVE_MS = 2000;
 export const POLL_MS = 5000;

@@ -46,7 +46,8 @@ export function createBuilderApi({ fetchImpl = (...a) => globalThis.fetch(...a) 
   return {
     call,
     drafts: () => call('admin/builder/drafts').then((r) => r.drafts || []),
-    create: (id, title) => call('admin/builder/drafts', { method: 'POST', body: { id, title } }),
+    /** A new draft; `hub` is a new hub ({id, name, isNew, map}) or an existing one ({id, name}). */
+    create: (id, title, hub = null) => call('admin/builder/drafts', { method: 'POST', body: hub ? { id, title, hub } : { id, title } }),
     /** The draft { zone, rev }, or null when `etag` is still its rev (304). */
     async draft(id, { etag } = {}) {
       const r = await call(draftPath(id), { headers: etag ? { 'If-None-Match': `"${etag}"` } : {} });
@@ -57,6 +58,8 @@ export function createBuilderApi({ fetchImpl = (...a) => globalThis.fetch(...a) 
     },
     ops: (id, rev, ops, note = '') => call(`${draftPath(id)}/ops`, { method: 'POST', body: { ops, note }, headers: { 'If-Match': `"${rev}"` } }),
     play: (id) => call(`${draftPath(id)}/play`),
+    /** New art through intake (spec 9.1): {report, asset, op}; a refusal throws with data.report. */
+    intake: (body) => call('admin/builder/assets', { method: 'POST', body }),
     /** The shipped street index as the console has it: [{tsid, label, hub}]. */
     streets: () => call('admin/streets').then((r) => r.streets || []),
   };

@@ -577,7 +577,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=d6cbbd5c';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=bc6e94f2';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=4343fa28';
 import {
   ladderTopDeck,
   groundBeneath,
