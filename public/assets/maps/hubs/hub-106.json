@@ -16,7 +16,9 @@
       "x1": 507,
       "y1": 306,
       "x2": 684,
-      "y2": 256
+      "y2": 256,
+      "store": "Hardware",
+      "shrine": "cosma"
     },
     {
       "tsid": "LHFET4I773D2OUU",
@@ -24,7 +26,9 @@
       "x1": 47,
       "y1": 410,
       "x2": 191,
-      "y2": 339
+      "y2": 339,
+      "store": "Animal Goods",
+      "shrine": "humbaba"
     },
     {
       "tsid": "LHFIV4V8J6J2I7U",
@@ -40,7 +44,9 @@
       "x1": 489,
       "y1": 123,
       "x2": 615,
-      "y2": 158
+      "y2": 158,
+      "store": "Kitchen Tools",
+      "shrine": "lem"
     },
     {
       "tsid": "LHFER9HGE3D2UPP",
@@ -48,7 +54,8 @@
       "x1": 313,
       "y1": 114,
       "x2": 420,
-      "y2": 174
+      "y2": 174,
+      "store": "Mining"
     },
     {
       "tsid": "LHFD24US63D2QO6",
@@ -56,7 +63,9 @@
       "x1": 84,
       "y1": 247,
       "x2": 178,
-      "y2": 144
+      "y2": 144,
+      "store": "Gardening Goods",
+      "shrine": "spriggan"
     },
     {
       "tsid": "LHFR6PV2Q2D24KJ",
@@ -64,7 +73,9 @@
       "x1": 431,
       "y1": 179,
       "x2": 541,
-      "y2": 233
+      "y2": 233,
+      "store": "Groceries",
+      "shrine": "pot"
     },
     {
       "tsid": "LHFTQ7GLV2D2GG1",
@@ -72,7 +83,8 @@
       "x1": 194,
       "y1": 337,
       "x2": 359,
-      "y2": 359
+      "y2": 359,
+      "store": "Mining"
     },
     {
       "tsid": "LHFNBKJMP4D2S9M",
@@ -80,7 +92,8 @@
       "x1": 182,
       "y1": 144,
       "x2": 308,
-      "y2": 114
+      "y2": 114,
+      "store": "Mining"
     },
     {
       "tsid": "LHF2KOKDR2D2EIU",
@@ -88,7 +101,8 @@
       "x1": 311,
       "y1": 112,
       "x2": 400,
-      "y2": 41
+      "y2": 41,
+      "store": "Mining"
     },
     {
       "tsid": "LHF893IMS2D2AKU",
@@ -96,7 +110,9 @@
       "x1": 490,
       "y1": 120,
       "x2": 590,
-      "y2": 37
+      "y2": 37,
+      "store": "Produce",
+      "shrine": "mab"
     },
     {
       "tsid": "LHFNIVJNP4D2IM6",
@@ -104,7 +120,8 @@
       "x1": 617,
       "y1": 157,
       "x2": 714,
-      "y2": 87
+      "y2": 87,
+      "store": "Mining"
     },
     {
       "tsid": "LHFUE6UMQ4D2K42",
@@ -112,7 +129,8 @@
       "x1": 351,
       "y1": 235,
       "x2": 488,
-      "y2": 123
+      "y2": 123,
+      "store": "Mining"
     },
     {
       "tsid": "LHFFH3GKN2D2BTS",
@@ -120,7 +138,9 @@
       "x1": 359,
       "y1": 357,
       "x2": 506,
-      "y2": 306
+      "y2": 306,
+      "store": "Alchemical Goods",
+      "shrine": "ti"
     },
     {
       "tsid": "LHFL7HBQO2D2B4H",
@@ -128,7 +148,9 @@
       "x1": 279,
       "y1": 347,
       "x2": 352,
-      "y2": 234
+      "y2": 234,
+      "store": "Alchemical Goods",
+      "shrine": "zille"
     },
     {
       "tsid": "LHFL23QTC2D21SF",
@@ -136,7 +158,9 @@
       "x1": 197,
       "y1": 230,
       "x2": 347,
-      "y2": 234
+      "y2": 234,
+      "store": "Produce",
+      "shrine": "grendaline"
     },
     {
       "tsid": "LHFRC7NQL4D2C59",
@@ -144,7 +168,8 @@
       "x1": 84,
       "y1": 252,
       "x2": 194,
-      "y2": 335
+      "y2": 335,
+      "store": "Mining"
     },
     {
       "tsid": "LHF8B3B0S4D2L5U",
@@ -152,7 +177,9 @@
       "x1": 205,
       "y1": 41,
       "x2": 311,
-      "y2": 111
+      "y2": 111,
+      "store": "Hardware",
+      "shrine": "friendly"
     },
     {
       "tsid": "LHFTBK54M4D2JQA",
@@ -160,7 +187,8 @@
       "x1": 63,
       "y1": 89,
       "x2": 182,
-      "y2": 143
+      "y2": 143,
+      "store": "Mining"
     },
     {
       "tsid": "LHFTJK6IQ4D2R6M",
@@ -168,7 +196,8 @@
       "x1": 509,
       "y1": 306,
       "x2": 659,
-      "y2": 351
+      "y2": 351,
+      "store": "Mining"
     },
     {
       "tsid": "LHFHR6S923D2RL9",
@@ -176,7 +205,9 @@
       "x1": 547,
       "y1": 420,
       "x2": 659,
-      "y2": 351
+      "y2": 351,
+      "store": "Animal Goods",
+      "shrine": "alph"
     }
   ],
   "hubs": [

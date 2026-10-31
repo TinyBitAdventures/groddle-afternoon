@@ -5,6 +5,7 @@
  */
 
 import { listMapDestinations, planTravel, resolveLoadedTsid, tsidAliases } from './travel.js?v=855c6c68';
+import { CLASSIC_ART } from './classic/classic-art.js?v=5745e669';
 
 /** Map catalog + per-hub files. */
 export const MAP_INDEX_URL = 'assets/maps/index.json';
@@ -81,6 +82,10 @@ export function buildHubMapView(hubData, currentTsid, streetIndex = {}) {
       label: loadedTsid
         ? streetIndex[loadedTsid]?.label || s.name || s.tsid
         : s.name || s.tsid,
+      // The map's street icons (MapHub.as drawStreet; tools/build-map-icons.mjs).
+      store: s.store || '',
+      shrine: s.shrine || '',
+      hasSubway: !!s.has_subway,
     };
   });
 
@@ -198,6 +203,168 @@ export function escapeXml(s) {
     .replace(/"/g, '&quot;');
 }
 
+/** The corners of rect (lx, ly, w, h) in a frame turned by rot degrees about (cx, cy), on the map. */
+export function rotatedQuad(cx, cy, rot, lx, ly, w, h) {
+  const r = (rot * Math.PI) / 180;
+  const c = Math.cos(r);
+  const s = Math.sin(r);
+  return [[lx, ly], [lx + w, ly], [lx + w, ly + h], [lx, ly + h]].map(([px, py]) => [cx + px * c - py * s, cy + px * s + py * c]);
+}
+
+/** A box's corners. */
+export function boxQuad(b) {
+  return [[b.x0, b.y0], [b.x1, b.y0], [b.x1, b.y1], [b.x0, b.y1]];
+}
+
+/** The box around some corners. */
+export function quadBox(q) {
+  const xs = q.map((p) => p[0]);
+  const ys = q.map((p) => p[1]);
+  return { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs), y1: Math.max(...ys) };
+}
+
+/** Do two convex quads overlap (separating axes)? Touching edges do not count. */
+export function quadsOverlap(a, b) {
+  for (const q of [a, b]) {
+    for (let i = 0; i < q.length; i++) {
+      const [x1, y1] = q[i];
+      const [x2, y2] = q[(i + 1) % q.length];
+      const nx = y1 - y2;
+      const ny = x2 - x1;
+      let aMin = Infinity, aMax = -Infinity, bMin = Infinity, bMax = -Infinity;
+      for (const [x, y] of a) { const d = x * nx + y * ny; aMin = Math.min(aMin, d); aMax = Math.max(aMax, d); }
+      for (const [x, y] of b) { const d = x * nx + y * ny; bMin = Math.min(bMin, d); bMax = Math.max(bMax, d); }
+      if (aMax <= bMin + 1e-9 || bMax <= aMin + 1e-9) return false;
+    }
+  }
+  return true;
+}
+
+/** The corners of a street label: text centred on (x, y), its baseline at y, turned by rot. */
+export function labelQuad(x, y, w, h, rot) {
+  return rotatedQuad(x, y, rot, -w / 2, -h * 0.8, w, h);
+}
+
+/** The you-are-here star's box (renderHubMapSvg draws it about the street's midpoint). */
+export function youBox(mx, my) {
+  return { x0: mx - 14, y0: my - 14, x1: mx + 14, y1: my + 12 };
+}
+
+/**
+ * The street icons' art and size (MapHub.as drawStreet; the art is Tiny Speck's CC0
+ * TSEngineAssets map_icon_shop / _shrine / _subway, tools/classic-art/manifest.json).
+ */
+export const MAP_ICON_ART = Object.freeze({
+  store: CLASSIC_ART.map_icon_shop,
+  shrine: CLASSIC_ART.map_icon_shrine,
+  subway: CLASSIC_ART.map_icon_subway,
+});
+
+/** MapHub.as nudges two subway icons along their street (TSIDs it hardcodes, "jed tower" and "groddle junction"). */
+export const SUBWAY_ICON_NUDGE = Object.freeze({ LIF10HE4JTU1S7P: 20, LLI3272LOTD1B1F: 40 });
+
+/** StringUtil.capitalizeFirstLetter. */
+const capitalizeFirst = (s) => {
+  const str = String(s || '');
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+/**
+ * An icon's tooltip, as the client's tipsH: "<Store> Vendor", "Shrine to <Giant>" and
+ * "Subway Station". A shrine named `ti` reads Tii (Street.as updateFromAnonymous).
+ * @param {'store'|'shrine'|'subway'} kind
+ * @param {string} [value] the store name or the Giant's id
+ */
+export function mapIconTip(kind, value = '') {
+  if (kind === 'store') return `${capitalizeFirst(value)} Vendor`;
+  if (kind === 'shrine') return `Shrine to ${capitalizeFirst(value === 'ti' ? 'tii' : value)}`;
+  return 'Subway Station';
+}
+
+/**
+ * Where each street's icons sit (MapHub.as drawStreet): each in the street's own frame, at the
+ * midpoint and turned with the line. The vendor sits just below the line to the right of the
+ * midpoint, the shrine below it to the left, the subway station above the line, centred.
+ *
+ * The remake writes each street's name beside its line (layoutStreetLabels), where the client
+ * wrote it on the line, so an icon that would cover a label, the you-are-here star, a GO button
+ * or another icon slides along its own street (and then a little further from the line) to
+ * the nearest clear spot; failing that, to the line's other side. The labels never move for
+ * the icons.
+ * @param {ReturnType<typeof buildHubMapView>['streets']} streets
+ * @param {{ labels?: ReturnType<typeof layoutStreetLabels>, hubs?: { x:number, y:number }[] }} [around]
+ * @returns {{ kind:string, tsid:string, streetName:string, tip:string, url:string,
+ *   w:number, h:number, mx:number, my:number, rot:number, lx:number, ly:number, moved:boolean,
+ *   quad:number[][], box:{ x0:number, y0:number, x1:number, y1:number } }[]}
+ */
+export function layoutStreetIcons(streets, { labels = [], hubs = [] } = {}) {
+  const out = [];
+  /** @type {number[][][]} */
+  const taken = [
+    ...labels.map((l) => rotatedQuad(l.x, l.y, l.rot, -l.w / 2 - 1.5, -l.h * 0.8 - 1, l.w + 3, l.h + 2)),
+    ...(hubs || []).map((h) => boxQuad({ x0: h.x - 23, y0: h.y - 23, x1: h.x + 23, y1: h.y + 23 })),
+  ];
+  const you = (streets || []).find((s) => s.current);
+  if (you) taken.push(boxQuad(youBox(you.mx, you.my)));
+  const hits = (q) => taken.reduce((n, o) => n + (quadsOverlap(q, o) ? 1 : 0), 0);
+
+  // The subway stations first (the fewest, and the most use when looking for one), then the rest.
+  for (const pass of ['subway', 'rest']) for (const s of streets || []) {
+    const rot = (Math.atan2(s.y2 - s.y1, s.x2 - s.x1) * 180) / Math.PI;
+    const half = Math.hypot(s.x2 - s.x1, s.y2 - s.y1) / 2;
+    const add = (kind, value, lx0, rows, along, reach = 6) => {
+      const art = MAP_ICON_ART[kind];
+      const { w, h } = art;
+      let pick = null;
+      let least = null;
+      for (const ly of rows) {
+        for (let r = 0; r <= 24 && !pick; r++) {
+          for (const dir of r ? [along, -along] : [0]) {
+            const lx = lx0 + dir * r * 4;
+            // Keep beside its own street: the icon's middle within (about) the line's length.
+            if (Math.abs(lx + w / 2) > Math.max(half + reach, w)) continue;
+            const quad = rotatedQuad(s.mx, s.my, rot, lx, ly, w, h);
+            const n = hits(quad);
+            if (!n) { pick = { lx, ly, quad }; break; }
+            if (!least || n < least.n) least = { lx, ly, quad, n };
+          }
+        }
+        if (pick) break;
+      }
+      // Nowhere clear (a crowded corner): the spot that covers the least.
+      const crowded = !pick;
+      if (!pick) pick = least || { lx: lx0, ly: rows[0], quad: rotatedQuad(s.mx, s.my, rot, lx0, rows[0], w, h) };
+      taken.push(pick.quad);
+      out.push({
+        kind,
+        tsid: s.loadedTsid || s.tsid,
+        streetName: s.label || s.name || s.tsid,
+        tip: mapIconTip(kind, value),
+        url: art.url,
+        w,
+        h,
+        mx: s.mx,
+        my: s.my,
+        rot,
+        lx: pick.lx,
+        ly: pick.ly,
+        moved: pick.lx !== lx0 || pick.ly !== rows[0],
+        crowded,
+        quad: pick.quad,
+        box: quadBox(pick.quad),
+      });
+    };
+    const sw = MAP_ICON_ART.shrine.w;
+    const sub = MAP_ICON_ART.subway;
+    if (pass === 'rest' && s.store) add('store', s.store, 2, [10, 14, 18, 22, 26, -24, -28], 1);
+    if (pass === 'rest' && s.shrine) add('shrine', s.shrine, -2 - sw, [10, 14, 18, 22, 26, -24, -28], -1);
+    if (pass === 'subway' && s.hasSubway) {
+      add('subway', '', Math.trunc(-sub.w / 2) + (SUBWAY_ICON_NUDGE[s.tsid] || 0), [-30, -34, -38, -42, -46, -50, 28, 32, 36, 40, 44, 48], 1, 24);
+    }
+  }
+  return out;
+}
+
 /**
  * Place street name labels with priority + simple collision resolution.
  * Loaded/current streets always keep labels; dim streets drop if crowded.
@@ -205,7 +372,8 @@ export function escapeXml(s) {
  * @param {Array<{ name:string, x1:number,y1:number,x2:number,y2:number,mx:number,my:number,loaded?:boolean,current?:boolean }>} streets
  * @param {number} [mapW=760]
  * @param {number} [mapH=460]
- * @returns {{ name:string, x:number, y:number, rot:number, cls:string }[]}
+ * @returns {{ name:string, x:number, y:number, rot:number, cls:string, w:number, h:number }[]}
+ *   (w and h: the size the layout reckons the label takes, in map units)
  */
 export function layoutStreetLabels(streets, mapW = 760, mapH = 460) {
   const ordered = [...(streets || [])].sort((a, b) => {
@@ -275,7 +443,7 @@ export function layoutStreetLabels(streets, mapW = 760, mapH = 460) {
         : 'map-label dim';
 
     boxes.push({ x, y, w, h });
-    out.push({ name: s.name, x, y, rot, cls });
+    out.push({ name: s.name, x, y, rot, cls, w, h });
   }
   return out;
 }
@@ -301,6 +469,13 @@ export function renderHubMapSvg(view) {
     </linearGradient>
     <filter id="labelHalo" x="-20%" y="-20%" width="140%" height="140%">
       <feDropShadow dx="0" dy="0" stdDeviation="1.2" flood-color="#f0e8c8" flood-opacity="0.95"/>
+    </filter>
+    <filter id="mapIconGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
+      <feComponentTransfer result="spread"><feFuncA type="linear" slope="9"/></feComponentTransfer>
+      <feFlood flood-color="#ffffff" flood-opacity="0.4"/>
+      <feComposite in2="spread" operator="in" result="glow"/>
+      <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>`);
 
@@ -349,7 +524,10 @@ export function renderHubMapSvg(view) {
   }
 
   // Labels with collision-aware placement (reduces unreadable pile-ups)
-  for (const lab of layoutStreetLabels(view.streets || [], view.mapW || 760, view.mapH || 460)) {
+  const labels = layoutStreetLabels(view.streets || [], view.mapW || 760, view.mapH || 460);
+  // The street icons (vendor, shrine, subway) find room around the labels, star and GO buttons.
+  const icons = layoutStreetIcons(view.streets || [], { labels, hubs: view.hubs });
+  for (const lab of labels) {
     parts.push(
       `<text class="${lab.cls}" x="${lab.x.toFixed(1)}" y="${lab.y.toFixed(1)}" text-anchor="middle" ` +
         `transform="rotate(${lab.rot.toFixed(1)} ${lab.x.toFixed(1)} ${lab.y.toFixed(1)})" ` +
@@ -361,6 +539,28 @@ export function renderHubMapSvg(view) {
     parts.push(
       `<image class="map-fg" href="${escapeXml(view.fgLocal)}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="none" pointer-events="none"/>`
     );
+  }
+
+  // MapHub.as drawStreet: each icon turned with its street; the vendor and shrine keep the
+  // client's white 2 px glow at 40% (StaticFilters.white2px40percent_GlowA), the subway none.
+  // One tab stop for them all (arrow keys move between them, js/ui/map-icon-tips.js), left to right.
+  const ordered = [...icons].sort((a, b) => a.box.x0 - b.box.x0 || a.box.y0 - b.box.y0);
+  if (ordered.length) {
+    parts.push(`<g class="map-icons">`);
+    ordered.forEach((ic, i) => {
+      const f = (n) => Number(n.toFixed(2));
+      parts.push(
+        `<g class="map-icon map-icon-${ic.kind}" tabindex="${i === 0 ? 0 : -1}" role="img" ` +
+          `aria-label="${escapeXml(`${ic.tip}, ${ic.streetName}`)}" data-tip="${escapeXml(ic.tip)}" ` +
+          `data-kind="${ic.kind}" data-tsid="${escapeXml(ic.tsid)}" ` +
+          `transform="translate(${f(ic.mx)} ${f(ic.my)}) rotate(${f(ic.rot)})">` +
+          `<rect class="map-icon-ring" x="${ic.lx - 2}" y="${ic.ly - 2}" width="${ic.w + 4}" height="${ic.h + 4}" rx="3"/>` +
+          `<image href="${escapeXml(ic.url)}" x="${ic.lx}" y="${ic.ly}" width="${ic.w}" height="${ic.h}"` +
+          `${ic.kind === 'subway' ? '' : ' filter="url(#mapIconGlow)"'}/>` +
+          `</g>`
+      );
+    });
+    parts.push(`</g>`);
   }
 
   const you = (view.streets || []).find((s) => s.current);
@@ -387,7 +587,7 @@ export function renderHubMapSvg(view) {
 
   return (
     `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" ` +
-    `role="img" aria-label="${escapeXml(view.hubName)} street map" class="hub-map-svg">` +
+    `role="${icons.length ? 'group' : 'img'}" aria-label="${escapeXml(view.hubName)} street map" class="hub-map-svg">` +
     parts.join('\n') +
     `</svg>`
   );

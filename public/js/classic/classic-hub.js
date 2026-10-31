@@ -25,7 +25,7 @@
  * the loading or start card is up, or while the upgrade cards are open (X closes those, as before).
  */
 import { uiState, onUiModeChange, readUiCache, writeUiCache } from './ui-mode.js?v=587c014a';
-import { classicArtUrl } from './classic-art.js?v=8da477d9';
+import { classicArtUrl } from './classic-art.js?v=5745e669';
 
 /** The clouds, in the client's two rows (ImgMenuView.as 343-415). */
 export const HUB_CLOUDS = Object.freeze([

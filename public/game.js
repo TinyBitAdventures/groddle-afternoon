@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=e2372a6b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=181a2477';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a1dfca27';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -838,8 +838,9 @@ import {
   listHubsFromIndex,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
-} from './js/map-graph.js?v=419ce342';
+} from './js/map-graph.js?v=fa3b2989';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=a6771c5e';
+import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import {
   loadStreetEcologyCatalog,
   ecologyForStreet,
@@ -896,7 +897,7 @@ import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?
 import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=0694e27a';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=b0d4eb80';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -21384,6 +21385,8 @@ async function openMap(hubId) {
   }
 
   canvas.innerHTML = renderHubMapSvg(view);
+  // The street icons' tips on hover and keyboard focus (vendor, shrine, subway; MapHub.as).
+  bindMapIconTips(canvas);
 
   canvas.querySelectorAll('.map-street.travelable').forEach((g) => {
     g.addEventListener('click', (e) => {

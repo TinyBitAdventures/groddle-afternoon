@@ -16,7 +16,9 @@
       "x1": 439,
       "y1": 228,
       "x2": 528,
-      "y2": 307
+      "y2": 307,
+      "store": "Alchemical Goods",
+      "shrine": "ti"
     },
     {
       "tsid": "LTJLTCN21IQ1URB",
@@ -24,7 +26,9 @@
       "x1": 527,
       "y1": 306,
       "x2": 579,
-      "y2": 212
+      "y2": 212,
+      "store": "Produce",
+      "shrine": "spriggan"
     },
     {
       "tsid": "LTJ1024R2DQ1B5S",
@@ -32,7 +36,9 @@
       "x1": 186,
       "y1": 391,
       "x2": 298,
-      "y2": 404
+      "y2": 404,
+      "store": "Kitchen Tools",
+      "shrine": "humbaba"
     },
     {
       "tsid": "LTJ12E6VSFQ1V4E",
@@ -40,7 +46,9 @@
       "x1": 579,
       "y1": 212,
       "x2": 652,
-      "y2": 172
+      "y2": 172,
+      "store": "Groceries",
+      "shrine": "zille"
     },
     {
       "tsid": "LTJ103U2KJK1BLG",
@@ -48,7 +56,9 @@
       "x1": 273,
       "y1": 136,
       "x2": 463,
-      "y2": 44
+      "y2": 44,
+      "store": "Alchemical Goods",
+      "shrine": "pot"
     },
     {
       "tsid": "LTJ102GGGJK1VDO",
@@ -56,7 +66,9 @@
       "x1": 55,
       "y1": 332,
       "x2": 235,
-      "y2": 213
+      "y2": 213,
+      "store": "Gardening Goods",
+      "shrine": "friendly"
     },
     {
       "tsid": "LTJ1013E97K17P1",
@@ -64,7 +76,9 @@
       "x1": 361,
       "y1": 275,
       "x2": 507,
-      "y2": 187
+      "y2": 187,
+      "store": "Gardening Goods",
+      "shrine": "mab"
     },
     {
       "tsid": "LTJ11BUJ57K1VUV",
@@ -72,7 +86,9 @@
       "x1": 361,
       "y1": 274,
       "x2": 406,
-      "y2": 352
+      "y2": 352,
+      "store": "Kitchen Tools",
+      "shrine": "pot"
     },
     {
       "tsid": "LTJ112E9DIO1BPE",
@@ -80,7 +96,9 @@
       "x1": 30,
       "y1": 253,
       "x2": 143,
-      "y2": 208
+      "y2": 208,
+      "store": "Produce",
+      "shrine": "grendaline"
     },
     {
       "tsid": "LTJ17MOFE6P1NJ3",
@@ -88,7 +106,9 @@
       "x1": 30,
       "y1": 254,
       "x2": 81,
-      "y2": 314
+      "y2": 314,
+      "store": "Kitchen Tools",
+      "shrine": "pot"
     },
     {
       "tsid": "LLI4HJ9GRLI1C4E",
@@ -96,7 +116,9 @@
       "x1": 265,
       "y1": 36,
       "x2": 281,
-      "y2": 192
+      "y2": 192,
+      "store": "Animal Goods",
+      "shrine": "mab"
     },
     {
       "tsid": "LTJ13ELOLPQ1DP3",
@@ -104,7 +126,9 @@
       "x1": 143,
       "y1": 209,
       "x2": 175,
-      "y2": 109
+      "y2": 109,
+      "store": "Kitchen Tools",
+      "shrine": "lem"
     },
     {
       "tsid": "LLI599R12JI1216",
@@ -112,7 +136,9 @@
       "x1": 161,
       "y1": 263,
       "x2": 182,
-      "y2": 386
+      "y2": 386,
+      "store": "Produce",
+      "shrine": "alph"
     },
     {
       "tsid": "LLI57FTH2HI17PN",
@@ -120,7 +146,9 @@
       "x1": 301,
       "y1": 405,
       "x2": 361,
-      "y2": 275
+      "y2": 275,
+      "store": "Alchemical Goods",
+      "shrine": "ti"
     },
     {
       "tsid": "LTJ102C4FFQ1Q6O",
@@ -128,7 +156,9 @@
       "x1": 406,
       "y1": 353,
       "x2": 501,
-      "y2": 419
+      "y2": 419,
+      "store": "Hardware",
+      "shrine": "friendly"
     },
     {
       "tsid": "LTJ11TPQUMO197U",
@@ -136,7 +166,9 @@
       "x1": 29,
       "y1": 157,
       "x2": 118,
-      "y2": 120
+      "y2": 120,
+      "store": "Animal Goods",
+      "shrine": "humbaba"
     },
     {
       "tsid": "LTJ102LVLDQ1NGH",
@@ -144,7 +176,9 @@
       "x1": 501,
       "y1": 417,
       "x2": 528,
-      "y2": 307
+      "y2": 307,
+      "store": "Kitchen Tools",
+      "shrine": "lem"
     },
     {
       "tsid": "LTJ108JAODQ11KH",
@@ -152,7 +186,9 @@
       "x1": 256,
       "y1": 292,
       "x2": 327,
-      "y2": 344
+      "y2": 344,
+      "store": "Gardening Goods",
+      "shrine": "spriggan"
     },
     {
       "tsid": "LTJ101PRVCQ1RN0",
@@ -160,7 +196,9 @@
       "x1": 393,
       "y1": 77,
       "x2": 490,
-      "y2": 113
+      "y2": 113,
+      "store": "Produce",
+      "shrine": "grendaline"
     },
     {
       "tsid": "LTJ10B0UHQQ172V",
@@ -168,7 +206,9 @@
       "x1": 175,
       "y1": 324,
       "x2": 255,
-      "y2": 291
+      "y2": 291,
+      "store": "Hardware",
+      "shrine": "cosma"
     },
     {
       "tsid": "LTJ3PGOAMIQ1QDS",
@@ -176,7 +216,9 @@
       "x1": 175,
       "y1": 110,
       "x2": 268,
-      "y2": 75
+      "y2": 75,
+      "store": "Groceries",
+      "shrine": "lem"
     },
     {
       "tsid": "LTJ101I3KSO1JQS",
@@ -184,7 +226,9 @@
       "x1": 312,
       "y1": 47,
       "x2": 388,
-      "y2": 77
+      "y2": 77,
+      "store": "Groceries",
+      "shrine": "lem"
     },
     {
       "tsid": "LLICF642CTI16R1",
@@ -192,7 +236,9 @@
       "x1": 366,
       "y1": 163,
       "x2": 510,
-      "y2": 187
+      "y2": 187,
+      "store": "Toys",
+      "shrine": "lem"
     },
     {
       "tsid": "LM11HIDASHO1THR",
@@ -200,7 +246,9 @@
       "x1": 299,
       "y1": 404,
       "x2": 406,
-      "y2": 353
+      "y2": 353,
+      "store": "Produce",
+      "shrine": "grendaline"
     },
     {
       "tsid": "LTJ101FB0SO17JK",
@@ -208,7 +256,9 @@
       "x1": 379,
       "y1": 305,
       "x2": 527,
-      "y2": 308
+      "y2": 308,
+      "store": "Animal Goods",
+      "shrine": "humbaba"
     },
     {
       "tsid": "LLI57G8I2HI1CSO",
@@ -216,7 +266,9 @@
       "x1": 506,
       "y1": 187,
       "x2": 577,
-      "y2": 212
+      "y2": 212,
+      "store": "Hardware",
+      "shrine": "cosma"
     },
     {
       "tsid": "LA99U5PI39524GN",
@@ -232,7 +284,9 @@
       "x1": 29,
       "y1": 157,
       "x2": 30,
-      "y2": 253
+      "y2": 253,
+      "store": "Alchemical Goods",
+      "shrine": "ti"
     },
     {
       "tsid": "LLI57DI72HI153U",
@@ -240,7 +294,10 @@
       "x1": 235,
       "y1": 214,
       "x2": 367,
-      "y2": 163
+      "y2": 163,
+      "store": "Kitchen Tools",
+      "shrine": "grendaline",
+      "has_subway": true
     },
     {
       "tsid": "LLI57EKC2HI1EH8",
@@ -248,7 +305,9 @@
       "x1": 89,
       "y1": 311,
       "x2": 182,
-      "y2": 390
+      "y2": 390,
+      "store": "Animal Goods",
+      "shrine": "alph"
     },
     {
       "tsid": "LTJ9IM9AFAO1C44",
@@ -256,7 +315,9 @@
       "x1": 279,
       "y1": 198,
       "x2": 365,
-      "y2": 275
+      "y2": 275,
+      "store": "Hardware",
+      "shrine": "friendly"
     },
     {
       "tsid": "LTJ12O0H7AO1IBS",
@@ -264,7 +325,9 @@
       "x1": 509,
       "y1": 187,
       "x2": 570,
-      "y2": 118
+      "y2": 118,
+      "store": "Gardening Goods",
+      "shrine": "spriggan"
     },
     {
       "tsid": "LTJ103NK29K1TNJ",
@@ -272,7 +335,9 @@
       "x1": 118,
       "y1": 121,
       "x2": 160,
-      "y2": 259
+      "y2": 259,
+      "store": "Hardware",
+      "shrine": "cosma"
     }
   ],
   "hubs": [

@@ -11835,3 +11835,19 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 /* The route card (To: / Next:) stacks under the map: --minimap-h is what the map takes (0 when hidden). */
 [data-ui="modern"] #game-root .route-gps { top: calc(var(--hud-h) + var(--space-3) + var(--minimap-h, 0px)); }
 /* —— end MINIMAP —— */
+
+/* —— MAPICONS —— the hub map's street icons (vendor, shrine, subway station; js/map-graph.js
+   renderHubMapSvg) and their tips (js/ui/map-icon-tips.js). The icons draw in the map's own units,
+   so they scale with it as the labels do. */
+.map-icon { cursor: default; outline: none; }
+.map-icon-ring { fill: none; stroke: transparent; stroke-width: 1.5; }
+.map-icon:focus-visible .map-icon-ring { stroke: var(--focus); fill: color-mix(in srgb, var(--focus) 18%, transparent); }
+.map-icon-tip {
+  position: absolute; z-index: var(--z-world);
+  width: max-content; max-width: 16rem; margin: 0; pointer-events: none;
+  padding: var(--sp-2) var(--sp-4); border-radius: var(--radius-md);
+  background: var(--surface-card); color: var(--text); box-shadow: 0 0 0 1px var(--border), var(--shadow-2);
+  font: var(--fw-bold) var(--fs-sm)/var(--lh-tight) var(--font-ui);
+}
+.map-icon-tip[hidden] { display: none; }
+/* —— end MAPICONS —— */

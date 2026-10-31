@@ -16,7 +16,8 @@
       "x1": 217,
       "y1": 318,
       "x2": 316,
-      "y2": 318
+      "y2": 318,
+      "shrine": "zille"
     },
     {
       "tsid": "LA9ENT2CRE22NFB",
@@ -24,7 +25,9 @@
       "x1": 139,
       "y1": 248,
       "x2": 140,
-      "y2": 331
+      "y2": 331,
+      "store": "Mining",
+      "shrine": "lem"
     },
     {
       "tsid": "LA91JU4QQ712DJN",
@@ -32,7 +35,9 @@
       "x1": 558,
       "y1": 57,
       "x2": 561,
-      "y2": 216
+      "y2": 216,
+      "store": "Mining",
+      "shrine": "ti"
     },
     {
       "tsid": "LA9114MS8B32FB2",
@@ -40,7 +45,9 @@
       "x1": 275,
       "y1": 413,
       "x2": 464,
-      "y2": 420
+      "y2": 420,
+      "store": "Mining",
+      "shrine": "spriggan"
     },
     {
       "tsid": "LM112V6OCA126K1",
@@ -48,7 +55,9 @@
       "x1": 265,
       "y1": 57,
       "x2": 266,
-      "y2": 141
+      "y2": 141,
+      "store": "Mining",
+      "shrine": "friendly"
     },
     {
       "tsid": "LA918AIN63127HB",
@@ -56,7 +65,9 @@
       "x1": 420,
       "y1": 216,
       "x2": 653,
-      "y2": 221
+      "y2": 221,
+      "store": "Mining",
+      "shrine": "lem"
     },
     {
       "tsid": "LM1TS65LBN12EIV",
@@ -64,7 +75,9 @@
       "x1": 44,
       "y1": 144,
       "x2": 265,
-      "y2": 142
+      "y2": 142,
+      "store": "Mining",
+      "shrine": "mab"
     },
     {
       "tsid": "LA911QQIDI32J6R",
@@ -72,7 +85,9 @@
       "x1": 632,
       "y1": 304,
       "x2": 636,
-      "y2": 434
+      "y2": 434,
+      "store": "Mining",
+      "shrine": "alph"
     },
     {
       "tsid": "LM113FUK5422FVO",
@@ -80,7 +95,9 @@
       "x1": 146,
       "y1": 300,
       "x2": 361,
-      "y2": 187
+      "y2": 187,
+      "store": "Toys",
+      "shrine": "pot"
     },
     {
       "tsid": "LA9QR2STO832N8E",
@@ -88,7 +105,9 @@
       "x1": 141,
       "y1": 329,
       "x2": 272,
-      "y2": 414
+      "y2": 414,
+      "store": "Mining",
+      "shrine": "zille"
     },
     {
       "tsid": "LA912TJ0KF328Q3",
@@ -96,7 +115,9 @@
       "x1": 535,
       "y1": 301,
       "x2": 716,
-      "y2": 304
+      "y2": 304,
+      "store": "Mining",
+      "shrine": "grendaline"
     },
     {
       "tsid": "LA9DNT3I2U22RS7",
@@ -104,7 +125,9 @@
       "x1": 462,
       "y1": 343,
       "x2": 654,
-      "y2": 224
+      "y2": 224,
+      "store": "Mining",
+      "shrine": "zille"
     },
     {
       "tsid": "LA910DULG012JIE",
@@ -112,7 +135,9 @@
       "x1": 42,
       "y1": 246,
       "x2": 139,
-      "y2": 247
+      "y2": 247,
+      "store": "Mining",
+      "shrine": "cosma"
     },
     {
       "tsid": "LA9QKFSST732VNK",
@@ -120,7 +145,9 @@
       "x1": 461,
       "y1": 343,
       "x2": 464,
-      "y2": 421
+      "y2": 421,
+      "store": "Mining",
+      "shrine": "mab"
     },
     {
       "tsid": "LM169I1E0C226G1",
@@ -128,7 +155,9 @@
       "x1": 40,
       "y1": 142,
       "x2": 42,
-      "y2": 247
+      "y2": 247,
+      "store": "Mining",
+      "shrine": "humbaba"
     },
     {
       "tsid": "LA9B6PJ3NM22M0D",
@@ -136,7 +165,9 @@
       "x1": 262,
       "y1": 241,
       "x2": 395,
-      "y2": 412
+      "y2": 412,
+      "store": "Mining",
+      "shrine": "cosma"
     },
     {
       "tsid": "LM113VSD6922MRJ",
@@ -144,7 +175,9 @@
       "x1": 267,
       "y1": 141,
       "x2": 419,
-      "y2": 215
+      "y2": 215,
+      "store": "Mining",
+      "shrine": "spriggan"
     }
   ],
   "hubs": [

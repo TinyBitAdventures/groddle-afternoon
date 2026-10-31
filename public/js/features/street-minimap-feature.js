@@ -23,7 +23,7 @@
  */
 
 import { createStreetMinimap, minimapVisibility, onStreetMapChange, setStreetMap, snapshotStreetView, streetMapOn } from '../ui/street-minimap.js?v=23e34f93';
-import { classicArtUrl } from '../classic/classic-art.js?v=8da477d9';
+import { classicArtUrl } from '../classic/classic-art.js?v=5745e669';
 import { onUiModeChange } from '../classic/ui-mode.js?v=587c014a';
 
 export const STREET_MINIMAP_FEATURE_ID = 'street-minimap';

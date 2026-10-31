@@ -6,11 +6,11 @@
  * avatar still (game.js ownerPortraitUrl) for the pictures the 2012 chrome showed.
  */
 import { installClassicFrame } from './classic-frame.js?v=1c54a74a';
-import { installClassicTopbar } from './classic-topbar.js?v=2886873b';
+import { installClassicTopbar } from './classic-topbar.js?v=8057c68a';
 import { installClassicGrowl } from './classic-growl.js?v=a476fea1';
-import { installClassicPanes } from './classic-panes.js?v=5aa9cfd5';
+import { installClassicPanes } from './classic-panes.js?v=419857a0';
 import { installClassicPack } from './classic-pack.js?v=7ece52b8';
-import { installClassicHub } from './classic-hub.js?v=42806180';
+import { installClassicHub } from './classic-hub.js?v=eb596079';
 
 let installed = null;
 
