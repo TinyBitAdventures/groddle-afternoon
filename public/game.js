@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=a8fb3004';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=72cc82cd';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=eeb9ca4c';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d1decac5';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -578,7 +578,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=390e4702';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=a7fac96a';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=19db20b0';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -602,7 +602,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=3f8384af';
+} from './js/street-render.js?v=90a690df';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -690,9 +690,9 @@ import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=587c0
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction } from './js/world-zoom.js?v=b5f4748a';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=917a2caa';
-import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=c52ec837';
+import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=8bc8920a';
 import './js/classic/classic-zoom.js?v=7a25123e';
-import { mountImaginationHub } from './js/ui/imagination-hub.js?v=972868f3';
+import { mountImaginationHub } from './js/ui/imagination-hub.js?v=fff73f8c';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=2089ac54';
 import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=8691416a';
@@ -869,7 +869,7 @@ import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from '.
 import { installHiresIcons } from './js/icon-hires.js?v=5357d4b4';
 import { installHiresDecos } from './js/deco-hires.js?v=cc8506f6';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=e56202ee';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=5b26a56e';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=f1b60367';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=f7ea0bd5';
@@ -884,7 +884,7 @@ import { createQuestTracker } from './js/ui/quest-tracker.js?v=e2899b11';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=e9d100c3';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=0eeb8604';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=e50c1649';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d51e';
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=3753a0d2';
@@ -900,7 +900,7 @@ import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?
 import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=007a73fa';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=ac12c722';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -10683,9 +10683,13 @@ const engine = {
       returnLabel: homeState.returnLocation?.label || '',
       // G328: where the home's way back leads (a visit to someone's home from yours returns there).
       returnLocation: homeState.returnLocation ? { ...homeState.returnLocation } : null,
+      // GATESIGN: the way-out signpost's street (the remembered one, else your arrival street).
+      wayOut: (({ tsid, label, hubName }) => ({ tsid, label, hubName }))(homeReturnDestination()),
       unread: unreadMailCount(mailboxState, Date.now()),
     };
   },
+  /** GATESIGN: the Imagination menus' Back to world ({ tsid, label, hubName, tip, art, go }), or null out in the world. */
+  homeWayOut: () => homeWayOut(),
   /**
    * Slash commands (features/slash-commands-feature.js, main.js doChatCommand /home, /house, /leave):
    * the Home panel's own travel. 'teleport' | 'teleport-inside' | 'inside' | 'outside' | 'return'.
@@ -20503,12 +20507,13 @@ function spawnHomeSceneTargets(room) {
       state: { room: 'street' },
     });
     const marker = makeHomeReturnSprite();
+    const way = homeReturnDestination();
     homeReturnTarget = register({
       classId: 'home_return_marker',
-      label: 'World Gate',
-      subtitle: `Back to ${homeState.returnLocation?.label || 'the world'}`,
+      label: way.label,
+      subtitle: `Back to ${way.label}`,
       sprite: marker,
-      state: { returnLabel: homeState.returnLocation?.label || '' },
+      state: { returnLabel: way.label, returnHub: way.hubName },
     });
   } else {
     const door = makeHomeDoorSprite(room);
@@ -20708,15 +20713,41 @@ async function switchHomeRoom(room) {
   return true;
 }
 
+/**
+ * GATESIGN: where your home's way out leads: the street you came from (homeState.returnLocation),
+ * else your arrival street (STREET_INDEX.default), with its label and hub name for the way-out
+ * signpost's arm and the Imagination hub's Back to world tip (ImgMenuHome.as: label + ", " + hub).
+ */
+function homeReturnDestination(back = homeState.returnLocation) {
+  const tsid = back?.tsid || STREET_INDEX.default;
+  const meta = STREET_INDEX.streets?.[tsid];
+  return {
+    ...(back || {}),
+    tsid,
+    label: back?.label || meta?.label || 'Groddle',
+    hubName: back?.hubName || meta?.hubName || '',
+  };
+}
+
+/**
+ * GATESIGN: the Imagination menu's Back to world (ImgMenuHome.as at home, ImgMenuBackToWorld.as in
+ * another player's home): where it leads ({ label, hubName, tip, art }) and go(), or null out in
+ * the world. Anywhere in your own home (street, house), as the original's isTsidInHome counted the
+ * house too; a visit to someone's home (neighbours-mp-feature) answers with its own way back.
+ */
+function homeWayOut() {
+  const visit = features.query('homeVisitWayOut', engine);
+  const base = visit || (homeIsInstanced() ? { ...homeReturnDestination(), go: () => returnFromHome() } : null);
+  if (!base) return null;
+  const tip = base.hubName && base.hubName !== base.label ? `${base.label}, ${base.hubName}` : base.label;
+  return { ...base, tip, art: base.tsid ? resolveLoadingImg(base.tsid) : null };
+}
+
 async function returnFromHome() {
   if (!homeIsInstanced()) return false;
   const result = endHomeVisit(homeState);
   if (!result.ok) return false;
-  const destination = result.returnLocation || {
-    tsid: STREET_INDEX.default,
-    label: STREET_INDEX.streets?.[STREET_INDEX.default]?.label || 'Groddle',
-    hubName: '',
-  };
+  const destination = homeReturnDestination(result.returnLocation);
   closeHomePanel();
   closeMailboxPanel();
   await enterStreetWithTransition(destination.tsid, {
@@ -21152,7 +21183,7 @@ async function travelTo(toTsid, meta = {}) {
     return { ok: false, reason: 'feature_gate' };
   }
   if (homeIsInstanced()) {
-    toast('Use the World Gate to return from home.');
+    toast('Use the signpost by your house, or Back to world on X, to leave home.');
     return { ok: false, reason: 'home_instance' };
   }
   if (greedyStreetIsInstanced()) {
@@ -21213,7 +21244,7 @@ async function travelTo(toTsid, meta = {}) {
 
 function doTeleport() {
   if (homeIsInstanced()) {
-    toast('Use the World Gate to return from home.');
+    toast('Use the signpost by your house, or Back to world on X, to leave home.');
     return;
   }
   if (greedyStreetIsInstanced()) {
@@ -27402,6 +27433,15 @@ async function main() {
       looks: () => openAvatarPanel(),
       teleport: () => features.query('teleportPointsKey', engine),
       home: () => document.getElementById('home-btn')?.click(),
+      // GATESIGN: Back to world (ImgMenuHome.as at home, ImgMenuBackToWorld.as on a visit).
+      back: () => homeWayOut()?.go?.(),
+    },
+    // Back to world is dimmed out in the world, as the original's cloud was (enabled only in a home).
+    tileState: (id) => {
+      if (id !== 'back') return null;
+      const way = homeWayOut();
+      // Out in the world the cloud shows where you are, dimmed (ImgMenuBackToWorld.as: "where we are now").
+      return way ? { disabled: false, tip: way.tip, art: way.art || null } : { disabled: true, tip: 'You are out in the world', art: resolveLoadingImg(currentStreetTsid) || null };
     },
     // Your home is an instance, but X opens the hub there; not over Decorate or Cultivate.
     canOpen: () => state.started && !engine.busy({ ignoreHome: true }) && !features.query('homeEditMode', engine) && !isScreenViewOpen(),

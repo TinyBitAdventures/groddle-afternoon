@@ -15,7 +15,7 @@ import {
   homeStreetLayout,
   normalizeCultivationState,
   placementCheck,
-} from '../public/js/home-cultivation.js?v=15295514';
+} from '../public/js/home-cultivation.js?v=7097c51d';
 import {
   DISPATCHER_HALF,
   DISPATCHER_TEXT,
@@ -25,8 +25,8 @@ import {
   gateX,
   savedDispatcherRx,
   streetFixtures,
-} from '../public/js/home-street-fixtures.js?v=088da201';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=a24321b5';
+} from '../public/js/home-street-fixtures.js?v=a9d81324';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=1b54505a';
 
 const root = join(import.meta.dirname, '..', 'public', 'js');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -73,7 +73,7 @@ describe('moving the Mail Dispatcher (HOMEMAIL)', () => {
       assert.equal(dispatcherFits(layout, x, { fixtures }).ok, true, `clear for ${want}`);
     }
     const on = dispatcherFits(layout, gateX(layout), { fixtures });
-    assert.deepEqual([on.ok, on.reason, on.msg], [false, 'gate', 'Keep it clear of your World Gate.']);
+    assert.deepEqual([on.ok, on.reason, on.msg], [false, 'gate', 'Keep it clear of your signpost.']);
     const sign = dispatcherFits(layout, gateX(layout) - 200, { fixtures });
     assert.deepEqual([sign.ok, sign.reason, sign.msg], [false, 'signpost', 'Keep it clear of your signpost.']);
     const edge = dispatcherFits(layout, 20, { fixtures });

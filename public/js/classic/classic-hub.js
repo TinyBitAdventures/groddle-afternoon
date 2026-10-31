@@ -7,7 +7,10 @@
  * public/assets/classic/; the skill book, quest book and upgrade cards on the first three), each routed to what the remake already has:
  *   Skills (S), Quests (Q or L), Upgrades (U): the Skills panel, the Quest Log, the upgrade cards;
  *   Your looks (Y): the Look builder (no outfit history exists); Teleport (T): the saved teleport
- *   points (Shift+T); Go home (H): Home; Back to world (B): closes the hub.
+ *   points (Shift+T); Go home (H): Home; Back to world (B): closes the hub. GATESIGN: at home the
+ *   home cloud reads Back to world and takes you back to the street you came from (ImgMenuHome.as
+ *   onHomeClick /leave), its tip that street and hub; on a visit to another player's home the
+ *   world cloud takes you back (ImgMenuBackToWorld.as /leave). Both ask engine.homeWayOut().
  * Arrows cycle the clouds, Enter picks, X and Esc close. The iMG button in the ear opens it too.
  *
  * Pictures in the clouds, as the client's (ImgMenuElement.as 119-127, 204-242: an image masked by a
@@ -15,7 +18,7 @@
  * still the home card uses), Teleport the familiar's teleport art, Go home your home street and Back
  * to world the street you are on, both from the game's own view snapshot (engine.snapshotView). The
  * home street is captured while you are on it and kept on this device; until the first visit the
- * cloud stays bare. At home the home cloud reads "Back to world" and the world cloud dims, as
+ * cloud stays bare. At home the home cloud reads "Back to world" and the world cloud dims and reads "Go home", as
  * ImgMenuHome / ImgMenuBackToWorld did.
  * Opening fades the hub in over .4 s and each cloud in .2 s, .1 s apart, each with its CLOUD1-7
  * sound, after IMAGINATION_OPEN; closing plays IMAGINATION_CLOSE (ImgMenuView.as 151-300).
@@ -52,8 +55,8 @@ export function coverRect(w, h, bw, bh) {
 /** PURE: the home and world clouds' words and state for where you are (ImgMenuHome.as 24-30, ImgMenuBackToWorld.as 28-43). */
 export function placeClouds(atHome) {
   return atHome
-    ? { homeTitle: 'Back to world', homePicture: 'world', backDisabled: true }
-    : { homeTitle: 'Go home', homePicture: 'home', backDisabled: false };
+    ? { homeTitle: 'Back to world', homePicture: 'world', backTitle: 'Go home', backDisabled: true }
+    : { homeTitle: 'Go home', homePicture: 'home', backTitle: 'Back to world', backDisabled: false };
 }
 
 /** PURE: the cloud a key picks inside the hub, or null. */
@@ -158,6 +161,10 @@ function createHub(doc, win, { engine = null, avatarPortrait = null } = {}) {
   const atHome = () => {
     try { return Boolean(engine?.homeContext?.()?.inHome); } catch { return false; }
   };
+  /** GATESIGN: where leaving leads ({ tip, go }) in your home or on a visit, else null (game.js homeWayOut). */
+  const wayOut = () => {
+    try { return engine?.homeWayOut?.() || null; } catch { return null; }
+  };
   /** The home street as you last saw it here; refreshed while you stand on it (at most every 2 minutes). */
   let homeShotAt = 0;
   async function captureHome({ force = false } = {}) {
@@ -180,6 +187,12 @@ function createHub(doc, win, { engine = null, avatarPortrait = null } = {}) {
     const homeCloud = cloudOf('home');
     homeCloud.querySelector('.classic-hub-title').textContent = words.homeTitle;
     cloudOf('back').disabled = words.backDisabled;
+    // ImgMenuBackToWorld.as show(): at home the dimmed world cloud reads Go home.
+    cloudOf('back').querySelector('.classic-hub-title').textContent = words.backTitle;
+    // The tip: the street (and hub) leaving takes you to (ImgMenuHome / ImgMenuBackToWorld drawTip).
+    const way = wayOut();
+    homeCloud.title = home && way ? way.tip : '';
+    cloudOf('back').title = !home && way ? way.tip : '';
     try {
       if (!home) worldUrl = (await snapshotUrl(engine, 'cloud_back_to_world')) || worldUrl;
     } catch { /* keep the last */ }
@@ -200,7 +213,9 @@ function createHub(doc, win, { engine = null, avatarPortrait = null } = {}) {
       else if (id === 'quests') click('quest-btn');
       else if (id === 'upgrades') click('img-btn');
       else if (id === 'looks') click('avatar-btn');
+      else if (id === 'home' && atHome() && wayOut()) wayOut().go();
       else if (id === 'home') click('home-btn');
+      else if (id === 'back') wayOut()?.go?.();
       else if (id === 'teleport') key({ key: 'T', code: 'KeyT', shiftKey: true });
     }, 0);
   }
@@ -240,7 +255,13 @@ function createHub(doc, win, { engine = null, avatarPortrait = null } = {}) {
       const k = String(e.key || '');
       if (k === 'Escape' || hubKey(k) === null && k.toLowerCase() === 'x') { api.close(); return true; }
       const id = hubKey(k);
-      if (id && !e.ctrlKey && !e.metaKey && !e.altKey) { if (id === 'back') api.close(); else pick(id); return true; }
+      if (id && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        // ImgMenuView onBKey: at home B is the home cloud's Back to world; on a visit the world cloud's.
+        if (id === 'back' && atHome()) pick('home');
+        else if (id === 'back' && !wayOut()) api.close();
+        else pick(id);
+        return true;
+      }
       if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'ArrowLeft' || k === 'ArrowUp') {
         const i = buttons.indexOf(doc.activeElement);
         const step = k === 'ArrowRight' || k === 'ArrowDown' ? 1 : -1;

@@ -12,8 +12,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GARDEN_ART } from '../public/js/garden-art.js?v=c947ccf4';
 import { bedPieces, GARDEN_SCALE, gardenHalfWidth, gardenLayout, gardenMetrics, gardenStyle, plotOrigin, plotPieces, PLOT_H, PLOT_W } from '../public/js/garden-view.js?v=05651e76';
-import { createCultivationState, cultivateDemoYard, cultivationDef, dispatcherRx, footprint, groundFixtures, homeStreetLayout, normalizeCultivationState, placementCheck, GATE_POST_HALF, SIGNPOST_POST_HALF } from '../public/js/home-cultivation.js?v=15295514';
-import { DISPATCHER_HALF } from '../public/js/home-street-fixtures.js?v=088da201';
+import { createCultivationState, cultivateDemoYard, cultivationDef, dispatcherRx, footprint, groundFixtures, homeStreetLayout, normalizeCultivationState, placementCheck, GATE_POST_HALF, SIGNPOST_POST_HALF } from '../public/js/home-cultivation.js?v=7097c51d';
+import { DISPATCHER_HALF } from '../public/js/home-street-fixtures.js?v=a9d81324';
 import { SEED_CATALOG } from '../public/js/garden.js?v=9a8f8f72';
 import { HIRES_SPRITES, FIRST_DRAW_SPRITES } from '../public/js/sprite-hires.js?v=f7ea0bd5';
 
@@ -103,7 +103,7 @@ describe('gardens put together as GardenView.as did (js/garden-view.js)', () => 
     assert.equal(footprint('proto_metal_rock'), Math.round(cultivationDef('proto_metal_rock').width * 0.4));
   });
 
-  it('nothing is set down on the World Gate\'s or the signpost\'s post, the Magic Rock or the Butler Box', () => {
+  it('nothing is set down on the way-out signpost\'s or the friends\' signpost\'s post, the Magic Rock or the Butler Box', () => {
     const state = createCultivationState({ yardLeft: 4, yardRight: 4 });
     const layout = homeStreetLayout(state);
     const half = footprint('proto_crop_garden_medium');
@@ -116,13 +116,17 @@ describe('gardens put together as GardenView.as did (js/garden-view.js)', () => 
     const post = groundFixtures(layout).find((f) => f.id === 'signpost');
     assert.equal(post.x2 - post.x1, 2 * SIGNPOST_POST_HALF);
     const gate = groundFixtures(layout).find((f) => f.id === 'gate');
-    assert.deepEqual(placementCheck(state, 'proto_crop_garden_medium', Math.round(gate.x2 - layout.houseX)).msg, 'Keep it clear of your World Gate.');
+    assert.deepEqual(placementCheck(state, 'proto_crop_garden_medium', Math.round(gate.x2 - layout.houseX)).msg, 'Keep it clear of your signpost.');
     assert.equal(gate.x2 - gate.x1, 2 * GATE_POST_HALF);
     // Any cultivation: under the signpost's arms is fine, on its post is not.
     const rockHalf = footprint('proto_metal_rock');
     assert.notEqual(placementCheck(state, 'proto_metal_rock', Math.round(post.x1 - layout.houseX) - rockHalf - 1).reason, 'signpost');
-    assert.equal(placementCheck(state, 'proto_metal_rock', Math.round((post.x1 + post.x2) / 2 - layout.houseX)).reason, 'signpost');
-    assert.equal(placementCheck(state, 'proto_patch', Math.round((gate.x1 + gate.x2) / 2 - layout.houseX)).msg, 'Keep it clear of your World Gate.');
+    // On the friends' post (a rock that wide, 98 each side, also reaches the way-out signpost's
+    // 22 px post 110 px away: both are signposts, as the player is told).
+    const onPost = placementCheck(state, 'proto_metal_rock', Math.round((post.x1 + post.x2) / 2 - layout.houseX));
+    assert.ok(['signpost', 'gate'].includes(onPost.reason), onPost.reason);
+    assert.equal(onPost.msg, 'Keep it clear of your signpost.');
+    assert.equal(placementCheck(state, 'proto_patch', Math.round((gate.x1 + gate.x2) / 2 - layout.houseX)).msg, 'Keep it clear of your signpost.');
   });
 
   it('a saved garden that no longer fits moves to the nearest spot that does; the dispatcher steps aside', () => {

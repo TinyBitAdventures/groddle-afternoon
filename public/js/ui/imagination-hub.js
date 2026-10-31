@@ -1,11 +1,18 @@
 /**
  * The modern skin's Imagination hub on X (phase 2, Warm paper; the HUD mock is the spec):
- * six round tiles in an arc over the avatar, the world dimmed around it, and a pill with the
+ * seven round tiles in an arc over the avatar, the world dimmed around it, and a pill with the
  * iMG there is to spend. It is the client's Imagination menu (ImgMenuView.as: the clouds for
- * Skills, Quests, Upgrades, Your Looks, Teleport and Home, opened with X) drawn the modern way.
+ * Skills, Quests, Upgrades, Your Looks, Teleport, Home and Back to world, opened with X) drawn
+ * the modern way.
+ *
+ * Back to world (GATESIGN; ImgMenuHome.as at home, ImgMenuBackToWorld.as in another player's
+ * home): in a home it takes you back to the street you came from, its tip that street and its
+ * hub ("Groddle Meadow, Groddle Forest") and its picture that street's own loading image (the
+ * client masked location.mapInfo.image_full into the cloud). Out in the world it is dimmed and
+ * does nothing, as the original's was. Home stays the Home panel, so the two never repeat.
  *
  * Keys while it is open (ImgMenuView.as 498-524 listened for its own letters and the arrows):
- * S, Q, U, L, T and H open their tile; the arrows (and Tab) move between tiles; Enter or Space
+ * S, Q, U, L, T, H and B open their tile; the arrows (and Tab) move between tiles; Enter or Space
  * opens the focused one; Esc and X close it. It has the keyboard while it is up, so no key
  * reaches the avatar or the game's own hotkeys.
  *
@@ -28,7 +35,31 @@ export const HUB_TILES = Object.freeze([
   Object.freeze({ id: 'looks', label: 'Looks', key: 'L', art: `${ART}art_avatar_walking.svg` }),
   Object.freeze({ id: 'teleport', label: 'Teleport', key: 'T', art: `${ART}art_skill_teleportation.svg` }),
   Object.freeze({ id: 'home', label: 'Home', key: 'H', art: `${ART}art_map.svg` }),
+  // ImgMenuBackToWorld.as (CLOUD7, B): its own cloud from imagination_clouds.swf on a card's blue,
+  // until a street's picture shows.
+  Object.freeze({ id: 'back', label: 'Back to world', key: 'B', art: 'assets/classic/cloud_back_to_world.svg', under: `${ART}bg_blue.svg` }),
 ]);
+
+/**
+ * PURE: a tile's state for where you are, from the game's answer (`tileState(id)`: { disabled,
+ * tip, art } or null for the tile as it is). The tip is the button's title; `art` (a street's
+ * loading image) replaces the tile's picture while it is set.
+ */
+export function hubTileState(tile, answer) {
+  const a = answer && typeof answer === 'object' ? answer : {};
+  return {
+    disabled: a.disabled === true,
+    tip: typeof a.tip === 'string' ? a.tip : '',
+    art: typeof a.art === 'string' && a.art ? a.art : tile.art,
+    photo: typeof a.art === 'string' && Boolean(a.art),
+  };
+}
+
+/** PURE: a tile picture's CSS background-image (its art over its `under`, or a street picture alone). */
+export function hubTileBackground(tile, st = null) {
+  if (st?.photo) return `url('${st.art}')`;
+  return tile.under ? `url('${tile.art}'), url('${tile.under}')` : `url('${tile.art}')`;
+}
 
 /** The mock's arc: radius 205 px, 1.3 times as wide as it is tall, tiles 92 px wide. */
 export const HUB_RADIUS = 205;
@@ -112,7 +143,8 @@ function reducedMotion(win) {
 
 /**
  * Mounts the hub in `root` (#game-root). Options:
- * - actions: { skills, quests, upgrades, looks, teleport, home }: what each tile opens.
+ * - actions: { skills, quests, upgrades, looks, teleport, home, back }: what each tile opens.
+ * - tileState(id): { disabled, tip, art } for a tile now (read on each open), or null.
  * - canOpen(): false while the game is busy (a panel, a verb, a screen), as X was before.
  * - anchor(): { head: {x, y}, feet: {x, y} } in #game-root px, the avatar on screen.
  * - imagination(): the iMG to spend.
@@ -120,7 +152,7 @@ function reducedMotion(win) {
  * - onOpenChange(open): the top bar's button state.
  * Returns { open, close, toggle, isOpen, pick, el }.
  */
-export function mountImaginationHub(doc, { root, actions = {}, canOpen = () => true, anchor = () => null, imagination = () => 0, setData = () => {}, onOpenChange = () => {} } = {}) {
+export function mountImaginationHub(doc, { root, actions = {}, tileState = () => null, canOpen = () => true, anchor = () => null, imagination = () => 0, setData = () => {}, onOpenChange = () => {} } = {}) {
   if (!doc || !root) return null;
   const win = doc.defaultView || globalThis.window;
   const el = doc.createElement('div');
@@ -134,7 +166,7 @@ export function mountImaginationHub(doc, { root, actions = {}, canOpen = () => t
     '<div class="hub-scrim" data-hub-scrim></div>' +
     HUB_TILES.map((t, i) =>
       `<button type="button" class="hub-tile" data-hub-tile="${t.id}" style="--hub-i:${i}" aria-keyshortcuts="${t.key}">` +
-      `<span class="hub-art" style="background-image:url('${t.art}')" aria-hidden="true"></span>` +
+      `<span class="hub-art" style="background-image:${hubTileBackground(t)}" aria-hidden="true"></span>` +
       `<span class="hub-label"><span class="kcap" aria-hidden="true">${t.key}</span>${t.label}</span></button>`).join('') +
     '<div class="hub-pill" data-hub-pill><img src="assets/imagination/ui/imagination_button.png" alt="" />' +
     '<span data-hub-img></span><span class="kcap" aria-hidden="true">Esc</span></div>';
@@ -219,11 +251,32 @@ export function mountImaginationHub(doc, { root, actions = {}, canOpen = () => t
     setData('hubLast', last);
   }
 
+  /** Each tile's state for where you are now (tileState): dimmed, its tip, its picture. */
+  function refreshTiles() {
+    for (const t of tiles) {
+      const def = HUB_TILES.find((d) => d.id === t.dataset.hubTile);
+      let answer = null;
+      try { answer = tileState(def.id); } catch { answer = null; }
+      const st = hubTileState(def, answer);
+      if (st.disabled) t.setAttribute('aria-disabled', 'true');
+      else t.removeAttribute('aria-disabled');
+      if (st.tip) t.title = st.tip;
+      else t.removeAttribute('title');
+      const art = t.querySelector('.hub-art');
+      art.style.backgroundImage = hubTileBackground(def, st);
+      art.classList.toggle('is-photo', st.photo);
+      t.dataset.hubTip = st.tip;
+    }
+    const back = tiles.find((t) => t.dataset.hubTile === 'back');
+    setData('hubBack', back ? `${back.getAttribute('aria-disabled') === 'true' ? 'off' : 'on'}|${back.dataset.hubTip || ''}` : '');
+  }
+
   function open() {
     if (!el.hidden) return true;
     if (!canOpen()) return false;
     opener = doc.activeElement && doc.activeElement !== doc.body ? doc.activeElement : null;
     imgEl.textContent = hubPillText(imagination());
+    refreshTiles();
     el.classList.toggle('is-still', reducedMotion(win));
     el.hidden = false;
     place();
@@ -253,6 +306,8 @@ export function mountImaginationHub(doc, { root, actions = {}, canOpen = () => t
   function pick(id) {
     const action = actions[id];
     if (!action) return false;
+    // A dimmed tile stays as it is (ImgMenuView onBackToWorldClick: CLICK_FAILURE, the menu stays).
+    if (tiles.find((t) => t.dataset.hubTile === id)?.getAttribute('aria-disabled') === 'true') return false;
     last = id;
     close({ restoreFocus: false });
     action();

@@ -27,7 +27,7 @@
  *   rebuilt npc_mailbox and npc_mail_dispatcher from the street template
  *   whenever a player-owned lot or quarter street changed, so they stood
  *   together on the old housing streets. Here it stands on your home
- *   street just outside the World Gate, past the friends' signpost's left
+ *   street just outside the way-out signpost, past the friends' signpost's left
  *   arms, clear of every fixture there (reimagined placement; homes-feature
  *   homeDispatcherX, the rules in js/home-street-fixtures.js). Send mail
  *   opens the mail window
@@ -62,10 +62,10 @@
 
 import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=85d4faba';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=db2ce452';
-import { questRoomConverse } from './quest-instances-feature.js?v=08f74567';
+import { questRoomConverse } from './quest-instances-feature.js?v=5e25c248';
 import { hellFeature } from './hell-feature.js?v=2d9958f9';
 import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=790f980a';
-import { DISPATCHER_GAP, DISPATCHER_HALF, GATE, SIGNPOST } from '../home-street-fixtures.js?v=088da201';
+import { DISPATCHER_GAP, DISPATCHER_HALF, GATE, SIGNPOST } from '../home-street-fixtures.js?v=a9d81324';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=e62cffa6';
 import {
   COURIER,
@@ -93,7 +93,7 @@ const HOME_STREET_TSID = 'RH_HOME_EXT';
 const FPS = 30;
 const FROG_LOOPERS = new Set(['idle', 'move', 'talk', 'treePose', 'dancerPose', 'warriorPose']);
 const DISPATCHER_LOOPERS = new Set(['idle', 'waiting_for_frog']);
-/** Without the homes feature's answer: the usual spot, from the World Gate (home-street-fixtures). */
+/** Without the homes feature's answer: the usual spot, from the way-out signpost (home-street-fixtures `gate`). */
 const DISPATCHER_GATE_DX = SIGNPOST.lotDx - GATE.lotDx - SIGNPOST.left - DISPATCHER_GAP - DISPATCHER_HALF;
 /**
  * in_foreground (the frog) and in_background (the station): both under the avatar's 50, since the

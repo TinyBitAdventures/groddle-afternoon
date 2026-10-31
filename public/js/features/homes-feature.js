@@ -11,7 +11,7 @@
  * game.js asks this feature for the home scene through the `homeScene` query
  * (renderHomeScene): the scene supplies the background (parallax street or the
  * room shell), the world width, where the avatar arrives, the mailbox / door /
- * World Gate targets, and `enter()` spawns furniture or cultivations.
+ * way-out signpost targets, and `enter()` spawns furniture or cultivations.
  *
  * Cultivations reuse the public-street systems through the engine:
  * gardens via engine.spawnGarden, rocks via engine.spawnMineRock (their state in
@@ -181,13 +181,13 @@ import {
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=15295514';
+} from '../home-cultivation.js?v=7097c51d';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=68506420';
-import { DISPATCHER_HALF, DISPATCHER_TEXT, dispatcherFits, gateX, savedDispatcherRx, streetFixtures } from '../home-street-fixtures.js?v=088da201';
+import { DISPATCHER_HALF, DISPATCHER_TEXT, dispatcherFits, gateX, savedDispatcherRx, streetFixtures } from '../home-street-fixtures.js?v=a9d81324';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
-import { projectApi } from './street-jobs-feature.js?v=8ee4bfa7';
+import { projectApi } from './street-jobs-feature.js?v=195eda11';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=6ccb3a4f';
 import { towerApi } from './home-tower-feature.js?v=a9047342';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=e676f00f';
@@ -215,6 +215,7 @@ import {
   yardStyleFor,
 } from '../home-styles.js?v=f591561f';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
+import { oneArmSignpost } from '../street-render.js?v=90a690df';
 import { ROCK_CATALOG } from '../mining.js?v=a7eb8740';
 import {
   HOUSE_SIGN,
@@ -1844,27 +1845,38 @@ function dispatcherPop(engine) {
   };
 }
 
-function makeGateSprite(engine) {
-  const { PIXI } = engine;
-  const marker = new PIXI.Container();
-  const post = new PIXI.Graphics();
-  post.roundRect(-6, -150, 12, 150, 5).fill(0x6e4a32);
-  post.roundRect(-70, -150, 140, 44, 10).fill(0x8d6444);
-  post.roundRect(-64, -145, 128, 34, 8).fill(0xf6e7b6);
-  marker.addChild(post);
-  const label = new PIXI.Text({ text: 'World Gate', style: {
-    fontFamily: 'Trebuchet MS, sans-serif',
-    fontSize: 15,
-    fontWeight: '700',
-    fill: 0x5b3d2b,
-  } });
-  label.anchor.set(0.5);
-  label.y = -128;
-  marker.addChild(label);
-  const glow = new PIXI.Graphics();
-  glow.ellipse(0, -6, 46, 10).fill({ color: 0xbfe9ff, alpha: 0.35 });
-  marker.addChildAt(glow, 0);
-  return marker;
+/**
+ * GATESIGN: the home street's way out, a Tiny Speck street signpost (street-render
+ * oneArmSignpost) whose one arm points left, toward the world, with the street you will
+ * return to on it. It stands where the remake's code-drawn World Gate stood (the
+ * fixtures' `gate` spot). The original had no gate: you left through the Imagination
+ * menu (ImgMenuHome.as, ImgMenuBackToWorld.as) and the home street's only post was the
+ * friends' signpost (locations/inc_homes.js geo_lock_signpost). Its arm sits at a street
+ * signpost's first slot (246 px post), above the friends' signpost's arms (200 px), so
+ * the two never cross.
+ */
+function makeWayOutSignpost(engine, label) {
+  const post = oneArmSignpost(engine.PIXI, label || WAY_OUT_FALLBACK, { left: true });
+  post._worldHitW = WAY_OUT_HIT.w;
+  post._worldHitH = WAY_OUT_HIT.h;
+  post.label = 'home-way-out';
+  return post;
+}
+
+/** The way-out signpost's hit box: the old gate board's 140 wide, the post's height. */
+export const WAY_OUT_HIT = Object.freeze({ w: 140, h: 210 });
+
+/** The arm's words when no street is known (homeContext gives one: the street you came from, else your arrival street). */
+export const WAY_OUT_FALLBACK = 'Back to the world';
+
+/** PURE: the way-out signpost's target words for the street it leads to ({ label, hubName }). */
+export function wayOutTarget(way = {}) {
+  const label = String(way?.label || '').trim();
+  const hub = String(way?.hubName || '').trim();
+  return {
+    label: label || WAY_OUT_FALLBACK,
+    subtitle: label ? `Back to ${label}${hub && hub !== label ? `, ${hub}` : ''}` : 'Back out into the world',
+  };
 }
 
 function spawnStreetTargets(engine) {
@@ -1902,18 +1914,21 @@ function spawnStreetTargets(engine) {
     sprite: door,
     state: { room: 'street' },
   });
-  const gate = makeGateSprite(engine);
+  const ctx = engine.homeContext?.() || {};
+  // GATESIGN: the street you came from (else your arrival street), as returnFromHome goes.
+  const way = ctx.wayOut || { label: ctx.returnLabel || '', hubName: '' };
+  const words = wayOutTarget(way);
+  const gate = makeWayOutSignpost(engine, way.label);
   gate.x = gateX(layout);
   gate.y = STREET_GROUND_Y + 2;
   gate.zIndex = 20;
   engine.entityLayer.addChild(gate);
-  const ctx = engine.homeContext?.() || {};
   const gateTarget = engine.register({
     classId: 'home_return_marker',
-    label: 'World Gate',
-    subtitle: `Back to ${ctx.returnLabel || 'the world'}`,
+    label: words.label,
+    subtitle: words.subtitle,
     sprite: gate,
-    state: { returnLabel: ctx.returnLabel || '' },
+    state: { returnLabel: way.label || '', returnHub: way.hubName || '' },
   });
   return { mailbox: mailTarget, door: doorTarget, gate: gateTarget };
 }
@@ -5612,13 +5627,14 @@ function drawVisitorYard(engine, st, groundY, houseX) {
  * 'street' or 'interior'. Returns the scene for engine.enterScene (the same
  * walk line, width and house as the owner's own scene, so both stand in the
  * same places) and `populate(engine)`, which draws what stands there and
- * returns { door, gate } spots for the caller's own targets. The visitor's
+ * returns { door, gate } spots for the caller's own targets (`gate` is the
+ * way-out signpost, its arm reading `opts.returnLabel`). The visitor's
  * own home state is put back before this returns.
  */
-export function visitorHomeScene(engine, view = {}, room = 'street') {
+export function visitorHomeScene(engine, view = {}, room = 'street', opts = {}) {
   const v = visitorHomeState(view);
   const shim = Object.create(engine, {
-    homeContext: { value: () => ({ inHome: false, room, owned: true, style: v.style, returnLabel: '', unread: 0 }) },
+    homeContext: { value: () => ({ inHome: false, room, owned: true, style: v.style, returnLabel: opts.returnLabel || '', unread: 0 }) },
   });
   if (room === 'interior') {
     return withOwnersHome(v, () => {
@@ -5690,7 +5706,8 @@ export function visitorHomeScene(engine, view = {}, room = 'street') {
         door.y = STREET_GROUND_Y;
         door.zIndex = 9;
         eng.entityLayer.addChild(door);
-        const gate = makeGateSprite(eng);
+        // The visitor's way out: the street they came from (neighbours-mp-feature visit.returnTo).
+        const gate = makeWayOutSignpost(eng, opts.returnLabel);
         gate.x = gateX(layout);
         gate.y = STREET_GROUND_Y + 2;
         gate.zIndex = 20;

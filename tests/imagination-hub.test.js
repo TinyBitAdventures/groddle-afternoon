@@ -1,6 +1,6 @@
 /**
- * The modern skin's Imagination hub on X (js/ui/imagination-hub.js; HUB, phase 2): six round
- * tiles in an arc over the avatar (the client's ImgMenuView clouds), the letters S Q U L T H,
+ * The modern skin's Imagination hub on X (js/ui/imagination-hub.js; HUB, phase 2): seven round
+ * tiles in an arc over the avatar (the client's ImgMenuView clouds), the letters S Q U L T H B,
  * the arrows, Enter, Esc and X, and the wiring that makes X, the top bar's Imagination
  * button and the hotkey sheet lead to it.
  * Run: node --test tests/imagination-hub.test.js
@@ -19,8 +19,8 @@ import {
   hubStep,
   hubTileForKey,
   isHubCloseKey,
-} from '../public/js/ui/imagination-hub.js?v=972868f3';
-import { hotkeySections } from '../public/js/client-hotkeys.js?v=0eeb8604';
+} from '../public/js/ui/imagination-hub.js?v=fff73f8c';
+import { hotkeySections } from '../public/js/client-hotkeys.js?v=e50c1649';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');
@@ -28,9 +28,10 @@ const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');
 const CLIENT = join(root, '..', 'glitch-client', 'com', 'tinyspeck', 'engine', 'view', 'gameoverlay', 'ImgMenuView.as');
 
 describe('hub tiles and keys', () => {
-  it('has the six tiles in the mock\'s order with the game\'s own card art', () => {
-    assert.deepEqual(HUB_TILES.map((t) => `${t.key} ${t.label}`), ['S Skills', 'Q Quests', 'U Upgrades', 'L Looks', 'T Teleport', 'H Home']);
+  it('has the seven tiles in the mock\'s order with Tiny Speck\'s own art (Back to world: ImgMenuBackToWorld)', () => {
+    assert.deepEqual(HUB_TILES.map((t) => `${t.key} ${t.label}`), ['S Skills', 'Q Quests', 'U Upgrades', 'L Looks', 'T Teleport', 'H Home', 'B Back to world']);
     for (const t of HUB_TILES) assert.ok(existsSync(join(PUBLIC, t.art)), t.art);
+    for (const t of HUB_TILES.filter((x) => x.under)) assert.ok(existsSync(join(PUBLIC, t.under)), t.under);
   });
 
   it('opens a tile on its plain letter, either case', () => {
@@ -40,6 +41,7 @@ describe('hub tiles and keys', () => {
     assert.equal(hubTileForKey({ key: 'l' }).id, 'looks');
     assert.equal(hubTileForKey({ key: 't' }).id, 'teleport');
     assert.equal(hubTileForKey({ key: 'h' }).id, 'home');
+    assert.equal(hubTileForKey({ key: 'B' }).id, 'back');
     assert.equal(hubTileForKey({ key: 's', shiftKey: true }), null);
     assert.equal(hubTileForKey({ key: 'q', metaKey: true }), null);
     assert.equal(hubTileForKey({ key: 'x' }), null);
@@ -80,11 +82,11 @@ describe('hub layout', () => {
     assert.equal(lay.r, HUB_RADIUS);
     assert.equal(lay.cx, 640);
     assert.equal(lay.cy, 429);
-    assert.equal(lay.tiles.length, 6);
+    assert.equal(lay.tiles.length, 7);
     // First and last tile level with the centre, 1.3 R out; the arc's top over the head.
     assert.deepEqual(lay.tiles[0], { x: Math.round(640 - HUB_RADIUS * 1.3), y: 429 });
-    assert.deepEqual(lay.tiles[5], { x: Math.round(640 + HUB_RADIUS * 1.3), y: 429 });
-    assert.ok(lay.tiles[2].y < 345 && lay.tiles[3].y < 345);
+    assert.deepEqual(lay.tiles[6], { x: Math.round(640 + HUB_RADIUS * 1.3), y: 429 });
+    assert.ok(lay.tiles[2].y < 345 && lay.tiles[3].y < 345 && lay.tiles[4].y < 345);
     assert.ok(lay.pill.y > 513 && lay.pill.y <= 740 - 44);
   });
 
@@ -124,7 +126,7 @@ describe('the game wires the hub', () => {
   it('the hotkey sheet names the hub\'s letters in the modern skin', () => {
     const menus = (opts) => hotkeySections(opts)[0].rows.find((r) => r[0] === 'Imagination Menu');
     assert.equal(menus({}).length, 2);
-    assert.equal(menus({ hub: true })[2], '(then S, Q, U, L, T or H)');
+    assert.equal(menus({ hub: true })[2], '(then S, Q, U, L, T, H or B)');
   });
 
   it('draws the look only under the modern skin, with reduced motion respected', () => {

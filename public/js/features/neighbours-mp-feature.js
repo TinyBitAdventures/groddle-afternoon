@@ -77,12 +77,12 @@ import { createMinnAccount } from '../minn-account.js?v=81339760';
 import { runStreetTransition } from '../screen-fx.js?v=f4314526';
 import { STREET_INDEX } from '../street-loader.js?v=390e4702';
 import { ITEM_CATALOG, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=85d4faba';
-import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=15295514';
+import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=7097c51d';
 import { tickGarden } from '../garden.js?v=9a8f8f72';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=e81817d9';
 import { normalizeButlerParts } from '../butler.js?v=814ee05f';
-import { butlerApi } from './butler-feature.js?v=c4758d14';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=a24321b5';
+import { butlerApi } from './butler-feature.js?v=cf0aa8cc';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=1b54505a';
 import {
   BUTLER_MESSAGE_MAX,
   KEY_VERB,
@@ -301,7 +301,7 @@ function createSession(engine, client) {
   /** The visit scene for a room, through the loading card. */
   async function show(room, { arrive = '' } = {}) {
     if (!visit) return;
-    const built = visitorHomeScene(engine, visit.view, room);
+    const built = visitorHomeScene(engine, visit.view, room, { returnLabel: wayOutOf(visit.returnTo).label });
     const label = room === 'interior' ? houseName(visit.name) : homeStreetName(visit.name);
     const x = arrive === 'door' && room === 'street' ? built.doorX + 70 : built.spawnX;
     const scene = {
@@ -351,7 +351,9 @@ function createSession(engine, client) {
     const t = {};
     if (room === 'street') {
       t.door = engine.register({ classId: CLASS_DOOR, featureId: NEIGHBOURS_MP_FEATURE_ID, label: houseName(visit.name), subtitle: `The indoor half of ${visit.name}'s home`, sprite: spots.door, state: { owner: visit.owner } });
-      t.gate = engine.register({ classId: CLASS_GATE, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'World Gate', subtitle: `Back to ${labelOf(visit.returnTo)}`, sprite: spots.gate, state: { owner: visit.owner } });
+      // GATESIGN: the way-out signpost, named for the street its arm points to.
+      const way = wayOutOf(visit.returnTo);
+      t.gate = engine.register({ classId: CLASS_GATE, featureId: NEIGHBOURS_MP_FEATURE_ID, label: way.label, subtitle: `Back to ${way.label}${way.hubName && way.hubName !== way.label ? `, ${way.hubName}` : ''}`, sprite: spots.gate, state: { owner: visit.owner } });
     } else {
       t.front = engine.register({ classId: CLASS_FRONT, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'Front Door', subtitle: `Back to ${homeStreetName(visit.name)}`, sprite: spots.door, state: { owner: visit.owner } });
     }
@@ -754,6 +756,19 @@ function createSession(engine, client) {
   });
 
 
+  /**
+   * GATESIGN: where the visit's way out leads (goBack: the spot you came from, else the arrival
+   * street), with its name and hub, for the way-out signpost's arm and the Imagination menu's
+   * Back to world (ImgMenuBackToWorld.as: label + ", " + hub).
+   */
+  function wayOutOf(spot) {
+    const tsid = spot?.tsid || STREET_INDEX.default;
+    const s = STREET_INDEX.streets || {};
+    const t = String(tsid);
+    const row = s[t] || s[t.replace(/^G/, 'L')] || s[t.replace(/^L/, 'G')];
+    return { tsid, label: labelOf({ tsid }), hubName: row?.hubName || '' };
+  }
+
   /** The public name of a street tsid (buddies-feature's streetLabel). */
   function labelOf(spot) {
     if (!spot?.tsid) return 'the world';
@@ -1140,6 +1155,11 @@ function createSession(engine, client) {
         publish();
       }
     },
+    /** GATESIGN: the Imagination menu's Back to world on a visit (ImgMenuBackToWorld.as /leave), or null. */
+    wayOut() {
+      if (!visit || !readVisitScene(engine.streetTsid)) return null;
+      return { ...wayOutOf(visit.returnTo), go: () => goBack() };
+    },
     /** The street others share with you (realtimeStreet). */
     street() {
       const home = engine.homeContext?.() || {};
@@ -1297,6 +1317,12 @@ export const neighboursMpFeature = {
   neighboursVisiting(engine) {
     if (!session?.visit || engine?.mode !== 'multiplayer') return null;
     return { owner: session.visit.owner, key: session.mayTend() };
+  },
+
+  /** GATESIGN: game.js homeWayOut, the Imagination menu's Back to world while you visit a home. */
+  homeVisitWayOut(engine) {
+    if (!session || engine?.mode !== 'multiplayer') return null;
+    return session.wayOut() || null;
   },
 
   /** buddies-feature's Visit button. */

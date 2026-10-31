@@ -326,14 +326,14 @@ export function snapsWithScene(classId) {
 
 /**
  * A scene's posts that the map shows as signposts (maybeAddSignpost: on a home street every post
- * shows): the World Gate (your own street's, and a visit's) and the friends' signpost.
+ * shows): the way-out signpost (your own street's, and a visit's) and the friends' signpost.
  */
 export const SCENE_SIGN_CLASSES = Object.freeze(['home_return_marker', 'mp_home_gate', 'mp_home_signpost']);
 
 /**
  * PURE: sign marks from a scene's registered targets ([{ classId, label, state, sprite: { x, y } }],
  * world px as the game's): the friends' signpost lists its friends one per line (state.arms), a
- * World Gate shows its label.
+ * way-out signpost shows its label (the street it leads to).
  */
 export function sceneSignMarks(targets = []) {
   const out = [];
@@ -837,7 +837,7 @@ export function createStreetMinimap(doc, host, opts = {}) {
       layout();
     },
     /**
-     * The posts a scene draws itself (sceneSignMarks: a home street's World Gate and friends'
+     * The posts a scene draws itself (sceneSignMarks: a home street's way-out signpost and friends'
      * signpost), in place of the last ones it gave; the street's own posts stay.
      */
     setSceneSigns(marks = []) {

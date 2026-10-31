@@ -1789,7 +1789,7 @@
  },
  "npc:npc_mail_dispatcher": {
   "status": "reimagined",
-  "reason": "no archived street holds one (inc_upgrades.js 344 rebuilt it with npc_mailbox on player-owned lot and quarter streets); placed on the home street outside the World Gate. Send mail, interact/cancel and the doParcel run (600 ms, 1 s, frog pickup, package_sent 1 s) are the source's; GSJS never calls sendParcel, here an item letter sent from it does (js/features/mail-courier-feature.js)",
+  "reason": "no archived street holds one (inc_upgrades.js 344 rebuilt it with npc_mailbox on player-owned lot and quarter streets); placed on the home street outside the way-out signpost. Send mail, interact/cancel and the doParcel run (600 ms, 1 s, frog pickup, package_sent 1 s) are the source's; GSJS never calls sendParcel, here an item letter sent from it does (js/features/mail-courier-feature.js)",
   "register": "G121"
  },
  "skill:betterlearning_1": {

@@ -221,9 +221,11 @@ export function getVerbsFor(target, ctx) {
   }
 
   if (classId === 'home_return_marker') {
-    add('return_to_world', 'return to Ur', {
+    // GATESIGN: the way-out signpost's one arm (homes-feature makeWayOutSignpost).
+    const where = s.returnLabel ? `${s.returnLabel}${s.returnHub && s.returnHub !== s.returnLabel ? `, ${s.returnHub}` : ''}` : '';
+    add('return_to_world', s.returnLabel ? `back to ${s.returnLabel}` : 'back to the world', {
       sort: 10,
-      tooltip: s.returnLabel ? `Teleport back to ${s.returnLabel}` : 'Teleport back to the world',
+      tooltip: where ? `Teleport back to ${where}` : 'Teleport back to the world',
     });
   }
 

@@ -22,10 +22,10 @@
  */
 import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=587c014a';
 import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=299eef68';
-import { installClassicChrome } from './classic-chrome.js?v=f79287a9';
+import { installClassicChrome } from './classic-chrome.js?v=82c8e0ea';
 import { clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b5f4748a';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL, nightTintOn, onNightTintChange, setNightTint } from '../night-tint.js?v=917a2caa';
-import { STREET_MAP_HINT, STREET_MAP_LABEL, onStreetMapChange, setStreetMap, streetMapOn } from '../ui/street-minimap.js?v=c52ec837';
+import { STREET_MAP_HINT, STREET_MAP_LABEL, onStreetMapChange, setStreetMap, streetMapOn } from '../ui/street-minimap.js?v=8bc8920a';
 
 export const PREFS_TITLE = 'Preferences';
 

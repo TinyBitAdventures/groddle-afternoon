@@ -88,6 +88,62 @@ export function signArmWidth(PIXI, labelText) {
   return Math.ceil(metrics.width + 2 * SIGN_ARM_PAD_X);
 }
 
+/** signpost_post.png is 246 tall: where buildSignpostSprite puts its first arm once the post has loaded. */
+export const SIGN_POST_H = 246;
+/** The post's ground width (signpost_post.png 43 wide at the 0.8 holder scale), in world px. */
+export const SIGN_POST_W = Math.round(43 * SIGNPOST.scale);
+/** The holder scale every signpost is drawn at (SignpostView.as holder.scale = 0.8). */
+export const SIGN_SCALE = SIGNPOST.scale;
+/** The first arm's centre above the post's foot, in holder units (buildSignpostSprite: -postH + 32). */
+export const SIGN_FIRST_ARM_Y = -SIGN_POST_H + 32;
+
+/**
+ * A signpost with one arm, drawn as a street's (buildSignpostSprite, SignpostView.as: the shadow,
+ * the post, the arm at the first slot with its words, all at the 0.8 holder scale), for a scene
+ * that places its own post: the home street's way out (homes-feature). `left` points the arm left
+ * (makeSign left_side: the arm mirrored, tilted 5.5 degrees). Returns a container whose origin is
+ * the post's foot; `armWidth` is the arm's length in world px. No new art: Tiny Speck's PNGs.
+ * @param {typeof PIXI} PIXI
+ * @param {string} text
+ * @param {{ left?: boolean, fill?: number }} [opts]
+ */
+export function oneArmSignpost(PIXI, text, { left = true, fill = SIGN_TEXT_FILL } = {}) {
+  const box = new PIXI.Container();
+  const holder = new PIXI.Container();
+  holder.scale.set(SIGNPOST.scale);
+  box.addChild(holder);
+  const shadow = new PIXI.Sprite(textureFromUrl(SIGNPOST.shadow));
+  shadow.anchor.set(0.5, 1);
+  shadow.y = 6;
+  shadow.alpha = 0.75;
+  shadow.label = 'sign-shadow';
+  const post = new PIXI.Sprite(textureFromUrl(SIGNPOST.post));
+  post.anchor.set(0.5, 1);
+  post.label = 'sign-post';
+  holder.addChild(shadow, post);
+  const arm = new PIXI.Container();
+  arm.y = SIGN_FIRST_ARM_Y;
+  arm.x = left ? -2 : 2;
+  arm.rotation = ((left ? 5.5 : -5.5) * Math.PI) / 180;
+  arm.label = 'sign-arm-holder';
+  const w = signArmWidth(PIXI, text);
+  const board = new PIXI.Sprite(textureFromUrl(SIGNPOST.arm));
+  board.anchor.set(0, 0.5);
+  board.width = w;
+  board.height = 30;
+  if (left) board.scale.x *= -1;
+  board.label = 'sign-arm';
+  const label = signLabel(PIXI, text, fill);
+  label.x = left ? -w / 2 : w / 2;
+  label.y = -1;
+  label.label = 'sign-label';
+  arm.addChild(board, label);
+  holder.addChild(arm);
+  box.armWidth = Math.round(w * SIGNPOST.scale);
+  box.signText = String(text);
+  return box;
+}
+
 /** @type {Set<string>|null} */
 let decoManifest = null;
 /** @type {Record<string, import('pixi.js').Texture>|null} */

@@ -15,7 +15,7 @@ import {
   footprint,
   homeStreetLayout,
   placementCheck,
-} from '../public/js/home-cultivation.js?v=15295514';
+} from '../public/js/home-cultivation.js?v=7097c51d';
 import {
   DISPATCHER_HALF,
   GATE,
@@ -25,8 +25,8 @@ import {
   gateX,
   signpostX,
   streetFixtures,
-} from '../public/js/home-street-fixtures.js?v=088da201';
-import { HOUSE_STYLE_KEYS, houseFixtureX, homesFeature } from '../public/js/features/homes-feature.js?v=a24321b5';
+} from '../public/js/home-street-fixtures.js?v=a9d81324';
+import { HOUSE_STYLE_KEYS, houseFixtureX, homesFeature } from '../public/js/features/homes-feature.js?v=1b54505a';
 
 const root = join(import.meta.dirname, '..', 'public', 'js');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

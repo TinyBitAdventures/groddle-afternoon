@@ -62,11 +62,11 @@ import {
   TOWER_PROTO,
   TOWER_WIDTH,
 } from './home-tower.js?v=6ccb3a4f';
-import { DISPATCHER_HALF, dispatcherSpot, fixtureName, gateX, savedDispatcherRx, signpostX, streetFixtures } from './home-street-fixtures.js?v=088da201';
+import { DISPATCHER_HALF, dispatcherSpot, fixtureName, gateX, savedDispatcherRx, signpostX, streetFixtures } from './home-street-fixtures.js?v=a9d81324';
 import { gardenHalfWidth } from './garden-view.js?v=05651e76';
 
 export const YARD_SEGMENT_W = 150;
-/** The house, porch, mailbox and World Gate stand on a fixed lot between the yards. */
+/** The house, porch, mailbox and way-out signpost stand on a fixed lot between the yards. */
 export const HOUSE_LOT_W = 720;
 /** Cultivations keep this much clear ground in front of the door. */
 export const DOOR_CLEARANCE = 150;
@@ -317,12 +317,17 @@ export function footprint(protoClass) {
 
 /** The signpost post's half width on the ground (home-street-mp-feature drawSignpost: signpost_post.png is 43 wide). */
 export const SIGNPOST_POST_HALF = 22;
-/** The World Gate's post (homes-feature makeGateSprite: 12 wide), with a little air. */
-export const GATE_POST_HALF = 10;
+/**
+ * The way-out signpost's post (homes-feature makeWayOutSignpost, GATESIGN): the same
+ * signpost_post.png as the friends' signpost, so the same half width. It replaced the
+ * World Gate's 12 px pole (half 10); a saved cultivation now on the wider post steps
+ * aside on load (settleGardens).
+ */
+export const GATE_POST_HALF = SIGNPOST_POST_HALF;
 
 /**
  * What stands on the ground of the home street, which a cultivation keeps clear of: the
- * World Gate's and the friends' signpost's posts (their board and arms are overhead, above
+ * way-out signpost's and the friends' signpost's posts (their arms are overhead, above
  * the tallest grown crop), the Magic Rock and the Butler Box.
  */
 export function groundFixtures(layout) {

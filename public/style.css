@@ -10059,7 +10059,7 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] .award-screen .award-badge::before { animation: none; }
 }
 /* —— HUB: Imagination hub —— */
-/* X (js/ui/imagination-hub.js): six round tiles in an arc over the avatar, the world dimmed
+/* X (js/ui/imagination-hub.js): seven round tiles in an arc over the avatar, the world dimmed
    round it, and the iMG to spend in a pill under the feet. The HUD mock's sizes: tiles 92 px
    with 66 px art, labels 13 px with a key cap, the pill 13 px. */
 .imagination-hub[hidden] { display: none; }
@@ -10127,6 +10127,14 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   white-space: nowrap;
 }
 [data-ui="modern"] .imagination-hub .hub-tile:focus-visible .hub-label { outline: 2px solid var(--focus); outline-offset: 1px; }
+/* GATESIGN: Back to world. Its cloud (imagination_clouds.swf) whole on the tile, or the street it
+   leads to (its loading image) filling it; dimmed out in the world, as the original's cloud was. */
+[data-ui="modern"] .imagination-hub [data-hub-tile="back"] .hub-art { background-size: 92% auto, cover; background-position: center, center; }
+[data-ui="modern"] .imagination-hub [data-hub-tile="back"] .hub-art.is-photo { background-size: cover; }
+[data-ui="modern"] .imagination-hub .hub-tile[aria-disabled="true"] { cursor: default; }
+[data-ui="modern"] .imagination-hub .hub-tile[aria-disabled="true"] .hub-art { opacity: 0.5; filter: grayscale(0.7); }
+[data-ui="modern"] .imagination-hub .hub-tile[aria-disabled="true"] .hub-label { color: var(--text-muted); }
+[data-ui="modern"] .imagination-hub .hub-tile[aria-disabled="true"]:hover .hub-art { transform: none; box-shadow: var(--shadow-2), 0 0 0 3px var(--surface-raised); }
 [data-ui="modern"] .imagination-hub .kcap {
   display: inline-grid;
   place-items: center;

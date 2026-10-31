@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HUB_CLOUDS, hubKey, isHubKey, coverRect, placeClouds, CLOUD_SIZE } from '../public/js/classic/classic-hub.js?v=eb596079';
+import { HUB_CLOUDS, hubKey, isHubKey, coverRect, placeClouds, CLOUD_SIZE } from '../public/js/classic/classic-hub.js?v=264ab19f';
 import { CLASSIC_ART } from '../public/js/classic/classic-art.js?v=5745e669';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -51,8 +51,8 @@ describe('Classic hub', () => {
   });
 
   it('at home the home cloud says Back to world and the world cloud dims (ImgMenuHome, ImgMenuBackToWorld)', () => {
-    assert.deepEqual(placeClouds(true), { homeTitle: 'Back to world', homePicture: 'world', backDisabled: true });
-    assert.deepEqual(placeClouds(false), { homeTitle: 'Go home', homePicture: 'home', backDisabled: false });
+    assert.deepEqual(placeClouds(true), { homeTitle: 'Back to world', homePicture: 'world', backTitle: 'Go home', backDisabled: true });
+    assert.deepEqual(placeClouds(false), { homeTitle: 'Go home', homePicture: 'home', backTitle: 'Back to world', backDisabled: false });
   });
 
   it('IMAGINATION_OPEN, CLOUD1-7 a tenth of a second apart, IMAGINATION_CLOSE: shipped sound keys', () => {

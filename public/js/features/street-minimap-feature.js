@@ -13,7 +13,7 @@
  *   snaps 0.25 s and 1.5 s later; anything else that changes what the snapshot draws (the Mail
  *   Dispatcher moved, a visitor's view of the owner's change, furniture after decorating) snaps
  *   0.3 s after it settles, never more than once a second (resnapMiniMap's batching). The
- *   scene's own posts (the World Gate, the friends' signpost) show as signposts
+ *   scene's own posts (the way-out signpost, the friends' signpost) show as signposts
  *   (sceneSignMarks), as location.is_home kept a home's posts (maybeAddSignpost).
  * - Ten times a second: your point, the other players here and the Rube. Other players are the
  *   realtime feature's (engine.query('minimapPlayers'), multiplayer) and solo's local companions
@@ -33,7 +33,7 @@
  * refused). QA: &streetmapexpand=1 expands it on each street.
  */
 
-import { createStreetMinimap, minimapVisibility, onStreetMapChange, sceneSignMarks, setStreetMap, snapshotStreetView, snapsWithScene, streetMapOn } from '../ui/street-minimap.js?v=c52ec837';
+import { createStreetMinimap, minimapVisibility, onStreetMapChange, sceneSignMarks, setStreetMap, snapshotStreetView, snapsWithScene, streetMapOn } from '../ui/street-minimap.js?v=8bc8920a';
 import { classicArtUrl } from '../classic/classic-art.js?v=5745e669';
 import { onUiModeChange } from '../classic/ui-mode.js?v=587c014a';
 

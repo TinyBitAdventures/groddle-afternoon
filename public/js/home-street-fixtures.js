@@ -4,13 +4,17 @@
  * home-cultivation.js homeStreetLayout (lotLeft, houseX, width).
  *
  * The fixtures and their drawn half widths:
- * - the World Gate (homes-feature makeGateSprite): its post at the lot's left
- *   edge + 40, its board 140 wide;
+ * - the way-out signpost (homes-feature makeWayOutSignpost; GATESIGN replaced the
+ *   code-drawn World Gate with Tiny Speck's street signpost): its post at the
+ *   lot's left edge + 40, its one arm pointing left (toward the world) at a
+ *   street signpost's first slot. Its span is still the old gate's 140 (the
+ *   id stays `gate`, so saved spots and reasons keep their meaning);
  * - the friends' signpost (multiplayer, home-street-mp-feature drawSignpost):
  *   its post 70 left of the lot, where locations/home.js 212-218 put the
- *   source's post (x -328) by the gate. Its right arms reach over the gate's
- *   board on purpose; its left arms (the 2nd and 4th friend) reach up to
- *   SIGNPOST.left, room for a 19-letter name (the site's name rule);
+ *   source's post (x -328). Its right arms reach under the way-out arm on
+ *   purpose (that arm sits higher, so they never cross); its left arms (the
+ *   2nd and 4th friend) reach up to SIGNPOST.left, room for a 19-letter name
+ *   (the site's name rule);
  * - the Mailbox at the house's sign corner, the front door's hit area, the
  *   Magic Rock right of the door (homes-feature STREET_ROCK) and the Butler
  *   Box beyond it (butler-feature BOX_RX).
@@ -18,8 +22,8 @@
  * The Mail Dispatcher (items/npc_mail_dispatcher.js). The source rebuilt it
  * with the mailbox from the street template whenever a player street changed
  * (locations/inc_upgrades.js upgrades_recreate_classes), so no player ever
- * moved it. Reimagined: it stands just outside the World Gate, past the
- * signpost's left arms (the same spot solo and online, whether or not the
+ * moved it. Reimagined: it stands just outside the way-out signpost, past the
+ * friends' signpost's left arms (the same spot solo and online, whether or not the
  * signpost has friends on it), and in Cultivate you can move it anywhere
  * along the street that is clear of these fixtures and of your cultivations,
  * or put it back. The spot is saved with the street (cultivation state
@@ -43,11 +47,11 @@ export const BUTLER_BOX = Object.freeze({ houseDx: 300, half: 32 });
 
 export const DISPATCHER_TEXT = Object.freeze({
   label: 'Mail Dispatcher',
-  sub: 'Move it anywhere along your street that is clear of your gate, signpost, Mailbox and door.',
+  sub: 'Move it anywhere along your street that is clear of your signposts, Mailbox and door.',
   move: 'Move',
   moveTitle: 'Carry it to a new spot on your street',
   reset: 'Back to its usual spot',
-  resetTitle: 'Put it back just outside the World Gate',
+  resetTitle: 'Put it back just past your signposts',
   atUsual: 'It is in its usual spot.',
   banner: 'Move Mail Dispatcher',
   bannerTitle: 'Pick up your Mail Dispatcher and set it down somewhere else on your street',
@@ -58,19 +62,19 @@ export const DISPATCHER_TEXT = Object.freeze({
 });
 
 const FIXTURE_NAMES = Object.freeze({
-  gate: 'World Gate',
+  gate: 'signpost',
   signpost: 'signpost',
   mailbox: 'Mailbox',
   rock: 'Magic Rock',
   butler_box: 'Butler Box',
 });
 
-/** A fixture's name in a player-facing line ("Keep it clear of your World Gate."). */
+/** A fixture's name in a player-facing line ("Keep it clear of your signpost."). */
 export function fixtureName(id) {
   return FIXTURE_NAMES[id] || id;
 }
 
-/** The world x of the gate's and the signpost's posts on this street. */
+/** The world x of the way-out signpost's (`gate`) and the friends' signpost's posts on this street. */
 export function gateX(layout) {
   return layout.lotLeft + GATE.lotDx;
 }
