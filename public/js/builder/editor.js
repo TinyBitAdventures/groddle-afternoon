@@ -48,7 +48,8 @@ import { installNewArt, withNewArt, provenanceSection } from './new-art.js?v=b24
 import * as textureUrls from '../textures.js?v=01a295a1';
 import { installPixiFixes } from '../pixi-fixes.js?v=173fb649';
 import { installHiresDecos } from '../deco-hires.js?v=a65f2d79';
-import { GEO_KINDS, GEO_LIST, GEO_WORDS, PERMS, geoKey, parseGeoKey, geoItem, geoKindOf, geoShape, geoHits, geoHandles, handleWorld, dragHandle, moveBy, changedFields, drawnItem, postOnFloor, defaultItem, permKey, permValue, permName, wallSides, dashes, arriveFor, newConnect, shapeBounds } from './geometry-handles.js?v=3befd62c';
+import { OVERLAY_COLOURS, drawGeometryOverlay, drawReachOverlay, strokeSegs } from './overlays.js?v=33839acd';
+import { GEO_KINDS, GEO_LIST, GEO_WORDS, PERMS, geoKey, parseGeoKey, geoItem, geoKindOf, geoShape, geoHits, geoHandles, handleWorld, dragHandle, moveBy, changedFields, drawnItem, postOnFloor, defaultItem, permKey, permValue, permName, dashes, arriveFor, newConnect, shapeBounds } from './geometry-handles.js?v=3befd62c';
 import { SNAP_PX, GUIDE_PX, endPoints, joinedEnds, snapPlatform, snapDrawnPlatform, snapPoint, floorSnapY, rulerTicks, bestPull } from './snap.js?v=c1cb84a7';
 
 export const ZOOM_MIN = 0.05;
@@ -65,10 +66,8 @@ const RULER_PX = 20;
 /** Geometry is picked this many canvas px from a line. */
 const PICK_PX = 6;
 /** Canvas colours (the street's art is the same in light and dark). */
-const COLOURS = Object.freeze({
-  Floor: 0x3ddc84, Roof: 0xffb020, Soft: 0x7cc4ff, Hard: 0xff5a5a, wall: 0xe879f9, ladder: 0x22d3ee, post: 0xfde047,
-  reached: 0x22c55e, unreached: 0xef4444, arrival: 0x60a5fa, trap: 0xf97316, plain: 0xfff176, running: 0xff8ad8, select: 0x1fa6ff,
-});
+/** The overlays' colours (js/builder/overlays.js, shared with the render page /builder-render/). */
+const COLOURS = OVERLAY_COLOURS;
 const hexCss = (n) => `#${n.toString(16).padStart(6, '0')}`;
 
 /** The view frames the overlay draws (spec 6.7): the game's Wide view and the original client's. */
@@ -660,12 +659,7 @@ async function boot() {
   });
 
   // —— Geometry and reach (in the street's px, under the selection) ——
-  /** A path of segments stroked once: an outline under, then the colour. */
-  function strokeSegs(g, segs, style) {
-    if (!segs.length) return;
-    for (const [x1, y1, x2, y2] of segs) g.moveTo(x1, y1).lineTo(x2, y2);
-    g.stroke(style);
-  }
+  /** The geometry, reach and population overlays (js/builder/overlays.js draws the first two, as the render page does). */
   function drawGeometry() {
     const s = street();
     const z = S.cam.zoom;
@@ -678,74 +672,7 @@ async function boot() {
     if (S.overlays.reach) drawReach(s, px);
     if (S.overlays.populations) drawSpots(s, px);
     if (!S.overlays.geometry) return;
-    const shape = (kind, item) => geoShape(s, kind, geoShown(kind, item));
-    // Platforms by permeability: Floor solid, Roof with ticks under it, Soft dashed, Hard thick.
-    const groups = { Floor: [], Roof: [], Soft: [], Hard: [] };
-    const outline = [];
-    const ticks = { Roof: [], wall: [] };
-    for (const p of s.platforms || []) {
-      const sh = shape('platform', p);
-      const name = permName(geoShown('platform', p).pc_perm);
-      const seg = [sh.x1, sh.y1, sh.x2, sh.y2];
-      outline.push(seg);
-      if (name === 'Soft') groups.Soft.push(...dashes(...seg, px(8), px(6)));
-      else groups[name].push(seg);
-      if (name === 'Roof') {
-        const len = Math.hypot(sh.x2 - sh.x1, sh.y2 - sh.y1);
-        for (let d = px(6); d < len; d += px(14)) {
-          const t = d / len;
-          const x = sh.x1 + t * (sh.x2 - sh.x1);
-          const y = sh.y1 + t * (sh.y2 - sh.y1);
-          ticks.Roof.push([x, y, x, y + px(5)]);
-        }
-      }
-    }
-    // Walls: a line, with ticks on each side it blocks (an open wall dashed).
-    const walls = [];
-    for (const b of s.barriers || []) {
-      const item = geoShown('barrier', b);
-      const sh = geoShape(s, 'barrier', item);
-      const sides = wallSides(item.pc_perm);
-      outline.push([sh.x, sh.y1, sh.x, sh.y2]);
-      if (!sides.left && !sides.right) walls.push(...dashes(sh.x, sh.y1, sh.x, sh.y2, px(8), px(6)));
-      else walls.push([sh.x, sh.y1, sh.x, sh.y2]);
-      for (let y = sh.y1 + px(6); y < sh.y2; y += px(14)) {
-        if (sides.left) ticks.wall.push([sh.x - px(5), y, sh.x, y]);
-        if (sides.right) ticks.wall.push([sh.x, y, sh.x + px(5), y]);
-      }
-    }
-    strokeSegs(geoGfx, outline, { width: px(5), color: 0x000000, alpha: 0.45 });
-    strokeSegs(geoGfx, groups.Floor, { width: px(2), color: COLOURS.Floor });
-    strokeSegs(geoGfx, groups.Roof, { width: px(2), color: COLOURS.Roof });
-    strokeSegs(geoGfx, ticks.Roof, { width: px(1.5), color: COLOURS.Roof });
-    strokeSegs(geoGfx, groups.Soft, { width: px(2), color: COLOURS.Soft });
-    strokeSegs(geoGfx, groups.Hard, { width: px(3.5), color: COLOURS.Hard });
-    strokeSegs(geoGfx, walls, { width: px(2.5), color: COLOURS.wall });
-    strokeSegs(geoGfx, ticks.wall, { width: px(1.5), color: COLOURS.wall });
-    // Line ends: where lines join up.
-    for (const seg of outline.slice(0, (s.platforms || []).length)) {
-      geoGfx.circle(seg[0], seg[1], px(2.5)).circle(seg[2], seg[3], px(2.5));
-    }
-    geoGfx.fill({ color: 0xffffff, alpha: 0.85 });
-    // Ladders: the climb zone with rungs.
-    const rungs = [];
-    for (const l of s.ladders || []) {
-      const sh = shape('ladder', l);
-      geoGfx.rect(sh.x - sh.w / 2, sh.y1, sh.w, sh.y2 - sh.y1);
-      for (let y = sh.y2 - 20; y > sh.y1; y -= 20) rungs.push([sh.x - sh.w / 2, y, sh.x + sh.w / 2, y]);
-    }
-    geoGfx.stroke({ width: px(2), color: COLOURS.ladder });
-    strokeSegs(geoGfx, rungs, { width: px(1), color: COLOURS.ladder, alpha: 0.7 });
-    // Signposts: their box; a post with no arm the game shows is dashed (it is not drawn).
-    const dashed = [];
-    for (const p of s.signposts || []) {
-      const sh = shape('signpost', p);
-      const b = shapeBounds(sh);
-      if ((p.connects || []).some((c) => !c.hidden)) geoGfx.rect(b.x1, b.y1, b.x2 - b.x1, b.y2 - b.y1);
-      else for (const [x1, y1, x2, y2] of [[b.x1, b.y1, b.x2, b.y1], [b.x2, b.y1, b.x2, b.y2], [b.x2, b.y2, b.x1, b.y2], [b.x1, b.y2, b.x1, b.y1]]) dashed.push(...dashes(x1, y1, x2, y2, px(8), px(6)));
-    }
-    geoGfx.stroke({ width: px(2), color: COLOURS.post });
-    strokeSegs(geoGfx, dashed, { width: px(2), color: COLOURS.post });
+    drawGeometryOverlay(geoGfx, s, { px, shown: geoShown });
   }
 
   /**
@@ -789,21 +716,7 @@ async function boot() {
       ensureLocalReach();
       return;
     }
-    const good = [];
-    const bad = [];
-    for (const u of r.surfaces || []) (u.reached ? good : bad).push([u.x1, u.y1, u.x2 === u.x1 ? u.x2 + 4 : u.x2, u.y2]);
-    strokeSegs(geoGfx, good, { width: px(8), color: COLOURS.reached, alpha: 0.5 });
-    strokeSegs(geoGfx, bad, { width: px(8), color: COLOURS.unreached, alpha: 0.5 });
-    for (const t of r.targets || []) {
-      geoGfx.rect(t.x - (t.w || 100) / 2, t.y - (t.h || 200), t.w || 100, t.h || 200);
-      geoGfx.stroke({ width: px(t.reached ? 2 : 4), color: t.reached ? COLOURS.reached : COLOURS.unreached });
-    }
-    for (const t of r.traps || []) geoGfx.poly([t.x, t.y - px(14), t.x - px(8), t.y, t.x + px(8), t.y]).fill({ color: COLOURS.trap });
-    for (const a of r.arrivals || []) {
-      geoGfx.circle(a.x, a.y, px(8));
-      if (a.stands) geoGfx.fill({ color: COLOURS.arrival });
-      else geoGfx.stroke({ width: px(3), color: COLOURS.arrival });
-    }
+    drawReachOverlay(geoGfx, r, { px });
   }
 
   function drawOverlay() {

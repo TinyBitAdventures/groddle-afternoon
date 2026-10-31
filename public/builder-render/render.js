@@ -23,7 +23,8 @@ import * as textureUrls from '../js/textures.js?v=01a295a1';
 import { installPixiFixes } from '../js/pixi-fixes.js?v=173fb649';
 import { installHiresDecos } from '../js/deco-hires.js?v=a65f2d79';
 import { installNewArt, withNewArt } from '../js/builder/new-art.js?v=b2411f6f';
-import { drawGeometryOverlay, drawReachOverlay, drawArrivals, OVERLAY_COLOURS } from '../js/builder/overlays.js?v=4f18d0b5';
+import { spotGroup } from '../js/builder/editor-zone.js?v=fb167700';
+import { drawGeometryOverlay, drawReachOverlay, drawArrivals, OVERLAY_COLOURS } from '../js/builder/overlays.js?v=33839acd';
 
 export const MAX_SIDE = 4096;
 export const WIDE = Object.freeze({ w: 960, h: 408 });
@@ -165,11 +166,12 @@ async function render({ street, assets = null, params = {}, reach = null, findin
   if (overlay.has('geometry')) drawGeometryOverlay(g, street, { px });
   if ((overlay.has('arrivals') || overlay.has('reach')) && reach) drawArrivals(g, reach.arrivals, { px });
   if (overlay.has('populations')) {
-    for (const p of populations || []) g.circle(p.x, p.y - px(6), px(6));
-    if ((populations || []).length) g.fill({ color: 0xfacc15 }).stroke({ width: px(1.5), color: 0x000000 });
+    // The editor's populations overlay: a dot per thing, coloured by kind (editor-zone.js SPOT_GROUPS).
     for (const p of populations || []) {
+      const group = spotGroup(p.key);
+      g.circle(p.x, p.y - px(9), px(group.id === 'player' ? 9 : 7)).fill({ color: group.colour, alpha: 0.9 }).stroke({ width: px(2), color: 0x000000, alpha: 0.6 });
       const o = toOut({ x: p.x, y: p.y });
-      if (frame.scale >= 0.2) labels.addChild(label(PIXI, p.key, o.x + 6, o.y - 22, { size: 10, colour: 0xfacc15 }));
+      if (frame.scale >= 0.2) labels.addChild(label(PIXI, p.key, o.x + 8, o.y - 26, { size: 10, colour: group.colour }));
     }
   }
   if (overlay.has('findings')) {

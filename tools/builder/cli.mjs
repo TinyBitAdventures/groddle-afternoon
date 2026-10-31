@@ -23,15 +23,20 @@ import { join, resolve, basename } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { GAME_DIR } from '../repos.mjs';
 import { signKey, parseKey, parseEnv, configDir, canonicalQuery } from './sign.mjs';
-import { catalog, searchDecos, styleProfile } from './catalog.mjs';
+import { catalog, searchDecos, styleProfile, styleProfiles } from './catalog.mjs';
 import { builderGuide } from './guide.mjs';
-import { applyOps, applyOp, nextDecoId, nextGeometryId, findGeometry, findDeco, GEOMETRY, OpError } from '../../public/js/builder/ops.js?v=28c0d569';
-import { forkStreet, forkOps, newTsid, libraryAsset } from '../../public/js/builder/zone.js?v=9608addf';
-import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js/builder/geometry-handles.js?v=54aaffb7';
+import { applyOps, applyOp, nextDecoId, nextGeometryId, findGeometry, findDeco, GEOMETRY, OpError, OP_NAMES } from '../../public/js/builder/ops.js?v=2ca2cc56';
+import { forkStreet, forkOps, newTsid, libraryAsset, linkEdit, editsOn } from '../../public/js/builder/zone.js?v=bdc23538';
+import { newStreet, newStreetOps, newHub, nextHubId, mapWithStreet, mapWithoutStreet, TEMPLATES, DEFAULT_MAP_COLOURS } from '../../public/js/builder/templates.js?v=0ee8c60d';
+import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js/builder/geometry-handles.js?v=3befd62c';
 import { platformsScreen, isStandable } from '../../public/js/street-model.js?v=23b926e5';
 import { DECO_TWINS } from '../../public/js/street-render.js?v=3bcef6a7';
 
 export const PERM_WORDS = Object.freeze({ floor: -1, roof: 1, soft: 0, hard: null });
+/** The game draws a signpost's first four arms (street-render.js); a fifth would never show. */
+export const ARMS_SHOWN = 4;
+/** Ops spec 8.3 names that are not built yet: refused here rather than sent. */
+export const NOT_BUILT = Object.freeze(['layer.add', 'layer.remove', 'layer.move', 'waiver.add', 'waiver.remove']);
 const BOOLEAN_FLAGS = new Set(['json', 'dry-run', 'write', 'help', 'all', 'flip', 'reach']);
 const pub = (p) => join(GAME_DIR, 'public', p);
 const readJson = (f) => JSON.parse(readFileSync(f, 'utf8'));
@@ -268,6 +273,11 @@ export function highestFloorAt(street, wx) {
  * (tinyspeck-cc0, from the catalog), as `place` does.
  */
 export function prepareOps(zone, ops, rows = catalog()) {
+  ops.forEach((op, i) => {
+    const name = String(op?.op ?? '');
+    if (NOT_BUILT.includes(name)) throw new CliError(`${name} (op ${i}) is in spec 8.3 but not built yet: templates make a street's layers through street add, and waivers come later.`, { code: 'builder_not_yet', data: { op: i } });
+    if (!OP_NAMES.includes(name)) throw new CliError(`Op ${i}: no op "${name}". The ops are: ${OP_NAMES.join(', ')}.`, { code: 'builder_bad_op', data: { op: i } });
+  });
   const taken = new Map();
   const byName = new Map(rows.map((d) => [d.name, d]));
   const rowed = new Set(Object.keys(zone.assets || {}));
@@ -395,7 +405,12 @@ export function setOps(zone, target, pairs) {
 export function rmOps(zone, target) {
   const [key, id, arm] = String(target).split('/');
   const row = streetOf(zone, key);
-  if (!id) return [{ op: 'street.remove', street: key }];
+  if (!id) {
+    // The street's line goes from the zone's hub map with it (NAV-006).
+    const tsid = row.street.tsid;
+    const lined = zone.hub?.map?.streets?.some((l) => l.tsid === tsid);
+    return [{ op: 'street.remove', street: key }, ...(lined ? [{ op: 'hubmap.set', map: mapWithoutStreet(zone.hub.map, tsid) }] : [])];
+  }
   if (arm !== undefined) return [{ op: 'connect.remove', street: key, signpost: id, at: Number(arm) }];
   const kind = kindOf(row.street, id);
   if (!kind || kind === 'layer') throw new CliError(`Street "${key}" has no deco or geometry ${id}.`, { code: 'builder_not_found' });
@@ -416,17 +431,34 @@ export function populateOps(zone, key, words, quoins) {
   return [{ op: 'population.set', street: key, population }];
 }
 
+/** PURE: the arms a shipped signpost shows with the zone's edits on it. */
+export function armsShown(post, edits, tsid) {
+  const added = editsOn(edits, tsid).filter((e) => e.op === 'add-connect' && e.signpost === post.id && !e.connect?.hidden).length;
+  return (post.connects || []).filter((c) => !c.hidden).length + added;
+}
+
 /**
- * PURE: link a zone street to a shipped one (spec 8.2 link-world): an arm on the shipped street's
- * post (edits[], op add-connect) that lands on the zone street, and an arm back from the zone street
- * (a new post at its left end, unless --post names one there).
+ * PURE: link a zone street to a shipped one (spec 8.2 link-world): an arm on a shipped signpost
+ * (edits[], add-connect) that lands on the zone street, and an arm back from the zone street (a new
+ * post at its left end, unless --back names one there). The shipped post must have room: the game
+ * draws a post's first four arms, so a full one is refused, and without --post the post showing the
+ * fewest arms is taken (the lowest number on a tie: Hechey Track's signpost_3).
  */
 export function linkWorldOps(zone, key, shipped, { post = null, back = null } = {}) {
   const row = streetOf(zone, key);
   const s = row.street;
   const posts = (shipped.signposts || []).filter((p) => !p.hidden);
-  const on = post ? posts.find((p) => p.id === post) : posts.slice().sort((p, q) => (p.connects || []).length - (q.connects || []).length)[0];
-  if (!on) throw new CliError(post ? `${shipped.label} has no signpost ${post}.` : `${shipped.label} has no signpost to add an arm to.`, { code: 'builder_not_found' });
+  const num = (p) => Number(/(\d+)$/.exec(p.id)?.[1] ?? 1e9);
+  let on;
+  if (post) {
+    on = posts.find((p) => p.id === post);
+    if (!on) throw new CliError(`${shipped.label} has no signpost ${post}.`, { code: 'builder_not_found' });
+    if (armsShown(on, zone.edits, shipped.tsid) >= ARMS_SHOWN) throw new CliError(`${shipped.label}'s ${post} already shows ${ARMS_SHOWN} arms, the most the game draws. Pick another signpost.`, { code: 'builder_post_full' });
+  } else {
+    on = posts.filter((p) => armsShown(p, zone.edits, shipped.tsid) < ARMS_SHOWN)
+      .sort((p, q) => armsShown(p, zone.edits, shipped.tsid) - armsShown(q, zone.edits, shipped.tsid) || num(p) - num(q))[0];
+    if (!on) throw new CliError(`Every signpost on ${shipped.label} already shows ${ARMS_SHOWN} arms.`, { code: 'builder_post_full' });
+  }
   const work = clone(zone);
   const ops = [];
   const arm = newConnect({ tsid: shipped.tsid, label: shipped.label, hubId: shipped.hubId });
@@ -441,17 +473,51 @@ export function linkWorldOps(zone, key, shipped, { post = null, back = null } = 
     ops.push({ op: 'signpost.add', street: key, signpost: { id: backId, x, y, w: POST_W, h: POST_H, connects: [arm] } });
   }
   applyOps(work, ops);
-  const arrive = arriveFor(streetOf(work, key).street, shipped.tsid);
-  const into = newConnect({ tsid: s.tsid, label: s.label, hubId: s.hubId, arrive });
-  // The arm back lands beside the shipped post the edit adds to.
-  const shippedArrive = arriveFor({ ...shipped, signposts: (shipped.signposts || []).map((p) => (p.id === on.id ? { ...p, connects: [...(p.connects || []), into] } : p)) }, s.tsid);
+  const edit = linkEdit({ shippedTsid: shipped.tsid, signpost: on.id, target: s, arrive: arriveFor(streetOf(work, key).street, shipped.tsid) });
+  // The arm back lands at the shipped post the edit adds to.
+  const shippedArrive = arriveFor({ ...shipped, signposts: (shipped.signposts || []).map((p) => (p.id === on.id ? { ...p, connects: [...(p.connects || []), edit.connect] } : p)) }, s.tsid);
   if (shippedArrive) {
     const last = ops[ops.length - 1];
     if (last.op === 'signpost.add') last.signpost.connects[0].arrive = shippedArrive;
     else last.connect.arrive = shippedArrive;
   }
-  ops.push({ op: 'edit.add', edit: { tsid: shipped.tsid, op: 'add-connect', signpost: on.id, connect: into } });
+  ops.push({ op: 'edit.add', edit });
   return { ops, post: `${key}/${backId}`, on: on.id };
+}
+
+/**
+ * PURE: every arm that leads to one of the zone's streets (its own arms, and edits[] on shipped
+ * streets) with its arrival worked out again where the target's signpost leading back now stands
+ * (arriveFor, as build-street-navigation.mjs does). For after moving a post or the floor under it.
+ * Returns { ops, arms: ["<street>/<post>/<n>" | "edit/<n>"] } for the arms that changed.
+ */
+export function arrivalOps(zone, { street = null } = {}) {
+  const byTsid = new Map((zone.streets || []).map((r) => [r.street?.tsid, r.street]));
+  const same = (a, b) => (a?.x ?? null) === (b?.x ?? null) && (a?.y ?? null) === (b?.y ?? null);
+  const ops = [];
+  const arms = [];
+  for (const row of zone.streets || []) {
+    if (street && row.key !== street) continue;
+    for (const post of row.street.signposts || []) {
+      (post.connects || []).forEach((c, at) => {
+        const target = byTsid.get(c.tsid);
+        if (!target) return;
+        const arrive = arriveFor(target, row.street.tsid);
+        if (!arrive || same(arrive, c.arrive)) return;
+        ops.push({ op: 'connect.set', street: row.key, signpost: post.id, at, set: { arrive } });
+        arms.push(`${row.key}/${post.id}/${at}`);
+      });
+    }
+  }
+  (zone.edits || []).forEach((e, at) => {
+    if (street || e.op !== 'add-connect' || !e.connect) return;
+    const target = byTsid.get(e.connect.tsid);
+    const arrive = target && arriveFor(target, e.tsid);
+    if (!arrive || same(arrive, e.connect.arrive)) return;
+    ops.push({ op: 'edit.remove', at }, { op: 'edit.add', at, edit: { ...e, connect: { ...e.connect, arrive } } });
+    arms.push(`edit/${at}`);
+  });
+  return { ops, arms };
 }
 
 /** PURE: a hubmap.set op with this street's line on the zone's hub map. */
@@ -459,7 +525,8 @@ export function hubMapOps(zone, key, line) {
   const s = streetOf(zone, key).street;
   const m = /^\s*(\d+(?:\.\d+)?),(\d+(?:\.\d+)?),(\d+(?:\.\d+)?),(\d+(?:\.\d+)?)\s*$/.exec(String(line || ''));
   if (!m) throw new CliError('--line is x1,y1,x2,y2 on the 760 x 460 map.');
-  const map = clone(zone.hub?.map || { streets: [] });
+  if (!zone.hub) throw new CliError('This draft has no hub yet.', { code: 'builder_no_hub' });
+  const map = clone(zone.hub.map || { ...DEFAULT_MAP_COLOURS, streets: [] });
   map.streets = (map.streets || []).filter((r) => r.tsid !== s.tsid);
   map.streets.push({ tsid: s.tsid, name: s.label, x1: Number(m[1]), y1: Number(m[2]), x2: Number(m[3]), y2: Number(m[4]) });
   return [{ op: 'hubmap.set', map }];
@@ -479,14 +546,15 @@ export const HELP = `Groddle level builder (docs/level-builder/spec.md 8.2)
   drafts                                      list drafts
   new <id> --title T (--hub 58 | --new-hub N)  start a zone
   pull <id> [--out f]   push <f> [-m note]    copy a draft to a file and back
-  street add --key k --label L [--template meadow] [--width 3000 --height 1000]
+  street add --key k --label L [--template meadow|tall|forest|cave|blank] [--width 3000 --height 1000]
   street fork <shipped tsid> --key k --label L
   place --street k --layer middleground --sprite bush_3 --x 300 --y -60 [--w --h --flip --z --r]
   set <street>[/<id>[/<arm>]] key=value ...   (key= removes)    rm <street>[/<id>[/<arm>]]
   platform --street k --from x,y --to x,y [--perm floor|roof|soft|hard]
   wall --street k --x --y --h [--perm]   ladder --street k --x --y --h [--w]   signpost --street k --x --y [--w --h]
   connect <streetA> <streetB> [--a-post id] [--b-post id]
-  link-world <street> --from <shipped tsid> [--post id] [--back id]
+  arrivals [--street k]                       work every arm's arrival out again (after moving a post or its floor)
+  link-world <street> --from <shipped tsid> [--post id] [--back id]   (a post with room: the game shows four arms)
   populate --street k npc_piggy=2 trant_fruit=1 [--quoins 6]
   hub map --street k --line x1,y1,x2,y2
   ops <file.json>                             apply a batch atomically
@@ -541,24 +609,23 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
         if (!row) throw new CliError(`No shipped street is in hub ${hubId}.`, { code: 'builder_not_found' });
         hub = { id: hubId, name: row.hubName };
       } else if (typeof flags['new-hub'] === 'string') {
-        let used = new Set();
+        let taken = [];
         if (!local()) {
           const { data } = await client.call('GET', '/drafts', { query: { all: '1' } });
-          const zones = await Promise.all(data.drafts.map((d) => client.call('GET', `/drafts/${encodeURIComponent(d.id)}`).then((r) => r.data).catch(() => null)));
-          used = new Set(zones.map((z) => z?.hub?.isNew && z.hub.id).filter(Boolean));
+          taken = data.drafts.map((d) => d.hub?.isNew && d.hub.id).filter(Boolean);
         }
-        let n = 900;
-        while (used.has(String(n)) && n < 999) n += 1;
-        hub = { id: String(n), name: flags['new-hub'].slice(0, 40), isNew: true };
+        const hubId = nextHubId(taken);
+        if (!hubId) throw new CliError('Every builder hub id (900-999) is taken.');
+        hub = newHub({ id: hubId, name: flags['new-hub'] });
       }
       if (local()) {
         const zone = { format: 'groddle-zone/1', id, title, rev: 1, ...(hub ? { hub } : {}), streets: [], edits: [], assets: {} };
         writeFileSync(resolve(flags.file), `${JSON.stringify(zone, null, 1)}\n`);
-        return { out: { id, rev: 1, hub, file: resolve(flags.file) }, text: `${id} rev 1 in ${flags.file}`, exit: 0 };
+        return { out: { id, rev: 1, hub: hub && { id: hub.id, name: hub.name, isNew: hub.isNew === true }, file: resolve(flags.file) }, text: `${id} rev 1 in ${flags.file}`, exit: 0 };
       }
       const { data } = await client.call('POST', '/drafts', { body: { id, title, ...(hub ? { hub } : {}) } });
       remember(cfg, id);
-      return { out: { id: data.id, rev: data.rev, hub: data.hub || null }, text: `${data.id} rev ${data.rev}${data.hub ? `  hub ${data.hub.id} ${data.hub.name}` : ''}`, exit: 0 };
+      return { out: { id: data.id, rev: data.rev, hub: data.hub ? { id: data.hub.id, name: data.hub.name, isNew: data.hub.isNew === true } : null }, text: `${data.id} rev ${data.rev}${data.hub ? `  hub ${data.hub.id} ${data.hub.name}` : ''}`, exit: 0 };
     }
 
     case 'pull': {
@@ -598,13 +665,23 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
         const fresh = newTsid();
         const r = await t.write((zone) => {
           const fork = forkStreet(shipped, { zoneId: zone.id, key, label, tsid: fresh, catalog: rows, twins: DECO_TWINS, ecologyRow: ecology[tsid] || null });
-          return forkOps(zone, fork);
+          const ops = forkOps(zone, fork);
+          // A new hub's map gains the street's line, as a street from a template does (NAV-006).
+          if (zone.hub?.isNew) ops.push({ op: 'hubmap.set', map: mapWithStreet(zone.hub.map, { tsid: fresh, name: fork.draftStreet.street.label }) });
+          return ops;
         }, `fork ${tsid}`);
         return wrote(r, { street: fresh }, `street ${key} ${fresh}`);
       }
       if (verb === 'add') {
-        const tpl = await templates();
-        const r = await t.write((zone) => tpl.streetAddOps(zone, { key, label, template: flags.template || 'meadow', width: num(flags.width, 'width', { optional: true }) ?? 3000, height: num(flags.height, 'height', { optional: true }) ?? 1000 }), `street add ${key}`);
+        const template = typeof flags.template === 'string' ? flags.template : 'meadow';
+        if (!TEMPLATES.some((x) => x.id === template)) throw new CliError(`--template is one of ${TEMPLATES.map((x) => x.id).join(', ')}.`);
+        const rows = new Map(catalog().map((d) => [d.name, d]));
+        const fresh = newTsid();
+        const r = await t.write((zone) => {
+          if (!zone.hub) throw new CliError('This draft has no hub yet: make it with new --hub <id> or --new-hub <name>.', { code: 'builder_no_hub' });
+          const draftStreet = newStreet({ zoneId: zone.id, key, label, template, width: num(flags.width, 'width', { optional: true }), height: num(flags.height, 'height', { optional: true }), hub: zone.hub, profiles: styleProfiles(), tsid: fresh, catalog: rows });
+          return newStreetOps(zone, draftStreet, rows);
+        }, `street add ${key}`);
         const added = r.ops.find((o) => o.op === 'street.add');
         return wrote(r, { street: added?.draftStreet?.street?.tsid, layers: added?.draftStreet?.street?.layers?.map((l) => l.id) }, `street ${key}`);
       }
@@ -692,6 +769,21 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       return wrote(r, { edits: 1, post: made.post, on: `${tsid}/${made.on}` }, `an arm on ${shipped.label} (${made.on}), back from ${made.post}`);
     }
 
+    case 'arrivals': {
+      let arms = [];
+      const r = await target().write((zone) => {
+        const a = arrivalOps(zone, { street: typeof flags.street === 'string' ? flags.street : null });
+        arms = a.arms;
+        if (!a.ops.length) throw new CliError('Every arm already lands where its street\'s signpost leading back stands.', { code: 'builder_nothing', exit: 0 });
+        return a.ops;
+      }, 'arrivals').catch((e) => {
+        if (e.code === 'builder_nothing') return null;
+        throw e;
+      });
+      if (!r) return { out: { changed: [], arms: [] }, text: 'Nothing to change.', exit: 0 };
+      return wrote(r, { arms }, `${arms.length} arrival${arms.length === 1 ? '' : 's'} worked out again`);
+    }
+
     case 'populate': {
       const q = num(flags.quoins, 'quoins', { optional: true });
       return wrote(await target().write((zone) => populateOps(zone, flags.street, args, q), 'populate'));
@@ -736,7 +828,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       let report;
       let rev;
       if (local()) {
-        const { validateZone } = await import('../../public/js/builder/validate.js?v=f15a39d0');
+        const { validateZone } = await import('../../public/js/builder/validate.js?v=ef755481');
         const { loadValidatorContext } = await import('./validator-context.mjs');
         const zone = readJson(resolve(flags.file));
         rev = zone.rev;
@@ -865,11 +957,6 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
     default:
       throw new CliError(`No command "${cmd}". Try: node tools/builder/cli.mjs help`);
   }
-}
-
-/** P3's street templates (street add). Wired at the rebase onto P3; until then a clear refusal. */
-async function templates() {
-  throw new CliError('street add needs the street templates that come with P3 (new zones). Fork a shipped street for now: street fork <tsid> --key k --label L.', { code: 'builder_not_yet' });
 }
 
 export async function main(argv = process.argv.slice(2), opts = {}) {

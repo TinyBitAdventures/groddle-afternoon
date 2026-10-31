@@ -41,6 +41,7 @@ const DRAFT = `mossy-hollow-${Date.now().toString(36)}`;
 const CLI = join(GAME_DIR, 'tools/builder/cli.mjs');
 
 const checks = [];
+const refused = [];
 const check = (name, ok, detail = '') => {
   checks.push({ name, ok: Boolean(ok), detail });
   console.log(`${ok ? 'ok  ' : 'FAIL'} ${name}${detail ? `  ${detail}` : ''}`);
@@ -91,6 +92,12 @@ async function main() {
     const line = r.stdout.trim().split('\n').pop() || '';
     let json = null;
     try { json = JSON.parse(line); } catch { /* text output */ }
+    // P3 saw unexplained 422s once: keep every 422's whole body.
+    if (json?.error?.status === 422 || /422/.test(r.stderr)) {
+      const entry = { at: new Date().toISOString(), args, body: json?.error ?? r.stderr.trim() };
+      refused.push(entry);
+      console.log(`422 ${args.slice(0, 2).join(' ')}: ${JSON.stringify(entry.body)}`);
+    }
     return { status: r.status, json, text: r.stdout.trim(), err: r.stderr.trim() };
   };
   let worker = null;
@@ -124,7 +131,7 @@ async function main() {
       check('street fork (without P3): end', r.status === 0, r.err);
     } else {
       r = cli('street', 'add', '--draft', DRAFT, '--key', 'lane', '--label', 'Mossy Lane', '--template', 'meadow', '--width', '3000', '--json');
-      check('street add: lane from the meadow template', r.status === 0 && /^GZ[A-Z0-9]{13}$/.test(r.json?.street || '') && r.json?.layers?.includes('middleground'), r.err || JSON.stringify(r.json));
+      check('street add: lane from the meadow template', r.status === 0 && /^GZ[A-Z0-9]{13}$/.test(r.json?.street || '') && JSON.stringify(r.json?.layers) === JSON.stringify(['sky', 'bg_1', 'middleground', 'middleplus']), r.err || JSON.stringify(r.json));
       r = cli('street', 'add', '--draft', DRAFT, '--key', 'end', '--label', 'Hollow End', '--template', 'meadow', '--width', '2000', '--json');
       check('street add: end', r.status === 0, r.err);
     }
@@ -155,7 +162,16 @@ async function main() {
       check('link-world waits for P3 (edit.add)', true, 'skipped');
     } else {
       r = cli('link-world', 'lane', '--from', 'GLI2V0UN7RD1T2J', '--json');
-      check('link-world: an arm on Hechey Track', r.status === 0 && r.json?.edits === 1, r.err || JSON.stringify(r.json));
+      check('link-world: an arm on Hechey Track\'s signpost_3 (it has room; signpost_1 shows four arms), and one back', r.status === 0 && r.json?.edits === 1 && r.json.on === 'GLI2V0UN7RD1T2J/signpost_3' && /^lane\/signpost_\d+$/.test(r.json.post || ''), r.err || JSON.stringify(r.json));
+      r = cli('link-world', 'lane', '--from', 'GLI2V0UN7RD1T2J', '--post', 'signpost_1', '--json');
+      check('link-world refuses a post that already shows four arms', r.status === 2 && r.json?.error?.code === 'builder_post_full', JSON.stringify(r.json));
+      r = cli('populate', '--street', 'end', 'npc_chicken=1', 'trant_bean=1', '--quoins', '4', '--json');
+      check('populate: Hollow End\'s population', r.status === 0 && r.json?.changed?.includes('end/population'), r.err || JSON.stringify(r.json));
+      r = cli('hub', 'map', '--street', 'end', '--line', '380,240,560,270', '--json');
+      check('hub map: Hollow End\'s line', r.status === 0 && r.json?.changed?.includes('hub'), r.err || JSON.stringify(r.json));
+      writeFileSync(join(OUT, 'layer-op.json'), JSON.stringify({ ops: [{ op: 'layer.add', street: 'lane', layer: { id: 'bg_9' } }] }));
+      r = cli('ops', '--draft', DRAFT, join(OUT, 'layer-op.json'), '--json');
+      check('an op spec 8.3 names but nobody built (layer.add) is refused, not sent', r.status === 2 && r.json?.error?.code === 'builder_not_yet', JSON.stringify(r.json));
     }
 
     // New art through intake, placed on the end street.
@@ -183,10 +199,19 @@ async function main() {
     const after = JSON.parse(readFileSync(cli('pull', DRAFT, '--out', join(OUT, 'p3.zone.json'), '--json').json.file, 'utf8'));
     const topper = after.streets.find((s) => s.key === 'lane').street.layers.find((l) => l.id === 'middleground').decos.find((d) => d.sprite === 'heights_topper_2' && d.y === ledgeY);
     if (topper) cli('set', `lane/${topper.id}`, `y=${floorY - 90}`, '--draft', DRAFT, '--json');
+    // The post on the ledge comes down with it, and the arm into it lands there again.
+    const lanePost = after.streets.find((s) => s.key === 'lane').street.signposts.find((p) => p.y === ledgeY);
+    if (lanePost) {
+      r = cli('set', `lane/${lanePost.id}`, `y=${floorY - 90}`, '--draft', DRAFT, '--json');
+      check('set: the post down with its ledge', r.status === 0, r.err);
+    }
+    r = cli('arrivals', '--draft', DRAFT, '--json');
+    check('arrivals: the arm into the moved post lands there again', r.status === 0 && (r.json?.arms || []).length >= 1, r.err || JSON.stringify(r.json));
     r = cli('validate', '--draft', DRAFT, '--rule', 'PHY-', '--json');
     const left = (r.json?.findings || []).filter((f) => f.street === 'lane' && f.rule === 'PHY-003');
     check('validate: the post is reached now (no PHY-003 on lane)', r.json && left.length === 0, left.map((f) => f.message).join(' | ') || JSON.stringify(r.json?.counts));
     r = cli('validate', '--draft', DRAFT, '--json');
+    if (r.json?.counts?.error) console.log('errors left:', JSON.stringify(r.json.findings.filter((f) => f.severity === 'error' || f.severity === 'fatal')));
     check(WITHOUT_P3 ? 'validate: counts (a fork of Hechey Track keeps its own findings)' : 'validate: no errors', WITHOUT_P3 ? r.json?.counts : r.status === 0, JSON.stringify(r.json?.counts) + (laneErrors.length ? ` other lane errors before: ${laneErrors.join(',')}` : ''));
     r = cli('render', '--draft', DRAFT, '--street', 'lane', '--scale', '0.25', '--overlay', 'geometry,reach,findings,grid', '--out', join(OUT, 'lane-fixed.png'), '--json');
     check('render: the fixed lane', r.status === 0, r.err);
@@ -235,5 +260,6 @@ async function main() {
 await main();
 const failed = checks.filter((c) => !c.ok);
 console.log(`\n${checks.length - failed.length} of ${checks.length} checks hold${KEEP ? ` (kept draft ${DRAFT})` : ''}; pictures and files in ${OUT}`);
-writeFileSync(join(OUT, 'session.json'), JSON.stringify({ draft: DRAFT, withoutP3: WITHOUT_P3, checks }, null, 1));
+writeFileSync(join(OUT, 'session.json'), JSON.stringify({ draft: DRAFT, withoutP3: WITHOUT_P3, checks, refused422: refused }, null, 1));
+if (refused.length) console.log(`${refused.length} answer(s) were 422; bodies in ${join(OUT, 'session.json')}`);
 process.exit(failed.length ? 1 : 0);

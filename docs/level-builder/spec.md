@@ -853,18 +853,18 @@ $ export $(cat ~/.config/groddle/builder.env)   # GRODDLE_BUILDER_URL, GRODDLE_B
 $ node tools/builder/cli.mjs new mossy-hollow --title "Mossy Hollow" --new-hub "Mossy Hollow" --json
 {"id":"mossy-hollow","rev":1,"hub":{"id":"900","name":"Mossy Hollow","isNew":true}}
 
-$ node tools/builder/cli.mjs style hub-58 --json | jq '.layers.sky'
-{"z":-3,"w":0.75,"h":1,"filters":{"saturation":[-83,-46,-15],"blur":[2,3,5]},"density":[1.25,4,16]}
+$ node tools/builder/cli.mjs style hub-58 --json | jq '.layers.sky | {z, w, density}'
+{"z":[-3,-4,-3],"w":[0.61,0.67,0.78],"density":[1.3,2,3.5]}
 
 $ node tools/builder/cli.mjs street add --draft mossy-hollow --key lane --label "Mossy Lane" \
     --template meadow --width 3000 --json
-{"rev":2,"street":"GZ0000000000001","layers":["sky","bg_1","middleground","middleplus"]}
+{"rev":2,"changed":["asset:evenground_platform_long","lane","hub"],"street":"GZ0000000000001","layers":["sky","bg_1","middleground","middleplus"]}
 $ node tools/builder/cli.mjs street add --draft mossy-hollow --key end --label "Hollow End" \
     --template meadow --width 2000 --json
-{"rev":3,"street":"GZ0000000000002"}
+{"rev":3,"changed":["end","hub"],"street":"GZ0000000000002","layers":["sky","bg_1","middleground","middleplus"]}
 
 $ node tools/builder/cli.mjs decos "bush" --layer middleground --hub 58 --limit 3 --json
-[{"name":"bush_3","placements":10700,"drawn":{"w_med":160,"h_med":90}}, …]
+[{"name":"bush_1","placements":625,"inHub":47,"drawn":{"w_med":104,"h_med":83}, …}, {"name":"bush_patch_1", …}, {"name":"bush_3", …}]
 
 $ cat > ops.json <<'EOF'
 { "ops": [
@@ -877,42 +877,48 @@ $ cat > ops.json <<'EOF'
 ] }
 EOF
 $ node tools/builder/cli.mjs ops --draft mossy-hollow ops.json --json
-{"rev":4,"changed":["lane/plat_2","lane/d_14","end/d_9"],"findings":{"error":0,"warn":0}}
+{"rev":4,"changed":["lane/plat_2","asset:heights_topper_2","lane/d_4","asset:bush_3","end/d_3","lane/population"]}
+# ops fills in deco ids, and the provenance rows of library decos the zone has none for.
 
 $ node tools/builder/cli.mjs connect lane end --json            # a post at each facing end, on its highest floor
-{"rev":5,"posts":["lane/signpost_1","end/signpost_1"]}
-$ node tools/builder/cli.mjs link-world lane --from GLI2V0UN7RD1T2J --json   # an arm on Hechey Track
-{"rev":6,"edits":1}
+{"rev":5,"changed":["lane/signpost_1","end/signpost_1"],"posts":["lane/signpost_1","end/signpost_1"]}
+$ node tools/builder/cli.mjs link-world lane --from GLI2V0UN7RD1T2J --json   # an arm on Hechey Track, and one back
+{"rev":6,"changed":["lane/signpost_2","edits"],"edits":1,"post":"lane/signpost_2","on":"GLI2V0UN7RD1T2J/signpost_3"}
+# The arm goes on the shipped post that shows the fewest arms (signpost_1 already shows four, the most
+# the game draws); the way back is a new post at Mossy Lane's left end.
 
 $ node tools/builder/cli.mjs validate --draft mossy-hollow --json
-{"ok":false,"rev":6,"counts":{"fatal":0,"error":1,"warn":0,"info":2},"findings":[
+{"ok":false,"rev":6,"counts":{"fatal":0,"error":1,"warn":0,"info":6},"findings":[
  {"rule":"PHY-003","severity":"error","at":"lane/signpost_1","message":"Signpost signpost_1 (to Hollow End) cannot be reached from the arrival at 150, 940.",
   "data":{"closest":{"x":2700,"y":940,"rise":132,"jump":105}},"fix":"Lower the ledge under the post to 100 px or less above the floor, or add a ladder."},
- {"rule":"NAV-005","severity":"info", …}]}
+ {"rule":"STY-003","severity":"info", …}]}
 
 $ node tools/builder/cli.mjs render --draft mossy-hollow --street lane --scale 0.25 \
     --overlay geometry,reach,findings,grid --out lane.png
-lane.png 750x250  rev 6  findings 1 error, 1 warn
+lane.png 750x250  rev 6  findings 1 error, 0 warnings
 # The agent looks at lane.png: the post stands on the new ledge, 132 px over the floor, with no way up.
 
-$ node tools/builder/cli.mjs set lane/plat_2 y1=-150 y2=-150 --draft mossy-hollow --json   # 90 px rise
-{"rev":7}
+$ node tools/builder/cli.mjs set lane/plat_2 y1=-150 y2=-150 --json      # a 90 px rise
+$ node tools/builder/cli.mjs set lane/d_4 y=-150 --json                  # the ledge's topper with it
+$ node tools/builder/cli.mjs set lane/signpost_1 y=-150 --json           # and the post
+$ node tools/builder/cli.mjs arrivals --json                             # the arm into that post lands there again
+{"rev":10,"changed":["end/signpost_1"],"arms":["end/signpost_1/0"]}
 $ node tools/builder/cli.mjs validate --draft mossy-hollow --json | jq .counts
-{"fatal":0,"error":0,"warn":0,"info":2}
+{"fatal":0,"error":0,"warn":0,"info":6}
 
 $ node tools/builder/cli.mjs play --draft mossy-hollow --street lane
 https://groddle.localhost/play/?practice=1&autostart=1&draft=mossy-hollow&street=lane
 $ curl -s -X POST "$GRODDLE_BUILDER_URL/wp-json/groddle/v1/admin/builder/drafts/mossy-hollow/publish-request" \
     -H "X-Groddle-Builder: $(node tools/builder/cli.mjs sign POST /groddle/v1/admin/builder/drafts/mossy-hollow/publish-request '{"note":"ready"}')" \
     -H 'Content-Type: application/json' -d '{"note":"ready"}'
-{"state":"ready","rev":7}
+{"id":"mossy-hollow","state":"ready","rev":10}
 ```
 
-Austin then play-tests it, and runs `publish --write` in a clean worktree (section 11). The zone document at rev 7 looks like this (shortened; the full form passes the schema):
+Austin then play-tests it, and runs `publish --write` in a clean worktree (section 11). The zone document at rev 10 looks like this (shortened; the full form passes the schema):
 
 ```json
 {
-  "format": "groddle-zone/1", "id": "mossy-hollow", "title": "Mossy Hollow", "rev": 7,
+  "format": "groddle-zone/1", "id": "mossy-hollow", "title": "Mossy Hollow", "rev": 10,
   "hub": { "id": "900", "name": "Mossy Hollow", "isNew": true, "map": { "streets": [
     { "tsid": "GZ0000000000001", "name": "Mossy Lane", "x1": 200, "y1": 260, "x2": 380, "y2": 240 },
     { "tsid": "GZ0000000000002", "name": "Hollow End", "x1": 380, "y1": 240, "x2": 560, "y2": 270 } ] } },
@@ -924,18 +930,20 @@ Austin then play-tests it, and runs `publish --write` in a clean worktree (secti
         "platforms": [ { "id": "plat_1", "x1": -1480, "y1": -60, "x2": 1480, "y2": -60, "pc_perm": -1, "item_perm": -1 } ],
         "layers": [ { "id": "middleground", "name": "middleground", "z": 0, "decos": [
           { "id": "d_9", "sprite": "patch_dirt_2a", "x": 0, "y": -40, "w": 600, "h": 90, "z": 1, "r": 0 } ] } ],
-        "signposts": [ { "id": "signpost_1", "x": 1350, "y": -60, "w": 100, "h": 200, "connects": [
-          { "tsid": "GZ0000000000002", "label": "Hollow End", "hub_id": "900", "arrive": { "x": 150, "y": 940 } } ] } ],
-        "stats": { "platformCount": 1, "layerCount": 1, "decoCount": 1, "signpostCount": 1 } },
+        "signposts": [ { "id": "signpost_1", "x": 1350, "y": -150, "w": 150, "h": 200, "connects": [
+            { "tsid": "GZ0000000000002", "label": "Hollow End", "hub_id": "900", "arrive": { "x": 150, "y": 940 } } ] },
+          { "id": "signpost_2", "x": -1350, "y": -60, "w": 150, "h": 200, "connects": [
+            { "tsid": "GLI2V0UN7RD1T2J", "label": "Hechey Track", "hub_id": "56", "arrive": { "x": 2026, "y": 894 } } ] } ],
+        "stats": { "platformCount": 1, "layerCount": 1, "decoCount": 1, "signpostCount": 2 } },
       "population": { "counts": { "npc_piggy": 2, "trant_fruit": 1 }, "quoins": 6 } }
   ],
-  "edits": [ { "tsid": "GLI2V0UN7RD1T2J", "op": "add-connect", "signpost": "signpost_1",
+  "edits": [ { "tsid": "GLI2V0UN7RD1T2J", "op": "add-connect", "signpost": "signpost_3",
     "connect": { "tsid": "GZ0000000000001", "label": "Mossy Lane", "hub_id": "900", "arrive": { "x": 150, "y": 940 } } } ],
   "assets": { "patch_dirt_2a": { "origin": "tinyspeck-cc0", "licence": "CC0-1.0", "source": "groddle1.swf#patch_dirt_2a" } }
 }
 ```
 
-Phase 4's acceptance test is this session as a script (`tools/builder/example-session.mjs`), run against groddle.localhost. It deletes its draft and key afterwards.
+Phase 4's acceptance test is this session as a script (`tools/builder/example-session.mjs`), run against groddle.localhost. It deletes its draft, its art and its key afterwards. (Ids and positions above are as the script's run gave them; a template street's own decos come first, so the ops' new decos number on from them.)
 
 ---
 
@@ -1244,10 +1252,10 @@ Sizes: S is 1-2 lane-days, M is 3-4, L is 5-7.
 - **New routes** 8.3 did not list: `DELETE keys/{id}?purge=1` (revoke and delete the row: test keys), `POST drafts/{id}/purge` (an archived draft deleted for good with its revisions and new art; session only; the example session's cleanup). `publish-request` sets the draft's state to `ready`, a fourth state. `POST drafts/{id}/validate` takes `rules` as ids or prefixes and `reach: true` to include the reach map.
 - **The worker** takes every call as a signed POST with the stored zone in the body (and, for a render, the new art's 2x files), so it needs no database. It serves its own checkout's `public/` and caches renders by the zone's bytes and the parameters (the same as draft, rev and parameters). `GET /health` is its only unsigned answer. Start it in a game checkout with `node tools/builder/worker.mjs` (127.0.0.1:8794; it refuses 8793).
 - **Renders.** Chrome opens `http://builder-render.localhost/builder-render/`, an origin nothing serves: every request is fulfilled from the checkout's `public/` or the art handed in, and anything else is refused. `full` draws every layer where a Wide view at the street's centre puts it, with the sky over the whole street; `camera` takes `x, y` as the world point at the view's centre and `w, h` (960 x 540 by default). Fatal findings block a render except AST-001 (missing art), which the game draws as its placeholder and an agent needs to see. `X-Builder-Findings` counts fatal with error; `X-Builder-Size` is the picture's size. A render takes about 1.3 s cold and 0.4 s warm at 0.25 on Hechey Track.
-- **Overlays.** `js/builder/overlays.js` holds the geometry and reach drawing in the editor's colours; the editor moves onto it when P3's editor changes land (it keeps its own copy until then).
-- **The CLI.** Beyond 8.2: `guide`, `sign METHOD ROUTE [BODY]`, `set ... key=` removes a field, `set <street>/<post>/<n>` edits an arm, `ops` fills missing deco ids and adds the library provenance rows the decos need, `new --new-hub` takes the lowest hub id from 900 no other draft holds, the last draft named is remembered (`~/.config/groddle/builder-state.json`), and `GRODDLE_BUILDER_HOME` moves the config folder. `link-world` adds the `edits[]` arm and a post with an arm back on the zone street. `street add`, `populate`, `hub map` and `link-world` send P3's ops (`population.set`, `hubmap.set`, `edit.add`, and the templates).
+- **Overlays.** `js/builder/overlays.js` holds the geometry and reach drawing and the colours; the editor and the render page both draw with it. The render page's populations overlay uses P3's `plannedSpots` and `SPOT_GROUPS` (`editor-zone.js`), so its spots and colours are the editor's.
+- **The CLI.** Beyond 8.2: `guide`, `sign METHOD ROUTE [BODY]`, `set ... key=` removes a field, `set <street>/<post>/<n>` edits an arm, `ops` fills missing deco ids and adds the library provenance rows the decos need, `new --new-hub` takes the lowest hub id from 900 no other draft holds, the last draft named is remembered (`~/.config/groddle/builder-state.json`), and `GRODDLE_BUILDER_HOME` moves the config folder. `link-world` adds the `edits[]` arm and a post with an arm back on the zone street. `street add` uses P3's templates (`templates.js newStreet`, `newStreetOps`), and `new --new-hub` P3's `newHub` and `nextHubId`; `street fork` into a new hub adds the street's map line too, and `rm <street>` takes it off. `link-world` puts the arm on a shipped post with room (the game draws four arms; the zone's own edits count), the fewest arms first, then the lowest number, and refuses a full `--post`. `arrivals` works every arm's arrival out again (after moving a post or its floor), as connect.set and, for edits, edit.remove and edit.add. Ops 8.3 names but nobody built (`layer.add`, `layer.remove`, `layer.move`, `waiver.*`) are refused before anything is sent, as is any name ops.js does not know.
 - **The example session** signs in with a one-time link minted on the machine (`minn login`), makes a key with the session, runs 8.7 with the CLI and the key only, adds a little new art through intake, checks the replay, stale and `admin/give` refusals, and deletes the draft (with its revisions and art) and the key. The key lives in a temporary folder, never in `~/.config/groddle`.
-- **Acceptance, measured 2026-10-31 on groddle.localhost** (before P3, with `--without-p3`, which forks Hechey Track for the template steps and skips link-world and the population): 26 of 27 checks held, the 27th being the PHY-003 on the ledge, which needs link-world's arrival (the lane's only arrival without it is the arm from Hollow End, which lands on the ledge itself; `--without-p3` now reports it as waiting on P3). The full session runs after P3 lands; a replayed request is 401 `replay`, a signature 90 s old or ahead is 401 `stale`, a key at `admin/give` is 401, at `keys` and `play` 403; the 20th render in a minute is 429 with `Retry-After`. Render golden: Hechey Track at 0.25 matches the stored picture (`tests/fixtures/builder/hechey-track-0.25.png`) within 1%.
+- **Acceptance, measured 2026-10-31 on groddle.localhost after P3 landed:** `example-session.mjs` ran 8.7 in full, 33 of 33 checks: a zone with a new hub (900), two Meadow streets, the ops batch, connect, link-world on Hechey Track's `signpost_3` (and a refusal on the four-armed `signpost_1`), populate, hub map, a `layer.add` refused before it is sent, new art through intake placed on Hollow End, PHY-003 on the ledge from the arrival from Hechey Track (exit 1), renders, the fix (ledge, topper and post down to a 90 px rise, `arrivals`), validate with no fatal finding, error or warning (6 notes), the play address, the publish request signed by `cli sign`; a replayed request 401 `replay`, a signature 120 s old 401 `stale`, the key at `admin/give` 401 and at `keys` 403; then the draft (14 revisions, 1 art row) and the key deleted. No 422 came back (the script keeps any 422's body in `session.json`). Earlier, before P3: the 20th render in a minute was 429 with `Retry-After`. Render golden: Hechey Track at 0.25 matches the stored picture (`tests/fixtures/builder/hechey-track-0.25.png`) within 1%.
 
 ---
 

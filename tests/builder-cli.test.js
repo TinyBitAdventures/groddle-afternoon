@@ -39,17 +39,32 @@ describe('a zone file, built with the CLI', () => {
     await cli('new', 'cli-test', '--title', 'Cli Test', '--new-hub', 'Cli Hollow', `file:${file}`);
   });
 
-  it('new writes a zone at rev 1 with a new hub in 900-999', () => {
+  it('new writes a zone at rev 1 with a new hub in 900-999 (P3\'s newHub: its map colours too)', () => {
     const z = zone();
     assert.equal(z.format, 'groddle-zone/1');
     assert.equal(z.rev, 1);
-    assert.deepEqual(z.hub, { id: '900', name: 'Cli Hollow', isNew: true });
+    assert.deepEqual({ id: z.hub.id, name: z.hub.name, isNew: z.hub.isNew }, { id: '900', name: 'Cli Hollow', isNew: true });
+    assert.deepEqual(z.hub.map.streets, []);
+  });
+
+  it('street add makes a street from P3\'s templates, with its line on the new hub\'s map', async () => {
+    const r = await cli('street', 'add', '--key', 'meadow', '--label', 'Cli Meadow', '--template', 'meadow', '--width', '3000', `file:${file}`);
+    assert.match(r.out.street, /^GZ[A-Z0-9]{13}$/);
+    assert.deepEqual(r.out.layers, ['sky', 'bg_1', 'middleground', 'middleplus']);
+    const z = zone();
+    const st = z.streets.find((x) => x.key === 'meadow').street;
+    assert.deepEqual(st.bounds, { l: -1500, r: 1500, t: -1000, b: 0 });
+    assert.equal(st.platforms[0].y1, -60);
+    assert.ok(z.hub.map.streets.some((l) => l.tsid === st.tsid));
+    await assert.rejects(() => cli('street', 'add', '--key', 'x', '--label', 'X', '--template', 'swamp', `file:${file}`), /--template is one of/);
+    await cli('rm', 'meadow', `file:${file}`);
   });
 
   it('street fork copies a shipped street under a GZ tsid, with provenance rows', async () => {
+    const before = zone().rev;
     const r = await cli('street', 'fork', HECHEY, '--key', 'lane', '--label', 'Cli Lane', `file:${file}`);
     assert.match(r.out.street, /^GZ[A-Z0-9]{13}$/);
-    assert.equal(r.out.rev, 2);
+    assert.equal(r.out.rev, before + 1);
     const z = zone();
     assert.equal(z.streets[0].street.label, 'Cli Lane');
     assert.equal(z.assets.bush_3.origin, 'tinyspeck-cc0');
@@ -97,7 +112,7 @@ describe('a zone file, built with the CLI', () => {
     await cli('rm', `lane/${d.id}`, `file:${file}`);
     assert.equal(zone().streets[0].street.layers.find((l) => l.id === 'middleground').decos.some((x) => x.id === d.id), false);
     assert.deepEqual(setOps(zone(), 'lane/signpost_1/0', ['label=Somewhere']), [{ op: 'connect.set', street: 'lane', signpost: 'signpost_1', at: 0, set: { label: 'Somewhere' } }]);
-    assert.deepEqual(rmOps(zone(), 'end'), [{ op: 'street.remove', street: 'end' }]);
+    assert.deepEqual(rmOps(zone(), 'end')[0], { op: 'street.remove', street: 'end' });
     assert.throws(() => rmOps(zone(), 'lane/d_999999'), /no deco or geometry/);
   });
 
@@ -133,6 +148,10 @@ describe('a zone file, built with the CLI', () => {
     writeFileSync(ops, JSON.stringify({ ops: [{ op: 'deco.set', street: 'end', id: 'd_1', set: { x: 1 } }, { op: 'deco.set', street: 'end', id: 'd_nope', set: { x: 1 } }] }));
     await assert.rejects(() => cli('ops', ops, `file:${file}`), (e) => e.code === 'builder_invalid' && e.data.op === 1);
     assert.equal(zone().rev, before + 1, 'nothing written');
+    writeFileSync(ops, JSON.stringify({ ops: [{ op: 'layer.add', street: 'end', layer: { id: 'bg_9' } }] }));
+    await assert.rejects(() => cli('ops', ops, `file:${file}`), (e) => e.code === 'builder_not_yet' && /not built yet/.test(e.message));
+    writeFileSync(ops, JSON.stringify({ ops: [{ op: 'deco.fly', street: 'end' }] }));
+    await assert.rejects(() => cli('ops', ops, `file:${file}`), (e) => e.code === 'builder_bad_op');
     const filled = prepareOps(zone(), [{ op: 'deco.add', street: 'end', layer: 'middleground', deco: { sprite: 'bush_3', x: 0, y: 0, w: 1, h: 1 } }]);
     assert.equal(filled.length, 1, 'bush_3 already has its row');
     assert.match(filled[0].deco.id, /^d_\d+$/);
@@ -157,8 +176,15 @@ describe('a zone file, built with the CLI', () => {
     assert.throws(() => populateOps(z, 'lane', ['piggy']), /class=count/);
     const [map] = hubMapOps(z, 'lane', '200,260,380,240');
     assert.equal(map.op, 'hubmap.set');
-    assert.deepEqual(map.map.streets[0], { tsid: z.streets[0].street.tsid, name: z.streets[0].street.label, x1: 200, y1: 260, x2: 380, y2: 240 });
+    assert.ok(!map.map.streets.some((l) => l.name === 'Cli Meadow'), 'rm took the removed street\'s line off the map');
+    assert.deepEqual(map.map.streets.find((l) => l.tsid === z.streets[0].street.tsid), { tsid: z.streets[0].street.tsid, name: z.streets[0].street.label, x1: 200, y1: 260, x2: 380, y2: 240 });
     const link = linkWorldOps(z, 'lane', shipped(HECHEY));
+    // Hechey Track's signpost_1 shows four arms (the most the game draws): the edit goes on signpost_3.
+    assert.equal(link.on, 'signpost_3');
+    assert.throws(() => linkWorldOps(z, 'lane', shipped(HECHEY), { post: 'signpost_1' }), (e) => e.code === 'builder_post_full');
+    const full = structuredClone(z);
+    full.edits = [1, 2, 3].map(() => ({ tsid: HECHEY, op: 'add-connect', signpost: 'signpost_3', connect: { tsid: 'GZ0000000000009', label: 'X' } }));
+    assert.equal(linkWorldOps(full, 'lane', shipped(HECHEY)).on, 'signpost_4', 'the zone\'s own edits count toward a post\'s arms');
     const edit = link.ops.at(-1);
     assert.equal(edit.op, 'edit.add');
     assert.equal(edit.edit.tsid, HECHEY);

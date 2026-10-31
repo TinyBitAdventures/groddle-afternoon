@@ -14,22 +14,21 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, normalize } from 'node:path';
 import { GAME_DIR } from '../repos.mjs';
 import { openBrowser } from '../qa/browser.mjs';
-import { validateZone, placementRequests } from '../../public/js/builder/validate.js?v=f15a39d0';
+import { validateZone, placementRequests } from '../../public/js/builder/validate.js?v=ef755481';
 import { planStreetPlacements, populationForStreet } from '../../public/js/street-ecology.js?v=7e30da8f';
-import { platformsScreen, streetWidth } from '../../public/js/street-model.js?v=23b926e5';
+import { platformsScreen, streetWidth, worldToScreen } from '../../public/js/street-model.js?v=23b926e5';
+import { plannedSpots } from '../../public/js/builder/editor-zone.js?v=fb167700';
 
 /** Fatal rules that still render (the street loads; see renderInput). */
 export const RENDERS_ANYWAY = new Set(['AST-001']);
 export const ORIGIN = 'http://builder-render.localhost';
 const TYPES = { '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.webp': 'image/webp', '.png': 'image/png', '.svg': 'image/svg+xml', '.html': 'text/html', '.woff2': 'font/woff2', '.jpg': 'image/jpeg', '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg' };
 
-/** PURE: the planner's spots for a street's population (screen space), as the game places them. */
+/** PURE: the planner's spots for a street's population (screen space), as the editor's overlay and the game place them. */
 export function populationSpots(row) {
   const s = row?.street;
   if (!s || !row.population) return [];
-  const pop = populationForStreet(s.tsid, { ...row.population, counts: row.population.counts || {} });
-  const plan = planStreetPlacements(platformsScreen(s), placementRequests(pop), { worldW: streetWidth(s), seed: s.tsid });
-  return Object.entries(plan.groups).flatMap(([key, list]) => list.map((p) => ({ key, x: p.x, y: p.y })));
+  return plannedSpots({ street: s, population: row.population, platformsScreen, worldToScreen, populationForStreet, planStreetPlacements, placementRequests, worldW: streetWidth(s) });
 }
 
 /**
