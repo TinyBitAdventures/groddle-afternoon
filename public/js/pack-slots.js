@@ -23,11 +23,22 @@
  * the player put them and new arrivals are what doesn't fit (a new bag goes in
  * place of the leftmost slot that is not a bag: arrivalSlot). What doesn't fit
  * is held by the magic rock (the source's familiar overflow) and comes back by
- * itself when room frees. A class's count is split into full stacks first and
- * one remainder stack last.
+ * itself when room frees.
  *
- * prefs = { bags: [{ key, cls }], place: { pack: [entry], <bagKey>: [cls] } }
- *   pack entries are a class (one stack) or '@<bagKey>' (a bag in that slot).
+ * Each saved stack keeps its own count (prefs.n), so a change of count never
+ * moves a stack (player report on v0.7.0: a plank stack in a bag filled up and
+ * jumped to the pack row). More of a class tops up the stacks held, limited
+ * bags first, then the pack, then the other bags (bag.js:157-206), and only
+ * the rest opens new stacks in the first free slot, the pack before the bags
+ * (bag.js:208-232; the pack is the first candidate, :120-122). Fewer takes from
+ * the first stack in slot order, a bag's slots where the bag sits
+ * (removeItemStackClass and removeItemStackClassExact, bag.js:316-404); a stack
+ * that empties frees its slot and nothing else moves. A save from before
+ * prefs.n splits each class into full stacks first, in saved order, once.
+ *
+ * prefs = { bags: [{ key, cls }], place: { pack: [entry], <bagKey>: [cls] }, n: { pack: [count], <bagKey>: [count] } }
+ *   pack entries are a class (one stack) or '@<bagKey>' (a bag in that slot);
+ *   n runs beside place, the count of the stack in each slot (0 for a bag, or unknown).
  */
 
 import {
@@ -150,9 +161,15 @@ export function bagAccepts(def, cls, opts = {}) {
 
 const cleanKey = (v) => String(v || '').replace(/[^a-zA-Z0-9_]/g, '').slice(0, 40);
 
-/** Saved arrangement, cleaned. */
+/** A saved stack count: a whole number from 1, else 0 (unknown). */
+const cleanCount = (v) => {
+  const n = Math.floor(Number(v));
+  return Number.isFinite(n) && n > 0 ? Math.min(n, 1e9) : 0;
+};
+
+/** Saved arrangement, cleaned. n has one count per place entry (0 where unknown). */
 export function normalizePrefs(seed) {
-  const out = { bags: [], place: { pack: [] } };
+  const out = { bags: [], place: { pack: [] }, n: { pack: [] } };
   if (!seed || typeof seed !== 'object') return out;
   const seen = new Set();
   for (const row of Array.isArray(seed.bags) ? seed.bags : []) {
@@ -163,13 +180,21 @@ export function normalizePrefs(seed) {
     out.bags.push({ key, cls });
   }
   const place = seed.place && typeof seed.place === 'object' ? seed.place : {};
+  const counts = seed.n && typeof seed.n === 'object' ? seed.n : {};
   for (const [rawKey, list] of Object.entries(place)) {
     const key = rawKey === 'pack' ? 'pack' : cleanKey(rawKey);
     if (!key || (key !== 'pack' && !seen.has(key)) || !Array.isArray(list)) continue;
-    out.place[key] = list
-      .map((entry) => (typeof entry === 'string' && entry.startsWith('@') ? `@${cleanKey(entry.slice(1))}` : cleanKey(entry)))
-      .filter((entry) => entry && entry !== '@')
-      .slice(0, 64);
+    const ns = Array.isArray(counts[rawKey]) ? counts[rawKey] : [];
+    const entries = [];
+    const nums = [];
+    list.forEach((raw, i) => {
+      const entry = typeof raw === 'string' && raw.startsWith('@') ? `@${cleanKey(raw.slice(1))}` : cleanKey(raw);
+      if (!entry || entry === '@' || entries.length >= 64) return;
+      entries.push(entry);
+      nums.push(entry.startsWith('@') ? 0 : cleanCount(ns[i]));
+    });
+    out.place[key] = entries;
+    out.n[key] = nums;
   }
   return out;
 }
@@ -259,22 +284,98 @@ export function layoutPack(inv, prefs = null, opts = {}) {
   };
   const has = (cls) => (left.get(cls)?.length || 0) > 0;
 
+  // A class whose every saved stack has its count keeps those counts (prefs.n);
+  // one saved before counts were kept is split as it always was (full stacks
+  // first, in saved order), once.
+  const counted = new Set();
+  const legacy = new Set();
+  for (const [key, list] of Object.entries(saved.place)) {
+    list.forEach((entry, i) => {
+      if (entry.startsWith('@')) return;
+      if (saved.n[key]?.[i] > 0) counted.add(entry);
+      else legacy.add(entry);
+    });
+  }
+  for (const cls of legacy) counted.delete(cls);
+  // The saved stacks kept, per class, in slot order (each { container, slot, saved }).
+  const held = new Map();
+  const reserved = (cls) => held.get(cls)?.length || 0;
+  const keepStack = (container, cls, savedCount) => {
+    if (!left.has(cls)) return;
+    if (!counted.has(cls) && reserved(cls) >= left.get(cls).length) return;
+    const slot = { kind: 'stack', cls, count: 0 };
+    container.slots.push(slot);
+    if (!held.has(cls)) held.set(cls, []);
+    held.get(cls).push({ container, slot, saved: savedCount });
+  };
+
   // Phase 1: the saved pack, then each placed bag's saved contents.
-  for (const entry of saved.place.pack || []) {
-    if (pack.slots.length >= capacity) break;
+  (saved.place.pack || []).forEach((entry, i) => {
+    if (pack.slots.length >= capacity) return;
     if (entry.startsWith('@')) {
       const inst = byKey.get(entry.slice(1));
       if (inst && !inst.placed) putBag(inst);
-    } else if (has(entry) && packAccepts(entry)) {
-      putStack(pack, entry);
+    } else if (packAccepts(entry)) {
+      keepStack(pack, entry, saved.n.pack?.[i] || 0);
     }
-  }
+  });
   for (const slot of pack.slots) {
     if (slot.kind !== 'bag') continue;
     const box = boxes.get(slot.key);
-    for (const cls of saved.place[slot.key] || []) {
-      if (has(cls) && boxTakes(box, cls)) putStack(box, cls);
+    (saved.place[slot.key] || []).forEach((cls, i) => {
+      if (boxTakes(box, cls)) keepStack(box, cls, saved.n[slot.key]?.[i] || 0);
+    });
+  }
+  // Each kept stack's count. A saved count stays as it is; more tops up the stacks
+  // held (limited bags, then the pack, then the other bags: bag.js:157-206) and
+  // the rest waits for new slots (phase 2b); fewer comes off the first stack in
+  // slot order, a bag's slots where the bag sits (bag.js:316-404), and a stack
+  // that empties gives up its slot. Nothing held moves.
+  const emptied = new Set();
+  for (const [cls, list] of held) {
+    const max = stackMaxOf(cls, opts.catalog);
+    const total = left.get(cls).reduce((a, b) => a + b, 0);
+    if (!counted.has(cls)) {
+      for (const h of list) h.slot.count = left.get(cls).shift();
+      continue;
     }
+    let sum = 0;
+    for (const h of list) {
+      h.slot.count = Math.min(h.saved, max);
+      sum += h.slot.count;
+    }
+    if (total >= sum) {
+      let more = total - sum;
+      const rank = (h) => (h.container === pack ? 1 : h.container.limited ? 0 : 2);
+      const topUp = [...list].sort((a, b) => rank(a) - rank(b));
+      for (const h of topUp) {
+        if (more <= 0) break;
+        const add = Math.min(more, Math.max(0, max - h.slot.count));
+        h.slot.count += add;
+        more -= add;
+      }
+      left.set(cls, splitStacks(more, max));
+    } else {
+      let less = sum - total;
+      const where = new Map(list.map((h) => [h.slot, h]));
+      const firstFirst = [];
+      for (const s of pack.slots) {
+        if (where.has(s)) firstFirst.push(where.get(s));
+        else if (s.kind === 'bag') for (const t of boxes.get(s.key).slots) if (where.has(t)) firstFirst.push(where.get(t));
+      }
+      for (const h of firstFirst) {
+        if (less <= 0) break;
+        const take = Math.min(less, h.slot.count);
+        h.slot.count -= take;
+        less -= take;
+        if (h.slot.count <= 0) emptied.add(h.slot);
+      }
+      left.set(cls, []);
+    }
+  }
+  if (emptied.size) {
+    pack.slots = pack.slots.filter((s) => !emptied.has(s));
+    for (const box of boxes.values()) box.slots = box.slots.filter((s) => !emptied.has(s));
   }
   // Phase 2a: a bag with no saved place (one that just arrived, or one the magic rock gives
   // back) goes in place of the leftmost pack slot that is not a bag, and the stack in that
@@ -329,8 +430,12 @@ export function layoutPack(inv, prefs = null, opts = {}) {
   const nextPrefs = {
     bags: instances.map((b) => ({ key: b.key, cls: b.cls })),
     place: { pack: pack.slots.map((s) => (s.kind === 'bag' ? `@${s.key}` : s.cls)) },
+    n: { pack: pack.slots.map((s) => (s.kind === 'bag' ? 0 : s.count)) },
   };
-  for (const [key, box] of boxes) nextPrefs.place[key] = box.slots.map((s) => s.cls);
+  for (const [key, box] of boxes) {
+    nextPrefs.place[key] = box.slots.map((s) => s.cls);
+    nextPrefs.n[key] = box.slots.map((s) => s.count);
+  }
   // Where each class sits, in slot counts (pack + bags), for "given back" and tests.
   const slotted = {};
   for (const s of pack.slots) if (s.kind === 'stack') slotted[s.cls] = (slotted[s.cls] || 0) + s.count;
@@ -426,23 +531,45 @@ export function moveStack(inv, prefs, from, to, opts = {}) {
   const srcKey = src === layout.pack ? 'pack' : from.container;
   const entry = slot.kind === 'bag' ? `@${slot.key}` : slot.cls;
   const list = next.place[srcKey];
-  const at = Math.floor(Number(from.index));
-  if (list[at] === entry) list.splice(at, 1);
-  else list.splice(list.indexOf(entry), 1);
+  const nums = (next.n[srcKey] ||= list.map(() => 0));
+  let at = Math.floor(Number(from.index));
+  if (list[at] !== entry) at = list.indexOf(entry);
+  // Each stack carries its own count (prefs.n), so the one dragged is the one that moves.
+  const count = slot.kind === 'bag' ? 0 : nums[at] || slot.count;
+  list.splice(at, 1);
+  nums.splice(at, 1);
   if (srcKey === destKey) {
     const idx = Number.isFinite(Number(to?.index)) ? Math.max(0, Math.min(list.length, Math.floor(Number(to.index)))) : list.length;
     list.splice(idx, 0, entry);
+    nums.splice(idx, 0, count);
     return { ok: true, prefs: next };
   }
   const destList = (next.place[destKey] ||= []);
-  if (dest.slots.length >= dest.capacity) {
-    // A full container still takes a stack that merges into one of its own (bag.js:191-206).
-    const merges = slot.kind === 'stack' && dest.slots.some((s) => s.cls === slot.cls && s.count + slot.count <= stackMaxOf(slot.cls, opts.catalog));
-    if (!merges) return { ok: false, reason: PACK_COPY.noRoom(dest.label || PACK_LABEL), prefs: layout.prefs };
+  const destNums = (next.n[destKey] ||= destList.map(() => 0));
+  // Into another container, a stack first tops up that container's stacks of its
+  // class (bag.js:191-206 addItemStack, existing stacks before a free slot); only
+  // what is left takes a slot. A full container takes what merges; the rest stays put.
+  let rest = count;
+  if (slot.kind === 'stack') {
+    const max = stackMaxOf(slot.cls, opts.catalog);
+    destList.forEach((cls, i) => {
+      if (rest <= 0 || cls !== slot.cls) return;
+      const add = Math.min(rest, Math.max(0, max - (destNums[i] || 0)));
+      destNums[i] += add;
+      rest -= add;
+    });
   }
-  const idx = Number.isFinite(Number(to?.index)) ? Math.max(0, Math.min(destList.length, Math.floor(Number(to.index)))) : destList.length;
-  destList.splice(idx, 0, entry);
-  // A stack moving out of the pack keeps the pack's later stacks of the same class where they are.
+  if (rest > 0 && dest.slots.length >= dest.capacity) {
+    if (rest === count) return { ok: false, reason: PACK_COPY.noRoom(dest.label || PACK_LABEL), prefs: layout.prefs };
+    list.splice(at, 0, entry);
+    nums.splice(at, 0, rest);
+    rest = 0;
+  }
+  if (rest > 0) {
+    const idx = Number.isFinite(Number(to?.index)) ? Math.max(0, Math.min(destList.length, Math.floor(Number(to.index)))) : destList.length;
+    destList.splice(idx, 0, entry);
+    destNums.splice(idx, 0, rest);
+  }
   const after = layoutPack(inv, next, opts);
   const landed = destKey === 'pack'
     ? after.pack.slots.some((s) => (slot.kind === 'bag' ? s.key === slot.key : s.cls === slot.cls))
@@ -453,14 +580,13 @@ export function moveStack(inv, prefs, from, to, opts = {}) {
   return { ok: true, prefs: after.prefs };
 }
 
-/** Each stack's class, split as the pack would (full stacks first): tools and the rest, in auto-place order. */
+/** Each stack ({ cls, count }), split as the pack would (full stacks first): tools and the rest, in auto-place order. */
 function stacksByKind(inv, opts) {
   const toolStacks = [];
   const otherStacks = [];
   for (const cls of classOrder(inv, opts)) {
     if (isBagClass(cls) || takesNoSlot(cls)) continue;
-    const stacks = splitStacks(inv[cls], stackMaxOf(cls, opts.catalog));
-    for (let i = 0; i < stacks.length; i += 1) (isToolClass(cls, opts) ? toolStacks : otherStacks).push(cls);
+    for (const count of splitStacks(inv[cls], stackMaxOf(cls, opts.catalog))) (isToolClass(cls, opts) ? toolStacks : otherStacks).push({ cls, count });
   }
   return { toolStacks, otherStacks };
 }
@@ -524,7 +650,7 @@ export function starterKit(inv, opts = {}) {
 export function arrangeIntoBags(inv, mint, opts = {}, keep = null) {
   const { toolStacks, otherStacks } = stacksByKind(inv, opts);
   const list = (Array.isArray(mint) ? mint : []).filter((cls) => isBagClass(cls));
-  const prefs = { bags: [], place: { pack: [] } };
+  const prefs = { bags: [], place: { pack: [] }, n: { pack: [] } };
   const kept = normalizePrefs(keep);
   const used = new Set();
   for (const entry of kept.place.pack || []) {
@@ -534,14 +660,18 @@ export function arrangeIntoBags(inv, mint, opts = {}, keep = null) {
     used.add(key);
     prefs.bags.push(row);
     prefs.place.pack.push(entry);
+    prefs.n.pack.push(0);
     prefs.place[key] = [...(kept.place[key] || [])];
-    // What this bag holds stays in it: those stacks are not laid out again.
-    for (const cls of prefs.place[key]) {
+    prefs.n[key] = [...(kept.n[key] || [])];
+    // What this bag holds stays in it, with its counts: those stacks are not laid out again.
+    prefs.place[key].forEach((cls, i) => {
       for (const stacks of [toolStacks, otherStacks]) {
-        const at = stacks.indexOf(cls);
+        const same = (s) => s.cls === cls;
+        let at = stacks.findIndex((s) => same(s) && s.count === prefs.n[key][i]);
+        if (at < 0) at = stacks.findLastIndex(same);
         if (at >= 0) { stacks.splice(at, 1); break; }
       }
-    }
+    });
   }
   const keyOf = list.map((cls) => {
     const key = nextBagKey(used);
@@ -551,17 +681,23 @@ export function arrangeIntoBags(inv, mint, opts = {}, keep = null) {
   for (const { cls, key } of keyOf) {
     prefs.bags.push({ key, cls });
     prefs.place.pack.push(`@${key}`);
+    prefs.n.pack.push(0);
     prefs.place[key] = [];
+    prefs.n[key] = [];
   }
+  const fill = (key, stacks) => {
+    prefs.place[key] = stacks.map((s) => s.cls);
+    prefs.n[key] = stacks.map((s) => s.count);
+  };
   // Toolboxes first take the tool stacks (as packIntoBags always did), then the bags that take anything.
   for (const { cls, key } of keyOf) {
     if (BAG_DEFS[cls].holds !== 'tool') continue;
-    prefs.place[key] = toolStacks.splice(0, BAG_DEFS[cls].capacity);
+    fill(key, toolStacks.splice(0, BAG_DEFS[cls].capacity));
   }
   const rest = [...toolStacks, ...otherStacks];
   for (const { cls, key } of keyOf) {
     if (BAG_DEFS[cls].holds !== 'any') continue;
-    prefs.place[key] = rest.splice(0, BAG_DEFS[cls].capacity);
+    fill(key, rest.splice(0, BAG_DEFS[cls].capacity));
   }
   return prefs;
 }

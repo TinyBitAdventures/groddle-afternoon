@@ -75,7 +75,7 @@ import {
   normalizePrefs,
   packIntoBags,
   roomFor,
-} from '../pack-slots.js?v=f01262b1';
+} from '../pack-slots.js?v=d8325f2a';
 import { createMinnAccount } from '../minn-account.js?v=81339760';
 
 export const BAGS_FEATURE_ID = 'bags';

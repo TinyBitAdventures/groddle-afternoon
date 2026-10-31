@@ -20,9 +20,9 @@ import {
   roomFor,
   splitStacks,
   stackMaxOf,
-} from '../public/js/pack-slots.js?v=f01262b1';
+} from '../public/js/pack-slots.js?v=d8325f2a';
 import { STACKMAX } from '../public/js/pack-slots-data.js?v=330c51e4';
-import { bagsFeature, rockChanges } from '../public/js/features/bags-feature.js?v=f6022e7f';
+import { bagsFeature, rockChanges } from '../public/js/features/bags-feature.js?v=1ea316db';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');
