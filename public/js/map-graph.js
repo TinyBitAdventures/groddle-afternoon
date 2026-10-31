@@ -44,6 +44,51 @@ export function resolveHubId(streetMeta, fallback = '56') {
   return String(raw || fallback);
 }
 
+/** How many streets back the Map looks for one that is drawn on a hub map. */
+export const MAP_TRAIL_MAX = 12;
+
+/**
+ * Note a street the player entered on the Map's trail (newest last, no repeats in a
+ * row, at most MAP_TRAIL_MAX). Returns a new array.
+ * @param {{ tsid: string, hubId: string }[]} trail
+ * @param {{ tsid?: string, hubId?: string|number }|null} street
+ */
+export function noteMapTrail(trail, street) {
+  const list = Array.isArray(trail) ? trail : [];
+  const tsid = String(street?.tsid || '');
+  if (!tsid) return list;
+  const hubId = street?.hubId == null || street.hubId === '' ? '' : String(street.hubId);
+  const last = list[list.length - 1];
+  if (last && last.tsid === tsid && last.hubId === hubId) return list;
+  return [...list, { tsid, hubId }].slice(-MAP_TRAIL_MAX);
+}
+
+/**
+ * The hub the Map opens on, and the street it marks "you" on (HubMapDialog.as start:
+ * always the current location's hub; a location off the hub maps shows its parent
+ * street, mapInfo.showStreet). `candidates` are tried in order (the current street, a
+ * feature's own answer such as a subway stop's surface street, then the streets walked
+ * before it, newest first); the first one drawn on its own hub's map wins.
+ * Failing that, the first candidate whose hub has a map at all, then `fallback`.
+ *
+ * @param {{ tsid?: string, hubId?: string|number }[]} candidates
+ * @param {(hubId: string) => boolean} hubHasMap  the hub is in the map index
+ * @param {(hubId: string, tsid: string) => boolean} streetOnHub  the street is drawn on that hub's map
+ * @returns {{ hubId: string, tsid: string, onMap: boolean }}
+ */
+export function pickMapSpot(candidates, hubHasMap, streetOnHub, fallback = '56') {
+  const rows = (candidates || [])
+    .filter((c) => c && c.tsid && c.hubId != null && c.hubId !== '')
+    .map((c) => ({ tsid: String(c.tsid), hubId: String(c.hubId) }));
+  const here = String(candidates?.find((c) => c?.tsid)?.tsid || '');
+  for (const c of rows) {
+    if (hubHasMap(c.hubId) && streetOnHub(c.hubId, c.tsid)) return { ...c, onMap: true };
+  }
+  const known = rows.find((c) => hubHasMap(c.hubId));
+  if (known) return { hubId: known.hubId, tsid: here, onMap: false };
+  return { hubId: String(fallback), tsid: here, onMap: false };
+}
+
 /**
  * Build a hub map view from original GSJS hub JSON + loaded street index.
  *

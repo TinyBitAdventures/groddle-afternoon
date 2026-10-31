@@ -826,6 +826,16 @@ export const subwayFeature = {
     return false;
   },
 
+  /**
+   * The street the Map marks "you" on underground: a station's surface street, or in the
+   * train its last stop's (the stations and the train are on no hub map; the client showed
+   * the parent street, HubMapDialog.as start, mapInfo.showStreet).
+   */
+  mapStreet(engine) {
+    const station = here(engine) || (inCar(engine) ? stationById(state.stop) || null : null);
+    return station ? { tsid: station.surfaceStreetTsid, hubId: station.surfaceHubId } : null;
+  },
+
   /** A reload in the train resumes on the platform of its last stop. */
   reloadLocation(saved) {
     if (!saved || !isCarTsid(saved.tsid)) return null;

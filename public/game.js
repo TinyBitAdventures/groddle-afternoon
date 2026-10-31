@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=45f8baaa';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=462645ba';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=99394698';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -835,11 +835,13 @@ import {
   buildHubMapView,
   mapClickTravel,
   renderHubMapSvg,
-  resolveHubId,
+  findCurrentStreet,
   listHubsFromIndex,
+  noteMapTrail,
+  pickMapSpot,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
-} from './js/map-graph.js?v=fa3b2989';
+} from './js/map-graph.js?v=ca1acd30';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=a6771c5e';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import {
@@ -904,8 +906,16 @@ import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=007a73
 let mapIndexCache = null;
 /** @type {Map<string, object>} hubId → hub geometry JSON */
 const hubMapCache = new Map();
-/** Currently displayed hub on the map panel (may differ from player hub). */
+/**
+ * The hub picked by hand on the open map panel (the region list, a hub exit, a route's
+ * destination) and the street the player stood on then. It lasts while the map stays
+ * open on that street: closing the map or moving streets drops it, so the map opens on
+ * the player's own hub every time (HubMapDialog.as start, moveMoveEnded).
+ */
 let mapPanelHubId = null;
+let mapPanelStreetTsid = null;
+/** The streets walked, newest last, for places off the hub maps (map-graph.js noteMapTrail). */
+let mapTrail = [];
 
 async function ensureMapIndex() {
   if (mapIndexCache) return mapIndexCache;
@@ -941,10 +951,28 @@ async function loadHubMapData(hubId) {
   return data;
 }
 
-function playerHubId() {
-  return resolveHubId(
-    currentStreet ? { hubId: currentStreet.hubId } : null,
-    '56'
+/**
+ * Where the map opens and whom it marks "you": the current street's own hub when the
+ * street is drawn there; else a feature's answer (a subway station or the train: the
+ * stop's surface street) or the last street walked that is on a hub map (an instance,
+ * a tower room: the street you came from); Groddle Forest only when nothing is known.
+ */
+async function playerMapSpot(mapIndex) {
+  const here = { tsid: currentStreetTsid, hubId: currentStreet?.hubId };
+  const featureSpot = features.query('mapStreet', engine);
+  const trail = mapTrail.filter((row) => row.tsid !== currentStreetTsid).reverse();
+  const candidates = [here, ...(featureSpot ? [featureSpot] : []), ...trail];
+  const hubHasMap = (id) => {
+    const row = mapIndex?.hubs?.[id];
+    return Boolean(row && (row.streetCount > 0 || row.zone));
+  };
+  // Load the candidate hubs' maps (cached) so the pick can see which streets each draws.
+  const ids = [...new Set(candidates.map((c) => (c?.hubId == null ? '' : String(c.hubId))).filter((id) => id && hubHasMap(id)))];
+  await Promise.all(ids.map((id) => loadHubMapData(id).catch(() => null)));
+  return pickMapSpot(
+    candidates,
+    hubHasMap,
+    (id, tsid) => Boolean(findCurrentStreet(tsid, hubMapCache.get(id)?.streets || []))
   );
 }
 
@@ -21048,6 +21076,7 @@ async function enterStreet(tsid, opts = {}) {
   spawnPhantomQuestEncounter();
   spawnIlmenskieJones();
   features.streetEnter(data, engine, opts);
+  mapTrail = noteMapTrail(mapTrail, { tsid: data.tsid, hubId: data.hubId });
   if (firstVisit) emitGameEvent(`street_first_visit:${data.tsid}`);
   if (!engine.inScene()) {
     recordStreetEntry(engine.streetSlot(STREET_VISITS_SLOT, data.tsid), Date.now(), achieveState.groups?.locations_visited?.includes(data.tsid) ? 1 : 0);
@@ -21344,8 +21373,17 @@ async function openMap(hubId) {
   closeVendor();
   closeQuestPanel();
 
-  const targetHub = String(hubId || mapPanelHubId || playerHubId());
-  mapPanelHubId = targetHub;
+  // A hub chosen on the open map holds until it closes or the player moves streets.
+  if (!isMapOpen() || mapPanelStreetTsid !== currentStreetTsid) mapPanelHubId = null;
+  let spot = { hubId: '56', tsid: currentStreetTsid };
+  try {
+    spot = await playerMapSpot(await ensureMapIndex());
+  } catch (err) {
+    console.error(err);
+  }
+  const targetHub = String(hubId || mapPanelHubId || spot.hubId);
+  mapPanelHubId = hubId ? targetHub : mapPanelHubId;
+  mapPanelStreetTsid = currentStreetTsid;
 
   let hubData;
   let mapIndex = null;
@@ -21383,7 +21421,12 @@ async function openMap(hubId) {
     hubCombobox.refresh();
   }
 
-  const view = buildHubMapView(hubData, currentStreetTsid, STREET_INDEX.streets);
+  // "You" on the hub map: the current street, or the street that stands for it (spot.tsid).
+  const view = buildHubMapView(hubData, spot.hubId === targetHub ? spot.tsid : currentStreetTsid, STREET_INDEX.streets);
+  if (app?.canvas) {
+    app.canvas.dataset.mapHub = targetHub;
+    app.canvas.dataset.mapYou = view.streets?.find((st) => st.current)?.tsid || '';
+  }
   if (title) title.textContent = view.hubName;
   if (sub) {
     // The painted-or-geometry note is for QA only (js/panel-copy.js), not the player's subtitle.
@@ -21559,6 +21602,7 @@ function openMapStreetMenu(canvas, event, street) {
 function closeMap() {
   const panel = document.getElementById('map-panel');
   if (panel) panel.hidden = true;
+  mapPanelHubId = null;
 }
 
 function isMapOpen() {
