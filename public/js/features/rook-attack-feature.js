@@ -453,6 +453,9 @@ function updateRookedVisuals(engine) {
     }
     // fullStop (include/rook.js 53-63): a rooked Piggy or Chicken stays put until it is revived.
     if (row.target.classId === 'npc_piggy' || row.target.classId === 'npc_chicken') spr.vx = 0;
+    // Its label says so until then, whatever else relabels it (the mood ticks, the shared Piggy and
+    // tree updates of street-objects-feature): the rook verbs are the only ones it offers.
+    if (row.target.subtitle !== rookedSubtitle()) row.target.subtitle = rookedSubtitle();
     if (row.halo && !row.halo.destroyed) {
       const b = spr.getBounds();
       const cam = engine.camera;

@@ -4,8 +4,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createAnimalState } from '../public/js/animals.js?v=e857d0af';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=17fe32af';
-import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=645600e9';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=4fa4ab60';
+import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=0cd81ddd';
 
 const TSID = 'GLI2HVHUM4F16B0'; // Pasha's Place, Groddle Forest: where Austin met it
 
@@ -73,6 +73,11 @@ describe('a rooked Piggy (Pasha\'s Place walk in place)', () => {
     animalMoodFeature.sharedAnimalEvent(pig, { ev: 'ate', on: tree }, engine);
     for (let i = 0; i < 4; i += 1) tick();
     assert.equal(pig.sprite.x, x);
+    // Whatever relabels it (here the server's tick event), it still reads as rooked.
+    animalMoodFeature.sharedAnimalEvent(pig, { ev: 'happy' }, engine);
+    assert.notEqual(pig.subtitle, 'Rooked! It needs reviving', 'the event relabels it');
+    tick();
+    assert.equal(pig.subtitle, 'Rooked! It needs reviving');
     // Revived: it walks again at a real pace, inside its patrol range.
     slots['rook-attack'].rooked = {};
     tick();
