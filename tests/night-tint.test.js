@@ -19,7 +19,7 @@ import {
   parseNightTint,
   saveNightTint,
   worldTintOpacity,
-} from '../public/js/night-tint.js?v=917a2caa';
+} from '../public/js/night-tint.js?v=1dfc9c89';
 import { daylightState, timestampForGameHour } from '../public/js/game-day.js?v=edb00566';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

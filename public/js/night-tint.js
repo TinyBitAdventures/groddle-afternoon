@@ -19,7 +19,7 @@ export const NIGHT_TINT_STORAGE_KEY = 'groddle.nightTint';
 export const NIGHT_TINT_EVENT = 'groddle:night-tint';
 export const NIGHT_TINT_DEFAULT = true;
 export const NIGHT_TINT_LABEL = 'Night tint';
-export const NIGHT_TINT_HINT = 'The world darkens at dusk and night with the game clock. The 2012 game had no tint.';
+export const NIGHT_TINT_HINT = 'The world darkens at dusk and night with the game clock.';
 
 /** PURE: the stored words as on (true) or off (false); anything else is the default. */
 export function parseNightTint(v) {
