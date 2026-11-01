@@ -234,7 +234,7 @@ import {
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=39921139';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=62899fad';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=ddae4999';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=a314f8a1';
 import { takeFromHouse } from '../ledger-house.js?v=258ef99e';
 import {

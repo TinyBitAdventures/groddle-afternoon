@@ -108,6 +108,7 @@ import {
   normalizeNewxpSave,
   pickNewxpExit,
   shouldResume,
+  tutorialPillSpot,
   startNewxp,
   street4Check,
   questQueueLine,
@@ -116,7 +117,7 @@ import {
   training2Layout,
   tutorialPhysics,
   vogPages,
-} from '../newxp.js?v=de3e754f';
+} from '../newxp.js?v=1f9ce43b';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=d4f4772b';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
@@ -129,7 +130,7 @@ import * as kit from '../quest-rooms/kit.js?v=c7ea6e0e';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=3753a0d2';
-import { HOME_MACHINE } from '../home-ticket.js?v=62899fad';
+import { HOME_MACHINE } from '../home-ticket.js?v=ddae4999';
 import { createAnimalState } from '../animals.js?v=a9883739';
 import {
   AK_ANIMALS,
@@ -400,8 +401,10 @@ function positionBubbles() {
   ui.fade.style.height = `${r.height}px`;
   ui.instr.style.left = `${r.left + r.width / 2}px`;
   ui.instr.style.top = `${r.top + Math.min(r.height - 60, (engineRef?.camera?.h || 408) * (r.width / (engineRef?.camera?.w || 960)) - 44)}px`;
-  ui.pill.style.left = `${r.left + 10}px`;
-  ui.pill.style.top = `${r.top + 10}px`;
+  // Under the energy, mood and level (#hud-stats), never over them (player report 2026-11-01).
+  const pill = tutorialPillSpot(r, document.querySelector('#hud-stats')?.getBoundingClientRect());
+  ui.pill.style.left = `${pill.left}px`;
+  ui.pill.style.top = `${pill.top}px`;
 }
 
 const plain = (html) => String(html || '').replace(/<br\s*\/?>/g, ' ').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();

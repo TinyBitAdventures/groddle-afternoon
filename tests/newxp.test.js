@@ -54,12 +54,13 @@ import {
   shouldResume,
   startNewxp,
   street4Check,
+  tutorialPillSpot,
   talkPages,
   training1Layout,
   training2Layout,
   tutorialPhysics,
   vogPages,
-} from '../public/js/newxp.js?v=de3e754f';
+} from '../public/js/newxp.js?v=1f9ce43b';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(ROOT, 'assets/streets', `${tsid}.json`), 'utf8'));
@@ -501,5 +502,21 @@ describe('the look step opens the new-player picker', () => {
     assert.match(src, /getElementById\('avatar-btn'\)\?\.click\(\);[\s\S]{0,200}#avatar-tabs \[data-slot="fresh"\]'\)\?\.click\(\)/);
     const game = readFileSync(join(ROOT, 'game.js'), 'utf8');
     assert.match(game, /\['fresh', 'Start fresh'\]/);
+  });
+});
+
+describe('tutorial pill (player report 2026-11-01)', () => {
+  it('sits under the HUD stats instead of over the energy, mood and level', () => {
+    const canvas = { left: 0, top: 0, right: 1440, bottom: 740, width: 1440, height: 740 };
+    // Modern: the stats pill at the top-left of the window.
+    assert.deepEqual(tutorialPillSpot(canvas, { left: 8, top: 4, right: 359, bottom: 48, width: 351, height: 44 }), { left: 10, top: 56 });
+    // Classic: the portrait column beside a canvas inset at 21,43.
+    const classic = { left: 21, top: 43, right: 1086, bottom: 740, width: 1065, height: 697 };
+    assert.deepEqual(tutorialPillSpot(classic, { left: 0, top: 0, right: 130, bottom: 133, width: 130, height: 133 }), { left: 31, top: 141 });
+    // Stats hidden (the clouds hide them) or elsewhere: the corner.
+    assert.deepEqual(tutorialPillSpot(canvas, { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }), { left: 10, top: 10 });
+    assert.deepEqual(tutorialPillSpot(canvas, { left: 900, top: 4, right: 1200, bottom: 48, width: 300, height: 44 }), { left: 10, top: 10 });
+    assert.deepEqual(tutorialPillSpot(canvas, null), { left: 10, top: 10 });
+    assert.match(readFileSync(join(ROOT, 'js/features/newxp-feature.js'), 'utf8'), /tutorialPillSpot\(r, document\.querySelector\('#hud-stats'\)\?\.getBoundingClientRect\(\)\)/);
   });
 });

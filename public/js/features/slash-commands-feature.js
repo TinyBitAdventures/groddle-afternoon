@@ -31,7 +31,7 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=337d934d';
-import { butlerApi } from './butler-feature.js?v=d208d4a0';
+import { butlerApi } from './butler-feature.js?v=9cf19af6';
 import { hellFeature } from './hell-feature.js?v=07bf8d89';
 import { towerApi } from './home-tower-feature.js?v=1469b73f';
 import { slashPlan, unknownLine } from '../slash-commands.js?v=23e13b20';

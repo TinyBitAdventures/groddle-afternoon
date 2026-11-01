@@ -502,6 +502,22 @@ export function leaveFlagStreet({ tsid = '', instance = false, inHome = false, d
   return !FIRST_SKILLS.some((s) => s.street === t);
 }
 
+/**
+ * Where the "Tutorial · <stage>" pill sits: the canvas's top-left corner, moved
+ * down under the HUD's stats (#hud-stats: the Modern energy, mood and level pill,
+ * the Classic portrait) when they share that corner, so it never covers them
+ * (player report 2026-11-01). Rects are DOMRect-like.
+ */
+export function tutorialPillSpot(canvas, stats, { gap = 8, inset = 10, pillWidth = 260 } = {}) {
+  const left = Math.round(canvas.left + inset);
+  let top = Math.round(canvas.top + inset);
+  const shown = stats && stats.width > 0 && stats.height > 0;
+  if (shown && stats.left < left + pillWidth && stats.right > left && stats.bottom > top) {
+    top = Math.round(Math.max(top, stats.bottom + gap));
+  }
+  return { left, top };
+}
+
 /** The Gentle Island Exit box only fires once leave_gentle_island is accepted. */
 export function islandExitOpen(island) {
   return island === 'leaving';
