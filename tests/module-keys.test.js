@@ -28,7 +28,7 @@ describe('module keys in the tree', () => {
 
   it('load every module under one URL: no module is named with two keys anywhere in public/', () => {
     const urls = new Map();
-    const files = execFileSync('git', ['ls-files', 'public'], { cwd: root, encoding: 'utf8' }).split('\n')
+    const files = execFileSync('git', ['ls-files', 'public'], { cwd: root, encoding: 'utf8', maxBuffer: 1 << 28 }).split('\n')
       .filter((f) => /\.(?:m?js|html)$/.test(f) && !f.startsWith('public/vendor/'));
     let refs = 0;
     for (const f of files) {
