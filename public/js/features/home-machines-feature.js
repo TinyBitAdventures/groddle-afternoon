@@ -1,11 +1,14 @@
 /**
- * Machines set down on a home street (lane MACHINES; Austin 2026-11-01: "Let
+ * Machines set down in a home (lane MACHINES; Austin 2026-11-01: "Let
  * owners set an assembled machine down on their street, as the original
- * did."). The rules, the copy and their sources are js/home-machines.js.
+ * did.", then lane HOMES2: "Machines may stand on the home street, in the
+ * house and in the Tower"). The rules, the copy and their sources are
+ * js/home-machines.js.
  *
- * - Place (a machine in the pack, on your own home street): it stands where
- *   you are, with its tank (machine_stand.js canDrop: not within 200 px of
- *   another, nor 70 px of an end of the street).
+ * - Place (a machine in the pack, in your own home: the home street, the
+ *   house or a Tower floor): it stands where you are, with its tank
+ *   (machine_stand.js canDrop: not within 200 px of another in the same
+ *   place, nor 70 px of an end of the street or a room's inner wall).
  * - Anyone on the street: Use opens the Make panel on it (the room
  *   machines' panel, engine.openMakeStation); Make puts the ingredients in
  *   and starts a job (count * wait_ms + 2200 ms); while it runs nobody else
@@ -35,13 +38,19 @@
  * machine, its skill, Engineering and two jobs' ingredients on your home
  * street. window.groddleHomeMachines: state(), place(classTsid), act(index,
  * verb), make(index, recipeKey, qty), standNear(index), refresh(); canvas data hmMachines (id:class:fuel:job:waiting
- * per machine, ';'), hmWhere (own | visit:<owner> | ''), hmLast.
+ * per machine here, ';'), hmWhere (own:<place> | visit:<owner>:<place> | ''), hmLast.
  */
 
 import {
   HOME_MACHINES_ID,
+  HOME_MACHINES_INTERIOR,
   HOME_MACHINES_STREET,
   HOME_MACHINE_TEXT as T,
+  PLACE_HOUSE,
+  PLACE_STREET,
+  ROOM_GROUND_Y,
+  roomSpan,
+  towerPlace,
   isHomeMachineClass,
   isMachineOp,
   jobFuel,
@@ -60,7 +69,7 @@ import {
   expireSolo,
   tankOf,
   TAKEN_KEEP,
-} from '../home-machines.js?v=765ad97b';
+} from '../home-machines.js?v=70f5c2fe';
 import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=b37e9a73';
 import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineSheetDef, roomMachineState } from '../machine-art.js?v=0fb7a5ca';
 import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=b5f892f6';
@@ -68,7 +77,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inv
 import { receiveToolCopy, takeToolCopy } from '../tools.js?v=3d109172';
 import { RECIPE_CATALOG } from '../making.js?v=ea3f10b5';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=bb8b2151';
+import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=bb8b2151';
 import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
@@ -144,7 +153,7 @@ function createSession(engine, client) {
   const site = mp ? createSite() : null;
   let slice = normalizeSlice(savedSlice);
   const me = () => (mp ? String(Number(client.me?.id) || 0) : ME_SOLO);
-  /** The home drawn now: { kind: 'own'|'visit', owner, name, houseX, layout, mayTake, key }. */
+  /** The home drawn now: { kind: 'own'|'visit', owner, place, name, x0, groundY, layout?, span?, mayTake, key }. */
   let home = null;
   /** id -> { m, sprite, target, frames, frame, art, bar, near, collectedAt } */
   let drawn = new Map();
@@ -169,25 +178,59 @@ function createSession(engine, client) {
   function publish() {
     const t = Date.now();
     engine.setData?.('hmMachines', [...machines.values()].map((m) => `${m.id}:${m.classTsid}:${m.fuel}:${m.job ? (jobRunning(m.job, t) ? 'run' : 'due') : '-'}:${m.waiting.join('+')}`).join(';'));
-    engine.setData?.('hmWhere', home ? (home.kind === 'visit' ? `visit:${home.owner}` : 'own') : '');
+    engine.setData?.('hmWhere', home ? (home.kind === 'visit' ? `visit:${home.owner}:${home.place}` : `own:${home.place}`) : '');
     engine.setData?.('hmLast', last);
   }
 
   // —— Where we are ——
 
+  /** The place in a home a visit scene shows (MPH_<id>, _IN, _T<n>). */
+  function visitPlace(scene) {
+    if (scene.room === 'street') return PLACE_STREET;
+    if (scene.room === 'interior') return PLACE_HOUSE;
+    if (scene.room === 'tower') return towerPlace(scene.floor);
+    return '';
+  }
+
   function where() {
     const tsid = engine.streetTsid;
     const scene = readVisitScene(tsid);
-    if (mp && scene?.room === 'street') return { kind: 'visit', owner: scene.owner, key: `visit:${tsid}` };
+    if (mp && scene) {
+      const place = visitPlace(scene);
+      return place ? { kind: 'visit', owner: scene.owner, place, key: `visit:${tsid}` } : null;
+    }
     const ctx = engine.homeContext?.() || {};
     if (!ctx.inHome) return null;
     const st = homesFeature._state?.();
-    if (st?.scene?.room !== 'street' || tsid !== HOME_MACHINES_STREET) return null;
-    return { kind: 'own', owner: mp ? Number(me()) : ME_SOLO, key: `own:${tsid}`, scene: st.scene };
+    const s = st?.scene;
+    if (!s) return null;
+    const owner = mp ? Number(me()) : ME_SOLO;
+    if (s.room === 'street' && tsid === HOME_MACHINES_STREET) return { kind: 'own', owner, place: PLACE_STREET, key: `own:${PLACE_STREET}`, scene: s };
+    if (s.room !== 'interior' || tsid !== HOME_MACHINES_INTERIOR) return null;
+    // A Tower floor (scene.tower its index), or the house's ground floor; an upper house floor is the owner's own room (G153), not a place for a machine.
+    if (s.tower != null) return { kind: 'own', owner, place: towerPlace(s.tower), key: `own:${towerPlace(s.tower)}`, scene: s };
+    if (s.houseFloor) return null;
+    return { kind: 'own', owner, place: PLACE_HOUSE, key: `own:${PLACE_HOUSE}`, scene: s };
   }
 
-  function ownLayout() {
-    return homeStreetLayout(homesFeature._state?.()?.cult);
+  /** Where a place's machines stand in this scene's world: x0 (rx 0), the walk line, and the street layout or a room's span. */
+  function geometry(place, { cult = null, backYard = null, decor = null } = {}) {
+    if (place === PLACE_STREET) {
+      const layout = homeStreetLayout(cult);
+      return { x0: layout.houseX, groundY: STREET_GROUND_Y, layout, span: null };
+    }
+    const span = roomSpan(place, decor);
+    // The house's left end sits past its back yard (homes-feature houseX0: homeStreetLayout(backCult).houseX); a Tower floor starts at 0.
+    const x0 = place === PLACE_HOUSE ? homeStreetLayout(createBackYardState(backYard || {})).houseX : 0;
+    return { x0, groundY: ROOM_GROUND_Y, layout: null, span };
+  }
+
+  function ownGeometry(place) {
+    const st = homesFeature._state?.() || {};
+    const g = geometry(place, { cult: st.cult, decor: st.decor });
+    // Your own house: the room's left end as the scene drew it.
+    if (place === PLACE_HOUSE && Number.isFinite(st.scene?.background?.houseX)) g.x0 = st.scene.background.houseX;
+    return g;
   }
 
   // —— Drawing ——
@@ -225,8 +268,8 @@ function createSession(engine, client) {
     if (!PIXI || !engine.entityLayer || !home) return;
     const sprite = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${m.classTsid}.png`));
     sprite.anchor.set(0.5, 1);
-    sprite.x = Math.round(home.houseX + m.rx);
-    sprite.y = STREET_GROUND_Y + 2;
+    sprite.x = Math.round(home.x0 + m.rx);
+    sprite.y = home.groundY + 2;
     sprite.zIndex = 14;
     engine.entityLayer.addChild(sprite);
     const bar = new PIXI.Graphics();
@@ -251,14 +294,18 @@ function createSession(engine, client) {
     publish();
   }
 
-  /** One machine's new state (from the site or solo), redrawn in place. */
+  /** One machine's new state (from the site or solo), redrawn in place; one that stands elsewhere in the home is not drawn here. */
   function setMachine(m) {
     if (!m) return;
+    if (home && m.place !== home.place) {
+      if (machines.has(m.id)) dropMachine(m.id);
+      return;
+    }
     machines.set(m.id, m);
     const e = drawn.get(m.id);
     if (e && !e.sprite.destroyed) {
       e.m = m;
-      e.sprite.x = Math.round(home.houseX + m.rx);
+      e.sprite.x = Math.round(home.x0 + m.rx);
     } else if (home) drawOne(m);
     publish();
   }
@@ -321,10 +368,12 @@ function createSession(engine, client) {
       machines = new Map();
       for (const raw of Array.isArray(answer?.machines) ? answer.machines : []) {
         const m = normalizeMachine(raw, offset);
-        if (m) machines.set(m.id, m);
+        if (m && m.place === at.place) machines.set(m.id, m);
       }
-      const layout = at.kind === 'visit' ? homeStreetLayout(normalizeCultivationState(answer?.cult || {})) : ownLayout();
-      home = { kind: at.kind, owner: at.owner, name: String(answer?.name || ''), houseX: layout.houseX, layout, mayTake: answer?.mayTake === true, key: at.key };
+      const g = at.kind === 'visit'
+        ? geometry(at.place, { cult: normalizeCultivationState(answer?.cult || {}), backYard: answer?.backYard || null, decor: { wallSegments: Number(answer?.segments) || undefined } })
+        : ownGeometry(at.place);
+      home = { kind: at.kind, owner: at.owner, place: at.place, name: String(answer?.name || ''), ...g, mayTake: answer?.mayTake === true, key: at.key };
       redraw();
     } catch (err) {
       console.warn('[home-machines]', err?.message || err);
@@ -337,12 +386,11 @@ function createSession(engine, client) {
   }
 
   function enterSolo(at) {
-    const layout = ownLayout();
-    home = { kind: 'own', owner: ME_SOLO, name: '', houseX: layout.houseX, layout, mayTake: true, key: at.key };
+    home = { kind: 'own', owner: ME_SOLO, place: at.place, name: '', ...ownGeometry(at.place), mayTake: true, key: at.key };
     machines = new Map();
     for (const row of slice.machines) {
       expireSolo(row, ME_SOLO);
-      machines.set(row.id, row);
+      if (row.place === at.place) machines.set(row.id, row);
     }
     redraw();
   }
@@ -520,8 +568,8 @@ function createSession(engine, client) {
     const at = where();
     if (!at || at.kind !== 'own' || !home || home.kind !== 'own') return say(T.placeHome, 2600);
     if (countItem(engine.inv, classTsid) < 1) return false;
-    const rx = Math.round((engine.player?.x || 0) - home.houseX);
-    const check = placeCheck({ machines: [...machines.values()], rx, layout: home.layout, classTsid });
+    const rx = Math.round((engine.player?.x || 0) - home.x0);
+    const check = placeCheck({ machines: [...machines.values()], rx, layout: home.layout, span: home.span, classTsid });
     if (!check.ok) return say(check.msg, 2600);
     const fuel = engine.toolState ? takeToolCopy(engine.toolState, classTsid, { take: false }) : null;
     if (mp) return send('place', null, { class: classTsid, rx: check.rx, ...(Number.isFinite(fuel) ? { fuel: Math.max(0, Math.min(MAX_FUEL, Math.round(fuel))) } : {}) });
@@ -536,7 +584,8 @@ function createSession(engine, client) {
   }
 
   function soloSaved() {
-    slice.machines = [...machines.values()];
+    // This place's machines as they stand, the rest of the home's as they were.
+    slice.machines = [...slice.machines.filter((row) => row.place !== home?.place), ...machines.values()];
     engine.save?.();
     publish();
   }
@@ -547,7 +596,7 @@ function createSession(engine, client) {
       const fuel = engine.toolState ? takeToolCopy(engine.toolState, extra.classTsid) : 50;
       removeItem(engine.inv, extra.classTsid, 1);
       engine.refreshPack?.();
-      const row = { id: newId(), classTsid: extra.classTsid, rx: extra.rx, fuel: Math.max(0, Math.min(MAX_FUEL, Math.round(Number(fuel) || 0))), music: true, job: null, contents: {}, waiting: [] };
+      const row = { id: newId(), classTsid: extra.classTsid, place: home.place, rx: extra.rx, fuel: Math.max(0, Math.min(MAX_FUEL, Math.round(Number(fuel) || 0))), music: true, job: null, contents: {}, waiting: [] };
       machines.set(row.id, row);
       drawOne(row);
       say(T.placed(machineLabel(row.classTsid)));
@@ -891,8 +940,8 @@ function createSession(engine, client) {
     state() {
       return {
         mode: mp ? 'mp' : 'solo',
-        where: home ? { kind: home.kind, owner: home.owner, mayTake: home.mayTake } : null,
-        machines: [...machines.values()].map((m) => ({ id: m.id, classTsid: m.classTsid, rx: m.rx, fuel: m.fuel, job: m.job ? { user: m.job.user, qty: m.job.qty, left: Math.max(0, Math.round((m.job.readyAt - Date.now()) / 1000)) } : null, waiting: m.waiting, art: drawn.get(m.id)?.art || '' })),
+        where: home ? { kind: home.kind, owner: home.owner, place: home.place, mayTake: home.mayTake } : null,
+        machines: [...machines.values()].map((m) => ({ id: m.id, classTsid: m.classTsid, place: m.place, rx: m.rx, fuel: m.fuel, job: m.job ? { user: m.job.user, qty: m.job.qty, left: Math.max(0, Math.round((m.job.readyAt - Date.now()) / 1000)) } : null, waiting: m.waiting, art: drawn.get(m.id)?.art || '' })),
         slice: { placed: slice.placed.length, taken: slice.taken.length, jobs: Object.keys(slice.jobs).length },
         last,
       };
@@ -935,7 +984,7 @@ function createSession(engine, client) {
       const st = homesFeature._state?.();
       const at = where();
       const ctx = engine.homeContext?.() || {};
-      return { me: me(), street: engine.streetTsid, home: { inHome: ctx.inHome, owned: ctx.owned }, scene: st?.scene ? { room: st.scene.room } : null, at: at ? { kind: at.kind, owner: at.owner, key: at.key } : null, drawn: home ? { kind: home.kind, owner: home.owner, houseX: home.houseX } : null, last };
+      return { me: me(), street: engine.streetTsid, home: { inHome: ctx.inHome, owned: ctx.owned }, scene: st?.scene ? { room: st.scene.room, tower: st.scene.tower ?? null, houseFloor: st.scene.houseFloor || 0, houseX: st.scene.background?.houseX ?? null } : null, at: at ? { kind: at.kind, owner: at.owner, place: at.place, key: at.key } : null, drawn: home ? { kind: home.kind, owner: home.owner, place: home.place, x0: home.x0, groundY: home.groundY, span: home.span } : null, last };
     },
   };
 }
@@ -991,7 +1040,7 @@ export const homeMachinesFeature = {
     if (s.placed.length) out.placed = s.placed;
     if (s.taken.length) out.taken = s.taken;
     if (Object.keys(s.jobs).length) out.jobs = s.jobs;
-    if (s.machines.length) out.machines = s.machines.map((m) => ({ id: m.id, classTsid: m.classTsid, rx: m.rx, fuel: m.fuel, music: m.music, job: m.job ? { ...m.job } : null, contents: m.contents || {} }));
+    if (s.machines.length) out.machines = s.machines.map((m) => ({ id: m.id, classTsid: m.classTsid, place: m.place, rx: m.rx, fuel: m.fuel, music: m.music, job: m.job ? { ...m.job } : null, contents: m.contents || {} }));
     return Object.keys(out).length ? out : undefined;
   },
 

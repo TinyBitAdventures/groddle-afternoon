@@ -19,8 +19,16 @@
  *   an instance, never within 200 px of another stand or machine, nor within
  *   70 px of either end of the street (machine_stand.js canDrop 770-788). So
  *   a home street, the house, the Tower and every public street could carry
- *   one. Here: the owner's home street (Austin's decision); the remake's
- *   machines stay pack tools as well (js/machines.js).
+ *   one. Here: the owner's home street, their house and their Tower's floors,
+ *   never a public street (Austin, 2026-11-01: "Machines may stand on the
+ *   home street, in the house and in the Tower"); the remake's machines stay
+ *   pack tools as well (js/machines.js). In a room the "ends of the street"
+ *   are the room's inner walls (home-decor interiorBounds: the house's side
+ *   walls 76 px inside each end segment, a Tower floor's elevator side and
+ *   far wall), and the 200 px spacing counts only machines in that room
+ *   (findCloseStack looks through pc.location.items, player.js 1152-1186:
+ *   one location). The house is its ground floor (HOUSE_<id>, the room
+ *   visitors share); an upper house floor stays the owner's own room.
  * - Anyone standing there could use it, refuel it and collect what they made
  *   (verbs.use 633-684, refuel 442-558, collect 560-631: no owner check);
  *   only the owner or a key-holder could take it apart (disassemble 322,
@@ -45,7 +53,10 @@
  *   7.0); locations/inc_cultivation.js 168-178: only on a home's public
  *   half, never for the owner). The source credits the street the maker
  *   stands on when the job finishes (this.location); here it is the
- *   machine's home, wherever the maker went (bug 8964's intent).
+ *   machine's place, wherever the maker went (bug 8964's intent). So only a
+ *   machine on the home street pays: the house is not public (:170
+ *   is_public), and a Tower's own rewards were never collected (the Magic
+ *   Rock reads home.exterior's alone, players/inc_houses.js 1706-1709).
  * - Fuel: 200 at most, a fresh machine 50 (onCreate max_fuel / 4), +50 a
  *   Fuel Cell and refused with less than 50 room (refuel 457-470).
  */
@@ -65,11 +76,43 @@ import {
   secondsToString,
 } from './machine-rooms.js?v=b37e9a73';
 import { ASSEMBLY_SKILL, FUEL_PER_CELL, MAX_FUEL, isMachine } from './machines.js?v=b5f892f6';
+import { INTERIOR, interiorBounds } from './home-decor.js?v=d03413ec';
 
 export const HOME_MACHINES_ID = 'home-machines';
 
 /** The home street's tsid in a save (homes-feature HOME_STREET_TSID). */
 export const HOME_MACHINES_STREET = 'RH_HOME_EXT';
+/** The house and Tower floors' tsid in a save (homes-feature HOME_INTERIOR_TSID). */
+export const HOME_MACHINES_INTERIOR = 'RH_HOME_INT';
+
+/**
+ * Where in a home a machine stands: the home street, the house (its ground
+ * floor) or a Tower floor ("tower:<0..8>", config_base.js towers MAX_FLOORS).
+ * The realtime server names it from the street the actor stands on
+ * (HOME_<id>, HOUSE_<id>, TOWER_<id>_<floor>).
+ */
+export const PLACE_STREET = 'street';
+export const PLACE_HOUSE = 'house';
+const PLACE_RE = /^(street|house|tower:[0-8])$/;
+export const isPlace = (p) => PLACE_RE.test(String(p || ''));
+export const towerPlace = (floor) => `tower:${Math.max(0, Math.min(8, Math.floor(Number(floor) || 0)))}`;
+/** Only the home street is a home's public half that pays the pool (inc_cultivation.js:170, inc_houses.js 1706-1709). */
+export const placePays = (p) => (p || PLACE_STREET) === PLACE_STREET;
+/** The walk line a machine stands on: the street's, or a room's floor (home-decor INTERIOR.floorY). */
+export const ROOM_GROUND_Y = INTERIOR.floorY;
+
+/**
+ * A room's span for placing, in room x (0 at the room's left end): the inner
+ * walls of the house (decor wallSegments) or of a Tower floor.
+ */
+export function roomSpan(place, decor = null) {
+  if (String(place).startsWith('tower:')) {
+    const b = interiorBounds({ layout: 'tower' });
+    return { lo: b.left, hi: b.right };
+  }
+  const b = interiorBounds({ wallSegments: decor?.wallSegments });
+  return { lo: b.left, hi: b.right };
+}
 
 /** inc_making.js:836 cultivation_add_img_rewards(this, 7.0). */
 export const HOME_MACHINE_POOL = 7;
@@ -88,8 +131,8 @@ export { DAYS_TO_STORE_CONTENTS, GAME_DAY_MS, MACHINE_EXTRA_WAIT_MS, MAX_FUEL, F
 
 export const HOME_MACHINE_TEXT = Object.freeze({
   placeVerb: 'Place',
-  placeTip: 'Set it down here, for anyone on your street to use',
-  placeHome: 'You can only set a machine down on your own home street.', // ours
+  placeTip: 'Set it down here, for anyone here to use',
+  placeHome: 'You can only set a machine down in your own home: on your home street, in your house or in your Tower.', // ours
   placeHere: (label) => `This ${label} cannot be placed here.`, // machine_stand.js canDrop
   placeMany: 'You have a lot of machines out already.', // ours
   placed: (label) => `You put your ${label} down here.`, // ours
@@ -124,15 +167,18 @@ export const machineLabel = (classTsid) => MACHINE_LABELS[classTsid] || String(c
 /**
  * Where on the street a machine may go (machine_stand.js canDrop): rx is
  * from the house, the street runs from -houseX to width - houseX.
- * machines: the placed ones ({ rx }).
+ * machines: the placed ones ({ rx }) in the same place. In a room `span`
+ * ({ lo, hi } in room x, roomSpan) stands for the street's ends.
  */
-export function placeCheck({ machines = [], rx, layout, classTsid } = {}) {
+export function placeCheck({ machines = [], rx, layout, span, classTsid } = {}) {
   const label = machineLabel(classTsid);
   if (!isHomeMachineClass(classTsid)) return { ok: false, why: 'class', msg: 'That is not a machine.' };
   if (machines.length >= HOME_MACHINES_MAX) return { ok: false, why: 'many', msg: HOME_MACHINE_TEXT.placeMany };
   const x = Math.round(finite(rx, NaN));
   if (!Number.isFinite(x)) return { ok: false, why: 'here', msg: HOME_MACHINE_TEXT.placeHere(label) };
-  if (layout && Number.isFinite(layout.houseX) && Number.isFinite(layout.width)) {
+  if (span && Number.isFinite(span.lo) && Number.isFinite(span.hi)) {
+    if (x <= span.lo + MACHINE_EDGE || x >= span.hi - MACHINE_EDGE) return { ok: false, why: 'edge', msg: HOME_MACHINE_TEXT.placeHere(label) };
+  } else if (layout && Number.isFinite(layout.houseX) && Number.isFinite(layout.width)) {
     const wx = layout.houseX + x;
     if (wx <= MACHINE_EDGE || wx >= layout.width - MACHINE_EDGE) return { ok: false, why: 'edge', msg: HOME_MACHINE_TEXT.placeHere(label) };
   }
@@ -169,8 +215,9 @@ export function jobLimit(taskLimit, upgrades = []) {
 
 /**
  * A machine's shared state, as the site sends it (and as solo keeps it):
- * { id, classTsid, rx, fuel, music, job: { user, name, qty, startedAt,
- * readyAt } | null, waiting: [user ids with output in it] }. `offset` turns
+ * { id, classTsid, place, rx, fuel, music, job: { user, name, qty, startedAt,
+ * readyAt } | null, waiting: [user ids with output in it] } (place: where
+ * in the home, PLACE_STREET when the row names none). `offset` turns
  * the site's clock into this page's (local - site).
  */
 export function normalizeMachine(raw, offset = 0) {
@@ -190,6 +237,7 @@ export function normalizeMachine(raw, offset = 0) {
   return {
     id,
     classTsid,
+    place: isPlace(raw.place) ? String(raw.place) : PLACE_STREET,
     rx: Math.round(finite(raw.rx)),
     fuel: Math.max(0, Math.min(MAX_FUEL, whole(raw.fuel))),
     music: raw.music !== false,

@@ -575,8 +575,8 @@
    "group": "making",
    "name": "Machines and the Still",
    "status": "source",
-   "blurb": "Assemble Blockmakers, Fuelmakers and Woodworkers; fuel them; distil hooch. Set an assembled machine down on your home street and use it there.",
-   "multiplayer": "A machine set down on a home street is the same for everyone there, even while its owner is away: anyone can refuel it, start a make and collect what they made, one job at a time, and each make by a visitor adds 7 to the owner’s Magic Rock. Only the owner or a key-holder can pick it up.",
+   "blurb": "Assemble Blockmakers, Fuelmakers and Woodworkers; fuel them; distil hooch. Set an assembled machine down on your home street, in your house or in your Tower, and use it there.",
+   "multiplayer": "A machine set down on a home street, in a house or in a Tower is the same for everyone there, even while its owner is away: anyone can refuel it, start a make and collect what they made, one job at a time, and each make by a visitor on the home street adds 7 to the owner’s Magic Rock. Only the owner or a key-holder can pick it up.",
    "spot": null,
    "evidence": [
     "public/js/machines.js",

@@ -23,11 +23,14 @@ import {
   normalizeSlice,
   othersInside,
   placeCheck,
+  placePays,
   placedMachineVerbs,
+  roomSpan,
+  towerPlace,
   settleSolo,
   soloRow,
-} from '../public/js/home-machines.js?v=765ad97b';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=171aec9c';
+} from '../public/js/home-machines.js?v=70f5c2fe';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=1d3b3eb4';
 import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=ea3f10b5';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 
@@ -85,6 +88,36 @@ describe('placing', () => {
     assert.equal(placeCheck({ machines: [], rx: 0, layout, classTsid: 'still' }).why, 'class');
     assert.equal(placeCheck({ machines: [], rx: 0, layout, classTsid: 'fuelmaker' }).msg, undefined);
     assert.equal(placeCheck({ machines: [{ rx: 0 }], rx: 10, layout, classTsid: 'fuelmaker' }).msg, 'This Fuelmaker cannot be placed here.');
+  });
+});
+
+describe('HOMES2: in the house and in the Tower', () => {
+  it('a room\'s ends are its inner walls; the spacing counts that room only', () => {
+    const house = roomSpan('house', { wallSegments: 7 });
+    assert.deepEqual(house, { lo: 76, hi: 7 * 150 - 76 });
+    assert.equal(placeCheck({ machines: [], rx: 146, span: house, classTsid: 'fuelmaker' }).why, 'edge');
+    assert.equal(placeCheck({ machines: [], rx: 147, span: house, classTsid: 'fuelmaker' }).ok, true);
+    assert.equal(placeCheck({ machines: [], rx: 904, span: house, classTsid: 'fuelmaker' }).why, 'edge');
+    assert.equal(placeCheck({ machines: [{ rx: 300 }], rx: 450, span: house, classTsid: 'fuelmaker' }).why, 'near');
+    assert.deepEqual(roomSpan('house', { wallSegments: 20 }).hi, 20 * 150 - 76);
+    assert.deepEqual(roomSpan('tower:3'), { lo: 130, hi: 1102 });
+    assert.equal(towerPlace(4), 'tower:4');
+    assert.equal(towerPlace(99), 'tower:8');
+  });
+  it('a machine keeps its place; the home street is the default', () => {
+    const raw = { id: 'hm-00000000000000aa', class: 'fuelmaker', rx: 0, fuel: 50 };
+    assert.equal(normalizeMachine(raw).place, 'street');
+    assert.equal(normalizeMachine({ ...raw, place: 'tower:2' }).place, 'tower:2');
+    assert.equal(normalizeMachine({ ...raw, place: 'yard' }).place, 'street');
+  });
+  it('only the home street pays the owner\'s pool (inc_cultivation.js:170, inc_houses.js 1706-1709)', () => {
+    assert.match(line('locations/inc_cultivation.js', 170), /if \(!this\.is_public\) return false;/);
+    assert.match(line('players/inc_houses.js', 1709), /this\.home\.exterior\.cultivation_get_img_rewards\(this\)/);
+    assert.match(line('locations/tower.js', 11), /this\.is_public = true;/);
+    assert.deepEqual(['street', 'house', 'tower:0'].map(placePays), [true, false, false]);
+  });
+  it('findCloseStack looks in one location (player.js 1152-1186)', () => {
+    assert.match(line('players/player.js', 1160), /for \(var i in this\.location\.items\)/);
   });
 });
 
@@ -207,6 +240,22 @@ describe('the site decides (src/HomeMachines.php)', { skip: skipSite }, () => {
     assert.equal(take('$r["contents"] = ["9" => ["items" => ["fuel_cell" => 1], "at" => 0]]; echo json_encode(H::takeWhy($r, 7, true, true, false, 5));'), 'others');
     assert.equal(take('$r["contents"] = ["9" => ["items" => ["fuel_cell" => 1], "at" => 0]]; echo json_encode(H::takeWhy($r, 7, true, true, true, 5));'), null);
   });
+  it('HOMES2: a room\'s walls and a Tower floor it has; only the street pays', () => {
+    assert.equal(php('echo json_encode(H::placeWhy($R, [], "fuelmaker", 146, [76, 974]));'), 'edge');
+    assert.equal(php('echo json_encode(H::placeWhy($R, [], "fuelmaker", 147, [76, 974]));'), null);
+    const tower = (floors, place) => php(`$s = json_decode('{"systems":{"features":{"home-tower":{"built":true,"floors":${floors}},"homes":{"decor":{"wallSegments":9}}}}}'); echo json_encode(H::span($R, "${place}", $s));`);
+    assert.deepEqual(tower(3, 'tower:2'), [130, 1102]);
+    assert.equal(tower(3, 'tower:3'), false, 'a floor it does not have');
+    assert.deepEqual(tower(3, 'house'), [76, 9 * 150 - 76]);
+    assert.equal(tower(3, 'street'), null);
+    assert.deepEqual(php('echo json_encode([H::placeId("tower:8"), H::placeId("tower:9"), H::placeId("house"), H::placeId("yard")]);'), [true, false, true, false]);
+    const job = '["user"=>9,"key"=>"fuel_cell","qty"=>1,"need"=>1,"name"=>"Fuel Cell","at"=>0,"ready"=>1000]';
+    const [, inHouse] = php(`$r = ${row}; $r["place"] = "house"; $r["job"] = ${job}; echo json_encode(H::settle($R, $r, 7, 1000));`);
+    assert.equal(inHouse, null, 'a make in the house pays nobody');
+    const [, onStreet] = php(`$r = ${row}; $r["place"] = "street"; $r["job"] = ${job}; echo json_encode(H::settle($R, $r, 7, 1000));`);
+    assert.equal(onStreet.amount, 7);
+    assert.equal(php(`$r = ${row}; $r["place"] = "tower:1"; echo json_encode(H::view($r));`).place, 'tower:1');
+  });
   it('placing and refuelling as the game does', () => {
     assert.equal(php('echo json_encode(H::placeWhy($R, [["rx" => 0]], "fuelmaker", 199));'), 'near');
     assert.equal(php('echo json_encode(H::placeWhy($R, [["rx" => 0]], "fuelmaker", 200));'), null);
@@ -230,6 +279,6 @@ describe('the realtime server carries it (home_machines.go)', { skip: HAS_SERVER
   it('posts to the site\'s route', () => {
     const go = readFileSync(serverPath('home_machines.go'), 'utf8');
     assert.match(go, /ledgerRouteHomeMachines = "\/groddle\/v1\/homes\/machines"/);
-    assert.match(go, /homeStreetPrefix\+strconv\.FormatInt\(owner, 10\)/, 'the actor stands on the home street');
+    assert.match(go, /func machinePlace\(street string, owner int64\)/, 'the actor stands in the owner\'s home: the street, the house or a Tower floor');
   });
 });
