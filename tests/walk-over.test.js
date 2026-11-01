@@ -60,9 +60,9 @@ describe('how near a verb needs you (main.js doVerb 2939-2967)', () => {
   it('cites the server check and the client walk', { skip: !(existsSync(gsjs) && existsSync(client)) && 'needs glitch-GameServerJS and glitch-client beside the repo' }, () => {
     const main = readFileSync(join(gsjs, 'main.js'), 'utf8').split('\n');
     assert.match(main.slice(2925, 2975).join('\n'), /var required_range = 300;[\s\S]*proximity_override[\s\S]*disable_proximity[\s\S]*msg\.verb == 'give'[\s\S]*at_home && msg\.verb == 'pickup'[\s\S]*Get closer:/);
-    // Hell's 150 px is in Eleven's copy of the server (eleven-gsjs main.js 2958-2961), not Tiny Speck's release.
+    // Hell's 150 px is in Eleven's copy of the server (eleven-gsjs main.js 2963-2966), not Tiny Speck's release.
     const eleven = join(root, '../eleven-gsjs/main.js');
-    if (existsSync(eleven)) assert.match(readFileSync(eleven, 'utf8').split('\n').slice(2955, 2962).join('\n'), /isInHell\(\)\) \{\s*required_range = 150;/);
+    if (existsSync(eleven)) assert.match(readFileSync(eleven, 'utf8').split('\n').slice(2955, 2968).join('\n'), /isInHell\(\)\) \{\s*required_range = 150;/);
     const fc = readFileSync(join(client, 'control/TSFrontController.as'), 'utf8').split('\n');
     assert.match(fc.slice(437, 453).join('\n'), /Moving you in order to/);
     assert.match(fc.slice(612, 636).join('\n'), /dist <= model\.physicsModel\.required_verb_proximity[\s\S]*Could not get close enough :\(/);
