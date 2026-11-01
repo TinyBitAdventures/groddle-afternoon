@@ -45,11 +45,11 @@ import {
   stepHogtie,
   stickPlaceState,
   takePlop,
-} from '../public/js/animal-husbandry.js?v=d29cd364';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=cad23774';
-import { getVerbsFor, runVerb } from '../public/content.js?v=6d499ac2';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=315ff68c';
-import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=33e0f54c';
+} from '../public/js/animal-husbandry.js?v=e23ccf02';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount, listAnimalFeedOptions, createAnimalState } from '../public/js/animals.js?v=a9883739';
+import { getVerbsFor, runVerb } from '../public/content.js?v=ae080af0';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=8574d30d';
+import { batterflyPlacementGroups, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=6503e1d0';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');

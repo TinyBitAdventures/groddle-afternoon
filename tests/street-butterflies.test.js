@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { butterflySplit, populationForStreet } from '../public/js/street-ecology.js?v=315ff68c';
+import { butterflySplit, populationForStreet } from '../public/js/street-ecology.js?v=8574d30d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const catalog = JSON.parse(readFileSync(join(root, 'public/assets/content/street-ecology.json'), 'utf8'));
@@ -91,15 +91,17 @@ describe('street Butterflies from the live street pages', () => {
     }
   });
 
-  it('splits a street\'s count between the path and the air, and keeps the starter\'s four', () => {
+  it('puts a street\'s count in the air, none resting on the ground, and keeps the starter\'s four (ticket 25)', () => {
+    // npc_butterfly.js flyAround 886-969: a healthy Butterfly always flies in the 200 px above the
+    // floor; only a rooked one lands (onRooked 1395-1404) and a sad one stops (flyAround returns).
     assert.deepEqual(butterflySplit(0), { butterflies: 0, flyingButterflies: 0 });
     assert.deepEqual(butterflySplit(1), { butterflies: 0, flyingButterflies: 1 });
-    assert.deepEqual(butterflySplit(2), { butterflies: 1, flyingButterflies: 1 });
-    assert.deepEqual(butterflySplit(3), { butterflies: 1, flyingButterflies: 2 });
-    assert.deepEqual(butterflySplit(8), { butterflies: 1, flyingButterflies: 2 });
+    assert.deepEqual(butterflySplit(2), { butterflies: 0, flyingButterflies: 2 });
+    assert.deepEqual(butterflySplit(3), { butterflies: 0, flyingButterflies: 3 });
+    assert.deepEqual(butterflySplit(8), { butterflies: 0, flyingButterflies: 3 });
     const starter = populationForStreet(index.default, catalog.streets[index.default], { starter: true });
-    assert.equal(starter.butterflies, 2);
-    assert.equal(starter.flyingButterflies, 2);
+    assert.equal(starter.butterflies, 0);
+    assert.equal(starter.flyingButterflies, 4);
   });
 
   it('leaves enough for Happy Endings For All! (massage 7, each once a game day) in every animal region', () => {

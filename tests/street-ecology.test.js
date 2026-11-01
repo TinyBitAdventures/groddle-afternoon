@@ -13,7 +13,7 @@ import {
   planStreetPlacements,
   nearestPlacementGap,
   STREET_ECOLOGY_URL,
-} from '../public/js/street-ecology.js?v=315ff68c';
+} from '../public/js/street-ecology.js?v=8574d30d';
 import {
   platformsScreen,
   platformYAt,
@@ -115,7 +115,9 @@ describe('Tiny Speck street ecology catalog', () => {
     assert.equal(population.treeClasses.filter((id) => id === 'trant_bubble').length, 2);
     assert.ok(population.treeClasses.includes('wood_tree'));
     assert.ok(population.chickens >= 2);
-    assert.ok(population.butterflies >= 2);
+    // Ticket 25: all flying, as the original's (npc_butterfly.js flyAround).
+    assert.equal(population.butterflies, 0);
+    assert.ok(population.flyingButterflies >= 4);
     assert.equal(population.giantId, 'mab');
   });
 });

@@ -12,8 +12,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { populationForStreet, setStreetEcologyCatalog, RENDER_ANIMAL_CAPS, STREET_ANIMAL_CAPS } from '../public/js/street-ecology.js?v=315ff68c';
-import { batterflyCountForStreet } from '../public/js/animal-husbandry.js?v=d29cd364';
+import { populationForStreet, setStreetEcologyCatalog, RENDER_ANIMAL_CAPS, STREET_ANIMAL_CAPS } from '../public/js/street-ecology.js?v=8574d30d';
+import { batterflyCountForStreet } from '../public/js/animal-husbandry.js?v=e23ccf02';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const catalog = JSON.parse(readFileSync(join(root, 'public/assets/content/street-ecology.json'), 'utf8'));
@@ -64,7 +64,7 @@ describe('street Piggies, Chickens and Batterflies from the live street pages', 
 
   it('keeps the starter its own 6 Piggies and its Chickens, and The Great Hog Haul its 6 Piggies', () => {
     const starter = pop(STARTER);
-    assert.deepEqual([starter.piggies, starter.chickens, starter.butterflies, starter.flyingButterflies], [6, 3, 2, 2]);
+    assert.deepEqual([starter.piggies, starter.chickens, starter.butterflies, starter.flyingButterflies], [6, 3, 0, 4]);
     // Hechey Track's page (August 2012): 6 Piggies, 7 Chickens.
     assert.deepEqual([catalog.piggies[STARTER].count, catalog.chickens[STARTER].count], [6, 7]);
     assert.equal(pop('GHVJQH26ERF3VMJ').piggies, 6);

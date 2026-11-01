@@ -227,14 +227,17 @@ export const RENDER_ANIMAL_CAPS = Object.freeze({ npc_piggy: 6, npc_chicken: 3 }
 
 /**
  * A street's Butterflies (build-street-ecology.mjs: the live street pages'
- * count, at most 3) split between the path and the air so the street shows
- * that many in all: one flies, two are one of each, three are one resting and
- * two flying.
+ * count, at most 3), all in the air. Ticket 25 (2026-11-01, "butterflies just
+ * sitting on the ground"): the original never sets a healthy Butterfly down:
+ * npc_butterfly.js flyAround 886-969 keeps it flying in the 200 px band above
+ * the floor (apiStartFlyingInTheArea), onWaitStart/onWaitEnd 1486-1531 only
+ * pause it by the player, and it lands only when rooked (onRooked 1395-1404
+ * drops it to the platform line, rest-rooked) or sad (flyAround returns). The
+ * remake's split put one in two on the path for good, resting.
  */
 export function butterflySplit(count) {
   const total = Math.min(whole(count), 3);
-  const resting = Math.floor(total / 2);
-  return { butterflies: resting, flyingButterflies: total - resting };
+  return { butterflies: 0, flyingButterflies: total };
 }
 
 function emptyPopulation({ source, sourceTsid = null }) {
@@ -330,8 +333,9 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
   if (starter) {
     piggies = Math.max(3, piggies);
     chickens = Math.max(2, chickens);
-    butterflies = Math.max(2, butterflies);
-    flyingButterflies = Math.max(2, flyingButterflies);
+    // The onboarding four, all flying (ticket 25: the original's never sat on the ground).
+    flyingButterflies = Math.max(4, butterflies + flyingButterflies);
+    butterflies = 0;
     if (!treeClasses.length) {
       treeClasses = ['trant_fruit', 'trant_egg', 'trant_bean', 'wood_tree'];
     } else if (!treeClasses.includes('wood_tree') && treeClasses.length < 8) {

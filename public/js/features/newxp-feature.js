@@ -130,7 +130,7 @@ import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textur
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=3753a0d2';
 import { HOME_MACHINE } from '../home-ticket.js?v=62899fad';
-import { createAnimalState } from '../animals.js?v=cad23774';
+import { createAnimalState } from '../animals.js?v=a9883739';
 import {
   AK_ANIMALS,
   AK_BUBBLE,

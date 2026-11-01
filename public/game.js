@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6d499ac2';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=ae080af0';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=49f8c9e8';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=fa233946';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -459,8 +459,8 @@ import {
 } from './js/inventory.js?v=85d4faba';
 import { PACK_COPY, unitRankAt } from './js/pack-slots.js?v=00bca2cf';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=9b23e21a';
-import { listAnimalFeedOptions } from './js/animals.js?v=cad23774';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=cad23774';
+import { listAnimalFeedOptions } from './js/animals.js?v=a9883739';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=a9883739';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -593,7 +593,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=390e4702';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=20951b6d';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=76d5efb8';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -777,7 +777,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=cad23774';
+} from './js/animals.js?v=a9883739';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -872,7 +872,7 @@ import {
   animalPatrolRange,
   ANIMAL_PATROL,
   nearestPlacementGap,
-} from './js/street-ecology.js?v=315ff68c';
+} from './js/street-ecology.js?v=8574d30d';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=a1c4a308';
 import {
   actionLoopFor,
