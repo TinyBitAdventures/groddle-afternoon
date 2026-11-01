@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=63da285f';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=30c75cfd';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0ecc74d5';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d094eb6e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -460,8 +460,8 @@ import {
 } from './js/inventory.js?v=91ee49cd';
 import { PACK_COPY, unitRankAt } from './js/pack-slots.js?v=00bca2cf';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=9b23e21a';
-import { listAnimalFeedOptions } from './js/animals.js?v=8fd74f3e';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=8fd74f3e';
+import { listAnimalFeedOptions } from './js/animals.js?v=7f5e5a98';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=7f5e5a98';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -594,7 +594,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=390e4702';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=76d5efb8';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=123877ea';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -722,7 +722,7 @@ import {
 } from './js/travel.js?v=a2c6427f';
 import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
 import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
-import { landingY } from './js/walk-surface.js?v=764d5f5a';
+import { landingY, walkSurfaceY } from './js/walk-surface.js?v=764d5f5a';
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, streetPhysicsExtras } from './js/avatar-step.js?v=c04c7c76';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
@@ -778,7 +778,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=8fd74f3e';
+} from './js/animals.js?v=7f5e5a98';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -875,8 +875,8 @@ import {
   animalPatrolRange,
   ANIMAL_PATROL,
   nearestPlacementGap,
-} from './js/street-ecology.js?v=8574d30d';
-import { easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=f61d1428';
+} from './js/street-ecology.js?v=cfa10e0b';
+import { easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=04437144';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=a1c4a308';
 import {
   actionLoopFor,
@@ -10492,6 +10492,10 @@ const engine = {
   imaginationHubOpen: () => Boolean(imaginationHub?.isOpen()),
   /** A verb in progress or the verb menu open (both interrupt meditation). */
   acting: () => Boolean(currentAction || menuTarget),
+  /** A verb in progress on this target, or its verb menu open (npc.js onInteractionStarting: the NPC waits for you). */
+  actingOn: (target) => Boolean(target) && (currentAction?.target === target || menuTarget === target),
+  /** What the player is at now: the target of the verb in progress, else of the open verb menu. */
+  interactionTarget: () => currentAction?.target || menuTarget || null,
   questDialogueOpen: () => isQuestDialogueOpen(),
   /** Ticket 21: when the player last dismissed an emergency card (Escape or its X); features wait for another street before showing it again. */
   questDialogueDismissedAt: () => urgentDismissedAt,
@@ -12681,6 +12685,20 @@ function handleInput() {
   }
 }
 
+/**
+ * A street Piggy or Chicken keeps its feet on its floor as it walks, up and down a slope: the
+ * original's walked the platform lines by apiFindPath (npc_piggy.js onCreate 1437-1444,
+ * npc_chicken.js onCreate 1008-1023, onPathing). Planted 2 px into the line, as enterStreet does.
+ */
+function followWalkFloor(spr, dt = 1) {
+  const y = walkSurfaceY(streetPlatforms, spr.x, spr.y - 2, { up: 24, down: 24 });
+  if (!Number.isFinite(y)) return;
+  // A step where two lines meet is taken over a few frames, not in one hop.
+  const d = y + 2 - spr.y;
+  const most = 1.5 * Math.max(1, dt);
+  spr.y += Math.abs(d) <= most ? d : Math.sign(d) * most;
+}
+
 function physics(dt) {
   time += dt;
   if (paradiseIsInstanced()) {
@@ -12762,6 +12780,7 @@ function physics(dt) {
     p.x += p.vx * dt;
     if (p.x > p.baseX + p.range) { p.x = p.baseX + p.range; p.vx *= -1; }
     if (p.x < p.baseX - p.range) { p.x = p.baseX - p.range; p.vx *= -1; }
+    followWalkFloor(p, dt);
     const ps = p.baseScale ?? ENTITY_SCALE.piggy;
     p.scale.x = (p.vx >= 0 ? 1 : -1) * ps;
     p.scale.y = Math.abs(ps);
@@ -12770,10 +12789,14 @@ function physics(dt) {
     if (menuTarget?.sprite === c || currentAction?.target?.sprite === c) continue;
     // Multiplayer: a street Chicken the server shares walks its shared path (street-objects-feature),
     // unless something here holds it still (the Rook, a sulk: their own vx 0).
-    if (c._path?.(dt)) continue;
+    if (c._path?.(dt)) {
+      followWalkFloor(c, dt);
+      continue;
+    }
     c.x += c.vx * dt;
     if (c.x > c.baseX + c.range) { c.x = c.baseX + c.range; c.vx *= -1; }
     if (c.x < c.baseX - c.range) { c.x = c.baseX - c.range; c.vx *= -1; }
+    followWalkFloor(c, dt);
     const cs = c.baseScale ?? ENTITY_SCALE.chicken;
     c.scale.x = (c.vx >= 0 ? 1 : -1) * cs;
     c.scale.y = Math.abs(cs);
@@ -21464,6 +21487,8 @@ async function enterStreet(tsid, opts = {}) {
   piggies.forEach((spr, i) => {
     const p = pigPoints[i];
     if (p) { spr.x = p.x; spr.y = p.y + 2; spr.baseX = p.x; spr.range = animalPatrolRange('piggies', p.room); }
+    // Its own walk (features/animal-mood-feature.js walks it back here after food).
+    spr.home = { x: spr.baseX, range: spr.range };
   });
   const chickenPoints = placement('chickens');
   chickens = spawnChickens(chickenPoints.map((p) => p.x));
@@ -27945,7 +27970,8 @@ async function main() {
         prompt: prompt?.visible ? { key: prompt.promptKey, label: prompt.promptLabel } : null,
         interactables: interactables
           .filter((it) => it?.sprite && !it.sprite.destroyed)
-          .map((it) => ({ classId: it.classId, label: it.label || '', featureId: it.featureId || '', x: it.sprite.x, y: it.sprite.y, page: toPage(it.sprite.x, it.sprite.y - 20) })),
+          // sx: the way it faces (-1 left); frame: its clip's frame (lane PIGSTUCK: animal walk QA).
+          .map((it) => ({ classId: it.classId, label: it.label || '', featureId: it.featureId || '', x: it.sprite.x, y: it.sprite.y, sx: Math.sign(it.sprite.scale?.x || 1), frame: it.sprite.currentFrame ?? null, page: toPage(it.sprite.x, it.sprite.y - 20) })),
         signposts: (currentStreet?.signposts || []).map((s) => {
           const pos = worldToScreen(currentStreet, s.x, s.y);
           const conn = pickConnection(s, availableStreetTsids());

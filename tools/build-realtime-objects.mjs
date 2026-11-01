@@ -70,7 +70,7 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=8574d30d';
+} from '../public/js/street-ecology.js?v=cfa10e0b';
 import { ROCK_CATALOG } from '../public/js/mining.js?v=fb4c7898';
 import { MEGA_ROCK_CHANCE, MEGA_ROCK_CHUNKS } from '../public/js/imagination-effects.js?v=70169933';
 import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=3b824ce9';
@@ -79,14 +79,14 @@ import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=1eff5718';
 import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=91490913';
 import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
 import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=fc882105';
-import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=d1241e26';
+import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=7c9c5235';
 import { kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=a56dce4d';
-import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=653b0122';
+import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=65c80cf6';
 import { hasRaceDispenser } from '../public/js/races.js?v=df0576ad';
 import { setWildlifeCatalog, wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
 import { boardSpotRow, furnitureFor, furniturePlacementGroups } from '../public/js/street-furniture.js?v=37094759';
-import { INCUBATION } from '../public/js/animal-husbandry.js?v=808076d1';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=de0efe2d';
+import { INCUBATION } from '../public/js/animal-husbandry.js?v=c7040204';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=dc3084ad';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

@@ -112,14 +112,14 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=de0efe2d';
+} from '../street-objects.js?v=dc3084ad';
 import { ROCK_CATALOG } from '../mining.js?v=fb4c7898';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=58743072';
-import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=8fd74f3e';
+import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=7f5e5a98';
 import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=91490913';
-import { animalPatrolRange } from '../street-ecology.js?v=8574d30d';
-import { INCUBATION, PIGGY_FEED, itemBaseCost, resetIncubation } from '../animal-husbandry.js?v=808076d1';
+import { animalPatrolRange } from '../street-ecology.js?v=cfa10e0b';
+import { INCUBATION, PIGGY_FEED, itemBaseCost, resetIncubation } from '../animal-husbandry.js?v=c7040204';
 import {
   applyCreatureState,
   batterflyAt,
@@ -134,7 +134,7 @@ import {
   restAt,
   sharedCreatureLabel,
   walkerAt,
-} from '../street-creatures.js?v=f61d1428';
+} from '../street-creatures.js?v=04437144';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -360,6 +360,29 @@ function setPath(engine, obj) {
   spr._path = step;
   spr._pathPoint = pointAt;
   pathed.add(spr);
+}
+
+/**
+ * A player at a shared Chicken or Butterfly (its menu open, a verb on it): game.js stops it on this
+ * screen, and the server holds its path for everyone (objects_creatures.go waitCreature: npc.js
+ * onInteractionStarting 1981-1990, npc_chicken.js onWaitStart 1630-1639, npc_butterfly.js
+ * onWaitStart 1513-1531), again every WAIT_EVERY_MS while the player stays, so nobody's copy runs
+ * ahead and it does not jump when the menu closes (lane PIGSTUCK, Austin 2026-11-01: Chickens
+ * "hop, like they're restarting their animation from the other side"). A Batterfly flies on.
+ */
+const WAIT_EVERY_MS = 700;
+let waitSent = { id: '', at: 0 };
+function waitAtCreature(engine, c, wall) {
+  if (c.state !== 'online' || !copy.creatures) return;
+  const t = engine.interactionTarget?.();
+  const a = t ? creatureOf(t) : null;
+  if (!a || a.kind === 'batterfly' || !copy.animals.has(a.id) || !t.sprite?._path) {
+    waitSent = { id: '', at: 0 };
+    return;
+  }
+  if (waitSent.id === a.id && wall - waitSent.at < WAIT_EVERY_MS) return;
+  reqSeq += 1;
+  if (c.send('obj_act', actMessage({ req: reqSeq, id: a.id, verb: 'wait' }))) waitSent = { id: a.id, at: wall };
 }
 
 /** Someone else's verb on a street animal: this player sees it happen. */
@@ -718,6 +741,7 @@ export const streetObjectsFeature = {
       pending.delete(req);
       if (!p.silent) engine.toast?.(COPY.timeout, 2400);
     }
+    waitAtCreature(engine, c, wall);
     if (reapplyAt && wall >= reapplyAt) {
       reapplyAt = 0;
       dirtyAll = true;

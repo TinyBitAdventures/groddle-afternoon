@@ -115,7 +115,7 @@ export const CHECKLIST = Object.freeze([
     evidence: ['public/js/animal-kinship.js', 'public/js/animal-husbandry.js'] },
   { id: 'chickens', group: 'creatures', name: 'Chickens', status: 'source', spot: 'chicken',
     blurb: 'Squeeze for grain, incubate eggs, raise chicks.',
-    multiplayer: 'A street Chicken is everyone’s: it walks the same path for every player on the street and stops for each squeeze, everyone sees it squeezed, and one sitting on an egg sits for everyone until it hatches for the player who gave it. Each player keeps their own squeezes a day, which the server counts too; a server restart keeps it all. On another player’s home street you can squeeze their Chickens, which fills their Magic Rock, and a Chicken the Rook rooked needs three different players to revive it.',
+    multiplayer: 'A street Chicken is everyone’s: it walks the same path for every player on the street and stops for everyone while any player has its menu open or squeezes it, everyone sees it squeezed, and one sitting on an egg sits for everyone until it hatches for the player who gave it. Each player keeps their own squeezes a day, which the server counts too; a server restart keeps it all. On another player’s home street you can squeeze their Chickens, which fills their Magic Rock, and a Chicken the Rook rooked needs three different players to revive it.',
     evidence: ['public/js/animal-kinship.js', 'public/js/street-creatures.js'] },
   { id: 'butterflies', group: 'creatures', name: 'Butterflies', status: 'source', spot: 'butterfly',
     blurb: 'Massage with lotion, then milk; the onboarding quests start here.',

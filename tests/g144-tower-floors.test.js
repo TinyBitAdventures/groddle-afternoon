@@ -11,9 +11,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry, platformYAt } from '../public/js/street-model.js?v=23b926e5';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=4be109b9';
-import { populationForStreet } from '../public/js/street-ecology.js?v=8574d30d';
+import { populationForStreet } from '../public/js/street-ecology.js?v=cfa10e0b';
 import { pickAwayConnection, pickConnection, planSignpostTravel, resolveLoadedTsid } from '../public/js/travel.js?v=a2c6427f';
-import { validateShippedStreet } from '../public/js/builder/validate.js?v=c7094745';
+import { validateShippedStreet } from '../public/js/builder/validate.js?v=f8a5ed7d';
 import {
   HAUKI_FLOOR_1,
   HAUKI_FLOOR_2,
@@ -35,7 +35,7 @@ import {
   towerForLobby,
 } from '../public/js/tower-floors.js?v=45fe0f93';
 import { towerFloorsFeature } from '../public/js/features/tower-floors-feature.js?v=7f87d087';
-import { FEATURES } from '../public/js/features/index.js?v=0ecc74d5';
+import { FEATURES } from '../public/js/features/index.js?v=d094eb6e';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

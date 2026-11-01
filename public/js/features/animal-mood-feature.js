@@ -10,7 +10,9 @@
  *   its herd in advanceYard instead.
  * - Food dropped on the street, or a trant you harvest, water or pet with
  *   fruit on it, sends every hungry piggy to it: on arrival it eats one,
- *   chews, says "Yum!" and its hunger goes to 0.
+ *   chews, says "Yum!" and its hunger goes to 0. It stops beside a tree's
+ *   foot, each Piggy on its own spot, and walks home to its own walk after
+ *   its pause; it waits only for a player at it (lane PIGSTUCK).
  * - A piggy at hunger 10 says "I'm about to croak!" once a minute. Only a
  *   piggy you own (released or raised: the animal-husbandry feature's
  *   extras) can starve: each tick at 10 rolls 50% and the tick's die event
@@ -62,7 +64,9 @@
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&animaldemo=piggy
  *   &animalrank=6&animalreset=1&animalmood=0 (E → nibble refuses);
  *   &animalhunger=9&animalfood=potato drops 3 Potatoes 220 px away and the
- *   piggy walks over and eats one; &animalhunger=10 croaks. Add
+ *   piggy walks over and eats one; &animalhunger=10 croaks. &animalharvest=6 makes every
+ *   street Piggy that hungry and harvests the fruiting tree nearest you 3 s in: they stop
+ *   beside it on their own spots, eat and walk home (lane PIGSTUCK). Add
  *   &animaldeathroll=0 (or 0.99) to put the demo piggy's next tick 3 s away
  *   and force the starvation roll: an ecology piggy only croaks, an owned one
  *   (&animaldemo=starve, or the yard's &homedemo=home&animaldemo=remote)
@@ -95,10 +99,11 @@ import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overla
 import { isInHell } from '../hell.js?v=6ffd0278';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
-import { animalStatusLabel } from '../animals.js?v=8fd74f3e';
+import { animalStatusLabel } from '../animals.js?v=7f5e5a98';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=91490913';
-import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=808076d1';
+import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=c7040204';
 import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=15eda966';
+import { ANIMAL_BODY, ANIMAL_PATROL, TREE_FOOTPRINT } from '../street-ecology.js?v=cfa10e0b';
 import {
   CHECK_ON_REMOVE,
   CROWD_CLASSES,
@@ -147,6 +152,23 @@ export const ANIMAL_MOOD_FEATURE_ID = 'animal-mood';
 const YARD_TSID = 'RH_HOME_EXT';
 /** apiFindPath on a street: food much higher or lower than the piggy is out of reach. */
 const REACH_DY = EAT_RADIUS;
+
+/**
+ * Where a Piggy going to food stops (lane PIGSTUCK, Austin 2026-11-01: on Groddle Forest Junction
+ * two Piggies walked into a Bean Tree and stayed in its trunk, one over the other). The original
+ * walked to the food's x (npc_animal goForFood: apiFindPath(item.x, item.y, 0, 'onFoodPathing'),
+ * npc_piggy.js 1404, 1428, 1986-2002), chewed, idled 3 s and walked the whole floor again
+ * (onFoodPathing 1482-1513, startMoving 2600-2700). The remake's Piggy walks a short patrol
+ * round a home spot, so it stops beside the tree's foot (TREE_FOOTPRINT, half its body clear),
+ * never two on one spot (the next one a body further out), and walks home after its pause.
+ */
+const PIG_BODY = ANIMAL_BODY.piggies;
+const TREE_STOP_PX = TREE_FOOTPRINT / 2 + PIG_BODY / 2;
+const STOP_GAP_PX = PIG_BODY + 8;
+/** The patrol pace, px a second (game.js spawnPiggies: 0.45 px a frame). */
+const PATROL_PX_S = 0.45 * 60;
+/** A patrol this short (a hold's 2 px) is a Piggy standing still. */
+const HELD_RANGE_PX = 10;
 
 /** OGA npc_piggy sheets (88×62 cells, measured): too_much_nibble 11×6 (65), chew 11×5 (53). */
 export const PIGGY_MOOD_SHEETS = Object.freeze({
@@ -231,10 +253,20 @@ function livePiggies(engine) {
 function recordFor(target) {
   let r = records.get(target);
   if (!r) {
-    r = { target, mode: 'idle', food: null, saved: null, holdUntil: 0, nextSadAt: 0, nextCroakAt: 0, speed: 0 };
+    r = { target, mode: 'idle', food: null, saved: null, holdUntil: 0, nextSadAt: 0, nextCroakAt: 0, speed: 0, stopX: null, home: homeOf(target) };
     records.set(target, r);
   }
   return r;
+}
+
+/** A street Piggy's own walk: game.js spawn sets sprite.home; else the walk it has when first seen. */
+function homeOf(target) {
+  const spr = target?.sprite;
+  if (!spr || isExtra(target)) return null;
+  const h = spr.home;
+  if (h && Number.isFinite(h.x) && Number.isFinite(h.range)) return { x: h.x, range: Math.max(HELD_RANGE_PX, h.range) };
+  if (Number.isFinite(spr.baseX) && Number(spr.range) >= HELD_RANGE_PX) return { x: spr.baseX, range: spr.range };
+  return Number.isFinite(spr.x) ? { x: spr.x, range: ANIMAL_PATROL.piggies } : null;
 }
 
 function isExtra(target) {
@@ -292,12 +324,70 @@ function release(engine, r) {
   if (isExtra(r.target)) {
     spr._moodHold = false;
     spr._moodRebase = spr.x;
-  } else if (r.saved) {
-    spr.baseX = spr.x;
-    spr.range = r.saved.range ?? 90;
-    spr.vx = (Math.random() < 0.5 ? -1 : 1) * (Math.abs(r.saved.vx) > 0.01 ? Math.abs(r.saved.vx) : 0.45);
+  } else if (r.saved || Number(spr.range) < HELD_RANGE_PX) {
+    // Its walk again, never the hold's 2 px (a hold taken over another one saved that).
+    const home = r.home;
+    const range = Number(r.saved?.range) >= HELD_RANGE_PX ? r.saved.range : home?.range ?? ANIMAL_PATROL.piggies;
+    const speed = Math.abs(r.saved?.vx) > 0.01 ? Math.abs(r.saved.vx) : 0.45;
+    r.saved = null;
+    r.stopX = null;
+    if (home && Math.abs(spr.x - home.x) > home.range) {
+      // Back to its own walk, at its walking pace: it does not live at the food.
+      r.saved = { range: home.range, vx: speed };
+      r.mode = 'home';
+      hold(engine, r);
+      return;
+    }
+    spr.baseX = home ? home.x : spr.x;
+    spr.range = home ? home.range : range;
+    spr.vx = (Math.random() < 0.5 ? -1 : 1) * speed;
   }
   r.saved = null;
+  r.stopX = null;
+}
+
+/** Walking home after food: to the near end of its own walk, then its patrol from there. */
+function stepHome(engine, r, dtMs) {
+  const spr = r.target.sprite;
+  const home = r.home;
+  const edge = spr.x < home.x ? home.x - home.range : home.x + home.range;
+  const dx = edge - spr.x;
+  const dir = dx > 0 ? 1 : -1;
+  if (Math.abs(dx) <= 1 || Math.abs(spr.x - home.x) <= home.range) {
+    const speed = Math.abs(r.saved?.vx) > 0.01 ? Math.abs(r.saved.vx) : 0.45;
+    r.mode = 'idle';
+    r.saved = null;
+    spr.baseX = home.x;
+    spr.range = home.range;
+    // On into its walk, the way it was going (no turn on the spot).
+    spr.vx = dir * speed;
+    return;
+  }
+  setX(r, spr.x + dir * Math.min(Math.abs(dx), (PATROL_PX_S * dtMs) / 1000));
+  face(r, dir);
+}
+
+/**
+ * Where this Piggy stops for food: beside a tree's foot (or on a stack), on its own side, the
+ * first spot no other Piggy has taken (a body further out each time; the far side when its own
+ * side is full).
+ */
+function stopFor(r, food) {
+  const spr = r.target.sprite;
+  const fx = food.x;
+  const near = spr.x < fx ? -1 : spr.x > fx ? 1 : (Number(r.target.classIndex) % 2 ? 1 : -1);
+  const first = food.kind === 'trant' ? TREE_STOP_PX : 0;
+  const taken = [...records.values()]
+    .filter((o) => o !== r && o.target?.sprite && !o.target.sprite.destroyed && (o.mode === 'seek' || o.mode === 'eat'))
+    .map((o) => (Number.isFinite(o.stopX) ? o.stopX : o.target.sprite.x));
+  const free = (x) => taken.every((t) => Math.abs(t - x) >= PIG_BODY);
+  for (const side of [near, -near]) {
+    for (let k = 0; k < 4; k += 1) {
+      const x = fx + side * (first + k * STOP_GAP_PX);
+      if (free(x)) return x;
+    }
+  }
+  return fx + near * (first + 4 * STOP_GAP_PX);
 }
 
 function face(r, dir) {
@@ -411,6 +501,22 @@ function eatNearby(engine, target) {
   return null;
 }
 
+/** The food it walked to: the stack (by id) or the tree it stopped beside. */
+function eatFood(engine, food) {
+  if (food?.kind === 'stack') {
+    const row = streetStacks(engine).find((x) => x.id === food.id && x.count > 0);
+    if (!row) return null;
+    const cls = row.classTsid;
+    consumeStack(engine, row);
+    return { kind: 'stack', classTsid: cls };
+  }
+  if (food?.kind === 'trant' && Number(food.target?.state?.fruitCount) > 0 && food.target.sprite && !food.target.sprite.destroyed) {
+    eatFruit(food.target);
+    return { kind: 'trant', classTsid: food.target.classId };
+  }
+  return null;
+}
+
 /** An offline tick's seek lands at once. */
 function eatOffline(engine, food) {
   if (food?.kind === 'stack') {
@@ -440,6 +546,8 @@ function startSeek(engine, r, food) {
   hold(engine, r);
   r.mode = 'seek';
   r.food = food;
+  r.stopX = null;
+  r.stopX = stopFor(r, food);
   r.speed = piggyWalkSpeed(r.target.state.hunger);
   lastEvent = `seek:${food.kind}:${food.kind === 'stack' ? food.id : food.target?.classId}`;
   return true;
@@ -447,7 +555,7 @@ function startSeek(engine, r, food) {
 
 function stepSeek(engine, r, dtMs) {
   const spr = r.target.sprite;
-  const fx = r.food.x;
+  const fx = Number.isFinite(r.stopX) ? r.stopX : r.food.x;
   const dx = fx - spr.x;
   if (Math.abs(dx) <= 6) {
     arrive(engine, r);
@@ -474,7 +582,9 @@ function arriveShared(engine, r) {
     const spr = target.sprite;
     const near = (x, y) => Math.hypot(x - spr.x, (Number.isFinite(y) ? y : spr.y) - spr.y) <= EAT_RADIUS;
     // G335 slice 5: only a shared tree's fruit; a stack only this player sees stays where it is.
-    const trant = fruitingTrants(engine).find((t) => near(t.sprite.x, t.sprite.y));
+    // The tree it walked to (it stops beside it), else one in reach.
+    const walkedTo = r.food?.kind === 'trant' && Number(r.food.target?.state?.fruitCount) > 0 && r.food.target.sprite && !r.food.target.sprite.destroyed ? r.food.target : null;
+    const trant = walkedTo || fruitingTrants(engine).find((t) => near(t.sprite.x, t.sprite.y));
     if (trant && engine.query?.('sharedPiggyAte', target, trant, engine)) {
       // The tree is shared: the server takes the fruit for everyone.
       ate = { kind: 'trant', classTsid: trant.classId };
@@ -500,7 +610,7 @@ function arrive(engine, r) {
     arriveShared(engine, r);
     return;
   }
-  const ate = Number(target.state.hunger) > 0 ? eatNearby(engine, target) : null;
+  const ate = Number(target.state.hunger) > 0 ? eatFood(engine, r.food) || eatNearby(engine, target) : null;
   if (ate) {
     satePiggy(target.state);
     playClip(engine, r, PIGGY_MOOD_SHEETS.chew);
@@ -1132,6 +1242,30 @@ function applyQaParams(engine) {
   lastEvent = `qa:mood=${s.mood}:hunger=${s.hunger}`;
 }
 
+/**
+ * &animalharvest=<hunger>: every street Piggy at that hunger, then the fruiting tree nearest the
+ * player is harvested as a verb would (onEvent), 3 s after arrival (lane PIGSTUCK's repro).
+ */
+let harvestDemoAt = 0;
+function runHarvestDemo(engine) {
+  const h = engine.param('animalharvest');
+  if (h === null || harvestDemoAt < 0) return;
+  if (!harvestDemoAt) {
+    harvestDemoAt = now() + 3000;
+    for (const t of livePiggies(engine)) {
+      t.state.hunger = Math.max(1, Math.min(PIGGY_HUNGER.max - 1, Math.floor(Number(h)) || 6));
+      t.subtitle = animalStatusLabel('npc_piggy', t.state);
+    }
+    return;
+  }
+  if (now() < harvestDemoAt) return;
+  harvestDemoAt = -1;
+  const p = engine.player;
+  const tree = fruitingTrants(engine).sort((a, b) => Math.abs(a.sprite.x - p.x) - Math.abs(b.sprite.x - p.x))[0];
+  if (tree) animalMoodFeature.onEvent(`${tree.classId}:harvest`, 1, engine);
+  lastEvent = tree ? `qa:harvest:${tree.classId}` : 'qa:harvest:none';
+}
+
 /** &animalfood=<class>: drop 3 of it 220 px from the demo piggy, as the player would. */
 function runFoodDemo(engine) {
   if (foodDemoDone || engine.param('animalfood') === null || !qaApplied) return;
@@ -1220,6 +1354,7 @@ export const animalMoodFeature = {
       crowdRespawnDemo(engine);
       liveTicks(engine);
       runFoodDemo(engine);
+      runHarvestDemo(engine);
       // Keep the world labels honest (game.js rewrites them after verbs).
       for (const r of records.values()) {
         if (isRooked(r.target, engine) || crowd.get(r.target)?.mode === 'sad') continue;
@@ -1231,10 +1366,13 @@ export const animalMoodFeature = {
     }
     stepCrowd(engine, { scan });
     watchDrops(engine);
-    const acting = engine.acting();
     for (const r of records.values()) {
       const target = r.target;
       if (!target.sprite || target.sprite.destroyed) continue;
+      // npc.js onInteractionStarting 2191-2200 / npc_animal onWaitStart 2048-2054: a Piggy waits
+      // only for a player at it (its menu, a verb on it), not while you harvest or dig elsewhere.
+      const waiting = typeof engine.actingOn === 'function' ? engine.actingOn(target) : false;
+      const crowdHeld = crowd.get(target)?.mode === 'sad' || crowd.get(target)?.mode === 'leaving';
       if ((r.mode === 'seek' || r.mode === 'eat') && isRooked(target, engine)) {
         // Rooked on the way to food: it stops there (include/rook.js fullStop 53-63) and the Rook
         // feature holds it; a rooked animal goes after no food (npc_animal onContainerItemAdded 1394, 1419).
@@ -1243,12 +1381,19 @@ export const animalMoodFeature = {
         if (time >= r.nextSadAt) sadInterval(engine, r);
         else hold(engine, r);
       } else if (r.mode === 'seek') {
-        if (!acting) stepSeek(engine, r, dtMs);
+        if (!waiting) stepSeek(engine, r, dtMs);
+      } else if (r.mode === 'home') {
+        // A Rook or a sulk on the way home holds it there (include/rook.js fullStop 53-63).
+        if (!waiting && !crowdHeld && !isRooked(target, engine)) stepHome(engine, r, dtMs);
       } else if (r.mode === 'eat' && time >= r.holdUntil) {
         release(engine, r);
       } else if (r.mode === 'eat') {
         // onFoodPathing 1485-1513: chew, then stand idle until startMoving 3 s on; never a walk in place.
         standStill(engine, r);
+      } else if (scan && r.mode === 'idle' && !isExtra(target) && !crowdHeld && !waiting && Number(target.sprite.range) < HELD_RANGE_PX && !isRooked(target, engine)) {
+        // Nothing holds it any more (no food walk, no sulk, no Rook), yet it stands: it walks again.
+        release(engine, r);
+        lastEvent = 'walk:unstuck';
       }
       if (target.state.croaking && Number(target.state.hunger) >= PIGGY_HUNGER.max) {
         if (r.nextCroakAt && time >= r.nextCroakAt) {

@@ -795,10 +795,13 @@ export function planStreetPlacements(
         const score = nearest + centerBias + edgeBias + jitter;
         const perch = !perching && (candidate.under || 0) >= footprint;
         // Big scenery: a clear perch before a crowded floor; a walking animal stays on
-        // the floor while it has room, crowded or not (it walks off as others come).
+        // the floor while it has room, crowded or not (it walks off as others come),
+        // never planted in a tree, rock or stall or on another walker, and, before a
+        // crowded spot, its walk clear of them (walkInScenery).
+        const scenery = walker ? walkInScenery(candidate, request.key, occupied) : 0;
         const tier = (footprint > 0
-          ? walker ? (perch ? 2 : 0) + (nearest < 1 ? 1 : 0) : (perch ? 1 : 0) + (nearest < 1 ? 2 : 0)
-          : 0) + (covers.has(candidate.id) ? 4 : 0);
+          ? walker ? (perch ? 8 : 0) + (scenery === 2 ? 4 : 0) + (nearest < 1 ? 2 : 0) + (scenery === 1 ? 1 : 0) : (perch ? 1 : 0) + (nearest < 1 ? 2 : 0)
+          : 0) + (covers.has(candidate.id) ? (walker ? 16 : 4) : 0);
         if (tier < bestTier || (tier === bestTier && score > bestScore)) {
           bestTier = tier;
           bestScore = score;
@@ -816,6 +819,46 @@ export function planStreetPlacements(
   }
 
   return { seed: String(seed), groups, occupied, candidateCount: candidates.length, fallbacks, perches, blocked };
+}
+
+/** How near a walk may come to big scenery on its own floor (px up or down: a sloped floor). */
+export const WALK_FLOOR_DY = 40;
+/** How near the arrival point (the plan's player) a walking animal may be planted. */
+export const WALK_ARRIVAL_PX = 140;
+const SCENERY_KEYS = Object.freeze(['trees', 'gardens', 'vendor', 'shrine', 'rocks']);
+
+/**
+ * A walking animal's spot against the big scenery already placed (lane PIGSTUCK, 2026-11-01:
+ * Piggies parked in a Bean Tree on Groddle Forest Junction): 0 when its whole walk (body and
+ * patrol both ways, animalPatrolRange on the spot's room) keeps clear of every tree, rock,
+ * garden, vendor and shrine footprint on its floor, 1 when its walk reaches into one, 2 when the
+ * spot itself is inside one, on another walking animal or at the arrival point. The original's animals were set down by hand (npc_piggy.js 2955
+ * obey_physics false) and walked their whole floor past trees (startMoving 2600-2700); the
+ * remake's walk is a short patrol, so it is planned clear of them.
+ */
+export function walkInScenery(point, key, placed = []) {
+  const range = animalPatrolRange(key, point?.room);
+  const body = (ANIMAL_BODY[key] || 0) / 2;
+  let worst = 0;
+  for (const other of placed || []) {
+    if (!Number.isFinite(other?.x) || !Number.isFinite(other?.y) || Math.abs(other.y - point.y) > WALK_FLOOR_DY) continue;
+    // Where players arrive: not planted there either (a walk may pass it).
+    if (other.key === 'player') {
+      if (Math.abs(point.x - other.x) < WALK_ARRIVAL_PX) return 2;
+      continue;
+    }
+    // Another walker: never planted on top of it (they walk through each other, as the original's did).
+    if (ANIMAL_BODY[other.key]) {
+      if (Math.abs(point.x - other.x) < (ANIMAL_BODY[other.key] + (ANIMAL_BODY[key] || 0)) / 2) return 2;
+      continue;
+    }
+    if (!SCENERY_KEYS.includes(other.key)) continue;
+    const reach = (PLACEMENT_FOOTPRINTS[other.key] || 0) / 2 + body;
+    if (Math.abs(point.x - other.x) < reach) return 2;
+    if (Math.abs(point.x - range - other.x) < reach || Math.abs(point.x + range - other.x) < reach
+      || (point.x - range < other.x && point.x + range > other.x)) worst = 1;
+  }
+  return worst;
 }
 
 export function nearestPlacementGap(plan, fromKey, toKeys = null) {

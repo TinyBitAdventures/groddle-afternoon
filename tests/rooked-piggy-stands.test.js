@@ -3,8 +3,8 @@
 // (no food while rooked), npc_piggy.js onRevived 1090-1095 (startMoving).
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createAnimalState } from '../public/js/animals.js?v=8fd74f3e';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=796b8d21';
+import { createAnimalState } from '../public/js/animals.js?v=7f5e5a98';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=94869468';
 import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=15eda966';
 
 const TSID = 'GLI2HVHUM4F16B0'; // Pasha's Place, Groddle Forest: where Austin met it
@@ -114,10 +114,11 @@ describe('a Piggy that reached its food', () => {
       pig.sprite.x += pig.sprite.vx * (ms / 16);
     };
     tick();
-    pig.sprite.x = tree.sprite.x + 40; // close by, so it gets there at once
+    pig.sprite.x = tree.sprite.x + 140; // close by, so it gets there at once
     animalMoodFeature.sharedAnimalEvent(pig, { ev: 'ate', on: tree }, engine);
     for (let i = 0; i < 4; i += 1) tick();
-    assert.ok(Math.abs(pig.sprite.x - tree.sprite.x) < 7, 'it reached the tree');
+    // Lane PIGSTUCK: beside the tree's foot (TREE_FOOTPRINT / 2 + half its body), not in its trunk.
+    assert.ok(Math.abs(pig.sprite.x - (tree.sprite.x + 120)) < 7, `it reached the tree: ${pig.sprite.x}`);
     // The chew clip plays first when its frames have loaded (they load in the background, so a
     // loaded machine may not have them yet): end it as Pixi would, back to the walk frames.
     pig.sprite.onComplete?.();
@@ -126,6 +127,12 @@ describe('a Piggy that reached its food', () => {
     clock += 3100;
     tick();
     assert.equal(playing, true, 'it walks on after the pause');
+    // Home to its own walk (lane PIGSTUCK: it does not live at the tree), then its patrol.
+    const x = pig.sprite.x;
+    tick();
+    assert.ok(pig.sprite.x > x, 'it walks home');
+    for (let i = 0; i < 40; i += 1) tick();
+    assert.equal(pig.sprite.baseX, 4400);
     assert.ok(Math.abs(pig.sprite.vx) >= 0.4);
     animalMoodFeature.onStreetClear();
     } finally {
