@@ -53,7 +53,7 @@ import {
   tickQuestTimers,
   restartTimedQuest,
   questTimerStatus,
-} from '../public/js/quest-offers.js?v=ada47e25';
+} from '../public/js/quest-offers.js?v=0bbc4098';
 import { XP_FOR_LEVEL } from '../public/js/progression.js?v=33462eaa';
 
 const CONTENT = join(dirname(fileURLToPath(import.meta.url)), '../public/assets/content');
@@ -160,8 +160,11 @@ describe('pendingQuestOffers triggers', () => {
   it('offers skill-map quests on learning the skill and gates prereq chains', () => {
     const state = createQuestState();
     const pc = freshPc();
-    let pending = ids(pendingQuestOffers(state, pc, { skills: ['ezcooking_1', 'ezcooking_2'], level: 3 }));
-    // ezcooking_1 is a newxp tutorial; its prereq is satisfied by the skill (prereqProxy).
+    const inv = { knife_and_board: 1 };
+    // Ticket 28: without the tutorial's tool (the original's practice quest hands it out) nothing yet.
+    assert.ok(!ids(pendingQuestOffers(state, pc, { skills: ['ezcooking_1'], level: 3 })).includes('ezcooking_make_level1_recipes'));
+    let pending = ids(pendingQuestOffers(state, pc, { skills: ['ezcooking_1', 'ezcooking_2'], level: 3, inv }));
+    // ezcooking_1 is a newxp tutorial; its prereq is satisfied by the skill and its Knife & Board (prereqProxy).
     assert.ok(pending.includes('ezcooking_make_level1_recipes'));
     assert.ok(!pending.includes('ezcooking_make_level2_recipes'));
     assert.equal(
@@ -170,9 +173,25 @@ describe('pendingQuestOffers triggers', () => {
     );
     assignQuest(state, 'ezcooking_make_level1_recipes', { ignorePrereq: true });
     completeQuest(state, 'ezcooking_make_level1_recipes', null);
-    pending = ids(pendingQuestOffers(state, pc, { skills: ['ezcooking_1', 'ezcooking_2'], level: 3 }));
+    pending = ids(pendingQuestOffers(state, pc, { skills: ['ezcooking_1', 'ezcooking_2'], level: 3, inv }));
     assert.ok(pending.includes('ezcooking_make_level2_recipes'));
     assert.ok(!pending.includes('ezcooking_make_level1_recipes'));
+  });
+
+  it('offers Give some H2O love only with a Watering Can, as Lift Your Light Green Thumb handed one out (ticket 28)', () => {
+    // lightgreenthumb_water_trees.js 17 prereq_quests lightgreenthumb_1, whose practice street gives the can
+    // (skillquest_lgt_v2.js 144-148); its offer: "Now that you have a Watering Can" (line 3).
+    const state = createQuestState();
+    const pc = freshPc();
+    const offered = (ctx) => ids(pendingQuestOffers(state, pc, { level: 3, ...ctx })).includes('lightgreenthumb_water_trees');
+    assert.equal(offered({ skills: ['light_green_thumb_1'] }), false);
+    assert.equal(offered({ skills: ['light_green_thumb_1'], inv: { watering_can: 0 } }), false);
+    assert.equal(offered({ skills: ['light_green_thumb_1'], inv: { watering_can: 1 } }), true);
+    assert.equal(offered({ inv: { watering_can: 1 } }), false, 'and the skill');
+    // Chosen on Gentle Island the tutorial quest is given finished (magic_rock.js 655): that counts on its own.
+    assignQuest(state, 'lightgreenthumb_1', { ignorePrereq: true });
+    completeQuest(state, 'lightgreenthumb_1', null);
+    assert.equal(offered({ skills: ['light_green_thumb_1'] }), true);
   });
 
   it('checks the original prerequisites gate list (level, achievement, skills)', () => {

@@ -310,6 +310,8 @@ export function questStatus(questState, classTsid) {
 function questDone(questState, classTsid, ctx) {
   if ((questState.completed || []).includes(classTsid)) return true;
   const proxy = getQuestCatalog()[classTsid]?.prereqProxy;
+  // Ticket 28: and the tool the tutorial handed out, when it has one (build-quests.mjs PREREQ_PROXY).
+  if (proxy?.item && !(countIn(ctx.inv, proxy.item, ctx) > 0)) return false;
   return Boolean(proxy?.skill && asSet(ctx.skills).has(proxy.skill));
 }
 

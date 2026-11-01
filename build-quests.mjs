@@ -274,12 +274,20 @@ const CUSTOM = new Set([
 ]);
 // Tutorial quests that the original hands out finished (magic_rock.js
 // quests_give_finished) or runs in newxp instances. Prereqs on them are
-// satisfied by the skill they introduce.
+// satisfied by the skill they introduce, and by the tool they hand out where
+// there is one: learnt outside newxp the original offers the tutorial quest
+// itself (inc_skills.js 1491-1504, quests_offer(..., true)), whose practice
+// street gives the tool (skillquest_lgt_v2.js items_added watering_can), and
+// only its completion offers the next quest (lightgreenthumb_1.js
+// onComplete_custom; quests_offer checks prereq_quests, inc_quests.js
+// 586-593). The remake has no route to those practice quests after newxp, so
+// the next quest waits until the player holds the tool its offer names
+// ("Now that you have a Watering Can", lightgreenthumb_water_trees.js 3).
 const PREREQ_PROXY = {
   animalkinship_1: { skill: 'animalkinship_1' },
-  ezcooking_1: { skill: 'ezcooking_1' },
-  lightgreenthumb_1: { skill: 'light_green_thumb_1' },
-  soilappreciation_1: { skill: 'soil_appreciation_1' },
+  ezcooking_1: { skill: 'ezcooking_1', item: 'knife_and_board' },
+  lightgreenthumb_1: { skill: 'light_green_thumb_1', item: 'watering_can' },
+  soilappreciation_1: { skill: 'soil_appreciation_1', item: 'shovel' },
 };
 const EXCLUDE = {
   // The 2011 Magic Rock tutorial chain: nothing in the final source starts learn_first_skill, and only it

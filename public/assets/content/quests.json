@@ -4401,7 +4401,8 @@
    }
   ],
   "prereqProxy": {
-   "skill": "ezcooking_1"
+   "skill": "ezcooking_1",
+   "item": "knife_and_board"
   },
   "solo": true,
   "custom": true
@@ -28779,7 +28780,8 @@
    }
   ],
   "prereqProxy": {
-   "skill": "light_green_thumb_1"
+   "skill": "light_green_thumb_1",
+   "item": "watering_can"
   },
   "solo": true,
   "custom": true
@@ -32501,7 +32503,8 @@
    }
   ],
   "prereqProxy": {
-   "skill": "soil_appreciation_1"
+   "skill": "soil_appreciation_1",
+   "item": "shovel"
   },
   "solo": true
  },

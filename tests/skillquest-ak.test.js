@@ -32,7 +32,7 @@ import {
 } from '../public/js/skillquest-ak.js?v=281b956d';
 import { listAnimalFeedOptions } from '../public/js/animals.js?v=cad23774';
 import { populationForStreet } from '../public/js/street-ecology.js?v=315ff68c';
-import { newxpFeature } from '../public/js/features/newxp-feature.js?v=ae1a6cb3';
+import { newxpFeature } from '../public/js/features/newxp-feature.js?v=74a34afe';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');

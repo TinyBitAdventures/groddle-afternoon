@@ -40,7 +40,7 @@
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=85d4faba';
 import { OVERLAY_USES, playWindowOverlay } from '../overlays.js?v=90f4b1ba';
-import { acceptOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js?v=ada47e25';
+import { acceptOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js?v=0bbc4098';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { parseQuestConversation } from '../quests.js?v=282e1621';
 import { HELL_LOCATION, HELL_QUESTS, isInHell, isInHellOne } from '../hell.js?v=393c3c7f';

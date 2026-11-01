@@ -118,7 +118,7 @@
       "assets/content/buffs.json": "70ea503c",
       "assets/content/deco-catalog.json": "103c9068",
       "assets/content/puzzle-triggers.json": "09810451",
-      "assets/content/quests.json": "005211b8",
+      "assets/content/quests.json": "d37c15d2",
       "assets/content/signpost-graph.json": "1ea27669",
       "assets/content/street-ecology.json": "6b83824c",
       "assets/content/style-profiles.json": "3aaf04c4",
