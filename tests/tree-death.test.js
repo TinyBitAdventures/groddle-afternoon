@@ -41,7 +41,7 @@ import {
 } from '../public/js/tree-poison.js?v=f6e01177';
 import { createPlot, killPlotTree, performPlotVerb, growTree } from '../public/js/patches.js?v=d8f9ceff';
 import { createFeatureHost } from '../public/js/feature-host.js?v=e4f648b1';
-import { FEATURES } from '../public/js/features/index.js?v=0781e1e0';
+import { FEATURES } from '../public/js/features/index.js?v=88d7e394';
 import { adoptedPlan } from '../public/js/features/patches-feature.js?v=762bbde9';
 import { patchesFeature } from '../public/js/features/patches-feature.js?v=762bbde9';
 import {

@@ -8,7 +8,9 @@
  *   animals on their street, from the site's view of the owner's stored save
  *   (groddle-afternoon-site src/HomeYard.php, GET homes/<owner>/yard), and
  *   gives them the source's verbs: a Patch's dig and tend run here on a copy
- *   of the owner's plot (js/patches.js, as the patches feature runs them);
+ *   of the owner's plot (js/patches.js, as the patches feature runs them),
+ *   and so do a Seedling's pet and planting a bean of your own (HOMES2: the
+ *   planting asks the site first, which takes the bean from your ledger);
  *   trees and animals are ordinary trant / wood_tree / npc_* targets, so the
  *   game's own pet, water, harvest, nibble, massage, milk and squeeze run on
  *   a copy carrying the visitor's own uses today. What only an owner may do
@@ -56,10 +58,10 @@ import { trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=38730935';
 import { animalStatusLabel } from '../animals.js?v=378af814';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
-import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=bb8b2151';
+import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=9afaa75d';
 import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=6c0f9284';
+import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=4d480822';
 import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=762bbde9';
 import {
   YARD_STREET,
@@ -76,8 +78,9 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=1eeb68de';
+} from '../yard-verbs-mp.js?v=f581690f';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { countItem, removeItem } from '../inventory.js?v=91ee49cd';
 import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=e356fe60';
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=a08218e0';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
@@ -91,7 +94,7 @@ import {
   normalizeStockView,
   visitorNode,
   visitorRock,
-} from '../yard-stock-mp.js?v=f83f17de';
+} from '../yard-stock-mp.js?v=c3e3449f';
 
 export { YARD_VERBS_MP_ID };
 
@@ -485,6 +488,10 @@ function createSession(engine, client) {
       const def = getResourceNodeDef(n?.classTsid);
       if (n && def) n.units = Math.max(Number(n.units) || 0, def.stock.harvestableAt);
     }
+    // HOMES2: a whistle catches the Firefly asked for and those near it (resource-nodes harvestResourceNode).
+    const flies = ask.kind === 'node' && String(ask.id).startsWith('node:npc_firefly:')
+      ? [...visit.nodes.values()].filter((e) => e.id !== ask.id && e.node && !e.node.depleted)
+      : [];
     grant = { target: t, verbId: ask.verbId, chunks: ask.kind === 'rock' && took > 0 ? took : undefined };
     try {
       engine.executeVerb?.(t, ask.verbId, { animated: true });
@@ -492,6 +499,8 @@ function createSession(engine, client) {
       grant = null;
     }
     setLeft(ask.kind, ask.id, act.left, Number(act.at) || Date.now());
+    // Each other Firefly the whistle took is told to the site after it (the site keeps the hive's count and the jar's pay).
+    for (const e of flies) if (e.node.depleted) send('node', e.id, 'open');
   }
 
   async function loadVisit(tsid) {
@@ -605,7 +614,8 @@ function createSession(engine, client) {
       upgrades: engine.pc?.imaginationUpgrades || [],
       buffs: engine.activeBuffIds?.() || [],
       toolState: engine.toolState,
-      hubId: null,
+      // patch.js canPlant: any bean grows on a home street ("everything is ok in new POLs").
+      hubId: 'home',
       now: Date.now(),
       owner: false,
     };
@@ -620,13 +630,14 @@ function createSession(engine, client) {
     const e = plotOf(target);
     if (!e) return [];
     return plotVerbs(e.plot, plotCtx())
-      .filter((v) => v.id === 'tend' || v.id === 'dig')
+      .filter((v) => v.id === 'tend' || v.id === 'dig' || v.id === 'pet' || v.id === 'plant' || v.id.startsWith('plant:'))
       .map((v) => ({ id: v.id, label: v.label, enabled: v.enabled, tooltip: v.tooltip, reason: v.reason, energy: v.energy || 0, durationMs: v.enabled ? v.durationMs || 0 : 0 }));
   }
 
   function runVerb(target, verbId) {
     const e = plotOf(target);
     if (!e) return false;
+    if (String(verbId).startsWith('plant:')) return askPlant(e, verbId);
     const result = performPlotVerb(e.plot, verbId, plotCtx());
     const x = e.sprite?.x ?? 0;
     const y = e.sprite?.y ?? STREET_GROUND_Y;
@@ -646,7 +657,7 @@ function createSession(engine, client) {
     if (p && result.costs?.mood) engine.floatText?.(p.x + 20, p.y - 90, `+${result.costs.mood} mood`, 0xffe066);
     if (p && result.costs?.xp) engine.floatText?.(p.x - 20, p.y - 90, `+${result.costs.xp} iMG`, 0xb388ff);
     for (const row of result.counters || []) engine.achievement?.(row.counter, row.amount);
-    engine.playSound?.(verbId === 'dig' ? 'SHOVEL' : 'HOE', { volume: 0.6, jitter: 0.05 });
+    if (verbId !== 'pet') engine.playSound?.(verbId === 'dig' ? 'SHOVEL' : 'HOE', { volume: 0.6, jitter: 0.05 });
     engine.refreshPack?.();
     redrawPlot(e);
     engine.save?.();
@@ -654,11 +665,81 @@ function createSession(engine, client) {
     return true;
   }
 
+  /**
+   * HOMES2: planting your bean in their Patch asks the site first (the bean
+   * leaves your ledger there, once); on its yes the copy becomes your
+   * Seedling (js/patches.js plant, on a scratch pack: the bean leaves your
+   * own pack through the receipt).
+   */
+  function askPlant(e, verbId) {
+    const bean = String(verbId).slice(6);
+    if (countItem(engine.inv, bean) < 1) return true;
+    if (client.state !== 'online') {
+      notice(T.offline);
+      return true;
+    }
+    for (const a of sent.values()) if (a.plant) return true;
+    req += 1;
+    const ask = { owner: visit.owner, kind: 'plot', id: e.key, verb: 'plant', plant: bean, verbId, at: Date.now() };
+    sent.set(req, ask);
+    const n = req;
+    const go = () => {
+      if (sent.get(n) !== ask) return;
+      client.send('home_yard', { req: n, owner: ask.owner, kind: 'plot', id: e.key, verb: 'plant', what: bean });
+    };
+    // The ledger counts what the last save held: write it first, then ask.
+    const f = saveStore?.flush?.();
+    if (f?.then) f.then(go, go);
+    else go();
+    last = `sent:plot:${e.key}:plant`;
+    publish();
+    return true;
+  }
+
+  /** A settled move of the site's (a planting's bean), once (the trade slice's applied list). */
+  function applySpend(r) {
+    if (!r?.op || engine.query?.('ledgerReceipt', String(r.op), engine) === false) return false;
+    for (const row of Array.isArray(r.gave?.items) ? r.gave.items : []) {
+      const c = String(row?.c || '');
+      const n = Math.max(0, Math.floor(Number(row?.n) || 0));
+      if (c && n) removeItem(engine.inv, c, Math.min(n, countItem(engine.inv, c)));
+    }
+    engine.refreshPack?.();
+    return true;
+  }
+
+  function planted(ask, msg) {
+    applySpend(msg.receipt);
+    const e = visit?.plots.get(ask.id);
+    if (!e) return;
+    const result = performPlotVerb(e.plot, ask.verbId, { ...plotCtx(), inv: { [ask.plant]: 1 } });
+    if (!result.ok) return;
+    engine.pushActivity?.(result.activity);
+    for (const row of result.counters || []) engine.achievement?.(row.counter, row.amount);
+    engine.playSound?.('HOE', { volume: 0.6, jitter: 0.05 });
+    redrawPlot(e);
+    engine.save?.();
+  }
+
   // —— The server's answers ——
 
   client.on('msg:home_yard_done', (msg) => {
     const ask = sent.get(Number(msg.req));
     sent.delete(Number(msg.req));
+    if (ask?.plant) {
+      if (msg.status === 'settled') {
+        sentOk += 1;
+        last = `ok:plot:${ask.id}:plant`;
+        planted(ask, msg);
+      } else {
+        last = `no:plot:${ask.id}:plant:${msg.why || ''}`;
+        notice(msg.text || T.failed);
+        engine.playSound?.('CLICK_FAILURE', { volume: 0.45 });
+        refreshVisit();
+      }
+      publish();
+      return;
+    }
     if (ask?.stock && visit && Number(msg.owner) === visit.owner && engine.streetTsid === visit.tsid) {
       if (msg.status === 'settled') {
         sentOk += 1;
@@ -753,7 +834,7 @@ function createSession(engine, client) {
       appliedCount += 1;
       last = `applied:${act.kind}:${act.target}:${act.verb}`;
       if (!changed) continue;
-      const line = T.acted(act.from.name, act.verb, changed.what);
+      const line = changed.planted ? T.planted(act.from.name, changed.planted) : T.acted(act.from.name, act.verb, changed.what);
       lastLine = line;
       engine.pushActivity?.(line);
       if (!here) continue;
@@ -825,7 +906,7 @@ function createSession(engine, client) {
   function tickStock() {
     const wall = Date.now();
     for (const [r, a] of sent) {
-      if (a.stock && wall - a.at > ASK_MS) {
+      if ((a.stock || a.plant) && wall - a.at > ASK_MS) {
         sent.delete(r);
         notice(T.failed, 2400);
       }

@@ -156,7 +156,6 @@ import {
   dispatcherRx,
   isBackYard,
   nearestFreeRx,
-  FIREFLY_HIVE,
   addWear,
   createCultivationState,
   depleteCultivation,
@@ -172,7 +171,7 @@ import {
   cultivationDef,
   expandYard,
   footprint,
-  hiveFireflyCount,
+  hiveFireflySpots,
   homeStreetLayout,
   lifespanLeft,
   normalizeCultivationState,
@@ -181,7 +180,7 @@ import {
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=bb8b2151';
+} from '../home-cultivation.js?v=9afaa75d';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=68506420';
 import { DISPATCHER_HALF, DISPATCHER_TEXT, dispatcherFits, savedDispatcherRx, signpostX, streetFixtures } from '../home-street-fixtures.js?v=26bb21a8';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
@@ -341,15 +340,7 @@ export function cultivationNodes(item, now = Date.now()) {
       dy: node.dy,
     }));
   }
-  if (def.kind === 'hive') {
-    const n = hiveFireflyCount(item, now);
-    const out = [];
-    for (let i = 0; i < n; i += 1) {
-      const a = (i / Math.max(1, n)) * Math.PI * 2 + 0.6;
-      out.push({ classTsid: 'npc_firefly', dx: Math.round(Math.cos(a) * FIREFLY_HIVE.radius * 0.6), dy: -40 - (i % 3) * 22 });
-    }
-    return out;
-  }
+  if (def.kind === 'hive') return hiveFireflySpots(item, now).map((spot) => ({ classTsid: 'npc_firefly', ...spot }));
   return [];
 }
 

@@ -9,15 +9,28 @@
  * - Piggies: pet, nibble (GameServerJS items/npc_piggy.js 912-960, 818-910)
  * - Butterflies: massage, milk (npc_butterfly.js 753-800, 695-750)
  * - Chickens: squeeze (npc_chicken.js 739-790)
- * - Patches: dig with a shovel, tend with a hoe (patch.js 120-214, 315-380)
+ * - Patches: dig with a shovel, tend with a hoe (patch.js 120-214, 315-380),
+ *   and plant a Seasoned Bean of your own (patch.js verbs.plant 216-310: no
+ *   owner check; the bean leaves your pack, the Seedling is the street's,
+ *   plantBean 742-790, with you as its planter, seedling.owner = pc :747,
+ *   whose grow cards set how soon it grows, patch_seedling.js 218-226)
+ * - Seedlings: pet (patch_seedling.js verbs.pet 77, onPetted 196-250: three
+ *   pets in all, from anyone; a fourth is "You don't need to pet this
+ *   seedling any more. Just wait a few minutes.")
  * - trees grown in them: pet, water, harvest (trant_base 463-600,
- *   include/trants.js), a Wood Tree's pet and water (wood_tree.js 510-570)
+ *   include/trants.js), a Wood Tree's pet, water and harvest (wood_tree.js
+ *   474-560, 510-570: harvest needs a Hatchet, is once a game day per player
+ *   and tree, canHarvest 586-612, gives the harvester Planks by the tree's
+ *   maturity, plankProdMap 880-887, and takes a maturity every second
+ *   harvest, 744-764)
  * The owner keeps what only an owner may do: setting an animal free
  * (set_free: container.owner == pc), removing a Patch (patch.js:63), and a
  * tree's remove, trantsform and poison (owner or key-holder, wood_tree.js
  * 117, 152, 303). Each act by a visitor adds a fixed amount to the owner's
  * Magic Rock pool (locations/inc_cultivation.js cultivation_add_img_rewards
- * 168-178): YARD_POOL below, with each handler's line.
+ * 168-178): YARD_POOL below, with each handler's line. Planting, petting a
+ * Seedling and harvesting a Wood Tree add nothing (no such call in patch.js
+ * plant, patch_seedling.js or wood_tree.js doHarvest).
  *
  * Daily limits are the visitor's own (canPet, canNibble, canHarvest ...:
  * per player and thing, checkSkillPackageOverLimit), so a visitor's copy of
@@ -28,9 +41,9 @@ import { createAnimalState } from './animals.js?v=378af814';
 import { petPiggy } from './animal-mood.js?v=a49495fc';
 import { trantFruitCycle } from './trant-care.js?v=4084db6e';
 import { resetTrantDay } from './trants.js?v=9c2e8c0f';
-import { GROWN_TREE_LABELS, SOIL_TIMERS } from './patches.js?v=d8f9ceff';
+import { GROWN_TREE_LABELS, SEASONED_BEANS, SOIL_TIMERS, seedlingTimings } from './patches.js?v=d8f9ceff';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=edb00566';
-import { isNodeId, isRockId } from './yard-stock-mp.js?v=f83f17de';
+import { isNodeId, isRockId } from './yard-stock-mp.js?v=c3e3449f';
 
 export const YARD_VERBS_MP_ID = 'yard-verbs-mp';
 /** js/features/homes-feature.js HOME_STREET_TSID: where an owner's save keeps the home street. */
@@ -51,6 +64,18 @@ export const YARD_POOL = Object.freeze({
   'trant:harvest': 8, // include/trants.js 420 onHarvestingComplete
   'wood_tree:pet': 3, // wood_tree.js 1018 onTendComplete
   'wood_tree:water': 3, // wood_tree.js 1018 onTendComplete
+  // HOMES2: the rest of the source's payments. A full Firefly Jar on a home street (firefly_jar.js:383
+  // onAttract, pc.location: the whistler's street). Heli Kitties, Batterflies and Icons pay too, but none
+  // can be at a home in the remake yet (animal-husbandry-feature ANIMAL_CLASSES, giant-icons.js), so no act
+  // reaches these: they wait for Austin's word on letting them live at home.
+  'firefly_jar:full': 25, // firefly_jar.js:383
+  'npc_kitty_chicken:squeeze': 4, // npc_kitty_chicken.js:1720 (the Heli Kitty)
+  'npc_batterfly:massage': 4, // npc_batterfly.js:1340 onMassageComplete
+  'npc_batterfly:milk': 4, // npc_batterfly.js:1509 onMilkComplete
+  'icon:ruminate': 10, // include/icon.js:112
+  'icon:revere': 10, // include/icon.js:177
+  'icon:reflect': 10, // include/icon.js:244
+  'icon:tithe': 10, // include/icon.js:327
 });
 
 /** What an Animal Kinship use gives (js/animal-kinship.js performAnimalKinship). */
@@ -65,9 +90,11 @@ export const ANIMAL_VERBS = Object.freeze({
   npc_butterfly: Object.freeze(['massage', 'milk']),
   npc_chicken: Object.freeze(['squeeze']),
 });
-export const PLOT_VERBS = Object.freeze(['tend', 'dig']);
+export const PLOT_VERBS = Object.freeze(['tend', 'dig', 'pet', 'plant']);
 export const TREE_VERBS = Object.freeze(['pet', 'water', 'harvest']);
-export const WOOD_VERBS = Object.freeze(['pet', 'water']);
+export const WOOD_VERBS = Object.freeze(['pet', 'water', 'harvest']);
+/** A planting act's `what`: the bean, and the planter's grow card if any ("bean_fruit" or "bean_fruit:soil_appreciation_bean_grow_1"). */
+export const PLANT_WHAT_RE = /^(bean_[a-z]{2,12})(?::(soil_appreciation_bean_grow_[12]))?$/;
 /** Verbs a visitor may use that change nothing of the owner's. */
 export const LOOK_VERBS = Object.freeze(['talk_to']);
 
@@ -89,6 +116,7 @@ export const YARD_TEXT = Object.freeze({
   offline: 'You are offline.',
   /** What the owner reads of a visitor's act. Our words. */
   acted: (who, verb, what) => `${who} ${DONE_WORD[verb] || verb} your ${what}.`,
+  planted: (who, tree) => `${who} planted a ${tree} in your Patch.`,
   pool: (n) => `+${n} iMG for their Magic Rock`,
 });
 
@@ -181,12 +209,15 @@ export function visitorTreeState(plot, key, mine = {}, now = Date.now()) {
     } else resetTrantDay(state);
   }
   if (tree.classId !== 'wood_tree') state.harvestsToday = Number(mine[`harvest:${key}`]) || 0;
+  // canHarvest (wood_tree.js 586-612): once a game day per player and tree, so the visitor's own.
+  else state.harvestedToday = (Number(mine[`harvest:${key}`]) || 0) >= 1;
   return state;
 }
 
 /** What a visitor's verb changed on a tree copy: [verb, ...]. */
 export function treeSnapshot(state = {}) {
-  return { petted: state?.petted === true, watered: state?.watered === true, harvests: Number(state?.harvestsToday) || 0 };
+  // A trant counts harvestsToday, a Wood Tree its totalHarvests (js/woodcutting.js harvestWoodTree).
+  return { petted: state?.petted === true, watered: state?.watered === true, harvests: (Number(state?.harvestsToday) || 0) + (Number(state?.totalHarvests) || 0) };
 }
 
 export function treeActs(before, after) {
@@ -214,10 +245,12 @@ export function normalizeYardActs(list) {
     const okTarget = { animal: isAnimalId, rock: isRockId, node: isNodeId }[a.kind] || isPlotKey;
     if (!okTarget(a.target)) continue;
     if (!/^[a-z]{2,8}$/.test(String(a.verb || ''))) continue;
+    if (a.verb === 'plant' && !PLANT_WHAT_RE.test(String(a.what || ''))) continue;
     const from = { id: Number(a.from?.id) || 0, name: String(a.from?.name || 'Someone').slice(0, 40) };
     const row = { id: a.id, from, kind: a.kind, target: a.target, verb: a.verb, took: Math.max(0, Math.floor(Number(a.took) || 0)), at: Number(a.at) || Date.now() };
     // MPVISIT: a rock's chunks or a node's uses left once the act landed (the site's word, for the copies).
     if (Number.isInteger(a.left) && a.left >= 0) row.left = a.left;
+    if (a.verb === 'plant') row.what = String(a.what);
     out.push(row);
   }
   return out;
@@ -254,6 +287,40 @@ export function applyYardAct({ plots = {}, animals = [] } = {}, act) {
   if (!plot || typeof plot !== 'object') return null;
   if (act.kind === 'plot') {
     regrow(plot, act.at);
+    if (act.verb === 'pet') {
+      // onPetted: one pet more of three; the third sets the grow level of the planter's card (tickPlot grows it).
+      const s = plot.stage === 'seedling' ? plot.seedling : null;
+      if (!s || s.petted >= SOIL_TIMERS.seedlingPets) return null;
+      s.petted += 1;
+      if (s.petted === SOIL_TIMERS.seedlingPets) {
+        s.thirdPetAt = act.at;
+        s.growLevel = s.upgradeGrowLevel || 0;
+      }
+      return { kind: 'plot', what: 'Seedling', plot };
+    }
+    if (act.verb === 'plant') {
+      // plantBean (patch.js 742-790): the Patch becomes the visitor's Seedling; its timers from the planter's card.
+      const m = PLANT_WHAT_RE.exec(String(act.what || ''));
+      const bean = m ? SEASONED_BEANS[m[1]] : null;
+      if (!bean || plot.stage !== 'clean') return null;
+      const timing = seedlingTimings(m[2] ? [m[2]] : []);
+      plot.stage = 'seedling';
+      plot.since = act.at;
+      plot.dueAt = 0;
+      plot.seedling = {
+        trantClass: bean.trantClass,
+        beanClass: m[1],
+        plantedAt: act.at,
+        minAt: act.at + timing.minMs,
+        maxAt: act.at + SOIL_TIMERS.seedlingMaxMs,
+        upgradeGrowLevel: timing.growLevel,
+        petted: 0,
+        petters: 0,
+        growLevel: 0,
+        thirdPetAt: 0,
+      };
+      return { kind: 'plot', what: 'Patch', planted: GROWN_TREE_LABELS[bean.trantClass] || 'tree', plot };
+    }
     if (act.verb === 'tend' && plot.stage === 'dirty') {
       plot.stage = 'clean';
       plot.since = act.at;
@@ -269,6 +336,16 @@ export function applyYardAct({ plots = {}, animals = [] } = {}, act) {
   if (!tree?.state) return null;
   const s = tree.state;
   const what = GROWN_TREE_LABELS[tree.classId] || 'tree';
+  if (act.verb === 'harvest' && tree.classId === 'wood_tree') {
+    // wood_tree.js 744-764: a maturity off every second harvest, at once at 2 or less; 0 clears it (tickPlot).
+    const m = Number(s.maturity) || 0;
+    if (m <= 0) return null;
+    if (m <= 2 || (Number(s.harvestCount) || 0) !== 0) {
+      s.maturity = m - 1;
+      s.harvestCount = 0;
+    } else s.harvestCount = 1;
+    return { kind: 'tree', what, plot };
+  }
   if (act.verb === 'harvest') {
     s.fruitCount = Math.max(0, (Number(s.fruitCount) || 0) - act.took);
     return { kind: 'tree', what, plot };

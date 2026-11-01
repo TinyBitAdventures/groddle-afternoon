@@ -40,18 +40,29 @@
  * - The site credits the yield it can count (the chunks it rolled; a node's
  *   base yield, objects.go objNodeYield) as a ledger receipt; skill bonuses
  *   and drops go through the visitor's earning budget, as on public streets.
- * - Firefly Hives' Fireflies stay the owner's for now (the jar whistle takes
- *   several at once and pays 25 only when it fills, firefly_jar.js 383).
+ * - HOMES2: a Firefly Hive's Fireflies (firefly_hive.js: one every 60 s up
+ *   to 10 around it) are anyone's to whistle into a Firefly Jar, as on any
+ *   street (firefly_jar.js verbs.open 129-216: no owner check; the
+ *   whistler's Firefly Whistling, energy and jar are their own). Each one
+ *   caught is gone for everyone until the hive's next comes (10 s, the
+ *   remake's Firefly respawn) and wears the hive one use (nodes wear from
+ *   their harvests). A jar filled on a home street pays its owner's pool 25
+ *   (firefly_jar.js:383, onAttract on pc.location). The site cannot see the
+ *   visitor's jar (a tool's state is their own), so every seventh Firefly a
+ *   visitor catches there in a game day counts as a full jar (FIREFLY_JAR_MAX
+ *   7); the owner's own catches pay nothing (inc_cultivation.js:171).
  */
 
-import { cultivationDef } from './home-cultivation.js?v=bb8b2151';
+import { cultivationDef, hiveFireflySpots } from './home-cultivation.js?v=9afaa75d';
 import { createMineRock, tickMineRock } from './mining.js?v=e356fe60';
 import { createResourceNode, getResourceNodeDef, normalizeResourceNode, regrowDelayMs, tickResourceNode } from './resource-nodes.js?v=a08218e0';
 
-/** The node classes a visitor may use on a home street (not the hive's Fireflies). */
-export const STOCK_NODE_CLASSES = Object.freeze(['peat_1', 'dirt_pile', 'mortar_barnacle', 'jellisac']);
-/** A visitor's verb on each. */
-export const STOCK_NODE_VERBS = Object.freeze({ peat_1: 'harvest', dirt_pile: 'dig', mortar_barnacle: 'scrape', jellisac: 'scoop' });
+/** The node classes a visitor may use on a home street (HOMES2: the hive's Fireflies too). */
+export const STOCK_NODE_CLASSES = Object.freeze(['peat_1', 'dirt_pile', 'mortar_barnacle', 'jellisac', 'npc_firefly']);
+/** A visitor's verb on each (a Firefly: open your jar and whistle, firefly_jar.js verbs.open). */
+export const STOCK_NODE_VERBS = Object.freeze({ peat_1: 'harvest', dirt_pile: 'dig', mortar_barnacle: 'scrape', jellisac: 'scoop', npc_firefly: 'open' });
+/** firefly_jar.js FIREFLY_JAR_MAX: a jar holds seven; the seventh a visitor catches at a home in a game day pays the pool (above). */
+export const FIREFLY_JAR_FULL = 7;
 
 /** cultivation_add_img_rewards amounts. */
 export const STOCK_POOL = Object.freeze({
@@ -71,6 +82,8 @@ export const STOCK_NODE_YIELD = Object.freeze({
   dirt_pile: Object.freeze(['earth', 2]),
   mortar_barnacle: Object.freeze(['barnacle', 1]),
   jellisac: Object.freeze(['jellisac_clump', 1]),
+  // A Firefly goes into the whistler's jar, a tool's state: nothing the ledger counts.
+  npc_firefly: null,
 });
 
 /** js/mining.js mineRock: a mined-out rock reforms 45 s on. */
@@ -78,9 +91,9 @@ export const ROCK_RESPAWN_MS = 45000;
 
 const LABEL = Object.freeze({
   rock_metal_1: 'Metal Rock', rock_dullite_1: 'Dullite Rock', rock_beryl_1: 'Beryl Rock', rock_sparkly_1: 'Sparkly Rock',
-  peat_1: 'Peat Bog', dirt_pile: 'Dirt Pile', mortar_barnacle: 'Mortar Barnacle', jellisac: 'Jellisac',
+  peat_1: 'Peat Bog', dirt_pile: 'Dirt Pile', mortar_barnacle: 'Mortar Barnacle', jellisac: 'Jellisac', npc_firefly: 'Firefly',
 });
-const DONE = Object.freeze({ mine: 'mined', harvest: 'harvested', dig: 'dug', scrape: 'scraped', scoop: 'scooped' });
+const DONE = Object.freeze({ mine: 'mined', harvest: 'harvested', dig: 'dug', scrape: 'scraped', scoop: 'scooped', open: 'whistled up' });
 
 export const STOCK_TEXT = Object.freeze({
   acted: (who, verb, what) => `${who} ${DONE[verb] || verb} your ${what}.`,
@@ -111,11 +124,20 @@ export function homeRocks(items = []) {
  * The street's resource nodes a visitor may use, keyed as resource-nodes-feature keys them
  * (`<class>:<n>`, peat_2/3 counted as peat_1; homes-feature nodeKeyMap), each with its cultivation.
  */
-export function homeNodes(items = []) {
+export function homeNodes(items = [], now = Date.now()) {
   const counters = {};
   const out = [];
   for (const row of Array.isArray(items) ? items : []) {
     const def = cultivationDef(row?.protoClass);
+    if (def?.kind === 'hive' && !row.depleted) {
+      // HOMES2: the hive's Fireflies, keyed npc_firefly:<n> as homes-feature nodeKeyMap keys them.
+      for (const spot of hiveFireflySpots(row, now)) {
+        const n = counters.npc_firefly || 0;
+        counters.npc_firefly = n + 1;
+        out.push({ id: `node:npc_firefly:${n}`, key: `npc_firefly:${n}`, classTsid: 'npc_firefly', cls: 'npc_firefly', itemId: row.id, rx: (Number(row.rx) || 0) + spot.dx, dy: spot.dy });
+      }
+      continue;
+    }
     if (!def || def.kind !== 'node' || row.depleted) continue;
     for (const node of def.nodes || []) {
       const cls = String(node.classTsid).startsWith('peat_') ? 'peat_1' : node.classTsid;
@@ -211,7 +233,7 @@ export function applyStockAct({ rocks = [], nodes = {}, items = [] } = {}, act, 
     return { kind: 'rock', what: stockLabel(row.classId), wearItem: row.itemId, rock };
   }
   if (act.kind === 'node') {
-    const row = homeNodes(items).find((r) => r.id === act.target);
+    const row = homeNodes(items, act.at).find((r) => r.id === act.target);
     if (!row) return null;
     let node = normalizeResourceNode(nodes[row.key]);
     if (!node || (node.classTsid !== row.cls && !(row.cls === 'peat_1' && String(node.classTsid).startsWith('peat_')))) {
@@ -225,6 +247,11 @@ export function applyStockAct({ rocks = [], nodes = {}, items = [] } = {}, act, 
     node.units = stock.afterHarvest != null ? stock.afterHarvest : Math.max(stock.min ?? 0, (Number(node.units) || 0) - Math.max(1, stock.consume ?? 1));
     node.totalHarvests = (Number(node.totalHarvests) || 0) + 1;
     if (def?.regrow) node.regrowAt = act.at + regrowDelayMs(def);
+    // A Firefly caught is gone until its respawn (resource-nodes 'respawn' stock).
+    if (def?.respawnMs && node.units <= 0) {
+      node.depleted = true;
+      node.respawnAt = act.at + def.respawnMs;
+    }
     tickResourceNode(node, now);
     return { kind: 'node', what: stockLabel(row.cls), node };
   }

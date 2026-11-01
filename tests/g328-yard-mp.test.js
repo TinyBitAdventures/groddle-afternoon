@@ -25,8 +25,9 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../public/js/yard-verbs-mp.js?v=1eeb68de';
-import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=c22f3739';
+} from '../public/js/yard-verbs-mp.js?v=f581690f';
+import { FIREFLY_JAR_FULL, STOCK_NODE_VERBS, applyStockAct, homeNodes } from '../public/js/yard-stock-mp.js?v=c3e3449f';
+import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=c209bd37';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -53,6 +54,15 @@ describe('the pool amounts are the handlers\' own (GSJS)', () => {
     ['trant:water', 'items/include/trants.js', 196],
     ['trant:harvest', 'items/include/trants.js', 420],
     ['wood_tree:pet', 'items/wood_tree.js', 1018],
+    // HOMES2: the rest of the source's payments (Kitties, Batterflies and Icons are not at a home in the remake yet).
+    ['npc_kitty_chicken:squeeze', 'items/npc_kitty_chicken.js', 1720],
+    ['npc_batterfly:massage', 'items/npc_batterfly.js', 1340],
+    ['npc_batterfly:milk', 'items/npc_batterfly.js', 1509],
+    ['firefly_jar:full', 'items/firefly_jar.js', 383],
+    ['icon:ruminate', 'items/include/icon.js', 112],
+    ['icon:revere', 'items/include/icon.js', 177],
+    ['icon:reflect', 'items/include/icon.js', 244],
+    ['icon:tithe', 'items/include/icon.js', 327],
   ];
   for (const [key, file, line] of cases) {
     it(`${key} is ${YARD_POOL[key]} (${file}:${line})`, () => {
@@ -65,8 +75,8 @@ describe('the pool amounts are the handlers\' own (GSJS)', () => {
     const butterfly = readFileSync(join(gsjs, 'items/npc_butterfly.js'), 'utf8');
     assert.match(butterfly, /verbs\.set_free[\s\S]{0,900}this\.container\.owner != pc/);
     assert.deepEqual(allowedVerbs('animal', 'npc_piggy'), ['pet', 'nibble', 'talk_to']);
-    assert.deepEqual(allowedVerbs('tree', 'wood_tree'), ['pet', 'water', 'talk_to']);
-    assert.deepEqual(allowedVerbs('plot', 'patch'), ['tend', 'dig']);
+    assert.deepEqual(allowedVerbs('tree', 'wood_tree'), ['pet', 'water', 'harvest', 'talk_to']);
+    assert.deepEqual(allowedVerbs('plot', 'patch'), ['tend', 'dig', 'pet', 'plant']);
     assert.equal(poolKey('tree', 'trant_fruit', 'harvest'), 'trant:harvest');
     assert.equal(poolKey('plot', 'patch_dark', 'dig'), 'patch:dig');
   });
@@ -133,6 +143,70 @@ describe('the owner\'s game applies what visitors did', () => {
     assert.equal(v.animals.length, 1);
     assert.deepEqual(v.mine, { 'pet:a1': 1 });
     assert.equal(normalizeYardView({ owner: 0 }), null);
+  });
+});
+
+describe('HOMES2: Wood Tree harvest, Seedling petting and planting on a visit', () => {
+  const gs = (file) => readFileSync(join(gsjs, file), 'utf8');
+  it('none of them adds to the pool, and none asks for the owner (GSJS)', () => {
+    const wood = gs('items/wood_tree.js');
+    const harvest = wood.slice(wood.indexOf('function doHarvest'), wood.indexOf('function onDie'));
+    assert.doesNotMatch(harvest, /cultivation_add_img_rewards/);
+    assert.match(wood, /if \(this\.intervals\[today\]\[pc\.tsid\] >= 1\)\{/, 'once a game day per player (canHarvest)');
+    const plant = gs('items/patch.js').split('\n').slice(215, 310).join('\n');
+    assert.doesNotMatch(plant, /pols_is_owner|acl_keys/);
+    assert.match(gs('items/patch_seedling.js'), /You don't need to pet this seedling any more\. Just wait a few minutes\./);
+    assert.deepEqual(['plant', 'pet'].map((v) => YARD_POOL[`patch:${v}`]), [undefined, undefined]);
+    assert.ok(allowedVerbs('tree', 'wood_tree').includes('harvest'));
+  });
+  it('a Wood Tree copy is harvested today only by me; the owner\'s tree loses a maturity every second harvest', () => {
+    const plot = { stage: 'tree', tree: { classId: 'wood_tree', resetAt: Date.now(), state: { maturity: 5, harvestCount: 0, harvestedToday: true, totalHarvests: 3 } } };
+    assert.equal(visitorTreeState(plot, 'patch:1', {}).harvestedToday, false, 'the owner harvested, I did not');
+    assert.equal(visitorTreeState(plot, 'patch:1', { 'harvest:patch:1': 1 }).harvestedToday, true);
+    assert.deepEqual(treeActs(treeSnapshot({ totalHarvests: 3 }), treeSnapshot({ totalHarvests: 4 })), ['harvest']);
+    const own = { plots: { 'patch:1': JSON.parse(JSON.stringify(plot)) } };
+    const act = (n) => ({ id: `yd-00000000000000${n}0`, from: { id: 9, name: 'Bo' }, kind: 'tree', target: 'patch:1', verb: 'harvest', took: 0, at: Date.now() });
+    applyYardAct(own, act(1));
+    assert.deepEqual([own.plots['patch:1'].tree.state.maturity, own.plots['patch:1'].tree.state.harvestCount], [5, 1]);
+    applyYardAct(own, act(2));
+    assert.deepEqual([own.plots['patch:1'].tree.state.maturity, own.plots['patch:1'].tree.state.harvestCount], [4, 0]);
+    assert.equal(own.plots['patch:1'].tree.state.harvestedToday, true, 'the owner\'s own harvest today is the owner\'s');
+  });
+  it('a visitor\'s bean becomes a Seedling with the planter\'s card; three pets in all', () => {
+    const plots = { 'patch:0': { classTsid: 'patch', kind: 'patch', stage: 'clean', since: 0, dueAt: Date.now() + 60000 } };
+    const at = Date.now();
+    const [plant] = normalizeYardActs([{ id: 'yd-00000000000000a1', from: { id: 9, name: 'Bo' }, kind: 'plot', target: 'patch:0', verb: 'plant', what: 'bean_fruit:soil_appreciation_bean_grow_1', took: 0, at }]);
+    const changed = applyYardAct({ plots }, plant);
+    assert.equal(changed.planted, 'Fruit Tree');
+    const s = plots['patch:0'].seedling;
+    assert.deepEqual([plots['patch:0'].stage, s.trantClass, s.beanClass, s.minAt - at, s.upgradeGrowLevel], ['seedling', 'trant_fruit', 'bean_fruit', 3 * 60000, 3]);
+    assert.equal(normalizeYardActs([{ ...plant, id: 'yd-00000000000000a2', what: 'cherry' }]).length, 0, 'a planting names a bean');
+    for (let i = 0; i < 4; i += 1) applyYardAct({ plots }, { id: `yd-00000000000000b${i}`, kind: 'plot', target: 'patch:0', verb: 'pet', at: at + i });
+    assert.deepEqual([s.petted, s.growLevel, s.thirdPetAt], [3, 3, at + 2]);
+    assert.equal(applyYardAct({ plots: { 'patch:0': { stage: 'dirty' } } }, plant), null, 'only a tended Patch takes a bean');
+  });
+});
+
+describe('HOMES2: the Firefly Hive whistle on a visit', () => {
+  const gs = (file) => readFileSync(join(gsjs, file), 'utf8');
+  it('anyone may whistle; a full jar on a home street pays its pool 25 (firefly_jar.js 129-216, 377-385)', () => {
+    const jar = gs('items/firefly_jar.js');
+    const open = jar.slice(jar.indexOf('verbs.open = {'), jar.indexOf('};', jar.indexOf('verbs.open = {')));
+    assert.doesNotMatch(open, /pols_is_owner|acl_keys/);
+    assert.match(jar.split('\n')[382], /pc\.location\.cultivation_add_img_rewards\(pc, 25\.0\)/);
+    assert.equal(FIREFLY_JAR_FULL, 7);
+    assert.equal(STOCK_NODE_VERBS.npc_firefly, 'open');
+  });
+  it('a hive\'s Fireflies are nodes a visitor sees, one a minute up to ten; one caught is gone until it comes back', () => {
+    const now = 1_000_000_000;
+    const items = [{ id: 7, protoClass: 'proto_firefly_hive', endClass: 'firefly_hive', rx: 300, placedAt: now - 150_000 }];
+    const rows = homeNodes(items, now);
+    assert.deepEqual(rows.map((r) => r.id), ['node:npc_firefly:0', 'node:npc_firefly:1', 'node:npc_firefly:2']);
+    assert.equal(homeNodes([{ ...items[0], placedAt: 0 }], now).length, 10);
+    const nodes = {};
+    const changed = applyStockAct({ nodes, items }, { kind: 'node', target: 'node:npc_firefly:1', verb: 'open', at: now, took: 1 }, now);
+    assert.equal(changed.what, 'Firefly');
+    assert.deepEqual([nodes['npc_firefly:1'].units, nodes['npc_firefly:1'].depleted, nodes['npc_firefly:1'].respawnAt], [0, true, now + 10000]);
   });
 });
 
@@ -203,6 +277,34 @@ describe('the site decides (src/HomeYard.php)', { skip: skipSite }, () => {
     assert.deepEqual(judge(owner, [], {}, ['gardening_1'], 'tree', 'patch:1', 'harvest'), { pool: 'trant:harvest', took: 5, got: { cherry: 5 } }, 'no more than the tree holds');
     assert.equal(judge(owner, [], { 'harvest:patch:1': 1 }, [], 'tree', 'patch:1', 'harvest').why, 'limit');
     assert.equal(judge(owner, [], {}, [], 'tree', 'patch:1', 'poison').why, 'gone');
+  });
+  it('HOMES2: a Wood Tree harvest is mine once a day, its Planks by maturity; a Seedling takes three pets; a bean goes in a tended Patch only', () => {
+    const wood = { ...owner, world: { streets: { RH_HOME_EXT: { features: { patches: { plots: {
+      'patch:0': { classTsid: 'patch', kind: 'patch', stage: 'clean', since: 0, dueAt: now + 60000 },
+      'patch:1': { stage: 'tree', tree: { classId: 'wood_tree', resetAt: now, state: { maturity: 4, harvestCount: 1 } } },
+    } } } } } } };
+    assert.deepEqual(judge(wood, [], {}, [], 'tree', 'patch:1', 'harvest'), { pool: 'wood_tree:harvest', got: { plank: 50 } });
+    assert.equal(judge(wood, [], { 'harvest:patch:1': 1 }, [], 'tree', 'patch:1', 'harvest').text, 'You can only harvest from this tree once per game day.');
+    const cut = [{ id: 'yd-0000000000000003', kind: 'tree', target: 'patch:1', verb: 'harvest', took: 0, at_ms: now - 1000 }];
+    assert.deepEqual(judge(wood, cut, {}, [], 'tree', 'patch:1', 'harvest').got, { plank: 40 }, 'the second harvest took a maturity (wood_tree.js 744-764)');
+    assert.deepEqual(judge(wood, [], {}, [], 'plot', 'patch:0', 'plant'), { pool: 'patch:plant' });
+    assert.equal(judge(owner, [], {}, [], 'plot', 'patch:0', 'plant').text, 'You should probably tend to the weeds first.');
+    const sown = [{ id: 'yd-0000000000000004', kind: 'plot', target: 'patch:0', verb: 'plant', took: 0, what: 'bean_fruit', at_ms: now - 1000 }];
+    assert.equal(judge(wood, sown, {}, [], 'plot', 'patch:0', 'plant').text, "There's already a seedling here.");
+    assert.deepEqual(judge(wood, sown, {}, [], 'plot', 'patch:0', 'pet'), { pool: 'patch_seedling:pet' });
+    const pets = [...sown, ...[5, 6, 7].map((n) => ({ id: `yd-000000000000000${n}`, kind: 'plot', target: 'patch:0', verb: 'pet', took: 0, at_ms: now - 500 }))];
+    assert.equal(judge(wood, pets, {}, [], 'plot', 'patch:0', 'pet').text, "You don't need to pet this seedling any more. Just wait a few minutes.");
+    assert.equal(php(['HomePool', 'HomeYard'], 'use Groddle\\Minn\\HomeYard as Y; echo json_encode([Y::growCard(Y::rules(), ["soil_appreciation_bean_grow_1", "soil_appreciation_bean_grow_2"]), Y::growCard(Y::rules(), [])]);').join(','), 'soil_appreciation_bean_grow_2,');
+  });
+  it('HOMES2: a hive\'s Fireflies on the site; the seventh a visitor catches there today pays 25, none for the owner', () => {
+    const t = Date.now();
+    const hive = { systems: { home: { owned: true }, features: { homes: { cult: { items: [{ id: 3, protoClass: 'proto_firefly_hive', endClass: 'firefly_hive', rx: 200, placedAt: t - 3_600_000 }] } } } } };
+    const stock = (uses, waiting = []) => php(['HomePool', 'HomeYard'], `use Groddle\\Minn\\HomeYard as Y; $s = json_decode(${JSON.stringify(JSON.stringify(hive))}); echo json_encode(Y::judgeStock(Y::rules(), $s, json_decode(${JSON.stringify(JSON.stringify(waiting))}, true), json_decode(${JSON.stringify(JSON.stringify(uses))}, true), [], "node", "node:npc_firefly:4", "open", ${t}, fn ($a, $b) => $a));`);
+    assert.deepEqual(stock({}), { pool: '', took: 1, got: [], left: 0 });
+    assert.equal(stock({ 'open:node:npc_firefly:0': 4, 'open:node:npc_firefly:1': 2 }).pool, 'firefly_jar:full');
+    const caught = [{ id: 'yd-0000000000000009', kind: 'node', target: 'node:npc_firefly:4', verb: 'open', took: 1, at_ms: t - 2000 }];
+    assert.equal(stock({}, caught).why, 'not_ready', 'caught two seconds ago: not back yet');
+    assert.equal(stock({}, [{ ...caught[0], at_ms: t - 11000 }]).pool, '', 'back after ten seconds');
   });
   it('the route is registered and the table declared', () => {
     assert.match(readFileSync(sitePath('src/Extension.php'), 'utf8'), /new HomeYard\(\$minn\)/);

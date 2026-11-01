@@ -625,6 +625,17 @@ export function hiveFireflyCount(item, now = Date.now()) {
   return Math.min(FIREFLY_HIVE.maxCount, 1 + Math.floor(elapsed / FIREFLY_HIVE.intervalMs));
 }
 
+/** Where a hive's Fireflies hover now ({ dx, dy } from the hive), one per Firefly it has spawned (homes-feature cultivationNodes; the site's HomeYard::homeNodes). */
+export function hiveFireflySpots(item, now = Date.now()) {
+  const n = hiveFireflyCount(item, now);
+  const out = [];
+  for (let i = 0; i < n; i += 1) {
+    const a = (i / Math.max(1, n)) * Math.PI * 2 + 0.6;
+    out.push({ dx: Math.round(Math.cos(a) * FIREFLY_HIVE.radius * 0.6), dy: -40 - (i % 3) * 22 });
+  }
+  return out;
+}
+
 /** Seed a lived-in demo yard (QA routes). Ignores cost and level. */
 export function cultivateDemoYard(state, now = Date.now()) {
   if (isBackYard(state)) {

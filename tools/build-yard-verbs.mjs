@@ -45,19 +45,23 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'yard-verbs.json');
 
 export async function yardVerbsJson() {
-  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=1eeb68de');
+  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=f581690f');
   const { ANIMAL_KINSHIP_PACKAGES } = await import('../public/js/animal-kinship.js?v=3a50bfb2');
   const { ARBOROLOGY_HARVEST, TRANT_META } = await import('../public/js/trants.js?v=9c2e8c0f');
-  const { SOIL_SKILL_PACKAGES, SOIL_TIMERS } = await import('../public/js/patches.js?v=d8f9ceff');
+  const { SEASONED_BEANS, SEEDLING_GROW_UPGRADES, SOIL_SKILL_PACKAGES, SOIL_TIMERS } = await import('../public/js/patches.js?v=d8f9ceff');
+  const { WOOD_TREE_HARVEST } = await import('../public/js/woodcutting.js?v=38730935');
+  const { ENCHANTED_WOOD_TREE } = await import('../public/js/enchanted-forests.js?v=d986bff5');
+  const beans = Object.keys(SEASONED_BEANS).sort().map((id) => `${JSON.stringify(id)}:${JSON.stringify(SEASONED_BEANS[id].trantClass)}`);
+  const grow = Object.keys(SEEDLING_GROW_UPGRADES).map((id) => `${JSON.stringify(id)}:{"minMs":${SEEDLING_GROW_UPGRADES[id].minMinutes * 60000},"level":${SEEDLING_GROW_UPGRADES[id].growLevel}}`);
   const ak = Object.keys(ANIMAL_KINSHIP_PACKAGES).sort().map((key) => `${JSON.stringify(key)}:[${ANIMAL_KINSHIP_PACKAGES[key].map((r) => `{"l":${r.intervalLimit},"b":${r.bonusAmount}}`).join(',')}]`);
   const arbor = Object.values(ARBOROLOGY_HARVEST).map((r) => `{"skill":${JSON.stringify(r.skillId)},"l":${r.intervalLimit},"b":${r.bonusAmount}}`);
   const dig = Object.entries(SOIL_SKILL_PACKAGES.dig_patch).map(([id, r]) => `{"skill":${JSON.stringify(id === 'no_skill' ? null : id)},"b":${r.bonus_amount}}`);
   const fruit = Object.keys(TRANT_META).sort().map((id) => `${JSON.stringify(id)}:${JSON.stringify(TRANT_META[id].fruitClass)}`);
-  const { STOCK_POOL, STOCK_NODE_CLASSES, STOCK_NODE_VERBS, STOCK_NODE_YIELD, ROCK_RESPAWN_MS } = await import('../public/js/yard-stock-mp.js?v=f83f17de');
+  const { STOCK_POOL, STOCK_NODE_CLASSES, STOCK_NODE_VERBS, STOCK_NODE_YIELD, ROCK_RESPAWN_MS } = await import('../public/js/yard-stock-mp.js?v=c3e3449f');
   const { ROCK_CATALOG } = await import('../public/js/mining.js?v=e356fe60');
   const { RESOURCE_NODE_CATALOG } = await import('../public/js/resource-nodes.js?v=a08218e0');
   const { CULTIVATION_CLASSES } = await import('../public/js/homes-catalog.js?v=29713fa8');
-  const { LIFESPAN_STEP, MAX_LIFE_STEPS } = await import('../public/js/home-cultivation.js?v=bb8b2151');
+  const { LIFESPAN_STEP, MAX_LIFE_STEPS } = await import('../public/js/home-cultivation.js?v=9afaa75d');
   const allPool = { ...YARD_POOL, ...STOCK_POOL };
   const pool = Object.keys(allPool).sort().map((key) => `${JSON.stringify(key)}:${allPool[key]}`);
   const rocks = Object.keys(ROCK_CATALOG).sort().map((id) => {
@@ -68,16 +72,22 @@ export async function yardVerbsJson() {
     const d = RESOURCE_NODE_CATALOG[id];
     const st = d.stock;
     const lim = d.dailyLimit && d.dailyLimit.verb === STOCK_NODE_VERBS[id] ? `{"base":${d.dailyLimit.base},"upgrades":${JSON.stringify(d.dailyLimit.upgrades)}}` : 'null';
-    return `${JSON.stringify(id)}:{"verb":${JSON.stringify(STOCK_NODE_VERBS[id])},"min":${st.min},"max":${st.max},"initial":${st.initial},"ready":${st.harvestableAt},"after":${st.afterHarvest ?? 'null'},"consume":${st.consume ?? 1},"regrow":[${d.regrow.minMs},${d.regrow.maxMs},${d.regrow.stepMs || 1000}],"yield":${JSON.stringify(STOCK_NODE_YIELD[id])},"daily":${lim}}`;
+    // A Firefly comes back respawnMs after it is caught (the 'respawn' stock): one step of that.
+    const regrow = d.regrow ? [d.regrow.minMs, d.regrow.maxMs, d.regrow.stepMs || 1000] : [d.respawnMs, d.respawnMs, 1000];
+    return `${JSON.stringify(id)}:{"verb":${JSON.stringify(STOCK_NODE_VERBS[id])},"min":${st.min},"max":${st.max},"initial":${st.initial},"ready":${st.harvestableAt},"after":${st.afterHarvest ?? 'null'},"consume":${st.consume ?? 1},"regrow":[${regrow.join(',')}],"yield":${JSON.stringify(STOCK_NODE_YIELD[id])},"daily":${lim}}`;
   });
-  const cult = Object.keys(CULTIVATION_CLASSES).sort().filter((id) => ['rock', 'node'].includes(CULTIVATION_CLASSES[id].kind)).map((id) => {
+  const { FIREFLY_HIVE } = await import('../public/js/home-cultivation.js?v=9afaa75d');
+  const { FIREFLY_JAR_FULL } = await import('../public/js/yard-stock-mp.js?v=c3e3449f');
+  const cult = Object.keys(CULTIVATION_CLASSES).sort().filter((id) => ['rock', 'node', 'hive'].includes(CULTIVATION_CLASSES[id].kind)).map((id) => {
     const d = CULTIVATION_CLASSES[id];
     const ns = (d.nodes || []).map((n) => [String(n.classTsid).startsWith('peat_') ? 'peat_1' : n.classTsid, n.dx, n.dy]);
-    return `${JSON.stringify(id)}:{"kind":${JSON.stringify(d.kind)},"maxWear":${d.maxWear},"nodes":${JSON.stringify(ns)}}`;
+    // HOMES2: a hive's Fireflies (home-cultivation hiveFireflySpots): one each intervalMs since it was placed, up to max, radius apart.
+    const hive = d.kind === 'hive' ? `,"hive":[${FIREFLY_HIVE.intervalMs},${FIREFLY_HIVE.maxCount},${FIREFLY_HIVE.radius}]` : '';
+    return `${JSON.stringify(id)}:{"kind":${JSON.stringify(d.kind)},"maxWear":${d.maxWear},"nodes":${JSON.stringify(ns)}${hive}}`;
   });
   const items = Object.keys(YARD_AK_ITEMS).sort().map((key) => `${JSON.stringify(key)}:${JSON.stringify(YARD_AK_ITEMS[key])}`);
-  const doc = 'Written by groddle-afternoon game tools/build-yard-verbs.mjs from js/yard-verbs-mp.js, js/animal-kinship.js, js/trants.js and js/patches.js: pool the Magic Rock iMG a visitor act adds, ak the Animal Kinship daily limit l and items b per rank 0..7, akItems what those items are, arbor and dig the harvest and dig rows by skill, soil the Patch timers in ms, fruit each tree\'s fruit; rocks, nodes and cult the home street\'s rocks and resource nodes (js/yard-stock-mp.js, js/mining.js, js/resource-nodes.js, js/homes-catalog.js), life the lifespan step a restore adds.';
-  return `{"_doc":${JSON.stringify(doc)},\n"pool":{${pool.join(',')}},\n"ak":{\n${ak.join(',\n')}},\n"akItems":{${items.join(',')}},\n"arbor":[${arbor.join(',')}],\n"dig":[${dig.join(',')}],\n"soil":{"cleanRegrowMs":${SOIL_TIMERS.cleanRegrowMs},"dugFillMs":${SOIL_TIMERS.dugFillMs}},\n"fruit":{${fruit.join(',')}},\n"rocks":{${rocks.join(',')}},"respawnMs":${ROCK_RESPAWN_MS},\n"nodes":{\n${nodes.join(',\n')}},\n"cult":{${cult.join(',')}},\n"life":{"step":${LIFESPAN_STEP},"max":${MAX_LIFE_STEPS}}}\n`;
+  const doc = 'Written by groddle-afternoon game tools/build-yard-verbs.mjs from js/yard-verbs-mp.js, js/animal-kinship.js, js/trants.js and js/patches.js: pool the Magic Rock iMG a visitor act adds, ak the Animal Kinship daily limit l and items b per rank 0..7, akItems what those items are, arbor and dig the harvest and dig rows by skill, soil the Patch timers in ms, fruit each tree\'s fruit; rocks, nodes and cult the home street\'s rocks and resource nodes (js/yard-stock-mp.js, js/mining.js, js/resource-nodes.js, js/homes-catalog.js), life the lifespan step a restore adds; wood the Planks a Wood Tree gives by maturity 1..6 (enchanted ones apart), seedling the pets a Seedling takes, its timers and the planter\'s grow cards (the better first), beans each Seasoned Bean\'s tree, jarFull the Fireflies a visitor catches at a home in a game day that count as a full jar (HOMES2).';
+  return `{"_doc":${JSON.stringify(doc)},\n"pool":{${pool.join(',')}},\n"ak":{\n${ak.join(',\n')}},\n"akItems":{${items.join(',')}},\n"arbor":[${arbor.join(',')}],\n"dig":[${dig.join(',')}],\n"soil":{"cleanRegrowMs":${SOIL_TIMERS.cleanRegrowMs},"dugFillMs":${SOIL_TIMERS.dugFillMs}},\n"fruit":{${fruit.join(',')}},\n"rocks":{${rocks.join(',')}},"respawnMs":${ROCK_RESPAWN_MS},\n"nodes":{\n${nodes.join(',\n')}},\n"cult":{${cult.join(',')}},\n"life":{"step":${LIFESPAN_STEP},"max":${MAX_LIFE_STEPS}},\n"wood":{"planks":${JSON.stringify(WOOD_TREE_HARVEST.plankYieldByMaturity)},"enchanted":${JSON.stringify(ENCHANTED_WOOD_TREE.plankYieldByMaturity)}},\n"seedling":{"pets":${SOIL_TIMERS.seedlingPets},"minMs":${SOIL_TIMERS.seedlingMinMs},"maxMs":${SOIL_TIMERS.seedlingMaxMs},"grow":{${grow.join(',')}}},\n"beans":{${beans.join(',')}},"jarFull":${FIREFLY_JAR_FULL}}\n`;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

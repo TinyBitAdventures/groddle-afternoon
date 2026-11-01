@@ -24,9 +24,9 @@ import {
   normalizeStockView,
   visitorNode,
   visitorRock,
-} from '../public/js/yard-stock-mp.js?v=f83f17de';
-import { normalizeYardActs } from '../public/js/yard-verbs-mp.js?v=1eeb68de';
-import { nodeKeyMap, rockItems } from '../public/js/features/homes-feature.js?v=6c0f9284';
+} from '../public/js/yard-stock-mp.js?v=c3e3449f';
+import { normalizeYardActs } from '../public/js/yard-verbs-mp.js?v=f581690f';
+import { nodeKeyMap, rockItems } from '../public/js/features/homes-feature.js?v=4d480822';
 import { homeStreetFor, readVisitScene, sharedHomeStreet, visitSceneTsid } from '../public/js/neighbours-mp.js?v=a8d5544e';
 import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=b16048cb';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
@@ -82,16 +82,17 @@ describe('a home street\'s rocks and nodes (js/yard-stock-mp.js)', () => {
     assert.deepEqual(rocks.map((r) => r.itemId), rockItems(ITEMS).map((r) => r.id));
     assert.deepEqual(rocks.map((r) => [r.id, r.classId]), [['rock:0', 'rock_metal_1'], ['rock:1', 'rock_sparkly_1']]);
     const keys = nodeKeyMap(ITEMS, 0);
-    const nodes = homeNodes(ITEMS);
+    const nodes = homeNodes(ITEMS, 0);
     for (const n of nodes) assert.ok(keys.get(n.itemId).includes(n.key), `${n.key} is ${n.itemId}'s`);
-    assert.deepEqual(nodes.map((n) => n.id), ['node:peat_1:0', 'node:mortar_barnacle:0', 'node:mortar_barnacle:1', 'node:mortar_barnacle:2', 'node:jellisac:0', 'node:jellisac:1']);
+    assert.deepEqual(nodes.filter((n) => n.cls !== 'npc_firefly').map((n) => n.id), ['node:peat_1:0', 'node:mortar_barnacle:0', 'node:mortar_barnacle:1', 'node:mortar_barnacle:2', 'node:jellisac:0', 'node:jellisac:1']);
     assert.equal(nodes[0].classTsid, 'peat_2');
-    assert.ok(!nodes.some((n) => n.cls === 'npc_firefly'), 'the hive\'s Fireflies stay the owner\'s');
+    // HOMES2: the hive's Fireflies are a visitor's to whistle too, keyed as the owner's street keys them.
+    assert.ok(nodes.some((n) => n.id === 'node:npc_firefly:0'));
   });
 
   it('ids and the acts the site sends', () => {
     assert.ok(isRockId('rock:0') && !isRockId('rock:x'));
-    assert.ok(isNodeId('node:peat_1:0') && !isNodeId('node:npc_firefly:0') && !isNodeId('node:peat_1'));
+    assert.ok(isNodeId('node:peat_1:0') && isNodeId('node:npc_firefly:0') && !isNodeId('node:salmon:0') && !isNodeId('node:peat_1'));
     const acts = normalizeYardActs([
       { id: 'yd-0000000000000001', kind: 'rock', target: 'rock:0', verb: 'mine', took: 7, at: 5, left: 43, from: { id: 9, name: 'Bo' } },
       { id: 'yd-0000000000000002', kind: 'node', target: 'node:peat_1:0', verb: 'harvest', took: 1, at: 6 },
@@ -112,7 +113,7 @@ describe('a home street\'s rocks and nodes (js/yard-stock-mp.js)', () => {
     assert.equal(fresh.units, 2);
     assert.deepEqual(fresh.dailyCounts, {}, 'the owner\'s counts are not the visitor\'s');
     assert.deepEqual(visitorNode(view.nodes[0], { 'harvest:node:peat_1:0': 1 }, 'today').dailyCounts, { harvest: 1 });
-    assert.deepEqual(STOCK_NODE_VERBS, { peat_1: 'harvest', dirt_pile: 'dig', mortar_barnacle: 'scrape', jellisac: 'scoop' });
+    assert.deepEqual(STOCK_NODE_VERBS, { peat_1: 'harvest', dirt_pile: 'dig', mortar_barnacle: 'scrape', jellisac: 'scoop', npc_firefly: 'open' });
     assert.deepEqual(STOCK_NODE_YIELD.peat_1, ['peat', 3]);
   });
 
