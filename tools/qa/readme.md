@@ -57,3 +57,5 @@ from `/console/` (local only); the Original zoom; no page errors.
 - It prints a JSON summary and writes `summary.json` and the shots to `--out` (default a temp
   folder). It exits 0 only when every check passes and the cleanup reads zero.
 - `--sweep` removes leftovers of earlier runs (any `zz-smoke-*` address) and nothing else.
+- `--game=<checkout>/public --ws=ws://127.0.0.1:<port>/ws` (local) runs it against a lane's game files
+  and its own test realtime server: the page's socket is piped to that server instead of the shared 8793.

@@ -30,6 +30,21 @@
  *     rates by Animal Kinship rank (catalog_skill_packages.js ak_piggy_pet / _nibble).
  * Street Piggies (pigs: game.js spawnPiggies, index i) are laid out too, and a
  * street where a Piggy is sad (js/animal-mood.js locationIsDepressing) says so.
+ * So are its Chickens (game.js spawnChickens, index i), Butterflies (game.js
+ * spawnButterflies: the resting ones 0..n-1, then the flying ones n..; a
+ * flyer's row ends in 1) and Batterflies (animal-husbandry-feature
+ * spawnStreet, `batterfly:<i>`, whose planner group comes after the feature
+ * groups listed in creatureRequests), for the server's street animals
+ * (the server's objects_creatures.go), with the rule numbers it applies:
+ *   - js/animal-kinship.js ANIMAL_KINSHIP_PACKAGES interval_limit, success
+ *     rate and bonus_amount by rank for the Chicken's squeeze, the Butterfly's
+ *     massage and milk and the Piggy's nibble (catalog_skill_packages.js
+ *     ak_chicken_squeeze 222-334, ak_butterfly_massage 2-113, ak_butterfly_milk
+ *     114-221, ak_piggy_nibble);
+ *   - js/animal-husbandry.js INCUBATION (npc_chicken.js incubate 547-675:
+ *     the eggs and what hatches from each, 60 s). Each food's base cost (a
+ *     Batterfly's food counter, npc_batterfly.js feed 789-824) is
+ *     data/trade.json's "cost" (tools/build-realtime-trade.mjs).
  *
  * What differs from a solo layout, on purpose (as tools/build-realtime-quoins.mjs):
  * no saved-arrival reservation (that one is per player; in multiplayer game.js
@@ -64,7 +79,14 @@ import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=1eff5718';
 import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=91490913';
 import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
 import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=786a2ac4';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=33fd3608';
+import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=28b64d4a';
+import { kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=a56dce4d';
+import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=c91c2df9';
+import { hasRaceDispenser } from '../public/js/races.js?v=df0576ad';
+import { setWildlifeCatalog, wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
+import { boardSpotRow, furnitureFor, furniturePlacementGroups } from '../public/js/street-furniture.js?v=37094759';
+import { INCUBATION } from '../public/js/animal-husbandry.js?v=beead095';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=de1a4e23';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -97,6 +119,33 @@ export function placementRequests(population) {
   ];
 }
 
+/**
+ * The feature groups game.js asks the planner for after the core groups, up to
+ * and including the Batterflies' (js/features/index.js order: resource-nodes,
+ * races' Race Dispenser, patches' soil, heli-kitties, street-furniture, then
+ * street-jobs and animal-husbandry). street-jobs' board and flora come from
+ * each player's own projects, so they are left out: a Batterfly's place is
+ * the server's (the snapshot's "spots"), the same for everyone, and on most
+ * streets the same as in solo. tests/street-creatures.test.js checks this
+ * list against FEATURES.
+ */
+export function creatureRequests(population, street, ecology) {
+  const groups = [...placementRequests(population)];
+  if (hasRaceDispenser(street.tsid)) groups.push({ key: 'raceDispenser', count: 1, clearance: 70 });
+  groups.push(...soilPlacementGroups(soilCountsForStreet(street.tsid)));
+  groups.push(...kittyPlacementGroups(wildlifeFor(ecology, street.tsid)));
+  groups.push(...furniturePlacementGroups(boardSpotRow(furnitureFor(ecology, street.tsid), street)));
+  groups.push(...batterflyPlacementGroups(street));
+  return groups;
+}
+
+let ecologyCatalog = null;
+/** The street-ecology catalog the heli-kitties feature reads its Heli Kitty counts from. */
+export function setCreatureEcology(json) {
+  ecologyCatalog = json;
+  setWildlifeCatalog(json);
+}
+
 const r1 = (n) => Math.round(n * 10) / 10;
 
 /** game.js enterStreet: GROUND_Y is the 75th-percentile platform midpoint. */
@@ -113,6 +162,10 @@ function groundY(platforms) {
  *   nodes [key, class, x, y]               resource-nodes-feature resourceSpawnPlan (`<class>:<n>`)
  *   pigs  [i, x, y]                        game.js spawnPiggies (index i in placement('piggies'); y + 2)
  *   sad   true                             locationIsDepressing for the street (its Piggies are sad)
+ *   chickens    [i, x, y]                  game.js spawnChickens (index i in placement('chickens'); y + 2)
+ *   butterflies [i, x, y, fly]             game.js spawnButterflies: resting i < n (fly 0), then the
+ *                                          flyers at n + j (fly 1, the planner point's y)
+ *   batterflies [i, x, y]                  animal-husbandry-feature spawnStreet (batterfly:<i>)
  */
 export function streetObjectLayout(data, { starter = false, ecology = ecologyForStreet(data.tsid) } = {}) {
   const population = populationForStreet(data.tsid, ecology, { starter });
@@ -160,7 +213,21 @@ export function streetObjectLayout(data, { starter = false, ecology = ecologyFor
     label: data.label || meta.label || '',
   });
 
-  return { rocks, trees, nodes, pigs, sad };
+  const chickens = placement('chickens').map((p, i) => [i, r1(p.x), r1((p.y ?? ground) + 2)]);
+  const rest = placement('butterflies').map((p, i) => [i, r1(p.x), r1((p.y ?? ground) + 2), 0]);
+  const butterflies = [...rest, ...placement('flyingButterflies').map((p, j) => [rest.length + j, r1(p.x), r1(p.y ?? ground), 1])];
+  // The Batterflies' group comes after the feature groups (creatureRequests): its own planner pass.
+  let batterflies = [];
+  if (batterflyPlacementGroups(data).length) {
+    const full = planStreetPlacements(platforms, creatureRequests(population, data, ecologyCatalog), {
+      worldW: streetWidth(data),
+      seed: data.tsid,
+      reserved,
+    });
+    batterflies = (full.groups[BATTERFLY_GROUP] || []).map((p, i) => [i, r1(p.x), r1(p.y ?? ground)]);
+  }
+
+  return { rocks, trees, nodes, pigs, sad, chickens, butterflies, batterflies };
 }
 
 /** The rule numbers the server applies, from the game's own tables. */
@@ -207,7 +274,14 @@ export function ruleTables(trantTables) {
       pig[verb][rank === 0 ? 'no_skill' : `animalkinship_${rank}`] = row.successRate;
     });
   }
-  return { rocks, mega, nodes, harvest, care, trants, prod, dig, pig };
+  // Animal Kinship by rank: [interval_limit, success_rate, bonus_amount] (the street animals' daily
+  // limits per player and animal, and the item each verb gives).
+  const ak = {};
+  for (const key of ['npc_chicken:squeeze', 'npc_butterfly:massage', 'npc_butterfly:milk', 'npc_piggy:nibble']) {
+    ak[key] = ANIMAL_KINSHIP_PACKAGES[key].map((row) => [row.intervalLimit, row.successRate, row.bonusAmount]);
+  }
+  const incubate = { hatches: { ...INCUBATION.hatches }, ms: INCUBATION.completeMs };
+  return { rocks, mega, nodes, harvest, care, trants, prod, dig, pig, ak, incubate };
 }
 
 async function main() {
@@ -216,10 +290,12 @@ async function main() {
   setZoneStreetsShown(false);
   const index = JSON.parse(await readFile(join(streetsDir, 'index.json'), 'utf8'));
   applyStreetIndex(index);
-  setStreetEcologyCatalog(JSON.parse(await readFile(join(root, 'public/assets/content/street-ecology.json'), 'utf8')));
+  const ecology = JSON.parse(await readFile(join(root, 'public/assets/content/street-ecology.json'), 'utf8'));
+  setStreetEcologyCatalog(ecology);
+  setCreatureEcology(ecology);
   const trantTables = JSON.parse(await readFile(join(root, 'public/assets/content/trants.json'), 'utf8'));
   const streets = {};
-  const totals = { rocks: 0, trees: 0, nodes: 0, pigs: 0 };
+  const totals = { rocks: 0, trees: 0, nodes: 0, pigs: 0, chickens: 0, butterflies: 0, batterflies: 0 };
   // A published zone's streets (GZ) are solo only (docs/level-builder/spec.md 15, Q6): never shared.
   for (const tsid of Object.keys(index.streets).filter((t) => !isZoneTsid(t)).sort()) {
     let data;
@@ -230,9 +306,10 @@ async function main() {
       continue;
     }
     const layout = streetObjectLayout(data, { starter: data.tsid === STREET_INDEX.default });
-    if (!layout.rocks.length && !layout.trees.length && !layout.nodes.length && !layout.pigs.length) continue;
+    const keys = ['rocks', 'trees', 'nodes', 'pigs', 'chickens', 'butterflies', 'batterflies'];
+    if (!keys.some((key) => layout[key].length)) continue;
     const row = {};
-    for (const key of ['rocks', 'trees', 'nodes', 'pigs']) {
+    for (const key of keys) {
       if (layout[key].length) row[key] = layout[key];
       totals[key] += layout[key].length;
     }
@@ -241,13 +318,13 @@ async function main() {
   }
   const out = {
     about: 'Shared street objects for objects.go in groddle-afternoon-server. Generated by tools/build-realtime-objects.mjs from public/assets/streets, street-ecology.json, trants.json and the game modules; do not edit by hand.',
-    format: 'streets[tsid] = { rocks: [[i, class, x, y]], trees: [[i, class, x, y, maturity, health]], nodes: [[key, class, x, y]], pigs: [[i, x, y]], sad?: true }',
+    format: 'streets[tsid] = { rocks: [[i, class, x, y]], trees: [[i, class, x, y, maturity, health]], nodes: [[key, class, x, y]], pigs: [[i, x, y]], chickens: [[i, x, y]], butterflies: [[i, x, y, fly]], batterflies: [[i, x, y]], sad?: true }',
     rules: ruleTables(trantTables),
     streets,
   };
   await mkdir(dirname(outPath), { recursive: true });
   await writeFile(outPath, `${JSON.stringify(out)}\n`);
-  console.log(`${Object.keys(streets).length} streets, ${totals.rocks} rocks, ${totals.trees} trees, ${totals.nodes} nodes, ${totals.pigs} pigs -> ${outPath}`);
+  console.log(`${Object.keys(streets).length} streets, ${totals.rocks} rocks, ${totals.trees} trees, ${totals.nodes} nodes, ${totals.pigs} pigs, ${totals.chickens} chickens, ${totals.butterflies} butterflies, ${totals.batterflies} batterflies -> ${outPath}`);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();

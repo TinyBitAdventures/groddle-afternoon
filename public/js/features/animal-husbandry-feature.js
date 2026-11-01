@@ -60,6 +60,7 @@ import { createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOpt
 import {
   BABY_ANIMALS,
   BATTERFLY,
+  BATTERFLY_RESPONSES,
   BATTERFLY_ID,
   HERDKEEPING,
   INCUBATION,
@@ -102,6 +103,7 @@ import {
   stepHogtie,
   stickPlaceState,
 } from '../animal-husbandry.js?v=beead095';
+import { batterflyResponseFor } from '../street-creatures.js?v=486c7a68';
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
@@ -284,6 +286,8 @@ function buildBatterfly(engine, key, x, y, state) {
   };
   spr.x = x;
   spr.y = entity.baseY;
+  // Its home for the shared path in multiplayer (street-objects-feature, js/street-creatures.js batterflyAt).
+  spr._home = { baseX: x, baseY: entity.baseY, phase0: entity.phase };
   entity.target = engine.register({
     classId: BATTERFLY_ID,
     featureId: HUSBANDRY_FEATURE_ID,
@@ -307,6 +311,8 @@ function stepBatterfly(entity, dtMs) {
     spr.loop = true;
     spr.play();
   }
+  // Multiplayer: a street Batterfly the server shares flies its shared path (held while it chews).
+  if (spr._path?.(dtMs / (1000 / 60))) return;
   // The flight path pauses while it chews, so it resumes where it stopped instead of jumping ahead.
   if (entity.chewUntil) return;
   entity.phase += dtMs / 1000;
@@ -705,7 +711,8 @@ function spawnStreet(engine) {
   landStarvedRemains(engine);
   // Chickens whose incubation finished while we were away lose the egg (onIncubationComplete: player not found).
   for (const target of engine.interactables) {
-    if (target.classId !== 'npc_chicken' || !target.state?.incubatingEgg) continue;
+    // Someone else's egg (multiplayer, incubBy): theirs to hatch or lose; the server says which.
+    if (target.classId !== 'npc_chicken' || !target.state?.incubatingEgg || target.state.incubBy) continue;
     if (incubationPhase(target.state, t, incubationTiming(engine)) === 'complete') {
       resetIncubation(target.state);
       lastAction = 'incubation:lost';
@@ -1104,7 +1111,8 @@ function watchIncubations(engine) {
       target.state.incubationHalfwaySaid = true;
       engine.say(target, INCUBATION.halfwayLine, 6000);
     }
-    if (phase === 'complete') {
+    // Multiplayer: only the egg's owner hatches it (the server credits the hatchling to them).
+    if (phase === 'complete' && !target.state.incubBy) {
       const res = hatchIncubation(target.state, engine.inv, { upgrades: engine.pc.imaginationUpgrades || [], rng: Math.random });
       if (!res.ok) continue;
       engine.say(target, res.bubble, 4000);
@@ -1755,6 +1763,14 @@ export const animalHusbandryFeature = {
         engine.toast(res.msg, 2400);
         return true;
       }
+      // Multiplayer: the street's shared food counter decided the Guano (objects_creatures.go).
+      const shared = engine.query?.('sharedVerbGrant', target, verbId, engine);
+      if (Number.isInteger(shared?.guano) && shared.guano !== res.guano) {
+        res.guano = shared.guano;
+        const lines = BATTERFLY_RESPONSES[batterflyResponseFor(res.guano)];
+        res.reply = lines[Math.floor(Math.random() * lines.length)];
+        res.msg = res.msg.replace(/ It "released" \d+ guano\.$/, '') + (res.guano ? ` It "released" ${res.guano} guano.` : '');
+      }
       chewBatterfly(entity);
       engine.say(target, res.reply, 3500);
       engine.pushActivity(res.msg);
@@ -1809,6 +1825,21 @@ export const animalHusbandryFeature = {
   },
 
   /** Name / Rename / Capture on the street's own animals (content.js lists those verbs). */
+  /** Multiplayer: a street Batterfly's home over the server's spot for it (x, y on a platform). */
+  batterflyHome(target, x, y, engine) {
+    const entity = batterflies.find((b) => b.target === target);
+    if (!entity || !Number.isFinite(x) || !Number.isFinite(y)) return null;
+    return { baseX: x, baseY: surfaceAt(engine, x, y) - 150, phase0: (entity.key.length * 1.7) % 6 };
+  },
+
+  /** Multiplayer: someone else fed this Batterfly (street-objects-feature): it chews here too. */
+  batterflyChew(target) {
+    const entity = batterflies.find((b) => b.target === target);
+    if (!entity) return null;
+    chewBatterfly(entity);
+    return true;
+  },
+
   runVerbOverride(target, verbId, engine) {
     if (!target || target.featureId) return null;
     if (!ANIMAL_CLASSES.has(target.classId)) return null;

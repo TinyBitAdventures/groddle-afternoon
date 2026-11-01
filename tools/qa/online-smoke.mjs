@@ -15,6 +15,8 @@
  *                       with a published zone in it) instead of the synced build: every request for
  *                       a path whose first part is in <dir> is answered from <dir>; the site's own
  *                       paths (wp-*, minn, /console/) still go to the site
+ *     --ws=<url>        (local) bridge the page's realtime socket to this server instead of the
+ *                       shared one (a lane's test server: ws://127.0.0.1:<port>/ws)
  *
  * Checks: 1 both players get in (signed in, online, both on the street); 2 Local chat both
  * ways; 3 a party invite from the player menu, the Party tab on both, /p goes to the party,
@@ -67,6 +69,11 @@ const SETTLE_MS = Number(value('settle', 20)) * 1000;
 const TIMEOUT_MS = Number(value('timeout', 900)) * 1000;
 const LOAD_MS = Number(value('load', 180)) * 1000;
 const GAME = value('game', '') ? resolve(value('game', '')) : null;
+const WS = value('ws', '');
+if (WS && (LIVE || !/^ws:\/\/127\.0\.0\.1:\d+\/ws$/.test(WS) || WS.endsWith(':8793/ws'))) {
+  console.error('--ws is for --local only, a ws://127.0.0.1:<port>/ws test server other than 8793');
+  process.exit(2);
+}
 if (GAME && (LIVE || !existsSync(join(GAME, 'play', 'online', 'index.html')))) {
   console.error(LIVE ? '--game is for --local only' : `--game=${GAME}: no play/online/index.html there (name a game checkout's public/ folder)`);
   process.exit(2);
@@ -188,6 +195,18 @@ async function newContext() {
   const ctx = await session.browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, ignoreHTTPSErrors: !LIVE });
   try { await ctx.grantPermissions(['local-network-access'], { origin: SITE }); } catch {}
   if (GAME) await routeGame(ctx);
+  if (WS) {
+    // Playwright's connectToServer takes no URL, so the frames are piped by hand.
+    await ctx.routeWebSocket(/^wss:\/\/groddle\.localhost\/ws/, (ws) => {
+      const up = new WebSocket(WS, { headers: { Origin: SITE } });
+      const queue = [];
+      up.onopen = () => { for (const m of queue.splice(0)) up.send(m); };
+      up.onmessage = (m) => { try { ws.send(String(m.data)); } catch {} };
+      up.onclose = (e) => { try { ws.close({ code: e.code >= 3000 || e.code === 1000 ? e.code : 1000, reason: String(e.reason || '') }); } catch {} };
+      ws.onMessage((m) => { if (up.readyState === 1) up.send(m); else queue.push(m); });
+      ws.onClose(() => { try { up.close(1000); } catch {} });
+    });
+  }
   return ctx;
 }
 

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=55e0524d';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8ea60b8f';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9f3dd50a';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -10570,6 +10570,10 @@ const engine = {
     world.x += dx;
     world.y += dy;
   },
+  /** Play a verb's start animation on a target (another player's squeeze or milking, seen here). */
+  playVerbAnimation(target, verbId, durationMs = 0) {
+    playVerbStartAnimation(target, verbId, durationMs);
+  },
   /** Planner points for a group a feature requested via placementGroups(). */
   placement(key) {
     return currentStreetPlacement?.groups?.[key] || [];
@@ -12679,6 +12683,9 @@ function physics(dt) {
   }
   for (const c of chickens) {
     if (menuTarget?.sprite === c || currentAction?.target?.sprite === c) continue;
+    // Multiplayer: a street Chicken the server shares walks its shared path (street-objects-feature),
+    // unless something here holds it still (the Rook, a sulk: their own vx 0).
+    if (c._path?.(dt)) continue;
     c.x += c.vx * dt;
     if (c.x > c.baseX + c.range) { c.x = c.baseX + c.range; c.vx *= -1; }
     if (c.x < c.baseX - c.range) { c.x = c.baseX - c.range; c.vx *= -1; }
@@ -12727,6 +12734,9 @@ function physics(dt) {
       continue;
     }
     if (menuTarget?.sprite === b || currentAction?.target?.sprite === b) continue;
+    // Multiplayer: a street Butterfly the server shares rests or flies on its shared path, unless
+    // something here grounded it (the Rook, a sulk).
+    if (b._path?.(dt)) continue;
     if (b._ambient) {
       b.x += b.vx * dt;
       b.phase += 0.06 * dt;

@@ -373,10 +373,11 @@
    "name": "Chickens",
    "status": "source",
    "blurb": "Squeeze for grain, incubate eggs, raise chicks.",
-   "multiplayer": "On another player’s home street you can squeeze their Chickens, which fills their Magic Rock, and a Chicken the Rook rooked needs three different players to revive it.",
+   "multiplayer": "A street Chicken is everyone’s: it walks the same path for every player on the street and stops for each squeeze, everyone sees it squeezed, and one sitting on an egg sits for everyone until it hatches for the player who gave it. Each player keeps their own squeezes a day, which the server counts too; a server restart keeps it all. On another player’s home street you can squeeze their Chickens, which fills their Magic Rock, and a Chicken the Rook rooked needs three different players to revive it.",
    "spot": "chicken",
    "evidence": [
-    "public/js/animal-kinship.js"
+    "public/js/animal-kinship.js",
+    "public/js/street-creatures.js"
    ],
    "shot": null,
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&animaldemo=chicken&animalrank=7&practice=1"
@@ -387,11 +388,12 @@
    "name": "Butterflies",
    "status": "source",
    "blurb": "Massage with lotion, then milk; the onboarding quests start here.",
-   "multiplayer": "On another player’s home street you can massage and milk their Butterflies, which fills their Magic Rock, and a Butterfly the Rook rooked needs three different players to revive it.",
+   "multiplayer": "A street Butterfly rests or flies in the same place for every player on the street, and everyone sees it massaged and milked. Each player warms it up for themselves and keeps their own milkings a day, which the server counts too. On another player’s home street you can massage and milk their Butterflies, which fills their Magic Rock, and a Butterfly the Rook rooked needs three different players to revive it.",
    "spot": "butterfly",
    "evidence": [
     "public/js/animal-kinship.js",
-    "public/js/tools.js"
+    "public/js/tools.js",
+    "public/js/street-creatures.js"
    ],
    "shot": "shots/butterflies.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&animaldemo=butterfly&animalrank=2&tooldemo=butterfly_lotion&toolremaining=5&practice=1"
@@ -419,10 +421,11 @@
    "name": "Batterflies and guano",
    "status": "source",
    "blurb": "Cave Batterflies that turn food into guano, and the bar that boosts them.",
-   "multiplayer": null,
+   "multiplayer": "A Batterfly flies the same loops for everyone on its street, and its appetite is shared: what one player feeds it counts toward the next player’s guano.",
    "spot": null,
    "evidence": [
-    "public/js/animal-husbandry.js"
+    "public/js/animal-husbandry.js",
+    "public/js/street-creatures.js"
    ],
    "shot": "shots/batterflies.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&streetdemo=GA9114MS8B32FB2&practice=1"
@@ -1275,7 +1278,7 @@
  },
  "back": 73,
  "possible": 74,
- "multiplayer": 35,
+ "multiplayer": 36,
  "quests": {
   "total": 445,
   "story": 245,
@@ -2796,6 +2799,6 @@
    }
   ]
  },
- "tests": 533,
+ "tests": 534,
  "generatedAt": "2026-10-31"
 }

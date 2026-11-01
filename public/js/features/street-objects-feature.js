@@ -61,9 +61,26 @@
  *   sharedVerbGrant().use. Without the item the server refuses with the
  *   ledger's words ("You don't have any antidote!") and nothing changes.
  *
+ * - Street animals (objects_creatures.go, js/street-creatures.js): a street's
+ *   Chickens, Butterflies and Batterflies are the same for everyone. When the
+ *   snapshot names them (animals), each one follows its shared path from the
+ *   server's clock (sprite._path, which game.js and animal-husbandry-feature
+ *   call each frame instead of their own wander), a verb that lands holds it
+ *   still for everyone, and the others see the verb happen (obj_ev: the
+ *   squeeze, the massage or milking, the Batterfly chewing). Squeeze, massage,
+ *   milk, request incubation and a Batterfly's feed ask the server first: it
+ *   keeps each player's daily uses of each animal (and the warmup a milking
+ *   needs), a Chicken's one egg and its owner (the ledger takes the egg; only
+ *   the owner's game hatches it), and a Batterfly's food counter (the ledger
+ *   takes the food; the server says how much Guano drops). The player's own
+ *   side refuses locally first, as in solo.
+ *
  * QA: canvas data streetObjects (street:snap|none|waiting), streetObjectsLast
  * (id:verb:ok|code), streetObjectsShared (shared objects on this street),
- * streetObjectsView (each as this client has it: rock:1=43, tree:0=98pw).
+ * streetObjectsView (each as this client has it: rock:1=43, tree:0=98pw),
+ * streetCreatures (when it was read, then each shared animal where this
+ * client draws it, on the street and # on the canvas:
+ * t1730000000000 chicken:0@2986,868#512,640).
  */
 
 import {
@@ -95,13 +112,27 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=33fd3608';
+} from '../street-objects.js?v=de1a4e23';
 import { ROCK_CATALOG } from '../mining.js?v=15c7bd6e';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=58743072';
 import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=fc721127';
 import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=91490913';
-import { PIGGY_FEED, itemBaseCost } from '../animal-husbandry.js?v=beead095';
+import { animalPatrolRange } from '../street-ecology.js?v=315ff68c';
+import { INCUBATION, PIGGY_FEED, itemBaseCost, resetIncubation } from '../animal-husbandry.js?v=beead095';
+import {
+  applyCreatureState,
+  batterflyAt,
+  batterflyPerks,
+  creatureOf,
+  easeToward,
+  flyerAt,
+  pathFrom,
+  pathTime,
+  restAt,
+  sharedCreatureLabel,
+  walkerAt,
+} from '../street-creatures.js?v=486c7a68';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -120,8 +151,20 @@ let seen = new WeakMap();
 let lastReconcile = 0;
 let reapplyAt = 0;
 let lastAnswer = '';
+let creaturesShownAt = 0;
+/** Sprites this feature set on a shared path (sprite._path), cleared when the street stops sharing. */
+let pathed = new Set();
+
+function clearPaths() {
+  for (const spr of pathed) {
+    if (spr && spr._path) delete spr._path;
+    if (spr) delete spr._pathPoint;
+  }
+  pathed = new Set();
+}
 
 function reset() {
+  clearPaths();
   copy = createStreetCopy();
   syncedStreet = '';
   seen = new WeakMap();
@@ -194,6 +237,10 @@ function bind(engine) {
     if (!msg || msg.street !== copy.street || copy.street !== engine.streetTsid) return;
     const obj = localObjects(engine).find((row) => row.id === msg.id);
     if (!obj) return;
+    if (obj.kind === 'chicken' || obj.kind === 'butterfly' || obj.kind === 'batterfly') {
+      creatureEvent(engine, obj, msg);
+      return;
+    }
     const on = msg.on ? localObjects(engine).find((row) => row.id === msg.on) : null;
     engine.query?.('sharedAnimalEvent', obj.target, { ev: String(msg.ev || ''), on: on?.target || null }, engine);
   });
@@ -213,6 +260,10 @@ function localObjects(engine) {
     } else if (t.classId === 'npc_piggy' && t.state) {
       const i = streetPigIndex(t, engine.streetTsid);
       if (i >= 0) out.push({ id: pigId(i), kind: 'pig', target: t, classId: t.classId, state: t.state, index: i });
+    } else if (t.state && copy.animals.has(creatureOf(t)?.id)) {
+      // A street animal the server shares here (its snapshot named it).
+      const a = creatureOf(t);
+      out.push({ id: a.id, kind: a.kind, target: t, classId: t.classId, state: t.state, index: a.index, me: client?.me?.id || 0 });
     }
   }
   for (const n of engine.query?.('streetResourceNodes', engine) || []) {
@@ -220,6 +271,117 @@ function localObjects(engine) {
     out.push({ id: nodeId(n.key), kind: 'node', target: n.target, classId: n.classTsid, node: n.node, refresh: n.refresh, ready: n.ready });
   }
   return out;
+}
+
+/**
+ * Put a street animal's sprite on its shared path (js/street-creatures.js): game.js (Chickens,
+ * Butterflies) and animal-husbandry-feature (Batterflies) call sprite._path(dt) each frame in place
+ * of their own wander, except while this player has its menu open or a verb on it. It answers false
+ * while something on this street holds the animal its own way (the Rook and a sulk stop a Chicken
+ * with vx 0 and ground a flyer, rook-attack-feature, animal-mood-feature), and the local code runs.
+ */
+function setPath(engine, obj) {
+  const t = obj.target;
+  const spr = t?.sprite;
+  if (!spr || spr.destroyed || spr._path) return;
+  let step = null;
+  // Where the shared path puts it now (QA: groddleCreatures reports it beside the sprite).
+  let pointAt = null;
+  if (obj.kind === 'chicken') {
+    // Its spot and walk from the street's plan (game.js spawnChickens: a short floor shortens the
+    // walk, street-ecology.js animalPatrolRange), the same for everyone.
+    const spot = engine.placement?.('chickens')?.[obj.index];
+    const home = { baseX: Number.isFinite(spot?.x) ? spot.x : spr.baseX, range: spot ? animalPatrolRange('chickens', spot.room) : (spr.range || 100), dir: obj.index % 2 ? -1 : 1 };
+    if (!Number.isFinite(home.baseX)) return;
+    pointAt = () => walkerAt(home, pathTime(t.sharedPath, Date.now(), copy.offset));
+    step = (dt) => {
+      if (Math.abs(spr.vx || 0) < 0.01) return false;
+      const p = pointAt();
+      spr.x = easeToward(spr.x, p.x, dt);
+      spr.vx = p.dir * Math.abs(spr.vx || 0.5);
+      const bs = spr.baseScale ?? Math.abs(spr.scale.y);
+      spr.scale.x = p.dir * bs;
+      spr.scale.y = Math.abs(bs);
+      return true;
+    };
+  } else if (obj.kind === 'butterfly' && t.airborne) {
+    const rest = engine.placement?.('butterflies')?.length || 0;
+    const j = obj.index - rest;
+    const spot = engine.placement?.('flyingButterflies')?.[j];
+    if (!spot || !Number.isFinite(spot.x)) return;
+    const home = { x0: spot.x, baseY: (Number.isFinite(spot.y) ? spot.y : spr.y + 90) - 90 - (j % 3) * 22, worldW: Number(engine.worldW) || 2000, phase0: j };
+    pointAt = () => flyerAt(home, pathTime(t.sharedPath, Date.now(), copy.offset));
+    step = (dt) => {
+      if (!spr._ambient) return false;
+      const p = pointAt();
+      spr.x = easeToward(spr.x, p.x, dt);
+      spr.y = easeToward(spr.y, p.y, dt);
+      const bs = spr.baseScale ?? Math.abs(spr.scale.y);
+      spr.scale.x = Math.abs(bs);
+      spr.scale.y = Math.abs(bs);
+      return true;
+    };
+  } else if (obj.kind === 'butterfly') {
+    const home = { groundY: Number.isFinite(spr._groundY) ? spr._groundY : spr.y - 2, phase0: obj.index };
+    pointAt = () => ({ x: spr.x, ...restAt({ ...home, groundY: Number.isFinite(spr._groundY) ? spr._groundY : home.groundY }, pathTime(t.sharedPath, Date.now(), copy.offset)) });
+    step = (dt) => {
+      if (spr._ambient) return false;
+      spr.y = easeToward(spr.y, pointAt().y, dt);
+      return true;
+    };
+  } else if (obj.kind === 'batterfly') {
+    // Its place is the server's (the snapshot's spots), the same for everyone.
+    const spot = copy.spots?.[obj.id];
+    const home = (Array.isArray(spot) && engine.query?.('batterflyHome', t, Number(spot[0]), Number(spot[1]), engine)) || spr._home;
+    if (!home) return;
+    pointAt = () => batterflyAt(home, pathTime(t.sharedPath, Date.now(), copy.offset));
+    step = (dt) => {
+      const p = pointAt();
+      spr.x = easeToward(spr.x, p.x, dt);
+      spr.y = easeToward(spr.y, p.y, dt);
+      spr.scale.x = Math.abs(spr.scale.y) * p.dir;
+      return true;
+    };
+  }
+  if (!step) return;
+  spr._path = step;
+  spr._pathPoint = pointAt;
+  pathed.add(spr);
+}
+
+/** Someone else's verb on a street animal: this player sees it happen. */
+function creatureEvent(engine, obj, msg) {
+  const ev = String(msg.ev || '');
+  const t = obj.target;
+  if (ev === 'lost' && Number(msg.by) === Number(client?.me?.id) && t?.state?.incubatingEgg && !t.state.incubBy) {
+    // Your egg: you were not on the street when it hatched (npc_chicken.js onPlayerExit 1365-1373).
+    resetIncubation(t.state);
+    t.subtitle = animalStatusLabel('npc_chicken', t.state);
+    return;
+  }
+  if (Number(msg.by) === Number(client?.me?.id) || !t?.sprite || t.sprite.destroyed) return;
+  if (ev === 'squeeze' || ev === 'massage' || ev === 'milk') engine.playVerbAnimation?.(t, ev, 1500);
+  else if (ev === 'feed' && obj.kind === 'batterfly') engine.query?.('batterflyChew', t, engine);
+  lastAnswer = `${obj.id}:${ev}:seen`;
+  publish(engine);
+}
+
+/** QA: where this client draws each shared street animal (streetCreatures). */
+function showCreatures(engine, all) {
+  const wall = Date.now();
+  if (wall - creaturesShownAt < 400) return;
+  creaturesShownAt = wall;
+  const rows = [];
+  for (const obj of all) {
+    if (obj.kind !== 'chicken' && obj.kind !== 'butterfly' && obj.kind !== 'batterfly') continue;
+    const spr = obj.target?.sprite;
+    if (!spr) continue;
+    // Where it is on the street, and (#) on the canvas, for QA scripts that click it.
+    const g = typeof spr.getGlobalPosition === 'function' ? spr.getGlobalPosition() : null;
+    rows.push(`${obj.id}@${Math.round(spr.x)},${Math.round(spr.y)}${g ? `#${Math.round(g.x)},${Math.round(g.y)}` : ''}`);
+  }
+  // The moment it was read (ms), so two clients' places can be compared at the same instant.
+  engine.setData?.('streetCreatures', rows.length ? `t${wall} ${rows.join(' ')}` : '');
 }
 
 function stateKey(obj) {
@@ -239,6 +401,11 @@ function redraw(engine, obj, before = null) {
     if (obj.target) engine.refreshTreeVisual?.(obj.target);
   } else if (obj.kind === 'pig') {
     if (obj.target) obj.target.subtitle = animalStatusLabel('npc_piggy', obj.state);
+  } else if (obj.kind === 'chicken' || obj.kind === 'butterfly') {
+    if (obj.target) obj.target.subtitle = sharedCreatureLabel(obj.classId, obj.state) || animalStatusLabel(obj.classId, obj.state);
+    setPath(engine, obj);
+  } else if (obj.kind === 'batterfly') {
+    setPath(engine, obj);
   } else obj.refresh?.();
   // G334: the server says this street tree died (for everyone): it dies here too.
   if ((obj.kind === 'tree' || obj.kind === 'wood') && obj.state?.sharedDead && obj.target) {
@@ -269,6 +436,7 @@ function reconcileAll(engine, force = false) {
   dirty.clear();
   publish(engine, n);
   engine.setData?.('streetObjectsView', all.map(viewOf).join(','));
+  showCreatures(engine, all);
 }
 
 /** QA: one object as this client has it (rock:1=43, node:peat_1:0=2, tree:0=98pw). */
@@ -277,6 +445,9 @@ function viewOf(obj) {
   if (obj.kind === 'node') return `${obj.id}=${obj.node.units}${obj.node.petted ? 'p' : ''}${obj.node.watered ? 'w' : ''}`;
   if (obj.kind === 'wood') return `${obj.id}=m${obj.state.maturity}c${obj.state.harvestCount || 0}${deathView(obj.state)}`;
   if (obj.kind === 'pig') return `${obj.id}=m${obj.state.mood}h${obj.state.hunger}${obj.state.hasBeenPetted ? 'p' : ''}`;
+  if (obj.kind === 'chicken') return `${obj.id}=s${obj.state.sharedSqueezes || 0}${obj.state.incubatingEgg ? 'i' : ''}`;
+  if (obj.kind === 'butterfly') return `${obj.id}=m${obj.state.sharedMassages || 0}k${obj.state.sharedMilks || 0}`;
+  if (obj.kind === 'batterfly') return `${obj.id}=f${obj.state.foodCounter || 0}`;
   return `${obj.id}=${obj.state.fruitCount}${obj.state.petted ? 'p' : ''}${obj.state.watered ? 'w' : ''}${deathView(obj.state)}`;
 }
 
@@ -300,6 +471,42 @@ function sharedVerbOn(engine, target, verbId) {
   // G334 tree death: the pour landed; its own checks (bottle, Botany, guilt, mood) ran in tree-death-feature.
   if (POUR_VERBS[verbId] && isStreetTree(target)) {
     return { id: treeId(target.treeIndex), wire: POUR_VERBS[verbId], ready: () => true };
+  }
+  // Street animals: the player's own side (energy, lotion, daily limits, warmup) refuses locally.
+  const animal = creatureOf(target);
+  if (animal && copy.animals.has(animal.id)) {
+    const [base, cls, countText] = String(verbId || '').split(':');
+    if ((animal.kind === 'chicken' && base === 'squeeze') || (animal.kind === 'butterfly' && (base === 'massage' || base === 'milk'))) {
+      if (verbId !== base) return null;
+      const rank = highestAnimalKinshipRank(learned);
+      return {
+        id: animal.id,
+        ready: () => quoteAnimalKinship(target.state, target.classId, base, { pc: engine.pc, inv: engine.inv, tools: engine.toolState, learned, upgrades }).ok === true,
+        skill: pigSkill(learned),
+        perks: base === 'milk' && rank >= 6 ? ['ak6'] : [],
+      };
+    }
+    if (animal.kind === 'chicken' && base === 'incubate' && INCUBATION.hatches[cls]) {
+      return {
+        id: animal.id,
+        wire: 'incubate',
+        ready: () => (Number(engine.inv?.[cls]) || 0) > 0 && learned.includes(INCUBATION.skill) && !target.state?.incubatingEgg,
+        c: cls,
+        n: 1,
+      };
+    }
+    if (animal.kind === 'batterfly' && base === 'feed' && cls) {
+      const n = Math.max(1, Math.floor(Number(countText) || 1));
+      return {
+        id: animal.id,
+        wire: 'feed',
+        ready: () => (Number(engine.inv?.[cls]) || 0) >= n,
+        perks: batterflyPerks(upgrades),
+        c: cls,
+        n,
+      };
+    }
+    return null;
   }
   // G334 street Piggies: the player's own side (energy, daily limits, petted first) refuses locally.
   const pig = streetPigIndex(target, engine.streetTsid);
@@ -373,7 +580,10 @@ function applyKnown(obj, s) {
   else if (obj.kind === 'node') applyNodeState(obj.node, s, now);
   else if (obj.kind === 'wood') applyWoodState(obj.state, s, now);
   else if (obj.kind === 'pig') applyPigState(obj.state, s, now);
-  else applyTreeState(obj.state, s, now);
+  else if (obj.kind === 'chicken' || obj.kind === 'butterfly' || obj.kind === 'batterfly') {
+    applyCreatureState(obj.classId, obj.state, s, { me: client?.me?.id || 0, now });
+    if (obj.target) obj.target.sharedPath = pathFrom(s, now);
+  } else applyTreeState(obj.state, s, now);
 }
 
 function answered(engine, msg, ok) {
@@ -403,10 +613,11 @@ function answered(engine, msg, ok) {
   if (!obj) return;
   // The local rules run on the state the server decided from, with its rolls.
   if (msg.before) applyKnown(obj, msg.before);
-  grant = { target: p.target, verbId: p.verbId, roll: Number(msg.roll), chunks: Number.isInteger(msg.chunks) ? msg.chunks : undefined, help: msg.help && typeof msg.help === 'object' ? msg.help : null, use: msg.use && typeof msg.use === 'object' ? msg.use : null };
-  // G335 slice 5: food the ledger took for a Piggy leaves the pack with the feed below, once (the
-  // trade slice's applied list holds its op, so the site counts it as applied).
-  if (grant.use?.spent && grant.use.n && String(p.verbId).startsWith('feed:')) engine.query?.('ledgerReceipt', String(grant.use.op || ''), engine);
+  grant = { target: p.target, verbId: p.verbId, roll: Number(msg.roll), chunks: Number.isInteger(msg.chunks) ? msg.chunks : undefined, help: msg.help && typeof msg.help === 'object' ? msg.help : null, use: msg.use && typeof msg.use === 'object' ? msg.use : null, guano: Number.isInteger(msg.guano) ? msg.guano : undefined };
+  // G335 slice 5: food the ledger took for a Piggy or a Batterfly, or the egg a Chicken sits on,
+  // leaves the pack with the verb below, once (the trade slice's applied list holds its op, so the
+  // site counts it as applied).
+  if (grant.use?.spent && grant.use.n && /^(feed|incubate):/.test(String(p.verbId))) engine.query?.('ledgerReceipt', String(grant.use.op || ''), engine);
   try {
     engine.executeVerb?.(p.target, p.verbId, { animated: true });
   } finally {
@@ -461,6 +672,21 @@ export const streetObjectsFeature = {
   init(engine) {
     if (engine.mode !== 'multiplayer') return;
     publish(engine);
+    // QA: each shared street animal where this page draws it right now (the two-player checks
+    // compare two pages at the same instant).
+    if (typeof window !== 'undefined') {
+      window.groddleCreatures = () => {
+        const out = { at: Date.now(), animals: {} };
+        for (const obj of localObjects(engine)) {
+          const spr = obj.target?.sprite;
+          if (!spr || (obj.kind !== 'chicken' && obj.kind !== 'butterfly' && obj.kind !== 'batterfly')) continue;
+          const g = typeof spr.getGlobalPosition === 'function' ? spr.getGlobalPosition() : null;
+          const p = typeof spr._pathPoint === 'function' ? spr._pathPoint() : null;
+          out.animals[obj.id] = { x: Math.round(spr.x), y: Math.round(spr.y), px: p && Number.isFinite(p.x) ? Math.round(p.x) : null, py: p && Number.isFinite(p.y) ? Math.round(p.y) : Math.round(spr.y), gx: g ? Math.round(g.x) : null, gy: g ? Math.round(g.y) : null, label: obj.target.label };
+        }
+        return out;
+      };
+    }
   },
 
   onTick(dtMs, now, engine) {
@@ -491,6 +717,7 @@ export const streetObjectsFeature = {
   onStreetClear() {
     pending.clear();
     grant = null;
+    clearPaths();
   },
 
   /** The new game day reset trees locally; the server's copy wins (again once its own rollover lands). */
@@ -589,6 +816,8 @@ export const streetObjectsFeature = {
     if (!grant || grant.target !== target || grant.verbId !== verbId) return null;
     const out = { roll: Number.isFinite(grant.roll) ? grant.roll : undefined, chunks: grant.chunks, help: grant.help };
     if (grant.use) out.use = grant.use;
+    // A Batterfly's feed: the Guano the shared food counter released (objects_creatures.go).
+    if (Number.isInteger(grant.guano)) out.guano = grant.guano;
     return out;
   },
 
@@ -611,6 +840,7 @@ export const streetObjectsFeature = {
   },
   _reset() {
     client = null;
+    creaturesShownAt = 0;
     reset();
     pending.clear();
     grant = null;

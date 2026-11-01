@@ -38,6 +38,7 @@ import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage 
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=1eff5718';
 import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=51d64696';
 import { highestAnimalKinshipRank } from './animal-kinship.js?v=91490913';
+import { applyCreatureState, pathFrom } from './street-creatures.js?v=486c7a68';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
 export const SHARED_NODE_CLASSES = Object.freeze(['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree']);
@@ -96,9 +97,9 @@ export function streetPigIndex(target, streetTsid) {
   return m && m[1] === String(streetTsid || '') ? Number(m[2]) : -1;
 }
 
-/** The kind an id names ('rock' | 'tree' | 'node' | 'pig'), or ''. */
+/** The kind an id names ('rock' | 'tree' | 'node' | 'pig' | 'chicken' | 'butterfly' | 'batterfly'), or ''. */
 export function idKind(id) {
-  const m = /^(rock|tree|node|pig):/.exec(String(id || ''));
+  const m = /^(rock|tree|node|pig|chicken|butterfly|batterfly):/.exec(String(id || ''));
   return m ? m[1] : '';
 }
 
@@ -360,7 +361,9 @@ export function applyPigState(state, s, now = Date.now()) {
  * this street at all (none: it has no layout for it, so everything stays local).
  */
 export function createStreetCopy() {
-  return { street: '', snap: false, none: false, objs: new Map(), version: 0 };
+  // creatures: the server shares this street's animals (js/street-creatures.js), animals: which ids;
+  // offset: the server's clock minus ours (each objs frame's "now").
+  return { street: '', snap: false, none: false, objs: new Map(), version: 0, creatures: false, animals: new Set(), spots: {}, offset: 0 };
 }
 
 /** Take one objs message; returns the ids it changed, or null when it is for another street. */
@@ -373,9 +376,14 @@ export function takeObjs(copy, msg, now = Date.now()) {
     copy.none = msg.none === true;
     copy.objs.clear();
     copy.version += 1;
+    copy.creatures = msg.creatures === true;
+    copy.animals = new Set(Array.isArray(msg.animals) ? msg.animals.filter((id) => typeof id === 'string') : []);
+    // A Batterfly's place, the same for everyone ({"batterfly:0":[x,y]}).
+    copy.spots = msg.spots && typeof msg.spots === 'object' ? msg.spots : {};
   } else if (street !== copy.street || !copy.snap) {
     return null;
   }
+  if (Number.isFinite(Number(msg.now)) && Number(msg.now) > 0) copy.offset = Number(msg.now) - now;
   const ids = [];
   for (const s of Array.isArray(msg.objs) ? msg.objs : []) {
     if (!s || typeof s.id !== 'string' || !idKind(s.id)) continue;
@@ -427,6 +435,10 @@ export function reconcile(obj, copy, now = Date.now()) {
     // The server lists every Piggy of a street it has; one it does not list keeps the local rules.
     if (!s) return false;
     applyPigState(obj.state, s, now);
+  } else if (obj.kind === 'chicken' || obj.kind === 'butterfly' || obj.kind === 'batterfly') {
+    // An animal the server does not list is fresh: on its path from the start, nobody's egg.
+    applyCreatureState(obj.classId, obj.state, s, { me: obj.me, now });
+    if (obj.target) obj.target.sharedPath = pathFrom(s, copy.objs.get(obj.id)?.at ?? now);
   } else return false;
   return true;
 }
