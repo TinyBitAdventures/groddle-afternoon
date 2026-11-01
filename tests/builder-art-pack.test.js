@@ -2,7 +2,9 @@
  * LEVEL BUILDER art pack: the art bible and prompts for an image model (tools/builder/art-bible.mjs),
  * the picture work on what comes back (tools/builder/art-image.mjs, tools/builder/art-intake.mjs:
  * keying, seams, palette, sizes, provenance) and the swap into a copy of a draft
- * (tools/builder/art-apply.mjs). The fixture is one street of Mount Ashomel with its code-drawn art's rows.
+ * (tools/builder/art-apply.mjs), and the generator that asks the Gemini API for the pictures
+ * (tools/builder/art-generate.mjs, against a stubbed fetch: no network). The fixture is one street of
+ * Mount Ashomel with its code-drawn art's rows.
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -16,6 +18,9 @@ import {
 } from '../tools/builder/art-image.mjs';
 import { prepare, fitSize, newName, toolLine, runIntake, pinkShare } from '../tools/builder/art-intake.mjs';
 import { swapOps, copyZone, lineUnder } from '../tools/builder/art-apply.mjs';
+import {
+  generate, pickAspect, pickSize, buildRequest, extractImage, correctiveLine, isHardQuota, DEFAULT_MODEL, WIDE_RATIOS, BASE_RATIOS,
+} from '../tools/builder/art-generate.mjs';
 import { applyOps } from '../public/js/builder/ops.js?v=acf30407';
 
 const root = join(import.meta.dirname, '..');
@@ -297,5 +302,171 @@ describe('the swap into a copy of the draft (art-apply.mjs)', () => {
     assert.equal(c.streets[0].street.hubId, '905');
     assert.ok(!JSON.stringify(c).includes('"hubId":"900"'));
     assert.match(c.streets[0].street.source, /^groddle-builder mount-ashomel-gen/);
+  });
+});
+
+describe('the generator (art-generate.mjs, stubbed fetch)', () => {
+  const KEY = 'test-key-not-real';
+  const magentaRock = (w, h) => encodePng(paint(w, h, (x, y) => ((x - w / 2) ** 2 / (w * w * 0.16) + (y - h / 2) ** 2 / (h * h * 0.16) < 1 ? [90, 80, 70, 255] : [255, 0, 255, 255])));
+  const checker = encodePng(paint(64, 64, (x, y) => (((x >> 3) + (y >> 3)) % 2 ? [255, 255, 255, 255] : [204, 204, 204, 255])));
+  const answer = (png) => ({ status: 'completed', steps: [{ type: 'model_output', content: [{ type: 'image', mime_type: 'image/png', data: png.toString('base64') }] }], usage: { total_input_tokens: 1000 } });
+  /** A stub fetch: `script` is a list of (req) => [status, body]; it records every request. */
+  function stub(script) {
+    const reqs = [];
+    const fetch = async (url, init) => {
+      const req = { url, headers: init.headers, body: JSON.parse(init.body) };
+      reqs.push(req);
+      const step = script[Math.min(reqs.length - 1, script.length - 1)];
+      const [status, body, headers = {}] = step(req);
+      return { ok: status >= 200 && status < 300, status, headers: { get: (k) => headers[k.toLowerCase()] ?? null }, text: async () => (typeof body === 'string' ? body : JSON.stringify(body)) };
+    };
+    return { fetch, reqs };
+  }
+  function pack(pieces) {
+    const dir = mkdtempSync(join(tmpdir(), 'art-gen-'));
+    mkdirSync(join(dir, 'drop'));
+    mkdirSync(join(dir, 'prompts'));
+    writeFileSync(join(dir, 'ref-sheet.png'), encodePng(paint(8, 8, () => [1, 2, 3, 255])));
+    writeFileSync(join(dir, 'ref-01-x.png'), encodePng(paint(8, 8, () => [4, 5, 6, 255])));
+    writeFileSync(join(dir, 'pieces.json'), JSON.stringify({ zone: 'z', palette: ['#3E3329'], inputs: ['deco:heights_platform_2'], refs: [{ file: 'ref-01-x.png', name: 'heights_platform_2' }], pieces }));
+    for (const p of pieces) writeFileSync(join(dir, p.promptFile), `prompt for ${p.short}\n`);
+    return dir;
+  }
+  const piece = (short, w = 200, h = 100, i = 1) => ({ name: `gz_ai_${short}`, short, kind: 'object', role: 'middleground', target: { w, h }, promptFile: `prompts/0${i}-${short}.txt`, attach: ['ref-sheet.png', 'ref-01-x.png'] });
+  const quiet = { textCheck: false, sleep: async () => {}, today: '2026-10-31' };
+
+  it('picks the nearest ratio the model takes, and 2K only for big pieces', () => {
+    assert.equal(pickAspect(4000, 1393), '21:9');
+    assert.equal(pickAspect(3200, 789), '4:1');
+    assert.equal(pickAspect(384, 1200), '1:4');
+    assert.equal(pickAspect(384, 1200, BASE_RATIOS), '9:16');
+    assert.ok(WIDE_RATIOS.length > BASE_RATIOS.length);
+    assert.equal(pickSize({ w: 3200, h: 789 }), '2K');
+    assert.equal(pickSize({ w: 520, h: 302 }), '1K');
+    assert.ok(isHardQuota(429, 'Rate limit exceeded for model x (limit: 0 requests per day on Free Tier)'));
+    assert.ok(!isHardQuota(429, 'Rate limit exceeded (limit: 10 requests per minute)'));
+  });
+
+  it('builds both request shapes with the prompt first and every reference inline; reads an image from either answer', () => {
+    const refs = [{ mimeType: 'image/png', data: 'AAA' }, { mimeType: 'image/png', data: 'BBB' }];
+    const a = buildRequest({ model: 'm', prompt: 'p', refs, aspect: '4:1', size: '2K' });
+    assert.equal(a.path, '/interactions');
+    assert.deepEqual(a.body, { model: 'm', input: [{ type: 'text', text: 'p' }, { type: 'image', mime_type: 'image/png', data: 'AAA' }, { type: 'image', mime_type: 'image/png', data: 'BBB' }], response_format: { type: 'image', aspect_ratio: '4:1', image_size: '2K' } });
+    const g = buildRequest({ api: 'generate-content', model: 'm', prompt: 'p', refs, aspect: '4:1', size: '1K' });
+    assert.equal(g.path, '/models/m:generateContent');
+    assert.deepEqual(g.body.contents[0].parts.map((x) => Object.keys(x)[0]), ['text', 'inlineData', 'inlineData']);
+    assert.deepEqual(g.body.generationConfig, { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: '4:1', imageSize: '1K' } });
+    assert.equal(extractImage({ candidates: [{ content: { parts: [{ inlineData: { mimeType: 'image/png', data: Buffer.from('x').toString('base64') } }] } }] }).buf.toString(), 'x');
+    assert.equal(extractImage(answer(Buffer.from('y'))).buf.toString(), 'y');
+    assert.equal(extractImage({ candidates: [{ finishReason: 'IMAGE_SAFETY', content: { parts: [] } }] }).none, 'IMAGE_SAFETY');
+    assert.match(correctiveLine(['checkerboard', 'text'], piece('r')), /#FF00FF.*no checkerboard.*No text/);
+  });
+
+  it('sends the key in the header only, skips pieces already in drop/, saves the picture, model.txt and provenance', async () => {
+    const dir = pack([piece('kept', 200, 100, 1), piece('rock', 200, 100, 2)]);
+    try {
+      writeFileSync(join(dir, 'drop/kept.png'), magentaRock(200, 100));
+      const { fetch, reqs } = stub([() => [200, answer(magentaRock(400, 200))]]);
+      const r = await generate(dir, { ...quiet, fetch, key: KEY });
+      assert.deepEqual(r.skipped, ['kept']);
+      assert.deepEqual(r.made, ['rock']);
+      assert.equal(reqs.length, 1);
+      assert.equal(reqs[0].url, 'https://generativelanguage.googleapis.com/v1beta/interactions');
+      assert.ok(!reqs[0].url.includes(KEY));
+      assert.equal(reqs[0].headers['x-goog-api-key'], KEY);
+      assert.equal(reqs[0].body.model, DEFAULT_MODEL);
+      assert.equal(reqs[0].body.input[0].text, 'prompt for rock');
+      assert.equal(reqs[0].body.input.length, 3, 'the prompt and both attached references');
+      assert.equal(reqs[0].body.response_format.aspect_ratio, '16:9');
+      assert.ok(existsSync(join(dir, 'drop/rock.png')));
+      assert.equal(readFileSync(join(dir, 'drop/model.txt'), 'utf8'), `${DEFAULT_MODEL}\n`);
+      const log = JSON.parse(readFileSync(join(dir, 'drop/generated.json'), 'utf8'));
+      assert.equal(log.pieces.rock.model, DEFAULT_MODEL);
+      assert.equal(log.pieces.rock.prompt, 'prompt for rock');
+      assert.deepEqual(log.pieces.rock.refs, ['ref-sheet.png', 'ref-01-x.png']);
+      assert.equal(log.pieces.rock.date, '2026-10-31');
+      assert.match(log.pieces.rock.sha256, /^[0-9a-f]{64}$/);
+      assert.ok(!readFileSync(join(dir, 'drop/generated.json'), 'utf8').includes(KEY), 'the key is never written');
+      assert.ok(r.cost > 0.03 && r.cost < 0.05, String(r.cost));
+      // intake keeps the run's record as the piece's provenance
+      const intake = runIntake(dir, { today: '2026-11-02', tag: 'gem' });
+      const rock = intake.pieces.find((p) => p.piece === 'rock');
+      assert.equal(rock.provenance.model, DEFAULT_MODEL);
+      assert.equal(rock.provenance.author, 'Austin Ginder (generated with tools/builder/art-generate.mjs)');
+      assert.equal(rock.provenance.tool, `${DEFAULT_MODEL} via the Gemini API; post-processed by tools/builder/art-intake.mjs`);
+      assert.equal(rock.provenance.date, '2026-10-31');
+      assert.equal(intake.pieces.find((p) => p.piece === 'kept').provenance.author, 'Austin Ginder (prompted in T3 Chat)', 'a hand-saved picture keeps the T3 Chat record');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('backs off and retries a 429 or 5xx; stops the run on a refused key or a hard quota', async () => {
+    const dir = pack([piece('a', 200, 100, 1), piece('b', 200, 100, 2)]);
+    try {
+      const waits = [];
+      const s1 = stub([() => [429, { error: { message: 'Rate limit exceeded (limit: 10 requests per minute)' } }, { 'retry-after': '3' }], () => [503, { error: { message: 'busy' } }], () => [200, answer(magentaRock(400, 200))]]);
+      const r1 = await generate(dir, { ...quiet, fetch: s1.fetch, key: KEY, only: new Set(['a']), sleep: async (ms) => waits.push(ms) });
+      assert.deepEqual(r1.made, ['a']);
+      assert.deepEqual(waits, [3000, 4000], 'Retry-After, then exponential');
+      assert.equal(r1.calls, 3);
+      const s2 = stub([() => [401, { error: { message: 'API key not valid' } }]]);
+      const r2 = await generate(dir, { ...quiet, fetch: s2.fetch, key: KEY, force: true });
+      assert.match(r2.stopped, /refused the key/);
+      assert.equal(s2.reqs.length, 1, 'no second piece after a refused key');
+      const s3 = stub([() => [429, { error: { message: 'Rate limit exceeded for model m (limit: 0 requests per day on Free Tier).' } }]]);
+      const r3 = await generate(dir, { ...quiet, fetch: s3.fetch, key: KEY, only: new Set(['b']) });
+      assert.match(r3.stopped, /Out of quota/);
+      assert.equal(s3.reqs.length, 1, 'a hard quota is not retried');
+      assert.equal(r3.cost, 0);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('stops at the cap of images per run', async () => {
+    const dir = pack([piece('a', 200, 100, 1), piece('b', 200, 100, 2), piece('c', 200, 100, 3)]);
+    try {
+      const lines = [];
+      const { fetch, reqs } = stub([() => [200, answer(magentaRock(400, 200))]]);
+      const r = await generate(dir, { ...quiet, fetch, key: KEY, cap: 2, log: (l) => lines.push(l) });
+      assert.deepEqual(r.made, ['a', 'b']);
+      assert.equal(r.stoppedAt, 'c');
+      assert.equal(reqs.length, 2);
+      assert.ok(lines.some((l) => l.includes('[2/2]')), 'a running count');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('asks once more with a corrective line for a checkerboard, a wrong shape or text, then keeps the better one and flags it', async () => {
+    const dir = pack([piece('board', 200, 100, 1), piece('wide', 400, 100, 2), piece('words', 200, 100, 3)]);
+    try {
+      const script = [
+        () => [200, answer(checker)], () => [200, answer(magentaRock(400, 200))], // board: fixed on the retry
+        () => [200, answer(magentaRock(200, 200))], () => [200, answer(magentaRock(200, 200))], // wide: still square: flagged
+        () => [200, answer(magentaRock(400, 200))], () => [200, { steps: [{ type: 'model_output', content: [{ type: 'text', text: 'YES' }] }] }], // words: text seen
+        () => [200, answer(magentaRock(400, 200))], () => [200, { steps: [{ type: 'model_output', content: [{ type: 'text', text: 'NO' }] }] }],
+      ];
+      const s = stub(script);
+      const r1 = await generate(dir, { ...quiet, fetch: s.fetch, key: KEY, only: new Set(['board', 'wide']) });
+      assert.deepEqual(r1.made, ['board', 'wide']);
+      assert.ok(!s.reqs[0].body.input[0].text.includes('IMPORTANT'));
+      assert.match(s.reqs[1].body.input[0].text, /IMPORTANT: .*#FF00FF.*no checkerboard/);
+      assert.match(s.reqs[3].body.input[0].text, /IMPORTANT: Shape it to 4\.00:1 \(wide\)/);
+      assert.deepEqual(r1.flagged, [{ piece: 'wide', flags: ['aspect'] }]);
+      const log = JSON.parse(readFileSync(join(dir, 'drop/generated.json'), 'utf8'));
+      assert.equal(log.pieces.board.attempt, 2);
+      assert.deepEqual(log.pieces.board.attempts.map((a) => a.flags), [['checkerboard'], []]);
+      assert.match(log.pieces.board.prompt, /IMPORTANT/, 'provenance keeps the prompt actually sent');
+      const r2 = await generate(dir, { ...quiet, textCheck: true, fetch: s.fetch, key: KEY, only: new Set(['words']) });
+      assert.deepEqual(r2.made, ['words']);
+      const textReq = s.reqs[5];
+      assert.equal(textReq.body.model, 'gemini-3.1-flash-lite');
+      assert.match(s.reqs[6].body.input[0].text, /No text, letters/);
+      assert.equal(JSON.parse(readFileSync(join(dir, 'drop/generated.json'), 'utf8')).pieces.words.attempt, 2);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

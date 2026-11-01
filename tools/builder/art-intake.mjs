@@ -16,7 +16,10 @@
  *   7. written to ready/<gz_ai_<tag>_<piece>>.png with ready/intake.json: per piece the file, sha256,
  *      size, what was done, warnings, and provenance (licence ai-generated, CC0 1.0: author, the
  *      model named in drop/model.txt or --model, the prompt text, the date, and the inputs: the
- *      Tiny Speck CC0 reference decos the prompt attached, as deco:<name>).
+ *      Tiny Speck CC0 reference decos the prompt attached, as deco:<name>). A picture
+ *      art-generate.mjs made (its sha256 in drop/generated.json) keeps that run's record instead:
+ *      the model, the prompt actually sent (with any corrective line), the date it was made, and
+ *      "via the Gemini API" in place of T3 Chat.
  *
  *   node tools/builder/art-intake.mjs <pack dir> [--model "<name>"] [--tag t3] [--snap 0.12] [--only a,b]
  *
@@ -33,6 +36,7 @@ import {
 } from './art-image.mjs';
 
 export const AUTHOR = 'Austin Ginder (prompted in T3 Chat)';
+export const AUTHOR_GENERATED = 'Austin Ginder (generated with tools/builder/art-generate.mjs)';
 export const SEAM_BAD = 2.5;
 export const TOOL_MAX = 120;
 const r3 = (n) => Math.round(n * 1000) / 1000;
@@ -43,9 +47,15 @@ export function newName(piece, tag = 't3') {
 }
 
 /** PURE: the tool line provenance keeps (the model as the person reported it; 120 characters at most). */
-export function toolLine(model) {
-  const base = `${String(model).trim()} via T3 Chat; post-processed by tools/builder/art-intake.mjs`;
-  return base.length <= TOOL_MAX ? base : `${String(model).trim().slice(0, TOOL_MAX - 12)} via T3 Chat`;
+export function toolLine(model, via = 'T3 Chat') {
+  const base = `${String(model).trim()} via ${via}; post-processed by tools/builder/art-intake.mjs`;
+  return base.length <= TOOL_MAX ? base : `${String(model).trim().slice(0, TOOL_MAX - 6 - via.length)} via ${via}`;
+}
+
+/** art-generate.mjs's record of the pictures it made (drop/generated.json): short name -> entry. */
+export function generatedRecord(dir) {
+  const f = join(dir, 'drop/generated.json');
+  return existsSync(f) ? JSON.parse(readFileSync(f, 'utf8')).pieces || {} : {};
 }
 
 /** PURE: the size a picture is scaled to: strips and ledges to the target width, the rest to fit the box. */
@@ -181,6 +191,7 @@ export function modelsFor(dir, fallback = '') {
 export function runIntake(dir, { model = '', tag = 't3', snap = 0.12, only = null, today = new Date().toISOString().slice(0, 10) } = {}) {
   const pack = JSON.parse(readFileSync(join(dir, 'pieces.json'), 'utf8'));
   const modelOf = modelsFor(dir, model);
+  const generated = generatedRecord(dir);
   const readyDir = join(dir, 'ready');
   mkdirSync(readyDir, { recursive: true });
   const done = [];
@@ -193,12 +204,15 @@ export function runIntake(dir, { model = '', tag = 't3', snap = 0.12, only = nul
       waiting.push(piece.short);
       continue;
     }
-    const m = modelOf(piece.short);
-    if (!m) throw new Error(`No model named for ${piece.short}: put it in drop/model.txt (or pass --model).`);
     const raw = readFileSync(file);
+    // A picture art-generate.mjs made (the same bytes it recorded) keeps that run's provenance.
+    const gen = generated[piece.short]?.sha256 === sha(raw) ? generated[piece.short] : null;
+    const m = gen?.model || modelOf(piece.short);
+    if (!m) throw new Error(`No model named for ${piece.short}: put it in drop/model.txt (or pass --model).`);
     const { img, report, refused: no } = prepare(readImage(file), piece, { palette: pack.palette, snap });
     const name = newName(piece, tag);
-    const row = { name, replaces: piece.name, piece: piece.short, kind: piece.kind, role: piece.role, drop: basename(file), dropSha256: sha(raw), madeOn: statSync(file).mtime.toISOString().slice(0, 10), report };
+    const row = { name, replaces: piece.name, piece: piece.short, kind: piece.kind, role: piece.role, drop: basename(file), dropSha256: sha(raw), madeOn: gen?.date || statSync(file).mtime.toISOString().slice(0, 10), report };
+    if (gen) row.generated = { model: gen.model, via: gen.via, attempt: gen.attempt, flags: gen.flags || [] };
     if (no) {
       refused.push(row);
       continue;
@@ -208,15 +222,15 @@ export function runIntake(dir, { model = '', tag = 't3', snap = 0.12, only = nul
     row.sha256 = sha(buf);
     row.w = img.w;
     row.h = img.h;
-    const prompt = readFileSync(join(dir, piece.promptFile), 'utf8');
+    const prompt = gen?.prompt || readFileSync(join(dir, piece.promptFile), 'utf8');
     row.provenance = {
       licence: 'ai-generated',
-      author: AUTHOR,
-      tool: toolLine(m),
+      author: gen ? AUTHOR_GENERATED : AUTHOR,
+      tool: gen ? toolLine(m, 'the Gemini API') : toolLine(m),
       model: m,
       prompt: prompt.slice(0, 4000),
       inputs: piece.attach.includes('ref-sheet.png') ? pack.inputs : pack.refs.filter((r) => piece.attach.includes(r.file)).map((r) => `deco:${r.name}`),
-      date: today,
+      date: gen?.date || today,
       role: piece.role === 'particle' ? 'middleground' : piece.role,
     };
     done.push(row);
