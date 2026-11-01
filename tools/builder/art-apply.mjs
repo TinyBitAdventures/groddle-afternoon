@@ -144,6 +144,21 @@ export function swapOps(zone, ready, kept) {
   return { ops, moved, dropped };
 }
 
+/**
+ * PURE: the ready pieces the zone has a piece for, each `replaces` set to the zone's own name for it:
+ * the name intake recorded, else the same short name as a placeholder (gz_ph_<short>, from
+ * art-placeholders.mjs), AI art (gz_ai_<short>) or own work (gz_<short>).
+ */
+export function resolveReplaces(pieces, zone) {
+  const out = [];
+  for (const p of pieces) {
+    const short = p.piece || String(p.replaces).replace(/^gz_(ai_|ph_)?/, '');
+    const hit = [p.replaces, `gz_ph_${short}`, `gz_ai_${short}`, `gz_${short}`].find((n) => zone.assets?.[n]);
+    if (hit) out.push(hit === p.replaces ? p : { ...p, replaces: hit });
+  }
+  return out;
+}
+
 /** PURE: the copy of a zone under a new id, title and hub id (every hubId / hub_id that named the old hub). */
 export function copyZone(zone, { id, title, hubId }) {
   const out = clone(zone);
@@ -190,9 +205,9 @@ async function main(argv) {
   const cfg = settings(process.env);
   const client = createClient({ url: cfg.url, key: cfg.key });
   const { zone: source } = await draftTarget(client, from).zone();
-  const missing = intake.pieces.filter((p) => !source.assets?.[p.replaces]).map((p) => p.replaces);
+  const ready = resolveReplaces(intake.pieces, source);
+  const missing = intake.pieces.filter((p) => !ready.some((r) => r.name === p.name)).map((p) => p.replaces);
   if (missing.length) process.stderr.write(`Not in ${from} (skipped): ${missing.join(', ')}\n`);
-  const ready = intake.pieces.filter((p) => source.assets?.[p.replaces]);
   if (argv.includes('--dry-run')) {
     const kept = Object.fromEntries(ready.map((r) => [r.name, { origin: 'new', w: r.w, h: r.h }]));
     const { ops, moved, dropped } = swapOps(source, ready, kept);

@@ -625,3 +625,79 @@ describe('the generator (art-generate.mjs, stubbed fetch)', () => {
     }
   });
 });
+
+describe('placeholder art (art-placeholders.mjs, lane GROUNDED)', async () => {
+  const { writePlaceholders, drawPlaceholder, tones, localRow, placeholderName, PLACEHOLDER_AUTHOR } = await import('../tools/builder/art-placeholders.mjs');
+  const { resolveReplaces } = await import('../tools/builder/art-apply.mjs');
+  const { provenanceProblems } = await import('../public/js/builder/new-art.js?v=29f0b13e');
+  const { execFileSync } = await import('node:child_process');
+  const pieces = [
+    { name: 'gz_ai_ground', short: 'ground', kind: 'ground', role: 'middleground', target: { w: 120, h: 48 } },
+    { name: 'gz_ai_ledge', short: 'ledge', kind: 'topper', role: 'middleground', target: { w: 100, h: 30 } },
+    { name: 'gz_ai_column', short: 'column', kind: 'support', role: 'middleground', target: { w: 64, h: 64 } },
+    { name: 'gz_ai_puff', short: 'puff', kind: 'particle', role: 'particle', target: { w: 40, h: 40 } },
+    { name: 'gz_ai_ridge', short: 'ridge', kind: 'strip', role: 'bg', target: { w: 200, h: 80 } },
+  ];
+
+  it('one flat stand-in per piece at its size and shape: ground to the bottom, a flat-topped ledge, a column, a dot, a seamless skyline', () => {
+    const t = tones(brief.palette.map((p) => p.hex));
+    assert.ok(t.body.every((v) => v < 140), 'a dark mid tone for rock');
+    const at = (img, x, y) => img.px[(y * img.w + x) * 4 + 3];
+    const g = drawPlaceholder(pieces[0], []);
+    assert.deepEqual([g.w, g.h], [120, 48]);
+    assert.equal(bottomSolid(g), 1, 'the ground runs off the bottom edge');
+    assert.equal(surfaceRow(g), 0);
+    const l = drawPlaceholder(pieces[1], []);
+    assert.equal(surfaceRow(l), 0, 'a flat walkable top');
+    assert.equal(at(l, 0, 29), 0, 'rounded underneath');
+    const c = drawPlaceholder(pieces[2], []);
+    assert.equal(at(c, 2, 30), 0, 'a column narrower than its box');
+    assert.equal(at(c, 32, 0), 255);
+    assert.equal(at(c, 32, 63), 255, 'and to the bottom');
+    const p = drawPlaceholder(pieces[3], []);
+    assert.equal(at(p, 0, 0), 0);
+    assert.equal(at(p, 20, 20), 255);
+    const r = drawPlaceholder(pieces[4], []);
+    assert.ok(seamScore(r) <= 2.5, 'the skyline meets itself');
+    assert.ok(at(r, 100, 79) < 255, 'a back layer is a little see-through');
+  });
+
+  it('writes gz_ph_<short>.webp and placeholders.json with own-work CC0 provenance; --draft file: adds the rows', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'placeholders-'));
+    try {
+      writeFileSync(join(dir, 'pieces.json'), JSON.stringify({ zone: 'z', palette: brief.palette.map((p) => p.hex), pieces }));
+      const rows = writePlaceholders(dir);
+      assert.deepEqual(rows.map((x) => x.name), ['gz_ph_ground', 'gz_ph_ledge', 'gz_ph_column', 'gz_ph_puff', 'gz_ph_ridge']);
+      assert.equal(placeholderName('Lava Fall'), 'gz_ph_lava_fall');
+      for (const x of rows) {
+        const img = readImage(join(dir, 'placeholders', x.file));
+        assert.deepEqual([img.w, img.h], [x.w, x.h]);
+        assert.equal(x.provenance.licence, 'own-work-CC0');
+        assert.equal(x.provenance.author, PLACEHOLDER_AUTHOR);
+        assert.deepEqual(provenanceProblems(x.name, localRow(x)), [], 'the licence policy takes it: own work, named gz_ (not gz_ai_)');
+      }
+      const manifest = JSON.parse(readFileSync(join(dir, 'placeholders/placeholders.json'), 'utf8'));
+      assert.equal(manifest.pieces.length, 5);
+      const zoneFile = join(dir, 'zone.json');
+      writeFileSync(zoneFile, JSON.stringify({ format: 'groddle-zone/1', id: 'ph-test', title: 'Ph', rev: 1, streets: [], edits: [], assets: {} }));
+      execFileSync(process.execPath, [join(root, 'tools/builder/art-placeholders.mjs'), dir, '--draft', `file:${zoneFile}`, '--only', 'ground,puff'], { env: { ...process.env, GRODDLE_BUILDER_HOME: join(dir, 'home') } });
+      const z = JSON.parse(readFileSync(zoneFile, 'utf8'));
+      assert.deepEqual(Object.keys(z.assets).sort(), ['gz_ph_ground', 'gz_ph_puff']);
+      assert.equal(z.assets.gz_ph_ground.w, 120);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('art-apply and the bible find a placeholder by its short name, so the picture swaps in for it', () => {
+    const zoneWith = { assets: { gz_ph_ground: { origin: 'new', w: 120, h: 48 }, gz_ai_ledge: { origin: 'new', w: 100, h: 30 } } };
+    const ready = resolveReplaces([{ name: 'gz_ai_t3_ground', piece: 'ground', replaces: 'gz_ai_ground' }, { name: 'gz_ai_t3_ledge', piece: 'ledge', replaces: 'gz_ai_ledge' }, { name: 'gz_ai_t3_x', piece: 'x', replaces: 'gz_ai_x' }], zoneWith);
+    assert.deepEqual(ready.map((r) => [r.name, r.replaces]), [['gz_ai_t3_ground', 'gz_ph_ground'], ['gz_ai_t3_ledge', 'gz_ai_ledge']]);
+    const z = { id: 'ph', streets: [], assets: { gz_ph_basalt_ground: { origin: 'new', w: 1200, h: 480 } } };
+    const ps = zonePieces(z, brief);
+    const g = ps.filter((p) => p.short === 'basalt_ground');
+    assert.equal(g.length, 1, 'one piece, not the placeholder and the brief\'s name twice');
+    assert.equal(g[0].name, 'gz_ph_basalt_ground');
+    assert.equal(g[0].kind, 'ground', 'the brief\'s words and kind, found by short name');
+  });
+});

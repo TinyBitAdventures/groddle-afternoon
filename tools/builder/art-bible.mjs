@@ -74,8 +74,8 @@ export const ledgesOf = (brief = {}) => (brief.ledges === 'floating' ? 'floating
 
 // —— Pieces: what the zone draws, and how ——
 
-/** PURE: the drop name of a piece (its name without gz_ or gz_ai_). */
-export const shortName = (name) => String(name).replace(/^gz_(ai_)?/, '');
+/** PURE: the drop name of a piece (its name without gz_, gz_ai_ or a placeholder's gz_ph_). */
+export const shortName = (name) => String(name).replace(/^gz_(ai_|ph_)?/, '');
 
 /**
  * PURE: every piece of new art the zone uses, with how it is used: roles, placements, drawn
@@ -86,7 +86,9 @@ export const shortName = (name) => String(name).replace(/^gz_(ai_)?/, '');
 export function zonePieces(zone, brief = {}) {
   const rows = zone.assets || {};
   const names = Object.keys(rows).filter((n) => rows[n]?.origin === 'new');
-  for (const [n, p] of Object.entries(brief.pieces || {})) if (!names.includes(n) && p.w && p.h) names.push(n);
+  // The brief names pieces gz_ai_<short>; a zone laid out with placeholders draws gz_ph_<short>: one piece.
+  const briefOf = (n) => (brief.pieces || {})[n] || Object.entries(brief.pieces || {}).find(([k]) => shortName(k) === shortName(n))?.[1] || {};
+  for (const [n, p] of Object.entries(brief.pieces || {})) if (!names.some((x) => shortName(x) === shortName(n)) && p.w && p.h) names.push(n);
   const use = new Map(names.map((n) => [n, { roles: new Map(), placements: 0, emitters: 0, streets: new Set(), drawn: [], edgeToEdge: 0, overlapping: 0, onLine: 0 }]));
   for (const { key, street } of zone.streets || []) {
     const floors = platformsScreen(street).filter(isStandable);
@@ -133,7 +135,7 @@ export function zonePieces(zone, brief = {}) {
   }
   const pieces = names.map((name) => {
     const row = rows[name] || {};
-    const b = (brief.pieces || {})[name] || {};
+    const b = briefOf(name);
     const u = use.get(name);
     const roles = [...u.roles].sort((a, c) => c[1] - a[1] || ROLE_ORDER.indexOf(a[0]) - ROLE_ORDER.indexOf(c[0]));
     let role = b.role || roles[0]?.[0] || 'middleground';
