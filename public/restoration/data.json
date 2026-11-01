@@ -222,7 +222,7 @@
    "name": "Your Glitch",
    "status": "source",
    "blurb": "Tiny Speck’s own vector avatar, rebuilt part by part: walk, climb, jump, happy, angry, surprised, with real hair, eyes, mouths, hats and clothes in their original colourways, sharp on Retina. Start fresh with Tiny Speck’s new-player picker, four choices for each part, or dress up as a giant, the Rook or a chicken from the original wardrobe. Nineteen pieces Tiny Speck left in greyscale are reimagined with colours borrowed from their siblings, and tagged as such. A player’s 2012 sheets, found on the Wayback Machine, were the first reference for the poses; they stay in the research notes and never ship.",
-   "multiplayer": null,
+   "multiplayer": "Other players see you in your own look, and a new outfit shows on their screens as soon as you put it on.",
    "spot": "player",
    "evidence": [
     "public/js/avatar-rig.js",
@@ -240,7 +240,7 @@
    "name": "Camera Mode",
    "status": "source",
    "blurb": "Press C to look around the street; with Eyeballery, the whole street.",
-   "multiplayer": null,
+   "multiplayer": "With the Snapshottery card, Enter in Camera Mode takes a Snap that other players can come across in a Camera from the Toy Vendor.",
    "spot": null,
    "evidence": [
     "public/js/features/camera-mode-feature.js"
@@ -373,7 +373,7 @@
    "name": "Chickens",
    "status": "source",
    "blurb": "Squeeze for grain, incubate eggs, raise chicks.",
-   "multiplayer": null,
+   "multiplayer": "On another player’s home street you can squeeze their Chickens, which fills their Magic Rock, and a Chicken the Rook rooked needs three different players to revive it.",
    "spot": "chicken",
    "evidence": [
     "public/js/animal-kinship.js"
@@ -387,7 +387,7 @@
    "name": "Butterflies",
    "status": "source",
    "blurb": "Massage with lotion, then milk; the onboarding quests start here.",
-   "multiplayer": null,
+   "multiplayer": "On another player’s home street you can massage and milk their Butterflies, which fills their Magic Rock, and a Butterfly the Rook rooked needs three different players to revive it.",
    "spot": "butterfly",
    "evidence": [
     "public/js/animal-kinship.js",
@@ -495,7 +495,7 @@
    "name": "Gardens and herbs",
    "status": "source",
    "blurb": "Hoe, plant, water and harvest crops and herbs, with the Master Gardener potions.",
-   "multiplayer": null,
+   "multiplayer": "Anyone holding a key to your house can water, plant, clear and harvest your gardens, and you see it at once if you are online.",
    "spot": "garden",
    "evidence": [
     "public/js/garden.js",
@@ -556,7 +556,7 @@
    "name": "Potions",
    "status": "source",
    "blurb": "Every Cauldron potion can be quaffed or poured again: the Amorous Philtre’s Feeling Called Love, the Elixir of Avarice’s fifty extra quoins, favor from a Draught of Giant Amicability (shake it for another Giant), the Keycutter Tonic, Potions of Animal Youth, clouds that embiggen or shrink you, Rainbow Juice that sends you up, and Trantsformation Fluid that turns one tree into another. You can munch a Rug, too.",
-   "multiplayer": null,
+   "multiplayer": "Quaff a Charades Potion and everyone on your street can play: the first to say your word wins.",
    "spot": null,
    "evidence": [
     "public/js/potions.js",
@@ -600,7 +600,7 @@
    "name": "Tools that wear and mend",
    "status": "source",
    "blurb": "Every tool’s exact condition, breakage and Tinkertool repairs.",
-   "multiplayer": null,
+   "multiplayer": "A tool keeps its own wear when you trade it, give it, drop it or sell it at auction to another player.",
    "spot": null,
    "evidence": [
     "public/js/tools.js"
@@ -646,7 +646,7 @@
    "name": "Giants and shrines",
    "status": "source",
    "blurb": "Donate at the eleven Giants’ shrines for favor; a waiting emblem is handed over as you walk past, and the third shrine you pass says hello. Spend favor, or a spare emblem, to learn the skill you are studying faster.",
-   "multiplayer": null,
+   "multiplayer": "When the Rook attacks, any player can prime the street’s shrine, and everyone there strikes the same Rook with their offerings.",
    "spot": "shrine",
    "evidence": [
     "public/js/shrines.js"
@@ -727,7 +727,7 @@
    "name": "Levels, energy and mood",
    "status": "source",
    "blurb": "The official XP table, level rewards, metabolics, idle mood loss and food variety.",
-   "multiplayer": null,
+   "multiplayer": "From level 5 your level shows on your player page, and you are listed on the Players page.",
    "spot": null,
    "evidence": [
     "public/js/progression.js",
@@ -744,7 +744,7 @@
    "name": "Badges",
    "status": "source",
    "blurb": "The full badge catalog with official art and the original counters.",
-   "multiplayer": null,
+   "multiplayer": "From level 5 your badges are on your player page for everyone to see, and the badges for things done with others, like buddies, hugs and helping at a friend’s home, are earned with real players.",
    "spot": null,
    "evidence": [
     "public/js/achievements.js",
@@ -1009,7 +1009,7 @@
    "name": "Mail",
    "status": "source",
    "blurb": "Mailboxes, postage, parcels and replies. A letter with an item comes by AFLC Frog, and the Mail Dispatcher by the signpost on your home street sends parcels.",
-   "multiplayer": null,
+   "multiplayer": "Stacks you buy from other players at auction, and your own that did not sell, come to your mailbox.",
    "spot": null,
    "evidence": [
     "public/js/mailbox.js",
@@ -1025,7 +1025,7 @@
    "name": "Neighbours",
    "status": "reimagined",
    "blurb": "Visiting Stones lead to six authored neighbours, standing in for other players’ homes.",
-   "multiplayer": "Visit other players’ homes as they keep them, knock to be let in, give friends house keys, leave a package or a message with their Butler, and water and tend their gardens with their key. Put up to five friends’ homes on your home street’s signpost, post a note on a Note Pole for visitors to read, sell furniture to visitors (the price waits in a Pile of Currants), and restore a friend’s worn-out cultivations together.",
+   "multiplayer": "Visit other players’ homes as they keep them, knock to be let in, give friends house keys, leave a package or a message with their Butler, and water and tend their gardens with their key. Put up to five friends’ homes on your home street’s signpost, post a note on a Note Pole for visitors to read, sell furniture to visitors (the price waits in a Pile of Currants), and restore a friend’s worn-out cultivations together. While you are away, your Butler tells you who comes onto your home street and what they say there, and says what you tell it to.",
    "spot": null,
    "evidence": [
     "public/js/neighbours.js"
@@ -1070,7 +1070,7 @@
    "name": "Other players and chat",
    "status": "source",
    "blurb": "Make a character with an email and a password, right in the game, and finish it from the link we email you; in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global Chat, Live Help and the Trade Channel are open to everyone the original let in, and players make, find and join groups with their own chat. Say hi with 5 and your daily hi sign flies to another player; a player with no sign catches it, matching signs share a bonus, and the clock shows the day’s Hi sign leaderboard. Follow another player and your Glitch walks after them wherever they go, teleports included.",
-   "multiplayer": "See other players and chat on the street, form parties, keep buddies, join groups and channels, trade hi signs, and follow another player from street to street. Hug, high five, kiss, moon or splank another player from their menu, soak them with a Watering Can or play them a Musicblock, play Charades on the street (the first to say your word wins), and throw a house party big enough for Epic Blowout.",
+   "multiplayer": "See other players and chat on the street, form parties, keep buddies, join groups and channels, trade hi signs, follow another player from street to street, and see a little “…” over a player who is starting to say something. Hug, high five, kiss, moon or splank another player from their menu, soak them with a Watering Can or play them a Musicblock, play Charades on the street (the first to say your word wins), and throw a house party big enough for Epic Blowout.",
    "spot": null,
    "evidence": [
     "public/js/realtime-client.js",
@@ -1105,7 +1105,7 @@
    "name": "Skills",
    "status": "source",
    "blurb": "All 105 skills to learn, with the real effects where their systems exist.",
-   "multiplayer": null,
+   "multiplayer": "From level 5 the skills you have learned are on your player page for everyone to see.",
    "spot": null,
    "evidence": [
     "public/js/skill-tree.js",
@@ -1193,7 +1193,7 @@
    "name": "Musicblocks, Cubimals and the Stoot doll",
    "status": "source",
    "blurb": "All 27 recovered Musicblock tunes (five series of five, SB-1 and Goodnight Groddle) with their collector trophies, both Cubimal series and the memorial pull-string doll.",
-   "multiplayer": null,
+   "multiplayer": "Play a Musicblock for another player on your street, and Blocks That Rock counts it.",
    "spot": null,
    "evidence": [
     "public/js/musicblocks.js",
@@ -1275,7 +1275,7 @@
  },
  "back": 73,
  "possible": 74,
- "multiplayer": 22,
+ "multiplayer": 35,
  "quests": {
   "total": 445,
   "story": 245,
@@ -2796,6 +2796,6 @@
    }
   ]
  },
- "tests": 531,
+ "tests": 532,
  "generatedAt": "2026-10-31"
 }

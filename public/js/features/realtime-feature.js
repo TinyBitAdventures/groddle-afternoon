@@ -20,6 +20,16 @@
  *   "Playing somewhere else" (close 4001: never reconnects by itself; Play
  *   here reloads, for the newest save, and takes the character back), and
  *   the chat log toggle.
+ * - The typing mark (G366, main.js doLocalChatStart 1677-1694): starting a
+ *   Local chat line (the input gets text that is no slash command, with the
+ *   Local tab in front) tells the street once per line, at most each 4 s
+ *   (ChatArea.as 529-537, ACTIVITY_TIMER 4000); the others see a small "…"
+ *   over your head for 5 s (duration 5000), gone as soon as your line comes
+ *   (doLocalChat 1758 overlay_dismiss). The typer never sees their own
+ *   (apiSendAnnouncementX). The source's typing_in_location_overlay SWF was
+ *   never archived, so the dots are drawn (typingMark): a little white bubble,
+ *   three dots in turn, over the name plate (ours: the source's delta_y -130
+ *   sat where the remake's plate is). A blocked player's mark never shows.
  * - The modern skin's Social drawer (engine.social, js/ui/social-drawer.js)
  *   is the chat log there: the state pill and Play here sit in its head, the
  *   arrivals and notes go to its Local tab with the emote buttons over them,
@@ -41,12 +51,13 @@
  *   mood and energy. Like the teleport, only the site's signed calls send them.
  *
  * QA: canvas data realtimeState, realtimeHere, realtimePlayers,
- * realtimeStreet, realtimeLastSaid, realtimeTeleport (the street an
+ * realtimeStreet, realtimeLastSaid, realtimeTypingSent (marks sent),
+ * realtimeTyping (ids showing the mark), realtimeTeleport (the street an
  * administrator sent you to, once there); window.groddleRealtime in multiplayer.
  */
 
 import { createMinnAccount } from '../minn-account.js?v=81339760';
-import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=8894c637';
+import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=f19c76a1';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
 import { movedLine } from '../admin-teleport.js?v=fa56e8df';
 import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=430d51e0';
@@ -59,6 +70,47 @@ export const LOG_LINES = 40;
 const BUBBLE_MS = 7200;
 const LOOK_CHECK_MS = 2000;
 const PLATE_Y = -150;
+/** G366: the mark lasts this long (main.js:1682 duration 5000) unless the line comes first. */
+export const TYPING_MS = 5000;
+/** One mark per line, and no sooner than this after the last (ChatArea.as:65 ACTIVITY_TIMER). */
+export const TYPING_EVERY_MS = 4000;
+/** The mark's foot, just over the name plate. */
+const TYPING_Y = PLATE_Y - 24;
+
+/**
+ * Whether a line in the chat input should show the typing mark: some text, no
+ * slash command (ChatArea.as:534 skips the slash key: a command is no line),
+ * and Local in front (a party, group or Butler chat is not the street).
+ */
+export function typingCounts(text, localTab = true) {
+  const t = String(text || '').trim();
+  return Boolean(t) && !t.startsWith('/') && localTab !== false;
+}
+
+/** The "…" drawn over a player who is typing (the SWF is lost): a bubble with three dots. */
+export function typingMark(PIXI) {
+  const mark = new PIXI.Container();
+  const bubble = new PIXI.Graphics();
+  bubble.roundRect(-17, -22, 34, 20, 10).fill({ color: 0xffffff, alpha: 0.96 }).stroke({ width: 1, color: 0x8c8378, alpha: 0.75 });
+  bubble.moveTo(-4, -2.5).lineTo(0, 4).lineTo(4, -2.5).closePath().fill({ color: 0xffffff, alpha: 0.96 });
+  mark.addChild(bubble);
+  mark.dots = [-8, 0, 8].map((x) => {
+    const d = new PIXI.Graphics();
+    d.circle(0, 0, 2.6).fill({ color: 0x5c554d });
+    d.x = x;
+    d.y = -12;
+    mark.addChild(d);
+    return d;
+  });
+  mark.y = TYPING_Y;
+  mark.visible = false;
+  return mark;
+}
+
+/** The dots light in turn, one each 220 ms. */
+export function typingDotAlpha(i, t) {
+  return Math.floor(t / 220) % 3 === i ? 1 : 0.35;
+}
 
 /** The pill's words for a client state (plain remake copy, no em-dashes). */
 export function statusText(state, { here = 0, attempt = 0 } = {}) {
@@ -265,7 +317,8 @@ function createSession(engine) {
     const plate = new PIXI.Graphics();
     plate.roundRect(-Math.ceil(name.width / 2) - 7, name.y - name.height - 4, Math.ceil(name.width) + 14, Math.ceil(name.height) + 7, 7)
       .fill({ color: 0xfffdf5, alpha: 0.86 }).stroke({ width: 1, color: 0x5fa83a, alpha: 0.7 });
-    root.addChild(body, plate, name);
+    const typing = typingMark(PIXI);
+    root.addChild(body, plate, name, typing);
     root.zIndex = remoteAvatarZ(arrivals++);
     root.eventMode = 'none';
     root.x = p.x;
@@ -281,6 +334,8 @@ function createSession(engine) {
       track: createTrack({ x: p.x, y: p.y, dir: p.dir, anim: p.anim }, performance.now()),
       emote: null,
       emoteUntil: 0,
+      typing,
+      typingUntil: 0,
       packCheckAt: 0,
       target: { name: p.name, label: p.name, classId: 'pc_remote', sprite: root, artHeight: -PLATE_Y + 4 },
     };
@@ -359,9 +414,49 @@ function createSession(engine) {
       r.body.scale.set(crowdScaleX(1, at.dir, true), 1);
       const standing = at.anim === 'stand' || /^idle\d$/.test(at.anim);
       applyAnim(r, r.emote && wall < r.emoteUntil && standing ? r.emote : at.anim);
+      const typingNow = wall < r.typingUntil;
+      if (r.typing.visible !== typingNow) {
+        r.typing.visible = typingNow;
+        typingChanged = true;
+      }
+      if (typingNow) r.typing.dots.forEach((d, i) => { d.alpha = typingDotAlpha(i, wall); });
+    }
+    if (typingChanged) {
+      typingChanged = false;
+      engine.setData?.('realtimeTyping', [...remotes.values()].filter((r) => r.typing.visible).map((r) => r.id).join(','));
     }
     if (swapped) holdPacks();
   }
+
+  // —— The typing mark (G366) ——
+  let typingChanged = false;
+  /** This line already told the street; when the last mark went. */
+  let typedLine = false;
+  let typedAt = 0;
+  let typingSent = 0;
+  function localTabInFront() {
+    if (social) return social.tab === 'local';
+    const t = engine.query?.('chatTab');
+    return t == null || t === 'street';
+  }
+  function onChatInput() {
+    const text = input?.value || '';
+    if (!String(text).trim()) {
+      typedLine = false;
+      return;
+    }
+    if (typedLine || teleporting || !typingCounts(text, localTabInFront())) return;
+    const t = Date.now();
+    if (t - typedAt < TYPING_EVERY_MS) return;
+    if (!client.typing()) return;
+    typedLine = true;
+    typedAt = t;
+    typingSent += 1;
+    engine.setData?.('realtimeTypingSent', String(typingSent));
+  }
+  input?.addEventListener('input', onChatInput);
+  // The line went (or the input was cleared for a command): the next line tells the street again.
+  form?.addEventListener('submit', () => { typedLine = false; });
 
   // —— Chat and emotes ——
   function emote(e) {
@@ -405,8 +500,17 @@ function createSession(engine) {
     engine.setData?.('realtimeLastSaid', `${name}:${text}`);
     if (mine) return;
     const r = remotes.get(id);
+    // doLocalChat 1758: the line clears the typing mark.
+    if (r?.typingUntil) {
+      r.typingUntil = 0;
+    }
     if (r) engine.say?.(r.target, text, BUBBLE_MS, { speaker: name });
     engine.chatLine?.(name, text);
+  });
+  client.on('typing', ({ id }) => {
+    if (engine.query?.('realtimeHidden', id)) return;
+    const r = remotes.get(id);
+    if (r) r.typingUntil = Date.now() + TYPING_MS;
   });
   client.on('emoted', ({ id, e }) => {
     if (engine.query?.('realtimeHidden', id)) return;

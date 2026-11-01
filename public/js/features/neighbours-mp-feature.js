@@ -81,7 +81,7 @@ import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=bb8b2
 import { tickGarden } from '../garden.js?v=175e782f';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=e81817d9';
 import { normalizeButlerParts } from '../butler.js?v=814ee05f';
-import { butlerApi } from './butler-feature.js?v=3733cccb';
+import { butlerApi } from './butler-feature.js?v=0140636b';
 import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=076e0276';
 import {
   BUTLER_MESSAGE_MAX,
@@ -1118,6 +1118,12 @@ function createSession(engine, client) {
   return {
     client,
     get visit() { return visit; },
+    /** G367: the owner's Butler says a line to the street you visit (butler_said): its name, or '' when not drawn here. */
+    butlerSays(owner, text) {
+      if (!vb?.target || vb.box.destroyed || visit?.owner !== Number(owner) || visit.room !== 'street' || !text) return '';
+      butlerSay(String(text), 5000);
+      return vb.name || 'Butler';
+    },
     get keys() { return keys; },
     get visitors() { return visitors; },
     visitHome,
@@ -1311,6 +1317,12 @@ export const neighboursMpFeature = {
   realtimeStreet(engine) {
     if (!session || engine?.mode !== 'multiplayer') return null;
     return session.street() || null;
+  },
+
+  /** G367 (features/butler-im-feature.js): the visited owner's Butler says a line; its name, or null. */
+  visitorButlerSay(owner, text, engine) {
+    if (!session || engine?.mode !== 'multiplayer') return null;
+    return session.butlerSays(owner, text) || null;
   },
 
   /** G329 (features/quests-mp-feature.js): the other player's home you stand on, and whether you hold their key. */

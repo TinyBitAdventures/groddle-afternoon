@@ -1194,6 +1194,8 @@ function butlerVerbs(engine) {
     st.muted
       ? { id: 'chatter', label: 'chatter', tooltip: 'Allow the Butler to say random things when bored', enabled: true }
       : { id: 'zip_it', label: 'zip it!', tooltip: 'Tell the Butler to stop the random chatter', enabled: true },
+    // G367 (multiplayer): eavesdrop / stop_eavesdropping, from features/butler-im-feature.js.
+    ...(mpVerbs?.list(engine) || []),
   ];
   return verbs.map((v) => ({ reason: '', durationMs: 0, ...v }));
 }
@@ -1219,7 +1221,7 @@ function runButlerVerb(engine, id) {
     case 'dispense_wisdom': st.hintsOff = false; engine.save?.(); lastMsg = 'hints:on'; return publish(engine, true);
     case 'zip_it': st.muted = true; engine.save?.(); lastMsg = 'chatter:off'; return publish(engine, true);
     case 'chatter': st.muted = false; engine.save?.(); lastMsg = 'chatter:on'; return publish(engine, true);
-    default: return null;
+    default: return mpVerbs?.run(engine, id) ?? null;
   }
 }
 
@@ -1683,6 +1685,8 @@ function neighbourIdFor(name) {
 /** For street-furniture-feature (one-way import, no cycle). */
 /** G328 slice 2 (multiplayer): { owns(id), take(engine, id) -> Promise<boolean> } for real visitors' parcels. */
 let parcelHook = null;
+/** G367 (multiplayer): { list(engine) -> verbs, run(engine, id) } the Butler IM feature adds. */
+let mpVerbs = null;
 
 export const butlerApi = {
   owned: () => st.owned === true,
@@ -1705,6 +1709,21 @@ export const butlerApi = {
   },
   /** butler.getLabel(pc) for the owner: the name, or "Butler". */
   label: () => (st.owned ? butlerName(st) : ''),
+  /** G367: verbs on the Butler that only multiplayer has (features/butler-im-feature.js). */
+  setMpVerbs(hook) {
+    mpVerbs = hook && typeof hook.list === 'function' && typeof hook.run === 'function' ? hook : null;
+  },
+  /**
+   * G367, multiplayer: the Butler says a line on the home street (sendBubbleAndChat): a bubble
+   * over it when you stand there, a reply to a verb (speak true) or an announcement. False when
+   * it is not drawn here.
+   */
+  streetSay(engine, text, ms = 5000) {
+    if (engine?.mode !== 'multiplayer' || !st.owned || !view?.butler || currentRoom(engine) !== 'street') return false;
+    command();
+    say(engine, text, ms);
+    return true;
+  },
   receiveVisitor: (engine, letter) => receiveVisitor(engine, letter),
   /** street-furniture-feature tells the hints whether visits are on and opt-in is open. */
   setVisitState(allowed, canOptIn) {

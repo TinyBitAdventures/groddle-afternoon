@@ -44,7 +44,7 @@ export const MAX_LOOK_BYTES = 4096;
 
 /** Emotes a player can send: the Glitch emotion animations (avatar-anims.js EMOTIONS). */
 /** Kinds the client sends through its own methods; send() refuses them. */
-export const CORE_KINDS = Object.freeze(new Set(['auth', 'join', 'move', 'chat', 'emote', 'leave', 'ping']));
+export const CORE_KINDS = Object.freeze(new Set(['auth', 'join', 'move', 'chat', 'typing', 'emote', 'leave', 'ping']));
 
 export const EMOTES = Object.freeze(['happy', 'surprise', 'angry']);
 
@@ -351,6 +351,13 @@ export function createRealtimeClient({
         emit('said', { id: Number(msg.id), name: String(msg.name || ''), text: String(msg.text || ''), at: Number(msg.at) || now(), mine });
         return;
       }
+      case 'typing': {
+        // G366: another player started a Local chat line (hub.go "typing"; no text travels).
+        if (awaitingStreet) return;
+        const p = players.get(Number(msg.id));
+        if (p) emit('typing', { id: p.id, player: p });
+        return;
+      }
       case 'emoted': {
         if (awaitingStreet) return;
         const p = players.get(Number(msg.id));
@@ -512,6 +519,12 @@ export function createRealtimeClient({
       const line = String(text || '').replace(/\s+/g, ' ').trim().slice(0, MAX_CHAT);
       if (!line || !want || !street) return false;
       return send({ t: 'chat', text: line });
+    },
+
+    /** G366: you started a Local chat line (main.js doLocalChatStart); false when it could not go. */
+    typing() {
+      if (!want || !street) return false;
+      return send({ t: 'typing' });
     },
 
     emote(e) {

@@ -17,6 +17,8 @@
  *   via 'door'); "You don't have a tower!" until it is built.
  * - /butler: the Butler's click response, 0.5 to 1 s later (bag_butler.js
  *   sendIM), in the activity log; silent without a Butler, as in the source.
+ *   In multiplayer the IM goes to the Butler's chat, and "/butler <command>"
+ *   is an IM to it (features/butler-im-feature.js butlerImCommand, G367).
  * - has_used_house_command / has_used_tower_command are kept (saved) for the
  *   Butler hints that teach /house and /tower (butler_hints.js:382-399).
  * - /tp: the administrators' teleport (js/admin-teleport.js, v0.2.2), multiplayer
@@ -29,7 +31,7 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=814ee05f';
-import { butlerApi } from './butler-feature.js?v=3733cccb';
+import { butlerApi } from './butler-feature.js?v=0140636b';
 import { hellFeature } from './hell-feature.js?v=2d9958f9';
 import { towerApi } from './home-tower-feature.js?v=1be4cf55';
 import { slashPlan, unknownLine } from '../slash-commands.js?v=23e13b20';
@@ -163,7 +165,8 @@ export function runSlashCommand(engine, text) {
     travel(engine, plan);
   } else if (plan.butler) {
     last = `${plan.command}:butler`;
-    butlerIm(engine);
+    const rest = String(text || '').trim().replace(/^\/butler\b\s*/i, '');
+    if (!engine.query?.('butlerImCommand', rest, engine)) butlerIm(engine);
   } else {
     last = `${plan.command}:silent`;
   }

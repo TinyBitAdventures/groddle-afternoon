@@ -859,4 +859,9 @@ export const groupsFeature = {
     if (engine.mode !== 'multiplayer' || !engine.started) return;
     ensure(engine);
   },
+
+  /** The chat a typed line is for ('street', 'party' or a channel), for realtime-feature's typing mark. */
+  chatTab() {
+    return session ? session.tab : null;
+  },
 };
