@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BUG_TEXT, MAX_MESSAGE, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=748dda15';
+import { BUG_TEXT, MAX_MESSAGE, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=094e4c47';
 import { createMinnAccount } from '../public/js/minn-account.js?v=ea900c51';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -51,7 +51,7 @@ describe('Report a bug (G353)', () => {
       ['TypeError: boom'],
       { document: doc, location: { pathname: '/play/online/' }, navigator: { userAgent: 'Test/1.0' }, innerWidth: 1280, innerHeight: 800 },
     );
-    assert.deepEqual(ctx, { street: 'GA5101HF7F429V5', streetName: 'Hechey Track', x: '121', y: '-30', build: '1a2b3c4d', page: '/play/online/', agent: 'Test/1.0', screen: '1280x800', errors: ['TypeError: boom'] });
+    assert.deepEqual(ctx, { street: 'GA5101HF7F429V5', streetName: 'Hechey Track', x: '121', y: '-30', build: '1a2b3c4d', page: '/play/online/', agent: 'Test/1.0', screen: '1280x800', panels: '', errors: ['TypeError: boom'] });
   });
 
   it('sends the report to groddle/v1/feedback with the session nonce', async () => {

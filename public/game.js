@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=63da285f';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f147b2c4';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a1e57d97';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -10588,6 +10588,16 @@ const engine = {
     } finally {
       if (prompt) prompt.visible = hint;
     }
+  },
+  /**
+   * The whole canvas as the player sees it, `width` CSS pixels wide (render-then-extract, so it
+   * works without preserveDrawingBuffer): the world under a report picture that includes the
+   * page's windows (features/bug-report-feature.js). Null before the renderer starts.
+   */
+  snapshotCanvas({ width = VIEW_W } = {}) {
+    if (!app?.renderer || !app.stage) return null;
+    const resolution = Math.max(0.25, Math.min(4, (Number(width) || VIEW_W) / VIEW_W));
+    return app.renderer.extract.canvas({ target: app.stage, frame: new PIXI.Rectangle(0, 0, VIEW_W, VIEW_H), resolution });
   },
   /**
    * Hold the camera centred `dx`/`dy` world pixels away from the avatar

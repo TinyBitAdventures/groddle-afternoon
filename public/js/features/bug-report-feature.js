@@ -29,13 +29,29 @@
  * The HUD, the chat dock, Activity and every window are page elements and are
  * never in it.
  *
+ * With the game's UI (player report 2026-11-01, Austin's design): Include the
+ * game's UI, ticked by default, draws the whole game window instead
+ * (capturePictureWithUi): the page (#wrap) through modern-screenshot 4.7.0
+ * (MIT, public/vendor/modern-screenshot, imported only when a report opens),
+ * with the canvas's own picture in place of the WebGL canvas
+ * (engine.snapshotCanvas: render then extract). The Reports window and its
+ * scrim are left out; chat, mail, Activity and group chat keep their boxes
+ * with the words blanked (REPORT_MASK), since they hold other players' names
+ * and words. The same size and JPEG budget as before. The report's context
+ * names the windows that were open (openPanels: "donate:mab", "make:gassifier").
+ *
+ * Over other windows (the same report): a window's scrim covers the top bar,
+ * so the bug icon could not be clicked while Donate or another window was
+ * open. While anything covers it, a copy of the icon (#bug-btn-lift) sits on
+ * top at the same place and opens the sheet over the window.
+ *
  * QA: canvas data bugReport (closed|open|sending), bugReportLast (the last
  * line shown), reportsView (list|thread|new), reportsUnread (n);
  * window.groddleBugReport.open('list'|'new'), .openTicket(id), .refresh() in multiplayer.
  */
 
-import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=3532797d';
-import { mountReportsSheet } from '../ui/reports-sheet.js?v=69a752c8';
+import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=eabbd20e';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=0cd0f668';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 
@@ -73,10 +89,58 @@ export function buildKey(doc = globalThis.document) {
   return m ? m[1] : '';
 }
 
+/** Where the words of other players show: kept as boxes, their text blanked, in a picture with the UI. */
+export const REPORT_MASK = Object.freeze([
+  '#local-chat-stream', '#local-chat-input', '#activity-history', '.social-log', '.social-compose',
+  '.grp-lines', '#mp-log', '#mail-list', '#mail-reader', '.mail-compose-form',
+]);
+
+/** Never in the picture: the Reports window itself and the icon's copy over windows. */
+export const REPORT_LEAVE_OUT = Object.freeze(['bug-report-panel', 'bug-btn-lift']);
+
+/** The names a report gives the windows (their element ids without "-panel", unless named here). */
+const PANEL_NAMES = Object.freeze({ 'shrine-panel': 'donate', 'quest-dialogue': 'conversation', 'verb-menu': 'verbs', 'pack-popover': 'item' });
+const PANEL_SELECTOR = '.side-panel, .ui-sheet, .glitch-modal, .home-panel, .mail-panel, .map-panel, #verb-menu, #pack-popover, #quest-dialogue, #social-body';
+
+const visible = (n) => Boolean(n && !n.hidden && n.getClientRects?.().length && globalThis.getComputedStyle?.(n)?.visibility !== 'hidden');
+const slug = (t) => String(t || '').trim().toLowerCase().replace(/\s+/g, ' ').slice(0, 40);
+
+/**
+ * The windows open when the report was written, e.g. ["donate:mab", "make:gassifier/heavy gas", "map"]:
+ * a picture can miss what the player saw, the list cannot.
+ */
+export function openPanels(doc = globalThis.document) {
+  const out = [];
+  const seen = new Set();
+  for (const n of doc?.querySelectorAll?.(PANEL_SELECTOR) || []) {
+    if (!n.id || REPORT_LEAVE_OUT.includes(n.id) || seen.has(n.id) || !visible(n)) continue;
+    seen.add(n.id);
+    let name = PANEL_NAMES[n.id] || n.id.replace(/-panel$/, '');
+    if (n.id === 'make-panel') {
+      const tool = slug(n.querySelector('.make-tool-chip.active')?.textContent);
+      const recipe = slug(n.querySelector('#make-title')?.textContent).replace(/^make\s*/, '');
+      if (tool) name += `:${tool}`;
+      if (recipe) name += `/${recipe}`;
+    } else if (n.id === 'shrine-panel') {
+      const giant = slug(n.querySelector('h2')?.textContent).replace(/^shrine to\s*/, '');
+      if (giant) name += `:${giant}`;
+    } else if (n.id === 'vendor-panel') {
+      const tab = slug(n.querySelector('[aria-selected="true"], .active')?.textContent);
+      if (tab) name += `:${tab}`;
+    } else if (n.id === 'social-body') {
+      name = 'social';
+    }
+    out.push(name);
+  }
+  return out;
+}
+
 /** What the report carries besides the player's words. */
 export function reportContext(engine, errors = [], env = globalThis) {
   const p = engine?.player;
   const street = engine?.street;
+  let panels = '';
+  try { panels = openPanels(env.document).join(', ').slice(0, 300); } catch { panels = ''; }
   return {
     street: String(engine?.streetTsid || ''),
     streetName: String(street?.label || street?.name || ''),
@@ -86,6 +150,7 @@ export function reportContext(engine, errors = [], env = globalThis) {
     page: String(env.location?.pathname || ''),
     agent: String(env.navigator?.userAgent || '').slice(0, 300),
     screen: env.innerWidth ? `${env.innerWidth}x${env.innerHeight}` : '',
+    panels,
     errors: errors.slice(-MAX_ERRORS),
   };
 }
@@ -97,6 +162,11 @@ export function reportContext(engine, errors = [], env = globalThis) {
 export function capturePicture(engine, doc = globalThis.document, limits = REPORT_PICTURE) {
   let view = null;
   try { view = engine?.snapshotView?.({ resolution: 1 }); } catch { view = null; }
+  return encodePicture(view, doc, limits);
+}
+
+/** A drawn view (a canvas) as the report's JPEG within the site's limits, or null. */
+export function encodePicture(view, doc = globalThis.document, limits = REPORT_PICTURE) {
   if (!view?.width || !view?.height || !doc?.createElement) return null;
   for (const widest of limits.widths) {
     const [w, h] = pictureSize(view.width, view.height, Math.min(widest, limits.maxWidth), limits.maxHeight);
@@ -120,6 +190,66 @@ export function capturePicture(engine, doc = globalThis.document, limits = REPOR
     }
   }
   return null;
+}
+
+/** modern-screenshot, self-hosted and pinned (MIT, public/vendor/modern-screenshot/LICENSE); loaded when first wanted. */
+const SHOT_LIB = '../../vendor/modern-screenshot/modern-screenshot-4.7.0.mjs';
+let shotLib = null;
+const loadShotLib = () => (shotLib ||= import(SHOT_LIB).catch((err) => { shotLib = null; throw err; }));
+
+/** Blanks the words inside a cloned box, keeping the box: every descendant hidden, its own text clear. */
+export function maskClone(root, selectors = REPORT_MASK) {
+  let n = 0;
+  for (const box of root?.querySelectorAll?.(selectors.join(', ')) || []) {
+    box.style.color = 'transparent';
+    if ('value' in box) box.value = '';
+    box.setAttribute?.('placeholder', '');
+    for (const d of box.querySelectorAll('*')) d.style.visibility = 'hidden';
+    n += 1;
+  }
+  return n;
+}
+
+/**
+ * The whole game window as a report's picture: the page with its HUD and open windows over
+ * the canvas's own picture, the Reports window left out, chat and mail blanked. Resolves to
+ * { url, width, height, bytes, ui: true } or null (the caller then sends the world only).
+ */
+export async function capturePictureWithUi(engine, doc = globalThis.document, limits = REPORT_PICTURE) {
+  const root = doc?.getElementById?.('wrap') || doc?.body;
+  const canvas = doc?.querySelector?.('#game-root canvas');
+  if (!root || !canvas) return null;
+  const rect = root.getBoundingClientRect();
+  if (!rect.width || !rect.height) return null;
+  let lib;
+  try { lib = await loadShotLib(); } catch { return null; }
+  const cssW = canvas.getBoundingClientRect().width || canvas.clientWidth;
+  let world = null;
+  try { world = engine?.snapshotCanvas?.({ width: cssW }); } catch { world = null; }
+  if (!world) return null;
+  const worldUrl = world.toDataURL('image/png');
+  const [w] = pictureSize(rect.width, rect.height, limits.maxWidth, limits.maxHeight);
+  // The library copies a canvas through its toDataURL: the WebGL buffer is empty by then, so the
+  // canvas answers with the picture just drawn from the stage while the page is copied.
+  const own = Object.prototype.hasOwnProperty.call(canvas, 'toDataURL');
+  canvas.toDataURL = () => worldUrl;
+  let drawn = null;
+  try {
+    const bg = globalThis.getComputedStyle?.(doc.body)?.backgroundColor || '#ffffff';
+    drawn = await lib.domToCanvas(root, {
+      scale: Math.min(1, w / rect.width),
+      backgroundColor: bg,
+      timeout: 8000,
+      filter: (node) => !(node?.id && REPORT_LEAVE_OUT.includes(node.id)),
+      onCloneNode: (clone) => { maskClone(clone); },
+    });
+  } catch {
+    drawn = null;
+  } finally {
+    if (!own) delete canvas.toDataURL;
+  }
+  const out = encodePicture(drawn, doc, limits);
+  return out ? { ...out, ui: true } : null;
 }
 
 const STYLE = `
@@ -181,6 +311,9 @@ const STYLE = `
 [data-ui="modern"] #bug-report-panel .reports-picture img { display: block; max-width: 100%; width: auto; height: auto; max-height: 180px; }
 [data-ui="modern"] #bug-report-panel .reports-status.is-error { color: var(--text-danger); white-space: normal; }
 [data-ui="modern"] .top-bar .top-actions .bug-btn .bug-unread { pointer-events: none; }
+#bug-btn-lift { position: fixed; z-index: calc(var(--z-modal) + 31); margin: 0; box-sizing: border-box; }
+#bug-btn-lift[hidden] { display: none !important; }
+#bug-report-panel .reports-check-sub { margin-left: var(--space-5); font-weight: var(--fw-regular); }
 @media (prefers-reduced-motion: reduce) { [data-ui="modern"] #bug-report-panel .reports-card { animation: none; } }
 `;
 
@@ -223,7 +356,7 @@ function createSession(engine, errors) {
     host,
     api,
     context: () => reportContext(engine, errors),
-    capture: () => capturePicture(engine),
+    capture: ({ ui = false } = {}) => (ui ? capturePictureWithUi(engine) : capturePicture(engine)),
     toast: (t, ms) => engine.toast?.(t, ms),
     opener: () => btn,
     onState: ({ state, view, unread, last }) => {
@@ -246,6 +379,36 @@ function createSession(engine, errors) {
   engine.panelShell?.add?.({ id: 'bug-report-panel', kind: 'center', close: () => sheet.close() });
   btn.addEventListener('click', () => (sheet.state === 'closed' ? sheet.open('list') : sheet.close()));
 
+  // Over other windows: a copy of the icon on top of whatever covers it, in the same place.
+  const lift = btn.cloneNode(true);
+  lift.id = 'bug-btn-lift';
+  lift.hidden = true;
+  lift.removeAttribute('data-bug-report-open');
+  lift.setAttribute('data-bug-report-lift', '');
+  lift.addEventListener('click', () => btn.click());
+  document.body.append(lift);
+  const placeLift = () => {
+    const r = btn.getBoundingClientRect();
+    const shown = r.width > 0 && r.height > 0 && btn.getClientRects().length;
+    // What is on top there, the copy itself aside (it sits exactly over the icon while shown).
+    const stack = shown ? document.elementsFromPoint(r.left + r.width / 2, r.top + r.height / 2) : [];
+    const top = stack.find((n) => n !== lift && !lift.contains(n)) || null;
+    const covered = Boolean(shown && top && !btn.contains(top));
+    if (covered) {
+      const cs = getComputedStyle(btn);
+      Object.assign(lift.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px`, background: cs.backgroundColor, borderRadius: cs.borderRadius, color: cs.color });
+      lift.title = btn.dataset.tip || btn.title || BUG_TEXT.tip;
+      lift.setAttribute('aria-label', btn.getAttribute('aria-label') || BUG_TEXT.tip);
+      const b = lift.querySelector('[data-reports-badge]');
+      const src = btn.querySelector('[data-reports-badge]');
+      if (b && src) { b.hidden = src.hidden; b.textContent = src.textContent; }
+    }
+    if (lift.hidden === covered) lift.hidden = !covered;
+    engine.setData?.('bugReportLift', covered ? '1' : '0');
+  };
+  // Its own clock: the game's tick stops while a window holds the game.
+  const liftTimer = setInterval(placeLift, 200);
+
   async function poll() {
     if (sheet.state !== 'closed' || document.hidden || globalThis.navigator?.onLine === false) return;
     try {
@@ -264,7 +427,7 @@ function createSession(engine, errors) {
     sheet.openTicket(linked);
   }
 
-  return { ...sheet, stop: () => clearInterval(timer), get state() { return sheet.state; }, get view() { return sheet.view; }, get unread() { return sheet.unread; } };
+  return { ...sheet, placeLift, stop: () => { clearInterval(timer); clearInterval(liftTimer); }, get state() { return sheet.state; }, get view() { return sheet.view; }, get unread() { return sheet.unread; } };
 }
 
 let session = null;

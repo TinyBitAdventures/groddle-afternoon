@@ -16,9 +16,9 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=3532797d';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=69a752c8';
-import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=748dda15';
+import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=eabbd20e';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=0cd0f668';
+import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=094e4c47';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -351,12 +351,13 @@ describe('a picture of the game with a report (Austin 2026-10-30)', () => {
     assert.equal(capturePicture(engine, doc, { ...REPORT_PICTURE, maxBytes: 10 }), null, 'never fits: no picture');
     assert.equal(capturePicture({}, doc), null, 'no renderer yet');
     assert.equal(capturePicture({ snapshotView: () => { throw new Error('lost context'); } }, doc), null);
-    // Only the canvas: the feature never reads the page's HUD or chat.
+    // The world-only picture is the canvas alone: it never reads the page's HUD or chat.
     const f = read('public/js/features/bug-report-feature.js');
-    const fn = f.slice(f.indexOf('export function capturePicture('), f.indexOf('const STYLE'));
+    const fn = f.slice(f.indexOf('export function capturePicture('), f.indexOf('export function encodePicture('));
     assert.match(fn, /engine\?\.snapshotView\?\.\(\{ resolution: 1 \}\)/);
     assert.doesNotMatch(fn, /querySelector|getElementById|html2canvas|innerHTML/);
-    assert.match(f, /capture: \(\) => capturePicture\(engine\),/);
+    // With the game's UI ticked (the default), the page too (tests/report-ui-picture.test.js).
+    assert.match(f, /capture: \(\{ ui = false \} = \{\}\) => \(ui \? capturePictureWithUi\(engine\) : capturePicture\(engine\)\),/);
     // snapshotView is the stage inside the location view (the pack strip below it left out).
     assert.match(read('public/game.js'), /snapshotView\(\{ resolution = 1 \} = \{\}\) \{[\s\S]*?app\.renderer\.extract\.canvas\(\{ target: app\.stage, frame: new PIXI\.Rectangle\(0, 0, VIEW_W, LOCATION_VIEW_H\), resolution \}\)/);
   });
@@ -623,7 +624,7 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
     assert.deepEqual(out.clean, { control: 'ab\nc', badUtf8: 'ok ?( there', cut: 2000 });
     // An old post: the words (entities read back, <br> a line, paragraphs a blank line apart), the Details as the context.
     assert.equal(out.migration.message, 'The pig & the <b>butterfly</b> froze.\nThen the street went dark.\n\nSecond paragraph.');
-    assert.deepEqual(out.migration.context, { street: 'GA5101HF7F429V5', streetName: 'Hechey Track', x: '120', y: '-30', build: 'g465-1', page: '/play/online/', agent: 'Test/1.0', screen: '1280x800', errors: ['TypeError: boom <here>', 'second'] });
+    assert.deepEqual(out.migration.context, { street: 'GA5101HF7F429V5', streetName: 'Hechey Track', x: '120', y: '-30', build: 'g465-1', page: '/play/online/', agent: 'Test/1.0', screen: '1280x800', panels: '', errors: ['TypeError: boom <here>', 'second'] });
     assert.equal(out.migration.bareMessage, 'Only words');
     assert.equal(out.migration.bareContext.street, 'LIF12PMQ5121D68', 'meta fills what the Details lack');
     assert.deepEqual(out.migration.bareContext.errors, ['From meta']);

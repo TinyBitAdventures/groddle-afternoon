@@ -13,7 +13,9 @@
  * picture of the game, ticked by default, sends the game's canvas as a JPEG
  * (REPORT_PICTURE; the feature's capturePicture). The canvas is the street:
  * you, other players' avatars, the name plates and speech bubbles drawn over
- * them; never the HUD, the chat dock or a window, which are page elements.
+ * them. With Include the game's UI (ticked by default, 2026-11-01) the picture
+ * is the whole game window, its HUD and open windows drawn over the canvas,
+ * with chat, mail and Activity blanked and the Reports window left out.
  * The site checks it again (src/ReportPicture.php) and shows it only to you
  * and the administrators (src/TicketPictures.php).
  */
@@ -52,6 +54,10 @@ export const REPORT_TEXT = Object.freeze({
   picture: 'Attach a picture of the game',
   pictureHint: 'It shows the street as you see it, with other players, their names and speech bubbles. Not your chat or these windows.',
   pictureNone: 'The game view could not be drawn, so no picture goes with this one.',
+  // 18(b), Austin 2026-11-01: the picture shows the game's windows too, unless this is unticked.
+  pictureUi: 'Include the game\'s UI',
+  pictureHintUi: 'It shows the game as you see it: the street, other players and their names, and the windows you have open. Chat, mail and Activity are blanked out. This window is never in it.',
+  pictureDrawing: 'Drawing the picture…',
   pictureAlt: 'The game when you reported it',
   pictureOpen: 'Open the picture full size',
   sentNoPicture: 'Thanks! Your message was sent, without the picture.',

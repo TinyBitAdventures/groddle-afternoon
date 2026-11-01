@@ -25,11 +25,12 @@
  * [data-reports-list] rows [data-ticket=<id>] with [data-unread],
  * [data-reports-messages], #reports-reply-text, [data-reports-send-reply],
  * [data-reports-close-ticket], [data-reports-new], [data-reports-back],
- * #reports-picture [data-reports-picture] (the checkbox),
+ * #reports-picture [data-reports-picture] (the checkbox), #reports-picture-ui
+ * [data-reports-picture-ui] (Include the game's UI: the feature's capture({ ui })),
  * [data-reports-picture-preview], [data-reports-thread-picture].
  */
 
-import { REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=3532797d';
+import { REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=eabbd20e';
 
 function el(doc, tag, attrs = {}, text = '') {
   const node = doc.createElement(tag);
@@ -57,6 +58,9 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   let loading = false;
   let shot = null;
   let picture = null;
+  // The two pictures a new report can carry (with the game's UI, the world only), drawn when first wanted.
+  let shots = { ui: null, world: null };
+  let drawing = null;
 
   const e = (tag, attrs, text) => el(doc, tag, attrs, text);
   const panel = e('div', { id: 'bug-report-panel', class: 'reports-panel ui-sheet ui-sheet-center', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'bug-report-title', hidden: true, 'data-bug-report': '', 'data-reports-view': 'list' });
@@ -103,7 +107,11 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   picBox.checked = true;
   picLabel.append(picBox, doc.createTextNode(` ${T.picture}`));
   const picHint = e('p', { id: 'reports-picture-hint', class: 'reports-hint' }, T.pictureHint);
-  picText.append(picLabel, picHint);
+  const uiLabel = e('label', { class: 'reports-check reports-check-sub', for: 'reports-picture-ui' });
+  const uiBox = e('input', { type: 'checkbox', id: 'reports-picture-ui', class: 'reports-checkbox', checked: true, 'data-reports-picture-ui': '' });
+  uiBox.checked = true;
+  uiLabel.append(uiBox, doc.createTextNode(` ${T.pictureUi}`));
+  picText.append(picLabel, uiLabel, picHint);
   const picPreview = e('img', { class: 'reports-picture-thumb', alt: T.pictureAlt, hidden: true, 'data-reports-picture-preview': '' });
   picRow.append(picText, picPreview);
   const newActs = e('div', { class: 'reports-actions' });
@@ -242,10 +250,17 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   }
 
   function drawPicture() {
+    shot = shots[uiBox.checked ? 'ui' : 'world'];
     const has = Boolean(shot?.url);
-    picBox.disabled = !has;
-    if (!has) picBox.checked = false;
-    picHint.textContent = has ? T.pictureHint : T.pictureNone;
+    uiBox.disabled = Boolean(drawing) || !picBox.checked;
+    picBox.disabled = Boolean(drawing) || (!has && !shots.ui && !shots.world);
+    if (drawing) {
+      picHint.textContent = T.pictureDrawing;
+      picPreview.hidden = true;
+      return;
+    }
+    if (!has && !shots.ui && !shots.world) picBox.checked = false;
+    picHint.textContent = has ? (uiBox.checked ? T.pictureHintUi : T.pictureHint) : T.pictureNone;
     picPreview.hidden = !(has && picBox.checked);
     if (has) {
       picPreview.setAttribute('src', shot.url);
@@ -254,15 +269,33 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     }
   }
 
-  /** The game as it is now, for a new report (the feature draws it; null when it cannot). */
-  async function takePicture() {
-    shot = null;
-    picBox.checked = true;
-    try {
-      const s = await capture();
-      shot = s && typeof s.url === 'string' && s.url.startsWith('data:image/jpeg;base64,') ? s : null;
-    } catch { shot = null; }
+  /** The game as it is now, for a new report (the feature draws it; null when it cannot): with its UI or the world only. */
+  function takePicture(ui = uiBox.checked) {
+    const mode = ui ? 'ui' : 'world';
+    const job = (async () => {
+      let s = null;
+      try { s = await capture({ ui }); } catch { s = null; }
+      shots[mode] = s && typeof s.url === 'string' && s.url.startsWith('data:image/jpeg;base64,') ? s : null;
+      // A UI picture that cannot be drawn falls back to the world only.
+      if (ui && !shots.ui && !shots.world) {
+        try { s = await capture({ ui: false }); } catch { s = null; }
+        shots.world = s && typeof s.url === 'string' && s.url.startsWith('data:image/jpeg;base64,') ? s : null;
+        if (shots.world) uiBox.checked = false;
+      }
+    })();
+    drawing = job;
     drawPicture();
+    return job.finally(() => {
+      if (drawing === job) drawing = null;
+      drawPicture();
+    });
+  }
+
+  function newPictures() {
+    shots = { ui: null, world: null };
+    picBox.checked = true;
+    uiBox.checked = true;
+    return takePicture(true);
   }
 
   function open(which = 'list') {
@@ -274,7 +307,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     if (which === 'new') {
       show('new');
       sendBtn.disabled = false;
-      takePicture();
+      newPictures();
       setTimeout(() => text.focus(), 0);
     } else {
       show('list');
@@ -314,7 +347,9 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     sendBtn.disabled = true;
     say(T.sending);
     const words = message.slice(0, REPORT_MAX);
-    const pic = picBox.checked && shot?.url ? shot.url : null;
+    if (drawing) await drawing.catch(() => {});
+    const chosen = shots[uiBox.checked ? 'ui' : 'world'];
+    const pic = picBox.checked && chosen?.url ? chosen.url : null;
     try {
       let r;
       let without = false;
@@ -328,6 +363,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       }
       const sentWords = without ? T.sentNoPicture : T.sent;
       shot = null;
+      shots = { ui: null, world: null };
       text.value = '';
       state = 'open';
       sendBtn.disabled = false;
@@ -411,6 +447,10 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   text.addEventListener('input', () => { if (status.classList.contains('is-error')) say(''); });
   reply.addEventListener('input', () => { if (status.classList.contains('is-error')) say(''); });
   picBox.addEventListener('change', () => drawPicture());
+  uiBox.addEventListener('change', () => {
+    if (!shots[uiBox.checked ? 'ui' : 'world'] && !drawing) takePicture(uiBox.checked);
+    else drawPicture();
+  });
   x.addEventListener('click', () => close());
   back.addEventListener('click', () => backToList());
   newBtn.addEventListener('click', () => open('new'));
