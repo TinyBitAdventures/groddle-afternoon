@@ -17,6 +17,14 @@
  *   rides to the next stop. Each boarding counts transit:subways_entered
  *   (Subwayfarer 23, Ground Hogger 103, Commuter Mug 251, Chute Jockey 503).
  * - A reload in the train resumes on the platform of its last stop.
+ * - Multiplayer (G115 online, js/subway-mp.js; groddle-afternoon-server
+ *   subway.go): the trains are shared. A paid ticket asks the server for a
+ *   seat; riders boarding the same line at the same station while a train
+ *   stands there share it (its street TRAIN_<id>: they see each other and
+ *   chat in the carriage), it waits for 3 riders or 60 s as the source did
+ *   (10 s while nobody else is on the platform), and each rider gets off at
+ *   their own stop. With no answer from the server in 3 s the ride is the
+ *   rider's own, as in solo. The fare is the client's 50 currants, as before.
  *
  * QA: ?autostart=1&questoffer=off&subwaydemo=<station id | name | tsid>
  *   enters that station by the stairs. &subwaypapers=1 grants You Have
@@ -79,6 +87,7 @@ import {
   stepRide,
   ticketOffer,
 } from '../subway.js?v=646ae6af';
+import { BOARD_ANSWER_MS, SUBWAY_MP_TEXT, applyTrain, riderChanges, trainOf } from '../subway-mp.js?v=ffd57d82';
 
 export const SUBWAY_FEATURE_ID = 'subway';
 const STYLE_ID = 'subway-feature-style';
@@ -97,6 +106,8 @@ let announceTimer = 0;
 let lastData = 0;
 let demo = { stage: 'idle', at: 0 };
 let generation = 0;
+/** Multiplayer: the realtime client and the train answer we wait for (js/subway-mp.js). */
+let mp = null;
 
 const fastScale = (engine) => (engine.param('subwayfast') === '1' ? 0.25 : 1);
 const here = (engine) => stationByTsid(engine.streetTsid);
@@ -529,9 +540,70 @@ function buyTicket(engine, station, direction) {
   engine.updateHud();
   engine.setData('subwayLast', `paid:${direction}`);
   pendingBoard = { stop: station.id, direction };
+  // Multiplayer: a seat on the shared train first (subway.go board); the car once it answers.
+  const client = mpClient(engine);
+  if (client && client.state === 'online' && client.send('subway_board', { station: station.id, line: direction })) {
+    pendingBoard.until = Date.now() + BOARD_ANSWER_MS;
+    engine.setData('subwayLast', `asked:${direction}`);
+    return true;
+  }
+  enterCar(engine);
+  return true;
+}
+
+function enterCar(engine) {
+  if (pendingBoard) pendingBoard.until = 0;
   const spot = boardingSpot();
   engine.enter(CAR_TSID, { spawnX: spot.x, spawnY: spot.y });
-  return true;
+}
+
+/* ------------------------------------------------------------------ */
+/* Multiplayer: shared trains                                          */
+/* ------------------------------------------------------------------ */
+
+const isMp = (engine) => engine?.mode === 'multiplayer' && Boolean(engine.query?.('realtimeClient'));
+
+function mpClient(engine) {
+  if (!isMp(engine)) return null;
+  if (mp) return mp.client;
+  const client = engine.query('realtimeClient');
+  mp = { client };
+  client.on('msg:subway_train', (msg) => onTrain(engine, trainOf(msg)));
+  client.on('msg:subway_refused', () => {
+    if (!pendingBoard?.until) return;
+    // Ours: no seat (the platform changed under the ticket): transit_refund_fare gives the fare back.
+    pendingBoard = null;
+    engine.pc.currants = (Number(engine.pc.currants) || 0) + FARE;
+    engine.updateHud();
+    engine.setData('subwayLast', 'refused:server');
+    openDialog(engine, { id: 'refused-server', kicker: TEXT.gateLabel, paras: [SUBWAY_MP_TEXT.refused], choices: [{ label: TEXT.ok, value: 'ok', primary: true }] });
+  });
+  return client;
+}
+
+function announceWaiting(engine) {
+  if (!ride?.initial || !ride.need || ride.phase === 'moving') return;
+  const secs = Math.max(1, Math.round((ride.departAt - Date.now()) / 1000));
+  showAnnouncement(engine, SUBWAY_MP_TEXT.waiting(ride.need, secs), 5000);
+}
+
+function onTrain(engine, train) {
+  if (!train) return;
+  if (pendingBoard?.until) {
+    pendingBoard.train = train;
+    engine.setData('subwayTrain', train.train);
+    enterCar(engine);
+    return;
+  }
+  if (!ride || ride.train !== train.train) return;
+  const before = ride.riders || [];
+  const need = ride.need;
+  applyTrain(ride, train, Date.now());
+  const { on, off } = riderChanges(before, train.riders, mp?.client?.me?.id || 0);
+  for (const name of on) engine.pushActivity?.(SUBWAY_MP_TEXT.boarded(name));
+  for (const name of off) engine.pushActivity?.(SUBWAY_MP_TEXT.gotOff(name));
+  if (ride.need !== need || on.length) announceWaiting(engine);
+  engine.setData('subwayRiders', train.riders.length);
 }
 
 /* ------------------------------------------------------------------ */
@@ -545,12 +617,16 @@ function stopTravelSound() {
 
 function board(engine) {
   const { stop, direction } = pendingBoard;
+  const train = pendingBoard.train || null;
   pendingBoard = null;
-  ride = createRide({ stop, direction, now: Date.now(), timing: rideTiming(fastScale(engine)) });
+  ride = createRide({ stop, direction, now: Date.now(), timing: rideTiming(train ? 1 : fastScale(engine)) });
+  if (train) applyTrain(ride, train, Date.now());
   state = { ...state, stop, direction, inCar: true, rides: (state.rides || 0) + 1 };
   // transit_schedule_departure: one count per boarding.
   engine.achievement(RIDE_COUNTER, 1);
-  showAnnouncement(engine, announce.boarding(Math.round(ride.timing.board / 1000)), 5000);
+  if (train && ride.initial && ride.need) announceWaiting(engine);
+  else showAnnouncement(engine, announce.boarding(Math.max(1, Math.round((ride.departAt - Date.now()) / 1000))), 5000);
+  engine.setData('subwayRiders', train ? train.riders.length : '');
   engine.save();
 }
 
@@ -798,6 +874,11 @@ export const subwayFeature = {
   onTick(_dt, now, engine) {
     if (!engine.started) return;
     const t = Date.now();
+    if (pendingBoard?.until && t >= pendingBoard.until) {
+      // No answer from the server: ride alone, as in solo.
+      engine.setData('subwayLast', 'alone');
+      enterCar(engine);
+    }
     if (ride && inCar(engine)) {
       runRide(engine, t);
       animateCar(t);
@@ -845,6 +926,17 @@ export const subwayFeature = {
     const spot = disembarkSpot(back);
     state = { ...state, inCar: false };
     return { tsid: back.streetTsid, x: spot.x, y: spot.y };
+  },
+
+  /** realtime-feature sharedStreet: riders of one shared train are on its own street (subway.go TRAIN_<id>). */
+  realtimeStreet(engine) {
+    return ride?.street && inCar(engine) ? ride.street : null;
+  },
+
+  /** A rider's place in a party roster (party-feature streetLabel): the train, not TRAIN_<id>. */
+  labelFor(tsid) {
+    if (!/^TRAIN_[0-9A-F]{16}$/.test(String(tsid || ''))) return null;
+    return { street: SUBWAY_LINE.car.label, hub: '', hubId: 'scene' };
   },
 
   /** QA / tests. */

@@ -34,9 +34,14 @@
  * is ours (the halls' geometry is lost): in the desk room by the partition,
  * clear of the glass doors and the desk.
  *
- * Multiplayer: the bureaucrats are each player's own (no server state), as
- * the rest of the hall is; in the source they were shared and one helped one
- * player at a time.
+ * Multiplayer (G479, js/halls-mp.js; groddle-afternoon-server halls.go): a
+ * street hall is shared by everyone in it (its scene street HALL_<tsid>), and
+ * so are its four bureaucrats. The server says which one greets you, helps
+ * you or is named next, and keeps the hall's line when all are busy
+ * (isBusy 805-837: one bureaucrat serves one player at a time); everyone sees
+ * the same bureaucrats walk, stroll and serve. Your visit's conversations stay
+ * yours. What they sell is bought from your purse as in solo, a loss the
+ * ledger always accepts. Legalize It's hall stays your own.
  *
  * QA: ?autostart=1&questoffer=off&doordemo=GA5I10NJDL52TKD (Chego Chase),
  *   doordemo=GA91JUQT2G82GUL (Baeli Bray) or doordemo=GLI32G3NUTD100I&doorindex=1
@@ -58,8 +63,9 @@ import { acceptOffer, ensureQuestOfferState, markOffered, questStatus } from '..
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { parseQuestConversation } from '../quests.js?v=282e1621';
 import { CUP_CLASS, CUP_OF_WATER, WATER_COOLER, WATER_COOLER_CLASS, drinkCup, getWater, getWaterState } from '../water-cooler.js?v=1cf1b040';
-import { BUREAUCRAT_CLASS, HALL, HALL_LAYOUT, HALL_TEXT, PLEASE_WAIT_BUFF, TALK_VERB, createHallFlow } from '../bureaucratic-hall.js?v=f5ab600e';
+import { BUREAUCRAT_CLASS, HALL, HALL_LAYOUT, HALL_TEXT, PLEASE_WAIT_BUFF, TALK_VERB, createHallFlow } from '../bureaucratic-hall.js?v=a0bc6317';
 import { questRoomConverse } from './quest-instances-feature.js?v=c5f79940';
+import { HALL_MP_TEXT, HALL_POSE_MS, clerkAt, clerkRow, poseChanged } from '../halls-mp.js?v=044b5c5a';
 
 export const HALLS_FEATURE_ID = 'bureaucratic-halls';
 export const HALL_ENTER_VERB = 'hall_enter';
@@ -102,6 +108,8 @@ let flowTargets = [];
 let autoAt = 0;
 let demoDone = false;
 let demoAt = 0;
+/** Multiplayer: the realtime client and the hall's bureaucrats as the server sent them. */
+let mpHall = null;
 
 function publish(engine) {
   engine.setData?.('hallScene', hall ? hall.def.tsid : '');
@@ -109,7 +117,7 @@ function publish(engine) {
 }
 
 /** `kit` = engine.bureaucraticHall(): { layer, clerk(index, x, y, scale), sprite(url) }. */
-function spawnHall(engine, kit) {
+function spawnHall(engine, kit, shared = null) {
   const door = kit.sprite(EXIT_ART);
   door.anchor.set(0.5, 1);
   door.position.set(EXIT_X, ROOM.ground + 2);
@@ -143,7 +151,7 @@ function spawnHall(engine, kit) {
   counter.zIndex = 44;
   counter.eventMode = 'none';
   engine.entityLayer.addChild(counter);
-  startFlow(engine, clerks, { label: hall.def.label });
+  startFlow(engine, clerks, { label: hall.def.label, shared });
   const cooler = kit.sprite(COOLER_ART);
   cooler.anchor.set(0.5, 1);
   cooler.position.set(COOLER_X, ROOM.ground + 2);
@@ -217,6 +225,135 @@ function hallHost(engine, targets, { label = 'Bureaucratic Hall', buy = null } =
     buy: buy || ((item) => buyItem(engine, item)),
     activity: (text) => engine.pushActivity?.(text),
     setData: (key, value) => engine.setData?.(key, value),
+    busyWith: (i, name) => {
+      const t = targets[i];
+      if (!t) return;
+      const sub = name ? HALL_MP_TEXT.serving(name) : label;
+      if (t.subtitle !== sub) t.subtitle = sub;
+    },
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Multiplayer: the shared bureaucrats (js/halls-mp.js, halls.go)      */
+/* ------------------------------------------------------------------ */
+
+const isMp = (engine) => engine?.mode === 'multiplayer' && Boolean(engine.query?.('realtimeClient'));
+
+function loseTurn(engine, i) {
+  if (!flow?.lost(i)) return;
+  engine.prompt?.({ text: HALL_MP_TEXT.lost, choices: [{ label: 'OK', value: 'ok' }], timeout: 10 });
+}
+
+function hallSession(engine) {
+  if (!isMp(engine)) return null;
+  if (mpHall) return mpHall;
+  const client = engine.query('realtimeClient');
+  const s = { client, street: '', rows: [], asks: new Map(), unsent: [], sent: [], sentAt: [], touchAt: [], place: 0 };
+  const here = (street) => Boolean(hall?.shared) && street === s.street;
+  client.on('msg:hall_state', (msg) => {
+    if (!here(msg.street)) return;
+    const t = Date.now();
+    s.rows = (Array.isArray(msg.clerks) ? msg.clerks : []).map((row) => clerkRow(row, t));
+    // One we hold that the server no longer gives us (it let us go while we were away).
+    const me = client.me?.id || 0;
+    for (const i of flow?.held || []) if (s.rows[i] && s.rows[i].by !== me) loseTurn(engine, i);
+  });
+  client.on('msg:hall_pose', (msg) => {
+    const row = s.rows[Number(msg.i)];
+    if (!hall?.shared || !row) return;
+    const x = Number(msg.x);
+    row.x = Number.isFinite(x) ? x : row.x;
+    row.dir = msg.face === 'right' ? 'right' : 'left';
+    row.anim = typeof msg.anim === 'string' ? msg.anim : 'idle';
+    delete row.to;
+    delete row.speed;
+    row.at = Date.now();
+  });
+  client.on('msg:hall_given', (msg) => {
+    const res = s.asks.get(msg.kind);
+    if (!res) return;
+    s.asks.delete(msg.kind);
+    s.place = 0;
+    res(Number.isInteger(msg.i) ? msg.i : -1);
+  });
+  client.on('msg:hall_wait', (msg) => {
+    if (!hall?.shared) return;
+    const place = Math.max(1, Number(msg.place) || 1);
+    flow?.inLine(msg.kind, place);
+    if (place !== s.place) engine.toast?.(HALL_MP_TEXT.line(place));
+    s.place = place;
+    engine.setData?.('hallLine', String(place));
+  });
+  client.on('msg:hall_lost', (msg) => loseTurn(engine, Number(msg.i)));
+  client.on('state', ({ state }) => {
+    if (state === 'online') return;
+    for (const res of s.asks.values()) res(-1);
+    s.asks.clear();
+    s.unsent = [];
+  });
+  // QA (two-player checks): one step of your own visit, as hallAutoStep.
+  s.autoStep = () => hallAutoStep(engine);
+  mpHall = s;
+  globalThis.groddleHallsMp = s;
+  return s;
+}
+
+/** Asks wait until the realtime client stands in the hall (its join goes first). */
+function flushAsks(s) {
+  if (!s?.unsent.length || s.client.street !== s.street) return;
+  for (const a of s.unsent.splice(0)) {
+    if (!s.client.send('hall_ask', a)) {
+      s.asks.get(a.kind)?.(-1);
+      s.asks.delete(a.kind);
+    }
+  }
+}
+
+/** createHallFlow's `shared`: the server decides the bureaucrats (bureaucratic-hall.js header). */
+function sharedAdapter(s, street) {
+  const client = s.client;
+  s.street = street;
+  s.rows = [];
+  s.asks.clear();
+  s.unsent = [];
+  s.sent = [];
+  s.sentAt = [];
+  s.touchAt = [];
+  s.place = 0;
+  return {
+    get me() {
+      return client.me?.id || 0;
+    },
+    ask(kind, x) {
+      return new Promise((resolve) => {
+        s.asks.get(kind)?.(-1);
+        s.asks.set(kind, resolve);
+        s.unsent.push({ kind, x: Math.round(Number(x) || 0) });
+        flushAsks(s);
+      });
+    },
+    as: (i, kind) => client.send('hall_as', { i, kind }),
+    pose(i, pose) {
+      const t = Date.now();
+      const p = { x: Math.round(pose.x), dir: pose.dir, anim: pose.anim };
+      if (t - (s.sentAt[i] || 0) < HALL_POSE_MS || !poseChanged(s.sent[i], p)) return;
+      s.sent[i] = p;
+      s.sentAt[i] = t;
+      client.send('hall_pose', { i, x: p.x, face: p.dir, anim: p.anim });
+    },
+    touch(i) {
+      const t = Date.now();
+      if (t - (s.touchAt[i] || 0) < 1000) return;
+      s.touchAt[i] = t;
+      client.send('hall_touch', { i });
+    },
+    done(i, x) {
+      s.sent[i] = null;
+      client.send('hall_done', { i, x: Math.round(Number(x) || 0) });
+    },
+    view: (i, now) => clerkAt(s.rows[i], now),
+    row: (i) => s.rows[i] || null,
   };
 }
 
@@ -237,10 +374,10 @@ function buyItem(engine, item) {
 }
 
 /** Start the visit for the bureaucrats now in the room (`targets`, in their order). */
-export function startFlow(engine, targets, { label, script = null, buy = null, start = null } = {}) {
+export function startFlow(engine, targets, { label, script = null, buy = null, start = null, shared = null } = {}) {
   flow?.end();
   flowTargets = targets;
-  flow = createHallFlow(hallHost(engine, targets, { label, buy }), { script, start });
+  flow = createHallFlow(hallHost(engine, targets, { label, buy }), { script, start, shared });
   return flow;
 }
 
@@ -379,6 +516,8 @@ export function enterHall(engine, def, door = null) {
   };
   const kit = engine.bureaucraticHall();
   const { layer } = kit;
+  const session = hallSession(engine);
+  const shared = session && session.client.state === 'online' ? sharedAdapter(session, hallSceneTsid(def.tsid)) : null;
   // The camera keeps the pack's allowance below the floor: carry the floor's grey on down.
   engine.playSound?.('DOOR_OPEN', { volume: 0.6 });
   engine.enterScene({
@@ -395,8 +534,8 @@ export function enterHall(engine, def, door = null) {
     returnTo,
     ownLight: true,
   });
-  hall = { def, returnTo };
-  spawnHall(engine, kit);
+  hall = { def, returnTo, shared: Boolean(shared) };
+  spawnHall(engine, kit, shared);
   last = `enter:${def.tsid}`;
   publish(engine);
   return true;
@@ -450,6 +589,7 @@ export const bureaucraticHallsFeature = {
       } else runDemo(engine, now);
     }
     if (!flow) return;
+    if (hall?.shared) flushAsks(mpHall);
     flow.tick(dtMs);
     if (engine.param?.('hallautoplay') === 'flow' && now >= autoAt) {
       autoAt = now + 250;
@@ -537,6 +677,11 @@ export const bureaucraticHallsFeature = {
   init() {
     // A cup kept in a save shows its own name and description in the pack.
     ensureCup();
+  },
+
+  /** realtime-feature sharedStreet: a shared street hall is one street for everyone in it (halls.go). */
+  realtimeStreet(engine) {
+    return hall?.shared && engine.inScene?.() ? hallSceneTsid(hall.def.tsid) : null;
   },
 
   /** Tests. */

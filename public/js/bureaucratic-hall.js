@@ -293,9 +293,16 @@ const randInt = (a, b, rng) => a + Math.floor(rng() * (b - a + 1));
  *   say(i, text), converse(i, { text, choices }) -> Promise<value|null>,
  *   prompt({ text, timeout, timeoutValue, onChoice }) -> uid, removePrompt(uid),
  *   applyBuff(), removeBuff(), acting(), learned(), achievements(), currants(),
- *   buy(item) -> 'ok' | 'broke' | 'room', activity(text), setData(key, value), rng().
+ *   buy(item) -> 'ok' | 'broke' | 'room', activity(text), setData(key, value), rng(),
+ *   busyWith(i, name) (optional: a bureaucrat busy with another player, multiplayer).
+ * `shared` (multiplayer, features/bureaucratic-halls-feature.js over js/halls-mp.js): the
+ *   hall's bureaucrats are the realtime server's (halls.go). It decides who greets, helps
+ *   or is named next: ask(kind, x) -> Promise<index | -1> (greet and help may wait in the
+ *   hall's line), as(i, kind), pose(i, pose), touch(i), done(i, x) (back at its place),
+ *   view(i, now) -> { x, dir, anim } | null, row(i) -> the server's row.
+ *   Bureaucrats that are not yours are drawn where the server says.
  */
-export function createHallFlow(host, { script = null, start = null } = {}) {
+export function createHallFlow(host, { script = null, start = null, shared = null } = {}) {
   const rng = () => (typeof host.rng === 'function' ? host.rng() : Math.random());
   const now = () => host.now();
   const L = HALL_LAYOUT;
@@ -324,7 +331,10 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
     ended: false,
     phase: 'arrived',
     last: '',
+    lost: false, // multiplayer: the server took your turn (halls.go turn)
   };
+  /** Multiplayer: the bureaucrats the server says are yours. */
+  const mine = new Set();
   if (start === 'done') {
     v.started = true;
     v.done = true;
@@ -352,8 +362,50 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
   const setPhase = (phase, last = '') => {
     v.phase = phase;
     if (last) v.last = last;
+    if (shared) for (const i of mine) shared.touch(i);
     publish();
   };
+
+  /**
+   * A bureaucrat for you: the nearest free one (greet, help) or the first free one (will).
+   * Multiplayer asks the server, which may put you in the line first.
+   */
+  async function claim(kind) {
+    if (!shared) return kind === 'will' ? firstFree() : nearestFree(kind);
+    const i = await shared.ask(kind, host.player().x);
+    if (v.ended || v.lost || !Number.isInteger(i) || i < 0 || !clerks[i]) return null;
+    const c = clerks[i];
+    mine.add(i);
+    const at = shared.view(i, now());
+    if (at) {
+      c.x = at.x;
+      c.dir = at.dir;
+    }
+    c.target = null;
+    c.state = 'idle';
+    c.phase = '';
+    return c;
+  }
+  /** Multiplayer: yours no longer (back at its place, or a promise not needed). */
+  function letGo(c) {
+    if (!shared || !mine.has(c.i)) return;
+    mine.delete(c.i);
+    shared.done(c.i, c.x);
+  }
+  /** The nearest free bureaucrat comes to help (Please Wait over, or a card holder with no Arts). */
+  function helpNext() {
+    if (!shared) {
+      const c = nearestFree('help');
+      if (c) help(c);
+      else setPhase('stuck', 'no-helper');
+      return;
+    }
+    setPhase('asking', 'ask:help');
+    claim('help').then((c) => {
+      if (c) help(c);
+      else if (!v.ended && !v.lost) setPhase('stuck', 'no-helper');
+    });
+  }
 
   /** pc.findCloseStack(is_bureaucrat): the nearest free bureaucrat to you. */
   function nearestFree(reason) {
@@ -406,7 +458,7 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
     v.conversing = true;
     const answer = await host.converse(c.i, { text: HALL_TEXT.greeting(pcLabel()), choices: [{ label: 'OK', value: 'greeting-ok' }] });
     v.conversing = false;
-    if (v.ended) return;
+    if (v.ended || v.lost) return;
     // greeting_onMsg 427-447: OK or closing it flags you as waiting.
     if (answer === 'greeting-ok' || answer === null) {
       v.waiting = true;
@@ -440,6 +492,12 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
     v.step = 0;
     v.helping = -1;
     c.willHelp = false;
+    // Multiplayer: a bureaucrat promised next and never reached is let go (ours).
+    const promised = clerks[v.helperIndex];
+    if (shared && promised && promised !== c && promised.willHelp && promised.state === 'idle') {
+      promised.willHelp = false;
+      letGo(promised);
+    }
     returnToStart(c);
     v.done = true;
     endPrompt();
@@ -453,7 +511,7 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
     v.conversing = true;
     const answer = await host.converse(c.i, { text, choices });
     v.conversing = false;
-    return v.ended ? undefined : answer;
+    return v.ended || v.lost ? undefined : answer;
   }
 
   async function helpingArrived(c) {
@@ -490,7 +548,8 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
     script?.onAnswer?.(Number(String(answer).slice(7)));
     const handoff = script?.handoff ? script.handoff() : rng() < HANDOFF_CHANCE;
     if (handoff) {
-      const next = firstFree();
+      const next = await claim('will');
+      if (v.ended || v.lost) return;
       let text;
       if (next) {
         next.willHelp = true;
@@ -523,6 +582,7 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
     c.willHelp = false;
     returnToStart(c);
     const next = clerks[v.helperIndex];
+    if (next && shared) shared.as(next.i, 'help');
     if (next) help(next);
     else setPhase('stuck', 'no-helper');
   }
@@ -553,7 +613,8 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
     if (!v.step) v.step = 1;
     v.item = it;
     script?.onItem?.(it.classTsid);
-    const next = firstFree();
+    const next = await claim('will');
+    if (v.ended || v.lost) return true;
     let text = HALL_TEXT.noOne;
     if (next) {
       next.willHelp = true;
@@ -616,6 +677,21 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
   }
 
   function tickClerk(c, dtMs, t) {
+    if (shared && !mine.has(c.i)) {
+      // Multiplayer: not yours; the server (or its player) moves it.
+      const at = shared.view(c.i, t);
+      if (at) {
+        c.x = at.x;
+        c.dir = at.dir;
+        c.anim = at.anim;
+      }
+      c.state = 'idle';
+      c.target = null;
+      const row = shared.row(c.i);
+      host.busyWith?.(c.i, row && row.by && row.by !== shared.me ? row.who : '');
+      host.drawClerk(c.i, { x: c.x, y: clerkYAt(c.x), dir: c.dir, anim: c.anim === 'walk1' || c.anim === 'walk2' || c.anim === 'talk' ? c.anim : 'idle', behind: clerkBehindCounter(c.x) });
+      return;
+    }
     const arrived = stepClerk(c, dtMs);
     if (arrived) {
       if (c.phase === 'return') {
@@ -624,6 +700,7 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
         c.phase = '';
         c.anim = 'idle';
         c.nextAt = t + 1000;
+        letGo(c);
       } else if (c.state === 'greeting' && c.phase === 'go') {
         c.anim = 'idle';
         greetingArrived(c);
@@ -644,7 +721,7 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
       host.say(c.i, respond('helping_reminder'));
       c.remindAt = t + REMINDER_MS;
     }
-    if (c.state === 'idle' && c.target == null && t >= c.nextAt) {
+    if (!shared && c.state === 'idle' && c.target == null && t >= c.nextAt) {
       // idle_onMsg interval: a stroll (25%), else maybe turn round.
       if (rng() < 0.25) walk(c, randInt(L.stroll[0], L.stroll[1], rng), randInt(20, 40, rng), 'walk1');
       else {
@@ -652,7 +729,12 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
         c.nextAt = t + randInt(1000, 10000, rng);
       }
     }
-    host.drawClerk(c.i, { x: c.x, y: clerkYAt(c.x), dir: c.dir, anim: c.target != null ? c.anim : c.anim === 'talk' ? 'talk' : 'idle', behind: clerkBehindCounter(c.x) });
+    const pose = { x: c.x, y: clerkYAt(c.x), dir: c.dir, anim: c.target != null ? c.anim : c.anim === 'talk' ? 'talk' : 'idle', behind: clerkBehindCounter(c.x) };
+    if (shared) {
+      host.busyWith?.(c.i, '');
+      shared.pose(c.i, pose);
+    }
+    host.drawClerk(c.i, pose);
   }
 
   return {
@@ -669,10 +751,17 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
       const p = host.player();
       // bureaucratic_hall_entered.
       if (!v.started && inEnteredBox(p.x)) {
-        const c = nearestFree('greet');
-        if (c) {
+        if (shared) {
           v.started = true;
-          greet(c);
+          claim('greet').then((c) => {
+            if (c) greet(c);
+          });
+        } else {
+          const c = nearestFree('greet');
+          if (c) {
+            v.started = true;
+            greet(c);
+          }
         }
       }
       // waiting_area (only while flagged waiting).
@@ -682,8 +771,11 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
         v.waitPrompt = '';
         if (host.achievements().includes('card_carrying_qualification') && !host.learned().includes('bureaucraticarts_1')) {
           host.prompt({ text: HALL_TEXT.cardNoSkill, choices: [{ label: 'OK', value: 'ok' }], timeout: 10 });
-          const c = nearestFree('help');
-          if (c) help(c);
+          if (shared) helpNext();
+          else {
+            const c = nearestFree('help');
+            if (c) help(c);
+          }
         } else applyWait();
       }
       if (v.buffOn) {
@@ -694,9 +786,7 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
           // please_wait on_remove after its full 10 s: the nearest free bureaucrat helps.
           host.removeBuff();
           v.buffOn = false;
-          const c = nearestFree('help');
-          if (c) help(c);
-          else setPhase('stuck', 'no-helper');
+          helpNext();
         }
         v.lastPos = { x: p.x, y: p.y };
       }
@@ -705,6 +795,43 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
         v.publishedAt = t;
         publish();
       }
+    },
+    /** Multiplayer: the bureaucrats the server says are yours. */
+    get held() {
+      return [...mine];
+    },
+    /** Multiplayer: every bureaucrat is busy; your place in the hall's line (halls.go hall_wait). */
+    inLine(kind, place) {
+      if (v.ended || v.lost) return;
+      setPhase('line', `line:${kind}:${place}`);
+    },
+    /**
+     * Multiplayer: the server took bureaucrat i from you (your turn ran out, or it let you go
+     * while you were away). Its part of the visit ends: you must leave and come back.
+     */
+    lost(i) {
+      if (!mine.has(i)) return false;
+      mine.delete(i);
+      const c = clerks[i];
+      c.target = null;
+      c.state = 'idle';
+      c.phase = '';
+      c.willHelp = false;
+      if (v.done || v.ended) return true;
+      v.lost = true;
+      v.done = true;
+      v.helping = -1;
+      v.step = 0;
+      // The others you held go back to the hall where they stand.
+      for (const k of [...mine]) {
+        clerks[k].state = 'idle';
+        clerks[k].phase = '';
+        clerks[k].target = null;
+        clerks[k].willHelp = false;
+        letGo(clerks[k]);
+      }
+      setPhase('done', 'lost');
+      return true;
     },
     /** A game event (a verb, a pack use): Please Wait does not allow it. */
     noteAction(kind) {
@@ -715,6 +842,7 @@ export function createHallFlow(host, { script = null, start = null } = {}) {
     end() {
       if (v.ended) return;
       v.ended = true;
+      mine.clear();
       if (v.waitPrompt) host.removePrompt?.(v.waitPrompt);
       if (v.buffOn) host.removeBuff();
       v.buffOn = false;
