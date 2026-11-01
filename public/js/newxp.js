@@ -488,6 +488,20 @@ export function street4Check(island, bagsDone) {
   return bagsDone ? 'notSoFast' : 'noBags';
 }
 
+/**
+ * Ticket 26: does standing here count toward On to the Big Time's flag? location.js onPlayerEnter
+ * 686-688: entering any location that is not an instance and not a home (pols), alive, while
+ * leave_gentle_island is todo, sets the flag 15 s later (LEAVE_FLAG_DELAY_MS). Gentle Island and the
+ * practice streets were per-player instances (newxp), so they never count; nor do the remake's
+ * tutorial scenes, rooms and other transient instances.
+ */
+export function leaveFlagStreet({ tsid = '', instance = false, inHome = false, dead = false } = {}) {
+  const t = String(tsid || '');
+  if (!t || instance || inHome || dead) return false;
+  if (isNewxpSceneTsid(t) || GENTLE_ISLAND_TSIDS.includes(t)) return false;
+  return !FIRST_SKILLS.some((s) => s.street === t);
+}
+
 /** The Gentle Island Exit box only fires once leave_gentle_island is accepted. */
 export function islandExitOpen(island) {
   return island === 'leaving';

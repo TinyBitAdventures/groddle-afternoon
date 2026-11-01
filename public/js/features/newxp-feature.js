@@ -77,6 +77,7 @@ import {
   reduceToHand,
   sourceToStreet,
   LEAVE_FLAG_DELAY_MS,
+  leaveFlagStreet,
   LINES,
   NEWXP_UPGRADES,
   PRACTICE_ARRIVAL,
@@ -115,7 +116,7 @@ import {
   training2Layout,
   tutorialPhysics,
   vogPages,
-} from '../newxp.js?v=d5978ec1';
+} from '../newxp.js?v=de3e754f';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=d4f4772b';
 import { soundForQuoin } from '../sound-moments.js?v=2f8597cd';
@@ -128,7 +129,7 @@ import * as kit from '../quest-rooms/kit.js?v=c7ea6e0e';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=3753a0d2';
-import { HOME_MACHINE } from '../home-ticket.js?v=61ef0eb9';
+import { HOME_MACHINE } from '../home-ticket.js?v=62899fad';
 import { createAnimalState } from '../animals.js?v=cad23774';
 import {
   AK_ANIMALS,
@@ -184,7 +185,9 @@ let auto = false;
 let holdAt = '';
 let islandBusy = false;
 let reminderAt = 0;
-let exitArrivedAt = 0;
+/** Ticket 26: since when the player has stood on streets that count toward On to the Big Time (0: not now). */
+let leaveSince = 0;
+let leaveFinishing = false;
 let jumpWatch = { onGround: true, count: 0 };
 
 class Cancel extends Error {}
@@ -2379,7 +2382,6 @@ function islandEnter(engine) {
     const rock = rockOnSurveyors(engine);
     if (save.island === 'arrive' && !islandBusy) islandRockScript(engine, token, rock);
   }
-  if (save.exit && tsid === save.exit.tsid && save.island === 'exited') exitArrivedAt = Date.now();
 }
 
 async function islandRockScript(engine, t, rock) {
@@ -2798,6 +2800,80 @@ async function finishTutorial(engine, t) {
   }
 }
 
+/**
+ * Ticket 26 (location.js onPlayerEnter 686-688): with On to the Big Time accepted (or the island's
+ * last step left behind), 15 s on any real street sets its flag and the quest turns in. It used to
+ * count only on the exit street the island picked, and only while the player stayed there from that
+ * same arrival, so walking on, reloading or leaving the island another way never finished it.
+ */
+function leaveFlagTick(engine, now) {
+  const qs = engine.questState;
+  if (!qs || leaveFinishing || islandBusy) return;
+  if (qs.completed?.includes('leave_gentle_island')) {
+    leaveSince = 0;
+    return;
+  }
+  const tutorialLeft = active() && save.stage === 'island' && ['leaving', 'exited'].includes(save.island);
+  if (!qs.active?.leave_gentle_island && !tutorialLeft) {
+    leaveSince = 0;
+    return;
+  }
+  const counts = leaveFlagStreet({
+    tsid: engine.streetTsid,
+    instance: Boolean(engine.transientInstance?.()),
+    inHome: Boolean(engine.homeContext?.().inHome),
+    dead: engine.query?.('isDead', engine) === true,
+  });
+  if (!counts) {
+    leaveSince = 0;
+    return;
+  }
+  if (!leaveSince) leaveSince = now;
+  if (now - leaveSince < (auto ? 1500 : LEAVE_FLAG_DELAY_MS) || engine.busy?.()) return;
+  leaveSince = 0;
+  leaveFinishing = true;
+  engine.setData('newxpLeaveFlag', engine.streetTsid);
+  const done = () => { leaveFinishing = false; };
+  if (tutorialLeft && run) {
+    // The tutorial's own ending: the quest, the relic and the wrap-up lines.
+    if (save.island !== 'exited') {
+      save.island = 'exited';
+      save.exit ||= { tsid: engine.streetTsid, x: 0 };
+      engine.save();
+    }
+    finishTutorial(engine, token).finally(done);
+    return;
+  }
+  finishLeaveQuest(engine).finally(done);
+}
+
+/** On to the Big Time outside the tutorial's run (a later session, the tutorial state gone): turn in and the relic. */
+async function finishLeaveQuest(engine) {
+  const qs = engine.questState;
+  if (!qs.active.leave_gentle_island) acceptOffer(qs, 'leave_gentle_island', questCtx(engine));
+  const quest = qs.active.leave_gentle_island;
+  if (!quest) return;
+  quest.progress ||= {};
+  quest.progress.leave_gentle_island = 1;
+  const result = turnInQuest(qs, 'leave_gentle_island', engine.pc, { ...questCtx(engine), force: true });
+  if (!result.ok) return;
+  engine.playSound('COMPLETE_QUEST_REQUIREMENT', { volume: 0.6 });
+  engine.pushActivity(`Quest complete: ${result.def.title}`);
+  // leave_gentle_island.js onComplete_custom 59-75: the Greeter Twig, a relic of the Island.
+  addItem(engine.inv, 'greeter_twig', 1);
+  engine.pushActivity(LINES.relic.replace(/<[^>]+>/g, ''));
+  if (active()) {
+    save.status = 'done';
+    save.stage = 'done';
+    save.doneAt = Date.now();
+    teardown(engine);
+  }
+  engine.refreshPack();
+  engine.updateHud();
+  engine.save();
+  await engine.award(questAwardPayload(result.def, result.rewards || {}));
+}
+
 function islandTick(engine, now) {
   if (!run || save.stage !== 'island' || save.status !== 'active') return;
   const p = P();
@@ -2841,10 +2917,6 @@ function islandTick(engine, now) {
   if (save.island === 'quest_given' && now > reminderAt && GENTLE_ISLAND_TSIDS.includes(tsid)) {
     reminderAt = now + BAG_REMINDER_MS;
     engine.pushActivity(LINES.bagReminder);
-  }
-  if (save.island === 'exited' && save.exit && tsid === save.exit.tsid && exitArrivedAt && now - exitArrivedAt > (auto ? 1500 : LEAVE_FLAG_DELAY_MS) && !islandBusy) {
-    exitArrivedAt = 0;
-    finishTutorial(engine, token);
   }
   engine.setData('newxpBags', bagsBought(engine));
 }
@@ -3585,6 +3657,7 @@ export const newxpFeature = {
         .catch((err) => console.warn('newxp stranded', err));
     }
     exitBoxTick(engine);
+    leaveFlagTick(engine, now);
     if (!active()) {
       publish(engine, now);
       return;
@@ -3818,4 +3891,8 @@ export const __newxpTest = {
   get rooted() { return rooted; },
   set rooted(v) { rooted = Boolean(v); },
   resetExits() { exitGraph = null; strandChecked = ''; strandRetryAt = 0; },
+  // Ticket 26: On to the Big Time's 15 s on a real street.
+  leaveFlagTick,
+  resetLeave() { leaveSince = 0; leaveFinishing = false; },
+  get leaveFinishing() { return leaveFinishing; },
 };

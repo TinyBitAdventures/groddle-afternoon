@@ -26,7 +26,7 @@
 
 import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=85d4faba';
 import { HOME_STYLES, imagineHome, normalizeHomeState } from './homes.js?v=385f9a1a';
-import { LINES, talkPages } from './newxp.js?v=d5978ec1';
+import { LINES, talkPages } from './newxp.js?v=de3e754f';
 
 export const HOME_TICKET_CLASS = 'homestreet_ticket';
 

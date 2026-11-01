@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { passShrine, shrineHintFeature, shrineHintText, SHRINES_TO_PASS } from '../public/js/features/shrine-hint-feature.js?v=b9c5fd6c';
+import { passShrine, shrineHintFeature, shrineHintText, SHRINES_TO_PASS } from '../public/js/features/shrine-hint-feature.js?v=56dec5dc';
 
 const quests = () => ({ active: {}, completed: [] });
 
