@@ -33,7 +33,7 @@ import {
 } from '../public/js/groups.js?v=65337c22';
 import { createMinnAccount } from '../public/js/minn-account.js?v=81339760';
 import { groupsFeature } from '../public/js/features/groups-feature.js?v=2dec3e9b';
-import { FEATURES } from '../public/js/features/index.js?v=9f3dd50a';
+import { FEATURES } from '../public/js/features/index.js?v=79a36835';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

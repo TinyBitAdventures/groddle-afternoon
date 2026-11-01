@@ -62,10 +62,12 @@ after(() => {
 
 /** G448: the overlays-more rows that also keep SVG frames (besides the rainbows). */
 const G448_MORE = ['321_countdown', 'rook_feathers_falling', 'musicblock_notes', 'target_effect_powder_extreme', 'target_effect_powder_mild', 'glitchmas_cracker', 'shrine_power_up', 'phantom_glitch', 'avatar_power_up'];
+/** G397: Math Mayhem's two winner pictures (500 and 330 px over the view) keep SVG frames too. */
+const G397_VECTOR = ['crown_game_winner_you', 'crown_game_winner_someone_else'];
 /** G448: the overlays.json rows that do. */
 const G448_ART = ['overlay_sneezing_powder', 'focusing_orb_laser_beam', 'shrine_laser_beam_1', 'shrine_laser_beam_2', 'shrine_laser_beam_3', 'smoke_puff', 'proto_puff', 'secret_location_marker', 'icon_giant_love', 'race_winner', 'grabemgood_winner', 'thegreathoghaul_winner', 'game_of_crowns_winner', 'focusing_orb_attack'];
 
-const overlays = () => import('../public/js/overlays.js?v=106b9955');
+const overlays = () => import('../public/js/overlays.js?v=90f4b1ba');
 const flush = async (n = 3) => {
   for (let i = 0; i < n; i += 1) {
     await new Promise((r) => setTimeout(r, 0));
@@ -282,7 +284,7 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
     // 0.82 MB as built (about 100 KB gzipped), under the 1.3 MB sheet.
     assert.ok(readFileSync(vfile).length < 1_000_000);
     // G446: every 400 px rainbow (and the charades arc); G448: the other FLA overlays the audit found soft.
-    for (const [key, m] of Object.entries(manifest)) assert.equal(Boolean(m.vector), /^rainbow_|^charades_gameover$/.test(key) || G448_MORE.includes(key), key);
+    for (const [key, m] of Object.entries(manifest)) assert.equal(Boolean(m.vector), /^rainbow_|^charades_gameover$/.test(key) || G448_MORE.includes(key) || G397_VECTOR.includes(key), key);
   });
 
   it('vectorDensity: the sheet on a 1x screen, the SVG frames from 1.5 device px per stage px, capped', async () => {
@@ -509,7 +511,7 @@ describe('G441: the super harvest arc drawn from its SVG frames on dense screens
 
   it('G448: the powders, notes, splashes, countdown, puffs, marker, giant love, cracker, Rook overlays and the phantom keep SVG frames, states and all', () => {
     const art = JSON.parse(readFileSync(join(pub, 'assets/sprites/overlays/overlays.json'), 'utf8'));
-    for (const [rows, keys] of [[manifest, G448_MORE], [art, G448_ART]]) {
+    for (const [rows, keys] of [[manifest, [...G448_MORE, ...G397_VECTOR]], [art, G448_ART]]) {
       for (const key of keys) {
         const m = rows[key];
         assert.equal(m.vector.file, `${key}.frames.json`, key);

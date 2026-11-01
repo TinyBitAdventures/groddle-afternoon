@@ -42,7 +42,7 @@ import { ensureQuestOfferState } from '../quest-offers.js?v=ada47e25';
 import { getMusicblock, isMusicblock } from '../musicblocks.js?v=35e2b17a';
 import { GAME_DAY_MS } from '../game-day.js?v=3095e05b';
 import { playSheetOverlay } from '../overlay-art.js?v=3753a0d2';
-import { showRainbow } from '../overlays.js?v=106b9955';
+import { showRainbow } from '../overlays.js?v=90f4b1ba';
 import {
   CHARADES_BUFF,
   CHARADES_POTION,

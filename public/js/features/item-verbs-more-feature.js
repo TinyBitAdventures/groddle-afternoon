@@ -50,7 +50,7 @@ import { HERDKEEPING, hogtieEscapeDelayMs, husbandryPack } from '../animal-husba
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { sourceFromUrl, frameTexture } from '../textures.js?v=db2ce452';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=764d5f5a';
-import { overlayOrStandIn } from '../overlay-stand-in.js?v=603ae86e';
+import { overlayOrStandIn } from '../overlay-stand-in.js?v=1ab35105';
 import {
   BUNDLE_OF_JOY,
   BUTTERFLY_NET,

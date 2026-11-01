@@ -33,9 +33,9 @@ import { createAnimalState, animalStatusLabel, resetAnimalDay } from '../public/
 import { performAnimalKinship } from '../public/js/animal-kinship.js?v=91490913';
 import { advanceYard, capturePiggy, captureVerbState, feedPiggyStack, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=beead095';
 import { getVerbsFor, runVerb } from '../public/content.js?v=55e0524d';
-import { animalMoodFeature, describeAnimalPlace } from '../public/js/features/animal-mood-feature.js?v=31289371';
+import { animalMoodFeature, describeAnimalPlace } from '../public/js/features/animal-mood-feature.js?v=943f5ddf';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=ca0a48d5';
-import { animalHusbandryFeature, deathRollFor, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=c91c2df9';
+import { animalHusbandryFeature, deathRollFor, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js?v=90ed4ae8';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS/items');

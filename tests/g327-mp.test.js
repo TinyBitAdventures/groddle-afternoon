@@ -32,7 +32,7 @@ import {
 } from '../public/js/hi-signs-mp.js?v=2fe76c23';
 import { HI_VARIANTS, HI_VARIANT_COLORS, HI_VARIANT_NAMES, hiDay } from '../public/js/hi-signs.js?v=92c780ad';
 import { hiSignsFeature } from '../public/js/features/hi-signs-feature.js?v=fe0eb632';
-import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=3aed2f0e';
+import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=98a4597c';
 import { addItem, countItem } from '../public/js/inventory.js?v=85d4faba';
 import { applyAchievementProgress, createAchievementState, getAchievementProgress, seedAchievementNearCompletion } from '../public/js/achievements.js?v=631d7daa';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';

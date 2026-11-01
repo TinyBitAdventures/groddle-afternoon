@@ -38,7 +38,7 @@
 import { addItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=85d4faba';
 import { DROP_ITEMS, rollDropTable } from '../drop-tables.js?v=0f922478';
 import { canUseTool, useToolCondition, TOOL_CONDITION_CATALOG } from '../tools.js?v=93286603';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=106b9955';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=90f4b1ba';
 import {
   ALL_ARTIFACT_CLASSES,
   ARRIVE_DELAY_MS,

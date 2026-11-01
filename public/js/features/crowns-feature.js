@@ -21,7 +21,7 @@
  */
 
 import { crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
-import { OVERLAY_USES, playCountdownArt, playWindowOverlay } from '../overlays.js?v=106b9955';
+import { OVERLAY_USES, playCountdownArt, playWindowOverlay } from '../overlays.js?v=90f4b1ba';
 import {
   CROWNS_ID,
   CROWNS_LADDERS,
@@ -55,6 +55,7 @@ import {
   tickCrowns,
 } from '../game-of-crowns.js?v=98e21baf';
 import { RACE_RIVALS } from '../races.js?v=df0576ad';
+import { mayhemHoldsArena } from './mayhem-feature.js?v=5dea190c';
 import { wallsScreen } from '../street-model.js?v=23b926e5';
 import { addItem, countItem, removeItem } from '../inventory.js?v=85d4faba';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
@@ -1388,7 +1389,8 @@ export const crownsFeature = {
   },
 
   reloadLocation(saved, engine) {
-    if (saved?.tsid === CROWNS_STREET) {
+    // G397: Math Mayhem shares the arena; mayhem-feature answers for its own games.
+    if (saved?.tsid === CROWNS_STREET && !mayhemHoldsArena()) {
       // G334: in multiplayer a reload out of the arena is a logout: out of the game (told on arrival).
       if ((engine || engineRef)?.mode === 'multiplayer') mpLeftNote = true;
       const back = record.returnTo;
@@ -1398,12 +1400,12 @@ export const crownsFeature = {
   },
 
   ecologyOverride(street) {
-    return street.tsid === CROWNS_STREET ? { label: CROWNS_TITLE, counts: {}, empty: true } : null;
+    return street.tsid === CROWNS_STREET && !mayhemHoldsArena() ? { label: CROWNS_TITLE, counts: {}, empty: true } : null;
   },
 
   prepareStreet(street) {
     if (street.tsid !== CROWNS_STREET) return;
-    street.label = CROWNS_TITLE;
+    if (!mayhemHoldsArena()) street.label = CROWNS_TITLE;
     // G318: no hub line. LHV2H026E492IAF sits in hub 67 "Multiplayer Quests" (inc_data_maps_prod.js
     // 18003), and getLoadingInfo sends instances no hub_name (location.js 3311).
     street.hubName = '';
@@ -1412,6 +1414,7 @@ export const crownsFeature = {
 
   labelFor(tsid) {
     // A multiplayer arena (CROWNS_<match>) reads as the game, not its hub street.
+    if (tsid === CROWNS_STREET && mayhemHoldsArena()) return null;
     return tsid === CROWNS_STREET || /^CROWNS_[0-9A-F]{16}$/.test(String(tsid || '')) ? { street: CROWNS_TITLE, hub: '', hubId: 'it_game' } : null;
   },
 

@@ -102,6 +102,11 @@ export const OVERLAY_USES = Object.freeze({
   crown_game_indicator_you: { type: 'vp', wh: 140, durationMs: 0, xPx: 70, y: 0.88, loop: false, src: 'players/inc_games.js 873-882' },
   crown_game_indicator_someone_else: { type: 'vp', wh: 100, durationMs: 0, x: 0.94, y: 0.91, loop: false, src: 'players/inc_games.js 884-893' },
   game_of_crowns_throbber: { type: 'vp', wh: 200, durationMs: 0, x: 0.5, y: 0.5, loop: true, src: 'groups/shared_instance_manager.js 247-257' },
+  // G397 players/inc_games.js games_end_math_mayhem: vp_overlays, duration 0 (until a button is clicked).
+  crown_game_winner_you: { type: 'vp', wh: 500, durationMs: 0, x: 0.5, y: 0.3, loop: false, src: 'players/inc_games.js 1065-1074' },
+  crown_game_winner_someone_else: { type: 'vp', wh: 330, durationMs: 0, x: 0.5, y: 0.3, loop: false, src: 'players/inc_games.js 1090-1099' },
+  button_play_again: { type: 'vp', wh: 150, durationMs: 0, x: 0.37, y: 0.6, loop: false, src: 'players/inc_games.js 1116-1131' },
+  button_leave_game: { type: 'vp', wh: 150, durationMs: 0, x: 0.63, y: 0.6, loop: false, src: 'players/inc_games.js 1133-1148' },
 });
 
 let manifestPromise = null;

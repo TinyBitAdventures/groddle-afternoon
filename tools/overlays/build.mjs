@@ -123,6 +123,12 @@ export const OVERLAYS = Object.freeze({
   crown_game_indicator_you: small('crown_game_indicator_you', { webp: 0.9 }),
   crown_game_indicator_someone_else: small('crown_game_indicator_someone_else', { webp: 0.9 }),
   game_of_crowns_throbber: small('game_of_crowns_throbber'),
+  // G397: Math Mayhem's end (players/inc_games.js games_end_math_mayhem 1065-1147): the winner's
+  // picture 500 wide, the other 330, the two buttons 150 (drawn at 1.5x for the 500 px picture).
+  crown_game_winner_you: { fla: fla('crown_game_winner_you'), scale: 1.5, step: 1, webp: 0.85, vector: true },
+  crown_game_winner_someone_else: { fla: fla('crown_game_winner_someone_else'), scale: 1.5, step: 1, webp: 0.85, vector: true },
+  button_play_again: small('button_play_again', { webp: 0.9 }),
+  button_leave_game: small('button_leave_game', { webp: 0.9 }),
 });
 
 /**

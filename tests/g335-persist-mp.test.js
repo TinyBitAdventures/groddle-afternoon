@@ -30,6 +30,7 @@ const STATE_FILES = {
   'rook-file': 'realtime-rook.json',
   'quoins-file': 'realtime-quoins.json',
   'crowns-file': 'realtime-crowns.json', // G334 lane RACES3: crowns.go's owed rewards
+  'mayhem-file': 'realtime-mayhem.json', // G397 lane MAYHEM: mayhem.go's owed rewards
   'party-file': 'realtime-party.json', // G335 lane PARTYSAVE: parties, Party Spaces and the spends owed back
 };
 

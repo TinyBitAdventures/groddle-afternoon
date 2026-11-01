@@ -62,6 +62,38 @@
    "sha256": "7a20e1485f451f3ed0245568ff29c6f82bfad699f2b9275abb2f34174d559054"
   }
  },
+ "button_leave_game": {
+  "kind": "sheet",
+  "src": "glitch-overlays/button_leave_game.fla",
+  "fla": "1c31ba708f3a1cba6794ae53ca8bff0ee8c74910",
+  "fps": 24,
+  "frames": 1,
+  "stage": [208, 42],
+  "box": [-1, -1, 209, 44],
+  "file": "button_leave_game@2x.webp",
+  "scale": 2,
+  "cell": [418, 88],
+  "cols": 1,
+  "order": [0],
+  "bytes": 4796,
+  "sha256": "69774a99df7cc176bbf1a96e4b5223682b181a0dd62b771ca4a56dbf7d3a8131"
+ },
+ "button_play_again": {
+  "kind": "sheet",
+  "src": "glitch-overlays/button_play_again.fla",
+  "fla": "42fb6655589b5736a1d981ee31970c67e6c4ba4c",
+  "fps": 24,
+  "frames": 1,
+  "stage": [207.1, 42],
+  "box": [-1, -1, 210, 44],
+  "file": "button_play_again@2x.webp",
+  "scale": 2,
+  "cell": [420, 88],
+  "cols": 1,
+  "order": [0],
+  "bytes": 3872,
+  "sha256": "9d6a26f7fbf8cc0b271da3b77c0ad574cb88214c70bd867fd45086a17c2a371d"
+ },
  "charades_gameover": {
   "kind": "sheet",
   "src": "glitch-overlays/charades_gameover.fla",
@@ -132,6 +164,52 @@
   "order": [0],
   "bytes": 13338,
   "sha256": "cf0ca2e57e2c5c80756c464430de2c318b3b34e52d6c76af513939831b1ad1bb"
+ },
+ "crown_game_winner_someone_else": {
+  "kind": "sheet",
+  "src": "glitch-overlays/crown_game_winner_someone_else.fla",
+  "fla": "4923fb056e1468387fb472c6db51c032e2bfca7d",
+  "fps": 24,
+  "frames": 1,
+  "stage": [344.65, 308.85],
+  "box": [-1, -1, 347, 296],
+  "file": "crown_game_winner_someone_else@1.5x.webp",
+  "scale": 1.5,
+  "cell": [521, 444],
+  "cols": 1,
+  "order": [0],
+  "bytes": 23648,
+  "sha256": "4a6ec52c740eb9ac9676796e8c8dea3cdba041aa284f85c1bd252c3166bad3b6",
+  "vector": {
+   "file": "crown_game_winner_someone_else.frames.json",
+   "frames": 1,
+   "order": [0],
+   "bytes": 64916,
+   "sha256": "d45243e0a23e135ff299ba3f50cfcd3051469f75a977fed01ac2f72e62dd7962"
+  }
+ },
+ "crown_game_winner_you": {
+  "kind": "sheet",
+  "src": "glitch-overlays/crown_game_winner_you.fla",
+  "fla": "f98a7b3e94d86aca1d7de0554695deb55c98d507",
+  "fps": 24,
+  "frames": 1,
+  "stage": [535.05, 516.85],
+  "box": [52, 52, 432, 413],
+  "file": "crown_game_winner_you@1.5x.webp",
+  "scale": 1.5,
+  "cell": [648, 620],
+  "cols": 1,
+  "order": [0],
+  "bytes": 68550,
+  "sha256": "94c07d4241358c68b60add5ad8c1a8bf7ba9be6310ffdcdfd17404ba721a1de2",
+  "vector": {
+   "file": "crown_game_winner_you.frames.json",
+   "frames": 1,
+   "order": [0],
+   "bytes": 86619,
+   "sha256": "2c5ffcf2a54d8e411b259e3fda1b54839fcd83a775745cec779b73819fe9cf94"
+  }
  },
  "dice_overlay": {
   "kind": "sheet",

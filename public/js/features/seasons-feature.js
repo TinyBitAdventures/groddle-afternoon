@@ -100,7 +100,7 @@ import {
   yetiQuote,
 } from '../seasons.js?v=886b0b84';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
-import { playOverlay } from '../overlays.js?v=106b9955';
+import { playOverlay } from '../overlays.js?v=90f4b1ba';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=e62cffa6';
 

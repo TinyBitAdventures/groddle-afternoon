@@ -39,7 +39,7 @@
  */
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=85d4faba';
-import { OVERLAY_USES, playWindowOverlay } from '../overlays.js?v=106b9955';
+import { OVERLAY_USES, playWindowOverlay } from '../overlays.js?v=90f4b1ba';
 import { acceptOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js?v=ada47e25';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { parseQuestConversation } from '../quests.js?v=282e1621';
