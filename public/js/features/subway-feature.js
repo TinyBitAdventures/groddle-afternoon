@@ -74,6 +74,8 @@ import {
   gateRefusal,
   isCarTsid,
   lineName,
+  lineText,
+  lineView,
   nextStation,
   papersHint,
   payFare,
@@ -86,7 +88,7 @@ import {
   stationScreen,
   stepRide,
   ticketOffer,
-} from '../subway.js?v=646ae6af';
+} from '../subway.js?v=5719ffc3';
 import { BOARD_ANSWER_MS, SUBWAY_MP_TEXT, applyTrain, riderChanges, trainOf } from '../subway-mp.js?v=ffd57d82';
 
 export const SUBWAY_FEATURE_ID = 'subway';
@@ -108,6 +110,9 @@ let demo = { stage: 'idle', at: 0 };
 let generation = 0;
 /** Multiplayer: the realtime client and the train answer we wait for (js/subway-mp.js). */
 let mp = null;
+/** M on the train: the line map ({ el, key }) and the stop you picked to get off at (a station id). */
+let lineMap = null;
+let chosenStop = null;
 
 const fastScale = (engine) => (engine.param('subwayfast') === '1' ? 0.25 : 1);
 const here = (engine) => stationByTsid(engine.streetTsid);
@@ -151,6 +156,28 @@ function ensureStyle() {
 .subway-map-close { font-size: var(--fs-3xl); color: var(--c-red-58b); line-height: var(--lh-none); padding: 0 .2rem; }
 .subway-map svg { display: block; width: 100%; height: auto; max-height: min(400px, calc(100vh - 260px)); margin-top: .3rem; }
 .subway-map-foot { text-align: center; margin: .3rem 0 0; color: var(--text-muted); font-size: var(--fs-md); }
+.subway-line-card { width: 860px; }
+.subway-line-head h3 { text-align: left; display: flex; align-items: center; gap: var(--sp-3); }
+.subway-line-head .subway-dot { display: inline-block; width: .8rem; height: .8rem; border-radius: var(--radius-round); }
+.subway-line-head .subway-line-car { font-size: var(--fs-sm); font-weight: 400; color: var(--text-muted); }
+.subway-line-body { display: grid; grid-template-columns: minmax(0, 1fr) 15.5rem; gap: var(--sp-5); align-items: start; }
+.subway-line-body svg .moving { filter: grayscale(1); opacity: .75; }
+.subway-line-body svg .stop-hit { cursor: pointer; }
+.subway-line-stops { margin: .3rem 0 0; padding: 0; list-style: none; max-height: min(400px, calc(100vh - 260px)); overflow: auto; }
+.subway-line-stops li { margin: 0; }
+.subway-line-stops button { display: grid; grid-template-columns: 1.6rem 1fr auto; align-items: center; gap: var(--sp-2); width: 100%; text-align: left; font: inherit; border: 0; border-radius: var(--radius-md);
+  background: none; padding: .22rem .35rem; cursor: pointer; color: var(--c-grey-29); }
+.subway-line-stops button:hover, .subway-line-stops button:focus-visible { background: var(--surface-sunken); outline: none; }
+.subway-line-stops button[aria-pressed="true"] { background: var(--surface-bright); box-shadow: inset 0 0 0 2px var(--line-colour); }
+.subway-line-stops .n { font-size: var(--fs-sm); color: var(--text-muted); text-align: right; }
+.subway-line-stops .name b { display: block; font-size: var(--fs-md); }
+.subway-line-stops .name small { color: var(--text-muted); }
+.subway-line-stops .tag { font-size: var(--fs-xs); font-weight: 700; color: var(--line-colour); text-transform: uppercase; letter-spacing: .04em; }
+.subway-line-now { margin: .45rem 0 0; font-size: var(--fs-md); }
+.subway-line-next { margin: .2rem 0 0; color: var(--line-colour); }
+.subway-line-next b { display: block; font-size: var(--fs-lg); }
+.subway-line-mine { margin: .45rem 0 0; font-size: var(--fs-md); }
+@media (max-width: 720px) { .subway-line-body { grid-template-columns: 1fr; } }
 `;
   document.head.appendChild(s);
 }
@@ -349,6 +376,174 @@ function mapSvg(station, direction) {
     : '';
   return `<svg viewBox="110 0 590 475" role="img" aria-label="${esc(TEXT.mapTitle)}"><rect x="110" width="590" height="475" rx="8" fill="#eceadb"/>`
     + `<path d="${path}" fill="none" stroke="${colour}" stroke-width="3" stroke-linecap="round" opacity=".9"/>${arrows}${dots}${nextNote}</svg>`;
+}
+
+/**
+ * M on the train (Austin 2026-11-01): the line you are riding, as the client's transit map showed it
+ * while riding (MapTransit.as setPlayerLocation 180-240; js/subway.js lineView): that line only, the
+ * train's station marked (grey while it moves), the next stop, the stops in order, and the stop you
+ * picked to get off at. The markers are the Subway Map's own (glitch-items misc/subway_map, CC0).
+ */
+function lineSvg(view) {
+  const colour = view.colour;
+  const pts = STATIONS.map((s) => ({ s, x: s.map_pos[0] + 60, y: s.map_pos[1] + 30 }));
+  const at = (id) => pts.find((p) => p.s.id === id);
+  const blue = view.direction === 'backwards';
+  let path = '';
+  let arrows = '';
+  for (const p of pts) {
+    const q = at(p.s.next_stop);
+    path += `M${p.x},${p.y} L${q.x},${q.y} `;
+    const [a, b] = blue ? [q, p] : [p, q];
+    const ang = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
+    arrows += `<path d="M-6,-5 L5,0 L-6,5 Z" fill="${colour}" transform="translate(${((a.x + b.x) / 2).toFixed(1)},${((a.y + b.y) / 2).toFixed(1)}) rotate(${ang.toFixed(1)})"/>`;
+  }
+  const dots = pts.map((p) => {
+    const side = LABEL_SIDE[p.s.id] || 'right';
+    const tx = side === 'right' ? p.x + 14 : side === 'left' ? p.x - 14 : p.x;
+    const anchor = side === 'right' ? 'start' : side === 'left' ? 'end' : 'middle';
+    const mine = view.chosen?.id === p.s.id;
+    // Above its dot, a name clears the ring round your stop.
+    const ty = side === 'above' ? p.y - (mine ? 32 : 22) : p.y - 2;
+    const isHere = p.s.id === view.at.id;
+    const isNext = view.next && p.s.id === view.next.id;
+    let mark = `<circle cx="${p.x}" cy="${p.y}" r="5" fill="#fff" stroke="${colour}" stroke-width="2.5"/>`;
+    if (isNext) mark = `<image href="${artUrl(blue ? 'subway_map_next_stop_blue' : 'subway_map_next_stop_red')}" x="${p.x - 12}" y="${p.y - 11.5}" width="24" height="23"/>`;
+    if (isHere) mark = `<image class="${view.moving ? 'moving' : ''}" href="${artUrl(blue ? 'subway_map_current_station_blue' : 'subway_map_current_station_red')}" x="${p.x - 15}" y="${p.y - 14}" width="30" height="27"/>`;
+    const ring = mine ? `<circle cx="${p.x}" cy="${p.y}" r="15" fill="none" stroke="#2b2a26" stroke-width="2.5" stroke-dasharray="4 3"/>` : '';
+    const hint = mine ? ` (${lineText.yourStop.toLowerCase()})` : '';
+    return `<g class="stop-hit" data-stop="${p.s.id}"><title>${esc(p.s.name)}${hint}</title><circle cx="${p.x}" cy="${p.y}" r="18" fill="transparent"/>${ring}${mark}`
+      + `<text x="${tx}" y="${ty}" text-anchor="${anchor}" font-weight="700" font-style="italic" font-size="13" fill="#2b2a26">${esc(p.s.name)}</text>`
+      + `<text x="${tx}" y="${ty + 13}" text-anchor="${anchor}" font-style="italic" font-size="11" fill="#8f8a7a">${mine ? esc(lineText.yourStop) : esc(p.s.hubName)}</text></g>`;
+  }).join('');
+  return `<svg viewBox="110 0 590 475" role="img" aria-label="${esc(lineText.title(view.lineName))}"><rect x="110" width="590" height="475" rx="8" fill="#eceadb"/>`
+    + `<path d="${path}" fill="none" stroke="${colour}" stroke-width="3" stroke-linecap="round" opacity=".9"/>${arrows}${dots}</svg>`;
+}
+
+const lineKey = (view) => (view ? `${view.direction}:${view.at.id}:${view.moving ? 'moving' : 'still'}:${view.chosen?.id || ''}` : '');
+
+function closeLineMap(engine) {
+  if (!lineMap) return false;
+  lineMap.el.remove();
+  lineMap = null;
+  engine?.setData('subwayLineMap', '');
+  return true;
+}
+
+function chooseStop(engine, id) {
+  chosenStop = chosenStop === id ? null : id;
+  engine.setData('subwayChosen', chosenStop || '');
+  if (lineMap) drawLineMap(engine, { focus: id });
+}
+
+function drawLineMap(engine, { focus = null } = {}) {
+  const view = lineView(ride, chosenStop);
+  if (!lineMap || !view) return;
+  const { el, card } = lineMap;
+  card.style.setProperty('--line-colour', view.colour);
+  lineMap.title.replaceChildren();
+  const dot = document.createElement('span');
+  dot.className = 'subway-dot';
+  dot.style.background = view.colour;
+  const car = document.createElement('span');
+  car.className = 'subway-line-car';
+  car.textContent = SUBWAY_LINE.car.label;
+  lineMap.title.append(dot, lineText.title(view.lineName), car);
+  lineMap.svg.innerHTML = lineSvg(view);
+  for (const g of lineMap.svg.querySelectorAll('[data-stop]')) g.addEventListener('click', () => chooseStop(engine, Number(g.dataset.stop)));
+  lineMap.now.textContent = view.moving ? lineText.between(view.at.name, view.next?.name || '') : lineText.at(view.at.name);
+  lineMap.next.replaceChildren(lineText.next);
+  const nb = document.createElement('b');
+  nb.textContent = view.next?.name || '';
+  lineMap.next.appendChild(nb);
+  lineMap.mine.textContent = view.chosen ? lineText.getOffAt(view.chosen.name, view.chosen.away) : lineText.pick;
+  lineMap.list.replaceChildren(...view.stops.map((x) => {
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.dataset.stop = String(x.id);
+    const mine = view.chosen?.id === x.id;
+    b.setAttribute('aria-pressed', String(mine));
+    b.title = mine ? lineText.unmark : lineText.mark(x.name);
+    const n = document.createElement('span');
+    n.className = 'n';
+    n.textContent = x.away === 0 ? '' : String(x.away);
+    const name = document.createElement('span');
+    name.className = 'name';
+    const nameB = document.createElement('b');
+    nameB.textContent = x.name;
+    const hub = document.createElement('small');
+    hub.textContent = x.hubName;
+    name.append(nameB, hub);
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.textContent = mine ? lineText.yourStop : x.away === 1 ? 'Next' : x.away === 0 ? 'Here' : '';
+    b.append(n, name, tag);
+    b.addEventListener('click', () => chooseStop(engine, x.id));
+    li.appendChild(b);
+    return li;
+  }));
+  lineMap.key = lineKey(view);
+  if (focus != null) lineMap.list.querySelector(`button[data-stop="${focus}"]`)?.focus({ preventScroll: true });
+  engine.setData('subwayLineMap', lineMap.key);
+  engine.setData('subwayLineStops', view.stops.map((x) => x.id).join(','));
+  el.hidden = false;
+}
+
+function openLineMap(engine) {
+  ensureStyle();
+  closeLineMap(engine);
+  document.getElementById('subway-map')?.remove();
+  const el = document.createElement('div');
+  el.id = 'subway-line-map';
+  el.className = 'subway-map glitch-modal';
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-modal', 'true');
+  const card = document.createElement('div');
+  card.className = 'subway-map-card subway-line-card';
+  const head = document.createElement('div');
+  head.className = 'subway-map-head subway-line-head';
+  const title = document.createElement('h3');
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.className = 'subway-map-close';
+  close.setAttribute('aria-label', 'Close');
+  close.textContent = '×';
+  close.addEventListener('click', () => closeLineMap(engine));
+  head.append(title, close);
+  const body = document.createElement('div');
+  body.className = 'subway-line-body';
+  const svg = document.createElement('div');
+  const side = document.createElement('div');
+  const now = document.createElement('p');
+  now.className = 'subway-line-now';
+  const next = document.createElement('p');
+  next.className = 'subway-line-next';
+  const mine = document.createElement('p');
+  mine.className = 'subway-line-mine';
+  const list = document.createElement('ol');
+  list.className = 'subway-line-stops';
+  list.setAttribute('aria-label', 'Stops in order');
+  side.append(now, next, list, mine);
+  body.append(svg, side);
+  card.append(head, body);
+  el.appendChild(card);
+  el.addEventListener('click', (e) => {
+    if (e.target === el) closeLineMap(engine);
+  });
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      closeLineMap(engine);
+    }
+  });
+  root().appendChild(el);
+  lineMap = { el, card, title, svg, now, next, mine, list, key: '' };
+  drawLineMap(engine);
+  close.focus({ preventScroll: true });
+  engine.playSound?.('OPEN_HUB_MAP', { volume: 0.5 });
+  return true;
 }
 
 /* ------------------------------------------------------------------ */
@@ -633,7 +828,8 @@ function board(engine) {
 function getOffPrompt(engine, station) {
   openDialog(engine, {
     id: 'get-off',
-    kicker: CAR_LABEL_KICKER,
+    // The stop you picked on the line map: the prompt says so (it asks at every stop, as the source did).
+    kicker: chosenStop === station.id ? lineText.yourStop : CAR_LABEL_KICKER,
     paras: [announce.getOff(station.name)],
     choices: [{ label: TEXT.yes, value: 'yes', primary: true }, { label: TEXT.no, value: 'no' }],
     timeoutMs: ride.timing.prompt,
@@ -649,6 +845,8 @@ async function disembark(engine) {
   clearAnnouncement();
   stopTravelSound();
   ride = null;
+  chosenStop = null;
+  closeLineMap(engine);
   state = { ...state, stop: station.id, inCar: false };
   engine.setData('subwayLast', `off:${station.id}`);
   const spot = disembarkSpot(station);
@@ -829,6 +1027,11 @@ export const subwayFeature = {
     generation += 1;
     clearViews(engine);
     closeDialog(engine);
+    closeLineMap(engine);
+    if (!isCarTsid(street?.tsid)) {
+      chosenStop = null;
+      engine.setData('subwayChosen', '');
+    }
     const station = stationByTsid(street?.tsid);
     engine.setData('subwayLinked', street?._subwayLinked || 0);
     if (station) {
@@ -882,6 +1085,7 @@ export const subwayFeature = {
     if (ride && inCar(engine)) {
       runRide(engine, t);
       animateCar(t);
+      if (lineMap && lineKey(lineView(ride, chosenStop)) !== lineMap.key) drawLineMap(engine);
     }
     if (dialog?.until && t >= dialog.until) {
       const cb = dialog.onTimeout;
@@ -907,6 +1111,17 @@ export const subwayFeature = {
       return true;
     }
     return false;
+  },
+
+  /**
+   * game.js openMap (M, the map button, Classic's too): on the train it opens the line you are
+   * riding instead of the world map, and M again closes it (HubMapDialog.as start 926-930: riding,
+   * the client opened the transit map). Off the train, the world map as before.
+   */
+  openMapOverride(engine) {
+    if (!inCar(engine) || !ride) return false;
+    if (lineMap) return closeLineMap(engine);
+    return openLineMap(engine);
   },
 
   /**
@@ -941,6 +1156,6 @@ export const subwayFeature = {
 
   /** QA / tests. */
   _state() {
-    return { state: { ...state }, ride: ride ? { ...ride, timing: undefined } : null, dialog: dialog?.id || '', windows: windows.length };
+    return { state: { ...state }, ride: ride ? { ...ride, timing: undefined } : null, dialog: dialog?.id || '', windows: windows.length, lineMap: lineMap?.key || '', chosenStop };
   },
 };

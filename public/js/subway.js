@@ -309,6 +309,57 @@ export function stepRide(ride, now) {
 /** Whether "Get off train?" may still be answered yes (transit_disembark_callback: not once departed). */
 export const canDisembark = (ride) => !!ride && ride.phase === 'stopped';
 
+/**
+ * The line you are riding, for its map (M on the train; Austin 2026-11-01). The client's transit
+ * map while riding (glitch-client HubMapDialog.as start 913-935, updateMapTransit 800-826,
+ * MapTransit.as setPlayerLocation 180-240, line buttons 125-135): the line being ridden only (the other line's button
+ * says "You're on the Red Line"), the star at the train's current station, grey while it moves,
+ * and "Next stop:" with the next station, from the server's transit_status (inc_transit.js
+ * current_tsid / next_tsid / is_moving). The remake adds the stops in order and the stop you
+ * picked to get off at (`chosen`, a station id).
+ *
+ * Returns { direction, lineName, colour, at, moving, next, stops: [{ id, name, hubName, away }],
+ * chosen: { id, name, away } | null }, the stops in riding order from the next one round the loop
+ * to the one the train is at (away 1 is the next stop; the train's own station is the last, its
+ * away the loop's length, 0 while the train stands there).
+ */
+export function lineView(ride, chosen = null) {
+  if (!ride || !stationById(ride.stop)) return null;
+  const direction = ride.direction === 'backwards' ? 'backwards' : 'forwards';
+  const at = stationById(ride.stop);
+  const moving = ride.phase === 'moving';
+  const stops = [];
+  let s = nextStation(at.id, direction);
+  for (let away = 1; s && away <= STATIONS.length; away += 1) {
+    stops.push({ id: s.id, name: s.name, hubName: s.hubName, away: s.id === at.id && !moving ? 0 : away });
+    s = nextStation(s.id, direction);
+  }
+  const pick = chosen == null ? null : stops.find((x) => x.id === Number(chosen)) || null;
+  return {
+    direction,
+    lineName: lineName(direction),
+    colour: LINE_COLOURS[direction],
+    at: { id: at.id, name: at.name, hubName: at.hubName },
+    moving,
+    next: stops[0] ? { ...stops[0] } : null,
+    stops,
+    chosen: pick ? { id: pick.id, name: pick.name, away: pick.away } : null,
+  };
+}
+
+/** The line map's footer: where you get off, if you picked a stop. */
+export const lineText = Object.freeze({
+  title: (line) => `${line} map`,
+  at: (name) => `The train is at ${name}.`,
+  between: (from, to) => `The train is between ${from} and ${to}.`,
+  next: 'Next stop:',
+  pick: 'Pick a stop to mark where you get off. The train still asks at every stop.',
+  getOffAt: (name, away) => (away === 0 ? `You get off here, at ${name}.` : `You get off at ${name}, ${away} ${away === 1 ? 'stop' : 'stops'} from here.`),
+  yourStop: 'Your stop',
+  mark: (name) => `Get off at ${name}`,
+  unmark: 'Clear your stop',
+});
+
 /* ------------------------------------------------------------------ */
 /* Streets                                                             */
 /* ------------------------------------------------------------------ */

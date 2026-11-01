@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=7e4c28c1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6fc15d1b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1e2ee4bc';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=aa89f717';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -122,7 +122,7 @@ import {
   travelToGregarious,
 } from './js/legalize-it.js?v=d569fd0e';
 import { HALL, HALL_LAYOUT, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=a0bc6317';
-import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=646ae6af';
+import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=5719ffc3';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=f4c54caa';
 import {
   WINTER_HAVEN_STREET_ID,
@@ -460,8 +460,8 @@ import {
 } from './js/inventory.js?v=91ee49cd';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=09c6ccbe';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=9b23e21a';
-import { listAnimalFeedOptions } from './js/animals.js?v=2e4e5f15';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=2e4e5f15';
+import { listAnimalFeedOptions } from './js/animals.js?v=378af814';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=378af814';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -783,7 +783,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=2e4e5f15';
+} from './js/animals.js?v=378af814';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -882,7 +882,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=7fbae08d';
-import { easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=b2dadf96';
+import { easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=e59f12ba';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=a1c4a308';
 import {
   actionLoopFor,
@@ -22141,6 +22141,8 @@ function renderHomeMapCallout(panel) {
  * @param {string} [hubId]  Open a specific hub map; default = player's hub
  */
 async function openMap(hubId, { find = '' } = {}) {
+  // On the subway train: the line you are riding (features/subway-feature.js openMapOverride).
+  if (!hubId && !find && features.query('openMapOverride', engine) === true) return;
   if (homeIsInstanced()) {
     openHomePanel();
     return;
