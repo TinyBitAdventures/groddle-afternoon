@@ -9963,15 +9963,21 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] .hud-zoom-keys { grid-column: 1 / -1; margin: var(--sp-2) 0 0; color: var(--text-muted); font-size: var(--fs-xs); }
 [data-ui="modern"] .hud-zoom input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
-/* —— NIGHT TINT —— the switch under Zoom in the Menu's Settings group (js/night-tint.js, js/ui/topbar.js). */
-[data-ui="modern"] .more-list .menu-night-tint {
+/* —— NIGHT TINT and STREET MAP —— the switches under Zoom in the Menu's Settings group (js/night-tint.js,
+   js/ui/street-minimap.js, js/ui/topbar.js): one look for both. */
+[data-ui="modern"] .more-list .menu-night-tint,
+[data-ui="modern"] .more-list .menu-street-map {
   padding: var(--space-1) var(--space-2) var(--space-2); border-radius: var(--radius-s);
   color: var(--text); font-size: var(--fs-m); font-weight: var(--fw-bold);
 }
-[data-ui="modern"] .more-list .menu-night-tint:hover { background: var(--surface-hover); }
-[data-ui="modern"] .more-list .menu-night-tint input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
-[data-ui="modern"] .more-list .menu-night-tint input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-[data-ui="modern"] .more-list .menu-night-tint small { color: var(--text-muted); font-size: var(--fs-xs); font-weight: var(--fw-regular); line-height: var(--lh-snug); }
+[data-ui="modern"] .more-list .menu-night-tint:hover,
+[data-ui="modern"] .more-list .menu-street-map:hover { background: var(--surface-hover); }
+[data-ui="modern"] .more-list .menu-night-tint input,
+[data-ui="modern"] .more-list .menu-street-map input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
+[data-ui="modern"] .more-list .menu-night-tint input:focus-visible,
+[data-ui="modern"] .more-list .menu-street-map input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+[data-ui="modern"] .more-list .menu-night-tint small,
+[data-ui="modern"] .more-list .menu-street-map small { color: var(--text-muted); font-size: var(--fs-xs); font-weight: var(--fw-regular); line-height: var(--lh-snug); }
 
 /* The tooltip (js/ui/topbar.js): words, a second line, key caps. */
 [data-ui="modern"] .hud-tip {

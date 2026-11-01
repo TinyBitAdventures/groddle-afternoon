@@ -403,3 +403,12 @@ describe('other players glide on the minimap', () => {
     assert.match(readFileSync(join(root, 'public/js/features/street-minimap-feature.js'), 'utf8'), /const UPDATE_MS = 100;/, 'the glide matches the update rate');
   });
 });
+
+describe('the Street map switch looks like Night tint', () => {
+  const css = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'public/style.css'), 'utf8');
+  it('both Menu switches share one rule set (the purple accent box, bold label, muted hint)', () => {
+    for (const part of ['', ':hover', ' input', ' input:focus-visible', ' small']) {
+      assert.ok(css.includes(`[data-ui="modern"] .more-list .menu-night-tint${part},\n[data-ui="modern"] .more-list .menu-street-map${part} {`), part || 'row');
+    }
+  });
+});
