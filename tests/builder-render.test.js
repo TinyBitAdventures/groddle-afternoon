@@ -83,3 +83,72 @@ describe('render golden: Hechey Track at scale 0.25 (Chrome, under the browser l
     assert.ok(RENDERS_ANYWAY.has('AST-001'));
   });
 });
+
+describe('honest renders: art left out is named, never dropped silently (lane GROUNDED)', async () => {
+  const { leftOutFindings, RENDER_ONLY } = await import('../tools/builder/render.mjs');
+  const { callContext } = await import('../tools/builder/worker.mjs');
+  const { localArt, parseLeftOut } = await import('../tools/builder/cli.mjs');
+  const { mkdtempSync, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { execFileSync, spawnSync } = await import('node:child_process');
+  const { SITE_DIR, skipWithoutSite } = await import('../tools/repos.mjs');
+  const sha = (c) => c.repeat(64);
+  const zone = () => {
+    const z = hecheyZone();
+    const st = z.streets[0].street;
+    st.layers.find((l) => l.id === 'middleground').decos.push({ id: 'd_new1', sprite: 'gz_ai_rock', x: 100, y: -60, w: 200, h: 100, z: 1, r: 0 });
+    st.emitters = [{ id: 'fx_1', kind: 'steam', x: 0, y: -60, sprite: 'gz_ai_puff' }];
+    z.assets.gz_ai_rock = { origin: 'new', licence: 'ai-generated', sha256: sha('a'), w: 400, h: 200 };
+    z.assets.gz_ai_puff = { origin: 'new', licence: 'ai-generated', sha256: sha('b'), w: 60, h: 60 };
+    z.assets.gz_ai_unused = { origin: 'new', licence: 'ai-generated', sha256: sha('c'), w: 60, h: 60 };
+    return z;
+  };
+
+  it('renderInput puts an AST-007 warning on each piece left out that the street draws, and counts it', () => {
+    assert.deepEqual(RENDER_ONLY, ['AST-007']);
+    const z = zone();
+    const f = leftOutFindings(z.streets[0], 'hechey', [{ name: 'gz_ai_rock', why: 'over the 12 MB of new art a render carries' }, 'gz_ai_puff', 'gz_ai_unused']);
+    assert.deepEqual(f.map((x) => [x.rule, x.severity, x.at]), [['AST-007', 'warn', 'hechey/d_new1'], ['AST-007', 'warn', 'hechey/fx_1']]);
+    assert.match(f[0].message, /gz_ai_rock was left out of this render \(over the 12 MB of new art a render carries\): it draws as the missing-art placeholder/);
+    assert.equal(f[0].where.space, 'screen');
+    const ctx = callContext(loadValidatorContext(), { artLeftOut: [{ name: 'gz_ai_rock', why: 'x' }] });
+    const input = renderInput(z, 'hechey', ctx, { street: 'hechey', view: 'full', scale: 0.25, overlay: ['findings'], layers: [] });
+    assert.ok(input.findings.some((x) => x.rule === 'AST-007'), 'drawn on the findings overlay');
+    const plain = renderInput(z, 'hechey', loadValidatorContext(), { street: 'hechey', view: 'full', scale: 0.25, overlay: [], layers: [] });
+    assert.equal(input.counts.warn, plain.counts.warn + 1);
+  });
+
+  it('the CLI prints the site\'s header as a warning; --art <folder> hands in the zone\'s art by name and names what is missing', () => {
+    assert.deepEqual(parseLeftOut('0'), []);
+    assert.deepEqual(parseLeftOut('2 gz_ai_a,gz_ai_b').map((x) => x.name), ['gz_ai_a', 'gz_ai_b']);
+    const dir = mkdtempSync(join(tmpdir(), 'art-folder-'));
+    try {
+      writeFileSync(join(dir, 'gz_ai_rock.webp'), Buffer.from('RIFF0000WEBP'));
+      writeFileSync(join(dir, 'gz_ai_unused.png'), Buffer.from('png'));
+      const got = localArt(zone(), 'hechey', dir);
+      assert.deepEqual(got.found.sort(), ['gz_ai_rock', 'gz_ai_unused']);
+      assert.deepEqual(got.missing, ['gz_ai_puff'], 'drawn by an effect and not in the folder');
+      assert.equal(Buffer.from(got.art[sha('a')], 'base64').toString(), 'RIFF0000WEBP', 'under the row\'s sha256');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('the site sends the smallest pieces first up to 12 MB and names the rest (AdminBuilderAgent::pickArt)', { skip: skipWithoutSite || (spawnSync('php', ['-v']).status !== 0 && 'no php') }, () => {
+    const z = zone();
+    const street = z.streets[0].street;
+    street.layers.find((l) => l.id === 'middleground').decos.push({ id: 'd_new2', sprite: 'gz_ai_unused', x: 0, y: -60, w: 10, h: 10, z: 1, r: 0 });
+    const code = `require ${JSON.stringify(SITE_DIR)} . '/src/AdminBuilderAgent.php';
+      $in = json_decode(stream_get_contents(STDIN), false);
+      $sizes = ['${sha('a')}' => 9, '${sha('b')}' => 4, '${sha('c')}' => null];
+      [$art, $left] = Groddle\\Minn\\AdminBuilderAgent::pickArt($in->zone, $in->street, fn (string $s): ?string => $sizes[$s] === null ? null : str_repeat('x', $sizes[$s]), 10);
+      echo json_encode(['sent' => array_keys($art), 'left' => $left, 'budget' => Groddle\\Minn\\AdminBuilderAgent::ART_BYTES]);`;
+    const r = JSON.parse(execFileSync('php', ['-r', code], { input: JSON.stringify({ zone: z, street }) }).toString());
+    assert.deepEqual(r.sent, [sha('b')], 'the 4-byte puff fits a 10-byte budget; the 9-byte rock does not');
+    assert.deepEqual(r.left, ['gz_ai_rock', 'gz_ai_unused'], 'over the budget, and a kept file that is gone');
+    assert.equal(r.budget, 12_000_000);
+    const src = readFileSync(join(SITE_DIR, 'src/AdminBuilderAgent.php'), 'utf8');
+    assert.match(src, /'X-Builder-Art-Left-Out' => count\(\$left\)/);
+    assert.match(src, /'artLeftOut' =>/);
+  });
+});

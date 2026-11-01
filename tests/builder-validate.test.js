@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=f217d6fa';
+import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=571b427b';
 import { streetWorld, jumpArc, jumpArcs, reachStreet } from '../public/js/builder/reach-graph.js?v=0eb97168';
 import { stepAvatar, avatarGround, steerX, coastX, NORMAL_BUFF } from '../public/js/avatar-step.js?v=c04c7c76';
 import { platformsScreen } from '../public/js/street-model.js?v=23b926e5';
@@ -180,8 +180,8 @@ describe('the validator (js/builder/validate.js): one fixture per rule', () => {
     lane(zone).rumble = { every: [14, 30], duration: 1.6, strength: 6 };
     assert.deepEqual(validateZone(zone, ctx).findings.filter((f) => /^(FX-|PRF-|SCH-)/.test(f.rule)), []);
   });
-  it('covers every rule but the STY rules (P5 tests those, tests/builder-style.test.js)', () => {
-    assert.deepEqual(cases.map(([r]) => r).sort(), Object.keys(RULES).filter((r) => !r.startsWith('STY-')).sort());
+  it('covers every rule but the STY rules (P5 tests those, tests/builder-style.test.js) and the render-only AST-007 (tests/builder-render.test.js)', () => {
+    assert.deepEqual(cases.map(([r]) => r).sort(), Object.keys(RULES).filter((r) => !r.startsWith('STY-') && r !== 'AST-007').sort());
   });
 
   it('runs P5\'s STY rules with the rest', () => {

@@ -24,7 +24,7 @@ import { GAME_DIR } from '../tools/repos.mjs';
 import { buildZones, files, listZones, mergeZoneIndex, mergeZoneEcology, streetWithZoneEdits, zoneStreets, sha256, overlay, NEW_ART } from '../tools/builder/zones.mjs';
 import { publishZone, unacknowledged } from '../tools/builder/publish.mjs';
 import { loadValidatorContext } from '../tools/builder/validator-context.mjs';
-import { validateZone } from '../public/js/builder/validate.js?v=f217d6fa';
+import { validateZone } from '../public/js/builder/validate.js?v=571b427b';
 import { isZoneTsid, withoutZoneConnects, withoutZoneRows } from '../public/js/zone-streets.js?v=b40010d5';
 import { listHubsFromIndex } from '../public/js/map-graph.js?v=c89ca7f3';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';

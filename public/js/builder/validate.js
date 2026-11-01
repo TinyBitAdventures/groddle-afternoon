@@ -70,6 +70,8 @@ export const RULES = Object.freeze({
   'AST-004': ['error', 'Licence or provenance not allowed'],
   'AST-005': ['warn', 'Drawn too large'],
   'AST-006': ['warn', 'Not animated'],
+  // Renders only (tools/builder/render.mjs renderInput, lane GROUNDED): never from validateZone.
+  'AST-007': ['warn', 'Art left out of the render'],
   'TXT-001': ['error', 'Words not allowed'],
   'TXT-002': ['error', 'Name taken'],
   'PRF-001': ['warn', 'Too heavy'],

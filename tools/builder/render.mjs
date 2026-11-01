@@ -14,11 +14,13 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, normalize } from 'node:path';
 import { GAME_DIR } from '../repos.mjs';
 import { openBrowser } from '../qa/browser.mjs';
-import { validateZone, placementRequests } from '../../public/js/builder/validate.js?v=f217d6fa';
+import { validateZone, placementRequests, hash16 } from '../../public/js/builder/validate.js?v=571b427b';
 import { planStreetPlacements, populationForStreet, streetReservedSpots } from '../../public/js/street-ecology.js?v=315ff68c';
 import { platformsScreen, streetWidth } from '../../public/js/street-model.js?v=23b926e5';
 import { plannedSpots } from '../../public/js/builder/editor-zone.js?v=423f180f';
 
+/** Rules only a render makes (validateZone never does): new art the render could not carry. */
+export const RENDER_ONLY = Object.freeze(['AST-007']);
 /** Fatal rules that still render (the street loads; see renderInput). */
 export const RENDERS_ANYWAY = new Set(['AST-001']);
 export const ORIGIN = 'http://builder-render.localhost';
@@ -37,6 +39,10 @@ export function populationSpots(row) {
  * { code: 'builder_invalid', status: 422 } error when a fatal finding blocks the render (7.2), all
  * but missing art (AST-001): the game draws a missing sprite as its placeholder and loads the street,
  * and seeing the placeholder is what the agent needs.
+ *
+ * ctx.artLeftOut (lane GROUNDED): new art the caller could not hand in, as [{name, why}] (or names):
+ * each piece this street draws gets an AST-007 warning at its first placement, so a render never
+ * drops art silently (it draws as the missing-art placeholder).
  */
 export function renderInput(zone, key, ctx, params = {}) {
   const row = (zone.streets || []).find((s) => s.key === key);
@@ -45,6 +51,7 @@ export function renderInput(zone, key, ctx, params = {}) {
   const mine = report.findings.filter((f) => f.street === key || f.street === null);
   const fatal = mine.filter((f) => f.severity === 'fatal' && !f.waived && !RENDERS_ANYWAY.has(f.rule));
   if (fatal.length) throw Object.assign(new Error(`A fatal finding blocks the render: ${fatal[0].rule} ${fatal[0].message}`), { code: 'builder_invalid', status: 422, data: { findings: fatal } });
+  for (const f of leftOutFindings(row, key, ctx.artLeftOut)) mine.push(f);
   const counts = { fatal: 0, error: 0, warn: 0, info: 0 };
   for (const f of mine) if (!f.waived) counts[f.severity] += 1;
   return {
@@ -56,6 +63,33 @@ export function renderInput(zone, key, ctx, params = {}) {
     populations: (params.overlay || []).includes('populations') ? populationSpots(row) : [],
     counts,
   };
+}
+
+/** PURE: AST-007 findings for the new art left out of a render that this street draws (decos or effects). */
+export function leftOutFindings(row, key, leftOut = []) {
+  const out = [];
+  const street = row.street;
+  for (const item of leftOut || []) {
+    const name = typeof item === 'string' ? item : item?.name;
+    if (typeof name !== 'string') continue;
+    const why = (typeof item === 'object' && item?.why) || 'the new art is more than a render carries';
+    let at = null;
+    let where = null;
+    for (const layer of street.layers || []) {
+      const d = (layer.decos || []).find((x) => x.sprite === name);
+      if (!d) continue;
+      at = d.id;
+      if (layer.id === 'middleground') where = { x: d.x - street.bounds.l, y: d.y - d.h / 2 - street.bounds.t, space: 'screen' };
+      break;
+    }
+    if (!at) {
+      const e = (street.emitters || []).find((x) => x.sprite === name);
+      if (!e) continue;
+      at = e.id;
+    }
+    out.push({ rule: 'AST-007', severity: 'warn', street: key, at: `${key}/${at}`, message: `${name} was left out of this render (${why}): it draws as the missing-art placeholder.`, where, data: { name, why }, fix: 'Send the art as WebP (art-intake.mjs writes it), render fewer layers (--layers), or render here with --draft file:<zone.json> --art <folder>.', fingerprint: hash16(`AST-007|${key}/${at}|${name}`) });
+  }
+  return out;
 }
 
 /** A renderer that keeps one Chrome page open between renders and closes it after `idleMs`. */

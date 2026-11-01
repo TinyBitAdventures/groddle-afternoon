@@ -22,7 +22,8 @@
  * the checkout whose validator and renderer you want; when it is not running the site answers 503.
  *
  *   POST /validate {zone, rules?, reach?, assetFiles?}                   the report (spec 7.2)
- *   POST /render   {draft, rev, zone, params, assetFiles?, art?}          image/png; X-Builder-Findings: <error>,<warn>
+ *   POST /render   {draft, rev, zone, params, assetFiles?, art?, artLeftOut?}   image/png; X-Builder-Findings: <error>,<warn>
+ *                  (artLeftOut: the new art the site could not send, [{name, why}]: AST-007 on the render)
  *   POST /decos    {q?, layer?, hub?, family?, animated?, limit?}         {decos:[...]}
  *   POST /style    {profile}                                             a style profile
  *   POST /guide    {}                                                    the guide (spec 8.6)
@@ -36,7 +37,7 @@ import { configDir } from './sign.mjs';
 import { pathToFileURL } from 'node:url';
 import { readMaster, masterFile, workerSecret, verifyWorker, WORKER_HEADER } from './sign.mjs';
 import { loadValidatorContext } from './validator-context.mjs';
-import { validateZone } from '../../public/js/builder/validate.js?v=f217d6fa';
+import { validateZone } from '../../public/js/builder/validate.js?v=571b427b';
 import { createRenderer, renderInput } from './render.mjs';
 import { catalog, searchDecos, styleProfile } from './catalog.mjs';
 import { builderGuide } from './guide.mjs';
@@ -44,7 +45,8 @@ import { RENDER } from './limits.mjs';
 
 export const PORT = 8794;
 export const HOST = '127.0.0.1';
-const MAX_BODY = 16 * 1024 * 1024;
+/** A render carries up to 12 MB of new art (the site's ART_BYTES), a third more as base64, plus the zone. */
+const MAX_BODY = 24 * 1024 * 1024;
 const NONCE_KEEP_MS = 120_000;
 const CACHE_MAX = 40;
 
@@ -58,8 +60,9 @@ class Refusal extends Error {
 }
 
 /** PURE: a validator ctx for one call: the loaded data plus the call's rules and stored new art. */
-export function callContext(base, { rules = null, assetFiles = null } = {}) {
+export function callContext(base, { rules = null, assetFiles = null, artLeftOut = null } = {}) {
   const ctx = { ...base };
+  if (Array.isArray(artLeftOut) && artLeftOut.length) ctx.artLeftOut = artLeftOut.slice(0, 500);
   if (Array.isArray(rules) && rules.length) ctx.rules = rules.map((r) => String(r).replace(/\*$/, ''));
   if (assetFiles && typeof assetFiles === 'object') ctx.assetFiles = new Map(Object.entries(assetFiles).map(([name, sha256]) => [name, { sha256 }]));
   return ctx;
@@ -83,7 +86,7 @@ export function createHandlers({ renderer = null, ctx = null } = {}) {
       if (!body?.zone || typeof p.street !== 'string') throw new Refusal(400, 'builder_bad_call', 'Send {zone, params: {street, ...}}.');
       const scale = Number(p.scale ?? 0.25);
       if (!(scale >= RENDER.scale[0] && scale <= RENDER.scale[1])) throw new Refusal(400, 'builder_bad_render', 'scale is 0.05 to 1.');
-      const key = createHash('sha256').update(JSON.stringify([body.zone, p])).digest('hex');
+      const key = createHash('sha256').update(JSON.stringify([body.zone, p, body.artLeftOut || null])).digest('hex');
       if (cache.has(key)) {
         const hit = cache.get(key);
         cache.delete(key);
@@ -175,7 +178,7 @@ export function createWorker({ secret, handlers = createHandlers(), log = () => 
     try {
       for await (const c of req) {
         size += c.length;
-        if (size > MAX_BODY) throw new Refusal(413, 'builder_too_large', 'At most 16 MB a call.');
+        if (size > MAX_BODY) throw new Refusal(413, 'builder_too_large', 'At most 24 MB a call.');
         chunks.push(c);
       }
       const raw = Buffer.concat(chunks).toString('utf8');

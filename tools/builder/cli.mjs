@@ -459,6 +459,37 @@ export function groundStreetOps(zone, key, { floor = null, support = null, wall 
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
+/**
+ * A zone's new art from a folder, by asset name (lane GROUNDED: `render file:<zone.json> --art <dir>`):
+ * <name>.webp, else <name>.png, handed to the render page under the row's sha256. Answers
+ * { art: {sha256: base64}, found: [names], missing: [names this street draws that are not there] }.
+ */
+export function localArt(zone, key, dir) {
+  const row = streetOf(zone, key);
+  const drawn = new Set();
+  for (const layer of row.street.layers || []) for (const d of layer.decos || []) drawn.add(d.sprite);
+  for (const e of row.street.emitters || []) if (e.sprite) drawn.add(e.sprite);
+  const art = {};
+  const found = [];
+  const missing = [];
+  for (const [name, a] of Object.entries(zone.assets || {})) {
+    if (a?.origin !== 'new' || !/^[0-9a-f]{64}$/.test(String(a.sha256 || ''))) continue;
+    const file = ['.webp', '.png'].map((ext) => join(dir, `${name}${ext}`)).find((f) => existsSync(f));
+    if (file) {
+      art[a.sha256] = readFileSync(file).toString('base64');
+      found.push(name);
+    } else if (drawn.has(name)) missing.push(name);
+  }
+  return { art, found, missing };
+}
+
+/** PURE: the site's X-Builder-Art-Left-Out header ("<n> <name>,<name>") as [{name, why}]. */
+export function parseLeftOut(header) {
+  const m = /^\s*(\d+)\s*(.*)$/.exec(String(header || ''));
+  if (!m || m[1] === '0') return [];
+  return m[2].split(',').map((x) => x.trim()).filter(Boolean).map((name) => ({ name, why: 'over the art a render carries' }));
+}
+
 /** PURE: words for what the ground command did. */
 export function groundWords(key, done, left) {
   const parts = [];
@@ -746,6 +777,7 @@ export const HELP = `Groddle level builder (docs/level-builder/spec.md 8.2)
   decos <query> [--layer sky] [--hub 58] [--limit 20]    style [hub-58|default]    guide
   validate [--rule PHY-*]                     exit 1 on an error or fatal finding
   render --street k [--view full|camera] [--x --y --w --h] [--scale 0.25] [--overlay geometry,reach,findings,grid] [--layers a,b] --out f.png
+         [file:<zone.json> --art <folder>]       a local render with the new art from a folder (<name>.webp or .png)
   assets                                      the draft's new art: kept size, trim, intake warnings
   asset add <file> --name gz_x --licence own-work-CC0|ai-generated --author A [--tool --prompt --inputs a,b --role --file3 f]
   asset add <file> <file> ... [--names a,b] --licence ... --author A   several at once (names from the files; x@1.5x.png is x's 3x)
@@ -1132,7 +1164,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       let report;
       let rev;
       if (local()) {
-        const { validateZone } = await import('../../public/js/builder/validate.js?v=f217d6fa');
+        const { validateZone } = await import('../../public/js/builder/validate.js?v=571b427b');
         const { loadValidatorContext } = await import('./validator-context.mjs');
         const zone = readJson(resolve(flags.file));
         rev = zone.rev;
@@ -1169,20 +1201,32 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       let rev;
       let counts;
       let size;
+      let leftOut = [];
       if (local()) {
         const { createRenderer, renderInput } = await import('./render.mjs');
         const { loadValidatorContext } = await import('./validator-context.mjs');
         const zone = readJson(resolve(flags.file));
         rev = zone.rev;
+        const ctx = loadValidatorContext();
+        // --art <folder> (lane GROUNDED): the zone's new art by asset name (<name>.webp or .png), so a
+        // full render needs no site; a piece this street draws that is not there is named (AST-007).
+        let art = {};
+        if (typeof flags.art === 'string') {
+          const got = localArt(zone, key, resolve(flags.art));
+          art = got.art;
+          leftOut = got.missing.map((name) => ({ name, why: `not in ${flags.art}` }));
+          ctx.assetFiles = new Map(got.found.map((name) => [name, { sha256: zone.assets[name].sha256 }]));
+          ctx.artLeftOut = leftOut;
+        }
         let input;
         try {
-          input = renderInput(zone, key, loadValidatorContext(), params);
+          input = renderInput(zone, key, ctx, params);
         } catch (e) {
           throw new CliError(e.message, { code: e.code || 'builder_invalid', status: e.status || 422, data: e.data || null });
         }
         const r = renderer || createRenderer({ idleMs: 1000 });
         try {
-          const out = await r.render(input);
+          const out = await r.render(input, art);
           png = out.png;
           size = `${out.width}x${out.height}`;
         } finally {
@@ -1200,10 +1244,12 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
         rev = Number(res.headers.get('x-builder-rev'));
         counts = res.headers.get('x-builder-findings') || '0,0';
         size = res.headers.get('x-builder-size') || '';
+        leftOut = parseLeftOut(res.headers.get('x-builder-art-left-out'));
       }
       writeFileSync(outFile, png);
       const [errors, warns] = counts.split(',').map(Number);
-      return { out: { file: outFile, size, rev, findings: { error: errors, warn: warns } }, text: `${basename(outFile)} ${size}  rev ${rev}  findings ${plural(errors, 'error')}, ${plural(warns, 'warning')}`, exit: 0 };
+      const warning = leftOut.length ? `\nwarning: ${plural(leftOut.length, 'piece')} of new art left out of this render, drawn as placeholders (AST-007): ${leftOut.map((x) => x.name).join(', ')}` : '';
+      return { out: { file: outFile, size, rev, findings: { error: errors, warn: warns }, ...(leftOut.length ? { artLeftOut: leftOut } : {}) }, text: `${basename(outFile)} ${size}  rev ${rev}  findings ${plural(errors, 'error')}, ${plural(warns, 'warning')}${warning}`, exit: 0 };
     }
 
     case 'asset': {
