@@ -44,9 +44,11 @@ const ITEM = (classTsid, count = 1) => Object.freeze({ classTsid, count });
 
 /**
  * The neighbours. `house` is a recovered `door_asset_*` (or hut) deco: doorX
- * is the door's centre and saleX the centre of its painted For Sale sign, both
- * as fractions of the house width (-1: no sign). A bush (`cover`) is planted
- * over the sign and the neighbour's own mailbox stands beside it.
+ * is the door's centre and saleX the centre of the spot where Tiny Speck's art
+ * keeps its For Sale sign, both as fractions of the house width (-1: none). The
+ * house decos ship without the sign (an owned house never showed it,
+ * DoorView.as 228-232; tools/deco-pipeline/door-signs.py); a bush (`cover`)
+ * stands on that spot and the neighbour's own mailbox beside it.
  */
 export const NEIGHBOURS = Object.freeze([
   Object.freeze({

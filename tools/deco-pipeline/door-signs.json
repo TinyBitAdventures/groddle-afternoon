@@ -1,0 +1,395 @@
+{
+ "decos": {
+  "door_asset_house_large_01": {
+   "forsale": "door_asset_house_large_01__forsale.webp",
+   "forsale_bytes": 63698,
+   "forsale_lossless": false,
+   "forsale_sha": "0803f668fc1bad32",
+   "nosign_sha": "881d4b23443b9640",
+   "offset": [
+    0,
+    0
+   ],
+   "plain_sha": "54dc7a8c9b6434dc",
+   "rest_diff": 0.75,
+   "sign_box": [
+    0,
+    443,
+    213,
+    666
+   ],
+   "sign_diff": 61.32,
+   "size2": [
+    830,
+    668
+   ],
+   "src_sha": "84f4fc8d22af32ff",
+   "swf_sha": "339bd7ffdec83b01"
+  },
+  "door_asset_house_large_02": {
+   "forsale": "door_asset_house_large_02__forsale.webp",
+   "forsale_bytes": 190368,
+   "forsale_lossless": true,
+   "forsale_sha": "ec881f91ca19e1db",
+   "nosign_sha": "c05635e02a96e4b1",
+   "offset": [
+    12,
+    -5
+   ],
+   "plain_sha": "869666573be00b40",
+   "rest_diff": 1.331,
+   "sign_box": [
+    21,
+    438,
+    236,
+    661
+   ],
+   "sign_diff": 44.47,
+   "size2": [
+    830,
+    668
+   ],
+   "src_sha": "cefed2b3f51f7e3a",
+   "swf_sha": "1bb494b0cf4a5f38"
+  },
+  "door_asset_house_large_03": {
+   "forsale": "door_asset_house_large_03__forsale@1.5x.webp",
+   "forsale_bytes": 107842,
+   "forsale_lossless": false,
+   "forsale_sha": "c8d4efd788f900b3",
+   "nosign_sha": "fd929807eefd5e80",
+   "offset": [
+    0,
+    0
+   ],
+   "plain_sha": "dcce885ba988f33f",
+   "rest_diff": 1.255,
+   "sign_box": [
+    0,
+    442,
+    213,
+    666
+   ],
+   "sign_diff": 47.6,
+   "size2": [
+    786,
+    686
+   ],
+   "src_sha": "7bb1fdde5b657ccf",
+   "swf_sha": "cc13fd826421db2b"
+  },
+  "door_asset_house_large_04": {
+   "forsale": "door_asset_house_large_04__forsale.webp",
+   "forsale_bytes": 54758,
+   "forsale_lossless": false,
+   "forsale_sha": "1803b2e1fd039c05",
+   "nosign_sha": "1976a9ddbc7674f3",
+   "offset": [
+    16,
+    0
+   ],
+   "plain_sha": "1057b94eecb9972d",
+   "rest_diff": 0.748,
+   "sign_box": [
+    16,
+    442,
+    229,
+    665
+   ],
+   "sign_diff": 47.67,
+   "size2": [
+    830,
+    668
+   ],
+   "src_sha": "46e1efbd50e3b0f3",
+   "swf_sha": "dea903f7bf350696"
+  },
+  "door_asset_house_large_05": {
+   "forsale": "door_asset_house_large_05__forsale.webp",
+   "forsale_bytes": 49626,
+   "forsale_lossless": false,
+   "forsale_sha": "ea5e142c0757123c",
+   "nosign_sha": "85358f9210b50201",
+   "offset": [
+    8,
+    -2
+   ],
+   "plain_sha": "5d1886bb693f7f1f",
+   "rest_diff": 0.599,
+   "sign_box": [
+    25,
+    441,
+    239,
+    664
+   ],
+   "sign_diff": 54.99,
+   "size2": [
+    830,
+    668
+   ],
+   "src_sha": "867e812a56fa172f",
+   "swf_sha": "23c9dce5df869984"
+  },
+  "door_asset_house_medium_01": {
+   "forsale": "door_asset_house_medium_01__forsale@1.5x.webp",
+   "forsale_bytes": 91752,
+   "forsale_lossless": false,
+   "forsale_sha": "fa9aea868fd9890f",
+   "nosign_sha": "a98f7184308d2774",
+   "offset": [
+    0,
+    0
+   ],
+   "plain_sha": "17d86fe221c3750c",
+   "rest_diff": 1.219,
+   "sign_box": [
+    0,
+    361,
+    213,
+    584
+   ],
+   "sign_diff": 53.4,
+   "size2": [
+    764,
+    586
+   ],
+   "src_sha": "a256f755435cfbe0",
+   "swf_sha": "114f1cfe1237d2d6"
+  },
+  "door_asset_house_medium_02": {
+   "forsale": "door_asset_house_medium_02__forsale.webp",
+   "forsale_bytes": 149056,
+   "forsale_lossless": true,
+   "forsale_sha": "d428297cd67110ea",
+   "nosign_sha": "659f9d61d77e951c",
+   "offset": [
+    11,
+    -3
+   ],
+   "plain_sha": "8a2f19983edcb0a2",
+   "rest_diff": 0.0,
+   "sign_box": [
+    32,
+    366,
+    246,
+    591
+   ],
+   "sign_diff": 47.13,
+   "size2": [
+    766,
+    620
+   ],
+   "src_sha": "a175706e65357c9f",
+   "swf_sha": "8c353166c8565d53"
+  },
+  "door_asset_house_medium_03": {
+   "forsale": "door_asset_house_medium_03__forsale.webp",
+   "forsale_bytes": 38490,
+   "forsale_lossless": false,
+   "forsale_sha": "a04a0cba993e7c2f",
+   "nosign_sha": "6b11db5f522d1002",
+   "offset": [
+    24,
+    -1
+   ],
+   "plain_sha": "ec849a36896f0b6f",
+   "rest_diff": 0.662,
+   "sign_box": [
+    24,
+    360,
+    237,
+    583
+   ],
+   "sign_diff": 46.01,
+   "size2": [
+    764,
+    586
+   ],
+   "src_sha": "819c2414be16737c",
+   "swf_sha": "63449b2fce9d35d9"
+  },
+  "door_asset_house_medium_04": {
+   "forsale": "door_asset_house_medium_04__forsale.webp",
+   "forsale_bytes": 41166,
+   "forsale_lossless": false,
+   "forsale_sha": "ba9fe6431469ce97",
+   "nosign_sha": "f41269d8eb7220c3",
+   "offset": [
+    10,
+    8
+   ],
+   "plain_sha": "54568f1fc1b11bad",
+   "rest_diff": 0.743,
+   "sign_box": [
+    11,
+    385,
+    225,
+    610
+   ],
+   "sign_diff": 46.43,
+   "size2": [
+    766,
+    620
+   ],
+   "src_sha": "25fd3689e4908586",
+   "swf_sha": "7fbe39597656e8e5"
+  },
+  "door_asset_house_medium_05": {
+   "forsale": "door_asset_house_medium_05__forsale.webp",
+   "forsale_bytes": 39618,
+   "forsale_lossless": false,
+   "forsale_sha": "ca638c48f692fb4a",
+   "nosign_sha": "62cad8b9eda0d611",
+   "offset": [
+    11,
+    0
+   ],
+   "plain_sha": "a9c31ddc084daa43",
+   "rest_diff": 0.848,
+   "sign_box": [
+    11,
+    360,
+    224,
+    584
+   ],
+   "sign_diff": 61.05,
+   "size2": [
+    764,
+    586
+   ],
+   "src_sha": "ef90a04377a4294a",
+   "swf_sha": "689b5594e0a435ad"
+  },
+  "door_asset_house_small_01": {
+   "forsale": "door_asset_house_small_01__forsale.webp",
+   "forsale_bytes": 30690,
+   "forsale_lossless": false,
+   "forsale_sha": "1aa8fa6d4abd2439",
+   "nosign_sha": "cff25950c5c06921",
+   "offset": [
+    -4,
+    -15
+   ],
+   "plain_sha": "4184438e0f8afcf5",
+   "rest_diff": 0.787,
+   "sign_box": [
+    7,
+    330,
+    222,
+    554
+   ],
+   "sign_diff": 35.07,
+   "size2": [
+    684,
+    570
+   ],
+   "src_sha": "56c58cfa197af2ba",
+   "swf_sha": "77c792ab47a83760"
+  },
+  "door_asset_house_small_02": {
+   "forsale": "door_asset_house_small_02__forsale@1.5x.webp",
+   "forsale_bytes": 68444,
+   "forsale_lossless": false,
+   "forsale_sha": "dba035d3ada526c5",
+   "nosign_sha": "bccae5b84ad12194",
+   "offset": [
+    0,
+    0
+   ],
+   "plain_sha": "b909eb2d526613da",
+   "rest_diff": 1.172,
+   "sign_box": [
+    0,
+    276,
+    213,
+    500
+   ],
+   "sign_diff": 51.92,
+   "size2": [
+    678,
+    502
+   ],
+   "src_sha": "787d7c06a1fbf7e9",
+   "swf_sha": "436ee573a161edca"
+  },
+  "door_asset_house_small_03": {
+   "forsale": "door_asset_house_small_03__forsale.webp",
+   "forsale_bytes": 37202,
+   "forsale_lossless": false,
+   "forsale_sha": "d6322d91368ca6f9",
+   "nosign_sha": "fcd686fe0f2a73dd",
+   "offset": [
+    4,
+    -3
+   ],
+   "plain_sha": "68bf091949060fc0",
+   "rest_diff": 1.045,
+   "sign_box": [
+    4,
+    239,
+    217,
+    463
+   ],
+   "sign_diff": 52.43,
+   "size2": [
+    682,
+    468
+   ],
+   "src_sha": "25c192ddfec7ff29",
+   "swf_sha": "e1e3260293bca04f"
+  },
+  "door_asset_house_small_04": {
+   "forsale": "door_asset_house_small_04__forsale.webp",
+   "forsale_bytes": 36842,
+   "forsale_lossless": false,
+   "forsale_sha": "822100916aa21bb8",
+   "nosign_sha": "9c3a2bd171407747",
+   "offset": [
+    10,
+    -1
+   ],
+   "plain_sha": "a38a20c6890a9381",
+   "rest_diff": 1.138,
+   "sign_box": [
+    10,
+    241,
+    223,
+    465
+   ],
+   "sign_diff": 50.51,
+   "size2": [
+    682,
+    468
+   ],
+   "src_sha": "5ecc357983febec2",
+   "swf_sha": "ca3e5dd300e01fec"
+  },
+  "door_asset_house_small_05": {
+   "forsale": "door_asset_house_small_05__forsale.webp",
+   "forsale_bytes": 33058,
+   "forsale_lossless": false,
+   "forsale_sha": "8083ec6f53dfc04b",
+   "nosign_sha": "48afe3835a20cacd",
+   "offset": [
+    2,
+    -4
+   ],
+   "plain_sha": "be9463eb6b68374d",
+   "rest_diff": 0.81,
+   "sign_box": [
+    2,
+    238,
+    215,
+    462
+   ],
+   "sign_diff": 54.63,
+   "size2": [
+    682,
+    468
+   ],
+   "src_sha": "dcc6931df27e3a39",
+   "swf_sha": "47cc2c28a13d115d"
+  }
+ },
+ "version": 1
+}

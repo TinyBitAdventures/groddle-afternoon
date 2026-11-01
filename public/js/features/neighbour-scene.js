@@ -7,7 +7,7 @@
  * neighbour by a stable hash.
  */
 
-import { NEIGHBOUR_SCENE, hash01, neighbourLayout } from '../neighbours.js?v=7fbf44a4';
+import { NEIGHBOUR_SCENE, hash01, neighbourLayout } from '../neighbours.js?v=b7e4258a';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 
 const DECO = 'assets/decos/groddle/';

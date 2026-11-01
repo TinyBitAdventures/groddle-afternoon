@@ -22,6 +22,11 @@ Sources
   (`corrected`). Kept decos get no 3x file. Small art offsets between the PNG and the SWF stage
   (`shift`, up to a few px) follow the SWF: that is where the client drew the art.
 
+Default state: a static render shows every child on the deco's stage, but some decos hide one
+from their code. HIDDEN_BY_DEFAULT names those (the POL houses' For Sale `sign`): they are taken
+off the root timeline before rendering (swfinfo.drop_root_places), the row records `hidden`, and
+the decos' source PNGs are door-signs.py's sign-free copies (assets-src/decos/door-signs).
+
 3x files are left out where they cannot be seen: decos only placed on blurred layers (baked at half
 resolution), decos every street places at 2/3 of the PNG size or less (the 2x file already has 3
 texels per world pixel), decos whose 3x render adds almost nothing over the 2x one upscaled
@@ -55,6 +60,8 @@ import swfinfo  # noqa: E402
 
 PUBLIC = os.path.join(SPIKE, 'public')
 SRC = os.environ.get('DECO_SRC') or os.path.join(SPIKE, 'assets-src', 'decos', 'groddle')
+# Sign-free copies of the source PNGs of decos with a hidden state child (tools/deco-pipeline/door-signs.py).
+STATE_SRC = os.path.join(os.path.dirname(SRC), 'door-signs')
 OUT = os.environ.get('DECO_OUT') or os.path.join(PUBLIC, 'assets', 'decos', 'groddle')
 MANIFEST = os.path.join(PUBLIC, 'assets', 'decos', 'manifest.json')
 STREETS = os.path.join(PUBLIC, 'assets', 'streets')
@@ -63,6 +70,14 @@ HIRES_JS = os.path.join(PUBLIC, 'js', 'deco-hires-list.js')
 VERDICTS = os.path.join(SPIKE, 'tools', 'deco-audit', 'verdicts.json')
 JAVA = audit.JAVA
 FFDEC = audit.FFDEC
+
+# State children a deco's code hides by default, dropped from the SWF before it is rendered. The
+# POL house decos (pol_ext_meadow door_asset_house_*) carry a `sign` (For Sale) MovieClip; the
+# client hid it unless the house was for sale (glitch-client DoorView.as 50-56, 228-232:
+# `_decoAsset.sign.visible = _door.for_sale`; server location.js 2313/2436, inc_pols.js
+# pols_is_for_sale). Their `plate` stays: blank until showNumber() writes digits on it, which
+# DoorView.as 234-235 only does for a numbered door. The For Sale art is door-signs.py's.
+HIDDEN_BY_DEFAULT = ('sign',)
 
 SETTINGS = {
     'version': 1,
@@ -84,6 +99,24 @@ SETTINGS = {
 
 def sha(path):
     return hashlib.sha256(open(path, 'rb').read()).hexdigest()
+
+
+def src_png(n):
+    """The source PNG of deco n: door-signs.py's sign-free copy when it has one, else the old PNG."""
+    p = os.path.join(STATE_SRC, n + '.png')
+    return p if os.path.exists(p) else os.path.join(SRC, n + '.png')
+
+
+def default_state(swf, work):
+    """(SWF to render, hidden names): the deco in the state the client drew it in by default, with
+    the root-timeline children named in HIDDEN_BY_DEFAULT taken off the stage."""
+    hide = sorted({n for n in swfinfo.root_names(swf) if n in HIDDEN_BY_DEFAULT})
+    if not hide:
+        return swf, []
+    out = os.path.join(work, 'default-state', os.path.basename(os.path.dirname(swf)), os.path.basename(swf))
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    swfinfo.drop_root_places(swf, out, set(hide))
+    return out, hide
 
 
 def png_size(path):
@@ -318,9 +351,10 @@ def expect_swf(row):
     return same_art(row['diff']) or bool(row.get('svg_ok'))
 
 
-def inputs_key(name, mode, swf_sha, src_sha, svg_ok=None):
+def inputs_key(name, mode, swf_sha, src_sha, svg_ok=None, hidden=None):
     keep = {k: SETTINGS[k] for k in SETTINGS if k not in DECISION}
-    return hashlib.sha256(json.dumps([name, mode, swf_sha, src_sha, svg_ok, keep], sort_keys=True).encode()).hexdigest()[:20]
+    parts = [name, mode, swf_sha, src_sha, svg_ok, keep] + ([hidden] if hidden else [])
+    return hashlib.sha256(json.dumps(parts, sort_keys=True).encode()).hexdigest()[:20]
 
 
 def base_decisions():
@@ -331,7 +365,7 @@ def base_decisions():
     place = placement_stats()
     out = {}
     for n in names:
-        src = os.path.join(SRC, n + '.png')
+        src = src_png(n)
         if not os.path.exists(src):
             raise SystemExit(f'{n}: no source PNG at {src}')
         size2 = png_size(src)
@@ -371,7 +405,7 @@ def render_zoom(d):
 def process(work, d, render_png, plan_row_extra):
     """Make both WebPs for one SWF deco from its render; fall back to the PNG when they differ."""
     n = d['name']
-    src = load(os.path.join(SRC, n + '.png'))
+    src = load(src_png(n))
     ren = load(render_png)
     z = d['zoom']
     img2 = stage_resample(ren, d['stage'], z, d['size2'])
@@ -416,7 +450,7 @@ def process(work, d, render_png, plan_row_extra):
 
 def emit_png(work, d, src=None):
     n = d['name']
-    src = src or load(os.path.join(SRC, n + '.png'))
+    src = src or load(src_png(n))
     out2 = os.path.join(OUT, n + '.webp')
     d['bytes2'], d['lossless2'], d['err2'] = encode(src, out2, os.path.join(work, 'enc'))
     d['sha2'] = sha(out2)[:16]
@@ -444,20 +478,22 @@ def cmd_build(args):
     for n, d in base.items():
         if only and n not in only:
             continue
-        src_sha = sha(os.path.join(SRC, n + '.png'))
+        src_sha = sha(src_png(n))
         swf_sha = None
         if d['mode'] == 'swf':
             swf = audit.swf_path(d['swf'], work, index)
             swf_sha = sha(swf)[:16]
-            d['_swf_path'] = swf
+            d['_swf_path'], hidden = default_state(swf, work)
+            if hidden:
+                d['hidden'] = hidden
         old = plan['decos'].get(n) or {}
         d['src_sha'] = src_sha[:16]
-        d['src_bytes'] = os.path.getsize(os.path.join(SRC, n + '.png'))
+        d['src_bytes'] = os.path.getsize(src_png(n))
         d['swf_sha'] = swf_sha
         d['svg_ok'] = old.get('svg_ok') if old.get('swf_sha') == swf_sha else None
         if d['svg_ok'] is None:
             d.pop('svg_ok')
-        d['key'] = inputs_key(n, d['mode'], swf_sha, src_sha, d.get('svg_ok'))
+        d['key'] = inputs_key(n, d['mode'], swf_sha, src_sha, d.get('svg_ok'), d.get('hidden'))
         done = (old.get('key') == d['key'] and os.path.exists(os.path.join(OUT, n + '.webp'))
                 and (not old.get('hires') or os.path.exists(os.path.join(OUT, n + '@1.5x.webp'))))
         if done and old.get('mode') == 'swf' and expect_swf(old) is False:
@@ -535,7 +571,7 @@ def cmd_svgcheck(args):
     print(len(rows), 'decos to cross-check', flush=True)
     for i in range(0, len(rows), args.batch):
         chunk = rows[i:i + args.batch]
-        items = [(r['name'], audit.swf_path(r['swf'], work, index)) for r in chunk]
+        items = [(r['name'], default_state(audit.swf_path(r['swf'], work, index), work)[0]) for r in chunk]
         found, tmp = render_batch(work, 2, items)
         svgs, tmp2 = audit.export_svgs(work, 'svgcheck', items, 2)
         for r in chunk:
@@ -599,13 +635,18 @@ def cmd_check(args):
         if not r:
             problems.append(f'{n}: not in plan.json')
             continue
-        src = os.path.join(SRC, n + '.png')
+        src = src_png(n)
         if sha(src)[:16] != r.get('src_sha'):
             problems.append(f'{n}: source PNG changed since the build')
         if r.get('swf_sha'):
             swf = audit.swf_path(r['swf'], work, index)
             if sha(swf)[:16] != r['swf_sha']:
                 problems.append(f'{n}: SWF changed since the build')
+            hide = sorted({x for x in swfinfo.root_names(swf) if x in HIDDEN_BY_DEFAULT})
+            if hide != (r.get('hidden') or []):
+                problems.append(f'{n}: built with hidden {r.get("hidden") or []}, the SWF has {hide} (rebuild)')
+            if hide and src == os.path.join(SRC, n + '.png'):
+                problems.append(f'{n}: hides {hide} but has no sign-free source (door-signs.py)')
         b = base[n]
         if b['mode'] == 'png' and r['mode'] != 'png':
             problems.append(f'{n}: should be kept as its PNG ({b["reason"]})')

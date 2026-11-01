@@ -1495,10 +1495,12 @@ export function towerDoorway(footX) {
 }
 
 /**
- * The planted border in front of the house (the street style's `trim`), which hides the
- * deco's For Sale sign: where each sprite stands. It starts at the sign corner and steps
- * right, but no sprite reaches into the doorway; one that would moves left, back over the
- * sign. PURE (world x).
+ * The planted border in front of the house (the street style's `trim`): where each sprite
+ * stands. It starts at the sign corner (the house's front left, where Tiny Speck's art keeps
+ * its For Sale sign; the house decos ship without it since FORSALE, as the client hid it on a
+ * house not for sale: DoorView.as 228-232, tools/deco-pipeline/door-signs.py) and steps right,
+ * but no sprite reaches into the doorway; one that would moves left, back to the corner.
+ * PURE (world x).
  */
 export function streetTrimSpots(look, layout, houseStyle = 'meadow') {
   const h = HOUSES[houseStyle] || HOUSES.meadow;
@@ -1748,7 +1750,7 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
   house.y = STREET_GROUND_Y + 14;
   house.zIndex = -20;
   root.addChild(house);
-  // A planted border in front of the house hides the deco's For Sale sign, clear of the doorway (PORCH).
+  // A planted border along the front of the house, from its left corner, clear of the doorway (PORCH).
   const trim = new PIXI.Container();
   trim.zIndex = -19;
   const { doorX, signX } = houseFixtureX(layout, houseStyle);

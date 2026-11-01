@@ -66,6 +66,93 @@ def rewrite(path, out, pad=1.0, swaps=None):
     open(out, 'wb').write(b'FWS' + bytes([ver]) + struct.pack('<I', len(body) + 8) + body)
 
 
+class _Bits:
+    """Big-endian bit reader over a bytes object from byte offset p (SWF MATRIX / CXFORM records)."""
+    def __init__(self, b, p):
+        self.b, self.bit = b, p * 8
+
+    def u(self, n):
+        v = 0
+        for _ in range(n):
+            v = (v << 1) | ((self.b[self.bit >> 3] >> (7 - (self.bit & 7))) & 1)
+            self.bit += 1
+        return v
+
+    def end(self):
+        return (self.bit + 7) // 8
+
+
+def place_name(body, code, q):
+    """The instance name of a PlaceObject2 (26) / PlaceObject3 (70) tag whose data starts at q, or None."""
+    f1 = body[q]
+    f2 = body[q + 1] if code == 70 else 0
+    p = q + (2 if code == 70 else 1) + 2          # flags, depth
+    if code == 70 and (f2 & 0x08 or (f2 & 0x10 and f1 & 0x02)):
+        p = body.index(0, p) + 1                  # class name
+    if f1 & 0x02:
+        p += 2                                    # character id
+    if f1 & 0x04:                                 # MATRIX
+        r = _Bits(body, p)
+        if r.u(1): n = r.u(5); r.u(2 * n)
+        if r.u(1): n = r.u(5); r.u(2 * n)
+        n = r.u(5); r.u(2 * n)
+        p = r.end()
+    if f1 & 0x08:                                 # CXFORMWITHALPHA
+        r = _Bits(body, p)
+        add, mult, n = r.u(1), r.u(1), r.u(4)
+        r.u(4 * n * (add + mult))
+        p = r.end()
+    if f1 & 0x10:
+        p += 2                                    # ratio
+    if not f1 & 0x20:
+        return None
+    return body[p:body.index(0, p)].decode('latin1')
+
+
+def root_names(path):
+    """Instance names placed on the root timeline."""
+    body = swf_body(path)[0]
+    out = []
+    p = rect_len(body) + 4
+    while p < len(body):
+        h = struct.unpack_from('<H', body, p)[0]; p += 2
+        code, ln = h >> 6, h & 0x3f
+        if ln == 0x3f: ln = struct.unpack_from('<I', body, p)[0]; p += 4
+        if code == 0: break
+        if code in (26, 70):
+            nm = place_name(body, code, p)
+            if nm: out.append(nm)
+        p += ln
+    return out
+
+
+def drop_root_places(path, out, names):
+    """Write an uncompressed copy of the SWF without the root-timeline PlaceObject tags that put
+    down an instance named in `names` (a state child its code hides by default, e.g. a door deco's
+    `sign`, which the client only shows for a house that is for sale). Returns the names dropped."""
+    body, ver = swf_body(path)
+    keep, dropped = [], []
+    p = rect_len(body) + 4
+    keep.append(body[:p])
+    while p < len(body):
+        start = p
+        h = struct.unpack_from('<H', body, p)[0]; p += 2
+        code, ln = h >> 6, h & 0x3f
+        if ln == 0x3f: ln = struct.unpack_from('<I', body, p)[0]; p += 4
+        nm = place_name(body, code, p) if code in (26, 70) else None
+        p += ln
+        if nm in names:
+            dropped.append(nm)
+        else:
+            keep.append(body[start:p])
+        if code == 0:
+            keep.append(body[p:])
+            break
+    new = b''.join(keep)
+    open(out, 'wb').write(b'FWS' + bytes([ver]) + struct.pack('<I', len(new) + 8) + new)
+    return dropped
+
+
 def read(path):
     body = swf_body(path)[0]
     nbits = body[0] >> 3

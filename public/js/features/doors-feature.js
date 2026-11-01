@@ -7,6 +7,7 @@
  *   (assets/decos/groddle, CoU _png-2x), or a plain drawn door when the art
  *   was never recovered. A locked door's keyhole names its key (door-lock-art.js;
  *   no key icon floats over it since 2026-11-01), its subtitle says which key;
+ *   a house for sale shows its For Sale sign (door-sign-art.js), no other house does;
  *   numbered doors a small plate. Hidden doors (client DoorView) are not drawn.
  * - Enter: the source door-move checks (destination, level, key). A failed
  *   check is spoken by the door, like the client's talking-door bubble.
@@ -47,6 +48,7 @@ import {
 } from '../doors.js?v=eb9510b1';
 import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=db2ce452';
 import { doorLockArt } from '../door-lock-art.js?v=ccb7b6a1';
+import { doorSaleArt } from '../door-sign-art.js?v=69daffff';
 
 export const DOORS_FEATURE_ID = 'doors';
 const DECO_BASE = 'assets/decos/groddle/';
@@ -137,7 +139,11 @@ function buildView(engine, door, available) {
   // A locked door shows only its key's keyhole (the deco's showLock(key_id), DoorView.as 243-244);
   // the plain deco has all twelve stacked (tools/deco-pipeline/door-locks.py).
   const lockArt = !door.src && hasArt && door.key_id ? doorLockArt(door.sprite, door.key_id) : null;
-  const tex = door.src ? textureFromUrl(door.src) : lockArt ? textureFromUrl(lockArt) : hasArt ? textureFromUrl(`${DECO_BASE}${door.sprite}.png`) : drawnDoorTexture(PIXI, door);
+  // A house shows its For Sale sign only while it is for sale (the deco's `sign`, DoorView.as
+  // 228-232); the plain house decos have none (tools/deco-pipeline/door-signs.py).
+  const saleArt = !door.src && !lockArt && hasArt && door.for_sale ? doorSaleArt(door.sprite) : null;
+  const art = lockArt || saleArt;
+  const tex = door.src ? textureFromUrl(door.src) : art ? textureFromUrl(art) : hasArt ? textureFromUrl(`${DECO_BASE}${door.sprite}.png`) : drawnDoorTexture(PIXI, door);
   const sprite = new PIXI.Sprite(tex);
   sprite.anchor.set(0.5, 1);
   sprite.x = door.x;
@@ -150,7 +156,7 @@ function buildView(engine, door, available) {
   sprite._worldHitW = Math.max(40, door.w || 60);
   sprite._worldHitH = Math.max(60, door.h || 110);
   engine.entityLayer.addChild(sprite);
-  const view = { door, sprite, extras: [], target: null, art: lockArt ? 'lock' : hasArt ? 'deco' : 'drawn' };
+  const view = { door, sprite, extras: [], target: null, art: lockArt ? 'lock' : saleArt ? 'sale' : hasArt ? 'deco' : 'drawn' };
 
   // Austin 2026-11-01: no key icon floats over a locked door any more (a remake addition; the
   // keyhole art above names the key, DoorView.as 243-244). Its subtitle still says which key.
