@@ -19,7 +19,7 @@
 import { vitalLevel, vitalTitle } from '../vitals.js?v=ca7471dd';
 import { ZOOM_KEYS_HINT, clampZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=b262a6c7';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL } from '../night-tint.js?v=917a2caa';
-import { STREET_MAP_HINT, STREET_MAP_LABEL } from './street-minimap.js?v=ee455eee';
+import { STREET_MAP_HINT, STREET_MAP_LABEL } from './street-minimap.js?v=abefc4d6';
 
 /** The Menu's groups, in the mock's order; Social shows only when something is in it. */
 export const MENU_GROUPS = Object.freeze([

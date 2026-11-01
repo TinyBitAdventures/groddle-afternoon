@@ -11968,6 +11968,10 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   display: grid; place-items: center; overflow: visible; white-space: nowrap;
 }
 .street-minimap .smm-dot.has-text { text-shadow: 0 0 2px var(--minimap-other-ring); }
+/* Placed ten times a second (UPDATE_MS): each dot glides to its next place over the same 100 ms, so
+   moving players read as smooth motion, not steps. */
+.street-minimap .smm-dot.smm-glide { transition: transform 100ms linear; }
+@media (prefers-reduced-motion: reduce) { .street-minimap .smm-dot.smm-glide { transition: none; } }
 .street-minimap .smm-you {
   --dot-d: 10; z-index: var(--z-raised); pointer-events: none; cursor: default;
   background: var(--minimap-you); border-color: var(--minimap-ring);

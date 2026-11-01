@@ -391,3 +391,15 @@ describe('street map: placement', () => {
     assert.match(read('public/style.css'), /\.street-minimap:has\(\.smm-tip:not\(\[hidden\]\)\) \{ z-index: calc\(var\(--z-hud\) \+ 1\); \}/);
   });
 });
+
+describe('other players glide on the minimap', () => {
+  const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+  const css = readFileSync(join(root, 'public/style.css'), 'utf8');
+  const view = readFileSync(join(root, 'public/js/ui/street-minimap.js'), 'utf8');
+  it('a placed dot glides over the 100 ms between updates, never from the corner, and not with reduced motion', () => {
+    assert.match(css, /\.street-minimap \.smm-dot\.smm-glide \{ transition: transform 100ms linear; \}/);
+    assert.match(css, /prefers-reduced-motion: reduce\) \{ \.street-minimap \.smm-dot\.smm-glide \{ transition: none; \} \}/);
+    assert.match(view, /if \(el\.classList\.contains\('smm-dot'\) && !el\.dataset\.placed\) \{/, 'the glide starts after the first place');
+    assert.match(readFileSync(join(root, 'public/js/features/street-minimap-feature.js'), 'utf8'), /const UPDATE_MS = 100;/, 'the glide matches the update rate');
+  });
+});

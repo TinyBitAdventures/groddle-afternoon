@@ -600,6 +600,12 @@ export function createStreetMinimap(doc, host, opts = {}) {
     const p = placeMark(geom, x, y, w, h, scrollY);
     el.style.transform = `translate(${p.left}px, ${p.top}px)`;
     el.hidden = !p.visible;
+    // Marks are placed ten times a second; a dot glides between places (.smm-glide), but only once
+    // it has a first place, so a new dot never slides in from the map's corner.
+    if (el.classList.contains('smm-dot') && !el.dataset.placed) {
+      el.dataset.placed = '1';
+      (globalThis.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => el.classList.add('smm-glide'));
+    }
     return p;
   }
 
