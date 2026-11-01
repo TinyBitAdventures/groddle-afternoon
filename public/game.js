@@ -458,7 +458,7 @@ import {
   removeItem,
   isToolItem,
 } from './js/inventory.js?v=91ee49cd';
-import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=09c6ccbe';
+import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=44e00ce9';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=9b23e21a';
 import { listAnimalFeedOptions } from './js/animals.js?v=378af814';
 import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=378af814';
@@ -3109,15 +3109,49 @@ function colorizeActivityText(text) {
     );
 }
 
-function findPackSlotElement(classTsid, copy = null, bag = null) {
+function findPackSlotElement(classTsid, copy = null, bag = null, place = null) {
   const all = [...document.querySelectorAll('.pack-slot[data-tsid]')].filter((el) => el.dataset.tsid === classTsid);
-  return (copy != null && all.find((el) => el.dataset.packCopy === String(copy)))
+  return (place && all.find((el) => isPackPlace(el, place)))
+    || (copy != null && all.find((el) => el.dataset.packCopy === String(copy)))
     || (bag && all.find((el) => el.dataset.packBag === String(bag)))
     || all[0] || null;
 }
 
+/** Whether a pack slot button is the stack at this place ({ container, index }). */
+function isPackPlace(el, place) {
+  return Boolean(place) && el?.dataset?.packContainer === String(place.container) && el.dataset.packIndex === String(place.index);
+}
+
+/** The place ({ container, index }) of the stack a pack slot button shows, or null. */
+function packPlaceOf(el) {
+  const d = el?.dataset;
+  if (!d || d.packBag || d.packContainer == null || d.packIndex == null || d.packIndex === '') return null;
+  return { container: d.packContainer, index: Number(d.packIndex) };
+}
+
 /** Which bag the open pack popover is about (its slot's bag key), or null: two bags of one colour are two bags. */
 let packSelectedBag = null;
+
+/**
+ * Which stack the open pack popover is about ({ container, index }, its slot's place), or null.
+ * Several stacks of one item are several stacks: the menu, its counts and what it does stay on
+ * the one it was opened from (main.js doVerb 2926-3250 acts on the itemstack the client named;
+ * player report 2026-11-01: the menu jumped to the first stack, and a drop took from it).
+ */
+let packSelectedPlace = null;
+
+/** The stack the open menu is about and its count (features/bags-feature.js packFocus), or null. */
+let packSelectedStack = null;
+
+/**
+ * A verb on the open menu's stack is about to take n of it (drop, eat, give): they come off that
+ * stack when they leave the pack, now or when the server answers (features/bags-feature.js packTakeFrom).
+ * Call it before closePackPopover.
+ */
+function takeFromMenuStack(classTsid, n, wait = undefined) {
+  if (packSelected !== classTsid || !packSelectedStack) return false;
+  return Boolean(features.query('packTakeFrom', classTsid, n, engine, { wait }));
+}
 
 /** Which of a class's tools the open pack popover is about (its slot's place in pack order), or null. */
 let packSelectedCopy = null;
@@ -3129,6 +3163,8 @@ function closePackPopover() {
   packSelected = null;
   packSelectedCopy = null;
   packSelectedBag = null;
+  packSelectedPlace = null;
+  packSelectedStack = null;
   packDropMode = false;
   packDropQty = 1;
   packEatMode = false;
@@ -3138,6 +3174,7 @@ function closePackPopover() {
     pop.hidden = true;
     pop.innerHTML = '';
     delete pop.dataset.packFor;
+    delete pop.dataset.packPlace;
   }
   packPopoverMarkup = '';
   document.querySelectorAll('.pack-slot[data-tsid]:not(.pack-bag)').forEach((slot) => {
@@ -3161,7 +3198,7 @@ const packRow = createPackRow({
   onQuery: () => renderPackBar(),
   onScroll: () => {
     if (!isPackPopoverOpen()) return;
-    const anchor = findPackSlotElement(packSelected);
+    const anchor = findPackSlotElement(packSelected, packSelectedCopy, packSelectedBag, packSelectedPlace);
     if (anchor) positionPackPopover(document.getElementById('pack-popover'), anchor);
   },
   tipFor: (el) => packTipFor(el),
@@ -3771,14 +3808,26 @@ function renderPackPopover(classTsid, anchor = null) {
   if (packSelected !== classTsid) {
     packSelectedCopy = null;
     packSelectedBag = null;
+    packSelectedPlace = null;
   }
   if (anchor?.dataset?.packCopy != null && anchor.dataset.packCopy !== '') packSelectedCopy = Number(anchor.dataset.packCopy);
   // A bag's menu stays the bag it was opened on (its slot's key), whatever redraws the popover.
   if (anchor?.dataset?.packBag) packSelectedBag = anchor.dataset.packBag;
+  // A stack's menu stays the stack it was opened on (its slot's place), whatever redraws the popover.
+  const anchorPlace = packPlaceOf(anchor);
+  if (anchorPlace) packSelectedPlace = anchorPlace;
   packSelected = classTsid;
-  packDropQty = normalizeStackQuantity(packDropQty, slot.count);
+  packSelectedStack = packSelectedPlace ? features.query('packFocus', { cls: classTsid, ...packSelectedPlace }, engine) || null : null;
+  if (!packSelectedStack) {
+    // The stack is gone (or the menu is about the item as a whole): the menu stays on the item.
+    packSelectedPlace = null;
+    features.query('packFocus', null, engine);
+  }
+  // This stack's count: Drop's and Eat's choosers stop at it (doVerb 3243-3246 caps a verb's count at the stack's).
+  const stackCount = Math.min(slot.count, packSelectedStack?.count || slot.count);
+  packDropQty = normalizeStackQuantity(packDropQty, stackCount);
   // A pack redraw replaces the slot buttons: an anchor from before it falls back to the slot.
-  const sourceAnchor = (anchor?.isConnected ? anchor : null) || findPackSlotElement(classTsid, packSelectedCopy, packSelectedBag);
+  const sourceAnchor = (anchor?.isConnected ? anchor : null) || findPackSlotElement(classTsid, packSelectedCopy, packSelectedBag, packSelectedPlace);
   const useInfo = getPackUseInfo(classTsid);
   const isEmotionalBear = classTsid === EMOTIONAL_BEAR_ID;
   const bearActions = isEmotionalBear
@@ -3916,8 +3965,8 @@ function renderPackPopover(classTsid, anchor = null) {
     ? `<div class="pack-drop-quantity count-pop" data-pack-drop-panel role="group" aria-label="Choose quantity to drop">
         <p class="pack-drop-title count-pop-title">Drop how many?</p>
         <p class="count-pop-note">${escapeHtml(features.query('sharedDropPrompt', classTsid, engine) || 'Drop this stack at your feet. Nearby matching stacks will merge.')}</p>
-        ${countStepMarkup({ value: packDropQty, max: slot.count, verb: 'Drop', attrs: { dec: 'data-pack-drop-dec', inc: 'data-pack-drop-inc', num: 'data-pack-drop-num', max: 'data-pack-drop-max' } })}
-        <output class="count-pop-of" aria-live="polite">${packDropQty} of ${slot.count}</output>
+        ${countStepMarkup({ value: packDropQty, max: stackCount, verb: 'Drop', attrs: { dec: 'data-pack-drop-dec', inc: 'data-pack-drop-inc', num: 'data-pack-drop-num', max: 'data-pack-drop-max' } })}
+        <output class="count-pop-of" aria-live="polite">${packDropQty} of ${stackCount}</output>
         <div class="pack-drop-confirm-row count-pop-actions">
           <span class="count-pop-esc mp-modern-only"><span class="kcap">Esc</span> back</span>
           <button type="button" class="pack-pop-primary" data-pack-drop-confirm>Drop ${packDropQty}</button>
@@ -3925,7 +3974,7 @@ function renderPackPopover(classTsid, anchor = null) {
       </div>`
     : '';
   // Eat how many? (js/eat-many.js): the original's count chooser, "Just one" first.
-  const eatMany = packEatManyInfo(classTsid, useInfo, slot.count);
+  const eatMany = packEatManyInfo(classTsid, useInfo, stackCount);
   if (!eatMany) packEatMode = false;
   if (eatMany) packEatQty = clampConsumeCount(packEatQty, eatMany.max);
   const eatVerbLower = eatMany ? eatMany.verb.toLowerCase() : '';
@@ -3954,7 +4003,7 @@ function renderPackPopover(classTsid, anchor = null) {
         <p id="pack-eat-title" class="pack-eat-title count-pop-title">${escapeHtml(eatMany.verb)} how many ${escapeHtml(eatMany.plural)}?</p>
         <div class="pack-eat-choices">${chips}</div>
         ${countStepMarkup({ value: qty, max: eatMany.max, verb: eatMany.verb, attrs: { dec: 'data-pack-eat-dec', inc: 'data-pack-eat-inc', num: 'data-pack-eat-num', max: 'data-pack-eat-max' } })}
-        <output class="count-pop-of" aria-live="polite" data-pack-eat-count>${qty} of ${slot.count}</output>
+        <output class="count-pop-of" aria-live="polite" data-pack-eat-count>${qty} of ${stackCount}</output>
         ${preview ? `<div class="pack-pop-effects pack-eat-preview" aria-live="polite">${preview}</div>` : ''}
         ${capNote || fullNote ? `<p class="pack-eat-note">${escapeHtml(capNote)}${capNote && fullNote ? ' ' : ''}${fullNote}</p>` : ''}
         <div class="pack-drop-confirm-row count-pop-actions">
@@ -4023,10 +4072,10 @@ function renderPackPopover(classTsid, anchor = null) {
   rows.push({
     attrs: 'data-pack-drop',
     label: 'Drop',
-    next: slot.count > 1,
+    next: stackCount > 1,
     disabled: Boolean(dropBlock),
     reason: dropBlock || '',
-    tip: slot.count > 1 ? `Choose how many to drop at your feet (${slot.count} here)` : 'Put it on the ground at your feet',
+    tip: stackCount > 1 ? `Choose how many to drop at your feet (${stackCount} here)` : 'Put it on the ground at your feet',
   });
   if (canSellHere) rows.push({ attrs: 'data-pack-sell', cls: 'pack-pop-sell', label: 'Sell', gain: `◎ ${sellPrice}`, tip: `Sell one to this vendor for ${sellPrice} currants` });
 
@@ -4047,7 +4096,7 @@ function renderPackPopover(classTsid, anchor = null) {
     <div class="pack-pop-head vm-head"${isEmotionalBear ? ` data-bear-state="${bearStateName}"` : ''}>
       <div class="pack-pop-icon"><img src="${slot.icon}" alt="" /></div>
       <div class="pack-pop-title">
-        <h3 id="pack-popover-title">${escapeHtml(named?.label || slot.label)} <b>×${slot.count}</b></h3>
+        <h3 id="pack-popover-title">${escapeHtml(named?.label || slot.label)} <b>×${stackCount}</b></h3>
         <span class="pack-pop-kind">${named ? escapeHtml(named.kind) : kind}${kindNote ? ` · ${kindNote}` : ''}</span>
       </div>
       <button type="button" class="pack-pop-close" data-pack-close aria-label="Close item actions">×</button>
@@ -4067,7 +4116,9 @@ function renderPackPopover(classTsid, anchor = null) {
         .filter((name) => focusedEat.hasAttribute(name))
         .map((name) => `[${name}${name === 'data-pack-eat-choice' ? `="${focusedEat.getAttribute(name)}"` : ''}]`)[0] || null
     : null;
-  const unchanged = pop.dataset.packFor === classTsid && pop.innerHTML !== '' && packPopoverMarkup === markup;
+  // Two stacks of one item can draw the same card: the stack's place keeps their buttons (and what they act on) apart.
+  const placeKey = packSelectedPlace ? `${packSelectedPlace.container}:${packSelectedPlace.index}` : '';
+  const unchanged = pop.dataset.packFor === classTsid && (pop.dataset.packPlace || '') === placeKey && pop.innerHTML !== '' && packPopoverMarkup === markup;
   // VERBS: a row with focus keeps it across a redraw of the same stack (its place in the list).
   const focusedRow = !keepFocus && focusedEat?.closest?.('.vm-row') && pop.dataset.packFor === classTsid
     ? [...pop.querySelectorAll('.vm-row')].indexOf(focusedEat.closest('.vm-row'))
@@ -4083,12 +4134,14 @@ function renderPackPopover(classTsid, anchor = null) {
     } else if (focusedRow >= 0) focusVerbRow(pop, focusedRow);
     syncVerbDetail(pop);
     pop.dataset.packFor = classTsid;
+    pop.dataset.packPlace = placeKey;
     packPopoverMarkup = markup;
   }
 
   // A bag button's aria-expanded is its tray's (renderPackRow), not the card's.
+  // Only the menu's own stack is marked when it is about one stack (several of an item are several stacks).
   document.querySelectorAll('.pack-slot[data-tsid]:not(.pack-bag)').forEach((el) => {
-    const selected = el.dataset.tsid === classTsid;
+    const selected = el.dataset.tsid === classTsid && (!packSelectedPlace || isPackPlace(el, packSelectedPlace));
     el.classList.toggle('active', selected);
     el.setAttribute('aria-expanded', selected ? 'true' : 'false');
   });
@@ -4104,10 +4157,12 @@ function renderPackPopover(classTsid, anchor = null) {
     });
   });
   pop.querySelector('[data-pack-use]')?.addEventListener('click', () => {
+    takeFromMenuStack(classTsid, 1);
     closePackPopover();
     usePackItem(classTsid);
   });
   pop.querySelector('[data-pack-eat-ticket]')?.addEventListener('click', () => {
+    takeFromMenuStack(classTsid, 1);
     closePackPopover();
     eatPackedParadiseTicket(classTsid);
   });
@@ -4155,21 +4210,21 @@ function renderPackPopover(classTsid, anchor = null) {
       dropPackBag(classTsid, packSelectedBag || sourceAnchor?.dataset?.packBag || '');
       return;
     }
-    if (slot.count <= 1) {
+    if (stackCount <= 1) {
       dropPackItem(classTsid, 1);
       return;
     }
     packDropMode = true;
-    packDropQty = normalizeStackQuantity(packDropQty, slot.count);
+    packDropQty = normalizeStackQuantity(packDropQty, stackCount);
     renderPackPopover(classTsid, sourceAnchor);
     pop.querySelector('[data-pack-drop-confirm]')?.focus({ preventScroll: true });
   });
   pop.querySelector('[data-pack-drop-dec]')?.addEventListener('click', () => {
-    packDropQty = normalizeStackQuantity(packDropQty - 1, slot.count);
+    packDropQty = normalizeStackQuantity(packDropQty - 1, stackCount);
     renderPackPopover(classTsid, sourceAnchor);
   });
   pop.querySelector('[data-pack-drop-inc]')?.addEventListener('click', () => {
-    packDropQty = normalizeStackQuantity(packDropQty + 1, slot.count);
+    packDropQty = normalizeStackQuantity(packDropQty + 1, stackCount);
     renderPackPopover(classTsid, sourceAnchor);
   });
   pop.querySelector('[data-pack-drop-cancel]')?.addEventListener('click', () => {
@@ -4184,18 +4239,18 @@ function renderPackPopover(classTsid, anchor = null) {
   // MPANELS (js/ui/count-chooser.js): Max, the number field and the keys (arrows, Page Up / Down,
   // Home / End step; Enter drops; Esc goes back to the stack's menu). The keys stay in the chooser.
   const setDropQty = (value) => {
-    packDropQty = normalizeStackQuantity(value, slot.count);
+    packDropQty = normalizeStackQuantity(value, stackCount);
     renderPackPopover(classTsid, sourceAnchor);
   };
-  pop.querySelector('[data-pack-drop-max]')?.addEventListener('click', () => setDropQty(slot.count));
+  pop.querySelector('[data-pack-drop-max]')?.addEventListener('click', () => setDropQty(stackCount));
   bindCountField(pop.querySelector('[data-pack-drop-num]'), {
-    max: () => slot.count,
+    max: () => stackCount,
     set: setDropQty,
-    confirm: (n) => dropPackItem(classTsid, normalizeStackQuantity(n, slot.count)),
+    confirm: (n) => dropPackItem(classTsid, normalizeStackQuantity(n, stackCount)),
     cancel: () => pop.querySelector('[data-pack-drop-cancel]')?.click(),
   });
   pop.querySelector('[data-pack-drop-panel]')?.addEventListener('keydown', (e) => {
-    const next = countKeyValue(e.key, packDropQty, slot.count);
+    const next = countKeyValue(e.key, packDropQty, stackCount);
     if (next != null) {
       e.preventDefault();
       e.stopPropagation();
@@ -4244,6 +4299,7 @@ function renderPackPopover(classTsid, anchor = null) {
     });
     pop.querySelector('[data-pack-eat-confirm]')?.addEventListener('click', () => {
       const n = clampConsumeCount(packEatQty, eatMany.max);
+      takeFromMenuStack(classTsid, n);
       closePackPopover();
       if (eatMany.ticket) eatPackedParadiseTicket(classTsid, n);
       else usePackItem(classTsid, n);
@@ -4340,7 +4396,7 @@ function renderPackRow(box, slots, opts = {}) {
     slot.className = 'pack-slot' + (s.isTool || opts.toolRow ? ' pack-tool' : '');
     slot.setAttribute('role', 'listitem');
     slot.setAttribute('aria-haspopup', 'dialog');
-    slot.setAttribute('aria-expanded', packSelected === s.classTsid ? 'true' : 'false');
+    slot.setAttribute('aria-expanded', packSelected === s.classTsid && (!packSelectedPlace || (packSelectedPlace.container === s.container && packSelectedPlace.index === s.index)) ? 'true' : 'false');
     slot.setAttribute(
       'aria-label',
       `${shownLabel} × ${s.count}${toolCondition?.tracked ? `, ${toolCondition.broken ? 'broken' : `${Math.round(toolCondition.percent * 100)} percent condition`}` : ''}`
@@ -4439,9 +4495,11 @@ function renderPackRow(box, slots, opts = {}) {
         usePackItem(s.classTsid);
         return;
       }
-      if (packSelected === s.classTsid && isPackPopoverOpen()) closePackPopover();
+      // The same stack's slot closes its menu; another stack of the same item moves the menu to that one.
+      const samePlace = !packSelectedPlace || !inLayout || isPackPlace(slot, packSelectedPlace);
+      if (packSelected === s.classTsid && isPackPopoverOpen() && samePlace) closePackPopover();
       else {
-        if (packSelected !== s.classTsid) {
+        if (packSelected !== s.classTsid || !samePlace) {
           packDropMode = false;
           packDropQty = 1;
           packEatMode = false;
@@ -11930,12 +11988,17 @@ function dropPackItem(classTsid, requested = 1) {
     toast(blocked);
     return;
   }
-  const count = normalizeStackQuantity(requested, inv[classTsid] || 0);
+  // From a stack's menu the drop is that stack's: no more than it holds, and it comes off it
+  // (main.js doVerb 3243-3246 caps the count at the stack's; player report 2026-11-01).
+  const fromStack = packSelected === classTsid && packSelectedStack ? packSelectedStack.count : Infinity;
+  const count = normalizeStackQuantity(requested, Math.min(inv[classTsid] || 0, fromStack));
   if (!count) {
     toast('That stack is no longer in your pack.');
     closePackPopover();
     return;
   }
+  // Online the stack leaves when the server answers: the take waits for it.
+  takeFromMenuStack(classTsid, count, 60000);
   const facing = player.facing === 'left' ? -1 : 1;
   const x = clamp(player.x + facing * 72, 24, Math.max(24, WORLD_W - 24));
   // Tiny Speck's takeable_drop (items/include/takeable.js 157-206) puts the stack in

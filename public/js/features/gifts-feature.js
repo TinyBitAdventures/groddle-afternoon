@@ -249,7 +249,9 @@ function createSession(engine, client) {
         continue;
       }
       const reason = table ? giveReason(c, table, ITEM_CATALOG[c]?.tags) : '';
-      out.push({ kind: 'stack', c, n: 1, max: Math.min(have, stackMax(c, table)), label: itemLabel(c, have), have, reason });
+      // Opened from one stack's menu, the give is that stack's: no more than it holds (main.js doVerb 3243-3246).
+      const own = give?.from?.cls === c ? give.from.count : Infinity;
+      out.push({ kind: 'stack', c, n: 1, max: Math.min(have, stackMax(c, table), own), label: itemLabel(c, have), have, reason });
     }
     slice.boxes.forEach((b) => {
       if (busyBoxes.has(b.id)) return;
@@ -320,9 +322,12 @@ function createSession(engine, client) {
       return true;
     }
     wrap = null;
-    give = { to: to || null, pick: null };
+    give = { to: to || null, pick: null, from: null };
     if (!give.to && others().length === 1) give.to = others()[0];
     if (classTsid) {
+      // The stack whose menu opened this (features/bags-feature.js packFocused): the give comes off it.
+      const at = engine.query?.('packFocused', classTsid, engine);
+      if (at?.count > 0) give.from = at;
       const t = givables().find((x) => x.c === classTsid);
       if (t && !t.reason) give.pick = { ...t, n: t.kind === 'stack' ? Math.min(t.max || 1, 1) : 1 };
     }
@@ -362,6 +367,8 @@ function createSession(engine, client) {
       frame = { to: to.id, ref, item };
     }
     if (!client.send('gift_give', frame)) return say("You're offline.", 'error');
+    // The give leaves the pack when the server settles it: from the stack it was opened on.
+    if (p.kind === 'stack' && give.from?.cls === p.c) engine.query?.('packTakeFrom', p.c, frame.item.n, engine, { place: give.from, wait: 60000 });
     sending.set(ref, { kind: p.kind, noteId: p.noteId || null, boxId: p.boxId || null, to, at: Date.now() });
     give.waiting = true;
     say('Giving…');

@@ -32,7 +32,10 @@
  * the rest opens new stacks in the first free slot, the pack before the bags
  * (bag.js:208-232; the pack is the first candidate, :120-122). Fewer takes from
  * the first stack in slot order, a bag's slots where the bag sits
- * (removeItemStackClass and removeItemStackClassExact, bag.js:316-404); a stack
+ * (removeItemStackClass and removeItemStackClassExact, bag.js:316-404), except
+ * that what a verb on one stack takes (drop, give, eat) comes off that stack
+ * (opts.takeFirst; main.js doVerb 2926-3250 works on the itemstack the client
+ * named, its count capped at that stack's: player report 2026-11-01); a stack
  * that empties frees its slot and nothing else moves. A save from before
  * prefs.n splits each class into full stacks first, in saved order, once.
  *
@@ -221,7 +224,10 @@ function classOrder(inv, opts) {
  * The pack's slots, each bag's slots and what the magic rock holds.
  * @param {Record<string, number>} inv
  * @param {object} prefs saved arrangement (normalizePrefs)
- * @param {{ capacity?: number, catalog?: object, isTool?: (cls: string) => boolean, order?: string[], labels?: Record<string,string> }} [opts]
+ * @param {{ capacity?: number, catalog?: object, isTool?: (cls: string) => boolean, order?: string[], labels?: Record<string,string>, takeFirst?: { container: string, index: number }[] }} [opts]
+ *   takeFirst: saved places (prefs place keys and indexes) whose stacks a class's
+ *   fewer comes off before the first-in-slot-order rule: the stack a verb was
+ *   used on (main.js doVerb 3239-3250 acts on the stack the client named).
  */
 export function layoutPack(inv, prefs = null, opts = {}) {
   const capacity = Math.max(1, Math.floor(opts.capacity ?? PACK_CAPACITY));
@@ -300,13 +306,13 @@ export function layoutPack(inv, prefs = null, opts = {}) {
   // The saved stacks kept, per class, in slot order (each { container, slot, saved }).
   const held = new Map();
   const reserved = (cls) => held.get(cls)?.length || 0;
-  const keepStack = (container, cls, savedCount) => {
+  const keepStack = (container, cls, savedCount, key, at) => {
     if (!left.has(cls)) return;
     if (!counted.has(cls) && reserved(cls) >= left.get(cls).length) return;
     const slot = { kind: 'stack', cls, count: 0 };
     container.slots.push(slot);
     if (!held.has(cls)) held.set(cls, []);
-    held.get(cls).push({ container, slot, saved: savedCount });
+    held.get(cls).push({ container, slot, saved: savedCount, key, at });
   };
 
   // Phase 1: the saved pack, then each placed bag's saved contents.
@@ -316,14 +322,14 @@ export function layoutPack(inv, prefs = null, opts = {}) {
       const inst = byKey.get(entry.slice(1));
       if (inst && !inst.placed) putBag(inst);
     } else if (packAccepts(entry)) {
-      keepStack(pack, entry, saved.n.pack?.[i] || 0);
+      keepStack(pack, entry, saved.n.pack?.[i] || 0, 'pack', i);
     }
   });
   for (const slot of pack.slots) {
     if (slot.kind !== 'bag') continue;
     const box = boxes.get(slot.key);
     (saved.place[slot.key] || []).forEach((cls, i) => {
-      if (boxTakes(box, cls)) keepStack(box, cls, saved.n[slot.key]?.[i] || 0);
+      if (boxTakes(box, cls)) keepStack(box, cls, saved.n[slot.key]?.[i] || 0, slot.key, i);
     });
   }
   // Each kept stack's count. A saved count stays as it is; more tops up the stacks
@@ -363,6 +369,13 @@ export function layoutPack(inv, prefs = null, opts = {}) {
         if (where.has(s)) firstFirst.push(where.get(s));
         else if (s.kind === 'bag') for (const t of boxes.get(s.key).slots) if (where.has(t)) firstFirst.push(where.get(t));
       }
+      // The stack a verb was used on gives first (takeFirst), then the rest in slot order.
+      const first = [];
+      for (const p of Array.isArray(opts.takeFirst) ? opts.takeFirst : []) {
+        const h = firstFirst.find((x) => x.key === String(p?.container) && x.at === Math.floor(Number(p?.index)));
+        if (h && !first.includes(h)) first.push(h);
+      }
+      firstFirst.splice(0, firstFirst.length, ...first, ...firstFirst.filter((h) => !first.includes(h)));
       for (const h of firstFirst) {
         if (less <= 0) break;
         const take = Math.min(less, h.slot.count);

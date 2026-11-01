@@ -19,6 +19,13 @@
  *    stack can't fit (takeable.js:48).
  *  - packVerbs: Put in <bag> / Take out of <bag> on a stack's popover, the
  *    same move without a drag (touch and keyboard).
+ *  - query('packFocus', place, engine): the stack an open menu is about (its
+ *    slot's container and index), so the menu, its counts and its verbs stay on
+ *    that stack however many stacks of the item there are; query('packTakeFrom',
+ *    cls, n, engine, { place, wait }): a verb on it (drop, give, eat) takes from that
+ *    stack, now or when the server answers (main.js doVerb 2926-3250 acts on the
+ *    itemstack the client named, its count capped at that stack's; player report
+ *    2026-11-01: the menu jumped to the first stack and a drop took from it).
  *
  * First load of a save from before bags: a solo game is packed into bags (a
  * Red Toolbox when tools spill, then Bigger Bags) so everything it held still
@@ -83,7 +90,7 @@ import {
   takeBag,
   unitPlaces,
   unitRankAt,
-} from '../pack-slots.js?v=09c6ccbe';
+} from '../pack-slots.js?v=44e00ce9';
 import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=3d109172';
 import { createMinnAccount } from '../minn-account.js?v=ea900c51';
 
@@ -108,6 +115,18 @@ export const BAG_DEMO_DROP = Object.freeze({ classTsid: 'plum', count: 5, dx: 70
 const fresh = () => ({ v: 1, prefs: normalizePrefs(null), rock: {}, open: '', migrated: false, starter: '' });
 let slice = fresh();
 let lastLayout = null;
+/** The stack the open menu is about ({ cls, container, index }: its place in the arrangement), or null. */
+let focus = null;
+/**
+ * Takes a verb on one stack asked for that have not come out of the inventory yet
+ * ({ cls, container, index, n, until }): the next fewer of that class comes off that
+ * stack first (pack-slots.js layoutPack takeFirst). Online the take lands when the
+ * server answers, so each waits a while.
+ */
+let takes = [];
+const TAKE_WAIT_MS = 60000;
+/** A take done here and now (eat, a solo drop) lands at once; one that didn't soon lapses. */
+const TAKE_SOON_MS = 1500;
 let demoDone = false;
 /** The site's answers that settle the starter question: granted, none, or refused (new, nosave). */
 const STARTER_DONE = new Set(['granted', 'none', 'new', 'nosave']);
@@ -313,10 +332,27 @@ function askStarter(engine) {
 }
 
 /** The layout, taking in whatever changed in the pack since the last look. */
+/** The stack at a place in a layout ({ container, index }), or null. */
+function slotAt(layout, place) {
+  const box = place?.container === 'pack' ? layout?.pack : layout?.bags?.[place?.container];
+  const s = box?.slots?.[Math.floor(Number(place?.index))];
+  return s?.kind === 'stack' ? s : null;
+}
+
+/** How many of a class the saved arrangement holds in its slots. */
+function savedCount(prefs, cls) {
+  let n = 0;
+  for (const [key, list] of Object.entries(prefs?.place || {})) list.forEach((e, i) => { if (e === cls) n += prefs.n?.[key]?.[i] || 0; });
+  return n;
+}
+
 function reconcile(engine) {
   const inv = engine?.inv || {};
   if (engine?.started) migrate(engine);
-  const layout = layoutPack(inv, slice.prefs, opts());
+  const now = Date.now();
+  takes = takes.filter((t) => t.until > now);
+  const prefsBefore = takes.length ? slice.prefs : null;
+  const layout = layoutPack(inv, slice.prefs, takes.length ? { ...opts(), takeFirst: takes } : opts());
   if (engine?.started) {
     const before = lastLayout;
     const changes = rockChanges(slice.rock, layout.rock, before?.slotted || layout.slotted, layout.slotted);
@@ -334,6 +370,18 @@ function reconcile(engine) {
     slice.rock = { ...layout.rock };
     if (slice.open && !layout.bags[slice.open]) slice.open = '';
     lastLayout = layout;
+    // What came off counts against the takes asked for; one fully taken, or whose stack is gone, ends.
+    if (prefsBefore) {
+      const fewer = new Map();
+      for (const t of takes) if (!fewer.has(t.cls)) fewer.set(t.cls, Math.max(0, savedCount(prefsBefore, t.cls) - savedCount(layout.prefs, t.cls)));
+      takes = takes.filter((t) => {
+        const off = Math.min(t.n, fewer.get(t.cls) || 0);
+        fewer.set(t.cls, (fewer.get(t.cls) || 0) - off);
+        t.n -= off;
+        return t.n > 0 && slotAt(layout, t)?.cls === t.cls;
+      });
+    }
+    if (focus && slotAt(layout, focus)?.cls !== focus.cls) focus = null;
   }
   publish(engine, layout);
   return layout;
@@ -346,6 +394,12 @@ function stackPlaces(layout, cls) {
     box.slots.forEach((s, i) => { if (s.cls === cls) out.push({ container: key, index: i }); });
   }
   return out;
+}
+
+/** The menu's own stack when it is about one of this class (Put in / Take out move that one), else every stack of it. */
+function focusedPlaces(layout, cls) {
+  if (focus?.cls === cls && slotAt(layout, focus)?.cls === cls) return [{ container: focus.container, index: focus.index }];
+  return stackPlaces(layout, cls);
 }
 
 /**
@@ -376,6 +430,9 @@ function doMove(engine, from, to) {
     const ranks = engine.toolState ? movedToolRanks(engine, before, from, to, result.prefs) : null;
     if (ranks && ranks.was !== ranks.now) moveToolCopy(engine.toolState, ranks.cls, ranks.was, ranks.now);
     slice.prefs = normalizePrefs(result.prefs);
+    // The stacks have new places: a menu or a take on one no longer knows where it is.
+    focus = null;
+    takes = [];
     engine.setData?.('packLast', 'moved');
   } else if (result.reason) {
     engine.setData?.('packLast', result.reason);
@@ -419,6 +476,49 @@ export const bagsFeature = {
   },
 
   /**
+   * game.js renderPackPopover: the stack the menu is about, from its slot's place
+   * ({ cls, container, index }); null forgets it. Returns { cls, container, index, count }
+   * when that slot holds the class, else null (then the menu stays on the class as a whole).
+   */
+  packFocus(place, engine) {
+    if (!place) {
+      focus = null;
+      return null;
+    }
+    const cls = String(place.cls || '');
+    const container = String(place.container ?? '');
+    const index = Math.floor(Number(place.index));
+    if (!cls || !container || !Number.isFinite(index) || !engine?.inv) return null;
+    const s = slotAt(reconcile(engine), { container, index });
+    if (s?.cls !== cls) {
+      if (focus?.cls === cls) focus = null;
+      return null;
+    }
+    focus = { cls, container, index };
+    return { ...focus, count: s.count };
+  },
+
+  /**
+   * A verb on the focused stack (or the given place) is about to take n of its class: those n
+   * come off that stack when they leave the inventory, now or when the server answers.
+   */
+  packTakeFrom(cls, n, engine, { place = null, wait = TAKE_SOON_MS } = {}) {
+    const at = place || focus;
+    const k = Math.floor(Number(n));
+    if (!at || at.cls !== String(cls || '') || !(k > 0)) return false;
+    const ms = Math.max(0, Math.min(TAKE_WAIT_MS, Number(wait) || TAKE_SOON_MS));
+    takes.push({ cls: at.cls, container: String(at.container), index: Math.floor(Number(at.index)), n: k, until: Date.now() + ms });
+    return true;
+  },
+
+  /** The stack the last menu of this class was about, with its count now ({ cls, container, index, count }), or null. */
+  packFocused(cls, engine) {
+    if (!focus || focus.cls !== String(cls || '') || !engine?.inv) return null;
+    const s = slotAt(layoutPack(engine.inv, slice.prefs, opts()), focus);
+    return s?.cls === focus.cls ? { ...focus, count: s.count } : null;
+  },
+
+  /**
    * A drop of a bag with things in it (game.js dropPackBag): the bag the player chose
    * leaves the pack with all it holds, as in the source (pack-slots.js takeBag).
    * Returns { ok, cls, contents: [{ cls, count, points? }] }; the inventory and the
@@ -455,6 +555,8 @@ export const bagsFeature = {
     removeItem(engine.inv, res.cls, 1);
     for (const c of contents) removeItem(engine.inv, c.cls, c.count);
     slice.prefs = normalizePrefs(res.prefs);
+    focus = null;
+    takes = [];
     if (slice.open === String(key)) slice.open = '';
     engine.setData?.('packLast', `bag_out:${res.cls}:${contents.length}`);
     return { ok: true, cls: res.cls, contents };
@@ -485,6 +587,8 @@ export const bagsFeature = {
     addItem(engine.inv, String(cls), 1);
     for (const c of list) addItem(engine.inv, c.cls, c.count);
     slice.prefs = normalizePrefs(res.prefs);
+    focus = null;
+    takes = [];
     if (engine.toolState) {
       const layout = layoutPack(engine.inv, slice.prefs, o);
       const box = layout.bags[res.key];
@@ -540,7 +644,7 @@ export const bagsFeature = {
     const cls = String(classTsid || '');
     if (!cls || isBagClass(cls) || !engine?.inv) return null;
     const layout = layoutPack(engine.inv, slice.prefs, opts());
-    const places = stackPlaces(layout, cls);
+    const places = focusedPlaces(layout, cls);
     if (!places.length) return null;
     const out = [];
     const inPack = places.some((p) => p.container === 'pack');
@@ -568,7 +672,7 @@ export const bagsFeature = {
     const m = /^bags_(put|take):([a-zA-Z0-9_]+)$/.exec(String(verbId || ''));
     if (!m) return false;
     const layout = layoutPack(engine.inv, slice.prefs, opts());
-    const places = stackPlaces(layout, String(classTsid || ''));
+    const places = focusedPlaces(layout, String(classTsid || ''));
     const from = m[1] === 'put'
       ? [...places].reverse().find((p) => p.container === 'pack')
       : [...places].reverse().find((p) => p.container === m[2]);
@@ -587,6 +691,8 @@ export const bagsFeature = {
   restore(saved) {
     slice = fresh();
     lastLayout = null;
+    focus = null;
+    takes = [];
     starterAsked = false;
     if (!saved || typeof saved !== 'object') return;
     slice.prefs = normalizePrefs(saved.prefs);

@@ -1079,6 +1079,9 @@
 :root[data-ui="classic"] #pack-popover :is(.vm-key, .vm-lock) { display: none; }
 :root[data-ui="classic"] #pack-popover .vm-row { display: inline-flex; align-items: center; gap: 3px; }
 :root[data-ui="classic"] #pack-popover .vm-row[aria-disabled="true"] { cursor: default; opacity: 0.48; }
+/* The pack band (#pack-bar) lets clicks through to the world; the menu over it takes its own (Modern's
+   rule is under [data-ui="modern"]): without this a Classic stack's Drop, Back and count went to the street. */
+:root[data-ui="classic"] #pack-popover { pointer-events: auto; }
 
 /* == The imagination hub on X (classic-spec spec §9; ImgMenuView.as 52-415; js/classic/classic-hub.js).
    A full-viewport overlay, not a window: the radial vignette (black .1 to .7 round a 650 px box,

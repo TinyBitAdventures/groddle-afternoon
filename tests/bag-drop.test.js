@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { bagLeavesLast, giveBag, layoutPack, takeBag, unitPlaces } from '../public/js/pack-slots.js?v=09c6ccbe';
+import { bagLeavesLast, giveBag, layoutPack, takeBag, unitPlaces } from '../public/js/pack-slots.js?v=44e00ce9';
 import {
   createDroppedItemState,
   dropInventoryStack,
@@ -148,7 +148,7 @@ describe('game.js and the bags feature', () => {
   it("a bag's Drop drops the bag its menu is about, with no count chooser", () => {
     assert.match(game, /if \(isBagClass\(classTsid\)\) \{\s*dropPackBag\(classTsid, packSelectedBag/);
     assert.match(game, /if \(anchor\?\.dataset\?\.packBag\) packSelectedBag = anchor\.dataset\.packBag;/);
-    assert.match(game, /findPackSlotElement\(classTsid, packSelectedCopy, packSelectedBag\)/);
+    assert.match(game, /findPackSlotElement\(classTsid, packSelectedCopy, packSelectedBag(, packSelectedPlace)?\)/);
   });
 
   it("refuses a bag holding something locked to you, with the source's words (takeable.js:128)", () => {

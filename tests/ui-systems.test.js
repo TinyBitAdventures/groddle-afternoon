@@ -166,10 +166,10 @@ describe('pack / inventory', () => {
     const game = readFileSync(join(__dirnameUi, '../public/game.js'), 'utf8');
     // updateHud redraws the open card on every HUD change; the same markup keeps the same buttons (no hover blink).
     assert.match(game, /if \(packSelected\) renderPackPopover\(packSelected\);/);
-    assert.match(game, /const unchanged = pop\.dataset\.packFor === classTsid && pop\.innerHTML !== '' && packPopoverMarkup === markup;\n[\s\S]{0,500}?if \(!unchanged\) \{\n\s*pop\.innerHTML = markup;/);
+    assert.match(game, /const unchanged = pop\.dataset\.packFor === classTsid && \(pop\.dataset\.packPlace \|\| ''\) === placeKey && pop\.innerHTML !== '' && packPopoverMarkup === markup;\n[\s\S]{0,500}?if \(!unchanged\) \{\n\s*pop\.innerHTML = markup;/);
     assert.match(game, /positionPackPopover\(pop, sourceAnchor\);\n\s*if \(unchanged\) return;/);
     assert.match(game, /packPopoverMarkup = '';/, 'closing forgets the markup');
-    assert.match(game, /const sourceAnchor = \(anchor\?\.isConnected \? anchor : null\) \|\| findPackSlotElement\(classTsid, packSelectedCopy, packSelectedBag\);/);
+    assert.match(game, /const sourceAnchor = \(anchor\?\.isConnected \? anchor : null\) \|\| findPackSlotElement\(classTsid, packSelectedCopy, packSelectedBag, packSelectedPlace\);/);
     // .pack-pop-actions button:hover (0,2,1) outranks .pack-pop-primary (0,2,0): the primary needs its own hover.
     assert.match(css, /\.pack-pop-actions \.pack-pop-primary:hover:not\(:disabled\) \{ background: #5a9e3e;/, 'a shade deeper than #6aaa3a (the design token --c-green-63)');
   });
