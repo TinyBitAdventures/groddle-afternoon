@@ -277,11 +277,11 @@ export const SKILL_REMAKE_NOTES = Object.freeze({
   },
   'Martial Imagination': {
     status: 'partial',
-    note: 'In Ur it let you start stun attacks on a Rook with a Focusing Orb. Rook attacks are here, but fought alone, so anyone may stun; the skill is not required.',
+    note: 'Lets you start stun attacks on a Rook with a Focusing Orb when other players are on the street; without it you join their orbs. When you face a Rook alone, solo or online, anyone may stun and the street joins your orb.',
   },
   Piety: {
     status: 'partial',
-    note: 'In Ur it let you prime shrines against an attacking Rook. Rook attacks are here, but fought alone, so anyone may prime a shrine; the skill is not required.',
+    note: 'Lets you prime a shrine against an attacking Rook when other players are on the street. When you face a Rook alone, solo or online, anyone may prime the shrine.',
   },
   Teleportation: {
     status: 'live',

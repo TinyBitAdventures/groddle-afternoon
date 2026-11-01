@@ -22,7 +22,7 @@ import {
   emblemUnlockFor,
   spendEmblemForSkill,
   skillTitle,
-} from '../public/js/skill-tree.js?v=cf7bc81f';
+} from '../public/js/skill-tree.js?v=cc29f9b4';
 
 const root = join(import.meta.dirname, '..', 'public');
 

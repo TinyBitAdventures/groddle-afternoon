@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setMetabolicGainGate } from '../public/js/metabolics.js?v=8504134e';
 import { createInventory, useItem } from '../public/js/inventory.js?v=85d4faba';
-import { createShrineState, donateToShrine } from '../public/js/shrines.js?v=b6bbcdb5';
+import { createShrineState, donateToShrine } from '../public/js/shrines.js?v=7cdc7073';
 import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=93286603';
 import { HERDKEEPING, capturePiggy, normalizeHusbandryPack } from '../public/js/animal-husbandry.js?v=e23ccf02';
 import { KITTY_PET, createKitty, petKitty } from '../public/js/heli-kitties.js?v=ee89a5bf';

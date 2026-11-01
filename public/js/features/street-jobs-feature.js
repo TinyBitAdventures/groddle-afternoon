@@ -49,7 +49,7 @@ import { ecologyForStreet } from '../street-ecology.js?v=8574d30d';
 import { worldToScreen } from '../street-model.js?v=23b926e5';
 import { signArmWidth } from '../street-render.js?v=b5ae0c3d';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { GIANTS } from '../shrines.js?v=b6bbcdb5';
+import { GIANTS } from '../shrines.js?v=7cdc7073';
 import { teleportationFeature } from './teleportation-feature.js?v=7cafdb53';
 import {
   SOLO_DIVISOR,

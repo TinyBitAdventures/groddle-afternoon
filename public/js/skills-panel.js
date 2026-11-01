@@ -15,7 +15,7 @@ import {
   filterSkillTree,
   skillTreeCounts,
   skillTitle,
-} from './skill-tree.js?v=cf7bc81f';
+} from './skill-tree.js?v=cc29f9b4';
 import { formatStudyTime, listStudyQueue } from './skills.js?v=4542bdf9';
 import { getSkillCatalog } from './content-catalogs.js?v=10b118dd';
 

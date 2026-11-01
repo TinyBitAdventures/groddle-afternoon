@@ -103,7 +103,7 @@ describe('paying drops', () => {
 
 describe('drops feature wiring', () => {
   it('maps world events and making batches to packages', async () => {
-    const { packageForEvent, rollResourceNodeDrop, RESOURCE_NODE_DROP_PACKAGES, dropsFeature } = await import('../public/js/features/drops-feature.js?v=4ff97282');
+    const { packageForEvent, rollResourceNodeDrop, RESOURCE_NODE_DROP_PACKAGES, dropsFeature } = await import('../public/js/features/drops-feature.js?v=b6abef49');
     const engine = { interactables: [], player: { x: 0, y: 0 } };
     assert.equal(packageForEvent('trant_bean:pet', engine), 'light_green_thumb_pet');
     assert.equal(packageForEvent('trant_egg:pet', engine), 'lgt_egg_plant_pet');

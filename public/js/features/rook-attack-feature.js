@@ -54,7 +54,7 @@ import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=85d4faba';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { nearestSurfaceY } from '../walk-surface.js?v=764d5f5a';
-import { donationValueFor } from '../shrines.js?v=b6bbcdb5';
+import { donationValueFor } from '../shrines.js?v=7cdc7073';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import {
   FOREHORSEMAN_LINES,
@@ -1885,7 +1885,7 @@ function shrineVerbs(engine, target, a) {
   const stunned = canStrike(a);
   const cost = costOf(ROOK_SOURCE.primeEnergy, { armor: armored() });
   const isPrimed = mp ? Boolean(a?.primed) : primed?.target === target;
-  const pietyless = Boolean(mp) && !engine.learnedSkills?.includes(MP_ROOK.primeSkill);
+  const pietyless = Boolean(mp) && !mpAlone() && !engine.learnedSkills?.includes(MP_ROOK.primeSkill);
   const gate = strikeGate(engine, target);
   return [
     {
@@ -2270,10 +2270,21 @@ function mpOnYou(engine, msg) {
 
 // —— Actions ——
 
+/**
+ * Ticket 19 (2026-11-01): nobody else on the street. The original's rule (only Martial Imagination
+ * starts a stun, focusing_orb.js:579; only Piety primes, npc_shrine_*.js:188) is for a crowd to team
+ * up in; alone online the Rook is fought as in solo (js/rook-attack.js ROOK_SOLO, the skill page's
+ * "anyone may stun"): anyone starts the orb and primes, and the street joins the orb (the server's
+ * rookStreetJoiners).
+ */
+function mpAlone() {
+  return (mp?.client?.players?.length || 0) === 0;
+}
+
 function mpStunGate(engine) {
   const a = here(engine);
   if (!a || !rookPresent(a) || !canStun(a)) return { ok: false, reason: ROOK_TEXT.stunWait };
-  if (!engine.learnedSkills?.includes(MP_ROOK.stunSkill)) return { ok: false, reason: MP_ROOK_TEXT.needsMartial };
+  if (!mpAlone() && !engine.learnedSkills?.includes(MP_ROOK.stunSkill)) return { ok: false, reason: MP_ROOK_TEXT.needsMartial };
   if (orbOf(a, mpMyId())) return { ok: false, reason: 'You are already focused on an orb.' };
   if (countItem(engine.inv, ORB_CLASS) <= 0) return { ok: false, reason: 'You need a Focusing Orb to stun the Rook.' };
   const cost = costOf(ROOK_SOURCE.stunEnergy, { armor: armored() });
@@ -2402,7 +2413,7 @@ function mpPrime(engine, target) {
     engine.toast(ROOK_TEXT.primeNotStunned, 2400);
     return false;
   }
-  if (!engine.learnedSkills?.includes(MP_ROOK.primeSkill)) {
+  if (!mpAlone() && !engine.learnedSkills?.includes(MP_ROOK.primeSkill)) {
     engine.toast(MP_ROOK_TEXT.needsPiety, 2400);
     return false;
   }

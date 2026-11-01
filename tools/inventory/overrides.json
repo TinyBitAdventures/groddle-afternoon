@@ -1463,12 +1463,12 @@
  },
  "skill:martial_imagination_1": {
   "mp": "game 221c66ab, server aa257cb",
-  "mpReason": "a Rook attack is one fight for everyone on the street, and only a player who learned Martial Imagination can start the Focusing Orb stun (rook-attack-feature.js MP_ROOK.stunSkill; the source's rook_attack stun rule)",
+  "mpReason": "a Rook attack is one fight for everyone on the street, and with others there only a player who learned Martial Imagination can start the Focusing Orb stun (rook-attack-feature.js MP_ROOK.stunSkill; the source's rook_attack stun rule); alone, anyone may and the street joins the orb (ticket 19, server rookStreetJoiners)",
   "register": "G334"
  },
  "skill:piety_1": {
   "mp": "game 221c66ab, server aa257cb",
-  "mpReason": "in the street's shared Rook fight only a player who learned Piety can prime a shrine against the Rook (rook-attack-feature.js MP_ROOK.primeSkill)",
+  "mpReason": "in the street's shared Rook fight, with others there, only a player who learned Piety can prime a shrine against the Rook (rook-attack-feature.js MP_ROOK.primeSkill); alone, anyone may (ticket 19)",
   "register": "G334"
  },
  "imagination:snapshotting": {
