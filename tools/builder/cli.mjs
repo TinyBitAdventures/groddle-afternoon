@@ -34,7 +34,7 @@ import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js
 import { arrivalOps, settlePostOps, followPostOps } from '../../public/js/builder/posts.js?v=3db41b1f';
 import { platformsScreen, isStandable } from '../../public/js/street-model.js?v=23b926e5';
 import { DECO_TWINS } from '../../public/js/street-render.js?v=b5ae0c3d';
-import { groundOps, floatingLines, FLOAT_REACH } from '../../public/js/builder/ground.js?v=6e2ebe6b';
+import { groundOps, floatingLines, FLOAT_REACH } from '../../public/js/builder/ground.js?v=adbaa141';
 import { EFFECT_KINDS, EFFECT_DEFAULTS, EFFECT_LIMITS, RUMBLE_DEFAULTS, effectsCost, normaliseEmitter, rumbleShare } from '../../public/js/street-effects.js?v=e427650f';
 
 export const PERM_WORDS = Object.freeze({ floor: -1, roof: 1, soft: 0, hard: null });
@@ -59,7 +59,7 @@ export function ladderTiling(word = 'wood') {
 
 /** Ops spec 8.3 names that are not built yet: refused here rather than sent. */
 export const NOT_BUILT = Object.freeze(['layer.add', 'layer.remove', 'layer.move', 'waiver.add', 'waiver.remove']);
-const BOOLEAN_FLAGS = new Set(['json', 'dry-run', 'write', 'help', 'all', 'flip', 'reach', 'dirty', 'no-build', 'always', 'quiet', 'off', 'posts', 'no-carry']);
+const BOOLEAN_FLAGS = new Set(['json', 'dry-run', 'stretch', 'write', 'help', 'all', 'flip', 'reach', 'dirty', 'no-build', 'always', 'quiet', 'off', 'posts', 'no-carry']);
 const pub = (p) => join(GAME_DIR, 'public', p);
 const readJson = (f) => JSON.parse(readFileSync(f, 'utf8'));
 const clone = (v) => JSON.parse(JSON.stringify(v));
@@ -447,9 +447,9 @@ export function drawnSize(zone, sprite, rows = catalog()) {
 }
 
 /** PURE: the ground command's ops for one street, made ready to send (ids, library provenance rows). */
-export function groundStreetOps(zone, key, { floor = null, support = null, wall = null } = {}, rows = catalog()) {
+export function groundStreetOps(zone, key, { floor = null, support = null, wall = null, stretch = false } = {}, rows = catalog()) {
   try {
-    const r = groundOps(zone, key, { floor, support, wall, size: (s) => drawnSize(zone, s, rows) });
+    const r = groundOps(zone, key, { floor, support, wall, stretch, size: (s) => drawnSize(zone, s, rows) });
     return { ops: prepareOps(zone, r.ops, rows), done: r.done };
   } catch (e) {
     if (e instanceof CliError) throw e;
@@ -768,9 +768,10 @@ export const HELP = `Groddle level builder (docs/level-builder/spec.md 8.2)
   effect --street k --kind steam|lava|embers --x --y [--layer middleground] [--rate --size --height --spread]
          [--period 6,10 --burst 3 | --always] [--sprite gz_x]   a zone ambient effect (set/rm it by its fx_ id)
   rumble --street k [--every 14,30 --duration 1.6 --strength 6 --quiet] | --off   the street's earthquake rumble
-  ground --street k [--floor gz_x] [--support gz_y] [--wall gz_z] [--dry-run]   stand a street on the ground: floor art
+  ground --street k [--floor gz_x] [--support gz_y] [--wall gz_z] [--stretch] [--dry-run]   stand a street on the ground: floor art
                                               past the bottom edge, supports under low ledges (ART-001), walls behind high ones;
-                                              re-runnable (replaces its own pieces)
+                                              re-runnable (replaces its own pieces); --stretch puts one stretched copy
+                                              per gap, for a stand-in picture that does not tile
   ground --ledges grounded|floating           the zone's choice: floating zones get no ART-001
   effects [--street k]                        each street's effects, rumble and cost against the limits
   ops <file.json>                             apply a batch atomically
@@ -1103,7 +1104,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       }
       const key = flags.street;
       if (typeof key !== 'string') throw new CliError('ground --street <key> [--floor gz_x] [--support gz_y] [--wall gz_z] [--dry-run], or ground --ledges grounded|floating.');
-      const pick = { floor: typeof flags.floor === 'string' ? flags.floor : null, support: typeof flags.support === 'string' ? flags.support : null, wall: typeof flags.wall === 'string' ? flags.wall : null };
+      const pick = { floor: typeof flags.floor === 'string' ? flags.floor : null, support: typeof flags.support === 'string' ? flags.support : null, wall: typeof flags.wall === 'string' ? flags.wall : null, stretch: flags.stretch === true };
       const t = target();
       const leftOf = (zone) => (zone.ledges === 'floating' ? [] : floatingLines(streetOf(zone, key).street).map((f) => ({ id: f.id, open: f.open, gap: f.gap })));
       if (flags['dry-run']) {
@@ -1164,7 +1165,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       let report;
       let rev;
       if (local()) {
-        const { validateZone } = await import('../../public/js/builder/validate.js?v=571b427b');
+        const { validateZone } = await import('../../public/js/builder/validate.js?v=067edbe5');
         const { loadValidatorContext } = await import('./validator-context.mjs');
         const zone = readJson(resolve(flags.file));
         rev = zone.rev;

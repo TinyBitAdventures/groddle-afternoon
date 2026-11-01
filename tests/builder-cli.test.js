@@ -326,6 +326,11 @@ describe('ground: standing a street on the ground (lane GROUNDED, js/builder/gro
     const again = await cli('ground', '--street', 'k', '--support', 'gz_rock', `file:${gfile}`);
     assert.equal(again.out.done.removed, sup.length);
     assert.equal(decos().filter((x) => x.name === 'ground:support').length, sup.length);
+    // --stretch: one stretched copy per gap, for a stand-in picture that does not tile.
+    await cli('ground', '--street', 'k', '--support', 'gz_rock', '--stretch', `file:${gfile}`);
+    const one = decos().filter((x) => x.name === 'ground:support');
+    assert.ok(one.length < sup.length || sup.length === 1);
+    for (const s of one) assert.equal(s.y - s.h, -240 + 24);
   });
 
   it('--wall puts a wall behind a high ledge; --floor lays a ground piece down past the bottom edge; --ledges floating', async () => {

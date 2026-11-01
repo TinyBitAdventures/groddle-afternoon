@@ -18,7 +18,7 @@ import { streetWithEdits, editsOn, linkEdit, streetStats } from '../public/js/bu
 import { applyZoneEdits } from '../public/js/builder/draft-play.js?v=20951b6d';
 import { applyOps } from '../public/js/builder/ops.js?v=27c7796f';
 import { compileSchema } from '../public/js/builder/schema-check.js?v=cc9d1af4';
-import { validateZone, placementRequests } from '../public/js/builder/validate.js?v=571b427b';
+import { validateZone, placementRequests } from '../public/js/builder/validate.js?v=067edbe5';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=23b926e5';
 import { populationForStreet, planStreetPlacements, streetReservedSpots } from '../public/js/street-ecology.js?v=315ff68c';
 import { arriveFor } from '../public/js/builder/geometry-handles.js?v=d39231a4';

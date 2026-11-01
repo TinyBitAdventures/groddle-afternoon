@@ -234,11 +234,12 @@ export function cutRanges(a, b, clear, min = SUPPORT_MIN_W) {
  * PURE: copies of a tiling piece stacked to fill [top, bottom] at width w: as few copies as keep
  * each near its own shape (tile height w * h/w of the art), each stretched a little to fit.
  */
-export function stack(top, bottom, w, aspect) {
+export function stack(top, bottom, w, aspect, { stretch = false } = {}) {
   const tile = w * aspect;
   const span = bottom - top;
   if (!(span > 0) || !(tile > 0)) return [];
-  const n = Math.max(1, Math.round(span / tile));
+  // A stand-in that does not tile (an object picture) goes in once, stretched to the gap.
+  const n = stretch ? 1 : Math.max(1, Math.round(span / tile));
   const h = span / n;
   return Array.from({ length: n }, (_, i) => ({ y: top + h * (i + 1), h }));
 }
@@ -249,7 +250,8 @@ export function stack(top, bottom, w, aspect) {
  * are removed first.
  *
  * opts: floor, support, wall (sprite names; each optional), size(sprite) -> { w, h } the art's
- * drawn size (its shape: a tile's height is width * h / w), reach (FLOAT_REACH).
+ * drawn size (its shape: a tile's height is width * h / w), reach (FLOAT_REACH), stretch (one copy
+ * per gap, stretched, for a stand-in picture that does not tile).
  *
  * - The floor (lines with nothing under them within `reach` of the street's bottom edge): its art
  *   runs FLOOR_SKIRT past the bottom edge, so no fill shows under it. With `floor`, the old floor
@@ -262,7 +264,7 @@ export function stack(top, bottom, w, aspect) {
  * - High lines: with `wall`, a wall behind each, from WALL_ABOVE over the line down into the
  *   surface below; without, they stay floating (the brief's choice).
  */
-export function groundOps(zone, key, { floor = null, support = null, wall = null, size = () => null, reach = FLOAT_REACH } = {}) {
+export function groundOps(zone, key, { floor = null, support = null, wall = null, size = () => null, reach = FLOAT_REACH, stretch = false } = {}) {
   const row = (zone.streets || []).find((s) => s.key === key);
   if (!row?.street) throw Object.assign(new Error(`This zone has no street "${key}".`), { code: 'builder_not_found' });
   const street = row.street;
@@ -397,7 +399,7 @@ export function groundOps(zone, key, { floor = null, support = null, wall = null
           if (g.s - lineYAt(p, cx) > reach) continue;
           if (!supportArt) continue;
           const top = lineYAt(p, cx) + SUPPORT_TUCK;
-          for (const t of stack(top, g.s + SINK, g.x1 - g.x0, supportArt.aspect)) {
+          for (const t of stack(top, g.s + SINK, g.x1 - g.x0, supportArt.aspect, { stretch })) {
             add({ sprite: support, name: GROUND_NAMES.support, x: cx, y: t.y, w: g.x1 - g.x0, h: t.h, z: back, r: 0 }, 0);
             supports += 1;
           }
@@ -413,7 +415,7 @@ export function groundOps(zone, key, { floor = null, support = null, wall = null
         // A wall already behind this part (one put up for a line above) serves this line too.
         if (openRun(columnCover(work, cx), lineTop - WALL_ABOVE / 2, g.s) <= FLOAT_OPEN) continue;
         const w = Math.min(g.x1 - g.x0, wallArt.w);
-        for (const t of stack(lineTop - WALL_ABOVE, g.s + SINK, w, wallArt.aspect)) {
+        for (const t of stack(lineTop - WALL_ABOVE, g.s + SINK, w, wallArt.aspect, { stretch })) {
           add({ sprite: wall, name: GROUND_NAMES.wall, x: cx, y: t.y, w, h: t.h, z: back, r: 0 }, 0);
           walls += 1;
         }

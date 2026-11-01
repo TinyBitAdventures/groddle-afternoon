@@ -36,7 +36,7 @@ import { STY_RULES, styleFindings } from './style-rules.js?v=abf9bfae';
 import { EFFECT_LIMITS, effectsCost, normaliseEmitter, rumbleShare, emitterAnchor } from '../street-effects.js?v=e427650f';
 import { LICENCE_POLICY, provenanceProblems } from './new-art.js?v=29f0b13e';
 import { postOffFloor, offFloorWords } from './posts.js?v=3db41b1f';
-import { floatingLines, FLOAT_REACH, FLOAT_OPEN } from './ground.js?v=6e2ebe6b';
+import { floatingLines, FLOAT_REACH, FLOAT_OPEN } from './ground.js?v=adbaa141';
 
 export const RULES = Object.freeze({
   'SCH-001': ['fatal', 'Zone does not fit the schema'],
