@@ -50,7 +50,7 @@ import {
   HOME_LIMITS,
   HOME_TEXTURE_CONFIGS,
 } from './homes-catalog.js?v=29713fa8';
-import { cleanHistory, cleanUpgradeId, upgradeArt, upgradeRow } from './furniture-upgrades.js?v=c4ee77ed';
+import { cleanHistory, cleanUpgradeId, upgradeArt, upgradeRow } from './furniture-upgrades.js?v=7e9a420c';
 
 export const SEGMENT_W = 150;
 /** Room geometry version stored with the house (2 = source 150 px segments). */
@@ -134,13 +134,23 @@ export function pieceArt(classTsid, upgradeId = '') {
  * Height above the foot where tabletop decor rests, or 0 for no surface. An
  * upgrade uses its highest catalog plat over the middle when that sits on the
  * art, else the class's surface in proportion to the art's height.
+ *
+ * A catalog plat is measured from the SWF stage's bottom centre (the point the
+ * original placed a piece by); the trimmed art keeps how far its own bottom sits
+ * above that point as art.foot (tools/furniture-upgrades/render.py --feet). A
+ * piece hung above it (the wall shelves: the Basic Wooden Shelf's plat is 52 over
+ * a stage bottom 19 px under its 49 px art) has its plat taken down by that much,
+ * so what is set on it rests on the plank instead of floating over it (Austin
+ * 2026-11-01). Floor pieces, drawn past their point (foot below 0), keep their
+ * plat as before.
  */
 export function surfaceHeight(classTsid, upgradeId = '') {
   const def = furnitureDef(classTsid);
   if (!def?.surface) return 0;
   const art = upgradeArt(classTsid, upgradeId);
   if (art) {
-    const plat = upgradeRow(classTsid, upgradeId)?.platY;
+    const row = upgradeRow(classTsid, upgradeId)?.platY;
+    const plat = row && Number(art.foot) > 0 ? row - art.foot : row;
     // Tops drawn in three-quarter view put the source plat mid-surface (about half the height).
     if (plat && plat <= art.h + 4 && plat >= art.h * 0.2) return plat;
     return Math.round(def.surface * (art.h / def.art.h));

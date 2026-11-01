@@ -131,9 +131,9 @@ import {
   textureConfig,
   unexpandInterior,
   UNEXPAND_TEXT,
-} from '../home-decor.js?v=cbf17565';
-import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=c4ee77ed';
-import { chooseUpgrade, closeUpgradePicker, openUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=42523674';
+} from '../home-decor.js?v=d03413ec';
+import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=7e9a420c';
+import { chooseUpgrade, closeUpgradePicker, openUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=f78f7410';
 import {
   BUILDER_TEXT,
   DRAG_DIST,
@@ -215,6 +215,7 @@ import {
   yardStyleFor,
 } from '../home-styles.js?v=f591561f';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
+import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=f9ece277';
 import { oneArmSignpost } from '../street-render.js?v=b5ae0c3d';
 import { ROCK_CATALOG } from '../mining.js?v=fb4c7898';
 import {
@@ -258,7 +259,7 @@ import {
   quoteHouseExpansion,
   quoteHouseUnexpand,
   unexpandHouseFloors,
-} from '../home-floors.js?v=e640ed56';
+} from '../home-floors.js?v=a6b5368b';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -4542,10 +4543,13 @@ function drawPackMarker(engine, target) {
   const { PIXI } = engine;
   const g = new PIXI.Container();
   g.zIndex = 95;
-  const icon = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[packDrag.classTsid]?.icon || `assets/sprites/icons/${packDrag.classTsid}.png`));
+  // The stack as it will lie there (js/world-art.js: its count's state at its own size).
+  const iconUrl = ITEM_CATALOG[packDrag.classTsid]?.icon || `assets/sprites/icons/${packDrag.classTsid}.png`;
+  const art = worldArtFor(packDrag.classTsid, packDrag.count, iconUrl);
+  const icon = new PIXI.Sprite(textureFromUrl(art?.url || iconUrl));
   icon.anchor.set(0.5, 1);
-  icon.width = 40;
-  icon.height = 40;
+  icon.width = art?.w || WORLD_ART_FALLBACK_MAX;
+  icon.height = art?.h || WORLD_ART_FALLBACK_MAX;
   icon.alpha = 0.85;
   const line = new PIXI.Graphics();
   line.roundRect(-26, -2, 52, 5, 2.5).fill({ color: 0xfff1b0, alpha: 0.95 });

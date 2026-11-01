@@ -13,6 +13,16 @@ size is whole, and written as public/assets/sprites/furniture/upgrades/<class>/<
 (js/textures.js reads the 3 from the name, so the sprite keeps its 1x size)
 (cwebp, quality 88, sharp_yuv, lossless alpha). art.json records each key's
 1x size and the SWF's hash; unchanged keys are skipped unless --force.
+
+`foot` (1x) is how far the art's bottom sits above the SWF stage's bottom
+centre, the point the original placed a piece by (LocationItemstackView.as
+_positionViewDO 853-854) and measured its catalog plats from: the trimmed art
+loses it, so js/home-decor.js surfaceHeight takes it off a plat (the Basic Wooden
+Shelf's plat is 52 over the stage bottom, its art ends 19 px above it, so things
+rest 33 px up its 49 px art, on the plank). Each render records it; for art
+rendered before it was kept:
+
+    python3 -I tools/furniture-upgrades/render.py --feet [--work DIR]
 """
 import hashlib, json, os, shutil, subprocess, sys, tempfile
 
@@ -41,10 +51,43 @@ def trim_box(path):
     return int(w), int(h), int(x), int(y)
 
 
+def foot_of(info, y, h, zoom):
+    """Stage bottom minus art bottom at 1x: swfinfo.rewrite pads the stage by its own size on every side."""
+    x0, x1, y0, y1 = info['rect']
+    return round(((y1 - y0) * 2 * zoom - (y + h)) / zoom)
+
+
+def feet(art, work):
+    """Render every key at zoom 1 to measure its foot (no art is written)."""
+    plan = json.load(open(PLAN))
+    keys = [k for k in sorted(art) if k in plan]
+    for b in range(0, len(keys), BATCH):
+        batch = keys[b:b + BATCH]
+        src_dir = os.path.join(work, f'fsrc{b}')
+        out_dir = os.path.join(work, f'fout{b}')
+        os.makedirs(src_dir, exist_ok=True)
+        infos = {}
+        for key in batch:
+            src = os.path.expanduser(plan[key]['swf'])
+            infos[key] = swfinfo.read(src)
+            swfinfo.rewrite(src, os.path.join(src_dir, key.replace('/', '__') + '.swf'), pad=1.0)
+        subprocess.run([JAVA, '-Djava.awt.headless=true', '-jar', FFDEC, '-zoom', '1', '-ignorebackground',
+                        '-select', '1', '-format', 'frame:png', '-export', 'frame', out_dir, src_dir],
+                       capture_output=True, text=True)
+        for key in batch:
+            png = os.path.join(out_dir, key.replace('/', '__') + '.swf', '1.png')
+            if os.path.exists(png):
+                w, h, x, y = trim_box(png)
+                art[key]['foot'] = foot_of(infos[key], y, h, 1)
+        shutil.rmtree(src_dir, ignore_errors=True)
+        shutil.rmtree(out_dir, ignore_errors=True)
+        print(f'  {min(b + BATCH, len(keys))}/{len(keys)}')
+
+
 def guard():
     load = os.getloadavg()[0]
     free = shutil.disk_usage(os.path.expanduser('~')).free / 1e9
-    if free < 8.5:
+    if free < 4:
         sys.exit(f'stop: {free:.1f} GB free')
     return load
 
@@ -54,6 +97,12 @@ def main(args):
     work = None
     if '--work' in args:
         work = args[args.index('--work') + 1]
+    if '--feet' in args:
+        art = json.load(open(ART))
+        feet(art, work or tempfile.mkdtemp(prefix='furnfeet-'))
+        json.dump(dict(sorted(art.items())), open(ART, 'w'), indent=1)
+        open(ART, 'a').write('\n')
+        return
     only = [a for a in args if not a.startswith('--') and a != work]
     plan = json.load(open(PLAN))
     art = json.load(open(ART)) if os.path.exists(ART) else {}
@@ -105,7 +154,7 @@ def main(args):
                             '-gravity', 'South', '-extent', f'{W}x{H}', '-strip', tmp], check=True)
             subprocess.run(['cwebp', '-quiet', '-metadata', 'none', '-q', '88', '-m', '4', '-sharp_yuv',
                             '-alpha_q', '100', '-alpha_filter', 'best', tmp, '-o', dst], check=True)
-            art[key] = {'w': W // ZOOM, 'h': H // ZOOM, 'sha': digest}
+            art[key] = {'w': W // ZOOM, 'h': H // ZOOM, 'sha': digest, 'foot': foot_of(swfinfo.read(src), y, h, ZOOM)}
         json.dump(dict(sorted(art.items())), open(ART, 'w'), indent=1)
         open(ART, 'a').write('\n')
         shutil.rmtree(src_dir, ignore_errors=True)

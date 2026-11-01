@@ -102,6 +102,8 @@ const CATALOGS = new Set([
   // The content keys of every asset URL (tools/data-versions/build.mjs): a 3x icon file names its
   // class without granting it (G446: rube_potato@3x.png lifted Rube Shaped Potato's credit gate).
   'public/js/data-versions.js',
+  // The art a put-down stack shows, for every droppable class (tools/world-art/render.py): art, not a grant.
+  'public/js/world-art-list.js',
 ]);
 
 export function unitValue(classTsid) {

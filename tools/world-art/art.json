@@ -1,0 +1,13875 @@
+{
+ "abbasid_ribs": {
+  "sha": "a1bac3524d8d4fa6",
+  "states": {
+   "1": {
+    "w": 47,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 47,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 47,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 47,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "abbasidose": {
+  "sha": "6311699efceae771",
+  "states": {
+   "1": {
+    "w": 19,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "ace_of_spades": {
+  "sha": "09a46c2739e4d5f0",
+  "states": {
+   "1": {
+    "w": 75,
+    "h": 19,
+    "dx": 1,
+    "lift": -3
+   }
+  }
+ },
+ "alchemical_tongs": {
+  "sha": "147f0de5caa08980",
+  "states": {
+   "1": {
+    "w": 52,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "all_spice": {
+  "sha": "d3178bb8077c26af",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 46,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 57,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 57,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "alphose": {
+  "sha": "aca75f75602930bf",
+  "states": {
+   "1": {
+    "w": 21,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "antique_spigot": {
+  "sha": "e51c208126df2850",
+  "states": {
+   "1": {
+    "w": 41,
+    "h": 36,
+    "dx": 0,
+    "lift": -6
+   }
+  }
+ },
+ "apple": {
+  "sha": "2dad967f6bc5dc0f",
+  "states": {
+   "1": {
+    "w": 19,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 32,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 43,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "applejack": {
+  "sha": "cc0675a1883fb758",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 37,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 37,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_butterfly_hair_clip": {
+  "sha": "bfe07ef3056170ed",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_chicken_brick": {
+  "sha": "3b04a996b13f474a",
+  "states": {
+   "1": {
+    "w": 58,
+    "h": 74,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_chicken_brick_piece1": {
+  "sha": "21cb7ca38d9880c9",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_chicken_brick_piece2": {
+  "sha": "494e95a670acafe8",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_chicken_brick_piece3": {
+  "sha": "3aedb7f6d6558ee6",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_chicken_brick_piece4": {
+  "sha": "478e889e5056a177",
+  "states": {
+   "1": {
+    "w": 31,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_chicken_brick_piece5": {
+  "sha": "7d3fa6356e889e56",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_glove_metal_finger": {
+  "sha": "b177216fe07cd936",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_glove_metal_finger_piece1": {
+  "sha": "36d85d04e40627f9",
+  "states": {
+   "1": {
+    "w": 16,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_glove_metal_finger_piece2": {
+  "sha": "d121d405f8322e72",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_glove_metal_finger_piece3": {
+  "sha": "6ac08cd5dd1a3889",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_magical_pendant": {
+  "sha": "003cd52c375cfd44",
+  "states": {
+   "1": {
+    "w": 40,
+    "h": 25,
+    "dx": -8,
+    "lift": 2
+   }
+  }
+ },
+ "artifact_magical_pendant_piece1": {
+  "sha": "13c811eaccd987ad",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_magical_pendant_piece2": {
+  "sha": "eefc2fa1d94343b6",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_magical_pendant_piece3": {
+  "sha": "fa8cfe7683a478ec",
+  "states": {
+   "1": {
+    "w": 21,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_mirror_with_scribbles": {
+  "sha": "c8332e62ab37e267",
+  "states": {
+   "1": {
+    "w": 55,
+    "h": 59,
+    "dx": -6,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_mirror_with_scribbles_piece1": {
+  "sha": "ec0099f1893f6743",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_mirror_with_scribbles_piece2": {
+  "sha": "da02dc21a6809182",
+  "states": {
+   "1": {
+    "w": 43,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_mirror_with_scribbles_piece3": {
+  "sha": "e36608ea14bd488b",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_mirror_with_scribbles_piece4": {
+  "sha": "7d55e9ce96c77e77",
+  "states": {
+   "1": {
+    "w": 31,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_mirror_with_scribbles_piece5": {
+  "sha": "ba119df310151f05",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_mysterious_cube": {
+  "sha": "4b5f0f51457a849e",
+  "states": {
+   "1": {
+    "w": 49,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_mysterious_cube_piece1": {
+  "sha": "f6cf6cd60eaa85f7",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_mysterious_cube_piece2": {
+  "sha": "1af734fdc8547d9c",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_mysterious_cube_piece3": {
+  "sha": "cad180984a983ab4",
+  "states": {
+   "1": {
+    "w": 31,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_mysterious_cube_piece4": {
+  "sha": "715fb57f92425b32",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_mysterious_cube_piece5": {
+  "sha": "6a19fe595845b7d0",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_necklace_amazonite": {
+  "sha": "412dad6a4b1e7370",
+  "states": {
+   "1": {
+    "w": 31,
+    "h": 17,
+    "dx": 0,
+    "lift": -3
+   }
+  }
+ },
+ "artifact_necklace_amazonite_piece": {
+  "sha": "6e26cb9a3a8e8493",
+  "states": {
+   "1": {
+    "w": 14,
+    "h": 8,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_necklace_imperial": {
+  "sha": "9d80f50f80cdad65",
+  "states": {
+   "1": {
+    "w": 28,
+    "h": 18,
+    "dx": -1,
+    "lift": -2
+   }
+  }
+ },
+ "artifact_necklace_imperial_piece": {
+  "sha": "0d1f595c98676354",
+  "states": {
+   "1": {
+    "w": 8,
+    "h": 9,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "artifact_necklace_onyx": {
+  "sha": "85271115a1995d4d",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 19,
+    "dx": -1,
+    "lift": -2
+   }
+  }
+ },
+ "artifact_necklace_onyx_piece": {
+  "sha": "67b5817fc6a4e448",
+  "states": {
+   "1": {
+    "w": 9,
+    "h": 9,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_necklace_redtigereye": {
+  "sha": "a897282912fb2816",
+  "states": {
+   "1": {
+    "w": 28,
+    "h": 19,
+    "dx": -1,
+    "lift": -2
+   }
+  }
+ },
+ "artifact_necklace_redtigereye_piece": {
+  "sha": "6b4ea70ee2dc84d8",
+  "states": {
+   "1": {
+    "w": 9,
+    "h": 9,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "artifact_necklace_rhyolite": {
+  "sha": "aa0dff5fe1414bef",
+  "states": {
+   "1": {
+    "w": 31,
+    "h": 17,
+    "dx": 0,
+    "lift": -3
+   }
+  }
+ },
+ "artifact_necklace_rhyolite_piece": {
+  "sha": "8f7372ba5d1b8bee",
+  "states": {
+   "1": {
+    "w": 14,
+    "h": 8,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_nose_of_china": {
+  "sha": "8a817d669f9a3a8d",
+  "states": {
+   "1": {
+    "w": 21,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_nose_of_china_piece1": {
+  "sha": "389774293b44f8d1",
+  "states": {
+   "1": {
+    "w": 14,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_nose_of_china_piece2": {
+  "sha": "ae7925dc5d42c5b0",
+  "states": {
+   "1": {
+    "w": 21,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_platinumium_spork": {
+  "sha": "f599cf157dadecc4",
+  "states": {
+   "1": {
+    "w": 42,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_platinumium_spork_piece1": {
+  "sha": "5d09dc6bb977795d",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 9,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "artifact_platinumium_spork_piece2": {
+  "sha": "1a2d8cf48b6ecd64",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 9,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_torn_manuscript": {
+  "sha": "9921d35c3b71690d",
+  "states": {
+   "1": {
+    "w": 75,
+    "h": 51,
+    "dx": -5,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_torn_manuscript_piece1": {
+  "sha": "bf76e03570b439a3",
+  "states": {
+   "1": {
+    "w": 66,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_torn_manuscript_piece2": {
+  "sha": "d318080771a2bb07",
+  "states": {
+   "1": {
+    "w": 53,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_torn_manuscript_piece3": {
+  "sha": "7908ca4d6e7702da",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_torn_manuscript_piece4": {
+  "sha": "7ba5d511cbd54971",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_wooden_apple": {
+  "sha": "c5d807d90a369bc7",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_wooden_apple_piece1": {
+  "sha": "f97074d25938ba7f",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_wooden_apple_piece2": {
+  "sha": "2217a415b326240d",
+  "states": {
+   "1": {
+    "w": 18,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_wooden_apple_piece3": {
+  "sha": "ef8b4844c3095530",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "artifact_wooden_apple_piece4": {
+  "sha": "78221b4df8575d50",
+  "states": {
+   "1": {
+    "w": 13,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "awesome_pot": {
+  "sha": "a2a67d48f84d5e62",
+  "states": {
+   "1": {
+    "w": 58,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "awesome_stew": {
+  "sha": "2203eb5b648ae531",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 36,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 36,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 36,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bacon": {
+  "sha": "d6031decf986091b",
+  "states": {
+   "1": {
+    "w": 65,
+    "h": 30,
+    "dx": 0,
+    "lift": 1
+   },
+   "2": {
+    "w": 65,
+    "h": 30,
+    "dx": 0,
+    "lift": 1
+   }
+  }
+ },
+ "bag_alchemistry_kit": {
+  "sha": "ecbc7b736c5d4633",
+  "states": {
+   "1": {
+    "w": 81,
+    "h": 58,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_bigger": {
+  "sha": "eab2dac39330c744",
+  "states": {
+   "1": {
+    "w": 55,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_bigger_blue": {
+  "sha": "9cdafc1ab9f93b85",
+  "states": {
+   "1": {
+    "w": 55,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_bigger_gray": {
+  "sha": "57ae324857cca75d",
+  "states": {
+   "1": {
+    "w": 54,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_bigger_green": {
+  "sha": "477eb9b3dcd7c46d",
+  "states": {
+   "1": {
+    "w": 54,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_bigger_pink": {
+  "sha": "afec5389a68e323e",
+  "states": {
+   "1": {
+    "w": 54,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_cubimal_case": {
+  "sha": "65e1f7f1156ab975",
+  "states": {
+   "1": {
+    "w": 49,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_elemental_pouch": {
+  "sha": "a059077e7bdb1ccb",
+  "states": {
+   "1": {
+    "w": 47,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_generic": {
+  "sha": "6c2612bea4600fd8",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_generic_blue": {
+  "sha": "ed9950d062a24ae0",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_generic_gray": {
+  "sha": "17c137c7a201ad33",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_generic_green": {
+  "sha": "5c30f68fceeef5cf",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_generic_pink": {
+  "sha": "e1a2ca5a10ee8a1c",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_gift_box": {
+  "sha": "58307800fe669014",
+  "states": {
+   "1": {
+    "w": 56,
+    "h": 49,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_gift_box_wrapped": {
+  "sha": "e2dd434ebd8e9dad",
+  "states": {
+   "1": {
+    "w": 52,
+    "h": 49,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_moving_box": {
+  "sha": "36746d29f123767e",
+  "states": {
+   "1": {
+    "w": 78,
+    "h": 84,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_spicerack": {
+  "sha": "ab032a41e4a61852",
+  "states": {
+   "1": {
+    "w": 64,
+    "h": 28,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "bag_toolbox_chrome": {
+  "sha": "5f46a8b1b1b7abfe",
+  "states": {
+   "1": {
+    "w": 65,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_toolbox_green": {
+  "sha": "cd3f3a73ebe5aaa9",
+  "states": {
+   "1": {
+    "w": 65,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bag_toolbox_red": {
+  "sha": "9c218c96eb8e7efe",
+  "states": {
+   "1": {
+    "w": 65,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "banana": {
+  "sha": "1a7be3f92fd45e13",
+  "states": {
+   "1": {
+    "w": 42,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 50,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 60,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 60,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "banana_no_names": {
+  "sha": "d619069c525ca238",
+  "states": {
+   "1": {
+    "w": 59,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 59,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 59,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 59,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "barnacle": {
+  "sha": "70ea491a6c741ca1",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 69,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 97,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 97,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "barnacle_talc": {
+  "sha": "80e3dde3559433d0",
+  "states": {
+   "1": {
+    "w": 56,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 71,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 78,
+    "h": 29,
+    "dx": -1,
+    "lift": 0
+   },
+   "4": {
+    "w": 78,
+    "h": 32,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "basic_omelet": {
+  "sha": "12cba9069c7bc1b9",
+  "states": {
+   "1": {
+    "w": 41,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 64,
+    "h": 24,
+    "dx": 2,
+    "lift": 0
+   },
+   "3": {
+    "w": 64,
+    "h": 25,
+    "dx": 2,
+    "lift": 0
+   },
+   "4": {
+    "w": 64,
+    "h": 28,
+    "dx": 2,
+    "lift": 0
+   }
+  }
+ },
+ "beachball": {
+  "sha": "5cc5f4c45dd769f2",
+  "states": {
+   "1": {
+    "w": 39,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "beaker": {
+  "sha": "dc9081308f38733c",
+  "states": {
+   "1": {
+    "w": 27,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "beam": {
+  "sha": "a87ed3ae437f0b20",
+  "states": {
+   "1": {
+    "w": 89,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bean_bean": {
+  "sha": "b10cd68742191ceb",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 46,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 58,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 58,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bean_bubble": {
+  "sha": "72734e07f3ba001e",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 57,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 57,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bean_egg": {
+  "sha": "eb862f03edf8da3f",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 56,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 56,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bean_fruit": {
+  "sha": "e426392112063317",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 46,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 57,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 58,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bean_gas": {
+  "sha": "a2f8ab7cc9a32904",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 46,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 57,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 57,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bean_plain": {
+  "sha": "9b74b5794a3a58a2",
+  "states": {
+   "1": {
+    "w": 19,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 36,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 45,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 45,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bean_seasoner": {
+  "sha": "0f770124fcdfc064",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bean_spice": {
+  "sha": "9891503cacce099f",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 46,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 58,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 58,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bean_wood": {
+  "sha": "ea232e65db63c56a",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 40,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 49,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 49,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "beer": {
+  "sha": "2e6c1b05813376ce",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 28,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 35,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 35,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "berry_bowl": {
+  "sha": "9c7cfa6706a5c689",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 34,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 35,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 35,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "beryl": {
+  "sha": "0692453d6fd8f37c",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 43,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 50,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 50,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "best_bean_dip": {
+  "sha": "28ede579c452a6ef",
+  "states": {
+   "1": {
+    "w": 28,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 28,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 28,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 28,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "big_salad": {
+  "sha": "5b1fe096ffbdfe75",
+  "states": {
+   "1": {
+    "w": 49,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 50,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 54,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 54,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "birch_candy": {
+  "sha": "02cd2a5b8664d83f",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 34,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 41,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 41,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "birch_syrup": {
+  "sha": "ed1e898640eb2b07",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 34,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 42,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 42,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "black_pepper": {
+  "sha": "d96e7a7e48f2c077",
+  "states": {
+   "1": {
+    "w": 50,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 62,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 69,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 69,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "blender": {
+  "sha": "e90a62eb245a235e",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 58,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "blockmaker_chassis": {
+  "sha": "19b1d75dc3be49ae",
+  "states": {
+   "1": {
+    "w": 123,
+    "h": 94,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "blockmaker_engine": {
+  "sha": "701c96c6a14901b9",
+  "states": {
+   "1": {
+    "w": 102,
+    "h": 56,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "blockmaker_plates": {
+  "sha": "56867a57a8a235c0",
+  "states": {
+   "1": {
+    "w": 87,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "blue_bubble": {
+  "sha": "b10ce91c0d8f8e68",
+  "states": {
+   "1": {
+    "w": 18,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 24,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 29,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 32,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "board": {
+  "sha": "8db4155cce554599",
+  "states": {
+   "1": {
+    "w": 94,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "boot": {
+  "sha": "463574ce79917669",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "broccoli": {
+  "sha": "3eb63321771aa50b",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 22,
+    "dx": -1,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 48,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 48,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bubble_and_squeak": {
+  "sha": "0fa576fe217e9d17",
+  "states": {
+   "1": {
+    "w": 54,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 54,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 54,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 54,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bubble_tea": {
+  "sha": "c6afdb2e36e722df",
+  "states": {
+   "1": {
+    "w": 18,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 29,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 38,
+    "h": 49,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 38,
+    "h": 54,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bubble_tuner": {
+  "sha": "e6b1a39890d9ec33",
+  "states": {
+   "1": {
+    "w": 57,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bulb": {
+  "sha": "f73d3d855e1b4a6e",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 15,
+    "dx": 0,
+    "lift": -1
+   },
+   "2": {
+    "w": 40,
+    "h": 18,
+    "dx": 0,
+    "lift": -1
+   },
+   "3": {
+    "w": 40,
+    "h": 22,
+    "dx": 0,
+    "lift": -1
+   },
+   "4": {
+    "w": 40,
+    "h": 28,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "bun": {
+  "sha": "a3d7d19e1c5ac370",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 26,
+    "dx": 4,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "bunch_of_grapes": {
+  "sha": "9882e691ab712c90",
+  "states": {
+   "1": {
+    "w": 40,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 56,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 56,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 56,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "butterfly_butter": {
+  "sha": "f47b3b5a4f02e68a",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 41,
+    "h": 19,
+    "dx": -2,
+    "lift": 0
+   }
+  }
+ },
+ "butterfly_egg": {
+  "sha": "c28086609b5ed98d",
+  "states": {
+   "1": {
+    "w": 21,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 40,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "butterfly_lotion": {
+  "sha": "95d76e8340195c7b",
+  "states": {
+   "1": {
+    "w": 15,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 24,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "butterfly_milker": {
+  "sha": "cce3b24f20077e41",
+  "states": {
+   "1": {
+    "w": 47,
+    "h": 69,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "butterfly_net": {
+  "sha": "875aff1342499d63",
+  "states": {
+   "1": {
+    "w": 110,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cabbage": {
+  "sha": "e67e4b46fba58450",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 53,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 51,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "camera": {
+  "sha": "62819c27aad9a042",
+  "states": {
+   "1": {
+    "w": 45,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "camphor": {
+  "sha": "6ea5c36e6452f151",
+  "states": {
+   "1": {
+    "w": 52,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 60,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 68,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 68,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "card_carrying_qualification": {
+  "sha": "5d99c7e14c3b36c4",
+  "states": {
+   "1": {
+    "w": 172,
+    "h": 172,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cardamom": {
+  "sha": "148c9b6c92ad3b25",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 46,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "carobish_treats": {
+  "sha": "828daa902c7fc176",
+  "states": {
+   "1": {
+    "w": 19,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 34,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 34,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 34,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "carrot": {
+  "sha": "58a392056f182ec0",
+  "states": {
+   "1": {
+    "w": 45,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 65,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 69,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 69,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "carrot_margarita": {
+  "sha": "fd013c4ebe4a3b27",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 36,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 47,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 47,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "caterpillar": {
+  "sha": "9056c2574193e15f",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cauldron": {
+  "sha": "61fa58522d49a310",
+  "states": {
+   "1": {
+    "w": 62,
+    "h": 66,
+    "dx": 0,
+    "lift": -3
+   }
+  }
+ },
+ "cedar_plank_salmon": {
+  "sha": "789777edb953a064",
+  "states": {
+   "1": {
+    "w": 54,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 54,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 54,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 54,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cheese": {
+  "sha": "7a61e11ed5d9136c",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 63,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 63,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 63,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cheese_plate": {
+  "sha": "cd6732e070d7a088",
+  "states": {
+   "1": {
+    "w": 68,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 68,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 68,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 68,
+    "h": 49,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cheese_stinky": {
+  "sha": "f440d3b2f482a66b",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 63,
+    "h": 32,
+    "dx": -3,
+    "lift": 8
+   }
+  }
+ },
+ "cheese_very_stinky": {
+  "sha": "bdeaed0b01125342",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 63,
+    "h": 33,
+    "dx": -3,
+    "lift": 8
+   }
+  }
+ },
+ "cheese_very_very_stinky": {
+  "sha": "cf970f41e2c614bc",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 63,
+    "h": 34,
+    "dx": -3,
+    "lift": 7
+   }
+  }
+ },
+ "cheezy_sammich": {
+  "sha": "f8102b82163d5689",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 28,
+    "dx": -2,
+    "lift": 0
+   },
+   "3": {
+    "w": 51,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 51,
+    "h": 33,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "cheezy_sauce": {
+  "sha": "56777c943d82a72e",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 34,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 44,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 44,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cherry": {
+  "sha": "67b5511b41b307df",
+  "states": {
+   "1": {
+    "w": 11,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 26,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 31,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 42,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "chick": {
+  "sha": "4019afbb5d6843c0",
+  "states": {
+   "1": {
+    "w": 28,
+    "h": 29,
+    "dx": 0,
+    "lift": 2
+   }
+  }
+ },
+ "chicken_egg": {
+  "sha": "75184a84565874c8",
+  "states": {
+   "1": {
+    "w": 25,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 51,
+    "h": 38,
+    "dx": 2,
+    "lift": 0
+   },
+   "3": {
+    "w": 65,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 65,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "chillybusting_chili": {
+  "sha": "9d285a01c8e19c62",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 37,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 37,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "choice_crudites": {
+  "sha": "47bd5e34651d63ef",
+  "states": {
+   "1": {
+    "w": 40,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 43,
+    "h": 25,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 46,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 45,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cinnamon": {
+  "sha": "c5296fb58620b83c",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 46,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "class_axe": {
+  "sha": "a833c1ca22928383",
+  "states": {
+   "1": {
+    "w": 61,
+    "h": 21,
+    "dx": 1,
+    "lift": -4
+   }
+  }
+ },
+ "cloud_11_smoothie": {
+  "sha": "6b94abfc4d6708bf",
+  "states": {
+   "1": {
+    "w": 18,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 29,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 35,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 35,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cloudberry": {
+  "sha": "44d2d4bcd7f1a1c1",
+  "states": {
+   "1": {
+    "w": 13,
+    "h": 13,
+    "dx": -1,
+    "lift": 0
+   },
+   "2": {
+    "w": 21,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 25,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 25,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cloudberry_daiquiri": {
+  "sha": "af86e7df90e9aa26",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 41,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 47,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 47,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cloudberry_jam": {
+  "sha": "180059b5eaf2074b",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 34,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 45,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 45,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cocktail_shaker": {
+  "sha": "fbd2a8dcf060a2d3",
+  "states": {
+   "1": {
+    "w": 21,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "coffee": {
+  "sha": "b518dc5c2b554226",
+  "states": {
+   "1": {
+    "w": 27,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 41,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 48,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 48,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cold_taco": {
+  "sha": "29dbd1b69b5a83df",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 51,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 51,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "collectors_edition_2010_glitchmas_yeti": {
+  "sha": "13866eed9cd43fa3",
+  "states": {
+   "1": {
+    "w": 67,
+    "h": 60,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "common_crudites": {
+  "sha": "599197a81bcf1a28",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 46,
+    "h": 49,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 53,
+    "h": 50,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 65,
+    "h": 54,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "conch": {
+  "sha": "e5e4f253c41fe845",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 34,
+    "dx": 2,
+    "lift": -2
+   }
+  }
+ },
+ "construction_tool": {
+  "sha": "c7cf118c9601571f",
+  "states": {
+   "1": {
+    "w": 72,
+    "h": 38,
+    "dx": 0,
+    "lift": -5
+   }
+  }
+ },
+ "contraband": {
+  "sha": "dff1ffacd5b31bd2",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "copper": {
+  "sha": "d1007f98b8591f30",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 47,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 47,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 47,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "corn": {
+  "sha": "f9f8336cf277b2e8",
+  "states": {
+   "1": {
+    "w": 39,
+    "h": 20,
+    "dx": 5,
+    "lift": -2
+   },
+   "2": {
+    "w": 65,
+    "h": 25,
+    "dx": 0,
+    "lift": -3
+   },
+   "3": {
+    "w": 79,
+    "h": 32,
+    "dx": 0,
+    "lift": -3
+   },
+   "4": {
+    "w": 79,
+    "h": 38,
+    "dx": 0,
+    "lift": -2
+   }
+  }
+ },
+ "corn_off_the_cob": {
+  "sha": "816edaec28ac91f8",
+  "states": {
+   "1": {
+    "w": 40,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 40,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 41,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 41,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "corn_syrup_squares": {
+  "sha": "5a62d6e4c2637b7c",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 30,
+    "h": 32,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 32,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 32,
+    "h": 55,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cornucopia_crops": {
+  "sha": "ab490c8f695ee758",
+  "states": {
+   "1": {
+    "w": 95,
+    "h": 81,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cornucopia_herbs": {
+  "sha": "d4efdd8ea630f90c",
+  "states": {
+   "1": {
+    "w": 99,
+    "h": 89,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "corny_fritter": {
+  "sha": "42e07cafe3fc47bc",
+  "states": {
+   "1": {
+    "w": 42,
+    "h": 17,
+    "dx": 1,
+    "lift": 1
+   },
+   "2": {
+    "w": 42,
+    "h": 25,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 42,
+    "h": 29,
+    "dx": 0,
+    "lift": 1
+   },
+   "4": {
+    "w": 42,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cosmapolitan": {
+  "sha": "8af1ab369d60ccdf",
+  "states": {
+   "1": {
+    "w": 31,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 42,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cosmox": {
+  "sha": "ee62331175c90b91",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "crabato_juice": {
+  "sha": "b623bcc64299a854",
+  "states": {
+   "1": {
+    "w": 19,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 32,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 37,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "crabphones": {
+  "sha": "04f2212d94efe9aa",
+  "states": {
+   "1": {
+    "w": 69,
+    "h": 36,
+    "dx": 6,
+    "lift": 0
+   }
+  }
+ },
+ "creamy_catsup": {
+  "sha": "40f6073084603e53",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 34,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 42,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 42,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "creamy_martini": {
+  "sha": "1f93a5e2d78f07e7",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 53,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 53,
+    "h": 49,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "crying_gas": {
+  "sha": "1a6086a512979150",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "crystallizer": {
+  "sha": "1b518dc0bf595268",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 58,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cubimal_package": {
+  "sha": "bb369d6471044e2e",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cubimal_package_2": {
+  "sha": "e5cdb2becbbf1612",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cucumber": {
+  "sha": "860cafc1d095d62f",
+  "states": {
+   "1": {
+    "w": 40,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 47,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 47,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 55,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cumin": {
+  "sha": "b0c3d2d4ef416239",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 53,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 56,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 56,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "cup_of_water": {
+  "sha": "a9369ad8806a7f1f",
+  "states": {
+   "1": {
+    "w": 42,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "curry": {
+  "sha": "6a2fccdbd141abf6",
+  "states": {
+   "1": {
+    "w": 41,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 49,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 55,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 55,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "death_to_veg": {
+  "sha": "df1099ff29dfc21d",
+  "states": {
+   "1": {
+    "w": 28,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "deluxe_sammich": {
+  "sha": "365c26d7582e0871",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 51,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 51,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "desssert_rub": {
+  "sha": "bebb5b46ef723648",
+  "states": {
+   "1": {
+    "w": 21,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "diabolic_acid": {
+  "sha": "a772ddb4b88ef63a",
+  "states": {
+   "1": {
+    "w": 16,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "dice": {
+  "sha": "63dc624d8f2ed07d",
+  "states": {
+   "1": {
+    "w": 26,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "dice_12sided": {
+  "sha": "d105b2a27d6865fa",
+  "states": {
+   "1": {
+    "w": 70,
+    "h": 71,
+    "dx": 0,
+    "lift": 2
+   }
+  }
+ },
+ "divine_crepes": {
+  "sha": "e19466f62a834470",
+  "states": {
+   "1": {
+    "w": 58,
+    "h": 20,
+    "dx": 3,
+    "lift": -4
+   },
+   "2": {
+    "w": 58,
+    "h": 25,
+    "dx": 3,
+    "lift": -4
+   },
+   "3": {
+    "w": 58,
+    "h": 29,
+    "dx": 3,
+    "lift": -4
+   },
+   "4": {
+    "w": 58,
+    "h": 33,
+    "dx": 3,
+    "lift": -4
+   }
+  }
+ },
+ "doll_nietzsche": {
+  "sha": "e186eb4b7b4a6e57",
+  "states": {
+   "1": {
+    "w": 57,
+    "h": 53,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "doll_wittgenstein": {
+  "sha": "898ce8192eeec5e8",
+  "states": {
+   "1": {
+    "w": 52,
+    "h": 53,
+    "dx": 2,
+    "lift": 0
+   }
+  }
+ },
+ "door_key_1": {
+  "sha": "64b96bcc45740d3f",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "door_key_10": {
+  "sha": "d5e7b7786dd2a383",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "door_key_11": {
+  "sha": "f55c897496e9f6da",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "door_key_12": {
+  "sha": "44dc70aa84cf13b9",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "door_key_2": {
+  "sha": "3a21b96f76bd44c6",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "door_key_3": {
+  "sha": "9dcfcf90188191d2",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "door_key_4": {
+  "sha": "26fe12c8309cee98",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "door_key_5": {
+  "sha": "2887f774217c7285",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "door_key_6": {
+  "sha": "796f2c989d304e23",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "door_key_7": {
+  "sha": "2e8ab3d9a27c2377",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "door_key_8": {
+  "sha": "6ad46756ed5a04fb",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "door_key_9": {
+  "sha": "facd3a9356a47224",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "drink_ticket": {
+  "sha": "0ef60e295aa807f2",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "dullite": {
+  "sha": "8a3dd825125be2fb",
+  "states": {
+   "1": {
+    "w": 27,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 41,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 48,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 48,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "earth": {
+  "sha": "f52dc4d0975f30b4",
+  "states": {
+   "1": {
+    "w": 58,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 86,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 96,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 96,
+    "h": 52,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "earthshaker": {
+  "sha": "6805ddda0c8d0087",
+  "states": {
+   "1": {
+    "w": 18,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 29,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 35,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 35,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "egg_plain": {
+  "sha": "457e20bd37e98882",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 36,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 49,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 58,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "egg_seasoner": {
+  "sha": "7136ea60dd4854ee",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "egghunt_egg_1": {
+  "sha": "3f505271966823cd",
+  "states": {
+   "1": {
+    "w": 21,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "egghunt_egg_2": {
+  "sha": "a00024d218365c5d",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "egghunt_egg_3": {
+  "sha": "79c8fd5bc920b1e7",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "egghunt_egg_4": {
+  "sha": "6cf7beec7a0e679c",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "egghunt_egg_5": {
+  "sha": "88deb6c0c28083bd",
+  "states": {
+   "1": {
+    "w": 31,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "eggy_scramble": {
+  "sha": "bb1deeec48a8d2e7",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 35,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 36,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 36,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "element_blue": {
+  "sha": "eb6c2dac0e58188f",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 43,
+    "dx": 0,
+    "lift": 2
+   }
+  }
+ },
+ "element_green": {
+  "sha": "329d54ba2c024269",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 42,
+    "dx": 0,
+    "lift": 2
+   }
+  }
+ },
+ "element_red": {
+  "sha": "8420b2ce54af52fc",
+  "states": {
+   "1": {
+    "w": 39,
+    "h": 43,
+    "dx": 0,
+    "lift": 2
+   }
+  }
+ },
+ "element_shiny": {
+  "sha": "cfcc003ee52c7631",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 43,
+    "dx": 0,
+    "lift": 2
+   }
+  }
+ },
+ "emblem_alph": {
+  "sha": "c0c7fbe6a742cae6",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "emblem_cosma": {
+  "sha": "071c55b99fb0bb45",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "emblem_friendly": {
+  "sha": "dc62b4fbc9c83172",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "emblem_grendaline": {
+  "sha": "291e810684e61fb9",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "emblem_humbaba": {
+  "sha": "554a76ef2bbe73f5",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "emblem_lem": {
+  "sha": "69dccbf8c849c114",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "emblem_mab": {
+  "sha": "cdebf586a4641b58",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "emblem_pot": {
+  "sha": "fbd19f29c94cb382",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "emblem_spriggan": {
+  "sha": "09a47cbeef891a5a",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "emblem_ti": {
+  "sha": "0ca2e6398d3b1068",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "emblem_zille": {
+  "sha": "b9a6077e434b7ba7",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "emotional_bear": {
+  "sha": "b54bc71dd87a7222",
+  "states": {
+   "1": {
+    "w": 39,
+    "h": 48,
+    "dx": -130,
+    "lift": 252
+   }
+  }
+ },
+ "essence_of_gandlevery": {
+  "sha": "e79c41abd96f041c",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "essence_of_hairball": {
+  "sha": "96ed553d28511b63",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "essence_of_purple": {
+  "sha": "0ca6b46b3f368cd0",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 39,
+    "dx": 0,
+    "lift": 1
+   }
+  }
+ },
+ "essence_of_rookswort": {
+  "sha": "e2e2bfd7d5be283b",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "essence_of_rubeweed": {
+  "sha": "fdee184f6ba5e605",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "essence_of_silvertongue": {
+  "sha": "dc1f137650ee0356",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "essence_of_yellow_crumb": {
+  "sha": "467a380c29733f5a",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "exotic_fruit_salad": {
+  "sha": "400e4a1f719bc444",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 34,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 36,
+    "h": 41,
+    "dx": 1,
+    "lift": 0
+   },
+   "4": {
+    "w": 36,
+    "h": 48,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "exotic_juice": {
+  "sha": "6f2346257b4001dd",
+  "states": {
+   "1": {
+    "w": 16,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 26,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 33,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 33,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "expensive_grilled_cheese": {
+  "sha": "4944c2aee6805fa6",
+  "states": {
+   "1": {
+    "w": 39,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 65,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 71,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 71,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "extremely_hallowed_shrine_powder": {
+  "sha": "992403456401689d",
+  "states": {
+   "1": {
+    "w": 25,
+    "h": 45,
+    "dx": 2,
+    "lift": 0
+   },
+   "2": {
+    "w": 25,
+    "h": 45,
+    "dx": 2,
+    "lift": 1
+   },
+   "3": {
+    "w": 25,
+    "h": 45,
+    "dx": 2,
+    "lift": 1
+   },
+   "4": {
+    "w": 25,
+    "h": 45,
+    "dx": 2,
+    "lift": 0
+   },
+   "5": {
+    "w": 25,
+    "h": 45,
+    "dx": 2,
+    "lift": 1
+   }
+  }
+ },
+ "face_smelter": {
+  "sha": "7604e7e1a894cc3e",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 36,
+    "dx": 6,
+    "lift": -1
+   },
+   "2": {
+    "w": 47,
+    "h": 38,
+    "dx": 4,
+    "lift": -1
+   },
+   "3": {
+    "w": 68,
+    "h": 42,
+    "dx": -2,
+    "lift": -1
+   },
+   "4": {
+    "w": 68,
+    "h": 44,
+    "dx": -2,
+    "lift": -1
+   }
+  }
+ },
+ "fairly_hallowed_shrine_powder": {
+  "sha": "01c8a6401882a508",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 40,
+    "dx": 0,
+    "lift": 1
+   },
+   "2": {
+    "w": 22,
+    "h": 40,
+    "dx": 0,
+    "lift": 1
+   },
+   "3": {
+    "w": 22,
+    "h": 40,
+    "dx": 0,
+    "lift": 1
+   },
+   "4": {
+    "w": 22,
+    "h": 40,
+    "dx": 0,
+    "lift": 1
+   },
+   "5": {
+    "w": 22,
+    "h": 40,
+    "dx": 0,
+    "lift": 1
+   }
+  }
+ },
+ "fancy_pick": {
+  "sha": "5ea654723663550a",
+  "states": {
+   "1": {
+    "w": 64,
+    "h": 24,
+    "dx": 0,
+    "lift": -7
+   }
+  }
+ },
+ "fertilidust": {
+  "sha": "b86b6e15c1419b64",
+  "states": {
+   "1": {
+    "w": 25,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 25,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 25,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 25,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   },
+   "5": {
+    "w": 25,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "fertilidust_lite": {
+  "sha": "725589d50c08c5db",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 22,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 22,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 22,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "5": {
+    "w": 22,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "firefly_jar": {
+  "sha": "5372bfb8e1389b82",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 54,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "flaming_humbaba": {
+  "sha": "ac2ee8cad431e9d9",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 46,
+    "h": 50,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 54,
+    "h": 50,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 54,
+    "h": 56,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "flour": {
+  "sha": "e4413d2c1d79c7fb",
+  "states": {
+   "1": {
+    "w": 31,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 48,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 48,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "flummery": {
+  "sha": "e826b03e36c3ddbc",
+  "states": {
+   "1": {
+    "w": 53,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 53,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 53,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 53,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "focusing_orb": {
+  "sha": "65795f66b321e5b5",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "fortifying_gruel": {
+  "sha": "cb2d1cb37044077f",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 37,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 38,
+    "h": 32,
+    "dx": -1,
+    "lift": 0
+   },
+   "4": {
+    "w": 38,
+    "h": 40,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "fortune": {
+  "sha": "55547842b85ab4f4",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 13,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "fortune_cookie": {
+  "sha": "647c24fdd5aa01d1",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 18,
+    "dx": -1,
+    "lift": 1
+   }
+  }
+ },
+ "fox_bait": {
+  "sha": "c601a74e4dfe69b4",
+  "states": {
+   "1": {
+    "w": 41,
+    "h": 40,
+    "dx": 0,
+    "lift": -2
+   }
+  }
+ },
+ "fox_brush": {
+  "sha": "fcf11daab0f07226",
+  "states": {
+   "1": {
+    "w": 45,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "fox_permit": {
+  "sha": "d36578e68a25fd91",
+  "states": {
+   "1": {
+    "w": 65,
+    "h": 23,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "fried_egg": {
+  "sha": "9b349e8d85d3588f",
+  "states": {
+   "1": {
+    "w": 49,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 65,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 80,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "fried_noodles": {
+  "sha": "94897a7261f61429",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 39,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 40,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 40,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "fried_rice": {
+  "sha": "a7de4636c32474fc",
+  "states": {
+   "1": {
+    "w": 40,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 40,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 40,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 40,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "friendly_acid": {
+  "sha": "712344a7c0d2b6b9",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "frog_in_a_hole": {
+  "sha": "81a64595a99404ec",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 35,
+    "h": 26,
+    "dx": -1,
+    "lift": 0
+   },
+   "3": {
+    "w": 35,
+    "h": 31,
+    "dx": -1,
+    "lift": 0
+   },
+   "4": {
+    "w": 35,
+    "h": 38,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "fruit_changing_machine": {
+  "sha": "69a73f570be4ddeb",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 56,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "fruit_salad": {
+  "sha": "3c576b8aeb5d86eb",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 35,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 36,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 36,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "fruity_juice": {
+  "sha": "b2dde0e027d01404",
+  "states": {
+   "1": {
+    "w": 21,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 27,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 41,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 41,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "frying_pan": {
+  "sha": "e79c92afd1f3b922",
+  "states": {
+   "1": {
+    "w": 90,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "fuel_cell": {
+  "sha": "22eef646ef91c75f",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 19,
+    "dx": 2,
+    "lift": 0
+   },
+   "3": {
+    "w": 47,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 47,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "fuelmaker_case": {
+  "sha": "ca5310bdf5b8f2b2",
+  "states": {
+   "1": {
+    "w": 107,
+    "h": 114,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "fuelmaker_core": {
+  "sha": "6c01587a66e6caa9",
+  "states": {
+   "1": {
+    "w": 61,
+    "h": 89,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "game_box": {
+  "sha": "74e23008c7ab95a0",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 50,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "gameshow_ticket": {
+  "sha": "17524f2547668906",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 15,
+    "dx": 0,
+    "lift": -1
+   },
+   "2": {
+    "w": 38,
+    "h": 17,
+    "dx": 0,
+    "lift": -1
+   },
+   "3": {
+    "w": 39,
+    "h": 19,
+    "dx": -1,
+    "lift": -1
+   },
+   "4": {
+    "w": 39,
+    "h": 21,
+    "dx": -1,
+    "lift": -1
+   },
+   "5": {
+    "w": 40,
+    "h": 22,
+    "dx": 0,
+    "lift": -1
+   },
+   "6": {
+    "w": 40,
+    "h": 23,
+    "dx": 0,
+    "lift": -1
+   },
+   "7": {
+    "w": 41,
+    "h": 24,
+    "dx": 0,
+    "lift": -1
+   },
+   "8": {
+    "w": 41,
+    "h": 26,
+    "dx": 0,
+    "lift": -1
+   },
+   "9": {
+    "w": 42,
+    "h": 26,
+    "dx": 0,
+    "lift": -1
+   },
+   "10": {
+    "w": 42,
+    "h": 27,
+    "dx": 0,
+    "lift": -1
+   },
+   "11": {
+    "w": 42,
+    "h": 29,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "gammas_pancakes": {
+  "sha": "644fd6323f40f2f5",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 50,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 50,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 50,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "gandlevery": {
+  "sha": "5f320df510ab35e4",
+  "states": {
+   "1": {
+    "w": 45,
+    "h": 22,
+    "dx": 0,
+    "lift": -5
+   },
+   "2": {
+    "w": 62,
+    "h": 35,
+    "dx": 0,
+    "lift": -5
+   },
+   "3": {
+    "w": 62,
+    "h": 35,
+    "dx": 0,
+    "lift": -5
+   },
+   "4": {
+    "w": 62,
+    "h": 39,
+    "dx": 0,
+    "lift": -5
+   }
+  }
+ },
+ "garlic": {
+  "sha": "5db234c6716fbcf2",
+  "states": {
+   "1": {
+    "w": 26,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 39,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 49,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 49,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "gassifier": {
+  "sha": "f2e531705c67824b",
+  "states": {
+   "1": {
+    "w": 53,
+    "h": 49,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "gem_amber": {
+  "sha": "c101bb4d026cf59b",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 31,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "gem_diamond": {
+  "sha": "78f660574ab92a38",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 26,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "gem_moonstone": {
+  "sha": "d28bf9ab2fa245bb",
+  "states": {
+   "1": {
+    "w": 45,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "gem_ruby": {
+  "sha": "b1050c4b2c1174bb",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "gem_sapphire": {
+  "sha": "314e93513e7c5341",
+  "states": {
+   "1": {
+    "w": 31,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "general_building_permit": {
+  "sha": "4b67fe29b0838988",
+  "states": {
+   "1": {
+    "w": 65,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "general_fabric": {
+  "sha": "4b984957eec14716",
+  "states": {
+   "1": {
+    "w": 64,
+    "h": 18,
+    "dx": -1,
+    "lift": -2
+   },
+   "2": {
+    "w": 68,
+    "h": 26,
+    "dx": 0,
+    "lift": -2
+   },
+   "3": {
+    "w": 71,
+    "h": 31,
+    "dx": -1,
+    "lift": -2
+   },
+   "4": {
+    "w": 72,
+    "h": 36,
+    "dx": 0,
+    "lift": -2
+   }
+  }
+ },
+ "general_vapour": {
+  "sha": "1114a8df8e7b9cb4",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "ginger": {
+  "sha": "83809e0dc264ddf0",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 35,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 50,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 50,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "girder": {
+  "sha": "73522473e812c357",
+  "states": {
+   "1": {
+    "w": 89,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "glitchepoix": {
+  "sha": "37c2ec355c2ead72",
+  "states": {
+   "1": {
+    "w": 28,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "glitchmas_card": {
+  "sha": "31a418ad6a883f7a",
+  "states": {
+   "1": {
+    "w": 54,
+    "h": 12,
+    "dx": 0,
+    "lift": 1
+   }
+  }
+ },
+ "glitchmas_cracker": {
+  "sha": "04f7f2d3266fcd48",
+  "states": {
+   "1": {
+    "w": 52,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "glitchmas_cracker_factoid": {
+  "sha": "776abf062f7e9d2f",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "glitchmas_cracker_joke": {
+  "sha": "342f834542c9a88b",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "glitchmas_present": {
+  "sha": "ff207308c2d09009",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "grade_aa_earth_block": {
+  "sha": "c4cbe21a3132b54e",
+  "states": {
+   "1": {
+    "w": 76,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 111,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 111,
+    "h": 67,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 111,
+    "h": 66,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "grain": {
+  "sha": "cf94da4d8a2f7472",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 53,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 53,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 54,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "grain_bushel": {
+  "sha": "46fa08369f8b2caf",
+  "states": {
+   "1": {
+    "w": 87,
+    "h": 49,
+    "dx": 4,
+    "lift": 0
+   },
+   "2": {
+    "w": 114,
+    "h": 58,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 114,
+    "h": 81,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 114,
+    "h": 80,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "grand_ol_grinder": {
+  "sha": "2642dcc8c0a16ec1",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 38,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "greasy_frybread": {
+  "sha": "a6590f301c81b629",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 35,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 37,
+    "h": 26,
+    "dx": -1,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 30,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "green": {
+  "sha": "9f60bbb1306384d9",
+  "states": {
+   "1": {
+    "w": 28,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "green_eggs": {
+  "sha": "abb07f513c997c16",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 63,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 74,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 86,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "greeter_twig": {
+  "sha": "99f85833a92e0bb7",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 25,
+    "dx": 0,
+    "lift": 6
+   }
+  }
+ },
+ "grendalinunin": {
+  "sha": "d29fd6b1edc19328",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "grilled_cheese": {
+  "sha": "d4060c7595b1e903",
+  "states": {
+   "1": {
+    "w": 39,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 65,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 71,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 71,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "groddlene": {
+  "sha": "80e7bf2b89bcc63d",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "guano": {
+  "sha": "92e4fe10af054d37",
+  "states": {
+   "1": {
+    "w": 28,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "gurly_drink": {
+  "sha": "bd3001a33f0a8a92",
+  "states": {
+   "1": {
+    "w": 31,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 54,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 54,
+    "h": 50,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "hairball_flower": {
+  "sha": "c7924956dde77ad6",
+  "states": {
+   "1": {
+    "w": 59,
+    "h": 28,
+    "dx": 0,
+    "lift": -8
+   },
+   "2": {
+    "w": 80,
+    "h": 34,
+    "dx": 0,
+    "lift": -8
+   },
+   "3": {
+    "w": 88,
+    "h": 39,
+    "dx": 0,
+    "lift": -8
+   },
+   "4": {
+    "w": 88,
+    "h": 44,
+    "dx": 0,
+    "lift": -8
+   }
+  }
+ },
+ "hard_bubble": {
+  "sha": "6937690236ac858f",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 23,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 28,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 32,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "hash": {
+  "sha": "f7c1e7e4bbbf995d",
+  "states": {
+   "1": {
+    "w": 41,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 24,
+    "dx": -1,
+    "lift": 0
+   },
+   "3": {
+    "w": 45,
+    "h": 27,
+    "dx": -1,
+    "lift": 0
+   },
+   "4": {
+    "w": 45,
+    "h": 34,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "hatchet": {
+  "sha": "ba44f8dd13d1b30c",
+  "states": {
+   "1": {
+    "w": 60,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "hearty_groddle_sammich": {
+  "sha": "8072f5115b3e0b34",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 47,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "hearty_omelet": {
+  "sha": "a7841509334f9880",
+  "states": {
+   "1": {
+    "w": 41,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 47,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 48,
+    "h": 35,
+    "dx": -1,
+    "lift": 0
+   },
+   "4": {
+    "w": 50,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "heavy_gas": {
+  "sha": "8f2312cffa902227",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "helium": {
+  "sha": "e1de3a9fb9f16287",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "heston_mash": {
+  "sha": "0d393e4d5a4544d4",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "high_class_hoe": {
+  "sha": "14fd6eacecc019b5",
+  "states": {
+   "1": {
+    "w": 70,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "hoe": {
+  "sha": "3e3e3ca94ca40fb2",
+  "states": {
+   "1": {
+    "w": 69,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "hogtied_piggy": {
+  "sha": "0f1bc36ceea32908",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "homestreet_ticket": {
+  "sha": "f055c49b7ead7f78",
+  "states": {
+   "1": {
+    "w": 47,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "honey": {
+  "sha": "f0f07fc2d611aa04",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 32,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 38,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 38,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "hooch": {
+  "sha": "ccab218f1bd12982",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 40,
+    "dx": 0,
+    "lift": -2
+   },
+   "2": {
+    "w": 37,
+    "h": 45,
+    "dx": 0,
+    "lift": -2
+   },
+   "3": {
+    "w": 47,
+    "h": 46,
+    "dx": 0,
+    "lift": -2
+   },
+   "4": {
+    "w": 47,
+    "h": 51,
+    "dx": 0,
+    "lift": -2
+   }
+  }
+ },
+ "hot_n_fizzy_sauce": {
+  "sha": "956fe5da58c61818",
+  "states": {
+   "1": {
+    "w": 13,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 21,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 27,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 27,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "hot_pepper": {
+  "sha": "181a2a1be694006c",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 43,
+    "h": 16,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 50,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 50,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "hot_potatoes": {
+  "sha": "0ddcf0bce4fd5187",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 20,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "hototot_rub": {
+  "sha": "6f2a7e76c8fc98bf",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "humbabol": {
+  "sha": "8daec2d1b287a770",
+  "states": {
+   "1": {
+    "w": 21,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "hungry_nachos": {
+  "sha": "8abb08e24e3d93c1",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "ice": {
+  "sha": "2087d09122ea0951",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 31,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 37,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "icon_alph": {
+  "sha": "7df6d69e142a5034",
+  "states": {
+   "1": {
+    "w": 88,
+    "h": 103,
+    "dx": 2,
+    "lift": 12
+   }
+  }
+ },
+ "icon_cosma": {
+  "sha": "0cce55a005aad451",
+  "states": {
+   "1": {
+    "w": 96,
+    "h": 93,
+    "dx": 5,
+    "lift": 12
+   }
+  }
+ },
+ "icon_friendly": {
+  "sha": "a25144566597f1b3",
+  "states": {
+   "1": {
+    "w": 85,
+    "h": 88,
+    "dx": 0,
+    "lift": 11
+   }
+  }
+ },
+ "icon_grendaline": {
+  "sha": "c79d6e83fbfea2de",
+  "states": {
+   "1": {
+    "w": 82,
+    "h": 96,
+    "dx": 0,
+    "lift": 11
+   }
+  }
+ },
+ "icon_humbaba": {
+  "sha": "e0acc854124f6421",
+  "states": {
+   "1": {
+    "w": 79,
+    "h": 94,
+    "dx": 1,
+    "lift": 11
+   }
+  }
+ },
+ "icon_lem": {
+  "sha": "68de831734b22aae",
+  "states": {
+   "1": {
+    "w": 90,
+    "h": 93,
+    "dx": 0,
+    "lift": 10
+   }
+  }
+ },
+ "icon_mab": {
+  "sha": "91fae3500ac7eb5c",
+  "states": {
+   "1": {
+    "w": 80,
+    "h": 96,
+    "dx": 0,
+    "lift": 11
+   }
+  }
+ },
+ "icon_pot": {
+  "sha": "b7d2c61b6194bbd4",
+  "states": {
+   "1": {
+    "w": 106,
+    "h": 89,
+    "dx": 0,
+    "lift": 11
+   }
+  }
+ },
+ "icon_spriggan": {
+  "sha": "4fed78f70e3d20b4",
+  "states": {
+   "1": {
+    "w": 71,
+    "h": 94,
+    "dx": 0,
+    "lift": 11
+   }
+  }
+ },
+ "icon_tii": {
+  "sha": "5b56ada63d62e95e",
+  "states": {
+   "1": {
+    "w": 86,
+    "h": 76,
+    "dx": -1,
+    "lift": 10
+   }
+  }
+ },
+ "icon_zille": {
+  "sha": "00559cb96d2dbf61",
+  "states": {
+   "1": {
+    "w": 100,
+    "h": 91,
+    "dx": 0,
+    "lift": 11
+   }
+  }
+ },
+ "irrigator_9000": {
+  "sha": "e4b03e6dfb9d00d0",
+  "states": {
+   "1": {
+    "w": 54,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "ixite": {
+  "sha": "8dd7a693ca91ca8c",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "ixstyle_braised_meat": {
+  "sha": "5230b26d5b3fbf27",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 37,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 37,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "jellisac_clump": {
+  "sha": "6c8d8160095c750e",
+  "states": {
+   "1": {
+    "w": 47,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 67,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 75,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 75,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "juicy_carpaccio": {
+  "sha": "45fe8b33581a2ccb",
+  "states": {
+   "1": {
+    "w": 41,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 46,
+    "h": 24,
+    "dx": -2,
+    "lift": 0
+   },
+   "3": {
+    "w": 46,
+    "h": 29,
+    "dx": -2,
+    "lift": 0
+   },
+   "4": {
+    "w": 46,
+    "h": 34,
+    "dx": -2,
+    "lift": 0
+   }
+  }
+ },
+ "juju_paperweight": {
+  "sha": "c77a98e5617a7ec1",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "juju_trowel": {
+  "sha": "598f98e6a894496a",
+  "states": {
+   "1": {
+    "w": 65,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "junked_tool_part": {
+  "sha": "05340dd5f3d173a1",
+  "states": {
+   "1": {
+    "w": 42,
+    "h": 18,
+    "dx": 0,
+    "lift": -3
+   }
+  }
+ },
+ "kind_breakfurst_burrito": {
+  "sha": "a0616803f3617eba",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 18,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "knife_and_board": {
+  "sha": "e2d749ba293cc5da",
+  "states": {
+   "1": {
+    "w": 69,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "krazy_salts": {
+  "sha": "4e9f0f503cba0322",
+  "states": {
+   "1": {
+    "w": 43,
+    "h": 23,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 67,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 67,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 67,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "laughing_gas": {
+  "sha": "a83cdc547b8cd1fe",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "lazy_salad": {
+  "sha": "f32b1d3e606da0b7",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 37,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 37,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 38,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "legitimate_post": {
+  "sha": "ab7b5df361f6339c",
+  "states": {
+   "1": {
+    "w": 72,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "legumes_parisienne": {
+  "sha": "778ba9670c7838a2",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "lemburger": {
+  "sha": "8022264967dca2d7",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 46,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 56,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 56,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "lemene": {
+  "sha": "108e1d23be166df6",
+  "states": {
+   "1": {
+    "w": 21,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "lemon": {
+  "sha": "81d824ac6f6e79d4",
+  "states": {
+   "1": {
+    "w": 21,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 31,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 35,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 35,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "lemon_juice": {
+  "sha": "b49c3abca0572fe5",
+  "states": {
+   "1": {
+    "w": 18,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 28,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 35,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 41,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "licorice": {
+  "sha": "330d633f6335c3da",
+  "states": {
+   "1": {
+    "w": 27,
+    "h": 12,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 41,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 45,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 45,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "limited_edition_imitation_grichmas_yeti": {
+  "sha": "7e83b2effb54db7e",
+  "states": {
+   "1": {
+    "w": 68,
+    "h": 61,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "lips": {
+  "sha": "c2e8346057ee4e77",
+  "states": {
+   "1": {
+    "w": 27,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "loam": {
+  "sha": "5e3113bad3db9d53",
+  "states": {
+   "1": {
+    "w": 58,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 88,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 112,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 112,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "loomer": {
+  "sha": "3bdde6084fd60c66",
+  "states": {
+   "1": {
+    "w": 71,
+    "h": 35,
+    "dx": 0,
+    "lift": -8
+   }
+  }
+ },
+ "lotsa_lox": {
+  "sha": "a0b9a513c9969258",
+  "states": {
+   "1": {
+    "w": 70,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 77,
+    "h": 37,
+    "dx": 4,
+    "lift": 0
+   },
+   "3": {
+    "w": 77,
+    "h": 43,
+    "dx": 4,
+    "lift": 0
+   },
+   "4": {
+    "w": 77,
+    "h": 48,
+    "dx": 4,
+    "lift": 0
+   }
+  }
+ },
+ "luxury_tortellini": {
+  "sha": "bd8ac81fd00cb630",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mabbish_coffee": {
+  "sha": "db0a3f67bc84112f",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 32,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 43,
+    "h": 50,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mabon": {
+  "sha": "93220424e625a334",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "maburger_royale": {
+  "sha": "fdddc6544b0b098e",
+  "states": {
+   "1": {
+    "w": 31,
+    "h": 21,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "machine_stand": {
+  "sha": "3863a242b58c8693",
+  "states": {
+   "1": {
+    "w": 140,
+    "h": 75,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "magic_butterfly_stick": {
+  "sha": "230fe984c32f4fc0",
+  "states": {
+   "1": {
+    "w": 119,
+    "h": 49,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "magic_chicken_stick": {
+  "sha": "0781b278b2dfb369",
+  "states": {
+   "1": {
+    "w": 119,
+    "h": 49,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "magic_pig_stick": {
+  "sha": "e10c72759c1d88bb",
+  "states": {
+   "1": {
+    "w": 119,
+    "h": 49,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mangosteen": {
+  "sha": "09ea39c7f8501b4b",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 32,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 40,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 40,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "meat": {
+  "sha": "e4676f4b63043122",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 48,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 67,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 67,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "meat_collector": {
+  "sha": "438e4ab9aeb10856",
+  "states": {
+   "1": {
+    "w": 70,
+    "h": 54,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "meat_gumbo": {
+  "sha": "49c74607eda3dc08",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 36,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 37,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "meat_tetrazzini": {
+  "sha": "a65ef3237cc73a4e",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 36,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 36,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 36,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mega_healthy_veggie_juice": {
+  "sha": "83ec23144b93713c",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 24,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 33,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 33,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_abstraction": {
+  "sha": "d713e485561916f0",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_anxiety": {
+  "sha": "34a47bd6d7c75a42",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_apprehension": {
+  "sha": "555db67a48b6dcec",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_bummer": {
+  "sha": "3c1394a7eef5c7b1",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_concept": {
+  "sha": "44995f7e1f95cba1",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_consideration": {
+  "sha": "a2d6e526768827be",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_contemplation": {
+  "sha": "0b5ec43ce5d31c65",
+  "states": {
+   "1": {
+    "w": 41,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_desire": {
+  "sha": "991af23c7e555019",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_ennui": {
+  "sha": "c8635d075ddad4d3",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_feeling": {
+  "sha": "2336cb85aa7b8ef7",
+  "states": {
+   "1": {
+    "w": 42,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_figment": {
+  "sha": "b1b87c509ba900de",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_hope": {
+  "sha": "fed29190e2d12829",
+  "states": {
+   "1": {
+    "w": 21,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_ideal": {
+  "sha": "96f658b8055daa45",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_image": {
+  "sha": "469b42cfc9a08f87",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_inkling": {
+  "sha": "cd33fc67c8936ccb",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_meditation": {
+  "sha": "6f5b3cf1798bb9f2",
+  "states": {
+   "1": {
+    "w": 41,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_memory": {
+  "sha": "7a773524bea7ae09",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_mirage": {
+  "sha": "a01480490b95cf6a",
+  "states": {
+   "1": {
+    "w": 39,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_musing": {
+  "sha": "470d7fb30a8e28d7",
+  "states": {
+   "1": {
+    "w": 43,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_notion": {
+  "sha": "266a908ccb5d2a76",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_perception": {
+  "sha": "109c972ba30fea0d",
+  "states": {
+   "1": {
+    "w": 47,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_reverie": {
+  "sha": "1f98da38f7311ff1",
+  "states": {
+   "1": {
+    "w": 39,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_rumination": {
+  "sha": "abf368c492c3bf70",
+  "states": {
+   "1": {
+    "w": 40,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_theory": {
+  "sha": "294cbd43380599cd",
+  "states": {
+   "1": {
+    "w": 40,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_thought": {
+  "sha": "e41e7fed3449d755",
+  "states": {
+   "1": {
+    "w": 41,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mental_worry": {
+  "sha": "3ab4b45a13289331",
+  "states": {
+   "1": {
+    "w": 40,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "messy_fry_up": {
+  "sha": "f61cec7b3ba40da9",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 38,
+    "h": 23,
+    "dx": -1,
+    "lift": 0
+   },
+   "3": {
+    "w": 39,
+    "h": 28,
+    "dx": -1,
+    "lift": 0
+   },
+   "4": {
+    "w": 39,
+    "h": 34,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "metal_post": {
+  "sha": "0a449554c14ddc9e",
+  "states": {
+   "1": {
+    "w": 51,
+    "h": 13,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 60,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 60,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 60,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "metal_rock": {
+  "sha": "e336ca2babf36232",
+  "states": {
+   "1": {
+    "w": 25,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 52,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 64,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 64,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "metal_rod": {
+  "sha": "2109a3e2078d268d",
+  "states": {
+   "1": {
+    "w": 41,
+    "h": 9,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 46,
+    "h": 10,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 46,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 47,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "metalmaker_mechanism": {
+  "sha": "22b3322c4b4a3b2c",
+  "states": {
+   "1": {
+    "w": 99,
+    "h": 50,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "metalmaker_tooler": {
+  "sha": "90c7b710ba7ac15e",
+  "states": {
+   "1": {
+    "w": 86,
+    "h": 118,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mexicali_eggs": {
+  "sha": "846810699dbbefed",
+  "states": {
+   "1": {
+    "w": 42,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 50,
+    "h": 22,
+    "dx": 3,
+    "lift": 0
+   },
+   "3": {
+    "w": 53,
+    "h": 24,
+    "dx": 2,
+    "lift": 0
+   },
+   "4": {
+    "w": 53,
+    "h": 29,
+    "dx": 2,
+    "lift": 0
+   }
+  }
+ },
+ "mike_tyson_grill": {
+  "sha": "9e4e145090a4f4df",
+  "states": {
+   "1": {
+    "w": 58,
+    "h": 41,
+    "dx": 0,
+    "lift": -2
+   }
+  }
+ },
+ "mild_sauce": {
+  "sha": "3397c76dc4353a52",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 33,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 44,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 44,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "milk_butterfly": {
+  "sha": "4a1fc7947c886503",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 40,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 29,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 35,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 36,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "molybdenum": {
+  "sha": "88aea6f48c17a825",
+  "states": {
+   "1": {
+    "w": 50,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 64,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 66,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 58,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "moon": {
+  "sha": "47338f74abfab1b5",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mountaineering_permit": {
+  "sha": "8b6a0be6a81510b5",
+  "states": {
+   "1": {
+    "w": 65,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mushroom": {
+  "sha": "39e2b6e7ed17aaf2",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 29,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 37,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 41,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_b_brown_01": {
+  "sha": "e0c33c92b70fb504",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_b_brown_02": {
+  "sha": "a76f3588d2727219",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_b_brown_03": {
+  "sha": "5aae30be012e3478",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_b_brown_04": {
+  "sha": "7b3e97d56f19d754",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_b_brown_05": {
+  "sha": "1e2f937fb7af3a58",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_d_blue_01": {
+  "sha": "a4faef27f4b1e79c",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_d_blue_02": {
+  "sha": "a6160ed56fc95eea",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_d_blue_03": {
+  "sha": "c76e60da1fee5cfb",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_d_blue_04": {
+  "sha": "fcebc6b6fbc6b3d5",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_d_blue_05": {
+  "sha": "b4acd59adec75666",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_d_green_01": {
+  "sha": "ad56e74188e0a310",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_d_green_02": {
+  "sha": "52db66e6e2f87fef",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_d_green_03": {
+  "sha": "6417f8987124ecb8",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_d_green_04": {
+  "sha": "2197b8c4e412e686",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_d_green_05": {
+  "sha": "1f85ef32d8e94beb",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_d_red_01": {
+  "sha": "30388490ef1a6362",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_d_red_02": {
+  "sha": "25b672907f82d391",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_d_red_03": {
+  "sha": "44e5576fcf833c77",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_d_red_04": {
+  "sha": "8a47deb87ea6a44f",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_d_red_05": {
+  "sha": "42b73a0c02390271",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_goodnight_groddle": {
+  "sha": "41a2e046ab648d3e",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_sb_secret_01": {
+  "sha": "172ff871b992644d",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_trumpets": {
+  "sha": "85f0a6633e98083e",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_x_shiny_01": {
+  "sha": "694b8137db40a5e8",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_x_shiny_02": {
+  "sha": "df802906f4a64aa4",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_x_shiny_03": {
+  "sha": "177dc6859e89470d",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_x_shiny_04": {
+  "sha": "0b680a1623288d07",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "musicblock_x_shiny_05": {
+  "sha": "5e264d76e0e2c743",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "mustard": {
+  "sha": "1630c37f576c101f",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 46,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "naraka_flame_rub": {
+  "sha": "6f2a7e76c8fc98bf",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "no_no_powder": {
+  "sha": "95dfd36d60e86907",
+  "states": {
+   "1": {
+    "w": 25,
+    "h": 10,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 39,
+    "h": 13,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 44,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 44,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "note": {
+  "sha": "9b71b57fca4e95c3",
+  "states": {
+   "1": {
+    "w": 45,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "note_hint": {
+  "sha": "575fae7710eeed99",
+  "states": {
+   "1": {
+    "w": 58,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "note_manor_mystery": {
+  "sha": "9b71b57fca4e95c3",
+  "states": {
+   "1": {
+    "w": 45,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "note_pole": {
+  "sha": "6692309fad672d03",
+  "states": {
+   "1": {
+    "w": 64,
+    "h": 184,
+    "dx": 1,
+    "lift": 14
+   }
+  }
+ },
+ "npc_crafty_bot": {
+  "sha": "3669759cede4520e",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 38,
+    "dx": -34,
+    "lift": 74
+   }
+  }
+ },
+ "npc_cubimal_batterfly": {
+  "sha": "37d9ce6df226d94f",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_bureaucrat": {
+  "sha": "1d959d6e88a57e38",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_butler": {
+  "sha": "5d972ca023628060",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_butterfly": {
+  "sha": "91baf1b6bf606e14",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_cactus": {
+  "sha": "6d8ab95242b3b311",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_chick": {
+  "sha": "4505bfb2314b4e91",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_crab": {
+  "sha": "ccb4c3d444cf439a",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_craftybot": {
+  "sha": "ee600abc366012a4",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_deimaginator": {
+  "sha": "933af038bfb49d68",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_dustbunny": {
+  "sha": "f6d99aede7236a2e",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_emobear": {
+  "sha": "1f48728e00c425e0",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_firebogstreetspirit": {
+  "sha": "b8f70779caeab506",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 28,
+    "dx": -1,
+    "lift": 1
+   }
+  }
+ },
+ "npc_cubimal_firefly": {
+  "sha": "710f697e3271480f",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_fox": {
+  "sha": "2f980f22a37b014a",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_foxranger": {
+  "sha": "160211f97508d800",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_frog": {
+  "sha": "99485f104edef195",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_gardeningtoolsvendor": {
+  "sha": "fd1998f3b5fe0ad7",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_gnome": {
+  "sha": "9f4026be6fca3551",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_greeterbot": {
+  "sha": "151e48c578d348d5",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_groddlestreetspirit": {
+  "sha": "9e504f8025885eed",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_gwendolyn": {
+  "sha": "e493495d3f941476",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_helga": {
+  "sha": "c040d3b6dd916235",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_hellbartender": {
+  "sha": "4aaf5ae446a6b333",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_ilmenskiejones": {
+  "sha": "ee7514fd3eef9443",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_juju": {
+  "sha": "a94d30a981f57376",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_magicrock": {
+  "sha": "f00b1b90144d9535",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_maintenancebot": {
+  "sha": "9797942d9052515a",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_mealvendor": {
+  "sha": "f1c10588139b0b50",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_phantom": {
+  "sha": "d74fc648aea520d2",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_piggy": {
+  "sha": "52ca3dfb4f80a998",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_rook": {
+  "sha": "f7c6c0e9aa613195",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_rube": {
+  "sha": "6fde2a3aeff78473",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_scionofpurple": {
+  "sha": "faa58c695a7335ee",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 34,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "npc_cubimal_senorfunpickle": {
+  "sha": "a3176bbef7eb4043",
+  "states": {
+   "1": {
+    "w": 39,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_sloth": {
+  "sha": "b7960df816133161",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_smuggler": {
+  "sha": "46bb7133c621fc98",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_snoconevendor": {
+  "sha": "29e99726f9a52448",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_squid": {
+  "sha": "e496e9089ff762ad",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_toolvendor": {
+  "sha": "a3dd2c5b868a395e",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_trisor": {
+  "sha": "5e9f85f6de21ad59",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_unclefriendly": {
+  "sha": "b72f92607b215478",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_uraliastreetspirit": {
+  "sha": "a55c863a6d2ff4dd",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_cubimal_yeti": {
+  "sha": "54029f5b603a541f",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "npc_garden_gnome": {
+  "sha": "cc4a5476fad1da17",
+  "states": {
+   "1": {
+    "w": 83,
+    "h": 129,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "nutmeg": {
+  "sha": "97a2dc7bca5fb42a",
+  "states": {
+   "1": {
+    "w": 15,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 30,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 32,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 32,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "oats": {
+  "sha": "f3745f567111d7df",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 47,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 59,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 59,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "oaty_cake": {
+  "sha": "3890f91b11a71009",
+  "states": {
+   "1": {
+    "w": 53,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 53,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 53,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 53,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "obvious_panini": {
+  "sha": "078eaab791b944cf",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 38,
+    "h": 31,
+    "dx": 2,
+    "lift": -1
+   },
+   "3": {
+    "w": 43,
+    "h": 36,
+    "dx": 0,
+    "lift": -1
+   },
+   "4": {
+    "w": 43,
+    "h": 40,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "oily_dressing": {
+  "sha": "0f525622a4fb7876",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 29,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 35,
+    "h": 49,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 35,
+    "h": 52,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "older_spice": {
+  "sha": "aa5449931678c9c0",
+  "states": {
+   "1": {
+    "w": 45,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 59,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 69,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 69,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "olive_oil": {
+  "sha": "ca63b9166436e29e",
+  "states": {
+   "1": {
+    "w": 14,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 23,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 29,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 29,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "onion": {
+  "sha": "5a0cf79488cfaf18",
+  "states": {
+   "1": {
+    "w": 27,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 49,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 57,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 57,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "onion_rings": {
+  "sha": "d38df77bb3ba64a8",
+  "states": {
+   "1": {
+    "w": 27,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "onion_sauce": {
+  "sha": "db9cda39564441e1",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 33,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 43,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "orange": {
+  "sha": "bb5a76bbb7d59944",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 32,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 39,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 39,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "orange_juice": {
+  "sha": "300c1ed51c535891",
+  "states": {
+   "1": {
+    "w": 17,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 30,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 40,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 40,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "ore_grinder": {
+  "sha": "6fb60c447dfb1cce",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 35,
+    "dx": 2,
+    "lift": -1
+   }
+  }
+ },
+ "pad_tii": {
+  "sha": "f6a6e3fb1b0857d6",
+  "states": {
+   "1": {
+    "w": 47,
+    "h": 24,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "paper": {
+  "sha": "12d6dfaec1c1ccd2",
+  "states": {
+   "1": {
+    "w": 54,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 57,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 57,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 57,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "papl_upside_down_pizza": {
+  "sha": "cd7ec1da6a710ed6",
+  "states": {
+   "1": {
+    "w": 51,
+    "h": 20,
+    "dx": -1,
+    "lift": 0
+   },
+   "2": {
+    "w": 52,
+    "h": 28,
+    "dx": -1,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 34,
+    "dx": -1,
+    "lift": 0
+   },
+   "4": {
+    "w": 54,
+    "h": 40,
+    "dx": -2,
+    "lift": 0
+   }
+  }
+ },
+ "paradise_ticket_abysmal_thrill": {
+  "sha": "1b2cd75ab2529003",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 15,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "paradise_ticket_aerial_boost": {
+  "sha": "994a288a7eb8631e",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 15,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "paradise_ticket_arbor_hollow": {
+  "sha": "c580aa8c447b8d84",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 15,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "paradise_ticket_beam_me_down": {
+  "sha": "822b980e2c98a942",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 15,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "paradise_ticket_bippity_bop": {
+  "sha": "086b2f05e3dc40de",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 15,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "paradise_ticket_cloud_flight": {
+  "sha": "fcf2fbafe3801559",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 15,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "paradise_ticket_cloud_rings": {
+  "sha": "16185048790f2e89",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 15,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "paradise_ticket_drafty_uplift": {
+  "sha": "c56f44e99f43a583",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 15,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "paradise_ticket_mountain_scaling": {
+  "sha": "9eab039021f709fd",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 15,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "paradise_ticket_radial_heights": {
+  "sha": "41395f66cdf83c05",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 15,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "paradise_ticket_sky_plunge": {
+  "sha": "c3410785d5b210e3",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 15,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "paradise_ticket_slip_n_slide": {
+  "sha": "6741f57072ad2110",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 15,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "paradise_ticket_starlit_night": {
+  "sha": "4e5eb7d91dde8fb6",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 15,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "paradise_ticket_updraft": {
+  "sha": "aaa6831b8df83921",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 15,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "pareidolic_cosma_toast": {
+  "sha": "9aebf00a433d4d1f",
+  "states": {
+   "1": {
+    "w": 39,
+    "h": 19,
+    "dx": 1,
+    "lift": -1
+   }
+  }
+ },
+ "parsnip": {
+  "sha": "7f22b75284889301",
+  "states": {
+   "1": {
+    "w": 49,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 52,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 73,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_aquarius": {
+  "sha": "aa1bd055f681c0c6",
+  "states": {
+   "1": {
+    "w": 60,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_double_rainbow": {
+  "sha": "4962c0c78b5177ec",
+  "states": {
+   "1": {
+    "w": 60,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_mazzala_gala": {
+  "sha": "a393055cd3f559ac",
+  "states": {
+   "1": {
+    "w": 60,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_monster_bash": {
+  "sha": "76c909e9560511e8",
+  "states": {
+   "1": {
+    "w": 59,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_nylon_phool": {
+  "sha": "10b4f3b10113539e",
+  "states": {
+   "1": {
+    "w": 60,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_pitchen_lilliputt": {
+  "sha": "91170e9a961ff603",
+  "states": {
+   "1": {
+    "w": 60,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_taster_aquarius": {
+  "sha": "621004ac33e281ea",
+  "states": {
+   "1": {
+    "w": 60,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_taster_double_rainbow": {
+  "sha": "f4c5edd2ab696d23",
+  "states": {
+   "1": {
+    "w": 60,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_taster_mazzala_gala": {
+  "sha": "b82fe281bcf41816",
+  "states": {
+   "1": {
+    "w": 60,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_taster_nylon_phool": {
+  "sha": "8d818e952b8bf688",
+  "states": {
+   "1": {
+    "w": 60,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_taster_pitchen_lilliputt": {
+  "sha": "718c7b4a3cf8a070",
+  "states": {
+   "1": {
+    "w": 60,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_taster_toxic_moon": {
+  "sha": "24e1c3ebb3112518",
+  "states": {
+   "1": {
+    "w": 60,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_taster_val_holla": {
+  "sha": "d0c5340fb277202c",
+  "states": {
+   "1": {
+    "w": 60,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_taster_winter_wingding": {
+  "sha": "44af95b8bb6168ad",
+  "states": {
+   "1": {
+    "w": 59,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_toxic_moon": {
+  "sha": "65a4f9a3089028be",
+  "states": {
+   "1": {
+    "w": 60,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_val_holla": {
+  "sha": "89ccf8cd092af01d",
+  "states": {
+   "1": {
+    "w": 60,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "party_pack_winter_wingding": {
+  "sha": "236d5823ed7a0a73",
+  "states": {
+   "1": {
+    "w": 59,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "peat": {
+  "sha": "505e381268229745",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 50,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 72,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 72,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "pepitas": {
+  "sha": "6eaf9fe056e26a81",
+  "states": {
+   "1": {
+    "w": 28,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 39,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 48,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 48,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "petrified_rock_large": {
+  "sha": "e06c2aa287900b05",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 43,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "petrified_rock_medium": {
+  "sha": "de30a3f6ad66c25b",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 27,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "petrified_rock_small": {
+  "sha": "8563e5c8c0477f3a",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 15,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "pi": {
+  "sha": "538751c783449739",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "pick": {
+  "sha": "21d5cf691c293069",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 21,
+    "dx": 0,
+    "lift": -6
+   }
+  }
+ },
+ "pickle": {
+  "sha": "bae8e65955262d4b",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 41,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 47,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 48,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "pig_bait": {
+  "sha": "a9a9b6b72cbbf60a",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "piggy_egg": {
+  "sha": "a7aa94e3beb696de",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 63,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 79,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 79,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "piggy_feeder": {
+  "sha": "cb7369fa2ef5812b",
+  "states": {
+   "1": {
+    "w": 85,
+    "h": 92,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "piglet": {
+  "sha": "b7c5aba1f624c444",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "pinch_of_salt": {
+  "sha": "e34fa1e25df10fa9",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 47,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 65,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 75,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "pineapple": {
+  "sha": "e9936f076a94bb34",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 49,
+    "h": 44,
+    "dx": 0,
+    "lift": 1
+   },
+   "3": {
+    "w": 58,
+    "h": 44,
+    "dx": 0,
+    "lift": 1
+   },
+   "4": {
+    "w": 58,
+    "h": 44,
+    "dx": 0,
+    "lift": 1
+   }
+  }
+ },
+ "plain_bubble": {
+  "sha": "b1407329f41a8680",
+  "states": {
+   "1": {
+    "w": 18,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 24,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 28,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 32,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "plain_crystal": {
+  "sha": "af5eb2e5b3e78136",
+  "states": {
+   "1": {
+    "w": 41,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 58,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 69,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 69,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "plain_metal": {
+  "sha": "3c646b6d22caf4f6",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 47,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 47,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 47,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "plain_noodles": {
+  "sha": "42b9cb3f4ccf55d1",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 40,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 40,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 40,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "plank": {
+  "sha": "24ad5e27f8c0811d",
+  "states": {
+   "1": {
+    "w": 59,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 59,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 63,
+    "h": 25,
+    "dx": -2,
+    "lift": 0
+   },
+   "4": {
+    "w": 63,
+    "h": 32,
+    "dx": -2,
+    "lift": 0
+   }
+  }
+ },
+ "plate_of_beans": {
+  "sha": "fec4439789f58766",
+  "states": {
+   "1": {
+    "w": 42,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "play_cube": {
+  "sha": "2558b71b83e96a91",
+  "states": {
+   "1": {
+    "w": 37,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "plop": {
+  "sha": "acd496a77798b653",
+  "states": {
+   "1": {
+    "w": 28,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "plum": {
+  "sha": "bbd7ec0c0d04dacf",
+  "states": {
+   "1": {
+    "w": 21,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 33,
+    "h": 39,
+    "dx": 2,
+    "lift": 0
+   },
+   "3": {
+    "w": 49,
+    "h": 39,
+    "dx": 2,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 39,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "potato": {
+  "sha": "7b4226371dce7bc6",
+  "states": {
+   "1": {
+    "w": 31,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 51,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 51,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potato_patty": {
+  "sha": "cfe99c0368e612dd",
+  "states": {
+   "1": {
+    "w": 42,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 42,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 42,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 42,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potcorn": {
+  "sha": "ef6a3e79c4505f75",
+  "states": {
+   "1": {
+    "w": 28,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potians_feast": {
+  "sha": "058fb84b6286c324",
+  "states": {
+   "1": {
+    "w": 42,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_amorous_philtre": {
+  "sha": "5493ddef40da5513",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_ancestral_spirits": {
+  "sha": "f3521bb231debfa2",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_animal_youth": {
+  "sha": "6db36b6d1c4c95f7",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_avatar_large": {
+  "sha": "2f9adb08e4578f28",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_avatar_small": {
+  "sha": "d1f5631b3c29ef21",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_charades": {
+  "sha": "f5fe56fd4ece3905",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_chris": {
+  "sha": "b2899adff893abef",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_draught_of_giant_amicability": {
+  "sha": "ac55722f778b5afb",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_elixir_of_avarice": {
+  "sha": "bd3471f8d2f57cfd",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_favor": {
+  "sha": "ac55722f778b5afb",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_garden_clear": {
+  "sha": "ccff2c6fd16cde0f",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_garden_fertilize": {
+  "sha": "62441d20addbb99e",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_garden_harvest": {
+  "sha": "1bc635fda905e513",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_garden_plant": {
+  "sha": "7526282dcad1636c",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_garden_water": {
+  "sha": "e0d066fd1b734b07",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_keycutter_tonic": {
+  "sha": "f9ce571159319d4d",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_rainbow_juice": {
+  "sha": "4c39af3711deb41c",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 37,
+    "dx": 0,
+    "lift": 1
+   }
+  }
+ },
+ "potion_rook_balm": {
+  "sha": "e89a5784c887676f",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_trantsformation_fluid": {
+  "sha": "794b81c59def5ba5",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_tree_poison": {
+  "sha": "fba58e5497ca8c2c",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potion_tree_poison_antidote": {
+  "sha": "6dd01765b2b4855f",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "potoxin": {
+  "sha": "e97514a39535e6a2",
+  "states": {
+   "1": {
+    "w": 18,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "pottine": {
+  "sha": "6592f77113b238c7",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "powder_of_mild_fecundity": {
+  "sha": "29f4b5bda5e56179",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 39,
+    "dx": 0,
+    "lift": 1
+   },
+   "2": {
+    "w": 22,
+    "h": 40,
+    "dx": 0,
+    "lift": 1
+   },
+   "3": {
+    "w": 22,
+    "h": 39,
+    "dx": 0,
+    "lift": 1
+   },
+   "4": {
+    "w": 22,
+    "h": 39,
+    "dx": 0,
+    "lift": 1
+   },
+   "5": {
+    "w": 22,
+    "h": 39,
+    "dx": 0,
+    "lift": 1
+   }
+  }
+ },
+ "powder_of_startling_fecundity": {
+  "sha": "b6cf2c1fdfdb5957",
+  "states": {
+   "1": {
+    "w": 25,
+    "h": 45,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 25,
+    "h": 45,
+    "dx": 1,
+    "lift": 1
+   },
+   "3": {
+    "w": 25,
+    "h": 45,
+    "dx": 1,
+    "lift": 1
+   },
+   "4": {
+    "w": 25,
+    "h": 45,
+    "dx": 1,
+    "lift": 0
+   },
+   "5": {
+    "w": 25,
+    "h": 45,
+    "dx": 1,
+    "lift": 1
+   }
+  }
+ },
+ "precious_potato_salad": {
+  "sha": "b28146095ddfaba9",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "proper_rice": {
+  "sha": "011bb113f32694dd",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 46,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 46,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 46,
+    "h": 56,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "pumpkin": {
+  "sha": "1568e8c75bcb1a84",
+  "states": {
+   "1": {
+    "w": 39,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 52,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 65,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 65,
+    "h": 52,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "pumpkin_ale": {
+  "sha": "f9441da91e26d934",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 34,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 46,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 46,
+    "h": 51,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "pumpkin_carved_1": {
+  "sha": "ff2575a9d2490636",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 47,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "pumpkin_carved_2": {
+  "sha": "5e4c7399c18d25ff",
+  "states": {
+   "1": {
+    "w": 49,
+    "h": 47,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "pumpkin_carved_3": {
+  "sha": "97d81e5570cbfb76",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "pumpkin_carved_4": {
+  "sha": "14203c6a4d3e4c57",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "pumpkin_carved_5": {
+  "sha": "73dda5f76e8122d9",
+  "states": {
+   "1": {
+    "w": 50,
+    "h": 55,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "pumpkin_lit_1": {
+  "sha": "a95b84c5848036d7",
+  "states": {
+   "1": {
+    "w": 49,
+    "h": 47,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "pumpkin_lit_2": {
+  "sha": "0c42a978513bc772",
+  "states": {
+   "1": {
+    "w": 49,
+    "h": 47,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "pumpkin_lit_3": {
+  "sha": "8e0e7c4e39fb800b",
+  "states": {
+   "1": {
+    "w": 49,
+    "h": 47,
+    "dx": -2,
+    "lift": 0
+   }
+  }
+ },
+ "pumpkin_lit_4": {
+  "sha": "faed8a1458a8935c",
+  "states": {
+   "1": {
+    "w": 49,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "pumpkin_lit_5": {
+  "sha": "d5c080d0f89f3fe5",
+  "states": {
+   "1": {
+    "w": 50,
+    "h": 55,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "pumpkin_pie": {
+  "sha": "76bea1026a68704d",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "pungent_sunrise": {
+  "sha": "6f4f95030e77ed71",
+  "states": {
+   "1": {
+    "w": 15,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 25,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 35,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 35,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "purple_flower": {
+  "sha": "410c377294ea318f",
+  "states": {
+   "1": {
+    "w": 55,
+    "h": 20,
+    "dx": 0,
+    "lift": -4
+   },
+   "2": {
+    "w": 56,
+    "h": 34,
+    "dx": 0,
+    "lift": -3
+   },
+   "3": {
+    "w": 56,
+    "h": 40,
+    "dx": 2,
+    "lift": -4
+   },
+   "4": {
+    "w": 68,
+    "h": 46,
+    "dx": 0,
+    "lift": -5
+   }
+  }
+ },
+ "quill": {
+  "sha": "7b4e570473f7e9fd",
+  "states": {
+   "1": {
+    "w": 42,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "race_ticket": {
+  "sha": "f07fafb8aa24c0b8",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 54,
+    "h": 24,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 66,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 66,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "race_ticket_amazing_race": {
+  "sha": "f07fafb8aa24c0b8",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 54,
+    "h": 24,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 66,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 66,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "race_ticket_canyon_run": {
+  "sha": "f07fafb8aa24c0b8",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 54,
+    "h": 24,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 66,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 66,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "race_ticket_cloudhopolis": {
+  "sha": "f07fafb8aa24c0b8",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 54,
+    "h": 24,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 66,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 66,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "race_ticket_crystal_climb": {
+  "sha": "f07fafb8aa24c0b8",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 54,
+    "h": 24,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 66,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 66,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "race_ticket_grab_em_good": {
+  "sha": "f07fafb8aa24c0b8",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 54,
+    "h": 24,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 66,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 66,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "race_ticket_hogtie_piggy": {
+  "sha": "f07fafb8aa24c0b8",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 54,
+    "h": 24,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 66,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 66,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "race_ticket_it_game": {
+  "sha": "f07fafb8aa24c0b8",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 54,
+    "h": 24,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 66,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 66,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "race_ticket_lava_leap": {
+  "sha": "f07fafb8aa24c0b8",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 54,
+    "h": 24,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 66,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 66,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "race_ticket_space_race": {
+  "sha": "f07fafb8aa24c0b8",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 54,
+    "h": 24,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 66,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 66,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "race_ticket_star_sprint": {
+  "sha": "f07fafb8aa24c0b8",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 54,
+    "h": 24,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 66,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 66,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "race_ticket_time_warp": {
+  "sha": "f07fafb8aa24c0b8",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 19,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 54,
+    "h": 24,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 66,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 66,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "random_kindness": {
+  "sha": "b943fa3dd6bad91b",
+  "states": {
+   "1": {
+    "w": 55,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "red": {
+  "sha": "e4d524016a145231",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 33,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "rice": {
+  "sha": "f358a91542e445dd",
+  "states": {
+   "1": {
+    "w": 28,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 47,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "rich_tagine": {
+  "sha": "b3f4bcd2b6893bbb",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 36,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 37,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "rookswort": {
+  "sha": "8313caf8967c1000",
+  "states": {
+   "1": {
+    "w": 50,
+    "h": 27,
+    "dx": 0,
+    "lift": -5
+   },
+   "2": {
+    "w": 57,
+    "h": 34,
+    "dx": 0,
+    "lift": -5
+   },
+   "3": {
+    "w": 60,
+    "h": 36,
+    "dx": 0,
+    "lift": -5
+   },
+   "4": {
+    "w": 60,
+    "h": 36,
+    "dx": 0,
+    "lift": -5
+   }
+  }
+ },
+ "roux": {
+  "sha": "8cd7e8fbaa35c35d",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 33,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "rube_potato": {
+  "sha": "30e2ed957dbd7836",
+  "states": {
+   "1": {
+    "w": 31,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "rubemycin": {
+  "sha": "be9cfd831ff1525e",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "rubeweed": {
+  "sha": "48aa1e707479d3f4",
+  "states": {
+   "1": {
+    "w": 59,
+    "h": 32,
+    "dx": 0,
+    "lift": -3
+   },
+   "2": {
+    "w": 64,
+    "h": 41,
+    "dx": 0,
+    "lift": -8
+   },
+   "3": {
+    "w": 64,
+    "h": 41,
+    "dx": 0,
+    "lift": -8
+   },
+   "4": {
+    "w": 64,
+    "h": 46,
+    "dx": 0,
+    "lift": -8
+   }
+  }
+ },
+ "saffron": {
+  "sha": "a03b8d43283c4b75",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 10,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 46,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 62,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 62,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "salmon": {
+  "sha": "846e587aee3b872d",
+  "states": {
+   "1": {
+    "w": 58,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 63,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 83,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 83,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "salmon_jaella": {
+  "sha": "34fa5b6cc96c1cc4",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "sammich": {
+  "sha": "9b5111b4ff131923",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 47,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 51,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 51,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "saucepan": {
+  "sha": "07f63a40ab1d79c3",
+  "states": {
+   "1": {
+    "w": 61,
+    "h": 31,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "savory_smoothie": {
+  "sha": "9fe02f2b08d96459",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 29,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 38,
+    "h": 49,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 38,
+    "h": 49,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "scraper": {
+  "sha": "01e263da9efd0acd",
+  "states": {
+   "1": {
+    "w": 40,
+    "h": 17,
+    "dx": 0,
+    "lift": -3
+   }
+  }
+ },
+ "scrumptious_frittata": {
+  "sha": "19e7586d946b1a3e",
+  "states": {
+   "1": {
+    "w": 35,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 58,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 74,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 74,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "secret_sauce": {
+  "sha": "b4763da2fed49e8a",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 35,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 44,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 44,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "seed_broccoli": {
+  "sha": "0367872f7925b056",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 43,
+    "h": 31,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 50,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 50,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "seed_cabbage": {
+  "sha": "a3b9cb4513ef375a",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 43,
+    "h": 33,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 51,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 51,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "seed_carrot": {
+  "sha": "5dc64c29a6b5119a",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 43,
+    "h": 32,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 51,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 51,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "seed_corn": {
+  "sha": "c8cf606ad1473749",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 28,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 51,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 51,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "seed_cucumber": {
+  "sha": "c5048e59e404d34b",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 43,
+    "h": 32,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 51,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 51,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "seed_onion": {
+  "sha": "28660cfb3ba85cfe",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 50,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 50,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "seed_parsnip": {
+  "sha": "47f277262253e251",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "seed_potato": {
+  "sha": "c9ce442d6c682178",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 27,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 43,
+    "h": 32,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 50,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 50,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "seed_pumpkin": {
+  "sha": "f0e4e2c2aa3a5b99",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 27,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 32,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "seed_rice": {
+  "sha": "da81252e961e76dc",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 26,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 42,
+    "h": 31,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 49,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 49,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "seed_spinach": {
+  "sha": "780bc7f8b4753fb4",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 27,
+    "dx": 2,
+    "lift": 0
+   },
+   "2": {
+    "w": 43,
+    "h": 33,
+    "dx": 2,
+    "lift": 0
+   },
+   "3": {
+    "w": 51,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 51,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "seed_strawberry": {
+  "sha": "05860580580ae0f3",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 42,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 50,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 51,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "seed_tomato": {
+  "sha": "ebc00b48269264fd",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 27,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 51,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 51,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "seed_zucchini": {
+  "sha": "6fbf257ff222e1f2",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 27,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 42,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 50,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 50,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "sesame_oil": {
+  "sha": "b9935767f00f6828",
+  "states": {
+   "1": {
+    "w": 14,
+    "h": 47,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 23,
+    "h": 49,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 31,
+    "h": 51,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 31,
+    "h": 54,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "shovel": {
+  "sha": "8bfebc111b70bf90",
+  "states": {
+   "1": {
+    "w": 74,
+    "h": 20,
+    "dx": 1,
+    "lift": -4
+   }
+  }
+ },
+ "signpost_permit": {
+  "sha": "07f89fca99f8f65d",
+  "states": {
+   "1": {
+    "w": 81,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "silvertongue": {
+  "sha": "d56541967233c505",
+  "states": {
+   "1": {
+    "w": 42,
+    "h": 26,
+    "dx": 0,
+    "lift": -4
+   },
+   "2": {
+    "w": 65,
+    "h": 37,
+    "dx": 0,
+    "lift": -3
+   },
+   "3": {
+    "w": 67,
+    "h": 45,
+    "dx": 0,
+    "lift": -5
+   },
+   "4": {
+    "w": 73,
+    "h": 45,
+    "dx": 0,
+    "lift": -5
+   }
+  }
+ },
+ "simple_bbq": {
+  "sha": "eeec0f486c889ff2",
+  "states": {
+   "1": {
+    "w": 41,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 41,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 41,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 41,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "simple_slaw": {
+  "sha": "3960cd7833761949",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 38,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 48,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 48,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "slow_gin_fizz": {
+  "sha": "9c07d66e6ece23a6",
+  "states": {
+   "1": {
+    "w": 14,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 25,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 32,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 32,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "small_worthless": {
+  "sha": "94ed329b1fa4663d",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 19,
+    "dx": -1,
+    "lift": 0
+   },
+   "2": {
+    "w": 24,
+    "h": 19,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "smelter": {
+  "sha": "6ac615e6f990476e",
+  "states": {
+   "1": {
+    "w": 69,
+    "h": 58,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "snack_pack": {
+  "sha": "1678a1f090732a2b",
+  "states": {
+   "1": {
+    "w": 70,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 70,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 70,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 70,
+    "h": 54,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "snail": {
+  "sha": "c0920c48015471a0",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 11,
+    "dx": 2,
+    "lift": 1
+   },
+   "2": {
+    "w": 26,
+    "h": 10,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 26,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 28,
+    "h": 15,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "sneezing_powder": {
+  "sha": "6f5b5d4d245da8d3",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 22,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 22,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 22,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "5": {
+    "w": 22,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "sno_cone_blue": {
+  "sha": "6491a93b4b14b889",
+  "states": {
+   "1": {
+    "w": 43,
+    "h": 42,
+    "dx": 3,
+    "lift": 0
+   },
+   "2": {
+    "w": 72,
+    "h": 42,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 89,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 89,
+    "h": 51,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "sno_cone_green": {
+  "sha": "30601f47a31bb033",
+  "states": {
+   "1": {
+    "w": 43,
+    "h": 42,
+    "dx": 3,
+    "lift": 0
+   },
+   "2": {
+    "w": 72,
+    "h": 42,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 89,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 89,
+    "h": 51,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "sno_cone_orange": {
+  "sha": "f45525dd261c85ea",
+  "states": {
+   "1": {
+    "w": 43,
+    "h": 42,
+    "dx": 3,
+    "lift": 0
+   },
+   "2": {
+    "w": 72,
+    "h": 42,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 89,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 89,
+    "h": 51,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "sno_cone_purple": {
+  "sha": "1f2964f5d395dffb",
+  "states": {
+   "1": {
+    "w": 43,
+    "h": 42,
+    "dx": 3,
+    "lift": 0
+   },
+   "2": {
+    "w": 72,
+    "h": 42,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 89,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 89,
+    "h": 51,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "sno_cone_rainbow": {
+  "sha": "c7439994b7fd914b",
+  "states": {
+   "1": {
+    "w": 43,
+    "h": 42,
+    "dx": 3,
+    "lift": 0
+   },
+   "2": {
+    "w": 72,
+    "h": 42,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 89,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 89,
+    "h": 51,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "sno_cone_red": {
+  "sha": "5650115c9d2d65b7",
+  "states": {
+   "1": {
+    "w": 43,
+    "h": 42,
+    "dx": 3,
+    "lift": 0
+   },
+   "2": {
+    "w": 72,
+    "h": 42,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 89,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 89,
+    "h": 51,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "sparkle_powder": {
+  "sha": "6226fa2a32931fe0",
+  "states": {
+   "1": {
+    "w": 22,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 22,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 22,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 22,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "5": {
+    "w": 22,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "sparkly": {
+  "sha": "de5cbb544d5839b2",
+  "states": {
+   "1": {
+    "w": 25,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 40,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 45,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 45,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "special_item_that_only_beta_testers_get": {
+  "sha": "1e74f244b9fadf19",
+  "states": {
+   "1": {
+    "w": 74,
+    "h": 51,
+    "dx": 0,
+    "lift": 1
+   }
+  }
+ },
+ "spice_mill": {
+  "sha": "21212d4301b90d4c",
+  "states": {
+   "1": {
+    "w": 31,
+    "h": 60,
+    "dx": 1,
+    "lift": 1
+   }
+  }
+ },
+ "spicy_grog": {
+  "sha": "8f5b1135954dd397",
+  "states": {
+   "1": {
+    "w": 14,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 23,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 27,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 27,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "spicy_quesadilla": {
+  "sha": "0ba345b0ba0365e6",
+  "states": {
+   "1": {
+    "w": 40,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 47,
+    "h": 30,
+    "dx": -1,
+    "lift": 0
+   },
+   "4": {
+    "w": 47,
+    "h": 34,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "spinach": {
+  "sha": "f1ffb0a0c8323836",
+  "states": {
+   "1": {
+    "w": 31,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 51,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 51,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 51,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "spinach_salad": {
+  "sha": "823c6fa7f82ea54b",
+  "states": {
+   "1": {
+    "w": 60,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 60,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 60,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 62,
+    "h": 57,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "spindle": {
+  "sha": "856fda925cd1c6ff",
+  "states": {
+   "1": {
+    "w": 42,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "splendid_spindle": {
+  "sha": "1ad7164b24ff31df",
+  "states": {
+   "1": {
+    "w": 49,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "spriggase": {
+  "sha": "380449bc305babb2",
+  "states": {
+   "1": {
+    "w": 21,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "still": {
+  "sha": "0c48ca9edd42aebd",
+  "states": {
+   "1": {
+    "w": 68,
+    "h": 100,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "stock_sauce": {
+  "sha": "d7d94cfab954291d",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 32,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "stoot_barfield_pullstring_doll": {
+  "sha": "10707cc62a93f754",
+  "states": {
+   "1": {
+    "w": 59,
+    "h": 59,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "strawberry": {
+  "sha": "d3e4306c43855085",
+  "states": {
+   "1": {
+    "w": 15,
+    "h": 16,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 25,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 32,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 32,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "string": {
+  "sha": "18314688e8ed8e45",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 13,
+    "dx": 2,
+    "lift": -1
+   },
+   "2": {
+    "w": 54,
+    "h": 20,
+    "dx": -1,
+    "lift": 2
+   },
+   "3": {
+    "w": 54,
+    "h": 23,
+    "dx": -1,
+    "lift": -1
+   },
+   "4": {
+    "w": 70,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "super_scraper": {
+  "sha": "19a481c24f6d0109",
+  "states": {
+   "1": {
+    "w": 46,
+    "h": 22,
+    "dx": -3,
+    "lift": -4
+   }
+  }
+ },
+ "super_veggie_kebabs": {
+  "sha": "a9b2c96bc72505cd",
+  "states": {
+   "1": {
+    "w": 42,
+    "h": 21,
+    "dx": -2,
+    "lift": 0
+   },
+   "2": {
+    "w": 47,
+    "h": 27,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 47,
+    "h": 30,
+    "dx": 1,
+    "lift": 0
+   },
+   "4": {
+    "w": 47,
+    "h": 35,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "swank_zucchini_loaf": {
+  "sha": "a504e8ea3b0b1e03",
+  "states": {
+   "1": {
+    "w": 45,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "sweet_n_sour_sauce": {
+  "sha": "56d460d381380f36",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 34,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 43,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "swf_1": {
+  "sha": "4490133059371488",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "swf_2": {
+  "sha": "909fb0d7da111de5",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "swf_3": {
+  "sha": "0bf55b8999611a99",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "swing_batter": {
+  "sha": "d10a94de2a5f0976",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "tangy_noodles": {
+  "sha": "2709b8de563e33c8",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 39,
+    "h": 24,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 42,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 42,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "tangy_sauce": {
+  "sha": "99f050d81d8f2851",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 34,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 45,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 45,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "tasty_pasta": {
+  "sha": "54b2768fdb2af8e1",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 36,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 36,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 36,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "teleportation_script": {
+  "sha": "8822bcacac412a48",
+  "states": {
+   "1": {
+    "w": 55,
+    "h": 18,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "teleportation_script_imbued": {
+  "sha": "362f4378f38fa420",
+  "states": {
+   "1": {
+    "w": 59,
+    "h": 18,
+    "dx": -2,
+    "lift": -1
+   }
+  }
+ },
+ "test_tube": {
+  "sha": "512cc0f24544f0da",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "thread": {
+  "sha": "6bf2fb3ae19befdc",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 4,
+    "dx": -1,
+    "lift": 0
+   },
+   "2": {
+    "w": 29,
+    "h": 8,
+    "dx": -2,
+    "lift": 0
+   },
+   "3": {
+    "w": 33,
+    "h": 8,
+    "dx": -2,
+    "lift": 0
+   },
+   "4": {
+    "w": 33,
+    "h": 9,
+    "dx": -2,
+    "lift": 0
+   }
+  }
+ },
+ "tiite": {
+  "sha": "5a42aa66569a00b2",
+  "states": {
+   "1": {
+    "w": 8,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "tin": {
+  "sha": "21eb86c6bd4e7305",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 48,
+    "h": 22,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 48,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 48,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "tincturing_kit": {
+  "sha": "b3cd8d105eb8fd0c",
+  "states": {
+   "1": {
+    "w": 44,
+    "h": 42,
+    "dx": 0,
+    "lift": -1
+   }
+  }
+ },
+ "tinkertool": {
+  "sha": "cdeab5a2b7d2896b",
+  "states": {
+   "1": {
+    "w": 51,
+    "h": 24,
+    "dx": 0,
+    "lift": -4
+   }
+  }
+ },
+ "tiny_bubble": {
+  "sha": "10f52704906a8589",
+  "states": {
+   "1": {
+    "w": 11,
+    "h": 11,
+    "dx": 1,
+    "lift": 0
+   },
+   "2": {
+    "w": 15,
+    "h": 11,
+    "dx": 1,
+    "lift": 0
+   },
+   "3": {
+    "w": 17,
+    "h": 14,
+    "dx": 1,
+    "lift": 0
+   },
+   "4": {
+    "w": 19,
+    "h": 14,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "tomato": {
+  "sha": "8d667cc6558f4374",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 36,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 44,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 44,
+    "h": 31,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "tooberry_shake": {
+  "sha": "0dad7e3f97edcc64",
+  "states": {
+   "1": {
+    "w": 18,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 29,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 35,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 35,
+    "h": 46,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "tortilla": {
+  "sha": "860427a5ba6870cb",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 37,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 39,
+    "h": 19,
+    "dx": -1,
+    "lift": 0
+   },
+   "4": {
+    "w": 39,
+    "h": 24,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "treasure_map_1": {
+  "sha": "9b71b57fca4e95c3",
+  "states": {
+   "1": {
+    "w": 45,
+    "h": 14,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_bubble": {
+  "sha": "e3ec518e15652abb",
+  "states": {
+   "1": {
+    "w": 47,
+    "h": 50,
+    "dx": 0,
+    "lift": 1
+   }
+  }
+ },
+ "trophy_cubimal": {
+  "sha": "20fe638888f886a2",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_cubimal_2": {
+  "sha": "061fcadc6a49a20b",
+  "states": {
+   "1": {
+    "w": 34,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_egghunt": {
+  "sha": "abc51d5a7746f182",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 62,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_emblems": {
+  "sha": "30dbbdb0e20ea64a",
+  "states": {
+   "1": {
+    "w": 39,
+    "h": 60,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_fruit": {
+  "sha": "72d23884f30d2156",
+  "states": {
+   "1": {
+    "w": 50,
+    "h": 50,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_gas": {
+  "sha": "93404f22cafc7a61",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 50,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_gem": {
+  "sha": "a809181aaf004245",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 50,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_music_b_brown": {
+  "sha": "79770b0f82e39379",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 49,
+    "dx": 0,
+    "lift": 1
+   }
+  }
+ },
+ "trophy_music_d_blue": {
+  "sha": "dc8c5302fbd2cb98",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 49,
+    "dx": 0,
+    "lift": 1
+   }
+  }
+ },
+ "trophy_music_d_green": {
+  "sha": "73ba74fa4e6419ee",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 49,
+    "dx": 0,
+    "lift": 1
+   }
+  }
+ },
+ "trophy_music_d_red": {
+  "sha": "07bc5b6e6a53a18a",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 49,
+    "dx": 0,
+    "lift": 1
+   }
+  }
+ },
+ "trophy_music_x_shiny": {
+  "sha": "3f4ea4f8b8e8c2a5",
+  "states": {
+   "1": {
+    "w": 48,
+    "h": 49,
+    "dx": 0,
+    "lift": 1
+   }
+  }
+ },
+ "trophy_spice": {
+  "sha": "aac72a8af362c469",
+  "states": {
+   "1": {
+    "w": 49,
+    "h": 50,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_dirt": {
+  "sha": "cd0e85c9b741e2a5",
+  "states": {
+   "1": {
+    "w": 69,
+    "h": 68,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_dirt_piece1": {
+  "sha": "5ba87b1f165dc108",
+  "states": {
+   "1": {
+    "w": 50,
+    "h": 36,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_dirt_piece2": {
+  "sha": "0542927ed9d7c050",
+  "states": {
+   "1": {
+    "w": 33,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_dirt_piece3": {
+  "sha": "95cc1faf221aad26",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 29,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_dirt_piece4": {
+  "sha": "4bdbb7e7a62374cf",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_dirt_piece5": {
+  "sha": "3382432abb576dfe",
+  "states": {
+   "1": {
+    "w": 23,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_earth": {
+  "sha": "c68753b821d6ec5c",
+  "states": {
+   "1": {
+    "w": 69,
+    "h": 67,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_earth_piece1": {
+  "sha": "febb5639e093a80e",
+  "states": {
+   "1": {
+    "w": 41,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_earth_piece2": {
+  "sha": "2dd61058b8152d21",
+  "states": {
+   "1": {
+    "w": 39,
+    "h": 20,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_earth_piece3": {
+  "sha": "79d8a3bc5dbf554a",
+  "states": {
+   "1": {
+    "w": 16,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_earth_piece4": {
+  "sha": "1fdd096f1310624d",
+  "states": {
+   "1": {
+    "w": 24,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_earth_piece5": {
+  "sha": "4a29cf8a937c9da1",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 45,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_rock": {
+  "sha": "d3556c2bb16032b7",
+  "states": {
+   "1": {
+    "w": 69,
+    "h": 65,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_rock_piece1": {
+  "sha": "0f8093df6671301b",
+  "states": {
+   "1": {
+    "w": 32,
+    "h": 30,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_rock_piece2": {
+  "sha": "54c909a783757809",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_rock_piece3": {
+  "sha": "9bc15477db3fa7fb",
+  "states": {
+   "1": {
+    "w": 30,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_rock_piece4": {
+  "sha": "20fc4821d38507e8",
+  "states": {
+   "1": {
+    "w": 25,
+    "h": 48,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_rock_piece5": {
+  "sha": "db206b7fa8b90929",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_wood": {
+  "sha": "ace4b23ef379eb6b",
+  "states": {
+   "1": {
+    "w": 69,
+    "h": 68,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_wood_piece1": {
+  "sha": "f6a0305073f2815e",
+  "states": {
+   "1": {
+    "w": 40,
+    "h": 27,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_wood_piece2": {
+  "sha": "0fa987d3250440e1",
+  "states": {
+   "1": {
+    "w": 41,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_wood_piece3": {
+  "sha": "aa5104f126f696b0",
+  "states": {
+   "1": {
+    "w": 27,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_wood_piece4": {
+  "sha": "e73b0aa00398866a",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 29,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trophy_street_creator_wood_piece5": {
+  "sha": "226f9f2b43392863",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "trump_rub": {
+  "sha": "2f1ccae0a89205cf",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "turmeric": {
+  "sha": "efde27120f3c1c83",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 12,
+    "dx": -1,
+    "lift": 0
+   },
+   "2": {
+    "w": 43,
+    "h": 16,
+    "dx": -1,
+    "lift": 0
+   },
+   "3": {
+    "w": 49,
+    "h": 16,
+    "dx": -1,
+    "lift": 0
+   },
+   "4": {
+    "w": 49,
+    "h": 17,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "upgrade_card_craftybot_lesson": {
+  "sha": "45022cec187d0c09",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 15,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "upgrade_card_instant_resurrection": {
+  "sha": "110bfd1dda2e6e75",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 38,
+    "h": 15,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "upgrade_card_reshuffle": {
+  "sha": "2ba3d91b90b59a84",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 11,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 45,
+    "h": 12,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 16,
+    "dx": -1,
+    "lift": 0
+   }
+  }
+ },
+ "urfu": {
+  "sha": "a39a427b00b949a3",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "vegmageddon": {
+  "sha": "d12db53ac9b11046",
+  "states": {
+   "1": {
+    "w": 28,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "waffles": {
+  "sha": "8b18654588efca1e",
+  "states": {
+   "1": {
+    "w": 38,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 51,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 44,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 44,
+    "h": 34,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "wall_segment": {
+  "sha": "f09b9acf7f9c0bf5",
+  "states": {
+   "1": {
+    "w": 161,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "watering_can": {
+  "sha": "fe5d9e20a59d3ade",
+  "states": {
+   "1": {
+    "w": 53,
+    "h": 44,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "wavy_gravy": {
+  "sha": "0c0377309139c543",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 34,
+    "h": 35,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 43,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 43,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "white_gas": {
+  "sha": "8603da0502f4899a",
+  "states": {
+   "1": {
+    "w": 29,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 44,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 52,
+    "h": 40,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 52,
+    "h": 43,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "whortleberry": {
+  "sha": "4f24ddaba376bc88",
+  "states": {
+   "1": {
+    "w": 14,
+    "h": 13,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 24,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 29,
+    "h": 18,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 30,
+    "h": 23,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "whortleberry_jelly": {
+  "sha": "d0192b25275eb26f",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 33,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 31,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 38,
+    "h": 38,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 38,
+    "h": 42,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "wicked_bolognese_sauce": {
+  "sha": "6fb6114ff34b54cb",
+  "states": {
+   "1": {
+    "w": 20,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 34,
+    "h": 36,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 44,
+    "h": 37,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 44,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "wine_of_the_dead": {
+  "sha": "0c6297c90bfec8d1",
+  "states": {
+   "1": {
+    "w": 18,
+    "h": 59,
+    "dx": 2,
+    "lift": 0
+   },
+   "2": {
+    "w": 31,
+    "h": 66,
+    "dx": 1,
+    "lift": -1
+   },
+   "3": {
+    "w": 42,
+    "h": 68,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 42,
+    "h": 78,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "wood_post": {
+  "sha": "ab7b5df361f6339c",
+  "states": {
+   "1": {
+    "w": 72,
+    "h": 41,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "woodworker_chassis": {
+  "sha": "17ae065672a7e9a4",
+  "states": {
+   "1": {
+    "w": 132,
+    "h": 110,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "woodworker_fuser": {
+  "sha": "102903d368a1fb93",
+  "states": {
+   "1": {
+    "w": 115,
+    "h": 78,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "yellow_crumb_flower": {
+  "sha": "2ec2c8c3c84898d9",
+  "states": {
+   "1": {
+    "w": 49,
+    "h": 25,
+    "dx": 0,
+    "lift": -5
+   },
+   "2": {
+    "w": 65,
+    "h": 30,
+    "dx": 0,
+    "lift": -5
+   },
+   "3": {
+    "w": 65,
+    "h": 34,
+    "dx": 0,
+    "lift": -5
+   },
+   "4": {
+    "w": 65,
+    "h": 35,
+    "dx": 0,
+    "lift": -5
+   }
+  }
+ },
+ "your_papers": {
+  "sha": "bfaa6585d562ac7f",
+  "states": {
+   "1": {
+    "w": 65,
+    "h": 14,
+    "dx": 1,
+    "lift": 0
+   }
+  }
+ },
+ "yummy_gruel": {
+  "sha": "c303d9ca8612d014",
+  "states": {
+   "1": {
+    "w": 36,
+    "h": 19,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 36,
+    "h": 26,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 36,
+    "h": 32,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 37,
+    "h": 39,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "zillene": {
+  "sha": "fc821cba1d0998e0",
+  "states": {
+   "1": {
+    "w": 19,
+    "h": 21,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ },
+ "zucchini": {
+  "sha": "4ec046c5d013e1fb",
+  "states": {
+   "1": {
+    "w": 41,
+    "h": 17,
+    "dx": 0,
+    "lift": 0
+   },
+   "2": {
+    "w": 58,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "3": {
+    "w": 64,
+    "h": 25,
+    "dx": 0,
+    "lift": 0
+   },
+   "4": {
+    "w": 64,
+    "h": 28,
+    "dx": 0,
+    "lift": 0
+   }
+  }
+ }
+}

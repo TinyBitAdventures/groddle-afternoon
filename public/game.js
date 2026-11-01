@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=30c75cfd';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d094eb6e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f5076396';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -914,6 +914,7 @@ import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc'
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=34ae15ae';
 import { installHeldKeyGuard } from './js/held-keys.js?v=98b96620';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
+import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=f9ece277';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=6f548fd1';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d51e';
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=3753a0d2';
@@ -11614,11 +11615,29 @@ function spawnMusicblockDrop(point, exactPlacement = false) {
 function sizeDroppedItemSprite(spr) {
   // The load callback can land after a refresh destroyed this sprite.
   if (!spr || spr.destroyed) return;
+  // World art (js/world-art.js) is drawn at its own size, as the original drew a stack's SWF.
+  if (spr.worldArt) {
+    spr.baseScale = 1;
+    spr.scale.set(1);
+    placeDroppedCount(spr, spr.worldArt.w, spr.worldArt.h);
+    return;
+  }
+  // A class with no world art: its pack icon at the size a put-down stack has.
   const width = Math.max(1, spr.texture?.orig?.width || spr.texture?.width || 36);
   const height = Math.max(1, spr.texture?.orig?.height || spr.texture?.height || 36);
-  const scale = Math.min(1.25, 48 / Math.max(width, height));
+  const scale = Math.min(1, WORLD_ART_FALLBACK_MAX / Math.max(width, height));
   spr.baseScale = scale;
   spr.scale.set(scale);
+  placeDroppedCount(spr, width * scale, height * scale);
+}
+
+/** A stack's count badge at its art's top right corner (sprite-local units). */
+function placeDroppedCount(spr, w, h) {
+  const badge = spr.countBadge;
+  if (!badge || badge.destroyed) return;
+  const s = spr.scale.x || 1;
+  badge.position.set((w / 2 + 2) / s, (-h + 2) / s);
+  badge.scale.set(1 / s);
 }
 
 /** Render one persistent street stack using its official iconic item art. */
@@ -11627,9 +11646,30 @@ function spawnDroppedItemStack(stack) {
     label: stack.classTsid.replace(/_/g, ' '),
     icon: `assets/sprites/icons/${stack.classTsid}.png`,
   };
-  const spr = new PIXI.Sprite(textureFromUrl(item.icon || `assets/sprites/icons/${stack.classTsid}.png`));
+  // The state the original showed for a put-down stack (its count's scene, not the pack icon),
+  // at its own size, resting on its point and lying still (js/world-art.js).
+  const worldArt = worldArtFor(stack.classTsid, stack.count, item.icon);
+  const spr = new PIXI.Sprite(textureFromUrl(worldArt?.url || item.icon || `assets/sprites/icons/${stack.classTsid}.png`));
   spr.label = 'world-item-stack';
   spr.anchor.set(0.5, 1);
+  spr.worldArt = worldArt;
+  if (stack.count > 1) {
+    const badge = new PIXI.Container();
+    badge.eventMode = 'none';
+    const ring = new PIXI.Graphics();
+    ring.circle(0, 0, 9).fill({ color: 0x3b352d, alpha: 0.9 }).stroke({ width: 1, color: 0xfff7e6, alpha: 0.9 });
+    const count = new PIXI.Text({ text: String(stack.count), style: {
+      fontFamily: 'Trebuchet MS, sans-serif',
+      fontSize: 11,
+      fontWeight: '800',
+      fill: 0xffffff,
+      align: 'center',
+    } });
+    count.anchor.set(0.5);
+    badge.addChild(ring, count);
+    spr.countBadge = badge;
+    spr.addChild(badge);
+  }
   sizeDroppedItemSprite(spr);
   if (!isLoaded(spr.texture?.source)) {
     onLoaded(spr.texture?.source, () => sizeDroppedItemSprite(spr));
@@ -11640,24 +11680,6 @@ function spawnDroppedItemStack(stack) {
   // Dropped stacks must stay legible in front of large vendors/gardens at crowded spawns.
   spr.zIndex = itemZ(stack.classTsid, 12);
   spr.worldItemId = stack.id;
-  spr.bob = (stack.id.match(/(\d+)$/)?.[1] || 0) * 0.7;
-
-  if (stack.count > 1) {
-    const badge = new PIXI.Graphics();
-    badge.circle(16, -33, 10).fill({ color: 0x3b352d, alpha: 0.9 }).stroke({ width: 1, color: 0xfff7e6, alpha: 0.9 });
-    badge.eventMode = 'none';
-    const count = new PIXI.Text({ text: String(stack.count), style: {
-      fontFamily: 'Trebuchet MS, sans-serif',
-      fontSize: 12,
-      fontWeight: '800',
-      fill: 0xffffff,
-      align: 'center',
-    } });
-    count.anchor.set(0.5);
-    count.position.set(16, -33);
-    count.eventMode = 'none';
-    spr.addChild(badge, count);
-  }
 
   entityLayer.addChild(spr);
   droppedItemSprites.push(spr);
@@ -12806,11 +12828,6 @@ function physics(dt) {
     a.bob = (a.bob || 0) + 0.05 * dt;
     if (!a._baseY) a._baseY = a.y;
     a.y = a._baseY + Math.sin(a.bob) * 3;
-  }
-
-  for (const stack of droppedItemSprites) {
-    stack.bob = (stack.bob || 0) + 0.025 * dt;
-    stack.y = stack.baseY + Math.sin(stack.bob) * 1.8;
   }
 
   for (const q of quoins) {

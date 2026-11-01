@@ -142,7 +142,7 @@ export async function build() {
       if (surface) row.platY = surface;
       if (a && swf) {
         // G448: rendered at 3x (tools/furniture-upgrades/render.py ZOOM).
-        row.art = { path: `${ART_DIR}/${cls}/${id}@3x.webp`, w: a.w, h: a.h };
+        row.art = { path: `${ART_DIR}/${cls}/${id}@3x.webp`, w: a.w, h: a.h, ...(Number.isFinite(a.foot) ? { foot: a.foot } : {}) };
         counts.withArt += 1;
       } else {
         missingArt.push({ key, swf: swfName(u.swf), why: swf ? 'not rendered yet' : 'no SWF in glitch-items' });
@@ -170,7 +170,9 @@ function render({ classes, counts, missingArt, leftOut }) {
  *   row.name / credits (0 = free) / visible / subscriberOnly / isNew are the
  *   catalog's name, credits_cost, is_visible, subscriber_only, is_new;
  *   row.platY is the highest catalog plat over the piece's middle (where
- *   tabletop decor rests), row.art the rendered frame ({ path, w, h } at 1x).
+ *   tabletop decor rests, measured from the SWF stage's bottom centre), row.art
+ *   the rendered frame ({ path, w, h } at 1x, and foot: how far the art's bottom
+ *   sits above that point, tools/furniture-upgrades/render.py --feet).
  */
 
 export const FURNITURE_UPGRADES = Object.freeze(${json(classes)});
