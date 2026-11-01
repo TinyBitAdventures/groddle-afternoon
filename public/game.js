@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6fc15d1b';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b351d7cb';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=963cb9bd';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9944b93d';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -458,11 +458,11 @@ import {
   addItem,
   removeItem,
   isToolItem,
-} from './js/inventory.js?v=91ee49cd';
+} from './js/inventory.js?v=b0e33301';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=44e00ce9';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=9b23e21a';
-import { listAnimalFeedOptions } from './js/animals.js?v=378af814';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=378af814';
+import { listAnimalFeedOptions } from './js/animals.js?v=24533b10';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=24533b10';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -473,13 +473,13 @@ import {
   pickupDroppedStack,
   placeDroppedBag,
   takeDroppedRecord,
-} from './js/world-items.js?v=908b061e';
+} from './js/world-items.js?v=4ed49084';
 import {
   createPlayerSave,
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=fbb276ec';
+} from './js/player-save.js?v=39b6973f';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -491,7 +491,7 @@ import {
   leaveHomeInterior,
   imagineHome,
 } from './js/homes.js?v=385f9a1a';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=0e6d825a';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=dd702301';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -549,7 +549,7 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=ea3f10b5';
+} from './js/making.js?v=20d5364b';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=0fb7a5ca';
 import {
@@ -576,7 +576,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=d605b654';
+} from './js/garden.js?v=854d4730';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=05651e76';
 import {
   ROCK_CATALOG,
@@ -589,7 +589,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=e356fe60';
+} from './js/mining.js?v=4806e3e8';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -649,7 +649,7 @@ import {
   canEatFood,
   recordFoodEat,
   resetFoodDay,
-} from './js/food.js?v=b2727d97';
+} from './js/food.js?v=7f71894f';
 import {
   consumeTakesCount,
   consumeCountCap,
@@ -659,7 +659,7 @@ import {
   limitCountCap,
   useItemMany,
   recordFoodEatMany,
-} from './js/eat-many.js?v=c45c74c0';
+} from './js/eat-many.js?v=622a2fbe';
 import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
@@ -732,7 +732,7 @@ import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=33ad1926';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoalX } from './js/walk-over.js?v=db80ba07';
-import { isInHell } from './js/hell.js?v=eb2a5cc4';
+import { isInHell } from './js/hell.js?v=d9afd81b';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=0b81a3e4';
@@ -769,7 +769,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=baadf1e1';
+} from './js/musicblocks.js?v=da091c51';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -780,12 +780,12 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=01acb225';
+} from './js/vendor.js?v=c2fc9ac0';
 import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=378af814';
+} from './js/animals.js?v=24533b10';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -814,7 +814,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=050c3b2b';
+} from './js/shrines.js?v=99cbf9a3';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=279a153b';
 import {
   GAMESHOW_TICKET_ID,
@@ -825,7 +825,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=a5793b2b';
+} from './js/spinning-wheel.js?v=c25f2a97';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -834,7 +834,7 @@ import {
   ensureCubimalItems,
   openCubimalPackage,
   setCubimalFree,
-} from './js/cubimals.js?v=e6166d7f';
+} from './js/cubimals.js?v=efe75c51';
 import {
   STOOT_DOLL_BUBBLE_MS,
   STOOT_DOLL_ID,
@@ -884,7 +884,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=7fbae08d';
-import { easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=e59f12ba';
+import { easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=7b80b1ee';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=d62791a6';
 import {
   actionLoopFor,
@@ -4574,6 +4574,7 @@ function renderPackRow(box, slots, opts = {}) {
         slot.classList.remove('is-dragging');
         document.getElementById('vendor-sell-drop')?.classList.remove('is-dragover');
         document.querySelectorAll('.pack-bar .is-drop-target').forEach((el) => el.classList.remove('is-drop-target'));
+        if (packBarHeld) renderPackBar();
       });
     }
     box.appendChild(slot);
@@ -4603,6 +4604,8 @@ function packRowSignature(slots, opts) {
 
 /** G152: the stack being dragged inside the pack ({ container, index, cls, bag }). */
 let packDrag = null;
+/** A pack redraw skipped while a stack was being dragged (renderPackBar): the drag's end draws it. */
+let packBarHeld = false;
 
 /** G152 (inc_rewards.js:66-93): what the magic rock holds for you while the pack is full. */
 function packRockChip(rock) {
@@ -4662,14 +4665,18 @@ function renderOpenBagRow(layout, openKey) {
   const box = openKey ? layout?.bags?.[openKey] : null;
   const bagEl = box ? document.querySelector(`.pack-slot[data-pack-bag="${box.key}"]`) : null;
   const free = box ? Math.max(0, box.capacity - box.slots.length) : 0;
+  const entries = box ? box.slots.map((slot, i) => packLayoutEntry(slot, box.key, i, layout, openKey)) : [];
+  const rowOpts = { emptyCount: box?.slots.length ? free : 0, fillEmpty: true, ghost: true, container: box?.key || '' };
   const tray = packRow.drawTray(box && {
     key: box.key,
     label: box.label,
     icon: itemIconUrl(box.cls),
     used: box.slots.length,
     capacity: box.capacity,
-    // The same bag with the same stacks keeps its tray as it is (updateHud runs about once a second).
-    sig: JSON.stringify([box.key, box.label, box.capacity, box.slots.map((x) => [x.cls, x.count])]),
+    // The same bag drawing the same stacks keeps its tray as it is (updateHud runs about once a second).
+    // Its stacks' part is the row's own signature (packRowSignature): a tool's wear, a break or a repair,
+    // a name, a bag inside it redraw it too (Austin 2026-11-01: a repair showed only after a close and open).
+    sig: JSON.stringify([box.key, box.label, box.capacity, packRowSignature(entries, rowOpts)]),
     cells: box.slots.length + (free && box.slots.length ? 1 : 0),
     // PackSlot.as:310-313: the opener strip's Options, here a button in the tray's head.
     optionsLabel: PACK_COPY.options,
@@ -4679,14 +4686,7 @@ function renderOpenBagRow(layout, openKey) {
     },
     onClose: () => closePackTray({ focusBag: true }),
   });
-  if (tray?.slots) {
-    renderPackRow(tray.slots, box.slots.map((slot, i) => packLayoutEntry(slot, box.key, i, layout, openKey)), {
-      emptyCount: box.slots.length ? free : 0,
-      fillEmpty: true,
-      ghost: true,
-      container: box.key,
-    });
-  }
+  if (tray?.slots) renderPackRow(tray.slots, entries, rowOpts);
   if (tray) packRow.settleTray(tray, bagEl, { focusOnOpen: packTrayFocusOnOpen });
   packTrayFocusOnOpen = false;
 }
@@ -4753,6 +4753,12 @@ function setupPackDrops() {
  * A search lists the matching stacks from the pack and from inside every bag.
  */
 function renderPackBar() {
+  // A stack being dragged keeps its button (a redraw would end the drag): the drop or the drag's end draws.
+  if (packDrag || vendorDragTsid) {
+    packBarHeld = true;
+    return;
+  }
+  packBarHeld = false;
   syncEmotionalBearCatalog();
   const bagsBox = document.getElementById('pack-bags');
   const itemsBox = document.getElementById('pack-items');
@@ -4907,11 +4913,13 @@ function typingIn(panelId) {
 /**
  * Open panels that show pack counts follow the pack (player report 2026-11-01): the Make
  * panel's "you have" and how many, the vendor's sell counts, the shrine's donate counts and
- * every feature panel through the `packChanged` hook (street projects). Each redraws only
- * when the stamp it was drawn with is out of date, never mid-craft or over a Make result.
+ * every feature panel through the `packChanged` hook (street projects, whose Work needs a
+ * working tool). Each redraws only when the stamp it was drawn with (counts, currants, energy
+ * and every tool's wear) is out of date, never mid-craft or over a Make result. The pack row
+ * and the open bag follow their own signature (packRowSignature) in renderPackBar.
  */
 function refreshPackPanels() {
-  const stamp = packStamp(inv, pc);
+  const stamp = packStamp(inv, pc, toolState);
   if (isMakeOpen() && packPanelStamps.make !== stamp && !activeCraftSession &&
       document.getElementById('make-result')?.hidden !== false && !typingIn('make-panel')) renderMakePanel();
   if (isVendorOpen() && packPanelStamps.vendor !== stamp && !typingIn('vendor-panel')) renderVendorList();
@@ -24506,7 +24514,7 @@ function renderMakePanel() {
     renderMakeProgressStage(activeCraftSession);
     return;
   }
-  packPanelStamps.make = packStamp(inv, pc);
+  packPanelStamps.make = packStamp(inv, pc, toolState);
   ensureMakingItems();
   // Recipe browser path — hide progress/result overlays
   clearMakeFeedback();
@@ -24862,7 +24870,7 @@ function renderShrinePanel() {
   const giantId = activeShrineTarget?.state?.giantId;
   const giant = GIANTS[giantId];
   if (!panel || panel.hidden || !giant) return;
-  packPanelStamps.shrine = packStamp(inv, pc);
+  packPanelStamps.shrine = packStamp(inv, pc, toolState);
   const favor = shrineState.favor[giantId] || 0;
   const cost = emblemCostFor(shrineState, giantId);
   const emblems = shrineState.emblems[giantId] || 0;
@@ -25346,7 +25354,7 @@ function renderVendorList() {
   const curEl = document.getElementById('vendor-currants');
   if (curEl) curEl.textContent = String(pc.currants || 0);
   if (!list) return;
-  packPanelStamps.vendor = packStamp(inv, pc);
+  packPanelStamps.vendor = packStamp(inv, pc, toolState);
   renderVendorDropZone();
 
   // MPANELS: in the modern skin the count is a popover over the shelf, by the tile it was asked from.
@@ -28551,7 +28559,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=534be670').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=b66dc06a').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // Loading card QA (js/loading-card-qa.js): ?loadcarddemo=<tsid>[,<tsid>].
   if (new URLSearchParams(location.search).has('loadcarddemo')) {

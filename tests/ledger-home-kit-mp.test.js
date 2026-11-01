@@ -28,7 +28,7 @@ import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { FURNITURE_STARTER_KIT } from '../public/js/homes-catalog.js?v=29713fa8';
 import { arrangeStarterRoom, createHomeDecorState, grantStarterKit } from '../public/js/home-decor.js?v=d03413ec';
 import { takeFromHouse } from '../public/js/ledger-house.js?v=258ef99e';
-import { applyCorrection } from '../public/js/features/ledger-feature.js?v=fb97c50f';
+import { applyCorrection } from '../public/js/features/ledger-feature.js?v=41769b24';
 
 const root = join(import.meta.dirname, '..');
 const hasPhp = spawnSync('php', ['-v']).status === 0;

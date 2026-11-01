@@ -30,9 +30,9 @@
  * daily limit leaves (limitCountCap; the feature runs its rule for each one).
  */
 
-import { ITEM_CATALOG, countItem, getItemUseInfo, removeItem, useItem } from './inventory.js?v=91ee49cd';
+import { ITEM_CATALOG, countItem, getItemUseInfo, removeItem, useItem } from './inventory.js?v=b0e33301';
 import { loseEnergy, loseMood, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
-import { quoteFoodVarietyBonus, foodFullness } from './food.js?v=b2727d97';
+import { quoteFoodVarietyBonus, foodFullness } from './food.js?v=7f71894f';
 
 /**
  * Eat and drink verbs marked "is_single": 1 in GSJS items/*.js (verbs.eat:

@@ -53,7 +53,7 @@
  *   cubimalStep, cubimalInPack.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=91ee49cd';
+import { addItem, countItem, removeItem } from '../inventory.js?v=b0e33301';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=5b6e1c8d';
 import { playPoofIn, poofInAlpha } from '../overlay-art.js?v=3753a0d2';
@@ -76,7 +76,7 @@ import {
   isCubimal,
   nameCubimal,
   rollCubimalRace,
-} from '../cubimals.js?v=e6166d7f';
+} from '../cubimals.js?v=efe75c51';
 
 export const CUBIMAL_RACE_FEATURE_ID = 'cubimal-race';
 const DEMO_DEFAULT = 'npc_cubimal_chick';

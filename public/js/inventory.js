@@ -367,18 +367,27 @@ export function countItem(inv, classTsid) {
 
 /**
  * A short fingerprint of what an open panel may show from the pack: every
- * non-zero count, the currants and the whole energy. Panels that list "you
- * have N" keep the stamp they were drawn with and redraw when it changes, so
- * they follow the pack while they stay open (player report 2026-11-01: the
- * street project panel kept "you have 2" after two more were made).
+ * non-zero count, the currants, the whole energy and, given the tool state
+ * (js/tools.js), every tool's wear. Panels that list "you have N" keep the
+ * stamp they were drawn with and redraw when it changes, so they follow the
+ * pack while they stay open (player report 2026-11-01: the street project
+ * panel kept "you have 2" after two more were made). Wear changes without a
+ * count changing (a use, a break, a repair: Austin 2026-11-01), and a panel's
+ * Work or Make can hang on a working tool.
  */
-export function packStamp(inv, pc = {}) {
+export function packStamp(inv, pc = {}, toolState = null) {
   let s = '';
   for (const k in inv || {}) {
     const n = inv[k];
     if (n) s += `${k}:${n},`;
   }
-  return `${s}|${Number(pc?.currants) || 0}|${Math.floor(Number(pc?.energy) || 0)}`;
+  let wear = '';
+  const rows = toolState?.condition;
+  for (const k in rows || {}) {
+    const copies = rows[k]?.copies;
+    if (Array.isArray(copies) && copies.length) wear += `${k}:${copies.join('.')},`;
+  }
+  return `${s}|${Number(pc?.currants) || 0}|${Math.floor(Number(pc?.energy) || 0)}|${wear}`;
 }
 
 /**

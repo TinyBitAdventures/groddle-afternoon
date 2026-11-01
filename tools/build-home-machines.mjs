@@ -28,9 +28,9 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'home-machines.json');
 
 export async function homeMachinesJson() {
-  const hm = await import('../public/js/home-machines.js?v=70f5c2fe');
-  const { MACHINE_SKILLS } = await import('../public/js/machine-rooms.js?v=b37e9a73');
-  const { FRESH_FUEL, MACHINE_IDS } = await import('../public/js/machines.js?v=b5f892f6');
+  const hm = await import('../public/js/home-machines.js?v=c28c47c9');
+  const { MACHINE_SKILLS } = await import('../public/js/machine-rooms.js?v=1e082003');
+  const { FRESH_FUEL, MACHINE_IDS } = await import('../public/js/machines.js?v=0641eeaa');
   const decor = await import('../public/js/home-decor.js?v=d03413ec');
   const { HOME_LIMITS } = await import('../public/js/homes-catalog.js?v=29713fa8');
   const tower = decor.interiorBounds({ layout: 'tower' });

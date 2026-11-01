@@ -108,7 +108,7 @@ import {
 } from '../quest-offers.js?v=fe9fb524';
 import { parseQuestConversation } from '../quests.js?v=282e1621';
 import { questRequirementText, renderQuestText, withQuestMarkup } from '../quest-text.js?v=7f5d761c';
-import { addItem, removeItem, countItem } from '../inventory.js?v=91ee49cd';
+import { addItem, removeItem, countItem } from '../inventory.js?v=b0e33301';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 
 const OFFER_CHECK_MS = 30_000;

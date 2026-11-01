@@ -29,8 +29,8 @@
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=670c3a7f';
-import { VENDOR_PROFILES } from '../vendor.js?v=01acb225';
-import { addItem, countItem, removeItem } from '../inventory.js?v=91ee49cd';
+import { VENDOR_PROFILES } from '../vendor.js?v=c2fc9ac0';
+import { addItem, countItem, removeItem } from '../inventory.js?v=b0e33301';
 import { parseQuestConversation } from '../quests.js?v=282e1621';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import {

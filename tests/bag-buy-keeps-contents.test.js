@@ -29,11 +29,11 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { ITEM_CATALOG, addItem, isToolItem } from '../public/js/inventory.js?v=91ee49cd';
+import { ITEM_CATALOG, addItem, isToolItem } from '../public/js/inventory.js?v=b0e33301';
 import { BAG_DEFS, PACK_CAPACITY, PACK_COPY, arrangeIntoBags, bagAccepts, layoutPack, moveStack, roomFor } from '../public/js/pack-slots.js?v=44e00ce9';
 import { TOOL_CLASSES } from '../public/js/pack-slots-data.js?v=330c51e4';
-import { vendorBuy } from '../public/js/vendor.js?v=01acb225';
-import { applyStarter, bagsFeature } from '../public/js/features/bags-feature.js?v=49d1e351';
+import { vendorBuy } from '../public/js/vendor.js?v=c2fc9ac0';
+import { applyStarter, bagsFeature } from '../public/js/features/bags-feature.js?v=4f96217c';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');

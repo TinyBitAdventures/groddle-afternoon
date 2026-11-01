@@ -28,7 +28,7 @@
  *     data-supply-permits).
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=91ee49cd';
+import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=b0e33301';
 import { getToolCondition } from '../tools.js?v=3d109172';
 import {
   MACHINE_ASSEMBLIES,
@@ -51,8 +51,8 @@ import {
   refuelMachine,
   stillEtaSeconds,
   stillRoom,
-} from '../machines.js?v=b5f892f6';
-import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform } from '../item-transforms.js?v=bb866d2c';
+} from '../machines.js?v=0641eeaa';
+import { HERB_SEEDS, ITEM_TRANSFORMS, listTransformVerbs, runTransform } from '../item-transforms.js?v=323734c2';
 import {
   BUREAUCRACY_ITEMS,
   HALL_STREETS,
@@ -61,7 +61,7 @@ import {
   clerkOffers,
   completePapers,
   completePapersCheck,
-} from '../bureaucracy.js?v=c656af7a';
+} from '../bureaucracy.js?v=03a4f7d3';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=db2ce452';
 import { setMetalMakingMusic } from '../sound-moments.js?v=2f8597cd';
 import { itemZ } from '../item-bands.js?v=e98b10bc';

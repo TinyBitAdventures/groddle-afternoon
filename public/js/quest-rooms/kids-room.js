@@ -30,7 +30,7 @@
  */
 
 import { applyRewards } from '../quests.js?v=282e1621';
-import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=91ee49cd';
+import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=b0e33301';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=db2ce452';
 import { playPoofIn } from '../overlay-art.js?v=3753a0d2';
 import { KIDS_ROOM_FLOOR, KIDS_ROOM_H, KIDS_ROOM_W, buildKidsRoomScene } from '../kids-room-scene.js?v=cfe30938';

@@ -71,22 +71,22 @@ import {
   setStreetEcologyCatalog,
   streetReservedSpots,
 } from '../public/js/street-ecology.js?v=7fbae08d';
-import { ROCK_CATALOG } from '../public/js/mining.js?v=e356fe60';
+import { ROCK_CATALOG } from '../public/js/mining.js?v=4806e3e8';
 import { MEGA_ROCK_CHANCE, MEGA_ROCK_CHUNKS } from '../public/js/imagination-effects.js?v=70169933';
-import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=a08218e0';
+import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=4f48fd75';
 import { ARBOROLOGY_HARVEST, TRANT_META } from '../public/js/trants.js?v=9c2e8c0f';
 import { TRANT_CARE_PACKAGES } from '../public/js/trant-care.js?v=4084db6e';
 import { ANIMAL_KINSHIP_PACKAGES } from '../public/js/animal-kinship.js?v=3a50bfb2';
 import { locationIsDepressing } from '../public/js/animal-mood.js?v=a49495fc';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=9bc5044b';
-import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=762bbde9';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=8c1e247f';
+import { soilCountsForStreet, soilPlacementGroups } from '../public/js/features/patches-feature.js?v=25d3d145';
 import { kittyPlacementGroups } from '../public/js/features/heli-kitties-feature.js?v=0def544f';
-import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=bcf398cb';
+import { BATTERFLY_GROUP, batterflyPlacementGroups } from '../public/js/features/animal-husbandry-feature.js?v=84161aa3';
 import { hasRaceDispenser } from '../public/js/races.js?v=df0576ad';
 import { setWildlifeCatalog, wildlifeFor } from '../public/js/wildlife.js?v=670c3a7f';
 import { boardSpotRow, furnitureFor, furniturePlacementGroups } from '../public/js/street-furniture.js?v=171adb63';
-import { INCUBATION } from '../public/js/animal-husbandry.js?v=ed43845f';
-import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=aeef52c8';
+import { INCUBATION } from '../public/js/animal-husbandry.js?v=ef8ed409';
+import { SHARED_NODE_CLASSES, freshTreePlan } from '../public/js/street-objects.js?v=fa4c33c2';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

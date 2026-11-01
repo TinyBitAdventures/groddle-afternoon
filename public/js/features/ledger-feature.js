@@ -17,7 +17,7 @@
  * window.groddleLedger.corrections.
  */
 
-import { countItem, removeItem } from '../inventory.js?v=91ee49cd';
+import { countItem, removeItem } from '../inventory.js?v=b0e33301';
 import { LEDGER_CORRECTED_EVENT } from '../save-store.js?v=8839ba7b';
 
 export const LEDGER_FEATURE_ID = 'ledger';

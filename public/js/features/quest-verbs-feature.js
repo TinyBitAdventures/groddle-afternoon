@@ -21,7 +21,7 @@
  * (street_spirit_groceries and the rest), so they do not take one yet.
  */
 
-import { removeItem, countItem } from '../inventory.js?v=91ee49cd';
+import { removeItem, countItem } from '../inventory.js?v=b0e33301';
 
 export const QUEST_VERB_PREFIX = 'questverb_';
 export const SLATHER_QUEST = 'jellisachands_donate_jellisacs';

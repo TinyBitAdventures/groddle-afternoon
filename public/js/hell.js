@@ -45,7 +45,7 @@
  * }
  */
 
-import { ensureItem } from './inventory.js?v=91ee49cd';
+import { ensureItem } from './inventory.js?v=b0e33301';
 import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from './game-day.js?v=edb00566';
 
 export const HELL_STATE_VERSION = 1;
