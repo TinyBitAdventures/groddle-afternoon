@@ -4,7 +4,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createAnimalState } from '../public/js/animals.js?v=378af814';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=06fcdc1c';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=bddb3381';
 import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=b1503761';
 
 const TSID = 'GLI2HVHUM4F16B0'; // Pasha's Place, Groddle Forest: where Austin met it
@@ -33,7 +33,8 @@ function setup() {
     homeContext: () => ({ inHome: false }),
     busy: () => true,
     acting: () => false,
-    param: () => null,
+    // pigroot=off: these walks are timed without the rooting pauses (tests/piggies-walk-on.test.js has those).
+    param: (k) => (k === 'pigroot' ? 'off' : null),
     setData: () => {},
     say: () => {},
     save: () => {},

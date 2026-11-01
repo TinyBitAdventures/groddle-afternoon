@@ -21,7 +21,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createAnimalState } from '../public/js/animals.js?v=378af814';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=06fcdc1c';
+import { PIGGY_ROOTING, animalMoodFeature, piggyRootDelayMs } from '../public/js/features/animal-mood-feature.js?v=bddb3381';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=505d8990';
 import {
   ANIMAL_BODY,
@@ -51,14 +51,14 @@ const TSID = 'GLI3272LOTD1B1F'; // Groddle Forest Junction
 const BEAN = 3310; // its Bean Tree at 3310, 1112 (the realtime data's tree:1)
 const SCENERY = ['trees', 'gardens', 'vendor', 'shrine', 'rocks'];
 
-function street({ mode = 'solo', hunger = 6 } = {}) {
+function street({ mode = 'solo', hunger = 6, root = 'off', xs = [2962, 2700] } = {}) {
   const walk = [{ walk: true }];
   const sprite = (x, i) => ({
     x, y: 1083, vx: (i % 2 ? -1 : 1) * 0.45, baseX: x, range: 90, home: { x, range: 90 }, baseScale: 1,
     scale: { x: 1, y: 1 }, visible: true, destroyed: false, textures: walk, loop: true, playing: true, animationSpeed: 0.14,
     gotoAndPlay() { this.playing = true; }, gotoAndStop() { this.playing = false; }, play() { this.playing = true; },
   });
-  const pigs = [2962, 2700].map((x, i) => ({
+  const pigs = xs.map((x, i) => ({
     classId: 'npc_piggy', label: 'Piggy', classIndex: i, animalKey: `${TSID}:npc_piggy:${i}`,
     state: createAnimalState('npc_piggy', { hunger, mood: 1, hungerAt: Date.now() + 3_600_000 }), sprite: sprite(x, i),
   }));
@@ -69,7 +69,8 @@ function street({ mode = 'solo', hunger = 6 } = {}) {
     interactables: [...pigs, tree], droppedItems: { streets: {} }, textures: { piggyWalk: { frames: walk } },
     platforms: [], groundY: 1110, player: { x: 3250, y: 1110 }, pc: {}, inv: {}, camera: { x: 0, y: 0, w: 1280 },
     inScene: () => false, transientInstance: () => false, homeContext: () => ({ inHome: false }), busy: () => false,
-    acting: () => Boolean(at), actingOn: (t) => Boolean(at) && at === t, param: () => null, setData() {}, say() {}, save() {},
+    // pigroot=off: these walks are timed without the rooting pauses (they have their own tests below).
+    acting: () => Boolean(at), actingOn: (t) => Boolean(at) && at === t, param: (k) => (k === 'pigroot' && root ? root : null), setData() {}, say() {}, save() {},
     droppedItemsChanged() {}, streetSlot: () => ({}),
     query: (k) => (mode === 'multiplayer' && (k === 'sharedPiggy' || k === 'sharedPiggyAte') ? true : null),
   };
@@ -198,5 +199,95 @@ describe('every street\'s walking animals', () => {
     // crowded streets 64 walks still reach a tree, rock or stall (no clear floor left, and the
     // arrival point kept clear first); they walk past it, as the original's did.
     assert.ok(turnsIn <= 70, `walks reaching into scenery: ${turnsIn}`);
+  });
+});
+
+describe('Piggies root as they walk (Austin 2026-11-01; npc_piggy.js onRooting 1131-1160)', () => {
+  const realRandom = Math.random;
+  /** Each stop on its walk: when it began (s into the walk), how long, and which way it went before and after. */
+  function stopsOf(pig, run, seconds) {
+    const out = [];
+    let cur = null;
+    let lastDir = Math.sign(pig.sprite.vx);
+    let t = 0;
+    run(seconds, () => {
+      t += 1 / 60;
+      const s = pig.sprite;
+      const still = s.range < 10;
+      if (still && !cur) cur = { at: t, x: s.x, before: lastDir };
+      if (!still && cur) {
+        out.push({ ...cur, ms: Math.round((t - cur.at) * 1000), after: Math.sign(s.vx) });
+        cur = null;
+      }
+      if (!still) lastDir = Math.sign(s.vx);
+    });
+    return out;
+  }
+
+  it('waits randInt(3, 10) s on its walk (startMoving 1243)', () => {
+    assert.deepEqual([PIGGY_ROOTING.minS, PIGGY_ROOTING.maxS, PIGGY_ROOTING.lookChance], [3, 10, 0.3]);
+    assert.equal(piggyRootDelayMs(() => 0), 3000);
+    assert.equal(piggyRootDelayMs(() => 0.999), 10000);
+    assert.equal(piggyRootDelayMs(() => 0.5), 7000);
+  });
+
+  for (const mode of ['solo', 'multiplayer']) {
+    it(`looks at you for 5 s and walks on the same way, or sniffs for 3 s and turns round (${mode})`, () => {
+      try {
+        // 0: a 3 s wait and a look (0 < 0.3); 0.5: a 7 s wait and a sniff.
+        const rolls = [0, 0, 0.5, 0.5];
+        Math.random = () => (rolls.length ? rolls.shift() : 0.99);
+        animalMoodFeature.onStreetClear();
+        const { pigs, run } = street({ mode, hunger: 0, root: '', xs: [1500] });
+        const pig = pigs[0];
+        const stops = stopsOf(pig, run, 20);
+        assert.ok(stops.length >= 2, JSON.stringify(stops));
+        const [look, sniff] = stops;
+        assert.ok(Math.abs(look.at - 4) < 1.3, `first stop about 3 s after the first scan: ${look.at}`);
+        assert.ok(Math.abs(look.ms - PIGGY_ROOTING.lookMs) < 1200, `a look lasts 5 s: ${look.ms}`);
+        assert.equal(look.after, look.before, 'after a look it walks on the same way');
+        assert.ok(Math.abs(sniff.ms - PIGGY_ROOTING.sniffMs) < 1200, `a sniff lasts 3 s: ${sniff.ms}`);
+        assert.equal(sniff.after, -sniff.before, 'after a sniff it turns round (stopSniffing turnAround)');
+        assert.ok(Math.abs(pig.sprite.x - pig.sprite.home.x) <= 90.01, 'always on its own walk');
+      } finally {
+        Math.random = realRandom;
+      }
+    });
+  }
+
+  it('with rooting on, a Piggy never stands in the tree, both still eat beside it and walk home', () => {
+    try {
+      let seed = 7;
+      Math.random = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+      animalMoodFeature.onStreetClear();
+      const { engine, pigs, tree, run } = street({ root: '' });
+      run(1.2);
+      animalMoodFeature.onEvent('trant_bean:harvest', 1, engine);
+      const trunk = TREE_FOOTPRINT / 2 + ANIMAL_BODY.piggies / 2;
+      run(60, () => {
+        for (const p of pigs) {
+          const s = p.sprite;
+          // Standing still by the trunk is only its eat pause: beside the foot, never in it.
+          if (s.range < 10 && Math.abs(s.x - BEAN) < trunk - 7) assert.fail(`a Piggy stood in the tree at ${s.x}`);
+        }
+      });
+      assert.equal(tree.state.fruitCount, 7, 'both walked to the tree and ate');
+      // Let any rooting stop end, then each walks its own walk.
+      run(6);
+      for (const p of pigs) {
+        assert.ok(Math.abs(p.sprite.x - p.sprite.home.x) <= 90.01, `back on its walk: ${p.sprite.x}`);
+        if (p.sprite.range >= 10) assert.equal(p.sprite.baseX, p.sprite.home.x);
+      }
+    } finally {
+      Math.random = realRandom;
+    }
+  });
+
+  it('a Piggy you stand at roots no more until you leave it; a rooked or sulking one never roots', () => {
+    const src = readFileSync(join(root, 'public/js/features/animal-mood-feature.js'), 'utf8');
+    assert.match(src, /r\.mode === 'idle' && !isExtra\(target\) && !crowdHeld && !waiting && Number\(target\.sprite\.range\) >= HELD_RANGE_PX\n\s*&& rootingMode\(engine\) !== 'off' && !isRooked\(target, engine\) && !isCrowdSad\(target\.state, time\)/);
+    assert.match(src, /if \(time >= r\.rootUntil && !waiting && !crowdHeld\) endRoot\(engine, r\);/);
+    assert.match(src, /\(r\.mode === 'seek' \|\| r\.mode === 'eat' \|\| r\.mode === 'root'\) && isRooked\(target, engine\)/);
+    assert.match(src, /lookScreen: Object\.freeze\(\{ path: 'assets\/sprites\/npc_piggy__x1_look_screen_png_1354829434\.png', fw: 88, fh: 62, cols: 10, frames: 48 \}\)/);
   });
 });

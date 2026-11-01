@@ -91,6 +91,9 @@
  *   game's own new-day poll rolls the day (new-day screen, onNewDay) and
  *   they walk back. Canvas: animalCrowdLeft (ecology animals off this
  *   street), animalCrowdReturned, animalCrowdRespawn (armed|rolled).
+ *   Rooting (Austin 2026-11-01): &pigroot=look|sniff makes every walking street Piggy root
+ *   that way a second after each walk starts; &pigroot=off stops rooting. Canvas:
+ *   animalMoodRooting (Piggies rooting now), animalMoodLast (root:look | root:sniff).
  */
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
@@ -170,11 +173,31 @@ const PATROL_PX_S = 0.45 * 60;
 /** A patrol this short (a hold's 2 px) is a Piggy standing still. */
 const HELD_RANGE_PX = 10;
 
-/** OGA npc_piggy sheets (88×62 cells, measured): too_much_nibble 11×6 (65), chew 11×5 (53). */
+/**
+ * Rooting (Austin 2026-11-01; npc_piggy.js startMoving 1226-1245, onRooting 1131-1160,
+ * stopSniffing 1267-1271): with players on the street, a walking Piggy that is not going to food
+ * stops every randInt(3, 10) s (2 to 6 inside a Magic Pig Stick's limits: no street Piggy has
+ * one). Three times in ten it looks at the screen and walks on the same way after 5 s; else it
+ * sniffs for 3 s, turns round and walks on. A rooked or sad Piggy does not root. Its own street is
+ * always a player's here (the page only draws the street you are on), so it roots whenever it walks.
+ */
+export const PIGGY_ROOTING = Object.freeze({ minS: 3, maxS: 10, lookChance: 0.3, lookMs: 5000, sniffMs: 3000 });
+/** A Piggy about to root by a tree's trunk waits until it is clear of it (lane PIGSTUCK: never stands in a tree). */
+const ROOT_TREE_WAIT_MS = 400;
+
+/** randInt(low, high) seconds as the source's apiSetTimer('onRooting', randInt(low, high) * 1000). */
+export function piggyRootDelayMs(rng = Math.random) {
+  const { minS, maxS } = PIGGY_ROOTING;
+  return (minS + Math.floor(rng() * (maxS - minS + 1))) * 1000;
+}
+
+/** OGA npc_piggy sheets (88×62 cells, measured): too_much_nibble 11×6 (65), chew 11×5 (53), look_screen 10×5 (48). */
 export const PIGGY_MOOD_SHEETS = Object.freeze({
   tooMuchNibble: Object.freeze({ path: 'assets/sprites/npc_piggy__x1_too_much_nibble_png_1354829441.png', fw: 88, fh: 62, cols: 11, frames: 65 }),
   chew: Object.freeze({ path: 'assets/sprites/npc_piggy__x1_chew_png_1354829433.png', fw: 88, fh: 62, cols: 11, frames: 53 }),
   rooked2: Object.freeze({ path: 'assets/sprites/rooks/piggy-rooked2.png', fw: 88, fh: 62, cols: 8, frames: 24 }),
+  // onRooting's look_screen. Its sniff has no clip in the CC0 exports: the chew clip stands in.
+  lookScreen: Object.freeze({ path: 'assets/sprites/npc_piggy__x1_look_screen_png_1354829434.png', fw: 88, fh: 62, cols: 10, frames: 48 }),
 });
 
 /**
@@ -425,6 +448,56 @@ function playClip(engine, r, def, { loop = false, fps = 24, restore = true } = {
   return true;
 }
 
+/** The walk frames again, playing (after a clip that stopped on its last frame). */
+function walkAgain(engine, r) {
+  const spr = r.target.sprite;
+  if (!spr || spr.destroyed) return;
+  const walk = walkFrames(engine, r.target);
+  if (walk.length && typeof spr.gotoAndPlay === 'function') {
+    spr.textures = walk;
+    spr.loop = true;
+    spr.animationSpeed = 0.14;
+    spr.gotoAndPlay(0);
+  }
+  spr.onComplete = null;
+}
+
+function rootingMode(engine) {
+  const v = String(engine?.param?.('pigroot') || '');
+  return v === 'off' || v === 'look' || v === 'sniff' ? v : '';
+}
+
+/** A tree's trunk beside it: it roots once clear (TREE_STOP_PX, as a Piggy eating stops). */
+function byTrunk(engine, spr) {
+  return (engine.interactables || []).some((t) => TRANT_META[t?.classId] && t.sprite && !t.sprite.destroyed
+    && Math.abs(t.sprite.x - spr.x) < TREE_STOP_PX && Math.abs((t.sprite.y ?? spr.y) - spr.y) <= REACH_DY);
+}
+
+/** onRooting: stop, then look at the screen (30%) or sniff. */
+function startRoot(engine, r, time, rng = Math.random) {
+  const forced = rootingMode(engine);
+  const look = forced ? forced === 'look' : rng() < PIGGY_ROOTING.lookChance;
+  hold(engine, r);
+  r.mode = 'root';
+  r.rootKind = look ? 'look' : 'sniff';
+  r.rootUntil = time + (look ? PIGGY_ROOTING.lookMs : PIGGY_ROOTING.sniffMs);
+  // Played once: look_screen ends facing you and stays so until it walks on.
+  if (!playClip(engine, r, look ? PIGGY_MOOD_SHEETS.lookScreen : PIGGY_MOOD_SHEETS.chew, { restore: false })) standStill(engine, r);
+  lastEvent = `root:${r.rootKind}`;
+}
+
+/** startMoving after a look (the same way) or stopSniffing (sniff_end, turnAround). */
+function endRoot(engine, r) {
+  const spr = r.target.sprite;
+  const dir = Math.sign(Number(r.saved?.vx) || Number(spr?.vx) || 1) || 1;
+  const turn = r.rootKind === 'sniff';
+  r.rootKind = '';
+  r.nextRootAt = 0;
+  walkAgain(engine, r);
+  release(engine, r);
+  if (r.mode === 'idle' && spr && !spr.destroyed) spr.vx = (turn ? -dir : dir) * Math.abs(Number(spr.vx) || 0.45);
+}
+
 function say(engine, target, text, ms) {
   if (text) engine.say(target, text, ms);
 }
@@ -543,6 +616,10 @@ function canSeek(engine, r) {
 
 function startSeek(engine, r, food) {
   if (!food || !reachable(r.target.sprite, food.x, food.y)) return false;
+  // setMovingTo('food'): rooting stops (wait_rooting 0) and the walk to food plays its walk.
+  if (r.mode === 'root') walkAgain(engine, r);
+  r.rootKind = '';
+  r.nextRootAt = 0;
   hold(engine, r);
   r.mode = 'seek';
   r.food = food;
@@ -1296,6 +1373,7 @@ function publish(engine, force = false) {
   engine.setData('animalMoodDepressing', animalPlaceIsDepressing(engine) ? '1' : '0');
   engine.setData('animalMoodSad', String([...records.values()].filter((r) => r.mode === 'sad').length));
   engine.setData('animalMoodSeeking', String([...records.values()].filter((r) => r.mode === 'seek').length));
+  engine.setData('animalMoodRooting', String([...records.values()].filter((r) => r.mode === 'root').length));
   engine.setData('animalMoodCroaking', String(piggies.filter((p) => p.state.croaking).length));
   engine.setData('animalMoodPiggy', demo ? `${demo.state.mood}:${demo.state.hunger}` : '');
   // x:facing:mode of the demo piggy (facing from the sprite's sign; the sheets face right).
@@ -1373,9 +1451,13 @@ export const animalMoodFeature = {
       // only for a player at it (its menu, a verb on it), not while you harvest or dig elsewhere.
       const waiting = typeof engine.actingOn === 'function' ? engine.actingOn(target) : false;
       const crowdHeld = crowd.get(target)?.mode === 'sad' || crowd.get(target)?.mode === 'leaving';
-      if ((r.mode === 'seek' || r.mode === 'eat') && isRooked(target, engine)) {
+      // Rooting is only for a Piggy on its walk: anything else restarts its clock (setMovingTo).
+      if (r.mode !== 'idle' && r.mode !== 'root') r.nextRootAt = 0;
+      if ((r.mode === 'seek' || r.mode === 'eat' || r.mode === 'root') && isRooked(target, engine)) {
         // Rooked on the way to food: it stops there (include/rook.js fullStop 53-63) and the Rook
-        // feature holds it; a rooked animal goes after no food (npc_animal onContainerItemAdded 1394, 1419).
+        // feature holds it; a rooked animal goes after no food (npc_animal onContainerItemAdded 1394, 1419)
+        // and roots no more (onRooting 1132).
+        if (r.mode === 'root') walkAgain(engine, r);
         release(engine, r);
       } else if (r.mode === 'sad') {
         if (time >= r.nextSadAt) sadInterval(engine, r);
@@ -1385,6 +1467,17 @@ export const animalMoodFeature = {
       } else if (r.mode === 'home') {
         // A Rook or a sulk on the way home holds it there (include/rook.js fullStop 53-63).
         if (!waiting && !crowdHeld && !isRooked(target, engine)) stepHome(engine, r, dtMs);
+      } else if (r.mode === 'root') {
+        // A player at it or a sulk keeps it standing; then it walks on (startMoving, stopSniffing).
+        if (time >= r.rootUntil && !waiting && !crowdHeld) endRoot(engine, r);
+      } else if (r.mode === 'idle' && !isExtra(target) && !crowdHeld && !waiting && Number(target.sprite.range) >= HELD_RANGE_PX
+        && rootingMode(engine) !== 'off' && !isRooked(target, engine) && !isCrowdSad(target.state, time)) {
+        // startMoving 1229-1245: the next rooting, randInt(3, 10) s into the walk.
+        if (!r.nextRootAt) r.nextRootAt = time + (rootingMode(engine) ? 1000 : piggyRootDelayMs());
+        else if (time >= r.nextRootAt) {
+          if (byTrunk(engine, target.sprite)) r.nextRootAt = time + ROOT_TREE_WAIT_MS;
+          else startRoot(engine, r, time);
+        }
       } else if (r.mode === 'eat' && time >= r.holdUntil) {
         release(engine, r);
       } else if (r.mode === 'eat') {
