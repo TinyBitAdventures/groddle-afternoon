@@ -42,7 +42,7 @@
 
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=85d4faba';
 import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy, setToolRemaining, toolCopies } from '../tools.js?v=93286603';
-import { saveStore } from '../save-store.js?v=b74a8113';
+import { saveStore } from '../save-store.js?v=8839ba7b';
 import { playOverlay } from '../overlays.js?v=90f4b1ba';
 import {
   APPLIED_KEEP,
@@ -74,7 +74,7 @@ export const TRADE_VERB = 'trade_start';
 const SEND_DEBOUNCE_MS = 220;
 const LOG_LINES = 40;
 const TABLE_URL = 'assets/content/trade-items.json';
-const BLOCKED_SAVES = new Set(['conflict', 'signed-out', 'error', 'offline']);
+const BLOCKED_SAVES = new Set(['conflict', 'elsewhere', 'signed-out', 'error', 'offline']);
 
 /**
  * G329 trade requests (players/inc_requests.js, the realtime server's requests.go):

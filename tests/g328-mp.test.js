@@ -34,10 +34,10 @@ import {
   sharedHomeStreet,
   visitSceneTsid,
 } from '../public/js/neighbours-mp.js?v=31a75688';
-import { createMinnAccount } from '../public/js/minn-account.js?v=4323ed29';
-import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=3e1708d4';
-import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=ecf49fd5';
-import { FEATURES } from '../public/js/features/index.js?v=1fded83a';
+import { createMinnAccount } from '../public/js/minn-account.js?v=ea900c51';
+import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=3d0f38b4';
+import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=7caf24df';
+import { FEATURES } from '../public/js/features/index.js?v=cc102295';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

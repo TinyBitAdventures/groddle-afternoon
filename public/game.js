@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=55e0524d';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6d499ac2';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1fded83a';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=cc102295';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -459,8 +459,8 @@ import {
 } from './js/inventory.js?v=85d4faba';
 import { PACK_COPY, unitRankAt } from './js/pack-slots.js?v=00bca2cf';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=9b23e21a';
-import { listAnimalFeedOptions } from './js/animals.js?v=fc721127';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=fc721127';
+import { listAnimalFeedOptions } from './js/animals.js?v=cad23774';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=cad23774';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -475,7 +475,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=8039781d';
+} from './js/player-save.js?v=0fe47bc7';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -633,7 +633,7 @@ import {
   getGameDayKey,
   timestampForGameHour,
   msUntilNewDay,
-} from './js/game-day.js?v=3095e05b';
+} from './js/game-day.js?v=edb00566';
 import {
   FOOD_VARIETY_UPGRADE,
   createFoodState,
@@ -643,7 +643,7 @@ import {
   canEatFood,
   recordFoodEat,
   resetFoodDay,
-} from './js/food.js?v=f6c6d15b';
+} from './js/food.js?v=ea442e4f';
 import {
   consumeTakesCount,
   consumeCountCap,
@@ -653,7 +653,7 @@ import {
   limitCountCap,
   useItemMany,
   recordFoodEatMany,
-} from './js/eat-many.js?v=4faca8e6';
+} from './js/eat-many.js?v=51398590';
 import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
@@ -738,7 +738,7 @@ import {
   APPEARANCE_PRESETS,
   PRESET_GROUPS,
   appearanceCacheKey,
-} from './js/character-builder.js?v=96976c4c';
+} from './js/character-builder.js?v=1cb9713f';
 import { clearPresetActive, renderPresetGroups, renderStarterPicker } from './js/avatar-builder-ui.js?v=be72005c';
 import {
   loadAmbientMusicConfig,
@@ -761,7 +761,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=35e2b17a';
+} from './js/musicblocks.js?v=b597bd9d';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -777,7 +777,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=fc721127';
+} from './js/animals.js?v=cad23774';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -806,7 +806,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=01b185bc';
+} from './js/shrines.js?v=b6bbcdb5';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=bff50be4';
 import {
   GAMESHOW_TICKET_ID,
@@ -817,7 +817,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=be7fe558';
+} from './js/spinning-wheel.js?v=24711d2b';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -914,10 +914,10 @@ import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d5
 import { cancelAllOverlays, playPoofIn, setOverlayResolution } from './js/overlay-art.js?v=3753a0d2';
 import * as textureUrls from './js/textures.js?v=db2ce452';
 import { installPixiFixes } from './js/pixi-fixes.js?v=173fb649';
-import { hidesChatBubble } from './js/hi-signs.js?v=92c780ad';
+import { hidesChatBubble } from './js/hi-signs.js?v=b90c7d7e';
 // Multiplayer phase 1: the mode flag and the save interface every save read/write goes through.
 import { GAME_MODE, isSolo } from './js/game-mode.js?v=1ecf2899';
-import { saveStore } from './js/save-store.js?v=b74a8113';
+import { saveStore } from './js/save-store.js?v=8839ba7b';
 import { isNewMultiplayerPlayer, newPlayerInventory, newPlayerStats } from './js/new-player.js?v=553c5481';
 import { clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechBubbleOutline, speechOffsetFor } from './js/speech-placement.js?v=7e03b1b9';
 import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?v=3ceb8a8c';

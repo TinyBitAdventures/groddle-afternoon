@@ -32,7 +32,7 @@
  */
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
-import { getGameDayKey } from '../game-day.js?v=3095e05b';
+import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { canUseTool, useToolCondition } from '../tools.js?v=93286603';
 import {
   PAPER_CLASS,

@@ -32,7 +32,7 @@
  * profileAboutSaved (saved, failed).
  */
 
-import { createMinnAccount } from '../minn-account.js?v=4323ed29';
+import { createMinnAccount } from '../minn-account.js?v=ea900c51';
 import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-compositor.js?v=dcd906ae';
 import { drawListBounds } from '../avatar-rig.js?v=b67f0da8';
 import { lookKey, resolveLook } from '../avatar-looks.js?v=64fab53e';
@@ -92,7 +92,7 @@ async function load(s) {
 /** The character saves to the server (save-store.js data-save-state): not refused, signed out or failing. */
 function saving() {
   const st = document.documentElement?.dataset?.saveState;
-  return !['conflict', 'signed-out', 'error'].includes(st);
+  return !['conflict', 'elsewhere', 'signed-out', 'error'].includes(st);
 }
 
 /** The still and the tile of the player's look, as base64 PNGs, with its key. */

@@ -34,7 +34,7 @@ import {
   qurazyFoundToday,
   rollQurazy,
   rollQurazyDay,
-} from '../qurazy.js?v=62ae37a2';
+} from '../qurazy.js?v=ae135979';
 
 export const QURAZY_FEATURE_ID = 'qurazy';
 export const QURAZY_PLACEMENT_GROUP = 'qurazy';

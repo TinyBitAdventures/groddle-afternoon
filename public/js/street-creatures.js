@@ -28,8 +28,8 @@
  * the server keeps its own count of them too and refuses past the limit.
  */
 
-import { GAME_EPOCH_MS } from './game-day.js?v=3095e05b';
-import { INCUBATION } from './animal-husbandry.js?v=beead095';
+import { GAME_EPOCH_MS } from './game-day.js?v=edb00566';
+import { INCUBATION } from './animal-husbandry.js?v=d29cd364';
 
 export const CREATURE_KINDS = Object.freeze(['chicken', 'butterfly', 'batterfly']);
 

@@ -46,7 +46,7 @@
  */
 
 import { STREET_INDEX } from '../street-loader.js?v=390e4702';
-import { hellFeature } from './hell-feature.js?v=2d9958f9';
+import { hellFeature } from './hell-feature.js?v=07bf8d89';
 import {
   ROUTE_COLOR,
   ROUTE_COLOR_CSS,

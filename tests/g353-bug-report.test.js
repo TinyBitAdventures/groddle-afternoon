@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BUG_TEXT, MAX_MESSAGE, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=c92c8fe2';
-import { createMinnAccount } from '../public/js/minn-account.js?v=4323ed29';
+import { BUG_TEXT, MAX_MESSAGE, bugReportFeature, buildKey, rememberError, reportContext } from '../public/js/features/bug-report-feature.js?v=5ad38e84';
+import { createMinnAccount } from '../public/js/minn-account.js?v=ea900c51';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const siteDir = process.env.GRODDLE_SITE_DIR || join(root, '..', 'groddle-afternoon-site');

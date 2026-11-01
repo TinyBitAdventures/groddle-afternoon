@@ -106,8 +106,11 @@ describe('groddle/v1 on the live site', { skip: !LIVE && 'set GRODDLE_LIVE=1 to 
     b = player('mpb');
   });
   after(() => {
+    // Every wp_groddle_* row keyed to the throwaways (the save writes seed ledgers; the takeover check makes trades).
+    const cols = wp('db', 'query', '--skip-column-names', "SELECT CONCAT(table_name, ' ', column_name) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name LIKE 'wp\\_groddle\\_%' AND column_name REGEXP '(user_id|^a_id|^b_id|from_id|to_id|owner_id|holder_id|visitor_id|dropper_id|taker_id|buyer_id|seller_id|buddy_id|ignored_id)$'").split('\n').filter(Boolean);
     for (const p of [a, b].filter(Boolean)) {
-      wp('db', 'query', `DELETE FROM wp_groddle_mp_saves WHERE user_id = ${p.id}; DELETE FROM wp_groddle_solo_backups WHERE user_id = ${p.id}; DELETE FROM wp_groddle_players WHERE user_id = ${p.id}; DELETE FROM wp_groddle_signups WHERE user_id = ${p.id}`);
+      if (!(p.id > 1) || p.id === 54) continue;
+      wp('db', 'query', cols.map((l) => { const [t, c] = l.split(' '); return `DELETE FROM ${t} WHERE ${c} = ${p.id};`; }).join(' '));
       wp('user', 'delete', String(p.id), '--yes');
     }
     rmSync(dir, { recursive: true, force: true });
@@ -212,6 +215,64 @@ describe('groddle/v1 on the live site', { skip: !LIVE && 'set GRODDLE_LIVE=1 to 
     assert.deepEqual(call(a.jar, 'DELETE', '/wp-json/groddle/v1/backups/2', { nonce: a.nonce }).json, { deleted: true, slot: 2 });
     assert.equal(call(a.jar, 'GET', '/wp-json/groddle/v1/backups/2', { nonce: a.nonce }).json.code, 'groddle_backup_missing');
     assert.equal(call(a.jar, 'DELETE', '/wp-json/groddle/v1/backups/2', { nonce: a.nonce }).status, 404);
+  });
+
+  it('ticket 21: the page that loaded last writes; its own lost or overlapping writes never stop it', () => {
+    const put = (body) => call(a.jar, 'PUT', '/wp-json/groddle/v1/save', { nonce: a.nonce, body });
+    const get = (q = '') => call(a.jar, 'GET', `/wp-json/groddle/v1/save${q}`, { nonce: a.nonce }).json;
+    const v0 = get('?writer=page1page1page1aa').version;
+    assert.equal(put({ version: v0, writer: 'page1page1page1aa', seq: 1, data: multi({ location: 'p1-1' }) }).json.version, v0 + 1);
+    // The answer to that write was lost: the page writes again naming the old version, with a newer seq.
+    const again = put({ version: v0, writer: 'page1page1page1aa', seq: 2, data: multi({ location: 'p1-2' }) });
+    assert.equal(again.status, 200, again.text);
+    assert.equal(again.json.version, v0 + 2);
+    // An older write of the same page landing late (the keepalive beside it went first) changes nothing.
+    const late = put({ version: v0, writer: 'page1page1page1aa', seq: 1, data: multi({ location: 'p1-old' }) });
+    assert.equal(late.status, 200);
+    assert.equal(late.json.superseded, true);
+    assert.equal(get('?peek=1').data.entries.location, 'p1-2');
+    // Another window loads the character: the read claims it, without a new version.
+    const claimed = get('?writer=page2page2page2bb');
+    assert.equal(claimed.version, v0 + 2, 'claiming is not a write');
+    const old = put({ version: v0 + 2, writer: 'page1page1page1aa', seq: 3, data: multi({ location: 'p1-3' }) });
+    assert.equal(old.status, 409, 'the window it was claimed from stops, even naming the right version');
+    assert.equal(old.json.code, 'groddle_save_elsewhere');
+    assert.equal(old.json.data.version, v0 + 2);
+    assert.match(old.json.data.updatedAt, /Z$/);
+    assert.equal(put({ version: v0 + 2, writer: 'page2page2page2bb', seq: 1, data: multi({ location: 'p2-1' }) }).json.version, v0 + 3);
+    // A game without a writer (the one live before this fix) keeps the version rule.
+    assert.equal(put({ version: v0, data: multi({ location: 'legacy' }) }).status, 409);
+    assert.equal(get('?peek=1').version, v0 + 3, 'a peek neither claims nor writes');
+  });
+
+  it('ticket 21: keeping this window\'s game takes the save back, with the trades the other window took in', () => {
+    const put = (body) => call(a.jar, 'PUT', '/wp-json/groddle/v1/save', { nonce: a.nonce, body });
+    const get = (q = '') => call(a.jar, 'GET', `/wp-json/groddle/v1/save${q}`, { nonce: a.nonce }).json;
+    const state = (inv) => JSON.stringify({ savedAt: 9, inventory: inv, player: { currants: 0 }, systems: { features: {} } });
+    const base = get('?writer=keep1keep1keep1aa');
+    const mine = put({ version: base.version, writer: 'keep1keep1keep1aa', seq: 1, data: multi({ playerState: state({ apple: 5, cherry: 4 }), location: 'k1' }) });
+    assert.equal(mine.status, 200, mine.text);
+    const since = mine.json.updatedAt;
+    // The other window loads, takes in a gift of 3 apples and gives away 2 cherries (settled and applied there).
+    get('?writer=keep2keep2keep2bb');
+    const at = new Date(Date.parse(since) + 2000).toISOString().slice(0, 19).replace('T', ' ');
+    const goods = (c, n) => JSON.stringify({ items: [{ c, n }], currants: 0 });
+    wp('db', 'query', `INSERT INTO wp_groddle_trades (trade_id, status, a_id, b_id, a_gave, b_gave, a_applied_at, b_applied_at, created_at) VALUES ('zz-t21-in-${a.id}', 'settled', ${b.id}, ${a.id}, '${goods('apple', 3)}', '{"items":[],"currants":0}', '${at}', '${at}', '${at}'), ('zz-t21-out-${a.id}', 'settled', ${a.id}, ${b.id}, '${goods('cherry', 2)}', '{"items":[],"currants":0}', '${at}', '${at}', '${at}')`);
+    const other = put({ version: get('?peek=1').version, writer: 'keep2keep2keep2bb', seq: 1, data: multi({ playerState: state({ apple: 8, cherry: 2 }), location: 'k2' }) });
+    assert.equal(other.status, 200, other.text);
+    // This window never saw either trade; it is refused, then the player keeps this window's game.
+    const refused = put({ version: base.version + 1, writer: 'keep1keep1keep1aa', seq: 2, data: multi({ playerState: state({ apple: 5, cherry: 4, plum: 1 }), location: 'k1-2' }) });
+    assert.equal(refused.json.code, 'groddle_save_elsewhere');
+    const kept = put({ version: base.version + 1, writer: 'keep1keep1keep1aa', seq: 3, takeover: true, since, data: multi({ playerState: state({ apple: 5, cherry: 4, plum: 1 }), location: 'k1-2' }) });
+    assert.equal(kept.status, 200, kept.text);
+    assert.equal(kept.json.took, true);
+    const stored = get('?peek=1');
+    assert.equal(stored.data.entries.location, 'k1-2', 'this window\'s game');
+    const inv = JSON.parse(stored.data.entries.playerState).inventory;
+    assert.equal(Number(inv.apple?.count ?? inv.apple), 8, 'the gift the other window took in is kept once');
+    assert.equal(Number(inv.cherry?.count ?? inv.cherry), 2, 'what it gave away does not come back');
+    assert.equal(Number(inv.plum?.count ?? inv.plum), 1, 'and this window\'s own find stays');
+    assert.equal(put({ version: stored.version, writer: 'keep2keep2keep2bb', seq: 2, data: multi() }).json.code, 'groddle_save_elsewhere', 'the other window stops now');
   });
 
   it('a realtime ticket: signed-in only, signed for a minute, good for one socket', async () => {

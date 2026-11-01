@@ -69,8 +69,8 @@
  * street per Feat (MP_ACTS).
  */
 
-import { FEAT_BY_ID, QUICK_MS, REWARD_ITEM, SOLO_FEATS, WIRED_FEATS, vogTextFor } from './solo-feats.js?v=e026b67b';
-import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=3095e05b';
+import { FEAT_BY_ID, QUICK_MS, REWARD_ITEM, SOLO_FEATS, WIRED_FEATS, vogTextFor } from './solo-feats.js?v=40f8c7b5';
+import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=edb00566';
 
 /** players/inc_feats.js 25-27: a Feat is open for 24 real hours. */
 export const RUN_MS = 24 * 60 * 60 * 1000;

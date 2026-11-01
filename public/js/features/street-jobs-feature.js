@@ -49,8 +49,8 @@ import { ecologyForStreet } from '../street-ecology.js?v=315ff68c';
 import { worldToScreen } from '../street-model.js?v=23b926e5';
 import { signArmWidth } from '../street-render.js?v=b5ae0c3d';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { GIANTS } from '../shrines.js?v=01b185bc';
-import { teleportationFeature } from './teleportation-feature.js?v=084947bd';
+import { GIANTS } from '../shrines.js?v=b6bbcdb5';
+import { teleportationFeature } from './teleportation-feature.js?v=7cafdb53';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
@@ -90,7 +90,7 @@ import {
   upgradeOption,
 } from '../street-jobs.js?v=3c8a3e97';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
-import { saveStore } from '../save-store.js?v=b74a8113';
+import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
   HALL_TEXT,
   MP_TEXT,
@@ -111,7 +111,7 @@ import {
   topLine,
 } from '../street-jobs-mp.js?v=74c659ea';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { createMinnAccount } from '../minn-account.js?v=4323ed29';
+import { createMinnAccount } from '../minn-account.js?v=ea900c51';
 import { normalizeGroups } from '../groups.js?v=65337c22';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
@@ -1191,7 +1191,7 @@ function doHire(engine, jobId, rid) {
 /* ------------------------------------------------------------------ */
 
 const n0 = (v) => Math.max(0, Math.floor(Number(v) || 0));
-const BLOCKED_SAVES = new Set(['conflict', 'signed-out', 'error', 'offline']);
+const BLOCKED_SAVES = new Set(['conflict', 'elsewhere', 'signed-out', 'error', 'offline']);
 /** A give the server has not answered is let go after this (its answer still applies when it comes). */
 const GIVE_WAIT_MS = 20000;
 const WORK_WAIT_MS = 6000;

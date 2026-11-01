@@ -25,11 +25,11 @@ import {
   restAt,
   sharedCreatureLabel,
   walkerAt,
-} from '../public/js/street-creatures.js?v=486c7a68';
-import { createStreetCopy, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=de1a4e23';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=876e95d0';
-import { FEATURES } from '../public/js/features/index.js?v=1fded83a';
-import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=3095e05b';
+} from '../public/js/street-creatures.js?v=60091de8';
+import { createStreetCopy, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=a713c2c6';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=c6e87ca6';
+import { FEATURES } from '../public/js/features/index.js?v=cc102295';
+import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=edb00566';
 import { creatureRequests, setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=390e4702';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=315ff68c';

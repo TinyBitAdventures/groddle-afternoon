@@ -15,13 +15,14 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=4323ed29';
-import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=c44186ce';
+import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=ea900c51';
+import { GATE_COPY, SAVE_ALERT_COPY, bootDataFrom, deliverHandoff, gateFor, saveAlertFor } from '../public/js/online-boot.js?v=c55ccff7';
+import { SAVE_STOPPED } from '../public/js/save-store.js?v=8839ba7b';
 import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=b40dbb9f';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=55fee77b';
-import { FEATURES } from '../public/js/features/index.js?v=1fded83a';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=399056e8';
+import { FEATURES } from '../public/js/features/index.js?v=cc102295';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=1ecf2899';
-import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=b74a8113';
+import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=8839ba7b';
 import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -33,7 +34,7 @@ function routedFetch(routes) {
   const calls = [];
   const fn = async (url, init = {}) => {
     calls.push({ url, ...init });
-    const key = Object.keys(routes).find((k) => url.endsWith(k));
+    const key = Object.keys(routes).find((k) => url.endsWith(k) || url.split('?')[0].endsWith(k));
     const answer = key ? routes[key] : { status: 404, body: '<!doctype html>Not found' };
     if (answer === 'network') throw new TypeError('Failed to fetch');
     const headers = new Map(answer.nonce ? [['x-wp-nonce', answer.nonce]] : []);
@@ -97,6 +98,11 @@ describe('minn-account', () => {
     assert.equal(account.nonce, '0123abcdef');
     assert.equal((await account.multiplayerSave()).version, 2);
     assert.equal(f.calls[2].headers['X-WP-Nonce'], '0123abcdef');
+    // Ticket 21: the game page's read claims the save for that page; the phone only peeks.
+    await account.multiplayerSave({ writer: 'aaaa1111bbbb2222' });
+    assert.match(f.calls[3].url, /groddle\/v1\/save\?writer=aaaa1111bbbb2222$/);
+    await account.multiplayerSave({ peek: true });
+    assert.match(f.calls[4].url, /groddle\/v1\/save\?peek=1$/);
   });
 
   it('signs up and in by email: the new session\'s nonce is fetched before the answer comes back', async () => {
@@ -218,13 +224,56 @@ describe('online-boot', () => {
     const account = { urls: minnUrls(BASE), nonce: 'abcdef0123' };
     const session = { player: { id: 3, name: 'Tess' } };
     const fresh = bootDataFrom({ account, session, save: { version: 0, updatedAt: null, data: null } });
-    assert.deepEqual(fresh, { saveUrl: `${BASE}wp-json/groddle/v1/save`, nonceUrl: `${BASE}${NONCE_PATH}`, nonce: 'abcdef0123', version: 0, updatedAt: null, entries: {}, player: session.player });
+    assert.deepEqual(fresh, { saveUrl: `${BASE}wp-json/groddle/v1/save`, nonceUrl: `${BASE}${NONCE_PATH}`, nonce: 'abcdef0123', version: 0, updatedAt: null, entries: {}, player: session.player, writer: '' });
+    assert.equal(bootDataFrom({ account, session, save: { version: 0, data: null }, writer: 'aaaa1111bbbb2222' }).writer, 'aaaa1111bbbb2222', 'the page that claimed the save writes it');
     const store = createMultiplayerSaveStore({ boot: fresh, scope: {}, fetch: async () => { throw new Error('no write expected'); } });
     assert.equal(store.ready, true);
     for (const name of SAVE_ENTRY_NAMES) assert.equal(store.get(name), null, `${name} is empty: the start card shows the tutorial choice`);
     const loaded = bootDataFrom({ account, session, save: { version: 7, updatedAt: 'x', data: { kind: 'groddle-multiplayer', format: 1, entries: { playerState: 'P' } } } });
     assert.equal(loaded.version, 7);
     assert.deepEqual(loaded.entries, { playerState: 'P' });
+  });
+
+  it('a reload delivers the page before\'s last write, then reads (ticket 21)', async () => {
+    const map = new Map([['groddle-save-handoff', JSON.stringify({ player: 3, body: '{"version":4,"writer":"old0old0old0old0","seq":7,"data":{}}', at: 1 })]]);
+    const scope = { sessionStorage: { getItem: (k) => map.get(k) ?? null, removeItem: (k) => map.delete(k), setItem: (k, v) => map.set(k, v) } };
+    const sent = [];
+    const account = { deliverHandoff: async (body) => { sent.push(JSON.parse(body)); return { status: 200, data: { version: 5 } }; } };
+    assert.equal((await deliverHandoff(account, 3, { scope })).status, 200);
+    assert.deepEqual(sent, [{ version: 4, writer: 'old0old0old0old0', seq: 7, data: {} }], 'as the old page sent it: its writer and seq');
+    assert.equal(await deliverHandoff(account, 3, { scope }), null, 'once');
+    map.set('groddle-save-handoff', JSON.stringify({ player: 3, body: '{}' }));
+    const hung = { deliverHandoff: () => new Promise(() => {}) };
+    assert.equal(await deliverHandoff(hung, 3, { scope, waitMs: 20 }), null, 'a hung site never holds the game');
+    const f = routedFetch({ 'groddle/v1/save': { status: 200, body: { version: 5, superseded: true } } });
+    const r = await createMinnAccount({ baseUri: BASE, fetch: f.fn, nonce: 'abcdef0123' }).deliverHandoff('{"version":4,"writer":"old0old0old0old0","seq":7,"data":{}}');
+    assert.equal(r.status, 200);
+    assert.equal(f.calls[0].method, 'PUT');
+    assert.equal(JSON.parse(f.calls[0].body).seq, 7);
+  });
+
+  it('asks other tabs to stand down, then reads the save as this page (ticket 21)', () => {
+    const src = read('public/js/online-boot.js');
+    assert.ok(src.indexOf('await deliverHandoff(account') < src.indexOf('await claimCharacter('), 'the page before\'s last write goes in first');
+    const claim = src.indexOf('await claimCharacter(');
+    const readAt = src.indexOf('await account.multiplayerSave({ writer })');
+    assert.ok(claim > 0 && readAt > claim, 'the other tab saves first, then this one reads');
+    assert.ok(src.indexOf('bootDataFrom({ account, session, save, writer })') > readAt);
+  });
+
+  it('a stopped save always says so over the game, with a way out for each state (ticket 21)', () => {
+    for (const state of SAVE_STOPPED) {
+      const said = saveAlertFor(state, {});
+      assert.ok(said?.title && said.body && said.buttons.length, state);
+    }
+    for (const state of ['saved', 'pending', 'saving', 'offline']) assert.equal(saveAlertFor(state, {}), null, state);
+    const two = saveAlertFor('elsewhere', { confirmedAt: '2026-11-01T06:52:00Z', otherUpdatedAt: '2026-11-01T06:53:00Z' });
+    assert.deepEqual(two.buttons.map(([c]) => c), ['load', 'keep'], 'loading the other save first; keeping this one replaces it');
+    assert.equal(two.lines.length, 3, 'when each was saved, and what keeping does');
+    assert.deepEqual(saveAlertFor('elsewhere', { by: 'window' }).buttons.map(([c]) => c), ['load'], 'a tab that saved and stood down only offers to play here');
+    assert.deepEqual(saveAlertFor('error', { message: 'Too big.' }).lines, ['Too big.']);
+    const words = JSON.stringify(SAVE_ALERT_COPY, (k, v) => (typeof v === 'function' ? v('7:24 PM') : v));
+    assert.ok(!words.includes('—') && !/glitch/i.test(words), 'plain copy');
   });
 
   it('refuses a save that is not a multiplayer save', () => {
@@ -371,7 +420,8 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
 
   it('reads and writes only the signed-in caller\'s rows, with the version check in the write itself', () => {
     const save = src('MultiplayerSave.php');
-    assert.match(save, /UPDATE \{\$table\} SET data = \?, version = version \+ 1, updated_at = \? WHERE user_id = \? AND version = \?/);
+    assert.match(save, /UPDATE \{\$table\} SET data = \?, version = version \+ 1, updated_at = \?, writer = \?, seq = \? WHERE user_id = \? AND version = \?/);
+    assert.match(save, /'groddle_save_elsewhere'[^;]*409/);
     assert.match(save, /INSERT IGNORE INTO \{\$table\}/);
     assert.match(save, /'groddle_save_conflict'[^;]*409/);
     for (const f of ['MultiplayerSave.php', 'SoloBackups.php']) {

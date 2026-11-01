@@ -49,13 +49,13 @@ import { hasRaceDispenser } from '../races.js?v=df0576ad';
 import { OVERLAY_USES, locationRect, playCountdownArt, playWindowOverlay } from '../overlays.js?v=90f4b1ba';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { saveStore } from '../save-store.js?v=b74a8113';
+import { saveStore } from '../save-store.js?v=8839ba7b';
 
 const PIG_CLASS = 'test_game_starter';
 const PIG_ART = 'assets/sprites/races/test_game_starter@3x.webp';
 const JUMP_SCALE = 1.15; // the arena's ledges, as crowns-feature
 const APPLIED_KEEP = 20;
-const BLOCKED_SAVES = new Set(['conflict', 'signed-out', 'error', 'offline']);
+const BLOCKED_SAVES = new Set(['conflict', 'elsewhere', 'signed-out', 'error', 'offline']);
 /** AbstractAvatarView.as 209: a disc with a number is 22 px across the radius, 2 px ring. */
 const DISC_R = 22;
 

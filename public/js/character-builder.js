@@ -15,7 +15,7 @@
 import { normalizeVectorFields, vectorFieldsFromColors } from './avatar-looks.js?v=64fab53e';
 import { installReimaginedTags } from './avatar-reimagined.js?v=9c22dac4';
 import { starterRowFields } from './avatar-starter.js?v=2ba02b11';
-import { saveStore } from './save-store.js?v=b74a8113';
+import { saveStore } from './save-store.js?v=8839ba7b';
 
 // The builder's wardrobe chips (game.js) get a "Reimagined" tag on the
 // greyscale masters the remake coloured (js/avatar-reimagined.js, row G52).

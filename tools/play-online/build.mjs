@@ -90,6 +90,25 @@ const ONLINE_STYLE = `  <style>
     .save-pill[data-state="conflict"], .save-pill[data-state="signed-out"] { background: var(--status-warn-soft); }
     .save-pill[data-state="conflict"] .save-pill-state::before, .save-pill[data-state="signed-out"] .save-pill-state::before { background: var(--c-red-59); }
     .save-pill a { color: var(--c-brown-46b); }
+    /* A stopped save (js/online-boot.js mountSaveAlert): a card over the game, never only the pack's cloud (ticket 21). */
+    .save-alert {
+      position: fixed; top: var(--sp-8); left: 50%; transform: translateX(-50%); z-index: calc(var(--z-screen) + 2);
+      width: min(30rem, calc(100vw - 2rem)); box-sizing: border-box; padding: var(--sp-7) var(--sp-8); border-radius: var(--radius-lg);
+      font: var(--fs-base)/var(--lh-normal) var(--font-system); color: var(--text); background: var(--surface-raised);
+      box-shadow: var(--shadow-2), inset 0 0 0 2px var(--c-red-59);
+    }
+    .save-alert[hidden] { display: none; }
+    .save-alert h2 { margin: 0 0 var(--sp-3); font-size: var(--fs-lg); }
+    .save-alert p { margin: 0 0 var(--sp-3); }
+    .save-alert .save-alert-note { font-size: var(--fs-sm); color: var(--text-moss); }
+    .save-alert-buttons { display: flex; flex-wrap: wrap; gap: var(--sp-4); margin-top: var(--sp-5); }
+    .save-alert-buttons button {
+      flex: 1 1 auto; border: 0; cursor: pointer; border-radius: var(--radius-lg); padding: var(--sp-4) var(--sp-7); font: inherit; font-weight: 700;
+      color: var(--text-moss); background: var(--surface-moss); box-shadow: inset 0 0 0 2px var(--c-lime-85);
+    }
+    .save-alert-buttons button:first-child { color: var(--text); background: linear-gradient(180deg, var(--c-orange-76), var(--c-orange-68)); box-shadow: 0 3px 0 var(--c-orange-57); }
+    .save-alert-buttons button:disabled { opacity: 0.6; cursor: default; }
+    .save-alert-buttons button:focus-visible { outline: 2px solid var(--c-sky-57); outline-offset: 2px; }
     /* In the pack, under its hint (js/online-boot.js mountSavePill): part of the game, not over it. */
     .pack-side { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: var(--sp-3); flex-shrink: 0; }
     .save-pill.in-pack { position: static; z-index: auto; box-shadow: none; padding: 0.18rem 0.55rem; font-size: var(--fs-xs); white-space: nowrap; }

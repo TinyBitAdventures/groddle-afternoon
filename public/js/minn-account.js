@@ -230,11 +230,28 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       return signedIn(await post('password-reset/confirm', { login, key, password }));
     },
 
-    /** The multiplayer save: { version, updatedAt, data } (data null before the first write). */
-    async multiplayerSave() {
-      const r = await call('save');
+    /**
+     * The multiplayer save: { version, updatedAt, data } (data null before the first write).
+     * writer: the game page's id, which claims the save for that page (the window that
+     * loads last is the one that saves, MultiplayerSave.php); peek: read only, no claim and
+     * no catching up on trades (the phone companion, which never writes the save).
+     */
+    async multiplayerSave({ writer = '', peek = false } = {}) {
+      const query = peek ? '?peek=1' : writer ? `?writer=${encodeURIComponent(writer)}` : '';
+      const r = await call(`save${query}`);
       if (!r.ok) throw failed('Loading the multiplayer save', r);
       return r.data;
+    },
+
+    /**
+     * Delivers the last write of the page before in this tab (js/save-claim.js takeHandoff), as
+     * that page sent it: { status, data }. A refusal is an answer, not an error.
+     */
+    async deliverHandoff(body) {
+      let parsed;
+      try { parsed = JSON.parse(body); } catch { return { status: 0, data: null }; }
+      const r = await call('save', { method: 'PUT', body: parsed });
+      return { status: r.status, data: r.data };
     },
 
     /** The solo backups: { slots, maxBytes, backups: [{ slot, madeAt, gameDay, size }] }. */

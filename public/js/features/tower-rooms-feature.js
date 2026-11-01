@@ -39,7 +39,7 @@
  */
 
 import { addItem, countItem } from '../inventory.js?v=85d4faba';
-import { getGameDayKey } from '../game-day.js?v=3095e05b';
+import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { DOOR_TEXT, doorKeyClass, insideBottomRect } from '../doors.js?v=eb9510b1';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { ROOM_15_TSID } from '../tower-rooms.js?v=eeebce6f';

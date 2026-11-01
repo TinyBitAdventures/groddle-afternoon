@@ -55,7 +55,7 @@
 import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=85d4faba';
 import { isItemFloor, platformYAt } from '../street-model.js?v=23b926e5';
 import { hiresSpriteUrl } from '../sprite-hires.js?v=f7ea0bd5';
-import { rollResourceNodeDrop } from './drops-feature.js?v=92989dc5';
+import { rollResourceNodeDrop } from './drops-feature.js?v=4ff97282';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { resourceNodeResponseKey, verbResponse } from '../verb-responses.js?v=3ceb8a8c';
 import { rollSlothBonusSnails } from '../imagination-effects.js?v=70169933';
@@ -84,7 +84,7 @@ import {
   starterResourceTools,
   swimmingSalmonCount,
   tickResourceNode,
-} from '../resource-nodes.js?v=51d64696';
+} from '../resource-nodes.js?v=b3e7b6ed';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js?v=db2ce452';
 import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js?v=ada47e25';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=ba11c5d4';

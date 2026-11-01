@@ -34,7 +34,7 @@ import {
   imgRewards,
   rewardsCap,
 } from '../public/js/magic-rock-home.js?v=39921139';
-import { getGameDayKey } from '../public/js/game-day.js?v=3095e05b';
+import { getGameDayKey } from '../public/js/game-day.js?v=edb00566';
 
 const spike = join(import.meta.dirname, '..');
 const GS = join(spike, '../glitch-GameServerJS');
@@ -156,11 +156,11 @@ describe('source wording', { skip: !existsSync(ROCK_JS) }, () => {
  * shiftCKeyHandler 816-828; HouseManager.as startCultivation 102-118).
  */
 describe('the home street rock (G231)', async () => {
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=3e1708d4');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=3d0f38b4');
   const { towerApi } = await import('../public/js/features/home-tower-feature.js?v=1be4cf55');
-  const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=57d34b4b');
+  const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=5b65f43e');
   const { homeEditing } = await import('../public/js/features/camera-mode-feature.js?v=ad1ae5ea');
-  const { newxpFeature, __newxpTest } = await import('../public/js/features/newxp-feature.js?v=00f35d65');
+  const { newxpFeature, __newxpTest } = await import('../public/js/features/newxp-feature.js?v=ae1a6cb3');
   const street = { classId: 'magic_rock', state: { room: 'street' } };
   const yard = { classId: 'magic_rock', state: { room: 'yard' } };
   const towerQuest = { active: { build_a_tower: { started: 1 } }, completed: [], offers: {} };
@@ -285,7 +285,7 @@ describe('the home street rock (G231)', async () => {
  * (NCMsgHandler.as 3093-3096). Solo: no visitors, so only the stipend.
  */
 describe('the rock’s daily iMG and the house sign (G232)', async () => {
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=3e1708d4');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=3d0f38b4');
   const street = { classId: 'magic_rock', state: { room: 'street' } };
   const yard = { classId: 'magic_rock', state: { room: 'yard' } };
   const quiet = { active: {}, completed: [], offers: {} };

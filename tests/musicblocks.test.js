@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GAME_DAY_MS } from '../public/js/game-day.js?v=3095e05b';
+import { GAME_DAY_MS } from '../public/js/game-day.js?v=edb00566';
 import {
   MUSICBLOCK_CATALOG,
   MUSICBLOCK_MONTH_MS,
@@ -27,17 +27,17 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from '../public/js/musicblocks.js?v=35e2b17a';
+} from '../public/js/musicblocks.js?v=b597bd9d';
 import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js?v=2d82d399';
 import { DROP_TABLES } from '../public/js/drop-tables-data.js?v=c51a6400';
-import { SOIL_DROP_TABLES } from '../public/js/patches.js?v=ebfd3365';
-import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js?v=be7fe558';
+import { SOIL_DROP_TABLES } from '../public/js/patches.js?v=dc77bb68';
+import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js?v=24711d2b';
 import {
   ITEM_CATALOG,
   countItem,
   createInventory,
 } from '../public/js/inventory.js?v=85d4faba';
-import { getVerbsFor, runVerb } from '../public/content.js?v=55e0524d';
+import { getVerbsFor, runVerb } from '../public/content.js?v=6d499ac2';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
@@ -307,7 +307,7 @@ describe('Musicblock game integration', () => {
 
 describe('Musicblock collection badges from any source', () => {
   it('emits in_inventory the first time a block reaches the pack', async () => {
-    const { musicblocksFeature, newlyOwnedMusicblocks } = await import('../public/js/features/musicblocks-feature.js?v=cce74646');
+    const { musicblocksFeature, newlyOwnedMusicblocks } = await import('../public/js/features/musicblocks-feature.js?v=2975bf89');
     assert.deepEqual(newlyOwnedMusicblocks(new Set(['musicblock_d_blue_01']), {
       musicblock_d_blue_01: 2, musicblock_d_blue_02: 1, apple: 3, musicblock_trumpets: 1,
     }), ['musicblock_d_blue_02']);

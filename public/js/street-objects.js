@@ -36,9 +36,9 @@ import { ROCK_CATALOG, findWorkingPick, miningProfile } from './mining.js?v=15c7
 import { MINING_EXPERT_UPGRADES } from './imagination-effects.js?v=70169933';
 import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage } from './trants.js?v=9c2e8c0f';
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=1eff5718';
-import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=51d64696';
+import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=b3e7b6ed';
 import { highestAnimalKinshipRank } from './animal-kinship.js?v=91490913';
-import { applyCreatureState, pathFrom } from './street-creatures.js?v=486c7a68';
+import { applyCreatureState, pathFrom } from './street-creatures.js?v=60091de8';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
 export const SHARED_NODE_CLASSES = Object.freeze(['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree']);

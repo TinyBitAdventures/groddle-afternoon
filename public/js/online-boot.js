@@ -17,8 +17,9 @@
  * play/index.html by tools/play-online/build.mjs.
  */
 
-import { createMinnAccount } from './minn-account.js?v=4323ed29';
+import { createMinnAccount } from './minn-account.js?v=ea900c51';
 import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from './account-forms.js?v=b40dbb9f';
+import { claimCharacter, newWriterId, takeHandoff } from './save-claim.js?v=30cf5250';
 
 const PILL_TEXT = {
   saved: 'Saved',
@@ -26,9 +27,79 @@ const PILL_TEXT = {
   saving: 'Saving…',
   offline: 'Offline, retrying',
   conflict: 'Saved somewhere else. Reload',
+  elsewhere: 'Playing in another window',
   'signed-out': 'Signed out. Sign in again',
   error: 'Not saved',
 };
+
+/**
+ * What a stopped save says over the game (js/save-store.js SAVE_STOPPED), so the
+ * player always knows this window is not saving and what each way out keeps
+ * (ticket 21, 2026-11-01: a stopped save used to show only in the pack's corner).
+ * Plain remake copy, no em dashes.
+ */
+export const SAVE_ALERT_COPY = {
+  conflict: {
+    title: 'Saved somewhere else',
+    body: 'Your character was saved somewhere else after this window loaded it, so this window stopped saving. Choose which game to keep.',
+  },
+  elsewhere: {
+    title: 'Playing in another window',
+    body: 'Your character was opened in another window or on another device, so this window stopped saving. Choose which game to keep.',
+  },
+  yielded: {
+    title: 'Playing in another tab',
+    body: 'You opened your character in another tab, so this tab saved your game and stopped. Play there, or come back here.',
+  },
+  error: {
+    title: 'Your game is not being saved',
+    body: 'The Groddle site did not take the last save.',
+  },
+  'signed-out': {
+    title: 'You are signed out',
+    body: 'Your game is not being saved while you are signed out. Sign in again to carry on.',
+  },
+  load: 'Load the other save',
+  keep: "Keep this window's game",
+  keepNote: "Keep this window's game replaces the other save with this one.",
+  here: 'Play here',
+  retry: 'Try again',
+  signIn: 'Sign in again',
+  lastSaved: (at) => `This window last saved at ${at}.`,
+  otherSaved: (at) => `The other save is from ${at}.`,
+};
+
+function clockTime(iso) {
+  const t = Date.parse(iso || '');
+  if (!Number.isFinite(t)) return '';
+  try {
+    return new Date(t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * The alert's words and buttons for a save state and its event detail, or null when
+ * the save is fine. Buttons: load (reload: the saved game), keep (this window's game
+ * over the other), retry, signIn (reload: the gate signs in).
+ */
+export function saveAlertFor(state, detail = {}) {
+  const C = SAVE_ALERT_COPY;
+  if (state === 'elsewhere' && detail.by === 'window') return { ...C.yielded, lines: [], buttons: [['load', C.here]] };
+  if (state === 'conflict' || state === 'elsewhere') {
+    const lines = [];
+    const mine = clockTime(detail.confirmedAt);
+    const other = clockTime(detail.otherUpdatedAt);
+    if (mine) lines.push(C.lastSaved(mine));
+    if (other && detail.otherUpdatedAt !== detail.confirmedAt) lines.push(C.otherSaved(other));
+    lines.push(C.keepNote);
+    return { ...C[state], lines, buttons: [['load', C.load], ['keep', C.keep]] };
+  }
+  if (state === 'error') return { ...C.error, lines: detail.message ? [String(detail.message)] : [], buttons: [['retry', C.retry]] };
+  if (state === 'signed-out') return { ...C['signed-out'], lines: [], buttons: [['signIn', C.signIn]] };
+  return null;
+}
 
 /** The solo choice under the sign-in (plain remake copy, no em-dashes). */
 export const SOLO_COPY = {
@@ -145,7 +216,7 @@ export function gateFor(session) {
 }
 
 /** The boot data the multiplayer store reads (js/save-store.js createMultiplayerSaveStore). */
-export function bootDataFrom({ account, session, save }) {
+export function bootDataFrom({ account, session, save, writer = '' }) {
   const data = save?.data;
   if (data && (data.kind !== 'groddle-multiplayer' || data.format !== 1)) throw new Error('The server sent a save that is not a multiplayer save');
   return {
@@ -156,6 +227,7 @@ export function bootDataFrom({ account, session, save }) {
     updatedAt: save?.updatedAt || null,
     entries: data?.entries && typeof data.entries === 'object' ? { ...data.entries } : {},
     player: session.player,
+    writer,
   };
 }
 
@@ -275,7 +347,8 @@ function mountSavePill(player) {
   const show = (s) => {
     if (s === shown) return;
     shown = s;
-    pill.dataset.state = s;
+    // Elsewhere looks like a conflict in the pack (its words show, not just the cloud).
+    pill.dataset.state = s === 'elsewhere' ? 'conflict' : s;
     // A conflict or an ended session needs the player: the words become the way out.
     // Reloading /play/online/ shows the gate's sign-in when the session is gone.
     const href = s === 'conflict' || s === 'signed-out' ? location.pathname : '';
@@ -283,12 +356,44 @@ function mountSavePill(player) {
     tip(text);
     pill.lastChild.replaceWith(href ? el('a', { class: 'save-pill-state', href }, text) : el('span', { class: 'save-pill-state' }, text));
   };
+  const alert = mountSaveAlert();
   window.addEventListener('groddle:save-state', (e) => {
     const s = e.detail?.state || 'saved';
     clearTimeout(slowTimer);
     if (s === 'saving') slowTimer = setTimeout(() => show(pillStateFor('saving', { slow: true })), SAVING_SHOWN_AFTER_MS);
     show(pillStateFor(s));
+    alert(s, e.detail || {});
   });
+}
+
+/** The card over the game while the save is stopped; its buttons answer the store (groddle:save-choice) or reload. */
+function mountSaveAlert() {
+  const box = el('section', { class: 'save-alert', role: 'alertdialog', 'aria-live': 'assertive', 'aria-labelledby': 'save-alert-title', 'data-save-alert': '' });
+  box.hidden = true;
+  document.body.append(box);
+  return (state, detail) => {
+    const said = saveAlertFor(state, detail);
+    box.hidden = !said;
+    box.dataset.state = said ? state : '';
+    if (!said) {
+      box.replaceChildren();
+      return;
+    }
+    const buttons = el('div', { class: 'save-alert-buttons' });
+    for (const [choice, label] of said.buttons) {
+      const b = el('button', { type: 'button', [`data-save-${choice === 'signIn' ? 'signin' : choice}`]: '' }, label);
+      b.addEventListener('click', () => {
+        if (choice === 'load' || choice === 'signIn') {
+          location.reload();
+          return;
+        }
+        for (const x of buttons.querySelectorAll('button')) x.disabled = true;
+        window.dispatchEvent(new CustomEvent('groddle:save-choice', { detail: { choice } }));
+      });
+      buttons.append(b);
+    }
+    box.replaceChildren(el('h2', { id: 'save-alert-title' }, said.title), el('p', {}, said.body), ...said.lines.map((l) => el('p', { class: 'save-alert-note' }, l)), buttons);
+  };
 }
 
 async function boot() {
@@ -328,12 +433,38 @@ async function boot() {
   await enter(gate, script, account, session, onSignedIn);
 }
 
+/** How long the page waits on the page before's last write (a hung site must not hold the game). */
+export const HANDOFF_WAIT_MS = 6000;
+
+/**
+ * A reload: the last write of the page before in this tab goes in before this page reads, so its
+ * last seconds are in the copy this page loads, however late its own keepalive lands (ticket 21).
+ */
+export async function deliverHandoff(account, player, { scope = globalThis, waitMs = HANDOFF_WAIT_MS } = {}) {
+  const handoff = takeHandoff({ scope, player });
+  if (!handoff) return null;
+  let timer;
+  try {
+    return await Promise.race([
+      account.deliverHandoff(handoff.body).catch(() => null),
+      new Promise((resolve) => { timer = setTimeout(() => resolve(null), waitMs); }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /** Loads the signed-in player's save, then the game. */
 async function enter(gate, script, account, session, onSignedIn) {
   let save;
+  // This page's name on the save: another tab playing this character saves and stands down first
+  // (js/save-claim.js), then the read claims the save for this page (MultiplayerSave.php).
+  const writer = newWriterId();
   try {
-    save = await account.multiplayerSave();
-    window.GRODDLE_MP_BOOT = bootDataFrom({ account, session, save });
+    await deliverHandoff(account, session.player?.id);
+    await claimCharacter({ player: session.player?.id, writer });
+    save = await account.multiplayerSave({ writer });
+    window.GRODDLE_MP_BOOT = bootDataFrom({ account, session, save, writer });
   } catch (err) {
     console.warn('[online] save did not load', err);
     showGate(gate, err?.status === 401 ? 'signed-out' : err?.code === 'groddle_suspended' ? 'suspended' : 'load-failed', { account, onSignedIn, onSignedOut: () => { boot(); } });

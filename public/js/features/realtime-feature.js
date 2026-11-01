@@ -56,12 +56,12 @@
  * administrator sent you to, once there); window.groddleRealtime in multiplayer.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=4323ed29';
+import { createMinnAccount } from '../minn-account.js?v=ea900c51';
 import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=f19c76a1';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js?v=fb921bf4';
 import { movedLine } from '../admin-teleport.js?v=fa56e8df';
 import { ADMIN_TEXT, applyAdminGive, applyAdminRefill, showAdminMessage, showBooted } from '../admin-console-mp.js?v=430d51e0';
-import { saveStore } from '../save-store.js?v=b74a8113';
+import { saveStore } from '../save-store.js?v=8839ba7b';
 import { STREET_INDEX } from '../street-loader.js?v=390e4702';
 
 export const REALTIME_FEATURE_ID = 'realtime';

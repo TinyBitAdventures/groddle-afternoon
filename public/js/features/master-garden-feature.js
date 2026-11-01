@@ -36,7 +36,7 @@ import {
   usePotion,
 } from '../master-garden.js?v=0b29d27f';
 import { rollDropTable } from '../drop-tables.js?v=0f922478';
-import { payDrop } from './drops-feature.js?v=92989dc5';
+import { payDrop } from './drops-feature.js?v=4ff97282';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 
 export const MASTER_GARDEN_FEATURE_ID = 'master-garden';

@@ -28,6 +28,9 @@
  */
 
 import { GAME_MODE, MULTIPLAYER } from './game-mode.js?v=1ecf2899';
+import { leaveHandoff, listenForClaims, newWriterId } from './save-claim.js?v=30cf5250';
+
+export { newWriterId };
 
 /** Save entry name -> localStorage key. These keys must never change. */
 export const SAVE_KEYS = Object.freeze({
@@ -59,11 +62,21 @@ export const SAVE_FORMAT = 1;
  * What the multiplayer store says about its save, on window as the
  * groddle:save-state event and <html data-save-state>:
  * saved, pending (a change waits for the next write), saving, offline (the
- * last write failed; it retries), conflict (a newer copy was saved elsewhere:
- * this page stops writing), signed-out (the session ended), error (the
- * server refused the save; it is not retried).
+ * last write failed; it retries), conflict (someone else saved over the
+ * copy this page loaded), elsewhere (the character was opened in another
+ * window or device since), signed-out (the session ended), error (the
+ * server refused the save). In conflict and elsewhere the page keeps its
+ * game in memory and writes nothing until the player chooses (js/online-
+ * boot.js asks): keep this window's game (takeover) or load the saved one;
+ * error waits for "Try again" (retry). None of them is ever silent.
  */
-export const SAVE_STATES = Object.freeze(['saved', 'pending', 'saving', 'offline', 'conflict', 'signed-out', 'error']);
+export const SAVE_STATES = Object.freeze(['saved', 'pending', 'saving', 'offline', 'conflict', 'elsewhere', 'signed-out', 'error']);
+
+/** The states that stop writing until the player acts (online-boot.js shows each one). */
+export const SAVE_STOPPED = Object.freeze(['conflict', 'elsewhere', 'signed-out', 'error']);
+
+/** The player's answer to a stopped save, as a groddle:save-choice event: keep (this window's game), retry. */
+export const SAVE_CHOICE_EVENT = 'groddle:save-choice';
 
 /** keepalive requests may carry about 64 KB; bigger writes go as ordinary requests. */
 const KEEPALIVE_LIMIT = 60_000;
@@ -135,20 +148,30 @@ function entriesOf(value) {
 
 /**
  * Background writer for the multiplayer save: one whole-save PUT at a time
- * to groddle/v1/save, naming the version it was made from. A change waits
+ * to groddle/v1/save, naming the version it was made from, this page's
+ * writer id and a number that grows with each write (seq). A change waits
  * debounceMs for more changes (never longer than maxWaitMs in all); a
- * failed write retries with backoff; 409 means another copy was saved
- * since this one loaded, and writing stops (state conflict) rather than
- * overwrite it. The REST nonce the server hands back on each answer is kept.
- * An answer whose ledger corrected the save (groddle-afternoon-site
- * src/Ledger.php, G335: what the site could not account for was taken out
- * of the stored save) goes to onLedger({ corrected: { items, currants }, text }).
+ * failed write retries with backoff. The site lets the page that loaded the
+ * save last keep writing whatever version it names, as long as each write
+ * is newer than its last (so a write whose answer was lost, or a keepalive
+ * write beside one in flight, never stops this page: ticket 21); an older
+ * one comes back "superseded" and changes nothing. A 409 says another page
+ * claimed the save (elsewhere) or someone else wrote over it (conflict):
+ * writing stops, the game goes on in memory, and the player chooses;
+ * takeover() writes this copy back over the other (the site first applies
+ * the trades this copy missed, MultiplayerSave.php). The REST nonce the
+ * server hands back on each answer is kept. An answer whose ledger corrected
+ * the save (groddle-afternoon-site src/Ledger.php, G335: what the site could
+ * not account for was taken out of the stored save) goes to
+ * onLedger({ corrected: { items, currants }, text }).
  */
 export function createSaveSync({
   url,
   nonce = '',
   nonceUrl = '',
   version = 0,
+  writer = '',
+  confirmedAt = null,
   payload,
   fetch: fetchFn = globalThis.fetch?.bind(globalThis),
   timers = { setTimeout: globalThis.setTimeout.bind(globalThis), clearTimeout: globalThis.clearTimeout.bind(globalThis) },
@@ -157,6 +180,7 @@ export function createSaveSync({
   maxWaitMs = 15000,
   onState = () => {},
   onLedger = () => {},
+  onFinal = () => {},
 } = {}) {
   let state = 'saved';
   let dirty = false;
@@ -165,9 +189,13 @@ export function createSaveSync({
   let inFlight = null;
   let failures = 0;
   let nonceRetried = false;
-  let current = { version, nonce };
+  let seq = 0;
+  let takingOver = false;
+  let yielding = false;
+  let current = { version, nonce, confirmedAt };
   let lastError = null;
-  const blocked = () => state === 'conflict' || state === 'signed-out' || state === 'error';
+  let refused = {};
+  const blocked = () => SAVE_STOPPED.includes(state) || yielding;
   const setState = (next, detail = {}) => {
     if (next === state && !detail.force) return;
     state = next;
@@ -200,14 +228,24 @@ export function createSaveSync({
     } catch { /* offline */ }
     return false;
   }
-  function put(body, keepalive) {
+  /** The next write's body: this copy, its version, this page and a number newer than any before. */
+  function body(extra = {}) {
+    seq += 1;
+    return JSON.stringify({ version: current.version, ...(writer ? { writer, seq } : {}), ...extra, data: payload() });
+  }
+  function put(text, keepalive) {
+    // A write sent as the page goes away may land after the next page has read the save, or not
+    // at all (a body over the keepalive limit is cancelled with the page): it is handed on too.
+    if (keepalive) {
+      try { onFinal(text); } catch { /* the page is going */ }
+    }
     return fetchFn(url, {
       method: 'PUT',
       credentials: 'same-origin',
       cache: 'no-store',
-      keepalive: Boolean(keepalive) && body.length <= KEEPALIVE_LIMIT,
+      keepalive: Boolean(keepalive) && text.length <= KEEPALIVE_LIMIT,
       headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': current.nonce },
-      body,
+      body: text,
     });
   }
   async function answer(res) {
@@ -215,7 +253,9 @@ export function createSaveSync({
     let data = null;
     try { data = await res.json(); } catch { /* not JSON */ }
     if (res.ok && Number.isInteger(data?.version)) {
-      current.version = data.version;
+      // A superseded answer: a newer write of this page is in already; nothing else to do.
+      if (!data.superseded || data.version > current.version) current.version = data.version;
+      if (typeof data.updatedAt === 'string') current.confirmedAt = data.updatedAt;
       if (data.ledger?.corrected && typeof data.ledger.corrected === 'object') {
         try { onLedger(data.ledger); } catch { /* a listener's trouble is not the save's */ }
       }
@@ -224,10 +264,11 @@ export function createSaveSync({
       lastError = null;
       return 'ok';
     }
-    lastError = { status: res.status, code: data?.code || '' };
+    lastError = { status: res.status, code: data?.code || '', message: typeof data?.message === 'string' ? data.message : '' };
     if (res.status === 409) {
       current.serverVersion = Number(data?.data?.version) || 0;
-      return 'conflict';
+      refused = { serverVersion: current.serverVersion, otherUpdatedAt: data?.data?.updatedAt || null, otherSavedAt: Number(data?.data?.savedAt) || 0 };
+      return data?.code === 'groddle_save_elsewhere' ? 'elsewhere' : 'conflict';
     }
     if (res.status === 403 && data?.code === 'rest_cookie_invalid_nonce' && !nonceRetried) {
       nonceRetried = true;
@@ -239,31 +280,32 @@ export function createSaveSync({
   }
   /** Writes now (when something changed and nothing blocks); resolves when this write is done. */
   function flush({ keepalive = false } = {}) {
-    if (!fetchFn || blocked()) return Promise.resolve(state);
+    if (!fetchFn || SAVE_STOPPED.includes(state)) return inFlight || Promise.resolve(state);
     if (inFlight) {
-      if (keepalive && dirty) {
-        // The page is going away mid-write: send the newest copy as the version the write in flight will make.
-        const body = JSON.stringify({ version: current.version + 1, data: payload() });
-        try { put(body, true).catch(() => {}); } catch { /* the page is going */ }
+      if (keepalive && dirty && !takingOver) {
+        // The page is going away mid-write: send the newest copy beside it. Its seq is newer, so
+        // the site keeps it whichever lands first, and the older one comes back superseded.
+        try { put(body(), true).catch(() => {}); } catch { /* the page is going */ }
       }
       return inFlight;
     }
-    if (!dirty) return Promise.resolve(state);
+    if (!dirty && !takingOver) return Promise.resolve(state);
     clear();
     dirty = false;
     firstDirtyAt = 0;
-    const body = JSON.stringify({ version: current.version, data: payload() });
+    const text = takingOver ? body({ takeover: true, since: current.confirmedAt || null }) : body();
     setState('saving');
     inFlight = (async () => {
       let outcome;
       try {
-        outcome = await answer(await put(body, keepalive));
+        outcome = await answer(await put(text, keepalive));
       } catch {
         outcome = 'offline';
       }
       inFlight = null;
       if (outcome === 'ok') {
-        if (dirty) {
+        takingOver = false;
+        if (dirty && !yielding) {
           setState('pending');
           schedule(debounceMs);
         } else {
@@ -276,9 +318,11 @@ export function createSaveSync({
         dirty = true;
         failures += 1;
         setState('offline', { failures });
-        schedule(Math.min(30_000, 2000 * 2 ** Math.min(failures - 1, 4)));
+        if (!yielding) schedule(Math.min(30_000, 2000 * 2 ** Math.min(failures - 1, 4)));
       } else {
-        setState(outcome, { serverVersion: current.serverVersion, ...lastError });
+        takingOver = false;
+        dirty = true;
+        setState(outcome, { ...refused, ...lastError, confirmedAt: current.confirmedAt });
       }
       return state;
     })();
@@ -295,14 +339,57 @@ export function createSaveSync({
     const waited = t - firstDirtyAt;
     schedule(waited >= maxWaitMs ? 0 : Math.min(debounceMs, maxWaitMs - waited));
   }
+  /**
+   * The player keeps this window's game over the copy saved elsewhere: written at once,
+   * claiming the save back (the other window then stops writing and says so).
+   */
+  function takeover() {
+    if (!['conflict', 'elsewhere'].includes(state) || yielding) return Promise.resolve(state);
+    takingOver = true;
+    dirty = true;
+    state = 'pending';
+    return flush();
+  }
+  /** "Try again" after the site refused a write (error): the next write goes now. */
+  function retry() {
+    if (state !== 'error') return Promise.resolve(state);
+    state = 'pending';
+    dirty = true;
+    return flush();
+  }
+  /**
+   * Another window of this browser takes the character (js/save-claim.js): the last change
+   * is written first, then this page stops writing and says so.
+   */
+  async function yieldTo(detail = {}) {
+    if (yielding || SAVE_STOPPED.includes(state)) return state;
+    yielding = true;
+    clear();
+    try {
+      await inFlight;
+      if (dirty && !SAVE_STOPPED.includes(state)) await flush();
+    } catch { /* offline: the other window loads what the site has */ }
+    yielding = false;
+    if (!SAVE_STOPPED.includes(state)) {
+      clear();
+      setState('elsewhere', { by: 'window', confirmedAt: current.confirmedAt, ...detail });
+    }
+    return state;
+  }
   return {
     changed,
     flush,
+    takeover,
+    retry,
+    yieldTo,
     get state() { return state; },
     get version() { return current.version; },
     get nonce() { return current.nonce; },
     get dirty() { return dirty; },
     get lastError() { return lastError; },
+    get writer() { return writer; },
+    /** The site's time of this page's last save that it confirmed (or of the boot read). */
+    get confirmedAt() { return current.confirmedAt; },
   };
 }
 
@@ -340,11 +427,14 @@ export function createMultiplayerSaveStore(opts = {}) {
   const boot = 'boot' in opts ? opts.boot : scope?.GRODDLE_MP_BOOT;
   if (!boot || typeof boot !== 'object' || typeof boot.saveUrl !== 'string') return createRefusingMultiplayerStore();
   const entries = entriesOf(boot.entries);
+  const writer = typeof boot.writer === 'string' && /^[A-Za-z0-9]{8,32}$/.test(boot.writer) ? boot.writer : newWriterId();
   const sync = createSaveSync({
     url: boot.saveUrl,
     nonce: boot.nonce || '',
     nonceUrl: boot.nonceUrl || '',
     version: Number.isInteger(boot.version) ? boot.version : 0,
+    writer,
+    confirmedAt: typeof boot.updatedAt === 'string' ? boot.updatedAt : null,
     payload: () => ({ kind: MULTIPLAYER_SAVE_KIND, format: SAVE_FORMAT, entries: Object.fromEntries(entries) }),
     fetch: opts.fetch ?? scope?.fetch?.bind(scope),
     timers: opts.timers,
@@ -353,13 +443,21 @@ export function createMultiplayerSaveStore(opts = {}) {
     maxWaitMs: opts.maxWaitMs,
     onState: (state, detail) => announceSaveState(scope, state, detail),
     onLedger: (ledger) => announceLedger(scope, ledger),
+    onFinal: (body) => leaveHandoff({ scope, player: boot.player?.id, body }),
   });
   if (typeof scope?.addEventListener === 'function') {
     scope.addEventListener('pagehide', () => { sync.flush({ keepalive: true }); });
     scope.document?.addEventListener?.('visibilitychange', () => {
       if (scope.document.visibilityState === 'hidden') sync.flush({ keepalive: true });
     });
+    // The player's answer to a stopped save (js/online-boot.js): keep this window's game, or try again.
+    scope.addEventListener(SAVE_CHOICE_EVENT, (e) => {
+      if (e?.detail?.choice === 'keep') sync.takeover();
+      else if (e?.detail?.choice === 'retry') sync.retry();
+    });
   }
+  // Another tab of this browser opening the same character asks this one to save and stand down first.
+  const claims = listenForClaims({ scope, player: boot.player?.id, writer, onClaim: () => sync.yieldTo() });
   const check = (name) => {
     keyFor(name);
     return name;
@@ -387,8 +485,18 @@ export function createMultiplayerSaveStore(opts = {}) {
     },
     /** Writes any pending change now; resolves to the save state. */
     flush: (o) => sync.flush(o),
+    /** Keeps this window's game over a copy saved elsewhere (state conflict or elsewhere). */
+    takeover: () => sync.takeover(),
+    /** Writes again after the site refused a write (state error). */
+    retry: () => sync.retry(),
+    /** Saves the last change, then stops writing: another window plays now. */
+    yieldTo: (detail) => sync.yieldTo(detail),
     get state() { return sync.state; },
     get version() { return sync.version; },
+    /** This page's name on the save (MultiplayerSave.php writer). */
+    writer,
+    /** Stops answering other tabs' claims (tests). */
+    close: () => claims.close(),
     /** The save entries as they are in memory (QA and tests). */
     snapshot: () => Object.fromEntries(entries),
     player: boot.player || null,

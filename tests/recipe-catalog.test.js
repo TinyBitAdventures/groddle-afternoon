@@ -36,7 +36,7 @@ import {
   createFoodState,
   isFoodBonusItem,
   quoteFoodVarietyBonus,
-} from '../public/js/food.js?v=f6c6d15b';
+} from '../public/js/food.js?v=ea442e4f';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,

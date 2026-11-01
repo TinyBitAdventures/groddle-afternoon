@@ -19,7 +19,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=85d4faba';
-import { getGameDayKey } from '../game-day.js?v=3095e05b';
+import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { listDroppedStacks } from '../world-items.js?v=a50e4a32';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import {

@@ -17,8 +17,8 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import vm from 'node:vm';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
-import { createMinnAccount } from '../public/js/minn-account.js?v=4323ed29';
-import { REPORT_PICTURE } from '../public/js/reports.js?v=a148dc3c';
+import { createMinnAccount } from '../public/js/minn-account.js?v=ea900c51';
+import { REPORT_PICTURE } from '../public/js/reports.js?v=3532797d';
 import {
   DEVICE_KEY,
   PHONE_TEXT,
@@ -35,7 +35,7 @@ import {
   snippetOf,
   unreadLetters,
   whereWords,
-} from '../public/js/phone/companion-data.js?v=8e9dfefd';
+} from '../public/js/phone/companion-data.js?v=8394855e';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(pub, p), 'utf8');
@@ -191,7 +191,8 @@ describe('play/phone/ (the companion page)', () => {
   it('writes to the save never: Mail is read only', () => {
     const js = read('js/phone/companion.js');
     assert.doesNotMatch(js, /\.writeBackup|method: 'PUT'|['"]save['"], \{ method/);
-    assert.match(js, /account\.multiplayerSave\(\)/);
+    // A peek: the phone neither claims the save from a game window nor catches it up (ticket 21).
+    assert.match(js, /account\.multiplayerSave\(\{ peek: true \}\)/);
   });
 
   it('the copy is plain: no em dashes, never the old game\'s name', () => {

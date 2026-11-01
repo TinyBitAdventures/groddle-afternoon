@@ -13,6 +13,7 @@ import { join } from 'node:path';
 import vm from 'node:vm';
 
 import {
+  SAVE_CHOICE_EVENT,
   MULTIPLAYER_SAVE_KIND,
   MULTIPLAYER_SAVE_UNAVAILABLE,
   SAVE_ENTRY_NAMES,
@@ -29,11 +30,14 @@ import {
   saveStore,
   savedAtOf,
   soloSaveSnapshot,
-} from '../public/js/save-store.js?v=b74a8113';
+} from '../public/js/save-store.js?v=8839ba7b';
+import { HANDOFF_KEY, claimCharacter, leaveHandoff, listenForClaims, takeHandoff } from '../public/js/save-claim.js?v=30cf5250';
+import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
+import { spawnSync } from 'node:child_process';
 import { AUDIO_MUTED_KEY } from '../public/js/audio-pref.js?v=e56202ee';
-import { STORAGE_KEY as APPEARANCE_KEY, APPEARANCE_PRESETS, appearanceToJson, loadAppearance, saveAppearance } from '../public/js/character-builder.js?v=96976c4c';
-import { getGameDayKey, getLastNewDayKey, getLastNewDayTs, resetGameDayClock, setLastNewDayTs } from '../public/js/game-day.js?v=3095e05b';
-import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=8039781d';
+import { STORAGE_KEY as APPEARANCE_KEY, APPEARANCE_PRESETS, appearanceToJson, loadAppearance, saveAppearance } from '../public/js/character-builder.js?v=1cb9713f';
+import { getGameDayKey, getLastNewDayKey, getLastNewDayTs, resetGameDayClock, setLastNewDayTs } from '../public/js/game-day.js?v=edb00566';
+import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=0fe47bc7';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (rel) => readFileSync(join(pub, rel), 'utf8');
@@ -315,7 +319,10 @@ describe('multiplayer save store (phase 2)', () => {
     assert.equal(put.method, 'PUT');
     assert.equal(put.credentials, 'same-origin');
     assert.equal(put.headers['X-WP-Nonce'], 'aaaaaaaaaa');
-    assert.deepEqual(put.json, { version: 4, data: { kind: MULTIPLAYER_SAVE_KIND, format: SAVE_FORMAT, entries: { playerState: '{"savedAt":6}', location: '{"tsid":"B"}' } } });
+    const { writer, seq, ...rest } = put.json;
+    assert.match(writer, /^[0-9a-f]{16}$/, 'the page names itself (a fresh id when the boot data has none)');
+    assert.equal(seq, 1, 'and numbers its writes');
+    assert.deepEqual(rest, { version: 4, data: { kind: MULTIPLAYER_SAVE_KIND, format: SAVE_FORMAT, entries: { playerState: '{"savedAt":6}', location: '{"tsid":"B"}' } } });
     assert.equal(store.state, 'saved');
     assert.equal(store.version, 5);
     assert.deepEqual(states, ['pending', 'saving', 'saved']);
@@ -452,7 +459,7 @@ describe('multiplayer save store (phase 2)', () => {
     assert.equal(scope.document.documentElement.dataset.saveState, 'pending');
     await timers.tick(2000);
     assert.equal(scope.document.documentElement.dataset.saveState, 'saved');
-    assert.deepEqual([...SAVE_STATES], ['saved', 'pending', 'saving', 'offline', 'conflict', 'signed-out', 'error']);
+    assert.deepEqual([...SAVE_STATES], ['saved', 'pending', 'saving', 'offline', 'conflict', 'elsewhere', 'signed-out', 'error']);
   });
 
   it('createSaveSync on its own writes nothing until something changes', async () => {
@@ -460,6 +467,350 @@ describe('multiplayer save store (phase 2)', () => {
     const sync = createSaveSync({ url: 'u', payload: () => ({}), fetch: fetch.fn, timers: fakeTimers() });
     assert.equal(await sync.flush(), 'saved');
     assert.equal(fetch.calls.length, 0);
+  });
+});
+
+/**
+ * The site's rule for a write (groddle-afternoon-site src/MultiplayerSave.php decide), as a
+ * model the store is tested against; the PHP itself is checked against this table below.
+ */
+function decide(row, { version, writer = '', seq = 0, takeover = false }) {
+  if (row === null) return version === 0 || (takeover && writer !== '') ? 'write' : 'conflict';
+  if (writer !== '' && takeover) return 'takeover';
+  if (writer !== '' && writer === row.writer) return seq > row.seq ? 'write' : 'superseded';
+  if (writer !== '' && row.writer !== '') return 'elsewhere';
+  return row.version === version ? 'write' : 'conflict';
+}
+
+/**
+ * The save route as a fake site: it keeps what each write does at once (the server commits
+ * before it answers), and can lose an answer (the page gets a network error: Safari's "Load
+ * failed") or hold one back (a slow connection).
+ */
+function fakeSite({ version = 4, writer = '' } = {}) {
+  const row = { version, writer, seq: 0, updatedAt: '2026-11-01T05:51:49Z', data: null };
+  const calls = [];
+  const lost = new Set();
+  const held = new Map();
+  let clock = 0;
+  const fn = async (url, init = {}) => {
+    const json = JSON.parse(init.body);
+    calls.push({ ...json, keepalive: init.keepalive });
+    const n = calls.length;
+    const did = decide(row, { version: json.version, writer: json.writer || '', seq: json.seq || 0, takeover: json.takeover === true });
+    let status = 200;
+    let body;
+    if (did === 'write' || did === 'takeover') {
+      row.version += 1;
+      row.writer = json.writer || '';
+      row.seq = json.seq || 0;
+      row.data = json.data;
+      row.updatedAt = `2026-11-01T06:${String(10 + (clock++ % 49)).padStart(2, '0')}:00Z`;
+      body = { version: row.version, updatedAt: row.updatedAt, ...(did === 'takeover' ? { took: true } : {}) };
+    } else if (did === 'superseded') {
+      body = { version: row.version, updatedAt: row.updatedAt, superseded: true };
+    } else {
+      status = 409;
+      body = { code: did === 'elsewhere' ? 'groddle_save_elsewhere' : 'groddle_save_conflict', data: { status: 409, version: row.version, updatedAt: row.updatedAt, savedAt: 7 } };
+    }
+    if (held.has(n)) await held.get(n);
+    if (lost.has(n)) throw new TypeError('Load failed');
+    return { status, ok: status === 200, headers: { get: () => null }, json: async () => body, text: async () => JSON.stringify(body) };
+  };
+  return {
+    fn,
+    calls,
+    row,
+    /** The answer to the nth write never reaches the page. */
+    lose: (n) => lost.add(n),
+    /** The answer to the nth write waits for the returned release(). */
+    hold: (n) => { let release; held.set(n, new Promise((r) => { release = r; })); return () => release(); },
+    /** Another page's boot read claims the save (MultiplayerSave.php read ?writer=). */
+    claim: (w) => { row.writer = w; row.seq = 0; },
+    /** A boot read as a page (claiming): what js/online-boot.js puts in GRODDLE_MP_BOOT. */
+    read: (w) => { row.writer = w; row.seq = 0; return { version: row.version, updatedAt: row.updatedAt, entries: { ...(row.data?.entries || {}) }, writer: w }; },
+  };
+}
+
+/** A tab's sessionStorage (it outlives a reload; js/save-claim.js hands the last write on in it). */
+function tabStorage() {
+  const map = new Map();
+  return { map, getItem: (k) => (map.has(k) ? map.get(k) : null), setItem: (k, v) => map.set(k, String(v)), removeItem: (k) => map.delete(k) };
+}
+
+describe('one window never conflicts with itself (ticket 21)', () => {
+  const make = (site, extra = {}) => {
+    const timers = fakeTimers();
+    const ev = eventScope();
+    const store = createMultiplayerSaveStore({ boot: { ...BOOT, writer: 'aaaa1111bbbb2222', updatedAt: '2026-11-01T05:51:49Z' }, scope: ev.scope, fetch: site.fn, timers, now: timers.now, debounceMs: 2000, maxWaitMs: 10000, ...extra });
+    return { store, timers, ...ev };
+  };
+
+  it('a write whose answer never came back does not stop the page saving', async () => {
+    // Live, 2026-11-01 05:52:13 and 06:53:13: one 409 after a save, then no save for 46 minutes.
+    const site = fakeSite();
+    site.lose(1);
+    const { store, timers, states } = make(site);
+    store.set('location', 'A');
+    await timers.tick(2000);
+    assert.equal(site.row.version, 5, 'the site kept the write');
+    assert.equal(store.state, 'offline', 'the page never heard so');
+    await timers.tick(2000);
+    assert.equal(store.state, 'saved', 'the retry goes in: it is this page\'s own newer write');
+    store.set('location', 'B');
+    await timers.tick(2000);
+    store.set('location', 'C');
+    await timers.tick(2000);
+    assert.equal(store.state, 'saved');
+    assert.equal(JSON.parse(JSON.stringify(site.row.data)).entries.location, 'C', 'later play is saved');
+    assert.ok(!states.includes('conflict'));
+    assert.deepEqual(site.calls.map((c) => c.seq), [1, 2, 3, 4]);
+  });
+
+  it('a keepalive write beside one in flight does not stop the page saving', async () => {
+    const site = fakeSite();
+    const release = site.hold(1);
+    const { store, timers, scope, states } = make(site);
+    store.set('location', 'A');
+    await timers.tick(2000);
+    store.set('location', 'B');
+    scope.document.visibilityState = 'hidden';
+    scope.fire('doc:visibilitychange');
+    await timers.tick(0);
+    assert.equal(site.calls.length, 2, 'the newest copy went beside the slow one');
+    assert.equal(site.calls[1].keepalive, true);
+    release();
+    await timers.tick(0);
+    scope.document.visibilityState = 'visible';
+    store.set('location', 'C');
+    await timers.tick(2000);
+    assert.equal(store.state, 'saved');
+    assert.equal(site.row.data.entries.location, 'C');
+    assert.ok(!states.includes('conflict'));
+  });
+
+  it('an older write of this page that lands late changes nothing (superseded)', async () => {
+    const site = fakeSite();
+    const { store, timers } = make(site);
+    store.set('location', 'A');
+    await timers.tick(2000);
+    // The page's seq 1 arriving again after seq 2 (a retried request the network delivered late).
+    site.row.seq = 2;
+    store.set('location', 'B');
+    await timers.tick(2000);
+    assert.equal(site.calls.at(-1).seq, 2);
+    assert.equal(store.state, 'saved', 'seq 2 against a stored 2 is superseded: nothing changes, nothing stops');
+    assert.equal(site.row.data.entries.location, 'A');
+  });
+
+  it('opened in another window: stops writing, keeps playing in memory and says so with the times', async () => {
+    const site = fakeSite();
+    const { store, timers, states, listeners } = make(site);
+    const details = [];
+    listeners['groddle:save-state'] = [(e) => details.push(e.detail)];
+    store.set('location', 'A');
+    await timers.tick(2000);
+    site.claim('cccc3333dddd4444');
+    store.set('location', 'B');
+    await timers.tick(2000);
+    assert.equal(store.state, 'elsewhere');
+    const told = details.at(-1);
+    assert.equal(told.state, 'elsewhere');
+    assert.equal(told.code, 'groddle_save_elsewhere');
+    assert.ok(told.confirmedAt, 'when this window last saved');
+    assert.ok(told.otherUpdatedAt, 'when the other copy was saved');
+    store.set('location', 'C');
+    await timers.tick(60_000);
+    assert.equal(site.calls.length, 2, 'never writes over the other window by itself');
+    assert.equal(store.get('location'), 'C');
+    assert.ok(states.includes('elsewhere'));
+  });
+
+  it('keep this window\'s game: a takeover write from the last confirmed save, then saving goes on', async () => {
+    const site = fakeSite();
+    const { store, timers, scope } = make(site);
+    store.set('location', 'A');
+    await timers.tick(2000);
+    const confirmed = site.row.updatedAt;
+    site.claim('cccc3333dddd4444');
+    site.row.version = 9;
+    store.set('location', 'B');
+    await timers.tick(2000);
+    assert.equal(store.state, 'elsewhere');
+    scope.dispatchEvent(new scope.CustomEvent(SAVE_CHOICE_EVENT, { detail: { choice: 'keep' } }));
+    await timers.tick(0);
+    const take = site.calls.at(-1);
+    assert.equal(take.takeover, true);
+    assert.equal(take.since, confirmed, 'the site applies what trades moved since then (Ledger::reapply)');
+    assert.equal(take.data.entries.location, 'B');
+    assert.equal(store.state, 'saved');
+    assert.equal(site.row.writer, 'aaaa1111bbbb2222', 'the save is this window\'s again');
+    store.set('location', 'C');
+    await timers.tick(2000);
+    assert.equal(site.row.data.entries.location, 'C');
+  });
+
+  it('a copy someone else wrote (no page claimed it) is a conflict with the same choice', async () => {
+    const site = fakeSite();
+    const { store, timers } = make(site);
+    store.set('location', 'A');
+    await timers.tick(2000);
+    // An administrator's teleport rewrote the stored save (AdminTeleport rewriteSave: writer '').
+    site.row.writer = '';
+    site.row.version += 1;
+    store.set('location', 'B');
+    await timers.tick(2000);
+    assert.equal(store.state, 'conflict');
+    await store.takeover();
+    assert.equal(store.state, 'saved');
+  });
+
+  it('a refused save waits for Try again, then writes', async () => {
+    const answers = fakeFetch([{ status: 413, body: { code: 'groddle_save_too_large', message: 'Too big.' } }]);
+    const timers = fakeTimers();
+    const ev = eventScope();
+    const store = createMultiplayerSaveStore({ boot: BOOT, scope: ev.scope, fetch: answers.fn, timers, now: timers.now, debounceMs: 2000 });
+    store.set('location', 'A');
+    await timers.tick(2000);
+    assert.equal(store.state, 'error');
+    ev.scope.dispatchEvent(new ev.scope.CustomEvent(SAVE_CHOICE_EVENT, { detail: { choice: 'retry' } }));
+    await timers.tick(0);
+    assert.equal(answers.calls.length, 2);
+    assert.equal(store.state, 'saved');
+  });
+
+  it('standing down for another tab writes the last change first, then stops', async () => {
+    const site = fakeSite();
+    const { store, timers } = make(site);
+    store.set('location', 'A');
+    const going = store.yieldTo();
+    await timers.tick(0);
+    assert.equal(await going, 'elsewhere');
+    assert.equal(site.row.data.entries.location, 'A', 'the other tab loads everything this one did');
+    store.set('location', 'B');
+    await timers.tick(30_000);
+    assert.equal(site.calls.length, 1);
+  });
+
+  it('a reload: the old page\'s last write lands after the new page read the save; nothing stops and nothing is lost', async () => {
+    // Live, 2026-11-01: 05:51:34 PUT 200 (old page), 05:51:48 reload, 05:51:49 GET save, 05:51:50 PUT 200 (the
+    // old page's keepalive, after the read), 05:52:13 the new page's first write 409, then no save for 46 minutes.
+    const site = fakeSite();
+    const tab = tabStorage();
+    const t1 = fakeTimers();
+    const one = eventScope();
+    one.scope.sessionStorage = tab;
+    const old = createMultiplayerSaveStore({ boot: { ...BOOT, writer: 'old0old0old0old0', ...site.read('old0old0old0old0') }, scope: one.scope, fetch: site.fn, timers: t1, now: t1.now, debounceMs: 2000 });
+    old.set('location', 'A');
+    await t1.tick(2000);
+    // The last seconds: a badge, then the reload. Its keepalive is slow to arrive.
+    old.set('playerState', '{"savedAt":9,"badge":"first_eleven_skills"}');
+    const late = site.hold(2);
+    one.scope.fire('pagehide');
+    assert.equal(site.calls.length, 2, 'the keepalive went out');
+    assert.ok(tab.map.has(HANDOFF_KEY), 'and the same write was left in the tab');
+    // The new page: it delivers the handoff (js/online-boot.js deliverHandoff), then reads and claims.
+    const handoff = takeHandoff({ scope: { sessionStorage: tab }, player: BOOT.player.id });
+    const delivered = await site.fn(BOOT.saveUrl, { method: 'PUT', body: handoff.body });
+    assert.equal(delivered.status, 200, 'the old page\'s own newer write');
+    const boot2 = site.read('new0new0new0new0');
+    assert.match(boot2.entries.playerState, /first_eleven_skills/, 'the new page starts from the old page\'s last seconds');
+    late();
+    await t1.tick(0);
+    const t2 = fakeTimers();
+    const two = eventScope();
+    const fresh = createMultiplayerSaveStore({ boot: { ...BOOT, ...boot2 }, scope: two.scope, fetch: site.fn, timers: t2, now: t2.now, debounceMs: 2000 });
+    fresh.set('location', 'B');
+    await t2.tick(2000);
+    fresh.set('location', 'C');
+    await t2.tick(2000);
+    assert.equal(fresh.state, 'saved', 'the new page never stops');
+    assert.equal(site.row.data.entries.location, 'C');
+    assert.match(site.row.data.entries.playerState, /first_eleven_skills/);
+    assert.ok(!two.states.some((st) => st === 'conflict' || st === 'elsewhere'));
+  });
+
+  it('a save too big for keepalive is still handed on (the page would cancel it as it goes)', () => {
+    const tab = tabStorage();
+    const { scope } = eventScope();
+    scope.sessionStorage = tab;
+    const store = createMultiplayerSaveStore({ boot: { ...BOOT, writer: 'big0big0big0big0' }, scope, fetch: fakeFetch().fn, timers: fakeTimers() });
+    store.set('playerState', 'x'.repeat(70_000));
+    scope.fire('pagehide');
+    const left = JSON.parse(tab.map.get(HANDOFF_KEY));
+    assert.equal(left.player, BOOT.player.id);
+    assert.equal(JSON.parse(left.body).writer, 'big0big0big0big0');
+    assert.equal(JSON.parse(left.body).data.entries.playerState.length, 70_000);
+  });
+
+  it('a handoff is taken once, and only for the same player', () => {
+    const tab = tabStorage();
+    assert.equal(leaveHandoff({ scope: { sessionStorage: tab }, player: 3, body: '{"seq":2}' }), true);
+    assert.equal(takeHandoff({ scope: { sessionStorage: tab }, player: 4 }), null, 'another character signed in here');
+    assert.equal(tab.map.size, 0, 'and it is gone either way');
+    leaveHandoff({ scope: { sessionStorage: tab }, player: 3, body: '{"seq":2}' });
+    assert.equal(takeHandoff({ scope: { sessionStorage: tab }, player: 3 }).body, '{"seq":2}');
+    assert.equal(takeHandoff({ scope: { sessionStorage: tab }, player: 3 }), null);
+    assert.equal(takeHandoff({ scope: {}, player: 3 }), null, 'no sessionStorage: nothing');
+  });
+
+  it('the old rule stopped a lone window for good (the 05:52 shape), the new one does not', async () => {
+    // A page that names no writer (the live game, d543b273) gets the old rule back from the site.
+    const site = fakeSite();
+    site.lose(1);
+    const timers = fakeTimers();
+    const sync = createSaveSync({ url: 'u', version: 4, payload: () => ({ x: 1 }), fetch: site.fn, timers, now: timers.now, debounceMs: 2000 });
+    sync.changed();
+    await timers.tick(2000);
+    await timers.tick(2000);
+    assert.equal(sync.state, 'conflict', 'without a writer, a lost answer still reads as someone else\'s save');
+  });
+});
+
+describe('another tab of this browser takes the character (js/save-claim.js)', () => {
+  it('the playing tab saves and stands down before the new tab reads the save', async () => {
+    const order = [];
+    const listening = listenForClaims({ player: 7, writer: 'old0old0old0old0', onClaim: async () => { order.push('old saves'); await new Promise((r) => setTimeout(r, 30)); order.push('old stopped'); } });
+    const other = listenForClaims({ player: 8, writer: 'some0some0some0s', onClaim: async () => order.push('another character') });
+    const answered = await claimCharacter({ player: 7, writer: 'new0new0new0new0', answerMs: 100 });
+    order.push('new reads');
+    listening.close();
+    other.close();
+    assert.equal(answered, 0, 'every tab that held it is done');
+    assert.deepEqual(order, ['old saves', 'old stopped', 'new reads']);
+  });
+
+  it('with nobody else playing, the claim resolves after a short wait', async () => {
+    const t0 = Date.now();
+    assert.equal(await claimCharacter({ player: 9, writer: 'solo0solo0solo0s', answerMs: 50 }), 0);
+    assert.ok(Date.now() - t0 < 1000);
+  });
+});
+
+describe('the site\'s write rule (MultiplayerSave.php decide)', () => {
+  const hasPhp = spawnSync('php', ['-v']).status === 0;
+  it('matches the model the store is tested against', { skip: skipWithoutSite || !hasPhp }, () => {
+    const cases = [];
+    for (const row of [null, { version: 4, writer: '', seq: 0 }, { version: 4, writer: 'aaaa1111', seq: 3 }, { version: 6, writer: 'aaaa1111', seq: 3 }, { version: 4, writer: 'bbbb2222', seq: 0 }]) {
+      for (const version of [0, 4, 5]) {
+        for (const writer of ['', 'aaaa1111']) {
+          for (const seq of [0, 3, 4]) {
+            for (const takeover of [false, true]) cases.push({ row, w: { version, writer, seq, takeover } });
+          }
+        }
+      }
+    }
+    const code = `require ${JSON.stringify(SITE_DIR)} . '/src/MultiplayerSave.php';
+      $out = [];
+      foreach (json_decode(stream_get_contents(STDIN), true) as $c) {
+        $r = $c['row']; $w = $c['w'];
+        $out[] = Groddle\\Minn\\MultiplayerSave::decide($r === null ? null : $r['version'], $r['writer'] ?? '', $r['seq'] ?? 0, $w['version'], $w['writer'], $w['seq'], $w['takeover']);
+      }
+      echo json_encode($out);`;
+    const res = spawnSync('php', ['-r', code], { input: JSON.stringify(cases), encoding: 'utf8' });
+    assert.equal(res.status, 0, res.stderr);
+    const php = JSON.parse(res.stdout);
+    cases.forEach((c, i) => assert.equal(php[i], decide(c.row, c.w), JSON.stringify(c)));
   });
 });
 
@@ -527,7 +878,7 @@ describe('every save read and write goes through the store', () => {
   // js/ui/street-minimap.js keeps whether the street map shows (G370), a device preference;
   // js/phone/companion.js is the phone page, not the game: it keeps this device's choice to open the full game anyway (groddle-play-device);
   // js/builder/editor.js is the level builder in the console, not the game: it keeps its panels, cameras and clipboard on this device.
-  const ALLOWED = new Set(['js/save-store.js', 'js/practice-mode.js', 'js/audio-pref.js', 'js/online-boot.js', 'js/features/groups-feature.js', 'js/ui/social-drawer.js', 'js/classic/ui-mode.js', 'js/world-zoom.js', 'js/night-tint.js', 'js/ui/street-minimap.js', 'js/builder/editor.js', 'js/phone/companion.js']);
+  const ALLOWED = new Set(['js/save-store.js', 'js/practice-mode.js', 'js/audio-pref.js', 'js/online-boot.js', 'js/features/groups-feature.js', 'js/ui/social-drawer.js', 'js/classic/ui-mode.js', 'js/world-zoom.js', 'js/night-tint.js', 'js/ui/street-minimap.js', 'js/builder/editor.js', 'js/phone/companion.js', 'js/save-claim.js']);
 
   it('game.js and js/ make no direct localStorage or sessionStorage calls', () => {
     const offenders = [];

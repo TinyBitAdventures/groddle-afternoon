@@ -92,13 +92,13 @@
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { nearestSurfaceY } from '../walk-surface.js?v=764d5f5a';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=3753a0d2';
-import { isInHell } from '../hell.js?v=454c9f42';
+import { isInHell } from '../hell.js?v=393c3c7f';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
-import { animalStatusLabel } from '../animals.js?v=fc721127';
+import { animalStatusLabel } from '../animals.js?v=cad23774';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=91490913';
-import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=beead095';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=05c71916';
+import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=d29cd364';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=54314a17';
 import {
   CHECK_ON_REMOVE,
   CROWD_CLASSES,
@@ -118,8 +118,8 @@ import {
   sadnessMax,
   sadnessStart,
   streetWidth,
-} from '../animal-crowding.js?v=81f4b6ea';
-import { GAME_DAY_MS, setLastNewDayTs } from '../game-day.js?v=3095e05b';
+} from '../animal-crowding.js?v=e8d3ce7c';
+import { GAME_DAY_MS, setLastNewDayTs } from '../game-day.js?v=edb00566';
 import {
   CROAK_INTERVAL_MS,
   EAT_PAUSE_MS,

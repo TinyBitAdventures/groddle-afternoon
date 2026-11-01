@@ -38,13 +38,13 @@ import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=85d4f
 import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js?v=0f922478';
 import { loseEnergy, loseMood, metabolicGain, moodMax } from './metabolics.js?v=8504134e';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
-import { musicblockItemMeta } from './musicblocks.js?v=35e2b17a';
+import { musicblockItemMeta } from './musicblocks.js?v=b597bd9d';
 import { isEnchantedForest } from './enchanted-forests.js?v=d986bff5';
 import { isSymphoniousTsid } from './symphonious-maximus.js?v=345ad437';
 import { isMissingFloorTsid } from './hidden-floors.js?v=5ce87a04';
 import { stationByTsid } from './subway.js?v=646ae6af';
 import { ensurePiggyMood, piggyTwiceDailyTick, satePiggy } from './animal-mood.js?v=a49495fc';
-import { isCrowdSad } from './animal-crowding.js?v=81f4b6ea';
+import { isCrowdSad } from './animal-crowding.js?v=e8d3ce7c';
 import { ecologyForStreet } from './street-ecology.js?v=315ff68c';
 
 const MINUTE = 60 * 1000;

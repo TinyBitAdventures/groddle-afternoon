@@ -52,10 +52,10 @@ import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { signArmWidth, signLabel } from '../street-render.js?v=b5ae0c3d';
 import { openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
 import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=31a75688';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=3e1708d4';
-import { projectApi } from './street-jobs-feature.js?v=ee238baf';
-import { saveStore } from '../save-store.js?v=b74a8113';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=4edbceb3';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=3d0f38b4';
+import { projectApi } from './street-jobs-feature.js?v=297f2499';
+import { saveStore } from '../save-store.js?v=8839ba7b';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=35defd51';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,
@@ -201,7 +201,7 @@ async function flush(engine) {
       return false;
     }
     if (saveStore.state === 'saved') return true;
-    if (['conflict', 'signed-out', 'error', 'offline'].includes(saveStore.state)) return false;
+    if (['conflict', 'elsewhere', 'signed-out', 'error', 'offline'].includes(saveStore.state)) return false;
   }
   return saveStore.state === 'saved';
 }

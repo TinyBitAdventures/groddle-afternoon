@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GAME_DAY_MS, GAME_EPOCH_MS } from '../public/js/game-day.js?v=3095e05b';
+import { GAME_DAY_MS, GAME_EPOCH_MS } from '../public/js/game-day.js?v=edb00566';
 import { QURAZY_MARKER_STREET_COUNT, qurazyMarkersFor } from '../public/js/qurazy-markers.js?v=f7a8124b';
 import {
   QURAZY_DAILY_MAX,
@@ -21,7 +21,7 @@ import {
   qurazyHistoryChance,
   qurazyIsChance,
   rollQurazy,
-} from '../public/js/qurazy.js?v=62ae37a2';
+} from '../public/js/qurazy.js?v=ae135979';
 import { planStreetQuoins } from '../public/js/quoins.js?v=d4f4772b';
 import {
   QURAZY_ZONE,
@@ -35,8 +35,8 @@ import {
   qurazyFeatureState,
   qurazyStreetEligible,
   resetQurazyFeatureForTests,
-} from '../public/js/features/qurazy-feature.js?v=667f85c8';
-import * as qurazyModule from '../public/js/features/qurazy-feature.js?v=667f85c8';
+} from '../public/js/features/qurazy-feature.js?v=7794c54f';
+import * as qurazyModule from '../public/js/features/qurazy-feature.js?v=7794c54f';
 import { GENTLE_ISLAND } from '../public/js/newxp.js?v=d5978ec1';
 
 const here = dirname(fileURLToPath(import.meta.url));

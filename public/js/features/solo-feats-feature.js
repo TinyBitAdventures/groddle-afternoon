@@ -86,7 +86,7 @@
  */
 
 import { addItem } from '../inventory.js?v=85d4faba';
-import { GAME_DAY_MS, getGameDayKey } from '../game-day.js?v=3095e05b';
+import { GAME_DAY_MS, getGameDayKey } from '../game-day.js?v=edb00566';
 import {
   CAP_OWNERS,
   COMPLETE_BUTTON,
@@ -114,11 +114,11 @@ import {
   resetPending,
   streakCheck,
   takePending,
-} from '../solo-feats.js?v=e026b67b';
-import { saveStore } from '../save-store.js?v=b74a8113';
+} from '../solo-feats.js?v=40f8c7b5';
+import { saveStore } from '../save-store.js?v=8839ba7b';
 import { gainMetabolic } from '../metabolics.js?v=8504134e';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { GIANTS } from '../shrines.js?v=01b185bc';
+import { GIANTS } from '../shrines.js?v=b6bbcdb5';
 import {
   MP_TEXT,
   endedLine,
@@ -133,7 +133,7 @@ import {
   runFromServer,
   vogFor,
   youLine,
-} from '../feats-mp.js?v=3aa606d6';
+} from '../feats-mp.js?v=70ffb0f7';
 
 const POLL_MS = 500;
 /** How often an open panel redraws its "Opens again in" lines. */
@@ -535,7 +535,7 @@ function applyDemo(engine) {
 
 // —— Multiplayer: the shared Feat (G345) ———————————————————————————————————
 
-const BLOCKED_SAVES = new Set(['conflict', 'signed-out', 'error', 'offline']);
+const BLOCKED_SAVES = new Set(['conflict', 'elsewhere', 'signed-out', 'error', 'offline']);
 const ROCK_ICONS = Object.freeze({
   petrified_rock_small: 'assets/sprites/icons/petrified_rock_small@3x.png',
   petrified_rock_medium: 'assets/sprites/icons/petrified_rock_medium@3x.png',
