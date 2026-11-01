@@ -11,7 +11,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=29713fa8';
-import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=9afaa75d';
+import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=1cfff492';
 import { EXTERIOR_STYLES, streetLook } from '../public/js/home-styles.js?v=f591561f';
 import {
   DOORWAY_GAP,
@@ -22,7 +22,7 @@ import {
   streetNearSkip,
   streetTrimSpots,
   towerDoorway,
-} from '../public/js/features/homes-feature.js?v=6faef845';
+} from '../public/js/features/homes-feature.js?v=d388620f';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', 'public', 'js', rel), 'utf8');
 const maxLeft = HOME_LIMITS.MAX_FRONTYARD_LEFT_SEGMENTS - HOME_LIMITS.START_FRONTYARD_LEFT_SEGMENTS;

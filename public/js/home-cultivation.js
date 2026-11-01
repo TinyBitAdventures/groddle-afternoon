@@ -51,6 +51,8 @@
  * - The Mail Dispatcher stands on the street (js/home-street-fixtures.js):
  *   its spot is kept with the street (`dispatcherRx`, null for the usual
  *   one) and cultivations keep clear of it, as it keeps clear of them.
+ *   PORCH: the Mailbox and the Magic Rock too, once moved (`mailboxRx`,
+ *   `rockRx`); a fixture steps aside for a cultivation, never the other way round.
  */
 
 import { CULTIVATION_CLASSES, HOME_LIMITS } from './homes-catalog.js?v=29713fa8';
@@ -62,7 +64,18 @@ import {
   TOWER_PROTO,
   TOWER_WIDTH,
 } from './home-tower.js?v=b05c58d8';
-import { DISPATCHER_HALF, dispatcherSpot, fixtureName, savedDispatcherRx, signpostX, streetFixtures } from './home-street-fixtures.js?v=26bb21a8';
+import {
+  DISPATCHER_HALF,
+  MOVABLE_FIXTURES,
+  MOVABLE_FIXTURE_IDS,
+  STREET_ROCK,
+  dispatcherDefaultRx,
+  fixtureName,
+  fixtureSpot,
+  savedFixtureRx,
+  signpostX,
+  streetFixtures,
+} from './home-street-fixtures.js?v=badcb725';
 import { gardenHalfWidth } from './garden-view.js?v=05651e76';
 
 export const YARD_SEGMENT_W = 150;
@@ -176,9 +189,14 @@ export function normalizeCultivationState(seed = {}) {
       : {},
     // achievements cultivation:times_restored is a set-to-max counter; the remake increments by the gain.
     timesRestored: Math.max(0, Math.floor(finite(seed?.timesRestored, 0))),
-    // The Mail Dispatcher's spot on the street once you have moved it (home-street-fixtures).
-    ...(!back && savedDispatcherRx(seed) != null ? { dispatcherRx: savedDispatcherRx(seed) } : {}),
   };
+  // The Mail Dispatcher's, the Mailbox's and the Magic Rock's spots once you have moved them (home-street-fixtures).
+  if (!back) {
+    for (const id of MOVABLE_FIXTURE_IDS) {
+      const rx = savedFixtureRx(seed, id);
+      if (rx != null) state[MOVABLE_FIXTURES[id].key] = rx;
+    }
+  }
   settleGardens(state);
   return state;
 }
@@ -327,11 +345,21 @@ export const SIGNPOST_POST_HALF = 22;
  * signpost's post (its arms are overhead, above
  * the tallest grown crop), the Magic Rock and the Butler Box.
  */
-export function groundFixtures(layout) {
-  return streetFixtures(layout).map((f) => {
+export function groundFixtures(layout, state = null, { moved = true } = {}) {
+  const rockRx = savedFixtureRx(state, 'rock');
+  const mailRx = savedFixtureRx(state, 'mailbox');
+  const rows = streetFixtures(layout, rockRx != null ? { rockX: layout.houseX + rockRx } : {}).map((f) => {
     if (f.id === 'signpost') return { id: f.id, x1: signpostX(layout) - SIGNPOST_POST_HALF, x2: signpostX(layout) + SIGNPOST_POST_HALF };
     return f;
   });
+  // PORCH: a moved Mailbox is kept clear too (in its usual spot it never was); `moved: false`
+  // leaves the moved fixtures out, so settling old saves never moves a cultivation for one.
+  if (mailRx != null) {
+    const x = layout.houseX + mailRx;
+    rows.push({ id: 'mailbox', x1: x - MOVABLE_FIXTURES.mailbox.half, x2: x + MOVABLE_FIXTURES.mailbox.half });
+  }
+  if (moved) return rows;
+  return rows.filter((f) => !(f.id === 'rock' && rockRx != null) && f.id !== 'mailbox');
 }
 
 /**
@@ -355,7 +383,7 @@ export function placementCheck(state, protoClass, rx, excludeId = null, { dispat
   // (ContiguousPlatformLineSet.calculateRanges kept placements off signposts).
   if (!back) {
     const wx = layout.houseX + x;
-    for (const f of groundFixtures(layout)) {
+    for (const f of groundFixtures(layout, state, { moved: dispatcher })) {
       if (wx + half > f.x1 && wx - half < f.x2) return { ok: false, reason: f.id, msg: `Keep it clear of your ${fixtureName(f.id)}.` };
     }
   }
@@ -372,20 +400,60 @@ export function placementCheck(state, protoClass, rx, excludeId = null, { dispat
 }
 
 /**
+ * A movable fixture's usual spot, x from the house's centre: the Mailbox at the house's sign
+ * corner (`at.mailboxX`, it follows the house style; null without it), the Magic Rock right
+ * of the door (inc_homes.js homes_demo_frontyard 2469-2471), the dispatcher past the signpost.
+ */
+export function usualFixtureRx(layout, id, at = {}) {
+  if (id === 'mailbox') return Number.isFinite(at.mailboxX) ? Math.round(at.mailboxX - layout.houseX) : null;
+  if (id === 'rock') return STREET_ROCK.houseDx;
+  if (id === 'dispatcher') return dispatcherDefaultRx(layout);
+  return null;
+}
+
+/**
+ * What movable fixture `id` keeps clear of: the other fixtures where they stand (each moved
+ * one at its saved spot, the rest at their usual ones; `at` adds the drawn Mailbox and the
+ * door and its mat) and the cultivations (but `excludeId`), in world x.
+ */
+export function fixtureObstacles(state, id, { excludeId = null, at = {} } = {}) {
+  const layout = homeStreetLayout(state);
+  const spot = (other) => {
+    const rx = savedFixtureRx(state, other) ?? usualFixtureRx(layout, other, at);
+    return rx == null ? undefined : layout.houseX + rx;
+  };
+  const where = { ...at, mailboxX: spot('mailbox'), rockX: spot('rock'), dispatcherX: spot('dispatcher') };
+  const items = (state?.items || []).filter((row) => row.id !== excludeId).map((row) => ({
+    x: layout.houseX + row.rx,
+    half: footprint(row.protoClass),
+    label: cultivationDef(row.protoClass)?.label,
+  }));
+  return { fixtures: streetFixtures(layout, where).filter((f) => f.id !== id), items };
+}
+
+/**
+ * Where movable fixture `id` stands on the home street, x from the house's centre (null in a
+ * back yard, or for the Mailbox without `at.mailboxX`). The Mailbox and the Magic Rock stand
+ * in their usual spots until moved; a moved one (and the dispatcher always) stands at its spot,
+ * or the nearest that is clear of the other fixtures and the cultivations (but `excludeId`).
+ */
+export function fixtureRx(state, id, { excludeId = null, at = {} } = {}) {
+  if (isBackYard(state) || !MOVABLE_FIXTURES[id]) return null;
+  const layout = homeStreetLayout(state);
+  const saved = savedFixtureRx(state, id);
+  const usual = usualFixtureRx(layout, id, at);
+  if (saved == null && id !== 'dispatcher') return usual;
+  return fixtureSpot(layout, id, saved ?? usual, fixtureObstacles(state, id, { excludeId, at })) - layout.houseX;
+}
+
+/**
  * Where the Mail Dispatcher stands on the home street, x from the house's centre: its saved
  * spot (or the usual one), or the nearest that is clear of the fixtures and of the
  * cultivations (but `excludeId`). `at` adds the drawn Mailbox and door x (home-street-fixtures
  * streetFixtures). Null in a back yard.
  */
 export function dispatcherRx(state, { excludeId = null, at = {} } = {}) {
-  if (isBackYard(state)) return null;
-  const layout = homeStreetLayout(state);
-  const items = (state?.items || []).filter((row) => row.id !== excludeId).map((row) => ({
-    x: layout.houseX + row.rx,
-    half: footprint(row.protoClass),
-    label: cultivationDef(row.protoClass)?.label,
-  }));
-  return dispatcherSpot(layout, savedDispatcherRx(state), { fixtures: streetFixtures(layout, at), items }) - layout.houseX;
+  return fixtureRx(state, 'dispatcher', { excludeId, at });
 }
 
 /** The nearest free spot to `rx` (searching outward), or null. */

@@ -87,12 +87,12 @@ import { createMinnAccount } from '../minn-account.js?v=ea900c51';
 import { runStreetTransition } from '../screen-fx.js?v=9d4640eb';
 import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
 import { ITEM_CATALOG, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=b0e33301';
-import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=9afaa75d';
+import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=1cfff492';
 import { tickGarden } from '../garden.js?v=854d4730';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=e81817d9';
 import { normalizeButlerParts } from '../butler.js?v=a0c80a92';
-import { butlerApi } from './butler-feature.js?v=2e13065e';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=6faef845';
+import { butlerApi } from './butler-feature.js?v=9b96ba58';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=d388620f';
 import {
   BUTLER_MESSAGE_MAX,
   KEY_VERB,
@@ -223,6 +223,8 @@ function createSession(engine, client) {
     engine.setData?.('neighboursLast', last);
     engine.setData?.('neighboursAllow', visitors ? String(visitors.allow === true) : '');
     engine.setData?.('neighboursButler', vb?.target ? `${vb.name}@${Math.round(vb.box.x)}` : '');
+    // PORCH: the owner's Mailbox on their street (where they moved it, else the house's sign corner).
+    engine.setData?.('neighboursMailbox', visit?.room === 'street' && Number.isFinite(visit.mailboxX) ? String(Math.round(visit.mailboxX)) : '');
     engine.setData?.('neighboursParcels', String(parcelsMerged));
     engine.setData?.('neighboursTended', `${tendApplied}/${tendSent}`);
   }
@@ -374,6 +376,7 @@ function createSession(engine, client) {
       t.gate = engine.register({ classId: CLASS_GATE, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'Back to Ur', subtitle: `${way.label}${way.hubName && way.hubName !== way.label ? `, ${way.hubName}` : ''}`, sprite: spots.gate, state: { owner: visit.owner } });
       // MPVISIT: the owner's built Tower: Enter (furniture_tower_chassis enter; the owner's customize and flip are left off).
       visit.towerX = spots.tower?.box?.x;
+      visit.mailboxX = spots.mailbox?.x;
       if (spots.tower?.built) {
         const tw = visitorHomeState(visit.view).tower;
         t.tower = engine.register({ classId: CLASS_TOWER, featureId: NEIGHBOURS_MP_FEATURE_ID, label: `${possessive(visit.name)} ${towerLabel(tw)}`, subtitle: `${tw.floors} floors`, sprite: spots.tower.box, state: { owner: visit.owner } });

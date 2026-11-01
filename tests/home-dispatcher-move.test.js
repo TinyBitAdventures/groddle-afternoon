@@ -15,7 +15,7 @@ import {
   homeStreetLayout,
   normalizeCultivationState,
   placementCheck,
-} from '../public/js/home-cultivation.js?v=9afaa75d';
+} from '../public/js/home-cultivation.js?v=1cfff492';
 import {
   DISPATCHER_HALF,
   DISPATCHER_TEXT,
@@ -25,8 +25,8 @@ import {
   savedDispatcherRx,
   signpostX,
   streetFixtures,
-} from '../public/js/home-street-fixtures.js?v=26bb21a8';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=6faef845';
+} from '../public/js/home-street-fixtures.js?v=badcb725';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=d388620f';
 
 const root = join(import.meta.dirname, '..', 'public', 'js');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -93,13 +93,14 @@ describe('moving the Mail Dispatcher (HOMEMAIL)', () => {
 
   it('is wired into Cultivate: select, Move, drag, Place, Back to its usual spot, saved', () => {
     const src = read('features/homes-feature.js');
-    for (const hook of ["'data-home-action': 'dispatcher-move'", "'data-home-action': 'dispatcher-reset'", "'data-home-dispatcher': 'select'"]) {
+    // PORCH: one path for the Mail Dispatcher, the Mailbox and the Magic Rock (data-home-action `${id}-move`).
+    for (const hook of ["'data-home-action': `${id}-move`", "'data-home-action': `${id}-reset`", "'data-home-dispatcher': 'select'"]) {
       assert.ok(src.includes(hook), hook);
     }
-    assert.match(src, /if \(placing\.kind === 'dispatcher'\) return placeDispatcher\(engine, at\.x\);/);
-    assert.match(src, /if \(press\.kind === 'dispatcher'\) beginDispatcherMove\(engine\);/);
-    assert.match(src, /cult\.dispatcherRx = Math\.round\(x\) - homeStreetLayout\(cult\)\.houseX;[\s\S]{0,400}engine\.save\(\);/);
-    assert.match(src, /delete cult\.dispatcherRx;[\s\S]{0,400}engine\.save\(\);/);
+    assert.match(src, /if \(placing\.kind === 'fixture'\) return placeFixture\(engine, placing\.id, at\.x\);/);
+    assert.match(src, /if \(press\.kind === 'fixture'\) beginFixtureMove\(engine, press\.id\);/);
+    assert.match(src, /cult\[key\] = Math\.round\(x\) - homeStreetLayout\(cult\)\.houseX;[\s\S]{0,400}engine\.save\(\);/);
+    assert.match(src, /delete cult\[MOVABLE_FIXTURES\[id\]\.key\];[\s\S]{0,400}engine\.save\(\);/);
     // Recorded as reimagined, with the source that never moved it.
     assert.match(src, /Reimagined: the\s+\* source rebuilt it/);
     assert.match(read('home-street-fixtures.js'), /upgrades_recreate_classes/);

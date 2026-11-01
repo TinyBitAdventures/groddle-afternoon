@@ -154,7 +154,8 @@ import {
 import { RECIPE_CATALOG } from '../making.js?v=20d5364b';
 import {
   createBackYardState,
-  dispatcherRx,
+  fixtureObstacles,
+  fixtureRx,
   isBackYard,
   nearestFreeRx,
   addWear,
@@ -181,9 +182,9 @@ import {
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=9afaa75d';
+} from '../home-cultivation.js?v=1cfff492';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=68506420';
-import { DISPATCHER_HALF, DISPATCHER_TEXT, dispatcherFits, savedDispatcherRx, signpostX, streetFixtures } from '../home-street-fixtures.js?v=26bb21a8';
+import { MOVABLE_FIXTURES, MOVABLE_FIXTURE_IDS, fixtureFits, fixtureText, savedFixtureRx, signpostX } from '../home-street-fixtures.js?v=badcb725';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=7fe91266';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
@@ -523,9 +524,10 @@ let backCult = createBackYardState();
 let savedHouseX = null;
 let mode = null; // 'decorate' | 'cultivate' | null
 let tab = 'furniture';
-let placing = null; // { kind: 'furniture'|'cultivation'|'dispatcher', classTsid|protoClass, moveId? }
+let placing = null; // { kind: 'furniture'|'cultivation'|'fixture', classTsid|protoClass, moveId?, id? (a fixture's) }
 let selected = null; // { kind, id }
-let dispatcherLast = ''; // QA: the last move of the Mail Dispatcher (moved:<rx> | usual | refused:<why>)
+// QA: the last move of each movable fixture (moved:<rx> | usual | refused:<why>), by id.
+const fixtureLast = { mailbox: '', rock: '', dispatcher: '' };
 let stamping = null; // { kind: 'wall'|'floor'|'ceiling', key } while a swatch is on the cursor
 let stampHover = null; // { kind, segment?, center? } under the cursor
 let scene = null; // live scene context while a home room is shown
@@ -629,10 +631,13 @@ function publish(engine) {
   // BUILDER: the tray tab and filter, and what moves the thing you carry.
   engine.setData('homeTray', mode === 'decorate' ? `${tab}:${trayFilter}` : mode || '');
   engine.setData('homeCarry', placing ? carryBy : '');
-  // HOMEMAIL: where the Mail Dispatcher stands (world x) and its saved spot (or usual), the last move.
-  const dx = dispatcherWorldX();
-  engine.setData('homeDispatcher', dx == null ? '' : `${Math.round(dx)}:${savedDispatcherRx(cult) ?? 'usual'}`);
-  engine.setData('homeDispatcherLast', dispatcherLast);
+  // HOMEMAIL / PORCH: where the Mail Dispatcher, the Mailbox and the Magic Rock stand (world x) and
+  // each one's saved spot (or usual), the last move.
+  for (const [id, spot, last] of [['dispatcher', 'homeDispatcher', 'homeDispatcherLast'], ['mailbox', 'homeMailboxSpot', 'homeMailboxMove'], ['rock', 'homeRockSpot', 'homeRockMove']]) {
+    const fx = fixtureWorldX(id);
+    engine.setData(spot, fx == null ? '' : `${Math.round(fx)}:${savedFixtureRx(cult, id) ?? 'usual'}`);
+    engine.setData(last, fixtureLast[id]);
+  }
   // G358: placed pieces' upgrades (class:id), the open picker and the last upgrade.
   engine.setData('furnupPlaced', decor.placed.filter((p) => p.upgradeId).map((p) => `${p.classTsid}:${p.upgradeId}`).join(','));
   engine.setData('furnupStored', Object.entries(decor.styles || {}).map(([c, rows]) => rows.map((r) => `${c}:${r.upgradeId || 0}`).join(',')).filter(Boolean).join(','));
@@ -1162,7 +1167,8 @@ function syncStreetRock(engine) {
   const want = owner && !held;
   const have = liveRock();
   if (want && !have) {
-    rockTarget = spawnRock(engine, homeStreetLayout(cult).houseX + STREET_ROCK.dx, STREET_GROUND_Y, 'street');
+    // PORCH: where you moved it, else its usual spot (STREET_ROCK).
+    rockTarget = spawnRock(engine, fixtureWorldX('rock') ?? homeStreetLayout(cult).houseX + STREET_ROCK.dx, STREET_GROUND_Y, 'street');
     publish(engine);
   } else if (!want && have) {
     engine.unregister?.(have);
@@ -1762,17 +1768,27 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
   return root;
 }
 
-/** The drawn Mailbox and door x on this street (they follow the house style). */
+/** The drawn Mailbox and door x on this street (they follow the house style), and the doorway (door and mat). */
 function streetFixtureAt() {
   const bg = scene?.background;
   const layout = homeStreetLayout(cult);
-  return { mailboxX: Math.round(bg?.houseSignX ?? layout.houseX - 260), doorX: bg?.houseDoorX ?? layout.houseX };
+  return {
+    mailboxX: Math.round(bg?.houseSignX ?? layout.houseX - 260),
+    doorX: bg?.houseDoorX ?? layout.houseX,
+    ...(bg?.houseDoorway ? { doorway: bg.houseDoorway } : {}),
+  };
+}
+
+/** A movable fixture's world x on your own home street (its usual spot until moved), or null. */
+function fixtureWorldX(id, excludeId = null) {
+  if (scene?.room !== 'street' || isBackYard(cult)) return null;
+  const rx = fixtureRx(cult, id, { excludeId, at: streetFixtureAt() });
+  return rx == null ? null : homeStreetLayout(cult).houseX + rx;
 }
 
 /** The Mail Dispatcher's world x on your own home street (mail-courier-feature draws it), or null. */
 function dispatcherWorldX(excludeId = null) {
-  if (scene?.room !== 'street') return null;
-  return homeStreetLayout(cult).houseX + dispatcherRx(cult, { excludeId, at: streetFixtureAt() });
+  return fixtureWorldX('dispatcher', excludeId);
 }
 
 /*
@@ -1783,46 +1799,58 @@ function dispatcherWorldX(excludeId = null) {
  * for Move and Back to its usual spot, or press and drag it. It sets down only where it is clear
  * of the street's ends, the fixtures and your cultivations (home-street-fixtures dispatcherFits);
  * the spot is saved with the street (cult.dispatcherRx, x from the house's centre), solo and online.
+ *
+ * PORCH (Austin 2026-11-01, "my house front is crowded"): the Mailbox and the Magic Rock move the
+ * same way (Move Mailbox, Move Magic Rock; cult.mailboxRx / cult.rockRx), reimagined as well: the
+ * source put the Mailbox with the street template and the rock at (221, -144) right of the door
+ * (inc_homes.js homes_demo_frontyard 2469-2471) and never moved either. They are part of the
+ * street, not items: nothing is created or moved in value, so the ledger is not involved.
  */
-const DISPATCHER_CLASS = 'npc_mail_dispatcher';
-let dimmedDispatcher = null;
+let dimmedFixture = null;
 
-function dispatcherTarget(engine) {
-  return (engine?.interactables || []).find((t) => t.classId === DISPATCHER_CLASS && t.sprite && !t.sprite.destroyed) || null;
+/** The movable fixture's interactable on your street (the rock: the street's own, not the yard's). */
+function fixtureTarget(engine, id) {
+  const meta = MOVABLE_FIXTURES[id];
+  if (!meta) return null;
+  return (engine?.interactables || []).find((t) => t.classId === meta.classId && t.sprite && !t.sprite.destroyed
+    && (id !== 'rock' || t.state?.room === 'street')) || null;
 }
 
-function canMoveDispatcher(engine) {
-  return mode === 'cultivate' && scene?.room === 'street' && Boolean(dispatcherTarget(engine));
+function canMoveFixture(engine, id) {
+  return mode === 'cultivate' && scene?.room === 'street' && Boolean(fixtureTarget(engine, id));
 }
 
-/** A world point on the dispatcher's drawn art (144 px tall, 104 wide). */
-function dispatcherAt(engine, p) {
-  if (scene?.room !== 'street') return false;
-  const s = dispatcherTarget(engine)?.sprite;
-  return Boolean(s) && Math.abs(p.x - s.x) <= DISPATCHER_HALF && p.y <= s.y + 10 && p.y >= s.y - 150;
+/** The movable fixture whose drawn art is under a world point, or null. */
+function fixtureAt(engine, p) {
+  if (scene?.room !== 'street') return null;
+  for (const id of ['dispatcher', 'mailbox', 'rock']) {
+    const s = fixtureTarget(engine, id)?.sprite;
+    const meta = MOVABLE_FIXTURES[id];
+    if (s && Math.abs(p.x - s.x) <= meta.half && p.y <= s.y + 10 && p.y >= s.y - meta.tall) return id;
+  }
+  return null;
 }
 
-/** Whether it may stand at world x now: on the street, clear of the fixtures and the cultivations. */
-function dispatcherCheck(x) {
+/** Whether it may stand at world x now: on the street, clear of the door, the other fixtures and the cultivations. */
+function fixtureCheck(id, x) {
   const layout = homeStreetLayout(cult);
-  const items = cult.items.map((row) => ({ x: layout.houseX + row.rx, half: footprint(row.protoClass), label: cultivationDef(row.protoClass)?.label }));
-  return dispatcherFits(layout, Math.round(x), { fixtures: streetFixtures(layout, streetFixtureAt()), items });
+  return fixtureFits(layout, id, Math.round(x), fixtureObstacles(cult, id, { at: streetFixtureAt() }));
 }
 
 /** While you carry it, the one standing there fades back. */
-function dimDispatcher(engine, on) {
-  if (dimmedDispatcher && !dimmedDispatcher.destroyed) dimmedDispatcher.alpha = 1;
-  dimmedDispatcher = null;
-  const s = on ? dispatcherTarget(engine)?.sprite : null;
+function dimFixture(engine, id, on) {
+  if (dimmedFixture && !dimmedFixture.destroyed) dimmedFixture.alpha = 1;
+  dimmedFixture = null;
+  const s = on ? fixtureTarget(engine, id)?.sprite : null;
   if (!s) return;
   s.alpha = 0.35;
-  dimmedDispatcher = s;
+  dimmedFixture = s;
 }
 
-function selectDispatcher(engine) {
-  if (!canMoveDispatcher(engine)) return false;
+function selectFixture(engine, id) {
+  if (!canMoveFixture(engine, id)) return false;
   if (placing) cancelCarry(engine);
-  selected = { kind: 'dispatcher', id: 'dispatcher' };
+  selected = { kind: 'fixture', id };
   drawCultivationMarkers(engine);
   renderBar(engine);
   publish(engine);
@@ -1830,14 +1858,14 @@ function selectDispatcher(engine) {
 }
 
 /** Carry it with the pointer, or at your feet ('avatar': walk it over, then Place). */
-function beginDispatcherMove(engine, by = 'pointer') {
-  if (!canMoveDispatcher(engine)) return false;
-  placing = { kind: 'dispatcher', classTsid: DISPATCHER_CLASS, moveId: 'dispatcher' };
-  selected = { kind: 'dispatcher', id: 'dispatcher' };
+function beginFixtureMove(engine, id, by = 'pointer') {
+  if (!canMoveFixture(engine, id)) return false;
+  placing = { kind: 'fixture', id, classTsid: MOVABLE_FIXTURES[id].classId, moveId: id };
+  selected = { kind: 'fixture', id };
   carryBy = by;
   if (by === 'avatar') pointer.inside = false;
   makeGhost(engine);
-  dimDispatcher(engine, true);
+  dimFixture(engine, id, true);
   renderBar(engine);
   if (by === 'avatar') {
     syncFloating(engine, true);
@@ -1847,49 +1875,52 @@ function beginDispatcherMove(engine, by = 'pointer') {
   return true;
 }
 
-/** Stand it where it now belongs (mail-courier-feature checks it every 400 ms as well). */
-function settleDispatcher(engine) {
-  const t = dispatcherTarget(engine);
-  const x = dispatcherWorldX();
-  if (t && x != null) t.sprite.x = Math.round(x);
+/** Stand them where they now belong (mail-courier-feature checks the dispatcher every 400 ms as well). */
+function settleFixtures(engine) {
+  for (const id of MOVABLE_FIXTURE_IDS) {
+    const t = fixtureTarget(engine, id);
+    const x = fixtureWorldX(id);
+    if (t && x != null) t.sprite.x = Math.round(x);
+  }
 }
 
-function placeDispatcher(engine, x) {
-  const fit = dispatcherCheck(x);
+function placeFixture(engine, id, x) {
+  const fit = fixtureCheck(id, x);
   if (!fit.ok) {
     engine.toast(fit.msg);
     engine.playSound?.('CLICK_FAILURE', { volume: 0.4 });
-    dispatcherLast = `refused:${fit.reason}`;
+    fixtureLast[id] = `refused:${fit.reason}`;
     publish(engine);
     return fit;
   }
-  cult.dispatcherRx = Math.round(x) - homeStreetLayout(cult).houseX;
+  const key = MOVABLE_FIXTURES[id].key;
+  cult[key] = Math.round(x) - homeStreetLayout(cult).houseX;
   placing = null;
-  selected = { kind: 'dispatcher', id: 'dispatcher' };
+  selected = { kind: 'fixture', id };
   destroyGhost();
-  settleDispatcher(engine);
+  settleFixtures(engine);
   engine.playSound?.('ITEM_DROP', { volume: 0.45 });
-  engine.pushActivity(DISPATCHER_TEXT.moved);
-  dispatcherLast = `moved:${cult.dispatcherRx}`;
+  engine.pushActivity(fixtureText(id).moved);
+  fixtureLast[id] = `moved:${cult[key]}`;
   engine.save();
   drawCultivationMarkers(engine);
   renderBar(engine);
   publish(engine);
-  return { ok: true, x: Math.round(x), rx: cult.dispatcherRx };
+  return { ok: true, x: Math.round(x), rx: cult[key] };
 }
 
-/** Back to its usual spot, just past the friends' signpost. */
-function resetDispatcher(engine) {
-  if (savedDispatcherRx(cult) == null) return { ok: false, reason: 'usual' };
-  delete cult.dispatcherRx;
-  if (placing?.kind === 'dispatcher') {
+/** Back to its usual spot. */
+function resetFixture(engine, id) {
+  if (savedFixtureRx(cult, id) == null) return { ok: false, reason: 'usual' };
+  delete cult[MOVABLE_FIXTURES[id].key];
+  if (placing?.kind === 'fixture') {
     placing = null;
     destroyGhost();
   }
-  settleDispatcher(engine);
+  settleFixtures(engine);
   engine.playSound?.('ITEM_DROP', { volume: 0.45 });
-  engine.pushActivity(DISPATCHER_TEXT.resetDone);
-  dispatcherLast = 'usual';
+  engine.pushActivity(fixtureText(id).resetDone);
+  fixtureLast[id] = 'usual';
   engine.save();
   drawCultivationMarkers(engine);
   renderBar(engine);
@@ -1897,25 +1928,39 @@ function resetDispatcher(engine) {
   return { ok: true };
 }
 
-/** The selected dispatcher's actions, floating by it: Move, Back to its usual spot. */
-function dispatcherPop(engine) {
-  if (selected?.kind !== 'dispatcher' || placing || !canMoveDispatcher(engine)) return null;
-  const moved = savedDispatcherRx(cult) != null;
+/** The selected fixture's actions, floating by it: Move, Back to its usual spot. */
+function fixturePop(engine) {
+  const id = selected?.kind === 'fixture' ? selected.id : null;
+  if (!id || placing || !canMoveFixture(engine, id)) return null;
+  const text = fixtureText(id);
+  const moved = savedFixtureRx(cult, id) != null;
   return {
-    key: `d:${moved ? 1 : 0}`,
-    title: DISPATCHER_TEXT.label,
-    sub: DISPATCHER_TEXT.sub,
+    key: `f:${id}:${moved ? 1 : 0}`,
+    title: text.label,
+    sub: text.sub,
     actions: [
-      { label: DISPATCHER_TEXT.move, primary: true, title: DISPATCHER_TEXT.moveTitle, attrs: { 'data-home-action': 'dispatcher-move' }, onClick: () => beginDispatcherMove(engine, 'avatar') },
+      { label: text.move, primary: true, title: text.moveTitle, attrs: { 'data-home-action': `${id}-move` }, onClick: () => beginFixtureMove(engine, id, 'avatar') },
       {
-        label: DISPATCHER_TEXT.reset,
+        label: text.reset,
         disabled: !moved,
-        title: moved ? DISPATCHER_TEXT.resetTitle : DISPATCHER_TEXT.atUsual,
-        attrs: { 'data-home-action': 'dispatcher-reset' },
-        onClick: () => resetDispatcher(engine),
+        title: moved ? text.resetTitle : text.atUsual,
+        attrs: { 'data-home-action': `${id}-reset` },
+        onClick: () => resetFixture(engine, id),
       },
     ],
   };
+}
+
+/** The banner's Move Mailbox, Move Magic Rock and Move Mail Dispatcher (those on the street now). */
+function fixtureBannerActions(engine) {
+  return MOVABLE_FIXTURE_IDS.filter((id) => fixtureTarget(engine, id)).map((id) => ({
+    label: fixtureText(id).banner,
+    title: fixtureText(id).bannerTitle,
+    attrs: { 'data-home-fixture': id, ...(id === 'dispatcher' ? { 'data-home-dispatcher': 'select' } : {}) },
+    onClick: () => {
+      if (selectFixture(engine, id)) ui?.builder?.pop?.querySelector('button:not([disabled])')?.focus({ preventScroll: true });
+    },
+  }));
 }
 
 /**
@@ -1965,7 +2010,8 @@ function spawnStreetTargets(engine) {
     ? 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.png'
     : 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png'));
   mailbox.anchor.set(0.5, 1);
-  mailbox.x = Math.round(bg?.houseSignX ?? layout.houseX - 260);
+  // PORCH: where you moved it, else the house's sign corner.
+  mailbox.x = Math.round(fixtureWorldX('mailbox') ?? bg?.houseSignX ?? layout.houseX - 260);
   mailbox.y = STREET_GROUND_Y + 4;
   mailbox.zIndex = 30;
   engine.entityLayer.addChild(mailbox);
@@ -2328,13 +2374,15 @@ function drawCultivationMarkers(engine) {
     pad.roundRect(x - 30, Y + 16, 60 * left, 6, 3).fill(left > 0.3 ? 0x7cc35a : 0xe0a84a);
     g.addChild(pad);
   }
-  // HOMEMAIL: the Mail Dispatcher can be picked up here too.
-  const disp = scene.room === 'street' ? dispatcherTarget(engine)?.sprite : null;
-  if (disp) {
-    const sel = selected?.kind === 'dispatcher';
+  // HOMEMAIL / PORCH: the Mail Dispatcher, the Mailbox and the Magic Rock can be picked up here too.
+  for (const id of scene.room === 'street' ? MOVABLE_FIXTURE_IDS : []) {
+    const spr = fixtureTarget(engine, id)?.sprite;
+    if (!spr) continue;
+    const half = MOVABLE_FIXTURES[id].half;
+    const sel = selected?.kind === 'fixture' && selected.id === id;
     const pad = new PIXI.Graphics();
-    pad.roundRect(disp.x - DISPATCHER_HALF, Y - 4, DISPATCHER_HALF * 2, 14, 7).fill({ color: sel ? 0xffd76a : 0xffffff, alpha: sel ? 0.28 : 0.14 });
-    pad.roundRect(disp.x - DISPATCHER_HALF, Y - 4, DISPATCHER_HALF * 2, 14, 7).stroke({ width: 2, color: sel ? 0xffd76a : 0xffffff, alpha: sel ? 0.95 : 0.4 });
+    pad.roundRect(spr.x - half, Y - 4, half * 2, 14, 7).fill({ color: sel ? 0xffd76a : 0xffffff, alpha: sel ? 0.28 : 0.14 });
+    pad.roundRect(spr.x - half, Y - 4, half * 2, 14, 7).stroke({ width: 2, color: sel ? 0xffd76a : 0xffffff, alpha: sel ? 0.95 : 0.4 });
     g.addChild(pad);
   }
   engine.entityLayer.addChild(g);
@@ -3748,15 +3796,9 @@ function cultivateModel(engine) {
     hint: BUILDER_TEXT.cultivateHint,
     closeLabel: 'Leave Cultivation Mode',
     onClose: () => setMode(engine, null),
-    // HOMEMAIL: the Mail Dispatcher moves in Cultivate too (reimagined); this reaches it from the keys.
-    bannerActions: back || scene?.room !== 'street' ? [] : [{
-      label: DISPATCHER_TEXT.banner,
-      title: DISPATCHER_TEXT.bannerTitle,
-      attrs: { 'data-home-dispatcher': 'select' },
-      onClick: () => {
-        if (selectDispatcher(engine)) ui?.builder?.pop?.querySelector('button:not([disabled])')?.focus({ preventScroll: true });
-      },
-    }],
+    // HOMEMAIL / PORCH: the Mailbox, the Magic Rock and the Mail Dispatcher move in Cultivate too
+    // (reimagined); this reaches them from the keys.
+    bannerActions: back || scene?.room !== 'street' ? [] : fixtureBannerActions(engine),
     trayLabel: 'Cultivation tray',
     stripLabel: back ? 'Things to grow in your yard' : 'Things to grow on your street',
     stripKey: `cult:${back ? 'yard' : 'street'}`,
@@ -4187,7 +4229,7 @@ function removeSelected(engine) {
 
 function placeAtPointer(engine, at) {
   if (!placing) return null;
-  if (placing.kind === 'dispatcher') return placeDispatcher(engine, at.x);
+  if (placing.kind === 'fixture') return placeFixture(engine, placing.id, at.x);
   if (placing.kind === 'furniture') {
     let result;
     const isDoor = placing.classTsid === DOOR_CLASS;
@@ -4264,7 +4306,7 @@ function destroyGhost() {
   if (scene?.ghost && !scene.ghost.destroyed) scene.ghost.destroy({ children: true });
   if (scene) scene.ghost = null;
   keyCarry = null;
-  dimDispatcher(null, false);
+  dimFixture(null, null, false);
 }
 
 function makeGhost(engine) {
@@ -4280,16 +4322,17 @@ function makeGhost(engine) {
     spr.scale.set(pieceScale(def.classTsid, placing.upgradeId));
     spr.alpha = 0.72;
     g.addChild(spr);
-  } else if (placing.kind === 'dispatcher') {
-    // The dispatcher's own frame over its footprint.
+  } else if (placing.kind === 'fixture') {
+    // The fixture's own frame over its footprint (the rock's is the sprite inside its box).
     const pad = new PIXI.Graphics();
     g.addChild(pad);
     g.pad = pad;
-    g.half = DISPATCHER_HALF;
-    const live = dispatcherTarget(engine)?.sprite;
-    if (live) {
-      const art = new PIXI.Sprite(live.texture);
-      art.anchor.copyFrom(live.anchor);
+    g.half = MOVABLE_FIXTURES[placing.id].half;
+    const live = fixtureTarget(engine, placing.id)?.sprite;
+    const src = live?.texture ? live : live?.children?.find((c) => c.texture);
+    if (src) {
+      const art = new PIXI.Sprite(src.texture);
+      art.anchor.copyFrom(src.anchor);
       art.alpha = 0.85;
       g.addChild(art);
       g.art = art;
@@ -4340,9 +4383,9 @@ function updateGhost(engine) {
     g.ok = true;
     return;
   }
-  if (placing.kind === 'dispatcher') {
+  if (placing.kind === 'fixture') {
     const x = Math.round(at.x);
-    const ok = dispatcherCheck(x).ok;
+    const ok = fixtureCheck(placing.id, x).ok;
     g.ok = ok;
     g.x = x;
     g.y = STREET_GROUND_Y + 4;
@@ -4907,10 +4950,10 @@ function popAnchor(engine) {
     const bottom = clientPoint(engine, b.x + b.w / 2 + roomX0(), b.y + b.h);
     return top && bottom ? { x: top.x, y: top.y, bottom: bottom.y } : null;
   }
-  if (selected?.kind === 'dispatcher') {
-    const s = dispatcherTarget(engine)?.sprite;
+  if (selected?.kind === 'fixture') {
+    const s = fixtureTarget(engine, selected.id)?.sprite;
     if (!s) return null;
-    const top = clientPoint(engine, s.x, s.y - 150);
+    const top = clientPoint(engine, s.x, s.y - MOVABLE_FIXTURES[selected.id].tall);
     const bottom = clientPoint(engine, s.x, s.y + 24);
     return top && bottom ? { x: top.x, y: top.y, bottom: bottom.y } : null;
   }
@@ -4967,7 +5010,7 @@ function syncFloating(engine, force = false) {
     b.setPlace(null);
     return;
   }
-  if (force) popModel = mode === 'decorate' ? (selected?.kind === 'stack' ? stackPop(engine) : furniturePop(engine)) : selected?.kind === 'dispatcher' ? dispatcherPop(engine) : cultivationPop(engine);
+  if (force) popModel = mode === 'decorate' ? (selected?.kind === 'stack' ? stackPop(engine) : furniturePop(engine)) : selected?.kind === 'fixture' ? fixturePop(engine) : cultivationPop(engine);
   if (popModel && !drag && !placing && !stackCarry) b.setPop(popModel, popAnchor(engine));
   else b.setPop(null);
   const g = scene.ghost;
@@ -5049,7 +5092,7 @@ function bindPointer(engine) {
         moveStackDrag(engine, e);
         return;
       }
-      if (press.kind === 'dispatcher') beginDispatcherMove(engine);
+      if (press.kind === 'fixture') beginFixtureMove(engine, press.id);
       else beginMove(engine, press.id);
       if (!placing) {
         press = null;
@@ -5126,10 +5169,10 @@ function bindPointer(engine) {
         window.addEventListener('pointerup', onPressUp, true);
         window.addEventListener('pointercancel', onPressUp, true);
       }
-    } else if (dispatcherAt(engine, p) && selectDispatcher(engine)) {
-      // HOMEMAIL: press and drag the Mail Dispatcher, or click it for its actions.
+    } else if (fixtureAt(engine, p) && selectFixture(engine, fixtureAt(engine, p))) {
+      // HOMEMAIL / PORCH: press and drag the Mail Dispatcher, the Mailbox or the Magic Rock, or click it for its actions.
       if (e.button === 0) {
-        press = { kind: 'dispatcher', id: 'dispatcher', x: e.clientX, y: e.clientY, pointerId: e.pointerId, dragging: false };
+        press = { kind: 'fixture', id: selected.id, x: e.clientX, y: e.clientY, pointerId: e.pointerId, dragging: false };
         window.addEventListener('pointermove', onPressMove, true);
         window.addEventListener('pointerup', onPressUp, true);
         window.addEventListener('pointercancel', onPressUp, true);
@@ -6079,7 +6122,10 @@ export function visitorHomeScene(engine, view = {}, room = 'street', opts = {}) 
         const { PIXI } = eng;
         const mailbox = new PIXI.Sprite(textureFromUrl('assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png'));
         mailbox.anchor.set(0.5, 1);
-        mailbox.x = Math.round(background.houseSignX ?? layout.houseX - 260);
+        // PORCH: where the owner moved it (their street's cultivation state), else the house's sign corner.
+        const usual = Math.round(background.houseSignX ?? layout.houseX - 260);
+        const moved = fixtureRx(st, 'mailbox', { at: { mailboxX: usual, doorway: background.houseDoorway } });
+        mailbox.x = moved == null ? usual : layout.houseX + moved;
         mailbox.y = STREET_GROUND_Y + 4;
         mailbox.zIndex = 30;
         eng.entityLayer.addChild(mailbox);
