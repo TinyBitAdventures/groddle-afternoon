@@ -548,7 +548,7 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
     const bug = src('src/BugReports.php');
     assert.match(bug, /MAX_MESSAGE = 2000;/);
     assert.match(bug, /PER_WINDOW = 3;/);
-    assert.match(bug, /PER_DAY = 20;/);
+    assert.match(bug, /PER_DAY = 50;/);
     assert.match(php, /openedSince\(\$me->id, BugReports::WINDOW, \$now\) >= BugReports::PER_WINDOW \|\| \$store->openedSince\(\$me->id, 86400, \$now\) >= BugReports::PER_DAY/);
     assert.match(php, /writtenSince\(\$me->id, BugReports::WINDOW, \$now\) >= self::REPLY_PER_WINDOW/);
     assert.match(php, /BugReports::context\(/);
