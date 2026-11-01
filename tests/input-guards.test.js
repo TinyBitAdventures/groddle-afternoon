@@ -124,3 +124,14 @@ describe('held keys (report 23)', () => {
     assert.match(game, /app\.canvas\.addEventListener\('pointerdown', \(e\) => \{\n[^\n]*\n[\s\S]{0,300}if \(e\.pointerType === 'mouse' && e\.button !== 0\) return;/);
   });
 });
+
+describe('mid-air menus (report 22)', () => {
+  it('a menu or verb in mid-air drops the avatar straight down; on the ground it stays still', () => {
+    const body = game.slice(game.indexOf('function physics(dt) {'));
+    const still = body.indexOf('} else if ((menuTarget || currentAction) && (player.onGround || climb.active)) {');
+    const air = body.indexOf('} else if (menuTarget || currentAction) {');
+    assert.ok(still > 0 && air > still, 'the grounded hold comes first');
+    const branch = body.slice(air, body.indexOf('} else if (climb.active && climb.wall) {'));
+    assert.match(branch, /player\.vx = 0;\n\s+stepAvatar\(player, \{/);
+  });
+});

@@ -12623,8 +12623,26 @@ function physics(dt) {
       paradiseCourseRuntime.physics(paradiseCourseHost(), paradiseCourse(), dt);
     } else if (paradiseCourse()?.movement === 'slide') paradiseSlidePhysics(dt);
     else paradiseFlightPhysics(dt);
-  } else if (menuTarget || currentAction) {
+  } else if ((menuTarget || currentAction) && (player.onGround || climb.active)) {
     // still bob quoins / butterflies ambient
+  } else if (menuTarget || currentAction) {
+    // Player report 22: a menu or a verb opened in mid-air holds the walk, not gravity: the avatar
+    // drops straight down (vx 0) and lands. The client's InteractionMenu stopped physics outright
+    // (TSMainView.blur 544-548, TSFrontController.stopAvatar 1333-1337, PhysicsController.stop
+    // 102-107 and onGameLoop 624) and dropped the avatar only once the menu closed, with its velocity
+    // reset (AvatarPhysicsHandler.handleVelocityTriggers 141-143); a running verb kept physics
+    // (stopAvatarKeyControl only). Hanging in the air read as a bug, so the drop comes at once.
+    player.vx = 0;
+    stepAvatar(player, {
+      dt,
+      buff: combinedPhysics(),
+      platforms: streetPlatforms,
+      barriers: barriersScreen(currentStreet),
+      worldW: WORLD_W,
+      bodyScale: features.query('avatarBodyScale', engine) ?? 1,
+      ceilings: features.query('ownsCeilings', engine) !== true,
+      ground: resolveGround,
+    });
   } else if (climb.active && climb.wall) {
     const wall = climb.wall;
     player.x = wall.x;
