@@ -84,10 +84,10 @@ import {
   secondsToString,
   takeJobIngredients,
   tankFuel,
-} from '../machine-rooms.js?v=36efe63c';
-import { refuelMachine, MAX_FUEL } from '../machines.js?v=f4b46418';
+} from '../machine-rooms.js?v=098ba4f7';
+import { refuelMachine, MAX_FUEL } from '../machines.js?v=6950a3d1';
 import { DROP_ITEMS, applyDropResult, isEmptyDrop, rollDropTable } from '../drop-tables.js?v=0f922478';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=91ee49cd';
 import { energyMax, moodMax } from '../metabolics.js?v=8504134e';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { worldToScreen } from '../street-model.js?v=23b926e5';

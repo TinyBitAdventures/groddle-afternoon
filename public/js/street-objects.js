@@ -32,13 +32,13 @@
  * keeps a dig crew (diggers) as a rock keeps miners.
  */
 
-import { ROCK_CATALOG, findWorkingPick, miningProfile } from './mining.js?v=15c7bd6e';
+import { ROCK_CATALOG, findWorkingPick, miningProfile } from './mining.js?v=fb4c7898';
 import { MINING_EXPERT_UPGRADES } from './imagination-effects.js?v=70169933';
 import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage } from './trants.js?v=9c2e8c0f';
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=1eff5718';
-import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=b3e7b6ed';
+import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=3b824ce9';
 import { highestAnimalKinshipRank } from './animal-kinship.js?v=91490913';
-import { applyCreatureState, pathFrom } from './street-creatures.js?v=8964f575';
+import { applyCreatureState, pathFrom } from './street-creatures.js?v=23a79d94';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
 export const SHARED_NODE_CLASSES = Object.freeze(['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree']);

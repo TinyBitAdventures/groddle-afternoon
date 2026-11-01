@@ -92,13 +92,13 @@
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { nearestSurfaceY } from '../walk-surface.js?v=764d5f5a';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=3753a0d2';
-import { isInHell } from '../hell.js?v=393c3c7f';
+import { isInHell } from '../hell.js?v=6ffd0278';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
-import { animalStatusLabel } from '../animals.js?v=a9883739';
+import { animalStatusLabel } from '../animals.js?v=8fd74f3e';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=91490913';
-import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=e23ccf02';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=8da2c1b0';
+import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=808076d1';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=a57297e5';
 import {
   CHECK_ON_REMOVE,
   CROWD_CLASSES,

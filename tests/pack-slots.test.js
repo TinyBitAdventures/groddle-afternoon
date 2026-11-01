@@ -22,7 +22,7 @@ import {
   stackMaxOf,
 } from '../public/js/pack-slots.js?v=00bca2cf';
 import { STACKMAX } from '../public/js/pack-slots-data.js?v=330c51e4';
-import { bagsFeature, rockChanges } from '../public/js/features/bags-feature.js?v=deeea28f';
+import { bagsFeature, rockChanges } from '../public/js/features/bags-feature.js?v=80f68991';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');

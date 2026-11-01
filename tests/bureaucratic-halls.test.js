@@ -16,8 +16,8 @@ import {
   HALL_LEAVE_VERB,
   bureaucraticHallsFeature,
   hallSceneTsid,
-} from '../public/js/features/bureaucratic-halls-feature.js?v=656b4f7b';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=1eba1a15';
+} from '../public/js/features/bureaucratic-halls-feature.js?v=751547ad';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=839bc9de';
 import { LEGALIZE_HALL_TSID } from '../public/js/legalize-it.js?v=d569fd0e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

@@ -43,14 +43,14 @@
  * 'restore', job type 5) and finishes the restore in its `onDone` hook.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=85d4faba';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=91ee49cd';
 import { canUseTool, useToolCondition } from '../tools.js?v=93286603';
 import { ecologyForStreet } from '../street-ecology.js?v=8574d30d';
 import { worldToScreen } from '../street-model.js?v=23b926e5';
 import { signArmWidth } from '../street-render.js?v=b5ae0c3d';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { GIANTS } from '../shrines.js?v=7cdc7073';
-import { teleportationFeature } from './teleportation-feature.js?v=7cafdb53';
+import { GIANTS } from '../shrines.js?v=7dd8f176';
+import { teleportationFeature } from './teleportation-feature.js?v=4d819e48';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
@@ -1866,6 +1866,11 @@ export const streetJobsFeature = {
     board = null;
     clearBarricades();
     clearFlora();
+  },
+
+  /** game.js refreshPackPanels: the pack, currants or energy changed, so the open panel's "you have", Add and Work follow it. */
+  packChanged(engine) {
+    if (panel && !panel.hidden) renderPanel(engine);
   },
 
   onTick(dtMs, now, engine) {

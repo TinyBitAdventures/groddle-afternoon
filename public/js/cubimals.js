@@ -12,7 +12,7 @@ import {
   countItem,
   ensureItem,
   removeItem,
-} from './inventory.js?v=85d4faba';
+} from './inventory.js?v=91ee49cd';
 
 export const CUBIMAL_PACKAGE_IDS = Object.freeze({
   1: 'cubimal_package',

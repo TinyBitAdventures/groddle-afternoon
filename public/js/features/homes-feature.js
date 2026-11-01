@@ -90,7 +90,7 @@
  *       (=restorehold stops on the proto, =restoreaward on the award)
  */
 
-import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=85d4faba';
+import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=91ee49cd';
 import {
   CULTIVATION_CLASSES,
   FURNITURE_CATALOG,
@@ -150,7 +150,7 @@ import {
   placeCostText,
   trayFilters,
 } from '../ui/home-builder.js?v=2e0c377b';
-import { RECIPE_CATALOG } from '../making.js?v=fe73bfce';
+import { RECIPE_CATALOG } from '../making.js?v=c9b7fd23';
 import {
   createBackYardState,
   dispatcherRx,
@@ -187,14 +187,14 @@ import { DISPATCHER_HALF, DISPATCHER_TEXT, dispatcherFits, savedDispatcherRx, si
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
-import { projectApi } from './street-jobs-feature.js?v=fca547a7';
+import { projectApi } from './street-jobs-feature.js?v=ca7b5ffb';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=b05c58d8';
-import { towerApi } from './home-tower-feature.js?v=1469b73f';
+import { towerApi } from './home-tower-feature.js?v=fe41a1f0';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=e676f00f';
 import { wantsHiresDecos } from '../deco-hires.js?v=cb905e17';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=3a0471e6';
-import { patchesFeature } from './patches-feature.js?v=c03b08c5';
-import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=dc77bb68';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=fc882105';
+import { patchesFeature } from './patches-feature.js?v=d1241e26';
+import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=aba34ac1';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
@@ -216,7 +216,7 @@ import {
 } from '../home-styles.js?v=f591561f';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { oneArmSignpost } from '../street-render.js?v=b5ae0c3d';
-import { ROCK_CATALOG } from '../mining.js?v=15c7bd6e';
+import { ROCK_CATALOG } from '../mining.js?v=fb4c7898';
 import {
   HOUSE_SIGN,
   IMG_BUBBLE_MS,
@@ -234,7 +234,7 @@ import {
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=39921139';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=ddae4999';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=0e6d825a';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=a314f8a1';
 import { takeFromHouse } from '../ledger-house.js?v=258ef99e';
 import {

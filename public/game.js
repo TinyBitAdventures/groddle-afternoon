@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=ae080af0';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=63da285f';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=dad92eff';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=39c25167';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -452,15 +452,16 @@ import {
   getItemUseInfo,
   ITEM_CATALOG,
   countItem,
+  packStamp,
   ensureItem,
   addItem,
   removeItem,
   isToolItem,
-} from './js/inventory.js?v=85d4faba';
+} from './js/inventory.js?v=91ee49cd';
 import { PACK_COPY, unitRankAt } from './js/pack-slots.js?v=00bca2cf';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=9b23e21a';
-import { listAnimalFeedOptions } from './js/animals.js?v=a9883739';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=a9883739';
+import { listAnimalFeedOptions } from './js/animals.js?v=8fd74f3e';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=8fd74f3e';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -469,13 +470,13 @@ import {
   normalizeStackQuantity,
   dropInventoryStack,
   pickupDroppedStack,
-} from './js/world-items.js?v=a50e4a32';
+} from './js/world-items.js?v=6b64c534';
 import {
   createPlayerSave,
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=027fa419';
+} from './js/player-save.js?v=2d300ea9';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -487,7 +488,7 @@ import {
   leaveHomeInterior,
   imagineHome,
 } from './js/homes.js?v=385f9a1a';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=ddae4999';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=0e6d825a';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -545,7 +546,7 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=fe73bfce';
+} from './js/making.js?v=c9b7fd23';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=0fb7a5ca';
 import {
@@ -572,7 +573,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=175e782f';
+} from './js/garden.js?v=1ec5a019';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=05651e76';
 import {
   ROCK_CATALOG,
@@ -585,7 +586,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=15c7bd6e';
+} from './js/mining.js?v=fb4c7898';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -643,7 +644,7 @@ import {
   canEatFood,
   recordFoodEat,
   resetFoodDay,
-} from './js/food.js?v=ea442e4f';
+} from './js/food.js?v=b2727d97';
 import {
   consumeTakesCount,
   consumeCountCap,
@@ -653,7 +654,7 @@ import {
   limitCountCap,
   useItemMany,
   recordFoodEatMany,
-} from './js/eat-many.js?v=51398590';
+} from './js/eat-many.js?v=c45c74c0';
 import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
@@ -761,7 +762,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=b597bd9d';
+} from './js/musicblocks.js?v=baadf1e1';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -772,12 +773,12 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=0f4afec9';
+} from './js/vendor.js?v=7dfc77a5';
 import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=a9883739';
+} from './js/animals.js?v=8fd74f3e';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -806,7 +807,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=7cdc7073';
+} from './js/shrines.js?v=7dd8f176';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=bff50be4';
 import {
   GAMESHOW_TICKET_ID,
@@ -817,7 +818,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=24711d2b';
+} from './js/spinning-wheel.js?v=a5793b2b';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -826,7 +827,7 @@ import {
   ensureCubimalItems,
   openCubimalPackage,
   setCubimalFree,
-} from './js/cubimals.js?v=378622fc';
+} from './js/cubimals.js?v=e6166d7f';
 import {
   STOOT_DOLL_BUBBLE_MS,
   STOOT_DOLL_ID,
@@ -4781,6 +4782,33 @@ function renderPinnedQuests() {
   if (root && root.style.getPropertyValue('--quest-pins-h') !== `${h}px`) root.style.setProperty('--quest-pins-h', `${h}px`);
 }
 
+/** The pack stamp (inventory.js packStamp) each open panel was last drawn with. */
+const packPanelStamps = { make: '', vendor: '', shrine: '', features: '' };
+
+/** True while the player is typing in a field inside this panel (a redraw would take the caret away). */
+function typingIn(panelId) {
+  const a = document.activeElement;
+  return Boolean(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && document.getElementById(panelId)?.contains(a));
+}
+
+/**
+ * Open panels that show pack counts follow the pack (player report 2026-11-01): the Make
+ * panel's "you have" and how many, the vendor's sell counts, the shrine's donate counts and
+ * every feature panel through the `packChanged` hook (street projects). Each redraws only
+ * when the stamp it was drawn with is out of date, never mid-craft or over a Make result.
+ */
+function refreshPackPanels() {
+  const stamp = packStamp(inv, pc);
+  if (isMakeOpen() && packPanelStamps.make !== stamp && !activeCraftSession &&
+      document.getElementById('make-result')?.hidden !== false && !typingIn('make-panel')) renderMakePanel();
+  if (isVendorOpen() && packPanelStamps.vendor !== stamp && !typingIn('vendor-panel')) renderVendorList();
+  if (isShrineOpen() && packPanelStamps.shrine !== stamp && !typingIn('shrine-panel')) renderShrinePanel();
+  if (packPanelStamps.features !== stamp) {
+    packPanelStamps.features = stamp;
+    features.collect('packChanged', engine);
+  }
+}
+
 function updateHud() {
   const spentRewardBuff = consumeRewardBuff(buffState, pc, Date.now());
   if (spentRewardBuff && state.started) {
@@ -5024,6 +5052,7 @@ function updateHud() {
   renderBuffStrip();
   updateSkillChrome();
   updateFeatChrome();
+  refreshPackPanels();
 
   document.getElementById('stat-img').textContent = pc.imagination;
   const levelInfo = levelUpdate.info || levelInfoForXp(pc.xp);
@@ -23889,6 +23918,7 @@ function renderMakePanel() {
     renderMakeProgressStage(activeCraftSession);
     return;
   }
+  packPanelStamps.make = packStamp(inv, pc);
   ensureMakingItems();
   // Recipe browser path — hide progress/result overlays
   clearMakeFeedback();
@@ -24239,6 +24269,7 @@ function renderShrinePanel() {
   const giantId = activeShrineTarget?.state?.giantId;
   const giant = GIANTS[giantId];
   if (!panel || panel.hidden || !giant) return;
+  packPanelStamps.shrine = packStamp(inv, pc);
   const favor = shrineState.favor[giantId] || 0;
   const cost = emblemCostFor(shrineState, giantId);
   const emblems = shrineState.emblems[giantId] || 0;
@@ -24722,6 +24753,7 @@ function renderVendorList() {
   const curEl = document.getElementById('vendor-currants');
   if (curEl) curEl.textContent = String(pc.currants || 0);
   if (!list) return;
+  packPanelStamps.vendor = packStamp(inv, pc);
   renderVendorDropZone();
 
   // MPANELS: in the modern skin the count is a popover over the shelf, by the tile it was asked from.
@@ -27891,7 +27923,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=57a573e1').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=728c61a8').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // Loading card QA (js/loading-card-qa.js): ?loadcarddemo=<tsid>[,<tsid>].
   if (new URLSearchParams(location.search).has('loadcarddemo')) {

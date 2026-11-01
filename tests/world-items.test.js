@@ -11,8 +11,8 @@ import {
   parseDroppedItemState,
   pickupDroppedStack,
   serializeDroppedItemState,
-} from '../public/js/world-items.js?v=a50e4a32';
-import { createInventory } from '../public/js/inventory.js?v=85d4faba';
+} from '../public/js/world-items.js?v=6b64c534';
+import { createInventory } from '../public/js/inventory.js?v=91ee49cd';
 
 const publicRoot = join(import.meta.dirname, '..', 'public');
 

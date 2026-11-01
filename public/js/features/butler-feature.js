@@ -66,10 +66,10 @@
  *   butlerDialog, butlerLast, butlerVisitors, butlerAutoplay.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackItemSlots, removeItem } from '../inventory.js?v=85d4faba';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackItemSlots, removeItem } from '../inventory.js?v=91ee49cd';
 import { homeStreetLayout, towerItem } from '../home-cultivation.js?v=bb8b2151';
-import { homesFeature } from './homes-feature.js?v=2cc8b344';
-import { towerApi } from './home-tower-feature.js?v=1469b73f';
+import { homesFeature } from './homes-feature.js?v=3d62f159';
+import { towerApi } from './home-tower-feature.js?v=fe41a1f0';
 import { levelInfoForXp } from '../progression.js?v=33462eaa';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { NEIGHBOURS, NEIGHBOUR_ITEMS, neighbourById } from '../neighbours.js?v=7fbf44a4';

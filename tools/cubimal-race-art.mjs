@@ -22,7 +22,7 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from 'node:fs
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
-import { CUBIMAL_RACE_CELLS, CUBIMAL_RACE_SHEET, cubimalRaceSheet } from '../public/js/cubimals.js?v=378622fc';
+import { CUBIMAL_RACE_CELLS, CUBIMAL_RACE_SHEET, cubimalRaceSheet } from '../public/js/cubimals.js?v=e6166d7f';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OGA = join(os.homedir(), 'Documents/glitch-audit/opengameart');

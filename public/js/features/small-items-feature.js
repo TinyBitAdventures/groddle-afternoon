@@ -23,11 +23,11 @@
  *     smallItemsBallX.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=85d4faba';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=91ee49cd';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { nearestSurfaceY } from '../walk-surface.js?v=764d5f5a';
 import { openNoteView, openNotePicker } from '../note-view.js?v=21c55475';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=cda1c5f6';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=4a3aad31';
 import {
   BALL,
   BALL_HIT,

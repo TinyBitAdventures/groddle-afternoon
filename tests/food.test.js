@@ -23,7 +23,7 @@ import {
   recordFoodEat,
   resetFoodDay,
   foodBonusStatus,
-} from '../public/js/food.js?v=ea442e4f';
+} from '../public/js/food.js?v=b2727d97';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

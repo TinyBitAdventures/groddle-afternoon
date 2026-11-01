@@ -85,7 +85,7 @@
  *   server message), mpFeatRewards (ids applied); window.groddleFeats (QA).
  */
 
-import { addItem } from '../inventory.js?v=85d4faba';
+import { addItem } from '../inventory.js?v=91ee49cd';
 import { GAME_DAY_MS, getGameDayKey } from '../game-day.js?v=edb00566';
 import {
   CAP_OWNERS,
@@ -118,7 +118,7 @@ import {
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import { gainMetabolic } from '../metabolics.js?v=8504134e';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
-import { GIANTS } from '../shrines.js?v=7cdc7073';
+import { GIANTS } from '../shrines.js?v=7dd8f176';
 import {
   MP_TEXT,
   endedLine,

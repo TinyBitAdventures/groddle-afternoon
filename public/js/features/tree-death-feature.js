@@ -54,9 +54,9 @@
  * treeGuilt, treeDeaths, treePoisonAutoplay.
  */
 
-import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=85d4faba';
+import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=91ee49cd';
 import { moodMax } from '../metabolics.js?v=8504134e';
-import { plantChoices } from '../patches.js?v=dc77bb68';
+import { plantChoices } from '../patches.js?v=aba34ac1';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=3753a0d2';
 import {
@@ -85,7 +85,7 @@ import {
   quotePoisonVerb,
   treeDeathOutcome,
 } from '../tree-poison.js?v=f6e01177';
-import { patchesFeature } from './patches-feature.js?v=c03b08c5';
+import { patchesFeature } from './patches-feature.js?v=d1241e26';
 
 export const TREE_DEATH_FEATURE_ID = 'tree-death';
 const VERB_PREFIX = 'treepoison:';

@@ -366,6 +366,22 @@ export function countItem(inv, classTsid) {
 }
 
 /**
+ * A short fingerprint of what an open panel may show from the pack: every
+ * non-zero count, the currants and the whole energy. Panels that list "you
+ * have N" keep the stamp they were drawn with and redraw when it changes, so
+ * they follow the pack while they stay open (player report 2026-11-01: the
+ * street project panel kept "you have 2" after two more were made).
+ */
+export function packStamp(inv, pc = {}) {
+  let s = '';
+  for (const k in inv || {}) {
+    const n = inv[k];
+    if (n) s += `${k}:${n},`;
+  }
+  return `${s}|${Number(pc?.currants) || 0}|${Math.floor(Number(pc?.energy) || 0)}`;
+}
+
+/**
  * Use an inventory item (pack verb).
  * @param {Inventory} inv
  * @param {{ energy: number, mood: number }} pc

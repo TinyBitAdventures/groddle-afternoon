@@ -36,7 +36,7 @@
  * window.groddleAuctions in multiplayer.
  */
 
-import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=85d4faba';
+import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=91ee49cd';
 import { TOOL_CONDITION_CATALOG, leavingToolWear, receiveToolCopy } from '../tools.js?v=93286603';
 import { createMinnAccount } from '../minn-account.js?v=ea900c51';
 import { saveStore } from '../save-store.js?v=8839ba7b';
