@@ -8173,6 +8173,26 @@ header.top-bar + .sub { display: none; }
   display: none;
 }
 
+/* HOMES2: a parcel waits at a mailbox (game.js updateHomeChrome sets data-parcel on the mail button), and the reader's note. */
+#mail-btn[data-parcel]::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  bottom: 1px;
+  width: 10px;
+  height: 9px;
+  border: 1.5px solid var(--c-white);
+  border-radius: 2px;
+  background: linear-gradient(var(--c-brown-49) 0 0) center / 2px 100% no-repeat, var(--c-brown-55c);
+  pointer-events: none;
+}
+
+.mail-collect-note {
+  margin: var(--sp-2) 0 0;
+  color: var(--text-muted);
+  font-size: var(--fs-2xs);
+}
+
 .home-panel,
 .mail-panel {
   position: absolute;

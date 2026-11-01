@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6fc15d1b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=bdaaaab7';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0781e1e0';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -901,7 +901,7 @@ import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from '.
 import { installHiresIcons } from './js/icon-hires.js?v=5357d4b4';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=e56202ee';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=b8184b19';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=2b16ba12';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=f7ea0bd5';
@@ -1903,6 +1903,20 @@ let homeDoorTarget = null;
 let homeReturnTarget = null;
 let mailboxFolder = 'inbox';
 let mailboxSelectedId = null;
+/**
+ * HOMES2 (Austin 2026-11-01: "Keep the button (Maybe a twist could be they
+ * have to visit a mailbox to receive items sent via mail)"): whether the mail
+ * panel open now was opened at a mailbox (a street one or your home's). The
+ * top mail button opens it anywhere; things the site holds in a letter (a
+ * player's parcel, an auction delivery) are received only at a mailbox
+ * (js/player-mail.js has the original's rules and where this differs).
+ */
+let mailboxAt = false;
+
+/** HOMES2: letters whose things wait in the site's ledger (js/player-mail.js parcelWaits). */
+function parcelsWaitingCount() {
+  return mailboxState.messages.filter((m) => !m.outgoing && m.ledger && !m.attachmentsClaimed).length;
+}
 let mailboxComposeReplyTo = null;
 
 /** @type {ReturnType<typeof createQuestState>} */
@@ -10914,8 +10928,10 @@ const engine = {
     return true;
   },
   /** Open the shared mail panel from a street mailbox (no home needed, like npc_mailbox.js). */
-  openMailbox: () => openMailboxPanel({ anywhere: true }),
+  openMailbox: (opts = {}) => openMailboxPanel({ anywhere: true, atMailbox: opts?.atMailbox === true }),
   mailboxOpen: () => isMailboxOpen(),
+  /** HOMES2: the mail panel is open at a mailbox (things in a player's letter are received only there). */
+  atMailbox: () => mailboxAt && isMailboxOpen(),
   mailUnread: () => unreadMailCount(mailboxState, Date.now()),
   /** G333: the mailbox's letters (live rows), for a feature that delivers and settles its own (auctions). */
   mailMessages: () => mailboxState.messages,
@@ -20708,7 +20724,14 @@ function updateHomeChrome() {
     badge.textContent = String(unread);
     badge.hidden = unread < 1;
   }
-  renderTopBar(document, { unread });
+  // HOMES2: the button shows a parcel waits at a mailbox.
+  const parcels = parcelsWaitingCount();
+  const mailBtn = document.getElementById('mail-btn');
+  if (mailBtn) {
+    if (parcels > 0) mailBtn.dataset.parcel = String(parcels);
+    else delete mailBtn.dataset.parcel;
+  }
+  renderTopBar(document, { unread, parcels });
   if (homeMailboxTarget?.sprite && !homeMailboxTarget.sprite.destroyed) {
     homeMailboxTarget.state.unread = unread;
     homeMailboxTarget.subtitle = unread
@@ -20833,6 +20856,7 @@ function closeMailboxPanel() {
   const panel = document.getElementById('mail-panel');
   if (panel) panel.hidden = true;
   mailboxComposeReplyTo = null;
+  mailboxAt = false;
 }
 
 function isMailboxOpen() {
@@ -21097,6 +21121,8 @@ function renderMailboxReader(message) {
   }
   const attachment = mailAttachmentLabel(message);
   const canReceive = !message.outgoing && attachment && !message.attachmentsClaimed;
+  // HOMES2: what the site holds in a letter waits for a mailbox; the button reads and writes anywhere.
+  const notHere = canReceive && message.ledger && !mailboxAt;
   reader.innerHTML = `
     <p class="mail-message-from">${message.outgoing ? 'To' : 'From'} ${escapeHtml(message.outgoing ? message.recipient : message.sender)}</p>
     <h3 class="mail-message-title">${message.replyTo ? 'Re: ' : ''}${message.outgoing ? 'Sent message' : 'Delivered message'}</h3>
@@ -21108,10 +21134,12 @@ function renderMailboxReader(message) {
         ${message.attachment ? `<img src="${escapeHtml(ITEM_CATALOG[message.attachment.classTsid]?.icon || `assets/sprites/icons/${message.attachment.classTsid}.png`)}" alt="" />` : '<span class="currant-coin">◎</span>'}
         <div class="mail-attachment-copy">
           <strong>${escapeHtml(attachment)}</strong>
-          <span>${message.attachmentsClaimed ? 'Collected' : 'Waiting in this envelope'}</span>
+          <span>${message.attachmentsClaimed ? 'Collected' : notHere ? 'Waiting for you at any mailbox' : 'Waiting in this envelope'}</span>
         </div>
-        ${canReceive ? '<button type="button" class="btn-glitch-primary" data-mail-receive>Receive</button>' : ''}
-      </div>` : ''}
+        ${canReceive && !notHere ? '<button type="button" class="btn-glitch-primary" data-mail-receive>Receive</button>' : ''}
+        ${notHere ? '<button type="button" class="btn-glitch-primary" data-mail-receive-away disabled title="You can only collect this at a mailbox.">Receive</button>' : ''}
+      </div>
+      ${notHere ? '<p class="mail-collect-note" data-mail-collect-note>Open a mailbox to collect it: yours on your home street, or any mailbox on a street.</p>' : ''}` : ''}
     <div class="mail-message-actions">
       ${!message.outgoing && !message.ledger ? `${message.playerMail && !message.fromId ? '' : '<button type="button" class="btn-glitch-primary" data-mail-reply>Reply</button>'}
         <button type="button" data-mail-archive>${message.archived ? 'Move to inbox' : 'Archive'}</button>
@@ -21209,7 +21237,7 @@ function renderMailboxPanel() {
   updateHomeChrome();
 }
 
-function openMailboxPanel({ anywhere = false } = {}) {
+function openMailboxPanel({ anywhere = false, atMailbox = false } = {}) {
   if (!homeState.owned && !anywhere) {
     openHomePanel();
     toast('A mailbox comes with your home street.');
@@ -21221,6 +21249,7 @@ function openMailboxPanel({ anywhere = false } = {}) {
   closePackPopover();
   mailboxFolder = 'inbox';
   mailboxComposeReplyTo = null;
+  mailboxAt = atMailbox === true;
   renderMailboxPanel();
   const panel = document.getElementById('mail-panel');
   if (panel) panel.hidden = false;
@@ -21605,7 +21634,7 @@ async function returnFromHome() {
 
 function handleHomeTarget(target, verbId) {
   if (target?.classId === 'npc_mailbox' && verbId === 'view_inbox') {
-    openMailboxPanel();
+    openMailboxPanel({ atMailbox: true });
     return true;
   }
   if (target?.classId === 'home_door') {

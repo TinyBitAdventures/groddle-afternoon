@@ -137,6 +137,11 @@ export const STREET_MAIL_WELCOME = Object.freeze({
   sender: MAIL_POST_SENDER,
   text: 'Every mailbox in Ur opens the same mail: yours. Write to a friend from any street, and collect your deliveries wherever you happen to be.',
 });
+/** HOMES2: online, what other players send waits for a mailbox (js/player-mail.js). */
+export const STREET_MAIL_WELCOME_ONLINE = Object.freeze({
+  sender: MAIL_POST_SENDER,
+  text: 'Every mailbox in Ur opens the same mail: yours. Read and write letters anywhere, and when someone sends you things, open any mailbox like this one to collect them.',
+});
 
 const DEMO_NOTE = Object.freeze({
   title: 'Hello, traveller',
@@ -429,11 +434,11 @@ function buildMailbox(engine, x, y) {
 function openStreetMailbox(engine) {
   if (!welcomed) {
     welcomed = true;
-    engine.deliverMail?.({ ...STREET_MAIL_WELCOME, deliveryAt: Date.now() - 1000 });
+    engine.deliverMail?.({ ...(engine.mode === 'multiplayer' ? STREET_MAIL_WELCOME_ONLINE : STREET_MAIL_WELCOME), deliveryAt: Date.now() - 1000 });
   }
   openMailboxView(mailView);
   for (const box of mailboxes) setMailboxClip(engine, box, 'interact');
-  engine.openMailbox?.();
+  engine.openMailbox?.({ atMailbox: true });
   engine.pushActivity('You opened the mailbox.');
   lastAction = 'mailbox:open';
   engine.save();

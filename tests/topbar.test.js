@@ -16,7 +16,7 @@ import {
   ringDash,
   vitalRing,
   volumeLevel,
-} from '../public/js/ui/topbar.js?v=b8184b19';
+} from '../public/js/ui/topbar.js?v=2b16ba12';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (f) => readFileSync(join(pub, f), 'utf8');
@@ -124,7 +124,7 @@ describe('top bar markup and wiring', () => {
     assert.match(game, /onImagination: \(\) => \(modernUi\(\) && imaginationHub \? imaginationHub\.toggle\(\) : document\.getElementById\('img-btn'\)\?\.click\(\)\),/);
     assert.match(game, /onMail: \(\) => \{ if \(state\.started\) openMailboxPanel\(\); \},/);
     assert.match(game, /onPlayerCard: \(\) => document\.getElementById\('player-menu-btn'\)\?\.click\(\),/);
-    assert.match(game, /renderTopBar\(document, \{ unread \}\);/);
+    assert.match(game, /renderTopBar\(document, \{ unread, parcels \}\);/);
     assert.match(game, /icon: `assets\/sprites\/giant-icons\/icon_\$\{favorGiant\.id === 'ti' \? 'tii' : favorGiant\.id\}\.png`/);
   });
 

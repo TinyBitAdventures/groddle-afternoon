@@ -131,12 +131,18 @@ export function favorChip(favor) {
   };
 }
 
-/** The mail button's tooltip second line and accessible name for an unread count. */
-export function mailText(unread) {
+/**
+ * The mail button's tooltip second line and accessible name for an unread
+ * count, and (HOMES2, multiplayer) the parcels waiting to be collected at a
+ * mailbox.
+ */
+export function mailText(unread, parcels = 0) {
   const n = Math.max(0, whole(unread));
+  const p = Math.max(0, whole(parcels));
+  const box = p ? `${p === 1 ? 'A parcel waits' : `${p} parcels wait`} at any mailbox` : '';
   return {
-    sub: n ? `${n} unread` : 'No new mail',
-    label: n ? `Mail, ${n} unread` : 'Mail',
+    sub: [n ? `${n} unread` : p ? '' : 'No new mail', box].filter(Boolean).join(' · '),
+    label: [n ? `Mail, ${n} unread` : 'Mail', box].filter(Boolean).join(', '),
   };
 }
 
@@ -234,7 +240,7 @@ export function renderTopBar(doc, state = {}) {
   }
   if ('unread' in state) {
     const mail = doc.getElementById('mail-btn');
-    const m = mailText(state.unread);
+    const m = mailText(state.unread, state.parcels);
     setAttr(mail, 'data-sub', m.sub);
     setAttr(mail, 'aria-label', m.label);
   }

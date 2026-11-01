@@ -36,6 +36,29 @@
  * - New mail: new_inbox_growl 670-695 ("You have new messages in your
  *   mailbox!"), the mailbox's has_mail state (npc_mailbox.js doIdle
  *   238-244), the Butler's "You have mail." (butler_data.js 369-386).
+ *
+ * Where things are collected (lane HOMES2, Austin 2026-11-01: "Keep the
+ * button (Maybe a twist could be they have to visit a mailbox to receive
+ * items sent via mail)"):
+ * - The original: the inbox opened only at a mailbox (npc_mailbox.js
+ *   verbs.view_inbox 176-191 -> pc.mail_check; the client's
+ *   MailManager.check returns unless a mailbox stack is named,
+ *   MailManager.as:84-85; there was no mail button), and Receive there took
+ *   the currants and the stack (MailReadUI.as:533, 592-597; doMailReceive
+ *   main.js 6742-6772 -> get_message_goodies inc_mail.js 628-683). A letter
+ *   with a stack came by the AFLC Frog to wherever you stood (to_mailbox
+ *   false, main.js 6677/6716; deliver_mail inc_mail.js 299-343;
+ *   npc_yoga_frog.js 517-611), unless your pack was full or it came while
+ *   you were away (send_unsent_player_mail_to_inbox 813-829, mail_login
+ *   1463-1468).
+ * - Here: the top mail button reads and writes letters anywhere, and things
+ *   in a letter from a player (a stack, currants, a returned parcel, an
+ *   auction delivery) are collected only at a mailbox, any mailbox: yours on
+ *   your home street or one on a street. So the Frog brings no player
+ *   parcels: they go straight into the mailbox and wait there, the letter
+ *   says where to collect them and the mail button shows a parcel waits.
+ *   They stay in the site's ledger until then (LedgerMail.php), and a parcel
+ *   that comes back from the Post waits the same way.
  */
 
 import { MAIL_POST_SENDER } from './mailbox.js?v=18178bf5';
@@ -70,7 +93,22 @@ export const PLAYER_MAIL_TEXT = Object.freeze({
   offline: 'The post office is not answering. Try again in a moment.',
   returnedFrom: MAIL_POST_SENDER,
   toPlaceholder: 'A buddy\'s name',
+  // HOMES2 (ours): things in a letter are collected at a mailbox.
+  parcelFrom: (name) => `${name} sent you a parcel. Collect it at any mailbox.`,
+  atMailbox: 'Open a mailbox to collect it: yours on your home street, or any mailbox on a street.',
+  waiting: 'Waiting for you at any mailbox',
+  notHere: 'You can only collect this at a mailbox.',
 });
+
+/** Whether a mailbox row carries things the site holds (a player's letter or an auction delivery) not yet collected. */
+export function parcelWaits(row) {
+  return Boolean(row && !row.outgoing && row.ledger && !row.attachmentsClaimed);
+}
+
+/** How many such rows wait, for the mail button. */
+export function parcelsWaiting(rows = []) {
+  return (Array.isArray(rows) ? rows : []).filter(parcelWaits).length;
+}
 
 const n0 = (v, max = Number.MAX_SAFE_INTEGER) => {
   const n = Math.floor(Number(v));
@@ -156,11 +194,11 @@ function itemOf(raw) {
  * A site letter (GET groddle/v1/mail) as a mailbox row (js/mailbox.js
  * deliverMail): a letter to you from its sender, or one of yours that came
  * back from the Post. Things in it wait in the site's ledger (ledger:
- * mail-<id>-c) until the mailbox's Receive. A letter with a stack is the
- * Frog's (express) unless it arrived before this session began (mail_login:
- * straight to the mailbox, expedited).
+ * mail-<id>-c) until Receive at a mailbox. HOMES2: never the Frog's
+ * (express); every letter goes straight to the mailbox (the source sent a
+ * stack by the Frog, to_mailbox false, main.js 6677/6716).
  */
-export function letterRow(letter, { sessionStart = 0 } = {}) {
+export function letterRow(letter) {
   if (!letter || !/^[0-9a-f]{16}$/.test(String(letter.id || ''))) return null;
   const returned = letter.box === 'returned';
   if (!returned && letter.box !== 'in') return null;
@@ -182,13 +220,7 @@ export function letterRow(letter, { sessionStart = 0 } = {}) {
     ...(letter.reply?.text && !returned ? { quote: { text: String(letter.reply.text).slice(0, 500), from: String(letter.reply.from?.name || '').slice(0, 80) } } : {}),
     ...(goods ? { ledger: `mail-${letter.id}-c` } : {}),
   };
-  if (item && !returned) {
-    row.express = true;
-    row.inMailbox = letter.collected === true || at < sessionStart;
-    if (row.inMailbox) row.expedited = true;
-  } else {
-    row.express = false;
-  }
+  row.express = false;
   return row;
 }
 

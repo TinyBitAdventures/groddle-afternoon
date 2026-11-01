@@ -54,7 +54,7 @@ import {
   normalizePlayerMailSlice,
   playerMailCost,
   sentRow,
-} from '../player-mail.js?v=1691cc67';
+} from '../player-mail.js?v=a1d50656';
 
 export const PLAYER_MAIL_FEATURE_ID = 'player-mail';
 const SYNC_EVERY_MS = 5 * 60_000;
@@ -146,6 +146,8 @@ function createSession(engine) {
       if (!row) continue;
       const have = rowFor(row.id);
       if (have) {
+        // HOMES2: a parcel a save still had waiting for the Frog waits in the mailbox now.
+        if (have.playerMail && have.express && !have.inMailbox) have.express = false;
         if (letter.collected && row.ledger) {
           have.attachmentsClaimed = true;
           if (have.express) have.inMailbox = true;
@@ -178,7 +180,8 @@ function createSession(engine) {
       say(T.growl, 4600);
     }
     for (const f of now) {
-      const text = f.letter.box === 'returned' ? T.growl : T.growlFrom(f.row.sender);
+      // HOMES2: a parcel says where it waits.
+      const text = f.letter.box === 'returned' ? T.growl : f.row.ledger ? T.parcelFrom(f.row.sender) : T.growlFrom(f.row.sender);
       engine.pushActivity?.(text);
       say(text, 4200);
     }
@@ -275,6 +278,13 @@ function createSession(engine) {
 
   async function receive(message, { quiet = false } = {}) {
     const id = String(message.ledger || '').slice(5, 21);
+    // HOMES2: things in a player's letter are collected only at a mailbox (js/player-mail.js).
+    if (!engine.atMailbox?.()) {
+      if (!quiet) say(T.notHere);
+      last = T.notHere;
+      publish();
+      return false;
+    }
     const item = message.attachmentsClaimed ? null : message.attachment || null;
     if (item) {
       const room = engine.query?.('packRoom', item.classTsid, item.count, engine);

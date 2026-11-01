@@ -1019,7 +1019,7 @@
    "name": "Mail",
    "status": "source",
    "blurb": "Mailboxes, postage, parcels and replies. A letter with an item comes by AFLC Frog, and the Mail Dispatcher by the signpost on your home street sends parcels.",
-   "multiplayer": "Write to other players, online or not: a letter, one stack and currants, for the original’s postage, to a buddy or anyone by name. Parcels arrive seven minutes later and the AFLC Frog brings them if you are playing; your Butler tells you that you have mail. Replies quote the letter they answer, and a parcel nobody can take comes back to you. Stacks you buy at auction, and your own that did not sell, come by mail too.",
+   "multiplayer": "Write to other players, online or not: a letter, one stack and currants, for the original’s postage, to a buddy or anyone by name. Parcels arrive seven minutes later; read your letters anywhere from the mail button, which shows when a parcel waits, and collect what they carry at any mailbox, yours or one on a street. Your Butler tells you that you have mail. Replies quote the letter they answer, and a parcel nobody can take comes back to you. Stacks you buy at auction, and your own that did not sell, come by mail too.",
    "spot": null,
    "evidence": [
     "public/js/mailbox.js",

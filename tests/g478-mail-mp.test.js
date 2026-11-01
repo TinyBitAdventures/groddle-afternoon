@@ -26,14 +26,17 @@ import {
   mailReceiptEffects,
   newLetterId,
   normalizeMailReceipt,
+  parcelWaits,
+  parcelsWaiting,
   normalizePlayerMailSlice,
   playerMailCost,
   sentRow,
-} from '../public/js/player-mail.js?v=1691cc67';
-import { playerMailFeature } from '../public/js/features/player-mail-feature.js?v=9ef2847e';
+} from '../public/js/player-mail.js?v=a1d50656';
+import { playerMailFeature } from '../public/js/features/player-mail-feature.js?v=59740de0';
 import { createMailboxState, deliverMail, listMailboxMessages, mailCost, normalizeMailboxState, recordSentMail } from '../public/js/mailbox.js?v=18178bf5';
 import { handOver, isExpressPending, sendDueToMailbox } from '../public/js/mail-courier.js?v=d525206a';
-import { mergePlayerMail } from '../public/js/phone/companion-data.js?v=912251ce';
+import { mailText } from '../public/js/ui/topbar.js?v=2b16ba12';
+import { mergePlayerMail } from '../public/js/phone/companion-data.js?v=35c85a68';
 import { mailJson } from '../tools/build-mail.mjs';
 import { ITEM_BASE_COSTS } from '../public/js/store-catalog.js?v=79d4de8a';
 import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
@@ -87,8 +90,8 @@ describe('postage and arrival follow inc_mail.js and config_prod.js', () => {
 });
 
 describe('letters from the site in the mailbox', () => {
-  it('reads a letter as a row from its sender, its things held by the site\'s ledger, the Frog\'s to bring', () => {
-    const row = letterRow(letter({ reply: { text: 'Got any cherries?', from: { id: 9, name: 'Bo' } } }), { sessionStart: 1_000_000 });
+  it('reads a letter as a row from its sender, its things held by the site\'s ledger, waiting in the mailbox (HOMES2: not the Frog\'s)', () => {
+    const row = letterRow(letter({ reply: { text: 'Got any cherries?', from: { id: 9, name: 'Bo' } } }));
     assert.equal(row.id, LETTER_ROW(ID));
     assert.equal(row.sender, 'Ada');
     assert.equal(row.fromId, 7);
@@ -96,27 +99,26 @@ describe('letters from the site in the mailbox', () => {
     assert.deepEqual(row.attachment, { classTsid: 'cherry', count: 3 });
     assert.equal(row.currants, 25);
     assert.equal(row.attachmentsClaimed, false);
-    assert.equal(row.express, true);
-    assert.equal(row.inMailbox, false);
+    assert.equal(row.express, false);
     assert.deepEqual(row.quote, { text: 'Got any cherries?', from: 'Bo' });
     const box = createMailboxState();
     const kept = deliverMail(box, row);
     assert.equal(kept.ledger, row.ledger);
     assert.equal(kept.fromId, 7);
     assert.equal(kept.playerMail, ID);
-    assert.equal(kept.express, true);
+    assert.notEqual(kept.express, true);
     assert.deepEqual(kept.quote, { text: 'Got any cherries?', from: 'Bo' });
     // Round trip through a save.
     const again = normalizeMailboxState(JSON.parse(JSON.stringify(box))).messages[0];
     assert.equal(again.ledger, row.ledger);
     assert.equal(again.fromId, 7);
-    assert.equal(again.express, true);
+    assert.notEqual(again.express, true);
   });
 
-  it('puts a parcel that arrived while you were away straight in the mailbox (mail_login 1448-1453), and words alone are never the Frog\'s', () => {
-    const away = letterRow(letter(), { sessionStart: 3_000_000 });
-    assert.equal(away.inMailbox, true);
-    assert.equal(away.expedited, true);
+  it('HOMES2: a parcel waits for a mailbox; words alone carry nothing to collect', () => {
+    const away = letterRow(letter());
+    assert.equal(isExpressPending(away), false);
+    assert.equal(parcelWaits(away), true);
     const words = letterRow(letter({ item: null, currants: 0 }));
     assert.equal(words.express, false);
     assert.equal(words.ledger, undefined, 'nothing to collect');
@@ -126,21 +128,50 @@ describe('letters from the site in the mailbox', () => {
     assert.equal(coins.ledger, `mail-${ID}-c`);
   });
 
-  it('never hands a player\'s parcel over locally: the Frog takes it through the site', () => {
+  it('never hands a player\'s parcel over locally, and the Frog brings none (HOMES2)', () => {
     const box = createMailboxState();
-    const row = deliverMail(box, letterRow(letter(), { sessionStart: 0 }));
-    assert.equal(isExpressPending(row), true);
+    const row = deliverMail(box, letterRow(letter()));
+    assert.equal(isExpressPending(row), false);
+    assert.equal(isExpressPending({ ...row, express: true }), true, 'an old save\'s row: the feature moves it into the mailbox (take)');
     const inv = {};
     const pc = { currants: 0 };
-    assert.deepEqual(handOver(row, inv, pc), { ok: false, reason: 'ledger' });
+    assert.deepEqual(handOver({ ...row, express: true }, inv, pc), { ok: false, reason: 'ledger' });
     assert.deepEqual(inv, {});
     assert.equal(pc.currants, 0);
     // An auction delivery is still never the Frog's.
     const auc = deliverMail(box, { id: 'auc-x', sender: 'AFLC', text: 'x', attachment: { classTsid: 'cherry', count: 1 }, ledger: 'auc-00000000000000b2-d' });
     assert.notEqual(auc.express, true);
     assert.equal(isExpressPending({ ...auc, express: true }), false);
-    // mail_login moves a due one into the mailbox.
-    assert.equal(sendDueToMailbox(box.messages, 3_000_000), 1);
+  });
+
+  it('HOMES2: things a letter holds wait for a mailbox; the button counts them', () => {
+    const rows = [
+      letterRow(letter()),
+      letterRow(letter({ id: '00000000000000a2', item: null, currants: 0 })),
+      letterRow(letter({ id: '00000000000000a3', collected: true })),
+      letterRow(letter({ id: '00000000000000a4', box: 'returned' })),
+      { id: 'auc-1', ledger: 'auc-00000000000000b2-d', attachmentsClaimed: false },
+      { id: 'sent', outgoing: true, ledger: 'mail-00000000000000a5-c' },
+    ];
+    assert.deepEqual(rows.map(parcelWaits), [true, false, false, true, true, false]);
+    assert.equal(parcelsWaiting(rows), 3);
+    assert.match(PLAYER_MAIL_TEXT.parcelFrom('Ada'), /^Ada sent you a parcel\. Collect it at any mailbox\.$/);
+    assert.deepEqual(mailText(1, 1), { sub: '1 unread · A parcel waits at any mailbox', label: 'Mail, 1 unread, A parcel waits at any mailbox' });
+    assert.deepEqual(mailText(0, 2), { sub: '2 parcels wait at any mailbox', label: 'Mail, 2 parcels wait at any mailbox' });
+    assert.deepEqual(mailText(0, 0), { sub: 'No new mail', label: 'Mail' });
+    const game = readFileSync(join(root, 'public/game.js'), 'utf8');
+    assert.match(game, /const notHere = canReceive && message\.ledger && !mailboxAt;/, 'the reader takes things only at a mailbox');
+    assert.match(game, /openMailboxPanel\(\{ atMailbox: true \}\)/, 'your home street\'s mailbox');
+    assert.match(readFileSync(join(root, 'public/js/features/street-furniture-feature.js'), 'utf8'), /engine\.openMailbox\?\.\(\{ atMailbox: true \}\)/, 'a street mailbox');
+    assert.match(game, /onMail: \(\) => \{ if \(state\.started\) openMailboxPanel\(\); \},/, 'the button reads and writes anywhere');
+  });
+
+  it('HOMES2: the original opened mail only at a mailbox and the Frog brought a stack in person (where this differs)', () => {
+    const gs = (f) => readFileSync(join(root, '..', 'glitch-GameServerJS', f), 'utf8').split('\n');
+    assert.match(gs('items/npc_mailbox.js').slice(175, 191).join('\n'), /view_inbox/);
+    assert.match(gs('main.js')[6676], /mail_add_player_delivery\(itemstack_tsid, .*, false, reply\)/, 'a stack: to_mailbox false, the Frog');
+    const client = readFileSync(join(root, '..', 'glitch-client', 'com', 'tinyspeck', 'engine', 'port', 'MailManager.as'), 'utf8').split('\n');
+    assert.match(client[84], /if\(!itemstack_tsid\) return;/, 'the client checks mail only with a mailbox named');
   });
 
   it('reads a letter that came back from the Post, with nobody to reply to', () => {
