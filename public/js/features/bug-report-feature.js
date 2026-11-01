@@ -51,7 +51,7 @@
  */
 
 import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=eabbd20e';
-import { mountReportsSheet } from '../ui/reports-sheet.js?v=af173642';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=f9d44c71';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 
@@ -208,10 +208,54 @@ export function maskClone(root, selectors = REPORT_MASK) {
   return n;
 }
 
+/** Never copied: the Reports window, and every element not drawn (most of the page is closed windows). */
+export function leftOut(node, win = globalThis) {
+  if (!node || node.nodeType !== 1) return false;
+  if (node.id && REPORT_LEAVE_OUT.includes(node.id)) return true;
+  if (node.hidden || node.tagName === 'TEMPLATE' || node.tagName === 'NOSCRIPT') return true;
+  try { return win.getComputedStyle?.(node)?.display === 'none'; } catch { return false; }
+}
+
+/**
+ * Whether a drawn picture came out blank: nearly every pixel pale (WebKit hands back a white page
+ * when the copy is too much for it; player report 32 got one), or all one colour. A sample of
+ * 48 x 24 pixels; a canvas that cannot be read counts as blank.
+ */
+export function blankPicture(canvas, doc = globalThis.document) {
+  if (!canvas?.width || !canvas?.height || !doc?.createElement) return true;
+  try {
+    const c = doc.createElement('canvas');
+    c.width = 48;
+    c.height = 24;
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(canvas, 0, 0, 48, 24);
+    const d = ctx.getImageData(0, 0, 48, 24).data;
+    let pale = 0;
+    let lo = 255;
+    let hi = 0;
+    for (let i = 0; i < d.length; i += 4) {
+      if (d[i] > 235 && d[i + 1] > 235 && d[i + 2] > 235) pale += 1;
+      const y = (d[i] * 3 + d[i + 1] * 6 + d[i + 2]) / 10;
+      if (y < lo) lo = y;
+      if (y > hi) hi = y;
+    }
+    return pale / (d.length / 4) >= 0.92 || hi - lo < 6;
+  } catch {
+    return true;
+  }
+}
+
+/** WebKit draws the page's copy again while its pictures decode (the library's fixSvgXmlDecode): a few passes, not one per picture. */
+const REDRAWS = 4;
+
 /**
  * The whole game window as a report's picture: the page with its HUD and open windows over
  * the canvas's own picture, the Reports window left out, chat and mail blanked. Resolves to
  * { url, width, height, bytes, ui: true } or null (the caller then sends the world only).
+ * Kept quick (ticket 30: Safari took most of a minute and froze typing): only what is drawn
+ * is copied, the canvas goes in as a JPEG, WebKit redraws a few times instead of once per
+ * picture, images that never load (closed windows' lazy ones) are not waited on, and a blank
+ * result is refused.
  */
 export async function capturePictureWithUi(engine, doc = globalThis.document, limits = REPORT_PICTURE) {
   const root = doc?.getElementById?.('wrap') || doc?.body;
@@ -225,7 +269,8 @@ export async function capturePictureWithUi(engine, doc = globalThis.document, li
   let world = null;
   try { world = engine?.snapshotCanvas?.({ width: cssW }); } catch { world = null; }
   if (!world) return null;
-  const worldUrl = world.toDataURL('image/png');
+  // A JPEG, not a PNG: a fifth of the bytes for the copy to carry and WebKit to decode.
+  const worldUrl = world.toDataURL('image/jpeg', 0.92);
   const [w] = pictureSize(rect.width, rect.height, limits.maxWidth, limits.maxHeight);
   // The library copies a canvas through its toDataURL: the WebGL buffer is empty by then, so the
   // canvas answers with the picture just drawn from the stage while the page is copied.
@@ -234,18 +279,30 @@ export async function capturePictureWithUi(engine, doc = globalThis.document, li
   let drawn = null;
   try {
     const bg = globalThis.getComputedStyle?.(doc.body)?.backgroundColor || '#ffffff';
-    drawn = await lib.domToCanvas(root, {
+    let context = null;
+    // The library waits for every <img> under the root first; a short wait there (closed windows hold
+    // lazy images that never load), the full one for the pictures it copies.
+    context = await lib.createContext(root, {
       scale: Math.min(1, w / rect.width),
       backgroundColor: bg,
-      timeout: 8000,
-      filter: (node) => !(node?.id && REPORT_LEAVE_OUT.includes(node.id)),
+      timeout: 1500,
+      drawImageInterval: 60,
+      filter: (node) => !leftOut(node),
       onCloneNode: (clone) => { maskClone(clone); },
+      onEmbedNode: () => { if (context) context.drawImageCount = Math.min(context.drawImageCount, REDRAWS); },
     });
+    context.timeout = 8000;
+    try {
+      drawn = await lib.domToCanvas(context);
+    } finally {
+      try { lib.destroyContext?.(context); } catch { /* gone */ }
+    }
   } catch {
     drawn = null;
   } finally {
     if (!own) delete canvas.toDataURL;
   }
+  if (!drawn || blankPicture(drawn, doc)) return null;
   const out = encodePicture(drawn, doc, limits);
   return out ? { ...out, ui: true } : null;
 }

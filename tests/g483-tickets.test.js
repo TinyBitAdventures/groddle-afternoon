@@ -17,8 +17,8 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SITE_DIR, sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { REPORT_MAX, REPORT_PICTURE, REPORT_TEXT, STATUS_WORDS, UNREAD_POLL_MS, base64Size, createReportsApi, pictureRefused, pictureSize, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../public/js/reports.js?v=eabbd20e';
-import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=af173642';
-import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=704a97ee';
+import { mountReportsSheet } from '../public/js/ui/reports-sheet.js?v=f9d44c71';
+import { BUG_TEXT, badgeFor, bugReportFeature, capturePicture } from '../public/js/features/bug-report-feature.js?v=cab34594';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -26,6 +26,8 @@ const hasPhp = spawnSync('php', ['-v']).status === 0;
 const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
 const noEngine = !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)';
 const flush = () => new Promise((r) => setImmediate(r));
+// Ticket 30: a new report's pictures are drawn after the form has painted (a frame and 50 ms), not as it opens.
+const settle = () => new Promise((r) => setTimeout(r, 120));
 const NOW = Date.parse('2026-10-30T12:00:00Z');
 
 // —— A small DOM, enough for the sheet ——
@@ -395,13 +397,13 @@ describe('a picture of the game with a report (Austin 2026-10-30)', () => {
     const api = pictureApi();
     const { host, sheet } = mount(api, () => { taken += 1; return shot; });
     sheet.open('new');
-    await flush();
+    await settle();
     const box = byId(host, 'reports-picture');
     assert.ok(box && 'reportsPicture' in box.dataset);
     assert.equal(box.attrs.type, 'checkbox');
     assert.equal(box.checked, true, 'on by default');
     assert.equal(box.disabled, false);
-    assert.equal(taken, 1, 'drawn when the form opens');
+    assert.equal(taken, 2, 'drawn behind the form once it opens: the world, then with the UI');
     const preview = byData(host, 'reportsPicturePreview');
     assert.equal(preview.hidden, false);
     assert.equal(preview.getAttribute('src'), shot.url);
@@ -413,8 +415,8 @@ describe('a picture of the game with a report (Austin 2026-10-30)', () => {
     assert.deepEqual(api.calls[0], ['create', 'Pigs float', shot.url]);
     // A second report, unticked: no picture.
     sheet.open('new');
-    await flush();
-    assert.equal(taken, 2, 'a fresh picture for each new report');
+    await settle();
+    assert.equal(taken, 4, 'fresh pictures for each new report');
     box.checked = false;
     box.dispatch('change');
     assert.equal(preview.hidden, true);
@@ -428,7 +430,7 @@ describe('a picture of the game with a report (Austin 2026-10-30)', () => {
   it('when the view cannot be drawn the box is off and says so; a refused picture never costs the report', async () => {
     const off = mount(pictureApi(), () => null);
     off.sheet.open('new');
-    await flush();
+    await settle();
     const box = byId(off.host, 'reports-picture');
     assert.equal(box.checked, false);
     assert.equal(box.disabled, true);
@@ -436,7 +438,7 @@ describe('a picture of the game with a report (Austin 2026-10-30)', () => {
     const api = pictureApi({ refusePicture: true });
     const { host, sheet, toasts } = mount(api, () => ({ url: JPEG(400), width: 800, height: 450 }));
     sheet.open('new');
-    await flush();
+    await settle();
     byId(host, 'bug-report-text').value = 'Pigs float';
     byData(host, 'bugReportSend').click();
     for (let i = 0; i < 4; i++) await flush();
@@ -448,7 +450,7 @@ describe('a picture of the game with a report (Austin 2026-10-30)', () => {
     const odd = pictureApi();
     const m = mount(odd, () => ({ url: 'https://evil.example/x.png' }));
     m.sheet.open('new');
-    await flush();
+    await settle();
     byId(m.host, 'bug-report-text').value = 'x';
     byData(m.host, 'bugReportSend').click();
     await flush();

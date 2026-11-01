@@ -9,9 +9,12 @@
  *   opens it again) and Close report;
  * - new: the original's form (BootError.as 280-290), sent with what the game
  *   knew (the feature's context()) and, with Attach a picture of the game
- *   ticked (the default), the picture the feature's capture() drew when the
- *   form opened, shown small beside the box so you see what goes. A picture
- *   the site refuses never costs the report: it goes again without it.
+ *   ticked (the default), the picture the feature's capture() draws once the
+ *   form is up, shown small beside the box so you see what goes. Ticket 30:
+ *   the box takes typing at once; the pictures are drawn behind it (the world
+ *   first, then with the game's UI), both ticks work meanwhile, and Send waits
+ *   for one still drawing at most PICTURE_WAIT_MS, then sends the world one.
+ *   A picture the site refuses never costs the report: it goes again without it.
  * A thread shows the report's picture under its first message; a click opens
  * it full size in a new tab.
  * Esc closes, Ctrl or Cmd+Enter sends, Back returns to the list.
@@ -32,6 +35,9 @@
 
 import { REPORT_MAX, REPORT_TEXT as T, STATUS_WORDS, pictureRefused, pictureSrc, refusalWords, ticketLine, unreadCount, whenWords } from '../reports.js?v=eabbd20e';
 
+/** How long Send waits for a picture still drawing before it sends the world-only one (ms). */
+export const PICTURE_WAIT_MS = 6000;
+
 function el(doc, tag, attrs = {}, text = '') {
   const node = doc.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
@@ -45,9 +51,9 @@ function el(doc, tag, attrs = {}, text = '') {
 /**
  * @param {{ doc?: Document, host: HTMLElement, api: ReturnType<import('../reports.js').createReportsApi>,
  *   context?: () => object, capture?: () => ({ url: string, width: number, height: number }|null|Promise<object|null>), onState?: (s: { state: string, view: string, unread: number, ticket: number, last: string }) => void,
- *   toast?: (text: string, ms?: number) => void, opener?: () => HTMLElement|null, now?: () => number }} opts
+ *   toast?: (text: string, ms?: number) => void, opener?: () => HTMLElement|null, now?: () => number, pictureWait?: number }} opts
  */
-export function mountReportsSheet({ doc = globalThis.document, host, api, context = () => ({}), capture = () => null, onState = () => {}, toast = () => {}, opener = () => null, now = () => Date.now() } = {}) {
+export function mountReportsSheet({ doc = globalThis.document, host, api, context = () => ({}), capture = () => null, onState = () => {}, toast = () => {}, opener = () => null, now = () => Date.now(), pictureWait = PICTURE_WAIT_MS } = {}) {
   let state = 'closed';
   let view = 'list';
   let tickets = [];
@@ -60,7 +66,11 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   let picture = null;
   // The two pictures a new report can carry (with the game's UI, the world only), drawn when first wanted.
   let shots = { ui: null, world: null };
-  let drawing = null;
+  // Each picture's drawing while it is under way (ticket 30: drawn behind the form, never in its way).
+  let jobs = { ui: null, world: null };
+  // The pictures still to start once the form has painted.
+  let queued = new Set();
+  let round = 0;
 
   const e = (tag, attrs, text) => el(doc, tag, attrs, text);
   const panel = e('div', { id: 'bug-report-panel', class: 'reports-panel ui-sheet ui-sheet-center', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'bug-report-title', hidden: true, 'data-bug-report': '', 'data-reports-view': 'list' });
@@ -255,17 +265,24 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     }
   }
 
+  const okShot = (x) => (x && typeof x.url === 'string' && x.url.startsWith('data:image/jpeg;base64,') ? x : null);
+  const mode = () => (uiBox.checked ? 'ui' : 'world');
+
+  /** The preview and the two boxes as the pictures stand. Both boxes stay usable while a picture draws. */
   function drawPicture() {
-    shot = shots[uiBox.checked ? 'ui' : 'world'];
+    const want = mode();
+    shot = shots[want];
     const has = Boolean(shot?.url);
-    uiBox.disabled = Boolean(drawing) || !picBox.checked;
-    picBox.disabled = Boolean(drawing) || (!has && !shots.ui && !shots.world);
-    if (drawing) {
+    const pending = Boolean(jobs[want]) || queued.has(want);
+    const none = !shots.ui && !shots.world && !jobs.ui && !jobs.world && queued.size === 0;
+    picBox.disabled = none;
+    uiBox.disabled = !picBox.checked;
+    if (none) picBox.checked = false;
+    if (pending && picBox.checked) {
       picHint.textContent = T.pictureDrawing;
       picPreview.hidden = true;
       return;
     }
-    if (!has && !shots.ui && !shots.world) picBox.checked = false;
     picHint.textContent = has ? (uiBox.checked ? T.pictureHintUi : T.pictureHint) : T.pictureNone;
     picPreview.hidden = !(has && picBox.checked);
     if (has) {
@@ -275,33 +292,62 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     }
   }
 
-  /** The game as it is now, for a new report (the feature draws it; null when it cannot): with its UI or the world only. */
-  function takePicture(ui = uiBox.checked) {
-    const mode = ui ? 'ui' : 'world';
+  /** One picture of the game as it is now (the feature draws it; null when it cannot), in the background. */
+  function takePicture(which) {
+    if (jobs[which]) return jobs[which];
+    queued.delete(which);
+    const mine = round;
     const job = (async () => {
       let s = null;
-      try { s = await capture({ ui }); } catch { s = null; }
-      shots[mode] = s && typeof s.url === 'string' && s.url.startsWith('data:image/jpeg;base64,') ? s : null;
-      // A UI picture that cannot be drawn falls back to the world only.
-      if (ui && !shots.ui && !shots.world) {
-        try { s = await capture({ ui: false }); } catch { s = null; }
-        shots.world = s && typeof s.url === 'string' && s.url.startsWith('data:image/jpeg;base64,') ? s : null;
-        if (shots.world) uiBox.checked = false;
-      }
+      try { s = await capture({ ui: which === 'ui' }); } catch { s = null; }
+      if (mine !== round) return;
+      shots[which] = okShot(s);
+      // A UI picture that cannot be drawn (or came out blank) falls back to the world only.
+      if (which === 'ui' && !shots.ui && uiBox.checked) uiBox.checked = false;
     })();
-    drawing = job;
+    jobs[which] = job;
     drawPicture();
     return job.finally(() => {
-      if (drawing === job) drawing = null;
+      if (jobs[which] === job) jobs[which] = null;
       drawPicture();
     });
   }
 
+  /** A new report's pictures: the world at once (a quick copy of the canvas), then the UI one behind the form. */
   function newPictures() {
+    round += 1;
     shots = { ui: null, world: null };
+    jobs = { ui: null, world: null };
+    queued = new Set(['world', 'ui']);
     picBox.checked = true;
     uiBox.checked = true;
-    return takePicture(true);
+    const mine = round;
+    // After the form has painted and the box has the caret: typing never waits on a picture.
+    const start = () => {
+      if (mine !== round || state === 'closed' || view !== 'new') return;
+      takePicture('world').then(() => {
+        if (mine !== round) return;
+        if (uiBox.checked && state !== 'closed' && queued.has('ui')) takePicture('ui');
+        else { queued.delete('ui'); drawPicture(); }
+      });
+    };
+    drawPicture();
+    picHint.textContent = T.pictureDrawing;
+    const raf = globalThis.requestAnimationFrame || ((f) => setTimeout(f, 16));
+    raf(() => setTimeout(start, 50));
+  }
+
+  /** The picture that goes with Send: the chosen one, waited on pictureWait ms at most, else the world. */
+  async function pictureToSend() {
+    if (!picBox.checked) return null;
+    const want = mode();
+    if (!shots[want] && !jobs[want]) takePicture(want);
+    const job = jobs[want];
+    if (job) await Promise.race([job.catch(() => {}), new Promise((r) => setTimeout(r, pictureWait))]);
+    if (shots[want]?.url) return shots[want].url;
+    if (!shots.world && !jobs.world) await takePicture('world');
+    else if (jobs.world) await jobs.world.catch(() => {});
+    return shots.world?.url || null;
   }
 
   function open(which = 'list') {
@@ -353,9 +399,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     sendBtn.disabled = true;
     say(T.sending);
     const words = message.slice(0, REPORT_MAX);
-    if (drawing) await drawing.catch(() => {});
-    const chosen = shots[uiBox.checked ? 'ui' : 'world'];
-    const pic = picBox.checked && chosen?.url ? chosen.url : null;
+    const pic = await pictureToSend();
     try {
       let r;
       let without = false;
@@ -369,7 +413,10 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       }
       const sentWords = without ? T.sentNoPicture : T.sent;
       shot = null;
+      round += 1;
       shots = { ui: null, world: null };
+      jobs = { ui: null, world: null };
+      queued = new Set();
       text.value = '';
       state = 'open';
       sendBtn.disabled = false;
@@ -454,7 +501,7 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
   reply.addEventListener('input', () => { if (status.classList.contains('is-error')) say(''); });
   picBox.addEventListener('change', () => drawPicture());
   uiBox.addEventListener('change', () => {
-    if (!shots[uiBox.checked ? 'ui' : 'world'] && !drawing) takePicture(uiBox.checked);
+    if (!shots[mode()] && !jobs[mode()]) takePicture(mode());
     else drawPicture();
   });
   x.addEventListener('click', () => close());
