@@ -907,6 +907,7 @@ import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-ch
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=e9d100c3';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
 import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=34ae15ae';
+import { installHeldKeyGuard } from './js/held-keys.js?v=98b96620';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
 import { sceneAnim, syncAnim } from './js/deco-anim.js?v=6f548fd1';
 import { revealStartCard, whenSceneDrawn } from './js/start-backdrop.js?v=8510d51e';
@@ -1289,6 +1290,9 @@ const SHEETS = {
 };
 
 const keys = new Set();
+// Player report 23 (js/held-keys.js): a held key is let go of whenever the page cannot vouch for
+// it (blur, a context menu, Cmd, a text field), as the client's KeyBeacon.reset did.
+const heldKeys = installHeldKeyGuard(keys, { onRelease: (why) => setCanvasData('keysReleased', why) });
 let app, world, bgLayer, entityLayer, fxLayer, player, prompt, promptLayer, camTarget, camY, portalSprites;
 // FEEL (js/camera-feel.js): per axis, whether the eased camera rests on its target this frame and
 // the way it last travelled.
@@ -12439,14 +12443,22 @@ function combinedPhysics() {
   };
 }
 
+/** Player report 23: whether the last frame held the avatar (a menu, a verb, a scene). */
+let inputWasBlocked = false;
+
 function handleInput() {
   if (gameplayInputBlocked()) {
     // MAPWALK: a menu or a scene that holds the avatar ends a walk you started.
     endUserWalk('held');
+    // Player report 23: a menu or scene that takes the avatar lets go of the keys held as it
+    // opened (its own keys come back on their next press), as TSMainView.blur's stopAvatar did.
+    if (!inputWasBlocked) heldKeys.releaseAll('held');
+    inputWasBlocked = true;
     player.vx = 0;
     clearJumpQueue(jumpState);
     return;
   }
+  inputWasBlocked = false;
   if (paradiseIsInstanced()) {
     if (paradiseCourseRuntime.owns(paradiseCourse())) {
       paradiseCourseRuntime.input(paradiseCourseHost(), paradiseCourse());
@@ -21153,6 +21165,8 @@ function setAvatarTone(filters) {
 function clearWorldEntities() {
   cancelCurrentAction({ quiet: true });
   endStreetOverlays();
+  // Player report 23: a new street starts with no key held (a real one comes back on its next repeat).
+  heldKeys.releaseAll('street');
   clearHoverGlow();
   clearSignpostBoardHover();
   recentInteractionTarget = null;
@@ -27385,6 +27399,9 @@ async function main() {
 
   app.canvas.addEventListener('pointerdown', (e) => {
     if (!state.started || menuTarget || isMapOpen() || isScreenFxBlocking()) return;
+    // Player report 23: only the main button acts on the world. The client's right click was its
+    // Flash menu, "A game by Tiny Speck" (BootStrap.as 38-55, TSMainView.as 207), never a verb menu.
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
     // The press that closed a verb menu (VERBS) does nothing else, as the old shade's did.
     if (e.timeStamp === verbMenuClosedByPointerAt) return;
     const bounds = app.canvas.getBoundingClientRect();
