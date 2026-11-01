@@ -342,8 +342,10 @@ function applyRookedVisual(engine, entry) {
     const ground = nearestSurfaceY(engine.platforms, spr.x, spr.y + 40);
     spr._groundY = Number.isFinite(ground) ? ground - 2 : (spr._groundY ?? engine.groundY);
   }
-  if (isTreeClass(cls)) spr.tint = 0xc4566c;
-  else if (cls === 'npc_kitty_chicken') spr.tint = 0xc8c2d6;
+  // No tint (player report 2026-11-01: trees stayed red until hovered). The client marks a rooked
+  // thing only with the rooked_halo overlay above it (LisRookManager.as rook(), ROOK_ANIMATION_NAME);
+  // a rooked tree's own art changes through its health and maturity (trants.js onRooked 1140-1166),
+  // and an animal through its rooked state (rook.js 55-64).
   setRookedClip(row, 'a');
   addHalo(engine, row);
 }
