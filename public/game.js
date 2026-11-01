@@ -22535,6 +22535,43 @@ function escapeTopPanel() {
   return true;
 }
 
+/**
+ * Player report 16: Esc has something here to close or stop. The main Escape branch then keeps
+ * the key from the browser (preventDefault): Safari's full-screen window takes an Escape the page
+ * left unhandled as "leave full screen", so Esc closes the panel and full screen stays. With
+ * nothing open, Esc goes on to the browser as before. (A full screen a page asked for, the
+ * Fullscreen API, always ends on Esc; only Chromium's Keyboard Lock can hold it.)
+ */
+function escapeHasWork() {
+  return Boolean(
+    menuTarget ||
+    currentAction ||
+    gardenTend ||
+    isPackPopoverOpen() ||
+    isFeedPickerOpen() ||
+    isEmotionalBearPickerOpen() ||
+    isQuestDialogueOpen() ||
+    isRookMuseumExhibitOpen() ||
+    isMailboxOpen() ||
+    isHomePanelOpen() ||
+    isMapOpen() ||
+    isVendorOpen() ||
+    isQuestOpen() ||
+    isAchieveOpen() ||
+    isFeatOpen() ||
+    isSkillsOpen() ||
+    isBuffsOpen() ||
+    isMakeOpen() ||
+    isGardenOpen() ||
+    isAvatarOpen() ||
+    isShrineOpen() ||
+    features.query('packOpenBag') ||
+    packRow.isSearching() ||
+    panelOnScreen() ||
+    [...document.querySelectorAll('[role="dialog"][aria-modal="true"]')].some((d) => d.getClientRects().length > 0)
+  );
+}
+
 /** True while escapeOpenFeatureDialog's own Escape is on its way (it must not be relayed again). */
 let relayingEscape = false;
 
@@ -26920,6 +26957,7 @@ async function main() {
     if ((e.key === 'Enter' || e.key === ' ') && focusedDialogButton()) return;
     keys.add(e.key);
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
+    if (e.key === 'Escape' && escapeHasWork()) e.preventDefault();
     if (e.key === 'Escape') {
       if (escapeTopPanel()) return;
       if (escapeOpenFeatureDialog()) return;

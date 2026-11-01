@@ -144,3 +144,13 @@ describe('Enter after walking (report 17)', () => {
     assert.ok(forget > 0 && forget < input.indexOf('if (avatarWalk && !climb.active) {'), 'raw keys only, before a walk steers');
   });
 });
+
+describe('Esc and full screen (report 16)', () => {
+  it('keeps Esc from the browser only when it closes or stops something', () => {
+    assert.match(game, /if \(e\.key === 'Escape' && escapeHasWork\(\)\) e\.preventDefault\(\);\n\s+if \(e\.key === 'Escape'\) \{/);
+    const fn = game.slice(game.indexOf('function escapeHasWork() {'), game.indexOf('/** True while escapeOpenFeatureDialog'));
+    for (const name of ['menuTarget', 'currentAction', 'isMapOpen()', 'isVendorOpen()', 'isQuestDialogueOpen()', 'panelOnScreen()', 'aria-modal']) {
+      assert.ok(fn.includes(name), name);
+    }
+  });
+});
