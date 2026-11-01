@@ -43367,5 +43367,59 @@
    0.9821,
    0.9821
   ]
+ },
+ "assets/ui/signpost/signpost_post.png": {
+  "animal": "signpost",
+  "character": "signpost",
+  "source": "tools/signpost-art",
+  "status": "ok",
+  "hires": "assets/ui/signpost/signpost_post@3x.webp",
+  "bytes": 6316,
+  "cells": 1,
+  "fw": 43,
+  "fh": 246,
+  "scoreKind": "hand-traced vectors vs the 1x PNG (3:1 box downscale)",
+  "score": 0.9962,
+  "minFrame": 0.9962,
+  "drift": [],
+  "frameScores": [
+   0.9962
+  ]
+ },
+ "assets/ui/signpost/signpost_arm.png": {
+  "animal": "signpost",
+  "character": "signpost",
+  "source": "tools/signpost-art",
+  "status": "ok",
+  "hires": "assets/ui/signpost/signpost_arm@3x.webp",
+  "bytes": 5546,
+  "cells": 1,
+  "fw": 260,
+  "fh": 30,
+  "scoreKind": "hand-traced vectors vs the 1x PNG (3:1 box downscale)",
+  "score": 0.9919,
+  "minFrame": 0.9919,
+  "drift": [],
+  "frameScores": [
+   0.9919
+  ]
+ },
+ "assets/ui/signpost/signpost_shadow.png": {
+  "animal": "signpost",
+  "character": "signpost",
+  "source": "tools/signpost-art",
+  "status": "ok",
+  "hires": "assets/ui/signpost/signpost_shadow@3x.png",
+  "bytes": 5745,
+  "cells": 1,
+  "fw": 87,
+  "fh": 26,
+  "scoreKind": "hand-traced vectors vs the 1x PNG (3:1 box downscale)",
+  "score": 0.9647,
+  "minFrame": 0.9647,
+  "drift": [],
+  "frameScores": [
+   0.9647
+  ]
  }
 }

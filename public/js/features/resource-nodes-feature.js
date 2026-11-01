@@ -54,7 +54,7 @@
 
 import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=b0e33301';
 import { isItemFloor, platformYAt } from '../street-model.js?v=505d8990';
-import { hiresSpriteUrl } from '../sprite-hires.js?v=17562829';
+import { hiresSpriteUrl } from '../sprite-hires.js?v=03e66d26';
 import { rollResourceNodeDrop } from './drops-feature.js?v=7c2db147';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { resourceNodeResponseKey, verbResponse } from '../verb-responses.js?v=3ceb8a8c';

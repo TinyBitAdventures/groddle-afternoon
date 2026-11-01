@@ -647,6 +647,9 @@ export const HIRES_SPRITES = new Map([
   ["assets/sprites/vendors/npc_tool_vendor_idle.webp", "assets/sprites/vendors/npc_tool_vendor_idle@3x.webp"],
   ["assets/sprites/vendors/npc_tool_vendor_talk.webp", "assets/sprites/vendors/npc_tool_vendor_talk@3x.webp"],
   ["assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.png", "assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445@3x.webp"],
+  ["assets/ui/signpost/signpost_arm.png", "assets/ui/signpost/signpost_arm@3x.webp"],
+  ["assets/ui/signpost/signpost_post.png", "assets/ui/signpost/signpost_post@3x.webp"],
+  ["assets/ui/signpost/signpost_shadow.png", "assets/ui/signpost/signpost_shadow@3x.png"],
 ]);
 
 /**

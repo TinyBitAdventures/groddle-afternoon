@@ -60,7 +60,7 @@ test('every animal sheet the game slices is found, the Piggy rooting look among 
 });
 
 test('every animal sheet has a 3x twin from the vector SWF, exactly three times its 1x pixels', async () => {
-  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=17562829');
+  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=03e66d26');
   const missing = [];
   for (const r of await animalSheets()) {
     if (r.density >= 3) continue;
@@ -71,7 +71,7 @@ test('every animal sheet has a 3x twin from the vector SWF, exactly three times 
 });
 
 test('each animal sheet stores at least as many pixels as its largest draw scale', async () => {
-  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=17562829');
+  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=03e66d26');
   const { stageFor } = await import('../public/js/location-view.js?v=5a0d5c0b');
   // Original zoom on a 2560 x 1440 monitor (the game area under the top bar), CSS px per world px.
   const stage = stageFor({ width: 2560, height: 1360, sceneWidth: 4000, sceneHeight: 1000, zoom: 1 }).scale;
@@ -90,8 +90,8 @@ test('each animal sheet stores at least as many pixels as its largest draw scale
 // Their words are drawn by Pixi at SIGN_TEXT_RESOLUTION; the woods are Tiny Speck's PNGs, which
 // exist only as 1x rasters (glitch-client TSEngineAssets/src/Assets.as embeds signpost_post.png,
 // signpost_arm.png and signpost_shadow.png; SignpostView.as 83 drew them at holder scale 0.8, so
-// the 2012 client never magnified them). No vector source shipped, so they stay listed here with
-// their draw scale until a sharper source exists.
+// the 2012 client never magnified them). No vector source shipped, so each has a 3x twin rendered
+// from a hand trace of the 1x PNG (tools/signpost-art, G509), loaded wherever the 1x URL is used.
 const SIGN_RASTERS = Object.freeze({
   'assets/ui/signpost/signpost_post.png': { w: 43, h: 246 },
   'assets/ui/signpost/signpost_arm.png': { w: 260, h: 30 },
@@ -116,7 +116,7 @@ test('signpost words are rendered at least as finely as a 2x screen draws them a
   }
 });
 
-test('signpost woods are Tiny Speck\'s own 1x PNGs, the one source there is', async () => {
+test('signpost woods keep Tiny Speck\'s own 1x PNGs, byte for byte, for 1x screens', async () => {
   const { readFileSync } = await import('node:fs');
   const client = join(root, '../glitch-client/TSEngineAssets/src/assets/graphics');
   for (const [path, size] of Object.entries(SIGN_RASTERS)) {
@@ -124,7 +124,33 @@ test('signpost woods are Tiny Speck\'s own 1x PNGs, the one source there is', as
     assert.deepEqual({ w: b.readUInt32BE(16), h: b.readUInt32BE(20) }, size, path);
     if (existsSync(client)) assert.ok(b.equals(readFileSync(join(client, path.split('/').pop()))), `${path} is the client's file`);
   }
-  // Drawn about 2x on a 2x laptop screen: why they read softer than the vector props beside them.
-  const draw = await signDrawScale(1280, 740);
-  assert.ok(draw > 1.5 && draw < 3, `signpost drawn ${draw.toFixed(2)}x`);
+});
+
+test('signpost woods have a sharp 3x copy, finer than a 2x screen draws them at Original zoom', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { HIRES_SPRITES, hiresSpriteUrl } = await import('../public/js/sprite-hires.js?v=03e66d26');
+  const soft = [];
+  for (const [path, size] of Object.entries(SIGN_RASTERS)) {
+    const twin = HIRES_SPRITES.get(path);
+    if (!twin || !existsSync(join(pub, twin))) {
+      soft.push(`${path}: no 3x copy`);
+      continue;
+    }
+    assert.match(twin, /@3x\.(png|webp)$/, twin);
+    assert.equal(hiresSpriteUrl(`./${path}?v=1`), `${twin}?v=1`, 'loaded wherever the 1x URL is used');
+    const b = readFileSync(join(pub, twin));
+    const kind = b.toString('ascii', 12, 16);
+    const three = b.readUInt32BE(0) === 0x89504e47
+      ? { w: b.readUInt32BE(16), h: b.readUInt32BE(20) }
+      : kind === 'VP8X'
+        ? { w: b.readUIntLE(24, 3) + 1, h: b.readUIntLE(27, 3) + 1 }
+        : { w: (b.readUInt32LE(21) & 0x3fff) + 1, h: ((b.readUInt32LE(21) >> 14) & 0x3fff) + 1 };
+    assert.deepEqual(three, { w: size.w * 3, h: size.h * 3 }, twin);
+  }
+  assert.deepEqual(soft, []);
+  // A 13 to 16 inch laptop, full screen, under the top bar: the 3x copy covers every draw scale.
+  for (const [w, h] of [[1280, 740], [1512, 880], [1728, 1010]]) {
+    const draw = await signDrawScale(w, h);
+    assert.ok(draw > 1.5 && draw <= 3, `${w} x ${h}: signpost drawn ${draw.toFixed(2)}x, stored 3x`);
+  }
 });

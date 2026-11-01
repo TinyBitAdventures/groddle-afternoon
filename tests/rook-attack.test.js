@@ -280,7 +280,7 @@ describe('rooked things and cures', () => {
 });
 
 describe('rook attack feature', async () => {
-  const { ROOK_SHEETS, rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=5401066c');
+  const { ROOK_SHEETS, rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=16ac9f33');
   const { createFeatureHost } = await import('../public/js/feature-host.js?v=e4f648b1');
 
   /** Pixel size from a PNG IHDR or a WebP VP8/VP8L/VP8X header. */

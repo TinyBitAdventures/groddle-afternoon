@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="87" height="26" viewBox="0 0 87 26">
+  <!--
+    Signpost shadow: the soft dark pool under the foot.
+    Hand-traced from Tiny Speck's 1x signpost_shadow.png (CC0, glitch-client
+    TSEngineAssets/src/assets/graphics, embedded by Assets.as; SignpostView.as
+    draws it under the post): an ellipse whose darkness falls off in a straight
+    line from the middle to the rim, with the denser pool right under the foot,
+    measured from the 1x alpha, in its 87 x 26 pixel units. Our derivative,
+    dedicated CC0 1.0 like the original.
+  -->
+  <defs>
+    <radialGradient id="pool" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(40.07 12.17) scale(40.55 11.79)">
+      <stop offset="0" stop-color="#1a1a1a" stop-opacity="0.61"/>
+      <stop offset="1" stop-color="#1a1a1a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="foot" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(37.56 8.52) scale(13.25 5.88)">
+      <stop offset="0" stop-color="#1a1a1a" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#1a1a1a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="40.07" cy="12.17" rx="40.55" ry="11.79" fill="url(#pool)"/>
+  <ellipse cx="37.56" cy="8.52" rx="13.25" ry="5.88" fill="url(#foot)"/>
+</svg>

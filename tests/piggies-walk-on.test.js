@@ -21,7 +21,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createAnimalState } from '../public/js/animals.js?v=24533b10';
-import { PIGGY_ROOTING, animalMoodFeature, piggyRootDelayMs } from '../public/js/features/animal-mood-feature.js?v=5c7f445f';
+import { PIGGY_ROOTING, animalMoodFeature, piggyRootDelayMs } from '../public/js/features/animal-mood-feature.js?v=87f18134';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=505d8990';
 import {
   ANIMAL_BODY,
