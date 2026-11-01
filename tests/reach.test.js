@@ -121,7 +121,8 @@ describe('every server-laid tree, rock and piggy stays in reach from beside it',
 describe('game.js wiring', () => {
   it('Enter, the chooser and the prompt drop things behind a floor', () => {
     assert.match(game, /import \{ avatarHitBox, behindFloor, OUT_OF_REACH_LINE \} from '\.\/js\/reach\.js\?v=[0-9a-f]{8}'/);
-    assert.match(game, /const hitBox = avatarHitBox\(player\.x, player\.y, bodyScale\);\s*return behindFloor\([\s\S]{0,200}feetY: player\.y, hitBox \}\);/);
+    assert.match(game, /function behindFloorFromPlayer\(t, at = player\) \{/);
+    assert.match(game, /const hitBox = avatarHitBox\(at\.x, at\.y, bodyScale\);\s*return behindFloor\([\s\S]{0,200}feetY: at\.y, hitBox \}\);/);
     assert.match(game, /function interactReach\(t\) \{[\s\S]{0,260}if \(d < 160 && behindFloorFromPlayer\(t\)\) return Infinity;/);
     assert.match(game, /avatarHeadReach\(bodyScale\)\.reach \/ 2/);
     assert.match(game, /withinReach\(recentInteractionTarget, 160\)\s*\) \{\s*openVerbMenu\(recentInteractionTarget\)/);
@@ -129,9 +130,9 @@ describe('game.js wiring', () => {
     assert.match(game, /recent \|\| \(nearHover && withinReach\(nearHover, 160\)/);
   });
 
-  it('a click on a thing behind a floor says the client\'s line instead of opening its menu', () => {
+  it('a click on a thing behind a floor that no walk-over reaches says the client\'s line instead of opening its menu', () => {
     assert.equal(OUT_OF_REACH_LINE, 'Could not get close enough :(');
-    assert.match(game, /if \(!\/\^pc_\/\.test\(String\(best\.classId \|\| ''\)\) && behindFloorFromPlayer\(best\)\) \{[\s\S]{0,140}toast\(OUT_OF_REACH_LINE\);\s*return;/);
+    assert.match(game, /if \(!\/\^pc_\/\.test\(String\(best\.classId \|\| ''\)\) && behindFloorFromPlayer\(best\) && !walkOverReaches\(best\)\) \{[\s\S]{0,140}toast\(OUT_OF_REACH_LINE\);\s*return;/);
   });
 
   it('cites client lines that say what it says', { skip: !existsSync(client) && 'needs glitch-client beside the repo' }, () => {

@@ -162,6 +162,6 @@ import { questPinsFeature } from './quest-pins-feature.js?v=e59012f1'; FEATURES.
 import { zoneEffectsFeature } from './zone-effects-feature.js?v=b0813bcf'; FEATURES.push(zoneEffectsFeature);
 import { updateReadyFeature } from './update-ready-feature.js?v=257c1dcb'; FEATURES.push(updateReadyFeature);
 import { butlerImFeature } from './butler-im-feature.js?v=6926ba8f'; FEATURES.push(butlerImFeature);
-import { streetObjectsFeature } from './street-objects-feature.js?v=7143913b'; FEATURES.push(streetObjectsFeature);
+import { streetObjectsFeature } from './street-objects-feature.js?v=2e1a1f2d'; FEATURES.push(streetObjectsFeature);
 import { realtimeFeature } from './realtime-feature.js?v=967ca61d'; FEATURES.push(realtimeFeature);
 import { accountBackupFeature } from './account-backup-feature.js?v=399056e8'; FEATURES.push(accountBackupFeature);

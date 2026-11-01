@@ -94,7 +94,7 @@ test.describe('integration playtest regressions', () => {
   });
 
   test('clicking a street mailbox goes through its feature, not the home mailbox gate', () => {
-    assert.match(game, /if \(best\.classId === 'npc_mailbox'\) \{[\s\S]{0,200}?executeVerb\(best, 'view_inbox'\);/);
+    assert.match(game, /if \(best\.classId === 'npc_mailbox'\) \{[\s\S]{0,400}?executeVerb\(best, 'view_inbox'\)/);
   });
 
   test('the street nameplate stays on one line on phones', () => {

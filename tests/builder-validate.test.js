@@ -77,7 +77,7 @@ describe('the stepper the game and the validator share (js/avatar-step.js)', () 
   it('game.js runs the shared frame', () => {
     const game = read('public/game.js');
     // assert.ok, not assert.match: a failing match would print the whole of game.js.
-    assert.ok(/import \{ WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, streetPhysicsExtras \} from '\.\/js\/avatar-step\.js\?v=[0-9a-f]{8}';/.test(game), 'imports js/avatar-step.js');
+    assert.ok(/import \{ WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, (?:steerX, )?streetPhysicsExtras \} from '\.\/js\/avatar-step\.js\?v=[0-9a-f]{8}';/.test(game), 'imports js/avatar-step.js');
     assert.ok(/stepAvatar\(player, \{\n\s+dt,\n\s+buff: combinedPhysics\(\),/.test(game), 'physics() steps through stepAvatar');
     assert.ok(game.includes('return avatarGround(streetPlatforms, px, py, player?.vy ?? 0, { street: currentStreet, fallback: GROUND_Y });'), 'resolveGround is avatarGround');
     assert.ok(!/function streetPhysicsFreeFall|const STREET_PHYSICS_TERMINAL_VY/.test(game), 'no second copy of the frame');

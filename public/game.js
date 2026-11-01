@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=7e4c28c1';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=eb65bc32';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1e2ee4bc';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -727,8 +727,10 @@ import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
 import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
 import { landingY, walkSurfaceY } from './js/walk-surface.js?v=5b6e1c8d';
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
-import { WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, streetPhysicsExtras } from './js/avatar-step.js?v=33ad1926';
+import { WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=33ad1926';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
+import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoalX } from './js/walk-over.js?v=db80ba07';
+import { isInHell } from './js/hell.js?v=6ffd0278';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=0b81a3e4';
@@ -2205,6 +2207,8 @@ function startUserWalk(goal) {
   const path = createUserPath(goal, { fromX: player.x, tsid: currentStreetTsid, worldW: WORLD_W });
   if (!path) return false;
   if (climb.active) stopClimb();
+  // A new walk drops a walk-over still on its way (AvatarController.beginPath replaces the path).
+  if (avatarWalk?.verbWalk) finishVerbWalk(avatarWalk.verbWalk, 'replaced');
   avatarWalk = path;
   setCanvasData('avatarWalk', `${path.kind}:${Math.round(path.x)}`);
   setCanvasData('avatarWalkEnd', '');
@@ -2217,6 +2221,10 @@ function endUserWalk(reason) {
   avatarWalk = null;
   setCanvasData('avatarWalk', '');
   setCanvasData('avatarWalkEnd', reason);
+  if (w.verbWalk) {
+    finishVerbWalk(w.verbWalk, reason);
+    return;
+  }
   // AvatarController.endPath 156-165: beside the player you walked to, their menu opens.
   if (reason === 'arrived' && w.kind === 'player' && w.id && !menuTarget) {
     const them = interactables.find((t) => t?.classId === 'pc_remote' && String(t.playerId) === w.id);
@@ -6957,7 +6965,7 @@ function renderVerbMenu(target, verbs, level = null) {
       if (picks) openVerbPickLevel(target, v, e.currentTarget);
       else {
         closeVerbMenu();
-        beginVerbAction(target, v);
+        requestVerb(target, v);
       }
     } : null);
   });
@@ -7241,11 +7249,11 @@ function commitFeedPick(classTsid, count = 1) {
   if (app?.canvas) app.canvas.dataset.feedPickerSelection = classTsid;
   closeFeedPicker('selected');
   const counted = pickerTakesCount(target.classId, verbId);
-  return beginVerbAction(target, {
+  return requestVerb(target, {
     id: counted ? `${verbId}:${classTsid}:${count}` : `${verbId}:${classTsid}`,
     label: `${verbId} ${counted && count > 1 ? `${count} ` : ''}${food.label}`,
     ...(target.featureId ? { durationMs: 0 } : {}),
-  });
+  }, { label: verbId });
 }
 
 /** A verb result's effects moved a stat or an item (NOTIFY: a gain, not a notice). */
@@ -7549,6 +7557,112 @@ async function playPickAnimation(target, durationMs = 0) {
   };
   tool.play();
   return tool;
+}
+
+/* —— WALK-OVER (js/walk-over.js): a verb on a thing more than reach away walks you over first —— */
+
+/** QA: canvas data verbWalk (classId:verb while one runs) and verbWalkEnd (ran | far:<why> | dropped:<why>). */
+function verbWalkRange(target, verbId) {
+  return verbRange(target?.classId, verbId, {
+    inHell: isInHell(currentStreetTsid, currentStreet?.hubId || ''),
+    atHome: homeIsInstanced(),
+  });
+}
+
+/** In reach for the verb with the avatar's feet at `at` (the thing measured where it is now). */
+function verbReachFrom(target, verbId, at = player) {
+  if (!target?.sprite || target.sprite.destroyed) return false;
+  const range = verbWalkRange(target, verbId);
+  const dist = interactDistance(target, at.x, at.y);
+  const serverFar = Boolean(features.query('verbOutOfReach', target, verbId, engine, { x: at.x, y: at.y }));
+  const behind = !/^pc_/.test(String(target.classId || '')) && behindFloorFromPlayer(target, at);
+  return inVerbReach({ dist, range, behind, serverFar });
+}
+
+/**
+ * Where a walk-over to `goalX` stops, run ahead with the avatar's own step (js/avatar-step.js)
+ * and the walk's own ends (js/user-path.js stepUserPath: arriving, a wall, the street's end).
+ */
+function dryRunWalk(goalX) {
+  const body = { x: player.x, y: player.y, vx: 0, vy: player.vy || 0, onGround: player.onGround !== false };
+  const path = createUserPath({ kind: 'point', x: goalX }, { fromX: body.x, tsid: currentStreetTsid, worldW: WORLD_W });
+  if (!path) return null;
+  // The ground under the dry run's own feet (resolveGround reads the avatar's vy).
+  const opts = { ...avatarStepOptions(1), ground: (x, y, vy) => avatarGround(streetPlatforms, x, y, vy ?? 0, { street: currentStreet, fallback: GROUND_Y }) };
+  let end = null;
+  for (let frame = 0; frame < 3600 && !end; frame += 1) {
+    const step = stepUserPath(path, { x: body.x, tsid: currentStreetTsid });
+    if (step.end) {
+      end = step.end;
+      break;
+    }
+    body.vx = steerX(body.vx, step.dir, body.onGround, opts.buff);
+    stepAvatar(body, opts);
+  }
+  // The feet settle: the walk lets go and the avatar coasts and lands.
+  for (let frame = 0; frame < 90 && (Math.abs(body.vx) > 0.05 || !body.onGround); frame += 1) {
+    body.vx = steerX(body.vx, 0, body.onGround, opts.buff);
+    stepAvatar(body, opts);
+  }
+  return { x: body.x, y: body.y, end: end || 'far' };
+}
+
+/**
+ * A verb chosen from a thing's menu (a click, Enter or a number key), from the pack picker's
+ * second level, or a click on a one-verb thing: run it if in reach, else walk over first
+ * (TSFrontController.as moveCloserForVerbOrAction 438-452), or refuse when no walk gets there.
+ * `run` does the verb (beginVerbAction by default).
+ */
+function requestVerb(target, verb, { label = '', run = null } = {}) {
+  const go = run || (() => beginVerbAction(target, verb));
+  if (!target?.sprite || target.sprite.destroyed || !player || !verb) return go();
+  if (verbReachFrom(target, verb.id)) return go();
+  const range = verbWalkRange(target, verb.id) ?? 300;
+  const box = spriteWorldHitBox(target.sprite, 0);
+  const goalX = walkOverGoalX({ targetX: box ? (box.left + box.right) / 2 : target.sprite.x, targetW: box ? box.right - box.left : 0, fromX: player.x, range });
+  const ahead = goalX == null ? null : dryRunWalk(goalX);
+  if (!ahead || !verbReachFrom(target, verb.id, ahead)) {
+    toast(FAILED_LINE, 2600);
+    pushActivity(FAILED_LINE);
+    playSound('CLICK_FAILURE', { volume: 0.45 });
+    setCanvasData('verbWalkEnd', `far:${ahead?.end || 'none'}`);
+    return true;
+  }
+  if (!startUserWalk({ kind: 'point', x: goalX })) return go();
+  avatarWalk.verbWalk = { target, verb, go, street: currentStreetTsid };
+  const said = movingLine(label || verb.label || verb.id);
+  toast(said, 2600);
+  setCanvasData('verbWalk', `${target.classId || ''}:${verb.id}`);
+  setCanvasData('verbWalkEnd', '');
+  return true;
+}
+
+/** AvatarController.endPath: every end but a new street (or a menu, a scene, a new walk) measures again. */
+/** A click on a thing behind a floor: whether a walk-over (at the usual 300 px) would get it in reach. */
+function walkOverReaches(target) {
+  if (!target?.sprite || target.sprite.destroyed || !player) return false;
+  const box = spriteWorldHitBox(target.sprite, 0);
+  const goalX = walkOverGoalX({ targetX: box ? (box.left + box.right) / 2 : target.sprite.x, targetW: box ? box.right - box.left : 0, fromX: player.x });
+  const ahead = goalX == null ? null : dryRunWalk(goalX);
+  return Boolean(ahead) && verbReachFrom(target, 'use', ahead);
+}
+
+function finishVerbWalk(vw, reason) {
+  setCanvasData('verbWalk', '');
+  if (walkOverEnd(reason) !== 'measure' || vw.street !== currentStreetTsid) {
+    setCanvasData('verbWalkEnd', `dropped:${reason}`);
+    return;
+  }
+  if (!verbReachFrom(vw.target, vw.verb.id)) {
+    toast(FAILED_LINE, 2600);
+    pushActivity(FAILED_LINE);
+    setCanvasData('verbWalkEnd', `far:${reason}`);
+    return;
+  }
+  setCanvasData('verbWalkEnd', `ran:${reason}`);
+  // Stand still for the verb, facing the thing (the walk let go of its key this frame).
+  player.vx = 0;
+  vw.go();
 }
 
 function beginVerbAction(target, verb) {
@@ -8407,14 +8521,14 @@ function interactDistance(t, px, py) {
  * under your feet, a piggy on the ledge over your head. The client offered
  * only what the avatar's hit box touched (MiddleGroundRenderer.as 1158-1167).
  */
-function behindFloorFromPlayer(t) {
+function behindFloorFromPlayer(t, at = player) {
   if (!t?.sprite || t.sprite.destroyed || !streetPlatforms?.length) return false;
   const bodyScale = features.query('avatarBodyScale', engine) ?? 1;
-  const body = { x: player.x, y: player.y - avatarHeadReach(bodyScale).reach / 2 };
+  const body = { x: at.x, y: at.y - avatarHeadReach(bodyScale).reach / 2 };
   const box = spriteWorldHitBox(t.sprite, 0);
   // What the avatar's hit box touches is in reach, floor or not (MiddleGroundRenderer.as 1161).
-  const hitBox = avatarHitBox(player.x, player.y, bodyScale);
-  return behindFloor(streetPlatforms, body, box, { x: t.sprite.x, y: t.sprite.y }, { airborne: Boolean(t.airborne), feetY: player.y, hitBox });
+  const hitBox = avatarHitBox(at.x, at.y, bodyScale);
+  return behindFloor(streetPlatforms, body, box, { x: t.sprite.x, y: t.sprite.y }, { airborne: Boolean(t.airborne), feetY: at.y, hitBox });
 }
 
 /** In reach for Enter: near enough and not behind a floor. */
@@ -12861,6 +12975,22 @@ function followWalkFloor(spr, dt = 1) {
   const d = y + 2 - spr.y;
   const most = 1.5 * Math.max(1, dt);
   spr.y += Math.abs(d) <= most ? d : Math.sign(d) * most;
+}
+
+/** The street's options for js/avatar-step.js stepAvatar, as physics() passes them (keep the two alike), for the walk-over's dry run. */
+function avatarStepOptions(dt = 1) {
+  return {
+    dt,
+    buff: combinedPhysics(),
+    platforms: streetPlatforms,
+    barriers: barriersScreen(currentStreet),
+    worldW: WORLD_W,
+    // The avatar's collision height (80 px) shrinks with a street's pc_scale.
+    bodyScale: features.query('avatarBodyScale', engine) ?? 1,
+    // Puzzle streets with reversible gravity run their own ceilings (features/puzzles-feature.js).
+    ceilings: features.query('ownsCeilings', engine) !== true,
+    ground: resolveGround,
+  };
 }
 
 function physics(dt) {
@@ -27791,9 +27921,10 @@ async function main() {
     }
     if (best) {
       setHoverTarget(best);
-      // Behind a floor (js/reach.js): the client walked you over or said this line
-      // (TSFrontController.as 633); players open from anywhere (LocationInputHandler.as 887-895).
-      if (!/^pc_/.test(String(best.classId || '')) && behindFloorFromPlayer(best)) {
+      // Behind a floor (js/reach.js): the menu opens when a walk-over gets there (js/walk-over.js),
+      // else the client's line (TSFrontController.as 633); players open from anywhere
+      // (LocationInputHandler.as 887-895).
+      if (!/^pc_/.test(String(best.classId || '')) && behindFloorFromPlayer(best) && !walkOverReaches(best)) {
         if (app?.canvas) app.canvas.dataset.reachBlocked = best.classId || '';
         toast(OUT_OF_REACH_LINE);
         return;
@@ -27804,7 +27935,7 @@ async function main() {
       if (best.classId === 'npc_mailbox') {
         // Through the verb path, so street mailboxes (street-furniture) open
         // without a home and the home mailbox still opens the home mail.
-        executeVerb(best, 'view_inbox');
+        requestVerb(best, { id: 'view_inbox', label: 'Check Mail' }, { run: () => executeVerb(best, 'view_inbox') });
         return;
       }
       openVerbMenu(best);

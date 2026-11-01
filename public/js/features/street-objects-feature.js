@@ -711,12 +711,13 @@ function ask(engine, target, verbId) {
  * far when the verb lands (objects.go handleAct "far") is refused now with the server's line, so
  * the swing never plays for nothing (player report 33). Null when the verb is local or in reach.
  */
-function outOfReach(engine, target, verbId) {
+function outOfReach(engine, target, verbId, at = null) {
   if (engine.mode !== 'multiplayer' || target?.yardVisit) return null;
   const c = bind(engine);
   if (!c || LOCAL_STATES.has(c.state) || (!c.wanted && c.state === 'online')) return null;
   const spr = target?.sprite;
-  const p = engine.player;
+  // `at`: feet somewhere else (game.js requestVerb's walk-over asks where a walk would stop).
+  const p = at || engine.player;
   if (!spr || !p || !Number.isFinite(spr.x) || !Number.isFinite(spr.y)) return null;
   const verb = sharedVerbOn(engine, target, verbId);
   if (!verb || !['rock', 'tree', 'node'].includes(idKind(verb.id))) return null;
@@ -726,8 +727,8 @@ function outOfReach(engine, target, verbId) {
 export const streetObjectsFeature = {
   id: STREET_OBJECTS_FEATURE_ID,
 
-  verbOutOfReach(target, verbId, engine) {
-    return outOfReach(engine, target, verbId);
+  verbOutOfReach(target, verbId, engine, at) {
+    return outOfReach(engine, target, verbId, at);
   },
 
   init(engine) {

@@ -84,7 +84,7 @@ describe('33a: what the avatar\'s hit box touches is in reach, floor or not', ()
   });
 
   it('game.js passes the hit box', () => {
-    assert.match(game, /const hitBox = avatarHitBox\(player\.x, player\.y, bodyScale\);/);
+    assert.match(game, /const hitBox = avatarHitBox\(at\.x, at\.y, bodyScale\);/);
   });
 });
 
@@ -170,7 +170,7 @@ describe('33b: a shared verb that starts also lands', () => {
   it('game.js refuses before the swing, with the server\'s line', () => {
     assert.match(game, /function beginVerbAction\(target, verb\) \{\s*if \(!target \|\| !verb \|\| currentAction\) return false;[\s\S]{0,300}const tooFar = features\.query\('verbOutOfReach', target, verb\.id, engine\);\s*if \(tooFar\) \{\s*toast\(tooFar, 2600\);/);
     const feature = readFileSync(join(root, 'public/js/features/street-objects-feature.js'), 'utf8');
-    assert.match(feature, /verbOutOfReach\(target, verbId, engine\) \{\s*return outOfReach\(engine, target, verbId\);/);
+    assert.match(feature, /verbOutOfReach\(target, verbId, engine, at\) \{\s*return outOfReach\(engine, target, verbId, at\);/);
     assert.match(feature, /\['rock', 'tree', 'node'\]\.includes\(idKind\(verb\.id\)\)/);
   });
 
