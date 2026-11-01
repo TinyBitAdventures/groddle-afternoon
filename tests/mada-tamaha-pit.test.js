@@ -95,7 +95,7 @@ describe('Mada Tamaha: the pit and its way out', () => {
   });
 
   it('the feature moves you on the same street with no travel gate, Modern and Classic alike (no UI)', () => {
-    assert.match(game, /boxes = \[\.\.\.teleportersOn\(street\.tsid\), \.\.\.narakaTeleportersOn\(street\.tsid\)\];/);
+    assert.match(game, /boxes = \[\.\.\.teleportersOn\(street\.tsid\), \.\.\.narakaTeleportersOn\(street\.tsid\)[,\]]/);
     const fn = game.slice(game.indexOf('async function teleport('));
     assert.ok(fn.indexOf('if (row.same)') < fn.indexOf('engine.travelGate('), 'in-street first, before the travel gate');
   });

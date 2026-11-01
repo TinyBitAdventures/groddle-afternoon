@@ -15,18 +15,35 @@
  *   on a pc_perm 0 line (a531c873e, tests/soft-lines.test.js); this pins the cage itself.
  */
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { describe, it, mock } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { homedir } from 'node:os';
 import { barriersScreen, platformsScreen, worldToScreen, streetWidth } from '../public/js/street-model.js?v=505d8990';
 import { avatarGround, stepAvatar, JUMP_SPEED } from '../public/js/avatar-step.js?v=33ad1926';
 import { rawTripleJumpMultiplier, scaledTripleJumpMultiplier, TRIPLE_JUMP_UPGRADES } from '../public/js/movement.js?v=a314f8a1';
+import { arrivalInTarget } from '../public/js/location-navigation.js?v=4be109b9';
+import { inTeleporter, teleportersOn, PLAIN_JUMP_APEX } from '../public/js/hidden-floors.js?v=5ce87a04';
+import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=dee9bfdf';
+import {
+  NORTHWEST_PASSAGE_TSID,
+  WINTRY_CAGE,
+  WINTRY_PLACE_TSID,
+  WINTRY_PORTAL_OBJREF,
+  WINTRY_PORTAL_TELEPORTERS,
+  wintryPortalTeleportersOn,
+} from '../public/js/wintry-portal.js?v=1437deda';
 
 const root = join(import.meta.dirname, '..');
 const python = '/opt/homebrew/bin/python3.11';
 const street = JSON.parse(readFileSync(join(root, 'public/assets/streets/GLI23D3LDHD1FQA.json'), 'utf8'));
 const animDir = join(root, 'public/assets/decos/animated');
+const wintry = JSON.parse(readFileSync(join(root, 'public/assets/streets/GM11E7ODKHO1QJE.json'), 'utf8'));
+const audit = [process.env.GLITCH_AUDIT, dirname(root), join(homedir(), 'Documents/glitch-audit')]
+  .find((d) => d && existsSync(join(d, 'streets/mnt/stos/location_data/LLI23D3LDHD1FQA.xml')) && existsSync(join(d, 'eleven-gsjs/items/teleporter.js')));
+const portal = WINTRY_PORTAL_TELEPORTERS[0];
+const walkway = worldToScreen(street, -2400, -700).y;
 
 function world() {
   const platforms = platformsScreen(street);
@@ -141,5 +158,150 @@ print(json.dumps(rows))
       assert.ok(edge < 40, `frame ${i}: the frame's edge is drawn (alpha ${edge})`);
       assert.ok(middle >= 170, `frame ${i}: the oval is missing (alpha ${middle})`);
     }
+  });
+});
+
+/*
+ * Austin 2026-11-01 (live v0.11.0, Northwest Passage): "jumping into here I believe is supposed to
+ * take you to a winter quest. Nothing happens." The portal is the secret entrance to Wintry Place:
+ * the street's one Collision-triggered Teleporter (items/teleporter.js onPlayerCollision), which
+ * the remake had left out, so the jump did nothing. js/wintry-portal.js.
+ */
+describe("Northwest Passage's wintry portal takes you to Wintry Place", () => {
+  it('stands for the street\'s one Collision-triggered Teleporter, the secret entrance GSJS names', { skip: !audit && 'glitch-audit archive not found' }, () => {
+    const xml = readFileSync(join(audit, 'streets/mnt/stos/location_data/LLI23D3LDHD1FQA.xml'), 'utf8');
+    assert.equal((xml.match(/label="Collision-triggered Teleporter"/g) || []).length, 1);
+    assert.ok(xml.includes(`<objref tsid="${WINTRY_PORTAL_OBJREF}" label="Collision-triggered Teleporter"/>`));
+    const quest = readFileSync(join(audit, 'eleven-gsjs/quests/meditativearts_maintain_energy_in_wintry_place.js'), 'utf8');
+    assert.match(quest, /secret entrances to Wintry Place are in <a [^>]*LLI23D3LDHD1FQA[^>]*>Northwest Passage/);
+    const tp = readFileSync(join(audit, 'eleven-gsjs/items/teleporter.js'), 'utf8');
+    assert.match(tp, /pc\.teleportToLocation\(this\.instanceProps\.target_tsid/);
+  });
+
+  it('is on Northwest Passage only and goes to Wintry Place', () => {
+    assert.deepEqual(wintryPortalTeleportersOn(NORTHWEST_PASSAGE_TSID).map((r) => r.id), ['northwest_to_wintry']);
+    assert.deepEqual(wintryPortalTeleportersOn('LLI23D3LDHD1FQA').map((r) => r.id), ['northwest_to_wintry']);
+    assert.deepEqual(wintryPortalTeleportersOn(WINTRY_PLACE_TSID), []);
+    assert.equal(portal.to, WINTRY_PLACE_TSID);
+    assert.equal(wintry.label, 'Wintry Place');
+  });
+
+  it('sits in the cage round the portal art', () => {
+    const deco = street.layers.find((l) => l.id === 'middleground').decos.find((d) => d.sprite === 'portal_wintry');
+    const walls = Object.fromEntries(street.barriers.map((b) => [b.id, b]));
+    assert.deepEqual([WINTRY_CAGE.x1, WINTRY_CAGE.x2], [walls.wall_1288127872349.x, walls.wall_1288127892296.x]);
+    assert.equal(WINTRY_CAGE.floor, street.platforms.find((p) => p.id === '_pl1288127904595').y1);
+    const { l } = street.bounds;
+    assert.ok(Math.abs(portal.box.x + l - deco.x) < 5, 'centred under the portal');
+    assert.ok(portal.box.x - portal.box.w / 2 + l > deco.x - deco.w / 2 && portal.box.x + portal.box.w / 2 + l < deco.x + deco.w / 2, 'inside the snowy oval');
+  });
+
+  it('standing or walking under the portal does nothing; a plain jump goes through', () => {
+    const w = world();
+    const { l } = street.bounds;
+    // Walk the walkway from left of the portal to right of it: never in the box.
+    const body = { x: -2650 - l, y: walkway, vx: 0, vy: 0, onGround: true };
+    run(body, w, 5);
+    for (let f = 0; f < 140; f++) {
+      run(body, w, 1, 1);
+      assert.equal(inTeleporter(portal, body.x, body.y), false, `walking at ${(body.x + l).toFixed(0)}, feet ${body.y.toFixed(0)}`);
+    }
+    assert.ok(body.x + l > -2300, 'walked past it');
+    // A plain jump from anywhere under the cage reaches it.
+    for (const wx of [-2470, -2400, -2335]) {
+      const jumper = run({ x: wx - l, y: walkway, vx: 0, vy: 0, onGround: true }, w, 5);
+      jumper.vy = JUMP_SPEED;
+      jumper.onGround = false;
+      let hit = false;
+      for (let f = 0; f < 80 && !hit; f++) {
+        run(jumper, w, 1);
+        hit = inTeleporter(portal, jumper.x, jumper.y);
+      }
+      assert.ok(hit, `a plain jump at x ${wx} reaches the portal`);
+    }
+    // The rise it needs is well under a plain jump and well over the walkway's slope.
+    const rise = walkway - portal.box.y;
+    assert.ok(rise > 30 && rise < PLAIN_JUMP_APEX - 30, `rise ${rise}`);
+  });
+
+  it('lands on Wintry Place\'s snow floor, clear of any box, and the way back lands outside the portal', () => {
+    const land = arrivalInTarget(wintry, portal.arrive.x + wintry.bounds.l, portal.arrive.y + wintry.bounds.t);
+    assert.equal(land.snapped, true);
+    assert.deepEqual({ x: land.x, y: land.y }, { ...portal.arrive });
+    assert.deepEqual([...teleportersOn(WINTRY_PLACE_TSID), ...wintryPortalTeleportersOn(WINTRY_PLACE_TSID)], []);
+    const back = wintry.signposts.find((s) => s.connects.some((c) => c.tsid === 'LLI23D3LDHD1FQA'));
+    const arrive = back.connects[0].arrive;
+    assert.equal(inTeleporter(portal, arrive.x, arrive.y), false, 'the signpost back does not bounce you straight in again');
+    assert.ok(Math.abs(arrive.x + street.bounds.l - (-2400)) < 150, 'it lands beside the portal');
+  });
+
+  describe('hidden-floors feature', () => {
+    const engineAt = (x, y, gate) => {
+      const calls = { enter: [], toast: [] };
+      const engine = {
+        started: true,
+        player: { x, y, vx: 0, vy: 0 },
+        data: {},
+        setData(k, v) { this.data[k] = v; },
+        param: () => null,
+        transientInstance: () => false,
+        homeContext: () => ({}),
+        acting: () => false,
+        questDialogueOpen: () => false,
+        travelGate: () => gate,
+        toast: (m) => calls.toast.push(m),
+        enter: async (tsid, opts) => { calls.enter.push([tsid, opts]); },
+        save: () => {},
+      };
+      return { engine, calls };
+    };
+
+    it('a jump into the portal enters Wintry Place at the landing', async () => {
+      let now = 1_000_000;
+      mock.method(Date, 'now', () => now);
+      try {
+        const { engine, calls } = engineAt(portal.box.x, portal.box.y - 20, null);
+        hiddenFloorsFeature.onStreetEnter(street, engine);
+        assert.equal(engine.data.hiddenFloorBoxes, 'northwest_to_wintry');
+        now += 2000;
+        hiddenFloorsFeature.onTick(16, now, engine);
+        await Promise.resolve();
+        assert.deepEqual(calls.enter, [[WINTRY_PLACE_TSID, { spawnX: portal.arrive.x, spawnY: portal.arrive.y }]]);
+        assert.equal(engine.data.hiddenFloorLast, 'northwest_to_wintry');
+      } finally {
+        hiddenFloorsFeature.onStreetClear();
+        mock.restoreAll();
+      }
+    });
+
+    it('standing under it does nothing, and a travel gate that refuses says why', async () => {
+      let now = 2_000_000;
+      mock.method(Date, 'now', () => now);
+      try {
+        const stand = engineAt(portal.box.x, walkway, null);
+        hiddenFloorsFeature.onStreetEnter(street, stand.engine);
+        now += 2000;
+        hiddenFloorsFeature.onTick(16, now, stand.engine);
+        assert.deepEqual(stand.calls.enter, []);
+        const refused = engineAt(portal.box.x, portal.box.y - 20, { ok: false, msg: 'You are too pooped to travel.' });
+        hiddenFloorsFeature.onStreetEnter(street, refused.engine);
+        now += 2000;
+        hiddenFloorsFeature.onTick(16, now, refused.engine);
+        await Promise.resolve();
+        assert.deepEqual(refused.calls.enter, []);
+        assert.deepEqual(refused.calls.toast, ['You are too pooped to travel.']);
+      } finally {
+        hiddenFloorsFeature.onStreetClear();
+        mock.restoreAll();
+      }
+    });
+
+    it('not inside a quest instance', () => {
+      const { engine } = engineAt(portal.box.x, portal.box.y - 20, null);
+      engine.transientInstance = () => true;
+      hiddenFloorsFeature.onStreetEnter(street, engine);
+      assert.equal(engine.data.hiddenFloorBoxes, '');
+      hiddenFloorsFeature.onStreetClear();
+    });
   });
 });

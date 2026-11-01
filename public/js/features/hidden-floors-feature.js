@@ -12,7 +12,9 @@
  *   asked first (Hell, Pooped). Mada Tamaha's pit (js/hell.js
  *   NARAKA_TELEPORTERS; player report 2026-11-01): a teleporter at each end
  *   of the pit floor puts you back up on that side's floor, on the same
- *   street (no loading, no travel gate: the dead walk Naraka).
+ *   street (no loading, no travel gate: the dead walk Naraka). Northwest
+ *   Passage's wintry portal (js/wintry-portal.js; Austin 2026-11-01): a jump
+ *   into the snowy oval takes you to Wintry Place, its secret entrance.
  * - The painted "EXIT" on both floors: the forgotten floor's archived
  *   sign_txt and, on the lost floor, the word read off the footage.
  * - Goorsh Gam's canopy and Ilmenskie's cave mouth: there the avatar walks
@@ -54,6 +56,7 @@ import {
   teleportersOn,
 } from '../hidden-floors.js?v=5ce87a04';
 import { narakaTeleportersOn } from '../hell.js?v=eb2a5cc4';
+import { wintryPortalTeleportersOn } from '../wintry-portal.js?v=1437deda';
 
 export const HIDDEN_FLOORS_FEATURE_ID = 'hidden-floors';
 const CHECK_MS = 60;
@@ -190,7 +193,7 @@ export const hiddenFloorsFeature = {
       publish(engine, enteredAt, true);
       return;
     }
-    boxes = [...teleportersOn(street.tsid), ...narakaTeleportersOn(street.tsid)];
+    boxes = [...teleportersOn(street.tsid), ...narakaTeleportersOn(street.tsid), ...wintryPortalTeleportersOn(street.tsid)];
     zone = clientPhysicsZone(street);
     if (isIlmenskieTsid(street.tsid)) ceilings = ceilingsScreen(street);
     const row = exitSignOn(street.tsid);

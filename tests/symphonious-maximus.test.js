@@ -36,7 +36,7 @@ import {
   touchesStar,
 } from '../public/js/symphonious-maximus.js?v=345ad437';
 import { symphoniousMaximusFeature, isSymphonious } from '../public/js/features/symphonious-maximus-feature.js?v=9fca63b1';
-import { FEATURES } from '../public/js/features/index.js?v=919b06a2';
+import { FEATURES } from '../public/js/features/index.js?v=963cb9bd';
 import { parallaxLayerOffset } from '../public/js/street-render.js?v=aa2eadc7';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
