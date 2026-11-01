@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6fc15d1b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=0d9a6d45';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=919b06a2';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -885,7 +885,7 @@ import {
   nearestPlacementGap,
 } from './js/street-ecology.js?v=7fbae08d';
 import { easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=e59f12ba';
-import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=a1c4a308';
+import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=7da54812';
 import {
   actionLoopFor,
   legacySoundKey,
@@ -5558,7 +5558,8 @@ async function loadAudio() {
   audio.musicGain.connect(audio.ctx.destination);
   audio.sfxGain.connect(audio.ctx.destination);
   // Every SFX goes through the sound board: recovered file when one exists,
-  // otherwise a js/synth-sfx.js recipe (assets/content/sound-keys.json).
+  // otherwise the recipe's Wavelength take (js/wavelength-sfx.js) or a
+  // js/synth-sfx.js recipe (assets/content/sound-keys.json).
   audio.board = createSoundBoard({
     getContext: () => audio.ctx,
     getDestination: () => audio.sfxGain,
@@ -28538,7 +28539,7 @@ async function main() {
     },
   };
   if (new URLSearchParams(location.search).has('soundtest')) {
-    import('./js/sound-test.js?v=4cd81fbe').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
+    import('./js/sound-test.js?v=6c1a43dd').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
       state.muted = false;
       if (audio.ctx?.state === 'suspended') {
         try { await audio.ctx.resume(); } catch (_) { /* opt-in */ }

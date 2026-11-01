@@ -1,0 +1,76 @@
+{
+ "tempo": 60,
+ "sampleRate": 48000,
+ "tail": 1.2,
+ "stems": "none",
+ "warmup": 0.2,
+ "tracks": [
+  {
+   "name": "00-gvib",
+   "gain": 0.0,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 11
+   },
+   "notes": [
+    {
+     "time": 0,
+     "length": 1.1,
+     "vel": 0.65,
+     "key": 76
+    }
+   ],
+   "sends": {
+    "Air": -10
+   }
+  },
+  {
+   "name": "01-synth",
+   "gain": -9,
+   "plugin": "builtin:synth",
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0,
+     "length": 0.8,
+     "vel": 0.55,
+     "key": 76
+    }
+   ],
+   "sends": {
+    "Air": -10
+   },
+   "preset": "PL Bell"
+  }
+ ],
+ "buses": [
+  {
+   "name": "Air",
+   "fx": [
+    {
+     "type": "reverb",
+     "decay": 1.1,
+     "size": 0.45,
+     "predelay": 12,
+     "damping": 0.6,
+     "highpass": 350,
+     "mix": 1
+    }
+   ]
+  }
+ ],
+ "master": {
+  "fx": [
+   {
+    "type": "eq",
+    "bands": [
+     {
+      "type": "highpass",
+      "freq": 40
+     }
+    ]
+   }
+  ]
+ }
+}

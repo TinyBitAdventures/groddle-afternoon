@@ -1,0 +1,999 @@
+{
+ "tempo": 60,
+ "sampleRate": 48000,
+ "tail": 1.2,
+ "stems": "none",
+ "warmup": 0.2,
+ "tracks": [
+  {
+   "name": "00-synth",
+   "gain": -6,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "sine"
+     },
+     {
+      "wave": "noise",
+      "level": 0.08,
+      "lowcut": 2000
+     }
+    ],
+    "filter": {
+     "type": "lowpass",
+     "cutoff": 7000
+    },
+    "amp": {
+     "attack": 0.15,
+     "decay": 0.3,
+     "sustain": 1,
+     "release": 0.04
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0,
+     "length": 0.45,
+     "vel": 0.5,
+     "key": 71,
+     "bend": [
+      [
+       0,
+       0
+      ],
+      [
+       0.4,
+       20
+      ],
+      [
+       0.45,
+       19
+      ]
+     ],
+     "vibrato": {
+      "depth": 0.15,
+      "rate": 9
+     }
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "01-synth",
+   "gain": -12,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 800,
+     "resonance": 0.3,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.2,
+     "decay": 0.25,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "automation": {
+    "params": {
+     "cutoff": [
+      [
+       0,
+       800
+      ],
+      [
+       0.45,
+       3500
+      ]
+     ]
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0,
+     "length": 0.45,
+     "vel": 0.5,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "02-timp",
+   "gain": 0.0,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 47
+   },
+   "notes": [
+    {
+     "time": 0.53,
+     "length": 0.6,
+     "vel": 0.85,
+     "key": 36
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "03-fx",
+   "gain": -10,
+   "plugin": "builtin:fx",
+   "notes": [
+    {
+     "time": 0.53,
+     "length": 0.4,
+     "vel": 0.5,
+     "key": 53
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "04-synth",
+   "gain": -8,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "lowpass",
+     "cutoff": 2000,
+     "resonance": 0.25,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.347,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "automation": {
+    "params": {
+     "cutoff": [
+      [
+       0.53,
+       2000
+      ],
+      [
+       0.88,
+       400
+      ]
+     ]
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0.53,
+     "length": 0.35,
+     "vel": 0.7,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "05-synth",
+   "gain": -4.0,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 5300,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0.6,
+     "length": 0.018,
+     "vel": 0.7,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "06-synth",
+   "gain": -4.222222222222222,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 5005,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0.6993,
+     "length": 0.018,
+     "vel": 0.6833333333333332,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "07-synth",
+   "gain": -4.444444444444445,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 6674,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0.7433,
+     "length": 0.018,
+     "vel": 0.6666666666666666,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "08-synth",
+   "gain": -4.666666666666667,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 4499,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0.8179,
+     "length": 0.018,
+     "vel": 0.6499999999999999,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "09-synth",
+   "gain": -4.888888888888889,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 5152,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0.8372,
+     "length": 0.018,
+     "vel": 0.6333333333333333,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "10-synth",
+   "gain": -5.111111111111111,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 4201,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0.8902,
+     "length": 0.018,
+     "vel": 0.6166666666666666,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "11-synth",
+   "gain": -5.333333333333333,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 5086,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0.9374,
+     "length": 0.018,
+     "vel": 0.6,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "12-synth",
+   "gain": -5.555555555555555,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 4207,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0.9793,
+     "length": 0.018,
+     "vel": 0.5833333333333333,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "13-synth",
+   "gain": -5.777777777777778,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 6668,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 1.0,
+     "length": 0.018,
+     "vel": 0.5666666666666667,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "14-synth",
+   "gain": -6.0,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 7013,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 1.0638,
+     "length": 0.018,
+     "vel": 0.5499999999999999,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "15-synth",
+   "gain": -6.222222222222222,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 5162,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 1.0906,
+     "length": 0.018,
+     "vel": 0.5333333333333333,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "16-synth",
+   "gain": -6.444444444444445,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 4683,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 1.1288,
+     "length": 0.018,
+     "vel": 0.5166666666666666,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "17-synth",
+   "gain": -6.666666666666666,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 4408,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 1.1702,
+     "length": 0.018,
+     "vel": 0.5,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "18-synth",
+   "gain": -6.888888888888889,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 7393,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 1.1911,
+     "length": 0.018,
+     "vel": 0.4833333333333333,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "19-synth",
+   "gain": -7.111111111111111,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 5366,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 1.2394,
+     "length": 0.018,
+     "vel": 0.4666666666666666,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "20-synth",
+   "gain": -7.333333333333334,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 6695,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 1.2832,
+     "length": 0.018,
+     "vel": 0.44999999999999996,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "21-synth",
+   "gain": -7.555555555555555,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 3972,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 1.3146,
+     "length": 0.018,
+     "vel": 0.4333333333333333,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "22-synth",
+   "gain": -7.777777777777778,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 6397,
+     "resonance": 0.5,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.015,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 1.3335,
+     "length": 0.018,
+     "vel": 0.41666666666666663,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "23-gglk",
+   "gain": -3.0,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 9
+   },
+   "notes": [
+    {
+     "time": 0.63,
+     "length": 0.3,
+     "vel": 0.45,
+     "key": 95
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "24-gglk",
+   "gain": -3.6,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 9
+   },
+   "notes": [
+    {
+     "time": 0.72,
+     "length": 0.3,
+     "vel": 0.42000000000000004,
+     "key": 100
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "25-gglk",
+   "gain": -4.2,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 9
+   },
+   "notes": [
+    {
+     "time": 0.81,
+     "length": 0.3,
+     "vel": 0.39,
+     "key": 92
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "26-gglk",
+   "gain": -4.8,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 9
+   },
+   "notes": [
+    {
+     "time": 0.9,
+     "length": 0.3,
+     "vel": 0.36,
+     "key": 97
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "27-gglk",
+   "gain": -5.4,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 9
+   },
+   "notes": [
+    {
+     "time": 0.99,
+     "length": 0.3,
+     "vel": 0.33,
+     "key": 88
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  }
+ ],
+ "buses": [
+  {
+   "name": "Air",
+   "fx": [
+    {
+     "type": "reverb",
+     "decay": 1.1,
+     "size": 0.45,
+     "predelay": 12,
+     "damping": 0.6,
+     "highpass": 350,
+     "mix": 1
+    }
+   ]
+  }
+ ],
+ "master": {
+  "fx": [
+   {
+    "type": "eq",
+    "bands": [
+     {
+      "type": "highpass",
+      "freq": 40
+     }
+    ]
+   }
+  ]
+ }
+}

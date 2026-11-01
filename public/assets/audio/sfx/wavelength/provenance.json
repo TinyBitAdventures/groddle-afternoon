@@ -1,0 +1,1034 @@
+{
+ "format": "groddle-wavelength-sfx/2",
+ "about": "Austin Ginder's Wavelength recreations of the game's synth sound recipes, picked by Austin on 2026-11-01 (tools/sound/wavelength-sfx/takes.json). Each file plays for the keys listed with it, in place of its js/synth-sfx.js recipe; keys with a recovered Tiny Speck recording keep the recording (recordingKeys).",
+ "author": "Austin Ginder",
+ "engine": "Wavelength 0.7.0-dev (MIT, Austin Ginder)",
+ "licence": {
+  "own-work": "CC0 1.0: rendered by Austin Ginder from his own Wavelength job, procedural sources only",
+  "own-work+MIT": "CC0 1.0 for Austin Ginder's arrangement and render; the MuseScore General samples heard in it stay under MIT, notice in MuseScore_General_License.md beside the files"
+ },
+ "method": "Wavelength job (tools/sound/wavelength-sfx/jobs/<recipe>.json) rendered at 48 kHz, trimmed and levelled by the WAVESFX lane, delivered as 44.1 kHz stereo 160 kbps MP3; installed by tools/sound/install-wavelength-sfx.mjs as mono 96kbps CBR MP3 peaked at -1 dBFS. gainDb = short-sound LUFS of the synth recipe's render minus the shipped file's.",
+ "rounds": [
+  {
+   "id": "clean",
+   "rendered": "2026-11-01",
+   "about": "Clean-licence round: round one's notes, timing and levels re-rendered on MuseScore General and Wavelength's builtin:synth (clean.py)."
+  },
+  {
+   "id": "redo",
+   "rendered": "2026-11-01",
+   "about": "Redo round: three candidates each for burp, sneeze and fireworks (redo.py); burp is still open."
+  }
+ ],
+ "sources": {
+  "fx:reverb": {
+   "label": "Wavelength algorithmic reverb bus",
+   "licence": "own-work",
+   "ship": true
+  },
+  "soundfont:MuseScore_General": {
+   "label": "MuseScore General 0.2 SoundFont (FluidR3 by Frank Wen, FluidR3Mono by Michael Cowgill, adapted by S. Christian Collins)",
+   "licence": "MIT",
+   "ship": true,
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "why": "MIT: use, copy, modify, publish and distribute are granted; its licence asks that the acknowledgements and copyright notices go with any derivative work, so the notice ships beside the files."
+  },
+  "builtin:synth:preset:PL Bell": {
+   "label": "Wavelength builtin:synth preset \"PL Bell\" (an FM bell defined in Wavelength's src/synth.cpp: no samples)",
+   "licence": "own-work",
+   "ship": true
+  },
+  "builtin:synth": {
+   "label": "Wavelength builtin:synth (oscillators, filtered noise, additive partials: no samples)",
+   "licence": "own-work",
+   "ship": true
+  },
+  "builtin:fx": {
+   "label": "Wavelength builtin:fx (synthesized impact, riser and sub drop: no samples)",
+   "licence": "own-work",
+   "ship": true
+  }
+ },
+ "takes": {
+  "littleStar1": {
+   "file": "assets/audio/sfx/wavelength/littleStar1.mp3",
+   "sha256": "eeb7b321be612a123f0de2e4292e37580acb52c9a09a8c36e01c679937639380",
+   "bytes": 17867,
+   "seconds": 1.43,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_1"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta G6 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar1.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -18.2,
+   "peak": -1.3,
+   "recipeLufs": -31.7,
+   "gainDb": -13.5,
+   "group": "littleStars"
+  },
+  "littleStar2": {
+   "file": "assets/audio/sfx/wavelength/littleStar2.mp3",
+   "sha256": "058679f01b5a196fec6914b9e4b1a6c3a8998ee0ef5ee0d91bb1fe9415fb15a4",
+   "bytes": 17867,
+   "seconds": 1.43,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_2"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta F6 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar2.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -19.8,
+   "peak": -1.5,
+   "recipeLufs": -32.2,
+   "gainDb": -12.4,
+   "group": "littleStars"
+  },
+  "littleStar3": {
+   "file": "assets/audio/sfx/wavelength/littleStar3.mp3",
+   "sha256": "5b2ee5f213718288162306061097ed739e523a48015ed34dc012e90e155756ab",
+   "bytes": 17867,
+   "seconds": 1.43,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_3"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta E6 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar3.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -18.3,
+   "peak": -1.5,
+   "recipeLufs": -32.4,
+   "gainDb": -14.1,
+   "group": "littleStars"
+  },
+  "littleStar4": {
+   "file": "assets/audio/sfx/wavelength/littleStar4.mp3",
+   "sha256": "2d26ad1092775b3e10d01787460cd72c428418eb8b556ed56d2b47479998e66b",
+   "bytes": 17867,
+   "seconds": 1.43,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_4"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta D6 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar4.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -18.9,
+   "peak": -1.5,
+   "recipeLufs": -32.8,
+   "gainDb": -13.9,
+   "group": "littleStars"
+  },
+  "littleStar5": {
+   "file": "assets/audio/sfx/wavelength/littleStar5.mp3",
+   "sha256": "f616e941167c07160a34c2b451e85e68d2f8b1c30512e2f37729bd018211dd11",
+   "bytes": 17867,
+   "seconds": 1.43,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_5"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta C6 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar5.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -18.7,
+   "peak": -1.6,
+   "recipeLufs": -33.1,
+   "gainDb": -14.4,
+   "group": "littleStars"
+  },
+  "littleStar6": {
+   "file": "assets/audio/sfx/wavelength/littleStar6.mp3",
+   "sha256": "41b63d8ea9f062287d7eda69d63e6dc6cbec61c567639ef27294ed1324d1ef31",
+   "bytes": 17867,
+   "seconds": 1.43,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_6"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta B5 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar6.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -18.9,
+   "peak": -1.5,
+   "recipeLufs": -33.2,
+   "gainDb": -14.3,
+   "group": "littleStars"
+  },
+  "littleStar7": {
+   "file": "assets/audio/sfx/wavelength/littleStar7.mp3",
+   "sha256": "ac44d2ba92369899ddcaa2ec940c042f76cfa28bc017a563f954f70526864dc8",
+   "bytes": 17867,
+   "seconds": 1.429,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_7"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta A5 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar7.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -16.6,
+   "peak": -1.3,
+   "recipeLufs": -33.4,
+   "gainDb": -16.8,
+   "group": "littleStars"
+  },
+  "littleStar8": {
+   "file": "assets/audio/sfx/wavelength/littleStar8.mp3",
+   "sha256": "a39631116493e6e7c6974a5d9ed2f157504672636b118c05042533f7110d0d7c",
+   "bytes": 17867,
+   "seconds": 1.429,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_8"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta G5 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar8.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -15.4,
+   "peak": -1.3,
+   "recipeLufs": -33.6,
+   "gainDb": -18.2,
+   "group": "littleStars"
+  },
+  "littleStar9": {
+   "file": "assets/audio/sfx/wavelength/littleStar9.mp3",
+   "sha256": "d89895af982c15ff6b46d2abc7cbcec4170455db9a3e4e6f6c3c89a2e3d40840",
+   "bytes": 17867,
+   "seconds": 1.43,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_9"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta F5 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar9.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -17.3,
+   "peak": -1.5,
+   "recipeLufs": -33.7,
+   "gainDb": -16.4,
+   "group": "littleStars"
+  },
+  "littleStar10": {
+   "file": "assets/audio/sfx/wavelength/littleStar10.mp3",
+   "sha256": "0762b7627095bd0052511486e114afaf2afc36c79da285365c7dde44908ee9c9",
+   "bytes": 17867,
+   "seconds": 1.429,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_10"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta E5 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar10.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -16.1,
+   "peak": -1.3,
+   "recipeLufs": -33.7,
+   "gainDb": -17.6,
+   "group": "littleStars"
+  },
+  "littleStar11": {
+   "file": "assets/audio/sfx/wavelength/littleStar11.mp3",
+   "sha256": "6cc7eb22bebda310de3d3fd38e27b236b68ea2eb29cbc07dff5482997ca8369c",
+   "bytes": 17867,
+   "seconds": 1.429,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_11"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta D5 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar11.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -18.2,
+   "peak": -1.4,
+   "recipeLufs": -33.8,
+   "gainDb": -15.6,
+   "group": "littleStars"
+  },
+  "littleStar12": {
+   "file": "assets/audio/sfx/wavelength/littleStar12.mp3",
+   "sha256": "e35e1899af0f18b84b74fb5a5adaf88a17c505d61e8acb7d0b89414ee58da24d",
+   "bytes": 17867,
+   "seconds": 1.43,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_12"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta C5 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar12.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -17.5,
+   "peak": -1.4,
+   "recipeLufs": -33.9,
+   "gainDb": -16.4,
+   "group": "littleStars"
+  },
+  "littleStar13": {
+   "file": "assets/audio/sfx/wavelength/littleStar13.mp3",
+   "sha256": "c848800acb094f5924670acfedd880c9b2002ee65839b512bd239e44b0a2cc58",
+   "bytes": 17867,
+   "seconds": 1.43,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_13"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta B4 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar13.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -18.6,
+   "peak": -1.4,
+   "recipeLufs": -33.9,
+   "gainDb": -15.3,
+   "group": "littleStars"
+  },
+  "littleStar14": {
+   "file": "assets/audio/sfx/wavelength/littleStar14.mp3",
+   "sha256": "b4f89be7e068fa9322f88aefe9742775f79529630b2c6027b8ca0e5471eacb63",
+   "bytes": 17867,
+   "seconds": 1.43,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_14"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta A4 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar14.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -17,
+   "peak": -1.5,
+   "recipeLufs": -33.9,
+   "gainDb": -16.9,
+   "group": "littleStars"
+  },
+  "littleStar15": {
+   "file": "assets/audio/sfx/wavelength/littleStar15.mp3",
+   "sha256": "819a15041f65e06aeab9cc42e609758d4680aa89ac1f9aea64a7655feef6759b",
+   "bytes": 17867,
+   "seconds": 1.429,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_15"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta G4 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar15.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -17.9,
+   "peak": -1.5,
+   "recipeLufs": -33.9,
+   "gainDb": -16,
+   "group": "littleStars"
+  },
+  "littleStar16": {
+   "file": "assets/audio/sfx/wavelength/littleStar16.mp3",
+   "sha256": "82e73b8d5e465b6885dd4cff32a5ec4a425e4689a8c423b545f8bfc8ae8e6d59",
+   "bytes": 17867,
+   "seconds": 1.43,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_16"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta F4 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar16.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -17.1,
+   "peak": -1.4,
+   "recipeLufs": -34,
+   "gainDb": -16.9,
+   "group": "littleStars"
+  },
+  "littleStar17": {
+   "file": "assets/audio/sfx/wavelength/littleStar17.mp3",
+   "sha256": "abcfe0864dc9b9bc9d68cde3a67cb8821b8937892526cc478f96cad22c8850ca",
+   "bytes": 17867,
+   "seconds": 1.429,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_17"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta E4 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar17.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -18.2,
+   "peak": -1.5,
+   "recipeLufs": -34,
+   "gainDb": -15.8,
+   "group": "littleStars"
+  },
+  "littleStar18": {
+   "file": "assets/audio/sfx/wavelength/littleStar18.mp3",
+   "sha256": "6d9d09a05610dccecf8616cc8da4c68981a9d44feed1ebebedede0c908a4e86f",
+   "bytes": 17867,
+   "seconds": 1.43,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_18"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta D4 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar18.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -17.8,
+   "peak": -1.5,
+   "recipeLufs": -34,
+   "gainDb": -16.2,
+   "group": "littleStars"
+  },
+  "littleStar19": {
+   "file": "assets/audio/sfx/wavelength/littleStar19.mp3",
+   "sha256": "0e4d699c2aa07abe4aef7f9f5521c98c52f2270613c6c3fb2603863ee8542fb8",
+   "bytes": 17867,
+   "seconds": 1.43,
+   "round": "clean",
+   "keys": [
+    "LITTLE_STAR_19"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Celesta C4 with a quiet harp double (evened note by note): one key of the Piano Party.",
+   "job": "tools/sound/wavelength-sfx/jobs/littleStar19.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -18,
+   "peak": -1.5,
+   "recipeLufs": -34.1,
+   "gainDb": -16.1,
+   "group": "littleStars"
+  },
+  "bigStar1": {
+   "file": "assets/audio/sfx/wavelength/bigStar1.mp3",
+   "sha256": "1d48d76f3200f85b057549754a2eeadb16e7d2839294de34a989e66119f76344",
+   "bytes": 21002,
+   "seconds": 1.689,
+   "round": "clean",
+   "keys": [
+    "BIG_STAR_1"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Vibraphone C5 (evened across its sample zones) with a soft FM bell strike: note 1 of \"Twinkle Twinkle Little Star\".",
+   "job": "tools/sound/wavelength-sfx/jobs/bigStar1.json",
+   "instruments": [
+    "builtin:synth:preset:PL Bell",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -15.4,
+   "peak": -1.5,
+   "recipeLufs": -33.3,
+   "gainDb": -17.9
+  },
+  "bigStar2": {
+   "file": "assets/audio/sfx/wavelength/bigStar2.mp3",
+   "sha256": "1d48d76f3200f85b057549754a2eeadb16e7d2839294de34a989e66119f76344",
+   "bytes": 21002,
+   "seconds": 1.689,
+   "round": "clean",
+   "keys": [
+    "BIG_STAR_2"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Vibraphone C5 (evened across its sample zones) with a soft FM bell strike: note 2 of \"Twinkle Twinkle Little Star\".",
+   "job": "tools/sound/wavelength-sfx/jobs/bigStar2.json",
+   "instruments": [
+    "builtin:synth:preset:PL Bell",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -15.4,
+   "peak": -1.5,
+   "recipeLufs": -33.3,
+   "gainDb": -17.9
+  },
+  "bigStar3": {
+   "file": "assets/audio/sfx/wavelength/bigStar3.mp3",
+   "sha256": "9b7935a32d1b6dd9b13f54be0125b856b7ffdd596c35ef1e014519257135b370",
+   "bytes": 20689,
+   "seconds": 1.66,
+   "round": "clean",
+   "keys": [
+    "BIG_STAR_3"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Vibraphone G5 (evened across its sample zones) with a soft FM bell strike: note 3 of \"Twinkle Twinkle Little Star\".",
+   "job": "tools/sound/wavelength-sfx/jobs/bigStar3.json",
+   "instruments": [
+    "builtin:synth:preset:PL Bell",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -19.4,
+   "peak": -1.4,
+   "recipeLufs": -32.9,
+   "gainDb": -13.5
+  },
+  "bigStar4": {
+   "file": "assets/audio/sfx/wavelength/bigStar4.mp3",
+   "sha256": "9b7935a32d1b6dd9b13f54be0125b856b7ffdd596c35ef1e014519257135b370",
+   "bytes": 20689,
+   "seconds": 1.66,
+   "round": "clean",
+   "keys": [
+    "BIG_STAR_4"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Vibraphone G5 (evened across its sample zones) with a soft FM bell strike: note 4 of \"Twinkle Twinkle Little Star\".",
+   "job": "tools/sound/wavelength-sfx/jobs/bigStar4.json",
+   "instruments": [
+    "builtin:synth:preset:PL Bell",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -19.4,
+   "peak": -1.4,
+   "recipeLufs": -32.9,
+   "gainDb": -13.5
+  },
+  "bigStar5": {
+   "file": "assets/audio/sfx/wavelength/bigStar5.mp3",
+   "sha256": "cc210a902318b29887b0dd2bd5fcc297bfe935003c51b3a981c71586ed5bedbc",
+   "bytes": 20689,
+   "seconds": 1.648,
+   "round": "clean",
+   "keys": [
+    "BIG_STAR_5"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Vibraphone A5 (evened across its sample zones) with a soft FM bell strike: note 5 of \"Twinkle Twinkle Little Star\".",
+   "job": "tools/sound/wavelength-sfx/jobs/bigStar5.json",
+   "instruments": [
+    "builtin:synth:preset:PL Bell",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -19.3,
+   "peak": -1.3,
+   "recipeLufs": -32.7,
+   "gainDb": -13.4
+  },
+  "bigStar6": {
+   "file": "assets/audio/sfx/wavelength/bigStar6.mp3",
+   "sha256": "cc210a902318b29887b0dd2bd5fcc297bfe935003c51b3a981c71586ed5bedbc",
+   "bytes": 20689,
+   "seconds": 1.648,
+   "round": "clean",
+   "keys": [
+    "BIG_STAR_6"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Vibraphone A5 (evened across its sample zones) with a soft FM bell strike: note 6 of \"Twinkle Twinkle Little Star\".",
+   "job": "tools/sound/wavelength-sfx/jobs/bigStar6.json",
+   "instruments": [
+    "builtin:synth:preset:PL Bell",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -19.3,
+   "peak": -1.3,
+   "recipeLufs": -32.7,
+   "gainDb": -13.4
+  },
+  "bigStar7": {
+   "file": "assets/audio/sfx/wavelength/bigStar7.mp3",
+   "sha256": "9b7935a32d1b6dd9b13f54be0125b856b7ffdd596c35ef1e014519257135b370",
+   "bytes": 20689,
+   "seconds": 1.66,
+   "round": "clean",
+   "keys": [
+    "BIG_STAR_7"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Vibraphone G5 (evened across its sample zones) with a soft FM bell strike: note 7 of \"Twinkle Twinkle Little Star\".",
+   "job": "tools/sound/wavelength-sfx/jobs/bigStar7.json",
+   "instruments": [
+    "builtin:synth:preset:PL Bell",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -19.4,
+   "peak": -1.4,
+   "recipeLufs": -32.9,
+   "gainDb": -13.5
+  },
+  "bigStar8": {
+   "file": "assets/audio/sfx/wavelength/bigStar8.mp3",
+   "sha256": "6130a4c55230f96d924309a85728cbed3669150b45b7fd5f0a489467d476b77f",
+   "bytes": 21002,
+   "seconds": 1.689,
+   "round": "clean",
+   "keys": [
+    "BIG_STAR_8"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Vibraphone F5 (evened across its sample zones) with a soft FM bell strike: note 8 of \"Twinkle Twinkle Little Star\".",
+   "job": "tools/sound/wavelength-sfx/jobs/bigStar8.json",
+   "instruments": [
+    "builtin:synth:preset:PL Bell",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -13.7,
+   "peak": -1.4,
+   "recipeLufs": -33,
+   "gainDb": -19.3
+  },
+  "bigStar9": {
+   "file": "assets/audio/sfx/wavelength/bigStar9.mp3",
+   "sha256": "6130a4c55230f96d924309a85728cbed3669150b45b7fd5f0a489467d476b77f",
+   "bytes": 21002,
+   "seconds": 1.689,
+   "round": "clean",
+   "keys": [
+    "BIG_STAR_9"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Vibraphone F5 (evened across its sample zones) with a soft FM bell strike: note 9 of \"Twinkle Twinkle Little Star\".",
+   "job": "tools/sound/wavelength-sfx/jobs/bigStar9.json",
+   "instruments": [
+    "builtin:synth:preset:PL Bell",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -13.7,
+   "peak": -1.4,
+   "recipeLufs": -33,
+   "gainDb": -19.3
+  },
+  "bigStar10": {
+   "file": "assets/audio/sfx/wavelength/bigStar10.mp3",
+   "sha256": "65da52f5cc7011d7a66abc317b59ffd5d442554b93dd17315bc231285e5fe80c",
+   "bytes": 21002,
+   "seconds": 1.69,
+   "round": "clean",
+   "keys": [
+    "BIG_STAR_10"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Vibraphone E5 (evened across its sample zones) with a soft FM bell strike: note 10 of \"Twinkle Twinkle Little Star\".",
+   "job": "tools/sound/wavelength-sfx/jobs/bigStar10.json",
+   "instruments": [
+    "builtin:synth:preset:PL Bell",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -14,
+   "peak": -1.4,
+   "recipeLufs": -33.1,
+   "gainDb": -19.1
+  },
+  "bigStar11": {
+   "file": "assets/audio/sfx/wavelength/bigStar11.mp3",
+   "sha256": "65da52f5cc7011d7a66abc317b59ffd5d442554b93dd17315bc231285e5fe80c",
+   "bytes": 21002,
+   "seconds": 1.69,
+   "round": "clean",
+   "keys": [
+    "BIG_STAR_11"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Vibraphone E5 (evened across its sample zones) with a soft FM bell strike: note 11 of \"Twinkle Twinkle Little Star\".",
+   "job": "tools/sound/wavelength-sfx/jobs/bigStar11.json",
+   "instruments": [
+    "builtin:synth:preset:PL Bell",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -14,
+   "peak": -1.4,
+   "recipeLufs": -33.1,
+   "gainDb": -19.1
+  },
+  "bigStar12": {
+   "file": "assets/audio/sfx/wavelength/bigStar12.mp3",
+   "sha256": "c8c971d68a4ca4b37cdfa377b890b8d5206d5b087829792ddbeac1ebee3ecd03",
+   "bytes": 21002,
+   "seconds": 1.689,
+   "round": "clean",
+   "keys": [
+    "BIG_STAR_12"
+   ],
+   "recordingKeys": [],
+   "how": "MuseScore General Vibraphone D5 (evened across its sample zones) with a soft FM bell strike: note 12 of \"Twinkle Twinkle Little Star\".",
+   "job": "tools/sound/wavelength-sfx/jobs/bigStar12.json",
+   "instruments": [
+    "builtin:synth:preset:PL Bell",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -15.2,
+   "peak": -1.5,
+   "recipeLufs": -33.2,
+   "gainDb": -18
+  },
+  "coin": {
+   "file": "assets/audio/sfx/wavelength/coin.mp3",
+   "sha256": "25ac21156e61b4925108919b946e5e46f0e752c25f2bb23e7e6ec7051630b910",
+   "bytes": 9717,
+   "seconds": 0.757,
+   "round": "clean",
+   "keys": [
+    "TRADE_COMPLETED"
+   ],
+   "recordingKeys": [
+    "PAY_50_CURRANTS",
+    "PAY_FIFTY_CURRANTS"
+   ],
+   "how": "MuseScore General Glockenspiel B6 to E7, the classic coin.",
+   "job": "tools/sound/wavelength-sfx/jobs/coin.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -14.4,
+   "peak": -1.9,
+   "recipeLufs": -33.1,
+   "gainDb": -18.7
+  },
+  "chime": {
+   "file": "assets/audio/sfx/wavelength/chime.mp3",
+   "sha256": "543df198d8f50cf362d7c1a2cae5279ed5188c65d8dd70de9f52077e6cd1bb5a",
+   "bytes": 13165,
+   "seconds": 1.027,
+   "round": "clean",
+   "keys": [
+    "HAS_MAIL",
+    "QUEST_ACCEPT",
+    "RANDOM_KINDNESS"
+   ],
+   "recordingKeys": [
+    "CONFIRM_DELIVERY",
+    "DISCOVER_USEFUL_NEW_ITEM",
+    "MEDITATION_SUCCESS",
+    "NEIGHBOUR_WAVE",
+    "STILL_READY"
+   ],
+   "how": "MuseScore General Celesta E5 B5 E6 doubled softly by its Vibraphone.",
+   "job": "tools/sound/wavelength-sfx/jobs/chime.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -15.3,
+   "peak": -1.9,
+   "recipeLufs": -32.5,
+   "gainDb": -17.2
+  },
+  "craftDone": {
+   "file": "assets/audio/sfx/wavelength/craftDone.mp3",
+   "sha256": "c485a3937042dcca2a710ded3fcfc62a4f0f2d8361f4c90cb43b2bf7c013e0d6",
+   "bytes": 12852,
+   "seconds": 1.001,
+   "round": "clean",
+   "keys": [
+    "COLLECT",
+    "CRAFT_DONE"
+   ],
+   "recordingKeys": [
+    "STILL_COLLECT"
+   ],
+   "how": "A MuseScore General Glockenspiel A6 ping, then Celesta G5 B5 D6.",
+   "job": "tools/sound/wavelength-sfx/jobs/craftDone.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -15.9,
+   "peak": -0.9,
+   "recipeLufs": -33.2,
+   "gainDb": -17.3
+  },
+  "magic": {
+   "file": "assets/audio/sfx/wavelength/magic.mp3",
+   "sha256": "e535d08e76bf765d908584882c3dc3b99efd29d01d5ec9ff42a0d0db1b24be09",
+   "bytes": 10344,
+   "seconds": 0.808,
+   "round": "clean",
+   "keys": [
+    "DUSTY_STICK",
+    "FOCUSING_ORB"
+   ],
+   "recordingKeys": [
+    "EFFECT_EXTREME",
+    "JUJU_BANDIT_SPAWN",
+    "TELEPORTER_VISIBLE_PORTAL"
+   ],
+   "how": "A MuseScore General Harp glissando A4 to A5 over a faint violin slide, with the sparkle (Celesta, Glockenspiel above C7, synth air) on top.",
+   "job": "tools/sound/wavelength-sfx/jobs/magic.json",
+   "instruments": [
+    "builtin:synth",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -17.7,
+   "peak": -1.5,
+   "recipeLufs": -37,
+   "gainDb": -19.3
+  },
+  "sneeze": {
+   "file": "assets/audio/sfx/wavelength/sneeze.mp3",
+   "sha256": "3592166d554a34f5bc1d037ade35b1ea793f3a6bb187adf8f5355964d8c1b46b",
+   "bytes": 6896,
+   "seconds": 0.519,
+   "round": "redo",
+   "take": "a",
+   "keys": [],
+   "recordingKeys": [
+    "SNEEZING_AHCHOO"
+   ],
+   "how": "All breath: two whispered \"ah\" intakes, then a sharp \"ch\" hiss and a noise \"oo\" falling from 2.5 kHz: ah-ah-choo.",
+   "job": "tools/sound/wavelength-sfx/jobs/sneeze.json",
+   "instruments": [
+    "builtin:synth",
+    "fx:reverb"
+   ],
+   "licence": "own-work",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -20.2,
+   "peak": -1.2,
+   "recipeLufs": -38.3,
+   "gainDb": -18.1
+  },
+  "fireworks": {
+   "file": "assets/audio/sfx/wavelength/fireworks.mp3",
+   "sha256": "548f8daa3afd36765b1fa182ad5dc6e8515365346937d6bd5724f162448b56dd",
+   "bytes": 19435,
+   "seconds": 1.564,
+   "round": "redo",
+   "take": "b",
+   "keys": [],
+   "recordingKeys": [
+    "GLITCHMAS_CRACKER",
+    "LONELINESS_FIREWORKS"
+   ],
+   "how": "A thin sine whistle with a tail of rising air, a timpani boom with a low noise thump, then dense crackle and glockenspiel sparks.",
+   "job": "tools/sound/wavelength-sfx/jobs/fireworks.json",
+   "instruments": [
+    "builtin:fx",
+    "builtin:synth",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -20.3,
+   "peak": -1.4,
+   "recipeLufs": -37.2,
+   "gainDb": -16.9
+  }
+ }
+}

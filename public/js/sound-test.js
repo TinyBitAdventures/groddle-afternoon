@@ -1,11 +1,13 @@
 /**
  * QA panel for the sound catalog: `?soundtest=1` (add `&autostart=1` to skip
  * the start gate). Lists every key in assets/content/sound-keys.json with its
- * moment, source and what plays (recovered file or synth recipe), with a Play
- * button per row, a category filter and a search box.
+ * moment, source and what plays (recovered file, one of Austin's Wavelength
+ * takes, or synth recipe), with a Play button per row (and a Synth button
+ * beside a Wavelength take to hear the recipe it replaced), a category filter
+ * and a search box.
  */
 
-import { resolveSound } from './sound-board.js?v=a1c4a308';
+import { resolveSound } from './sound-board.js?v=7da54812';
 
 const CSS = `
 .sound-test{position:fixed;inset:12px 12px auto auto;width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 24px);
@@ -24,6 +26,8 @@ const CSS = `
 .sound-test .st-meta{grid-column:2;color:var(--c-sand-48);font-size:var(--fs-sm)}
 .sound-test .st-tag{display:inline-block;border-radius:var(--radius-md);padding:0 var(--sp-3);margin-left:var(--sp-3);font-size:var(--fs-xs);background:var(--surface-moss);color:var(--c-lime-43)}
 .sound-test .st-tag.synth{background:var(--c-mauve-93);color:var(--c-violet-38)}
+.sound-test .st-tag.wavelength{background:var(--c-gold-89c);color:var(--c-sand-33)}
+.sound-test [data-sound-synth]{margin-left:var(--sp-3)}
 .sound-test .st-tag.none{background:var(--c-mauve-92);color:var(--c-red-43)}
 .sound-test footer{padding:var(--sp-3) var(--sp-6);border-top:1px solid var(--c-gold-87b);color:var(--c-sand-48);font-size:var(--fs-sm)}
 `;
@@ -64,7 +68,7 @@ export async function openSoundTest(host) {
   const cats = ['all-sfx', 'all', ...[...new Set(rows.map((r) => r.category))].sort()];
   for (const c of cats) category.appendChild(el(doc, 'option', { value: c }, c === 'all-sfx' ? 'all except music' : c));
   const kind = el(doc, 'select', { 'aria-label': 'What plays' });
-  for (const k of ['any', 'file', 'synth', 'silent']) kind.appendChild(el(doc, 'option', { value: k }, k));
+  for (const k of ['any', 'file', 'wavelength', 'synth', 'silent']) kind.appendChild(el(doc, 'option', { value: k }, k));
   const playShown = el(doc, 'button', { type: 'button' }, 'Play shown');
   tools.append(search, category, kind, playShown);
 
@@ -82,6 +86,7 @@ export async function openSoundTest(host) {
   }
   function what(row) {
     if (row.play.file) return 'file';
+    if (row.play.take) return 'wavelength';
     if (row.play.recipe) return 'synth';
     return 'silent';
   }
@@ -104,14 +109,21 @@ export async function openSoundTest(host) {
       const name = el(doc, 'div');
       name.appendChild(el(doc, 'b', {}, r.key));
       const w = what(r);
-      name.appendChild(el(doc, 'span', { class: `st-tag ${w === 'file' ? '' : w === 'synth' ? 'synth' : 'none'}` },
-        w === 'file' ? fileTag(r) : w === 'synth' ? `synth: ${r.play.recipe}` : 'not recovered'));
+      const TAGS = { file: ['', fileTag(r)], wavelength: ['wavelength', `Wavelength: ${r.play.recipe}`], synth: ['synth', `synth: ${r.play.recipe}`] };
+      const [tagClass, tagText] = TAGS[w] || ['none', 'not recovered'];
+      name.appendChild(el(doc, 'span', { class: `st-tag ${tagClass}`.trim(), 'data-plays': w }, tagText));
+      if (w === 'wavelength') {
+        // Hear the synth recipe the take replaced.
+        const synth = el(doc, 'button', { type: 'button', 'data-sound-synth': r.key }, 'Synth');
+        synth.addEventListener('click', () => host.playSound(r.key, { volume: 0.8, allowMultiple: true, synth: true }));
+        name.appendChild(synth);
+      }
       const meta = el(doc, 'div', { class: 'st-meta' }, `${r.category} · ${r.moment || ''}${r.url ? ` · ${r.url.replace('http://c2.glitch.bz/sounds/', 'c2:')}` : ''}`);
       li.append(btn, name, meta);
       list.appendChild(li);
     }
     const counts = catalog.counts || {};
-    footer.textContent = `${shown.length} shown · ${counts.keys || rows.length} keys · ${rows.filter((r) => r.play.file).length} play a recording (${counts.withFile || 0} files) · ${rows.filter((r) => !r.play.file && r.play.recipe).length} synthesized`;
+    footer.textContent = `${shown.length} shown · ${counts.keys || rows.length} keys · ${rows.filter((r) => r.play.file).length} play a recording (${counts.withFile || 0} files) · ${rows.filter((r) => r.play.take).length} Wavelength takes · ${rows.filter((r) => !r.play.file && !r.play.take && r.play.recipe).length} synthesized`;
     const view = doc.querySelector('canvas');
     if (view) {
       view.dataset.soundTestShown = String(shown.length);

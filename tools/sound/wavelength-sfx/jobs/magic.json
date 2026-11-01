@@ -1,0 +1,348 @@
+{
+ "tempo": 60,
+ "sampleRate": 48000,
+ "tail": 1.2,
+ "stems": "none",
+ "warmup": 0.2,
+ "tracks": [
+  {
+   "name": "00-ghrp",
+   "gain": -2.3,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 46
+   },
+   "notes": [
+    {
+     "time": 0.0,
+     "length": 0.3,
+     "vel": 0.6,
+     "key": 69
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "01-ghrp",
+   "gain": -1.3,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 46
+   },
+   "notes": [
+    {
+     "time": 0.03,
+     "length": 0.3,
+     "vel": 0.6,
+     "key": 71
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "02-ghrp",
+   "gain": 2.5,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 46
+   },
+   "notes": [
+    {
+     "time": 0.06,
+     "length": 0.3,
+     "vel": 0.6,
+     "key": 73
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "03-ghrp",
+   "gain": 7.8,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 46
+   },
+   "notes": [
+    {
+     "time": 0.09,
+     "length": 0.3,
+     "vel": 0.6,
+     "key": 76
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "04-ghrp",
+   "gain": 8.6,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 46
+   },
+   "notes": [
+    {
+     "time": 0.12,
+     "length": 0.3,
+     "vel": 0.6,
+     "key": 78
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "05-ghrp",
+   "gain": 9.0,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 46
+   },
+   "notes": [
+    {
+     "time": 0.15,
+     "length": 0.3,
+     "vel": 0.6,
+     "key": 81
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "06-vln",
+   "gain": -12,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 40
+   },
+   "notes": [
+    {
+     "time": 0,
+     "length": 0.35,
+     "vel": 0.35,
+     "key": 69,
+     "bend": [
+      [
+       0,
+       0
+      ],
+      [
+       0.3,
+       12
+      ]
+     ],
+     "vibrato": {
+      "depth": 0.2
+     }
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "07-gcel",
+   "gain": -0.3,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 8
+   },
+   "notes": [
+    {
+     "time": 0.05,
+     "length": 0.25,
+     "vel": 0.45,
+     "key": 88
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "08-gcel",
+   "gain": 0.2,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 8
+   },
+   "notes": [
+    {
+     "time": 0.085,
+     "length": 0.25,
+     "vel": 0.42000000000000004,
+     "key": 95
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "09-gglk",
+   "gain": -4.0,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 9
+   },
+   "notes": [
+    {
+     "time": 0.12,
+     "length": 0.25,
+     "vel": 0.39,
+     "key": 102
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "10-gglk",
+   "gain": -4.0,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 9
+   },
+   "notes": [
+    {
+     "time": 0.155,
+     "length": 0.25,
+     "vel": 0.36,
+     "key": 109
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "11-gcel",
+   "gain": 1.1,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 8
+   },
+   "notes": [
+    {
+     "time": 0.19,
+     "length": 0.25,
+     "vel": 0.33,
+     "key": 90
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "12-gglk",
+   "gain": -4.0,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 9
+   },
+   "notes": [
+    {
+     "time": 0.225,
+     "length": 0.25,
+     "vel": 0.30000000000000004,
+     "key": 97
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  },
+  {
+   "name": "13-synth",
+   "gain": -14.0,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "highpass",
+     "cutoff": 6000,
+     "resonance": 0.25,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.05,
+     "decay": 0.25,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0.05,
+     "length": 0.3,
+     "vel": 0.5,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -8
+   }
+  }
+ ],
+ "buses": [
+  {
+   "name": "Air",
+   "fx": [
+    {
+     "type": "reverb",
+     "decay": 1.1,
+     "size": 0.45,
+     "predelay": 12,
+     "damping": 0.6,
+     "highpass": 350,
+     "mix": 1
+    }
+   ]
+  }
+ ],
+ "master": {
+  "fx": [
+   {
+    "type": "eq",
+    "bands": [
+     {
+      "type": "highpass",
+      "freq": 40
+     }
+    ]
+   }
+  ]
+ }
+}

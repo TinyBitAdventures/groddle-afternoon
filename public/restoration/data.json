@@ -207,13 +207,14 @@
    "group": "world",
    "name": "Music and sounds",
    "status": "source",
-   "blurb": "The published soundtrack per region, every recovered Musicblock and meditation track, Esquibeth's melody from her own overlay files, real recordings for most sound keys (Wayback files plus Tiny Speck's archived sound effects set), and gentle synth stand-ins for the sounds still lost.",
+   "blurb": "The published soundtrack per region, every recovered Musicblock and meditation track, Esquibeth's melody from her own overlay files, real recordings for most sound keys (Wayback files plus Tiny Speck's archived sound effects set), and for the sounds still lost, new takes Austin made with Wavelength (the constellation stars, a finished trade, mail and quest chimes, crafting, the Focusing Orb) or gentle synth stand-ins.",
    "multiplayer": null,
    "spot": null,
    "evidence": [
     "public/js/ambient-music.js",
     "public/js/sound-board.js",
-    "tools/sound/archiveorg-sfx-map.json"
+    "tools/sound/archiveorg-sfx-map.json",
+    "public/assets/audio/sfx/wavelength/provenance.json"
    ],
    "shot": null,
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&soundtest=1&practice=1"
@@ -2808,6 +2809,6 @@
    }
   ]
  },
- "tests": 564,
+ "tests": 565,
  "generatedAt": "2026-10-31"
 }

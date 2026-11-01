@@ -242,6 +242,8 @@ function inMyScene(engine) {
   return Boolean(active) && engine.inScene() && engine.sceneTsid === sceneTsid(active.id);
 }
 
+const CONSTELLATION_SOUNDS = Object.freeze([...Array.from({ length: 19 }, (_, i) => `LITTLE_STAR_${i + 1}`), 'MOON_APPEARS']);
+
 function startScene(engine, id) {
   const scene = SCENES[id];
   if (!scene || entering) return false;
@@ -249,6 +251,9 @@ function startScene(engine, id) {
     save.returnTo = { tsid: engine.streetTsid, x: Math.round(engine.player?.x || 0), y: Math.round(engine.player?.y || 0) };
   }
   engine.closeMap?.();
+  // The run plays LITTLE_STAR_1..19 as a melody: warm every note (Wavelength takes) on the way in,
+  // so no note falls back to its synth recipe mid-tune.
+  if (id === 'constellation') engine.preloadSounds?.(CONSTELLATION_SOUNDS);
   const views = id === 'constellation' ? buildConstellation(engine) : buildBeamMeDown(engine);
   const platforms = id === 'constellation'
     ? [{ id: 'clouds', x1: 0, y1: scene.floorY, x2: scene.width, y2: scene.floorY }]
