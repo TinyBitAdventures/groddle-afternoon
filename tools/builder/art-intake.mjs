@@ -32,7 +32,7 @@ import { basename, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   readImage, writePng, alphaShare, estimateKey, keyOut, looksLikeCheckerboard, clearHidden, opaqueBox, crop,
-  seamScore, fixSeam, resize, snapToPalette, sharpness, surfaceRow, topAt, isImageFile, rgbToHex,
+  seamScore, fixSeam, seamScoreV, fixSeamV, bottomSolid, resize, snapToPalette, sharpness, surfaceRow, topAt, isImageFile, rgbToHex,
 } from './art-image.mjs';
 
 export const AUTHOR = 'Austin Ginder (prompted in T3 Chat)';
@@ -40,6 +40,18 @@ export const AUTHOR_GENERATED = 'Austin Ginder (generated with tools/builder/art
 export const SEAM_BAD = 2.5;
 export const TOOL_MAX = 120;
 const r3 = (n) => Math.round(n * 1000) / 1000;
+
+/** Kinds scaled to the target width (they tile, cover a line or fill a gap); the rest fit the box. */
+export const WIDTH_KINDS = Object.freeze(['strip', 'topper', 'ground', 'support', 'wall', 'stream']);
+/** Kinds whose copies sit side by side (a left-right seam) or stack (a top-bottom seam). */
+export const SEAM_ACROSS = Object.freeze(['strip', 'ground']);
+export const SEAM_DOWN = Object.freeze(['support', 'wall', 'stream']);
+/** Kinds that run off the picture's edges by design (no "touches an edge" warning). */
+export const EDGE_KINDS = Object.freeze(['strip', 'ground', 'support', 'wall', 'stream']);
+/** Kinds with a flat top something stands on (the surface is measured). */
+export const SURFACE_KINDS = Object.freeze(['topper', 'ground', 'support']);
+/** A ground strip's bottom rows must be this solid, or drips and lumps show under the floor. */
+export const GROUND_SOLID = 0.9;
 
 /** PURE: the gz_ name a generated piece is kept under (beside the code-drawn art, never over it). */
 export function newName(piece, tag = 't3') {
@@ -58,10 +70,10 @@ export function generatedRecord(dir) {
   return existsSync(f) ? JSON.parse(readFileSync(f, 'utf8')).pieces || {} : {};
 }
 
-/** PURE: the size a picture is scaled to: strips and ledges to the target width, the rest to fit the box. */
+/** PURE: the size a picture is scaled to: strips, ledges, ground, supports, walls and streams to the target width, the rest to fit the box. */
 export function fitSize(piece, w, h) {
   const t = piece.target;
-  const s = piece.kind === 'strip' || piece.kind === 'topper' ? t.w / w : Math.min(t.w / w, t.h / h);
+  const s = WIDTH_KINDS.includes(piece.kind) ? t.w / w : Math.min(t.w / w, t.h / h);
   let W = Math.max(1, Math.round(w * s));
   let H = Math.max(1, Math.round(h * s));
   const over = Math.max(W, H) / 4096;
@@ -112,14 +124,17 @@ export function prepare(img, piece, { palette = [], snap = 0.12 } = {}) {
   let out = crop(img, box);
   report.trim = { x: box.x, y: box.y, w: box.w, h: box.h };
   if (box.x <= 1 || box.y <= 1 || box.x + box.w >= img.w - 1) {
-    if (piece.kind !== 'strip') report.warnings.push('The art touches an edge of the picture: it may be cut off.');
+    if (!EDGE_KINDS.includes(piece.kind)) report.warnings.push('The art touches an edge of the picture: it may be cut off.');
   }
-  if (piece.kind === 'strip') {
-    const before = seamScore(out);
-    report.seam = { before };
+  // A strip or a ground strip tiles left to right; a support, a wall or a stream stacks top to bottom.
+  const across = SEAM_ACROSS.includes(piece.kind);
+  const down = SEAM_DOWN.includes(piece.kind);
+  if (across || down) {
+    const before = across ? seamScore(out) : seamScoreV(out);
+    report.seam = { before, ...(down ? { axis: 'vertical' } : {}) };
     if (before > SEAM_BAD) {
-      out = fixSeam(out, 0.08);
-      report.steps.push(`crossfaded the ends (seam ${before} before)`);
+      out = across ? fixSeam(out, 0.08) : fixSeamV(out, 0.08);
+      report.steps.push(`crossfaded the ${across ? 'ends' : 'top and bottom'} (seam ${before} before)`);
     }
   }
   const aspect = out.w / out.h;
@@ -132,9 +147,9 @@ export function prepare(img, piece, { palette = [], snap = 0.12 } = {}) {
     report.steps.push(`${size.scale > 1 ? 'upscaled' : 'scaled'} ${report.trim.w} x ${report.trim.h} to ${size.w} x ${size.h} (x${size.scale}, Lanczos 3)`);
   }
   if (size.scale > 1.6) report.warnings.push(`Upscaled ${size.scale} times: it may look soft. A larger picture from the model would be sharper.`);
-  if (piece.kind === 'strip') {
-    report.seam.after = seamScore(out);
-    if (report.seam.after > SEAM_BAD) report.warnings.push(`The ends still do not meet well (seam ${report.seam.after}).`);
+  if (across || down) {
+    report.seam.after = across ? seamScore(out) : seamScoreV(out);
+    if (report.seam.after > SEAM_BAD) report.warnings.push(`The ${across ? 'ends' : 'top and bottom'} still do not meet well (seam ${report.seam.after}).`);
   }
   if (snap > 0 && palette.length) {
     const m = snapToPalette(out, palette, { strength: snap });
@@ -145,9 +160,13 @@ export function prepare(img, piece, { palette = [], snap = 0.12 } = {}) {
   report.sharpness = sharpness(out);
   // The top edge across the width (21 columns), for placing effects at a vent's mouth.
   report.tops = Array.from({ length: 21 }, (_, i) => topAt(out, (i / 20) * (out.w - 1)));
-  if (piece.kind === 'topper') {
+  if (SURFACE_KINDS.includes(piece.kind)) {
     report.surface = surfaceRow(out);
-    if (report.surface !== null && report.surface > out.h * 0.2) report.warnings.push(`Its walkable top is ${report.surface} px down (${Math.round((report.surface / out.h) * 100)}% of its height): check it reads as a ledge.`);
+    if (report.surface !== null && report.surface > out.h * 0.2) report.warnings.push(`Its ${piece.kind === 'support' ? 'flat' : 'walkable'} top is ${report.surface} px down (${Math.round((report.surface / out.h) * 100)}% of its height): check it reads as ${piece.kind === 'support' ? 'a support' : piece.kind === 'ground' ? 'ground' : 'a ledge'}.`);
+  }
+  if (piece.kind === 'ground') {
+    report.bottomSolid = bottomSolid(out);
+    if (report.bottomSolid < GROUND_SOLID) report.warnings.push(`Only ${Math.round(report.bottomSolid * 100)}% of its bottom edge is solid: lumps or drips will show under the floor. Ask again: solid rock running off the bottom edge.`);
   }
   return { img: out, report };
 }
@@ -172,6 +191,17 @@ export function pinkShare(img) {
 }
 
 const sha = (buf) => createHash('sha256').update(buf).digest('hex');
+
+/**
+ * PURE: the prompt file a picture made at `made` (ms) came from: the piece's prompt, or, for a
+ * picture saved before the prompt last changed (pieces.json `since`), the archived text that was
+ * in effect then (`history`, oldest first, each good `until` a time).
+ */
+export function promptFileFor(piece, made) {
+  if (!piece.since || !(made < Date.parse(piece.since))) return piece.promptFile;
+  const then = (piece.history || []).filter((e) => made < Date.parse(e.until)).sort((a, b) => Date.parse(a.until) - Date.parse(b.until))[0];
+  return then ? then.file : piece.promptFile;
+}
 
 /** The drop file for a piece: drop/<short>.<png|webp|jpg|jpeg> (any case), or null. */
 export function dropFile(dir, piece) {
@@ -222,7 +252,7 @@ export function runIntake(dir, { model = '', tag = 't3', snap = 0.12, only = nul
     row.sha256 = sha(buf);
     row.w = img.w;
     row.h = img.h;
-    const prompt = gen?.prompt || readFileSync(join(dir, piece.promptFile), 'utf8');
+    const prompt = gen?.prompt || readFileSync(join(dir, promptFileFor(piece, statSync(file).mtimeMs)), 'utf8');
     row.provenance = {
       licence: 'ai-generated',
       author: gen ? AUTHOR_GENERATED : AUTHOR,

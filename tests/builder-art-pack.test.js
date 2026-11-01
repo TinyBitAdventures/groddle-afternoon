@@ -11,12 +11,12 @@ import { describe, it } from 'node:test';
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { buildPack, zonePieces, loadShippedStreets, loadPalette, decoColour, applyMatrix, swatches, PROMPT_MAX, KEY_HEX } from '../tools/builder/art-bible.mjs';
+import { buildPack, zonePieces, loadShippedStreets, loadPalette, decoColour, applyMatrix, swatches, PROMPT_MAX, KEY_HEX, shapeWords, keepPromptHistory, KINDS } from '../tools/builder/art-bible.mjs';
 import {
   blank, decodePng, encodePng, keyOut, estimateKey, looksLikeCheckerboard, seamScore, fixSeam, snapToPalette,
-  resize, opaqueBox, surfaceRow, alphaShare,
+  resize, opaqueBox, surfaceRow, alphaShare, transpose, seamScoreV, bottomSolid,
 } from '../tools/builder/art-image.mjs';
-import { prepare, fitSize, newName, toolLine, runIntake, pinkShare } from '../tools/builder/art-intake.mjs';
+import { prepare, fitSize, newName, toolLine, runIntake, pinkShare, promptFileFor } from '../tools/builder/art-intake.mjs';
 import { swapOps, copyZone, lineUnder } from '../tools/builder/art-apply.mjs';
 import {
   generate, pickAspect, pickSize, buildRequest, extractImage, correctiveLine, isHardQuota, DEFAULT_MODEL, WIDE_RATIOS, BASE_RATIOS,
@@ -65,11 +65,14 @@ describe('art bible and prompts (art-bible.mjs)', () => {
 
   it('one self-contained prompt per piece: one layer or object, the exact size, the background rule, the style', () => {
     const { files, pieces, refs } = make();
-    assert.equal(pieces.length, Object.keys(zone.assets).length);
+    const briefOnly = Object.entries(brief.pieces).filter(([n, b]) => !zone.assets[n] && b.w && b.h).length;
+    assert.ok(briefOnly >= 3, 'the brief names pieces the zone does not use yet (support, wall, the fall\'s lip)');
+    assert.equal(pieces.length, Object.keys(zone.assets).length + briefOnly);
+    const HEAD = { strip: /ONE LAYER ONLY/, ground: /ONE GROUND STRIP ONLY/, support: /ONE ROCK SUPPORT ONLY/, wall: /ONE ROCK WALL ONLY/, stream: /ONE STREAM ONLY/ };
     for (const p of pieces) {
       const t = files[p.promptFile];
       assert.ok(t.length <= PROMPT_MAX, `${p.short}: ${t.length} characters`);
-      assert.match(t, p.kind === 'strip' ? /ONE LAYER ONLY/ : /ONE (OBJECT|SPRITE) ONLY/);
+      assert.match(t, HEAD[p.kind] || /ONE (OBJECT|SPRITE) ONLY/);
       assert.ok(t.includes(`${p.target.w} x ${p.target.h} px`), p.short);
       assert.ok(t.includes(KEY_HEX) && /transparent/.test(t), p.short);
       assert.match(t, /Tiny Speck/);
@@ -123,6 +126,143 @@ describe('art bible and prompts (art-bible.mjs)', () => {
     const sw = swatches([{ label: 'A', colours: [{ sprite: 'a', role: 'bg', rgb: [200, 0, 0], lab: [53, 80, 67], w: 0.5 }, { sprite: 'b', role: 'sky', rgb: [0, 0, 200], lab: [25, 66, -100], w: 0.5 }] }], 2);
     assert.equal(sw.length, 2);
     assert.deepEqual(sw.map((s) => s.hex).sort(), ['#0000C8', '#C80000']);
+  });
+});
+
+describe('grounded pieces (art-bible.mjs kinds ground, support, wall, stream; ledges grounded or floating)', () => {
+  const shipped = loadShippedStreets();
+  const palette = loadPalette();
+  const catalogRows = new Map(json('public/assets/content/deco-catalog.json').decos.map((r) => [r.name, r]));
+  const profiles = json('public/assets/content/style-profiles.json');
+  const make = (b = brief) => buildPack({ zone, brief: b, shipped, palette, catalogRows, profiles, outDir: '/pack' });
+  const promptOf = (pack, name) => pack.files[pack.pieces.find((p) => p.name === name).promptFile];
+
+  it('the brief names the kinds: ground, support, wall and stream, with sizes of their own', () => {
+    assert.deepEqual(KINDS, ['strip', 'object', 'topper', 'particle', 'ground', 'support', 'wall', 'stream']);
+    const by = Object.fromEntries(make().pieces.map((p) => [p.short, p]));
+    assert.equal(by.basalt_ground.kind, 'ground');
+    assert.deepEqual(by.basalt_ground.target, { w: 1200, h: 480 }, "the brief's size wins over the ledge it replaces");
+    assert.equal(by.basalt_ground.seamless, true);
+    assert.equal(by.basalt_support.kind, 'support');
+    assert.equal(by.basalt_support.tilesDown, true);
+    assert.equal(by.basalt_wall.kind, 'wall');
+    assert.equal(by.lava_fall.kind, 'stream');
+    assert.equal(by.lava_fall_lip.kind, 'object');
+    assert.equal(JSON.parse(make().files['pieces.json']).ledges, 'grounded');
+    assert.throws(() => zonePieces(zone, { pieces: { gz_ai_x: { kind: 'blob', w: 10, h: 10 } } }), /not one of/);
+  });
+
+  it('a ground strip is solid to its bottom edge with no underside; a support has a flat top and tiles down', () => {
+    const pack = make();
+    const g = promptOf(pack, 'gz_ai_basalt_ground');
+    assert.match(g, /ONE GROUND STRIP ONLY/);
+    assert.match(g, /SOLID TO THE BOTTOM/);
+    assert.match(g, /runs off the BOTTOM edge/);
+    assert.match(g, /No underside, no hanging lumps, no drips/);
+    assert.match(g, /SEAMLESS: copies are placed side by side/);
+    const sp = promptOf(pack, 'gz_ai_basalt_support');
+    assert.match(sp, /ONE ROCK SUPPORT ONLY/);
+    assert.match(sp, /its top is flat and level across its whole width/);
+    assert.match(sp, /runs off the BOTTOM edge/);
+    assert.match(sp, /SEAMLESS TOP TO BOTTOM/);
+    const w = promptOf(pack, 'gz_ai_basalt_wall');
+    assert.match(w, /ONE ROCK WALL ONLY/);
+    assert.match(w, /ledges jut out of it/);
+    assert.match(w, /SEAMLESS TOP TO BOTTOM/);
+  });
+
+  it('ledges: grounded by default (a short, flat-ish underside, nothing hanging); floating only when the brief says so', () => {
+    const grounded = promptOf(make(), 'gz_ai_basalt_ledge_medium');
+    assert.match(grounded, /thick shelf: its underside is short and nearly flat/);
+    assert.match(grounded, /no lumps, spikes or drips hanging underneath/);
+    assert.doesNotMatch(grounded, /lumps of rock hanging underneath/);
+    const floating = promptOf(make({ ...brief, ledges: 'floating' }), 'gz_ai_basalt_ledge_medium');
+    assert.match(floating, /It floats in the air: rounded lumps of rock may hang underneath it/);
+    assert.doesNotMatch(floating, /thick shelf: its underside/);
+    assert.equal(JSON.parse(make({ ...brief, ledges: 'floating' }).files['pieces.json']).ledges, 'floating');
+    assert.match(make().files['art-bible.md'], /## Standing on the ground/);
+  });
+
+  it('a fall is a plain stream that tiles downward: no lip, no pool (pieces of their own)', () => {
+    const t = promptOf(make(), 'gz_ai_lava_fall');
+    assert.match(t, /ONE STREAM ONLY/);
+    assert.match(t, /No rock lip at the top, no pool, splash or rocks at the bottom/);
+    assert.match(t, /stacked one under another to make a fall of any height/);
+  });
+
+  it('particles and objects keep their asked shape, said in words', () => {
+    assert.equal(shapeWords(96, 88), 'about as wide as it is tall');
+    assert.equal(shapeWords(390, 100), 'about 3.9 times as wide as it is tall');
+    assert.equal(shapeWords(61, 96), 'about 1.6 times as tall as it is wide');
+    const wisp = make().pieces.find((p) => p.kind === 'particle');
+    assert.match(promptOf(make(), wisp.name), new RegExp(`SHAPE: keep it ${shapeWords(wisp.target.w, wisp.target.h)} \\(${wisp.target.w} x ${wisp.target.h}\\); do not flatten`));
+  });
+
+  it('background pieces are asked to stay quiet: lower contrast, little detail, few seams, hazier', () => {
+    const pack = make();
+    const ridge = promptOf(pack, 'gz_ai_basalt_ridge');
+    assert.match(ridge, /about half the contrast of the play area/);
+    assert.match(ridge, /few or no cracks, seams or glowing lines/);
+    assert.match(ridge, /haze/);
+    assert.match(promptOf(pack, 'gz_ai_ash_haze_sky'), /very little detail/);
+    assert.match(promptOf(pack, 'gz_ai_basalt_ledge_medium'), /the crispest, most detailed/);
+  });
+
+  it('intake: a ground strip is scaled to its width and its bottom checked; a support and a stream mend their top-bottom seam', () => {
+    const groundPiece = { kind: 'ground', target: { w: 200, h: 80 } };
+    // Solid to the bottom (with a magenta border above it): no warning.
+    const solid = paint(220, 100, (x, y) => (y < 20 ? [255, 0, 255, 255] : [80 + (x % 7), 60, 50, 255]));
+    const ok = prepare(solid, groundPiece);
+    assert.equal(ok.img.w, 200);
+    assert.equal(ok.report.bottomSolid, 1);
+    assert.ok(!ok.report.warnings.some((w) => /bottom edge is solid/.test(w)), ok.report.warnings.join(' | '));
+    // Drips under it: warned.
+    const drips = paint(220, 100, (x, y) => (y < 20 || (y > 70 && x % 40 > 12) ? [255, 0, 255, 255] : [80, 60, 50, 255]));
+    const bad = prepare(drips, groundPiece);
+    assert.ok(bad.report.bottomSolid < 0.9);
+    assert.ok(bad.report.warnings.some((w) => /lumps or drips will show under the floor/.test(w)));
+    // A stream whose top and bottom differ: crossfaded top to bottom.
+    const stream = paint(80, 200, (x, y) => (x < 10 || x >= 70 ? [255, 0, 255, 255] : [255, Math.round((y / 199) * 255), 40, 255]));
+    assert.ok(seamScoreV(stream) > 2.5);
+    const st = prepare(stream, { kind: 'stream', target: { w: 60, h: 200 } });
+    assert.equal(st.report.seam.axis, 'vertical');
+    assert.ok(st.report.seam.after < st.report.seam.before);
+    assert.ok(!st.report.warnings.some((w) => /touches an edge/.test(w)), 'a stream runs off its edges by design');
+    assert.deepEqual(fitSize({ kind: 'support', target: { w: 100, h: 100 } }, 50, 200), { w: 100, h: 400, scale: 2 });
+    const t = transpose(paint(3, 2, (x, y) => [x, y, 0, 255]));
+    assert.equal(t.w, 2);
+    assert.deepEqual(px(t, 1, 2), [2, 1, 0, 255]);
+    assert.equal(bottomSolid(paint(10, 10, () => [0, 0, 0, 0])), 0);
+  });
+
+  it('a rewritten pack keeps the prompt each old picture was made from', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'grounded-pack-'));
+    try {
+      mkdirSync(join(dir, 'prompts'));
+      writeFileSync(join(dir, 'prompts/09-lava_fall.txt'), 'old fall prompt\n');
+      writeFileSync(join(dir, 'prompts/01-ash_haze_sky.txt'), 'same\n');
+      writeFileSync(join(dir, 'pieces.json'), JSON.stringify({ pieces: [{ short: 'lava_fall', promptFile: 'prompts/09-lava_fall.txt' }, { short: 'ash_haze_sky', promptFile: 'prompts/01-ash_haze_sky.txt' }] }));
+      const files = {
+        'pieces.json': JSON.stringify({ pieces: [{ short: 'ash_haze_sky', promptFile: 'prompts/01-ash_haze_sky.txt' }, { short: 'lava_fall', promptFile: 'prompts/12-lava_fall.txt' }, { short: 'basalt_wall', promptFile: 'prompts/02-basalt_wall.txt' }] }),
+        'prompts/01-ash_haze_sky.txt': 'same\n',
+        'prompts/12-lava_fall.txt': 'new fall prompt\n',
+        'prompts/02-basalt_wall.txt': 'wall\n',
+      };
+      const now = '2026-11-01T12:00:00.000Z';
+      const { manifest, archived } = keepPromptHistory(dir, files, now);
+      assert.deepEqual(archived, ['prompts/archive/lava_fall.until-20261101T120000.txt']);
+      assert.equal(readFileSync(join(dir, archived[0]), 'utf8'), 'old fall prompt\n');
+      assert.ok(!existsSync(join(dir, 'prompts/09-lava_fall.txt')), 'a prompt file no piece names goes');
+      const fall = manifest.pieces.find((p) => p.short === 'lava_fall');
+      assert.equal(fall.since, now);
+      assert.deepEqual(fall.history, [{ file: archived[0], until: now }]);
+      assert.equal(manifest.pieces.find((p) => p.short === 'ash_haze_sky').since, undefined, 'an unchanged prompt has no history');
+      assert.equal(promptFileFor(fall, Date.parse('2026-10-31T20:00:00Z')), archived[0], 'a picture from before the change: the old prompt');
+      assert.equal(promptFileFor(fall, Date.parse('2026-11-02T08:00:00Z')), 'prompts/12-lava_fall.txt');
+      assert.equal(promptFileFor({ promptFile: 'p.txt' }, 0), 'p.txt');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });
 

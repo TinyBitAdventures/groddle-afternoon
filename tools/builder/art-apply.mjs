@@ -13,8 +13,9 @@
  *   2. sends each ready picture through the site's asset intake (spec 9.1; licence ai-generated,
  *      CC0 1.0) with its provenance from ready/intake.json: author, model, prompt, inputs;
  *   3. one batch of ops: the new art's asset rows, every deco and effect that drew the old piece
- *      now draws the new one (sized to the new picture's shape at the old drawn scale; a ledge set
- *      so its walkable top sits on its line again; an effect at a vent's mouth moved to the new
+ *      now draws the new one (sized to the new picture's shape at the old drawn scale; strips,
+ *      ledges and ground keep their drawn width, supports, walls and streams their drawn box; a
+ *      ledge or ground strip set so its walkable top sits on its line again; an effect at a vent's mouth moved to the new
  *      mouth), and the old pieces' rows dropped where nothing uses them. Pieces with no new
  *      picture keep the old art.
  *
@@ -83,14 +84,19 @@ export function swapOps(zone, ready, kept) {
         const set = { sprite: r.name };
         let w = round(k.w * sx);
         let h = round(k.h * sy);
-        // Strips and ledges keep their drawn width (they tile or cover a line); their height follows the new shape.
-        if (r.kind === 'strip' || r.kind === 'topper') {
+        // Strips, ledges and ground keep their drawn width (they tile or cover a line); their height follows the new shape.
+        if (r.kind === 'strip' || r.kind === 'topper' || r.kind === 'ground') {
           w = d.w;
           h = round((d.w * k.h) / k.w);
         }
+        // Supports, walls and streams fill the gap they were placed to fill (they tile down): the drawn box stays.
+        if (r.kind === 'support' || r.kind === 'wall' || r.kind === 'stream') {
+          w = d.w;
+          h = d.h;
+        }
         set.w = w;
         set.h = h;
-        if (r.kind === 'topper' && layer.id === 'middleground' && Number.isFinite(r.report?.surface)) {
+        if ((r.kind === 'topper' || r.kind === 'ground') && layer.id === 'middleground' && Number.isFinite(r.report?.surface)) {
           const line = lineUnder(street, d);
           if (line !== null) {
             set.y = round(line + h * (1 - r.report.surface / k.h));

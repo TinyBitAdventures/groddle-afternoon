@@ -754,3 +754,45 @@ export function bottomGap(img) {
   const box = opaqueBox(img);
   return box ? img.h - (box.y + box.h) : img.h;
 }
+
+/** PURE: the picture turned on its diagonal (rows become columns), so the left-right seam tools measure and mend a top-bottom seam. */
+export function transpose(img) {
+  const { w, h, px } = img;
+  const out = blank(h, w);
+  for (let y = 0; y < h; y += 1) for (let x = 0; x < w; x += 1) out.px.set(px.subarray((y * w + x) * 4, (y * w + x) * 4 + 4), (x * h + y) * 4);
+  return out;
+}
+
+/** PURE: a vertically tiled piece's top-bottom seam (seamScore on the transposed picture). */
+export const seamScoreV = (img) => seamScore(transpose(img));
+
+/** PURE: a vertically tiled piece made seamless by crossfading its top and bottom ends (fixSeam on the transposed picture). */
+export const fixSeamV = (img, frac = 0.08) => transpose(fixSeam(transpose(img), frac));
+
+/**
+ * PURE: how solid a piece's bottom is: the share of columns, between the first and last column
+ * with any art, whose bottom `rows` rows are all over alpha 200. A ground strip that runs off the
+ * bottom edge is near 1; one with an underside of lumps or drips is far below.
+ */
+export function bottomSolid(img, rows = 4) {
+  const { w, h, px } = img;
+  let first = -1;
+  let last = -1;
+  for (let x = 0; x < w; x += 1) {
+    for (let y = 0; y < h; y += 1) {
+      if (px[(y * w + x) * 4 + 3] > 8) {
+        if (first < 0) first = x;
+        last = x;
+        break;
+      }
+    }
+  }
+  if (first < 0) return 0;
+  let solid = 0;
+  for (let x = first; x <= last; x += 1) {
+    let ok = true;
+    for (let y = Math.max(0, h - rows); y < h && ok; y += 1) if (px[(y * w + x) * 4 + 3] <= 200) ok = false;
+    if (ok) solid += 1;
+  }
+  return r3(solid / (last - first + 1));
+}

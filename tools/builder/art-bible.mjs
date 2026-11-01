@@ -53,7 +53,24 @@ const ROLE_ORDER = ['sky', 'bg', 'middleground', 'middleplus', 'foreground'];
  * measured tones and the references (a blur box or a shadow gradient says nothing about style).
  */
 export const NOT_ART = /(blur|shadow|gradient|light_?spot|light_?beam|penaltybox|_filler|^box_|vignette|darkness|overlay)/i;
-const KIND_WORDS = { strip: 'background strip', object: 'object', topper: 'walkable ledge', particle: 'particle' };
+const KIND_WORDS = { strip: 'background strip', object: 'object', topper: 'walkable ledge', particle: 'particle', ground: 'ground strip', support: 'support under a ledge', wall: 'rock wall', stream: 'falling stream' };
+/**
+ * The kinds of piece. Besides the four the zone shows by itself (strip, object, topper, particle),
+ * a brief can name the pieces that stand a street on the ground (Tiny Speck's own streets do: the
+ * floor's art runs to the street's bottom edge and low ledges stand on rock; see the bible's
+ * "Standing on the ground"):
+ *   ground   a seamless floor strip: a flat walkable top, solid rock or earth running off the
+ *            bottom edge of the picture, no underside;
+ *   support  what a low ledge stands on: a pillar, buttress or rock mass with a flat top, running
+ *            off the bottom edge, tileable top to bottom so it can be any height;
+ *   wall     a big rock face behind the play area that ledges jut out of, tileable top to bottom;
+ *   stream   a plain vertical stream (a lava fall, a waterfall) that tiles downward: no lip, no pool
+ *            (those are pieces of their own).
+ */
+export const KINDS = Object.freeze(Object.keys(KIND_WORDS));
+/** A brief's ledges: grounded (the default: a thick shelf with a short, flat-ish underside) or floating (lumps may hang under it). */
+export const LEDGES = Object.freeze(['grounded', 'floating']);
+export const ledgesOf = (brief = {}) => (brief.ledges === 'floating' ? 'floating' : 'grounded');
 
 // —— Pieces: what the zone draws, and how ——
 
@@ -127,9 +144,11 @@ export function zonePieces(zone, brief = {}) {
       else if (u.onLine > 0 && u.onLine >= u.placements / 2) kind = 'topper';
       else kind = 'object';
     }
+    if (kind && !KINDS.includes(kind)) throw new Error(`${name}: the brief's kind "${kind}" is not one of ${KINDS.join(', ')}.`);
     if (kind === 'particle') role = 'particle';
-    const w = Number(row.w || b.w);
-    const h = Number(row.h || b.h);
+    // The brief's size wins when it gives one (a ground strip is taller than the ledge it replaces).
+    const w = Number((b.w && b.h ? b.w : 0) || row.w || b.w);
+    const h = Number((b.w && b.h ? b.h : 0) || row.h || b.h);
     return {
       name,
       short: shortName(name),
@@ -141,14 +160,15 @@ export function zonePieces(zone, brief = {}) {
       placements: u.placements,
       emitters: u.emitters,
       streets: [...u.streets].sort(byName),
-      seamless: kind === 'strip',
+      seamless: kind === 'strip' || kind === 'ground',
+      tilesDown: kind === 'support' || kind === 'wall' || kind === 'stream',
       overlapping: u.overlapping > 0,
       what: b.what || `${shortName(name).replace(/_/g, ' ')}.`,
       notes: b.notes || '',
     };
   });
   const rank = (p) => (p.kind === 'particle' ? 9 : ROLE_ORDER.indexOf(p.role));
-  const kindRank = { strip: 0, object: 1, topper: 2, particle: 3 };
+  const kindRank = { strip: 0, wall: 1, object: 2, ground: 3, support: 4, topper: 5, stream: 6, particle: 7 };
   return pieces.sort((a, b) => rank(a) - rank(b) || kindRank[a.kind] - kindRank[b.kind] || b.target.w * b.target.h - a.target.w * a.target.h || byName(a.name, b.name));
 }
 
@@ -412,8 +432,8 @@ export function styleParagraph(brief) {
 }
 
 const DEPTH_WORDS = {
-  sky: 'It is far away: low contrast, soft edges, no outlines, hazy and muted.',
-  bg: 'It is in the background: softer and less contrasty than the play area, thin or no outlines.',
+  sky: 'It is far away, behind everything: very low contrast, very little detail, soft edges, no outlines, hazy and muted, its colours close to the sky.',
+  bg: 'It is in the background, behind the play area, and must stay quiet so the ledges in front stand out: about half the contrast of the play area, broad simple shapes, little detail, few or no cracks, seams or glowing lines, a soft haze over it that pulls its colours toward the sky, thin or no outlines.',
   middleground: 'It is in the play area, beside the character: the crispest, most detailed and most contrasty art in the scene.',
   middleplus: 'It stands just in front of the play area: crisp, a little darker.',
   foreground: 'It is in the very front: dark, simple shapes, little detail.',
@@ -433,27 +453,74 @@ function layerFilterWords(zone, piece) {
   return '';
 }
 
+/** PURE: a piece's shape in words ("about as wide as it is tall", "about 3.9 times as wide as it is tall"). */
+export function shapeWords(w, h) {
+  const a = w / h;
+  if (a >= 0.87 && a <= 1.15) return 'about as wide as it is tall';
+  return a > 1 ? `about ${r1(a)} times as wide as it is tall` : `about ${r1(1 / a)} times as tall as it is wide`;
+}
+
+/** The first line of each kind's description ("ONE ... ONLY:"), and the word for the thing. */
+const HEADS = { strip: ['ONE LAYER ONLY', 'strip'], particle: ['ONE SPRITE ONLY', 'sprite'], ground: ['ONE GROUND STRIP ONLY', 'strip'], support: ['ONE ROCK SUPPORT ONLY', 'support'], wall: ['ONE ROCK WALL ONLY', 'wall'], stream: ['ONE STREAM ONLY', 'stream'] };
+const NOTHING_ELSE = 'nothing else: no ground under it, no scenery, no other objects, no cast shadow, no frame, no text, no lettering, no signature, no watermark.';
+const TILE_DOWN = 'SEAMLESS TOP TO BOTTOM: copies are stacked one above another to make it any height, so the bottom edge must continue exactly into the top edge (tileable vertically).';
+
+/** PURE: the lines that say what a piece is and how it sits in the street, by kind. */
+function kindLines(piece, brief) {
+  const L = [];
+  const [head] = HEADS[piece.kind] || ['ONE OBJECT ONLY'];
+  L.push(`${head}: ${piece.what}`);
+  switch (piece.kind) {
+    case 'strip':
+      L.push('Just this one strip of scenery. Nothing in front of it, no characters, no plants, no sky painted behind it (the game paints the sky itself), no text.');
+      L.push('SEAMLESS: copies are placed side by side, so the right edge must continue exactly into the left edge (tileable horizontally). The rock and the skyline run off both side edges at the same height; do not round off or end the strip at the sides.');
+      break;
+    case 'ground':
+      L.push('Just this strip of ground: nothing standing on it, no characters, no plants, no sky behind it, no text.');
+      L.push('Its top is walked on: a nearly flat, level top edge along the whole width, right at the top of the picture.');
+      L.push('SOLID TO THE BOTTOM: under the top, solid rock or earth fills the picture all the way down and runs off the BOTTOM edge, cut straight by the frame. No underside, no hanging lumps, no drips, no rounded or ragged bottom, nothing see-through below the top: it is the ground the whole street stands on.');
+      L.push('SEAMLESS: copies are placed side by side, so the right edge must continue exactly into the left edge (tileable horizontally); the top runs off both side edges at the same height.');
+      break;
+    case 'support':
+      L.push(`Just this one support, ${NOTHING_ELSE.replace('no ground under it, ', '')}`);
+      L.push('A walkable ledge rests on it: its top is flat and level across its whole width, right at the top of the picture, so a ledge sits on it with no gap.');
+      L.push(`It runs off the BOTTOM edge, cut straight by the frame: no base, no foot, no rounded bottom. Its left and right sides are its own rough rock outline, with the background beyond them. ${TILE_DOWN}`);
+      break;
+    case 'wall':
+      L.push('A big rock face that stands behind the play area; walkable ledges jut out of it. Just the rock face: no ledges, no plants, no sky, no text.');
+      L.push(`It runs off the TOP and BOTTOM edges of the picture. Its left and right sides are its own rough outline, with the background beyond them. ${TILE_DOWN}`);
+      L.push('Keep its face fairly plain (broad planes, a few cracks), so the ledges in front of it read clearly.');
+      break;
+    case 'stream':
+      L.push('Only the falling stream itself: a plain vertical stream falling straight down, filling the picture from the top edge to the bottom edge and running off both. No rock lip at the top, no pool, splash or rocks at the bottom, no cliff behind it: the lip and the pool are separate pieces.');
+      L.push(TILE_DOWN.replace('stacked one above another to make it any height', 'stacked one under another to make a fall of any height'));
+      break;
+    default:
+      L.push(`Centred, the whole of it in the picture, ${NOTHING_ELSE}`);
+  }
+  if (piece.kind === 'topper') {
+    L.push('Its top is walked on: a nearly flat, level top edge across about 90% of its width, right at the top of the object; everything else is below that edge.');
+    if (ledgesOf(brief) === 'floating') L.push('It floats in the air: rounded lumps of rock may hang underneath it.');
+    else L.push('It is a thick shelf: its underside is short and nearly flat (gently uneven), with no lumps, spikes or drips hanging underneath, because in the game it rests on a rock support or juts out of a cliff.');
+    if (piece.overlapping) L.push('Copies overlap end to end, so give it rounded ends.');
+  }
+  if (piece.kind === 'particle' || piece.kind === 'object') {
+    const { w, h } = piece.target;
+    L.push(`SHAPE: keep it ${shapeWords(w, h)} (${w} x ${h}); do not flatten, stretch or squash it.`);
+  }
+  return L;
+}
+
 /** PURE: the prompt for one piece: self-contained (an image tool remembers nothing between chats). */
 export function promptText(piece, { zone, brief, refs }) {
   const { w, h } = piece.target;
   const { ratio, shape } = ratioWords(w, h);
-  const thing = piece.kind === 'strip' ? 'strip' : piece.kind === 'particle' ? 'sprite' : 'object';
+  const thing = (HEADS[piece.kind] || [null, 'object'])[1];
   const lines = [];
   const gist = brief.summary ? brief.summary.split('. ')[0].replace(/\.$/, '') : 'a new place';
   lines.push(`Make one picture for a 2D side-scrolling game. The place, ${brief.title || zone.title}: ${gist.charAt(0).toLowerCase()}${gist.slice(1)}.`);
   lines.push('');
-  if (piece.kind === 'strip') {
-    lines.push(`ONE LAYER ONLY: ${piece.what}`);
-    lines.push('Just this one strip of scenery. Nothing in front of it, no characters, no plants, no sky painted behind it (the game paints the sky itself), no text.');
-    lines.push('SEAMLESS: copies are placed side by side, so the right edge must continue exactly into the left edge (tileable horizontally). The rock and the skyline run off both side edges at the same height; do not round off or end the strip at the sides.');
-  } else {
-    lines.push(`ONE ${piece.kind === 'particle' ? 'SPRITE' : 'OBJECT'} ONLY: ${piece.what}`);
-    lines.push('Centred, the whole of it in the picture, nothing else: no ground under it, no scenery, no other objects, no cast shadow, no frame, no text, no lettering, no signature, no watermark.');
-  }
-  if (piece.kind === 'topper') {
-    lines.push('Its top is walked on: a nearly flat, level top edge across about 90% of its width, right at the top of the object; everything else is below that edge.');
-    if (piece.overlapping) lines.push('Copies overlap end to end, so give it rounded ends.');
-  }
+  lines.push(...kindLines(piece, brief));
   if (piece.notes) lines.push(piece.notes);
   lines.push('');
   lines.push(`SIZE: the finished file is ${w} x ${h} px (${ratio}, ${shape}); the game draws it at half that, so make it as large and sharp as you can. If you cannot make exactly that size, use a ${shape.split(' ')[0]} canvas and shape the ${thing} to ${ratio}: it will be trimmed and scaled.`);
@@ -493,6 +560,12 @@ export function bibleText({ zone, brief, pieces, streets, palette, refs, profile
   L.push('## How a street is built (one picture per layer or object)');
   L.push('');
   L.push("A street in this game is not one painting. The game paints the sky gradient itself; behind the play area sit parallax layers (here: sky and bg) made of wide strips and big shapes, transparent wherever the layer behind shows through; the play area (middleground) holds the ledges the character walks on and props as separate transparent sprites; effects (steam, lava squirts, embers) are tiny particle sprites the game throws around. Image models answer with one flat picture unless asked for exactly one layer or one object, so every prompt asks for one piece only, on a transparent (or flat magenta) background.");
+  L.push('');
+  L.push('## Standing on the ground');
+  L.push('');
+  L.push("Tiny Speck's streets stand on something. Over the shipped streets (measured 2026-11-01): in about 3 streets of 4 the floor's art runs down past the street's bottom edge, and about 3 walkable lines of 4 with 450 px or less to the surface below have art under them (rock, trunks, hills). Floating platforms are the exception, kept for heights and cloud streets (High Jumper's Gully, Gentle Island). The alpine set shows how: a thin walkable cap (`platform_topper_01a_al1`) sits on separate rock masses (`cliff_face_skirt_01a_al1`, `cliff_face_mountaineering_01a_al1`), as on Rasal Hanoo (Haraiva).");
+  L.push('');
+  L.push(`So this pack asks for a ground strip that is solid to its bottom edge, ${ledgesOf(brief) === 'floating' ? 'ledges that float (this zone floats on purpose: lumps may hang under them)' : 'ledges that are thick shelves with a short, flat-ish underside'}, supports for low ledges to stand on and a rock wall for high ones to jut from (both tile top to bottom, so they can be any height), falls as a plain stream with the lip and the pool as pieces of their own, and quiet back layers so the play area wins. \`node tools/builder/cli.mjs ground\` stands a street on them.`);
   L.push('');
   const grad = targetOf(zone, brief).gradient;
   if (grad) L.push(`Sky gradient (drawn by the game, never painted into the art): top ${grad.hex.top}, bottom ${grad.hex.bottom}.`, '');
@@ -558,7 +631,7 @@ export function bibleText({ zone, brief, pieces, streets, palette, refs, profile
   L.push('');
   L.push('| # | Piece | Kind | Layer | File size (px) | Used |');
   L.push('|---|---|---|---|---|---|');
-  pieces.forEach((p, i) => L.push(`| ${i + 1} | ${p.short} | ${KIND_WORDS[p.kind]}${p.seamless ? ', seamless' : ''} | ${p.role} | ${p.target.w} x ${p.target.h} | ${p.placements ? `${p.placements} placements` : ''}${p.emitters ? `${p.placements ? ', ' : ''}${p.emitters} effects` : ''} on ${p.streets.join(', ')} |`));
+  pieces.forEach((p, i) => L.push(`| ${i + 1} | ${p.short} | ${KIND_WORDS[p.kind]}${p.seamless ? ', seamless' : ''}${p.tilesDown ? ', tiles top to bottom' : ''} | ${p.role} | ${p.target.w} x ${p.target.h} | ${p.placements ? `${p.placements} placements` : ''}${p.emitters ? `${p.placements ? ', ' : ''}${p.emitters} effects` : ''}${p.streets.length ? ` on ${p.streets.join(', ')}` : 'not placed yet (the brief names it)'} |`));
   L.push('');
   return `${L.join('\n')}\n`;
 }
@@ -591,7 +664,7 @@ export function packText({ zone, brief, pieces, outDir }) {
   L.push('');
   L.push('| # | Prompt | Attach | Save as | What | Size |');
   L.push('|---|---|---|---|---|---|');
-  pieces.forEach((p, i) => L.push(`| ${i + 1} | \`${p.promptFile}\` | ${p.attach.map((a) => `\`${a}\``).join(', ')} | \`drop/${p.short}.png\` | ${KIND_WORDS[p.kind]}${p.seamless ? ' (seamless)' : ''} | ${p.target.w} x ${p.target.h} |`));
+  pieces.forEach((p, i) => L.push(`| ${i + 1} | \`${p.promptFile}\` | ${p.attach.map((a) => `\`${a}\``).join(', ')} | \`drop/${p.short}.png\` | ${KIND_WORDS[p.kind]}${p.seamless ? ' (seamless)' : ''}${p.tilesDown ? ' (tiles top to bottom)' : ''} | ${p.target.w} x ${p.target.h} |`));
   L.push('');
   L.push('## Afterwards (Claude)');
   L.push('');
@@ -630,10 +703,11 @@ export function buildPack({ zone, brief, shipped, palette, catalogRows, profiles
     rev: zone.rev,
     title: brief.title || zone.title,
     key: KEY_HEX,
+    ledges: ledgesOf(brief),
     palette: snap,
     refs: refs.map(({ file, name, role, source }) => ({ file, name, role, source })),
     inputs: refs.map((r) => `deco:${r.name}`),
-    pieces: pieces.map((p) => ({ name: p.name, short: p.short, kind: p.kind, role: p.role, target: p.target, seamless: p.seamless, overlapping: p.overlapping, promptFile: p.promptFile, attach: p.attach, save: `drop/${p.short}.png` })),
+    pieces: pieces.map((p) => ({ name: p.name, short: p.short, kind: p.kind, role: p.role, target: p.target, seamless: p.seamless, tilesDown: p.tilesDown, overlapping: p.overlapping, promptFile: p.promptFile, attach: p.attach, save: `drop/${p.short}.png` })),
   };
   files['pieces.json'] = `${JSON.stringify(manifest, null, 1)}\n`;
   files['refs.json'] = `${JSON.stringify(refs.map(({ file, name, role, source, size2, placements, streets: on, why }) => ({ file, name, role, licence: 'CC0-1.0', source, size2, placements, streets: on, why })), null, 1)}\n`;
@@ -663,6 +737,48 @@ export function writeRefs(outDir, refs, root = ROOT) {
     execFileSync('rm', ['-f', a, b]);
   }
   return made;
+}
+
+/**
+ * Rewriting a pack keeps the prompts its pictures were made from. A piece whose prompt text changed
+ * gets its old prompt copied to prompts/archive/<short>.until-<time>.txt, a `history` row
+ * ({file, until}) and `since` (when the new text started); art-intake.mjs then records, for a
+ * picture saved before `since`, the prompt it was really made from. Prompt files no piece names
+ * any more go (the archive stays). Answers the manifest with since/history added, and the archived files.
+ */
+export function keepPromptHistory(outDir, files, now = new Date().toISOString()) {
+  const manifest = JSON.parse(files['pieces.json']);
+  const oldFile = join(outDir, 'pieces.json');
+  const old = existsSync(oldFile) ? JSON.parse(readFileSync(oldFile, 'utf8')) : null;
+  const before = new Map((old?.pieces || []).map((p) => [p.short, p]));
+  const archived = [];
+  const stamp = now.slice(0, 19).replace(/[-:]/g, '');
+  for (const p of manifest.pieces) {
+    const was = before.get(p.short);
+    if (!was) continue;
+    const wasFile = join(outDir, was.promptFile);
+    const wasText = existsSync(wasFile) ? readFileSync(wasFile, 'utf8') : null;
+    let history = was.history || [];
+    let since = was.since || null;
+    if (wasText !== null && wasText !== files[p.promptFile]) {
+      const keep = `prompts/archive/${p.short}.until-${stamp}.txt`;
+      mkdirSync(join(outDir, 'prompts/archive'), { recursive: true });
+      writeFileSync(join(outDir, keep), wasText);
+      archived.push(keep);
+      history = [...history, { file: keep, until: now }];
+      since = now;
+    }
+    if (since) p.since = since;
+    if (history.length) p.history = history;
+  }
+  const named = new Set(manifest.pieces.map((p) => p.promptFile));
+  const promptDir = join(outDir, 'prompts');
+  if (existsSync(promptDir)) {
+    for (const f of readdirSync(promptDir)) {
+      if (f.endsWith('.txt') && !named.has(`prompts/${f}`)) execFileSync('rm', ['-f', join(promptDir, f)]);
+    }
+  }
+  return { manifest, archived };
 }
 
 async function loadZone(spec) {
@@ -704,7 +820,10 @@ async function main(argv) {
   });
   mkdirSync(join(outDir, 'prompts'), { recursive: true });
   mkdirSync(join(outDir, 'drop'), { recursive: true });
+  const { manifest, archived } = keepPromptHistory(outDir, pack.files);
+  pack.files['pieces.json'] = `${JSON.stringify(manifest, null, 1)}\n`;
   for (const [p, text] of Object.entries(pack.files)) writeFileSync(join(outDir, p), text);
+  if (archived.length) process.stdout.write(`  ${archived.length} changed prompts: the old text kept in prompts/archive/ for the pictures made from it\n`);
   if (!argv.includes('--no-refs')) writeRefs(outDir, pack.refs);
   process.stdout.write(`${outDir}\n  ${pack.pieces.length} prompts, ${pack.refs.length} references, ${pack.palette.length} measured tones from ${pack.streets.list.map((s) => s.label).join(', ')}\n`);
   for (const p of pack.pieces) process.stdout.write(`  ${p.promptFile.padEnd(40)} ${p.kind.padEnd(8)} ${p.role.padEnd(12)} ${p.target.w}x${p.target.h}\n`);
