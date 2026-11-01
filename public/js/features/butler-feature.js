@@ -123,6 +123,7 @@ import {
   randomButlerParts,
   recordVisitor,
   renameButler,
+  retrieveNoneLine,
   retrieveVerbs,
   serializeButlerState,
   setButlerParts,
@@ -131,7 +132,7 @@ import {
   takeVisitorDelivery,
   teachButler,
   visitorsReport,
-} from '../butler.js?v=337d934d';
+} from '../butler.js?v=a0c80a92';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const BUTLER_FEATURE_ID = 'butler';
@@ -1206,8 +1207,8 @@ function runButlerVerb(engine, id) {
     case 'talk_to': return talkTo(engine);
     case 'chat': return chat(engine);
     case 'access_mailbox': return accessMailbox(engine);
-    case 'retrieve_messages':
-    case 'retrieve_packages': return retrieve(engine);
+    case 'retrieve_messages': return retrieve(engine, 'messages');
+    case 'retrieve_packages': return retrieve(engine, 'packages');
     case 'visitors': return whoVisited(engine);
     case 'give': return giveMenu(engine);
     case 'name': return nameMenu(engine);
@@ -1237,7 +1238,7 @@ function talkTo(engine) {
         closeDialog(engine);
         return accessMailbox(engine);
       }
-      if (value === 'messages' || value === 'packages') return retrieve(engine);
+      if (value === 'messages' || value === 'packages') return retrieve(engine, value);
       if (value === 'chat') return joke(engine);
       if (value === 'teach') return teachMenu(engine);
       return closeDialog(engine);
@@ -1307,9 +1308,9 @@ function accessMailbox(engine) {
 }
 
 /** onRetrieveMessages: "Yes, yes, let me get those for you!", then one at a time. */
-function retrieve(engine) {
-  const c = butlerCounts(st);
-  if (!c.packages && !c.messages) return line(engine, 'none', BUTLER_STRINGS.messagesNone, 'Thanks!');
+function retrieve(engine, asked = 'messages') {
+  const none = retrieveNoneLine(st, asked);
+  if (none) return line(engine, 'none', none, 'Thanks!');
   line(engine, 'retrieve', butlerText('messagesStart'), 'Thanks!', () => handOver(engine));
 }
 

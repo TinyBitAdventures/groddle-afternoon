@@ -759,6 +759,18 @@ export function nextHandover(state, { now = Date.now(), itemName = (cls, n) => `
   return { kind: 'package', text, from: pkg.fromName, give: { classTsid: pkg.classTsid, count: pkg.count }, id: pkg.id };
 }
 
+/**
+ * The Butler's line when he has nothing to hand over for what you asked ('' when he
+ * has): "Give me my packages!" runs his packages state, which says packagesNone when
+ * the list is empty (bag_butler.js stateChange 'packages'; butler_strings.js:263);
+ * messages say messagesNone (retrieve_messages conditions, bag_butler.js:1491; :279).
+ */
+export function retrieveNoneLine(state, asked = 'messages') {
+  const c = butlerCounts(state);
+  if (asked === 'packages') return c.packages > 0 ? '' : BUTLER_STRINGS.packagesNone;
+  return c.packages > 0 || c.messages > 0 ? '' : BUTLER_STRINGS.messagesNone;
+}
+
 /** retrieve_messages / retrieve_packages verb states (one of the two shows). */
 export function retrieveVerbs(state) {
   const c = butlerCounts(state);

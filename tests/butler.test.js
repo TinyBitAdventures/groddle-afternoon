@@ -59,6 +59,7 @@ import {
   pluralize,
   recordVisitor,
   renameButler,
+  retrieveNoneLine,
   retrieveVerbs,
   serializeButlerState,
   setGift,
@@ -66,13 +67,13 @@ import {
   takeVisitorDelivery,
   teachButler,
   visitorsReport,
-} from '../public/js/butler.js?v=337d934d';
+} from '../public/js/butler.js?v=a0c80a92';
 import { canOptIn, stoneVog, STONE_TEXT } from '../public/js/street-furniture.js?v=37094759';
 import { NEIGHBOURS, neighbourById, normalizeNeighbourState, visitorLetter } from '../public/js/neighbours.js?v=7fbf44a4';
-import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js?v=6c901760';
+import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js?v=78209760';
 // The URL clubhouse.js imports, so these share its Butler.
-import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=6c901760';
-import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js?v=3f1901d2';
+import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=78209760';
+import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js?v=9c22b306';
 import { BUTLER_FEET, ButlerPainter, clipRange, drawList } from '../public/js/butler-rig.js?v=e81817d9';
 import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
@@ -212,6 +213,22 @@ describe('visitor packages and messages', () => {
     assert.equal(nextHandover(s, { now: NOW }).kind, 'none');
     assert.equal(retrieveVerbs(s)[0].enabled, false);
     assert.equal(retrieveVerbs(s)[0].reason, 'I have no messages for you.');
+  });
+
+  it('says the empty line for what you asked: packages or messages (ticket 31)', () => {
+    // bag_butler.js stateChange 'packages': packagesNone; retrieve_messages conditions: messagesNone.
+    const s = owned();
+    assert.equal(retrieveNoneLine(s, 'packages'), 'I have no packages for you.');
+    assert.equal(retrieveNoneLine(s, 'messages'), 'I have no messages for you.');
+    takeVisitorDelivery(s, { from: 'juniper', fromName: 'Juniper Quoinsworth', text: 'The birds say hi.', now: NOW });
+    assert.equal(retrieveNoneLine(s, 'packages'), 'I have no packages for you.');
+    assert.equal(retrieveNoneLine(s, 'messages'), '');
+    takeVisitorDelivery(s, { from: 'fenwick', fromName: 'Wobbly Fenwick', attachment: { classTsid: 'cherry', count: 1 }, text: '', now: NOW });
+    assert.equal(retrieveNoneLine(s, 'packages'), '');
+    assert.equal(retrieveNoneLine(s, 'messages'), '');
+    const feature = readFileSync(new URL('../public/js/features/butler-feature.js', import.meta.url), 'utf8');
+    assert.match(feature, /value === 'packages'\) return retrieve\(engine, value\)/);
+    assert.match(feature, /case 'retrieve_packages': return retrieve\(engine, 'packages'\)/);
   });
 
   it('says when a package came without a message', () => {

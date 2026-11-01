@@ -30,8 +30,8 @@
  *     slashLine (the last line shown).
  */
 
-import { BUTLER_STRINGS } from '../butler.js?v=337d934d';
-import { butlerApi } from './butler-feature.js?v=6c901760';
+import { BUTLER_STRINGS } from '../butler.js?v=a0c80a92';
+import { butlerApi } from './butler-feature.js?v=78209760';
 import { hellFeature } from './hell-feature.js?v=8e4ebacf';
 import { towerApi } from './home-tower-feature.js?v=7ce20566';
 import { slashPlan, unknownLine } from '../slash-commands.js?v=23e13b20';
