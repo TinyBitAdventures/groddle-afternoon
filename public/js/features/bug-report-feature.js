@@ -100,7 +100,7 @@ export const REPORT_LEAVE_OUT = Object.freeze(['bug-report-panel', 'bug-btn-lift
 
 /** The names a report gives the windows (their element ids without "-panel", unless named here). */
 const PANEL_NAMES = Object.freeze({ 'shrine-panel': 'donate', 'quest-dialogue': 'conversation', 'verb-menu': 'verbs', 'pack-popover': 'item' });
-const PANEL_SELECTOR = '.side-panel, .ui-sheet, .glitch-modal, .home-panel, .mail-panel, .map-panel, #verb-menu, #pack-popover, #quest-dialogue, #social-body';
+const PANEL_SELECTOR = '.side-panel, .ui-sheet, .glitch-modal, .home-panel, .mail-panel, .map-panel, #verb-menu, #pack-popover, #quest-dialogue';
 
 const visible = (n) => Boolean(n && !n.hidden && n.getClientRects?.().length && globalThis.getComputedStyle?.(n)?.visibility !== 'hidden');
 const slug = (t) => String(t || '').trim().toLowerCase().replace(/\s+/g, ' ').slice(0, 40);
@@ -127,8 +127,6 @@ export function openPanels(doc = globalThis.document) {
     } else if (n.id === 'vendor-panel') {
       const tab = slug(n.querySelector('[aria-selected="true"], .active')?.textContent);
       if (tab) name += `:${tab}`;
-    } else if (n.id === 'social-body') {
-      name = 'social';
     }
     out.push(name);
   }

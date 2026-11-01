@@ -7,7 +7,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
 import { REPORT_TEXT } from '../public/js/reports.js?v=eabbd20e';
-import { REPORT_LEAVE_OUT, REPORT_MASK, maskClone, openPanels } from '../public/js/features/bug-report-feature.js?v=094e4c47';
+import { REPORT_LEAVE_OUT, REPORT_MASK, maskClone, openPanels } from '../public/js/features/bug-report-feature.js?v=885d24cb';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -52,7 +52,9 @@ describe('the picture with the game UI', () => {
     const map = node({ id: 'map-panel', className: 'map-panel' });
     const shut = node({ id: 'vendor-panel', className: 'glitch-modal', hidden: true });
     const report = node({ id: 'bug-report-panel', className: 'ui-sheet' });
-    const doc = node({}, [make, shrine, map, shut, report]);
+    // The Social drawer is open nearly all the time in Modern, so it is left out (Austin, 2026-11-01).
+    const social = node({ id: 'social-body' });
+    const doc = node({}, [make, shrine, map, shut, report, social]);
     assert.deepEqual(openPanels(doc), ['make:gassifier/heavy gas', 'donate:mab', 'map']);
   });
 
