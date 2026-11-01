@@ -207,6 +207,19 @@ function el(tag, attrs = {}, text = '') {
   return node;
 }
 
+/**
+ * The drawn Glitches still holding frames of a freed idle sheet: those drawn from a pack
+ * whose anims game.js just refilled (dropIdleSheet), skipping the gone and the never drawn.
+ */
+export function remotesOnFreedFrames(remotes, anims) {
+  const out = [];
+  for (const r of remotes) {
+    if (!r?.st || !r.body || r.body.destroyed || !anims?.has(r.pack?.anims)) continue;
+    out.push(r);
+  }
+  return out;
+}
+
 /** One running multiplayer session: the client, the drawn Glitches and the dock UI. */
 function createSession(engine) {
   const boot = globalThis.GRODDLE_MP_BOOT || {};
@@ -379,6 +392,19 @@ function createSession(engine) {
       : null;
     if (frames.length < 2 || hold) r.body.gotoAndStop(0);
     else r.body.gotoAndPlay(0);
+  }
+
+  /**
+   * game.js freed an idle sheet: a Glitch with your look shares your pack, and if it is in
+   * that idle its sprite still holds the old frames. Draw it again from the refilled pack
+   * before the textures go (a destroyed texture stops the whole frame drawing).
+   */
+  function framesFreed(anims) {
+    for (const r of remotesOnFreedFrames(remotes.values(), anims)) {
+      const st = r.st;
+      r.st = null;
+      applyAnim(r, st);
+    }
   }
 
   function drawRemotes(t) {
@@ -631,6 +657,7 @@ function createSession(engine) {
     speechTargets() {
       return [...remotes.values()].map((r) => r.target).filter((t) => t.sprite && !t.sprite.destroyed && t.sprite.visible !== false);
     },
+    framesFreed,
   };
   return session;
 }
@@ -685,6 +712,12 @@ export const realtimeFeature = {
     return [...session.remotes.values()]
       .filter((r) => r.root && !r.root.destroyed && r.root.visible !== false)
       .map((r) => ({ id: r.id, label: r.name, x: r.root.x, y: r.root.y }));
+  },
+
+  /** game.js dropIdleSheet: these packs' anims were refilled and an idle sheet is about to be destroyed. */
+  glitchFramesFreed(anims) {
+    session?.framesFreed(anims);
+    return null;
   },
 
   /** /who: the other players on this street. */

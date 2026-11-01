@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=7e4c28c1';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1f5ce037';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=eb65bc32';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -9962,17 +9962,24 @@ function loadIdleSheetsFor(pack, st, standing, now) {
 /**
  * Free a random idle sheet: every cached pack holding it falls back to the
  * still stand for it (until it loads again), then its texture is destroyed.
+ * Other players' Glitches with the same look are drawn from the same pack
+ * (engine.glitchPack) and may be in that idle right now: they take the
+ * refilled frames first (feature hook glitchFramesFreed), or the next
+ * render draws a destroyed texture and every frame after it throws.
  */
 function dropIdleSheet(pack, name) {
   const sheet = pack.sheets[name];
   if (!sheet) return;
   const packs = new Set([pack, ...appearanceTexCache.values(), ...[...vectorBakes.values()].map((b) => b.pack)]);
+  const refilled = new Set();
   for (const p of packs) {
     if (p?.sheets?.[name] !== sheet) continue;
     delete p.sheets[name];
     p.idleLoading?.delete(name);
     fillPackAnims(p);
+    refilled.add(p.anims);
   }
+  features.collect('glitchFramesFreed', refilled, engine);
   sheet.release?.();
   if (app?.canvas && player?.pack === pack) app.canvas.dataset.playerIdleSheets = Object.keys(pack.sheets).filter((n) => IDLE_SHEETS.includes(n)).join(',');
 }
