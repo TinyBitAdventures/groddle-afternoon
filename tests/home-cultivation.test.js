@@ -17,12 +17,14 @@ import {
   hiveFireflyCount,
   homeStreetLayout,
   lifespanLeft,
+  listCultivationClasses,
   normalizeCultivationState,
   nudgeCultivation,
   placementCheck,
   quoteYardExpansion,
   removeCultivation,
 } from '../public/js/home-cultivation.js?v=bb8b2151';
+import { cultivationIcon } from '../public/js/features/homes-feature.js?v=42951491';
 
 const root = join(import.meta.dirname, '..', 'public');
 const rich = () => ({ level: 60, imagination: 1_000_000 });
@@ -146,5 +148,18 @@ describe('cultivating the home street', () => {
     assert.ok(state.items.length >= 5);
     const copy = normalizeCultivationState(JSON.parse(JSON.stringify(state)));
     assert.deepEqual(copy.items, state.items);
+  });
+});
+
+describe('cultivation menu icons (ticket 31)', () => {
+  // CultButton.as show: ItemIconView(choice.class_id, 'iconic'); CultCarryUI.as: ItemIconView(proto tsid, '1').
+  it('shows every choice with its own proto icon, never the bean fallback', () => {
+    for (const def of listCultivationClasses()) {
+      const url = cultivationIcon(def.protoClass);
+      assert.ok(existsSync(join(root, url)), `${def.protoClass}: ${url} is missing`);
+      assert.doesNotMatch(url, /bean_plain|seed_|herb_seed/, def.protoClass);
+      if (def.kind !== 'tower') assert.equal(url, `assets/sprites/icons/${def.protoClass}.png`);
+    }
+    assert.equal(cultivationIcon('proto_patch'), 'assets/sprites/icons/proto_patch.png');
   });
 });

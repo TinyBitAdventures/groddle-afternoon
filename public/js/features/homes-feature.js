@@ -3801,15 +3801,17 @@ function cultivationPop(engine) {
   };
 }
 
-function cultivationIcon(protoClass) {
+/**
+ * The cultivation menu tile and the carried placement art: the proto item's own
+ * icon, as the original drew them (CultButton.as show: ItemIconView(choice.class_id,
+ * 'iconic'); CultCarryUI.as: ItemIconView(proto tsid, '1')). Tiny Speck's proto
+ * icons (glitch-items misc/proto, CC0) are in assets/sprites/icons/proto_*.png. The
+ * Tower keeps its built-stage art (js/home-tower.js).
+ */
+export function cultivationIcon(protoClass) {
   const def = cultivationDef(protoClass);
-  if (def.kind === 'tower') return 'assets/sprites/home-tower/proto_3.webp';
-  if (def.art) return `assets/sprites/cultivation/${def.art}.png`;
-  if (def.kind === 'garden') return `assets/sprites/icons/${def.gardenType === 'herb' ? 'herb_seed_rubeweed' : 'seed_carrot'}.png`;
-  if (def.kind === 'rock') return `assets/sprites/icons/${{ proto_metal_rock: 'metal_rock', proto_dullite_rock: 'dullite', proto_beryl_rock: 'beryl', proto_sparkly_rock: 'sparkly' }[protoClass]}.png`;
-  if (protoClass === 'proto_peat') return 'assets/sprites/icons/peat.png';
-  if (protoClass === 'proto_dirt_pile') return 'assets/sprites/icons/earth.png';
-  return 'assets/sprites/icons/bean_plain.png';
+  if (def?.kind === 'tower') return 'assets/sprites/home-tower/proto_3.webp';
+  return `assets/sprites/icons/${protoClass}.png`;
 }
 
 // ---------------------------------------------------------------------------

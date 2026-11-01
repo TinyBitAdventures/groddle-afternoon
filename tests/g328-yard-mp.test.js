@@ -26,7 +26,7 @@ import {
   visitorAnimalState,
   visitorTreeState,
 } from '../public/js/yard-verbs-mp.js?v=44dc8ff1';
-import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=ee4cfe40';
+import { yardVerbsMpFeature } from '../public/js/features/yard-verbs-mp-feature.js?v=bdf09740';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
