@@ -31,6 +31,17 @@ export function filterOptions(options, query) {
 }
 
 /**
+ * What the list shows: every option for an empty query; for a query, the matches, of which at
+ * most `searchLimit` are search-only options (data-search-only on the <option>: the Map's
+ * streets, listed only when you type, as the client's LocationSearchMap showed 8).
+ */
+export function shownOptions(options, query, { searchLimit = 8 } = {}) {
+  if (!norm(query).trim()) return options.filter((o) => !o.searchOnly);
+  let extra = 0;
+  return filterOptions(options, query).filter((o) => !o.searchOnly || (extra += 1) <= searchLimit);
+}
+
+/**
  * @param {HTMLSelectElement} select
  * @param {{ placeholder?: string, label?: string }} [opts]
  */
@@ -74,7 +85,7 @@ export function createCombobox(select, opts = {}) {
   const currentLabel = () => options.find((o) => o.value === select.value)?.label || '';
 
   function readOptions() {
-    options = [...select.options].map((o) => ({ value: o.value, label: o.textContent || '' }));
+    options = [...select.options].map((o) => ({ value: o.value, label: o.textContent || '', hint: o.dataset.hint || '', searchOnly: o.dataset.searchOnly === '1' }));
   }
 
   function setActive(index) {
@@ -92,7 +103,7 @@ export function createCombobox(select, opts = {}) {
   }
 
   function render(query) {
-    shown = filterOptions(options, query);
+    shown = shownOptions(options, query);
     list.innerHTML = '';
     const q = norm(query).trim();
     shown.forEach((opt, i) => {
@@ -117,6 +128,12 @@ export function createCombobox(select, opts = {}) {
         nameEl.textContent = name;
       }
       li.append(nameEl);
+      if (opt.hint) {
+        const hint = document.createElement('span');
+        hint.className = 'combo-count combo-hint';
+        hint.textContent = opt.hint;
+        li.append(hint);
+      }
       if (m[2]) {
         const count = document.createElement('span');
         count.className = 'combo-count';

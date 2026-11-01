@@ -18,13 +18,16 @@ import {
   labelQuad,
   layoutStreetIcons,
   layoutStreetLabels,
+  layoutHubMapMarks,
+  segmentHitsQuad,
+  goLabelY,
   mapIconTip,
   MAP_ICON_ART,
   quadsOverlap,
   renderHubMapSvg,
   SUBWAY_ICON_NUDGE,
   youBox,
-} from '../public/js/map-graph.js?v=c89ca7f3';
+} from '../public/js/map-graph.js?v=d35e9573';
 import { mapIconStep, mapIconTipPlace } from '../public/js/ui/map-icon-tips.js?v=6b3eb3f9';
 import { selectVendorProfile } from '../public/js/vendor.js?v=7dfc77a5';
 import { CLASSIC_ART } from '../public/js/classic/classic-art.js?v=5745e669';
@@ -141,8 +144,7 @@ describe('map icon placement and render (js/map-graph.js)', () => {
       const here = (h.streets || []).filter((x) => x.store || x.shrine || x.has_subway).slice(0, 3);
       for (const at of ['', ...here.map((s) => `G${s.tsid.slice(1)}`)]) {
         const view = buildHubMapView(h, at, STREETS);
-        const labels = layoutStreetLabels(view.streets, 760, 460);
-        const icons = layoutStreetIcons(view.streets, { labels, hubs: view.hubs });
+        const { labels, icons } = layoutHubMapMarks(view);
         views += 1;
         if (!at) { total += icons.length; moved += icons.filter((i) => i.moved).length; }
         const you = view.streets.find((x) => x.current);
@@ -162,10 +164,38 @@ describe('map icon placement and render (js/map-graph.js)', () => {
     assert.ok(moved < total * 0.25, `${moved} of ${total} moved`);
   });
 
+  it('street names keep off each other and off other streets (player report 2026-11-01)', () => {
+    let over = 0;
+    let crossing = 0;
+    for (const h of HUBS) {
+      const view = buildHubMapView(h, '', STREETS);
+      const { labels } = layoutHubMapMarks(view);
+      const q = (l) => labelQuad(l.x, l.y, l.w, l.h, l.rot);
+      labels.forEach((a, i) => { for (const b of labels.slice(i + 1)) if (quadsOverlap(q(a), q(b))) over += 1; });
+      for (const a of labels) for (const s of view.streets) if (!s.hidden && s.name !== a.name && segmentHitsQuad(s.x1, s.y1, s.x2, s.y2, q(a))) crossing += 1;
+    }
+    // Across every hub (1,368 labels): 137 overlaps and 347 crossings before.
+    assert.ok(over <= 30, `${over} labels over labels`);
+    assert.ok(crossing <= 135, `${crossing} labels over streets`);
+  });
+
+  it('a GO button at the edge is drawn whole, its sign over it where the map ends below', () => {
+    const view = buildHubMapView(hub(56), 'GLI2V0UN7RD1T2J', STREETS);
+    const svg = renderHubMapSvg(view);
+    const [x, y, w, hh] = svg.match(/viewBox="([^"]+)"/)[1].split(' ').map(Number);
+    for (const g of view.hubs) {
+      assert.ok(g.x - 22 >= x && g.x + 22 <= x + w && g.y - 22 >= y && g.y + 22 <= y + hh, g.label);
+      const ly = goLabelY(g, view.mapH);
+      assert.ok(ly <= y + hh - 2 && ly >= y + 8, `${g.label} sign at ${ly}`);
+    }
+    assert.equal(goLabelY({ y: 455 }, 460), 425);
+    assert.equal(goLabelY({ y: 300 }, 460), 334);
+  });
+
   it('the labels stay where they were (the icons find room around them)', () => {
     for (const [id, at] of [[56, 'GLI2V0UN7RD1T2J'], [93, 'GIFI9G70SV72H3C']]) {
       const view = buildHubMapView(hub(id), at, STREETS);
-      const labels = layoutStreetLabels(view.streets, 760, 460);
+      const { labels } = layoutHubMapMarks(view);
       // Every street the map draws (not Salatu's Start streets, tools/build-map-hidden.mjs).
       assert.equal(labels.length, view.streets.filter((s) => !s.hidden).length, 'every street keeps its label');
       const svg = renderHubMapSvg(view);
@@ -177,7 +207,7 @@ describe('map icon placement and render (js/map-graph.js)', () => {
     const view = buildHubMapView(hub(56), 'GLI2V0UN7RD1T2J', STREETS);
     const svg = renderHubMapSvg(view);
     const icons = svg.match(/<g class="map-icon map-icon-[a-z]+"[^>]*>/g) || [];
-    assert.equal(icons.length, layoutStreetIcons(view.streets, { labels: layoutStreetLabels(view.streets), hubs: view.hubs }).length);
+    assert.equal(icons.length, layoutStreetIcons(view.streets, { labels: layoutHubMapMarks(view).labels, hubs: view.hubs }).length);
     assert.ok(icons.length > 20);
     assert.equal(icons.filter((g) => /tabindex="0"/.test(g)).length, 1);
     assert.match(svg, /role="group" aria-label="Groddle Forest street map"/);

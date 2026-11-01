@@ -6184,6 +6184,11 @@ body.buff-purple-pulse::after {
   background: var(--moss);
   margin-left: -0.15rem;
 }
+.combo-hint { white-space: nowrap; }
+/* A street found with the Map's search flashes (MapHub.as alert()). */
+.map-street.is-found .map-seg { animation: map-found 0.55s ease-in-out 6 alternate; }
+@keyframes map-found { to { stroke: var(--c-white); stroke-width: 11; } }
+@media (prefers-reduced-motion: reduce) { .map-street.is-found .map-seg { animation: none; stroke: var(--c-white); stroke-width: 11; } }
 .combo-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .combo-name mark { background: var(--c-gold-89c); color: inherit; border-radius: var(--radius-xs); padding: 0 1px; }
 .combo-count {

@@ -387,7 +387,7 @@ import {
   recordStreetEntry,
   streetLoadingVisit,
 } from './js/exploration.js?v=19c6758f';
-import { createCombobox } from './js/combobox.js?v=378292bc';
+import { createCombobox } from './js/combobox.js?v=6854d30d';
 import {
   INCANTATION_LINES,
   INCANTATION_FEAT_TITLE,
@@ -857,11 +857,13 @@ import {
   renderHubMapSvg,
   findCurrentStreet,
   listHubsFromIndex,
+  mapSearchStreets,
+  parseMapSearchValue,
   noteMapTrail,
   pickMapSpot,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
-} from './js/map-graph.js?v=c89ca7f3';
+} from './js/map-graph.js?v=d35e9573';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=9fc1b2da';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import {
@@ -21817,7 +21819,7 @@ function renderHomeMapCallout(panel) {
 /**
  * @param {string} [hubId]  Open a specific hub map; default = player's hub
  */
-async function openMap(hubId) {
+async function openMap(hubId, { find = '' } = {}) {
   if (homeIsInstanced()) {
     openHomePanel();
     return;
@@ -21891,16 +21893,29 @@ async function openMap(hubId) {
       if (h.hubId === targetHub) opt.selected = true;
       hubSelect.appendChild(opt);
     }
+    // The streets too, listed only when you type (the client's LocationSearchMap: regions and streets;
+    // none on Gentle Island, HubMapDialog.as 1004-1006).
+    const onIsland = targetHub === '129';
+    for (const st of onIsland ? [] : mapSearchStreets(STREET_INDEX.streets, hubs)) {
+      const opt = document.createElement('option');
+      opt.value = st.value;
+      opt.textContent = st.label;
+      opt.dataset.hint = st.hint;
+      opt.dataset.searchOnly = '1';
+      hubSelect.appendChild(opt);
+    }
     if (!hubSelect.dataset.bound) {
       hubSelect.dataset.bound = '1';
       hubSelect.addEventListener('change', () => {
-        openMap(hubSelect.value);
+        const street = parseMapSearchValue(hubSelect.value);
+        if (street) openMap(street.hubId, { find: street.tsid });
+        else openMap(hubSelect.value);
       });
     } else if (prev && prev !== targetHub) {
       hubSelect.value = targetHub;
     }
     // Themed type-to-search picker in front of the (hidden) select.
-    hubCombobox ||= createCombobox(hubSelect, { placeholder: 'Find a region…', label: 'Regions' });
+    hubCombobox ||= createCombobox(hubSelect, { placeholder: 'Find a region or street…', label: 'Regions and streets' });
     hubCombobox.refresh();
   }
 
@@ -21976,6 +21991,23 @@ async function openMap(hubId) {
   }
   arrangeMapCards(panel);
   panel.hidden = false;
+  if (find) showFoundStreet(canvas, find, view);
+}
+
+/** A street found with the Map's search: its line flashes (MapHub.as 785-828 alert()), or a note when the map does not draw it. */
+function showFoundStreet(canvas, tsid, view) {
+  const g = [...canvas.querySelectorAll('.map-street')].find((n) => n.getAttribute('data-tsid') === tsid);
+  const label = STREET_INDEX.streets[tsid]?.label || tsid;
+  if (app?.canvas) app.canvas.dataset.mapFound = g ? tsid : '';
+  if (!g) {
+    toast(`${label} is not drawn on the ${view.hubName} map.`);
+    return;
+  }
+  g.classList.remove('is-found');
+  void g.getBoundingClientRect();
+  g.classList.add('is-found');
+  toast(`${label}, ${view.hubName}`, 2600);
+  setTimeout(() => g.classList.remove('is-found'), 4200);
 }
 
 /**

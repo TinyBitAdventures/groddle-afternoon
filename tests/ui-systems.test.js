@@ -52,7 +52,7 @@ import {
   segmentMid,
   listHubsFromIndex,
   resolveHubId,
-} from '../public/js/map-graph.js?v=c89ca7f3';
+} from '../public/js/map-graph.js?v=d35e9573';
 import { STREET_INDEX } from '../public/js/street-loader.js?v=390e4702';
 import { listMapDestinations } from '../public/js/travel.js?v=a2c6427f';
 import { readFileSync } from 'node:fs';
@@ -409,7 +409,9 @@ describe('GSJS hub-56 geometry map', () => {
     assert.equal(mid.y, 25);
     const view = buildHubMapView(HUB56, 'GLI2V0UN7RD1T2J', STREET_INDEX.streets);
     const svg = renderHubMapSvg(view);
-    assert.match(svg, /viewBox="0 0 760 460"/);
+    // The painted 760 x 460 map, grown to take in GO buttons at its edge (map-graph.js hubMapFrame).
+    const [vx, vy, vw, vh] = /viewBox="([^"]+)"/.exec(svg)[1].split(' ').map(Number);
+    assert.ok(vx <= 0 && vy <= 0 && vx + vw >= 760 && vy + vh >= 460, `${vx} ${vy} ${vw} ${vh}`);
     assert.match(svg, /map-you/);
     assert.match(svg, /map-street travelable/);
     assert.match(svg, /Hechey Track/);

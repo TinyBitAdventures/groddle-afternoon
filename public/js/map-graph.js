@@ -422,32 +422,83 @@ export function layoutStreetIcons(streets, { labels = [], hubs = [] } = {}) {
   return out;
 }
 
+/** Does segment (x1, y1)-(x2, y2) touch a convex quad? */
+export function segmentHitsQuad(x1, y1, x2, y2, q) {
+  const inside = (px, py) => {
+    let sign = 0;
+    for (let i = 0; i < q.length; i++) {
+      const [ax, ay] = q[i];
+      const [bx, by] = q[(i + 1) % q.length];
+      const c = (bx - ax) * (py - ay) - (by - ay) * (px - ax);
+      if (c !== 0) {
+        if (sign && Math.sign(c) !== sign) return false;
+        sign = Math.sign(c);
+      }
+    }
+    return true;
+  };
+  if (inside(x1, y1) || inside(x2, y2)) return true;
+  const cross = (ax, ay, bx, by, cx, cy) => (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
+  for (let i = 0; i < q.length; i++) {
+    const [ax, ay] = q[i];
+    const [bx, by] = q[(i + 1) % q.length];
+    const d1 = cross(x1, y1, x2, y2, ax, ay);
+    const d2 = cross(x1, y1, x2, y2, bx, by);
+    const d3 = cross(ax, ay, bx, by, x1, y1);
+    const d4 = cross(ax, ay, bx, by, x2, y2);
+    if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) return true;
+  }
+  return false;
+}
+
+/** A GO button's sign: under the button, or over it where the map ends below (player report 2026-11-01). */
+export function goLabelY(h, mapH = 460) {
+  return h.y + 34 <= mapH - 4 ? h.y + 34 : h.y - 30;
+}
+
+/** The room a GO button and its sign take, as a box. */
+function goBox(h, mapH) {
+  const sub = String(h.label || '').length * 2.9 + 4;
+  const ly = goLabelY(h, mapH);
+  return { x0: Math.min(h.x - 24, h.x - sub), y0: Math.min(h.y - 24, ly - 9), x1: Math.max(h.x + 24, h.x + sub), y1: Math.max(h.y + 24, ly + 3) };
+}
+
 /**
- * Place street name labels with priority + simple collision resolution.
- * Loaded/current streets always keep labels; dim streets drop if crowded.
+ * Place street name labels beside their lines (player report 2026-11-01: names covered each other
+ * and other streets). Each label tries spots along its own street on both sides and takes the one
+ * that covers the least: another label first, then a GO button or the you-are-here star, then
+ * other streets' lines, then the map's edge, then the distance from the street's middle.
+ * Loaded and current streets always keep a label; a dim street's label drops where it would cover
+ * another label, and at most 18 dim labels show.
  *
- * @param {Array<{ name:string, x1:number,y1:number,x2:number,y2:number,mx:number,my:number,loaded?:boolean,current?:boolean }>} streets
+ * @param {Array<{ name:string, x1:number,y1:number,x2:number,y2:number,mx:number,my:number,loaded?:boolean,current?:boolean,hidden?:boolean }>} streets
  * @param {number} [mapW=760]
  * @param {number} [mapH=460]
+ * @param {{ hubs?: { x:number, y:number, label?:string }[] }} [around]
  * @returns {{ name:string, x:number, y:number, rot:number, cls:string, w:number, h:number }[]}
  *   (w and h: the size the layout reckons the label takes, in map units)
  */
-export function layoutStreetLabels(streets, mapW = 760, mapH = 460) {
-  const ordered = [...(streets || [])].sort((a, b) => {
+export function layoutStreetLabels(streets, mapW = 760, mapH = 460, { hubs = [], avoid = [] } = {}) {
+  const shown = (streets || []).filter((s) => !s.hidden);
+  const ordered = [...shown].sort((a, b) => {
     const rank = (s) => (s.current ? 0 : s.loaded ? 1 : 2);
     return rank(a) - rank(b);
   });
-  /** @type {{ x:number,y:number,w:number,h:number }[]} */
-  const boxes = [];
+  /** @type {number[][][]} */
+  const placed = [];
+  const blockers = [...(hubs || []).map((h) => boxQuad(goBox(h, mapH))), ...(avoid || [])];
+  const you = shown.find((s) => s.current);
+  if (you) blockers.push(boxQuad(youBox(you.mx, you.my)));
   const out = [];
+  let dimCount = 0;
 
   for (const s of ordered) {
-    if (s.hidden) continue;
+    const strong = s.current || s.loaded;
+    if (!strong && dimCount >= 18) continue;
     const angle = (Math.atan2(s.y2 - s.y1, s.x2 - s.x1) * 180) / Math.PI;
     let rot = angle;
     if (rot > 90) rot -= 180;
     if (rot < -90) rot += 180;
-
     const dx = s.x2 - s.x1;
     const dy = s.y2 - s.y1;
     const len = Math.hypot(dx, dy) || 1;
@@ -457,53 +508,66 @@ export function layoutStreetLabels(streets, mapW = 760, mapH = 460) {
       nx = -nx;
       ny = -ny;
     }
-    const offset = s.current || s.loaded ? 11 : 8;
-    let x = s.mx + nx * offset;
-    let y = s.my + ny * offset;
-
-    const fontW = s.current || s.loaded ? 6.2 : 5.0;
+    const fontW = strong ? 6.2 : 5.0;
     const w = Math.max(28, String(s.name || '').length * fontW);
-    const h = s.loaded || s.current ? 13 : 11;
+    const h = strong ? 13 : 11;
+    const above = strong ? 11 : 8;
+    const below = -(3 + h * 0.8);
 
-    let placed = false;
-    for (let tryN = 0; tryN < 24; tryN++) {
-      const hit = boxes.some(
-        (b) => Math.abs(b.x - x) < (b.w + w) * 0.48 && Math.abs(b.y - y) < (b.h + h) * 0.55
-      );
-      if (!hit) {
-        placed = true;
-        break;
+    let best = null;
+    for (const t of [0.5, 0.4, 0.6, 0.3, 0.7, 0.2, 0.8, 0.1, 0.9]) {
+      // Beside the line on either side, then one line further out.
+      for (const [side, off] of [[0, above], [1, below], [2, above + h * 0.95], [3, below - h * 0.95]]) {
+        const x = s.x1 + dx * t + nx * off;
+        const y = s.y1 + dy * t + ny * off;
+        const quad = labelQuad(x, y, w, h, rot);
+        const pad = rotatedQuad(x, y, rot, -w / 2 - 1.5, -h * 0.8 - 1.5, w + 3, h + 3);
+        let score = Math.abs(t - 0.5) * 20 + side * 3 + (side >= 2 ? 12 : 0);
+        // The street's own icons sit by its middle (layoutStreetIcons): the vendor and shrine below the
+        // line, the subway above it, so the name keeps to the other side there.
+        if (Math.abs(t - 0.5) < 0.25 && ((side % 2 === 1 && (s.store || s.shrine)) || (side % 2 === 0 && s.hasSubway))) score += 40;
+        for (const q of placed) if (quadsOverlap(pad, q)) score += 1000;
+        for (const q of blockers) if (quadsOverlap(pad, q)) score += 300;
+        for (const o of shown) if (o !== s && segmentHitsQuad(o.x1, o.y1, o.x2, o.y2, quad)) score += 40;
+        const box = quadBox(quad);
+        if (box.x0 < 2 || box.y0 < 2 || box.x1 > mapW - 2 || box.y1 > mapH - 2) score += 150;
+        if (!best || score < best.score) best = { x, y, quad, score };
+        if (score < 1) break;
       }
-      if (tryN % 2 === 0) {
-        y -= h * 0.85;
-        x += nx * 2;
-      } else {
-        x += (tryN % 4 === 1 ? 1 : -1) * (w * 0.15);
-        y += ny * 2;
-      }
-      x = Math.max(20, Math.min(mapW - 20, x));
-      y = Math.max(14, Math.min(mapH - 14, y));
+      if (best && best.score < 1) break;
     }
-
-    if (!placed && !s.loaded && !s.current) continue;
-    if (!placed) y = Math.min(mapH - 14, y + h * 2);
-
-    // Cap dim labels so dense hubs stay readable
-    if (!s.loaded && !s.current) {
-      const dimCount = out.filter((o) => o.cls.includes('dim')).length;
-      if (dimCount >= 18) continue;
-    }
-
-    const cls = s.current
-      ? 'map-label current'
-      : s.loaded
-        ? 'map-label loaded'
-        : 'map-label dim';
-
-    boxes.push({ x, y, w, h });
-    out.push({ name: s.name, x, y, rot, cls, w, h });
+    if (!strong && best.score >= 1000) continue;
+    if (!strong) dimCount += 1;
+    const cls = s.current ? 'map-label current' : s.loaded ? 'map-label loaded' : 'map-label dim';
+    placed.push(best.quad);
+    out.push({ name: s.name, x: best.x, y: best.y, rot, cls, w, h });
   }
   return out;
+}
+
+/**
+ * The labels and the street icons together: the icons find room around the labels; where an
+ * icon finds none (a crowded corner), the labels are laid out again keeping clear of it, and
+ * that layout is kept when it leaves fewer icons crowded.
+ * @param {ReturnType<typeof buildHubMapView>} view
+ */
+export function layoutHubMapMarks(view) {
+  const streets = view.streets || [];
+  const w = view.mapW || 760;
+  const h = view.mapH || 460;
+  const hubs = view.hubs || [];
+  let labels = layoutStreetLabels(streets, w, h, { hubs });
+  let icons = layoutStreetIcons(streets, { labels, hubs });
+  const crowded = (list) => list.filter((i) => i.crowded).length;
+  if (crowded(icons)) {
+    const labels2 = layoutStreetLabels(streets, w, h, { hubs, avoid: icons.filter((i) => i.crowded).map((i) => i.quad) });
+    const icons2 = layoutStreetIcons(streets, { labels: labels2, hubs });
+    if (crowded(icons2) < crowded(icons)) {
+      labels = labels2;
+      icons = icons2;
+    }
+  }
+  return { labels, icons };
 }
 
 /** An art URL with its content key (js/data-urls.js groddleDataUrl); as it is in Node and on a page without the map. */
@@ -514,9 +578,26 @@ const keyedArt = (url) => (typeof globalThis.groddleDataUrl === 'function' ? glo
  * Uses local bg/fg art when present.
  * @param {ReturnType<typeof buildHubMapView>} view
  */
+/** The map's viewBox [x, y, w, h]: the painted map, grown just enough to take in every GO button and its sign. */
+export function hubMapFrame(hubs, mapW = 760, mapH = 460) {
+  let x0 = 0;
+  let y0 = 0;
+  let x1 = mapW;
+  let y1 = mapH;
+  for (const g of hubs || []) {
+    const b = goBox(g, mapH);
+    x0 = Math.min(x0, Math.floor(b.x0 - 2));
+    y0 = Math.min(y0, Math.floor(b.y0 - 2));
+    x1 = Math.max(x1, Math.ceil(b.x1 + 2));
+    y1 = Math.max(y1, Math.ceil(b.y1 + 2));
+  }
+  return [x0, y0, x1 - x0, y1 - y0];
+}
+
 export function renderHubMapSvg(view) {
   const w = view.mapW || 760;
   const h = view.mapH || 460;
+  const mapH = h;
   const parts = [];
 
   parts.push(`<defs>
@@ -593,9 +674,8 @@ export function renderHubMapSvg(view) {
   }
 
   // Labels with collision-aware placement (reduces unreadable pile-ups)
-  const labels = layoutStreetLabels(view.streets || [], view.mapW || 760, view.mapH || 460);
   // The street icons (vendor, shrine, subway) find room around the labels, star and GO buttons.
-  const icons = layoutStreetIcons(view.streets || [], { labels, hubs: view.hubs });
+  const { labels, icons } = layoutHubMapMarks(view);
   for (const lab of labels) {
     parts.push(
       `<text class="${lab.cls}" x="${lab.x.toFixed(1)}" y="${lab.y.toFixed(1)}" text-anchor="middle" ` +
@@ -649,13 +729,15 @@ export function renderHubMapSvg(view) {
       `<g class="map-hub-go" data-hub="${escapeXml(h.hubId)}" data-label="${escapeXml(h.label)}">` +
         `<circle class="map-go-ring" cx="${h.x}" cy="${h.y}" r="22"/>` +
         `<text class="map-go-text" x="${h.x}" y="${h.y + 1}" text-anchor="middle" dominant-baseline="middle">GO</text>` +
-        `<text class="map-go-sub" x="${h.x}" y="${h.y + 34}" text-anchor="middle">${escapeXml(h.label)}</text>` +
+        `<text class="map-go-sub" x="${h.x}" y="${goLabelY(h, mapH)}" text-anchor="middle">${escapeXml(h.label)}</text>` +
         `</g>`
     );
   }
 
+  // The frame grows to take in a GO button at the very edge (28 of 193 reach past it), so none is cut off.
+  const frame = hubMapFrame(view.hubs || [], w, h);
   return (
-    `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" ` +
+    `<svg viewBox="${frame.join(' ')}" xmlns="http://www.w3.org/2000/svg" ` +
     `role="${icons.length ? 'group' : 'img'}" aria-label="${escapeXml(view.hubName)} street map" class="hub-map-svg">` +
     parts.join('\n') +
     `</svg>`
@@ -699,6 +781,36 @@ export function listHubsFromIndex(mapIndex, { keep = null } = {}) {
     }))
     .filter((h) => h.streetCount > 0)
     .sort((a, b) => a.hubName.localeCompare(b.hubName));
+}
+
+/**
+ * The Map's street search (player report 2026-11-01): the client's map had one search for
+ * regions and streets (HubMapDialog.as 197-202, LocationSearchMap.as: 8 results; picking a
+ * street opened its region and flashed it, MapHub.as 785-828). One row a street of a listed
+ * region, by name: { value: "street:<hubId>:<tsid>", label, hint: region }.
+ * @param {Record<string, { label?: string, hubId?: string|number, hubName?: string }>} streetIndex
+ * @param {{ hubId: string, hubName: string }[]} hubs the listed regions (listHubsFromIndex)
+ */
+export function mapSearchStreets(streetIndex, hubs) {
+  const named = new Map((hubs || []).map((h) => [String(h.hubId), h.hubName]));
+  const seen = new Set();
+  const out = [];
+  for (const [tsid, st] of Object.entries(streetIndex || {})) {
+    const hubId = String(st?.hubId ?? '');
+    const label = String(st?.label || '').trim();
+    if (!label || !named.has(hubId)) continue;
+    const key = `${hubId}|${label.toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ value: `street:${hubId}:${tsid}`, label, hint: named.get(hubId) });
+  }
+  return out.sort((a, b) => a.label.localeCompare(b.label) || a.hint.localeCompare(b.hint));
+}
+
+/** A street search row's value as { hubId, tsid }, or null for a region's. */
+export function parseMapSearchValue(value) {
+  const m = /^street:([^:]+):(.+)$/.exec(String(value || ''));
+  return m ? { hubId: m[1], tsid: m[2] } : null;
 }
 
 /**
