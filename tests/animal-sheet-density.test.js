@@ -85,3 +85,46 @@ test('each animal sheet stores at least as many pixels as its largest draw scale
   }
   assert.deepEqual(soft, []);
 });
+
+// Signposts (Austin, 2026-11-01, Groddle Forest Junction: "Does the sign post look slightly blurry?").
+// Their words are drawn by Pixi at SIGN_TEXT_RESOLUTION; the woods are Tiny Speck's PNGs, which
+// exist only as 1x rasters (glitch-client TSEngineAssets/src/Assets.as embeds signpost_post.png,
+// signpost_arm.png and signpost_shadow.png; SignpostView.as 83 drew them at holder scale 0.8, so
+// the 2012 client never magnified them). No vector source shipped, so they stay listed here with
+// their draw scale until a sharper source exists.
+const SIGN_RASTERS = Object.freeze({
+  'assets/ui/signpost/signpost_post.png': { w: 43, h: 246 },
+  'assets/ui/signpost/signpost_arm.png': { w: 260, h: 30 },
+  'assets/ui/signpost/signpost_shadow.png': { w: 87, h: 26 },
+});
+
+/** Device px per signpost art px: holder 0.8 x the stage at Original zoom x a 2x screen. */
+async function signDrawScale(width, height) {
+  const { stageFor } = await import('../public/js/location-view.js?v=5a0d5c0b');
+  const { moduleConsts } = await import('./sheet-sources.js');
+  const sign = moduleConsts('js/street-render.js').get('SIGNPOST');
+  return sign.scale * stageFor({ width, height, sceneWidth: 4000, sceneHeight: 1000, zoom: 1 }).scale * 2;
+}
+
+test('signpost words are rendered at least as finely as a 2x screen draws them at Original zoom', async () => {
+  const { moduleConsts } = await import('./sheet-sources.js');
+  const resolution = moduleConsts('js/street-render.js').get('SIGN_TEXT_RESOLUTION');
+  // A 13 to 16 inch laptop, full screen, under the top bar.
+  for (const [w, h] of [[1280, 740], [1512, 880], [1728, 1010]]) {
+    const draw = await signDrawScale(w, h);
+    assert.ok(resolution >= draw, `${w} x ${h}: words at ${resolution}x, drawn ${draw.toFixed(2)}x`);
+  }
+});
+
+test('signpost woods are Tiny Speck\'s own 1x PNGs, the one source there is', async () => {
+  const { readFileSync } = await import('node:fs');
+  const client = join(root, '../glitch-client/TSEngineAssets/src/assets/graphics');
+  for (const [path, size] of Object.entries(SIGN_RASTERS)) {
+    const b = readFileSync(join(pub, path));
+    assert.deepEqual({ w: b.readUInt32BE(16), h: b.readUInt32BE(20) }, size, path);
+    if (existsSync(client)) assert.ok(b.equals(readFileSync(join(client, path.split('/').pop()))), `${path} is the client's file`);
+  }
+  // Drawn about 2x on a 2x laptop screen: why they read softer than the vector props beside them.
+  const draw = await signDrawScale(1280, 740);
+  assert.ok(draw > 1.5 && draw < 3, `signpost drawn ${draw.toFixed(2)}x`);
+});
