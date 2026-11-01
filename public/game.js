@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b351d7cb';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=252556ed';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=3430097c';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -933,7 +933,7 @@ import { hidesChatBubble } from './js/hi-signs.js?v=b90c7d7e';
 import { GAME_MODE, isSolo } from './js/game-mode.js?v=1ecf2899';
 import { saveStore } from './js/save-store.js?v=8839ba7b';
 import { isNewMultiplayerPlayer, newPlayerInventory, newPlayerStats } from './js/new-player.js?v=553c5481';
-import { clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechBubbleOutline, speechOffsetFor } from './js/speech-placement.js?v=7e03b1b9';
+import { SPEECH_HOLD_MARGIN, clearSpeechOfBox, deepestSpeechTip, giveArtHeight, holdSpeechSide, hudColumnBox, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechBubbleOutline, speechOffsetFor, speechTipOnSide } from './js/speech-placement.js?v=d12cdd6a';
 import { shrineDonationResponseKey, verbResponse } from './js/verb-responses.js?v=3ceb8a8c';
 import { itemZ } from './js/item-bands.js?v=e98b10bc';
 import { SLUG_ANIMATION, SLUG_LAYOUT, SLUG_STYLES, SLUG_TARGETS, drawSlugIcon, formatRawSlugs, formatSlugList, layoutSlugRow, slugBox, slugNumber, slugPillPath, slugSign, speechSlugList } from './js/speech-slugs.js?v=130338f9';
@@ -6458,51 +6458,75 @@ function positionSpeechBubble(bubble) {
   const underPill = Boolean(pill && left < pill.right + 8 && left + meta.width > pill.left - 8);
   if (underPill) lowestTip = Math.max(lowestTip, cameraY + pill.bottom + 8 + meta.height + 11);
   const highestTip = cameraY + LOCATION_VIEW_H - 18;
-  // Pushed down over the speaker as the client did (at most 120 px), else hung
-  // under the feet of a short one near the top of the view, tail up (G185).
+  // Pushed down over the speaker as the client did (at most 120 px; never into a short one's art,
+  // Austin 2026-11-01), else hung under the feet of a short one near the top of the view, tail up (G185).
+  // A bubble holds the side it opened on (meta.hold, js/speech-placement.js holdSpeechSide): it
+  // leaves only when it misses there by 24 px for 400 ms, once a bubble (Austin 2026-11-01).
+  const hold = meta.hold || (meta.hold = { side: null, since: null, flips: 0 });
+  const keep = hold.side ?? null;
   const below = spr.y + 6;
+  const belowSpare = cameraY + LOCATION_VIEW_H - 8 - (below + 11 + meta.height);
+  const want = spr.y - spriteHeight - 12 + offset.y;
+  const deepest = deepestSpeechTip({ artTop: spr.y - spriteHeight, feet: spr.y, want });
   let place = placeSpeechTip({
-    want: spr.y - spriteHeight - 12 + offset.y,
+    want,
     minTip: lowestTip,
     maxTip: highestTip,
     artTop: spr.y - spriteHeight,
     feet: spr.y,
     below,
-    belowFits: below + 11 + meta.height <= cameraY + LOCATION_VIEW_H - 8,
+    belowFits: belowSpare,
+    deepest,
+    keep,
   });
   // G269: clear of the activity feed and buff strip (js/speech-placement.js clearSpeechOfBox).
   const clear = clearSpeechOfBox({
     left: bubble.x - cameraX - meta.width / 2, width: meta.width, height: meta.height,
-    tip: place.tip - cameraY, flip: place.flip, speakerX: spr.x + offset.x - cameraX, feet: spr.y - cameraY,
-    box: hudColumnViewBox(), viewWidth: horizontalLocationViewWidth(), viewBottom: LOCATION_VIEW_H - 18,
+    tip: place.tip - cameraY, flip: place.flip, speakerX: spr.x + offset.x - cameraX, feet: spr.y - cameraY, deepest: deepest - cameraY,
+    box: hudColumnViewBox(), viewWidth: horizontalLocationViewWidth(), viewBottom: LOCATION_VIEW_H - 18, prefer: meta.clearHow || null,
   });
   if (clear) {
     bubble.x += clear.dx;
     place = { tip: clear.tip + cameraY, flip: clear.flip };
   }
+  meta.clearHow = clear && clear.how !== 'over' ? { how: clear.how, dx: clear.dx } : null;
   meta.overHud = clear?.how === 'over';
   // NOTIFY zones: clear of the notices and a banner too; where it cannot be, the notices fade under it.
   const zone = notifyZoneViewBox();
   const clearZone = zone && clearSpeechOfBox({
     left: bubble.x - cameraX - meta.width / 2, width: meta.width, height: meta.height,
-    tip: place.tip - cameraY, flip: place.flip, speakerX: spr.x + offset.x - cameraX, feet: spr.y - cameraY,
-    box: zone, viewWidth: horizontalLocationViewWidth(), viewBottom: LOCATION_VIEW_H - 18,
+    tip: place.tip - cameraY, flip: place.flip, speakerX: spr.x + offset.x - cameraX, feet: spr.y - cameraY, deepest: deepest - cameraY,
+    box: zone, viewWidth: horizontalLocationViewWidth(), viewBottom: LOCATION_VIEW_H - 18, prefer: meta.zoneHow || null,
   });
   if (clearZone && clearZone.how !== 'over') {
     bubble.x += clearZone.dx;
     place = { tip: clearZone.tip + cameraY, flip: clearZone.flip };
   }
+  meta.zoneHow = clearZone && clearZone.how !== 'over' ? { how: clearZone.how, dx: clearZone.dx } : null;
   meta.overNotices = clearZone?.how === 'over';
   // G357/G427: slid off a player's head as the client slid bubbles (at most 100 px, the
   // tail still on the speaker, ChatBubble.as 151-201), else hung under the speaker's feet
   // when that fits; eased so it doesn't jump. The tail never stretches (ChatBubble.as 374-379).
   const speakerX = spr.x + offset.x;
-  const slide = place.flip ? { dx: 0, covered: false } : slideOffAvatars({
-    left: bubble.x - meta.width / 2, width: meta.width, height: meta.height, tip: place.tip, speakerX,
-    avatars: speechAvoidBoxes(meta.target),
+  const avatars = speechAvoidBoxes(meta.target);
+  const slideFor = (p) => (p.flip ? { dx: 0, covered: false } : slideOffAvatars({
+    left: bubble.x - meta.width / 2, width: meta.width, height: meta.height, tip: p.tip, speakerX,
+    avatars,
     minLeft: cameraX + 12, maxRight: cameraX + horizontalLocationViewWidth() - 12,
-  });
-  if (slide.covered && below + 11 + meta.height <= cameraY + LOCATION_VIEW_H - 8) place = { tip: below, flip: true };
+    prefer: meta.slideWant || 0,
+  }));
+  let slide = slideFor(place);
+  if (slide.covered && belowSpare >= (keep === false ? SPEECH_HOLD_MARGIN : 0)) place = { tip: below, flip: true };
+  // Hold the side: a change waits, and after one flip only an under-the-feet bubble that no longer fits goes back.
+  const side = holdSpeechSide(hold, place.flip, performance.now(), { forced: hold.side === true && belowSpare < -SPEECH_HOLD_MARGIN });
+  if (side !== place.flip) {
+    place = speechTipOnSide(side, { want, minTip: lowestTip, maxTip: highestTip, below });
+    slide = slideFor(place);
+    // Held where a move had cleared the HUD or the notices: they fade under it meanwhile.
+    if (clear) meta.overHud = true;
+    if (clearZone) meta.overNotices = true;
+  }
+  meta.slideWant = slide.dx;
   const shown = Number(meta.slide) || 0;
   const nextSlide = Math.abs(slide.dx - shown) < 0.5 ? slide.dx : shown + (slide.dx - shown) * 0.3;
   meta.slide = Math.round(nextSlide * 2) / 2;
@@ -6536,6 +6560,7 @@ function positionSpeechBubble(bubble) {
     app.canvas.dataset.speechTail = meta.tailAt;
     app.canvas.dataset.speechClear = clear?.how || '';
     app.canvas.dataset.speechSlide = `${Math.round(slide.dx)}${slide.covered ? ':covered' : ''}`;
+    app.canvas.dataset.speechHold = `${hold.side ? 'under' : 'over'}:${hold.flips}${hold.since === null ? '' : ':pending'}`;
   }
   return true;
 }
@@ -28479,6 +28504,38 @@ async function main() {
     },
     /** Street decos that play (js/deco-anim.js, G435): placed, strips in, playing, stopped off screen; `detail` adds each one's stage box. */
     /** LEVEL BUILDER QA (js/builder/draft-play.js): a placed deco as drawn, by its id, or null. */
+    /**
+     * SPEECH QA: the `classId` (a pattern: 'trant_.*') target nearest the avatar says `text` (slugs as a verb's reply), placed
+     * as any bubble is; returns its world spot and art box, or null. Read the bubble from the canvas
+     * dataset (speechScreen, speechFlipped, speechHold, speechSlide).
+     */
+    say(classId, text, slugs = null) {
+      const cls = new RegExp(`^(${String(classId || '')})$`);
+      const near = interactables
+        .filter((t) => cls.test(String(t?.classId || '')) && t.sprite && !t.sprite.destroyed && t.sprite.visible !== false)
+        .sort((a, b) => Math.abs(a.sprite.x - (player?.x || 0)) - Math.abs(b.sprite.x - (player?.x || 0)))[0];
+      if (!near || !showSpeechBubble(near, { text: String(text || ''), slugs, durationMs: 60000 })) return null;
+      const art = Number(near.artHeight) || 0;
+      return { classId: near.classId, x: near.sprite.x, y: near.sprite.y, art };
+    },
+    /** SPEECH QA: every bubble up, in view px: its speaker, its box (tail included), side and hold. */
+    speech() {
+      const cx = Number.isFinite(camTarget) ? camTarget : 0;
+      const cy = Number.isFinite(camY) ? camY : 0;
+      return speechBubbles.map((b) => {
+        const m = b._speechFx || {};
+        const spr = m.target?.sprite;
+        const top = m.flipped ? b.y : b.y - m.height - 11;
+        return {
+          classId: m.target?.classId || '',
+          speaker: spr ? { wx: Math.round(spr.x), x: Math.round(spr.x - cx), feet: Math.round(spr.y - cy), art: Math.round(Number(m.target.artHeight) || 0) } : null,
+          box: { left: Math.round(b.x - m.width / 2 - cx), right: Math.round(b.x + m.width / 2 - cx), top: Math.round(top - cy), bottom: Math.round(top + m.height + 11 - cy) },
+          flipped: Boolean(m.flipped),
+          hold: m.hold ? { ...m.hold } : null,
+          slide: m.slide || 0,
+        };
+      });
+    },
     /** Level builder play-tests (spec 7.4 calibration): set the avatar down at a screen-space spot. */
     placeAvatar(x, y) {
       if (!player || !Number.isFinite(x) || !Number.isFinite(y)) return false;

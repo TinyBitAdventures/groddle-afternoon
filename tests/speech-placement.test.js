@@ -31,7 +31,14 @@ import {
   speechBubbleOutline,
   speechTailPoints,
   SPEECH_SLIDE_LIMIT,
-} from '../public/js/speech-placement.js?v=7e03b1b9';
+  SPEECH_HOLD_MARGIN,
+  SPEECH_HOLD_MS,
+  SPEECH_SHORT_SPEAKER,
+  deepestSpeechTip,
+  holdSpeechSide,
+  speechTipOnSide,
+  texelsPerUnit,
+} from '../public/js/speech-placement.js?v=d12cdd6a';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '../glitch-GameServerJS');
@@ -224,11 +231,11 @@ describe('art heights', () => {
 describe('wiring', () => {
   it('game.js places every bubble through the module and gives registered targets art heights', () => {
     const game = read('public/game.js');
-    assert.match(game, /import \{ clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechBubbleOutline, speechOffsetFor \} from '\.\/js\/speech-placement\.js\?v=[\w-]+';/);
+    assert.match(game, /import \{ SPEECH_HOLD_MARGIN, clearSpeechOfBox, deepestSpeechTip, giveArtHeight, holdSpeechSide, hudColumnBox, placeSpeechTail, placeSpeechTip, slideOffAvatars, speechBubbleOutline, speechOffsetFor, speechTipOnSide \} from '\.\/js\/speech-placement\.js\?v=[\w-]+';/);
     assert.match(game, /function register\(target\) \{\n[^\n]*\n  giveArtHeight\(target\);\n  interactables\.push\(target\);/);
     const fn = game.slice(game.indexOf('function positionSpeechBubble'), game.indexOf('function showSpeechBubble'));
     assert.match(fn, /const offset = speechOffsetFor\(meta\.target\);\n  bubble\.x = clampWorldOverlayX\(spr\.x \+ offset\.x, meta\.width, 12\);/);
-    assert.match(fn, /want: spr\.y - spriteHeight - 12 \+ offset\.y,/);
+    assert.match(fn, /const want = spr\.y - spriteHeight - 12 \+ offset\.y;/);
     assert.match(fn, /dataset\.speechArt = /);
     // G233: the tail is aimed at the speaker the bubble was meant to centre on.
     assert.match(fn, /const speakerX = spr\.x \+ offset\.x;/);
@@ -370,12 +377,142 @@ describe('bubbles slide off players\' heads (G357 Austin 2026-10-27, G427 2026-1
   it('game.js slides tip-down bubbles, hangs a covered one under the feet, names only players and sizes a bubble to its line', () => {
     const game = read('public/game.js');
     const fn = game.slice(game.indexOf('function positionSpeechBubble'), game.indexOf('function showSpeechBubble'));
-    assert.match(fn, /const slide = place\.flip \? \{ dx: 0, covered: false \} : slideOffAvatars\(\{/);
-    assert.match(fn, /avatars: speechAvoidBoxes\(meta\.target\),\n/);
-    assert.match(fn, /if \(slide\.covered && below \+ 11 \+ meta\.height <= cameraY \+ LOCATION_VIEW_H - 8\) place = \{ tip: below, flip: true \};/);
+    assert.match(fn, /const slideFor = \(p\) => \(p\.flip \? \{ dx: 0, covered: false \} : slideOffAvatars\(\{/);
+    assert.match(fn, /const avatars = speechAvoidBoxes\(meta\.target\);\n/);
+    assert.match(fn, /const belowSpare = cameraY \+ LOCATION_VIEW_H - 8 - \(below \+ 11 \+ meta\.height\);/);
+    assert.match(fn, /if \(slide\.covered && belowSpare >= \(keep === false \? SPEECH_HOLD_MARGIN : 0\)\) place = \{ tip: below, flip: true \};/);
     const show = game.slice(game.indexOf('function showSpeechBubble'), game.indexOf('function speechSlugRow'));
     assert.match(show, /const named = target\.classId === 'pc_player' \|\| target\.classId === 'pc_remote';/);
     assert.match(show, /\+ 20, 60, 280\);/);
     assert.match(read('public/js/features/realtime-feature.js'), /speechAvoidTargets\(\) \{/);
+  });
+});
+
+describe('bubbles hold their place (Austin 2026-11-01: a Bean Tree\'s bubble bounced; a pet Piggy\'s sat on it)', () => {
+  const view = { minTip: 140, maxTip: 390 };
+
+  it('the client held the anchor until the art moved more than 20 px (getYAboveDisplay)', { skip: !existsSync(CLIENT) && 'no client checkout' }, () => {
+    const src = readFileSync(join(CLIENT, 'view/itemstack/LocationItemstackView.as'), 'utf8');
+    assert.match(src, /const px_tolerance:int = 20;/);
+    assert.match(src, /if\(gety_rect\.top - action_indicator_offset > px_tolerance \|\| action_indicator_offset - gety_rect\.top > px_tolerance\)\{/);
+    assert.equal(SPEECH_HOLD_MARGIN, 24);
+    assert.equal(SPEECH_HOLD_MS, 400);
+  });
+
+  it('a short speaker is never pushed into: the tip stays over its top, else the bubble hangs under its feet', () => {
+    // A 60 px Piggy whose bubble would need a 70 px push: before, the tip went down to its middle (160).
+    const pig = { artTop: 130, feet: 190, want: 70 };
+    const deepest = deepestSpeechTip(pig);
+    assert.equal(deepest, 134);
+    assert.ok(190 - 130 < SPEECH_SHORT_SPEAKER);
+    assert.deepEqual(placeSpeechTip({ ...view, ...pig, below: 196, belowFits: 40 }), { tip: 140, flip: false }, 'the old rule');
+    assert.deepEqual(placeSpeechTip({ ...view, ...pig, below: 196, belowFits: 40, deepest }), { tip: 196, flip: true });
+    // A 200 px tree keeps the client's push into its upper half.
+    const tree = { artTop: 52, feet: 252, want: 40 };
+    assert.equal(deepestSpeechTip(tree), 152);
+    assert.deepEqual(placeSpeechTip({ ...view, ...tree, below: 258, belowFits: 40, deepest: deepestSpeechTip(tree) }), { tip: 140, flip: false });
+    // A Street Spirit's own offset into its art is never "too deep".
+    assert.equal(deepestSpeechTip({ artTop: 136, feet: 380, want: 184 }), 258);
+    assert.equal(deepestSpeechTip({ artTop: 136, feet: 200, want: 184 }), 184);
+  });
+
+  it('a short speaker under the notices is not covered by a bubble moved below them', () => {
+    const notices = { left: 300, right: 700, top: 20, bottom: 120 };
+    const base = { width: 220, height: 90, viewWidth: 960, viewBottom: 390, left: 390, speakerX: 500 };
+    // The Piggy's art 210-270: dropping the bubble below the notices would point at y 227, inside it.
+    const old = clearSpeechOfBox({ ...base, tip: 190, feet: 270, box: notices });
+    assert.equal(old.how, 'below', 'without deepest the old rule pointed into the Piggy');
+    assert.equal(old.tip, 227);
+    const out = clearSpeechOfBox({ ...base, tip: 190, feet: 270, deepest: 214, box: notices });
+    assert.notEqual(out.how, 'below');
+  });
+
+  it('keeps its side while the fit sits on the edge: small camera or avatar moves never flip it', () => {
+    // A tree whose push sits at the 120 px limit: one px either way flips the old rule.
+    const tree = { artTop: 52, feet: 330, below: 336 };
+    const at = (want, keep) => placeSpeechTip({ ...view, ...tree, want, belowFits: 30, keep });
+    assert.equal(at(140 - 121, null).flip, true, 'a new bubble 1 px past the limit hangs under');
+    assert.equal(at(140 - 119, null).flip, false);
+    for (let d = -20; d <= 20; d += 1) {
+      assert.equal(at(140 - 120 + d, false).flip, false, `held over, ${d}`);
+      assert.equal(at(140 - 120 + d, true).flip, true, `held under, ${d}`);
+    }
+    // Missing by more than the margin, it asks to change.
+    assert.equal(at(140 - 120 - 30, false).flip, true);
+    // Held under while the room below shrinks by less than the margin, even where it would fit above now.
+    assert.equal(placeSpeechTip({ ...view, ...tree, want: 140, belowFits: -20, keep: true }).flip, true);
+    assert.equal(placeSpeechTip({ ...view, ...tree, want: 0, belowFits: -20, keep: true }).flip, true);
+    assert.equal(placeSpeechTip({ ...view, ...tree, want: 0, belowFits: -30, keep: true }).flip, false);
+  });
+
+  it('a change of side waits 400 ms of asking and happens once a bubble unless forced', () => {
+    const hold = { side: null, since: null, flips: 0 };
+    assert.equal(holdSpeechSide(hold, false, 0), false);
+    assert.equal(holdSpeechSide(hold, true, 100), false);
+    assert.equal(holdSpeechSide(hold, false, 200), false, 'asked back: the wait starts over');
+    assert.equal(holdSpeechSide(hold, true, 300), false);
+    assert.equal(holdSpeechSide(hold, true, 650), false);
+    assert.equal(holdSpeechSide(hold, true, 700), true);
+    assert.equal(hold.flips, 1);
+    // A second flip is refused however long it is asked for...
+    assert.equal(holdSpeechSide(hold, false, 800), true);
+    assert.equal(holdSpeechSide(hold, false, 5000), true);
+    // ...unless the held side cannot be drawn.
+    assert.equal(holdSpeechSide(hold, false, 5100, { forced: true }), false);
+  });
+
+  it('the held side\'s tip: under the feet, or over the speaker kept in view', () => {
+    assert.deepEqual(speechTipOnSide(true, { ...view, want: 60, below: 226 }), { tip: 226, flip: true });
+    assert.deepEqual(speechTipOnSide(false, { ...view, want: 60, below: 226 }), { tip: 140, flip: false });
+    assert.deepEqual(speechTipOnSide(false, { ...view, want: 200, below: 226 }), { tip: 200, flip: false });
+  });
+
+  it('a slid bubble keeps its berth while a head moves a few px, and goes back once it is 24 px clear', () => {
+    const bubble = { left: 100, width: 200, height: 50, tip: 400, speakerX: 200 };
+    const head = (x) => ({ left: x, right: x + 40, top: 300, bottom: 450 });
+    const first = slideOffAvatars({ ...bubble, avatars: [head(220)] });
+    assert.deepEqual(first, { dx: -86, covered: false });
+    // The head steps right, just clear of the centred bubble: a new bubble would sit at its edge;
+    // the slid one comes back only as far as the head allows plus the gap, not onto it.
+    assert.deepEqual(slideOffAvatars({ ...bubble, avatars: [head(310)] }), { dx: 0, covered: false }, 'a new bubble');
+    assert.deepEqual(slideOffAvatars({ ...bubble, avatars: [head(310)], prefer: -86 }), { dx: 4, covered: false });
+    // The head wandering a few px away leaves it put; coming closer moves it only as far as the gap needs.
+    for (const x of [312, 316, 320, 326]) assert.equal(slideOffAvatars({ ...bubble, avatars: [head(x)], prefer: 4 }).dx, 4, `head at ${x}`);
+    assert.equal(slideOffAvatars({ ...bubble, avatars: [head(308)], prefer: 4 }).dx, 2);
+    // 24 px clear of it: back to the middle.
+    assert.deepEqual(slideOffAvatars({ ...bubble, avatars: [head(340)], prefer: -86 }), { dx: 0, covered: false });
+  });
+
+  it('a bubble moved off the HUD keeps that way while the column grows or shrinks a few px', () => {
+    const base = { width: 220, height: 80, viewWidth: 948, viewBottom: 390, left: 300, tip: 200, speakerX: 470, feet: 280 };
+    const first = clearSpeechOfBox({ ...base, box: { left: 14, right: 441, top: 48, bottom: 210 } });
+    assert.equal(first.how, 'beside');
+    // The column shrinks to just clear of the bubble: it stays beside.
+    const near = clearSpeechOfBox({ ...base, box: { left: 14, right: 294, top: 48, bottom: 210 }, prefer: first });
+    assert.equal(near?.how, 'beside');
+    assert.equal(clearSpeechOfBox({ ...base, box: { left: 14, right: 294, top: 48, bottom: 210 } }), null);
+  });
+
+  it('a sheet drawn from its 3x file is measured in its own texels (a Chicken\'s bubble sat on it)', () => {
+    // js/sprite-hires.js: frames stay in 1x units on a resolution-3 source holding the 3x image.
+    assert.equal(texelsPerUnit({ width: 888, resolution: 3 }, { width: 2664 }), 3);
+    assert.equal(texelsPerUnit({ width: 704, resolution: 1 }, { width: 704 }), 1);
+    assert.equal(texelsPerUnit({ resolution: 3 }, null), 3);
+    assert.equal(texelsPerUnit(null, null), 1);
+    const src = read('public/js/speech-placement.js');
+    assert.match(src, /ctx\.drawImage\(res, f\.x \* k, f\.y \* k, f\.width \* k, f\.height \* k, 0, 0, w, h\);/);
+  });
+
+  it('game.js holds the side and the slide every placement', () => {
+    const game = read('public/game.js');
+    const fn = game.slice(game.indexOf('function positionSpeechBubble'), game.indexOf('function showSpeechBubble'));
+    assert.match(fn, /const hold = meta\.hold \|\| \(meta\.hold = \{ side: null, since: null, flips: 0 \}\);/);
+    assert.match(fn, /const deepest = deepestSpeechTip\(\{ artTop: spr\.y - spriteHeight, feet: spr\.y, want \}\);/);
+    assert.match(fn, /deepest,\n    keep,\n  \}\);/);
+    assert.match(fn, /prefer: meta\.clearHow \|\| null,/);
+    assert.match(fn, /prefer: meta\.zoneHow \|\| null,/);
+    assert.match(fn, /prefer: meta\.slideWant \|\| 0,/);
+    assert.match(fn, /const side = holdSpeechSide\(hold, place\.flip, performance\.now\(\), \{ forced: hold\.side === true && belowSpare < -SPEECH_HOLD_MARGIN \}\);/);
+    assert.match(fn, /place = speechTipOnSide\(side, \{ want, minTip: lowestTip, maxTip: highestTip, below \}\);/);
   });
 });

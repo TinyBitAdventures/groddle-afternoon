@@ -71,23 +71,94 @@ export function speechOffsetFor(target) {
 }
 
 /**
+ * Bubbles hold their place (Austin 2026-11-01: harvesting a Bean Tree, its joke bubble bounced
+ * between above and below; a pet Piggy's bubble sat on the Piggy). The client held an itemstack's
+ * anchor until the art's top moved more than 20 px (LocationItemstackView.as getYAboveDisplay
+ * 636-652) and never moved a bubble under its speaker at all, so the remake's own moves (hung under
+ * the feet, G185; off the HUD and notices, G269; off heads, G357) keep the side a bubble opened on
+ * unless it stops fitting there by SPEECH_HOLD_MARGIN, for SPEECH_HOLD_MS, and flip at most
+ * SPEECH_MAX_FLIPS times a bubble unless the side it holds cannot be drawn at all.
+ */
+export const SPEECH_HOLD_MARGIN = 24;
+export const SPEECH_HOLD_MS = 400;
+export const SPEECH_MAX_FLIPS = 1;
+
+/**
+ * A speaker shorter than this (a Piggy, a Chicken, a butterfly) never has a bubble pushed into its
+ * art: pushed over a 60 px Piggy as far as its middle, the bubble covered it (Austin 2026-11-01).
+ * Taller ones (trees, Street Spirits) keep the push into their upper half (G185).
+ */
+export const SPEECH_SHORT_SPEAKER = 120;
+
+/**
+ * The lowest tip a tip-down bubble may have over its speaker: just over a short speaker's art,
+ * the middle of a tall one's, never above the tip the speaker asked for (a Street Spirit's 60 px
+ * offset points into its art on purpose).
+ */
+export function deepestSpeechTip({ artTop, feet, want }) {
+  if (!Number.isFinite(artTop) || !Number.isFinite(feet)) return Infinity;
+  const deep = feet - artTop < SPEECH_SHORT_SPEAKER ? artTop + 4 : (artTop + feet) / 2;
+  return Number.isFinite(want) ? Math.max(deep, want) : deep;
+}
+
+/**
  * The tail tip's y for a bubble (view or world units, y down).
  *  want    the tip over the speaker's art, offsets applied
  *  minTip  the highest tip that keeps the bubble's top in view
  *  maxTip  the lowest tip still in view
  *  artTop  the top of the speaker's art; feet its feet
  *  below   the tip when hung under the feet; belowFits whether that fits
+ *          (or the px to spare below, negative when it does not fit)
+ *  deepest the lowest tip pushed over the speaker (deepestSpeechTip; default its middle)
+ *  keep    the side the bubble holds (false over, true under), null for a new one:
+ *          it leaves that side only when it misses there by `margin`
  * Returns { tip, flip }.
  */
-export function placeSpeechTip({ want, minTip, maxTip, artTop, feet, below, belowFits }) {
+export function placeSpeechTip({ want, minTip, maxTip, artTop, feet, below, belowFits, deepest, keep = null, margin = SPEECH_HOLD_MARGIN }) {
   const top = Math.min(minTip, maxTip);
+  const spare = typeof belowFits === 'number' ? belowFits : belowFits ? 0 : -Infinity;
+  const fitsBelow = spare >= (keep === true ? -margin : keep === false ? margin : 0);
+  if (keep === true && fitsBelow) return { tip: below, flip: true };
   if (want >= top) return { tip: Math.min(want, maxTip), flip: false };
   // Pushed down over the speaker, as far as the client would and while the
-  // tail still points at the upper half of the art.
+  // tail still points at the speaker's top (deepest).
   const middle = Number.isFinite(artTop) && Number.isFinite(feet) ? (artTop + feet) / 2 : Infinity;
-  if (top - want <= SPEECH_PUSH_LIMIT && top <= middle) return { tip: top, flip: false };
-  if (belowFits) return { tip: below, flip: true };
+  const deep = Number.isFinite(deepest) ? deepest : middle;
+  const slack = keep === false ? margin : 0;
+  if (top - want <= SPEECH_PUSH_LIMIT + slack && top <= deep + slack) return { tip: top, flip: false };
+  if (fitsBelow) return { tip: below, flip: true };
   return { tip: top, flip: false };
+}
+
+/** The tip on a side the bubble holds (holdSpeechSide): under the feet, or over the speaker kept in view. */
+export function speechTipOnSide(flip, { want, minTip, maxTip, below }) {
+  if (flip) return { tip: below, flip: true };
+  return { tip: Math.max(Math.min(minTip, maxTip), Math.min(want, maxTip)), flip: false };
+}
+
+/**
+ * Which side a bubble shows this frame. `hold` is the bubble's own record ({ side, since, flips });
+ * `want` the side its placement asks for now. A new bubble takes `want`; a change waits SPEECH_HOLD_MS
+ * of asking, and after SPEECH_MAX_FLIPS only a `forced` one (the held side cannot be drawn) goes.
+ */
+export function holdSpeechSide(hold, want, now, { forced = false, delayMs = SPEECH_HOLD_MS, maxFlips = SPEECH_MAX_FLIPS } = {}) {
+  if (hold.side === undefined || hold.side === null) {
+    hold.side = want;
+    hold.since = null;
+    hold.flips = 0;
+    return want;
+  }
+  if (want === hold.side) {
+    hold.since = null;
+    return hold.side;
+  }
+  if (hold.since === null || hold.since === undefined) hold.since = now;
+  if (now - hold.since >= delayMs && ((hold.flips || 0) < maxFlips || forced)) {
+    hold.side = want;
+    hold.since = null;
+    hold.flips = (hold.flips || 0) + 1;
+  }
+  return hold.side;
 }
 
 /** The first row (0 = top) of a w x h alpha array with any pixel over OPAQUE_ALPHA, or -1. */
@@ -120,11 +191,25 @@ export function opaqueTopOf(texture, read = readFrameAlpha) {
   return top;
 }
 
+/**
+ * Texels per frame unit of a texture's image: 3 for a sheet drawn from its @3x file
+ * (js/sprite-hires.js keeps frames in 1x units on a resolution-3 source), else 1.
+ * Reading a 3x image with 1x frame coordinates measured the wrong corner: a Chicken's
+ * art came out 3 px tall and its bubble sat on it (Austin 2026-11-01).
+ */
+export function texelsPerUnit(source, image) {
+  const logical = Number(source?.width) || 0;
+  const px = Number(image?.width) || 0;
+  if (logical > 0 && px > 0) return px / logical;
+  return Number(source?.resolution) > 0 ? Number(source.resolution) : 1;
+}
+
 function readFrameAlpha(texture) {
   const res = texture?.source?.resource;
   const f = texture?.frame;
   if (!res || !f || !(f.width > 0) || !(f.height > 0) || typeof document === 'undefined') return null;
   if (res.complete === false || !(res.width > 0)) return null;
+  const k = texelsPerUnit(texture.source, res);
   try {
     scratch ||= document.createElement('canvas');
     const w = Math.ceil(f.width);
@@ -133,7 +218,7 @@ function readFrameAlpha(texture) {
     if (scratch.height < h) scratch.height = h;
     const ctx = scratch.getContext('2d', { willReadFrequently: true });
     ctx.clearRect(0, 0, w, h);
-    ctx.drawImage(res, f.x, f.y, f.width, f.height, 0, 0, w, h);
+    ctx.drawImage(res, f.x * k, f.y * k, f.width * k, f.height * k, 0, 0, w, h);
     const data = ctx.getImageData(0, 0, w, h).data;
     return { alpha: data.subarray(3), w, h, stride: 4 };
   } catch {
@@ -294,10 +379,11 @@ function overlaps(a, b, margin) {
  * `how: 'over'`, and game.js fades the column under it instead.
  * Returns { dx, tip, flip, how } (dx moves the bubble's x).
  */
-export function clearSpeechOfBox({ left, width, height, tip, flip = false, speakerX, feet, box, viewWidth, viewBottom, margin = SPEECH_HUD_MARGIN, edge = 12 }) {
+export function clearSpeechOfBox({ left, width, height, tip, flip = false, speakerX, feet, deepest, box, viewWidth, viewBottom, margin = SPEECH_HUD_MARGIN, edge = 12, prefer = null, hold = SPEECH_HOLD_MARGIN }) {
   if (!box || !(box.right > box.left) || !(box.bottom > box.top)) return null;
   const now = speechBubbleRect({ left, width, height, tip, flip });
-  if (!overlaps(now, box, margin)) return null;
+  // Moved last frame (`prefer`, its `how`): it stays moved until it clears by the hold margin too.
+  if (!overlaps(now, box, margin + (prefer ? hold : 0))) return null;
   const reaches = (l) => !Number.isFinite(speakerX) || (speakerX >= l + SPEECH_TAIL_TIP_INSET && speakerX <= l + width - SPEECH_TAIL_TIP_INSET);
   const options = [];
   for (const l of [box.right + margin, box.left - margin - width]) {
@@ -306,7 +392,9 @@ export function clearSpeechOfBox({ left, width, height, tip, flip = false, speak
     }
   }
   const downTip = box.bottom + margin + height + SPEECH_TAIL_HEIGHT;
-  if (downTip <= viewBottom && (!Number.isFinite(feet) || downTip <= feet)) {
+  // Never down over the speaker past its deepest tip (a short one's top), else its feet.
+  const lowest = Number.isFinite(deepest) ? deepest : feet;
+  if (downTip <= viewBottom && (!Number.isFinite(lowest) || downTip <= lowest)) {
     options.push({ dx: 0, tip: downTip, flip: false, how: 'below', cost: Math.abs(downTip - height - SPEECH_TAIL_HEIGHT - now.top) });
   }
   const underTip = Number.isFinite(feet) ? feet + 6 : NaN;
@@ -314,6 +402,10 @@ export function clearSpeechOfBox({ left, width, height, tip, flip = false, speak
     options.push({ dx: 0, tip: underTip, flip: true, how: 'under', cost: Math.abs(underTip - now.top) });
   }
   if (!options.length) return { dx: 0, tip, flip, how: 'over' };
+  // The way it went last frame wins unless another is shorter by the hold margin (no left/right flicker).
+  for (const o of options) {
+    if (prefer && o.how === prefer.how && (o.how !== 'beside' || Math.sign(o.dx) === Math.sign(prefer.dx || 0))) o.cost -= hold;
+  }
   options.sort((a, b) => a.cost - b.cost);
   const { cost, ...best } = options[0];
   return best;
@@ -378,23 +470,33 @@ export const SPEECH_SLIDE_LIMIT = 100;
 export function slideOffAvatars({
   left, width, height, tip, speakerX, avatars,
   minLeft = -Infinity, maxRight = Infinity,
-  limit = SPEECH_SLIDE_LIMIT, margin = SPEECH_AVATAR_MARGIN,
+  limit = SPEECH_SLIDE_LIMIT, margin: gap = SPEECH_AVATAR_MARGIN,
+  prefer = 0, hold = SPEECH_HOLD_MARGIN,
 }) {
+  // `prefer`: the slide it had last frame. A slid bubble keeps a wider berth (the hold margin) and its
+  // side while that side is within the margin of the shortest, so a head moving by a few px never
+  // swaps it left and right or drops it back on the head.
+  const margin = gap;
+  const stay = prefer ? gap + hold : gap;
   const bottom = tip - SPEECH_TAIL_HEIGHT;
   const top = bottom - height;
   const heads = (avatars || []).filter((a) => a && a.right > a.left && a.bottom > a.top
-    && bottom > a.top - margin && top < a.bottom);
-  const covers = (dx) => heads.some((a) => left + dx + width > a.left - margin && left + dx < a.right + margin);
-  if (!covers(0)) return { dx: 0, covered: false };
+    && bottom > a.top - stay && top < a.bottom);
+  const near = (dx, m) => heads.filter((a) => left + dx + width > a.left - m && left + dx < a.right + m);
+  const covers = (dx) => near(dx, margin).length > 0;
+  if (!near(0, stay).length) return { dx: 0, covered: false };
   // The tail's tip stays on the speaker, inside the body (placeSpeechTail's inset).
   const lo = Math.max(-limit, minLeft - left, speakerX - (left + width - SPEECH_TAIL_TIP_INSET));
   const hi = Math.min(limit, maxRight - width - left, speakerX - (left + SPEECH_TAIL_TIP_INSET));
   const tries = [];
   for (const a of heads) tries.push(a.right + margin - left, a.left - margin - width - left);
+  // Where it was slid to, while that still clears every head.
+  if (prefer) tries.push(prefer);
   let best = null;
+  const cost = (dx) => Math.abs(dx) - (prefer && Math.sign(dx) === Math.sign(prefer) ? hold : 0);
   for (const dx of tries) {
     if (dx < lo || dx > hi || covers(dx)) continue;
-    if (best === null || Math.abs(dx) < Math.abs(best)) best = dx;
+    if (best === null || cost(dx) < cost(best)) best = dx;
   }
   return best === null ? { dx: 0, covered: true } : { dx: best, covered: false };
 }
