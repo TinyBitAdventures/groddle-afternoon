@@ -27,12 +27,27 @@
  *   lists what it applied in this feature's slice, which the site reads to
  *   drop them. The owner reads a line for each ("Bo petted your Piggy.").
  *
+ * - Rocks and resource nodes (MPVISIT, rules in js/yard-stock-mp.js): the
+ *   owner's cultivated rocks are drawn as minable rocks and their Peat Bogs,
+ *   Dirt Piles, Mortar Barnacles and Jellisacs as resource nodes, from the
+ *   site's view of them now (chunks, stock). A swing or a harvest asks the
+ *   server first (home_yard, after the swing has played, as shared street
+ *   objects do); the site rolls the chunks, takes the stock, wears the
+ *   cultivation, fills the owner's Magic Rock and credits the yield to the
+ *   visitor's ledger; on its go-ahead the game's own verb runs with the
+ *   site's chunks (sharedVerbGrant). The visitor's own side (pick, Mining I,
+ *   energy, tools, daily limits) refuses locally first. Everyone at that
+ *   home sees the rock or node change; the owner's game takes the chunks off
+ *   its rock, the use off its node and the wear off its cultivation.
+ *
  * Multiplayer only (engine.mode and the realtime client): solo never runs any
  * of it.
  *
  * QA: window.groddleYard in multiplayer: state(), act(what, verb) with what
  * 'plot:<key>' | 'tree:<key>' | 'animal:<id>', standNear(what), refresh();
- * canvas data yardVisit (owner:patches:trees:animals), yardLast,
+ * act('rock:rock:0', 'mine') / act('node:node:peat_1:0', 'harvest');
+ * canvas data yardVisit (owner:patches:trees:animals:rocks:nodes), yardStock
+ * (rock:0=43,node:peat_1:0=3: the copies), yardLast,
  * yardApplied (acts applied to my home), yardSent (acts the site took).
  */
 
@@ -42,9 +57,9 @@ import { woodTreeStatusLabel } from '../woodcutting.js?v=38730935';
 import { animalStatusLabel } from '../animals.js?v=0b84b6a9';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=bb8b2151';
-import { readVisitScene } from '../neighbours-mp.js?v=31a75688';
+import { readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { STREET_GROUND_Y } from './homes-feature.js?v=792fc4b8';
+import { STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=36561c92';
 import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=09e87d4d';
 import {
   YARD_STREET,
@@ -61,8 +76,22 @@ import {
   treeSnapshot,
   visitorAnimalState,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=30dcd023';
+} from '../yard-verbs-mp.js?v=44dc8ff1';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=e356fe60';
+import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=a08218e0';
+import { getGameDayKey } from '../game-day.js?v=edb00566';
+import { rockReady } from '../street-objects.js?v=6be84aa7';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=34465cfa';
+import {
+  ROCK_RESPAWN_MS,
+  STOCK_NODE_VERBS,
+  STOCK_TEXT,
+  applyStockAct,
+  normalizeStockView,
+  visitorNode,
+  visitorRock,
+} from '../yard-stock-mp.js?v=f83f17de';
 
 export { YARD_VERBS_MP_ID };
 
@@ -70,6 +99,8 @@ const CLASS_PLOT = 'mp_yard_plot';
 const WOOD_SHEET = Object.freeze({ url: 'assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.png', fw: 88, fh: 138, count: 6 });
 const SCAN_MS = 300;
 const OWN_FETCH_MS = 30000;
+const ASK_MS = 8000;
+const STOCK_TEXT_BUSY = 'Someone is already on it. Try again in a moment.';
 
 /** The site's routes for this feature (the cookie with its REST nonce, refreshed once when stale). */
 function createSite() {
@@ -136,7 +167,8 @@ function createSession(engine, client) {
 
   function publish() {
     const v = visit;
-    engine.setData?.('yardVisit', v ? `${v.owner}:${v.plots.size}:${v.trees.size}:${v.animals.size}` : '');
+    engine.setData?.('yardVisit', v ? `${v.owner}:${v.plots.size}:${v.trees.size}:${v.animals.size}:${v.rocks.size}:${v.nodes.size}` : '');
+    engine.setData?.('yardStock', v ? stockView() : '');
     engine.setData?.('yardLast', last);
     engine.setData?.('yardApplied', String(appliedCount));
     engine.setData?.('yardSent', String(sentOk));
@@ -150,7 +182,7 @@ function createSession(engine, client) {
 
   function clearVisit() {
     if (!visit) return;
-    for (const map of [visit.plots, visit.trees, visit.animals]) {
+    for (const map of [visit.plots, visit.trees, visit.animals, visit.rocks]) {
       for (const e of map.values()) {
         if (e.target) engine.unregister?.(e.target);
         if (e.sprite && !e.sprite.destroyed) e.sprite.destroy();
@@ -283,11 +315,183 @@ function createSession(engine, client) {
 
   function draw(view, tsid, name) {
     clearVisit();
-    visit = { owner: view.owner, name, tsid, view, plots: new Map(), trees: new Map(), animals: new Map() };
+    visit = { owner: view.owner, name, tsid, view, plots: new Map(), trees: new Map(), animals: new Map(), rocks: new Map(), nodes: new Map() };
     const hx = houseX(view);
     view.patches.forEach((p, i) => drawPatch(p, hx + p.rx, i));
     for (const row of view.animals) drawAnimal(row);
+    for (const row of view.stock.rocks) drawRock(row, hx + row.rx);
+    spawnNodes(view, hx);
     publish();
+  }
+
+  // —— MPVISIT: the owner's rocks and resource nodes on a visit ——
+
+  /** A minable rock, drawn as game.js spawnMineRock draws one (its own target: no street rock slot). */
+  function drawRock(row, x) {
+    const { PIXI } = engine;
+    const def = ROCK_CATALOG[row.classId];
+    if (!def) return;
+    const rock = visitorRock(row);
+    const root = new PIXI.Container();
+    root.x = x;
+    root.y = STREET_GROUND_Y;
+    root.zIndex = itemZ(def.classTsid, 9.5);
+    root.eventMode = 'static';
+    root.cursor = 'pointer';
+    root.hitArea = new PIXI.Rectangle(-48, -90, 96, 92);
+    root._mineHitW = 96;
+    root._mineHitH = 90;
+    const frames = engine.textures?.[def.textureKey]?.frames || [];
+    const base = textureFromUrl(`${def.worldSheet}?v=exact-rock-cells-1`);
+    const spr = new PIXI.Sprite(frames[0] || base);
+    spr.anchor.set(0.5, 1);
+    spr.scale.set(0.85);
+    spr.eventMode = 'none';
+    root.addChild(spr);
+    Object.assign(root, { rockSprite: spr, rockFrames: frames, rockFrameW: def.frameWidth, rockFrameH: def.frameHeight, rockBaseTex: base });
+    engine.entityLayer.addChild(root);
+    const target = engine.register({ classId: def.classTsid, label: def.label, subtitle: rockStatusLabel(rock), sprite: root, state: { rock }, yardVisit: { kind: 'rock', id: row.id } });
+    engine.refreshRock?.(target);
+    visit.rocks.set(row.id, { id: row.id, classId: def.classTsid, rock, sprite: root, target });
+  }
+
+  /**
+   * The owner's nodes through the resource-nodes feature, as homes-feature
+   * spawns them on the owner's own street, with a slot of their own (the
+   * site's stock, the visitor's own daily counts) that never reaches the
+   * visitor's save.
+   */
+  function spawnNodes(view, hx) {
+    const rows = view.stock.nodes;
+    if (!rows.length) return;
+    const slot = { nodes: {} };
+    const dayKey = getGameDayKey(Date.now());
+    const population = { resourceNodeClasses: [] };
+    const points = {};
+    for (const row of rows) {
+      const cls = row.key.split(':')[0];
+      slot.nodes[row.key] = visitorNode(row, view.mine, dayKey);
+      population.resourceNodeClasses.push(row.classTsid);
+      (points[`resource:${cls}`] ||= []).push({ x: hx + row.rx, y: STREET_GROUND_Y + row.dy });
+      visit.nodes.set(row.id, { id: row.id, key: row.key, cls, target: null, node: null, refresh: null, ready: null });
+    }
+    const shim = Object.create(engine, {
+      population: { value: population },
+      placement: { value: (key) => points[key] || [] },
+      streetSlot: { value: (id, tsid) => (id === 'resource-nodes' && tsid == null ? slot : engine.streetSlot?.(id, tsid)) },
+    });
+    resourceNodesFeature.onStreetEnter({ tsid: visit.tsid }, shim);
+  }
+
+  /** The node entities the resource feature drew (it may draw after its art loads): marked as this visit's. */
+  function bindNodes() {
+    if (!visit?.nodes.size) return;
+    for (const row of resourceNodesFeature.streetResourceNodes(engine) || []) {
+      const e = visit.nodes.get(`node:${row.key}`);
+      if (!e || !row.target || e.target === row.target) continue;
+      Object.assign(e, { target: row.target, node: row.node, refresh: row.refresh, ready: row.ready });
+      row.target.yardVisit = { kind: 'node', id: e.id };
+    }
+  }
+
+  /** QA: the copies (rock:0=43, node:peat_1:0=3). */
+  function stockView() {
+    const out = [];
+    for (const r of visit.rocks.values()) out.push(`${r.id}=${r.rock.depleted ? 0 : r.rock.chunksRemaining}`);
+    for (const n of visit.nodes.values()) if (n.node) out.push(`${n.id}=${n.node.units}`);
+    return out.join(',');
+  }
+
+  /** A copy follows the site's word: a rock's chunks left, a node's uses left (a mined-out rock reforms). */
+  function setLeft(kind, id, left, at = Date.now()) {
+    if (!visit || !Number.isInteger(left)) return;
+    if (kind === 'rock') {
+      const r = visit.rocks.get(id);
+      if (!r) return;
+      r.rock.chunksRemaining = left;
+      if (left <= 0) {
+        if (!r.rock.depleted) r.rock.respawnAt = at + ROCK_RESPAWN_MS;
+        r.rock.depleted = true;
+      } else {
+        r.rock.depleted = false;
+        r.rock.respawnAt = 0;
+      }
+      engine.refreshRock?.(r.target);
+      return;
+    }
+    const n = visit.nodes.get(id);
+    if (!n?.node) return;
+    n.node.units = left;
+    const def = getResourceNodeDef(n.node.classTsid);
+    if (def?.regrow && left < def.stock.max) n.node.regrowAt = at + regrowDelayMs(def);
+    n.refresh?.();
+  }
+
+  // —— A visitor's swing or harvest asks first ——
+
+  let grant = null;
+
+  function askStock(target, verbId) {
+    const v = target?.yardVisit;
+    if (!visit || !v) return null;
+    if (grant && grant.target === target && grant.verbId === verbId) return null;
+    const base = String(verbId || '').split(':')[0];
+    if (base === 'talk_to') return null;
+    let verb;
+    if (v.kind === 'rock') {
+      if (base !== 'mine') return notMine();
+      // The visitor's own side refuses locally, as in solo (a pick, Mining I, energy; a mined-out rock).
+      if (target.state?.rock?.depleted || !rockReady(target.state?.rock, { inv: engine.inv, pc: engine.pc, learned: engine.learnedSkills || [], toolState: engine.toolState })) return null;
+      verb = 'mine';
+    } else {
+      const e = visit.nodes.get(v.id);
+      if (!e || base !== STOCK_NODE_VERBS[e.cls]) return notMine();
+      if (!e.ready?.(verbId)) return null;
+      verb = base;
+    }
+    if (client.state !== 'online') {
+      notice(T.offline);
+      return true;
+    }
+    for (const a of sent.values()) {
+      if (a.stock && a.id === v.id) {
+        notice(STOCK_TEXT_BUSY, 1600);
+        return true;
+      }
+    }
+    req += 1;
+    sent.set(req, { owner: visit.owner, kind: v.kind, id: v.id, verb, stock: true, target, verbId, at: Date.now() });
+    client.send('home_yard', { req, owner: visit.owner, kind: v.kind, id: v.id, verb });
+    last = `sent:${v.kind}:${v.id}:${verb}`;
+    publish();
+    return true;
+  }
+
+  function notMine() {
+    notice(T.notYours(visit.name), 2400);
+    return true;
+  }
+
+  /** The site said yes: the game's own verb runs on the copy with the site's chunks, then the copy takes the site's word. */
+  function runGranted(ask, msg) {
+    const act = msg.act || {};
+    const took = Math.max(0, Math.floor(Number(act.took) || 0));
+    const t = ask.target;
+    if (ask.kind === 'rock' && t?.state?.rock) {
+      // The state the site decided from: never a refusal here for a rock the copy thought mined out.
+      if (t.state.rock.depleted || t.state.rock.chunksRemaining <= 0) Object.assign(t.state.rock, { depleted: false, respawnAt: 0, chunksRemaining: Math.max(1, took) });
+    } else if (ask.kind === 'node') {
+      const n = visit?.nodes.get(ask.id)?.node;
+      const def = getResourceNodeDef(n?.classTsid);
+      if (n && def) n.units = Math.max(Number(n.units) || 0, def.stock.harvestableAt);
+    }
+    grant = { target: t, verbId: ask.verbId, chunks: ask.kind === 'rock' && took > 0 ? took : undefined };
+    try {
+      engine.executeVerb?.(t, ask.verbId, { animated: true });
+    } finally {
+      grant = null;
+    }
+    setLeft(ask.kind, ask.id, act.left, Number(act.at) || Date.now());
   }
 
   async function loadVisit(tsid) {
@@ -295,7 +499,9 @@ function createSession(engine, client) {
     if (!scene || scene.room !== 'street' || loading === tsid) return;
     loading = tsid;
     try {
-      const view = normalizeYardView(await site.yard(scene.owner));
+      const answer = await site.yard(scene.owner);
+      const view = normalizeYardView(answer);
+      if (view) view.stock = normalizeStockView(answer);
       if (view && engine.streetTsid === tsid) draw(view, tsid, view.name || 'someone');
     } catch (err) {
       console.warn('[yard]', err?.message || err);
@@ -309,9 +515,23 @@ function createSession(engine, client) {
     if (!visit) return;
     const tsid = visit.tsid;
     try {
-      const view = normalizeYardView(await site.yard(visit.owner));
+      const answer = await site.yard(visit.owner);
+      const view = normalizeYardView(answer);
       if (!view || !visit || visit.tsid !== tsid) return;
+      view.stock = normalizeStockView(answer);
       visit.view = view;
+      for (const row of view.stock.rocks) {
+        const r = visit.rocks.get(row.id);
+        if (!r) continue;
+        Object.assign(r.rock, visitorRock(row));
+        engine.refreshRock?.(r.target);
+      }
+      for (const row of view.stock.nodes) {
+        const n = visit.nodes.get(row.id);
+        if (!n?.node) continue;
+        Object.assign(n.node, visitorNode(row, view.mine, getGameDayKey(Date.now())));
+        n.refresh?.();
+      }
       for (const p of view.patches) {
         const e = visit.plots.get(p.key);
         if (e && p.plot.stage !== 'tree') {
@@ -439,6 +659,21 @@ function createSession(engine, client) {
   client.on('msg:home_yard_done', (msg) => {
     const ask = sent.get(Number(msg.req));
     sent.delete(Number(msg.req));
+    if (ask?.stock && visit && Number(msg.owner) === visit.owner && engine.streetTsid === visit.tsid) {
+      if (msg.status === 'settled') {
+        sentOk += 1;
+        last = `ok:${ask.kind}:${ask.id}:${ask.verb}:${Number(msg.added) || 0}:${Number(msg.act?.took) || 0}`;
+        runGranted(ask, msg);
+        if (Number(msg.added) > 0 && ask.target?.sprite) engine.floatText?.(ask.target.sprite.x, ask.target.sprite.y - 130, T.pool(Number(msg.added)), 0xb388ff);
+      } else {
+        last = `no:${ask.kind}:${ask.id}:${ask.verb}:${msg.why || ''}`;
+        notice(msg.text || T.failed);
+        engine.playSound?.('CLICK_FAILURE', { volume: 0.45 });
+        refreshVisit();
+      }
+      publish();
+      return;
+    }
     if (msg.status === 'settled') {
       sentOk += 1;
       last = `ok:${ask?.kind}:${ask?.id}:${ask?.verb}:${Number(msg.added) || 0}`;
@@ -461,6 +696,11 @@ function createSession(engine, client) {
     }
     // Someone else's act on the yard I am visiting: my copy follows.
     if (!visit || Number(msg.owner) !== visit.owner) return;
+    if (act.kind === 'rock' || act.kind === 'node') {
+      if (Number(msg.from?.id) !== me()) setLeft(act.kind, act.target, act.left, act.at);
+      publish();
+      return;
+    }
     const plots = {};
     for (const [k, e] of visit.plots) plots[k] = e.plot;
     for (const [k, tr] of visit.trees) plots[k] = { stage: 'tree', tree: { classId: tr.classId, state: tr.state, resetAt: 0 } };
@@ -487,6 +727,12 @@ function createSession(engine, client) {
     return { plots: patches.plots || {}, animals: Array.isArray(husbandry.animals) ? husbandry.animals : [] };
   }
 
+  function stockEntry(kind, id) {
+    if (kind === 'rock') return visit?.rocks.get(id) || null;
+    if (kind === 'node') return visit?.nodes.get(id) || null;
+    return null;
+  }
+
   function onMyStreet() {
     const home = engine.homeContext?.() || {};
     return Boolean(home.inHome) && engine.streetTsid === YARD_STREET;
@@ -499,6 +745,10 @@ function createSession(engine, client) {
     const slots = ownSlots();
     const here = onMyStreet();
     for (const act of fresh) {
+      if (act.kind === 'rock' || act.kind === 'node') {
+        applyOwnStock(act, here);
+        continue;
+      }
       const changed = applyYardAct(slots, act);
       appliedCount += 1;
       last = `applied:${act.kind}:${act.target}:${act.verb}`;
@@ -529,6 +779,33 @@ function createSession(engine, client) {
     return fresh.length;
   }
 
+  /** MPVISIT: a visitor's swing or harvest on my street: off my rock or node, and one use off its cultivation. */
+  function applyOwnStock(act, here) {
+    const cult = homesFeature._state?.().cult;
+    const world = engine.streetWorld?.(YARD_STREET);
+    const nodesSlot = engine.streetSlot?.('resource-nodes', YARD_STREET) || {};
+    if (!nodesSlot.nodes || typeof nodesSlot.nodes !== 'object') nodesSlot.nodes = {};
+    appliedCount += 1;
+    last = `applied:${act.kind}:${act.target}:${act.verb}`;
+    if (!cult || !world) return;
+    const changed = applyStockAct({ rocks: world.rocks, nodes: nodesSlot.nodes, items: cult.items }, act);
+    if (!changed) return;
+    // A home rock wears a use a swing, as the owner's own (homes-feature wearFromEvent); nodes wear from their harvests (wearFromNodes).
+    if (changed.kind === 'rock' && changed.wearItem != null) wearHomeCultivation(engine, changed.wearItem, 1);
+    const line = STOCK_TEXT.acted(act.from.name, act.verb, changed.what);
+    lastLine = line;
+    engine.pushActivity?.(line);
+    if (!here) return;
+    notice(line, 3600);
+    if (changed.kind === 'rock') {
+      const t = (engine.interactables || []).find((it) => it.state?.rock === changed.rock);
+      if (t) engine.refreshRock?.(t);
+    } else {
+      const row = (resourceNodesFeature.streetResourceNodes(engine) || []).find((r) => r.node === changed.node);
+      row?.refresh?.();
+    }
+  }
+
   async function loadOwn() {
     if (ownBusy) return;
     ownBusy = true;
@@ -543,6 +820,23 @@ function createSession(engine, client) {
   }
 
   // —— Ticking ——
+
+  /** Mined-out rocks reform on the copy; an ask with no answer is dropped. */
+  function tickStock() {
+    const wall = Date.now();
+    for (const [r, a] of sent) {
+      if (a.stock && wall - a.at > ASK_MS) {
+        sent.delete(r);
+        notice(T.failed, 2400);
+      }
+    }
+    if (!visit) return;
+    for (const r of visit.rocks.values()) {
+      if (tickMineRock(r.rock, wall)) engine.refreshRock?.(r.target);
+      else if (r.rock.depleted) r.target.subtitle = rockStatusLabel(r.rock);
+    }
+    publish();
+  }
 
   function stepAnimals(dtMs) {
     if (!visit) return;
@@ -569,6 +863,10 @@ function createSession(engine, client) {
 
   return {
     get visit() { return visit; },
+    askStock,
+    grantFor(target, verbId) {
+      return grant && grant.target === target && grant.verbId === verbId ? { chunks: grant.chunks } : null;
+    },
     get applied() { return applied; },
     verbsFor,
     runVerb,
@@ -581,6 +879,8 @@ function createSession(engine, client) {
       if (now - scanAt >= SCAN_MS) {
         scanAt = now;
         scan();
+        bindNodes();
+        tickStock();
       }
       const home = onMyStreet();
       if ((home && !wasHome) || (!ownAt && engine.started)) loadOwn();
@@ -594,7 +894,7 @@ function createSession(engine, client) {
     act(what, verbId) {
       const [kind, ...rest] = String(what).split(':');
       const id = rest.join(':');
-      const e = kind === 'plot' ? visit?.plots.get(id) : kind === 'tree' ? visit?.trees.get(id) : visit?.animals.get(id);
+      const e = stockEntry(kind, id) || (kind === 'plot' ? visit?.plots.get(id) : kind === 'tree' ? visit?.trees.get(id) : visit?.animals.get(id));
       if (!e?.target) return false;
       const verbs = engine.targetVerbs?.(e.target) || verbsFor(e.target);
       if (!verbId) return verbs.map((v) => `${v.id}${v.enabled === false ? '!' : ''}`);
@@ -605,10 +905,11 @@ function createSession(engine, client) {
     standNear(what) {
       const [kind, ...rest] = String(what).split(':');
       const id = rest.join(':');
-      const e = kind === 'plot' ? visit?.plots.get(id) : kind === 'tree' ? visit?.trees.get(id) : visit?.animals.get(id);
+      const e = stockEntry(kind, id) || (kind === 'plot' ? visit?.plots.get(id) : kind === 'tree' ? visit?.trees.get(id) : visit?.animals.get(id));
+      const spr = e?.sprite || e?.target?.sprite;
       const p = engine.player;
-      if (!p || !e?.sprite) return false;
-      p.x = e.sprite.x - 40;
+      if (!p || !spr) return false;
+      p.x = spr.x - 40;
       p.vx = 0;
       return true;
     },
@@ -622,6 +923,7 @@ function createSession(engine, client) {
         trees: visit ? Object.fromEntries([...visit.trees].map(([k, t]) => [k, treeSnapshot(t.state)])) : {},
         plots: visit ? Object.fromEntries([...visit.plots].map(([k, e]) => [k, e.plot.stage])) : {},
         animals: visit ? Object.fromEntries([...visit.animals].map(([k, a]) => [k, animalUses(a.classId, a.state)])) : {},
+        stock: visit ? stockView() : '',
         applied: applied.length,
         appliedCount,
         sentOk,
@@ -670,6 +972,8 @@ export const yardVerbsMpFeature = {
   decorateVerbs(target, verbs) {
     const v = visitTarget(target);
     if (!v || v.kind === 'plot') return null;
+    if (v.kind === 'rock') return verbs.filter((row) => ['mine', 'talk_to'].includes(String(row.id || '').split(':')[0]));
+    if (v.kind === 'node') return verbs;
     const ok = new Set(allowedVerbs(v.kind, target.classId));
     return verbs.filter((row) => ok.has(String(row.id || '').split(':')[0]));
   },
@@ -678,9 +982,16 @@ export const yardVerbsMpFeature = {
   runVerbOverride(target, verbId, engine) {
     const v = visitTarget(target);
     if (!v || v.kind === 'plot') return null;
+    // MPVISIT: a swing or a harvest asks the site first (null: the local rules answer, a talk_to or a refusal).
+    if (v.kind === 'rock' || v.kind === 'node') return session.askStock(target, verbId);
     if (allowedVerbs(v.kind, target.classId).includes(String(verbId).split(':')[0])) return null;
     engine?.toast?.(T.notYours(session.visit.name), 2400);
     return true;
+  },
+
+  /** game.js runVerb / resource-nodes verbContext: the site's chunks for the swing it just allowed. */
+  sharedVerbGrant(target, verbId) {
+    return session ? session.grantFor(target, verbId) : null;
   },
 
   save() {

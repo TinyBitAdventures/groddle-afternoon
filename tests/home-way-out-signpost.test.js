@@ -17,8 +17,8 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { getVerbsFor } from '../public/content.js?v=5be63ce2';
 import { SIGN_FIRST_ARM_Y, SIGN_POST_W, SIGN_SCALE } from '../public/js/street-render.js?v=b5ae0c3d';
-import { WAY_OUT_ARM, WAY_OUT_HIT, wayOutTarget } from '../public/js/features/homes-feature.js?v=792fc4b8';
-import { FRIENDS_HIT_H } from '../public/js/features/home-street-mp-feature.js?v=01c6d246';
+import { WAY_OUT_ARM, WAY_OUT_HIT, wayOutTarget } from '../public/js/features/homes-feature.js?v=36561c92';
+import { FRIENDS_HIT_H } from '../public/js/features/home-street-mp-feature.js?v=5b9ec8de';
 import {
   SIGNPOST_POST_HALF,
   createCultivationState,
@@ -216,7 +216,7 @@ describe('online: a visitor\'s way out and the owner\'s', () => {
   const mp = read('js/features/neighbours-mp-feature.js');
 
   it('a visitor sees the same one post: its top arm Back to Ur takes them back where they came from', () => {
-    assert.match(mp, /const built = visitorHomeScene\(engine, visit\.view, room, \{ returnLabel: wayOutOf\(visit\.returnTo\)\.label \}\);/);
+    assert.match(mp, /const built = visitorHomeScene\(engine, visit\.view, room, \{ returnLabel: wayOutOf\(visit\.returnTo\)\.label(, floor, via)? \}\);/);
     assert.match(mp, /t\.gate = engine\.register\(\{ classId: CLASS_GATE, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'Back to Ur', subtitle: `\$\{way\.label\}/);
     assert.match(mp, /if \(target\.classId === CLASS_GATE\) return \[\{ id: 'go_back'/);
     assert.match(mp, /else if \(verbId === 'go_back'\) goBack\(\);/);

@@ -51,11 +51,11 @@ import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { signArmWidth, signLabel } from '../street-render.js?v=b5ae0c3d';
 import { openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
-import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=31a75688';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=792fc4b8';
+import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?v=a8d5544e';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=36561c92';
 import { projectApi } from './street-jobs-feature.js?v=cd496fad';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=c7932fe1';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=030a2d16';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,
@@ -86,7 +86,7 @@ import {
   saleVerbs,
   signpostArms,
   signpostCandidates,
-} from '../home-street-mp.js?v=0fc12d80';
+} from '../home-street-mp.js?v=4039f2d5';
 
 export { HOME_STREET_MP_ID };
 

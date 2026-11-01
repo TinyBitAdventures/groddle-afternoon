@@ -144,7 +144,9 @@ describe('ceiling furniture hangs over the avatars (FG_FURN)', () => {
     assert.match(homes, /back: make\(FURNITURE_Z, 'home-furniture'\), front: make\(FURNITURE_FRONT_Z, 'home-furniture-front'\)/);
     // Your rooms (house, upper floors, tower floors) and a neighbour's (visitorHomeScene) all split.
     assert.equal([...homes.matchAll(/scene\.furnitureFrontLayer = layers\.front;/g)].length, 3);
-    assert.match(homes, /export function visitorHomeScene[\s\S]{0,1800}const layers = addFurnitureLayers\(eng, x0\);[\s\S]{0,400}furnitureHolder\(layers, item\)\.addChild\(box\);/);
+    assert.match(homes, /export function visitorHomeScene[\s\S]{0,4000}const layers = addFurnitureLayers\(eng, x0\);[\s\S]{0,400}furnitureHolder\(layers, item\)\.addChild\(box\);/);
+    // A visitor on a floor of the owner's Tower (MPVISIT) splits the same way.
+    assert.match(homes, /if \(room === 'tower'\) \{[\s\S]{0,2200}const layers = addFurnitureLayers\(eng, 0\);[\s\S]{0,200}furnitureHolder\(layers, item\)\.addChild\(box\);/);
     // A press finds the hanging piece first.
     assert.match(homes, /function furnitureAt\(point\) \{[\s\S]{0,300}top\.filter\(furnitureDrawsInFront\)/);
   });

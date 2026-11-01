@@ -188,8 +188,8 @@ import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playP
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
 import { projectApi } from './street-jobs-feature.js?v=cd496fad';
-import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=b05c58d8';
-import { towerApi } from './home-tower-feature.js?v=51a24401';
+import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=b05c58d8';
+import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=7ce20566';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=e676f00f';
 import { wantsHiresDecos } from '../deco-hires.js?v=cb905e17';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=34465cfa';
@@ -5167,6 +5167,16 @@ function wearItem(engine, id, n = 1, st = activeCult()) {
   return result;
 }
 
+/**
+ * MPVISIT (features/yard-verbs-mp-feature.js): a visitor's swing at a rock on
+ * my home street wears its cultivation as my own swing does (wearFromEvent);
+ * a worn-out one turns into its proto. Returns addWear's answer, or null.
+ */
+export function wearHomeCultivation(engine, itemId, n = 1) {
+  if (!cult.items.some((row) => row.id === Number(itemId) && !row.depleted)) return null;
+  return wearItem(engine, Number(itemId), n, cult);
+}
+
 function wearFromNodes(engine, now) {
   if (!scene || (scene.room !== 'street' && !inHouse()) || now - lastNodeCheck < 2000) return;
   lastNodeCheck = now;
@@ -5508,11 +5518,16 @@ function runRestoreAutoplay(engine) {
 // Another player's home, for a visitor (G328, multiplayer)
 // ---------------------------------------------------------------------------
 
-/** G328: the homes slice a visitor is shown, normalized as restore() does (no Tower floors, no rock). */
+/** G328: the homes slice a visitor is shown, normalized as restore() does (no rock; MPVISIT: the Tower and its floors). */
 export function visitorHomeState(view = {}) {
   const slice = view?.homes && typeof view.homes === 'object' ? view.homes : {};
   const style = ['meadow', 'firebog', 'uralia'].includes(view?.home?.style) ? view.home.style : 'meadow';
+  const tower = normalizeTowerState(slice.tower || {});
   return {
+    tower,
+    towerDecor: (Array.isArray(slice.towerDecor) ? slice.towerDecor : [])
+      .slice(0, TOWER_CONFIG.MAX_FLOORS)
+      .map((row) => normalizeHomeDecorState({ ...row, wallSegments: TOWER_GEO.wallSegments, layout: 'tower', starterKit: true })),
     style,
     decor: normalizeHomeDecorState(slice.decor || {}),
     cult: normalizeCultivationState(slice.cult || {}),
@@ -5565,14 +5580,22 @@ function rockStill(PIXI, endClass) {
  * and hives, worn-out protos, and gardens with their crops (the garden path,
  * detached, a copy of the owner's plots). Display only: the visitor's
  * features own none of it (features/neighbours-mp-feature.js answers their
- * menus). Patches, resource nodes and the Tower are not drawn yet.
+ * menus). On the home street (`opts.liveRocks`) the rocks are left to
+ * yard-verbs-mp-feature, which draws them and the resource nodes as the
+ * site has them, to mine and harvest; Patches are that feature's too.
  */
-function drawVisitorYard(engine, st, groundY, houseX) {
+function drawVisitorYard(engine, st, groundY, houseX, opts = {}) {
   const { PIXI } = engine;
   const layer = engine.entityLayer;
   const targets = [];
   for (const item of st.items) {
     const def = cultivationDef(item.protoClass);
+    if (def?.kind === 'tower' && opts.tower) {
+      // MPVISIT: the owner's Tower (built: its chassis and sign; else the scaffolding).
+      const built = item.endClass === TOWER_CHASSIS && opts.tower.built;
+      opts.towerSpot = { box: visitorTowerView(engine, opts.tower, { x: houseX + item.rx, groundY, built }), built };
+      continue;
+    }
     if (!def || def.kind === 'tower') continue;
     const x = houseX + item.rx;
     if (item.depleted) {
@@ -5590,6 +5613,8 @@ function drawVisitorYard(engine, st, groundY, houseX) {
       continue;
     }
     if (def.kind === 'rock') {
+      // MPVISIT: the home street's rocks are minable on a visit (yard-verbs-mp-feature draws them).
+      if (opts.liveRocks) continue;
       const spr = rockStill(PIXI, item.endClass);
       spr.x = x;
       spr.y = groundY;
@@ -5644,6 +5669,46 @@ export function visitorHomeScene(engine, view = {}, room = 'street', opts = {}) 
   const shim = Object.create(engine, {
     homeContext: { value: () => ({ inHome: false, room, owned: true, style: v.style, returnLabel: opts.returnLabel || '', unread: 0 }) },
   });
+  if (room === 'tower') {
+    // MPVISIT: a floor of the owner's Tower (towerFloorScene, read-only: furniture_base's verbs are the owner's).
+    const floor = Math.max(0, Math.min(Math.max(0, v.tower.floors - 1), Math.floor(Number(opts.floor) || 0)));
+    return withOwnersHome(v, () => {
+      decor = v.towerDecor[floor] || createHomeDecorState({
+        wall: TOWER_CONFIG.START_TEXTURE_WALL,
+        floor: TOWER_CONFIG.START_TEXTURE_FLOOR,
+        ceiling: TOWER_CONFIG.START_TEXTURE_CEILING,
+        wallSegments: TOWER_GEO.wallSegments,
+        layout: 'tower',
+        starterKit: true,
+      });
+      const floorDecorNow = decor;
+      const background = interiorBackground(shim, {});
+      const width = interiorWidth(floorDecorNow);
+      const furniture = renderOrder(floorDecorNow).map((item) => ({ ...item }));
+      return {
+        width,
+        height: background.worldH,
+        groundY: GROUND_Y,
+        background,
+        platforms: background.platformsScreen,
+        // tower_get_teleport_point (w - 150) from outside; the elevator (x 200) between floors.
+        spawnX: opts.via === 'elevator' ? TOWER_GEO.elevatorX + 70 : TOWER_GEO.arriveX,
+        floor,
+        populate(eng) {
+          const { PIXI } = eng;
+          const layers = addFurnitureLayers(eng, 0);
+          furniture.forEach((item, i) => {
+            const box = furnitureView(PIXI, item);
+            box.zIndex = i;
+            furnitureHolder(layers, item).addChild(box);
+          });
+          const elevator = drawTowerElevator(eng, { floor, groundY: GROUND_Y });
+          const exit = floor === 0 ? drawTowerExit(eng, { doorX: TOWER_GEO.exitX, groundY: GROUND_Y }) : null;
+          return { elevator, exit, gardens: [] };
+        },
+      };
+    });
+  }
   if (room === 'interior') {
     return withOwnersHome(v, () => {
       const background = interiorBackground(shim, { yard: true });
@@ -5720,8 +5785,9 @@ export function visitorHomeScene(engine, view = {}, room = 'street', opts = {}) 
         gate.y = STREET_GROUND_Y + 2;
         gate.zIndex = 20;
         eng.entityLayer.addChild(gate);
-        const gardens = drawVisitorYard(eng, st, STREET_GROUND_Y, layout.houseX);
-        return { door, gate, mailbox, gardens };
+        const yardOpts = { liveRocks: true, tower: v.tower };
+        const gardens = drawVisitorYard(eng, st, STREET_GROUND_Y, layout.houseX, yardOpts);
+        return { door, gate, mailbox, gardens, tower: yardOpts.towerSpot || null };
       },
     };
   });

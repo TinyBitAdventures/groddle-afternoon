@@ -674,6 +674,8 @@ function answered(engine, msg, ok) {
 function ask(engine, target, verbId) {
   if (engine.mode !== 'multiplayer') return null;
   if (grant && grant.target === target && grant.verbId === verbId) return null;
+  // A visited home street's rocks and nodes are the owner's (yard-verbs-mp-feature asks the site), never this server's street objects.
+  if (target?.yardVisit) return null;
   const c = bind(engine);
   if (!c || LOCAL_STATES.has(c.state)) return null;
   // A private place (home, quest room, instance): nobody shares it.

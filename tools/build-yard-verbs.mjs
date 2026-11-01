@@ -23,6 +23,15 @@
  * - soil: how long a tended Patch stays clean and a dug one stays dug
  *   (patch.js setClean / setDug, js/patches.js SOIL_TIMERS).
  * - fruit: each tree's fruit class (items/trant_*.js fruit_class).
+ * - rocks, nodes, cult, life (MPVISIT, js/yard-stock-mp.js): each rock's
+ *   chunks and roll (js/mining.js ROCK_CATALOG) and its reform time; each
+ *   node's stock, regrow steps, a visitor's verb, the yield the site credits
+ *   and its daily limit (js/resource-nodes.js RESOURCE_NODE_CATALOG); which
+ *   cultivations are rocks and nodes, their max wear and the nodes each
+ *   carries (js/homes-catalog.js CULTIVATION_CLASSES); the lifespan step a
+ *   restore adds (js/home-cultivation.js). The pool gains the rock-clear and
+ *   node amounts (include/mining.js 388-401, peat_1.js:301, dirt_pile.js:470,
+ *   mortar_barnacle.js:304, jellisac.js:234).
  *
  *   node tools/build-yard-verbs.mjs           writes the site repo's data/yard-verbs.json
  *   node tools/build-yard-verbs.mjs --check   exits 1 when it is stale
@@ -36,7 +45,7 @@ import { requireSite, sitePath } from './repos.mjs';
 export const OUT = sitePath('data', 'yard-verbs.json');
 
 export async function yardVerbsJson() {
-  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=30dcd023');
+  const { YARD_POOL, YARD_AK_ITEMS } = await import('../public/js/yard-verbs-mp.js?v=44dc8ff1');
   const { ANIMAL_KINSHIP_PACKAGES } = await import('../public/js/animal-kinship.js?v=3a50bfb2');
   const { ARBOROLOGY_HARVEST, TRANT_META } = await import('../public/js/trants.js?v=9c2e8c0f');
   const { SOIL_SKILL_PACKAGES, SOIL_TIMERS } = await import('../public/js/patches.js?v=d8f9ceff');
@@ -44,10 +53,31 @@ export async function yardVerbsJson() {
   const arbor = Object.values(ARBOROLOGY_HARVEST).map((r) => `{"skill":${JSON.stringify(r.skillId)},"l":${r.intervalLimit},"b":${r.bonusAmount}}`);
   const dig = Object.entries(SOIL_SKILL_PACKAGES.dig_patch).map(([id, r]) => `{"skill":${JSON.stringify(id === 'no_skill' ? null : id)},"b":${r.bonus_amount}}`);
   const fruit = Object.keys(TRANT_META).sort().map((id) => `${JSON.stringify(id)}:${JSON.stringify(TRANT_META[id].fruitClass)}`);
-  const pool = Object.keys(YARD_POOL).sort().map((key) => `${JSON.stringify(key)}:${YARD_POOL[key]}`);
+  const { STOCK_POOL, STOCK_NODE_CLASSES, STOCK_NODE_VERBS, STOCK_NODE_YIELD, ROCK_RESPAWN_MS } = await import('../public/js/yard-stock-mp.js?v=f83f17de');
+  const { ROCK_CATALOG } = await import('../public/js/mining.js?v=e356fe60');
+  const { RESOURCE_NODE_CATALOG } = await import('../public/js/resource-nodes.js?v=a08218e0');
+  const { CULTIVATION_CLASSES } = await import('../public/js/homes-catalog.js?v=29713fa8');
+  const { LIFESPAN_STEP, MAX_LIFE_STEPS } = await import('../public/js/home-cultivation.js?v=bb8b2151');
+  const allPool = { ...YARD_POOL, ...STOCK_POOL };
+  const pool = Object.keys(allPool).sort().map((key) => `${JSON.stringify(key)}:${allPool[key]}`);
+  const rocks = Object.keys(ROCK_CATALOG).sort().map((id) => {
+    const d = ROCK_CATALOG[id];
+    return `${JSON.stringify(id)}:{"type":${JSON.stringify(d.rockType)},"chunk":${JSON.stringify(d.chunkId)},"min":${d.minChunks},"max":${d.maxChunks},"chunks":${d.chunksMax}}`;
+  });
+  const nodes = [...STOCK_NODE_CLASSES].sort().map((id) => {
+    const d = RESOURCE_NODE_CATALOG[id];
+    const st = d.stock;
+    const lim = d.dailyLimit && d.dailyLimit.verb === STOCK_NODE_VERBS[id] ? `{"base":${d.dailyLimit.base},"upgrades":${JSON.stringify(d.dailyLimit.upgrades)}}` : 'null';
+    return `${JSON.stringify(id)}:{"verb":${JSON.stringify(STOCK_NODE_VERBS[id])},"min":${st.min},"max":${st.max},"initial":${st.initial},"ready":${st.harvestableAt},"after":${st.afterHarvest ?? 'null'},"consume":${st.consume ?? 1},"regrow":[${d.regrow.minMs},${d.regrow.maxMs},${d.regrow.stepMs || 1000}],"yield":${JSON.stringify(STOCK_NODE_YIELD[id])},"daily":${lim}}`;
+  });
+  const cult = Object.keys(CULTIVATION_CLASSES).sort().filter((id) => ['rock', 'node'].includes(CULTIVATION_CLASSES[id].kind)).map((id) => {
+    const d = CULTIVATION_CLASSES[id];
+    const ns = (d.nodes || []).map((n) => [String(n.classTsid).startsWith('peat_') ? 'peat_1' : n.classTsid, n.dx, n.dy]);
+    return `${JSON.stringify(id)}:{"kind":${JSON.stringify(d.kind)},"maxWear":${d.maxWear},"nodes":${JSON.stringify(ns)}}`;
+  });
   const items = Object.keys(YARD_AK_ITEMS).sort().map((key) => `${JSON.stringify(key)}:${JSON.stringify(YARD_AK_ITEMS[key])}`);
-  const doc = 'Written by groddle-afternoon game tools/build-yard-verbs.mjs from js/yard-verbs-mp.js, js/animal-kinship.js, js/trants.js and js/patches.js: pool the Magic Rock iMG a visitor act adds, ak the Animal Kinship daily limit l and items b per rank 0..7, akItems what those items are, arbor and dig the harvest and dig rows by skill, soil the Patch timers in ms, fruit each tree\'s fruit.';
-  return `{"_doc":${JSON.stringify(doc)},\n"pool":{${pool.join(',')}},\n"ak":{\n${ak.join(',\n')}},\n"akItems":{${items.join(',')}},\n"arbor":[${arbor.join(',')}],\n"dig":[${dig.join(',')}],\n"soil":{"cleanRegrowMs":${SOIL_TIMERS.cleanRegrowMs},"dugFillMs":${SOIL_TIMERS.dugFillMs}},\n"fruit":{${fruit.join(',')}}}\n`;
+  const doc = 'Written by groddle-afternoon game tools/build-yard-verbs.mjs from js/yard-verbs-mp.js, js/animal-kinship.js, js/trants.js and js/patches.js: pool the Magic Rock iMG a visitor act adds, ak the Animal Kinship daily limit l and items b per rank 0..7, akItems what those items are, arbor and dig the harvest and dig rows by skill, soil the Patch timers in ms, fruit each tree\'s fruit; rocks, nodes and cult the home street\'s rocks and resource nodes (js/yard-stock-mp.js, js/mining.js, js/resource-nodes.js, js/homes-catalog.js), life the lifespan step a restore adds.';
+  return `{"_doc":${JSON.stringify(doc)},\n"pool":{${pool.join(',')}},\n"ak":{\n${ak.join(',\n')}},\n"akItems":{${items.join(',')}},\n"arbor":[${arbor.join(',')}],\n"dig":[${dig.join(',')}],\n"soil":{"cleanRegrowMs":${SOIL_TIMERS.cleanRegrowMs},"dugFillMs":${SOIL_TIMERS.dugFillMs}},\n"fruit":{${fruit.join(',')}},\n"rocks":{${rocks.join(',')}},"respawnMs":${ROCK_RESPAWN_MS},\n"nodes":{\n${nodes.join(',\n')}},\n"cult":{${cult.join(',')}},\n"life":{"step":${LIFESPAN_STEP},"max":${MAX_LIFE_STEPS}}}\n`;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

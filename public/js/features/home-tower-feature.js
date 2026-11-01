@@ -292,6 +292,72 @@ function drawExterior(engine, box) {
 }
 
 /**
+ * MPVISIT: another player's Tower on their home street, for a visitor
+ * (homes-feature visitorHomeScene): the built chassis and its name sign from
+ * the owner's Tower as the site sends it (normalizeTowerState), or the
+ * scaffolding while it is a proto. Draws nothing of this player's own Tower
+ * and touches none of this module's state. Returns the container.
+ */
+export function visitorTowerView(engine, towerState, { x, groundY, built }) {
+  const { PIXI } = engine;
+  const box = new PIXI.Container();
+  box.x = x;
+  box.y = groundY + 6;
+  box.zIndex = 6;
+  if (built && towerState?.built) {
+    box.addChild(chassisContainer(PIXI, towerState.style, extraFloors(towerState), towerState.config, towerState.facingRight));
+    if (towerState.name) {
+      const sign = nameSign(PIXI, towerState.name);
+      sign.x = towerFacingX(TOWER_SIGN.dx, towerState.facingRight);
+      sign.y = TOWER_SIGN.dy;
+      box.addChild(sign);
+    }
+  } else {
+    box.addChild(protoSprite(PIXI, protoArtState(0)));
+  }
+  engine.entityLayer.addChild(box);
+  return box;
+}
+
+/** MPVISIT: the elevator column and its floor mark, as spawnFloor draws them (for a visitor's floor). */
+export function drawTowerElevator(engine, { floor, groundY }) {
+  const { PIXI } = engine;
+  const lift = new PIXI.Sprite(textureFromUrl(pieceUrl('signpost_asset_elevator_tower', hires(engine))));
+  lift.anchor.set(0.5, 1);
+  lift.width = 180;
+  lift.height = 514;
+  lift.x = 90;
+  lift.y = groundY + 43 + 28;
+  lift.zIndex = 5;
+  engine.entityLayer.addChild(lift);
+  const bound = groundY + 43 + 28;
+  const mark = new PIXI.Text({ text: elevatorMark(floor), style: {
+    fontFamily: 'Georgia, "Times New Roman", serif', fontSize: Math.round(ELEVATOR_MARK.capH / 0.7), fill: 0x2f2f2f,
+  } });
+  mark.anchor.set(0.5, 0);
+  mark.x = ELEVATOR_MARK.x;
+  mark.y = bound - ELEVATOR_MARK.footAboveBound - ELEVATOR_MARK.capH - (mark.height - ELEVATOR_MARK.capH) * 0.42;
+  mark.alpha = 0.85;
+  mark.zIndex = 6;
+  engine.entityLayer.addChild(mark);
+  return lift;
+}
+
+/** MPVISIT: the ground floor's exit door (tower_build_exit), for a visitor's floor. */
+export function drawTowerExit(engine, { doorX, groundY }) {
+  const { PIXI } = engine;
+  const door = new PIXI.Sprite(textureFromUrl(pieceUrl('door_asset_entry_basic', hires(engine))));
+  door.anchor.set(0.5, 1);
+  door.width = 75;
+  door.height = 236;
+  door.x = doorX;
+  door.y = groundY + 43 + 28 - 53;
+  door.zIndex = 8;
+  engine.entityLayer.addChild(door);
+  return door;
+}
+
+/**
  * homes-feature spawnCultivations: draw the Tower (proto or built) at its
  * cultivation spot. The Magic Rock is homes-feature's (G231).
  */

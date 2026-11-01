@@ -25,6 +25,13 @@
 export const HOME_STREET_PREFIX = 'HOME_';
 /** The realtime server's street for a player's house. */
 export const HOUSE_STREET_PREFIX = 'HOUSE_';
+/**
+ * MPVISIT: a floor of a home's Tower, TOWER_<id>_<floor>. The source's Tower
+ * is a public home location (locations/tower.js:2-22): anyone the owner has
+ * not blocked may enter (inc_pols.js:452-458) and ride its elevator to every
+ * floor (tower.js:584-620). The remake's floors are rooms of their own.
+ */
+export const TOWER_STREET_PREFIX = 'TOWER_';
 /** The scene tsid a visitor stands in on someone's home street or in their house. */
 export const VISIT_SCENE_PREFIX = 'MPH_';
 
@@ -114,35 +121,46 @@ function positiveId(value) {
   return Number.isInteger(n) && n > 0 ? n : 0;
 }
 
-/** The realtime server's street for a home: HOME_<id> or HOUSE_<id>. */
-export function homeStreetFor(ownerId, room = 'street') {
+function towerFloorOf(value) {
+  const n = Number(value);
+  return Number.isInteger(n) && n >= 0 && n <= 9 ? n : 0;
+}
+
+/** The realtime server's street for a home: HOME_<id>, HOUSE_<id>, or TOWER_<id>_<floor>. */
+export function homeStreetFor(ownerId, room = 'street', floor = 0) {
   const id = positiveId(ownerId);
   if (!id) return '';
+  if (room === 'tower') return `${TOWER_STREET_PREFIX}${id}_${towerFloorOf(floor)}`;
   return `${room === 'interior' ? HOUSE_STREET_PREFIX : HOME_STREET_PREFIX}${id}`;
 }
 
-/** The visit scene's tsid (engine.enterScene): MPH_<id> on the street, MPH_<id>_IN in the house. */
-export function visitSceneTsid(ownerId, room = 'street') {
+/** The visit scene's tsid (engine.enterScene): MPH_<id> on the street, MPH_<id>_IN in the house, MPH_<id>_T<n> on a Tower floor. */
+export function visitSceneTsid(ownerId, room = 'street', floor = 0) {
   const id = positiveId(ownerId);
   if (!id) return '';
+  if (room === 'tower') return `${VISIT_SCENE_PREFIX}${id}_T${towerFloorOf(floor)}`;
   return `${VISIT_SCENE_PREFIX}${id}${room === 'interior' ? '_IN' : ''}`;
 }
 
-/** { owner, room } a visit scene tsid names, or null. */
+/** { owner, room, floor? } a visit scene tsid names, or null. */
 export function readVisitScene(tsid) {
-  const m = /^MPH_([1-9]\d{0,17})(_IN)?$/.exec(String(tsid || ''));
-  return m ? { owner: Number(m[1]), room: m[2] ? 'interior' : 'street' } : null;
+  const m = /^MPH_([1-9]\d{0,17})(_IN|_T\d)?$/.exec(String(tsid || ''));
+  if (!m) return null;
+  if (m[2]?.startsWith('_T')) return { owner: Number(m[1]), room: 'tower', floor: Number(m[2].slice(2)) };
+  return { owner: Number(m[1]), room: m[2] ? 'interior' : 'street' };
 }
 
 /**
  * The street others share with the player now (realtime-feature's
  * realtimeStreet query): someone's home they visit, or their own home when
- * they are there (a Tower floor stays private, as the source's tower was its
- * own location nobody was let into).
+ * they are there. A Tower floor is TOWER_<id>_<floor> for its owner and its
+ * visitors alike (MPVISIT); an upper house floor stays the owner's own room.
  */
-export function sharedHomeStreet({ visit = null, me = 0, inHome = false, room = 'street', towerFloor = false } = {}) {
-  if (visit?.owner) return homeStreetFor(visit.owner, visit.room);
-  if (!inHome || !positiveId(me) || towerFloor) return '';
+export function sharedHomeStreet({ visit = null, me = 0, inHome = false, room = 'street', towerFloor = false, ownTowerFloor = null } = {}) {
+  if (visit?.owner) return homeStreetFor(visit.owner, visit.room, visit.floor);
+  if (!inHome || !positiveId(me)) return '';
+  if (Number.isInteger(ownTowerFloor) && ownTowerFloor >= 0) return homeStreetFor(me, 'tower', ownTowerFloor);
+  if (towerFloor) return '';
   return homeStreetFor(me, room === 'interior' ? 'interior' : 'street');
 }
 

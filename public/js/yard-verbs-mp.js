@@ -30,6 +30,7 @@ import { trantFruitCycle } from './trant-care.js?v=4084db6e';
 import { resetTrantDay } from './trants.js?v=9c2e8c0f';
 import { GROWN_TREE_LABELS, SOIL_TIMERS } from './patches.js?v=d8f9ceff';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=edb00566';
+import { isNodeId, isRockId } from './yard-stock-mp.js?v=f83f17de';
 
 export const YARD_VERBS_MP_ID = 'yard-verbs-mp';
 /** js/features/homes-feature.js HOME_STREET_TSID: where an owner's save keeps the home street. */
@@ -209,11 +210,15 @@ export function normalizeYardActs(list) {
   const out = [];
   for (const a of Array.isArray(list) ? list : []) {
     if (!/^yd-[0-9a-f]{16}$/.test(String(a?.id || ''))) continue;
-    if (!['animal', 'plot', 'tree'].includes(a.kind)) continue;
-    if (a.kind === 'animal' ? !isAnimalId(a.target) : !isPlotKey(a.target)) continue;
+    if (!['animal', 'plot', 'tree', 'rock', 'node'].includes(a.kind)) continue;
+    const okTarget = { animal: isAnimalId, rock: isRockId, node: isNodeId }[a.kind] || isPlotKey;
+    if (!okTarget(a.target)) continue;
     if (!/^[a-z]{2,8}$/.test(String(a.verb || ''))) continue;
     const from = { id: Number(a.from?.id) || 0, name: String(a.from?.name || 'Someone').slice(0, 40) };
-    out.push({ id: a.id, from, kind: a.kind, target: a.target, verb: a.verb, took: Math.max(0, Math.floor(Number(a.took) || 0)), at: Number(a.at) || Date.now() });
+    const row = { id: a.id, from, kind: a.kind, target: a.target, verb: a.verb, took: Math.max(0, Math.floor(Number(a.took) || 0)), at: Number(a.at) || Date.now() };
+    // MPVISIT: a rock's chunks or a node's uses left once the act landed (the site's word, for the copies).
+    if (Number.isInteger(a.left) && a.left >= 0) row.left = a.left;
+    out.push(row);
   }
   return out;
 }

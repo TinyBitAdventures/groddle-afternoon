@@ -61,10 +61,20 @@
  *   owner's hosted_party (crowded_house, house_party: locations/home.js:55-66,
  *   told by the server).
  *
- * A visited street's Patches, trees and animals and their visitor verbs are
- * features/yard-verbs-mp-feature.js; the Magic Rock's daily iMG from visitors
- * is features/home-pool-mp-feature.js. Not yet: resource nodes and the Tower
- * on a visited street.
+ * A visited street's Patches, trees, animals, rocks and resource nodes and
+ * their visitor verbs are features/yard-verbs-mp-feature.js; the Magic
+ * Rock's daily iMG from visitors is features/home-pool-mp-feature.js.
+ *
+ * The Tower (MPVISIT): the owner's Tower stands on their street as they
+ * built it (homes-feature visitorHomeScene, from the site's copy of their
+ * Tower and its floors). The source's Tower is a public home location: anyone
+ * the owner has not blocked may Enter it (locations/tower.js:2-22,
+ * inc_pols.js:452-458) and ride the elevator to every floor (its signposts
+ * lead back into the Tower with no check, tower.js:584-620). Its furniture
+ * stays the owner's: furniture_base's pickup, flip, upgrade and style are
+ * the owner's alone (furniture_tower_chassis.js:64-339), so a visitor looks.
+ * Each floor is TOWER_<id>_<floor> on the realtime server, the owner's too,
+ * so the owner and visitors on a floor see each other.
  *
  * QA: canvas data neighboursVisit (owner:room), neighboursKeys (given/received
  * counts), neighboursLast, neighboursButler (the visitor Butler: name@x),
@@ -81,8 +91,8 @@ import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=bb8b2
 import { tickGarden } from '../garden.js?v=d605b654';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=e81817d9';
 import { normalizeButlerParts } from '../butler.js?v=337d934d';
-import { butlerApi } from './butler-feature.js?v=962e1166';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=792fc4b8';
+import { butlerApi } from './butler-feature.js?v=efa6c115';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=36561c92';
 import {
   BUTLER_MESSAGE_MAX,
   KEY_VERB,
@@ -120,8 +130,9 @@ import {
   tendedText,
   TENDED_KEEP,
   visitSceneTsid,
-} from '../neighbours-mp.js?v=31a75688';
+} from '../neighbours-mp.js?v=a8d5544e';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
+import { elevatorStops, towerLabel } from '../home-tower.js?v=b05c58d8';
 
 export const NEIGHBOURS_MP_FEATURE_ID = 'neighbours-mp';
 const OWN_VERBS = new Set([VISIT_VERB.id, KEY_VERB.id, 'neighbour_noop']);
@@ -129,6 +140,9 @@ const BUTLER_VERB_IDS = new Set(Object.values(BV).map((v) => v.id));
 const CLASS_DOOR = 'mp_home_door';
 const CLASS_GATE = 'mp_home_gate';
 const CLASS_FRONT = 'mp_home_front_door';
+const CLASS_TOWER = 'mp_home_tower';
+const CLASS_LIFT = 'mp_home_tower_elevator';
+const CLASS_TOWER_EXIT = 'mp_home_tower_exit';
 
 const STYLE = `
 .keys-shade { position: fixed; inset: 0; z-index: var(--z-screen); display: grid; place-items: center; padding: var(--sp-8); background: color-mix(in srgb, var(--c-sage-23) 45%, transparent); }
@@ -204,7 +218,7 @@ function createSession(engine, client) {
   const me = () => Number(client.me?.id) || 0;
 
   function publish() {
-    engine.setData?.('neighboursVisit', visit ? `${visit.owner}:${visit.room}` : '');
+    engine.setData?.('neighboursVisit', visit ? `${visit.owner}:${visit.room}${visit.room === 'tower' ? `:${visit.floor}` : ''}` : '');
     engine.setData?.('neighboursKeys', keys ? `${keys.given.length}/${keys.received.length}` : '');
     engine.setData?.('neighboursLast', last);
     engine.setData?.('neighboursAllow', visitors ? String(visitors.allow === true) : '');
@@ -299,15 +313,18 @@ function createSession(engine, client) {
   }
 
   /** The visit scene for a room, through the loading card. */
-  async function show(room, { arrive = '' } = {}) {
+  async function show(room, { arrive = '', floor = 0, via = '' } = {}) {
     if (!visit) return;
-    const built = visitorHomeScene(engine, visit.view, room, { returnLabel: wayOutOf(visit.returnTo).label });
-    const label = room === 'interior' ? houseName(visit.name) : homeStreetName(visit.name);
-    const x = arrive === 'door' && room === 'street' ? built.doorX + 70 : built.spawnX;
+    const built = visitorHomeScene(engine, visit.view, room, { returnLabel: wayOutOf(visit.returnTo).label, floor, via });
+    const tower = room === 'tower' ? visitorHomeState(visit.view).tower : null;
+    const stop = tower ? elevatorStops(tower).find((row) => row.index === built.floor) : null;
+    const label = room === 'interior' ? houseName(visit.name) : room === 'tower' ? `${possessive(visit.name)} ${towerLabel(tower)}` : homeStreetName(visit.name);
+    let x = arrive === 'door' && room === 'street' ? built.doorX + 70 : built.spawnX;
+    if (arrive === 'tower' && room === 'street' && Number.isFinite(visit.towerX)) x = visit.towerX + 60;
     const scene = {
-      tsid: visitSceneTsid(visit.owner, room),
+      tsid: visitSceneTsid(visit.owner, room, built.floor),
       label,
-      hubName: 'Homes',
+      hubName: stop ? stop.label : 'Homes',
       width: built.width,
       height: built.height,
       background: built.background,
@@ -320,12 +337,13 @@ function createSession(engine, client) {
     const setup = () => {
       if (!visit) return;
       visit.room = room;
+      visit.floor = room === 'tower' ? built.floor : 0;
       engine.enterScene(scene);
       vb = null;
       const spots = built.populate(engine);
       registerTargets(room, spots);
       // HOMES3 (features/home-street-mp-feature.js): the signpost, Note Poles, furniture for sale and restorations here.
-      engine.query?.('homeStreetVisit', { owner: visit.owner, name: visit.name, room, key: visit.key, view: visit.view, built, spots }, engine);
+      if (room !== 'tower') engine.query?.('homeStreetVisit', { owner: visit.owner, name: visit.name, room, key: visit.key, view: visit.view, built, spots }, engine);
       if (room === 'street') {
         spawnVisitorButler(built.groundY);
         // location.js:160-168: another player's home street (not their house), one label per street.
@@ -341,7 +359,7 @@ function createSession(engine, client) {
         fromHub: from.hub,
         toLabel: label,
         toHub: 'Homes',
-        pol: { type: room === 'interior' ? 'interior' : 'exterior', ownerName: visit.name },
+        pol: { type: room === 'street' ? 'exterior' : 'interior', ownerName: visit.name },
         onMid: setup,
       });
     }
@@ -354,6 +372,17 @@ function createSession(engine, client) {
       // GATESIGN2: the signpost's top arm, Back to Ur; its tip the street the visitor came from.
       const way = wayOutOf(visit.returnTo);
       t.gate = engine.register({ classId: CLASS_GATE, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'Back to Ur', subtitle: `${way.label}${way.hubName && way.hubName !== way.label ? `, ${way.hubName}` : ''}`, sprite: spots.gate, state: { owner: visit.owner } });
+      // MPVISIT: the owner's built Tower: Enter (furniture_tower_chassis enter; the owner's customize and flip are left off).
+      visit.towerX = spots.tower?.box?.x;
+      if (spots.tower?.built) {
+        const tw = visitorHomeState(visit.view).tower;
+        t.tower = engine.register({ classId: CLASS_TOWER, featureId: NEIGHBOURS_MP_FEATURE_ID, label: `${possessive(visit.name)} ${towerLabel(tw)}`, subtitle: `${tw.floors} floors`, sprite: spots.tower.box, state: { owner: visit.owner } });
+      }
+    } else if (room === 'tower') {
+      const tw = visitorHomeState(visit.view).tower;
+      const here = elevatorStops(tw).find((row) => row.index === visit.floor);
+      t.lift = engine.register({ classId: CLASS_LIFT, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'Elevator', subtitle: `${here?.label || 'Ground Floor'} · ${towerStops(tw).length} stops`, sprite: spots.elevator, state: { owner: visit.owner } });
+      if (spots.exit) t.exit = engine.register({ classId: CLASS_TOWER_EXIT, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'Exit', subtitle: `Back to ${homeStreetName(visit.name)}`, sprite: spots.exit, state: { owner: visit.owner } });
     } else {
       t.front = engine.register({ classId: CLASS_FRONT, featureId: NEIGHBOURS_MP_FEATURE_ID, label: 'Front Door', subtitle: `Back to ${homeStreetName(visit.name)}`, sprite: spots.door, state: { owner: visit.owner } });
     }
@@ -799,6 +828,29 @@ function createSession(engine, client) {
     show('street', { arrive: 'door' });
   }
 
+  /** MPVISIT: the floors a visitor may ride to (not one still being built: its Workbench is the owner's project). */
+  function towerStops(tw) {
+    return elevatorStops(tw).filter((row) => !row.construction);
+  }
+
+  function enterTower() {
+    if (!visit || visit.room !== 'street') return;
+    if (!visitorHomeState(visit.view).tower.built) return;
+    show('tower', { floor: 0 });
+  }
+
+  function rideTo(floor) {
+    if (!visit || visit.room !== 'tower') return;
+    const stops = towerStops(visitorHomeState(visit.view).tower);
+    if (!stops.some((row) => row.index === floor) || floor === visit.floor) return;
+    show('tower', { floor, via: 'elevator' });
+  }
+
+  function leaveTower() {
+    if (!visit || visit.room !== 'tower') return;
+    show('street', { arrive: 'tower' });
+  }
+
   function knock() {
     if (!visit) return;
     if (visit.key || visit.letIn) return goInside();
@@ -1171,9 +1223,10 @@ function createSession(engine, client) {
       const home = engine.homeContext?.() || {};
       if (visit && readVisitScene(engine.streetTsid)?.owner !== visit.owner) return '';
       const scene = homesFeature._state?.().scene;
-      // A Tower floor or an upper house floor (G153, home-floors.js) is a room of its own: not the street visitors share.
-      const ownRoom = scene?.tower != null || Number(scene?.houseFloor) > 0;
-      return sharedHomeStreet({ visit, me: me(), inHome: home.inHome === true, room: home.room, towerFloor: ownRoom });
+      // An upper house floor (G153, home-floors.js) is a room of its own; a Tower floor is shared with its visitors (MPVISIT).
+      const ownRoom = Number(scene?.houseFloor) > 0;
+      const ownTowerFloor = Number.isInteger(scene?.tower) ? scene.tower : null;
+      return sharedHomeStreet({ visit, me: me(), inHome: home.inHome === true, room: home.room, towerFloor: ownRoom, ownTowerFloor });
     },
     /** The scene went away (an ordinary street, a reload): the visit is over. */
     left() {
@@ -1189,11 +1242,19 @@ function createSession(engine, client) {
       if (target.classId === CLASS_DOOR) return doorVerbs({ key: visit.key, letIn: visit.letIn, ownerName: visit.name });
       if (target.classId === CLASS_GATE) return [{ id: 'go_back', label: T.goBackVerb, tooltip: `Back to ${labelOf(visit.returnTo)}`, enabled: true, reason: '' }];
       if (target.classId === CLASS_FRONT) return [{ id: 'go_outside', label: T.outsideVerb, tooltip: `Back to ${homeStreetName(visit.name)}`, enabled: true, reason: '' }];
+      if (target.classId === CLASS_TOWER) return [{ id: 'enter_tower', label: 'enter', tooltip: `Go inside ${target.label}`, enabled: true, reason: '' }];
+      if (target.classId === CLASS_TOWER_EXIT) return [{ id: 'leave_tower', label: 'leave tower', tooltip: `Back to ${homeStreetName(visit.name)}`, enabled: true, reason: '' }];
+      if (target.classId === CLASS_LIFT) {
+        return towerStops(visitorHomeState(visit.view).tower).map((row) => ({ id: `ride:${row.index}`, label: `ride to ${row.label}`, tooltip: 'Go to another floor', enabled: row.index !== visit.floor, reason: row.index === visit.floor ? 'You are here.' : '' }));
+      }
       return [];
     },
     runVerb(target, verbId) {
       if (BUTLER_VERB_IDS.has(verbId)) return this.runButler(verbId);
-      if (verbId === 'enter') goInside();
+      if (String(verbId).startsWith('ride:')) rideTo(Number(String(verbId).slice(5)));
+      else if (verbId === 'enter_tower') enterTower();
+      else if (verbId === 'leave_tower') leaveTower();
+      else if (verbId === 'enter') goInside();
       else if (verbId === 'knock') knock();
       else if (verbId === 'go_back') goBack();
       else if (verbId === 'go_outside') goOutside();
@@ -1234,7 +1295,7 @@ function createSession(engine, client) {
       else if (what === 'garden') {
         const e = visit ? [...visit.beds.keys()][0] : (engine.interactables || []).find((t) => t.classId === 'garden_new');
         x = e?.sprite?.x;
-      }
+      } else if (['tower', 'lift', 'exit'].includes(what) && visit?.targets?.[what]) x = visit.targets[what].sprite?.x;
       if (!p || !Number.isFinite(x)) return false;
       p.x = x;
       p.vx = 0;
