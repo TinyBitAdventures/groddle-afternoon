@@ -8994,6 +8994,9 @@ html[data-street-cards] .familiar-dialog,
 .fam-learn-next::before, .fam-learn-next::after { content: ''; flex: 1; height: 1px; background: var(--c-grey-43); }
 .fam-learn-next[hidden] { display: none; }
 .fam-skill-list { display: grid; justify-content: center; column-gap: var(--sp-5); }
+.fam-skill-list[hidden] { display: none; }
+/* "Pick up where you left off" (Austin 2026-11-01): paused skills first, each with its time left. */
+.fam-skill .fam-skill-left { margin-left: 2px; color: var(--c-slate-78); font-size: var(--fs-2xs); font-weight: 600; white-space: nowrap; }
 .fam-skill-list[data-cols="2"] { grid-template-columns: repeat(2, max-content); }
 .fam-skill-list[data-cols="3"] { grid-template-columns: repeat(3, 130px); }
 .fam-skill {

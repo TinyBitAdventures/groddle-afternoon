@@ -29,7 +29,7 @@ import {
   skillLearnedModel,
   truncateLabel,
   vogLayout,
-} from '../public/js/familiar.js?v=2089ac54';
+} from '../public/js/familiar.js?v=c7e902af';
 import { CARD_ART_LAYERS } from '../public/js/imagination-data.js?v=4a85e7fe';
 import {
   _resetFamiliarDialog,
@@ -37,7 +37,7 @@ import {
   familiarDialogFeature,
   familiarDialogOpen,
   queueSkillLearned,
-} from '../public/js/features/familiar-dialog-feature.js?v=2fc8b1b5';
+} from '../public/js/features/familiar-dialog-feature.js?v=b043ef2b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');
@@ -195,6 +195,28 @@ describe('skill learned panel (G218)', () => {
     assert.equal(many.cols, 3, 'three columns past 8 (BREAK_COUNT)');
     assert.equal(many.skills[0].label, 'Transcendent...', 'StringUtil.truncate keeps 15 characters in all');
     assert.equal(truncateLabel('Short'), 'Short');
+  });
+
+  it('lists the skills started and paused first, under "Pick up where you left off" (Austin 2026-11-01)', () => {
+    const m = skillLearnedModel({
+      classTsid: 'ezcooking_1',
+      name: 'EZ Cooking I',
+      paused: [{ classTsid: 'grilling_1', name: 'Grilling I', left: '8:00' }, { classTsid: 'ezcooking_1', name: 'EZ Cooking I' }],
+      next: [{ classTsid: 'grilling_1', name: 'Grilling I' }, { classTsid: 'saucery_1', name: 'Saucery I' }],
+    });
+    assert.equal(m.resumeLabel, 'Pick up where you left off');
+    assert.deepEqual(m.resume.map((s) => [s.classTsid, s.left]), [['grilling_1', '8:00']], 'the learned skill is not offered again');
+    assert.deepEqual(m.skills.map((s) => s.classTsid), ['saucery_1'], 'a paused skill is not listed twice');
+    assert.equal(m.resumeCols, 2);
+    const none = skillLearnedModel({ classTsid: 'a_1', next: [{ classTsid: 'b_1', name: 'B' }] });
+    assert.deepEqual(none.resume, [], 'no paused skills: the heading stays hidden');
+    const game = read('game.js');
+    const info = game.slice(game.indexOf('skillLearnedInfo(classTsid) {'), game.indexOf('openSkillTree(classTsid'));
+    assert.match(info, /listStudyQueue\(skillState\)\s*\.filter\(\(row\) => row\.isPaused/);
+    assert.match(info, /\.sort\(\(a, b\) => b\.pausedAt - a\.pausedAt\)/, 'the last paused first');
+    const fx = read('js/features/familiar-dialog-feature.js');
+    assert.ok(fx.indexOf('data-fam-resume-label') < fx.indexOf('data-fam-next-label'), 'the heading sits above the usual list');
+    assert.match(fx, /resumeLabel\.hidden = !model\.resume\.length;/);
   });
 
   it('finds CC0 skill tiles and writes the source activity line', () => {

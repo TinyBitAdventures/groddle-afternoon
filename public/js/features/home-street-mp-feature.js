@@ -55,7 +55,7 @@ import { homeStreetName, possessive, readVisitScene } from '../neighbours-mp.js?
 import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=ceacbbb8';
 import { projectApi } from './street-jobs-feature.js?v=c6f9ba1f';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=7af549d0';
+import { giveCarriedNote, takeCarriedNote, writtenCarriedNotes } from './street-furniture-feature.js?v=dcc8374f';
 import {
   GOOD_NEIGHBOUR_AT,
   GOOD_NEIGHBOUR_COUNTER,

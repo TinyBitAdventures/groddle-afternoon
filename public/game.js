@@ -4,12 +4,12 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6fc15d1b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e0180af1';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8ebcb64a';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
 import { createVogOverlay } from './js/vog-overlay.js?v=c2a9cc07';
-import { createPromptStack } from './js/prompt-stack.js?v=d7843266';
+import { createPromptStack } from './js/prompt-stack.js?v=c8788aeb';
 import { createWindowStack } from './js/window-stack.js?v=be3b7274';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=8b79ff4d';
 import {
@@ -705,7 +705,7 @@ import {
   streetCardUp,
   STREET_CARD_UP,
   POL_OWNER_SIZE,
-} from './js/screen-fx.js?v=f4314526';
+} from './js/screen-fx.js?v=9d4640eb';
 import { momentMoreText } from './js/ui/moment-card.js?v=077703c8';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
 import { MODERN, onUiModeChange, uiState } from './js/classic/ui-mode.js?v=587c014a';
@@ -716,8 +716,8 @@ import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=a
 import './js/classic/classic-zoom.js?v=1ef4b9a5';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=fff73f8c';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
-import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=2089ac54';
-import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=8691416a';
+import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=c7e902af';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=c13ee4f6';
 import {
   planTravel,
   listMapDestinations,
@@ -11176,7 +11176,13 @@ const engine = {
     const next = listSkills()
       .filter((row) => canLearnSkill(skillState, row.classTsid, ctx).ok)
       .map((row) => ({ classTsid: row.classTsid, name: skillTitle(row) || row.name }));
-    return { classTsid, name: skillTitle(def) || def.name || classTsid, learned: def.learned || '', next };
+    // Austin 2026-11-01: the skills started and paused, last paused first ("Pick up where you left off").
+    const catalog = getSkillCatalog();
+    const paused = listStudyQueue(skillState)
+      .filter((row) => row.isPaused && catalog[row.classTsid])
+      .sort((a, b) => b.pausedAt - a.pausedAt)
+      .map((row) => ({ classTsid: row.classTsid, name: skillTitle(catalog[row.classTsid]) || row.classTsid, left: formatStudyTime(row.remainingSeconds) }));
+    return { classTsid, name: skillTitle(def) || def.name || classTsid, learned: def.learned || '', next, paused };
   },
   /** Open the Skills panel, focused on one skill when given (G218). */
   openSkillTree(classTsid = '') {
@@ -26619,6 +26625,19 @@ async function main() {
   }
   if (bootParams.has('quoinmult')) {
     quoinState.multiplier = clamp(Number(bootParams.get('quoinmult')) || 1, 1, 100);
+  }
+  // "Pick up where you left off" QA: `&skillpaused=<a>,<b>` starts each skill (its direct
+  // prerequisites granted) and pauses it a minute in, the last named paused last.
+  if (bootParams.has('skillpaused')) {
+    let at = Date.now();
+    for (const id of String(bootParams.get('skillpaused')).split(',')) {
+      const def = getSkillCatalog()[id];
+      if (!def || skillState.learned.includes(id)) continue;
+      for (const prereq of def.reqSkills || []) grantSkill(skillState, prereq, true);
+      if (!startSkillStudy(skillState, id, { ...skillStudyContext(), level: 99 }, at).ok) continue;
+      at += 60_000;
+      pauseSkillStudy(skillState, id, at);
+    }
   }
   // Deterministic persistent-study QA route. Direct prerequisites are granted
   // so the requested catalog skill can always be inspected in progress.

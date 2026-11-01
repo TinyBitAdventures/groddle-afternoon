@@ -236,24 +236,36 @@ export function achievementBubbleText({ status = '', name = '' } = {}) {
 export const SKILL_BREAK_COUNT = 8;
 export const SKILL_LABEL_MAX = 15;
 
-export function skillLearnedModel({ classTsid = '', name = '', learned = '', next = [] } = {}) {
-  const list = (Array.isArray(next) ? next : []).filter((s) => s && s.classTsid && s.classTsid !== classTsid);
-  const cols = list.length > SKILL_BREAK_COUNT ? 3 : 2;
+export function skillLearnedModel({ classTsid = '', name = '', learned = '', next = [], paused = [] } = {}) {
+  const usable = (rows) => (Array.isArray(rows) ? rows : []).filter((s) => s && s.classTsid && s.classTsid !== classTsid);
+  // Austin 2026-11-01: skills started and paused come first, under their own heading, then
+  // the usual list (without them). The client listed learnable skills only.
+  const resumeRows = usable(paused);
+  const resumeIds = new Set(resumeRows.map((s) => s.classTsid));
+  const list = usable(next).filter((s) => !resumeIds.has(s.classTsid));
+  const colsFor = (rows) => (rows.length > SKILL_BREAK_COUNT ? 3 : 2);
+  const rowsFor = (rows, cols) => rows.map((s) => ({
+    classTsid: s.classTsid,
+    name: String(s.name || s.classTsid),
+    label: cols === 3 ? truncateLabel(s.name || s.classTsid, SKILL_LABEL_MAX) : String(s.name || s.classTsid),
+    ...(s.left ? { left: String(s.left) } : {}),
+  }));
+  const cols = colsFor(list);
+  const resumeCols = colsFor(resumeRows);
   return {
     classTsid,
     header: 'Woohoo! New skill learned...',
     name: String(name || classTsid),
     learned: String(learned || ''),
+    resumeLabel: 'Pick up where you left off',
+    resumeCols,
+    resume: rowsFor(resumeRows, resumeCols),
     chooseLabel: 'Choose a Skill to Learn Next',
     // The client's link opened the web skill tree in a new window; here it
     // opens the Skills panel, so the "(opens in new window)" note is dropped.
     treeLabel: 'View Full Skill Tree',
     cols,
-    skills: list.map((s) => ({
-      classTsid: s.classTsid,
-      name: String(s.name || s.classTsid),
-      label: cols === 3 ? truncateLabel(s.name || s.classTsid, SKILL_LABEL_MAX) : String(s.name || s.classTsid),
-    })),
+    skills: rowsFor(list, cols),
   };
 }
 

@@ -29,7 +29,8 @@
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&familiardemo=skill
  *     (&familiarskill=<class>, default animalkinship_1; =<a>,<b> queues two)
- *     shows the panel; &familiardemo=award grants a real badge
+ *     shows the panel (&skillpaused=<a>,<b> starts and pauses those first, for "Pick up
+ *     where you left off"); &familiardemo=award grants a real badge
  *     (&familiarbadge=<id>, default betterthanlousy_douser) so the rock drops
  *     in beside it (G219). The voice-of-rock overlay (G220):
  *     &questdemo=high_jump (the High Jumper's tree-top line).
@@ -39,7 +40,7 @@
  */
 
 import { CARD_ART_LAYERS } from '../imagination-data.js?v=4a85e7fe';
-import { skillArtFor, skillLearnedModel } from '../familiar.js?v=2089ac54';
+import { skillArtFor, skillLearnedModel } from '../familiar.js?v=c7e902af';
 
 /** FamiliarDialog grow / shrink: 0.3 s (start 340-343, end 253-268). */
 export const FAMILIAR_GROW_MS = 300;
@@ -94,6 +95,8 @@ function buildRoot() {
         <p class="fam-learned-desc" data-fam-desc></p>
       </div>
     </div>
+    <p class="fam-learn-next fam-resume" data-fam-resume-label hidden><span></span></p>
+    <div class="fam-skill-list fam-resume-list" data-fam-resume></div>
     <p class="fam-learn-next" data-fam-next-label><span></span></p>
     <div class="fam-skill-list" data-fam-skills></div>
     <button type="button" class="fam-tree-link" data-fam-tree></button>`;
@@ -110,18 +113,29 @@ function render(engine, info) {
   el.querySelector('[data-fam-header]').textContent = model.header;
   el.querySelector('[data-fam-title]').textContent = model.name;
   el.querySelector('[data-fam-desc]').textContent = model.learned;
+  // Austin 2026-11-01: the skills started and paused first, under their own heading.
+  const resumeLabel = el.querySelector('[data-fam-resume-label]');
+  resumeLabel.querySelector('span').textContent = model.resumeLabel;
+  resumeLabel.hidden = !model.resume.length;
+  fillSkillList(engine, el.querySelector('[data-fam-resume]'), model.resume, model.resumeCols);
   const nextLabel = el.querySelector('[data-fam-next-label]');
   nextLabel.querySelector('span').textContent = model.chooseLabel;
   nextLabel.hidden = !model.skills.length;
-  const list = el.querySelector('[data-fam-skills]');
+  fillSkillList(engine, el.querySelector('[data-fam-skills]'), model.skills, model.cols);
+  el.querySelector('[data-fam-tree]').textContent = model.treeLabel;
+}
+
+function fillSkillList(engine, list, skills, cols) {
   list.replaceChildren();
-  list.dataset.cols = String(model.cols);
-  for (const skill of model.skills) {
+  list.dataset.cols = String(cols);
+  list.hidden = !skills.length;
+  for (const skill of skills) {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'fam-skill';
     b.dataset.skill = skill.classTsid;
-    if (skill.label !== skill.name) b.title = skill.name;
+    const tip = [skill.label !== skill.name ? skill.name : '', skill.left ? `${skill.left} left` : ''].filter(Boolean).join(': ');
+    if (tip) b.title = tip;
     const icon = document.createElement('img');
     icon.src = skillArtFor(skill.classTsid, CARD_ART_LAYERS);
     icon.alt = '';
@@ -130,11 +144,16 @@ function render(engine, info) {
     const label = document.createElement('span');
     label.textContent = skill.label;
     b.append(icon, label);
+    if (skill.left) {
+      const left = document.createElement('small');
+      left.className = 'fam-skill-left';
+      left.textContent = `${skill.left} left`;
+      b.append(left);
+    }
     // FamiliarDialog onSkillClick: the skill's details (here, the Skills panel on it).
     b.addEventListener('click', () => openTree(engine, skill.classTsid));
     list.appendChild(b);
   }
-  el.querySelector('[data-fam-tree]').textContent = model.treeLabel;
 }
 
 function openTree(engine, classTsid = '') {
