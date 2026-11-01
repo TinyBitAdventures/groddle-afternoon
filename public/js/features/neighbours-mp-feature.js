@@ -90,8 +90,8 @@ import { ITEM_CATALOG, countItem, listPackItemSlots, removeItem } from '../inven
 import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=1cfff492';
 import { tickGarden } from '../garden.js?v=854d4730';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=e81817d9';
-import { normalizeButlerParts } from '../butler.js?v=a0c80a92';
-import { butlerApi } from './butler-feature.js?v=9b96ba58';
+import { butlerPostRx, normalizeButlerParts } from '../butler.js?v=9d29b9b4';
+import { butlerApi } from './butler-feature.js?v=d2f293d5';
 import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=d388620f';
 import {
   BUTLER_MESSAGE_MAX,
@@ -539,8 +539,8 @@ function createSession(engine, client) {
     if (!b || !engine.PIXI || !engine.entityLayer) return;
     const { PIXI } = engine;
     const layout = homeStreetLayout(visitorHomeState(visit.view).cult);
-    // bag_butler.js target_loc: its post, else 300 px right of the house (butler-feature BOX_RX).
-    const x = Math.max(60, Math.min(layout.width - 60, layout.houseX + (b.post ?? 300)));
+    // bag_butler.js target_loc: its post, else 660 right of the house, where the owner sees it stand (butlerPostRx).
+    const x = Math.max(200, Math.min(layout.width - 200, layout.houseX + butlerPostRx(b.post)));
     const box = new PIXI.Container();
     box.zIndex = itemZ('bag_butler', 4);
     box.x = x;

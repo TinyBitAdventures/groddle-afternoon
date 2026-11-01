@@ -9,7 +9,8 @@
  *    own a home and are level 3. Read label (four beats), Open: a puff, the
  *    Butler 750 ms later where the box stood (randomized part by part),
  *    and two seconds later "Thank you. I am very happy to be here with you".
- *  - Stands at its post right of the door, strolls up to 300 px either side
+ *  - Stands at its post, 660 right of the house (target_loc's default, the
+ *    source's; PORCH: no longer by the door), strolls up to 300 px either side
  *    (walk4, the walk chooseWalk always picks), idles (idle1-4), steps back
  *    when you walk into it, waves when you come within 550 px, acknowledges
  *    you at 250 px, and walks back to its post 15 s after your last command.
@@ -79,6 +80,7 @@ import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=3753a0d2';
 import {
   BUTLER,
+  butlerPostRx,
   BUTLER_BOX,
   BUTLER_BOX_ART,
   BUTLER_FALLBACK,
@@ -132,12 +134,12 @@ import {
   takeVisitorDelivery,
   teachButler,
   visitorsReport,
-} from '../butler.js?v=a0c80a92';
+} from '../butler.js?v=9d29b9b4';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const BUTLER_FEATURE_ID = 'butler';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
-/** The box (and so the first post) stands right of the door, inside the house lot. */
+/** The box stands right of the door, inside the house lot (the source drops it at x 50, inc_butler.js 93; the remake keeps it off the doorway). */
 const BOX_RX = 300;
 /** The butler (bag_butler) is a foreground item; its box (butler_box) a normal one (item-bands.js). */
 const Z = Object.freeze({ box: itemZ('butler_box', 9), butler: itemZ('bag_butler', 4) });
@@ -213,10 +215,10 @@ function houseX() {
   return layout().houseX;
 }
 
+/** The post in world x: set post's, else target_loc's 660 right of the house (butlerPostRx). */
 function postX() {
   const l = layout();
-  const rx = st.post ?? BOX_RX;
-  return Math.max(60, Math.min(l.width - 60, l.houseX + rx));
+  return Math.max(BUTLER.WANDER_EDGE, Math.min(l.width - BUTLER.WANDER_EDGE, l.houseX + butlerPostRx(st.post)));
 }
 
 function itemName(cls, n = 1) {
@@ -758,7 +760,8 @@ function puff(engine, x, top) {
 
 function finishOpen(engine) {
   pendingOpenAt = 0;
-  createButler(st, { post: pendingOpenX - houseX(), now: now() });
+  // createButler sets no target_loc: it appears where the box stood and makes for its post.
+  createButler(st, { now: now() });
   const forced = paramParts(engine);
   if (forced) setButlerParts(st, forced);
   rt.x = pendingOpenX;
@@ -818,11 +821,11 @@ function returnToPost(engine) {
 }
 
 function wander(engine) {
-  // startMoving: a stroll to a random spot within 300 px of the post.
+  // startMoving (5507-5521): a stroll to a random spot within 300 px of the post, 200 px off the ends.
   const p = postX();
   const l = layout();
-  const left = Math.max(200, p - BUTLER.WANDER_RANGE);
-  const right = Math.min(l.width - 200, p + BUTLER.WANDER_RANGE);
+  const left = Math.max(BUTLER.WANDER_EDGE, p - BUTLER.WANDER_RANGE);
+  const right = Math.min(l.width - BUTLER.WANDER_EDGE, p + BUTLER.WANDER_RANGE);
   let x = left + Math.random() * Math.max(1, right - left);
   if (Math.abs(x - rt.x) < 100) x = rt.x + (x < rt.x ? -120 : 120);
   startWalk(engine, x);
@@ -1519,6 +1522,8 @@ function setPost(engine) {
       closeDialog(engine);
       if (v !== 'yes' || !engine.player) return;
       st.post = Math.round(engine.player.x - houseX());
+      // 300 reads as a post from before PORCH (butlerPostRx): a step over keeps yours.
+      if (st.post === BUTLER.LEGACY_BOX_POST) st.post += 1;
       engine.save?.();
       lastMsg = `post:${st.post}`;
       returnToPost(engine);
@@ -1822,7 +1827,7 @@ let demoOwnedDone = false;
 function ownedDemo(engine) {
   demoOwnedDone = true;
   if (String(engine.param('butlerdemo') || '').toLowerCase() !== 'owned' || st.owned) return;
-  createButler(st, { post: BOX_RX, now: now(), rand: () => 0 });
+  createButler(st, { now: now(), rand: () => 0 });
   st.introDone = true;
   if (engine.param('butlername')) renameButler(st, engine.param('butlername'));
   engine.save?.();
@@ -1861,7 +1866,7 @@ function demoSetup(engine) {
   if (kind === 'box') {
     st = createButlerState();
   } else if (!st.owned) {
-    createButler(st, { post: BOX_RX, now: now(), rand: () => 0 });
+    createButler(st, { now: now(), rand: () => 0 });
     st.introDone = true;
     st.createdAt = now();
   }

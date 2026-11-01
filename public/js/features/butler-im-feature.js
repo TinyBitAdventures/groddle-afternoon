@@ -29,8 +29,8 @@
  * window.groddleButlerIm in multiplayer.
  */
 
-import { butlerApi } from './butler-feature.js?v=9b96ba58';
-import { BUTLER_STRINGS } from '../butler.js?v=a0c80a92';
+import { butlerApi } from './butler-feature.js?v=d2f293d5';
+import { BUTLER_STRINGS } from '../butler.js?v=9d29b9b4';
 import { BUTLER_IM_TEXT, BUTLER_IM_VERBS, HELP_AGAIN_MS, imDelayMs, imLine, normalizeImPrefs, parseButlerIm } from '../butler-im.js?v=44783638';
 
 export const BUTLER_IM_FEATURE_ID = 'butler-im';

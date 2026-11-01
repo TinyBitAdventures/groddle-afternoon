@@ -16,9 +16,15 @@
  *    giver, limits capacity 5, package_limit 5, message_limit 10) and hands
  *    them to the owner (retrieve_messages / retrieve_packages →
  *    giveNextMessage / giveNextPackage, one at a time, "Thanks!" for the next).
- *  - It stands at a post (target_loc, default 660 "to the right of the door";
- *    set post moves it to where you stand), wanders up to 300 px either side
- *    while idle and walks back after wait_time 15 s without a command.
+ *  - It stands at a post (target_loc, default 660 "to the right of the door",
+ *    bag_butler.js 4820-4823; set post moves it to where you stand), wanders up
+ *    to 300 px either side while idle, never within 200 px of the street's
+ *    ends (startMoving 5507-5521), and walks back after wait_time 15 s without
+ *    a command (shouldReturnToBase 5415-5442). createButler (inc_butler.js 1-42)
+ *    sets no target_loc, so a new Butler appears where its box stood and makes
+ *    for 660. PORCH (Austin 2026-11-01, "my house front is crowded"): the remake
+ *    had posted it where the box stood (300, just past the Magic Rock), so it
+ *    hovered by the door; it now keeps the source's post (butlerPostRx).
  *  - Owner verbs: name (19 characters, tags stripped, nameSuccess /
  *    nameShortened), customize (the client's Customizer, eight parts), set post, mailbox,
  *    messages, packages, who visited?, give (a gift handed to each visitor
@@ -62,6 +68,12 @@ export const BUTLER = Object.freeze({
   WALK_SPEED: 75,
   /** startMoving: never more than 300 px from the post. */
   WANDER_RANGE: 300,
+  /** startMoving: never nearer the street's ends than this (geo.l + 200, geo.r - 200). */
+  WANDER_EDGE: 200,
+  /** target_loc's default, x from the house's centre: "to the right of the door" (bag_butler.js 4820-4823). */
+  POST_RX: 660,
+  /** Before PORCH a Butler was posted where its box stood (butler-feature BOX_RX): read as no post set. */
+  LEGACY_BOX_POST: 300,
   /**
    * lookAtPlayer (bag_butler.js 2971-3020): facing away from the player, it plays turnBack
    * (playAnim 633 ms, held: playAnim sets no endAnim for turnBack, 2337) and 1500 ms later
@@ -446,7 +458,8 @@ export function normalizeButlerState(seed = {}) {
     if (cleanId(id) && cleanId(cls)) gifts[cleanId(id)] = cleanId(cls);
   }
   const owned = s.owned === true;
-  const post = Number(s.post);
+  // No post saved is none (Number(null) would read as 0, the door).
+  const post = s.post == null || s.post === '' ? NaN : Number(s.post);
   // Saves before the rig hold only a look id (v10 / v11 / v22): its parts.
   const parts = normalizeButlerParts(s.parts, BUTLER_LEGACY_LOOKS[s.look] ? s.look : BUTLER_LOOKS[0].id);
   return {
@@ -499,13 +512,27 @@ export function setButlerParts(state, parts) {
   return state.parts;
 }
 
-/** createButler (players/inc_butler.js 2-42): one Butler, randomized part by part, posted where the box stood. */
-export function createButler(state, { post = 0, now = Date.now(), rand = Math.random } = {}) {
+/**
+ * The Butler's post, x from the house's centre: the one set with set post, else target_loc's
+ * default (660). A post saved at the box's spot (300) is from before PORCH, when every new
+ * Butler was posted there, and reads as none; set post never saves exactly 300 (butler-feature).
+ */
+export function butlerPostRx(post) {
+  const n = Number(post);
+  if (post == null || post === '' || !Number.isFinite(n) || Math.round(n) === BUTLER.LEGACY_BOX_POST) return BUTLER.POST_RX;
+  return Math.round(n);
+}
+
+/**
+ * createButler (players/inc_butler.js 2-42): one Butler, randomized part by part. The source
+ * sets no target_loc, so `post` null (the default) leaves it at target_loc's 660.
+ */
+export function createButler(state, { post = null, now = Date.now(), rand = Math.random } = {}) {
   if (state.owned) return { ok: false, reason: 'You already have a Butler.' };
   state.owned = true;
   state.boxRead = true;
   setButlerParts(state, randomButlerParts(rand));
-  state.post = Math.round(Number(post) || 0);
+  state.post = post == null ? null : Math.round(Number(post) || 0);
   state.createdAt = whole(now);
   state.lastOwnerVisit = whole(now);
   state.introDone = false;
