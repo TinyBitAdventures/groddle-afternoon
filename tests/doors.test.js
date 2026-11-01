@@ -33,7 +33,7 @@ import {
   blockBarrierCrossing,
   climbWallsWorld,
   navigableSignposts,
-} from '../public/js/street-model.js?v=23b926e5';
+} from '../public/js/street-model.js?v=d6ad10e7';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const street = (tsid) =>
@@ -335,7 +335,7 @@ describe('ladders, walls and signposts at runtime', () => {
 
 describe('barriersScreen follows walls opened at runtime', () => {
   it('drops a wall once its pc_perm becomes 0 and brings it back', async () => {
-    const { barriersScreen } = await import('../public/js/street-model.js?v=23b926e5');
+    const { barriersScreen } = await import('../public/js/street-model.js?v=d6ad10e7');
     const street = { bounds: { l: 0, t: 0, r: 1000, b: 500 }, barriers: [{ id: 'w', x: 100, y: 0, h: 200, pc_perm: null }] };
     assert.equal(barriersScreen(street).length, 1);
     street.barriers[0].pc_perm = 0;

@@ -4,8 +4,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { OUT_OF_REACH_LINE, STAND_LIFT, behindFloor, floorBetween, reachPoint } from '../public/js/reach.js?v=f8c4a366';
-import { avatarHeadReach, groundBeneath, platformsScreen } from '../public/js/street-model.js?v=23b926e5';
+import { OUT_OF_REACH_LINE, STAND_LIFT, behindFloor, floorBetween, reachPoint } from '../public/js/reach.js?v=4187d746';
+import { avatarHeadReach, groundBeneath, platformsScreen } from '../public/js/street-model.js?v=d6ad10e7';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -120,7 +120,8 @@ describe('every server-laid tree, rock and piggy stays in reach from beside it',
 
 describe('game.js wiring', () => {
   it('Enter, the chooser and the prompt drop things behind a floor', () => {
-    assert.match(game, /import \{ behindFloor, OUT_OF_REACH_LINE \} from '\.\/js\/reach\.js\?v=[0-9a-f]{8}'/);
+    assert.match(game, /import \{ avatarHitBox, behindFloor, OUT_OF_REACH_LINE \} from '\.\/js\/reach\.js\?v=[0-9a-f]{8}'/);
+    assert.match(game, /const hitBox = avatarHitBox\(player\.x, player\.y, bodyScale\);\s*return behindFloor\([\s\S]{0,200}feetY: player\.y, hitBox \}\);/);
     assert.match(game, /function interactReach\(t\) \{[\s\S]{0,260}if \(d < 160 && behindFloorFromPlayer\(t\)\) return Infinity;/);
     assert.match(game, /avatarHeadReach\(bodyScale\)\.reach \/ 2/);
     assert.match(game, /withinReach\(recentInteractionTarget, 160\)\s*\) \{\s*openVerbMenu\(recentInteractionTarget\)/);

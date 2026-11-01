@@ -45,7 +45,7 @@ import {
   offeredFor,
   talkBeats,
 } from '../public/js/street-spirit-talks.js?v=5321850f';
-import { runVerb } from '../public/content.js?v=5be63ce2';
+import { runVerb } from '../public/content.js?v=0bf7424c';
 import { CONVERSATIONS } from '../public/js/conversations-data.js?v=f11b7e02';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -552,7 +552,7 @@ test.describe('conversations against GameServerJS (G185)', () => {
   });
 
   test('&spiritautoplay=far keeps the spirit in view on a short deck (G239, Somewhat Sump)', async () => {
-    const { spiritFarSpot } = await import('../public/js/features/street-spirits-feature.js?v=eb13e46c');
+    const { spiritFarSpot } = await import('../public/js/features/street-spirits-feature.js?v=24972592');
     // A flat street: 330 px to the right on the spirit's own floor, camera untouched.
     const flat = [{ x1: 0, y1: 900, x2: 3000, y2: 900 }];
     assert.deepEqual(spiritFarSpot(flat, 1000, 900), { x: 1330, y: 900, lookY: 0 });
@@ -562,7 +562,7 @@ test.describe('conversations against GameServerJS (G185)', () => {
     // near y 660 with the ground at y 902-920 on both sides; no floor at its
     // height 280-430 px away, so 330 px off on the ground with the camera lifted.
     const street = JSON.parse(readFileSync(join(ROOT, 'public/assets/streets/GLI57DI72HI153U.json'), 'utf8'));
-    const { platformsScreen } = await import('../public/js/street-model.js?v=23b926e5');
+    const { platformsScreen } = await import('../public/js/street-model.js?v=d6ad10e7');
     const sump = platformsScreen(street);
     const spot = spiritFarSpot(sump, 4797, 650, { artHeight: 140, viewH: 408 });
     assert.equal(spot.x, 5127);

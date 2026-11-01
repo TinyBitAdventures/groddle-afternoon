@@ -2,12 +2,12 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=5be63ce2';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=0bf7424c';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2606d2be';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=43afc7b5';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
-import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
+import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
 import { createVogOverlay } from './js/vog-overlay.js?v=c2a9cc07';
 import { createPromptStack } from './js/prompt-stack.js?v=d7843266';
 import { createWindowStack } from './js/window-stack.js?v=be3b7274';
@@ -460,8 +460,8 @@ import {
 } from './js/inventory.js?v=91ee49cd';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=09c6ccbe';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=9b23e21a';
-import { listAnimalFeedOptions } from './js/animals.js?v=0b84b6a9';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=0b84b6a9';
+import { listAnimalFeedOptions } from './js/animals.js?v=65c8f67c';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=65c8f67c';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -595,8 +595,8 @@ import {
   availableStreetTsids,
   ensureStreetIndex,
   resolveIndexTsid,
-} from './js/street-loader.js?v=390e4702';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=123877ea';
+} from './js/street-loader.js?v=5858971b';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=39fa3b1c';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -611,8 +611,9 @@ import {
   avatarHeadReach,
   isItemFloor,
   isStandable,
-} from './js/street-model.js?v=23b926e5';
-import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=f609fb2f';
+  signpostReachY,
+} from './js/street-model.js?v=d6ad10e7';
+import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=083038d3';
 import {
   buildStreetView,
   glitchLayerMatrix,
@@ -622,7 +623,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=b5ae0c3d';
+} from './js/street-render.js?v=b42b5803';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -721,12 +722,12 @@ import {
   listMapDestinations,
   pickAwayConnection,
   planSignpostTravel,
-} from './js/travel.js?v=a2c6427f';
+} from './js/travel.js?v=7fd6e363';
 import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
 import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
-import { landingY, walkSurfaceY } from './js/walk-surface.js?v=764d5f5a';
+import { landingY, walkSurfaceY } from './js/walk-surface.js?v=f8308fde';
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
-import { WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, streetPhysicsExtras } from './js/avatar-step.js?v=c04c7c76';
+import { WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, streetPhysicsExtras } from './js/avatar-step.js?v=cc813993';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
@@ -780,7 +781,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=0b84b6a9';
+} from './js/animals.js?v=65c8f67c';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -866,7 +867,7 @@ import {
   pickMapSpot,
   MAP_INDEX_URL,
   HUB_56_MAP_URL,
-} from './js/map-graph.js?v=d35e9573';
+} from './js/map-graph.js?v=afa8c721';
 import { hubMapArtNote, hubMapSubtitle, questLogSummary } from './js/panel-copy.js?v=9fc1b2da';
 import { bindMapIconTips } from './js/ui/map-icon-tips.js?v=6b3eb3f9';
 import {
@@ -878,8 +879,8 @@ import {
   animalPatrolRange,
   ANIMAL_PATROL,
   nearestPlacementGap,
-} from './js/street-ecology.js?v=cfa10e0b';
-import { easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=04437144';
+} from './js/street-ecology.js?v=09911562';
+import { easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=d1659f22';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=a1c4a308';
 import {
   actionLoopFor,
@@ -7552,6 +7553,17 @@ async function playPickAnimation(target, durationMs = 0) {
 
 function beginVerbAction(target, verb) {
   if (!target || !verb || currentAction) return false;
+  // Player report 33: the reach the realtime server checks when a shared verb lands is checked
+  // before the swing too (features/street-objects-feature.js verbOutOfReach), so it never plays
+  // and then fails.
+  const tooFar = features.query('verbOutOfReach', target, verb.id, engine);
+  if (tooFar) {
+    toast(tooFar, 2600);
+    pushActivity(tooFar);
+    playSound('CLICK_FAILURE', { volume: 0.45 });
+    if (app?.canvas) app.canvas.dataset.verbOutOfReach = `${target.classId || ''}:${verb.id}`;
+    return true;
+  }
   const durationMs = Number.isFinite(verb.durationMs)
     ? Math.max(0, Number(verb.durationMs))
     : actionDurationFor(target.classId, verb.id);
@@ -8067,7 +8079,7 @@ function enterChoicesHere() {
     const d = interactReach(t);
     if (d < 100) near.push({ target: t, distance: d });
   }
-  const sign = currentStreet && !climb.active ? signpostNear(walkUpSignpostStreet(currentStreet), player.x, 140) : null;
+  const sign = currentStreet && !climb.active ? signpostNear(walkUpSignpostStreet(currentStreet), player.x, 140, player.y) : null;
   const connects = (sign?.signpost?.connects || []).filter((c) => c && !c.hidden);
   return buildEnterChoices({
     near,
@@ -8400,7 +8412,9 @@ function behindFloorFromPlayer(t) {
   const bodyScale = features.query('avatarBodyScale', engine) ?? 1;
   const body = { x: player.x, y: player.y - avatarHeadReach(bodyScale).reach / 2 };
   const box = spriteWorldHitBox(t.sprite, 0);
-  return behindFloor(streetPlatforms, body, box, { x: t.sprite.x, y: t.sprite.y }, { airborne: Boolean(t.airborne), feetY: player.y });
+  // What the avatar's hit box touches is in reach, floor or not (MiddleGroundRenderer.as 1161).
+  const hitBox = avatarHitBox(player.x, player.y, bodyScale);
+  return behindFloor(streetPlatforms, body, box, { x: t.sprite.x, y: t.sprite.y }, { airborne: Boolean(t.airborne), feetY: player.y, hitBox });
 }
 
 /** In reach for Enter: near enough and not behind a floor. */
@@ -21894,11 +21908,13 @@ function doTeleport() {
     return;
   }
   if (!currentStreet) return;
+  // Player report 33: only a post the avatar's hit box reaches up and down (street-model.js signpostReachY).
   const plan = planSignpostTravel(
     walkUpSignpostStreet(currentStreet),
     player.x,
     availableStreetTsids(),
     140,
+    (s) => signpostReachY(currentStreet, s, player.y),
   );
   if (!plan.ok) {
     if (plan.reason === 'no_signpost') {
@@ -28333,7 +28349,7 @@ async function main() {
         recent || (nearHover && withinReach(nearHover, 160)
           ? nearHover
           : nearestInteractable(100));
-      const nearSign = currentStreet ? signpostNear(walkUpSignpostStreet(currentStreet), player.x, 140) : null;
+      const nearSign = currentStreet ? signpostNear(walkUpSignpostStreet(currentStreet), player.x, 140, player.y) : null;
       const nearClimb = !climb.active
         ? findClimbWallNear(streetWalls, player.x, player.y, 42)
         : null;

@@ -134,8 +134,10 @@ export function listMapDestinations(currentTsid, streetIndex) {
  * @param {number} playerScreenX
  * @param {Set<string>|string[]} availableTsids
  * @param {number} [radius=120]
+ * @param {((signpost: object) => boolean)|null} [inReachY]  up and down: a post this says no to
+ *   is out of reach however close across (game.js passes street-model.js signpostReachY)
  */
-export function planSignpostTravel(street, playerScreenX, availableTsids, radius = 120) {
+export function planSignpostTravel(street, playerScreenX, availableTsids, radius = 120, inReachY = null) {
   if (!street) {
     return { ok: false, reason: 'no_street' };
   }
@@ -145,6 +147,7 @@ export function planSignpostTravel(street, playerScreenX, availableTsids, radius
   let nearest = null;
   let bestD = radius;
   for (const s of street.signposts || []) {
+    if (inReachY && !inReachY(s)) continue;
     const sx = s.x - l;
     const d = Math.abs(sx - playerScreenX);
     if (d <= bestD) {

@@ -56,7 +56,7 @@ import {
 } from '../game-of-crowns.js?v=98e21baf';
 import { RACE_RIVALS } from '../races.js?v=df0576ad';
 import { mayhemHoldsArena } from './mayhem-feature.js?v=eb2a46e3';
-import { wallsScreen } from '../street-model.js?v=23b926e5';
+import { wallsScreen } from '../street-model.js?v=d6ad10e7';
 import { addItem, countItem, removeItem } from '../inventory.js?v=91ee49cd';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';

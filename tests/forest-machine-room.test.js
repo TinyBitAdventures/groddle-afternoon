@@ -10,9 +10,9 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry } from '../public/js/street-model.js?v=23b926e5';
+import { assertStreetGeometry } from '../public/js/street-model.js?v=d6ad10e7';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=4be109b9';
-import { populationForStreet } from '../public/js/street-ecology.js?v=cfa10e0b';
+import { populationForStreet } from '../public/js/street-ecology.js?v=09911562';
 import { MACHINE_ROOMS, availableHubStreets, countsTowardHub, isMachineRoom, streetVisitCounters } from '../public/js/exploration.js?v=19c6758f';
 import {
   CLEARING_DOOR,
@@ -28,8 +28,8 @@ import {
   forestMachineRoomStreet,
   isForestMachineRoomTsid,
 } from '../public/js/forest-machine-room.js?v=5f7e4589';
-import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=cf78e00a';
-import { FEATURES } from '../public/js/features/index.js?v=2606d2be';
+import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=ccb5867d';
+import { FEATURES } from '../public/js/features/index.js?v=43afc7b5';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

@@ -470,15 +470,42 @@ export function ladderTopDeck(platforms, feetX, feetY, ladderBottomY) {
 }
 
 /**
+ * Up and down, a signpost is in reach while the avatar's hit box overlaps the
+ * post: the client glowed a signpost (and Enter and T took it) only when
+ * `_avatarView.hit_target.hitTestObject(renderer.hit_target)`
+ * (MiddleGroundRenderer.as glowSignPosts 1164-1180 via glowRenderer 1158-1167),
+ * the hit box 123 tall with its bottom 10 px under the feet (AbstractAvatarView.as
+ * 139-149) and the post its h tall over its foot (location XML signpost h).
+ * POST_REACH_SLACK px more each way: the post's art is drawn wider than its box
+ * and a post can stand up to 150 px over a floor on the source streets (Glutton
+ * Greens), still in a jump's reach. Across, the remake keeps its looser radius.
+ * Player report 33: a post 600 to 3,500 px over the avatar (Northwest Passage,
+ * The Other Drop) took Enter and T off the street.
+ */
+export const POST_REACH_SLACK = 40;
+export function signpostReachY(street, signpost, feetY, scale = 1) {
+  if (!Number.isFinite(feetY)) return true;
+  const s = scale > 0 ? scale : 1;
+  const foot = worldToScreen(street, signpost.x, signpost.y).y;
+  const top = foot - (Number(signpost.h) > 0 ? Number(signpost.h) : 200);
+  const boxBottom = feetY + Math.round(10 * s);
+  const boxTop = boxBottom - Math.round(123 * s);
+  return boxTop < foot + POST_REACH_SLACK && boxBottom > top - POST_REACH_SLACK;
+}
+
+/**
  * @param {StreetData} street
  * @param {number} screenX
  * @param {number} [radius=60]
+ * @param {number|null} [feetY]  the avatar's feet; when given, a post must also be in reach up
+ *   and down (signpostReachY)
  */
-export function signpostNear(street, screenX, radius = 120) {
+export function signpostNear(street, screenX, radius = 120, feetY = null) {
   let best = null;
   let bestD = radius;
   for (const s of street.signposts || []) {
     if (isBuriedSignpost(street, s)) continue;
+    if (feetY != null && !signpostReachY(street, s, feetY)) continue;
     const pos = worldToScreen(street, s.x, s.y);
     const d = Math.abs(pos.x - screenX);
     if (d <= bestD) {
@@ -568,8 +595,8 @@ export function buriedSignpostUnder(street, screenX, screenY, { reach = 110, dep
   return null;
 }
 
-export function signpostNearWide(street, screenX, radius = 120) {
-  return signpostNear(street, screenX, radius);
+export function signpostNearWide(street, screenX, radius = 120, feetY = null) {
+  return signpostNear(street, screenX, radius, feetY);
 }
 
 /**

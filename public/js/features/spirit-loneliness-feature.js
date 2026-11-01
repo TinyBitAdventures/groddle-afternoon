@@ -53,8 +53,8 @@
  *   &lonelyhold=invite      keep the porthole on screen (frozen at the loop) for screenshots
  */
 
-import { STREET_INDEX } from '../street-loader.js?v=390e4702';
-import { getStreetEcologyCatalog } from '../street-ecology.js?v=cfa10e0b';
+import { STREET_INDEX } from '../street-loader.js?v=5858971b';
+import { getStreetEcologyCatalog } from '../street-ecology.js?v=09911562';
 import { graphKey, routeGraph, tsidAliases } from '../map-routes.js?v=5090dbb7';
 import { STREET_SPIRIT_VARIANTS, portraitFit, portraitSheet, spiritForStreet } from '../street-spirits.js?v=f9e88445';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';

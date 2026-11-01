@@ -90,8 +90,8 @@ import { DROP_ITEMS, applyDropResult, isEmptyDrop, rollDropTable } from '../drop
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=91ee49cd';
 import { energyMax, moodMax } from '../metabolics.js?v=8504134e';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
-import { worldToScreen } from '../street-model.js?v=23b926e5';
-import { nearestSurfaceY } from '../walk-surface.js?v=764d5f5a';
+import { worldToScreen } from '../street-model.js?v=d6ad10e7';
+import { nearestSurfaceY } from '../walk-surface.js?v=f8308fde';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { createSheetLoader } from '../sprite-sheets.js?v=1b2de668';
 import {

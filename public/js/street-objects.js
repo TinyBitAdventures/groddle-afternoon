@@ -38,7 +38,7 @@ import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage 
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=4084db6e';
 import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=a08218e0';
 import { highestAnimalKinshipRank } from './animal-kinship.js?v=3a50bfb2';
-import { applyCreatureState, pathFrom } from './street-creatures.js?v=04437144';
+import { applyCreatureState, pathFrom } from './street-creatures.js?v=d1659f22';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
 export const SHARED_NODE_CLASSES = Object.freeze(['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree']);
@@ -58,11 +58,31 @@ export const REQUEST_TIMEOUT_MS = 6000;
 
 /** Plain copy for the moments the source has no line for. */
 export const COPY = Object.freeze({
+  // The server's refusal when the player stands too far from the object (objects.go handleAct).
+  far: 'You need to be closer.',
   connecting: 'The street is still connecting. Try again in a moment.',
   timeout: 'The street did not answer. Try again.',
   busy: 'Hold on, still asking the street.',
   mega: 'I am huuuuuuuuuge!', // include/mining.js:174 onMegaRoxx
 });
+
+/**
+ * How far from a rock, tree or resource node the realtime server still takes
+ * a verb on it (objects.go objReachX / objReachY: about a screen, measured
+ * from the player's feet to the object's spot). The server checks when the
+ * verb lands, after the swing; the game checks the same box before the swing
+ * starts (features/street-objects-feature.js verbOutOfReach), so a verb that
+ * starts also lands (player report 33: Scraping and Digging played, then
+ * "You need to be closer."). The source checked once, at the start (main.js
+ * doVerb 2939-2960: 300 px, or the verb's proximity_override), and the client
+ * walked the avatar over (TSFrontController.as moveCloserForVerbOrAction 438-452).
+ */
+export const OBJECT_REACH = Object.freeze({ x: 700, y: 500 });
+
+/** PURE: feet (px, py) are within the server's reach of an object whose spot is (x, y). */
+export function inObjectReach(px, py, x, y) {
+  return Math.abs(px - x) <= OBJECT_REACH.x && Math.abs(py - y) <= OBJECT_REACH.y;
+}
 
 /**
  * game.js spawnTrees: a placed tree's starting maturity and health by its

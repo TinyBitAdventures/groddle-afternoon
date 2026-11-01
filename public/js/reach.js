@@ -19,6 +19,10 @@
  * the floor under your feet when it is below you, the floor it stands on when
  * it is above you. Steps, slopes and ledges you could walk off are not
  * between, so a piggy just above or below a step stays in reach.
+ * And a thing the avatar's own hit box touches is always in reach, floor or
+ * not, because that touch is the client's whole rule (player report 33: a
+ * Piggy sitting a little under the ground line on a hilly street, right
+ * beside or under the avatar, said "Could not get close enough").
  *
  * Clicks: with dont_move_for_item_menu on (FlashVarModel.as 210) a click
  * opened the menu at once (LocationInputHandler.as 873-886), and the server
@@ -33,6 +37,25 @@
 
 /** The client's line when the avatar could not get to a thing (TSFrontController.as 633). */
 export const OUT_OF_REACH_LINE = 'Could not get close enough :(';
+
+/**
+ * The client avatar's hit box (AbstractAvatarView.as drawHitBox 139-149): 66 x 123,
+ * its bottom 10 px under the feet, all times the avatar's scale.
+ */
+export const AVATAR_HIT_BOX = Object.freeze({ w: 66, h: 123, below: 10 });
+
+/** The avatar's hit box at feet (x, feetY), screen space. */
+export function avatarHitBox(x, feetY, scale = 1) {
+  const s = scale > 0 ? scale : 1;
+  const half = Math.round(AVATAR_HIT_BOX.w * s) / 2;
+  const bottom = feetY + Math.round(AVATAR_HIT_BOX.below * s);
+  return { left: x - half, right: x + half, top: bottom - Math.round(AVATAR_HIT_BOX.h * s), bottom };
+}
+
+/** Two boxes overlap (Flash hitTestObject on bounds, MiddleGroundRenderer.as 1161). */
+export function boxesTouch(a, b) {
+  return Boolean(a && b) && a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+}
 
 /**
  * How far up a thing's box the reach line ends: a thing stands on its floor
@@ -107,12 +130,14 @@ export function floorBetween(platforms, ax, ay, bx, by, margin = 1, skip = null)
  * @param {{ x:number, y:number }} body  the avatar's body point (feet less half its height)
  * @param {{ left:number, top:number, right:number, bottom:number }|null} box  the thing's box
  * @param {{ x:number, y:number }} [at]  the thing's foot point when it has no box
- * @param {{ airborne?: boolean, feetY?: number }} [opts]  feetY: a line crossing the avatar
- *   between its feet and its body point runs through the avatar itself (a shelf at chest
- *   height over a slope), so it is not between the avatar and anything
+ * @param {{ airborne?: boolean, feetY?: number, hitBox?: object }} [opts]  feetY: a line
+ *   crossing the avatar between its feet and its body point runs through the avatar itself
+ *   (a shelf at chest height over a slope), so it is not between the avatar and anything.
+ *   hitBox: the avatar's hit box (avatarHitBox); a thing it touches is never behind a floor
  */
 export function behindFloor(platforms, body, box, at = null, opts = {}) {
   if (!body || !Array.isArray(platforms) || !platforms.length) return false;
+  if (opts.hitBox && box && boxesTouch(opts.hitBox, box)) return false;
   let pt;
   if (box) pt = reachPoint(box, body.x, body.y, opts);
   else if (at) pt = { x: at.x, y: opts.airborne ? at.y : at.y - STAND_LIFT };

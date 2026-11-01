@@ -10,7 +10,7 @@
  *
  * Everything here works in world space (the numbers the inspector shows). Pure.
  */
-import { isStandable, platformYAt } from '../street-model.js?v=23b926e5';
+import { isStandable, platformYAt } from '../street-model.js?v=d6ad10e7';
 
 export const SNAP_PX = 30;
 export const GRID_PX = 10;

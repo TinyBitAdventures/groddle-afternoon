@@ -38,8 +38,8 @@ import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { slugsFromEffects } from '../speech-slugs.js?v=130338f9';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { cleanQuestMarkup } from '../quests.js?v=282e1621';
-import { walkSurfaceY } from '../walk-surface.js?v=764d5f5a';
-import { isStandable } from '../street-model.js?v=23b926e5';
+import { walkSurfaceY } from '../walk-surface.js?v=f8308fde';
+import { isStandable } from '../street-model.js?v=d6ad10e7';
 import {
   CRAB_CLASS,
   CRAB_COPY,

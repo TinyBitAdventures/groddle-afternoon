@@ -8,7 +8,7 @@
  * Units are px per frame at 60 fps (spec 2.3). A body is { x, y, vx, vy, onGround } with the feet
  * at x, y in screen space (the street's top-left origin, y down).
  */
-import { avatarHeadReach, blockBarrierCrossing, buriedSignpostUnder, headCeiling, isStandable, resolveGround, worldToScreen } from './street-model.js?v=23b926e5';
+import { avatarHeadReach, blockBarrierCrossing, buriedSignpostUnder, headCeiling, isStandable, resolveGround, worldToScreen } from './street-model.js?v=d6ad10e7';
 import { stickToSlope } from './slope-walk.js?v=9af1e505';
 
 /** Gravity per frame (x the street's gravity multiplier). game.js physics(). */

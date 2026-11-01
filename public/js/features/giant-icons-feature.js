@@ -38,7 +38,7 @@ import { addItem, countItem, ensureItem } from '../inventory.js?v=91ee49cd';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
 import { XP_FOR_LEVEL } from '../progression.js?v=33462eaa';
 import { emblemCostFor } from '../shrines.js?v=7dd8f176';
-import { landingY } from '../walk-surface.js?v=764d5f5a';
+import { landingY } from '../walk-surface.js?v=f8308fde';
 import {
   EMBLEM_VERBS,
   GIANT_ICON_DATA,

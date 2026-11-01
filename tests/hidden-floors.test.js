@@ -12,7 +12,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry } from '../public/js/street-model.js?v=23b926e5';
+import { assertStreetGeometry } from '../public/js/street-model.js?v=d6ad10e7';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=4be109b9';
 import { SOURCE_PHYSICS } from '../public/js/puzzle-triggers.js?v=3ee2f2c8';
 import {
@@ -50,7 +50,7 @@ import {
   teleportersOn,
 } from '../public/js/hidden-floors.js?v=5ce87a04';
 import { hiddenFloorsFeature } from '../public/js/features/hidden-floors-feature.js?v=fff3374b';
-import { FEATURES } from '../public/js/features/index.js?v=2606d2be';
+import { FEATURES } from '../public/js/features/index.js?v=43afc7b5';
 import { rawTripleJumpMultiplier, scaledTripleJumpMultiplier } from '../public/js/movement.js?v=a314f8a1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

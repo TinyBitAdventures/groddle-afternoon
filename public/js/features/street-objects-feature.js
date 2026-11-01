@@ -96,6 +96,8 @@ import {
   nodeId,
   nodePerks,
   digSkill,
+  idKind,
+  inObjectReach,
   applyPigState,
   pigId,
   pigSkill,
@@ -112,14 +114,14 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=6be84aa7';
+} from '../street-objects.js?v=2b96c551';
 import { ROCK_CATALOG } from '../mining.js?v=e356fe60';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=38730935';
-import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=0b84b6a9';
+import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=65c8f67c';
 import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=3a50bfb2';
-import { animalPatrolRange } from '../street-ecology.js?v=cfa10e0b';
-import { INCUBATION, PIGGY_FEED, itemBaseCost, resetIncubation } from '../animal-husbandry.js?v=c7040204';
+import { animalPatrolRange } from '../street-ecology.js?v=09911562';
+import { INCUBATION, PIGGY_FEED, itemBaseCost, resetIncubation } from '../animal-husbandry.js?v=d2ce0be4';
 import {
   applyCreatureState,
   batterflyAt,
@@ -134,7 +136,7 @@ import {
   restAt,
   sharedCreatureLabel,
   walkerAt,
-} from '../street-creatures.js?v=04437144';
+} from '../street-creatures.js?v=d1659f22';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -704,8 +706,29 @@ function ask(engine, target, verbId) {
   return true;
 }
 
+/**
+ * game.js beginVerbAction, before the swing: a rock, tree or node the server would refuse as too
+ * far when the verb lands (objects.go handleAct "far") is refused now with the server's line, so
+ * the swing never plays for nothing (player report 33). Null when the verb is local or in reach.
+ */
+function outOfReach(engine, target, verbId) {
+  if (engine.mode !== 'multiplayer' || target?.yardVisit) return null;
+  const c = bind(engine);
+  if (!c || LOCAL_STATES.has(c.state) || (!c.wanted && c.state === 'online')) return null;
+  const spr = target?.sprite;
+  const p = engine.player;
+  if (!spr || !p || !Number.isFinite(spr.x) || !Number.isFinite(spr.y)) return null;
+  const verb = sharedVerbOn(engine, target, verbId);
+  if (!verb || !['rock', 'tree', 'node'].includes(idKind(verb.id))) return null;
+  return inObjectReach(p.x, p.y, spr.x, spr.y) ? null : COPY.far;
+}
+
 export const streetObjectsFeature = {
   id: STREET_OBJECTS_FEATURE_ID,
+
+  verbOutOfReach(target, verbId, engine) {
+    return outOfReach(engine, target, verbId);
+  },
 
   init(engine) {
     if (engine.mode !== 'multiplayer') return;

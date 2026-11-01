@@ -17,9 +17,9 @@ import {
   ladderTopSignpostLadder,
   ladderTopSignposts,
   walkUpSignpostStreet,
-} from '../public/js/ladder-top-signposts.js?v=f609fb2f';
-import { navigableSignposts, signpostNear, wallsScreen, worldToScreen } from '../public/js/street-model.js?v=23b926e5';
-import { planSignpostTravel } from '../public/js/travel.js?v=a2c6427f';
+} from '../public/js/ladder-top-signposts.js?v=083038d3';
+import { navigableSignposts, signpostNear, wallsScreen, worldToScreen } from '../public/js/street-model.js?v=d6ad10e7';
+import { planSignpostTravel } from '../public/js/travel.js?v=7fd6e363';
 import { visibleDoors } from '../public/js/doors.js?v=eb9510b1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -151,7 +151,7 @@ describe('ladder-top signposts: game.js', () => {
     assert.match(game, /updateBuriedSignposts\(\);\n\s*updateLadderTopSignposts\(\);/);
     assert.match(game, /if \(!climberAtLadderTop\(climb\.wall, player\.y\)\) return;/);
     assert.match(game, /const sign = ladderTopSignpostFor\(currentStreet, climb\.wall\.id\);[\s\S]{0,400}travelTo\(conn\.tsid, \{ label: conn\.label, arrive: conn\.arrive, via: 'door' \}\)/);
-    assert.equal((game.match(/signpostNear\(walkUpSignpostStreet\(currentStreet\), player\.x, 140\)/g) || []).length, 2);
+    assert.equal((game.match(/signpostNear\(walkUpSignpostStreet\(currentStreet\), player\.x, 140, player\.y\)/g) || []).length, 2);
     assert.match(game, /planSignpostTravel\(\s*walkUpSignpostStreet\(currentStreet\),/);
   });
 });

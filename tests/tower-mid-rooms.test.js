@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FRAME_DT_CAP, assertStreetGeometry, platformYAt, resolveGround } from '../public/js/street-model.js?v=23b926e5';
+import { FRAME_DT_CAP, assertStreetGeometry, platformYAt, resolveGround } from '../public/js/street-model.js?v=d6ad10e7';
 import { insideBottomRect } from '../public/js/doors.js?v=eb9510b1';
 import {
   GREETERBOT,
@@ -32,8 +32,8 @@ import {
 } from '../public/js/tower-mid-rooms.js?v=b38e8578';
 import { greet, greeterAction, midTowerFeature } from '../public/js/features/mid-tower-feature.js?v=efeefcdd';
 import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js?v=c153ec46';
-import { populationForStreet } from '../public/js/street-ecology.js?v=cfa10e0b';
-import { reachStreet } from '../public/js/builder/reach-graph.js?v=0eb97168';
+import { populationForStreet } from '../public/js/street-ecology.js?v=09911562';
+import { reachStreet } from '../public/js/builder/reach-graph.js?v=972d3c6f';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');

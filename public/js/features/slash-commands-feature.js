@@ -31,14 +31,14 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=a0c80a92';
-import { butlerApi } from './butler-feature.js?v=78209760';
+import { butlerApi } from './butler-feature.js?v=43bee881';
 import { hellFeature } from './hell-feature.js?v=8e4ebacf';
 import { towerApi } from './home-tower-feature.js?v=7ce20566';
 import { slashPlan, unknownLine } from '../slash-commands.js?v=23e13b20';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';
 import { minnUrls } from '../minn-account.js?v=ea900c51';
 import { saveStore } from '../save-store.js?v=8839ba7b';
-import { STREET_INDEX } from '../street-loader.js?v=390e4702';
+import { STREET_INDEX } from '../street-loader.js?v=5858971b';
 
 export const SLASH_COMMANDS_FEATURE_ID = 'slash-commands';
 

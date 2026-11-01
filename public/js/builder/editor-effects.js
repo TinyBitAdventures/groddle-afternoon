@@ -11,7 +11,7 @@
  * with the game's own code. Every change is an op (emitter.set, street.set { rumble }), so undo,
  * autosave and an agent's edits work as for everything else. DOM only through ctx.el.
  */
-import { EFFECT_KINDS, EFFECT_WORDS, EFFECT_DEFAULTS, EFFECT_RANGES, EFFECT_LIMITS, RUMBLE_DEFAULTS, RUMBLE_RANGES, effectsCost, normaliseEmitter, rumbleShare } from '../street-effects.js?v=e427650f';
+import { EFFECT_KINDS, EFFECT_WORDS, EFFECT_DEFAULTS, EFFECT_RANGES, EFFECT_LIMITS, RUMBLE_DEFAULTS, RUMBLE_RANGES, effectsCost, normaliseEmitter, rumbleShare } from '../street-effects.js?v=4c962270';
 
 const round2 = (n) => Math.round(Number(n) * 100) / 100;
 const clamp = (v, [lo, hi]) => Math.max(lo, Math.min(hi, v));

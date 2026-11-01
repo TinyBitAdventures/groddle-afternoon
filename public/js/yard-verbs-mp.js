@@ -24,7 +24,7 @@
  * an animal or tree carries the visitor's uses today, never the owner's.
  */
 
-import { createAnimalState } from './animals.js?v=0b84b6a9';
+import { createAnimalState } from './animals.js?v=65c8f67c';
 import { petPiggy } from './animal-mood.js?v=a49495fc';
 import { trantFruitCycle } from './trant-care.js?v=4084db6e';
 import { resetTrantDay } from './trants.js?v=9c2e8c0f';
