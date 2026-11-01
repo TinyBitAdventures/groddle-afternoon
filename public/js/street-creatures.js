@@ -10,8 +10,10 @@
  *     0.5 px a frame, 30 px/s, the odd ones setting off left);
  *   - a resting Butterfly bobs on its perch (spawnButterflies: 0.04 a frame);
  *   - a flying Butterfly drifts across the whole street and back in from the far side
- *     (0.65 px a frame, 39 px/s, bobbing 14 px at 0.06 a frame);
- *   - a Batterfly loops low over its spot (animal-husbandry-feature stepBatterfly).
+ *     (0.65 px a frame, 39 px/s, bobbing 14 px at 0.06 a frame), over the floor under it
+ *     (flightFloor);
+ *   - a Batterfly loops low over its spot (animal-husbandry-feature stepBatterfly), never lower
+ *     over the floor under it than over its spot.
  * The server keeps when a path stood still: "lag" (ms held so far) and "hold" (ms it holds from
  * now), so the path's clock is the server's now minus lag, frozen while held. A verb that lands
  * holds it for everyone (the source stops an animal for the player at it, onWaitStart), and a
@@ -30,6 +32,7 @@
 
 import { GAME_EPOCH_MS } from './game-day.js?v=edb00566';
 import { INCUBATION } from './animal-husbandry.js?v=808076d1';
+import { isStandable } from './street-model.js?v=23b926e5';
 
 export const CREATURE_KINDS = Object.freeze(['chicken', 'butterfly', 'batterfly']);
 
@@ -93,12 +96,178 @@ export function walkerAt({ baseX, range = CREATURE_PATHS.chicken.range, speed = 
   return { x: baseX + s - 4 * r, dir: 1 };
 }
 
-/** A flying Butterfly at path time t: across the street and back in from the far side. */
-export function flyerAt({ x0, baseY, worldW, phase0 = 0 }, t) {
+/**
+ * The floor a flier keeps above (player report of 2026-11-01, a Butterfly under the ground on
+ * Middle Arbor). The original flies a Butterfly in the 200 px above the street's floor
+ * (npc_butterfly.js flyAround 886-969: floor = geo.ground_y or geo.b, apiStartFlyingInTheArea(l,
+ * floor - 200, w, 200)) and a Batterfly in the 400 px above it (npc_batterfly.js flyAround
+ * 1039-1052). That floor is one height for the whole street, and the remake's streets slope and
+ * step (Middle Arbor climbs 260 px from right to left), so a flier at one height across the street
+ * went into the ground where the floor rose. The remake keeps the band but measures it from the
+ * floor under the flier:
+ *   - the floor at x (floorUnder) is the walkable line (street-model.js isStandable) nearest the
+ *     top among the lines at x no more than `band` (the original's 200 px) above the ground there
+ *     (the lowest line within `ground` px): a hill drawn over a lower line counts, a branch or an
+ *     upper ledge high over the ground does not. A line ending within `join` px of x is under it
+ *     (street-ecology.js FLOOR_JOIN_PX: the source's floors meet with a few pixels between them);
+ *   - each pixel then takes the highest floor within `reach` px either side, then the mean over
+ *     `ease` px either side (ease <= reach), so the path rises before a step instead of at it and
+ *     never comes below the floor within `ease` px of it (a flier's half width is under 50 px).
+ * A gap with no floor (a pit, past the street's ends) takes the higher of the floors beside it.
+ */
+export const FLIGHT_FLOOR = Object.freeze({ band: 200, join: 6, ground: 24, reach: 120, ease: 60 });
+
+/**
+ * How high each planned flier flies over that floor, and how far its art reaches below its point
+ * (the sprite's anchor to its bottom edge, at its drawn scale), for tests/flier-floor.test.js:
+ *   - a street Butterfly (game.js spawnButterflies): 90 px up, 22 more for every second and third
+ *     one (j % 3), bobbing 14 px; the fly-side sheet is 70x65 at ENTITY_SCALE.butterflyFly
+ *     (1.35 x 0.52), anchored at its centre;
+ *   - a Batterfly (animal-husbandry-feature buildBatterfly): 150 px up, looping 170 px each way and
+ *     up to 60 px up and down (stepBatterfly); the profile sheet is 111x96 at 0.82, anchored at
+ *     0.62 of its height.
+ */
+export const FLIER_LIFT = Object.freeze({
+  butterfly: Object.freeze({ lift: 90, perRow: 22, amp: 14, halfW: 70 * 0.702 / 2, below: 65 * 0.702 / 2 }),
+  batterfly: Object.freeze({ lift: 150, dx: 170, amp: 60, halfW: 111 * 0.82 / 2, below: 96 * 0.82 * 0.38 }),
+});
+
+/** A street Butterfly's height over the floor: the j-th flyer (game.js spawnButterflies). */
+export function flyerLift(j) {
+  const b = FLIER_LIFT.butterfly;
+  return b.lift + (Math.abs(Math.trunc(Number(j) || 0)) % 3) * b.perRow;
+}
+
+function lineYAt(p, x) {
+  const dx = p.x2 - p.x1;
+  const cx = Math.max(p.x1, Math.min(p.x2, x));
+  if (Math.abs(dx) < 1e-6) return Math.min(p.y1, p.y2);
+  return p.y1 + ((cx - p.x1) / dx) * (p.y2 - p.y1);
+}
+
+function flightLines(platforms) {
+  return (platforms || [])
+    .filter((p) => p && [p.x1, p.y1, p.x2, p.y2].every(Number.isFinite) && isStandable(p))
+    .map((p) => (p.x1 <= p.x2 ? p : { ...p, x1: p.x2, y1: p.y2, x2: p.x1, y2: p.y1 }));
+}
+
+/**
+ * The floor under x, exactly (no smoothing; see FLIGHT_FLOOR), or null where there is none.
+ * tests/flier-floor.test.js checks every flier against it.
+ */
+export function floorUnder(platforms, x, { lines = flightLines(platforms), ...opts } = {}) {
+  const { band, join, ground } = { ...FLIGHT_FLOOR, ...opts };
+  let lowest = -Infinity;
+  const at = [];
+  for (const p of lines) {
+    if (x < p.x1 - ground || x > p.x2 + ground) continue;
+    const y = lineYAt(p, x);
+    if (y > lowest) lowest = y;
+    if (x >= p.x1 - join && x <= p.x2 + join) at.push(y);
+  }
+  let top = null;
+  for (const y of at) if (y >= lowest - band && (top == null || y < top)) top = y;
+  return top;
+}
+
+/** floorUnder at every whole pixel 0..worldW (null over a gap). */
+export function floorProfile(platforms, worldW, opts = {}) {
+  const { join, ground } = { ...FLIGHT_FLOOR, ...opts };
+  const lines = flightLines(platforms);
+  const n = Math.max(1, Math.ceil(Number(worldW) || 0) + 1);
+  // Lines by 64 px column, so each pixel reads only the lines near it.
+  const col = 64;
+  const cols = Array.from({ length: Math.ceil(n / col) + 1 }, () => []);
+  const pad = Math.max(join, ground);
+  for (const p of lines) {
+    const a = Math.max(0, Math.floor((p.x1 - pad) / col));
+    const b = Math.min(cols.length - 1, Math.floor((p.x2 + pad) / col));
+    for (let c = a; c <= b; c += 1) cols[c].push(p);
+  }
+  const row = new Array(n);
+  for (let x = 0; x < n; x += 1) row[x] = floorUnder(null, x, { ...opts, lines: cols[Math.floor(x / col)] });
+  return row;
+}
+
+/** The smoothed floor fliers keep above, for a street (see FLIGHT_FLOOR), or null with no floor. */
+export function flightFloor(platforms, worldW, opts = {}) {
+  const { reach, ease } = { ...FLIGHT_FLOOR, ...opts };
+  const raw = floorProfile(platforms, worldW, opts);
+  const n = raw.length;
+  if (!raw.some((y) => y != null)) return null;
+  // The highest floor within reach either side (smaller y is higher): a sliding minimum.
+  const r = Math.max(0, Math.round(reach));
+  const env = new Array(n).fill(null);
+  const queue = [];
+  let head = 0;
+  for (let k = 0; k < n + r; k += 1) {
+    if (k < n && raw[k] != null) {
+      while (queue.length > head && raw[queue[queue.length - 1]] >= raw[k]) queue.pop();
+      queue.push(k);
+    }
+    const i = k - r;
+    if (i < 0) continue;
+    while (queue.length > head && queue[head] < i - r) head += 1;
+    env[i] = queue.length > head ? raw[queue[head]] : null;
+  }
+  // A wide gap: the higher of the floors beside it.
+  let last = null;
+  const fromLeft = env.map((v) => (v == null ? last : (last = v)));
+  last = null;
+  for (let i = n - 1; i >= 0; i -= 1) {
+    if (env[i] != null) {
+      last = env[i];
+      continue;
+    }
+    const a = fromLeft[i];
+    env[i] = a == null ? last : last == null ? a : Math.min(a, last);
+  }
+  // The mean over ease either side (ease <= reach keeps it under the floor).
+  const e = Math.max(0, Math.min(r, Math.round(ease)));
+  const sums = new Float64Array(n + 1);
+  for (let i = 0; i < n; i += 1) sums[i + 1] = sums[i] + env[i];
+  const ys = new Array(n);
+  for (let i = 0; i < n; i += 1) {
+    const a = Math.max(0, i - e);
+    const b = Math.min(n - 1, i + e);
+    ys[i] = (sums[b + 1] - sums[a]) / (b - a + 1);
+  }
+  return { step: 1, ys };
+}
+
+const floorCache = new WeakMap();
+
+/** flightFloor, kept per platforms array (a street's lines; game.js and the features share it). */
+export function flightFloorFor(platforms, worldW) {
+  if (!platforms || typeof platforms !== 'object') return null;
+  const hit = floorCache.get(platforms);
+  if (hit && hit.worldW === worldW && hit.count === platforms.length) return hit.floor;
+  const floor = flightFloor(platforms, worldW);
+  floorCache.set(platforms, { worldW, count: platforms.length, floor });
+  return floor;
+}
+
+/** The smoothed floor's y at x (clamped to the street's ends), or null without a floor. */
+export function flightFloorAt(floor, x) {
+  if (!floor?.ys?.length || !Number.isFinite(x)) return null;
+  const { step, ys } = floor;
+  const f = Math.max(0, Math.min(ys.length - 1, x / step));
+  const i = Math.floor(f);
+  const j = Math.min(ys.length - 1, i + 1);
+  return ys[i] + (ys[j] - ys[i]) * (f - i);
+}
+
+/**
+ * A flying Butterfly at path time t: across the street and back in from the far side, `lift` px
+ * over the floor under it (flightFloor) when the street has one, else at baseY.
+ */
+export function flyerAt({ x0, baseY, worldW, phase0 = 0, floor = null, lift = FLIER_LIFT.butterfly.lift }, t) {
   const f = CREATURE_PATHS.fly;
   const span = Math.max(1, worldW + 2 * f.margin);
   const x = mod(x0 + f.margin + (t / 1000) * f.speed, span) - f.margin;
-  return { x, y: baseY + Math.sin(phase0 + (t / 1000) * f.bob) * f.amp, dir: 1 };
+  const under = flightFloorAt(floor, x);
+  const mid = under == null ? baseY : under - lift;
+  return { x, y: mid + Math.sin(phase0 + (t / 1000) * f.bob) * f.amp, dir: 1 };
 }
 
 /** A resting Butterfly's y at path time t (it bobs where it sits). */
@@ -107,12 +276,24 @@ export function restAt({ groundY, phase0 = 0 }, t) {
   return { y: groundY + 2 + Math.sin(phase0 + (t / 1000) * r.bob) * r.amp };
 }
 
+/**
+ * A Batterfly's middle height at x: its own (150 px over the line it was placed on), but never
+ * less than 150 px over the floor under it (flightFloor), so a loop over rising ground rises too.
+ */
+export function batterflyBaseY(baseY, floor, x) {
+  const under = flightFloorAt(floor, x);
+  if (under == null) return baseY;
+  const over = under - FLIER_LIFT.batterfly.lift;
+  return Number.isFinite(baseY) ? Math.min(baseY, over) : over;
+}
+
 /** A Batterfly at path time t: lazy loops in the lower part of the street (stepBatterfly). */
-export function batterflyAt({ baseX, baseY, phase0 = 0 }, t) {
+export function batterflyAt({ baseX, baseY, phase0 = 0, floor = null }, t) {
   const phase = phase0 + t / 1000;
+  const x = baseX + Math.sin(phase * 0.35) * CREATURE_PATHS.batterfly.dx;
   return {
-    x: baseX + Math.sin(phase * 0.35) * CREATURE_PATHS.batterfly.dx,
-    y: baseY + Math.sin(phase * 0.9) * 26 + Math.cos(phase * 0.21) * 34,
+    x,
+    y: batterflyBaseY(baseY, floor, x) + Math.sin(phase * 0.9) * 26 + Math.cos(phase * 0.21) * 34,
     dir: Math.cos(phase * 0.35) >= 0 ? 1 : -1,
   };
 }

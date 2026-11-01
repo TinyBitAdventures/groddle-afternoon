@@ -112,7 +112,7 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=5d00c847';
+} from '../street-objects.js?v=de0efe2d';
 import { ROCK_CATALOG } from '../mining.js?v=fb4c7898';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=58743072';
@@ -126,13 +126,15 @@ import {
   batterflyPerks,
   creatureOf,
   easeToward,
+  flightFloorFor,
   flyerAt,
+  flyerLift,
   pathFrom,
   pathTime,
   restAt,
   sharedCreatureLabel,
   walkerAt,
-} from '../street-creatures.js?v=23a79d94';
+} from '../street-creatures.js?v=f61d1428';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -309,7 +311,16 @@ function setPath(engine, obj) {
     const j = obj.index - rest;
     const spot = engine.placement?.('flyingButterflies')?.[j];
     if (!spot || !Number.isFinite(spot.x)) return;
-    const home = { x0: spot.x, baseY: (Number.isFinite(spot.y) ? spot.y : spr.y + 90) - 90 - (j % 3) * 22, worldW: Number(engine.worldW) || 2000, phase0: j };
+    const worldW = Number(engine.worldW) || 2000;
+    // Over the floor under it (js/street-creatures.js flightFloor): every player's street has the same lines.
+    const home = {
+      x0: spot.x,
+      baseY: (Number.isFinite(spot.y) ? spot.y : spr.y + 90) - flyerLift(j),
+      worldW,
+      phase0: j,
+      floor: flightFloorFor(engine.platforms, worldW),
+      lift: flyerLift(j),
+    };
     pointAt = () => flyerAt(home, pathTime(t.sharedPath, Date.now(), copy.offset));
     step = (dt) => {
       if (!spr._ambient) return false;
@@ -332,8 +343,10 @@ function setPath(engine, obj) {
   } else if (obj.kind === 'batterfly') {
     // Its place is the server's (the snapshot's spots), the same for everyone.
     const spot = copy.spots?.[obj.id];
-    const home = (Array.isArray(spot) && engine.query?.('batterflyHome', t, Number(spot[0]), Number(spot[1]), engine)) || spr._home;
-    if (!home) return;
+    const placed = (Array.isArray(spot) && engine.query?.('batterflyHome', t, Number(spot[0]), Number(spot[1]), engine)) || spr._home;
+    if (!placed) return;
+    // Never lower over the floor under it than over its spot (js/street-creatures.js batterflyBaseY).
+    const home = { ...placed, floor: flightFloorFor(engine.platforms, Number(engine.worldW) || 2000) };
     pointAt = () => batterflyAt(home, pathTime(t.sharedPath, Date.now(), copy.offset));
     step = (dt) => {
       const p = pointAt();

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=63da285f';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=6a3d5a1b';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=585dfdb9';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -876,6 +876,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=8574d30d';
+import { easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=f61d1428';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=a1c4a308';
 import {
   actionLoopFor,
@@ -11333,6 +11334,12 @@ function spawnButterflies(xs, flyingSpots) {
     b.x = Number.isFinite(spot.x) ? spot.x : 250 + i * 400;
     b.y = Number.isFinite(spot.y) ? spot.y - 90 - (i % 3) * 22 : GROUND_Y - 90 - (i % 3) * 22;
     b.baseY = b.y;
+    // It flies its lift over the floor under it, not at one height across a street that slopes
+    // (js/street-creatures.js flightFloor; npc_butterfly.js flyAround 886-969: the 200 px above the floor).
+    b.lift = flyerLift(i);
+    b._flightFloor = flightFloorFor(streetPlatforms, WORLD_W);
+    const under = flightFloorAt(b._flightFloor, b.x);
+    if (under != null) b.y = under - b.lift;
     b.vx = 0.65;
     b.phase = i;
     b.zIndex = itemZ('npc_butterfly', 5);
@@ -12818,8 +12825,11 @@ function physics(dt) {
     if (b._ambient) {
       b.x += b.vx * dt;
       b.phase += 0.06 * dt;
-      b.y = b.baseY + Math.sin(b.phase) * 14;
       if (b.x > WORLD_W + 40) b.x = -40;
+      // Over the floor under it (spawnButterflies); back from a net, the Rook or a sulk, it eases in.
+      const under = flightFloorAt(b._flightFloor, b.x);
+      const mid = under == null ? b.baseY : under - (b.lift ?? 90);
+      b.y = easeToward(b.y, mid + Math.sin(b.phase) * 14, dt);
       const bs = b.baseScale ?? ENTITY_SCALE.butterflyFly;
       b.scale.x = (b.vx >= 0 ? 1 : -1) * bs;
       b.scale.y = Math.abs(bs);

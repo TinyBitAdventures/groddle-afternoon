@@ -103,7 +103,7 @@ import {
   stepHogtie,
   stickPlaceState,
 } from '../animal-husbandry.js?v=808076d1';
-import { batterflyResponseFor } from '../street-creatures.js?v=23a79d94';
+import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=f61d1428';
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';
@@ -302,7 +302,7 @@ function buildBatterfly(engine, key, x, y, state) {
   return entity;
 }
 
-function stepBatterfly(entity, dtMs) {
+function stepBatterfly(engine, entity, dtMs) {
   const spr = entity.sprite;
   if (!spr || spr.destroyed) return;
   if (entity.chewUntil && now() > entity.chewUntil) {
@@ -322,7 +322,8 @@ function stepBatterfly(entity, dtMs) {
   const nx = entity.baseX + dx;
   const facing = Math.cos(entity.phase * 0.35) >= 0 ? 1 : -1;
   spr.x = nx;
-  spr.y = entity.baseY + dy;
+  // Never lower over the floor under it than over its spot (js/street-creatures.js batterflyBaseY).
+  spr.y = batterflyBaseY(entity.baseY, flightFloorFor(engine?.platforms, engine?.worldW), nx) + dy;
   spr.scale.x = 0.82 * facing; // the art faces right
 }
 
@@ -1637,7 +1638,7 @@ export const animalHusbandryFeature = {
       if (!loader.ready(BATTERFLY_SHEETS.profile)) return;
       spawnStreet(engine);
     }
-    for (const b of batterflies) stepBatterfly(b, dtMs);
+    for (const b of batterflies) stepBatterfly(engine, b, dtMs);
     for (const e of extras) stepExtra(engine, e, dtMs);
     // Piggy Plop queue (doPlop every 5 s).
     for (const plop of drainPlops(now())) {
