@@ -27,7 +27,7 @@ import {
   settleSolo,
   soloRow,
 } from '../public/js/home-machines.js?v=765ad97b';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=d77a16a1';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=171aec9c';
 import { RECIPE_CATALOG, setRecipeCatalog } from '../public/js/making.js?v=ea3f10b5';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 

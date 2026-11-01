@@ -23,7 +23,8 @@ trimmed, and written as public/assets/sprites/world/<id>/<n>@3x.webp
 boards, a few toys) renders its first frame as '1'. art.json records each
 state's 1x size and where the art sits against the stage's bottom centre
 (`dx`: the art's centre right of it, `lift`: the art's bottom above it, both at 1x),
-and the SWF's hash; unchanged ids are skipped unless --force. Ids that can't be
+the SWF's hash and its path in glitch-items (`swf`); unchanged ids are skipped unless --force.
+Only the item folders count: glitch-items/achievements is badge art (NOT_ITEMS). Ids that can't be
 put down are left out, and their old renders removed.
 """
 import glob, hashlib, json, os, shutil, subprocess, sys, tempfile
@@ -70,9 +71,19 @@ def icon_ids():
     return sorted({os.path.basename(p)[:-4] for p in glob.glob(os.path.join(ICONS, '*.png')) if '@' not in os.path.basename(p)})
 
 
+# Not an item's art: glitch-items/achievements holds the badges (one SWF per achievement), and 11
+# badges share their name with an item (card_carrying_qualification, the ten artifact_* pieces), so
+# a put-down Card-Carrying Qualification drew its badge (player report 35). An item's own SWF is in
+# the item folders (misc/<class>/<class>.swf, artifacts/<class>/<class>.swf, food/..., ...).
+NOT_ITEMS = ('achievements',)
+
+
 def swf_index():
+    """{name: path}: each item SWF by its file name, from the item folders only (never a badge)."""
     idx = {}
     for p in sorted(glob.glob(os.path.join(ITEMS, '**/*.swf'), recursive=True)):
+        if os.path.relpath(p, ITEMS).split(os.sep)[0] in NOT_ITEMS:
+            continue
         idx.setdefault(os.path.basename(p)[:-4], p)
     return idx
 
@@ -145,6 +156,7 @@ def main(args):
         if not force and art.get(key, {}).get('sha') == digest and all(
             os.path.exists(os.path.join(OUT, key, f'{n}@{ZOOM}x.webp')) for n in art[key]['states']
         ):
+            art[key] = {'sha': digest, 'swf': os.path.relpath(src, ITEMS), 'states': art[key]['states']}
             continue
         try:
             info = swfinfo.read(src)
@@ -204,7 +216,7 @@ def main(args):
                         'lift': round((foot_y - (y + h)) / ZOOM),
                     }
                 if out:
-                    art[key] = {'sha': digest, 'states': out}
+                    art[key] = {'sha': digest, 'swf': os.path.relpath(src, ITEMS), 'states': out}
                 else:
                     print('  no render', key)
                     art.pop(key, None)

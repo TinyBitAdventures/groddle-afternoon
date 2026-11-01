@@ -1,6 +1,7 @@
 {
  "abbasid_ribs": {
   "sha": "a1bac3524d8d4fa6",
+  "swf": "food/abbasid_ribs/abbasid_ribs.swf",
   "states": {
    "1": {
     "w": 47,
@@ -30,6 +31,7 @@
  },
  "abbasidose": {
   "sha": "6311699efceae771",
+  "swf": "compounds/abbasidose/abbasidose.swf",
   "states": {
    "1": {
     "w": 19,
@@ -41,6 +43,7 @@
  },
  "ace_of_spades": {
   "sha": "09a46c2739e4d5f0",
+  "swf": "tools/shovel/ace_of_spades/ace_of_spades.swf",
   "states": {
    "1": {
     "w": 75,
@@ -52,6 +55,7 @@
  },
  "alchemical_tongs": {
   "sha": "147f0de5caa08980",
+  "swf": "tools/tool_base/alchemical_tongs/alchemical_tongs.swf",
   "states": {
    "1": {
     "w": 52,
@@ -63,6 +67,7 @@
  },
  "all_spice": {
   "sha": "d3178bb8077c26af",
+  "swf": "spice/all_spice/all_spice.swf",
   "states": {
    "1": {
     "w": 35,
@@ -92,6 +97,7 @@
  },
  "alphose": {
   "sha": "aca75f75602930bf",
+  "swf": "compounds/alphose/alphose.swf",
   "states": {
    "1": {
     "w": 21,
@@ -103,6 +109,7 @@
  },
  "antique_spigot": {
   "sha": "e51c208126df2850",
+  "swf": "rare_items/antique_spigot/antique_spigot.swf",
   "states": {
    "1": {
     "w": 41,
@@ -114,6 +121,7 @@
  },
  "apple": {
   "sha": "2dad967f6bc5dc0f",
+  "swf": "food/apple/apple.swf",
   "states": {
    "1": {
     "w": 19,
@@ -143,6 +151,7 @@
  },
  "applejack": {
   "sha": "cc0675a1883fb758",
+  "swf": "food/applejack/applejack.swf",
   "states": {
    "1": {
     "w": 36,
@@ -172,6 +181,7 @@
  },
  "artifact_butterfly_hair_clip": {
   "sha": "bfe07ef3056170ed",
+  "swf": "artifacts/artifact_butterfly_hair_clip/artifact_butterfly_hair_clip.swf",
   "states": {
    "1": {
     "w": 46,
@@ -183,6 +193,7 @@
  },
  "artifact_chicken_brick": {
   "sha": "3b04a996b13f474a",
+  "swf": "artifacts/artifact_chicken_brick/artifact_chicken_brick.swf",
   "states": {
    "1": {
     "w": 58,
@@ -194,6 +205,7 @@
  },
  "artifact_chicken_brick_piece1": {
   "sha": "21cb7ca38d9880c9",
+  "swf": "artifacts/artifact_chicken_brick_piece1/artifact_chicken_brick_piece1.swf",
   "states": {
    "1": {
     "w": 24,
@@ -205,6 +217,7 @@
  },
  "artifact_chicken_brick_piece2": {
   "sha": "494e95a670acafe8",
+  "swf": "artifacts/artifact_chicken_brick_piece2/artifact_chicken_brick_piece2.swf",
   "states": {
    "1": {
     "w": 29,
@@ -216,6 +229,7 @@
  },
  "artifact_chicken_brick_piece3": {
   "sha": "3aedb7f6d6558ee6",
+  "swf": "artifacts/artifact_chicken_brick_piece3/artifact_chicken_brick_piece3.swf",
   "states": {
    "1": {
     "w": 33,
@@ -227,6 +241,7 @@
  },
  "artifact_chicken_brick_piece4": {
   "sha": "478e889e5056a177",
+  "swf": "artifacts/artifact_chicken_brick_piece4/artifact_chicken_brick_piece4.swf",
   "states": {
    "1": {
     "w": 31,
@@ -238,6 +253,7 @@
  },
  "artifact_chicken_brick_piece5": {
   "sha": "7d3fa6356e889e56",
+  "swf": "artifacts/artifact_chicken_brick_piece5/artifact_chicken_brick_piece5.swf",
   "states": {
    "1": {
     "w": 32,
@@ -249,6 +265,7 @@
  },
  "artifact_glove_metal_finger": {
   "sha": "b177216fe07cd936",
+  "swf": "artifacts/artifact_glove_metal_finger/artifact_glove_metal_finger.swf",
   "states": {
    "1": {
     "w": 38,
@@ -260,6 +277,7 @@
  },
  "artifact_glove_metal_finger_piece1": {
   "sha": "36d85d04e40627f9",
+  "swf": "artifacts/artifact_glove_metal_finger_piece1/artifact_glove_metal_finger_piece1.swf",
   "states": {
    "1": {
     "w": 16,
@@ -271,6 +289,7 @@
  },
  "artifact_glove_metal_finger_piece2": {
   "sha": "d121d405f8322e72",
+  "swf": "artifacts/artifact_glove_metal_finger_piece2/artifact_glove_metal_finger_piece2.swf",
   "states": {
    "1": {
     "w": 35,
@@ -282,6 +301,7 @@
  },
  "artifact_glove_metal_finger_piece3": {
   "sha": "6ac08cd5dd1a3889",
+  "swf": "artifacts/artifact_glove_metal_finger_piece3/artifact_glove_metal_finger_piece3.swf",
   "states": {
    "1": {
     "w": 34,
@@ -292,18 +312,20 @@
   }
  },
  "artifact_magical_pendant": {
-  "sha": "003cd52c375cfd44",
+  "sha": "23b9dd4c0b330bf7",
+  "swf": "artifacts/artifact_magical_pendant/artifact_magical_pendant.swf",
   "states": {
    "1": {
-    "w": 40,
+    "w": 59,
     "h": 25,
-    "dx": -8,
-    "lift": 2
+    "dx": 0,
+    "lift": -2
    }
   }
  },
  "artifact_magical_pendant_piece1": {
   "sha": "13c811eaccd987ad",
+  "swf": "artifacts/artifact_magical_pendant_piece1/artifact_magical_pendant_piece1.swf",
   "states": {
    "1": {
     "w": 48,
@@ -315,6 +337,7 @@
  },
  "artifact_magical_pendant_piece2": {
   "sha": "eefc2fa1d94343b6",
+  "swf": "artifacts/artifact_magical_pendant_piece2/artifact_magical_pendant_piece2.swf",
   "states": {
    "1": {
     "w": 20,
@@ -326,6 +349,7 @@
  },
  "artifact_magical_pendant_piece3": {
   "sha": "fa8cfe7683a478ec",
+  "swf": "artifacts/artifact_magical_pendant_piece3/artifact_magical_pendant_piece3.swf",
   "states": {
    "1": {
     "w": 21,
@@ -336,18 +360,20 @@
   }
  },
  "artifact_mirror_with_scribbles": {
-  "sha": "c8332e62ab37e267",
+  "sha": "b3c44c4ab69074ac",
+  "swf": "artifacts/artifact_mirror_with_scribbles/artifact_mirror_with_scribbles.swf",
   "states": {
    "1": {
-    "w": 55,
-    "h": 59,
-    "dx": -6,
-    "lift": 0
+    "w": 67,
+    "h": 22,
+    "dx": 0,
+    "lift": 1
    }
   }
  },
  "artifact_mirror_with_scribbles_piece1": {
   "sha": "ec0099f1893f6743",
+  "swf": "artifacts/artifact_mirror_with_scribbles_piece1/artifact_mirror_with_scribbles_piece1.swf",
   "states": {
    "1": {
     "w": 32,
@@ -359,6 +385,7 @@
  },
  "artifact_mirror_with_scribbles_piece2": {
   "sha": "da02dc21a6809182",
+  "swf": "artifacts/artifact_mirror_with_scribbles_piece2/artifact_mirror_with_scribbles_piece2.swf",
   "states": {
    "1": {
     "w": 43,
@@ -370,6 +397,7 @@
  },
  "artifact_mirror_with_scribbles_piece3": {
   "sha": "e36608ea14bd488b",
+  "swf": "artifacts/artifact_mirror_with_scribbles_piece3/artifact_mirror_with_scribbles_piece3.swf",
   "states": {
    "1": {
     "w": 38,
@@ -381,6 +409,7 @@
  },
  "artifact_mirror_with_scribbles_piece4": {
   "sha": "7d55e9ce96c77e77",
+  "swf": "artifacts/artifact_mirror_with_scribbles_piece4/artifact_mirror_with_scribbles_piece4.swf",
   "states": {
    "1": {
     "w": 31,
@@ -392,6 +421,7 @@
  },
  "artifact_mirror_with_scribbles_piece5": {
   "sha": "ba119df310151f05",
+  "swf": "artifacts/artifact_mirror_with_scribbles_piece5/artifact_mirror_with_scribbles_piece5.swf",
   "states": {
    "1": {
     "w": 37,
@@ -403,6 +433,7 @@
  },
  "artifact_mysterious_cube": {
   "sha": "4b5f0f51457a849e",
+  "swf": "artifacts/artifact_mysterious_cube/artifact_mysterious_cube.swf",
   "states": {
    "1": {
     "w": 49,
@@ -414,6 +445,7 @@
  },
  "artifact_mysterious_cube_piece1": {
   "sha": "f6cf6cd60eaa85f7",
+  "swf": "artifacts/artifact_mysterious_cube_piece1/artifact_mysterious_cube_piece1.swf",
   "states": {
    "1": {
     "w": 32,
@@ -425,6 +457,7 @@
  },
  "artifact_mysterious_cube_piece2": {
   "sha": "1af734fdc8547d9c",
+  "swf": "artifacts/artifact_mysterious_cube_piece2/artifact_mysterious_cube_piece2.swf",
   "states": {
    "1": {
     "w": 35,
@@ -436,6 +469,7 @@
  },
  "artifact_mysterious_cube_piece3": {
   "sha": "cad180984a983ab4",
+  "swf": "artifacts/artifact_mysterious_cube_piece3/artifact_mysterious_cube_piece3.swf",
   "states": {
    "1": {
     "w": 31,
@@ -447,6 +481,7 @@
  },
  "artifact_mysterious_cube_piece4": {
   "sha": "715fb57f92425b32",
+  "swf": "artifacts/artifact_mysterious_cube_piece4/artifact_mysterious_cube_piece4.swf",
   "states": {
    "1": {
     "w": 36,
@@ -458,6 +493,7 @@
  },
  "artifact_mysterious_cube_piece5": {
   "sha": "6a19fe595845b7d0",
+  "swf": "artifacts/artifact_mysterious_cube_piece5/artifact_mysterious_cube_piece5.swf",
   "states": {
    "1": {
     "w": 36,
@@ -469,6 +505,7 @@
  },
  "artifact_necklace_amazonite": {
   "sha": "412dad6a4b1e7370",
+  "swf": "artifacts/artifact_necklace_amazonite/artifact_necklace_amazonite.swf",
   "states": {
    "1": {
     "w": 31,
@@ -480,6 +517,7 @@
  },
  "artifact_necklace_amazonite_piece": {
   "sha": "6e26cb9a3a8e8493",
+  "swf": "artifacts/artifact_necklace_amazonite_piece/artifact_necklace_amazonite_piece.swf",
   "states": {
    "1": {
     "w": 14,
@@ -491,6 +529,7 @@
  },
  "artifact_necklace_imperial": {
   "sha": "9d80f50f80cdad65",
+  "swf": "artifacts/artifact_necklace_imperial/artifact_necklace_imperial.swf",
   "states": {
    "1": {
     "w": 28,
@@ -502,6 +541,7 @@
  },
  "artifact_necklace_imperial_piece": {
   "sha": "0d1f595c98676354",
+  "swf": "artifacts/artifact_necklace_imperial_piece/artifact_necklace_imperial_piece.swf",
   "states": {
    "1": {
     "w": 8,
@@ -513,6 +553,7 @@
  },
  "artifact_necklace_onyx": {
   "sha": "85271115a1995d4d",
+  "swf": "artifacts/artifact_necklace_onyx/artifact_necklace_onyx.swf",
   "states": {
    "1": {
     "w": 29,
@@ -524,6 +565,7 @@
  },
  "artifact_necklace_onyx_piece": {
   "sha": "67b5817fc6a4e448",
+  "swf": "artifacts/artifact_necklace_onyx_piece/artifact_necklace_onyx_piece.swf",
   "states": {
    "1": {
     "w": 9,
@@ -535,6 +577,7 @@
  },
  "artifact_necklace_redtigereye": {
   "sha": "a897282912fb2816",
+  "swf": "artifacts/artifact_necklace_redtigereye/artifact_necklace_redtigereye.swf",
   "states": {
    "1": {
     "w": 28,
@@ -546,6 +589,7 @@
  },
  "artifact_necklace_redtigereye_piece": {
   "sha": "6b4ea70ee2dc84d8",
+  "swf": "artifacts/artifact_necklace_redtigereye_piece/artifact_necklace_redtigereye_piece.swf",
   "states": {
    "1": {
     "w": 9,
@@ -557,6 +601,7 @@
  },
  "artifact_necklace_rhyolite": {
   "sha": "aa0dff5fe1414bef",
+  "swf": "artifacts/artifact_necklace_rhyolite/artifact_necklace_rhyolite.swf",
   "states": {
    "1": {
     "w": 31,
@@ -568,6 +613,7 @@
  },
  "artifact_necklace_rhyolite_piece": {
   "sha": "8f7372ba5d1b8bee",
+  "swf": "artifacts/artifact_necklace_rhyolite_piece/artifact_necklace_rhyolite_piece.swf",
   "states": {
    "1": {
     "w": 14,
@@ -579,6 +625,7 @@
  },
  "artifact_nose_of_china": {
   "sha": "8a817d669f9a3a8d",
+  "swf": "artifacts/artifact_nose_of_china/artifact_nose_of_china.swf",
   "states": {
    "1": {
     "w": 21,
@@ -590,6 +637,7 @@
  },
  "artifact_nose_of_china_piece1": {
   "sha": "389774293b44f8d1",
+  "swf": "artifacts/artifact_nose_of_china_piece1/artifact_nose_of_china_piece1.swf",
   "states": {
    "1": {
     "w": 14,
@@ -601,6 +649,7 @@
  },
  "artifact_nose_of_china_piece2": {
   "sha": "ae7925dc5d42c5b0",
+  "swf": "artifacts/artifact_nose_of_china_piece2/artifact_nose_of_china_piece2.swf",
   "states": {
    "1": {
     "w": 21,
@@ -611,18 +660,20 @@
   }
  },
  "artifact_platinumium_spork": {
-  "sha": "f599cf157dadecc4",
+  "sha": "ee32eb36279ceeb9",
+  "swf": "artifacts/artifact_platinumium_spork/artifact_platinumium_spork.swf",
   "states": {
    "1": {
-    "w": 42,
-    "h": 37,
+    "w": 40,
+    "h": 14,
     "dx": 0,
-    "lift": 0
+    "lift": -3
    }
   }
  },
  "artifact_platinumium_spork_piece1": {
   "sha": "5d09dc6bb977795d",
+  "swf": "artifacts/artifact_platinumium_spork_piece1/artifact_platinumium_spork_piece1.swf",
   "states": {
    "1": {
     "w": 24,
@@ -634,6 +685,7 @@
  },
  "artifact_platinumium_spork_piece2": {
   "sha": "1a2d8cf48b6ecd64",
+  "swf": "artifacts/artifact_platinumium_spork_piece2/artifact_platinumium_spork_piece2.swf",
   "states": {
    "1": {
     "w": 17,
@@ -644,18 +696,20 @@
   }
  },
  "artifact_torn_manuscript": {
-  "sha": "9921d35c3b71690d",
+  "sha": "ae7267bb60264124",
+  "swf": "artifacts/artifact_torn_manuscript/artifact_torn_manuscript.swf",
   "states": {
    "1": {
-    "w": 75,
-    "h": 51,
-    "dx": -5,
-    "lift": 0
+    "w": 86,
+    "h": 31,
+    "dx": 0,
+    "lift": -2
    }
   }
  },
  "artifact_torn_manuscript_piece1": {
   "sha": "bf76e03570b439a3",
+  "swf": "artifacts/artifact_torn_manuscript_piece1/artifact_torn_manuscript_piece1.swf",
   "states": {
    "1": {
     "w": 66,
@@ -667,6 +721,7 @@
  },
  "artifact_torn_manuscript_piece2": {
   "sha": "d318080771a2bb07",
+  "swf": "artifacts/artifact_torn_manuscript_piece2/artifact_torn_manuscript_piece2.swf",
   "states": {
    "1": {
     "w": 53,
@@ -678,6 +733,7 @@
  },
  "artifact_torn_manuscript_piece3": {
   "sha": "7908ca4d6e7702da",
+  "swf": "artifacts/artifact_torn_manuscript_piece3/artifact_torn_manuscript_piece3.swf",
   "states": {
    "1": {
     "w": 32,
@@ -689,6 +745,7 @@
  },
  "artifact_torn_manuscript_piece4": {
   "sha": "7ba5d511cbd54971",
+  "swf": "artifacts/artifact_torn_manuscript_piece4/artifact_torn_manuscript_piece4.swf",
   "states": {
    "1": {
     "w": 33,
@@ -700,6 +757,7 @@
  },
  "artifact_wooden_apple": {
   "sha": "c5d807d90a369bc7",
+  "swf": "artifacts/artifact_wooden_apple/artifact_wooden_apple.swf",
   "states": {
    "1": {
     "w": 33,
@@ -711,6 +769,7 @@
  },
  "artifact_wooden_apple_piece1": {
   "sha": "f97074d25938ba7f",
+  "swf": "artifacts/artifact_wooden_apple_piece1/artifact_wooden_apple_piece1.swf",
   "states": {
    "1": {
     "w": 36,
@@ -722,6 +781,7 @@
  },
  "artifact_wooden_apple_piece2": {
   "sha": "2217a415b326240d",
+  "swf": "artifacts/artifact_wooden_apple_piece2/artifact_wooden_apple_piece2.swf",
   "states": {
    "1": {
     "w": 18,
@@ -733,6 +793,7 @@
  },
  "artifact_wooden_apple_piece3": {
   "sha": "ef8b4844c3095530",
+  "swf": "artifacts/artifact_wooden_apple_piece3/artifact_wooden_apple_piece3.swf",
   "states": {
    "1": {
     "w": 30,
@@ -744,6 +805,7 @@
  },
  "artifact_wooden_apple_piece4": {
   "sha": "78221b4df8575d50",
+  "swf": "artifacts/artifact_wooden_apple_piece4/artifact_wooden_apple_piece4.swf",
   "states": {
    "1": {
     "w": 13,
@@ -755,6 +817,7 @@
  },
  "awesome_pot": {
   "sha": "a2a67d48f84d5e62",
+  "swf": "tools/tool_base/awesome_pot/awesome_pot.swf",
   "states": {
    "1": {
     "w": 58,
@@ -766,6 +829,7 @@
  },
  "awesome_stew": {
   "sha": "2203eb5b648ae531",
+  "swf": "food/awesome_stew/awesome_stew.swf",
   "states": {
    "1": {
     "w": 36,
@@ -795,6 +859,7 @@
  },
  "bacon": {
   "sha": "d6031decf986091b",
+  "swf": "food/bacon/bacon.swf",
   "states": {
    "1": {
     "w": 65,
@@ -812,6 +877,7 @@
  },
  "bag_alchemistry_kit": {
   "sha": "ecbc7b736c5d4633",
+  "swf": "misc/bag_generic/bag_alchemistry_kit/bag_alchemistry_kit.swf",
   "states": {
    "1": {
     "w": 81,
@@ -823,6 +889,7 @@
  },
  "bag_bigger": {
   "sha": "eab2dac39330c744",
+  "swf": "misc/bag_bigger/bag_bigger.swf",
   "states": {
    "1": {
     "w": 55,
@@ -834,6 +901,7 @@
  },
  "bag_bigger_blue": {
   "sha": "9cdafc1ab9f93b85",
+  "swf": "misc/bag_bigger/bag_bigger_blue/bag_bigger_blue.swf",
   "states": {
    "1": {
     "w": 55,
@@ -845,6 +913,7 @@
  },
  "bag_bigger_gray": {
   "sha": "57ae324857cca75d",
+  "swf": "misc/bag_bigger/bag_bigger_gray/bag_bigger_gray.swf",
   "states": {
    "1": {
     "w": 54,
@@ -856,6 +925,7 @@
  },
  "bag_bigger_green": {
   "sha": "477eb9b3dcd7c46d",
+  "swf": "misc/bag_bigger/bag_bigger_green/bag_bigger_green.swf",
   "states": {
    "1": {
     "w": 54,
@@ -867,6 +937,7 @@
  },
  "bag_bigger_pink": {
   "sha": "afec5389a68e323e",
+  "swf": "misc/bag_bigger/bag_bigger_pink/bag_bigger_pink.swf",
   "states": {
    "1": {
     "w": 54,
@@ -878,6 +949,7 @@
  },
  "bag_cubimal_case": {
   "sha": "65e1f7f1156ab975",
+  "swf": "misc/bag_generic/bag_cubimal_case/bag_cubimal_case.swf",
   "states": {
    "1": {
     "w": 49,
@@ -889,6 +961,7 @@
  },
  "bag_elemental_pouch": {
   "sha": "a059077e7bdb1ccb",
+  "swf": "misc/bag_generic/bag_elemental_pouch/bag_elemental_pouch.swf",
   "states": {
    "1": {
     "w": 47,
@@ -900,6 +973,7 @@
  },
  "bag_generic": {
   "sha": "6c2612bea4600fd8",
+  "swf": "misc/bag_generic/bag_generic.swf",
   "states": {
    "1": {
     "w": 33,
@@ -911,6 +985,7 @@
  },
  "bag_generic_blue": {
   "sha": "ed9950d062a24ae0",
+  "swf": "misc/bag_generic/bag_generic_blue/bag_generic_blue.swf",
   "states": {
    "1": {
     "w": 33,
@@ -922,6 +997,7 @@
  },
  "bag_generic_gray": {
   "sha": "17c137c7a201ad33",
+  "swf": "misc/bag_generic/bag_generic_gray/bag_generic_gray.swf",
   "states": {
    "1": {
     "w": 33,
@@ -933,6 +1009,7 @@
  },
  "bag_generic_green": {
   "sha": "5c30f68fceeef5cf",
+  "swf": "misc/bag_generic/bag_generic_green/bag_generic_green.swf",
   "states": {
    "1": {
     "w": 33,
@@ -944,6 +1021,7 @@
  },
  "bag_generic_pink": {
   "sha": "e1a2ca5a10ee8a1c",
+  "swf": "misc/bag_generic/bag_generic_pink/bag_generic_pink.swf",
   "states": {
    "1": {
     "w": 33,
@@ -955,6 +1033,7 @@
  },
  "bag_gift_box": {
   "sha": "58307800fe669014",
+  "swf": "misc/bag_generic/bag_gift_box/bag_gift_box.swf",
   "states": {
    "1": {
     "w": 56,
@@ -966,6 +1045,7 @@
  },
  "bag_gift_box_wrapped": {
   "sha": "e2dd434ebd8e9dad",
+  "swf": "misc/bag_gift_box/bag_gift_box_wrapped/bag_gift_box_wrapped.swf",
   "states": {
    "1": {
     "w": 52,
@@ -977,6 +1057,7 @@
  },
  "bag_moving_box": {
   "sha": "36746d29f123767e",
+  "swf": "misc/bag_moving_box/bag_moving_box.swf",
   "states": {
    "1": {
     "w": 78,
@@ -988,6 +1069,7 @@
  },
  "bag_spicerack": {
   "sha": "ab032a41e4a61852",
+  "swf": "misc/bag_generic/bag_spicerack/bag_spicerack.swf",
   "states": {
    "1": {
     "w": 64,
@@ -999,6 +1081,7 @@
  },
  "bag_toolbox_chrome": {
   "sha": "5f46a8b1b1b7abfe",
+  "swf": "misc/bag_toolbox_base/bag_toolbox_chrome/bag_toolbox_chrome.swf",
   "states": {
    "1": {
     "w": 65,
@@ -1010,6 +1093,7 @@
  },
  "bag_toolbox_green": {
   "sha": "cd3f3a73ebe5aaa9",
+  "swf": "misc/bag_toolbox_base/bag_toolbox_green/bag_toolbox_green.swf",
   "states": {
    "1": {
     "w": 65,
@@ -1021,6 +1105,7 @@
  },
  "bag_toolbox_red": {
   "sha": "9c218c96eb8e7efe",
+  "swf": "misc/bag_toolbox_base/bag_toolbox_red/bag_toolbox_red.swf",
   "states": {
    "1": {
     "w": 65,
@@ -1032,6 +1117,7 @@
  },
  "banana": {
   "sha": "1a7be3f92fd45e13",
+  "swf": "food/banana/banana.swf",
   "states": {
    "1": {
     "w": 42,
@@ -1061,6 +1147,7 @@
  },
  "banana_no_names": {
   "sha": "d619069c525ca238",
+  "swf": "food/banana_no_names/banana_no_names.swf",
   "states": {
    "1": {
     "w": 59,
@@ -1090,6 +1177,7 @@
  },
  "barnacle": {
   "sha": "70ea491a6c741ca1",
+  "swf": "misc/barnacle/barnacle.swf",
   "states": {
    "1": {
     "w": 44,
@@ -1119,6 +1207,7 @@
  },
  "barnacle_talc": {
   "sha": "80e3dde3559433d0",
+  "swf": "misc/barnacle_talc/barnacle_talc.swf",
   "states": {
    "1": {
     "w": 56,
@@ -1148,6 +1237,7 @@
  },
  "basic_omelet": {
   "sha": "12cba9069c7bc1b9",
+  "swf": "food/basic_omelet/basic_omelet.swf",
   "states": {
    "1": {
     "w": 41,
@@ -1177,6 +1267,7 @@
  },
  "beachball": {
   "sha": "5cc5f4c45dd769f2",
+  "swf": "misc/beachball/beachball.swf",
   "states": {
    "1": {
     "w": 39,
@@ -1188,6 +1279,7 @@
  },
  "beaker": {
   "sha": "dc9081308f38733c",
+  "swf": "tools/tool_base/beaker/beaker.swf",
   "states": {
    "1": {
     "w": 27,
@@ -1199,6 +1291,7 @@
  },
  "beam": {
   "sha": "a87ed3ae437f0b20",
+  "swf": "misc/beam/beam.swf",
   "states": {
    "1": {
     "w": 89,
@@ -1210,6 +1303,7 @@
  },
  "bean_bean": {
   "sha": "b10cd68742191ceb",
+  "swf": "beans/bean_bean/bean_bean.swf",
   "states": {
    "1": {
     "w": 24,
@@ -1239,6 +1333,7 @@
  },
  "bean_bubble": {
   "sha": "72734e07f3ba001e",
+  "swf": "beans/bean_bubble/bean_bubble.swf",
   "states": {
    "1": {
     "w": 24,
@@ -1268,6 +1363,7 @@
  },
  "bean_egg": {
   "sha": "eb862f03edf8da3f",
+  "swf": "beans/bean_egg/bean_egg.swf",
   "states": {
    "1": {
     "w": 24,
@@ -1297,6 +1393,7 @@
  },
  "bean_fruit": {
   "sha": "e426392112063317",
+  "swf": "beans/bean_fruit/bean_fruit.swf",
   "states": {
    "1": {
     "w": 24,
@@ -1326,6 +1423,7 @@
  },
  "bean_gas": {
   "sha": "a2f8ab7cc9a32904",
+  "swf": "beans/bean_gas/bean_gas.swf",
   "states": {
    "1": {
     "w": 24,
@@ -1355,6 +1453,7 @@
  },
  "bean_plain": {
   "sha": "9b74b5794a3a58a2",
+  "swf": "food/bean_plain/bean_plain.swf",
   "states": {
    "1": {
     "w": 19,
@@ -1384,6 +1483,7 @@
  },
  "bean_seasoner": {
   "sha": "0f770124fcdfc064",
+  "swf": "tools/tool_base/bean_seasoner/bean_seasoner.swf",
   "states": {
    "1": {
     "w": 22,
@@ -1395,6 +1495,7 @@
  },
  "bean_spice": {
   "sha": "9891503cacce099f",
+  "swf": "beans/bean_spice/bean_spice.swf",
   "states": {
    "1": {
     "w": 24,
@@ -1424,6 +1525,7 @@
  },
  "bean_wood": {
   "sha": "ea232e65db63c56a",
+  "swf": "beans/bean_wood/bean_wood.swf",
   "states": {
    "1": {
     "w": 24,
@@ -1453,6 +1555,7 @@
  },
  "beer": {
   "sha": "2e6c1b05813376ce",
+  "swf": "drink/beer/beer.swf",
   "states": {
    "1": {
     "w": 17,
@@ -1482,6 +1585,7 @@
  },
  "berry_bowl": {
   "sha": "9c7cfa6706a5c689",
+  "swf": "food/berry_bowl/berry_bowl.swf",
   "states": {
    "1": {
     "w": 34,
@@ -1511,6 +1615,7 @@
  },
  "beryl": {
   "sha": "0692453d6fd8f37c",
+  "swf": "misc/beryl/beryl.swf",
   "states": {
    "1": {
     "w": 24,
@@ -1540,6 +1645,7 @@
  },
  "best_bean_dip": {
   "sha": "28ede579c452a6ef",
+  "swf": "food/best_bean_dip/best_bean_dip.swf",
   "states": {
    "1": {
     "w": 28,
@@ -1569,6 +1675,7 @@
  },
  "big_salad": {
   "sha": "5b1fe096ffbdfe75",
+  "swf": "food/big_salad/big_salad.swf",
   "states": {
    "1": {
     "w": 49,
@@ -1598,6 +1705,7 @@
  },
  "birch_candy": {
   "sha": "02cd2a5b8664d83f",
+  "swf": "food/zilloween_candy/birch_candy/birch_candy.swf",
   "states": {
    "1": {
     "w": 23,
@@ -1627,6 +1735,7 @@
  },
  "birch_syrup": {
   "sha": "ed1e898640eb2b07",
+  "swf": "food/birch_syrup/birch_syrup.swf",
   "states": {
    "1": {
     "w": 24,
@@ -1656,6 +1765,7 @@
  },
  "black_pepper": {
   "sha": "d96e7a7e48f2c077",
+  "swf": "spice/black_pepper/black_pepper.swf",
   "states": {
    "1": {
     "w": 50,
@@ -1685,6 +1795,7 @@
  },
  "blender": {
   "sha": "e90a62eb245a235e",
+  "swf": "tools/tool_base/blender/blender.swf",
   "states": {
    "1": {
     "w": 35,
@@ -1696,6 +1807,7 @@
  },
  "blockmaker_chassis": {
   "sha": "19b1d75dc3be49ae",
+  "swf": "tools/blockmaker_chassis/blockmaker_chassis.swf",
   "states": {
    "1": {
     "w": 123,
@@ -1707,6 +1819,7 @@
  },
  "blockmaker_engine": {
   "sha": "701c96c6a14901b9",
+  "swf": "tools/blockmaker_engine/blockmaker_engine.swf",
   "states": {
    "1": {
     "w": 102,
@@ -1718,6 +1831,7 @@
  },
  "blockmaker_plates": {
   "sha": "56867a57a8a235c0",
+  "swf": "tools/blockmaker_plates/blockmaker_plates.swf",
   "states": {
    "1": {
     "w": 87,
@@ -1729,6 +1843,7 @@
  },
  "blue_bubble": {
   "sha": "b10ce91c0d8f8e68",
+  "swf": "food/blue_bubble/blue_bubble.swf",
   "states": {
    "1": {
     "w": 18,
@@ -1758,6 +1873,7 @@
  },
  "board": {
   "sha": "8db4155cce554599",
+  "swf": "misc/board/board.swf",
   "states": {
    "1": {
     "w": 94,
@@ -1769,6 +1885,7 @@
  },
  "boot": {
   "sha": "463574ce79917669",
+  "swf": "misc/boot/boot.swf",
   "states": {
    "1": {
     "w": 32,
@@ -1780,6 +1897,7 @@
  },
  "broccoli": {
   "sha": "3eb63321771aa50b",
+  "swf": "food/broccoli/broccoli.swf",
   "states": {
    "1": {
     "w": 29,
@@ -1809,6 +1927,7 @@
  },
  "bubble_and_squeak": {
   "sha": "0fa576fe217e9d17",
+  "swf": "food/bubble_and_squeak/bubble_and_squeak.swf",
   "states": {
    "1": {
     "w": 54,
@@ -1838,6 +1957,7 @@
  },
  "bubble_tea": {
   "sha": "c6afdb2e36e722df",
+  "swf": "drink/bubble_tea/bubble_tea.swf",
   "states": {
    "1": {
     "w": 18,
@@ -1867,6 +1987,7 @@
  },
  "bubble_tuner": {
   "sha": "e6b1a39890d9ec33",
+  "swf": "tools/tool_base/bubble_tuner/bubble_tuner.swf",
   "states": {
    "1": {
     "w": 57,
@@ -1878,6 +1999,7 @@
  },
  "bulb": {
   "sha": "f73d3d855e1b4a6e",
+  "swf": "misc/bulb/bulb.swf",
   "states": {
    "1": {
     "w": 24,
@@ -1907,6 +2029,7 @@
  },
  "bun": {
   "sha": "a3d7d19e1c5ac370",
+  "swf": "food/bun/bun.swf",
   "states": {
    "1": {
     "w": 30,
@@ -1936,6 +2059,7 @@
  },
  "bunch_of_grapes": {
   "sha": "9882e691ab712c90",
+  "swf": "food/bunch_of_grapes/bunch_of_grapes.swf",
   "states": {
    "1": {
     "w": 40,
@@ -1965,6 +2089,7 @@
  },
  "butterfly_butter": {
   "sha": "f47b3b5a4f02e68a",
+  "swf": "food/butterfly_butter/butterfly_butter.swf",
   "states": {
    "1": {
     "w": 33,
@@ -1982,6 +2107,7 @@
  },
  "butterfly_egg": {
   "sha": "c28086609b5ed98d",
+  "swf": "misc/butterfly_egg/butterfly_egg.swf",
   "states": {
    "1": {
     "w": 21,
@@ -2011,6 +2137,7 @@
  },
  "butterfly_lotion": {
   "sha": "95d76e8340195c7b",
+  "swf": "tools/tool_base/butterfly_lotion/butterfly_lotion.swf",
   "states": {
    "1": {
     "w": 15,
@@ -2028,6 +2155,7 @@
  },
  "butterfly_milker": {
   "sha": "cce3b24f20077e41",
+  "swf": "misc/butterfly_milker/butterfly_milker.swf",
   "states": {
    "1": {
     "w": 47,
@@ -2039,6 +2167,7 @@
  },
  "butterfly_net": {
   "sha": "875aff1342499d63",
+  "swf": "tools/tool_base/butterfly_net/butterfly_net.swf",
   "states": {
    "1": {
     "w": 110,
@@ -2050,6 +2179,7 @@
  },
  "cabbage": {
   "sha": "e67e4b46fba58450",
+  "swf": "food/cabbage/cabbage.swf",
   "states": {
    "1": {
     "w": 33,
@@ -2079,6 +2209,7 @@
  },
  "camera": {
   "sha": "62819c27aad9a042",
+  "swf": "misc/camera/camera.swf",
   "states": {
    "1": {
     "w": 45,
@@ -2090,6 +2221,7 @@
  },
  "camphor": {
   "sha": "6ea5c36e6452f151",
+  "swf": "spice/camphor/camphor.swf",
   "states": {
    "1": {
     "w": 52,
@@ -2118,18 +2250,20 @@
   }
  },
  "card_carrying_qualification": {
-  "sha": "5d99c7e14c3b36c4",
+  "sha": "2d84e3936a236329",
+  "swf": "misc/card_carrying_qualification/card_carrying_qualification.swf",
   "states": {
    "1": {
-    "w": 172,
-    "h": 172,
-    "dx": 0,
-    "lift": 0
+    "w": 58,
+    "h": 16,
+    "dx": 2,
+    "lift": 1
    }
   }
  },
  "cardamom": {
   "sha": "148c9b6c92ad3b25",
+  "swf": "spice/cardamom/cardamom.swf",
   "states": {
    "1": {
     "w": 37,
@@ -2159,6 +2293,7 @@
  },
  "carobish_treats": {
   "sha": "828daa902c7fc176",
+  "swf": "food/zilloween_candy/carobish_treats/carobish_treats.swf",
   "states": {
    "1": {
     "w": 19,
@@ -2188,6 +2323,7 @@
  },
  "carrot": {
   "sha": "58a392056f182ec0",
+  "swf": "food/carrot/carrot.swf",
   "states": {
    "1": {
     "w": 45,
@@ -2217,6 +2353,7 @@
  },
  "carrot_margarita": {
   "sha": "fd013c4ebe4a3b27",
+  "swf": "drink/carrot_margarita/carrot_margarita.swf",
   "states": {
    "1": {
     "w": 29,
@@ -2246,6 +2383,7 @@
  },
  "caterpillar": {
   "sha": "9056c2574193e15f",
+  "swf": "inhabitants/caterpillar/caterpillar.swf",
   "states": {
    "1": {
     "w": 30,
@@ -2257,6 +2395,7 @@
  },
  "cauldron": {
   "sha": "61fa58522d49a310",
+  "swf": "tools/tool_base/cauldron/cauldron.swf",
   "states": {
    "1": {
     "w": 62,
@@ -2268,6 +2407,7 @@
  },
  "cedar_plank_salmon": {
   "sha": "789777edb953a064",
+  "swf": "food/cedar_plank_salmon/cedar_plank_salmon.swf",
   "states": {
    "1": {
     "w": 54,
@@ -2297,6 +2437,7 @@
  },
  "cheese": {
   "sha": "7a61e11ed5d9136c",
+  "swf": "food/cheese/cheese.swf",
   "states": {
    "1": {
     "w": 33,
@@ -2326,6 +2467,7 @@
  },
  "cheese_plate": {
   "sha": "cd6732e070d7a088",
+  "swf": "food/cheese_plate/cheese_plate.swf",
   "states": {
    "1": {
     "w": 68,
@@ -2355,6 +2497,7 @@
  },
  "cheese_stinky": {
   "sha": "f440d3b2f482a66b",
+  "swf": "food/cheese_stinky/cheese_stinky.swf",
   "states": {
    "1": {
     "w": 34,
@@ -2372,6 +2515,7 @@
  },
  "cheese_very_stinky": {
   "sha": "bdeaed0b01125342",
+  "swf": "food/cheese_very_stinky/cheese_very_stinky.swf",
   "states": {
    "1": {
     "w": 35,
@@ -2389,6 +2533,7 @@
  },
  "cheese_very_very_stinky": {
   "sha": "cf970f41e2c614bc",
+  "swf": "food/cheese_very_very_stinky/cheese_very_very_stinky.swf",
   "states": {
    "1": {
     "w": 35,
@@ -2406,6 +2551,7 @@
  },
  "cheezy_sammich": {
   "sha": "f8102b82163d5689",
+  "swf": "food/cheezy_sammich/cheezy_sammich.swf",
   "states": {
    "1": {
     "w": 29,
@@ -2435,6 +2581,7 @@
  },
  "cheezy_sauce": {
   "sha": "56777c943d82a72e",
+  "swf": "food/cheezy_sauce/cheezy_sauce.swf",
   "states": {
    "1": {
     "w": 20,
@@ -2464,6 +2611,7 @@
  },
  "cherry": {
   "sha": "67b5511b41b307df",
+  "swf": "food/cherry/cherry.swf",
   "states": {
    "1": {
     "w": 11,
@@ -2493,6 +2641,7 @@
  },
  "chick": {
   "sha": "4019afbb5d6843c0",
+  "swf": "inhabitants/chick/chick.swf",
   "states": {
    "1": {
     "w": 28,
@@ -2504,6 +2653,7 @@
  },
  "chicken_egg": {
   "sha": "75184a84565874c8",
+  "swf": "misc/chicken_egg/chicken_egg.swf",
   "states": {
    "1": {
     "w": 25,
@@ -2533,6 +2683,7 @@
  },
  "chillybusting_chili": {
   "sha": "9d285a01c8e19c62",
+  "swf": "food/chillybusting_chili/chillybusting_chili.swf",
   "states": {
    "1": {
     "w": 36,
@@ -2562,6 +2713,7 @@
  },
  "choice_crudites": {
   "sha": "47bd5e34651d63ef",
+  "swf": "food/choice_crudites/choice_crudites.swf",
   "states": {
    "1": {
     "w": 40,
@@ -2591,6 +2743,7 @@
  },
  "cinnamon": {
   "sha": "c5296fb58620b83c",
+  "swf": "spice/cinnamon/cinnamon.swf",
   "states": {
    "1": {
     "w": 37,
@@ -2620,6 +2773,7 @@
  },
  "class_axe": {
   "sha": "a833c1ca22928383",
+  "swf": "tools/hatchet/class_axe/class_axe.swf",
   "states": {
    "1": {
     "w": 61,
@@ -2631,6 +2785,7 @@
  },
  "cloud_11_smoothie": {
   "sha": "6b94abfc4d6708bf",
+  "swf": "drink/cloud_11_smoothie/cloud_11_smoothie.swf",
   "states": {
    "1": {
     "w": 18,
@@ -2660,6 +2815,7 @@
  },
  "cloudberry": {
   "sha": "44d2d4bcd7f1a1c1",
+  "swf": "food/cloudberry/cloudberry.swf",
   "states": {
    "1": {
     "w": 13,
@@ -2689,6 +2845,7 @@
  },
  "cloudberry_daiquiri": {
   "sha": "af86e7df90e9aa26",
+  "swf": "drink/cloudberry_daiquiri/cloudberry_daiquiri.swf",
   "states": {
    "1": {
     "w": 32,
@@ -2718,6 +2875,7 @@
  },
  "cloudberry_jam": {
   "sha": "180059b5eaf2074b",
+  "swf": "food/cloudberry_jam/cloudberry_jam.swf",
   "states": {
    "1": {
     "w": 20,
@@ -2747,6 +2905,7 @@
  },
  "cocktail_shaker": {
   "sha": "fbd2a8dcf060a2d3",
+  "swf": "tools/tool_base/cocktail_shaker/cocktail_shaker.swf",
   "states": {
    "1": {
     "w": 21,
@@ -2758,6 +2917,7 @@
  },
  "coffee": {
   "sha": "b518dc5c2b554226",
+  "swf": "drink/coffee/coffee.swf",
   "states": {
    "1": {
     "w": 27,
@@ -2787,6 +2947,7 @@
  },
  "cold_taco": {
   "sha": "29dbd1b69b5a83df",
+  "swf": "food/cold_taco/cold_taco.swf",
   "states": {
    "1": {
     "w": 33,
@@ -2816,6 +2977,7 @@
  },
  "collectors_edition_2010_glitchmas_yeti": {
   "sha": "13866eed9cd43fa3",
+  "swf": "misc/doll/collectors_edition_2010_glitchmas_yeti/collectors_edition_2010_glitchmas_yeti.swf",
   "states": {
    "1": {
     "w": 67,
@@ -2827,6 +2989,7 @@
  },
  "common_crudites": {
   "sha": "599197a81bcf1a28",
+  "swf": "food/common_crudites/common_crudites.swf",
   "states": {
    "1": {
     "w": 33,
@@ -2856,6 +3019,7 @@
  },
  "conch": {
   "sha": "e5e4f253c41fe845",
+  "swf": "misc/conch/conch.swf",
   "states": {
    "1": {
     "w": 48,
@@ -2867,6 +3031,7 @@
  },
  "construction_tool": {
   "sha": "c7cf118c9601571f",
+  "swf": "tools/tool_base/construction_tool/construction_tool.swf",
   "states": {
    "1": {
     "w": 72,
@@ -2878,6 +3043,7 @@
  },
  "contraband": {
   "sha": "dff1ffacd5b31bd2",
+  "swf": "misc/contraband/contraband.swf",
   "states": {
    "1": {
     "w": 35,
@@ -2889,6 +3055,7 @@
  },
  "copper": {
   "sha": "d1007f98b8591f30",
+  "swf": "misc/copper/copper.swf",
   "states": {
    "1": {
     "w": 33,
@@ -2918,6 +3085,7 @@
  },
  "corn": {
   "sha": "f9f8336cf277b2e8",
+  "swf": "food/corn/corn.swf",
   "states": {
    "1": {
     "w": 39,
@@ -2947,6 +3115,7 @@
  },
  "corn_off_the_cob": {
   "sha": "816edaec28ac91f8",
+  "swf": "food/corn_off_the_cob/corn_off_the_cob.swf",
   "states": {
    "1": {
     "w": 40,
@@ -2976,6 +3145,7 @@
  },
  "corn_syrup_squares": {
   "sha": "5a62d6e4c2637b7c",
+  "swf": "food/zilloween_candy/corn_syrup_squares/corn_syrup_squares.swf",
   "states": {
    "1": {
     "w": 29,
@@ -3005,6 +3175,7 @@
  },
  "cornucopia_crops": {
   "sha": "ab490c8f695ee758",
+  "swf": "misc/cornucopia_crops/cornucopia_crops.swf",
   "states": {
    "1": {
     "w": 95,
@@ -3016,6 +3187,7 @@
  },
  "cornucopia_herbs": {
   "sha": "d4efdd8ea630f90c",
+  "swf": "misc/cornucopia_herbs/cornucopia_herbs.swf",
   "states": {
    "1": {
     "w": 99,
@@ -3027,6 +3199,7 @@
  },
  "corny_fritter": {
   "sha": "42e07cafe3fc47bc",
+  "swf": "food/corny_fritter/corny_fritter.swf",
   "states": {
    "1": {
     "w": 42,
@@ -3056,6 +3229,7 @@
  },
  "cosmapolitan": {
   "sha": "8af1ab369d60ccdf",
+  "swf": "drink/cosmapolitan/cosmapolitan.swf",
   "states": {
    "1": {
     "w": 31,
@@ -3085,6 +3259,7 @@
  },
  "cosmox": {
   "sha": "ee62331175c90b91",
+  "swf": "compounds/cosmox/cosmox.swf",
   "states": {
    "1": {
     "w": 22,
@@ -3096,6 +3271,7 @@
  },
  "crabato_juice": {
   "sha": "b623bcc64299a854",
+  "swf": "drink/crabato_juice/crabato_juice.swf",
   "states": {
    "1": {
     "w": 19,
@@ -3125,6 +3301,7 @@
  },
  "crabphones": {
   "sha": "04f2212d94efe9aa",
+  "swf": "misc/crabphones/crabphones.swf",
   "states": {
    "1": {
     "w": 69,
@@ -3136,6 +3313,7 @@
  },
  "creamy_catsup": {
   "sha": "40f6073084603e53",
+  "swf": "food/creamy_catsup/creamy_catsup.swf",
   "states": {
    "1": {
     "w": 20,
@@ -3165,6 +3343,7 @@
  },
  "creamy_martini": {
   "sha": "1f93a5e2d78f07e7",
+  "swf": "drink/creamy_martini/creamy_martini.swf",
   "states": {
    "1": {
     "w": 33,
@@ -3194,6 +3373,7 @@
  },
  "crying_gas": {
   "sha": "1a6086a512979150",
+  "swf": "misc/crying_gas/crying_gas.swf",
   "states": {
    "1": {
     "w": 29,
@@ -3223,6 +3403,7 @@
  },
  "crystallizer": {
   "sha": "1b518dc0bf595268",
+  "swf": "tools/tool_base/crystallizer/crystallizer.swf",
   "states": {
    "1": {
     "w": 37,
@@ -3234,6 +3415,7 @@
  },
  "cubimal_package": {
   "sha": "bb369d6471044e2e",
+  "swf": "cubimals/cubimal_package/cubimal_package.swf",
   "states": {
    "1": {
     "w": 30,
@@ -3245,6 +3427,7 @@
  },
  "cubimal_package_2": {
   "sha": "e5cdb2becbbf1612",
+  "swf": "cubimals/cubimal_package_2/cubimal_package_2.swf",
   "states": {
    "1": {
     "w": 30,
@@ -3256,6 +3439,7 @@
  },
  "cucumber": {
   "sha": "860cafc1d095d62f",
+  "swf": "food/cucumber/cucumber.swf",
   "states": {
    "1": {
     "w": 40,
@@ -3285,6 +3469,7 @@
  },
  "cumin": {
   "sha": "b0c3d2d4ef416239",
+  "swf": "spice/cumin/cumin.swf",
   "states": {
    "1": {
     "w": 44,
@@ -3314,6 +3499,7 @@
  },
  "cup_of_water": {
   "sha": "a9369ad8806a7f1f",
+  "swf": "misc/cup_of_water/cup_of_water.swf",
   "states": {
    "1": {
     "w": 42,
@@ -3325,6 +3511,7 @@
  },
  "curry": {
   "sha": "6a2fccdbd141abf6",
+  "swf": "spice/curry/curry.swf",
   "states": {
    "1": {
     "w": 41,
@@ -3354,6 +3541,7 @@
  },
  "death_to_veg": {
   "sha": "df1099ff29dfc21d",
+  "swf": "food/death_to_veg/death_to_veg.swf",
   "states": {
    "1": {
     "w": 28,
@@ -3365,6 +3553,7 @@
  },
  "deluxe_sammich": {
   "sha": "365c26d7582e0871",
+  "swf": "food/deluxe_sammich/deluxe_sammich.swf",
   "states": {
    "1": {
     "w": 29,
@@ -3394,6 +3583,7 @@
  },
  "desssert_rub": {
   "sha": "bebb5b46ef723648",
+  "swf": "food/desssert_rub/desssert_rub.swf",
   "states": {
    "1": {
     "w": 21,
@@ -3405,6 +3595,7 @@
  },
  "diabolic_acid": {
   "sha": "a772ddb4b88ef63a",
+  "swf": "compounds/diabolic_acid/diabolic_acid.swf",
   "states": {
    "1": {
     "w": 16,
@@ -3416,6 +3607,7 @@
  },
  "dice": {
   "sha": "63dc624d8f2ed07d",
+  "swf": "misc/dice/dice.swf",
   "states": {
    "1": {
     "w": 26,
@@ -3427,6 +3619,7 @@
  },
  "dice_12sided": {
   "sha": "d105b2a27d6865fa",
+  "swf": "misc/dice_12sided/dice_12sided.swf",
   "states": {
    "1": {
     "w": 70,
@@ -3438,6 +3631,7 @@
  },
  "divine_crepes": {
   "sha": "e19466f62a834470",
+  "swf": "food/divine_crepes/divine_crepes.swf",
   "states": {
    "1": {
     "w": 58,
@@ -3467,6 +3661,7 @@
  },
  "doll_nietzsche": {
   "sha": "e186eb4b7b4a6e57",
+  "swf": "misc/doll/doll_nietzsche/doll_nietzsche.swf",
   "states": {
    "1": {
     "w": 57,
@@ -3478,6 +3673,7 @@
  },
  "doll_wittgenstein": {
   "sha": "898ce8192eeec5e8",
+  "swf": "misc/doll/doll_wittgenstein/doll_wittgenstein.swf",
   "states": {
    "1": {
     "w": 52,
@@ -3489,6 +3685,7 @@
  },
  "door_key_1": {
   "sha": "64b96bcc45740d3f",
+  "swf": "keys/door_key_1/door_key_1.swf",
   "states": {
    "1": {
     "w": 38,
@@ -3500,6 +3697,7 @@
  },
  "door_key_10": {
   "sha": "d5e7b7786dd2a383",
+  "swf": "keys/door_key_10/door_key_10.swf",
   "states": {
    "1": {
     "w": 37,
@@ -3511,6 +3709,7 @@
  },
  "door_key_11": {
   "sha": "f55c897496e9f6da",
+  "swf": "keys/door_key_11/door_key_11.swf",
   "states": {
    "1": {
     "w": 36,
@@ -3522,6 +3721,7 @@
  },
  "door_key_12": {
   "sha": "44dc70aa84cf13b9",
+  "swf": "keys/door_key_12/door_key_12.swf",
   "states": {
    "1": {
     "w": 36,
@@ -3533,6 +3733,7 @@
  },
  "door_key_2": {
   "sha": "3a21b96f76bd44c6",
+  "swf": "keys/door_key_2/door_key_2.swf",
   "states": {
    "1": {
     "w": 37,
@@ -3544,6 +3745,7 @@
  },
  "door_key_3": {
   "sha": "9dcfcf90188191d2",
+  "swf": "keys/door_key_3/door_key_3.swf",
   "states": {
    "1": {
     "w": 36,
@@ -3555,6 +3757,7 @@
  },
  "door_key_4": {
   "sha": "26fe12c8309cee98",
+  "swf": "keys/door_key_4/door_key_4.swf",
   "states": {
    "1": {
     "w": 36,
@@ -3566,6 +3769,7 @@
  },
  "door_key_5": {
   "sha": "2887f774217c7285",
+  "swf": "keys/door_key_5/door_key_5.swf",
   "states": {
    "1": {
     "w": 38,
@@ -3577,6 +3781,7 @@
  },
  "door_key_6": {
   "sha": "796f2c989d304e23",
+  "swf": "keys/door_key_6/door_key_6.swf",
   "states": {
    "1": {
     "w": 37,
@@ -3588,6 +3793,7 @@
  },
  "door_key_7": {
   "sha": "2e8ab3d9a27c2377",
+  "swf": "keys/door_key_7/door_key_7.swf",
   "states": {
    "1": {
     "w": 36,
@@ -3599,6 +3805,7 @@
  },
  "door_key_8": {
   "sha": "6ad46756ed5a04fb",
+  "swf": "keys/door_key_8/door_key_8.swf",
   "states": {
    "1": {
     "w": 36,
@@ -3610,6 +3817,7 @@
  },
  "door_key_9": {
   "sha": "facd3a9356a47224",
+  "swf": "keys/door_key_9/door_key_9.swf",
   "states": {
    "1": {
     "w": 38,
@@ -3621,6 +3829,7 @@
  },
  "drink_ticket": {
   "sha": "0ef60e295aa807f2",
+  "swf": "misc/drink_ticket/drink_ticket.swf",
   "states": {
    "1": {
     "w": 48,
@@ -3632,6 +3841,7 @@
  },
  "dullite": {
   "sha": "8a3dd825125be2fb",
+  "swf": "misc/dullite/dullite.swf",
   "states": {
    "1": {
     "w": 27,
@@ -3661,6 +3871,7 @@
  },
  "earth": {
   "sha": "f52dc4d0975f30b4",
+  "swf": "misc/earth/earth.swf",
   "states": {
    "1": {
     "w": 58,
@@ -3690,6 +3901,7 @@
  },
  "earthshaker": {
   "sha": "6805ddda0c8d0087",
+  "swf": "drink/earthshaker/earthshaker.swf",
   "states": {
    "1": {
     "w": 18,
@@ -3719,6 +3931,7 @@
  },
  "egg_plain": {
   "sha": "457e20bd37e98882",
+  "swf": "food/egg_plain/egg_plain.swf",
   "states": {
    "1": {
     "w": 20,
@@ -3748,6 +3961,7 @@
  },
  "egg_seasoner": {
   "sha": "7136ea60dd4854ee",
+  "swf": "tools/tool_base/egg_seasoner/egg_seasoner.swf",
   "states": {
    "1": {
     "w": 22,
@@ -3759,6 +3973,7 @@
  },
  "egghunt_egg_1": {
   "sha": "3f505271966823cd",
+  "swf": "food/egghunt_egg_1/egghunt_egg_1.swf",
   "states": {
    "1": {
     "w": 21,
@@ -3770,6 +3985,7 @@
  },
  "egghunt_egg_2": {
   "sha": "a00024d218365c5d",
+  "swf": "food/egghunt_egg_2/egghunt_egg_2.swf",
   "states": {
    "1": {
     "w": 24,
@@ -3781,6 +3997,7 @@
  },
  "egghunt_egg_3": {
   "sha": "79c8fd5bc920b1e7",
+  "swf": "food/egghunt_egg_3/egghunt_egg_3.swf",
   "states": {
    "1": {
     "w": 24,
@@ -3792,6 +4009,7 @@
  },
  "egghunt_egg_4": {
   "sha": "6cf7beec7a0e679c",
+  "swf": "food/egghunt_egg_4/egghunt_egg_4.swf",
   "states": {
    "1": {
     "w": 24,
@@ -3803,6 +4021,7 @@
  },
  "egghunt_egg_5": {
   "sha": "88deb6c0c28083bd",
+  "swf": "food/egghunt_egg_5/egghunt_egg_5.swf",
   "states": {
    "1": {
     "w": 31,
@@ -3814,6 +4033,7 @@
  },
  "eggy_scramble": {
   "sha": "bb1deeec48a8d2e7",
+  "swf": "food/eggy_scramble/eggy_scramble.swf",
   "states": {
    "1": {
     "w": 34,
@@ -3843,6 +4063,7 @@
  },
  "element_blue": {
   "sha": "eb6c2dac0e58188f",
+  "swf": "compounds/element_blue/element_blue.swf",
   "states": {
    "1": {
     "w": 38,
@@ -3854,6 +4075,7 @@
  },
  "element_green": {
   "sha": "329d54ba2c024269",
+  "swf": "compounds/element_green/element_green.swf",
   "states": {
    "1": {
     "w": 38,
@@ -3865,6 +4087,7 @@
  },
  "element_red": {
   "sha": "8420b2ce54af52fc",
+  "swf": "compounds/element_red/element_red.swf",
   "states": {
    "1": {
     "w": 39,
@@ -3876,6 +4099,7 @@
  },
  "element_shiny": {
   "sha": "cfcc003ee52c7631",
+  "swf": "compounds/element_shiny/element_shiny.swf",
   "states": {
    "1": {
     "w": 38,
@@ -3887,6 +4111,7 @@
  },
  "emblem_alph": {
   "sha": "c0c7fbe6a742cae6",
+  "swf": "giants/emblem_alph/emblem_alph.swf",
   "states": {
    "1": {
     "w": 46,
@@ -3898,6 +4123,7 @@
  },
  "emblem_cosma": {
   "sha": "071c55b99fb0bb45",
+  "swf": "giants/emblem_cosma/emblem_cosma.swf",
   "states": {
    "1": {
     "w": 46,
@@ -3909,6 +4135,7 @@
  },
  "emblem_friendly": {
   "sha": "dc62b4fbc9c83172",
+  "swf": "giants/emblem_friendly/emblem_friendly.swf",
   "states": {
    "1": {
     "w": 46,
@@ -3920,6 +4147,7 @@
  },
  "emblem_grendaline": {
   "sha": "291e810684e61fb9",
+  "swf": "giants/emblem_grendaline/emblem_grendaline.swf",
   "states": {
    "1": {
     "w": 46,
@@ -3931,6 +4159,7 @@
  },
  "emblem_humbaba": {
   "sha": "554a76ef2bbe73f5",
+  "swf": "giants/emblem_humbaba/emblem_humbaba.swf",
   "states": {
    "1": {
     "w": 46,
@@ -3942,6 +4171,7 @@
  },
  "emblem_lem": {
   "sha": "69dccbf8c849c114",
+  "swf": "giants/emblem_lem/emblem_lem.swf",
   "states": {
    "1": {
     "w": 46,
@@ -3953,6 +4183,7 @@
  },
  "emblem_mab": {
   "sha": "cdebf586a4641b58",
+  "swf": "giants/emblem_mab/emblem_mab.swf",
   "states": {
    "1": {
     "w": 46,
@@ -3964,6 +4195,7 @@
  },
  "emblem_pot": {
   "sha": "fbd19f29c94cb382",
+  "swf": "giants/emblem_pot/emblem_pot.swf",
   "states": {
    "1": {
     "w": 46,
@@ -3975,6 +4207,7 @@
  },
  "emblem_spriggan": {
   "sha": "09a47cbeef891a5a",
+  "swf": "giants/emblem_spriggan/emblem_spriggan.swf",
   "states": {
    "1": {
     "w": 46,
@@ -3986,6 +4219,7 @@
  },
  "emblem_ti": {
   "sha": "0ca2e6398d3b1068",
+  "swf": "giants/emblem_ti/emblem_ti.swf",
   "states": {
    "1": {
     "w": 46,
@@ -3997,6 +4231,7 @@
  },
  "emblem_zille": {
   "sha": "b9a6077e434b7ba7",
+  "swf": "giants/emblem_zille/emblem_zille.swf",
   "states": {
    "1": {
     "w": 46,
@@ -4008,6 +4243,7 @@
  },
  "emotional_bear": {
   "sha": "b54bc71dd87a7222",
+  "swf": "misc/emotional_bear/emotional_bear.swf",
   "states": {
    "1": {
     "w": 39,
@@ -4019,6 +4255,7 @@
  },
  "essence_of_gandlevery": {
   "sha": "e79c41abd96f041c",
+  "swf": "alchemy/essence_of_gandlevery/essence_of_gandlevery.swf",
   "states": {
    "1": {
     "w": 17,
@@ -4030,6 +4267,7 @@
  },
  "essence_of_hairball": {
   "sha": "96ed553d28511b63",
+  "swf": "alchemy/essence_of_hairball/essence_of_hairball.swf",
   "states": {
    "1": {
     "w": 17,
@@ -4041,6 +4279,7 @@
  },
  "essence_of_purple": {
   "sha": "0ca6b46b3f368cd0",
+  "swf": "alchemy/essence_of_purple/essence_of_purple.swf",
   "states": {
    "1": {
     "w": 17,
@@ -4052,6 +4291,7 @@
  },
  "essence_of_rookswort": {
   "sha": "e2e2bfd7d5be283b",
+  "swf": "alchemy/essence_of_rookswort/essence_of_rookswort.swf",
   "states": {
    "1": {
     "w": 17,
@@ -4063,6 +4303,7 @@
  },
  "essence_of_rubeweed": {
   "sha": "fdee184f6ba5e605",
+  "swf": "alchemy/essence_of_rubeweed/essence_of_rubeweed.swf",
   "states": {
    "1": {
     "w": 17,
@@ -4074,6 +4315,7 @@
  },
  "essence_of_silvertongue": {
   "sha": "dc1f137650ee0356",
+  "swf": "alchemy/essence_of_silvertongue/essence_of_silvertongue.swf",
   "states": {
    "1": {
     "w": 17,
@@ -4085,6 +4327,7 @@
  },
  "essence_of_yellow_crumb": {
   "sha": "467a380c29733f5a",
+  "swf": "alchemy/essence_of_yellow_crumb/essence_of_yellow_crumb.swf",
   "states": {
    "1": {
     "w": 17,
@@ -4096,6 +4339,7 @@
  },
  "exotic_fruit_salad": {
   "sha": "400e4a1f719bc444",
+  "swf": "food/exotic_fruit_salad/exotic_fruit_salad.swf",
   "states": {
    "1": {
     "w": 34,
@@ -4125,6 +4369,7 @@
  },
  "exotic_juice": {
   "sha": "6f2346257b4001dd",
+  "swf": "drink/exotic_juice/exotic_juice.swf",
   "states": {
    "1": {
     "w": 16,
@@ -4154,6 +4399,7 @@
  },
  "expensive_grilled_cheese": {
   "sha": "4944c2aee6805fa6",
+  "swf": "food/expensive_grilled_cheese/expensive_grilled_cheese.swf",
   "states": {
    "1": {
     "w": 39,
@@ -4183,6 +4429,7 @@
  },
  "extremely_hallowed_shrine_powder": {
   "sha": "992403456401689d",
+  "swf": "alchemy/extremely_hallowed_shrine_powder/extremely_hallowed_shrine_powder.swf",
   "states": {
    "1": {
     "w": 25,
@@ -4218,6 +4465,7 @@
  },
  "face_smelter": {
   "sha": "7604e7e1a894cc3e",
+  "swf": "drink/face_smelter/face_smelter.swf",
   "states": {
    "1": {
     "w": 38,
@@ -4247,6 +4495,7 @@
  },
  "fairly_hallowed_shrine_powder": {
   "sha": "01c8a6401882a508",
+  "swf": "alchemy/fairly_hallowed_shrine_powder/fairly_hallowed_shrine_powder.swf",
   "states": {
    "1": {
     "w": 22,
@@ -4282,6 +4531,7 @@
  },
  "fancy_pick": {
   "sha": "5ea654723663550a",
+  "swf": "tools/pick/fancy_pick/fancy_pick.swf",
   "states": {
    "1": {
     "w": 64,
@@ -4293,6 +4543,7 @@
  },
  "fertilidust": {
   "sha": "b86b6e15c1419b64",
+  "swf": "alchemy/fertilidust/fertilidust.swf",
   "states": {
    "1": {
     "w": 25,
@@ -4328,6 +4579,7 @@
  },
  "fertilidust_lite": {
   "sha": "725589d50c08c5db",
+  "swf": "alchemy/fertilidust_lite/fertilidust_lite.swf",
   "states": {
    "1": {
     "w": 22,
@@ -4363,6 +4615,7 @@
  },
  "firefly_jar": {
   "sha": "5372bfb8e1389b82",
+  "swf": "misc/firefly_jar/firefly_jar.swf",
   "states": {
    "1": {
     "w": 38,
@@ -4374,6 +4627,7 @@
  },
  "flaming_humbaba": {
   "sha": "ac2ee8cad431e9d9",
+  "swf": "drink/flaming_humbaba/flaming_humbaba.swf",
   "states": {
    "1": {
     "w": 30,
@@ -4403,6 +4657,7 @@
  },
  "flour": {
   "sha": "e4413d2c1d79c7fb",
+  "swf": "food/flour/flour.swf",
   "states": {
    "1": {
     "w": 31,
@@ -4432,6 +4687,7 @@
  },
  "flummery": {
   "sha": "e826b03e36c3ddbc",
+  "swf": "food/flummery/flummery.swf",
   "states": {
    "1": {
     "w": 53,
@@ -4461,6 +4717,7 @@
  },
  "focusing_orb": {
   "sha": "65795f66b321e5b5",
+  "swf": "tools/tool_base/focusing_orb/focusing_orb.swf",
   "states": {
    "1": {
     "w": 35,
@@ -4472,6 +4729,7 @@
  },
  "fortifying_gruel": {
   "sha": "cb2d1cb37044077f",
+  "swf": "food/fortifying_gruel/fortifying_gruel.swf",
   "states": {
    "1": {
     "w": 36,
@@ -4501,6 +4759,7 @@
  },
  "fortune": {
   "sha": "55547842b85ab4f4",
+  "swf": "misc/fortune/fortune.swf",
   "states": {
    "1": {
     "w": 23,
@@ -4512,6 +4771,7 @@
  },
  "fortune_cookie": {
   "sha": "647c24fdd5aa01d1",
+  "swf": "misc/fortune_cookie/fortune_cookie.swf",
   "states": {
    "1": {
     "w": 20,
@@ -4523,6 +4783,7 @@
  },
  "fox_bait": {
   "sha": "c601a74e4dfe69b4",
+  "swf": "misc/fox_bait/fox_bait.swf",
   "states": {
    "1": {
     "w": 41,
@@ -4534,6 +4795,7 @@
  },
  "fox_brush": {
   "sha": "fcf11daab0f07226",
+  "swf": "tools/tool_base/fox_brush/fox_brush.swf",
   "states": {
    "1": {
     "w": 45,
@@ -4545,6 +4807,7 @@
  },
  "fox_permit": {
   "sha": "d36578e68a25fd91",
+  "swf": "misc/fox_permit/fox_permit.swf",
   "states": {
    "1": {
     "w": 65,
@@ -4556,6 +4819,7 @@
  },
  "fried_egg": {
   "sha": "9b349e8d85d3588f",
+  "swf": "food/fried_egg/fried_egg.swf",
   "states": {
    "1": {
     "w": 49,
@@ -4579,6 +4843,7 @@
  },
  "fried_noodles": {
   "sha": "94897a7261f61429",
+  "swf": "food/fried_noodles/fried_noodles.swf",
   "states": {
    "1": {
     "w": 38,
@@ -4608,6 +4873,7 @@
  },
  "fried_rice": {
   "sha": "a7de4636c32474fc",
+  "swf": "food/fried_rice/fried_rice.swf",
   "states": {
    "1": {
     "w": 40,
@@ -4637,6 +4903,7 @@
  },
  "friendly_acid": {
   "sha": "712344a7c0d2b6b9",
+  "swf": "compounds/friendly_acid/friendly_acid.swf",
   "states": {
    "1": {
     "w": 22,
@@ -4648,6 +4915,7 @@
  },
  "frog_in_a_hole": {
   "sha": "81a64595a99404ec",
+  "swf": "food/frog_in_a_hole/frog_in_a_hole.swf",
   "states": {
    "1": {
     "w": 33,
@@ -4677,6 +4945,7 @@
  },
  "fruit_changing_machine": {
   "sha": "69a73f570be4ddeb",
+  "swf": "tools/tool_base/fruit_changing_machine/fruit_changing_machine.swf",
   "states": {
    "1": {
     "w": 36,
@@ -4688,6 +4957,7 @@
  },
  "fruit_salad": {
   "sha": "3c576b8aeb5d86eb",
+  "swf": "food/fruit_salad/fruit_salad.swf",
   "states": {
    "1": {
     "w": 34,
@@ -4717,6 +4987,7 @@
  },
  "fruity_juice": {
   "sha": "b2dde0e027d01404",
+  "swf": "drink/fruity_juice/fruity_juice.swf",
   "states": {
    "1": {
     "w": 21,
@@ -4746,6 +5017,7 @@
  },
  "frying_pan": {
   "sha": "e79c92afd1f3b922",
+  "swf": "tools/tool_base/frying_pan/frying_pan.swf",
   "states": {
    "1": {
     "w": 90,
@@ -4757,6 +5029,7 @@
  },
  "fuel_cell": {
   "sha": "22eef646ef91c75f",
+  "swf": "misc/fuel_cell/fuel_cell.swf",
   "states": {
    "1": {
     "w": 32,
@@ -4786,6 +5059,7 @@
  },
  "fuelmaker_case": {
   "sha": "ca5310bdf5b8f2b2",
+  "swf": "tools/fuelmaker_case/fuelmaker_case.swf",
   "states": {
    "1": {
     "w": 107,
@@ -4797,6 +5071,7 @@
  },
  "fuelmaker_core": {
   "sha": "6c01587a66e6caa9",
+  "swf": "tools/fuelmaker_core/fuelmaker_core.swf",
   "states": {
    "1": {
     "w": 61,
@@ -4808,6 +5083,7 @@
  },
  "game_box": {
   "sha": "74e23008c7ab95a0",
+  "swf": "misc/game_box/game_box.swf",
   "states": {
    "1": {
     "w": 37,
@@ -4819,6 +5095,7 @@
  },
  "gameshow_ticket": {
   "sha": "17524f2547668906",
+  "swf": "misc/gameshow_ticket/gameshow_ticket.swf",
   "states": {
    "1": {
     "w": 38,
@@ -4890,6 +5167,7 @@
  },
  "gammas_pancakes": {
   "sha": "644fd6323f40f2f5",
+  "swf": "food/gammas_pancakes/gammas_pancakes.swf",
   "states": {
    "1": {
     "w": 35,
@@ -4919,6 +5197,7 @@
  },
  "gandlevery": {
   "sha": "5f320df510ab35e4",
+  "swf": "herbs/gandlevery/gandlevery.swf",
   "states": {
    "1": {
     "w": 45,
@@ -4948,6 +5227,7 @@
  },
  "garlic": {
   "sha": "5db234c6716fbcf2",
+  "swf": "spice/garlic/garlic.swf",
   "states": {
    "1": {
     "w": 26,
@@ -4977,6 +5257,7 @@
  },
  "gassifier": {
   "sha": "f2e531705c67824b",
+  "swf": "tools/tool_base/gassifier/gassifier.swf",
   "states": {
    "1": {
     "w": 53,
@@ -4988,6 +5269,7 @@
  },
  "gem_amber": {
   "sha": "c101bb4d026cf59b",
+  "swf": "misc/gem_amber/gem_amber.swf",
   "states": {
    "1": {
     "w": 29,
@@ -4999,6 +5281,7 @@
  },
  "gem_diamond": {
   "sha": "78f660574ab92a38",
+  "swf": "misc/gem_diamond/gem_diamond.swf",
   "states": {
    "1": {
     "w": 23,
@@ -5010,6 +5293,7 @@
  },
  "gem_moonstone": {
   "sha": "d28bf9ab2fa245bb",
+  "swf": "misc/gem_moonstone/gem_moonstone.swf",
   "states": {
    "1": {
     "w": 45,
@@ -5021,6 +5305,7 @@
  },
  "gem_ruby": {
   "sha": "b1050c4b2c1174bb",
+  "swf": "misc/gem_ruby/gem_ruby.swf",
   "states": {
    "1": {
     "w": 24,
@@ -5032,6 +5317,7 @@
  },
  "gem_sapphire": {
   "sha": "314e93513e7c5341",
+  "swf": "misc/gem_sapphire/gem_sapphire.swf",
   "states": {
    "1": {
     "w": 31,
@@ -5043,6 +5329,7 @@
  },
  "general_building_permit": {
   "sha": "4b67fe29b0838988",
+  "swf": "misc/general_building_permit/general_building_permit.swf",
   "states": {
    "1": {
     "w": 65,
@@ -5054,6 +5341,7 @@
  },
  "general_fabric": {
   "sha": "4b984957eec14716",
+  "swf": "misc/general_fabric/general_fabric.swf",
   "states": {
    "1": {
     "w": 64,
@@ -5083,6 +5371,7 @@
  },
  "general_vapour": {
   "sha": "1114a8df8e7b9cb4",
+  "swf": "misc/general_vapour/general_vapour.swf",
   "states": {
    "1": {
     "w": 29,
@@ -5112,6 +5401,7 @@
  },
  "ginger": {
   "sha": "83809e0dc264ddf0",
+  "swf": "spice/ginger/ginger.swf",
   "states": {
    "1": {
     "w": 22,
@@ -5141,6 +5431,7 @@
  },
  "girder": {
   "sha": "73522473e812c357",
+  "swf": "misc/girder/girder.swf",
   "states": {
    "1": {
     "w": 89,
@@ -5152,6 +5443,7 @@
  },
  "glitchepoix": {
   "sha": "37c2ec355c2ead72",
+  "swf": "food/glitchepoix/glitchepoix.swf",
   "states": {
    "1": {
     "w": 28,
@@ -5163,6 +5455,7 @@
  },
  "glitchmas_card": {
   "sha": "31a418ad6a883f7a",
+  "swf": "misc/note/glitchmas_card/glitchmas_card.swf",
   "states": {
    "1": {
     "w": 54,
@@ -5174,6 +5467,7 @@
  },
  "glitchmas_cracker": {
   "sha": "04f7f2d3266fcd48",
+  "swf": "misc/glitchmas_cracker/glitchmas_cracker.swf",
   "states": {
    "1": {
     "w": 52,
@@ -5185,6 +5479,7 @@
  },
  "glitchmas_cracker_factoid": {
   "sha": "776abf062f7e9d2f",
+  "swf": "misc/glitchmas_cracker_joke/glitchmas_cracker_factoid/glitchmas_cracker_factoid.swf",
   "states": {
    "1": {
     "w": 29,
@@ -5196,6 +5491,7 @@
  },
  "glitchmas_cracker_joke": {
   "sha": "342f834542c9a88b",
+  "swf": "misc/note/glitchmas_cracker_joke/glitchmas_cracker_joke.swf",
   "states": {
    "1": {
     "w": 29,
@@ -5207,6 +5503,7 @@
  },
  "glitchmas_present": {
   "sha": "ff207308c2d09009",
+  "swf": "misc/glitchmas_present/glitchmas_present.swf",
   "states": {
    "1": {
     "w": 44,
@@ -5218,6 +5515,7 @@
  },
  "grade_aa_earth_block": {
   "sha": "c4cbe21a3132b54e",
+  "swf": "misc/grade_aa_earth_block/grade_aa_earth_block.swf",
   "states": {
    "1": {
     "w": 76,
@@ -5247,6 +5545,7 @@
  },
  "grain": {
   "sha": "cf94da4d8a2f7472",
+  "swf": "food/grain/grain.swf",
   "states": {
    "1": {
     "w": 46,
@@ -5276,6 +5575,7 @@
  },
  "grain_bushel": {
   "sha": "46fa08369f8b2caf",
+  "swf": "misc/grain_bushel/grain_bushel.swf",
   "states": {
    "1": {
     "w": 87,
@@ -5305,6 +5605,7 @@
  },
  "grand_ol_grinder": {
   "sha": "2642dcc8c0a16ec1",
+  "swf": "tools/ore_grinder/grand_ol_grinder/grand_ol_grinder.swf",
   "states": {
    "1": {
     "w": 38,
@@ -5316,6 +5617,7 @@
  },
  "greasy_frybread": {
   "sha": "a6590f301c81b629",
+  "swf": "food/greasy_frybread/greasy_frybread.swf",
   "states": {
    "1": {
     "w": 35,
@@ -5345,6 +5647,7 @@
  },
  "green": {
   "sha": "9f60bbb1306384d9",
+  "swf": "food/green/green.swf",
   "states": {
    "1": {
     "w": 28,
@@ -5356,6 +5659,7 @@
  },
  "green_eggs": {
   "sha": "abb07f513c997c16",
+  "swf": "food/green_eggs/green_eggs.swf",
   "states": {
    "1": {
     "w": 48,
@@ -5385,6 +5689,7 @@
  },
  "greeter_twig": {
   "sha": "99f85833a92e0bb7",
+  "swf": "misc/greeter_twig/greeter_twig.swf",
   "states": {
    "1": {
     "w": 48,
@@ -5396,6 +5701,7 @@
  },
  "grendalinunin": {
   "sha": "d29fd6b1edc19328",
+  "swf": "compounds/grendalinunin/grendalinunin.swf",
   "states": {
    "1": {
     "w": 22,
@@ -5407,6 +5713,7 @@
  },
  "grilled_cheese": {
   "sha": "d4060c7595b1e903",
+  "swf": "food/grilled_cheese/grilled_cheese.swf",
   "states": {
    "1": {
     "w": 39,
@@ -5436,6 +5743,7 @@
  },
  "groddlene": {
   "sha": "80e7bf2b89bcc63d",
+  "swf": "compounds/groddlene/groddlene.swf",
   "states": {
    "1": {
     "w": 22,
@@ -5447,6 +5755,7 @@
  },
  "guano": {
   "sha": "92e4fe10af054d37",
+  "swf": "misc/guano/guano.swf",
   "states": {
    "1": {
     "w": 28,
@@ -5458,6 +5767,7 @@
  },
  "gurly_drink": {
   "sha": "bd3001a33f0a8a92",
+  "swf": "drink/gurly_drink/gurly_drink.swf",
   "states": {
    "1": {
     "w": 31,
@@ -5487,6 +5797,7 @@
  },
  "hairball_flower": {
   "sha": "c7924956dde77ad6",
+  "swf": "herbs/hairball_flower/hairball_flower.swf",
   "states": {
    "1": {
     "w": 59,
@@ -5516,6 +5827,7 @@
  },
  "hard_bubble": {
   "sha": "6937690236ac858f",
+  "swf": "food/hard_bubble/hard_bubble.swf",
   "states": {
    "1": {
     "w": 17,
@@ -5545,6 +5857,7 @@
  },
  "hash": {
   "sha": "f7c1e7e4bbbf995d",
+  "swf": "food/hash/hash.swf",
   "states": {
    "1": {
     "w": 41,
@@ -5574,6 +5887,7 @@
  },
  "hatchet": {
   "sha": "ba44f8dd13d1b30c",
+  "swf": "tools/tool_base/hatchet/hatchet.swf",
   "states": {
    "1": {
     "w": 60,
@@ -5585,6 +5899,7 @@
  },
  "hearty_groddle_sammich": {
   "sha": "8072f5115b3e0b34",
+  "swf": "food/hearty_groddle_sammich/hearty_groddle_sammich.swf",
   "states": {
    "1": {
     "w": 29,
@@ -5614,6 +5929,7 @@
  },
  "hearty_omelet": {
   "sha": "a7841509334f9880",
+  "swf": "food/hearty_omelet/hearty_omelet.swf",
   "states": {
    "1": {
     "w": 41,
@@ -5643,6 +5959,7 @@
  },
  "heavy_gas": {
   "sha": "8f2312cffa902227",
+  "swf": "misc/heavy_gas/heavy_gas.swf",
   "states": {
    "1": {
     "w": 29,
@@ -5672,6 +5989,7 @@
  },
  "helium": {
   "sha": "e1de3a9fb9f16287",
+  "swf": "misc/helium/helium.swf",
   "states": {
    "1": {
     "w": 29,
@@ -5701,6 +6019,7 @@
  },
  "heston_mash": {
   "sha": "0d393e4d5a4544d4",
+  "swf": "food/heston_mash/heston_mash.swf",
   "states": {
    "1": {
     "w": 36,
@@ -5712,6 +6031,7 @@
  },
  "high_class_hoe": {
   "sha": "14fd6eacecc019b5",
+  "swf": "tools/hoe/high_class_hoe/high_class_hoe.swf",
   "states": {
    "1": {
     "w": 70,
@@ -5723,6 +6043,7 @@
  },
  "hoe": {
   "sha": "3e3e3ca94ca40fb2",
+  "swf": "tools/tool_base/hoe/hoe.swf",
   "states": {
    "1": {
     "w": 69,
@@ -5734,6 +6055,7 @@
  },
  "hogtied_piggy": {
   "sha": "0f1bc36ceea32908",
+  "swf": "misc/hogtied_piggy/hogtied_piggy.swf",
   "states": {
    "1": {
     "w": 46,
@@ -5745,6 +6067,7 @@
  },
  "homestreet_ticket": {
   "sha": "f055c49b7ead7f78",
+  "swf": "misc/homestreet_ticket/homestreet_ticket.swf",
   "states": {
    "1": {
     "w": 47,
@@ -5756,6 +6079,7 @@
  },
  "honey": {
   "sha": "f0f07fc2d611aa04",
+  "swf": "food/honey/honey.swf",
   "states": {
    "1": {
     "w": 20,
@@ -5785,6 +6109,7 @@
  },
  "hooch": {
   "sha": "ccab218f1bd12982",
+  "swf": "drink/hooch/hooch.swf",
   "states": {
    "1": {
     "w": 23,
@@ -5814,6 +6139,7 @@
  },
  "hot_n_fizzy_sauce": {
   "sha": "956fe5da58c61818",
+  "swf": "food/hot_n_fizzy_sauce/hot_n_fizzy_sauce.swf",
   "states": {
    "1": {
     "w": 13,
@@ -5843,6 +6169,7 @@
  },
  "hot_pepper": {
   "sha": "181a2a1be694006c",
+  "swf": "spice/hot_pepper/hot_pepper.swf",
   "states": {
    "1": {
     "w": 36,
@@ -5872,6 +6199,7 @@
  },
  "hot_potatoes": {
   "sha": "0ddcf0bce4fd5187",
+  "swf": "food/hot_potatoes/hot_potatoes.swf",
   "states": {
    "1": {
     "w": 33,
@@ -5883,6 +6211,7 @@
  },
  "hototot_rub": {
   "sha": "6f2a7e76c8fc98bf",
+  "swf": "food/hototot_rub/hototot_rub.swf",
   "states": {
    "1": {
     "w": 20,
@@ -5894,6 +6223,7 @@
  },
  "humbabol": {
   "sha": "8daec2d1b287a770",
+  "swf": "compounds/humbabol/humbabol.swf",
   "states": {
    "1": {
     "w": 21,
@@ -5905,6 +6235,7 @@
  },
  "hungry_nachos": {
   "sha": "8abb08e24e3d93c1",
+  "swf": "food/hungry_nachos/hungry_nachos.swf",
   "states": {
    "1": {
     "w": 38,
@@ -5916,6 +6247,7 @@
  },
  "ice": {
   "sha": "2087d09122ea0951",
+  "swf": "food/ice/ice.swf",
   "states": {
    "1": {
     "w": 17,
@@ -5945,6 +6277,7 @@
  },
  "icon_alph": {
   "sha": "7df6d69e142a5034",
+  "swf": "giants/icon_alph/icon_alph.swf",
   "states": {
    "1": {
     "w": 88,
@@ -5956,6 +6289,7 @@
  },
  "icon_cosma": {
   "sha": "0cce55a005aad451",
+  "swf": "giants/icon_cosma/icon_cosma.swf",
   "states": {
    "1": {
     "w": 96,
@@ -5967,6 +6301,7 @@
  },
  "icon_friendly": {
   "sha": "a25144566597f1b3",
+  "swf": "giants/icon_friendly/icon_friendly.swf",
   "states": {
    "1": {
     "w": 85,
@@ -5978,6 +6313,7 @@
  },
  "icon_grendaline": {
   "sha": "c79d6e83fbfea2de",
+  "swf": "giants/icon_grendaline/icon_grendaline.swf",
   "states": {
    "1": {
     "w": 82,
@@ -5989,6 +6325,7 @@
  },
  "icon_humbaba": {
   "sha": "e0acc854124f6421",
+  "swf": "giants/icon_humbaba/icon_humbaba.swf",
   "states": {
    "1": {
     "w": 79,
@@ -6000,6 +6337,7 @@
  },
  "icon_lem": {
   "sha": "68de831734b22aae",
+  "swf": "giants/icon_lem/icon_lem.swf",
   "states": {
    "1": {
     "w": 90,
@@ -6011,6 +6349,7 @@
  },
  "icon_mab": {
   "sha": "91fae3500ac7eb5c",
+  "swf": "giants/icon_mab/icon_mab.swf",
   "states": {
    "1": {
     "w": 80,
@@ -6022,6 +6361,7 @@
  },
  "icon_pot": {
   "sha": "b7d2c61b6194bbd4",
+  "swf": "giants/icon_pot/icon_pot.swf",
   "states": {
    "1": {
     "w": 106,
@@ -6033,6 +6373,7 @@
  },
  "icon_spriggan": {
   "sha": "4fed78f70e3d20b4",
+  "swf": "giants/icon_spriggan/icon_spriggan.swf",
   "states": {
    "1": {
     "w": 71,
@@ -6044,6 +6385,7 @@
  },
  "icon_tii": {
   "sha": "5b56ada63d62e95e",
+  "swf": "giants/icon_tii/icon_tii.swf",
   "states": {
    "1": {
     "w": 86,
@@ -6055,6 +6397,7 @@
  },
  "icon_zille": {
   "sha": "00559cb96d2dbf61",
+  "swf": "giants/icon_zille/icon_zille.swf",
   "states": {
    "1": {
     "w": 100,
@@ -6066,6 +6409,7 @@
  },
  "irrigator_9000": {
   "sha": "e4b03e6dfb9d00d0",
+  "swf": "tools/watering_can/irrigator_9000/irrigator_9000.swf",
   "states": {
    "1": {
     "w": 54,
@@ -6077,6 +6421,7 @@
  },
  "ixite": {
   "sha": "8dd7a693ca91ca8c",
+  "swf": "compounds/ixite/ixite.swf",
   "states": {
    "1": {
     "w": 22,
@@ -6088,6 +6433,7 @@
  },
  "ixstyle_braised_meat": {
   "sha": "5230b26d5b3fbf27",
+  "swf": "food/ixstyle_braised_meat/ixstyle_braised_meat.swf",
   "states": {
    "1": {
     "w": 36,
@@ -6117,6 +6463,7 @@
  },
  "jellisac_clump": {
   "sha": "6c8d8160095c750e",
+  "swf": "misc/jellisac_clump/jellisac_clump.swf",
   "states": {
    "1": {
     "w": 47,
@@ -6146,6 +6493,7 @@
  },
  "juicy_carpaccio": {
   "sha": "45fe8b33581a2ccb",
+  "swf": "food/juicy_carpaccio/juicy_carpaccio.swf",
   "states": {
    "1": {
     "w": 41,
@@ -6175,6 +6523,7 @@
  },
  "juju_paperweight": {
   "sha": "c77a98e5617a7ec1",
+  "swf": "misc/juju_paperweight/juju_paperweight.swf",
   "states": {
    "1": {
     "w": 38,
@@ -6186,6 +6535,7 @@
  },
  "juju_trowel": {
   "sha": "598f98e6a894496a",
+  "swf": "misc/juju_trowel/juju_trowel.swf",
   "states": {
    "1": {
     "w": 65,
@@ -6197,6 +6547,7 @@
  },
  "junked_tool_part": {
   "sha": "05340dd5f3d173a1",
+  "swf": "misc/junked_tool_part/junked_tool_part.swf",
   "states": {
    "1": {
     "w": 42,
@@ -6208,6 +6559,7 @@
  },
  "kind_breakfurst_burrito": {
   "sha": "a0616803f3617eba",
+  "swf": "food/kind_breakfurst_burrito/kind_breakfurst_burrito.swf",
   "states": {
    "1": {
     "w": 33,
@@ -6219,6 +6571,7 @@
  },
  "knife_and_board": {
   "sha": "e2d749ba293cc5da",
+  "swf": "tools/tool_base/knife_and_board/knife_and_board.swf",
   "states": {
    "1": {
     "w": 69,
@@ -6230,6 +6583,7 @@
  },
  "krazy_salts": {
   "sha": "4e9f0f503cba0322",
+  "swf": "alchemy/krazy_salts/krazy_salts.swf",
   "states": {
    "1": {
     "w": 43,
@@ -6259,6 +6613,7 @@
  },
  "laughing_gas": {
   "sha": "a83cdc547b8cd1fe",
+  "swf": "misc/laughing_gas/laughing_gas.swf",
   "states": {
    "1": {
     "w": 29,
@@ -6288,6 +6643,7 @@
  },
  "lazy_salad": {
   "sha": "f32b1d3e606da0b7",
+  "swf": "food/lazy_salad/lazy_salad.swf",
   "states": {
    "1": {
     "w": 37,
@@ -6317,6 +6673,7 @@
  },
  "legitimate_post": {
   "sha": "ab7b5df361f6339c",
+  "swf": "misc/legitimate_post/legitimate_post.swf",
   "states": {
    "1": {
     "w": 72,
@@ -6328,6 +6685,7 @@
  },
  "legumes_parisienne": {
   "sha": "778ba9670c7838a2",
+  "swf": "food/legumes_parisienne/legumes_parisienne.swf",
   "states": {
    "1": {
     "w": 29,
@@ -6339,6 +6697,7 @@
  },
  "lemburger": {
   "sha": "8022264967dca2d7",
+  "swf": "food/lemburger/lemburger.swf",
   "states": {
    "1": {
     "w": 30,
@@ -6368,6 +6727,7 @@
  },
  "lemene": {
   "sha": "108e1d23be166df6",
+  "swf": "compounds/lemene/lemene.swf",
   "states": {
    "1": {
     "w": 21,
@@ -6379,6 +6739,7 @@
  },
  "lemon": {
   "sha": "81d824ac6f6e79d4",
+  "swf": "food/lemon/lemon.swf",
   "states": {
    "1": {
     "w": 21,
@@ -6408,6 +6769,7 @@
  },
  "lemon_juice": {
   "sha": "b49c3abca0572fe5",
+  "swf": "drink/lemon_juice/lemon_juice.swf",
   "states": {
    "1": {
     "w": 18,
@@ -6437,6 +6799,7 @@
  },
  "licorice": {
   "sha": "330d633f6335c3da",
+  "swf": "spice/licorice/licorice.swf",
   "states": {
    "1": {
     "w": 27,
@@ -6466,6 +6829,7 @@
  },
  "limited_edition_imitation_grichmas_yeti": {
   "sha": "7e83b2effb54db7e",
+  "swf": "rare_items/limited_edition_imitation_grichmas_yeti/limited_edition_imitation_grichmas_yeti.swf",
   "states": {
    "1": {
     "w": 68,
@@ -6477,6 +6841,7 @@
  },
  "lips": {
   "sha": "c2e8346057ee4e77",
+  "swf": "misc/lips/lips.swf",
   "states": {
    "1": {
     "w": 27,
@@ -6488,6 +6853,7 @@
  },
  "loam": {
   "sha": "5e3113bad3db9d53",
+  "swf": "misc/loam/loam.swf",
   "states": {
    "1": {
     "w": 58,
@@ -6517,6 +6883,7 @@
  },
  "loomer": {
   "sha": "3bdde6084fd60c66",
+  "swf": "tools/tool_base/loomer/loomer.swf",
   "states": {
    "1": {
     "w": 71,
@@ -6528,6 +6895,7 @@
  },
  "lotsa_lox": {
   "sha": "a0b9a513c9969258",
+  "swf": "food/lotsa_lox/lotsa_lox.swf",
   "states": {
    "1": {
     "w": 70,
@@ -6557,6 +6925,7 @@
  },
  "luxury_tortellini": {
   "sha": "bd8ac81fd00cb630",
+  "swf": "food/luxury_tortellini/luxury_tortellini.swf",
   "states": {
    "1": {
     "w": 38,
@@ -6568,6 +6937,7 @@
  },
  "mabbish_coffee": {
   "sha": "db0a3f67bc84112f",
+  "swf": "drink/mabbish_coffee/mabbish_coffee.swf",
   "states": {
    "1": {
     "w": 23,
@@ -6597,6 +6967,7 @@
  },
  "mabon": {
   "sha": "93220424e625a334",
+  "swf": "compounds/mabon/mabon.swf",
   "states": {
    "1": {
     "w": 22,
@@ -6608,6 +6979,7 @@
  },
  "maburger_royale": {
   "sha": "fdddc6544b0b098e",
+  "swf": "food/maburger_royale/maburger_royale.swf",
   "states": {
    "1": {
     "w": 31,
@@ -6619,6 +6991,7 @@
  },
  "machine_stand": {
   "sha": "3863a242b58c8693",
+  "swf": "tools/machine_stand/machine_stand.swf",
   "states": {
    "1": {
     "w": 140,
@@ -6630,6 +7003,7 @@
  },
  "magic_butterfly_stick": {
   "sha": "230fe984c32f4fc0",
+  "swf": "misc/magic_animal_stick/magic_butterfly_stick/magic_butterfly_stick.swf",
   "states": {
    "1": {
     "w": 119,
@@ -6641,6 +7015,7 @@
  },
  "magic_chicken_stick": {
   "sha": "0781b278b2dfb369",
+  "swf": "misc/magic_animal_stick/magic_chicken_stick/magic_chicken_stick.swf",
   "states": {
    "1": {
     "w": 119,
@@ -6652,6 +7027,7 @@
  },
  "magic_pig_stick": {
   "sha": "e10c72759c1d88bb",
+  "swf": "misc/magic_animal_stick/magic_pig_stick/magic_pig_stick.swf",
   "states": {
    "1": {
     "w": 119,
@@ -6663,6 +7039,7 @@
  },
  "mangosteen": {
   "sha": "09ea39c7f8501b4b",
+  "swf": "food/mangosteen/mangosteen.swf",
   "states": {
    "1": {
     "w": 23,
@@ -6692,6 +7069,7 @@
  },
  "meat": {
   "sha": "e4676f4b63043122",
+  "swf": "food/meat/meat.swf",
   "states": {
    "1": {
     "w": 35,
@@ -6721,6 +7099,7 @@
  },
  "meat_collector": {
   "sha": "438e4ab9aeb10856",
+  "swf": "misc/meat_collector/meat_collector.swf",
   "states": {
    "1": {
     "w": 70,
@@ -6732,6 +7111,7 @@
  },
  "meat_gumbo": {
   "sha": "49c74607eda3dc08",
+  "swf": "food/meat_gumbo/meat_gumbo.swf",
   "states": {
    "1": {
     "w": 36,
@@ -6761,6 +7141,7 @@
  },
  "meat_tetrazzini": {
   "sha": "a65ef3237cc73a4e",
+  "swf": "food/meat_tetrazzini/meat_tetrazzini.swf",
   "states": {
    "1": {
     "w": 36,
@@ -6790,6 +7171,7 @@
  },
  "mega_healthy_veggie_juice": {
   "sha": "83ec23144b93713c",
+  "swf": "drink/mega_healthy_veggie_juice/mega_healthy_veggie_juice.swf",
   "states": {
    "1": {
     "w": 17,
@@ -6819,6 +7201,7 @@
  },
  "mental_abstraction": {
   "sha": "d713e485561916f0",
+  "swf": "misc/mental_item_base/mental_abstraction/mental_abstraction.swf",
   "states": {
    "1": {
     "w": 44,
@@ -6830,6 +7213,7 @@
  },
  "mental_anxiety": {
   "sha": "34a47bd6d7c75a42",
+  "swf": "misc/mental_item_base/mental_anxiety/mental_anxiety.swf",
   "states": {
    "1": {
     "w": 46,
@@ -6841,6 +7225,7 @@
  },
  "mental_apprehension": {
   "sha": "555db67a48b6dcec",
+  "swf": "misc/mental_item_base/mental_apprehension/mental_apprehension.swf",
   "states": {
    "1": {
     "w": 46,
@@ -6852,6 +7237,7 @@
  },
  "mental_bummer": {
   "sha": "3c1394a7eef5c7b1",
+  "swf": "misc/mental_item_base/mental_bummer/mental_bummer.swf",
   "states": {
    "1": {
     "w": 38,
@@ -6863,6 +7249,7 @@
  },
  "mental_concept": {
   "sha": "44995f7e1f95cba1",
+  "swf": "misc/mental_item_base/mental_concept/mental_concept.swf",
   "states": {
    "1": {
     "w": 48,
@@ -6874,6 +7261,7 @@
  },
  "mental_consideration": {
   "sha": "a2d6e526768827be",
+  "swf": "misc/mental_item_base/mental_consideration/mental_consideration.swf",
   "states": {
    "1": {
     "w": 38,
@@ -6885,6 +7273,7 @@
  },
  "mental_contemplation": {
   "sha": "0b5ec43ce5d31c65",
+  "swf": "misc/mental_item_base/mental_contemplation/mental_contemplation.swf",
   "states": {
    "1": {
     "w": 41,
@@ -6896,6 +7285,7 @@
  },
  "mental_desire": {
   "sha": "991af23c7e555019",
+  "swf": "misc/mental_item_base/mental_desire/mental_desire.swf",
   "states": {
    "1": {
     "w": 44,
@@ -6907,6 +7297,7 @@
  },
  "mental_ennui": {
   "sha": "c8635d075ddad4d3",
+  "swf": "misc/mental_item_base/mental_ennui/mental_ennui.swf",
   "states": {
    "1": {
     "w": 44,
@@ -6918,6 +7309,7 @@
  },
  "mental_feeling": {
   "sha": "2336cb85aa7b8ef7",
+  "swf": "misc/mental_item_base/mental_feeling/mental_feeling.swf",
   "states": {
    "1": {
     "w": 42,
@@ -6929,6 +7321,7 @@
  },
  "mental_figment": {
   "sha": "b1b87c509ba900de",
+  "swf": "misc/mental_item_base/mental_figment/mental_figment.swf",
   "states": {
    "1": {
     "w": 37,
@@ -6940,6 +7333,7 @@
  },
  "mental_hope": {
   "sha": "fed29190e2d12829",
+  "swf": "misc/mental_item_base/mental_hope/mental_hope.swf",
   "states": {
    "1": {
     "w": 21,
@@ -6951,6 +7345,7 @@
  },
  "mental_ideal": {
   "sha": "96f658b8055daa45",
+  "swf": "misc/mental_item_base/mental_ideal/mental_ideal.swf",
   "states": {
    "1": {
     "w": 32,
@@ -6962,6 +7357,7 @@
  },
  "mental_image": {
   "sha": "469b42cfc9a08f87",
+  "swf": "misc/mental_item_base/mental_image/mental_image.swf",
   "states": {
    "1": {
     "w": 44,
@@ -6973,6 +7369,7 @@
  },
  "mental_inkling": {
   "sha": "cd33fc67c8936ccb",
+  "swf": "misc/mental_item_base/mental_inkling/mental_inkling.swf",
   "states": {
    "1": {
     "w": 34,
@@ -6984,6 +7381,7 @@
  },
  "mental_meditation": {
   "sha": "6f5b3cf1798bb9f2",
+  "swf": "misc/mental_item_base/mental_meditation/mental_meditation.swf",
   "states": {
    "1": {
     "w": 41,
@@ -6995,6 +7393,7 @@
  },
  "mental_memory": {
   "sha": "7a773524bea7ae09",
+  "swf": "misc/mental_item_base/mental_memory/mental_memory.swf",
   "states": {
    "1": {
     "w": 46,
@@ -7006,6 +7405,7 @@
  },
  "mental_mirage": {
   "sha": "a01480490b95cf6a",
+  "swf": "misc/mental_item_base/mental_mirage/mental_mirage.swf",
   "states": {
    "1": {
     "w": 39,
@@ -7017,6 +7417,7 @@
  },
  "mental_musing": {
   "sha": "470d7fb30a8e28d7",
+  "swf": "misc/mental_item_base/mental_musing/mental_musing.swf",
   "states": {
    "1": {
     "w": 43,
@@ -7028,6 +7429,7 @@
  },
  "mental_notion": {
   "sha": "266a908ccb5d2a76",
+  "swf": "misc/mental_item_base/mental_notion/mental_notion.swf",
   "states": {
    "1": {
     "w": 44,
@@ -7039,6 +7441,7 @@
  },
  "mental_perception": {
   "sha": "109c972ba30fea0d",
+  "swf": "misc/mental_item_base/mental_perception/mental_perception.swf",
   "states": {
    "1": {
     "w": 47,
@@ -7050,6 +7453,7 @@
  },
  "mental_reverie": {
   "sha": "1f98da38f7311ff1",
+  "swf": "misc/mental_item_base/mental_reverie/mental_reverie.swf",
   "states": {
    "1": {
     "w": 39,
@@ -7061,6 +7465,7 @@
  },
  "mental_rumination": {
   "sha": "abf368c492c3bf70",
+  "swf": "misc/mental_item_base/mental_rumination/mental_rumination.swf",
   "states": {
    "1": {
     "w": 40,
@@ -7072,6 +7477,7 @@
  },
  "mental_theory": {
   "sha": "294cbd43380599cd",
+  "swf": "misc/mental_item_base/mental_theory/mental_theory.swf",
   "states": {
    "1": {
     "w": 40,
@@ -7083,6 +7489,7 @@
  },
  "mental_thought": {
   "sha": "e41e7fed3449d755",
+  "swf": "misc/mental_item_base/mental_thought/mental_thought.swf",
   "states": {
    "1": {
     "w": 41,
@@ -7094,6 +7501,7 @@
  },
  "mental_worry": {
   "sha": "3ab4b45a13289331",
+  "swf": "misc/mental_item_base/mental_worry/mental_worry.swf",
   "states": {
    "1": {
     "w": 40,
@@ -7105,6 +7513,7 @@
  },
  "messy_fry_up": {
   "sha": "f61cec7b3ba40da9",
+  "swf": "food/messy_fry_up/messy_fry_up.swf",
   "states": {
    "1": {
     "w": 35,
@@ -7134,6 +7543,7 @@
  },
  "metal_post": {
   "sha": "0a449554c14ddc9e",
+  "swf": "misc/metal_post/metal_post.swf",
   "states": {
    "1": {
     "w": 51,
@@ -7163,6 +7573,7 @@
  },
  "metal_rock": {
   "sha": "e336ca2babf36232",
+  "swf": "misc/metal_rock/metal_rock.swf",
   "states": {
    "1": {
     "w": 25,
@@ -7192,6 +7603,7 @@
  },
  "metal_rod": {
   "sha": "2109a3e2078d268d",
+  "swf": "misc/metal_rod/metal_rod.swf",
   "states": {
    "1": {
     "w": 41,
@@ -7221,6 +7633,7 @@
  },
  "metalmaker_mechanism": {
   "sha": "22b3322c4b4a3b2c",
+  "swf": "tools/metalmaker_mechanism/metalmaker_mechanism.swf",
   "states": {
    "1": {
     "w": 99,
@@ -7232,6 +7645,7 @@
  },
  "metalmaker_tooler": {
   "sha": "90c7b710ba7ac15e",
+  "swf": "tools/metalmaker_tooler/metalmaker_tooler.swf",
   "states": {
    "1": {
     "w": 86,
@@ -7243,6 +7657,7 @@
  },
  "mexicali_eggs": {
   "sha": "846810699dbbefed",
+  "swf": "food/mexicali_eggs/mexicali_eggs.swf",
   "states": {
    "1": {
     "w": 42,
@@ -7272,6 +7687,7 @@
  },
  "mike_tyson_grill": {
   "sha": "9e4e145090a4f4df",
+  "swf": "tools/tool_base/mike_tyson_grill/mike_tyson_grill.swf",
   "states": {
    "1": {
     "w": 58,
@@ -7283,6 +7699,7 @@
  },
  "mild_sauce": {
   "sha": "3397c76dc4353a52",
+  "swf": "food/mild_sauce/mild_sauce.swf",
   "states": {
    "1": {
     "w": 20,
@@ -7312,6 +7729,7 @@
  },
  "milk_butterfly": {
   "sha": "4a1fc7947c886503",
+  "swf": "drink/milk_butterfly/milk_butterfly.swf",
   "states": {
    "1": {
     "w": 17,
@@ -7341,6 +7759,7 @@
  },
  "molybdenum": {
   "sha": "88aea6f48c17a825",
+  "swf": "misc/molybdenum/molybdenum.swf",
   "states": {
    "1": {
     "w": 50,
@@ -7370,6 +7789,7 @@
  },
  "moon": {
   "sha": "47338f74abfab1b5",
+  "swf": "misc/moon/moon.swf",
   "states": {
    "1": {
     "w": 33,
@@ -7381,6 +7801,7 @@
  },
  "mountaineering_permit": {
   "sha": "8b6a0be6a81510b5",
+  "swf": "party_packs/party_pack/mountaineering_permit/mountaineering_permit.swf",
   "states": {
    "1": {
     "w": 65,
@@ -7392,6 +7813,7 @@
  },
  "mushroom": {
   "sha": "39e2b6e7ed17aaf2",
+  "swf": "food/mushroom/mushroom.swf",
   "states": {
    "1": {
     "w": 17,
@@ -7421,6 +7843,7 @@
  },
  "musicblock_b_brown_01": {
   "sha": "e0c33c92b70fb504",
+  "swf": "musicblocks/musicblock_b_brown_01/musicblock_b_brown_01.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7432,6 +7855,7 @@
  },
  "musicblock_b_brown_02": {
   "sha": "a76f3588d2727219",
+  "swf": "musicblocks/musicblock_b_brown_02/musicblock_b_brown_02.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7443,6 +7867,7 @@
  },
  "musicblock_b_brown_03": {
   "sha": "5aae30be012e3478",
+  "swf": "musicblocks/musicblock_b_brown_03/musicblock_b_brown_03.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7454,6 +7879,7 @@
  },
  "musicblock_b_brown_04": {
   "sha": "7b3e97d56f19d754",
+  "swf": "musicblocks/musicblock_b_brown_04/musicblock_b_brown_04.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7465,6 +7891,7 @@
  },
  "musicblock_b_brown_05": {
   "sha": "1e2f937fb7af3a58",
+  "swf": "musicblocks/musicblock_b_brown_05/musicblock_b_brown_05.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7476,6 +7903,7 @@
  },
  "musicblock_d_blue_01": {
   "sha": "a4faef27f4b1e79c",
+  "swf": "musicblocks/musicblock_d_blue_01/musicblock_d_blue_01.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7487,6 +7915,7 @@
  },
  "musicblock_d_blue_02": {
   "sha": "a6160ed56fc95eea",
+  "swf": "musicblocks/musicblock_d_blue_02/musicblock_d_blue_02.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7498,6 +7927,7 @@
  },
  "musicblock_d_blue_03": {
   "sha": "c76e60da1fee5cfb",
+  "swf": "musicblocks/musicblock_d_blue_03/musicblock_d_blue_03.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7509,6 +7939,7 @@
  },
  "musicblock_d_blue_04": {
   "sha": "fcebc6b6fbc6b3d5",
+  "swf": "musicblocks/musicblock_d_blue_04/musicblock_d_blue_04.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7520,6 +7951,7 @@
  },
  "musicblock_d_blue_05": {
   "sha": "b4acd59adec75666",
+  "swf": "musicblocks/musicblock_d_blue_05/musicblock_d_blue_05.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7531,6 +7963,7 @@
  },
  "musicblock_d_green_01": {
   "sha": "ad56e74188e0a310",
+  "swf": "musicblocks/musicblock_d_green_01/musicblock_d_green_01.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7542,6 +7975,7 @@
  },
  "musicblock_d_green_02": {
   "sha": "52db66e6e2f87fef",
+  "swf": "musicblocks/musicblock_d_green_02/musicblock_d_green_02.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7553,6 +7987,7 @@
  },
  "musicblock_d_green_03": {
   "sha": "6417f8987124ecb8",
+  "swf": "musicblocks/musicblock_d_green_03/musicblock_d_green_03.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7564,6 +7999,7 @@
  },
  "musicblock_d_green_04": {
   "sha": "2197b8c4e412e686",
+  "swf": "musicblocks/musicblock_d_green_04/musicblock_d_green_04.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7575,6 +8011,7 @@
  },
  "musicblock_d_green_05": {
   "sha": "1f85ef32d8e94beb",
+  "swf": "musicblocks/musicblock_d_green_05/musicblock_d_green_05.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7586,6 +8023,7 @@
  },
  "musicblock_d_red_01": {
   "sha": "30388490ef1a6362",
+  "swf": "musicblocks/musicblock_d_red_01/musicblock_d_red_01.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7597,6 +8035,7 @@
  },
  "musicblock_d_red_02": {
   "sha": "25b672907f82d391",
+  "swf": "musicblocks/musicblock_d_red_02/musicblock_d_red_02.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7608,6 +8047,7 @@
  },
  "musicblock_d_red_03": {
   "sha": "44e5576fcf833c77",
+  "swf": "musicblocks/musicblock_d_red_03/musicblock_d_red_03.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7619,6 +8059,7 @@
  },
  "musicblock_d_red_04": {
   "sha": "8a47deb87ea6a44f",
+  "swf": "musicblocks/musicblock_d_red_04/musicblock_d_red_04.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7630,6 +8071,7 @@
  },
  "musicblock_d_red_05": {
   "sha": "42b73a0c02390271",
+  "swf": "musicblocks/musicblock_d_red_05/musicblock_d_red_05.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7641,6 +8083,7 @@
  },
  "musicblock_goodnight_groddle": {
   "sha": "41a2e046ab648d3e",
+  "swf": "musicblocks/musicblock_goodnight_groddle/musicblock_goodnight_groddle.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7652,6 +8095,7 @@
  },
  "musicblock_sb_secret_01": {
   "sha": "172ff871b992644d",
+  "swf": "musicblocks/musicblock_sb_secret_01/musicblock_sb_secret_01.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7663,6 +8107,7 @@
  },
  "musicblock_trumpets": {
   "sha": "85f0a6633e98083e",
+  "swf": "musicblocks/musicblock_trumpets/musicblock_trumpets.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7674,6 +8119,7 @@
  },
  "musicblock_x_shiny_01": {
   "sha": "694b8137db40a5e8",
+  "swf": "musicblocks/musicblock_x_shiny_01/musicblock_x_shiny_01.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7685,6 +8131,7 @@
  },
  "musicblock_x_shiny_02": {
   "sha": "df802906f4a64aa4",
+  "swf": "musicblocks/musicblock_x_shiny_02/musicblock_x_shiny_02.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7696,6 +8143,7 @@
  },
  "musicblock_x_shiny_03": {
   "sha": "177dc6859e89470d",
+  "swf": "musicblocks/musicblock_x_shiny_03/musicblock_x_shiny_03.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7707,6 +8155,7 @@
  },
  "musicblock_x_shiny_04": {
   "sha": "0b680a1623288d07",
+  "swf": "musicblocks/musicblock_x_shiny_04/musicblock_x_shiny_04.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7718,6 +8167,7 @@
  },
  "musicblock_x_shiny_05": {
   "sha": "5e264d76e0e2c743",
+  "swf": "musicblocks/musicblock_x_shiny_05/musicblock_x_shiny_05.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7729,6 +8179,7 @@
  },
  "mustard": {
   "sha": "1630c37f576c101f",
+  "swf": "spice/mustard/mustard.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7758,6 +8209,7 @@
  },
  "naraka_flame_rub": {
   "sha": "6f2a7e76c8fc98bf",
+  "swf": "food/naraka_flame_rub/naraka_flame_rub.swf",
   "states": {
    "1": {
     "w": 20,
@@ -7769,6 +8221,7 @@
  },
  "no_no_powder": {
   "sha": "95dfd36d60e86907",
+  "swf": "alchemy/no_no_powder/no_no_powder.swf",
   "states": {
    "1": {
     "w": 25,
@@ -7798,6 +8251,7 @@
  },
  "note": {
   "sha": "9b71b57fca4e95c3",
+  "swf": "misc/note/note.swf",
   "states": {
    "1": {
     "w": 45,
@@ -7809,6 +8263,7 @@
  },
  "note_hint": {
   "sha": "575fae7710eeed99",
+  "swf": "misc/note/note_hint/note_hint.swf",
   "states": {
    "1": {
     "w": 58,
@@ -7820,6 +8275,7 @@
  },
  "note_manor_mystery": {
   "sha": "9b71b57fca4e95c3",
+  "swf": "misc/note/note_manor_mystery/note_manor_mystery.swf",
   "states": {
    "1": {
     "w": 45,
@@ -7831,6 +8287,7 @@
  },
  "note_pole": {
   "sha": "6692309fad672d03",
+  "swf": "misc/note_pole/note_pole.swf",
   "states": {
    "1": {
     "w": 64,
@@ -7842,6 +8299,7 @@
  },
  "npc_crafty_bot": {
   "sha": "3669759cede4520e",
+  "swf": "inhabitants/craftybot/npc_crafty_bot.swf",
   "states": {
    "1": {
     "w": 37,
@@ -7853,6 +8311,7 @@
  },
  "npc_cubimal_batterfly": {
   "sha": "37d9ce6df226d94f",
+  "swf": "cubimals/npc_cubimal_batterfly/npc_cubimal_batterfly.swf",
   "states": {
    "1": {
     "w": 32,
@@ -7864,6 +8323,7 @@
  },
  "npc_cubimal_bureaucrat": {
   "sha": "1d959d6e88a57e38",
+  "swf": "cubimals/npc_cubimal_bureaucrat/npc_cubimal_bureaucrat.swf",
   "states": {
    "1": {
     "w": 32,
@@ -7875,6 +8335,7 @@
  },
  "npc_cubimal_butler": {
   "sha": "5d972ca023628060",
+  "swf": "cubimals/npc_cubimal_butler/npc_cubimal_butler.swf",
   "states": {
    "1": {
     "w": 33,
@@ -7886,6 +8347,7 @@
  },
  "npc_cubimal_butterfly": {
   "sha": "91baf1b6bf606e14",
+  "swf": "cubimals/npc_cubimal_butterfly/npc_cubimal_butterfly.swf",
   "states": {
    "1": {
     "w": 35,
@@ -7897,6 +8359,7 @@
  },
  "npc_cubimal_cactus": {
   "sha": "6d8ab95242b3b311",
+  "swf": "cubimals/npc_cubimal_cactus/npc_cubimal_cactus.swf",
   "states": {
    "1": {
     "w": 32,
@@ -7908,6 +8371,7 @@
  },
  "npc_cubimal_chick": {
   "sha": "4505bfb2314b4e91",
+  "swf": "cubimals/npc_cubimal_chick/npc_cubimal_chick.swf",
   "states": {
    "1": {
     "w": 32,
@@ -7919,6 +8383,7 @@
  },
  "npc_cubimal_crab": {
   "sha": "ccb4c3d444cf439a",
+  "swf": "cubimals/npc_cubimal_crab/npc_cubimal_crab.swf",
   "states": {
    "1": {
     "w": 35,
@@ -7930,6 +8395,7 @@
  },
  "npc_cubimal_craftybot": {
   "sha": "ee600abc366012a4",
+  "swf": "cubimals/npc_cubimal_craftybot/npc_cubimal_craftybot.swf",
   "states": {
    "1": {
     "w": 33,
@@ -7941,6 +8407,7 @@
  },
  "npc_cubimal_deimaginator": {
   "sha": "933af038bfb49d68",
+  "swf": "cubimals/npc_cubimal_deimaginator/npc_cubimal_deimaginator.swf",
   "states": {
    "1": {
     "w": 32,
@@ -7952,6 +8419,7 @@
  },
  "npc_cubimal_dustbunny": {
   "sha": "f6d99aede7236a2e",
+  "swf": "cubimals/npc_cubimal_dustbunny/npc_cubimal_dustbunny.swf",
   "states": {
    "1": {
     "w": 34,
@@ -7963,6 +8431,7 @@
  },
  "npc_cubimal_emobear": {
   "sha": "1f48728e00c425e0",
+  "swf": "cubimals/npc_cubimal_emobear/npc_cubimal_emobear.swf",
   "states": {
    "1": {
     "w": 36,
@@ -7974,6 +8443,7 @@
  },
  "npc_cubimal_firebogstreetspirit": {
   "sha": "b8f70779caeab506",
+  "swf": "cubimals/npc_cubimal_firebogstreetspirit/npc_cubimal_firebogstreetspirit.swf",
   "states": {
    "1": {
     "w": 33,
@@ -7985,6 +8455,7 @@
  },
  "npc_cubimal_firefly": {
   "sha": "710f697e3271480f",
+  "swf": "cubimals/npc_cubimal_firefly/npc_cubimal_firefly.swf",
   "states": {
    "1": {
     "w": 33,
@@ -7996,6 +8467,7 @@
  },
  "npc_cubimal_fox": {
   "sha": "2f980f22a37b014a",
+  "swf": "cubimals/npc_cubimal_fox/npc_cubimal_fox.swf",
   "states": {
    "1": {
     "w": 33,
@@ -8007,6 +8479,7 @@
  },
  "npc_cubimal_foxranger": {
   "sha": "160211f97508d800",
+  "swf": "cubimals/npc_cubimal_foxranger/npc_cubimal_foxranger.swf",
   "states": {
    "1": {
     "w": 33,
@@ -8018,6 +8491,7 @@
  },
  "npc_cubimal_frog": {
   "sha": "99485f104edef195",
+  "swf": "cubimals/npc_cubimal_frog/npc_cubimal_frog.swf",
   "states": {
    "1": {
     "w": 34,
@@ -8029,6 +8503,7 @@
  },
  "npc_cubimal_gardeningtoolsvendor": {
   "sha": "fd1998f3b5fe0ad7",
+  "swf": "cubimals/npc_cubimal_gardeningtoolsvendor/npc_cubimal_gardeningtoolsvendor.swf",
   "states": {
    "1": {
     "w": 35,
@@ -8040,6 +8515,7 @@
  },
  "npc_cubimal_gnome": {
   "sha": "9f4026be6fca3551",
+  "swf": "cubimals/npc_cubimal_gnome/npc_cubimal_gnome.swf",
   "states": {
    "1": {
     "w": 35,
@@ -8051,6 +8527,7 @@
  },
  "npc_cubimal_greeterbot": {
   "sha": "151e48c578d348d5",
+  "swf": "cubimals/npc_cubimal_greeterbot/npc_cubimal_greeterbot.swf",
   "states": {
    "1": {
     "w": 32,
@@ -8062,6 +8539,7 @@
  },
  "npc_cubimal_groddlestreetspirit": {
   "sha": "9e504f8025885eed",
+  "swf": "cubimals/npc_cubimal_groddlestreetspirit/npc_cubimal_groddlestreetspirit.swf",
   "states": {
    "1": {
     "w": 35,
@@ -8073,6 +8551,7 @@
  },
  "npc_cubimal_gwendolyn": {
   "sha": "e493495d3f941476",
+  "swf": "cubimals/npc_cubimal_gwendolyn/npc_cubimal_gwendolyn.swf",
   "states": {
    "1": {
     "w": 33,
@@ -8084,6 +8563,7 @@
  },
  "npc_cubimal_helga": {
   "sha": "c040d3b6dd916235",
+  "swf": "cubimals/npc_cubimal_helga/npc_cubimal_helga.swf",
   "states": {
    "1": {
     "w": 34,
@@ -8095,6 +8575,7 @@
  },
  "npc_cubimal_hellbartender": {
   "sha": "4aaf5ae446a6b333",
+  "swf": "cubimals/npc_cubimal_hellbartender/npc_cubimal_hellbartender.swf",
   "states": {
    "1": {
     "w": 36,
@@ -8106,6 +8587,7 @@
  },
  "npc_cubimal_ilmenskiejones": {
   "sha": "ee7514fd3eef9443",
+  "swf": "cubimals/npc_cubimal_ilmenskiejones/npc_cubimal_ilmenskiejones.swf",
   "states": {
    "1": {
     "w": 34,
@@ -8117,6 +8599,7 @@
  },
  "npc_cubimal_juju": {
   "sha": "a94d30a981f57376",
+  "swf": "cubimals/npc_cubimal_juju/npc_cubimal_juju.swf",
   "states": {
    "1": {
     "w": 33,
@@ -8128,6 +8611,7 @@
  },
  "npc_cubimal_magicrock": {
   "sha": "f00b1b90144d9535",
+  "swf": "cubimals/npc_cubimal_magicrock/npc_cubimal_magicrock.swf",
   "states": {
    "1": {
     "w": 33,
@@ -8139,6 +8623,7 @@
  },
  "npc_cubimal_maintenancebot": {
   "sha": "9797942d9052515a",
+  "swf": "cubimals/npc_cubimal_maintenancebot/npc_cubimal_maintenancebot.swf",
   "states": {
    "1": {
     "w": 32,
@@ -8150,6 +8635,7 @@
  },
  "npc_cubimal_mealvendor": {
   "sha": "f1c10588139b0b50",
+  "swf": "cubimals/npc_cubimal_mealvendor/npc_cubimal_mealvendor.swf",
   "states": {
    "1": {
     "w": 34,
@@ -8161,6 +8647,7 @@
  },
  "npc_cubimal_phantom": {
   "sha": "d74fc648aea520d2",
+  "swf": "cubimals/npc_cubimal_phantom/npc_cubimal_phantom.swf",
   "states": {
    "1": {
     "w": 32,
@@ -8172,6 +8659,7 @@
  },
  "npc_cubimal_piggy": {
   "sha": "52ca3dfb4f80a998",
+  "swf": "cubimals/npc_cubimal_piggy/npc_cubimal_piggy.swf",
   "states": {
    "1": {
     "w": 33,
@@ -8183,6 +8671,7 @@
  },
  "npc_cubimal_rook": {
   "sha": "f7c6c0e9aa613195",
+  "swf": "cubimals/npc_cubimal_rook/npc_cubimal_rook.swf",
   "states": {
    "1": {
     "w": 36,
@@ -8194,6 +8683,7 @@
  },
  "npc_cubimal_rube": {
   "sha": "6fde2a3aeff78473",
+  "swf": "cubimals/npc_cubimal_rube/npc_cubimal_rube.swf",
   "states": {
    "1": {
     "w": 34,
@@ -8205,6 +8695,7 @@
  },
  "npc_cubimal_scionofpurple": {
   "sha": "faa58c695a7335ee",
+  "swf": "cubimals/npc_cubimal_scionofpurple/npc_cubimal_scionofpurple.swf",
   "states": {
    "1": {
     "w": 35,
@@ -8216,6 +8707,7 @@
  },
  "npc_cubimal_senorfunpickle": {
   "sha": "a3176bbef7eb4043",
+  "swf": "cubimals/npc_cubimal_senorfunpickle/npc_cubimal_senorfunpickle.swf",
   "states": {
    "1": {
     "w": 39,
@@ -8227,6 +8719,7 @@
  },
  "npc_cubimal_sloth": {
   "sha": "b7960df816133161",
+  "swf": "cubimals/npc_cubimal_sloth/npc_cubimal_sloth.swf",
   "states": {
    "1": {
     "w": 33,
@@ -8238,6 +8731,7 @@
  },
  "npc_cubimal_smuggler": {
   "sha": "46bb7133c621fc98",
+  "swf": "cubimals/npc_cubimal_smuggler/npc_cubimal_smuggler.swf",
   "states": {
    "1": {
     "w": 34,
@@ -8249,6 +8743,7 @@
  },
  "npc_cubimal_snoconevendor": {
   "sha": "29e99726f9a52448",
+  "swf": "cubimals/npc_cubimal_snoconevendor/npc_cubimal_snoconevendor.swf",
   "states": {
    "1": {
     "w": 32,
@@ -8260,6 +8755,7 @@
  },
  "npc_cubimal_squid": {
   "sha": "e496e9089ff762ad",
+  "swf": "cubimals/npc_cubimal_squid/npc_cubimal_squid.swf",
   "states": {
    "1": {
     "w": 34,
@@ -8271,6 +8767,7 @@
  },
  "npc_cubimal_toolvendor": {
   "sha": "a3dd2c5b868a395e",
+  "swf": "cubimals/npc_cubimal_toolvendor/npc_cubimal_toolvendor.swf",
   "states": {
    "1": {
     "w": 33,
@@ -8282,6 +8779,7 @@
  },
  "npc_cubimal_trisor": {
   "sha": "5e9f85f6de21ad59",
+  "swf": "cubimals/npc_cubimal_trisor/npc_cubimal_trisor.swf",
   "states": {
    "1": {
     "w": 32,
@@ -8293,6 +8791,7 @@
  },
  "npc_cubimal_unclefriendly": {
   "sha": "b72f92607b215478",
+  "swf": "cubimals/npc_cubimal_unclefriendly/npc_cubimal_unclefriendly.swf",
   "states": {
    "1": {
     "w": 34,
@@ -8304,6 +8803,7 @@
  },
  "npc_cubimal_uraliastreetspirit": {
   "sha": "a55c863a6d2ff4dd",
+  "swf": "cubimals/npc_cubimal_uraliastreetspirit/npc_cubimal_uraliastreetspirit.swf",
   "states": {
    "1": {
     "w": 34,
@@ -8315,6 +8815,7 @@
  },
  "npc_cubimal_yeti": {
   "sha": "54029f5b603a541f",
+  "swf": "cubimals/npc_cubimal_yeti/npc_cubimal_yeti.swf",
   "states": {
    "1": {
     "w": 35,
@@ -8326,6 +8827,7 @@
  },
  "npc_garden_gnome": {
   "sha": "cc4a5476fad1da17",
+  "swf": "misc/npc/npc_garden_gnome/npc_garden_gnome.swf",
   "states": {
    "1": {
     "w": 83,
@@ -8337,6 +8839,7 @@
  },
  "nutmeg": {
   "sha": "97a2dc7bca5fb42a",
+  "swf": "spice/nutmeg/nutmeg.swf",
   "states": {
    "1": {
     "w": 15,
@@ -8366,6 +8869,7 @@
  },
  "oats": {
   "sha": "f3745f567111d7df",
+  "swf": "food/oats/oats.swf",
   "states": {
    "1": {
     "w": 34,
@@ -8395,6 +8899,7 @@
  },
  "oaty_cake": {
   "sha": "3890f91b11a71009",
+  "swf": "food/oaty_cake/oaty_cake.swf",
   "states": {
    "1": {
     "w": 53,
@@ -8424,6 +8929,7 @@
  },
  "obvious_panini": {
   "sha": "078eaab791b944cf",
+  "swf": "food/obvious_panini/obvious_panini.swf",
   "states": {
    "1": {
     "w": 33,
@@ -8453,6 +8959,7 @@
  },
  "oily_dressing": {
   "sha": "0f525622a4fb7876",
+  "swf": "food/oily_dressing/oily_dressing.swf",
   "states": {
    "1": {
     "w": 20,
@@ -8482,6 +8989,7 @@
  },
  "older_spice": {
   "sha": "aa5449931678c9c0",
+  "swf": "spice/older_spice/older_spice.swf",
   "states": {
    "1": {
     "w": 45,
@@ -8511,6 +9019,7 @@
  },
  "olive_oil": {
   "sha": "ca63b9166436e29e",
+  "swf": "food/olive_oil/olive_oil.swf",
   "states": {
    "1": {
     "w": 14,
@@ -8540,6 +9049,7 @@
  },
  "onion": {
   "sha": "5a0cf79488cfaf18",
+  "swf": "food/onion/onion.swf",
   "states": {
    "1": {
     "w": 27,
@@ -8569,6 +9079,7 @@
  },
  "onion_rings": {
   "sha": "d38df77bb3ba64a8",
+  "swf": "food/onion_rings/onion_rings.swf",
   "states": {
    "1": {
     "w": 27,
@@ -8580,6 +9091,7 @@
  },
  "onion_sauce": {
   "sha": "db9cda39564441e1",
+  "swf": "food/onion_sauce/onion_sauce.swf",
   "states": {
    "1": {
     "w": 20,
@@ -8609,6 +9121,7 @@
  },
  "orange": {
   "sha": "bb5a76bbb7d59944",
+  "swf": "food/orange/orange.swf",
   "states": {
    "1": {
     "w": 20,
@@ -8638,6 +9151,7 @@
  },
  "orange_juice": {
   "sha": "300c1ed51c535891",
+  "swf": "drink/orange_juice/orange_juice.swf",
   "states": {
    "1": {
     "w": 17,
@@ -8667,6 +9181,7 @@
  },
  "ore_grinder": {
   "sha": "6fb60c447dfb1cce",
+  "swf": "tools/tool_base/ore_grinder/ore_grinder.swf",
   "states": {
    "1": {
     "w": 38,
@@ -8678,6 +9193,7 @@
  },
  "pad_tii": {
   "sha": "f6a6e3fb1b0857d6",
+  "swf": "food/pad_tii/pad_tii.swf",
   "states": {
    "1": {
     "w": 47,
@@ -8689,6 +9205,7 @@
  },
  "paper": {
   "sha": "12d6dfaec1c1ccd2",
+  "swf": "misc/paper/paper.swf",
   "states": {
    "1": {
     "w": 54,
@@ -8718,6 +9235,7 @@
  },
  "papl_upside_down_pizza": {
   "sha": "cd7ec1da6a710ed6",
+  "swf": "food/papl_upside_down_pizza/papl_upside_down_pizza.swf",
   "states": {
    "1": {
     "w": 51,
@@ -8747,6 +9265,7 @@
  },
  "paradise_ticket_abysmal_thrill": {
   "sha": "1b2cd75ab2529003",
+  "swf": "misc/paradise_ticket/paradise_ticket_abysmal_thrill/paradise_ticket_abysmal_thrill.swf",
   "states": {
    "1": {
     "w": 38,
@@ -8776,6 +9295,7 @@
  },
  "paradise_ticket_aerial_boost": {
   "sha": "994a288a7eb8631e",
+  "swf": "misc/paradise_ticket/paradise_ticket_aerial_boost/paradise_ticket_aerial_boost.swf",
   "states": {
    "1": {
     "w": 38,
@@ -8805,6 +9325,7 @@
  },
  "paradise_ticket_arbor_hollow": {
   "sha": "c580aa8c447b8d84",
+  "swf": "misc/paradise_ticket/paradise_ticket_arbor_hollow/paradise_ticket_arbor_hollow.swf",
   "states": {
    "1": {
     "w": 38,
@@ -8834,6 +9355,7 @@
  },
  "paradise_ticket_beam_me_down": {
   "sha": "822b980e2c98a942",
+  "swf": "misc/paradise_ticket/paradise_ticket_beam_me_down/paradise_ticket_beam_me_down.swf",
   "states": {
    "1": {
     "w": 38,
@@ -8863,6 +9385,7 @@
  },
  "paradise_ticket_bippity_bop": {
   "sha": "086b2f05e3dc40de",
+  "swf": "misc/paradise_ticket/paradise_ticket_bippity_bop/paradise_ticket_bippity_bop.swf",
   "states": {
    "1": {
     "w": 38,
@@ -8892,6 +9415,7 @@
  },
  "paradise_ticket_cloud_flight": {
   "sha": "fcf2fbafe3801559",
+  "swf": "misc/paradise_ticket/paradise_ticket_cloud_flight/paradise_ticket_cloud_flight.swf",
   "states": {
    "1": {
     "w": 38,
@@ -8921,6 +9445,7 @@
  },
  "paradise_ticket_cloud_rings": {
   "sha": "16185048790f2e89",
+  "swf": "misc/paradise_ticket/paradise_ticket_cloud_rings/paradise_ticket_cloud_rings.swf",
   "states": {
    "1": {
     "w": 38,
@@ -8950,6 +9475,7 @@
  },
  "paradise_ticket_drafty_uplift": {
   "sha": "c56f44e99f43a583",
+  "swf": "misc/paradise_ticket/paradise_ticket_drafty_uplift/paradise_ticket_drafty_uplift.swf",
   "states": {
    "1": {
     "w": 38,
@@ -8979,6 +9505,7 @@
  },
  "paradise_ticket_mountain_scaling": {
   "sha": "9eab039021f709fd",
+  "swf": "misc/paradise_ticket/paradise_ticket_mountain_scaling/paradise_ticket_mountain_scaling.swf",
   "states": {
    "1": {
     "w": 38,
@@ -9008,6 +9535,7 @@
  },
  "paradise_ticket_radial_heights": {
   "sha": "41395f66cdf83c05",
+  "swf": "misc/paradise_ticket/paradise_ticket_radial_heights/paradise_ticket_radial_heights.swf",
   "states": {
    "1": {
     "w": 38,
@@ -9037,6 +9565,7 @@
  },
  "paradise_ticket_sky_plunge": {
   "sha": "c3410785d5b210e3",
+  "swf": "misc/paradise_ticket/paradise_ticket_sky_plunge/paradise_ticket_sky_plunge.swf",
   "states": {
    "1": {
     "w": 38,
@@ -9066,6 +9595,7 @@
  },
  "paradise_ticket_slip_n_slide": {
   "sha": "6741f57072ad2110",
+  "swf": "misc/paradise_ticket/paradise_ticket_slip_n_slide/paradise_ticket_slip_n_slide.swf",
   "states": {
    "1": {
     "w": 38,
@@ -9095,6 +9625,7 @@
  },
  "paradise_ticket_starlit_night": {
   "sha": "4e5eb7d91dde8fb6",
+  "swf": "misc/paradise_ticket/paradise_ticket_starlit_night/paradise_ticket_starlit_night.swf",
   "states": {
    "1": {
     "w": 38,
@@ -9124,6 +9655,7 @@
  },
  "paradise_ticket_updraft": {
   "sha": "aaa6831b8df83921",
+  "swf": "misc/paradise_ticket/paradise_ticket_updraft/paradise_ticket_updraft.swf",
   "states": {
    "1": {
     "w": 38,
@@ -9153,6 +9685,7 @@
  },
  "pareidolic_cosma_toast": {
   "sha": "9aebf00a433d4d1f",
+  "swf": "rare_items/pareidolic_cosma_toast/pareidolic_cosma_toast.swf",
   "states": {
    "1": {
     "w": 39,
@@ -9164,6 +9697,7 @@
  },
  "parsnip": {
   "sha": "7f22b75284889301",
+  "swf": "food/parsnip/parsnip.swf",
   "states": {
    "1": {
     "w": 49,
@@ -9193,6 +9727,7 @@
  },
  "party_pack_aquarius": {
   "sha": "aa1bd055f681c0c6",
+  "swf": "party_packs/party_pack/party_pack_aquarius/party_pack_aquarius.swf",
   "states": {
    "1": {
     "w": 60,
@@ -9204,6 +9739,7 @@
  },
  "party_pack_double_rainbow": {
   "sha": "4962c0c78b5177ec",
+  "swf": "party_packs/party_pack/party_pack_double_rainbow/party_pack_double_rainbow.swf",
   "states": {
    "1": {
     "w": 60,
@@ -9215,6 +9751,7 @@
  },
  "party_pack_mazzala_gala": {
   "sha": "a393055cd3f559ac",
+  "swf": "party_packs/party_pack/party_pack_mazzala_gala/party_pack_mazzala_gala.swf",
   "states": {
    "1": {
     "w": 60,
@@ -9226,6 +9763,7 @@
  },
  "party_pack_monster_bash": {
   "sha": "76c909e9560511e8",
+  "swf": "party_packs/party_pack/party_pack_monster_bash/party_pack_monster_bash.swf",
   "states": {
    "1": {
     "w": 59,
@@ -9237,6 +9775,7 @@
  },
  "party_pack_nylon_phool": {
   "sha": "10b4f3b10113539e",
+  "swf": "party_packs/party_pack/party_pack_nylon_phool/party_pack_nylon_phool.swf",
   "states": {
    "1": {
     "w": 60,
@@ -9248,6 +9787,7 @@
  },
  "party_pack_pitchen_lilliputt": {
   "sha": "91170e9a961ff603",
+  "swf": "party_packs/party_pack/party_pack_pitchen_lilliputt/party_pack_pitchen_lilliputt.swf",
   "states": {
    "1": {
     "w": 60,
@@ -9259,6 +9799,7 @@
  },
  "party_pack_taster_aquarius": {
   "sha": "621004ac33e281ea",
+  "swf": "party_packs/party_pack_aquarius/party_pack_taster_aquarius/party_pack_taster_aquarius.swf",
   "states": {
    "1": {
     "w": 60,
@@ -9270,6 +9811,7 @@
  },
  "party_pack_taster_double_rainbow": {
   "sha": "f4c5edd2ab696d23",
+  "swf": "party_packs/party_pack_double_rainbow/party_pack_taster_double_rainbow/party_pack_taster_double_rainbow.swf",
   "states": {
    "1": {
     "w": 60,
@@ -9281,6 +9823,7 @@
  },
  "party_pack_taster_mazzala_gala": {
   "sha": "b82fe281bcf41816",
+  "swf": "party_packs/party_pack_mazzala_gala/party_pack_taster_mazzala_gala/party_pack_taster_mazzala_gala.swf",
   "states": {
    "1": {
     "w": 60,
@@ -9292,6 +9835,7 @@
  },
  "party_pack_taster_nylon_phool": {
   "sha": "8d818e952b8bf688",
+  "swf": "party_packs/party_pack_nylon_phool/party_pack_taster_nylon_phool/party_pack_taster_nylon_phool.swf",
   "states": {
    "1": {
     "w": 60,
@@ -9303,6 +9847,7 @@
  },
  "party_pack_taster_pitchen_lilliputt": {
   "sha": "718c7b4a3cf8a070",
+  "swf": "party_packs/party_pack_pitchen_lilliputt/party_pack_taster_pitchen_lilliputt/party_pack_taster_pitchen_lilliputt.swf",
   "states": {
    "1": {
     "w": 60,
@@ -9314,6 +9859,7 @@
  },
  "party_pack_taster_toxic_moon": {
   "sha": "24e1c3ebb3112518",
+  "swf": "party_packs/party_pack_toxic_moon/party_pack_taster_toxic_moon/party_pack_taster_toxic_moon.swf",
   "states": {
    "1": {
     "w": 60,
@@ -9325,6 +9871,7 @@
  },
  "party_pack_taster_val_holla": {
   "sha": "d0c5340fb277202c",
+  "swf": "party_packs/party_pack_val_holla/party_pack_taster_val_holla/party_pack_taster_val_holla.swf",
   "states": {
    "1": {
     "w": 60,
@@ -9336,6 +9883,7 @@
  },
  "party_pack_taster_winter_wingding": {
   "sha": "44af95b8bb6168ad",
+  "swf": "party_packs/party_pack/party_pack_taster_winter_wingding/party_pack_taster_winter_wingding.swf",
   "states": {
    "1": {
     "w": 59,
@@ -9347,6 +9895,7 @@
  },
  "party_pack_toxic_moon": {
   "sha": "65a4f9a3089028be",
+  "swf": "party_packs/party_pack/party_pack_toxic_moon/party_pack_toxic_moon.swf",
   "states": {
    "1": {
     "w": 60,
@@ -9358,6 +9907,7 @@
  },
  "party_pack_val_holla": {
   "sha": "89ccf8cd092af01d",
+  "swf": "party_packs/party_pack/party_pack_val_holla/party_pack_val_holla.swf",
   "states": {
    "1": {
     "w": 60,
@@ -9369,6 +9919,7 @@
  },
  "party_pack_winter_wingding": {
   "sha": "236d5823ed7a0a73",
+  "swf": "party_packs/party_pack/party_pack_winter_wingding/party_pack_winter_wingding.swf",
   "states": {
    "1": {
     "w": 59,
@@ -9380,6 +9931,7 @@
  },
  "peat": {
   "sha": "505e381268229745",
+  "swf": "misc/peat/peat.swf",
   "states": {
    "1": {
     "w": 34,
@@ -9409,6 +9961,7 @@
  },
  "pepitas": {
   "sha": "6eaf9fe056e26a81",
+  "swf": "food/pepitas/pepitas.swf",
   "states": {
    "1": {
     "w": 28,
@@ -9438,6 +9991,7 @@
  },
  "petrified_rock_large": {
   "sha": "e06c2aa287900b05",
+  "swf": "misc/petrified_rock_base/petrified_rock_large/petrified_rock_large.swf",
   "states": {
    "1": {
     "w": 37,
@@ -9449,6 +10003,7 @@
  },
  "petrified_rock_medium": {
   "sha": "de30a3f6ad66c25b",
+  "swf": "misc/petrified_rock_base/petrified_rock_medium/petrified_rock_medium.swf",
   "states": {
    "1": {
     "w": 24,
@@ -9460,6 +10015,7 @@
  },
  "petrified_rock_small": {
   "sha": "8563e5c8c0477f3a",
+  "swf": "misc/petrified_rock_base/petrified_rock_small/petrified_rock_small.swf",
   "states": {
    "1": {
     "w": 20,
@@ -9471,6 +10027,7 @@
  },
  "pi": {
   "sha": "538751c783449739",
+  "swf": "food/pi/pi.swf",
   "states": {
    "1": {
     "w": 48,
@@ -9482,6 +10039,7 @@
  },
  "pick": {
   "sha": "21d5cf691c293069",
+  "swf": "tools/tool_base/pick/pick.swf",
   "states": {
    "1": {
     "w": 48,
@@ -9493,6 +10051,7 @@
  },
  "pickle": {
   "sha": "bae8e65955262d4b",
+  "swf": "food/pickle/pickle.swf",
   "states": {
    "1": {
     "w": 29,
@@ -9522,6 +10081,7 @@
  },
  "pig_bait": {
   "sha": "a9a9b6b72cbbf60a",
+  "swf": "misc/pig_bait/pig_bait.swf",
   "states": {
    "1": {
     "w": 29,
@@ -9551,6 +10111,7 @@
  },
  "piggy_egg": {
   "sha": "a7aa94e3beb696de",
+  "swf": "misc/piggy_egg/piggy_egg.swf",
   "states": {
    "1": {
     "w": 37,
@@ -9580,6 +10141,7 @@
  },
  "piggy_feeder": {
   "sha": "cb7369fa2ef5812b",
+  "swf": "misc/piggy_feeder/piggy_feeder.swf",
   "states": {
    "1": {
     "w": 85,
@@ -9591,6 +10153,7 @@
  },
  "piglet": {
   "sha": "b7c5aba1f624c444",
+  "swf": "inhabitants/piglet/piglet.swf",
   "states": {
    "1": {
     "w": 37,
@@ -9602,6 +10165,7 @@
  },
  "pinch_of_salt": {
   "sha": "e34fa1e25df10fa9",
+  "swf": "spice/pinch_of_salt/pinch_of_salt.swf",
   "states": {
    "1": {
     "w": 29,
@@ -9631,6 +10195,7 @@
  },
  "pineapple": {
   "sha": "e9936f076a94bb34",
+  "swf": "food/pineapple/pineapple.swf",
   "states": {
    "1": {
     "w": 20,
@@ -9660,6 +10225,7 @@
  },
  "plain_bubble": {
   "sha": "b1407329f41a8680",
+  "swf": "food/plain_bubble/plain_bubble.swf",
   "states": {
    "1": {
     "w": 18,
@@ -9689,6 +10255,7 @@
  },
  "plain_crystal": {
   "sha": "af5eb2e5b3e78136",
+  "swf": "misc/plain_crystal/plain_crystal.swf",
   "states": {
    "1": {
     "w": 41,
@@ -9718,6 +10285,7 @@
  },
  "plain_metal": {
   "sha": "3c646b6d22caf4f6",
+  "swf": "misc/plain_metal/plain_metal.swf",
   "states": {
    "1": {
     "w": 34,
@@ -9747,6 +10315,7 @@
  },
  "plain_noodles": {
   "sha": "42b9cb3f4ccf55d1",
+  "swf": "food/plain_noodles/plain_noodles.swf",
   "states": {
    "1": {
     "w": 38,
@@ -9776,6 +10345,7 @@
  },
  "plank": {
   "sha": "24ad5e27f8c0811d",
+  "swf": "food/plank/plank.swf",
   "states": {
    "1": {
     "w": 59,
@@ -9805,6 +10375,7 @@
  },
  "plate_of_beans": {
   "sha": "fec4439789f58766",
+  "swf": "misc/plate_of_beans/plate_of_beans.swf",
   "states": {
    "1": {
     "w": 42,
@@ -9816,6 +10387,7 @@
  },
  "play_cube": {
   "sha": "2558b71b83e96a91",
+  "swf": "misc/play_cube/play_cube.swf",
   "states": {
    "1": {
     "w": 37,
@@ -9827,6 +10399,7 @@
  },
  "plop": {
   "sha": "acd496a77798b653",
+  "swf": "misc/plop/plop.swf",
   "states": {
    "1": {
     "w": 28,
@@ -9838,6 +10411,7 @@
  },
  "plum": {
   "sha": "bbd7ec0c0d04dacf",
+  "swf": "food/plum/plum.swf",
   "states": {
    "1": {
     "w": 21,
@@ -9867,6 +10441,7 @@
  },
  "potato": {
   "sha": "7b4226371dce7bc6",
+  "swf": "food/potato/potato.swf",
   "states": {
    "1": {
     "w": 31,
@@ -9896,6 +10471,7 @@
  },
  "potato_patty": {
   "sha": "cfe99c0368e612dd",
+  "swf": "food/potato_patty/potato_patty.swf",
   "states": {
    "1": {
     "w": 42,
@@ -9925,6 +10501,7 @@
  },
  "potcorn": {
   "sha": "ef6a3e79c4505f75",
+  "swf": "food/potcorn/potcorn.swf",
   "states": {
    "1": {
     "w": 28,
@@ -9936,6 +10513,7 @@
  },
  "potians_feast": {
   "sha": "058fb84b6286c324",
+  "swf": "food/potians_feast/potians_feast.swf",
   "states": {
    "1": {
     "w": 42,
@@ -9947,6 +10525,7 @@
  },
  "potion_amorous_philtre": {
   "sha": "5493ddef40da5513",
+  "swf": "alchemy/potion_amorous_philtre/potion_amorous_philtre.swf",
   "states": {
    "1": {
     "w": 23,
@@ -9958,6 +10537,7 @@
  },
  "potion_ancestral_spirits": {
   "sha": "f3521bb231debfa2",
+  "swf": "alchemy/potion_ancestral_spirits/potion_ancestral_spirits.swf",
   "states": {
    "1": {
     "w": 23,
@@ -9969,6 +10549,7 @@
  },
  "potion_animal_youth": {
   "sha": "6db36b6d1c4c95f7",
+  "swf": "alchemy/potion_animal_youth/potion_animal_youth.swf",
   "states": {
    "1": {
     "w": 23,
@@ -9980,6 +10561,7 @@
  },
  "potion_avatar_large": {
   "sha": "2f9adb08e4578f28",
+  "swf": "alchemy/potion_avatar_large/potion_avatar_large.swf",
   "states": {
    "1": {
     "w": 22,
@@ -9991,6 +10573,7 @@
  },
  "potion_avatar_small": {
   "sha": "d1f5631b3c29ef21",
+  "swf": "alchemy/potion_avatar_small/potion_avatar_small.swf",
   "states": {
    "1": {
     "w": 22,
@@ -10002,6 +10585,7 @@
  },
  "potion_charades": {
   "sha": "f5fe56fd4ece3905",
+  "swf": "alchemy/potion_charades/potion_charades.swf",
   "states": {
    "1": {
     "w": 23,
@@ -10013,6 +10597,7 @@
  },
  "potion_chris": {
   "sha": "b2899adff893abef",
+  "swf": "alchemy/potion_chris/potion_chris.swf",
   "states": {
    "1": {
     "w": 23,
@@ -10024,6 +10609,7 @@
  },
  "potion_draught_of_giant_amicability": {
   "sha": "ac55722f778b5afb",
+  "swf": "alchemy/potion_draught_of_giant_amicability/potion_draught_of_giant_amicability.swf",
   "states": {
    "1": {
     "w": 23,
@@ -10035,6 +10621,7 @@
  },
  "potion_elixir_of_avarice": {
   "sha": "bd3471f8d2f57cfd",
+  "swf": "alchemy/potion_elixir_of_avarice/potion_elixir_of_avarice.swf",
   "states": {
    "1": {
     "w": 23,
@@ -10046,6 +10633,7 @@
  },
  "potion_favor": {
   "sha": "ac55722f778b5afb",
+  "swf": "alchemy/potion_favor/potion_favor.swf",
   "states": {
    "1": {
     "w": 23,
@@ -10057,6 +10645,7 @@
  },
  "potion_garden_clear": {
   "sha": "ccff2c6fd16cde0f",
+  "swf": "alchemy/potion_garden_clear/potion_garden_clear.swf",
   "states": {
    "1": {
     "w": 30,
@@ -10068,6 +10657,7 @@
  },
  "potion_garden_fertilize": {
   "sha": "62441d20addbb99e",
+  "swf": "alchemy/potion_garden_fertilize/potion_garden_fertilize.swf",
   "states": {
    "1": {
     "w": 30,
@@ -10079,6 +10669,7 @@
  },
  "potion_garden_harvest": {
   "sha": "1bc635fda905e513",
+  "swf": "alchemy/potion_garden_harvest/potion_garden_harvest.swf",
   "states": {
    "1": {
     "w": 30,
@@ -10090,6 +10681,7 @@
  },
  "potion_garden_plant": {
   "sha": "7526282dcad1636c",
+  "swf": "alchemy/potion_garden_plant/potion_garden_plant.swf",
   "states": {
    "1": {
     "w": 30,
@@ -10101,6 +10693,7 @@
  },
  "potion_garden_water": {
   "sha": "e0d066fd1b734b07",
+  "swf": "alchemy/potion_garden_water/potion_garden_water.swf",
   "states": {
    "1": {
     "w": 30,
@@ -10112,6 +10705,7 @@
  },
  "potion_keycutter_tonic": {
   "sha": "f9ce571159319d4d",
+  "swf": "alchemy/potion_keycutter_tonic/potion_keycutter_tonic.swf",
   "states": {
    "1": {
     "w": 23,
@@ -10123,6 +10717,7 @@
  },
  "potion_rainbow_juice": {
   "sha": "4c39af3711deb41c",
+  "swf": "alchemy/potion_rainbow_juice/potion_rainbow_juice.swf",
   "states": {
    "1": {
     "w": 23,
@@ -10134,6 +10729,7 @@
  },
  "potion_rook_balm": {
   "sha": "e89a5784c887676f",
+  "swf": "alchemy/potion_rook_balm/potion_rook_balm.swf",
   "states": {
    "1": {
     "w": 23,
@@ -10145,6 +10741,7 @@
  },
  "potion_trantsformation_fluid": {
   "sha": "794b81c59def5ba5",
+  "swf": "alchemy/potion_trantsformation_fluid/potion_trantsformation_fluid.swf",
   "states": {
    "1": {
     "w": 23,
@@ -10156,6 +10753,7 @@
  },
  "potion_tree_poison": {
   "sha": "fba58e5497ca8c2c",
+  "swf": "alchemy/potion_tree_poison/potion_tree_poison.swf",
   "states": {
    "1": {
     "w": 23,
@@ -10167,6 +10765,7 @@
  },
  "potion_tree_poison_antidote": {
   "sha": "6dd01765b2b4855f",
+  "swf": "alchemy/potion_tree_poison_antidote/potion_tree_poison_antidote.swf",
   "states": {
    "1": {
     "w": 23,
@@ -10178,6 +10777,7 @@
  },
  "potoxin": {
   "sha": "e97514a39535e6a2",
+  "swf": "compounds/potoxin/potoxin.swf",
   "states": {
    "1": {
     "w": 18,
@@ -10189,6 +10789,7 @@
  },
  "pottine": {
   "sha": "6592f77113b238c7",
+  "swf": "food/pottine/pottine.swf",
   "states": {
    "1": {
     "w": 44,
@@ -10200,6 +10801,7 @@
  },
  "powder_of_mild_fecundity": {
   "sha": "29f4b5bda5e56179",
+  "swf": "alchemy/powder_of_mild_fecundity/powder_of_mild_fecundity.swf",
   "states": {
    "1": {
     "w": 22,
@@ -10235,6 +10837,7 @@
  },
  "powder_of_startling_fecundity": {
   "sha": "b6cf2c1fdfdb5957",
+  "swf": "alchemy/powder_of_startling_fecundity/powder_of_startling_fecundity.swf",
   "states": {
    "1": {
     "w": 25,
@@ -10270,6 +10873,7 @@
  },
  "precious_potato_salad": {
   "sha": "b28146095ddfaba9",
+  "swf": "food/precious_potato_salad/precious_potato_salad.swf",
   "states": {
    "1": {
     "w": 36,
@@ -10281,6 +10885,7 @@
  },
  "proper_rice": {
   "sha": "011bb113f32694dd",
+  "swf": "food/proper_rice/proper_rice.swf",
   "states": {
    "1": {
     "w": 46,
@@ -10310,6 +10915,7 @@
  },
  "pumpkin": {
   "sha": "1568e8c75bcb1a84",
+  "swf": "food/pumpkin/pumpkin.swf",
   "states": {
    "1": {
     "w": 39,
@@ -10339,6 +10945,7 @@
  },
  "pumpkin_ale": {
   "sha": "f9441da91e26d934",
+  "swf": "drink/pumpkin_ale/pumpkin_ale.swf",
   "states": {
    "1": {
     "w": 23,
@@ -10368,6 +10975,7 @@
  },
  "pumpkin_carved_1": {
   "sha": "ff2575a9d2490636",
+  "swf": "carved_pumpkins/pumpkin_carved_1/pumpkin_carved_1.swf",
   "states": {
    "1": {
     "w": 48,
@@ -10379,6 +10987,7 @@
  },
  "pumpkin_carved_2": {
   "sha": "5e4c7399c18d25ff",
+  "swf": "carved_pumpkins/pumpkin_carved_2/pumpkin_carved_2.swf",
   "states": {
    "1": {
     "w": 49,
@@ -10390,6 +10999,7 @@
  },
  "pumpkin_carved_3": {
   "sha": "97d81e5570cbfb76",
+  "swf": "carved_pumpkins/pumpkin_carved_3/pumpkin_carved_3.swf",
   "states": {
    "1": {
     "w": 48,
@@ -10401,6 +11011,7 @@
  },
  "pumpkin_carved_4": {
   "sha": "14203c6a4d3e4c57",
+  "swf": "carved_pumpkins/pumpkin_carved_4/pumpkin_carved_4.swf",
   "states": {
    "1": {
     "w": 48,
@@ -10412,6 +11023,7 @@
  },
  "pumpkin_carved_5": {
   "sha": "73dda5f76e8122d9",
+  "swf": "carved_pumpkins/pumpkin_carved_5/pumpkin_carved_5.swf",
   "states": {
    "1": {
     "w": 50,
@@ -10423,6 +11035,7 @@
  },
  "pumpkin_lit_1": {
   "sha": "a95b84c5848036d7",
+  "swf": "carved_pumpkins/pumpkin_lit_1/pumpkin_lit_1.swf",
   "states": {
    "1": {
     "w": 49,
@@ -10434,6 +11047,7 @@
  },
  "pumpkin_lit_2": {
   "sha": "0c42a978513bc772",
+  "swf": "carved_pumpkins/pumpkin_lit_2/pumpkin_lit_2.swf",
   "states": {
    "1": {
     "w": 49,
@@ -10445,6 +11059,7 @@
  },
  "pumpkin_lit_3": {
   "sha": "8e0e7c4e39fb800b",
+  "swf": "carved_pumpkins/pumpkin_lit_3/pumpkin_lit_3.swf",
   "states": {
    "1": {
     "w": 49,
@@ -10456,6 +11071,7 @@
  },
  "pumpkin_lit_4": {
   "sha": "faed8a1458a8935c",
+  "swf": "carved_pumpkins/pumpkin_lit_4/pumpkin_lit_4.swf",
   "states": {
    "1": {
     "w": 49,
@@ -10467,6 +11083,7 @@
  },
  "pumpkin_lit_5": {
   "sha": "d5c080d0f89f3fe5",
+  "swf": "carved_pumpkins/pumpkin_lit_5/pumpkin_lit_5.swf",
   "states": {
    "1": {
     "w": 50,
@@ -10478,6 +11095,7 @@
  },
  "pumpkin_pie": {
   "sha": "76bea1026a68704d",
+  "swf": "food/pumpkin_pie/pumpkin_pie.swf",
   "states": {
    "1": {
     "w": 48,
@@ -10489,6 +11107,7 @@
  },
  "pungent_sunrise": {
   "sha": "6f4f95030e77ed71",
+  "swf": "drink/pungent_sunrise/pungent_sunrise.swf",
   "states": {
    "1": {
     "w": 15,
@@ -10518,6 +11137,7 @@
  },
  "purple_flower": {
   "sha": "410c377294ea318f",
+  "swf": "herbs/purple_flower/purple_flower.swf",
   "states": {
    "1": {
     "w": 55,
@@ -10547,6 +11167,7 @@
  },
  "quill": {
   "sha": "7b4e570473f7e9fd",
+  "swf": "tools/tool_base/quill/quill.swf",
   "states": {
    "1": {
     "w": 42,
@@ -10558,6 +11179,7 @@
  },
  "race_ticket": {
   "sha": "f07fafb8aa24c0b8",
+  "swf": "misc/race_ticket/race_ticket.swf",
   "states": {
    "1": {
     "w": 44,
@@ -10587,6 +11209,7 @@
  },
  "race_ticket_amazing_race": {
   "sha": "f07fafb8aa24c0b8",
+  "swf": "misc/race_ticket/race_ticket_amazing_race.swf",
   "states": {
    "1": {
     "w": 44,
@@ -10616,6 +11239,7 @@
  },
  "race_ticket_canyon_run": {
   "sha": "f07fafb8aa24c0b8",
+  "swf": "misc/race_ticket/race_ticket_canyon_run.swf",
   "states": {
    "1": {
     "w": 44,
@@ -10645,6 +11269,7 @@
  },
  "race_ticket_cloudhopolis": {
   "sha": "f07fafb8aa24c0b8",
+  "swf": "misc/race_ticket/race_ticket_cloudhopolis.swf",
   "states": {
    "1": {
     "w": 44,
@@ -10674,6 +11299,7 @@
  },
  "race_ticket_crystal_climb": {
   "sha": "f07fafb8aa24c0b8",
+  "swf": "misc/race_ticket/race_ticket_crystal_climb.swf",
   "states": {
    "1": {
     "w": 44,
@@ -10703,6 +11329,7 @@
  },
  "race_ticket_grab_em_good": {
   "sha": "f07fafb8aa24c0b8",
+  "swf": "misc/race_ticket/race_ticket_grab_em_good.swf",
   "states": {
    "1": {
     "w": 44,
@@ -10732,6 +11359,7 @@
  },
  "race_ticket_hogtie_piggy": {
   "sha": "f07fafb8aa24c0b8",
+  "swf": "misc/race_ticket/race_ticket_hogtie_piggy.swf",
   "states": {
    "1": {
     "w": 44,
@@ -10761,6 +11389,7 @@
  },
  "race_ticket_it_game": {
   "sha": "f07fafb8aa24c0b8",
+  "swf": "misc/race_ticket/race_ticket_it_game.swf",
   "states": {
    "1": {
     "w": 44,
@@ -10790,6 +11419,7 @@
  },
  "race_ticket_lava_leap": {
   "sha": "f07fafb8aa24c0b8",
+  "swf": "misc/race_ticket/race_ticket_lava_leap.swf",
   "states": {
    "1": {
     "w": 44,
@@ -10819,6 +11449,7 @@
  },
  "race_ticket_space_race": {
   "sha": "f07fafb8aa24c0b8",
+  "swf": "misc/race_ticket/race_ticket_space_race.swf",
   "states": {
    "1": {
     "w": 44,
@@ -10848,6 +11479,7 @@
  },
  "race_ticket_star_sprint": {
   "sha": "f07fafb8aa24c0b8",
+  "swf": "misc/race_ticket/race_ticket_star_sprint.swf",
   "states": {
    "1": {
     "w": 44,
@@ -10877,6 +11509,7 @@
  },
  "race_ticket_time_warp": {
   "sha": "f07fafb8aa24c0b8",
+  "swf": "misc/race_ticket/race_ticket_time_warp.swf",
   "states": {
    "1": {
     "w": 44,
@@ -10906,6 +11539,7 @@
  },
  "random_kindness": {
   "sha": "b943fa3dd6bad91b",
+  "swf": "tools/tool_base/random_kindness/random_kindness.swf",
   "states": {
    "1": {
     "w": 55,
@@ -10917,6 +11551,7 @@
  },
  "red": {
   "sha": "e4d524016a145231",
+  "swf": "food/red/red.swf",
   "states": {
    "1": {
     "w": 20,
@@ -10928,6 +11563,7 @@
  },
  "rice": {
   "sha": "f358a91542e445dd",
+  "swf": "food/rice/rice.swf",
   "states": {
    "1": {
     "w": 28,
@@ -10957,6 +11593,7 @@
  },
  "rich_tagine": {
   "sha": "b3f4bcd2b6893bbb",
+  "swf": "food/rich_tagine/rich_tagine.swf",
   "states": {
    "1": {
     "w": 36,
@@ -10986,6 +11623,7 @@
  },
  "rookswort": {
   "sha": "8313caf8967c1000",
+  "swf": "herbs/rookswort/rookswort.swf",
   "states": {
    "1": {
     "w": 50,
@@ -11015,6 +11653,7 @@
  },
  "roux": {
   "sha": "8cd7e8fbaa35c35d",
+  "swf": "food/roux/roux.swf",
   "states": {
    "1": {
     "w": 20,
@@ -11026,6 +11665,7 @@
  },
  "rube_potato": {
   "sha": "30e2ed957dbd7836",
+  "swf": "rare_items/rube_potato/rube_potato.swf",
   "states": {
    "1": {
     "w": 31,
@@ -11037,6 +11677,7 @@
  },
  "rubemycin": {
   "sha": "be9cfd831ff1525e",
+  "swf": "compounds/rubemycin/rubemycin.swf",
   "states": {
    "1": {
     "w": 20,
@@ -11048,6 +11689,7 @@
  },
  "rubeweed": {
   "sha": "48aa1e707479d3f4",
+  "swf": "herbs/rubeweed/rubeweed.swf",
   "states": {
    "1": {
     "w": 59,
@@ -11077,6 +11719,7 @@
  },
  "saffron": {
   "sha": "a03b8d43283c4b75",
+  "swf": "spice/saffron/saffron.swf",
   "states": {
    "1": {
     "w": 33,
@@ -11106,6 +11749,7 @@
  },
  "salmon": {
   "sha": "846e587aee3b872d",
+  "swf": "food/salmon/salmon.swf",
   "states": {
    "1": {
     "w": 58,
@@ -11135,6 +11779,7 @@
  },
  "salmon_jaella": {
   "sha": "34fa5b6cc96c1cc4",
+  "swf": "food/salmon_jaella/salmon_jaella.swf",
   "states": {
    "1": {
     "w": 38,
@@ -11146,6 +11791,7 @@
  },
  "sammich": {
   "sha": "9b5111b4ff131923",
+  "swf": "food/sammich/sammich.swf",
   "states": {
    "1": {
     "w": 29,
@@ -11175,6 +11821,7 @@
  },
  "saucepan": {
   "sha": "07f63a40ab1d79c3",
+  "swf": "tools/tool_base/saucepan/saucepan.swf",
   "states": {
    "1": {
     "w": 61,
@@ -11186,6 +11833,7 @@
  },
  "savory_smoothie": {
   "sha": "9fe02f2b08d96459",
+  "swf": "drink/savory_smoothie/savory_smoothie.swf",
   "states": {
    "1": {
     "w": 20,
@@ -11215,6 +11863,7 @@
  },
  "scraper": {
   "sha": "01e263da9efd0acd",
+  "swf": "tools/tool_base/scraper/scraper.swf",
   "states": {
    "1": {
     "w": 40,
@@ -11226,6 +11875,7 @@
  },
  "scrumptious_frittata": {
   "sha": "19e7586d946b1a3e",
+  "swf": "food/scrumptious_frittata/scrumptious_frittata.swf",
   "states": {
    "1": {
     "w": 35,
@@ -11255,6 +11905,7 @@
  },
  "secret_sauce": {
   "sha": "b4763da2fed49e8a",
+  "swf": "food/secret_sauce/secret_sauce.swf",
   "states": {
    "1": {
     "w": 20,
@@ -11284,6 +11935,7 @@
  },
  "seed_broccoli": {
   "sha": "0367872f7925b056",
+  "swf": "seeds/seed_broccoli/seed_broccoli.swf",
   "states": {
    "1": {
     "w": 22,
@@ -11313,6 +11965,7 @@
  },
  "seed_cabbage": {
   "sha": "a3b9cb4513ef375a",
+  "swf": "seeds/seed_cabbage/seed_cabbage.swf",
   "states": {
    "1": {
     "w": 23,
@@ -11342,6 +11995,7 @@
  },
  "seed_carrot": {
   "sha": "5dc64c29a6b5119a",
+  "swf": "seeds/seed_carrot/seed_carrot.swf",
   "states": {
    "1": {
     "w": 22,
@@ -11371,6 +12025,7 @@
  },
  "seed_corn": {
   "sha": "c8cf606ad1473749",
+  "swf": "seeds/seed_corn/seed_corn.swf",
   "states": {
    "1": {
     "w": 23,
@@ -11400,6 +12055,7 @@
  },
  "seed_cucumber": {
   "sha": "c5048e59e404d34b",
+  "swf": "seeds/seed_cucumber/seed_cucumber.swf",
   "states": {
    "1": {
     "w": 23,
@@ -11429,6 +12085,7 @@
  },
  "seed_onion": {
   "sha": "28660cfb3ba85cfe",
+  "swf": "seeds/seed_onion/seed_onion.swf",
   "states": {
    "1": {
     "w": 22,
@@ -11458,6 +12115,7 @@
  },
  "seed_parsnip": {
   "sha": "47f277262253e251",
+  "swf": "seeds/seed_parsnip/seed_parsnip.swf",
   "states": {
    "1": {
     "w": 23,
@@ -11487,6 +12145,7 @@
  },
  "seed_potato": {
   "sha": "c9ce442d6c682178",
+  "swf": "seeds/seed_potato/seed_potato.swf",
   "states": {
    "1": {
     "w": 23,
@@ -11516,6 +12175,7 @@
  },
  "seed_pumpkin": {
   "sha": "f0e4e2c2aa3a5b99",
+  "swf": "seeds/seed_pumpkin/seed_pumpkin.swf",
   "states": {
    "1": {
     "w": 23,
@@ -11545,6 +12205,7 @@
  },
  "seed_rice": {
   "sha": "da81252e961e76dc",
+  "swf": "seeds/seed_rice/seed_rice.swf",
   "states": {
    "1": {
     "w": 22,
@@ -11574,6 +12235,7 @@
  },
  "seed_spinach": {
   "sha": "780bc7f8b4753fb4",
+  "swf": "seeds/seed_spinach/seed_spinach.swf",
   "states": {
    "1": {
     "w": 23,
@@ -11603,6 +12265,7 @@
  },
  "seed_strawberry": {
   "sha": "05860580580ae0f3",
+  "swf": "seeds/seed_strawberry/seed_strawberry.swf",
   "states": {
    "1": {
     "w": 22,
@@ -11632,6 +12295,7 @@
  },
  "seed_tomato": {
   "sha": "ebc00b48269264fd",
+  "swf": "seeds/seed_tomato/seed_tomato.swf",
   "states": {
    "1": {
     "w": 22,
@@ -11661,6 +12325,7 @@
  },
  "seed_zucchini": {
   "sha": "6fbf257ff222e1f2",
+  "swf": "seeds/seed_zucchini/seed_zucchini.swf",
   "states": {
    "1": {
     "w": 22,
@@ -11690,6 +12355,7 @@
  },
  "sesame_oil": {
   "sha": "b9935767f00f6828",
+  "swf": "food/sesame_oil/sesame_oil.swf",
   "states": {
    "1": {
     "w": 14,
@@ -11719,6 +12385,7 @@
  },
  "shovel": {
   "sha": "8bfebc111b70bf90",
+  "swf": "tools/tool_base/shovel/shovel.swf",
   "states": {
    "1": {
     "w": 74,
@@ -11730,6 +12397,7 @@
  },
  "signpost_permit": {
   "sha": "07f89fca99f8f65d",
+  "swf": "misc/signpost_permit/signpost_permit.swf",
   "states": {
    "1": {
     "w": 81,
@@ -11741,6 +12409,7 @@
  },
  "silvertongue": {
   "sha": "d56541967233c505",
+  "swf": "herbs/silvertongue/silvertongue.swf",
   "states": {
    "1": {
     "w": 42,
@@ -11770,6 +12439,7 @@
  },
  "simple_bbq": {
   "sha": "eeec0f486c889ff2",
+  "swf": "food/simple_bbq/simple_bbq.swf",
   "states": {
    "1": {
     "w": 41,
@@ -11799,6 +12469,7 @@
  },
  "simple_slaw": {
   "sha": "3960cd7833761949",
+  "swf": "food/simple_slaw/simple_slaw.swf",
   "states": {
    "1": {
     "w": 22,
@@ -11828,6 +12499,7 @@
  },
  "slow_gin_fizz": {
   "sha": "9c07d66e6ece23a6",
+  "swf": "drink/slow_gin_fizz/slow_gin_fizz.swf",
   "states": {
    "1": {
     "w": 14,
@@ -11857,6 +12529,7 @@
  },
  "small_worthless": {
   "sha": "94ed329b1fa4663d",
+  "swf": "misc/small_worthless/small_worthless.swf",
   "states": {
    "1": {
     "w": 24,
@@ -11874,6 +12547,7 @@
  },
  "smelter": {
   "sha": "6ac615e6f990476e",
+  "swf": "tools/tool_base/smelter/smelter.swf",
   "states": {
    "1": {
     "w": 69,
@@ -11885,6 +12559,7 @@
  },
  "snack_pack": {
   "sha": "1678a1f090732a2b",
+  "swf": "food/snack_pack/snack_pack.swf",
   "states": {
    "1": {
     "w": 70,
@@ -11914,6 +12589,7 @@
  },
  "snail": {
   "sha": "c0920c48015471a0",
+  "swf": "misc/snail/snail.swf",
   "states": {
    "1": {
     "w": 24,
@@ -11943,6 +12619,7 @@
  },
  "sneezing_powder": {
   "sha": "6f5b5d4d245da8d3",
+  "swf": "alchemy/sneezing_powder/sneezing_powder.swf",
   "states": {
    "1": {
     "w": 22,
@@ -11978,6 +12655,7 @@
  },
  "sno_cone_blue": {
   "sha": "6491a93b4b14b889",
+  "swf": "food/sno_cone_blue/sno_cone_blue.swf",
   "states": {
    "1": {
     "w": 43,
@@ -12007,6 +12685,7 @@
  },
  "sno_cone_green": {
   "sha": "30601f47a31bb033",
+  "swf": "food/sno_cone_green/sno_cone_green.swf",
   "states": {
    "1": {
     "w": 43,
@@ -12036,6 +12715,7 @@
  },
  "sno_cone_orange": {
   "sha": "f45525dd261c85ea",
+  "swf": "food/sno_cone_orange/sno_cone_orange.swf",
   "states": {
    "1": {
     "w": 43,
@@ -12065,6 +12745,7 @@
  },
  "sno_cone_purple": {
   "sha": "1f2964f5d395dffb",
+  "swf": "food/sno_cone_purple/sno_cone_purple.swf",
   "states": {
    "1": {
     "w": 43,
@@ -12094,6 +12775,7 @@
  },
  "sno_cone_rainbow": {
   "sha": "c7439994b7fd914b",
+  "swf": "food/sno_cone_rainbow/sno_cone_rainbow.swf",
   "states": {
    "1": {
     "w": 43,
@@ -12123,6 +12805,7 @@
  },
  "sno_cone_red": {
   "sha": "5650115c9d2d65b7",
+  "swf": "food/sno_cone_red/sno_cone_red.swf",
   "states": {
    "1": {
     "w": 43,
@@ -12152,6 +12835,7 @@
  },
  "sparkle_powder": {
   "sha": "6226fa2a32931fe0",
+  "swf": "alchemy/sparkle_powder/sparkle_powder.swf",
   "states": {
    "1": {
     "w": 22,
@@ -12187,6 +12871,7 @@
  },
  "sparkly": {
   "sha": "de5cbb544d5839b2",
+  "swf": "misc/sparkly/sparkly.swf",
   "states": {
    "1": {
     "w": 25,
@@ -12216,6 +12901,7 @@
  },
  "special_item_that_only_beta_testers_get": {
   "sha": "1e74f244b9fadf19",
+  "swf": "misc/special_item_that_only_beta_testers_get/special_item_that_only_beta_testers_get.swf",
   "states": {
    "1": {
     "w": 74,
@@ -12227,6 +12913,7 @@
  },
  "spice_mill": {
   "sha": "21212d4301b90d4c",
+  "swf": "tools/tool_base/spice_mill/spice_mill.swf",
   "states": {
    "1": {
     "w": 31,
@@ -12238,6 +12925,7 @@
  },
  "spicy_grog": {
   "sha": "8f5b1135954dd397",
+  "swf": "drink/spicy_grog/spicy_grog.swf",
   "states": {
    "1": {
     "w": 14,
@@ -12267,6 +12955,7 @@
  },
  "spicy_quesadilla": {
   "sha": "0ba345b0ba0365e6",
+  "swf": "food/spicy_quesadilla/spicy_quesadilla.swf",
   "states": {
    "1": {
     "w": 40,
@@ -12296,6 +12985,7 @@
  },
  "spinach": {
   "sha": "f1ffb0a0c8323836",
+  "swf": "food/spinach/spinach.swf",
   "states": {
    "1": {
     "w": 31,
@@ -12325,6 +13015,7 @@
  },
  "spinach_salad": {
   "sha": "823c6fa7f82ea54b",
+  "swf": "food/spinach_salad/spinach_salad.swf",
   "states": {
    "1": {
     "w": 60,
@@ -12354,6 +13045,7 @@
  },
  "spindle": {
   "sha": "856fda925cd1c6ff",
+  "swf": "tools/tool_base/spindle/spindle.swf",
   "states": {
    "1": {
     "w": 42,
@@ -12365,6 +13057,7 @@
  },
  "splendid_spindle": {
   "sha": "1ad7164b24ff31df",
+  "swf": "tools/spindle/splendid_spindle/splendid_spindle.swf",
   "states": {
    "1": {
     "w": 49,
@@ -12376,6 +13069,7 @@
  },
  "spriggase": {
   "sha": "380449bc305babb2",
+  "swf": "compounds/spriggase/spriggase.swf",
   "states": {
    "1": {
     "w": 21,
@@ -12387,6 +13081,7 @@
  },
  "still": {
   "sha": "0c48ca9edd42aebd",
+  "swf": "misc/still/still.swf",
   "states": {
    "1": {
     "w": 68,
@@ -12398,6 +13093,7 @@
  },
  "stock_sauce": {
   "sha": "d7d94cfab954291d",
+  "swf": "food/stock_sauce/stock_sauce.swf",
   "states": {
    "1": {
     "w": 20,
@@ -12409,6 +13105,7 @@
  },
  "stoot_barfield_pullstring_doll": {
   "sha": "10707cc62a93f754",
+  "swf": "rare_items/stoot_barfield_pullstring_doll/stoot_barfield_pullstring_doll.swf",
   "states": {
    "1": {
     "w": 59,
@@ -12420,6 +13117,7 @@
  },
  "strawberry": {
   "sha": "d3e4306c43855085",
+  "swf": "food/strawberry/strawberry.swf",
   "states": {
    "1": {
     "w": 15,
@@ -12449,6 +13147,7 @@
  },
  "string": {
   "sha": "18314688e8ed8e45",
+  "swf": "misc/string/string.swf",
   "states": {
    "1": {
     "w": 48,
@@ -12478,6 +13177,7 @@
  },
  "super_scraper": {
   "sha": "19a481c24f6d0109",
+  "swf": "tools/scraper/super_scraper/super_scraper.swf",
   "states": {
    "1": {
     "w": 46,
@@ -12489,6 +13189,7 @@
  },
  "super_veggie_kebabs": {
   "sha": "a9b2c96bc72505cd",
+  "swf": "food/super_veggie_kebabs/super_veggie_kebabs.swf",
   "states": {
    "1": {
     "w": 42,
@@ -12518,6 +13219,7 @@
  },
  "swank_zucchini_loaf": {
   "sha": "a504e8ea3b0b1e03",
+  "swf": "food/swank_zucchini_loaf/swank_zucchini_loaf.swf",
   "states": {
    "1": {
     "w": 45,
@@ -12529,6 +13231,7 @@
  },
  "sweet_n_sour_sauce": {
   "sha": "56d460d381380f36",
+  "swf": "food/sweet_n_sour_sauce/sweet_n_sour_sauce.swf",
   "states": {
    "1": {
     "w": 20,
@@ -12558,6 +13261,7 @@
  },
  "swf_1": {
   "sha": "4490133059371488",
+  "swf": "misc/swf_1/swf_1.swf",
   "states": {
    "1": {
     "w": 32,
@@ -12569,6 +13273,7 @@
  },
  "swf_2": {
   "sha": "909fb0d7da111de5",
+  "swf": "misc/swf_2/swf_2.swf",
   "states": {
    "1": {
     "w": 30,
@@ -12580,6 +13285,7 @@
  },
  "swf_3": {
   "sha": "0bf55b8999611a99",
+  "swf": "misc/swf_3/swf_3.swf",
   "states": {
    "1": {
     "w": 30,
@@ -12591,6 +13297,7 @@
  },
  "swing_batter": {
   "sha": "d10a94de2a5f0976",
+  "swf": "food/swing_batter/swing_batter.swf",
   "states": {
    "1": {
     "w": 36,
@@ -12602,6 +13309,7 @@
  },
  "tangy_noodles": {
   "sha": "2709b8de563e33c8",
+  "swf": "food/tangy_noodles/tangy_noodles.swf",
   "states": {
    "1": {
     "w": 38,
@@ -12631,6 +13339,7 @@
  },
  "tangy_sauce": {
   "sha": "99f050d81d8f2851",
+  "swf": "food/tangy_sauce/tangy_sauce.swf",
   "states": {
    "1": {
     "w": 20,
@@ -12660,6 +13369,7 @@
  },
  "tasty_pasta": {
   "sha": "54b2768fdb2af8e1",
+  "swf": "food/tasty_pasta/tasty_pasta.swf",
   "states": {
    "1": {
     "w": 36,
@@ -12689,6 +13399,7 @@
  },
  "teleportation_script": {
   "sha": "8822bcacac412a48",
+  "swf": "misc/note/teleportation_script/teleportation_script.swf",
   "states": {
    "1": {
     "w": 55,
@@ -12700,6 +13411,7 @@
  },
  "teleportation_script_imbued": {
   "sha": "362f4378f38fa420",
+  "swf": "misc/teleportation_script/teleportation_script_imbued/teleportation_script_imbued.swf",
   "states": {
    "1": {
     "w": 59,
@@ -12711,6 +13423,7 @@
  },
  "test_tube": {
   "sha": "512cc0f24544f0da",
+  "swf": "tools/tool_base/test_tube/test_tube.swf",
   "states": {
    "1": {
     "w": 30,
@@ -12722,6 +13435,7 @@
  },
  "thread": {
   "sha": "6bf2fb3ae19befdc",
+  "swf": "misc/thread/thread.swf",
   "states": {
    "1": {
     "w": 20,
@@ -12751,6 +13465,7 @@
  },
  "tiite": {
   "sha": "5a42aa66569a00b2",
+  "swf": "compounds/tiite/tiite.swf",
   "states": {
    "1": {
     "w": 8,
@@ -12762,6 +13477,7 @@
  },
  "tin": {
   "sha": "21eb86c6bd4e7305",
+  "swf": "misc/tin/tin.swf",
   "states": {
    "1": {
     "w": 34,
@@ -12791,6 +13507,7 @@
  },
  "tincturing_kit": {
   "sha": "b3cd8d105eb8fd0c",
+  "swf": "tools/tool_base/tincturing_kit/tincturing_kit.swf",
   "states": {
    "1": {
     "w": 44,
@@ -12802,6 +13519,7 @@
  },
  "tinkertool": {
   "sha": "cdeab5a2b7d2896b",
+  "swf": "tools/tool_base/tinkertool/tinkertool.swf",
   "states": {
    "1": {
     "w": 51,
@@ -12813,6 +13531,7 @@
  },
  "tiny_bubble": {
   "sha": "10f52704906a8589",
+  "swf": "food/tiny_bubble/tiny_bubble.swf",
   "states": {
    "1": {
     "w": 11,
@@ -12842,6 +13561,7 @@
  },
  "tomato": {
   "sha": "8d667cc6558f4374",
+  "swf": "food/tomato/tomato.swf",
   "states": {
    "1": {
     "w": 24,
@@ -12871,6 +13591,7 @@
  },
  "tooberry_shake": {
   "sha": "0dad7e3f97edcc64",
+  "swf": "drink/tooberry_shake/tooberry_shake.swf",
   "states": {
    "1": {
     "w": 18,
@@ -12900,6 +13621,7 @@
  },
  "tortilla": {
   "sha": "860427a5ba6870cb",
+  "swf": "food/tortilla/tortilla.swf",
   "states": {
    "1": {
     "w": 36,
@@ -12929,6 +13651,7 @@
  },
  "treasure_map_1": {
   "sha": "9b71b57fca4e95c3",
+  "swf": "misc/treasure_map_1/treasure_map_1.swf",
   "states": {
    "1": {
     "w": 45,
@@ -12940,6 +13663,7 @@
  },
  "trophy_bubble": {
   "sha": "e3ec518e15652abb",
+  "swf": "trophies/trophy_bubble/trophy_bubble.swf",
   "states": {
    "1": {
     "w": 47,
@@ -12951,6 +13675,7 @@
  },
  "trophy_cubimal": {
   "sha": "20fe638888f886a2",
+  "swf": "trophies/trophy_cubimal/trophy_cubimal.swf",
   "states": {
    "1": {
     "w": 34,
@@ -12962,6 +13687,7 @@
  },
  "trophy_cubimal_2": {
   "sha": "061fcadc6a49a20b",
+  "swf": "trophies/trophy_cubimal_2/trophy_cubimal_2.swf",
   "states": {
    "1": {
     "w": 34,
@@ -12973,6 +13699,7 @@
  },
  "trophy_egghunt": {
   "sha": "abc51d5a7746f182",
+  "swf": "trophies/trophy_egghunt/trophy_egghunt.swf",
   "states": {
    "1": {
     "w": 36,
@@ -12984,6 +13711,7 @@
  },
  "trophy_emblems": {
   "sha": "30dbbdb0e20ea64a",
+  "swf": "trophies/trophy_emblems/trophy_emblems.swf",
   "states": {
    "1": {
     "w": 39,
@@ -12995,6 +13723,7 @@
  },
  "trophy_fruit": {
   "sha": "72d23884f30d2156",
+  "swf": "trophies/trophy_fruit/trophy_fruit.swf",
   "states": {
    "1": {
     "w": 50,
@@ -13006,6 +13735,7 @@
  },
  "trophy_gas": {
   "sha": "93404f22cafc7a61",
+  "swf": "trophies/trophy_gas/trophy_gas.swf",
   "states": {
    "1": {
     "w": 36,
@@ -13017,6 +13747,7 @@
  },
  "trophy_gem": {
   "sha": "a809181aaf004245",
+  "swf": "trophies/trophy_gem/trophy_gem.swf",
   "states": {
    "1": {
     "w": 36,
@@ -13028,6 +13759,7 @@
  },
  "trophy_music_b_brown": {
   "sha": "79770b0f82e39379",
+  "swf": "trophies/trophy_music_b_brown/trophy_music_b_brown.swf",
   "states": {
    "1": {
     "w": 48,
@@ -13039,6 +13771,7 @@
  },
  "trophy_music_d_blue": {
   "sha": "dc8c5302fbd2cb98",
+  "swf": "trophies/trophy_music_d_blue/trophy_music_d_blue.swf",
   "states": {
    "1": {
     "w": 48,
@@ -13050,6 +13783,7 @@
  },
  "trophy_music_d_green": {
   "sha": "73ba74fa4e6419ee",
+  "swf": "trophies/trophy_music_d_green/trophy_music_d_green.swf",
   "states": {
    "1": {
     "w": 48,
@@ -13061,6 +13795,7 @@
  },
  "trophy_music_d_red": {
   "sha": "07bc5b6e6a53a18a",
+  "swf": "trophies/trophy_music_d_red/trophy_music_d_red.swf",
   "states": {
    "1": {
     "w": 48,
@@ -13072,6 +13807,7 @@
  },
  "trophy_music_x_shiny": {
   "sha": "3f4ea4f8b8e8c2a5",
+  "swf": "trophies/trophy_music_x_shiny/trophy_music_x_shiny.swf",
   "states": {
    "1": {
     "w": 48,
@@ -13083,6 +13819,7 @@
  },
  "trophy_spice": {
   "sha": "aac72a8af362c469",
+  "swf": "trophies/trophy_spice/trophy_spice.swf",
   "states": {
    "1": {
     "w": 49,
@@ -13094,6 +13831,7 @@
  },
  "trophy_street_creator_dirt": {
   "sha": "cd0e85c9b741e2a5",
+  "swf": "trophies/trophy_street_creator_dirt/trophy_street_creator_dirt.swf",
   "states": {
    "1": {
     "w": 69,
@@ -13105,6 +13843,7 @@
  },
  "trophy_street_creator_dirt_piece1": {
   "sha": "5ba87b1f165dc108",
+  "swf": "trophies/trophy_street_creator_dirt_piece1/trophy_street_creator_dirt_piece1.swf",
   "states": {
    "1": {
     "w": 50,
@@ -13116,6 +13855,7 @@
  },
  "trophy_street_creator_dirt_piece2": {
   "sha": "0542927ed9d7c050",
+  "swf": "trophies/trophy_street_creator_dirt_piece2/trophy_street_creator_dirt_piece2.swf",
   "states": {
    "1": {
     "w": 33,
@@ -13127,6 +13867,7 @@
  },
  "trophy_street_creator_dirt_piece3": {
   "sha": "95cc1faf221aad26",
+  "swf": "trophies/trophy_street_creator_dirt_piece3/trophy_street_creator_dirt_piece3.swf",
   "states": {
    "1": {
     "w": 30,
@@ -13138,6 +13879,7 @@
  },
  "trophy_street_creator_dirt_piece4": {
   "sha": "4bdbb7e7a62374cf",
+  "swf": "trophies/trophy_street_creator_dirt_piece4/trophy_street_creator_dirt_piece4.swf",
   "states": {
    "1": {
     "w": 29,
@@ -13149,6 +13891,7 @@
  },
  "trophy_street_creator_dirt_piece5": {
   "sha": "3382432abb576dfe",
+  "swf": "trophies/trophy_street_creator_dirt_piece5/trophy_street_creator_dirt_piece5.swf",
   "states": {
    "1": {
     "w": 23,
@@ -13160,6 +13903,7 @@
  },
  "trophy_street_creator_earth": {
   "sha": "c68753b821d6ec5c",
+  "swf": "trophies/trophy_street_creator_earth/trophy_street_creator_earth.swf",
   "states": {
    "1": {
     "w": 69,
@@ -13171,6 +13915,7 @@
  },
  "trophy_street_creator_earth_piece1": {
   "sha": "febb5639e093a80e",
+  "swf": "trophies/trophy_street_creator_earth_piece1/trophy_street_creator_earth_piece1.swf",
   "states": {
    "1": {
     "w": 41,
@@ -13182,6 +13927,7 @@
  },
  "trophy_street_creator_earth_piece2": {
   "sha": "2dd61058b8152d21",
+  "swf": "trophies/trophy_street_creator_earth_piece2/trophy_street_creator_earth_piece2.swf",
   "states": {
    "1": {
     "w": 39,
@@ -13193,6 +13939,7 @@
  },
  "trophy_street_creator_earth_piece3": {
   "sha": "79d8a3bc5dbf554a",
+  "swf": "trophies/trophy_street_creator_earth_piece3/trophy_street_creator_earth_piece3.swf",
   "states": {
    "1": {
     "w": 16,
@@ -13204,6 +13951,7 @@
  },
  "trophy_street_creator_earth_piece4": {
   "sha": "1fdd096f1310624d",
+  "swf": "trophies/trophy_street_creator_earth_piece4/trophy_street_creator_earth_piece4.swf",
   "states": {
    "1": {
     "w": 24,
@@ -13215,6 +13963,7 @@
  },
  "trophy_street_creator_earth_piece5": {
   "sha": "4a29cf8a937c9da1",
+  "swf": "trophies/trophy_street_creator_earth_piece5/trophy_street_creator_earth_piece5.swf",
   "states": {
    "1": {
     "w": 32,
@@ -13226,6 +13975,7 @@
  },
  "trophy_street_creator_rock": {
   "sha": "d3556c2bb16032b7",
+  "swf": "trophies/trophy_street_creator_rock/trophy_street_creator_rock.swf",
   "states": {
    "1": {
     "w": 69,
@@ -13237,6 +13987,7 @@
  },
  "trophy_street_creator_rock_piece1": {
   "sha": "0f8093df6671301b",
+  "swf": "trophies/trophy_street_creator_rock_piece1/trophy_street_creator_rock_piece1.swf",
   "states": {
    "1": {
     "w": 32,
@@ -13248,6 +13999,7 @@
  },
  "trophy_street_creator_rock_piece2": {
   "sha": "54c909a783757809",
+  "swf": "trophies/trophy_street_creator_rock_piece2/trophy_street_creator_rock_piece2.swf",
   "states": {
    "1": {
     "w": 30,
@@ -13259,6 +14011,7 @@
  },
  "trophy_street_creator_rock_piece3": {
   "sha": "9bc15477db3fa7fb",
+  "swf": "trophies/trophy_street_creator_rock_piece3/trophy_street_creator_rock_piece3.swf",
   "states": {
    "1": {
     "w": 30,
@@ -13270,6 +14023,7 @@
  },
  "trophy_street_creator_rock_piece4": {
   "sha": "20fc4821d38507e8",
+  "swf": "trophies/trophy_street_creator_rock_piece4/trophy_street_creator_rock_piece4.swf",
   "states": {
    "1": {
     "w": 25,
@@ -13281,6 +14035,7 @@
  },
  "trophy_street_creator_rock_piece5": {
   "sha": "db206b7fa8b90929",
+  "swf": "trophies/trophy_street_creator_rock_piece5/trophy_street_creator_rock_piece5.swf",
   "states": {
    "1": {
     "w": 20,
@@ -13292,6 +14047,7 @@
  },
  "trophy_street_creator_wood": {
   "sha": "ace4b23ef379eb6b",
+  "swf": "trophies/trophy_street_creator_wood/trophy_street_creator_wood.swf",
   "states": {
    "1": {
     "w": 69,
@@ -13303,6 +14059,7 @@
  },
  "trophy_street_creator_wood_piece1": {
   "sha": "f6a0305073f2815e",
+  "swf": "trophies/trophy_street_creator_wood_piece1/trophy_street_creator_wood_piece1.swf",
   "states": {
    "1": {
     "w": 40,
@@ -13314,6 +14071,7 @@
  },
  "trophy_street_creator_wood_piece2": {
   "sha": "0fa987d3250440e1",
+  "swf": "trophies/trophy_street_creator_wood_piece2/trophy_street_creator_wood_piece2.swf",
   "states": {
    "1": {
     "w": 41,
@@ -13325,6 +14083,7 @@
  },
  "trophy_street_creator_wood_piece3": {
   "sha": "aa5104f126f696b0",
+  "swf": "trophies/trophy_street_creator_wood_piece3/trophy_street_creator_wood_piece3.swf",
   "states": {
    "1": {
     "w": 27,
@@ -13336,6 +14095,7 @@
  },
  "trophy_street_creator_wood_piece4": {
   "sha": "e73b0aa00398866a",
+  "swf": "trophies/trophy_street_creator_wood_piece4/trophy_street_creator_wood_piece4.swf",
   "states": {
    "1": {
     "w": 29,
@@ -13347,6 +14107,7 @@
  },
  "trophy_street_creator_wood_piece5": {
   "sha": "226f9f2b43392863",
+  "swf": "trophies/trophy_street_creator_wood_piece5/trophy_street_creator_wood_piece5.swf",
   "states": {
    "1": {
     "w": 29,
@@ -13358,6 +14119,7 @@
  },
  "trump_rub": {
   "sha": "2f1ccae0a89205cf",
+  "swf": "food/trump_rub/trump_rub.swf",
   "states": {
    "1": {
     "w": 20,
@@ -13369,6 +14131,7 @@
  },
  "turmeric": {
   "sha": "efde27120f3c1c83",
+  "swf": "spice/turmeric/turmeric.swf",
   "states": {
    "1": {
     "w": 36,
@@ -13398,6 +14161,7 @@
  },
  "upgrade_card_craftybot_lesson": {
   "sha": "45022cec187d0c09",
+  "swf": "misc/upgrade_card_craftybot_lesson/upgrade_card_craftybot_lesson.swf",
   "states": {
    "1": {
     "w": 38,
@@ -13427,6 +14191,7 @@
  },
  "upgrade_card_instant_resurrection": {
   "sha": "110bfd1dda2e6e75",
+  "swf": "misc/upgrade_card_instant_resurrection/upgrade_card_instant_resurrection.swf",
   "states": {
    "1": {
     "w": 38,
@@ -13456,6 +14221,7 @@
  },
  "upgrade_card_reshuffle": {
   "sha": "2ba3d91b90b59a84",
+  "swf": "misc/upgrade_card_reshuffle/upgrade_card_reshuffle.swf",
   "states": {
    "1": {
     "w": 38,
@@ -13485,6 +14251,7 @@
  },
  "urfu": {
   "sha": "a39a427b00b949a3",
+  "swf": "food/urfu/urfu.swf",
   "states": {
    "1": {
     "w": 29,
@@ -13496,6 +14263,7 @@
  },
  "vegmageddon": {
   "sha": "d12db53ac9b11046",
+  "swf": "food/vegmageddon/vegmageddon.swf",
   "states": {
    "1": {
     "w": 28,
@@ -13507,6 +14275,7 @@
  },
  "waffles": {
   "sha": "8b18654588efca1e",
+  "swf": "food/waffles/waffles.swf",
   "states": {
    "1": {
     "w": 38,
@@ -13536,6 +14305,7 @@
  },
  "wall_segment": {
   "sha": "f09b9acf7f9c0bf5",
+  "swf": "misc/wall_segment/wall_segment.swf",
   "states": {
    "1": {
     "w": 161,
@@ -13547,6 +14317,7 @@
  },
  "watering_can": {
   "sha": "fe5d9e20a59d3ade",
+  "swf": "tools/tool_base/watering_can/watering_can.swf",
   "states": {
    "1": {
     "w": 53,
@@ -13558,6 +14329,7 @@
  },
  "wavy_gravy": {
   "sha": "0c0377309139c543",
+  "swf": "food/wavy_gravy/wavy_gravy.swf",
   "states": {
    "1": {
     "w": 20,
@@ -13587,6 +14359,7 @@
  },
  "white_gas": {
   "sha": "8603da0502f4899a",
+  "swf": "misc/white_gas/white_gas.swf",
   "states": {
    "1": {
     "w": 29,
@@ -13616,6 +14389,7 @@
  },
  "whortleberry": {
   "sha": "4f24ddaba376bc88",
+  "swf": "food/whortleberry/whortleberry.swf",
   "states": {
    "1": {
     "w": 14,
@@ -13645,6 +14419,7 @@
  },
  "whortleberry_jelly": {
   "sha": "d0192b25275eb26f",
+  "swf": "food/whortleberry_jelly/whortleberry_jelly.swf",
   "states": {
    "1": {
     "w": 20,
@@ -13674,6 +14449,7 @@
  },
  "wicked_bolognese_sauce": {
   "sha": "6fb6114ff34b54cb",
+  "swf": "food/wicked_bolognese_sauce/wicked_bolognese_sauce.swf",
   "states": {
    "1": {
     "w": 20,
@@ -13703,6 +14479,7 @@
  },
  "wine_of_the_dead": {
   "sha": "0c6297c90bfec8d1",
+  "swf": "misc/wine_of_the_dead/wine_of_the_dead.swf",
   "states": {
    "1": {
     "w": 18,
@@ -13732,6 +14509,7 @@
  },
  "wood_post": {
   "sha": "ab7b5df361f6339c",
+  "swf": "misc/wood_post/wood_post.swf",
   "states": {
    "1": {
     "w": 72,
@@ -13743,6 +14521,7 @@
  },
  "woodworker_chassis": {
   "sha": "17ae065672a7e9a4",
+  "swf": "tools/woodworker_chassis/woodworker_chassis.swf",
   "states": {
    "1": {
     "w": 132,
@@ -13754,6 +14533,7 @@
  },
  "woodworker_fuser": {
   "sha": "102903d368a1fb93",
+  "swf": "tools/woodworker_fuser/woodworker_fuser.swf",
   "states": {
    "1": {
     "w": 115,
@@ -13765,6 +14545,7 @@
  },
  "yellow_crumb_flower": {
   "sha": "2ec2c8c3c84898d9",
+  "swf": "herbs/yellow_crumb_flower/yellow_crumb_flower.swf",
   "states": {
    "1": {
     "w": 49,
@@ -13794,6 +14575,7 @@
  },
  "your_papers": {
   "sha": "bfaa6585d562ac7f",
+  "swf": "misc/your_papers/your_papers.swf",
   "states": {
    "1": {
     "w": 65,
@@ -13805,6 +14587,7 @@
  },
  "yummy_gruel": {
   "sha": "c303d9ca8612d014",
+  "swf": "food/yummy_gruel/yummy_gruel.swf",
   "states": {
    "1": {
     "w": 36,
@@ -13834,6 +14617,7 @@
  },
  "zillene": {
   "sha": "fc821cba1d0998e0",
+  "swf": "compounds/zillene/zillene.swf",
   "states": {
    "1": {
     "w": 19,
@@ -13845,6 +14629,7 @@
  },
  "zucchini": {
   "sha": "4ec046c5d013e1fb",
+  "swf": "food/zucchini/zucchini.swf",
   "states": {
    "1": {
     "w": 41,

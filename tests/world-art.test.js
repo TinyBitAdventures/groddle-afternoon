@@ -9,15 +9,17 @@
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { readFileSync, readdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { WORLD_ART } from '../public/js/world-art-list.js?v=d1252eef';
-import { FALLBACK_MAX, artIdOf, worldArtFor, worldStateFor } from '../public/js/world-art.js?v=f9ece277';
+import { WORLD_ART } from '../public/js/world-art-list.js?v=df42115a';
+import { FALLBACK_MAX, artIdOf, worldArtFor, worldStateFor } from '../public/js/world-art.js?v=df476660';
 import { surfaceHeight, stackSurfaceAt, createHomeDecorState } from '../public/js/home-decor.js?v=d03413ec';
 import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=1b84f5f7';
 
 const root = join(import.meta.dirname, '..');
 const pub = join(root, 'public');
+const items = join(root, '../glitch-items');
 
 describe('world art (tools/world-art/render.py)', () => {
   it('lists exactly the rendered files, one per state', () => {
@@ -61,6 +63,53 @@ describe('world art (tools/world-art/render.py)', () => {
   it('leaves out things that never lie in a place (no drop verb: furniture, trees, rocks)', () => {
     for (const id of ['furniture_shelf', 'trant_bean', 'rock_metal_1', 'bag_cabinet_ok_4_4']) assert.equal(WORLD_ART[id], undefined, id);
     assert.ok(WORLD_ART.bag_generic && WORLD_ART.pick && WORLD_ART.plank);
+  });
+
+  // Player report 35: a put-down Card-Carrying Qualification drew its badge. glitch-items/achievements
+  // holds the badges, and 11 share a file name with an item; the render took the first file of a
+  // name, the badge's.
+  it("every state is drawn from the item's own SWF, never a badge (report 35)", () => {
+    const art = JSON.parse(readFileSync(join(root, 'tools/world-art/art.json'), 'utf8'));
+    assert.deepEqual(Object.keys(art).sort(), Object.keys(WORLD_ART).sort());
+    const wrong = [];
+    for (const [id, row] of Object.entries(art)) {
+      const swf = String(row.swf || '');
+      const parts = swf.split('/');
+      if (parts[0] === 'achievements' || parts.at(-1) !== `${id}.swf`) wrong.push(`${id}: ${swf || 'no swf'}`);
+    }
+    assert.deepEqual(wrong, []);
+    assert.equal(art.card_carrying_qualification.swf, 'misc/card_carrying_qualification/card_carrying_qualification.swf');
+    for (const id of ['artifact_magical_pendant', 'artifact_mirror_with_scribbles', 'artifact_platinumium_spork', 'artifact_torn_manuscript']) {
+      assert.equal(art[id].swf, `artifacts/${id}/${id}.swf`, id);
+    }
+    // The card lies flat at its own 58 x 16, not the 172 x 172 badge.
+    assert.deepEqual(WORLD_ART.card_carrying_qualification, { 1: [58, 16] });
+  });
+
+  it('each SWF named in art.json is the one rendered (its hash), when glitch-items is beside the repo', { skip: !existsSync(items) && 'needs glitch-items beside the repo' }, () => {
+    const art = JSON.parse(readFileSync(join(root, 'tools/world-art/art.json'), 'utf8'));
+    const stale = [];
+    for (const [id, row] of Object.entries(art)) {
+      const path = join(items, row.swf);
+      const digest = existsSync(path) ? createHash('sha256').update(readFileSync(path)).digest('hex').slice(0, 16) : 'missing';
+      if (digest !== row.sha) stale.push(`${id}: ${row.swf} ${digest} vs ${row.sha}`);
+    }
+    assert.deepEqual(stale, []);
+    // And no item folder holds a SWF of the same name the render passed over for another one.
+    const seen = new Map();
+    const walk = (dir, top) => {
+      for (const e of readdirSync(dir, { withFileTypes: true })) {
+        const p = join(dir, e.name);
+        if (e.isDirectory()) walk(p, top ?? e.name);
+        else if (e.name.endsWith('.swf') && top !== 'achievements') {
+          const id = e.name.slice(0, -4);
+          if (art[id]) seen.set(id, [...(seen.get(id) || []), p.slice(items.length + 1)]);
+        }
+      }
+    };
+    walk(items, null);
+    const twins = [...seen].filter(([, paths]) => paths.length > 1).map(([id, paths]) => `${id}: ${paths.join(', ')}`);
+    assert.deepEqual(twins, []);
   });
 
   it('game.js draws a dropped stack from it, still, at its own size', () => {
