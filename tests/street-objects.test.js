@@ -39,8 +39,8 @@ import {
   treeReady,
   treeSkill,
 } from '../public/js/street-objects.js?v=fa4c33c2';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=2b91bf5c';
-import { FEATURES } from '../public/js/features/index.js?v=9944b93d';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=89c2ed5d';
+import { FEATURES } from '../public/js/features/index.js?v=cf17887e';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=4806e3e8';
 import { createResourceNode } from '../public/js/resource-nodes.js?v=4f48fd75';
 import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/trants.js?v=9c2e8c0f';
@@ -410,6 +410,69 @@ describe('street objects: the feature', () => {
     const h = rig();
     h.client.wanted = '';
     assert.equal(streetObjectsFeature.runVerbOverride(h.rockT, 'mine', h.engine), null, 'a private place');
+  });
+
+  it('player report 36: your own yard\'s Dirt Pile, Peat Bog and rock are local in your home\'s room', () => {
+    for (const street of ['RH_HOME_EXT', 'LHOMEINTERIOR']) {
+      const r = rig();
+      const pile = createResourceNode('dirt_pile');
+      const pileT = { classId: 'dirt_pile', featureId: 'resource-nodes', resourceKey: 'dirt_pile:0' };
+      const query = r.engine.query;
+      r.engine.query = (hook) => (hook === 'streetResourceNodes'
+        ? [{ key: 'dirt_pile:0', classTsid: 'dirt_pile', node: pile, target: pileT, ready: () => true }, ...query('streetResourceNodes')]
+        : query(hook));
+      // The owner at home stands in HOME_<id> (front yard) or HOUSE_<id> (the back yard), not the street's tsid.
+      r.engine.streetTsid = street;
+      const room = street === 'RH_HOME_EXT' ? 'HOME_77' : 'HOUSE_77';
+      r.client.wanted = room;
+      r.client.street = room;
+      r.client.emit('roster', { street: room, players: [] });
+      assert.equal(streetObjectsFeature.runVerbOverride(pileT, 'dig', r.engine), null, `${street}: no wait before the server answers`);
+      r.client.emit('msg:objs', { t: 'objs', street: room, snap: true, none: true, objs: [] });
+      streetObjectsFeature.onTick(16, 0, r.engine);
+      assert.equal(streetObjectsFeature.runVerbOverride(pileT, 'dig', r.engine), null, `${street}: the dig is the local one`);
+      assert.equal(streetObjectsFeature.runVerbOverride(r.peatT, 'harvest', r.engine), null);
+      assert.equal(streetObjectsFeature.runVerbOverride(r.rockT, 'mine', r.engine), null);
+      assert.equal(streetObjectsFeature.runVerbOverride(r.treeT, 'pet', r.engine), null);
+      assert.equal(streetObjectsFeature.verbOutOfReach(pileT, 'dig', r.engine), null);
+      assert.equal(streetObjectsFeature.sharedDiggers(pileT, r.engine), null, 'no shared dig crew at home');
+      assert.equal(streetObjectsFeature.sharedMiners(r.rockT), null, 'no shared mining crew at home');
+      assert.deepEqual(r.engine.toasts, [], `${street}: never "still connecting"`);
+      assert.equal(r.sent.some((m) => m.t === 'obj_act'), false, 'nothing asked of the server');
+    }
+    // A party space, race or train room on a street the server knows: local too.
+    const p = rig();
+    p.client.wanted = 'PARTY_1234';
+    p.client.emit('roster', { street: 'PARTY_1234', players: [] });
+    assert.equal(streetObjectsFeature.runVerbOverride(p.rockT, 'mine', p.engine), null);
+    assert.deepEqual(p.engine.toasts, []);
+    // A visitor on someone's home street keeps the site's yard verbs (yard-verbs-mp-feature).
+    const v = rig();
+    assert.equal(streetObjectsFeature.runVerbOverride({ ...v.rockT, yardVisit: true }, 'mine', v.engine), null);
+  });
+
+  it('asks again for a street whose snapshot never came, and a street with none is local', () => {
+    const r = rig();
+    r.client.street = 'GSTREET';
+    assert.deepEqual(r.sent, [{ t: 'obj_sync' }]);
+    const realNow = Date.now;
+    try {
+      Date.now = () => realNow() + 1000;
+      streetObjectsFeature.onTick(16, 0, r.engine);
+      assert.equal(r.sent.length, 1, 'not before SYNC_RETRY_MS');
+      Date.now = () => realNow() + 4000;
+      streetObjectsFeature.onTick(16, 0, r.engine);
+      assert.deepEqual(r.sent, [{ t: 'obj_sync' }, { t: 'obj_sync' }], 'the dropped sync is asked again');
+      // A fresh zone the server does not lay out: its answer is none, and verbs run here.
+      r.client.emit('msg:objs', { t: 'objs', street: 'GSTREET', snap: true, none: true, objs: [] });
+      Date.now = () => realNow() + 9000;
+      streetObjectsFeature.onTick(16, 0, r.engine);
+      assert.equal(r.sent.length, 2, 'answered: no more asking');
+    } finally {
+      Date.now = realNow;
+    }
+    assert.equal(streetObjectsFeature.runVerbOverride(r.peatT, 'harvest', r.engine), null);
+    assert.deepEqual(r.engine.toasts, []);
   });
 });
 

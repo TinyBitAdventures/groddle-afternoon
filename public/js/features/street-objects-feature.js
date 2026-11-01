@@ -22,6 +22,15 @@
  * this feature does nothing. While the socket is connecting a shared verb
  * waits ("The street is still connecting."); with no realtime on the site,
  * or this window replaced by another, the local rules apply.
+ * - Only a realtime room named for this street shares its objects: the
+ *   server lays objects out by street tsid (data/objects.json) and answers
+ *   any other room "none". On your own home street and back yard (HOME_<id>,
+ *   HOUSE_<id>), a party space, a race or a train every verb is local, the
+ *   same as a Patch (player report 36: a Dirt Pile placed in the yard always
+ *   said the street was still connecting). A visited home's rocks and nodes
+ *   are yard-verbs-mp-feature's (the site's). A street whose snapshot never
+ *   came is asked again (SYNC_RETRY_MS), so a dropped obj_sync never leaves
+ *   its verbs waiting for good.
  *
  * - Help mine: help-mine-feature tells the server when a mining swing starts
  *   or is cancelled (sharedMineSwing), reads who is swinging (sharedMiners)
@@ -140,12 +149,15 @@ import {
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
+/** No snapshot for the street joined in this long (a dropped obj_sync): ask again. */
+const SYNC_RETRY_MS = 3000;
 /** States in which the site has no live street at all: the local rules apply. */
 const LOCAL_STATES = new Set(['off', 'signed-out', 'replaced', 'stopped']);
 
 let client = null;
 let copy = createStreetCopy();
 let syncedStreet = '';
+let syncAskedAt = 0;
 let reqSeq = 0;
 const pending = new Map();
 let grant = null;
@@ -203,6 +215,7 @@ function bind(engine) {
     if (street === syncedStreet) return;
     reset();
     syncedStreet = street;
+    syncAskedAt = Date.now();
     c.send('obj_sync');
   });
   c.on('msg:objs', (msg) => {
@@ -455,6 +468,16 @@ function shared(engine) {
   return Boolean(client) && client.state === 'online' && copy.snap && !copy.none && copy.street === engine.streetTsid;
 }
 
+/**
+ * Whether the realtime room the player is in (or is joining) is this street. The server keeps
+ * objects only for street tsids (objects.go handleSync answers any other room "none"), so a
+ * home (HOME_<id>, HOUSE_<id>), party space, race or train room never holds them: no verb
+ * there waits for the server (player report 36).
+ */
+function roomIsStreet(engine, c) {
+  return Boolean(c?.wanted) && c.wanted === String(engine?.streetTsid || '');
+}
+
 function reconcileAll(engine, force = false) {
   if (!shared(engine)) return;
   const now = Date.now();
@@ -680,8 +703,9 @@ function ask(engine, target, verbId) {
   if (target?.yardVisit) return null;
   const c = bind(engine);
   if (!c || LOCAL_STATES.has(c.state)) return null;
-  // A private place (home, quest room, instance): nobody shares it.
-  if (!c.wanted && c.state === 'online') return null;
+  // A private place (quest room, instance) or a room that is not this street (your own home, a
+  // party space, a race): the server shares nothing there.
+  if (!roomIsStreet(engine, c)) return null;
   const verb = sharedVerbOn(engine, target, verbId);
   if (!verb) return null;
   if (copy.none && copy.street === engine.streetTsid) return null;
@@ -714,7 +738,7 @@ function ask(engine, target, verbId) {
 function outOfReach(engine, target, verbId, at = null) {
   if (engine.mode !== 'multiplayer' || target?.yardVisit) return null;
   const c = bind(engine);
-  if (!c || LOCAL_STATES.has(c.state) || (!c.wanted && c.state === 'online')) return null;
+  if (!c || LOCAL_STATES.has(c.state) || !roomIsStreet(engine, c)) return null;
   const spr = target?.sprite;
   // `at`: feet somewhere else (game.js requestVerb's walk-over asks where a walk would stop).
   const p = at || engine.player;
@@ -759,9 +783,16 @@ export const streetObjectsFeature = {
     if (c.state === 'online' && c.street && c.street !== syncedStreet) {
       reset();
       syncedStreet = c.street;
+      syncAskedAt = Date.now();
       c.send('obj_sync');
     }
     const wall = Date.now();
+    // No snapshot yet for the street joined (the server dropped a sync over its rate limit): ask
+    // again, so its verbs never wait on "still connecting" for good.
+    if (c.state === 'online' && syncedStreet && c.street === syncedStreet && !copy.snap && wall - syncAskedAt >= SYNC_RETRY_MS) {
+      syncAskedAt = wall;
+      c.send('obj_sync');
+    }
     for (const [req, p] of pending) {
       if (wall - p.at < REQUEST_TIMEOUT_MS) continue;
       pending.delete(req);
@@ -859,7 +890,7 @@ export const streetObjectsFeature = {
 
   /** Help dig (features/help-mine-feature.js): who the server says digs a shared Dirt Pile, or null. */
   sharedDiggers(target, engine) {
-    if (!client || !copy.snap || !target?.resourceKey) return null;
+    if (!client || !copy.snap || copy.none || !target?.resourceKey || (engine && copy.street !== engine.streetTsid)) return null;
     const n = (engine?.query?.('streetResourceNodes', engine) || []).find((row) => row.target === target);
     if (!n || n.classTsid !== 'dirt_pile') return null;
     const s = stateFor(copy, nodeId(n.key));
@@ -886,7 +917,7 @@ export const streetObjectsFeature = {
 
   /** Help mine (features/help-mine-feature.js): who the server says is swinging at a shared rock, or null. */
   sharedMiners(target) {
-    if (!client || !copy.snap || !Number.isInteger(target?.rockIndex)) return null;
+    if (!client || !copy.snap || copy.none || !Number.isInteger(target?.rockIndex)) return null;
     const s = stateFor(copy, rockId(target.rockIndex));
     return Array.isArray(s?.miners) ? s.miners.map(Number) : [];
   },
@@ -908,6 +939,7 @@ export const streetObjectsFeature = {
     pending.clear();
     grant = null;
     reqSeq = 0;
+    syncAskedAt = 0;
     lastAnswer = '';
   },
 };
