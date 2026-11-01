@@ -607,7 +607,7 @@ describe('the site (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
   it('the console has a Reports tab: list, thread, reply, close and reopen, and the old reports\' button', async () => {
     const page = src('src/AdminConsolePage.php');
     for (const hook of ['data-console-tab="reports"', 'data-console-tickets', 'data-console-thread', 'data-console-reply', 'data-console-thread-close', 'data-console-thread-reopen', 'data-console-migrate', 'data-console-ticket-filter']) assert.ok(page.includes(hook), hook);
-    assert.match(page, /ASSET_KEY = 'chat-log-1'/);
+    assert.match(page, /ASSET_KEY = 'picture-popup-1'/);
     const js = src('console/console.js');
     for (const route of ["admin/tickets?status=", "admin/tickets/${id}", "admin/tickets/${tickets.open}/reply", "admin/tickets/${tickets.open}/${kind}", "admin/tickets/migrate"]) assert.ok(js.includes(route), route);
     assert.match(js, /el\('p', \{ class: 'console-msg-body', text: m\.body \}\)/, 'messages set as text');
@@ -713,6 +713,18 @@ describe('the site keeps a report\'s picture (groddle-afternoon-site)', { skip: 
     assert.equal(mod.pictureSrc({ url: '/report-pictures/3' }), '/report-pictures/3');
     assert.equal(mod.pictureSrc({ url: '//evil.example/x' }), '');
     assert.equal(mod.pictureSrc(null), '');
+  });
+
+  it('the picture opens in a popup over the console, and a report without one shows no frame (Austin 2026-11-01)', () => {
+    const css = src('console/console.css');
+    // The figure's display: grid beat [hidden], so a report with no picture drew an empty broken frame.
+    assert.match(css, /\.console-picture\[hidden\] \{ display: none; \}/);
+    assert.match(css, /\.console-lightbox::backdrop/);
+    const js = src('console/console.js');
+    assert.match(js, /if \(e\.button !== 0 \|\| e\.metaKey \|\| e\.ctrlKey \|\| e\.shiftKey \|\| e\.altKey\) return;/, 'modified clicks still open a tab');
+    assert.match(js, /el\('dialog', \{ class: 'console-lightbox'/);
+    assert.match(js, /dlg\.showModal\(\);/);
+    assert.match(src('src/AdminConsolePage.php'), /The picture could not be loaded\./);
   });
 
   it('the picture rules (php)', { skip: (!hasPhp && 'no php') || noEngine }, () => {
