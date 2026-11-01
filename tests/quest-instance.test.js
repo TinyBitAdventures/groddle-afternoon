@@ -388,7 +388,7 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
   };
 
   it('a run lost to a reload marks a startable quest failed, not a retry prompt', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=834cff62');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=1f0589c3');
     const { ensureQuestOfferState } = await import('../public/js/quest-offers.js?v=06a5e180');
     assert.equal(getQuestCatalog().mental_block?.needsStart, true);
     assert.notEqual(getQuestCatalog().help_juju_bandits?.needsStart, true, 'no onStarted in GSJS');
@@ -452,7 +452,7 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('a reload removes a source-removed quest and its offers, and keeps the prompt for the three', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=834cff62');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=1f0589c3');
     const { questStatus } = await import('../public/js/quest-offers.js?v=06a5e180');
     const t = Date.now() - 60_000;
     questInstancesFeature.restore({ memory: {}, retry: { tower_quest: t, le_miserable_part_2: t, smuggle_the_smuggler_part2: t } });
@@ -480,9 +480,19 @@ describe('G313: failed room quests the source removes', () => {
   });
 
   it('has no map card', async () => {
-    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=834cff62');
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js?v=1f0589c3');
     assert.equal(questInstancesFeature.mapCards, undefined);
     const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
     assert.doesNotMatch(src, /Unfinished quest places/);
+  });
+});
+
+describe('leaving a quest place names where you arrive', () => {
+  const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../public/js/features/quest-instances-feature.js'), 'utf8');
+  const leave = src.slice(src.indexOf('async function leaveInstance('), src.indexOf('/* HUD + QA data'));
+  it('a street gets its own loading card and home gets a named card, never an unnamed one', () => {
+    assert.doesNotMatch(leave, /withTransition\(engine, '',/, 'an empty label shows "An Unknown Area"');
+    assert.match(leave, /else await go\(true\);/, 'back to a street: the street transition (its name, hub and picture)');
+    assert.match(leave, /'Your House' : 'Your Home Street'/, 'back home: the home place by name');
   });
 });

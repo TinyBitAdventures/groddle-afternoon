@@ -88,6 +88,7 @@ import { parseQuestConversation } from '../quests.js?v=282e1621';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=91ee49cd';
 import { runStreetTransition } from '../screen-fx.js?v=f4314526';
+import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=385f9a1a';
 import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=8691416a';
 import { applyFamiliarLook, familiarLook } from '../familiar.js?v=2089ac54';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=d4f4772b';
@@ -1039,11 +1040,15 @@ async function leaveInstance(engine, opts = {}) {
   engine.save();
   engine.setData('qiStatus', 'left');
   engine.setData('qiOutcome', result.outcome);
-  const go = async () => {
-    if (back?.tsid) await engine.enter(back.tsid, { spawnX: back.x, spawnY: back.y, quiet: true, bypassFeatureGates: true, useTransition: false });
+  const go = async (useTransition = false) => {
+    if (back?.tsid) await engine.enter(back.tsid, { spawnX: back.x, spawnY: back.y, quiet: true, bypassFeatureGates: true, useTransition });
   };
-  if (opts.transition === false) await go();
-  else await withTransition(engine, '', leftRoom?.theme, go);
+  // Back to a street: the street's own loading card (its name, hub and picture), as any travel shows.
+  // Back home: the quest's card, named for the home place. Never a card with no name ("An Unknown Area").
+  const home = back?.tsid === HOME_STREET_TSID || back?.tsid === HOME_INTERIOR_TSID;
+  if (opts.transition === false || !back?.tsid) await go();
+  else if (home) await withTransition(engine, back.tsid === HOME_INTERIOR_TSID ? 'Your House' : 'Your Home Street', leftRoom?.theme, () => go());
+  else await go(true);
   publish(engine, true);
   if (activeQuest(engine, questId) && requirementsMet(engine, questId) && !hook.noTurnIn) {
     await turnIn(engine, questId);
