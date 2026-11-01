@@ -1,0 +1,1061 @@
+{
+ "format": "groddle-zone/1",
+ "id": "mount-ashomel",
+ "title": "Mount Ashomel",
+ "rev": 97,
+ "hub": {
+  "id": "900",
+  "name": "Mount Ashomel",
+  "isNew": true,
+  "map": {
+   "color": "#1d3a80",
+   "top_color": "#989cb6",
+   "btm_color": "#6a6d7f",
+   "streets": [
+    {
+     "tsid": "GZ4PV1C0OTXC37W",
+     "name": "Cindra Foothold",
+     "x1": 170,
+     "y1": 410,
+     "x2": 300,
+     "y2": 330
+    }
+   ]
+  }
+ },
+ "streets": [
+  {
+   "key": "foot",
+   "street": {
+    "source": "groddle-builder mount-ashomel",
+    "tsid": "GZ4PV1C0OTXC37W",
+    "label": "Cindra Foothold",
+    "hubId": "900",
+    "hubName": "Mount Ashomel",
+    "bounds": {
+     "l": -1200,
+     "r": 1200,
+     "t": -2400,
+     "b": 0
+    },
+    "gradient": {
+     "top": "2F2438",
+     "bottom": "D9733F"
+    },
+    "platforms": [
+     {
+      "id": "plat_1",
+      "x1": -1180,
+      "y1": -60,
+      "x2": 1180,
+      "y2": -60,
+      "pc_perm": -1,
+      "item_perm": -1
+     },
+     {
+      "id": "plat_2",
+      "x1": -180,
+      "y1": -150,
+      "x2": 180,
+      "y2": -150,
+      "pc_perm": -1,
+      "item_perm": -1
+     },
+     {
+      "id": "plat_3",
+      "x1": 90,
+      "y1": -240,
+      "x2": 450,
+      "y2": -240,
+      "pc_perm": -1,
+      "item_perm": -1
+     },
+     {
+      "id": "plat_4",
+      "x1": 360,
+      "y1": -330,
+      "x2": 720,
+      "y2": -330,
+      "pc_perm": -1,
+      "item_perm": -1
+     },
+     {
+      "id": "plat_5",
+      "x1": 630,
+      "y1": -420,
+      "x2": 990,
+      "y2": -420,
+      "pc_perm": -1,
+      "item_perm": -1
+     },
+     {
+      "id": "plat_6",
+      "x1": 700,
+      "y1": -820,
+      "x2": 1150,
+      "y2": -820,
+      "pc_perm": -1,
+      "item_perm": -1
+     },
+     {
+      "id": "plat_7",
+      "x1": 420,
+      "y1": -910,
+      "x2": 780,
+      "y2": -910,
+      "pc_perm": -1,
+      "item_perm": -1
+     },
+     {
+      "id": "plat_8",
+      "x1": 150,
+      "y1": -1000,
+      "x2": 510,
+      "y2": -1000,
+      "pc_perm": -1,
+      "item_perm": -1
+     },
+     {
+      "id": "plat_9",
+      "x1": -120,
+      "y1": -1090,
+      "x2": 240,
+      "y2": -1090,
+      "pc_perm": -1,
+      "item_perm": -1
+     },
+     {
+      "id": "plat_10",
+      "x1": -390,
+      "y1": -1180,
+      "x2": -30,
+      "y2": -1180,
+      "pc_perm": -1,
+      "item_perm": -1
+     },
+     {
+      "id": "plat_11",
+      "x1": -660,
+      "y1": -1270,
+      "x2": -300,
+      "y2": -1270,
+      "pc_perm": -1,
+      "item_perm": -1
+     },
+     {
+      "id": "plat_12",
+      "x1": -980,
+      "y1": -1360,
+      "x2": -570,
+      "y2": -1360,
+      "pc_perm": -1,
+      "item_perm": -1
+     },
+     {
+      "id": "plat_13",
+      "x1": -1000,
+      "y1": -1760,
+      "x2": -500,
+      "y2": -1760,
+      "pc_perm": -1,
+      "item_perm": -1
+     },
+     {
+      "id": "plat_14",
+      "x1": -590,
+      "y1": -1850,
+      "x2": -230,
+      "y2": -1850,
+      "pc_perm": -1,
+      "item_perm": -1
+     },
+     {
+      "id": "plat_15",
+      "x1": -300,
+      "y1": -1940,
+      "x2": 1150,
+      "y2": -1940,
+      "pc_perm": -1,
+      "item_perm": -1
+     }
+    ],
+    "layers": [
+     {
+      "id": "sky",
+      "name": "sky",
+      "z": -4,
+      "w": 1800,
+      "h": 1800,
+      "filters": {
+       "brightness": -6,
+       "contrast": -12,
+       "saturation": -18
+      },
+      "decos": [
+       {
+        "id": "d_72",
+        "sprite": "gz_ai_ash_haze_sky",
+        "x": 900,
+        "y": 1920,
+        "w": 1980,
+        "h": 690,
+        "z": 1,
+        "r": 0
+       },
+       {
+        "id": "d_73",
+        "sprite": "gz_ai_volcano_cone_far",
+        "x": 1044,
+        "y": 1940,
+        "w": 1440,
+        "h": 668,
+        "z": 2,
+        "r": 0
+       },
+       {
+        "id": "d_74",
+        "sprite": "gz_ai_ash_cloud_big",
+        "x": 396,
+        "y": 576,
+        "w": 560,
+        "h": 242,
+        "z": 3,
+        "r": 0
+       },
+       {
+        "id": "d_75",
+        "sprite": "gz_ai_ash_cloud_small",
+        "x": 1404,
+        "y": 324,
+        "w": 360,
+        "h": 161,
+        "z": 4,
+        "r": 0
+       },
+       {
+        "id": "d_76",
+        "sprite": "gz_ai_ash_cloud_small",
+        "x": 810,
+        "y": 990,
+        "w": 300,
+        "h": 134,
+        "z": 5,
+        "r": 0,
+        "flip": true
+       }
+      ]
+     },
+     {
+      "id": "bg_1",
+      "name": "bg_1",
+      "z": -2,
+      "w": 2160,
+      "h": 2160,
+      "filters": {
+       "brightness": -4,
+       "contrast": -8,
+       "saturation": -12
+      },
+      "decos": [
+       {
+        "id": "d_77",
+        "sprite": "gz_ai_basalt_ridge",
+        "x": 800,
+        "y": 2420,
+        "w": 1600,
+        "h": 395,
+        "z": 6,
+        "r": 0
+       },
+       {
+        "id": "d_78",
+        "sprite": "gz_ai_basalt_ridge",
+        "x": 2400,
+        "y": 2420,
+        "w": 1600,
+        "h": 395,
+        "z": 7,
+        "r": 0
+       },
+       {
+        "id": "d_79",
+        "sprite": "gz_ai_basalt_slope_tall",
+        "x": 300,
+        "y": 2460,
+        "w": 640,
+        "h": 941,
+        "z": 8,
+        "r": 0,
+        "flip": true
+       },
+       {
+        "id": "d_80",
+        "sprite": "gz_ai_basalt_slope_tall",
+        "x": 1860,
+        "y": 2460,
+        "w": 640,
+        "h": 941,
+        "z": 9,
+        "r": 0
+       }
+      ]
+     },
+     {
+      "id": "middleground",
+      "name": "middleground",
+      "z": 0,
+      "w": 2400,
+      "h": 2400,
+      "decos": [
+       {
+        "id": "d_81",
+        "sprite": "gz_ai_basalt_ground",
+        "x": -920,
+        "y": 51,
+        "w": 599,
+        "h": 113,
+        "z": 50,
+        "r": 0
+       },
+       {
+        "id": "d_82",
+        "sprite": "gz_ai_basalt_ground",
+        "x": -369,
+        "y": 51,
+        "w": 599,
+        "h": 113,
+        "z": 50,
+        "r": 0
+       },
+       {
+        "id": "d_83",
+        "sprite": "gz_ai_basalt_ground",
+        "x": 182,
+        "y": 51,
+        "w": 599,
+        "h": 113,
+        "z": 50,
+        "r": 0
+       },
+       {
+        "id": "d_84",
+        "sprite": "gz_ai_basalt_ground",
+        "x": 733,
+        "y": 51,
+        "w": 599,
+        "h": 113,
+        "z": 50,
+        "r": 0
+       },
+       {
+        "id": "d_85",
+        "sprite": "gz_ai_basalt_ground",
+        "x": 1284,
+        "y": 51,
+        "w": 599,
+        "h": 113,
+        "z": 50,
+        "r": 0
+       },
+       {
+        "id": "d_86",
+        "sprite": "gz_ai_lava_pool",
+        "x": -330,
+        "y": -30,
+        "w": 420,
+        "h": 76,
+        "z": 10,
+        "r": 0
+       },
+       {
+        "id": "d_87",
+        "sprite": "gz_ai_cooled_rock_1",
+        "x": -700,
+        "y": -52,
+        "w": 210,
+        "h": 152,
+        "z": 11,
+        "r": 0
+       },
+       {
+        "id": "d_88",
+        "sprite": "gz_ai_cooled_rock_2",
+        "x": 1050,
+        "y": -54,
+        "w": 150,
+        "h": 102,
+        "z": 12,
+        "r": 0,
+        "flip": true
+       },
+       {
+        "id": "d_89",
+        "sprite": "gz_ai_basalt_columns",
+        "x": 700,
+        "y": -50,
+        "w": 300,
+        "h": 332,
+        "z": 13,
+        "r": 0
+       },
+       {
+        "id": "d_90",
+        "sprite": "gz_ai_basalt_ledge_medium",
+        "x": 0,
+        "y": -11,
+        "w": 419,
+        "h": 142,
+        "z": 14,
+        "r": 0
+       },
+       {
+        "id": "d_91",
+        "sprite": "gz_ai_basalt_ledge_medium",
+        "x": 270,
+        "y": -101,
+        "w": 419,
+        "h": 142,
+        "z": 15,
+        "r": 0
+       },
+       {
+        "id": "d_92",
+        "sprite": "gz_ai_basalt_ledge_medium",
+        "x": 540,
+        "y": -191,
+        "w": 419,
+        "h": 142,
+        "z": 16,
+        "r": 0
+       },
+       {
+        "id": "d_93",
+        "sprite": "gz_ai_basalt_ledge_medium",
+        "x": 810,
+        "y": -281,
+        "w": 419,
+        "h": 142,
+        "z": 17,
+        "r": 0
+       },
+       {
+        "id": "d_94",
+        "sprite": "gz_ai_pumice_ledge_large",
+        "x": 925,
+        "y": -686,
+        "w": 523,
+        "h": 137,
+        "z": 18,
+        "r": 0
+       },
+       {
+        "id": "d_95",
+        "sprite": "gz_ai_basalt_ledge_medium",
+        "x": 600,
+        "y": -771,
+        "w": 419,
+        "h": 142,
+        "z": 19,
+        "r": 0
+       },
+       {
+        "id": "d_96",
+        "sprite": "gz_ai_basalt_ledge_medium",
+        "x": 330,
+        "y": -861,
+        "w": 419,
+        "h": 142,
+        "z": 20,
+        "r": 0
+       },
+       {
+        "id": "d_97",
+        "sprite": "gz_ai_basalt_ledge_medium",
+        "x": 60,
+        "y": -951,
+        "w": 419,
+        "h": 142,
+        "z": 21,
+        "r": 0
+       },
+       {
+        "id": "d_98",
+        "sprite": "gz_ai_basalt_ledge_medium",
+        "x": -210,
+        "y": -1041,
+        "w": 419,
+        "h": 142,
+        "z": 22,
+        "r": 0
+       },
+       {
+        "id": "d_99",
+        "sprite": "gz_ai_basalt_ledge_medium",
+        "x": -480,
+        "y": -1131,
+        "w": 419,
+        "h": 142,
+        "z": 23,
+        "r": 0
+       },
+       {
+        "id": "d_100",
+        "sprite": "gz_ai_basalt_ledge_medium",
+        "x": -775,
+        "y": -1215,
+        "w": 434,
+        "h": 148,
+        "z": 24,
+        "r": 0
+       },
+       {
+        "id": "d_101",
+        "sprite": "gz_ai_pumice_ledge_large",
+        "x": -750,
+        "y": -1622,
+        "w": 540,
+        "h": 141,
+        "z": 25,
+        "r": 0
+       },
+       {
+        "id": "d_102",
+        "sprite": "gz_ai_basalt_ledge_medium",
+        "x": -410,
+        "y": -1711,
+        "w": 419,
+        "h": 142,
+        "z": 26,
+        "r": 0
+       },
+       {
+        "id": "d_103",
+        "sprite": "gz_ai_basalt_ledge_large",
+        "x": -58,
+        "y": -1792,
+        "w": 586,
+        "h": 151,
+        "z": 27,
+        "r": 0
+       },
+       {
+        "id": "d_104",
+        "sprite": "gz_ai_basalt_ledge_large",
+        "x": 425,
+        "y": -1792,
+        "w": 586,
+        "h": 151,
+        "z": 28,
+        "r": 0,
+        "flip": true
+       },
+       {
+        "id": "d_105",
+        "sprite": "gz_ai_basalt_ledge_large",
+        "x": 908,
+        "y": -1792,
+        "w": 586,
+        "h": 151,
+        "z": 29,
+        "r": 0
+       },
+       {
+        "id": "d_106",
+        "sprite": "gz_ai_steam_vent",
+        "x": -560,
+        "y": -54,
+        "w": 170,
+        "h": 97,
+        "z": 30,
+        "r": 0
+       },
+       {
+        "id": "d_107",
+        "sprite": "gz_ai_steam_vent",
+        "x": 420,
+        "y": -54,
+        "w": 170,
+        "h": 97,
+        "z": 31,
+        "r": 0
+       }
+      ]
+     },
+     {
+      "id": "middleplus",
+      "name": "middleplus",
+      "z": 1,
+      "w": 2400,
+      "h": 2400,
+      "filters": {
+       "brightness": -5,
+       "saturation": -15
+      },
+      "decos": []
+     }
+    ],
+    "signposts": [
+     {
+      "id": "signpost_1",
+      "x": 1050,
+      "y": -1940,
+      "w": 150,
+      "h": 200,
+      "connects": [
+       {
+        "tsid": "GZYX8AY85PVOKHH",
+        "label": "Hoffo Zigzag",
+        "hub_id": "900",
+        "arrive": {
+         "x": 150,
+         "y": 2940
+        }
+       }
+      ]
+     },
+     {
+      "id": "signpost_2",
+      "x": -1050,
+      "y": -60,
+      "w": 150,
+      "h": 200,
+      "connects": [
+       {
+        "tsid": "GHFU61GVLKI2ATQ",
+        "label": "Paaviri Vent",
+        "hub_id": "113",
+        "arrive": {
+         "x": 1806,
+         "y": 783
+        }
+       }
+      ]
+     }
+    ],
+    "stats": {
+     "platformCount": 1,
+     "layerCount": 4,
+     "decoCount": 3,
+     "signpostCount": 0
+    },
+    "emitters": [
+     {
+      "id": "fx_1",
+      "kind": "steam",
+      "layer": "middleground",
+      "x": -560,
+      "y": -142,
+      "rate": 6,
+      "size": 70,
+      "height": 260,
+      "spread": 12,
+      "period": [
+       6,
+       10
+      ],
+      "burst": 3.5
+     },
+     {
+      "id": "fx_2",
+      "kind": "steam",
+      "layer": "middleground",
+      "x": 420,
+      "y": -142,
+      "rate": 6,
+      "size": 70,
+      "height": 320,
+      "spread": 12,
+      "period": [
+       8,
+       13
+      ],
+      "burst": 4
+     },
+     {
+      "id": "fx_3",
+      "kind": "lava",
+      "layer": "middleground",
+      "x": -330,
+      "y": -52,
+      "sprite": "gz_ai_lava_blob",
+      "rate": 6,
+      "size": 26,
+      "height": 180,
+      "spread": 18,
+      "period": [
+       5,
+       9
+      ],
+      "burst": 1.2
+     },
+     {
+      "id": "fx_4",
+      "kind": "embers",
+      "layer": "middleground",
+      "x": -330,
+      "y": -60,
+      "sprite": "gz_ai_ember",
+      "rate": 3,
+      "size": 12,
+      "height": 320,
+      "spread": 30
+     }
+    ],
+    "ladders": [
+     {
+      "id": "ladder_1",
+      "x": 880,
+      "y": -420,
+      "w": 50,
+      "h": 400,
+      "tiling": {
+       "cap_0": {
+        "sprite": "ladder_tile_center_00_basicWood",
+        "w": 60,
+        "h": 50
+       },
+       "cap_1": {
+        "sprite": "ladder_tile_cap_1_basicWood",
+        "w": 60,
+        "h": 50
+       },
+       "centers": [
+        {
+         "sprite": "ladder_tile_center_00_basicWood",
+         "w": 60,
+         "h": 50
+        }
+       ]
+      }
+     },
+     {
+      "id": "ladder_2",
+      "x": -800,
+      "y": -1360,
+      "w": 50,
+      "h": 400,
+      "tiling": {
+       "cap_0": {
+        "sprite": "ladder_tile_center_00_basicWood",
+        "w": 60,
+        "h": 50
+       },
+       "cap_1": {
+        "sprite": "ladder_tile_cap_1_basicWood",
+        "w": 60,
+        "h": 50
+       },
+       "centers": [
+        {
+         "sprite": "ladder_tile_center_00_basicWood",
+         "w": 60,
+         "h": 50
+        }
+       ]
+      }
+     }
+    ]
+   },
+   "population": {
+    "counts": {
+     "rock_beryl_1": 2,
+     "rock_dullite_1": 1,
+     "trant_gas": 1
+    },
+    "quoins": 6
+   }
+  }
+ ],
+ "edits": [],
+ "assets": {
+  "gz_ai_ash_haze_sky": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "e5c24cacb873fbfb31e9cdd4c7941f045da7396b31b191b38005d205ca738a94",
+   "w": 4000,
+   "h": 1393,
+   "registration": {
+    "x": 2000,
+    "y": 1393
+   },
+   "inputs": [],
+   "intake": "in-e5c24cacb873fbfb"
+  },
+  "gz_ai_ash_cloud_big": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "b9c182f0705a53468a261b6373d7e40dc481e8a924852800aff06545d8f1e1e1",
+   "w": 1160,
+   "h": 501,
+   "registration": {
+    "x": 580,
+    "y": 501
+   },
+   "inputs": [],
+   "intake": "in-b9c182f0705a5346"
+  },
+  "gz_ai_ash_cloud_small": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "68111d6f5fa4bd23882c8fc9af35d989545dc3e51bcf13eb81447ba6f2024efc",
+   "w": 760,
+   "h": 339,
+   "registration": {
+    "x": 380,
+    "y": 339
+   },
+   "inputs": [],
+   "intake": "in-68111d6f5fa4bd23"
+  },
+  "gz_ai_volcano_cone_far": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "31ee65114d7be09dd5da29fb659092ccc70dc1c444a047658f56fde8b4e3895a",
+   "w": 3200,
+   "h": 1484,
+   "registration": {
+    "x": 1600,
+    "y": 1484
+   },
+   "inputs": [],
+   "intake": "in-31ee65114d7be09d"
+  },
+  "gz_ai_basalt_ridge": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "f90fec4b2acd462cef70e31b54ce38cceb39224c4348ced2257bfc151602ba6b",
+   "w": 3200,
+   "h": 789,
+   "registration": {
+    "x": 1600,
+    "y": 789
+   },
+   "inputs": [],
+   "intake": "in-f90fec4b2acd462c"
+  },
+  "gz_ai_basalt_slope_tall": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "b39e7a2bcd5e34c402075dbc385137768f706877c662bca810f5094e2bc6fa94",
+   "w": 1600,
+   "h": 2352,
+   "registration": {
+    "x": 800,
+    "y": 2352
+   },
+   "inputs": [],
+   "intake": "in-b39e7a2bcd5e34c4"
+  },
+  "gz_ai_basalt_columns": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "73f33197f352fd9e8fd44095b0425081ef87d38d62e6e659b55a14f9e1f0dd0b",
+   "w": 760,
+   "h": 841,
+   "registration": {
+    "x": 380,
+    "y": 841
+   },
+   "inputs": [],
+   "intake": "in-73f33197f352fd9e"
+  },
+  "gz_ai_basalt_ledge_medium": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "5e38aea7f716d5ffb8b6a18b7d7450cc4871275f59b02fc3fc0234b3468d41c8",
+   "w": 694,
+   "h": 235,
+   "registration": {
+    "x": 347,
+    "y": 235
+   },
+   "inputs": [],
+   "intake": "in-5e38aea7f716d5ff"
+  },
+  "gz_ai_basalt_ledge_large": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "e7682d8bd7ec5fa75c5bf010d2e7f78e4af67d55ed5aad7546a16f5c9dddbf4d",
+   "w": 1186,
+   "h": 305,
+   "registration": {
+    "x": 593,
+    "y": 305
+   },
+   "inputs": [],
+   "intake": "in-e7682d8bd7ec5fa7"
+  },
+  "gz_ai_pumice_ledge_large": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "0faccca2a50f3914bb718bd16443a2f567d13888c6a36250ba16a211a11f6f7c",
+   "w": 864,
+   "h": 226,
+   "registration": {
+    "x": 432,
+    "y": 226
+   },
+   "inputs": [],
+   "intake": "in-0faccca2a50f3914"
+  },
+  "gz_ai_basalt_ground": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "d912ce73d6beb31dd34002db7df70a3df829b1407f2b6b7c9f05aa1aea8f46c6",
+   "w": 1198,
+   "h": 226,
+   "registration": {
+    "x": 599,
+    "y": 226
+   },
+   "inputs": [],
+   "intake": "in-d912ce73d6beb31d"
+  },
+  "gz_ai_lava_pool": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "c37cf257ce5aa0a9d73c874f2df878dba5610de6c14f758630c31bdd41424c74",
+   "w": 900,
+   "h": 162,
+   "registration": {
+    "x": 450,
+    "y": 162
+   },
+   "inputs": [],
+   "intake": "in-c37cf257ce5aa0a9"
+  },
+  "gz_ai_steam_vent": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "ee4a1c43272602a0c792e4d0b6d3fa66ccbc2be77487d09dd3de10ae6ef82cba",
+   "w": 340,
+   "h": 193,
+   "registration": {
+    "x": 170,
+    "y": 193
+   },
+   "inputs": [],
+   "intake": "in-ee4a1c43272602a0"
+  },
+  "gz_ai_cooled_rock_1": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "8df88a4bf558835c44290a4dee75a4a777b3ca5f7e96d119765ea6382f8454f9",
+   "w": 420,
+   "h": 303,
+   "registration": {
+    "x": 210,
+    "y": 303
+   },
+   "inputs": [],
+   "intake": "in-8df88a4bf558835c"
+  },
+  "gz_ai_cooled_rock_2": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "62eb9736b2645849edbc90bddcc7da84cabecf620932cb47885c85fca2d58e87",
+   "w": 300,
+   "h": 203,
+   "registration": {
+    "x": 150,
+    "y": 203
+   },
+   "inputs": [],
+   "intake": "in-62eb9736b2645849"
+  },
+  "gz_ai_lava_blob": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "8d1e2be3b4d20484cdfae90f248460661bb2c4e826cfbb62c6ee94491ac1cee6",
+   "w": 92,
+   "h": 94,
+   "registration": {
+    "x": 46,
+    "y": 94
+   },
+   "inputs": [],
+   "intake": "in-8d1e2be3b4d20484"
+  },
+  "gz_ai_ember": {
+   "origin": "new",
+   "licence": "ai-generated",
+   "source": "Claude (claude-opus-5-5) for Austin Ginder with claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "author": "Claude (claude-opus-5-5) for Austin Ginder",
+   "tool": "claude-opus-5-5, drawing scripts tools/builder/art/volcano/ (draw.mjs, lib.mjs, build.mjs), rsvg-convert",
+   "prompt": "Austin Ginder: vertical climbing map of a Volcano; various effects like steam and lava squirts; earthquake rumble effect; original artwork; feel free to use whatever to generate it. Drawn in code as SVG (no image model), from no input images.",
+   "sha256": "6b22601b2d2ce6a2c4f2c8ba6cf517c84fe88c4c85b2751e905a645dca7516dc",
+   "w": 48,
+   "h": 48,
+   "registration": {
+    "x": 24,
+    "y": 48
+   },
+   "inputs": [],
+   "intake": "in-6b22601b2d2ce6a2"
+  }
+ }
+}
