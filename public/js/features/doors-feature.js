@@ -5,8 +5,9 @@
  * (`street.doors`, `street.boxes`). This file binds them to the world:
  * - Draws each visible door at its source rect with its recovered deco
  *   (assets/decos/groddle, CoU _png-2x), or a plain drawn door when the art
- *   was never recovered. Locked doors carry their key's CC0 icon, numbered
- *   doors a small plate. Hidden doors (client DoorView) are not drawn.
+ *   was never recovered. A locked door's keyhole names its key (door-lock-art.js;
+ *   no key icon floats over it since 2026-11-01), its subtitle says which key;
+ *   numbered doors a small plate. Hidden doors (client DoorView) are not drawn.
  * - Enter: the source door-move checks (destination, level, key). A failed
  *   check is spoken by the door, like the client's talking-door bubble.
  *   Locked doors use up one matching Door Key each time (inc_locked_doors.js).
@@ -151,14 +152,8 @@ function buildView(engine, door, available) {
   engine.entityLayer.addChild(sprite);
   const view = { door, sprite, extras: [], target: null, art: lockArt ? 'lock' : hasArt ? 'deco' : 'drawn' };
 
-  if (door.key_id && DOOR_KEYS[door.key_id]) {
-    const badge = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${doorKeyClass(door.key_id)}.png`));
-    badge.anchor.set(0.5, 0.5);
-    badge.x = door.x;
-    badge.y = door.y - Math.max(40, (door.h || 110) * 0.62);
-    badge.alpha = 0.92;
-    addExtra(engine, view, badge);
-  }
+  // Austin 2026-11-01: no key icon floats over a locked door any more (a remake addition; the
+  // keyhole art above names the key, DoorView.as 243-244). Its subtitle still says which key.
   if (door.house_number) {
     const plate = new PIXI.Text({ text: String(door.house_number), style: {
       fontFamily: 'Trebuchet MS, sans-serif',

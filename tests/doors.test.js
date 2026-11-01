@@ -268,6 +268,13 @@ describe('door rules', () => {
     assert.equal(doorSubtitle(locked, { hasKey: () => true }), 'Unlock with a Yellow-Teal Square Key');
   });
 
+  it('draws no key icon over a locked door: its keyhole and its subtitle name the key (Austin 2026-11-01)', () => {
+    const fx = readFileSync(join(here, '../public/js/features/doors-feature.js'), 'utf8');
+    assert.doesNotMatch(fx, /assets\/sprites\/icons\/\$\{doorKeyClass/, 'the floating key badge is gone');
+    assert.match(fx, /const lockArt = !door\.src && hasArt && door\.key_id \? doorLockArt\(door\.sprite, door\.key_id\) : null;/);
+    assert.match(fx, /subtitle: doorSubtitle\(door, \{ hasKey: hasKeyIn\(engine\) \}\)/);
+  });
+
   it('covers all twelve keys and maps key_id N to door_key_N', () => {
     assert.equal(Object.keys(DOOR_KEYS).length, 12);
     assert.equal(doorKeyClass(12), 'door_key_12');
