@@ -37,7 +37,7 @@ import {
   contributionBadgesReached,
   jobText,
   plainText,
-} from '../public/js/street-jobs.js?v=3c8a3e97';
+} from '../public/js/street-jobs.js?v=897619fc';
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
@@ -321,7 +321,8 @@ describe('street jobs rules', () => {
 describe('street project phase names', () => {
   it('fill {job_location} in phase titles shown in the panel and phase-complete text', () => {
     const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'public/js/features/street-jobs-feature.js'), 'utf8');
-    assert.match(src, /function phaseTitle\(job, phase, def\)[\s\S]{0,120}jobText\(/);
+    // js/street-jobs.js phaseName fills it (jobText) and decodes the markup (tests/job-text-placeholders.test.js).
+    assert.match(src, /function phaseTitle\(job, phase, def\)[\s\S]{0,120}phaseName\(/);
     // Every phase/def title reaches the UI through phaseTitle, never raw.
     assert.doesNotMatch(src, /\$\{[^}]*(phase\.label|def\.title)[^}]*\}/);
   });

@@ -19,7 +19,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { NEWXP_EXITS, GENTLE_ISLAND, indexTsid, normalizeNewxpSave } from '../public/js/newxp.js?v=de3e754f';
-import { closedStreets, normalizeStreetJobState } from '../public/js/street-jobs.js?v=3c8a3e97';
+import { closedStreets, normalizeStreetJobState } from '../public/js/street-jobs.js?v=897619fc';
 import { newxpFeature, __newxpTest, exitLeadsHome, pickOpenExit } from '../public/js/features/newxp-feature.js?v=3b123f7d';
 
 const root = join(import.meta.dirname, '..');

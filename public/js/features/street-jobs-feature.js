@@ -81,14 +81,16 @@ import {
   upgradeEcologyEntry,
   upgradeFeatures,
   contributionBadgesReached,
+  contributionsText,
   jobText,
+  phaseName,
   plainText,
   isJobBuilt,
   jobInProgress,
   cancelJob,
   jobDivisor,
   upgradeOption,
-} from '../street-jobs.js?v=3c8a3e97';
+} from '../street-jobs.js?v=897619fc';
 import { gainMetabolic, loseEnergy } from '../metabolics.js?v=8504134e';
 import { saveStore } from '../save-store.js?v=8839ba7b';
 import {
@@ -109,7 +111,7 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../street-jobs-mp.js?v=74c659ea';
+} from '../street-jobs-mp.js?v=d18e4b4a';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=ea900c51';
 import { normalizeGroups } from '../groups.js?v=65337c22';
@@ -172,7 +174,12 @@ const localOf = (id) => localIds.get(String(id || '')) || String(id || '');
 
 /** A phase's name; the source's phase classes title themselves "{job_location}" (the new street's name). */
 function phaseTitle(job, phase, def) {
-  return jobText(phase?.label || def?.title || '', { location: job?.label });
+  return phaseName(job, phase, def);
+}
+
+/** The next phase's name in a phase card ("the next phase" when it has none). */
+function nextPhaseName(job, next) {
+  return (next && phaseTitle(job, next, catalog?.classes?.[next.classTsid])) || 'the next phase';
 }
 
 function load() {
@@ -543,8 +550,8 @@ function finishPhase(engine, jobId) {
     const mins = out.readyAt ? Math.round((out.readyAt - Date.now()) / 60000) : 0;
     steps.push({
       text: mins
-        ? `${next?.delayText || `The ${phaseOrdinal(out.index + 1)} phase, ${next?.label || 'the next phase'}, opens in ${mins} minutes.`}`
-        : `The ${phaseOrdinal(out.index + 1)} phase, ${next?.label || 'the next phase'}, is ready now.`,
+        ? `${next?.delayText ? plainText(jobText(next.delayText, { location: job.label })) : `The ${phaseOrdinal(out.index + 1)} phase, ${nextPhaseName(job, next)}, opens in ${mins} minutes.`}`
+        : `The ${phaseOrdinal(out.index + 1)} phase, ${nextPhaseName(job, next)}, is ready now.`,
       response: 'OK',
     });
   }
@@ -565,14 +572,11 @@ function finishJob(engine, jobId, out, solo) {
   const def = phaseClass(catalog, jobId, 0).def;
   if (out.participant) engine.achievement(PARTICIPANT_COUNTER, 1);
   if (job.kind === 'restore') return finishRestore(engine, jobId, job, def, out);
-  const contributions = job.phases
-    .map((p, i) => {
-      const mine = state.jobs[jobId]?.mine?.[p.classTsid];
-      // Shared (multiplayer): your share of each phase's base cost, as the source's text said it.
-      const pct = shared(jobId) ? Math.round(phaseShare(state.jobs[jobId], p.classTsid, catalog.classes[p.classTsid], jobDivisor(job)) * 100) : 100;
-      return `${i + 1}. ${p.label || catalog.classes[p.classTsid]?.title || 'Phase'}: ${mine ? `You contributed ${pct}% of the work!` : 'You did not contribute.'}`;
-    })
-    .join(' ');
+  const contributions = contributionsText(job, catalog, {
+    mine: (p) => Boolean(state.jobs[jobId]?.mine?.[p.classTsid]),
+    // Shared (multiplayer): your share of each phase's base cost, as the source's text said it.
+    share: (p) => (shared(jobId) ? Math.round(phaseShare(state.jobs[jobId], p.classTsid, catalog.classes[p.classTsid], jobDivisor(job)) * 100) : 100),
+  });
   if (job.kind === 'hall') return finishHall(engine, jobId, job, contributions, solo);
   teleportationFeature.grantScript(engine, arrivalFor(job));
   if (job.kind === 'street') {
@@ -1550,8 +1554,8 @@ function mpPhaseAward(engine, jobId, out, paid, paidPerformance, note) {
     const mins = out.readyAt ? Math.round((out.readyAt - Date.now()) / 60000) : 0;
     steps.push({
       text: mins
-        ? `${upcoming?.delayText || `The ${phaseOrdinal(out.index + 1)} phase, ${upcoming?.label || 'the next phase'}, opens in ${mins} minutes.`}`
-        : `The ${phaseOrdinal(out.index + 1)} phase, ${upcoming?.label || 'the next phase'}, is ready now.`,
+        ? `${upcoming?.delayText ? plainText(jobText(upcoming.delayText, { location: job.label })) : `The ${phaseOrdinal(out.index + 1)} phase, ${nextPhaseName(job, upcoming)}, opens in ${mins} minutes.`}`
+        : `The ${phaseOrdinal(out.index + 1)} phase, ${nextPhaseName(job, upcoming)}, is ready now.`,
       response: 'OK',
     });
   }

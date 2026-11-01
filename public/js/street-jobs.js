@@ -155,13 +155,46 @@ export function phaseClass(catalog, jobId, index) {
   return phase ? { phase, def: catalog.classes?.[phase.classTsid] || null } : null;
 }
 
-/** Source text with {job_location}, {job_participation}, {job_phase}, {job_phase_label}. */
+/**
+ * Source text with its placeholders filled, as quests/quest.js expandText 232-264 does: {pc_label},
+ * {job_phase} (an ordinal word), {job_phase_label}, {job_location} (the job's primary location),
+ * {job_performance} (your place among the contributors; dropped with its space when first) and
+ * {job_participation} (your share in percent).
+ */
 export function jobText(template, vars = {}) {
   return String(template || '')
+    .replace(/\{pc_label\}/g, vars.pcLabel || 'friend')
     .replace(/\{job_location\}/g, vars.location || '')
     .replace(/\{job_participation\}/g, String(vars.participation ?? 0))
     .replace(/\{job_phase\}/g, vars.phase || '')
-    .replace(/\{job_phase_label\}/g, vars.phaseLabel || '');
+    .replace(/\{job_phase_label\}/g, vars.phaseLabel || '')
+    .replace(/\{job_performance\} ?/g, vars.performance ? `${vars.performance} ` : '');
+}
+
+/**
+ * A phase's name for the player: its label, else its class's title (the street jobs' classes title
+ * themselves "{job_location}", the new street's name), placeholders filled and markup and entities
+ * gone ("Build &amp; Replenish" reads "Build & Replenish").
+ */
+export function phaseName(job, phase, def) {
+  return plainText(jobText(phase?.label || def?.title || '', { location: job?.label }));
+}
+
+/**
+ * The completion card's "Your contributions" (players/inc_jobs.js jobs_familiar_job_complete_do
+ * 485-499): per phase "N. <label>: You contributed {job_participation}% of the work!" or "You did not
+ * contribute.". Ticket (Austin 2026-11-01): the label was printed unfilled ("1. {job_location}"); it
+ * is the phase's name now, and a one-phase project drops the number and name (the card's title
+ * already names the street). `share(phase)` is your percent of that phase, `mine(phase)` whether you
+ * gave anything.
+ */
+export function contributionsText(job, catalog, { mine, share }) {
+  const phases = job?.phases || [];
+  const line = (p) => (mine(p) ? `You contributed ${share(p)}% of the work!` : 'You did not contribute.');
+  if (phases.length === 1) return line(phases[0]);
+  return phases
+    .map((p, i) => `${i + 1}. ${phaseName(job, p, catalog?.classes?.[p.classTsid]) || `Phase ${i + 1}`}: ${line(p)}`)
+    .join(' ');
 }
 
 const ORDINALS = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth'];
