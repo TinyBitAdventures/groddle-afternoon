@@ -114,6 +114,22 @@ describe('profile-aware vendor UI wiring', () => {
     assert.match(game, /assets\/decos\/groddle\/vendor\.png/);
   });
 
+  it('a good buy closes the item card back to the shelf; a refused one keeps it open (ticket 29)', () => {
+    // StoreDialog.as:596-608: buySuccess -> buyOver -> onBackClick (back to the product list).
+    const game = readFileSync(join(publicDir, 'game.js'), 'utf8');
+    const go = game.slice(game.indexOf("detail.querySelector('[data-v-go]')?.addEventListener('click'"));
+    const okBuy = go.match(/if \(r\.ok && isBuy\) \{([\s\S]*?)\n {6}\}/);
+    assert.ok(okBuy, 'a branch for a good buy');
+    assert.match(okBuy[1], /vendorSelected = null;/);
+    assert.match(okBuy[1], /vendorQty = 1;/);
+    assert.match(okBuy[1], /renderVendorList\(\);/);
+    assert.match(okBuy[1], /return;/);
+    // The refused buy only toasts its reason; nothing else clears the selection for it.
+    assert.match(go, /toast\(r\.msgs\[0\]\);/);
+    const before = go.slice(0, go.indexOf('if (r.ok && isBuy) {'));
+    assert.doesNotMatch(before, /vendorSelected = null/);
+  });
+
   it('generalizes browse and talk verbs to every street spirit profile', () => {
     const content = readFileSync(join(publicDir, 'content.js'), 'utf8');
     assert.ok((content.match(/classId\.startsWith\('street_spirit_'\)/g) || []).length >= 3);

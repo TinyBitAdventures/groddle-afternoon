@@ -25102,6 +25102,18 @@ function renderVendorList() {
         emitGameEvent(`vendor_${isBuy ? 'bought' : 'sold'}:${vendorSelected}`, r.qty || vendorQty);
         if (isBuy) announceAchievementUpdates(purchaseAchievementUpdates(achieveState, r.cost, pc));
       }
+      // A bought item sends you back to the shelf, on the tile you bought from (StoreDialog.as:596-608,
+      // buySuccess -> buyOver -> onBackClick). A refused buy keeps the count open with the reason in
+      // the toast, so you can change the count (the original went back to the shelf behind an alert).
+      if (r.ok && isBuy) {
+        const was = vendorSelected;
+        vendorSelected = null;
+        vendorQty = 1;
+        updateHud();
+        renderVendorList();
+        list.querySelector(`[data-vendor-item="${CSS.escape(was || '')}"]`)?.focus({ preventScroll: true });
+        return;
+      }
       if (r.ok && !isBuy) {
         vendorSellReceipt = { label, qty: r.qty, gain: r.gain };
         vendorSelected = null;
