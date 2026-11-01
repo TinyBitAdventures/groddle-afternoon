@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <!-- The phone companion (js/phone/companion.js): phones and touch-only tablets come here from /play/online/ and /play/
+       (their #phone-gate script). It never loads Pixi, game.js or the game's assets. Paths stay relative to the site root. -->
+  <base href="../../" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#dcefc9" />
+  <title>Groddle Afternoon · On your phone</title>
+  <script src="site/theme.js"></script>
+  <link rel="stylesheet" href="site/site-nav.css" />
+  <link rel="stylesheet" href="play/phone/phone.css?v=ba00087e" />
+  <link rel="preload" href="assets/fonts/nunito/nunito-roman-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="icon" href="favicon.svg?v=df15aba7" type="image/svg+xml" />
+  <link rel="icon" href="favicon.ico?v=arch" sizes="32x32" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=df15aba7" />
+</head>
+<body class="phone">
+  <header class="pc-top">
+    <a class="pc-brand" href="./"><img src="favicon.svg?v=df15aba7" alt="" width="28" height="28" /><span>Groddle Afternoon</span></a>
+    <button class="site-nav-theme" type="button" aria-label="Colour theme"></button>
+  </header>
+  <main id="phone-app" class="pc-main" data-phone="checking">
+    <noscript><p class="pc-card">This page needs JavaScript. <a href="./">Back to Groddle Afternoon</a></p></noscript>
+  </main>
+  <footer class="pc-foot"><a href="credits/">Credits</a> · <a href="privacy-policy/">Privacy</a></footer>
+  <script type="module" src="js/phone/companion.js?v=f1068f97"></script>
+</body>
+</html>

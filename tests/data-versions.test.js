@@ -242,7 +242,10 @@ describe('asset keys written into HTML and CSS (2026-10-29)', () => {
 });
 
 describe('every page that runs scripts loads the map and the hook first', () => {
-  const pages = git(root, 'ls-files', 'public').split('\n').filter((f) => f.endsWith('.html'));
+  // The phone companion stays small for phones (tests/phone-companion.test.js: no 260 KB data map); its
+  // only data fetches (items/data.json and item icons on the Mail tab) go unkeyed.
+  const LIGHT_PAGES = new Set(['public/play/phone/index.html']);
+  const pages = git(root, 'ls-files', 'public').split('\n').filter((f) => f.endsWith('.html') && !LIGHT_PAGES.has(f));
   const scriptTag = /<script\b([^>]*)>/g;
   const srcOf = (attrs) => /\bsrc="([^"]+)"/.exec(attrs)?.[1] || '';
   const needsHook = (html) => [...html.matchAll(scriptTag)].some((m) => {
