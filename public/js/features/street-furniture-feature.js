@@ -3,7 +3,7 @@
  * js/feature-host.js). Rules live in js/street-furniture.js (mailboxes, notes,
  * notice boards, Visiting Stones) and js/neighbours.js (neighbour homes).
  *
- * - Street Mailboxes (265 archived) open the same mail as the home Mailbox (1)
+ * - Street Mailboxes (265 archived) open the same mail as the home Mailbox
  *   through engine.openMailbox(), with the per-player npc_mailbox.js states:
  *   has_mail (73-frame wobble) while you have unread mail, interact while the
  *   mail is open, all_done for two seconds after, then idle. No home needed.
@@ -119,8 +119,8 @@ import {
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=302e64ad';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
-import { butlerApi } from './butler-feature.js?v=43bee881';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=90fa0542';
+import { butlerApi } from './butler-feature.js?v=866cab78';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=6854acca';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=18178bf5';
 
