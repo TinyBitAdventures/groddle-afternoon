@@ -115,7 +115,8 @@ import {
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { createMinnAccount } from '../minn-account.js?v=ea900c51';
 import { normalizeGroups } from '../groups.js?v=65337c22';
-import { textureFromUrl } from '../textures.js?v=db2ce452';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
+import { JOB_WORK_OVERLAY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=4c2511cd';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
@@ -679,6 +680,57 @@ function workCtx(engine) {
   };
 }
 
+/**
+ * The tool overlay while working (items/include/jobs.js startJobWork 293-305: a pc_overlay in a
+ * bubble, 40x40, the tool's tool_animation, delta_y -110), drawn in front of the street on the fx
+ * layer like the Focusing Orb's meditation (meditation-feature zIndex 40). js/job-work-fx.js.
+ */
+function workToolFx(engine, tool) {
+  const { PIXI } = engine;
+  const root = new PIXI.Container();
+  root.zIndex = 40;
+  root.label = 'job-work-tool';
+  const { width: w, height: h } = JOB_WORK_OVERLAY;
+  const r = Math.round(Math.max(w, h) / 2 + 9);
+  const bubble = new PIXI.Graphics();
+  // The client's overlay bubble: a round white balloon with a small tail toward the player.
+  bubble.circle(0, 0, r).fill({ color: 0xffffff, alpha: 0.94 }).stroke({ color: 0x8c7a5b, width: 1.5, alpha: 0.7 });
+  bubble.poly([-6, r - 2, 6, r - 2, 0, r + 9]).fill({ color: 0xffffff, alpha: 0.94 });
+  root.addChild(bubble);
+  const sheet = jobWorkToolSheet(tool);
+  let art;
+  if (sheet) {
+    const base = sourceFromUrl(sheet.url);
+    const frames = [];
+    for (let i = 0; i < sheet.frames; i += 1) {
+      frames.push(frameTexture(base, new PIXI.Rectangle((i % sheet.cols) * sheet.fw, Math.floor(i / sheet.cols) * sheet.fh, sheet.fw, sheet.fh)));
+    }
+    art = new PIXI.AnimatedSprite(frames);
+    art.animationSpeed = sheet.fps / 60;
+    art.loop = true;
+    art.scale.set(jobWorkToolScale(sheet));
+    art.play();
+  } else {
+    art = new PIXI.Sprite(textureFromUrl(itemIcon(tool)));
+    art.width = w;
+    art.height = h;
+  }
+  art.anchor.set(0.5);
+  root.addChild(art);
+  root.x = engine.player.x;
+  root.y = engine.player.y + JOB_WORK_OVERLAY.deltaY;
+  (engine.fxLayer || engine.entityLayer).addChild(root);
+  engine.setData?.('jobWorkTool', `${tool}:${sheet ? 'animation' : 'icon'}`);
+  return root;
+}
+
+/** A work unit's float, beside the bubble and away from the board's Enter hint. */
+function workFloat(engine, text) {
+  const boardX = (external.get(work?.jobId)?.target?.() || board?.target)?.sprite?.x;
+  const at = jobWorkFloatPoint(engine.player, Number.isFinite(boardX) ? boardX : null);
+  engine.floatText(at.x, at.y, text, 0xf2c14e);
+}
+
 function startWork(engine, jobId, rid, maxUnits = Infinity) {
   if (work) stopWork(engine, '');
   const check = workCheck(state, catalog, jobId, rid, workCtx(engine));
@@ -686,12 +738,7 @@ function startWork(engine, jobId, rid, maxUnits = Infinity) {
     engine.toast(check.msg);
     return false;
   }
-  const { PIXI } = engine;
-  const icon = new PIXI.Sprite(textureFromUrl(itemIcon(check.tool)));
-  icon.anchor.set(0.5, 1);
-  icon.scale.set(0.8);
-  icon.zIndex = 40;
-  engine.entityLayer.addChild(icon);
+  const fx = workToolFx(engine, check.tool);
   work = {
     jobId,
     rid,
@@ -701,7 +748,8 @@ function startWork(engine, jobId, rid, maxUnits = Infinity) {
     startedAt: Date.now(),
     nextAt: Date.now() + WORK_UNIT_MS,
     anchorX: engine.player.x,
-    toolSprite: icon,
+    toolSprite: fx,
+    sound: jobWorkSoundKey(check.tool) ? engine.playSoundLoop?.(jobWorkSoundKey(check.tool), { volume: 0.5 }) || null : null,
     tool: check.tool,
     // Shared: each unit goes to the server, and counts (energy, wear) when it answers.
     mp: shared(jobId),
@@ -719,7 +767,8 @@ function stopWork(engine, reason) {
   if (!work) return;
   const w = work;
   work = null;
-  if (w.toolSprite && !w.toolSprite.destroyed) w.toolSprite.destroy();
+  if (w.toolSprite && !w.toolSprite.destroyed) w.toolSprite.destroy({ children: true });
+  w.sound?.stop?.();
   const req = phaseRequirements(state, catalog, w.jobId).find((r) => r.id === w.rid);
   if (reason) engine.prompt({ kicker: 'Street Project', title: 'Work stopped', text: reason });
   const sayTo = external.get(w.jobId)?.target?.() || board?.target;
@@ -738,8 +787,9 @@ function tickWork(engine, now) {
   if (!work) return;
   const p = engine.player;
   if (work.toolSprite && !work.toolSprite.destroyed) {
+    // items/include/jobs.js 293-305: the overlay rides the player at delta_y -110.
     work.toolSprite.x = p.x;
-    work.toolSprite.y = p.y - 96 + Math.sin(now / 120) * 4;
+    work.toolSprite.y = p.y + JOB_WORK_OVERLAY.deltaY;
   }
   if (Math.abs(p.x - work.anchorX) > WALK_AWAY_PX) {
     stopWork(engine, 'You walked away from the project.');
@@ -760,7 +810,7 @@ function tickWork(engine, now) {
   }
   work.units += 1;
   work.energy += res.energy;
-  engine.floatText(p.x, p.y - 118, `+1 ${res.req.verbPast}`, 0xf2c14e);
+  workFloat(engine, `+1 ${res.req.verbPast}`);
   if (res.wear?.msg) engine.pushActivity(res.wear.msg);
   engine.updateHud();
   drawPlate(engine);
@@ -1519,8 +1569,7 @@ function mpWorked(engine, msg) {
   const wear = useToolCondition(engine.toolState, work.tool, req.wear);
   work.units += 1;
   work.energy += req.energy;
-  const p = engine.player;
-  engine.floatText(p.x, p.y - 118, `+1 ${req.verbPast}`, 0xf2c14e);
+  workFloat(engine, `+1 ${req.verbPast}`);
   if (wear?.msg) engine.pushActivity(wear.msg);
   const rec = markContributed(state, work.jobId, work.cls);
   if (rec.newPhase) for (const badge of contributionBadgesReached(rec.distinctPhases)) engine.grantAchievement(badge);
@@ -1735,6 +1784,11 @@ function publish(engine) {
 
 export const streetJobsFeature = {
   id: STREET_JOBS_FEATURE_ID,
+
+  /** The work bubble sits over the player: no Enter hint over it while the work runs (game.js quietEnterHint). */
+  quietEnterHint() {
+    return work ? true : null;
+  },
 
   init(engine) {
     engineRef = engine;

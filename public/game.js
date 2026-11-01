@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6d499ac2';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=82912a67';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=49f8c9e8';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -28112,7 +28112,9 @@ async function main() {
         }
         // G228: no Enter hint while a call-out holds Enter; none while the thing itself is talking
         // (speakingNow: the client hides a stack's indicators under its bubble).
-        if (!enterHeldBy() && !speakingNow(near)) want = {
+        // A feature's own overlay over the player (a street project's work bubble) asks for no hint
+        // while it is up; Enter itself still works.
+        if (!enterHeldBy() && !speakingNow(near) && features.query('quietEnterHint', engine) !== true) want = {
           key: 'Enter',
           label,
           x: near.sprite.x,
