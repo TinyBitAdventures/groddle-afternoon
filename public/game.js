@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=5be63ce2';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d8cfea46';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=2606d2be';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -355,7 +355,7 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=deb5fb26';
+} from './js/paradise-flight.js?v=a94b5875';
 import { resolveParadiseCourseAlias } from './js/paradise-courses.js?v=bb3d9051';
 import {
   buildParadiseCourseArt,
@@ -478,7 +478,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=0a6b25cc';
+} from './js/player-save.js?v=922f1eda';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -843,6 +843,7 @@ import {
   QUOIN_TYPES,
   createQuoinState,
   planStreetQuoins,
+  quoinTouches,
   collectQuoin,
   resetQuoinDay,
   streetQuoinClass,
@@ -852,7 +853,7 @@ import {
   quoinClassType,
   resetStreetQuoinsForNewDay,
   creditQuoinStat,
-} from './js/quoins.js?v=d4f4772b';
+} from './js/quoins.js?v=e75558c6';
 import {
   buildHubMapView,
   mapClickTravel,
@@ -13048,10 +13049,12 @@ function physics(dt) {
   // auto-pickup apples on walk-over still? Keep click/menu only for apples to showcase verbs
   // quoin auto collect
   tickQuoinRespawns();
-  if (!menuTarget) {
+  if (!menuTarget && quoins.length) {
+    const bodyScale = features.query('avatarBodyScale', engine) ?? 1;
     for (let i = quoins.length - 1; i >= 0; i--) {
       const q = quoins[i];
-      if (Math.hypot(q.x - player.x, q.y - (player.y - 28)) < 44) {
+      // Player report 32: the source's box touch (js/quoins.js quoinTouches), head height included.
+      if (quoinTouches(q, player.x, player.y, { scale: bodyScale, quoinScale: q.scale?.y || 1 })) {
         // Multiplayer: a street quoin is the realtime server's to give (features/shared-quoins-feature.js).
         if (features.query('quoinTouched', q, engine)) continue;
         grabWorldQuoin(q);
@@ -16931,7 +16934,7 @@ function updateSummersDay(dt) {
       q.phase += 0.045 * dt;
       q.y = q.baseY + Math.sin(q.phase) * 4;
       if (!summersDayAnnexReveal?.touched) continue;
-      if (menuTarget || Math.hypot(q.x - player.x, q.y - (player.y - 28)) >= 46) continue;
+      if (menuTarget || !quoinTouches(q, player.x, player.y, { scale: features.query('avatarBodyScale', engine) ?? 1, quoinScale: q.scale?.y || 1 })) continue;
       const result = collectSummersDayBonusQuoin(
         summersDayRun,
         entry.index,

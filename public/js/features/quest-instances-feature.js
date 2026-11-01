@@ -91,7 +91,7 @@ import { runStreetTransition } from '../screen-fx.js?v=f4314526';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=385f9a1a';
 import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=8691416a';
 import { applyFamiliarLook, familiarLook } from '../familiar.js?v=2089ac54';
-import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=d4f4772b';
+import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=e75558c6';
 import { sourceFromUrl } from '../textures.js?v=db2ce452';
 
 let quoinFrames = null;

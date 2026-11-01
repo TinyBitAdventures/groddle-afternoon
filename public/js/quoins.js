@@ -35,6 +35,32 @@ export const QURAZY_REWARDS = Object.freeze([
 /** config_base.js 165-177: the Giants a favor quoin for 'all' credits. */
 export const FAVOR_GIANT_IDS = Object.freeze(['alph', 'cosma', 'friendly', 'grendaline', 'humbaba', 'lem', 'mab', 'pot', 'spriggan', 'ti', 'zille']);
 
+/**
+ * Touching a quoin (player report 32: one level with the avatar's head was
+ * only taken by jumping into it). Quoins were taken on the server, by
+ * collision: quoin.js onPlayerCollision 156 runs when the player's box
+ * overlaps the quoin's. The player's box is w 59 x h 112 over the feet
+ * (GameServerJS players/player.js 63-64, times the avatar's scale); quoin.js
+ * sets no hit box of its own, so the engine's default 60 x 60 box over the
+ * quoin's bottom centre counts (Tiny Speck's engine is not public: Eleven
+ * Giants' reconstruction, eleven-server src/model/Player.js handleCollision
+ * 735-737 and isHit 801-814, which also overlaps the two boxes). The remake
+ * draws a quoin centred on (x, y), a QUOIN_SHEET frame tall, so its bottom is
+ * half a frame under y. Was a 44 px circle 28 px over the feet, which a quoin
+ * at head height missed.
+ */
+export const QUOIN_TOUCH = Object.freeze({ playerW: 59, playerH: 112, box: 60 });
+
+/** Whether the avatar standing (or jumping) with its feet at (x, feetY) touches quoin q (its centre x, y). */
+export function quoinTouches(q, x, feetY, { scale = 1, quoinScale = 1 } = {}) {
+  if (!q || !Number.isFinite(q.x) || !Number.isFinite(q.y)) return false;
+  const s = scale > 0 ? scale : 1;
+  const bottom = q.y + (QUOIN_SHEET.frameHeight / 2) * quoinScale;
+  const xDist = Math.abs(x - q.x);
+  const yDist = Math.abs(feetY - (QUOIN_TOUCH.playerH * s) / 2 - (bottom - QUOIN_TOUCH.box / 2));
+  return xDist < (QUOIN_TOUCH.box + QUOIN_TOUCH.playerW * s) / 2 && yDist < (QUOIN_TOUCH.box + QUOIN_TOUCH.playerH * s) / 2;
+}
+
 const STREET_SEQUENCE = Object.freeze(['xp', 'energy', 'mood', 'currants', 'mystery', 'favor', 'xp', 'time']);
 
 function finite(value, fallback = 0) {

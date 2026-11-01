@@ -24,7 +24,7 @@ import {
   shardFor,
   statusOf,
 } from '../public/js/shared-quoins.js?v=98d9f115';
-import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?v=e1102af3';
+import { sharedQuoinsFeature } from '../public/js/features/shared-quoins-feature.js?v=c8865e4d';
 import {
   QUOIN_SHARD_FLOOR,
   QUOIN_SHARD_NEAR,
@@ -34,7 +34,7 @@ import {
 } from '../public/js/quoin-shards.js?v=9a2e4c37';
 import { placementRequests, streetQuoinLayout, classTable, mysteryTable } from '../tools/build-realtime-quoins.mjs';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=cfa10e0b';
-import { QUOIN_CLASSES } from '../public/js/quoins.js?v=d4f4772b';
+import { QUOIN_CLASSES } from '../public/js/quoins.js?v=e75558c6';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -371,8 +371,10 @@ describe('the server and the wiring', () => {
     assert.equal(num('shardFall'), QUOIN_SHARD_FALL);
     assert.equal(num('shardTop'), QUOIN_SHARD_TOP);
     assert.equal(num('shardFloor'), QUOIN_SHARD_FLOOR);
-    assert.equal(num('quoinTouch'), 44, 'game.js picks a quoin up within 44 px');
-    assert.match(read('public/game.js'), /Math\.hypot\(q\.x - player\.x, q\.y - \(player\.y - 28\)\) < 44/);
+    // Report 32: game.js touches by the source's boxes (js/quoins.js quoinTouches); the server's
+    // circle with its slack still takes every such touch (tests/reach-report33.test.js).
+    assert.equal(num('quoinTouch'), 44);
+    assert.match(read('public/game.js'), /if \(quoinTouches\(q, player\.x, player\.y, /);
     assert.match(go, /go:embed data\/quoins\.json/);
     assert.match(go, /items\/quoin\.js onPlayerCollision/);
   });

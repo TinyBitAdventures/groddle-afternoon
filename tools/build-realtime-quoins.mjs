@@ -43,7 +43,7 @@ import {
   mysteryClassFor,
   planStreetQuoins,
   streetQuoinClass,
-} from '../public/js/quoins.js?v=d4f4772b';
+} from '../public/js/quoins.js?v=e75558c6';
 import { partyEcologyEntry, partySpaceForStreet } from '../public/js/party-spaces.js?v=6fea0ad5';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 

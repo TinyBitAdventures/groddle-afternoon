@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { QUOIN_SHEET, QUOIN_TYPES } from '../public/js/quoins.js?v=d4f4772b';
+import { QUOIN_SHEET, QUOIN_TYPES } from '../public/js/quoins.js?v=e75558c6';
 import { FIRST_DRAW_SPRITES, HIRES_SPRITES, hiresSpriteUrl } from '../public/js/sprite-hires.js?v=f7ea0bd5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
