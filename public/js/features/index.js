@@ -155,6 +155,7 @@ import { homeStreetMpFeature } from './home-street-mp-feature.js?v=221cf2b5'; FE
 import { swoonerfliesFeature } from './swoonerflies-feature.js?v=00c4b491'; FEATURES.push(swoonerfliesFeature);
 import { homePoolMpFeature } from './home-pool-mp-feature.js?v=575920f2'; FEATURES.push(homePoolMpFeature);
 import { yardVerbsMpFeature } from './yard-verbs-mp-feature.js?v=e13f0811'; FEATURES.push(yardVerbsMpFeature);
+import { homeMachinesFeature } from './home-machines-feature.js?v=d77a16a1'; FEATURES.push(homeMachinesFeature);
 import { questVerbsFeature } from './quest-verbs-feature.js?v=7dfda702'; FEATURES.push(questVerbsFeature);
 import { itemVerbsMoreFeature } from './item-verbs-more-feature.js?v=924882fe'; FEATURES.push(itemVerbsMoreFeature);
 import { questPinsFeature } from './quest-pins-feature.js?v=e59012f1'; FEATURES.push(questPinsFeature);
