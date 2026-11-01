@@ -30,6 +30,16 @@
  * the free Home Street Ticket (js/home-ticket.js), so /home and /house without
  * one open the Home panel (teleportHome's own answer), where the Magic Rock
  * hands over the ticket and the Selection Machine takes it.
+ *
+ * /stuck is the remake's own (Austin 2026-11-01; the source had no such
+ * command: a stuck player asked a guide, whose /link and god teleports are
+ * staff-only above). It puts you back where you arrived on the street you
+ * are on (the signpost or door you came through, else the street's own
+ * arrival), or at the door at home. Once every 5 minutes; not in a race, a
+ * timed quest room or a Paradise course (they have Leave), not while dead
+ * (Hell's grapes are the way out, items/bunch_of_grapes_hell.js), not in the
+ * middle of something. It never moves you anywhere you had not already been
+ * on that street, so it skips nothing the street gates.
  */
 
 /** main.js doChatCommand, inc_houses.js and location.js lines, verbatim. */
@@ -54,6 +64,29 @@ export const SLASH_TEXT = Object.freeze({
   leaveNotHome: 'To leave, you must first go /home',
   /** main.js:1931 (and :1970). */
   unknown: 'Unknown command: ',
+});
+
+/** /stuck's words (the remake's own, no source line). */
+export const STUCK_TEXT = Object.freeze({
+  done: "You're back where you arrived on this street.",
+  doneHome: "You're back at the door.",
+  leave: "/stuck doesn't work here. Use Leave to get out.",
+  dead: "You are dead. Squish Hellish Grapes to get out of Naraka.",
+  /** The cooldown's time left, in whole minutes (seconds under one). */
+  wait: (ms) => {
+    const s = Math.max(1, Math.ceil(ms / 1000));
+    if (s < 60) return `You can use /stuck again in ${s} ${s === 1 ? 'second' : 'seconds'}.`;
+    const m = Math.ceil(s / 60);
+    return `You can use /stuck again in ${m} ${m === 1 ? 'minute' : 'minutes'}.`;
+  },
+});
+
+/** /stuck once every 5 minutes (Austin 2026-11-01). */
+export const STUCK_COOLDOWN_MS = 5 * 60 * 1000;
+
+/** The remake's own commands, with what they do: the slash-command help. */
+export const REMAKE_COMMANDS = Object.freeze({
+  '/stuck': 'Back to where you arrived on this street (or your door at home), once every 5 minutes.',
 });
 
 /** The commands a regular player could use (main.js:1850-1916), in source order. */
@@ -108,6 +141,7 @@ function travelBlock(ctx) {
  * What one slash line does. `ctx` is the remake's state:
  *   { who: string[], home: { owned, inHome, room }, onTowerFloor, towerBuilt,
  *     dead, busy, instance, butlerOwned }
+ * ctx.stuckWaitMs: what is left of /stuck's cooldown (0 when it is ready).
  * Returns null for a line this module does not answer (/beans and unknown
  * lines), else one of
  *   { command, say }                 a line for the activity log (sendActivity)
@@ -115,6 +149,7 @@ function travelBlock(ctx) {
  *                                    'inside' | 'outside' | 'return' |
  *                                    'house-from-tower' | 'tower'
  *   { command, butler: true }        the Butler IMs you
+ *   { command, stuck: 'arrival' | 'home-door' | 'tower-door' }  /stuck's move
  *   { command, silent: true }        the source returns without a word
  */
 export function slashPlan(text, ctx = {}) {
@@ -152,6 +187,14 @@ export function slashPlan(text, ctx = {}) {
       return { command, travel: ['return'] };
     case '/butler':
       return ctx.butlerOwned ? { command, butler: true } : { command, silent: true };
+    case '/stuck': {
+      if (ctx.instance) return { command, say: STUCK_TEXT.leave };
+      if (ctx.dead) return { command, say: STUCK_TEXT.dead };
+      if (ctx.busy) return { command, say: SLASH_TEXT.busy };
+      if (ctx.stuckWaitMs > 0) return { command, say: STUCK_TEXT.wait(ctx.stuckWaitMs) };
+      if (home.inHome) return { command, stuck: ctx.onTowerFloor ? 'tower-door' : 'home-door' };
+      return { command, stuck: 'arrival' };
+    }
     default:
       return null;
   }

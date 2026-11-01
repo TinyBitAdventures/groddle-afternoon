@@ -21,12 +21,21 @@
  *   is an IM to it (features/butler-im-feature.js butlerImCommand, G367).
  * - has_used_house_command / has_used_tower_command are kept (saved) for the
  *   Butler hints that teach /house and /tower (butler_hints.js:382-399).
+ * - /stuck (the remake's own; js/slash-commands.js STUCK_TEXT, REMAKE_COMMANDS):
+ *   back to where you arrived on this street (engine.stuckReturn: the signpost
+ *   or door you came through, else the street's own arrival), standing on the
+ *   floor, or at home to the door (house, home street or tower floor). Once
+ *   every 5 minutes (saved, so a reload does not reset it); refused with its
+ *   reason in a race, a timed quest room or a Paradise course (Leave), dead in
+ *   Hell (the grapes), or busy. Online it is a move on the same street like any
+ *   step: the realtime server shares it as it shares every move (hub.go "move").
  * - /tp: the administrators' teleport (js/admin-teleport.js, v0.2.2), multiplayer
  *   only; the site's admin/teleport route decides who may, and anyone else sees
  *   the ordinary Unknown command line. Solo says /tp is not available.
  *
  * QA: type the commands into Local chat. Canvas data: slashLast
- *     (`<command>:<outcome>`, `/tp:<kind>:<outcome>` once a /tp is answered),
+ *     (`<command>:<outcome>`, `/tp:<kind>:<outcome>` once a /tp is answered,
+ *     `/stuck:<arrival|street|home-door|tower-door|refused|failed>`),
  *     slashLine (the last line shown).
  */
 
@@ -34,7 +43,7 @@ import { BUTLER_STRINGS } from '../butler.js?v=a0c80a92';
 import { butlerApi } from './butler-feature.js?v=72b2221f';
 import { hellFeature } from './hell-feature.js?v=0b83669c';
 import { towerApi } from './home-tower-feature.js?v=7ce20566';
-import { slashPlan, unknownLine } from '../slash-commands.js?v=23e13b20';
+import { STUCK_COOLDOWN_MS, STUCK_TEXT, slashPlan, unknownLine } from '../slash-commands.js?v=58e63833';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';
 import { minnUrls } from '../minn-account.js?v=ea900c51';
 import { saveStore } from '../save-store.js?v=8839ba7b';
@@ -43,6 +52,10 @@ import { STREET_INDEX } from '../street-loader.js?v=33d2b8bc';
 export const SLASH_COMMANDS_FEATURE_ID = 'slash-commands';
 
 let used = { house: false, tower: false };
+/** When /stuck last moved you (ms since epoch), for its 5 minute cooldown. */
+let stuckAt = 0;
+/** Tests replace the clock. */
+let now = () => Date.now();
 let last = '';
 let lastLine = '';
 
@@ -71,7 +84,26 @@ export function slashContext(engine) {
     busy: engine.acting?.() === true,
     instance: engine.transientInstance?.() === true,
     butlerOwned: butlerApi.owned?.() === true,
+    stuckWaitMs: Math.max(0, stuckAt + STUCK_COOLDOWN_MS - now()),
   };
+}
+
+/** /stuck's move: the street's arrival, or the door at home. */
+async function stuck(engine, plan) {
+  let result;
+  if (plan.stuck === 'tower-door') result = await towerApi.goToFloor(engine, towerApi.currentFloor?.() ?? 0, 'door');
+  else if (plan.stuck === 'home-door') result = await engine.refreshHomeScene?.({ arrive: 'door', spawnX: undefined });
+  else result = engine.stuckReturn?.();
+  if (result === false || result?.ok === false || result == null) {
+    last = `/stuck:failed:${result?.reason || 'blocked'}`;
+    publish(engine);
+    return;
+  }
+  stuckAt = now();
+  activity(engine, plan.stuck === 'arrival' ? STUCK_TEXT.done : STUCK_TEXT.doneHome);
+  last = `/stuck:${plan.stuck === 'arrival' ? result.from || 'arrival' : plan.stuck}`;
+  engine.save?.();
+  publish(engine);
 }
 
 async function runStep(engine, step) {
@@ -160,6 +192,9 @@ export function runSlashCommand(engine, text) {
   if (plan.say) {
     activity(engine, plan.say);
     last = `${plan.command}:say`;
+  } else if (plan.stuck) {
+    last = '/stuck:moving';
+    stuck(engine, plan);
   } else if (plan.travel) {
     last = `${plan.command}:travelling`;
     travel(engine, plan);
@@ -192,16 +227,23 @@ export const slashCommandsFeature = {
   },
 
   save() {
-    return { version: 1, usedHouse: used.house, usedTower: used.tower };
+    return { version: 1, usedHouse: used.house, usedTower: used.tower, ...(stuckAt ? { stuckAt } : {}) };
   },
 
   restore(slice) {
     used = { house: slice?.usedHouse === true, tower: slice?.usedTower === true };
+    const at = Math.floor(Number(slice?.stuckAt));
+    stuckAt = Number.isFinite(at) && at > 0 ? Math.min(at, now()) : 0;
   },
 
   /** butler_hints.js:382, :392: has the player used /house or /tower yet. */
   usedCommand(name) {
     return name === 'house' ? used.house : name === 'tower' ? used.tower : false;
+  },
+
+  /** Tests: the clock /stuck's cooldown reads. */
+  _setClock(fn) {
+    now = typeof fn === 'function' ? fn : () => Date.now();
   },
 
   /** Tests: what /tp reaches instead of the page (fetch, baseUri, nonce, nonceUrl, streets, flush). */
@@ -211,10 +253,11 @@ export const slashCommandsFeature = {
 
   /** Tests. */
   _state() {
-    return { used: { ...used }, last, lastLine };
+    return { used: { ...used }, last, lastLine, stuckAt };
   },
   _reset() {
     used = { house: false, tower: false };
+    stuckAt = 0;
     last = '';
     lastLine = '';
   },

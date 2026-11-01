@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6fc15d1b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b5ed6a33';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=42f996a1';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -1888,6 +1888,12 @@ let streetWalls = [];
 let currentStreetPopulation = null;
 let currentStreetPlacement = null;
 let currentStreetTsid = STREET_INDEX.default;
+/**
+ * Where the avatar arrived on this street ({ tsid, x, y, from }): the signpost or door it came
+ * through, else the street's own arrival (a load from a save or a return from elsewhere is not an
+ * arrival). /stuck goes back here (features/slash-commands-feature.js, engine.stuckReturn).
+ */
+let streetArrival = null;
 /** Climb state: original Glitch walls and ladders */
 // regrabLock: AvatarController gets on a ladder on an Up/Down key press, not a held key; after leaving
 // one, a still-held Up/Down must not pull the avatar straight back on.
@@ -11037,6 +11043,35 @@ const engine = {
   },
   /** /who (location.js get_roster_msg): the player and the Glitches chatting on this street. */
   whoIsHere: () => [playerSpeechTarget?.label || 'Ur', ...localCompanions.map((actor) => actor.name), ...(features.query('remotePlayerNames', engine) || [])],
+  /**
+   * /stuck (features/slash-commands-feature.js): back to where you arrived on this street (the
+   * signpost or door you came through, else the street's own arrival), standing on its floor.
+   * Answers { ok, x, y, from } or { ok: false, reason }.
+   */
+  stuckReturn() {
+    if (!state.started || !player || !currentStreetTsid) return { ok: false, reason: 'not_started' };
+    let at = streetArrival?.tsid === currentStreetTsid ? streetArrival : null;
+    if (!at) return { ok: false, reason: 'no_arrival' };
+    // No arrival this visit (a load, a return): the street's own way in nearest you, a signpost or
+    // a door, where an arrival from it stands; the planned spawn only on a street with neither
+    // (it can sit anywhere, Mada Tamaha's pit included).
+    if (at.from === 'street') {
+      const ways = [...(currentStreet?.signposts || []), ...(currentStreet?.doors || [])]
+        .filter((w) => Number.isFinite(Number(w?.x)) && Number.isFinite(Number(w?.y)))
+        .map((w) => worldToScreen(currentStreet, Number(w.x), Number(w.y)));
+      const near = ways.sort((a, b) => Math.abs(a.x - player.x) - Math.abs(b.x - player.x))[0];
+      if (near) at = { ...at, x: clamp(near.x, 40, Math.max(80, WORLD_W - 40)), y: near.y, from: 'street' };
+    }
+    player.x = at.x;
+    // A little above the floor: the avatar settles onto it (resolveGround), as at an arrival.
+    player.y = at.y - 2;
+    player.vx = 0;
+    player.vy = 0;
+    player.onGround = false;
+    engine.snapCamera();
+    updateHud();
+    return { ok: true, x: at.x, y: at.y, from: at.from };
+  },
   /** Rebuild the current home room in place (decorate / cultivate changes). */
   async refreshHomeScene(opts = {}) {
     if (!homeIsInstanced()) return false;
@@ -21911,6 +21946,15 @@ async function enterStreet(tsid, opts = {}) {
     player.x = clamp(player.x, 40, Math.max(80, WORLD_W - 40));
     const streetH = bgLayer?.worldH || VIEW_H;
     player.y = clamp(player.y, 40, Math.max(80, streetH - 20));
+    // /stuck's spot: this arrival, or the street's own when this entry restores a place (quiet).
+    streetArrival = opts.quiet || !Number.isFinite(opts.spawnX)
+      ? {
+        tsid: data.tsid,
+        x: clamp(sourceSpawnX ?? WORLD_W * 0.5, 40, Math.max(80, WORLD_W - 40)),
+        y: clamp(spawn?.y ?? GROUND_Y, 40, Math.max(80, streetH - 20)),
+        from: 'street',
+      }
+      : { tsid: data.tsid, x: player.x, y: player.y, from: 'arrival' };
     player.vx = 0;
     player.vy = 0;
     player.onGround = true;
