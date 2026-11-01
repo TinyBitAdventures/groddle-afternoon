@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6fc15d1b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=aa89f717';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=b5ed6a33';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -730,7 +730,7 @@ import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
 import { WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, steerX, streetPhysicsExtras } from './js/avatar-step.js?v=33ad1926';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { FAILED_LINE, inVerbReach, movingLine, verbRange, walkOverEnd, walkOverGoalX } from './js/walk-over.js?v=db80ba07';
-import { isInHell } from './js/hell.js?v=6ffd0278';
+import { isInHell } from './js/hell.js?v=eb2a5cc4';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=0b81a3e4';

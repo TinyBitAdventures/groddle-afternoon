@@ -11,7 +11,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=f7ea0bd5';
-import { HELL_SPRITES } from '../public/js/hell.js?v=6ffd0278';
+import { HELL_SPRITES } from '../public/js/hell.js?v=eb2a5cc4';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');

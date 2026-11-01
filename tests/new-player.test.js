@@ -20,7 +20,7 @@ import { normalizePlayerSnapshot } from '../public/js/player-save.js?v=922f1eda'
 import { createQuoinState } from '../public/js/quoins.js?v=e75558c6';
 import { createShrineState } from '../public/js/shrines.js?v=7dd8f176';
 import { PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=a94b5875';
-import { imaginationFeature, STARTER_UPGRADES } from '../public/js/features/imagination-feature.js?v=0fb678d8';
+import { imaginationFeature, STARTER_UPGRADES } from '../public/js/features/imagination-feature.js?v=ee410558';
 import { RESOURCE_FEATURE_ID, resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js?v=189a6890';
 
 const here = import.meta.dirname;

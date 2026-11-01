@@ -259,6 +259,63 @@ export const NARAKA_STREETS = Object.freeze([
 ].map((row) => Object.freeze(row)));
 
 /**
+ * Mada Tamaha's way out of its pit (player report 2026-11-01, ticket 21).
+ *
+ * The street (GA524M0OMOE2OGT.xml, the same 42 platform lines and 8 walls the
+ * remake ships, no ladders, no doors, no physics) has no floor between source
+ * x -868 and 266: you drop 375 px into a closed pit (floor y -150, walls at
+ * x -1054 and 447, ledges overhead) and no jump climbs back. The street's
+ * items (LA524M0OMOE2OGT.xml 850-883) include four Collision-triggered
+ * Teleporters (IA525A2OMOE2UPJ, IA52572OMOE2UOD, IA52582OMOE2UO0, IA52592OMOE2UPQ;
+ * items/teleporter.js onPlayerCollision 55-77: pc.teleportToLocation to
+ * target_x/y), whose instances were never archived. Footage (1qsoo4vYM74,
+ * 2:28-2:54) shows the crossing: from Ratna Vitteha's post she walks right,
+ * drops into the pit (2:36), walks right along its floor, vanishes at its
+ * right end (2:44) and stands on the right-hand floor a second later, then
+ * walks on to Valuka Himsa's post.
+ *
+ * Rebuilt here, in screen space (sx = x + 2500, sy = y + 1200), as boxes the
+ * feet walk into (bottom-centre x, y, w, h) and the spot the avatar stands on
+ * after (same street): the right end, as filmed; the left end, inferred so the
+ * walk from Valuka Himsa back to Ratna Vitteha gets out the same way. Where the
+ * other two stood (and so which objref is which) is not on record. Hell's grapes still resurrect you
+ * wherever you are (bunch_of_grapes_hell.js).
+ */
+export const MADA_TAMAHA_TSID = 'GA524M0OMOE2OGT';
+export const NARAKA_TELEPORTERS = Object.freeze([
+  Object.freeze({
+    id: 'mada_pit_right',
+    from: MADA_TAMAHA_TSID,
+    to: MADA_TAMAHA_TSID,
+    same: true,
+    label: 'Mada Tamaha',
+    // Source x 377..447, the pit floor's right end (plat_1318991020499, y -155) by wall_1318991020502.
+    box: Object.freeze({ x: 2912, y: 1050, w: 70, h: 120 }),
+    // Source (360, -534): the right-hand floor past the pit's rim (plat_1318991020504).
+    arrive: Object.freeze({ x: 2860, y: 665 }),
+    why: 'Filmed: 1qsoo4vYM74 2:44-2:45, the right end of the pit floor to the floor above it on the right.',
+  }),
+  Object.freeze({
+    id: 'mada_pit_left',
+    from: MADA_TAMAHA_TSID,
+    to: MADA_TAMAHA_TSID,
+    same: true,
+    label: 'Mada Tamaha',
+    // Source x -1054..-984, the pit floor's left end (plat_1318974673731, y -149) by wall_1318974673730.
+    box: Object.freeze({ x: 1481, y: 1056, w: 70, h: 120 }),
+    // Source (-960, -525): the left-hand floor before the pit's rim (plat_1318974673726).
+    arrive: Object.freeze({ x: 1540, y: 673 }),
+    why: 'Inferred: the mirror of the filmed right end, for the walk from Valuka Himsa to Ratna Vitteha.',
+  }),
+]);
+
+/** Naraka's Collision-triggered Teleporters on a street (either TSID prefix). */
+export function narakaTeleportersOn(tsid) {
+  const key = String(tsid || '').slice(1);
+  return NARAKA_TELEPORTERS.filter((t) => t.from.slice(1) === key);
+}
+
+/**
  * Hell Bar instance (hell_quest `hell_bar`); its geometry is not in the public
  * dump, so it is rebuilt from reference (js/hell-bar.js, tools/build-hell-bar.mjs,
  * features/hell-bar-feature.js; G140).

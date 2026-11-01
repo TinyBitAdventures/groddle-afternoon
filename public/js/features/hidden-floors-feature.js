@@ -9,7 +9,10 @@
  *   floor, and the corner past its EXIT back; Ilmenskie's top-right ledge
  *   (a running Triple Jump off the mushroom caps) -> the missing floor, and
  *   its right end back. The avatar's feet must enter the box; travelGate is
- *   asked first (Hell, Pooped).
+ *   asked first (Hell, Pooped). Mada Tamaha's pit (js/hell.js
+ *   NARAKA_TELEPORTERS; player report 2026-11-01): a teleporter at each end
+ *   of the pit floor puts you back up on that side's floor, on the same
+ *   street (no loading, no travel gate: the dead walk Naraka).
  * - The painted "EXIT" on both floors: the forgotten floor's archived
  *   sign_txt and, on the lost floor, the word read off the footage.
  * - Goorsh Gam's canopy and Ilmenskie's cave mouth: there the avatar walks
@@ -50,6 +53,7 @@ import {
   isMissingFloorTsid,
   teleportersOn,
 } from '../hidden-floors.js?v=5ce87a04';
+import { narakaTeleportersOn } from '../hell.js?v=eb2a5cc4';
 
 export const HIDDEN_FLOORS_FEATURE_ID = 'hidden-floors';
 const CHECK_MS = 60;
@@ -128,6 +132,21 @@ function drawSign(engine, row) {
 }
 
 async function teleport(engine, row) {
+  // On its own street (pc.teleportToLocation to the street it is on): stand at the target.
+  if (row.same) {
+    const p = engine.player;
+    p.x = row.arrive.x;
+    p.y = row.arrive.y;
+    p.vx = 0;
+    p.vy = 0;
+    p.onGround = false;
+    engine.snapCamera?.();
+    teleports += 1;
+    last = row.id;
+    publish(engine, Date.now(), true);
+    engine.save?.();
+    return;
+  }
   const gate = engine.travelGate(row.to, { via: 'teleporter' });
   if (gate && gate.ok === false) {
     if (gate.msg) engine.toast(gate.msg);
@@ -171,7 +190,7 @@ export const hiddenFloorsFeature = {
       publish(engine, enteredAt, true);
       return;
     }
-    boxes = teleportersOn(street.tsid);
+    boxes = [...teleportersOn(street.tsid), ...narakaTeleportersOn(street.tsid)];
     zone = clientPhysicsZone(street);
     if (isIlmenskieTsid(street.tsid)) ceilings = ceilingsScreen(street);
     const row = exitSignOn(street.tsid);
