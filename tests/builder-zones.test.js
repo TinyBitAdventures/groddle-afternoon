@@ -12,15 +12,15 @@ import { join } from 'node:path';
 import { tokensOf, searchDecos, facetCounts, passesFacets, sizeClass, drawnSize, hubPlacements, newArtRows, thumbUrl, decoFor, textScore, queryWords, NEW_ART_BUNDLE } from '../public/js/builder/deco-search.js?v=fda9b16b';
 import { TEMPLATES, newStreet, newStreetOps, groundStrip, templateLayers, gradientFrom, hslHex, filtersFor, nextHubId, newHub, nextMapLine, mapWithStreet, mapWithoutStreet, profileOf, tallLayerHeight, FLOOR_Y, MAP_W, MAP_H } from '../public/js/builder/templates.js?v=22093310';
 import { parallaxLayerOffset } from '../public/js/street-render.js?v=b5ae0c3d';
-import { populationWith, plannedSpots, moveMapLine, mapForStreets, spotGroup } from '../public/js/builder/editor-zone.js?v=aec513c7';
+import { populationWith, plannedSpots, moveMapLine, mapForStreets, spotGroup } from '../public/js/builder/editor-zone.js?v=423f180f';
 import { intakeBody, base64Of } from '../public/js/builder/editor-picker.js?v=724352b6';
 import { streetWithEdits, editsOn, linkEdit, streetStats } from '../public/js/builder/zone.js?v=6a3db28e';
-import { applyZoneEdits } from '../public/js/builder/draft-play.js?v=df35eb27';
+import { applyZoneEdits } from '../public/js/builder/draft-play.js?v=20951b6d';
 import { applyOps } from '../public/js/builder/ops.js?v=acf30407';
 import { compileSchema } from '../public/js/builder/schema-check.js?v=cc9d1af4';
-import { validateZone, placementRequests } from '../public/js/builder/validate.js?v=6d3bc6e2';
-import { platformsScreen, worldToScreen, streetWidth } from '../public/js/street-model.js?v=23b926e5';
-import { populationForStreet, planStreetPlacements } from '../public/js/street-ecology.js?v=fd79899d';
+import { validateZone, placementRequests } from '../public/js/builder/validate.js?v=b77d4848';
+import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=23b926e5';
+import { populationForStreet, planStreetPlacements, streetReservedSpots } from '../public/js/street-ecology.js?v=315ff68c';
 import { arriveFor } from '../public/js/builder/geometry-handles.js?v=d39231a4';
 import { applyStreetIndex, clearStreetIndex } from '../public/js/street-loader.js?v=390e4702';
 import { loadValidatorContext } from '../tools/builder/validator-context.mjs';
@@ -248,7 +248,7 @@ describe('populations (js/builder/editor-zone.js, spec 6.7)', () => {
 
   it('shows the spots the planner gives, as game.js plans them', () => {
     const row = base.streets[0];
-    const spots = plannedSpots({ street: row.street, population: row.population, platformsScreen, worldToScreen, populationForStreet, planStreetPlacements, placementRequests, worldW: streetWidth(row.street) });
+    const spots = plannedSpots({ street: row.street, population: row.population, platformsScreen, streetReservedSpots, populationForStreet, planStreetPlacements, placementRequests, worldW: streetWidth(row.street) });
     const keys = spots.map((s) => s.key);
     assert.equal(keys.filter((k) => k === 'piggies').length, 2);
     assert.equal(keys.filter((k) => k === 'quoins').length, 6);

@@ -8,7 +8,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { GAME_DIR } from '../repos.mjs';
 import { GRAVITY, JUMP_SPEED, WALK_MAX, FLOOR_ACCEL, AIR_ACCEL_RATIO, STREET_PHYSICS_TERMINAL_VY, AVATAR_BODY_H, GROUND_SNAP, NORMAL_BUFF } from '../../public/js/avatar-step.js?v=c04c7c76';
-import { RULES, LIMITS, MIN_VIEW, PARALLAX_VIEW, LICENCES, plainApex } from '../../public/js/builder/validate.js?v=6d3bc6e2';
+import { RULES, LIMITS, MIN_VIEW, PARALLAX_VIEW, LICENCES, plainApex } from '../../public/js/builder/validate.js?v=b77d4848';
 import { REACH_LIMITS, POST_REACH_X, POST_BELOW, DOOR_REACH_X, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetWorld, jumpArc } from '../../public/js/builder/reach-graph.js?v=0eb97168';
 import { OP_NAMES } from '../../public/js/builder/ops.js?v=acf30407';
 import { LAYER_ROLES } from '../../public/js/builder/layer-role.js?v=e585f610';

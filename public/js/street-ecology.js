@@ -3,7 +3,7 @@
  * placement on recovered locations-xml platforms.
  */
 
-import { isItemSolid, isStandable } from './street-model.js?v=23b926e5';
+import { isItemSolid, isStandable, worldToScreen } from './street-model.js?v=23b926e5';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
 
@@ -400,22 +400,51 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
  * - rocks: the mining sheets' opaque art (assets/sprites/mining, cells 131-137 px)
  *   at spawnMineRock's 0.85: metal 134 -> 114 px, beryl and sparkly 114 -> 97,
  *   dullite 108 -> 92.
- * - piggies: the feet and body of the Piggy walk art (about 86 px at
- *   ENTITY_SCALE.piggy; snout and tail may overhang, as a canopy does), 60 px:
- *   a Piggy is a shared server object online, laid out from this plan, and must
- *   stand where a player beside it can reach it (tests/reach.test.js).
- * Chickens, Butterflies, quoins, apples and the rest keep the plain rule: any
- * line wide enough to sample.
+ * - the walking animals (lane DOORCLEAR, 2026-10-31: a Chicken stood on the tip
+ *   of a short branch up in Groddle Forest Junction's great tree and walked off
+ *   its ends): the body (ANIMAL_BODY) plus its patrol both ways (ANIMAL_PATROL,
+ *   game.js spawnPiggies / spawnChickens spr.range, the walk loop turning at
+ *   baseX +- range). Piggies: the feet and body of the walk art (about 86 px at
+ *   ENTITY_SCALE.piggy; snout and tail may overhang, as a canopy does), 60 px,
+ *   + 2 x 90 = 240; Chickens: the walk art's bird (54 px of the 148 px cell at
+ *   ENTITY_SCALE.chicken 0.702) 38 px, + 2 x 100 = 238. They keep off perches
+ *   while any floor has room (planStreetPlacements). A Piggy is a shared server object online, laid out from
+ *   this plan, and must stand where a player beside it can reach it
+ *   (tests/reach.test.js). When no spot has the room (a fallback) game.js
+ *   shortens the patrol to the floor it got (animalPatrolRange).
+ * - resting Butterflies: the rest frame's cell (70 px at ENTITY_SCALE.butterfly
+ *   0.702), 48 px, so one never sits on a stub narrower than itself. They fly,
+ *   so a branch or ledge is as good as a floor (PERCHING_GROUPS).
+ * Flying Butterflies, Batterflies (they fly loops 150 px over the floor), quoins,
+ * apples and the rest keep the plain rule: any line wide enough to sample.
  */
 export const TREE_FOOTPRINT = 180;
+export const ANIMAL_BODY = Object.freeze({ piggies: 60, chickens: 38 });
+export const ANIMAL_PATROL = Object.freeze({ piggies: 90, chickens: 100 });
 export const PLACEMENT_FOOTPRINTS = Object.freeze({
   trees: TREE_FOOTPRINT,
   gardens: 280,
   vendor: 106,
   shrine: 118,
   rocks: 100,
-  piggies: 60,
+  piggies: ANIMAL_BODY.piggies + 2 * ANIMAL_PATROL.piggies,
+  chickens: ANIMAL_BODY.chickens + 2 * ANIMAL_PATROL.chickens,
+  butterflies: 48,
 });
+/** Groups that need their room but may sit on a perch as readily as on a floor. */
+export const PERCHING_GROUPS = Object.freeze(['butterflies']);
+
+/**
+ * How far a walking animal planned at a spot with `room` (the plan point's room:
+ * twice the floor on its narrower side) patrols each way: its own range, or less
+ * when the floor is short, so it turns before the line ends.
+ */
+export function animalPatrolRange(key, room) {
+  const range = ANIMAL_PATROL[key];
+  if (!range) return 0;
+  if (!Number.isFinite(room)) return range;
+  return Math.max(0, Math.min(range, Math.floor((room - ANIMAL_BODY[key]) / 2)));
+}
 
 /**
  * Glitch floors are often many short lines joined end to end (or one line's
@@ -432,6 +461,88 @@ export const FLOOR_JOIN_PX = 6;
  * floor with nothing under it is a floor like any other.
  */
 export const PERCH_DROP_PX = 150;
+
+/**
+ * Keep-clear fixtures (lane DOORCLEAR, 2026-10-31): a Fruit Tree planted on
+ * Groddle Forest Junction's subway steps (door_1, door_asset_subway_forest_heights_1,
+ * 294 x 294 at 4099, 1063) hid half the way down. The planner reserves the
+ * street's fixed things, each as a floor point with a soft clearance (as the
+ * signposts always were) and a box the art covers (`block`):
+ * - doors (street.doors, build-street-navigation.mjs: screen space already,
+ *   bottom-centre, w x h; the client's DoorView and doors-feature buildView draw
+ *   the art there; hidden doors are not drawn): subway entrances, houses,
+ *   tower and machine-room doors, Bureaucratic Hall, cave mouths. Soft
+ *   clearance half the door's width, as the art is wide. A door is also a
+ *   doorway (`doorway: true`): its rect is where the player stands to go in
+ *   (doors.js insideBottomRect, the hit test).
+ * - ladder feet (street.ladders: world x centre, y bottom, h up, as
+ *   street-model.js climbWallsWorld reads them): the bottom LADDER_FOOT_PX of
+ *   the ladder, where the player steps on (LadderView).
+ * - signposts (world x, y at the post's foot, w x h), clearance 100 as before.
+ * Big scenery (PLACEMENT_HEIGHTS: trees, gardens, the vendor, shrines, rocks)
+ * never overlaps a block with its own box (footprint wide, height tall, standing
+ * on its spot); smaller things (quoins, apples, animals, Musicblocks, nodes)
+ * may stand beside a door but never inside its doorway. Only when every free
+ * spot breaks that does a thing still go down (never dropped), and the plan
+ * lists it under `blocked` ({ key, index, fixture }). The original placed
+ * every one of these by hand (GSJS obey_physics false), so no tree ever stood
+ * on a doorstep; the remake plans them and keeps the doors clear instead.
+ */
+export const PLACEMENT_HEIGHTS = Object.freeze({
+  trees: 210, // spawnTrees trantDisplayScale targetH
+  gardens: 80, // garden-view.js bed box (44 px) and the crops that grow from it
+  vendor: 127, // decos/groddle/vendor.webp 422 x 508 at 0.25
+  shrine: 147, // a shrine cell 188 px tall at spawnShrine's 0.78
+  rocks: 110, // the mining sheets' cells (131-137 px) at spawnMineRock's 0.85
+});
+export const LADDER_FOOT_PX = 120;
+/** Below a door's floor point, how far a spot still counts as its doorstep (a sloped floor). */
+export const DOORWAY_DROP_PX = 40;
+
+/**
+ * The street's keep-clear spots for planStreetPlacements, in screen space:
+ * { x, y, key, clearance, block: { l, r, t, b }, doorway? }. One helper for
+ * game.js enterStreet, the realtime data builders and the level builder, so
+ * every player's street and the server's layout match.
+ */
+export function streetReservedSpots(street) {
+  const out = [];
+  const bounds = street?.bounds;
+  const toScreen = (x, y) => (bounds ? worldToScreen(street, x, y) : { x, y });
+  const box = (x, y, w, h) => ({ l: x - w / 2, r: x + w / 2, t: y - h, b: y });
+  (street?.signposts || []).forEach((signpost, index) => {
+    if (!Number.isFinite(signpost?.x) || !Number.isFinite(signpost?.y)) return;
+    const point = toScreen(signpost.x, signpost.y);
+    out.push({ ...point, key: `signpost:${index}`, clearance: 100, block: box(point.x, point.y, Number(signpost.w) || 100, Number(signpost.h) || 200) });
+  });
+  for (const door of street?.doors || []) {
+    if (!door || door.hidden || !Number.isFinite(door.x) || !Number.isFinite(door.y)) continue;
+    const w = Number(door.w) > 0 ? Number(door.w) : 60;
+    const h = Number(door.h) > 0 ? Number(door.h) : 110;
+    out.push({ x: door.x, y: door.y, key: `door:${door.id}`, clearance: Math.round(w / 2), block: box(door.x, door.y, w, h), doorway: true });
+  }
+  for (const ladder of street?.ladders || []) {
+    if (!ladder || !Number.isFinite(ladder.x) || !Number.isFinite(ladder.y) || !(ladder.h > 0)) continue;
+    const foot = toScreen(ladder.x, ladder.y);
+    const w = Number(ladder.w) > 0 ? Number(ladder.w) : 50;
+    out.push({ ...foot, key: `ladder:${ladder.id}`, clearance: Math.round(w / 2), block: box(foot.x, foot.y, w, Math.min(ladder.h, LADDER_FOOT_PX)) });
+  }
+  return out;
+}
+
+/** The first fixture a thing at `spot` would cover: big scenery by its box, the rest by the doorways. */
+export function blockingFixture(spot, fixtures, { footprint = 0, height = 0 } = {}) {
+  for (const fixture of fixtures || []) {
+    const b = fixture?.block;
+    if (!b) continue;
+    if (footprint > 0 && height > 0) {
+      if (spot.x - footprint / 2 < b.r && b.l < spot.x + footprint / 2 && spot.y - height < b.b && b.t < spot.y) return fixture;
+    } else if (fixture.doorway && spot.x > b.l && spot.x < b.r && spot.y >= b.t && spot.y <= b.b + DOORWAY_DROP_PX) {
+      return fixture;
+    }
+  }
+  return null;
+}
 
 function pointToSegment(px, py, p) {
   const dx = p.x2 - p.x1;
@@ -588,13 +699,24 @@ function scaledDistance(a, b, verticalScale = 1.75) {
  * obey_physics false), where the player reaches them, so they keep the avatar's
  * floor too; a shelf only items rest on (pc_perm 0, item_perm -1) holds none.
  *
- * Big scenery (PLACEMENT_FOOTPRINTS, or a request's own `footprint`) also needs
- * room: a spot whose floor run holds its width, half on each side. Among those it
- * takes, in order: a floor spot clear of everything placed (nearest >= 1), a
- * perch (PERCH_DROP_PX) that is clear, a crowded floor spot, a crowded perch;
- * the plan lists perches under `perches` ({ key, index }). When no free spot has
- * the room the thing still goes down, on the roomiest spots left, and the plan
- * lists it under `fallbacks` ({ key, index, room, footprint }).
+ * Big scenery and the animals (PLACEMENT_FOOTPRINTS, or a request's own
+ * `footprint`) also need room: a spot whose floor run holds its width (an
+ * animal's: its walk), half on each side. Among those it takes, in order: a floor
+ * spot clear of everything placed (nearest >= 1), a perch (PERCH_DROP_PX) that is
+ * clear, a crowded floor spot, a crowded perch. A walking animal (ANIMAL_PATROL)
+ * takes any floor spot, crowded or not, before a perch; PERCHING_GROUPS (or
+ * `perch: true`) take a perch as a floor. The plan lists perches under `perches`
+ * ({ key, index }).
+ * When no free spot has the room the thing still goes down, on the roomiest spots
+ * left, and the plan lists it under `fallbacks` ({ key, index, room, footprint }).
+ * Every placed point carries its spot's `room`.
+ *
+ * Reserved spots that carry a `block` (streetReservedSpots: doors, ladder feet,
+ * signposts) are kept clear before all of that: big scenery (PLACEMENT_HEIGHTS,
+ * or a request's own `height`) never covers one, nothing else stands in a
+ * doorway, and the room asked for is the most a clear spot has. When no clear
+ * spot is left the thing goes on the best covering one and the plan lists it
+ * under `blocked` ({ key, index, fixture }).
  *
  * @param {any[]} platforms
  * @param {{key:string,count:number,clearance:number,footprint?:number}[]} requests
@@ -607,10 +729,12 @@ export function planStreetPlacements(
   const candidates = buildPlatformCandidates(platforms, { worldW, seed });
   const occupied = (reserved || []).filter((p) => Number.isFinite(p?.x) && Number.isFinite(p?.y))
     .map((point, index) => ({ ...point, key: point.key || `reserved:${index}`, clearance: whole(point.clearance, 120, 600) }));
+  const fixtures = occupied.filter((point) => point.block);
   const used = new Set();
   const groups = {};
   const fallbacks = [];
   const perches = [];
+  const blocked = [];
 
   for (const request of requests || []) {
     const count = whole(request?.count, 0, 40);
@@ -620,14 +744,30 @@ export function planStreetPlacements(
     const footprint = avatar ? 0 : Number.isFinite(request?.footprint)
       ? Math.max(0, request.footprint)
       : PLACEMENT_FOOTPRINTS[request.key] || 0;
+    const perching = request?.perch === true || PERCHING_GROUPS.includes(request.key);
+    const walker = Boolean(ANIMAL_PATROL[request.key]);
+    const height = Number.isFinite(request?.height) ? Math.max(0, request.height) : PLACEMENT_HEIGHTS[request.key] || 0;
+    // The fixture each spot would cover for this request (null: clear); the arrival covers nothing.
+    const covers = new Map();
+    if (!avatar && fixtures.length) {
+      for (const candidate of candidates) {
+        const fixture = blockingFixture(candidate, fixtures, { footprint, height });
+        if (fixture) covers.set(candidate.id, fixture);
+      }
+    }
     for (let index = 0; index < count; index += 1) {
-      // The room this one asks for: its footprint, or the most any free spot has.
+      // The room this one asks for: its footprint, or the most any free clear spot
+      // has (any free spot's, when none is clear).
       let need = 0;
       if (footprint > 0) {
+        let clearNeed = -1;
         for (const candidate of candidates) {
           if (used.has(candidate.id) || candidate.item === false) continue;
-          need = Math.max(need, Math.min(footprint, candidate.room || 0));
+          const room = Math.min(footprint, candidate.room || 0);
+          need = Math.max(need, room);
+          if (!covers.has(candidate.id)) clearNeed = Math.max(clearNeed, room);
         }
+        if (clearNeed >= 0) need = clearNeed;
         if (need < footprint) fallbacks.push({ key: request.key, index, room: Math.round(need), footprint });
       }
       let best = null;
@@ -649,9 +789,12 @@ export function planStreetPlacements(
         const edgeBias = Math.min(candidate.x, worldW - candidate.x) / Math.max(1, worldW) * 0.08;
         const jitter = (stableEcologyHash(`${seed}:${request.key}:${index}:${candidate.id}`) % 1000) / 100000;
         const score = nearest + centerBias + edgeBias + jitter;
-        const tier = footprint > 0
-          ? ((candidate.under || 0) >= footprint ? 1 : 0) + (nearest < 1 ? 2 : 0)
-          : 0;
+        const perch = !perching && (candidate.under || 0) >= footprint;
+        // Big scenery: a clear perch before a crowded floor; a walking animal stays on
+        // the floor while it has room, crowded or not (it walks off as others come).
+        const tier = (footprint > 0
+          ? walker ? (perch ? 2 : 0) + (nearest < 1 ? 1 : 0) : (perch ? 1 : 0) + (nearest < 1 ? 2 : 0)
+          : 0) + (covers.has(candidate.id) ? 4 : 0);
         if (tier < bestTier || (tier === bestTier && score > bestScore)) {
           bestTier = tier;
           bestScore = score;
@@ -659,15 +802,16 @@ export function planStreetPlacements(
         }
       }
       if (!best) break;
-      if (footprint > 0 && (best.under || 0) >= footprint) perches.push({ key: request.key, index });
+      if (footprint > 0 && !perching && (best.under || 0) >= footprint) perches.push({ key: request.key, index });
+      if (covers.has(best.id)) blocked.push({ key: request.key, index, fixture: covers.get(best.id).key });
       used.add(best.id);
-      const point = { x: best.x, y: best.y, id: best.id, key: request.key, clearance };
+      const point = { x: best.x, y: best.y, id: best.id, key: request.key, clearance, room: best.room || 0 };
       groups[request.key].push(point);
       occupied.push(point);
     }
   }
 
-  return { seed: String(seed), groups, occupied, candidateCount: candidates.length, fallbacks, perches };
+  return { seed: String(seed), groups, occupied, candidateCount: candidates.length, fallbacks, perches, blocked };
 }
 
 export function nearestPlacementGap(plan, fromKey, toKeys = null) {

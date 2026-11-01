@@ -33,11 +33,11 @@ export function populationWith(pop, cls, n) {
   return { ...(pop || {}), counts: ordered };
 }
 
-/** PURE: the spots the planner gives a street's population (js/street-ecology.js, as game.js plans them). */
-export function plannedSpots({ street, population, platformsScreen, worldToScreen, populationForStreet, planStreetPlacements, placementRequests, worldW }) {
+/** PURE: the spots the planner gives a street's population (js/street-ecology.js, as game.js plans them, signposts, doors and ladder feet kept clear). */
+export function plannedSpots({ street, population, platformsScreen, streetReservedSpots, populationForStreet, planStreetPlacements, placementRequests, worldW }) {
   if (!street || !population) return [];
   const pop = populationForStreet(street.tsid, { ...population, counts: population.counts || {} });
-  const reserved = (street.signposts || []).map((s, i) => ({ ...worldToScreen(street, s.x, s.y), key: `signpost:${i}`, clearance: 100 }));
+  const reserved = streetReservedSpots(street);
   const plan = planStreetPlacements(platformsScreen(street), placementRequests(pop), { worldW, seed: street.tsid, reserved });
   const out = [];
   for (const [key, points] of Object.entries(plan.groups || {})) for (const p of points) out.push({ key, x: p.x, y: p.y });

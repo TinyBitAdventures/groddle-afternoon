@@ -3,7 +3,8 @@
  * (the realtime server's quoins.go). For every street in public/assets/streets/index.json
  * it lays out the natural quoins exactly as game.js enterStreet does (the
  * street's source population, then planStreetPlacements over the street's
- * own platforms with the same group order and the signposts reserved) and
+ * own platforms with the same group order and the same keep-clear spots,
+ * street-ecology.js streetReservedSpots: signposts, doors, ladder feet) and
  * writes each spot's place, type and class, plus the class table from
  * js/quoins.js QUOIN_CLASSES (items/quoin.js onPropsChanged 318-662).
  *
@@ -26,13 +27,14 @@ import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=390e4702';
-import { platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js?v=23b926e5';
+import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=23b926e5';
 import {
   ecologyForStreet,
   planStreetPlacements,
   populationForStreet,
   setStreetEcologyCatalog,
-} from '../public/js/street-ecology.js?v=fd79899d';
+  streetReservedSpots,
+} from '../public/js/street-ecology.js?v=315ff68c';
 import {
   MYSTERY_QUOIN_KINDS,
   QUOIN_CLASSES,
@@ -86,10 +88,7 @@ export function streetEcology(tsid) {
 export function streetQuoinLayout(data, { starter = false, ecology = streetEcology(data.tsid) } = {}) {
   const population = populationForStreet(data.tsid, ecology, { starter });
   if (!population.quoins) return [];
-  const reserved = (data.signposts || []).map((signpost, index) => {
-    const point = worldToScreen(data, signpost.x, signpost.y);
-    return { ...point, key: `signpost:${index}`, clearance: 100 };
-  });
+  const reserved = streetReservedSpots(data);
   const plan = planStreetPlacements(platformsScreen(data), placementRequests(population), {
     worldW: streetWidth(data),
     seed: data.tsid,

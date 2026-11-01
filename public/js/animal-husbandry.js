@@ -45,7 +45,7 @@ import { isMissingFloorTsid } from './hidden-floors.js?v=5ce87a04';
 import { stationByTsid } from './subway.js?v=646ae6af';
 import { ensurePiggyMood, piggyTwiceDailyTick, satePiggy } from './animal-mood.js?v=a49495fc';
 import { isCrowdSad } from './animal-crowding.js?v=81f4b6ea';
-import { ecologyForStreet } from './street-ecology.js?v=fd79899d';
+import { ecologyForStreet } from './street-ecology.js?v=315ff68c';
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;

@@ -14,10 +14,10 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, normalize } from 'node:path';
 import { GAME_DIR } from '../repos.mjs';
 import { openBrowser } from '../qa/browser.mjs';
-import { validateZone, placementRequests } from '../../public/js/builder/validate.js?v=6d3bc6e2';
-import { planStreetPlacements, populationForStreet } from '../../public/js/street-ecology.js?v=fd79899d';
-import { platformsScreen, streetWidth, worldToScreen } from '../../public/js/street-model.js?v=23b926e5';
-import { plannedSpots } from '../../public/js/builder/editor-zone.js?v=aec513c7';
+import { validateZone, placementRequests } from '../../public/js/builder/validate.js?v=b77d4848';
+import { planStreetPlacements, populationForStreet, streetReservedSpots } from '../../public/js/street-ecology.js?v=315ff68c';
+import { platformsScreen, streetWidth } from '../../public/js/street-model.js?v=23b926e5';
+import { plannedSpots } from '../../public/js/builder/editor-zone.js?v=423f180f';
 
 /** Fatal rules that still render (the street loads; see renderInput). */
 export const RENDERS_ANYWAY = new Set(['AST-001']);
@@ -28,7 +28,7 @@ const TYPES = { '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'te
 export function populationSpots(row) {
   const s = row?.street;
   if (!s || !row.population) return [];
-  return plannedSpots({ street: s, population: row.population, platformsScreen, worldToScreen, populationForStreet, planStreetPlacements, placementRequests, worldW: streetWidth(s) });
+  return plannedSpots({ street: s, population: row.population, platformsScreen, streetReservedSpots, populationForStreet, planStreetPlacements, placementRequests, worldW: streetWidth(s) });
 }
 
 /**

@@ -30,7 +30,7 @@
 import { compileSchema } from './schema-check.js?v=cc9d1af4';
 import { reachStreet, REACH_LIMITS, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetBuff } from './reach-graph.js?v=0eb97168';
 import { platformsScreen, barriersScreen, isStandable, isSolidFromBelow, isItemFloor, assertStreetGeometry, avatarHeadReach, platformYAt, worldToScreen, streetWidth, streetHeight } from '../street-model.js?v=23b926e5';
-import { planStreetPlacements, populationForStreet } from '../street-ecology.js?v=fd79899d';
+import { planStreetPlacements, populationForStreet, streetReservedSpots } from '../street-ecology.js?v=315ff68c';
 import { JUMP_SPEED } from '../avatar-step.js?v=c04c7c76';
 import { STY_RULES, styleFindings } from './style-rules.js?v=abf9bfae';
 import { EFFECT_LIMITS, effectsCost, normaliseEmitter, rumbleShare, emitterAnchor } from '../street-effects.js?v=e427650f';
@@ -543,7 +543,7 @@ export function validateZone(zone, ctx = {}) {
         f('POP-002', 'population', 'The street has a population but no floor that holds items.', null, {}, 'Give a floor line item_perm -1 (Floor).');
       } else if (total > 0) {
         const pop = populationForStreet(s.tsid, { ...row.population, counts: row.population.counts || {} });
-        const plan = planStreetPlacements(lines, placementRequests(pop), { worldW: W, seed: s.tsid });
+        const plan = planStreetPlacements(lines, placementRequests(pop), { worldW: W, seed: s.tsid, reserved: streetReservedSpots(s) });
         const short = placementRequests(pop).filter((q) => (plan.groups[q.key] || []).length < q.count).map((q) => ({ key: q.key, wanted: q.count, placed: (plan.groups[q.key] || []).length }));
         if (short.length) f('POP-001', 'population', `The planner could not place everything: ${short.map((x) => `${x.placed} of ${x.wanted} ${x.key}`).join(', ')}.`, null, { short }, 'Lengthen the floors, or ask for fewer.');
       }

@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=20b826eb';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=55e0524d';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=c7b973de';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8ea60b8f';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -459,8 +459,8 @@ import {
 } from './js/inventory.js?v=85d4faba';
 import { PACK_COPY, unitRankAt } from './js/pack-slots.js?v=00bca2cf';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=9b23e21a';
-import { listAnimalFeedOptions } from './js/animals.js?v=3fbbca52';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=3fbbca52';
+import { listAnimalFeedOptions } from './js/animals.js?v=fc721127';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=fc721127';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -592,7 +592,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=390e4702';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=df35eb27';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=20951b6d';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -776,7 +776,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=3fbbca52';
+} from './js/animals.js?v=fc721127';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -867,8 +867,11 @@ import {
   ecologyForStreet,
   populationForStreet,
   planStreetPlacements,
+  streetReservedSpots,
+  animalPatrolRange,
+  ANIMAL_PATROL,
   nearestPlacementGap,
-} from './js/street-ecology.js?v=fd79899d';
+} from './js/street-ecology.js?v=315ff68c';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=a1c4a308';
 import {
   actionLoopFor,
@@ -11141,7 +11144,7 @@ function spawnPiggies(xs) {
     spr.y = GROUND_Y + 2;
     spr.vx = (i % 2 === 0 ? 1 : -1) * 0.45;
     spr.baseX = x;
-    spr.range = 90;
+    spr.range = ANIMAL_PATROL.piggies;
     spr.zIndex = itemZ('npc_piggy', 2);
     spr.playPet = (durationMs = 0) => {
       const actionFrames = textures.piggyNibble.frames.slice(0, 10);
@@ -11190,7 +11193,7 @@ function spawnChickens(xs) {
     spr.y = GROUND_Y + 2;
     spr.vx = i % 2 ? -0.5 : 0.5;
     spr.baseX = x;
-    spr.range = 100;
+    spr.range = ANIMAL_PATROL.chickens;
     spr.zIndex = itemZ('npc_chicken', 1);
     spr.playSqueeze = (durationMs = 0) => {
       const actionFrames = textures.chickenPeck.frames.slice(0, 6);
@@ -21208,10 +21211,9 @@ async function enterStreet(tsid, opts = {}) {
   for (const feature of features.features) {
     if (typeof feature.vendorProfile === 'function') activeVendor = feature.vendorProfile(activeVendor, engine) || activeVendor;
   }
-  const reserved = (data.signposts || []).map((signpost, index) => {
-    const point = worldToScreen(data, signpost.x, signpost.y);
-    return { ...point, key: `signpost:${index}`, clearance: 100 };
-  });
+  // Signposts, doors and ladder feet stay clear (street-ecology.js streetReservedSpots,
+  // shared with the realtime server's layout).
+  const reserved = streetReservedSpots(data);
   // Multiplayer: no per-player reservation, so every player's street (and the
   // realtime server's layout, tools/build-realtime-objects.mjs) puts each
   // rock, tree and node in the same place.
@@ -21243,15 +21245,16 @@ async function enterStreet(tsid, opts = {}) {
   // Place living content on its reserved real-platform anchors.
   const pigPoints = placement('piggies');
   piggies = spawnPiggies(pigPoints.map((p) => p.x));
+  // A walking animal turns before its floor ends (street-ecology.js animalPatrolRange).
   piggies.forEach((spr, i) => {
     const p = pigPoints[i];
-    if (p) { spr.x = p.x; spr.y = p.y + 2; spr.baseX = p.x; }
+    if (p) { spr.x = p.x; spr.y = p.y + 2; spr.baseX = p.x; spr.range = animalPatrolRange('piggies', p.room); }
   });
   const chickenPoints = placement('chickens');
   chickens = spawnChickens(chickenPoints.map((p) => p.x));
   chickens.forEach((spr, i) => {
     const p = chickenPoints[i];
-    if (p) { spr.x = p.x; spr.y = p.y + 2; spr.baseX = p.x; }
+    if (p) { spr.x = p.x; spr.y = p.y + 2; spr.baseX = p.x; spr.range = animalPatrolRange('chickens', p.room); }
   });
   const butterflyPoints = placement('butterflies');
   butterflies = spawnButterflies(

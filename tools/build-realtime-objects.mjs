@@ -7,7 +7,8 @@
  * For every street in public/assets/streets/index.json it lays the objects
  * out exactly as game.js enterStreet does (the street's source population,
  * then planStreetPlacements over the street's own platforms with the same
- * group order and the signposts reserved), so the server knows each object's
+ * group order and the same keep-clear spots, street-ecology.js
+ * streetReservedSpots: signposts, doors, ladder feet), so the server knows each object's
  * class and place and can check a player stands near it. It also copies the
  * rule numbers the server applies from the game's own modules, so the two
  * never drift:
@@ -47,13 +48,14 @@ import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=390e4702';
-import { platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js?v=23b926e5';
+import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=23b926e5';
 import {
   ecologyForStreet,
   planStreetPlacements,
   populationForStreet,
   setStreetEcologyCatalog,
-} from '../public/js/street-ecology.js?v=fd79899d';
+  streetReservedSpots,
+} from '../public/js/street-ecology.js?v=315ff68c';
 import { ROCK_CATALOG } from '../public/js/mining.js?v=15c7bd6e';
 import { MEGA_ROCK_CHANCE, MEGA_ROCK_CHUNKS } from '../public/js/imagination-effects.js?v=70169933';
 import { RESOURCE_NODE_CATALOG, RESOURCE_SKILL_PACKAGES } from '../public/js/resource-nodes.js?v=51d64696';
@@ -115,10 +117,7 @@ function groundY(platforms) {
 export function streetObjectLayout(data, { starter = false, ecology = ecologyForStreet(data.tsid) } = {}) {
   const population = populationForStreet(data.tsid, ecology, { starter });
   const platforms = platformsScreen(data);
-  const reserved = (data.signposts || []).map((signpost, index) => {
-    const point = worldToScreen(data, signpost.x, signpost.y);
-    return { ...point, key: `signpost:${index}`, clearance: 100 };
-  });
+  const reserved = streetReservedSpots(data);
   const plan = planStreetPlacements(platforms, placementRequests(population), {
     worldW: streetWidth(data),
     seed: data.tsid,

@@ -99,9 +99,9 @@ import {
 import { ROCK_CATALOG } from '../mining.js?v=15c7bd6e';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=58743072';
-import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=3fbbca52';
+import { animalStatusLabel, pickerMaxCount } from '../animals.js?v=fc721127';
 import { highestAnimalKinshipRank, quoteAnimalKinship } from '../animal-kinship.js?v=91490913';
-import { PIGGY_FEED, itemBaseCost } from '../animal-husbandry.js?v=f273e2e7';
+import { PIGGY_FEED, itemBaseCost } from '../animal-husbandry.js?v=beead095';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;

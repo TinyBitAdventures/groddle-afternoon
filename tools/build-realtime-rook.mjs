@@ -32,8 +32,8 @@ import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=390e4702';
-import { platformsScreen, streetWidth, worldToScreen } from '../public/js/street-model.js?v=23b926e5';
-import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=fd79899d';
+import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=23b926e5';
+import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=315ff68c';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=85d4faba';
 import { loadRecipeCatalogFromFile } from '../public/js/making.js?v=fe73bfce';
 import { SHRINE_ITEM_BASE_COSTS, donationValueFor, giantForStreet } from '../public/js/shrines.js?v=01b185bc';
@@ -61,10 +61,7 @@ export function streetShrine(data, { starter = false, ecology = ecologyForStreet
   const population = populationForStreet(data.tsid, ecology, { starter });
   if (!population.shrine) return null;
   const platforms = platformsScreen(data);
-  const reserved = (data.signposts || []).map((signpost, index) => {
-    const point = worldToScreen(data, signpost.x, signpost.y);
-    return { ...point, key: `signpost:${index}`, clearance: 100 };
-  });
+  const reserved = streetReservedSpots(data);
   const worldW = streetWidth(data);
   const plan = planStreetPlacements(platforms, placementRequests(population), { worldW, seed: data.tsid, reserved });
   const point = plan.groups.shrine?.[0] || { x: worldW * 0.72, y: groundY(platforms) };
