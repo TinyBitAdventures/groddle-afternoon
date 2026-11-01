@@ -14,7 +14,7 @@ import { join } from 'node:path';
 import { buildPack, zonePieces, loadShippedStreets, loadPalette, decoColour, applyMatrix, swatches, PROMPT_MAX, KEY_HEX, shapeWords, keepPromptHistory, KINDS } from '../tools/builder/art-bible.mjs';
 import {
   blank, decodePng, encodePng, keyOut, estimateKey, looksLikeCheckerboard, seamScore, fixSeam, snapToPalette,
-  resize, opaqueBox, surfaceRow, alphaShare, transpose, seamScoreV, bottomSolid,
+  resize, opaqueBox, surfaceRow, alphaShare, transpose, seamScoreV, bottomSolid, readImage,
 } from '../tools/builder/art-image.mjs';
 import { prepare, fitSize, newName, toolLine, runIntake, pinkShare, promptFileFor } from '../tools/builder/art-intake.mjs';
 import { swapOps, copyZone, lineUnder } from '../tools/builder/art-apply.mjs';
@@ -384,9 +384,24 @@ describe('intake of returned pictures (art-intake.mjs)', () => {
       assert.equal(ledge.report.background, 'magenta');
       assert.equal(ledge.w, 120, 'a ledge is scaled to the target width');
       assert.equal(ledge.report.surface, 0, 'trimmed to its top');
-      const kept = decodePng(readFileSync(join(dir, 'ready', ledge.file)));
+      // WebP by default (lane GROUNDED): quality 90, lossless alpha, method 6; format and bytes recorded.
+      assert.match(ledge.file, /^gz_ai_t3_ledge\.webp$/);
+      assert.match(ledge.format, /^webp \(-quality 90 -define webp:alpha-quality=100 -define webp:method=6/);
+      const bytes = readFileSync(join(dir, 'ready', ledge.file));
+      assert.equal(bytes.subarray(8, 12).toString('latin1'), 'WEBP');
+      assert.equal(ledge.bytes, bytes.length);
+      const kept = readImage(join(dir, 'ready', ledge.file));
       assert.equal(kept.w, 120);
-      assert.equal(JSON.parse(readFileSync(join(dir, 'ready/intake.json'), 'utf8')).pieces.length, 2);
+      assert.equal(kept.px[3], 255, 'its top-left is solid art');
+      const intake = JSON.parse(readFileSync(join(dir, 'ready/intake.json'), 'utf8'));
+      assert.equal(intake.pieces.length, 2);
+      assert.equal(intake.picture, 'webp');
+      assert.equal(intake.bytes, r.pieces[0].bytes + r.pieces[1].bytes);
+      // --png keeps the old PNG output (old packs of PNGs still apply the same way).
+      const png = runIntake(dir, { today: '2026-10-31', format: 'png', only: new Set(['ledge']) });
+      assert.equal(png.pieces[0].file, 'gz_ai_t3_ledge.png');
+      assert.equal(decodePng(readFileSync(join(dir, 'ready', png.pieces[0].file))).w, 120);
+      assert.ok(png.pieces[0].bytes > ledge.bytes);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

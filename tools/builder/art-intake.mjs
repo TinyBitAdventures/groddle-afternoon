@@ -13,15 +13,16 @@
  *      upscaling only when the model gave less, and said);
  *   5. its colours pulled lightly toward the bible's palette (--snap 0 turns it off);
  *   6. measured: sharpness, how far it was upscaled, a ledge's walkable surface, its top edge;
- *   7. written to ready/<gz_ai_<tag>_<piece>>.png with ready/intake.json: per piece the file, sha256,
- *      size, what was done, warnings, and provenance (licence ai-generated, CC0 1.0: author, the
+ *   7. written to ready/<gz_ai_<tag>_<piece>>.webp (lossy quality 90, lossless alpha, method 6: about
+ *      an eighth of the PNG's bytes; --png keeps PNG) with ready/intake.json: per piece the file, its
+ *      format and bytes, sha256, size, what was done, warnings, and provenance (licence ai-generated, CC0 1.0: author, the
  *      model named in drop/model.txt or --model, the prompt text, the date, and the inputs: the
  *      Tiny Speck CC0 reference decos the prompt attached, as deco:<name>). A picture
  *      art-generate.mjs made (its sha256 in drop/generated.json) keeps that run's record instead:
  *      the model, the prompt actually sent (with any corrective line), the date it was made, and
  *      "via the Gemini API" in place of T3 Chat.
  *
- *   node tools/builder/art-intake.mjs <pack dir> [--model "<name>"] [--tag t3] [--snap 0.12] [--only a,b]
+ *   node tools/builder/art-intake.mjs <pack dir> [--model "<name>"] [--tag t3] [--snap 0.12] [--only a,b] [--png]
  *
  * Pieces with no picture in drop/ are listed as waiting. Exit 1 when a picture was refused.
  * tools/builder/art-apply.mjs then puts ready/ into a copy of the draft.
@@ -31,7 +32,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSy
 import { basename, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  readImage, writePng, alphaShare, estimateKey, keyOut, looksLikeCheckerboard, clearHidden, opaqueBox, crop,
+  readImage, writePng, writeWebp, WEBP_ARGS, alphaShare, estimateKey, keyOut, looksLikeCheckerboard, clearHidden, opaqueBox, crop,
   seamScore, fixSeam, seamScoreV, fixSeamV, bottomSolid, resize, snapToPalette, sharpness, surfaceRow, topAt, isImageFile, rgbToHex,
 } from './art-image.mjs';
 
@@ -218,7 +219,7 @@ export function modelsFor(dir, fallback = '') {
   return (short) => per[short] || per[`${short}.png`] || one;
 }
 
-export function runIntake(dir, { model = '', tag = 't3', snap = 0.12, only = null, today = new Date().toISOString().slice(0, 10) } = {}) {
+export function runIntake(dir, { model = '', tag = 't3', snap = 0.12, only = null, format = 'webp', today = new Date().toISOString().slice(0, 10) } = {}) {
   const pack = JSON.parse(readFileSync(join(dir, 'pieces.json'), 'utf8'));
   const modelOf = modelsFor(dir, model);
   const generated = generatedRecord(dir);
@@ -247,8 +248,10 @@ export function runIntake(dir, { model = '', tag = 't3', snap = 0.12, only = nul
       refused.push(row);
       continue;
     }
-    const buf = writePng(join(readyDir, `${name}.png`), img);
-    row.file = `${name}.png`;
+    const buf = format === 'png' ? writePng(join(readyDir, `${name}.png`), img) : writeWebp(join(readyDir, `${name}.webp`), img);
+    row.file = `${name}.${format}`;
+    row.format = format === 'png' ? 'png' : `webp (${WEBP_ARGS.join(' ')})`;
+    row.bytes = buf.length;
     row.sha256 = sha(buf);
     row.w = img.w;
     row.h = img.h;
@@ -265,7 +268,7 @@ export function runIntake(dir, { model = '', tag = 't3', snap = 0.12, only = nul
     };
     done.push(row);
   }
-  const out = { format: 'groddle-art-intake/1', zone: pack.zone, tag, snap, pieces: done, refused, waiting };
+  const out = { format: 'groddle-art-intake/1', zone: pack.zone, tag, snap, picture: format, bytes: done.reduce((t, p) => t + p.bytes, 0), pieces: done, refused, waiting };
   writeFileSync(join(readyDir, 'intake.json'), `${JSON.stringify(out, null, 1)}\n`);
   return out;
 }
@@ -276,9 +279,10 @@ async function main(argv) {
     return i >= 0 ? argv[i + 1] : null;
   };
   const valued = new Set(['--model', '--tag', '--snap', '--only']);
+  const format = argv.includes('--png') ? 'png' : 'webp';
   const dir = argv.find((a, i) => !a.startsWith('--') && !valued.has(argv[i - 1]));
   if (!dir || !existsSync(join(dir, 'pieces.json'))) {
-    process.stderr.write('node tools/builder/art-intake.mjs <pack dir (with pieces.json)> [--model "<name>"] [--tag t3] [--snap 0.12] [--only a,b]\n');
+    process.stderr.write('node tools/builder/art-intake.mjs <pack dir (with pieces.json)> [--model "<name>"] [--tag t3] [--snap 0.12] [--only a,b] [--png]\n');
     return 2;
   }
   const r = runIntake(resolve(dir), {
@@ -286,11 +290,12 @@ async function main(argv) {
     tag: opt('--tag') || 't3',
     snap: opt('--snap') !== null ? Number(opt('--snap')) : 0.12,
     only: opt('--only') ? new Set(opt('--only').split(',')) : null,
+    format,
   });
-  for (const p of r.pieces) process.stdout.write(`ready    ${p.file.padEnd(40)} ${p.w}x${p.h}  ${p.report.background}${p.report.seam ? `  seam ${p.report.seam.before} -> ${p.report.seam.after}` : ''}  sharp ${p.report.sharpness}${p.report.warnings.length ? `\n         warn: ${p.report.warnings.join(' | ')}` : ''}\n`);
+  for (const p of r.pieces) process.stdout.write(`ready    ${p.file.padEnd(40)} ${p.w}x${p.h}  ${(p.bytes / 1024).toFixed(0)} KB  ${p.report.background}${p.report.seam ? `  seam ${p.report.seam.before} -> ${p.report.seam.after}` : ''}  sharp ${p.report.sharpness}${p.report.warnings.length ? `\n         warn: ${p.report.warnings.join(' | ')}` : ''}\n`);
   for (const p of r.refused) process.stdout.write(`REFUSED  ${p.drop}: ${p.report.refused}\n`);
   if (r.waiting.length) process.stdout.write(`waiting  ${r.waiting.join(', ')}\n`);
-  process.stdout.write(`${r.pieces.length} ready, ${r.refused.length} refused, ${r.waiting.length} waiting -> ${join(resolve(dir), 'ready/intake.json')}\n`);
+  process.stdout.write(`${r.pieces.length} ready (${(r.bytes / 1e6).toFixed(1)} MB as ${format}), ${r.refused.length} refused, ${r.waiting.length} waiting -> ${join(resolve(dir), 'ready/intake.json')}\n`);
   return r.refused.length ? 1 : 0;
 }
 

@@ -3,6 +3,7 @@
  * plain RGBA buffers ({ w, h, px: Uint8Array of w*h*4, straight alpha }). Pure apart from
  * readImage and writePng, which touch the disk (and ImageMagick for files that are not PNG).
  *
+ * - WebP out through ImageMagick (encodeWebp: quality 90, lossless alpha, method 6), what intake writes;
  * - PNG in and out with node:zlib (8 and 16 bit, every colour type, not interlaced; anything else
  *   goes through `magick`);
  * - keying: the picture's own alpha when it has one, else a flat #FF00FF-ish background keyed
@@ -195,6 +196,23 @@ export function writePng(file, img) {
   writeFileSync(file, buf);
   return buf;
 }
+
+/**
+ * The WebP a ready piece is written as (lane GROUNDED): lossy quality 90 with lossless alpha
+ * (alpha-quality 100) at the slowest, smallest method 6. The 27 Mount Ashomel pieces came to 2.7 MB
+ * this way against 20.5 MB as PNG, with no visible loss; the site's agent render sends at most a
+ * few MB of new art to the worker, so size is what decides whether a piece shows.
+ */
+export const WEBP_ARGS = Object.freeze(['-quality', '90', '-define', 'webp:alpha-quality=100', '-define', 'webp:method=6', '-define', 'webp:exact=false']);
+
+/** A picture as WebP bytes (ImageMagick 7 from the PNG encodePng makes); written to `file` when one is given. */
+export function encodeWebp(img, file = null) {
+  const buf = execFileSync('magick', ['png:-', ...WEBP_ARGS, 'webp:-'], { input: encodePng(img), maxBuffer: 1 << 30 });
+  if (file) writeFileSync(file, buf);
+  return buf;
+}
+
+export const writeWebp = (file, img) => encodeWebp(img, file);
 
 export const IMAGE_EXTS = Object.freeze(['.png', '.webp', '.jpg', '.jpeg']);
 export const isImageFile = (f) => IMAGE_EXTS.includes(extname(f).toLowerCase());

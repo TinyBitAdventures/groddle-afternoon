@@ -237,6 +237,27 @@ describe('asset intake (groddle-afternoon-site src/BuilderIntake.php)', { skip: 
     assert.ok(r.report.findings.filter((f) => f.check === 'style').every((f) => f.severity === 'info'));
   });
 
+  it('a lossy WebP is kept lossy (quality 90, its alpha lossless), so AI art sent small stays small (lane GROUNDED)', () => {
+    // Noisy painted art, sent as tools/builder/art-intake.mjs writes it (lossy, lossless alpha).
+    const art = png(240, 180, (x, y) => ((x - 120) ** 2 / 12000 + (y - 100) ** 2 / 6000 < 1 ? [(x * 37 + y * 11) & 255, (x * y) & 255, (x * 5 + y * 3) & 255, 255] : [0, 0, 0, 0]));
+    const lossy = execFileSync('magick', ['png:-', '-quality', '90', '-define', 'webp:alpha-quality=100', '-define', 'webp:method=6', 'webp:-'], { input: art });
+    assert.equal(lossy.subarray(12, 16).toString('latin1'), 'VP8X', 'a lossy WebP with alpha (VP8X, ALPH, VP8)');
+    const ai = { ...base, licence: 'ai-generated', tool: 'GPT Image 2.5 via T3 Chat', prompt: 'a rock', inputs: [], role: 'middleground' };
+    const r = intake({ ...ai, name: 'gz_ai_rock', file2: b64(lossy) });
+    assert.equal(r.ok, true, JSON.stringify(r.report.findings));
+    assert.equal(r.report.file2.lossy, true);
+    assert.equal(r.report.kept.encoding, 'lossy q90');
+    const kept = Buffer.from(r.file2, 'base64');
+    assert.ok(kept.includes(Buffer.from('VP8 ')) && kept.includes(Buffer.from('ALPH')), 'kept lossy, with an alpha chunk');
+    assert.ok(!kept.includes(Buffer.from('VP8L')));
+    const { rgba } = gdPixels(r.file2);
+    assert.equal(rgba[3], 0, 'its clear corner stays clear');
+    // The same pixels sent as a PNG are kept lossless, and bigger.
+    const fromPng = intake({ ...ai, name: 'gz_ai_rock', file2: b64(art) });
+    assert.equal(fromPng.report.kept.encoding, 'lossless');
+    assert.ok(Buffer.from(fromPng.file2, 'base64').length > kept.length);
+  });
+
   it('measures colour as js/builder/colour-stats.js does (GD keeps alpha in 7 bits)', () => {
     const r = intake({ ...base, name: 'gz_measure', file2: b64(png(90, 70, (x, y) => (y < 10 ? [0, 0, 0, 0] : [(x * 3) & 255, (y * 7) & 255, (x * y) & 255, 40 + ((x + y) % 216)]))) });
     const { w, h, rgba } = gdPixels(r.file2);
