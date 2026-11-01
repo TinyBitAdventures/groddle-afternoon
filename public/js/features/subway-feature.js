@@ -40,7 +40,7 @@
  */
 
 import { countItem } from '../inventory.js?v=91ee49cd';
-import { doorsFeature } from './doors-feature.js?v=260e7cad';
+import { doorsFeature } from './doors-feature.js?v=3917c0f4';
 import { frameTexture, textureFromUrl } from '../textures.js?v=db2ce452';
 import {
   CAR_FLOOR,

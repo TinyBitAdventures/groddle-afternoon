@@ -19,8 +19,8 @@ import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
-import { barriersScreen, platformsScreen, worldToScreen, streetWidth } from '../public/js/street-model.js?v=d6ad10e7';
-import { avatarGround, stepAvatar, JUMP_SPEED } from '../public/js/avatar-step.js?v=cc813993';
+import { barriersScreen, platformsScreen, worldToScreen, streetWidth } from '../public/js/street-model.js?v=505d8990';
+import { avatarGround, stepAvatar, JUMP_SPEED } from '../public/js/avatar-step.js?v=33ad1926';
 import { rawTripleJumpMultiplier, scaledTripleJumpMultiplier, TRIPLE_JUMP_UPGRADES } from '../public/js/movement.js?v=a314f8a1';
 
 const root = join(import.meta.dirname, '..');

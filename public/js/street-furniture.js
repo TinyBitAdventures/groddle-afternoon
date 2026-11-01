@@ -1,4 +1,4 @@
-import { isItemFloor, platformYAt, worldToScreen } from './street-model.js?v=d6ad10e7';
+import { isItemFloor, platformYAt, worldToScreen } from './street-model.js?v=505d8990';
 
 /**
  * Street furniture rules: street Mailboxes, placed Notes, Notice Boards and

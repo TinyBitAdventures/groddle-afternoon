@@ -41,8 +41,8 @@ import {
 import { MACHINE_IDS } from '../public/js/machines.js?v=b5f892f6';
 import { MACHINE_EXTRA_WAIT_MS, machineTank, tankFuel } from '../public/js/machine-rooms.js?v=b37e9a73';
 import { craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=ea3f10b5';
-import { platformsScreen } from '../public/js/street-model.js?v=d6ad10e7';
-import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=ccb5867d';
+import { platformsScreen } from '../public/js/street-model.js?v=505d8990';
+import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=05e483fe';
 import { machineArtFeature } from '../public/js/features/machine-art-feature.js?v=b1db10ed';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

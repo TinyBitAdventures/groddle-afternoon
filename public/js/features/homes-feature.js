@@ -187,13 +187,13 @@ import { DISPATCHER_HALF, DISPATCHER_TEXT, dispatcherFits, savedDispatcherRx, si
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=3753a0d2';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
-import { projectApi } from './street-jobs-feature.js?v=e3c495fa';
+import { projectApi } from './street-jobs-feature.js?v=5c7d33a7';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=b05c58d8';
 import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=7ce20566';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=e676f00f';
 import { wantsHiresDecos } from '../deco-hires.js?v=cb905e17';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=6f67e7b2';
-import { patchesFeature } from './patches-feature.js?v=f5fe7325';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=189a6890';
+import { patchesFeature } from './patches-feature.js?v=762bbde9';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=d8f9ceff';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
 import { WOTD_TOOL, pourApproach, pourDropTip } from '../wine-pour-fx.js?v=364e22d2';
@@ -216,7 +216,7 @@ import {
 } from '../home-styles.js?v=f591561f';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=f9ece277';
-import { oneArmSignpost } from '../street-render.js?v=b42b5803';
+import { oneArmSignpost } from '../street-render.js?v=1c464e0a';
 import { ROCK_CATALOG } from '../mining.js?v=e356fe60';
 import {
   HOUSE_SIGN,

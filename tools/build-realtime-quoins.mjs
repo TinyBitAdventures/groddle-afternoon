@@ -26,15 +26,15 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=5858971b';
-import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=d6ad10e7';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=33d2b8bc';
+import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=505d8990';
 import {
   ecologyForStreet,
   planStreetPlacements,
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=09911562';
+} from '../public/js/street-ecology.js?v=7fbae08d';
 import {
   MYSTERY_QUOIN_KINDS,
   QUOIN_CLASSES,

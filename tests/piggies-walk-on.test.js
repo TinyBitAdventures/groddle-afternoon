@@ -20,9 +20,9 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { createAnimalState } from '../public/js/animals.js?v=65c8f67c';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=4144fb5f';
-import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=d6ad10e7';
+import { createAnimalState } from '../public/js/animals.js?v=2e4e5f15';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=d45ef9be';
+import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=505d8990';
 import {
   ANIMAL_BODY,
   PLACEMENT_FOOTPRINTS,
@@ -35,10 +35,10 @@ import {
   setStreetEcologyCatalog,
   streetReservedSpots,
   walkInScenery,
-} from '../public/js/street-ecology.js?v=09911562';
-import { walkerAt } from '../public/js/street-creatures.js?v=d1659f22';
+} from '../public/js/street-ecology.js?v=7fbae08d';
+import { walkerAt } from '../public/js/street-creatures.js?v=b2dadf96';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';
-import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=5858971b';
+import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=33d2b8bc';
 
 const root = join(import.meta.dirname, '..');
 const streetsDir = join(root, 'public/assets/streets');

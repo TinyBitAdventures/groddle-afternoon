@@ -13,13 +13,13 @@ import {
   planStreetPlacements,
   nearestPlacementGap,
   STREET_ECOLOGY_URL,
-} from '../public/js/street-ecology.js?v=09911562';
+} from '../public/js/street-ecology.js?v=7fbae08d';
 import {
   platformsScreen,
   platformYAt,
   streetWidth,
   worldToScreen,
-} from '../public/js/street-model.js?v=d6ad10e7';
+} from '../public/js/street-model.js?v=505d8990';
 import { giantForStreet } from '../public/js/shrines.js?v=7dd8f176';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

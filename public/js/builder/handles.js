@@ -6,7 +6,7 @@
  * data and its layer's current parallax offset, never Pixi's transforms (a blurred layer's sprites
  * are parked off the stage, so their transforms do not say where they are drawn).
  */
-import { decoScreen, screenToDeco } from './zone.js?v=29defbb2';
+import { decoScreen, screenToDeco } from './zone.js?v=77727f6b';
 
 const RAD = Math.PI / 180;
 export const MIN_SIZE = 4;

@@ -223,15 +223,34 @@ export function blockBarrierCrossing(barriers, prevX, nextX, feetY, bodyH = 80) 
   return allowed;
 }
 
+/** The tsid without its G/L prefix (the same street under either). */
+const tsidBody = (tsid) => String(tsid || '').slice(1);
+
 /**
  * Signposts as the client shows them (SignpostView.render): hidden connects
  * are dropped, and a post with no visible connect is not shown at all.
+ *
+ * With `hereTsid` (the street the posts stand on), an arm back to that street
+ * goes too when the post has other arms. Only the tower lifts list their own
+ * street among others (the lobby XML's lift, e.g. GA5134UPLRU29OH
+ * signpost_1336673011493 `exit`, names the lobby; every floor's lift lists
+ * every floor); the party spaces' one-arm posts keep theirs. The client
+ * drew a lift as its deco, not arms, and its Vator Corp panel greyed out the
+ * button for where you stand (LocationSelectorDialog.as showElevator,
+ * bt_disabled); ordinary posts never point at their own street. Here the
+ * lift's choices are arms, so the arm for here is left off (player report 35).
  * @param {object[]} signposts
+ * @param {string} [hereTsid]
  */
-export function navigableSignposts(signposts) {
+export function navigableSignposts(signposts, hereTsid = '') {
   const out = [];
+  const here = tsidBody(hereTsid);
   for (const sign of signposts || []) {
-    const connects = (sign?.connects || []).filter((c) => c && !c.hidden);
+    let connects = (sign?.connects || []).filter((c) => c && !c.hidden);
+    if (here) {
+      const away = connects.filter((c) => tsidBody(c.tsid) !== here);
+      if (away.length) connects = away;
+    }
     if (!connects.length) continue;
     out.push(connects.length === (sign.connects || []).length ? sign : { ...sign, connects });
   }

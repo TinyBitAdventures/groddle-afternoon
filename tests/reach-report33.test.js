@@ -6,10 +6,10 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { AVATAR_HIT_BOX, avatarHitBox, behindFloor, boxesTouch } from '../public/js/reach.js?v=4187d746';
-import { avatarHeadReach, groundBeneath, isBuriedSignpost, isStandable, platformYAt, platformsScreen, signpostNear, signpostReachY, worldToScreen } from '../public/js/street-model.js?v=d6ad10e7';
-import { walkUpSignpostStreet } from '../public/js/ladder-top-signposts.js?v=083038d3';
+import { avatarHeadReach, groundBeneath, isBuriedSignpost, isStandable, platformYAt, platformsScreen, signpostNear, signpostReachY, worldToScreen } from '../public/js/street-model.js?v=505d8990';
+import { walkUpSignpostStreet } from '../public/js/ladder-top-signposts.js?v=40abe6f5';
 import { planSignpostTravel } from '../public/js/travel.js?v=7fd6e363';
-import { COPY, OBJECT_REACH, inObjectReach } from '../public/js/street-objects.js?v=2b96c551';
+import { COPY, OBJECT_REACH, inObjectReach } from '../public/js/street-objects.js?v=3f183a06';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');

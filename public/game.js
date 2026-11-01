@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=0bf7424c';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=7e4c28c1';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=654c2914';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d9805243';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -460,8 +460,8 @@ import {
 } from './js/inventory.js?v=91ee49cd';
 import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=09c6ccbe';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=9b23e21a';
-import { listAnimalFeedOptions } from './js/animals.js?v=65c8f67c';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=65c8f67c';
+import { listAnimalFeedOptions } from './js/animals.js?v=2e4e5f15';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=2e4e5f15';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -595,8 +595,8 @@ import {
   availableStreetTsids,
   ensureStreetIndex,
   resolveIndexTsid,
-} from './js/street-loader.js?v=5858971b';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=39fa3b1c';
+} from './js/street-loader.js?v=33d2b8bc';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=8c7c2fa5';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -612,8 +612,8 @@ import {
   isItemFloor,
   isStandable,
   signpostReachY,
-} from './js/street-model.js?v=d6ad10e7';
-import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=083038d3';
+} from './js/street-model.js?v=505d8990';
+import { climberAtLadderTop, ladderTopSignpostFor, walkUpSignpostStreet } from './js/ladder-top-signposts.js?v=40abe6f5';
 import {
   buildStreetView,
   glitchLayerMatrix,
@@ -623,7 +623,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=b42b5803';
+} from './js/street-render.js?v=1c464e0a';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -725,9 +725,9 @@ import {
 } from './js/travel.js?v=7fd6e363';
 import { facingScaleX, facingFromVelocity } from './js/avatar.js?v=c4da73ea';
 import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js?v=fb921bf4';
-import { landingY, walkSurfaceY } from './js/walk-surface.js?v=f8308fde';
+import { landingY, walkSurfaceY } from './js/walk-surface.js?v=5b6e1c8d';
 import { holdCloseToFloor } from './js/slope-walk.js?v=9af1e505';
-import { WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, streetPhysicsExtras } from './js/avatar-step.js?v=cc813993';
+import { WALK_MAX, avatarGround, coastX, stepAvatar, steerAccel, streetPhysicsExtras } from './js/avatar-step.js?v=33ad1926';
 import { createUserPath, stepUserPath } from './js/user-path.js?v=8880557f';
 import { climbBobY, ladderAnimState, ladderSwap } from './js/ladder-anim.js?v=a8b327a0';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js?v=ad801376';
@@ -781,7 +781,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=65c8f67c';
+} from './js/animals.js?v=2e4e5f15';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -879,8 +879,8 @@ import {
   animalPatrolRange,
   ANIMAL_PATROL,
   nearestPlacementGap,
-} from './js/street-ecology.js?v=09911562';
-import { easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=d1659f22';
+} from './js/street-ecology.js?v=7fbae08d';
+import { easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=b2dadf96';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=a1c4a308';
 import {
   actionLoopFor,

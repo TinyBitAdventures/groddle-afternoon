@@ -7,7 +7,7 @@
  * `isStandable` instead.
  */
 
-import { isItemSolid, platformYAt } from './street-model.js?v=d6ad10e7';
+import { isItemSolid, platformYAt } from './street-model.js?v=505d8990';
 
 /**
  * The surface at x closest to the creature's current feet y, accepting only a

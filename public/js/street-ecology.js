@@ -3,7 +3,7 @@
  * placement on recovered locations-xml platforms.
  */
 
-import { isItemSolid, isStandable, worldToScreen } from './street-model.js?v=d6ad10e7';
+import { isItemSolid, isStandable, worldToScreen } from './street-model.js?v=505d8990';
 
 export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
 

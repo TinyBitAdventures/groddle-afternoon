@@ -45,9 +45,9 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=91ee49cd';
 import { canUseTool, useToolCondition } from '../tools.js?v=3d109172';
-import { ecologyForStreet } from '../street-ecology.js?v=09911562';
-import { worldToScreen } from '../street-model.js?v=d6ad10e7';
-import { signArmWidth } from '../street-render.js?v=b42b5803';
+import { ecologyForStreet } from '../street-ecology.js?v=7fbae08d';
+import { worldToScreen } from '../street-model.js?v=505d8990';
+import { signArmWidth } from '../street-render.js?v=1c464e0a';
 import { getSkillCatalog } from '../content-catalogs.js?v=10b118dd';
 import { GIANTS } from '../shrines.js?v=7dd8f176';
 import { teleportationFeature } from './teleportation-feature.js?v=a2883436';

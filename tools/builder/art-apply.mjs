@@ -30,8 +30,8 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { applyOps } from '../../public/js/builder/ops.js?v=27c7796f';
-import { newHub, nextHubId } from '../../public/js/builder/templates.js?v=b52dcdf5';
-import { isStandable } from '../../public/js/street-model.js?v=d6ad10e7';
+import { newHub, nextHubId } from '../../public/js/builder/templates.js?v=d6e95682';
+import { isStandable } from '../../public/js/street-model.js?v=505d8990';
 
 const clone = (v) => JSON.parse(JSON.stringify(v));
 const round = (n) => Math.round(n);

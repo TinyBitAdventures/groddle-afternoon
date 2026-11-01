@@ -6,8 +6,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
-import { BOARD_ART, DOOR_CLEARANCE, clearOfDoors } from '../public/js/street-furniture.js?v=5e83a6a0';
-import { platformsScreen } from '../public/js/street-model.js?v=d6ad10e7';
+import { BOARD_ART, DOOR_CLEARANCE, clearOfDoors } from '../public/js/street-furniture.js?v=171adb63';
+import { platformsScreen } from '../public/js/street-model.js?v=505d8990';
 
 const towers = JSON.parse(readFileSync(new URL('../public/assets/streets/GA5134UPLRU29OH.json', import.meta.url), 'utf8'));
 

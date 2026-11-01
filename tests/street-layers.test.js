@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { glitchLayerMatrix, parallaxLayerOffset } from '../public/js/street-render.js?v=b42b5803';
+import { glitchLayerMatrix, parallaxLayerOffset } from '../public/js/street-render.js?v=1c464e0a';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const street = (tsid) =>
