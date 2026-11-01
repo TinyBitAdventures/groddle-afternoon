@@ -90,7 +90,7 @@ test.describe('integration playtest regressions', () => {
     const jobs = fs.readFileSync(path.join(root, 'public/js/features/street-jobs-feature.js'), 'utf8');
     assert.match(jobs, /travelGate\(tsid, engine, meta = \{\}\) \{\n    if \(!catalog \|\| meta\?\.via !== 'signpost'\) return null;/);
     assert.match(game, /features\.travelGate\(toTsid, engine, \{ via: meta\.via \}\)/);
-    assert.equal((game.match(/via: 'signpost' \}\)/g) || []).length, 2, 'T and signpost-board clicks both say signpost');
+    assert.equal((game.match(/via: 'signpost' \}\)/g) || []).length, 3, 'T, signpost-board clicks and the arm keys all say signpost');
   });
 
   test('clicking a street mailbox goes through its feature, not the home mailbox gate', () => {

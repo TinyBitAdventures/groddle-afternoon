@@ -107,6 +107,8 @@ export function hotkeySections({ keyring = false, hub = false } = {}) {
         ['Inventory Search', [['Shift', 'F'], ['`']]],
         ['Preferences', [[',']]],
         ['Verbs', [['Enter'], ['E']]],
+        // Austin 2026-11-01: at a post, the number on an arm takes it (game.js signpostArmKey).
+        ['Signpost Arm', [['1-9']], '(At a signpost: arms numbered from the top)'],
       ],
     },
     {

@@ -142,7 +142,8 @@ describe('33d: a signpost far over (or under) the avatar is not in reach', () =>
   });
 
   it('game.js asks with the feet: Enter, the prompt and T', () => {
-    assert.equal((game.match(/signpostNear\(walkUpSignpostStreet\(currentStreet\), player\.x, 140, player\.y\)/g) || []).length, 2);
+    // Enter, the T hint and the signpost arm keys (signpostAtHand).
+    assert.equal((game.match(/signpostNear\(walkUpSignpostStreet\(currentStreet\), player\.x, 140, player\.y\)/g) || []).length, 3);
     assert.match(game, /planSignpostTravel\([\s\S]{0,160}\(s\) => signpostReachY\(currentStreet, s, player\.y\),/);
   });
 

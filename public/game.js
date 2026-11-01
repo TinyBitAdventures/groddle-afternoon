@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6fc15d1b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8ebcb64a';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=1b59d043';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -597,7 +597,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=33d2b8bc';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=8c7c2fa5';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=f6e43604';
 import {
   ladderTopDeck,
   groundBeneath,
@@ -623,8 +623,9 @@ import {
   loadDecoManifest,
   loadSignpostTextures,
   setSignpostHover,
+  setSignpostKeys,
   signpostBoardAt,
-} from './js/street-render.js?v=1c464e0a';
+} from './js/street-render.js?v=aa2eadc7';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -918,7 +919,7 @@ import { createQuestTracker } from './js/ui/quest-tracker.js?v=e2899b11';
 import { bindCountField, countKeyValue, countStepMarkup } from './js/ui/count-chooser.js?v=893305c8';
 import { bindVerbMenu, focusVerbRow, lockVerbMenuSize, makeVerbRow, placeVerbMenu, plainWords, refuseVerbRow, syncVerbDetail, verbMenuKey, verbRowAttrs, verbRowInner, verbRowKeys } from './js/ui/verb-menu.js?v=e9d100c3';
 import { createPromptSettler, promptId } from './js/prompt-settle.js?v=509ba9cc';
-import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=34ae15ae';
+import { clientKeyAction, createHotkeysSheet, isHotkeySheetRelease, isPlainKey } from './js/client-hotkeys.js?v=becd1f95';
 import { installHeldKeyGuard } from './js/held-keys.js?v=98b96620';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=db2ce452';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=df476660';
@@ -11168,6 +11169,8 @@ const engine = {
   closeMap: () => closeMap(),
   /** QA routes: learn a skill outright (prerequisites skipped). */
   grantSkill: (classTsid) => grantSkill(skillState, classTsid, true),
+  /** Austin 2026-11-01: true while a number key would take an arm of the post at hand (hi-signs keeps 5 for that). */
+  signpostTakesKey: (key) => Boolean(signpostArmFor(key)),
   /** G218: a learned skill for the familiar panel, with the skills the player can start next. */
   skillLearnedInfo(classTsid) {
     const def = getSkillCatalog()[classTsid];
@@ -22158,35 +22161,87 @@ async function travelTo(toTsid, meta = {}) {
   return plan;
 }
 
-function doTeleport() {
+/** Where an ordinary signpost cannot be used: says why and returns true (T and the arm keys). */
+function signpostTravelRefused() {
   if (homeIsInstanced()) {
     toast('Use the signpost by your house, or Back to world on X, to leave home.');
-    return;
+    return true;
   }
   if (greedyStreetIsInstanced()) {
     toast('Storyland has no ordinary signposts.');
-    return;
+    return true;
   }
   if (legalizeIsInstanced()) {
     toast('The Bureaucratic Hall has no ordinary signposts.');
-    return;
+    return true;
   }
   if (summersDayIsInstanced()) {
     toast('There are no ordinary signposts inside this memory.');
-    return;
+    return true;
   }
   if (deEmbiggenifyIsInstanced()) {
     toast('Every ordinary signpost is enormous while you are this small.');
-    return;
+    return true;
   }
   if (rookWoodsIsInstanced()) {
     toast('Humbaba has sealed every ordinary signpost during the trial.');
-    return;
+    return true;
   }
   if (winterWalkIsInstanced()) {
     toast('The cold has frozen every ordinary signpost.');
-    return;
+    return true;
   }
+  return false;
+}
+
+/**
+ * The post the avatar stands at, as Enter and the T hint find it (in reach up and down, never
+ * from a ladder: the client gave a climber no signpost, ladder-top-signposts.js), with its view.
+ */
+function signpostAtHand() {
+  if (!currentStreet || climb.active || !player) return null;
+  const near = signpostNear(walkUpSignpostStreet(currentStreet), player.x, 140, player.y);
+  if (!near) return null;
+  const view = (portalSprites || []).find((v) => v && !v.destroyed && v.signpost === near.signpost);
+  return view?.signBoards?.length ? { signpost: near.signpost, view } : null;
+}
+
+/** Austin 2026-11-01: the post at hand shows each arm's number key (street-render.js setSignpostKeys). */
+let keyedSignView = null;
+function showSignpostKeys(at) {
+  const view = at?.view || null;
+  if (keyedSignView === view) return;
+  if (keyedSignView && !keyedSignView.destroyed) setSignpostKeys(keyedSignView, false);
+  keyedSignView = view;
+  if (view) setSignpostKeys(view, true);
+  if (app?.canvas) app.canvas.dataset.signpostKeys = view ? view.signBoards.map((b) => `${b.key}:${b.connection?.label || b.connection?.tsid || ''}`).join('|') : '';
+}
+
+/**
+ * 1 to 9 at a post take that arm (numbered from the top), as a click on it does. False when no
+ * post is at hand or it has no such arm, so the key keeps its own use (5 says hi).
+ */
+function signpostArmFor(key) {
+  if (!/^[1-9]$/.test(String(key))) return null;
+  const at = signpostAtHand();
+  return at?.view.signBoards.find((b) => b.key === String(key)) || null;
+}
+function signpostArmKey(key) {
+  const board = signpostArmFor(key);
+  if (!board) return false;
+  if (signpostTravelRefused()) return true;
+  const conn = pickConnection({ connects: [board.connection] }, availableStreetTsids());
+  if (app?.canvas) app.canvas.dataset.signpostArmKey = `${key}:${board.connection?.label || ''}`;
+  if (!conn) {
+    toast('That road is not loaded yet. Use the map for another destination.');
+    return true;
+  }
+  travelTo(conn.tsid, { label: conn.label, arrive: conn.arrive, via: 'signpost' });
+  return true;
+}
+
+function doTeleport() {
+  if (signpostTravelRefused()) return;
   if (!currentStreet) return;
   // Player report 33: only a post the avatar's hit box reaches up and down (street-model.js signpostReachY).
   const plan = planSignpostTravel(
@@ -27787,6 +27842,12 @@ async function main() {
       return;
     }
     if (e.key === 'f' || e.key === 'F') eatApple();
+    // Austin 2026-11-01: at a post, 1 to 9 take the arm with that number (T and E stay as they are).
+    if (!e.repeat && !e.shiftKey && signpostArmKey(e.key)) {
+      e.preventDefault();
+      keys.delete(e.key);
+      return;
+    }
     if (e.key === 't' || e.key === 'T') doTeleport();
     if (e.key === 'g' || e.key === 'G' || isPlainKey(e, 'm')) {
       // G254: M is the client's map key (TSMainView.as 641, mKeyHandler 733-741); G stays.
@@ -28690,6 +28751,7 @@ async function main() {
           ? nearHover
           : nearestInteractable(100));
       const nearSign = currentStreet ? signpostNear(walkUpSignpostStreet(currentStreet), player.x, 140, player.y) : null;
+      showSignpostKeys(signpostAtHand());
       const nearClimb = !climb.active
         ? findClimbWallNear(streetWalls, player.x, player.y, 42)
         : null;
@@ -28733,6 +28795,7 @@ async function main() {
       }
     } else {
       prompt.visible = false;
+      showSignpostKeys(null);
     }
   });
 

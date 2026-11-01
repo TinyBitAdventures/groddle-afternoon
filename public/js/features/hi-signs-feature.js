@@ -65,7 +65,7 @@
  * Canvas data: hiMpLast, hiBoard (sign:count,...), hiBoardOpen, hiYesterday.
  */
 
-import { butlerApi } from './butler-feature.js?v=6c4cf5b8';
+import { butlerApi } from './butler-feature.js?v=ac5aafd9';
 import { metabolicGain, moodMax } from '../metabolics.js?v=8504134e';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=db2ce452';
 import {
@@ -971,7 +971,9 @@ function inTextField(target) {
 function onKey(e) {
   if (!eng?.started || e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
   if (inTextField(e.target)) return;
-  // LocationInputHandler: NUMBER_5 and NUMPAD_5 (H is the remake's Feat key).
+  // LocationInputHandler: NUMBER_5 and NUMPAD_5 (H is the remake's Feat key). At a post with
+  // five arms, 5 takes the fifth (Austin 2026-11-01, game.js signpostArmKey) and says nothing.
+  if (eng.signpostTakesKey?.(e.key)) return;
   if (e.key === '5' || e.code === 'Digit5' || e.code === 'Numpad5') sayHi(eng);
 }
 

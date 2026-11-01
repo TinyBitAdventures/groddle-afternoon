@@ -151,7 +151,8 @@ describe('ladder-top signposts: game.js', () => {
     assert.match(game, /updateBuriedSignposts\(\);\n\s*updateLadderTopSignposts\(\);/);
     assert.match(game, /if \(!climberAtLadderTop\(climb\.wall, player\.y\)\) return;/);
     assert.match(game, /const sign = ladderTopSignpostFor\(currentStreet, climb\.wall\.id\);[\s\S]{0,400}travelTo\(conn\.tsid, \{ label: conn\.label, arrive: conn\.arrive, via: 'door' \}\)/);
-    assert.equal((game.match(/signpostNear\(walkUpSignpostStreet\(currentStreet\), player\.x, 140, player\.y\)/g) || []).length, 2);
+    // Enter, the T hint and the arm keys (signpostAtHand).
+    assert.equal((game.match(/signpostNear\(walkUpSignpostStreet\(currentStreet\), player\.x, 140, player\.y\)/g) || []).length, 3);
     assert.match(game, /planSignpostTravel\(\s*walkUpSignpostStreet\(currentStreet\),/);
   });
 });

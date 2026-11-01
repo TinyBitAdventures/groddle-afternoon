@@ -233,8 +233,9 @@ function buildSignpostSprite(PIXI, signpost, pos) {
   // Collect visible connections (all, with preferred loaded one first for label emphasis)
   const connects = (signpost.connects || []).filter((c) => c && (c.label || c.tsid));
   const available = availableStreetTsids();
-  // Show up to 4 arms like typical posts
-  const shown = connects.slice(0, 4);
+  // SignpostView.as 229-247 draws every visible connect, one arm under the other (five on the
+  // Sabudana Drama Towers posts); the number keys pick one (signpostArmKey), so nine at most.
+  const shown = connects.slice(0, SIGN_MAX_ARMS);
   shown.forEach((conn, visibleI) => {
     const leftSide = Boolean(visibleI % 2);
     const armHolder = new PIXI.Container();
@@ -300,6 +301,12 @@ function buildSignpostSprite(PIXI, signpost, pos) {
     label.label = 'sign-label';
     label._baseFill = baseFill;
     armHolder.addChild(label);
+    // Austin 2026-11-01: arms are numbered 1 to N from the top; at the post each shows its key
+    // just past its tip (setSignpostKeys), and that number key takes it.
+    const keyCap = signKeyCap(PIXI, visibleI + 1);
+    keyCap.x = leftSide ? -armW - SIGN_KEY_GAP - SIGN_KEY_W / 2 : armW + SIGN_KEY_GAP + SIGN_KEY_W / 2;
+    keyCap.visible = false;
+    armHolder.addChild(keyCap);
     g.signHoverParts.labels.push(label);
     g.signHoverParts.baseLabelFills.push(baseFill);
     g.signBoards.push({
@@ -308,6 +315,8 @@ function buildSignpostSprite(PIXI, signpost, pos) {
       arm: armSprite,
       glow,
       label,
+      keyCap,
+      key: String(visibleI + 1),
       baseFill,
       x: armHolder.x,
       y: armHolder.y,
@@ -339,6 +348,41 @@ function buildSignpostSprite(PIXI, signpost, pos) {
 
   g.signpost = signpost;
   return g;
+}
+
+/** The most arms a post draws: one for each number key. */
+export const SIGN_MAX_ARMS = 9;
+/** An arm's key cap, in holder units: its size and its gap from the arm's tip. */
+const SIGN_KEY_W = 18;
+const SIGN_KEY_GAP = 3;
+
+/** The small key past an arm's tip (the top bar's key caps, in the signpost's wood colours). */
+function signKeyCap(PIXI, n) {
+  const cap = new PIXI.Container();
+  cap.label = 'sign-key';
+  const box = new PIXI.Graphics();
+  box.roundRect(-SIGN_KEY_W / 2, -SIGN_KEY_W / 2, SIGN_KEY_W, SIGN_KEY_W, 4)
+    .fill({ color: 0xfdf8ee, alpha: 0.95 })
+    .stroke({ width: 1.5, color: 0x5a3a22, alpha: 0.9 });
+  const text = new PIXI.Text({ text: String(n), style: { fontFamily: 'Trebuchet MS, Georgia, serif', fontSize: 13, fontWeight: '700', fill: 0x3a2a18 } });
+  text.resolution = SIGN_TEXT_RESOLUTION;
+  text.anchor.set(0.5, 0.5);
+  text.y = 0.5;
+  cap.addChild(box, text);
+  return cap;
+}
+
+/**
+ * Show or hide a post's arm keys (the post the avatar stands at: game.js showSignpostKeys).
+ * @param {PIXI.Container} g  signpost container from buildSignpostSprite
+ * @param {boolean} on
+ */
+export function setSignpostKeys(g, on) {
+  if (!g || g.destroyed) return;
+  for (const board of g.signBoards || []) {
+    if (board.keyCap && !board.keyCap.destroyed) board.keyCap.visible = Boolean(on);
+  }
+  g.signKeysShown = Boolean(on);
 }
 
 /**
