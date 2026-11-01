@@ -5273,7 +5273,41 @@ body.buff-purple-pulse::after {
   background:
     radial-gradient(circle at 88% 5%, color-mix(in srgb, var(--shrine-accent) 15%, transparent), transparent 35%),
     var(--surface-card);
+  /* The whole panel fits the window without scrolling (player report 2026-11-01, 1440x810):
+     the item grid gives up rows first (it scrolls on its own), so the donate buttons and the
+     official value line always show. The card still scrolls on a window too short for one row. */
+  display: flex;
+  flex-direction: column;
 }
+.shrine-card > * { flex: none; }
+.shrine-card > .shrine-grid { flex: 0 1 auto; min-height: 108px; }
+/* Learn Faster? sits beside its button on one band instead of three stacked rows. */
+.shrine-learn {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--sp-5);
+  align-items: center;
+  padding-bottom: 0.55rem;
+}
+.shrine-learn > * { grid-column: 1; }
+.shrine-learn > [data-shrine-learn-spend] { grid-column: 2; grid-row: 1 / span 4; margin: 0; }
+.shrine-learn > h3.shrine-section-title { margin: 0; }
+.shrine-learn > .shrine-daily { margin-top: var(--sp-1); }
+/* The card may use the whole space between the top bar and the pack, not 78% of the window. */
+.shrine-card { max-height: min(640px, calc(100% - 12px)); }
+.shrine-desc { margin-bottom: var(--sp-3); }
+.shrine-card .shrine-favor-card { padding-bottom: var(--sp-3); }
+.shrine-card .shrine-favor-track { margin-top: var(--sp-2); }
+.shrine-card .shrine-daily { margin-top: var(--sp-2); }
+.shrine-card .shrine-all-favor { margin: var(--sp-2) 0; }
+.shrine-card .shrine-tip { margin-top: var(--sp-2); }
+/* The chosen item: its name and rewards share a line, then the count and Donate. */
+.shrine-detail { grid-template-columns: 56px 1fr; align-items: center; padding: var(--sp-3) 0.55rem; }
+.shrine-detail-icon { width: 54px; height: 54px; }
+.shrine-detail-icon img { max-width: 44px; max-height: 44px; }
+.shrine-detail-body h3 { display: inline-block; margin: 0 var(--sp-3) 0 0; vertical-align: middle; }
+.shrine-detail-body .shrine-rewards { display: inline-flex; vertical-align: middle; margin: 0; }
+.shrine-detail-body .shrine-rewards + * { margin-top: var(--sp-2); }
 .shrine-title-lockup {
   display: flex;
   align-items: center;
