@@ -12,7 +12,7 @@ import {
   playSynthRecipe,
   recipeForKey,
 } from '../public/js/synth-sfx.js?v=9853c8e7';
-import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=d62791a6';
+import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=a1c4a308';
 import {
   LEGACY_SFX_KEYS,
   actionLoopFor,
@@ -282,13 +282,12 @@ describe('sound board', () => {
   }
 
   test('plays a recipe for a synthesized key and respects mute', () => {
-    // FOX_YIP keeps its synth recipe (2026-11-01); CARD_DEAL3 now plays a Wavelength take.
     const h = host();
-    const handle = h.board.play('FOX_YIP');
+    const handle = h.board.play('CARD_DEAL3');
     assert.equal(handle.kind, 'synth');
-    assert.equal(handle.recipe, recipeForKey('FOX_YIP', catalog.keys.FOX_YIP.category));
+    assert.equal(handle.recipe, recipeForKey('CARD_DEAL3', 'ui'));
     const muted = host({ muted: true });
-    assert.equal(muted.board.play('FOX_YIP'), null);
+    assert.equal(muted.board.play('CARD_DEAL3'), null);
   });
 
   test('prefers a recovered file over the recipe once it is warm', async () => {

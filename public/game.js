@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b351d7cb';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=537003d6';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=9915c79e';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -885,7 +885,7 @@ import {
   nearestPlacementGap,
 } from './js/street-ecology.js?v=7fbae08d';
 import { easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=144ebb1e';
-import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=d62791a6';
+import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=a1c4a308';
 import {
   actionLoopFor,
   legacySoundKey,
@@ -5566,8 +5566,7 @@ async function loadAudio() {
   audio.musicGain.connect(audio.ctx.destination);
   audio.sfxGain.connect(audio.ctx.destination);
   // Every SFX goes through the sound board: recovered file when one exists,
-  // otherwise the recipe's Wavelength take (js/wavelength-sfx.js) or a
-  // js/synth-sfx.js recipe (assets/content/sound-keys.json).
+  // otherwise a js/synth-sfx.js recipe (assets/content/sound-keys.json).
   audio.board = createSoundBoard({
     getContext: () => audio.ctx,
     getDestination: () => audio.sfxGain,
@@ -5598,8 +5597,6 @@ const PRELOAD_SOUND_KEYS = [
   // Small archive.org takes heard every minute (all under 60 KB).
   'ITEM_PICKUP', 'ITEM_DROP', 'QUOIN_GOT', 'CLICK_SUCCESS', 'CLICK_FAILURE', 'PET_PIGGY', 'PICK', 'HATCHET',
   'WATERING_CAN', 'ITEM_EAT',
-  // The Wavelength whoosh on every signpost trip (9 KB).
-  'SIGNPOST_TRAVEL',
 ];
 
 /** SFX bus level: ?sfxvol=0..1, else DEFAULT_SFX_VOLUME. */
@@ -28610,7 +28607,7 @@ async function main() {
     },
   };
   if (new URLSearchParams(location.search).has('soundtest')) {
-    import('./js/sound-test.js?v=f7ccda4d').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
+    import('./js/sound-test.js?v=4cd81fbe').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
       state.muted = false;
       if (audio.ctx?.state === 'suspended') {
         try { await audio.ctx.resume(); } catch (_) { /* opt-in */ }

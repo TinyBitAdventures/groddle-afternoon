@@ -5,10 +5,7 @@
  * lazily, decoded once, cached), otherwise its Web Audio recipe from
  * js/synth-sfx.js. While a file is still loading, a key with a recipe plays
  * the recipe instead of arriving late; voice and music keys (no recipe) play
- * when their file is ready. A key with no recording whose recipe has one of
- * Austin's Wavelength takes (js/wavelength-sfx.js, 2026-11-01) plays the take
- * at the recipe's loudness, the recipe covering while it loads or if it fails.
- * All SFX run through one bus under the game's
+ * when their file is ready. All SFX run through one bus under the game's
  * mute gain. The client defaulted SFX and music both to 0.6
  * (SoundManager.DEFAULT_SFX_VOLUME); the remake's BGM sits at 0.26, so the SFX
  * bus defaults to 0.7 to keep the same balance (?sfxvol=0..1 overrides).
@@ -17,7 +14,6 @@
 import { SOUND_ALIASES, SOUND_CATEGORIES, SOUND_FILES } from './sound-keys.js?v=2d82d399';
 import { playSynthRecipe, recipeForKey } from './synth-sfx.js?v=9853c8e7';
 import { legacySoundKey } from './sound-moments.js?v=2f8597cd';
-import { WAVELENGTH_TAKES } from './wavelength-sfx.js?v=824b9270';
 
 export const DEFAULT_SFX_VOLUME = 0.7;
 const LATE_FILE_MS = 350;
@@ -26,27 +22,15 @@ const MIN_REPEAT_MS = 35;
 const MAX_VOICES = 14;
 
 /**
- * Resolve a key (or legacy id) to what would play: its recording, else its
- * recipe's Wavelength take (`take`), else the recipe alone.
+ * Resolve a key (or legacy id) to what would play.
  * @param {string} name
- * @param {Record<string, { file: string, gainDb: number, vary?: number, group?: string }>} [takes]
- * @returns {{ key: string, file: string|null, recipe: string|null, category: string,
- *   take: { file: string, gainDb: number, vary?: number, group?: string }|null }}
+ * @returns {{ key: string, file: string|null, recipe: string|null, category: string }}
  */
-export function resolveSound(name, takes = WAVELENGTH_TAKES) {
+export function resolveSound(name) {
   const key = legacySoundKey(name);
   const category = SOUND_CATEGORIES[key] || '';
   const file = SOUND_FILES[key] || SOUND_FILES[SOUND_ALIASES[key]] || null;
-  const recipe = recipeForKey(key, category);
-  // A recording always wins; a take only replaces a recipe that is the sound.
-  const take = !file && recipe ? takes[recipe] || null : null;
-  return { key, file, recipe, category, take };
-}
-
-/** A stable 0..1 from a seed, for a take's per-play spread. */
-function seeded(seed) {
-  const x = Math.sin((Number(seed) + 1) * 12.9898) * 43758.5453;
-  return x - Math.floor(x);
+  return { key, file, recipe: recipeForKey(key, category), category };
 }
 
 /**
@@ -55,15 +39,12 @@ function seeded(seed) {
  *   getDestination: () => AudioNode|null,
  *   isMuted?: () => boolean,
  *   fetchImpl?: typeof fetch,
- *   takes?: Record<string, { file: string, gainDb: number, vary?: number, group?: string }>,
  *   volume?: number,
  *   now?: () => number,
  *   onPlayed?: (last: string) => void,
  * }} host
  */
 export function createSoundBoard(host) {
-  const takes = host.takes || WAVELENGTH_TAKES;
-  const resolve = (name) => resolveSound(name, takes);
   const fetchImpl = host.fetchImpl || ((...args) => fetch(...args));
   const now = host.now || (() => performance.now());
   const buffers = new Map(); // url → AudioBuffer
@@ -75,7 +56,7 @@ export function createSoundBoard(host) {
   let busCtx = null;
   let busDestination = null;
   let volume = Number.isFinite(host.volume) ? host.volume : DEFAULT_SFX_VOLUME;
-  const stats = { file: 0, take: 0, synth: 0, skipped: 0, last: '' };
+  const stats = { file: 0, synth: 0, skipped: 0, last: '' };
 
   function output() {
     const ctx = host.getContext();
@@ -143,9 +124,9 @@ export function createSoundBoard(host) {
     };
   }
 
-  function playBuffer(resolved, buffer, opts, take = null) {
+  function playBuffer(resolved, buffer, opts) {
     const ctx = host.getContext();
-    const gain = voiceGain(ctx, (opts.volume ?? 0.8) * (take ? 10 ** (take.gainDb / 20) : 1));
+    const gain = voiceGain(ctx, opts.volume ?? 0.8);
     if (!gain) return null;
     const src = ctx.createBufferSource();
     src.buffer = buffer;
@@ -161,54 +142,11 @@ export function createSoundBoard(host) {
       src.stop(end + 0.02);
     }
     src.onended = () => { try { gain.disconnect(); } catch { /* */ } };
-    if (take) stats.take += 1;
-    else stats.file += 1;
-    stats.last = take ? `${resolved.key}:wavelength:${resolved.recipe}` : `${resolved.key}:file`;
+    stats.file += 1;
+    stats.last = `${resolved.key}:file`;
     host.onPlayed?.(stats.last);
     const seconds = opts.loop ? 600 : buffer.duration / (opts.rate ?? 1);
-    const kind = take ? 'wavelength' : 'file';
-    return track({ key: resolved.key, kind, ...(take ? { recipe: resolved.recipe } : {}), stop: stopper(ctx, gain, src) }, seconds);
-  }
-
-  /**
-   * A recipe's Wavelength take: warm, it plays at the recipe's loudness with
-   * the same volume and rate (plus the recipe's own small per-play spread);
-   * cold, the recipe covers if the file is not in within LATE_FILE_MS; a file
-   * that failed plays the recipe at once. A take in a group (the Piano Party
-   * stars) warms the whole group, so a melody does not fall back note by note.
-   */
-  function playTake(resolved, opts) {
-    const take = resolved.take;
-    if (failed.has(take.file)) return playRecipe(resolved, opts);
-    const spread = take.vary ? 1 + (seeded(opts.seed ?? Math.random() * 1000) * 2 - 1) * take.vary : 1;
-    const takeOpts = { ...opts, rate: (opts.rate ?? 1) * spread };
-    const buffer = buffers.get(take.file);
-    if (buffer) return playBuffer(resolved, buffer, takeOpts, take);
-    if (take.group) warmGroup(take.group);
-    const requested = now();
-    let fallback = null;
-    let timer = null;
-    load(take.file).then((loaded) => {
-      if (fallback || host.isMuted?.()) return;
-      if (!loaded) {
-        // Failed: the recipe plays now instead of after the wait.
-        clearTimeout(timer);
-        if (now() - requested <= LATE_FILE_MS) fallback = playRecipe(resolved, opts);
-        return;
-      }
-      if (now() - requested > LATE_FILE_MS) return;
-      clearTimeout(timer);
-      fallback = playBuffer(resolved, loaded, takeOpts, take);
-    });
-    timer = setTimeout(() => {
-      if (fallback || buffers.has(take.file) || host.isMuted?.()) return;
-      fallback = playRecipe(resolved, opts);
-    }, LATE_FILE_MS);
-    return { key: resolved.key, kind: 'loading', stop() { fallback?.stop(); } };
-  }
-
-  function warmGroup(group) {
-    for (const row of Object.values(takes)) if (row.group === group) load(row.file);
+    return track({ key: resolved.key, kind: 'file', stop: stopper(ctx, gain, src) }, seconds);
   }
 
   function playRecipe(resolved, opts) {
@@ -239,7 +177,7 @@ export function createSoundBoard(host) {
     if (host.isMuted?.()) return null;
     const out = output();
     if (!out) return null;
-    const resolved = resolve(name);
+    const resolved = resolveSound(name);
     if (!resolved.file && !resolved.recipe) {
       stats.skipped += 1;
       return null;
@@ -273,7 +211,6 @@ export function createSoundBoard(host) {
       }, LATE_FILE_MS);
       return { key: resolved.key, kind: 'loading', stop() { fallback?.stop(); } };
     }
-    if (resolved.take && !opts.synth) return playTake(resolved, playOpts);
     return playRecipe(resolved, playOpts);
   }
 
@@ -283,7 +220,7 @@ export function createSoundBoard(host) {
    * hands over to the native loop. Returns a handle whose stop() ends the loop.
    */
   function loop(name, { intervalMs = 650, durationMs = 0, volume = 0.6, rate = 1, jitter = 0.04 } = {}) {
-    const resolved = resolve(name);
+    const resolved = resolveSound(name);
     if (!resolved.file && !resolved.recipe) return { stop() {} };
     let stopped = false;
     let current = null;
@@ -293,7 +230,6 @@ export function createSoundBoard(host) {
       current = play(resolved.key, { volume, rate, loop: true, allowMultiple: true, maxSeconds: durationMs ? durationMs / 1000 : 0 });
     } else {
       if (resolved.file) load(resolved.file);
-      else if (resolved.take) load(resolved.take.file);
       const tick = () => {
         if (stopped || now() >= endAt) return;
         if (resolved.file && buffers.has(resolved.file)) {
@@ -301,11 +237,8 @@ export function createSoundBoard(host) {
           current = play(resolved.key, { volume, rate, loop: true, allowMultiple: true, maxSeconds: left });
           return;
         }
-        // A take re-fires like its recipe did (it is a one-shot, not a loop),
-        // and only once it is warm: until then the recipe ticks.
-        const warmTake = resolved.take && buffers.has(resolved.take.file);
         current = resolved.recipe
-          ? play(resolved.key, { volume, rate, jitter, allowMultiple: true, synth: !warmTake, seed: Math.floor(Math.random() * 1000) })
+          ? play(resolved.key, { volume, rate, jitter, allowMultiple: true, synth: true, seed: Math.floor(Math.random() * 1000) })
           : null;
         timer = setTimeout(tick, resolved.recipe ? intervalMs : 120);
       };
@@ -322,11 +255,7 @@ export function createSoundBoard(host) {
   }
 
   function preload(names = []) {
-    const urls = names.map((n) => {
-      const r = resolve(n);
-      return r.file || r.take?.file;
-    });
-    return Promise.all(urls.filter(Boolean).map((url) => load(url)));
+    return Promise.all(names.map((n) => resolveSound(n).file).filter(Boolean).map((url) => load(url)));
   }
 
   function setVolume(v) {
@@ -343,7 +272,7 @@ export function createSoundBoard(host) {
     play,
     loop,
     preload,
-    resolve,
+    resolve: resolveSound,
     setVolume,
     stopAll,
     get volume() { return volume; },
