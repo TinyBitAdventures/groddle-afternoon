@@ -1,0 +1,239 @@
+{
+ "decos": {
+  "door_asset_apartment_door_lock": {
+   "1": {
+    "bytes": 81886,
+    "err": 3.12,
+    "lossless": false,
+    "sha": "5beb9f51bc3ba5ad",
+    "size": [
+     489,
+     579
+    ],
+    "swf_sha": "7442f5cd4dec3d5a"
+   },
+   "2": {
+    "bytes": 81526,
+    "err": 3.1,
+    "lossless": false,
+    "sha": "1b585cf8301ec8a7",
+    "size": [
+     489,
+     579
+    ],
+    "swf_sha": "7442f5cd4dec3d5a"
+   },
+   "3": {
+    "bytes": 81098,
+    "err": 3.15,
+    "lossless": false,
+    "sha": "9924b6c312a1585d",
+    "size": [
+     489,
+     579
+    ],
+    "swf_sha": "7442f5cd4dec3d5a"
+   },
+   "4": {
+    "bytes": 81854,
+    "err": 3.11,
+    "lossless": false,
+    "sha": "29020a9fcbabc4e6",
+    "size": [
+     489,
+     579
+    ],
+    "swf_sha": "7442f5cd4dec3d5a"
+   },
+   "5": {
+    "bytes": 81814,
+    "err": 3.09,
+    "lossless": false,
+    "sha": "66c43ab46ca36bc1",
+    "size": [
+     489,
+     579
+    ],
+    "swf_sha": "7442f5cd4dec3d5a"
+   }
+  },
+  "door_asset_heights_door_lock": {
+   "1": {
+    "bytes": 97010,
+    "err": 3.05,
+    "lossless": false,
+    "sha": "3eae4f11d285ccc0",
+    "size": [
+     549,
+     525
+    ],
+    "swf_sha": "1a888c6af145903a"
+   },
+   "10": {
+    "bytes": 96918,
+    "err": 3.05,
+    "lossless": false,
+    "sha": "ffffd9b0a05e67a5",
+    "size": [
+     549,
+     525
+    ],
+    "swf_sha": "1a888c6af145903a"
+   },
+   "2": {
+    "bytes": 96484,
+    "err": 2.94,
+    "lossless": false,
+    "sha": "12e9f56849e11a91",
+    "size": [
+     549,
+     525
+    ],
+    "swf_sha": "1a888c6af145903a"
+   },
+   "5": {
+    "bytes": 96714,
+    "err": 3.07,
+    "lossless": false,
+    "sha": "d8a76922e2d80343",
+    "size": [
+     549,
+     525
+    ],
+    "swf_sha": "1a888c6af145903a"
+   },
+   "8": {
+    "bytes": 96442,
+    "err": 2.93,
+    "lossless": false,
+    "sha": "fc321b31cfa7bc98",
+    "size": [
+     549,
+     525
+    ],
+    "swf_sha": "1a888c6af145903a"
+   }
+  },
+  "door_asset_wooden_door_lock": {
+   "9": {
+    "bytes": 21232,
+    "err": 2.82,
+    "lossless": false,
+    "sha": "8186c5495901ccf5",
+    "size": [
+     591,
+     498
+    ],
+    "swf_sha": "9c68f7759b63d1f9"
+   }
+  },
+  "groddle_door_asset_groddle_wooden_door_lock": {
+   "1": {
+    "bytes": 35578,
+    "err": 3.6,
+    "lossless": false,
+    "sha": "565342cec787b633",
+    "size": [
+     540,
+     513
+    ],
+    "swf_sha": "a95af646feb34c35"
+   },
+   "10": {
+    "bytes": 36064,
+    "err": 3.52,
+    "lossless": false,
+    "sha": "8cf44fcb2ba9e68c",
+    "size": [
+     540,
+     513
+    ],
+    "swf_sha": "a95af646feb34c35"
+   },
+   "12": {
+    "bytes": 35830,
+    "err": 3.54,
+    "lossless": false,
+    "sha": "952d8dad53ee1556",
+    "size": [
+     540,
+     513
+    ],
+    "swf_sha": "a95af646feb34c35"
+   },
+   "2": {
+    "bytes": 35358,
+    "err": 3.54,
+    "lossless": false,
+    "sha": "b65222ffa130f9c7",
+    "size": [
+     540,
+     513
+    ],
+    "swf_sha": "a95af646feb34c35"
+   },
+   "3": {
+    "bytes": 34924,
+    "err": 3.63,
+    "lossless": false,
+    "sha": "235d5f4d222c86be",
+    "size": [
+     540,
+     513
+    ],
+    "swf_sha": "a95af646feb34c35"
+   },
+   "4": {
+    "bytes": 35484,
+    "err": 3.56,
+    "lossless": false,
+    "sha": "3a907571bed99aec",
+    "size": [
+     540,
+     513
+    ],
+    "swf_sha": "a95af646feb34c35"
+   },
+   "5": {
+    "bytes": 35302,
+    "err": 3.57,
+    "lossless": false,
+    "sha": "b8108475fd79cc4c",
+    "size": [
+     540,
+     513
+    ],
+    "swf_sha": "a95af646feb34c35"
+   }
+  },
+  "zutto_door_asset_wooden_door_lock": {
+   "7": {
+    "bytes": 20982,
+    "err": 2.94,
+    "lossless": false,
+    "sha": "1d1b970a5e642285",
+    "size": [
+     591,
+     498
+    ],
+    "swf_sha": "f436874f34ce4db4"
+   },
+   "9": {
+    "bytes": 21232,
+    "err": 2.82,
+    "lossless": false,
+    "sha": "8186c5495901ccf5",
+    "size": [
+     591,
+     498
+    ],
+    "swf_sha": "f436874f34ce4db4"
+   }
+  }
+ },
+ "skipped": {
+  "door_asset_jethimadh_tower_interior_lock02": "no SWF render in plan.json (deco kept as its PNG)",
+  "door_asset_jethimadh_tower_interior_lock_fix2": "no SWF render in plan.json (deco kept as its PNG)"
+ },
+ "version": 1
+}

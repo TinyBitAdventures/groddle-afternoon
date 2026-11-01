@@ -45,6 +45,7 @@ import {
   visibleDoors,
 } from '../doors.js?v=eb9510b1';
 import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=db2ce452';
+import { doorLockArt } from '../door-lock-art.js?v=ccb7b6a1';
 
 export const DOORS_FEATURE_ID = 'doors';
 const DECO_BASE = 'assets/decos/groddle/';
@@ -132,7 +133,10 @@ function buildView(engine, door, available) {
   const { PIXI } = engine;
   // `src`: art rendered at the door's own size (Jethimadh Room 16's mouth, tools/room-art), over the deco.
   const hasArt = Boolean(door.src) || (door.sprite && available.has(door.sprite));
-  const tex = door.src ? textureFromUrl(door.src) : hasArt ? textureFromUrl(`${DECO_BASE}${door.sprite}.png`) : drawnDoorTexture(PIXI, door);
+  // A locked door shows only its key's keyhole (the deco's showLock(key_id), DoorView.as 243-244);
+  // the plain deco has all twelve stacked (tools/deco-pipeline/door-locks.py).
+  const lockArt = !door.src && hasArt && door.key_id ? doorLockArt(door.sprite, door.key_id) : null;
+  const tex = door.src ? textureFromUrl(door.src) : lockArt ? textureFromUrl(lockArt) : hasArt ? textureFromUrl(`${DECO_BASE}${door.sprite}.png`) : drawnDoorTexture(PIXI, door);
   const sprite = new PIXI.Sprite(tex);
   sprite.anchor.set(0.5, 1);
   sprite.x = door.x;
@@ -145,7 +149,7 @@ function buildView(engine, door, available) {
   sprite._worldHitW = Math.max(40, door.w || 60);
   sprite._worldHitH = Math.max(60, door.h || 110);
   engine.entityLayer.addChild(sprite);
-  const view = { door, sprite, extras: [], target: null, art: hasArt ? 'deco' : 'drawn' };
+  const view = { door, sprite, extras: [], target: null, art: lockArt ? 'lock' : hasArt ? 'deco' : 'drawn' };
 
   if (door.key_id && DOOR_KEYS[door.key_id]) {
     const badge = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${doorKeyClass(door.key_id)}.png`));
