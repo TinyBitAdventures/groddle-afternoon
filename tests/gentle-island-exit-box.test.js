@@ -56,7 +56,7 @@ describe('the exit box goes for everyone (newbie_island.js hitBox 24-29)', () =>
 
 describe('newxp-feature wiring', () => {
   it('the feature tests the box every tick, before the tutorial-only guard', () => {
-    assert.match(feature, /exitBoxTick\(engine\);\s*if \(!active\(\)\) \{\s*publish\(engine, now\);\s*return;/);
+    assert.match(feature, /exitBoxTick\(engine\);\s*leaveFlagTick\(engine, now\);\s*if \(!active\(\)\) \{\s*publish\(engine, now\);\s*return;/);
     assert.match(feature, /function exitBoxTick\(engine\) \{[\s\S]{0,200}exitBoxAction\(save\) !== 'teleport'\) return;[\s\S]{0,200}inHitBox\(box, p\.x, p\.y\)/);
   });
 

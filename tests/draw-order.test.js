@@ -196,7 +196,7 @@ describe('the Enter chip and its target\'s bubble', () => {
 
   it('the chip waits while the thing it names is talking', () => {
     const game = read('public/game.js');
-    assert.match(game, /if \(!enterHeldBy\(\) && !speakingNow\(near\)\) want = \{/);
+    assert.match(game, /if \(!enterHeldBy\(\) && !speakingNow\(near\) && features\.query\('quietEnterHint', engine\) !== true\) want = \{/);
     assert.match(game, /function speakingNow\(target\) \{[\s\S]{0,200}speechBubbles\.some/);
   });
 });

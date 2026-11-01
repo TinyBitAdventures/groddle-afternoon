@@ -228,7 +228,8 @@ describe('every shared street', () => {
     }
     assert.deepEqual(bad, []);
     assert.ok(doors >= 240, String(doors));
-    assert.ok(animals >= 3000, String(animals));
+    // Ticket 25: Butterflies all fly now (no resting ones on a floor), so fewer animals are planned on floors.
+    assert.ok(animals >= 2500, String(animals));
   });
 
   it('the server data keeps the doors clear', { skip: skipWithoutServer }, async () => {

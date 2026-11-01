@@ -142,7 +142,7 @@ describe('G277: timer buff icons for NPC classes', () => {
 describe('G277: emergencies, Escape and plain confirms', () => {
   it('a waiting emergency is looked at every second', () => {
     assert.equal(EMERGENCY_RETRY_MS, 1000);
-    assert.match(read('js/features/quest-offers-feature.js'), /if \(!offerOpen && waitingOffers\(engine\.questState\)\.some\(\(row\) => row\.emergency\)\) \{\n\s+nextOfferCheckAt = Math\.min\(nextOfferCheckAt, now \+ EMERGENCY_RETRY_MS\);/);
+    assert.match(read('js/features/quest-offers-feature.js'), /if \(!offerOpen && !emergencySnoozed\(engine, now\) && waitingOffers\(engine\.questState\)\.some\(\(row\) => row\.emergency\)\) \{\n\s+nextOfferCheckAt = Math\.min\(nextOfferCheckAt, now \+ EMERGENCY_RETRY_MS\);/);
   });
 
   it('the client checks every second', { skip: !hasClient && 'no glitch-client' }, () => {
