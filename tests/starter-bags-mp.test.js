@@ -15,9 +15,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { ITEM_CATALOG, isToolItem } from '../public/js/inventory.js?v=91ee49cd';
-import { BAG_DEFS, PACK_CAPACITY, STARTER_FLOOR, arrangeIntoBags, isBagClass, layoutPack, packIntoBags, starterKit } from '../public/js/pack-slots.js?v=00bca2cf';
+import { BAG_DEFS, PACK_CAPACITY, STARTER_FLOOR, arrangeIntoBags, isBagClass, layoutPack, packIntoBags, starterKit } from '../public/js/pack-slots.js?v=09c6ccbe';
 import { STACKMAX, TOOL_CLASSES } from '../public/js/pack-slots-data.js?v=330c51e4';
-import { applyStarter, bagsFeature, starterMint, starterText } from '../public/js/features/bags-feature.js?v=80f68991';
+import { applyStarter, bagsFeature, starterMint, starterText } from '../public/js/features/bags-feature.js?v=5cea431c';
 import { sitePackSlotsJson, OUT } from '../tools/build-site-pack-slots.mjs';
 import { HAS_SITE, SITE_DIR } from '../tools/repos.mjs';
 

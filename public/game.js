@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=30c75cfd';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=5be63ce2';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f5076396';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d7ec374a';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -36,7 +36,7 @@ import {
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=06a5e180';
+import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=fe9fb524';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -220,7 +220,7 @@ import {
   rookEggStateForProgress,
   rookWoodsObjective,
   rookWoodsRemainingMs,
-} from './js/rook-woods.js?v=3bc5c6ae';
+} from './js/rook-woods.js?v=754a9774';
 import {
   ROOK_HALL_QUEST_ID,
   ROOK_HALL_START_QUEST_ID,
@@ -458,10 +458,10 @@ import {
   removeItem,
   isToolItem,
 } from './js/inventory.js?v=91ee49cd';
-import { PACK_COPY, unitRankAt } from './js/pack-slots.js?v=00bca2cf';
+import { PACK_COPY, isBagClass, unitRankAt } from './js/pack-slots.js?v=09c6ccbe';
 import { createPackRow, mountPackClearance, packBandRange, packCountText, packSearchEntries, packSlotTip } from './js/ui/pack-row.js?v=9b23e21a';
-import { listAnimalFeedOptions } from './js/animals.js?v=7f5e5a98';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=7f5e5a98';
+import { listAnimalFeedOptions } from './js/animals.js?v=0b84b6a9';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=0b84b6a9';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -470,13 +470,15 @@ import {
   normalizeStackQuantity,
   dropInventoryStack,
   pickupDroppedStack,
-} from './js/world-items.js?v=6b64c534';
+  placeDroppedBag,
+  takeDroppedRecord,
+} from './js/world-items.js?v=908b061e';
 import {
   createPlayerSave,
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=2d300ea9';
+} from './js/player-save.js?v=0a6b25cc';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -517,7 +519,7 @@ import {
   firstWorkingTool,
   bindToolInventory,
   TOOL_CONDITION_CATALOG as TOOL_WEAR,
-} from './js/tools.js?v=93286603';
+} from './js/tools.js?v=3d109172';
 import {
   listRecipes,
   listRecipesForTool,
@@ -546,7 +548,7 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=c9b7fd23';
+} from './js/making.js?v=ea3f10b5';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=6f758e09';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=0fb7a5ca';
 import {
@@ -573,7 +575,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=1ec5a019';
+} from './js/garden.js?v=d605b654';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=05651e76';
 import {
   ROCK_CATALOG,
@@ -586,7 +588,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=fb4c7898';
+} from './js/mining.js?v=e356fe60';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -773,19 +775,19 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=7dfc77a5';
+} from './js/vendor.js?v=01acb225';
 import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=7f5e5a98';
+} from './js/animals.js?v=0b84b6a9';
 import {
   ensureWoodTreeState,
   pickWoodTool,
   resetWoodTreeDay,
   woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=58743072';
+} from './js/woodcutting.js?v=38730935';
 import {
   GIANTS,
   createShrineState,
@@ -808,7 +810,7 @@ import {
   emblemRelationNote,
   formatSpeedUpTime,
 } from './js/shrines.js?v=7dd8f176';
-import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=bff50be4';
+import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=279a153b';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,
@@ -3097,10 +3099,15 @@ function colorizeActivityText(text) {
     );
 }
 
-function findPackSlotElement(classTsid, copy = null) {
+function findPackSlotElement(classTsid, copy = null, bag = null) {
   const all = [...document.querySelectorAll('.pack-slot[data-tsid]')].filter((el) => el.dataset.tsid === classTsid);
-  return (copy != null && all.find((el) => el.dataset.packCopy === String(copy))) || all[0] || null;
+  return (copy != null && all.find((el) => el.dataset.packCopy === String(copy)))
+    || (bag && all.find((el) => el.dataset.packBag === String(bag)))
+    || all[0] || null;
 }
+
+/** Which bag the open pack popover is about (its slot's bag key), or null: two bags of one colour are two bags. */
+let packSelectedBag = null;
 
 /** Which of a class's tools the open pack popover is about (its slot's place in pack order), or null. */
 let packSelectedCopy = null;
@@ -3111,6 +3118,7 @@ let packPopoverMarkup = '';
 function closePackPopover() {
   packSelected = null;
   packSelectedCopy = null;
+  packSelectedBag = null;
   packDropMode = false;
   packDropQty = 1;
   packEatMode = false;
@@ -3750,12 +3758,17 @@ function renderPackPopover(classTsid, anchor = null) {
     packEatQty = 1;
   }
   // A tool's own slot says which tool it is (its wear and its repair are that one's).
-  if (packSelected !== classTsid) packSelectedCopy = null;
+  if (packSelected !== classTsid) {
+    packSelectedCopy = null;
+    packSelectedBag = null;
+  }
   if (anchor?.dataset?.packCopy != null && anchor.dataset.packCopy !== '') packSelectedCopy = Number(anchor.dataset.packCopy);
+  // A bag's menu stays the bag it was opened on (its slot's key), whatever redraws the popover.
+  if (anchor?.dataset?.packBag) packSelectedBag = anchor.dataset.packBag;
   packSelected = classTsid;
   packDropQty = normalizeStackQuantity(packDropQty, slot.count);
   // A pack redraw replaces the slot buttons: an anchor from before it falls back to the slot.
-  const sourceAnchor = (anchor?.isConnected ? anchor : null) || findPackSlotElement(classTsid, packSelectedCopy);
+  const sourceAnchor = (anchor?.isConnected ? anchor : null) || findPackSlotElement(classTsid, packSelectedCopy, packSelectedBag);
   const useInfo = getPackUseInfo(classTsid);
   const isEmotionalBear = classTsid === EMOTIONAL_BEAR_ID;
   const bearActions = isEmotionalBear
@@ -4127,6 +4140,11 @@ function renderPackPopover(classTsid, anchor = null) {
     stageVendorSell(classTsid);
   });
   pop.querySelector('[data-pack-drop]')?.addEventListener('click', () => {
+    // A bag is one bag: drop the one this menu is about, with what it holds (no count chooser).
+    if (isBagClass(classTsid)) {
+      dropPackBag(classTsid, packSelectedBag || sourceAnchor?.dataset?.packBag || '');
+      return;
+    }
     if (slot.count <= 1) {
       dropPackItem(classTsid, 1);
       return;
@@ -11687,13 +11705,16 @@ function spawnDroppedItemStack(stack) {
   register({
     classId: 'dropped_item',
     label: named?.label || item.label || stack.classTsid,
-    subtitle: `${named ? `${named.kind} · ` : ''}${stack.subtitle || `Dropped stack · ${stack.count} in this pile`}`,
+    subtitle: `${named ? `${named.kind} · ` : ''}${stack.subtitle || (stack.contents?.length
+      ? `Dropped bag · ${stack.contents.length} ${stack.contents.length === 1 ? 'stack' : 'stacks'} inside`
+      : `Dropped stack · ${stack.count} in this pile`)}`,
     sprite: spr,
     state: {
       id: stack.id,
       classTsid: stack.classTsid,
       count: stack.count,
       label: named?.label || item.label || stack.classTsid,
+      ...(stack.contents?.length ? { contents: stack.contents.map((c) => ({ ...c })) } : {}),
     },
     worldItemId: stack.id,
   });
@@ -11819,7 +11840,106 @@ function dropPackItem(classTsid, requested = 1) {
   updateHud();
 }
 
+/**
+ * Drop the bag the player chose (its key), as the source did: a bag goes down
+ * whole with what it holds (items/include/takeable.js takeable_drop 157-213; the
+ * conditions let it unless something in it is locked to you, 122-130), and it
+ * comes back up with it all inside (pickupDroppedWorldItem). An empty bag drops
+ * as any stack does (shared on a public street online); one with things in it
+ * stays the player's own (the shared ground carries single stacks: drops.go).
+ */
+function dropPackBag(classTsid, key) {
+  if (!state.started || !player || !currentStreetTsid) return;
+  const blocked = packDropBlockReason(classTsid);
+  if (blocked) {
+    toast(blocked);
+    return;
+  }
+  const layout = features.query('packLayout', engine);
+  const bagKey = layout?.bags?.[key]?.cls === classTsid
+    ? key
+    : layout?.pack?.slots?.find((s) => s.kind === 'bag' && s.cls === classTsid)?.key;
+  const box = bagKey ? layout.bags[bagKey] : null;
+  if (!box) {
+    dropPackItem(classTsid, 1);
+    return;
+  }
+  if (!box.slots.length) {
+    features.query('packBagLeaves', bagKey, engine);
+    dropPackItem(classTsid, 1);
+    return;
+  }
+  if (box.slots.some((s) => packDropBlockReason(s.cls))) {
+    toast("This contains items locked to you and can't be dropped.");
+    return;
+  }
+  const facing = player.facing === 'left' ? -1 : 1;
+  const x = clamp(player.x + facing * 72, 24, Math.max(24, WORLD_W - 24));
+  const y = landingY(streetPlatforms, x, player.y - 20) ?? player.y;
+  const res = features.query('packTakeBag', bagKey, engine);
+  closePackPopover();
+  if (!res?.ok) {
+    toast('Could not drop that item.');
+    return;
+  }
+  const result = placeDroppedBag(droppedItemState, droppedStacksTsid(), classTsid, res.contents, { x, y }, { now: Date.now() });
+  saveDroppedItems();
+  refreshDroppedWorldItems();
+  const label = ITEM_CATALOG[classTsid]?.label || classTsid.replace(/_/g, ' ');
+  const line = `You dropped 1× ${label}.`;
+  toast(line);
+  pushActivity(line);
+  floatText(result.stack.x, result.stack.y - 55, `−1 ${label}`, 0xf2c879);
+  burst(result.stack.x, result.stack.y - 12, 0xd8c49a, 7);
+  playSound('ITEM_DROP', { volume: 0.6 });
+  updateHud();
+}
+
+/** Pick up a dropped bag with what it held: it comes back whole, everything still inside. */
+function pickupDroppedBag(target) {
+  const cls = target?.state?.classTsid;
+  const contents = target?.state?.contents || [];
+  if (!features.query('packBagRoom', cls, contents, engine)) {
+    playSound('PACK_FULL', { volume: 0.6 });
+    toast(PACK_COPY.pickupFull);
+    pushActivity(PACK_COPY.pickupFull);
+    if (app?.canvas) app.canvas.dataset.packLast = PACK_COPY.pickupFull;
+    return false;
+  }
+  const id = target?.state?.id || target?.worldItemId;
+  const x = target?.sprite?.x ?? player?.x ?? 0;
+  const y = target?.sprite?.y ?? player?.y ?? 0;
+  const tsid = droppedStacksTsid();
+  const record = takeDroppedRecord(droppedItemState, tsid, id);
+  if (!record) {
+    toast('That stack has already been picked up.');
+    refreshDroppedWorldItems();
+    return false;
+  }
+  const res = features.query('packGiveBag', record.classTsid, record.contents || [], engine);
+  if (!res?.ok) {
+    // It didn't fit after all: it stays where it was.
+    (droppedItemState.streets[tsid] ||= []).push(record);
+    playSound('PACK_FULL', { volume: 0.6 });
+    toast(PACK_COPY.pickupFull);
+    refreshDroppedWorldItems();
+    return false;
+  }
+  saveDroppedItems();
+  const label = ITEM_CATALOG[record.classTsid]?.label || record.classTsid.replace(/_/g, ' ');
+  const line = `You picked up 1× ${label}.`;
+  toast(line);
+  pushActivity(line);
+  floatText(x, y - 55, `+1 ${label}`, 0x7dcea0);
+  burst(x, y - 12, 0xffe066, 10);
+  playSound('ITEM_PICKUP', { volume: 0.65, jitter: 0.04 });
+  refreshDroppedWorldItems();
+  updateHud();
+  return true;
+}
+
 function pickupDroppedWorldItem(target) {
+  if (target?.state?.contents?.length) return pickupDroppedBag(target);
   // G152 (takeable.js:76-79, 84-93): a full pack refuses the stack; a part that fits is taken, the rest stays down.
   const wantClass = target?.state?.classTsid;
   const wantCount = Math.max(1, Math.floor(Number(target?.state?.count) || 1));
@@ -28008,7 +28128,7 @@ async function main() {
   }
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
-    import('./js/garden-talk-qa.js?v=728c61a8').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+    import('./js/garden-talk-qa.js?v=534be670').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   // Loading card QA (js/loading-card-qa.js): ?loadcarddemo=<tsid>[,<tsid>].
   if (new URLSearchParams(location.search).has('loadcarddemo')) {

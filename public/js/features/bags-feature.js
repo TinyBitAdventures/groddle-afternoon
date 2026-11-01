@@ -43,7 +43,10 @@
  * Departures (see js/pack-slots.js): every overflow is held by the magic rock
  * (the source put things made from a source on the ground); rock-held stacks
  * are out of the pack but recipes and quests still count them; elements may
- * use pack slots; a bag that leaves the pack leaves its contents behind; a
+ * use pack slots; a bag that leaves the pack some other way (sold, given,
+ * traded) leaves its contents behind, but a dropped bag takes them with it and
+ * brings them back when it is picked up, as the source's did (packTakeBag,
+ * packGiveBag; player report 2026-11-01); a
  * bag that arrives (bought, a reward, a gift, mail, picked up, made) goes in
  * place of the leftmost pack slot that is not a bag and takes the stack there
  * in with it, so a full pack still takes one (Austin 2026-10-31; the source
@@ -61,7 +64,7 @@
  * grant(class, n) to gain something the way a reward does.
  */
 
-import { ITEM_CATALOG, addItem, isToolItem } from '../inventory.js?v=91ee49cd';
+import { ITEM_CATALOG, addItem, isToolItem, removeItem } from '../inventory.js?v=91ee49cd';
 import {
   BAG_DEFS,
   PACK_CAPACITY,
@@ -70,14 +73,18 @@ import {
   isBagClass,
   layoutPack,
   arrangeIntoBags,
+  bagLeavesLast,
+  giveBag,
   isBagClass as isBag,
   moveStack,
   normalizePrefs,
   packIntoBags,
   roomFor,
+  takeBag,
+  unitPlaces,
   unitRankAt,
-} from '../pack-slots.js?v=00bca2cf';
-import { TOOL_CONDITION_CATALOG, moveToolCopy } from '../tools.js?v=93286603';
+} from '../pack-slots.js?v=09c6ccbe';
+import { TOOL_CONDITION_CATALOG, moveToolCopy, pickToolCopies, placeToolCopies } from '../tools.js?v=3d109172';
 import { createMinnAccount } from '../minn-account.js?v=ea900c51';
 
 export const BAGS_FEATURE_ID = 'bags';
@@ -411,6 +418,99 @@ export const bagsFeature = {
     return doMove(engine, from, to);
   },
 
+  /**
+   * A drop of a bag with things in it (game.js dropPackBag): the bag the player chose
+   * leaves the pack with all it holds, as in the source (pack-slots.js takeBag).
+   * Returns { ok, cls, contents: [{ cls, count, points? }] }; the inventory and the
+   * arrangement have changed (tools' wear goes with them in `points`).
+   */
+  packTakeBag(key, engine) {
+    if (!engine?.inv) return { ok: false, reason: 'missing' };
+    const o = opts();
+    const layout = layoutPack(engine.inv, slice.prefs, o);
+    const res = takeBag(engine.inv, slice.prefs, key, o);
+    if (!res.ok) return res;
+    const contents = res.contents.map((c) => ({ ...c }));
+    if (engine.toolState) {
+      for (const cls of new Set(contents.map((c) => c.cls))) {
+        if (!TOOL_CONDITION_CATALOG[cls]) continue;
+        const places = unitPlaces(layout, cls);
+        const ranks = [];
+        const per = [];
+        contents.forEach((c, j) => {
+          if (c.cls !== cls) return;
+          const mine = [];
+          places.forEach((pl, r) => { if (pl.container === String(key) && pl.index === j) mine.push(r); });
+          ranks.push(...mine);
+          per.push([c, mine.length]);
+        });
+        const points = pickToolCopies(engine.toolState, cls, ranks);
+        let at = 0;
+        for (const [c, n] of per) {
+          c.points = points.slice(at, at + n);
+          at += n;
+        }
+      }
+    }
+    removeItem(engine.inv, res.cls, 1);
+    for (const c of contents) removeItem(engine.inv, c.cls, c.count);
+    slice.prefs = normalizePrefs(res.prefs);
+    if (slice.open === String(key)) slice.open = '';
+    engine.setData?.('packLast', `bag_out:${res.cls}:${contents.length}`);
+    return { ok: true, cls: res.cls, contents };
+  },
+
+  /** An empty bag's drop (shared or not) takes the bag the player chose (pack-slots.js bagLeavesLast). */
+  packBagLeaves(key) {
+    slice.prefs = bagLeavesLast(slice.prefs, key);
+    return true;
+  },
+
+  /** Whether a dropped bag with these contents fits back in the pack now (pick up). */
+  packBagRoom(cls, contents, engine) {
+    return giveBag(engine?.inv || {}, slice.prefs, String(cls || ''), (contents || []).map((c) => ({ cls: c.classTsid || c.cls, count: c.count })), opts()).ok;
+  },
+
+  /**
+   * A pick up of a bag with things in it: the bag comes back with them inside
+   * (pack-slots.js giveBag) and its tools keep their wear. Returns { ok, key } or
+   * { ok: false, reason: 'full' }; on ok the inventory holds the bag and its contents.
+   */
+  packGiveBag(cls, contents, engine) {
+    if (!engine?.inv) return { ok: false, reason: 'missing' };
+    const o = opts();
+    const list = (contents || []).map((c) => ({ cls: c.classTsid || c.cls, count: c.count, points: c.points }));
+    const res = giveBag(engine.inv, slice.prefs, String(cls || ''), list, o);
+    if (!res.ok) return res;
+    addItem(engine.inv, String(cls), 1);
+    for (const c of list) addItem(engine.inv, c.cls, c.count);
+    slice.prefs = normalizePrefs(res.prefs);
+    if (engine.toolState) {
+      const layout = layoutPack(engine.inv, slice.prefs, o);
+      const box = layout.bags[res.key];
+      for (const tcls of new Set(list.map((c) => c.cls))) {
+        if (!TOOL_CONDITION_CATALOG[tcls] || !box) continue;
+        const places = unitPlaces(layout, tcls);
+        const ranks = [];
+        const points = [];
+        // The contents went in in order, so the bag's j-th slot is the j-th content (a swallowed stack comes last).
+        list.forEach((c, j) => {
+          if (c.cls !== tcls) return;
+          let k = 0;
+          places.forEach((pl, r) => {
+            if (pl.container !== res.key || pl.index !== j) return;
+            ranks.push(r);
+            points.push(Array.isArray(c.points) ? (c.points[k] ?? null) : null);
+            k += 1;
+          });
+        });
+        if (ranks.length) placeToolCopies(engine.toolState, tcls, ranks, points);
+      }
+    }
+    engine.setData?.('packLast', `bag_in:${cls}:${list.length}`);
+    return { ok: true, key: res.key };
+  },
+
   packOpenBag() {
     return slice.open || '';
   },
@@ -427,8 +527,12 @@ export const bagsFeature = {
     if (!Array.isArray(verbs) || !verbs.some((v) => v?.id === 'pickup' && v.enabled !== false)) return null;
     const cls = target?.classId === 'dropped_item' ? target?.state?.classTsid : target?.classId;
     if (!cls) return null;
-    const room = roomFor(engine?.inv || {}, slice.prefs, cls, 1, opts());
-    if (room > 0) return null;
+    // A dropped bag with things in it needs room for itself with them inside (pack-slots.js giveBag).
+    const contents = target?.classId === 'dropped_item' ? target?.state?.contents : null;
+    const fits = contents?.length
+      ? bagsFeature.packBagRoom(cls, contents, engine)
+      : roomFor(engine?.inv || {}, slice.prefs, cls, 1, opts()) > 0;
+    if (fits) return null;
     return verbs.map((v) => (v?.id === 'pickup' ? { ...v, enabled: false, reason: PACK_COPY.pickupDisabled } : v));
   },
 

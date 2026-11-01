@@ -47,12 +47,35 @@ function pointsFor(points, count) {
   return out;
 }
 
+/** The most stacks a bag holds (js/pack-slots.js BAG_DEFS: 16). */
+export const BAG_CONTENTS_MAX = 16;
+
+/**
+ * What a dropped bag holds ([{ classTsid, count, points? }]), or null: in the
+ * source a bag goes down with its contents inside it (items/include/takeable.js
+ * takeable_drop 157-213 moves the bag itemstack and all it holds).
+ */
+export function cleanContents(value) {
+  if (!Array.isArray(value)) return null;
+  const out = [];
+  for (const row of value.slice(0, BAG_CONTENTS_MAX)) {
+    const classTsid = cleanClassTsid(row?.classTsid ?? row?.cls);
+    const count = cleanCount(row?.count);
+    if (!classTsid || count < 1) continue;
+    const points = cleanPoints(row?.points, count);
+    out.push({ classTsid, count, ...(points ? { points } : {}) });
+  }
+  return out.length ? out : null;
+}
+
 function cleanRecord(row, streetTsid, fallbackId) {
   const classTsid = cleanClassTsid(row?.classTsid);
   const count = cleanCount(row?.count);
   if (!classTsid || count < 1) return null;
   const id = String(row?.id || fallbackId).trim() || fallbackId;
   const points = cleanPoints(row?.points, count);
+  // A bag with things in it is one bag (bags never stack, stackmax 1).
+  const contents = count === 1 ? cleanContents(row?.contents) : null;
   return {
     id,
     streetTsid,
@@ -62,6 +85,7 @@ function cleanRecord(row, streetTsid, fallbackId) {
     y: finite(row?.y, 0),
     droppedAt: Math.max(0, Math.floor(finite(row?.droppedAt, 0))),
     ...(points ? { points } : {}),
+    ...(contents ? { contents } : {}),
   };
 }
 
@@ -145,7 +169,7 @@ export function dropInventoryStack(state, inv, streetTsid, classTsid, requested,
   const mergeRadius = Math.max(0, finite(opts.mergeRadius, DEFAULT_MERGE_RADIUS));
   const merge = opts.merge !== false
     ? rows
-      .filter((row) => row.classTsid === item)
+      .filter((row) => row.classTsid === item && !row.contents)
       .map((row) => ({ row, distance: Math.hypot(row.x - x, row.y - y) }))
       .filter((candidate) => candidate.distance <= mergeRadius)
       .sort((a, b) => a.distance - b.distance)[0]?.row
@@ -202,4 +226,40 @@ export function pickupDroppedStack(state, inv, streetTsid, stackId, requested = 
     remaining: Math.max(0, stack.count),
     ...(points.some((r) => r != null) ? { points } : {}),
   };
+}
+
+/**
+ * Put a bag down with what it held (the pack already gave them up: bags-feature
+ * packTakeBag). It never merges: each bag is its own thing on the ground.
+ */
+export function placeDroppedBag(state, streetTsid, classTsid, contents, position = {}, opts = {}) {
+  const street = cleanStreetTsid(streetTsid);
+  const item = cleanClassTsid(classTsid);
+  if (!street || !item) return { ok: false, reason: 'invalid_target' };
+  const held = cleanContents((contents || []).map((c) => ({ classTsid: c.classTsid ?? c.cls, count: c.count, points: c.points })));
+  const rows = state.streets[street] || (state.streets[street] = []);
+  const stack = {
+    id: `world-item-${state.nextId++}`,
+    streetTsid: street,
+    classTsid: item,
+    count: 1,
+    x: finite(position?.x, 0),
+    y: finite(position?.y, 0),
+    droppedAt: Math.max(0, Math.floor(finite(opts.now, Date.now()))),
+    ...(held ? { contents: held } : {}),
+  };
+  rows.push(stack);
+  return { ok: true, count: 1, stack: { ...stack }, merged: false };
+}
+
+/** Take a whole record off the ground (a bag with its contents going back into the pack). */
+export function takeDroppedRecord(state, streetTsid, stackId) {
+  const street = cleanStreetTsid(streetTsid);
+  const rows = state?.streets?.[street];
+  if (!Array.isArray(rows)) return null;
+  const index = rows.findIndex((row) => row.id === stackId);
+  if (index < 0) return null;
+  const [row] = rows.splice(index, 1);
+  if (!rows.length) delete state.streets[street];
+  return row;
 }

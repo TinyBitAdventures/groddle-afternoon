@@ -21,7 +21,7 @@ import {
   getWaterState,
 } from '../public/js/water-cooler.js?v=1cf1b040';
 import { addItem, countItem, removeItem } from '../public/js/inventory.js?v=91ee49cd';
-import { COOLER_X, DRINK_VERB, GET_WATER_VERB, bureaucraticHallsFeature } from '../public/js/features/bureaucratic-halls-feature.js?v=190f7447';
+import { COOLER_X, DRINK_VERB, GET_WATER_VERB, bureaucraticHallsFeature } from '../public/js/features/bureaucratic-halls-feature.js?v=90fe0fcb';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=10b118dd';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

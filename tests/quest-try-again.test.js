@@ -22,7 +22,7 @@ import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=10b118dd';
 import { createQuestState } from '../public/js/quests.js?v=282e1621';
-import { acceptOffer, markOffered, questStatus, tickQuestTimers } from '../public/js/quest-offers.js?v=06a5e180';
+import { acceptOffer, markOffered, questStatus, tickQuestTimers } from '../public/js/quest-offers.js?v=fe9fb524';
 import {
   ALREADY_DOING_TIP,
   NO_STARTING_QUESTS_TIP,
@@ -30,7 +30,7 @@ import {
   retryTimedQuest,
   showWaitingOffer,
   startBlockedReason,
-} from '../public/js/features/quest-offers-feature.js?v=278a3a8a';
+} from '../public/js/features/quest-offers-feature.js?v=592eb304';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');

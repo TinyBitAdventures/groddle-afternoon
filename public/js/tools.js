@@ -391,6 +391,40 @@ export function receiveToolCopy(state, classTsid, remaining, n = 1) {
   return getToolCondition(state, classTsid, { copy: row.copies.length - 1 });
 }
 
+/**
+ * A bag about to leave the pack with tools in it (bags-feature packTakeBag): the
+ * copies at `ranks` (their places in pack order, js/pack-slots.js unitPlaces) move
+ * last, in order, so the count going down takes exactly those. Returns their points.
+ */
+export function pickToolCopies(state, classTsid, ranks = []) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def) return [];
+  const row = ensureToolCondition(state, classTsid);
+  const set = new Set(ranks.filter((r) => Number.isInteger(r) && r >= 0 && r < row.copies.length));
+  const out = row.copies.filter((_, i) => set.has(i));
+  row.copies = [...row.copies.filter((_, i) => !set.has(i)), ...out];
+  settleRow(row, def);
+  return out;
+}
+
+/**
+ * Tools that came back into the pack inside a bag (bags-feature packGiveBag): the
+ * newest copies (the count already went up) take `points` (null: full) and move to
+ * `ranks`, their places in pack order, ascending.
+ */
+export function placeToolCopies(state, classTsid, ranks = [], points = []) {
+  const def = TOOL_CONDITION_CATALOG[classTsid];
+  if (!def) return false;
+  const row = ensureToolCondition(state, classTsid);
+  const k = Math.min(ranks.length, row.copies.length);
+  if (!k) return false;
+  const fresh = row.copies.splice(row.copies.length - k, k).map((r, i) => (points[i] === undefined ? r : clampPoints(def, points[i])));
+  const order = ranks.slice(0, k).map((r, i) => [r, fresh[i]]).sort((a, b) => a[0] - b[0]);
+  for (const [r, v] of order) row.copies.splice(Math.max(0, Math.min(row.copies.length, r)), 0, v);
+  settleRow(row, def);
+  return true;
+}
+
 /** A drag moved a class's copy from one place in pack order to another (bags-feature packMove). */
 export function moveToolCopy(state, classTsid, from, to) {
   const def = TOOL_CONDITION_CATALOG[classTsid];

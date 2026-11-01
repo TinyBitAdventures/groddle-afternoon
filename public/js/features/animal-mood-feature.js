@@ -99,8 +99,8 @@ import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overla
 import { isInHell } from '../hell.js?v=6ffd0278';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=50d2e072';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
-import { animalStatusLabel } from '../animals.js?v=7f5e5a98';
-import { quoteAnimalKinship } from '../animal-kinship.js?v=91490913';
+import { animalStatusLabel } from '../animals.js?v=0b84b6a9';
+import { quoteAnimalKinship } from '../animal-kinship.js?v=3a50bfb2';
 import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js?v=c7040204';
 import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=15eda966';
 import { ANIMAL_BODY, ANIMAL_PATROL, TREE_FOOTPRINT } from '../street-ecology.js?v=cfa10e0b';

@@ -20,8 +20,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { createAnimalState } from '../public/js/animals.js?v=7f5e5a98';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=94869468';
+import { createAnimalState } from '../public/js/animals.js?v=0b84b6a9';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=16852907';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=23b926e5';
 import {
   ANIMAL_BODY,

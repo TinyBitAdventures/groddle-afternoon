@@ -8,9 +8,9 @@ import assert from 'node:assert/strict';
 
 import { createFeatureHost } from '../public/js/feature-host.js?v=e4f648b1';
 import { createInventory, countItem } from '../public/js/inventory.js?v=91ee49cd';
-import { createToolConditionState } from '../public/js/tools.js?v=93286603';
+import { createToolConditionState } from '../public/js/tools.js?v=3d109172';
 import { meditationFeature } from '../public/js/features/meditation-feature.js?v=3fb6ade0';
-import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=4d819e48';
+import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=a2883436';
 
 function fakeEngine(overrides = {}) {
   const toasts = [];

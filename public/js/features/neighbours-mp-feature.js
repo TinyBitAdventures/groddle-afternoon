@@ -78,11 +78,11 @@ import { runStreetTransition } from '../screen-fx.js?v=f4314526';
 import { STREET_INDEX } from '../street-loader.js?v=390e4702';
 import { ITEM_CATALOG, countItem, listPackItemSlots, removeItem } from '../inventory.js?v=91ee49cd';
 import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=bb8b2151';
-import { tickGarden } from '../garden.js?v=1ec5a019';
+import { tickGarden } from '../garden.js?v=d605b654';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=e81817d9';
 import { normalizeButlerParts } from '../butler.js?v=337d934d';
-import { butlerApi } from './butler-feature.js?v=5578d447';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=0babc512';
+import { butlerApi } from './butler-feature.js?v=962e1166';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=792fc4b8';
 import {
   BUTLER_MESSAGE_MAX,
   KEY_VERB,

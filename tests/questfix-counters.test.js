@@ -28,10 +28,10 @@ import {
   PURPLE_JOURNEY_STREETS,
   COLD_COMFORT,
   COLD_COMFORT_LEAVE_TEXT,
-} from '../public/js/quest-offers.js?v=06a5e180';
-import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=3b824ce9';
-import { createPlot, performPlotVerb } from '../public/js/patches.js?v=aba34ac1';
-import { createToolConditionState } from '../public/js/tools.js?v=93286603';
+} from '../public/js/quest-offers.js?v=fe9fb524';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=a08218e0';
+import { createPlot, performPlotVerb } from '../public/js/patches.js?v=d8f9ceff';
+import { createToolConditionState } from '../public/js/tools.js?v=3d109172';
 import { performEmotionalBearAction, createEmotionalBearState } from '../public/js/emotional-bear.js?v=1dd276f7';
 import {
   questVerbsFeature,
@@ -39,7 +39,7 @@ import {
   SLATHER_VERB,
   SLATHER_COPY,
 } from '../public/js/features/quest-verbs-feature.js?v=7dfda702';
-import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=278a3a8a';
+import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=592eb304';
 import {
   giveCubimalVerb,
   GIVE_CUBIMAL_VERB,

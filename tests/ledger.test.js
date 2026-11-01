@@ -89,6 +89,13 @@ describe('ledger holdings (LedgerMath::holdings)', { skip }, () => {
     }));
     assert.deepEqual(h, { items: { apple: 9, bag_furniture_sdb: 1, cherry: 7, furniture_chair: 2, pick: 1 }, currants: 50 });
   });
+
+  it('counts a dropped bag and what it holds, so dropping a full bag reads as no change (takeable.js takeable_drop)', () => {
+    const inPack = php('holdings', save({ inv: { bag_generic_blue: 1, plank: 30, apple: 5 } }));
+    const down = php('holdings', save({ dropped: { POL_1: [{ id: 'w1', classTsid: 'bag_generic_blue', count: 1, contents: [{ classTsid: 'plank', count: 30 }, { classTsid: 'apple', count: 5 }] }] } }));
+    assert.deepEqual(down, inPack);
+    assert.deepEqual(php('reconcile', inPack, down, 0, 50_000).clamped, empty);
+  });
 });
 
 describe('ledger reconcile (LedgerMath::reconcile)', { skip }, () => {
@@ -153,6 +160,16 @@ describe('ledger edits to a stored save', { skip }, () => {
     assert.deepEqual(JSON.parse(out.droppedItems).streets.GA5[0].count, 2);
     assert.deepEqual(php('holdings', out), counts({ apple: 2 }, 10));
     assert.equal(out.location, entries.location, 'other entries are left as they are');
+  });
+
+  it('takes clamped goods out of a dropped bag, and a clamped bag leaves what it held in the pack', () => {
+    const bag = () => ({ POL_1: [{ id: 'w1', classTsid: 'bag_generic_blue', count: 1, contents: [{ classTsid: 'plank', count: 30 }, { classTsid: 'apple', count: 5 }] }] });
+    const out = php('remove', save({ dropped: bag() }), counts({ apple: 2 }));
+    assert.deepEqual(JSON.parse(out.droppedItems).streets.POL_1[0].contents, [{ classTsid: 'plank', count: 30 }, { classTsid: 'apple', count: 3 }]);
+    assert.deepEqual(php('holdings', out), counts({ apple: 3, bag_generic_blue: 1, plank: 30 }));
+    const gone = php('remove', save({ dropped: bag() }), counts({ bag_generic_blue: 1 }));
+    assert.deepEqual(JSON.parse(gone.droppedItems).streets.POL_1, []);
+    assert.deepEqual(php('holdings', gone), counts({ apple: 5, plank: 30 }));
   });
 
   it('applies a settled trade as the game does: hold minus gave back, got in, remembered as applied', () => {

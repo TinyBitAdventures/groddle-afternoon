@@ -726,3 +726,94 @@ export function arrangeIntoBags(inv, mint, opts = {}, keep = null) {
   }
   return prefs;
 }
+
+/**
+ * A bag leaves the pack whole, with everything in it (a drop): in the source a
+ * bag is a container whose contents are its own (items/bag.js), takeable_drop
+ * moves the bag itemstack and all it holds (items/include/takeable.js 157-213,
+ * apiPutItemIntoPosition), and takeable_drop_conditions lets a bag go down with
+ * things in it unless one of them is soulbound (104-135, 122-130).
+ * key: the bag the player chose (prefs bag key). Returns { ok, cls, contents:
+ * [{ cls, count }], prefs } (prefs: the arrangement once the bag and its contents
+ * are out; the caller takes cls and each content's count from the inventory), or
+ * { ok: false, reason }.
+ */
+export function takeBag(inv, prefs, key, opts = {}) {
+  const layout = layoutPack(inv, prefs, opts);
+  const box = layout.bags[String(key || '')];
+  if (!box) return { ok: false, reason: 'missing' };
+  const contents = box.slots.map((s) => ({ cls: s.cls, count: s.count }));
+  const next = JSON.parse(JSON.stringify(layout.prefs));
+  next.bags = next.bags.filter((b) => b.key !== box.key);
+  const at = next.place.pack.indexOf(`@${box.key}`);
+  if (at >= 0) {
+    next.place.pack.splice(at, 1);
+    next.n.pack.splice(at, 1);
+  }
+  delete next.place[box.key];
+  delete next.n[box.key];
+  return { ok: true, cls: box.cls, contents, prefs: next };
+}
+
+/**
+ * Which bag of a class leaves the pack when one goes (a drop of an empty bag,
+ * shared or not): the arrangement with `key` last among its class's bags, since
+ * layoutPack keeps a class's first saved bags (the newest went before: player
+ * report 2026-11-01). Returns prefs.
+ */
+export function bagLeavesLast(prefs, key) {
+  const next = normalizePrefs(prefs);
+  const row = next.bags.find((b) => b.key === String(key || ''));
+  if (!row) return next;
+  next.bags = [...next.bags.filter((b) => b !== row), row];
+  return next;
+}
+
+/**
+ * A bag comes back into the pack with what it held (a pick up): in the source a
+ * bag only ever sits in the pack's own row (bag_generic.js canContain 588-590;
+ * PackDisplayManager.as:675), so it takes a free pack slot, next to the other
+ * bags; with none free it goes in place of the leftmost stack it can hold, which
+ * goes in with it (the arrival rule, arrivalSlot). contents: [{ cls, count }] as
+ * takeBag gave them. inv is the inventory before the bag and its contents are
+ * added. Returns { ok, key, prefs } (the caller adds the counts), or { ok: false,
+ * reason: 'full' } when it can't fit without anything going to the magic rock.
+ */
+export function giveBag(inv, prefs, cls, contents = [], opts = {}) {
+  if (!isBagClass(cls)) return { ok: false, reason: 'not_bag' };
+  const def = BAG_DEFS[cls];
+  const capacity = Math.max(1, Math.floor(opts.capacity ?? PACK_CAPACITY));
+  const layout = layoutPack(inv, prefs, opts);
+  const next = JSON.parse(JSON.stringify(layout.prefs));
+  const key = nextBagKey(new Set(next.bags.map((b) => b.key)));
+  const list = (Array.isArray(contents) ? contents : [])
+    .map((c) => ({ cls: String(c?.cls || ''), count: Math.max(0, Math.floor(Number(c?.count) || 0)) }))
+    .filter((c) => c.cls && c.count > 0);
+  next.bags.push({ key, cls });
+  next.place[key] = list.map((c) => c.cls);
+  next.n[key] = list.map((c) => c.count);
+  const lastBag = next.place.pack.reduce((last, e, i) => (e.startsWith('@') ? i : last), -1);
+  if (layout.pack.slots.length < capacity) {
+    next.place.pack.splice(lastBag + 1, 0, `@${key}`);
+    next.n.pack.splice(lastBag + 1, 0, 0);
+  } else {
+    const holds = list.length;
+    const takes = (c) => holds < def.capacity && bagAccepts(def, c, opts) && !(def.onePerClass && list.some((x) => x.cls === c));
+    const at = arrivalSlot(layout.pack.slots, capacity, takes, opts);
+    if (at == null || at < 0) return { ok: false, reason: 'full' };
+    const swallowed = layout.pack.slots[at];
+    next.place.pack.splice(at, 1);
+    next.n.pack.splice(at, 1);
+    next.place[key].push(swallowed.cls);
+    next.n[key].push(swallowed.count);
+    next.place.pack.splice(lastBag + 1, 0, `@${key}`);
+    next.n.pack.splice(lastBag + 1, 0, 0);
+  }
+  const after = { ...inv };
+  after[cls] = (Number(after[cls]) || 0) + 1;
+  for (const c of list) after[c.cls] = (Number(after[c.cls]) || 0) + c.count;
+  const check = layoutPack(after, next, opts);
+  const box = check.bags[key];
+  if (!box || overflowOf(check) > overflowOf(layout)) return { ok: false, reason: 'full' };
+  return { ok: true, key, prefs: check.prefs };
+}

@@ -99,9 +99,9 @@ import {
   sniffNoNo,
   sprinkleHallowed,
   usePowderCharge,
-} from '../powders.js?v=bff50be4';
+} from '../powders.js?v=279a153b';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=729ccd91';
-import { DEAD_TRANT_CLASSES } from '../patches.js?v=aba34ac1';
+import { DEAD_TRANT_CLASSES } from '../patches.js?v=d8f9ceff';
 import { hellFeature } from './hell-feature.js?v=8e4ebacf';
 import { grantMoodXp } from '../mood-xp.js?v=958e7680';
 import { displayTopOf, playSheetOverlay } from '../overlay-art.js?v=3753a0d2';

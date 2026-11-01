@@ -24,11 +24,11 @@
  * an animal or tree carries the visitor's uses today, never the owner's.
  */
 
-import { createAnimalState } from './animals.js?v=7f5e5a98';
+import { createAnimalState } from './animals.js?v=0b84b6a9';
 import { petPiggy } from './animal-mood.js?v=a49495fc';
-import { trantFruitCycle } from './trant-care.js?v=1eff5718';
+import { trantFruitCycle } from './trant-care.js?v=4084db6e';
 import { resetTrantDay } from './trants.js?v=9c2e8c0f';
-import { GROWN_TREE_LABELS, SOIL_TIMERS } from './patches.js?v=aba34ac1';
+import { GROWN_TREE_LABELS, SOIL_TIMERS } from './patches.js?v=d8f9ceff';
 import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=edb00566';
 
 export const YARD_VERBS_MP_ID = 'yard-verbs-mp';

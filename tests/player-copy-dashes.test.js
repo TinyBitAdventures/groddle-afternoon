@@ -141,7 +141,7 @@ describe('em-dashes in player-facing copy (G215)', () => {
 
 describe('the lines G215 reworded', () => {
   it('making uses the source result line and a colon before the recipe name', async () => {
-    const { formatCraftProgress, formatCraftResultLine } = await import('../public/js/making.js?v=c9b7fd23');
+    const { formatCraftProgress, formatCraftResultLine } = await import('../public/js/making.js?v=ea3f10b5');
     assert.equal(formatCraftProgress(2, 5, 'Flour'), 'Making 2 of 5: Flour');
     assert.equal(formatCraftProgress(1, 1), 'Making 1 of 1');
     // players/inc_making.js 896-909.

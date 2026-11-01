@@ -30,10 +30,10 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { ITEM_CATALOG, addItem, isToolItem } from '../public/js/inventory.js?v=91ee49cd';
-import { BAG_DEFS, PACK_CAPACITY, PACK_COPY, arrangeIntoBags, bagAccepts, layoutPack, moveStack, roomFor } from '../public/js/pack-slots.js?v=00bca2cf';
+import { BAG_DEFS, PACK_CAPACITY, PACK_COPY, arrangeIntoBags, bagAccepts, layoutPack, moveStack, roomFor } from '../public/js/pack-slots.js?v=09c6ccbe';
 import { TOOL_CLASSES } from '../public/js/pack-slots-data.js?v=330c51e4';
-import { vendorBuy } from '../public/js/vendor.js?v=7dfc77a5';
-import { applyStarter, bagsFeature } from '../public/js/features/bags-feature.js?v=80f68991';
+import { vendorBuy } from '../public/js/vendor.js?v=01acb225';
+import { applyStarter, bagsFeature } from '../public/js/features/bags-feature.js?v=5cea431c';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');

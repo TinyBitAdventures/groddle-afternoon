@@ -31,9 +31,9 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=337d934d';
-import { butlerApi } from './butler-feature.js?v=5578d447';
+import { butlerApi } from './butler-feature.js?v=962e1166';
 import { hellFeature } from './hell-feature.js?v=8e4ebacf';
-import { towerApi } from './home-tower-feature.js?v=fe41a1f0';
+import { towerApi } from './home-tower-feature.js?v=51a24401';
 import { slashPlan, unknownLine } from '../slash-commands.js?v=23e13b20';
 import { parseTp, runTeleportCommand, TP_TEXT } from '../admin-teleport.js?v=fa56e8df';
 import { minnUrls } from '../minn-account.js?v=ea900c51';

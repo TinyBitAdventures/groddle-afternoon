@@ -20,7 +20,7 @@ import {
   isToolItem,
   getItemUseInfo,
 } from '../public/js/inventory.js?v=91ee49cd';
-import { starterToolsInventory, ensureMakingItems } from '../public/js/making.js?v=c9b7fd23';
+import { starterToolsInventory, ensureMakingItems } from '../public/js/making.js?v=ea3f10b5';
 import {
   createQuestState,
   assignQuest,
@@ -42,7 +42,7 @@ import {
   listBuyOffers,
   listSellOffers,
   createVendorSellQuote,
-} from '../public/js/vendor.js?v=7dfc77a5';
+} from '../public/js/vendor.js?v=01acb225';
 import {
   buildMapGraph,
   buildHubMapView,
@@ -169,7 +169,7 @@ describe('pack / inventory', () => {
     assert.match(game, /const unchanged = pop\.dataset\.packFor === classTsid && pop\.innerHTML !== '' && packPopoverMarkup === markup;\n[\s\S]{0,500}?if \(!unchanged\) \{\n\s*pop\.innerHTML = markup;/);
     assert.match(game, /positionPackPopover\(pop, sourceAnchor\);\n\s*if \(unchanged\) return;/);
     assert.match(game, /packPopoverMarkup = '';/, 'closing forgets the markup');
-    assert.match(game, /const sourceAnchor = \(anchor\?\.isConnected \? anchor : null\) \|\| findPackSlotElement\(classTsid, packSelectedCopy\);/);
+    assert.match(game, /const sourceAnchor = \(anchor\?\.isConnected \? anchor : null\) \|\| findPackSlotElement\(classTsid, packSelectedCopy, packSelectedBag\);/);
     // .pack-pop-actions button:hover (0,2,1) outranks .pack-pop-primary (0,2,0): the primary needs its own hover.
     assert.match(css, /\.pack-pop-actions \.pack-pop-primary:hover:not\(:disabled\) \{ background: #5a9e3e;/, 'a shade deeper than #6aaa3a (the design token --c-green-63)');
   });
