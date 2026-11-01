@@ -119,10 +119,10 @@ import {
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=302e64ad';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=21c55475';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
-import { butlerApi } from './butler-feature.js?v=8d979c40';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=bafaceaf';
+import { butlerApi } from './butler-feature.js?v=57d34b4b';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=ecf49fd5';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { MAIL_POST_SENDER } from '../mailbox.js?v=e62cffa6';
+import { MAIL_POST_SENDER } from '../mailbox.js?v=18178bf5';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';
 const PLAYER_ID = 'player';

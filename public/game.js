@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=55e0524d';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=79a36835';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=f175d9b9';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -475,7 +475,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=b211632f';
+} from './js/player-save.js?v=8039781d';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -498,10 +498,11 @@ import {
   mailCost,
   readMail,
   receiveMailAttachments,
+  recordSentMail,
   seedMailbox,
   sendMail,
   unreadMailCount,
-} from './js/mailbox.js?v=e62cffa6';
+} from './js/mailbox.js?v=18178bf5';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,
@@ -10662,7 +10663,14 @@ const engine = {
   deliverMail(message) {
     const row = deliverMail(mailboxState, { sentAt: Date.now(), ...message });
     updateHomeChrome();
+    if (isMailboxOpen() && !mailboxComposeReplyTo) renderMailboxPanel();
     return row;
+  },
+  /** G478: one of your letters to a real player, as the site sent it (player-mail-feature). */
+  recordSentMail(row) {
+    const sent = recordSentMail(mailboxState, row);
+    if (sent && isMailboxOpen() && !mailboxComposeReplyTo) renderMailboxPanel();
+    return sent;
   },
   questFlag(flag) {
     questFlagsFeature.set(flag);
@@ -20371,6 +20379,12 @@ function mailAttachmentLabel(message) {
 function renderMailboxCompose(recipient = '', replyTo = null) {
   const reader = document.getElementById('mail-reader');
   if (!reader) return;
+  // G478: in multiplayer the letter goes to a real player through the site (player-mail-feature).
+  const online = engine.mode === 'multiplayer' ? features.query('mailCompose', engine) : null;
+  if (online) {
+    renderPlayerMailCompose(reader, online, recipient, replyTo);
+    return;
+  }
   // A truthy sentinel distinguishes a new unsent draft from the ordinary
   // reader state so the once-per-second delivery refresh does not erase it.
   mailboxComposeReplyTo = replyTo || '__new_mail__';
@@ -20472,6 +20486,111 @@ function renderMailboxCompose(recipient = '', replyTo = null) {
   form.querySelector('textarea')?.focus({ preventScroll: true });
 }
 
+/**
+ * G478: Write mail in multiplayer: To a real player (your buddies offered,
+ * MailComposeUI.as:384-411), at most 300 characters, one stack of up to 999,
+ * currants, the postage the site will take (mail_get_message_cost).
+ */
+function renderPlayerMailCompose(reader, online, recipient = '', replyTo = null) {
+  mailboxComposeReplyTo = replyTo || '__new_mail__';
+  const reply = mailboxState.messages.find((message) => message.id === replyTo);
+  const rules = online.rules || {};
+  const attachable = listPackItemSlots(inv).filter((slot) => slot.count > 0).slice(0, 80);
+  const buddies = (online.buddies || []).map((b) => b.name).filter(Boolean);
+  reader.innerHTML = `
+    <form id="mail-compose-form" class="mail-compose-form" data-player-mail-compose>
+      <label>To
+        <input name="recipient" type="text" list="mail-buddy-names" autocomplete="off" maxlength="64" required placeholder="${escapeHtml(online.placeholder || '')}" value="${escapeHtml(recipient || reply?.sender || '')}" />
+        <datalist id="mail-buddy-names">${buddies.map((name) => `<option value="${escapeHtml(name)}"></option>`).join('')}</datalist>
+      </label>
+      ${reply?.text ? `<blockquote class="mail-quote">${escapeHtml(reply.text)}</blockquote>` : ''}
+      <label>Message
+        <textarea name="text" maxlength="${Number(rules.textMax) || 300}" placeholder="Write something envelope-sized…"></textarea>
+      </label>
+      <div class="mail-compose-grid">
+        <label>Attach one stack
+          <select name="attachment">
+            <option value="">Nothing</option>
+            ${attachable.map((slot) => `<option value="${escapeHtml(slot.classTsid)}">${escapeHtml(slot.label)} ×${slot.count}</option>`).join('')}
+          </select>
+        </label>
+        <label>Qty
+          <input name="quantity" type="number" min="1" max="${Number(rules.countMax) || 999}" value="1" />
+        </label>
+        <label>Enclose currants
+          <input name="currants" type="number" min="0" max="${Math.max(0, Math.min(Number(rules.currantsMax) || 999999, Math.floor(pc.currants)))}" value="0" />
+        </label>
+      </div>
+      <div class="mail-compose-cost">
+        <span>Postage, with any currants you enclose</span>
+        <strong data-mail-cost>◎ 2</strong>
+      </div>
+      <p class="mail-compose-status" data-mail-status aria-live="polite"></p>
+      <div class="mail-message-actions">
+        <button type="submit" class="btn-glitch-primary">Send mail</button>
+        <button type="button" data-mail-cancel>Cancel</button>
+      </div>
+    </form>
+  `;
+  const form = reader.querySelector('#mail-compose-form');
+  const read = () => {
+    const data = new FormData(form);
+    const c = String(data.get('attachment') || '');
+    return {
+      to: String(data.get('recipient') || '').trim(),
+      text: String(data.get('text') || ''),
+      item: c ? { c, n: Math.max(1, Math.floor(Number(data.get('quantity')) || 1)) } : null,
+      currants: Math.max(0, Math.floor(Number(data.get('currants')) || 0)),
+    };
+  };
+  const updateCost = () => {
+    const f = read();
+    const costEl = form.querySelector('[data-mail-cost]');
+    if (costEl) costEl.textContent = `◎ ${online.cost({ c: f.item?.c, n: f.item?.n || 0, currants: f.currants })}`;
+  };
+  const status = (text) => {
+    const el = form.querySelector('[data-mail-status]');
+    if (el) el.textContent = text || '';
+  };
+  form.addEventListener('input', updateCost);
+  form.querySelector('[data-mail-cancel]')?.addEventListener('click', () => {
+    mailboxComposeReplyTo = null;
+    renderMailboxPanel();
+  });
+  let sending = false;
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (sending) return;
+    sending = true;
+    const button = form.querySelector('button[type="submit"]');
+    if (button) button.disabled = true;
+    status('Sending…');
+    const f = read();
+    Promise.resolve(features.query('mailSend', { ...f, reply: reply?.playerMail || null }, engine)).then((result) => {
+      sending = false;
+      if (button) button.disabled = false;
+      if (!result?.ok) {
+        status(result?.text || 'That letter could not be sent.');
+        toast(result?.text || 'That letter could not be sent.');
+        return;
+      }
+      mailboxFolder = 'sent';
+      mailboxSelectedId = result.row;
+      mailboxComposeReplyTo = null;
+      pushActivity(`Mail sent to ${result.to} · ${result.postage} currants postage.`);
+      emitGameEvent('mail_sent');
+      toast(result.parcel ? 'Your parcel is on its way. It arrives in about 7 minutes.' : 'Your letter is on its way.', 2600);
+      playSound('PACKAGE_SENT', { volume: 0.55 });
+      updateHud();
+      updateHomeChrome();
+      savePlayerState();
+      renderMailboxPanel();
+    });
+  });
+  updateCost();
+  form.querySelector(recipient || reply ? 'textarea' : 'input[name="recipient"]')?.focus({ preventScroll: true });
+}
+
 function renderMailboxReader(message) {
   const reader = document.getElementById('mail-reader');
   if (!reader) return;
@@ -20490,6 +20609,7 @@ function renderMailboxReader(message) {
     <p class="mail-message-from">${message.outgoing ? 'To' : 'From'} ${escapeHtml(message.outgoing ? message.recipient : message.sender)}</p>
     <h3 class="mail-message-title">${message.replyTo ? 'Re: ' : ''}${message.outgoing ? 'Sent message' : 'Delivered message'}</h3>
     <time class="mail-message-time">${new Date(message.deliveryAt).toLocaleString()}</time>
+    ${message.quote ? `<blockquote class="mail-quote" data-mail-quote>${message.quote.from ? `<cite>${escapeHtml(message.quote.from)} wrote</cite>` : ''}${escapeHtml(message.quote.text)}</blockquote>` : ''}
     <div class="mail-message-body">${escapeHtml(message.text)}</div>
     ${attachment ? `
       <div class="mail-attachment">
@@ -20501,10 +20621,13 @@ function renderMailboxReader(message) {
         ${canReceive ? '<button type="button" class="btn-glitch-primary" data-mail-receive>Receive</button>' : ''}
       </div>` : ''}
     <div class="mail-message-actions">
-      ${!message.outgoing && !message.ledger ? `<button type="button" class="btn-glitch-primary" data-mail-reply>Reply</button>
+      ${!message.outgoing && !message.ledger ? `${message.playerMail && !message.fromId ? '' : '<button type="button" class="btn-glitch-primary" data-mail-reply>Reply</button>'}
         <button type="button" data-mail-archive>${message.archived ? 'Move to inbox' : 'Archive'}</button>
         <button type="button" data-mail-delete>Delete</button>` : ''}
+      ${!message.outgoing && message.ledger && message.playerMail ? `${message.fromId ? '<button type="button" class="btn-glitch-primary" data-mail-reply>Reply</button>' : ''}
+        <button type="button" data-mail-archive>${message.archived ? 'Move to inbox' : 'Archive'}</button>` : ''}
       ${message.ledger && message.attachmentsClaimed ? '<button type="button" data-mail-delete>Delete</button>' : ''}
+      ${message.ledger && message.playerMail && !message.attachmentsClaimed ? '<button type="button" data-mail-delete disabled title="You still have attachments!">Delete</button>' : ''}
     </div>
   `;
   reader.querySelector('[data-mail-receive]')?.addEventListener('click', () => {

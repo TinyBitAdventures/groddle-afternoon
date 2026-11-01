@@ -13,7 +13,7 @@ import { FakeEl, memoryStore, page } from './social-fake-dom.js';
 import { mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=bee1328e';
 import { createNotifier } from '../public/js/notify.js?v=d85330ff';
 import { partyFeature } from '../public/js/features/party-feature.js?v=e0756bfb';
-import { groupsFeature } from '../public/js/features/groups-feature.js?v=2dec3e9b';
+import { groupsFeature } from '../public/js/features/groups-feature.js?v=482356a2';
 
 const ANSWER = {
   max: 20,

@@ -10,17 +10,20 @@
  *   keeps (REPORT_PICTURE; src/ReportPicture.php checks it again).
  * - Mail: the multiplayer save (groddle/v1/save through js/minn-account.js),
  *   read only: the letters are the save's mailbox (js/player-save.js systems.
- *   mailbox, js/mailbox.js rules). Nothing here writes the save; collecting a
- *   letter's item stays in the game.
+ *   mailbox, js/mailbox.js rules), plus the letters from other players the
+ *   site holds that the save has not taken in yet (groddle/v1/mail, G478:
+ *   groddle-afternoon-site src/LedgerMail.php; mergePlayerMail). Nothing here
+ *   writes the save or the site; collecting a letter's things stays in the game.
  * - Friends: groddle/v1/buddies (the lists) and groddle/v1/buddies/online (who
  *   of them plays now and where; groddle-afternoon-site src/BuddiesOnline.php).
  *   The companion never opens the realtime socket: it would take over the
  *   player's game on another device.
  */
 
-import { REPORT_PICTURE, base64Size, pictureSize } from '../reports.js?v=0cc4230d';
-import { listMailboxMessages, mailSender, normalizeMailboxState } from '../mailbox.js?v=e62cffa6';
+import { REPORT_PICTURE, base64Size, pictureSize } from '../reports.js?v=a148dc3c';
+import { listMailboxMessages, mailSender, normalizeMailboxState } from '../mailbox.js?v=18178bf5';
 import { addedYouOnly, normalizeList } from '../buddies.js?v=183da4ff';
+import { letterRow } from '../player-mail.js?v=1691cc67';
 
 /** localStorage: "full" opens the game on this device anyway; "companion" always opens this page (play/index.html #phone-gate). */
 export const DEVICE_KEY = 'groddle-play-device';
@@ -158,6 +161,41 @@ export function mailRows(state, now = Date.now()) {
     collected: m.attachmentsClaimed === true,
     onItsWay: m.express === true && m.inMailbox !== true,
   }));
+}
+
+/**
+ * G478: the inbox rows plus the site's letters from other players (and ones
+ * that came back) the save has not taken in yet, newest first; a letter the
+ * save has is marked collected when the site says so. `answer` is
+ * groddle/v1/mail's (null when it could not be read: the save's rows stand).
+ */
+export function mergePlayerMail(rows, answer, now = Date.now()) {
+  const out = Array.isArray(rows) ? rows.map((r) => ({ ...r })) : [];
+  const byId = new Map(out.map((r) => [r.id, r]));
+  for (const letter of Array.isArray(answer?.letters) ? answer.letters : []) {
+    const m = letterRow(letter, { sessionStart: now });
+    if (!m || m.deliveryAt > now) continue;
+    const have = byId.get(m.id);
+    if (have) {
+      if (letter.collected) have.collected = true;
+      continue;
+    }
+    const row = {
+      id: m.id,
+      sender: mailSender(m.sender),
+      text: m.text,
+      snippet: snippetOf(m.text),
+      at: m.deliveryAt || m.sentAt,
+      unread: true,
+      item: m.attachment ? { id: m.attachment.classTsid, count: m.attachment.count } : null,
+      currants: m.currants,
+      collected: m.attachmentsClaimed === true,
+      onItsWay: false,
+    };
+    out.push(row);
+    byId.set(row.id, row);
+  }
+  return out.sort((a, b) => b.at - a.at);
 }
 
 /** A letter's first words for the list: one line, cut at a word with an ellipsis. */

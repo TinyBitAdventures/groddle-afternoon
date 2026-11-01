@@ -514,6 +514,25 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
     },
 
     /**
+     * Mail between players (register G478, groddle-afternoon-site/src/LedgerMail.php).
+     * playerMail() { letters, sent, next, receipts, rules, now };
+     * sendMail({ id, to, text, item: { c, n, r? } | null, currants, reply }) { status: sent, letter, receipt, tell };
+     * collectMail(id) { status: collected | done, receipt, letter }.
+     * A refusal throws with the site's { status: refused, why, text } as err.data.
+     */
+    async playerMail() {
+      return buddyCall('Checking your mail', 'mail');
+    },
+
+    async sendMail(letter) {
+      return buddyCall('Sending your letter', 'mail', { method: 'POST', body: letter });
+    },
+
+    async collectMail(id) {
+      return buddyCall('Collecting your mail', `mail/${encodeURIComponent(String(id))}/collect`, { method: 'POST' });
+    },
+
+    /**
      * Starter bags for a character made before bags (G152, groddle-afternoon-site
      * src/LedgerStarter.php): { status: granted, trade, got, text, again? } |
      * { status: none } | { status: refused, why: new | nosave, text }. Once per

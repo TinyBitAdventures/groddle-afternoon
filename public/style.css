@@ -8581,6 +8581,35 @@ header.top-bar + .sub { display: none; }
   font-size: var(--fs-lg);
 }
 
+/* G478: the words a player's letter answers, and the compose form's line from the site. */
+.mail-quote {
+  margin: var(--sp-4) 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--c-gold-83);
+  background: var(--surface-parchment);
+  color: var(--c-mauve-53);
+  font-size: var(--fs-sm);
+  white-space: pre-wrap;
+}
+
+.mail-quote cite {
+  display: block;
+  margin-bottom: 4px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.mail-compose-status {
+  min-height: 1.2em;
+  margin: 0;
+  color: var(--c-mauve-53);
+  font-size: var(--fs-sm);
+}
+
+.mail-compose-form input[name="recipient"] {
+  width: 100%;
+}
+
 .map-home-card {
   display: flex;
   align-items: center;
@@ -11419,6 +11448,8 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #mail-panel .mail-compose-form label { color: var(--text-muted); font-size: var(--fs-xs); letter-spacing: 0.06em; }
 [data-ui="modern"] #mail-panel .mail-compose-form :is(select, textarea, input) { padding: var(--space-2) var(--space-3); border: 1px solid var(--border-strong); border-radius: var(--radius-m); background: var(--surface); color: var(--text); }
 [data-ui="modern"] #mail-panel .mail-compose-form :is(select, textarea, input):focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+[data-ui="modern"] #mail-panel .mail-quote { border-left-color: var(--accent); border-radius: var(--radius-m); background: var(--surface-sunken); color: var(--text-muted); }
+[data-ui="modern"] #mail-panel .mail-compose-status { color: var(--text-muted); }
 [data-ui="modern"] #mail-panel .mail-compose-cost { border-radius: var(--radius-m); background: var(--surface-sunken); color: var(--text-muted); }
 [data-ui="modern"] #mail-panel .mail-compose-cost strong { color: var(--text); }
 @media (max-width: 760px) { [data-ui="modern"] #mail-panel .mail-layout { grid-template-columns: 1fr; } }

@@ -102,7 +102,7 @@ import {
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=db2ce452';
 import { playOverlay } from '../overlays.js?v=90f4b1ba';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
-import { MAIL_POST_SENDER } from '../mailbox.js?v=e62cffa6';
+import { MAIL_POST_SENDER } from '../mailbox.js?v=18178bf5';
 
 export const SEASONS_FEATURE_ID = 'seasons';
 const LANTERN_GROUP = 'seasons:lantern';

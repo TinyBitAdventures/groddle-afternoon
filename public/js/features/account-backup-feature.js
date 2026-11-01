@@ -29,12 +29,12 @@
  * QA: /play/ on groddle.localhost, Menu, Account; /play/online/, Menu, Sign out.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=81339760';
+import { createMinnAccount } from '../minn-account.js?v=4323ed29';
 import { mountAccountForms, mountAccountSettings } from '../account-forms.js?v=b40dbb9f';
 import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=b74a8113';
 import { formatGameDayLabel } from '../game-day.js?v=3095e05b';
 import { multiplayerEntryUrl } from '../game-mode.js?v=1ecf2899';
-import { quietSession } from '../online-boot.js?v=8f6e0097';
+import { quietSession } from '../online-boot.js?v=c44186ce';
 
 /** Which slot a new backup goes to: the first empty one, else the oldest (which then needs a yes). */
 export function slotForNewBackup(backups, slots) {

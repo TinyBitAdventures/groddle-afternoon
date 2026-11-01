@@ -1013,12 +1013,14 @@
    "name": "Mail",
    "status": "source",
    "blurb": "Mailboxes, postage, parcels and replies. A letter with an item comes by AFLC Frog, and the Mail Dispatcher by the signpost on your home street sends parcels.",
-   "multiplayer": "Stacks you buy from other players at auction, and your own that did not sell, come to your mailbox.",
+   "multiplayer": "Write to other players, online or not: a letter, one stack and currants, for the original’s postage, to a buddy or anyone by name. Parcels arrive seven minutes later and the AFLC Frog brings them if you are playing; your Butler tells you that you have mail. Replies quote the letter they answer, and a parcel nobody can take comes back to you. Stacks you buy at auction, and your own that did not sell, come by mail too.",
    "spot": null,
    "evidence": [
     "public/js/mailbox.js",
     "public/js/mail-courier.js",
-    "public/js/features/mail-courier-feature.js"
+    "public/js/features/mail-courier-feature.js",
+    "public/js/player-mail.js",
+    "public/js/features/player-mail-feature.js"
    ],
    "shot": null,
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=mail&practice=1"
@@ -2675,131 +2677,131 @@
   ]
  },
  "git": {
-  "commits": 911,
+  "commits": 961,
   "since": "2026-10-19",
   "recent": [
    {
     "date": "2026-10-31",
-    "kind": "fix",
-    "text": "A Piggy that has eaten stands still for its pause instead of walking in place"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "fix",
-    "text": "A rooked Piggy, Chicken or tree keeps saying it is rooked"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "fix",
-    "text": "A Piggy the Rook catches on its way to food stands still, and walks again once revived"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "improve",
-    "text": "The start card's fan remake, Credits and Privacy links are moss green, not browser blue"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "fix",
-    "text": "Focus Pocus tells you why a focus fell short of 24, and its step says one focus"
+    "kind": "new",
+    "text": "Write to other players online: a letter, a stack and currants, the Frog brings parcels, your Butler says you have mail"
    },
    {
     "date": "2026-10-31",
     "kind": "new",
-    "text": "Tests for the chat log in the console and the realtime server"
+    "text": "Math Mayhem, the crowd game on the Game of Crowns arena, between real players"
    },
    {
     "date": "2026-10-31",
     "kind": "new",
-    "text": "An open game says when a new version is out, with an Update ready button"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "improve",
-    "text": "The quest-complete book is solid and less stretched, so it reads clearly"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "fix",
-    "text": "The street map's name tips show over the travel card instead of under it"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "fix",
-    "text": "Trees, gardens, shrines, vendors and rocks stand on real ground, not on branch stubs"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "fix",
-    "text": "Buying a bag no longer tips the other bags' things out"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "fix",
-    "text": "Released and raised Piggies and chickens walk forwards, not backwards"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "improve",
-    "text": "The Glitchmas Yeti's letter is signed Groddle Afternoon and reads as a letter"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "fix",
-    "text": "The street map on your home street shows your street, you and your visitors instead of an empty box"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "fix",
-    "text": "Gardens draw at the original's size and keep clear of the gate, signpost, Mail Dispatcher and each other"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "improve",
-    "text": "Gardens draw Tiny Speck's own garden art: soil plots, seedlings, every crop and herb, and the beds"
-   },
-   {
-    "date": "2026-10-31",
-    "kind": "improve",
-    "text": "Letters from the game now come from Groddle Afternoon Post, not Tiny Speck Post"
+    "text": "Online, street Chickens, Butterflies and Batterflies are shared: both players see them in the same place, see each other squeeze and milk them, and an egg under a Chicken is one player's"
    },
    {
     "date": "2026-10-31",
     "kind": "new",
-    "text": "Move your Mail Dispatcher: in Cultivate, click or drag it anywhere clear along your home street, or put it back in its usual spot"
+    "text": "A zone's art pack can ask the Gemini API for its pictures instead of a chat by hand"
    },
    {
     "date": "2026-10-31",
     "kind": "fix",
-    "text": "The Mail Dispatcher no longer stands on your friends' signpost: it waits just past the signpost, clear of the gate, Mailbox and door"
+    "text": "Trees, rocks and stalls keep clear of doors, ladders and signposts, and Chickens and Piggies stay on the ground"
    },
    {
     "date": "2026-10-31",
     "kind": "new",
-    "text": "The map shows which streets have a vendor, a shrine or a subway station, with a tip on hover and keyboard focus"
+    "text": "A little \"…\" shows over a player starting to say something, and your Butler IMs you about visitors and speaks for you on your home street"
    },
    {
     "date": "2026-10-31",
     "kind": "new",
-    "text": "The validator flags landings a keyboard player often misses, and agents can play-test a draft by script"
+    "text": "An art bible and image-model prompts for a zone, and intake for the pictures that come back"
    },
    {
     "date": "2026-10-31",
-    "kind": "fix",
-    "text": "New Tall streets' back layers reach the floor wherever the camera is"
+    "kind": "new",
+    "text": "On a phone, Play opens a small companion for your reports, mail and friends"
    },
    {
     "date": "2026-10-31",
     "kind": "improve",
-    "text": "A signpost stays on its floor when the floor moves, and findings name the post"
+    "text": "Vicar's Peak is home to 6 Piggies and 4 Chickens, between its loading card and its street page"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "improve",
+    "text": "Vicar's Peak's ledges sit closer together, its top door stands on a short ledge of its own and the pine grows a row lower"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "improve",
+    "text": "The Mezzanine is the full Rook Museum lobby: pillars between the signs, a dark floor over warm floorboards, and six currant quoins hidden under it"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "improve",
+    "text": "The welcome card is easier to read: the start buttons up top, today's goals in one box, and the keys in tidy Move, Do and Open lists"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "fix",
+    "text": "Each tool wears on its own: a new pick is new, mining wears only the pick in use, a repair mends the one you chose"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "fix",
+    "text": "A revive dose stays on the animal you gave it to, so the other Butterflies no longer say you already helped them"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "improve",
+    "text": "Every Zoom slider names its keys, and 0 says how to zoom back out"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "fix",
+    "text": "A stack that fills up in a bag stays in its slot, and only the extra opens a new stack"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "improve",
+    "text": "Piggies, Chickens and Batterflies are back where the live street pages listed them: 1,074 Piggies, 1,547 Chickens and 139 Batterflies"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "improve",
+    "text": "Room 23 has an upper floor: the vine posts under the up arrow are a ladder up to where Gwendolyn waits"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "improve",
+    "text": "The Ventilation Room is a tall root cave of tangled trunks, rope bridges and plank steps between its three doors"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "improve",
+    "text": "Martleby Hare's cliff drops down seven staggered rows of ledges to a door in the middle of the floor"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "improve",
+    "text": "Room 15 is a dark root cave: a plank deck, two little bridges over the void and the key by a trunk door"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "improve",
+    "text": "The Stairs up Jethimadh Tower are one long tube climbing to the Mezzanine door, no ladder"
    },
    {
     "date": "2026-10-31",
     "kind": "new",
-    "text": "Publishing a draft fetches its new art with the builder key"
+    "text": "Every home page photo opens full size, and the photos show today's game"
+   },
+   {
+    "date": "2026-10-31",
+    "kind": "improve",
+    "text": "Butterflies are back on the streets the original had them: 745 streets in 36 regions, from the live street pages"
    }
   ]
  },
- "tests": 535,
+ "tests": 536,
  "generatedAt": "2026-10-31"
 }

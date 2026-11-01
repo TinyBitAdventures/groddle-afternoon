@@ -78,7 +78,7 @@ import {
   unitRankAt,
 } from '../pack-slots.js?v=00bca2cf';
 import { TOOL_CONDITION_CATALOG, moveToolCopy } from '../tools.js?v=93286603';
-import { createMinnAccount } from '../minn-account.js?v=81339760';
+import { createMinnAccount } from '../minn-account.js?v=4323ed29';
 
 export const BAGS_FEATURE_ID = 'bags';
 export const BAG_DEMO_KIT = Object.freeze([

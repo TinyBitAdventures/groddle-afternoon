@@ -93,7 +93,12 @@ function normalizeMessage(seed = {}, index = 0) {
     ...(seed?.express === true ? { express: true, inMailbox: seed?.inMailbox === true, expedited: seed?.expedited === true } : {}),
     // Multiplayer only (G333): an attachment the site's ledger holds until it is received
     // (features/auctions-feature.js mailReceive). Solo letters never carry one.
-    ...(/^auc-[0-9a-f]{16}-d$/.test(String(seed?.ledger || '')) ? { ledger: String(seed.ledger) } : {}),
+    ...(/^(auc-[0-9a-f]{16}-d|mail-[0-9a-f]{16}-c)$/.test(String(seed?.ledger || '')) ? { ledger: String(seed.ledger) } : {}),
+    // Multiplayer only (G478): a letter from (or back to) a real player, kept by the site
+    // (features/player-mail-feature.js): its id there, the sender's id for a reply, the words it answers.
+    ...(/^[0-9a-f]{16}$/.test(String(seed?.playerMail || '')) ? { playerMail: String(seed.playerMail) } : {}),
+    ...(finiteInt(seed?.fromId, 0, Number.MAX_SAFE_INTEGER) > 0 ? { fromId: finiteInt(seed.fromId, 0, Number.MAX_SAFE_INTEGER) } : {}),
+    ...(seed?.quote && typeof seed.quote === 'object' && seed.quote.text ? { quote: { text: cleanText(seed.quote.text), from: cleanText(seed.quote.from, 80) } } : {}),
   };
 }
 
@@ -149,16 +154,32 @@ export function deliverMail(state, message = {}) {
   Object.assign(state, normalized);
   // G121: an item makes a letter express unless the caller says otherwise (express: false);
   // a letter the site's ledger settles (G333 auctions) is never the frog's.
-  const express = message.express !== false && !message.ledger && Boolean(normalizeAttachment(message.attachment || message.item));
+  // A player's parcel (G478, ledger mail-) is the frog's too; it hands it over through the site.
+  const express = message.express !== false && (!message.ledger || /^mail-/.test(message.ledger)) && Boolean(normalizeAttachment(message.attachment || message.item));
   const row = normalizeMessage({
     ...message,
     id: message.id || nextMessageId(state),
     outgoing: false,
-    ...(express ? { express: true, inMailbox: message.inMailbox === true } : { express: false }),
+    ...(express ? { express: true, inMailbox: message.inMailbox === true, expedited: message.expedited === true } : { express: false }),
   }, state.messages.length);
   state.messages.push(row);
   state.totalReceived += 1;
   return row;
+}
+
+/**
+ * G478: one of your letters to a real player, as the site sent it
+ * (features/player-mail-feature.js): a Sent row, nothing moved here (the
+ * site's receipt already took the postage and what went with it).
+ */
+export function recordSentMail(state, row = {}) {
+  const normalized = normalizeMailboxState(state);
+  Object.assign(state, normalized);
+  const sent = normalizeMessage({ ...row, outgoing: true, read: true, attachmentsClaimed: true, express: false }, state.messages.length);
+  if (state.messages.some((m) => m.id === sent.id)) return null;
+  state.messages.push(sent);
+  state.totalSent += 1;
+  return sent;
 }
 
 export function seedMailbox(state, now = Date.now()) {

@@ -38,7 +38,7 @@
  * style), and a letter's sender stands in for getPlayer(sender).label.
  */
 
-import { mailSender } from './mailbox.js?v=e62cffa6';
+import { mailSender } from './mailbox.js?v=18178bf5';
 
 export const COURIER = Object.freeze({
   /** inc_mail.js 936-938. */
@@ -176,14 +176,18 @@ const int = (v, d = 0) => {
   return Number.isFinite(n) ? n : d;
 };
 
-/** A letter the frog brings: express, not yet in the mailbox, nothing settled through the site's ledger. */
+/**
+ * A letter the frog brings: express, not yet in the mailbox, nothing settled
+ * through the site's ledger but a real player's parcel (G478, ledger mail-:
+ * the frog hands it over through the site, features/mail-courier-feature.js).
+ */
 export function isExpressPending(message) {
   return Boolean(message) &&
     message.express === true &&
     message.inMailbox !== true &&
     message.outgoing !== true &&
     message.deleted !== true &&
-    !message.ledger;
+    (!message.ledger || /^mail-[0-9a-f]{16}-c$/.test(String(message.ledger)));
 }
 
 /** mail_get_next_player_message: the earliest pending express letter due within 60 s (or any, with `future`). */
@@ -238,6 +242,8 @@ export function sendCarriedToMailbox(messages, now = Date.now()) {
  */
 export function handOver(message, inventory, player, { room = null } = {}) {
   if (!isExpressPending(message)) return { ok: false, reason: 'missing' };
+  // A real player's parcel moves only through the site's ledger (ledgerHandOver in the feature).
+  if (message.ledger) return { ok: false, reason: 'ledger' };
   const currants = message.attachmentsClaimed ? 0 : Math.max(0, int(message.currants));
   if (currants && player) {
     player.currants = Math.max(0, int(player.currants)) + currants;

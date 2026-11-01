@@ -62,11 +62,11 @@
 
 import { ITEM_CATALOG, itemIcon } from '../inventory.js?v=85d4faba';
 import { frameTexture, sourceFromUrl } from '../textures.js?v=db2ce452';
-import { questRoomConverse } from './quest-instances-feature.js?v=67405224';
+import { questRoomConverse } from './quest-instances-feature.js?v=c5f79940';
 import { hellFeature } from './hell-feature.js?v=2d9958f9';
 import { DISPATCHER_ART, FROG_ART, MAIL_NPC_ART_DIR } from '../mail-npc-art.js?v=790f980a';
 import { DISPATCHER_GAP, DISPATCHER_HALF, SIGNPOST } from '../home-street-fixtures.js?v=26bb21a8';
-import { MAIL_POST_SENDER } from '../mailbox.js?v=e62cffa6';
+import { MAIL_POST_SENDER } from '../mailbox.js?v=18178bf5';
 import {
   COURIER,
   COURIER_TEXT,
@@ -82,7 +82,7 @@ import {
   pickPose,
   sendCarriedToMailbox,
   sendDueToMailbox,
-} from '../mail-courier.js?v=cef544b7';
+} from '../mail-courier.js?v=d525206a';
 import { itemZ } from '../item-bands.js?v=e98b10bc';
 
 export const MAIL_COURIER_FEATURE_ID = 'mail-courier';
@@ -442,7 +442,7 @@ async function talkToFrog(engine) {
         const msg = (engine.mailMessages?.() || []).find((m) => m.id === f.current);
         const item = msg && !msg.attachmentsClaimed ? msg.attachment : null;
         const room = item ? engine.query?.('packRoom', item.classTsid, item.count, engine) : null;
-        const res = msg ? handOver(msg, engine.inv, engine.pc, { room: room == null ? null : room }) : { ok: false };
+        const res = !msg ? { ok: false } : msg.ledger ? await ledgerHandOver(engine, msg, room) : handOver(msg, engine.inv, engine.pc, { room: room == null ? null : room });
         if (res.currants || res.ok) received(engine, res);
         if (!res.ok && res.reason === 'pack_full') {
           choice = await say3(engine, escapeHtml(COURIER_TEXT.packFull), [
@@ -477,6 +477,23 @@ async function talkToFrog(engine) {
   } finally {
     talking = false;
   }
+}
+
+/**
+ * G478: a real player's parcel is handed over through the site (the
+ * mailbox's Receive, features/player-mail-feature.js mailReceive): the stack
+ * and the currants together, once the pack has room (get_mail_items 976).
+ */
+async function ledgerHandOver(engine, msg, room) {
+  const item = msg.attachmentsClaimed ? null : msg.attachment || null;
+  if (item && room != null && Number(room) < Number(item.count)) return { ok: false, reason: 'pack_full', currants: 0, item };
+  const currants = msg.attachmentsClaimed ? 0 : Math.max(0, Math.floor(Number(msg.currants) || 0));
+  const ok = await engine.query?.('mailReceive', msg, engine, { quiet: true });
+  if (!ok) return { ok: false, reason: 'missing' };
+  msg.read = true;
+  msg.inMailbox = true;
+  msg.expedited = true;
+  return { ok: true, currants, item };
 }
 
 function received(engine, res) {

@@ -20,11 +20,11 @@
  * [data-friend=<id>], #pc-report-text, #pc-photo, #pc-reply-text.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=81339760';
+import { createMinnAccount } from '../minn-account.js?v=4323ed29';
 import { mountAccountForms, resetLinkFrom, verifyLinkFrom } from '../account-forms.js?v=b40dbb9f';
-import { gateFor, quietSession, suspendedNow } from '../online-boot.js?v=8f6e0097';
-import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, pictureRefused, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../reports.js?v=0cc4230d';
-import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, phoneContext, unreadLetters } from './companion-data.js?v=72341ec9';
+import { gateFor, quietSession, suspendedNow } from '../online-boot.js?v=c44186ce';
+import { REPORT_MAX, REPORT_TEXT, STATUS_WORDS, createReportsApi, pictureRefused, pictureSrc, refusalWords, reportFromHash, ticketLine, unreadCount, whenWords } from '../reports.js?v=a148dc3c';
+import { DEVICE_KEY, PHONE_TEXT as T, POLL_MS, createPresenceApi, fitPhoto, friendsView, fullGameHref, itemNamesFrom, itemWords, mailRows, mailboxFromSave, mergePlayerMail, phoneContext, unreadLetters } from './companion-data.js?v=8e9dfefd';
 
 const doc = globalThis.document;
 
@@ -534,8 +534,9 @@ async function loadMail({ draw = true } = {}) {
     loadingLine(panel);
   }
   let save;
+  let playerMail = null;
   try {
-    save = await account.multiplayerSave();
+    [save, playerMail] = await Promise.all([account.multiplayerSave(), account.playerMail().catch(() => null)]);
   } catch {
     if (!draw || panel.dataset.view !== 'list') return;
     panel.querySelector('[data-phone-loading]')?.remove();
@@ -543,13 +544,14 @@ async function loadMail({ draw = true } = {}) {
     return;
   }
   const box = mailboxFromSave(save);
-  letters = mailRows(box);
+  // G478: letters from other players the site holds that the save has not taken in yet.
+  letters = mergePlayerMail(mailRows(box), playerMail);
   badge('mail', unreadLetters(letters), (n) => (n === 1 ? '1 new letter' : `${n} new letters`));
   if (!draw || panel.dataset.view !== 'list') return;
   await namesFor(letters);
   panel.querySelector('[data-phone-loading]')?.remove();
   panel.append(el('p', { class: 'pc-hint' }, T.mailNote));
-  if (!box) {
+  if (!box && !letters.length) {
     panel.append(el('p', { class: 'pc-empty' }, T.mailNoSave));
     return;
   }

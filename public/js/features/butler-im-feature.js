@@ -29,7 +29,7 @@
  * window.groddleButlerIm in multiplayer.
  */
 
-import { butlerApi } from './butler-feature.js?v=8d979c40';
+import { butlerApi } from './butler-feature.js?v=57d34b4b';
 import { BUTLER_STRINGS } from '../butler.js?v=814ee05f';
 import { BUTLER_IM_TEXT, BUTLER_IM_VERBS, HELP_AGAIN_MS, imDelayMs, imLine, normalizeImPrefs, parseButlerIm } from '../butler-im.js?v=44783638';
 
@@ -211,6 +211,12 @@ function createSession(engine, client) {
     client,
     command,
     watch,
+    /** G478: a line of the Butler's own (mail came: butler_data.js ownerMail), when its IMs are on. */
+    notice(text) {
+      if (butlerApi.owned?.() !== true || !prefs.notify) return false;
+      butlerIm(text);
+      return true;
+    },
     tick(now) {
       if (now < watchAt) return;
       watchAt = now + WATCH_CHECK_MS;
@@ -240,6 +246,12 @@ export const butlerImFeature = {
   onTick(dtMs, now, engine) {
     if (engine.mode !== 'multiplayer' || !engine.started) return;
     ensure(engine)?.tick(performance.now());
+  },
+
+  /** G478 (player-mail-feature): the Butler IMs "You have mail." when a letter arrives. */
+  butlerImNotice(text, engine) {
+    const s = ensure(engine);
+    return s ? s.notice(String(text || '')) : null;
   },
 
   /** slash-commands-feature's /butler in multiplayer: an IM to your Butler. */

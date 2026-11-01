@@ -37,7 +37,7 @@
  * buddiesIgnoring (ids), buddiesLast (the last notice); window.groddleBuddies.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=81339760';
+import { createMinnAccount } from '../minn-account.js?v=4323ed29';
 import { STREET_INDEX } from '../street-loader.js?v=390e4702';
 import {
   BUDDY_COUNTER,
@@ -478,6 +478,12 @@ export const buddiesFeature = {
   runVerbOverride(target, verbId) {
     if (!VERB_IDS.has(verbId) || !session || !target?.playerId) return null;
     return session.run(target, verbId);
+  },
+
+  /** G478 (player-mail-feature): your buddies' names, for the mail's To field (MailComposeUI.as:384-411). */
+  buddyNames() {
+    const list = session?.list;
+    return list ? list.buddies.map((b) => ({ id: b.id, name: b.name })) : null;
   },
 
   /**

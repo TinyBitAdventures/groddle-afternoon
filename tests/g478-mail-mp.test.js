@@ -1,0 +1,249 @@
+/**
+ * Register G478: mail between real players in multiplayer. The pure rules
+ * and words are js/player-mail.js; the site's rules (src/LedgerMail.php:
+ * postage, limits, what a reader sees) run here through php -r (skipped
+ * without the site or php), and its table (data/mail.json) must match
+ * tools/build-mail.mjs. The routes, the ledger moves and the realtime nudge
+ * are checked live with two players (the lane's two-player check). Solo is
+ * untouched: the feature answers nothing there and the mailbox keeps the
+ * companions' letters as they were.
+ */
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+import {
+  LETTER_ROW,
+  PLAYER_MAIL_RULES,
+  PLAYER_MAIL_TEXT,
+  RETURN_ROW,
+  arrivesAt,
+  composeRefusal,
+  goodsWords,
+  letterRow,
+  mailReceiptEffects,
+  newLetterId,
+  normalizeMailReceipt,
+  normalizePlayerMailSlice,
+  playerMailCost,
+  sentRow,
+} from '../public/js/player-mail.js?v=1691cc67';
+import { playerMailFeature } from '../public/js/features/player-mail-feature.js?v=bba3beed';
+import { createMailboxState, deliverMail, listMailboxMessages, mailCost, normalizeMailboxState, recordSentMail } from '../public/js/mailbox.js?v=18178bf5';
+import { handOver, isExpressPending, sendDueToMailbox } from '../public/js/mail-courier.js?v=d525206a';
+import { mergePlayerMail } from '../public/js/phone/companion-data.js?v=8e9dfefd';
+import { mailJson } from '../tools/build-mail.mjs';
+import { ITEM_BASE_COSTS } from '../public/js/store-catalog.js?v=79d4de8a';
+import { HAS_SITE, SITE_DIR, sitePath } from '../tools/repos.mjs';
+
+const root = join(import.meta.dirname, '..');
+const hasPhp = spawnSync('php', ['-v']).status === 0;
+const skipSite = !HAS_SITE ? 'no groddle-afternoon-site checkout' : !hasPhp ? 'no php' : false;
+
+function php(body) {
+  const code = `foreach (['Economy', 'LedgerMath', 'LedgerGift', 'LedgerMail'] as $c) require ${JSON.stringify(SITE_DIR)} . "/src/$c.php"; use Groddle\\Minn\\LedgerMail; ${body}`;
+  return JSON.parse(execFileSync('php', ['-r', code]).toString());
+}
+
+const ID = '00000000000000a1';
+const letter = (over = {}) => ({
+  id: ID, box: 'in', from: { id: 7, name: 'Ada' }, to: { id: 9, name: 'Bo' }, text: 'Cherries for you',
+  item: { c: 'cherry', n: 3 }, currants: 25, postage: 7, at: 2_000_000, sent: 1_580_000, collected: false, reply: null, replied: false, ...over,
+});
+
+describe('postage and arrival follow inc_mail.js and config_prod.js', () => {
+  it('charges 2, 10% of the stack\'s base cost (at least 1), 10% of the currants, at most 200, plus the currants (mail_get_message_cost 1295-1312)', () => {
+    assert.equal(playerMailCost({}, ITEM_BASE_COSTS), 2);
+    assert.equal(playerMailCost({ c: 'apple', n: 10 }, ITEM_BASE_COSTS), 7, 'base 5 x 10 x 0.1 = 5');
+    assert.equal(playerMailCost({ c: 'cherry', n: 1 }, ITEM_BASE_COSTS), 3, 'at least 1 for a stack');
+    assert.equal(playerMailCost({ c: 'cosmox', n: 3 }, ITEM_BASE_COSTS), 4, 'base 8.2: Math.round(2.46)');
+    assert.equal(playerMailCost({ currants: 100 }, ITEM_BASE_COSTS), 112);
+    assert.equal(playerMailCost({ c: 'antique_spigot', n: 5, currants: 5000 }, ITEM_BASE_COSTS), 5200, 'postage stops at 200');
+    assert.equal(playerMailCost({ c: 'bag_butler', n: 3 }, ITEM_BASE_COSTS), 3, 'no base cost: the minimum 1');
+    // The solo mailbox's own formula agrees where it has the same base cost.
+    assert.equal(mailCost({ itemBaseCost: 5, itemCount: 10, currants: 0 }), playerMailCost({ c: 'apple', n: 10 }, ITEM_BASE_COSTS));
+  });
+
+  it('delivers words at once and anything carrying things 420 s later (config_prod.js:45-46)', () => {
+    assert.equal(arrivesAt({}, 1000), 1000);
+    assert.equal(arrivesAt({ item: { c: 'apple', n: 1 } }, 1000), 421_000);
+    assert.equal(arrivesAt({ currants: 1 }, 1000), 421_000);
+    assert.deepEqual(PLAYER_MAIL_RULES, { textMax: 300, countMax: 999, currantsMax: 999999, delay: 0, delayAttached: 420, baseCost: 2, postageMax: 200, mailboxMax: 50, sendPerHour: 60 });
+  });
+
+  it('checks the compose form as the AS3 client did', () => {
+    assert.equal(composeRefusal({ to: '', text: 'hi' }), PLAYER_MAIL_TEXT.noOne);
+    assert.equal(composeRefusal({ to: 'Bo', text: '   ' }), PLAYER_MAIL_TEXT.empty);
+    assert.equal(composeRefusal({ to: 'Bo', text: 'x'.repeat(301) }), 'Keep it to 300 characters.');
+    assert.equal(composeRefusal({ to: 'Bo', item: { c: 'apple', n: 1000 } }), 'Choose how many to send, from 1 to 999.');
+    assert.equal(composeRefusal({ to: 'Bo', item: { c: 'apple', n: 4 }, held: 3 }), "You don't have that many.");
+    assert.equal(composeRefusal({ to: 'Bo', item: { c: 'bag_generic', n: 1 }, bagHolds: true }), PLAYER_MAIL_TEXT.bagStuffed);
+    assert.equal(composeRefusal({ to: 'Bo', currants: 50, purse: 56 }, ITEM_BASE_COSTS), PLAYER_MAIL_TEXT.needCurrants, '50 + 2 + 5 = 57');
+    assert.equal(composeRefusal({ to: 'Bo', currants: 50, purse: 57 }, ITEM_BASE_COSTS), null);
+    assert.equal(composeRefusal({ to: 'Bo', currants: 1_000_000 }), 'Enclose from 0 to 999,999 currants.');
+  });
+});
+
+describe('letters from the site in the mailbox', () => {
+  it('reads a letter as a row from its sender, its things held by the site\'s ledger, the Frog\'s to bring', () => {
+    const row = letterRow(letter({ reply: { text: 'Got any cherries?', from: { id: 9, name: 'Bo' } } }), { sessionStart: 1_000_000 });
+    assert.equal(row.id, LETTER_ROW(ID));
+    assert.equal(row.sender, 'Ada');
+    assert.equal(row.fromId, 7);
+    assert.equal(row.ledger, `mail-${ID}-c`);
+    assert.deepEqual(row.attachment, { classTsid: 'cherry', count: 3 });
+    assert.equal(row.currants, 25);
+    assert.equal(row.attachmentsClaimed, false);
+    assert.equal(row.express, true);
+    assert.equal(row.inMailbox, false);
+    assert.deepEqual(row.quote, { text: 'Got any cherries?', from: 'Bo' });
+    const box = createMailboxState();
+    const kept = deliverMail(box, row);
+    assert.equal(kept.ledger, row.ledger);
+    assert.equal(kept.fromId, 7);
+    assert.equal(kept.playerMail, ID);
+    assert.equal(kept.express, true);
+    assert.deepEqual(kept.quote, { text: 'Got any cherries?', from: 'Bo' });
+    // Round trip through a save.
+    const again = normalizeMailboxState(JSON.parse(JSON.stringify(box))).messages[0];
+    assert.equal(again.ledger, row.ledger);
+    assert.equal(again.fromId, 7);
+    assert.equal(again.express, true);
+  });
+
+  it('puts a parcel that arrived while you were away straight in the mailbox (mail_login 1448-1453), and words alone are never the Frog\'s', () => {
+    const away = letterRow(letter(), { sessionStart: 3_000_000 });
+    assert.equal(away.inMailbox, true);
+    assert.equal(away.expedited, true);
+    const words = letterRow(letter({ item: null, currants: 0 }));
+    assert.equal(words.express, false);
+    assert.equal(words.ledger, undefined, 'nothing to collect');
+    assert.equal(words.attachmentsClaimed, true);
+    const coins = letterRow(letter({ item: null }));
+    assert.equal(coins.express, false, 'currants alone go to the mailbox (main.js 6747)');
+    assert.equal(coins.ledger, `mail-${ID}-c`);
+  });
+
+  it('never hands a player\'s parcel over locally: the Frog takes it through the site', () => {
+    const box = createMailboxState();
+    const row = deliverMail(box, letterRow(letter(), { sessionStart: 0 }));
+    assert.equal(isExpressPending(row), true);
+    const inv = {};
+    const pc = { currants: 0 };
+    assert.deepEqual(handOver(row, inv, pc), { ok: false, reason: 'ledger' });
+    assert.deepEqual(inv, {});
+    assert.equal(pc.currants, 0);
+    // An auction delivery is still never the Frog's.
+    const auc = deliverMail(box, { id: 'auc-x', sender: 'AFLC', text: 'x', attachment: { classTsid: 'cherry', count: 1 }, ledger: 'auc-00000000000000b2-d' });
+    assert.notEqual(auc.express, true);
+    assert.equal(isExpressPending({ ...auc, express: true }), false);
+    // mail_login moves a due one into the mailbox.
+    assert.equal(sendDueToMailbox(box.messages, 3_000_000), 1);
+  });
+
+  it('reads a letter that came back from the Post, with nobody to reply to', () => {
+    const row = letterRow(letter({ box: 'returned', why: 'gone', returned: 'Your letter to Bo came back: there is nobody at that address any more. Here are your things.' }));
+    assert.equal(row.id, RETURN_ROW(ID));
+    assert.equal(row.sender, 'Groddle Afternoon Post');
+    assert.equal(row.fromId, undefined);
+    assert.match(row.text, /came back/);
+    assert.match(row.text, /Cherries for you/);
+    assert.equal(row.express, false);
+    assert.equal(row.ledger, `mail-${ID}-c`);
+  });
+
+  it('keeps your sent letter as a Sent row, nothing moved', () => {
+    const box = createMailboxState();
+    const sent = recordSentMail(box, sentRow({ ...letter(), box: 'sent' }));
+    assert.equal(sent.outgoing, true);
+    assert.equal(sent.recipient, 'Bo');
+    assert.equal(sent.attachmentsClaimed, true);
+    assert.equal(recordSentMail(box, sentRow({ ...letter(), box: 'sent' })), null, 'once');
+    assert.equal(listMailboxMessages(box, { now: Date.now(), outgoing: true }).length, 1);
+    assert.equal(box.totalSent, 1);
+  });
+
+  it('applies the site\'s receipts as moves of the pack and purse', () => {
+    const s = normalizeMailReceipt({ op: `mail-${ID}-s`, gave: { items: [{ c: 'cherry', n: 3 }], currants: 32 }, got: { items: [], currants: 0 } });
+    assert.deepEqual(mailReceiptEffects(s), { pack: { cherry: -3 }, currants: -32 });
+    const c = normalizeMailReceipt({ op: `mail-${ID}-c`, gave: { items: [], currants: 0 }, got: { items: [{ c: 'cherry', n: 3 }], currants: 25 } });
+    assert.deepEqual(mailReceiptEffects(c), { pack: { cherry: 3 }, currants: 25 });
+    assert.equal(c.kind, 'c');
+    assert.equal(c.id, ID);
+    assert.equal(normalizeMailReceipt({ op: 'auc-00000000000000a1-d' }), null);
+    assert.match(newLetterId(), /^[0-9a-f]{16}$/);
+    assert.equal(goodsWords({ classTsid: 'cherry', count: 3 }, 25, (c, n) => `${n} ${c}`), '3 cherry and 25 currants');
+    assert.deepEqual(normalizePlayerMailSlice({ seen: ['pm-' + ID, 'junk', 'pmr-' + ID], toldAt: 5 }), { seen: ['pm-' + ID, 'pmr-' + ID], toldAt: 5 });
+  });
+
+  it('shows the phone companion the letters the save has not taken in yet', () => {
+    const rows = [{ id: LETTER_ROW(ID), sender: 'Ada', text: 'x', snippet: 'x', at: 5, unread: false, item: null, currants: 0, collected: false, onItsWay: false }];
+    const out = mergePlayerMail(rows, { letters: [letter({ collected: true }), letter({ id: '00000000000000c3', item: null, currants: 0, text: 'Hello from far away', at: 9 }), letter({ id: '00000000000000d4', at: Date.now() + 60_000 })] }, 1_000_000_000);
+    assert.equal(out.length, 2, 'a letter still on its way is not shown');
+    assert.equal(out.find((r) => r.id === LETTER_ROW(ID)).collected, true);
+    assert.equal(out.find((r) => r.id === LETTER_ROW('00000000000000c3')).sender, 'Ada');
+    assert.deepEqual(mergePlayerMail(rows, null).map((r) => r.id), [LETTER_ROW(ID)]);
+  });
+});
+
+describe('solo is untouched', () => {
+  it('answers nothing in solo', () => {
+    playerMailFeature.restore({ seen: ['pm-' + ID] }, { mode: 'solo' });
+    playerMailFeature.init({ mode: 'solo' });
+    assert.equal(playerMailFeature.mailCompose({ mode: 'solo' }), null);
+    assert.equal(playerMailFeature.mailSend({ to: 'Bo' }, { mode: 'solo' }), null);
+    assert.equal(playerMailFeature.mailReceive({ ledger: `mail-${ID}-c` }, { mode: 'solo' }), null);
+    assert.equal(playerMailFeature.save(), undefined);
+  });
+
+  it('is registered once, after the trade feature (ledgerReceipt) and before street-objects; game.js asks it', () => {
+    const index = readFileSync(join(root, 'public/js/features/index.js'), 'utf8');
+    assert.equal((index.match(/player-mail-feature\.js/g) || []).length, 1);
+    assert.ok(index.indexOf('player-mail-feature.js') > index.indexOf('trade-feature.js'));
+    assert.ok(index.indexOf('player-mail-feature.js') < index.indexOf('street-objects-feature.js'));
+    const game = readFileSync(join(root, 'public/game.js'), 'utf8');
+    assert.match(game, /features\.query\('mailCompose', engine\)/);
+    assert.match(game, /features\.query\('mailSend', \{ \.\.\.f, reply: reply\?\.playerMail \|\| null \}, engine\)/);
+    assert.match(game, /recordSentMail\(row\) \{/);
+    const courier = readFileSync(join(root, 'public/js/features/mail-courier-feature.js'), 'utf8');
+    assert.match(courier, /msg\.ledger \? await ledgerHandOver\(engine, msg, room\)/);
+  });
+});
+
+describe('the site\'s rules', { skip: skipSite }, () => {
+  it('has the table tools/build-mail.mjs writes', () => {
+    assert.equal(readFileSync(sitePath('data/mail.json'), 'utf8'), mailJson());
+  });
+
+  it('charges the postage the game shows, and refuses as the game says', () => {
+    const cases = [[null, 0, 0], ['apple', 10, 0], ['cherry', 1, 0], ['cosmox', 3, 0], [null, 0, 100], ['antique_spigot', 5, 5000], ['bag_butler', 3, 0], ['potato', 999, 999999]];
+    const out = php(`echo json_encode([
+      'cost' => array_map(fn ($x) => LedgerMail::cost($x[0], $x[1], $x[2]), ${JSON.stringify(cases)}),
+      'refuse' => [LedgerMail::sendRefusal('', null, 0), LedgerMail::sendRefusal('hi', ['c' => 'greeter_twig', 'n' => 1], 0), LedgerMail::sendRefusal('', ['c' => 'apple', 'n' => 1000], 0), LedgerMail::sendRefusal('', null, 1000000), LedgerMail::sendRefusal('hi', ['c' => 'apple', 'n' => 3], 10)],
+      'call' => [LedgerMail::call(['id' => '${ID}', 'to' => ' Bo ', 'text' => str_repeat('x', 400), 'item' => ['c' => 'apple', 'n' => 3], 'currants' => 5]), LedgerMail::call(['id' => 'nope', 'to' => 'Bo']), LedgerMail::call(['id' => '${ID}', 'to' => 9, 'currants' => 1.5])],
+      'shown' => [LedgerMail::shown(['status' => 'sent', 'class_tsid' => '', 'currants' => 0, 'from_id' => 7], [7]), LedgerMail::shown(['status' => 'sent', 'class_tsid' => 'apple', 'currants' => 0, 'from_id' => 7], [7]), LedgerMail::shown(['status' => 'sent', 'class_tsid' => '', 'currants' => 0, 'from_id' => 7], [8])],
+      'op' => LedgerMail::op('${ID}', 'c'),
+      'rules' => LedgerMail::rules(),
+    ]);`);
+    assert.deepEqual(out.cost, cases.map(([c, n, currants]) => playerMailCost({ c, n, currants }, ITEM_BASE_COSTS)));
+    assert.deepEqual(out.refuse, [['empty', PLAYER_MAIL_TEXT.empty], ['type', "That can't be sent by mail."], ['bad_count', 'Choose how many to send, from 1 to 999.'], ['bad_currants', 'Enclose from 0 to 999,999 currants.'], null]);
+    assert.equal(out.call[0].text.length, 300);
+    assert.equal(out.call[0].to, 'Bo');
+    assert.deepEqual(out.call[0].item, { c: 'apple', n: 3 });
+    assert.equal(out.call[1], null);
+    assert.equal(out.call[2], null);
+    assert.deepEqual(out.shown, [false, true, true], 'build_mail_check_msg 1356-1358');
+    assert.equal(out.op, `mail-${ID}-c`);
+    assert.deepEqual(out.rules, PLAYER_MAIL_RULES);
+  });
+
+  it('is registered with Minn and its table declared', () => {
+    assert.match(readFileSync(sitePath('src/Extension.php'), 'utf8'), /new LedgerMail\(\$minn\)/);
+    const manifest = JSON.parse(readFileSync(sitePath('minn.json'), 'utf8'));
+    const cols = manifest.tables.groddle_player_mail;
+    assert.ok(cols.some((c) => c.startsWith('PRIMARY KEY')));
+    for (const c of ['from_id ', 'to_id ', 'deliver_to ', 'deliver_at ', 'collected_at ', 'status ']) assert.ok(cols.some((x) => x.startsWith(c)), c);
+  });
+});
