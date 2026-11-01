@@ -2321,6 +2321,7 @@
 :root[data-ui="classic"] #game-root .hb-tray .hb-foot .hb-bt { min-height: calc(19 * var(--cu)); flex-direction: row; }
 :root[data-ui="classic"] #game-root .hb-tray .hb-tray-note { padding-top: calc(4 * var(--cu)); color: var(--c-classic-text); font-size: calc(var(--fs-classic-count) * var(--cu-n, 1)); }
 :root[data-ui="classic"] #game-root .hb-tray.is-drop-target .hb-panel { box-shadow: 0 0 7px 2px var(--c-classic-focus); }
+:root[data-ui="classic"] #pack-bar.is-drop-target { box-shadow: 0 0 7px 2px var(--c-classic-focus); }
 /* The actions by a selected piece: a small white window (Dialog.as outline and halo). */
 :root[data-ui="classic"] #game-root .hb-pop {
   max-width: calc(420 * var(--cu));

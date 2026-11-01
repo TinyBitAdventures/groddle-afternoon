@@ -50,7 +50,7 @@ import {
   HOME_LIMITS,
   HOME_TEXTURE_CONFIGS,
 } from './homes-catalog.js?v=29713fa8';
-import { cleanHistory, cleanUpgradeId, upgradeArt, upgradeRow } from './furniture-upgrades.js?v=7e9a420c';
+import { cleanHistory, cleanUpgradeId, upgradeArt, upgradeRow } from './furniture-upgrades.js?v=2bc913dc';
 
 export const SEGMENT_W = 150;
 /** Room geometry version stored with the house (2 = source 150 px segments). */
@@ -130,19 +130,30 @@ export function pieceArt(classTsid, upgradeId = '') {
   return upgradeArt(classTsid, upgradeId) || furnitureDef(classTsid)?.art || null;
 }
 
+/** 1x px a thing rests into a piece's visible top when the catalog gives no plat on the art. */
+export const REST_INSET = 2;
+
 /**
- * Height above the foot where tabletop decor rests, or 0 for no surface. An
- * upgrade uses its highest catalog plat over the middle when that sits on the
- * art, else the class's surface in proportion to the art's height.
+ * Height above the foot where tabletop decor rests, or 0 for no surface.
  *
- * A catalog plat is measured from the SWF stage's bottom centre (the point the
- * original placed a piece by); the trimmed art keeps how far its own bottom sits
- * above that point as art.foot (tools/furniture-upgrades/render.py --feet). A
- * piece hung above it (the wall shelves: the Basic Wooden Shelf's plat is 52 over
- * a stage bottom 19 px under its 49 px art) has its plat taken down by that much,
- * so what is set on it rests on the plank instead of floating over it (Austin
- * 2026-11-01). Floor pieces, drawn past their point (foot below 0), keep their
- * plat as before.
+ * An upgrade uses its highest catalog plat over the middle. A catalog plat is
+ * measured from the SWF stage's bottom centre (the point the original placed a
+ * piece by, LocationItemstackView.as _positionViewDO 853-854); the trimmed art
+ * keeps how far its own bottom sits above that point as art.foot
+ * (tools/furniture-upgrades/render.py --feet), and the remake draws the art's
+ * bottom on the piece's foot, so the plat is `platY - foot` over it:
+ * - a piece hung above its point (the wall shelves, foot > 0: the Basic Wooden
+ *   Shelf's plat is 52 over a stage bottom 19 px under its 49 px art) rests
+ *   things 33 px up, on the plank (HOUSEFIX, Austin 2026-11-01);
+ * - a floor piece drawn past its point (foot < 0: legs and front edges in
+ *   three-quarter view reach below the line it stands on) rests them that much
+ *   higher, on its top: the Dining Table with Striped Runner's plat 52 with a
+ *   foot of -24 is 76 up its 90 px art. Before, its plat was taken as it stood,
+ *   so things sat on a table's front edge or in front of its legs.
+ * Nothing rests above the art's visible top over its middle (art.top, measured
+ * by tools/furniture-upgrades/tops.mjs, whose --check sweeps every piece): a
+ * plat above it, or a piece with no plat, rests things REST_INSET into that top.
+ * With no measurement, the class's surface in proportion to the art's height.
  */
 export function surfaceHeight(classTsid, upgradeId = '') {
   const def = furnitureDef(classTsid);
@@ -150,9 +161,11 @@ export function surfaceHeight(classTsid, upgradeId = '') {
   const art = upgradeArt(classTsid, upgradeId);
   if (art) {
     const row = upgradeRow(classTsid, upgradeId)?.platY;
-    const plat = row && Number(art.foot) > 0 ? row - art.foot : row;
-    // Tops drawn in three-quarter view put the source plat mid-surface (about half the height).
-    if (plat && plat <= art.h + 4 && plat >= art.h * 0.2) return plat;
+    const foot = Number.isFinite(Number(art.foot)) ? Number(art.foot) : 0;
+    const plat = row != null && Number.isFinite(Number(row)) ? Math.round(Number(row) - foot) : 0;
+    const top = Number.isFinite(Number(art.top)) ? art.h - Number(art.top) : null;
+    if (plat > 0 && plat <= (top ?? art.h + 4)) return plat;
+    if (top != null) return Math.max(1, top - REST_INSET);
     return Math.round(def.surface * (art.h / def.art.h));
   }
   return Math.round(def.surface * furnitureScale(classTsid));
@@ -487,6 +500,83 @@ export function stackSurfaceAt(state, x, y, { give = 24 } = {}) {
   }
   if (best) return { x: best.x, y: best.y, on: best.on };
   return { x: px, y: INTERIOR.floorY, on: null };
+}
+
+/** How far over a piece's surface a stack set down before a surface fix may sit and still be on that piece. */
+export const STALE_REST_GIVE = 40;
+
+/** The piece's resting line: { top, left, right } in room px, or null when it holds nothing. */
+function restLine(row) {
+  if (!row || row.slot === 'ceiling' || row.slot === 'rug') return null;
+  const h = surfaceHeight(row.classTsid, row.upgradeId);
+  if (!h) return null;
+  const half = Math.max(0, furnitureSize(row.classTsid, row.upgradeId).w / 2 - 6);
+  return { top: Math.round(row.y - h), left: row.x - half, right: row.x + half };
+}
+
+/**
+ * Stacks set down in a room rest on what holds them, as the original kept them
+ * (HandOfDecorator.as dropFromLocationOnTargetPlatform 1500-1575: a moved piece
+ * takes the stacks on its plats with it, also_tsids; a stack lands on the plat
+ * line under it). `rows` are the room's dropped-stack records (world x, `on`
+ * the piece id), `x0` the room's world x. Each comes to rest:
+ * - on its piece (`on`), at that piece's surface now: after a move, a new style
+ *   or a surface fix (the Basic Wooden Shelf's things were set down at 52 px
+ *   before HOUSEFIX made it 33, and floated 19 px over the plank), and inside its
+ *   ends;
+ * - a stack with no piece yet (set down before stacks kept one) takes the piece
+ *   it sits on: its x over the piece, no more than STALE_REST_GIVE over its
+ *   surface and above its foot; one on the floor stays on the floor;
+ * - a stack whose piece is gone (picked up, sold) falls to the first surface
+ *   under it, or the floor.
+ * Mutates the rows; returns how many moved. Only x, y and `on` change, so the
+ * pack and the ledger never see it.
+ */
+export function settleStacks(state, rows, x0 = 0) {
+  if (!state || !Array.isArray(rows)) return 0;
+  let moved = 0;
+  const lines = new Map();
+  for (const row of state.placed || []) {
+    const line = restLine(row);
+    if (line) lines.set(row.id, line);
+  }
+  for (const stack of rows) {
+    if (!stack || stack.contents) continue;
+    const rx = Number(stack.x) - x0;
+    const y = Number(stack.y);
+    if (!Number.isFinite(rx) || !Number.isFinite(y)) continue;
+    let on = Number.isInteger(stack.on) && lines.has(stack.on) ? stack.on : null;
+    if (on == null && stack.on == null) {
+      // A stack from before `on`: the piece under it, nearest its surface.
+      let best = null;
+      for (const row of state.placed || []) {
+        const line = lines.get(row.id);
+        if (!line || rx < line.left || rx > line.right) continue;
+        if (y < line.top - STALE_REST_GIVE || y > row.y - 2) continue;
+        const d = Math.abs(y - line.top);
+        if (!best || d < best.d) best = { id: row.id, d };
+      }
+      on = best?.id ?? null;
+    }
+    let next;
+    if (on != null) {
+      const line = lines.get(on);
+      next = { x: Math.round(Math.max(line.left, Math.min(line.right, rx))), y: line.top, on };
+    } else if (stack.on != null) {
+      // Its piece is gone: it falls to whatever is under it.
+      const hit = stackSurfaceAt(state, rx, y, { give: 0 });
+      next = { x: hit.x, y: hit.y, on: hit.on };
+    } else continue;
+    const nx = next.x + x0;
+    if (nx !== stack.x || next.y !== stack.y || (next.on ?? null) !== (stack.on ?? null)) {
+      stack.x = nx;
+      stack.y = next.y;
+      if (next.on != null) stack.on = next.on;
+      else delete stack.on;
+      moved += 1;
+    }
+  }
+  return moved;
 }
 
 /**

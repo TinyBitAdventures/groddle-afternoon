@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b351d7cb';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=cf17887e';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=69117518';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -473,7 +473,7 @@ import {
   pickupDroppedStack,
   placeDroppedBag,
   takeDroppedRecord,
-} from './js/world-items.js?v=4ed49084';
+} from './js/world-items.js?v=210bef3b';
 import {
   createPlayerSave,
   parsePlayerSave,
@@ -11138,6 +11138,11 @@ const engine = {
     playSound('ITEM_DROP', { volume: 0.6 });
     updateHud();
     return result;
+  },
+  /** A dropped stack drawn here back into the pack, as its Pick up verb does (homes-feature: Decoration Mode). */
+  pickUpDroppedStack(id) {
+    const target = interactables.find((t) => t.classId === 'dropped_item' && t.worldItemId === id);
+    return target ? pickupDroppedWorldItem(target) : false;
   },
   /** Every street's dropped stacks (js/world-items.js state), for features that fetch from the ground. */
   get droppedItems() {

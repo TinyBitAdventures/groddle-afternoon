@@ -86,6 +86,8 @@ function cleanRecord(row, streetTsid, fallbackId) {
     droppedAt: Math.max(0, Math.floor(finite(row?.droppedAt, 0))),
     ...(points ? { points } : {}),
     ...(contents ? { contents } : {}),
+    // In a house: the placed piece (its id in that room's decor) the stack rests on (js/home-decor.js settleStacks).
+    ...(Number.isInteger(row?.on) && row.on > 0 ? { on: row.on } : {}),
   };
 }
 

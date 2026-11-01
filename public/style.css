@@ -11736,6 +11736,8 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 [data-ui="modern"] #game-root .hb-tray .hb-tray-note { align-self: center; color: var(--text-muted); font-size: var(--fs-xs); line-height: var(--lh-snug); }
 [data-ui="modern"] #game-root .hb-tray .hb-empty { color: var(--text-muted); font-size: var(--fs-s); }
 [data-ui="modern"] #game-root .hb-tray.is-drop-target { border-color: var(--accent); box-shadow: var(--shadow-3), inset 0 0 0 2px var(--accent); }
+/* Decoration Mode: a stack set down in the room dragged back over the pack goes into it. */
+[data-ui="modern"] #pack-bar.is-drop-target { box-shadow: var(--shadow-3), inset 0 0 0 2px var(--accent); }
 [data-ui="modern"] #game-root .hb-builder.is-dragging .hb-tray { cursor: grabbing; }
 [data-ui="modern"] #game-root .hb-pop {
   max-width: min(440px, calc(100% - 16px));

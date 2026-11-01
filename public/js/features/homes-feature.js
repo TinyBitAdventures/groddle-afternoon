@@ -126,14 +126,15 @@ import {
   restackFurniture,
   setHomeTexture,
   snapPlacement,
+  settleStacks,
   stackSurfaceAt,
   surfaceHeight,
   textureConfig,
   unexpandInterior,
   UNEXPAND_TEXT,
-} from '../home-decor.js?v=d03413ec';
-import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=7e9a420c';
-import { chooseUpgrade, closeUpgradePicker, openUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=f78f7410';
+} from '../home-decor.js?v=df55aa99';
+import { applyBonusUpgrade, applyUpgrade, bonusUpgradeLine, currantsText, hasUpgrades, pieceLabel, rollBonusUpgrade, upgradeVerb, UPGRADE_TEXT } from '../furniture-upgrades.js?v=2bc913dc';
+import { chooseUpgrade, closeUpgradePicker, openUpgradePicker, saveUpgrade, upgradePickerOpen, upgradePickerState } from '../furniture-upgrade-picker.js?v=b9a05bee';
 import {
   BUILDER_TEXT,
   DRAG_DIST,
@@ -149,7 +150,7 @@ import {
   panKey,
   placeCostText,
   trayFilters,
-} from '../ui/home-builder.js?v=2e0c377b';
+} from '../ui/home-builder.js?v=a542286a';
 import { RECIPE_CATALOG } from '../making.js?v=20d5364b';
 import {
   createBackYardState,
@@ -258,7 +259,7 @@ import {
   quoteHouseExpansion,
   quoteHouseUnexpand,
   unexpandHouseFloors,
-} from '../home-floors.js?v=a6b5368b';
+} from '../home-floors.js?v=e5b6dd98';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -889,14 +890,18 @@ function interiorBackground(engine, opts = {}) {
   root.yardStyle = opts.yard ? shownYardStyle(engine) : null;
   root.worldH = root.room.bottom;
   const { room } = root;
+  // The floor is solid from the top (inc_homes.js homes_rebuild_floor 928-933: platform_pc_perm -1).
+  // pc_perm 1 is an underside (street-model.js isStandable): with it the avatar stood on the yard's
+  // line 60 px under the room's floor, and that floor then lay between the avatar and everything set
+  // on a shelf or a table, so a click on it said "Could not get close enough :(" (Austin 2026-11-01).
   root.platformsScreen = room.leftOpen
     ? [
       // homes_rebuild_floor left-open: the yard, the ramp (x -20 at y 0 to x 56 on the floor), the floor.
-      { id: 'home-yard', x1: 0, y1: room.groundY, x2: x0 + room.rampX, y2: room.groundY, pc_perm: 1 },
-      { id: 'home-yard-ramp', x1: x0 + room.rampX, y1: room.groundY, x2: x0 + room.floorStart, y2: GROUND_Y, pc_perm: 1 },
-      { id: 'home-floor', x1: x0 + room.floorStart, y1: GROUND_Y, x2: width, y2: GROUND_Y, pc_perm: 1 },
+      { id: 'home-yard', x1: 0, y1: room.groundY, x2: x0 + room.rampX, y2: room.groundY, pc_perm: -1 },
+      { id: 'home-yard-ramp', x1: x0 + room.rampX, y1: room.groundY, x2: x0 + room.floorStart, y2: GROUND_Y, pc_perm: -1 },
+      { id: 'home-floor', x1: x0 + room.floorStart, y1: GROUND_Y, x2: width, y2: GROUND_Y, pc_perm: -1 },
     ]
-    : [{ id: 'home-floor', x1: 0, y1: GROUND_Y, x2: width, y2: GROUND_Y, pc_perm: 1 }];
+    : [{ id: 'home-floor', x1: 0, y1: GROUND_Y, x2: width, y2: GROUND_Y, pc_perm: -1 }];
   root.redraw = (preview = null) => {
     root.room = drawRoomShell(engine, shell, preview ? { ...opts, preview } : opts);
     drawStampMarks(engine);
@@ -1673,7 +1678,7 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
   root.addChild(trim);
 
   root.worldH = STREET_WORLD_H;
-  root.platformsScreen = [{ id: 'home-ground', x1: 0, y1: STREET_GROUND_Y, x2: width, y2: STREET_GROUND_Y, pc_perm: 1 }];
+  root.platformsScreen = [{ id: 'home-ground', x1: 0, y1: STREET_GROUND_Y, x2: width, y2: STREET_GROUND_Y, pc_perm: -1 }];
   root.updateParallax = (camX, camY, vpW, vpH, skyH = vpH) => land.update(camX, camY, vpW, skyH);
   root.houseDoorX = doorX;
   root.houseSignX = signX;
@@ -2045,6 +2050,9 @@ function renderFurniture(engine) {
   }
   engine.setData('homeFurnitureFront', layers.front ? layers.front.children.length : 0);
   scene.background?.redraw?.();
+  // What was set on a piece rests on it as it stands now (moved, restyled, picked up or sold).
+  settleRoomStacks(engine);
+  drawStackSelection(engine);
   publish(engine);
 }
 
@@ -3293,7 +3301,8 @@ function decorateModel(engine) {
   const model = {
     mode: 'decorate',
     title: BUILDER_TEXT.decorateTitle,
-    hint: inTower() ? `${towerApi.floorTitle()} · ${BUILDER_TEXT.decorateHint}` : BUILDER_TEXT.decorateHint,
+    // The Pack tab's hint line says how things go down and come back up (Austin 2026-11-01).
+    hint: tab === 'pack' ? BUILDER_TEXT.packHint : inTower() ? `${towerApi.floorTitle()} · ${BUILDER_TEXT.decorateHint}` : BUILDER_TEXT.decorateHint,
     closeLabel: 'Leave Decoration Mode',
     onClose: () => setMode(engine, null),
     bannerActions: decorateBannerActions(engine),
@@ -3819,6 +3828,9 @@ function setMode(engine, next) {
   selected = null;
   drag = null;
   packDrag = null;
+  stackCarry = null;
+  drawPackMarker(engine, null);
+  drawStackSelection(engine);
   carryBy = 'pointer';
   heldPan.clear();
   setHover(engine, null);
@@ -4107,7 +4119,14 @@ function placeAtPointer(engine, at) {
     if (!doorCheck.ok) {
       result = { ok: false, reason: doorCheck.reason, msg: doorCheck.msg };
     } else if (placing.moveId) {
+      const was = placedItem(decor, placing.moveId);
+      const fromX = was?.x;
       result = moveFurniture(decor, placing.moveId, at);
+      // dropFromLocationOnTargetPlatform also_tsids: the stacks on a moved piece go with it.
+      if (result.ok && Number.isFinite(fromX)) {
+        const dx = placedItem(decor, placing.moveId).x - fromX;
+        for (const row of roomStackRows(engine)) if (row.on === placing.moveId) row.x += dx;
+      }
       selected = { kind: 'furniture', id: placing.moveId };
       if (result.ok && isDoor) setTimeout(() => engine.refreshHomeScene?.(), 0);
     } else {
@@ -4530,16 +4549,16 @@ function packDropTarget(engine, e) {
   return stackSurfaceAt(decor, p.x, p.y);
 }
 
-function drawPackMarker(engine, target) {
+function drawPackMarker(engine, target, what = packDrag) {
   if (scene?.packMarker && !scene.packMarker.destroyed) scene.packMarker.destroy({ children: true });
   if (scene) scene.packMarker = null;
-  if (!target || !packDrag || !scene) return;
+  if (!target || !what || !scene) return;
   const { PIXI } = engine;
   const g = new PIXI.Container();
   g.zIndex = 95;
   // The stack as it will lie there (js/world-art.js: its count's state at its own size).
-  const iconUrl = ITEM_CATALOG[packDrag.classTsid]?.icon || `assets/sprites/icons/${packDrag.classTsid}.png`;
-  const art = worldArtFor(packDrag.classTsid, packDrag.count, iconUrl);
+  const iconUrl = ITEM_CATALOG[what.classTsid]?.icon || `assets/sprites/icons/${what.classTsid}.png`;
+  const art = worldArtFor(what.classTsid, what.count, iconUrl);
   const icon = new PIXI.Sprite(textureFromUrl(art?.url || iconUrl));
   icon.anchor.set(0.5, 1);
   icon.width = art?.w || WORLD_ART_FALLBACK_MAX;
@@ -4599,6 +4618,13 @@ function wirePackDrag(engine) {
     if (!res?.ok) {
       if (res?.msg) engine.toast(res.msg);
       engine.playSound?.('CLICK_FAILURE', { volume: 0.4 });
+    } else {
+      settleRoomStacks(engine);
+      // Once a visit: how to move it or take it back (Austin 2026-11-01).
+      if (!stackHintShown) {
+        stackHintShown = true;
+        engine.toast(BUILDER_TEXT.stackHint, 4200);
+      }
     }
     engine.setData('homeDropLast', res?.ok ? `stack:${was.classTsid}:${target.on ?? 'floor'}` : `refused:${res?.reason || ''}`);
   });
@@ -4624,10 +4650,179 @@ function startPackDrag(classTsid, event, engine) {
   return true;
 }
 
+// --- stacks set down in the room: select, drag to move, drag onto the pack to pick up
+// (HandOfDecorator.as startWithItemFromLocation 1250-1323: in Decoration Mode any stack you can
+// pick up is dragged like furniture; dropFromLocationOnTargetPlatform 1445-1620 sets it down on the
+// plat under the pointer, as main.js doModifyItem 4873-4910 does, at home only; endWithItemFromLocation
+// 1325-1404 and the pack take one dropped on them back, as the item's own Pick up does.)
+
+let stackCarry = null; // { id } a stack carried after its Move button, set down by the next click
+let stackHintShown = false;
+
+/** This room's dropped-stack records (live: game.js droppedItemState, this room's key). */
+function roomStackRows(engine) {
+  const rows = engine?.droppedItems?.streets?.[engine.dropTsid ?? engine.streetTsid];
+  return Array.isArray(rows) ? rows : [];
+}
+
+function stackRow(engine, id) {
+  return roomStackRows(engine).find((row) => row.id === id) || null;
+}
+
+/** A stack's drawn box in world px (js/world-art.js: its art at its own size, bottom centre on its point). */
+function stackBox(row) {
+  const iconUrl = ITEM_CATALOG[row.classTsid]?.icon || `assets/sprites/icons/${row.classTsid}.png`;
+  const art = worldArtFor(row.classTsid, row.count, iconUrl);
+  const w = art?.w || WORLD_ART_FALLBACK_MAX;
+  const h = art?.h || WORLD_ART_FALLBACK_MAX;
+  return { x: row.x - w / 2, y: row.y - h, w, h };
+}
+
+/** The stack under a world point (the last drawn first), or null. */
+function stackAt(engine, p) {
+  const rows = roomStackRows(engine);
+  for (let i = rows.length - 1; i >= 0; i -= 1) {
+    const b = stackBox(rows[i]);
+    if (p.x >= b.x - 6 && p.x <= b.x + b.w + 6 && p.y >= b.y - 6 && p.y <= b.y + b.h + 4) return rows[i];
+  }
+  return null;
+}
+
+/** Every stack in the room rests on what holds it now (js/home-decor.js settleStacks). */
+function settleRoomStacks(engine) {
+  if (!scene?.furnitureLayer || scene.room !== 'interior' || !engine?.droppedItems) return 0;
+  const moved = settleStacks(decor, roomStackRows(engine), roomX0());
+  if (moved) engine.droppedItemsChanged?.();
+  return moved;
+}
+
+function itemName(row) {
+  const label = ITEM_CATALOG[row.classTsid]?.label || String(row.classTsid).replace(/_/g, ' ');
+  return row.count > 1 ? `${label} × ${row.count}` : label;
+}
+
+/** The yellow outline round the selected stack. */
+function drawStackSelection(engine) {
+  if (scene?.stackSel && !scene.stackSel.destroyed) scene.stackSel.destroy();
+  if (scene) scene.stackSel = null;
+  const row = selected?.kind === 'stack' && mode === 'decorate' ? stackRow(engine, selected.id) : null;
+  if (!row || !scene) return;
+  const b = stackBox(row);
+  const g = selectionOutline(engine.PIXI, b);
+  g.zIndex = 96;
+  g.eventMode = 'none';
+  engine.entityLayer.addChild(g);
+  scene.stackSel = g;
+}
+
+function selectStack(engine, id) {
+  selected = id ? { kind: 'stack', id } : null;
+  drawStackSelection(engine);
+  renderFurniture(engine);
+  renderBar(engine);
+}
+
+/** Over the pack (the Pack tab) or the decorate tray: a stack dropped there goes back in the pack. */
+function overPack(clientX, clientY) {
+  if (ui?.builder?.trayHit?.(clientX, clientY)) return true;
+  const r = typeof document !== 'undefined' ? document.getElementById('pack-bar')?.getBoundingClientRect?.() : null;
+  return Boolean(r?.width) && clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom;
+}
+
+/** Set a stack down where `p` (room px) lands: on the shelf or table under it, else the floor. */
+function moveStack(engine, id, p) {
+  const row = stackRow(engine, id);
+  if (!row) return { ok: false, reason: 'gone' };
+  const target = stackSurfaceAt(decor, p.x, p.y);
+  row.x = target.x + roomX0();
+  row.y = target.y;
+  if (target.on != null) row.on = target.on;
+  else delete row.on;
+  engine.droppedItemsChanged?.();
+  engine.playSound?.('ITEM_DROP', { volume: 0.45 });
+  engine.setData('homeStackLast', `moved:${id}:${target.on ?? 'floor'}`);
+  selected = { kind: 'stack', id };
+  drawStackSelection(engine);
+  renderBar(engine);
+  return { ok: true, target };
+}
+
+/** Back in the pack, by the item's own Pick up (game.js pickupDroppedWorldItem: a full pack refuses). */
+function pickUpStack(engine, id) {
+  const ok = Boolean(engine.pickUpDroppedStack?.(id));
+  engine.setData('homeStackLast', ok ? `picked:${id}` : `refused:${id}`);
+  if (ok || !stackRow(engine, id)) selected = null;
+  drawStackSelection(engine);
+  renderBar(engine);
+  publish(engine);
+  return ok;
+}
+
+function stackPop(engine) {
+  if (selected?.kind !== 'stack' || placing) return null;
+  const row = stackRow(engine, selected.id);
+  if (!row) return null;
+  return {
+    key: `s:${row.id}:${row.count}:${row.x}:${row.y}`,
+    title: itemName(row),
+    sub: BUILDER_TEXT.stackHint,
+    actions: [
+      { label: 'Move', attrs: { 'data-home-stack': 'move' }, onClick: () => { stackCarry = { id: row.id }; syncFloating(engine, true); } },
+      { label: 'Pick up', attrs: { 'data-home-stack': 'pickup' }, onClick: () => pickUpStack(engine, row.id) },
+    ],
+    extra: [],
+  };
+}
+
+/** A stack dragged (or carried after Move): the marker shows where it will rest, or the pack lights up. */
+function moveStackDrag(engine, e) {
+  lastClient = { x: e.clientX, y: e.clientY };
+  const row = stackRow(engine, drag.id);
+  const toPack = overPack(e.clientX, e.clientY);
+  drag.over = toPack ? 'tray' : overCanvas(e) ? 'room' : null;
+  const tray = ui?.builder?.tray;
+  if (tray && tray.classList.contains('is-drop-target') !== toPack) {
+    tray.classList.toggle('is-drop-target', toPack);
+    const note = tray.querySelector('.hb-tray-note');
+    if (note) {
+      if (toPack) note.dataset.was = note.textContent;
+      note.textContent = toPack ? BUILDER_TEXT.dropInPack : note.dataset.was || '';
+    }
+  }
+  document.getElementById('pack-bar')?.classList.toggle('is-drop-target', toPack);
+  const target = drag.over === 'room' && row ? stackSurfaceAt(decor, toRoom(worldPoint(engine, e)).x, toRoom(worldPoint(engine, e)).y) : null;
+  drawPackMarker(engine, target, row);
+  syncFloating(engine);
+  engine.setData('homeDrag', `stack:${row?.classTsid || ''}:${drag.over || ''}`);
+}
+
+function endStackDrag(engine, e, cancelled) {
+  const was = drag;
+  drag = null;
+  lastClient = null;
+  edgeSince = 0;
+  drawPackMarker(engine, null);
+  ui?.builder?.tray?.classList.remove('is-drop-target');
+  document.getElementById('pack-bar')?.classList.remove('is-drop-target');
+  engine.setData('homeDrag', '');
+  if (cancelled || !was) return null;
+  if (overPack(e.clientX, e.clientY)) return pickUpStack(engine, was.id);
+  if (!overCanvas(e)) return null;
+  return moveStack(engine, was.id, toRoom(worldPoint(engine, e)));
+}
+
 // --- the floating actions and the Place button
 
 /** The selected piece's top centre and bottom on screen. */
 function popAnchor(engine) {
+  if (selected?.kind === 'stack') {
+    const row = stackRow(engine, selected.id);
+    if (!row) return null;
+    const b = stackBox(row);
+    const top = clientPoint(engine, b.x + b.w / 2, b.y);
+    const bottom = clientPoint(engine, b.x + b.w / 2, b.y + b.h);
+    return top && bottom ? { x: top.x, y: top.y, bottom: bottom.y } : null;
+  }
   if (selected?.kind === 'furniture') {
     const item = placedItem(decor, selected.id);
     if (!item) return null;
@@ -4696,8 +4891,8 @@ function syncFloating(engine, force = false) {
     b.setPlace(null);
     return;
   }
-  if (force) popModel = mode === 'decorate' ? furniturePop(engine) : selected?.kind === 'dispatcher' ? dispatcherPop(engine) : cultivationPop(engine);
-  if (popModel && !drag && !placing) b.setPop(popModel, popAnchor(engine));
+  if (force) popModel = mode === 'decorate' ? (selected?.kind === 'stack' ? stackPop(engine) : furniturePop(engine)) : selected?.kind === 'dispatcher' ? dispatcherPop(engine) : cultivationPop(engine);
+  if (popModel && !drag && !placing && !stackCarry) b.setPop(popModel, popAnchor(engine));
   else b.setPop(null);
   const g = scene.ghost;
   if (!placing || !g || g.destroyed || (packDrag && !packDrag.furniture) || drag?.over === 'tray') {
@@ -4749,7 +4944,13 @@ function bindPointer(engine) {
       updateGhost(engine);
       return;
     }
-    if (mode === 'decorate') setHover(engine, furnitureAt(toRoom(p))?.id ?? null);
+    if (stackCarry && mode === 'decorate') {
+      const row = stackRow(engine, stackCarry.id);
+      const r = toRoom(p);
+      drawPackMarker(engine, row ? stackSurfaceAt(decor, r.x, r.y) : null, row);
+      return;
+    }
+    if (mode === 'decorate') setHover(engine, stackAt(engine, p) ? null : furnitureAt(toRoom(p))?.id ?? null);
   }, true);
   root.addEventListener('pointerleave', () => {
     if (mode === 'decorate') setHover(engine, null);
@@ -4765,6 +4966,13 @@ function bindPointer(engine) {
       if (Math.hypot(e.clientX - press.x, e.clientY - press.y) < DRAG_DIST) return;
       // HandOfDecorator locDragStart: a placed piece pressed and moved is carried.
       press.dragging = true;
+      if (press.kind === 'stack') {
+        drag = { source: 'stack', id: press.id, over: 'room' };
+        setHover(engine, null);
+        syncFloating(engine, true);
+        moveStackDrag(engine, e);
+        return;
+      }
       if (press.kind === 'dispatcher') beginDispatcherMove(engine);
       else beginMove(engine, press.id);
       if (!placing) {
@@ -4775,7 +4983,8 @@ function bindPointer(engine) {
       carryBy = 'pointer';
       setHover(engine, null);
     }
-    moveDrag(engine, e);
+    if (drag?.source === 'stack') moveStackDrag(engine, e);
+    else moveDrag(engine, e);
   };
   const onPressUp = (e) => {
     if (!press || e.pointerId !== press.pointerId) return;
@@ -4785,6 +4994,10 @@ function bindPointer(engine) {
     const was = press;
     press = null;
     if (!was.dragging || !drag) return;
+    if (drag.source === 'stack') {
+      endStackDrag(engine, e, e.type === 'pointercancel');
+      return;
+    }
     endDrag(engine, e, { cancelled: e.type === 'pointercancel', overTray: Boolean(ui?.builder?.trayHit(e.clientX, e.clientY)) });
   };
   root.addEventListener('pointerdown', (e) => {
@@ -4805,9 +5018,29 @@ function bindPointer(engine) {
       stampAt(engine, toRoom(p));
       return;
     }
-    if (mode === 'decorate') {
+    if (mode === 'decorate' && stackCarry) {
+      const id = stackCarry.id;
+      stackCarry = null;
+      drawPackMarker(engine, null);
+      moveStack(engine, id, toRoom(p));
+      publish(engine);
+      return;
+    }
+    const stack = mode === 'decorate' ? stackAt(engine, p) : null;
+    if (stack) {
+      // A stack on a shelf is in front of the shelf: it takes the press first.
+      setHover(engine, null);
+      selectStack(engine, stack.id);
+      if (e.button === 0) {
+        press = { kind: 'stack', id: stack.id, x: e.clientX, y: e.clientY, pointerId: e.pointerId, dragging: false };
+        window.addEventListener('pointermove', onPressMove, true);
+        window.addEventListener('pointerup', onPressUp, true);
+        window.addEventListener('pointercancel', onPressUp, true);
+      }
+    } else if (mode === 'decorate') {
       const item = furnitureAt(toRoom(p));
       selected = item ? { kind: 'furniture', id: item.id } : null;
+      drawStackSelection(engine);
       setHover(engine, null);
       renderFurniture(engine);
       renderBar(engine);
@@ -4842,9 +5075,15 @@ function bindPointer(engine) {
       // 102-111 submits escape_value; HouseExpandDialog.as 202-209 sets it false). The bar stays open.
       if (engine.questDialogueOpen?.()) return;
       e.stopImmediatePropagation();
-      if (drag || ui?.builder?.dragging) {
+      if (drag?.source === 'stack') {
+        endStackDrag(engine, e, true);
+      } else if (drag || ui?.builder?.dragging) {
         ui?.builder?.cancelDrag();
         cancelCarry(engine);
+      } else if (stackCarry) {
+        stackCarry = null;
+        drawPackMarker(engine, null);
+        syncFloating(engine, true);
       } else if (stamping) {
         stopStamping(engine);
         redrawPreview(engine);
@@ -4853,6 +5092,7 @@ function bindPointer(engine) {
         cancelCarry(engine);
       } else if (selected) {
         selected = null;
+        drawStackSelection(engine);
         if (mode === 'decorate') renderFurniture(engine);
         else drawCultivationMarkers(engine);
         renderBar(engine);
@@ -6189,8 +6429,11 @@ export const homesFeature = {
         publish(engine);
         return true;
       };
-      // QA (BUILDER): window.groddleHomePiece(id | classTsid) is a placed piece's client rect
-      // ({ id, left, top, right, bottom }), or of the shelf-or-table surface a pack item would rest on.
+    }
+    // QA (BUILDER; DECOITEMS: always, read-only, so the online two-player checks can find a shelf):
+    // window.groddleHomePiece(id | classTsid) is a placed piece's client rect ({ id, left, top, right,
+    // bottom }), with where a pack item rests on it.
+    if (typeof window !== 'undefined') {
       window.groddleHomePiece = (key) => {
         const item = decor.placed.find((row) => row.id === Number(key)) || decor.placed.find((row) => row.classTsid === key);
         if (!item || !scene) return null;
@@ -6198,8 +6441,10 @@ export const homesFeature = {
         const a = clientPoint(engine, b.x + roomX0(), b.y);
         const z = clientPoint(engine, b.x + b.w + roomX0(), b.y + b.h);
         const top = surfaceHeight(item.classTsid, item.upgradeId) ? clientPoint(engine, item.x + roomX0(), item.y - surfaceHeight(item.classTsid, item.upgradeId)) : null;
-        return a && z ? { id: item.id, left: a.x, top: a.y, right: z.x, bottom: z.y, surfaceY: top?.y ?? null } : null;
+        return a && z ? { id: item.id, left: a.x, top: a.y, right: z.x, bottom: z.y, surfaceY: top?.y ?? null, x0: roomX0(), x: item.x, y: item.y, surface: surfaceHeight(item.classTsid, item.upgradeId) } : null;
       };
+    }
+    if (engine.param?.('homedemo') && typeof window !== 'undefined') {
       // QA: window.groddleHomeRock() lists the rock's verbs; (verbId) runs one; ('house_sign') opens HouseSignDialog.
       window.groddleHomeRock = (verbId) => {
         if (!rockTarget || rockTarget.sprite?.destroyed) return null;
@@ -6282,6 +6527,7 @@ export const homesFeature = {
     rockBubble = null;
     drag = null;
     packDrag = null;
+    stackCarry = null;
     hoverId = null;
     if (ui) {
       ui.builder.render(null);
@@ -6454,6 +6700,11 @@ export const homesFeature = {
    */
   homeEditMode() {
     return scene && mode ? mode : null;
+  },
+
+  /** Decoration Mode hides the avatar (HandOfDecorator start(): hidePCs): no Enter hint over what is near it. */
+  quietEnterHint() {
+    return scene && mode === 'decorate' ? true : null;
   },
 
   /** butler_hints.js:383: how many times you have gone into your house. */

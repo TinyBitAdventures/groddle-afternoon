@@ -17,6 +17,9 @@
  *   python3 -I tools/furniture-upgrades/render.py      renders plan.json to
  *                                                      public/assets/sprites/furniture/upgrades/
  *                                                      and records sizes in art.json
+ *   node tools/furniture-upgrades/tops.mjs             the visible tops of the pieces things
+ *                                                      rest on, into art.json (--check sweeps
+ *                                                      that nothing set on one floats)
  *   node tools/furniture-upgrades/build.mjs            again, to pick the sizes up
  *   node tools/furniture-upgrades/build.mjs --check    exit 1 when the data module,
  *                                                      plan or art is stale or missing
@@ -84,7 +87,10 @@ function swfName(url) {
 /**
  * Height above the foot where tabletop decor rests on an upgraded piece: the
  * highest catalog plat that spans the piece's middle (x 0), else the longest.
- * Plats are relative to the piece's foot (applyUpgrade adds item x / y).
+ * Plats are relative to the piece's foot (applyUpgrade adds item x / y), the
+ * SWF stage's bottom centre; a plat under it (a hearth: the Foresty Fireplace's
+ * at y 10) is kept as a negative height, since the art reaches below that point
+ * (js/home-decor.js surfaceHeight takes art.foot off).
  */
 function surfaceFrom(plats) {
   const rows = Object.values(plats || {}).filter((p) => p?.start && p?.end);
@@ -94,7 +100,7 @@ function surfaceFrom(plats) {
     const y = -Math.min(p.start.y, p.end.y);
     return !best || y > best.y ? { y, len: Math.abs(p.end.x - p.start.x) } : best;
   }, null);
-  return pick && pick.y > 0 ? Math.round(pick.y) : null;
+  return pick ? Math.round(pick.y) : null;
 }
 
 async function remakeClasses() {
@@ -139,10 +145,10 @@ export async function build() {
       if (u.subscriber_only) row.subscriberOnly = true;
       if (u.is_new) row.isNew = true;
       const surface = surfaceFrom(u.plats);
-      if (surface) row.platY = surface;
+      if (surface != null) row.platY = surface;
       if (a && swf) {
         // G448: rendered at 3x (tools/furniture-upgrades/render.py ZOOM).
-        row.art = { path: `${ART_DIR}/${cls}/${id}@3x.webp`, w: a.w, h: a.h, ...(Number.isFinite(a.foot) ? { foot: a.foot } : {}) };
+        row.art = { path: `${ART_DIR}/${cls}/${id}@3x.webp`, w: a.w, h: a.h, ...(Number.isFinite(a.foot) ? { foot: a.foot } : {}), ...(Number.isFinite(a.top) ? { top: a.top } : {}) };
         counts.withArt += 1;
       } else {
         missingArt.push({ key, swf: swfName(u.swf), why: swf ? 'not rendered yet' : 'no SWF in glitch-items' });
@@ -172,7 +178,9 @@ function render({ classes, counts, missingArt, leftOut }) {
  *   row.platY is the highest catalog plat over the piece's middle (where
  *   tabletop decor rests, measured from the SWF stage's bottom centre), row.art
  *   the rendered frame ({ path, w, h } at 1x, and foot: how far the art's bottom
- *   sits above that point, tools/furniture-upgrades/render.py --feet).
+ *   sits above that point, tools/furniture-upgrades/render.py --feet; top, on a
+ *   piece things rest on: its visible top over the middle, px from the art's top
+ *   edge, tools/furniture-upgrades/tops.mjs).
  */
 
 export const FURNITURE_UPGRADES = Object.freeze(${json(classes)});

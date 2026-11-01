@@ -108,7 +108,11 @@ export const BUILDER_TEXT = Object.freeze({
   moveHere: 'Move Here',
   dropToPickUp: 'Drop here to put it in storage',
   emptyFurniture: 'Everything is placed. Pick something up, buy furniture at the Furniture Store, or build some with a Construction Tool.',
-  packNote: 'Drag things from your pack onto a shelf, a table or the floor.',
+  packNote: 'Drag things from your pack onto a shelf, a table or the floor. Drag them back onto your pack to pick them up.',
+  // The remake's (the 2012 client said nothing): how a thing set down moves and comes back (Austin 2026-11-01).
+  packHint: 'Drag things to set them down or move them • Drop them on your pack to pick up',
+  stackHint: 'Drag it to move it, or drop it on your pack to pick it up.',
+  dropInPack: 'Drop here to put it in your pack',
 });
 
 /** CultPickerUI.as choose_tf, for the street or (inside the house) the back yard. */

@@ -26,7 +26,7 @@ import {
   panKey,
   placeCostText,
   trayFilters,
-} from '../public/js/ui/home-builder.js?v=2e0c377b';
+} from '../public/js/ui/home-builder.js?v=a542286a';
 import {
   INTERIOR,
   createHomeDecorState,
@@ -36,7 +36,7 @@ import {
   placeFurniture,
   stackSurfaceAt,
   surfaceHeight,
-} from '../public/js/home-decor.js?v=d03413ec';
+} from '../public/js/home-decor.js?v=df55aa99';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=29713fa8';
 
 const root = join(import.meta.dirname, '..');

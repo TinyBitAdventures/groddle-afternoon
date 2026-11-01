@@ -14,8 +14,8 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { WORLD_ART } from '../public/js/world-art-list.js?v=df42115a';
 import { FALLBACK_MAX, artIdOf, worldArtFor, worldStateFor } from '../public/js/world-art.js?v=df476660';
-import { surfaceHeight, stackSurfaceAt, createHomeDecorState } from '../public/js/home-decor.js?v=d03413ec';
-import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=1b84f5f7';
+import { surfaceHeight, stackSurfaceAt, createHomeDecorState } from '../public/js/home-decor.js?v=df55aa99';
+import { FURNITURE_UPGRADES } from '../public/js/furniture-upgrades-data.js?v=268c538a';
 
 const root = join(import.meta.dirname, '..');
 const pub = join(root, 'public');
@@ -137,9 +137,11 @@ describe('what is set on a shelf rests on its plank', () => {
     assert.equal(surfaceHeight('furniture_shelf', '94'), 33);
   });
 
-  it('leaves tables and the base shelf as they were', () => {
+  it('leaves the base shelf as it was; a table drawn past its point rests things that much higher, on its top (DECOITEMS)', () => {
     assert.equal(surfaceHeight('furniture_shelf', ''), 40);
-    assert.equal(surfaceHeight('furniture_table', '59'), 52);
+    // Dining Table with Striped Runner: plat 52 over a stage bottom 24 px above its art's bottom.
+    assert.equal(FURNITURE_UPGRADES.furniture_table.upgrades['59'].art.foot, -24);
+    assert.equal(surfaceHeight('furniture_table', '59'), 76);
   });
 
   it("a stack dragged onto an upgraded shelf lands on the shelf's plank", () => {

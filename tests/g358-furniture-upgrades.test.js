@@ -11,7 +11,7 @@ import {
   FURNITURE_UPGRADE_COUNTS,
   FURNITURE_UPGRADES_LEFT_OUT,
   FURNITURE_UPGRADES_MISSING_ART,
-} from '../public/js/furniture-upgrades-data.js?v=1b84f5f7';
+} from '../public/js/furniture-upgrades-data.js?v=268c538a';
 import {
   applyBonusUpgrade,
   applyUpgrade,
@@ -23,7 +23,7 @@ import {
   saveButtonText,
   upgradeVerb,
   UPGRADE_TEXT,
-} from '../public/js/furniture-upgrades.js?v=7e9a420c';
+} from '../public/js/furniture-upgrades.js?v=2bc913dc';
 import {
   createHomeDecorState,
   furnitureSize,
@@ -33,11 +33,11 @@ import {
   pickUpFurniture,
   placeFurniture,
   surfaceHeight,
-} from '../public/js/home-decor.js?v=d03413ec';
+} from '../public/js/home-decor.js?v=df55aa99';
 import { FURNITURE_CATALOG } from '../public/js/homes-catalog.js?v=29713fa8';
 import { IMAGINATION_UPGRADES, upgradeStatus, DEALT_SECRET_CARDS } from '../public/js/imagination.js?v=b4f0eaf6';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=ca0a48d5';
-import { visitorHomeState } from '../public/js/features/homes-feature.js?v=95033d88';
+import { visitorHomeState } from '../public/js/features/homes-feature.js?v=388aff4a';
 
 const spike = join(import.meta.dirname, '..');
 const pub = join(spike, 'public');
@@ -94,7 +94,7 @@ describe('upgrade data (tools/furniture-upgrades/build.mjs)', () => {
   });
 
   it('the picker gives a style\'s 3x file a density srcset: tiles at its 1x size, the preview at 2x as before', async () => {
-    const { artImgAttrs } = await import('../public/js/furniture-upgrade-picker.js?v=f78f7410');
+    const { artImgAttrs } = await import('../public/js/furniture-upgrade-picker.js?v=b9a05bee');
     const path = FURNITURE_UPGRADES.furniture_chair.upgrades['1'].art.path;
     assert.deepEqual(artImgAttrs(path), { src: path, srcset: `${path} 3x` });
     assert.deepEqual(artImgAttrs(path, 2), { src: path, srcset: `${path} 1.5x` });
@@ -210,7 +210,9 @@ describe('upgraded pieces in the house (home-decor.js)', () => {
 
   it('rests tabletop decor on an upgraded table at its catalog plat', () => {
     assert.equal(surfaceHeight('furniture_table'), 80);
-    assert.equal(surfaceHeight('furniture_table', '59'), FURNITURE_UPGRADES.furniture_table.upgrades['59'].platY);
+    // The catalog plat counts from the SWF stage's bottom, art.foot over the art's bottom (DECOITEMS).
+    const row = FURNITURE_UPGRADES.furniture_table.upgrades['59'];
+    assert.equal(surfaceHeight('furniture_table', '59'), row.platY - row.art.foot);
     // The Fireplace's base frame is drawn at half size; its upgrades are 1:1.
     assert.deepEqual(furnitureSize('furniture_fireplace', Object.keys(FURNITURE_UPGRADES.furniture_fireplace.upgrades)[0]).w < 400, true);
   });

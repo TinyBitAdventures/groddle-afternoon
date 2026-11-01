@@ -3,79 +3,92 @@
   "w": 169,
   "h": 201,
   "sha": "b46aad0a2e3f2353",
-  "foot": -34
+  "foot": -34,
+  "top": 0
  },
  "bag_furniture_cabinet/305": {
   "w": 137,
   "h": 207,
   "sha": "0bb485f768fcb632",
-  "foot": -23
+  "foot": -23,
+  "top": 11
  },
  "bag_furniture_cabinet/306": {
   "w": 179,
   "h": 211,
   "sha": "f45ef1f6b509b1b2",
-  "foot": -26
+  "foot": -26,
+  "top": 3
  },
  "bag_furniture_cabinet/307": {
   "w": 135,
   "h": 196,
   "sha": "f42ce7775aa2819e",
-  "foot": -26
+  "foot": -26,
+  "top": 0
  },
  "bag_furniture_cabinet/327": {
   "w": 150,
   "h": 200,
   "sha": "65eebe3aaa03a483",
-  "foot": -32
+  "foot": -32,
+  "top": 1
  },
  "bag_furniture_cabinet/352": {
   "w": 129,
   "h": 199,
   "sha": "2cbacc972c3fb86c",
-  "foot": -28
+  "foot": -28,
+  "top": 0
  },
  "bag_furniture_cabinet/396": {
   "w": 137,
   "h": 207,
   "sha": "6ca6eb0260f02d64",
-  "foot": -25
+  "foot": -25,
+  "top": 0
  },
  "bag_furniture_cabinet/514": {
   "w": 120,
   "h": 213,
   "sha": "62acbc82974988f4",
-  "foot": -21
+  "foot": -21,
+  "top": 2
  },
  "bag_furniture_cabinet/626": {
   "w": 168,
   "h": 215,
   "sha": "4db76ea05ebb8f79",
-  "foot": -26
+  "foot": -26,
+  "top": 3
  },
  "bag_furniture_cabinet/657": {
   "w": 175,
   "h": 180,
   "sha": "34becd2c9648591a",
-  "foot": -24
+  "foot": -24,
+  "top": 7
  },
  "bag_furniture_cabinet/669": {
   "w": 187,
   "h": 214,
   "sha": "b325cb5c0c505416",
-  "foot": -24
+  "foot": -24,
+  "top": 7
  },
  "bag_furniture_cabinet/689": {
   "w": 136,
   "h": 218,
   "sha": "39aeeeda4787b78e",
-  "foot": -27
+  "foot": -27,
+  "top": 0
  },
  "bag_furniture_cabinet/702": {
   "w": 136,
   "h": 218,
   "sha": "3d9221914176242d",
-  "foot": -27
+  "foot": -27,
+  "top": 0
  },
  "bag_furniture_sdb/214": {
   "w": 67,
@@ -363,61 +376,71 @@
   "w": 172,
   "h": 81,
   "sha": "9c175e1e45cd667a",
-  "foot": -28
+  "foot": -28,
+  "top": 0
  },
  "bag_furniture_smallcabinet/308": {
   "w": 171,
   "h": 80,
   "sha": "d66362a98c32f2b7",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "bag_furniture_smallcabinet/325": {
   "w": 171,
   "h": 77,
   "sha": "ec3706a972fd5ef4",
-  "foot": -25
+  "foot": -25,
+  "top": 1
  },
  "bag_furniture_smallcabinet/326": {
   "w": 183,
   "h": 81,
   "sha": "15cd9e0c9fb5000c",
-  "foot": -28
+  "foot": -28,
+  "top": 0
  },
  "bag_furniture_smallcabinet/348": {
   "w": 151,
   "h": 70,
   "sha": "befc4aa7c46ad3cb",
-  "foot": -24
+  "foot": -24,
+  "top": 5
  },
  "bag_furniture_smallcabinet/349": {
   "w": 175,
   "h": 84,
   "sha": "12583b784ba1cf81",
-  "foot": -29
+  "foot": -29,
+  "top": 1
  },
  "bag_furniture_smallcabinet/350": {
   "w": 158,
   "h": 80,
   "sha": "f3dda7650063afda",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "bag_furniture_smallcabinet/397": {
   "w": 169,
   "h": 78,
   "sha": "44956a1de7288646",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "bag_furniture_smallcabinet/439": {
   "w": 160,
   "h": 103,
   "sha": "972ba62fe237bd46",
-  "foot": -26
+  "foot": -26,
+  "top": 1
  },
  "bag_furniture_smallcabinet/627": {
   "w": 146,
   "h": 98,
   "sha": "60b2519b079a0e59",
-  "foot": -25
+  "foot": -25,
+  "top": 3
  },
  "bag_furniture_wallcabinet/298": {
   "w": 93,
@@ -831,7 +854,8 @@
   "w": 149,
   "h": 215,
   "sha": "e11296f36560a950",
-  "foot": -21
+  "foot": -21,
+  "top": 0
  },
  "furniture_ceilingdeco/154": {
   "w": 100,
@@ -1239,349 +1263,407 @@
   "w": 222,
   "h": 56,
   "sha": "f008148c53dd5fc3",
-  "foot": -16
+  "foot": -16,
+  "top": 7
  },
  "furniture_coffeetable/194": {
   "w": 261,
   "h": 69,
   "sha": "32836018ddab67fe",
-  "foot": -37
+  "foot": -37,
+  "top": 0
  },
  "furniture_coffeetable/244": {
   "w": 209,
   "h": 59,
   "sha": "1e4517b5fb122dc9",
-  "foot": -21
+  "foot": -21,
+  "top": 0
  },
  "furniture_coffeetable/280": {
   "w": 180,
   "h": 73,
   "sha": "8b74324eda68b43f",
-  "foot": -25
+  "foot": -25,
+  "top": 1
  },
  "furniture_coffeetable/362": {
   "w": 217,
   "h": 68,
   "sha": "983887f10b445c07",
-  "foot": -36
+  "foot": -36,
+  "top": 0
  },
  "furniture_coffeetable/437": {
   "w": 238,
   "h": 86,
   "sha": "a11f5eed813513cb",
-  "foot": -48
+  "foot": -48,
+  "top": 2
  },
  "furniture_coffeetable/438": {
   "w": 186,
   "h": 68,
   "sha": "6d9ce8422fd65c1e",
-  "foot": -28
+  "foot": -28,
+  "top": 2
  },
  "furniture_coffeetable/484": {
   "w": 198,
   "h": 63,
   "sha": "9ead42fcc79ad7f3",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "furniture_coffeetable/521": {
   "w": 224,
   "h": 62,
   "sha": "df02dc74e5ff986d",
-  "foot": -24
+  "foot": -24,
+  "top": 3
  },
  "furniture_coffeetable/54": {
   "w": 209,
   "h": 53,
   "sha": "d1e3b0ca71f56251",
-  "foot": -17
+  "foot": -17,
+  "top": 0
  },
  "furniture_coffeetable/61": {
   "w": 261,
   "h": 61,
   "sha": "85fbcf16b7d59390",
-  "foot": -28
+  "foot": -28,
+  "top": 1
  },
  "furniture_coffeetable/674": {
   "w": 229,
   "h": 81,
   "sha": "4e9d212f551270fb",
-  "foot": -29
+  "foot": -29,
+  "top": 10
  },
  "furniture_coffeetable/698": {
   "w": 117,
   "h": 78,
   "sha": "e9dbe9dbd5ef6155",
-  "foot": -19
+  "foot": -19,
+  "top": 20
  },
  "furniture_counter/253": {
   "w": 286,
   "h": 78,
   "sha": "fc387b8b1a8aa53a",
-  "foot": -23
+  "foot": -23,
+  "top": 5
  },
  "furniture_counter/254": {
   "w": 285,
   "h": 92,
   "sha": "ab663870f551640d",
-  "foot": -23
+  "foot": -23,
+  "top": 5
  },
  "furniture_counter/255": {
   "w": 286,
   "h": 77,
   "sha": "cd7016e555a0afe2",
-  "foot": -23
+  "foot": -23,
+  "top": 5
  },
  "furniture_counter/256": {
   "w": 388,
   "h": 75,
   "sha": "36e41a2bccf7a0df",
-  "foot": -23
+  "foot": -23,
+  "top": 0
  },
  "furniture_counter/257": {
   "w": 363,
   "h": 82,
   "sha": "5ad4f4f56623052a",
-  "foot": -22
+  "foot": -22,
+  "top": 3
  },
  "furniture_counter/258": {
   "w": 337,
   "h": 84,
   "sha": "80790eb5a1174bc0",
-  "foot": -21
+  "foot": -21,
+  "top": 0
  },
  "furniture_counter/284": {
   "w": 285,
   "h": 82,
   "sha": "59f9b4bf4954358a",
-  "foot": -30
+  "foot": -30,
+  "top": 0
  },
  "furniture_counter/285": {
   "w": 229,
   "h": 74,
   "sha": "7bc9747570094c42",
-  "foot": -25
+  "foot": -25,
+  "top": 0
  },
  "furniture_counter/408": {
   "w": 226,
   "h": 77,
   "sha": "121adc793abc7683",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "furniture_counter/477": {
   "w": 195,
   "h": 77,
   "sha": "d3c5cdb39f551993",
-  "foot": -25
+  "foot": -25,
+  "top": 0
  },
  "furniture_counter/488": {
   "w": 229,
   "h": 70,
   "sha": "460a18398fa40a76",
-  "foot": -22
+  "foot": -22,
+  "top": 0
  },
  "furniture_counter/518": {
   "w": 224,
   "h": 65,
   "sha": "7144202b6943c335",
-  "foot": -28
+  "foot": -28,
+  "top": 1
  },
  "furniture_counter/539": {
   "w": 222,
   "h": 73,
   "sha": "8b5698416b45ca3e",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "furniture_counter/540": {
   "w": 209,
   "h": 73,
   "sha": "94e063e27cd22817",
-  "foot": -26
+  "foot": -26,
+  "top": 0
  },
  "furniture_counter/541": {
   "w": 222,
   "h": 72,
   "sha": "a556cefab1d65354",
-  "foot": -26
+  "foot": -26,
+  "top": 0
  },
  "furniture_counter/579": {
   "w": 281,
   "h": 97,
   "sha": "60cf325515efb99d",
-  "foot": -22
+  "foot": -22,
+  "top": 6
  },
  "furniture_counter/589": {
   "w": 236,
   "h": 76,
   "sha": "17fb04bc2e525a81",
-  "foot": -26
+  "foot": -26,
+  "top": 0
  },
  "furniture_counter/590": {
   "w": 236,
   "h": 76,
   "sha": "d0ce279b5f168bad",
-  "foot": -26
+  "foot": -26,
+  "top": 0
  },
  "furniture_counter/591": {
   "w": 235,
   "h": 81,
   "sha": "3a6691f6ae9fcd27",
-  "foot": -32
+  "foot": -32,
+  "top": 1
  },
  "furniture_counter/641": {
   "w": 263,
   "h": 83,
   "sha": "6040cbcbcf3b7d3a",
-  "foot": -24
+  "foot": -24,
+  "top": 4
  },
  "furniture_counter/650": {
   "w": 253,
   "h": 97,
   "sha": "049279b21a1804d9",
-  "foot": -34
+  "foot": -34,
+  "top": 15
  },
  "furniture_counter/676": {
   "w": 238,
   "h": 74,
   "sha": "21cc3efa68264624",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "furniture_counter/704": {
   "w": 238,
   "h": 74,
   "sha": "87a1089826e3e979",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "furniture_counter/78": {
   "w": 218,
   "h": 73,
   "sha": "78c4352ee7d1190f",
-  "foot": -22
+  "foot": -22,
+  "top": 0
  },
  "furniture_counter/80": {
   "w": 228,
   "h": 76,
   "sha": "1a9a9c7bfda1c4a0",
-  "foot": -23
+  "foot": -23,
+  "top": 0
  },
  "furniture_counter/82": {
   "w": 227,
   "h": 72,
   "sha": "7824760c628a555e",
-  "foot": -23
+  "foot": -23,
+  "top": 0
  },
  "furniture_desk/151": {
   "w": 157,
   "h": 80,
   "sha": "13377b1c91aee806",
-  "foot": -27
+  "foot": -27,
+  "top": 0
  },
  "furniture_desk/238": {
   "w": 181,
   "h": 123,
   "sha": "0a73ae636bca6052",
-  "foot": -23
+  "foot": -23,
+  "top": 2
  },
  "furniture_desk/478": {
   "w": 160,
   "h": 76,
   "sha": "250c920a5bfadcae",
-  "foot": -27
+  "foot": -27,
+  "top": 0
  },
  "furniture_desk/660": {
   "w": 199,
   "h": 104,
   "sha": "8017ffe9e37059c0",
-  "foot": -24
+  "foot": -24,
+  "top": 24
  },
  "furniture_desk/68": {
   "w": 172,
   "h": 89,
   "sha": "7e68dc207190d16e",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "furniture_desk/681": {
   "w": 161,
   "h": 83,
   "sha": "0b43d47695b8a056",
-  "foot": -30
+  "foot": -30,
+  "top": 0
  },
  "furniture_desk/69": {
   "w": 172,
   "h": 118,
   "sha": "0a8cc5c0eef53353",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "furniture_desk/700": {
   "w": 157,
   "h": 77,
   "sha": "8baabe04e0d240eb",
-  "foot": -23
+  "foot": -23,
+  "top": 0
  },
  "furniture_fireplace/269": {
   "w": 213,
   "h": 338,
   "sha": "97a06a30b65b800d",
-  "foot": -29
+  "foot": -29,
+  "top": 1
  },
  "furniture_fireplace/395": {
   "w": 240,
   "h": 303,
   "sha": "dc3453bdf2c359af",
-  "foot": -34
+  "foot": -34,
+  "top": 3
  },
  "furniture_fireplace/413": {
   "w": 216,
   "h": 137,
   "sha": "c43907d22bd7b9f6",
-  "foot": -25
+  "foot": -25,
+  "top": 2
  },
  "furniture_fireplace/713": {
   "w": 139,
   "h": 227,
   "sha": "fcb7b0c738b4a92d",
-  "foot": -25
+  "foot": -25,
+  "top": 12
  },
  "furniture_fireplace/714": {
   "w": 126,
   "h": 339,
   "sha": "1d5734f1f8b359f0",
-  "foot": -26
+  "foot": -26,
+  "top": 3
  },
  "furniture_fireplace/715": {
   "w": 130,
   "h": 133,
   "sha": "b97af0d1cb046f0a",
-  "foot": -25
+  "foot": -25,
+  "top": 1
  },
  "furniture_fireplace/716": {
   "w": 156,
   "h": 161,
   "sha": "a2fc5d6a4505ffa6",
-  "foot": -24
+  "foot": -24,
+  "top": 8
  },
  "furniture_fireplace/717": {
   "w": 221,
   "h": 136,
   "sha": "eb6a4506aaa7c162",
-  "foot": -21
+  "foot": -21,
+  "top": 3
  },
  "furniture_fireplace/719": {
   "w": 149,
   "h": 181,
   "sha": "3910acab5cf6d928",
-  "foot": -21
+  "foot": -21,
+  "top": 45
  },
  "furniture_fireplace/720": {
   "w": 166,
   "h": 112,
   "sha": "5e3c694863d70d4f",
-  "foot": -30
+  "foot": -30,
+  "top": 24
  },
  "furniture_fireplace/721": {
   "w": 150,
   "h": 147,
   "sha": "18fd2d79c33d071c",
-  "foot": -27
+  "foot": -27,
+  "top": 28
  },
  "furniture_floorlamp/114": {
   "w": 86,
@@ -2145,343 +2227,400 @@
   "w": 152,
   "h": 32,
   "sha": "85db68a4d15155ec",
-  "foot": 4
+  "foot": 4,
+  "top": 4
  },
  "furniture_shelf/101": {
   "w": 152,
   "h": 63,
   "sha": "29e5197a4b20cdc8",
-  "foot": 0
+  "foot": 0,
+  "top": 4
  },
  "furniture_shelf/102": {
   "w": 151,
   "h": 78,
   "sha": "8fdca5017e717666",
-  "foot": 2
+  "foot": 2,
+  "top": 3
  },
  "furniture_shelf/123": {
   "w": 188,
   "h": 49,
   "sha": "679eebc4e198b183",
-  "foot": 10
+  "foot": 10,
+  "top": 0
  },
  "furniture_shelf/148": {
   "w": 239,
   "h": 65,
   "sha": "0f8b5937814515c0",
-  "foot": 8
+  "foot": 8,
+  "top": 0
  },
  "furniture_shelf/344": {
   "w": 226,
   "h": 69,
   "sha": "03784085620572b0",
-  "foot": -1
+  "foot": -1,
+  "top": 6
  },
  "furniture_shelf/411": {
   "w": 225,
   "h": 46,
   "sha": "249c0b43a1379308",
-  "foot": 5
+  "foot": 5,
+  "top": 0
  },
  "furniture_shelf/426": {
   "w": 214,
   "h": 45,
   "sha": "d7f5e757d74a3c50",
-  "foot": 31
+  "foot": 31,
+  "top": 10
  },
  "furniture_shelf/427": {
   "w": 190,
   "h": 94,
   "sha": "c4ea02c3a29e7262",
-  "foot": 5
+  "foot": 5,
+  "top": 12
  },
  "furniture_shelf/489": {
   "w": 226,
   "h": 41,
   "sha": "e08b76c96b7e4bb2",
-  "foot": 20
+  "foot": 20,
+  "top": 0
  },
  "furniture_shelf/490": {
   "w": 226,
   "h": 41,
   "sha": "86e788f2dd909399",
-  "foot": 20
+  "foot": 20,
+  "top": 0
  },
  "furniture_shelf/511": {
   "w": 249,
   "h": 39,
   "sha": "dc3f65d502360f4f",
-  "foot": 27
+  "foot": 27,
+  "top": 3
  },
  "furniture_shelf/533": {
   "w": 219,
   "h": 40,
   "sha": "bebaab53ca863959",
-  "foot": 22
+  "foot": 22,
+  "top": 0
  },
  "furniture_shelf/592": {
   "w": 229,
   "h": 37,
   "sha": "c4a733ef8dfb5b88",
-  "foot": 22
+  "foot": 22,
+  "top": 0
  },
  "furniture_shelf/614": {
   "w": 229,
   "h": 39,
   "sha": "56c1d4d786f29c02",
-  "foot": 20
+  "foot": 20,
+  "top": 0
  },
  "furniture_shelf/642": {
   "w": 226,
   "h": 57,
   "sha": "713c9b821b59023f",
-  "foot": 14
+  "foot": 14,
+  "top": 5
  },
  "furniture_shelf/651": {
   "w": 250,
   "h": 48,
   "sha": "a3318a13db7bde3d",
-  "foot": 16
+  "foot": 16,
+  "top": 3
  },
  "furniture_shelf/652": {
   "w": 196,
   "h": 44,
   "sha": "5441ecf977a27f67",
-  "foot": 15
+  "foot": 15,
+  "top": 3
  },
  "furniture_shelf/677": {
   "w": 226,
   "h": 65,
   "sha": "b6548ce20e1fd059",
-  "foot": 0
+  "foot": 0,
+  "top": 1
  },
  "furniture_shelf/703": {
   "w": 226,
   "h": 65,
   "sha": "eaf69b468f636754",
-  "foot": 0
+  "foot": 0,
+  "top": 1
  },
  "furniture_shelf/93": {
   "w": 226,
   "h": 46,
   "sha": "f05b373c5624f913",
-  "foot": 20
+  "foot": 20,
+  "top": 7
  },
  "furniture_shelf/94": {
   "w": 225,
   "h": 49,
   "sha": "93327a53e3b07a9b",
-  "foot": 19
+  "foot": 19,
+  "top": 9
  },
  "furniture_shelf/95": {
   "w": 225,
   "h": 49,
   "sha": "7e1d893a2742b239",
-  "foot": 21
+  "foot": 21,
+  "top": 8
  },
  "furniture_shelf/96": {
   "w": 226,
   "h": 74,
   "sha": "1fa0fe34e3a08b42",
-  "foot": 18
+  "foot": 18,
+  "top": 5
  },
  "furniture_shelf/97": {
   "w": 228,
   "h": 91,
   "sha": "954e29b765f70cf4",
-  "foot": 16
+  "foot": 16,
+  "top": 3
  },
  "furniture_shelf/98": {
   "w": 151,
   "h": 34,
   "sha": "b5307dd002c3ef59",
-  "foot": 3
+  "foot": 3,
+  "top": 4
  },
  "furniture_shelf/99": {
   "w": 151,
   "h": 37,
   "sha": "3cd01b4ec1e7f929",
-  "foot": -4
+  "foot": -4,
+  "top": 6
  },
  "furniture_sidetable/109": {
   "w": 87,
   "h": 67,
   "sha": "b7c67fe7596c6c80",
-  "foot": -25
+  "foot": -25,
+  "top": 1
  },
  "furniture_sidetable/113": {
   "w": 83,
   "h": 54,
   "sha": "4c635a01336915ea",
-  "foot": -16
+  "foot": -16,
+  "top": 0
  },
  "furniture_sidetable/115": {
   "w": 115,
   "h": 70,
   "sha": "af3621c3f8b0d057",
-  "foot": -21
+  "foot": -21,
+  "top": 1
  },
  "furniture_sidetable/157": {
   "w": 62,
   "h": 62,
   "sha": "441285f7662afc27",
-  "foot": -22
+  "foot": -22,
+  "top": 1
  },
  "furniture_sidetable/162": {
   "w": 64,
   "h": 66,
   "sha": "8ae3e4331148826f",
-  "foot": -22
+  "foot": -22,
+  "top": 1
  },
  "furniture_sidetable/199": {
   "w": 102,
   "h": 70,
   "sha": "87c8632d672445c4",
-  "foot": -23
+  "foot": -23,
+  "top": 0
  },
  "furniture_sidetable/242": {
   "w": 99,
   "h": 59,
   "sha": "f18787ca6525d50f",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "furniture_sidetable/409": {
   "w": 97,
   "h": 61,
   "sha": "46f16eebd5fdb78a",
-  "foot": -25
+  "foot": -25,
+  "top": 0
  },
  "furniture_sidetable/415": {
   "w": 89,
   "h": 71,
   "sha": "d3966960f69905c5",
-  "foot": -19
+  "foot": -19,
+  "top": 0
  },
  "furniture_sidetable/495": {
   "w": 62,
   "h": 49,
   "sha": "ac2803be76f34028",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "furniture_sidetable/496": {
   "w": 69,
   "h": 70,
   "sha": "96c13bbda352600b",
-  "foot": -27
+  "foot": -27,
+  "top": 0
  },
  "furniture_sidetable/497": {
   "w": 74,
   "h": 82,
   "sha": "df6d4325dd1db443",
-  "foot": -27
+  "foot": -27,
+  "top": 8
  },
  "furniture_sidetable/498": {
   "w": 59,
   "h": 77,
   "sha": "deb4272a02c4e7f4",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "furniture_sidetable/500": {
   "w": 61,
   "h": 66,
   "sha": "7bfdb43d75797755",
-  "foot": -22
+  "foot": -22,
+  "top": 0
  },
  "furniture_sidetable/501": {
   "w": 67,
   "h": 52,
   "sha": "f79ed6581f2c4e80",
-  "foot": -23
+  "foot": -23,
+  "top": 0
  },
  "furniture_sidetable/503": {
   "w": 69,
   "h": 87,
   "sha": "d269203d020c30cb",
-  "foot": -23
+  "foot": -23,
+  "top": 1
  },
  "furniture_sidetable/504": {
   "w": 60,
   "h": 62,
   "sha": "9671f7c8adf789cf",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "furniture_sidetable/505": {
   "w": 59,
   "h": 61,
   "sha": "c5846991af989bfa",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "furniture_sidetable/519": {
   "w": 109,
   "h": 67,
   "sha": "599c37d5e6610184",
-  "foot": -25
+  "foot": -25,
+  "top": 1
  },
  "furniture_sidetable/520": {
   "w": 81,
   "h": 63,
   "sha": "4ac60a1506308f90",
-  "foot": -24
+  "foot": -24,
+  "top": 1
  },
  "furniture_sidetable/537": {
   "w": 69,
   "h": 78,
   "sha": "fccd3325a0273856",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "furniture_sidetable/538": {
   "w": 69,
   "h": 85,
   "sha": "b030b9ec6a5e668d",
-  "foot": -21
+  "foot": -21,
+  "top": 0
  },
  "furniture_sidetable/630": {
   "w": 67,
   "h": 65,
   "sha": "898407db37a3d056",
-  "foot": -24
+  "foot": -24,
+  "top": 1
  },
  "furniture_sidetable/67": {
   "w": 62,
   "h": 59,
   "sha": "fdee4cb673495e8d",
-  "foot": -22
+  "foot": -22,
+  "top": 0
  },
  "furniture_sidetable/673": {
   "w": 114,
   "h": 75,
   "sha": "824f01ccd32f33c9",
-  "foot": -26
+  "foot": -26,
+  "top": 1
  },
  "furniture_sidetable/693": {
   "w": 66,
   "h": 67,
   "sha": "7869eef0bd8d0dc8",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "furniture_sidetable/694": {
   "w": 66,
   "h": 68,
   "sha": "01fd62129e15bee1",
-  "foot": -24
+  "foot": -24,
+  "top": 1
  },
  "furniture_sidetable/695": {
   "w": 57,
   "h": 65,
   "sha": "55e1bf14c6afb7b9",
-  "foot": -22
+  "foot": -22,
+  "top": 0
  },
  "furniture_sidetable/89": {
   "w": 62,
   "h": 62,
   "sha": "3188d2d7f57ec1d6",
-  "foot": -17
+  "foot": -17,
+  "top": 0
  },
  "furniture_sidetable/90": {
   "w": 99,
   "h": 69,
   "sha": "cfd63c8a615d19fb",
-  "foot": -21
+  "foot": -21,
+  "top": 0
  },
  "furniture_sofa/158": {
   "w": 270,
@@ -2679,97 +2818,113 @@
   "w": 178,
   "h": 97,
   "sha": "7188afcbec8d1e7c",
-  "foot": -24
+  "foot": -24,
+  "top": 1
  },
  "furniture_table/187": {
   "w": 164,
   "h": 88,
   "sha": "36c85a2068e01981",
-  "foot": -22
+  "foot": -22,
+  "top": 0
  },
  "furniture_table/335": {
   "w": 166,
   "h": 80,
   "sha": "5a4c455b0551df0c",
-  "foot": -26
+  "foot": -26,
+  "top": 0
  },
  "furniture_table/363": {
   "w": 224,
   "h": 100,
   "sha": "6c7e85245e9e5fd7",
-  "foot": -34
+  "foot": -34,
+  "top": 0
  },
  "furniture_table/417": {
   "w": 156,
   "h": 90,
   "sha": "4422f51d273f61bd",
-  "foot": -16
+  "foot": -16,
+  "top": 0
  },
  "furniture_table/481": {
   "w": 195,
   "h": 87,
   "sha": "650888762045a743",
-  "foot": -19
+  "foot": -19,
+  "top": 1
  },
  "furniture_table/534": {
   "w": 174,
   "h": 87,
   "sha": "b936f6e7692f9c3f",
-  "foot": -22
+  "foot": -22,
+  "top": 0
  },
  "furniture_table/59": {
   "w": 241,
   "h": 90,
   "sha": "2c62502ce8853f12",
-  "foot": -24
+  "foot": -24,
+  "top": 0
  },
  "furniture_table/60": {
   "w": 210,
   "h": 83,
   "sha": "7e761d74ea2bf41f",
-  "foot": -12
+  "foot": -12,
+  "top": 0
  },
  "furniture_table/615": {
   "w": 231,
   "h": 87,
   "sha": "eb69c1b7fe7a016e",
-  "foot": -20
+  "foot": -20,
+  "top": 0
  },
  "furniture_table/616": {
   "w": 231,
   "h": 87,
   "sha": "f69c23d424d917c4",
-  "foot": -20
+  "foot": -20,
+  "top": 0
  },
  "furniture_table/62": {
   "w": 181,
   "h": 95,
   "sha": "a742b7b8853a7cb2",
-  "foot": -21
+  "foot": -21,
+  "top": 1
  },
  "furniture_table/63": {
   "w": 229,
   "h": 88,
   "sha": "3881b820e3151f6d",
-  "foot": -17
+  "foot": -17,
+  "top": 0
  },
  "furniture_table/631": {
   "w": 177,
   "h": 88,
   "sha": "d4dea0bee6549af5",
-  "foot": -23
+  "foot": -23,
+  "top": 3
  },
  "furniture_table/680": {
   "w": 221,
   "h": 86,
   "sha": "b4736001082c1395",
-  "foot": -21
+  "foot": -21,
+  "top": 1
  },
  "furniture_table/699": {
   "w": 221,
   "h": 85,
   "sha": "7ecd8c29d11538cf",
-  "foot": -21
+  "foot": -21,
+  "top": 0
  },
  "furniture_tabledeco/118": {
   "w": 21,
