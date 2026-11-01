@@ -263,3 +263,13 @@ describe('Meet the Merchants', () => {
 function getDef(id) {
   return getQuestCatalog()[id];
 }
+
+describe('shop and Make tile names are never cut mid-line', () => {
+  it('a tile label never shrinks, so its two lines always fit inside the tile', async () => {
+    const { readFileSync } = await import('node:fs');
+    const css = readFileSync(new URL('../public/style.css', import.meta.url), 'utf8');
+    const rule = css.slice(css.indexOf('.vendor-tile .tile-label,\n.make-tile .tile-label {'));
+    const assert = (await import('node:assert/strict')).default;
+    assert.match(rule.slice(0, rule.indexOf('}')), /flex-shrink: 0;/);
+  });
+});

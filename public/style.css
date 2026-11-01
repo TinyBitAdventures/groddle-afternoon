@@ -5593,6 +5593,9 @@ body.buff-purple-pulse::after {
 }
 .vendor-tile .tile-label,
 .make-tile .tile-label {
+  /* Never squeezed: a clamped label hides its overflow, so as a flex item it would shrink and cut its
+     second line; the tile grows to fit two lines instead, and the grid keeps each row the same height. */
+  flex-shrink: 0;
   font-size: var(--fs-2xs);
   text-align: center;
   line-height: var(--lh-tight);
