@@ -40,7 +40,7 @@ import {
   npcQuestOffers,
   questAwardPayload,
   turnInQuest,
-} from '../quest-offers.js?v=0bbc4098';
+} from '../quest-offers.js?v=06a5e180';
 import {
   GOT_QUEST_TEXT,
   VENDOR_NPCS,

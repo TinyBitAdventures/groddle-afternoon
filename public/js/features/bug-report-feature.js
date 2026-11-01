@@ -126,7 +126,7 @@ const STYLE = `
 .bug-btn { display: inline-flex; align-items: center; justify-content: center; padding: var(--sp-2) 0.45rem; position: relative; }
 .bug-btn img { width: 23px; height: 20px; display: block; }
 .bug-btn .bug-unread[hidden], .reports-panel[hidden], .reports-view[hidden], .reports-panel [hidden] { display: none !important; }
-[data-ui="modern"] #game-root #bug-report-panel { position: absolute; inset: 0; z-index: calc(var(--z-dialog) + 5); display: grid; place-items: center; padding: calc(var(--hud-h) + 12px) var(--hud-inset) calc(var(--pack-live-height, 72px) + 8px); background: var(--scrim); }
+[data-ui="modern"] #game-root #bug-report-panel { position: absolute; inset: 0; z-index: calc(var(--z-modal) + 32); display: grid; place-items: center; padding: calc(var(--hud-h) + 12px) var(--hud-inset) calc(var(--pack-live-height, 72px) + 8px); background: var(--scrim); }
 [data-ui="modern"] #bug-report-panel .reports-card { display: flex; flex-direction: column; width: min(560px, 100%); height: min(620px, 100%); max-height: 100%; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-l); background: var(--surface); box-shadow: var(--shadow-3); color: var(--text); font-family: var(--font-ui); font-size: var(--fs-m); animation: ui-sheet-center-in var(--motion-med) var(--ease-out); }
 [data-ui="modern"] #bug-report-panel .reports-head { flex: none; flex-wrap: nowrap; }
 [data-ui="modern"] #bug-report-panel .reports-head h2 { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -540,7 +540,8 @@ export function waitingOffers(questState) {
   const offers = ensureQuestOfferState(questState);
   const catalog = getQuestCatalog();
   return Object.entries(offers.offered)
-    .filter(([id]) => catalog[id] && !questState.active?.[id])
+    // Ticket 21: an offer for a quest already done (and not repeatable) is stale: it could never be accepted.
+    .filter(([id]) => catalog[id] && !questState.active?.[id] && !((questState.completed || []).includes(id) && !catalog[id].isRepeatable))
     .sort((a, b) => a[1] - b[1] || (a[0] < b[0] ? -1 : 1))
     .map(([id, at]) => ({ classTsid: id, def: catalog[id], offeredAt: at, emergency: !!catalog[id].isEmergency }));
 }

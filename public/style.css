@@ -10327,6 +10327,13 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
 }
 /* —— end HUB top bar layer —— */
 
+/* Ticket 21 (2026-11-01): a quest card (#quest-dialogue, --z-modal + 30) covered the whole game, so
+   the bug report could not be opened while one was up, even one that kept coming back. While a card
+   is up the bar lifts over it, and only its bug report button takes clicks; the report sheet itself
+   sits over the card (bug-report-feature.js, classic.css). */
+#wrap:has(#quest-dialogue:not([hidden])) > header.top-bar { z-index: calc(var(--z-modal) + 31); pointer-events: none; }
+#wrap:has(#quest-dialogue:not([hidden])) > header.top-bar #bug-btn { pointer-events: auto; }
+
 /* —— VERBS —— (phase 2, Warm paper: the verb menu, js/ui/verb-menu.js; the HUD mock is the spec)
    The world's verb menu (#verb-menu) and a stack's menu (#pack-popover) are one compact card: a
    head (icon, name, what it is), one line per verb with its 1-9 key cap and energy cost, and a

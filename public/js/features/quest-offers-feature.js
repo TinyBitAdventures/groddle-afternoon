@@ -105,7 +105,7 @@ import {
   COLD_COMFORT_LEAVE_TEXT,
   HOME_TREE_GROWN_TEXT,
   SEED_TO_SCYTHE,
-} from '../quest-offers.js?v=0bbc4098';
+} from '../quest-offers.js?v=06a5e180';
 import { parseQuestConversation } from '../quests.js?v=282e1621';
 import { questRequirementText, renderQuestText, withQuestMarkup } from '../quest-text.js?v=7f5d761c';
 import { addItem, removeItem, countItem } from '../inventory.js?v=85d4faba';
@@ -148,6 +148,15 @@ let lastBroken = null;
 let lastStreetTsid = '';
 /** G446: your yard trees' maturities at the last look (null off your yard). */
 let lastYardMaturity = null;
+/** When the open card was shown (ticket 21: a dismissal after this snoozes emergencies). */
+let openedAt = 0;
+/**
+ * Ticket 21: an emergency the player dismissed (Escape or its X, game.js closeQuestDialogue
+ * dismiss) waits for another street, or this long on the same one, instead of coming back in 1 s.
+ */
+export const EMERGENCY_SNOOZE_MS = 60_000;
+let snoozedUntil = 0;
+let snoozeStreet = '';
 /** The patches feature's per-street slot id (features/patches-feature.js PATCHES_FEATURE_ID). */
 const PATCHES_SLOT = 'patches';
 
@@ -234,8 +243,9 @@ function finish(rows, engine) {
 function presentOffer(engine, now = Date.now()) {
   if (offerOpen || engine.busy() || engine.questOffersHeld?.()) return false;
   const qs = engine.questState;
-  // QuestsDialog.as onEmergencyTick 335-360: an emergency still unanswered shows again.
-  const again = waitingOffers(qs).find((row) => row.emergency);
+  // QuestsDialog.as onEmergencyTick 335-360: an emergency still unanswered shows again
+  // (ticket 21: not while the player's dismissal of it is snoozing).
+  const again = emergencySnoozed(engine, now) ? null : waitingOffers(qs).find((row) => row.emergency);
   let card = again ? questOfferCard(again.classTsid) : null;
   if (!card) {
     card = nextQuestOffer(qs, engine.pc, questContext(engine, now));
@@ -257,6 +267,16 @@ function presentOffer(engine, now = Date.now()) {
   return true;
 }
 
+/** Ticket 21: a dismissed emergency waits for another street or EMERGENCY_SNOOZE_MS. */
+function emergencySnoozed(engine, now = Date.now()) {
+  if (!snoozedUntil) return false;
+  if (now >= snoozedUntil || String(engine.streetTsid || '') !== snoozeStreet) {
+    snoozedUntil = 0;
+    return false;
+  }
+  return true;
+}
+
 /** Accept an offer (the card's accept, or a put-off quest's Try it): in the log and started. */
 function acceptCard(engine, classTsid, def) {
   // main.js doQuestConversationChoice 6040-6046 / doQuestBegin: starting while dead fails
@@ -273,6 +293,9 @@ function acceptCard(engine, classTsid, def) {
   }
   const result = acceptOffer(engine.questState, classTsid, questContext(engine));
   engine.setData('questOfferResult', result.ok ? 'accepted' : result.reason || 'failed');
+  // Ticket 21: an offer that cannot be accepted (already done, already under way, gone from the
+  // catalog) leaves the Magic Rock: kept as waiting, an emergency came back every second forever.
+  if (!result.ok) dropOffer(engine.questState, classTsid);
   if (result.ok) {
     engine.pushActivity(`New quest: ${def.title}`);
     engine.refreshPack();
@@ -389,10 +412,18 @@ export function retryTimedQuest(engine, classTsid, now = Date.now()) {
   return result;
 }
 
+/** Ticket 21: forget an offer that can no longer be accepted. */
+function dropOffer(questState, classTsid) {
+  const offers = ensureQuestOfferState(questState);
+  delete offers.offered[classTsid];
+  offers.queue = offers.queue.filter((id) => id !== classTsid);
+}
+
 /** Show an offer's card: on the street, or inside the Quests dialog (`inLog`). */
 function openOffer(engine, card, { inLog = false } = {}) {
   const qs = engine.questState;
   offerOpen = true;
+  openedAt = Date.now();
   openCard = { classTsid: card.classTsid, inLog };
   engine.setData('questOfferCard', `${card.classTsid}:${inLog ? 'log' : 'street'}`);
   engine.playSound('QUEST_OFFER', { volume: 0.55 });
@@ -598,6 +629,8 @@ export const questOffersFeature = {
     nextOfferCheckAt = Date.now() + (engine.param('questoffer') === 'now' ? 1_500 : 12_000);
     heldByCard = false;
     cardGoneAt = 0;
+    snoozedUntil = 0;
+    openedAt = 0;
     offerOpen = false;
     openCard = null;
     lastWaiting = -1;
@@ -643,6 +676,12 @@ export const questOffersFeature = {
     if (offerOpen && !engine.questDialogueOpen()) {
       // G225: closed without an answer (the X in the Quests dialog, Escape):
       // the offer keeps waiting in the log (QuestsDialog.as onConvoClose 209-216).
+      // Ticket 21: an emergency the player dismissed waits for another street.
+      if (openCard && !openCard.inLog && (engine.questDialogueDismissedAt?.() || 0) >= openedAt && openedAt) {
+        snoozedUntil = now + EMERGENCY_SNOOZE_MS;
+        snoozeStreet = String(engine.streetTsid || '');
+        engine.setData('questOfferResult', 'dismissed');
+      }
       offerOpen = false;
       openCard = null;
       engine.setData('questOfferCard', '');
@@ -707,7 +746,7 @@ export const questOffersFeature = {
         cardGoneAt = 0;
       }
       // G277: an emergency still unanswered (pushed off, closed by force, held) tries again in 1 s, not 30 s.
-      if (!offerOpen && waitingOffers(engine.questState).some((row) => row.emergency)) {
+      if (!offerOpen && !emergencySnoozed(engine, now) && waitingOffers(engine.questState).some((row) => row.emergency)) {
         nextOfferCheckAt = Math.min(nextOfferCheckAt, now + EMERGENCY_RETRY_MS);
       }
     }

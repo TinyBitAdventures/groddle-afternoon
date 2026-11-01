@@ -1948,7 +1948,8 @@
 :root[data-ui="classic"] #game-root #bug-report-panel:not([hidden]) {
   position: absolute;
   inset: 0 0 auto 0;
-  z-index: calc(var(--z-dialog) + 5);
+  /* Ticket 21: over the quest card too, so a card that will not go away can still be reported. */
+  z-index: calc(var(--z-modal) + 32);
   height: var(--cvh);
   display: grid;
   place-items: center;

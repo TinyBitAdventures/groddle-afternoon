@@ -32,9 +32,9 @@ import {
   withinReach,
 } from '../public/js/juju-bandits.js?v=6cf92f4f';
 import { DROP_TABLES } from '../public/js/drop-tables.js?v=0f922478';
-import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=0bbc4098';
+import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=06a5e180';
 import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
-import { FEATURES } from '../public/js/features/index.js?v=d304d680';
+import { FEATURES } from '../public/js/features/index.js?v=aa3211f4';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=ca0a48d5';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

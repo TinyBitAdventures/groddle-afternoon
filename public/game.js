@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6d499ac2';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d304d680';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=aa3211f4';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=f8c4a366';
@@ -36,7 +36,7 @@ import {
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=7f5d761c';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=0bbc4098';
+import { dropBootStarterQuests, routesCounter, worldVerbQuestEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=06a5e180';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -475,7 +475,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=09f3b7b2';
+} from './js/player-save.js?v=0e2a622f';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -10460,6 +10460,8 @@ const engine = {
   /** A verb in progress or the verb menu open (both interrupt meditation). */
   acting: () => Boolean(currentAction || menuTarget),
   questDialogueOpen: () => isQuestDialogueOpen(),
+  /** Ticket 21: when the player last dismissed an emergency card (Escape or its X); features wait for another street before showing it again. */
+  questDialogueDismissedAt: () => urgentDismissedAt,
   /** True while a feature holds the Magic Rock quiet (rook attack, Naraka, meditation). */
   questOffersHeld: () => startHeld() || features.query('holdQuestOffers', engine) === true,
   /** STARTCARD: resolves once the player has left the start card (familiar-dialog-feature waits on it). */
@@ -22295,9 +22297,10 @@ function renderQuestDialogueBeat() {
   if (head) head.textContent = look === 'conversation' ? (title && !title.hidden ? title.textContent : '') : familiarCardHeading({ offer, kicker: questDialogueState.kicker });
   const closeX = document.getElementById('quest-dialogue-close');
   // The card's close X declines like "Not right now" (in the Quests dialog it only closes the card);
-  // emergencies have none (QuestConversationUI.as 154-155). The conversation panel's X ends a
+  // emergencies have none (QuestConversationUI.as 154-155), but ticket 21 gives them one: it
+  // dismisses the card unanswered (closeQuestDialogue dismiss). The conversation panel's X ends a
   // conversation that can be left (ChoicesDialog.as 327-344).
-  if (closeX) closeX.hidden = !['familiar', 'conversation'].includes(look) || ((!cancel || cancel.hidden) && !inLog) || urgent;
+  if (closeX) closeX.hidden = !['familiar', 'conversation'].includes(look) || (!urgent && (!cancel || cancel.hidden) && !inLog);
   // Split steps show one button; the decline joins the last one (QuestConversationUI.as 207-252).
   if (cancel && look === 'familiar' && offer && closeX && !closeX.hidden && index < beats.length - 1) cancel.hidden = true;
   const wasHidden = modal.hidden;
@@ -22462,6 +22465,9 @@ function releaseHeldScriptedDialog() {
   if (app?.canvas) app.canvas.dataset.dialogHeld = String(heldScriptedDialogs.length);
 }
 
+/** Ticket 21: when the player last dismissed an emergency card with Escape or its X (0: never). */
+let urgentDismissedAt = 0;
+
 function closeQuestDialogue(opts = {}) {
   if (
     questDialogueState?.mode === 'script' &&
@@ -22470,11 +22476,13 @@ function closeQuestDialogue(opts = {}) {
   ) {
     return false;
   }
-  // G225: an emergency offer on the street has no close and ignores Escape
-  // (QuestConversationUI.as 154-155, escKeyHandler 410-414); its buttons still answer.
-  if (questDialogueState?.urgent === true && !questDialogueState.inLog && opts.cancel !== true && opts.force !== true) {
-    return false;
-  }
+  // G225: an emergency offer on the street has no close and ignores Escape in the original
+  // (QuestConversationUI.as 154-155, escKeyHandler 410-414). Ticket 21 (2026-11-01): a card that
+  // keeps coming back must never trap the player, so here Escape and its X dismiss it unanswered
+  // (opts.dismiss): it waits, and the Magic Rock brings it back on another street.
+  const dismissing = questDialogueState?.urgent === true && !questDialogueState.inLog && opts.cancel !== true && opts.force !== true;
+  if (dismissing && opts.dismiss !== true) return false;
+  if (dismissing) urgentDismissedAt = Date.now();
   const onCancel =
     opts.cancel === true && typeof questDialogueState?.onCancel === 'function'
       ? questDialogueState.onCancel
@@ -26914,7 +26922,10 @@ async function main() {
   );
   document.getElementById('quest-dialogue-close')?.addEventListener('click', () =>
     // G225: in the Quests dialog the X only closes the card; the offer keeps waiting (QuestsDialog.as 209-216).
-    closeQuestDialogue({ cancel: questDialogueState?.inLog !== true, force: questDialogueState?.inLog === true })
+    // Ticket 21: an emergency's X dismisses it unanswered, like Escape.
+    questDialogueState?.urgent === true && questDialogueState?.inLog !== true
+      ? closeQuestDialogue({ dismiss: true })
+      : closeQuestDialogue({ cancel: questDialogueState?.inLog !== true, force: questDialogueState?.inLog === true })
   );
   document.getElementById('hog-haul-ready-btn')?.addEventListener('click', beginHogHaulCountdown);
   document.getElementById('four-letter-leave-btn')?.addEventListener('click', confirmLeaveFourLetterQuest);
@@ -26974,7 +26985,7 @@ async function main() {
         return;
       }
       if (isQuestDialogueOpen()) {
-        closeQuestDialogue();
+        closeQuestDialogue({ dismiss: true });
         return;
       }
       if (isFeedPickerOpen()) {

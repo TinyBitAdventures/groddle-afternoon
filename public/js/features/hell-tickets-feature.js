@@ -40,7 +40,7 @@
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=85d4faba';
 import { OVERLAY_USES, playWindowOverlay } from '../overlays.js?v=90f4b1ba';
-import { acceptOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js?v=0bbc4098';
+import { acceptOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js?v=06a5e180';
 import { getQuestCatalog } from '../content-catalogs.js?v=10b118dd';
 import { parseQuestConversation } from '../quests.js?v=282e1621';
 import { HELL_LOCATION, HELL_QUESTS, isInHell, isInHellOne } from '../hell.js?v=393c3c7f';
@@ -80,6 +80,10 @@ let auto = { stage: '', at: 0, dialogAt: 0 };
 /** When the current street finished loading: visits and offers wait for the loading card to fade. */
 let streetAt = 0;
 const SETTLE_MS = 2000;
+/** Ticket 21: a card the player dismissed (Escape or its X) waits for another street or this long. */
+const DISMISS_SNOOZE_MS = 60_000;
+let offerShownAt = 0;
+let snooze = { until: 0, street: '' };
 
 const isPankaTsid = (tsid) => String(tsid || '').slice(1) === PANKA_TSID.slice(1);
 
@@ -112,9 +116,13 @@ function presentOffer(engine, id, text) {
   const qs = engine.questState;
   const def = getQuestCatalog()[id] || HELL_QUESTS[id];
   if (!qs || !def) return false;
+  // Ticket 21: never offer a quest that is already under way or done (its accept would fail and
+  // the card would come back).
+  if (hellQuestStatus(qs, id) !== 'none') return false;
   ensureQuestOfferState(qs);
   markOffered(qs, id, Date.now());
   offerOpen = { id, text };
+  offerShownAt = Date.now();
   engine.setData('hellTicketOffer', id);
   engine.playSound?.('QUEST_OFFER', { volume: 0.55 });
   engine.offerQuestDialogue({
@@ -128,6 +136,8 @@ function presentOffer(engine, id, text) {
       offerOpen = null;
       const result = acceptOffer(qs, id, questContext(engine));
       engine.setData('hellTicketOfferResult', result.ok ? 'accepted' : result.reason || 'failed');
+      // Ticket 21: an offer that cannot be accepted is gone, not left waiting to show again.
+      if (!result.ok && qs.offers?.offered) delete qs.offers.offered[id];
       if (result.ok) engine.pushActivity(`New quest: ${def.title}`);
       engine.refreshPack();
       engine.save();
@@ -306,6 +316,8 @@ export const hellTicketsFeature = {
     unanswered = null;
     pendingPrompts = [];
     forceUsed = false;
+    offerShownAt = 0;
+    snooze = { until: 0, street: '' };
     auto = { stage: '', at: 0, dialogAt: 0 };
     if (engine.param('gravedone') === '1' && engine.questState) {
       const qs = engine.questState;
@@ -337,6 +349,11 @@ export const hellTicketsFeature = {
     // G255: our emergency offer closed unanswered (another dialog took the screen): show it again.
     if (offerOpen && !engine.questDialogueOpen()) {
       engine.setData('hellTicketOfferResult', 'waiting');
+      // Ticket 21: dismissed by the player, it waits for another street (or a minute) instead of the next tick.
+      if (offerShownAt && (engine.questDialogueDismissedAt?.() || 0) >= offerShownAt) {
+        snooze = { until: now + DISMISS_SNOOZE_MS, street: String(engine.streetTsid || '') };
+        engine.setData('hellTicketOfferResult', 'dismissed');
+      }
       unanswered = offerOpen;
       offerOpen = null;
       engine.save();
@@ -350,7 +367,8 @@ export const hellTicketsFeature = {
       engine.prompt({ text: next.text });
       return;
     }
-    if (unanswered) {
+    if (snooze.until && (now >= snooze.until || String(engine.streetTsid || '') !== snooze.street)) snooze = { until: 0, street: '' };
+    if (unanswered && !snooze.until) {
       const { id, text } = unanswered;
       unanswered = null;
       if (hellQuestStatus(qs, id) === 'none' && qs.offers?.offered?.[id]) {
@@ -408,6 +426,8 @@ export const hellTicketsFeature = {
     forceUsed = false;
     quiet = false;
     streetAt = 0;
+    offerShownAt = 0;
+    snooze = { until: 0, street: '' };
     auto = { stage: '', at: 0, dialogAt: 0 };
   },
 };
