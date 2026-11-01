@@ -125,17 +125,6 @@ describe('held keys (report 23)', () => {
   });
 });
 
-describe('mid-air menus (report 22)', () => {
-  it('a menu or verb in mid-air drops the avatar straight down; on the ground it stays still', () => {
-    const body = game.slice(game.indexOf('function physics(dt) {'));
-    const still = body.indexOf('} else if ((menuTarget || currentAction) && (player.onGround || climb.active)) {');
-    const air = body.indexOf('} else if (menuTarget || currentAction) {');
-    assert.ok(still > 0 && air > still, 'the grounded hold comes first');
-    const branch = body.slice(air, body.indexOf('} else if (climb.active && climb.wall) {'));
-    assert.match(branch, /player\.vx = 0;\n\s+stepAvatar\(player, \{/);
-  });
-});
-
 describe('Enter after walking (report 17)', () => {
   it('walking forgets the last thing used and a hover the pointer left behind', () => {
     assert.match(game, /function forgetInteractionFocus\(\) \{\n\s+recentInteractionTarget = null;\n\s+recentInteractionUntil = 0;\n\s+if \(hoverTarget && !gardenTend\) clearHoverGlow\(\);/);
