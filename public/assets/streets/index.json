@@ -13193,7 +13193,7 @@
       "file": "assets/streets/GDOBRJIEU2V2Q2G.json",
       "hubId": "75",
       "hubName": "Bortola",
-      "platforms": 2,
+      "platforms": 7,
       "decos": 107,
       "reconstructed": true,
       "internalLabel": "Abandoned Hauki Seeks Manor, floor 1"
@@ -13203,7 +13203,7 @@
       "file": "assets/streets/GDOBRKREU2V2F9B.json",
       "hubId": "75",
       "hubName": "Bortola",
-      "platforms": 2,
+      "platforms": 5,
       "decos": 114,
       "reconstructed": true,
       "internalLabel": "Abandoned Hauki Seeks Manor, floor 2"
@@ -13213,7 +13213,7 @@
       "file": "assets/streets/GHF9DOUO7K03OUA.json",
       "hubId": "75",
       "hubName": "Bortola",
-      "platforms": 2,
+      "platforms": 4,
       "decos": 108,
       "reconstructed": true,
       "internalLabel": "Abandoned Hauki Seeks Manor, floor 3"
@@ -13253,7 +13253,7 @@
       "file": "assets/streets/GNV6EBBIS2V2JB8.json",
       "hubId": "101",
       "hubName": "Aranna",
-      "platforms": 2,
+      "platforms": 4,
       "decos": 96,
       "reconstructed": true,
       "internalLabel": "Abandoned Sabudana Drama Towers, floor 1"
@@ -13263,7 +13263,7 @@
       "file": "assets/streets/GNV6ECKIS2V26JU.json",
       "hubId": "101",
       "hubName": "Aranna",
-      "platforms": 2,
+      "platforms": 6,
       "decos": 94,
       "reconstructed": true,
       "internalLabel": "Abandoned Sabudana Drama Towers, floor 2"
@@ -13273,7 +13273,7 @@
       "file": "assets/streets/GNV6EDVIS2V2SFD.json",
       "hubId": "101",
       "hubName": "Aranna",
-      "platforms": 2,
+      "platforms": 7,
       "decos": 92,
       "reconstructed": true,
       "internalLabel": "Abandoned Sabudana Drama Towers, floor 3"
@@ -13283,7 +13283,7 @@
       "file": "assets/streets/GNV6EEAJS2V26B2.json",
       "hubId": "101",
       "hubName": "Aranna",
-      "platforms": 2,
+      "platforms": 7,
       "decos": 92,
       "reconstructed": true,
       "internalLabel": "Abandoned Sabudana Drama Towers, floor 4"
@@ -13293,7 +13293,7 @@
       "file": "assets/streets/GA9TBQS1V2V2G34.json",
       "hubId": "97",
       "hubName": "Muufo",
-      "platforms": 2,
+      "platforms": 4,
       "decos": 90,
       "reconstructed": true,
       "internalLabel": "Abandoned Hakusan Heaps Towers, floor 1"
@@ -13303,7 +13303,7 @@
       "file": "assets/streets/GA9TBR62V2V23E2.json",
       "hubId": "97",
       "hubName": "Muufo",
-      "platforms": 2,
+      "platforms": 5,
       "decos": 111,
       "reconstructed": true,
       "internalLabel": "Abandoned Hakusan Heaps Towers, floor 2"
@@ -13313,7 +13313,7 @@
       "file": "assets/streets/GDOBRLULU2V24DS.json",
       "hubId": "58",
       "hubName": "Groddle Meadow",
-      "platforms": 2,
+      "platforms": 12,
       "decos": 106,
       "reconstructed": true,
       "internalLabel": "Abandoned Gregarious Towers, floor 1"
@@ -13323,7 +13323,7 @@
       "file": "assets/streets/GDOBRNDMU2V2Q34.json",
       "hubId": "58",
       "hubName": "Groddle Meadow",
-      "platforms": 2,
+      "platforms": 13,
       "decos": 100,
       "reconstructed": true,
       "internalLabel": "Abandoned Gregarious Towers, floor 2"
@@ -13333,7 +13333,7 @@
       "file": "assets/streets/GDOBROOMU2V2GCK.json",
       "hubId": "58",
       "hubName": "Groddle Meadow",
-      "platforms": 2,
+      "platforms": 13,
       "decos": 107,
       "reconstructed": true,
       "internalLabel": "Abandoned Gregarious Towers, floor 3"

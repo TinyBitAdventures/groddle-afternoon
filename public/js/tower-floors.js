@@ -945,17 +945,85 @@ function accentDecos(tower, floor, layout) {
   return out;
 }
 
+/**
+ * Crates and barrels you can stand on, as in the archived towers: the
+ * Gregarious lobby and basement XML put a platform on the top of every crate
+ * and barrel on the walk line (GA5134UPLRU29OH plat_1336418407239 on barrel_1
+ * at 228, plat_1336429009349 on crate_2 at 616, plat_1336429009354 on the
+ * crate stack at -151; GDONEDVHC4030KF plat_1336067451644 / _41 / _43 / _45
+ * on its crates, plat_1336067451643 on the stacked one at 408), a little in
+ * from each side and a little under the lid. The crates and barrels nearer
+ * than the walk line sat in the lobby's middleplus layer, over the avatar,
+ * with no platform. Measured from those: `inset` of the width off each side,
+ * `top` of the height under the top edge. (Player report 35.)
+ */
+export const TOWER_STANDABLE = Object.freeze({
+  crate_1: Object.freeze({ inset: 0.21, top: 0.15 }),
+  barrel_1: Object.freeze({ inset: 0.28, top: 0.06 }),
+});
+/** A crate or barrel based more than this below the floor line stands nearer than the walk line. */
+export const TOWER_NEAR_BASE = 20;
+
+/**
+ * The layout's props placed: [{ sprite, x, y (base), w, h, opts, front }].
+ * A crate or barrel nearer than the walk line, or stacked on one that is, is
+ * drawn in front of the avatar (the lobby's middleplus); `front: true` does
+ * that for any prop.
+ */
+export function towerProps(layout, floorY) {
+  const out = (layout.props || []).map(([sprite, x, base, w, h, opts = {}]) => ({
+    sprite, x, y: layout.relative && !opts.abs ? floorY + base : base, w, h, opts, front: Boolean(opts.front),
+  }));
+  // Lowest bases first, so a stack's lower crate is settled before the one on it.
+  const loose = out.filter((p) => TOWER_STANDABLE[p.sprite] && !p.opts.front && !p.opts.abs).sort((a, b) => b.y - a.y);
+  for (const p of loose) {
+    // Stacked: the top of another crate or barrel is under this one's base.
+    const under = out.filter((q) => q !== p && TOWER_STANDABLE[q.sprite] && Math.abs(q.x - p.x) < (q.w + p.w) / 2 && Math.abs(q.y - q.h - p.y) <= 16);
+    p.front = under.length ? under.some((q) => q.front) : p.y - floorY > TOWER_NEAR_BASE;
+    for (const q of under) (q.stacked ||= []).push([p.x - p.w / 2, p.x + p.w / 2]);
+  }
+  return out;
+}
+
+/**
+ * One-way platforms on the tops of the crates and barrels on or behind the
+ * walk line; under a stack only the open part of the lower top; none on one
+ * hidden behind a nearer crate.
+ */
+export function towerPropPlatforms(layout, floorY) {
+  const out = [];
+  const props = towerProps(layout, floorY);
+  for (const p of props) {
+    const s = TOWER_STANDABLE[p.sprite];
+    if (!s || p.front || p.opts.r) continue;
+    // Hidden behind a nearer crate whose top is as high: you would seem to stand on that one, which has none.
+    if (props.some((q) => q.front && TOWER_STANDABLE[q.sprite] && Math.abs(q.x - p.x) < q.w / 2 && q.y - q.h <= p.y - p.h + 30)) continue;
+    const half = p.w / 2 - Math.round(p.w * s.inset);
+    const y = Math.round(p.y - p.h + p.h * s.top);
+    let x1 = p.x - half;
+    let x2 = p.x + half;
+    // A crate stacked on this one covers part of its top: keep the open side, if any.
+    for (const [a, b] of p.stacked || []) {
+      if (a <= x1 && b >= x2) x2 = x1;
+      else if (a <= x1) x1 = Math.max(x1, b);
+      else if (b >= x2) x2 = Math.min(x2, a);
+    }
+    if (x2 - x1 < 24) continue;
+    out.push({ id: `plat_tower_${p.sprite.replace(/_1$/, '')}_${out.length + 1}`, x1: Math.round(x1), y1: y, x2: Math.round(x2), y2: y, pc_perm: -1 });
+  }
+  return out;
+}
+
 function propDecos(layout, front, floorY) {
   const { l, t } = TOWER_FLOOR_BOUNDS;
   const out = [];
   let z = front ? 200 : 120;
-  for (const [sprite, x, base, w, h, opts = {}] of layout.props) {
-    if (Boolean(opts.front) !== front) continue;
+  for (const p of towerProps(layout, floorY)) {
+    if (p.front !== front) continue;
     const extra = {};
-    if (opts.flip) extra.flip = true;
-    const y = layout.relative && !opts.abs ? floorY + base : base;
-    const d = deco(sprite, x, y, w, h, opts.z ?? z++, extra);
-    if (opts.r) d.r = opts.r;
+    if (p.opts.flip) extra.flip = true;
+    const d = deco(p.sprite, p.x, p.y, p.w, p.h, p.opts.z ?? z++, extra);
+    if (p.opts.r) d.r = p.opts.r;
     out.push(front ? { ...d, x: d.x - l, y: d.y - t } : d);
   }
   return out;
@@ -1005,6 +1073,7 @@ export function towerFloorStreet(floor, lobby) {
     // A closed-off end has no floor: you never stand in it.
     { id: 'plat_tower_floor', x1: layout.closed ? layout.closed[1] : B.l, y1: y, x2: B.r, y2: y, pc_perm: -1 },
     { id: 'plat_tower_ceiling', x1: B.l, y1: CEILING_Y, x2: B.r, y2: CEILING_Y, pc_perm: 1 },
+    ...towerPropPlatforms(layout, y),
   ];
   const barriers = layout.closed ? [{ id: 'wall_tower_closed', x: layout.closed[1], y: -640, h: 640, pc_perm: null }] : [];
   const lobbyFilter = (lobby.layers || []).find((l) => l.name === 'middleground')?.filters || null;
