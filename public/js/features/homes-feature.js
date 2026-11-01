@@ -188,7 +188,7 @@ import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playP
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=7fe91266';
 import { fadeInNewNear } from '../poof-fade.js?v=06fed92f';
 import { projectApi } from './street-jobs-feature.js?v=49e239a6';
-import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=b05c58d8';
+import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=b05c58d8';
 import { drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=6ca164d2';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=e676f00f';
 import { wantsHiresDecos } from '../deco-hires.js?v=cb905e17';
@@ -1456,11 +1456,93 @@ function runRockVerb(target, verbId, engine) {
  * through homes_rebuild_exterior.
  */
 const HOUSES = {
-  meadow: { path: 'door_asset_house_large_01', w: 830, h: 668, scale: 0.48, doorX: 0.52, signX: 0.06 },
-  firebog: { path: 'door_asset_house_medium_03', w: 764, h: 586, scale: 0.58, doorX: 0.55, signX: 0.06 },
-  uralia: { path: 'door_asset_house_large_05', w: 830, h: 668, scale: 0.48, doorX: 0.52, signX: 0.06 },
+  meadow: { path: 'door_asset_house_large_01', w: 830, h: 668, scale: 0.48, doorX: 0.52, signX: 0.06, doorway: [0.38, 0.64] },
+  firebog: { path: 'door_asset_house_medium_03', w: 764, h: 586, scale: 0.58, doorX: 0.55, signX: 0.06, doorway: [0.32, 0.64] },
+  uralia: { path: 'door_asset_house_large_05', w: 830, h: 668, scale: 0.48, doorX: 0.52, signX: 0.06, doorway: [0.30, 0.62] },
 };
 export const HOUSE_STYLE_KEYS = Object.freeze(Object.keys(HOUSES));
+
+/**
+ * PORCH (Austin 2026-11-01, "my house front is crowded"): the doorway, the front door and
+ * the mat (Firebog's pink mat, Uralia's carrot rug) or worn path (Meadow) painted in front of
+ * it, as fractions of the house art (measured on the door_asset_house_* decos). The street's
+ * own scenery keeps out of it, as street-ecology's reserved spots keep a public street's
+ * doors clear (DOORCLEAR, streetReservedSpots; glitch-client DoorView.as 308-313).
+ */
+export const DOORWAY_GAP = 8;
+
+/** The doorway (door and mat) in world x: { x1, x2 }. */
+export function houseDoorway(layout, houseStyle = 'meadow') {
+  const h = HOUSES[houseStyle] || HOUSES.meadow;
+  const w = h.w * h.scale;
+  const left = layout.houseX - w / 2;
+  return { x1: Math.round(left + w * h.doorway[0]), x2: Math.round(left + w * h.doorway[1]) };
+}
+
+/**
+ * A Tower's doorway on the street, from its foot x: the door (door_asset_entry_basic, 75 wide)
+ * TOWER_DOOR_DX either side of the foot as it faces, so both sides are kept.
+ */
+export function towerDoorway(footX) {
+  const reach = TOWER_DOOR_DX + 38 + DOORWAY_GAP;
+  return { x1: Math.round(footX - reach), x2: Math.round(footX + reach) };
+}
+
+/**
+ * The planted border in front of the house (the street style's `trim`), which hides the
+ * deco's For Sale sign: where each sprite stands. It starts at the sign corner and steps
+ * right, but no sprite reaches into the doorway; one that would moves left, back over the
+ * sign. PURE (world x).
+ */
+export function streetTrimSpots(look, layout, houseStyle = 'meadow') {
+  const h = HOUSES[houseStyle] || HOUSES.meadow;
+  const w = h.w * h.scale;
+  const { left } = houseFixtureX(layout, houseStyle);
+  const door = houseDoorway(layout, houseStyle);
+  return (look?.trim || []).map((meta, i) => {
+    const half = (meta.w * meta.scale) / 2;
+    const want = left + w * (h.signX + 0.05 + i * 0.07);
+    return { meta, x: Math.min(want, door.x1 - DOORWAY_GAP - half), half, flip: i % 2 === 1 };
+  });
+}
+
+/** The street's Tower's foot in world x (its cultivation's spot), or null. */
+function towerFootX(state) {
+  const t = towerItem(state);
+  return t ? homeStreetLayout(state).houseX + t.rx : null;
+}
+
+/**
+ * Where the street's own grass, flowers and plants may grow (drawLandscape's `skipNear`): off
+ * the house lot, and no sprite over a Tower's doorway (`towerX`, its foot, when there is one).
+ * Cultivations a player planted are not scenery and are never moved. PURE.
+ */
+export function streetNearSkip(layout, { towerX = null } = {}) {
+  const tower = Number.isFinite(towerX) ? towerDoorway(towerX) : null;
+  return (px, half = 0) => (px > layout.lotLeft + 40 && px < layout.lotRight - 40)
+    || Boolean(tower && px + half > tower.x1 && px - half < tower.x2);
+}
+
+/**
+ * The street style's `near` row along the ground (grass, flowers, plants): each sprite's x,
+ * half width and flip, skipping where `skip(px, half)` says. PURE; drawLandscape draws these.
+ */
+export function landscapeNearSpots(style, seed, width, skip = () => false) {
+  const out = [];
+  for (const item of style?.near || []) {
+    let i = 0;
+    for (let x = item.offset || 0; x < width; x += item.every) {
+      const jx = (hash01(`${seed}:near:${item.s}:${i}`) - 0.5) * item.jitter * 2;
+      const px = x + jx;
+      i += 1;
+      const row = pickAlt(item, `${seed}:near:${item.s}:${i}:alt`);
+      const half = (row.w * row.scale) / 2;
+      if (skip(px, half)) continue;
+      out.push({ item, row, x: px, half, flip: hash01(`${item.s}:${i}`) > 0.5 });
+    }
+  }
+  return out;
+}
 
 /** The house's left end, its front door and its sign corner (where the Mailbox stands), in world x. */
 export function houseFixtureX(layout, houseStyle = 'meadow') {
@@ -1614,20 +1696,13 @@ function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNe
     soil.zIndex = -39;
     root.addChild(soil);
   }
-  // Grass, flowers and plants along the yard, kept off the house lot.
+  // Grass, flowers and plants along the yard, kept off the house lot (landscapeNearSpots).
   const near = new PIXI.Container();
   near.zIndex = -30;
-  for (const item of style.near) {
-    let i = 0;
-    for (let x = item.offset || 0; x < width; x += item.every) {
-      const jx = (hash01(`${seed}:near:${item.s}:${i}`) - 0.5) * item.jitter * 2;
-      const px = x + jx;
-      i += 1;
-      if (skipNear(px)) continue;
-      const row = pickAlt(item, `${seed}:near:${item.s}:${i}:alt`);
-      if (row.tint == null && style.nearTint != null) row.tint = style.nearTint;
-      near.addChild(decoSprite(PIXI, row, px, groundY + 22 + (item.below || 0), hash01(`${item.s}:${i}`) > 0.5));
-    }
+  for (const spot of landscapeNearSpots(style, seed, width, skipNear)) {
+    const row = spot.row;
+    if (row.tint == null && style.nearTint != null) row.tint = style.nearTint;
+    near.addChild(decoSprite(PIXI, row, spot.x, groundY + 22 + (spot.item.below || 0), spot.flip));
   }
   root.addChild(near);
 
@@ -1654,8 +1729,8 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
     width,
     groundY: STREET_GROUND_Y,
     lift: STREET_LIFT,
-    // Grass, flowers and plants along the yard, kept off the house lot.
-    skipNear: (px) => px > layout.lotLeft + 40 && px < layout.lotRight - 40,
+    // Grass, flowers and plants along the yard, kept off the house lot and a Tower's doorway.
+    skipNear: streetNearSkip(layout, { towerX: towerFootX(cult) }),
   });
 
   // The house, centred on its lot
@@ -1667,14 +1742,14 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
   house.y = STREET_GROUND_Y + 14;
   house.zIndex = -20;
   root.addChild(house);
-  // A planted border in front of the house hides the deco's For Sale sign.
+  // A planted border in front of the house hides the deco's For Sale sign, clear of the doorway (PORCH).
   const trim = new PIXI.Container();
   trim.zIndex = -19;
-  const { left, doorX, signX } = houseFixtureX(layout, houseStyle);
-  style.trim.forEach((meta, i) => {
-    const row = style.nearTint != null && meta.tint == null ? { ...meta, tint: style.nearTint } : meta;
-    trim.addChild(decoSprite(PIXI, row, left + h.w * h.scale * (h.signX + 0.05 + i * 0.07), STREET_GROUND_Y + 20, i % 2 === 1));
-  });
+  const { doorX, signX } = houseFixtureX(layout, houseStyle);
+  for (const spot of streetTrimSpots(style, layout, houseStyle)) {
+    const row = style.nearTint != null && spot.meta.tint == null ? { ...spot.meta, tint: style.nearTint } : spot.meta;
+    trim.addChild(decoSprite(PIXI, row, spot.x, STREET_GROUND_Y + 20, spot.flip));
+  }
   root.addChild(trim);
 
   root.worldH = STREET_WORLD_H;
@@ -1682,6 +1757,7 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
   root.updateParallax = (camX, camY, vpW, vpH, skyH = vpH) => land.update(camX, camY, vpW, skyH);
   root.houseDoorX = doorX;
   root.houseSignX = signX;
+  root.houseDoorway = houseDoorway(layout, houseStyle);
   root.streetStyle = styleKey;
   return root;
 }
