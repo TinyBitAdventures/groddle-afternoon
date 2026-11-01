@@ -249,10 +249,14 @@ describe('in the game', () => {
     }
   });
 
-  it('cancels from the button, Escape and movement', () => {
+  // Player report 17 (2026-11-01): walking no longer cancels. The client held the avatar's keys
+  // while a verb's locking overlay had focus (TSMainView.blur 544-551 stopAvatarKeyControl) and only
+  // the overlay's cancel button ended it (main.js doOverlayDismissed 4982-4986).
+  it('cancels from the button and Escape, never by walking', () => {
     assert.match(game, /createWordProgressView\(el, \{ onCancel: \(\) => cancelCurrentAction\(\) \}\)/);
     assert.match(game, /if \(currentAction\) \{\n\s+cancelCurrentAction\(\);\n\s+return;\n\s+\}/); // Escape
-    assert.match(game, /if \(currentAction\) \{\n\s+if \(\['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'w', 'W', 'a', 'A', 's', 'S', 'd', 'D'\]\.includes\(e\.key\)\) \{\n\s+cancelCurrentAction\(\);/);
+    assert.match(game, /\n    if \(currentAction\) return;\n/);
+    assert.doesNotMatch(game, /if \(currentAction\) \{\n\s+if \(\['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'/);
     assert.match(css, /\.word-progress-cancel:hover,[\s\S]*?cancel_hover\.svg/);
   });
 

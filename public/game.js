@@ -12446,6 +12446,19 @@ function combinedPhysics() {
 /** Player report 23: whether the last frame held the avatar (a menu, a verb, a scene). */
 let inputWasBlocked = false;
 
+/**
+ * Player report 17: once you walk away, Enter means what you walk up to. The client's Enter
+ * (LocationInputHandler.as _beginInteractionAfterEnterKey 208-237) took the sprites the avatar
+ * touches, one opens, several ask which; it had no memory of the last thing used and no hover.
+ * The remake keeps both while you stand still (pet then nibble through a trant's big hit box),
+ * and lets go of them when you walk, so the butterfly you milked is not the answer at the tree.
+ */
+function forgetInteractionFocus() {
+  recentInteractionTarget = null;
+  recentInteractionUntil = 0;
+  if (hoverTarget && !gardenTend) clearHoverGlow();
+}
+
 function handleInput() {
   if (gameplayInputBlocked()) {
     // MAPWALK: a menu or a scene that holds the avatar ends a walk you started.
@@ -12481,6 +12494,7 @@ function handleInput() {
   let right = keys.has('ArrowRight') || keys.has('d') || keys.has('D');
   const up = keys.has('ArrowUp') || keys.has('w') || keys.has('W');
   const down = keys.has('ArrowDown') || keys.has('s') || keys.has('S');
+  if ((left || right) && (recentInteractionTarget || hoverTarget)) forgetInteractionFocus();
   if (avatarWalk && !climb.active) {
     const steer = avatarWalkSteer(left || right || up || down);
     if (steer < 0) left = true;
@@ -26988,12 +27002,14 @@ async function main() {
     if (isEmotionalBearPickerOpen()) return;
     // Bug report #5: while tending a garden its plots take the arrows, WASD, Enter and E.
     if (gardenTend && !menuTarget && !panelOnScreen() && gardenTendKey(e)) return;
-    if (currentAction) {
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'w', 'W', 'a', 'A', 's', 'S', 'd', 'D'].includes(e.key)) {
-        cancelCurrentAction();
-      }
-      return;
-    }
+    // Player report 17: walking no longer cancels a verb. The client held the avatar's keys while a
+    // verb ran (inc_skill_packages.js runSkillPackage 255-292 sends a `locking` overlay;
+    // AnnouncementController.takeFocus 429-446 takes focus, TSMainView.blur 544-551 calls
+    // stopAvatarKeyControl, AvatarController.stopListeningForControlEvts 111-124 sets ignore_keys),
+    // and only the overlay's cancel button ended it (overlay_dismissed, main.js doOverlayDismissed
+    // 4982-4986, the one caller of cancelSkillPackage). Here the cancel button and Esc end it; a
+    // key you hold walks on once it is done.
+    if (currentAction) return;
     if (isFeedPickerOpen() && feedPickerQtyFood) {
       if (e.key === 'Enter') {
         e.preventDefault();

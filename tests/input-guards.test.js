@@ -135,3 +135,12 @@ describe('mid-air menus (report 22)', () => {
     assert.match(branch, /player\.vx = 0;\n\s+stepAvatar\(player, \{/);
   });
 });
+
+describe('Enter after walking (report 17)', () => {
+  it('walking forgets the last thing used and a hover the pointer left behind', () => {
+    assert.match(game, /function forgetInteractionFocus\(\) \{\n\s+recentInteractionTarget = null;\n\s+recentInteractionUntil = 0;\n\s+if \(hoverTarget && !gardenTend\) clearHoverGlow\(\);/);
+    const input = game.slice(game.indexOf('function handleInput() {'));
+    const forget = input.indexOf('if ((left || right) && (recentInteractionTarget || hoverTarget)) forgetInteractionFocus();');
+    assert.ok(forget > 0 && forget < input.indexOf('if (avatarWalk && !climb.active) {'), 'raw keys only, before a walk steers');
+  });
+});
