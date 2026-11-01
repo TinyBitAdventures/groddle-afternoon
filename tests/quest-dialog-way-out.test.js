@@ -10,8 +10,14 @@
  *   escKeyHandler 410-414). Here Escape and an X dismiss it unanswered: it waits for another street
  *   (or a minute) before the Magic Rock shows it again, so no card can trap the player.
  * - The bug report button and panel sit above the card.
+ *
+ * The clock is faked, and so is Math.random: a fresh croak rolls a grave visit (1 in 3, 20-50 s
+ * later; hell-tickets.js GRAVE_VISIT), and a visitor offers Beelzebooze again on purpose
+ * (player.js recognizeDeath 1444-1445). Left to chance, that visit landed inside the snooze window
+ * in about one run in seven and looked like the card coming straight back. The rolls here say no
+ * visit, so each test sees only the snooze it checks.
  */
-import { describe, it, before, beforeEach } from 'node:test';
+import { describe, it, before, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -88,6 +94,7 @@ function run(engine, fromMs, toMs, step = 250) {
 
 describe('No quest card can trap the player (ticket 21)', () => {
   let realNow;
+  let realRandom;
   let clock;
   before(async () => {
     await loadContentCatalogsFromDir(join(root, 'public/assets/content'));
@@ -96,9 +103,15 @@ describe('No quest card can trap the player (ticket 21)', () => {
     realNow = Date.now;
     clock = realNow();
     Date.now = () => clock;
+    realRandom = Math.random;
+    Math.random = () => 0.99; // no grave visit rolled (GRAVE_VISIT.chance is 1/3)
     hellTicketsFeature._reset();
     hellTicketsFeature.restore({});
     hellFeature.restore({});
+  });
+  afterEach(() => {
+    Date.now = realNow;
+    Math.random = realRandom;
   });
   const tick = (engine, ms) => {
     const from = clock;
