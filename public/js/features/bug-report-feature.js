@@ -51,7 +51,7 @@
  */
 
 import { createReportsApi, REPORT_PICTURE, REPORT_TEXT, UNREAD_POLL_MS, base64Size, pictureSize, reportFromHash } from '../reports.js?v=eabbd20e';
-import { mountReportsSheet } from '../ui/reports-sheet.js?v=0cd0f668';
+import { mountReportsSheet } from '../ui/reports-sheet.js?v=af173642';
 
 export const BUG_REPORT_FEATURE_ID = 'bug-report';
 
@@ -267,7 +267,10 @@ const STYLE = `
 [data-ui="modern"] #bug-report-panel .reports-btn.is-quiet:hover { background: var(--surface-hover); }
 [data-ui="modern"] #bug-report-panel :is(button, textarea):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 [data-ui="modern"] #bug-report-panel button:disabled { opacity: 0.55; cursor: default; }
-[data-ui="modern"] #bug-report-panel .reports-body { display: flex; flex-direction: column; padding-top: var(--space-2); }
+[data-ui="modern"] #bug-report-panel .reports-body { display: flex; flex-direction: column; padding-top: var(--space-2); scrollbar-width: auto; scrollbar-color: auto; }
+[data-ui="modern"] #bug-report-panel .reports-body::-webkit-scrollbar { width: 10px; }
+[data-ui="modern"] #bug-report-panel .reports-body::-webkit-scrollbar-track { background: var(--surface-sunken); border-radius: var(--radius-pill); }
+[data-ui="modern"] #bug-report-panel .reports-body::-webkit-scrollbar-thumb { background: var(--border-strong); border: 2px solid var(--surface-sunken); border-radius: var(--radius-pill); }
 [data-ui="modern"] #bug-report-panel .reports-view { display: flex; flex-direction: column; gap: var(--space-2); min-height: 0; flex: 1 1 auto; }
 [data-ui="modern"] #bug-report-panel .reports-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-1); }
 [data-ui="modern"] #bug-report-panel .reports-row-btn { display: grid; gap: 2px; width: 100%; margin: 0; padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface-raised); color: var(--text); font: inherit; text-align: left; cursor: pointer; }
@@ -283,7 +286,10 @@ const STYLE = `
 [data-ui="modern"] #bug-report-panel .reports-chip.is-answered { color: var(--status-good); }
 [data-ui="modern"] #bug-report-panel .reports-empty { margin: var(--space-4) 0; color: var(--text-muted); line-height: var(--lh-body); text-align: center; }
 [data-ui="modern"] #bug-report-panel .reports-thread-head { display: flex; align-items: center; gap: var(--space-2); }
-[data-ui="modern"] #bug-report-panel .reports-messages { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+/* Ticket 21: a thread is read in the sheet's one scroller (its body, with a scrollbar you can see), every message at its full height. */
+[data-ui="modern"] #bug-report-panel .reports-thread-view { flex: 1 0 auto; }
+[data-ui="modern"] #bug-report-panel .reports-messages { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); flex: none; }
+[data-ui="modern"] #bug-report-panel .reports-msg { flex: none; }
 [data-ui="modern"] #bug-report-panel .reports-msg { max-width: 88%; padding: var(--space-2) var(--space-3); border-radius: var(--radius-m); background: var(--surface-sunken); }
 [data-ui="modern"] #bug-report-panel .reports-msg.is-admin { align-self: flex-start; border: 1px solid var(--accent); background: var(--surface-raised); }
 [data-ui="modern"] #bug-report-panel .reports-msg.is-player { align-self: flex-end; }

@@ -190,7 +190,12 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
     }
     closedNote.hidden = ticket.status !== 'closed';
     closeTicket.hidden = ticket.status === 'closed';
-    globalThis.requestAnimationFrame?.(() => { msgs.lastElementChild?.scrollIntoView?.({ block: 'nearest' }); });
+    // Open at the newest message's first line (a long reply reads from its start); the body is the one scroller.
+    globalThis.requestAnimationFrame?.(() => {
+      const last = msgs.lastElementChild;
+      if (!last?.getBoundingClientRect) return;
+      body.scrollTop = Math.max(0, body.scrollTop + last.getBoundingClientRect().top - body.getBoundingClientRect().top - 8);
+    });
   }
 
   function show(next) {
@@ -243,7 +248,8 @@ export function mountReportsSheet({ doc = globalThis.document, host, api, contex
       drawList();
       drawThread();
       say('');
-      setTimeout(() => reply.focus(), 0);
+      // The caret waits in the reply box without scrolling past the newest message (ticket 21).
+      setTimeout(() => reply.focus({ preventScroll: true }), 0);
     } catch (err) {
       say(refusalWords(err, T.loadFailed), true);
     }

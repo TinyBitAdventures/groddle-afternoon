@@ -2100,7 +2100,14 @@
 :root[data-ui="classic"] #bug-report-panel .reports-chip.is-closed { color: var(--c-classic-offline); }
 :root[data-ui="classic"] #bug-report-panel .reports-empty { margin: calc(16 * var(--cu)) 0; color: var(--c-classic-offline); text-align: center; }
 :root[data-ui="classic"] #bug-report-panel .reports-thread-head { display: flex; align-items: center; gap: calc(8 * var(--cu)); }
-:root[data-ui="classic"] #bug-report-panel .reports-messages { list-style: none; margin: 0; padding: 0; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+/* Ticket 21: the thread scrolls in the well (the body), every message at its full height, with the chat log's scrollbar. */
+:root[data-ui="classic"] #bug-report-panel .reports-thread-view { flex: 1 0 auto; }
+:root[data-ui="classic"] #bug-report-panel .reports-messages { list-style: none; margin: 0; padding: 0; flex: none; }
+:root[data-ui="classic"] #bug-report-panel .reports-msg { flex: none; }
+:root[data-ui="classic"] #bug-report-panel .reports-body { scrollbar-width: auto; scrollbar-color: auto; }
+:root[data-ui="classic"] #bug-report-panel .reports-body::-webkit-scrollbar { width: 12px; }
+:root[data-ui="classic"] #bug-report-panel .reports-body::-webkit-scrollbar-track { background: var(--c-classic-chat-track); border: 1px solid var(--c-classic-chat-track-border); border-radius: 3px; }
+:root[data-ui="classic"] #bug-report-panel .reports-body::-webkit-scrollbar-thumb { background: var(--c-classic-chat-handle); border: 1px solid var(--c-classic-chat-handle-border); border-radius: 3px; }
 :root[data-ui="classic"] #bug-report-panel .reports-msg { padding: calc(8 * var(--cu)) 0 calc(8 * var(--cu)) calc(9 * var(--cu)); border-bottom: 1px solid var(--c-classic-row-rule); box-shadow: inset 3px 0 0 color-mix(in srgb, var(--c-classic-activity-bar) 50%, transparent); }
 :root[data-ui="classic"] #bug-report-panel .reports-msg.is-admin { box-shadow: inset 3px 0 0 var(--c-classic-link); }
 :root[data-ui="classic"] #bug-report-panel .reports-msg-who { margin: 0 0 calc(2 * var(--cu)); color: var(--c-classic-title); font-family: var(--font-classic-title); }
