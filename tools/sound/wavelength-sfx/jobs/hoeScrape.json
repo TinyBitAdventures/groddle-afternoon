@@ -1,0 +1,67 @@
+{
+ "tempo": 60,
+ "sampleRate": 48000,
+ "tail": 1.2,
+ "stems": "none",
+ "warmup": 0.2,
+ "tracks": [
+  {
+   "name": "00-kit",
+   "gain": 0,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 0,
+    "bank": 128
+   },
+   "notes": [
+    {
+     "time": 0,
+     "length": 0.22,
+     "vel": 0.6,
+     "key": 74
+    }
+   ],
+   "fx": [
+    {
+     "type": "eq",
+     "bands": [
+      {
+       "type": "highpass",
+       "freq": 500
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "buses": [
+  {
+   "name": "Air",
+   "fx": [
+    {
+     "type": "reverb",
+     "decay": 1.1,
+     "size": 0.45,
+     "predelay": 12,
+     "damping": 0.6,
+     "highpass": 350,
+     "mix": 1
+    }
+   ]
+  }
+ ],
+ "master": {
+  "fx": [
+   {
+    "type": "eq",
+    "bands": [
+     {
+      "type": "highpass",
+      "freq": 40
+     }
+    ]
+   }
+  ]
+ }
+}

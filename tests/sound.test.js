@@ -12,7 +12,7 @@ import {
   playSynthRecipe,
   recipeForKey,
 } from '../public/js/synth-sfx.js?v=9853c8e7';
-import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=7da54812';
+import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=d62791a6';
 import {
   LEGACY_SFX_KEYS,
   actionLoopFor,

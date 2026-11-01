@@ -1,0 +1,72 @@
+{
+ "tempo": 60,
+ "sampleRate": 48000,
+ "tail": 1.2,
+ "stems": "none",
+ "warmup": 0.2,
+ "tracks": [
+  {
+   "name": "00-bsn",
+   "gain": 0.0,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 70
+   },
+   "notes": [
+    {
+     "time": 0,
+     "length": 0.75,
+     "vel": 0.7,
+     "key": 52,
+     "bend": [
+      [
+       0.1,
+       0
+      ],
+      [
+       0.7,
+       -7
+      ]
+     ],
+     "vibrato": {
+      "depth": 0.25,
+      "rate": 3
+     }
+    }
+   ],
+   "sends": {
+    "Air": -14
+   }
+  }
+ ],
+ "buses": [
+  {
+   "name": "Air",
+   "fx": [
+    {
+     "type": "reverb",
+     "decay": 1.1,
+     "size": 0.45,
+     "predelay": 12,
+     "damping": 0.6,
+     "highpass": 350,
+     "mix": 1
+    }
+   ]
+  }
+ ],
+ "master": {
+  "fx": [
+   {
+    "type": "eq",
+    "bands": [
+     {
+      "type": "highpass",
+      "freq": 40
+     }
+    ]
+   }
+  ]
+ }
+}

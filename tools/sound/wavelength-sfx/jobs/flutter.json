@@ -1,0 +1,102 @@
+{
+ "tempo": 60,
+ "sampleRate": 48000,
+ "tail": 1.2,
+ "stems": "none",
+ "warmup": 0.2,
+ "tracks": [
+  {
+   "name": "00-synth",
+   "gain": 0.0,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 1800,
+     "resonance": 0.2,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.01,
+     "decay": 0.29,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0,
+     "length": 0.3,
+     "vel": 0.5,
+     "key": 60
+    }
+   ],
+   "fx": [
+    {
+     "type": "tremolo",
+     "rate": 28,
+     "depth": 0.9
+    }
+   ],
+   "sends": {
+    "Air": -12
+   }
+  },
+  {
+   "name": "01-bird",
+   "gain": -4,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 123
+   },
+   "notes": [
+    {
+     "time": 0.1,
+     "length": 0.25,
+     "vel": 0.4,
+     "key": 88
+    }
+   ],
+   "sends": {
+    "Air": -12
+   }
+  }
+ ],
+ "buses": [
+  {
+   "name": "Air",
+   "fx": [
+    {
+     "type": "reverb",
+     "decay": 1.1,
+     "size": 0.45,
+     "predelay": 12,
+     "damping": 0.6,
+     "highpass": 350,
+     "mix": 1
+    }
+   ]
+  }
+ ],
+ "master": {
+  "fx": [
+   {
+    "type": "eq",
+    "bands": [
+     {
+      "type": "highpass",
+      "freq": 40
+     }
+    ]
+   }
+  ]
+ }
+}

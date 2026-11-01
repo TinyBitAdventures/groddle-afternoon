@@ -1,0 +1,138 @@
+{
+ "tempo": 60,
+ "sampleRate": 48000,
+ "tail": 1.2,
+ "stems": "none",
+ "warmup": 0.2,
+ "tracks": [
+  {
+   "name": "00-bsn",
+   "gain": 0.0,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 70
+   },
+   "notes": [
+    {
+     "time": 0,
+     "length": 0.9,
+     "vel": 0.85,
+     "key": 68,
+     "bend": [
+      [
+       0.05,
+       0
+      ],
+      [
+       0.9,
+       -31
+      ]
+     ],
+     "vibrato": {
+      "depth": 0.3,
+      "rate": 5
+     }
+    }
+   ],
+   "sends": {
+    "Air": -14
+   }
+  },
+  {
+   "name": "01-vc",
+   "gain": -8,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 42
+   },
+   "notes": [
+    {
+     "time": 0,
+     "length": 0.9,
+     "vel": 0.5,
+     "key": 56,
+     "bend": [
+      [
+       0.05,
+       0
+      ],
+      [
+       0.9,
+       -19
+      ]
+     ]
+    }
+   ],
+   "sends": {
+    "Air": -14
+   }
+  },
+  {
+   "name": "02-timp",
+   "gain": 0.0,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 47
+   },
+   "notes": [
+    {
+     "time": 0.75,
+     "length": 0.5,
+     "vel": 0.8,
+     "key": 42
+    }
+   ],
+   "sends": {
+    "Air": -14
+   }
+  },
+  {
+   "name": "03-fx",
+   "gain": -6,
+   "plugin": "builtin:fx",
+   "notes": [
+    {
+     "time": 0.75,
+     "length": 0.45,
+     "vel": 0.6,
+     "key": 53
+    }
+   ],
+   "sends": {
+    "Air": -14
+   }
+  }
+ ],
+ "buses": [
+  {
+   "name": "Air",
+   "fx": [
+    {
+     "type": "reverb",
+     "decay": 1.1,
+     "size": 0.45,
+     "predelay": 12,
+     "damping": 0.6,
+     "highpass": 350,
+     "mix": 1
+    }
+   ]
+  }
+ ],
+ "master": {
+  "fx": [
+   {
+    "type": "eq",
+    "bands": [
+     {
+      "type": "highpass",
+      "freq": 40
+     }
+    ]
+   }
+  ]
+ }
+}

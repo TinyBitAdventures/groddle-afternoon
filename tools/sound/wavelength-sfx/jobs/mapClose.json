@@ -1,0 +1,181 @@
+{
+ "tempo": 60,
+ "sampleRate": 48000,
+ "tail": 1.2,
+ "stems": "none",
+ "warmup": 0.2,
+ "tracks": [
+  {
+   "name": "00-synth",
+   "gain": -6,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 3000,
+     "resonance": 0.4,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.047,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0.0,
+     "length": 0.05,
+     "vel": 0.6,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -18
+   }
+  },
+  {
+   "name": "01-synth",
+   "gain": -6,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 2400,
+     "resonance": 0.4,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.047,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0.05,
+     "length": 0.05,
+     "vel": 0.6,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -18
+   }
+  },
+  {
+   "name": "02-synth",
+   "gain": -6,
+   "plugin": "builtin:synth",
+   "synth": {
+    "osc": [
+     {
+      "wave": "noise"
+     }
+    ],
+    "filter": {
+     "type": "bandpass",
+     "cutoff": 1800,
+     "resonance": 0.4,
+     "slope": 12
+    },
+    "amp": {
+     "attack": 0.003,
+     "decay": 0.047,
+     "sustain": 0,
+     "release": 0.03,
+     "velocity": 0.3
+    }
+   },
+   "harmony": false,
+   "notes": [
+    {
+     "time": 0.1,
+     "length": 0.05,
+     "vel": 0.6,
+     "key": 60
+    }
+   ],
+   "sends": {
+    "Air": -18
+   }
+  },
+  {
+   "name": "03-kit",
+   "gain": -16,
+   "plugin": "builtin:sampler",
+   "sampler": {
+    "soundfont": "MuseScore_General",
+    "program": 0,
+    "bank": 128
+   },
+   "notes": [
+    {
+     "time": 0.1,
+     "length": 0.3,
+     "vel": 0.25,
+     "key": 77
+    }
+   ],
+   "fx": [
+    {
+     "type": "eq",
+     "bands": [
+      {
+       "type": "highpass",
+       "freq": 600
+      }
+     ]
+    }
+   ],
+   "sends": {
+    "Air": -18
+   }
+  }
+ ],
+ "buses": [
+  {
+   "name": "Air",
+   "fx": [
+    {
+     "type": "reverb",
+     "decay": 1.1,
+     "size": 0.45,
+     "predelay": 12,
+     "damping": 0.6,
+     "highpass": 350,
+     "mix": 1
+    }
+   ]
+  }
+ ],
+ "master": {
+  "fx": [
+   {
+    "type": "eq",
+    "bands": [
+     {
+      "type": "highpass",
+      "freq": 40
+     }
+    ]
+   }
+  ]
+ }
+}

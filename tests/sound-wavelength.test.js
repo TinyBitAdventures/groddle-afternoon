@@ -13,8 +13,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { SYNTH_RECIPE_NAMES, SYNTH_RECIPES } from '../public/js/synth-sfx.js?v=9853c8e7';
-import { WAVELENGTH_TAKES } from '../public/js/wavelength-sfx.js?v=fd2ceb4b';
-import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=7da54812';
+import { WAVELENGTH_TAKES } from '../public/js/wavelength-sfx.js?v=824b9270';
+import { createSoundBoard, resolveSound } from '../public/js/sound-board.js?v=d62791a6';
 import { jobSources, roundPicks, tableSource } from '../tools/sound/install-wavelength-sfx.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -83,6 +83,12 @@ describe('Wavelength takes: what ships', () => {
     for (const r of [...clean.picks, 'sneeze', 'fireworks']) assert.equal(PROV.takes[r]?.round, r === 'sneeze' || r === 'fireworks' ? 'redo' : 'clean', r);
     assert.equal(PROV.takes.sneeze.take, 'a');
     assert.equal(PROV.takes.fireworks.take, 'b');
+    // Round one (approved 2026-11-01): the 16 takes whose sources were clean already ship; the rest of
+    // its picks ship from the clean round or are held for their Serum 2, Bitwig or Apple samples.
+    const one = shipped.filter((r) => PROV.takes[r].round === 'one');
+    assert.deepEqual(one.sort(), ['cardFlip', 'croak', 'flutter', 'gong', 'hiss', 'hoeScrape', 'mapClose', 'mew', 'ribbit', 'rustle', 'shake', 'sizzle', 'sloth', 'squish', 'squishSoft', 'whoosh']);
+    assert.deepEqual(held.sort(), ['donate', 'elevator', 'grow', 'harvest', 'mapOpen', 'moonAppears', 'purchase', 'quoinCurrants', 'quoinMood', 'quoinShard', 'quoinTime', 'sell', 'shrink', 'skill', 'win']);
+    for (const r of ['SIGNPOST_TRAVEL', 'CARD_DEAL1', 'FLIP_OVER', 'IDLE_FROG', 'GARDEN_CLEAR', 'SPICE_TREE']) assert.ok(resolveSound(r).take, r);
     // Every pick of every round ships or is held with what blocks it; nothing else ships.
     const picked = new Set(CONFIG.rounds.flatMap((r) => roundPicks(r).map(([recipe]) => recipe)));
     assert.deepEqual([...shipped, ...held].sort(), [...picked].sort());

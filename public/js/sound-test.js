@@ -7,7 +7,7 @@
  * and a search box.
  */
 
-import { resolveSound } from './sound-board.js?v=7da54812';
+import { resolveSound } from './sound-board.js?v=d62791a6';
 
 const CSS = `
 .sound-test{position:fixed;inset:12px 12px auto auto;width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 24px);

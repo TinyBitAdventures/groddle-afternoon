@@ -18,6 +18,11 @@
    "id": "redo",
    "rendered": "2026-11-01",
    "about": "Redo round: three candidates each for burp, sneeze and fireworks (redo.py); burp is still open."
+  },
+  {
+   "id": "one",
+   "rendered": "2026-11-01",
+   "about": "Round one: the first Wavelength take of each recipe (make-jobs.py, render-all.py). Austin approved the 16 whose sources were clean already; the rest of his round-one picks shipped from the clean round or are held here for their samples."
   }
  ],
  "sources": {
@@ -47,6 +52,42 @@
    "label": "Wavelength builtin:fx (synthesized impact, riser and sub drop: no samples)",
    "licence": "own-work",
    "ship": true
+  },
+  "sfz:Glockenspiel": {
+   "label": "Glockenspiel.sfz, Xfer Records Serum 2 factory multisamples",
+   "licence": "Xfer Records Serum 2 factory content",
+   "ship": false,
+   "why": "Serum 2 factory content, (c) Xfer Records, all rights reserved; no grant to redistribute its samples as standalone sounds."
+  },
+  "multisample:Vibraphone": {
+   "label": "Vibraphone, Bitwig Studio factory package (Chromatic Percussion)",
+   "licence": "Bitwig Studio EULA",
+   "ship": false,
+   "why": "Bitwig EULA II.2.4: its samples may be used as part of music made with Bitwig Studio; disseminating them or making them publicly accessible otherwise is not permitted."
+  },
+  "sfz:Harp": {
+   "label": "Harp.sfz, Xfer Records Serum 2 factory multisamples",
+   "licence": "Xfer Records Serum 2 factory content",
+   "ship": false,
+   "why": "Serum 2 factory content, (c) Xfer Records, all rights reserved; no grant to redistribute its samples as standalone sounds."
+  },
+  "sfz:Kalimba": {
+   "label": "Kalimba.sfz, Xfer Records Serum 2 factory multisamples",
+   "licence": "Xfer Records Serum 2 factory content",
+   "ship": false,
+   "why": "Serum 2 factory content, (c) Xfer Records, all rights reserved; no grant to redistribute its samples as standalone sounds."
+  },
+  "multisample:Vox Continental Baroque Celesta": {
+   "label": "Vox Continental Baroque Celesta, Bitwig Studio factory package (Rare Organs and Keys)",
+   "licence": "Bitwig Studio EULA",
+   "ship": false,
+   "why": "Bitwig EULA II.2.4: its samples may be used as part of music made with Bitwig Studio; disseminating them or making them publicly accessible otherwise is not permitted."
+  },
+  "exs:Flute Solo Staccato": {
+   "label": "Flute Solo Staccato.exs, Apple Logic/GarageBand sampler instrument",
+   "licence": "Apple GarageBand/Logic licence (Digital Materials)",
+   "ship": false,
+   "why": "Apple's licence: Digital Materials may not be repackaged in whole or in part as audio samples, sound libraries, sound effects or music beds."
   }
  },
  "takes": {
@@ -1029,6 +1070,658 @@
    "peak": -1.4,
    "recipeLufs": -37.2,
    "gainDb": -16.9
+  },
+  "mapClose": {
+   "file": "assets/audio/sfx/wavelength/mapClose.mp3",
+   "sha256": "ae7468f47b1bad976e4e9e7564600d5a4ab6bbb37e98d1cce74f882c730b56a8",
+   "bytes": 5329,
+   "seconds": 0.379,
+   "round": "one",
+   "keys": [],
+   "recordingKeys": [
+    "CLOSE_HUB_MAP"
+   ],
+   "how": "Three falling paper flicks folding shut on a faint low woodblock tap.",
+   "job": "tools/sound/wavelength-sfx/jobs/mapClose.json",
+   "instruments": [
+    "builtin:synth",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -22.9,
+   "peak": -1.7,
+   "recipeLufs": -54.4,
+   "gainDb": -31.5
+  },
+  "cardFlip": {
+   "file": "assets/audio/sfx/wavelength/cardFlip.mp3",
+   "sha256": "5b28e878f1d76a47bd3bbb2bbc9eb35b10c29fb52e3afe6c8356bfb906ecd4ef",
+   "bytes": 2194,
+   "seconds": 0.124,
+   "round": "one",
+   "keys": [
+    "CARD_DEAL1",
+    "CARD_DEAL2",
+    "CARD_DEAL3",
+    "CARD_DEAL4",
+    "CARD_DEAL5",
+    "CARD_DEAL6",
+    "CARD_DEAL7",
+    "FLIP_BACK",
+    "FLIP_OVER"
+   ],
+   "recordingKeys": [],
+   "how": "Two crisp filtered-noise flicks, the second lower, with a faint stick tap: a card flipping.",
+   "job": "tools/sound/wavelength-sfx/jobs/cardFlip.json",
+   "instruments": [
+    "builtin:synth",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -23.6,
+   "peak": -1.7,
+   "recipeLufs": -51.8,
+   "gainDb": -28.2
+  },
+  "gong": {
+   "file": "assets/audio/sfx/wavelength/gong.mp3",
+   "sha256": "ab29724a17372b6baada4ac78bac9a20e611b3b599e8d46d03ccb5d06c54e5c7",
+   "bytes": 14106,
+   "seconds": 1.099,
+   "round": "one",
+   "keys": [],
+   "recordingKeys": [
+    "CROWN_CHANGES_HANDS",
+    "GONG_GIANTS"
+   ],
+   "how": "An additive gong on C3 (inharmonic partials blooming) over a soft timpani stroke and a tubular bell.",
+   "job": "tools/sound/wavelength-sfx/jobs/gong.json",
+   "instruments": [
+    "builtin:synth",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -19.8,
+   "peak": -1.4,
+   "recipeLufs": -27.5,
+   "gainDb": -7.7
+  },
+  "hoeScrape": {
+   "file": "assets/audio/sfx/wavelength/hoeScrape.mp3",
+   "sha256": "c6a7554a56b2105e71a21e9fa064791ed247d9c557d38c8c3f9bdc02ce82aaab",
+   "bytes": 6269,
+   "seconds": 0.445,
+   "round": "one",
+   "keys": [
+    "GARDEN_CLEAR"
+   ],
+   "recordingKeys": [
+    "HIGH_CLASS_HOE",
+    "HOE",
+    "SCRAPER",
+    "SUPER_SCRAPER"
+   ],
+   "how": "One long guiro stroke: the hoe scraping soil.",
+   "job": "tools/sound/wavelength-sfx/jobs/hoeScrape.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -24.8,
+   "peak": -2,
+   "recipeLufs": -47.5,
+   "gainDb": -22.7
+  },
+  "sizzle": {
+   "file": "assets/audio/sfx/wavelength/sizzle.mp3",
+   "sha256": "f663f3b2016156ec860487684cd0653c6f07baef5ea7dc4ce4ca530df47b9579",
+   "bytes": 7209,
+   "seconds": 0.533,
+   "round": "one",
+   "keys": [],
+   "recordingKeys": [
+    "FRYING_PAN",
+    "MIKE_TYSON_GRILL"
+   ],
+   "how": "High hissing noise with cabasa crackles popping through it: a frying pan.",
+   "job": "tools/sound/wavelength-sfx/jobs/sizzle.json",
+   "instruments": [
+    "builtin:synth",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -17.3,
+   "peak": -2.4,
+   "recipeLufs": -33.8,
+   "gainDb": -16.5,
+   "vary": 0.04
+  },
+  "shake": {
+   "file": "assets/audio/sfx/wavelength/shake.mp3",
+   "sha256": "cf6fc3e3fc183f031a66f994ab2464d2ec173b80b03168bb345b3e6e7a1cf45b",
+   "bytes": 8463,
+   "seconds": 0.64,
+   "round": "one",
+   "keys": [],
+   "recordingKeys": [
+    "COCKTAIL_SHAKER"
+   ],
+   "how": "Six alternating maraca and shaker hits: a cocktail shaker.",
+   "job": "tools/sound/wavelength-sfx/jobs/shake.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -17.8,
+   "peak": -1,
+   "recipeLufs": -47.8,
+   "gainDb": -30
+  },
+  "hiss": {
+   "file": "assets/audio/sfx/wavelength/hiss.mp3",
+   "sha256": "201dc8d2a86ed335627d64c201cd80a42e38abca6825b57b873a37158e05cae0",
+   "bytes": 7209,
+   "seconds": 0.535,
+   "round": "one",
+   "keys": [],
+   "recordingKeys": [
+    "GASSIFIER"
+   ],
+   "how": "High-passed noise opening upward with a breath on top: gas escaping.",
+   "job": "tools/sound/wavelength-sfx/jobs/hiss.json",
+   "instruments": [
+    "builtin:synth",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -19.1,
+   "peak": -1.5,
+   "recipeLufs": -33,
+   "gainDb": -13.9
+  },
+  "squishSoft": {
+   "file": "assets/audio/sfx/wavelength/squishSoft.mp3",
+   "sha256": "250e2eefc5a611b82f7aa051911550357b4cc317c50b60493693c925dc81ff60",
+   "bytes": 3134,
+   "seconds": 0.188,
+   "round": "one",
+   "keys": [],
+   "recordingKeys": [
+    "BUTLER_DOLL_IDLE_2",
+    "BUTTERFLY_LOTION",
+    "SCOOPED_JELLISAC"
+   ],
+   "how": "A soft squelch: resonant low-passed noise closing down over a sine sagging from D4.",
+   "job": "tools/sound/wavelength-sfx/jobs/squishSoft.json",
+   "instruments": [
+    "builtin:synth",
+    "fx:reverb"
+   ],
+   "licence": "own-work",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -24.8,
+   "peak": -1.4,
+   "recipeLufs": -42,
+   "gainDb": -17.2
+  },
+  "flutter": {
+   "file": "assets/audio/sfx/wavelength/flutter.mp3",
+   "sha256": "6a200b9982434aa180be2cd4c29219a458e85f593132681b396809f20d961e04",
+   "bytes": 9404,
+   "seconds": 0.717,
+   "round": "one",
+   "keys": [],
+   "recordingKeys": [],
+   "how": "Fluttering wing noise (a tremolo on filtered noise) and a short bird tweet.",
+   "job": "tools/sound/wavelength-sfx/jobs/flutter.json",
+   "instruments": [
+    "builtin:synth",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -9.7,
+   "peak": -1.4,
+   "recipeLufs": -42.7,
+   "gainDb": -33
+  },
+  "mew": {
+   "file": "assets/audio/sfx/wavelength/mew.mp3",
+   "sha256": "5afe2658cee5fef7a5cab7abcbcb1ded79021a0d9dff3c8e11573d63ab5c4f4b",
+   "bytes": 8777,
+   "seconds": 0.658,
+   "round": "one",
+   "keys": [],
+   "recordingKeys": [
+    "FLYING_KITTY_MEW",
+    "KITTY_MEW"
+   ],
+   "how": "A violin sliding F5 up to C6 and sagging back: a kitten mew.",
+   "job": "tools/sound/wavelength-sfx/jobs/mew.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -11,
+   "peak": -1.3,
+   "recipeLufs": -38.3,
+   "gainDb": -27.3
+  },
+  "ribbit": {
+   "file": "assets/audio/sfx/wavelength/ribbit.mp3",
+   "sha256": "784a4616e84d099add9de8a7d235e75186e1d6d4fbe2442819fc0f405e17e7fc",
+   "bytes": 5329,
+   "seconds": 0.386,
+   "round": "one",
+   "keys": [
+    "IDLE_FROG",
+    "MOVE_FROG",
+    "TALK_FROG",
+    "WAITING_FOR_FROG"
+   ],
+   "recordingKeys": [
+    "DANCER_POSE_FROG",
+    "TREE_POSE_FROG",
+    "WARRIOR_POSE_FROG"
+   ],
+   "how": "Two short guiro strokes (the wooden frog) over a low bassoon blip: ribbit.",
+   "job": "tools/sound/wavelength-sfx/jobs/ribbit.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -17.1,
+   "peak": -1.3,
+   "recipeLufs": -48,
+   "gainDb": -30.9
+  },
+  "sloth": {
+   "file": "assets/audio/sfx/wavelength/sloth.mp3",
+   "sha256": "cef9c6a5c518601d1f2190ce0371c16f4a4e1f09805029f2865f76b802ea8dbc",
+   "bytes": 15673,
+   "seconds": 1.229,
+   "round": "one",
+   "keys": [],
+   "recordingKeys": [
+    "SLOTH_ARRIVES"
+   ],
+   "how": "A slow, sleepy bassoon E3 sagging to A2 with a lazy vibrato.",
+   "job": "tools/sound/wavelength-sfx/jobs/sloth.json",
+   "instruments": [
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -10.6,
+   "peak": -1.4,
+   "recipeLufs": -34.4,
+   "gainDb": -23.8
+  },
+  "rustle": {
+   "file": "assets/audio/sfx/wavelength/rustle.mp3",
+   "sha256": "80d4e0305cbe4451a549f67defbe1fa97e0b003757fcb0ec99d9fef40784d066",
+   "bytes": 6269,
+   "seconds": 0.46,
+   "round": "one",
+   "keys": [
+    "SPICE_TREE"
+   ],
+   "recordingKeys": [
+    "BEEN_TREE",
+    "BUBBLE_TREE",
+    "EGG_TREE",
+    "FRUIT_TREE",
+    "GAS_TREE",
+    "PAPER_TREE",
+    "PET_TRANT"
+   ],
+   "how": "Five leafy noise rustles with a cabasa and a shaker brush.",
+   "job": "tools/sound/wavelength-sfx/jobs/rustle.json",
+   "instruments": [
+    "builtin:synth",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -19.3,
+   "peak": -2.2,
+   "recipeLufs": -48.9,
+   "gainDb": -29.6,
+   "vary": 0.04
+  },
+  "croak": {
+   "file": "assets/audio/sfx/wavelength/croak.mp3",
+   "sha256": "8a4d37a4bc49b164e4f89e0621846cb4f1577da0d986e83bb96c9fce875b5e6f",
+   "bytes": 23196,
+   "seconds": 1.866,
+   "round": "one",
+   "keys": [],
+   "recordingKeys": [
+    "CROAK"
+   ],
+   "how": "A bassoon and cello groaning from G#4 down nearly three octaves, landing on a timpani and a sub drop.",
+   "job": "tools/sound/wavelength-sfx/jobs/croak.json",
+   "instruments": [
+    "builtin:fx",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -18.4,
+   "peak": -1.5,
+   "recipeLufs": -14.7,
+   "gainDb": 1.5
+  },
+  "squish": {
+   "file": "assets/audio/sfx/wavelength/squish.mp3",
+   "sha256": "33c482fd11dd40f8d02250833008d4a3843c6121b550a38125512359bea91941",
+   "bytes": 3761,
+   "seconds": 0.251,
+   "round": "one",
+   "keys": [],
+   "recordingKeys": [
+    "SQUISH_GRAPES"
+   ],
+   "how": "A juicy squelch: resonant noise closing from 1.8 kHz to 260 Hz over a sine falling from C4.",
+   "job": "tools/sound/wavelength-sfx/jobs/squish.json",
+   "instruments": [
+    "builtin:synth",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -18.8,
+   "peak": -1.3,
+   "recipeLufs": -28.2,
+   "gainDb": -9.4
+  },
+  "whoosh": {
+   "file": "assets/audio/sfx/wavelength/whoosh.mp3",
+   "sha256": "057b07a1d3d368ff362aa85d04da35c90faecd7851b19375f1af050e4ec78c73",
+   "bytes": 8777,
+   "seconds": 0.677,
+   "round": "one",
+   "keys": [
+    "SIGNPOST_TRAVEL"
+   ],
+   "recordingKeys": [
+    "CLIENT_LOADED",
+    "DEIMAGINATOR_TAKES_BOX",
+    "PACKAGE_SENT",
+    "SMUGGLER_GIVES_OR_TAKES_BOX",
+    "SMUGGLING_NPC_ARRIVES",
+    "SMUGGLING_NPC_LEAVES",
+    "TELEPORTER_VISIBLE_DISAPPEARS"
+   ],
+   "how": "A band-passed air whoosh sweeping 400 Hz to 2.6 kHz with a breath.",
+   "job": "tools/sound/wavelength-sfx/jobs/whoosh.json",
+   "instruments": [
+    "builtin:synth",
+    "fx:reverb",
+    "soundfont:MuseScore_General"
+   ],
+   "licence": "own-work+MIT",
+   "notice": "assets/audio/sfx/wavelength/MuseScore_General_License.md",
+   "author": "Austin Ginder",
+   "rendered": "2026-11-01",
+   "lufs": -15.1,
+   "peak": -1.3,
+   "recipeLufs": -52.5,
+   "gainDb": -37.4
+  }
+ },
+ "held": {
+  "mapOpen": {
+   "round": "one",
+   "keys": [],
+   "blockedBy": [
+    "sfz:Glockenspiel"
+   ],
+   "instruments": [
+    "builtin:synth",
+    "fx:reverb",
+    "sfz:Glockenspiel",
+    "soundfont:MuseScore_General"
+   ]
+  },
+  "purchase": {
+   "round": "one",
+   "keys": [],
+   "blockedBy": [
+    "sfz:Glockenspiel"
+   ],
+   "instruments": [
+    "fx:reverb",
+    "sfz:Glockenspiel",
+    "soundfont:MuseScore_General"
+   ]
+  },
+  "sell": {
+   "round": "one",
+   "keys": [],
+   "blockedBy": [
+    "sfz:Glockenspiel"
+   ],
+   "instruments": [
+    "fx:reverb",
+    "sfz:Glockenspiel"
+   ]
+  },
+  "quoinMood": {
+   "round": "one",
+   "keys": [],
+   "blockedBy": [
+    "multisample:Vibraphone",
+    "sfz:Harp"
+   ],
+   "instruments": [
+    "fx:reverb",
+    "multisample:Vibraphone",
+    "sfz:Harp"
+   ]
+  },
+  "quoinCurrants": {
+   "round": "one",
+   "keys": [],
+   "blockedBy": [
+    "sfz:Glockenspiel"
+   ],
+   "instruments": [
+    "fx:reverb",
+    "sfz:Glockenspiel",
+    "soundfont:MuseScore_General"
+   ]
+  },
+  "quoinTime": {
+   "round": "one",
+   "keys": [],
+   "blockedBy": [
+    "multisample:Vibraphone",
+    "sfz:Glockenspiel"
+   ],
+   "instruments": [
+    "fx:reverb",
+    "multisample:Vibraphone",
+    "sfz:Glockenspiel",
+    "soundfont:MuseScore_General"
+   ]
+  },
+  "quoinShard": {
+   "round": "one",
+   "keys": [],
+   "blockedBy": [
+    "sfz:Kalimba"
+   ],
+   "instruments": [
+    "fx:reverb",
+    "sfz:Kalimba"
+   ]
+  },
+  "skill": {
+   "round": "one",
+   "keys": [],
+   "blockedBy": [
+    "multisample:Vox Continental Baroque Celesta",
+    "sfz:Harp"
+   ],
+   "instruments": [
+    "fx:reverb",
+    "multisample:Vox Continental Baroque Celesta",
+    "sfz:Harp"
+   ]
+  },
+  "donate": {
+   "round": "one",
+   "keys": [],
+   "blockedBy": [
+    "multisample:Vibraphone",
+    "sfz:Glockenspiel"
+   ],
+   "instruments": [
+    "fx:reverb",
+    "multisample:Vibraphone",
+    "sfz:Glockenspiel",
+    "soundfont:MuseScore_General"
+   ]
+  },
+  "harvest": {
+   "round": "one",
+   "keys": [],
+   "blockedBy": [
+    "multisample:Vox Continental Baroque Celesta",
+    "sfz:Kalimba"
+   ],
+   "instruments": [
+    "builtin:synth",
+    "fx:reverb",
+    "multisample:Vox Continental Baroque Celesta",
+    "sfz:Kalimba",
+    "soundfont:MuseScore_General"
+   ]
+  },
+  "elevator": {
+   "round": "one",
+   "keys": [],
+   "blockedBy": [
+    "multisample:Vibraphone",
+    "multisample:Vox Continental Baroque Celesta"
+   ],
+   "instruments": [
+    "fx:reverb",
+    "multisample:Vibraphone",
+    "multisample:Vox Continental Baroque Celesta"
+   ]
+  },
+  "win": {
+   "round": "one",
+   "keys": [],
+   "blockedBy": [
+    "exs:Flute Solo Staccato",
+    "multisample:Vibraphone",
+    "multisample:Vox Continental Baroque Celesta",
+    "sfz:Glockenspiel",
+    "sfz:Harp"
+   ],
+   "instruments": [
+    "exs:Flute Solo Staccato",
+    "fx:reverb",
+    "multisample:Vibraphone",
+    "multisample:Vox Continental Baroque Celesta",
+    "sfz:Glockenspiel",
+    "sfz:Harp"
+   ]
+  },
+  "grow": {
+   "round": "one",
+   "keys": [],
+   "blockedBy": [
+    "sfz:Harp"
+   ],
+   "instruments": [
+    "fx:reverb",
+    "sfz:Harp",
+    "soundfont:MuseScore_General"
+   ]
+  },
+  "shrink": {
+   "round": "one",
+   "keys": [],
+   "blockedBy": [
+    "sfz:Harp"
+   ],
+   "instruments": [
+    "fx:reverb",
+    "sfz:Harp",
+    "soundfont:MuseScore_General"
+   ]
+  },
+  "moonAppears": {
+   "round": "one",
+   "keys": [],
+   "blockedBy": [
+    "multisample:Vibraphone",
+    "multisample:Vox Continental Baroque Celesta",
+    "sfz:Harp"
+   ],
+   "instruments": [
+    "fx:reverb",
+    "multisample:Vibraphone",
+    "multisample:Vox Continental Baroque Celesta",
+    "sfz:Harp",
+    "soundfont:MuseScore_General"
+   ]
   }
  }
 }
