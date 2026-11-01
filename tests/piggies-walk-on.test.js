@@ -21,7 +21,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createAnimalState } from '../public/js/animals.js?v=378af814';
-import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=2220a524';
+import { animalMoodFeature } from '../public/js/features/animal-mood-feature.js?v=06fcdc1c';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=505d8990';
 import {
   ANIMAL_BODY,

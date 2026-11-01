@@ -12,9 +12,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=67d0ba60';
+import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=b1503761';
 import { MP_ROOK_TEXT } from '../public/js/rook-mp.js?v=6012319e';
-import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=cc29f9b4';
+import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=17787a09';
 
 const root = join(import.meta.dirname, '..');
 const TSID = 'LIF12PMQ5121D68';

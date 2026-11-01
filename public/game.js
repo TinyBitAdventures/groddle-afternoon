@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=6fc15d1b';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=88d7e394';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e0180af1';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -413,8 +413,9 @@ import {
   canLearnSkill,
   listLearnedSkills,
 } from './js/skills.js?v=4542bdf9';
-import { skillTitle, spendEmblemForSkill } from './js/skill-tree.js?v=cc29f9b4';
-import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=8391a27b';
+import { skillTitle, spendEmblemForSkill, studyPillName } from './js/skill-tree.js?v=17787a09';
+import { CARD_ART_LAYERS } from './js/imagination-data.js?v=4a85e7fe';
+import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=f036186a';
 import {
   createBuffState,
   applyBuff,
@@ -478,7 +479,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=922f1eda';
+} from './js/player-save.js?v=fbb276ec';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -715,7 +716,7 @@ import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=a
 import './js/classic/classic-zoom.js?v=1ef4b9a5';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=fff73f8c';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=cf0132c0';
-import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=2089ac54';
+import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=2089ac54';
 import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=8691416a';
 import {
   planTravel,
@@ -812,7 +813,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=7dd8f176';
+} from './js/shrines.js?v=050c3b2b';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=279a153b';
 import {
   GAMESHOW_TICKET_ID,
@@ -901,7 +902,7 @@ import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from '.
 import { installHiresIcons } from './js/icon-hires.js?v=5357d4b4';
 import { installHiresDecos } from './js/deco-hires.js?v=cb905e17';
 import { loadAudioLevels, loadMutedPreference, saveAudioLevel, saveMutedPreference } from './js/audio-pref.js?v=e56202ee';
-import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=2b16ba12';
+import { installTopBar, renderTopBar } from './js/ui/topbar.js?v=47260776';
 import { installFocusReturn } from './js/ui/focus-return.js?v=8885653a';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js?v=ea0bd408';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js?v=f7ea0bd5';
@@ -23786,14 +23787,46 @@ function updateSkillChrome(now = Date.now()) {
   }
   const def = getSkillCatalog()[active.classTsid];
   const remaining = formatStudyTime(active.remainingSeconds);
+  const name = skillTitle(def) || def?.name || active.classTsid;
   button.textContent = `Study · ${remaining}`;
-  button.title = `${def?.name || active.classTsid}: ${remaining} remaining`;
+  button.title = `${name}: ${remaining} remaining`;
   button.classList.add('is-studying');
-  if (chip) {
-    chip.textContent = button.textContent;
-    chip.title = button.title;
-    chip.hidden = false;
+  if (chip) paintStudyChip(chip, active.classTsid, name, remaining);
+}
+
+/**
+ * The bar's study pill (Austin 2026-11-01): the skill's name, cut short when long, and the
+ * time left; hovered or focused, a card under it shows the skill's icon and its whole name.
+ */
+function paintStudyChip(chip, classTsid, name, remaining) {
+  let label = chip.querySelector('.study-chip-label');
+  if (!label) {
+    chip.textContent = '';
+    label = document.createElement('span');
+    label.className = 'study-chip-label';
+    label.innerHTML = '<span class="study-chip-name"></span><span class="study-chip-time"></span>';
+    const card = document.createElement('span');
+    card.className = 'study-chip-card';
+    card.setAttribute('aria-hidden', 'true');
+    card.innerHTML = '<img class="study-chip-icon" alt="" width="48" height="48"><span class="study-chip-copy"><strong></strong><small></small></span>';
+    chip.append(label, card);
   }
+  const card = chip.querySelector('.study-chip-card');
+  label.firstChild.textContent = studyPillName(name);
+  label.lastChild.textContent = ` · ${remaining}`;
+  if (chip.dataset.skill !== classTsid) {
+    chip.dataset.skill = classTsid;
+    card.querySelector('.study-chip-icon').src = skillArtFor(classTsid, CARD_ART_LAYERS);
+    card.querySelector('strong').textContent = name;
+  }
+  card.querySelector('small').textContent = `${remaining} left`;
+  // Modern draws the card as the bar's own tooltip (js/ui/topbar.js data-tip-icon); Classic shows the card.
+  chip.dataset.tip = name;
+  chip.dataset.sub = `${remaining} left`;
+  chip.dataset.tipIcon = card.querySelector('.study-chip-icon').getAttribute('src');
+  chip.removeAttribute('title');
+  chip.setAttribute('aria-label', `Studying ${name}, ${remaining} left. Open Skills`);
+  chip.hidden = false;
 }
 
 function openSkillsPanel() {

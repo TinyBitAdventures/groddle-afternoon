@@ -325,6 +325,25 @@ export function skillTitle(def) {
   return family > 1 && def.level ? `${def.name} ${romanRank(def.level)}` : def.name;
 }
 
+/** The study pill's longest name: past it the name is cut at a word, its rank kept. */
+export const STUDY_PILL_NAME_MAX = 16;
+
+/**
+ * The top bar's study pill names the skill (Austin 2026-11-01): a long name is cut with
+ * an ellipsis (at a word when that loses three letters or fewer) and keeps its rank ("Transcenden… III").
+ */
+export function studyPillName(title, max = STUDY_PILL_NAME_MAX) {
+  const text = String(title || '').trim();
+  if (text.length <= max) return text;
+  const rank = text.match(/ ([IVX]+)$/)?.[1] || '';
+  const base = rank ? text.slice(0, -rank.length - 1) : text;
+  const room = Math.max(4, max - (rank ? rank.length + 1 : 0) - 1);
+  let cut = base.slice(0, room);
+  const space = cut.lastIndexOf(' ');
+  if (base[room] !== ' ' && space > 0 && cut.length - space <= 3) cut = cut.slice(0, space);
+  return `${cut.trimEnd()}…${rank ? ` ${rank}` : ''}`;
+}
+
 function familySize(name) {
   return Object.values(catalog()).filter((d) => d.name === name).length;
 }

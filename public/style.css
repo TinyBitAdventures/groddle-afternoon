@@ -9826,6 +9826,10 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   flex: none; height: 28px; padding: 0 var(--space-2); margin: 0 2px; border: 0; border-radius: var(--radius-pill);
   background: var(--accent-soft); color: var(--accent); font-size: var(--fs-s); font-weight: var(--fw-heavy); white-space: nowrap; cursor: pointer;
 }
+[data-ui="modern"] .top-bar #study-chip { position: relative; }
+/* Modern: the bar's tooltip (topbar.js) carries the icon, so the pill's own card stays hidden. */
+[data-ui="modern"] #study-chip .study-chip-card { display: none !important; }
+[data-ui="modern"] .hud-tip .hud-tip-icon { flex: none; width: 40px; height: 40px; margin: -2px 0 -2px -4px; object-fit: contain; object-view-box: inset(76px 51px 109px 54px); }
 [data-ui="modern"] .top-bar .more-menu { position: static; display: contents; }
 [data-ui="modern"] .top-bar .more-btn::after { content: none; }
 [data-ui="modern"] .top-bar .more-menu:has(.mail-unread-badge:not([hidden])) .more-btn::after { content: none; }
@@ -10042,6 +10046,24 @@ html.stage-pinned[data-ui="modern"] header.top-bar { left: calc(var(--sp-5) + va
   [data-ui="modern"] #buff-strip { top: calc(2 * var(--hud-h) + var(--space-4)); }
 }
 /* —— end PAPER —— */
+/* Both skins: the study pill names the skill (game.js paintStudyChip); hovered or focused, Classic's card shows its icon. */
+#study-chip .study-chip-label { display: flex; min-width: 0; white-space: nowrap; }
+#study-chip .study-chip-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+#study-chip .study-chip-time { flex: none; }
+/* Phone width: the bar is tight, so the name gives way first (the time always shows). */
+@media (max-width: 560px) { #study-chip .study-chip-name { max-width: 64px; } }
+#study-chip .study-chip-card { display: none; }
+@media (hover: hover) { #study-chip:hover .study-chip-card { display: flex; } }
+#study-chip:focus-visible .study-chip-card { display: flex; }
+#study-chip .study-chip-card {
+  position: absolute; top: calc(100% + 8px); left: 50%; z-index: calc(var(--z-notice) + 20); transform: translateX(-50%);
+  align-items: center; gap: var(--space-2); padding: 6px 12px 6px 6px; pointer-events: none; white-space: nowrap; text-align: left;
+}
+/* The skill tile sits at about (55, 77)-(178, 200) of its 230 x 310 card layer (as in the familiar's panel). */
+#study-chip .study-chip-icon { flex: none; width: 48px; height: 48px; object-fit: contain; object-view-box: inset(76px 51px 109px 54px); }
+#study-chip .study-chip-copy { display: flex; flex-direction: column; gap: 2px; }
+#study-chip .study-chip-copy small { font-size: 0.85em; font-weight: 400; }
+
 /* NIGHT TINT: the switch row in either skin (js/ui/topbar.js nightTintToggle; the modern look is in PAPER above). */
 .hud-toggle { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: var(--sp-4); cursor: pointer; }
 .hud-toggle small { grid-column: 2; }

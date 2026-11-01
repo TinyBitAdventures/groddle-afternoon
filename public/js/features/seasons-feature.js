@@ -40,11 +40,11 @@ import { getToolCondition } from '../tools.js?v=3d109172';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=5b6e1c8d';
 import { isStandable } from '../street-model.js?v=505d8990';
 import { isBatterflyHabitat } from '../animal-husbandry.js?v=ed43845f';
-import { emblemCostFor } from '../shrines.js?v=7dd8f176';
+import { emblemCostFor } from '../shrines.js?v=050c3b2b';
 import { rollDropTable } from '../drop-tables.js?v=0f922478';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=21c55475';
-import { payDrop } from './drops-feature.js?v=24f391a8';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=189a6890';
+import { payDrop } from './drops-feature.js?v=fa4c35f6';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=9bc5044b';
 import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import {
   CANDY_CLASSES,

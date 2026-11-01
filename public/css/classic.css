@@ -628,6 +628,15 @@
 }
 :root[data-ui="classic"] .top-bar .hud-actions > .update-ready-btn:is(:hover, :focus-visible) { background: var(--c-classic-panel); }
 :root[data-ui="classic"] .top-bar .hud-actions:has(> .update-ready-btn:not([hidden])) > #study-chip { left: calc(var(--cvx) + 458 * var(--cu)); }
+:root[data-ui="classic"] .top-bar #study-chip .study-chip-label { max-width: calc(150 * var(--cu)); }
+/* Its hover card (game.js paintStudyChip) in the pack tooltip's dress. */
+:root[data-ui="classic"] .top-bar #study-chip .study-chip-card {
+  top: calc(100% + 6 * var(--cu)); padding: calc(4 * var(--cu)) calc(10 * var(--cu)) calc(4 * var(--cu)) calc(4 * var(--cu)); border-radius: 3px;
+  background: var(--c-classic-tip); box-shadow: 0 1px 2px color-mix(in srgb, var(--c-classic-ink) 30%, transparent);
+  color: var(--c-classic-title); font: var(--fs-classic-body)/var(--lh-normal) var(--font-classic-body);
+}
+:root[data-ui="classic"] .top-bar #study-chip .study-chip-copy strong { font: 800 var(--fs-classic-body)/var(--lh-tight) var(--font-classic-title); }
+:root[data-ui="classic"] .top-bar #study-chip .study-chip-icon { width: calc(40 * var(--cu)); height: calc(40 * var(--cu)); }
 :root[data-ui="classic"] .update-ready-btn svg { width: calc(12 * var(--cu)); height: calc(12 * var(--cu)); }
 :root[data-ui="classic"] .top-bar .classic-help-btn { right: calc(var(--cf-cluster-r) + 138 * var(--cu)); top: calc(10 * var(--cu)); width: calc(20 * var(--cu)); height: calc(21 * var(--cu)); }
 :root[data-ui="classic"] .top-bar .classic-help-btn img { display: block; width: 100%; height: 100%; }

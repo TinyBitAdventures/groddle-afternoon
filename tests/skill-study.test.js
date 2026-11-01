@@ -21,6 +21,7 @@ import {
   tickSkillStudy,
 } from '../public/js/skills.js?v=4542bdf9';
 import { brainCapacityRescale } from '../public/js/imagination-effects.js?v=70169933';
+import { studyPillName } from '../public/js/skill-tree.js?v=17787a09';
 
 const root = join(import.meta.dirname, '..', 'public');
 
@@ -105,6 +106,30 @@ describe('skill study client wiring', () => {
     assert.match(game, /bootParams\.has\('skilldemo'\)/);
     assert.match(game, /Study · \$\{remaining\}/);
     assert.match(css, /skill-study-card\.studying/);
+  });
+
+  it('names the skill on the bar\'s study pill, cut short when long, its icon on hover (Austin 2026-11-01)', () => {
+    assert.equal(studyPillName('Alchemy'), 'Alchemy');
+    assert.equal(studyPillName('EZ Cooking II'), 'EZ Cooking II');
+    assert.equal(studyPillName('Intermediate Admixing'), 'Intermediate…', 'a word cut when it loses three letters or fewer');
+    assert.equal(studyPillName('Martial Imagination'), 'Martial Imagina…');
+    assert.equal(studyPillName('Transcendental Radiation III'), 'Transcenden… III', 'the rank stays');
+    assert.equal(studyPillName('Animal Kinship VII'), 'Animal Kins… VII');
+    for (const n of ['Transcendental Radiation III', 'Bureaucratic Arts III', 'Remote Herdkeeping', 'Light Green Thumb II']) assert.ok(studyPillName(n).length <= 16, n);
+    const game = readFileSync(join(root, 'game.js'), 'utf8');
+    const fn = game.slice(game.indexOf('function paintStudyChip'), game.indexOf('function openSkillsPanel'));
+    assert.match(fn, /label\.firstChild\.textContent = studyPillName\(name\);/);
+    assert.match(fn, /label\.lastChild\.textContent = ` · \$\{remaining\}`;/);
+    assert.match(fn, /skillArtFor\(classTsid, CARD_ART_LAYERS\)/);
+    assert.match(fn, /chip\.dataset\.tipIcon = /, 'Modern: the bar tooltip shows the icon');
+    assert.match(fn, /chip\.dataset\.sub = `\$\{remaining\} left`;/, 'the tooltip\'s time follows the clock');
+    assert.match(fn, /chip\.removeAttribute\('title'\);/);
+    const topbar = readFileSync(join(root, 'js', 'ui', 'topbar.js'), 'utf8');
+    assert.match(topbar, /el\.dataset\.tipIcon \? `<img class="hud-tip-icon"/);
+    const css = readFileSync(join(root, 'style.css'), 'utf8');
+    assert.match(css, /@media \(hover: hover\) \{ #study-chip:hover \.study-chip-card \{ display: flex; \} \}/, 'Classic: a card under the pill');
+    assert.match(css, /@media \(max-width: 560px\) \{ #study-chip \.study-chip-name \{ max-width: 64px; \} \}/, 'phone width: the name gives way, the time stays');
+    assert.match(readFileSync(join(root, 'css', 'classic.css'), 'utf8'), /\.top-bar #study-chip \.study-chip-card \{/);
   });
 });
 

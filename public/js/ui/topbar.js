@@ -342,7 +342,7 @@ function installMenu(doc) {
   });
 }
 
-/** One tooltip for the bar: data-tip, data-sub and data-key (a "Shift K" key shows two caps). */
+/** One tooltip for the bar: data-tip, data-sub and data-key (a "Shift K" key shows two caps); data-tip-icon puts a picture first (the study pill's skill). */
 function installTooltips(doc, scopes) {
   const tip = doc.createElement('div');
   tip.id = 'hud-tip';
@@ -363,7 +363,8 @@ function installTooltips(doc, scopes) {
     const text = el.dataset.tip;
     if (!text || el.getAttribute('aria-expanded') === 'true' || !el.getClientRects().length) return;
     const keys = (el.dataset.key || '').split(' ').filter(Boolean);
-    tip.innerHTML = `<span>${esc(text)}${el.dataset.sub ? ` <span class="hud-tip-sub">· ${esc(el.dataset.sub)}</span>` : ''}</span>${keys.map((k) => `<span class="kcap">${esc(k)}</span>`).join('')}`;
+    const icon = el.dataset.tipIcon ? `<img class="hud-tip-icon" src="${esc(el.dataset.tipIcon)}" alt="" width="40" height="40">` : '';
+    tip.innerHTML = `${icon}<span>${esc(text)}${el.dataset.sub ? ` <span class="hud-tip-sub">· ${esc(el.dataset.sub)}</span>` : ''}</span>${keys.map((k) => `<span class="kcap">${esc(k)}</span>`).join('')}`;
     tip.hidden = false;
     const r = el.getBoundingClientRect();
     const vw = doc.documentElement.clientWidth;

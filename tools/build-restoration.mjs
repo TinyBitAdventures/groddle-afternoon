@@ -19,7 +19,7 @@ import { execFileSync } from 'node:child_process';
 
 import { CHECKLIST, GROUPS, STATUS } from './restoration/checklist.mjs';
 import { QUEST_ROOMS, BUILT_ROOMS } from '../public/js/quest-rooms/catalog.js?v=9ebeb502';
-import { skillAuditTable } from '../public/js/skill-tree.js?v=cc29f9b4';
+import { skillAuditTable } from '../public/js/skill-tree.js?v=17787a09';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=ca0a48d5';

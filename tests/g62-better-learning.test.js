@@ -19,7 +19,7 @@ import {
 import { canLearnSkill, createSkillState, grantSkill, startSkillStudy, tickSkillStudy } from '../public/js/skills.js?v=4542bdf9';
 import { skillTimeFactor } from '../public/js/imagination-effects.js?v=70169933';
 import { learnTimeReductions } from '../public/js/imagination.js?v=b4f0eaf6';
-import { emblemUnlockSkillFor, skillRemakeNote, skillTitle, skillTreeEntry, spendEmblemForSkill } from '../public/js/skill-tree.js?v=cc29f9b4';
+import { emblemUnlockSkillFor, skillRemakeNote, skillTitle, skillTreeEntry, spendEmblemForSkill } from '../public/js/skill-tree.js?v=17787a09';
 import { acceptOffer, pendingQuestOffers } from '../public/js/quest-offers.js?v=fe9fb524';
 import { createQuestState } from '../public/js/quests.js?v=282e1621';
 import { normalizeStreetJobState, phaseRequirements, workCheck } from '../public/js/street-jobs.js?v=897619fc';

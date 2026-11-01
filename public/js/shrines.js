@@ -27,7 +27,7 @@ import { metabolicGain, moodMax } from './metabolics.js?v=8504134e';
 import { grantMoodXp } from './mood-xp.js?v=958e7680';
 import { getSkillCatalog } from './content-catalogs.js?v=10b118dd';
 import { accelerateActiveStudy, getActiveStudy, maxStudyAcceleration } from './skills.js?v=4542bdf9';
-import { emblemUnlockSkillFor } from './skill-tree.js?v=cc29f9b4';
+import { emblemUnlockSkillFor } from './skill-tree.js?v=17787a09';
 
 export const EMBLEM_FAVOR_COST = 1000;
 export const EMBLEM_FAVOR_INCREMENT = 100;
