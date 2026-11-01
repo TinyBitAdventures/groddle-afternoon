@@ -123,7 +123,7 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=fa4c33c2';
+} from '../street-objects.js?v=fdb9ea3a';
 import { ROCK_CATALOG } from '../mining.js?v=4806e3e8';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=9c2e8c0f';
 import { quoteWoodTreeHarvest } from '../woodcutting.js?v=38730935';
@@ -140,12 +140,15 @@ import {
   flightFloorFor,
   flyerAt,
   flyerLift,
+  followPath,
+  PATH_STEP,
   pathFrom,
   pathTime,
   restAt,
+  serverPathClock,
   sharedCreatureLabel,
   walkerAt,
-} from '../street-creatures.js?v=7b80b1ee';
+} from '../street-creatures.js?v=144ebb1e';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -314,7 +317,8 @@ function setPath(engine, obj) {
     step = (dt) => {
       if (Math.abs(spr.vx || 0) < 0.01) return false;
       const p = pointAt();
-      spr.x = easeToward(spr.x, p.x, dt);
+      // On its path, not trailing it: it stops, turns and walks on where the path does (CHICKLOOP).
+      spr.x = followPath(spr.x, p.x, dt, PATH_STEP.chicken);
       spr.vx = p.dir * Math.abs(spr.vx || 0.5);
       const bs = spr.baseScale ?? Math.abs(spr.scale.y);
       spr.scale.x = p.dir * bs;
@@ -340,8 +344,8 @@ function setPath(engine, obj) {
     step = (dt) => {
       if (!spr._ambient) return false;
       const p = pointAt();
-      spr.x = easeToward(spr.x, p.x, dt);
-      spr.y = easeToward(spr.y, p.y, dt);
+      spr.x = followPath(spr.x, p.x, dt, PATH_STEP.fly);
+      spr.y = followPath(spr.y, p.y, dt, PATH_STEP.fly);
       const bs = spr.baseScale ?? Math.abs(spr.scale.y);
       spr.scale.x = Math.abs(bs);
       spr.scale.y = Math.abs(bs);
@@ -384,20 +388,28 @@ function setPath(engine, obj) {
  * onWaitStart 1513-1531), again every WAIT_EVERY_MS while the player stays, so nobody's copy runs
  * ahead and it does not jump when the menu closes (lane PIGSTUCK, Austin 2026-11-01: Chickens
  * "hop, like they're restarting their animation from the other side"). A Batterfly flies on.
+ *
+ * Each wait says where this screen stopped it ("at", the path's clock when the menu opened or the
+ * verb began), so the hold starts there for everyone rather than a trip to the server later: the
+ * original's Chicken stood where it was and walked on from there (npc_chicken.js onWaitStart
+ * 1635-1643, onWaitEnd 1626-1633; lane CHICKLOOP, Austin 2026-11-01: "I'm still seeing chickens
+ * jump around").
  */
 const WAIT_EVERY_MS = 700;
-let waitSent = { id: '', at: 0 };
+let waitSent = { id: '', at: 0, stop: 0 };
 function waitAtCreature(engine, c, wall) {
   if (c.state !== 'online' || !copy.creatures) return;
   const t = engine.interactionTarget?.();
   const a = t ? creatureOf(t) : null;
   if (!a || a.kind === 'batterfly' || !copy.animals.has(a.id) || !t.sprite?._path) {
-    waitSent = { id: '', at: 0 };
+    waitSent = { id: '', at: 0, stop: 0 };
     return;
   }
-  if (waitSent.id === a.id && wall - waitSent.at < WAIT_EVERY_MS) return;
+  // The first frame at it: where its path stood when this screen stopped it.
+  if (waitSent.id !== a.id) waitSent = { id: a.id, at: 0, stop: serverPathClock(t.sharedPath, wall, copy.offset) };
+  if (wall - waitSent.at < WAIT_EVERY_MS) return;
   reqSeq += 1;
-  if (c.send('obj_act', actMessage({ req: reqSeq, id: a.id, verb: 'wait' }))) waitSent = { id: a.id, at: wall };
+  if (c.send('obj_act', actMessage({ req: reqSeq, id: a.id, verb: 'wait', at: waitSent.stop }))) waitSent.at = wall;
 }
 
 /** Someone else's verb on a street animal: this player sees it happen. */
@@ -643,7 +655,7 @@ function applyKnown(obj, s) {
   else if (obj.kind === 'pig') applyPigState(obj.state, s, now);
   else if (obj.kind === 'chicken' || obj.kind === 'butterfly' || obj.kind === 'batterfly') {
     applyCreatureState(obj.classId, obj.state, s, { me: client?.me?.id || 0, now });
-    if (obj.target) obj.target.sharedPath = pathFrom(s, now);
+    if (obj.target) obj.target.sharedPath = pathFrom(s, now, copy.offset);
   } else applyTreeState(obj.state, s, now);
 }
 
@@ -762,13 +774,14 @@ export const streetObjectsFeature = {
     // compare two pages at the same instant).
     if (typeof window !== 'undefined') {
       window.groddleCreatures = () => {
-        const out = { at: Date.now(), animals: {} };
+        // off: the street's clock (server ms minus local ms, js/street-creatures.js clockOffset).
+        const out = { at: Date.now(), off: copy.offset, animals: {} };
         for (const obj of localObjects(engine)) {
           const spr = obj.target?.sprite;
           if (!spr || (obj.kind !== 'chicken' && obj.kind !== 'butterfly' && obj.kind !== 'batterfly')) continue;
           const g = typeof spr.getGlobalPosition === 'function' ? spr.getGlobalPosition() : null;
           const p = typeof spr._pathPoint === 'function' ? spr._pathPoint() : null;
-          out.animals[obj.id] = { x: Math.round(spr.x), y: Math.round(spr.y), px: p && Number.isFinite(p.x) ? Math.round(p.x) : null, py: p && Number.isFinite(p.y) ? Math.round(p.y) : Math.round(spr.y), gx: g ? Math.round(g.x) : null, gy: g ? Math.round(g.y) : null, label: obj.target.label };
+          out.animals[obj.id] = { x: Math.round(spr.x), y: Math.round(spr.y), path: obj.target.sharedPath || null, px: p && Number.isFinite(p.x) ? Math.round(p.x) : null, py: p && Number.isFinite(p.y) ? Math.round(p.y) : Math.round(spr.y), gx: g ? Math.round(g.x) : null, gy: g ? Math.round(g.y) : null, label: obj.target.label };
         }
         return out;
       };
@@ -941,5 +954,6 @@ export const streetObjectsFeature = {
     reqSeq = 0;
     syncAskedAt = 0;
     lastAnswer = '';
+    waitSent = { id: '', at: 0, stop: 0 };
   },
 };

@@ -17,18 +17,22 @@ import {
   batterflyAt,
   batterflyPerks,
   batterflyResponseFor,
+  clockOffset,
   creatureOf,
   easeToward,
   flyerAt,
+  followPath,
+  PATH_STEP,
   pathFrom,
   pathTime,
+  serverPathClock,
   restAt,
   sharedCreatureLabel,
   walkerAt,
-} from '../public/js/street-creatures.js?v=7b80b1ee';
-import { createStreetCopy, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=fa4c33c2';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=89c2ed5d';
-import { FEATURES } from '../public/js/features/index.js?v=cf7e5ce9';
+} from '../public/js/street-creatures.js?v=144ebb1e';
+import { createStreetCopy, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=fdb9ea3a';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=ddf0cba9';
+import { FEATURES } from '../public/js/features/index.js?v=537003d6';
 import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=edb00566';
 import { creatureRequests, setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=33d2b8bc';
@@ -71,8 +75,9 @@ describe('street animals: the shared paths', () => {
     const local = 1_000_000;
     const offset = 5000;
     assert.equal(pathTime({ lag: 0, holdEnd: 0 }, local, offset), local + offset - GAME_EPOCH_MS);
-    const held = pathFrom({ lag: 3000, hold: 2500 }, local);
-    assert.deepEqual(held, { lag: 3000, holdEnd: local + 2500 });
+    // The hold's end is kept on the server's clock (received at `local` with that offset).
+    const held = pathFrom({ lag: 3000, hold: 2500 }, local, offset);
+    assert.deepEqual(held, { lag: 3000, holdEnd: local + offset + 2500 });
     const at = pathTime(held, local, offset);
     assert.equal(pathTime(held, local + 2000, offset), at, 'still while held');
     assert.equal(pathTime(held, local + 3500, offset), at + 1000, 'then on again');
@@ -83,7 +88,61 @@ describe('street animals: the shared paths', () => {
     assert.equal(a, b);
   });
 
-  it('a sprite eases to its path, and jumps when it is far off', () => {
+  it('a held animal stands still whatever the clock does meanwhile (lane CHICKLOOP)', () => {
+    const local = 1_000_000;
+    const held = pathFrom({ lag: 3000, hold: 2500 }, local, 5000);
+    // A later frame was held up 200 ms on the way, then a quick one: the place does not move.
+    const at = pathTime(held, local + 100, 5000);
+    assert.equal(pathTime(held, local + 300, 4800), at);
+    assert.equal(pathTime(held, local + 900, 5050), at);
+    // The "at" a wait sends: the path's clock as the server counts it (server ms minus lag).
+    assert.equal(serverPathClock(held, local + 100, 5000), local + 5000 + 2500 - 3000);
+    assert.equal(serverPathClock({ lag: 400, holdEnd: 0 }, local, 5000), local + 5000 - 400);
+    // A frame's own "now" fixes the hold's end on the server's clock, whatever the offset reads.
+    assert.deepEqual(pathFrom({ lag: 3000, hold: 2500 }, local, 4321, 7_000_000), { lag: 3000, holdEnd: 7_002_500 });
+  });
+
+  it('the street\'s clock is the least delayed recent frame (lane CHICKLOOP)', () => {
+    const samples = [];
+    assert.equal(clockOffset(samples, 10_000, 4000), 6000);
+    // Frames held up 150 and 300 ms read late: the offset stays.
+    assert.equal(clockOffset(samples, 11_000, 5150), 6000);
+    assert.equal(clockOffset(samples, 12_000, 6300), 6000);
+    // A quicker frame than any before wins at once.
+    assert.equal(clockOffset(samples, 13_000, 6990), 6010);
+    // After the window the old frames are forgotten (the way there got slower for good).
+    assert.equal(clockOffset(samples, 50_000, 44_100), 5900);
+    assert.ok(samples.length <= 64);
+  });
+
+  it('pointing at a walker never moves it (lane CHICKLOOP: a Chicken dropped 25-53 px when a verb began)', () => {
+    // clearHoverGlow put back the y the sprite had when the pointer came over it; a Chicken or Piggy
+    // that walked up or down a slope since (followWalkFloor) went into the ground or the air.
+    const game = readFileSync(join(root, 'public/game.js'), 'utf8');
+    const fn = (name) => {
+      const i = game.indexOf(`function ${name}(`);
+      return game.slice(i, game.indexOf('\n}\n', i));
+    };
+    for (const name of ['clearHoverGlow', 'setHoverTarget']) {
+      assert.doesNotMatch(fn(name), /\.y\s*=[^=]|_hoverBaseY/, name);
+    }
+  });
+
+  it('a walker is on its path, eases back to it after a correction, and jumps when far off', () => {
+    // CHICKLOOP: within its walking pace a frame the sprite is on the path, not 4 px behind it.
+    assert.equal(followPath(100, 100.5, 1, PATH_STEP.chicken), 100.5);
+    assert.equal(followPath(100, 101.5, 2, PATH_STEP.chicken), 101.5, 'a slow frame');
+    assert.ok(Math.abs(followPath(100, 110, 1, PATH_STEP.chicken) - 101.8) < 1e-9, 'a correction eases');
+    // Behind a walking path (0.5 px a frame) it closes the gap and is on it again, not 4 px behind.
+    let x = 0;
+    let target = 10;
+    for (let k = 0; k < 90; k += 1) {
+      target += 0.5;
+      x = followPath(x, target, 1, PATH_STEP.chicken);
+      assert.ok(target - x < 10.5 && x <= target, `never past it, never further back: ${x} ${target}`);
+    }
+    assert.equal(x, target, 'on its path after a second and a half');
+    assert.equal(followPath(0, SNAP_PX + 1, 1), SNAP_PX + 1);
     assert.ok(Math.abs(easeToward(0, 10, 1) - 1.2) < 1e-9);
     assert.equal(easeToward(0, SNAP_PX + 1, 1), SNAP_PX + 1);
     assert.equal(easeToward(5, 5.1, 1), 5.1);
@@ -138,7 +197,8 @@ describe('street animals: ids and the server\'s word', () => {
     const target = { classId: 'npc_chicken', classIndex: 0, state: {} };
     const obj = { id: 'chicken:0', kind: 'chicken', classId: 'npc_chicken', state: target.state, target };
     assert.equal(reconcile(obj, copy, 1200), true);
-    assert.deepEqual(target.sharedPath, { lag: 2500, holdEnd: 2000 });
+    // The frame said now 5000: the hold ends at 5000 + 1000 on the server's clock.
+    assert.deepEqual(target.sharedPath, { lag: 2500, holdEnd: 6000 });
     copy.objs.clear();
     reconcile(obj, copy, 3000);
     assert.deepEqual(target.sharedPath, { lag: 0, holdEnd: 0 });
@@ -254,6 +314,44 @@ describe('street animals: the feature', () => {
     // The socket drops: back to the local wander.
     r.client.emit('state', { state: 'connecting' });
     assert.equal(r.chicken.sprite._path, undefined);
+  });
+
+  it('a player at a Chicken holds it from where this screen stopped it, for the whole visit (lane CHICKLOOP)', (t) => {
+    t.mock.timers.enable({ apis: ['Date'], now: 1_800_000_000_000 });
+    const r = rig();
+    let at = null;
+    r.engine.interactionTarget = () => at;
+    // The server's clock is 5 s ahead of this one; the Chicken has stood 2 s so far (lag 2000).
+    r.client.emit('msg:objs', snap({ now: Date.now() + 5000, objs: [{ id: 'chicken:1', lag: 2000, hold: 0 }] }));
+    streetObjectsFeature.onTick(16, 0, r.engine);
+    const waits = () => r.sent.filter((m) => m.t === 'obj_act' && m.verb === 'wait');
+    assert.equal(waits().length, 0, 'nobody at it');
+    // The menu opens: this screen stopped it now, on its path's clock (server ms minus lag).
+    at = r.chicken;
+    const stopped = Date.now() + 5000 - 2000;
+    streetObjectsFeature.onTick(16, 0, r.engine);
+    assert.deepEqual(waits().map((m) => [m.id, m.at]), [['chicken:1', stopped]]);
+    // The menu stays open, then a verb on it: every wait names the same stop.
+    t.mock.timers.tick(400);
+    streetObjectsFeature.onTick(16, 0, r.engine);
+    assert.equal(waits().length, 1, 'one wait every 700 ms');
+    t.mock.timers.tick(400);
+    streetObjectsFeature.onTick(16, 0, r.engine);
+    t.mock.timers.tick(800);
+    streetObjectsFeature.onTick(16, 0, r.engine);
+    assert.deepEqual(waits().map((m) => m.at), [stopped, stopped, stopped]);
+    // It walked on; the next visit stops it somewhere new.
+    at = null;
+    streetObjectsFeature.onTick(16, 0, r.engine);
+    t.mock.timers.tick(3000);
+    at = r.chicken;
+    streetObjectsFeature.onTick(16, 0, r.engine);
+    assert.equal(waits().at(-1).at, stopped + 4600);
+    // A Batterfly flies on (no wait), and only a street animal the server named is held.
+    at = r.bat;
+    t.mock.timers.tick(800);
+    streetObjectsFeature.onTick(16, 0, r.engine);
+    assert.equal(waits().length, 4);
   });
 
   it('a squeeze asks the server with the rank, and runs on its roll', () => {

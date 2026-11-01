@@ -38,7 +38,7 @@ import { TRANT_META, canHarvestTrant, fruitCapacityAt, resolveArborologyPackage 
 import { highestLightGreenThumbRank, quoteTrantCare } from './trant-care.js?v=4084db6e';
 import { RESOURCE_NODE_ALIASES, RESOURCE_NODE_CATALOG, resolveResourceSkillPackage } from './resource-nodes.js?v=4f48fd75';
 import { highestAnimalKinshipRank } from './animal-kinship.js?v=3a50bfb2';
-import { applyCreatureState, pathFrom } from './street-creatures.js?v=7b80b1ee';
+import { applyCreatureState, clockOffset, pathFrom } from './street-creatures.js?v=144ebb1e';
 
 /** The resource-node classes whose stock is shared (the "N uses left, then regrows" nodes). */
 export const SHARED_NODE_CLASSES = Object.freeze(['mortar_barnacle', 'ice_knob', 'jellisac', 'dirt_pile', 'peat_1', 'paper_tree']);
@@ -382,8 +382,9 @@ export function applyPigState(state, s, now = Date.now()) {
  */
 export function createStreetCopy() {
   // creatures: the server shares this street's animals (js/street-creatures.js), animals: which ids;
-  // offset: the server's clock minus ours (each objs frame's "now").
-  return { street: '', snap: false, none: false, objs: new Map(), version: 0, creatures: false, animals: new Set(), spots: {}, offset: 0 };
+  // offset: the server's clock minus ours, from the least delayed of the recent objs frames' "now"
+  // (clock: those frames, js/street-creatures.js clockOffset).
+  return { street: '', snap: false, none: false, objs: new Map(), version: 0, creatures: false, animals: new Set(), spots: {}, offset: 0, clock: [] };
 }
 
 /** Take one objs message; returns the ids it changed, or null when it is for another street. */
@@ -403,11 +404,11 @@ export function takeObjs(copy, msg, now = Date.now()) {
   } else if (street !== copy.street || !copy.snap) {
     return null;
   }
-  if (Number.isFinite(Number(msg.now)) && Number(msg.now) > 0) copy.offset = Number(msg.now) - now;
+  if (Number.isFinite(Number(msg.now)) && Number(msg.now) > 0) copy.offset = clockOffset(copy.clock ||= [], Number(msg.now), now);
   const ids = [];
   for (const s of Array.isArray(msg.objs) ? msg.objs : []) {
     if (!s || typeof s.id !== 'string' || !idKind(s.id)) continue;
-    copy.objs.set(s.id, { state: s, at: now });
+    copy.objs.set(s.id, { state: s, at: now, off: copy.offset, srv: Number(msg.now) > 0 ? Number(msg.now) : 0 });
     ids.push(s.id);
   }
   return ids;
@@ -416,7 +417,7 @@ export function takeObjs(copy, msg, now = Date.now()) {
 /** Take a single object's state (an obj_ok / obj_no answer). */
 export function takeObj(copy, s, now = Date.now()) {
   if (!s || typeof s.id !== 'string' || !idKind(s.id) || !copy.snap) return false;
-  copy.objs.set(s.id, { state: s, at: now });
+  copy.objs.set(s.id, { state: s, at: now, off: copy.offset });
   return true;
 }
 
@@ -458,13 +459,14 @@ export function reconcile(obj, copy, now = Date.now()) {
   } else if (obj.kind === 'chicken' || obj.kind === 'butterfly' || obj.kind === 'batterfly') {
     // An animal the server does not list is fresh: on its path from the start, nobody's egg.
     applyCreatureState(obj.classId, obj.state, s, { me: obj.me, now });
-    if (obj.target) obj.target.sharedPath = pathFrom(s, copy.objs.get(obj.id)?.at ?? now);
+    const row = copy.objs.get(obj.id);
+    if (obj.target) obj.target.sharedPath = pathFrom(s, row?.at ?? now, row?.off ?? copy.offset, row?.srv);
   } else return false;
   return true;
 }
 
 /** An obj_act message, validated the way the server will. */
-export function actMessage({ req, id, verb, perks = [], skill = '', on = '', c = '', n = 0 }) {
+export function actMessage({ req, id, verb, perks = [], skill = '', on = '', c = '', n = 0, at = 0 }) {
   const msg = { req: Math.max(1, Math.floor(Number(req) || 1)), id: String(id || ''), verb: String(verb || '') };
   const words = (perks || []).filter((p) => /^[a-z0-9_]{1,24}$/.test(p)).slice(0, 8);
   if (words.length) msg.perks = words;
@@ -475,5 +477,7 @@ export function actMessage({ req, id, verb, perks = [], skill = '', on = '', c =
     msg.c = c;
     msg.n = Math.max(1, Math.min(9999, Math.floor(Number(n) || 1)));
   }
+  // A wait: the path's clock (server ms minus lag) where this player's screen stopped the animal.
+  if (verb === 'wait' && Number.isSafeInteger(Math.round(Number(at))) && Number(at) > 0) msg.at = Math.round(Number(at));
   return msg;
 }

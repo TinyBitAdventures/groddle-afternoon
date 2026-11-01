@@ -19,6 +19,22 @@
  * holds it for everyone (the source stops an animal for the player at it, onWaitStart), and a
  * Chicken on an egg holds until it hatches.
  *
+ * Carrying on from where it stopped (lane CHICKLOOP, Austin 2026-11-01: "I'm still seeing chickens
+ * jump around. I think interacting with them messes with their loop"): the source's Chicken stops
+ * where it stands while a player is at it and walks on from there (npc_chicken.js onWaitStart
+ * 1635-1643 apiStopMoving, onWaitEnd 1626-1633 startMoving; its npc parts onInteractionStarting
+ * 1986-1995, onInteractionEnding 1967-1973; squeeze 773-774 stopMoving, onSqueezeComplete
+ * 1579-1585 startMoving). So the page:
+ *   - keeps one clock for the street (clockOffset: the least delayed frame of the last 30 s, so a
+ *     frame held up on the way no longer moves every animal back and forth);
+ *   - keeps a hold's end on the server's clock (pathFrom), so an animal standing still stands
+ *     still, whatever frame came in since;
+ *   - draws a walker on its path, not a few px behind it (followPath: exact while the path moves
+ *     at its walking pace, eased only to catch up after a real correction), so the place the menu
+ *     stopped it is the place on its path;
+ *   - tells the server where its screen stopped the animal ("at" on the wait, the path's clock), so
+ *     the hold starts there for everyone, not a trip later (objects_creatures.go waitCreature).
+ *
  * Ids are the spawn index, the same as the Rook's keys (js/rook-attack.js rookKeyFor):
  * chicken:<i>, butterfly:<i> (the resting ones, then the flyers), batterfly:<i> (husbandryKey).
  * Released and raised animals (husbandryAnimal) and the yard's stay each player's own.
@@ -47,6 +63,26 @@ export const CREATURE_PATHS = Object.freeze({
 /** Beyond this far from its path a sprite jumps there instead of easing (a flyer wrapping round). */
 export const SNAP_PX = 260;
 
+/** How long the street's clock remembers a frame (clockOffset), and how many frames at most. */
+export const CLOCK_WINDOW_MS = 30000;
+const CLOCK_SAMPLES = 64;
+
+/**
+ * The street's clock: server ms minus local ms. Each "objs" frame carries the server's "now"; a
+ * frame that was held up on the way reads late, so the offset is the largest (the least delayed)
+ * of the frames seen in the last CLOCK_WINDOW_MS. `samples` is the copy's list ([localMs, offset]
+ * pairs), kept here. Returns the offset.
+ */
+export function clockOffset(samples, serverNow, localNow, windowMs = CLOCK_WINDOW_MS) {
+  const off = Number(serverNow) - Number(localNow);
+  if (!Number.isFinite(off)) return samples.length ? Math.max(...samples.map((s) => s[1])) : 0;
+  samples.push([Number(localNow), off]);
+  while (samples.length && (samples[0][0] < localNow - windowMs || samples.length > CLOCK_SAMPLES)) samples.shift();
+  let best = -Infinity;
+  for (const s of samples) if (s[1] > best) best = s[1];
+  return best;
+}
+
 export function creatureId(kind, index) {
   return `${kind}:${index}`;
 }
@@ -73,14 +109,20 @@ export const CREATURE_VERBS = Object.freeze({
 });
 
 /**
- * The street's clock as the client keeps it: offset is server ms minus local ms (from each "objs"
- * frame's "now"). An animal's path time (ms) at local time `local`: frozen while it is held.
+ * The street's clock as the client keeps it: offset is server ms minus local ms (clockOffset). An
+ * animal's path time (ms) at local time `local`: frozen while it is held. holdEnd is on the
+ * server's clock (pathFrom), so a held animal stands still whatever the offset does meanwhile.
  */
 export function pathTime(path, local, offset = 0) {
   const lag = Math.max(0, Number(path?.lag) || 0);
   const holdEnd = Number(path?.holdEnd) || 0;
   // The server's path clock: (now < holdEnd ? holdEnd : now) - lag, where lag already counts the hold.
-  return Math.max(local, holdEnd) + offset - lag - GAME_EPOCH_MS;
+  return Math.max(local + offset, holdEnd) - lag - GAME_EPOCH_MS;
+}
+
+/** The path's clock as the server counts it (server ms minus lag), for the "at" of a wait. */
+export function serverPathClock(path, local, offset = 0) {
+  return Math.round(pathTime(path, local, offset) + GAME_EPOCH_MS);
 }
 
 function mod(a, n) {
@@ -305,10 +347,36 @@ export function easeToward(current, target, dt = 1) {
   return current + d * Math.min(1, 0.12 * Math.max(0, dt));
 }
 
-/** The path a target follows, from its server state (lag, hold) received at local time `at`. */
-export function pathFrom(s, at = Date.now()) {
+/**
+ * The most a path moves in a frame (px at 60 fps), per kind: a Chicken walks 0.5 px a frame, a
+ * flyer drifts 0.65 px and bobs under 0.9 px; a little over, for a slow frame's rounding.
+ */
+export const PATH_STEP = Object.freeze({ chicken: 0.8, fly: 1.2 });
+
+/**
+ * A sprite on its path: where the path moved no more than its walking pace this frame, the sprite
+ * is on it (no trailing a few px behind, so it stops, turns and walks on where the path does).
+ * Further off (the path was corrected, a hold began where another screen stopped it, the Rook let
+ * it go) it goes its walking pace plus a tenth of the gap a frame, so it closes the gap and is on
+ * its path again in a second or so (a plain ease would trail a walking path by 4 px for good), and
+ * jumps when far off.
+ */
+export function followPath(current, target, dt = 1, step = PATH_STEP.chicken) {
+  const d = target - current;
+  const f = Math.max(1, Number(dt) || 1);
+  if (!Number.isFinite(d) || Math.abs(d) > SNAP_PX || Math.abs(d) <= step * f) return target;
+  return current + Math.sign(d) * Math.min(Math.abs(d), step * f + Math.abs(d) * Math.min(1, 0.1 * f));
+}
+
+/**
+ * The path a target follows, from its server state (lag, hold) received at local time `at`: the
+ * hold's end is kept on the server's clock, from the frame's own "now" when it had one
+ * (`serverNow`), else from the street's clock offset then.
+ */
+export function pathFrom(s, at = Date.now(), offset = 0, serverNow = 0) {
   const hold = Math.max(0, Number(s?.hold) || 0);
-  return { lag: Math.max(0, Number(s?.lag) || 0), holdEnd: hold > 0 ? at + hold : 0 };
+  const base = Number(serverNow) > 0 ? Number(serverNow) : at + (Number(offset) || 0);
+  return { lag: Math.max(0, Number(s?.lag) || 0), holdEnd: hold > 0 ? base + hold : 0 };
 }
 
 function count(v) {

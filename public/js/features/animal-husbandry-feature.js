@@ -103,7 +103,7 @@ import {
   stepHogtie,
   stickPlaceState,
 } from '../animal-husbandry.js?v=ef8ed409';
-import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=7b80b1ee';
+import { batterflyBaseY, batterflyResponseFor, flightFloorFor } from '../street-creatures.js?v=144ebb1e';
 import { loseEnergy, shiftMetabolic } from '../metabolics.js?v=8504134e';
 import { textureFromUrl } from '../textures.js?v=db2ce452';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js?v=a49495fc';

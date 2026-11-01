@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=b351d7cb';
 import { createFeatureHost } from './js/feature-host.js?v=e4f648b1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=cf7e5ce9';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=537003d6';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=3990ddea';
 import { firstTendKey, stepTendKey, tendKeyAction } from './js/garden-tend.js?v=beb9a657';
 import { avatarHitBox, behindFloor, OUT_OF_REACH_LINE } from './js/reach.js?v=4187d746';
@@ -884,7 +884,7 @@ import {
   ANIMAL_PATROL,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=7fbae08d';
-import { easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=7b80b1ee';
+import { easeToward, flightFloorAt, flightFloorFor, flyerLift } from './js/street-creatures.js?v=144ebb1e';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js?v=d62791a6';
 import {
   actionLoopFor,
@@ -6320,10 +6320,10 @@ function clearHoverGlow() {
     }
   }
   t._hoverGlow = null;
-  if (t.sprite && !t.sprite.destroyed) {
-    t.sprite.tint = 0xffffff;
-    if (t._hoverBaseY != null) t.sprite.y = t._hoverBaseY;
-  }
+  // Only the tint: nothing lifts a hovered sprite now, and putting back the y it had when the
+  // pointer came over it dropped a Chicken or Piggy that had walked up or down a slope since
+  // (game.js followWalkFloor) into the ground or the air (lane CHICKLOOP, Austin 2026-11-01).
+  if (t.sprite && !t.sprite.destroyed) t.sprite.tint = 0xffffff;
   hoverTarget = null;
 }
 
@@ -6337,7 +6337,6 @@ function setHoverTarget(target) {
   if (!target?.sprite || target.sprite.destroyed || !entityLayer) return;
   hoverTarget = target;
   const spr = target.sprite;
-  target._hoverBaseY = spr.y;
 
   const outline = createSpriteOutline(spr, { color: 0xa8e4ff, thickness: 2 });
   // Insert just below the sprite in the child list, then rely on zIndex sort

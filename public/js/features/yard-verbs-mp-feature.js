@@ -84,7 +84,7 @@ import { countItem, removeItem } from '../inventory.js?v=b0e33301';
 import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=4806e3e8';
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=4f48fd75';
 import { getGameDayKey } from '../game-day.js?v=edb00566';
-import { rockReady } from '../street-objects.js?v=fa4c33c2';
+import { rockReady } from '../street-objects.js?v=fdb9ea3a';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=59cfa106';
 import {
   ROCK_RESPAWN_MS,
