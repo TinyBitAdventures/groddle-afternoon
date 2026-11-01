@@ -30,7 +30,7 @@
  * Canvas: crabs, crabLast, crabClip, crabOutcome, crabMemory, crabTalk.
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1b2de668';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=7fe91266';
 import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=b0e33301';
 import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js?v=da091c51';
 import { energyMax, loseMood, metabolicGain, moodMax, shiftMetabolic } from '../metabolics.js?v=8504134e';

@@ -37,13 +37,13 @@ import {
   packMakeState,
   roomMachineState,
   setMachineArtFrame,
-} from '../public/js/machine-art.js?v=0fb7a5ca';
+} from '../public/js/machine-art.js?v=12dc2bc3';
 import { MACHINE_IDS } from '../public/js/machines.js?v=0641eeaa';
 import { MACHINE_EXTRA_WAIT_MS, machineTank, tankFuel } from '../public/js/machine-rooms.js?v=1e082003';
 import { craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=20d5364b';
 import { platformsScreen } from '../public/js/street-model.js?v=505d8990';
-import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=7db84173';
-import { machineArtFeature } from '../public/js/features/machine-art-feature.js?v=93abe5b1';
+import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=a294ee5a';
+import { machineArtFeature } from '../public/js/features/machine-art-feature.js?v=abce1e76';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');

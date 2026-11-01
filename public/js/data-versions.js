@@ -2340,6 +2340,7 @@
       "assets/sprites/npc_butterfly__x1_fly-side_png_1354829525@3x.webp": "845628e3",
       "assets/sprites/npc_butterfly__x1_rest-angle1_png_1354829530@3x.webp": "89e8d833",
       "assets/sprites/npc_piggy__x1_chew_png_1354829433@3x.webp": "3a0199b1",
+      "assets/sprites/npc_piggy__x1_look_screen_png_1354829434@3x.webp": "2c72821a",
       "assets/sprites/npc_piggy__x1_too_much_nibble_png_1354829441@3x.webp": "3e71b34b",
       "assets/sprites/overlays/321_countdown.frames.json": "fa76fea3",
       "assets/sprites/overlays/avatar_power_up.frames.json": "7a20e148",
