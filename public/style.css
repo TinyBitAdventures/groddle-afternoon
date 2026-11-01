@@ -5215,15 +5215,22 @@ body.buff-purple-pulse::after {
   gap: 0;
   margin-left: auto;
 }
+/* More tools than fit scroll sideways with no scrollbar: a bar drawn over the strip covered the
+   tool names (Safari, 2026-11-01). A trackpad swipe, touch, a vertical wheel and a mouse drag scroll
+   it (js/ui/drag-scroll.js), the fade below says there is more, and the picked tool glides into view. */
 .glitch-modal-tabs.make-tool-tabs {
   flex: 1 1 100%;
   order: 3;
   max-width: 100%;
   overflow-x: auto;
+  overflow-y: hidden;
   padding: 0 0 var(--sp-2);
-  scrollbar-width: thin;
-  scroll-behavior: smooth;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
 }
+.glitch-modal-tabs.make-tool-tabs::-webkit-scrollbar { display: none; }
+.glitch-modal-tabs.make-tool-tabs.is-dragging { cursor: grabbing; user-select: none; -webkit-user-select: none; }
+.glitch-modal-tabs.make-tool-tabs.is-dragging .make-tool-chip { cursor: grabbing; }
 /* More tools than fit: the strip scrolls sideways under a fade pinned to its right edge (the card's
    colour, never fully opaque), so the next tool still peeks in. The fade's own place is after the
    last tool, so scrolled to the end nothing is faded. */

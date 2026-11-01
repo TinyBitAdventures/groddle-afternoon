@@ -903,6 +903,7 @@ import { wholeStatAmounts, wholeEffects } from './js/stat-text.js?v=f96d8fd3';
 import { createNotifier, effectTokens, floatKey, offerCardDrop, stackFloat, tokenText } from './js/notify.js?v=d85330ff';
 import { mountNotifyView } from './js/notify-view.js?v=81d06119';
 import { mountSocialDrawer } from './js/ui/social-drawer.js?v=bee1328e';
+import { bindDragScroll } from './js/ui/drag-scroll.js?v=9a527ac8';
 import { SIDE_SHEET_IDS, bindTabs, inSideSheet, mountPanelShell, sheetKeyToWorld } from './js/ui/panel-shell.js?v=3309a3d9';
 import { createQuestSheet, questStep } from './js/ui/quest-sheet.js?v=2a704f05';
 import { createQuestTracker } from './js/ui/quest-tracker.js?v=e2899b11';
@@ -23954,6 +23955,9 @@ function renderMakePanel() {
   }
 
   if (toolsEl) {
+    // Rebuilt on every pick: keep where the strip was scrolled, so the picked tool glides into
+    // view from where it was instead of the strip jumping back to its start first.
+    const stripLeft = toolsEl.scrollLeft;
     toolsEl.innerHTML = '';
     // Owned tools first: the original opened recipes from a tool in the pack,
     // so the 28-tool catalog leads with what the player can actually use.
@@ -23979,8 +23983,10 @@ function renderMakePanel() {
       });
       toolsEl.appendChild(btn);
     }
+    toolsEl.scrollLeft = stripLeft;
     requestAnimationFrame(() => {
       toolsEl.querySelector('.make-tool-chip.active')?.scrollIntoView({
+        behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
         block: 'nearest',
         inline: 'center',
       });
@@ -27415,6 +27421,8 @@ async function main() {
     else openMakePanel();
   });
   document.getElementById('make-close')?.addEventListener('click', closeMakePanel);
+  // The tool strip has no scrollbar (it covered the tool names): wheel and mouse drag scroll it.
+  bindDragScroll(document.getElementById('make-tools'));
   document.getElementById('make-search')?.addEventListener('input', (event) => {
     makeSearchQuery = event.target.value || '';
     makeSelected = null;
