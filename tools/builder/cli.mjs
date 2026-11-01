@@ -15,7 +15,7 @@
  * Commands (spec 8.2): drafts; new; pull; push; street add | fork; place; set; rm; platform; wall;
  * ladder; signpost; connect; link-world; populate; hub map; ops; decos; style; guide; validate;
  * render; asset add; play; history; restore; publish; sign. Zone ambient effects (spec 15 Q12):
- * effect, rumble, effects. `cli.mjs help` lists them.
+ * effect, rumble, effects. Standing a street on the ground (lane GROUNDED): ground. `cli.mjs help` lists them.
  *
  * Exit status: 0 done; 1 validate (or publish) found an error or a fatal finding; 2 refused or wrong usage.
  */
@@ -27,13 +27,14 @@ import { GAME_DIR } from '../repos.mjs';
 import { signKey, parseKey, parseEnv, configDir, canonicalQuery } from './sign.mjs';
 import { catalog, searchDecos, styleProfile, styleProfiles } from './catalog.mjs';
 import { builderGuide } from './guide.mjs';
-import { applyOps, applyOp, nextDecoId, nextGeometryId, findGeometry, findDeco, GEOMETRY, OpError, OP_NAMES } from '../../public/js/builder/ops.js?v=acf30407';
+import { applyOps, applyOp, nextDecoId, nextGeometryId, findGeometry, findDeco, GEOMETRY, OpError, OP_NAMES } from '../../public/js/builder/ops.js?v=27c7796f';
 import { forkStreet, forkOps, newTsid, libraryAsset, linkEdit, editsOn } from '../../public/js/builder/zone.js?v=6a3db28e';
 import { newStreet, newStreetOps, newHub, nextHubId, mapWithStreet, mapWithoutStreet, TEMPLATES, DEFAULT_MAP_COLOURS } from '../../public/js/builder/templates.js?v=22093310';
 import { arriveFor, newConnect, POST_W, POST_H, LADDER_W } from '../../public/js/builder/geometry-handles.js?v=d39231a4';
-import { arrivalOps, settlePostOps, followPostOps } from '../../public/js/builder/posts.js?v=ebcf627c';
+import { arrivalOps, settlePostOps, followPostOps } from '../../public/js/builder/posts.js?v=3db41b1f';
 import { platformsScreen, isStandable } from '../../public/js/street-model.js?v=23b926e5';
 import { DECO_TWINS } from '../../public/js/street-render.js?v=b5ae0c3d';
+import { groundOps, floatingLines, FLOAT_REACH } from '../../public/js/builder/ground.js?v=6e2ebe6b';
 import { EFFECT_KINDS, EFFECT_DEFAULTS, EFFECT_LIMITS, RUMBLE_DEFAULTS, effectsCost, normaliseEmitter, rumbleShare } from '../../public/js/street-effects.js?v=e427650f';
 
 export const PERM_WORDS = Object.freeze({ floor: -1, roof: 1, soft: 0, hard: null });
@@ -433,6 +434,46 @@ export function newArtFilterNote(zone, key, layerId, sprite) {
 }
 
 /**
+ * PURE: a sprite's drawn size for the ground command (lane GROUNDED): the zone's own art at half its
+ * kept 2x file, a library deco at its median drawn size (else half its 2x size). Null when unknown.
+ */
+export function drawnSize(zone, sprite, rows = catalog()) {
+  const own = zone.assets?.[sprite];
+  if (own?.origin === 'new' && Number(own.w) > 0 && Number(own.h) > 0) return { w: Number(own.w) / 2, h: Number(own.h) / 2 };
+  const art = rows.find((d) => d.name === sprite || d.name === DECO_TWINS[sprite]);
+  if (!art) return null;
+  if (art.drawn?.w_med > 0 && art.drawn?.h_med > 0) return { w: art.drawn.w_med, h: art.drawn.h_med };
+  return art.size2 ? { w: art.size2[0] / 2, h: art.size2[1] / 2 } : null;
+}
+
+/** PURE: the ground command's ops for one street, made ready to send (ids, library provenance rows). */
+export function groundStreetOps(zone, key, { floor = null, support = null, wall = null } = {}, rows = catalog()) {
+  try {
+    const r = groundOps(zone, key, { floor, support, wall, size: (s) => drawnSize(zone, s, rows) });
+    return { ops: prepareOps(zone, r.ops, rows), done: r.done };
+  } catch (e) {
+    if (e instanceof CliError) throw e;
+    throw new CliError(e.message, { code: e.code || 'builder_invalid' });
+  }
+}
+
+const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+/** PURE: words for what the ground command did. */
+export function groundWords(key, done, left) {
+  const parts = [];
+  const f = done.floor;
+  if (f.lines) parts.push(`floor: ${plural(f.lines, 'line')}${f.laid ? `, ${f.laid} ground pieces laid` : ''}${f.stretched ? `, ${f.stretched} pieces run past the bottom edge` : ''}${!f.laid && !f.stretched ? ', already reaching the bottom edge' : ''}`);
+  if (done.supports.length) parts.push(`supports under ${done.supports.join(', ')}`);
+  if (done.walls.length) parts.push(`walls behind ${done.walls.join(', ')}`);
+  if (done.high.length) parts.push(`high lines left floating (no --wall): ${done.high.join(', ')}`);
+  if (done.floating.length) parts.push(`still floating: ${done.floating.join(', ')}`);
+  if (done.removed) parts.push(`replaced ${plural(done.removed, 'earlier piece')}`);
+  if (left?.length) parts.push(`ART-001 left: ${left.map((x) => x.id).join(', ')}`);
+  return `${key}: ${parts.join('; ') || 'nothing to do'}`;
+}
+
+/**
  * PURE: two-way signposts between two of the zone's streets (spec 8.7 `connect`): a post at each
  * facing end (A's right end, B's left end) on the highest floor there, unless posts are named; the
  * arms carry the target's label and hub, and arrive where build-street-navigation.mjs would put them.
@@ -674,8 +715,6 @@ function findingLine(f) {
   return `${f.severity.padEnd(5)} ${f.rule} ${f.at}  ${f.message}${f.fix ? `\n        ${f.fix}` : ''}`;
 }
 
-const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
-
 export const HELP = `Groddle level builder (docs/level-builder/spec.md 8.2)
   node tools/builder/cli.mjs <command> [args] [--json] [--draft <id> | file:<zone.json>]
 
@@ -698,6 +737,10 @@ export const HELP = `Groddle level builder (docs/level-builder/spec.md 8.2)
   effect --street k --kind steam|lava|embers --x --y [--layer middleground] [--rate --size --height --spread]
          [--period 6,10 --burst 3 | --always] [--sprite gz_x]   a zone ambient effect (set/rm it by its fx_ id)
   rumble --street k [--every 14,30 --duration 1.6 --strength 6 --quiet] | --off   the street's earthquake rumble
+  ground --street k [--floor gz_x] [--support gz_y] [--wall gz_z] [--dry-run]   stand a street on the ground: floor art
+                                              past the bottom edge, supports under low ledges (ART-001), walls behind high ones;
+                                              re-runnable (replaces its own pieces)
+  ground --ledges grounded|floating           the zone's choice: floating zones get no ART-001
   effects [--street k]                        each street's effects, rumble and cost against the limits
   ops <file.json>                             apply a batch atomically
   decos <query> [--layer sky] [--hub 58] [--limit 20]    style [hub-58|default]    guide
@@ -1019,6 +1062,37 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       return { out, text: text || 'No streets.', exit: 0 };
     }
 
+    case 'ground': {
+      // Lane GROUNDED: stand a street on the ground (js/builder/ground.js), or set the zone's choice.
+      if (typeof flags.ledges === 'string' && flags.street === undefined) {
+        if (!['grounded', 'floating'].includes(flags.ledges)) throw new CliError('--ledges is grounded or floating.');
+        const r = await target().write(() => [{ op: 'zone.set', set: { ledges: flags.ledges } }], `ledges ${flags.ledges}`);
+        return wrote(r, { ledges: flags.ledges }, `ledges ${flags.ledges}`);
+      }
+      const key = flags.street;
+      if (typeof key !== 'string') throw new CliError('ground --street <key> [--floor gz_x] [--support gz_y] [--wall gz_z] [--dry-run], or ground --ledges grounded|floating.');
+      const pick = { floor: typeof flags.floor === 'string' ? flags.floor : null, support: typeof flags.support === 'string' ? flags.support : null, wall: typeof flags.wall === 'string' ? flags.wall : null };
+      const t = target();
+      const leftOf = (zone) => (zone.ledges === 'floating' ? [] : floatingLines(streetOf(zone, key).street).map((f) => ({ id: f.id, open: f.open, gap: f.gap })));
+      if (flags['dry-run']) {
+        const { zone } = await t.zone();
+        const { ops, done } = groundStreetOps(zone, key, pick);
+        const after = clone(zone);
+        applyOps(after, clone(ops));
+        const left = leftOf(after);
+        return { out: { dryRun: true, ops: ops.length, done, left, reach: FLOAT_REACH }, text: `dry run: ${ops.length} ops\n${groundWords(key, done, left)}`, exit: 0 };
+      }
+      let done = null;
+      const r = await t.write((zone) => {
+        const g = groundStreetOps(zone, key, pick);
+        done = g.done;
+        return g.ops;
+      }, `ground ${key}`);
+      const { zone: after } = await t.zone();
+      const left = leftOf(after);
+      return { out: { rev: r.rev, ops: r.ops.length, done, left, reach: FLOAT_REACH }, text: `rev ${r.rev}  ${groundWords(key, done, left)}`, exit: 0 };
+    }
+
     case 'hub': {
       if (args[0] !== 'map') throw new CliError('hub map --street k --line x1,y1,x2,y2');
       return wrote(await target().write((zone) => hubMapOps(zone, flags.street, flags.line), 'hub map'));
@@ -1058,7 +1132,7 @@ export async function run(argv, { env = process.env, fetchImpl = globalThis.fetc
       let report;
       let rev;
       if (local()) {
-        const { validateZone } = await import('../../public/js/builder/validate.js?v=b77d4848');
+        const { validateZone } = await import('../../public/js/builder/validate.js?v=f217d6fa');
         const { loadValidatorContext } = await import('./validator-context.mjs');
         const zone = readJson(resolve(flags.file));
         rev = zone.rev;

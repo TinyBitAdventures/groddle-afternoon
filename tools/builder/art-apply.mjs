@@ -29,7 +29,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { applyOps } from '../../public/js/builder/ops.js?v=acf30407';
+import { applyOps } from '../../public/js/builder/ops.js?v=27c7796f';
 import { newHub, nextHubId } from '../../public/js/builder/templates.js?v=22093310';
 import { isStandable } from '../../public/js/street-model.js?v=23b926e5';
 

@@ -219,6 +219,8 @@ describe('catalog, style and guide', () => {
     assert.ok(g.rules.some((r) => r.id === 'PHY-003' && r.severity === 'error'));
     assert.ok(g.ops.includes('deco.add'));
     assert.equal(g.limits.ratesPerMinute.render, 20);
+    assert.ok(g.rules.some((r) => r.id === 'ART-001' && r.severity === 'warn' && r.title === 'Floats'));
+    assert.equal(g.ground.reach, 450);
   });
 });
 
@@ -271,5 +273,81 @@ describe('a draft on the site (signed REST, faked here)', () => {
   it('sign prints the header for a request', async () => {
     const r = await cli('sign', 'POST', '/groddle/v1/admin/builder/drafts/x/publish-request', '{"note":"ready"}');
     assert.match(r.out.header, /^a{16}\.\d+\.[0-9a-f]{16}\.[A-Za-z0-9_-]{43}$/);
+  });
+});
+
+describe('ground: standing a street on the ground (lane GROUNDED, js/builder/ground.js)', () => {
+  const gfile = join(dir, 'ground.json');
+  const row = (w, h) => ({ origin: 'new', licence: 'own-work-CC0', author: 'Test', sha256: 'a'.repeat(64), w, h, intake: 'in-0000000000000000' });
+  const groundZone = () => ({
+    format: 'groddle-zone/1', id: 'ground-test', title: 'Ground Test', rev: 1, edits: [],
+    assets: { gz_ledge: row(840, 204), gz_floor: row(1200, 480), gz_rock: row(400, 400), gz_cliff: row(800, 1000) },
+    streets: [{ key: 'k', street: {
+      tsid: 'GZTEST000000003', label: 'Ground Test', bounds: { l: -1000, r: 1000, t: -1500, b: 0 },
+      platforms: [
+        { id: 'plat_1', x1: -990, y1: -60, x2: 990, y2: -60, pc_perm: -1 },
+        { id: 'plat_2', x1: -200, y1: -240, x2: 200, y2: -240, pc_perm: -1 },
+        { id: 'plat_3', x1: 300, y1: -800, x2: 700, y2: -800, pc_perm: -1 },
+      ],
+      layers: [{ id: 'middleground', name: 'middleground', z: 0, decos: [
+        { id: 'd_1', sprite: 'gz_floor', x: -500, y: -10, w: 1000, h: 52, z: 5, r: 0 },
+        { id: 'd_2', sprite: 'gz_floor', x: 500, y: -10, w: 1000, h: 52, z: 5, r: 0 },
+        { id: 'd_3', sprite: 'gz_ledge', x: 0, y: -140, w: 420, h: 102, z: 6, r: 0 },
+        { id: 'd_4', sprite: 'gz_ledge', x: 500, y: -700, w: 420, h: 102, z: 6, r: 0 },
+      ] }],
+      signposts: [], ladders: [{ id: 'ladder_1', x: 120, y: -60, w: 50, h: 180 }],
+    } }],
+  });
+  const decos = () => JSON.parse(readFileSync(gfile, 'utf8')).streets[0].street.layers[0].decos;
+
+  it('runs the floor past the bottom edge, stands the low ledge on supports clear of the ladder, leaves the high one; again replaces its own', async () => {
+    writeFileSync(gfile, JSON.stringify(groundZone()));
+    const dry = await cli('ground', '--street', 'k', '--support', 'gz_rock', '--dry-run', `file:${gfile}`);
+    assert.equal(dry.out.dryRun, true);
+    assert.equal(decos().length, 4, 'a dry run writes nothing');
+    const r = await cli('ground', '--street', 'k', '--support', 'gz_rock', `file:${gfile}`);
+    assert.equal(r.exit, 0);
+    assert.deepEqual(r.out.done.supports, ['plat_2']);
+    assert.deepEqual(r.out.done.high, ['plat_3'], 'no --wall: the high ledge floats (the brief\'s choice)');
+    assert.equal(r.out.done.floor.stretched, 2);
+    assert.deepEqual(r.out.left, []);
+    const d = decos();
+    for (const f of d.filter((x) => x.sprite === 'gz_floor')) assert.equal(f.y, 40, 'the floor art reaches 40 px past the bottom edge');
+    const sup = d.filter((x) => x.name === 'ground:support');
+    assert.ok(sup.length >= 1);
+    for (const s of sup) {
+      assert.equal(s.z, 4, 'behind everything on the middleground');
+      assert.ok(s.x + s.w / 2 <= 95 || s.x - s.w / 2 >= 145, `clear of the ladder: ${s.x - s.w / 2}..${s.x + s.w / 2}`);
+      assert.ok(s.x - s.w / 2 >= -200 + 60 - 1 && s.x + s.w / 2 <= 200 - 60 + 1, 'in from the ledge\'s ends');
+    }
+    assert.equal(Math.min(...sup.map((s) => s.y - s.h)), -240 + 24, 'its top just under the walkable surface');
+    assert.equal(Math.max(...sup.map((s) => s.y)), -60 + 16, 'its foot just into the floor');
+    assert.equal(d.indexOf(sup[0]), 0, 'drawn first');
+    const again = await cli('ground', '--street', 'k', '--support', 'gz_rock', `file:${gfile}`);
+    assert.equal(again.out.done.removed, sup.length);
+    assert.equal(decos().filter((x) => x.name === 'ground:support').length, sup.length);
+  });
+
+  it('--wall puts a wall behind a high ledge; --floor lays a ground piece down past the bottom edge; --ledges floating', async () => {
+    writeFileSync(gfile, JSON.stringify(groundZone()));
+    const r = await cli('ground', '--street', 'k', '--support', 'gz_rock', '--wall', 'gz_cliff', '--floor', 'gz_floor', `file:${gfile}`);
+    assert.deepEqual(r.out.done.walls, ['plat_3']);
+    const d = decos();
+    assert.ok(!d.some((x) => x.id === 'd_1' || x.id === 'd_2'), 'the old floor art went');
+    const floor = d.filter((x) => x.name === 'ground:floor');
+    assert.ok(floor.length >= 3);
+    for (const f of floor) {
+      assert.equal(f.y - f.h, -62, 'its top on the floor line');
+      assert.equal(f.h, 240, 'at its own shape (600 x 240 drawn), which already runs past the bottom edge');
+    }
+    const walls = d.filter((x) => x.name === 'ground:wall');
+    assert.equal(Math.min(...walls.map((w) => w.y - w.h)), -800 - 160);
+    assert.equal(Math.max(...walls.map((w) => w.y)), -60 + 16);
+    const v = await cli('validate', '--rule', 'ART-', `file:${gfile}`);
+    assert.equal(v.out.counts.warn, 0);
+    await assert.rejects(cli('ground', '--street', 'k', '--support', 'gz_nothing', `file:${gfile}`), /No art "gz_nothing" for --support/);
+    const f = await cli('ground', '--ledges', 'floating', `file:${gfile}`);
+    assert.equal(f.out.ledges, 'floating');
+    assert.equal(JSON.parse(readFileSync(gfile, 'utf8')).ledges, 'floating');
   });
 });

@@ -15,7 +15,7 @@
  *   now stands (was cli.mjs's; the editor uses it after carrying or settling posts).
  */
 import { isStandable, platformsScreen, isBuriedSignpost } from '../street-model.js?v=23b926e5';
-import { applyOps } from './ops.js?v=acf30407';
+import { applyOps } from './ops.js?v=27c7796f';
 import { arriveFor } from './geometry-handles.js?v=d39231a4';
 
 /** How far (px) a post's foot may be from its floor before it is off it: over it, and sunk into it. */

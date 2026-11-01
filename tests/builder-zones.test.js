@@ -16,9 +16,9 @@ import { populationWith, plannedSpots, moveMapLine, mapForStreets, spotGroup } f
 import { intakeBody, base64Of } from '../public/js/builder/editor-picker.js?v=724352b6';
 import { streetWithEdits, editsOn, linkEdit, streetStats } from '../public/js/builder/zone.js?v=6a3db28e';
 import { applyZoneEdits } from '../public/js/builder/draft-play.js?v=20951b6d';
-import { applyOps } from '../public/js/builder/ops.js?v=acf30407';
+import { applyOps } from '../public/js/builder/ops.js?v=27c7796f';
 import { compileSchema } from '../public/js/builder/schema-check.js?v=cc9d1af4';
-import { validateZone, placementRequests } from '../public/js/builder/validate.js?v=b77d4848';
+import { validateZone, placementRequests } from '../public/js/builder/validate.js?v=f217d6fa';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=23b926e5';
 import { populationForStreet, planStreetPlacements, streetReservedSpots } from '../public/js/street-ecology.js?v=315ff68c';
 import { arriveFor } from '../public/js/builder/geometry-handles.js?v=d39231a4';

@@ -7,7 +7,7 @@
  * and at publish) or `rev` (the store's).
  *
  * P1 ops (a street is named by its key, a deco or layer by its id):
- *   zone.set     { set: {title?, notes?}, unset?: [..], order?: [..] }
+ *   zone.set     { set: {title?, notes?, ledges?}, unset?: [..], order?: [..] }
  *   hub.set      { hub: {...} | null }
  *   asset.set    { name, asset: {...} | null }
  *   street.add   { street: <key>, draftStreet: {key, street, population?, editor?}, at? }
@@ -72,7 +72,7 @@ export const OP_NAMES = Object.freeze([
 export const STREET_FIELDS = Object.freeze(['label', 'internalLabel', 'hubId', 'hubName', 'gradient', 'musicFile', 'noMap', 'fogMap', 'bounds', 'rumble']);
 export const LAYER_FIELDS = Object.freeze(['name', 'z', 'w', 'h', 'hidden', 'filters']);
 export const DECO_FIELDS = Object.freeze(['sprite', 'name', 'signText', 'x', 'y', 'w', 'h', 'z', 'r', 'flip', 'hidden', 'animated']);
-const ZONE_FIELDS = Object.freeze(['title', 'notes']);
+const ZONE_FIELDS = Object.freeze(['title', 'notes', 'ledges']);
 
 /** Geometry kinds: the street list each lives in, its id prefix and the fields an op may set. */
 export const GEOMETRY = Object.freeze({

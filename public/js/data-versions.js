@@ -123,7 +123,7 @@
       "assets/content/street-ecology.json": "6b83824c",
       "assets/content/style-profiles.json": "3aaf04c4",
       "assets/content/trade-items.json": "fae9f290",
-      "assets/content/zone.schema.json": "6c4a14c3",
+      "assets/content/zone.schema.json": "b3a553b8",
       "assets/decos/animated/Glints_3.json": "1f110e8e",
       "assets/decos/animated/Glints_3.webp": "9942c793",
       "assets/decos/animated/Glints_5.json": "fdc67c59",

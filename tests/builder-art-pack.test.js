@@ -21,7 +21,7 @@ import { swapOps, copyZone, lineUnder } from '../tools/builder/art-apply.mjs';
 import {
   generate, pickAspect, pickSize, buildRequest, extractImage, correctiveLine, isHardQuota, DEFAULT_MODEL, WIDE_RATIOS, BASE_RATIOS,
 } from '../tools/builder/art-generate.mjs';
-import { applyOps } from '../public/js/builder/ops.js?v=acf30407';
+import { applyOps } from '../public/js/builder/ops.js?v=27c7796f';
 
 const root = join(import.meta.dirname, '..');
 const json = (p) => JSON.parse(readFileSync(join(root, p), 'utf8'));

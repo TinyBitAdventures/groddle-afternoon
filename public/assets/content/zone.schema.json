@@ -26,6 +26,7 @@
       "pattern": "^[0-9a-f]{7,40}$"
     },
     "notes": { "type": "string", "maxLength": 4000 },
+    "ledges": { "description": "How the zone's ledges stand (lane GROUNDED): grounded, the default, on supports, walls or the floor (the validator's ART-001 warns about a low ledge with open space under it); floating, for a place that floats on purpose (heights, clouds), and ART-001 stays quiet.", "enum": ["grounded", "floating"] },
     "hub": { "$ref": "#/$defs/hub" },
     "streets": {
       "type": "array",

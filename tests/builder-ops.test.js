@@ -10,7 +10,7 @@ import { describe, it } from 'node:test';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { GEOMETRY, OP_NAMES, OpError, applyOp, applyOps, nextDecoId, nextGeometryId, opsSummary } from '../public/js/builder/ops.js?v=acf30407';
+import { GEOMETRY, OP_NAMES, OpError, applyOp, applyOps, nextDecoId, nextGeometryId, opsSummary } from '../public/js/builder/ops.js?v=27c7796f';
 import { DEFAULT_GRADIENT, forkOps, forkStreet, newTsid, relayerPosition, streetKeyFrom } from '../public/js/builder/zone.js?v=6a3db28e';
 import { compileSchema } from '../public/js/builder/schema-check.js?v=cc9d1af4';
 import { DECO_TWINS } from '../public/js/street-render.js?v=b5ae0c3d';
@@ -117,7 +117,7 @@ function randomOps(zone, n, seed = 7) {
     else if (kind === 'move') ops.push({ op: 'deco.move', street: 'lane', id: deco.id, layer: pick(layers).id, at: 0, set: { x: 5, y: -5 } });
     else if (kind === 'layer') ops.push({ op: 'layer.set', street: 'lane', layer: layer.id, set: { hidden: rnd() > 0.5, filters: { blur: 2, saturation: -20 } } });
     else if (kind === 'street') ops.push({ op: 'street.set', street: 'lane', set: { label: `Lane ${i}`, gradient: { top: '102030', bottom: 'FFEEDD' } }, unset: ['musicFile'] });
-    else if (kind === 'zone') ops.push({ op: 'zone.set', set: { notes: `n${i}` } });
+    else if (kind === 'zone') ops.push({ op: 'zone.set', set: i % 2 ? { notes: `n${i}` } : { ledges: i % 4 ? 'floating' : 'grounded' } });
     else if (kind === 'asset') ops.push({ op: 'asset.set', name: 'bush_3', asset: rnd() > 0.5 ? null : { origin: 'tinyspeck-cc0', licence: 'CC0-1.0', source: 'groddle1.swf#bush_3' } });
     else if (kind === 'editor') ops.push({ op: 'editor.set', street: 'lane', editor: { camera: { x: i, y: 2, zoom: 1 }, lockedLayers: ['sky'] } });
     else if (kind === 'geo.add') {

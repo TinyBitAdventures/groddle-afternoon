@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=b77d4848';
+import { validateZone, RULES, hash16, healOps, plainApex, badWords, zoneArrivals } from '../public/js/builder/validate.js?v=f217d6fa';
 import { streetWorld, jumpArc, jumpArcs, reachStreet } from '../public/js/builder/reach-graph.js?v=0eb97168';
 import { stepAvatar, avatarGround, steerX, coastX, NORMAL_BUFF } from '../public/js/avatar-step.js?v=c04c7c76';
 import { platformsScreen } from '../public/js/street-model.js?v=23b926e5';
@@ -165,6 +165,8 @@ describe('the validator (js/builder/validate.js): one fixture per rule', () => {
     ['FX-002', (z) => { lane(z).emitters = [{ id: 'fx_1', kind: 'lava', x: lane(z).bounds.r + 400, y: -60 }]; }],
     ['FX-003', (z) => { lane(z).rumble = { every: [4, 5], duration: 3, strength: 20 }; }],
     ['FX-004', (z) => { lane(z).emitters = [{ id: 'fx_1', kind: 'steam', x: 0, y: -60, period: [2, 4], burst: 6 }]; }],
+    // A ledge 300 px over the floor, drawn as a 70 px slab with nothing under it (lane GROUNDED).
+    ['ART-001', (z) => { lane(z).platforms.push({ id: 'plat_art', x1: -40, y1: -360, x2: 360, y2: -360, pc_perm: -1 }); lane(z).layers.find((l) => l.id === 'middleground').decos.push({ id: 'd_art', sprite: 'bush_3', x: 160, y: -290, w: 400, h: 70, z: 99, r: 0 }); }],
   ];
 
   it('effects: a busy street is too heavy (PRF-001), and an effect\'s particle art needs provenance (AST-002)', () => {
@@ -251,5 +253,60 @@ describe('calibration (tools/builder/calibration.json, spec 7.4)', () => {
     // P7: tight jumps are kept with their kind: too little height, or a landing a keyboard player often misses.
     assert.ok(cal.findings.filter((f) => f.rule === 'PHY-006').every((f) => ['height', 'landing'].includes(f.data.kind)));
     assert.ok(cal.findings.every((f) => ['reaches', 'also'].includes(f.data.jump2012)));
+  });
+});
+
+describe('ART-001: art that floats (js/builder/ground.js, lane GROUNDED)', () => {
+  /** A street with a floor (its strip of art past the bottom edge), a low ledge 180 px up and a high one 740 px up, art on each. */
+  const street = () => ({
+    tsid: 'GZTEST000000002', label: 'Ground Test', bounds: { l: -1000, r: 1000, t: -1000, b: 0 },
+    platforms: [
+      { id: 'plat_1', x1: -990, y1: -60, x2: 990, y2: -60, pc_perm: -1 },
+      { id: 'plat_2', x1: -200, y1: -240, x2: 200, y2: -240, pc_perm: -1 },
+      { id: 'plat_3', x1: 300, y1: -800, x2: 700, y2: -800, pc_perm: -1 },
+    ],
+    layers: [{ id: 'middleground', name: 'middleground', z: 0, decos: [
+      { id: 'd_1', sprite: 'gz_floor', x: -500, y: 40, w: 1000, h: 100, z: 1, r: 0 },
+      { id: 'd_2', sprite: 'gz_floor', x: 500, y: 40, w: 1000, h: 100, z: 1, r: 0 },
+      { id: 'd_3', sprite: 'gz_ledge', x: 0, y: -140, w: 420, h: 102, z: 2, r: 0 },
+      { id: 'd_4', sprite: 'gz_ledge', x: 500, y: -700, w: 420, h: 102, z: 2, r: 0 },
+    ] }],
+    signposts: [], ladders: [], emitters: [],
+  });
+  const rock = { id: 'd_5', sprite: 'gz_rock', x: 0, y: -40, w: 300, h: 120, z: 0, r: 0 };
+
+  it('a low ledge with open space under it floats; the floor past the bottom edge does not; a high one may float', async () => {
+    const { floatingLines, FLOAT_REACH, FLOAT_OPEN } = await import('../public/js/builder/ground.js?v=6e2ebe6b');
+    assert.equal(FLOAT_REACH, 450);
+    assert.equal(FLOAT_OPEN, 24);
+    const f = floatingLines(street());
+    assert.deepEqual(f.map((x) => x.id), ['plat_2'], 'plat_3 is 740 px over the floor: high, left alone');
+    assert.equal(f[0].gap, 180);
+    assert.equal(f[0].open, 80, "from the art's underside at -140 down to the floor at -60");
+    const held = street();
+    held.layers[0].decos.push(rock);
+    assert.deepEqual(floatingLines(held), [], 'a rock under it: grounded');
+    const short = street();
+    short.layers[0].decos.push(rock);
+    for (const d of short.layers[0].decos.slice(0, 2)) Object.assign(d, { y: -30, h: 30 });
+    const fl = floatingLines(short);
+    assert.deepEqual(fl.map((x) => [x.id, x.floor, x.open]), [['plat_1', true, 30]], 'the floor strip stops 30 px above the bottom edge');
+  });
+
+  it('the validator says so (warn, at the line, in screen space), unless the zone floats on purpose', () => {
+    const zone = structuredClone(base);
+    const s = street();
+    Object.assign(zone.streets[0].street, { bounds: s.bounds, platforms: s.platforms, signposts: [], ladders: [], emitters: [], layers: zone.streets[0].street.layers.map((l) => (l.id === 'middleground' ? { ...l, decos: s.layers[0].decos } : l)) });
+    const only = { ...ctx, rules: ['ART-'] };
+    const fs = validateZone(zone, only).findings;
+    assert.deepEqual(fs.map((f) => f.at), [`${zone.streets[0].key}/plat_2`]);
+    const [f] = fs;
+    assert.equal(f.severity, 'warn');
+    assert.equal(RULES['ART-001'][1], 'Floats');
+    assert.match(f.message, /Ledge plat_2 floats: 80 px of open space under its art, 180 px above the surface below/);
+    assert.match(f.fix, /cli\.mjs ground --street \S+ --support/);
+    assert.deepEqual(f.where, { x: 1000, y: 860, space: 'screen' });
+    zone.ledges = 'floating';
+    assert.deepEqual(validateZone(zone, only).findings, [], 'a zone that set "ledges": "floating" gets none');
   });
 });

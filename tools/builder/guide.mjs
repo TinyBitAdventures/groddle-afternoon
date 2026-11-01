@@ -8,9 +8,10 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { GAME_DIR } from '../repos.mjs';
 import { GRAVITY, JUMP_SPEED, WALK_MAX, FLOOR_ACCEL, AIR_ACCEL_RATIO, STREET_PHYSICS_TERMINAL_VY, AVATAR_BODY_H, GROUND_SNAP, NORMAL_BUFF } from '../../public/js/avatar-step.js?v=c04c7c76';
-import { RULES, LIMITS, MIN_VIEW, PARALLAX_VIEW, LICENCES, plainApex } from '../../public/js/builder/validate.js?v=b77d4848';
+import { FLOAT_REACH, FLOAT_OPEN, FLOOR_SKIRT } from '../../public/js/builder/ground.js?v=6e2ebe6b';
+import { RULES, LIMITS, MIN_VIEW, PARALLAX_VIEW, LICENCES, plainApex } from '../../public/js/builder/validate.js?v=f217d6fa';
 import { REACH_LIMITS, POST_REACH_X, POST_BELOW, DOOR_REACH_X, TIGHT_MARGIN, LANDING_TRIES, AIR_JUMP_TRIES, LANDING_SHARE, streetWorld, jumpArc } from '../../public/js/builder/reach-graph.js?v=0eb97168';
-import { OP_NAMES } from '../../public/js/builder/ops.js?v=acf30407';
+import { OP_NAMES } from '../../public/js/builder/ops.js?v=27c7796f';
 import { LAYER_ROLES } from '../../public/js/builder/layer-role.js?v=e585f610';
 import { POPULATION_CLASSES } from '../../public/js/builder/zone.js?v=6a3db28e';
 import { SCOPES, RATES, RENDER } from './limits.mjs';
@@ -94,6 +95,12 @@ export function builderGuide() {
       limits: EFFECT_LIMITS,
       cli: ['effect --street k --kind steam --x 0 --y -60', 'set <street>/fx_1 rate=4 period=[5,9]', 'rm <street>/fx_1', 'rumble --street k --every 14,30 --duration 1.6 --strength 6', 'effects --street k'],
       ops: 'emitter.add {street, emitter: {kind, layer, x, y, ...}}, emitter.set {street, id, set}, emitter.remove {street, id}; street.set {street, set: {rumble}}',
+    },
+    ground: {
+      what: "Standing a street on the ground (lane GROUNDED): the floor's art runs past the street's bottom edge, a low ledge (the surface below within `reach` px) stands on something, a high one sits against a wall or floats (the zone's choice). ART-001 warns about a low ledge whose art has more than `open` px of open space under it, unless the zone's ledges are floating.",
+      reach: FLOAT_REACH, open: FLOAT_OPEN, floorSkirt: FLOOR_SKIRT,
+      cli: ['ground --street k --support gz_y [--floor gz_x] [--wall gz_z] [--dry-run]', 'ground --ledges floating'],
+      names: 'its decos are named ground:floor, ground:support, ground:wall; a second run replaces them',
     },
     population: POPULATION_CLASSES,
     rules: Object.entries(RULES).map(([id, [severity, title]]) => ({ id, severity, title })),

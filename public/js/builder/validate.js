@@ -35,7 +35,8 @@ import { JUMP_SPEED } from '../avatar-step.js?v=c04c7c76';
 import { STY_RULES, styleFindings } from './style-rules.js?v=abf9bfae';
 import { EFFECT_LIMITS, effectsCost, normaliseEmitter, rumbleShare, emitterAnchor } from '../street-effects.js?v=e427650f';
 import { LICENCE_POLICY, provenanceProblems } from './new-art.js?v=29f0b13e';
-import { postOffFloor, offFloorWords } from './posts.js?v=ebcf627c';
+import { postOffFloor, offFloorWords } from './posts.js?v=3db41b1f';
+import { floatingLines, FLOAT_REACH, FLOAT_OPEN } from './ground.js?v=6e2ebe6b';
 
 export const RULES = Object.freeze({
   'SCH-001': ['fatal', 'Zone does not fit the schema'],
@@ -77,6 +78,8 @@ export const RULES = Object.freeze({
   'FX-002': ['warn', 'Effect off its layer'],
   'FX-003': ['warn', 'Rumble too often or too strong'],
   'FX-004': ['info', 'Burst trimmed to its period'],
+  // Art that stands on the ground (js/builder/ground.js, lane GROUNDED).
+  'ART-001': ['warn', 'Floats'],
   // P5's style rules (js/builder/style-rules.js), run here with the rest.
   ...Object.fromEntries(STY_RULES.map((r) => [r.id, [r.severity, r.title]])),
 });
@@ -706,6 +709,24 @@ export function validateZone(zone, ctx = {}) {
   if (zone.hub) {
     const bad = badWords(zone.hub.name);
     if (bad.length) add('TXT-001', null, 'hub', `The hub name "${zone.hub.name}" uses ${bad.join(' and ')}.`, null, { words: bad }, 'Reword it.');
+  }
+
+  // ART-001: a walkable line whose art has open space under it, down to the surface below
+  // (js/builder/ground.js floatingLines), in a zone that has not chosen floating ledges.
+  if (want('ART-001') && zone.ledges !== 'floating') {
+    for (const row of streets) {
+      const st = row?.street;
+      if (!st?.bounds || !Array.isArray(st.platforms) || !Array.isArray(st.layers)) continue;
+      for (const f of floatingLines(st)) {
+        const where = { ...worldToScreen(st, f.x, f.y), space: 'screen' };
+        const data = { gap: f.gap, open: f.open, share: f.share, floor: f.floor, surface: f.surface, reach: FLOAT_REACH, allowed: FLOAT_OPEN };
+        if (f.floor && f.surface === st.bounds.b) {
+          add('ART-001', row.key, f.id, `The floor's art on ${f.id} stops ${f.open} px above the street's bottom edge: what is behind shows under it, so the street looks like it floats.`, where, data, `Run: node tools/builder/cli.mjs ground --street ${row.key} (it runs the floor's art past the bottom edge; --floor <sprite> lays a ground piece instead).`, `${f.gap}|${f.open}`);
+        } else {
+          add('ART-001', row.key, f.id, `Ledge ${f.id} floats: ${f.open} px of open space under its art, ${f.gap} px above the surface below, with nothing standing under it.`, where, data, `Stand it on something: node tools/builder/cli.mjs ground --street ${row.key} --support <sprite>. If this place floats on purpose, set the zone's ledges to floating (cli.mjs ground --ledges floating).`, `${f.gap}|${f.open}`);
+        }
+      }
+    }
   }
 
   // STY-001..005 (spec 7.3, 9.2): P5's style rules, one draft street at a time.
