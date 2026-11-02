@@ -192,7 +192,7 @@ describe('the style rules (js/builder/style-rules.js)', () => {
     }
     assert.ok((counts['STY-001'] || 0) <= 10, `STY-001 ${counts['STY-001']}`);
     assert.equal(counts['STY-005'] || 0, 0);
-    assert.equal(counts['STY-004'], 196, 'the shipped streets with no gradient (spec 14.1)');
+    assert.equal(counts['STY-004'], 11, 'the shipped streets with no gradient (spec 14.1; 196 until gradients without leading zeros were read, ticket 39)');
   });
 });
 
