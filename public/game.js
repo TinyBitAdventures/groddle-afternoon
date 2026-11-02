@@ -2040,6 +2040,8 @@ let vendorSelected = null;
 let vendorQty = 1;
 /** @type {string|null} pack item currently being dragged toward the vendor */
 let vendorDragTsid = null;
+/** The tool copy being dragged to the vendor (ticket 43), else null. */
+let vendorDragCopy = null;
 /** @type {null|{ label:string, qty:number, gain:number }} */
 let vendorSellReceipt = null;
 let vendorReceiptTimer = 0;
@@ -4483,7 +4485,10 @@ function renderPackRow(box, slots, opts = {}) {
     if (toolCondition?.tracked && s.copy != null) slot.dataset.packCopy = String(s.copy);
     slot.dataset.packName = shownLabel;
     if (s.inBag) slot.dataset.packInBag = s.inBag.label;
-    const canDragToVendor = !(s.isTool || opts.toolRow);
+    // Ticket 43: a tool drags onto an open vendor too (any vendor bought tools, tool_base.js getBaseCost);
+    // onto another player it stays put, as before (giving one is the Give window's).
+    const toolSlot = Boolean(s.isTool || opts.toolRow);
+    const canDragToVendor = true;
     // G152: a slot from the pack layout knows where it sits, so it can be dragged between the pack and a bag.
     const inLayout = s.container != null;
     if (inLayout) {
@@ -4499,7 +4504,8 @@ function renderPackRow(box, slots, opts = {}) {
       slot.setAttribute('aria-label', `${s.bag.label || shownLabel}, ${s.bag.used} of ${s.bag.capacity} slots used, ${s.bag.open ? 'open' : 'closed'}`);
       slot.setAttribute('aria-controls', 'pack-bag');
     }
-    slot.draggable = canDragToVendor || inLayout;
+    // Every slot drags; dragstart cancels a drag with nowhere to go (a tool with no vendor open).
+    slot.draggable = true;
     if (s.icon) {
       const img = document.createElement('img');
       const brokenToolIcons = {
@@ -4590,7 +4596,7 @@ function renderPackRow(box, slots, opts = {}) {
         packDrag = inLayout ? { container: s.container, index: s.index, cls: s.classTsid, bag: s.bag?.key || '' } : null;
         if (!isVendorOpen() || !canDragToVendor) {
           // G332: drag a pack item onto another player to give it (features/gifts-feature.js).
-          if (canDragToVendor && !s.bag && features.query('packDragStart', s.classTsid, event, engine)) return;
+          if (!toolSlot && !s.bag && features.query('packDragStart', s.classTsid, event, engine)) return;
           if (inLayout) {
             // G152: between the pack and a bag (PackContainerView.as startDraggingAPISView).
             closePackPopover();
@@ -4607,6 +4613,7 @@ function renderPackRow(box, slots, opts = {}) {
         }
         closePackPopover();
         vendorDragTsid = s.classTsid;
+        vendorDragCopy = toolSlot && s.copy != null ? s.copy : null;
         vendorSellReceipt = null;
         vendorTab = 'sell';
         vendorSelected = null;
@@ -28611,8 +28618,11 @@ async function main() {
       event.dataTransfer?.getData('application/x-groddle-item') ||
       event.dataTransfer?.getData('text/plain') ||
       vendorDragTsid;
+    const copy = classTsid === vendorDragTsid ? vendorDragCopy : null;
     vendorDragTsid = null;
-    if (classTsid) stageVendorSell(classTsid);
+    vendorDragCopy = null;
+    // A dragged tool sells the copy that was dragged (stageVendorSell's chosen copy).
+    if (classTsid) stageVendorSell(classTsid, copy);
   });
 
   document.getElementById('garden-close')?.addEventListener('click', closeGardenPanel);

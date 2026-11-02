@@ -158,6 +158,14 @@ describe('vendors buy tools (inc_stores.js storeSell)', () => {
     assert.deepEqual([quote.ok, quote.qty, quote.maxQty, quote.unitPrice], [true, 1, 1, 66]);
   });
 
+  it('a tool drags onto an open vendor, the dragged copy staged; it still never drags onto a player (ticket 43)', () => {
+    const game = read('game.js');
+    assert.match(game, /const toolSlot = Boolean\(s\.isTool \|\| opts\.toolRow\);\n\s*const canDragToVendor = true;/);
+    assert.match(game, /if \(!toolSlot && !s\.bag && features\.query\('packDragStart', s\.classTsid, event, engine\)\) return;/);
+    assert.match(game, /vendorDragCopy = toolSlot && s\.copy != null \? s\.copy : null;/);
+    assert.match(game, /if \(classTsid\) stageVendorSell\(classTsid, copy\);/);
+  });
+
   it('sells one copy, the worn one, through the caller\'s last step', () => {
     const { inv, state } = kit();
     const pc = { currants: 0 };
